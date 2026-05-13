@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/domain.css' %}">
+{% endblock %}
+{% block title %}{{ page_title }}{% endblock %}
+{% block content %}
+  <div class="app-page">
+    <div class="app-page__shell">
+      <header class="app-page-hero app-page__header app-page-hero--hybrid app-page__header--hybrid app-page-hero--compact" aria-labelledby="roteiros-detail-title">
+        <div class="app-page-hero__stage">
+          <span class="app-page-hero__eyebrow">Roteiros</span>
+          <h1 class="app-page-hero__title" id="roteiros-detail-title">{{ page_title }}</h1>
+        </div>
+        <div class="app-page-hero__body">
+          <div class="app-page__hero-top">
+            <div class="app-page__brand">
+              <div class="app-page__brand-mark" aria-hidden="true">RT</div>
+              <div class="app-page__brand-copy">
+                <p class="app-page__subtitle">{{ page_description }}</p>
+              </div>
+            </div>
+            <div class="app-page__hero-actions">
+              {% include "components/buttons/action_button.html" with href=edit_url label="Editar" variant="primary" only %}
+              {% include "components/buttons/action_button.html" with href=delete_url label="Excluir" variant="danger" only %}
+            </div>
+          </div>
+        </div>
+        <div class="app-page-hero__ribbon" aria-hidden="true"></div>
+      </header>
+
+      <section class="app-page__form-card roteiro-detail">
+        <div class="form-section app-form-section">
+          {% include "components/forms/form_section.html" with title="Sede e resumo" description="Dados persistidos conforme o fluxo anterior (sedes, trechos e diárias)." only %}
+          {% include "components/domain/resumo_rota.html" with roteiro=roteiro trechos=trechos %}
+        </div>
+
+        <div class="form-section app-form-section">
+          {% include "components/forms/form_section.html" with title="Destinos (ordem)" only %}
+          {% if destinos_detalhe %}
+            <ol class="roteiro-sequencia">
+              {% for d in destinos_detalhe %}
+                <li>{{ d.ordem }}. {{ d.label }}</li>
+              {% endfor %}
+            </ol>
+          {% else %}
+            <p class="text-muted">Nenhum destino cadastrado.</p>
+          {% endif %}
+        </div>
+
+        <div class="form-section app-form-section">
+          {% include "components/forms/form_section.html" with title="Trechos" only %}
+          {% if trechos %}
+            <div class="roteiro-sequencia" role="list">
+              {% for trecho in trechos %}
+                {% include "components/domain/trecho_card.html" with trecho=trecho %}
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="empty-state roteiro-detail__empty">
+              <p>Nenhum trecho persistido.</p>
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="form-actions">
+          {% include "components/buttons/action_button.html" with href=back_url label="Voltar" variant="secondary" only %}
+        </div>
+      </section>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,36 @@
+<article class="oficio-card app-card">
+  <header class="oficio-card__header">
+    <div class="oficio-card__identity">
+      <span class="oficio-card__number-label">{{ card.number_label }}:</span>
+      <strong class="oficio-card__number">{{ card.number }}</strong>
+    </div>
+    <div class="oficio-card__status-row">
+      <span class="status-chip {{ card.status_class }}">{{ card.status }}</span>
+      {% if card.finalizacao_assinatura_badge %}
+        <span class="status-chip {{ card.finalizacao_assinatura_badge_class }}">{{ card.finalizacao_assinatura_badge }}</span>
+      {% endif %}
+    </div>
+  </header>
+
+  <div class="oficio-card__body">
+    <h2 class="oficio-card__title">{{ card.title }}</h2>
+    <p class="oficio-card__subtitle">{{ card.subtitle }}</p>
+  </div>
+
+  <dl class="oficio-card__meta">
+    {% for item in card.meta %}
+      <div>
+        <dt>{{ item.label }}</dt>
+        <dd>{{ item.value }}</dd>
+      </div>
+    {% endfor %}
+  </dl>
+
+  {% if card.actions %}
+    <div class="oficio-card__actions">
+      {% for action in card.actions %}
+        {% include "components/buttons/action_button.html" with href=action.href label=action.label variant=action.variant method=action.method confirm=action.confirm link_target=action.link_target|default:'' link_rel=action.link_rel|default:'' only %}
+      {% endfor %}
+    </div>
+  {% endif %}
+</article>

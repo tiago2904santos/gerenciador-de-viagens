@@ -1,0 +1,4 @@
+-r base.txt
+
+docx2pdf>=0.1.8,<0.2
+pywin32>=306,<308; platform_system == "Windows"

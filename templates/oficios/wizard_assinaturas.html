@@ -1,0 +1,215 @@
+﻿{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260512">
+  <link rel="stylesheet" href="{% static 'css/oficios-documentos-inline.css' %}?v=20260512">
+  <link rel="stylesheet" href="{% static 'css/oficios-assinaturas-central.css' %}?v=20260512">
+{% endblock %}
+
+{% block content %}
+  <div class="app-page oficio-wizard app-wizard">
+    <section class="oficio-wizard__section">
+      <div class="app-page__shell oficio-wizard__shell">
+        <section class="oficio-wizard__top app-wizard__top" aria-labelledby="oficios-wizard-title">
+          <header class="oficio-wizard__header app-wizard__header">
+            <div class="oficio-wizard__header-copy app-wizard__header-copy">
+              <h1 class="oficio-wizard__title app-wizard__title" id="oficios-wizard-title">{{ wizard_header.title }}</h1>
+              <p class="oficio-wizard__subtitle app-wizard__subtitle">{{ wizard_header.subtitle }}</p>
+            </div>
+            <div class="app-page__brand-mark" aria-hidden="true">OF</div>
+          </header>
+          {% include "oficios/partials/wizard_stepper.html" with steps=wizard_steps only %}
+        </section>
+
+        <div class="oficio-wizard__layout app-wizard__layout">
+          <main class="oficio-wizard__main">
+            <div class="app-form-shell app-form-shell--oficio form-shell">
+
+              <header class="assinaturas-center-hero">
+                <h2>Central de assinaturas</h2>
+                <p>
+                  Ofício {{ oficio.numero_formatado }} — confira os documentos no estado atual e gere solicitações de assinatura quando necessário.
+                </p>
+              </header>
+
+              <section class="assinaturas-center-kpis" aria-label="Resumo">
+                <div class="assinaturas-kpi-card">
+                  <p class="assinaturas-kpi-card__label">Documentos</p>
+                  <p class="assinaturas-kpi-card__value">{{ assinaturas_kpis.documentos }}</p>
+                </div>
+                <div class="assinaturas-kpi-card">
+                  <p class="assinaturas-kpi-card__label">Destinatários</p>
+                  <p class="assinaturas-kpi-card__value">{{ assinaturas_kpis.destinatarios }}</p>
+                </div>
+                <div class="assinaturas-kpi-card">
+                  <p class="assinaturas-kpi-card__label">Assinados</p>
+                  <p class="assinaturas-kpi-card__value">{{ assinaturas_kpis.assinados }}</p>
+                </div>
+                <div class="assinaturas-kpi-card">
+                  <p class="assinaturas-kpi-card__label">Pendentes</p>
+                  <p class="assinaturas-kpi-card__value">{{ assinaturas_kpis.pendentes }}</p>
+                </div>
+              </section>
+
+              <section class="assinaturas-document-stack" aria-label="Documentos">
+                {% for documento in documentos_assinatura %}
+                  <article class="assinaturas-document-card">
+                    <header class="assinaturas-document-card__header">
+                      <div>
+                        <p class="assinaturas-document-card__eyebrow">{{ documento.tipo_label }}</p>
+                        <h3>{{ documento.titulo }}</h3>
+                        <p>{{ documento.descricao }}</p>
+                      </div>
+                      <div class="assinaturas-document-card__status-area">
+                        <span class="assinaturas-status-badge assinaturas-status-badge--{{ documento.status_key }}">{{ documento.status_label }}</span>
+                        {% if documento.pode_gerar_solicitacao %}
+                          <form method="post" action="{{ documento.gerar_solicitacao_url }}">
+                            {% csrf_token %}
+                            <input type="hidden" name="gerar_solicitacao" value="1">
+                            <input type="hidden" name="artefato_id" value="{{ documento.artefato.pk }}">
+                            <button type="submit" class="btn btn-primary app-btn app-btn--primary">Gerar solicitação</button>
+                          </form>
+                        {% endif %}
+                      </div>
+                    </header>
+
+                    {% if documento.erro %}
+                      <p class="doc-muted" style="padding: 0 1.15rem;">{{ documento.erro }}</p>
+                    {% endif %}
+
+                    {% if documento.link_pedido_assinatura %}
+                      <section class="assinaturas-link-pedido" aria-labelledby="link-pedido-titulo-{{ documento.key }}">
+                        <h4 class="assinaturas-link-pedido__title" id="link-pedido-titulo-{{ documento.key }}">Link para o assinante</h4>
+                        <p class="assinaturas-link-pedido__hint doc-muted">
+                          Copie o endereço abaixo e envie manualmente ao assinante.
+                        </p>
+                        <div class="assinaturas-link-pedido__row">
+                          <input
+                            type="text"
+                            readonly
+                            class="assinaturas-link-pedido__input"
+                            value="{{ documento.link_pedido_assinatura }}"
+                            aria-label="URL público de assinatura"
+                          >
+                          <div class="assinaturas-link-pedido__actions">
+                            <button
+                              type="button"
+                              class="btn btn-secondary app-btn app-btn--secondary assinatura-hash-copy"
+                              data-copy-value="{{ documento.link_pedido_assinatura }}"
+                              data-copy-done="Link copiado"
+                            >Copiar link</button>
+                          </div>
+                        </div>
+                      </section>
+                    {% endif %}
+
+                    {% if documento.disponivel %}
+                      <div class="assinaturas-document-card__meta">
+                        <span><strong>Última atualização:</strong> {% if documento.atualizado_em %}{{ documento.atualizado_em|date:"d/m/Y H:i" }}{% else %}—{% endif %}</span>
+                        <span><strong>Destinatários (solicitações):</strong> {{ documento.n_destinatarios }}</span>
+                        <span><strong>Estado do ficheiro:</strong> {% if documento.ja_assinado %}PDF assinado disponível{% else %}PDF original (sem assinatura){% endif %}</span>
+                      </div>
+
+                      <div class="assinaturas-document-card__hashes">
+                        <div class="assinatura-hash-grid">
+                          <div class="assinatura-hash-box">
+                            <p class="assinatura-hash-box__label">Hash original</p>
+                            <p class="assinatura-hash-box__value">{{ documento.hash_original }}</p>
+                            <div class="assinatura-hash-box__actions">
+                              <button type="button" class="btn btn-secondary app-btn app-btn--secondary assinatura-hash-copy" data-copy-value="{{ documento.hash_original }}">Copiar</button>
+                            </div>
+                          </div>
+                          <div class="assinatura-hash-box">
+                            <p class="assinatura-hash-box__label">Hash assinado</p>
+                            {% if documento.hash_assinado_placeholder %}
+                              <p class="assinatura-hash-box__placeholder">Ainda não gerado</p>
+                            {% else %}
+                              <p class="assinatura-hash-box__value">{{ documento.hash_assinado_exibicao }}</p>
+                              <div class="assinatura-hash-box__actions">
+                                <button type="button" class="btn btn-secondary app-btn app-btn--secondary assinatura-hash-copy" data-copy-value="{{ documento.hash_assinado_exibicao }}">Copiar</button>
+                              </div>
+                            {% endif %}
+                          </div>
+                        </div>
+                      </div>
+
+                      <details class="document-inline-card document-inline-card--lazy assinaturas-document-card__preview" data-lazy-inline>
+                        <summary class="document-inline-card__header">
+                          <span class="document-inline-card__title">Pré-visualização do PDF</span>
+                          <span class="assinaturas-document-card__preview-hint doc-muted">Clique para mostrar ou ocultar — {{ documento.pdf_versao_label }}</span>
+                        </summary>
+                        <div class="document-inline-card__body">
+                          <div class="document-inline-viewer">
+                            <iframe
+                              class="document-inline-viewer__frame"
+                              data-src="{{ documento.pdf_estado_atual_url }}"
+                              title="PDF — {{ documento.titulo }}"
+                              loading="lazy"
+                            ></iframe>
+                          </div>
+                        </div>
+                      </details>
+                    {% endif %}
+
+                    <section class="assinaturas-document-card__destinatarios">
+                      <h4>Destinatários e solicitações</h4>
+                      {% if documento.destinatarios %}
+                        <div class="assinatura-destinatarios">
+                          {% for d in documento.destinatarios %}
+                            <article class="assinatura-destinatario-card">
+                              <div class="assinatura-destinatario-avatar" aria-hidden="true">{{ d.iniciais }}</div>
+                              <div class="assinatura-destinatario-col">
+                                <div class="assinatura-destinatario-main">
+                                  <strong>{{ d.nome }}</strong>
+                                  <div class="muted">CPF: {{ d.cpf_mascarado }}{% if d.cargo and d.cargo != "—" %} · {{ d.cargo }}{% endif %}</div>
+                                  <div class="assinatura-destinatario-status assinatura-destinatario-status--{{ d.status_key }}">{{ d.status_label }}</div>
+                                </div>
+                                <dl class="assinatura-destinatario-timeline">
+                                  <div>
+                                    <dt>Envio</dt>
+                                    <dd>{{ d.enviado_em|date:"d/m/Y H:i" }}</dd>
+                                  </div>
+                                  <div>
+                                    <dt>Visualização</dt>
+                                    <dd>{% if d.visualizado_em %}{{ d.visualizado_em|date:"d/m/Y H:i" }}{% else %}—{% endif %}</dd>
+                                  </div>
+                                  <div>
+                                    <dt>Assinatura</dt>
+                                    <dd>{% if d.assinado_em %}{{ d.assinado_em|date:"d/m/Y H:i" }}{% else %}—{% endif %}</dd>
+                                  </div>
+                                  <div>
+                                    <dt>Expiração</dt>
+                                    <dd>{{ d.expiracao|date:"d/m/Y H:i" }}</dd>
+                                  </div>
+                                </dl>
+                              </div>
+                            </article>
+                          {% endfor %}
+                        </div>
+                      {% else %}
+                        <p class="doc-muted">Nenhuma solicitação registada para este documento.</p>
+                      {% endif %}
+                    </section>
+                  </article>
+                {% endfor %}
+              </section>
+
+              <div class="assinaturas-wizard-footer form-actions app-form-actions">
+                <a class="btn btn-secondary app-btn app-btn--secondary" href="{% url 'oficios:wizard_documentos' oficio.pk %}">Voltar para documentos</a>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </section>
+  </div>
+{% endblock %}
+
+{% block extra_js %}
+  {{ block.super }}
+  <script src="{% static 'js/pages/oficios-documentos-inline.js' %}?v=20260512" defer></script>
+  <script src="{% static 'js/pages/assinaturas-central.js' %}?v=20260512" defer></script>
+{% endblock %}

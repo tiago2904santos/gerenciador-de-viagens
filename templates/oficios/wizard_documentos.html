@@ -1,0 +1,533 @@
+{% extends "oficios/wizard_base.html" %}
+{% load static %}
+
+{% block extra_css %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'css/oficios-documentos-inline.css' %}?v=20260512">
+{% endblock %}
+
+{% block wizard_content %}
+  {% if mostrar_pendencias %}
+    <section class="oficio-documentos-pendencias oficio-documentos-pendencias--alert" aria-live="polite">
+      <div class="oficio-documentos-pendencias__inner">
+        <span class="oficio-documentos-pendencias__marker" aria-hidden="true"></span>
+        <div class="oficio-documentos-pendencias__body">
+          <h3 class="oficio-documentos-pendencias__title">Pendências encontradas</h3>
+          <p class="oficio-documentos-pendencias__lead">
+            Corrija os itens abaixo antes de finalizar o ofício ou gerar DOCX/PDF.
+          </p>
+          <ul class="oficio-documentos-pendencias__items">
+            {% for p in pendencias_documentos %}
+              <li>{{ p }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </section>
+  {% endif %}
+
+  <section class="document-inline-stack" aria-labelledby="documentos-conferencia-title">
+    <h2 class="document-inline-stack__heading" id="documentos-conferencia-title">Documentos para conferência</h2>
+
+    {% with di=documentos_ctx.documentos_inline %}
+      <details class="document-inline-card" open>
+        <summary class="document-inline-card__header">
+          <span class="document-inline-card__title">{{ di.oficio.titulo }}</span>
+          {% if di.oficio.disponivel %}
+            <span class="document-inline-card__header-end">
+              <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do documento">
+                <a class="btn btn-secondary app-btn app-btn--secondary document-inline-actions__btn" href="{{ di.oficio.url }}" target="_blank" rel="noopener noreferrer">Abrir em nova aba</a>
+                <a class="btn btn-secondary app-btn app-btn--secondary document-inline-actions__btn" href="{% url 'oficios:baixar_documento' oficio.pk 'pdf' %}">Baixar PDF</a>
+              </span>
+            </span>
+          {% endif %}
+        </summary>
+        <div class="document-inline-card__body">
+          {% if di.oficio.disponivel %}
+            <div class="document-inline-viewer">
+              <iframe
+                class="document-inline-viewer__frame"
+                src="{{ di.oficio.url }}"
+                title="Visualização do ofício em PDF"
+                loading="lazy"
+              ></iframe>
+            </div>
+          {% else %}
+            <p class="document-inline-empty">{{ di.oficio.mensagem }}</p>
+          {% endif %}
+        </div>
+      </details>
+
+      <details class="document-inline-card document-inline-card--lazy" data-lazy-inline>
+        <summary class="document-inline-card__header">
+          <span class="document-inline-card__title">{{ di.justificativa.titulo }}</span>
+          {% if di.justificativa.disponivel %}
+            <span class="document-inline-card__header-end">
+              <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do documento">
+                <a class="btn btn-secondary app-btn app-btn--secondary document-inline-actions__btn" href="{{ di.justificativa.url }}" target="_blank" rel="noopener noreferrer">Abrir em nova aba</a>
+                <a class="btn btn-secondary app-btn app-btn--secondary document-inline-actions__btn" href="{% url 'oficios:baixar_justificativa_documento' oficio.pk 'pdf' %}">Baixar PDF</a>
+              </span>
+            </span>
+          {% endif %}
+        </summary>
+        <div class="document-inline-card__body">
+          {% if di.justificativa.disponivel %}
+            <div class="document-inline-viewer">
+              <iframe
+                class="document-inline-viewer__frame"
+                data-src="{{ di.justificativa.url }}"
+                title="Visualização da justificativa em PDF"
+                loading="lazy"
+              ></iframe>
+            </div>
+          {% else %}
+            <p class="document-inline-empty">{{ di.justificativa.mensagem }}</p>
+          {% endif %}
+        </div>
+      </details>
+
+      <details class="document-inline-card document-inline-card--termos">
+        <summary class="document-inline-card__header">
+          <span class="document-inline-card__title">Termos de Autorização</span>
+        </summary>
+        <div class="document-inline-card__body document-inline-card__body--termos">
+          {% if di.termos_vazio %}
+            <p class="document-inline-empty">{{ di.termos_empty_message }}</p>
+          {% else %}
+            {% for t in di.termos %}
+              <details class="document-inline-card document-inline-card--nested document-inline-card--lazy" data-lazy-inline>
+                <summary class="document-inline-card__header">
+                  <span class="document-inline-card__title">{{ t.titulo }}</span>
+                  {% if t.disponivel %}
+                    <span class="document-inline-card__header-end">
+                      <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do termo">
+                        <a class="btn btn-secondary app-btn app-btn--secondary document-inline-actions__btn" href="{{ t.inline_url }}" target="_blank" rel="noopener noreferrer">Abrir em nova aba</a>
+                        <a class="btn btn-secondary app-btn app-btn--secondary document-inline-actions__btn" href="{{ t.download_pdf_url }}">Baixar PDF</a>
+                        <a class="btn btn-secondary app-btn app-btn--secondary document-inline-actions__btn" href="{{ t.download_docx_url }}">Baixar DOCX</a>
+                      </span>
+                    </span>
+                  {% endif %}
+                </summary>
+                <div class="document-inline-card__body">
+                  {% if t.disponivel %}
+                    <div class="document-inline-viewer">
+                      <iframe
+                        class="document-inline-viewer__frame"
+                        data-src="{{ t.inline_url }}"
+                        title="Termo de autorização — {{ t.servidor_nome }}"
+                        loading="lazy"
+                      ></iframe>
+                    </div>
+                  {% else %}
+                    <p class="document-inline-empty">{{ di.mensagem_indisponivel }}</p>
+                  {% endif %}
+                </div>
+              </details>
+            {% endfor %}
+          {% endif %}
+        </div>
+      </details>
+    {% endwith %}
+  </section>
+
+  <div class="oficio-documentos-grid">
+    <article class="oficio-documentos-card oficio-documentos-card--admin">
+      <header class="oficio-documentos-card__header">
+        <div>
+          <h4 class="oficio-documentos-card__title">Dados administrativos</h4>
+          <p class="oficio-documentos-card__subtitle">Identificação e custeio</p>
+        </div>
+        <div
+          class="oficio-documentos-summary__status {% if mostrar_pendencias %}oficio-documentos-summary__status--warning{% else %}oficio-documentos-summary__status--ok{% endif %}"
+          role="status"
+        >
+          {% if mostrar_pendencias %}
+            Pendências encontradas
+          {% else %}
+            Sem pendências
+          {% endif %}
+        </div>
+      </header>
+      <div class="oficio-documentos-card__body">
+        <dl class="oficio-documentos-facts">
+          <div class="oficio-documentos-fact">
+            <dt>Número do ofício</dt>
+            <dd>{{ documentos_ctx.detalhe.numero_formatado }}</dd>
+          </div>
+          <div class="oficio-documentos-fact">
+            <dt>Protocolo</dt>
+            <dd>{{ documentos_ctx.detalhe.protocolo }}</dd>
+          </div>
+          <div class="oficio-documentos-fact">
+            <dt>Data de criação</dt>
+            <dd>{{ documentos_ctx.detalhe.data_criacao }}</dd>
+          </div>
+          <div class="oficio-documentos-fact">
+            <dt>Custeio</dt>
+            <dd>{{ documentos_ctx.detalhe.custeio }}</dd>
+          </div>
+        </dl>
+      </div>
+    </article>
+
+    <article class="oficio-documentos-card oficio-documentos-card--travellers" aria-label="Viajantes">
+      <header class="oficio-documentos-card__header oficio-documentos-travellers__header">
+        <div class="oficio-documentos-travellers__titles">
+          <span class="oficio-documentos-card__eyebrow">Equipe</span>
+          <h4 class="oficio-documentos-card__title">Viajantes</h4>
+          <p class="oficio-documentos-card__subtitle">Servidores vinculados ao ofício</p>
+        </div>
+        <span class="oficio-documentos-count-pill" aria-label="Total de viajantes">
+          {{ documentos_ctx.viajantes_cards|length }}
+          {% if documentos_ctx.viajantes_cards|length == 1 %}viajante{% else %}viajantes{% endif %}
+        </span>
+      </header>
+      <div class="oficio-documentos-card__body">
+        {% with n=documentos_ctx.viajantes_cards|length %}
+        <div class="oficio-documentos-travellers-lines oficio-documentos-travellers-lines--n{{ n }}">
+          {% for viajante in documentos_ctx.viajantes_cards %}
+            <article class="oficio-documentos-traveller-line">
+              <div class="oficio-documentos-traveller-line__name-row">
+                <strong class="oficio-documentos-traveller-line__name">{{ viajante.nome }}</strong>
+                {% if viajante.is_motorista %}
+                  <span class="oficio-documentos-traveller-line__badge">Motorista</span>
+                {% endif %}
+              </div>
+              {% if viajante.cargo or viajante.funcao or viajante.unidade %}
+                <span class="oficio-documentos-traveller-line__cargo">
+                  {% if viajante.cargo %}{{ viajante.cargo }}{% elif viajante.funcao %}{{ viajante.funcao }}{% endif %}{% if viajante.unidade and viajante.cargo %} · {{ viajante.unidade }}{% elif viajante.unidade and viajante.funcao %} · {{ viajante.unidade }}{% elif viajante.unidade %}{{ viajante.unidade }}{% endif %}
+                </span>
+              {% endif %}
+            </article>
+          {% empty %}
+            <div class="oficio-documentos-travellers-empty">Nenhum viajante vinculado a este ofício.</div>
+          {% endfor %}
+        </div>
+        {% endwith %}
+      </div>
+    </article>
+
+    <article class="oficio-documentos-card oficio-documentos-card--vehicle" aria-label="Viatura e condução">
+      <header class="oficio-documentos-card__header oficio-documentos-vehicle__header">
+        <div class="oficio-documentos-vehicle__titles">
+          <span class="oficio-documentos-card__eyebrow">Transporte</span>
+          <h4 class="oficio-documentos-card__title">Viatura e condução</h4>
+          <p class="oficio-documentos-card__subtitle">Transporte utilizado no deslocamento</p>
+        </div>
+      </header>
+      <div class="oficio-documentos-card__body">
+        {% with t=documentos_ctx.transporte %}
+          <div class="oficio-documentos-vehicle-executive">
+            <section class="oficio-documentos-vehicle-executive__hero" aria-label="Identificação da viatura">
+              <span class="oficio-documentos-vehicle-executive__label">Viatura</span>
+              <strong class="oficio-documentos-vehicle-executive__plate">{{ t.viatura|default:t.placa }}</strong>
+              <span class="oficio-documentos-vehicle-executive__model">{{ t.modelo }}</span>
+            </section>
+            <dl class="oficio-documentos-vehicle-executive__facts" aria-label="Detalhes da viatura">
+              <div>
+                <dt>Tipo</dt>
+                <dd>{{ t.tipo_viatura|default:t.tipo }}</dd>
+              </div>
+              <div>
+                <dt>Combustível</dt>
+                <dd>{{ t.combustivel }}</dd>
+              </div>
+              <div>
+                <dt>Porte/transporte de armas</dt>
+                <dd>{{ t.porte_armas }}</dd>
+              </div>
+              <div>
+                <dt>Unidade</dt>
+                <dd>{{ t.unidade }}</dd>
+              </div>
+            </dl>
+            <section class="oficio-documentos-vehicle-executive__driver" aria-label="Motorista">
+              <span class="oficio-documentos-vehicle-executive__driver-label">Motorista</span>
+              <strong class="oficio-documentos-vehicle-executive__driver-value">{{ t.motorista }}</strong>
+            </section>
+          </div>
+        {% endwith %}
+      </div>
+    </article>
+
+    {% if documentos_ctx.roteiro_card %}
+      {% with card=documentos_ctx.roteiro_card %}
+        <article
+          class="oficio-documentos-route-card oficio-documentos-route-card--trechos-{{ card.trechos_count|default:0 }} oficio-documentos-route-card--layout-{{ card.roteiro_card_layout|default:'compact' }}"
+        >
+          <header class="oficio-documentos-route-card__head">
+            <p class="oficio-documentos-route-card__eyebrow">Roteiro e diárias</p>
+            <div class="oficio-documentos-route-card__title-row">
+              <h3 class="oficio-documentos-route-card__title">{{ card.title|default:"Roteiro" }}</h3>
+              {% if card.status_chip_label %}
+                <span class="status-chip oficio-documentos-route-card__status-chip {{ card.status_chip_class|default:'status-chip--muted' }}">{{ card.status_chip_label }}</span>
+              {% endif %}
+            </div>
+            {% if card.subtitle %}
+              <p class="oficio-documentos-route-card__subtitle">{{ card.subtitle }}</p>
+            {% endif %}
+            <p class="oficio-documentos-route-card__tagline">Trajeto, tempos e valores</p>
+          </header>
+
+              <div class="oficio-documentos-route-card__body">
+                <div class="oficio-documentos-route-card__trechos-col">
+                  {% for t in card.trechos %}
+                    <div class="oficio-documentos-route-card__trecho">
+                      <div class="oficio-documentos-route-card__trecho-rota">{{ t.rota }}</div>
+                      <div class="oficio-documentos-route-card__trecho-times">
+                        <span><span class="oficio-documentos-route-card__trecho-label">Saída:</span> {{ t.saida }}</span>
+                        <span><span class="oficio-documentos-route-card__trecho-label">Chegada:</span> {{ t.chegada }}</span>
+                      </div>
+                    </div>
+                  {% endfor %}
+
+                  {% if card.trechos_resumo %}
+                    <div class="oficio-documentos-route-card__trecho oficio-documentos-route-card__trecho-summary">
+                      <div class="oficio-documentos-route-card__trecho-summary-text">
+                        + {{ card.trechos_resumo.count }}{% if card.trechos_resumo.texto %}, {{ card.trechos_resumo.texto }}{% endif %}
+                      </div>
+                    </div>
+                  {% endif %}
+
+                </div>
+
+                <aside class="oficio-documentos-route-card__diarias-col" aria-label="Diárias">
+                  <div class="oficio-documentos-route-card__diarias-box">
+                    <span class="oficio-documentos-route-card__diarias-box-title">Diárias</span>
+
+                    {% if card.roteiro_card_layout == "diarias-dashboard" %}
+                      <div class="oficio-documentos-route-card__diarias-grid" aria-label="Resumo de diárias">
+                        <div class="oficio-documentos-route-card__diarias-main{% if card.diaria_vazio %} oficio-documentos-route-card__diarias-main--vazio{% endif %}">
+                          <span class="oficio-documentos-route-card__diarias-panel-heading">Valor total</span>
+                          <div class="oficio-documentos-route-card__diarias-main-content">
+                            {% if card.diaria_vazio %}
+                              <p class="oficio-documentos-route-card__diarias-panel-line oficio-documentos-route-card__diarias-panel-line--muted">Não calculado</p>
+                            {% elif card.diaria_moeda %}
+                              <p class="oficio-documentos-route-card__diarias-panel-line oficio-documentos-route-card__diarias-panel-line--moeda oficio-documentos-route-card__diarias-panel-line--moeda-large">{{ card.diaria_moeda }}</p>
+                            {% else %}
+                              <p class="oficio-documentos-route-card__diarias-panel-line oficio-documentos-route-card__diarias-panel-line--muted">—</p>
+                            {% endif %}
+
+                            <span class="oficio-documentos-route-card__diarias-panel-heading oficio-documentos-route-card__diarias-extenso-label">Valor por extenso</span>
+                            {% if card.diaria_extenso %}
+                              <p class="oficio-documentos-route-card__diarias-extenso">{{ card.diaria_extenso }}</p>
+                            {% else %}
+                              <p class="oficio-documentos-route-card__diarias-extenso oficio-documentos-route-card__diarias-panel-line--muted">Não informado</p>
+                            {% endif %}
+                          </div>
+                        </div>
+
+                        <div class="oficio-documentos-route-card__diarias-side">
+                          <div class="oficio-documentos-route-card__diarias-metric">
+                            <span class="oficio-documentos-route-card__diarias-panel-heading">Tipo destino</span>
+                            <div class="oficio-documentos-route-card__diarias-metric-value">
+                              {% if card.diaria_tipo_destino %}
+                                <p class="oficio-documentos-route-card__diarias-panel-line oficio-documentos-route-card__diarias-panel-line--strong">{{ card.diaria_tipo_destino }}</p>
+                              {% else %}
+                                <p class="oficio-documentos-route-card__diarias-panel-line oficio-documentos-route-card__diarias-panel-line--muted">—</p>
+                              {% endif %}
+                            </div>
+                          </div>
+
+                          <div class="oficio-documentos-route-card__diarias-metric">
+                            <span class="oficio-documentos-route-card__diarias-panel-heading">Quantidade de diárias</span>
+                            <div class="oficio-documentos-route-card__diarias-metric-value">
+                              {% if card.diaria_composicao_linhas %}
+                                <ul class="oficio-documentos-route-card__diarias-composicao-list">
+                                  {% for linha in card.diaria_composicao_linhas %}
+                                    <li>{{ linha }}</li>
+                                  {% endfor %}
+                                </ul>
+                              {% else %}
+                                <p class="oficio-documentos-route-card__diarias-panel-line oficio-documentos-route-card__diarias-panel-line--muted">—</p>
+                              {% endif %}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    {% else %}
+                      <div class="oficio-documentos-route-card__diarias-box-panels">
+                        <div class="oficio-documentos-route-card__diarias-subblock oficio-documentos-route-card__diarias-subblock--valor{% if card.diaria_vazio %} oficio-documentos-route-card__diarias-subblock--vazio{% endif %}">
+                          <span class="oficio-documentos-route-card__diarias-panel-heading">Valor da diária</span>
+                          <div class="oficio-documentos-route-card__diarias-metric-value">
+                            {% if card.diaria_vazio %}
+                              <p class="oficio-documentos-route-card__diarias-panel-line oficio-documentos-route-card__diarias-panel-line--muted">Não calculado</p>
+                            {% elif card.diaria_moeda %}
+                              <p class="oficio-documentos-route-card__diarias-panel-line oficio-documentos-route-card__diarias-panel-line--moeda">{{ card.diaria_moeda }}</p>
+                            {% else %}
+                              <p class="oficio-documentos-route-card__diarias-panel-line oficio-documentos-route-card__diarias-panel-line--muted">—</p>
+                            {% endif %}
+                          </div>
+                        </div>
+
+                        <div class="oficio-documentos-route-card__diarias-subblock oficio-documentos-route-card__diarias-subblock--composicao">
+                          <span class="oficio-documentos-route-card__diarias-panel-heading">Quantidade de diárias</span>
+                          <div class="oficio-documentos-route-card__diarias-metric-value">
+                            {% if card.diaria_composicao_linhas %}
+                              <ul class="oficio-documentos-route-card__diarias-composicao-list">
+                                {% for linha in card.diaria_composicao_linhas %}
+                                  <li>{{ linha }}</li>
+                                {% endfor %}
+                              </ul>
+                            {% else %}
+                              <p class="oficio-documentos-route-card__diarias-panel-line oficio-documentos-route-card__diarias-panel-line--muted">—</p>
+                            {% endif %}
+                          </div>
+                        </div>
+                      </div>
+                    {% endif %}
+                  </div>
+                </aside>
+              </div>
+        </article>
+      {% endwith %}
+    {% else %}
+      <article class="oficio-documentos-route-card oficio-documentos-route-card--fallback">
+        <header class="oficio-documentos-route-card__head">
+          <p class="oficio-documentos-route-card__eyebrow">Roteiro e diárias</p>
+          <div class="oficio-documentos-route-card__title-row">
+            <h3 class="oficio-documentos-route-card__title">{{ documentos_ctx.sede_label }} → {{ documentos_ctx.destino_principal_label }}</h3>
+          </div>
+          <p class="oficio-documentos-route-card__subtitle">
+            Nenhum roteiro vinculado a este ofício; abaixo estão os dados disponíveis para documentos.
+          </p>
+        </header>
+            <div class="oficio-documentos-route-card__body">
+              <div class="oficio-documentos-route-card__trechos-col">
+                <div class="oficio-documentos-route-card__fallback-facts">
+                  <div class="oficio-documentos-route-card__fallback-fact">
+                    <span class="oficio-documentos-route-card__fallback-label">Destinos</span>
+                    <span class="oficio-documentos-route-card__fallback-value">
+                      {% if documentos_ctx.destinos %}{{ documentos_ctx.destinos|join:", " }}{% else %}—{% endif %}
+                    </span>
+                  </div>
+                  <div class="oficio-documentos-route-card__fallback-fact">
+                    <span class="oficio-documentos-route-card__fallback-label">Primeira saída</span>
+                    <span class="oficio-documentos-route-card__fallback-value">{{ documentos_ctx.primeira_saida_label }}</span>
+                  </div>
+                  <div class="oficio-documentos-route-card__fallback-fact">
+                    <span class="oficio-documentos-route-card__fallback-label">Retorno (saída)</span>
+                    <span class="oficio-documentos-route-card__fallback-value">{{ documentos_ctx.retorno_label }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <aside class="oficio-documentos-route-card__diarias-col" aria-label="Diárias">
+                <div class="oficio-documentos-route-card__diarias-box">
+                  <span class="oficio-documentos-route-card__diarias-box-title">Diárias</span>
+                  <div class="oficio-documentos-route-card__diarias-box-panels">
+                    <div class="oficio-documentos-route-card__diarias-subblock oficio-documentos-route-card__diarias-subblock--valor">
+                      <span class="oficio-documentos-route-card__diarias-panel-heading">Valor total</span>
+                      <div class="oficio-documentos-route-card__diarias-metric-value">
+                        <p class="oficio-documentos-route-card__diarias-panel-line oficio-documentos-route-card__diarias-panel-line--moeda">{{ documentos_ctx.valor_diarias_display }}</p>
+                      </div>
+                      <span class="oficio-documentos-route-card__diarias-panel-heading oficio-documentos-route-card__diarias-extenso-label">Valor por extenso</span>
+                      {% if documentos_ctx.valor_diarias_extenso and documentos_ctx.valor_diarias_extenso != "—" %}
+                        <p class="oficio-documentos-route-card__diarias-extenso">{{ documentos_ctx.valor_diarias_extenso }}</p>
+                      {% else %}
+                        <p class="oficio-documentos-route-card__diarias-extenso oficio-documentos-route-card__diarias-panel-line--muted">—</p>
+                      {% endif %}
+                    </div>
+                    <div class="oficio-documentos-route-card__diarias-subblock oficio-documentos-route-card__diarias-subblock--composicao">
+                      <span class="oficio-documentos-route-card__diarias-panel-heading">Quantidade de diárias</span>
+                      <div class="oficio-documentos-route-card__diarias-metric-value">
+                        <p class="oficio-documentos-route-card__diarias-panel-line oficio-documentos-route-card__diarias-panel-line--strong">{{ documentos_ctx.quantidade_diarias }}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </aside>
+            </div>
+      </article>
+    {% endif %}
+
+    {% with jr=documentos_ctx.justificativa_resumo %}
+      <article class="oficio-documentos-card oficio-documentos-card--justification">
+        <header class="oficio-documentos-card__header oficio-documentos-justification__header">
+          <div class="oficio-documentos-justification__intro">
+            <span class="oficio-documentos-card__eyebrow">Justificativa</span>
+            <h4 class="oficio-documentos-card__title">Antecedência e fundamento registrado</h4>
+            <p class="oficio-documentos-card__subtitle">Resumo da regra aplicada ao ofício</p>
+          </div>
+          <span class="oficio-documentos-status-chip oficio-documentos-status-chip--{{ jr.chip_variant }}">{{ jr.chip_label }}</span>
+        </header>
+        <div class="oficio-documentos-card__body oficio-documentos-card__body--justification">
+          <div class="oficio-documentos-justification-stack">
+            <div class="oficio-documentos-justification-grid">
+              <section class="oficio-documentos-model-card" aria-label="Modelo">
+                <span class="oficio-documentos-model-card__label">Modelo utilizado</span>
+                <strong class="oficio-documentos-model-card__value">{{ jr.modelo_nome }}</strong>
+              </section>
+              <section class="oficio-documentos-antecedence-card" aria-label="Antecedência">
+                <span class="oficio-documentos-antecedence-card__label">Dias de antecedência</span>
+                <strong class="oficio-documentos-antecedence-card__value">{{ jr.antecedencia_label }}</strong>
+                <span class="oficio-documentos-antecedence-card__help">{{ jr.antecedencia_helper }}</span>
+              </section>
+            </div>
+            <section class="oficio-documentos-justification-text-card" aria-label="Texto registrado">
+              <span class="oficio-documentos-justification-text-card__label">Texto registrado</span>
+              <div class="oficio-documentos-justification-text-card__body">
+                {{ jr.texto_registrado|linebreaks }}
+              </div>
+            </section>
+          </div>
+        </div>
+      </article>
+    {% endwith %}
+  </div>
+{% endblock %}
+
+{% block wizard_actions %}
+  <div class="form-actions app-form-actions oficio-wizard__actions app-wizard__actions">
+    <button type="submit" name="action" value="wizard_back" class="btn btn-secondary app-btn app-btn--secondary">{{ wizard_back_label|default:"Voltar" }}</button>
+    {% if oficio %}
+      <a class="btn btn-secondary app-btn app-btn--secondary" href="{% url 'oficios:baixar_documento' oficio.pk 'docx' %}">DOCX</a>
+      {% if documentos_ctx.generation_status %}
+        {% if documentos_ctx.generation_status.pdf_available %}
+          <a class="btn btn-secondary app-btn app-btn--secondary" href="{% url 'oficios:baixar_documento' oficio.pk 'pdf' %}">{{ documentos_ctx.generation_status.pdf_link_label }}</a>
+          {% if documentos_ctx.generation_status.oficio_pdf_botoes_assinatura and documentos_ctx.documentos_inline.oficio.disponivel %}
+            {% if documentos_ctx.generation_status.oficio_pdf_signature_status == "signed" %}
+              <span class="oficio-documentos-sig-badge oficio-documentos-sig-badge--signed" role="status">PDF assinado</span>
+            {% elif documentos_ctx.generation_status.oficio_pdf_signature_status == "unsigned" %}
+              <span class="oficio-documentos-sig-badge oficio-documentos-sig-badge--unsigned" role="status">PDF sem assinatura digital</span>
+            {% endif %}
+            <a
+              class="btn btn-secondary app-btn app-btn--secondary"
+              href="{% url 'oficios:wizard_assinaturas' oficio.pk %}"
+            >Central de assinaturas</a>
+          {% elif documentos_ctx.documentos_inline.oficio.disponivel and documentos_ctx.generation_status.pdf_available %}
+            {% if not documentos_ctx.generation_status.documentos_persist_artefatos %}
+              <span class="doc-muted oficio-documentos-sig-hint" role="note">Assinatura digital desativada: defina <code>DOCUMENTOS_PERSIST_ARTEFATOS=true</code> no ambiente.</span>
+            {% endif %}
+          {% endif %}
+        {% else %}
+          <span class="btn btn-secondary app-btn app-btn--secondary oficio-documentos-pdf-btn--muted" role="note" title="{{ documentos_ctx.generation_status.pdf_message }}">PDF indisponível</span>
+        {% endif %}
+      {% else %}
+        <a class="btn btn-secondary app-btn app-btn--secondary" href="{% url 'oficios:baixar_documento' oficio.pk 'pdf' %}">PDF</a>
+      {% endif %}
+      <a class="btn btn-secondary app-btn app-btn--secondary" href="{% url 'oficios:baixar_justificativa_documento' oficio.pk 'pdf' %}">Justificativa PDF</a>
+      <a class="btn btn-secondary app-btn app-btn--secondary" href="{% url 'oficios:baixar_plano_trabalho_documento' oficio.pk 'docx' %}">Plano DOCX</a>
+      <a class="btn btn-secondary app-btn app-btn--secondary" href="{% url 'oficios:baixar_ordem_servico_documento' oficio.pk 'docx' %}">Ordem serviço DOCX</a>
+      <a class="btn btn-secondary app-btn app-btn--secondary" href="{% url 'termos:preview_termo_oficio' oficio.pk %}">Termos</a>
+    {% endif %}
+    {% if not oficio_completo|default:False %}
+      <button class="btn btn-secondary app-btn app-btn--secondary" type="submit" name="action" value="save_draft_list">Salvar como rascunho</button>
+    {% endif %}
+    {% if wizard_finalizar %}
+      {% if oficio_completo|default:False %}
+        <button class="btn btn-primary app-btn app-btn--primary" type="submit" name="action" value="finalizar">Finalizar Ofício</button>
+      {% endif %}
+    {% else %}
+      <button class="btn btn-primary app-btn app-btn--primary" type="submit" name="action" value="wizard_next">Avançar</button>
+    {% endif %}
+  </div>
+  {% if documentos_ctx.generation_status %}
+    <p class="doc-muted oficio-documentos-pdf-hint" role="status">{{ documentos_ctx.generation_status.pdf_message }}</p>
+  {% endif %}
+{% endblock %}
+
+{% block extra_js %}
+  {{ block.super }}
+  <script src="{% static 'js/pages/oficios-documentos-inline.js' %}?v=20260512" defer></script>
+{% endblock %}

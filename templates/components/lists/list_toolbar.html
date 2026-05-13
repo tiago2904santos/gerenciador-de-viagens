@@ -1,0 +1,19 @@
+<form class="list-toolbar app-list-toolbar" method="get"{% if search_form_action %} action="{{ search_form_action }}"{% endif %}>
+  <div class="list-search">
+    <label class="sr-only" for="{{ search_id|default:'list-search' }}">Buscar</label>
+    <input id="{{ search_id|default:'list-search' }}" name="q" type="search" value="{{ q }}" placeholder="{{ search_placeholder|default:'Buscar registros' }}" autocomplete="off">
+  </div>
+  {% include "components/lists/list_filters.html" %}
+  <div class="btn-group">
+    {% if export_csv_url %}
+      {% include "components/buttons/action_button.html" with href=export_csv_url label=export_csv_label|default:"Baixar CSV" variant="secondary" only %}
+    {% endif %}
+    {% if q and search_clear_url %}
+      {% include "components/buttons/action_button.html" with href=search_clear_url label="Limpar" variant="secondary" only %}
+    {% endif %}
+    {% include "components/buttons/action_button.html" with label="Buscar" variant="muted" type="submit" only %}
+    {% if action_label and action_url %}
+      {% include "components/buttons/action_button.html" with href=action_url label=action_label variant="primary" only %}
+    {% endif %}
+  </div>
+</form>

@@ -1,0 +1,90 @@
+﻿{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+  <div class="app-page">
+    <div class="app-page__shell">
+      <header class="app-page-hero app-page-hero--hybrid app-page-hero--compact" aria-labelledby="config-form-title">
+        <div class="app-page-hero__stage">
+          <span class="app-page-hero__eyebrow">Cadastros</span>
+          <h1 class="app-page-hero__title" id="config-form-title">{{ page_title }}</h1>
+        </div>
+        <div class="app-page-hero__body">
+          <div class="app-page__hero-single">
+            <div class="app-page__brand-mark" aria-hidden="true">CF</div>
+            <p class="app-page__subtitle">{{ page_description }}</p>
+          </div>
+        </div>
+        <div class="app-page-hero__ribbon" aria-hidden="true"></div>
+      </header>
+
+      <div class="app-page__form-card">
+        <form
+          class="app-form-shell form-shell"
+          method="post"
+          novalidate
+          data-configuracoes-form
+          data-cep-lookup-url-template="{% url 'cadastros:api_consulta_cep' '00000000' %}"
+        >
+          {% csrf_token %}
+
+          <div class="form-section app-form-section">
+            {% include "components/forms/form_section.html" with title="Dados da unidade" description="Identificação da divisão e da unidade." only %}
+            <div class="form-grid app-form-grid">
+              {% include "components/forms/form_field.html" with field=form.divisao only %}
+              {% include "components/forms/form_field.html" with field=form.unidade only %}
+            </div>
+          </div>
+
+          <div class="form-section app-form-section">
+            {% include "components/forms/form_section.html" with title="Endereço dos documentos" description="Dados institucionais utilizados no rodapé dos documentos gerados pelo sistema." only %}
+            <div class="form-grid app-form-grid">
+              <div class="field-span-4">
+                {% include "components/forms/form_field.html" with field=form.cep only %}
+              </div>
+              <div class="field-span-6">
+                {% include "components/forms/form_field.html" with field=form.logradouro only %}
+              </div>
+              <div class="field-span-2">
+                {% include "components/forms/form_field.html" with field=form.numero only %}
+              </div>
+              <div class="field-span-4">
+                {% include "components/forms/form_field.html" with field=form.bairro only %}
+              </div>
+              <div class="field-span-6">
+                {% include "components/forms/form_field.html" with field=form.cidade_endereco only %}
+              </div>
+              <div class="field-span-2">
+                {% include "components/forms/form_field.html" with field=form.uf only %}
+              </div>
+              <div class="field-span-4">
+                {% include "components/forms/form_field.html" with field=form.telefone only %}
+              </div>
+              <div class="field-span-8">
+                {% include "components/forms/form_field.html" with field=form.email only %}
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section app-form-section">
+            {% include "components/forms/form_section.html" with title="Assinaturas documentais" description="Assinantes preferenciais por tipo de documento; não é assinatura digital." only %}
+            <div class="form-grid app-form-grid">
+              {% include "components/forms/form_field.html" with field=form.assinatura_oficio only %}
+              {% include "components/forms/form_field.html" with field=form.assinatura_justificativas only %}
+              {% include "components/forms/form_field.html" with field=form.assinatura_planos_trabalho only %}
+              {% include "components/forms/form_field.html" with field=form.assinatura_ordens_servico only %}
+            </div>
+          </div>
+
+          {% include "components/forms/form_actions.html" with primary_label=submit_label secondary_label="Voltar" secondary_url=back_url only %}
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'js/pages/configuracoes.js' %}" defer></script>
+{% endblock %}

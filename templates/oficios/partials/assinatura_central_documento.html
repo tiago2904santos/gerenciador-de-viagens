@@ -1,0 +1,80 @@
+<section class="assinaturas-central-card">
+  <header class="assinaturas-central-card__header">
+    <div>
+      <h3>{{ titulo }}</h3>
+      <p>Status, destinatários e vínculos de assinatura.</p>
+    </div>
+    {% if painel.disponivel %}
+      {% if painel.ja_assinado %}
+        <span class="oficio-documentos-sig-badge oficio-documentos-sig-badge--signed" role="status">Assinado</span>
+      {% else %}
+        <span class="oficio-documentos-sig-badge oficio-documentos-sig-badge--unsigned" role="status">Não assinado</span>
+      {% endif %}
+    {% endif %}
+  </header>
+
+  {% if painel.erro %}
+    <p class="doc-muted">{{ painel.erro }}</p>
+  {% elif painel.disponivel %}
+    <dl class="oficio-documentos-facts assinaturas-central-hashes">
+      <div class="oficio-documentos-fact">
+        <dt>Hash SHA-256 (original)</dt>
+        <dd class="oficio-assinatura-pdf__mono">{{ painel.artefato.hash_sha256 }}</dd>
+      </div>
+      <div class="oficio-documentos-fact">
+        <dt>Hash SHA-256 (assinado)</dt>
+        <dd class="oficio-assinatura-pdf__mono">{% if painel.artefato.hash_sha256_assinado %}{{ painel.artefato.hash_sha256_assinado }}{% else %}—{% endif %}</dd>
+      </div>
+    </dl>
+
+    <div class="assinaturas-central-actions">
+      <a class="btn btn-secondary app-btn app-btn--secondary" href="{{ painel.pdf_visualizar_url }}" target="_blank" rel="noopener noreferrer">Visualizar documento original</a>
+      {% if painel.etiqueta_urls.pdf_assinado %}
+        <a class="btn btn-secondary app-btn app-btn--secondary" href="{{ painel.etiqueta_urls.pdf_assinado }}" target="_blank" rel="noopener noreferrer">Ver PDF assinado</a>
+      {% endif %}
+      {% if painel.pedido_pendente %}
+        <button class="btn btn-secondary app-btn app-btn--secondary" type="button" data-copy-value="{{ painel.pedido_pendente.link_publico }}">Copiar link</button>
+        <form method="post" action="{{ painel.etiqueta_urls.revogar }}" class="assinaturas-central-inline-form">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <button class="btn btn-secondary app-btn app-btn--secondary" type="submit">Revogar link</button>
+        </form>
+      {% else %}
+        <a class="btn btn-primary app-btn app-btn--primary" href="{{ painel.etiqueta_urls.gerar_link }}?next={{ request.get_full_path|urlencode }}">Gerar solicitação</a>
+      {% endif %}
+    </div>
+
+    <div class="assinaturas-central-destinatarios">
+      <h4>Destinatários</h4>
+      {% if painel.pedidos_assinatura %}
+        {% for pedido in painel.pedidos_assinatura %}
+          <article class="assinaturas-central-row">
+            <div>
+              <strong>{{ pedido.nome_assinante_snapshot }}</strong>
+              <p>CPF: {{ pedido.cpf_mascarado }}</p>
+              {% if pedido.email_assinante_snapshot %}<p>E-mail: {{ pedido.email_assinante_snapshot }}</p>{% endif %}
+            </div>
+            <dl>
+              <div><dt>Status</dt><dd>{{ pedido.get_status_display }}</dd></div>
+              <div><dt>Envio</dt><dd>{{ pedido.criado_em|date:"d/m/Y H:i" }}</dd></div>
+              <div><dt>Visualização</dt><dd>{% if pedido.visualizado_em %}{{ pedido.visualizado_em|date:"d/m/Y H:i" }}{% else %}—{% endif %}</dd></div>
+              <div><dt>Assinatura</dt><dd>{% if pedido.assinado_em %}{{ pedido.assinado_em|date:"d/m/Y H:i" }}{% else %}—{% endif %}</dd></div>
+              <div><dt>Expiração</dt><dd>{{ pedido.expira_em|date:"d/m/Y H:i" }}</dd></div>
+            </dl>
+            <div class="assinaturas-central-row__actions">
+              {% if pedido.status == "assinado" and pedido.assinatura %}
+                <a class="btn btn-secondary app-btn app-btn--secondary" href="{% url 'assinaturas:assinatura-verificar-codigo' pedido.assinatura.codigo_verificacao %}">Ver comprovante</a>
+              {% elif pedido.status == "expirado" or pedido.status == "revogada" or pedido.status == "recusada" %}
+                <a class="btn btn-secondary app-btn app-btn--secondary" href="{{ painel.etiqueta_urls.gerar_link }}?next={{ request.get_full_path|urlencode }}&forcar_novo=1">Gerar novo link</a>
+              {% else %}
+                <button class="btn btn-secondary app-btn app-btn--secondary" type="button" data-copy-value="{{ pedido.link_publico }}">Copiar link</button>
+              {% endif %}
+            </div>
+          </article>
+        {% endfor %}
+      {% else %}
+        <p class="doc-muted">Nenhuma solicitação gerada.</p>
+      {% endif %}
+    </div>
+  {% endif %}
+</section>

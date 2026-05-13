@@ -1,0 +1,279 @@
+/* ==========================================================================
+   SIDEBAR
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Shell e branding institucional
+   -------------------------------------------------------------------------- */
+.sidebar {
+  background: var(--sidebar-surface);
+  border-right: 1px solid var(--sidebar-border);
+  box-shadow: var(--sidebar-shadow);
+  box-sizing: border-box;
+  color: var(--sidebar-fg-soft);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-width: 0;
+  padding: 0;
+  position: sticky;
+  top: 0;
+  width: 100%;
+  z-index: var(--z-sidebar);
+}
+
+.sidebar-header {
+  border-bottom: 1px solid var(--sidebar-border);
+  padding: var(--space-5) var(--space-5) var(--space-4);
+}
+
+.sidebar-brand {
+  align-items: center;
+  color: var(--sidebar-brand-fg);
+  display: inline-flex;
+  gap: calc(var(--space-2) + 2px);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  transition: color var(--transition-slow);
+}
+
+.sidebar-brand-badge {
+  align-items: center;
+  background: var(--sidebar-badge-bg);
+  border: 1px solid rgba(255, 243, 207, 0.5);
+  border-radius: var(--radius-pill);
+  color: var(--color-white);
+  display: inline-flex;
+  font-size: 11px;
+  font-weight: 800;
+  height: 28px;
+  justify-content: center;
+  width: 28px;
+}
+
+.sidebar-brand:hover {
+  opacity: 0.88;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: var(--space-2);
+  overflow-y: auto;
+  padding: calc(var(--space-3) + 2px) var(--space-3) var(--space-section-y);
+}
+
+.sidebar-item {
+  min-width: 0;
+}
+
+.sidebar-item + .sidebar-item {
+  margin-top: 0;
+}
+
+/* --------------------------------------------------------------------------
+   2. Links de modulo e colapsaveis
+   -------------------------------------------------------------------------- */
+.sidebar-row--top {
+  align-items: stretch;
+  display: flex;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.sidebar-link {
+  text-decoration: none;
+  transition: background-color var(--transition-slow), border-color var(--transition-slow), color var(--transition-slow), box-shadow var(--transition-slow);
+}
+
+.sidebar-link--module {
+  align-items: center;
+  background: var(--sidebar-link-surface);
+  border: 1px solid var(--sidebar-link-border);
+  border-radius: var(--radius-control-lg);
+  box-sizing: border-box;
+  color: var(--sidebar-link-fg);
+  display: flex;
+  flex: 1;
+  font-size: 0.93rem;
+  font-weight: 500;
+  min-height: calc(var(--control-height-md) - 2px);
+  min-width: 0;
+  padding: 10px 13px;
+}
+
+.sidebar-module-expand {
+  cursor: pointer;
+  flex: 1;
+  font: inherit;
+  justify-content: space-between;
+  text-align: left;
+  width: 100%;
+}
+
+.sidebar-module-expand .sidebar-item-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.sidebar-module-expand__chevron {
+  color: var(--sidebar-fg-heading);
+  flex-shrink: 0;
+  font-size: 0.82rem;
+  line-height: 1;
+  margin-left: var(--space-2);
+  opacity: 0.92;
+  transform: rotate(-90deg);
+  transition: transform var(--transition-slow);
+}
+
+.sidebar-item--collapsible.is-open > .sidebar-row--top .sidebar-module-expand__chevron {
+  transform: rotate(0deg);
+}
+
+.sidebar-item-main {
+  align-items: center;
+  display: inline-flex;
+  gap: calc(var(--space-2) + 2px);
+  min-width: 0;
+}
+
+.sidebar-item-icon {
+  align-items: center;
+  background: var(--sidebar-icon-bg);
+  border-radius: var(--radius-sm);
+  color: var(--sidebar-icon-fg);
+  display: inline-flex;
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 800;
+  height: 22px;
+  justify-content: center;
+  letter-spacing: 0.03em;
+  width: 22px;
+}
+
+.sidebar-accordion {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--transition-slow);
+}
+
+.sidebar-item--collapsible.is-open > .sidebar-accordion {
+  grid-template-rows: 1fr;
+}
+
+.sidebar-accordion__inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar-accordion {
+    transition: none;
+  }
+
+  .sidebar-module-expand__chevron {
+    transition: none;
+  }
+}
+
+.sidebar-panel {
+  border-left: 2px solid var(--sidebar-panel-border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 6px 0 4px 14px;
+  padding: 6px 0 4px 10px;
+}
+
+.sidebar-link--cadastros {
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  box-sizing: border-box;
+  color: var(--sidebar-link-fg);
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 8px 10px;
+}
+
+.sidebar-link--module:hover,
+.sidebar-link--module:focus-visible,
+.sidebar-module-expand:hover,
+.sidebar-module-expand:focus-visible,
+.sidebar-link--cadastros:hover,
+.sidebar-link--cadastros:focus-visible {
+  background: var(--sidebar-link-hover-bg);
+  color: var(--sidebar-brand-fg);
+}
+
+.sidebar-link--module.is-active,
+.sidebar-module-expand.is-active,
+.sidebar-link--cadastros.is-active {
+  background: var(--sidebar-active-bg);
+  border: 1px solid var(--sidebar-active-border);
+  box-shadow: inset 4px 0 0 var(--color-accent);
+  color: var(--sidebar-active-fg);
+  font-weight: 600;
+}
+
+.sidebar-link--cadastros.is-active {
+  border-left: none;
+}
+
+/* --------------------------------------------------------------------------
+   3. Rodape e logout
+   -------------------------------------------------------------------------- */
+.sidebar-footer {
+  border-top: 1px solid var(--sidebar-border);
+  color: var(--sidebar-footer-fg);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space-2) + 2px);
+  font-size: 12px;
+  padding: 14px 20px 16px;
+}
+
+.sidebar-logout-form {
+  margin: 0;
+}
+
+.sidebar-logout-btn {
+  background: var(--sidebar-logout-bg);
+  border: 1px solid var(--sidebar-logout-border);
+  border-radius: var(--radius-sm);
+  color: var(--sidebar-logout-fg);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 12px;
+  transition: background-color var(--transition-base), border-color var(--transition-base);
+  width: 100%;
+}
+
+.sidebar-logout-btn:hover {
+  background: rgba(216, 162, 27, 0.2);
+  border-color: rgba(255, 243, 207, 0.35);
+}
+
+.sidebar-footer-note {
+  opacity: 0.92;
+}
+
+/* --------------------------------------------------------------------------
+   4. Responsividade
+   -------------------------------------------------------------------------- */
+@media (max-width: 840px) {
+  .sidebar {
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+    min-height: unset;
+    position: relative;
+  }
+
+  .sidebar-nav {
+    padding: 12px;
+  }
+}

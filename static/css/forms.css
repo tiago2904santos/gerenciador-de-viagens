@@ -1,0 +1,1043 @@
+/* ==========================================================================
+   FORMS
+   ========================================================================== */
+
+/* ============================================================
+   Form system — shell premium (referência visual: Roteiros)
+   Classes: .app-form-shell (canônico), .form-shell (alias legado)
+   ============================================================ */
+
+.app-form-shell,
+.form-shell {
+  background: var(--route-card-bg);
+  border: 1px solid var(--route-section-border);
+  border-radius: var(--radius-shell);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.65) inset,
+    0 20px 44px rgba(15, 34, 54, 0.1);
+  box-sizing: border-box;
+  display: grid;
+  gap: var(--space-2);
+  padding: clamp(18px, 2.2vw, 26px) clamp(18px, 2.5vw, 28px);
+  width: 100%;
+}
+
+.app-page__shell > .app-form-shell,
+.app-page__shell > .roteiro-form-shell {
+  background: var(--route-card-bg);
+  border: 1px solid var(--route-section-border);
+  border-radius: var(--radius-shell);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.65) inset,
+    0 20px 44px rgba(15, 34, 54, 0.1);
+  box-sizing: border-box;
+  padding: clamp(18px, 2.2vw, 26px) clamp(18px, 2.5vw, 28px);
+  width: 100%;
+}
+
+/* --------------------------------------------------------------------------
+   1. Estrutura de pagina e secoes
+   -------------------------------------------------------------------------- */
+.form-page {
+  display: grid;
+  gap: var(--space-6);
+}
+
+/* form_section.html renderiza apenas .form-section-header. Um único .form-section no template pai
+   deve envolver cabeçalho + .form-grid; dois .form-section seguidos para a mesma seção geram faixa vazia. */
+
+.form-section {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-soft);
+  padding: var(--space-5);
+}
+
+.app-form-shell .form-section,
+.form-shell .form-section {
+  background: var(--route-section-bg);
+  border: 1px solid var(--route-section-border);
+  border-radius: var(--radius-section);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+}
+
+.form-section-header {
+  border-bottom: 1px solid var(--color-border-soft);
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--space-3);
+}
+
+.app-form-shell .form-section-header,
+.form-shell .form-section-header {
+  border-bottom-color: var(--route-card-inner-border);
+}
+
+.form-section-header h3 {
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--space-1);
+}
+
+.app-form-shell .form-section-header h3,
+.form-shell .form-section-header h3 {
+  color: var(--theme-text-heading);
+  font-size: 1.06rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+.form-section-header p,
+.field-help {
+  color: var(--color-help);
+  font-size: var(--font-size-sm);
+  margin-bottom: 0;
+}
+
+.app-form-shell .form-section-header p,
+.form-shell .form-section-header p {
+  color: var(--theme-text-muted);
+  line-height: 1.45;
+  max-width: 68ch;
+}
+
+.form-grid {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+}
+
+.form-grid > * {
+  grid-column: span 6;
+}
+
+.form-grid--stack > * {
+  grid-column: span 12;
+}
+
+.field-span-12 {
+  grid-column: span 12;
+}
+
+.field-span-6 {
+  grid-column: span 6;
+}
+
+.field-span-8 {
+  grid-column: span 8;
+}
+
+.field-span-4 {
+  grid-column: span 4;
+}
+
+.field-span-2 {
+  grid-column: span 2;
+}
+
+/* ============================================================
+   Painel grid (design system) — base visual de .roteiro-editor__grid
+   Tokens de rota; caixa extra só em .app-form-grid-panel.
+   ============================================================ */
+
+.app-form-grid-panel,
+.roteiro-editor__grid {
+  background: var(--route-card-inner-bg);
+  box-sizing: border-box;
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  min-width: 0;
+}
+
+.app-form-grid-panel {
+  border: 1px solid var(--route-card-inner-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+}
+
+.app-form-grid-panel.align-items-end,
+.roteiro-editor__grid.align-items-end {
+  align-items: end;
+}
+
+.app-form-grid-panel > .field-span-6,
+.roteiro-editor__grid > .field-span-6 {
+  grid-column: span 6;
+}
+
+.app-form-grid-panel > .field-span-4,
+.roteiro-editor__grid > .field-span-4 {
+  grid-column: span 4;
+}
+
+.app-form-grid-panel > .field-span-12,
+.roteiro-editor__grid > .field-span-12 {
+  grid-column: span 12;
+}
+
+@media (max-width: 720px) {
+  .app-form-grid-panel > .field-span-6,
+  .app-form-grid-panel > .field-span-4,
+  .roteiro-editor__grid > .field-span-6,
+  .roteiro-editor__grid > .field-span-4 {
+    grid-column: span 12;
+  }
+}
+/* --------------------------------------------------------------------------
+   2. Campos e controles
+   -------------------------------------------------------------------------- */
+.field {
+  display: grid;
+  gap: var(--space-field-gap);
+}
+
+.field-check {
+  align-items: center;
+  display: flex;
+}
+
+.field label {
+  color: var(--color-label);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.app-form-shell .field label,
+.form-shell .field label {
+  color: var(--theme-text-muted-strong);
+}
+
+.form-control {
+  background: var(--color-input-bg);
+  border-color: var(--color-input-border);
+  border-radius: var(--radius-control);
+  box-shadow: var(--shadow-inner-light);
+  color: var(--color-input-text);
+  min-height: var(--control-height-md);
+  width: 100%;
+}
+
+.form-select {
+  background: var(--color-input-bg);
+  border-color: var(--color-input-border);
+  border-radius: var(--radius-control);
+  color: var(--color-input-text);
+  min-height: var(--control-height-md);
+  width: 100%;
+}
+
+.app-form-shell .form-control,
+.app-form-shell .form-select,
+.app-form-shell select {
+  background: var(--color-card);
+  border-color: var(--route-field-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-inner-light);
+  color: var(--route-field-text);
+}
+
+.app-form-shell input[type="text"],
+.app-form-shell input[type="date"],
+.app-form-shell input[type="time"],
+.app-form-shell input[type="number"],
+.app-form-shell input[type="search"],
+.app-form-shell input[type="email"],
+.app-form-shell input[type="url"],
+.app-form-shell textarea,
+.app-form-shell .oficio-equipe-picker__input,
+.form-shell input[type="text"],
+.form-shell input[type="date"],
+.form-shell input[type="time"],
+.form-shell input[type="number"],
+.form-shell input[type="search"],
+.form-shell input[type="email"],
+.form-shell input[type="url"],
+.form-shell textarea,
+.form-shell .oficio-equipe-picker__input {
+  background: var(--color-card);
+  border-color: var(--route-field-border);
+  color: var(--route-field-text);
+}
+
+.app-form-shell .oficio-equipe-picker__input {
+  border-style: solid;
+  border-width: 1px;
+}
+
+.app-form-shell .form-control:focus,
+.app-form-shell .form-select:focus,
+.app-form-shell select:focus,
+.form-shell .form-control:focus,
+.form-shell .form-select:focus,
+.form-shell select:focus {
+  border-color: var(--route-button-primary-border);
+  box-shadow: 0 0 0 3px var(--route-focus-ring);
+  outline: none;
+}
+
+.app-form-shell .form-control::placeholder,
+.app-form-shell .form-select::placeholder,
+.app-form-shell textarea::placeholder,
+.form-shell .form-control::placeholder,
+.form-shell .form-select::placeholder,
+.form-shell textarea::placeholder {
+  color: var(--route-field-placeholder);
+  opacity: 1;
+}
+
+.app-form-shell input:disabled,
+.app-form-shell select:disabled,
+.app-form-shell textarea:disabled,
+.app-form-shell input[readonly],
+.app-form-shell select[readonly],
+.app-form-shell textarea[readonly],
+.form-shell input:disabled,
+.form-shell select:disabled,
+.form-shell textarea:disabled,
+.form-shell input[readonly],
+.form-shell select[readonly],
+.form-shell textarea[readonly] {
+  background: var(--route-field-disabled-bg);
+  border-color: var(--route-field-border);
+  color: var(--route-field-disabled-text);
+  opacity: 1;
+}
+
+.app-form-shell .form-control.is-invalid,
+.app-form-shell .form-select.is-invalid,
+.form-shell .form-control.is-invalid,
+.form-shell .form-select.is-invalid {
+  border-color: var(--color-danger);
+}
+
+.form-check-input {
+  accent-color: var(--color-accent);
+  height: 18px;
+  min-height: 18px;
+  width: 18px;
+}
+
+.field-error {
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  margin-bottom: 0;
+}
+.app-form-shell .btn-primary,
+.app-page--roteiros-form .btn-primary {
+  background: var(--route-button-primary-bg);
+  border-color: var(--route-button-primary-border);
+  color: var(--route-button-primary-text);
+}
+
+.app-form-shell .btn-primary:hover,
+.app-form-shell .btn-primary:focus-visible,
+.app-page--roteiros-form .btn-primary:hover,
+.app-page--roteiros-form .btn-primary:focus-visible {
+  background: var(--route-button-primary-hover-bg);
+  border-color: var(--route-button-primary-hover-border);
+  color: var(--route-button-primary-text);
+}
+
+.app-form-shell .btn-secondary,
+.app-form-shell .btn-outline-secondary,
+.app-form-shell .btn-muted,
+.app-page--roteiros-form .btn-secondary,
+.app-page--roteiros-form .btn-outline-secondary,
+.app-page--roteiros-form .btn-muted {
+  background: var(--route-button-secondary-bg);
+  border-color: var(--route-button-secondary-border);
+  color: var(--route-button-secondary-text);
+}
+
+.app-form-shell .btn-secondary:hover,
+.app-form-shell .btn-secondary:focus-visible,
+.app-form-shell .btn-outline-secondary:hover,
+.app-form-shell .btn-outline-secondary:focus-visible,
+.app-form-shell .btn-muted:hover,
+.app-form-shell .btn-muted:focus-visible,
+.app-page--roteiros-form .btn-secondary:hover,
+.app-page--roteiros-form .btn-secondary:focus-visible,
+.app-page--roteiros-form .btn-outline-secondary:hover,
+.app-page--roteiros-form .btn-outline-secondary:focus-visible,
+.app-page--roteiros-form .btn-muted:hover,
+.app-page--roteiros-form .btn-muted:focus-visible {
+  background: var(--route-button-secondary-hover-bg);
+  border-color: var(--route-button-secondary-hover-border);
+  color: var(--route-button-secondary-text);
+}
+
+.app-form-shell .btn-danger,
+.app-page--roteiros-form .btn-danger {
+  background: var(--route-button-danger-bg);
+  border-color: var(--route-button-danger-border);
+  color: var(--route-button-danger-text);
+}
+
+.app-form-shell .btn-danger:hover,
+.app-form-shell .btn-danger:focus-visible,
+.app-page--roteiros-form .btn-danger:hover,
+.app-page--roteiros-form .btn-danger:focus-visible {
+  background: var(--route-button-danger-hover-bg);
+  border-color: var(--route-button-danger-hover-border);
+  color: var(--route-button-danger-text);
+}
+
+.app-form-shell .btn:focus-visible,
+.app-page--roteiros-form .btn:focus-visible {
+  box-shadow: 0 0 0 3px var(--route-focus-ring), var(--shadow-xs);
+  outline: none;
+}
+
+.form-actions,
+.app-form-actions {
+  align-items: center;
+  border-top: 1px solid var(--color-border-soft);
+  display: flex;
+  gap: var(--space-3);
+  justify-content: flex-end;
+  padding: var(--space-3) var(--space-5) var(--space-3) 0;
+}
+
+.app-form-shell .form-actions,
+.app-form-shell .app-form-actions,
+.roteiro-editor__actions {
+  align-items: center;
+  background: var(--route-card-bg);
+  border: 1px solid var(--route-section-border);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  justify-content: flex-end;
+  margin-top: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+}
+
+.roteiro-editor__actions--avulso {
+  justify-content: space-between;
+}
+
+.roteiro-form--legacy-roteiro .oficio-wizard-footer-actions .btn,
+.oficio-roteiro-page .oficio-wizard-footer-actions .btn,
+.app-form-shell .form-actions .btn,
+.app-form-shell .app-form-actions .btn,
+.roteiro-editor__actions .btn {
+  border-radius: var(--radius-pill);
+  min-height: var(--control-height-md);
+  padding-left: var(--space-5);
+  padding-right: var(--space-5);
+}
+
+.app-form-shell .form-actions .btn-primary,
+.app-form-shell .app-form-actions .btn-primary,
+.roteiro-editor__actions .btn-primary {
+  background: var(--route-button-primary-bg);
+  border-color: var(--route-button-primary-border);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.12) inset,
+    0 8px 18px rgba(11, 58, 102, 0.28);
+  color: var(--route-button-primary-text);
+}
+
+.app-form-shell .form-actions .btn-primary:hover,
+.app-form-shell .form-actions .btn-primary:focus-visible,
+.app-form-shell .app-form-actions .btn-primary:hover,
+.app-form-shell .app-form-actions .btn-primary:focus-visible,
+.roteiro-editor__actions .btn-primary:hover,
+.roteiro-editor__actions .btn-primary:focus-visible {
+  background: var(--route-button-primary-hover-bg);
+  border-color: var(--route-button-primary-hover-border);
+  color: var(--route-button-primary-text);
+}
+
+.app-form-shell .form-actions .btn-outline-secondary,
+.app-form-shell .form-actions .btn-secondary,
+.app-form-shell .app-form-actions .btn-outline-secondary,
+.app-form-shell .app-form-actions .btn-secondary,
+.roteiro-editor__actions .btn-outline-secondary,
+.roteiro-editor__actions .btn-secondary {
+  background: var(--route-button-secondary-bg);
+  border-color: var(--route-button-secondary-border);
+  color: var(--route-button-secondary-text);
+}
+
+.app-form-shell .form-actions .btn-outline-secondary:hover,
+.app-form-shell .form-actions .btn-outline-secondary:focus-visible,
+.app-form-shell .form-actions .btn-secondary:hover,
+.app-form-shell .form-actions .btn-secondary:focus-visible,
+.app-form-shell .app-form-actions .btn-outline-secondary:hover,
+.app-form-shell .app-form-actions .btn-outline-secondary:focus-visible,
+.app-form-shell .app-form-actions .btn-secondary:hover,
+.app-form-shell .app-form-actions .btn-secondary:focus-visible,
+.roteiro-editor__actions .btn-outline-secondary:hover,
+.roteiro-editor__actions .btn-outline-secondary:focus-visible,
+.roteiro-editor__actions .btn-secondary:hover,
+.roteiro-editor__actions .btn-secondary:focus-visible {
+  background: var(--route-button-secondary-hover-bg);
+  border-color: var(--route-button-secondary-hover-border);
+  color: var(--route-button-secondary-text);
+}
+
+/* --------------------------------------------------------------------------
+   3. Responsividade da grade
+   -------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  .form-grid > * {
+    grid-column: span 12;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   4. Card-toggle (BooleanField)
+   -------------------------------------------------------------------------- */
+/* Card toggle global para BooleanFields visiveis. */
+.field-card-toggle {
+  grid-column: span 6;
+}
+
+.app-card-toggle {
+  align-items: center;
+  background: #fff7f7;
+  border: 1px solid #fecaca;
+  border-radius: 16px;
+  box-shadow: none;
+  cursor: pointer;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  min-height: 56px;
+  padding: 10px 12px;
+  position: relative;
+  transition: background var(--transition-base), border-color var(--transition-base), box-shadow var(--transition-base), transform var(--transition-base);
+  max-width: 100%;
+  width: 260px;
+}
+
+.app-card-toggle__input {
+  clip: rect(0, 0, 0, 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+.app-card-toggle__input:focus-visible ~ .app-card-toggle__icon,
+.app-card-toggle:focus-within {
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.14);
+  outline: 2px solid rgba(34, 197, 94, 0.44);
+  outline-offset: 2px;
+}
+
+.app-card-toggle__icon {
+  align-items: center;
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+  border-radius: 10px;
+  color: #b42318;
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 900;
+  height: 32px;
+  justify-content: center;
+  letter-spacing: 0;
+  min-width: 32px;
+  padding: 0 8px;
+}
+
+.app-card-toggle__content {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.app-card-toggle__title {
+  color: var(--color-heading);
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-card-toggle__description {
+  color: var(--color-description);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.15;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-card-toggle__state {
+  align-items: center;
+  background: #f7c8c8;
+  border: 0;
+  border-radius: var(--radius-pill);
+  color: #b42318;
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 900;
+  height: 26px;
+  justify-content: center;
+  letter-spacing: 0;
+  min-width: 74px;
+  padding: 0 12px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.app-card-toggle:hover {
+  border-color: #fca5a5;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+  transform: none;
+}
+
+.app-card-toggle.is-checked {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  box-shadow: none;
+}
+
+.app-card-toggle.is-checked .app-card-toggle__icon {
+  background: #dcfce7;
+  border-color: #86efac;
+  color: #15803d;
+}
+
+.app-card-toggle.is-checked .app-card-toggle__state {
+  background: #bbf7d0;
+  box-shadow: none;
+  color: #15803d;
+}
+
+.app-card-toggle.is-disabled {
+  cursor: not-allowed;
+  opacity: 0.68;
+  transform: none;
+}
+
+.app-card-toggle.is-disabled:hover {
+  box-shadow: var(--shadow-xs);
+  transform: none;
+}
+
+/* Select + ação lateral */
+.form-field-with-action__row {
+  align-items: stretch;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.form-field-with-action__control {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+.form-field-with-action__button {
+  align-self: center;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+/* --------------------------------------------------------------------------
+   5. Responsividade de acao lateral
+   -------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  .form-field-with-action__button {
+    width: 100%;
+  }
+
+  .app-card-toggle {
+    align-items: start;
+    grid-template-columns: auto minmax(0, 1fr);
+    width: 100%;
+  }
+
+  .app-card-toggle__state {
+    grid-column: 2;
+    justify-self: start;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   6. Estados de bloqueio e placeholders
+   -------------------------------------------------------------------------- */
+/* RG travado quando "Não possui RG" */
+.field-rg-wrap.field--locked .form-control {
+  background: var(--color-input-disabled-bg);
+  color: var(--color-input-disabled-text);
+  cursor: not-allowed;
+}
+
+.form-control::placeholder,
+.form-select::placeholder,
+textarea.form-control::placeholder {
+  color: var(--color-input-placeholder);
+  opacity: 1;
+}
+
+.form-control:disabled,
+.form-select:disabled,
+textarea:disabled,
+input[readonly],
+select[readonly],
+textarea[readonly] {
+  background: var(--color-input-disabled-bg);
+  border-color: var(--color-border);
+  color: var(--color-input-disabled-text);
+  opacity: 1;
+}
+
+.app-form-shell .alert {
+  border-radius: var(--radius-md);
+}
+
+.app-form-shell .oficio-roteiro-destinos-stack input,
+.app-form-shell .oficio-roteiro-destinos-stack select,
+.app-form-shell .oficio-roteiro-destinos-stack textarea,
+.app-form-shell .oficio-roteiro-trecho-card input,
+.app-form-shell .oficio-roteiro-trecho-card select,
+.app-form-shell .oficio-roteiro-trecho-card textarea {
+  background: var(--color-card);
+  border-color: var(--route-field-border);
+  color: var(--route-field-text);
+}
+
+html[data-theme="dark"] .app-form-shell .form-control,
+html[data-theme="dark"] .app-form-shell .form-select,
+html[data-theme="dark"] .app-form-shell select,
+html[data-theme="dark"] .app-form-shell textarea {
+  background: var(--color-card);
+  border-color: var(--route-field-border);
+  color: var(--route-field-text);
+}
+
+html[data-theme="dark-dark"] .app-form-shell select option,
+html[data-theme="light-dark"] .app-form-shell select option {
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+html[data-theme="dark-dark"] .app-form-shell select option:disabled,
+html[data-theme="light-dark"] .app-form-shell select option:disabled,
+html[data-theme="dark-dark"] .app-form-shell select optgroup,
+html[data-theme="light-dark"] .app-form-shell select optgroup {
+  color: var(--color-text-muted);
+}
+
+.field-rg-wrap.field--locked label::after {
+  color: var(--color-help);
+  content: " — bloqueado";
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+}
+
+html[data-theme="dark"] .form-check-input,
+html[data-theme="dark-dark"] .form-check-input,
+html[data-theme="light-dark"] .form-check-input,
+html[data-theme="dark"] input[type="radio"],
+html[data-theme="dark-dark"] input[type="radio"],
+html[data-theme="light-dark"] input[type="radio"],
+html[data-theme="dark"] input[type="checkbox"],
+html[data-theme="dark-dark"] input[type="checkbox"],
+html[data-theme="light-dark"] input[type="checkbox"] {
+  accent-color: var(--color-accent);
+}
+.form-field--hidden {
+  display: none;
+}
+/* --------------------------------------------------------------------------
+   Input com sufixo fixo (ex.: número do ofício do motorista + /ANO)
+   -------------------------------------------------------------------------- */
+.app-input-addon {
+  align-items: stretch;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-sizing: border-box;
+  display: flex;
+  max-width: 100%;
+  min-height: calc(var(--font-size-md, 1rem) * 2.6);
+  overflow: hidden;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+  width: 100%;
+}
+
+.app-input-addon:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 1px rgba(21, 91, 154, 0.2);
+}
+
+.app-input-addon__control {
+  background: transparent;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  flex: 1;
+  min-width: 0;
+}
+
+.app-input-addon__control:focus {
+  outline: none;
+}
+
+.app-input-addon__suffix {
+  align-items: center;
+  background: var(--route-section-bg, var(--color-card-muted));
+  border-left: 1px solid var(--color-border-soft, var(--color-border));
+  color: var(--color-muted-strong, var(--color-muted));
+  display: flex;
+  flex-shrink: 0;
+  font-size: var(--font-size-md);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  padding: 0 var(--space-3);
+  user-select: none;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   ALIASES CANONICOS DO DESIGN SYSTEM — Fase 6
+   Novas classes semanticas .app-form-* como joint selectors das regras
+   existentes. Classes legadas (.field, .form-grid, etc.) nao removidas.
+   ========================================================================== */
+
+.app-form-field,
+.field {
+  display: grid;
+  gap: var(--space-field-gap);
+}
+
+.app-form-label,
+.app-form-field label,
+.field label {
+  color: var(--color-label);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.app-form-help,
+.field-help {
+  color: var(--color-help);
+  font-size: var(--font-size-sm);
+  margin-bottom: 0;
+}
+
+.app-form-error,
+.field-error {
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+  margin-top: var(--space-1);
+}
+
+.app-form-grid {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+}
+
+.app-form-grid > * {
+  grid-column: span 6;
+}
+
+.app-form-grid > .field-span-12 {
+  grid-column: span 12;
+}
+
+.app-form-grid > .field-span-8 {
+  grid-column: span 8;
+}
+
+.app-form-grid > .field-span-6 {
+  grid-column: span 6;
+}
+
+.app-form-grid > .field-span-4 {
+  grid-column: span 4;
+}
+
+.app-form-grid > .field-span-2 {
+  grid-column: span 2;
+}
+
+.app-form-grid--stack > * {
+  grid-column: span 12;
+}
+
+.app-form-section {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-soft);
+  padding: var(--space-5);
+}
+
+.app-form-section__header {
+  border-bottom: 1px solid var(--color-border-soft);
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--space-3);
+}
+
+.app-form-section__title {
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--space-1);
+}
+
+.app-form-section__description {
+  color: var(--color-help);
+  font-size: var(--font-size-sm);
+  margin-bottom: 0;
+}
+
+.app-form-page {
+  display: grid;
+  gap: var(--space-6);
+}
+
+/* ==========================================================================
+   ALIASES CANONICOS DO DESIGN SYSTEM — Fase 10: Wizard shell
+   .app-wizard-* e .app-stepper-* como aliases de .oficio-wizard-* e
+   .oficio-stepper-*. Classes originais nao removidas.
+   Tratamento visual completo aqui: garante que o wizard funcione mesmo
+   sem oficios.css carregado (ex.: cache antigo de style.css).
+   ========================================================================== */
+
+.app-wizard {
+  container-type: inline-size;
+}
+
+.app-wizard__top {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-panel);
+  overflow: hidden;
+}
+
+.app-wizard__header {
+  align-items: center;
+  background:
+    linear-gradient(135deg, rgba(11, 58, 102, 0.96), rgba(21, 91, 154, 0.92)),
+    var(--color-primary);
+  border: 0;
+  color: var(--color-white);
+  display: flex;
+  gap: var(--space-4);
+  justify-content: space-between;
+  min-height: 108px;
+  padding: var(--space-5) var(--space-5) var(--space-6);
+}
+
+.app-wizard__header-copy {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.app-wizard__title {
+  color: var(--color-white);
+  font-size: var(--font-size-2xl);
+  font-weight: 800;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.app-wizard__subtitle {
+  color: var(--color-accent-soft);
+  font-size: var(--font-size-lg);
+  font-weight: 800;
+  margin: 0;
+}
+
+.app-wizard__layout {
+  align-items: start;
+  display: grid;
+  gap: var(--space-5);
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.app-wizard__actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.app-stepper {
+  background: var(--color-card);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: var(--space-3);
+  width: 100%;
+}
+
+.app-stepper__list {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fit, minmax(156px, 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.app-stepper__item {
+  min-width: 0;
+}
+
+.app-stepper__link {
+  align-items: center;
+  background: var(--color-card-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  color: var(--color-heading);
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: auto minmax(0, 1fr);
+  min-height: 76px;
+  padding: var(--space-3);
+  text-decoration: none;
+}
+
+.app-stepper__number {
+  align-items: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  display: inline-flex;
+  font-weight: 900;
+  height: 36px;
+  justify-content: center;
+  width: 36px;
+}
+
+.app-stepper__copy {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.app-stepper__state {
+  color: var(--color-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.app-stepper__title {
+  font-size: var(--font-size-sm);
+  font-weight: 900;
+  line-height: 1.2;
+}

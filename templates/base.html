@@ -1,0 +1,30 @@
+{% load static %}
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="{% static 'js/core/theme-shared.js' %}"></script>
+  <script src="{% static 'js/core/theme-init.js' %}"></script>
+  <title>{% block title %}Central de Viagens 3{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+  <div class="app-shell">
+    {% include "components/layout/sidebar.html" %}
+    <main class="app-main">
+      <section class="content-wrap">
+        {% include "components/feedback/alerts.html" %}
+        {% block content %}{% endblock %}
+      </section>
+    </main>
+  </div>
+  <script src="{% static 'js/theme-toggle.js' %}" defer></script>
+  <script src="{% static 'js/core/app.js' %}" defer></script>
+  <script src="{% static 'js/components/sidebar.js' %}" defer></script>
+  <script src="{% static 'js/components/masks.js' %}" defer></script>
+  <script src="{% static 'js/components/card-toggle.js' %}" defer></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

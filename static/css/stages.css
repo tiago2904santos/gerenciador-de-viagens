@@ -1,0 +1,64 @@
+/* ==========================================================================
+   STAGES
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Estrutura base da linha de fases
+   -------------------------------------------------------------------------- */
+.stage-track {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  list-style: none;
+  margin: 0;
+  padding: var(--space-4);
+}
+
+.stage-track-item {
+  align-items: center;
+  color: var(--color-muted);
+  display: flex;
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  gap: var(--space-2);
+}
+
+.stage-track-item span {
+  align-items: center;
+  background: var(--color-bg-subtle);
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  height: 28px;
+  justify-content: center;
+  width: 28px;
+}
+
+/* --------------------------------------------------------------------------
+   2. Estados e acoes
+   -------------------------------------------------------------------------- */
+.stage-track-item.is-active {
+  color: var(--color-primary-strong);
+}
+
+.stage-track-item.is-active span {
+  background: var(--color-primary);
+  color: var(--color-white);
+}
+
+.stage-track-actions {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: flex-end;
+}
+
+/* --------------------------------------------------------------------------
+   3. Responsividade
+   -------------------------------------------------------------------------- */
+@media (max-width: 760px) {
+  .stage-track {
+    grid-template-columns: 1fr;
+  }
+}

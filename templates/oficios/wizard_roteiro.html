@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<link rel="stylesheet" href="{% static 'css/domain.css' %}?v=20260512">
+<link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260512">
+{% endblock %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="{% static 'js/roteiros_wizard.js' %}?v=20260512"></script>
+<script src="{% static 'js/autosave.js' %}?v=20260512"></script>
+<script type="module" src="{% static 'js/roteiros.js' %}?v=20260513"></script>
+<script src="{% static 'js/roteiros-map.js' %}?v=20260512"></script>
+{% endblock %}
+
+{% block content %}
+  <div class="app-page oficio-wizard app-wizard">
+    <section class="oficio-wizard__section">
+      <div class="app-page__shell oficio-wizard__shell">
+        <section class="oficio-wizard__top" aria-labelledby="oficios-wizard-title">
+          <header class="oficio-wizard__header app-wizard__header">
+            <div class="oficio-wizard__header-copy">
+              <h1 class="oficio-wizard__title app-wizard__title" id="oficios-wizard-title">{{ wizard_header.title }}</h1>
+              <p class="oficio-wizard__subtitle app-wizard__subtitle">{{ wizard_header.subtitle }}</p>
+            </div>
+            <div class="app-page__brand-mark" aria-hidden="true">OF</div>
+          </header>
+
+          {% include "oficios/partials/wizard_stepper.html" with steps=wizard_steps only %}
+        </section>
+
+        <div class="oficio-wizard__layout app-wizard__layout">
+          <main class="oficio-wizard__main">
+            <div class="app-form-shell app-form-shell--roteiro roteiro-form-shell">
+              {{ initial_trechos_data|json_script:"initialTrechosData" }}
+              {% include "roteiros/includes/_roteiro_editor.html" %}
+            </div>
+          </main>
+        </div>
+      </div>
+    </section>
+  </div>
+{% endblock %}

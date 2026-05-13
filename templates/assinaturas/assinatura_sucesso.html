@@ -1,0 +1,71 @@
+{% extends "assinaturas/base_publica_assinatura.html" %}
+
+{% block title %}Documento assinado{% endblock %}
+
+{% block content %}
+<div class="app-page signature-public-flow">
+  <div class="app-page__shell">
+
+    <header class="app-page-hero app-page-hero--hybrid app-page-hero--compact" aria-labelledby="signature-success-title">
+      <div class="app-page-hero__stage">
+        <div class="signature-public-hero-kicker">
+          <span class="app-page-hero__eyebrow">Concluído</span>
+          <span class="signature-header-badge signature-header-badge--success">Assinatura concluída</span>
+        </div>
+        <h1 class="app-page-hero__title" id="signature-success-title">Documento assinado com sucesso</h1>
+      </div>
+      <div class="app-page-hero__body">
+        <p class="app-page__subtitle">Este link não permite nova assinatura para o mesmo pedido.</p>
+      </div>
+      <div class="app-page-hero__ribbon" aria-hidden="true"></div>
+    </header>
+
+    <section class="app-page__form-card signature-success-card" aria-label="Resumo da assinatura">
+      <div class="signature-success-card__header">Resumo da assinatura</div>
+      <ul class="signature-success-summary signature-info-list">
+        <li class="signature-info-item">
+          <span class="signature-info-item__label">Documento</span>
+          <strong class="signature-info-item__value">{{ public_context.document_label|default:"Documento" }}</strong>
+        </li>
+        <li class="signature-info-item">
+          <span class="signature-info-item__label">Assinante</span>
+          <strong class="signature-info-item__value">{{ public_context.signer_name }}</strong>
+        </li>
+        <li class="signature-info-item">
+          <span class="signature-info-item__label">CPF</span>
+          <strong class="signature-info-item__value">{{ public_context.signer_cpf_masked }}</strong>
+        </li>
+        <li class="signature-info-item">
+          <span class="signature-info-item__label">Data e hora</span>
+          <strong class="signature-info-item__value">{{ pedido.assinado_em|date:"d/m/Y H:i" }}</strong>
+        </li>
+        <li class="signature-info-item">
+          <span class="signature-info-item__label">Código de verificação</span>
+          <code class="signature-code">{{ assinatura.codigo_verificacao }}</code>
+        </li>
+        <li class="signature-info-item">
+          <span class="signature-info-item__label">Código do pedido</span>
+          <code class="signature-code">{{ public_context.public_code }}</code>
+        </li>
+        {% if pedido.hash_documento_assinado %}
+        <li class="signature-info-item signature-info-item--full">
+          <span class="signature-info-item__label">Hash do documento assinado</span>
+          <code class="signature-code mono">{{ pedido.hash_documento_assinado }}</code>
+        </li>
+        {% endif %}
+      </ul>
+      <div class="signature-success-actions btn-group">
+        <a
+          class="btn btn-primary app-btn"
+          href="{% url 'assinaturas:assinatura-pdf-assinado' assinatura.pk %}"
+          target="_blank"
+          rel="noopener"
+        >
+          Visualizar PDF assinado
+        </a>
+      </div>
+    </section>
+
+  </div>
+</div>
+{% endblock %}

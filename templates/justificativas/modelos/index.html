@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+  {% include "components/lists/list_page_simple.html" with title=page_title description=page_description eyebrow="Ofícios" brand_mark="OF" search_placeholder="Buscar modelos de justificativa" action_label="Novo modelo" action_url=new_url empty_message="Nenhum modelo de justificativa cadastrado." rows=rows q=q %}
+{% endblock %}

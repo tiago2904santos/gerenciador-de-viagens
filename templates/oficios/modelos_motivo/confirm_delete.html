@@ -1,0 +1,41 @@
+﻿{% extends "base.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+  <div class="app-page modelos-motivo-page">
+    <div class="app-page__shell">
+      <header class="app-page-hero app-page-hero--hybrid app-page-hero--compact" aria-labelledby="modelos-motivo-delete-title">
+        <div class="app-page-hero__stage">
+          <span class="app-page-hero__eyebrow">Ofícios</span>
+          <h1 class="app-page-hero__title" id="modelos-motivo-delete-title">{{ page_title }}</h1>
+        </div>
+        <div class="app-page-hero__body">
+          <div class="app-page__hero-single">
+            <div class="app-page__brand-mark" aria-hidden="true">OF</div>
+            <p class="app-page__subtitle">{{ page_description }}</p>
+          </div>
+        </div>
+        <div class="app-page-hero__ribbon" aria-hidden="true"></div>
+      </header>
+
+      <section class="app-page__form-card modelos-motivo-delete">
+        <div class="form-section">
+          {% include "components/forms/form_section.html" with title="Confirmação de exclusão" only %}
+          <p class="modelos-motivo-delete__lead">Confirma a exclusão do modelo <strong>{{ object.nome }}</strong>?</p>
+          <div class="modelos-motivo-delete__preview">
+            <p><strong>Prévia do texto:</strong></p>
+            <p>{{ object.texto|default:"—" }}</p>
+          </div>
+          <div class="oficio-wizard-pendencias oficio-wizard-pendencias--inline modelos-motivo-delete__alert">
+            <p>Esta ação remove o modelo da lista de sugestões, mas não altera ofícios já criados.</p>
+          </div>
+        </div>
+        <form method="post" class="app-form-shell form-shell">
+          {% csrf_token %}
+          {% include "components/forms/form_actions.html" with primary_label="Excluir modelo" primary_variant="danger" secondary_label="Cancelar" secondary_url=back_url only %}
+        </form>
+      </section>
+    </div>
+  </div>
+{% endblock %}

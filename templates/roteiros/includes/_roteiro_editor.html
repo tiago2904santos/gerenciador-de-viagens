@@ -1,0 +1,72 @@
+{% load static %}
+
+<div class="app-page-shell app-page-shell--wizard oficio-wizard-page oficio-roteiro-page roteiro-form--legacy-roteiro roteiro-editor {% if is_avulso %}roteiro-editor--avulso{% endif %}{% if roteiro_editor_oficio %} roteiro-editor--oficio{% endif %}" data-glance-state="closed">
+  <div class="app-page-shell__inner oficio-wizard-shell">
+    <div class="roteiro-editor__intro" role="region" aria-labelledby="roteiro-editor-intro-title">
+      <span class="roteiro-editor__intro-kicker" id="roteiro-editor-intro-kicker">{% if roteiro_editor_oficio %}Etapa 3 — Ofício{% elif is_avulso %}Cadastro avulso{% else %}Etapa 2{% endif %}</span>
+      <h2 class="roteiro-editor__intro-title" id="roteiro-editor-intro-title">{% if roteiro_editor_oficio %}Roteiro e diárias{% else %}Roteiro e trechos{% endif %}</h2>
+      <p class="roteiro-editor__intro-text">Organize sede, destinos, trechos, retorno e diárias em um fluxo único e contínuo.</p>
+    </div>
+
+    <div class="card roteiro-editor__main oficio-stage-panel">
+      <div class="card-body">
+        <section class="card-section">
+          <form method="post" id="roteiro-editor-form" novalidate class="oficio-stage-form"
+                {% if roteiro_form_action %}action="{{ roteiro_form_action }}"{% endif %}
+                data-autosave="true"
+                data-autosave-model="roteiro"
+                data-autosave-url="{% if object %}{% url 'roteiros:roteiro-autosave' object.pk %}{% endif %}"
+                data-autosave-create-url="{% url 'roteiros:roteiro-autosave-create' %}"
+                data-autosave-edit-url-template="/roteiros/__ID__/autosave/"
+                data-autosave-object-id="{{ object.pk|default:'' }}"
+                data-api-cidades-url="{{ api_cidades_por_estado_url }}"
+                data-api-diarias-url="{{ api_calcular_diarias_url }}"
+                data-api-calcular-rota-url="{{ api_calcular_rota_url }}"
+                data-api-calcular-rota-preview-url="{{ api_calcular_rota_preview_url }}"
+                data-destino-estado-default-id="{{ destino_estado_fixo_id|default:'' }}"
+                data-url-trechos-estimar="{% url 'roteiros:trechos_estimar' %}"
+                data-diarias-quantidade-servidores="{{ diarias_quantidade_servidores|default:1 }}">
+            {% csrf_token %}
+            <input type="hidden" name="autosave_obj_id" id="id_autosave_obj_id" value="{{ object.pk|default:'' }}">
+            <span class="visually-hidden" id="roteiro-autosave-status" aria-live="polite"></span>
+            <input type="hidden" name="quantidade_servidores" id="id_quantidade_servidores" value="{{ diarias_quantidade_servidores|default:1 }}">
+            <input type="hidden" name="tipo_destino" id="id_tipo_destino" value="{{ roteiro_diarias_resultado.tipo_destino|default:'' }}">
+            <input type="hidden" name="quantidade_diarias" id="id_quantidade_diarias" value="{{ roteiro_diarias_resultado.totais.total_diarias|default:'' }}">
+            <input type="hidden" name="valor_diarias" id="id_valor_diarias" value="{{ roteiro_diarias_resultado.totais.total_valor|default:'' }}">
+            <input type="hidden" name="valor_diarias_extenso" id="id_valor_diarias_extenso" value="{{ roteiro_diarias_resultado.totais.valor_extenso|default:'' }}">
+            <input type="hidden" name="map_route_geometry_json" id="id_map_route_geometry_json" value="">
+            <input type="hidden" name="map_route_points_json" id="id_map_route_points_json" value="">
+            <input type="hidden" name="map_route_distance_km" id="id_map_route_distance_km" value="">
+            <input type="hidden" name="map_route_duration_minutes" id="id_map_route_duration_minutes" value="">
+            <input type="hidden" name="map_route_provider" id="id_map_route_provider" value="">
+            <input type="hidden" name="map_route_calculated_at" id="id_map_route_calculated_at" value="">
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger py-2" role="alert">
+              {% for err in form.non_field_errors %}
+                {% if err %}<div>{{ err }}</div>{% endif %}
+              {% endfor %}
+            </div>
+            {% endif %}
+            {% if roteiro_seed_source_label %}
+            <p class="form-text text-muted mb-2" role="status">{{ roteiro_seed_source_label }}</p>
+            {% endif %}
+
+            {% include "roteiros/partials/roteiro/source.html" %}
+            {% include "components/domain/sede_destinos.html" %}
+            {% include "roteiros/partials/roteiro/bate_volta.html" %}
+            {% include "roteiros/includes/mapa_rota.html" %}
+            {% include "components/domain/trechos.html" %}
+            {% include "components/domain/retorno.html" %}
+            {% include "components/domain/calculadora_rota.html" %}
+            {% include "roteiros/partials/roteiro/actions.html" %}
+          </form>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{ roteiro_editor_state_json|default:'{}'|json_script:"roteiro-editor-state-data" }}
+{{ roteiro_routes_json|default_if_none:''|json_script:"roteiro-editor-routes-data" }}
+{{ roteiro_diarias_resultado|default_if_none:''|json_script:"roteiro-editor-diarias-data" }}

@@ -1,0 +1,36 @@
+﻿{% extends "base.html" %}
+{% block title %}{{ page_title }}{% endblock %}
+{% block content %}
+  <div class="app-page">
+    <div class="app-page__shell">
+      <header class="app-page-hero app-page-hero--hybrid app-page-hero--compact" aria-labelledby="cargos-form-title">
+        <div class="app-page-hero__stage">
+          <span class="app-page-hero__eyebrow">Cadastros</span>
+          <h1 class="app-page-hero__title" id="cargos-form-title">{{ page_title }}</h1>
+        </div>
+        <div class="app-page-hero__body">
+          <div class="app-page__hero-single">
+            <div class="app-page__brand-mark" aria-hidden="true">CG</div>
+            <p class="app-page__subtitle">{{ page_description }}</p>
+          </div>
+        </div>
+        <div class="app-page-hero__ribbon" aria-hidden="true"></div>
+      </header>
+
+      <div class="app-page__form-card">
+        <form class="app-form-shell form-shell" method="post" novalidate>
+          {% csrf_token %}
+          <div class="form-section app-form-section">
+            {% include "components/forms/form_section.html" with title="Dados do cargo" description="Nome único. Opcionalmente marque como cargo padrão para novos servidores." only %}
+            <div class="form-grid app-form-grid">
+              <div class="field-span-12">
+                {% include "components/forms/form_field.html" with field=form.nome only %}
+              </div>
+            </div>
+          </div>
+          {% include "components/forms/form_actions.html" with primary_label=submit_label secondary_label="Voltar" secondary_url=back_url only %}
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,631 @@
+/* Lista de roteiros: cards compactos, status por borda lateral (sem bloco amarelo). */
+
+.app-page--roteiros-list .app-page__shell {
+  gap: var(--space-4);
+}
+
+.app-page--roteiros-list .app-page__toolbar {
+  background: var(--route-card-bg);
+  border: 1px solid var(--route-card-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--theme-shadow-block);
+}
+
+.app-page--roteiros-list .app-page__toolbar input,
+.app-page--roteiros-list .app-page__toolbar select {
+  background: var(--route-field-bg);
+  border-color: var(--route-field-border);
+  color: var(--route-field-text);
+}
+
+.app-page--roteiros-list .app-page__toolbar input::placeholder {
+  color: var(--route-field-placeholder);
+}
+
+.app-page--roteiros-list .btn-primary,
+.app-page--roteiros-list .btn-secondary,
+.app-page--roteiros-list .btn-danger,
+.app-page--roteiros-list .btn-muted {
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-xs);
+  font-weight: 800;
+}
+
+.app-page--roteiros-list .btn-primary {
+  background: var(--route-button-primary-bg);
+  border-color: var(--route-button-primary-border);
+  color: var(--route-button-primary-text);
+}
+
+.app-page--roteiros-list .btn-primary:hover,
+.app-page--roteiros-list .btn-primary:focus-visible {
+  background: var(--route-button-primary-hover-bg);
+  border-color: var(--route-button-primary-hover-border);
+  color: var(--route-button-primary-text);
+}
+
+.app-page--roteiros-list .btn-secondary,
+.app-page--roteiros-list .btn-muted {
+  background: var(--route-button-secondary-bg);
+  border-color: var(--route-button-secondary-border);
+  color: var(--route-button-secondary-text);
+}
+
+.app-page--roteiros-list .btn-secondary:hover,
+.app-page--roteiros-list .btn-secondary:focus-visible,
+.app-page--roteiros-list .btn-muted:hover,
+.app-page--roteiros-list .btn-muted:focus-visible {
+  background: var(--route-button-secondary-hover-bg);
+  border-color: var(--route-button-secondary-hover-border);
+  color: var(--route-button-secondary-text);
+}
+
+.app-page--roteiros-list .btn-danger {
+  background: var(--route-button-danger-bg);
+  border-color: var(--route-button-danger-border);
+  color: var(--route-button-danger-text);
+}
+
+.app-page--roteiros-list .btn-danger:hover,
+.app-page--roteiros-list .btn-danger:focus-visible {
+  background: var(--route-button-danger-hover-bg);
+  border-color: var(--route-button-danger-hover-border);
+  color: var(--route-button-danger-text);
+}
+
+.app-page--roteiros-list .btn:focus-visible {
+  box-shadow: 0 0 0 3px var(--route-focus-ring), var(--shadow-xs);
+  outline: none;
+}
+
+.app-page-hero--roteiros-list {
+  box-shadow: var(--theme-shadow-block);
+}
+
+.app-page-hero--roteiros-list .app-page-hero__stage {
+  padding: var(--space-4) var(--space-5);
+}
+
+.app-page-hero--roteiros-list .app-page-hero__stage::after {
+  background: none;
+  opacity: 1;
+}
+
+.app-page-hero--roteiros-list .app-page-hero__eyebrow {
+  margin-bottom: var(--space-1);
+}
+
+.app-page-hero--roteiros-list .app-page-hero__title {
+  font-size: clamp(1.2rem, 1.65vw, 1.45rem);
+  margin: 0 0 var(--space-1);
+}
+
+.list-grid--roteiros {
+  gap: var(--space-3);
+}
+
+.roteiro-list-card {
+  background: var(--route-card-bg);
+  border: 1px solid var(--route-card-border);
+  border-radius: calc(var(--radius-lg) + 4px);
+  border-left: 8px solid #5b7694;
+  box-shadow: var(--theme-shadow-block);
+  box-sizing: border-box;
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4) var(--space-2);
+  transition:
+    border-color var(--transition-base),
+    box-shadow var(--transition-base);
+}
+
+.roteiro-list-card:hover {
+  border-color: #7f9bbb;
+  box-shadow: var(--shadow-panel);
+}
+
+.roteiro-list-card--status-rascunho {
+  border-left-color: #b7791f;
+}
+
+.roteiro-list-card--status-finalizado {
+  border-left-color: #16805a;
+}
+
+.roteiro-list-card--status-outro {
+  border-left-color: #64748b;
+}
+
+.roteiro-list-card__top {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.roteiro-list-card__title-row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  justify-content: space-between;
+}
+
+.roteiro-list-card__title {
+  color: var(--theme-text-heading);
+  flex: 1 1 12rem;
+  font-size: var(--font-size-md);
+  font-weight: 800;
+  letter-spacing: 0;
+  line-height: 1.25;
+  margin: 0;
+  min-width: 0;
+  word-break: break-word;
+}
+
+.roteiro-list-card__status-chip {
+  flex-shrink: 0;
+  letter-spacing: 0.04em;
+  margin-bottom: 0;
+  min-height: 26px;
+  padding: 5px 12px;
+}
+
+.roteiro-list-card__status-chip.status-chip--draft {
+  background: var(--route-status-draft-bg);
+  border-color: var(--route-status-draft-border);
+  color: var(--route-status-draft-text);
+}
+
+.roteiro-list-card__status-chip.status-chip--completed {
+  background: var(--route-status-final-bg);
+  border-color: var(--route-status-final-border);
+  color: var(--route-status-final-text);
+}
+
+.roteiro-list-card__status-chip.status-chip--muted {
+  background: var(--route-status-muted-bg);
+  border-color: var(--route-status-muted-border);
+  color: var(--route-status-muted-text);
+}
+
+.roteiro-list-card__subtitle {
+  color: var(--theme-text-muted);
+  font-size: 12px;
+  line-height: 1.35;
+  margin: 0;
+  max-width: 56ch;
+}
+
+/*
+ * Corpo: 2 colunas — trechos (~60%) | bloco “Diárias” com dois sub-blocos (valor | composição).
+ */
+.roteiro-list-card__body {
+  align-items: stretch;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: var(--space-1);
+}
+
+.roteiro-list-card__trechos-col {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
+}
+
+.roteiro-list-card__diarias-col {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  grid-column: 2;
+  grid-row: 1;
+  height: auto;
+  min-height: 0;
+  min-width: 0;
+}
+
+.roteiro-list-card__diarias-box {
+  background: var(--route-card-inner-bg);
+  border: 1px solid var(--route-card-inner-border);
+  border-radius: var(--radius-md);
+  box-sizing: border-box;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 8px;
+  height: auto;
+  min-height: 0;
+  padding: 12px 14px 14px;
+}
+
+.roteiro-list-card__diarias-box-title {
+  color: var(--theme-text-heading);
+  display: block;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0;
+  line-height: 1.2;
+  margin-bottom: 4px;
+  padding: 2px 2px 0;
+  text-transform: uppercase;
+}
+
+.roteiro-list-card__diarias-box-panels {
+  align-items: stretch;
+  display: grid;
+  flex: 1 1 auto;
+  gap: 8px;
+  grid-template-columns: 1fr 1fr;
+  min-height: 0;
+  min-width: 0;
+}
+
+.roteiro-list-card__diarias-subblock {
+  align-items: flex-start;
+  background: var(--route-card-inner-bg);
+  border: 1px solid var(--route-card-inner-border);
+  border-radius: var(--radius-md);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 4px;
+  min-width: 0;
+  padding: 12px 14px;
+  text-align: left;
+}
+
+.roteiro-list-card__diarias-subblock--vazio {
+  justify-content: center;
+}
+
+.roteiro-list-card__diarias-panel-heading {
+  color: var(--theme-text-subtle);
+  display: block;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0;
+  margin-bottom: 2px;
+  text-transform: uppercase;
+}
+
+.roteiro-list-card__diarias-panel-line {
+  color: var(--theme-text-heading);
+  filter: none;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  line-height: 1.35;
+  margin: 0;
+  text-shadow: none;
+  word-break: break-word;
+}
+
+.roteiro-list-card__diarias-panel-line--moeda {
+  filter: none;
+  font-size: clamp(1.12rem, 1.5vw, 1.35rem);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0;
+  line-height: 1.25;
+  text-shadow: none;
+}
+
+.roteiro-list-card__diarias-panel-line--muted {
+  color: var(--theme-text-muted);
+  filter: none;
+  font-weight: var(--font-weight-medium);
+  text-shadow: none;
+}
+
+.roteiro-list-card__diarias-composicao-list {
+  align-items: flex-start;
+  color: var(--theme-text-heading);
+  display: flex;
+  filter: none;
+  flex: 0 1 auto;
+  flex-direction: row;
+  font-size: clamp(1rem, 1.25vw, 1.18rem);
+  font-weight: var(--font-weight-bold);
+  gap: 2px;
+  justify-content: flex-start;
+  line-height: 1.4;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  text-shadow: none;
+  width: 100%;
+  word-break: break-word;
+}
+
+.roteiro-list-card__diarias-metric-value {
+  align-items: center;
+  display: flex;
+  flex: 1 1 auto;
+  justify-content: flex-start;
+  min-height: 0;
+  text-align: center;
+  width: 100%;
+}
+
+.roteiro-list-card__diarias-metric-value .roteiro-list-card__diarias-composicao-list {
+  justify-content: flex-start;
+}
+
+.roteiro-list-card__diarias-composicao-list li {
+  white-space: normal;
+}
+
+.roteiro-list-card__diarias-composicao-list li + li::before {
+  content: "+";
+  margin: 0 4px 0 2px;
+}
+
+.roteiro-list-card--trechos-2.roteiro-list-card--layout-compact .roteiro-list-card__diarias-box {
+  gap: 5px;
+  padding: 8px 10px 10px;
+}
+
+.roteiro-list-card--trechos-2.roteiro-list-card--layout-compact .roteiro-list-card__diarias-box-title {
+  font-size: 10px;
+  line-height: 1.1;
+  margin-bottom: 2px;
+  padding-top: 0;
+}
+
+.roteiro-list-card--trechos-2.roteiro-list-card--layout-compact .roteiro-list-card__diarias-box-panels {
+  gap: 6px;
+}
+
+.roteiro-list-card--trechos-2.roteiro-list-card--layout-compact .roteiro-list-card__diarias-subblock {
+  gap: 2px;
+  padding: 8px 10px;
+}
+
+.roteiro-list-card--trechos-2.roteiro-list-card--layout-compact .roteiro-list-card__diarias-panel-heading {
+  font-size: 9px;
+  line-height: 1.1;
+  margin-bottom: 1px;
+}
+
+.roteiro-list-card--trechos-2.roteiro-list-card--layout-compact .roteiro-list-card__diarias-panel-line--moeda {
+  font-size: clamp(1.05rem, 1.35vw, 1.2rem);
+}
+
+.roteiro-list-card--trechos-2.roteiro-list-card--layout-compact .roteiro-list-card__diarias-composicao-list {
+  font-size: clamp(0.92rem, 1.1vw, 1.05rem);
+  line-height: 1.25;
+}
+
+.roteiro-list-card--layout-expanded-3 .roteiro-list-card__diarias-box {
+  gap: 10px;
+  padding: 14px 16px 16px;
+}
+
+.roteiro-list-card--layout-expanded-3 .roteiro-list-card__diarias-box-title {
+  font-size: 12px;
+}
+
+.roteiro-list-card--layout-expanded-3 .roteiro-list-card__diarias-subblock {
+  padding: 14px 16px;
+}
+
+.roteiro-list-card--layout-expanded-3 .roteiro-list-card__diarias-panel-heading {
+  font-size: 11px;
+}
+
+.roteiro-list-card--layout-expanded-3 .roteiro-list-card__diarias-panel-line--moeda {
+  font-size: clamp(1.55rem, 2.4vw, 1.9rem);
+}
+
+.roteiro-list-card--layout-expanded-3 .roteiro-list-card__diarias-composicao-list {
+  font-size: clamp(1.18rem, 1.8vw, 1.45rem);
+}
+
+.roteiro-list-card--layout-diarias-dashboard .roteiro-list-card__diarias-box-title {
+  font-size: 12px;
+}
+
+.roteiro-list-card--layout-diarias-dashboard .roteiro-list-card__diarias-panel-heading {
+  font-size: 11px;
+}
+
+.roteiro-list-card__diarias-grid {
+  align-items: stretch;
+  display: grid;
+  flex: 1 1 auto;
+  gap: 10px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  min-height: 0;
+}
+
+.roteiro-list-card__diarias-main,
+.roteiro-list-card__diarias-metric {
+  background: var(--route-card-inner-bg);
+  border: 1px solid var(--route-card-inner-border);
+  border-radius: var(--radius-md);
+  box-sizing: border-box;
+  min-width: 0;
+  padding: 14px 16px;
+}
+
+.roteiro-list-card__diarias-main {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-height: 0;
+}
+
+.roteiro-list-card__diarias-main--vazio {
+  justify-content: center;
+}
+
+.roteiro-list-card__diarias-side {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 1fr;
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+  min-height: 0;
+  min-width: 0;
+}
+
+.roteiro-list-card__diarias-metric {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-height: 0;
+}
+
+.roteiro-list-card__diarias-panel-line--moeda-large {
+  font-size: clamp(1.75rem, 3vw, 2.2rem);
+  line-height: 1.1;
+}
+
+.roteiro-list-card__diarias-panel-line--strong {
+  font-size: clamp(1.15rem, 1.6vw, 1.35rem);
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.roteiro-list-card__diarias-main-content {
+  align-items: flex-start;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 0;
+  text-align: left;
+}
+
+.roteiro-list-card__diarias-extenso-label {
+  margin-top: 12px;
+}
+
+.roteiro-list-card__diarias-extenso {
+  color: var(--theme-text-heading);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  line-height: 1.4;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.roteiro-list-card__trecho {
+  background: var(--route-card-inner-bg);
+  border: 1px solid var(--route-card-inner-border);
+  border-radius: var(--radius-md);
+  box-sizing: border-box;
+  flex-shrink: 0;
+  padding: var(--space-2) var(--space-3);
+  width: 100%;
+}
+
+.roteiro-list-card__trecho-summary {
+  align-items: center;
+  display: flex;
+  min-height: 48px;
+}
+
+.roteiro-list-card__trecho-summary-text {
+  color: var(--theme-text-heading);
+  font-size: var(--font-size-sm);
+  font-weight: 800;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.roteiro-list-card__trecho-rota {
+  color: var(--theme-text-heading);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  line-height: 1.25;
+  margin-bottom: 2px;
+}
+
+.roteiro-list-card__trecho-times {
+  color: var(--theme-text-muted);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: var(--font-size-xs);
+  gap: var(--space-2) var(--space-4);
+}
+
+.roteiro-list-card__trecho-label {
+  color: var(--theme-text-subtle);
+  font-weight: 700;
+  margin-right: 0.15rem;
+}
+
+.roteiro-list-card__actions {
+  border-top: 1px solid var(--route-card-inner-border);
+  justify-content: flex-end;
+  margin: 0;
+  padding-top: var(--space-1);
+}
+
+@media (max-width: 1100px) {
+  .roteiro-list-card__body {
+    grid-template-columns: minmax(0, 1.5fr) minmax(240px, 1fr);
+  }
+}
+
+.roteiro-list-card__actions .btn {
+  border-radius: var(--radius-pill);
+  min-width: 5.5rem;
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .roteiro-list-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .roteiro-list-card__trechos-col {
+    grid-column: unset;
+    grid-row: unset;
+  }
+
+  .roteiro-list-card__diarias-col {
+    flex: 0 1 auto;
+    grid-column: unset;
+    grid-row: unset;
+    width: 100%;
+  }
+
+  .roteiro-list-card__diarias-box {
+    flex: 0 1 auto;
+  }
+
+  .roteiro-list-card__diarias-box-panels {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .roteiro-list-card__diarias-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(180px, 0.8fr);
+  }
+}
+
+@media (max-width: 520px) {
+  .roteiro-list-card__diarias-box-panels,
+  .roteiro-list-card__diarias-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .roteiro-list-card__diarias-side {
+    gap: var(--space-2);
+  }
+}
+
+@media (max-width: 640px) {
+  .roteiro-list-card__actions {
+    justify-content: stretch;
+  }
+
+  .roteiro-list-card__actions .btn {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+}

@@ -1,0 +1,18 @@
+# Exemplo (validar imagens e portas no seu registry antes de usar).
+# PDF primário: WeasyPrint no container do Django com libs Pango/Cairo instaladas.
+# PDF opcional derivado de DOCX: serviço LibreOffice + unoserver na rede interna.
+
+services:
+  app:
+    environment:
+      DOCUMENTOS_DEFAULT_PDF_ENGINE: weasyprint
+      DOCUMENTOS_ENABLE_LIBREOFFICE: "true"
+      DOCUMENTOS_UNOSERVER_URL: http://libreoffice:2003
+    depends_on:
+      - libreoffice
+
+  libreoffice:
+    image: your-registry/unoserver:latest
+    command: ["unoserver", "--interface", "0.0.0.0", "--port", "2003"]
+    expose:
+      - "2003"

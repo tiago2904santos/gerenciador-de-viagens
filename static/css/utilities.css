@@ -1,0 +1,163 @@
+/* ==========================================================================
+   UTILITIES
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Acessibilidade e helpers de layout
+   -------------------------------------------------------------------------- */
+.sr-only {
+  clip: rect(0, 0, 0, 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+.stack {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.cluster {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.alerts {
+  display: grid;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+}
+
+#id_roteiro_seed_source_label:empty {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* --------------------------------------------------------------------------
+   2. Alertas semanticos
+   -------------------------------------------------------------------------- */
+.alert {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-xs);
+  font-weight: 600;
+  padding: var(--space-3) var(--space-4);
+  position: relative;
+}
+
+.alert::before {
+  border-radius: var(--radius-pill);
+  content: "";
+  display: inline-block;
+  height: 8px;
+  margin-right: var(--space-2);
+  width: 8px;
+}
+
+.alert-success {
+  background: var(--color-success-soft);
+  border-color: rgba(22, 128, 90, 0.35);
+  color: var(--color-success);
+}
+
+.alert-success::before {
+  background: var(--color-success);
+}
+
+.alert-error,
+.alert-danger {
+  background: var(--color-danger-bg);
+  border-color: rgba(180, 35, 24, 0.32);
+  color: var(--color-danger-text);
+}
+
+.alert-error::before,
+.alert-danger::before {
+  background: var(--color-danger);
+}
+
+.alert-warning {
+  background: var(--color-warning-soft);
+  border-color: rgba(183, 121, 31, 0.3);
+  color: var(--color-accent-hover);
+}
+
+.alert-warning::before {
+  background: var(--color-warning);
+}
+
+.alert-info {
+  background: var(--color-info-bg);
+  border-color: var(--color-info-border);
+  color: var(--color-info-text);
+}
+
+.alert-info::before {
+  background: var(--color-info);
+}
+
+/* --------------------------------------------------------------------------
+   3. Chips de status
+   -------------------------------------------------------------------------- */
+.status-chip {
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+  letter-spacing: 0;
+  margin-bottom: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  text-transform: uppercase;
+}
+
+.status-chip--draft {
+  background: var(--color-warning-soft);
+  border-color: rgba(183, 121, 31, 0.22);
+  color: var(--color-warning);
+}
+
+.status-chip--active {
+  background: var(--color-info-soft);
+  border-color: rgba(37, 99, 168, 0.24);
+  color: var(--color-info);
+}
+
+.status-chip--completed {
+  background: var(--color-success-soft);
+  border-color: rgba(22, 128, 90, 0.22);
+  color: var(--color-success);
+}
+
+.status-chip--danger {
+  background: var(--color-danger-soft);
+  border-color: rgba(180, 35, 24, 0.20);
+  color: var(--color-danger);
+}
+
+.status-chip--muted {
+  background: var(--color-surface-soft);
+  border-color: var(--color-border);
+  color: var(--color-description);
+}
+
+.status-chip--warning {
+  background: var(--color-warning-soft);
+  border-color: rgba(183, 121, 31, 0.22);
+  color: var(--color-warning);
+}
+
+html[data-theme="dark"] .status-chip--muted,
+html[data-theme="dark-dark"] .status-chip--muted,
+html[data-theme="light-dark"] .status-chip--muted {
+  background: var(--color-info-bg);
+  border-color: var(--color-info-border);
+  color: var(--color-info-text);
+}

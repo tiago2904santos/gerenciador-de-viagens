@@ -1,0 +1,25 @@
+<nav class="oficio-stepper app-stepper" aria-label="Etapas do ofício">
+  <ol class="oficio-stepper__list app-stepper__list">
+    {% for step in steps %}
+      <li class="oficio-stepper__item app-stepper__item oficio-stepper__item--{{ step.state }} oficio-stepper__item--status-{{ step.completion_state }}">
+        {% if step.url and step.state != "locked" %}
+          <a class="oficio-stepper__link app-stepper__link" href="{{ step.url }}" aria-current="{% if step.state == 'current' %}step{% endif %}">
+            <span class="oficio-stepper__number">{{ step.number }}</span>
+            <span class="oficio-stepper__copy">
+              <span class="oficio-stepper__state">{{ step.state_label }}</span>
+              <span class="oficio-stepper__title">{{ step.title }}</span>
+            </span>
+          </a>
+        {% else %}
+          <span class="oficio-stepper__link app-stepper__link" aria-disabled="true" aria-current="{% if step.state == 'current' %}step{% endif %}">
+            <span class="oficio-stepper__number">{{ step.number }}</span>
+            <span class="oficio-stepper__copy">
+              <span class="oficio-stepper__state">{{ step.state_label }}</span>
+              <span class="oficio-stepper__title">{{ step.title }}</span>
+            </span>
+          </span>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ol>
+</nav>

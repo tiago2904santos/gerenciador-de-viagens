@@ -1,0 +1,177 @@
+:root {
+  /* --------------------------------------------------------------------------
+     Cores base
+     -------------------------------------------------------------------------- */
+  --color-bg: #f2f6fb;
+  --color-bg-strong: #e7eff8;
+  --color-bg-dark: #062847;
+  --color-bg-subtle: #eaf1f8;
+  --color-bg-glow: #f7fbff;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f8fafd;
+  --color-surface-soft: #f8fafd;
+  --color-surface-glass: #ffffff;
+  --color-border: #cbd8e6;
+  --color-border-soft: #e3eaf2;
+  --color-border-strong: #afc0d3;
+  --color-text: #132238;
+  --color-heading: #071a33;
+  --color-muted: #52657a;
+  --color-muted-strong: #334c63;
+  --color-subtle: #71839a;
+  --color-primary: #0b3a66;
+  --color-primary-strong: #062847;
+  --color-primary-dark: #062847;
+  --color-primary-hover: #082f55;
+  --color-primary-bright: #155b9a;
+  --color-primary-soft: #e5eff8;
+  --color-secondary: #155b9a;
+  --color-secondary-hover: #0f477a;
+  --color-secondary-soft: #e3f0fb;
+  --color-accent: #d8a21b;
+  --color-accent-hover: #b98712;
+  --color-accent-soft: #fff3cf;
+  --color-danger: #b42318;
+  --color-danger-soft: #fdecec;
+  --color-warning: #d8a21b;
+  --color-warning-soft: #fff3cf;
+  --color-success: #16805a;
+  --color-success-soft: #e5f6ef;
+  --color-info: #155b9a;
+  --color-info-soft: #e3f0fb;
+  --color-white: #ffffff;
+  --color-danger-border-soft: rgba(180, 35, 24, 0.24);
+  --color-danger-border-strong: rgba(180, 35, 24, 0.38);
+  --color-info-border-strong: rgba(21, 91, 154, 0.48);
+  --color-accent-border-soft: rgba(216, 162, 27, 0.35);
+  --color-accent-border-strong: rgba(216, 162, 27, 0.45);
+
+  /* --------------------------------------------------------------------------
+     Sombras (escala base + aliases semanticos)
+     -------------------------------------------------------------------------- */
+  --shadow-xs: 0 1px 2px rgba(7, 26, 51, 0.06);
+  --shadow-sm: 0 6px 16px rgba(7, 26, 51, 0.1);
+  --shadow-md: 0 14px 34px rgba(7, 26, 51, 0.16);
+  --shadow-lg: 0 24px 60px rgba(7, 26, 51, 0.2);
+  --shadow-inner: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  --shadow-soft: var(--shadow-sm);
+  --shadow-card: var(--shadow-md);
+  --shadow-panel: 0 18px 40px rgba(7, 26, 51, 0.16);
+  --shadow-section: 0 18px 36px rgba(15, 34, 54, 0.08);
+  --shadow-elevated: var(--shadow-lg);
+  --shadow-strong: 0 20px 44px rgba(15, 34, 54, 0.1);
+  --shadow-inner-light: var(--shadow-inner);
+  --glow-primary: 0 0 0 1px rgba(21, 91, 154, 0.12), 0 14px 34px rgba(11, 58, 102, 0.28);
+  --glow-accent: 0 14px 34px rgba(216, 162, 27, 0.22);
+
+  /* --------------------------------------------------------------------------
+     Espacamento (escala + aliases de contexto)
+     -------------------------------------------------------------------------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-field-gap: var(--space-2);
+  --space-form-gap: var(--space-4);
+  --space-card-x: var(--space-4);
+  --space-card-y: var(--space-4);
+  --space-section-x: var(--space-5);
+  --space-section-y: var(--space-5);
+
+  /* --------------------------------------------------------------------------
+     Raios (escala + aliases semanticos)
+     -------------------------------------------------------------------------- */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-control: 12px;
+  --radius-control-lg: var(--radius-md);
+  --radius-card: 16px;
+  --radius-panel: 18px;
+  --radius-section: 18px;
+  --radius-shell: 22px;
+  --radius-map: var(--radius-panel);
+  --radius-pill: 999px;
+  --radius-full: var(--radius-pill);
+
+  /* --------------------------------------------------------------------------
+     Tipografia
+     -------------------------------------------------------------------------- */
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 20px;
+  --font-size-xl: 24px;
+  --font-size-2xl: 32px;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+  --font-weight-black: 900;
+  --letter-spacing-eyebrow: 0.12em;
+  --letter-spacing-label: 0.06em;
+  --letter-spacing-chip: 0.04em;
+
+  /* --------------------------------------------------------------------------
+     Controles e interacao
+     -------------------------------------------------------------------------- */
+  --control-height-sm: 34px;
+  --control-height-md: 44px;
+  --control-height-lg: 52px;
+  --transition-fast: 140ms ease;
+  --transition-base: 160ms ease;
+  --transition-slow: 220ms ease;
+
+  /* --------------------------------------------------------------------------
+     Pilha de camadas
+     -------------------------------------------------------------------------- */
+  --font-sans: "Segoe UI", Arial, sans-serif;
+  --z-sidebar: 20;
+  --z-dropdown: 50;
+  --z-modal: 100;
+  --z-toast: 120;
+
+  /* Shell: sidebar fixa em % da viewport; conteudo usa o restante (grid em layout.css). */
+  --sidebar-width: 15%;
+  --page-max-width: 100%;
+
+  /* --------------------------------------------------------------------------
+     Espaco 7 (28px) — alias ausente; corrige uso em app-page.css/dashboard.css
+     -------------------------------------------------------------------------- */
+  --space-7: 28px;
+
+  /* --------------------------------------------------------------------------
+     API publica do design system — tokens --app-*
+     Alias estaveis para radius, espaco e tipografia (nao mudam por tema).
+     Tokens de cor ficam em theme.css pois variam entre light e dark.
+     -------------------------------------------------------------------------- */
+
+  /* Radius */
+  --app-radius-sm: var(--radius-sm);
+  --app-radius-md: var(--radius-md);
+  --app-radius-lg: var(--radius-lg);
+  --app-radius-xl: var(--radius-xl);
+
+  /* Espaco */
+  --app-space-1: var(--space-1);
+  --app-space-2: var(--space-2);
+  --app-space-3: var(--space-3);
+  --app-space-4: var(--space-4);
+  --app-space-5: var(--space-5);
+
+  /* Tipografia */
+  --app-font-family: var(--font-sans);
+  --app-font-size-xs: var(--font-size-xs);
+  --app-font-size-sm: var(--font-size-sm);
+  --app-font-size-md: var(--font-size-md);
+  --app-font-size-lg: var(--font-size-lg);
+  --app-font-size-xl: var(--font-size-xl);
+  --app-font-weight-normal: 400;
+  --app-font-weight-semibold: var(--font-weight-semibold);
+  --app-font-weight-bold: var(--font-weight-bold);
+}

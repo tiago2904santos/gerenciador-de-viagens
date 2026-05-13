@@ -1,0 +1,41 @@
+﻿{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260512">
+{% endblock %}
+
+{% block content %}
+  <!-- wizard-oficio v2: 4=justificativa, 5=documentos, 6=assinaturas; /resumo/ = alias de documentos -->
+  <div class="app-page oficio-wizard app-wizard">
+    <section class="oficio-wizard__section">
+      <div class="app-page__shell oficio-wizard__shell">
+        <section class="oficio-wizard__top app-wizard__top" aria-labelledby="oficios-wizard-title">
+          <header class="oficio-wizard__header app-wizard__header">
+            <div class="oficio-wizard__header-copy app-wizard__header-copy">
+              <h1 class="oficio-wizard__title app-wizard__title" id="oficios-wizard-title">{{ wizard_header.title }}</h1>
+              <p class="oficio-wizard__subtitle app-wizard__subtitle">{{ wizard_header.subtitle }}</p>
+            </div>
+            <div class="app-page__brand-mark" aria-hidden="true">OF</div>
+          </header>
+
+          {% include "oficios/partials/wizard_stepper.html" with steps=wizard_steps only %}
+        </section>
+
+        <div class="oficio-wizard__layout app-wizard__layout">
+          <main class="oficio-wizard__main">
+            <form class="app-form-shell app-form-shell--oficio form-shell" method="post" novalidate>
+              {% csrf_token %}
+              {% block wizard_content %}{% endblock %}
+              {% block wizard_actions %}
+              {% include "oficios/partials/wizard_actions.html" with wizard_back_url=wizard_back_url wizard_back_label=wizard_back_label oficio=oficio wizard_finalizar=wizard_finalizar oficio_completo=oficio_completo|default:False only %}
+              {% endblock %}
+            </form>
+          </main>
+        </div>
+      </div>
+    </section>
+  </div>
+{% endblock %}

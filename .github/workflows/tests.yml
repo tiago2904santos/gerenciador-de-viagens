@@ -1,0 +1,41 @@
+name: Tests
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  django:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install LibreOffice (DOCX→PDF e deteção soffice)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libreoffice-writer
+
+      - name: Install Python dependencies
+        run: pip install -r requirements/dev.txt
+
+      - name: Run Django tests (SQLite, núcleo documental)
+        run: |
+          python manage.py test \
+            documentos.tests.test_docxtpl_nested_templates \
+            documentos.tests.test_facade \
+            documentos.tests.test_libreoffice_resolve \
+            documentos.tests.test_simple_pdf_fallback \
+            documentos.tests.test_templates \
+            documentos.tests.test_validators \
+            documentos.tests.test_filenames \
+            documentos.tests.test_responses \
+            documentos.tests.test_registry \
+            documentos.tests.test_placeholders \
+            --settings=config.settings.test -v 1

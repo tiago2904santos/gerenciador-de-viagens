@@ -1,0 +1,42 @@
+﻿{% extends "base.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+  <div class="app-page modelo-motivo-form">
+    <div class="app-page__shell">
+      <header class="app-page-hero app-page-hero--hybrid app-page-hero--compact" aria-labelledby="modelos-motivo-form-title">
+        <div class="app-page-hero__stage">
+          <span class="app-page-hero__eyebrow">Ofícios</span>
+          <h1 class="app-page-hero__title" id="modelos-motivo-form-title">{{ page_title }}</h1>
+        </div>
+        <div class="app-page-hero__body">
+          <div class="app-page__hero-single">
+            <div class="app-page__brand-mark" aria-hidden="true">OF</div>
+            <p class="app-page__subtitle">{{ page_description }}</p>
+          </div>
+        </div>
+        <div class="app-page-hero__ribbon" aria-hidden="true"></div>
+      </header>
+
+      <section class="app-page__form-card">
+        <form method="post" class="app-form-shell form-shell" novalidate>
+          {% csrf_token %}
+          {% if form.is_padrao.value %}
+            <input type="hidden" name="{{ form.is_padrao.html_name }}" value="on">
+          {% endif %}
+          <div class="form-section">
+            {% include "components/forms/form_section.html" with title="Dados do modelo" only %}
+            <div class="form-grid form-grid--stack">
+              {% include "components/forms/form_field.html" with field=form.nome only %}
+              <div class="field-span-12">
+                {% include "components/forms/form_field.html" with field=form.texto only %}
+              </div>
+            </div>
+          </div>
+          {% include "components/forms/form_actions.html" with primary_label=submit_label secondary_label="Voltar" secondary_url=back_url only %}
+        </form>
+      </section>
+    </div>
+  </div>
+{% endblock %}

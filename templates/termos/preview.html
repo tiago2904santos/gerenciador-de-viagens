@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}{{ page_title }}{% endblock %}
+{% block content %}
+  <div class="app-page">
+    <div class="app-page__shell">
+      <h1 class="app-page__title">{{ page_title }}</h1>
+      <p class="app-page__description">
+        <a href="{% url 'oficios:dados_viajantes' oficio.pk %}">Voltar à edição do ofício</a>
+        · <a href="?format=json">JSON</a>
+      </p>
+      {% if preview.erro %}
+        <p class="text-danger">{{ preview.erro }}</p>
+      {% else %}
+        <section class="app-panel">
+          <h2>Servidores com Termo de Autorização</h2>
+          <ul>
+            {% for servidor in preview.servidores %}
+              <li>{{ servidor.nome }}</li>
+            {% empty %}
+              <li>Nenhum servidor selecionado para Termo de Autorização neste ofício.</li>
+            {% endfor %}
+          </ul>
+        </section>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

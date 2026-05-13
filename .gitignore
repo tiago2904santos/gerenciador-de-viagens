@@ -1,0 +1,36 @@
+__pycache__/
+*.py[cod]
+*.sqlite3
+db.sqlite3
+.env
+.venv/
+venv/
+env/
+staticfiles/
+media/
+.pytest_cache/
+.coverage
+htmlcov/
+.idea/
+.vscode/
+legacy/
+
+# Agentes/Claude/Cursor - evitar projetos duplicados dentro do repo
+/Central de Viagens 3.0/
+*_DUPLICADO_NAO_USAR/
+great-euler-*/
+kind-jennings-*/
+.claude/
+legacy/
+
+# CSVs grandes de geografia (manter localmente; exemplo versionado em dados/exemplos/)
+dados/municipio_code.csv
+dados/municipios.csv
+dados/estados.csv
+
+.env
+.venv/
+__pycache__/
+*.pyc
+db.sqlite3
+legacy/

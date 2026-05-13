@@ -1,0 +1,301 @@
+{% extends "assinaturas/base_publica_assinatura.html" %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<div class="app-page signature-public-flow">
+  <div class="app-page__shell">
+
+    <header class="app-page-hero app-page-hero--hybrid app-page-hero--compact" aria-labelledby="signature-public-doc-title">
+      <div class="app-page-hero__stage">
+        <div class="signature-public-hero-kicker">
+          <span class="app-page-hero__eyebrow">Assinatura pendente</span>
+          <span class="signature-header-badge signature-header-badge--valid">Link válido</span>
+        </div>
+        <h1 class="app-page-hero__title" id="signature-public-doc-title">{{ public_context.document_label|default:"Documento para assinatura" }}</h1>
+      </div>
+      <div class="app-page-hero__body">
+        <div class="signature-public-hero-row">
+          <p class="app-page__subtitle signature-public-hero-row__text">Revise integralmente o documento antes de confirmar a assinatura eletrônica.</p>
+          <button type="button" class="btn btn-secondary app-btn btn-sm app-btn--sm" data-signature-details-open>
+            Ver detalhes da assinatura
+          </button>
+        </div>
+      </div>
+      <div class="app-page-hero__ribbon" aria-hidden="true"></div>
+    </header>
+
+    <form
+      method="post"
+      action="{% url 'assinaturas:assinatura-token-confirmar' pedido.token %}"
+      id="signature-public-form"
+      class="signature-public-form"
+    >
+      {% csrf_token %}
+      <input type="hidden" name="sig_x"    id="sig-x"    value="0.58"   autocomplete="off">
+      <input type="hidden" name="sig_y"    id="sig-y"    value="0.78"   autocomplete="off">
+      <input type="hidden" name="sig_w"    id="sig-w"    value="0.253"  autocomplete="off">
+      <input type="hidden" name="sig_h"    id="sig-h"    value="0.068"  autocomplete="off">
+      <input type="hidden" name="sig_page" id="sig-page" value="-1"     autocomplete="off">
+
+      <section class="app-page__form-card signature-public-signing-shell" aria-label="Documento e dados da solicitação">
+        <div class="signature-signing-layout">
+
+          <div class="signature-signing-layout__document signature-document-shell">
+            <section
+              class="signature-document-viewer"
+              id="assinatura-pdf-editor"
+              data-pdf-url="{{ pdf_url }}"
+              data-pdf-fit-shrink="0.9"
+              data-form-id="signature-public-form"
+              data-signer-name="{{ label_context.signer_name }}"
+              data-signer-cpf="{{ label_context.signer_cpf_masked }}"
+              data-signer-role="{{ label_context.signer_role }}"
+              data-document-label="{{ label_context.document_label }}"
+              data-label-title="{{ label_context.title }}"
+              data-label-status="{{ label_context.status_label }}"
+              data-verification-code="{{ label_context.verification_code }}"
+              data-verification-url="{{ verification_url|default:'' }}"
+              data-organization-label="{{ label_context.organization_label }}"
+              data-worker-src="{% static 'vendor/pdfjs/pdf.worker.min.js' %}?v=20260513"
+              aria-label="Documento para leitura e assinatura"
+            >
+              <div class="signature-document-viewer__toolbar">
+                <div class="signature-document-viewer__meta">
+                  <strong>Documento para conferência</strong>
+                  <span id="assinatura-pdf-meta">Carregando…</span>
+                  <span id="assinatura-pdf-error" class="signature-pdf-error" role="alert" hidden></span>
+                </div>
+                <div class="signature-document-viewer__toolbar-actions">
+                  <div class="signature-document-viewer__zoom btn-group" aria-label="Controles de zoom">
+                    <button type="button" class="btn btn-secondary app-btn btn-sm app-btn--sm btn-icon app-btn--icon" id="assinatura-zoom-out" aria-label="Diminuir zoom">−</button>
+                    <button type="button" class="btn btn-secondary app-btn btn-sm app-btn--sm" id="assinatura-zoom-reset">Ajustar largura</button>
+                    <button type="button" class="btn btn-secondary app-btn btn-sm app-btn--sm btn-icon app-btn--icon" id="assinatura-zoom-in" aria-label="Aumentar zoom">+</button>
+                  </div>
+                  <a class="btn btn-outline-secondary app-btn btn-sm app-btn--sm" href="{{ pdf_url }}" target="_blank" rel="noopener noreferrer">Abrir PDF em nova aba</a>
+                </div>
+              </div>
+              <div class="signature-document-viewer__canvas" id="assinatura-editor-scroll">
+                <div class="signature-document-viewer__pages" id="assinatura-pages-column"></div>
+              </div>
+            </section>
+          </div>
+
+          <aside class="signature-signing-layout__side" aria-label="Dados da solicitação">
+            <div class="signature-info-panel">
+              <h3 class="signature-info-panel__title">Detalhes da assinatura</h3>
+              <details class="signature-info-panel__details" open>
+                <summary class="signature-info-panel__toggle">Dados da solicitação</summary>
+                <div class="signature-info-panel__body">
+                  <ul class="signature-info-list">
+                    <li class="signature-info-item">
+                      <span class="signature-info-item__label">Documento</span>
+                      <strong class="signature-info-item__value">{{ public_context.document_label|default:"Documento" }}</strong>
+                    </li>
+                    {% if public_context.document_type %}
+                    <li class="signature-info-item">
+                      <span class="signature-info-item__label">Tipo</span>
+                      <strong class="signature-info-item__value">{{ public_context.document_type }}</strong>
+                    </li>
+                    {% endif %}
+                    {% if public_context.document_number %}
+                    <li class="signature-info-item">
+                      <span class="signature-info-item__label">Número / referência</span>
+                      <strong class="signature-info-item__value">{{ public_context.document_number }}{% if public_context.document_year %} / {{ public_context.document_year }}{% endif %}</strong>
+                    </li>
+                    {% elif public_context.document_year %}
+                    <li class="signature-info-item">
+                      <span class="signature-info-item__label">Ano</span>
+                      <strong class="signature-info-item__value">{{ public_context.document_year }}</strong>
+                    </li>
+                    {% endif %}
+                    {% if public_context.document_subject %}
+                    <li class="signature-info-item signature-info-item--full">
+                      <span class="signature-info-item__label">Assunto</span>
+                      <strong class="signature-info-item__value">{{ public_context.document_subject }}</strong>
+                    </li>
+                    {% endif %}
+                    {% if public_context.linked_oficio %}
+                    <li class="signature-info-item">
+                      <span class="signature-info-item__label">Ofício vinculado</span>
+                      <strong class="signature-info-item__value">{{ public_context.linked_oficio }}</strong>
+                    </li>
+                    {% endif %}
+                    <li class="signature-info-item">
+                      <span class="signature-info-item__label">Órgão emissor</span>
+                      <strong class="signature-info-item__value">{{ public_context.issuer_label }}</strong>
+                    </li>
+                    <li class="signature-info-item">
+                      <span class="signature-info-item__label">Unidade solicitante</span>
+                      <strong class="signature-info-item__value">{{ public_context.issuer_unit }}</strong>
+                    </li>
+                    <li class="signature-info-item">
+                      <span class="signature-info-item__label">Assinante</span>
+                      <strong class="signature-info-item__value">{{ public_context.signer_name }}</strong>
+                    </li>
+                    {% if public_context.signer_role %}
+                    <li class="signature-info-item">
+                      <span class="signature-info-item__label">Cargo / função</span>
+                      <strong class="signature-info-item__value">{{ public_context.signer_role }}</strong>
+                    </li>
+                    {% endif %}
+                    <li class="signature-info-item">
+                      <span class="signature-info-item__label">CPF</span>
+                      <strong class="signature-info-item__value">{{ public_context.signer_cpf_masked }}</strong>
+                    </li>
+                    <li class="signature-info-item">
+                      <span class="signature-info-item__label">Status</span>
+                      <span class="signature-status-badge">{{ public_context.status_label }}</span>
+                    </li>
+                    <li class="signature-info-item">
+                      <span class="signature-info-item__label">Expira em</span>
+                      <strong class="signature-info-item__value">{{ public_context.expires_at|date:"d/m/Y H:i" }}</strong>
+                    </li>
+                    <li class="signature-info-item">
+                      <span class="signature-info-item__label">Código do pedido</span>
+                      <code class="signature-code">{{ public_context.public_code }}</code>
+                    </li>
+                    <li class="signature-info-item">
+                      <span class="signature-info-item__label">Documento vinculado (sistema)</span>
+                      <strong class="signature-info-item__value">{{ public_context.linked_document }}</strong>
+                    </li>
+                    {% if public_context.internal_responsible %}
+                    <li class="signature-info-item">
+                      <span class="signature-info-item__label">Responsável interno</span>
+                      <strong class="signature-info-item__value">{{ public_context.internal_responsible }}</strong>
+                    </li>
+                    {% endif %}
+                    <li class="signature-info-item">
+                      <span class="signature-info-item__label">Método de assinatura</span>
+                      <strong class="signature-info-item__value">{{ public_context.signature_method }}</strong>
+                    </li>
+                    <li class="signature-info-item signature-info-item--muted">
+                      <span class="signature-info-item__label">Registro</span>
+                      <strong class="signature-info-item__value">Data/hora, IP e navegador serão gravados ao confirmar.</strong>
+                    </li>
+                  </ul>
+                </div>
+              </details>
+            </div>
+          </aside>
+
+        </div>
+
+        <div class="signature-action-bar" aria-label="Confirmar ou recusar assinatura">
+          <label class="signature-action-bar__check">
+            <input
+              type="checkbox"
+              name="ciencia"
+              value="1"
+              id="signature-consent-checkbox"
+              required
+            >
+            <span>Li e conferi integralmente o documento acima.</span>
+          </label>
+          <div class="signature-action-bar__actions btn-group">
+            <button type="button" class="btn btn-secondary app-btn" data-signature-refuse-open>
+              Recusar assinatura
+            </button>
+            <button type="button" class="btn btn-primary app-btn" id="signature-confirm-open" disabled>
+              Confirmar assinatura
+            </button>
+          </div>
+        </div>
+      </section>
+
+    </form>
+
+  </div>
+</div>
+
+<dialog class="signature-confirmation-modal" id="signature-confirmation-modal">
+  <div class="signature-modal__body">
+    <p class="signature-kicker">Confirmação final</p>
+    <h2>Confirmar assinatura eletrônica</h2>
+    <p>Ao confirmar, sua assinatura será registrada com data/hora, IP, navegador e vínculo ao documento exibido.</p>
+    <dl class="signature-modal-facts">
+      <div>
+        <dt>Documento</dt>
+        <dd>{{ public_context.document_label|default:"Documento" }}</dd>
+      </div>
+      <div>
+        <dt>Assinante</dt>
+        <dd>{{ public_context.signer_name }}</dd>
+      </div>
+      <div>
+        <dt>Código do pedido</dt>
+        <dd><code class="signature-code">{{ public_context.public_code }}</code></dd>
+      </div>
+    </dl>
+    <div class="signature-modal__actions btn-group">
+      <button type="button" class="btn btn-secondary app-btn" data-modal-close>Cancelar</button>
+      <button type="submit" form="signature-public-form" class="btn btn-primary app-btn">
+        Assinar agora
+      </button>
+    </div>
+  </div>
+</dialog>
+
+<dialog class="signature-confirmation-modal" id="signature-refuse-modal">
+  <div class="signature-modal__body">
+    <p class="signature-kicker">Recusa de assinatura</p>
+    <h2>Recusar assinatura</h2>
+    <form method="post" action="{% url 'assinaturas:assinatura-token-recusar' pedido.token %}">
+      {% csrf_token %}
+      <label class="signature-field">
+        <span>Motivo da recusa</span>
+        <textarea name="motivo" rows="4"></textarea>
+      </label>
+      <div class="signature-modal__actions btn-group">
+        <button type="button" class="btn btn-secondary app-btn" data-modal-close>Voltar</button>
+        <button type="submit" class="btn btn-danger app-btn">Recusar assinatura</button>
+      </div>
+    </form>
+  </div>
+</dialog>
+
+<dialog class="signature-confirmation-modal" id="signature-details-modal">
+  <div class="signature-modal__body signature-modal__body--wide">
+    <p class="signature-kicker">Detalhes técnicos</p>
+    <h2>Informações de segurança</h2>
+    <dl class="signature-detail-grid">
+      <div>
+        <dt>Hash original do documento</dt>
+        <dd class="mono">{{ public_context.original_hash|default:"Indisponível" }}</dd>
+      </div>
+      <div>
+        <dt>Criado em</dt>
+        <dd>{{ public_context.created_at|date:"d/m/Y H:i" }}</dd>
+      </div>
+      <div>
+        <dt>Documento vinculado</dt>
+        <dd>{{ public_context.linked_document }}</dd>
+      </div>
+      <div>
+        <dt>Ofício vinculado</dt>
+        <dd>{{ public_context.linked_oficio|default:"Não informado" }}</dd>
+      </div>
+      <div>
+        <dt>Responsável interno</dt>
+        <dd>{{ public_context.internal_responsible|default:"Não informado" }}</dd>
+      </div>
+      <div>
+        <dt>Método</dt>
+        <dd>{{ public_context.signature_method }}</dd>
+      </div>
+    </dl>
+    <p>O IP, a data/hora oficial e o navegador serão registrados no momento da assinatura. O CPF é sempre exibido de forma mascarada.</p>
+    <div class="signature-modal__actions btn-group">
+      <button type="button" class="btn btn-primary app-btn" data-modal-close>Entendi</button>
+    </div>
+  </div>
+</dialog>
+
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'vendor/pdfjs/pdf.min.js' %}?v=20260513"></script>
+  <script type="module" src="{% static 'js/pages/assinatura-pdf.js' %}?v=20260513"></script>
+  <script src="{% static 'js/pages/signature-public.js' %}?v=20260513"></script>
+{% endblock %}

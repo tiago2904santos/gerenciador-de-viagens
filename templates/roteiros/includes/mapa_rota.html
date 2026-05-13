@@ -1,0 +1,88 @@
+<section class="roteiro-mapa card roteiro-editor__map-card roteiro-editor__section roteiro-editor__section--mapa" aria-labelledby="roteiro-mapa-titulo">
+  <header class="roteiro-editor__section-header roteiro-mapa__section-head" id="sec-mapa-rota">
+    <div class="roteiro-mapa__section-title-group">
+      <span class="roteiro-mapa__section-kicker">ROTEIRO</span>
+      <h3 class="roteiro-editor__section-title" id="roteiro-mapa-titulo">4. Mapa da rota</h3>
+    </div>
+  </header>
+  <div class="card-body">
+
+    <p class="roteiro-mapa__stale-hint text-warning-emphasis small mb-2"
+       id="roteiro-mapa-stale-hint"
+       hidden
+       role="status">
+      A ordem dos destinos mudou. Recalcule a rota para atualizar distância e tempo estimados.
+    </p>
+
+    <div class="roteiro-mapa__summary" id="roteiro-mapa-summary" hidden>
+      <dl class="roteiro-mapa__stats">
+        <div>
+          <dt>Distância</dt>
+          <dd id="roteiro-mapa-distancia">—</dd>
+        </div>
+        <div>
+          <dt>Tempo</dt>
+          <dd id="roteiro-mapa-tempo">—</dd>
+        </div>
+        <div>
+          <dt>Fonte do cálculo</dt>
+          <dd id="roteiro-mapa-fonte">—</dd>
+        </div>
+        <div>
+          <dt>Cálculo realizado em</dt>
+          <dd id="roteiro-mapa-calculada-em">—</dd>
+        </div>
+      </dl>
+    </div>
+
+    <div class="roteiro-mapa__canvas-shell">
+      <div class="roteiro-mapa__canvas-head">
+        <div class="roteiro-mapa__heading">
+          <span class="roteiro-mapa__title-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+              <path d="M3 6.8 8.8 4l6.4 2.2L21 3.8V17l-5.8 2.8-6.4-2.2L3 20z"></path>
+              <path d="M8.8 4v13.6M15.2 6.2v13.6"></path>
+            </svg>
+          </span>
+          <div class="roteiro-mapa__title-block">
+            <h4 class="roteiro-mapa__title">Visualização do trajeto</h4>
+            <p class="roteiro-mapa__subtitle">Visualização interativa do trajeto com zoom e navegação.</p>
+          </div>
+        </div>
+        <div class="roteiro-mapa__actions roteiro-mapa__actions--canvas">
+          <button type="button"
+                  class="btn roteiro-editor__btn-pill roteiro-mapa__action-btn roteiro-mapa__action-btn--primary"
+                  id="btn-calcular-rota-mapa">
+            <span class="roteiro-mapa__action-icon" aria-hidden="true"></span>
+            Calcular rota
+          </button>
+          <button type="button"
+                  class="btn roteiro-editor__btn-pill roteiro-mapa__action-btn roteiro-mapa__action-btn--secondary"
+                  id="btn-recalcular-rota-mapa"
+                  hidden>
+            <span class="roteiro-mapa__action-icon" aria-hidden="true"></span>
+            Recalcular rota
+          </button>
+          <button type="button"
+                  class="btn roteiro-editor__btn-pill roteiro-mapa__action-btn roteiro-mapa__action-btn--secondary"
+                  id="btn-fit-rota-mapa"
+                  hidden>
+            Ver rota inteira
+          </button>
+        </div>
+      </div>
+      <div class="roteiro-mapa__frame roteiro-mapa__frame--placeholder" id="roteiro-mapa-container" data-testid="roteiro-mapa-container"></div>
+    </div>
+    <div class="roteiro-mapa__error alert alert-warning py-2 small"
+         id="roteiro-mapa-error"
+         hidden
+         role="alert"></div>
+    <div class="roteiro-mapa__loading small text-muted"
+         id="roteiro-mapa-loading"
+         hidden>
+      Calculando rota…
+    </div>
+  </div>
+</section>
+
+{{ roteiro_mapa_inicial|json_script:"roteiro-mapa-inicial" }}

@@ -1,0 +1,73 @@
+﻿/* Central de assinaturas — etapa 6 */
+.assinaturas-center-hero { margin-bottom: 1.5rem; }
+.assinaturas-center-hero h2 { font-size: 1.35rem; font-weight: 700; margin: 0 0 0.35rem; color: #0f172a; }
+.assinaturas-center-hero p { margin: 0; font-size: 0.95rem; color: #475569; max-width: 52rem; line-height: 1.45; }
+.assinaturas-center-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.75rem; margin-bottom: 1.5rem; }
+@media (max-width: 900px) { .assinaturas-center-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.assinaturas-kpi-card { border: 1px solid rgba(15,23,42,.08); border-radius: 12px; padding: .75rem 1rem; background: linear-gradient(180deg,#fff,#f8fafc); }
+.assinaturas-kpi-card__label { font-size: .68rem; text-transform: uppercase; letter-spacing: .06em; color: #64748b; margin: 0 0 .25rem; }
+.assinaturas-kpi-card__value { font-size: 1.45rem; font-weight: 700; color: #0f172a; }
+.assinaturas-document-stack { display: flex; flex-direction: column; gap: 1.25rem; }
+.assinaturas-document-card { border: 1px solid rgba(15,23,42,.1); border-radius: 14px; background: #fff; box-shadow: 0 2px 12px rgba(15,23,42,.06); overflow: hidden; }
+.assinaturas-document-card__header { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; padding: 1rem 1.15rem; border-bottom: 1px solid rgba(15,23,42,.06); }
+.assinaturas-document-card__eyebrow { font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; color: #64748b; margin: 0 0 .2rem; }
+.assinaturas-document-card__header h3 { margin: 0 0 .25rem; font-size: 1.05rem; font-weight: 650; color: #0f172a; }
+.assinaturas-document-card__header p { margin: 0; font-size: .88rem; color: #475569; max-width: 36rem; }
+.assinaturas-document-card__status-area { display: flex; flex-direction: column; align-items: flex-end; gap: .65rem; min-width: 10rem; }
+.assinaturas-status-badge { display: inline-flex; padding: .2rem .55rem; border-radius: 999px; font-size: .72rem; font-weight: 600; }
+.assinaturas-status-badge--assinado { background: #ecfdf5; color: #047857; }
+.assinaturas-status-badge--nao_assinado { background: #fffbeb; color: #b45309; }
+.assinaturas-status-badge--solicitacao { background: #eff6ff; color: #1d4ed8; }
+.assinaturas-status-badge--indisponivel { background: #f1f5f9; color: #64748b; }
+.assinaturas-document-card__meta { display: flex; flex-wrap: wrap; gap: .75rem 1.25rem; padding: .65rem 1.15rem; font-size: .8rem; color: #475569; background: #fafafa; }
+.assinaturas-document-card__hashes { padding: .75rem 1.15rem .25rem; }
+.assinatura-hash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: .65rem; }
+.assinatura-hash-box { border-radius: 10px; padding: .55rem .65rem; background: #f8fafc; border: 1px solid rgba(15,23,42,.06); }
+.assinatura-hash-box__label { font-size: .65rem; text-transform: uppercase; color: #64748b; margin: 0 0 .25rem; }
+.assinatura-hash-box__value { font-family: ui-monospace, monospace; font-size: .72rem; word-break: break-all; color: #0f172a; }
+.assinatura-hash-box__placeholder { color: #64748b; font-style: italic; font-size: .8rem; }
+.assinatura-hash-copy { font-size: .72rem; padding: .15rem .45rem; margin-top: .35rem; }
+.assinaturas-document-card__destinatarios { padding: .75rem 1.15rem 1.1rem; border-top: 1px solid rgba(15,23,42,.06); background: #fcfcfd; }
+.assinaturas-document-card__destinatarios h4 { margin: 0 0 .65rem; font-size: .8rem; text-transform: uppercase; color: #64748b; }
+.assinatura-destinatarios { display: flex; flex-direction: column; gap: .65rem; }
+.assinatura-destinatario-card { display: grid; grid-template-columns: auto 1fr; gap: .65rem .85rem; padding: .55rem .65rem; border-radius: 10px; border: 1px solid rgba(15,23,42,.07); background: #fff; }
+.assinatura-destinatario-avatar { grid-row: span 2; width: 2.5rem; height: 2.5rem; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: .78rem; font-weight: 700; background: linear-gradient(135deg,#e2e8f0,#cbd5e1); }
+.assinatura-destinatario-main strong { font-size: .88rem; color: #0f172a; }
+.assinatura-destinatario-main .muted { font-size: .78rem; color: #64748b; }
+.assinatura-destinatario-status { font-size: .72rem; font-weight: 600; }
+.assinatura-destinatario-status--assinado { color: #047857; }
+.assinatura-destinatario-status--pendente { color: #b45309; }
+.assinatura-destinatario-status--expirado { color: #64748b; }
+.assinatura-destinatario-status--recusado { color: #b91c1c; }
+.assinatura-destinatario-status--revogado { color: #64748b; }
+.assinatura-destinatario-timeline { grid-column: 2; display: grid; grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr)); gap: .35rem .75rem; font-size: .72rem; }
+.assinatura-destinatario-timeline dt { margin: 0; color: #94a3b8; font-size: .65rem; text-transform: uppercase; }
+.assinatura-destinatario-timeline dd { margin: 0; font-weight: 500; color: #334155; }
+.assinaturas-wizard-footer { margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid rgba(15,23,42,.08); }
+
+.assinatura-destinatario-col { display: flex; flex-direction: column; gap: 0.5rem; min-width: 0; }
+.assinatura-destinatario-timeline { grid-column: unset; }
+
+
+/* Link publico do pedido (copiar / enviar futuro) */
+.assinaturas-link-pedido { margin: 1rem 1.15rem 1rem; padding: 0.85rem 1rem; border-radius: 12px; border: 1px solid rgba(15,23,42,.1); background: #f8fafc; }
+.assinaturas-link-pedido__title { margin: 0 0 0.35rem; font-size: 0.95rem; color: #0f172a; }
+.assinaturas-link-pedido__hint { margin: 0 0 0.65rem; font-size: 0.82rem; line-height: 1.4; }
+.assinaturas-link-pedido__row { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: stretch; }
+.assinaturas-link-pedido__input { flex: 1 1 12rem; min-width: 0; padding: 0.5rem 0.65rem; font-size: 0.78rem; font-family: ui-monospace, monospace; border: 1px solid rgba(15,23,42,.15); border-radius: 8px; background: #fff; color: #0f172a; }
+.assinaturas-link-pedido__actions { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.assinaturas-link-pedido__send:disabled { opacity: 0.55; cursor: not-allowed; }
+
+
+/* Preview PDF recolhivel (alinhado etapa 5) */
+.assinaturas-document-card__preview.document-inline-card {
+  margin-top: 0.75rem;
+  margin-bottom: 0;
+  margin: var(--space-4);
+}
+.assinaturas-document-card__preview-hint {
+  flex: 1 1 100%;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  text-align: left;
+}

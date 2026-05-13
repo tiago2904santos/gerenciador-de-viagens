@@ -1,0 +1,105 @@
+{% extends "oficios/wizard_base.html" %}
+{% load static %}
+
+{% block wizard_content %}
+  {% if mostrar_pendencias_documento and pendencias %}
+    <div class="oficio-wizard-pendencias oficio-wizard-pendencias--inline" role="status">
+      <h3>Pendências para concluir esta etapa</h3>
+      <ul>
+        {% for pendencia in pendencias %}
+          <li>{{ pendencia }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <div class="form-section app-form-section">
+    {% include "components/forms/form_section.html" with title="Dados do ofício" description="Identificação administrativa, protocolo e custeio." only %}
+    <div class="oficio-data-block app-form-grid-panel">
+      <div class="oficio-data-grid oficio-data-grid--three">
+        <div class="oficio-data-info">
+          <span class="oficio-data-info__label">N° do Ofício:</span>
+          <p class="oficio-data-info__value">
+            {{ wizard_summary.numero_label }}
+          </p>
+        </div>
+        <div class="oficio-data-grid__field">
+          {% include "components/forms/form_field.html" with field=form.protocolo label="Protocolo" only %}
+        </div>
+        <div class="oficio-data-info">
+          <span class="oficio-data-info__label">Data criação:</span>
+          <p class="oficio-data-info__value">
+            {{ wizard_summary.data_criacao_label }}
+          </p>
+        </div>
+      </div>
+      <div class="oficio-data-grid oficio-data-grid--full">
+        <div class="oficio-data-grid__field">
+          {% include "components/forms/form_field.html" with field=form.custeio label="Custeio" only %}
+        </div>
+      </div>
+      <div class="oficio-data-observacao{% if not mostrar_custeio_observacao %} form-field--hidden{% endif %}" data-custeio-observacao-wrapper>
+        {% include "components/forms/form_field.html" with field=form.custeio_observacao label="Nome da Instituição" only %}
+      </div>
+    </div>
+  </div>
+
+  <div class="form-section motivo-card">
+    <div class="motivo-card__header">
+      <div class="motivo-card__heading">
+        <h3 class="motivo-card__title">Motivo</h3>
+        <p class="motivo-card__description">Use um modelo salvo ou descreva o motivo da viagem.</p>
+      </div>
+      <div class="motivo-card__actions">
+        {% include "components/buttons/action_button.html" with href=modelos_motivo_url label="Gerenciar modelos" variant="secondary" only %}
+      </div>
+    </div>
+    <div class="motivo-card__body app-form-grid-panel">
+      <div class="motivo-card__model field">
+        <label for="{{ form.modelo_motivo.id_for_label }}">{{ form.modelo_motivo.label }}</label>
+        <select name="{{ form.modelo_motivo.html_name }}" id="{{ form.modelo_motivo.id_for_label }}" class="form-select" data-modelo-motivo-select="true">
+          <option value="">Selecione um modelo (opcional)</option>
+          {% for modelo in form.fields.modelo_motivo.queryset %}
+            <option value="{{ modelo.pk }}" data-texto-motivo="{{ modelo.texto }}"{% if form.modelo_motivo.value|stringformat:'s' == modelo.pk|stringformat:'s' %} selected{% endif %}>{{ modelo.nome }}</option>
+          {% endfor %}
+        </select>
+        {% if form.modelo_motivo.errors %}<p class="field-error">{{ form.modelo_motivo.errors|striptags }}</p>{% endif %}
+        {% if not tem_modelos_motivo %}
+          <p class="field-help">Nenhum modelo cadastrado. Crie um modelo para agilizar o preenchimento.</p>
+          <p class="field-help"><a href="{{ modelos_motivo_url }}">Abrir gerenciamento de modelos</a></p>
+        {% elif modelo_motivo_selecionado %}
+          <p class="field-help">O texto pode ser editado antes de salvar.</p>
+        {% endif %}
+      </div>
+      <div class="motivo-card__textarea">
+        {% include "components/forms/form_field.html" with field=form.motivo only %}
+      </div>
+    </div>
+  </div>
+
+  <div class="form-section oficio-equipe-section">
+    <div class="oficio-equipe-section__header">
+      <div class="oficio-equipe-section__copy">
+        <h3>Equipe do ofício</h3>
+        <p>Busque servidores finalizados e mantenha a seleção visível enquanto monta o ofício.</p>
+      </div>
+      {% include "components/buttons/action_button.html" with href=servidor_create_url label="Cadastrar novo viajante" variant="secondary" only %}
+    </div>
+    <div class="form-grid app-form-grid">
+      <div class="field-span-12">
+        {% include "components/forms/form_field.html" with field=form.servidores label="BUSCAR VIAJANTE" help_text="A busca mostra apenas viajantes finalizados e continua disponível após cada seleção." only %}
+      </div>
+    </div>
+    <div class="oficio-termos-selector-field" data-oficio-termos-selector>
+      <input type="hidden" name="servidores_termo_autorizacao_present" value="1">
+      {{ form.servidores_termo_autorizacao }}
+    </div>
+  </div>
+{% endblock %}
+
+{% block extra_js %}
+  {{ block.super }}
+  <script src="{% static 'js/components/app-multiselect.js' %}?v=20260512" defer></script>
+  <script src="{% static 'js/oficios_termos_selector.js' %}?v=20260512" defer></script>
+  <script src="{% static 'js/pages/oficios-dados-viajantes.js' %}?v=20260512" defer></script>
+{% endblock %}

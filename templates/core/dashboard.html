@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+  <div class="dashboard-login-inspired app-page">
+    <div class="dashboard-login-inspired__shell app-page__shell">
+      <header class="dashboard-login-inspired__hero" aria-labelledby="dashboard-title">
+        <div class="dashboard-login-inspired__brand">
+          <div class="dashboard-login-inspired__brand-mark" aria-hidden="true">CV</div>
+          <div class="dashboard-login-inspired__brand-copy">
+            <span class="dashboard-login-inspired__eyebrow">Base institucional</span>
+            <h1 class="dashboard-login-inspired__title" id="dashboard-title">Central de Viagens 3</h1>
+            <p class="dashboard-login-inspired__subtitle">
+              Painel institucional de documentos e viagens oficiais.
+            </p>
+            <p class="dashboard-login-inspired__subtitle dashboard-login-inspired__subtitle--secondary">
+              Acesse rapidamente os fluxos documentais e cadastros atualmente operacionais.
+            </p>
+          </div>
+        </div>
+        <div class="dashboard-login-inspired__accent-line" aria-hidden="true"></div>
+      </header>
+
+      <section class="dashboard-login-inspired__main-grid app-section" aria-label="Painel inicial e indicadores">
+        <div class="dashboard-login-inspired__welcome">
+          <span class="dashboard-login-inspired__eyebrow">Painel inicial</span>
+          <h2 class="dashboard-login-inspired__welcome-title">Bem-vindo ao sistema</h2>
+          <p class="dashboard-login-inspired__welcome-text">
+            Gerencie documentos oficiais de viagem com organização, padronização e rastreabilidade.
+          </p>
+        </div>
+
+        <div class="dashboard-login-inspired__stats" role="list" aria-label="Indicadores">
+          <article class="dashboard-login-inspired__stat-card app-card" role="listitem">
+            <span class="dashboard-login-inspired__stat-label">Total de ofícios</span>
+            <strong class="dashboard-login-inspired__stat-value">—</strong>
+            <p class="dashboard-login-inspired__stat-note">Aguardando dados</p>
+          </article>
+          <article class="dashboard-login-inspired__stat-card app-card" role="listitem">
+            <span class="dashboard-login-inspired__stat-label">Rascunhos</span>
+            <strong class="dashboard-login-inspired__stat-value">—</strong>
+            <p class="dashboard-login-inspired__stat-note">Aguardando dados</p>
+          </article>
+          <article class="dashboard-login-inspired__stat-card app-card" role="listitem">
+            <span class="dashboard-login-inspired__stat-label">Documentos recentes</span>
+            <strong class="dashboard-login-inspired__stat-value">—</strong>
+            <p class="dashboard-login-inspired__stat-note">Nenhuma consulta adicional nesta tela</p>
+          </article>
+          <article class="dashboard-login-inspired__stat-card app-card" role="listitem">
+            <span class="dashboard-login-inspired__stat-label">Pendências</span>
+            <strong class="dashboard-login-inspired__stat-value">—</strong>
+            <p class="dashboard-login-inspired__stat-note">Nenhuma consulta adicional nesta tela</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="dashboard-login-inspired__quick-grid app-section" aria-label="Acessos rápidos">
+        <article class="dashboard-login-inspired__quick-card app-card">
+          <span class="dashboard-login-inspired__quick-icon" aria-hidden="true">OF</span>
+          <h3 class="dashboard-login-inspired__quick-title">Ofícios</h3>
+          <p class="dashboard-login-inspired__quick-desc">
+            Emissão e acompanhamento dos documentos oficiais de viagem.
+          </p>
+          <a class="dashboard-login-inspired__button" href="{% url 'oficios:index' %}">Abrir</a>
+        </article>
+        <article class="dashboard-login-inspired__quick-card app-card">
+          <span class="dashboard-login-inspired__quick-icon" aria-hidden="true">TA</span>
+          <h3 class="dashboard-login-inspired__quick-title">Termos</h3>
+          <p class="dashboard-login-inspired__quick-desc">
+            Geração de termos vinculados aos ofícios completos.
+          </p>
+          <a class="dashboard-login-inspired__button" href="{% url 'termos:index' %}">Abrir</a>
+        </article>
+        <article class="dashboard-login-inspired__quick-card app-card">
+          <span class="dashboard-login-inspired__quick-icon" aria-hidden="true">JT</span>
+          <h3 class="dashboard-login-inspired__quick-title">Justificativas</h3>
+          <p class="dashboard-login-inspired__quick-desc">
+            Modelos e textos formais vinculados aos documentos.
+          </p>
+          <a class="dashboard-login-inspired__button" href="{% url 'justificativas:index' %}">Abrir</a>
+        </article>
+        <article class="dashboard-login-inspired__quick-card app-card">
+          <span class="dashboard-login-inspired__quick-icon" aria-hidden="true">RT</span>
+          <h3 class="dashboard-login-inspired__quick-title">Roteiros</h3>
+          <p class="dashboard-login-inspired__quick-desc">
+            Cadastro e reaproveitamento de trajetos oficiais.
+          </p>
+          <a class="dashboard-login-inspired__button" href="{% url 'roteiros:index' %}">Abrir</a>
+        </article>
+      </section>
+    </div>
+  </div>
+{% endblock %}

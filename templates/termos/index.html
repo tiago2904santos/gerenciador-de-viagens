@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+  <div class="app-page">
+    <div class="app-page__shell">
+      <h1 class="app-page__title">{{ page_title }}</h1>
+      <p class="app-page__description">{{ page_description }}</p>
+      <p>
+        <a class="btn btn-primary app-btn" href="{{ oficios_url }}">Ir para ofícios</a>
+      </p>
+      <p class="text-muted">
+        Com um ofício completo, use os links na etapa <strong>Documentos</strong> ou as rotas
+        <code>/termos/oficio/&lt;id&gt;/…</code> para preview, download por servidor e lote ZIP.
+      </p>
+    </div>
+  </div>
+{% endblock %}
