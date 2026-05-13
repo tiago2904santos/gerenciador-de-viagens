@@ -91,12 +91,12 @@
   /* Fallback antes do JS (equivalente a light-light) */
   --app-body-bg: linear-gradient(180deg, #f8fbff 0%, #eef4fb 48%, #e3ecf6 100%);
   --app-main-bg: transparent;
-  --app-featured-bg-fallback: #d2e0ef;
+  --app-featured-bg-fallback: #bed0e4;
   --app-featured-bg:
-    radial-gradient(ellipse 110% 75% at 0% 0%, rgba(216, 162, 27, 0.12), transparent 52%),
-    radial-gradient(ellipse 80% 60% at 100% 8%, rgba(21, 91, 154, 0.11), transparent 50%),
-    radial-gradient(ellipse 70% 48% at 50% 105%, rgba(11, 58, 102, 0.08), transparent 58%),
-    linear-gradient(168deg, #f7fbff 0%, #eef4fb 34%, #dde9f5 68%, #d0def0 100%);
+    radial-gradient(ellipse 110% 78% at 0% 0%, rgba(216, 162, 27, 0.16), transparent 50%),
+    radial-gradient(ellipse 82% 62% at 100% 6%, rgba(21, 91, 154, 0.16), transparent 48%),
+    radial-gradient(ellipse 70% 48% at 50% 108%, rgba(11, 58, 102, 0.12), transparent 56%),
+    linear-gradient(168deg, #fcfeff 0%, #eef4fb 26%, #d9e6f2 62%, #c2d3e7 100%);
 
   /* Faixa superior do hero (.app-page-hero__stage) */
   --app-hero-stage-start: #0a1f35;
