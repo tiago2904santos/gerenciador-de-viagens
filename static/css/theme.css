@@ -91,11 +91,12 @@
   /* Fallback antes do JS (equivalente a light-light) */
   --app-body-bg: linear-gradient(180deg, #f8fbff 0%, #eef4fb 48%, #e3ecf6 100%);
   --app-main-bg: transparent;
-  --app-featured-bg-fallback: #d8e4f2;
+  --app-featured-bg-fallback: #bed0e4;
   --app-featured-bg:
-    radial-gradient(ellipse 100% 80% at 6% 0%, rgba(216, 162, 27, 0.12), transparent 55%),
-    radial-gradient(ellipse 90% 60% at 100% 0%, rgba(21, 91, 154, 0.1), transparent 50%),
-    linear-gradient(165deg, #eef3fb 0%, #e0eaf6 45%, #d2e0f0 100%);
+    radial-gradient(ellipse 110% 78% at 0% 0%, rgba(216, 162, 27, 0.16), transparent 50%),
+    radial-gradient(ellipse 82% 62% at 100% 6%, rgba(21, 91, 154, 0.16), transparent 48%),
+    radial-gradient(ellipse 70% 48% at 50% 108%, rgba(11, 58, 102, 0.12), transparent 56%),
+    linear-gradient(168deg, #fcfeff 0%, #eef4fb 26%, #d9e6f2 62%, #c2d3e7 100%);
 
   /* Faixa superior do hero (.app-page-hero__stage) */
   --app-hero-stage-start: #0a1f35;
@@ -278,11 +279,12 @@ html[data-theme="light-dark"] {
   --app-body-bg:
     radial-gradient(ellipse 70% 50% at 50% 0%, rgba(21, 91, 154, 0.14), transparent 55%),
     linear-gradient(180deg, #0e1928 0%, #081018 100%);
-  --app-featured-bg-fallback: #062847;
+  --app-featured-bg-fallback: #061f39;
   --app-featured-bg:
-    radial-gradient(ellipse 120% 80% at 8% 0%, rgba(216, 162, 27, 0.14), transparent 55%),
-    radial-gradient(ellipse 95% 65% at 100% 16%, rgba(21, 91, 154, 0.3), transparent 52%),
-    linear-gradient(165deg, #041e36 0%, #062847 48%, #031523 100%);
+    radial-gradient(ellipse 112% 82% at 0% 0%, rgba(216, 162, 27, 0.15), transparent 54%),
+    radial-gradient(ellipse 88% 62% at 100% 12%, rgba(21, 91, 154, 0.34), transparent 50%),
+    radial-gradient(ellipse 72% 52% at 46% 108%, rgba(8, 28, 48, 0.82), transparent 60%),
+    linear-gradient(168deg, #04192c 0%, #062847 46%, #031521 100%);
 
   --app-hero-eyebrow: rgba(255, 236, 180, 0.95);
   --app-hero-title: var(--color-white);
@@ -424,11 +426,12 @@ html[data-theme="light-light"] {
   --color-input-border: rgba(31, 76, 125, 0.22);
 
   --app-body-bg: linear-gradient(180deg, #f8fbff 0%, #eef4fb 48%, #e3ecf6 100%);
-  --app-featured-bg-fallback: #d8e4f2;
+  --app-featured-bg-fallback: #d2e0ef;
   --app-featured-bg:
-    radial-gradient(ellipse 100% 80% at 6% 0%, rgba(216, 162, 27, 0.12), transparent 55%),
-    radial-gradient(ellipse 90% 60% at 100% 0%, rgba(21, 91, 154, 0.1), transparent 50%),
-    linear-gradient(165deg, #eef3fb 0%, #e0eaf6 45%, #d2e0f0 100%);
+    radial-gradient(ellipse 110% 75% at 0% 0%, rgba(216, 162, 27, 0.12), transparent 52%),
+    radial-gradient(ellipse 80% 60% at 100% 8%, rgba(21, 91, 154, 0.11), transparent 50%),
+    radial-gradient(ellipse 70% 48% at 50% 105%, rgba(11, 58, 102, 0.08), transparent 58%),
+    linear-gradient(168deg, #f7fbff 0%, #eef4fb 34%, #dde9f5 68%, #d0def0 100%);
 
   --app-hero-eyebrow: rgba(255, 248, 230, 0.98);
   --app-hero-title: var(--color-white);

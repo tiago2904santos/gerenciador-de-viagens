@@ -1,0 +1,123 @@
+/*
+ * Background exclusivo da UI Lab.
+ * Carregado apenas nesta pagina via extra_css.
+ */
+
+.cv-ui-lab {
+  box-sizing: border-box;
+  position: relative;
+  width: 100%;
+  z-index: 0;
+}
+
+.cv-ui-lab > section {
+  position: relative;
+  z-index: 1;
+}
+
+.cv-ui-lab > section:first-child {
+  display: grid;
+  gap: var(--cv-ui-lab-copy-gap);
+  max-width: 58ch;
+}
+
+.cv-ui-lab > section:first-child > p:first-child {
+  color: var(--cv-ui-lab-eyebrow);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.cv-ui-lab > section:first-child > h1 {
+  color: var(--cv-ui-lab-title);
+  font-size: clamp(2rem, 3.5vw, 3.1rem);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 0.98;
+  margin: 0;
+}
+
+.cv-ui-lab > section:first-child > p:last-child {
+  color: var(--cv-ui-lab-text-muted);
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+  max-width: 44ch;
+}
+
+.cv-ui-lab > section:last-child {
+  min-height: var(--cv-ui-lab-empty-height);
+}
+
+.app-shell:has(.cv-ui-lab-flow-bg) {
+  --cv-ui-lab-shell-padding-block: clamp(1.5rem, 2.4vw, 2.75rem);
+  --cv-ui-lab-shell-padding-inline: clamp(1.25rem, 2.2vw, 2.5rem);
+  --cv-ui-lab-shell-padding-block-mobile: clamp(1.25rem, 3.5vw, 1.75rem);
+  --cv-ui-lab-shell-padding-inline-mobile: clamp(1rem, 3vw, 1.25rem);
+  --cv-ui-lab-empty-height: clamp(11rem, 26vh, 19rem);
+  --cv-ui-lab-copy-gap: var(--space-3);
+  --cv-ui-lab-text: #0b1a2c;
+  --cv-ui-lab-text-muted: rgba(11, 26, 44, 0.74);
+  --cv-ui-lab-eyebrow: rgba(19, 44, 73, 0.8);
+  --cv-ui-lab-title: #071224;
+  background-color: #06131f;
+  background-image: url("/static/img/backgrounds/ui-lab-flow-dark.png");
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  overflow: hidden;
+  position: relative;
+}
+
+.app-main:has(.cv-ui-lab-flow-bg) {
+  background: transparent;
+  box-sizing: border-box;
+  padding:
+    var(--cv-ui-lab-shell-padding-block) var(--cv-ui-lab-shell-padding-inline)
+    var(--cv-ui-lab-shell-padding-block);
+}
+
+html[data-theme="dark"] .app-shell:has(.cv-ui-lab-flow-bg),
+html[data-theme="dark-dark"] .app-shell:has(.cv-ui-lab-flow-bg),
+html[data-theme="light-dark"] .app-shell:has(.cv-ui-lab-flow-bg) {
+  --cv-ui-lab-text: rgba(247, 250, 255, 0.98);
+  --cv-ui-lab-text-muted: rgba(214, 229, 245, 0.78);
+  --cv-ui-lab-eyebrow: rgba(220, 235, 255, 0.82);
+  --cv-ui-lab-title: #ffffff;
+  background-color: #04111c;
+  background-image: url("/static/img/backgrounds/ui-lab-flow-dark.png");
+}
+
+html[data-theme="light"] .app-shell:has(.cv-ui-lab-flow-bg),
+html[data-theme="dark-light"] .app-shell:has(.cv-ui-lab-flow-bg),
+html[data-theme="light-light"] .app-shell:has(.cv-ui-lab-flow-bg) {
+  --cv-ui-lab-text: #0b1a2c;
+  --cv-ui-lab-text-muted: rgba(11, 26, 44, 0.74);
+  --cv-ui-lab-eyebrow: rgba(19, 44, 73, 0.8);
+  --cv-ui-lab-title: #071224;
+  background-color: #eef6fb;
+  background-image: url("/static/img/backgrounds/ui-lab-flow-light.png");
+}
+
+.app-shell:has(.cv-ui-lab-flow-bg) .sidebar {
+  background: rgba(6, 19, 31, 0.46);
+  backdrop-filter: blur(16px) saturate(130%);
+  -webkit-backdrop-filter: blur(16px) saturate(130%);
+}
+
+html[data-theme="light"] .app-shell:has(.cv-ui-lab-flow-bg) .sidebar,
+html[data-theme="dark-light"] .app-shell:has(.cv-ui-lab-flow-bg) .sidebar,
+html[data-theme="light-light"] .app-shell:has(.cv-ui-lab-flow-bg) .sidebar {
+  background: rgba(245, 249, 255, 0.58);
+  backdrop-filter: blur(14px) saturate(120%);
+  -webkit-backdrop-filter: blur(14px) saturate(120%);
+}
+
+@media (max-width: 840px) {
+  .app-shell:has(.cv-ui-lab-flow-bg) {
+    --cv-ui-lab-shell-padding-block: var(--cv-ui-lab-shell-padding-block-mobile);
+    --cv-ui-lab-shell-padding-inline: var(--cv-ui-lab-shell-padding-inline-mobile);
+  }
+}

@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.views import LogoutView
 from django.urls import path
 
@@ -10,3 +11,8 @@ urlpatterns = [
     path("logout/", LogoutView.as_view(), name="logout"),
     path("", views.dashboard, name="dashboard"),
 ]
+
+if settings.DEBUG:
+    urlpatterns += [
+        path("dev/ui-lab/", views.ui_lab, name="ui_lab"),
+    ]

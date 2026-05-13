@@ -1,6 +1,5 @@
-from django.shortcuts import render
-
 from django.contrib.auth.views import LoginView as DjangoLoginView
+from django.shortcuts import render
 
 from .forms import LoginForm
 
@@ -21,3 +20,7 @@ def dashboard(request):
             "page_description": "Fundacao visual para os fluxos documentais do sistema.",
         },
     )
+
+
+def ui_lab(request):
+    return render(request, "dev/ui_lab.html")

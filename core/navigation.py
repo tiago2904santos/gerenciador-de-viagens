@@ -1,5 +1,6 @@
 from copy import deepcopy
 
+from django.conf import settings
 from django.urls import NoReverseMatch
 from django.urls import reverse
 
@@ -64,6 +65,16 @@ NAVIGATION_ITEMS = [
         "icon": "JS",
     },
 ]
+
+if settings.DEBUG:
+    NAVIGATION_ITEMS.append(
+        {
+            "id": "ui-lab",
+            "label": "UI Lab",
+            "url_name": "core:ui_lab",
+            "icon": "DV",
+        }
+    )
 
 
 def build_navigation(request):
