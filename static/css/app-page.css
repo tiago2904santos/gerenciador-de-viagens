@@ -18,6 +18,20 @@
     var(--app-page-shell-padding-block);
 }
 
+.app-main:has(.ui-lab-page) {
+  --app-featured-bg-fallback: #a9bfd6;
+  --app-featured-bg:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.26) 0%, transparent 16%),
+    linear-gradient(90deg, rgba(11, 58, 102, 0.08) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(11, 58, 102, 0.08) 1px, transparent 1px),
+    radial-gradient(ellipse 82% 62% at 0% 0%, rgba(216, 162, 27, 0.18), transparent 48%),
+    radial-gradient(ellipse 78% 58% at 100% 8%, rgba(21, 91, 154, 0.2), transparent 50%),
+    radial-gradient(ellipse 68% 46% at 50% 108%, rgba(11, 58, 102, 0.16), transparent 56%),
+    linear-gradient(168deg, #f9fcff 0%, #e8f0f8 28%, #d1dfed 62%, #b6cbe0 100%);
+  background-size: auto, 24px 24px, 24px 24px, auto, auto, auto, auto;
+  background-position: 0 0, 0 0, 0 0, 0 0, 100% 0, 50% 100%, 0 0;
+}
+
 @media (max-width: 840px) {
   .app-main:has(.app-page) {
     padding:
