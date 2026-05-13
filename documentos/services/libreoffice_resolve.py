@@ -30,12 +30,7 @@ def sys_platform_is_darwin() -> bool:
 
 
 def _readable_file(path: str | Path) -> bool:
-    p = Path(path)
-    if not p.is_file():
-        return False
-    if os.name == "nt":
-        return True
-    return os.access(p, os.X_OK)
+    return Path(path).is_file()
 
 
 def verify_libreoffice_binary(binary: str, *, timeout_seconds: float = 5.0) -> bool:
