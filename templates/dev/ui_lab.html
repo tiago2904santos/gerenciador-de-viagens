@@ -1,9 +1,14 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}UI Lab{% endblock %}
 
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/dev/ui-lab.css' %}">
+{% endblock %}
+
 {% block content %}
-<main class="app-page ui-lab-page">
+<main class="cv-ui-lab cv-ui-lab-flow-bg">
   <section>
     <p>Desenvolvimento</p>
     <h1>UI Lab</h1>
