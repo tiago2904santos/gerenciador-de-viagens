@@ -27,6 +27,17 @@
     linear-gradient(168deg, #f9fcff 0%, #e8f0f8 28%, #d1dfed 62%, #b6cbe0 100%);
 }
 
+html[data-theme="dark"] .app-main:has(.ui-lab-page),
+html[data-theme="dark-dark"] .app-main:has(.ui-lab-page),
+html[data-theme="light-dark"] .app-main:has(.ui-lab-page) {
+  --app-featured-bg-fallback: #061f39;
+  --app-featured-bg:
+    radial-gradient(ellipse 112% 82% at 0% 0%, rgba(216, 162, 27, 0.15), transparent 54%),
+    radial-gradient(ellipse 88% 62% at 100% 12%, rgba(21, 91, 154, 0.34), transparent 50%),
+    radial-gradient(ellipse 72% 52% at 46% 108%, rgba(8, 28, 48, 0.82), transparent 60%),
+    linear-gradient(168deg, #04192c 0%, #062847 46%, #031521 100%);
+}
+
 @media (max-width: 840px) {
   .app-main:has(.app-page) {
     padding:
