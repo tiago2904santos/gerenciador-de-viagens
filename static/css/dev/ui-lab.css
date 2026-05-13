@@ -1,19 +1,10 @@
 /*
- * Background flow exclusivo da UI Lab.
- * Carregado apenas nesta página via extra_css.
- *
- * Composição:
- *  ::before  – banda diagonal rotacionada (arco aurora principal)
- *  ::after   – profundidade atmosférica + presença secundária superior-direita
+ * Background exclusivo da UI Lab.
+ * Carregado apenas nesta pagina via extra_css.
  */
-
-/* ─────────────────────────────────────────────────────────────
-   TIPOGRAFIA E LAYOUT INTERNOS
-   ───────────────────────────────────────────────────────────── */
 
 .cv-ui-lab {
   box-sizing: border-box;
-  color: var(--cv-ui-lab-text);
   position: relative;
   width: 100%;
   z-index: 0;
@@ -60,10 +51,6 @@
   min-height: var(--cv-ui-lab-empty-height);
 }
 
-/* ─────────────────────────────────────────────────────────────
-   SHELL PRINCIPAL – variáveis e estrutura
-   ───────────────────────────────────────────────────────────── */
-
 .app-main:has(.cv-ui-lab-flow-bg) {
   --cv-ui-lab-shell-padding-block: clamp(1.5rem, 2.4vw, 2.75rem);
   --cv-ui-lab-shell-padding-inline: clamp(1.25rem, 2.2vw, 2.5rem);
@@ -71,22 +58,15 @@
   --cv-ui-lab-shell-padding-inline-mobile: clamp(1rem, 3vw, 1.25rem);
   --cv-ui-lab-empty-height: clamp(11rem, 26vh, 19rem);
   --cv-ui-lab-copy-gap: var(--space-3);
-
-  /* cores padrão (light) */
   --cv-ui-lab-text: #0b1a2c;
   --cv-ui-lab-text-muted: rgba(11, 26, 44, 0.74);
-  --cv-ui-lab-eyebrow: rgba(19, 44, 73, 0.80);
+  --cv-ui-lab-eyebrow: rgba(19, 44, 73, 0.8);
   --cv-ui-lab-title: #071224;
-
-  /* fundo padrão (light) */
-  --cv-ui-lab-bg-fallback: #ddeaf5;
-  --cv-ui-lab-bg:
-    linear-gradient(168deg, #f6fbff 0%, #ecf5fd 38%, #dde8f3 65%, #f3f8fd 100%);
-
-  background-color: var(--cv-ui-lab-bg-fallback);
-  background-image: var(--cv-ui-lab-bg);
-  background-position: center;
+  background-color: #06131f;
+  background-image: url("/static/img/backgrounds/ui-lab-flow-dark.png");
+  background-position: center center;
   background-repeat: no-repeat;
+  background-size: cover;
   box-sizing: border-box;
   isolation: isolate;
   min-height: 100vh;
@@ -97,155 +77,27 @@
   position: relative;
 }
 
-/* ─────────────────────────────────────────────────────────────
-   PSEUDO-ELEMENTOS – estrutura compartilhada
-   ───────────────────────────────────────────────────────────── */
-
-.app-main:has(.cv-ui-lab-flow-bg)::before,
-.app-main:has(.cv-ui-lab-flow-bg)::after {
-  content: "";
-  pointer-events: none;
-  position: absolute;
-}
-
-/*
- * ::before – ARCO PRINCIPAL (banda diagonal rotacionada)
- * Canvas grande para que a banda diagonal ultrapasse os limites visíveis.
- * A banda é estreita + alta → ao ser rotacionada, cria o arco aurora.
- * Blur mínimo para manter nitidez e evitar aparência genérica.
- */
-.app-main:has(.cv-ui-lab-flow-bg)::before {
-  inset: -80%;           /* canvas 260% × 260% do pai */
-  transform: rotate(-40deg);
-  z-index: -2;
-}
-
-/*
- * ::after – ATMOSFERA + PRESENÇA SECUNDÁRIA
- * Gradientes amplos e suaves que dão profundidade
- * sem competir com o arco principal.
- */
-.app-main:has(.cv-ui-lab-flow-bg)::after {
-  inset: -40%;
-  z-index: -1;
-}
-
-/* ─────────────────────────────────────────────────────────────
-   LIGHT – arco e atmosfera padrão
-   ───────────────────────────────────────────────────────────── */
-
-/*
- * Núcleo branco-puro → halo azul-gelo → glow suave.
- * filter: blur(5px) suficiente para suavizar bordas sem apagar definição.
- */
-.app-main:has(.cv-ui-lab-flow-bg)::before {
-  background:
-    radial-gradient(ellipse 6%  62% at 40% 54%, rgba(255, 255, 255, 1.00), transparent 100%),
-    radial-gradient(ellipse 14% 70% at 40% 54%, rgba(215, 236, 255, 0.55), transparent 100%),
-    radial-gradient(ellipse 30% 78% at 40% 54%, rgba(185, 218, 252, 0.20), transparent 100%);
-  filter: blur(5px);
-  opacity: 0.95;
-}
-
-/*
- * Presença superior-direita + profundidade atmosférica leve.
- */
-.app-main:has(.cv-ui-lab-flow-bg)::after {
-  background:
-    radial-gradient(ellipse 52% 36% at 84% 13%, rgba(210, 234, 255, 0.66), transparent 64%),
-    radial-gradient(ellipse 66% 50% at 10% 88%, rgba(192, 220, 248, 0.36), transparent 70%),
-    radial-gradient(ellipse 88% 66% at 44% 52%, rgba(228, 242, 255, 0.44), transparent 82%);
-  filter: blur(44px);
-  opacity: 0.88;
-}
-
-/* ─────────────────────────────────────────────────────────────
-   DARK – base, arco e atmosfera
-   ───────────────────────────────────────────────────────────── */
-
-html[data-theme="dark"]       .app-main:has(.cv-ui-lab-flow-bg),
-html[data-theme="dark-dark"]  .app-main:has(.cv-ui-lab-flow-bg),
+html[data-theme="dark"] .app-main:has(.cv-ui-lab-flow-bg),
+html[data-theme="dark-dark"] .app-main:has(.cv-ui-lab-flow-bg),
 html[data-theme="light-dark"] .app-main:has(.cv-ui-lab-flow-bg) {
-  --cv-ui-lab-text: rgba(240, 248, 255, 0.97);
-  --cv-ui-lab-text-muted: rgba(200, 225, 245, 0.76);
-  --cv-ui-lab-eyebrow: rgba(210, 232, 255, 0.80);
+  --cv-ui-lab-text: rgba(247, 250, 255, 0.98);
+  --cv-ui-lab-text-muted: rgba(214, 229, 245, 0.78);
+  --cv-ui-lab-eyebrow: rgba(220, 235, 255, 0.82);
   --cv-ui-lab-title: #ffffff;
-
-  --cv-ui-lab-bg-fallback: #020b14;
-  --cv-ui-lab-bg:
-    linear-gradient(170deg, #020b14 0%, #05152a 42%, #071e38 68%, #030d1c 100%);
+  background-color: #04111c;
+  background-image: url("/static/img/backgrounds/ui-lab-flow-dark.png");
 }
 
-/*
- * Núcleo turquesa-claro → halo teal → glow profundo.
- * filter: blur(3px) para máxima nitidez do arco.
- */
-html[data-theme="dark"]       .app-main:has(.cv-ui-lab-flow-bg)::before,
-html[data-theme="dark-dark"]  .app-main:has(.cv-ui-lab-flow-bg)::before,
-html[data-theme="light-dark"] .app-main:has(.cv-ui-lab-flow-bg)::before {
-  background:
-    radial-gradient(ellipse 6%  62% at 40% 54%, rgba(75, 242, 200, 0.82), transparent 100%),
-    radial-gradient(ellipse 14% 70% at 40% 54%, rgba(45, 212, 180, 0.42), transparent 100%),
-    radial-gradient(ellipse 30% 78% at 40% 54%, rgba(18, 172, 152, 0.15), transparent 100%);
-  filter: blur(3px);
-  opacity: 1;
-}
-
-/*
- * Presença azul superior-direita + profundidade navy inferior-esquerda.
- */
-html[data-theme="dark"]       .app-main:has(.cv-ui-lab-flow-bg)::after,
-html[data-theme="dark-dark"]  .app-main:has(.cv-ui-lab-flow-bg)::after,
-html[data-theme="light-dark"] .app-main:has(.cv-ui-lab-flow-bg)::after {
-  background:
-    radial-gradient(ellipse 52% 36% at 84% 13%, rgba(56, 188, 252, 0.22), transparent 64%),
-    radial-gradient(ellipse 66% 50% at 10% 88%, rgba(15, 96, 132, 0.25), transparent 70%),
-    radial-gradient(ellipse 88% 66% at 40% 58%, rgba(8, 52, 92, 0.20), transparent 82%);
-  filter: blur(32px);
-  opacity: 0.94;
-}
-
-/* ─────────────────────────────────────────────────────────────
-   LIGHT EXPLÍCITO (sobrepõe possível herança de dark)
-   ───────────────────────────────────────────────────────────── */
-
-html[data-theme="light"]       .app-main:has(.cv-ui-lab-flow-bg),
-html[data-theme="dark-light"]  .app-main:has(.cv-ui-lab-flow-bg),
+html[data-theme="light"] .app-main:has(.cv-ui-lab-flow-bg),
+html[data-theme="dark-light"] .app-main:has(.cv-ui-lab-flow-bg),
 html[data-theme="light-light"] .app-main:has(.cv-ui-lab-flow-bg) {
   --cv-ui-lab-text: #0b1a2c;
   --cv-ui-lab-text-muted: rgba(11, 26, 44, 0.74);
-  --cv-ui-lab-eyebrow: rgba(19, 44, 73, 0.80);
+  --cv-ui-lab-eyebrow: rgba(19, 44, 73, 0.8);
   --cv-ui-lab-title: #071224;
-  --cv-ui-lab-bg-fallback: #ddeaf5;
-  --cv-ui-lab-bg:
-    linear-gradient(168deg, #f6fbff 0%, #ecf5fd 38%, #dde8f3 65%, #f3f8fd 100%);
+  background-color: #eef6fb;
+  background-image: url("/static/img/backgrounds/ui-lab-flow-light.png");
 }
-
-html[data-theme="light"]       .app-main:has(.cv-ui-lab-flow-bg)::before,
-html[data-theme="dark-light"]  .app-main:has(.cv-ui-lab-flow-bg)::before,
-html[data-theme="light-light"] .app-main:has(.cv-ui-lab-flow-bg)::before {
-  background:
-    radial-gradient(ellipse 6%  62% at 40% 54%, rgba(255, 255, 255, 1.00), transparent 100%),
-    radial-gradient(ellipse 14% 70% at 40% 54%, rgba(215, 236, 255, 0.55), transparent 100%),
-    radial-gradient(ellipse 30% 78% at 40% 54%, rgba(185, 218, 252, 0.20), transparent 100%);
-  filter: blur(5px);
-  opacity: 0.95;
-}
-
-html[data-theme="light"]       .app-main:has(.cv-ui-lab-flow-bg)::after,
-html[data-theme="dark-light"]  .app-main:has(.cv-ui-lab-flow-bg)::after,
-html[data-theme="light-light"] .app-main:has(.cv-ui-lab-flow-bg)::after {
-  background:
-    radial-gradient(ellipse 52% 36% at 84% 13%, rgba(210, 234, 255, 0.66), transparent 64%),
-    radial-gradient(ellipse 66% 50% at 10% 88%, rgba(192, 220, 248, 0.36), transparent 70%),
-    radial-gradient(ellipse 88% 66% at 44% 52%, rgba(228, 242, 255, 0.44), transparent 82%);
-  filter: blur(44px);
-  opacity: 0.88;
-}
-
-/* ─────────────────────────────────────────────────────────────
-   RESPONSIVIDADE
-   ───────────────────────────────────────────────────────────── */
 
 @media (max-width: 840px) {
   .app-main:has(.cv-ui-lab-flow-bg) {
