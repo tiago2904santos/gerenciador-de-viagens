@@ -30,11 +30,11 @@
   position: relative;
   overflow: hidden;
   background:
-    radial-gradient(circle at 82% 14%, rgba(186, 230, 253, 0.48), transparent 24%),
-    radial-gradient(circle at 18% 86%, rgba(204, 251, 241, 0.28), transparent 28%),
-    radial-gradient(circle at 56% 52%, rgba(255, 255, 255, 0.24), transparent 52%),
-    linear-gradient(135deg, #fbfdff 0%, #eef6fb 44%, #dceaf3 100%);
-  background-color: #eef6fb;
+    radial-gradient(circle at 82% 14%, rgba(186, 230, 253, 0.42), transparent 24%),
+    radial-gradient(circle at 18% 86%, rgba(204, 251, 241, 0.22), transparent 28%),
+    radial-gradient(circle at 56% 52%, rgba(255, 255, 255, 0.28), transparent 50%),
+    linear-gradient(135deg, #fbfdff 0%, #f2f8fd 44%, #dceaf3 100%);
+  background-color: #f0f7fc;
 }
 
 .app-shell:has(.cv-ui-lab-css-bg)::before {
@@ -44,26 +44,31 @@
   position: absolute;
   z-index: -2;
   background-image:
-    linear-gradient(rgba(15, 23, 42, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(15, 23, 42, 0.03) 1px, transparent 1px),
-    linear-gradient(135deg, transparent 0 46%, rgba(255, 255, 255, 0.34) 48%, transparent 52%);
-  background-size: 72px 72px, 72px 72px, 100% 100%;
-  -webkit-mask-image: radial-gradient(circle at 68% 20%, black 0%, rgba(0, 0, 0, 0.9) 42%, rgba(0, 0, 0, 0.24) 76%, transparent 100%);
-  mask-image: radial-gradient(circle at 68% 20%, black 0%, rgba(0, 0, 0, 0.9) 42%, rgba(0, 0, 0, 0.24) 76%, transparent 100%);
-  opacity: 0.34;
+    linear-gradient(rgba(15, 23, 42, 0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 23, 42, 0.018) 1px, transparent 1px),
+    linear-gradient(135deg, transparent 0 45%, rgba(255, 255, 255, 0.28) 48%, transparent 54%),
+    linear-gradient(90deg, rgba(14, 165, 233, 0.04), transparent 18%, transparent 82%, rgba(14, 165, 233, 0.05));
+  background-position: 0 0, 0 0, 0 0, 0 0;
+  background-size: 104px 104px, 104px 104px, 100% 100%, 100% 100%;
+  -webkit-mask-image: radial-gradient(circle at 66% 34%, black 0%, rgba(0, 0, 0, 0.88) 34%, rgba(0, 0, 0, 0.28) 68%, transparent 100%);
+  mask-image: radial-gradient(circle at 66% 34%, black 0%, rgba(0, 0, 0, 0.88) 34%, rgba(0, 0, 0, 0.28) 68%, transparent 100%);
+  opacity: 0.24;
 }
 
 .app-shell:has(.cv-ui-lab-css-bg)::after {
   content: "";
-  inset: -12%;
+  inset: -18%;
   pointer-events: none;
   position: absolute;
   z-index: -1;
   background:
-    linear-gradient(128deg, transparent 0 44%, rgba(255, 255, 255, 0.56) 48%, rgba(186, 230, 253, 0.16) 52%, transparent 62%),
-    linear-gradient(156deg, transparent 0 61%, rgba(14, 165, 233, 0.08) 67%, transparent 78%);
-  filter: blur(20px);
-  opacity: 0.5;
+    radial-gradient(circle at 78% 10%, rgba(186, 230, 253, 0.34), transparent 26%),
+    radial-gradient(circle at 18% 86%, rgba(45, 212, 191, 0.16), transparent 28%),
+    radial-gradient(circle at 52% 48%, rgba(255, 255, 255, 0.34), transparent 44%),
+    linear-gradient(132deg, transparent 0 41%, rgba(255, 255, 255, 0.38) 47%, rgba(186, 230, 253, 0.11) 52%, transparent 60%),
+    linear-gradient(152deg, transparent 0 61%, rgba(14, 165, 233, 0.06) 67%, transparent 78%);
+  filter: blur(24px);
+  opacity: 0.42;
 }
 
 .cv-ui-lab {
@@ -117,10 +122,11 @@
 }
 
 .app-shell:has(.cv-ui-lab-css-bg) .sidebar {
-  background: rgba(246, 250, 255, 0.54);
+  background: rgba(246, 250, 255, 0.62);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  border-right: 1px solid rgba(148, 163, 184, 0.14);
+  border-right: 1px solid rgba(148, 163, 184, 0.1);
+  box-shadow: 1px 0 0 rgba(255, 255, 255, 0.4), 18px 0 32px rgba(15, 23, 42, 0.04);
 }
 
 html[data-theme="dark-dark"] .app-shell:has(.cv-ui-lab-css-bg),
@@ -130,37 +136,45 @@ html[data-theme="light-dark"] .app-shell:has(.cv-ui-lab-css-bg) {
   --cv-ui-lab-eyebrow: rgba(220, 235, 255, 0.82);
   --cv-ui-lab-title: #ffffff;
   background:
-    radial-gradient(circle at 82% 12%, rgba(56, 189, 248, 0.18), transparent 22%),
-    radial-gradient(circle at 18% 86%, rgba(45, 212, 191, 0.12), transparent 26%),
-    radial-gradient(circle at 56% 44%, rgba(14, 165, 233, 0.08), transparent 44%),
-    linear-gradient(135deg, #06131f 0%, #071d2c 46%, #030b12 100%);
-  background-color: #06131f;
+    radial-gradient(circle at 82% 12%, rgba(56, 189, 248, 0.16), transparent 20%),
+    radial-gradient(circle at 18% 86%, rgba(45, 212, 191, 0.1), transparent 24%),
+    radial-gradient(circle at 56% 44%, rgba(14, 165, 233, 0.06), transparent 42%),
+    radial-gradient(ellipse at 52% 52%, rgba(255, 255, 255, 0.03), transparent 56%),
+    linear-gradient(135deg, #04101a 0%, #071d2c 48%, #020810 100%);
+  background-color: #04101a;
 }
 
 html[data-theme="dark-dark"] .app-shell:has(.cv-ui-lab-css-bg)::before,
 html[data-theme="light-dark"] .app-shell:has(.cv-ui-lab-css-bg)::before {
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.028) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.028) 1px, transparent 1px),
-    linear-gradient(135deg, transparent 0 46%, rgba(255, 255, 255, 0.04) 49%, transparent 52%);
-  background-size: 72px 72px, 72px 72px, 100% 100%;
-  opacity: 0.4;
+    linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+    linear-gradient(135deg, transparent 0 45%, rgba(255, 255, 255, 0.05) 48%, transparent 54%),
+    linear-gradient(90deg, rgba(56, 189, 248, 0.06), transparent 18%, transparent 82%, rgba(45, 212, 191, 0.05));
+  background-size: 104px 104px, 104px 104px, 100% 100%, 100% 100%;
+  -webkit-mask-image: radial-gradient(circle at 66% 34%, black 0%, rgba(0, 0, 0, 0.86) 34%, rgba(0, 0, 0, 0.24) 68%, transparent 100%);
+  mask-image: radial-gradient(circle at 66% 34%, black 0%, rgba(0, 0, 0, 0.86) 34%, rgba(0, 0, 0, 0.24) 68%, transparent 100%);
+  opacity: 0.2;
 }
 
 html[data-theme="dark-dark"] .app-shell:has(.cv-ui-lab-css-bg)::after,
 html[data-theme="light-dark"] .app-shell:has(.cv-ui-lab-css-bg)::after {
   background:
-    linear-gradient(128deg, transparent 0 42%, rgba(125, 249, 231, 0.11) 48%, rgba(56, 189, 248, 0.1) 54%, transparent 64%),
-    linear-gradient(148deg, transparent 0 60%, rgba(14, 165, 233, 0.08) 66%, transparent 78%);
-  opacity: 0.72;
+    radial-gradient(circle at 78% 10%, rgba(56, 189, 248, 0.2), transparent 24%),
+    radial-gradient(circle at 18% 86%, rgba(45, 212, 191, 0.11), transparent 26%),
+    radial-gradient(circle at 52% 48%, rgba(255, 255, 255, 0.05), transparent 42%),
+    linear-gradient(128deg, transparent 0 41%, rgba(125, 249, 231, 0.08) 48%, rgba(56, 189, 248, 0.07) 54%, transparent 64%),
+    linear-gradient(148deg, transparent 0 60%, rgba(14, 165, 233, 0.05) 66%, transparent 78%);
+  opacity: 0.68;
 }
 
 html[data-theme="dark-dark"] .app-shell:has(.cv-ui-lab-css-bg) .sidebar,
 html[data-theme="light-dark"] .app-shell:has(.cv-ui-lab-css-bg) .sidebar {
-  background: rgba(4, 15, 26, 0.44);
-  border-right-color: rgba(148, 163, 184, 0.16);
+  background: rgba(4, 15, 26, 0.5);
+  border-right-color: rgba(148, 163, 184, 0.12);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
+  box-shadow: 1px 0 0 rgba(255, 255, 255, 0.04), 18px 0 32px rgba(0, 0, 0, 0.14);
 }
 
 html[data-theme="dark-light"] .app-shell:has(.cv-ui-lab-css-bg),
@@ -170,36 +184,44 @@ html[data-theme="light-light"] .app-shell:has(.cv-ui-lab-css-bg) {
   --cv-ui-lab-eyebrow: rgba(19, 44, 73, 0.78);
   --cv-ui-lab-title: #071224;
   background:
-    radial-gradient(circle at 82% 12%, rgba(186, 230, 253, 0.56), transparent 24%),
-    radial-gradient(circle at 18% 86%, rgba(204, 251, 241, 0.32), transparent 28%),
-    radial-gradient(circle at 56% 44%, rgba(255, 255, 255, 0.34), transparent 48%),
-    linear-gradient(135deg, #fbfdff 0%, #eef6fb 46%, #dceaf3 100%);
-  background-color: #f7fbff;
+    radial-gradient(circle at 82% 12%, rgba(186, 230, 253, 0.48), transparent 24%),
+    radial-gradient(circle at 18% 86%, rgba(204, 251, 241, 0.24), transparent 28%),
+    radial-gradient(circle at 56% 44%, rgba(255, 255, 255, 0.42), transparent 46%),
+    linear-gradient(135deg, #fcfeff 0%, #f2f8fd 46%, #dceaf3 100%);
+  background-color: #f3f8fd;
 }
 
 html[data-theme="dark-light"] .app-shell:has(.cv-ui-lab-css-bg)::before,
 html[data-theme="light-light"] .app-shell:has(.cv-ui-lab-css-bg)::before {
   background-image:
-    linear-gradient(rgba(15, 23, 42, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(15, 23, 42, 0.028) 1px, transparent 1px),
-    linear-gradient(135deg, transparent 0 46%, rgba(255, 255, 255, 0.44) 49%, transparent 52%);
-  opacity: 0.3;
+    linear-gradient(rgba(15, 23, 42, 0.016) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 23, 42, 0.014) 1px, transparent 1px),
+    linear-gradient(135deg, transparent 0 45%, rgba(255, 255, 255, 0.42) 48%, transparent 54%),
+    linear-gradient(90deg, rgba(14, 165, 233, 0.025), transparent 18%, transparent 82%, rgba(14, 165, 233, 0.025));
+  background-size: 104px 104px, 104px 104px, 100% 100%, 100% 100%;
+  -webkit-mask-image: radial-gradient(circle at 66% 34%, black 0%, rgba(0, 0, 0, 0.86) 34%, rgba(0, 0, 0, 0.22) 68%, transparent 100%);
+  mask-image: radial-gradient(circle at 66% 34%, black 0%, rgba(0, 0, 0, 0.86) 34%, rgba(0, 0, 0, 0.22) 68%, transparent 100%);
+  opacity: 0.16;
 }
 
 html[data-theme="dark-light"] .app-shell:has(.cv-ui-lab-css-bg)::after,
 html[data-theme="light-light"] .app-shell:has(.cv-ui-lab-css-bg)::after {
   background:
-    linear-gradient(128deg, transparent 0 44%, rgba(255, 255, 255, 0.66) 48%, rgba(186, 230, 253, 0.18) 52%, transparent 62%),
-    linear-gradient(156deg, transparent 0 61%, rgba(14, 165, 233, 0.1) 67%, transparent 78%);
-  opacity: 0.58;
+    radial-gradient(circle at 78% 10%, rgba(186, 230, 253, 0.28), transparent 26%),
+    radial-gradient(circle at 18% 86%, rgba(204, 251, 241, 0.16), transparent 28%),
+    radial-gradient(circle at 52% 48%, rgba(255, 255, 255, 0.58), transparent 42%),
+    linear-gradient(128deg, transparent 0 42%, rgba(255, 255, 255, 0.54) 48%, rgba(186, 230, 253, 0.12) 54%, transparent 64%),
+    linear-gradient(156deg, transparent 0 61%, rgba(14, 165, 233, 0.06) 67%, transparent 78%);
+  opacity: 0.46;
 }
 
 html[data-theme="dark-light"] .app-shell:has(.cv-ui-lab-css-bg) .sidebar,
 html[data-theme="light-light"] .app-shell:has(.cv-ui-lab-css-bg) .sidebar {
-  background: rgba(247, 251, 255, 0.66);
-  border-right-color: rgba(148, 163, 184, 0.18);
+  background: rgba(247, 251, 255, 0.74);
+  border-right-color: rgba(148, 163, 184, 0.12);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  box-shadow: 1px 0 0 rgba(255, 255, 255, 0.55), 18px 0 32px rgba(15, 23, 42, 0.03);
 }
 
 @media (max-width: 840px) {
