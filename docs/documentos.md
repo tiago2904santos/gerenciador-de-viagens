@@ -10,8 +10,8 @@ Os ficheiros seguem o nome do enum `DocumentoTipo` (ex.: `oficio.docx`, `justifi
 
 | Documento | Estilo de placeholders no modelo | Contexto passado ao docxtpl |
 |-----------|----------------------------------|------------------------------|
-| Ofício, Justificativa | Chaves planas `{{ protocolo }}`, etc. | `docxtpl_context` montado em `oficios.docxtpl_context` |
-| Termo, Plano de trabalho, Ordem de serviço | Aninhados `{{ oficio.numero_formatado }}`, `{{ termo.participante.nome }}`, … | Payload canónico (`oficios.documents`) sem `docxtpl_context` |
+| Ofício, Justificativa | Chaves planas `{% raw %}{{ protocolo }}{% endraw %}`, etc. | `docxtpl_context` montado em `oficios.docxtpl_context` |
+| Termo, Plano de trabalho, Ordem de serviço | Aninhados `{% raw %}{{ oficio.numero_formatado }}{% endraw %}`, `{% raw %}{{ termo.participante.nome }}{% endraw %}`, … | Payload canónico (`oficios.documents`) sem `docxtpl_context` |
 
 ## PDF: motor por defeito (HTML + WeasyPrint)
 

@@ -41,7 +41,9 @@ CSS: `static/css/domain.css` + estilos do form em `roteiros.css` quando o partia
 **Exemplo:**
 
 ```django
+{% raw %}
 {% include "components/domain/sede_destinos.html" %}
+{% endraw %}
 ```
 
 **Nao deve:** Executar queries; depender de URL nomeada fora do contexto ja montado pelo presenter/logica.
@@ -63,7 +65,9 @@ CSS: `static/css/domain.css` + estilos do form em `roteiros.css` quando o partia
 **Exemplo:**
 
 ```django
+{% raw %}
 {% include "components/domain/destinos.html" %}
+{% endraw %}
 ```
 
 **Nao deve:** Introduzir HTML divergente do partial canon sem atualizar documentacao.
@@ -85,7 +89,9 @@ CSS: `static/css/domain.css` + estilos do form em `roteiros.css` quando o partia
 **Exemplo:**
 
 ```django
+{% raw %}
 {% include "components/domain/trechos.html" %}
+{% endraw %}
 ```
 
 **Nao deve:** Chamar API diretamente no template; o JS global le `data-url-trechos-estimar` do form.
@@ -109,7 +115,9 @@ CSS: `static/css/domain.css` + estilos do form em `roteiros.css` quando o partia
 **Exemplo:**
 
 ```django
+{% raw %}
 {% include "components/domain/trecho_card.html" with trecho=trecho only %}
+{% endraw %}
 ```
 
 **Nao deve:** Gerar links de edicao sem URL real; nao embutir regra de negocio.
@@ -131,7 +139,9 @@ CSS: `static/css/domain.css` + estilos do form em `roteiros.css` quando o partia
 **Exemplo:**
 
 ```django
+{% raw %}
 {% include "components/domain/retorno.html" %}
+{% endraw %}
 ```
 
 **Nao deve:** Duplicar o partial (uma unica inclusao).
@@ -153,7 +163,9 @@ CSS: `static/css/domain.css` + estilos do form em `roteiros.css` quando o partia
 **Exemplo:**
 
 ```django
+{% raw %}
 {% include "components/domain/calculadora_rota.html" %}
+{% endraw %}
 ```
 
 **Nao deve:** Substituir o endpoint `calcular_diarias`; apenas exibe e envia campos.
@@ -178,7 +190,9 @@ CSS: `static/css/domain.css` + estilos do form em `roteiros.css` quando o partia
 **Exemplo:**
 
 ```django
+{% raw %}
 {% include "components/domain/resumo_rota.html" with roteiro=roteiro trechos=trechos only %}
+{% endraw %}
 ```
 
 **Nao deve:** Exibir `updated_at` ou "Atualizado em".

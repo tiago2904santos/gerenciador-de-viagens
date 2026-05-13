@@ -45,7 +45,7 @@ Rotas internas (dashboard, cadastros, roteiros, documentos, demais apps) exigem 
 
 ## Logout na interface
 
-- O link de saida fica no **rodape da sidebar** (formulario POST para `core:logout`, com `{% csrf_token %}`), visivel quando `user.is_authenticated`.
+- O link de saida fica no **rodape da sidebar** (formulario POST para `core:logout`, com `{% raw %}{% csrf_token %}{% endraw %}`), visivel quando `user.is_authenticated`.
 
 ## Permissoes
 

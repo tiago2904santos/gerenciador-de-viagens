@@ -199,6 +199,7 @@ Estas excecoes sao decisoes deliberadas e documentadas. O auditor (`scripts/audi
 ### Formulario canonico
 
 ```html
+{% raw %}
 <form class="app-form-shell form-shell">
   <div class="form-section app-form-section">
     {# form_field.html — emite app-form-field, app-form-label, app-form-help, app-form-error #}
@@ -210,15 +211,18 @@ Estas excecoes sao decisoes deliberadas e documentadas. O auditor (`scripts/audi
     {% include "components/buttons/action_button.html" with ... only %}
   </div>
 </form>
+{% endraw %}
 ```
 
 ### Botao canonico
 
 ```html
+{% raw %}
 {# Via componente (preferido) #}
 {% include "components/buttons/action_button.html" with href=url label="Acao" variant="primary" only %}
 
 {# Saida: emite .btn.btn-primary.app-btn.app-btn--primary #}
+{% endraw %}
 ```
 
 ### Lista canonico

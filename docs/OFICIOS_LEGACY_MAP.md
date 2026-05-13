@@ -193,7 +193,7 @@ Mapeamento documental legado:
   - `modelo_ordem_servico.docx`
 
 - Placeholders:
-  - extração por regex `{{ ... }}`;
+  - extração por regex `{% raw %}{{ ... }}{% endraw %}`;
   - substituição inclusive em runs fragmentados;
   - fallback para vazio quando chave ausente.
 
