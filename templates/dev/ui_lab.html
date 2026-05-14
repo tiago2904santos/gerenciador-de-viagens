@@ -166,7 +166,8 @@
 
     <!-- ══════════════════════════════════════════════════════
          VARIAÇÃO 2 — PAGE SHELL STANDARD
-         Cadastro com múltiplas seções, sem stepper.
+         Cadastros curtos/médios com mais de 4 campos, sem stepper.
+         Um único Main Form Panel com múltiplas Form Sections.
          ══════════════════════════════════════════════════════ -->
     <div id="shell-standard" class="ui-lab-variant-block" hidden>
       <span class="ui-lab-demo-label">Variação 2 — Page Shell Standard</span>
@@ -190,7 +191,7 @@
               <div class="app-page__brand-mark" aria-hidden="true">CS</div>
               <div class="app-page__brand-copy">
                 <p class="app-page__subtitle">
-                  Preencha os dados básicos do servidor para uso nos documentos de viagem.
+                  Preencha os dados funcionais, contato e lotação do servidor para uso nos documentos de viagem.
                 </p>
               </div>
             </div>
@@ -201,15 +202,16 @@
 
         </header>
 
+        <!-- Um único Main Form Panel com três Form Sections -->
         <main class="main-form-panel">
 
-          <!-- Seção 1: Dados pessoais -->
-          <section class="form-section" aria-labelledby="std-dados">
+          <!-- Seção 1: Dados funcionais -->
+          <section class="form-section" aria-labelledby="std-funcionais">
             <header class="section-header">
               <div class="section-header__copy">
-                <h3 class="section-header__title" id="std-dados">Dados pessoais</h3>
+                <h3 class="section-header__title" id="std-funcionais">Dados funcionais</h3>
                 <p class="section-header__description">
-                  Informações de identificação do servidor.
+                  Informações principais de identificação funcional do servidor.
                 </p>
               </div>
             </header>
@@ -222,14 +224,6 @@
                 <span class="ui-lab-demo-field__label">Matrícula</span>
                 <div class="ui-lab-demo-field__input"></div>
               </div>
-              <div class="ui-lab-demo-field field-size-2">
-                <span class="ui-lab-demo-field__label">Cargo / Função</span>
-                <div class="ui-lab-demo-field__input"></div>
-              </div>
-              <div class="ui-lab-demo-field field-size-2">
-                <span class="ui-lab-demo-field__label">Lotação</span>
-                <div class="ui-lab-demo-field__input"></div>
-              </div>
               <div class="ui-lab-demo-field field-size-1">
                 <span class="ui-lab-demo-field__label">CPF</span>
                 <div class="ui-lab-demo-field__input"></div>
@@ -238,12 +232,12 @@
                 <span class="ui-lab-demo-field__label">RG</span>
                 <div class="ui-lab-demo-field__input"></div>
               </div>
-              <div class="ui-lab-demo-field field-size-1">
-                <span class="ui-lab-demo-field__label">UF emissão</span>
+              <div class="ui-lab-demo-field field-size-2">
+                <span class="ui-lab-demo-field__label">Cargo / Função</span>
                 <div class="ui-lab-demo-field__input"></div>
               </div>
-              <div class="ui-lab-demo-field field-size-1">
-                <span class="ui-lab-demo-field__label">Data de nascimento</span>
+              <div class="ui-lab-demo-field field-size-2">
+                <span class="ui-lab-demo-field__label">Lotação</span>
                 <div class="ui-lab-demo-field__input"></div>
               </div>
             </div>
@@ -255,7 +249,7 @@
               <div class="section-header__copy">
                 <h3 class="section-header__title" id="std-contato">Contato</h3>
                 <p class="section-header__description">
-                  Dados para comunicação com o servidor.
+                  Dados para comunicação e notificações relacionadas aos documentos.
                 </p>
               </div>
             </header>
@@ -265,68 +259,49 @@
                 <div class="ui-lab-demo-field__input"></div>
               </div>
               <div class="ui-lab-demo-field field-size-2">
-                <span class="ui-lab-demo-field__label">E-mail pessoal</span>
-                <div class="ui-lab-demo-field__input"></div>
-              </div>
-              <div class="ui-lab-demo-field field-size-1">
                 <span class="ui-lab-demo-field__label">Telefone</span>
                 <div class="ui-lab-demo-field__input"></div>
               </div>
-              <div class="ui-lab-demo-field field-size-1">
-                <span class="ui-lab-demo-field__label">Ramal</span>
+              <div class="ui-lab-demo-field field-size-4">
+                <span class="ui-lab-demo-field__label">Observações</span>
                 <div class="ui-lab-demo-field__input"></div>
               </div>
             </div>
           </section>
 
-          <!-- Seção 3: Endereço -->
-          <section class="form-section" aria-labelledby="std-endereco">
+          <!-- Seção 3: Configurações -->
+          <section class="form-section" aria-labelledby="std-config">
             <header class="section-header">
               <div class="section-header__copy">
-                <h3 class="section-header__title" id="std-endereco">Endereço</h3>
+                <h3 class="section-header__title" id="std-config">Configurações</h3>
                 <p class="section-header__description">
-                  Endereço para correspondência e deslocamentos.
+                  Preferências e status de uso do servidor no sistema.
                 </p>
               </div>
             </header>
             <div class="field-grid">
               <div class="ui-lab-demo-field field-size-1">
-                <span class="ui-lab-demo-field__label">CEP</span>
-                <div class="ui-lab-demo-field__input"></div>
-              </div>
-              <div class="ui-lab-demo-field field-size-3">
-                <span class="ui-lab-demo-field__label">Logradouro</span>
-                <div class="ui-lab-demo-field__input"></div>
-              </div>
-              <div class="ui-lab-demo-field field-size-1">
-                <span class="ui-lab-demo-field__label">Número</span>
+                <span class="ui-lab-demo-field__label">Status</span>
                 <div class="ui-lab-demo-field__input"></div>
               </div>
               <div class="ui-lab-demo-field field-size-2">
-                <span class="ui-lab-demo-field__label">Complemento</span>
+                <span class="ui-lab-demo-field__label">Perfil documental</span>
                 <div class="ui-lab-demo-field__input"></div>
               </div>
               <div class="ui-lab-demo-field field-size-1">
-                <span class="ui-lab-demo-field__label">Bairro</span>
-                <div class="ui-lab-demo-field__input"></div>
-              </div>
-              <div class="ui-lab-demo-field field-size-2">
-                <span class="ui-lab-demo-field__label">Município</span>
-                <div class="ui-lab-demo-field__input"></div>
-              </div>
-              <div class="ui-lab-demo-field field-size-1">
-                <span class="ui-lab-demo-field__label">UF</span>
+                <span class="ui-lab-demo-field__label">Recebe notificações</span>
                 <div class="ui-lab-demo-field__input"></div>
               </div>
             </div>
           </section>
 
+          <!-- Footer Actions: ações ao final do painel, não no Page Header -->
           <footer class="footer-actions">
             <div class="footer-actions__secondary">
               <button class="btn btn-secondary" type="button">Cancelar</button>
             </div>
             <div class="footer-actions__primary">
-              <button class="btn btn-primary" type="button">Salvar cadastro</button>
+              <button class="btn btn-primary" type="button">Salvar servidor</button>
             </div>
           </footer>
 
