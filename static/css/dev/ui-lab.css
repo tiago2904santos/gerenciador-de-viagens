@@ -74,37 +74,36 @@ html[data-theme="dark"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg)::after {
 html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg)::before {
   background:
     radial-gradient(
-      ellipse 115% 120% at -30% 0%,
-      rgba(214, 170, 70, 0.18) 0%,
-      rgba(214, 170, 70, 0.08) 20%,
+      ellipse 115% 120% at -24% -8%,
+      rgba(255, 255, 255, 0.92) 0%,
+      rgba(235, 242, 248, 0.6) 22%,
       transparent 64%
     ),
     radial-gradient(
-      ellipse 95% 72% at 85% 20%,
-      rgba(110, 175, 230, 0.22) 0%,
-      rgba(160, 210, 245, 0.12) 28%,
+      ellipse 92% 68% at 86% 14%,
+      rgba(182, 216, 238, 0.42) 0%,
+      rgba(210, 229, 243, 0.22) 26%,
       transparent 68%
     ),
     radial-gradient(
-      ellipse 85% 70% at 16% 92%,
-      rgba(120, 205, 220, 0.14) 0%,
-      rgba(120, 205, 220, 0.06) 24%,
+      ellipse 82% 68% at 18% 92%,
+      rgba(194, 230, 238, 0.26) 0%,
+      rgba(194, 230, 238, 0.1) 26%,
       transparent 56%
     ),
     linear-gradient(
-      128deg,
+      132deg,
       transparent 0%,
-      transparent 28%,
-      rgba(155, 210, 245, 0.12) 42%,
-      rgba(172, 221, 228, 0.07) 50%,
-      rgba(140, 185, 225, 0.04) 58%,
-      transparent 90%
+      transparent 30%,
+      rgba(180, 214, 236, 0.14) 44%,
+      rgba(212, 230, 241, 0.08) 54%,
+      transparent 76%
     ),
     linear-gradient(
       145deg,
-      #f8fbfe 0%,
-      #edf4f9 24%,
-      #dce8f2 58%,
+      #fbfdff 0%,
+      #eef4f8 24%,
+      #dce7ef 58%,
       #edf3f8 82%,
       #f9fbfd 100%
     );
@@ -115,9 +114,9 @@ html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg)::after 
     radial-gradient(
       circle at 50% 42%,
       transparent 0%,
-      transparent 44%,
-      rgba(11, 58, 102, 0.05) 78%,
-      rgba(11, 58, 102, 0.1) 100%
+      transparent 48%,
+      rgba(106, 132, 160, 0.05) 80%,
+      rgba(106, 132, 160, 0.11) 100%
     );
 }
 
@@ -157,58 +156,82 @@ html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sideba
   background:
     linear-gradient(
       180deg,
-      rgba(248, 251, 254, 0.88) 0%,
-      rgba(238, 245, 250, 0.82) 46%,
-      rgba(228, 238, 246, 0.88) 100%
+      rgba(248, 252, 255, 0.82) 0%,
+      rgba(237, 245, 250, 0.76) 46%,
+      rgba(227, 238, 246, 0.82) 100%
     );
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
-  border-right: 1px solid rgba(100, 125, 150, 0.18);
+  border-right: 1px solid rgba(150, 175, 194, 0.28);
   box-shadow:
-    inset -1px 0 0 rgba(255, 255, 255, 0.72),
-    18px 0 44px rgba(90, 115, 145, 0.1);
+    inset 0 1px 0 rgba(255, 255, 255, 0.88),
+    inset -1px 0 0 rgba(255, 255, 255, 0.45),
+    18px 0 40px rgba(106, 132, 160, 0.1);
+  overflow: hidden;
+  isolation: isolate;
 }
 
 html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) {
   --cv-ui-lab-title: #061427;
   --cv-ui-lab-text: #243447;
-  --cv-ui-lab-text-muted: #405469;
-  --cv-ui-lab-eyebrow: #33536b;
+  --cv-ui-lab-text-muted: #42566b;
+  --cv-ui-lab-eyebrow: #3a5872;
   --sidebar-surface:
     linear-gradient(
       180deg,
-      rgba(248, 251, 254, 0.88) 0%,
-      rgba(238, 245, 250, 0.82) 46%,
-      rgba(228, 238, 246, 0.88) 100%
+      rgba(248, 252, 255, 0.82) 0%,
+      rgba(237, 245, 250, 0.76) 46%,
+      rgba(227, 238, 246, 0.82) 100%
     );
-  --sidebar-border: rgba(100, 125, 150, 0.18);
-  --sidebar-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.72), 18px 0 44px rgba(90, 115, 145, 0.1);
+  --sidebar-border: rgba(150, 175, 194, 0.28);
+  --sidebar-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.88),
+    inset -1px 0 0 rgba(255, 255, 255, 0.45),
+    18px 0 40px rgba(106, 132, 160, 0.1);
   --sidebar-brand-fg: #0b1726;
-  --sidebar-fg: #1b2a3a;
-  --sidebar-fg-soft: #43566b;
+  --sidebar-fg: #1a2a3a;
+  --sidebar-fg-soft: #4a5c6f;
   --sidebar-fg-heading: #0d1b2a;
-  --sidebar-badge-bg: linear-gradient(135deg, #e7c86f 0%, #c59637 100%);
-  --sidebar-link-surface: rgba(255, 255, 255, 0.58);
-  --sidebar-link-border: rgba(120, 140, 160, 0.18);
-  --sidebar-link-fg: #1b2a3a;
-  --sidebar-link-hover-bg: rgba(255, 255, 255, 0.82);
-  --sidebar-icon-bg: rgba(238, 244, 250, 0.96);
+  --sidebar-badge-bg: linear-gradient(135deg, #f7edd1 0%, #d8be72 100%);
+  --sidebar-link-surface: linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(244, 249, 252, 0.42));
+  --sidebar-link-border: rgba(155, 177, 194, 0.2);
+  --sidebar-link-fg: #1a2a3a;
+  --sidebar-link-hover-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(235, 245, 250, 0.62));
+  --sidebar-icon-bg: rgba(235, 242, 248, 0.96);
   --sidebar-icon-fg: #243447;
-  --sidebar-active-bg: linear-gradient(135deg, rgba(214, 170, 70, 0.18), rgba(255, 255, 255, 0.8));
-  --sidebar-active-fg: #0b1726;
-  --sidebar-active-border: rgba(196, 150, 55, 0.62);
-  --sidebar-panel-border: rgba(196, 150, 55, 0.34);
+  --sidebar-active-bg: linear-gradient(135deg, rgba(220, 236, 243, 0.92), rgba(171, 204, 216, 0.72));
+  --sidebar-active-fg: #0a1726;
+  --sidebar-active-border: rgba(196, 214, 226, 0.9);
+  --sidebar-panel-border: rgba(196, 214, 226, 0.7);
   --sidebar-footer-fg: #475569;
-  --sidebar-logout-bg: rgba(255, 255, 255, 0.62);
-  --sidebar-logout-border: rgba(120, 140, 160, 0.18);
-  --sidebar-logout-fg: #1b2a3a;
-  --sidebar-focus-ring: rgba(196, 150, 55, 0.36);
+  --sidebar-logout-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(244, 249, 252, 0.42));
+  --sidebar-logout-border: rgba(155, 177, 194, 0.2);
+  --sidebar-logout-fg: #1a2a3a;
+  --sidebar-focus-ring: rgba(150, 190, 214, 0.34);
   --sidebar-theme-active-bg: #172033;
 }
 
 html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-header,
 html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-footer {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.56), rgba(248, 251, 255, 0.34));
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.62), rgba(242, 247, 251, 0.42));
+  backdrop-filter: blur(12px) saturate(120%);
+  -webkit-backdrop-filter: blur(12px) saturate(120%);
+}
+
+html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.26), transparent 26%),
+    radial-gradient(ellipse 80% 32% at 50% 0%, rgba(255, 255, 255, 0.62), transparent 72%);
+  z-index: 0;
+}
+
+html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar > * {
+  position: relative;
+  z-index: 1;
 }
 
 html[data-theme="dark"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-header,
@@ -232,17 +255,19 @@ html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sideba
 }
 
 html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-brand-badge {
-  background: linear-gradient(135deg, #e7c86f 0%, #c59637 100%);
-  border-color: rgba(154, 112, 30, 0.58);
-  box-shadow: 0 10px 20px rgba(196, 150, 55, 0.24);
-  color: #152234;
+  background: linear-gradient(135deg, #f7edcf 0%, #d4b96d 100%);
+  border-color: rgba(176, 142, 67, 0.54);
+  box-shadow: 0 10px 22px rgba(176, 142, 67, 0.2);
+  color: #13202f;
 }
 
 html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-link--module,
 html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-link--cadastros,
 html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .app-theme-grid__btn,
 html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-logout-btn {
-  box-shadow: 0 2px 10px rgba(100, 120, 145, 0.04);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 4px 14px rgba(110, 135, 160, 0.06);
 }
 
 html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-link--module:hover,
@@ -251,8 +276,10 @@ html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sideba
 html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-link--module:focus-visible,
 html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-module-expand:focus-visible,
 html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-link--cadastros:focus-visible {
-  border-color: rgba(120, 170, 215, 0.28);
-  box-shadow: 0 8px 20px rgba(115, 145, 180, 0.08);
+  border-color: rgba(150, 190, 214, 0.34);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.88),
+    0 10px 24px rgba(120, 150, 180, 0.1);
   color: #0d1b2a;
 }
 
@@ -260,26 +287,27 @@ html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sideba
 html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-module-expand.is-active,
 html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-link--cadastros.is-active {
   background:
-    linear-gradient(135deg, rgba(214, 170, 70, 0.18), rgba(255, 255, 255, 0.8));
-  border-color: rgba(196, 150, 55, 0.62);
+    linear-gradient(135deg, rgba(220, 236, 243, 0.92), rgba(171, 204, 216, 0.72));
+  border-color: rgba(196, 214, 226, 0.9);
   box-shadow:
-    0 12px 24px rgba(196, 150, 55, 0.1),
-    inset 3px 0 0 rgba(196, 150, 55, 0.88);
+    inset 0 1px 0 rgba(255, 255, 255, 0.92),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.3),
+    0 12px 26px rgba(122, 150, 172, 0.14);
   color: #0b1726;
 }
 
 html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-item-icon {
-  background: rgba(235, 243, 249, 0.96);
-  border: 1px solid rgba(120, 140, 160, 0.16);
-  color: #243447;
+  background: rgba(237, 243, 248, 0.96);
+  border: 1px solid rgba(155, 177, 194, 0.2);
+  color: #1a2a3a;
 }
 
 html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-link--module.is-active .sidebar-item-icon,
 html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-module-expand.is-active .sidebar-item-icon,
 html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-link--cadastros.is-active .sidebar-item-icon {
-  background: rgba(214, 170, 70, 0.28);
-  border-color: rgba(196, 150, 55, 0.46);
-  color: #152234;
+  background: linear-gradient(180deg, rgba(232, 241, 247, 0.98), rgba(210, 225, 235, 0.9));
+  border-color: rgba(196, 214, 226, 0.96);
+  color: #0a1726;
 }
 
 html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-theme__label {
@@ -291,15 +319,20 @@ html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .app-th
 }
 
 html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .app-theme-grid__btn {
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(120, 140, 160, 0.18);
-  color: #243447;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(239, 245, 249, 0.58));
+  border: 1px solid rgba(155, 177, 194, 0.2);
+  color: #1a2a3a;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.86),
+    0 4px 14px rgba(110, 135, 160, 0.06);
 }
 
 html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .app-theme-grid__btn:hover,
 html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .app-theme-grid__btn:focus-visible {
-  background: rgba(255, 255, 255, 0.9);
-  border-color: rgba(120, 170, 215, 0.28);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(235, 245, 250, 0.7));
+  border-color: rgba(150, 190, 214, 0.34);
   color: #0d1b2a;
 }
 
@@ -311,7 +344,7 @@ html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .app-th
 html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .app-theme-grid__btn[aria-pressed="true"],
 html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .app-theme-grid__btn[aria-checked="true"] {
   background: #172033;
-  border-color: rgba(196, 150, 55, 0.72);
+  border-color: rgba(196, 214, 226, 0.96);
   box-shadow: 0 12px 26px rgba(15, 23, 42, 0.16);
   color: #f8fafc;
 }
@@ -324,6 +357,16 @@ html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .ui-lab
 
 html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .ui-lab-page > section:first-child {
   max-width: 48rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(243, 248, 252, 0.42));
+  border: 1px solid rgba(155, 177, 194, 0.18);
+  border-radius: var(--radius-panel);
+  backdrop-filter: blur(14px) saturate(118%);
+  -webkit-backdrop-filter: blur(14px) saturate(118%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.88),
+    0 18px 48px rgba(106, 132, 160, 0.08);
+  padding: clamp(20px, 2.4vw, 30px);
 }
 
 html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .ui-lab-page > section:first-child > p:first-child {
