@@ -385,10 +385,67 @@ html[data-theme="light"] {
    07. Page Header — Variações
    ========================================================= */
 
-/* --- 7.1 Standard: header direto, sem metadados extras --- */
+/* --- 7.1 Standard: stage escuro — mesma linguagem do app-page-hero__stage --- */
 
-/* Nenhuma regra visual adicional necessária; a estrutura base
-   com .page-header__row já cobre o standard. */
+.page-header--standard {
+  background:    var(--app-hero-stage-bg);
+  border-radius: var(--radius-lg);
+  box-shadow:    inset 0 -1px 0 rgba(255, 255, 255, 0.08), var(--shadow-lg);
+  overflow:      hidden;
+  padding:       var(--space-5) var(--space-6);
+  position:      relative;
+}
+
+/* Ribbon inferior — idêntico ao app-page-hero__ribbon */
+.page-header--standard::after {
+  background:     var(--app-hero-ribbon);
+  bottom:         0;
+  content:        "";
+  height:         3px;
+  left:           0;
+  pointer-events: none;
+  position:       absolute;
+  right:          0;
+}
+
+/* Tipografia sobre fundo escuro */
+.page-header--standard .page-header__eyebrow {
+  color: var(--app-hero-eyebrow);
+}
+
+.page-header--standard .page-header__title {
+  color: var(--app-hero-title);
+}
+
+.page-header--standard .page-header__subtitle {
+  color: rgba(255, 255, 255, 0.72);
+  max-width: 64ch;
+}
+
+/* Botões sobre fundo escuro */
+.page-header--standard .btn-primary {
+  background:   var(--color-accent);
+  border-color: var(--color-accent-hover);
+  color:        var(--color-primary-strong);
+}
+
+.page-header--standard .btn-primary:hover,
+.page-header--standard .btn-primary:focus-visible {
+  background:   var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+}
+
+.page-header--standard .btn-secondary {
+  background:   rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.22);
+  color:        var(--color-white);
+}
+
+.page-header--standard .btn-secondary:hover,
+.page-header--standard .btn-secondary:focus-visible {
+  background:   rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.34);
+}
 
 /* --- 7.2 Wizard: header com linha de metadados abaixo --- */
 
