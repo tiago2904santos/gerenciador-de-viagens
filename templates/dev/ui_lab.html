@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 {% load static %}
 
 {% block title %}UI Lab{% endblock %}
@@ -11,7 +11,7 @@
 {% block content %}
 <main class="ui-lab-page cv-ui-lab-css-bg">
 
-  <!-- Hero da página -->
+  <!-- Hero da pÃ¡gina -->
   <header class="app-page-hero app-page__header app-page-hero--hybrid app-page__header--hybrid app-page-hero--compact"
           aria-labelledby="ui-lab-title">
     <div class="app-page-hero__stage">
@@ -24,7 +24,7 @@
           <div class="app-page__brand-mark" aria-hidden="true">DV</div>
           <div class="app-page__brand-copy">
             <p class="app-page__subtitle">
-              Ambiente de desenvolvimento para testar padrões, estados e composições visuais.
+              Ambiente de desenvolvimento para testar padrÃµes, estados e composiÃ§Ãµes visuais.
             </p>
           </div>
         </div>
@@ -33,30 +33,30 @@
     <div class="app-page-hero__ribbon" aria-hidden="true"></div>
   </header>
 
-  <!-- Demonstração: Page Shell Layer System — quatro variações oficiais -->
-  <section aria-label="Demonstração: Variações de Page Shell">
+  <!-- DemonstraÃ§Ã£o: Page Shell Layer System â€” quatro variaÃ§Ãµes oficiais -->
+  <section aria-label="DemonstraÃ§Ã£o: VariaÃ§Ãµes de Page Shell">
 
-    <!-- Nav de acesso rápido -->
-    <nav class="ui-lab-variant-nav" aria-label="Variações de Page Shell">
+    <!-- Nav de acesso rÃ¡pido -->
+    <nav class="ui-lab-variant-nav" aria-label="VariaÃ§Ãµes de Page Shell">
       <a href="#shell-simple"   class="ui-lab-variant-nav__link">Standard Simple</a>
       <a href="#shell-standard" class="ui-lab-variant-nav__link">Standard</a>
       <a href="#shell-wizard"   class="ui-lab-variant-nav__link">Wizard / Stepper</a>
       <a href="#shell-list"     class="ui-lab-variant-nav__link">List / Filters</a>
     </nav>
 
-    <!-- ══════════════════════════════════════════════════════
-         VARIAÇÃO 1 — PAGE SHELL STANDARD SIMPLE
-         Cadastro curto: até 4 campos, painel compacto centralizado.
-         ══════════════════════════════════════════════════════ -->
+    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+         VARIAÃ‡ÃƒO 1 â€” PAGE SHELL STANDARD SIMPLE
+         Cadastro curto: atÃ© 4 campos, painel compacto centralizado.
+         â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
     <div id="shell-simple" class="ui-lab-variant-block">
-      <span class="ui-lab-demo-label">Variação 1 — Page Shell Standard Simple</span>
+      <span class="ui-lab-demo-label">VariaÃ§Ã£o 1 â€” Page Shell Standard Simple</span>
 
       <div class="page-shell page-shell--standard-simple">
 
-        <!-- Page Header: limpo, sem botões -->
+        <!-- Page Header: limpo, sem botÃµes -->
         <header class="page-header page-header--clean">
 
-          <!-- Stage: fundo escuro — eyebrow + título -->
+          <!-- Stage: fundo escuro â€” eyebrow + tÃ­tulo -->
           <div class="page-header__stage">
             <div class="page-header__context">
               <span class="page-header__eyebrow">Cadastro auxiliar</span>
@@ -64,13 +64,13 @@
             </div>
           </div>
 
-          <!-- Body: fundo claro — brand mark + subtítulo -->
+          <!-- Body: fundo claro â€” brand mark + subtÃ­tulo -->
           <div class="page-header__body">
             <div class="app-page__brand">
               <div class="app-page__brand-mark" aria-hidden="true">CA</div>
               <div class="app-page__brand-copy">
                 <p class="app-page__subtitle">
-                  Cargos e funções são usados para identificar servidores nos documentos de viagem.
+                  Cargos e funÃ§Ãµes sÃ£o usados para identificar servidores nos documentos de viagem.
                 </p>
               </div>
             </div>
@@ -164,185 +164,479 @@
       </div>
     </div>
 
-    <!-- ══════════════════════════════════════════════════════
-         VARIAÇÃO 2 — PAGE SHELL STANDARD
-         Cadastros curtos/médios com mais de 4 campos, sem stepper.
-         Um único Main Form Panel com múltiplas Form Sections.
-         ══════════════════════════════════════════════════════ -->
+    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+         VARIAÃ‡ÃƒO 2 â€” PAGE SHELL STANDARD
+         Cadastros curtos/mÃ©dios com mais de 4 campos, sem stepper.
+         Um Ãºnico Main Form Panel com mÃºltiplas Form Sections.
+         â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
     <div id="shell-standard" class="ui-lab-variant-block" hidden>
       <span class="ui-lab-demo-label">Variação 2 — Page Shell Standard</span>
 
-      <div class="page-shell page-shell--standard">
+      <nav class="ui-lab-standard-nav" aria-label="Exemplos reais do Standard">
+        <a href="#std-servidores" class="ui-lab-standard-nav__link">Servidores</a>
+        <a href="#std-viaturas" class="ui-lab-standard-nav__link">Viaturas</a>
+        <a href="#std-configuracoes" class="ui-lab-standard-nav__link">Configurações</a>
+      </nav>
 
-        <!-- Page Header: limpo, sem botões -->
-        <header class="page-header page-header--clean">
-
-          <!-- Stage: fundo escuro — eyebrow + título -->
-          <div class="page-header__stage">
-            <div class="page-header__context">
-              <span class="page-header__eyebrow">Cadastro</span>
-              <h2 class="page-header__title">Cadastro de servidor</h2>
-            </div>
-          </div>
-
-          <!-- Body: fundo claro — brand mark + subtítulo -->
-          <div class="page-header__body">
-            <div class="app-page__brand">
-              <div class="app-page__brand-mark" aria-hidden="true">CS</div>
-              <div class="app-page__brand-copy">
-                <p class="app-page__subtitle">
-                  Preencha os dados funcionais, contato e lotação do servidor para uso nos documentos de viagem.
-                </p>
+      <div id="std-servidores" class="ui-lab-standard-example">
+        <div class="page-shell page-shell--standard">
+          <header class="page-header page-header--clean" aria-labelledby="std-servidores-title">
+            <div class="page-header__stage">
+              <div class="page-header__context">
+                <span class="page-header__eyebrow">Cadastros</span>
+                <h2 class="page-header__title" id="std-servidores-title">Novo servidor</h2>
               </div>
             </div>
-          </div>
-
-          <!-- Ribbon: faixa gradiente -->
-          <div class="page-header__ribbon" aria-hidden="true"></div>
-
-        </header>
-
-        <!-- Um único Main Form Panel com três Form Sections -->
-        <main class="main-form-panel">
-
-          <!-- Seção 1: Dados funcionais -->
-          <section class="form-section" aria-labelledby="std-funcionais">
-            <header class="section-header">
-              <div class="section-header__copy">
-                <h3 class="section-header__title" id="std-funcionais">Dados funcionais</h3>
-                <p class="section-header__description">
-                  Informações principais de identificação funcional do servidor.
-                </p>
-              </div>
-            </header>
-            <div class="field-grid">
-              <div class="ui-lab-demo-field field-size-3">
-                <span class="ui-lab-demo-field__label">Nome completo</span>
-                <div class="ui-lab-demo-field__input"></div>
-              </div>
-              <div class="ui-lab-demo-field field-size-1">
-                <span class="ui-lab-demo-field__label">Matrícula</span>
-                <div class="ui-lab-demo-field__input"></div>
-              </div>
-              <div class="ui-lab-demo-field field-size-1">
-                <span class="ui-lab-demo-field__label">CPF</span>
-                <div class="ui-lab-demo-field__input"></div>
-              </div>
-              <div class="ui-lab-demo-field field-size-1">
-                <span class="ui-lab-demo-field__label">RG</span>
-                <div class="ui-lab-demo-field__input"></div>
-              </div>
-              <div class="ui-lab-demo-field field-size-2">
-                <span class="ui-lab-demo-field__label">Cargo / Função</span>
-                <div class="ui-lab-demo-field__input"></div>
-              </div>
-              <div class="ui-lab-demo-field field-size-2">
-                <span class="ui-lab-demo-field__label">Lotação</span>
-                <div class="ui-lab-demo-field__input"></div>
+            <div class="page-header__body">
+              <div class="app-page__brand">
+                <div class="app-page__brand-mark" aria-hidden="true">SV</div>
+                <div class="app-page__brand-copy">
+                  <p class="app-page__subtitle">
+                    Cadastro real do módulo Servidores. Nome, cargo e CPF sao obrigatorios; RG e telefone sao opcionais.
+                  </p>
+                  <div class="page-header__meta">
+                    <span class="page-header__badge page-header__badge--draft">RG opcional</span>
+                    <span class="page-header__meta-sep" aria-hidden="true">·</span>
+                    <span class="page-header__meta-item">Cargo e unidade com acao acoplada</span>
+                  </div>
+                </div>
               </div>
             </div>
-          </section>
+            <div class="page-header__ribbon" aria-hidden="true"></div>
+          </header>
 
-          <!-- Seção 2: Contato -->
-          <section class="form-section" aria-labelledby="std-contato">
-            <header class="section-header">
-              <div class="section-header__copy">
-                <h3 class="section-header__title" id="std-contato">Contato</h3>
-                <p class="section-header__description">
-                  Dados para comunicação e notificações relacionadas aos documentos.
-                </p>
+          <main class="main-form-panel">
+            <section class="form-section" aria-labelledby="std-servidores-dados">
+              <header class="section-header">
+                <div class="section-header__copy">
+                  <h3 class="section-header__title" id="std-servidores-dados">Dados do servidor</h3>
+                  <p class="section-header__description">
+                    Identificacao funcional, vinculo e documentos basicos do cadastro.
+                  </p>
+                </div>
+              </header>
+              <div class="field-grid">
+                <div class="ui-lab-form-field field-size-3">
+                  <label class="ui-lab-form-label" for="ui-lab-servidor-nome">Nome completo <span class="form-field__required" aria-hidden="true">*</span></label>
+                  <input id="ui-lab-servidor-nome" class="form-control" type="text" value="MARIA APARECIDA SILVA" placeholder="Nome completo">
+                  <p class="form-field__hint">Campo obrigatorio e normalizado em caixa alta.</p>
+                </div>
+
+                <div class="ui-lab-form-field field-size-2">
+                  <label class="ui-lab-form-label" for="ui-lab-servidor-cargo">Cargo <span class="form-field__required" aria-hidden="true">*</span></label>
+                  <div class="field-control-row">
+                    <select id="ui-lab-servidor-cargo" class="form-select">
+                      <option selected>Selecione</option>
+                      <option>Agente administrativo</option>
+                      <option>Motorista</option>
+                    </select>
+                    <button class="btn btn-secondary btn-sm field-addon-action" type="button">Gerenciar cargos</button>
+                  </div>
+                  <p class="form-field__hint">O formulario real abre a lista de cargos sem sair do cadastro.</p>
+                </div>
+
+                <div class="ui-lab-form-field field-size-1">
+                  <label class="ui-lab-form-label" for="ui-lab-servidor-cpf">CPF <span class="form-field__required" aria-hidden="true">*</span></label>
+                  <input id="ui-lab-servidor-cpf" class="form-control" type="text" value="123.456.789-09" placeholder="000.000.000-00" inputmode="numeric" autocomplete="off">
+                  <p class="form-field__error">CPF deve conter 11 digitos.</p>
+                </div>
               </div>
-            </header>
-            <div class="field-grid">
-              <div class="ui-lab-demo-field field-size-2">
-                <span class="ui-lab-demo-field__label">E-mail institucional</span>
-                <div class="ui-lab-demo-field__input"></div>
+            </section>
+
+            <section class="form-section" aria-labelledby="std-servidores-rg">
+              <header class="section-header">
+                <div class="section-header__copy">
+                  <h3 class="section-header__title" id="std-servidores-rg">Identificacao complementar</h3>
+                  <p class="section-header__description">
+                    RG pode ser bloqueado pelo marcador de ausencia. Telefone e opcional.
+                  </p>
+                </div>
+              </header>
+              <div class="field-grid">
+                <div class="field-group field-size-4">
+                  <div class="field-group__header">
+                    <h4 class="field-group__title">RG e bloqueio</h4>
+                  </div>
+                  <div class="field-group__body">
+                    <div class="field-grid">
+                      <div class="ui-lab-form-field field-size-2">
+                        <label class="ui-lab-form-label" for="ui-lab-servidor-sem-rg">Nao possui RG</label>
+                        <label class="form-field__checkbox" for="ui-lab-servidor-sem-rg">
+                          <input id="ui-lab-servidor-sem-rg" type="checkbox" checked>
+                          <span class="form-field__checkbox-copy">
+                            <span class="form-field__checkbox-title">Marcar como sem RG</span>
+                            <span class="form-field__hint">Bloqueia o campo RG e salva o valor canonico usado pelo sistema.</span>
+                          </span>
+                        </label>
+                      </div>
+
+                      <div class="ui-lab-form-field field-size-2">
+                        <label class="ui-lab-form-label" for="ui-lab-servidor-rg">RG</label>
+                        <input id="ui-lab-servidor-rg" class="form-control" type="text" value="" placeholder="Bloqueado quando sem RG" disabled aria-disabled="true">
+                        <p class="form-field__hint">Quando o checkbox acima esta ativo, este campo fica desabilitado.</p>
+                      </div>
+
+                      <div class="status-inline-card field-size-4">
+                        <span class="status-inline-card__badge">Bloqueado</span>
+                        <p class="form-field__hint">
+                          O cadastro real aceita RG vazio ou a marca de ausencia. A validacao impede duplicidade quando ha valor informado.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div class="ui-lab-demo-field field-size-2">
-                <span class="ui-lab-demo-field__label">Telefone</span>
-                <div class="ui-lab-demo-field__input"></div>
+            </section>
+
+            <section class="form-section" aria-labelledby="std-servidores-contato">
+              <header class="section-header">
+                <div class="section-header__copy">
+                  <h3 class="section-header__title" id="std-servidores-contato">Contato e lotacao</h3>
+                  <p class="section-header__description">
+                    Telefone e opcional. Unidade tambem e opcional e possui atalho de gerenciamento.
+                  </p>
+                </div>
+              </header>
+              <div class="field-grid">
+                <div class="ui-lab-form-field field-size-2">
+                  <label class="ui-lab-form-label" for="ui-lab-servidor-telefone">Telefone</label>
+                  <input id="ui-lab-servidor-telefone" class="form-control" type="text" value="(41) 99999-8888" placeholder="(00) 00000-0000" inputmode="numeric" autocomplete="off">
+                  <p class="form-field__hint">Mascara aceita 10 ou 11 digitos.</p>
+                </div>
+
+                <div class="ui-lab-form-field field-size-2">
+                  <label class="ui-lab-form-label" for="ui-lab-servidor-unidade">Unidade</label>
+                  <div class="field-control-row">
+                    <select id="ui-lab-servidor-unidade" class="form-select">
+                      <option selected>Selecione (opcional)</option>
+                      <option>Unidade central</option>
+                      <option>Unidade operacional</option>
+                    </select>
+                    <button class="btn btn-secondary btn-sm field-addon-action" type="button">Gerenciar unidades</button>
+                  </div>
+                  <p class="form-field__hint">A selecao e opcional e pode ficar em branco.</p>
+                </div>
               </div>
-              <div class="ui-lab-demo-field field-size-4">
-                <span class="ui-lab-demo-field__label">Observações</span>
-                <div class="ui-lab-demo-field__input"></div>
+            </section>
+
+            <footer class="footer-actions">
+              <div class="footer-actions__secondary">
+                <button class="btn btn-secondary" type="button">Voltar</button>
+              </div>
+              <div class="footer-actions__primary">
+                <button class="btn btn-primary" type="button">Criar servidor</button>
+              </div>
+            </footer>
+          </main>
+        </div>
+      </div>
+
+      <div id="std-viaturas" class="ui-lab-standard-example">
+        <div class="page-shell page-shell--standard">
+          <header class="page-header page-header--clean" aria-labelledby="std-viaturas-title">
+            <div class="page-header__stage">
+              <div class="page-header__context">
+                <span class="page-header__eyebrow">Cadastros</span>
+                <h2 class="page-header__title" id="std-viaturas-title">Nova viatura</h2>
               </div>
             </div>
-          </section>
-
-          <!-- Seção 3: Configurações -->
-          <section class="form-section" aria-labelledby="std-config">
-            <header class="section-header">
-              <div class="section-header__copy">
-                <h3 class="section-header__title" id="std-config">Configurações</h3>
-                <p class="section-header__description">
-                  Preferências e status de uso do servidor no sistema.
-                </p>
-              </div>
-            </header>
-            <div class="field-grid">
-              <div class="ui-lab-demo-field field-size-1">
-                <span class="ui-lab-demo-field__label">Status</span>
-                <div class="ui-lab-demo-field__input"></div>
-              </div>
-              <div class="ui-lab-demo-field field-size-2">
-                <span class="ui-lab-demo-field__label">Perfil documental</span>
-                <div class="ui-lab-demo-field__input"></div>
-              </div>
-              <div class="ui-lab-demo-field field-size-1">
-                <span class="ui-lab-demo-field__label">Recebe notificações</span>
-                <div class="ui-lab-demo-field__input"></div>
+            <div class="page-header__body">
+              <div class="app-page__brand">
+                <div class="app-page__brand-mark" aria-hidden="true">VT</div>
+                <div class="app-page__brand-copy">
+                  <p class="app-page__subtitle">
+                    Cadastro real do modulo Viaturas. A placa, o modelo, o combustivel, o tipo e os motoristas refletem o formulario atual.
+                  </p>
+                  <div class="page-header__meta">
+                    <span class="page-header__badge page-header__badge--draft">Motoristas opcionais</span>
+                    <span class="page-header__meta-sep" aria-hidden="true">·</span>
+                    <span class="page-header__meta-item">Placa com mascara Mercosul ou antiga</span>
+                  </div>
+                </div>
               </div>
             </div>
-          </section>
+            <div class="page-header__ribbon" aria-hidden="true"></div>
+          </header>
 
-          <!-- Footer Actions: ações ao final do painel, não no Page Header -->
-          <footer class="footer-actions">
-            <div class="footer-actions__secondary">
-              <button class="btn btn-secondary" type="button">Cancelar</button>
+          <main class="main-form-panel">
+            <section class="form-section" aria-labelledby="std-viaturas-dados">
+              <header class="section-header">
+                <div class="section-header__copy">
+                  <h3 class="section-header__title" id="std-viaturas-dados">Dados da viatura</h3>
+                  <p class="section-header__description">
+                    Placa, modelo, combustivel e tipo sao os campos do cadastro real.
+                  </p>
+                </div>
+              </header>
+              <div class="field-grid">
+                <div class="ui-lab-form-field field-size-1">
+                  <label class="ui-lab-form-label" for="ui-lab-viatura-placa">Placa <span class="form-field__required" aria-hidden="true">*</span></label>
+                  <input id="ui-lab-viatura-placa" class="form-control" type="text" value="AAA1A23" placeholder="AAA1234 ou AAA1A23" autocomplete="off">
+                  <p class="form-field__hint">Placa deve estar no formato AAA1234 ou AAA1A23.</p>
+                </div>
+
+                <div class="ui-lab-form-field field-size-2">
+                  <label class="ui-lab-form-label" for="ui-lab-viatura-modelo">Modelo <span class="form-field__required" aria-hidden="true">*</span></label>
+                  <input id="ui-lab-viatura-modelo" class="form-control" type="text" value="COROLLA" placeholder="Modelo">
+                  <p class="form-field__hint">Campo obrigatorio e normalizado em caixa alta.</p>
+                </div>
+
+                <div class="ui-lab-form-field field-size-2">
+                  <label class="ui-lab-form-label" for="ui-lab-viatura-combustivel">Combustivel <span class="form-field__required" aria-hidden="true">*</span></label>
+                  <div class="field-control-row">
+                    <select id="ui-lab-viatura-combustivel" class="form-select">
+                      <option selected>Selecione</option>
+                      <option>Gasolina</option>
+                      <option>Diesel</option>
+                    </select>
+                    <button class="btn btn-secondary btn-sm field-addon-action" type="button">Gerenciar combustiveis</button>
+                  </div>
+                </div>
+
+                <div class="ui-lab-form-field field-size-1">
+                  <label class="ui-lab-form-label" for="ui-lab-viatura-tipo">Tipo <span class="form-field__required" aria-hidden="true">*</span></label>
+                  <select id="ui-lab-viatura-tipo" class="form-select">
+                    <option selected>Descaracterizada</option>
+                    <option>Caracterizada</option>
+                  </select>
+                </div>
+              </div>
+            </section>
+
+            <section class="form-section" aria-labelledby="std-viaturas-motoristas">
+              <header class="section-header">
+                <div class="section-header__copy">
+                  <h3 class="section-header__title" id="std-viaturas-motoristas">Motoristas vinculados</h3>
+                  <p class="section-header__description">
+                    O campo e opcional e aceita multipla selecao de servidores.
+                  </p>
+                </div>
+              </header>
+              <div class="field-grid">
+                <div class="ui-lab-form-field field-size-4">
+                  <label class="ui-lab-form-label" for="ui-lab-viatura-motoristas">Motoristas</label>
+                  <select id="ui-lab-viatura-motoristas" class="form-select" multiple size="6" aria-label="Motoristas">
+                    <option>MARIA APARECIDA SILVA</option>
+                    <option>JOAO PEDRO SANTOS</option>
+                    <option>ANA BEATRIZ SOUZA</option>
+                  </select>
+                  <p class="form-field__hint">Use Ctrl ou Cmd para selecionar mais de um motorista.</p>
+                </div>
+              </div>
+            </section>
+
+            <footer class="footer-actions">
+              <div class="footer-actions__secondary">
+                <button class="btn btn-secondary" type="button">Voltar</button>
+              </div>
+              <div class="footer-actions__primary">
+                <button class="btn btn-primary" type="button">Criar viatura</button>
+              </div>
+            </footer>
+          </main>
+        </div>
+      </div>
+
+      <div id="std-configuracoes" class="ui-lab-standard-example">
+        <div class="page-shell page-shell--standard">
+          <header class="page-header page-header--clean" aria-labelledby="std-configuracoes-title">
+            <div class="page-header__stage">
+              <div class="page-header__context">
+                <span class="page-header__eyebrow">Sistema</span>
+                <h2 class="page-header__title" id="std-configuracoes-title">Configurações do sistema</h2>
+              </div>
             </div>
-            <div class="footer-actions__primary">
-              <button class="btn btn-primary" type="button">Salvar servidor</button>
+            <div class="page-header__body">
+              <div class="app-page__brand">
+                <div class="app-page__brand-mark" aria-hidden="true">CF</div>
+                <div class="app-page__brand-copy">
+                  <p class="app-page__subtitle">
+                    Dados institucionais usados em documentos e assinantes preferenciais por tipo de documento.
+                  </p>
+                  <div class="page-header__meta">
+                    <span class="page-header__badge page-header__badge--draft">Singleton</span>
+                    <span class="page-header__meta-sep" aria-hidden="true">·</span>
+                    <span class="page-header__meta-item">CEP aciona consulta automatica</span>
+                  </div>
+                </div>
+              </div>
             </div>
-          </footer>
+            <div class="page-header__ribbon" aria-hidden="true"></div>
+          </header>
 
-        </main>
+          <main class="main-form-panel">
+            <section class="form-section" aria-labelledby="std-config-dados">
+              <header class="section-header">
+                <div class="section-header__copy">
+                  <h3 class="section-header__title" id="std-config-dados">Dados institucionais</h3>
+                  <p class="section-header__description">
+                    Identificacao textual usada em documentos e cabeçalhos institucionais.
+                  </p>
+                </div>
+              </header>
+              <div class="field-grid">
+                <div class="ui-lab-form-field field-size-2">
+                  <label class="ui-lab-form-label" for="ui-lab-config-divisao">Divisao</label>
+                  <input id="ui-lab-config-divisao" class="form-control" type="text" value="DIVISAO ADMINISTRATIVA" data-mask="upper">
+                </div>
 
+                <div class="ui-lab-form-field field-size-2">
+                  <label class="ui-lab-form-label" for="ui-lab-config-unidade">Unidade</label>
+                  <input id="ui-lab-config-unidade" class="form-control" type="text" value="UNIDADE CENTRAL" data-mask="upper">
+                </div>
+              </div>
+            </section>
+
+            <section class="form-section" aria-labelledby="std-config-endereco">
+              <header class="section-header">
+                <div class="section-header__copy">
+                  <h3 class="section-header__title" id="std-config-endereco">Endereco dos documentos</h3>
+                  <p class="section-header__description">
+                    Campos usados no rodape dos documentos gerados pelo sistema.
+                  </p>
+                </div>
+              </header>
+              <div class="field-grid">
+                <div class="ui-lab-form-field field-size-1">
+                  <label class="ui-lab-form-label" for="ui-lab-config-cep">CEP</label>
+                  <input id="ui-lab-config-cep" class="form-control" type="text" value="80000-000" placeholder="00000-000" inputmode="numeric" autocomplete="off">
+                  <p class="form-field__hint">A tela real busca endereco ao sair do campo com 8 digitos.</p>
+                </div>
+
+                <div class="ui-lab-form-field field-size-3">
+                  <label class="ui-lab-form-label" for="ui-lab-config-logradouro">Logradouro</label>
+                  <input id="ui-lab-config-logradouro" class="form-control" type="text" value="RUA TESTE" data-mask="upper">
+                </div>
+
+                <div class="ui-lab-form-field field-size-1">
+                  <label class="ui-lab-form-label" for="ui-lab-config-numero">Numero</label>
+                  <input id="ui-lab-config-numero" class="form-control" type="text" value="123" autocomplete="off">
+                </div>
+
+                <div class="ui-lab-form-field field-size-2">
+                  <label class="ui-lab-form-label" for="ui-lab-config-bairro">Bairro</label>
+                  <input id="ui-lab-config-bairro" class="form-control" type="text" value="CENTRO" data-mask="upper">
+                </div>
+
+                <div class="ui-lab-form-field field-size-2">
+                  <label class="ui-lab-form-label" for="ui-lab-config-cidade">Cidade</label>
+                  <input id="ui-lab-config-cidade" class="form-control" type="text" value="CURITIBA" data-mask="upper">
+                </div>
+
+                <div class="ui-lab-form-field field-size-1">
+                  <label class="ui-lab-form-label" for="ui-lab-config-uf">UF</label>
+                  <input id="ui-lab-config-uf" class="form-control" type="text" value="PR" maxlength="2" autocomplete="off" data-mask="upper">
+                </div>
+
+                <div class="status-inline-card field-size-4">
+                  <span class="status-inline-card__badge">ViaCEP</span>
+                  <p class="form-field__hint">
+                    Quando o CEP e valido, o formulario real tenta preencher logradouro, bairro, cidade e UF automaticamente.
+                  </p>
+                </div>
+
+                <div class="ui-lab-form-field field-size-2">
+                  <label class="ui-lab-form-label" for="ui-lab-config-telefone">Telefone</label>
+                  <input id="ui-lab-config-telefone" class="form-control" type="text" value="(41) 3333-4444" placeholder="(00) 00000-0000" inputmode="numeric" autocomplete="off">
+                </div>
+
+                <div class="ui-lab-form-field field-size-2">
+                  <label class="ui-lab-form-label" for="ui-lab-config-email">E-mail</label>
+                  <input id="ui-lab-config-email" class="form-control" type="email" value="teste@pc.pr.gov.br" autocomplete="off">
+                </div>
+              </div>
+            </section>
+
+            <section class="form-section" aria-labelledby="std-config-assinaturas">
+              <header class="section-header">
+                <div class="section-header__copy">
+                  <h3 class="section-header__title" id="std-config-assinaturas">Assinaturas documentais</h3>
+                  <p class="section-header__description">
+                    Assinantes preferenciais por tipo de documento; nao e assinatura digital.
+                  </p>
+                </div>
+              </header>
+              <div class="field-grid">
+                <div class="ui-lab-form-field field-size-2">
+                  <label class="ui-lab-form-label" for="ui-lab-config-oficio">Assinante oficio</label>
+                  <select id="ui-lab-config-oficio" class="form-select">
+                    <option selected>---------</option>
+                    <option>MARIA APARECIDA SILVA</option>
+                    <option>JOAO PEDRO SANTOS</option>
+                  </select>
+                </div>
+
+                <div class="ui-lab-form-field field-size-2">
+                  <label class="ui-lab-form-label" for="ui-lab-config-justificativas">Assinante justificativa</label>
+                  <select id="ui-lab-config-justificativas" class="form-select">
+                    <option selected>---------</option>
+                    <option>MARIA APARECIDA SILVA</option>
+                    <option>ANA BEATRIZ SOUZA</option>
+                  </select>
+                </div>
+
+                <div class="ui-lab-form-field field-size-2">
+                  <label class="ui-lab-form-label" for="ui-lab-config-planos">Assinante plano de trabalho</label>
+                  <select id="ui-lab-config-planos" class="form-select">
+                    <option selected>---------</option>
+                    <option>MARIA APARECIDA SILVA</option>
+                    <option>JOAO PEDRO SANTOS</option>
+                  </select>
+                </div>
+
+                <div class="ui-lab-form-field field-size-2">
+                  <label class="ui-lab-form-label" for="ui-lab-config-ordens">Assinante ordem de servico</label>
+                  <select id="ui-lab-config-ordens" class="form-select">
+                    <option selected>---------</option>
+                    <option>MARIA APARECIDA SILVA</option>
+                    <option>ANA BEATRIZ SOUZA</option>
+                  </select>
+                </div>
+              </div>
+            </section>
+
+            <footer class="footer-actions">
+              <div class="footer-actions__secondary">
+                <button class="btn btn-secondary" type="button">Voltar</button>
+              </div>
+              <div class="footer-actions__primary">
+                <button class="btn btn-primary" type="button">Salvar configuracoes</button>
+              </div>
+            </footer>
+          </main>
+        </div>
       </div>
     </div>
 
-    <!-- ══════════════════════════════════════════════════════
-         VARIAÇÃO 3 — PAGE SHELL WIZARD / STEPPER
-         Cadastro longo com etapas, metadados de contexto.
-         ══════════════════════════════════════════════════════ -->
     <div id="shell-wizard" class="ui-lab-variant-block" hidden>
-      <span class="ui-lab-demo-label">Variação 3 — Page Shell Wizard / Stepper</span>
+      <span class="ui-lab-demo-label">VariaÃ§Ã£o 3 â€” Page Shell Wizard / Stepper</span>
 
       <div class="page-shell page-shell--wizard">
 
-        <!-- Page Header: limpo, sem botões -->
+        <!-- Page Header: limpo, sem botÃµes -->
         <header class="page-header page-header--clean">
 
-          <!-- Stage: fundo escuro — eyebrow + título -->
+          <!-- Stage: fundo escuro â€” eyebrow + tÃ­tulo -->
           <div class="page-header__stage">
             <div class="page-header__context">
-              <span class="page-header__eyebrow">Ofício</span>
-              <h2 class="page-header__title">Novo Ofício de Viagem</h2>
+              <span class="page-header__eyebrow">OfÃ­cio</span>
+              <h2 class="page-header__title">Novo OfÃ­cio de Viagem</h2>
             </div>
           </div>
 
-          <!-- Body: fundo claro — brand mark + subtítulo + metadados -->
+          <!-- Body: fundo claro â€” brand mark + subtÃ­tulo + metadados -->
           <div class="page-header__body">
             <div class="app-page__brand">
               <div class="app-page__brand-mark" aria-hidden="true">OV</div>
               <div class="app-page__brand-copy">
                 <p class="app-page__subtitle">
-                  Organize viajantes, transporte, roteiro e diárias em um fluxo guiado.
+                  Organize viajantes, transporte, roteiro e diÃ¡rias em um fluxo guiado.
                 </p>
                 <div class="page-header__meta">
                   <span class="page-header__badge page-header__badge--draft">Rascunho</span>
-                  <span class="page-header__meta-sep" aria-hidden="true">·</span>
+                  <span class="page-header__meta-sep" aria-hidden="true">Â·</span>
                   <span class="page-header__meta-item">Criado hoje</span>
-                  <span class="page-header__meta-sep" aria-hidden="true">·</span>
+                  <span class="page-header__meta-sep" aria-hidden="true">Â·</span>
                   <span class="page-header__meta-item">Etapa 2 de 4</span>
                 </div>
               </div>
@@ -355,10 +649,10 @@
         </header>
 
         <!-- Stepper: indicador de progresso -->
-        <nav class="page-stepper" aria-label="Etapas do formulário">
+        <nav class="page-stepper" aria-label="Etapas do formulÃ¡rio">
           <ol class="page-stepper__list">
             <li class="page-stepper__item is-complete">
-              <span class="page-stepper__number" aria-hidden="true">✓</span>
+              <span class="page-stepper__number" aria-hidden="true">âœ“</span>
               <span class="page-stepper__label">Dados do viajante</span>
             </li>
             <li class="page-stepper__item is-active" aria-current="step">
@@ -367,7 +661,7 @@
             </li>
             <li class="page-stepper__item">
               <span class="page-stepper__number" aria-hidden="true">3</span>
-              <span class="page-stepper__label">Roteiro e diárias</span>
+              <span class="page-stepper__label">Roteiro e diÃ¡rias</span>
             </li>
             <li class="page-stepper__item">
               <span class="page-stepper__number" aria-hidden="true">4</span>
@@ -378,7 +672,7 @@
 
         <main class="main-form-panel">
 
-          <!-- Seção 1: Transporte -->
+          <!-- SeÃ§Ã£o 1: Transporte -->
           <section class="form-section" aria-labelledby="wiz-transporte">
             <header class="section-header">
               <div class="section-header__copy">
@@ -400,7 +694,7 @@
                 <div class="ui-lab-demo-field__input"></div>
               </div>
               <div class="ui-lab-demo-field field-size-1">
-                <span class="ui-lab-demo-field__label">Placa / Identificação</span>
+                <span class="ui-lab-demo-field__label">Placa / IdentificaÃ§Ã£o</span>
                 <div class="ui-lab-demo-field__input"></div>
               </div>
               <div class="ui-lab-demo-field field-size-1">
@@ -427,7 +721,7 @@
             </div>
           </section>
 
-          <!-- Seção 2: Roteiro -->
+          <!-- SeÃ§Ã£o 2: Roteiro -->
           <section class="form-section" aria-labelledby="wiz-roteiro">
             <header class="section-header">
               <div class="section-header__copy">
@@ -447,7 +741,7 @@
                 <div class="ui-lab-demo-field__input"></div>
               </div>
               <div class="ui-lab-demo-field field-size-1">
-                <span class="ui-lab-demo-field__label">Data de saída</span>
+                <span class="ui-lab-demo-field__label">Data de saÃ­da</span>
                 <div class="ui-lab-demo-field__input"></div>
               </div>
               <div class="ui-lab-demo-field field-size-1">
@@ -455,7 +749,7 @@
                 <div class="ui-lab-demo-field__input"></div>
               </div>
               <div class="ui-lab-demo-field field-size-1">
-                <span class="ui-lab-demo-field__label">Nº de diárias</span>
+                <span class="ui-lab-demo-field__label">NÂº de diÃ¡rias</span>
                 <div class="ui-lab-demo-field__input"></div>
               </div>
               <div class="ui-lab-demo-field field-size-4">
@@ -467,11 +761,11 @@
 
           <footer class="footer-actions">
             <div class="footer-actions__secondary">
-              <button class="btn btn-secondary" type="button">← Voltar</button>
+              <button class="btn btn-secondary" type="button">â† Voltar</button>
             </div>
             <div class="footer-actions__primary">
               <button class="btn btn-secondary" type="button">Salvar rascunho</button>
-              <button class="btn btn-primary"   type="button">Avançar →</button>
+              <button class="btn btn-primary"   type="button">AvanÃ§ar â†’</button>
             </div>
           </footer>
 
@@ -480,21 +774,21 @@
       </div>
     </div>
 
-    <!-- ══════════════════════════════════════════════════════
-         VARIAÇÃO 4 — PAGE SHELL LIST / FILTERS
-         Página de lista com filtros, paginação e ação de criação
-         na filter bar — nunca no page header.
-         Inclui subvariação Quick Create Inline.
-         ══════════════════════════════════════════════════════ -->
+    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+         VARIAÃ‡ÃƒO 4 â€” PAGE SHELL LIST / FILTERS
+         PÃ¡gina de lista com filtros, paginaÃ§Ã£o e aÃ§Ã£o de criaÃ§Ã£o
+         na filter bar â€” nunca no page header.
+         Inclui subvariaÃ§Ã£o Quick Create Inline.
+         â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
     <div id="shell-list" class="ui-lab-variant-block" hidden>
-      <span class="ui-lab-demo-label">Variação 4 — Page Shell List / Filters + Quick Create Inline</span>
+      <span class="ui-lab-demo-label">VariaÃ§Ã£o 4 â€” Page Shell List / Filters + Quick Create Inline</span>
 
       <div class="page-shell page-shell--list">
 
-        <!-- Page Header: limpo, sem botões -->
+        <!-- Page Header: limpo, sem botÃµes -->
         <header class="page-header page-header--clean">
 
-          <!-- Stage: fundo escuro — eyebrow + título + count -->
+          <!-- Stage: fundo escuro â€” eyebrow + tÃ­tulo + count -->
           <div class="page-header__stage">
             <div class="page-header__context">
               <span class="page-header__eyebrow">Cadastros auxiliares</span>
@@ -505,13 +799,13 @@
             </div>
           </div>
 
-          <!-- Body: fundo claro — subtítulo -->
+          <!-- Body: fundo claro â€” subtÃ­tulo -->
           <div class="page-header__body">
             <div class="app-page__brand">
               <div class="app-page__brand-mark" aria-hidden="true">CA</div>
               <div class="app-page__brand-copy">
                 <p class="app-page__subtitle">
-                  Cargos e funções utilizados para identificar servidores nos documentos de viagem.
+                  Cargos e funÃ§Ãµes utilizados para identificar servidores nos documentos de viagem.
                 </p>
               </div>
             </div>
@@ -525,7 +819,7 @@
         <!-- Painel de lista -->
         <div class="list-panel">
 
-          <!-- Filter Bar: controles à esquerda, ação de criação à direita -->
+          <!-- Filter Bar: controles Ã  esquerda, aÃ§Ã£o de criaÃ§Ã£o Ã  direita -->
           <div class="filter-bar">
             <div class="filter-bar__controls">
               <div class="ui-lab-demo-input ui-lab-demo-input--search"
@@ -551,26 +845,26 @@
             </div>
           </div>
 
-          <!-- Quick Create Panel: extensão visual da Filter Bar -->
+          <!-- Quick Create Panel: extensÃ£o visual da Filter Bar -->
           <div class="quick-create-panel"
                id="quick-create-cargo"
                role="region"
-               aria-label="Cadastro rápido de cargo">
+               aria-label="Cadastro rÃ¡pido de cargo">
 
-            <!-- Cabeçalho do painel -->
+            <!-- CabeÃ§alho do painel -->
             <div class="quick-create-panel__header">
               <h3 class="quick-create-panel__title">Novo cargo</h3>
               <button class="quick-create-panel__close"
                       type="button"
                       id="qc-close-btn"
-                      aria-label="Fechar cadastro rápido">×</button>
+                      aria-label="Fechar cadastro rÃ¡pido">Ã—</button>
             </div>
 
-            <!-- Corpo: campo(s) + ações na mesma linha (desktop) -->
+            <!-- Corpo: campo(s) + aÃ§Ãµes na mesma linha (desktop) -->
             <div class="quick-create-panel__body">
               <div class="quick-create-panel__row">
 
-                <!-- Field Grid: apenas campos, sem botões -->
+                <!-- Field Grid: apenas campos, sem botÃµes -->
                 <div class="field-grid">
                   <div class="ui-lab-demo-field field-size-3">
                     <span class="ui-lab-demo-field__label">Nome do cargo</span>
@@ -582,7 +876,7 @@
                   </div>
                 </div>
 
-                <!-- Quick Create Actions: botões fora do field-grid -->
+                <!-- Quick Create Actions: botÃµes fora do field-grid -->
                 <div class="quick-create-actions">
                   <button class="btn btn-secondary" type="button" id="qc-cancel-btn">
                     Cancelar
@@ -597,13 +891,13 @@
 
             <!-- Mensagem auxiliar opcional -->
             <p class="quick-create-panel__hint">
-              Para cadastros com mais detalhes, use a página completa de cadastro.
+              Para cadastros com mais detalhes, use a pÃ¡gina completa de cadastro.
             </p>
 
           </div>
 
           <!-- Lista de itens -->
-          <div class="list-content" role="list" aria-label="Lista de ofícios (demonstração)">
+          <div class="list-content" role="list" aria-label="Lista de ofÃ­cios (demonstraÃ§Ã£o)">
 
             <div class="ui-lab-demo-row" role="listitem">
               <div class="ui-lab-demo-row__avatar" aria-hidden="true"></div>
@@ -623,7 +917,7 @@
                 <div class="ui-lab-demo-bar ui-lab-demo-bar--sub"></div>
               </div>
               <div class="ui-lab-demo-row__aside">
-                <span class="ui-lab-demo-chip ui-lab-demo-chip--done">Concluído</span>
+                <span class="ui-lab-demo-chip ui-lab-demo-chip--done">ConcluÃ­do</span>
               </div>
             </div>
 
@@ -634,7 +928,7 @@
                 <div class="ui-lab-demo-bar ui-lab-demo-bar--sub"></div>
               </div>
               <div class="ui-lab-demo-row__aside">
-                <span class="ui-lab-demo-chip ui-lab-demo-chip--review">Em revisão</span>
+                <span class="ui-lab-demo-chip ui-lab-demo-chip--review">Em revisÃ£o</span>
               </div>
             </div>
 
@@ -656,23 +950,23 @@
                 <div class="ui-lab-demo-bar ui-lab-demo-bar--sub"></div>
               </div>
               <div class="ui-lab-demo-row__aside">
-                <span class="ui-lab-demo-chip ui-lab-demo-chip--done">Concluído</span>
+                <span class="ui-lab-demo-chip ui-lab-demo-chip--done">ConcluÃ­do</span>
               </div>
             </div>
 
           </div>
 
-          <!-- Paginação -->
+          <!-- PaginaÃ§Ã£o -->
           <div class="pagination-shell">
-            <span class="pagination-shell__info">1–5 de 24 itens</span>
+            <span class="pagination-shell__info">1â€“5 de 24 itens</span>
             <div class="pagination-shell__controls">
               <button class="btn btn-secondary" type="button" disabled
-                      aria-label="Página anterior">←</button>
+                      aria-label="PÃ¡gina anterior">â†</button>
               <button class="btn btn-primary"   type="button" aria-current="page">1</button>
               <button class="btn btn-secondary" type="button">2</button>
               <button class="btn btn-secondary" type="button">3</button>
               <button class="btn btn-secondary" type="button"
-                      aria-label="Próxima página">→</button>
+                      aria-label="PrÃ³xima pÃ¡gina">â†’</button>
             </div>
           </div>
 
@@ -687,7 +981,7 @@
 
 <script>
 (function () {
-  /* ── Tab switcher ── */
+  /* â”€â”€ Tab switcher â”€â”€ */
   var VARIANTS = ['shell-simple', 'shell-standard', 'shell-wizard', 'shell-list'];
 
   function showVariant(id) {
@@ -711,7 +1005,7 @@
     });
   });
 
-  /* ── Quick Create toggle ── */
+  /* â”€â”€ Quick Create toggle â”€â”€ */
   var qcPanel  = document.getElementById('quick-create-cargo');
   var qcToggle = document.getElementById('qc-toggle-btn');
   var qcClose  = document.getElementById('qc-close-btn');
@@ -738,3 +1032,6 @@
 }());
 </script>
 {% endblock %}
+
+
+
