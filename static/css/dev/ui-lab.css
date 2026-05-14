@@ -73,46 +73,47 @@ html[data-theme="dark"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg)::after {
 
 html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg)::before {
   background:
+    /* 1. O detalhe Lima/Amarelo (ajustado para não sumir no branco) */
     radial-gradient(
-      ellipse 112% 116% at -26% -10%,
-      rgba(255, 255, 255, 0.94) 0%,
-      rgba(239, 244, 249, 0.7) 18%,
-      transparent 60%
+      ellipse 115% 120% at -30% 0%,
+      rgba(210, 240, 50, 0.4) 10%,  /* Lima com menos brilho, mais cor */
+      rgba(210, 240, 50, 0.2) 18%,
+      rgba(210, 240, 50, 0.1) 44%,
+      transparent 90%
     ),
+    /* 2. O azul vibrante do canto superior direito */
     radial-gradient(
-      ellipse 94% 74% at 84% 16%,
-      rgba(176, 208, 232, 0.42) 0%,
-      rgba(198, 223, 240, 0.22) 24%,
-      transparent 66%
+      ellipse 95% 72% at 85% 20%,
+      rgba(14, 165, 233, 0.15) 0%, 
+      rgba(14, 165, 233, 0.08) 18%,
+      rgba(14, 165, 233, 0.03) 34%,
+      transparent 64%
     ),
+    /* 3. O toque de Ciano/Teal inferior */
     radial-gradient(
-      ellipse 84% 68% at 14% 92%,
-      rgba(188, 225, 233, 0.24) 0%,
-      rgba(188, 225, 233, 0.1) 28%,
-      transparent 58%
+      ellipse 85% 70% at 16% 92%,
+      rgba(45, 212, 191, 0.15) 0%,
+      rgba(45, 212, 191, 0.06) 22%,
+      transparent 52%
     ),
-    radial-gradient(
-      ellipse 58% 44% at 52% 46%,
-      rgba(255, 255, 255, 0.42) 0%,
-      rgba(255, 255, 255, 0.12) 34%,
-      transparent 70%
-    ),
-    linear-gradient(
-      136deg,
-      transparent 0%,
-      transparent 30%,
-      rgba(177, 209, 232, 0.16) 43%,
-      rgba(207, 224, 235, 0.1) 54%,
-      rgba(162, 191, 216, 0.06) 66%,
-      transparent 88%
-    ),
+    /* 4. A faixa diagonal de luz colorida */
     linear-gradient(
       145deg,
-      #fbfdff 0%,
-      #eef4f8 22%,
-      #dce7ef 53%,
-      #e8eff5 78%,
-      #f8fbfd 100%
+      transparent 0%,
+      transparent 28%,
+      rgba(56, 189, 248, 0.1) 42%,  /* Sky blue */
+      rgba(45, 212, 191, 0.07) 50%, /* Teal */
+      rgba(14, 165, 233, 0.04) 58%, /* Ocean blue */
+      transparent 90%
+    ),
+    /* 5. O fundo estrutural (substituindo o preto pelo "Off-White" azulado) */
+    linear-gradient(
+      145deg,
+      #f8fafc 0%,   /* Slate 50 */
+      #f1f5f9 18%,  /* Slate 100 */
+      #e2e8f0 46%,  /* Slate 200 - Aqui é onde o contraste acontece */
+      #f1f5f9 74%,
+      #f8fafc 100%
     );
 }
 
