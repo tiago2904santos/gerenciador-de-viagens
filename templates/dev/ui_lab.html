@@ -264,7 +264,7 @@
                   <p class="form-field__hint">A selecao e opcional e pode ficar em branco.</p>
                 </div>
             </section>
-            
+
             <footer class="footer-actions">
               <div class="footer-actions__secondary">
                 <button class="btn btn-secondary" type="button">Voltar</button>
@@ -276,6 +276,9 @@
           </main>
         </div>
       </div>
+
+
+
 
 
 
@@ -300,11 +303,6 @@
                   <p class="app-page__subtitle">
                     Cadastro real do modulo Viaturas. A placa, o modelo, o combustivel, o tipo e os motoristas refletem o formulario atual.
                   </p>
-                  <div class="page-header__meta">
-                    <span class="page-header__badge page-header__badge--draft">Motoristas opcionais</span>
-                    <span class="page-header__meta-sep" aria-hidden="true">·</span>
-                    <span class="page-header__meta-item">Placa com mascara Mercosul ou antiga</span>
-                  </div>
                 </div>
               </div>
             </div>
@@ -322,7 +320,7 @@
                 </div>
               </header>
               <div class="field-grid">
-                <div class="ui-lab-form-field field-size-1">
+                <div class="ui-lab-form-field field-size-2">
                   <label class="ui-lab-form-label" for="ui-lab-viatura-placa">Placa <span class="form-field__required" aria-hidden="true">*</span></label>
                   <input id="ui-lab-viatura-placa" class="form-control" type="text" value="AAA1A23" placeholder="AAA1234 ou AAA1A23" autocomplete="off">
                   <p class="form-field__hint">Placa deve estar no formato AAA1234 ou AAA1A23.</p>
@@ -346,7 +344,7 @@
                   </div>
                 </div>
 
-                <div class="ui-lab-form-field field-size-1">
+                <div class="ui-lab-form-field field-size-2">
                   <label class="ui-lab-form-label" for="ui-lab-viatura-tipo">Tipo <span class="form-field__required" aria-hidden="true">*</span></label>
                   <select id="ui-lab-viatura-tipo" class="form-select">
                     <option selected>Descaracterizada</option>
@@ -354,19 +352,7 @@
                   </select>
                 </div>
               </div>
-            </section>
-
-            <section class="form-section" aria-labelledby="std-viaturas-motoristas">
-              <header class="section-header">
-                <div class="section-header__copy">
-                  <h3 class="section-header__title" id="std-viaturas-motoristas">Motoristas vinculados</h3>
-                  <p class="section-header__description">
-                    O campo e opcional e aceita multipla selecao de servidores.
-                  </p>
-                </div>
-              </header>
-              <div class="field-grid">
-                <div class="ui-lab-form-field field-size-4">
+              <div class="ui-lab-form-field field-size-4">
                   <label class="ui-lab-form-label" for="ui-lab-viatura-motoristas">Motoristas</label>
                   <select id="ui-lab-viatura-motoristas" class="form-select" multiple size="6" aria-label="Motoristas">
                     <option>MARIA APARECIDA SILVA</option>
@@ -375,7 +361,6 @@
                   </select>
                   <p class="form-field__hint">Use Ctrl ou Cmd para selecionar mais de um motorista.</p>
                 </div>
-              </div>
             </section>
 
             <footer class="footer-actions">
@@ -389,6 +374,15 @@
           </main>
         </div>
       </div>
+
+
+
+
+
+
+
+
+
 
       <div id="std-configuracoes" class="ui-lab-standard-example">
         <div class="page-shell page-shell--standard">
@@ -406,11 +400,6 @@
                   <p class="app-page__subtitle">
                     Dados institucionais usados em documentos e assinantes preferenciais por tipo de documento.
                   </p>
-                  <div class="page-header__meta">
-                    <span class="page-header__badge page-header__badge--draft">Singleton</span>
-                    <span class="page-header__meta-sep" aria-hidden="true">·</span>
-                    <span class="page-header__meta-item">CEP aciona consulta automatica</span>
-                  </div>
                 </div>
               </div>
             </div>
@@ -450,10 +439,36 @@
                 </div>
               </header>
               <div class="field-grid">
+
+                <div class="ui-lab-form-field field-size-2">
+                  <label class="ui-lab-form-label" for="ui-lab-config-telefone">Telefone</label>
+                  <input id="ui-lab-config-telefone" class="form-control" type="text" value="(41) 3333-4444" placeholder="(00) 00000-0000" inputmode="numeric" autocomplete="off">
+                </div>
+
+                <div class="ui-lab-form-field field-size-2">
+                  <label class="ui-lab-form-label" for="ui-lab-config-email">E-mail</label>
+                  <input id="ui-lab-config-email" class="form-control" type="email" value="teste@pc.pr.gov.br" autocomplete="off">
+                </div>
+                
                 <div class="ui-lab-form-field field-size-1">
                   <label class="ui-lab-form-label" for="ui-lab-config-cep">CEP</label>
                   <input id="ui-lab-config-cep" class="form-control" type="text" value="80000-000" placeholder="00000-000" inputmode="numeric" autocomplete="off">
                   <p class="form-field__hint">A tela real busca endereco ao sair do campo com 8 digitos.</p>
+                </div>
+
+                <div class="ui-lab-form-field field-size-1">
+                  <label class="ui-lab-form-label" for="ui-lab-config-bairro">Bairro</label>
+                  <input id="ui-lab-config-bairro" class="form-control" type="text" value="CENTRO" data-mask="upper">
+                </div>
+
+                <div class="ui-lab-form-field field-size-1">
+                  <label class="ui-lab-form-label" for="ui-lab-config-cidade">Cidade</label>
+                  <input id="ui-lab-config-cidade" class="form-control" type="text" value="CURITIBA" data-mask="upper">
+                </div>
+
+                <div class="ui-lab-form-field field-size-1">
+                  <label class="ui-lab-form-label" for="ui-lab-config-uf">UF</label>
+                  <input id="ui-lab-config-uf" class="form-control" type="text" value="PR" maxlength="2" autocomplete="off" data-mask="upper">
                 </div>
 
                 <div class="ui-lab-form-field field-size-3">
@@ -465,38 +480,17 @@
                   <label class="ui-lab-form-label" for="ui-lab-config-numero">Numero</label>
                   <input id="ui-lab-config-numero" class="form-control" type="text" value="123" autocomplete="off">
                 </div>
-
-                <div class="ui-lab-form-field field-size-2">
-                  <label class="ui-lab-form-label" for="ui-lab-config-bairro">Bairro</label>
-                  <input id="ui-lab-config-bairro" class="form-control" type="text" value="CENTRO" data-mask="upper">
-                </div>
-
-                <div class="ui-lab-form-field field-size-2">
-                  <label class="ui-lab-form-label" for="ui-lab-config-cidade">Cidade</label>
-                  <input id="ui-lab-config-cidade" class="form-control" type="text" value="CURITIBA" data-mask="upper">
-                </div>
-
-                <div class="ui-lab-form-field field-size-1">
-                  <label class="ui-lab-form-label" for="ui-lab-config-uf">UF</label>
-                  <input id="ui-lab-config-uf" class="form-control" type="text" value="PR" maxlength="2" autocomplete="off" data-mask="upper">
-                </div>
-
                 <div class="status-inline-card field-size-4">
-                  <span class="status-inline-card__badge">ViaCEP</span>
+                  <span class="status-inline-card__badge">Via CEP</span>
                   <p class="form-field__hint">
                     Quando o CEP e valido, o formulario real tenta preencher logradouro, bairro, cidade e UF automaticamente.
                   </p>
                 </div>
 
-                <div class="ui-lab-form-field field-size-2">
-                  <label class="ui-lab-form-label" for="ui-lab-config-telefone">Telefone</label>
-                  <input id="ui-lab-config-telefone" class="form-control" type="text" value="(41) 3333-4444" placeholder="(00) 00000-0000" inputmode="numeric" autocomplete="off">
-                </div>
 
-                <div class="ui-lab-form-field field-size-2">
-                  <label class="ui-lab-form-label" for="ui-lab-config-email">E-mail</label>
-                  <input id="ui-lab-config-email" class="form-control" type="email" value="teste@pc.pr.gov.br" autocomplete="off">
-                </div>
+
+
+                
               </div>
             </section>
 

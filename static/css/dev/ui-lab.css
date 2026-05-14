@@ -132,13 +132,13 @@
 }
 
 .status-inline-card {
-  align-items: flex-start;
+  align-items: center;
   background: var(--surface-field-group);
   border: 1px solid var(--border-field-group);
-  border-radius: var(--radius-lg);
-  display: flex;
+  border-radius: var(--radius-md);
   gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
+  display: flex;
+  padding: var(--space-2) var(--space-3);
 }
 
 .status-inline-card__badge {
