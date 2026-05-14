@@ -1,0 +1,168 @@
+/*
+ * UI Lab dev-only background.
+ * Loaded only on /dev/ui-lab/ through extra_css.
+ */
+
+.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+}
+
+.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg)::before,
+.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg)::after {
+  content: "";
+  inset: 0;
+  pointer-events: none;
+  position: fixed;
+  z-index: 0;
+}
+
+html[data-theme="dark"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg)::before {
+  background:
+    radial-gradient(
+      ellipse 115% 88% at -12% -6%,
+      rgba(245, 204, 99, 0.22) 0%,
+      rgba(245, 204, 99, 0.11) 18%,
+      rgba(245, 204, 99, 0.04) 34%,
+      transparent 56%
+    ),
+    radial-gradient(
+      ellipse 95% 72% at 78% 18%,
+      rgba(14, 165, 233, 0.2) 0%,
+      rgba(14, 165, 233, 0.11) 18%,
+      rgba(14, 165, 233, 0.04) 34%,
+      transparent 54%
+    ),
+    radial-gradient(
+      ellipse 85% 70% at 16% 92%,
+      rgba(45, 212, 191, 0.12) 0%,
+      rgba(45, 212, 191, 0.05) 22%,
+      transparent 52%
+    ),
+    linear-gradient(
+      128deg,
+      transparent 0%,
+      transparent 28%,
+      rgba(86, 220, 255, 0.08) 42%,
+      rgba(45, 212, 191, 0.05) 50%,
+      rgba(14, 165, 233, 0.03) 58%,
+      transparent 72%
+    ),
+    linear-gradient(
+      145deg,
+      #02070d 0%,
+      #04111d 18%,
+      #07233d 46%,
+      #04111f 74%,
+      #01050a 100%
+    );
+}
+
+html[data-theme="dark"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg)::after {
+  background:
+    radial-gradient(
+      circle at 50% 42%,
+      transparent 0%,
+      transparent 44%,
+      rgba(0, 0, 0, 0.16) 76%,
+      rgba(0, 0, 0, 0.36) 100%
+    );
+}
+
+html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg)::before {
+  background:
+    radial-gradient(
+      ellipse 112% 86% at -10% -4%,
+      rgba(216, 162, 27, 0.22) 0%,
+      rgba(216, 162, 27, 0.11) 18%,
+      rgba(216, 162, 27, 0.04) 34%,
+      transparent 58%
+    ),
+    radial-gradient(
+      ellipse 92% 70% at 78% 16%,
+      rgba(21, 91, 154, 0.18) 0%,
+      rgba(21, 91, 154, 0.09) 20%,
+      rgba(21, 91, 154, 0.04) 36%,
+      transparent 58%
+    ),
+    radial-gradient(
+      ellipse 78% 58% at 20% 90%,
+      rgba(45, 212, 191, 0.1) 0%,
+      rgba(45, 212, 191, 0.05) 24%,
+      transparent 54%
+    ),
+    linear-gradient(
+      128deg,
+      transparent 0%,
+      transparent 28%,
+      rgba(86, 220, 255, 0.06) 42%,
+      rgba(45, 212, 191, 0.04) 50%,
+      rgba(14, 165, 233, 0.03) 58%,
+      transparent 72%
+    ),
+    linear-gradient(
+      145deg,
+      #fcfeff 0%,
+      #eef4fb 18%,
+      #d9e6f2 48%,
+      #bed0e4 78%,
+      #a9c0d9 100%
+    );
+}
+
+html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg)::after {
+  background:
+    radial-gradient(
+      circle at 50% 42%,
+      transparent 0%,
+      transparent 52%,
+      rgba(11, 58, 102, 0.08) 82%,
+      rgba(11, 58, 102, 0.14) 100%
+    );
+}
+
+.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar,
+.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .app-main {
+  position: relative;
+  z-index: 1;
+}
+
+html[data-theme="dark"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar {
+  background:
+    linear-gradient(180deg, rgba(3, 11, 18, 0.78), rgba(3, 11, 18, 0.66));
+  backdrop-filter: blur(18px) saturate(118%);
+  -webkit-backdrop-filter: blur(18px) saturate(118%);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    inset -1px 0 0 rgba(255, 255, 255, 0.04),
+    18px 0 40px rgba(0, 0, 0, 0.18);
+}
+
+html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar {
+  background:
+    linear-gradient(180deg, rgba(251, 253, 255, 0.82), rgba(236, 243, 251, 0.74));
+  backdrop-filter: blur(16px) saturate(112%);
+  -webkit-backdrop-filter: blur(16px) saturate(112%);
+  border-right: 1px solid rgba(80, 108, 138, 0.14);
+  box-shadow:
+    inset -1px 0 0 rgba(255, 255, 255, 0.55),
+    18px 0 36px rgba(67, 92, 124, 0.08);
+}
+
+html[data-theme="dark"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-header,
+html[data-theme="dark"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-footer {
+  background: rgba(2, 7, 13, 0.22);
+}
+
+html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-header,
+html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-footer {
+  background: rgba(255, 255, 255, 0.42);
+}
+
+.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .app-main,
+.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .ui-lab-page,
+.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .cv-ui-lab-css-bg {
+  background-color: transparent;
+  background-image: none;
+}
