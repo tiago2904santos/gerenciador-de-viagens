@@ -1,0 +1,601 @@
+/* ==========================================================================
+   Page Shell — Sistema Oficial de Camadas
+   Central de Viagens 3.0
+
+   Validado no UI Lab antes de aplicação global.
+   Hierarquia obrigatória para telas de formulário e fluxos em etapas:
+
+   Background
+   └── Page Shell
+       ├── Page Header
+       ├── Stepper / Navegação
+       └── Main Form Panel
+           ├── Form Section
+           │   ├── Section Header
+           │   ├── Field Grid
+           │   └── Field Group (opcional)
+           └── Footer Actions
+   ========================================================================== */
+
+
+/* =========================================================
+   01. Design Tokens — Estrutura e Layout
+   ========================================================= */
+
+:root {
+  /* Page Shell */
+  --page-shell-gap:        var(--space-6);
+  --page-shell-padding-y:  var(--space-6);
+  --page-shell-max-width:  var(--page-max-width);
+
+  /* Form Panel */
+  --form-panel-radius:     var(--radius-lg);
+
+  /* Form Section */
+  --form-section-padding-x:   var(--space-6);
+  --form-section-padding-y:   var(--space-5);
+  --form-section-inner-gap:   var(--space-5);
+
+  /* Field Grid */
+  --field-grid-gap:     var(--space-4);
+
+  /* Field Group */
+  --field-group-padding:  var(--space-4);
+  --field-group-radius:   var(--radius-sm);
+  --field-group-gap:      var(--space-3);
+
+  /* Stepper */
+  --stepper-padding-x:    var(--space-6);
+  --stepper-padding-y:    var(--space-4);
+  --stepper-radius:       var(--radius-lg);
+  --stepper-item-size:    28px;
+  --stepper-gap:          var(--space-2);
+
+  /* Footer Actions */
+  --footer-actions-padding-x: var(--space-6);
+  --footer-actions-padding-y: var(--space-5);
+  --footer-actions-gap:       var(--space-3);
+
+  /* Z-index das camadas de página */
+  --z-page-shell:           1;
+  --z-stepper:              2;
+  --z-footer-actions-fixed: 10;
+}
+
+
+/* =========================================================
+   02. Theme Tokens — Dark
+   Superfícies e estados cromáticos para o tema escuro.
+   ========================================================= */
+
+html[data-theme="dark"] {
+  /* Superfícies */
+  --surface-form-panel:     var(--theme-surface-card);
+  --border-form-panel:      var(--theme-border-card);
+  --shadow-form-panel:      var(--theme-shadow-hero);
+
+  --surface-form-section:   var(--color-surface);
+  --border-form-section:    var(--color-border-soft);
+  --shadow-form-section:    none;
+
+  --surface-field-group:    rgba(255, 255, 255, 0.04);
+  --border-field-group:     rgba(255, 255, 255, 0.09);
+
+  --surface-stepper:        var(--theme-surface-card);
+  --border-stepper:         var(--theme-border-card);
+  --shadow-stepper:         var(--theme-shadow-stat);
+
+  --surface-footer-actions: var(--color-surface-muted);
+  --border-footer-actions:  var(--theme-border-card);
+
+  /* Stepper — estados */
+  --stepper-idle-bg:       rgba(255, 255, 255, 0.07);
+  --stepper-idle-border:   rgba(255, 255, 255, 0.14);
+  --stepper-idle-color:    rgba(255, 255, 255, 0.45);
+
+  --stepper-active-bg:     var(--color-accent);
+  --stepper-active-border: transparent;
+  --stepper-active-color:  var(--color-white);
+
+  --stepper-done-bg:       rgba(216, 162, 27, 0.16);
+  --stepper-done-border:   rgba(216, 162, 27, 0.42);
+  --stepper-done-color:    var(--color-accent);
+
+  --stepper-connector:     rgba(255, 255, 255, 0.12);
+  --stepper-connector-on:  var(--color-accent);
+  --stepper-label-idle:    var(--theme-text-muted);
+  --stepper-label-active:  var(--theme-text-heading);
+  --stepper-label-done:    var(--theme-text-muted);
+}
+
+
+/* =========================================================
+   03. Theme Tokens — Light
+   Superfícies e estados cromáticos para o tema claro (Silver Frost).
+   ========================================================= */
+
+html[data-theme="light"] {
+  /* Superfícies — separação visual clara entre as camadas */
+  --surface-form-panel:     var(--color-surface);
+  --border-form-panel:      #d4dde9;
+  --shadow-form-panel:      var(--theme-shadow-hero);
+
+  --surface-form-section:   #f6f9fc;
+  --border-form-section:    #dde6ef;
+  --shadow-form-section:    none;
+
+  --surface-field-group:    #edf3f9;
+  --border-field-group:     #d0dce8;
+
+  --surface-stepper:        var(--color-surface);
+  --border-stepper:         #d4dde9;
+  --shadow-stepper:         var(--shadow-xs);
+
+  --surface-footer-actions: #f4f8fc;
+  --border-footer-actions:  #d4dde9;
+
+  /* Stepper — estados */
+  --stepper-idle-bg:       var(--color-bg-strong);
+  --stepper-idle-border:   var(--color-border);
+  --stepper-idle-color:    var(--color-muted);
+
+  --stepper-active-bg:     var(--color-primary);
+  --stepper-active-border: transparent;
+  --stepper-active-color:  var(--color-white);
+
+  --stepper-done-bg:       var(--color-primary-soft);
+  --stepper-done-border:   rgba(11, 58, 102, 0.35);
+  --stepper-done-color:    var(--color-primary);
+
+  --stepper-connector:     var(--color-border);
+  --stepper-connector-on:  var(--color-primary-bright);
+  --stepper-label-idle:    var(--theme-text-muted);
+  --stepper-label-active:  var(--theme-text-heading);
+  --stepper-label-done:    var(--theme-text-muted);
+}
+
+
+/* =========================================================
+   04. Page Shell
+   Organiza a página verticalmente e controla o fluxo de conteúdo.
+   Não define superfície própria — expõe o background.
+   ========================================================= */
+
+.page-shell {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--page-shell-gap);
+  max-width: var(--page-shell-max-width);
+  padding-block: var(--page-shell-padding-y);
+  position: relative;
+  width: 100%;
+  z-index: var(--z-page-shell);
+}
+
+
+/* =========================================================
+   05. Page Header
+   Cabeçalho da página com eyebrow, título, subtítulo e ações.
+   Usado em modo standalone (sem hero completo).
+   ========================================================= */
+
+.page-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.page-header__eyebrow {
+  color: var(--theme-accent-eyebrow);
+  display: block;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
+  text-transform: uppercase;
+}
+
+.page-header__title {
+  color: var(--theme-text-heading);
+  font-size: clamp(1.4rem, 2.2vw, 2.2rem);
+  font-weight: var(--font-weight-extrabold);
+  letter-spacing: -0.03em;
+  line-height: 1.12;
+  margin: 0;
+}
+
+.page-header__subtitle {
+  color: var(--theme-text-muted);
+  font-size: var(--font-size-sm);
+  line-height: 1.55;
+  margin: 0;
+  max-width: 58ch;
+}
+
+.page-header__actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+}
+
+
+/* =========================================================
+   06. Stepper / Navegação
+   Indicador de progresso entre etapas de um fluxo.
+   Oculto ou vazio em páginas de etapa única.
+   ========================================================= */
+
+.page-stepper {
+  background:   var(--surface-stepper);
+  border:       1px solid var(--border-stepper);
+  border-radius: var(--stepper-radius);
+  box-shadow:   var(--shadow-stepper);
+  box-sizing:   border-box;
+  overflow-x:   auto;
+  padding:      var(--stepper-padding-y) var(--stepper-padding-x);
+  scrollbar-width: none;
+  width: 100%;
+  z-index: var(--z-stepper);
+}
+
+.page-stepper::-webkit-scrollbar { display: none; }
+
+.page-stepper__list {
+  align-items: center;
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.page-stepper__item {
+  align-items: center;
+  display: flex;
+  flex: 1;
+  gap: var(--stepper-gap);
+  min-width: 0;
+}
+
+/* Conector entre etapas */
+.page-stepper__item + .page-stepper__item::before {
+  background:  var(--stepper-connector);
+  content:     "";
+  flex-shrink: 0;
+  height:      1px;
+  margin:      0 var(--space-2);
+  transition:  background var(--transition-base);
+  width:       var(--space-6);
+}
+
+.page-stepper__item.is-complete + .page-stepper__item::before,
+.page-stepper__item.is-active  + .page-stepper__item::before {
+  background: var(--stepper-connector-on);
+}
+
+/* Número / indicador de etapa */
+.page-stepper__number {
+  align-items:   center;
+  background:    var(--stepper-idle-bg);
+  border:        1px solid var(--stepper-idle-border);
+  border-radius: var(--radius-pill);
+  color:         var(--stepper-idle-color);
+  display:       inline-flex;
+  flex-shrink:   0;
+  font-size:     var(--font-size-xs);
+  font-weight:   var(--font-weight-bold);
+  height:        var(--stepper-item-size);
+  justify-content: center;
+  transition:
+    background var(--transition-base),
+    color var(--transition-base),
+    border-color var(--transition-base);
+  width: var(--stepper-item-size);
+}
+
+.page-stepper__label {
+  color:      var(--stepper-label-idle);
+  font-size:  var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  overflow:   hidden;
+  text-overflow: ellipsis;
+  transition: color var(--transition-base);
+  white-space: nowrap;
+}
+
+/* Estado: etapa concluída */
+.page-stepper__item.is-complete .page-stepper__number {
+  background:   var(--stepper-done-bg);
+  border-color: var(--stepper-done-border);
+  color:        var(--stepper-done-color);
+}
+
+.page-stepper__item.is-complete .page-stepper__label {
+  color: var(--stepper-label-done);
+}
+
+/* Estado: etapa ativa */
+.page-stepper__item.is-active .page-stepper__number {
+  background:   var(--stepper-active-bg);
+  border-color: var(--stepper-active-border);
+  color:        var(--stepper-active-color);
+}
+
+.page-stepper__item.is-active .page-stepper__label {
+  color:       var(--stepper-label-active);
+  font-weight: var(--font-weight-bold);
+}
+
+
+/* =========================================================
+   07. Main Form Panel
+   Superfície central do formulário. Agrupa as seções e o
+   footer de ações. Separa o conteúdo funcional do background.
+   ========================================================= */
+
+.main-form-panel {
+  background:    var(--surface-form-panel);
+  border:        1px solid var(--border-form-panel);
+  border-radius: var(--form-panel-radius);
+  box-shadow:    var(--shadow-form-panel);
+  box-sizing:    border-box;
+  display:       flex;
+  flex-direction: column;
+  overflow:      hidden;
+  width:         100%;
+}
+
+
+/* =========================================================
+   08. Form Section
+   Unidade modular de conteúdo dentro do Main Form Panel.
+   Separadas por border-bottom — não são cards individuais.
+   ========================================================= */
+
+.main-form-panel .form-section {
+  background:  var(--surface-form-section);
+  border:      none;
+  border-bottom: 1px solid var(--border-form-panel);
+  border-radius: 0;
+  box-shadow:  var(--shadow-form-section);
+  box-sizing:  border-box;
+  display:     flex;
+  flex-direction: column;
+  gap:         var(--form-section-inner-gap);
+  margin:      0;
+  padding:     var(--form-section-padding-y) var(--form-section-padding-x);
+}
+
+.main-form-panel .form-section:last-of-type {
+  border-bottom: none;
+}
+
+
+/* =========================================================
+   09. Section Header
+   Cabeçalho interno de cada Form Section.
+   ========================================================= */
+
+.section-header {
+  align-items:     flex-start;
+  display:         flex;
+  gap:             var(--space-4);
+  justify-content: space-between;
+}
+
+.section-header__copy {
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--space-1);
+  min-width:      0;
+}
+
+.section-header__title {
+  color:          var(--theme-text-heading);
+  font-size:      var(--font-size-md);
+  font-weight:    var(--font-weight-bold);
+  letter-spacing: -0.01em;
+  line-height:    1.3;
+  margin:         0;
+}
+
+.section-header__description {
+  color:       var(--theme-text-muted);
+  font-size:   var(--font-size-sm);
+  line-height: 1.5;
+  margin:      0;
+}
+
+.section-header__actions {
+  align-items: center;
+  display:     flex;
+  flex-shrink: 0;
+  gap:         var(--space-2);
+}
+
+
+/* =========================================================
+   10. Field Grid
+   Grade responsiva de campos. Suporta 1–4 colunas.
+   Modificadores: --one, --two, --three, --four, --auto
+   ========================================================= */
+
+.field-grid {
+  display:               grid;
+  gap:                   var(--field-grid-gap);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.field-grid--one   { grid-template-columns: 1fr; }
+.field-grid--two   { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.field-grid--three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.field-grid--four  { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.field-grid--auto  { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+
+/* Utilitários de span */
+.field-grid__span-2    { grid-column: span 2; }
+.field-grid__span-3    { grid-column: span 3; }
+.field-grid__span-full { grid-column: 1 / -1; }
+
+
+/* =========================================================
+   11. Field Group (opcional)
+   Agrupamento leve dentro de uma Form Section.
+   Usado para blocos condicionais ou campos muito relacionados.
+   ========================================================= */
+
+.field-group {
+  background:    var(--surface-field-group);
+  border:        1px solid var(--border-field-group);
+  border-radius: var(--field-group-radius);
+  box-sizing:    border-box;
+  display:       flex;
+  flex-direction: column;
+  gap:           var(--field-group-gap);
+  padding:       var(--field-group-padding);
+}
+
+.field-group__header {
+  align-items:     center;
+  display:         flex;
+  gap:             var(--space-2);
+  justify-content: space-between;
+}
+
+.field-group__title {
+  color:          var(--theme-text-muted-strong);
+  font-size:      var(--font-size-xs);
+  font-weight:    var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
+  margin:         0;
+  text-transform: uppercase;
+}
+
+.field-group__body {
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--space-3);
+}
+
+
+/* =========================================================
+   12. Footer Actions
+   Rodapé de ações do formulário. Sempre ao final do Main Form Panel.
+   Divide ações secundárias (esquerda) das primárias (direita).
+   ========================================================= */
+
+.footer-actions {
+  align-items:     center;
+  background:      var(--surface-footer-actions);
+  border-top:      1px solid var(--border-footer-actions);
+  box-sizing:      border-box;
+  display:         flex;
+  flex-wrap:       wrap;
+  gap:             var(--footer-actions-gap);
+  justify-content: space-between;
+  padding:         var(--footer-actions-padding-y) var(--footer-actions-padding-x);
+}
+
+.footer-actions__secondary {
+  align-items: center;
+  display:     flex;
+  gap:         var(--footer-actions-gap);
+}
+
+.footer-actions__primary {
+  align-items: center;
+  display:     flex;
+  gap:         var(--footer-actions-gap);
+}
+
+
+/* =========================================================
+   13. Responsive
+   ========================================================= */
+
+@media (max-width: 840px) {
+  .page-shell {
+    gap:     var(--space-4);
+    padding-block: var(--space-4);
+  }
+
+  .page-stepper {
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .main-form-panel .form-section {
+    padding: var(--space-4);
+    gap:     var(--space-4);
+  }
+
+  .footer-actions {
+    flex-direction:  column-reverse;
+    align-items:     stretch;
+    gap:             var(--space-2);
+    padding:         var(--space-4);
+  }
+
+  .footer-actions__secondary,
+  .footer-actions__primary {
+    width: 100%;
+  }
+
+  .field-grid--two,
+  .field-grid--three,
+  .field-grid--four {
+    grid-template-columns: 1fr;
+  }
+
+  .field-grid__span-2,
+  .field-grid__span-3,
+  .field-grid__span-full {
+    grid-column: 1;
+  }
+}
+
+@media (max-width: 600px) {
+  .page-stepper__label {
+    display: none;
+  }
+
+  .page-header__title {
+    font-size: 1.5rem;
+  }
+}
+
+
+/* =========================================================
+   15. UI Lab Demo Only
+   Elementos fictícios para demonstrar a hierarquia visual.
+   Não usar em páginas reais.
+   ========================================================= */
+
+.ui-lab-demo-label {
+  color:          var(--theme-text-muted);
+  display:        block;
+  font-size:      var(--font-size-xs);
+  font-weight:    var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
+  margin-bottom:  var(--space-3);
+  text-transform: uppercase;
+}
+
+.ui-lab-demo-field {
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--space-1);
+}
+
+.ui-lab-demo-field__label {
+  color:       var(--theme-text-muted-strong);
+  font-size:   var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.ui-lab-demo-field__input {
+  background:    var(--theme-input-bg);
+  border:        1px solid var(--theme-input-border);
+  border-radius: var(--radius-sm);
+  height:        var(--control-height-md);
+}

@@ -10,7 +10,10 @@
 
 {% block content %}
 <main class="ui-lab-page cv-ui-lab-css-bg">
-  <header class="app-page-hero app-page__header app-page-hero--hybrid app-page__header--hybrid app-page-hero--compact" aria-labelledby="ui-lab-title">
+
+  {# ── Hero da página (componente padrão do sistema) ── #}
+  <header class="app-page-hero app-page__header app-page-hero--hybrid app-page__header--hybrid app-page-hero--compact"
+          aria-labelledby="ui-lab-title">
     <div class="app-page-hero__stage">
       <span class="app-page-hero__eyebrow">UI Lab</span>
       <h1 class="app-page-hero__title" id="ui-lab-title">Componentes visuais</h1>
@@ -20,7 +23,9 @@
         <div class="app-page__brand">
           <div class="app-page__brand-mark" aria-hidden="true">DV</div>
           <div class="app-page__brand-copy">
-            <p class="app-page__subtitle">Ambiente de desenvolvimento para testar padrÃµes, estados e composiÃ§Ãµes visuais.</p>
+            <p class="app-page__subtitle">
+              Ambiente de desenvolvimento para testar padrões, estados e composições visuais.
+            </p>
           </div>
         </div>
       </div>
@@ -28,8 +33,181 @@
     <div class="app-page-hero__ribbon" aria-hidden="true"></div>
   </header>
 
-  <section>
-    <!-- Ãrea vazia para testes futuros -->
+  <!-- DEMONSTRAÇÃO: Page Shell Layer System — não representa formulário real -->
+  <section aria-label="Demonstração: Page Shell Layer System">
+    <span class="ui-lab-demo-label">Demo — Page Shell Layer System</span>
+
+    {# ── Page Shell ── #}
+    <div class="page-shell">
+
+      {# ── Page Header ── #}
+      <header class="page-header">
+        <span class="page-header__eyebrow">Ofícios</span>
+        <h2 class="page-header__title">Novo Ofício de Solicitação</h2>
+        <p class="page-header__subtitle">
+          Preencha os dados para solicitar autorização de viagem institucional.
+        </p>
+        <div class="page-header__actions">
+          <button class="btn btn-secondary" type="button">Cancelar</button>
+          <button class="btn btn-primary"   type="button">Salvar rascunho</button>
+        </div>
+      </header>
+
+      {# ── Stepper / Navegação ── #}
+      <nav class="page-stepper" aria-label="Etapas do formulário">
+        <ol class="page-stepper__list">
+          <li class="page-stepper__item is-complete">
+            <span class="page-stepper__number" aria-hidden="true">✓</span>
+            <span class="page-stepper__label">Dados gerais</span>
+          </li>
+          <li class="page-stepper__item is-active" aria-current="step">
+            <span class="page-stepper__number" aria-hidden="true">2</span>
+            <span class="page-stepper__label">Transporte</span>
+          </li>
+          <li class="page-stepper__item">
+            <span class="page-stepper__number" aria-hidden="true">3</span>
+            <span class="page-stepper__label">Roteiro</span>
+          </li>
+          <li class="page-stepper__item">
+            <span class="page-stepper__number" aria-hidden="true">4</span>
+            <span class="page-stepper__label">Diárias</span>
+          </li>
+          <li class="page-stepper__item">
+            <span class="page-stepper__number" aria-hidden="true">5</span>
+            <span class="page-stepper__label">Revisão</span>
+          </li>
+        </ol>
+      </nav>
+
+      {# ── Main Form Panel ── #}
+      <main class="main-form-panel">
+
+        {# ── Form Section 1: Dados gerais ── #}
+        <section class="form-section" aria-labelledby="sec-dados-gerais">
+          <header class="section-header">
+            <div class="section-header__copy">
+              <h3 class="section-header__title" id="sec-dados-gerais">Dados gerais</h3>
+              <p class="section-header__description">Informações básicas do documento de solicitação.</p>
+            </div>
+          </header>
+
+          <div class="field-grid field-grid--three">
+            <div class="ui-lab-demo-field">
+              <span class="ui-lab-demo-field__label">Número do ofício</span>
+              <div class="ui-lab-demo-field__input"></div>
+            </div>
+            <div class="ui-lab-demo-field">
+              <span class="ui-lab-demo-field__label">Data de emissão</span>
+              <div class="ui-lab-demo-field__input"></div>
+            </div>
+            <div class="ui-lab-demo-field">
+              <span class="ui-lab-demo-field__label">Unidade solicitante</span>
+              <div class="ui-lab-demo-field__input"></div>
+            </div>
+            <div class="ui-lab-demo-field field-grid__span-2">
+              <span class="ui-lab-demo-field__label">Assunto / Objeto</span>
+              <div class="ui-lab-demo-field__input"></div>
+            </div>
+            <div class="ui-lab-demo-field">
+              <span class="ui-lab-demo-field__label">Classificação</span>
+              <div class="ui-lab-demo-field__input"></div>
+            </div>
+          </div>
+        </section>
+
+        {# ── Form Section 2: Viajante ── #}
+        <section class="form-section" aria-labelledby="sec-viajante">
+          <header class="section-header">
+            <div class="section-header__copy">
+              <h3 class="section-header__title" id="sec-viajante">Dados do viajante</h3>
+              <p class="section-header__description">Servidor ou cidadão que realizará a viagem.</p>
+            </div>
+          </header>
+
+          <div class="field-grid field-grid--two">
+            <div class="ui-lab-demo-field">
+              <span class="ui-lab-demo-field__label">Nome completo</span>
+              <div class="ui-lab-demo-field__input"></div>
+            </div>
+            <div class="ui-lab-demo-field">
+              <span class="ui-lab-demo-field__label">Matrícula / CPF</span>
+              <div class="ui-lab-demo-field__input"></div>
+            </div>
+            <div class="ui-lab-demo-field">
+              <span class="ui-lab-demo-field__label">Cargo / Função</span>
+              <div class="ui-lab-demo-field__input"></div>
+            </div>
+            <div class="ui-lab-demo-field">
+              <span class="ui-lab-demo-field__label">Lotação</span>
+              <div class="ui-lab-demo-field__input"></div>
+            </div>
+          </div>
+
+          {# ── Field Group: Motorista (opcional) ── #}
+          <div class="field-group">
+            <header class="field-group__header">
+              <h4 class="field-group__title">Dados do motorista</h4>
+            </header>
+            <div class="field-group__body">
+              <div class="field-grid field-grid--two">
+                <div class="ui-lab-demo-field">
+                  <span class="ui-lab-demo-field__label">Nome do motorista</span>
+                  <div class="ui-lab-demo-field__input"></div>
+                </div>
+                <div class="ui-lab-demo-field">
+                  <span class="ui-lab-demo-field__label">CNH / Categoria</span>
+                  <div class="ui-lab-demo-field__input"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {# ── Form Section 3: Transporte ── #}
+        <section class="form-section" aria-labelledby="sec-transporte">
+          <header class="section-header">
+            <div class="section-header__copy">
+              <h3 class="section-header__title" id="sec-transporte">Transporte</h3>
+              <p class="section-header__description">Modal e viatura utilizados na viagem.</p>
+            </div>
+            <div class="section-header__actions">
+              <button class="btn btn-secondary" type="button" style="font-size:13px;min-height:34px;padding:0 12px;">
+                + Adicionar trecho
+              </button>
+            </div>
+          </header>
+
+          <div class="field-grid field-grid--three">
+            <div class="ui-lab-demo-field">
+              <span class="ui-lab-demo-field__label">Modal</span>
+              <div class="ui-lab-demo-field__input"></div>
+            </div>
+            <div class="ui-lab-demo-field">
+              <span class="ui-lab-demo-field__label">Placa / Identificação</span>
+              <div class="ui-lab-demo-field__input"></div>
+            </div>
+            <div class="ui-lab-demo-field">
+              <span class="ui-lab-demo-field__label">Km estimado</span>
+              <div class="ui-lab-demo-field__input"></div>
+            </div>
+          </div>
+        </section>
+
+        {# ── Footer Actions ── #}
+        <footer class="footer-actions">
+          <div class="footer-actions__secondary">
+            <button class="btn btn-secondary" type="button">← Voltar</button>
+          </div>
+          <div class="footer-actions__primary">
+            <button class="btn btn-secondary" type="button">Cancelar</button>
+            <button class="btn btn-primary"   type="button">Avançar →</button>
+          </div>
+        </footer>
+
+      </main>{# /main-form-panel #}
+
+    </div>{# /page-shell #}
   </section>
+
 </main>
 {% endblock %}
