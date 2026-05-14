@@ -2,91 +2,166 @@
    Page Shell — Sistema Oficial de Camadas
    Central de Viagens 3.0
 
-   Validado no UI Lab antes de aplicação global.
-   Hierarquia obrigatória para telas de formulário e fluxos em etapas:
+   Hierarquia obrigatória para telas de formulário, fluxo em etapas e lista:
 
    Background
-   └── Page Shell
-       ├── Page Header
-       ├── Stepper / Navegação
-       └── Main Form Panel
-           ├── Form Section
-           │   ├── Section Header
-           │   ├── Field Grid
-           │   └── Field Group (opcional)
-           └── Footer Actions
+   └── Page Shell (.page-shell[--standard|--wizard|--list])
+       ├── Page Header (.page-header[--standard|--wizard|--list])
+       ├── Stepper / Navegação (.page-stepper)       [wizard]
+       ├── Main Form Panel (.main-form-panel)         [standard|wizard]
+       │   ├── Form Section (.form-section)
+       │   │   ├── Section Header (.section-header)
+       │   │   ├── Field Grid (.field-grid)
+       │   │   └── Field Group (.field-group)         [opcional]
+       │   └── Footer Actions (.footer-actions)
+       └── List Panel (.list-panel)                   [list]
+           ├── Filter Bar (.filter-bar)
+           ├── List Content (.list-content)
+           └── Pagination (.pagination-shell)
    ========================================================================== */
 
 
 /* =========================================================
-   01. Design Tokens — Estrutura e Layout
+   01. Design Tokens — Estrutura, Layout e Aliases
    ========================================================= */
 
 :root {
-  /* Page Shell */
+  /* --- Layout --- */
+  --layout-page-max-width:       var(--page-max-width);
+  --layout-page-padding-x:       var(--space-8);
+  --layout-page-padding-y:       var(--space-6);
+  --layout-shell-gap:            var(--space-6);
+  --layout-section-gap:          var(--space-5);
+  --layout-form-panel-max-width: 960px;
+  --layout-list-panel-max-width: var(--page-max-width);
+  --layout-field-grid-gap:       var(--space-4);
+
+  /* --- Espaçamento estendido --- */
+  --space-12: 48px;
+
+  /* --- Radius estendido --- */
+  --radius-2xl: 40px;
+
+  /* --- Page Shell --- */
   --page-shell-gap:        var(--space-6);
   --page-shell-padding-y:  var(--space-6);
   --page-shell-max-width:  var(--page-max-width);
 
-  /* Form Panel */
+  /* --- Form Panel --- */
   --form-panel-radius:     var(--radius-lg);
 
-  /* Form Section */
+  /* --- Form Section --- */
   --form-section-padding-x:   var(--space-6);
   --form-section-padding-y:   var(--space-5);
   --form-section-inner-gap:   var(--space-5);
 
-  /* Field Grid */
-  --field-grid-gap:     var(--space-4);
+  /* --- Field Grid --- */
+  --field-grid-gap: var(--space-4);
 
-  /* Field Group */
-  --field-group-padding:  var(--space-4);
-  --field-group-radius:   var(--radius-sm);
-  --field-group-gap:      var(--space-3);
+  /* --- Field Group --- */
+  --field-group-padding: var(--space-4);
+  --field-group-radius:  var(--radius-sm);
+  --field-group-gap:     var(--space-3);
 
-  /* Stepper */
-  --stepper-padding-x:    var(--space-6);
-  --stepper-padding-y:    var(--space-4);
-  --stepper-radius:       var(--radius-lg);
-  --stepper-item-size:    28px;
-  --stepper-gap:          var(--space-2);
+  /* --- Stepper --- */
+  --stepper-padding-x:  var(--space-6);
+  --stepper-padding-y:  var(--space-4);
+  --stepper-radius:     var(--radius-lg);
+  --stepper-item-size:  28px;
+  --stepper-gap:        var(--space-2);
 
-  /* Footer Actions */
+  /* --- Footer Actions --- */
   --footer-actions-padding-x: var(--space-6);
   --footer-actions-padding-y: var(--space-5);
   --footer-actions-gap:       var(--space-3);
 
-  /* Z-index das camadas de página */
+  /* --- List Panel --- */
+  --list-panel-radius:       var(--radius-lg);
+  --filter-bar-padding-x:    var(--space-5);
+  --filter-bar-padding-y:    var(--space-4);
+  --filter-bar-gap:          var(--space-3);
+  --list-content-padding-x:  var(--space-5);
+  --list-content-padding-y:  var(--space-3);
+  --list-row-padding-x:      var(--space-4);
+  --list-row-padding-y:      var(--space-3);
+  --list-row-radius:         var(--radius-sm);
+  --pagination-padding-x:    var(--space-5);
+  --pagination-padding-y:    var(--space-4);
+
+  /* --- Sombras semânticas --- */
+  --shadow-soft:     var(--shadow-sm);
+  --shadow-medium:   var(--shadow-md);
+  --shadow-shell:    var(--shadow-panel);
+  --shadow-elevated: var(--shadow-lg);
+
+  /* --- Bordas semânticas --- */
+  --border-subtle: var(--color-border-soft);
+  --border-strong: var(--color-border-strong);
+  --border-focus:  var(--color-primary);
+  --border-active: var(--color-accent);
+
+  /* --- Texto semântico --- */
+  --text-primary:   var(--theme-text-heading);
+  --text-secondary: var(--theme-text-body);
+  --text-muted:     var(--theme-text-muted);
+  --text-inverse:   var(--color-white);
+
+  /* --- Duração e easing --- */
+  --duration-fast:   140ms;
+  --duration-normal: 160ms;
+  --duration-slow:   220ms;
+  --ease-standard:   ease;
+
+  /* --- Z-index das camadas de página --- */
+  --z-background:           0;
   --z-page-shell:           1;
   --z-stepper:              2;
+  --z-footer-actions:       10;
   --z-footer-actions-fixed: 10;
+  --z-overlay:              60;
 }
 
 
 /* =========================================================
    02. Theme Tokens — Dark
-   Superfícies e estados cromáticos para o tema escuro.
    ========================================================= */
 
 html[data-theme="dark"] {
   /* Superfícies */
-  --surface-form-panel:     var(--theme-surface-card);
-  --border-form-panel:      var(--theme-border-card);
-  --shadow-form-panel:      var(--theme-shadow-hero);
+  --surface-page-shell:      transparent;
+  --surface-page-header:     transparent;
 
-  --surface-form-section:   var(--color-surface);
-  --border-form-section:    var(--color-border-soft);
-  --shadow-form-section:    none;
+  --surface-stepper:         var(--theme-surface-card);
+  --border-stepper:          var(--theme-border-card);
+  --shadow-stepper:          var(--theme-shadow-stat);
 
-  --surface-field-group:    rgba(255, 255, 255, 0.04);
-  --border-field-group:     rgba(255, 255, 255, 0.09);
+  --surface-form-panel:      var(--theme-surface-card);
+  --border-form-panel:       var(--theme-border-card);
+  --shadow-form-panel:       var(--theme-shadow-hero);
 
-  --surface-stepper:        var(--theme-surface-card);
-  --border-stepper:         var(--theme-border-card);
-  --shadow-stepper:         var(--theme-shadow-stat);
+  --surface-form-section:    var(--color-surface);
+  --border-form-section:     var(--color-border-soft);
+  --shadow-form-section:     none;
 
-  --surface-footer-actions: var(--color-surface-muted);
-  --border-footer-actions:  var(--theme-border-card);
+  --surface-field-group:     rgba(255, 255, 255, 0.04);
+  --border-field-group:      rgba(255, 255, 255, 0.09);
+
+  --surface-list-panel:      var(--theme-surface-card);
+  --border-list-panel:       var(--theme-border-card);
+  --shadow-list-panel:       var(--theme-shadow-hero);
+
+  --surface-filter-bar:      rgba(255, 255, 255, 0.03);
+  --border-filter-bar:       var(--theme-border-card);
+
+  --surface-list-row:        transparent;
+  --border-list-row:         rgba(255, 255, 255, 0.07);
+  --surface-list-row-hover:  rgba(255, 255, 255, 0.05);
+
+  --surface-footer-actions:  var(--color-surface-muted);
+  --border-footer-actions:   var(--theme-border-card);
+
+  --surface-pagination:      transparent;
+  --border-pagination:       var(--theme-border-card);
 
   /* Stepper — estados */
   --stepper-idle-bg:       rgba(255, 255, 255, 0.07);
@@ -101,38 +176,58 @@ html[data-theme="dark"] {
   --stepper-done-border:   rgba(216, 162, 27, 0.42);
   --stepper-done-color:    var(--color-accent);
 
-  --stepper-connector:     rgba(255, 255, 255, 0.12);
-  --stepper-connector-on:  var(--color-accent);
-  --stepper-label-idle:    var(--theme-text-muted);
-  --stepper-label-active:  var(--theme-text-heading);
-  --stepper-label-done:    var(--theme-text-muted);
+  --stepper-connector:    rgba(255, 255, 255, 0.12);
+  --stepper-connector-on: var(--color-accent);
+  --stepper-label-idle:   var(--theme-text-muted);
+  --stepper-label-active: var(--theme-text-heading);
+  --stepper-label-done:   var(--theme-text-muted);
+
+  /* Badges específicos do page-header */
+  --surface-header-count: rgba(21, 91, 154, 0.25);
+  --text-header-count:    #9fd0ff;
 }
 
 
 /* =========================================================
-   03. Theme Tokens — Light
-   Superfícies e estados cromáticos para o tema claro (Silver Frost).
+   03. Theme Tokens — Light (Silver Frost)
    ========================================================= */
 
 html[data-theme="light"] {
-  /* Superfícies — separação visual clara entre as camadas */
-  --surface-form-panel:     var(--color-surface);
-  --border-form-panel:      #d4dde9;
-  --shadow-form-panel:      var(--theme-shadow-hero);
+  /* Superfícies — separação visual clara entre camadas */
+  --surface-page-shell:      transparent;
+  --surface-page-header:     transparent;
 
-  --surface-form-section:   #f6f9fc;
-  --border-form-section:    #dde6ef;
-  --shadow-form-section:    none;
+  --surface-stepper:         var(--color-surface);
+  --border-stepper:          #d4dde9;
+  --shadow-stepper:          var(--shadow-xs);
 
-  --surface-field-group:    #edf3f9;
-  --border-field-group:     #d0dce8;
+  --surface-form-panel:      var(--color-surface);
+  --border-form-panel:       #d4dde9;
+  --shadow-form-panel:       var(--theme-shadow-hero);
 
-  --surface-stepper:        var(--color-surface);
-  --border-stepper:         #d4dde9;
-  --shadow-stepper:         var(--shadow-xs);
+  --surface-form-section:    #f6f9fc;
+  --border-form-section:     #dde6ef;
+  --shadow-form-section:     none;
 
-  --surface-footer-actions: #f4f8fc;
-  --border-footer-actions:  #d4dde9;
+  --surface-field-group:     #edf3f9;
+  --border-field-group:      #d0dce8;
+
+  --surface-list-panel:      var(--color-surface);
+  --border-list-panel:       #d4dde9;
+  --shadow-list-panel:       var(--theme-shadow-hero);
+
+  --surface-filter-bar:      #f4f8fc;
+  --border-filter-bar:       #dde6ef;
+
+  --surface-list-row:        transparent;
+  --border-list-row:         #e5edf5;
+  --surface-list-row-hover:  var(--color-primary-soft);
+
+  --surface-footer-actions:  #f4f8fc;
+  --border-footer-actions:   #d4dde9;
+
+  --surface-pagination:      transparent;
+  --border-pagination:       #d4dde9;
 
   /* Stepper — estados */
   --stepper-idle-bg:       var(--color-bg-strong);
@@ -147,115 +242,237 @@ html[data-theme="light"] {
   --stepper-done-border:   rgba(11, 58, 102, 0.35);
   --stepper-done-color:    var(--color-primary);
 
-  --stepper-connector:     var(--color-border);
-  --stepper-connector-on:  var(--color-primary-bright);
-  --stepper-label-idle:    var(--theme-text-muted);
-  --stepper-label-active:  var(--theme-text-heading);
-  --stepper-label-done:    var(--theme-text-muted);
+  --stepper-connector:    var(--color-border);
+  --stepper-connector-on: var(--color-primary-bright);
+  --stepper-label-idle:   var(--theme-text-muted);
+  --stepper-label-active: var(--theme-text-heading);
+  --stepper-label-done:   var(--theme-text-muted);
+
+  /* Badges específicos do page-header */
+  --surface-header-count: var(--color-primary-soft);
+  --text-header-count:    var(--color-primary);
 }
 
 
 /* =========================================================
-   04. Page Shell
-   Organiza a página verticalmente e controla o fluxo de conteúdo.
-   Não define superfície própria — expõe o background.
+   04. Background
+   O background atmosférico é gerenciado pelo contexto de página
+   (ui-lab.css para o UI Lab; base para páginas globais).
+   Este arquivo não define gradientes de fundo.
+   ========================================================= */
+
+
+/* =========================================================
+   05. Page Shell Base
+   Container principal de cada página. Não define superfície
+   própria — expõe o background.
    ========================================================= */
 
 .page-shell {
-  box-sizing: border-box;
-  display: flex;
+  box-sizing:     border-box;
+  display:        flex;
   flex-direction: column;
-  gap: var(--page-shell-gap);
-  max-width: var(--page-shell-max-width);
-  padding-block: var(--page-shell-padding-y);
-  position: relative;
+  gap:            var(--page-shell-gap);
+  max-width:      var(--page-shell-max-width);
+  padding-block:  var(--page-shell-padding-y);
+  position:       relative;
+  width:          100%;
+  z-index:        var(--z-page-shell);
+}
+
+/* Variante: cadastro curto — painel centralizado e confortável */
+.page-shell--standard .main-form-panel {
+  max-width:     780px;
+  margin-inline: auto;
+  width:         100%;
+}
+
+/* Variante: wizard — painel largo, comporta muitas seções */
+.page-shell--wizard .main-form-panel {
+  max-width: var(--layout-form-panel-max-width);
+}
+
+/* Variante: lista — sem restrição de largura */
+.page-shell--list .list-panel {
   width: 100%;
-  z-index: var(--z-page-shell);
 }
 
 
 /* =========================================================
-   05. Page Header
-   Cabeçalho da página com eyebrow, título, subtítulo e ações.
-   Usado em modo standalone (sem hero completo).
+   06. Page Header — Base
+   Elementos compartilhados pelas três variações.
    ========================================================= */
 
 .page-header {
-  display: flex;
+  box-sizing:     border-box;
+  display:        flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap:            var(--space-3);
+  width:          100%;
 }
 
+/* Linha horizontal: contexto à esquerda, ações à direita */
+.page-header__row,
+.page-header__top {
+  align-items:     flex-start;
+  display:         flex;
+  gap:             var(--space-4);
+  justify-content: space-between;
+}
+
+/* Coluna de contexto textual */
+.page-header__context {
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--space-1);
+  min-width:      0;
+}
+
+/* Eyebrow / kicker */
 .page-header__eyebrow {
-  color: var(--theme-accent-eyebrow);
-  display: block;
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-bold);
+  color:          var(--theme-accent-eyebrow);
+  display:        block;
+  font-size:      var(--font-size-xs);
+  font-weight:    var(--font-weight-bold);
   letter-spacing: var(--letter-spacing-eyebrow);
   text-transform: uppercase;
 }
 
+/* Título principal */
 .page-header__title {
-  color: var(--theme-text-heading);
-  font-size: clamp(1.4rem, 2.2vw, 2.2rem);
-  font-weight: var(--font-weight-extrabold);
+  align-items:    center;
+  color:          var(--theme-text-heading);
+  display:        flex;
+  font-size:      clamp(1.4rem, 2.2vw, 2.2rem);
+  font-weight:    var(--font-weight-extrabold);
+  gap:            var(--space-2);
   letter-spacing: -0.03em;
-  line-height: 1.12;
-  margin: 0;
+  line-height:    1.12;
+  margin:         0;
 }
 
+/* Contador de itens (usado no header de lista) */
+.page-header__count {
+  background:    var(--surface-header-count);
+  border-radius: var(--radius-pill);
+  color:         var(--text-header-count);
+  font-size:     var(--font-size-sm);
+  font-weight:   var(--font-weight-bold);
+  line-height:   1;
+  padding:       3px 10px;
+}
+
+/* Subtítulo */
 .page-header__subtitle {
-  color: var(--theme-text-muted);
-  font-size: var(--font-size-sm);
+  color:       var(--theme-text-muted);
+  font-size:   var(--font-size-sm);
   line-height: 1.55;
-  margin: 0;
-  max-width: 58ch;
+  margin:      0;
+  max-width:   58ch;
 }
 
+/* Grupo de botões de ação */
 .page-header__actions {
   align-items: center;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  margin-top: var(--space-1);
+  display:     flex;
+  flex-shrink: 0;
+  flex-wrap:   wrap;
+  gap:         var(--space-2);
 }
 
 
 /* =========================================================
-   06. Stepper / Navegação
+   07. Page Header — Variações
+   ========================================================= */
+
+/* --- 7.1 Standard: header direto, sem metadados extras --- */
+
+/* Nenhuma regra visual adicional necessária; a estrutura base
+   com .page-header__row já cobre o standard. */
+
+/* --- 7.2 Wizard: header com linha de metadados abaixo --- */
+
+.page-header__meta {
+  align-items: center;
+  display:     flex;
+  flex-wrap:   wrap;
+  gap:         var(--space-2);
+  margin-top:  calc(var(--space-1) * -1);
+}
+
+.page-header__meta-sep {
+  color:   var(--theme-text-muted);
+  opacity: 0.45;
+}
+
+.page-header__meta-item {
+  color:       var(--theme-text-muted);
+  font-size:   var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+/* Badge de estado (ex.: Rascunho, Enviado) */
+.page-header__badge {
+  border-radius: var(--radius-pill);
+  font-size:     var(--font-size-xs);
+  font-weight:   var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-chip);
+  padding:       3px 10px;
+}
+
+.page-header__badge--draft {
+  background: var(--route-status-draft-bg);
+  border:     1px solid var(--route-status-draft-border);
+  color:      var(--route-status-draft-text);
+}
+
+.page-header__badge--sent {
+  background: var(--route-status-final-bg);
+  border:     1px solid var(--route-status-final-border);
+  color:      var(--route-status-final-text);
+}
+
+/* --- 7.3 List: estrutura idêntica ao standard mas com count no título --- */
+
+/* Nenhuma regra adicional; o .page-header__count no título
+   e o botão de ação primária diferenciam o header de lista. */
+
+
+/* =========================================================
+   08. Stepper / Navegação
    Indicador de progresso entre etapas de um fluxo.
-   Oculto ou vazio em páginas de etapa única.
+   Ausente ou vazio em páginas de etapa única.
    ========================================================= */
 
 .page-stepper {
-  background:   var(--surface-stepper);
-  border:       1px solid var(--border-stepper);
+  background:    var(--surface-stepper);
+  border:        1px solid var(--border-stepper);
   border-radius: var(--stepper-radius);
-  box-shadow:   var(--shadow-stepper);
-  box-sizing:   border-box;
-  overflow-x:   auto;
-  padding:      var(--stepper-padding-y) var(--stepper-padding-x);
+  box-shadow:    var(--shadow-stepper);
+  box-sizing:    border-box;
+  overflow-x:    auto;
+  padding:       var(--stepper-padding-y) var(--stepper-padding-x);
   scrollbar-width: none;
-  width: 100%;
-  z-index: var(--z-stepper);
+  width:         100%;
+  z-index:       var(--z-stepper);
 }
 
 .page-stepper::-webkit-scrollbar { display: none; }
 
 .page-stepper__list {
   align-items: center;
-  display: flex;
-  list-style: none;
-  margin: 0;
-  padding: 0;
+  display:     flex;
+  list-style:  none;
+  margin:      0;
+  padding:     0;
 }
 
 .page-stepper__item {
   align-items: center;
-  display: flex;
-  flex: 1;
-  gap: var(--stepper-gap);
-  min-width: 0;
+  display:     flex;
+  flex:        1;
+  gap:         var(--stepper-gap);
+  min-width:   0;
 }
 
 /* Conector entre etapas */
@@ -276,32 +493,32 @@ html[data-theme="light"] {
 
 /* Número / indicador de etapa */
 .page-stepper__number {
-  align-items:   center;
-  background:    var(--stepper-idle-bg);
-  border:        1px solid var(--stepper-idle-border);
-  border-radius: var(--radius-pill);
-  color:         var(--stepper-idle-color);
-  display:       inline-flex;
-  flex-shrink:   0;
-  font-size:     var(--font-size-xs);
-  font-weight:   var(--font-weight-bold);
-  height:        var(--stepper-item-size);
+  align-items:     center;
+  background:      var(--stepper-idle-bg);
+  border:          1px solid var(--stepper-idle-border);
+  border-radius:   var(--radius-pill);
+  color:           var(--stepper-idle-color);
+  display:         inline-flex;
+  flex-shrink:     0;
+  font-size:       var(--font-size-xs);
+  font-weight:     var(--font-weight-bold);
+  height:          var(--stepper-item-size);
   justify-content: center;
   transition:
-    background var(--transition-base),
-    color var(--transition-base),
-    border-color var(--transition-base);
+    background     var(--transition-base),
+    color          var(--transition-base),
+    border-color   var(--transition-base);
   width: var(--stepper-item-size);
 }
 
 .page-stepper__label {
-  color:      var(--stepper-label-idle);
-  font-size:  var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  overflow:   hidden;
+  color:         var(--stepper-label-idle);
+  font-size:     var(--font-size-xs);
+  font-weight:   var(--font-weight-semibold);
+  overflow:      hidden;
   text-overflow: ellipsis;
-  transition: color var(--transition-base);
-  white-space: nowrap;
+  transition:    color var(--transition-base);
+  white-space:   nowrap;
 }
 
 /* Estado: etapa concluída */
@@ -329,54 +546,49 @@ html[data-theme="light"] {
 
 
 /* =========================================================
-   07. Main Form Panel
-   Superfície central do formulário. Agrupa as seções e o
-   footer de ações. Separa o conteúdo funcional do background.
+   09. Main Form Panel
+   Superfície central do formulário. Agrupa seções e footer.
+   Separa o conteúdo funcional do background da página.
    ========================================================= */
 
 .main-form-panel {
-  background:    var(--surface-form-panel);
-  border:        1px solid var(--border-form-panel);
-  border-radius: var(--form-panel-radius);
-  box-shadow:    var(--shadow-form-panel);
-  box-sizing:    border-box;
-  display:       flex;
+  background:     var(--surface-form-panel);
+  border:         1px solid var(--border-form-panel);
+  border-radius:  var(--form-panel-radius);
+  box-shadow:     var(--shadow-form-panel);
+  box-sizing:     border-box;
+  display:        flex;
   flex-direction: column;
-  overflow:      hidden;
-  width:         100%;
+  overflow:       hidden;
+  width:          100%;
 }
 
 
 /* =========================================================
-   08. Form Section
+   10. Form Section
    Unidade modular de conteúdo dentro do Main Form Panel.
    Separadas por border-bottom — não são cards individuais.
    ========================================================= */
 
 .main-form-panel .form-section {
-  background:  var(--surface-form-section);
-  border:      none;
-  border-bottom: 1px solid var(--border-form-panel);
-  border-radius: 0;
-  box-shadow:  var(--shadow-form-section);
-  box-sizing:  border-box;
-  display:     flex;
+  background:     var(--surface-form-section);
+  border:         none;
+  border-bottom:  1px solid var(--border-form-panel);
+  border-radius:  0;
+  box-shadow:     var(--shadow-form-section);
+  box-sizing:     border-box;
+  display:        flex;
   flex-direction: column;
-  gap:         var(--form-section-inner-gap);
-  margin:      0;
-  padding:     var(--form-section-padding-y) var(--form-section-padding-x);
+  gap:            var(--form-section-inner-gap);
+  margin:         0;
+  padding:        var(--form-section-padding-y) var(--form-section-padding-x);
 }
 
 .main-form-panel .form-section:last-of-type {
   border-bottom: none;
 }
 
-
-/* =========================================================
-   09. Section Header
-   Cabeçalho interno de cada Form Section.
-   ========================================================= */
-
+/* Section Header */
 .section-header {
   align-items:     flex-start;
   display:         flex;
@@ -416,10 +628,10 @@ html[data-theme="light"] {
 
 
 /* =========================================================
-   10. Field Grid
-   Grade responsiva de campos. Suporta 1–4 colunas.
-   Modificadores: --one, --two, --three, --four, --auto
+   11. Field Grid / Field Group
    ========================================================= */
+
+/* --- Field Grid --- */
 
 .field-grid {
   display:               grid;
@@ -433,27 +645,21 @@ html[data-theme="light"] {
 .field-grid--four  { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .field-grid--auto  { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
 
-/* Utilitários de span */
 .field-grid__span-2    { grid-column: span 2; }
 .field-grid__span-3    { grid-column: span 3; }
 .field-grid__span-full { grid-column: 1 / -1; }
 
-
-/* =========================================================
-   11. Field Group (opcional)
-   Agrupamento leve dentro de uma Form Section.
-   Usado para blocos condicionais ou campos muito relacionados.
-   ========================================================= */
+/* --- Field Group --- */
 
 .field-group {
-  background:    var(--surface-field-group);
-  border:        1px solid var(--border-field-group);
-  border-radius: var(--field-group-radius);
-  box-sizing:    border-box;
-  display:       flex;
+  background:     var(--surface-field-group);
+  border:         1px solid var(--border-field-group);
+  border-radius:  var(--field-group-radius);
+  box-sizing:     border-box;
+  display:        flex;
   flex-direction: column;
-  gap:           var(--field-group-gap);
-  padding:       var(--field-group-padding);
+  gap:            var(--field-group-gap);
+  padding:        var(--field-group-padding);
 }
 
 .field-group__header {
@@ -481,8 +687,8 @@ html[data-theme="light"] {
 
 /* =========================================================
    12. Footer Actions
-   Rodapé de ações do formulário. Sempre ao final do Main Form Panel.
-   Divide ações secundárias (esquerda) das primárias (direita).
+   Rodapé de ações do formulário. Sempre ao final do Main
+   Form Panel. Ações secundárias à esquerda, primárias à direita.
    ========================================================= */
 
 .footer-actions {
@@ -497,12 +703,7 @@ html[data-theme="light"] {
   padding:         var(--footer-actions-padding-y) var(--footer-actions-padding-x);
 }
 
-.footer-actions__secondary {
-  align-items: center;
-  display:     flex;
-  gap:         var(--footer-actions-gap);
-}
-
+.footer-actions__secondary,
 .footer-actions__primary {
   align-items: center;
   display:     flex;
@@ -511,13 +712,106 @@ html[data-theme="light"] {
 
 
 /* =========================================================
-   13. Responsive
+   13. List Panel / Filters
+   Painel principal das páginas de lista. Substitui o
+   Main Form Panel nas variações de tipo list.
+   ========================================================= */
+
+/* --- 13.1 List Panel --- */
+
+.list-panel {
+  background:     var(--surface-list-panel);
+  border:         1px solid var(--border-list-panel);
+  border-radius:  var(--list-panel-radius);
+  box-shadow:     var(--shadow-list-panel);
+  box-sizing:     border-box;
+  display:        flex;
+  flex-direction: column;
+  overflow:       hidden;
+  width:          100%;
+}
+
+/* --- 13.2 Filter Bar --- */
+
+.filter-bar {
+  align-items:  center;
+  background:   var(--surface-filter-bar);
+  border-bottom: 1px solid var(--border-filter-bar);
+  box-sizing:   border-box;
+  display:      flex;
+  flex-wrap:    wrap;
+  gap:          var(--filter-bar-gap);
+  justify-content: space-between;
+  padding:      var(--filter-bar-padding-y) var(--filter-bar-padding-x);
+}
+
+.filter-bar__search {
+  flex:      1;
+  min-width: 200px;
+}
+
+.filter-bar__filters {
+  align-items: center;
+  display:     flex;
+  flex-wrap:   wrap;
+  gap:         var(--space-2);
+}
+
+/* --- 13.3 List Content --- */
+
+.list-content {
+  box-sizing:     border-box;
+  display:        flex;
+  flex-direction: column;
+  padding:        var(--list-content-padding-y) 0;
+  width:          100%;
+}
+
+/* --- 13.4 Pagination --- */
+
+.pagination-shell {
+  align-items:   center;
+  background:    var(--surface-pagination);
+  border-top:    1px solid var(--border-pagination);
+  box-sizing:    border-box;
+  display:       flex;
+  flex-wrap:     wrap;
+  gap:           var(--space-3);
+  justify-content: space-between;
+  padding:       var(--pagination-padding-y) var(--pagination-padding-x);
+}
+
+.pagination-shell__info {
+  color:     var(--theme-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.pagination-shell__controls {
+  align-items: center;
+  display:     flex;
+  gap:         var(--space-1);
+}
+
+
+/* =========================================================
+   14. Responsive
    ========================================================= */
 
 @media (max-width: 840px) {
   .page-shell {
-    gap:     var(--space-4);
+    gap:          var(--space-4);
     padding-block: var(--space-4);
+  }
+
+  .page-header__row,
+  .page-header__top {
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .page-header__actions {
+    flex-shrink: unset;
+    width: 100%;
   }
 
   .page-stepper {
@@ -525,15 +819,15 @@ html[data-theme="light"] {
   }
 
   .main-form-panel .form-section {
-    padding: var(--space-4);
     gap:     var(--space-4);
+    padding: var(--space-4);
   }
 
   .footer-actions {
-    flex-direction:  column-reverse;
-    align-items:     stretch;
-    gap:             var(--space-2);
-    padding:         var(--space-4);
+    align-items:    stretch;
+    flex-direction: column-reverse;
+    gap:            var(--space-2);
+    padding:        var(--space-4);
   }
 
   .footer-actions__secondary,
@@ -552,6 +846,24 @@ html[data-theme="light"] {
   .field-grid__span-full {
     grid-column: 1;
   }
+
+  .filter-bar {
+    flex-direction: column;
+    align-items:    stretch;
+  }
+
+  .filter-bar__search,
+  .filter-bar__filters {
+    width: 100%;
+  }
+
+  .filter-bar__filters {
+    flex-wrap: wrap;
+  }
+
+  .page-shell--standard .main-form-panel {
+    max-width: 100%;
+  }
 }
 
 @media (max-width: 600px) {
@@ -562,6 +874,16 @@ html[data-theme="light"] {
   .page-header__title {
     font-size: 1.5rem;
   }
+
+  .pagination-shell {
+    flex-direction: column;
+    align-items:    stretch;
+    text-align:     center;
+  }
+
+  .pagination-shell__controls {
+    justify-content: center;
+  }
 }
 
 
@@ -570,6 +892,41 @@ html[data-theme="light"] {
    Elementos fictícios para demonstrar a hierarquia visual.
    Não usar em páginas reais.
    ========================================================= */
+
+/* --- Nav de variações --- */
+
+.ui-lab-variant-nav {
+  align-items:   center;
+  display:       flex;
+  flex-wrap:     wrap;
+  gap:           var(--space-2);
+  margin-bottom: var(--space-6);
+}
+
+.ui-lab-variant-nav__link {
+  background:    var(--surface-form-section);
+  border:        1px solid var(--border-form-section);
+  border-radius: var(--radius-pill);
+  color:         var(--theme-text-muted);
+  font-size:     var(--font-size-xs);
+  font-weight:   var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
+  padding:       var(--space-1) var(--space-3);
+  text-decoration: none;
+  text-transform: uppercase;
+  transition:
+    background   var(--transition-base),
+    color        var(--transition-base),
+    border-color var(--transition-base);
+}
+
+.ui-lab-variant-nav__link:hover {
+  background:   var(--surface-list-row-hover);
+  border-color: var(--border-active);
+  color:        var(--theme-text-heading);
+}
+
+/* --- Separador de bloco de demo --- */
 
 .ui-lab-demo-label {
   color:          var(--theme-text-muted);
@@ -580,6 +937,16 @@ html[data-theme="light"] {
   margin-bottom:  var(--space-3);
   text-transform: uppercase;
 }
+
+.ui-lab-variant-block {
+  margin-bottom: var(--space-10);
+}
+
+.ui-lab-variant-block:last-child {
+  margin-bottom: 0;
+}
+
+/* --- Campos fictícios --- */
 
 .ui-lab-demo-field {
   display:        flex;
@@ -596,6 +963,116 @@ html[data-theme="light"] {
 .ui-lab-demo-field__input {
   background:    var(--theme-input-bg);
   border:        1px solid var(--theme-input-border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-control);
   height:        var(--control-height-md);
+}
+
+/* --- Inputs fictícios (filter bar) --- */
+
+.ui-lab-demo-input {
+  align-items:   center;
+  background:    var(--theme-input-bg);
+  border:        1px solid var(--theme-input-border);
+  border-radius: var(--radius-control);
+  box-sizing:    border-box;
+  color:         var(--theme-text-muted);
+  display:       flex;
+  font-size:     var(--font-size-sm);
+  height:        var(--control-height-md);
+  padding:       0 var(--space-3);
+  width:         100%;
+}
+
+.ui-lab-demo-input--select {
+  min-width: 120px;
+  width:     auto;
+}
+
+/* --- Linhas de lista fictícias --- */
+
+.ui-lab-demo-row {
+  align-items: center;
+  background:  var(--surface-list-row);
+  border-bottom: 1px solid var(--border-list-row);
+  box-sizing:  border-box;
+  cursor:      default;
+  display:     flex;
+  gap:         var(--space-4);
+  padding:     var(--list-row-padding-y) var(--list-row-padding-x);
+  transition:  background var(--transition-base);
+}
+
+.ui-lab-demo-row:last-child { border-bottom: none; }
+
+.ui-lab-demo-row:hover { background: var(--surface-list-row-hover); }
+
+/* Avatar / ícone placeholder */
+.ui-lab-demo-row__avatar {
+  background:    var(--surface-header-count);
+  border-radius: var(--radius-pill);
+  flex-shrink:   0;
+  height:        36px;
+  width:         36px;
+}
+
+/* Corpo textual */
+.ui-lab-demo-row__body {
+  display:        flex;
+  flex:           1;
+  flex-direction: column;
+  gap:            var(--space-1);
+  min-width:      0;
+}
+
+/* Área lateral direita (badge, ações) */
+.ui-lab-demo-row__aside {
+  align-items: center;
+  display:     flex;
+  flex-shrink: 0;
+  gap:         var(--space-2);
+}
+
+/* Barras de texto placeholder */
+.ui-lab-demo-bar {
+  background:    var(--surface-field-group);
+  border-radius: var(--radius-pill);
+  height:        12px;
+}
+
+.ui-lab-demo-bar--sm  { width: 32%; }
+.ui-lab-demo-bar--md  { width: 56%; }
+.ui-lab-demo-bar--lg  { width: 72%; }
+.ui-lab-demo-bar--xl  { width: 88%; }
+.ui-lab-demo-bar--sub {
+  height: 10px;
+  opacity: 0.6;
+  width:   44%;
+}
+
+/* Chips de status fictícios */
+.ui-lab-demo-chip {
+  border-radius:  var(--radius-pill);
+  font-size:      var(--font-size-xs);
+  font-weight:    var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-chip);
+  padding:        3px 10px;
+  white-space:    nowrap;
+}
+
+.ui-lab-demo-chip--draft {
+  background: var(--route-status-draft-bg);
+  border:     1px solid var(--route-status-draft-border);
+  color:      var(--route-status-draft-text);
+}
+
+.ui-lab-demo-chip--done {
+  background: var(--route-status-final-bg);
+  border:     1px solid var(--route-status-final-border);
+  color:      var(--route-status-final-text);
+}
+
+.ui-lab-demo-chip--review {
+  background: var(--route-status-muted-bg);
+  border:     1px solid var(--route-status-muted-border);
+  color:      var(--route-status-muted-text);
 }

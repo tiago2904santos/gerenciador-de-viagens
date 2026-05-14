@@ -33,180 +33,381 @@
     <div class="app-page-hero__ribbon" aria-hidden="true"></div>
   </header>
 
-  <!-- DEMONSTRAÇÃO: Page Shell Layer System — não representa formulário real -->
-  <section aria-label="Demonstração: Page Shell Layer System">
-    <span class="ui-lab-demo-label">Demo — Page Shell Layer System</span>
+  <!-- DEMONSTRAÇÃO: Page Shell Layer System — três variações oficiais -->
+  <section aria-label="Demonstração: Variações de Page Shell">
 
-    {# ── Page Shell ── #}
-    <div class="page-shell">
+    <!-- Nav de acesso rápido às variações -->
+    <nav class="ui-lab-variant-nav" aria-label="Variações de Page Shell">
+      <a href="#shell-standard" class="ui-lab-variant-nav__link">Standard</a>
+      <a href="#shell-wizard"   class="ui-lab-variant-nav__link">Wizard / Stepper</a>
+      <a href="#shell-list"     class="ui-lab-variant-nav__link">List / Filters</a>
+    </nav>
 
-      {# ── Page Header ── #}
-      <header class="page-header">
-        <span class="page-header__eyebrow">Ofícios</span>
-        <h2 class="page-header__title">Novo Ofício de Solicitação</h2>
-        <p class="page-header__subtitle">
-          Preencha os dados para solicitar autorização de viagem institucional.
-        </p>
-        <div class="page-header__actions">
-          <button class="btn btn-secondary" type="button">Cancelar</button>
-          <button class="btn btn-primary"   type="button">Salvar rascunho</button>
-        </div>
-      </header>
+    <!-- ══════════════════════════════════════════════════════
+         VARIAÇÃO 1 — PAGE SHELL STANDARD
+         Cadastro curto, sem stepper.
+         ══════════════════════════════════════════════════════ -->
+    <div id="shell-standard" class="ui-lab-variant-block">
+      <span class="ui-lab-demo-label">Variação 1 — Page Shell Standard</span>
 
-      {# ── Stepper / Navegação ── #}
-      <nav class="page-stepper" aria-label="Etapas do formulário">
-        <ol class="page-stepper__list">
-          <li class="page-stepper__item is-complete">
-            <span class="page-stepper__number" aria-hidden="true">✓</span>
-            <span class="page-stepper__label">Dados gerais</span>
-          </li>
-          <li class="page-stepper__item is-active" aria-current="step">
-            <span class="page-stepper__number" aria-hidden="true">2</span>
-            <span class="page-stepper__label">Transporte</span>
-          </li>
-          <li class="page-stepper__item">
-            <span class="page-stepper__number" aria-hidden="true">3</span>
-            <span class="page-stepper__label">Roteiro</span>
-          </li>
-          <li class="page-stepper__item">
-            <span class="page-stepper__number" aria-hidden="true">4</span>
-            <span class="page-stepper__label">Diárias</span>
-          </li>
-          <li class="page-stepper__item">
-            <span class="page-stepper__number" aria-hidden="true">5</span>
-            <span class="page-stepper__label">Revisão</span>
-          </li>
-        </ol>
-      </nav>
+      <div class="page-shell page-shell--standard">
 
-      {# ── Main Form Panel ── #}
-      <main class="main-form-panel">
-
-        {# ── Form Section 1: Dados gerais ── #}
-        <section class="form-section" aria-labelledby="sec-dados-gerais">
-          <header class="section-header">
-            <div class="section-header__copy">
-              <h3 class="section-header__title" id="sec-dados-gerais">Dados gerais</h3>
-              <p class="section-header__description">Informações básicas do documento de solicitação.</p>
+        <header class="page-header page-header--standard">
+          <div class="page-header__row">
+            <div class="page-header__context">
+              <span class="page-header__eyebrow">Cadastro</span>
+              <h2 class="page-header__title">Cadastro de servidor</h2>
+              <p class="page-header__subtitle">
+                Preencha os dados básicos do servidor para uso nos documentos de viagem.
+              </p>
             </div>
-          </header>
-
-          <div class="field-grid field-grid--three">
-            <div class="ui-lab-demo-field">
-              <span class="ui-lab-demo-field__label">Número do ofício</span>
-              <div class="ui-lab-demo-field__input"></div>
-            </div>
-            <div class="ui-lab-demo-field">
-              <span class="ui-lab-demo-field__label">Data de emissão</span>
-              <div class="ui-lab-demo-field__input"></div>
-            </div>
-            <div class="ui-lab-demo-field">
-              <span class="ui-lab-demo-field__label">Unidade solicitante</span>
-              <div class="ui-lab-demo-field__input"></div>
-            </div>
-            <div class="ui-lab-demo-field field-grid__span-2">
-              <span class="ui-lab-demo-field__label">Assunto / Objeto</span>
-              <div class="ui-lab-demo-field__input"></div>
-            </div>
-            <div class="ui-lab-demo-field">
-              <span class="ui-lab-demo-field__label">Classificação</span>
-              <div class="ui-lab-demo-field__input"></div>
+            <div class="page-header__actions">
+              <button class="btn btn-secondary" type="button">Voltar</button>
+              <button class="btn btn-primary"   type="button">Salvar cadastro</button>
             </div>
           </div>
-        </section>
+        </header>
 
-        {# ── Form Section 2: Viajante ── #}
-        <section class="form-section" aria-labelledby="sec-viajante">
-          <header class="section-header">
-            <div class="section-header__copy">
-              <h3 class="section-header__title" id="sec-viajante">Dados do viajante</h3>
-              <p class="section-header__description">Servidor ou cidadão que realizará a viagem.</p>
-            </div>
-          </header>
+        <main class="main-form-panel">
 
-          <div class="field-grid field-grid--two">
-            <div class="ui-lab-demo-field">
-              <span class="ui-lab-demo-field__label">Nome completo</span>
-              <div class="ui-lab-demo-field__input"></div>
-            </div>
-            <div class="ui-lab-demo-field">
-              <span class="ui-lab-demo-field__label">Matrícula / CPF</span>
-              <div class="ui-lab-demo-field__input"></div>
-            </div>
-            <div class="ui-lab-demo-field">
-              <span class="ui-lab-demo-field__label">Cargo / Função</span>
-              <div class="ui-lab-demo-field__input"></div>
-            </div>
-            <div class="ui-lab-demo-field">
-              <span class="ui-lab-demo-field__label">Lotação</span>
-              <div class="ui-lab-demo-field__input"></div>
-            </div>
-          </div>
-
-          {# ── Field Group: Motorista (opcional) ── #}
-          <div class="field-group">
-            <header class="field-group__header">
-              <h4 class="field-group__title">Dados do motorista</h4>
+          <section class="form-section" aria-labelledby="std-dados">
+            <header class="section-header">
+              <div class="section-header__copy">
+                <h3 class="section-header__title" id="std-dados">Dados pessoais</h3>
+                <p class="section-header__description">
+                  Informações de identificação do servidor.
+                </p>
+              </div>
             </header>
-            <div class="field-group__body">
-              <div class="field-grid field-grid--two">
-                <div class="ui-lab-demo-field">
-                  <span class="ui-lab-demo-field__label">Nome do motorista</span>
-                  <div class="ui-lab-demo-field__input"></div>
-                </div>
-                <div class="ui-lab-demo-field">
-                  <span class="ui-lab-demo-field__label">CNH / Categoria</span>
-                  <div class="ui-lab-demo-field__input"></div>
+            <div class="field-grid field-grid--two">
+              <div class="ui-lab-demo-field">
+                <span class="ui-lab-demo-field__label">Nome completo</span>
+                <div class="ui-lab-demo-field__input"></div>
+              </div>
+              <div class="ui-lab-demo-field">
+                <span class="ui-lab-demo-field__label">Matrícula</span>
+                <div class="ui-lab-demo-field__input"></div>
+              </div>
+              <div class="ui-lab-demo-field">
+                <span class="ui-lab-demo-field__label">Cargo / Função</span>
+                <div class="ui-lab-demo-field__input"></div>
+              </div>
+              <div class="ui-lab-demo-field">
+                <span class="ui-lab-demo-field__label">Lotação</span>
+                <div class="ui-lab-demo-field__input"></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="form-section" aria-labelledby="std-contato">
+            <header class="section-header">
+              <div class="section-header__copy">
+                <h3 class="section-header__title" id="std-contato">Contato</h3>
+                <p class="section-header__description">
+                  Dados para comunicação com o servidor.
+                </p>
+              </div>
+            </header>
+            <div class="field-grid field-grid--two">
+              <div class="ui-lab-demo-field">
+                <span class="ui-lab-demo-field__label">E-mail institucional</span>
+                <div class="ui-lab-demo-field__input"></div>
+              </div>
+              <div class="ui-lab-demo-field">
+                <span class="ui-lab-demo-field__label">Telefone</span>
+                <div class="ui-lab-demo-field__input"></div>
+              </div>
+            </div>
+          </section>
+
+          <footer class="footer-actions">
+            <div class="footer-actions__secondary">
+              <button class="btn btn-secondary" type="button">Cancelar</button>
+            </div>
+            <div class="footer-actions__primary">
+              <button class="btn btn-primary" type="button">Salvar cadastro</button>
+            </div>
+          </footer>
+
+        </main>
+
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════
+         VARIAÇÃO 2 — PAGE SHELL WIZARD / STEPPER
+         Cadastro longo com etapas e metadados de contexto.
+         ══════════════════════════════════════════════════════ -->
+    <div id="shell-wizard" class="ui-lab-variant-block">
+      <span class="ui-lab-demo-label">Variação 2 — Page Shell Wizard / Stepper</span>
+
+      <div class="page-shell page-shell--wizard">
+
+        <header class="page-header page-header--wizard">
+          <div class="page-header__top">
+            <div class="page-header__context">
+              <span class="page-header__eyebrow">Ofício</span>
+              <h2 class="page-header__title">Novo Ofício de Viagem</h2>
+              <p class="page-header__subtitle">
+                Organize viajantes, transporte, roteiro e diárias em um fluxo guiado.
+              </p>
+            </div>
+            <div class="page-header__actions">
+              <button class="btn btn-secondary" type="button">Cancelar</button>
+            </div>
+          </div>
+          <div class="page-header__meta">
+            <span class="page-header__badge page-header__badge--draft">Rascunho</span>
+            <span class="page-header__meta-sep" aria-hidden="true">·</span>
+            <span class="page-header__meta-item">Criado hoje</span>
+            <span class="page-header__meta-sep" aria-hidden="true">·</span>
+            <span class="page-header__meta-item">Etapa 2 de 4</span>
+          </div>
+        </header>
+
+        <nav class="page-stepper" aria-label="Etapas do formulário">
+          <ol class="page-stepper__list">
+            <li class="page-stepper__item is-complete">
+              <span class="page-stepper__number" aria-hidden="true">✓</span>
+              <span class="page-stepper__label">Dados do viajante</span>
+            </li>
+            <li class="page-stepper__item is-active" aria-current="step">
+              <span class="page-stepper__number" aria-hidden="true">2</span>
+              <span class="page-stepper__label">Transporte</span>
+            </li>
+            <li class="page-stepper__item">
+              <span class="page-stepper__number" aria-hidden="true">3</span>
+              <span class="page-stepper__label">Roteiro e diárias</span>
+            </li>
+            <li class="page-stepper__item">
+              <span class="page-stepper__number" aria-hidden="true">4</span>
+              <span class="page-stepper__label">Resumo</span>
+            </li>
+          </ol>
+        </nav>
+
+        <main class="main-form-panel">
+
+          <section class="form-section" aria-labelledby="wiz-transporte">
+            <header class="section-header">
+              <div class="section-header__copy">
+                <h3 class="section-header__title" id="wiz-transporte">Transporte</h3>
+                <p class="section-header__description">
+                  Modal e viatura utilizados na viagem.
+                </p>
+              </div>
+              <div class="section-header__actions">
+                <button class="btn btn-secondary" type="button"
+                        style="font-size:13px;min-height:34px;padding:0 12px;">
+                  + Adicionar trecho
+                </button>
+              </div>
+            </header>
+            <div class="field-grid field-grid--three">
+              <div class="ui-lab-demo-field">
+                <span class="ui-lab-demo-field__label">Modal</span>
+                <div class="ui-lab-demo-field__input"></div>
+              </div>
+              <div class="ui-lab-demo-field">
+                <span class="ui-lab-demo-field__label">Placa / Identificação</span>
+                <div class="ui-lab-demo-field__input"></div>
+              </div>
+              <div class="ui-lab-demo-field">
+                <span class="ui-lab-demo-field__label">Km estimado</span>
+                <div class="ui-lab-demo-field__input"></div>
+              </div>
+            </div>
+            <div class="field-group">
+              <header class="field-group__header">
+                <h4 class="field-group__title">Dados do motorista</h4>
+              </header>
+              <div class="field-group__body">
+                <div class="field-grid field-grid--two">
+                  <div class="ui-lab-demo-field">
+                    <span class="ui-lab-demo-field__label">Nome do motorista</span>
+                    <div class="ui-lab-demo-field__input"></div>
+                  </div>
+                  <div class="ui-lab-demo-field">
+                    <span class="ui-lab-demo-field__label">CNH / Categoria</span>
+                    <div class="ui-lab-demo-field__input"></div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
 
-        {# ── Form Section 3: Transporte ── #}
-        <section class="form-section" aria-labelledby="sec-transporte">
-          <header class="section-header">
-            <div class="section-header__copy">
-              <h3 class="section-header__title" id="sec-transporte">Transporte</h3>
-              <p class="section-header__description">Modal e viatura utilizados na viagem.</p>
+          <section class="form-section" aria-labelledby="wiz-roteiro">
+            <header class="section-header">
+              <div class="section-header__copy">
+                <h3 class="section-header__title" id="wiz-roteiro">Roteiro</h3>
+                <p class="section-header__description">
+                  Destinos e datas da viagem.
+                </p>
+              </div>
+            </header>
+            <div class="field-grid field-grid--two">
+              <div class="ui-lab-demo-field">
+                <span class="ui-lab-demo-field__label">Origem</span>
+                <div class="ui-lab-demo-field__input"></div>
+              </div>
+              <div class="ui-lab-demo-field">
+                <span class="ui-lab-demo-field__label">Destino</span>
+                <div class="ui-lab-demo-field__input"></div>
+              </div>
+              <div class="ui-lab-demo-field">
+                <span class="ui-lab-demo-field__label">Data de saída</span>
+                <div class="ui-lab-demo-field__input"></div>
+              </div>
+              <div class="ui-lab-demo-field">
+                <span class="ui-lab-demo-field__label">Data de retorno</span>
+                <div class="ui-lab-demo-field__input"></div>
+              </div>
             </div>
-            <div class="section-header__actions">
-              <button class="btn btn-secondary" type="button" style="font-size:13px;min-height:34px;padding:0 12px;">
-                + Adicionar trecho
+          </section>
+
+          <footer class="footer-actions">
+            <div class="footer-actions__secondary">
+              <button class="btn btn-secondary" type="button">← Voltar</button>
+            </div>
+            <div class="footer-actions__primary">
+              <button class="btn btn-secondary" type="button">Salvar rascunho</button>
+              <button class="btn btn-primary"   type="button">Avançar →</button>
+            </div>
+          </footer>
+
+        </main>
+
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════
+         VARIAÇÃO 3 — PAGE SHELL LIST / FILTERS
+         Página de lista com busca, filtros e paginação.
+         ══════════════════════════════════════════════════════ -->
+    <div id="shell-list" class="ui-lab-variant-block">
+      <span class="ui-lab-demo-label">Variação 3 — Page Shell List / Filters</span>
+
+      <div class="page-shell page-shell--list">
+
+        <header class="page-header page-header--list">
+          <div class="page-header__row">
+            <div class="page-header__context">
+              <span class="page-header__eyebrow">Documentos</span>
+              <h2 class="page-header__title">
+                Ofícios
+                <span class="page-header__count">24</span>
+              </h2>
+              <p class="page-header__subtitle">
+                Consulte, filtre e acompanhe os documentos de viagem cadastrados.
+              </p>
+            </div>
+            <div class="page-header__actions">
+              <button class="btn btn-primary" type="button">+ Novo Ofício</button>
+            </div>
+          </div>
+        </header>
+
+        <div class="list-panel">
+
+          <div class="filter-bar">
+            <div class="filter-bar__search">
+              <div class="ui-lab-demo-input" role="presentation" aria-hidden="true">
+                Buscar ofícios...
+              </div>
+            </div>
+            <div class="filter-bar__filters">
+              <div class="ui-lab-demo-input ui-lab-demo-input--select"
+                   role="presentation" aria-hidden="true">
+                Status
+              </div>
+              <div class="ui-lab-demo-input ui-lab-demo-input--select"
+                   role="presentation" aria-hidden="true">
+                Período
+              </div>
+              <button class="btn btn-secondary" type="button"
+                      style="font-size:13px;min-height:44px;padding:0 14px;">
+                Limpar filtros
               </button>
             </div>
-          </header>
+          </div>
 
-          <div class="field-grid field-grid--three">
-            <div class="ui-lab-demo-field">
-              <span class="ui-lab-demo-field__label">Modal</span>
-              <div class="ui-lab-demo-field__input"></div>
+          <div class="list-content" role="list" aria-label="Lista de ofícios (demonstração)">
+
+            <div class="ui-lab-demo-row" role="listitem">
+              <div class="ui-lab-demo-row__avatar" aria-hidden="true"></div>
+              <div class="ui-lab-demo-row__body">
+                <div class="ui-lab-demo-bar ui-lab-demo-bar--lg"></div>
+                <div class="ui-lab-demo-bar ui-lab-demo-bar--sub"></div>
+              </div>
+              <div class="ui-lab-demo-row__aside">
+                <span class="ui-lab-demo-chip ui-lab-demo-chip--draft">Rascunho</span>
+              </div>
             </div>
-            <div class="ui-lab-demo-field">
-              <span class="ui-lab-demo-field__label">Placa / Identificação</span>
-              <div class="ui-lab-demo-field__input"></div>
+
+            <div class="ui-lab-demo-row" role="listitem">
+              <div class="ui-lab-demo-row__avatar" aria-hidden="true"></div>
+              <div class="ui-lab-demo-row__body">
+                <div class="ui-lab-demo-bar ui-lab-demo-bar--xl"></div>
+                <div class="ui-lab-demo-bar ui-lab-demo-bar--sub"></div>
+              </div>
+              <div class="ui-lab-demo-row__aside">
+                <span class="ui-lab-demo-chip ui-lab-demo-chip--done">Concluído</span>
+              </div>
             </div>
-            <div class="ui-lab-demo-field">
-              <span class="ui-lab-demo-field__label">Km estimado</span>
-              <div class="ui-lab-demo-field__input"></div>
+
+            <div class="ui-lab-demo-row" role="listitem">
+              <div class="ui-lab-demo-row__avatar" aria-hidden="true"></div>
+              <div class="ui-lab-demo-row__body">
+                <div class="ui-lab-demo-bar ui-lab-demo-bar--md"></div>
+                <div class="ui-lab-demo-bar ui-lab-demo-bar--sub"></div>
+              </div>
+              <div class="ui-lab-demo-row__aside">
+                <span class="ui-lab-demo-chip ui-lab-demo-chip--review">Em revisão</span>
+              </div>
+            </div>
+
+            <div class="ui-lab-demo-row" role="listitem">
+              <div class="ui-lab-demo-row__avatar" aria-hidden="true"></div>
+              <div class="ui-lab-demo-row__body">
+                <div class="ui-lab-demo-bar ui-lab-demo-bar--lg"></div>
+                <div class="ui-lab-demo-bar ui-lab-demo-bar--sub"></div>
+              </div>
+              <div class="ui-lab-demo-row__aside">
+                <span class="ui-lab-demo-chip ui-lab-demo-chip--draft">Rascunho</span>
+              </div>
+            </div>
+
+            <div class="ui-lab-demo-row" role="listitem">
+              <div class="ui-lab-demo-row__avatar" aria-hidden="true"></div>
+              <div class="ui-lab-demo-row__body">
+                <div class="ui-lab-demo-bar ui-lab-demo-bar--xl"></div>
+                <div class="ui-lab-demo-bar ui-lab-demo-bar--sub"></div>
+              </div>
+              <div class="ui-lab-demo-row__aside">
+                <span class="ui-lab-demo-chip ui-lab-demo-chip--done">Concluído</span>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="pagination-shell">
+            <span class="pagination-shell__info">1–5 de 24 itens</span>
+            <div class="pagination-shell__controls">
+              <button class="btn btn-secondary" type="button" disabled
+                      aria-label="Página anterior">←</button>
+              <button class="btn btn-primary"   type="button" aria-current="page">1</button>
+              <button class="btn btn-secondary" type="button">2</button>
+              <button class="btn btn-secondary" type="button">3</button>
+              <button class="btn btn-secondary" type="button"
+                      aria-label="Próxima página">→</button>
             </div>
           </div>
-        </section>
 
-        {# ── Footer Actions ── #}
-        <footer class="footer-actions">
-          <div class="footer-actions__secondary">
-            <button class="btn btn-secondary" type="button">← Voltar</button>
-          </div>
-          <div class="footer-actions__primary">
-            <button class="btn btn-secondary" type="button">Cancelar</button>
-            <button class="btn btn-primary"   type="button">Avançar →</button>
-          </div>
-        </footer>
+        </div>
 
-      </main>{# /main-form-panel #}
+      </div>
+    </div>
 
-    </div>{# /page-shell #}
   </section>
 
 </main>
