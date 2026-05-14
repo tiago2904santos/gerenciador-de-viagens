@@ -159,11 +159,6 @@ html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sideba
     18px 0 36px rgba(67, 92, 124, 0.08);
 }
 
-html[data-theme="dark"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-header,
-html[data-theme="dark"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-footer {
-  background: rgba(2, 7, 13, 0.18);
-}
-
 html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-header,
 html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-footer {
   background: rgba(255, 255, 255, 0.42);
