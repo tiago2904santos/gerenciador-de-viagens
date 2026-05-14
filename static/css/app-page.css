@@ -4,25 +4,22 @@
  */
 
 .app-main:has(.app-page) {
-  --app-page-shell-padding-block: var(--space-7);
-  --app-page-shell-padding-inline: var(--space-7);
-  --app-page-shell-padding-block-mobile: var(--space-5);
-  --app-page-shell-padding-inline-mobile: var(--space-5);
+  --app-page-shell-padding-block: 32px;
+  --app-page-shell-padding-inline: 32px;
+  --app-page-shell-padding-block-mobile: 32px;
+  --app-page-shell-padding-inline-mobile: 32px;
   --app-page-shell-min-height: min(100vh, 100%);
   background-color: var(--app-featured-bg-fallback);
   background-image: var(--app-featured-bg);
   box-sizing: border-box;
   min-height: var(--app-page-shell-min-height);
   padding:
-    var(--app-page-shell-padding-block) var(--app-page-shell-padding-inline)
-    var(--app-page-shell-padding-block);
+    32px;
 }
 
 @media (max-width: 840px) {
   .app-main:has(.app-page) {
-    padding:
-      var(--app-page-shell-padding-block-mobile) var(--app-page-shell-padding-inline-mobile)
-      var(--app-page-shell-padding-block-mobile);
+    padding: 32px;
   }
 }
 
