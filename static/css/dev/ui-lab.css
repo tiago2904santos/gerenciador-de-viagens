@@ -23,10 +23,10 @@ html[data-theme="dark"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg)::before 
   background:
     radial-gradient(
       ellipse 115% 120% at -30% 0%,
-      rgba(255, 200, 62, 0.5) 10%,
-      rgba(255, 200, 62, 0.3) 18%,
-      rgba(255, 200, 62, 0.25) 34%,
-      transparent 76%
+      rgba(218, 255, 46, 0.6) 10%,
+      rgba(218, 255, 46, 0.3) 18%,
+      rgba(218, 255, 46, 0.2) 44%,
+      transparent 90%
     ),
     radial-gradient(
       ellipse 95% 72% at 85% 20%,
@@ -42,7 +42,7 @@ html[data-theme="dark"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg)::before 
       transparent 52%
     ),
     linear-gradient(
-      128deg,
+      145deg,
       transparent 0%,
       transparent 28%,
       rgba(86, 220, 255, 0.08) 42%,
