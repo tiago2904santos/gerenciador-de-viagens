@@ -926,6 +926,12 @@ html[data-theme="light"] {
   color:        var(--theme-text-heading);
 }
 
+.ui-lab-variant-nav__link.is-active {
+  background:    var(--color-primary);
+  border-color:  var(--color-primary);
+  color:         var(--color-white);
+}
+
 /* --- Separador de bloco de demo --- */
 
 .ui-lab-demo-label {

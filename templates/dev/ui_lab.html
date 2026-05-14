@@ -411,4 +411,31 @@
   </section>
 
 </main>
+
+<script>
+(function () {
+  var VARIANTS = ['shell-standard', 'shell-wizard', 'shell-list'];
+
+  function showVariant(id) {
+    VARIANTS.forEach(function (v) {
+      var block = document.getElementById(v);
+      if (block) block.hidden = (v !== id);
+    });
+    document.querySelectorAll('.ui-lab-variant-nav__link').forEach(function (a) {
+      a.classList.toggle('is-active', a.getAttribute('href') === '#' + id);
+    });
+    history.replaceState(null, '', '#' + id);
+  }
+
+  var hash = location.hash.slice(1);
+  showVariant(VARIANTS.includes(hash) ? hash : VARIANTS[0]);
+
+  document.querySelectorAll('.ui-lab-variant-nav__link').forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      e.preventDefault();
+      showVariant(a.getAttribute('href').slice(1));
+    });
+  });
+}());
+</script>
 {% endblock %}
