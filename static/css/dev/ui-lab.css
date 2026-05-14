@@ -150,6 +150,91 @@ html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) {
   --cv-ui-lab-eyebrow: #3a5872;
 }
 
+.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar {
+  background: var(--sidebar-surface);
+  border-right: 1px solid var(--sidebar-border);
+  box-shadow: var(--sidebar-shadow);
+}
+
+.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-header {
+  border-bottom: 1px solid var(--sidebar-border);
+}
+
+.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-footer {
+  border-top: 1px solid var(--sidebar-border);
+  color: var(--sidebar-footer-fg);
+}
+
+.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-brand {
+  color: var(--sidebar-brand-fg);
+}
+
+.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-brand-badge {
+  background: var(--sidebar-badge-bg);
+  border: 1px solid rgba(255, 243, 207, 0.5);
+  color: var(--color-white);
+}
+
+.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-link--module,
+.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-link--cadastros {
+  background: var(--sidebar-link-surface);
+  border-color: var(--sidebar-link-border);
+  color: var(--sidebar-link-fg);
+}
+
+.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-item-icon {
+  background: var(--sidebar-icon-bg);
+  color: var(--sidebar-icon-fg);
+}
+
+.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-link--module:hover,
+.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-module-expand:hover,
+.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-link--cadastros:hover,
+.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-link--module:focus-visible,
+.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-module-expand:focus-visible,
+.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-link--cadastros:focus-visible {
+  background: var(--sidebar-link-hover-bg);
+  color: var(--sidebar-brand-fg);
+}
+
+.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-link--module.is-active,
+.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-module-expand.is-active,
+.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-link--cadastros.is-active {
+  background: var(--sidebar-active-bg);
+  border-color: var(--sidebar-active-border);
+  box-shadow: inset 4px 0 0 var(--color-accent);
+  color: var(--sidebar-active-fg);
+}
+
+.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-panel {
+  border-left-color: var(--sidebar-panel-border);
+}
+
+.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-module-expand__chevron {
+  color: var(--sidebar-fg-heading);
+}
+
+.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-theme__label {
+  color: var(--sidebar-footer-fg);
+}
+
+.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .app-theme-grid__btn {
+  background: var(--sidebar-link-surface);
+  border: 1px solid var(--sidebar-link-border);
+  color: var(--sidebar-fg-soft);
+}
+
+.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .app-theme-grid__btn:hover,
+.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .app-theme-grid__btn:focus-visible {
+  color: var(--sidebar-brand-fg);
+}
+
+.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .app-theme-grid__btn[aria-pressed="true"],
+.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .app-theme-grid__btn[aria-checked="true"] {
+  background: var(--sidebar-theme-active-bg);
+  color: var(--color-white);
+}
+
 .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .app-main,
 .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .ui-lab-page,
 .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .cv-ui-lab-css-bg {
