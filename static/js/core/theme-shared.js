@@ -2,7 +2,7 @@
   "use strict";
 
   var STORAGE_KEY = "cv-theme";
-  var VALID_THEMES = ["dark-dark", "light-dark", "dark-light", "light-light"];
+  var VALID_THEMES = ["dark", "light"];
   var LEGACY_THEMES = {
     "dark-dark": "dark",
     "light-dark": "dark",
@@ -15,7 +15,7 @@
   };
 
   function getSystemPreferredTheme() {
-    return global.matchMedia("(prefers-color-scheme: dark)").matches ? "dark-dark" : "light-light";
+    return global.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
   }
 
   function normalizeTheme(rawTheme) {
@@ -23,10 +23,10 @@
       return getSystemPreferredTheme();
     }
     if (isValidTheme(rawTheme)) return rawTheme;
-    if (rawTheme === "dark" || rawTheme === "variant-a") return "dark-dark";
-    if (rawTheme === "light" || rawTheme === "variant-b") return "light-light";
-    if (LEGACY_THEMES[rawTheme] === "dark") return "dark-dark";
-    if (LEGACY_THEMES[rawTheme] === "light") return "light-light";
+    if (rawTheme === "dark" || rawTheme === "variant-a") return "dark";
+    if (rawTheme === "light" || rawTheme === "variant-b") return "light";
+    if (LEGACY_THEMES[rawTheme] === "dark") return "dark";
+    if (LEGACY_THEMES[rawTheme] === "light") return "light";
     return getSystemPreferredTheme();
   }
 
