@@ -224,6 +224,16 @@ html[data-theme="light"] .app-shell--ui-lab {
   z-index: var(--ui-lab-content-z);
 }
 
+.app-shell--ui-lab .app-main {
+  padding: 32px;
+}
+
+@media (max-width: 840px) {
+  .app-shell--ui-lab .app-main {
+    padding: 32px;
+  }
+}
+
 /* Neutraliza backgrounds herdados do layout base para expor o fundo do UI Lab. */
 
 .app-shell--ui-lab .app-main,
