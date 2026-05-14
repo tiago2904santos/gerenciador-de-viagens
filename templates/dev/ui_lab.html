@@ -53,19 +53,36 @@
       <div class="page-shell page-shell--standard">
 
         <header class="page-header page-header--standard">
-          <div class="page-header__row">
-            <div class="page-header__context">
-              <span class="page-header__eyebrow">Cadastro</span>
-              <h2 class="page-header__title">Cadastro de servidor</h2>
-              <p class="page-header__subtitle">
-                Preencha os dados básicos do servidor para uso nos documentos de viagem.
-              </p>
-            </div>
-            <div class="page-header__actions">
-              <button class="btn btn-secondary" type="button">Voltar</button>
-              <button class="btn btn-primary"   type="button">Salvar cadastro</button>
+
+          {# ── Stage: fundo escuro — eyebrow, título, ações ── #}
+          <div class="page-header__stage">
+            <div class="page-header__row">
+              <div class="page-header__context">
+                <span class="page-header__eyebrow">Cadastro</span>
+                <h2 class="page-header__title">Cadastro de servidor</h2>
+              </div>
+              <div class="page-header__actions">
+                <button class="btn btn-secondary" type="button">Voltar</button>
+                <button class="btn btn-primary"   type="button">Salvar cadastro</button>
+              </div>
             </div>
           </div>
+
+          {# ── Body: fundo claro — brand mark e subtítulo ── #}
+          <div class="page-header__body">
+            <div class="app-page__brand">
+              <div class="app-page__brand-mark" aria-hidden="true">CS</div>
+              <div class="app-page__brand-copy">
+                <p class="app-page__subtitle">
+                  Preencha os dados básicos do servidor para uso nos documentos de viagem.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {# ── Ribbon: faixa gradiente ── #}
+          <div class="page-header__ribbon" aria-hidden="true"></div>
+
         </header>
 
         <main class="main-form-panel">

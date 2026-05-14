@@ -385,30 +385,37 @@ html[data-theme="light"] {
    07. Page Header — Variações
    ========================================================= */
 
-/* --- 7.1 Standard: stage escuro — mesma linguagem do app-page-hero__stage --- */
+/* --- 7.1 Standard: hero completo — stage + body + ribbon --- */
 
+/* Container: card shell com radius e sombra */
 .page-header--standard {
-  background:    var(--app-hero-stage-bg);
   border-radius: var(--radius-lg);
-  box-shadow:    inset 0 -1px 0 rgba(255, 255, 255, 0.08), var(--shadow-lg);
+  box-shadow:    var(--shadow-lg);
   overflow:      hidden;
-  padding:       var(--space-5) var(--space-6);
-  position:      relative;
 }
 
-/* Ribbon inferior — idêntico ao app-page-hero__ribbon */
-.page-header--standard::after {
-  background:     var(--app-hero-ribbon);
-  bottom:         0;
-  content:        "";
-  height:         3px;
-  left:           0;
-  pointer-events: none;
-  position:       absolute;
-  right:          0;
+/* Stage: fundo escuro — eyebrow, título, ações */
+.page-header--standard .page-header__stage {
+  background: var(--app-hero-stage-bg);
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+  padding:    var(--space-5) var(--space-6);
 }
 
-/* Tipografia sobre fundo escuro */
+/* Body: fundo claro — brand mark e subtítulo */
+.page-header--standard .page-header__body {
+  background: var(--app-hero-body-bg);
+  padding:    var(--space-4) var(--space-6);
+}
+
+/* Ribbon: faixa gradiente no rodapé — idêntica ao app-page-hero__ribbon */
+.page-header--standard .page-header__ribbon {
+  background:   var(--app-hero-ribbon);
+  box-shadow:   0 1px 2px rgba(7, 26, 51, 0.08);
+  height:       3px;
+  width:        100%;
+}
+
+/* Tipografia do stage (sobre fundo escuro) */
 .page-header--standard .page-header__eyebrow {
   color: var(--app-hero-eyebrow);
 }
@@ -417,12 +424,7 @@ html[data-theme="light"] {
   color: var(--app-hero-title);
 }
 
-.page-header--standard .page-header__subtitle {
-  color: rgba(255, 255, 255, 0.72);
-  max-width: 64ch;
-}
-
-/* Botões sobre fundo escuro */
+/* Botões no stage (sobre fundo escuro) */
 .page-header--standard .btn-primary {
   background:   var(--color-accent);
   border-color: var(--color-accent-hover);
