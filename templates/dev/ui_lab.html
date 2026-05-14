@@ -10,14 +10,26 @@
 
 {% block content %}
 <main class="ui-lab-page cv-ui-lab-css-bg">
-  <section>
-    <p>Desenvolvimento</p>
-    <h1>UI Lab</h1>
-    <p>Página de desenvolvimento e testes de componentes visuais.</p>
-  </section>
+  <header class="app-page-hero app-page__header app-page-hero--hybrid app-page__header--hybrid app-page-hero--compact" aria-labelledby="ui-lab-title">
+    <div class="app-page-hero__stage">
+      <span class="app-page-hero__eyebrow">UI Lab</span>
+      <h1 class="app-page-hero__title" id="ui-lab-title">Componentes visuais</h1>
+    </div>
+    <div class="app-page-hero__body">
+      <div class="app-page__hero-top">
+        <div class="app-page__brand">
+          <div class="app-page__brand-mark" aria-hidden="true">DV</div>
+          <div class="app-page__brand-copy">
+            <p class="app-page__subtitle">Ambiente de desenvolvimento para testar padrÃµes, estados e composiÃ§Ãµes visuais.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="app-page-hero__ribbon" aria-hidden="true"></div>
+  </header>
 
   <section>
-    <!-- Área vazia para testes futuros -->
+    <!-- Ãrea vazia para testes futuros -->
   </section>
 </main>
 {% endblock %}
