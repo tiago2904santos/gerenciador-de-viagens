@@ -194,11 +194,6 @@
                   <p class="app-page__subtitle">
                     Cadastro real do módulo Servidores. Nome, cargo e CPF sao obrigatorios; RG e telefone sao opcionais.
                   </p>
-                  <div class="page-header__meta">
-                    <span class="page-header__badge page-header__badge--draft">RG opcional</span>
-                    <span class="page-header__meta-sep" aria-hidden="true">·</span>
-                    <span class="page-header__meta-item">Cargo e unidade com acao acoplada</span>
-                  </div>
                 </div>
               </div>
             </div>
@@ -216,12 +211,21 @@
                 </div>
               </header>
               <div class="field-grid">
-                <div class="ui-lab-form-field field-size-3">
+                <div class="ui-lab-form-field field-size-2">
                   <label class="ui-lab-form-label" for="ui-lab-servidor-nome">Nome completo <span class="form-field__required" aria-hidden="true">*</span></label>
                   <input id="ui-lab-servidor-nome" class="form-control" type="text" value="MARIA APARECIDA SILVA" placeholder="Nome completo">
                   <p class="form-field__hint">Campo obrigatorio e normalizado em caixa alta.</p>
                 </div>
-
+                <div class="ui-lab-form-field field-size-1">
+                  <label class="ui-lab-form-label" for="ui-lab-servidor-cpf">CPF <span class="form-field__required" aria-hidden="true">*</span></label>
+                  <input id="ui-lab-servidor-cpf" class="form-control" type="text" value="123.456.789-09" placeholder="000.000.000-00" inputmode="numeric" autocomplete="off">
+                  <p class="form-field__error">CPF deve conter 11 digitos.</p>
+                </div>
+                <div class="ui-lab-form-field field-size-1">
+                  <label class="ui-lab-form-label" for="ui-lab-servidor-telefone">Telefone</label>
+                  <input id="ui-lab-servidor-telefone" class="form-control" type="text" value="(41) 99999-8888" placeholder="(00) 00000-0000" inputmode="numeric" autocomplete="off">
+                  <p class="form-field__hint">Mascara aceita 10 ou 11 digitos.</p>
+                </div>
                 <div class="ui-lab-form-field field-size-2">
                   <label class="ui-lab-form-label" for="ui-lab-servidor-cargo">Cargo <span class="form-field__required" aria-hidden="true">*</span></label>
                   <div class="field-control-row">
@@ -234,91 +238,33 @@
                   </div>
                   <p class="form-field__hint">O formulario real abre a lista de cargos sem sair do cadastro.</p>
                 </div>
-
                 <div class="ui-lab-form-field field-size-1">
-                  <label class="ui-lab-form-label" for="ui-lab-servidor-cpf">CPF <span class="form-field__required" aria-hidden="true">*</span></label>
-                  <input id="ui-lab-servidor-cpf" class="form-control" type="text" value="123.456.789-09" placeholder="000.000.000-00" inputmode="numeric" autocomplete="off">
-                  <p class="form-field__error">CPF deve conter 11 digitos.</p>
+                  <label class="ui-lab-form-label" for="ui-lab-servidor-rg">RG</label>
+                  <input id="ui-lab-servidor-rg" class="form-control" type="text" value="" placeholder="Bloqueado quando sem RG" disabled aria-disabled="true">
+                  <p class="form-field__hint">Quando o checkbox acima esta ativo, este campo fica desabilitado.</p>
+                </div>
+                <div class="ui-lab-form-field field-size-1">
+                  <label class="form-field__checkbox" for="ui-lab-servidor-sem-rg">
+                    <input id="ui-lab-servidor-sem-rg" type="checkbox" checked>
+                    <span class="form-field__checkbox-copy">
+                      <span class="form-field__checkbox-title">Não Possui RG</span>
+                    </span>
+                  </label>
                 </div>
               </div>
-            </section>
-
-            <section class="form-section" aria-labelledby="std-servidores-rg">
-              <header class="section-header">
-                <div class="section-header__copy">
-                  <h3 class="section-header__title" id="std-servidores-rg">Identificacao complementar</h3>
-                  <p class="section-header__description">
-                    RG pode ser bloqueado pelo marcador de ausencia. Telefone e opcional.
-                  </p>
-                </div>
-              </header>
-              <div class="field-grid">
-                <div class="field-group field-size-4">
-                  <div class="field-group__header">
-                    <h4 class="field-group__title">RG e bloqueio</h4>
-                  </div>
-                  <div class="field-group__body">
-                    <div class="field-grid">
-                      <div class="ui-lab-form-field field-size-2">
-                        <label class="ui-lab-form-label" for="ui-lab-servidor-sem-rg">Nao possui RG</label>
-                        <label class="form-field__checkbox" for="ui-lab-servidor-sem-rg">
-                          <input id="ui-lab-servidor-sem-rg" type="checkbox" checked>
-                          <span class="form-field__checkbox-copy">
-                            <span class="form-field__checkbox-title">Marcar como sem RG</span>
-                            <span class="form-field__hint">Bloqueia o campo RG e salva o valor canonico usado pelo sistema.</span>
-                          </span>
-                        </label>
-                      </div>
-
-                      <div class="ui-lab-form-field field-size-2">
-                        <label class="ui-lab-form-label" for="ui-lab-servidor-rg">RG</label>
-                        <input id="ui-lab-servidor-rg" class="form-control" type="text" value="" placeholder="Bloqueado quando sem RG" disabled aria-disabled="true">
-                        <p class="form-field__hint">Quando o checkbox acima esta ativo, este campo fica desabilitado.</p>
-                      </div>
-
-                      <div class="status-inline-card field-size-4">
-                        <span class="status-inline-card__badge">Bloqueado</span>
-                        <p class="form-field__hint">
-                          O cadastro real aceita RG vazio ou a marca de ausencia. A validacao impede duplicidade quando ha valor informado.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <section class="form-section" aria-labelledby="std-servidores-contato">
-              <header class="section-header">
-                <div class="section-header__copy">
-                  <h3 class="section-header__title" id="std-servidores-contato">Contato e lotacao</h3>
-                  <p class="section-header__description">
-                    Telefone e opcional. Unidade tambem e opcional e possui atalho de gerenciamento.
-                  </p>
-                </div>
-              </header>
-              <div class="field-grid">
-                <div class="ui-lab-form-field field-size-2">
-                  <label class="ui-lab-form-label" for="ui-lab-servidor-telefone">Telefone</label>
-                  <input id="ui-lab-servidor-telefone" class="form-control" type="text" value="(41) 99999-8888" placeholder="(00) 00000-0000" inputmode="numeric" autocomplete="off">
-                  <p class="form-field__hint">Mascara aceita 10 ou 11 digitos.</p>
-                </div>
-
-                <div class="ui-lab-form-field field-size-2">
-                  <label class="ui-lab-form-label" for="ui-lab-servidor-unidade">Unidade</label>
+              <div class="ui-lab-form-field field-size-4">
+                  <label class="ui-lab-form-label" for="ui-lab-servidor-unidade">Divisão/Unidade</label>
                   <div class="field-control-row">
                     <select id="ui-lab-servidor-unidade" class="form-select">
                       <option selected>Selecione (opcional)</option>
                       <option>Unidade central</option>
                       <option>Unidade operacional</option>
                     </select>
-                    <button class="btn btn-secondary btn-sm field-addon-action" type="button">Gerenciar unidades</button>
                   </div>
                   <p class="form-field__hint">A selecao e opcional e pode ficar em branco.</p>
                 </div>
-              </div>
             </section>
-
+            
             <footer class="footer-actions">
               <div class="footer-actions__secondary">
                 <button class="btn btn-secondary" type="button">Voltar</button>
@@ -330,6 +276,13 @@
           </main>
         </div>
       </div>
+
+
+
+
+
+
+
 
       <div id="std-viaturas" class="ui-lab-standard-example">
         <div class="page-shell page-shell--standard">
