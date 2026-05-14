@@ -653,7 +653,7 @@ def servidor_create(request):
         "cadastros/servidores/form.html",
         {
             "page_title": "Novo servidor",
-            "page_description": "Cadastre servidor com cargo, CPF e RG opcional.",
+            "page_description": "Nome, cargo e CPF são obrigatórios. RG e vínculo com unidade são opcionais.",
             "form": form,
             "submit_label": "Criar servidor",
             "back_url": reverse("cadastros:servidores_index"),
@@ -675,7 +675,7 @@ def servidor_update(request, pk):
         "cadastros/servidores/form.html",
         {
             "page_title": "Editar servidor",
-            "page_description": "Atualize os dados do servidor.",
+            "page_description": "Atualize os dados do servidor. RG e vínculo com unidade são opcionais.",
             "form": form,
             "submit_label": "Salvar servidor",
             "back_url": reverse("cadastros:servidores_index"),

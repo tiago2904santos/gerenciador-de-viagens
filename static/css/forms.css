@@ -629,6 +629,98 @@
   transform: none;
 }
 
+/* --------------------------------------------------------------------------
+   4.1 Field option card — checkbox compacto em linha (variante leve)
+   Usar compact=True no include de card_toggle.html.
+   -------------------------------------------------------------------------- */
+.field-option-card-wrap {
+  display: grid;
+}
+
+.field-option-card {
+  align-items: center;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  transition:
+    border-color var(--transition-base),
+    background var(--transition-base);
+  user-select: none;
+  width: 100%;
+}
+
+.field-option-card:hover {
+  border-color: var(--color-primary);
+}
+
+.field-option-card:focus-within {
+  box-shadow: 0 0 0 3px var(--color-focus-ring, rgba(21, 91, 154, 0.22));
+  outline: none;
+}
+
+.field-option-card input[type="checkbox"] {
+  accent-color: var(--color-accent);
+  flex-shrink: 0;
+  height: 18px;
+  width: 18px;
+}
+
+.field-option-card__label {
+  color: var(--color-heading);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.field-option-card__hint {
+  color: var(--color-help);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  line-height: 1.3;
+  margin-top: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   4.2 Field control row + field addon action — select com link lateral leve
+   -------------------------------------------------------------------------- */
+.field-control-row {
+  align-items: stretch;
+  display: flex;
+  gap: var(--space-2);
+}
+
+.field-control-row .form-select,
+.field-control-row .form-control {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.field-addon-action {
+  align-items: center;
+  align-self: center;
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  display: inline-flex;
+  flex-shrink: 0;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  gap: var(--space-1);
+  padding: 0 var(--space-1);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.field-addon-action:hover,
+.field-addon-action:focus-visible {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
 /* Select + ação lateral */
 .form-field-with-action__row {
   align-items: stretch;

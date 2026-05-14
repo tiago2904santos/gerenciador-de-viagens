@@ -1,42 +1,36 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 {% block title %}{{ page_title }}{% endblock %}
 {% block content %}
-  <div class="app-page">
-    <div class="app-page__shell">
-      <header class="app-page-hero app-page-hero--hybrid app-page-hero--compact" aria-labelledby="servidores-form-title">
-        <div class="app-page-hero__stage">
-          <span class="app-page-hero__eyebrow">Cadastros</span>
-          <h1 class="app-page-hero__title" id="servidores-form-title">{{ page_title }}</h1>
-        </div>
-        <div class="app-page-hero__body">
-          <div class="app-page__hero-single">
-            <div class="app-page__brand-mark" aria-hidden="true">SV</div>
-            <p class="app-page__subtitle">{{ page_description }}</p>
-          </div>
-        </div>
-        <div class="app-page-hero__ribbon" aria-hidden="true"></div>
-      </header>
+  <div class="page-shell page-shell--standard">
+    <header class="page-header page-header--clean" aria-labelledby="servidores-form-title">
+      <div class="page-header__eyebrow">Cadastros</div>
+      <h1 class="page-header__title" id="servidores-form-title">{{ page_title }}</h1>
+      <p class="page-header__description">{{ page_description }}</p>
+    </header>
 
-      <div class="app-page__form-card">
-        <form class="app-form-shell form-shell" method="post" novalidate data-servidor-sem-rg-form>
-          {% csrf_token %}
-          <div class="form-section app-form-section">
-            {% include "components/forms/form_section.html" with title="Dados do servidor" description="Nome, cargo e CPF obrigatórios. RG opcional com marcação de ausência e telefone opcional." only %}
-            <div class="form-grid app-form-grid">
-              {% include "components/forms/form_field.html" with field=form.nome only %}
-              {% include "components/forms/input_with_action.html" with field=form.cargo action_url=cargos_manage_url action_label="Gerenciar cargos" only %}
-              {% include "components/forms/form_field.html" with field=form.cpf only %}
-              {% include "components/forms/card_toggle.html" with field=form.sem_rg title="Não possui RG" description="Bloqueia o campo RG" icon="RG" only %}
-              <div class="field-span-12 field-rg-wrap" data-rg-field-wrap>
-                {% include "components/forms/form_field.html" with field=form.rg only %}
-              </div>
-              {% include "components/forms/form_field.html" with field=form.telefone only %}
-              {% include "components/forms/input_with_action.html" with field=form.unidade action_url=unidades_manage_url action_label="Gerenciar unidades" only %}
-            </div>
+    <form class="main-form-panel" method="post" novalidate data-servidor-sem-rg-form>
+      {% csrf_token %}
+      <div class="form-section">
+        <header class="section-header">
+          <h2 class="section-header__title">Identificação</h2>
+          <p class="section-header__description">Nome, cargo e CPF são obrigatórios. RG e telefone são opcionais.</p>
+        </header>
+        <div class="field-grid">
+          {% include "components/forms/form_field.html" with field=form.nome size_class="field-size-3" only %}
+          {% include "components/forms/form_field.html" with field=form.cpf size_class="field-size-1" only %}
+          {% include "components/forms/input_with_action.html" with field=form.cargo action_url=cargos_manage_url action_label="Gerenciar cargos" size_class="field-size-2" only %}
+          {% include "components/forms/form_field.html" with field=form.telefone size_class="field-size-2" only %}
+          {% include "components/forms/card_toggle.html" with field=form.sem_rg title="Não possui RG" description="Bloqueia o campo RG" compact=True size_class="field-size-2" only %}
+          <div class="field-size-2 field-rg-wrap" data-rg-field-wrap>
+            {% include "components/forms/form_field.html" with field=form.rg only %}
           </div>
-          {% include "components/forms/form_actions.html" with primary_label=submit_label secondary_label="Voltar" secondary_url=back_url only %}
-        </form>
+          {% include "components/forms/input_with_action.html" with field=form.unidade action_url=unidades_manage_url action_label="Gerenciar unidades" size_class="field-size-4" only %}
+        </div>
       </div>
-    </div>
+      <div class="footer-actions">
+        <a class="btn btn-secondary" href="{{ back_url }}">Voltar</a>
+        <button class="btn btn-primary" type="submit">{{ submit_label }}</button>
+      </div>
+    </form>
   </div>
 {% endblock %}
