@@ -5,85 +5,91 @@
    ========================================================================== */
 
 /*
- * Este arquivo protótipa padrões visuais antes de migrá-los
- * para o design system global do Central de Viagens.
- * Tudo validado aqui é candidato a se tornar padrão global.
+ * Arquivo de prototipagem visual do Central de Viagens 3.0.
+ * Regras visuais consomem tokens; valores crus ficam concentrados
+ * nas seções 1 e 2 (camada de tokens).
+ * Padrões validados aqui são candidatos a migração para o design system global.
  */
 
 
 /* ==========================================================================
-   1. Scope / Page Shell
+   1. Scope Tokens
+   Tokens estruturais e de compatibilidade válidos em ambos os temas.
    ========================================================================== */
 
 .app-shell--ui-lab {
-  isolation: isolate;
-  min-height: 100vh;
-  overflow: hidden;
-  position: relative;
+  /* Camadas de empilhamento */
+  --ui-lab-bg-z:        0;
+  --ui-lab-content-z:   1;
+
+  /* Dimensões do shell */
+  --ui-lab-shell-min-h: 100vh;
+
+  /* Sidebar — tokens ausentes no sistema global.
+     Candidatos a promoção conforme seção 6. */
+  --ui-lab-sidebar-badge-border:  rgba(255, 243, 207, 0.5);
+  --ui-lab-sidebar-active-inset:  inset 4px 0 0 var(--color-accent);
 }
 
 
 /* ==========================================================================
-   2. Background Layers
+   2. Theme Tokens
+   Paletas de cor e atmosferas de fundo por tema.
+   Valores crus de cor e gradiente permitidos apenas aqui.
    ========================================================================== */
 
-/* 2.1 Shared pseudo-elements
-   Camadas fixas de fundo renderizadas abaixo de todo o conteúdo (z-index: 0). */
-
-.app-shell--ui-lab::before,
-.app-shell--ui-lab::after {
-  content: "";
-  inset: 0;
-  pointer-events: none;
-  position: fixed;
-  z-index: 0;
-}
-
 /* --------------------------------------------------------------------------
-   2.2 Dark theme background
-   --------------------------------------------------------------------------
+   2.1 Dark Theme
 
    FUTURE DESIGN SYSTEM CANDIDATE:
-   Estes gradientes podem migrar para o tema escuro global
-   após validação no UI Lab.
+   Paleta escura com profundidade atmosférica — candidata a --app-body-bg
+   no tema dark após aprovação de produto.
    -------------------------------------------------------------------------- */
 
-html[data-theme="dark"] .app-shell--ui-lab::before {
-  background:
-    /* Realce lima no canto superior esquerdo */
+html[data-theme="dark"] .app-shell--ui-lab {
+
+  /* Tipografia sobre fundo escuro */
+  --ui-lab-color-title:   #f7fbff;
+  --ui-lab-color-text:    #edf4ff;
+  --ui-lab-color-muted:   #c4d1e3;
+  --ui-lab-color-eyebrow: #deebfb;
+
+  /* Atmosfera principal — camada ::before */
+  --ui-lab-bg-atmosphere:
+    /* Realce lima — canto superior esquerdo */
     radial-gradient(
       ellipse 125% 150% at -68% -20%,
-      rgba(218, 255, 46, 0.6) 10%,
-      rgba(218, 255, 46, 0.3) 18%,
-      rgba(218, 255, 46, 0.2) 44%,
-      transparent 100%
+      rgba(218, 255, 46, 0.6)  10%,
+      rgba(218, 255, 46, 0.3)  18%,
+      rgba(218, 255, 46, 0.2)  44%,
+      transparent              100%
     ),
-    /* Atmosfera azul no canto superior direito */
+    /* Difusão azul — lateral direita */
     radial-gradient(
       ellipse 95% 72% at 95% 25%,
       rgba(14, 165, 233, 0.2)  0%,
       rgba(14, 165, 233, 0.11) 18%,
       rgba(14, 165, 233, 0.04) 34%,
-      transparent 74%
+      transparent              74%
     ),
-    /* Lavagem teal na base esquerda */
+    /* Lavagem teal — base esquerda */
     radial-gradient(
       ellipse 85% 70% at 16% 92%,
       rgba(45, 212, 191, 0.12) 0%,
       rgba(45, 212, 191, 0.05) 22%,
-      transparent 52%
+      transparent              52%
     ),
     /* Faixa diagonal de luz */
     linear-gradient(
       142deg,
-      transparent 0%,
-      transparent 28%,
+      transparent              0%,
+      transparent              28%,
       rgba(86, 220, 255, 0.08) 42%,
       rgba(45, 212, 191, 0.05) 50%,
       rgba(14, 165, 233, 0.03) 58%,
-      transparent 90%
+      transparent              90%
     ),
-    /* Gradiente estrutural base */
+    /* Gradiente estrutural base — navy profundo */
     linear-gradient(
       145deg,
       #02070d 0%,
@@ -92,51 +98,67 @@ html[data-theme="dark"] .app-shell--ui-lab::before {
       #04111f 74%,
       #01050a 100%
     );
+
+  /* Vignette de profundidade — camada ::after */
+  --ui-lab-bg-vignette: radial-gradient(
+    circle at 50% 42%,
+    transparent       0%,
+    transparent       44%,
+    rgba(0, 0, 0, 0.16) 76%,
+    rgba(0, 0, 0, 0.36) 100%
+  );
 }
 
 /* --------------------------------------------------------------------------
-   2.3 Light theme background
-   --------------------------------------------------------------------------
+   2.2 Light Theme
 
    FUTURE DESIGN SYSTEM CANDIDATE:
-   Estes gradientes podem migrar para o tema claro global
-   após validação no UI Lab.
+   Paleta clara com off-white azulado estrutural — candidata a --app-body-bg
+   no tema light após aprovação de produto.
    -------------------------------------------------------------------------- */
 
-html[data-theme="light"] .app-shell--ui-lab::before {
-  background:
-    /* Realce lima no canto superior esquerdo */
+html[data-theme="light"] .app-shell--ui-lab {
+
+  /* Tipografia sobre fundo claro */
+  --ui-lab-color-title:   #061427;
+  --ui-lab-color-text:    #243447;
+  --ui-lab-color-muted:   #42566b;
+  --ui-lab-color-eyebrow: #3a5872;
+
+  /* Atmosfera principal — camada ::before */
+  --ui-lab-bg-atmosphere:
+    /* Realce lima — canto superior esquerdo */
     radial-gradient(
       ellipse 115% 120% at -30% 0%,
-      rgba(210, 240, 50, 0.4) 10%,
-      rgba(210, 240, 50, 0.2) 18%,
-      rgba(210, 240, 50, 0.1) 44%,
-      transparent 90%
+      rgba(210, 240, 50, 0.4)  10%,
+      rgba(210, 240, 50, 0.2)  18%,
+      rgba(210, 240, 50, 0.1)  44%,
+      transparent              90%
     ),
-    /* Atmosfera azul no canto superior direito */
+    /* Difusão azul — lateral direita */
     radial-gradient(
       ellipse 95% 72% at 85% 20%,
       rgba(14, 165, 233, 0.15) 0%,
       rgba(14, 165, 233, 0.08) 18%,
       rgba(14, 165, 233, 0.03) 34%,
-      transparent 64%
+      transparent              64%
     ),
-    /* Lavagem teal na base esquerda */
+    /* Lavagem teal — base esquerda */
     radial-gradient(
       ellipse 85% 70% at 16% 92%,
       rgba(45, 212, 191, 0.15) 0%,
       rgba(45, 212, 191, 0.06) 22%,
-      transparent 52%
+      transparent              52%
     ),
     /* Faixa diagonal de luz */
     linear-gradient(
       145deg,
-      transparent 0%,
-      transparent 28%,
+      transparent              0%,
+      transparent              28%,
       rgba(56, 189, 248, 0.1)  42%,
       rgba(45, 212, 191, 0.07) 50%,
       rgba(14, 165, 233, 0.04) 58%,
-      transparent 90%
+      transparent              90%
     ),
     /* Gradiente estrutural base — off-white azulado */
     linear-gradient(
@@ -147,26 +169,12 @@ html[data-theme="light"] .app-shell--ui-lab::before {
       #f1f5f9 74%,
       #f8fafc 100%
     );
-}
 
-/* 2.4 Vignette de profundidade
-   Camada sutil sobre o background para dar peso às bordas sem escurecer o centro. */
-
-html[data-theme="dark"] .app-shell--ui-lab::after {
-  background: radial-gradient(
+  /* Vignette de profundidade — camada ::after */
+  --ui-lab-bg-vignette: radial-gradient(
     circle at 50% 42%,
-    transparent 0%,
-    transparent 44%,
-    rgba(0, 0, 0, 0.16) 76%,
-    rgba(0, 0, 0, 0.36) 100%
-  );
-}
-
-html[data-theme="light"] .app-shell--ui-lab::after {
-  background: radial-gradient(
-    circle at 50% 42%,
-    transparent 0%,
-    transparent 46%,
+    transparent              0%,
+    transparent              46%,
     rgba(104, 128, 152, 0.04) 78%,
     rgba(104, 128, 152, 0.1)  100%
   );
@@ -174,20 +182,49 @@ html[data-theme="light"] .app-shell--ui-lab::after {
 
 
 /* ==========================================================================
-   3. Stacking Context & Content Reset
+   3. Shell and Background Layers
    ========================================================================== */
 
-/* Eleva o conteúdo acima das camadas de background (z-index: 0). */
+/* Cria contexto de isolamento para que as camadas de fundo não escapem
+   do shell nem afetem elementos externos. */
+
+.app-shell--ui-lab {
+  isolation: isolate;
+  min-height: var(--ui-lab-shell-min-h);
+  overflow: hidden;
+  position: relative;
+}
+
+/* Pseudo-elementos de fundo — posição fixa, abaixo de todo o conteúdo. */
+
+.app-shell--ui-lab::before,
+.app-shell--ui-lab::after {
+  content: "";
+  inset: 0;
+  pointer-events: none;
+  position: fixed;
+  z-index: var(--ui-lab-bg-z);
+}
+
+.app-shell--ui-lab::before { background: var(--ui-lab-bg-atmosphere); }
+.app-shell--ui-lab::after  { background: var(--ui-lab-bg-vignette);   }
+
+
+/* ==========================================================================
+   4. Stacking Context
+   ========================================================================== */
+
+/* Eleva o conteúdo e o sidebar acima das camadas de background. */
 
 .app-shell--ui-lab .app-main,
 .app-shell--ui-lab .content-wrap,
 .app-shell--ui-lab .ui-lab-page,
 .app-shell--ui-lab .cv-ui-lab-css-bg {
   position: relative;
-  z-index: 1;
+  z-index: var(--ui-lab-content-z);
 }
 
-/* Neutraliza backgrounds herdados do layout base para expor as camadas de fundo. */
+/* Neutraliza backgrounds herdados do layout base para expor o fundo do UI Lab. */
 
 .app-shell--ui-lab .app-main,
 .app-shell--ui-lab .ui-lab-page,
@@ -198,51 +235,17 @@ html[data-theme="light"] .app-shell--ui-lab::after {
 
 
 /* ==========================================================================
-   4. UI Lab Local Tokens
-   ========================================================================== */
-
-/*
- * Tokens de tipografia restritos ao UI Lab.
- * Usados na introdução hero e em futuras seções de protótipo.
- *
- * FUTURE DESIGN SYSTEM CANDIDATE:
- * Podem migrar para o tema global se aprovados como padrão de tipografia.
- */
-
-/* 4.1 Dark theme tokens */
-
-html[data-theme="dark"] .app-shell--ui-lab {
-  --cv-ui-lab-title:      #f7fbff;
-  --cv-ui-lab-text:       #edf4ff;
-  --cv-ui-lab-text-muted: #c4d1e3;
-  --cv-ui-lab-eyebrow:    #deebfb;
-}
-
-/* 4.2 Light theme tokens */
-
-html[data-theme="light"] .app-shell--ui-lab {
-  --cv-ui-lab-title:      #061427;
-  --cv-ui-lab-text:       #243447;
-  --cv-ui-lab-text-muted: #42566b;
-  --cv-ui-lab-eyebrow:    #3a5872;
-}
-
-
-/* ==========================================================================
    5. Sidebar Compatibility Layer
    ========================================================================== */
 
 /*
  * O background do UI Lab é aplicado via ::before/::after no app-shell.
- * Sem estes overrides, as camadas de fundo podem vazar visualmente
- * para dentro do sidebar (position: relative por padrão).
- *
- * Este bloco reafirma os tokens oficiais do sistema no sidebar,
- * garantindo que o UI Lab não crie um menu lateral alternativo.
- * O sidebar deve permanecer idêntico ao de qualquer outra página.
+ * Este bloco reafirma os tokens oficiais do sidebar para garantir que
+ * as camadas de fundo não degradem o menu lateral.
+ * O sidebar do UI Lab deve ser visualmente idêntico ao de qualquer outra página.
  */
 
-/* 5.1 Sidebar surface */
+/* 5.1 Surface */
 
 .app-shell--ui-lab .sidebar {
   background:   var(--sidebar-surface);
@@ -259,7 +262,7 @@ html[data-theme="light"] .app-shell--ui-lab {
   color:      var(--sidebar-footer-fg);
 }
 
-/* 5.2 Sidebar brand */
+/* 5.2 Brand */
 
 .app-shell--ui-lab .sidebar-brand {
   color: var(--sidebar-brand-fg);
@@ -267,11 +270,11 @@ html[data-theme="light"] .app-shell--ui-lab {
 
 .app-shell--ui-lab .sidebar-brand-badge {
   background: var(--sidebar-badge-bg);
-  border:     1px solid rgba(255, 243, 207, 0.5);
+  border:     1px solid var(--ui-lab-sidebar-badge-border);
   color:      var(--color-white);
 }
 
-/* 5.3 Sidebar links */
+/* 5.3 Links */
 
 .app-shell--ui-lab :is(.sidebar-link--module, .sidebar-link--cadastros) {
   background:   var(--sidebar-link-surface);
@@ -292,7 +295,7 @@ html[data-theme="light"] .app-shell--ui-lab {
   color: var(--sidebar-fg-heading);
 }
 
-/* 5.4 Sidebar active/hover states */
+/* 5.4 Active / Hover */
 
 .app-shell--ui-lab :is(
   .sidebar-link--module,
@@ -308,13 +311,13 @@ html[data-theme="light"] .app-shell--ui-lab {
   .sidebar-module-expand,
   .sidebar-link--cadastros
 ).is-active {
-  background:  var(--sidebar-active-bg);
+  background:   var(--sidebar-active-bg);
   border-color: var(--sidebar-active-border);
-  box-shadow:  inset 4px 0 0 var(--color-accent);
-  color:       var(--sidebar-active-fg);
+  box-shadow:   var(--ui-lab-sidebar-active-inset);
+  color:        var(--sidebar-active-fg);
 }
 
-/* 5.5 Sidebar theme switcher */
+/* 5.5 Theme switcher */
 
 .app-shell--ui-lab .sidebar-theme__label {
   color: var(--sidebar-footer-fg);
@@ -337,46 +340,25 @@ html[data-theme="light"] .app-shell--ui-lab {
 
 
 /* ==========================================================================
-   7. UI Lab Hero / Page Intro
+   6. Future Design System Notes
    ========================================================================== */
 
 /*
- * Tipografia da seção introdutória do UI Lab.
- * Usa os tokens locais definidos na seção 4.
+ * Candidatos a promoção para o design system global após validação:
  *
- * FUTURE DESIGN SYSTEM CANDIDATE:
- * Escala tipográfica e espaçamentos podem migrar para um componente
- * de hero global depois de validados aqui.
+ * — --ui-lab-bg-atmosphere (dark/light)
+ *   → --app-body-bg por tema. Substitui os gradientes atuais de fundo global.
+ *
+ * — --ui-lab-color-* (title, text, muted, eyebrow)
+ *   → Escala de texto sobre fundos atmosféricos. Candidata a tokens de
+ *     contraste no style guide global (ex.: --color-on-atmosphere-*).
+ *
+ * — --ui-lab-sidebar-badge-border
+ *   → --sidebar-badge-border no sistema de tokens do sidebar.
+ *
+ * — --ui-lab-sidebar-active-inset
+ *   → --sidebar-active-inset ou parte de --sidebar-active-shadow global.
+ *
+ * Nota: o hero do UI Lab é renderizado pelo componente global app-page-hero.
+ * Estilos tipográficos do hero seguem os tokens de --app-hero-* do sistema.
  */
-
-html[data-theme="light"] .app-shell--ui-lab .ui-lab-page {
-  display: grid;
-  gap:     clamp(20px, 2vw, 28px);
-  padding: 8px 0 0;
-}
-
-html[data-theme="light"] .app-shell--ui-lab .ui-lab-page > section:first-child > p:first-child {
-  color:          var(--cv-ui-lab-eyebrow);
-  font-size:      12px;
-  font-weight:    700;
-  letter-spacing: 0.14em;
-  margin-bottom:  8px;
-  text-transform: uppercase;
-}
-
-html[data-theme="light"] .app-shell--ui-lab .ui-lab-page > section:first-child > h1 {
-  color:          var(--cv-ui-lab-title);
-  font-size:      clamp(2.2rem, 3vw, 3rem);
-  font-weight:    800;
-  letter-spacing: -0.03em;
-  line-height:    1.04;
-  margin:         0 0 10px;
-}
-
-html[data-theme="light"] .app-shell--ui-lab .ui-lab-page > section:first-child > p:last-child {
-  color:      var(--cv-ui-lab-text-muted);
-  font-size:  1rem;
-  line-height: 1.6;
-  margin:     0;
-  max-width:  42rem;
-}
