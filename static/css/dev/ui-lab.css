@@ -1,17 +1,37 @@
+/* ==========================================================================
+   UI Lab — Visual Prototype Layer
+   Carregado apenas em /dev/ui-lab/ via extra_css no template.
+   Escopo controlado pela classe .app-shell--ui-lab no shell raiz.
+   ========================================================================== */
+
 /*
- * UI Lab dev-only background.
- * Loaded only on /dev/ui-lab/ through extra_css.
+ * Este arquivo protótipa padrões visuais antes de migrá-los
+ * para o design system global do Central de Viagens.
+ * Tudo validado aqui é candidato a se tornar padrão global.
  */
 
-.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) {
-  position: relative;
+
+/* ==========================================================================
+   1. Scope / Page Shell
+   ========================================================================== */
+
+.app-shell--ui-lab {
   isolation: isolate;
   min-height: 100vh;
   overflow: hidden;
+  position: relative;
 }
 
-.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg)::before,
-.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg)::after {
+
+/* ==========================================================================
+   2. Background Layers
+   ========================================================================== */
+
+/* 2.1 Shared pseudo-elements
+   Camadas fixas de fundo renderizadas abaixo de todo o conteúdo (z-index: 0). */
+
+.app-shell--ui-lab::before,
+.app-shell--ui-lab::after {
   content: "";
   inset: 0;
   pointer-events: none;
@@ -19,8 +39,18 @@
   z-index: 0;
 }
 
-html[data-theme="dark"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg)::before {
+/* --------------------------------------------------------------------------
+   2.2 Dark theme background
+   --------------------------------------------------------------------------
+
+   FUTURE DESIGN SYSTEM CANDIDATE:
+   Estes gradientes podem migrar para o tema escuro global
+   após validação no UI Lab.
+   -------------------------------------------------------------------------- */
+
+html[data-theme="dark"] .app-shell--ui-lab::before {
   background:
+    /* Realce lima no canto superior esquerdo */
     radial-gradient(
       ellipse 125% 150% at -68% -20%,
       rgba(218, 255, 46, 0.6) 10%,
@@ -28,19 +58,22 @@ html[data-theme="dark"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg)::before 
       rgba(218, 255, 46, 0.2) 44%,
       transparent 100%
     ),
+    /* Atmosfera azul no canto superior direito */
     radial-gradient(
       ellipse 95% 72% at 95% 25%,
-      rgba(14, 165, 233, 0.2) 0%,
+      rgba(14, 165, 233, 0.2)  0%,
       rgba(14, 165, 233, 0.11) 18%,
       rgba(14, 165, 233, 0.04) 34%,
       transparent 74%
     ),
+    /* Lavagem teal na base esquerda */
     radial-gradient(
       ellipse 85% 70% at 16% 92%,
       rgba(45, 212, 191, 0.12) 0%,
       rgba(45, 212, 191, 0.05) 22%,
       transparent 52%
     ),
+    /* Faixa diagonal de luz */
     linear-gradient(
       142deg,
       transparent 0%,
@@ -50,6 +83,7 @@ html[data-theme="dark"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg)::before 
       rgba(14, 165, 233, 0.03) 58%,
       transparent 90%
     ),
+    /* Gradiente estrutural base */
     linear-gradient(
       145deg,
       #02070d 0%,
@@ -60,218 +94,289 @@ html[data-theme="dark"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg)::before 
     );
 }
 
-html[data-theme="dark"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg)::after {
-  background:
-    radial-gradient(
-      circle at 50% 42%,
-      transparent 0%,
-      transparent 44%,
-      rgba(0, 0, 0, 0.16) 76%,
-      rgba(0, 0, 0, 0.36) 100%
-    );
-}
+/* --------------------------------------------------------------------------
+   2.3 Light theme background
+   --------------------------------------------------------------------------
 
-html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg)::before {
+   FUTURE DESIGN SYSTEM CANDIDATE:
+   Estes gradientes podem migrar para o tema claro global
+   após validação no UI Lab.
+   -------------------------------------------------------------------------- */
+
+html[data-theme="light"] .app-shell--ui-lab::before {
   background:
-    /* 1. O detalhe Lima/Amarelo (ajustado para não sumir no branco) */
+    /* Realce lima no canto superior esquerdo */
     radial-gradient(
       ellipse 115% 120% at -30% 0%,
-      rgba(210, 240, 50, 0.4) 10%,  /* Lima com menos brilho, mais cor */
+      rgba(210, 240, 50, 0.4) 10%,
       rgba(210, 240, 50, 0.2) 18%,
       rgba(210, 240, 50, 0.1) 44%,
       transparent 90%
     ),
-    /* 2. O azul vibrante do canto superior direito */
+    /* Atmosfera azul no canto superior direito */
     radial-gradient(
       ellipse 95% 72% at 85% 20%,
-      rgba(14, 165, 233, 0.15) 0%, 
+      rgba(14, 165, 233, 0.15) 0%,
       rgba(14, 165, 233, 0.08) 18%,
       rgba(14, 165, 233, 0.03) 34%,
       transparent 64%
     ),
-    /* 3. O toque de Ciano/Teal inferior */
+    /* Lavagem teal na base esquerda */
     radial-gradient(
       ellipse 85% 70% at 16% 92%,
       rgba(45, 212, 191, 0.15) 0%,
       rgba(45, 212, 191, 0.06) 22%,
       transparent 52%
     ),
-    /* 4. A faixa diagonal de luz colorida */
+    /* Faixa diagonal de luz */
     linear-gradient(
       145deg,
       transparent 0%,
       transparent 28%,
-      rgba(56, 189, 248, 0.1) 42%,  /* Sky blue */
-      rgba(45, 212, 191, 0.07) 50%, /* Teal */
-      rgba(14, 165, 233, 0.04) 58%, /* Ocean blue */
+      rgba(56, 189, 248, 0.1)  42%,
+      rgba(45, 212, 191, 0.07) 50%,
+      rgba(14, 165, 233, 0.04) 58%,
       transparent 90%
     ),
-    /* 5. O fundo estrutural (substituindo o preto pelo "Off-White" azulado) */
+    /* Gradiente estrutural base — off-white azulado */
     linear-gradient(
       145deg,
-      #f8fafc 0%,   /* Slate 50 */
-      #f1f5f9 18%,  /* Slate 100 */
-      #e2e8f0 46%,  /* Slate 200 - Aqui é onde o contraste acontece */
+      #f8fafc 0%,
+      #f1f5f9 18%,
+      #e2e8f0 46%,
       #f1f5f9 74%,
       #f8fafc 100%
     );
 }
 
-html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg)::after {
-  background:
-    radial-gradient(
-      circle at 50% 42%,
-      transparent 0%,
-      transparent 46%,
-      rgba(104, 128, 152, 0.04) 78%,
-      rgba(104, 128, 152, 0.1) 100%
-    );
+/* 2.4 Vignette de profundidade
+   Camada sutil sobre o background para dar peso às bordas sem escurecer o centro. */
+
+html[data-theme="dark"] .app-shell--ui-lab::after {
+  background: radial-gradient(
+    circle at 50% 42%,
+    transparent 0%,
+    transparent 44%,
+    rgba(0, 0, 0, 0.16) 76%,
+    rgba(0, 0, 0, 0.36) 100%
+  );
 }
 
-.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .app-main,
-.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .content-wrap,
-.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .ui-lab-page,
-.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .cv-ui-lab-css-bg {
+html[data-theme="light"] .app-shell--ui-lab::after {
+  background: radial-gradient(
+    circle at 50% 42%,
+    transparent 0%,
+    transparent 46%,
+    rgba(104, 128, 152, 0.04) 78%,
+    rgba(104, 128, 152, 0.1)  100%
+  );
+}
+
+
+/* ==========================================================================
+   3. Stacking Context & Content Reset
+   ========================================================================== */
+
+/* Eleva o conteúdo acima das camadas de background (z-index: 0). */
+
+.app-shell--ui-lab .app-main,
+.app-shell--ui-lab .content-wrap,
+.app-shell--ui-lab .ui-lab-page,
+.app-shell--ui-lab .cv-ui-lab-css-bg {
   position: relative;
   z-index: 1;
 }
 
-html[data-theme="dark"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) {
-  --cv-ui-lab-title: #f7fbff;
-  --cv-ui-lab-text: #edf4ff;
-  --cv-ui-lab-text-muted: #c4d1e3;
-  --cv-ui-lab-eyebrow: #deebfb;
-}
+/* Neutraliza backgrounds herdados do layout base para expor as camadas de fundo. */
 
-html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) {
-  --cv-ui-lab-title: #061427;
-  --cv-ui-lab-text: #243447;
-  --cv-ui-lab-text-muted: #42566b;
-  --cv-ui-lab-eyebrow: #3a5872;
-}
-
-.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar {
-  background: var(--sidebar-surface);
-  border-right: 1px solid var(--sidebar-border);
-  box-shadow: var(--sidebar-shadow);
-}
-
-.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-header {
-  border-bottom: 1px solid var(--sidebar-border);
-}
-
-.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-footer {
-  border-top: 1px solid var(--sidebar-border);
-  color: var(--sidebar-footer-fg);
-}
-
-.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-brand {
-  color: var(--sidebar-brand-fg);
-}
-
-.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-brand-badge {
-  background: var(--sidebar-badge-bg);
-  border: 1px solid rgba(255, 243, 207, 0.5);
-  color: var(--color-white);
-}
-
-.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-link--module,
-.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-link--cadastros {
-  background: var(--sidebar-link-surface);
-  border-color: var(--sidebar-link-border);
-  color: var(--sidebar-link-fg);
-}
-
-.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-item-icon {
-  background: var(--sidebar-icon-bg);
-  color: var(--sidebar-icon-fg);
-}
-
-.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-link--module:hover,
-.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-module-expand:hover,
-.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-link--cadastros:hover,
-.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-link--module:focus-visible,
-.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-module-expand:focus-visible,
-.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-link--cadastros:focus-visible {
-  background: var(--sidebar-link-hover-bg);
-  color: var(--sidebar-brand-fg);
-}
-
-.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-link--module.is-active,
-.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-module-expand.is-active,
-.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-link--cadastros.is-active {
-  background: var(--sidebar-active-bg);
-  border-color: var(--sidebar-active-border);
-  box-shadow: inset 4px 0 0 var(--color-accent);
-  color: var(--sidebar-active-fg);
-}
-
-.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-panel {
-  border-left-color: var(--sidebar-panel-border);
-}
-
-.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-module-expand__chevron {
-  color: var(--sidebar-fg-heading);
-}
-
-.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-theme__label {
-  color: var(--sidebar-footer-fg);
-}
-
-.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .app-theme-grid__btn {
-  background: var(--sidebar-link-surface);
-  border: 1px solid var(--sidebar-link-border);
-  color: var(--sidebar-fg-soft);
-}
-
-.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .app-theme-grid__btn:hover,
-.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .app-theme-grid__btn:focus-visible {
-  color: var(--sidebar-brand-fg);
-}
-
-.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .app-theme-grid__btn[aria-pressed="true"],
-.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .app-theme-grid__btn[aria-checked="true"] {
-  background: var(--sidebar-theme-active-bg);
-  color: var(--color-white);
-}
-
-.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .app-main,
-.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .ui-lab-page,
-.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .cv-ui-lab-css-bg {
+.app-shell--ui-lab .app-main,
+.app-shell--ui-lab .ui-lab-page,
+.app-shell--ui-lab .cv-ui-lab-css-bg {
   background-color: transparent;
   background-image: none;
 }
 
-html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .ui-lab-page {
+
+/* ==========================================================================
+   4. UI Lab Local Tokens
+   ========================================================================== */
+
+/*
+ * Tokens de tipografia restritos ao UI Lab.
+ * Usados na introdução hero e em futuras seções de protótipo.
+ *
+ * FUTURE DESIGN SYSTEM CANDIDATE:
+ * Podem migrar para o tema global se aprovados como padrão de tipografia.
+ */
+
+/* 4.1 Dark theme tokens */
+
+html[data-theme="dark"] .app-shell--ui-lab {
+  --cv-ui-lab-title:      #f7fbff;
+  --cv-ui-lab-text:       #edf4ff;
+  --cv-ui-lab-text-muted: #c4d1e3;
+  --cv-ui-lab-eyebrow:    #deebfb;
+}
+
+/* 4.2 Light theme tokens */
+
+html[data-theme="light"] .app-shell--ui-lab {
+  --cv-ui-lab-title:      #061427;
+  --cv-ui-lab-text:       #243447;
+  --cv-ui-lab-text-muted: #42566b;
+  --cv-ui-lab-eyebrow:    #3a5872;
+}
+
+
+/* ==========================================================================
+   5. Sidebar Compatibility Layer
+   ========================================================================== */
+
+/*
+ * O background do UI Lab é aplicado via ::before/::after no app-shell.
+ * Sem estes overrides, as camadas de fundo podem vazar visualmente
+ * para dentro do sidebar (position: relative por padrão).
+ *
+ * Este bloco reafirma os tokens oficiais do sistema no sidebar,
+ * garantindo que o UI Lab não crie um menu lateral alternativo.
+ * O sidebar deve permanecer idêntico ao de qualquer outra página.
+ */
+
+/* 5.1 Sidebar surface */
+
+.app-shell--ui-lab .sidebar {
+  background:   var(--sidebar-surface);
+  border-right: 1px solid var(--sidebar-border);
+  box-shadow:   var(--sidebar-shadow);
+}
+
+.app-shell--ui-lab .sidebar-header {
+  border-bottom: 1px solid var(--sidebar-border);
+}
+
+.app-shell--ui-lab .sidebar-footer {
+  border-top: 1px solid var(--sidebar-border);
+  color:      var(--sidebar-footer-fg);
+}
+
+/* 5.2 Sidebar brand */
+
+.app-shell--ui-lab .sidebar-brand {
+  color: var(--sidebar-brand-fg);
+}
+
+.app-shell--ui-lab .sidebar-brand-badge {
+  background: var(--sidebar-badge-bg);
+  border:     1px solid rgba(255, 243, 207, 0.5);
+  color:      var(--color-white);
+}
+
+/* 5.3 Sidebar links */
+
+.app-shell--ui-lab :is(.sidebar-link--module, .sidebar-link--cadastros) {
+  background:   var(--sidebar-link-surface);
+  border-color: var(--sidebar-link-border);
+  color:        var(--sidebar-link-fg);
+}
+
+.app-shell--ui-lab .sidebar-item-icon {
+  background: var(--sidebar-icon-bg);
+  color:      var(--sidebar-icon-fg);
+}
+
+.app-shell--ui-lab .sidebar-panel {
+  border-left-color: var(--sidebar-panel-border);
+}
+
+.app-shell--ui-lab .sidebar-module-expand__chevron {
+  color: var(--sidebar-fg-heading);
+}
+
+/* 5.4 Sidebar active/hover states */
+
+.app-shell--ui-lab :is(
+  .sidebar-link--module,
+  .sidebar-module-expand,
+  .sidebar-link--cadastros
+):is(:hover, :focus-visible) {
+  background: var(--sidebar-link-hover-bg);
+  color:      var(--sidebar-brand-fg);
+}
+
+.app-shell--ui-lab :is(
+  .sidebar-link--module,
+  .sidebar-module-expand,
+  .sidebar-link--cadastros
+).is-active {
+  background:  var(--sidebar-active-bg);
+  border-color: var(--sidebar-active-border);
+  box-shadow:  inset 4px 0 0 var(--color-accent);
+  color:       var(--sidebar-active-fg);
+}
+
+/* 5.5 Sidebar theme switcher */
+
+.app-shell--ui-lab .sidebar-theme__label {
+  color: var(--sidebar-footer-fg);
+}
+
+.app-shell--ui-lab .app-theme-grid__btn {
+  background: var(--sidebar-link-surface);
+  border:     1px solid var(--sidebar-link-border);
+  color:      var(--sidebar-fg-soft);
+}
+
+.app-shell--ui-lab .app-theme-grid__btn:is(:hover, :focus-visible) {
+  color: var(--sidebar-brand-fg);
+}
+
+.app-shell--ui-lab .app-theme-grid__btn:is([aria-pressed="true"], [aria-checked="true"]) {
+  background: var(--sidebar-theme-active-bg);
+  color:      var(--color-white);
+}
+
+
+/* ==========================================================================
+   7. UI Lab Hero / Page Intro
+   ========================================================================== */
+
+/*
+ * Tipografia da seção introdutória do UI Lab.
+ * Usa os tokens locais definidos na seção 4.
+ *
+ * FUTURE DESIGN SYSTEM CANDIDATE:
+ * Escala tipográfica e espaçamentos podem migrar para um componente
+ * de hero global depois de validados aqui.
+ */
+
+html[data-theme="light"] .app-shell--ui-lab .ui-lab-page {
   display: grid;
-  gap: clamp(20px, 2vw, 28px);
+  gap:     clamp(20px, 2vw, 28px);
   padding: 8px 0 0;
 }
 
-
-
-html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .ui-lab-page > section:first-child > p:first-child {
-  color: var(--cv-ui-lab-eyebrow);
-  font-size: 12px;
-  font-weight: 700;
+html[data-theme="light"] .app-shell--ui-lab .ui-lab-page > section:first-child > p:first-child {
+  color:          var(--cv-ui-lab-eyebrow);
+  font-size:      12px;
+  font-weight:    700;
   letter-spacing: 0.14em;
-  margin-bottom: 8px;
+  margin-bottom:  8px;
   text-transform: uppercase;
 }
 
-html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .ui-lab-page > section:first-child > h1 {
-  color: var(--cv-ui-lab-title);
-  font-size: clamp(2.2rem, 3vw, 3rem);
-  font-weight: 800;
+html[data-theme="light"] .app-shell--ui-lab .ui-lab-page > section:first-child > h1 {
+  color:          var(--cv-ui-lab-title);
+  font-size:      clamp(2.2rem, 3vw, 3rem);
+  font-weight:    800;
   letter-spacing: -0.03em;
-  line-height: 1.04;
-  margin: 0 0 10px;
+  line-height:    1.04;
+  margin:         0 0 10px;
 }
 
-html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .ui-lab-page > section:first-child > p:last-child {
-  color: var(--cv-ui-lab-text-muted);
-  font-size: 1rem;
+html[data-theme="light"] .app-shell--ui-lab .ui-lab-page > section:first-child > p:last-child {
+  color:      var(--cv-ui-lab-text-muted);
+  font-size:  1rem;
   line-height: 1.6;
-  margin: 0;
-  max-width: 42rem;
+  margin:     0;
+  max-width:  42rem;
 }

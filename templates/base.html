@@ -11,7 +11,7 @@
   {% block extra_css %}{% endblock %}
 </head>
 <body>
-  <div class="app-shell">
+  <div class="app-shell {% block shell_class %}{% endblock %}">
     {% include "components/layout/sidebar.html" %}
     <main class="app-main">
       <section class="content-wrap">
