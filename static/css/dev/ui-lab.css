@@ -22,11 +22,11 @@
 html[data-theme="dark"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg)::before {
   background:
     radial-gradient(
-      ellipse 115% 130% at -48% -10%,
+      ellipse 125% 150% at -68% -20%,
       rgba(218, 255, 46, 0.6) 10%,
       rgba(218, 255, 46, 0.3) 18%,
       rgba(218, 255, 46, 0.2) 44%,
-      transparent 90%
+      transparent 100%
     ),
     radial-gradient(
       ellipse 95% 72% at 95% 25%,
