@@ -7,6 +7,7 @@
   position: relative;
   isolation: isolate;
   min-height: 100vh;
+  overflow: hidden;
 }
 
 .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg)::before,
@@ -21,18 +22,18 @@
 html[data-theme="dark"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg)::before {
   background:
     radial-gradient(
-      ellipse 115% 88% at -12% -6%,
-      rgba(245, 204, 99, 0.22) 0%,
-      rgba(245, 204, 99, 0.11) 18%,
-      rgba(245, 204, 99, 0.04) 34%,
-      transparent 56%
+      ellipse 115% 120% at -30% 0%,
+      rgba(255, 200, 62, 0.5) 10%,
+      rgba(255, 200, 62, 0.3) 18%,
+      rgba(255, 200, 62, 0.25) 34%,
+      transparent 76%
     ),
     radial-gradient(
-      ellipse 95% 72% at 78% 18%,
+      ellipse 95% 72% at 85% 20%,
       rgba(14, 165, 233, 0.2) 0%,
       rgba(14, 165, 233, 0.11) 18%,
       rgba(14, 165, 233, 0.04) 34%,
-      transparent 54%
+      transparent 64%
     ),
     radial-gradient(
       ellipse 85% 70% at 16% 92%,
@@ -47,7 +48,7 @@ html[data-theme="dark"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg)::before 
       rgba(86, 220, 255, 0.08) 42%,
       rgba(45, 212, 191, 0.05) 50%,
       rgba(14, 165, 233, 0.03) 58%,
-      transparent 72%
+      transparent 90%
     ),
     linear-gradient(
       145deg,
@@ -123,14 +124,22 @@ html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg)::after 
 }
 
 .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar,
-.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .app-main {
+.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .app-main,
+.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .content-wrap,
+.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .ui-lab-page,
+.app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .cv-ui-lab-css-bg {
   position: relative;
   z-index: 1;
 }
 
 html[data-theme="dark"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar {
   background:
-    linear-gradient(180deg, rgba(3, 11, 18, 0.78), rgba(3, 11, 18, 0.66));
+    linear-gradient(
+      180deg,
+      rgba(2, 7, 13, 0.76),
+      rgba(3, 14, 24, 0.68),
+      rgba(2, 7, 13, 0.78)
+    );
   backdrop-filter: blur(18px) saturate(118%);
   -webkit-backdrop-filter: blur(18px) saturate(118%);
   border-right: 1px solid rgba(255, 255, 255, 0.08);
@@ -152,7 +161,7 @@ html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sideba
 
 html[data-theme="dark"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-header,
 html[data-theme="dark"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-footer {
-  background: rgba(2, 7, 13, 0.22);
+  background: rgba(2, 7, 13, 0.18);
 }
 
 html[data-theme="light"] .app-shell:has(.ui-lab-page, .cv-ui-lab-css-bg) .sidebar-header,
