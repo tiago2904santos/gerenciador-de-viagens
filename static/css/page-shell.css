@@ -5,19 +5,33 @@
    Hierarquia obrigatória para telas de formulário, fluxo em etapas e lista:
 
    Background
-   └── Page Shell (.page-shell[--standard|--wizard|--list])
-       ├── Page Header (.page-header[--standard|--wizard|--list])
-       ├── Stepper / Navegação (.page-stepper)       [wizard]
-       ├── Main Form Panel (.main-form-panel)         [standard|wizard]
-       │   ├── Form Section (.form-section)
+   └── Page Shell (.page-shell[--standard-simple|--standard|--wizard|--list])
+       ├── Page Header Limpo (.page-header.page-header--clean)
+       │   ├── Stage (dark): eyebrow + título
+       │   ├── Body (light): brand mark + subtítulo + metadados opcionais
+       │   └── Ribbon: faixa gradiente
+       ├── Stepper (.page-stepper)              [wizard]
+       ├── Main Form Panel (.main-form-panel)   [standard-simple|standard|wizard]
+       │   ├── Form Section (.form-section) — sempre 100%
        │   │   ├── Section Header (.section-header)
-       │   │   ├── Field Grid (.field-grid)
-       │   │   └── Field Group (.field-group)         [opcional]
+       │   │   ├── Field Grid (.field-grid) — 4 colunas
+       │   │   │   ├── .field-size-1  (span 1)
+       │   │   │   ├── .field-size-2  (span 2)
+       │   │   │   ├── .field-size-3  (span 3)
+       │   │   │   └── .field-size-4  (span 4 / linha inteira)
+       │   │   └── Field Group (.field-group)   [opcional]
        │   └── Footer Actions (.footer-actions)
-       └── List Panel (.list-panel)                   [list]
+       └── List Panel (.list-panel)             [list]
            ├── Filter Bar (.filter-bar)
+           │   ├── Controls (.filter-bar__controls)
+           │   └── Actions (.filter-bar__actions)
            ├── List Content (.list-content)
            └── Pagination (.pagination-shell)
+
+   REGRAS GLOBAIS:
+   1. Page Header jamais contém botões.
+   2. Form Section sempre ocupa 100% do painel.
+   3. Field Grid usa sempre 4 colunas no desktop.
    ========================================================================== */
 
 
@@ -27,14 +41,14 @@
 
 :root {
   /* --- Layout --- */
-  --layout-page-max-width:       var(--page-max-width);
-  --layout-page-padding-x:       var(--space-8);
-  --layout-page-padding-y:       var(--space-6);
-  --layout-shell-gap:            var(--space-6);
-  --layout-section-gap:          var(--space-5);
-  --layout-form-panel-max-width: 960px;
-  --layout-list-panel-max-width: var(--page-max-width);
-  --layout-field-grid-gap:       var(--space-4);
+  --layout-page-max-width:              var(--page-max-width);
+  --layout-page-padding-x:             var(--space-8);
+  --layout-page-padding-y:             var(--space-6);
+  --layout-shell-gap:                  var(--space-6);
+  --layout-section-gap:                var(--space-5);
+  --layout-form-panel-max-width:       960px;
+--layout-list-panel-max-width:       var(--page-max-width);
+  --layout-field-grid-gap:             var(--space-4);
 
   /* --- Espaçamento estendido --- */
   --space-12: 48px;
@@ -43,17 +57,17 @@
   --radius-2xl: 40px;
 
   /* --- Page Shell --- */
-  --page-shell-gap:        var(--space-6);
-  --page-shell-padding-y:  var(--space-6);
-  --page-shell-max-width:  var(--page-max-width);
+  --page-shell-gap:       var(--space-6);
+  --page-shell-padding-y: var(--space-6);
+  --page-shell-max-width: var(--page-max-width);
 
   /* --- Form Panel --- */
-  --form-panel-radius:     var(--radius-lg);
+  --form-panel-radius: var(--radius-lg);
 
   /* --- Form Section --- */
-  --form-section-padding-x:   var(--space-6);
-  --form-section-padding-y:   var(--space-5);
-  --form-section-inner-gap:   var(--space-5);
+  --form-section-padding-x: var(--space-6);
+  --form-section-padding-y: var(--space-5);
+  --form-section-inner-gap: var(--space-5);
 
   /* --- Field Grid --- */
   --field-grid-gap: var(--space-4);
@@ -64,11 +78,11 @@
   --field-group-gap:     var(--space-3);
 
   /* --- Stepper --- */
-  --stepper-padding-x:  var(--space-6);
-  --stepper-padding-y:  var(--space-4);
-  --stepper-radius:     var(--radius-lg);
-  --stepper-item-size:  28px;
-  --stepper-gap:        var(--space-2);
+  --stepper-padding-x: var(--space-6);
+  --stepper-padding-y: var(--space-4);
+  --stepper-radius:    var(--radius-lg);
+  --stepper-item-size: 28px;
+  --stepper-gap:       var(--space-2);
 
   /* --- Footer Actions --- */
   --footer-actions-padding-x: var(--space-6);
@@ -76,17 +90,18 @@
   --footer-actions-gap:       var(--space-3);
 
   /* --- List Panel --- */
-  --list-panel-radius:       var(--radius-lg);
-  --filter-bar-padding-x:    var(--space-5);
-  --filter-bar-padding-y:    var(--space-4);
-  --filter-bar-gap:          var(--space-3);
-  --list-content-padding-x:  var(--space-5);
-  --list-content-padding-y:  var(--space-3);
-  --list-row-padding-x:      var(--space-4);
-  --list-row-padding-y:      var(--space-3);
-  --list-row-radius:         var(--radius-sm);
-  --pagination-padding-x:    var(--space-5);
-  --pagination-padding-y:    var(--space-4);
+  --list-panel-radius:    var(--radius-lg);
+  --filter-bar-padding-x: var(--space-5);
+  --filter-bar-padding-y: var(--space-4);
+  --filter-bar-gap:       var(--space-3);
+  --list-row-padding-x:   var(--space-4);
+  --list-row-padding-y:   var(--space-3);
+  --pagination-padding-x: var(--space-5);
+  --pagination-padding-y: var(--space-4);
+
+  /* --- Quick Create Inline --- */
+  --layout-quick-create-gap:          var(--space-3);
+  --layout-quick-create-actions-width: 200px;
 
   /* --- Sombras semânticas --- */
   --shadow-soft:     var(--shadow-sm);
@@ -127,64 +142,66 @@
    ========================================================= */
 
 html[data-theme="dark"] {
-  /* Superfícies */
-  --surface-page-shell:      transparent;
-  --surface-page-header:     transparent;
+  --surface-page-shell:     transparent;
+  --surface-page-header:    transparent;
 
-  --surface-stepper:         var(--theme-surface-card);
-  --border-stepper:          var(--theme-border-card);
-  --shadow-stepper:          var(--theme-shadow-stat);
+  --surface-stepper:        var(--theme-surface-card);
+  --border-stepper:         var(--theme-border-card);
+  --shadow-stepper:         var(--theme-shadow-stat);
 
-  --surface-form-panel:      var(--theme-surface-card);
-  --border-form-panel:       var(--theme-border-card);
-  --shadow-form-panel:       var(--theme-shadow-hero);
+  --surface-form-panel:     var(--theme-surface-card);
+  --border-form-panel:      var(--theme-border-card);
+  --shadow-form-panel:      var(--theme-shadow-hero);
 
-  --surface-form-section:    var(--color-surface);
-  --border-form-section:     var(--color-border-soft);
-  --shadow-form-section:     none;
+  --surface-form-section:   var(--color-surface);
+  --border-form-section:    var(--color-border-soft);
+  --shadow-form-section:    none;
 
-  --surface-field-group:     rgba(255, 255, 255, 0.04);
-  --border-field-group:      rgba(255, 255, 255, 0.09);
+  --surface-field-group:    rgba(255, 255, 255, 0.04);
+  --border-field-group:     rgba(255, 255, 255, 0.09);
 
-  --surface-list-panel:      var(--theme-surface-card);
-  --border-list-panel:       var(--theme-border-card);
-  --shadow-list-panel:       var(--theme-shadow-hero);
+  --surface-list-panel:     var(--theme-surface-card);
+  --border-list-panel:      var(--theme-border-card);
+  --shadow-list-panel:      var(--theme-shadow-hero);
 
-  --surface-filter-bar:      rgba(255, 255, 255, 0.03);
-  --border-filter-bar:       var(--theme-border-card);
+  --surface-filter-bar:     rgba(255, 255, 255, 0.03);
+  --border-filter-bar:      var(--theme-border-card);
 
-  --surface-list-row:        transparent;
-  --border-list-row:         rgba(255, 255, 255, 0.07);
-  --surface-list-row-hover:  rgba(255, 255, 255, 0.05);
+  --surface-list-row:       transparent;
+  --border-list-row:        rgba(255, 255, 255, 0.07);
+  --surface-list-row-hover: rgba(255, 255, 255, 0.05);
 
-  --surface-footer-actions:  var(--color-surface-muted);
-  --border-footer-actions:   var(--theme-border-card);
+  --surface-footer-actions: var(--color-surface-muted);
+  --border-footer-actions:  var(--theme-border-card);
 
-  --surface-pagination:      transparent;
-  --border-pagination:       var(--theme-border-card);
+  --surface-pagination:     transparent;
+  --border-pagination:      var(--theme-border-card);
 
   /* Stepper — estados */
   --stepper-idle-bg:       rgba(255, 255, 255, 0.07);
   --stepper-idle-border:   rgba(255, 255, 255, 0.14);
   --stepper-idle-color:    rgba(255, 255, 255, 0.45);
-
   --stepper-active-bg:     var(--color-accent);
   --stepper-active-border: transparent;
   --stepper-active-color:  var(--color-white);
-
   --stepper-done-bg:       rgba(216, 162, 27, 0.16);
   --stepper-done-border:   rgba(216, 162, 27, 0.42);
   --stepper-done-color:    var(--color-accent);
+  --stepper-connector:     rgba(255, 255, 255, 0.12);
+  --stepper-connector-on:  var(--color-accent);
+  --stepper-label-idle:    var(--theme-text-muted);
+  --stepper-label-active:  var(--theme-text-heading);
+  --stepper-label-done:    var(--theme-text-muted);
 
-  --stepper-connector:    rgba(255, 255, 255, 0.12);
-  --stepper-connector-on: var(--color-accent);
-  --stepper-label-idle:   var(--theme-text-muted);
-  --stepper-label-active: var(--theme-text-heading);
-  --stepper-label-done:   var(--theme-text-muted);
-
-  /* Badges específicos do page-header */
-  --surface-header-count: rgba(21, 91, 154, 0.25);
+  /* Badges do header */
+  --surface-header-count: rgba(21, 91, 154, 0.28);
   --text-header-count:    #9fd0ff;
+
+  /* Quick Create Inline */
+  --surface-quick-create:        rgba(255, 255, 255, 0.02);
+  --surface-quick-create-header: rgba(255, 255, 255, 0.04);
+  --border-quick-create:         rgba(255, 255, 255, 0.08);
+  --shadow-quick-create:         none;
 }
 
 
@@ -193,79 +210,80 @@ html[data-theme="dark"] {
    ========================================================= */
 
 html[data-theme="light"] {
-  /* Superfícies — separação visual clara entre camadas */
-  --surface-page-shell:      transparent;
-  --surface-page-header:     transparent;
+  --surface-page-shell:     transparent;
+  --surface-page-header:    transparent;
 
-  --surface-stepper:         var(--color-surface);
-  --border-stepper:          #d4dde9;
-  --shadow-stepper:          var(--shadow-xs);
+  --surface-stepper:        var(--color-surface);
+  --border-stepper:         #d4dde9;
+  --shadow-stepper:         var(--shadow-xs);
 
-  --surface-form-panel:      var(--color-surface);
-  --border-form-panel:       #d4dde9;
-  --shadow-form-panel:       var(--theme-shadow-hero);
+  --surface-form-panel:     var(--color-surface);
+  --border-form-panel:      #d4dde9;
+  --shadow-form-panel:      var(--theme-shadow-hero);
 
-  --surface-form-section:    #f6f9fc;
-  --border-form-section:     #dde6ef;
-  --shadow-form-section:     none;
+  --surface-form-section:   #f6f9fc;
+  --border-form-section:    #dde6ef;
+  --shadow-form-section:    none;
 
-  --surface-field-group:     #edf3f9;
-  --border-field-group:      #d0dce8;
+  --surface-field-group:    #edf3f9;
+  --border-field-group:     #d0dce8;
 
-  --surface-list-panel:      var(--color-surface);
-  --border-list-panel:       #d4dde9;
-  --shadow-list-panel:       var(--theme-shadow-hero);
+  --surface-list-panel:     var(--color-surface);
+  --border-list-panel:      #d4dde9;
+  --shadow-list-panel:      var(--theme-shadow-hero);
 
-  --surface-filter-bar:      #f4f8fc;
-  --border-filter-bar:       #dde6ef;
+  --surface-filter-bar:     #f4f8fc;
+  --border-filter-bar:      #dde6ef;
 
-  --surface-list-row:        transparent;
-  --border-list-row:         #e5edf5;
-  --surface-list-row-hover:  var(--color-primary-soft);
+  --surface-list-row:       transparent;
+  --border-list-row:        #e5edf5;
+  --surface-list-row-hover: var(--color-primary-soft);
 
-  --surface-footer-actions:  #f4f8fc;
-  --border-footer-actions:   #d4dde9;
+  --surface-footer-actions: #f4f8fc;
+  --border-footer-actions:  #d4dde9;
 
-  --surface-pagination:      transparent;
-  --border-pagination:       #d4dde9;
+  --surface-pagination:     transparent;
+  --border-pagination:      #d4dde9;
 
   /* Stepper — estados */
   --stepper-idle-bg:       var(--color-bg-strong);
   --stepper-idle-border:   var(--color-border);
   --stepper-idle-color:    var(--color-muted);
-
   --stepper-active-bg:     var(--color-primary);
   --stepper-active-border: transparent;
   --stepper-active-color:  var(--color-white);
-
   --stepper-done-bg:       var(--color-primary-soft);
   --stepper-done-border:   rgba(11, 58, 102, 0.35);
   --stepper-done-color:    var(--color-primary);
+  --stepper-connector:     var(--color-border);
+  --stepper-connector-on:  var(--color-primary-bright);
+  --stepper-label-idle:    var(--theme-text-muted);
+  --stepper-label-active:  var(--theme-text-heading);
+  --stepper-label-done:    var(--theme-text-muted);
 
-  --stepper-connector:    var(--color-border);
-  --stepper-connector-on: var(--color-primary-bright);
-  --stepper-label-idle:   var(--theme-text-muted);
-  --stepper-label-active: var(--theme-text-heading);
-  --stepper-label-done:   var(--theme-text-muted);
-
-  /* Badges específicos do page-header */
+  /* Badges do header */
   --surface-header-count: var(--color-primary-soft);
   --text-header-count:    var(--color-primary);
+
+  /* Quick Create Inline */
+  --surface-quick-create:        #eef3f8;
+  --surface-quick-create-header: #e6edf5;
+  --border-quick-create:         #d4dde9;
+  --shadow-quick-create:         none;
 }
 
 
 /* =========================================================
    04. Background
-   O background atmosférico é gerenciado pelo contexto de página
-   (ui-lab.css para o UI Lab; base para páginas globais).
-   Este arquivo não define gradientes de fundo.
+   O background atmosférico é gerenciado por ui-lab.css no UI Lab
+   e pelo base global em páginas reais. Este arquivo não define
+   gradientes de fundo — apenas consome tokens de superfície.
    ========================================================= */
 
 
 /* =========================================================
    05. Page Shell Base
-   Container principal de cada página. Não define superfície
-   própria — expõe o background.
+   Container principal da página. Não define superfície própria.
    ========================================================= */
 
 .page-shell {
@@ -280,68 +298,57 @@ html[data-theme="light"] {
   z-index:        var(--z-page-shell);
 }
 
-/* Variante: cadastro curto — painel centralizado e confortável */
-.page-shell--standard .main-form-panel {
-  max-width:     780px;
-  margin-inline: auto;
-  width:         100%;
-}
 
-/* Variante: wizard — painel largo, comporta muitas seções */
-.page-shell--wizard .main-form-panel {
-  max-width: var(--layout-form-panel-max-width);
-}
+/* =========================================================
+   06. Page Shell Variants
+   Controles de largura e composição por tipo de página.
+   ========================================================= */
 
-/* Variante: lista — sem restrição de largura */
-.page-shell--list .list-panel {
-  width: 100%;
-}
+/* Standard Simple: painel compacto centralizado (até 4 campos) */
+/* Largura controlada pelo .main-form-panel--compact */
+
+/* Standard: painel de largura confortável */
+/* Wizard: painel largo, comporta muitas seções */
+/* List: sem restrição — painel ocupa largura total */
+
+/* Nenhum dos variants exige regras de layout extras:
+   o max-width do painel é controlado pelo próprio painel. */
 
 
 /* =========================================================
-   06. Page Header — Base
-   Elementos compartilhados pelas três variações.
+   07. Page Header — Limpo
+   Etiqueta limpa da página. Nunca contém botões.
+   Estrutura: Stage (dark) + Body (light) + Ribbon.
    ========================================================= */
 
-.page-header {
-  box-sizing:     border-box;
-  display:        flex;
-  flex-direction: column;
-  gap:            var(--space-3);
-  width:          100%;
+/* Container: card com radius e sombra */
+.page-header--clean {
+  border-radius: var(--radius-lg);
+  box-shadow:    var(--shadow-lg);
+  overflow:      hidden;
+  width:         100%;
 }
 
-/* Linha horizontal: contexto à esquerda, ações à direita */
-.page-header__row,
-.page-header__top {
-  align-items:     flex-start;
-  display:         flex;
-  gap:             var(--space-4);
-  justify-content: space-between;
+/* Stage: fundo dark — eyebrow + título */
+.page-header--clean .page-header__stage {
+  background: var(--app-hero-stage-bg);
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+  padding:    var(--space-5) var(--space-6);
 }
 
-/* Coluna de contexto textual */
-.page-header__context {
-  display:        flex;
-  flex-direction: column;
-  gap:            var(--space-1);
-  min-width:      0;
-}
-
-/* Eyebrow / kicker */
-.page-header__eyebrow {
-  color:          var(--theme-accent-eyebrow);
+.page-header--clean .page-header__eyebrow {
+  color:          var(--app-hero-eyebrow);
   display:        block;
   font-size:      var(--font-size-xs);
   font-weight:    var(--font-weight-bold);
   letter-spacing: var(--letter-spacing-eyebrow);
+  margin-bottom:  var(--space-1);
   text-transform: uppercase;
 }
 
-/* Título principal */
-.page-header__title {
+.page-header--clean .page-header__title {
   align-items:    center;
-  color:          var(--theme-text-heading);
+  color:          var(--app-hero-title);
   display:        flex;
   font-size:      clamp(1.4rem, 2.2vw, 2.2rem);
   font-weight:    var(--font-weight-extrabold);
@@ -351,112 +358,38 @@ html[data-theme="light"] {
   margin:         0;
 }
 
-/* Contador de itens (usado no header de lista) */
-.page-header__count {
-  background:    var(--surface-header-count);
+/* Count badge — sempre sobre stage escuro */
+.page-header--clean .page-header__count {
+  background:    rgba(255, 255, 255, 0.15);
   border-radius: var(--radius-pill);
-  color:         var(--text-header-count);
+  color:         rgba(255, 255, 255, 0.9);
   font-size:     var(--font-size-sm);
   font-weight:   var(--font-weight-bold);
   line-height:   1;
   padding:       3px 10px;
 }
 
-/* Subtítulo */
-.page-header__subtitle {
-  color:       var(--theme-text-muted);
-  font-size:   var(--font-size-sm);
-  line-height: 1.55;
-  margin:      0;
-  max-width:   58ch;
-}
-
-/* Grupo de botões de ação */
-.page-header__actions {
-  align-items: center;
-  display:     flex;
-  flex-shrink: 0;
-  flex-wrap:   wrap;
-  gap:         var(--space-2);
-}
-
-
-/* =========================================================
-   07. Page Header — Variações
-   ========================================================= */
-
-/* --- 7.1 Standard: hero completo — stage + body + ribbon --- */
-
-/* Container: card shell com radius e sombra */
-.page-header--standard {
-  border-radius: var(--radius-lg);
-  box-shadow:    var(--shadow-lg);
-  overflow:      hidden;
-}
-
-/* Stage: fundo escuro — eyebrow, título, ações */
-.page-header--standard .page-header__stage {
-  background: var(--app-hero-stage-bg);
-  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.08);
-  padding:    var(--space-5) var(--space-6);
-}
-
-/* Body: fundo claro — brand mark e subtítulo */
-.page-header--standard .page-header__body {
+/* Body: fundo claro — brand mark + subtítulo + metadados */
+.page-header--clean .page-header__body {
   background: var(--app-hero-body-bg);
   padding:    var(--space-4) var(--space-6);
 }
 
-/* Ribbon: faixa gradiente no rodapé — idêntica ao app-page-hero__ribbon */
-.page-header--standard .page-header__ribbon {
-  background:   var(--app-hero-ribbon);
-  box-shadow:   0 1px 2px rgba(7, 26, 51, 0.08);
-  height:       3px;
-  width:        100%;
+/* Ribbon: faixa gradiente no rodapé */
+.page-header--clean .page-header__ribbon {
+  background: var(--app-hero-ribbon);
+  box-shadow: 0 1px 2px rgba(7, 26, 51, 0.08);
+  height:     3px;
+  width:      100%;
 }
 
-/* Tipografia do stage (sobre fundo escuro) */
-.page-header--standard .page-header__eyebrow {
-  color: var(--app-hero-eyebrow);
-}
-
-.page-header--standard .page-header__title {
-  color: var(--app-hero-title);
-}
-
-/* Botões no stage (sobre fundo escuro) */
-.page-header--standard .btn-primary {
-  background:   var(--color-accent);
-  border-color: var(--color-accent-hover);
-  color:        var(--color-primary-strong);
-}
-
-.page-header--standard .btn-primary:hover,
-.page-header--standard .btn-primary:focus-visible {
-  background:   var(--color-accent-hover);
-  border-color: var(--color-accent-hover);
-}
-
-.page-header--standard .btn-secondary {
-  background:   rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.22);
-  color:        var(--color-white);
-}
-
-.page-header--standard .btn-secondary:hover,
-.page-header--standard .btn-secondary:focus-visible {
-  background:   rgba(255, 255, 255, 0.16);
-  border-color: rgba(255, 255, 255, 0.34);
-}
-
-/* --- 7.2 Wizard: header com linha de metadados abaixo --- */
-
+/* Metadados opcionais no body (wizard: status, etapa) */
 .page-header__meta {
   align-items: center;
   display:     flex;
   flex-wrap:   wrap;
   gap:         var(--space-2);
-  margin-top:  calc(var(--space-1) * -1);
+  margin-top:  var(--space-2);
 }
 
 .page-header__meta-sep {
@@ -470,13 +403,12 @@ html[data-theme="light"] {
   font-weight: var(--font-weight-medium);
 }
 
-/* Badge de estado (ex.: Rascunho, Enviado) */
 .page-header__badge {
-  border-radius: var(--radius-pill);
-  font-size:     var(--font-size-xs);
-  font-weight:   var(--font-weight-bold);
+  border-radius:  var(--radius-pill);
+  font-size:      var(--font-size-xs);
+  font-weight:    var(--font-weight-bold);
   letter-spacing: var(--letter-spacing-chip);
-  padding:       3px 10px;
+  padding:        3px 10px;
 }
 
 .page-header__badge--draft {
@@ -491,29 +423,23 @@ html[data-theme="light"] {
   color:      var(--route-status-final-text);
 }
 
-/* --- 7.3 List: estrutura idêntica ao standard mas com count no título --- */
-
-/* Nenhuma regra adicional; o .page-header__count no título
-   e o botão de ação primária diferenciam o header de lista. */
-
 
 /* =========================================================
    08. Stepper / Navegação
-   Indicador de progresso entre etapas de um fluxo.
-   Ausente ou vazio em páginas de etapa única.
+   Indicador de progresso entre etapas. Presente apenas no wizard.
    ========================================================= */
 
 .page-stepper {
-  background:    var(--surface-stepper);
-  border:        1px solid var(--border-stepper);
-  border-radius: var(--stepper-radius);
-  box-shadow:    var(--shadow-stepper);
-  box-sizing:    border-box;
-  overflow-x:    auto;
-  padding:       var(--stepper-padding-y) var(--stepper-padding-x);
+  background:      var(--surface-stepper);
+  border:          1px solid var(--border-stepper);
+  border-radius:   var(--stepper-radius);
+  box-shadow:      var(--shadow-stepper);
+  box-sizing:      border-box;
+  overflow-x:      auto;
+  padding:         var(--stepper-padding-y) var(--stepper-padding-x);
   scrollbar-width: none;
-  width:         100%;
-  z-index:       var(--z-stepper);
+  width:           100%;
+  z-index:         var(--z-stepper);
 }
 
 .page-stepper::-webkit-scrollbar { display: none; }
@@ -534,7 +460,6 @@ html[data-theme="light"] {
   min-width:   0;
 }
 
-/* Conector entre etapas */
 .page-stepper__item + .page-stepper__item::before {
   background:  var(--stepper-connector);
   content:     "";
@@ -550,7 +475,6 @@ html[data-theme="light"] {
   background: var(--stepper-connector-on);
 }
 
-/* Número / indicador de etapa */
 .page-stepper__number {
   align-items:     center;
   background:      var(--stepper-idle-bg);
@@ -564,9 +488,9 @@ html[data-theme="light"] {
   height:          var(--stepper-item-size);
   justify-content: center;
   transition:
-    background     var(--transition-base),
-    color          var(--transition-base),
-    border-color   var(--transition-base);
+    background   var(--transition-base),
+    color        var(--transition-base),
+    border-color var(--transition-base);
   width: var(--stepper-item-size);
 }
 
@@ -580,18 +504,14 @@ html[data-theme="light"] {
   white-space:   nowrap;
 }
 
-/* Estado: etapa concluída */
 .page-stepper__item.is-complete .page-stepper__number {
   background:   var(--stepper-done-bg);
   border-color: var(--stepper-done-border);
   color:        var(--stepper-done-color);
 }
 
-.page-stepper__item.is-complete .page-stepper__label {
-  color: var(--stepper-label-done);
-}
+.page-stepper__item.is-complete .page-stepper__label { color: var(--stepper-label-done); }
 
-/* Estado: etapa ativa */
 .page-stepper__item.is-active .page-stepper__number {
   background:   var(--stepper-active-bg);
   border-color: var(--stepper-active-border);
@@ -606,8 +526,8 @@ html[data-theme="light"] {
 
 /* =========================================================
    09. Main Form Panel
-   Superfície central do formulário. Agrupa seções e footer.
-   Separa o conteúdo funcional do background da página.
+   Superfície central do formulário. Separa o conteúdo funcional
+   do background. Agrupa Form Sections e Footer Actions.
    ========================================================= */
 
 .main-form-panel {
@@ -625,8 +545,9 @@ html[data-theme="light"] {
 
 /* =========================================================
    10. Form Section
-   Unidade modular de conteúdo dentro do Main Form Panel.
-   Separadas por border-bottom — não são cards individuais.
+   Unidade modular dentro do Main Form Panel.
+   Sempre ocupa 100% da largura — sem max-width interno.
+   Separadas por border-bottom; não são cards individuais.
    ========================================================= */
 
 .main-form-panel .form-section {
@@ -641,13 +562,19 @@ html[data-theme="light"] {
   gap:            var(--form-section-inner-gap);
   margin:         0;
   padding:        var(--form-section-padding-y) var(--form-section-padding-x);
+  width:          100%;
 }
 
 .main-form-panel .form-section:last-of-type {
   border-bottom: none;
 }
 
-/* Section Header */
+
+/* =========================================================
+   11. Section Header
+   Cabeçalho interno de cada Form Section.
+   ========================================================= */
+
 .section-header {
   align-items:     flex-start;
   display:         flex;
@@ -687,28 +614,43 @@ html[data-theme="light"] {
 
 
 /* =========================================================
-   11. Field Grid / Field Group
+   12. Field Grid
+   Grade de 4 colunas. Controla a distribuição dos campos.
+   A largura de cada campo é definida pelas classes .field-size-*.
    ========================================================= */
-
-/* --- Field Grid --- */
 
 .field-grid {
   display:               grid;
   gap:                   var(--field-grid-gap);
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  width:                 100%;
 }
 
-.field-grid--one   { grid-template-columns: 1fr; }
-.field-grid--two   { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.field-grid--three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.field-grid--four  { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-.field-grid--auto  { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
 
-.field-grid__span-2    { grid-column: span 2; }
-.field-grid__span-3    { grid-column: span 3; }
-.field-grid__span-full { grid-column: 1 / -1; }
+/* =========================================================
+   13. Field Sizes
+   Quatro tamanhos de campo baseados em colunas do grid.
+   Escolher o tamanho conforme o tipo de informação inserida.
+   ========================================================= */
 
-/* --- Field Group --- */
+/* Pequeno: RG, CPF, UF, CEP, matrícula, status, data curta */
+.field-size-1 { grid-column: span 1; }
+
+/* Médio: telefone, e-mail, cargo, município, placa, modelo */
+.field-size-2 { grid-column: span 2; }
+
+/* Grande: nome completo, endereço, lotação, destino principal */
+.field-size-3 { grid-column: span 3; }
+
+/* Linha inteira: justificativa, observações, descrição, textarea */
+.field-size-4 { grid-column: 1 / -1; }
+
+
+/* =========================================================
+   14. Field Group
+   Agrupamento leve dentro de uma Form Section.
+   Usado para blocos condicionais ou campos muito relacionados.
+   ========================================================= */
 
 .field-group {
   background:     var(--surface-field-group);
@@ -745,9 +687,9 @@ html[data-theme="light"] {
 
 
 /* =========================================================
-   12. Footer Actions
-   Rodapé de ações do formulário. Sempre ao final do Main
-   Form Panel. Ações secundárias à esquerda, primárias à direita.
+   15. Footer Actions
+   Rodapé de ações do formulário. Sempre ao final do Main Form Panel.
+   Ações secundárias à esquerda, primárias à direita.
    ========================================================= */
 
 .footer-actions {
@@ -771,13 +713,12 @@ html[data-theme="light"] {
 
 
 /* =========================================================
-   13. List Panel / Filters
-   Painel principal das páginas de lista. Substitui o
-   Main Form Panel nas variações de tipo list.
+   16. List Panel / Filters
+   Painel principal das páginas de lista.
+   Ações de criação ficam na Filter Bar — nunca no Page Header.
    ========================================================= */
 
-/* --- 13.1 List Panel --- */
-
+/* List Panel */
 .list-panel {
   background:     var(--surface-list-panel);
   border:         1px solid var(--border-list-panel);
@@ -790,54 +731,55 @@ html[data-theme="light"] {
   width:          100%;
 }
 
-/* --- 13.2 Filter Bar --- */
-
+/* Filter Bar: controles de busca/filtro à esquerda, ações à direita */
 .filter-bar {
-  align-items:  center;
-  background:   var(--surface-filter-bar);
-  border-bottom: 1px solid var(--border-filter-bar);
-  box-sizing:   border-box;
-  display:      flex;
-  flex-wrap:    wrap;
-  gap:          var(--filter-bar-gap);
+  align-items:     center;
+  background:      var(--surface-filter-bar);
+  border-bottom:   1px solid var(--border-filter-bar);
+  box-sizing:      border-box;
+  display:         flex;
+  flex-wrap:       wrap;
+  gap:             var(--filter-bar-gap);
   justify-content: space-between;
-  padding:      var(--filter-bar-padding-y) var(--filter-bar-padding-x);
+  padding:         var(--filter-bar-padding-y) var(--filter-bar-padding-x);
 }
 
-.filter-bar__search {
-  flex:      1;
-  min-width: 200px;
-}
-
-.filter-bar__filters {
+.filter-bar__controls {
   align-items: center;
   display:     flex;
+  flex:        1;
   flex-wrap:   wrap;
+  gap:         var(--space-2);
+  min-width:   0;
+}
+
+.filter-bar__actions {
+  align-items: center;
+  display:     flex;
+  flex-shrink: 0;
   gap:         var(--space-2);
 }
 
-/* --- 13.3 List Content --- */
-
+/* List Content */
 .list-content {
   box-sizing:     border-box;
   display:        flex;
   flex-direction: column;
-  padding:        var(--list-content-padding-y) 0;
+  padding-block:  var(--space-3);
   width:          100%;
 }
 
-/* --- 13.4 Pagination --- */
-
+/* Pagination */
 .pagination-shell {
-  align-items:   center;
-  background:    var(--surface-pagination);
-  border-top:    1px solid var(--border-pagination);
-  box-sizing:    border-box;
-  display:       flex;
-  flex-wrap:     wrap;
-  gap:           var(--space-3);
+  align-items:     center;
+  background:      var(--surface-pagination);
+  border-top:      1px solid var(--border-pagination);
+  box-sizing:      border-box;
+  display:         flex;
+  flex-wrap:       wrap;
+  gap:             var(--space-3);
   justify-content: space-between;
-  padding:       var(--pagination-padding-y) var(--pagination-padding-x);
+  padding:         var(--pagination-padding-y) var(--pagination-padding-x);
 }
 
 .pagination-shell__info {
@@ -853,24 +795,119 @@ html[data-theme="light"] {
 
 
 /* =========================================================
-   14. Responsive
+   17. Quick Create Inline
+   Subvariação do List / Filters para mini-cadastros auxiliares.
+   Exibe-se abaixo da Filter Bar como extensão visual do painel.
+   Visível apenas quando .is-open.
+   Regra: botões ficam em .quick-create-actions, nunca no .field-grid.
+   ========================================================= */
+
+/* Painel: oculto por padrão, revelado via .is-open */
+.quick-create-panel {
+  background:    var(--surface-quick-create);
+  border-bottom: 1px solid var(--border-quick-create);
+  box-shadow:    var(--shadow-quick-create);
+  box-sizing:    border-box;
+  display:       none;
+  flex-direction: column;
+  width:         100%;
+}
+
+.quick-create-panel.is-open {
+  display: flex;
+}
+
+/* Cabeçalho: título + botão de fechar */
+.quick-create-panel__header {
+  align-items:     center;
+  background:      var(--surface-quick-create-header);
+  border-bottom:   1px solid var(--border-quick-create);
+  box-sizing:      border-box;
+  display:         flex;
+  gap:             var(--space-3);
+  justify-content: space-between;
+  padding:         var(--space-2) var(--filter-bar-padding-x);
+}
+
+.quick-create-panel__title {
+  color:       var(--theme-text-heading);
+  font-size:   var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  margin:      0;
+}
+
+.quick-create-panel__close {
+  align-items:      center;
+  background:       transparent;
+  border:           none;
+  border-radius:    var(--radius-sm);
+  color:            var(--theme-text-muted);
+  cursor:           pointer;
+  display:          flex;
+  font-size:        var(--font-size-md);
+  height:           28px;
+  justify-content:  center;
+  line-height:      1;
+  padding:          0;
+  transition:       color var(--transition-base), background var(--transition-base);
+  width:            28px;
+}
+
+.quick-create-panel__close:hover {
+  background: var(--border-quick-create);
+  color:      var(--theme-text-heading);
+}
+
+/* Corpo: linha de campos + ações em flex row no desktop */
+.quick-create-panel__body {
+  box-sizing: border-box;
+  display:    flex;
+  gap:        var(--layout-quick-create-gap);
+  padding:    var(--space-4) var(--filter-bar-padding-x);
+  width:      100%;
+}
+
+/* Row: field-grid + quick-create-actions lado a lado */
+.quick-create-panel__row {
+  align-items: flex-end;
+  display:     flex;
+  flex:        1;
+  gap:         var(--layout-quick-create-gap);
+  min-width:   0;
+}
+
+/* Field Grid dentro do Quick Create ocupa o espaço restante */
+.quick-create-panel .field-grid {
+  flex: 1;
+}
+
+/* Ações: área exclusiva para Cancelar / Salvar */
+.quick-create-actions {
+  align-items: flex-end;
+  display:     flex;
+  flex-shrink: 0;
+  gap:         var(--space-2);
+  padding-bottom: 1px;
+  width:       var(--layout-quick-create-actions-width);
+}
+
+/* Mensagem auxiliar opcional */
+.quick-create-panel__hint {
+  box-sizing:  border-box;
+  color:       var(--theme-text-muted);
+  font-size:   var(--font-size-xs);
+  padding:     0 var(--filter-bar-padding-x) var(--space-3);
+}
+
+
+/* =========================================================
+   18. Responsive
    ========================================================= */
 
 @media (max-width: 840px) {
   .page-shell {
-    gap:          var(--space-4);
+    gap:           var(--space-4);
     padding-block: var(--space-4);
-  }
-
-  .page-header__row,
-  .page-header__top {
-    flex-direction: column;
-    gap: var(--space-3);
-  }
-
-  .page-header__actions {
-    flex-shrink: unset;
-    width: 100%;
   }
 
   .page-stepper {
@@ -894,49 +931,77 @@ html[data-theme="light"] {
     width: 100%;
   }
 
-  .field-grid--two,
-  .field-grid--three,
-  .field-grid--four {
-    grid-template-columns: 1fr;
+  /* Field Grid: 2 colunas no tablet */
+  .field-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .field-grid__span-2,
-  .field-grid__span-3,
-  .field-grid__span-full {
-    grid-column: 1;
-  }
+  .field-size-1 { grid-column: span 1; }
+  .field-size-2 { grid-column: span 2; }
+  .field-size-3 { grid-column: 1 / -1; }
+  .field-size-4 { grid-column: 1 / -1; }
 
+  /* Filter Bar empilha no tablet */
   .filter-bar {
     flex-direction: column;
     align-items:    stretch;
   }
 
-  .filter-bar__search,
-  .filter-bar__filters {
+  .filter-bar__controls,
+  .filter-bar__actions {
     width: 100%;
   }
 
-  .filter-bar__filters {
+  .filter-bar__controls {
     flex-wrap: wrap;
   }
 
-  .page-shell--standard .main-form-panel {
-    max-width: 100%;
+  /* Quick Create: campos e ações empilham no tablet */
+  .quick-create-panel__body {
+    flex-direction: column;
+  }
+
+  .quick-create-panel__row {
+    flex-direction: column;
+    align-items:    stretch;
+  }
+
+  .quick-create-actions {
+    width:          100%;
+    justify-content: flex-end;
+  }
+
+  /* Header clean: stage com padding reduzido */
+  .page-header--clean .page-header__stage,
+  .page-header--clean .page-header__body {
+    padding: var(--space-4);
   }
 }
 
 @media (max-width: 600px) {
+  /* Field Grid: 1 coluna no mobile */
+  .field-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .field-size-1,
+  .field-size-2,
+  .field-size-3,
+  .field-size-4 {
+    grid-column: 1;
+  }
+
   .page-stepper__label {
     display: none;
   }
 
-  .page-header__title {
+  .page-header--clean .page-header__title {
     font-size: 1.5rem;
   }
 
   .pagination-shell {
-    flex-direction: column;
     align-items:    stretch;
+    flex-direction: column;
     text-align:     center;
   }
 
@@ -947,7 +1012,7 @@ html[data-theme="light"] {
 
 
 /* =========================================================
-   15. UI Lab Demo Only
+   19. UI Lab Demo Only
    Elementos fictícios para demonstrar a hierarquia visual.
    Não usar em páginas reais.
    ========================================================= */
@@ -963,16 +1028,16 @@ html[data-theme="light"] {
 }
 
 .ui-lab-variant-nav__link {
-  background:    var(--surface-form-section);
-  border:        1px solid var(--border-form-section);
-  border-radius: var(--radius-pill);
-  color:         var(--theme-text-muted);
-  font-size:     var(--font-size-xs);
-  font-weight:   var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-eyebrow);
-  padding:       var(--space-1) var(--space-3);
+  background:      var(--surface-form-section);
+  border:          1px solid var(--border-form-section);
+  border-radius:   var(--radius-pill);
+  color:           var(--theme-text-muted);
+  font-size:       var(--font-size-xs);
+  font-weight:     var(--font-weight-bold);
+  letter-spacing:  var(--letter-spacing-eyebrow);
+  padding:         var(--space-1) var(--space-3);
   text-decoration: none;
-  text-transform: uppercase;
+  text-transform:  uppercase;
   transition:
     background   var(--transition-base),
     color        var(--transition-base),
@@ -986,12 +1051,12 @@ html[data-theme="light"] {
 }
 
 .ui-lab-variant-nav__link.is-active {
-  background:    var(--color-primary);
-  border-color:  var(--color-primary);
-  color:         var(--color-white);
+  background:   var(--color-primary);
+  border-color: var(--color-primary);
+  color:        var(--color-white);
 }
 
-/* --- Separador de bloco de demo --- */
+/* --- Bloco de demo --- */
 
 .ui-lab-demo-label {
   color:          var(--theme-text-muted);
@@ -1032,7 +1097,7 @@ html[data-theme="light"] {
   height:        var(--control-height-md);
 }
 
-/* --- Inputs fictícios (filter bar) --- */
+/* --- Inputs fictícios para filter bar --- */
 
 .ui-lab-demo-input {
   align-items:   center;
@@ -1045,33 +1110,27 @@ html[data-theme="light"] {
   font-size:     var(--font-size-sm);
   height:        var(--control-height-md);
   padding:       0 var(--space-3);
-  width:         100%;
 }
 
-.ui-lab-demo-input--select {
-  min-width: 120px;
-  width:     auto;
-}
+.ui-lab-demo-input--search { flex: 1; min-width: 180px; }
+.ui-lab-demo-input--select { min-width: 110px; width: auto; }
 
 /* --- Linhas de lista fictícias --- */
 
 .ui-lab-demo-row {
-  align-items: center;
-  background:  var(--surface-list-row);
+  align-items:  center;
+  background:   var(--surface-list-row);
   border-bottom: 1px solid var(--border-list-row);
-  box-sizing:  border-box;
-  cursor:      default;
-  display:     flex;
-  gap:         var(--space-4);
-  padding:     var(--list-row-padding-y) var(--list-row-padding-x);
-  transition:  background var(--transition-base);
+  box-sizing:   border-box;
+  display:      flex;
+  gap:          var(--space-4);
+  padding:      var(--list-row-padding-y) var(--list-row-padding-x);
+  transition:   background var(--transition-base);
 }
 
 .ui-lab-demo-row:last-child { border-bottom: none; }
+.ui-lab-demo-row:hover      { background: var(--surface-list-row-hover); }
 
-.ui-lab-demo-row:hover { background: var(--surface-list-row-hover); }
-
-/* Avatar / ícone placeholder */
 .ui-lab-demo-row__avatar {
   background:    var(--surface-header-count);
   border-radius: var(--radius-pill);
@@ -1080,7 +1139,6 @@ html[data-theme="light"] {
   width:         36px;
 }
 
-/* Corpo textual */
 .ui-lab-demo-row__body {
   display:        flex;
   flex:           1;
@@ -1089,7 +1147,6 @@ html[data-theme="light"] {
   min-width:      0;
 }
 
-/* Área lateral direita (badge, ações) */
 .ui-lab-demo-row__aside {
   align-items: center;
   display:     flex;
@@ -1108,11 +1165,7 @@ html[data-theme="light"] {
 .ui-lab-demo-bar--md  { width: 56%; }
 .ui-lab-demo-bar--lg  { width: 72%; }
 .ui-lab-demo-bar--xl  { width: 88%; }
-.ui-lab-demo-bar--sub {
-  height: 10px;
-  opacity: 0.6;
-  width:   44%;
-}
+.ui-lab-demo-bar--sub { height: 10px; opacity: 0.6; width: 44%; }
 
 /* Chips de status fictícios */
 .ui-lab-demo-chip {
