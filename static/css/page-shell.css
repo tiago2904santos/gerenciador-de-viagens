@@ -1194,3 +1194,76 @@ html[data-theme="light"] {
   border:     1px solid var(--route-status-muted-border);
   color:      var(--route-status-muted-text);
 }
+
+
+/* =========================================================
+   20. Field Layout / Field Rows
+   Camada complementar ao Field Grid para controle de colunas
+   por linha. Usar quando cada linha do formulário precisa de
+   uma quantidade específica de colunas, independente das demais.
+
+   MODO 1 — Field Grid automático (existente):
+     .field-grid  →  .field-size-1 / .field-size-2 / .field-size-3 / .field-size-4
+     Bom para: distribuição flexível onde o grid decide a quebra.
+
+   MODO 2 — Field Layout com linhas controladas (novo):
+     .field-layout  →  .field-row--1/2/3/4  →  campos
+     Bom para: formulários onde cada linha tem colunagem específica.
+
+   Ambos os modos são válidos e coexistem.
+   ========================================================= */
+
+/* Container vertical das linhas — ocupa 100% da Form Section */
+.field-layout {
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--layout-field-grid-gap);
+  width:          100%;
+}
+
+/* Linha base — grade com largura total */
+.field-row {
+  display:   grid;
+  gap:       var(--layout-field-grid-gap);
+  min-width: 0;
+  width:     100%;
+}
+
+/* 1 coluna — linha inteira: textarea, observações, campo único amplo */
+.field-row--1 {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* 2 colunas — pares: datas, telefone + e-mail, valor + tipo */
+.field-row--2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* 3 colunas — trios: nome + CPF + telefone, cargo + RG + status */
+.field-row--3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* 4 colunas — quartetos compactos: placa + modelo + tipo + combustível */
+.field-row--4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+/* Tablet (840px): rows de 3 e 4 colunas reduzem para 2 */
+@media (max-width: 840px) {
+  .field-row--3,
+  .field-row--4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Mobile (600px): todos os rows viram 1 coluna */
+@media (max-width: 600px) {
+  .field-row,
+  .field-row--1,
+  .field-row--2,
+  .field-row--3,
+  .field-row--4 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

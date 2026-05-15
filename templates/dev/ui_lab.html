@@ -38,10 +38,11 @@
 
     <!-- Nav de acesso rÃ¡pido -->
     <nav class="ui-lab-variant-nav" aria-label="VariaÃ§Ãµes de Page Shell">
-      <a href="#shell-simple"   class="ui-lab-variant-nav__link">Standard Simple</a>
-      <a href="#shell-standard" class="ui-lab-variant-nav__link">Standard</a>
-      <a href="#shell-wizard"   class="ui-lab-variant-nav__link">Wizard / Stepper</a>
-      <a href="#shell-list"     class="ui-lab-variant-nav__link">List / Filters</a>
+      <a href="#shell-simple"     class="ui-lab-variant-nav__link">Standard Simple</a>
+      <a href="#shell-standard"   class="ui-lab-variant-nav__link">Standard</a>
+      <a href="#shell-wizard"     class="ui-lab-variant-nav__link">Wizard / Stepper</a>
+      <a href="#shell-list"       class="ui-lab-variant-nav__link">List / Filters</a>
+      <a href="#shell-field-rows" class="ui-lab-variant-nav__link">Field Layout / Rows</a>
     </nav>
 
     <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -922,6 +923,456 @@
       </div>
     </div>
 
+    <!-- ══════════════════════════════════════════════════════
+         VARIAÇÃO 5 — FIELD LAYOUT / FIELD ROWS
+         Camada complementar ao Field Grid para controle de
+         colunas por linha. Usar quando cada linha precisa de
+         uma quantidade específica de colunas.
+         ══════════════════════════════════════════════════════ -->
+    <div id="shell-field-rows" class="ui-lab-variant-block" hidden>
+      <span class="ui-lab-demo-label">Variação 5 — Field Layout / Field Rows</span>
+
+      <nav class="ui-lab-standard-nav" aria-label="Exemplos de Field Layout">
+        <a href="#frow-primitivos" class="ui-lab-standard-nav__link">Primitivos</a>
+        <a href="#frow-servidor"   class="ui-lab-standard-nav__link">Servidor</a>
+        <a href="#frow-viatura"    class="ui-lab-standard-nav__link">Viatura</a>
+      </nav>
+
+      <!-- ─────────────────────────────────────────────
+           Exemplo 1 — Primitivos: todos os tipos de row
+           ───────────────────────────────────────────── -->
+      <div id="frow-primitivos" class="ui-lab-standard-example">
+        <div class="page-shell page-shell--standard">
+
+          <header class="page-header page-header--clean" aria-labelledby="frow-prim-title">
+            <div class="page-header__stage">
+              <div class="page-header__context">
+                <span class="page-header__eyebrow">UI Lab — Field Layout</span>
+                <h2 class="page-header__title" id="frow-prim-title">Field Row — Primitivos</h2>
+              </div>
+            </div>
+            <div class="page-header__body">
+              <div class="app-page__brand">
+                <div class="app-page__brand-mark" aria-hidden="true">FR</div>
+                <div class="app-page__brand-copy">
+                  <p class="app-page__subtitle">
+                    Demonstração isolada de cada variante de Field Row: 1, 2, 3 e 4 colunas, mistura e textarea full width.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="page-header__ribbon" aria-hidden="true"></div>
+          </header>
+
+          <main class="main-form-panel">
+
+            <!-- field-row--4 -->
+            <section class="form-section" aria-labelledby="frow-4col">
+              <header class="section-header">
+                <div class="section-header__copy">
+                  <h3 class="section-header__title" id="frow-4col">field-row--4 — Quatro colunas</h3>
+                  <p class="section-header__description">Campos compactos de mesma largura. Ideal para dados curtos: placa, tipo, código, status.</p>
+                </div>
+              </header>
+              <div class="field-layout">
+                <div class="field-row field-row--4">
+                  <div class="ui-lab-form-field">
+                    <label class="ui-lab-form-label" for="frow-4-a">Placa</label>
+                    <input id="frow-4-a" class="form-control" type="text" placeholder="AAA1A23">
+                  </div>
+                  <div class="ui-lab-form-field">
+                    <label class="ui-lab-form-label" for="frow-4-b">Tipo</label>
+                    <select id="frow-4-b" class="form-select">
+                      <option>Descaracterizada</option>
+                      <option>Caracterizada</option>
+                    </select>
+                  </div>
+                  <div class="ui-lab-form-field">
+                    <label class="ui-lab-form-label" for="frow-4-c">Ano</label>
+                    <input id="frow-4-c" class="form-control" type="text" placeholder="2024">
+                  </div>
+                  <div class="ui-lab-form-field">
+                    <label class="ui-lab-form-label" for="frow-4-d">Status</label>
+                    <select id="frow-4-d" class="form-select">
+                      <option>Ativo</option>
+                      <option>Inativo</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- field-row--3 -->
+            <section class="form-section" aria-labelledby="frow-3col">
+              <header class="section-header">
+                <div class="section-header__copy">
+                  <h3 class="section-header__title" id="frow-3col">field-row--3 — Três colunas</h3>
+                  <p class="section-header__description">Trios de campos relacionados. Ideal para nome + CPF + telefone ou cargo + RG + status.</p>
+                </div>
+              </header>
+              <div class="field-layout">
+                <div class="field-row field-row--3">
+                  <div class="ui-lab-form-field">
+                    <label class="ui-lab-form-label" for="frow-3-a">Nome completo <span class="form-field__required" aria-hidden="true">*</span></label>
+                    <input id="frow-3-a" class="form-control" type="text" placeholder="Nome completo">
+                  </div>
+                  <div class="ui-lab-form-field">
+                    <label class="ui-lab-form-label" for="frow-3-b">CPF <span class="form-field__required" aria-hidden="true">*</span></label>
+                    <input id="frow-3-b" class="form-control" type="text" placeholder="000.000.000-00" inputmode="numeric">
+                  </div>
+                  <div class="ui-lab-form-field">
+                    <label class="ui-lab-form-label" for="frow-3-c">Telefone</label>
+                    <input id="frow-3-c" class="form-control" type="text" placeholder="(00) 00000-0000" inputmode="numeric">
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- field-row--2 -->
+            <section class="form-section" aria-labelledby="frow-2col">
+              <header class="section-header">
+                <div class="section-header__copy">
+                  <h3 class="section-header__title" id="frow-2col">field-row--2 — Duas colunas</h3>
+                  <p class="section-header__description">Pares de campos. Ideal para datas, valores, e-mail + telefone, origem + destino.</p>
+                </div>
+              </header>
+              <div class="field-layout">
+                <div class="field-row field-row--2">
+                  <div class="ui-lab-form-field">
+                    <label class="ui-lab-form-label" for="frow-2-a">Data de saída</label>
+                    <input id="frow-2-a" class="form-control" type="date">
+                  </div>
+                  <div class="ui-lab-form-field">
+                    <label class="ui-lab-form-label" for="frow-2-b">Data de retorno</label>
+                    <input id="frow-2-b" class="form-control" type="date">
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- field-row--1 -->
+            <section class="form-section" aria-labelledby="frow-1col">
+              <header class="section-header">
+                <div class="section-header__copy">
+                  <h3 class="section-header__title" id="frow-1col">field-row--1 — Uma coluna (linha inteira)</h3>
+                  <p class="section-header__description">Linha inteira. Ideal para textarea, justificativa, unidade e campos que merecem destaque.</p>
+                </div>
+              </header>
+              <div class="field-layout">
+                <div class="field-row field-row--1">
+                  <div class="ui-lab-form-field">
+                    <label class="ui-lab-form-label" for="frow-1-a">Divisão / Unidade</label>
+                    <select id="frow-1-a" class="form-select">
+                      <option>Selecione (opcional)</option>
+                      <option>Unidade central</option>
+                      <option>Unidade operacional</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="field-row field-row--1">
+                  <div class="ui-lab-form-field">
+                    <label class="ui-lab-form-label" for="frow-1-b">Observações</label>
+                    <textarea id="frow-1-b" class="form-control" rows="3" placeholder="Observações adicionais sobre esta viagem..."></textarea>
+                    <p class="form-field__hint">Texto livre. Aparece no verso do ofício quando preenchido.</p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- Mistura de rows na mesma section -->
+            <section class="form-section" aria-labelledby="frow-misto">
+              <header class="section-header">
+                <div class="section-header__copy">
+                  <h3 class="section-header__title" id="frow-misto">Mistura de rows na mesma Form Section</h3>
+                  <p class="section-header__description">Linha 1 com 3 colunas, linha 2 com 4 colunas, linha 3 com 1 coluna (textarea).</p>
+                </div>
+              </header>
+              <div class="field-layout">
+                <div class="field-row field-row--3">
+                  <div class="ui-lab-form-field">
+                    <label class="ui-lab-form-label" for="frow-m-a">Nome</label>
+                    <input id="frow-m-a" class="form-control" type="text" placeholder="Nome completo">
+                  </div>
+                  <div class="ui-lab-form-field">
+                    <label class="ui-lab-form-label" for="frow-m-b">CPF</label>
+                    <input id="frow-m-b" class="form-control" type="text" placeholder="000.000.000-00" inputmode="numeric">
+                  </div>
+                  <div class="ui-lab-form-field">
+                    <label class="ui-lab-form-label" for="frow-m-c">Telefone</label>
+                    <input id="frow-m-c" class="form-control" type="text" placeholder="(00) 00000-0000">
+                  </div>
+                </div>
+                <div class="field-row field-row--4">
+                  <div class="ui-lab-form-field">
+                    <label class="ui-lab-form-label" for="frow-m-d">Placa</label>
+                    <input id="frow-m-d" class="form-control" type="text" placeholder="AAA1A23">
+                  </div>
+                  <div class="ui-lab-form-field">
+                    <label class="ui-lab-form-label" for="frow-m-e">Modelo</label>
+                    <input id="frow-m-e" class="form-control" type="text" placeholder="Modelo">
+                  </div>
+                  <div class="ui-lab-form-field">
+                    <label class="ui-lab-form-label" for="frow-m-f">Tipo</label>
+                    <select id="frow-m-f" class="form-select">
+                      <option>Descaracterizada</option>
+                    </select>
+                  </div>
+                  <div class="ui-lab-form-field">
+                    <label class="ui-lab-form-label" for="frow-m-g">Status</label>
+                    <select id="frow-m-g" class="form-select">
+                      <option>Ativo</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="field-row field-row--1">
+                  <div class="ui-lab-form-field">
+                    <label class="ui-lab-form-label" for="frow-m-h">Justificativa</label>
+                    <textarea id="frow-m-h" class="form-control" rows="3" placeholder="Descreva a justificativa da viagem..."></textarea>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <footer class="footer-actions">
+              <div class="footer-actions__secondary">
+                <button class="btn btn-secondary" type="button">Voltar</button>
+              </div>
+              <div class="footer-actions__primary">
+                <button class="btn btn-primary" type="button">Salvar</button>
+              </div>
+            </footer>
+
+          </main>
+        </div>
+      </div>
+
+      <!-- ─────────────────────────────────────────────
+           Exemplo 2 — Servidor (com field-layout)
+           ───────────────────────────────────────────── -->
+      <div id="frow-servidor" class="ui-lab-standard-example">
+        <div class="page-shell page-shell--standard">
+
+          <header class="page-header page-header--clean" aria-labelledby="frow-sv-title">
+            <div class="page-header__stage">
+              <div class="page-header__context">
+                <span class="page-header__eyebrow">Cadastros</span>
+                <h2 class="page-header__title" id="frow-sv-title">Novo servidor</h2>
+              </div>
+            </div>
+            <div class="page-header__body">
+              <div class="app-page__brand">
+                <div class="app-page__brand-mark" aria-hidden="true">SV</div>
+                <div class="app-page__brand-copy">
+                  <p class="app-page__subtitle">
+                    Cadastro de servidor com field-layout. Linha 1: 3 colunas. Linha 2: 3 colunas. Linha 3: 1 coluna.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="page-header__ribbon" aria-hidden="true"></div>
+          </header>
+
+          <main class="main-form-panel">
+            <section class="form-section" aria-labelledby="frow-sv-dados">
+              <header class="section-header">
+                <div class="section-header__copy">
+                  <h3 class="section-header__title" id="frow-sv-dados">Dados do servidor</h3>
+                  <p class="section-header__description">Nome, cargo e CPF são obrigatórios. RG e telefone são opcionais.</p>
+                </div>
+              </header>
+
+              <div class="field-layout">
+
+                <!-- Linha 1: nome + CPF + telefone -->
+                <div class="field-row field-row--3">
+                  <div class="ui-lab-form-field">
+                    <label class="ui-lab-form-label" for="frow-sv-nome">Nome completo <span class="form-field__required" aria-hidden="true">*</span></label>
+                    <input id="frow-sv-nome" class="form-control" type="text" value="MARIA APARECIDA SILVA" placeholder="Nome completo">
+                    <p class="form-field__hint">Campo normalizado em caixa alta.</p>
+                  </div>
+                  <div class="ui-lab-form-field">
+                    <label class="ui-lab-form-label" for="frow-sv-cpf">CPF <span class="form-field__required" aria-hidden="true">*</span></label>
+                    <input id="frow-sv-cpf" class="form-control" type="text" value="123.456.789-09" placeholder="000.000.000-00" inputmode="numeric">
+                  </div>
+                  <div class="ui-lab-form-field">
+                    <label class="ui-lab-form-label" for="frow-sv-tel">Telefone</label>
+                    <input id="frow-sv-tel" class="form-control" type="text" value="(41) 99999-8888" placeholder="(00) 00000-0000" inputmode="numeric">
+                  </div>
+                </div>
+
+                <!-- Linha 2: cargo + RG + "Não possui RG" -->
+                <div class="field-row field-row--3">
+                  <div class="ui-lab-form-field">
+                    <label class="ui-lab-form-label" for="frow-sv-cargo">Cargo <span class="form-field__required" aria-hidden="true">*</span></label>
+                    <div class="field-control-row">
+                      <select id="frow-sv-cargo" class="form-select">
+                        <option>Agente administrativo</option>
+                        <option>Motorista</option>
+                      </select>
+                      <a class="field-addon-action" href="#">Gerenciar cargos</a>
+                    </div>
+                  </div>
+                  <div class="ui-lab-form-field">
+                    <label class="ui-lab-form-label" for="frow-sv-rg">RG</label>
+                    <input id="frow-sv-rg" class="form-control" type="text" placeholder="Bloqueado quando sem RG" disabled aria-disabled="true">
+                  </div>
+                  <div class="ui-lab-form-field">
+                    <label class="form-field__checkbox" for="frow-sv-semrg">
+                      <input id="frow-sv-semrg" type="checkbox" checked>
+                      <span class="form-field__checkbox-copy">
+                        <span class="form-field__checkbox-title">Não possui RG</span>
+                      </span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Linha 3: unidade (linha inteira) -->
+                <div class="field-row field-row--1">
+                  <div class="ui-lab-form-field">
+                    <label class="ui-lab-form-label" for="frow-sv-unidade">Divisão / Unidade</label>
+                    <div class="field-control-row">
+                      <select id="frow-sv-unidade" class="form-select">
+                        <option>Selecione (opcional)</option>
+                        <option>Unidade central</option>
+                        <option>Unidade operacional</option>
+                      </select>
+                      <a class="field-addon-action" href="#">Gerenciar unidades</a>
+                    </div>
+                    <p class="form-field__hint">Seleção opcional.</p>
+                  </div>
+                </div>
+
+              </div>
+            </section>
+
+            <footer class="footer-actions">
+              <div class="footer-actions__secondary">
+                <button class="btn btn-secondary" type="button">Voltar</button>
+              </div>
+              <div class="footer-actions__primary">
+                <button class="btn btn-primary" type="button">Criar servidor</button>
+              </div>
+            </footer>
+          </main>
+
+        </div>
+      </div>
+
+      <!-- ─────────────────────────────────────────────
+           Exemplo 3 — Viatura (com field-layout)
+           ───────────────────────────────────────────── -->
+      <div id="frow-viatura" class="ui-lab-standard-example">
+        <div class="page-shell page-shell--standard">
+
+          <header class="page-header page-header--clean" aria-labelledby="frow-vt-title">
+            <div class="page-header__stage">
+              <div class="page-header__context">
+                <span class="page-header__eyebrow">Cadastros</span>
+                <h2 class="page-header__title" id="frow-vt-title">Nova viatura</h2>
+              </div>
+            </div>
+            <div class="page-header__body">
+              <div class="app-page__brand">
+                <div class="app-page__brand-mark" aria-hidden="true">VT</div>
+                <div class="app-page__brand-copy">
+                  <p class="app-page__subtitle">
+                    Cadastro de viatura com field-layout. Linha 1: 4 colunas. Linha 2: 3 colunas. Linha 3: 1 coluna (textarea).
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="page-header__ribbon" aria-hidden="true"></div>
+          </header>
+
+          <main class="main-form-panel">
+            <section class="form-section" aria-labelledby="frow-vt-dados">
+              <header class="section-header">
+                <div class="section-header__copy">
+                  <h3 class="section-header__title" id="frow-vt-dados">Dados da viatura</h3>
+                  <p class="section-header__description">Placa, modelo, combustível e tipo são obrigatórios.</p>
+                </div>
+              </header>
+
+              <div class="field-layout">
+
+                <!-- Linha 1: placa + modelo + tipo + combustível (4 colunas) -->
+                <div class="field-row field-row--4">
+                  <div class="ui-lab-form-field">
+                    <label class="ui-lab-form-label" for="frow-vt-placa">Placa <span class="form-field__required" aria-hidden="true">*</span></label>
+                    <input id="frow-vt-placa" class="form-control" type="text" value="AAA1A23" placeholder="AAA1234 ou AAA1A23" autocomplete="off">
+                  </div>
+                  <div class="ui-lab-form-field">
+                    <label class="ui-lab-form-label" for="frow-vt-modelo">Modelo <span class="form-field__required" aria-hidden="true">*</span></label>
+                    <input id="frow-vt-modelo" class="form-control" type="text" value="COROLLA" placeholder="Modelo">
+                  </div>
+                  <div class="ui-lab-form-field">
+                    <label class="ui-lab-form-label" for="frow-vt-tipo">Tipo <span class="form-field__required" aria-hidden="true">*</span></label>
+                    <select id="frow-vt-tipo" class="form-select">
+                      <option>Descaracterizada</option>
+                      <option>Caracterizada</option>
+                    </select>
+                  </div>
+                  <div class="ui-lab-form-field">
+                    <label class="ui-lab-form-label" for="frow-vt-comb">Combustível <span class="form-field__required" aria-hidden="true">*</span></label>
+                    <div class="field-control-row">
+                      <select id="frow-vt-comb" class="form-select">
+                        <option>Gasolina</option>
+                        <option>Diesel</option>
+                      </select>
+                      <a class="field-addon-action" href="#">Gerenciar</a>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Linha 2: unidade + status + ano (3 colunas) -->
+                <div class="field-row field-row--3">
+                  <div class="ui-lab-form-field">
+                    <label class="ui-lab-form-label" for="frow-vt-unidade">Unidade</label>
+                    <select id="frow-vt-unidade" class="form-select">
+                      <option>Unidade central</option>
+                      <option>Unidade operacional</option>
+                    </select>
+                  </div>
+                  <div class="ui-lab-form-field">
+                    <label class="ui-lab-form-label" for="frow-vt-status">Status</label>
+                    <select id="frow-vt-status" class="form-select">
+                      <option>Ativo</option>
+                      <option>Inativo</option>
+                    </select>
+                  </div>
+                  <div class="ui-lab-form-field">
+                    <label class="ui-lab-form-label" for="frow-vt-ano">Ano</label>
+                    <input id="frow-vt-ano" class="form-control" type="text" placeholder="2024" inputmode="numeric">
+                  </div>
+                </div>
+
+                <!-- Linha 3: observações full width (textarea) -->
+                <div class="field-row field-row--1">
+                  <div class="ui-lab-form-field">
+                    <label class="ui-lab-form-label" for="frow-vt-obs">Observações</label>
+                    <textarea id="frow-vt-obs" class="form-control" rows="3" placeholder="Informações adicionais sobre a viatura..."></textarea>
+                    <p class="form-field__hint">Texto livre. Não é impresso nos documentos.</p>
+                  </div>
+                </div>
+
+              </div>
+            </section>
+
+            <footer class="footer-actions">
+              <div class="footer-actions__secondary">
+                <button class="btn btn-secondary" type="button">Voltar</button>
+              </div>
+              <div class="footer-actions__primary">
+                <button class="btn btn-primary" type="button">Criar viatura</button>
+              </div>
+            </footer>
+          </main>
+
+        </div>
+      </div>
+
+    </div><!-- /shell-field-rows -->
+
   </section>
 
 </main>
@@ -929,7 +1380,7 @@
 <script>
 (function () {
   /* â”€â”€ Tab switcher â”€â”€ */
-  var VARIANTS = ['shell-simple', 'shell-standard', 'shell-wizard', 'shell-list'];
+  var VARIANTS = ['shell-simple', 'shell-standard', 'shell-wizard', 'shell-list', 'shell-field-rows'];
 
   function showVariant(id) {
     VARIANTS.forEach(function (v) {
