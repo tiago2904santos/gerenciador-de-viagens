@@ -155,7 +155,43 @@
 }
 
 
-/* ==========================================================================
+/* ========================================================================== */
+/* 3. Header Stack Quick Add                                                  */
+/* Scoped only to UI Lab example 7.                                           */
+/* ========================================================================== */
+
+.header-stack--quick-add {
+  border-bottom-right-radius: 0;
+  position: relative;
+}
+
+.header-stack--quick-add__rail-group {
+  padding-bottom: var(--quick-add-tab-height, 35px);
+  position: relative;
+  width: 100%;
+}
+
+.header-stack--quick-add .quick-add-tab {
+  bottom: 0;
+  max-width: 100%;
+  position: absolute;
+  right: 0;
+  z-index: 2;
+}
+
+.header-stack--quick-add .quick-add-panel {
+  border-top-right-radius: 0;
+  margin-top: 0;
+  width: 100%;
+}
+
+.header-stack--quick-add .header-rail--quick-add,
+.header-stack--quick-add .page-header-rail--filters-quick-add {
+  width: 100%;
+}
+
+
+/* ========================================================================== 
    1. Scope Tokens
    Tokens estruturais e de compatibilidade válidos em ambos os temas.
    ========================================================================== */

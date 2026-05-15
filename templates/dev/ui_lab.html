@@ -307,7 +307,7 @@
            ======================================================= -->
       <div class="ui-lab-variant-block">
         <span class="ui-lab-demo-label">7. Header Stack — Rail Filters + Quick Add (aba pasta)</span>
-        <div class="page-header-stack">
+        <div class="page-header-stack header-stack--quick-add">
           <div class="page-header-band">
             <div class="page-header-band__content">
               <div class="page-header-band__text">
@@ -316,33 +316,27 @@
               </div>
             </div>
           </div>
-          <div class="page-header-rail page-header-rail--filters-quick-add">
-            <div class="page-header-rail__marker" aria-hidden="true">TP</div>
-            <div class="header-filter-bar">
-              <div class="header-filter-bar__search">
-                <input class="header-filter-input" type="search"
-                       placeholder="Filtro exemplo 1..." aria-label="Buscar">
+          <div class="header-stack--quick-add__rail-group">
+            <div class="page-header-rail page-header-rail--filters-quick-add header-rail--quick-add">
+              <div class="page-header-rail__marker" aria-hidden="true">TP</div>
+              <div class="header-filter-bar">
+                <div class="header-filter-bar__search">
+                  <input class="header-filter-input" type="search"
+                         placeholder="Filtro exemplo 1..." aria-label="Buscar">
+                </div>
               </div>
+              <button class="quick-add-inline__tab quick-add-tab" type="button"
+                      data-quick-add-toggle-headers
+                      aria-expanded="false"
+                      aria-controls="qa-hdr-panel">
+                <span class="quick-add-inline__tab-icon" aria-hidden="true">+</span>
+                <span class="quick-add-inline__tab-label">Cadastrar item</span>
+              </button>
             </div>
           </div>
-        </div>
 
-        <!-- Quick Add com aba estilo pasta -->
-        <div class="quick-add-inline" data-quick-add-headers>
-
-          <!-- Aba / gatilho -->
-          <div class="quick-add-inline__tab-row">
-            <button class="quick-add-inline__tab" type="button"
-                    data-quick-add-toggle-headers
-                    aria-expanded="false"
-                    aria-controls="qa-hdr-panel">
-              <span class="quick-add-inline__tab-icon" aria-hidden="true">+</span>
-              <span class="quick-add-inline__tab-label">Cadastrar item</span>
-            </button>
-          </div>
-
-          <!-- Painel expansível (inicialmente oculto) -->
-          <div class="quick-add-inline__panel" id="qa-hdr-panel" hidden>
+          <!-- Quick Add com aba estilo pasta -->
+          <div class="quick-add-inline__panel quick-add-panel" id="qa-hdr-panel" hidden>
             <div class="quick-add-inline__body">
               <div class="quick-add-inline__fields">
                 <div class="field-grid">
@@ -363,7 +357,6 @@
               </div>
             </div>
           </div>
-
         </div>
       </div>
 
