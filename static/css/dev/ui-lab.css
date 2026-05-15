@@ -161,7 +161,6 @@
 /* ========================================================================== */
 
 .header-stack--quick-add {
-  border-bottom-right-radius: 0;
   position: relative;
 }
 
@@ -169,73 +168,64 @@
   display: flex;
   flex-direction: column;
   gap: 0;
-  padding-bottom: var(--quick-add-tab-height, 35px);
   position: relative;
   width: 100%;
 }
 
 .header-stack--quick-add .header-rail--quick-add,
 .header-stack--quick-add .page-header-rail--filters-quick-add {
+  align-items: center;
+  display: flex;
   overflow: visible;
   position: relative;
   width: 100%;
-  border-bottom-right-radius: 0;
 }
 
-.header-stack--quick-add .quick-add-tab {
-  --quick-add-tab-width:  clamp(184px, 24vw, 232px);
-  --quick-add-tab-height: 38px;
-  --quick-add-tab-cut:    var(--space-5);
+.header-stack--quick-add .filter-row {
+  align-items: center;
+  display: flex;
+  flex: 1;
+  gap: var(--space-4);
+  justify-content: space-between;
+  min-width: 0;
+  width: 100%;
+}
 
-  bottom: 0;
+.header-stack--quick-add .filter-control {
+  align-items: center;
+  display: flex;
+  flex: 1;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.header-stack--quick-add .filter-actions {
+  align-items: center;
+  display: flex;
+  flex-shrink: 0;
+  justify-content: flex-end;
+}
+
+.header-stack--quick-add .quick-add-button {
+  align-items: center;
   box-sizing: border-box;
-  clip-path: none;
-  height: var(--quick-add-tab-height);
-  max-width: min(100%, var(--quick-add-tab-width));
-  padding-inline: calc(var(--space-5) + var(--quick-add-tab-cut)) var(--space-5);
-  position: absolute;
-  right: 0;
-  border-radius: 0 var(--radius-md) var(--radius-md) 0;
-  background: var(--surface-quick-add-tab);
-  border: 1px solid var(--border-quick-add-tab);
-  color: var(--color-quick-add-tab);
+  display: inline-flex;
+  gap: var(--space-2);
+  height: var(--control-height-sm);
+  justify-content: center;
+  padding-inline: var(--space-4);
   white-space: nowrap;
-  z-index: 2;
 }
 
-.header-stack--quick-add .quick-add-tab::before {
-  background: var(--surface-filter-bar);
-  clip-path: polygon(100% 0, 0 50%, 100% 100%);
-  content: "";
-  inset: 0 auto 0 calc(-1 * var(--quick-add-tab-cut));
-  pointer-events: none;
-  position: absolute;
-  width: var(--quick-add-tab-cut);
-}
-
-.header-stack--quick-add .quick-add-tab > * {
-  position: relative;
-  z-index: 1;
-}
-
-.header-stack--quick-add .quick-add-tab:hover,
-.header-stack--quick-add .quick-add-tab:focus-visible {
-  background: var(--surface-quick-add-tab);
-  border-color: var(--border-quick-add-tab);
-  box-shadow: none;
-  color: var(--theme-text-heading);
-}
-
-.header-stack--quick-add .quick-add-tab:hover .quick-add-inline__tab-icon {
-  background: var(--color-accent-hover, var(--color-accent));
+.header-stack--quick-add .quick-add-button,
+.header-stack--quick-add .quick-add-button:hover,
+.header-stack--quick-add .quick-add-button:focus {
+  border-radius: var(--radius-pill);
 }
 
 .header-stack--quick-add .quick-add-panel {
-  border-top-right-radius: 0;
   margin-top: 0;
   width: 100%;
-  position: relative;
-  z-index: 1;
 }
 
 .header-stack--quick-add .header-rail--quick-add,
