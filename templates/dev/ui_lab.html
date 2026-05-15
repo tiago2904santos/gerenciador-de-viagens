@@ -329,15 +329,7 @@
                   </div>
                 </div>
               </div>
-              <button class="quick-add-footer-button btn btn-secondary" type="button"
-                      data-quick-add-toggle-headers
-                      aria-expanded="false"
-                      aria-controls="qa-hdr-panel">
-                <span class="quick-add-footer-button__icon" aria-hidden="true">+</span>
-                <span class="quick-add-footer-button__label">Cadastrar item</span>
-              </button>
             </div>
-            <!-- Quick Add footer -->
             <div class="quick-add-inline__panel quick-add-panel" id="qa-hdr-panel" hidden>
               <div class="quick-add-inline__body">
                 <div class="quick-add-inline__fields">
@@ -359,6 +351,15 @@
                 </div>
               </div>
             </div>
+            <button class="quick-add-footer-button btn btn-secondary" type="button"
+                    data-quick-add-toggle-headers
+                    aria-expanded="false"
+                    aria-controls="qa-hdr-panel">
+              <span class="quick-add-footer-button__icon" aria-hidden="true">+</span>
+              <span class="quick-add-footer-button__label">Cadastrar item</span>
+            </button>
+            <!-- Quick Add footer -->
+            
           </div>
         </div>
       </div>
@@ -1321,31 +1322,54 @@
   if (qaiClose)  qaiClose.addEventListener('click',  closeQai);
   if (qaiCancel) qaiCancel.addEventListener('click', closeQai);
 
-  /* ── Quick Add Folder Tab (Headers → exemplo 7) ── */
-  document.querySelectorAll('[data-quick-add-toggle-headers]').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      var panelId  = btn.getAttribute('aria-controls');
-      var panel    = document.getElementById(panelId);
-      var expanded = btn.getAttribute('aria-expanded') === 'true';
+  /* ── Quick Add Footer (Headers → exemplo 7) ── */
+  var headerQaiToggle = document.querySelector('[data-quick-add-toggle-headers]');
+  var headerQaiPanel  = document.getElementById('qa-hdr-panel');
+  var headerQaiClose  = document.querySelectorAll('[data-quick-add-close-headers]');
+  var headerQaiHideTimer = null;
+
+  function showHeaderQai() {
+    if (!headerQaiToggle || !headerQaiPanel) return;
+    if (headerQaiHideTimer) {
+      window.clearTimeout(headerQaiHideTimer);
+      headerQaiHideTimer = null;
+    }
+    headerQaiPanel.hidden = false;
+    window.requestAnimationFrame(function () {
+      headerQaiPanel.classList.add('is-open');
+    });
+    headerQaiToggle.setAttribute('aria-expanded', 'true');
+    headerQaiToggle.classList.add('is-active');
+  }
+
+  function hideHeaderQai() {
+    if (!headerQaiToggle || !headerQaiPanel) return;
+    headerQaiToggle.setAttribute('aria-expanded', 'false');
+    headerQaiToggle.classList.remove('is-active');
+    headerQaiPanel.classList.remove('is-open');
+
+    var finishHide = function () {
+      headerQaiPanel.hidden = true;
+      headerQaiPanel.removeEventListener('transitionend', finishHide);
+    };
+
+    headerQaiPanel.addEventListener('transitionend', finishHide);
+    headerQaiHideTimer = window.setTimeout(finishHide, 280);
+  }
+
+  if (headerQaiToggle) {
+    headerQaiToggle.addEventListener('click', function () {
+      var expanded = headerQaiToggle.getAttribute('aria-expanded') === 'true';
       if (expanded) {
-        btn.setAttribute('aria-expanded', 'false');
-        panel.hidden = true;
+        hideHeaderQai();
       } else {
-        btn.setAttribute('aria-expanded', 'true');
-        panel.hidden = false;
+        showHeaderQai();
       }
     });
-  });
+  }
 
-  document.querySelectorAll('[data-quick-add-close-headers]').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      var toggle = document.querySelector('[data-quick-add-toggle-headers]');
-      if (!toggle) return;
-      var panelId = toggle.getAttribute('aria-controls');
-      var panel   = document.getElementById(panelId);
-      toggle.setAttribute('aria-expanded', 'false');
-      if (panel) panel.hidden = true;
-    });
+  headerQaiClose.forEach(function (btn) {
+    btn.addEventListener('click', hideHeaderQai);
   });
 
 }());

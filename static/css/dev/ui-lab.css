@@ -242,7 +242,21 @@
 
 .header-stack--quick-add .quick-add-panel {
   margin-top: 0;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transform: translateY(-8px);
+  transition:
+    max-height 220ms ease,
+    opacity 180ms ease,
+    transform 220ms ease;
   width: 100%;
+}
+
+.header-stack--quick-add .quick-add-panel.is-open {
+  max-height: 480px;
+  opacity: 1;
+  transform: translateY(0);
 }
 
 
