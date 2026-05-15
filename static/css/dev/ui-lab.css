@@ -174,9 +174,9 @@
 
 .header-stack--quick-add .header-rail--quick-add,
 .header-stack--quick-add .page-header-rail--filters-quick-add {
-  align-items: center;
   display: flex;
-  overflow: visible;
+  flex-direction: column;
+  overflow: hidden;
   position: relative;
   width: 100%;
 }
@@ -184,7 +184,6 @@
 .header-stack--quick-add .filter-row {
   align-items: center;
   display: flex;
-  flex: 1;
   gap: var(--space-4);
   justify-content: space-between;
   min-width: 0;
@@ -199,11 +198,13 @@
   min-width: 0;
 }
 
-.header-stack--quick-add .filter-actions {
+.header-stack--quick-add .quick-add-footer {
   align-items: center;
   display: flex;
-  flex-shrink: 0;
   justify-content: flex-end;
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--border-subtle);
+  background: var(--surface-filter-footer, var(--surface-filter-bar));
 }
 
 .header-stack--quick-add .quick-add-button {
@@ -225,11 +226,6 @@
 
 .header-stack--quick-add .quick-add-panel {
   margin-top: 0;
-  width: 100%;
-}
-
-.header-stack--quick-add .header-rail--quick-add,
-.header-stack--quick-add .page-header-rail--filters-quick-add {
   width: 100%;
 }
 
