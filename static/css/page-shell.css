@@ -1893,10 +1893,10 @@ html[data-theme="light"] {
 
 /* Aba / gatilho de abertura — estilo pasta física */
 .quick-add-inline__tab {
-  width: 185px;
-  height: 38px;
+  width: 230px;
+  height: 35px;
   padding-inline: var(--space-4);
-
+  border-radius: 0 0 var(--radius-md) 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1910,7 +1910,7 @@ html[data-theme="light"] {
   border: 0;
   cursor: pointer;
 
-  clip-path: path("M 0 0 H 185 Q 172 14 160 32 Q 154 38 145 38 H 40 Q 31 38 25 32 Q 13 14 0 0 Z");
+  clip-path: path("M 0 0 H 230 V 35 H 46 Q 38 35 33 32 Q 11 11 2 0 Z");
 }
 
 .quick-add-inline__tab:hover,

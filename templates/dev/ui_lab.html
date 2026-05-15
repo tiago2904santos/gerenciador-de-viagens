@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 {% load static %}
 
 {% block title %}UI Lab{% endblock %}
@@ -343,12 +343,6 @@
 
           <!-- Painel expansível (inicialmente oculto) -->
           <div class="quick-add-inline__panel" id="qa-hdr-panel" hidden>
-            <div class="quick-add-inline__header">
-              <h3 class="quick-add-inline__title">Cadastrar item</h3>
-              <button class="quick-add-inline__close" type="button"
-                      data-quick-add-close-headers
-                      aria-label="Fechar cadastro rápido">×</button>
-            </div>
             <div class="quick-add-inline__body">
               <div class="quick-add-inline__fields">
                 <div class="field-grid">
@@ -368,7 +362,6 @@
                 <button class="btn btn-primary" type="button">Salvar</button>
               </div>
             </div>
-            <p class="quick-add-inline__hint">Texto auxiliar opcional abaixo do formulário.</p>
           </div>
 
         </div>
@@ -387,132 +380,130 @@
              is-pending  — etapa 5 (aguardando)
              is-disabled — etapa 6 (bloqueada)
            ======================================================= -->
-      <div class="ui-lab-variant-block">
-        <span class="ui-lab-demo-label">8. Header Stack — Rail Stepper (6 etapas, todos os estados)</span>
-        <div class="page-header-stack">
+      <div id="est-wizard" class="ui-lab-standard-example">
+        <div class="page-shell page-shell--wizard">
 
-          <!-- Band com chip de status -->
-          <div class="page-header-band">
-            <div class="page-header-band__content">
-              <div class="page-header-band__text">
-                <span class="page-header-band__eyebrow">Contexto</span>
-                <h2 class="page-header-band__title">Título da página</h2>
+          <div class="page-header-stack">
+            <div class="page-header-band">
+              <div class="page-header-band__content">
+                <div class="page-header-band__text">
+                  <span class="page-header-band__eyebrow">Contexto</span>
+                  <h2 class="page-header-band__title">Título da página</h2>
+                </div>
+                <span class="page-header-status-chip page-header-status-chip--draft">Rascunho</span>
               </div>
-              <span class="page-header-status-chip page-header-status-chip--draft">Rascunho</span>
+            </div>
+            <div class="page-header-rail">
+              <div class="page-header-rail__marker" aria-hidden="true">TP</div>
+              <div class="page-header-rail__content">
+                <span class="page-header-rail__eyebrow">Módulo</span>
+                <p class="page-header-rail__subtitle">Etapa 2 de 6 — Subtítulo genérico da etapa atual.</p>
+              </div>
             </div>
           </div>
 
-          <!-- Rail Stepper -->
-          <div class="page-header-rail page-header-rail--stepper">
-            <nav class="page-stepper page-stepper--horizontal"
-                 aria-label="Etapas do formulário"
-                 style="background: transparent; border: none; box-shadow: none; padding: 0; overflow: visible;">
-              <ol class="page-stepper__list">
+          <!-- Stepper de 6 etapas com labels reais do fluxo de ofício -->
+          <nav class="page-stepper page-stepper--horizontal" aria-label="Etapas do formulário">
+            <ol class="page-stepper__list">
 
-                <!-- Etapa 1: Concluída -->
-                <li class="page-stepper__item is-complete">
-                  <div class="page-stepper__track">
-                    <div class="page-stepper__connector page-stepper__connector--before"></div>
-                    <div class="page-stepper__marker" aria-hidden="true">
-                      <span class="page-stepper__marker-icon">✓</span>
-                    </div>
-                    <div class="page-stepper__connector page-stepper__connector--after"></div>
+              <!-- Etapa 1: Concluída -->
+              <li class="page-stepper__item is-complete">
+                <div class="page-stepper__track">
+                  <div class="page-stepper__connector page-stepper__connector--before"></div>
+                  <div class="page-stepper__marker" aria-hidden="true">
+                    <span class="page-stepper__marker-icon">✓</span>
                   </div>
-                  <div class="page-stepper__content">
-                    <span class="page-stepper__eyebrow">Etapa 1</span>
-                    <span class="page-stepper__label">Etapa um</span>
-                    <span class="page-stepper__status">Concluída</span>
-                  </div>
-                </li>
+                  <div class="page-stepper__connector page-stepper__connector--after"></div>
+                </div>
+                <div class="page-stepper__content">
+                  <span class="page-stepper__eyebrow">Etapa 1</span>
+                  <span class="page-stepper__label">Dados e viajantes</span>
+                  <span class="page-stepper__status">Concluída</span>
+                </div>
+              </li>
 
-                <!-- Etapa 2: Concluída -->
-                <li class="page-stepper__item is-complete">
-                  <div class="page-stepper__track">
-                    <div class="page-stepper__connector page-stepper__connector--before"></div>
-                    <div class="page-stepper__marker" aria-hidden="true">
-                      <span class="page-stepper__marker-icon">✓</span>
-                    </div>
-                    <div class="page-stepper__connector page-stepper__connector--after"></div>
+              <!-- Etapa 2: Atual -->
+              <li class="page-stepper__item is-current" aria-current="step">
+                <div class="page-stepper__track">
+                  <div class="page-stepper__connector page-stepper__connector--before"></div>
+                  <div class="page-stepper__marker">
+                    <span class="page-stepper__marker-icon" aria-hidden="true">2</span>
                   </div>
-                  <div class="page-stepper__content">
-                    <span class="page-stepper__eyebrow">Etapa 2</span>
-                    <span class="page-stepper__label">Etapa dois</span>
-                    <span class="page-stepper__status">Concluída</span>
-                  </div>
-                </li>
+                  <div class="page-stepper__connector page-stepper__connector--after"></div>
+                </div>
+                <div class="page-stepper__content">
+                  <span class="page-stepper__eyebrow">Etapa 2</span>
+                  <span class="page-stepper__label">Transporte</span>
+                  <span class="page-stepper__status">Em andamento</span>
+                </div>
+              </li>
 
-                <!-- Etapa 3: Atual / em andamento -->
-                <li class="page-stepper__item is-current" aria-current="step">
-                  <div class="page-stepper__track">
-                    <div class="page-stepper__connector page-stepper__connector--before"></div>
-                    <div class="page-stepper__marker">
-                      <span class="page-stepper__marker-icon" aria-hidden="true">3</span>
-                    </div>
-                    <div class="page-stepper__connector page-stepper__connector--after"></div>
+              <!-- Etapa 3: Pendente -->
+              <li class="page-stepper__item is-pending">
+                <div class="page-stepper__track">
+                  <div class="page-stepper__connector page-stepper__connector--before"></div>
+                  <div class="page-stepper__marker">
+                    <span class="page-stepper__marker-icon" aria-hidden="true">3</span>
                   </div>
-                  <div class="page-stepper__content">
-                    <span class="page-stepper__eyebrow">Etapa 3</span>
-                    <span class="page-stepper__label">Etapa três</span>
-                    <span class="page-stepper__status">Em andamento</span>
-                  </div>
-                </li>
+                  <div class="page-stepper__connector page-stepper__connector--after"></div>
+                </div>
+                <div class="page-stepper__content">
+                  <span class="page-stepper__eyebrow">Etapa 3</span>
+                  <span class="page-stepper__label">Roteiro e diárias</span>
+                  <span class="page-stepper__status">Aguardando</span>
+                </div>
+              </li>
 
-                <!-- Etapa 4: Com pendência / faltando algo -->
-                <li class="page-stepper__item is-missing">
-                  <div class="page-stepper__track">
-                    <div class="page-stepper__connector page-stepper__connector--before"></div>
-                    <div class="page-stepper__marker">
-                      <span class="page-stepper__marker-icon" aria-hidden="true">✕</span>
-                    </div>
-                    <div class="page-stepper__connector page-stepper__connector--after"></div>
+              <!-- Etapa 4: Pendente -->
+              <li class="page-stepper__item is-pending">
+                <div class="page-stepper__track">
+                  <div class="page-stepper__connector page-stepper__connector--before"></div>
+                  <div class="page-stepper__marker">
+                    <span class="page-stepper__marker-icon" aria-hidden="true">4</span>
                   </div>
-                  <div class="page-stepper__content">
-                    <span class="page-stepper__eyebrow">Etapa 4</span>
-                    <span class="page-stepper__label">Etapa quatro</span>
-                    <span class="page-stepper__status">Pendência</span>
+                  <div class="page-stepper__connector page-stepper__connector--after"></div>
+                </div>
+                <div class="page-stepper__content">
+                  <span class="page-stepper__eyebrow">Etapa 4</span>
+                  <span class="page-stepper__label">Justificativa</span>
+                  <span class="page-stepper__status">Aguardando</span>
+                </div>
+              </li>
+
+              <!-- Etapa 5: Pendente -->
+              <li class="page-stepper__item is-pending">
+                <div class="page-stepper__track">
+                  <div class="page-stepper__connector page-stepper__connector--before"></div>
+                  <div class="page-stepper__marker">
+                    <span class="page-stepper__marker-icon" aria-hidden="true">5</span>
                   </div>
-                </li>
+                  <div class="page-stepper__connector page-stepper__connector--after"></div>
+                </div>
+                <div class="page-stepper__content">
+                  <span class="page-stepper__eyebrow">Etapa 5</span>
+                  <span class="page-stepper__label">Documentos</span>
+                  <span class="page-stepper__status">Aguardando</span>
+                </div>
+              </li>
 
-                <!-- Etapa 5: Pendente / aguardando -->
-                <li class="page-stepper__item is-pending">
-                  <div class="page-stepper__track">
-                    <div class="page-stepper__connector page-stepper__connector--before"></div>
-                    <div class="page-stepper__marker">
-                      <span class="page-stepper__marker-icon" aria-hidden="true">5</span>
-                    </div>
-                    <div class="page-stepper__connector page-stepper__connector--after"></div>
+              <!-- Etapa 6: Desabilitada -->
+              <li class="page-stepper__item is-disabled">
+                <div class="page-stepper__track">
+                  <div class="page-stepper__connector page-stepper__connector--before"></div>
+                  <div class="page-stepper__marker" aria-hidden="true">
+                    <span class="page-stepper__marker-icon">6</span>
                   </div>
-                  <div class="page-stepper__content">
-                    <span class="page-stepper__eyebrow">Etapa 5</span>
-                    <span class="page-stepper__label">Etapa cinco</span>
-                    <span class="page-stepper__status">Aguardando</span>
-                  </div>
-                </li>
+                  <div class="page-stepper__connector page-stepper__connector--after"></div>
+                </div>
+                <div class="page-stepper__content">
+                  <span class="page-stepper__eyebrow">Etapa 6</span>
+                  <span class="page-stepper__label">Central de assinaturas</span>
+                  <span class="page-stepper__status">Bloqueada</span>
+                </div>
+              </li>
 
-                <!-- Etapa 6: Desabilitada / bloqueada -->
-                <li class="page-stepper__item is-disabled">
-                  <div class="page-stepper__track">
-                    <div class="page-stepper__connector page-stepper__connector--before"></div>
-                    <div class="page-stepper__marker" aria-hidden="true">
-                      <span class="page-stepper__marker-icon">6</span>
-                    </div>
-                    <div class="page-stepper__connector page-stepper__connector--after"></div>
-                  </div>
-                  <div class="page-stepper__content">
-                    <span class="page-stepper__eyebrow">Etapa 6</span>
-                    <span class="page-stepper__label">Etapa seis</span>
-                    <span class="page-stepper__status">Bloqueada</span>
-                  </div>
-                </li>
-
-              </ol>
-            </nav>
-          </div>
-
-        </div>
-      </div>
-
-
+            </ol>
+          </nav>
     </div><!-- /headers -->
 
 
