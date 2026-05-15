@@ -1888,30 +1888,29 @@ html[data-theme="light"] {
 /* Linha que contém a aba (não estica a aba) */
 .quick-add-inline__tab-row {
   display: flex;
+  justify-content: flex-end;
 }
 
 /* Aba / gatilho de abertura — estilo pasta física */
 .quick-add-inline__tab {
-  align-items:     center;
-  background:      var(--surface-quick-add-tab);
-  border:          1px solid var(--border-quick-add-tab);
-  border-bottom:   none;
-  border-radius:   var(--quick-add-tab-radius) var(--quick-add-tab-radius) 0 0;
-  box-shadow:      -1px -2px 8px rgba(0, 0, 0, 0.10),
-                    1px -2px 8px rgba(0, 0, 0, 0.07);
-  color:           var(--color-quick-add-tab, var(--theme-text-muted));
-  cursor:          pointer;
-  display:         inline-flex;
-  font-size:       var(--font-size-sm);
-  font-weight:     var(--font-weight-semibold);
-  gap:             var(--space-2);
-  letter-spacing:  0.01em;
-  padding:         var(--quick-add-tab-py) var(--quick-add-tab-px);
-  transition:
-    background  var(--transition-base),
-    box-shadow  var(--transition-base),
-    color       var(--transition-base);
-  white-space:     nowrap;
+  width: 185px;
+  height: 38px;
+  padding-inline: var(--space-4);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+
+  background: var(--surface-filter-bar);
+  color: var(--text-primary);
+  font-weight: 700;
+  font-size: var(--font-size-sm);
+
+  border: 0;
+  cursor: pointer;
+
+  clip-path: path("M 0 0 H 185 Q 172 14 160 32 Q 154 38 145 38 H 40 Q 31 38 25 32 Q 13 14 0 0 Z");
 }
 
 .quick-add-inline__tab:hover,
