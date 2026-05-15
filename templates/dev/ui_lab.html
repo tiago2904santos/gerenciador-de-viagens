@@ -375,6 +375,7 @@
              is-pending  — etapa 5 (aguardando)
              is-disabled — etapa 6 (bloqueada)
            ======================================================= -->
+      
       <div id="hdr-stepper" class="ui-lab-standard-example">
         <div class="page-shell page-shell--wizard">
 
@@ -523,47 +524,30 @@
            Estrutura 1 — Quick Add Inline
            Cadastro rápido abaixo do filter bar.
            ───────────────────────────────────────────── -->
-      <div id="est-quickadd" class="ui-lab-standard-example">
-        <div class="page-shell page-shell--list">
 
-          <div class="page-header-stack">
-            <div class="page-header-band">
-              <div class="page-header-band__content">
-                <div class="page-header-band__text">
-                  <span class="page-header-band__eyebrow">Contexto</span>
-                  <h2 class="page-header-band__title">Título da página</h2>
-                </div>
-              </div>
-            </div>
-            <div class="page-header-rail page-header-rail--filters-quick-add">
-              <div class="page-header-rail__marker" aria-hidden="true">TP</div>
-              <div class="header-filter-bar">
-                <div class="header-filter-bar__search">
-                  <input class="header-filter-input" type="search"
-                         placeholder="Filtro exemplo 1..." aria-label="Buscar">
-                </div>
-              </div>
-              <div class="page-header-rail__actions">
-                <button class="btn btn-primary" type="button"
-                        id="qai-open-btn" aria-expanded="false"
-                        aria-controls="quick-add-demo">
-                  + Cadastrar item
-                </button>
-              </div>
+      <div class="page-header-stack header-stack--quick-add">
+        <div class="page-header-band">
+          <div class="page-header-band__content">
+            <div class="page-header-band__text">
+              <span class="page-header-band__eyebrow">Contexto</span>
+              <h2 class="page-header-band__title">Título da página</h2>
             </div>
           </div>
-
-          <div class="list-panel">
-
-            <!-- Quick Add Inline -->
-            <div class="quick-add-inline" id="quick-add-demo"
-                 role="region" aria-label="Cadastro rápido">
-              <div class="quick-add-inline__header">
-                <h3 class="quick-add-inline__title">Cadastrar item</h3>
-                <button class="quick-add-inline__close"
-                        type="button" id="qai-close-btn"
-                        aria-label="Fechar cadastro rápido">×</button>
+        </div>
+        <div class="header-stack--quick-add__rail-group">
+          <div class="page-header-rail page-header-rail--filters-quick-add header-rail--quick-add">
+            <div class="filter-row">
+              <div class="filter-control">
+                <div class="page-header-rail__marker" aria-hidden="true">TP</div>
+                <div class="header-filter-bar">
+                  <div class="header-filter-bar__search">
+                    <input class="header-filter-input" type="search"
+                          placeholder="Filtro exemplo 1..." aria-label="Buscar">
+                  </div>
+                </div>
               </div>
+            </div>
+            <div class="quick-add-inline__panel quick-add-panel" id="qa-hdr-panel" hidden>
               <div class="quick-add-inline__body">
                 <div class="quick-add-inline__fields">
                   <div class="field-grid">
@@ -578,13 +562,28 @@
                   </div>
                 </div>
                 <div class="quick-add-inline__actions">
-                  <button class="btn btn-secondary" type="button" id="qai-cancel-btn">Botão 1</button>
-                  <button class="btn btn-primary"   type="button">Botão 2</button>
+                  <button class="btn btn-secondary" type="button"
+                          data-quick-add-close-headers>Cancelar</button>
+                  <button class="btn btn-primary" type="button">Salvar</button>
                 </div>
               </div>
-              <p class="quick-add-inline__hint">Texto auxiliar opcional abaixo do formulário.</p>
             </div>
+          </div>
+          <button class="quick-add-footer-button btn btn-secondary" type="button"
+                    data-quick-add-toggle-headers
+                    aria-expanded="false"
+                    aria-controls="qa-hdr-panel">
+              <span class="quick-add-footer-button__icon" aria-hidden="true">+</span>
+              <span class="quick-add-footer-button__label">Cadastrar item</span>
+            </button>
+        </div>
+      </div>
 
+          <div class="list-panel">
+
+            <!-- Quick Add Inline -->
+          
+            
             <!-- Lista de exemplo -->
             <div class="list-content" role="list" aria-label="Lista de itens (demonstração)">
               <div class="ui-lab-demo-row" role="listitem">
