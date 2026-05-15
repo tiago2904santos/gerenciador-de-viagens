@@ -95,9 +95,10 @@
   --filter-input-height:        var(--control-height-md);
 
   /* --- Quick Add Folder Tab --- */
-  --quick-add-tab-radius:       var(--radius-sm);
-  --quick-add-tab-px:           var(--space-4);
-  --quick-add-tab-py:           var(--space-2);
+  --quick-add-tab-radius:     var(--radius-md);  /* 14px — aba mais arredondada */
+  --quick-add-tab-px:         var(--space-5);    /* 20px — aba mais larga      */
+  --quick-add-tab-py:         var(--space-3);    /* 12px — aba mais alta        */
+  --quick-add-tab-icon-size:  var(--space-5);    /* 20px — círculo do ícone     */
 
   /* --- Footer Actions --- */
   --footer-actions-padding-x: var(--space-6);
@@ -219,8 +220,11 @@ html[data-theme="dark"] {
   --shadow-quick-create:         none;
 
   /* Quick Add Folder Tab */
-  --surface-quick-add-tab:        rgba(255, 255, 255, 0.08);
-  --border-quick-add-tab:         rgba(255, 255, 255, 0.14);
+  --surface-quick-add-tab:        rgba(11, 58, 102, 0.50);   /* azul primário com opacidade */
+  --border-quick-add-tab:         rgba(255, 255, 255, 0.22);
+  --color-quick-add-tab:          #ccdff5;                   /* texto claro sobre fundo escuro */
+  --color-quick-add-tab-icon-bg:  var(--color-accent);       /* círculo dourado */
+  --color-quick-add-tab-icon-fg:  var(--color-primary-dark); /* texto escuro sobre dourado */
 
   /* Header Filter Bar */
   --surface-filter-input:         rgba(255, 255, 255, 0.05);
@@ -317,8 +321,11 @@ html[data-theme="light"] {
   --shadow-quick-create:         none;
 
   /* Quick Add Folder Tab */
-  --surface-quick-add-tab:        #e8f0f9;
-  --border-quick-add-tab:         #c2d4e6;
+  --surface-quick-add-tab:        #dbeaf8;
+  --border-quick-add-tab:         #a8c5de;
+  --color-quick-add-tab:          var(--color-primary-strong);
+  --color-quick-add-tab-icon-bg:  var(--color-primary);
+  --color-quick-add-tab-icon-fg:  var(--color-white);
 
   /* Header Filter Bar */
   --surface-filter-input:         var(--color-surface);
@@ -1883,30 +1890,39 @@ html[data-theme="light"] {
   display: flex;
 }
 
-/* Aba / gatilho de abertura */
+/* Aba / gatilho de abertura — estilo pasta física */
 .quick-add-inline__tab {
   align-items:     center;
   background:      var(--surface-quick-add-tab);
   border:          1px solid var(--border-quick-add-tab);
   border-bottom:   none;
   border-radius:   var(--quick-add-tab-radius) var(--quick-add-tab-radius) 0 0;
-  color:           var(--theme-text-muted-strong, var(--theme-text-muted));
+  box-shadow:      -1px -2px 8px rgba(0, 0, 0, 0.10),
+                    1px -2px 8px rgba(0, 0, 0, 0.07);
+  color:           var(--color-quick-add-tab, var(--theme-text-muted));
   cursor:          pointer;
   display:         inline-flex;
   font-size:       var(--font-size-sm);
   font-weight:     var(--font-weight-semibold);
   gap:             var(--space-2);
+  letter-spacing:  0.01em;
   padding:         var(--quick-add-tab-py) var(--quick-add-tab-px);
   transition:
-    background var(--transition-base),
-    color      var(--transition-base);
+    background  var(--transition-base),
+    box-shadow  var(--transition-base),
+    color       var(--transition-base);
   white-space:     nowrap;
 }
 
 .quick-add-inline__tab:hover,
 .quick-add-inline__tab:focus-visible {
-  background: var(--surface-filter-button);
+  box-shadow: -1px -3px 12px rgba(0, 0, 0, 0.15),
+               1px -3px 12px rgba(0, 0, 0, 0.10);
   color:      var(--theme-text-heading);
+}
+
+.quick-add-inline__tab:hover .quick-add-inline__tab-icon {
+  background: var(--color-accent-hover, var(--color-accent));
 }
 
 .quick-add-inline__tab:focus-visible {
@@ -1914,25 +1930,41 @@ html[data-theme="light"] {
   outline-offset: -2px;
 }
 
+/* Aberta: aba conectada visivelmente ao painel */
 .quick-add-inline__tab[aria-expanded="true"] {
   background: var(--surface-quick-create-header);
+  box-shadow: none;
   color:      var(--theme-text-heading);
 }
 
-/* Ícone rotaciona de + para − quando aberto */
-.quick-add-inline__tab-icon {
-  font-size:      var(--font-size-md);
-  font-weight:    var(--font-weight-bold);
-  line-height:    1;
-  pointer-events: none;
-  transition:     transform var(--transition-base);
-}
-
 .quick-add-inline__tab[aria-expanded="true"] .quick-add-inline__tab-icon {
-  transform: rotate(45deg);
+  background: var(--color-accent);
+  transform:  rotate(45deg);
 }
 
+/* Ícone — círculo colorido com sinal + (gira 45° para virar ×) */
+.quick-add-inline__tab-icon {
+  align-items:     center;
+  background:      var(--color-quick-add-tab-icon-bg);
+  border-radius:   var(--radius-pill);
+  color:           var(--color-quick-add-tab-icon-fg);
+  display:         inline-flex;
+  flex-shrink:     0;
+  font-size:       var(--font-size-xs);
+  font-weight:     var(--font-weight-bold);
+  height:          var(--quick-add-tab-icon-size);
+  justify-content: center;
+  line-height:     1;
+  pointer-events:  none;
+  transition:
+    background  var(--transition-base),
+    transform   var(--transition-base);
+  width:           var(--quick-add-tab-icon-size);
+}
+
+/* Label do texto */
 .quick-add-inline__tab-label {
+  letter-spacing: inherit;
   pointer-events: none;
 }
 
