@@ -78,11 +78,26 @@
   --field-group-gap:     var(--space-3);
 
   /* --- Stepper --- */
-  --stepper-padding-x: var(--space-6);
-  --stepper-padding-y: var(--space-4);
-  --stepper-radius:    var(--radius-lg);
-  --stepper-item-size: 28px;
-  --stepper-gap:       var(--space-2);
+  --stepper-padding-x:   var(--space-6);
+  --stepper-padding-y:   var(--space-4);
+  --stepper-radius:      var(--radius-lg);
+  --stepper-item-size:   28px;           /* legado — mantido para compat */
+  --stepper-marker-size: 40px;           /* marcador premium (novo) */
+  --stepper-connector-h: 2px;            /* espessura da linha conectora */
+  --stepper-gap:         var(--space-2);
+
+  /* --- Header Band --- */
+  --header-band-gap:            var(--space-4);
+
+  /* --- Header Filter Bar --- */
+  --filter-search-min-width:    200px;
+  --filter-field-min-width:     130px;
+  --filter-input-height:        var(--control-height-md);
+
+  /* --- Quick Add Folder Tab --- */
+  --quick-add-tab-radius:       var(--radius-sm);
+  --quick-add-tab-px:           var(--space-4);
+  --quick-add-tab-py:           var(--space-2);
 
   /* --- Footer Actions --- */
   --footer-actions-padding-x: var(--space-6);
@@ -202,6 +217,36 @@ html[data-theme="dark"] {
   --surface-quick-create-header: rgba(255, 255, 255, 0.04);
   --border-quick-create:         rgba(255, 255, 255, 0.08);
   --shadow-quick-create:         none;
+
+  /* Quick Add Folder Tab */
+  --surface-quick-add-tab:        rgba(255, 255, 255, 0.08);
+  --border-quick-add-tab:         rgba(255, 255, 255, 0.14);
+
+  /* Header Filter Bar */
+  --surface-filter-input:         rgba(255, 255, 255, 0.05);
+  --border-filter-input:          rgba(255, 255, 255, 0.12);
+  --color-filter-placeholder:     rgba(255, 255, 255, 0.35);
+  --color-filter-text:            var(--theme-text-body);
+  --surface-filter-button:        rgba(255, 255, 255, 0.06);
+  --border-filter-button:         rgba(255, 255, 255, 0.14);
+  --color-filter-button:          var(--theme-text-muted);
+
+  /* Filtros aplicados — chips */
+  --surface-applied-chip:         rgba(255, 255, 255, 0.07);
+  --border-applied-chip:          rgba(255, 255, 255, 0.16);
+  --color-applied-chip:           var(--theme-text-muted);
+
+  /* Stepper — estados adicionais */
+  --stepper-missing-bg:           rgba(180, 35, 24, 0.16);
+  --stepper-missing-border:       rgba(180, 35, 24, 0.40);
+  --stepper-missing-color:        var(--color-danger);
+  --stepper-missing-connector:    rgba(180, 35, 24, 0.25);
+  --stepper-disabled-opacity:     0.38;
+  --stepper-eyebrow-color:        var(--stepper-label-idle);
+  --stepper-label-missing:        #e57d78;
+  --stepper-status-done-color:    var(--stepper-done-color);
+  --stepper-status-current-color: var(--color-accent);
+  --stepper-status-missing-color: #e57d78;
 }
 
 
@@ -270,6 +315,36 @@ html[data-theme="light"] {
   --surface-quick-create-header: #e6edf5;
   --border-quick-create:         #d4dde9;
   --shadow-quick-create:         none;
+
+  /* Quick Add Folder Tab */
+  --surface-quick-add-tab:        #e8f0f9;
+  --border-quick-add-tab:         #c2d4e6;
+
+  /* Header Filter Bar */
+  --surface-filter-input:         var(--color-surface);
+  --border-filter-input:          var(--color-border);
+  --color-filter-placeholder:     var(--theme-text-muted);
+  --color-filter-text:            var(--theme-text-body);
+  --surface-filter-button:        var(--color-surface);
+  --border-filter-button:         var(--color-border);
+  --color-filter-button:          var(--theme-text-muted);
+
+  /* Filtros aplicados — chips */
+  --surface-applied-chip:         var(--color-primary-soft);
+  --border-applied-chip:          rgba(11, 58, 102, 0.18);
+  --color-applied-chip:           var(--color-primary-strong);
+
+  /* Stepper — estados adicionais */
+  --stepper-missing-bg:           var(--color-danger-soft);
+  --stepper-missing-border:       var(--color-danger-border-soft);
+  --stepper-missing-color:        var(--color-danger);
+  --stepper-missing-connector:    rgba(180, 35, 24, 0.14);
+  --stepper-disabled-opacity:     0.42;
+  --stepper-eyebrow-color:        var(--stepper-label-idle);
+  --stepper-label-missing:        var(--color-danger);
+  --stepper-status-done-color:    var(--color-primary);
+  --stepper-status-current-color: var(--color-accent);
+  --stepper-status-missing-color: var(--color-danger);
 }
 
 
@@ -425,10 +500,25 @@ html[data-theme="light"] {
 
 
 /* =========================================================
-   08. Stepper / Navegação
-   Indicador de progresso entre etapas. Presente apenas no wizard.
+   08. Stepper / Navegação em Etapas
+   Indicador de progresso horizontal com marcadores circulares,
+   conectores, rótulos, subestatutos e 5 estados visuais.
+
+   Estrutura de cada item:
+     .page-stepper__track   — trilha: [conector-antes] [marcador] [conector-após]
+     .page-stepper__content — rótulos: eyebrow + label + status
+
+   Estados:
+     .is-complete  — concluído (marcador verde/check)
+     .is-current   — em andamento (marcador azul destacado)
+     .is-pending   — aguardando (marcador neutro)
+     .is-missing   — com pendência (marcador vermelho/X)
+     .is-disabled  — bloqueado (opacidade reduzida)
+
+   Alias legado: .is-active → equivalente a .is-current
    ========================================================= */
 
+/* Contêiner — card branco com scroll horizontal */
 .page-stepper {
   background:      var(--surface-stepper);
   border:          1px solid var(--border-stepper);
@@ -444,37 +534,77 @@ html[data-theme="light"] {
 
 .page-stepper::-webkit-scrollbar { display: none; }
 
+/* Lista horizontal de etapas */
 .page-stepper__list {
-  align-items: center;
+  align-items: flex-start;
   display:     flex;
   list-style:  none;
   margin:      0;
+  min-width:   max-content;
   padding:     0;
 }
 
+/* Item — coluna: trilha no topo, rótulos abaixo */
 .page-stepper__item {
+  align-items:    center;
+  display:        flex;
+  flex:           1;
+  flex-direction: column;
+  gap:            var(--space-2);
+  min-width:      80px;
+}
+
+/* Trilha: linha-esquerda + marcador + linha-direita */
+.page-stepper__track {
   align-items: center;
   display:     flex;
-  flex:        1;
-  gap:         var(--stepper-gap);
-  min-width:   0;
+  width:       100%;
 }
 
-.page-stepper__item + .page-stepper__item::before {
-  background:  var(--stepper-connector);
-  content:     "";
-  flex-shrink: 0;
-  height:      1px;
-  margin:      0 var(--space-2);
-  transition:  background var(--transition-base);
-  width:       var(--space-6);
+/* Linha conectora entre marcadores */
+.page-stepper__connector {
+  background: var(--stepper-connector);
+  flex:       1;
+  height:     var(--stepper-connector-h);
+  min-width:  var(--space-2);
+  transition: background var(--transition-base);
 }
 
-.page-stepper__item.is-complete + .page-stepper__item::before,
-.page-stepper__item.is-active  + .page-stepper__item::before {
-  background: var(--stepper-connector-on);
+/* Extremidades invisíveis para alinhamento centrado */
+.page-stepper__item:first-child .page-stepper__connector--before { visibility: hidden; }
+.page-stepper__item:last-child  .page-stepper__connector--after  { visibility: hidden; }
+
+/* Marcador circular premium */
+.page-stepper__marker {
+  align-items:     center;
+  background:      var(--stepper-idle-bg);
+  border:          2px solid var(--stepper-idle-border);
+  border-radius:   var(--radius-pill);
+  color:           var(--stepper-idle-color);
+  display:         inline-flex;
+  flex-shrink:     0;
+  font-size:       var(--font-size-sm);
+  font-weight:     var(--font-weight-bold);
+  height:          var(--stepper-marker-size);
+  justify-content: center;
+  line-height:     1;
+  transition:
+    background   var(--transition-base),
+    border-color var(--transition-base),
+    box-shadow   var(--transition-base),
+    color        var(--transition-base);
+  width:           var(--stepper-marker-size);
 }
 
+/* Ícone interno do marcador (✓, ✕, número) */
+.page-stepper__marker-icon {
+  font-size:   var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+  pointer-events: none;
+}
+
+/* Alias legado para __marker */
 .page-stepper__number {
   align-items:     center;
   background:      var(--stepper-idle-bg);
@@ -491,36 +621,128 @@ html[data-theme="light"] {
     background   var(--transition-base),
     color        var(--transition-base),
     border-color var(--transition-base);
-  width: var(--stepper-item-size);
+  width:           var(--stepper-item-size);
 }
 
+/* Bloco textual centralizado abaixo do marcador */
+.page-stepper__content {
+  align-items:    center;
+  display:        flex;
+  flex-direction: column;
+  gap:            2px;
+  padding:        0 var(--space-1);
+  text-align:     center;
+}
+
+/* Número da etapa (eyebrow) */
+.page-stepper__eyebrow {
+  color:          var(--stepper-eyebrow-color);
+  font-size:      10px;
+  font-weight:    var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
+  text-transform: uppercase;
+}
+
+/* Título da etapa */
 .page-stepper__label {
-  color:         var(--stepper-label-idle);
-  font-size:     var(--font-size-xs);
-  font-weight:   var(--font-weight-semibold);
-  overflow:      hidden;
-  text-overflow: ellipsis;
-  transition:    color var(--transition-base);
-  white-space:   nowrap;
+  color:       var(--stepper-label-idle);
+  font-size:   var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.3;
+  transition:  color var(--transition-base);
 }
 
+/* Status da etapa (Concluída, Em andamento…) */
+.page-stepper__status {
+  color:     var(--stepper-label-idle);
+  font-size: 10px;
+  opacity:   0.7;
+  transition: color var(--transition-base), opacity var(--transition-base);
+}
+
+
+/* ─── Estado: Concluído (.is-complete) ──────────────────── */
+
+.page-stepper__item.is-complete .page-stepper__connector {
+  background: var(--stepper-connector-on);
+}
+
+.page-stepper__item.is-complete + .page-stepper__item .page-stepper__connector--before {
+  background: var(--stepper-connector-on);
+}
+
+.page-stepper__item.is-complete .page-stepper__marker,
 .page-stepper__item.is-complete .page-stepper__number {
   background:   var(--stepper-done-bg);
   border-color: var(--stepper-done-border);
   color:        var(--stepper-done-color);
 }
 
-.page-stepper__item.is-complete .page-stepper__label { color: var(--stepper-label-done); }
+.page-stepper__item.is-complete .page-stepper__label {
+  color: var(--stepper-label-done);
+}
 
-.page-stepper__item.is-active .page-stepper__number {
+.page-stepper__item.is-complete .page-stepper__status {
+  color:   var(--stepper-status-done-color);
+  opacity: 1;
+}
+
+
+/* ─── Estado: Atual / em andamento (.is-current | .is-active) ── */
+
+.page-stepper__item.is-current .page-stepper__marker,
+.page-stepper__item.is-active  .page-stepper__number {
   background:   var(--stepper-active-bg);
   border-color: var(--stepper-active-border);
+  box-shadow:   0 0 0 3px var(--stepper-idle-bg),
+                0 0 0 5px var(--stepper-active-bg);
   color:        var(--stepper-active-color);
 }
 
-.page-stepper__item.is-active .page-stepper__label {
+.page-stepper__item.is-current .page-stepper__label,
+.page-stepper__item.is-active  .page-stepper__label {
   color:       var(--stepper-label-active);
   font-weight: var(--font-weight-bold);
+}
+
+.page-stepper__item.is-current .page-stepper__status,
+.page-stepper__item.is-active  .page-stepper__status {
+  color:   var(--stepper-status-current-color);
+  opacity: 1;
+}
+
+
+/* ─── Estado: Com pendência / faltando algo (.is-missing) ── */
+
+.page-stepper__item.is-missing .page-stepper__marker {
+  background:   var(--stepper-missing-bg);
+  border-color: var(--stepper-missing-border);
+  color:        var(--stepper-missing-color);
+}
+
+.page-stepper__item.is-missing .page-stepper__label {
+  color: var(--stepper-label-missing, var(--stepper-label-idle));
+}
+
+.page-stepper__item.is-missing .page-stepper__status {
+  color:   var(--stepper-status-missing-color);
+  opacity: 1;
+}
+
+
+/* ─── Estado: Desabilitado / bloqueado (.is-disabled) ────── */
+
+.page-stepper__item.is-disabled {
+  opacity:        var(--stepper-disabled-opacity);
+  pointer-events: none;
+}
+
+
+/* ─── Foco acessível ─────────────────────────────────────── */
+
+.page-stepper__item:focus-visible .page-stepper__marker {
+  outline:        2px solid var(--border-focus);
+  outline-offset: 3px;
 }
 
 
@@ -1323,6 +1545,24 @@ html[data-theme="light"] {
   margin:         0;
 }
 
+/* Conteúdo do Band: texto à esquerda + chip à direita */
+.page-header-band__content {
+  align-items:     center;
+  display:         flex;
+  gap:             var(--header-band-gap);
+  justify-content: space-between;
+  min-width:       0;
+  width:           100%;
+}
+
+/* Bloco textual do Band (eyebrow + título) */
+.page-header-band__text {
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--space-1);
+  min-width:      0;
+}
+
 /* Chip de status dentro do Band */
 .page-header-status-chip {
   border-radius:  var(--radius-pill);
@@ -1630,17 +1870,86 @@ html[data-theme="light"] {
    ========================================================= */
 
 .quick-add-inline {
-  background:     var(--surface-quick-create);
-  border-bottom:  1px solid var(--border-quick-create);
-  box-shadow:     var(--shadow-quick-create);
   box-sizing:     border-box;
-  display:        none;
+  display:        flex;
   flex-direction: column;
   width:          100%;
 }
 
-.quick-add-inline.is-open {
+/* ─── Folder Tab — orelhinha de pasta física ─────────────── */
+
+/* Linha que contém a aba (não estica a aba) */
+.quick-add-inline__tab-row {
   display: flex;
+}
+
+/* Aba / gatilho de abertura */
+.quick-add-inline__tab {
+  align-items:     center;
+  background:      var(--surface-quick-add-tab);
+  border:          1px solid var(--border-quick-add-tab);
+  border-bottom:   none;
+  border-radius:   var(--quick-add-tab-radius) var(--quick-add-tab-radius) 0 0;
+  color:           var(--theme-text-muted-strong, var(--theme-text-muted));
+  cursor:          pointer;
+  display:         inline-flex;
+  font-size:       var(--font-size-sm);
+  font-weight:     var(--font-weight-semibold);
+  gap:             var(--space-2);
+  padding:         var(--quick-add-tab-py) var(--quick-add-tab-px);
+  transition:
+    background var(--transition-base),
+    color      var(--transition-base);
+  white-space:     nowrap;
+}
+
+.quick-add-inline__tab:hover,
+.quick-add-inline__tab:focus-visible {
+  background: var(--surface-filter-button);
+  color:      var(--theme-text-heading);
+}
+
+.quick-add-inline__tab:focus-visible {
+  outline:        2px solid var(--border-focus);
+  outline-offset: -2px;
+}
+
+.quick-add-inline__tab[aria-expanded="true"] {
+  background: var(--surface-quick-create-header);
+  color:      var(--theme-text-heading);
+}
+
+/* Ícone rotaciona de + para − quando aberto */
+.quick-add-inline__tab-icon {
+  font-size:      var(--font-size-md);
+  font-weight:    var(--font-weight-bold);
+  line-height:    1;
+  pointer-events: none;
+  transition:     transform var(--transition-base);
+}
+
+.quick-add-inline__tab[aria-expanded="true"] .quick-add-inline__tab-icon {
+  transform: rotate(45deg);
+}
+
+.quick-add-inline__tab-label {
+  pointer-events: none;
+}
+
+/* Painel: visualmente unido à aba acima */
+.quick-add-inline__panel {
+  background:    var(--surface-quick-create);
+  border:        1px solid var(--border-quick-create);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) var(--radius-sm);
+  box-shadow:    var(--shadow-quick-create);
+  box-sizing:    border-box;
+  width:         100%;
+}
+
+/* Fallback: quando não usa __panel (forma antiga com .is-open) */
+.quick-add-inline.is-open > :not(.quick-add-inline__tab-row) {
+  display: flex;
+  flex-direction: column;
 }
 
 .quick-add-inline__header {
@@ -1778,6 +2087,28 @@ html[data-theme="light"] {
     justify-content: flex-end;
     width:           100%;
   }
+
+  /* Filter bar: empilha campos e ações */
+  .header-filter-bar {
+    flex-direction: column;
+    align-items:    stretch;
+  }
+
+  .header-filter-bar__search,
+  .header-filter-bar__fields {
+    min-width: 0;
+    width:     100%;
+  }
+
+  .header-filter-bar--advanced .header-filter-field {
+    flex:      unset;
+    min-width: 0;
+    width:     100%;
+  }
+
+  .header-applied-filters {
+    padding-top: var(--space-2);
+  }
 }
 
 @media (max-width: 600px) {
@@ -1785,13 +2116,207 @@ html[data-theme="light"] {
     font-size: 1.5rem;
   }
 
+  .page-header-band__content {
+    align-items: flex-start;
+    flex-wrap:   wrap;
+    gap:         var(--space-2);
+  }
+
   .card-list {
     grid-template-columns: 1fr;
     padding:               var(--space-3);
+  }
+
+  /* Stepper: scroll horizontal sem overflow da página */
+  .page-stepper {
+    padding: var(--stepper-padding-y) var(--space-4);
+  }
+
+  .page-stepper__list {
+    min-width: 520px;
   }
 
   .page-header-rail--stepper .page-header-rail__stepper {
     order: 3;
     width: 100%;
   }
+}
+
+
+/* =========================================================
+   29. Header Filter Bar
+   Barra de filtros usada dentro do page-header-rail.
+   Suporta busca textual, filtros e botões de ação.
+   ========================================================= */
+
+/* Contêiner principal */
+.header-filter-bar {
+  align-items: center;
+  display:     flex;
+  flex:        1;
+  flex-wrap:   wrap;
+  gap:         var(--space-2) var(--space-3);
+  min-width:   0;
+}
+
+/* Campo de busca (cresce para preencher espaço) */
+.header-filter-bar__search {
+  flex:      1;
+  min-width: var(--filter-search-min-width);
+}
+
+/* Botões de ação à direita */
+.header-filter-bar__actions {
+  align-items: center;
+  display:     flex;
+  flex-shrink: 0;
+  gap:         var(--space-2);
+}
+
+/* Input de texto / busca */
+.header-filter-input {
+  background:    var(--surface-filter-input);
+  border:        1px solid var(--border-filter-input);
+  border-radius: var(--radius-control);
+  box-sizing:    border-box;
+  color:         var(--color-filter-text);
+  font-size:     var(--font-size-sm);
+  height:        var(--filter-input-height);
+  outline:       none;
+  padding:       0 var(--space-3);
+  transition:    border-color var(--transition-base);
+  width:         100%;
+}
+
+.header-filter-input::placeholder { color: var(--color-filter-placeholder); }
+
+.header-filter-input:focus { border-color: var(--border-focus); }
+
+/* Select de filtro */
+.header-filter-select {
+  appearance:    none;
+  background:    var(--surface-filter-input);
+  border:        1px solid var(--border-filter-input);
+  border-radius: var(--radius-control);
+  box-sizing:    border-box;
+  color:         var(--color-filter-text);
+  cursor:        pointer;
+  font-size:     var(--font-size-sm);
+  height:        var(--filter-input-height);
+  outline:       none;
+  padding:       0 var(--space-4) 0 var(--space-3);
+  transition:    border-color var(--transition-base);
+  width:         100%;
+}
+
+.header-filter-select:focus { border-color: var(--border-focus); }
+
+/* Botão secundário da filter bar */
+.header-filter-button {
+  align-items:     center;
+  background:      var(--surface-filter-button);
+  border:          1px solid var(--border-filter-button);
+  border-radius:   var(--radius-control);
+  color:           var(--color-filter-button);
+  cursor:          pointer;
+  display:         inline-flex;
+  font-size:       var(--font-size-sm);
+  font-weight:     var(--font-weight-semibold);
+  height:          var(--filter-input-height);
+  justify-content: center;
+  padding:         0 var(--space-4);
+  transition:
+    background   var(--transition-base),
+    border-color var(--transition-base),
+    color        var(--transition-base);
+  white-space: nowrap;
+}
+
+.header-filter-button:hover,
+.header-filter-button:focus-visible {
+  border-color: var(--border-active);
+  color:        var(--theme-text-heading);
+  outline:      none;
+}
+
+/* Variante primária */
+.header-filter-button--primary {
+  background:   var(--color-primary);
+  border-color: var(--color-primary);
+  color:        var(--color-white);
+}
+
+.header-filter-button--primary:hover,
+.header-filter-button--primary:focus-visible {
+  background:   var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+  color:        var(--color-white);
+}
+
+
+/* =========================================================
+   30. Header Filter Bar — Advanced
+   Variação completa: busca + ordenar + período + status
+   + botões de ação + chips de filtros aplicados.
+   Conteúdo visual estático no UI Lab (sem lógica real).
+   ========================================================= */
+
+.header-filter-bar--advanced {
+  align-items: flex-start;
+  flex-wrap:   wrap;
+  gap:         var(--space-3);
+}
+
+/* Grid de campos de filtro */
+.header-filter-bar__fields {
+  align-items: center;
+  display:     flex;
+  flex:        1;
+  flex-wrap:   wrap;
+  gap:         var(--space-2);
+  min-width:   0;
+}
+
+/* Campo de filtro individual */
+.header-filter-field {
+  flex:      1;
+  min-width: var(--filter-field-min-width);
+}
+
+/* Campo de busca: cresce o dobro dos outros */
+.header-filter-field--search {
+  flex:      2;
+  min-width: var(--filter-search-min-width);
+}
+
+/* Linha de chips de filtros aplicados */
+.header-applied-filters {
+  align-items: center;
+  display:     flex;
+  flex-basis:  100%;
+  flex-wrap:   wrap;
+  gap:         var(--space-2);
+  min-width:   0;
+}
+
+/* Chip de filtro aplicado */
+.header-applied-chip {
+  align-items:   center;
+  background:    var(--surface-applied-chip);
+  border:        1px solid var(--border-applied-chip);
+  border-radius: var(--radius-pill);
+  color:         var(--color-applied-chip);
+  cursor:        pointer;
+  display:       inline-flex;
+  font-size:     var(--font-size-xs);
+  font-weight:   var(--font-weight-semibold);
+  gap:           var(--space-1);
+  padding:       2px var(--space-2);
+  transition:
+    background   var(--transition-base),
+    border-color var(--transition-base);
+}
+
+.header-applied-chip:hover {
+  border-color: var(--border-active);
 }

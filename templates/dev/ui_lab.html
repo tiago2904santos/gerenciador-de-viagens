@@ -1,4 +1,4 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 {% load static %}
 
 {% block title %}UI Lab{% endblock %}
@@ -48,62 +48,95 @@
     <!-- ══════════════════════════════════════════════════════
          ABA 1 — HEADERS
          Composição e variações do sistema de cabeçalhos.
-         Toda header real combina: page-header-band + page-header-rail.
+         page-header-band: faixa escura com eyebrow + título + chip.
+         page-header-rail: faixa clara com marker + conteúdo dinâmico.
          ══════════════════════════════════════════════════════ -->
     <div id="headers" class="ui-lab-variant-block">
       <span class="ui-lab-demo-label">Headers — Composição e variações</span>
 
-      <!-- 1. Header Band — sem chip -->
+
+      <!-- =======================================================
+           1. Header Band — sem chip
+           Uso: páginas de lista simples, sem status de item.
+           ======================================================= -->
       <div class="ui-lab-variant-block">
         <span class="ui-lab-demo-label">1. Header Band — sem chip</span>
         <div class="page-header-stack">
           <div class="page-header-band">
-            <span class="page-header-band__eyebrow">Contexto</span>
-            <h2 class="page-header-band__title">Título da página</h2>
+            <div class="page-header-band__content">
+              <div class="page-header-band__text">
+                <span class="page-header-band__eyebrow">Contexto</span>
+                <h2 class="page-header-band__title">Título da página</h2>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- 2. Header Band — com chip de status -->
+
+      <!-- =======================================================
+           2. Header Band — com chip de status
+           Uso: ofícios, roteiros e entidades com estado de ciclo.
+           Chip alinhado à direita, centralizado verticalmente.
+           ======================================================= -->
       <div class="ui-lab-variant-block">
-        <span class="ui-lab-demo-label">2. Header Band — com chip de status</span>
+        <span class="ui-lab-demo-label">2. Header Band — com chip de status (3 variantes)</span>
+
+        <!-- Chip: Rascunho -->
         <div class="page-header-stack">
           <div class="page-header-band">
-            <span class="page-header-band__eyebrow">Contexto</span>
-            <h2 class="page-header-band__title">
-              Título da página
-              <span class="page-header-status-chip page-header-status-chip--draft">Status exemplo</span>
-            </h2>
+            <div class="page-header-band__content">
+              <div class="page-header-band__text">
+                <span class="page-header-band__eyebrow">Contexto</span>
+                <h2 class="page-header-band__title">Título da página</h2>
+              </div>
+              <span class="page-header-status-chip page-header-status-chip--draft">Rascunho</span>
+            </div>
           </div>
         </div>
-        <!-- Variações do chip -->
+
+        <!-- Chip: Ativo -->
         <div class="page-header-stack" style="margin-top: var(--space-3);">
           <div class="page-header-band">
-            <span class="page-header-band__eyebrow">Contexto</span>
-            <h2 class="page-header-band__title">
-              Título da página
-              <span class="page-header-status-chip page-header-status-chip--active">Status exemplo</span>
-            </h2>
+            <div class="page-header-band__content">
+              <div class="page-header-band__text">
+                <span class="page-header-band__eyebrow">Contexto</span>
+                <h2 class="page-header-band__title">Título da página</h2>
+              </div>
+              <span class="page-header-status-chip page-header-status-chip--active">Ativo</span>
+            </div>
           </div>
         </div>
+
+        <!-- Chip: Pendente -->
         <div class="page-header-stack" style="margin-top: var(--space-3);">
           <div class="page-header-band">
-            <span class="page-header-band__eyebrow">Contexto</span>
-            <h2 class="page-header-band__title">
-              Título da página
-              <span class="page-header-status-chip page-header-status-chip--pending">Status exemplo</span>
-            </h2>
+            <div class="page-header-band__content">
+              <div class="page-header-band__text">
+                <span class="page-header-band__eyebrow">Contexto</span>
+                <h2 class="page-header-band__title">Título da página</h2>
+              </div>
+              <span class="page-header-status-chip page-header-status-chip--pending">Pendente</span>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- 3. Header Stack — Rail Simple -->
+
+      <!-- =======================================================
+           3. Header Stack — Rail Simple
+           Uso: formulários de edição com marker de módulo e subtítulo.
+           ======================================================= -->
       <div class="ui-lab-variant-block">
         <span class="ui-lab-demo-label">3. Header Stack — Rail Simple (band + rail)</span>
         <div class="page-header-stack">
           <div class="page-header-band">
-            <span class="page-header-band__eyebrow">Contexto</span>
-            <h2 class="page-header-band__title">Título da página</h2>
+            <div class="page-header-band__content">
+              <div class="page-header-band__text">
+                <span class="page-header-band__eyebrow">Contexto</span>
+                <h2 class="page-header-band__title">Título da página</h2>
+              </div>
+            </div>
           </div>
           <div class="page-header-rail">
             <div class="page-header-rail__marker" aria-hidden="true">TP</div>
@@ -117,13 +150,21 @@
         </div>
       </div>
 
-      <!-- 4. Header Stack — Rail Back Action -->
+
+      <!-- =======================================================
+           4. Header Stack — Rail Back Action
+           Uso: detalhe ou edição com botão de retorno à lista.
+           ======================================================= -->
       <div class="ui-lab-variant-block">
         <span class="ui-lab-demo-label">4. Header Stack — Rail Back Action (botão de retorno)</span>
         <div class="page-header-stack">
           <div class="page-header-band">
-            <span class="page-header-band__eyebrow">Contexto</span>
-            <h2 class="page-header-band__title">Título da página</h2>
+            <div class="page-header-band__content">
+              <div class="page-header-band__text">
+                <span class="page-header-band__eyebrow">Contexto</span>
+                <h2 class="page-header-band__title">Título da página</h2>
+              </div>
+            </div>
           </div>
           <div class="page-header-rail">
             <div class="page-header-rail__marker" aria-hidden="true">TP</div>
@@ -140,80 +181,337 @@
         </div>
       </div>
 
-      <!-- 5. Header Stack — Rail Filters -->
+
+      <!-- =======================================================
+           5. Header Stack — Rail Filters
+           Uso: listas com busca + dois botões de ação.
+           ======================================================= -->
       <div class="ui-lab-variant-block">
-        <span class="ui-lab-demo-label">5. Header Stack — Rail Filters</span>
+        <span class="ui-lab-demo-label">5. Header Stack — Rail Filters (busca + 2 botões)</span>
         <div class="page-header-stack">
           <div class="page-header-band">
-            <span class="page-header-band__eyebrow">Contexto</span>
-            <h2 class="page-header-band__title">Título da página</h2>
+            <div class="page-header-band__content">
+              <div class="page-header-band__text">
+                <span class="page-header-band__eyebrow">Contexto</span>
+                <h2 class="page-header-band__title">Título da página</h2>
+              </div>
+            </div>
           </div>
           <div class="page-header-rail page-header-rail--filters">
             <div class="page-header-rail__marker" aria-hidden="true">TP</div>
-            <div class="page-header-rail__filters">
-              <div class="ui-lab-demo-input ui-lab-demo-input--search"
-                   role="presentation" aria-hidden="true">Filtro exemplo 1...</div>
-              <div class="ui-lab-demo-input ui-lab-demo-input--select"
-                   role="presentation" aria-hidden="true">Filtro 2</div>
-              <div class="ui-lab-demo-input ui-lab-demo-input--select"
-                   role="presentation" aria-hidden="true">Filtro 3</div>
+            <div class="header-filter-bar">
+              <div class="header-filter-bar__search">
+                <input class="header-filter-input" type="search"
+                       placeholder="Filtro exemplo 1..." aria-label="Buscar">
+              </div>
+              <div class="header-filter-bar__actions">
+                <button class="header-filter-button" type="button">Botão 1</button>
+                <button class="header-filter-button header-filter-button--primary"
+                        type="button">Botão 2</button>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- 6. Header Stack — Rail Filters + Quick Add -->
+
+      <!-- =======================================================
+           6. Header Stack — Rail Advanced Filters
+           Uso: telas complexas com busca, ordenação, período,
+           status e chips de filtros aplicados.
+           ======================================================= -->
       <div class="ui-lab-variant-block">
-        <span class="ui-lab-demo-label">6. Header Stack — Rail Filters + Quick Add</span>
+        <span class="ui-lab-demo-label">6. Header Stack — Rail Advanced Filters</span>
         <div class="page-header-stack">
           <div class="page-header-band">
-            <span class="page-header-band__eyebrow">Contexto</span>
-            <h2 class="page-header-band__title">Título da página</h2>
+            <div class="page-header-band__content">
+              <div class="page-header-band__text">
+                <span class="page-header-band__eyebrow">Contexto</span>
+                <h2 class="page-header-band__title">Título da página</h2>
+              </div>
+            </div>
+          </div>
+          <div class="page-header-rail page-header-rail--filters page-header-rail--advanced-filters">
+            <div class="page-header-rail__marker" aria-hidden="true">TP</div>
+
+            <div class="header-filter-bar header-filter-bar--advanced">
+              <!-- Campos de filtro -->
+              <div class="header-filter-bar__fields">
+                <div class="header-filter-field header-filter-field--search">
+                  <input class="header-filter-input" type="search"
+                         placeholder="Buscar item..." aria-label="Buscar">
+                </div>
+                <div class="header-filter-field header-filter-field--sort">
+                  <select class="header-filter-select" aria-label="Ordenar por">
+                    <option value="">Ordenar por</option>
+                    <option value="newest">Mais recentes</option>
+                    <option value="oldest">Mais antigos</option>
+                    <option value="name">Nome A–Z</option>
+                    <option value="status">Status</option>
+                  </select>
+                </div>
+                <div class="header-filter-field header-filter-field--period">
+                  <select class="header-filter-select" aria-label="Período">
+                    <option value="">Período</option>
+                    <option value="today">Hoje</option>
+                    <option value="7d">Últimos 7 dias</option>
+                    <option value="30d" selected>Últimos 30 dias</option>
+                    <option value="custom">Personalizado</option>
+                  </select>
+                </div>
+                <div class="header-filter-field header-filter-field--status">
+                  <select class="header-filter-select" aria-label="Status">
+                    <option value="">Status</option>
+                    <option value="all">Todos</option>
+                    <option value="active">Ativo</option>
+                    <option value="pending">Pendente</option>
+                    <option value="done">Finalizado</option>
+                    <option value="issues">Com pendência</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Ações -->
+              <div class="header-filter-bar__actions">
+                <button class="header-filter-button" type="button">Limpar</button>
+                <button class="header-filter-button header-filter-button--primary"
+                        type="button">Aplicar filtros</button>
+              </div>
+
+              <!-- Chips de filtros aplicados (opcional) -->
+              <div class="header-applied-filters" aria-label="Filtros ativos">
+                <span class="header-applied-chip">
+                  Status exemplo
+                  <span aria-hidden="true">×</span>
+                </span>
+                <span class="header-applied-chip">
+                  Últimos 30 dias
+                  <span aria-hidden="true">×</span>
+                </span>
+                <span class="header-applied-chip">
+                  Mais recentes
+                  <span aria-hidden="true">×</span>
+                </span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+
+      <!-- =======================================================
+           7. Header Stack — Rail Filters + Quick Add
+           Uso: listas com cadastro rápido integrado.
+           O toggle é uma aba estilo pasta física.
+           ======================================================= -->
+      <div class="ui-lab-variant-block">
+        <span class="ui-lab-demo-label">7. Header Stack — Rail Filters + Quick Add (aba pasta)</span>
+        <div class="page-header-stack">
+          <div class="page-header-band">
+            <div class="page-header-band__content">
+              <div class="page-header-band__text">
+                <span class="page-header-band__eyebrow">Contexto</span>
+                <h2 class="page-header-band__title">Título da página</h2>
+              </div>
+            </div>
           </div>
           <div class="page-header-rail page-header-rail--filters-quick-add">
             <div class="page-header-rail__marker" aria-hidden="true">TP</div>
-            <div class="page-header-rail__filters">
-              <div class="ui-lab-demo-input ui-lab-demo-input--search"
-                   role="presentation" aria-hidden="true">Filtro exemplo 1...</div>
-              <div class="ui-lab-demo-input ui-lab-demo-input--select"
-                   role="presentation" aria-hidden="true">Filtro 2</div>
-            </div>
-            <div class="page-header-rail__actions">
-              <button class="btn btn-primary" type="button">+ Cadastrar item</button>
+            <div class="header-filter-bar">
+              <div class="header-filter-bar__search">
+                <input class="header-filter-input" type="search"
+                       placeholder="Filtro exemplo 1..." aria-label="Buscar">
+              </div>
             </div>
           </div>
+        </div>
+
+        <!-- Quick Add com aba estilo pasta -->
+        <div class="quick-add-inline" data-quick-add-headers>
+
+          <!-- Aba / gatilho -->
+          <div class="quick-add-inline__tab-row">
+            <button class="quick-add-inline__tab" type="button"
+                    data-quick-add-toggle-headers
+                    aria-expanded="false"
+                    aria-controls="qa-hdr-panel">
+              <span class="quick-add-inline__tab-icon" aria-hidden="true">+</span>
+              <span class="quick-add-inline__tab-label">Cadastrar item</span>
+            </button>
+          </div>
+
+          <!-- Painel expansível (inicialmente oculto) -->
+          <div class="quick-add-inline__panel" id="qa-hdr-panel" hidden>
+            <div class="quick-add-inline__header">
+              <h3 class="quick-add-inline__title">Cadastrar item</h3>
+              <button class="quick-add-inline__close" type="button"
+                      data-quick-add-close-headers
+                      aria-label="Fechar cadastro rápido">×</button>
+            </div>
+            <div class="quick-add-inline__body">
+              <div class="quick-add-inline__fields">
+                <div class="field-grid">
+                  <div class="ui-lab-demo-field field-size-3">
+                    <span class="ui-lab-demo-field__label">Input exemplo 1</span>
+                    <div class="ui-lab-demo-field__input"></div>
+                  </div>
+                  <div class="ui-lab-demo-field field-size-1">
+                    <span class="ui-lab-demo-field__label">Input exemplo 2</span>
+                    <div class="ui-lab-demo-field__input"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="quick-add-inline__actions">
+                <button class="btn btn-secondary" type="button"
+                        data-quick-add-close-headers>Cancelar</button>
+                <button class="btn btn-primary" type="button">Salvar</button>
+              </div>
+            </div>
+            <p class="quick-add-inline__hint">Texto auxiliar opcional abaixo do formulário.</p>
+          </div>
+
         </div>
       </div>
 
-      <!-- 7. Header Stack — Rail Stepper -->
+
+      <!-- =======================================================
+           8. Header Stack — Rail Stepper
+           Uso: formulários multi-etapa com status de progresso.
+           Demonstra 6 etapas com todos os estados visuais.
+
+           Estados usados:
+             is-complete — etapas 1 e 2 (concluídas)
+             is-current  — etapa 3 (em andamento, aria-current="step")
+             is-missing  — etapa 4 (com pendência, ícone X vermelho)
+             is-pending  — etapa 5 (aguardando)
+             is-disabled — etapa 6 (bloqueada)
+           ======================================================= -->
       <div class="ui-lab-variant-block">
-        <span class="ui-lab-demo-label">7. Header Stack — Rail Stepper</span>
+        <span class="ui-lab-demo-label">8. Header Stack — Rail Stepper (6 etapas, todos os estados)</span>
         <div class="page-header-stack">
+
+          <!-- Band com chip de status -->
           <div class="page-header-band">
-            <span class="page-header-band__eyebrow">Contexto</span>
-            <h2 class="page-header-band__title">
-              Título da página
+            <div class="page-header-band__content">
+              <div class="page-header-band__text">
+                <span class="page-header-band__eyebrow">Contexto</span>
+                <h2 class="page-header-band__title">Título da página</h2>
+              </div>
               <span class="page-header-status-chip page-header-status-chip--draft">Rascunho</span>
-            </h2>
+            </div>
           </div>
+
+          <!-- Rail Stepper -->
           <div class="page-header-rail page-header-rail--stepper">
-            <ol class="page-header-rail__stepper" aria-label="Etapas do formulário">
-              <li class="page-stepper__item is-complete">
-                <span class="page-stepper__number" aria-hidden="true">✓</span>
-                <span class="page-stepper__label">Etapa um</span>
-              </li>
-              <li class="page-stepper__item is-active" aria-current="step">
-                <span class="page-stepper__number" aria-hidden="true">2</span>
-                <span class="page-stepper__label">Etapa dois</span>
-              </li>
-              <li class="page-stepper__item">
-                <span class="page-stepper__number" aria-hidden="true">3</span>
-                <span class="page-stepper__label">Etapa três</span>
-              </li>
-            </ol>
+            <nav class="page-stepper page-stepper--horizontal"
+                 aria-label="Etapas do formulário"
+                 style="background: transparent; border: none; box-shadow: none; padding: 0; overflow: visible;">
+              <ol class="page-stepper__list">
+
+                <!-- Etapa 1: Concluída -->
+                <li class="page-stepper__item is-complete">
+                  <div class="page-stepper__track">
+                    <div class="page-stepper__connector page-stepper__connector--before"></div>
+                    <div class="page-stepper__marker" aria-hidden="true">
+                      <span class="page-stepper__marker-icon">✓</span>
+                    </div>
+                    <div class="page-stepper__connector page-stepper__connector--after"></div>
+                  </div>
+                  <div class="page-stepper__content">
+                    <span class="page-stepper__eyebrow">Etapa 1</span>
+                    <span class="page-stepper__label">Etapa um</span>
+                    <span class="page-stepper__status">Concluída</span>
+                  </div>
+                </li>
+
+                <!-- Etapa 2: Concluída -->
+                <li class="page-stepper__item is-complete">
+                  <div class="page-stepper__track">
+                    <div class="page-stepper__connector page-stepper__connector--before"></div>
+                    <div class="page-stepper__marker" aria-hidden="true">
+                      <span class="page-stepper__marker-icon">✓</span>
+                    </div>
+                    <div class="page-stepper__connector page-stepper__connector--after"></div>
+                  </div>
+                  <div class="page-stepper__content">
+                    <span class="page-stepper__eyebrow">Etapa 2</span>
+                    <span class="page-stepper__label">Etapa dois</span>
+                    <span class="page-stepper__status">Concluída</span>
+                  </div>
+                </li>
+
+                <!-- Etapa 3: Atual / em andamento -->
+                <li class="page-stepper__item is-current" aria-current="step">
+                  <div class="page-stepper__track">
+                    <div class="page-stepper__connector page-stepper__connector--before"></div>
+                    <div class="page-stepper__marker">
+                      <span class="page-stepper__marker-icon" aria-hidden="true">3</span>
+                    </div>
+                    <div class="page-stepper__connector page-stepper__connector--after"></div>
+                  </div>
+                  <div class="page-stepper__content">
+                    <span class="page-stepper__eyebrow">Etapa 3</span>
+                    <span class="page-stepper__label">Etapa três</span>
+                    <span class="page-stepper__status">Em andamento</span>
+                  </div>
+                </li>
+
+                <!-- Etapa 4: Com pendência / faltando algo -->
+                <li class="page-stepper__item is-missing">
+                  <div class="page-stepper__track">
+                    <div class="page-stepper__connector page-stepper__connector--before"></div>
+                    <div class="page-stepper__marker">
+                      <span class="page-stepper__marker-icon" aria-hidden="true">✕</span>
+                    </div>
+                    <div class="page-stepper__connector page-stepper__connector--after"></div>
+                  </div>
+                  <div class="page-stepper__content">
+                    <span class="page-stepper__eyebrow">Etapa 4</span>
+                    <span class="page-stepper__label">Etapa quatro</span>
+                    <span class="page-stepper__status">Pendência</span>
+                  </div>
+                </li>
+
+                <!-- Etapa 5: Pendente / aguardando -->
+                <li class="page-stepper__item is-pending">
+                  <div class="page-stepper__track">
+                    <div class="page-stepper__connector page-stepper__connector--before"></div>
+                    <div class="page-stepper__marker">
+                      <span class="page-stepper__marker-icon" aria-hidden="true">5</span>
+                    </div>
+                    <div class="page-stepper__connector page-stepper__connector--after"></div>
+                  </div>
+                  <div class="page-stepper__content">
+                    <span class="page-stepper__eyebrow">Etapa 5</span>
+                    <span class="page-stepper__label">Etapa cinco</span>
+                    <span class="page-stepper__status">Aguardando</span>
+                  </div>
+                </li>
+
+                <!-- Etapa 6: Desabilitada / bloqueada -->
+                <li class="page-stepper__item is-disabled">
+                  <div class="page-stepper__track">
+                    <div class="page-stepper__connector page-stepper__connector--before"></div>
+                    <div class="page-stepper__marker" aria-hidden="true">
+                      <span class="page-stepper__marker-icon">6</span>
+                    </div>
+                    <div class="page-stepper__connector page-stepper__connector--after"></div>
+                  </div>
+                  <div class="page-stepper__content">
+                    <span class="page-stepper__eyebrow">Etapa 6</span>
+                    <span class="page-stepper__label">Etapa seis</span>
+                    <span class="page-stepper__status">Bloqueada</span>
+                  </div>
+                </li>
+
+              </ol>
+            </nav>
           </div>
+
         </div>
       </div>
+
 
     </div><!-- /headers -->
 
@@ -242,16 +540,20 @@
 
           <div class="page-header-stack">
             <div class="page-header-band">
-              <span class="page-header-band__eyebrow">Contexto</span>
-              <h2 class="page-header-band__title">Título da página</h2>
+              <div class="page-header-band__content">
+                <div class="page-header-band__text">
+                  <span class="page-header-band__eyebrow">Contexto</span>
+                  <h2 class="page-header-band__title">Título da página</h2>
+                </div>
+              </div>
             </div>
             <div class="page-header-rail page-header-rail--filters-quick-add">
               <div class="page-header-rail__marker" aria-hidden="true">TP</div>
-              <div class="page-header-rail__filters">
-                <div class="ui-lab-demo-input ui-lab-demo-input--search"
-                     role="presentation" aria-hidden="true">Filtro exemplo 1...</div>
-                <div class="ui-lab-demo-input ui-lab-demo-input--select"
-                     role="presentation" aria-hidden="true">Filtro 2</div>
+              <div class="header-filter-bar">
+                <div class="header-filter-bar__search">
+                  <input class="header-filter-input" type="search"
+                         placeholder="Filtro exemplo 1..." aria-label="Buscar">
+                </div>
               </div>
               <div class="page-header-rail__actions">
                 <button class="btn btn-primary" type="button"
@@ -342,8 +644,12 @@
 
           <div class="page-header-stack">
             <div class="page-header-band">
-              <span class="page-header-band__eyebrow">Contexto</span>
-              <h2 class="page-header-band__title">Título da página</h2>
+              <div class="page-header-band__content">
+                <div class="page-header-band__text">
+                  <span class="page-header-band__eyebrow">Contexto</span>
+                  <h2 class="page-header-band__title">Título da página</h2>
+                </div>
+              </div>
             </div>
             <div class="page-header-rail">
               <div class="page-header-rail__marker" aria-hidden="true">TP</div>
@@ -406,8 +712,12 @@
 
           <div class="page-header-stack">
             <div class="page-header-band">
-              <span class="page-header-band__eyebrow">Contexto</span>
-              <h2 class="page-header-band__title">Título da página</h2>
+              <div class="page-header-band__content">
+                <div class="page-header-band__text">
+                  <span class="page-header-band__eyebrow">Contexto</span>
+                  <h2 class="page-header-band__title">Título da página</h2>
+                </div>
+              </div>
             </div>
             <div class="page-header-rail">
               <div class="page-header-rail__marker" aria-hidden="true">TP</div>
@@ -500,43 +810,131 @@
 
       <!-- ─────────────────────────────────────────────
            Estrutura 4 — Wizard
-           Formulários em etapas: stepper + 1 etapa ativa.
+           Formulários em etapas: stepper com labels reais
+           do fluxo de ofício + etapa ativa com 2 seções.
            ───────────────────────────────────────────── -->
       <div id="est-wizard" class="ui-lab-standard-example">
         <div class="page-shell page-shell--wizard">
 
           <div class="page-header-stack">
             <div class="page-header-band">
-              <span class="page-header-band__eyebrow">Contexto</span>
-              <h2 class="page-header-band__title">
-                Título da página
+              <div class="page-header-band__content">
+                <div class="page-header-band__text">
+                  <span class="page-header-band__eyebrow">Contexto</span>
+                  <h2 class="page-header-band__title">Título da página</h2>
+                </div>
                 <span class="page-header-status-chip page-header-status-chip--draft">Rascunho</span>
-              </h2>
+              </div>
             </div>
             <div class="page-header-rail">
               <div class="page-header-rail__marker" aria-hidden="true">TP</div>
               <div class="page-header-rail__content">
                 <span class="page-header-rail__eyebrow">Módulo</span>
-                <p class="page-header-rail__subtitle">Etapa 2 de 3 — Subtítulo genérico da etapa atual.</p>
+                <p class="page-header-rail__subtitle">Etapa 2 de 6 — Subtítulo genérico da etapa atual.</p>
               </div>
             </div>
           </div>
 
-          <!-- Stepper de progresso -->
-          <nav class="page-stepper" aria-label="Etapas do formulário">
+          <!-- Stepper de 6 etapas com labels reais do fluxo de ofício -->
+          <nav class="page-stepper page-stepper--horizontal" aria-label="Etapas do formulário">
             <ol class="page-stepper__list">
+
+              <!-- Etapa 1: Concluída -->
               <li class="page-stepper__item is-complete">
-                <span class="page-stepper__number" aria-hidden="true">✓</span>
-                <span class="page-stepper__label">Etapa exemplo 1</span>
+                <div class="page-stepper__track">
+                  <div class="page-stepper__connector page-stepper__connector--before"></div>
+                  <div class="page-stepper__marker" aria-hidden="true">
+                    <span class="page-stepper__marker-icon">✓</span>
+                  </div>
+                  <div class="page-stepper__connector page-stepper__connector--after"></div>
+                </div>
+                <div class="page-stepper__content">
+                  <span class="page-stepper__eyebrow">Etapa 1</span>
+                  <span class="page-stepper__label">Dados e viajantes</span>
+                  <span class="page-stepper__status">Concluída</span>
+                </div>
               </li>
-              <li class="page-stepper__item is-active" aria-current="step">
-                <span class="page-stepper__number" aria-hidden="true">2</span>
-                <span class="page-stepper__label">Etapa exemplo 2</span>
+
+              <!-- Etapa 2: Atual -->
+              <li class="page-stepper__item is-current" aria-current="step">
+                <div class="page-stepper__track">
+                  <div class="page-stepper__connector page-stepper__connector--before"></div>
+                  <div class="page-stepper__marker">
+                    <span class="page-stepper__marker-icon" aria-hidden="true">2</span>
+                  </div>
+                  <div class="page-stepper__connector page-stepper__connector--after"></div>
+                </div>
+                <div class="page-stepper__content">
+                  <span class="page-stepper__eyebrow">Etapa 2</span>
+                  <span class="page-stepper__label">Transporte</span>
+                  <span class="page-stepper__status">Em andamento</span>
+                </div>
               </li>
-              <li class="page-stepper__item">
-                <span class="page-stepper__number" aria-hidden="true">3</span>
-                <span class="page-stepper__label">Etapa exemplo 3</span>
+
+              <!-- Etapa 3: Pendente -->
+              <li class="page-stepper__item is-pending">
+                <div class="page-stepper__track">
+                  <div class="page-stepper__connector page-stepper__connector--before"></div>
+                  <div class="page-stepper__marker">
+                    <span class="page-stepper__marker-icon" aria-hidden="true">3</span>
+                  </div>
+                  <div class="page-stepper__connector page-stepper__connector--after"></div>
+                </div>
+                <div class="page-stepper__content">
+                  <span class="page-stepper__eyebrow">Etapa 3</span>
+                  <span class="page-stepper__label">Roteiro e diárias</span>
+                  <span class="page-stepper__status">Aguardando</span>
+                </div>
               </li>
+
+              <!-- Etapa 4: Pendente -->
+              <li class="page-stepper__item is-pending">
+                <div class="page-stepper__track">
+                  <div class="page-stepper__connector page-stepper__connector--before"></div>
+                  <div class="page-stepper__marker">
+                    <span class="page-stepper__marker-icon" aria-hidden="true">4</span>
+                  </div>
+                  <div class="page-stepper__connector page-stepper__connector--after"></div>
+                </div>
+                <div class="page-stepper__content">
+                  <span class="page-stepper__eyebrow">Etapa 4</span>
+                  <span class="page-stepper__label">Justificativa</span>
+                  <span class="page-stepper__status">Aguardando</span>
+                </div>
+              </li>
+
+              <!-- Etapa 5: Pendente -->
+              <li class="page-stepper__item is-pending">
+                <div class="page-stepper__track">
+                  <div class="page-stepper__connector page-stepper__connector--before"></div>
+                  <div class="page-stepper__marker">
+                    <span class="page-stepper__marker-icon" aria-hidden="true">5</span>
+                  </div>
+                  <div class="page-stepper__connector page-stepper__connector--after"></div>
+                </div>
+                <div class="page-stepper__content">
+                  <span class="page-stepper__eyebrow">Etapa 5</span>
+                  <span class="page-stepper__label">Documentos</span>
+                  <span class="page-stepper__status">Aguardando</span>
+                </div>
+              </li>
+
+              <!-- Etapa 6: Desabilitada -->
+              <li class="page-stepper__item is-disabled">
+                <div class="page-stepper__track">
+                  <div class="page-stepper__connector page-stepper__connector--before"></div>
+                  <div class="page-stepper__marker" aria-hidden="true">
+                    <span class="page-stepper__marker-icon">6</span>
+                  </div>
+                  <div class="page-stepper__connector page-stepper__connector--after"></div>
+                </div>
+                <div class="page-stepper__content">
+                  <span class="page-stepper__eyebrow">Etapa 6</span>
+                  <span class="page-stepper__label">Central de assinaturas</span>
+                  <span class="page-stepper__status">Bloqueada</span>
+                </div>
+              </li>
+
             </ol>
           </nav>
 
@@ -627,19 +1025,30 @@
 
           <div class="page-header-stack">
             <div class="page-header-band">
-              <span class="page-header-band__eyebrow">Contexto</span>
-              <h2 class="page-header-band__title">
-                Título da página
-                <span class="page-header-status-chip page-header-status-chip--active" style="font-size: var(--font-size-sm); padding: 3px var(--space-3);">12</span>
-              </h2>
+              <div class="page-header-band__content">
+                <div class="page-header-band__text">
+                  <span class="page-header-band__eyebrow">Contexto</span>
+                  <h2 class="page-header-band__title">Título da página</h2>
+                </div>
+                <span class="page-header-status-chip page-header-status-chip--active"
+                      style="font-size: var(--font-size-sm); padding: 3px var(--space-3);">12</span>
+              </div>
             </div>
             <div class="page-header-rail page-header-rail--filters-quick-add">
               <div class="page-header-rail__marker" aria-hidden="true">TP</div>
-              <div class="page-header-rail__filters">
-                <div class="ui-lab-demo-input ui-lab-demo-input--search"
-                     role="presentation" aria-hidden="true">Buscar itens...</div>
-                <div class="ui-lab-demo-input ui-lab-demo-input--select"
-                     role="presentation" aria-hidden="true">Status</div>
+              <div class="header-filter-bar">
+                <div class="header-filter-bar__search">
+                  <input class="header-filter-input" type="search"
+                         placeholder="Buscar itens..." aria-label="Buscar">
+                </div>
+                <div class="header-filter-bar__actions">
+                  <select class="header-filter-select" aria-label="Status"
+                          style="width: auto; min-width: 110px;">
+                    <option value="">Status</option>
+                    <option>Ativo</option>
+                    <option>Pendente</option>
+                  </select>
+                </div>
               </div>
               <div class="page-header-rail__actions">
                 <button class="btn btn-primary" type="button">+ Cadastrar</button>
@@ -746,16 +1155,28 @@
 
           <div class="page-header-stack">
             <div class="page-header-band">
-              <span class="page-header-band__eyebrow">Contexto</span>
-              <h2 class="page-header-band__title">Título da página</h2>
+              <div class="page-header-band__content">
+                <div class="page-header-band__text">
+                  <span class="page-header-band__eyebrow">Contexto</span>
+                  <h2 class="page-header-band__title">Título da página</h2>
+                </div>
+              </div>
             </div>
             <div class="page-header-rail page-header-rail--filters">
               <div class="page-header-rail__marker" aria-hidden="true">TP</div>
-              <div class="page-header-rail__filters">
-                <div class="ui-lab-demo-input ui-lab-demo-input--search"
-                     role="presentation" aria-hidden="true">Buscar cards...</div>
-                <div class="ui-lab-demo-input ui-lab-demo-input--select"
-                     role="presentation" aria-hidden="true">Status</div>
+              <div class="header-filter-bar">
+                <div class="header-filter-bar__search">
+                  <input class="header-filter-input" type="search"
+                         placeholder="Buscar cards..." aria-label="Buscar">
+                </div>
+                <div class="header-filter-bar__actions">
+                  <select class="header-filter-select" aria-label="Status"
+                          style="width: auto; min-width: 110px;">
+                    <option value="">Status</option>
+                    <option>Ativo</option>
+                    <option>Pendente</option>
+                  </select>
+                </div>
               </div>
             </div>
           </div>
@@ -912,6 +1333,34 @@
   if (qaiOpen)   qaiOpen.addEventListener('click',   function () { qaiPanel.classList.contains('is-open') ? closeQai() : openQai(); });
   if (qaiClose)  qaiClose.addEventListener('click',  closeQai);
   if (qaiCancel) qaiCancel.addEventListener('click', closeQai);
+
+  /* ── Quick Add Folder Tab (Headers → exemplo 7) ── */
+  document.querySelectorAll('[data-quick-add-toggle-headers]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var panelId  = btn.getAttribute('aria-controls');
+      var panel    = document.getElementById(panelId);
+      var expanded = btn.getAttribute('aria-expanded') === 'true';
+      if (expanded) {
+        btn.setAttribute('aria-expanded', 'false');
+        panel.hidden = true;
+      } else {
+        btn.setAttribute('aria-expanded', 'true');
+        panel.hidden = false;
+      }
+    });
+  });
+
+  document.querySelectorAll('[data-quick-add-close-headers]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var toggle = document.querySelector('[data-quick-add-toggle-headers]');
+      if (!toggle) return;
+      var panelId = toggle.getAttribute('aria-controls');
+      var panel   = document.getElementById(panelId);
+      toggle.setAttribute('aria-expanded', 'false');
+      if (panel) panel.hidden = true;
+    });
+  });
+
 }());
 </script>
 {% endblock %}
