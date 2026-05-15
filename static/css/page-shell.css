@@ -1267,3 +1267,531 @@ html[data-theme="light"] {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+
+/* =========================================================
+   21. Page Header Stack
+   Nomenclatura canônica para headers do design system.
+   Agrupa obrigatoriamente: .page-header-band + .page-header-rail.
+   A faixa branca (rail) é obrigatória — nunca mostrar o band sozinho.
+   ========================================================= */
+
+.page-header-stack {
+  border-radius: var(--radius-lg);
+  box-shadow:    var(--shadow-lg);
+  overflow:      hidden;
+  width:         100%;
+}
+
+
+/* =========================================================
+   22. Page Header Band — Faixa Escura
+   Contexto: eyebrow, título e chip opcional de status.
+   Não recebe filtros, stepper nem botões funcionais.
+   ========================================================= */
+
+.page-header-band {
+  align-items:    flex-start;
+  background:     var(--app-hero-stage-bg);
+  box-shadow:     inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+  box-sizing:     border-box;
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--space-2);
+  padding:        var(--space-5) var(--space-6);
+}
+
+.page-header-band__eyebrow {
+  color:          var(--app-hero-eyebrow);
+  font-size:      var(--font-size-xs);
+  font-weight:    var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
+  margin:         0;
+  text-transform: uppercase;
+}
+
+.page-header-band__title {
+  align-items:    center;
+  color:          var(--app-hero-title);
+  display:        flex;
+  flex-wrap:      wrap;
+  font-size:      clamp(1.4rem, 2.2vw, 2.2rem);
+  font-weight:    var(--font-weight-extrabold);
+  gap:            var(--space-2);
+  letter-spacing: -0.03em;
+  line-height:    1.12;
+  margin:         0;
+}
+
+/* Chip de status dentro do Band */
+.page-header-status-chip {
+  border-radius:  var(--radius-pill);
+  font-size:      var(--font-size-xs);
+  font-weight:    var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-chip);
+  padding:        3px var(--space-3);
+  white-space:    nowrap;
+}
+
+.page-header-status-chip--draft {
+  background: var(--route-status-draft-bg);
+  border:     1px solid var(--route-status-draft-border);
+  color:      var(--route-status-draft-text);
+}
+
+.page-header-status-chip--active {
+  background: var(--route-status-final-bg);
+  border:     1px solid var(--route-status-final-border);
+  color:      var(--route-status-final-text);
+}
+
+.page-header-status-chip--pending {
+  background: var(--route-status-muted-bg);
+  border:     1px solid var(--route-status-muted-border);
+  color:      var(--route-status-muted-text);
+}
+
+
+/* =========================================================
+   23. Page Header Rail — Faixa Clara Obrigatória
+   Parte dinâmica do header. Sempre acompanha o Band.
+   Variações: simple | back-action | filters |
+              filters-quick-add | stepper
+   ========================================================= */
+
+.page-header-rail {
+  align-items: center;
+  background:  var(--app-hero-body-bg);
+  box-sizing:  border-box;
+  display:     flex;
+  gap:         var(--space-4);
+  padding:     var(--space-4) var(--space-6);
+  width:       100%;
+}
+
+/* Marcador circular de módulo */
+.page-header-rail__marker {
+  align-items:     center;
+  background:      var(--color-primary-soft);
+  border:          1px solid var(--color-border);
+  border-radius:   var(--radius-pill);
+  color:           var(--color-primary);
+  display:         inline-flex;
+  flex-shrink:     0;
+  font-size:       var(--font-size-sm);
+  font-weight:     var(--font-weight-extrabold);
+  height:          44px;
+  justify-content: center;
+  letter-spacing:  -0.01em;
+  width:           44px;
+}
+
+/* Bloco de texto */
+.page-header-rail__content {
+  display:        flex;
+  flex:           1;
+  flex-direction: column;
+  gap:            var(--space-1);
+  min-width:      0;
+}
+
+.page-header-rail__eyebrow {
+  color:          var(--theme-text-muted);
+  font-size:      var(--font-size-xs);
+  font-weight:    var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
+  text-transform: uppercase;
+}
+
+.page-header-rail__title {
+  color:          var(--theme-text-heading);
+  font-size:      var(--font-size-md);
+  font-weight:    var(--font-weight-bold);
+  letter-spacing: -0.01em;
+  line-height:    1.3;
+  margin:         0;
+}
+
+.page-header-rail__subtitle {
+  color:       var(--theme-text-muted);
+  font-size:   var(--font-size-sm);
+  line-height: 1.5;
+  margin:      0;
+}
+
+/* Ações no Rail — somente botão de retorno */
+.page-header-rail__actions {
+  align-items: center;
+  display:     flex;
+  flex-shrink: 0;
+  gap:         var(--space-2);
+}
+
+/* Área de filtros no Rail */
+.page-header-rail__filters {
+  align-items: center;
+  display:     flex;
+  flex:        1;
+  flex-wrap:   wrap;
+  gap:         var(--space-2);
+  min-width:   0;
+}
+
+/* Stepper embutido no Rail */
+.page-header-rail__stepper {
+  align-items:     center;
+  display:         flex;
+  flex:            1;
+  list-style:      none;
+  margin:          0;
+  min-width:       0;
+  overflow-x:      auto;
+  padding:         0;
+  scrollbar-width: none;
+}
+
+.page-header-rail__stepper::-webkit-scrollbar { display: none; }
+
+/* Variações */
+.page-header-rail--filters,
+.page-header-rail--filters-quick-add {
+  flex-wrap: wrap;
+  gap:       var(--space-3) var(--space-4);
+}
+
+.page-header-rail--stepper {
+  flex-wrap: wrap;
+  gap:       var(--space-3);
+}
+
+
+/* =========================================================
+   24. Simple List
+   Lista linear de itens com avatar, título, meta e ações.
+   Uso: cadastros auxiliares, cargos, unidades, categorias.
+   ========================================================= */
+
+.simple-list {
+  box-sizing:     border-box;
+  display:        flex;
+  flex-direction: column;
+  width:          100%;
+}
+
+.simple-list-item {
+  align-items:   center;
+  background:    var(--surface-list-row);
+  border-bottom: 1px solid var(--border-list-row);
+  box-sizing:    border-box;
+  display:       flex;
+  gap:           var(--space-4);
+  padding:       var(--list-row-padding-y) var(--list-row-padding-x);
+  transition:    background var(--transition-base);
+}
+
+.simple-list-item:last-child { border-bottom: none; }
+.simple-list-item:hover      { background: var(--surface-list-row-hover); }
+
+.simple-list-item__avatar {
+  align-items:     center;
+  background:      var(--surface-header-count);
+  border-radius:   var(--radius-pill);
+  color:           var(--text-header-count);
+  display:         inline-flex;
+  flex-shrink:     0;
+  font-size:       var(--font-size-xs);
+  font-weight:     var(--font-weight-bold);
+  height:          36px;
+  justify-content: center;
+  width:           36px;
+}
+
+.simple-list-item__body {
+  display:        flex;
+  flex:           1;
+  flex-direction: column;
+  gap:            var(--space-1);
+  min-width:      0;
+}
+
+.simple-list-item__title {
+  color:         var(--theme-text-heading);
+  font-size:     var(--font-size-sm);
+  font-weight:   var(--font-weight-semibold);
+  overflow:      hidden;
+  text-overflow: ellipsis;
+  white-space:   nowrap;
+}
+
+.simple-list-item__meta {
+  color:         var(--theme-text-muted);
+  font-size:     var(--font-size-xs);
+  overflow:      hidden;
+  text-overflow: ellipsis;
+  white-space:   nowrap;
+}
+
+.simple-list-item__aside {
+  align-items: center;
+  display:     flex;
+  flex-shrink: 0;
+  gap:         var(--space-2);
+}
+
+
+/* =========================================================
+   25. Card List
+   Grade de cards com hover. Uso: roteiros, ofícios,
+   documentos e listas com mais informação visual.
+   ========================================================= */
+
+.card-list {
+  box-sizing:            border-box;
+  display:               grid;
+  gap:                   var(--space-4);
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  padding:               var(--space-4);
+  width:                 100%;
+}
+
+.list-card {
+  background:     var(--surface-form-panel);
+  border:         1px solid var(--border-form-panel);
+  border-radius:  var(--radius-md);
+  box-shadow:     var(--shadow-soft);
+  box-sizing:     border-box;
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--space-3);
+  padding:        var(--space-4);
+  transition:
+    border-color var(--transition-base),
+    box-shadow   var(--transition-base);
+}
+
+.list-card:hover {
+  border-color: var(--border-active);
+  box-shadow:   var(--shadow-medium);
+}
+
+.list-card__header {
+  align-items:     center;
+  display:         flex;
+  gap:             var(--space-2);
+  justify-content: space-between;
+}
+
+.list-card__title {
+  color:         var(--theme-text-heading);
+  font-size:     var(--font-size-sm);
+  font-weight:   var(--font-weight-bold);
+  margin:        0;
+  overflow:      hidden;
+  text-overflow: ellipsis;
+  white-space:   nowrap;
+}
+
+.list-card__meta {
+  color:     var(--theme-text-muted);
+  display:   flex;
+  flex-wrap: wrap;
+  font-size: var(--font-size-xs);
+  gap:       var(--space-1) var(--space-3);
+}
+
+.list-card__meta-item {
+  display: flex;
+  gap:     var(--space-1);
+}
+
+.list-card__body {
+  color:       var(--theme-text-muted);
+  flex:        1;
+  font-size:   var(--font-size-xs);
+  line-height: 1.5;
+}
+
+.list-card__footer {
+  align-items:     center;
+  border-top:      1px solid var(--border-subtle);
+  display:         flex;
+  gap:             var(--space-2);
+  justify-content: flex-end;
+  margin-top:      auto;
+  padding-top:     var(--space-3);
+}
+
+
+/* =========================================================
+   26. Quick Add Inline
+   Nome genérico para o padrão de cadastro rápido inline.
+   Equivalente funcional ao .quick-create-panel.
+   Extensão visual abaixo do filter bar / toolbar.
+   ========================================================= */
+
+.quick-add-inline {
+  background:     var(--surface-quick-create);
+  border-bottom:  1px solid var(--border-quick-create);
+  box-shadow:     var(--shadow-quick-create);
+  box-sizing:     border-box;
+  display:        none;
+  flex-direction: column;
+  width:          100%;
+}
+
+.quick-add-inline.is-open {
+  display: flex;
+}
+
+.quick-add-inline__header {
+  align-items:     center;
+  background:      var(--surface-quick-create-header);
+  border-bottom:   1px solid var(--border-quick-create);
+  box-sizing:      border-box;
+  display:         flex;
+  gap:             var(--space-3);
+  justify-content: space-between;
+  padding:         var(--space-2) var(--filter-bar-padding-x);
+}
+
+.quick-add-inline__title {
+  color:       var(--theme-text-heading);
+  font-size:   var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  margin:      0;
+}
+
+.quick-add-inline__close {
+  align-items:     center;
+  background:      transparent;
+  border:          none;
+  border-radius:   var(--radius-sm);
+  color:           var(--theme-text-muted);
+  cursor:          pointer;
+  display:         flex;
+  font-size:       var(--font-size-md);
+  height:          28px;
+  justify-content: center;
+  line-height:     1;
+  padding:         0;
+  transition:      color var(--transition-base), background var(--transition-base);
+  width:           28px;
+}
+
+.quick-add-inline__close:hover {
+  background: var(--border-quick-create);
+  color:      var(--theme-text-heading);
+}
+
+.quick-add-inline__body {
+  align-items: flex-end;
+  box-sizing:  border-box;
+  display:     flex;
+  gap:         var(--layout-quick-create-gap);
+  padding:     var(--space-4) var(--filter-bar-padding-x);
+  width:       100%;
+}
+
+.quick-add-inline__fields {
+  flex:      1;
+  min-width: 0;
+}
+
+.quick-add-inline__actions {
+  align-items:    flex-end;
+  display:        flex;
+  flex-shrink:    0;
+  gap:            var(--space-2);
+  padding-bottom: 1px;
+  width:          var(--layout-quick-create-actions-width);
+}
+
+.quick-add-inline__hint {
+  box-sizing: border-box;
+  color:      var(--theme-text-muted);
+  font-size:  var(--font-size-xs);
+  padding:    0 var(--filter-bar-padding-x) var(--space-3);
+}
+
+
+/* =========================================================
+   27. Field Grid — Variantes com Colunagem Explícita
+   Complementam o .field-grid padrão de 4 colunas.
+   Usar quando a seção inteira precisa de colunagem diferente.
+   ========================================================= */
+
+/* 3 colunas: trios de campos — nome + CPF + telefone */
+.field-grid--cols-3 {
+  display:               grid;
+  gap:                   var(--field-grid-gap);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width:                 100%;
+}
+
+/* 4 colunas: alias explícito do .field-grid padrão */
+.field-grid--cols-4 {
+  display:               grid;
+  gap:                   var(--field-grid-gap);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  width:                 100%;
+}
+
+@media (max-width: 840px) {
+  .field-grid--cols-3,
+  .field-grid--cols-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .field-grid--cols-3,
+  .field-grid--cols-4 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+
+/* =========================================================
+   28. Responsive — Header Stack, Listas e Quick Add Inline
+   ========================================================= */
+
+@media (max-width: 840px) {
+  .page-header-band {
+    padding: var(--space-4);
+  }
+
+  .page-header-rail {
+    flex-wrap: wrap;
+    padding:   var(--space-4);
+  }
+
+  .card-list {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+
+  .quick-add-inline__body {
+    align-items:    stretch;
+    flex-direction: column;
+  }
+
+  .quick-add-inline__actions {
+    justify-content: flex-end;
+    width:           100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .page-header-band__title {
+    font-size: 1.5rem;
+  }
+
+  .card-list {
+    grid-template-columns: 1fr;
+    padding:               var(--space-3);
+  }
+
+  .page-header-rail--stepper .page-header-rail__stepper {
+    order: 3;
+    width: 100%;
+  }
+}
