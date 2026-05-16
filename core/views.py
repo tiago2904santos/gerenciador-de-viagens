@@ -110,17 +110,6 @@ UI_LAB_PAGE_DEFINITIONS = [
         "route_name": "core:ui_lab_feedback",
     },
     {
-        "slug": "cards",
-        "label": "Cards / List Items",
-        "mark": "CD",
-        "title": "Cards / List Items",
-        "subtitle": "Cards e linhas de lista para entidades, documentos e acoes.",
-        "summary": "Card documental, list row, acoes, status e empty list.",
-        "status_label": "Pronto",
-        "status_modifier": "done",
-        "route_name": "core:ui_lab_cards",
-    },
-    {
         "slug": "overlays",
         "label": "Modals / Overlays",
         "mark": "OV",
@@ -246,12 +235,6 @@ UI_LAB_PLAN_ITEMS = {
         "Pending signer chip e document action bar",
         "Download PDF/DOCX, preview e copy link",
         "Expired signature state",
-    ],
-    "cards": [
-        "Lista simples com avatar, titulo e status",
-        "Lista com cards, descricao e metadados",
-        "Estado vazio com acao contextual",
-        "Pagination shell com paginas anterior e proxima",
     ],
 }
 
