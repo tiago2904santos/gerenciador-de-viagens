@@ -4,7 +4,7 @@
   {% include "dev/ui_lab/partials/_lab_page_title.html" %}
   {% include "dev/ui_lab/partials/_lab_nav.html" %}
 
-  <section class="ui-lab-section">
+  <section class="ui-lab-section ui-lab-section--structures">
     <div class="ui-lab-section__header">
       <p class="ui-lab-section__eyebrow">Structure Lab</p>
       <h2 class="ui-lab-section__title">Composições de página</h2>
@@ -14,9 +14,9 @@
     </div>
 
     <div class="ui-lab-stack">
-      <article class="ui-lab-preview-card">
+      <article class="ui-lab-preview-card ui-lab-header-quick-add">
         <div class="ui-lab-preview-card__header">
-          <span class="ui-lab-preview-card__label">Quick Create Inline</span>
+          <span class="ui-lab-preview-card__label">Quick Add Inline</span>
           <span class="ui-lab-status-pill ui-lab-status-pill--review">Em revisão</span>
         </div>
         <div class="page-header-stack header-stack--quick-add">
@@ -28,39 +28,36 @@
               </div>
             </div>
           </div>
-          <div class="header-stack--quick-add__rail-group">
-            <div class="page-header-rail page-header-rail--filters-quick-add header-rail--quick-add">
-              <div class="filter-row">
-                <div class="filter-control">
-                  <div class="page-header-rail__marker" aria-hidden="true">TP</div>
-                  <div class="header-filter-bar">
-                    <div class="header-filter-bar__search">
-                      <input class="header-filter-input" type="search" placeholder="Filtro exemplo 1..." aria-label="Buscar">
-                    </div>
+          <div class="page-header-rail page-header-rail--filters page-header-rail--filters-quick-add ui-lab-header-quick-add__rail">
+            <div class="page-header-rail__marker" aria-hidden="true">TP</div>
+            <div class="header-filter-bar">
+              <div class="header-filter-bar__search">
+                <input class="header-filter-input" type="search" placeholder="Buscar itens..." aria-label="Buscar">
+              </div>
+              <div class="header-filter-bar__actions">
+                <button class="header-filter-button" type="button">Limpar filtros</button>
+              </div>
+            </div>
+            <div class="quick-add-inline__panel quick-add-panel" id="ui-lab-structure-quick-add" hidden>
+              <div class="quick-add-inline__body">
+                <div class="quick-add-inline__fields">
+                  <div class="field-grid">
+                    {% for field in ui_lab_fields.quick_add_structure %}
+                      {% include "dev/ui_lab/partials/_demo_field.html" with field=field only %}
+                    {% endfor %}
                   </div>
                 </div>
-              </div>
-              <div class="quick-add-inline__panel quick-add-panel" id="ui-lab-structure-quick-add" hidden>
-                <div class="quick-add-inline__body">
-                  <div class="quick-add-inline__fields">
-                    <div class="field-grid">
-                      {% for field in ui_lab_fields.quick_add_structure %}
-                        {% include "dev/ui_lab/partials/_demo_field.html" with field=field only %}
-                      {% endfor %}
-                    </div>
-                  </div>
-                  <div class="quick-add-inline__actions">
-                    <button class="btn btn-secondary" type="button" data-ui-lab-close>Cancelar</button>
-                    <button class="btn btn-primary" type="button">Salvar</button>
-                  </div>
+                <div class="quick-add-inline__actions">
+                  <button class="btn btn-secondary" type="button" data-ui-lab-close>Cancelar</button>
+                  <button class="btn btn-primary" type="button">Salvar</button>
                 </div>
               </div>
             </div>
-            <button class="quick-add-footer-button btn btn-secondary" type="button" data-ui-lab-toggle aria-controls="ui-lab-structure-quick-add" aria-expanded="false">
-              <span class="quick-add-footer-button__icon" aria-hidden="true">+</span>
-              <span class="quick-add-footer-button__label">Cadastrar item</span>
-            </button>
           </div>
+          <button class="quick-add-footer-button btn btn-secondary" type="button" data-ui-lab-toggle aria-controls="ui-lab-structure-quick-add" aria-expanded="false">
+            <span class="quick-add-footer-button__icon" aria-hidden="true">+</span>
+            <span class="quick-add-footer-button__label">Cadastrar item</span>
+          </button>
         </div>
       </article>
 
@@ -84,9 +81,6 @@
               <div class="page-header-rail__content">
                 <span class="page-header-rail__eyebrow">Módulo</span>
                 <p class="page-header-rail__subtitle">Subtítulo genérico para explicar o objetivo desta tela.</p>
-              </div>
-              <div class="page-header-rail__actions">
-                <button class="btn btn-secondary" type="button">Voltar à lista</button>
               </div>
             </div>
           </div>
@@ -136,9 +130,6 @@
               <div class="page-header-rail__content">
                 <span class="page-header-rail__eyebrow">Módulo</span>
                 <p class="page-header-rail__subtitle">Subtítulo genérico para explicar o objetivo desta tela.</p>
-              </div>
-              <div class="page-header-rail__actions">
-                <button class="btn btn-secondary" type="button">Voltar à lista</button>
               </div>
             </div>
           </div>
@@ -203,6 +194,9 @@
                 <span class="page-header-rail__eyebrow">Módulo</span>
                 <p class="page-header-rail__subtitle">Etapa 2 de 6 — Subtítulo genérico da etapa atual.</p>
               </div>
+              <div class="page-header-rail__actions">
+                <button class="btn btn-secondary" type="button">Voltar à lista</button>
+              </div>
             </div>
           </div>
           <nav class="page-stepper page-stepper--horizontal" aria-label="Etapas do formulário">
@@ -254,11 +248,10 @@
             </section>
             <footer class="footer-actions">
               <div class="footer-actions__secondary">
-                <button class="btn btn-secondary" type="button">← Botão 1</button>
+                <button class="btn btn-secondary" type="button">Salvar rascunho</button>
               </div>
               <div class="footer-actions__primary">
-                <button class="btn btn-secondary" type="button">Salvar rascunho</button>
-                <button class="btn btn-primary" type="button">Botão 2 →</button>
+                <button class="btn btn-primary" type="button">Próximo →</button>
               </div>
             </footer>
           </main>
