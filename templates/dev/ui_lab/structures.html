@@ -1,0 +1,329 @@
+{% extends "dev/ui_lab/base.html" %}
+
+{% block ui_lab_content %}
+  {% include "dev/ui_lab/partials/_lab_page_title.html" %}
+  {% include "dev/ui_lab/partials/_lab_nav.html" %}
+
+  <section class="ui-lab-section">
+    <div class="ui-lab-section__header">
+      <p class="ui-lab-section__eyebrow">Structure Lab</p>
+      <h2 class="ui-lab-section__title">Composições de página</h2>
+      <p class="ui-lab-section__description">
+        Esta área mostra shells completos. Componentes isolados ficam nas páginas próprias.
+      </p>
+    </div>
+
+    <div class="ui-lab-stack">
+      <article class="ui-lab-preview-card">
+        <div class="ui-lab-preview-card__header">
+          <span class="ui-lab-preview-card__label">Quick Create Inline</span>
+          <span class="ui-lab-status-pill ui-lab-status-pill--review">Em revisão</span>
+        </div>
+        <div class="page-header-stack header-stack--quick-add">
+          <div class="page-header-band">
+            <div class="page-header-band__content">
+              <div class="page-header-band__text">
+                <span class="page-header-band__eyebrow">Contexto</span>
+                <h2 class="page-header-band__title">Título da página</h2>
+              </div>
+            </div>
+          </div>
+          <div class="header-stack--quick-add__rail-group">
+            <div class="page-header-rail page-header-rail--filters-quick-add header-rail--quick-add">
+              <div class="filter-row">
+                <div class="filter-control">
+                  <div class="page-header-rail__marker" aria-hidden="true">TP</div>
+                  <div class="header-filter-bar">
+                    <div class="header-filter-bar__search">
+                      <input class="header-filter-input" type="search" placeholder="Filtro exemplo 1..." aria-label="Buscar">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="quick-add-inline__panel quick-add-panel" id="ui-lab-structure-quick-add" hidden>
+                <div class="quick-add-inline__body">
+                  <div class="quick-add-inline__fields">
+                    <div class="field-grid">
+                      {% for field in ui_lab_fields.quick_add_structure %}
+                        {% include "dev/ui_lab/partials/_demo_field.html" with field=field only %}
+                      {% endfor %}
+                    </div>
+                  </div>
+                  <div class="quick-add-inline__actions">
+                    <button class="btn btn-secondary" type="button" data-ui-lab-close>Cancelar</button>
+                    <button class="btn btn-primary" type="button">Salvar</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button class="quick-add-footer-button btn btn-secondary" type="button" data-ui-lab-toggle aria-controls="ui-lab-structure-quick-add" aria-expanded="false">
+              <span class="quick-add-footer-button__icon" aria-hidden="true">+</span>
+              <span class="quick-add-footer-button__label">Cadastrar item</span>
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <article class="ui-lab-preview-card">
+        <div class="ui-lab-preview-card__header">
+          <span class="ui-lab-preview-card__label">Standard Simple</span>
+          <span class="ui-lab-status-pill ui-lab-status-pill--done">Pronto</span>
+        </div>
+        <div class="page-shell page-shell--standard-simple">
+          <div class="page-header-stack">
+            <div class="page-header-band">
+              <div class="page-header-band__content">
+                <div class="page-header-band__text">
+                  <span class="page-header-band__eyebrow">Contexto</span>
+                  <h2 class="page-header-band__title">Título da página</h2>
+                </div>
+              </div>
+            </div>
+            <div class="page-header-rail">
+              <div class="page-header-rail__marker" aria-hidden="true">TP</div>
+              <div class="page-header-rail__content">
+                <span class="page-header-rail__eyebrow">Módulo</span>
+                <p class="page-header-rail__subtitle">Subtítulo genérico para explicar o objetivo desta tela.</p>
+              </div>
+              <div class="page-header-rail__actions">
+                <button class="btn btn-secondary" type="button">Voltar à lista</button>
+              </div>
+            </div>
+          </div>
+          <main class="main-form-panel">
+            <section class="form-section" aria-labelledby="structure-simple-title">
+              <header class="section-header">
+                <div class="section-header__copy">
+                  <h3 class="section-header__title" id="structure-simple-title">Seção exemplo 1</h3>
+                  <p class="section-header__description">Subtítulo da seção exemplo.</p>
+                </div>
+              </header>
+              <div class="field-grid">
+                {% for field in ui_lab_fields.standard_simple %}
+                  {% include "dev/ui_lab/partials/_demo_field.html" with field=field only %}
+                {% endfor %}
+              </div>
+            </section>
+            <footer class="footer-actions">
+              <div class="footer-actions__secondary">
+                <button class="btn btn-secondary" type="button">Botão 1</button>
+              </div>
+              <div class="footer-actions__primary">
+                <button class="btn btn-primary" type="button">Botão 2</button>
+              </div>
+            </footer>
+          </main>
+        </div>
+      </article>
+
+      <article class="ui-lab-preview-card">
+        <div class="ui-lab-preview-card__header">
+          <span class="ui-lab-preview-card__label">Standard</span>
+          <span class="ui-lab-status-pill ui-lab-status-pill--done">Pronto</span>
+        </div>
+        <div class="page-shell page-shell--standard">
+          <div class="page-header-stack">
+            <div class="page-header-band">
+              <div class="page-header-band__content">
+                <div class="page-header-band__text">
+                  <span class="page-header-band__eyebrow">Contexto</span>
+                  <h2 class="page-header-band__title">Título da página</h2>
+                </div>
+              </div>
+            </div>
+            <div class="page-header-rail">
+              <div class="page-header-rail__marker" aria-hidden="true">TP</div>
+              <div class="page-header-rail__content">
+                <span class="page-header-rail__eyebrow">Módulo</span>
+                <p class="page-header-rail__subtitle">Subtítulo genérico para explicar o objetivo desta tela.</p>
+              </div>
+              <div class="page-header-rail__actions">
+                <button class="btn btn-secondary" type="button">Voltar à lista</button>
+              </div>
+            </div>
+          </div>
+          <main class="main-form-panel">
+            <section class="form-section" aria-labelledby="structure-standard-primary">
+              <header class="section-header">
+                <div class="section-header__copy">
+                  <h3 class="section-header__title" id="structure-standard-primary">Seção exemplo 1</h3>
+                  <p class="section-header__description">Subtítulo da seção exemplo.</p>
+                </div>
+              </header>
+              <div class="field-grid">
+                {% for field in ui_lab_fields.standard_primary %}
+                  {% include "dev/ui_lab/partials/_demo_field.html" with field=field only %}
+                {% endfor %}
+              </div>
+            </section>
+            <section class="form-section" aria-labelledby="structure-standard-secondary">
+              <header class="section-header">
+                <div class="section-header__copy">
+                  <h3 class="section-header__title" id="structure-standard-secondary">Seção exemplo 2</h3>
+                  <p class="section-header__description">Subtítulo da seção exemplo.</p>
+                </div>
+              </header>
+              <div class="field-grid">
+                {% for field in ui_lab_fields.standard_secondary %}
+                  {% include "dev/ui_lab/partials/_demo_field.html" with field=field only %}
+                {% endfor %}
+              </div>
+            </section>
+            <footer class="footer-actions">
+              <div class="footer-actions__secondary">
+                <button class="btn btn-secondary" type="button">Botão 1</button>
+              </div>
+              <div class="footer-actions__primary">
+                <button class="btn btn-primary" type="button">Botão 2</button>
+              </div>
+            </footer>
+          </main>
+        </div>
+      </article>
+
+      <article class="ui-lab-preview-card">
+        <div class="ui-lab-preview-card__header">
+          <span class="ui-lab-preview-card__label">Wizard</span>
+          <span class="ui-lab-status-pill ui-lab-status-pill--done">Pronto</span>
+        </div>
+        <div class="page-shell page-shell--wizard">
+          <div class="page-header-stack">
+            <div class="page-header-band">
+              <div class="page-header-band__content">
+                <div class="page-header-band__text">
+                  <span class="page-header-band__eyebrow">Contexto</span>
+                  <h2 class="page-header-band__title">Título da página</h2>
+                </div>
+                <span class="page-header-status-chip page-header-status-chip--draft">Rascunho</span>
+              </div>
+            </div>
+            <div class="page-header-rail">
+              <div class="page-header-rail__marker" aria-hidden="true">TP</div>
+              <div class="page-header-rail__content">
+                <span class="page-header-rail__eyebrow">Módulo</span>
+                <p class="page-header-rail__subtitle">Etapa 2 de 6 — Subtítulo genérico da etapa atual.</p>
+              </div>
+            </div>
+          </div>
+          <nav class="page-stepper page-stepper--horizontal" aria-label="Etapas do formulário">
+            <ol class="page-stepper__list">
+              {% for step in ui_lab_steps %}
+                <li class="page-stepper__item {{ step.state_class }}"{% if step.aria_current %} aria-current="{{ step.aria_current }}"{% endif %}>
+                  <div class="page-stepper__track">
+                    <div class="page-stepper__connector page-stepper__connector--before"></div>
+                    <div class="page-stepper__marker" aria-hidden="{{ step.marker_aria_hidden|yesno:'true,false' }}">
+                      <span class="page-stepper__marker-icon">{{ step.marker }}</span>
+                    </div>
+                    <div class="page-stepper__connector page-stepper__connector--after"></div>
+                  </div>
+                  <div class="page-stepper__content">
+                    <span class="page-stepper__eyebrow">{{ step.step_label }}</span>
+                    <span class="page-stepper__label">{{ step.title }}</span>
+                    <span class="page-stepper__status">{{ step.status }}</span>
+                  </div>
+                </li>
+              {% endfor %}
+            </ol>
+          </nav>
+          <main class="main-form-panel">
+            <section class="form-section" aria-labelledby="structure-wizard-primary">
+              <header class="section-header">
+                <div class="section-header__copy">
+                  <h3 class="section-header__title" id="structure-wizard-primary">Seção exemplo 1</h3>
+                  <p class="section-header__description">Subtítulo da seção exemplo da etapa 2.</p>
+                </div>
+              </header>
+              <div class="field-grid">
+                {% for field in ui_lab_fields.wizard_primary %}
+                  {% include "dev/ui_lab/partials/_demo_field.html" with field=field only %}
+                {% endfor %}
+              </div>
+            </section>
+            <section class="form-section" aria-labelledby="structure-wizard-secondary">
+              <header class="section-header">
+                <div class="section-header__copy">
+                  <h3 class="section-header__title" id="structure-wizard-secondary">Seção exemplo 2</h3>
+                  <p class="section-header__description">Subtítulo da seção exemplo.</p>
+                </div>
+              </header>
+              <div class="field-grid">
+                {% for field in ui_lab_fields.wizard_secondary %}
+                  {% include "dev/ui_lab/partials/_demo_field.html" with field=field only %}
+                {% endfor %}
+              </div>
+            </section>
+            <footer class="footer-actions">
+              <div class="footer-actions__secondary">
+                <button class="btn btn-secondary" type="button">← Botão 1</button>
+              </div>
+              <div class="footer-actions__primary">
+                <button class="btn btn-secondary" type="button">Salvar rascunho</button>
+                <button class="btn btn-primary" type="button">Botão 2 →</button>
+              </div>
+            </footer>
+          </main>
+        </div>
+      </article>
+
+      <article class="ui-lab-preview-card">
+        <div class="ui-lab-preview-card__header">
+          <span class="ui-lab-preview-card__label">List / Filters</span>
+          <span class="ui-lab-status-pill ui-lab-status-pill--build">Em construção</span>
+        </div>
+        <div class="page-shell page-shell--list">
+          <div class="page-header-stack">
+            <div class="page-header-band">
+              <div class="page-header-band__content">
+                <div class="page-header-band__text">
+                  <span class="page-header-band__eyebrow">Contexto</span>
+                  <h2 class="page-header-band__title">Título da página</h2>
+                </div>
+                <span class="page-header-status-chip page-header-status-chip--active">12</span>
+              </div>
+            </div>
+            <div class="page-header-rail page-header-rail--filters">
+              <div class="page-header-rail__marker" aria-hidden="true">TP</div>
+              <div class="header-filter-bar">
+                <div class="header-filter-bar__search">
+                  <input class="header-filter-input" type="search" placeholder="Buscar itens..." aria-label="Buscar">
+                </div>
+                <div class="header-filter-bar__actions">
+                  <select class="header-filter-select" aria-label="Status">
+                    <option value="">Status</option>
+                    <option>Ativo</option>
+                    <option>Pendente</option>
+                  </select>
+                </div>
+              </div>
+              <div class="page-header-rail__actions">
+                <button class="btn btn-primary" type="button">+ Cadastrar</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="list-panel">
+            <div class="filter-bar">
+              <div class="filter-bar__controls">
+                <div class="ui-lab-demo-input ui-lab-demo-input--search" role="presentation" aria-hidden="true">Buscar itens...</div>
+                <button class="btn btn-secondary" type="button">Limpar filtros</button>
+              </div>
+              <div class="filter-bar__actions">
+                <button class="btn btn-primary" type="button">+ Cadastrar item</button>
+              </div>
+            </div>
+            <div class="simple-list" role="list" aria-label="Lista de itens (demonstração)">
+              {% for item in ui_lab_simple_rows %}
+                {% include "dev/ui_lab/partials/_simple_list_item.html" with item=item only %}
+              {% endfor %}
+            </div>
+            <div class="card-list" role="list" aria-label="Lista de cards (demonstração)">
+              {% for card in ui_lab_cards %}
+                {% include "dev/ui_lab/partials/_list_card.html" with card=card only %}
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+{% endblock %}

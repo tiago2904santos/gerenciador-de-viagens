@@ -1,0 +1,30 @@
+{% extends "dev/ui_lab/base.html" %}
+
+{% block ui_lab_content %}
+  {% include "dev/ui_lab/partials/_lab_page_title.html" %}
+  {% include "dev/ui_lab/partials/_lab_nav.html" %}
+
+  <section class="ui-lab-section">
+    <div class="ui-lab-section__header">
+      <p class="ui-lab-section__eyebrow">Buttons Lab</p>
+      <h2 class="ui-lab-section__title">Padrões de ação</h2>
+      <p class="ui-lab-section__description">
+        Página preparada para os estados e variações de botão. Os componentes reais continuam
+        usando os arquivos globais de botão.
+      </p>
+    </div>
+    {% include "dev/ui_lab/partials/_component_placeholder.html" with title="Buttons" status_label=ui_lab_current_page.status_label status_modifier=ui_lab_current_page.status_modifier description=ui_lab_current_page.summary items=ui_lab_plan_items only %}
+
+    <div class="ui-lab-button-matrix">
+      <button class="btn btn-primary" type="button">Primary</button>
+      <button class="btn btn-secondary" type="button">Secondary</button>
+      <button class="btn btn-outline-secondary" type="button">Outline</button>
+      <button class="btn btn-muted" type="button">Ghost</button>
+      <button class="btn btn-danger" type="button">Danger</button>
+      <button class="btn btn-primary btn-sm" type="button">Compact</button>
+      <button class="btn btn-secondary btn-icon" type="button" aria-label="Icon button">+</button>
+      <button class="btn btn-primary" type="button" disabled>Disabled</button>
+      <button class="btn btn-primary" type="button">Loading...</button>
+    </div>
+  </section>
+{% endblock %}

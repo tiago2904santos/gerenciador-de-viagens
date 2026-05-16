@@ -1,0 +1,36 @@
+{% extends "dev/ui_lab/base.html" %}
+
+{% block ui_lab_content %}
+  {% include "dev/ui_lab/partials/_lab_page_title.html" %}
+  {% include "dev/ui_lab/partials/_lab_nav.html" %}
+
+  <section class="ui-lab-section">
+    <div class="ui-lab-section__header">
+      <p class="ui-lab-section__eyebrow">Feedback Lab</p>
+      <h2 class="ui-lab-section__title">Mensagens, avisos e estados vazios</h2>
+      <p class="ui-lab-section__description">
+        Os elementos desta página devem servir de referência para validação e feedback discreto.
+      </p>
+    </div>
+    {% include "dev/ui_lab/partials/_component_placeholder.html" with title="Feedback / Validation" status_label=ui_lab_current_page.status_label status_modifier=ui_lab_current_page.status_modifier description=ui_lab_current_page.summary items=ui_lab_plan_items only %}
+
+    <div class="ui-lab-feedback-grid">
+      <div class="ui-lab-feedback-card ui-lab-feedback-card--info">
+        <strong>Info</strong>
+        <p>Exemplo de callout informativo para contexto de tela.</p>
+      </div>
+      <div class="ui-lab-feedback-card ui-lab-feedback-card--warning">
+        <strong>Aviso</strong>
+        <p>Exemplo de alerta preventivo com contraste suficiente.</p>
+      </div>
+      <div class="ui-lab-feedback-card ui-lab-feedback-card--success">
+        <strong>Sucesso</strong>
+        <p>Exemplo de feedback positivo, autosave ou conclusão.</p>
+      </div>
+      <div class="ui-lab-feedback-card ui-lab-feedback-card--danger">
+        <strong>Erro</strong>
+        <p>Exemplo de erro de formulário, validação ou pendência crítica.</p>
+      </div>
+    </div>
+  </section>
+{% endblock %}

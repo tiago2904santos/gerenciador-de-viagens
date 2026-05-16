@@ -1,0 +1,30 @@
+{% extends "dev/ui_lab/base.html" %}
+
+{% block ui_lab_content %}
+  {% include "dev/ui_lab/partials/_lab_page_title.html" %}
+  {% include "dev/ui_lab/partials/_lab_nav.html" %}
+
+  <section class="ui-lab-section">
+    <div class="ui-lab-section__header">
+      <p class="ui-lab-section__eyebrow">Cards Lab</p>
+      <h2 class="ui-lab-section__title">Cards e linhas de lista</h2>
+      <p class="ui-lab-section__description">
+        Use esta página para alinhar cards documentais, rows e empty state de listagem.
+      </p>
+    </div>
+    {% include "dev/ui_lab/partials/_component_placeholder.html" with title="Cards / List Items" status_label=ui_lab_current_page.status_label status_modifier=ui_lab_current_page.status_modifier description=ui_lab_current_page.summary items=ui_lab_plan_items only %}
+
+    <div class="list-panel">
+      <div class="simple-list" role="list" aria-label="Lista de itens (demonstração)">
+        {% for item in ui_lab_simple_rows %}
+          {% include "dev/ui_lab/partials/_simple_list_item.html" with item=item only %}
+        {% endfor %}
+      </div>
+      <div class="card-list" role="list" aria-label="Lista de cards (demonstração)">
+        {% for card in ui_lab_cards %}
+          {% include "dev/ui_lab/partials/_list_card.html" with card=card only %}
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+{% endblock %}

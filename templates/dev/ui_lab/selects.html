@@ -1,0 +1,56 @@
+{% extends "dev/ui_lab/base.html" %}
+
+{% block ui_lab_content %}
+  {% include "dev/ui_lab/partials/_lab_page_title.html" %}
+  {% include "dev/ui_lab/partials/_lab_nav.html" %}
+
+  <section class="ui-lab-section">
+    <div class="ui-lab-section__header">
+      <p class="ui-lab-section__eyebrow">Selects & Filters</p>
+      <h2 class="ui-lab-section__title">Selecao e filtragem</h2>
+      <p class="ui-lab-section__description">
+        Quick add, selects e barrafiltro ficam aqui para documentar o comportamento visual sem
+        misturar a regra de negocio.
+      </p>
+    </div>
+
+    {% include "dev/ui_lab/partials/_component_placeholder.html" with title="Selects / Dropdowns / Filters" status_label=ui_lab_current_page.status_label status_modifier=ui_lab_current_page.status_modifier description=ui_lab_current_page.summary items=ui_lab_plan_items only %}
+
+    <article class="ui-lab-preview-card">
+      <div class="ui-lab-preview-card__header">
+        <span class="ui-lab-preview-card__label">Filter rail</span>
+        <span class="ui-lab-status-pill ui-lab-status-pill--build">Em construcao</span>
+      </div>
+
+      <div class="page-header-stack">
+        <div class="page-header-band">
+          <div class="page-header-band__content">
+            <div class="page-header-band__text">
+              <span class="page-header-band__eyebrow">Contexto</span>
+              <h2 class="page-header-band__title">Titulo da pagina</h2>
+            </div>
+          </div>
+        </div>
+        <div class="page-header-rail page-header-rail--filters">
+          <div class="page-header-rail__marker" aria-hidden="true">TP</div>
+          <div class="header-filter-bar">
+            <div class="header-filter-bar__search">
+              <input class="header-filter-input" type="search" placeholder="Filtro exemplo..." aria-label="Buscar">
+            </div>
+            <div class="header-filter-bar__actions">
+              <select class="header-filter-select" aria-label="Status">
+                <option value="">Status</option>
+                <option value="all">Todos</option>
+                <option value="active">Ativo</option>
+                <option value="pending">Pendente</option>
+              </select>
+              <button class="header-filter-button" type="button">Aplicar filtros</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {% include "dev/ui_lab/partials/_quick_add_inline.html" with panel_id="ui-lab-selects-quick-add" toggle_label="Cadastrar item" panel_title="Cadastro rapido" fields=ui_lab_fields.quick_add_structure save_label="Salvar" cancel_label="Cancelar" only %}
+    </article>
+  </section>
+{% endblock %}

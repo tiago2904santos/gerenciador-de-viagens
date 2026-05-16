@@ -1,0 +1,23 @@
+{% extends "dev/ui_lab/base.html" %}
+
+{% block ui_lab_content %}
+  {% include "dev/ui_lab/partials/_lab_page_title.html" %}
+  {% include "dev/ui_lab/partials/_lab_nav.html" %}
+
+  <section class="ui-lab-section">
+    <div class="ui-lab-section__header">
+      <p class="ui-lab-section__eyebrow">Status Lab</p>
+      <h2 class="ui-lab-section__title">Badges, chips e estados</h2>
+      <p class="ui-lab-section__description">
+        Esta página vai concentrar estados documentais e chips reutilizáveis.
+      </p>
+    </div>
+    {% include "dev/ui_lab/partials/_component_placeholder.html" with title="Badges / Chips / Status" status_label=ui_lab_current_page.status_label status_modifier=ui_lab_current_page.status_modifier description=ui_lab_current_page.summary items=ui_lab_plan_items only %}
+
+    <div class="ui-lab-chip-grid">
+      {% for status in ui_lab_status_examples %}
+        <span class="ui-lab-status-pill ui-lab-status-pill--{{ status.modifier }}">{{ status.label }}</span>
+      {% endfor %}
+    </div>
+  </section>
+{% endblock %}

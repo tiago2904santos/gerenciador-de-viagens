@@ -1,0 +1,16 @@
+<article class="list-card" role="listitem">
+  <div class="list-card__header">
+    <h3 class="list-card__title">{{ card.title }}</h3>
+    <span class="ui-lab-demo-chip ui-lab-demo-chip--{{ card.status_modifier }}">{{ card.status_label }}</span>
+  </div>
+  <div class="list-card__meta">
+    {% for meta_item in card.meta_items %}
+      <span class="list-card__meta-item">{{ meta_item }}</span>
+    {% endfor %}
+  </div>
+  <p class="list-card__body">{{ card.description }}</p>
+  <div class="list-card__footer">
+    <button class="btn btn-secondary btn-sm" type="button">{{ card.secondary_action }}</button>
+    <button class="btn btn-primary btn-sm" type="button">{{ card.primary_action }}</button>
+  </div>
+</article>

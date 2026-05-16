@@ -1,0 +1,11 @@
+<div class="simple-list-item" role="listitem">
+  <div class="simple-list-item__avatar" aria-hidden="true">{{ item.avatar }}</div>
+  <div class="simple-list-item__body">
+    <span class="simple-list-item__title">{{ item.title }}</span>
+    <span class="simple-list-item__meta">{{ item.meta }}</span>
+  </div>
+  <div class="simple-list-item__aside">
+    <span class="ui-lab-demo-chip ui-lab-demo-chip--{{ item.status_modifier }}">{{ item.status_label }}</span>
+    <button class="btn btn-secondary btn-sm" type="button">{{ item.action_label }}</button>
+  </div>
+</div>

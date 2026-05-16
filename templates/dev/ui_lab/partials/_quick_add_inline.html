@@ -1,0 +1,46 @@
+{% comment %}
+Reusable quick add block for UI Lab demos.
+Parameters:
+- panel_id
+- toggle_label
+- panel_title
+- fields
+- save_label
+- cancel_label
+{% endcomment %}
+<div class="quick-add-inline">
+  <div class="quick-add-inline__tab-row">
+    <button
+      class="quick-add-inline__tab"
+      type="button"
+      aria-expanded="false"
+      aria-controls="{{ panel_id }}"
+      data-quick-add-toggle>
+      <span class="quick-add-inline__tab-icon" aria-hidden="true">+</span>
+      <span class="quick-add-inline__tab-label">{{ toggle_label }}</span>
+    </button>
+  </div>
+
+  <div class="quick-add-inline__panel" id="{{ panel_id }}" hidden>
+    <div class="quick-add-inline__header">
+      <h3 class="quick-add-inline__title">{{ panel_title }}</h3>
+      <button class="quick-add-inline__close" type="button" aria-label="Fechar painel" data-quick-add-close>
+        ×
+      </button>
+    </div>
+
+    <div class="quick-add-inline__body">
+      <div class="quick-add-inline__fields">
+        <div class="field-grid">
+          {% for field in fields %}
+            {% include "dev/ui_lab/partials/_demo_field.html" with field=field only %}
+          {% endfor %}
+        </div>
+      </div>
+      <div class="quick-add-inline__actions">
+        <button class="btn btn-secondary" type="button" data-quick-add-close>{{ cancel_label|default:"Cancelar" }}</button>
+        <button class="btn btn-primary" type="button">{{ save_label|default:"Salvar" }}</button>
+      </div>
+    </div>
+  </div>
+</div>

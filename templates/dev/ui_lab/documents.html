@@ -1,0 +1,36 @@
+{% extends "dev/ui_lab/base.html" %}
+
+{% block ui_lab_content %}
+  {% include "dev/ui_lab/partials/_lab_page_title.html" %}
+  {% include "dev/ui_lab/partials/_lab_nav.html" %}
+
+  <section class="ui-lab-section">
+    <div class="ui-lab-section__header">
+      <p class="ui-lab-section__eyebrow">Documents Lab</p>
+      <h2 class="ui-lab-section__title">Viewer documental</h2>
+      <p class="ui-lab-section__description">
+        Espaço visual para PDF preview, toolbar, metadados e arquivos vinculados.
+      </p>
+    </div>
+    {% include "dev/ui_lab/partials/_component_placeholder.html" with title="Document Viewer / PDF Preview" status_label=ui_lab_current_page.status_label status_modifier=ui_lab_current_page.status_modifier description=ui_lab_current_page.summary items=ui_lab_plan_items only %}
+
+    <div class="ui-lab-document-viewer">
+      <div class="ui-lab-document-viewer__toolbar">
+        <button class="btn btn-secondary" type="button">Zoom -</button>
+        <button class="btn btn-secondary" type="button">Ajustar largura</button>
+        <button class="btn btn-secondary" type="button">Zoom +</button>
+        <button class="btn btn-secondary" type="button">Abrir PDF</button>
+        <button class="btn btn-secondary" type="button">Baixar</button>
+      </div>
+      <div class="ui-lab-document-viewer__content">
+        <div class="ui-lab-document-viewer__preview">Preview de PDF</div>
+        <aside class="ui-lab-document-viewer__side">
+          <div class="ui-lab-feedback-card ui-lab-feedback-card--info">
+            <strong>Status do documento</strong>
+            <p>Exemplo de metadado lateral e estado documental.</p>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+{% endblock %}

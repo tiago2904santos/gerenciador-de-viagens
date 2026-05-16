@@ -1,0 +1,12 @@
+<header class="ui-lab-hero" aria-labelledby="{{ ui_lab_current_page.slug }}-title">
+  <div class="ui-lab-hero__copy">
+    <p class="ui-lab-hero__eyebrow">UI Lab</p>
+    <h1 class="ui-lab-hero__title" id="{{ ui_lab_current_page.slug }}-title">{{ ui_lab_current_page.title }}</h1>
+    <p class="ui-lab-hero__subtitle">{{ ui_lab_current_page.subtitle }}</p>
+  </div>
+  <div class="ui-lab-hero__meta">
+    <span class="ui-lab-status-pill ui-lab-status-pill--{{ ui_lab_current_page.status_modifier }}">
+      {{ ui_lab_current_page.status_label }}
+    </span>
+  </div>
+</header>

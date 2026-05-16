@@ -1,0 +1,38 @@
+{% extends "dev/ui_lab/base.html" %}
+
+{% block ui_lab_content %}
+  {% include "dev/ui_lab/partials/_lab_page_title.html" %}
+  {% include "dev/ui_lab/partials/_lab_nav.html" %}
+
+  <section class="ui-lab-section">
+    <div class="ui-lab-section__header">
+      <p class="ui-lab-section__eyebrow">Signature Lab</p>
+      <h2 class="ui-lab-section__title">Ações documentais e assinatura</h2>
+      <p class="ui-lab-section__description">
+        Esta área prepara os blocos de ação para envio, download e acompanhamento de assinatura.
+      </p>
+    </div>
+    {% include "dev/ui_lab/partials/_component_placeholder.html" with title="Signature / Document Actions" status_label=ui_lab_current_page.status_label status_modifier=ui_lab_current_page.status_modifier description=ui_lab_current_page.summary items=ui_lab_plan_items only %}
+
+    <div class="ui-lab-signature-grid">
+      <article class="ui-lab-signature-card">
+        <strong>Assinatura pendente</strong>
+        <span class="ui-lab-status-pill ui-lab-status-pill--pending">Pendente</span>
+        <p>Card de ação para solicitação e acompanhamento de signatários.</p>
+      </article>
+      <article class="ui-lab-signature-card">
+        <strong>Documento expirado</strong>
+        <span class="ui-lab-status-pill ui-lab-status-pill--cancelled">Expirado</span>
+        <p>Estado visual para links ou solicitações vencidas.</p>
+      </article>
+      <article class="ui-lab-signature-card">
+        <strong>Download e preview</strong>
+        <div class="btn-group">
+          <button class="btn btn-secondary" type="button">PDF</button>
+          <button class="btn btn-secondary" type="button">DOCX</button>
+          <button class="btn btn-primary" type="button">Preview</button>
+        </div>
+      </article>
+    </div>
+  </section>
+{% endblock %}

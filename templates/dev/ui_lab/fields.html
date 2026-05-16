@@ -1,0 +1,24 @@
+{% extends "dev/ui_lab/base.html" %}
+
+{% block ui_lab_content %}
+  {% include "dev/ui_lab/partials/_lab_page_title.html" %}
+  {% include "dev/ui_lab/partials/_lab_nav.html" %}
+
+  <section class="ui-lab-section">
+    <div class="ui-lab-section__header">
+      <p class="ui-lab-section__eyebrow">Fields Lab</p>
+      <h2 class="ui-lab-section__title">Campos e grupos de campo</h2>
+      <p class="ui-lab-section__description">
+        A área está pronta para receber exemplos reais de inputs, checkboxes, radios, switches
+        e layouts de campo.
+      </p>
+    </div>
+    {% include "dev/ui_lab/partials/_component_placeholder.html" with title="Fields / Inputs" status_label=ui_lab_current_page.status_label status_modifier=ui_lab_current_page.status_modifier description=ui_lab_current_page.summary items=ui_lab_plan_items only %}
+
+    <div class="field-grid ui-lab-field-showcase">
+      {% for field in ui_lab_fields.standard_primary %}
+        {% include "dev/ui_lab/partials/_demo_field.html" with field=field only %}
+      {% endfor %}
+    </div>
+  </section>
+{% endblock %}

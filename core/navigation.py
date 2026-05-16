@@ -73,6 +73,7 @@ if settings.DEBUG:
             "label": "UI Lab",
             "url_name": "core:ui_lab",
             "icon": "DV",
+            "active_when": ["core:ui_lab"],
         }
     )
 

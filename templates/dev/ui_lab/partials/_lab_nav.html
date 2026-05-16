@@ -1,0 +1,13 @@
+<nav class="ui-lab-nav" aria-label="Navegação do UI Lab">
+  {% for page in ui_lab_nav_items %}
+    <a class="ui-lab-nav__link{% if page.slug == ui_lab_current_page.slug %} is-active{% endif %}"
+       href="{{ page.url }}"
+       data-ui-lab-nav-link
+       {% if page.slug == ui_lab_current_page.slug %}aria-current="page"{% endif %}>
+      <span class="ui-lab-nav__label">{{ page.label }}</span>
+      <span class="ui-lab-status-pill ui-lab-status-pill--{{ page.status_modifier }}">
+        {{ page.status_label }}
+      </span>
+    </a>
+  {% endfor %}
+</nav>

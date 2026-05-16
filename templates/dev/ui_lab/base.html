@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ ui_lab_current_page.title|default:"UI Lab" }}{% endblock %}
+{% block shell_class %}app-shell--ui-lab{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dev/ui-lab.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/dev/ui-lab.js' %}" defer></script>
+{% endblock %}
+
+{% block content %}
+<div class="ui-lab-page">
+  {% block ui_lab_content %}{% endblock %}
+</div>
+{% endblock %}
