@@ -30,7 +30,7 @@ UI_LAB_PAGE_DEFINITIONS = [
         "summary": "Standard Simple, Standard, Wizard e variacoes de list/filter shell.",
         "status_label": "Pronto",
         "status_modifier": "done",
-        "route_name": "core:ui_lab_section",
+        "route_name": "core:ui_lab_structures",
     },
     {
         "slug": "headers",
@@ -41,7 +41,7 @@ UI_LAB_PAGE_DEFINITIONS = [
         "summary": "Header Band, Header Stack, filtros no rail e quick add separado.",
         "status_label": "Pronto",
         "status_modifier": "done",
-        "route_name": "core:ui_lab_section",
+        "route_name": "core:ui_lab_headers",
     },
     {
         "slug": "buttons",
@@ -52,7 +52,7 @@ UI_LAB_PAGE_DEFINITIONS = [
         "summary": "Base para botoes primarios, secundarios, icone, loading e disabled.",
         "status_label": "Planejado",
         "status_modifier": "planned",
-        "route_name": "core:ui_lab_section",
+        "route_name": "core:ui_lab_buttons",
     },
     {
         "slug": "fields",
@@ -63,7 +63,7 @@ UI_LAB_PAGE_DEFINITIONS = [
         "summary": "Inputs, textareas, checkboxes, radios, switches e layouts de campo.",
         "status_label": "Planejado",
         "status_modifier": "planned",
-        "route_name": "core:ui_lab_section",
+        "route_name": "core:ui_lab_fields",
     },
     {
         "slug": "selects",
@@ -74,7 +74,7 @@ UI_LAB_PAGE_DEFINITIONS = [
         "summary": "Selects, filtros simples, filtros avancados e quick add aberto.",
         "status_label": "Em construcao",
         "status_modifier": "build",
-        "route_name": "core:ui_lab_section",
+        "route_name": "core:ui_lab_selects_filters",
     },
     {
         "slug": "status",
@@ -85,7 +85,7 @@ UI_LAB_PAGE_DEFINITIONS = [
         "summary": "Status de ciclo, chips de pessoa, viajante, destino e filtros aplicados.",
         "status_label": "Planejado",
         "status_modifier": "planned",
-        "route_name": "core:ui_lab_section",
+        "route_name": "core:ui_lab_status",
     },
     {
         "slug": "feedback",
@@ -96,7 +96,7 @@ UI_LAB_PAGE_DEFINITIONS = [
         "summary": "Erros, avisos, sucesso, loading, skeleton e estados discretos.",
         "status_label": "Planejado",
         "status_modifier": "planned",
-        "route_name": "core:ui_lab_section",
+        "route_name": "core:ui_lab_feedback",
     },
     {
         "slug": "cards",
@@ -107,7 +107,7 @@ UI_LAB_PAGE_DEFINITIONS = [
         "summary": "Card documental, list row, acoes, status e empty list.",
         "status_label": "Pronto",
         "status_modifier": "done",
-        "route_name": "core:ui_lab_section",
+        "route_name": "core:ui_lab_cards",
     },
     {
         "slug": "overlays",
@@ -118,7 +118,7 @@ UI_LAB_PAGE_DEFINITIONS = [
         "summary": "Modal, drawer lateral, popover, tooltip e menus de acao.",
         "status_label": "Planejado",
         "status_modifier": "planned",
-        "route_name": "core:ui_lab_section",
+        "route_name": "core:ui_lab_overlays",
     },
     {
         "slug": "tables",
@@ -129,7 +129,7 @@ UI_LAB_PAGE_DEFINITIONS = [
         "summary": "Tabela simples, densa, responsiva, com acoes e paginacao.",
         "status_label": "Planejado",
         "status_modifier": "planned",
-        "route_name": "core:ui_lab_section",
+        "route_name": "core:ui_lab_tables",
     },
     {
         "slug": "documents",
@@ -140,7 +140,7 @@ UI_LAB_PAGE_DEFINITIONS = [
         "summary": "Preview de PDF, toolbar, info lateral e arquivos vinculados.",
         "status_label": "Planejado",
         "status_modifier": "planned",
-        "route_name": "core:ui_lab_section",
+        "route_name": "core:ui_lab_documents",
     },
     {
         "slug": "signature",
@@ -151,7 +151,7 @@ UI_LAB_PAGE_DEFINITIONS = [
         "summary": "Solicitacao, download, copia de link e estados de assinatura.",
         "status_label": "Planejado",
         "status_modifier": "planned",
-        "route_name": "core:ui_lab_section",
+        "route_name": "core:ui_lab_signature",
     },
 ]
 
@@ -396,31 +396,11 @@ UI_LAB_CARDS = [
     },
 ]
 
-UI_LAB_SECTION_TEMPLATES = {
-    "structures": "dev/ui_lab/structures.html",
-    "headers": "dev/ui_lab/headers.html",
-    "buttons": "dev/ui_lab/buttons.html",
-    "fields": "dev/ui_lab/fields.html",
-    "selects": "dev/ui_lab/selects.html",
-    "status": "dev/ui_lab/status.html",
-    "feedback": "dev/ui_lab/feedback.html",
-    "cards": "dev/ui_lab/cards.html",
-    "overlays": "dev/ui_lab/overlays.html",
-    "tables": "dev/ui_lab/tables.html",
-    "documents": "dev/ui_lab/documents.html",
-    "signature": "dev/ui_lab/signature.html",
-}
-
-
 def _build_ui_lab_pages():
     pages = []
     for page in UI_LAB_PAGE_DEFINITIONS:
         item = page.copy()
-        route_name = item["route_name"]
-        if route_name == "core:ui_lab_section":
-            item["url"] = reverse(route_name, kwargs={"section": item["slug"]})
-        else:
-            item["url"] = reverse(route_name)
+        item["url"] = reverse(item["route_name"])
         pages.append(item)
     return pages
 
@@ -478,8 +458,49 @@ def ui_lab_index(request):
     return _render_ui_lab(request, "dev/ui_lab/index.html", "index")
 
 
-def ui_lab_section(request, section):
-    template_name = UI_LAB_SECTION_TEMPLATES.get(section)
-    if template_name is None:
-        raise Http404
-    return _render_ui_lab(request, template_name, section)
+def ui_lab_structures(request):
+    return _render_ui_lab(request, "dev/ui_lab/structures.html", "structures")
+
+
+def ui_lab_headers(request):
+    return _render_ui_lab(request, "dev/ui_lab/headers.html", "headers")
+
+
+def ui_lab_buttons(request):
+    return _render_ui_lab(request, "dev/ui_lab/buttons.html", "buttons")
+
+
+def ui_lab_fields(request):
+    return _render_ui_lab(request, "dev/ui_lab/fields.html", "fields")
+
+
+def ui_lab_selects_filters(request):
+    return _render_ui_lab(request, "dev/ui_lab/selects_filters.html", "selects")
+
+
+def ui_lab_status(request):
+    return _render_ui_lab(request, "dev/ui_lab/status.html", "status")
+
+
+def ui_lab_feedback(request):
+    return _render_ui_lab(request, "dev/ui_lab/feedback.html", "feedback")
+
+
+def ui_lab_cards(request):
+    return _render_ui_lab(request, "dev/ui_lab/cards.html", "cards")
+
+
+def ui_lab_overlays(request):
+    return _render_ui_lab(request, "dev/ui_lab/overlays.html", "overlays")
+
+
+def ui_lab_tables(request):
+    return _render_ui_lab(request, "dev/ui_lab/tables.html", "tables")
+
+
+def ui_lab_documents(request):
+    return _render_ui_lab(request, "dev/ui_lab/documents.html", "documents")
+
+
+def ui_lab_signature(request):
+    return _render_ui_lab(request, "dev/ui_lab/signature.html", "signature")

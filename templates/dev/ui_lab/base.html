@@ -6,9 +6,12 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/dev/ui-lab.css' %}">
+<link rel="stylesheet" href="{% static 'css/dev/ui-lab-navigation.css' %}">
+<link rel="stylesheet" href="{% static 'css/dev/ui-lab-pages.css' %}">
 {% endblock %}
 
 {% block extra_js %}
+<script src="{% static 'js/dev/ui-lab-navigation.js' %}" defer></script>
 <script src="{% static 'js/dev/ui-lab.js' %}" defer></script>
 {% endblock %}
 
