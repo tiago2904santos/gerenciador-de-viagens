@@ -248,16 +248,18 @@
               </div>
             </div>
           </div>
-          <div class="header-stack--quick-add__rail-group">
-            <div class="page-header-rail page-header-rail--filters page-header-rail--filters-quick-add">
-              <div class="page-header-rail__marker" aria-hidden="true">TP</div>
-              <div class="header-filter-bar">
-                <div class="header-filter-bar__search">
-                  <input class="header-filter-input" type="search" placeholder="Buscar itens..." aria-label="Buscar">
-                </div>
+          <div class="page-header-rail page-header-rail--filters page-header-rail--filters-quick-add ui-lab-header-quick-add__rail">
+            <div class="page-header-rail__marker" aria-hidden="true">TP</div>
+            <div class="header-filter-bar">
+              <div class="header-filter-bar__search">
+                <input class="header-filter-input" type="search" placeholder="Buscar itens..." aria-label="Buscar">
               </div>
-              <div class="page-header-rail__actions">
+              <div class="header-filter-bar__actions">
                 <button class="header-filter-button" type="button">Limpar filtros</button>
+                <button class="quick-add-footer-button btn btn-secondary" type="button" data-ui-lab-toggle aria-controls="ui-lab-headers-quick-add" aria-expanded="false">
+                  <span class="quick-add-footer-button__icon" aria-hidden="true">+</span>
+                  <span class="quick-add-footer-button__label">Cadastrar item</span>
+                </button>
               </div>
             </div>
             <div class="quick-add-inline__panel quick-add-panel" id="ui-lab-headers-quick-add" hidden>
@@ -275,10 +277,6 @@
                 </div>
               </div>
             </div>
-            <button class="quick-add-footer-button btn btn-secondary" type="button" data-ui-lab-toggle aria-controls="ui-lab-headers-quick-add" aria-expanded="false">
-              <span class="quick-add-footer-button__icon" aria-hidden="true">+</span>
-              <span class="quick-add-footer-button__label">Cadastrar item</span>
-            </button>
           </div>
         </div>
       </article>

@@ -306,6 +306,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+  align-items: flex-start;
   width: 100%;
 }
 
@@ -342,8 +343,10 @@
 
 .ui-lab-section--headers .header-applied-filters {
   display: flex;
+  justify-content: flex-start;
   flex-wrap: wrap;
   gap: var(--space-1);
+  width: 100%;
 }
 
 .ui-lab-section--headers .header-applied-chip {
@@ -359,86 +362,81 @@
   padding: 4px 8px;
 }
 
-.page-header-stack--quick-add,
-.header-stack--quick-add {
-  position: relative;
+.ui-lab-section--headers .page-header-rail--filters,
+.ui-lab-section--headers .page-header-rail--filters-quick-add {
+  gap: var(--space-3);
 }
 
-.header-stack--quick-add__rail-group {
+.ui-lab-header-quick-add__rail {
   display: flex;
   flex-direction: column;
-  gap: 0;
-  position: relative;
-  width: 100%;
-}
-
-.page-header-stack--quick-add .page-header-rail--filters-quick-add,
-.header-rail--quick-add {
-  display: flex;
-  flex-direction: column;
+  gap: var(--space-3);
   overflow: hidden;
-  padding-bottom: var(--space-6);
   position: relative;
   width: 100%;
 }
 
-.page-header-stack--quick-add .page-header-rail--filters-quick-add {
-  display: flex;
-  flex-direction: column;
+.ui-lab-header-quick-add__rail .header-filter-bar {
+  align-items: center;
   width: 100%;
 }
 
-.page-header-stack--quick-add .header-filter-bar {
+.ui-lab-header-quick-add__rail .header-filter-bar__actions {
+  justify-content: flex-end;
+}
+
+.ui-lab-header-quick-add__rail .quick-add-footer-button {
+  align-items: center;
+  appearance: none;
+  background: var(--surface-filter-bar);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-control);
+  box-sizing: border-box;
+  color: var(--text-primary);
+  cursor: pointer;
+  display: inline-flex;
+  gap: var(--space-2);
+  height: var(--control-height-md);
+  justify-content: center;
+  padding: 0 var(--space-4);
+  width: auto;
+}
+
+.ui-lab-header-quick-add__rail .quick-add-footer-button:hover {
+  background: var(--surface-list-row-hover);
+}
+
+.ui-lab-header-quick-add__rail .quick-add-footer-button:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: -2px;
+}
+
+.ui-lab-header-quick-add__rail .quick-add-footer-button.is-active,
+.ui-lab-header-quick-add__rail .quick-add-footer-button[aria-expanded="true"] {
+  background: var(--surface-quick-add-tab);
+  border-color: var(--border-quick-add-tab);
+  color: var(--color-quick-add-tab);
+}
+
+.ui-lab-header-quick-add__rail .quick-add-inline__panel {
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--border-subtle);
+  box-shadow: none;
   width: 100%;
 }
 
 .ui-lab-header-quick-add .quick-add-inline__body {
-  padding-left: 0;
-  padding-right: 0;
+  align-items: flex-end;
+  display: flex;
+  gap: var(--layout-quick-create-gap);
+  padding: var(--space-4) 0;
+  width: 100%;
 }
 
 .ui-lab-header-quick-add .quick-add-inline__actions {
   margin-left: auto;
   width: auto;
-}
-
-.quick-add-footer-button {
-  align-items: center;
-  appearance: none;
-  background: var(--surface-filter-bar);
-  border: 0;
-  border-top: 1px solid var(--border-subtle);
-  border-radius: 0;
-  box-sizing: border-box;
-  color: var(--text-primary);
-  cursor: pointer;
-  display: flex;
-  gap: var(--space-2);
-  height: var(--control-height-md);
-  justify-content: center;
-  padding: var(--space-3) var(--space-4);
-  width: 100%;
-}
-
-.quick-add-footer-button:hover {
-  background: var(--surface-list-row-hover);
-}
-
-.quick-add-footer-button:focus-visible {
-  outline: 2px solid var(--border-focus);
-  outline-offset: -2px;
-}
-
-.quick-add-footer-button.is-active,
-.quick-add-footer-button[aria-expanded="true"] {
-  background: var(--surface-list-row-hover);
-}
-
-.ui-lab-header-quick-add .quick-add-footer-button.btn.btn-secondary.is-active,
-.ui-lab-header-quick-add .quick-add-footer-button.btn.btn-secondary[aria-expanded="true"] {
-  background: var(--surface-list-row-hover);
-  border-color: var(--border-active);
-  color: var(--theme-text-heading);
 }
 
 .quick-add-footer-button__icon {
@@ -452,11 +450,6 @@
 }
 
 .quick-add-panel {
-  background: transparent;
-  border: 0;
-  border-top: 1px solid var(--border-subtle);
-  border-radius: 0;
-  box-shadow: none;
   box-sizing: border-box;
   margin-top: 0;
   max-height: 0;
@@ -495,6 +488,10 @@
   .ui-lab-section--headers .header-filter-bar__row {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .ui-lab-section--headers .header-applied-filters {
+    justify-content: flex-start;
   }
 
   .ui-lab-section--headers .header-filter-bar__fields {
