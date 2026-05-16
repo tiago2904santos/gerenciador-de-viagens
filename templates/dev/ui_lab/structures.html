@@ -321,6 +321,16 @@
                 {% include "dev/ui_lab/partials/_list_card.html" with card=card only %}
               {% endfor %}
             </div>
+            <div class="pagination-shell">
+              <span class="pagination-shell__info">1–4 de 12 itens</span>
+              <div class="pagination-shell__controls">
+                <button class="btn btn-secondary" type="button" disabled aria-label="Página anterior">←</button>
+                <button class="btn btn-primary" type="button" aria-current="page">1</button>
+                <button class="btn btn-secondary" type="button">2</button>
+                <button class="btn btn-secondary" type="button">3</button>
+                <button class="btn btn-secondary" type="button" aria-label="Próxima página">→</button>
+              </div>
+            </div>
           </div>
         </div>
       </article>
