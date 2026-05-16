@@ -413,6 +413,13 @@
 
 .ui-lab-header-quick-add .quick-add-footer-button.is-active,
 .ui-lab-header-quick-add .quick-add-footer-button[aria-expanded="true"] {
+  background: var(--surface-filter-bar);
+  border-color: var(--border-subtle);
+  color: var(--text-primary);
+}
+
+html[data-theme="dark"] .ui-lab-header-quick-add .quick-add-footer-button.is-active,
+html[data-theme="dark"] .ui-lab-header-quick-add .quick-add-footer-button[aria-expanded="true"] {
   background: var(--surface-quick-add-tab);
   border-color: var(--border-quick-add-tab);
   color: var(--color-quick-add-tab);
