@@ -38,6 +38,7 @@ class UILabRouteTests(TestCase):
 
         valid_routes = [
             "/dev/ui-lab/structures/",
+            "/dev/ui-lab/lists/",
             "/dev/ui-lab/headers/",
             "/dev/ui-lab/buttons/",
             "/dev/ui-lab/fields/",
@@ -55,6 +56,33 @@ class UILabRouteTests(TestCase):
             with self.subTest(route=route):
                 response = self.client.get(route)
                 self.assertEqual(response.status_code, 200)
+
+    @override_settings(DEBUG=True)
+    def test_ui_lab_structures_page_no_longer_contains_lists_block(self):
+        self._reload_core_urls()
+
+        response = self.client.get("/dev/ui-lab/structures/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Quick Add Inline")
+        self.assertContains(response, "Standard Simple")
+        self.assertContains(response, "Standard")
+        self.assertContains(response, "Wizard")
+        self.assertNotContains(response, "List / Filters")
+        self.assertNotContains(response, "Lista de itens")
+
+    @override_settings(DEBUG=True)
+    def test_ui_lab_lists_page_contains_list_patterns(self):
+        self._reload_core_urls()
+
+        response = self.client.get("/dev/ui-lab/lists/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Lists Lab")
+        self.assertContains(response, "List Shell")
+        self.assertContains(response, "Empty State")
+        self.assertContains(response, "simple-list")
+        self.assertContains(response, "card-list")
 
     @override_settings(DEBUG=True)
     def test_ui_lab_returns_404_for_invalid_route(self):

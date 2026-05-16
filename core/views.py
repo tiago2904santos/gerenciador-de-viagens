@@ -26,11 +26,22 @@ UI_LAB_PAGE_DEFINITIONS = [
         "label": "Page Structures",
         "mark": "PS",
         "title": "Page Structures",
-        "subtitle": "Layouts de shell, listas, formularios e wizards em nivel de pagina.",
-        "summary": "Standard Simple, Standard, Wizard e variacoes de list/filter shell.",
+        "subtitle": "Layouts de shell, formularios e wizards em nivel de pagina.",
+        "summary": "Quick Add Inline, Standard Simple, Standard e Wizard.",
         "status_label": "Pronto",
         "status_modifier": "done",
         "route_name": "core:ui_lab_structures",
+    },
+    {
+        "slug": "lists",
+        "label": "Lists",
+        "mark": "LS",
+        "title": "Lists",
+        "subtitle": "Listagens simples, cards e paginação em uma página dedicada.",
+        "summary": "Lista simples, lista com cards, empty state e paginação.",
+        "status_label": "Pronto",
+        "status_modifier": "done",
+        "route_name": "core:ui_lab_lists",
     },
     {
         "slug": "headers",
@@ -194,6 +205,12 @@ UI_LAB_PLAN_ITEMS = {
         "Applied filter chips e quick create inline",
         "Quick add aberto, separado do Header Lab",
     ],
+    "lists": [
+        "Lista simples com avatar, titulo e status",
+        "Lista com cards, descricao e metadados",
+        "Estado vazio com acao contextual",
+        "Pagination shell com paginas anterior e proxima",
+    ],
     "status": [
         "Status de ciclo documental e estados operacionais",
         "Chips de pessoa, servidor, viajante e viatura",
@@ -229,6 +246,12 @@ UI_LAB_PLAN_ITEMS = {
         "Pending signer chip e document action bar",
         "Download PDF/DOCX, preview e copy link",
         "Expired signature state",
+    ],
+    "cards": [
+        "Lista simples com avatar, titulo e status",
+        "Lista com cards, descricao e metadados",
+        "Estado vazio com acao contextual",
+        "Pagination shell com paginas anterior e proxima",
     ],
 }
 
@@ -486,8 +509,12 @@ def ui_lab_feedback(request):
     return _render_ui_lab(request, "dev/ui_lab/feedback.html", "feedback")
 
 
+def ui_lab_lists(request):
+    return _render_ui_lab(request, "dev/ui_lab/lists.html", "lists")
+
+
 def ui_lab_cards(request):
-    return _render_ui_lab(request, "dev/ui_lab/cards.html", "cards")
+    return ui_lab_lists(request)
 
 
 def ui_lab_overlays(request):
