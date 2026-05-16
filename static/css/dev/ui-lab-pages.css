@@ -369,7 +369,7 @@
 
 .ui-lab-header-quick-add__rail {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: var(--space-3);
   overflow: hidden;
   position: relative;
@@ -385,34 +385,34 @@
   justify-content: flex-end;
 }
 
-.ui-lab-header-quick-add__rail .quick-add-footer-button {
+.ui-lab-header-quick-add .quick-add-footer-button {
   align-items: center;
   appearance: none;
   background: var(--surface-filter-bar);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-control);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
   box-sizing: border-box;
   color: var(--text-primary);
   cursor: pointer;
-  display: inline-flex;
+  display: flex;
   gap: var(--space-2);
   height: var(--control-height-md);
   justify-content: center;
   padding: 0 var(--space-4);
-  width: auto;
+  width: 100%;
 }
 
-.ui-lab-header-quick-add__rail .quick-add-footer-button:hover {
+.ui-lab-header-quick-add .quick-add-footer-button:hover {
   background: var(--surface-list-row-hover);
 }
 
-.ui-lab-header-quick-add__rail .quick-add-footer-button:focus-visible {
+.ui-lab-header-quick-add .quick-add-footer-button:focus-visible {
   outline: 2px solid var(--border-focus);
   outline-offset: -2px;
 }
 
-.ui-lab-header-quick-add__rail .quick-add-footer-button.is-active,
-.ui-lab-header-quick-add__rail .quick-add-footer-button[aria-expanded="true"] {
+.ui-lab-header-quick-add .quick-add-footer-button.is-active,
+.ui-lab-header-quick-add .quick-add-footer-button[aria-expanded="true"] {
   background: var(--surface-quick-add-tab);
   border-color: var(--border-quick-add-tab);
   color: var(--color-quick-add-tab);
