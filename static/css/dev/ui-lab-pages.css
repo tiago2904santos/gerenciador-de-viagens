@@ -280,6 +280,12 @@
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
 }
 
+.ui-lab-section--headers .ui-lab-header-band-demo {
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  overflow: hidden;
+}
+
 .ui-lab-section--headers .ui-lab-header-variant-grid {
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
 }
