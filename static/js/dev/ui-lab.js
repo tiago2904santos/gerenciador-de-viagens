@@ -127,6 +127,7 @@
     buttons.forEach(function (btn) {
       btn.addEventListener('click', function () {
         btn.classList.toggle('is-active');
+        btn.classList.toggle('is-selected');
         var isActive = btn.classList.contains('is-active');
         btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
       });

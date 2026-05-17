@@ -1,0 +1,399 @@
+/* =========================================================
+   CV-BTN — Sistema de botoes do design system
+   Central de Viagens 3.0
+   =========================================================
+   Namespace: .cv-btn
+   Uso atual: UI Lab (demo e aprovacao visual)
+   Proxima fase: migracao progressiva das paginas reais
+   ========================================================= */
+
+/* =========================================================
+   1. Tokens locais do cv-btn
+   ========================================================= */
+:root {
+  /* Alturas — reusa tokens de controle existentes */
+  --cv-btn-height-xs: 26px;
+  --cv-btn-height-sm: var(--control-height-sm);   /* 34px */
+  --cv-btn-height-md: var(--control-height-md);   /* 44px */
+  --cv-btn-height-lg: var(--control-height-lg);   /* 52px */
+
+  /* Radius — reusa token pill existente */
+  --cv-btn-radius: var(--radius-pill);             /* 999px */
+
+  /* Gap interno entre icone e texto */
+  --cv-btn-gap: var(--space-2);                    /* 8px */
+
+  /* Padding horizontal por tamanho */
+  --cv-btn-padding-x-xs: var(--space-2);           /* 8px */
+  --cv-btn-padding-x-sm: var(--space-3);           /* 12px */
+  --cv-btn-padding-x-md: var(--space-4);           /* 16px */
+  --cv-btn-padding-x-lg: var(--space-6);           /* 24px */
+
+  /* Tipografia */
+  --cv-btn-font-size: var(--font-size-sm);         /* 14px */
+  --cv-btn-font-weight: 700;
+
+  /* Transicao — reusa token existente */
+  --cv-btn-transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    color var(--transition-fast),
+    transform var(--transition-fast);
+
+  /* Acessibilidade */
+  --cv-btn-focus-ring: 0 0 0 3px rgba(21, 91, 154, 0.28);
+
+  /* Estado disabled */
+  --cv-btn-disabled-opacity: 0.45;
+
+  /* Document tokens — reusa os de buttons-functional.css se existirem */
+  --cv-btn-preview-bg: var(--surface-button-preview, #0e7c9e);
+  --cv-btn-preview-hover-bg: var(--surface-button-preview-hover, #0a6882);
+  --cv-btn-preview-color: var(--surface-button-preview-text, #fff);
+
+  --cv-btn-pdf-bg: var(--surface-button-pdf, #b42318);
+  --cv-btn-pdf-hover-bg: var(--surface-button-pdf-hover, #961d15);
+  --cv-btn-pdf-color: var(--surface-button-pdf-text, #fff);
+
+  --cv-btn-docx-bg: var(--surface-button-docx, #1a5498);
+  --cv-btn-docx-hover-bg: var(--surface-button-docx-hover, #154382);
+  --cv-btn-docx-color: var(--surface-button-docx-text, #fff);
+
+  --cv-btn-download-bg: var(--surface-button-download, #16805a);
+  --cv-btn-download-hover-bg: var(--surface-button-download-hover, #126848);
+  --cv-btn-download-color: var(--surface-button-download-text, #fff);
+}
+
+/* =========================================================
+   2. Base .cv-btn
+   ========================================================= */
+.cv-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--cv-btn-gap);
+  min-height: var(--cv-btn-height-md);
+  padding: 0 var(--cv-btn-padding-x-md);
+  border-radius: var(--cv-btn-radius);
+  border: 1px solid transparent;
+  font-family: var(--font-sans);
+  font-size: var(--cv-btn-font-size);
+  font-weight: var(--cv-btn-font-weight);
+  line-height: 1;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  user-select: none;
+  transition: var(--cv-btn-transition);
+  box-sizing: border-box;
+  box-shadow: var(--shadow-xs), var(--shadow-inner);
+}
+
+.cv-btn:hover,
+.cv-btn:focus {
+  transform: translateY(-1px);
+}
+
+.cv-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--cv-btn-focus-ring);
+}
+
+.cv-btn:disabled,
+.cv-btn[aria-disabled="true"] {
+  opacity: var(--cv-btn-disabled-opacity);
+  cursor: not-allowed;
+  pointer-events: none;
+  transform: none !important;
+}
+
+.cv-btn.is-loading {
+  cursor: wait;
+  opacity: 0.75;
+  pointer-events: none;
+  position: relative;
+}
+
+/* =========================================================
+   3. Variantes visuais
+   ========================================================= */
+
+/* --- Primary --- */
+.cv-btn--primary {
+  background: linear-gradient(180deg, var(--color-secondary), var(--color-primary));
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 18px rgba(11, 58, 102, 0.22);
+  color: var(--color-white);
+}
+
+.cv-btn--primary:hover,
+.cv-btn--primary:focus {
+  background: linear-gradient(180deg, var(--color-secondary-hover), var(--color-primary-dark));
+  border-color: rgba(255, 255, 255, 0.24);
+  box-shadow: 0 12px 24px rgba(11, 58, 102, 0.28);
+}
+
+/* --- Secondary --- */
+.cv-btn--secondary {
+  background: var(--color-surface);
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-xs), var(--shadow-inner);
+  color: var(--color-primary);
+}
+
+.cv-btn--secondary:hover,
+.cv-btn--secondary:focus {
+  background: var(--color-surface-soft);
+  border-color: var(--color-secondary);
+}
+
+/* --- Neutral (secondary mais neutro, sem cor de marca) --- */
+.cv-btn--neutral {
+  background: var(--color-surface-muted);
+  border-color: var(--color-border);
+  box-shadow: none;
+  color: var(--color-muted-strong);
+}
+
+.cv-btn--neutral:hover,
+.cv-btn--neutral:focus {
+  background: var(--color-bg-strong);
+  border-color: var(--color-border-strong);
+  color: var(--color-text);
+}
+
+/* --- Ghost (sem background, sem borda) --- */
+.cv-btn--ghost {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  color: var(--color-primary);
+}
+
+.cv-btn--ghost:hover,
+.cv-btn--ghost:focus {
+  background: var(--color-primary-soft);
+  border-color: transparent;
+  box-shadow: none;
+  transform: none;
+}
+
+/* --- Back (voltar — secondary sutil, discreta) --- */
+.cv-btn--back {
+  background: var(--color-surface-muted);
+  border-color: var(--color-border-soft);
+  box-shadow: none;
+  color: var(--color-muted-strong);
+}
+
+.cv-btn--back:hover,
+.cv-btn--back:focus {
+  background: var(--color-surface-soft);
+  border-color: var(--color-border-strong);
+  color: var(--color-primary);
+}
+
+/* --- Back-list (volta ao indice — levemente mais distinto que --back) --- */
+.cv-btn--back-list {
+  background: var(--color-surface-muted);
+  border-color: var(--color-border);
+  box-shadow: none;
+  color: var(--color-muted);
+  font-weight: var(--font-weight-semibold);
+}
+
+.cv-btn--back-list:hover,
+.cv-btn--back-list:focus {
+  background: var(--color-secondary-soft);
+  border-color: var(--color-secondary);
+  color: var(--color-secondary);
+}
+
+/* --- Danger (excluir — acao permanente no banco) --- */
+.cv-btn--danger {
+  background: linear-gradient(135deg, #c0392b 0%, var(--color-danger) 100%);
+  border-color: #8f1f18;
+  box-shadow: 0 6px 16px rgba(180, 35, 24, 0.28);
+  color: var(--color-white);
+}
+
+.cv-btn--danger:hover,
+.cv-btn--danger:focus {
+  background: linear-gradient(135deg, #a83228 0%, #9a2018 100%);
+  border-color: #7a1a14;
+  box-shadow: 0 8px 20px rgba(180, 35, 24, 0.38);
+}
+
+/* --- Soft-danger (remover — remocao local, reversivel) --- */
+.cv-btn--soft-danger {
+  background: transparent;
+  border-color: var(--color-danger-border-strong);
+  box-shadow: none;
+  color: var(--color-danger);
+}
+
+.cv-btn--soft-danger:hover,
+.cv-btn--soft-danger:focus {
+  background: var(--color-danger-soft);
+  border-color: var(--color-danger);
+  transform: none;
+}
+
+/* --- Preview (visualizar — teal informativo) --- */
+.cv-btn--preview {
+  background: var(--cv-btn-preview-bg);
+  border-color: var(--cv-btn-preview-hover-bg);
+  box-shadow: 0 4px 12px rgba(14, 124, 158, 0.22);
+  color: var(--cv-btn-preview-color);
+}
+
+.cv-btn--preview:hover,
+.cv-btn--preview:focus {
+  background: var(--cv-btn-preview-hover-bg);
+  box-shadow: 0 6px 16px rgba(14, 124, 158, 0.3);
+}
+
+/* --- PDF (vermelho-documental) --- */
+.cv-btn--pdf {
+  background: var(--cv-btn-pdf-bg);
+  border-color: #8f1f18;
+  box-shadow: 0 4px 12px rgba(180, 35, 24, 0.2);
+  color: var(--cv-btn-pdf-color);
+  font-weight: var(--font-weight-extrabold);
+}
+
+.cv-btn--pdf:hover,
+.cv-btn--pdf:focus {
+  background: var(--cv-btn-pdf-hover-bg);
+  border-color: #7a1a14;
+  box-shadow: 0 6px 18px rgba(180, 35, 24, 0.3);
+}
+
+/* --- DOCX (azul-arquivo) --- */
+.cv-btn--docx {
+  background: var(--cv-btn-docx-bg);
+  border-color: #103e76;
+  box-shadow: 0 4px 12px rgba(26, 84, 152, 0.2);
+  color: var(--cv-btn-docx-color);
+  font-weight: var(--font-weight-extrabold);
+}
+
+.cv-btn--docx:hover,
+.cv-btn--docx:focus {
+  background: var(--cv-btn-docx-hover-bg);
+  border-color: #0e3366;
+  box-shadow: 0 6px 18px rgba(26, 84, 152, 0.3);
+}
+
+/* --- Tool (acoes operacionais: calcular, tracar rota, limpar filtros) --- */
+.cv-btn--tool {
+  background: var(--color-surface-muted);
+  border-color: var(--color-border);
+  box-shadow: none;
+  color: var(--color-muted-strong);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.cv-btn--tool:hover,
+.cv-btn--tool:focus {
+  background: var(--color-secondary-soft);
+  border-color: var(--color-border-strong);
+  color: var(--color-primary);
+  transform: none;
+}
+
+/* --- Icon (padding quadrado, compacto) --- */
+.cv-btn--icon {
+  aspect-ratio: 1;
+  min-height: var(--cv-btn-height-md);
+  padding: 0;
+  width: var(--cv-btn-height-md);
+}
+
+/* --- Pill (border-radius 999px explicito) --- */
+.cv-btn--pill {
+  border-radius: 999px;
+}
+
+/* =========================================================
+   4. Tamanhos
+   ========================================================= */
+
+.cv-btn--xs {
+  min-height: var(--cv-btn-height-xs);
+  padding: 0 var(--cv-btn-padding-x-xs);
+  font-size: 0.7rem;
+}
+
+.cv-btn--sm {
+  min-height: var(--cv-btn-height-sm);
+  padding: 0 var(--cv-btn-padding-x-sm);
+  font-size: 0.8rem;
+}
+
+/* md e o default — sem classe adicional necessaria */
+
+.cv-btn--lg {
+  min-height: var(--cv-btn-height-lg);
+  padding: 0 var(--cv-btn-padding-x-lg);
+  font-size: 1rem;
+}
+
+/* Icon sizes */
+.cv-btn--icon.cv-btn--sm {
+  width: var(--cv-btn-height-sm);
+  min-height: var(--cv-btn-height-sm);
+}
+
+.cv-btn--icon.cv-btn--xs {
+  width: var(--cv-btn-height-xs);
+  min-height: var(--cv-btn-height-xs);
+}
+
+/* =========================================================
+   5. Estado loading — spinner animado
+   ========================================================= */
+.cv-btn.is-loading::after {
+  content: '';
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: cv-btn-spin 0.6s linear infinite;
+  margin-left: var(--cv-btn-gap);
+  flex-shrink: 0;
+}
+
+@keyframes cv-btn-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* =========================================================
+   6. Estado selected / active
+   ========================================================= */
+.cv-btn.is-selected,
+.cv-btn[aria-pressed="true"] {
+  box-shadow: var(--cv-btn-focus-ring), var(--shadow-xs);
+  outline: none;
+}
+
+/* Selected sobre secondary */
+.cv-btn--secondary.is-selected,
+.cv-btn--secondary[aria-pressed="true"] {
+  background: var(--color-secondary-soft);
+  border-color: var(--color-secondary);
+  color: var(--color-secondary);
+}
+
+/* Selected sobre neutral/tool */
+.cv-btn--neutral.is-selected,
+.cv-btn--neutral[aria-pressed="true"],
+.cv-btn--tool.is-selected,
+.cv-btn--tool[aria-pressed="true"] {
+  background: var(--color-primary-soft);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
