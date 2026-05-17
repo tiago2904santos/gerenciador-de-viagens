@@ -78,4 +78,60 @@
   }
 
   initQuickAddToggles();
+  initButtonLoadingDemos();
+  initButtonToggleDemos();
+}());
+
+/* --------------------------------------------------------------------------
+   Button demos — loading state
+   -------------------------------------------------------------------------- */
+(function () {
+  function initButtonLoadingDemos() {
+    var buttons = Array.prototype.slice.call(
+      document.querySelectorAll('[data-button-loading-demo]')
+    );
+
+    buttons.forEach(function (btn) {
+      var originalText = btn.textContent;
+
+      btn.addEventListener('click', function () {
+        if (btn.classList.contains('is-loading')) {
+          return;
+        }
+
+        btn.classList.add('is-loading');
+        btn.setAttribute('disabled', '');
+        btn.textContent = 'Processando...';
+
+        window.setTimeout(function () {
+          btn.classList.remove('is-loading');
+          btn.removeAttribute('disabled');
+          btn.textContent = originalText;
+        }, 2000);
+      });
+    });
+  }
+
+  initButtonLoadingDemos();
+}());
+
+/* --------------------------------------------------------------------------
+   Button demos — toggle active state
+   -------------------------------------------------------------------------- */
+(function () {
+  function initButtonToggleDemos() {
+    var buttons = Array.prototype.slice.call(
+      document.querySelectorAll('[data-button-toggle-demo]')
+    );
+
+    buttons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        btn.classList.toggle('is-active');
+        var isActive = btn.classList.contains('is-active');
+        btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+      });
+    });
+  }
+
+  initButtonToggleDemos();
 }());
