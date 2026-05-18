@@ -402,6 +402,90 @@ UI_LAB_CARDS = [
     },
 ]
 
+UI_LAB_ROTEIROS_CARDS = [
+    {
+        "title": "CURITIBA/PR \u2192 LONDRINA/PR",
+        "subtitle": "Roteiro reutiliz\u00e1vel para documentos",
+        "status_chip_label": "RASCUNHO",
+        "status_chip_class": "status-chip--draft",
+        "status_variant": "rascunho",
+        "trechos": [
+            {
+                "rota": "CURITIBA/PR \u2192 LONDRINA/PR",
+                "saida": "27/05/2026 13:01",
+                "chegada": "27/05/2026 18:01",
+            },
+            {
+                "rota": "LONDRINA/PR \u2192 CURITIBA/PR",
+                "saida": "29/05/2026 18:01",
+                "chegada": "29/05/2026 23:01",
+            },
+        ],
+        "trechos_count": 2,
+        "diaria_moeda": "R$ 150,00",
+        "diaria_composicao_linhas": ["2"],
+        "actions": [
+            {"href": "#", "label": "Abrir", "variant": "secondary"},
+            {"href": "#", "label": "Editar", "variant": "secondary"},
+            {"href": "#", "label": "Excluir", "variant": "danger"},
+        ],
+    },
+    {
+        "title": "CURITIBA/PR \u2192 LONDRINA/PR",
+        "subtitle": "Roteiro reutiliz\u00e1vel para documentos",
+        "status_chip_label": "RASCUNHO",
+        "status_chip_class": "status-chip--draft",
+        "status_variant": "rascunho",
+        "trechos": [
+            {
+                "rota": "CURITIBA/PR \u2192 LONDRINA/PR",
+                "saida": "26/05/2026 13:01",
+                "chegada": "26/05/2026 18:01",
+            },
+            {
+                "rota": "LONDRINA/PR \u2192 CURITIBA/PR",
+                "saida": "28/05/2026 18:01",
+                "chegada": "28/05/2026 23:01",
+            },
+        ],
+        "trechos_count": 2,
+        "diaria_moeda": "R$ 150,00",
+        "diaria_composicao_linhas": ["2"],
+        "actions": [
+            {"href": "#", "label": "Abrir", "variant": "secondary"},
+            {"href": "#", "label": "Editar", "variant": "secondary"},
+            {"href": "#", "label": "Excluir", "variant": "danger"},
+        ],
+    },
+    {
+        "title": "CURITIBA/PR \u2192 LONDRINA/PR",
+        "subtitle": "Roteiro reutiliz\u00e1vel para documentos",
+        "status_chip_label": "RASCUNHO",
+        "status_chip_class": "status-chip--draft",
+        "status_variant": "rascunho",
+        "trechos": [
+            {
+                "rota": "CURITIBA/PR \u2192 LONDRINA/PR",
+                "saida": "25/05/2026 13:01",
+                "chegada": "25/05/2026 18:01",
+            },
+            {
+                "rota": "LONDRINA/PR \u2192 CURITIBA/PR",
+                "saida": "27/05/2026 18:01",
+                "chegada": "27/05/2026 23:01",
+            },
+        ],
+        "trechos_count": 2,
+        "diaria_moeda": "R$ 150,00",
+        "diaria_composicao_linhas": ["2"],
+        "actions": [
+            {"href": "#", "label": "Abrir", "variant": "secondary"},
+            {"href": "#", "label": "Editar", "variant": "secondary"},
+            {"href": "#", "label": "Excluir", "variant": "danger"},
+        ],
+    },
+]
+
 def _build_ui_lab_pages():
     pages = []
     for page in UI_LAB_PAGE_DEFINITIONS:
@@ -429,6 +513,7 @@ def _build_ui_lab_context(active_slug):
         "ui_lab_fields": UI_LAB_FIELDS,
         "ui_lab_simple_rows": UI_LAB_SIMPLE_ROWS,
         "ui_lab_cards": UI_LAB_CARDS,
+        "ui_lab_roteiros_cards": UI_LAB_ROTEIROS_CARDS,
         "ui_lab_status_examples": UI_LAB_STATUS_EXAMPLES,
         "ui_lab_plan_items": UI_LAB_PLAN_ITEMS.get(active_slug, []),
     }
