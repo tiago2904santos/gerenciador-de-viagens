@@ -1426,7 +1426,7 @@ html[data-theme="light"] {
   background:  var(--app-hero-body-bg);
   box-sizing:  border-box;
   display:     flex;
-  gap:         var(--space-4);
+  gap:         var(--space-3);
   padding:     var(--space-4) var(--space-6);
   width:       100%;
 }
@@ -1518,7 +1518,7 @@ html[data-theme="light"] {
 .page-header-rail--filters,
 .page-header-rail--filters-quick-add {
   flex-wrap: wrap;
-  gap:       var(--space-6);
+  gap:       var(--space-3);
 }
 
 .page-header-rail--stepper {

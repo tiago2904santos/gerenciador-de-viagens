@@ -1,0 +1,15 @@
+{% if page_obj and page_obj.paginator.num_pages > 1 %}
+<div class="pagination-shell">
+  <p class="pagination-shell__info">
+    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }} &mdash; {{ page_obj.paginator.count }} registro{{ page_obj.paginator.count|pluralize }}
+  </p>
+  <div class="pagination-shell__controls">
+    {% if page_obj.has_previous %}
+      <a class="cv-btn cv-btn--secondary cv-btn--sm" href="?{% if q %}q={{ q }}&{% endif %}page={{ page_obj.previous_page_number }}">Anterior</a>
+    {% endif %}
+    {% if page_obj.has_next %}
+      <a class="cv-btn cv-btn--primary cv-btn--sm" href="?{% if q %}q={{ q }}&{% endif %}page={{ page_obj.next_page_number }}">Próxima</a>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
