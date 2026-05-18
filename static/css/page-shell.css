@@ -1592,6 +1592,109 @@ html[data-theme="light"] {
   gap:       var(--space-3);
 }
 
+/* Painel inline dentro do rail quick-add */
+.page-header-rail--filters-quick-add .quick-add-panel {
+  background:  transparent;
+  border:      0;
+  border-top:  1px solid var(--border-filter-bar);
+  box-shadow:  none;
+  width:       100%;
+}
+
+.page-header-rail--filters-quick-add .quick-add-inline__body {
+  align-items: flex-end;
+  display:     flex;
+  gap:         var(--layout-quick-create-gap);
+  padding:     var(--space-4) 0;
+  width:       100%;
+}
+
+.page-header-rail--filters-quick-add .quick-add-inline__actions {
+  margin-left: auto;
+  width:       auto;
+}
+
+/* =========================================================
+   23b. Quick-Add Panel — animação de expansão
+   Controlado por JS: remove [hidden] → adiciona .is-open.
+   ========================================================= */
+
+.quick-add-panel {
+  box-sizing:  border-box;
+  margin-top:  0;
+  max-height:  0;
+  opacity:     0;
+  overflow:    hidden;
+  transform:   translateY(-8px);
+  transition:  max-height 220ms ease, opacity 180ms ease, transform 220ms ease;
+  width:       100%;
+}
+
+.quick-add-panel.is-open {
+  max-height: 520px;
+  opacity:    1;
+  transform:  translateY(0);
+}
+
+/* =========================================================
+   23c. Quick-Add Footer Button
+   Botão largo fixado no rodapé do page-header-stack que
+   dispara o painel de cadastro rápido.
+   ========================================================= */
+
+.quick-add-footer-button {
+  align-items:     center;
+  appearance:      none;
+  background:      var(--surface-filter-bar);
+  border:          none;
+  border-top:      1px solid var(--border-filter-bar);
+  border-radius:   0;
+  box-shadow:      none;
+  box-sizing:      border-box;
+  color:           var(--theme-text-body);
+  cursor:          pointer;
+  display:         flex;
+  font-size:       var(--font-size-sm);
+  gap:             var(--space-2);
+  height:          var(--control-height-md);
+  justify-content: center;
+  padding:         0 var(--space-4);
+  width:           100%;
+}
+
+.quick-add-footer-button:hover {
+  background: var(--surface-list-row-hover);
+}
+
+.quick-add-footer-button:focus-visible {
+  outline:        2px solid var(--border-focus);
+  outline-offset: -2px;
+}
+
+.quick-add-footer-button.is-active,
+.quick-add-footer-button[aria-expanded="true"] {
+  background:   var(--surface-filter-bar);
+  border-color: var(--border-filter-bar);
+  box-shadow:   none;
+}
+
+html[data-theme="dark"] .quick-add-footer-button.is-active,
+html[data-theme="dark"] .quick-add-footer-button[aria-expanded="true"] {
+  background:   var(--surface-quick-add-tab, var(--surface-filter-bar));
+  border-color: var(--border-quick-add-tab, var(--border-filter-bar));
+  color:        var(--color-quick-add-tab, inherit);
+}
+
+.quick-add-footer-button__icon {
+  align-items:     center;
+  display:         inline-flex;
+  justify-content: center;
+}
+
+.quick-add-footer-button__label {
+  font-weight: var(--font-weight-bold);
+}
+
 
 /* =========================================================
    24. Simple List

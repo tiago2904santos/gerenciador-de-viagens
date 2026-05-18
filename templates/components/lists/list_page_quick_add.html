@@ -54,6 +54,8 @@
     </button>
   </div>
 
-  {% include "components/lists/simple_list.html" with rows=rows empty_message=empty_message %}
-  {% include "components/lists/pagination.html" %}
+  <div class="list-panel">
+    {% include "components/lists/simple_list.html" with rows=rows empty_message=empty_message %}
+    {% include "components/lists/pagination.html" %}
+  </div>
 </div>

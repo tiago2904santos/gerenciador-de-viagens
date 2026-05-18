@@ -8,17 +8,21 @@
       {% csrf_token %}
       {% include "components/ui/layouts/form_section.html" with title="Identificação" description="Nome, cargo e CPF são obrigatórios. RG e telefone são opcionais." section_id="servidores-form-id" only %}
       <div class="field-grid">
-        {% include "components/forms/form_field.html" with field=form.nome size_class="field-size-3" only %}
-        {% include "components/forms/form_field.html" with field=form.cpf size_class="field-size-1" only %}
+        {% include "components/forms/form_field.html" with field=form.nome size_class="field-size-2" only %}
         {% include "components/forms/input_with_action.html" with field=form.cargo action_url=cargos_manage_url action_label="Gerenciar cargos" action_icon="settings" action_variant="secondary" size_class="field-size-2" only %}
-        {% include "components/forms/form_field.html" with field=form.telefone size_class="field-size-2" only %}
-        {% include "components/forms/card_toggle.html" with field=form.sem_rg title="Não possui RG" description="Bloqueia o campo RG" compact=True size_class="field-size-2" only %}
-        <div class="field-size-2 field-rg-wrap" data-rg-field-wrap>
+
+        {% include "components/forms/form_field.html" with field=form.cpf size_class="field-size-1" only %}
+        {% include "components/forms/form_field.html" with field=form.telefone size_class="field-size-1" only %}
+        <div class="field-size-1 field-rg-wrap" data-rg-field-wrap>
           {% include "components/forms/form_field.html" with field=form.rg only %}
         </div>
+        {% include "components/forms/card_toggle.html" with field=form.sem_rg title="Não possui RG" description="Bloqueia o campo RG" compact=True size_class="field-size-1" only %}
+
         {% include "components/forms/input_with_action.html" with field=form.unidade action_url=unidades_manage_url action_label="Gerenciar unidades" action_icon="settings" action_variant="secondary" size_class="field-size-4" only %}
       </div>
       {% include "components/ui/layouts/footer_actions.html" with secondary_label="Voltar" secondary_url=back_url only %}
+      {% include "components/ui/layouts/footer_actions.html" with primary_label="Salvar" secondary_url=back_url only %}
+
       {% include "components/ui/buttons/floating_primary_action.html" with label=submit_label icon=submit_icon|default:"check" type="submit" only %}
     </form>
   </div>
