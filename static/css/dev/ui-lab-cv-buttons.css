@@ -76,8 +76,8 @@
   --cv-btn-preview-hover-bg: var(--cv-btn-secondary-hover-bg);
   --cv-btn-preview-color: var(--cv-btn-secondary-color);
 
-  --cv-btn-pdf-bg: linear-gradient(180deg, #df5b49 0%, #c94335 100%);
-  --cv-btn-pdf-hover-bg: linear-gradient(180deg, #d24e3d 0%, #b93a2d 100%);
+  --cv-btn-pdf-bg: linear-gradient(135deg, #c0392b 0%, var(--color-danger) 100%);
+  --cv-btn-pdf-hover-bg: linear-gradient(135deg, #a93328 0%, #951f18 100%);
   --cv-btn-pdf-color: var(--color-white);
 
   --cv-btn-docx-bg: linear-gradient(180deg, #2f67aa 0%, #1f5493 100%);
@@ -114,8 +114,8 @@ html[data-theme="dark"] {
   --cv-btn-preview-hover-bg: var(--cv-btn-secondary-hover-bg);
   --cv-btn-preview-color: var(--cv-btn-secondary-color);
 
-  --cv-btn-pdf-bg: linear-gradient(180deg, #ea6b59 0%, #cf4a3a 100%);
-  --cv-btn-pdf-hover-bg: linear-gradient(180deg, #e25d4b 0%, #bf3f30 100%);
+  --cv-btn-pdf-bg: linear-gradient(135deg, #c0392b 0%, var(--color-danger) 100%);
+  --cv-btn-pdf-hover-bg: linear-gradient(135deg, #a93328 0%, #951f18 100%);
   --cv-btn-docx-bg: linear-gradient(180deg, #3e74b9 0%, #295b9a 100%);
   --cv-btn-docx-hover-bg: linear-gradient(180deg, #4a85c9 0%, #2d5f9d 100%);
 
