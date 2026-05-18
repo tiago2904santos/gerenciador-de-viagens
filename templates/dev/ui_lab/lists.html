@@ -7,18 +7,19 @@
   <section class="ui-lab-section">
     <div class="ui-lab-section__header">
       <p class="ui-lab-section__eyebrow">Lists Lab</p>
-      <h2 class="ui-lab-section__title">Listagens separadas</h2>
+      <h2 class="ui-lab-section__title">Três variações de lista</h2>
       <p class="ui-lab-section__description">
-        Esta area concentra filtros, listas simples, cards e empty states sem misturar formularios.
+        A página mostra a lista standard com filtro simples, a lista standard
+        com quick add e a lista em cards.
       </p>
     </div>
 
-    {% include "dev/ui_lab/partials/_component_placeholder.html" with title="Lists / Filters" status_label=ui_lab_current_page.status_label status_modifier=ui_lab_current_page.status_modifier description=ui_lab_current_page.summary items=ui_lab_plan_items only %}
+    {% include "dev/ui_lab/partials/_component_placeholder.html" with title="Lists / Rails / Cards" status_label=ui_lab_current_page.status_label status_modifier=ui_lab_current_page.status_modifier description=ui_lab_current_page.summary items=ui_lab_plan_items only %}
 
     <div class="ui-lab-stack">
       <article class="ui-lab-preview-card">
         <div class="ui-lab-preview-card__header">
-          <span class="ui-lab-preview-card__label">List Shell</span>
+          <span class="ui-lab-preview-card__label">Lista standard</span>
           <span class="ui-lab-status-pill ui-lab-status-pill--done">Pronto</span>
         </div>
         <div class="page-shell page-shell--list">
@@ -27,7 +28,7 @@
               <div class="page-header-band__content">
                 <div class="page-header-band__text">
                   <span class="page-header-band__eyebrow">Contexto</span>
-                  <h2 class="page-header-band__title">Lista de itens</h2>
+                  <h2 class="page-header-band__title">Lista standard</h2>
                 </div>
                 <span class="page-header-status-chip page-header-status-chip--active">12</span>
               </div>
@@ -39,38 +40,16 @@
                   <input class="header-filter-input" type="search" placeholder="Buscar itens..." aria-label="Buscar">
                 </div>
                 <div class="header-filter-bar__actions">
-                  <select class="header-filter-select" aria-label="Status">
-                    <option value="">Status</option>
-                    <option>Ativo</option>
-                    <option>Pendente</option>
-                  </select>
                   <button class="header-filter-button" type="button">Limpar filtros</button>
                 </div>
-              </div>
-              <div class="page-header-rail__actions">
-                <button class="btn btn-primary" type="button">+ Cadastrar</button>
               </div>
             </div>
           </div>
 
           <div class="list-panel">
-            <div class="filter-bar">
-              <div class="filter-bar__controls">
-                <div class="ui-lab-demo-input ui-lab-demo-input--search" role="presentation" aria-hidden="true">Buscar itens...</div>
-                <button class="btn btn-secondary" type="button">Limpar filtros</button>
-              </div>
-              <div class="filter-bar__actions">
-                <button class="btn btn-primary" type="button">+ Cadastrar item</button>
-              </div>
-            </div>
             <div class="simple-list" role="list" aria-label="Lista de itens (demonstração)">
               {% for item in ui_lab_simple_rows %}
                 {% include "dev/ui_lab/partials/_simple_list_item.html" with item=item only %}
-              {% endfor %}
-            </div>
-            <div class="card-list" role="list" aria-label="Lista de cards (demonstração)">
-              {% for card in ui_lab_cards %}
-                {% include "dev/ui_lab/partials/_list_card.html" with card=card only %}
               {% endfor %}
             </div>
             <div class="pagination-shell">
@@ -89,11 +68,99 @@
 
       <article class="ui-lab-preview-card">
         <div class="ui-lab-preview-card__header">
-          <span class="ui-lab-preview-card__label">Empty State</span>
-          <span class="ui-lab-status-pill ui-lab-status-pill--build">Em construção</span>
+          <span class="ui-lab-preview-card__label">Lista standard + quick add</span>
+          <span class="ui-lab-status-pill ui-lab-status-pill--review">Quick add</span>
+        </div>
+        <div class="page-shell page-shell--list">
+          <div class="page-header-stack header-stack--quick-add">
+            <div class="page-header-band">
+              <div class="page-header-band__content">
+                <div class="page-header-band__text">
+                  <span class="page-header-band__eyebrow">Contexto</span>
+                  <h2 class="page-header-band__title">Lista com quick add</h2>
+                </div>
+                <span class="page-header-status-chip page-header-status-chip--draft">Rascunho</span>
+              </div>
+            </div>
+            <div class="page-header-rail page-header-rail--filters page-header-rail--filters-quick-add">
+              <div class="page-header-rail__marker" aria-hidden="true">TP</div>
+              <div class="header-filter-bar">
+                <div class="header-filter-bar__search">
+                  <input class="header-filter-input" type="search" placeholder="Buscar itens..." aria-label="Buscar">
+                </div>
+                <div class="header-filter-bar__actions">
+                  <button class="header-filter-button" type="button">Limpar filtros</button>
+                </div>
+              </div>
+            </div>
+            <div class="quick-add-inline is-open">
+              <div class="quick-add-inline__tab-row">
+                <button
+                  class="quick-add-inline__tab is-active"
+                  type="button"
+                  aria-expanded="true"
+                  aria-controls="ui-lab-lists-quick-add"
+                  data-quick-add-toggle>
+                  <span class="quick-add-inline__tab-icon" aria-hidden="true">+</span>
+                  <span class="quick-add-inline__tab-label">Cadastrar item</span>
+                </button>
+              </div>
+
+              <div class="quick-add-inline__panel" id="ui-lab-lists-quick-add">
+                <div class="quick-add-inline__header">
+                  <h3 class="quick-add-inline__title">Cadastro rapido</h3>
+                  <button class="quick-add-inline__close" type="button" aria-label="Fechar painel" data-quick-add-close>
+                    &times;
+                  </button>
+                </div>
+                <div class="quick-add-inline__body">
+                  <div class="quick-add-inline__fields">
+                    <div class="field-grid">
+                      {% for field in ui_lab_fields.quick_add_structure %}
+                        {% include "dev/ui_lab/partials/_demo_field.html" with field=field only %}
+                      {% endfor %}
+                    </div>
+                  </div>
+                  <div class="quick-add-inline__actions">
+                    <button class="btn btn-secondary" type="button" data-quick-add-close>Cancelar</button>
+                    <button class="btn btn-primary" type="button">Salvar</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="list-panel">
+            <div class="simple-list" role="list" aria-label="Lista com cadastro rápido (demonstração)">
+              {% for item in ui_lab_simple_rows %}
+                {% include "dev/ui_lab/partials/_simple_list_item.html" with item=item only %}
+              {% endfor %}
+            </div>
+            <div class="pagination-shell">
+              <span class="pagination-shell__info">1-4 de 12 itens</span>
+              <div class="pagination-shell__controls">
+                <button class="btn btn-secondary" type="button" disabled aria-label="Página anterior">←</button>
+                <button class="btn btn-primary" type="button" aria-current="page">1</button>
+                <button class="btn btn-secondary" type="button">2</button>
+                <button class="btn btn-secondary" type="button">3</button>
+                <button class="btn btn-secondary" type="button" aria-label="Próxima página">→</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="ui-lab-preview-card">
+        <div class="ui-lab-preview-card__header">
+          <span class="ui-lab-preview-card__label">Lista com cards</span>
+          <span class="ui-lab-status-pill ui-lab-status-pill--done">Cards</span>
         </div>
         <div class="list-panel">
-          {% include "components/lists/list_empty.html" with title="Nenhum item cadastrado" message="Este exemplo mostra como a página de listas lida com estados vazios." only %}
+          <div class="card-list" role="list" aria-label="Lista de cards (demonstração)">
+            {% for card in ui_lab_cards %}
+              {% include "dev/ui_lab/partials/_list_card.html" with card=card only %}
+            {% endfor %}
+          </div>
         </div>
       </article>
     </div>
