@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 TARGETS = [ROOT / "templates", ROOT / "static" / "css"]
 IGNORED_PARTS = {
     "templates/dev/ui_lab",
+    "templates/components/ui",
     "templates/documentos/pdf",
     "static/css/dev",
 }
@@ -23,7 +24,7 @@ PATTERNS: dict[str, str] = {
     "module_card": r"\b(oficio-card|termo-card|servidor-card|cargo-card|unidade-card|combustivel-card|custom-card|process-card)\b",
     "field_legacy": r"\b(input-group|form-control|form-select|custom-input|custom-select|field-wrapper|inline-field)\b",
     "filter_legacy": r"\b(filter-bar|filters|search-box|search-row|list-toolbar)\b",
-    "hardcoded_visual": r"\b(box-shadow|border-radius|background|color|border|font-size|font-weight|padding|margin|gap)\s*:\s*(?!(var|transparent|none|0|inherit|currentColor)\b)",
+    "hardcoded_visual": r"\b(box-shadow|border-radius|background|color|border|font-size|font-weight|padding|margin|gap)\s*:\s*(?!\s*(var|transparent|none|0|inherit|currentColor)\b)",
     "hex_or_rgba": r"(#[0-9a-fA-F]{3,8}|rgba?\()",
     "rendered_docs": r"(# Button|Parâmetros|Parametros)",
 }
@@ -67,8 +68,17 @@ def main() -> int:
         return 0
 
     print(f"{len(findings)} ocorrência(s) suspeita(s) encontradas:")
-    for rel, number, name, excerpt in findings:
+    by_kind: dict[str, int] = {}
+    for _, _, name, _ in findings:
+        by_kind[name] = by_kind.get(name, 0) + 1
+    for name, count in sorted(by_kind.items()):
+        print(f"- {name}: {count}")
+
+    print("\nPrimeiras 200 ocorrências:")
+    for rel, number, name, excerpt in findings[:200]:
         print(f"{rel}:{number}: {name}: {excerpt}")
+    if len(findings) > 200:
+        print(f"... {len(findings) - 200} ocorrência(s) adicionais omitidas.")
     return 1
 
 
