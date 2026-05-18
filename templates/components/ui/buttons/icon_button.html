@@ -1,0 +1,30 @@
+{#
+  Icon Button — Circular
+  Uso EXCLUSIVO: ações compactas em listas, cards e documentos.
+  SEMPRE: aria-label + data-tooltip obrigatórios.
+  NUNCA usar texto visível. NUNCA usar para ações principais de formulário.
+
+  Parâmetros:
+    action     (str)       — edit | delete | preview | pdf | docx | sign | signature | copy | open
+    href       (str, opc.) — transforma em <a>; se ausente usa <button>
+    aria_label (str)       — OBRIGATÓRIO — descrição da ação para screen readers
+    tooltip    (str, opc.) — texto do tooltip (default: usa aria_label)
+    size       (str, opc.) — sm | lg (default: tamanho padrão 36px)
+    type       (str, opc.) — "button" | "submit" (default: "button")
+    extra_class(str, opc.)
+#}
+{% if href %}
+  <a class="cv-icon-btn cv-icon-btn--{{ action }}{% if size %} cv-icon-btn--{{ size }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
+     href="{{ href }}"
+     aria-label="{{ aria_label }}"
+     data-tooltip="{{ tooltip|default:aria_label }}"
+     title="{{ tooltip|default:aria_label }}"
+  >{% include "dev/ui_lab/partials/_cv_icon.html" with icon=action only %}</a>
+{% else %}
+  <button class="cv-icon-btn cv-icon-btn--{{ action }}{% if size %} cv-icon-btn--{{ size }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
+          type="{{ type|default:'button' }}"
+          aria-label="{{ aria_label }}"
+          data-tooltip="{{ tooltip|default:aria_label }}"
+          title="{{ tooltip|default:aria_label }}"
+  >{% include "dev/ui_lab/partials/_cv_icon.html" with icon=action only %}</button>
+{% endif %}

@@ -8,38 +8,11 @@
 {% endblock %}
 
 {% block content %}
-  <div class="app-page app-page--roteiros-list">
-    <div class="app-page__shell">
-      <header class="app-page-hero app-page__header app-page-hero--hybrid app-page__header--hybrid app-page-hero--roteiros-list" aria-labelledby="roteiros-list-title">
-        <div class="app-page-hero__stage">
-          <span class="app-page-hero__eyebrow">Roteiros</span>
-          <h1 class="app-page-hero__title" id="roteiros-list-title">{{ page_title }}</h1>
-        </div>
-        <div class="app-page-hero__body">
-          <div class="app-page__hero-top">
-            <div class="app-page__brand">
-              <div class="app-page__brand-mark" aria-hidden="true">RT</div>
-              <div class="app-page__brand-copy">
-                {% if page_description %}
-                  <p class="app-page__subtitle">{{ page_description }}</p>
-                {% endif %}
-              </div>
-            </div>
-            {% if create_url %}
-              <div class="app-page__hero-actions app-page__actions">
-                {% include "components/buttons/action_button.html" with href=create_url label="Novo roteiro" variant="primary" only %}
-              </div>
-            {% endif %}
-          </div>
-        </div>
-        <div class="app-page-hero__ribbon" aria-hidden="true"></div>
-      </header>
+  <div class="app-page--roteiros-list page-shell page-shell--list">
+    {% include "components/ui/headers/header_stack_filters.html" with eyebrow="ROTEIROS" title=page_title icon_label="RT" form_action=request.path search_name="q" search_value=q search_placeholder="Buscar por sede, destino ou observações" search_clear_url=search_clear_url only %}
 
-      <div class="app-page__toolbar">
-        {% include "components/lists/list_toolbar.html" with search_placeholder="Buscar por sede, destino ou observações" q=q search_clear_url=search_clear_url action_label="" action_url="" only %}
-      </div>
-
-      <div class="list-grid list-grid--roteiros app-list-grid">
+    <div class="list-panel">
+      <div class="list-content list-grid list-grid--roteiros app-list-grid">
         {% for card in cards %}
           {% include "roteiros/partials/roteiro_list_card.html" with card=card only %}
         {% empty %}

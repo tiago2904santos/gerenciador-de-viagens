@@ -1,0 +1,17 @@
+{#
+  Form Section
+  Uso: Seção agrupada dentro de um formulário (.main-form-panel).
+
+  Parâmetros:
+    title         (str)        — título da seção (h2/h3)
+    description   (str, opc.)  — subtítulo/descrição da seção
+    section_id    (str, opc.)  — id para aria-labelledby
+    extra_class   (str, opc.)
+#}
+<section class="form-section{% if extra_class %} {{ extra_class }}{% endif %}"{% if section_id %} aria-labelledby="{{ section_id }}"{% endif %}>
+  <header class="section-header">
+    <div class="section-header__copy">
+      <h2 class="section-header__title"{% if section_id %} id="{{ section_id }}"{% endif %}>{{ title }}</h2>
+      {% if description %}<p class="section-header__description">{{ description }}</p>{% endif %}
+    </div>
+  </header>

@@ -1,0 +1,63 @@
+{#
+  Header Stack — Rail Filters
+  Uso: Páginas de lista com busca e filtros.
+
+  Parâmetros:
+    eyebrow            (str)         — contexto no band (ex: "ROTEIROS")
+    title              (str)         — título da lista
+    icon_label         (str)         — sigla do marcador
+    form_action        (str, opc.)   — action do form de busca; se ausente não renderiza form
+    search_name        (str, opc.)   — name do input de busca (default: "q")
+    search_placeholder (str, opc.)   — placeholder do input
+    search_value       (str, opc.)   — valor atual da busca
+    search_clear_url   (str, opc.)   — URL para limpar filtros
+    status_label       (str, opc.)   — chip de status no band
+    status_variant     (str, opc.)   — draft | active | pending
+    extra_class        (str, opc.)
+#}
+{% if form_action %}
+  <form class="page-header-stack{% if extra_class %} {{ extra_class }}{% endif %}" method="get" action="{{ form_action }}">
+{% else %}
+  <div class="page-header-stack{% if extra_class %} {{ extra_class }}{% endif %}">
+{% endif %}
+  <div class="page-header-band">
+    <div class="page-header-band__content">
+      <div class="page-header-band__text">
+        {% if eyebrow %}<span class="page-header-band__eyebrow">{{ eyebrow }}</span>{% endif %}
+        <h1 class="page-header-band__title">{{ title }}</h1>
+      </div>
+      {% if status_label %}
+        <span class="page-header-status-chip page-header-status-chip--{{ status_variant|default:'draft' }}">{{ status_label }}</span>
+      {% endif %}
+    </div>
+  </div>
+  <div class="page-header-rail page-header-rail--filters">
+    {% if icon_label %}
+      <div class="page-header-rail__marker" aria-hidden="true">{{ icon_label }}</div>
+    {% endif %}
+    <div class="header-filter-bar">
+      <div class="header-filter-bar__search">
+        <input
+          class="header-filter-input"
+          type="search"
+          name="{{ search_name|default:'q' }}"
+          placeholder="{{ search_placeholder|default:'Buscar...' }}"
+          aria-label="{{ search_placeholder|default:'Buscar' }}"
+          {% if search_value %}value="{{ search_value }}"{% endif %}
+        >
+      </div>
+    </div>
+    <div class="page-header-rail__actions">
+      {% if form_action is not None %}
+        <button class="header-filter-button" type="submit">Buscar</button>
+      {% endif %}
+      {% if search_clear_url %}
+        <a class="header-filter-button" href="{{ search_clear_url }}">Limpar filtros</a>
+      {% endif %}
+    </div>
+  </div>
+{% if form_action %}
+  </form>
+{% else %}
+  </div>
+{% endif %}

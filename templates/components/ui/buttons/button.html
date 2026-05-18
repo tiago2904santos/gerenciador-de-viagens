@@ -1,0 +1,46 @@
+{#
+  Button — Pill
+  Uso: ações principais e secundárias em formulários, headers e barras de ação.
+  NÃO usar para ações compactas em lista; nesse caso usar icon_button.html.
+
+  Parâmetros:
+    label       (str)        — rótulo visível
+    variant     (str, opc.)  — primary | secondary | back | back-list | cancel | danger | soft-danger |
+                               preview | pdf | docx | sign | neutral | tool (default: "secondary")
+    icon        (str, opc.)  — nome do ícone (via _cv_icon.html)
+    icon_after  (bool, opc.) — coloca o ícone após o texto (ex: "Avançar →")
+    type        (str, opc.)  — "submit" | "button" | "reset" (default: "button")
+    href        (str, opc.)  — transforma em <a>; se ausente usa <button>
+    extra_class (str, opc.)  — classes adicionais
+    disabled    (bool, opc.) — desabilita o botão
+    aria_label  (str, opc.)  — aria-label opcional
+#}
+{% if href %}
+  <a class="cv-btn cv-btn--{{ variant|default:'secondary' }}{% if extra_class %} {{ extra_class }}{% endif %}"
+     href="{{ href }}"
+     {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
+     {% if disabled %}aria-disabled="true"{% endif %}
+  >
+    {% if icon and not icon_after %}
+      <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon=icon only %}</span>
+    {% endif %}
+    <span>{{ label }}</span>
+    {% if icon and icon_after %}
+      <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon=icon only %}</span>
+    {% endif %}
+  </a>
+{% else %}
+  <button class="cv-btn cv-btn--{{ variant|default:'secondary' }}{% if extra_class %} {{ extra_class }}{% endif %}"
+          type="{{ type|default:'button' }}"
+          {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
+          {% if disabled %}disabled{% endif %}
+  >
+    {% if icon and not icon_after %}
+      <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon=icon only %}</span>
+    {% endif %}
+    <span>{{ label }}</span>
+    {% if icon and icon_after %}
+      <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon=icon only %}</span>
+    {% endif %}
+  </button>
+{% endif %}

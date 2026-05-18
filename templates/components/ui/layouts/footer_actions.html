@@ -1,0 +1,37 @@
+{#
+  Footer Actions
+  Uso: Rodapé de formulário com botões de ação principal e secundária.
+  Sempre dentro de .main-form-panel.
+
+  Parâmetros:
+    primary_label    (str, opc.)  — rótulo do botão primário (default: "Salvar")
+    primary_variant  (str, opc.)  — variante cv-btn do primário (default: "primary")
+    primary_icon     (str, opc.)  — ícone do primário (default: "check")
+    primary_type     (str, opc.)  — type do botão primário (default: "submit")
+    secondary_label  (str, opc.)  — rótulo do botão secundário
+    secondary_url    (str, opc.)  — href; se ausente usa <button type="button">
+    secondary_icon   (str, opc.)  — ícone do secundário (default: "arrow-left")
+#}
+<footer class="footer-actions">
+  <div class="footer-actions__secondary">
+    {% if secondary_label %}
+      {% if secondary_url %}
+        <a class="cv-btn cv-btn--back" href="{{ secondary_url }}">
+          <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon=secondary_icon|default:"arrow-left" only %}</span>
+          <span>{{ secondary_label }}</span>
+        </a>
+      {% else %}
+        <button class="cv-btn cv-btn--back" type="button">
+          <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon=secondary_icon|default:"arrow-left" only %}</span>
+          <span>{{ secondary_label }}</span>
+        </button>
+      {% endif %}
+    {% endif %}
+  </div>
+  <div class="footer-actions__primary">
+    <button class="cv-btn cv-btn--{{ primary_variant|default:'primary' }}" type="{{ primary_type|default:'submit' }}">
+      <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon=primary_icon|default:"check" only %}</span>
+      <span>{{ primary_label|default:"Salvar" }}</span>
+    </button>
+  </div>
+</footer>
