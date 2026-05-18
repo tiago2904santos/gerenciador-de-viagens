@@ -114,7 +114,7 @@
   background: var(--route-card-bg);
   border: 1px solid var(--route-card-border);
   border-radius: calc(var(--radius-lg) + 4px);
-  border-left: 8px solid #5b7694;
+  border-left: 8px solid #64748b;
   box-shadow: var(--theme-shadow-block);
   box-sizing: border-box;
   display: grid;
@@ -130,15 +130,23 @@
   box-shadow: var(--shadow-panel);
 }
 
-.roteiro-list-card--status-rascunho {
-  border-left-color: #b7791f;
+.roteiro-list-card--faixa-rascunho-atrasado {
+  border-left-color: #dc2626;
 }
 
-.roteiro-list-card--status-finalizado {
+.roteiro-list-card--faixa-rascunho-futuro {
+  border-left-color: #d97706;
+}
+
+.roteiro-list-card--faixa-finalizado-antecipado {
+  border-left-color: #2563eb;
+}
+
+.roteiro-list-card--faixa-finalizado-concluido {
   border-left-color: #16805a;
 }
 
-.roteiro-list-card--status-outro {
+.roteiro-list-card--faixa-neutro {
   border-left-color: #64748b;
 }
 

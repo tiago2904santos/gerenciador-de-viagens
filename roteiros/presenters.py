@@ -1,6 +1,7 @@
 from decimal import Decimal, InvalidOperation
 
 from django.urls import reverse
+from django.utils import timezone
 
 from core.presenters.actions import build_delete_action
 from core.presenters.actions import build_edit_action
@@ -85,6 +86,38 @@ def _inferir_tipo_destino(destinos):
     return infer_tipo_destino_from_paradas(paradas) if paradas else ""
 
 
+def _roteiro_faixa_lateral_class(roteiro):
+    now = timezone.now()
+    inicio = (
+        getattr(roteiro, "saida_dt", None)
+        or getattr(roteiro, "chegada_dt", None)
+        or getattr(roteiro, "retorno_saida_dt", None)
+        or getattr(roteiro, "retorno_chegada_dt", None)
+    )
+    fim = (
+        getattr(roteiro, "retorno_chegada_dt", None)
+        or getattr(roteiro, "chegada_dt", None)
+        or getattr(roteiro, "saida_dt", None)
+        or getattr(roteiro, "retorno_saida_dt", None)
+    )
+
+    if inicio and fim and fim < inicio:
+        inicio, fim = fim, inicio
+
+    status_code = getattr(roteiro, "status", "") or ""
+    if status_code == Roteiro.STATUS_RASCUNHO:
+        if inicio and now >= inicio:
+            return "roteiro-list-card--faixa-rascunho-atrasado"
+        return "roteiro-list-card--faixa-rascunho-futuro"
+
+    if status_code == Roteiro.STATUS_FINALIZADO:
+        if fim and now >= fim:
+            return "roteiro-list-card--faixa-finalizado-concluido"
+        return "roteiro-list-card--faixa-finalizado-antecipado"
+
+    return "roteiro-list-card--faixa-neutro"
+
+
 def apresentar_roteiro_card(roteiro):
     origem_txt = _label_cidade_uf(roteiro.origem_cidade, roteiro.origem_estado)
     destinos_todos = list(roteiro.destinos.all()) if roteiro.pk else []
@@ -145,6 +178,7 @@ def apresentar_roteiro_card(roteiro):
         "status_chip_label": status,
         "status_chip_class": status_chip_class,
         "status_variant": status_variant,
+        "faixa_lateral_class": _roteiro_faixa_lateral_class(roteiro),
         "diaria_moeda": diaria_moeda,
         "diaria_resumo": diaria_resumo,
         "diaria_extenso": diaria_extenso,

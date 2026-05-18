@@ -1,4 +1,4 @@
-<article class="roteiro-list-card roteiro-list-card--status-{{ card.status_variant|default:'outro' }} roteiro-list-card--trechos-{{ card.trechos_count|default:0 }} roteiro-list-card--layout-{{ card.roteiro_card_layout|default:'compact' }}">
+<article class="roteiro-list-card roteiro-list-card--status-{{ card.status_variant|default:'outro' }} {{ card.faixa_lateral_class|default:'' }} roteiro-list-card--trechos-{{ card.trechos_count|default:0 }} roteiro-list-card--layout-{{ card.roteiro_card_layout|default:'compact' }}">
   <div class="roteiro-list-card__top">
     <div class="roteiro-list-card__title-row">
       <h3 class="roteiro-list-card__title">{{ card.title|default:"Roteiro" }}</h3>
