@@ -1,18 +1,4 @@
-{#
-  Icon Button — Circular
-  Uso EXCLUSIVO: ações compactas em listas, cards e documentos.
-  SEMPRE: aria-label + data-tooltip obrigatórios.
-  NUNCA usar texto visível. NUNCA usar para ações principais de formulário.
-
-  Parâmetros:
-    action     (str)       — edit | delete | preview | pdf | docx | sign | signature | copy | open
-    href       (str, opc.) — transforma em <a>; se ausente usa <button>
-    aria_label (str)       — OBRIGATÓRIO — descrição da ação para screen readers
-    tooltip    (str, opc.) — texto do tooltip (default: usa aria_label)
-    size       (str, opc.) — sm | lg (default: tamanho padrão 36px)
-    type       (str, opc.) — "button" | "submit" (default: "button")
-    extra_class(str, opc.)
-#}
+{# icon_button.html — ver docs/ui-components.md #}
 {% if href %}
   <a class="cv-icon-btn cv-icon-btn--{{ action }}{% if size %} cv-icon-btn--{{ size }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
      href="{{ href }}"

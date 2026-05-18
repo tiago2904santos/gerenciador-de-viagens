@@ -1,17 +1,4 @@
-{#
-  Field Action Button — Botão lateral acoplado a input/select
-  Uso: sempre ao lado de um campo (input ou select), mesma altura do controle.
-  Formato: retangular com radius de controle. NUNCA pill. NUNCA circular.
-  Envolva o conjunto em .cv-field-row com o campo em .cv-field-control--grow.
-
-  Parâmetros:
-    label      (str)        — rótulo visível (ex: "Gerenciar cargo")
-    icon       (str, opc.)  — ícone (ex: "settings", "x")
-    variant    (str, opc.)  — secondary | neutral | manage | clear | primary (default: "secondary")
-    href       (str, opc.)  — transforma em <a>
-    type       (str, opc.)  — "button" | "submit" (default: "button")
-    extra_class(str, opc.)
-#}
+{# field_action_button.html — ver docs/ui-components.md #}
 {% if href %}
   <a class="cv-field-side-action cv-field-side-action--{{ variant|default:'secondary' }}{% if extra_class %} {{ extra_class }}{% endif %}"
      href="{{ href }}">

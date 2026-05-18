@@ -1,16 +1,4 @@
-{#
-  Footer Action — Botão de rodapé integrado ao card
-  O rodapé inteiro é o botão. Deve ser o último elemento dentro de um card com overflow:hidden.
-  NÃO usar como botão solto; usar apenas integrado ao rodapé de um card/bloco.
-
-  Parâmetros:
-    label      (str)       — rótulo visível (ex: "Adicionar destino")
-    icon       (str, opc.) — ícone (default: "plus")
-    variant    (str, opc.) — add | primary | neutral (default: "add")
-    href       (str, opc.) — transforma em <a>
-    type       (str, opc.) — "button" | "submit" (default: "button")
-    extra_class(str, opc.)
-#}
+{# footer_action.html — ver docs/ui-components.md #}
 {% if href %}
   <a class="cv-footer-action cv-footer-action--{{ variant|default:'add' }}{% if extra_class %} {{ extra_class }}{% endif %}"
      href="{{ href }}">

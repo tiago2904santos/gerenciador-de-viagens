@@ -1,8 +1,4 @@
-{#
-  List Page Simple
-  Uso: páginas de lista de cadastros simples (cargos, combustíveis, servidores, etc.).
-  Inclui header com busca e ação primária, e lista com linhas simples.
-#}
+{# list_page_simple.html — ver docs/ui-components.md #}
 <div class="page-shell page-shell--list">
   {% include "components/ui/headers/header_stack_filters.html" with eyebrow=eyebrow title=title icon_label=brand_mark form_action=request.path search_name="q" search_value=q search_placeholder=search_placeholder search_clear_url=search_clear_url primary_action_label=action_label primary_action_url=action_url %}
 

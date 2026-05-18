@@ -1,22 +1,4 @@
-{#
-  Header Stack — Rail Filters
-  Uso: Páginas de lista com busca e filtros.
-
-  Parâmetros:
-    eyebrow              (str)         — contexto no band (ex: "ROTEIROS")
-    title                (str)         — título da lista
-    icon_label           (str)         — sigla do marcador
-    form_action          (str, opc.)   — action do form de busca; se ausente não renderiza form
-    search_name          (str, opc.)   — name do input de busca (default: "q")
-    search_placeholder   (str, opc.)   — placeholder do input
-    search_value         (str, opc.)   — valor atual da busca
-    search_clear_url     (str, opc.)   — URL para limpar filtros
-    primary_action_label (str, opc.)   — rótulo do botão de ação principal (ex: "Novo cargo")
-    primary_action_url   (str, opc.)   — href do botão de ação principal
-    status_label         (str, opc.)   — chip de status no band
-    status_variant       (str, opc.)   — draft | active | pending
-    extra_class          (str, opc.)
-#}
+{# header_stack_filters.html — ver docs/ui-components.md #}
 {% if form_action %}
   <form class="page-header-stack{% if extra_class %} {{ extra_class }}{% endif %}" method="get" action="{{ form_action }}">
 {% else %}

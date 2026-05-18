@@ -1,20 +1,4 @@
-{#
-  Button — Pill
-  Uso: ações principais e secundárias em formulários, headers e barras de ação.
-  NÃO usar para ações compactas em lista; nesse caso usar icon_button.html.
-
-  Parâmetros:
-    label       (str)        — rótulo visível
-    variant     (str, opc.)  — primary | secondary | back | back-list | cancel | danger | soft-danger |
-                               preview | pdf | docx | sign | neutral | tool (default: "secondary")
-    icon        (str, opc.)  — nome do ícone (via _cv_icon.html)
-    icon_after  (bool, opc.) — coloca o ícone após o texto (ex: "Avançar →")
-    type        (str, opc.)  — "submit" | "button" | "reset" (default: "button")
-    href        (str, opc.)  — transforma em <a>; se ausente usa <button>
-    extra_class (str, opc.)  — classes adicionais
-    disabled    (bool, opc.) — desabilita o botão
-    aria_label  (str, opc.)  — aria-label opcional
-#}
+{# button.html — ver docs/ui-components.md #}
 {% if href %}
   <a class="cv-btn cv-btn--{{ variant|default:'secondary' }}{% if extra_class %} {{ extra_class }}{% endif %}"
      href="{{ href }}"

@@ -1,21 +1,4 @@
-{#
-  Header Stack — Rail Back Action
-  Uso: Wizard, documentos em fluxo, telas com ação de retorno ou CTA final no rail.
-
-  Parâmetros:
-    eyebrow         (str)         — contexto no band (ex: "ROTEIROS")
-    title           (str)         — título principal
-    module_label    (str)         — eyebrow do rail
-    description     (str)         — subtítulo do rail
-    icon_label      (str)         — sigla do marcador
-    status_label    (str, opc.)   — texto do chip
-    status_variant  (str, opc.)   — draft | active | pending
-    back_label      (str, opc.)   — rótulo do botão de ação (ex: "Voltar para lista")
-    back_url        (str, opc.)   — href do botão de ação; se ausente renderiza <button>
-    primary_action_label  (str, opc.) — rótulo do CTA primário quando no estado final
-    primary_action_url    (str, opc.) — href do CTA primário
-    extra_class     (str, opc.)
-#}
+{# header_stack_back_action.html — ver docs/ui-components.md #}
 <div class="page-header-stack{% if extra_class %} {{ extra_class }}{% endif %}">
   <div class="page-header-band">
     <div class="page-header-band__content">
