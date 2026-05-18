@@ -22,7 +22,7 @@
           <span class="ui-lab-preview-card__label">Lista standard</span>
           <span class="ui-lab-status-pill ui-lab-status-pill--done">Pronto</span>
         </div>
-        <div class="page-shell page-shell--list">
+        <div class="page-shell page-shell--list ui-lab-list-panel--flush-footer">
           <div class="page-header-stack">
             <div class="page-header-band">
               <div class="page-header-band__content">
@@ -49,7 +49,7 @@
           <div class="list-panel">
             <div class="simple-list" role="list" aria-label="Lista de itens (demonstração)">
               {% for item in ui_lab_simple_rows %}
-                {% include "dev/ui_lab/partials/_simple_list_item.html" with item=item only %}
+                {% include "dev/ui_lab/partials/_simple_list_item.html" with item=item compact_actions=True only %}
               {% endfor %}
             </div>
             <div class="pagination-shell">
@@ -71,7 +71,7 @@
           <span class="ui-lab-preview-card__label">Lista standard + quick add</span>
           <span class="ui-lab-status-pill ui-lab-status-pill--review">Quick add</span>
         </div>
-        <div class="page-shell page-shell--list">
+        <div class="page-shell page-shell--list ui-lab-list-panel--flush-footer">
           <div class="page-header-stack header-stack--quick-add">
             <div class="page-header-band">
               <div class="page-header-band__content">
@@ -117,7 +117,7 @@
           <div class="list-panel">
             <div class="simple-list" role="list" aria-label="Lista com quick add (demonstração)">
               {% for item in ui_lab_simple_rows %}
-                {% include "dev/ui_lab/partials/_simple_list_item.html" with item=item only %}
+                {% include "dev/ui_lab/partials/_simple_list_item.html" with item=item compact_actions=True only %}
               {% endfor %}
             </div>
             <div class="pagination-shell">
@@ -142,7 +142,7 @@
         <div class="list-panel">
           <div class="card-list" role="list" aria-label="Lista de cards (demonstração)">
             {% for card in ui_lab_cards %}
-              {% include "dev/ui_lab/partials/_list_card.html" with card=card only %}
+              {% include "dev/ui_lab/partials/_list_card.html" with card=card compact_actions=True secondary_action_label="Visualizar" primary_action_label="Abrir" only %}
             {% endfor %}
           </div>
         </div>

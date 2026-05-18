@@ -1,7 +1,9 @@
 <article class="list-card" role="listitem">
   <div class="list-card__header">
     <h3 class="list-card__title">{{ card.title }}</h3>
-    <span class="ui-lab-demo-chip ui-lab-demo-chip--{{ card.status_modifier }}">{{ card.status_label }}</span>
+    {% if not compact_actions %}
+      <span class="ui-lab-demo-chip ui-lab-demo-chip--{{ card.status_modifier }}">{{ card.status_label }}</span>
+    {% endif %}
   </div>
   <div class="list-card__meta">
     {% for meta_item in card.meta_items %}
@@ -10,7 +12,18 @@
   </div>
   <p class="list-card__body">{{ card.description }}</p>
   <div class="list-card__footer">
-    <button class="btn btn-secondary btn-sm" type="button">{{ card.secondary_action }}</button>
-    <button class="btn btn-primary btn-sm" type="button">{{ card.primary_action }}</button>
+    {% if compact_actions %}
+      <button class="cv-btn cv-btn--secondary cv-btn--sm" type="button">
+        <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="eye" only %}</span>
+        <span>{{ secondary_action_label|default:card.secondary_action }}</span>
+      </button>
+      <button class="cv-btn cv-btn--primary cv-btn--sm" type="button">
+        <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="arrow-right" only %}</span>
+        <span>{{ primary_action_label|default:card.primary_action }}</span>
+      </button>
+    {% else %}
+      <button class="btn btn-secondary btn-sm" type="button">{{ card.secondary_action }}</button>
+      <button class="btn btn-primary btn-sm" type="button">{{ card.primary_action }}</button>
+    {% endif %}
   </div>
 </article>

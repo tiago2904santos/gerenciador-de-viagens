@@ -5,7 +5,18 @@
     <span class="simple-list-item__meta">{{ item.meta }}</span>
   </div>
   <div class="simple-list-item__aside">
-    <span class="ui-lab-demo-chip ui-lab-demo-chip--{{ item.status_modifier }}">{{ item.status_label }}</span>
-    <button class="btn btn-secondary btn-sm" type="button">{{ item.action_label }}</button>
+    {% if compact_actions %}
+      <div class="cv-icon-btn-group">
+        <button class="cv-icon-btn cv-icon-btn--preview" type="button" aria-label="Visualizar {{ item.title }}" data-tooltip="Visualizar {{ item.title }}" title="Visualizar {{ item.title }}">
+          {% include "dev/ui_lab/partials/_cv_icon.html" with icon="eye" only %}
+        </button>
+        <button class="cv-icon-btn cv-icon-btn--edit" type="button" aria-label="Editar {{ item.title }}" data-tooltip="Editar {{ item.title }}" title="Editar {{ item.title }}">
+          {% include "dev/ui_lab/partials/_cv_icon.html" with icon="edit" only %}
+        </button>
+      </div>
+    {% else %}
+      <span class="ui-lab-demo-chip ui-lab-demo-chip--{{ item.status_modifier }}">{{ item.status_label }}</span>
+      <button class="btn btn-secondary btn-sm" type="button">{{ item.action_label }}</button>
+    {% endif %}
   </div>
 </div>

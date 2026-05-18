@@ -525,6 +525,15 @@ html[data-theme="dark"] .ui-lab-structure-quick-add .quick-add-footer-button[ari
   width: auto;
 }
 
+.ui-lab-list-panel--flush-footer .list-panel .simple-list {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.ui-lab-list-panel--flush-footer .list-panel .pagination-shell {
+  border-top-color: var(--border-list-panel);
+}
+
 .quick-add-footer-button__icon {
   align-items: center;
   display: inline-flex;
