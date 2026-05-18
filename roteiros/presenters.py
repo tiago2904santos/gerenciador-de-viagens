@@ -142,7 +142,7 @@ def apresentar_roteiro_card(roteiro):
         "title": titulo_rota,
         "subtitle": "Roteiro reutilizável para documentos",
         "status": status,
-        "status_chip_label": (status or "").upper(),
+        "status_chip_label": status,
         "status_chip_class": status_chip_class,
         "status_variant": status_variant,
         "diaria_moeda": diaria_moeda,
