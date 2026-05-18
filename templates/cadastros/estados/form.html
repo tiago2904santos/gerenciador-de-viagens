@@ -1,38 +1,21 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block content %}
-  <div class="app-page">
-    <div class="app-page__shell">
-      <header class="app-page-hero app-page-hero--hybrid app-page-hero--compact" aria-labelledby="estados-form-title">
-        <div class="app-page-hero__stage">
-          <span class="app-page-hero__eyebrow">Cadastros</span>
-          <h1 class="app-page-hero__title" id="estados-form-title">{{ page_title }}</h1>
-        </div>
-        <div class="app-page-hero__body">
-          <div class="app-page__hero-single">
-            <div class="app-page__brand-mark" aria-hidden="true">UF</div>
-            <p class="app-page__subtitle">{{ page_description }}</p>
-          </div>
-        </div>
-        <div class="app-page-hero__ribbon" aria-hidden="true"></div>
-      </header>
+  <div class="page-shell page-shell--standard-simple">
+    {% include "components/ui/headers/header_stack_simple.html" with eyebrow="CADASTROS" title=page_title description=page_description icon_label="UF" module_label="Cadastros" only %}
 
-      <div class="app-page__form-card">
-        <form class="app-form-shell form-shell" method="post" novalidate>
-          {% csrf_token %}
-          <div class="form-section app-form-section">
-            {% include "components/forms/form_section.html" with title="Dados da UF" description="Nome oficial, sigla de 2 letras e codigo IBGE da UF (opcional)." only %}
-            <div class="form-grid app-form-grid">
-              {% include "components/forms/form_field.html" with field=form.nome only %}
-              {% include "components/forms/form_field.html" with field=form.sigla only %}
-              {% include "components/forms/form_field.html" with field=form.codigo_ibge only %}
-            </div>
-          </div>
-          {% include "components/forms/form_actions.html" with primary_label=submit_label secondary_label="Voltar" secondary_url=back_url only %}
-        </form>
+    <form class="main-form-panel" method="post" novalidate>
+      {% csrf_token %}
+      {% include "components/ui/layouts/form_section.html" with title="Dados da UF" description="Nome oficial, sigla de 2 letras e código IBGE da UF (opcional)." section_id="estados-form-section" only %}
+      <div class="field-grid">
+        {% include "components/forms/form_field.html" with field=form.nome size_class="field-size-2" only %}
+        {% include "components/forms/form_field.html" with field=form.sigla size_class="field-size-1" only %}
+        {% include "components/forms/form_field.html" with field=form.codigo_ibge size_class="field-size-1" only %}
       </div>
-    </div>
+      </section>
+      {% include "components/ui/layouts/footer_actions.html" with primary_label=submit_label secondary_label="Voltar" secondary_url=back_url only %}
+    </form>
   </div>
 {% endblock %}

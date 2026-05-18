@@ -1,36 +1,12 @@
-<div class="app-page">
-  <div class="app-page__shell">
-    <header class="app-page-hero app-page__header app-page-hero--hybrid app-page__header--hybrid" aria-labelledby="{{ title_id|default:'app-list-page-title' }}">
-      <div class="app-page-hero__stage">
-        <span class="app-page-hero__eyebrow">{{ eyebrow|default:"Cadastros" }}</span>
-        <h1 class="app-page-hero__title" id="{{ title_id|default:'app-list-page-title' }}">{{ title }}</h1>
-      </div>
-      <div class="app-page-hero__body">
-        <div class="app-page__hero-top">
-          <div class="app-page__brand">
-            <div class="app-page__brand-mark" aria-hidden="true">{{ brand_mark|default:"CV" }}</div>
-            <div class="app-page__brand-copy">
-              {% if description %}
-                <p class="app-page__subtitle">{{ description }}</p>
-              {% endif %}
-            </div>
-          </div>
-          {% if action_label and action_url %}
-            <div class="app-page__hero-actions">
-              {% include "components/buttons/action_button.html" with href=action_url label=action_label variant="primary" only %}
-            </div>
-          {% endif %}
-        </div>
-      </div>
-      <div class="app-page-hero__ribbon" aria-hidden="true"></div>
-    </header>
+{#
+  List Page Simple
+  Uso: páginas de lista de cadastros simples (cargos, combustíveis, servidores, etc.).
+  Inclui header com busca e ação primária, e lista com linhas simples.
+#}
+<div class="page-shell page-shell--list">
+  {% include "components/ui/headers/header_stack_filters.html" with eyebrow=eyebrow title=title icon_label=brand_mark form_action=request.path search_name="q" search_value=q search_placeholder=search_placeholder search_clear_url=search_clear_url primary_action_label=action_label primary_action_url=action_url %}
 
-    <div class="app-page__toolbar">
-      {% include "components/lists/list_toolbar.html" with search_placeholder=search_placeholder q=q action_label="" action_url="" export_csv_url=export_csv_url export_csv_label=export_csv_label only %}
-    </div>
-
-    <div class="app-page__list-card">
-      {% include "components/lists/simple_list.html" with rows=rows empty_message=empty_message empty_action_label=action_label empty_action_url=action_url %}
-    </div>
+  <div class="list-panel">
+    {% include "components/lists/simple_list.html" with rows=rows empty_message=empty_message empty_action_label=action_label empty_action_url=action_url %}
   </div>
 </div>

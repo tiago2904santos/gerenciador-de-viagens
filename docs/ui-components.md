@@ -230,10 +230,34 @@ Variantes: `add` (default) | `primary` | `neutral`.
 
 ---
 
+## Telas reais migradas (Fase 1)
+
+| Tela | Componentes aplicados |
+|------|-----------------------|
+| `cadastros/cargos/form.html` | `header_stack_simple`, `form_section`, `footer_actions` |
+| `cadastros/combustiveis/form.html` | `header_stack_simple`, `form_section`, `footer_actions` |
+| `cadastros/unidades/form.html` | `header_stack_simple`, `form_section`, `footer_actions` |
+| `cadastros/estados/form.html` | `header_stack_simple`, `form_section`, `footer_actions` |
+| `cadastros/cidades/form.html` | `header_stack_simple`, `form_section`, `footer_actions` |
+| `cadastros/viaturas/form.html` | `header_stack_simple`, `form_section`, `footer_actions`, `input_with_action` |
+| `cadastros/servidores/form.html` | `header_stack_simple`, `form_section`, `footer_actions`, `input_with_action` |
+| `roteiros/index.html` | `header_stack_filters`, `page-shell--list` |
+| `roteiros/roteiro_form_page.html` | `header_stack_back_action`, `page-shell--wizard` |
+| `roteiros/detail.html` | `header_band_status`, `page-shell--standard`, `button` |
+| `components/lists/list_page_simple.html` | `header_stack_filters`, `page-shell--list` |
+| `components/lists/list_page.html` | `header_stack_filters`, `page-shell--list` |
+
+`form_actions.html` atualizado com ícones e estrutura `footer-actions` (compatibilidade com telas legadas).
+`header_stack_filters.html` agora suporta `primary_action_label` / `primary_action_url`.
+`roteiro_list_card.html` agora usa `button.html` nas ações do rodapé.
+
+---
+
 ## Pendências para a próxima fase
 
-- Migrar `input_with_action.html` para usar `cv-field-side-action` em vez de `btn btn-secondary`
-- Migrar `form_actions.html` para usar `cv-btn` em vez de `btn btn-primary`
-- Aplicar os novos componentes no restante das telas do sistema
+- Aplicar `icon_button.html` nas ações de cards de documentos (ofícios, ordens de serviço)
+- Migrar telas de detalhe de ofícios para `header_band_status`
+- Aplicar `footer_action.html` (rodapé de card) em Destinos, Trechos e Anexos
+- Aplicar nos wizards de ofícios (com `page-shell--wizard` e `header_stack_back_action`)
 - Mover `_cv_icon.html` de `dev/ui_lab/partials/` para `components/ui/` (path de produção)
 - Criar componente para o stepper (`page-stepper`) para wizards

@@ -124,7 +124,7 @@
   <footer class="roteiro-list-card__actions document-actions">
     {% if card.actions %}
       {% for action in card.actions %}
-        {% include "components/buttons/action_button.html" with href=action.href label=action.label variant=action.variant size="sm" link_target=action.link_target|default:'' link_rel=action.link_rel|default:'' only %}
+        {% include "components/ui/buttons/button.html" with label=action.label variant=action.variant href=action.href icon=action.icon only %}
       {% endfor %}
     {% endif %}
   </footer>

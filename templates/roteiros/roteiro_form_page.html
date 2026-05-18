@@ -18,30 +18,12 @@
 {% endblock %}
 
 {% block content %}
-  <div class="app-page app-page--roteiros-form">
-    <div class="app-page__shell">
-      <header class="app-page-hero app-page__header app-page-hero--hybrid app-page__header--hybrid app-page-hero--compact" aria-labelledby="roteiros-form-title">
-        <div class="app-page-hero__stage">
-          <span class="app-page-hero__eyebrow">Roteiros</span>
-          <h1 class="app-page-hero__title" id="roteiros-form-title">{{ page_title }}</h1>
-        </div>
-        <div class="app-page-hero__body">
-          <div class="app-page__hero-top">
-            <div class="app-page__brand">
-              <div class="app-page__brand-mark" aria-hidden="true">RT</div>
-              <div class="app-page__brand-copy">
-                <p class="app-page__subtitle">Sede, destinos, trechos, retorno e diárias no mesmo fluxo do legacy.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="app-page-hero__ribbon" aria-hidden="true"></div>
-      </header>
+  <div class="page-shell page-shell--wizard app-page--roteiros-form">
+    {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="ROTEIROS" title=page_title description="Sede, destinos, trechos, retorno e diárias no mesmo fluxo." icon_label="RT" module_label="Roteiros" back_label="Voltar para lista" back_url=back_url only %}
 
-      <div class="app-form-shell app-form-shell--roteiro roteiro-form-shell">
-        {{ initial_trechos_data|json_script:"initialTrechosData" }}
-        {% include "roteiros/partials/roteiro_form.html" with is_avulso=True %}
-      </div>
+    <div class="app-form-shell app-form-shell--roteiro roteiro-form-shell">
+      {{ initial_trechos_data|json_script:"initialTrechosData" }}
+      {% include "roteiros/partials/roteiro_form.html" with is_avulso=True %}
     </div>
   </div>
 {% endblock %}
