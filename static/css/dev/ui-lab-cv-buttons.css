@@ -14,7 +14,7 @@
   /* Régua única */
   --cv-btn-height: 36px;
   --cv-btn-size: var(--cv-btn-height);
-  --cv-btn-icon-size: 13px;
+  --cv-btn-icon-size: 15px;
   --cv-btn-padding-x: 13px;
   --cv-btn-radius: var(--radius-pill);
   --cv-btn-gap: 5px;
@@ -478,10 +478,11 @@ html[data-theme="dark"] {
   --cv-icon-btn-size: var(--cv-btn-size);
   --cv-icon-btn-size-sm: 32px;
   --cv-icon-btn-size-lg: 40px;
-  --cv-icon-btn-icon-size: var(--cv-btn-icon-size);
+  --cv-icon-btn-icon-size: 17px;
 }
 
 .cv-icon-btn {
+  --cv-icon-btn-icon-size: 17px;
   align-items: center;
   background: var(--cv-btn-neutral-bg);
   border: 1px solid var(--cv-btn-neutral-border);
@@ -539,11 +540,13 @@ html[data-theme="dark"] {
 
 /* Tamanhos */
 .cv-icon-btn--sm {
+  --cv-icon-btn-icon-size: 16px;
   height: var(--cv-icon-btn-size-sm);
   width: var(--cv-icon-btn-size-sm);
 }
 
 .cv-icon-btn--lg {
+  --cv-icon-btn-icon-size: 18px;
   height: var(--cv-icon-btn-size-lg);
   width: var(--cv-icon-btn-size-lg);
 }
@@ -1062,10 +1065,10 @@ html[data-theme="dark"] {
   align-items: center;
   display: inline-flex;
   flex-shrink: 0;
-  height: 1em;
+  height: var(--cv-btn-icon-size);
   justify-content: center;
   line-height: 0;
-  width: 1em;
+  width: var(--cv-btn-icon-size);
 }
 
 .cv-btn__icon svg {
