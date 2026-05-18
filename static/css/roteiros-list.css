@@ -102,6 +102,7 @@
 
 .list-grid--roteiros {
   gap: var(--space-3);
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .roteiro-list-card {
@@ -574,6 +575,20 @@
   border-radius: var(--radius-pill);
   min-width: 5.5rem;
   text-align: center;
+}
+
+.app-page--roteiros-list .app-page__toolbar .list-search {
+  flex: 1 1 560px;
+  max-width: 720px;
+}
+
+.app-page--roteiros-list .app-page__toolbar .list-toolbar {
+  align-items: center;
+  justify-content: space-between;
+}
+
+.app-page--roteiros-list .app-page__toolbar .btn-group {
+  margin-left: auto;
 }
 
 @media (max-width: 900px) {
