@@ -243,80 +243,88 @@
       <p class="ui-lab-section__eyebrow">Field Attached</p>
       <h2 class="ui-lab-section__title">Botões acoplados a input e select</h2>
       <p class="ui-lab-section__description">
-        O botão acoplado deve ter exatamente a altura do campo. Ele alinha com
-        o input ou select, não com o título do bloco.
+        O botão lateral é uma ação simples ao lado do campo. Ele alinha só com
+        a linha do input ou select e mantém a mesma altura visual.
       </p>
     </div>
 
     <div class="ui-lab-stack">
       <article class="ui-lab-preview-card">
         <div class="ui-lab-preview-card__header">
-          <span class="ui-lab-preview-card__label">Limpar filtros</span>
+          <span class="ui-lab-preview-card__label">Cargo</span>
           <span class="ui-lab-status-pill ui-lab-status-pill--pending">Attached</span>
         </div>
-        <div class="cv-demo-field-row cv-demo-field-row--attached">
-          <label class="cv-demo-field cv-demo-field--grow">
-            <span class="cv-demo-field__label">Cidade</span>
-            <input class="cv-demo-input" type="text" value="Brasília" aria-label="Filtro por cidade">
-          </label>
-          <button class="cv-field-action cv-field-action--clear cv-field-action--attached" type="button">
-            <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="x" only %}</span>
-            <span>Limpar filtros</span>
-          </button>
-        </div>
-      </article>
-
-      <article class="ui-lab-preview-card">
-        <div class="ui-lab-preview-card__header">
-          <span class="ui-lab-preview-card__label">Calcular rota</span>
-          <span class="ui-lab-status-pill ui-lab-status-pill--pending">Primary attached</span>
-        </div>
-        <div class="cv-demo-field-row cv-demo-field-row--attached">
-          <label class="cv-demo-field cv-demo-field--grow">
-            <span class="cv-demo-field__label">Trecho</span>
-            <input class="cv-demo-input" type="text" value="Brasília - Goiânia" aria-label="Trecho da rota">
-          </label>
-          <button class="cv-field-action cv-field-action--calculate cv-field-action--attached" type="button">
-            <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="route" only %}</span>
-            <span>Calcular rota</span>
-          </button>
-        </div>
-      </article>
-
-      <article class="ui-lab-preview-card">
-        <div class="ui-lab-preview-card__header">
-          <span class="ui-lab-preview-card__label">Calcular diária</span>
-          <span class="ui-lab-status-pill ui-lab-status-pill--pending">Secondary attached</span>
-        </div>
-        <div class="cv-demo-field-row cv-demo-field-row--attached">
-          <label class="cv-demo-field cv-demo-field--grow">
-            <span class="cv-demo-field__label">Valor</span>
-            <input class="cv-demo-input" type="number" value="128" aria-label="Valor da diária">
-          </label>
-          <button class="cv-field-action cv-field-action--secondary cv-field-action--attached" type="button">
-            <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="calculator" only %}</span>
-            <span>Calcular diária</span>
-          </button>
-        </div>
-      </article>
-
-      <article class="ui-lab-preview-card">
-        <div class="ui-lab-preview-card__header">
-          <span class="ui-lab-preview-card__label">Gerenciar</span>
-          <span class="ui-lab-status-pill ui-lab-status-pill--pending">Neutral attached</span>
-        </div>
-        <div class="cv-demo-field-row cv-demo-field-row--attached">
-          <label class="cv-demo-field cv-demo-field--grow">
-            <span class="cv-demo-field__label">Modelo</span>
-            <select class="cv-demo-select" aria-label="Selecionar modelo">
-              <option>Modelo de ofício</option>
-              <option>Modelo de justificativa</option>
-              <option>Modelo de roteiro</option>
+        <div class="cv-field-row">
+          <label class="cv-field-control cv-field-control--grow">
+            <span class="cv-field-control__label">Cargo</span>
+            <select class="cv-field-control__select" aria-label="Selecionar cargo">
+              <option>Coordenador</option>
+              <option>Analista</option>
+              <option>Motorista</option>
             </select>
           </label>
-          <button class="cv-field-action cv-field-action--manage cv-field-action--attached" type="button">
+          <button class="cv-field-side-action cv-field-side-action--secondary" type="button">
             <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="settings" only %}</span>
-            <span>Gerenciar</span>
+            <span>Gerenciar cargo</span>
+          </button>
+        </div>
+      </article>
+
+      <article class="ui-lab-preview-card">
+        <div class="ui-lab-preview-card__header">
+          <span class="ui-lab-preview-card__label">Unidade</span>
+          <span class="ui-lab-status-pill ui-lab-status-pill--pending">Primary attached</span>
+        </div>
+        <div class="cv-field-row">
+          <label class="cv-field-control cv-field-control--grow">
+            <span class="cv-field-control__label">Unidade</span>
+            <select class="cv-field-control__select" aria-label="Selecionar unidade">
+              <option>Sede</option>
+              <option>Regional Norte</option>
+              <option>Regional Sul</option>
+            </select>
+          </label>
+          <button class="cv-field-side-action cv-field-side-action--secondary" type="button">
+            <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="settings" only %}</span>
+            <span>Gerenciar unidade</span>
+          </button>
+        </div>
+      </article>
+
+      <article class="ui-lab-preview-card">
+        <div class="ui-lab-preview-card__header">
+          <span class="ui-lab-preview-card__label">Combustível</span>
+          <span class="ui-lab-status-pill ui-lab-status-pill--pending">Secondary attached</span>
+        </div>
+        <div class="cv-field-row">
+          <label class="cv-field-control cv-field-control--grow">
+            <span class="cv-field-control__label">Combustível</span>
+            <select class="cv-field-control__select" aria-label="Selecionar combustível">
+              <option>Gasolina</option>
+              <option>Diesel</option>
+              <option>Etanol</option>
+            </select>
+          </label>
+          <button class="cv-field-side-action cv-field-side-action--secondary" type="button">
+            <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="settings" only %}</span>
+            <span>Gerenciar combustíveis</span>
+          </button>
+        </div>
+      </article>
+
+      <article class="ui-lab-preview-card">
+        <div class="ui-lab-preview-card__header">
+          <span class="ui-lab-preview-card__label">Campo auxiliar</span>
+          <span class="ui-lab-status-pill ui-lab-status-pill--pending">Neutral attached</span>
+        </div>
+        <div class="cv-field-row">
+          <label class="cv-field-control cv-field-control--grow">
+            <span class="cv-field-control__label">Campo auxiliar</span>
+            <input class="cv-field-control__input" type="text" value="Brasília" aria-label="Campo auxiliar">
+          </label>
+          <button class="cv-field-side-action cv-field-side-action--neutral" type="button">
+            <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="x" only %}</span>
+            <span>Limpar</span>
           </button>
         </div>
       </article>

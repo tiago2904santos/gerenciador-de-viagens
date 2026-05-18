@@ -1069,6 +1069,148 @@ html[data-theme="dark"] {
   border-right: none;
 }
 
+.cv-field-row {
+  align-items: end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.cv-field-control {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.cv-field-control--grow {
+  flex: 1 1 260px;
+}
+
+.cv-field-control__label {
+  color: var(--color-muted-strong);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
+  text-transform: uppercase;
+}
+
+.cv-field-control__input,
+.cv-field-control__select {
+  background: var(--color-surface);
+  border: 1px solid var(--cv-btn-secondary-border);
+  border-radius: var(--radius-control);
+  box-sizing: border-box;
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  height: var(--cv-btn-height);
+  min-height: var(--cv-btn-height);
+  padding: 0 var(--space-3);
+  width: 100%;
+}
+
+.cv-field-control__select {
+  appearance: none;
+  padding-right: var(--space-6);
+}
+
+.cv-field-side-action {
+  align-items: center;
+  border-radius: var(--cv-btn-control-radius);
+  border: 1px solid transparent;
+  box-shadow: var(--shadow-xs);
+  box-sizing: border-box;
+  cursor: pointer;
+  display: inline-flex;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  gap: var(--space-2);
+  height: var(--cv-btn-height);
+  justify-content: center;
+  min-height: var(--cv-btn-height);
+  padding: 0 var(--cv-btn-padding-x);
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    color var(--transition-fast),
+    transform var(--transition-fast);
+  user-select: none;
+  white-space: nowrap;
+}
+
+.cv-field-side-action .cv-btn__icon {
+  height: 17px;
+  width: 17px;
+}
+
+.cv-field-side-action:hover,
+.cv-field-side-action:focus {
+  transform: translateY(-1px);
+}
+
+.cv-field-side-action:active {
+  filter: brightness(0.985);
+  transform: translateY(1px);
+}
+
+.cv-field-side-action:focus-visible {
+  box-shadow: var(--cv-btn-focus-ring), var(--shadow-xs);
+  outline: none;
+}
+
+.cv-field-side-action--neutral {
+  background: var(--cv-btn-neutral-bg);
+  border-color: var(--cv-btn-neutral-border);
+  color: var(--cv-btn-neutral-color);
+}
+
+.cv-field-side-action--neutral:hover,
+.cv-field-side-action--neutral:focus {
+  background: var(--cv-btn-neutral-hover-bg);
+  border-color: var(--cv-btn-neutral-hover-border);
+  color: var(--cv-btn-neutral-hover-color);
+}
+
+.cv-field-side-action--secondary {
+  background: var(--cv-btn-secondary-bg);
+  border-color: var(--cv-btn-secondary-border);
+  color: var(--cv-btn-secondary-color);
+}
+
+.cv-field-side-action--secondary:hover,
+.cv-field-side-action--secondary:focus {
+  background: var(--cv-btn-secondary-hover-bg);
+  border-color: var(--cv-btn-secondary-hover-border);
+  color: var(--cv-btn-secondary-hover-color);
+}
+
+.cv-field-side-action--primary {
+  background: var(--cv-btn-primary-bg);
+  border-color: var(--cv-btn-primary-border);
+  color: var(--cv-btn-primary-color);
+}
+
+.cv-field-side-action--primary:hover,
+.cv-field-side-action--primary:focus {
+  background: var(--cv-btn-primary-hover-bg);
+  border-color: var(--cv-btn-primary-hover-border);
+  color: var(--cv-btn-primary-color);
+}
+
+@media (max-width: 640px) {
+  .cv-field-row {
+    align-items: stretch;
+  }
+
+  .cv-field-control--grow,
+  .cv-field-side-action {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+}
+
 /* =========================================================
    11. Grammar helpers for the button lab
    ========================================================= */
