@@ -397,3 +397,483 @@
   border-color: var(--color-primary);
   color: var(--color-primary);
 }
+
+/* =========================================================
+   7. Botões Circulares — .cv-icon-btn
+   Uso exclusivo: ações compactas em listas, cards e ações
+   documentais. Apenas ícone, sem texto visível.
+   Obrigatório: aria-label + data-tooltip.
+   ========================================================= */
+
+:root {
+  --cv-icon-btn-size: 36px;
+  --cv-icon-btn-size-sm: 30px;
+  --cv-icon-btn-size-lg: 40px;
+  --cv-icon-btn-icon-size: 16px;
+}
+
+.cv-icon-btn {
+  align-items: center;
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  box-shadow: var(--shadow-xs);
+  color: var(--color-muted-strong);
+  cursor: pointer;
+  display: inline-flex;
+  flex-shrink: 0;
+  height: var(--cv-icon-btn-size);
+  justify-content: center;
+  overflow: visible;
+  padding: 0;
+  position: relative;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    color var(--transition-fast),
+    transform var(--transition-fast);
+  user-select: none;
+  width: var(--cv-icon-btn-size);
+}
+
+.cv-icon-btn svg {
+  flex-shrink: 0;
+  height: var(--cv-icon-btn-icon-size);
+  pointer-events: none;
+  width: var(--cv-icon-btn-icon-size);
+}
+
+.cv-icon-btn:hover,
+.cv-icon-btn:focus {
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+.cv-icon-btn:active {
+  box-shadow: var(--shadow-xs);
+  transform: translateY(0);
+}
+
+.cv-icon-btn:focus-visible {
+  box-shadow: var(--cv-btn-focus-ring);
+  outline: none;
+}
+
+.cv-icon-btn:disabled,
+.cv-icon-btn[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.45;
+  pointer-events: none;
+  transform: none;
+}
+
+/* Tamanhos */
+.cv-icon-btn--sm {
+  height: var(--cv-icon-btn-size-sm);
+  width: var(--cv-icon-btn-size-sm);
+}
+
+.cv-icon-btn--lg {
+  height: var(--cv-icon-btn-size-lg);
+  width: var(--cv-icon-btn-size-lg);
+}
+
+/* --- Variantes semânticas --- */
+
+/* Edit — neutro com hover azul discreto */
+.cv-icon-btn--edit {
+  background: var(--color-surface-muted);
+  border-color: var(--color-border);
+  color: var(--color-muted-strong);
+}
+
+.cv-icon-btn--edit:hover,
+.cv-icon-btn--edit:focus {
+  background: var(--color-primary-soft);
+  border-color: var(--color-secondary);
+  color: var(--color-secondary);
+}
+
+/* Delete — vermelho destrutivo */
+.cv-icon-btn--delete {
+  background: transparent;
+  border-color: var(--color-danger-border-strong);
+  color: var(--color-danger);
+}
+
+.cv-icon-btn--delete:hover,
+.cv-icon-btn--delete:focus {
+  background: var(--color-danger-soft);
+  border-color: var(--color-danger);
+}
+
+/* Preview — teal informativo (olho) */
+.cv-icon-btn--preview {
+  background: var(--color-surface-muted);
+  border-color: var(--color-border);
+  color: var(--surface-button-preview, #0e7c9e);
+}
+
+.cv-icon-btn--preview:hover,
+.cv-icon-btn--preview:focus {
+  background: #e5f5fa;
+  border-color: var(--surface-button-preview, #0e7c9e);
+  color: var(--surface-button-preview-hover, #0a6882);
+}
+
+/* Sign — assinar (primary blue, caneta) */
+.cv-icon-btn--sign {
+  background: var(--color-surface-muted);
+  border-color: var(--color-border);
+  color: var(--color-primary);
+}
+
+.cv-icon-btn--sign:hover,
+.cv-icon-btn--sign:focus {
+  background: var(--color-primary-soft);
+  border-color: var(--color-primary);
+  color: var(--color-primary-strong);
+}
+
+/* Signature — gerar assinatura (primary soft preenchido) */
+.cv-icon-btn--signature {
+  background: var(--color-primary-soft);
+  border-color: var(--color-secondary);
+  color: var(--color-secondary);
+}
+
+.cv-icon-btn--signature:hover,
+.cv-icon-btn--signature:focus {
+  background: var(--color-secondary-soft);
+  border-color: var(--color-primary);
+  color: var(--color-primary-strong);
+}
+
+/* PDF — vermelho documental, preenchido */
+.cv-icon-btn--pdf {
+  background: var(--surface-button-pdf, #b42318);
+  border-color: #8f1f18;
+  box-shadow: 0 2px 8px rgba(180, 35, 24, 0.2);
+  color: #fff;
+}
+
+.cv-icon-btn--pdf:hover,
+.cv-icon-btn--pdf:focus {
+  background: var(--surface-button-pdf-hover, #961d15);
+  box-shadow: 0 4px 12px rgba(180, 35, 24, 0.3);
+}
+
+/* DOCX — azul arquivo, preenchido */
+.cv-icon-btn--docx {
+  background: var(--surface-button-docx, #1a5498);
+  border-color: #103e76;
+  box-shadow: 0 2px 8px rgba(26, 84, 152, 0.2);
+  color: #fff;
+}
+
+.cv-icon-btn--docx:hover,
+.cv-icon-btn--docx:focus {
+  background: var(--surface-button-docx-hover, #154382);
+  box-shadow: 0 4px 12px rgba(26, 84, 152, 0.3);
+}
+
+/* --- Tooltip CSS (scoped em cv-icon-btn) --- */
+.cv-icon-btn[data-tooltip]::after {
+  background: var(--color-heading);
+  border-radius: 6px;
+  bottom: calc(100% + 6px);
+  color: var(--color-white);
+  content: attr(data-tooltip);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  left: 50%;
+  line-height: 1.2;
+  opacity: 0;
+  padding: 4px 8px;
+  pointer-events: none;
+  position: absolute;
+  transform: translateX(-50%) translateY(4px);
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+  white-space: nowrap;
+  z-index: var(--z-dropdown);
+}
+
+.cv-icon-btn[data-tooltip]:hover::after,
+.cv-icon-btn[data-tooltip]:focus-visible::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Grupo de icon buttons (para listas e cards) */
+.cv-icon-btn-group {
+  align-items: center;
+  display: flex;
+  gap: var(--space-2);
+}
+
+/* =========================================================
+   8. Botões Acoplados a Campo — .cv-field-action
+   Uso OBRIGATÓRIO: quando o botão estiver ao lado de
+   input, select ou campo de filtro.
+   Formato: retangular com bordas arredondadas. NUNCA pill.
+   ========================================================= */
+
+:root {
+  --cv-field-action-radius: var(--radius-control);
+}
+
+.cv-field-action {
+  align-items: center;
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--cv-field-action-radius);
+  box-shadow: var(--shadow-xs);
+  box-sizing: border-box;
+  color: var(--color-muted-strong);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  gap: var(--space-2);
+  justify-content: center;
+  min-height: var(--control-height-md);
+  padding: 0 var(--space-3);
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast);
+  user-select: none;
+  white-space: nowrap;
+}
+
+.cv-field-action:hover,
+.cv-field-action:focus {
+  background: var(--color-bg-strong);
+  border-color: var(--color-border-strong);
+  color: var(--color-text);
+}
+
+.cv-field-action:focus-visible {
+  box-shadow: var(--cv-btn-focus-ring);
+  outline: none;
+}
+
+.cv-field-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* Acoplado à direita de um input (sem borda esquerda, sem radius esquerdo) */
+.cv-field-action--attached {
+  border-left: none;
+  border-radius: 0 var(--cv-field-action-radius) var(--cv-field-action-radius) 0;
+  box-shadow: none;
+}
+
+/* Variantes */
+
+/* Neutral — ação operacional genérica */
+.cv-field-action--neutral {
+  background: var(--color-surface-muted);
+  border-color: var(--color-border);
+  color: var(--color-muted-strong);
+}
+
+.cv-field-action--neutral:hover,
+.cv-field-action--neutral:focus {
+  background: var(--color-bg-strong);
+  border-color: var(--color-border-strong);
+  color: var(--color-text);
+}
+
+/* Clear — limpar filtro/campo (muito discreto) */
+.cv-field-action--clear {
+  background: transparent;
+  border-color: var(--color-border);
+  box-shadow: none;
+  color: var(--color-muted);
+}
+
+.cv-field-action--clear:hover,
+.cv-field-action--clear:focus {
+  background: var(--color-surface-muted);
+  border-color: var(--color-border-strong);
+  color: var(--color-muted-strong);
+}
+
+/* Calculate — calcular (destaque azul sutil) */
+.cv-field-action--calculate {
+  background: var(--color-primary-soft);
+  border-color: var(--color-secondary);
+  color: var(--color-secondary);
+}
+
+.cv-field-action--calculate:hover,
+.cv-field-action--calculate:focus {
+  background: var(--color-secondary-soft);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* Manage — gerenciar select (ação moderada) */
+.cv-field-action--manage {
+  background: var(--color-surface-muted);
+  border-color: var(--color-border-strong);
+  color: var(--color-primary);
+  font-weight: var(--font-weight-bold);
+}
+
+.cv-field-action--manage:hover,
+.cv-field-action--manage:focus {
+  background: var(--color-primary-soft);
+  border-color: var(--color-primary);
+  color: var(--color-primary-strong);
+}
+
+/* =========================================================
+   9. Botão de Rodapé — .cv-footer-action
+   Uso: adicionar itens dentro de cards/blocos.
+   Integrado ao rodapé — largura total, hover sinaliza
+   que o rodapé inteiro é clicável.
+   ========================================================= */
+
+.cv-footer-action {
+  align-items: center;
+  background: var(--color-surface-muted);
+  border: none;
+  border-radius: 0 0 var(--radius-card) var(--radius-card);
+  border-top: 1px solid var(--color-border-soft);
+  color: var(--color-muted-strong);
+  cursor: pointer;
+  display: flex;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  gap: var(--space-2);
+  justify-content: center;
+  padding: var(--space-3) var(--space-4);
+  text-decoration: none;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast);
+  user-select: none;
+  width: 100%;
+}
+
+.cv-footer-action:hover,
+.cv-footer-action:focus {
+  background: var(--color-bg-strong);
+  border-top-color: var(--color-border);
+  color: var(--color-primary);
+}
+
+.cv-footer-action:focus-visible {
+  box-shadow: var(--cv-btn-focus-ring);
+  outline: none;
+}
+
+.cv-footer-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* Add — ação de adição com plus */
+.cv-footer-action--add {
+  background: var(--color-surface-muted);
+  color: var(--color-muted-strong);
+}
+
+.cv-footer-action--add:hover,
+.cv-footer-action--add:focus {
+  background: var(--color-primary-soft);
+  border-top-color: var(--color-border-strong);
+  color: var(--color-primary);
+}
+
+/* Primary — criação mais destacada */
+.cv-footer-action--primary {
+  background: var(--color-secondary-soft);
+  border-top-color: var(--color-border);
+  color: var(--color-secondary);
+}
+
+.cv-footer-action--primary:hover,
+.cv-footer-action--primary:focus {
+  background: var(--color-primary-soft);
+  border-top-color: var(--color-secondary);
+  color: var(--color-primary-strong);
+}
+
+/* Neutral — ação discreta, borda tracejada */
+.cv-footer-action--neutral {
+  background: transparent;
+  border-top: 1px dashed var(--color-border);
+  color: var(--color-muted);
+}
+
+.cv-footer-action--neutral:hover,
+.cv-footer-action--neutral:focus {
+  background: var(--color-surface-muted);
+  border-top-color: var(--color-border-strong);
+  color: var(--color-muted-strong);
+}
+
+/* =========================================================
+   10. Demo helpers extras (UI Lab apenas)
+   ========================================================= */
+
+/* Container simulando um card para demonstrar cv-footer-action */
+.ui-lab-demo-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-xs);
+  overflow: hidden;
+}
+
+.ui-lab-demo-card__body {
+  padding: var(--space-4);
+}
+
+.ui-lab-demo-card__title {
+  color: var(--color-heading);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  margin: 0 0 var(--space-2);
+}
+
+.ui-lab-demo-card__text {
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+  margin: 0;
+}
+
+/* Input simulado ao lado de botão de campo */
+.ui-lab-demo-field-row {
+  align-items: center;
+  display: flex;
+  gap: 0;
+}
+
+.ui-lab-demo-input {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-control);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  min-height: var(--control-height-md);
+  padding: 0 var(--space-3);
+}
+
+/* Input preparado para receber botão acoplado à direita */
+.ui-lab-demo-input--for-addon {
+  border-radius: var(--radius-control) 0 0 var(--radius-control);
+  min-width: 180px;
+}
