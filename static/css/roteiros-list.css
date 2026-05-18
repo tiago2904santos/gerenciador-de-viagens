@@ -100,8 +100,13 @@
   margin: 0 0 var(--space-1);
 }
 
-.list-grid--roteiros {
+.app-page--roteiros-list .list-grid.list-grid--roteiros.app-list-grid {
   gap: var(--space-3);
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.app-page--roteiros-list .list-grid--roteiros .roteiro-list-card {
+  width: 100%;
 }
 
 .roteiro-list-card {
