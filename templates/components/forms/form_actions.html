@@ -1,6 +1,6 @@
 <div class="form-actions app-form-actions">
-  {% include "components/buttons/action_button.html" with label=primary_label|default:"Salvar" variant=primary_variant|default:"primary" type="submit" only %}
+  <button class="cv-btn cv-btn--primary" type="submit">{{ primary_label|default:"Salvar" }}</button>
   {% if secondary_label %}
-    {% include "components/buttons/action_button.html" with href=secondary_url label=secondary_label variant=secondary_variant|default:"secondary" only %}
+    <a class="cv-btn cv-btn--back" href="{{ secondary_url }}">{{ secondary_label }}</a>
   {% endif %}
 </div>

@@ -1,21 +1,10 @@
-<div class="field form-field-with-action {{ size_class }}">
+<div class="field {{ size_class }}">
   <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-  {% if size_class %}
-  <div class="field-control-row">
+  <div class="cv-field-row">
     {{ field.as_widget }}
     {% if action_url %}
-    <a class="field-addon-action" href="{{ action_url }}">{{ action_label }}</a>
+    <a class="cv-field-side-action cv-field-side-action--secondary" href="{{ action_url }}">{{ action_label }}</a>
     {% endif %}
   </div>
-  {% else %}
-  <div class="form-field-with-action__row">
-    <div class="form-field-with-action__control">
-      {{ field.as_widget }}
-    </div>
-    {% if action_url %}
-    <a class="btn btn-secondary btn-sm app-btn app-btn--secondary app-btn--sm form-field-with-action__button" href="{{ action_url }}">{{ action_label }}</a>
-    {% endif %}
-  </div>
-  {% endif %}
   {% if field.errors %}<p class="field-error">{{ field.errors|striptags }}</p>{% endif %}
 </div>
