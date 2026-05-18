@@ -82,7 +82,7 @@
                 <span class="page-header-status-chip page-header-status-chip--draft">Rascunho</span>
               </div>
             </div>
-            <div class="page-header-rail page-header-rail--filters page-header-rail--filters-quick-add">
+            <div class="page-header-rail page-header-rail--filters page-header-rail--filters-quick-add ui-lab-structure-quick-add__rail">
               <div class="page-header-rail__marker" aria-hidden="true">TP</div>
               <div class="header-filter-bar">
                 <div class="header-filter-bar__search">
@@ -92,27 +92,7 @@
                   <button class="header-filter-button" type="button">Limpar filtros</button>
                 </div>
               </div>
-            </div>
-            <div class="quick-add-inline is-open">
-              <div class="quick-add-inline__tab-row">
-                <button
-                  class="quick-add-inline__tab is-active"
-                  type="button"
-                  aria-expanded="true"
-                  aria-controls="ui-lab-lists-quick-add"
-                  data-quick-add-toggle>
-                  <span class="quick-add-inline__tab-icon" aria-hidden="true">+</span>
-                  <span class="quick-add-inline__tab-label">Cadastrar item</span>
-                </button>
-              </div>
-
-              <div class="quick-add-inline__panel" id="ui-lab-lists-quick-add">
-                <div class="quick-add-inline__header">
-                  <h3 class="quick-add-inline__title">Cadastro rapido</h3>
-                  <button class="quick-add-inline__close" type="button" aria-label="Fechar painel" data-quick-add-close>
-                    &times;
-                  </button>
-                </div>
+              <div class="quick-add-inline__panel quick-add-panel" id="ui-lab-lists-quick-add" hidden>
                 <div class="quick-add-inline__body">
                   <div class="quick-add-inline__fields">
                     <div class="field-grid">
@@ -122,16 +102,20 @@
                     </div>
                   </div>
                   <div class="quick-add-inline__actions">
-                    <button class="btn btn-secondary" type="button" data-quick-add-close>Cancelar</button>
+                    <button class="btn btn-secondary" type="button" data-ui-lab-close>Cancelar</button>
                     <button class="btn btn-primary" type="button">Salvar</button>
                   </div>
                 </div>
               </div>
             </div>
+            <button class="quick-add-footer-button btn btn-secondary" type="button" data-ui-lab-toggle aria-controls="ui-lab-lists-quick-add" aria-expanded="false">
+              <span class="quick-add-footer-button__icon" aria-hidden="true">+</span>
+              <span class="quick-add-footer-button__label">Cadastrar item</span>
+            </button>
           </div>
 
           <div class="list-panel">
-            <div class="simple-list" role="list" aria-label="Lista com cadastro rápido (demonstração)">
+            <div class="simple-list" role="list" aria-label="Lista com quick add (demonstração)">
               {% for item in ui_lab_simple_rows %}
                 {% include "dev/ui_lab/partials/_simple_list_item.html" with item=item only %}
               {% endfor %}
