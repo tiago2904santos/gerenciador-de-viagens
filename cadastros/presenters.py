@@ -1,4 +1,6 @@
-﻿from core.utils.masks import format_cpf as _format_cpf_masked
+﻿import json
+
+from core.utils.masks import format_cpf as _format_cpf_masked
 from core.utils.masks import format_placa as _format_placa_masked
 from core.utils.masks import format_rg_display as _format_rg_masked
 from core.utils.masks import format_telefone as _format_telefone_masked
@@ -120,6 +122,7 @@ def apresentar_linha_lista_simples_cargo(cargo, edit_url="#", delete_url="#", se
         "badges": [],
         "meta": [],
         "edit_url": edit_url,
+        "edit_fields_json": json.dumps({"nome": cargo.nome}, ensure_ascii=False),
         "delete_url": delete_url,
         "set_default_url": set_default_url,
     }
@@ -135,6 +138,7 @@ def apresentar_linha_lista_simples_combustivel(combustivel, edit_url="#", delete
         "badges": [],
         "meta": [],
         "edit_url": edit_url,
+        "edit_fields_json": json.dumps({"nome": combustivel.nome}, ensure_ascii=False),
         "delete_url": delete_url,
         "set_default_url": set_default_url,
     }
@@ -152,6 +156,7 @@ def apresentar_linha_lista_simples_unidade(unidade, edit_url="#", delete_url="#"
             build_meta("Sigla", unidade.sigla or "—"),
         ],
         "edit_url": edit_url,
+        "edit_fields_json": json.dumps({"nome": unidade.nome, "sigla": unidade.sigla or ""}, ensure_ascii=False),
         "delete_url": delete_url,
     }
 

@@ -10,9 +10,9 @@
       {% csrf_token %}
       {% include "components/ui/layouts/form_section.html" with title="Dados da viatura" description="Informe placa, modelo, combustível, tipo e motoristas quando aplicável." section_id="viaturas-form-section" only %}
       <div class="field-grid">
-        {% include "components/forms/form_field.html" with field=form.placa size_class="field-size-1" only %}
-        {% include "components/forms/form_field.html" with field=form.modelo size_class="field-size-3" only %}
-        {% include "components/forms/input_with_action.html" with field=form.combustivel action_url=combustiveis_manage_url action_label="Gerenciar combustíveis" action_icon="settings" action_variant="secondary" size_class="field-size-2" only %}
+        {% include "components/forms/form_field.html" with field=form.placa size_class="field-size-2" only %}
+        {% include "components/forms/input_with_action.html" with field=form.combustivel action_url=combustiveis_manage_url action_label="Gerenciar combustíveis" action_icon="settings" action_variant="secondary" size_class="field-size-2" only %}        
+        {% include "components/forms/form_field.html" with field=form.modelo size_class="field-size-2" only %}
         {% include "components/forms/form_field.html" with field=form.tipo size_class="field-size-2" only %}
         {% include "components/forms/form_field.html" with field=form.motoristas size_class="field-size-4" only %}
       </div>

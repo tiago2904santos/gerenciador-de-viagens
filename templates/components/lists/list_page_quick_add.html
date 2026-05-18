@@ -34,7 +34,7 @@
         </div>
       </form>
 
-      <form class="quick-add-inline__panel quick-add-panel" id="{{ quick_add_panel_id }}" method="post" hidden novalidate>
+      <form class="quick-add-inline__panel quick-add-panel" id="{{ quick_add_panel_id }}" method="post" action="{{ request.path }}" data-create-action="{{ request.path }}" hidden novalidate>
         {% csrf_token %}
         <div class="quick-add-inline__body">
           <div class="quick-add-inline__fields">
@@ -48,7 +48,7 @@
       </form>
     </div>
 
-    <button class="quick-add-footer-button btn btn-secondary" type="button" data-quick-add-toggle aria-controls="{{ quick_add_panel_id }}" aria-expanded="{% if quick_add_form.errors %}true{% else %}false{% endif %}">
+    <button class="quick-add-footer-button" type="button" data-quick-add-toggle aria-controls="{{ quick_add_panel_id }}" aria-expanded="{% if quick_add_form.errors %}true{% else %}false{% endif %}">
       <span class="quick-add-footer-button__icon" aria-hidden="true">+</span>
       <span class="quick-add-footer-button__label">{{ quick_add_label|default:"Cadastrar item" }}</span>
     </button>
