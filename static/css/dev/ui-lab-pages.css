@@ -534,6 +534,12 @@ html[data-theme="dark"] .ui-lab-structure-quick-add .quick-add-footer-button[ari
   border-top-color: var(--border-list-panel);
 }
 
+.card-list--roteiros {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .quick-add-footer-button__icon {
   align-items: center;
   display: inline-flex;

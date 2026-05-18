@@ -138,7 +138,7 @@
           <span class="ui-lab-preview-card__label">Lista com cards</span>
           <span class="ui-lab-status-pill ui-lab-status-pill--done">Cards</span>
         </div>
-        <div class="page-shell page-shell--list">
+        <div class="page-shell page-shell--list ui-lab-list-panel--flush-footer">
           <div class="page-header-stack">
             <div class="page-header-band">
               <div class="page-header-band__content">
@@ -149,22 +149,59 @@
                 <span class="page-header-status-chip page-header-status-chip--active">3</span>
               </div>
             </div>
-            <div class="page-header-rail page-header-rail--filters">
+            <div class="page-header-rail page-header-rail--filters page-header-rail--advanced-filters">
               <div class="page-header-rail__marker" aria-hidden="true">TP</div>
-              <div class="header-filter-bar">
+              <div class="header-filter-bar header-filter-bar--advanced">
                 <div class="header-filter-bar__search">
-                  <input class="header-filter-input" type="search" placeholder="Buscar cards..." aria-label="Buscar cards">
+                  <input class="header-filter-input" type="search" placeholder="Buscar itens..." aria-label="Buscar">
                 </div>
-              </div>
-              <div class="page-header-rail__actions">
-                <button class="header-filter-button" type="button">Limpar filtros</button>
+                <div class="header-filter-bar__row">
+                  <div class="header-filter-bar__fields">
+                    <div class="header-filter-field header-filter-field--sort">
+                      <select class="header-filter-select" aria-label="Ordenar por">
+                        <option value="">Ordenar por</option>
+                        <option value="newest">Mais recentes</option>
+                        <option value="oldest">Mais antigos</option>
+                        <option value="name">Nome A-Z</option>
+                        <option value="status">Status</option>
+                      </select>
+                    </div>
+                    <div class="header-filter-field header-filter-field--period">
+                      <select class="header-filter-select" aria-label="Período">
+                        <option value="">Período</option>
+                        <option value="today">Hoje</option>
+                        <option value="7d">Últimos 7 dias</option>
+                        <option value="30d" selected>Últimos 30 dias</option>
+                        <option value="custom">Personalizado</option>
+                      </select>
+                    </div>
+                    <div class="header-filter-field header-filter-field--status">
+                      <select class="header-filter-select" aria-label="Status">
+                        <option value="">Status</option>
+                        <option value="all">Todos</option>
+                        <option value="active">Ativo</option>
+                        <option value="pending">Pendente</option>
+                        <option value="done">Finalizado</option>
+                        <option value="issues">Com pendência</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="header-filter-bar__actions">
+                    <button class="header-filter-button" type="button">Limpar filtros</button>
+                  </div>
+                </div>
+                <div class="header-applied-filters" aria-label="Filtros ativos">
+                  <span class="header-applied-chip">Status exemplo <span aria-hidden="true">×</span></span>
+                  <span class="header-applied-chip">Últimos 30 dias <span aria-hidden="true">×</span></span>
+                  <span class="header-applied-chip">Mais recentes <span aria-hidden="true">×</span></span>
+                </div>
               </div>
             </div>
           </div>
           <div class="list-panel">
-            <div class="card-list" role="list" aria-label="Lista de cards (demonstração)">
+            <div class="card-list card-list--roteiros" role="list" aria-label="Lista de cards (demonstração)">
               {% for card in ui_lab_cards %}
-                {% include "dev/ui_lab/partials/_list_card.html" with card=card compact_actions=True secondary_action_label="Visualizar" primary_action_label="Abrir" only %}
+                {% include "roteiros/partials/roteiro_list_card.html" with card=card only %}
               {% endfor %}
             </div>
           </div>
