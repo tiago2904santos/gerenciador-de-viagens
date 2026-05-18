@@ -1,0 +1,5 @@
+<div class="field-grid{% if extra_class %} {{ extra_class }}{% endif %}">
+  {% for field in fields %}
+    {% include "components/ui/forms/field.html" with field=field only %}
+  {% endfor %}
+</div>

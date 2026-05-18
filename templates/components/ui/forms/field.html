@@ -1,0 +1,21 @@
+{% if field.field.widget.input_type == 'checkbox' %}
+  {% include "components/forms/card_toggle.html" with field=field title=label|default:field.label description=help_text size_class=size_class only %}
+{% else %}
+<div class="field app-form-field{% if size_class %} {{ size_class }}{% endif %}">
+  <label class="app-form-label" for="{{ field.id_for_label }}">{{ label|default:field.label }}</label>
+  {% if action_url or action_label %}
+    <div class="cv-field-row">
+      {{ field.as_widget }}
+      {% if action_url %}
+        {% include "components/ui/buttons/field_action_button.html" with href=action_url label=action_label icon=action_icon variant=action_variant|default:"secondary" only %}
+      {% else %}
+        {% include "components/ui/buttons/field_action_button.html" with label=action_label icon=action_icon variant=action_variant|default:"secondary" type=action_type|default:"button" only %}
+      {% endif %}
+    </div>
+  {% else %}
+    {{ field.as_widget }}
+  {% endif %}
+  {% if help_text %}<p class="field-help app-form-help">{{ help_text }}</p>{% endif %}
+  {% if field.errors %}{% include "components/ui/feedback/field_error.html" with errors=field.errors only %}{% endif %}
+</div>
+{% endif %}

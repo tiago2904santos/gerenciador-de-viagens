@@ -1,0 +1,9 @@
+<div class="list-card__footer">
+  {% for action in actions %}
+    {% if action.icon_only %}
+      {% include "components/ui/buttons/icon_button.html" with href=action.href action=action.icon aria_label=action.aria_label tooltip=action.label size=action.size only %}
+    {% else %}
+      {% include "components/ui/buttons/button.html" with href=action.href label=action.label variant=action.variant icon=action.icon size=action.size only %}
+    {% endif %}
+  {% endfor %}
+</div>

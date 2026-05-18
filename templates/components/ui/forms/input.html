@@ -1,0 +1,9 @@
+<input class="cv-field-control__input{% if extra_class %} {{ extra_class }}{% endif %}"
+       type="{{ type|default:'text' }}"
+       name="{{ name }}"
+       id="{{ id }}"
+       {% if value %}value="{{ value }}"{% endif %}
+       {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
+       {% if required %}required{% endif %}
+       {% if disabled %}disabled{% endif %}
+       {% if readonly %}readonly{% endif %}>

@@ -1,0 +1,4 @@
+<div class="modal-shell{% if extra_class %} {{ extra_class }}{% endif %}" role="dialog" aria-modal="true"{% if title_id %} aria-labelledby="{{ title_id }}"{% endif %}>
+  {% if title %}<h2 class="modal-shell__title"{% if title_id %} id="{{ title_id }}"{% endif %}>{{ title }}</h2>{% endif %}
+  {% if message %}<p class="modal-shell__message">{{ message }}</p>{% endif %}
+</div>

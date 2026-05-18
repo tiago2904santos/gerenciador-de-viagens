@@ -1,11 +1,1 @@
-{# confirm_delete_block.html — bloco de confirmação de exclusão. Usar dentro de main-form-panel. #}
-<div class="form-section">
-  <header class="section-header">
-    <div class="section-header__copy">
-      <span class="status-chip status-chip--danger">Atenção</span>
-      <h2 class="section-header__title">{{ object_label }}</h2>
-      <p class="section-header__description">{{ message|default:"Esta ação excluirá o cadastro. Se houver vínculos com outros registros, a exclusão será bloqueada." }}</p>
-    </div>
-  </header>
-</div>
-{% include "components/ui/layouts/footer_actions.html" with primary_label=primary_label|default:"Excluir" primary_variant="danger" primary_icon="trash" secondary_label="Cancelar" secondary_url=back_url only %}
+{% include "components/ui/modals/confirm_delete.html" with object_label=object_label message=message primary_label=primary_label back_url=back_url only %}

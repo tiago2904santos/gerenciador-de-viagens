@@ -1,9 +1,11 @@
 {# button.html — ver docs/ui-components.md #}
 {% if href %}
-  <a class="cv-btn cv-btn--{{ variant|default:'secondary' }}{% if extra_class %} {{ extra_class }}{% endif %}"
+  <a class="cv-btn cv-btn--{{ variant|default:'secondary' }}{% if size %} cv-btn--{{ size }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
      href="{{ href }}"
      {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
      {% if disabled %}aria-disabled="true"{% endif %}
+     {% if link_target %}target="{{ link_target }}"{% endif %}
+     {% if link_rel %}rel="{{ link_rel }}"{% endif %}
   >
     {% if icon and not icon_after %}
       <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon=icon only %}</span>
@@ -14,7 +16,7 @@
     {% endif %}
   </a>
 {% else %}
-  <button class="cv-btn cv-btn--{{ variant|default:'secondary' }}{% if extra_class %} {{ extra_class }}{% endif %}"
+  <button class="cv-btn cv-btn--{{ variant|default:'secondary' }}{% if size %} cv-btn--{{ size }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
           type="{{ type|default:'button' }}"
           {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
           {% if disabled %}disabled{% endif %}

@@ -5,7 +5,7 @@
       {% if row.badges %}
         <span class="simple-list__badges">
           {% for badge in row.badges %}
-            <span class="simple-list__badge simple-list__badge--{{ badge.variant|default:'accent' }}">{{ badge.text }}</span>
+            {% include "components/ui/lists/status_pill.html" with label=badge.text variant=badge.variant|default:'accent' only %}
           {% endfor %}
         </span>
       {% endif %}
@@ -25,10 +25,10 @@
     {% if row.set_default_url %}
       <form method="post" action="{{ row.set_default_url }}" class="simple-list__inline-form">
         {% csrf_token %}
-        <button type="submit" class="btn btn-secondary btn-sm app-btn app-btn--secondary app-btn--sm">Definir como padrão</button>
+        {% include "components/ui/buttons/button.html" with label="Definir como padrão" variant="secondary" size="sm" type="submit" only %}
       </form>
     {% endif %}
-    {% include "components/buttons/action_button.html" with href=row.edit_url label="Editar" variant="secondary" size="sm" only %}
-    {% include "components/buttons/action_button.html" with href=row.delete_url label="Excluir" variant="danger" size="sm" only %}
+    {% include "components/ui/buttons/icon_button.html" with href=row.edit_url action="edit" aria_label="Editar" tooltip="Editar" size="sm" only %}
+    {% include "components/ui/buttons/icon_button.html" with href=row.delete_url action="delete" aria_label="Excluir" tooltip="Excluir" size="sm" only %}
   </div>
 </div>

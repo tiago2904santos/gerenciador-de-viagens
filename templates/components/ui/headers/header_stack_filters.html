@@ -33,16 +33,13 @@
     </div>
     <div class="page-header-rail__actions">
       {% if form_action is not None %}
-        <button class="header-filter-button" type="submit">Buscar</button>
+        {% include "components/ui/buttons/button.html" with label="Buscar" variant="tool" type="submit" icon="search" only %}
       {% endif %}
       {% if search_clear_url %}
-        <a class="header-filter-button" href="{{ search_clear_url }}">Limpar filtros</a>
+        {% include "components/ui/buttons/button.html" with href=search_clear_url label="Limpar filtros" variant="secondary" icon="x" only %}
       {% endif %}
       {% if primary_action_label and primary_action_url %}
-        <a class="cv-btn cv-btn--primary" href="{{ primary_action_url }}">
-          <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="plus" only %}</span>
-          <span>{{ primary_action_label }}</span>
-        </a>
+        {% include "components/ui/buttons/button.html" with href=primary_action_url label=primary_action_label variant="primary" icon="plus" only %}
       {% endif %}
     </div>
   </div>

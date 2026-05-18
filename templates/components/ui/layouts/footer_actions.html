@@ -15,10 +15,12 @@
       {% endif %}
     {% endif %}
   </div>
-  <div class="footer-actions__primary">
-    <button class="cv-btn cv-btn--{{ primary_variant|default:'primary' }}" type="{{ primary_type|default:'submit' }}">
-      <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon=primary_icon|default:"check" only %}</span>
-      <span>{{ primary_label|default:"Salvar" }}</span>
-    </button>
-  </div>
+  {% if primary_label %}
+    <div class="footer-actions__primary">
+      <button class="cv-btn cv-btn--{{ primary_variant|default:'primary' }}" type="{{ primary_type|default:'submit' }}">
+        <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon=primary_icon|default:"check" only %}</span>
+        <span>{{ primary_label }}</span>
+      </button>
+    </div>
+  {% endif %}
 </footer>

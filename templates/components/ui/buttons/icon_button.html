@@ -5,12 +5,12 @@
      aria-label="{{ aria_label }}"
      data-tooltip="{{ tooltip|default:aria_label }}"
      title="{{ tooltip|default:aria_label }}"
-  >{% include "dev/ui_lab/partials/_cv_icon.html" with icon=action only %}</a>
+  >{% if action == "preview" %}{% include "dev/ui_lab/partials/_cv_icon.html" with icon="eye" only %}{% else %}{% include "dev/ui_lab/partials/_cv_icon.html" with icon=action only %}{% endif %}</a>
 {% else %}
   <button class="cv-icon-btn cv-icon-btn--{{ action }}{% if size %} cv-icon-btn--{{ size }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
           type="{{ type|default:'button' }}"
           aria-label="{{ aria_label }}"
           data-tooltip="{{ tooltip|default:aria_label }}"
           title="{{ tooltip|default:aria_label }}"
-  >{% include "dev/ui_lab/partials/_cv_icon.html" with icon=action only %}</button>
+  >{% if action == "preview" %}{% include "dev/ui_lab/partials/_cv_icon.html" with icon="eye" only %}{% else %}{% include "dev/ui_lab/partials/_cv_icon.html" with icon=action only %}{% endif %}</button>
 {% endif %}

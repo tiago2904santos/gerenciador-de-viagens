@@ -1,25 +1,25 @@
-<article class="oficio-card app-card">
-  <header class="oficio-card__header">
-    <div class="oficio-card__identity">
-      <span class="oficio-card__number-label">{{ card.number_label }}:</span>
-      <strong class="oficio-card__number">{{ card.number }}</strong>
+<article class="list-card app-card">
+  <header class="list-card__header">
+    <div>
+      <span class="list-card__meta-item">{{ card.number_label }}</span>
+      <h2 class="list-card__title">{{ card.number }}</h2>
     </div>
-    <div class="oficio-card__status-row">
-      <span class="status-chip {{ card.status_class }}">{{ card.status }}</span>
+    <div class="simple-list__badges">
+      {% include "components/ui/lists/status_pill.html" with label=card.status variant=card.status_class|default:"muted" only %}
       {% if card.finalizacao_assinatura_badge %}
-        <span class="status-chip {{ card.finalizacao_assinatura_badge_class }}">{{ card.finalizacao_assinatura_badge }}</span>
+        {% include "components/ui/lists/status_pill.html" with label=card.finalizacao_assinatura_badge variant=card.finalizacao_assinatura_badge_class|default:"muted" only %}
       {% endif %}
     </div>
   </header>
 
-  <div class="oficio-card__body">
-    <h2 class="oficio-card__title">{{ card.title }}</h2>
-    <p class="oficio-card__subtitle">{{ card.subtitle }}</p>
+  <div class="list-card__body">
+    <h3 class="list-card__title">{{ card.title }}</h3>
+    <p>{{ card.subtitle }}</p>
   </div>
 
-  <dl class="oficio-card__meta">
+  <dl class="list-card__meta">
     {% for item in card.meta %}
-      <div>
+      <div class="list-card__meta-item">
         <dt>{{ item.label }}</dt>
         <dd>{{ item.value }}</dd>
       </div>
@@ -27,10 +27,6 @@
   </dl>
 
   {% if card.actions %}
-    <div class="oficio-card__actions">
-      {% for action in card.actions %}
-        {% include "components/buttons/action_button.html" with href=action.href label=action.label variant=action.variant method=action.method confirm=action.confirm link_target=action.link_target|default:'' link_rel=action.link_rel|default:'' only %}
-      {% endfor %}
-    </div>
+    {% include "components/ui/lists/list_card_actions.html" with actions=card.actions only %}
   {% endif %}
 </article>

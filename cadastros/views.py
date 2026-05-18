@@ -180,6 +180,7 @@ def estado_create(request):
             "page_description": "Cadastre UF e nome oficial.",
             "form": form,
             "submit_label": "Criar estado",
+            "submit_icon": "plus",
             "back_url": reverse("cadastros:estados_index"),
         },
     )
@@ -200,6 +201,7 @@ def estado_update(request, pk):
             "page_description": "Atualize os dados da UF.",
             "form": form,
             "submit_label": "Salvar estado",
+            "submit_icon": "check",
             "back_url": reverse("cadastros:estados_index"),
         },
     )
@@ -264,6 +266,7 @@ def unidade_create(request):
             "page_description": "Cadastre uma unidade administrativa reutilizável.",
             "form": form,
             "submit_label": "Criar unidade",
+            "submit_icon": "plus",
             "back_url": reverse("cadastros:unidades_index"),
         },
     )
@@ -284,6 +287,7 @@ def unidade_update(request, pk):
             "page_description": "Atualize os dados da unidade.",
             "form": form,
             "submit_label": "Salvar unidade",
+            "submit_icon": "check",
             "back_url": reverse("cadastros:unidades_index"),
         },
     )
@@ -378,6 +382,7 @@ def cidade_create(request):
             "page_description": "Cadastre uma cidade de referência.",
             "form": form,
             "submit_label": "Criar cidade",
+            "submit_icon": "plus",
             "back_url": reverse("cadastros:cidades_index"),
         },
     )
@@ -398,6 +403,7 @@ def cidade_update(request, pk):
             "page_description": "Atualize os dados da cidade.",
             "form": form,
             "submit_label": "Salvar cidade",
+            "submit_icon": "check",
             "back_url": reverse("cadastros:cidades_index"),
         },
     )
@@ -465,6 +471,7 @@ def cargo_create(request):
             "page_description": "Cadastre um cargo para seleção em servidores.",
             "form": form,
             "submit_label": "Criar cargo",
+            "submit_icon": "plus",
             "back_url": reverse("cadastros:cargos_index"),
         },
     )
@@ -485,6 +492,7 @@ def cargo_update(request, pk):
             "page_description": "Atualize os dados do cargo.",
             "form": form,
             "submit_label": "Salvar cargo",
+            "submit_icon": "check",
             "back_url": reverse("cadastros:cargos_index"),
         },
     )
@@ -563,6 +571,7 @@ def combustivel_create(request):
             "page_description": "Cadastre um combustível para seleção em viaturas.",
             "form": form,
             "submit_label": "Criar combustível",
+            "submit_icon": "plus",
             "back_url": reverse("cadastros:combustiveis_index"),
         },
     )
@@ -583,6 +592,7 @@ def combustivel_update(request, pk):
             "page_description": "Atualize os dados do combustível.",
             "form": form,
             "submit_label": "Salvar combustível",
+            "submit_icon": "check",
             "back_url": reverse("cadastros:combustiveis_index"),
         },
     )
@@ -656,6 +666,7 @@ def servidor_create(request):
             "page_description": "Nome, cargo e CPF são obrigatórios. RG e vínculo com unidade são opcionais.",
             "form": form,
             "submit_label": "Criar servidor",
+            "submit_icon": "plus",
             "back_url": reverse("cadastros:servidores_index"),
             "cargos_manage_url": reverse("cadastros:cargos_index"),
             "unidades_manage_url": reverse("cadastros:unidades_index"),
@@ -678,6 +689,7 @@ def servidor_update(request, pk):
             "page_description": "Atualize os dados do servidor. RG e vínculo com unidade são opcionais.",
             "form": form,
             "submit_label": "Salvar servidor",
+            "submit_icon": "check",
             "back_url": reverse("cadastros:servidores_index"),
             "cargos_manage_url": reverse("cadastros:cargos_index"),
             "unidades_manage_url": reverse("cadastros:unidades_index"),
@@ -744,6 +756,7 @@ def viatura_create(request):
             "page_description": "Cadastre placa, modelo, combustível e tipo.",
             "form": form,
             "submit_label": "Criar viatura",
+            "submit_icon": "plus",
             "back_url": reverse("cadastros:viaturas_index"),
             "combustiveis_manage_url": reverse("cadastros:combustiveis_index"),
         },
@@ -765,6 +778,7 @@ def viatura_update(request, pk):
             "page_description": "Atualize os dados da viatura.",
             "form": form,
             "submit_label": "Salvar viatura",
+            "submit_icon": "check",
             "back_url": reverse("cadastros:viaturas_index"),
             "combustiveis_manage_url": reverse("cadastros:combustiveis_index"),
         },
@@ -797,6 +811,7 @@ def configuracao_sistema(request):
             "page_description": "Unidade, cidade em documentos e assinantes padrão por tipo.",
             "form": form,
             "submit_label": "Salvar configuração",
+            "submit_icon": "check",
             "back_url": reverse("core:dashboard"),
         },
     )

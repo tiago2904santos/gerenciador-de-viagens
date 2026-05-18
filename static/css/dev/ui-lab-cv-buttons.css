@@ -1080,10 +1080,11 @@ html[data-theme="dark"] {
 }
 
 .cv-field-row {
-  align-items: end;
+  align-items: stretch;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: var(--space-2);
+  min-width: 0;
 }
 
 .cv-field-control {
@@ -1136,9 +1137,9 @@ html[data-theme="dark"] {
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-bold);
   gap: var(--space-2);
-  height: var(--cv-btn-height);
+  height: var(--control-height-md);
   justify-content: center;
-  min-height: var(--cv-btn-height);
+  min-height: var(--control-height-md);
   padding: 0 var(--cv-btn-padding-x);
   transition:
     background-color var(--transition-fast),
@@ -1151,8 +1152,8 @@ html[data-theme="dark"] {
 }
 
 .cv-field-side-action .cv-btn__icon {
-  height: 17px;
-  width: 17px;
+  height: 18px;
+  width: 18px;
 }
 
 .cv-field-side-action:hover,
@@ -1212,6 +1213,7 @@ html[data-theme="dark"] {
 @media (max-width: 640px) {
   .cv-field-row {
     align-items: stretch;
+    flex-wrap: wrap;
   }
 
   .cv-field-control--grow,

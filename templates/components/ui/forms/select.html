@@ -1,0 +1,9 @@
+<select class="cv-field-control__select{% if extra_class %} {{ extra_class }}{% endif %}"
+        name="{{ name }}"
+        id="{{ id }}"
+        {% if required %}required{% endif %}
+        {% if disabled %}disabled{% endif %}>
+  {% for option in options %}
+    <option value="{{ option.value }}"{% if option.selected %} selected{% endif %}>{{ option.label }}</option>
+  {% endfor %}
+</select>

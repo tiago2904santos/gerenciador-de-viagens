@@ -1,5 +1,2 @@
-{% if href %}
-  <a class="btn btn-{{ variant|default:'primary' }}{% if size %} btn-{{ size }}{% endif %}{% if icon %} btn-icon{% endif %} app-btn app-btn--{{ variant|default:'primary' }}{% if size %} app-btn--{{ size }}{% endif %}{% if icon %} app-btn--icon{% endif %}" href="{{ href }}"{% if link_target %} target="{{ link_target }}"{% endif %}{% if link_rel %} rel="{{ link_rel }}"{% endif %}>{{ label }}</a>
-{% else %}
-  <button class="btn btn-{{ variant|default:'primary' }}{% if size %} btn-{{ size }}{% endif %}{% if icon %} btn-icon{% endif %} app-btn app-btn--{{ variant|default:'primary' }}{% if size %} app-btn--{{ size }}{% endif %}{% if icon %} app-btn--icon{% endif %}" type="{{ type|default:'button' }}">{{ label }}</button>
-{% endif %}
+{# Compatibility wrapper. New templates must include components/ui/buttons/button.html directly. #}
+{% include "components/ui/buttons/button.html" with href=href label=label variant=variant size=size icon=icon type=type aria_label=aria_label disabled=disabled extra_class=extra_class link_target=link_target link_rel=link_rel only %}

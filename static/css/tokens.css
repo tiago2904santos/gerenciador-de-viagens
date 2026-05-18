@@ -81,6 +81,10 @@
   --space-card-y: var(--space-4);
   --space-section-x: var(--space-5);
   --space-section-y: var(--space-5);
+  --cv-page-gap: var(--space-6);
+  --cv-grid-gap: var(--space-4);
+  --cv-shell-padding: var(--space-6);
+  --cv-footer-height: 72px;
 
   /* --------------------------------------------------------------------------
      Raios (escala + aliases semanticos)
@@ -98,6 +102,10 @@
   --radius-map: var(--radius-panel);
   --radius-pill: 999px;
   --radius-full: var(--radius-pill);
+  --cv-btn-radius: var(--radius-pill);
+  --cv-field-radius: var(--radius-control);
+  --cv-card-radius: var(--radius-card);
+  --cv-list-card-radius: var(--radius-card);
 
   /* --------------------------------------------------------------------------
      Tipografia
@@ -123,6 +131,33 @@
   --control-height-sm: 34px;
   --control-height-md: 44px;
   --control-height-lg: 52px;
+  --cv-btn-height: 36px;
+  --cv-btn-padding-x: 13px;
+  --cv-btn-gap: 5px;
+  --cv-btn-icon-size: 17px;
+  --cv-btn-shadow: var(--shadow-xs);
+  --cv-field-height: var(--control-height-md);
+  --cv-field-padding-x: var(--space-3);
+  --cv-field-gap: var(--space-2);
+  --cv-field-border: 1px solid var(--color-border-strong);
+  --cv-field-bg: var(--color-surface);
+  --cv-field-color: var(--color-text);
+  --cv-field-focus-ring: 0 0 0 3px rgba(21, 91, 154, 0.28);
+  --cv-card-border: 1px solid var(--color-border);
+  --cv-card-shadow: var(--shadow-card);
+  --cv-card-bg: var(--color-surface);
+  --cv-panel-padding: var(--space-5);
+  --cv-section-padding: var(--space-5);
+  --cv-list-card-bg: var(--color-surface);
+  --cv-list-card-border: 1px solid var(--color-border);
+  --cv-list-card-padding: var(--space-4);
+  --cv-list-card-accent: var(--color-accent);
+  --cv-list-card-gap: var(--space-3);
+  --cv-status-draft-bg: var(--color-warning-soft);
+  --cv-status-draft-color: var(--color-warning);
+  --cv-status-success-bg: var(--color-success-soft);
+  --cv-status-warning-bg: var(--color-warning-soft);
+  --cv-status-danger-bg: var(--color-danger-soft);
   --transition-fast: 140ms ease;
   --transition-base: 160ms ease;
   --transition-slow: 220ms ease;

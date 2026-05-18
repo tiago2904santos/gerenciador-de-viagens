@@ -1,0 +1,4 @@
+<div class="filter-bar{% if extra_class %} {{ extra_class }}{% endif %}">
+  {% include "components/ui/filters/search_input.html" with search_id=search_id q=q search_placeholder=search_placeholder search_name=search_name only %}
+  {% if clear_url %}{% include "components/ui/buttons/button.html" with href=clear_url label="Limpar" variant="secondary" icon="x" only %}{% endif %}
+</div>
