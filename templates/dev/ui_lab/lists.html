@@ -139,11 +139,35 @@
           <span class="ui-lab-preview-card__label">Lista com cards</span>
           <span class="ui-lab-status-pill ui-lab-status-pill--done">Cards</span>
         </div>
-        <div class="list-panel">
-          <div class="card-list" role="list" aria-label="Lista de cards (demonstração)">
-            {% for card in ui_lab_cards %}
-              {% include "dev/ui_lab/partials/_list_card.html" with card=card compact_actions=True secondary_action_label="Visualizar" primary_action_label="Abrir" only %}
-            {% endfor %}
+        <div class="page-shell page-shell--list">
+          <div class="page-header-stack">
+            <div class="page-header-band">
+              <div class="page-header-band__content">
+                <div class="page-header-band__text">
+                  <span class="page-header-band__eyebrow">Contexto</span>
+                  <h2 class="page-header-band__title">Lista com cards</h2>
+                </div>
+                <span class="page-header-status-chip page-header-status-chip--active">3</span>
+              </div>
+            </div>
+            <div class="page-header-rail page-header-rail--filters">
+              <div class="page-header-rail__marker" aria-hidden="true">TP</div>
+              <div class="header-filter-bar">
+                <div class="header-filter-bar__search">
+                  <input class="header-filter-input" type="search" placeholder="Buscar cards..." aria-label="Buscar cards">
+                </div>
+              </div>
+              <div class="page-header-rail__actions">
+                <button class="header-filter-button" type="button">Limpar filtros</button>
+              </div>
+            </div>
+          </div>
+          <div class="list-panel">
+            <div class="card-list" role="list" aria-label="Lista de cards (demonstração)">
+              {% for card in ui_lab_cards %}
+                {% include "dev/ui_lab/partials/_list_card.html" with card=card compact_actions=True secondary_action_label="Visualizar" primary_action_label="Abrir" only %}
+              {% endfor %}
+            </div>
           </div>
         </div>
       </article>
