@@ -126,7 +126,7 @@
             <span>Gerar assinatura</span>
           </button>
           <button class="cv-btn cv-btn--copy-link" type="button">
-            <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="copy" only %}</span>
+            <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="link" only %}</span>
             <span>Copiar link</span>
           </button>
         </div>
@@ -208,6 +208,35 @@
         </div>
       </article>
     </div>
+  </section>
+
+  <section class="ui-lab-section">
+    <div class="ui-lab-section__header">
+      <p class="ui-lab-section__eyebrow">Operacional Buttons</p>
+      <h2 class="ui-lab-section__title">Botões operacionais</h2>
+      <p class="ui-lab-section__description">
+        Ações de ferramenta reutilizáveis para operações como calcular rota e
+        diária. Os ícones já existem no sistema e seguem a mesma régua visual
+        dos demais botões pill compactos.
+      </p>
+    </div>
+
+    <article class="ui-lab-preview-card">
+      <div class="ui-lab-preview-card__header">
+        <span class="ui-lab-preview-card__label">Ferramentas</span>
+        <span class="ui-lab-status-pill ui-lab-status-pill--done">Tools</span>
+      </div>
+      <div class="ui-lab-button-row">
+        <button class="cv-btn cv-btn--tool" type="button">
+          <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="route" only %}</span>
+          <span>Calcular rota</span>
+        </button>
+        <button class="cv-btn cv-btn--tool" type="button">
+          <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="calculator" only %}</span>
+          <span>Calcular diária</span>
+        </button>
+      </div>
+    </article>
   </section>
 
   <section class="ui-lab-section">
