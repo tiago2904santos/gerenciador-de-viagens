@@ -137,14 +137,12 @@
           <span class="ui-lab-preview-card__label">Exportação documental</span>
           <span class="ui-lab-status-pill ui-lab-status-pill--done">PDF / DOCX</span>
         </div>
-        <div class="ui-lab-button-row">
-          <button class="cv-btn cv-btn--pdf" type="button">
-            <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="pdf" only %}</span>
-            <span>PDF</span>
+        <div class="cv-icon-btn-group">
+          <button class="cv-icon-btn cv-icon-btn--pdf" type="button" aria-label="Baixar PDF" data-tooltip="Baixar PDF" title="Baixar PDF">
+            {% include "dev/ui_lab/partials/_cv_icon.html" with icon="pdf" only %}
           </button>
-          <button class="cv-btn cv-btn--docx" type="button">
-            <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="docx" only %}</span>
-            <span>DOCX</span>
+          <button class="cv-icon-btn cv-icon-btn--docx" type="button" aria-label="Baixar DOCX" data-tooltip="Baixar DOCX" title="Baixar DOCX">
+            {% include "dev/ui_lab/partials/_cv_icon.html" with icon="docx" only %}
           </button>
         </div>
         <p class="ui-lab-preview-card__description">
