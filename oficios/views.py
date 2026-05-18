@@ -275,6 +275,8 @@ def index(request):
             "cards": cards,
             "create_url": reverse("oficios:novo"),
             "search_clear_url": reverse("oficios:index"),
+            "status_options": [{"value": "", "label": "Todos os status"}]
+            + [{"value": value, "label": label} for value, label in Oficio.STATUS_CHOICES],
             "empty_message": "Nenhum ofício cadastrado ainda.",
         },
     )

@@ -66,7 +66,8 @@ from .services.routing.trecho_route_service import calcular_rota_trecho
 
 def index(request):
     q = request.GET.get("q", "").strip()
-    roteiros = listar_roteiros(q=q)
+    status = request.GET.get("status", "").strip()
+    roteiros = listar_roteiros(q=q, status=status or None)
     cards = [apresentar_roteiro_card(roteiro) for roteiro in roteiros]
     return render(
         request,
@@ -79,6 +80,9 @@ def index(request):
             "empty_message": "Nenhum roteiro cadastrado ainda.",
             "cards": cards,
             "q": q,
+            "status": status,
+            "status_options": [{"value": "", "label": "Todos os status"}]
+            + [{"value": value, "label": label} for value, label in Roteiro.STATUS_CHOICES],
         },
     )
 

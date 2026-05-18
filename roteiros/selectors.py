@@ -9,7 +9,7 @@ from .models import Roteiro
 from .models import RoteiroTrecho
 
 
-def listar_roteiros(q=None):
+def listar_roteiros(q=None, status=None):
     trechos_qs = (
         RoteiroTrecho.objects.select_related(
             "origem_estado",
@@ -31,6 +31,8 @@ def listar_roteiros(q=None):
         .annotate(trechos_count=Count("trechos", distinct=True))
         .order_by("-updated_at")
     )
+    if status:
+        queryset = queryset.filter(status=status)
     if q:
         queryset = queryset.filter(
             Q(origem_cidade__nome__icontains=q)

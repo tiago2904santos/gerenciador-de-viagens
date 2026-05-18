@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% block title %}Cargos{% endblock %}
 {% block content %}
-  {% url "cadastros:cargo_create" as create_url %}
-  {% include "components/lists/list_page_simple.html" with title=page_title description=page_description eyebrow="Cadastros" brand_mark="CG" search_placeholder="Buscar cargos" action_label="Novo cargo" action_url=create_url header_action_label="" header_action_url="" empty_message="Nenhum cargo cadastrado ainda." rows=rows q=q %}
+  {% include "components/lists/list_page_quick_add.html" with title=page_title description=page_description eyebrow="Cadastros" brand_mark="CG" search_placeholder="Buscar cargos" empty_message="Nenhum cargo cadastrado ainda." rows=rows q=q quick_add_form=quick_add_form quick_add_panel_id="quick-add-cargo" quick_add_label="Cadastrar cargo" quick_add_submit_label="Salvar cargo" quick_add_body_template="cadastros/cargos/partials/_quick_add_fields.html" %}
 {% endblock %}

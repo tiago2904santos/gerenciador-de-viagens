@@ -32,14 +32,30 @@ def _status_variant(status: str) -> str:
     return "status-chip--warning"
 
 
+def _oficio_faixa_lateral_class(status: str) -> str:
+    if status in {Oficio.STATUS_GERADO, Oficio.STATUS_FINALIZADO}:
+        return "roteiro-list-card--faixa-finalizado-concluido"
+    if status == Oficio.STATUS_RASCUNHO:
+        return "roteiro-list-card--faixa-rascunho-futuro"
+    return "roteiro-list-card--faixa-neutro"
+
+
 def apresentar_oficio_card(oficio, *, assinatura_pdf: str | None = None):
     card = {
         "number_label": "N° do Ofício",
         "number": oficio.numero_formatado,
         "status": oficio.get_status_display(),
         "status_class": _status_variant(oficio.status),
+        "status_chip_label": oficio.get_status_display(),
+        "status_chip_class": _status_variant(oficio.status),
+        "status_variant": oficio.status.lower() if oficio.status else "outro",
+        "faixa_lateral_class": _oficio_faixa_lateral_class(oficio.status),
         "title": f"Ofício {oficio.numero_formatado}",
         "subtitle": oficio.motivo[:120] if oficio.motivo else "Sem motivo",
+        "side_title": "Ofício",
+        "side_items": [
+            build_meta("Status", oficio.get_status_display()),
+        ],
         "meta": [
             build_meta("Protocolo", format_protocolo(oficio.protocolo) or "—"),
             build_meta("Data criação", oficio.data_criacao.strftime("%d/%m/%Y")),
@@ -50,6 +66,8 @@ def apresentar_oficio_card(oficio, *, assinatura_pdf: str | None = None):
     if oficio.status == Oficio.STATUS_FINALIZADO and assinatura_pdf in ("assinado", "aguardando"):
         suffix = "Assinado" if assinatura_pdf == "assinado" else "Aguardando assinatura"
         card["status"] = f"Finalizado — {suffix}"
+        card["status_chip_label"] = card["status"]
+        card["side_items"].append(build_meta("Assinatura", suffix))
     return card
 
 

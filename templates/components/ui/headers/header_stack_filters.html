@@ -19,7 +19,7 @@
     {% if icon_label %}
       <div class="page-header-rail__marker" aria-hidden="true">{{ icon_label }}</div>
     {% endif %}
-    <div class="header-filter-bar">
+    <div class="header-filter-bar{% if status_options %} header-filter-bar--advanced{% endif %}">
       <div class="header-filter-bar__search">
         <input
           class="header-filter-input"
@@ -30,6 +30,19 @@
           {% if search_value %}value="{{ search_value }}"{% endif %}
         >
       </div>
+      {% if status_options %}
+        <div class="header-filter-bar__row">
+          <div class="header-filter-bar__fields">
+            <div class="header-filter-field">
+              <select class="header-filter-select" name="{{ status_name|default:'status' }}" aria-label="{{ status_label|default:'Status' }}">
+                {% for option in status_options %}
+                  <option value="{{ option.value }}"{% if option.value == status_value %} selected{% endif %}>{{ option.label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+        </div>
+      {% endif %}
     </div>
     <div class="page-header-rail__actions">
       {% if form_action is not None %}

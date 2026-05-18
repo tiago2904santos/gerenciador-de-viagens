@@ -1,79 +1,79 @@
 /* Lista de roteiros: cards compactos, status por borda lateral (sem bloco amarelo). */
 
-.app-page--roteiros-list .app-page__shell {
+.app-page--main-card-list .app-page__shell {
   gap: var(--space-4);
 }
 
-.app-page--roteiros-list .app-page__toolbar {
+.app-page--main-card-list .app-page__toolbar {
   background: var(--route-card-bg);
   border: 1px solid var(--route-card-border);
   border-radius: var(--radius-lg);
   box-shadow: var(--theme-shadow-block);
 }
 
-.app-page--roteiros-list .app-page__toolbar input,
-.app-page--roteiros-list .app-page__toolbar select {
+.app-page--main-card-list .app-page__toolbar input,
+.app-page--main-card-list .app-page__toolbar select {
   background: var(--route-field-bg);
   border-color: var(--route-field-border);
   color: var(--route-field-text);
 }
 
-.app-page--roteiros-list .app-page__toolbar input::placeholder {
+.app-page--main-card-list .app-page__toolbar input::placeholder {
   color: var(--route-field-placeholder);
 }
 
-.app-page--roteiros-list .btn-primary,
-.app-page--roteiros-list .btn-secondary,
-.app-page--roteiros-list .btn-danger,
-.app-page--roteiros-list .btn-muted {
+.app-page--main-card-list .btn-primary,
+.app-page--main-card-list .btn-secondary,
+.app-page--main-card-list .btn-danger,
+.app-page--main-card-list .btn-muted {
   border-radius: var(--radius-pill);
   box-shadow: var(--shadow-xs);
   font-weight: 800;
 }
 
-.app-page--roteiros-list .btn-primary {
+.app-page--main-card-list .btn-primary {
   background: var(--route-button-primary-bg);
   border-color: var(--route-button-primary-border);
   color: var(--route-button-primary-text);
 }
 
-.app-page--roteiros-list .btn-primary:hover,
-.app-page--roteiros-list .btn-primary:focus-visible {
+.app-page--main-card-list .btn-primary:hover,
+.app-page--main-card-list .btn-primary:focus-visible {
   background: var(--route-button-primary-hover-bg);
   border-color: var(--route-button-primary-hover-border);
   color: var(--route-button-primary-text);
 }
 
-.app-page--roteiros-list .btn-secondary,
-.app-page--roteiros-list .btn-muted {
+.app-page--main-card-list .btn-secondary,
+.app-page--main-card-list .btn-muted {
   background: var(--route-button-secondary-bg);
   border-color: var(--route-button-secondary-border);
   color: var(--route-button-secondary-text);
 }
 
-.app-page--roteiros-list .btn-secondary:hover,
-.app-page--roteiros-list .btn-secondary:focus-visible,
-.app-page--roteiros-list .btn-muted:hover,
-.app-page--roteiros-list .btn-muted:focus-visible {
+.app-page--main-card-list .btn-secondary:hover,
+.app-page--main-card-list .btn-secondary:focus-visible,
+.app-page--main-card-list .btn-muted:hover,
+.app-page--main-card-list .btn-muted:focus-visible {
   background: var(--route-button-secondary-hover-bg);
   border-color: var(--route-button-secondary-hover-border);
   color: var(--route-button-secondary-text);
 }
 
-.app-page--roteiros-list .btn-danger {
+.app-page--main-card-list .btn-danger {
   background: var(--route-button-danger-bg);
   border-color: var(--route-button-danger-border);
   color: var(--route-button-danger-text);
 }
 
-.app-page--roteiros-list .btn-danger:hover,
-.app-page--roteiros-list .btn-danger:focus-visible {
+.app-page--main-card-list .btn-danger:hover,
+.app-page--main-card-list .btn-danger:focus-visible {
   background: var(--route-button-danger-hover-bg);
   border-color: var(--route-button-danger-hover-border);
   color: var(--route-button-danger-text);
 }
 
-.app-page--roteiros-list .btn:focus-visible {
+.app-page--main-card-list .btn:focus-visible {
   box-shadow: 0 0 0 3px var(--route-focus-ring), var(--shadow-xs);
   outline: none;
 }
@@ -100,13 +100,13 @@
   margin: 0 0 var(--space-1);
 }
 
-.app-page--roteiros-list .list-grid.list-grid--roteiros.app-list-grid {
+.app-page--main-card-list .list-grid.list-grid--roteiros.app-list-grid {
   display: grid;
   gap: var(--space-3);
   grid-template-columns: minmax(0, 1fr);
 }
 
-.app-page--roteiros-list .list-grid--roteiros .roteiro-list-card {
+.app-page--main-card-list .list-grid--roteiros .roteiro-list-card {
   width: 100%;
 }
 
@@ -591,8 +591,8 @@
   text-align: center;
 }
 
-.app-page--roteiros-list .roteiro-list-card__actions .btn-secondary,
-.app-page--roteiros-list .roteiro-list-card__actions .btn-primary {
+.app-page--main-card-list .roteiro-list-card__actions .btn-secondary,
+.app-page--main-card-list .roteiro-list-card__actions .btn-primary {
   background: linear-gradient(180deg, #f6f9fe 0%, #e7eef8 100%);
   border-color: rgba(93, 123, 161, 0.45);
   color: #173a5f;
@@ -601,16 +601,16 @@
     0 6px 14px rgba(16, 33, 53, 0.12);
 }
 
-.app-page--roteiros-list .roteiro-list-card__actions .btn-secondary:hover,
-.app-page--roteiros-list .roteiro-list-card__actions .btn-secondary:focus,
-.app-page--roteiros-list .roteiro-list-card__actions .btn-primary:hover,
-.app-page--roteiros-list .roteiro-list-card__actions .btn-primary:focus {
+.app-page--main-card-list .roteiro-list-card__actions .btn-secondary:hover,
+.app-page--main-card-list .roteiro-list-card__actions .btn-secondary:focus,
+.app-page--main-card-list .roteiro-list-card__actions .btn-primary:hover,
+.app-page--main-card-list .roteiro-list-card__actions .btn-primary:focus {
   background: linear-gradient(180deg, #ffffff 0%, #edf4fb 100%);
   border-color: rgba(93, 123, 161, 0.6);
   color: #12304e;
 }
 
-.app-page--roteiros-list .roteiro-list-card__actions .btn-danger {
+.app-page--main-card-list .roteiro-list-card__actions .btn-danger {
   background: linear-gradient(180deg, #d94e43 0%, #b9352e 100%);
   border-color: rgba(124, 31, 24, 0.5);
   box-shadow:
@@ -618,21 +618,21 @@
     0 6px 14px rgba(86, 18, 15, 0.22);
 }
 
-.app-page--roteiros-list .app-page__toolbar .list-search {
+.app-page--main-card-list .app-page__toolbar .list-search {
   flex: 1 1 560px;
   max-width: 720px;
 }
 
-.app-page--roteiros-list .app-page__toolbar .list-toolbar {
+.app-page--main-card-list .app-page__toolbar .list-toolbar {
   align-items: center;
   justify-content: space-between;
 }
 
-.app-page--roteiros-list .app-page__toolbar .btn-group {
+.app-page--main-card-list .app-page__toolbar .btn-group {
   margin-left: auto;
 }
 
-.app-page--roteiros-list .app-page__toolbar .btn-muted {
+.app-page--main-card-list .app-page__toolbar .btn-muted {
   background: linear-gradient(180deg, #f7fbff 0%, #e6eef8 100%);
   border-color: rgba(93, 123, 161, 0.45);
   color: #173a5f;
@@ -641,8 +641,8 @@
     0 6px 14px rgba(16, 33, 53, 0.12);
 }
 
-.app-page--roteiros-list .app-page__toolbar .btn-muted:hover,
-.app-page--roteiros-list .app-page__toolbar .btn-muted:focus {
+.app-page--main-card-list .app-page__toolbar .btn-muted:hover,
+.app-page--main-card-list .app-page__toolbar .btn-muted:focus {
   background: linear-gradient(180deg, #ffffff 0%, #edf4fb 100%);
   border-color: rgba(93, 123, 161, 0.6);
   color: #12304e;

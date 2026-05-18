@@ -1,0 +1,59 @@
+{# Lista simples com header Quick Add. Usa os mesmos tokens/estruturas do UI Lab. #}
+<div class="page-shell page-shell--list">
+  <div class="page-header-stack header-stack--quick-add">
+    <div class="page-header-band">
+      <div class="page-header-band__content">
+        <div class="page-header-band__text">
+          {% if eyebrow %}<span class="page-header-band__eyebrow">{{ eyebrow }}</span>{% endif %}
+          <h1 class="page-header-band__title">{{ title }}</h1>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-header-rail page-header-rail--filters page-header-rail--filters-quick-add">
+      {% if brand_mark %}
+        <div class="page-header-rail__marker" aria-hidden="true">{{ brand_mark }}</div>
+      {% endif %}
+
+      <form class="header-filter-bar" method="get" action="{{ request.path }}">
+        <div class="header-filter-bar__search">
+          <input
+            class="header-filter-input"
+            type="search"
+            name="q"
+            placeholder="{{ search_placeholder|default:'Buscar itens' }}"
+            aria-label="{{ search_placeholder|default:'Buscar itens' }}"
+            {% if q %}value="{{ q }}"{% endif %}
+          >
+        </div>
+        <div class="header-filter-bar__actions">
+          {% include "components/ui/buttons/button.html" with label="Buscar" variant="tool" type="submit" icon="search" only %}
+          {% if q %}
+            {% include "components/ui/buttons/button.html" with href=request.path label="Limpar filtros" variant="secondary" icon="x" only %}
+          {% endif %}
+        </div>
+      </form>
+
+      <form class="quick-add-inline__panel quick-add-panel" id="{{ quick_add_panel_id }}" method="post" hidden novalidate>
+        {% csrf_token %}
+        <div class="quick-add-inline__body">
+          <div class="quick-add-inline__fields">
+            {% include quick_add_body_template with form=quick_add_form only %}
+          </div>
+          <div class="quick-add-inline__actions">
+            {% include "components/ui/buttons/button.html" with label="Cancelar" variant="secondary" type="button" icon="x" data_quick_add_close=True only %}
+            {% include "components/ui/buttons/button.html" with label=quick_add_submit_label|default:"Salvar" variant="primary" type="submit" icon="check" only %}
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <button class="quick-add-footer-button btn btn-secondary" type="button" data-quick-add-toggle aria-controls="{{ quick_add_panel_id }}" aria-expanded="{% if quick_add_form.errors %}true{% else %}false{% endif %}">
+      <span class="quick-add-footer-button__icon" aria-hidden="true">+</span>
+      <span class="quick-add-footer-button__label">{{ quick_add_label|default:"Cadastrar item" }}</span>
+    </button>
+  </div>
+
+  {% include "components/lists/simple_list.html" with rows=rows empty_message=empty_message %}
+  {% include "components/lists/pagination.html" %}
+</div>

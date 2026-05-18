@@ -231,6 +231,11 @@ def estado_delete(request, pk):
 
 def unidades_index(request):
     q = request.GET.get("q", "").strip()
+    form = UnidadeForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        criar_unidade(form)
+        messages.success(request, "Unidade criada com sucesso.")
+        return redirect("cadastros:unidades_index")
     unidades = listar_unidades(q=q)
     rows = [
         apresentar_linha_lista_simples_unidade(
@@ -248,6 +253,7 @@ def unidades_index(request):
             "page_description": "Unidades administrativas reutilizadas nos fluxos.",
             "rows": rows,
             "q": q,
+            "quick_add_form": form,
         },
     )
 
@@ -433,6 +439,11 @@ def cidade_delete(request, pk):
 
 def cargos_index(request):
     q = request.GET.get("q", "").strip()
+    form = CargoForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        criar_cargo(form)
+        messages.success(request, "Cargo criado com sucesso.")
+        return redirect("cadastros:cargos_index")
     cargos = listar_cargos(q=q)
     rows = [
         apresentar_linha_lista_simples_cargo(
@@ -453,6 +464,7 @@ def cargos_index(request):
             "page_description": "Cadastre os cargos utilizados em servidores.",
             "rows": rows,
             "q": q,
+            "quick_add_form": form,
         },
     )
 
@@ -531,6 +543,11 @@ def cargo_delete(request, pk):
 
 def combustiveis_index(request):
     q = request.GET.get("q", "").strip()
+    form = CombustivelForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        criar_combustivel(form)
+        messages.success(request, "Combustível criado com sucesso.")
+        return redirect("cadastros:combustiveis_index")
     combustiveis = listar_combustiveis(q=q)
     rows = [
         apresentar_linha_lista_simples_combustivel(
@@ -553,6 +570,7 @@ def combustiveis_index(request):
             "page_description": "Cadastre os combustíveis disponíveis para viaturas.",
             "rows": rows,
             "q": q,
+            "quick_add_form": form,
         },
     )
 
