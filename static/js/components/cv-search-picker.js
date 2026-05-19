@@ -41,6 +41,17 @@
     };
   }
 
+  function maskDocument(value, kind) {
+    const digits = (value || "").replace(/\D/g, "");
+    if (kind === "cpf" && digits.length >= 11) {
+      return `${digits.slice(0, 3)}.***.***-${digits.slice(-2)}`;
+    }
+    if (kind === "rg" && digits.length >= 5) {
+      return `${digits.slice(0, 2)}.***.***-${digits.slice(-1)}`;
+    }
+    return value || "";
+  }
+
   /* ── Inicialização do picker ──────────────────────────────────── */
 
   function initPicker(select) {
@@ -81,16 +92,19 @@
 
     /* ── Construção do DOM ──────────────────────────────────────── */
 
-    const root = el("div", `cv-search-picker cv-search-picker--${variant}`);
-    if (mode === "single") root.classList.add("cv-search-picker--single");
+    const root = el("div", `cv-search-picker cv-search-picker--${mode} cv-search-picker--${variant}`);
     if (select.disabled)   root.classList.add("cv-search-picker--disabled");
     if (isError)           root.classList.add("cv-search-picker--error");
 
+    const fieldLabel = select.dataset.pickerLabel || "";
+    const fieldHint  = select.dataset.pickerHint  || "";
+
     /* Área de busca */
-    const searchWrap = el("div",    "cv-search-picker__search");
-    const inputWrap  = el("div",    "cv-search-picker__input-wrap");
+    const field      = el("div",    "cv-search-picker__field");
+    const control    = el("div",    "cv-search-picker__control");
+    const icon       = el("span",   "cv-search-picker__icon", "");
     const input      = el("input",  "cv-search-picker__input");
-    const clearBtn   = el("button", "cv-search-picker__clear", "×");
+    const clearBtn   = el("button", "cv-search-picker__clear", "x");
     const dropdown   = el("div",    "cv-search-picker__dropdown");
     const list       = el("div",    "cv-search-picker__list");
     const emptyEl    = el("div",    "cv-search-picker__empty", emptyMsg);
@@ -106,29 +120,33 @@
 
     clearBtn.type = "button";
     clearBtn.setAttribute("aria-label", "Limpar busca");
+    icon.setAttribute("aria-hidden", "true");
 
     list.id = listboxId;
     list.setAttribute("role", "listbox");
     list.setAttribute("aria-multiselectable", mode === "multi" ? "true" : "false");
     dropdown.hidden = true;
 
+    if (fieldLabel) field.appendChild(el("div", "cv-search-picker__label", fieldLabel));
+    if (fieldHint) field.appendChild(el("div", "cv-search-picker__hint", fieldHint));
     dropdown.appendChild(list);
     dropdown.appendChild(emptyEl);
-    inputWrap.appendChild(input);
-    inputWrap.appendChild(clearBtn);
-    searchWrap.appendChild(inputWrap);
-    searchWrap.appendChild(dropdown);
-    root.appendChild(searchWrap);
+    control.appendChild(icon);
+    control.appendChild(input);
+    control.appendChild(clearBtn);
+    field.appendChild(control);
+    field.appendChild(dropdown);
+    root.appendChild(field);
 
     /* Painel de selecionados — apenas no modo multi */
     let panel = null, grid = null, counter = null, panelEmpty = null;
     if (mode === "multi") {
-      panel      = el("section", "cv-search-picker__panel");
-      const panelHeader = el("div",  "cv-search-picker__panel-header");
-      const titleEl     = el("h4",   "cv-search-picker__panel-title", panelTitle);
-      counter    = el("span", "cv-search-picker__counter", "0");
-      grid       = el("div",  "cv-search-picker__grid");
-      panelEmpty = el("p",    "cv-search-picker__panel-empty", emptyPanelMsg);
+      panel      = el("section", "cv-search-picker__selected-panel");
+      const panelHeader = el("div",  "cv-search-picker__selected-header");
+      const titleEl     = el("h4",   "cv-search-picker__selected-title", panelTitle);
+      counter    = el("span", "cv-search-picker__selected-count", "0");
+      grid       = el("div",  "cv-search-picker__selected-list");
+      panelEmpty = el("p",    "cv-search-picker__selected-empty", emptyPanelMsg);
 
       panelHeader.appendChild(titleEl);
       panelHeader.appendChild(counter);
@@ -235,8 +253,8 @@
 
     function renderOptionItem(item, index) {
       const btn    = el("button", "cv-search-picker__option");
-      const marker = el("span",   "cv-search-picker__option-marker", "✓");
-      const body   = el("div",    "cv-search-picker__option-body");
+      const marker = el("span",   "cv-search-picker__option-marker", "");
+      const body   = el("div",    "cv-search-picker__option-content");
       const main   = el("span",   "cv-search-picker__option-main", item.main || item.label);
 
       btn.type = "button";
@@ -271,19 +289,19 @@
 
     function buildTermControl(value) {
       const enabled = selectedForTerm.has(value);
-      const row     = el("div",  "cv-term-control");
-      const label   = el("span", "cv-term-control__label", "Termo de Autorização");
-      const choice  = el("div",  "cv-term-control__choice");
+      const row     = el("div",  "cv-search-picker__term-control");
+      const label   = el("span", "cv-search-picker__term-label", "Termo de Autorizacao");
+      const choice  = el("div",  "cv-search-picker__term-options");
 
-      const btnNo  = el("button", "cv-term-control__option cv-term-control__option--no",  "Não gerar");
-      const btnYes = el("button", "cv-term-control__option cv-term-control__option--yes", "Gerar");
+      const btnNo  = el("button", "cv-search-picker__term-option cv-search-picker__term-option--no",  "Nao gerar");
+      const btnYes = el("button", "cv-search-picker__term-option cv-search-picker__term-option--yes", "Gerar");
 
       btnNo.type  = "button";
       btnYes.type = "button";
       btnNo.setAttribute("aria-pressed",  !enabled ? "true" : "false");
       btnYes.setAttribute("aria-pressed",  enabled ? "true" : "false");
-      btnNo.classList.toggle("cv-term-control__option--active",  !enabled);
-      btnYes.classList.toggle("cv-term-control__option--active",  enabled);
+      btnNo.classList.toggle("cv-search-picker__term-option--active",  !enabled);
+      btnYes.classList.toggle("cv-search-picker__term-option--active",  enabled);
       btnNo.addEventListener("click",  () => setTermValue(value, false));
       btnYes.addEventListener("click", () => setTermValue(value, true));
 
@@ -297,15 +315,15 @@
     /* ── Render: Cards selecionados ─────────────────────────────── */
 
     function buildCard(item) {
-      const card = el("div", "cv-search-picker__card");
+      const card = el("div", "cv-search-picker__selected-card");
       card.dataset.value = item.value;
 
-      const body = el("div",  "cv-search-picker__card-body");
-      const name = el("span", "cv-search-picker__card-name", item.label);
+      const body = el("div",  "cv-search-picker__selected-main");
+      const name = el("span", "cv-search-picker__selected-name", item.label);
       const metaParts = [item.cargo, item.unidade].filter(Boolean);
       const meta = el(
         "span",
-        "cv-search-picker__card-meta",
+        "cv-search-picker__selected-meta",
         metaParts.length ? metaParts.join(" • ") : "Dados complementares não informados",
       );
       body.appendChild(name);
@@ -313,13 +331,13 @@
 
       /* Detalhe: CPF / RG — exibido pelo CSS apenas no modo --detailed */
       const detailParts = [];
-      if (item.cpf) detailParts.push("CPF: " + item.cpf);
-      if (item.rg)  detailParts.push("RG: "  + item.rg);
+      if (item.cpf) detailParts.push("CPF: " + maskDocument(item.cpf, "cpf"));
+      if (item.rg)  detailParts.push("RG: "  + maskDocument(item.rg, "rg"));
       if (detailParts.length) {
-        body.appendChild(el("span", "cv-search-picker__card-detail", detailParts.join("  •  ")));
+        body.appendChild(el("span", "cv-search-picker__selected-detail", detailParts.join("  •  ")));
       }
 
-      const removeBtn = el("button", "cv-search-picker__card-remove", "×");
+      const removeBtn = el("button", "cv-search-picker__remove", "x");
       removeBtn.type = "button";
       removeBtn.setAttribute("aria-label", "Remover " + item.label);
       removeBtn.addEventListener("click", () => removeItem(item.value));
@@ -330,7 +348,7 @@
       /* Controle de Termo */
       if (showTermCtrl) {
         card.appendChild(buildTermControl(item.value));
-        card.classList.toggle("cv-search-picker__card--has-termo", selectedForTerm.has(item.value));
+        card.classList.toggle("cv-search-picker__selected-card--has-term", selectedForTerm.has(item.value));
       }
 
       return card;

@@ -988,8 +988,9 @@
           </select>
 
           {# ── 1. Search Picker simples (single) ──────────────────────── #}
-          <div>
-            <p class="cv-field__label">1 — Search Picker simples (modo single) — valor no input, sem painel</p>
+          <div class="cv-search-picker-demo-card">
+            <p class="cv-search-picker-demo-card__title">1 — Search Picker simples</p>
+            <p class="cv-search-picker-demo-card__description">Modo single com busca por destino e valor sincronizado no select oculto.</p>
             <select
               id="lab-picker-single"
               name="lab-picker-single"
@@ -997,6 +998,8 @@
               data-cv-search-picker="true"
               data-picker-mode="single"
               data-picker-variant="compact"
+              data-picker-label="Destino"
+              data-picker-hint="Digite para localizar uma cidade cadastrada."
               data-placeholder="Buscar destino"
               data-empty-message="Nenhum destino encontrado."
             >
@@ -1012,8 +1015,9 @@
           {# ── 2 & 3. Multiselect compacto e detalhado ────────────────── #}
           <div class="cv-field-grid cv-field-grid--2">
 
-            <div>
-              <p class="cv-field__label">2 — Multiselect compacto (cards em 2 colunas, sem CPF/RG)</p>
+            <div class="cv-search-picker-demo-card">
+              <p class="cv-search-picker-demo-card__title">2 — Multiselect compacto</p>
+              <p class="cv-search-picker-demo-card__description">Selecao densa com cards compactos, contador e remocao por item.</p>
               <select
                 id="lab-picker-multi-compact"
                 name="lab-picker-multi-compact"
@@ -1021,6 +1025,8 @@
                 data-cv-search-picker="true"
                 data-picker-mode="multi"
                 data-picker-variant="compact"
+                data-picker-label="Viajantes"
+                data-picker-hint="Busque por nome, cargo ou unidade."
                 data-panel-title="VIAJANTES SELECIONADOS"
                 data-placeholder="Digite nome, cargo ou unidade"
                 data-empty-message="Nenhum servidor encontrado."
@@ -1035,8 +1041,9 @@
               </select>
             </div>
 
-            <div>
-              <p class="cv-field__label">3 — Multiselect detalhado (cards com CPF e RG visíveis)</p>
+            <div class="cv-search-picker-demo-card">
+              <p class="cv-search-picker-demo-card__title">3 — Multiselect detalhado</p>
+              <p class="cv-search-picker-demo-card__description">Cards com metadados completos para revisao de equipe.</p>
               <select
                 id="lab-picker-multi-detailed"
                 name="lab-picker-multi-detailed"
@@ -1044,6 +1051,8 @@
                 data-cv-search-picker="true"
                 data-picker-mode="multi"
                 data-picker-variant="detailed"
+                data-picker-label="Equipe"
+                data-picker-hint="Inclui CPF e RG fake mascarados nos selecionados."
                 data-panel-title="EQUIPE DO OFICIO"
                 data-placeholder="Buscar por nome, CPF ou RG"
                 data-empty-message="Nenhum resultado encontrado."
@@ -1061,8 +1070,9 @@
           </div>
 
           {# ── 4. Servidores compacto com Termo ───────────────────────── #}
-          <div>
-            <p class="cv-field__label">4 — Servidores compacto com Termo de Autorização (Ana e Bruno pré-selecionados)</p>
+          <div class="cv-search-picker-demo-card cv-search-picker-demo-card--wide">
+            <p class="cv-search-picker-demo-card__title">4 — Servidores compacto com Termo</p>
+            <p class="cv-search-picker-demo-card__description">Ana e Bruno pre-selecionados com controle binario de termo por servidor.</p>
             <select
               id="lab-picker-termo-compact"
               name="lab-picker-termo-compact"
@@ -1071,6 +1081,8 @@
               data-picker-mode="multi"
               data-picker-variant="compact"
               data-picker-term-control="true"
+              data-picker-label="Servidores"
+              data-picker-hint="Cada selecionado controla se o termo sera gerado."
               data-cv-termos-name="lab-termos-tc"
               data-panel-title="VIAJANTES SELECIONADOS"
               data-placeholder="Buscar por nome, CPF ou RG"
@@ -1087,8 +1099,9 @@
           </div>
 
           {# ── 5. Servidores detalhado com Termo ──────────────────────── #}
-          <div>
-            <p class="cv-field__label">5 — Servidores detalhado com Termo de Autorização (Ana pré-selecionada)</p>
+          <div class="cv-search-picker-demo-card cv-search-picker-demo-card--wide">
+            <p class="cv-search-picker-demo-card__title">5 — Servidores detalhado com Termo</p>
+            <p class="cv-search-picker-demo-card__description">Variante rica com documentos fake, unidade e termo individual.</p>
             <select
               id="lab-picker-termo-detailed"
               name="lab-picker-termo-detailed"
@@ -1097,6 +1110,8 @@
               data-picker-mode="multi"
               data-picker-variant="detailed"
               data-picker-term-control="true"
+              data-picker-label="Equipe com autorizacao"
+              data-picker-hint="Use o controle segmentado de cada card para alternar o termo."
               data-cv-termos-name="lab-termos-td"
               data-panel-title="EQUIPE DO OFICIO"
               data-placeholder="Buscar por nome, CPF ou RG"
@@ -1115,8 +1130,9 @@
           {# ── 6 & 7. Estados especiais ────────────────────────────────── #}
           <div class="cv-field-grid cv-field-grid--2">
 
-            <div>
-              <p class="cv-field__label">6 — Estado de erro (borda vermelha + mensagem)</p>
+            <div class="cv-search-picker-demo-card">
+              <p class="cv-search-picker-demo-card__title">6 — Estado erro</p>
+              <p class="cv-search-picker-demo-card__description">Erro com borda e mensagem sem quebrar a hierarquia visual.</p>
               <select
                 id="lab-picker-error"
                 name="lab-picker-error"
@@ -1125,6 +1141,8 @@
                 data-picker-mode="multi"
                 data-picker-variant="compact"
                 data-picker-error="true"
+                data-picker-label="Viajantes obrigatorios"
+                data-picker-hint="O componente preserva o layout mesmo no estado invalido."
                 data-panel-title="VIAJANTES"
                 data-placeholder="Digite para buscar"
                 data-empty-message="Nenhum servidor encontrado."
@@ -1138,8 +1156,9 @@
               <p class="cv-search-picker__error-msg">Selecione pelo menos um viajante para continuar.</p>
             </div>
 
-            <div>
-              <p class="cv-field__label">7 — Estado disabled (Ana pre-selecionada, card opaco)</p>
+            <div class="cv-search-picker-demo-card">
+              <p class="cv-search-picker-demo-card__title">7 — Estado disabled</p>
+              <p class="cv-search-picker-demo-card__description">Controle bloqueado com selecionados ainda legiveis.</p>
               <select
                 id="lab-picker-disabled"
                 name="lab-picker-disabled"
@@ -1147,6 +1166,8 @@
                 data-cv-search-picker="true"
                 data-picker-mode="multi"
                 data-picker-variant="compact"
+                data-picker-label="Viajantes bloqueados"
+                data-picker-hint="Campo indisponivel para edicao neste fluxo."
                 data-panel-title="VIAJANTES"
                 data-placeholder="Campo desabilitado"
                 data-empty-message="Nenhum servidor encontrado."

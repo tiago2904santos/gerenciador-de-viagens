@@ -129,6 +129,52 @@ html[data-theme="dark"] .ui-lab-page {
   padding: var(--space-3) var(--space-4);
 }
 
+/* =========================================================
+   Search picker demos
+   ========================================================= */
+
+#fields-search-picker .cv-field-panel__body {
+  gap: var(--space-5);
+}
+
+.cv-search-picker-demo-card {
+  background: var(--theme-surface-card);
+  border: 1px solid var(--theme-border-card);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-xs);
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: var(--space-4);
+}
+
+.cv-search-picker-demo-card--wide {
+  grid-column: 1 / -1;
+}
+
+.cv-search-picker-demo-card__title {
+  color: var(--theme-text-heading);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-extrabold);
+  line-height: 1.25;
+  margin: 0;
+}
+
+.cv-search-picker-demo-card__description {
+  color: var(--theme-text-muted);
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+  margin: calc(var(--space-2) * -1) 0 var(--space-1);
+}
+
+#fields-search-picker .cv-field-grid {
+  align-items: stretch;
+}
+
+#fields-search-picker .cv-field-grid > .cv-search-picker-demo-card {
+  height: 100%;
+}
+
 .cv-field-surface {
   background: var(--theme-surface-card);
   border: 1px solid var(--theme-border-card);
