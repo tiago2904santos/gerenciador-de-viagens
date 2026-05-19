@@ -155,7 +155,10 @@
               </span>
             </div>
             <div class="cv-field cv-field--error">
-              <label class="cv-field__label" for="field-select-error">Erro</label>
+              <div class="cv-field__label-row">
+                <label class="cv-field__label" for="field-select-error">Erro <span class="cv-field__required" aria-hidden="true">*</span></label>
+                <span class="cv-field__error-badge">Erro</span>
+              </div>
               <span class="cv-select__wrapper cv-select--error">
                 <select class="cv-select__control" id="field-select-error" aria-invalid="true" aria-describedby="field-select-error-text">
                   <option>Selecao invalida</option>
@@ -282,37 +285,6 @@
             <code>.cv-select--sm</code>, <code>.cv-select--md</code>, <code>.cv-select--lg</code>,
             <code>.cv-select--disabled</code>, <code>.cv-select--error</code> e
             <code>.cv-field-with-action</code>.
-          </div>
-        </div>
-      </article>
-                <option>Motorista</option>
-                <option>Tecnico</option>
-              </select>
-            </div>
-            <div class="cv-field">
-              <label class="cv-field__label" for="field-unidade">Unidade</label>
-              <select class="cv-field__control cv-field__control--select" id="field-unidade">
-                <option>SEJUS / PR</option>
-                <option>SEAP / PR</option>
-                <option>Gabinete</option>
-              </select>
-            </div>
-            <div class="cv-field">
-              <label class="cv-field__label" for="field-estado">Estado / UF</label>
-              <select class="cv-field__control cv-field__control--select" id="field-estado">
-                <option>PR</option>
-                <option>SC</option>
-                <option>SP</option>
-              </select>
-            </div>
-            <div class="cv-field">
-              <label class="cv-field__label" for="field-status">Status</label>
-              <select class="cv-field__control cv-field__control--select" id="field-status">
-                <option>Rascunho</option>
-                <option>Pendente</option>
-                <option>Finalizado</option>
-              </select>
-            </div>
           </div>
         </div>
       </article>
@@ -629,31 +601,37 @@
           <div class="cv-field-grid cv-field-grid--2">
             <div class="cv-field">
               <label class="cv-field__label" for="field-action-cargo">Cargo</label>
-              <div class="cv-field__control-row">
-                <select class="cv-field__control cv-field__control--select" id="field-action-cargo">
-                  <option>Analista administrativa</option>
-                  <option>Tecnico</option>
-                </select>
+              <div class="cv-field-with-action">
+                <span class="cv-select__wrapper">
+                  <select class="cv-select__control" id="field-action-cargo">
+                    <option>Analista administrativa</option>
+                    <option>Tecnico</option>
+                  </select>
+                </span>
                 <button class="cv-field-action cv-field-action--manage" type="button">Gerenciar cargo</button>
               </div>
             </div>
             <div class="cv-field">
               <label class="cv-field__label" for="field-action-unidade">Unidade</label>
-              <div class="cv-field__control-row">
-                <select class="cv-field__control cv-field__control--select" id="field-action-unidade">
-                  <option>SEJUS / PR</option>
-                  <option>SEAP / PR</option>
-                </select>
+              <div class="cv-field-with-action">
+                <span class="cv-select__wrapper">
+                  <select class="cv-select__control" id="field-action-unidade">
+                    <option>SEJUS / PR</option>
+                    <option>SEAP / PR</option>
+                  </select>
+                </span>
                 <button class="cv-field-action cv-field-action--manage" type="button">Gerenciar unidade</button>
               </div>
             </div>
             <div class="cv-field">
               <label class="cv-field__label" for="field-action-combustivel">Combustivel</label>
-              <div class="cv-field__control-row">
-                <select class="cv-field__control cv-field__control--select" id="field-action-combustivel">
-                  <option>Diesel S10</option>
-                  <option>Gasolina comum</option>
-                </select>
+              <div class="cv-field-with-action">
+                <span class="cv-select__wrapper">
+                  <select class="cv-select__control" id="field-action-combustivel">
+                    <option>Diesel S10</option>
+                    <option>Gasolina comum</option>
+                  </select>
+                </span>
                 <button class="cv-field-action cv-field-action--manage" type="button">Gerenciar combustiveis</button>
               </div>
             </div>
@@ -681,24 +659,24 @@
           <div class="cv-field-grid cv-field-grid--2">
             <div class="cv-multiselect">
               <div class="cv-field">
-                <label class="cv-field__label" for="multiselect-viajantes">Viajantes</label>
+                <label class="cv-field__label" for="multiselect-viajantes">Multiselect com chips e dropdown aberto</label>
                 <div class="cv-multiselect__control">
                   <div class="cv-multiselect__header">
-                    <input class="cv-multiselect__search" type="search" id="multiselect-viajantes" placeholder="Buscar servidor, viajante ou documento">
+                    <input class="cv-multiselect__search" type="search" id="multiselect-viajantes" value="ser" placeholder="Buscar servidor, viajante ou documento">
                     <span class="cv-multiselect__count">3 selecionados</span>
                   </div>
                   <div class="cv-multiselect__chips" aria-label="Itens selecionados">
                     <span class="cv-multiselect__chip">
                       <span class="cv-multiselect__chip-label">Ana Souza</span>
-                      <button class="cv-multiselect__chip-remove" type="button" aria-label="Remover Ana Souza">×</button>
+                      <button class="cv-multiselect__chip-remove" type="button" aria-label="Remover Ana Souza">&times;</button>
                     </span>
                     <span class="cv-multiselect__chip">
                       <span class="cv-multiselect__chip-label">Bruno Lima</span>
-                      <button class="cv-multiselect__chip-remove" type="button" aria-label="Remover Bruno Lima">×</button>
+                      <button class="cv-multiselect__chip-remove" type="button" aria-label="Remover Bruno Lima">&times;</button>
                     </span>
                     <span class="cv-multiselect__chip">
                       <span class="cv-multiselect__chip-label">Camila Reis</span>
-                      <button class="cv-multiselect__chip-remove" type="button" aria-label="Remover Camila Reis">×</button>
+                      <button class="cv-multiselect__chip-remove" type="button" aria-label="Remover Camila Reis">&times;</button>
                     </span>
                   </div>
                 </div>
@@ -712,7 +690,7 @@
                 <div class="cv-multiselect__option cv-multiselect__option--active">
                   <span class="cv-multiselect__option-marker" aria-hidden="true"></span>
                   <span class="cv-multiselect__option-label">Bruno Lima</span>
-                  <span class="cv-multiselect__option-meta">Servidor</span>
+                  <span class="cv-multiselect__option-meta">Hover / foco</span>
                 </div>
                 <div class="cv-multiselect__option">
                   <span class="cv-multiselect__option-marker" aria-hidden="true"></span>
@@ -723,25 +701,63 @@
             </div>
             <div class="cv-multiselect">
               <div class="cv-field">
-                <label class="cv-field__label" for="multiselect-empty">Servidor / documento vinculado</label>
+                <label class="cv-field__label" for="multiselect-search-empty">Select com busca vazio</label>
                 <div class="cv-multiselect__control">
                   <div class="cv-multiselect__header">
-                    <input class="cv-multiselect__search" type="search" id="multiselect-empty" placeholder="Buscar itens">
+                    <input class="cv-multiselect__search" type="search" id="multiselect-search-empty" placeholder="Buscar itens">
                     <span class="cv-multiselect__count">Estado vazio</span>
                   </div>
                   <div class="cv-multiselect__empty">Nenhum item selecionado. Comece digitando para buscar.</div>
                 </div>
               </div>
-              <div class="cv-field cv-field--error">
-                <label class="cv-field__label" for="multiselect-error">Destino vinculado <span class="cv-field__required" aria-hidden="true">*</span></label>
+              <div class="cv-field">
+                <label class="cv-field__label" for="multiselect-search-filled">Select com busca preenchido</label>
                 <div class="cv-multiselect__control">
                   <div class="cv-multiselect__header">
-                    <input class="cv-multiselect__search" type="search" id="multiselect-error" placeholder="Buscar destino" aria-invalid="true" aria-describedby="multiselect-error-text">
-                    <span class="cv-multiselect__count">Erro</span>
+                    <input class="cv-multiselect__search" type="search" id="multiselect-search-filled" value="Unidade administrativa" placeholder="Buscar unidade">
+                    <span class="cv-multiselect__count">1 selecionado</span>
                   </div>
-                  <div class="cv-multiselect__empty">Selecione ao menos um destino para continuar.</div>
+                  <div class="cv-multiselect__chips" aria-label="Item selecionado">
+                    <span class="cv-multiselect__chip">
+                      <span class="cv-multiselect__chip-label">SEJUS / PR</span>
+                      <button class="cv-multiselect__chip-remove" type="button" aria-label="Remover SEJUS / PR">&times;</button>
+                    </span>
+                  </div>
                 </div>
-                <p class="cv-field__error" id="multiselect-error-text">Selecao obrigatoria para vincular o documento.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="cv-field-grid cv-field-grid--2">
+            <div class="cv-field cv-field--error">
+              <div class="cv-field__label-row">
+                <label class="cv-field__label" for="multiselect-error">Multiselect em erro <span class="cv-field__required" aria-hidden="true">*</span></label>
+                <span class="cv-field__error-badge">Erro</span>
+              </div>
+              <div class="cv-multiselect__control">
+                <div class="cv-multiselect__header">
+                  <input class="cv-multiselect__search" type="search" id="multiselect-error" placeholder="Buscar destino" aria-invalid="true" aria-describedby="multiselect-error-text">
+                  <span class="cv-multiselect__count">Obrigatorio</span>
+                </div>
+                <div class="cv-multiselect__empty">Selecione ao menos um destino para continuar.</div>
+              </div>
+              <p class="cv-field__error" id="multiselect-error-text">Selecao obrigatoria para vincular o documento.</p>
+            </div>
+            <div class="cv-multiselect cv-multiselect--disabled">
+              <div class="cv-field cv-field--disabled">
+                <label class="cv-field__label" for="multiselect-disabled">Multiselect disabled</label>
+                <div class="cv-multiselect__control">
+                  <div class="cv-multiselect__header">
+                    <input class="cv-multiselect__search" type="search" id="multiselect-disabled" value="Indisponivel" disabled>
+                    <span class="cv-multiselect__count">Bloqueado</span>
+                  </div>
+                  <div class="cv-multiselect__chips" aria-label="Item selecionado indisponivel">
+                    <span class="cv-multiselect__chip">
+                      <span class="cv-multiselect__chip-label">Documento travado</span>
+                      <button class="cv-multiselect__chip-remove" type="button" aria-label="Remover Documento travado" disabled>&times;</button>
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
