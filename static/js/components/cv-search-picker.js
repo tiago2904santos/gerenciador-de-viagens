@@ -3,7 +3,7 @@
 
   const SELECTOR = "select[data-cv-search-picker]";
 
-  /* ── Utilitários ────────────────────────────────────────────────── */
+  /* ── Utilitários ─────────────────────────────────────────────── */
 
   function normalize(value) {
     return (value || "")
@@ -27,33 +27,36 @@
 
   function readOption(option) {
     return {
-      cargo: option.dataset.cargo || "",
-      cpf: option.dataset.cpf || "",
+      cargo:    option.dataset.cargo    || "",
+      cpf:      option.dataset.cpf      || "",
       disabled: option.disabled,
-      label: (option.textContent || "").trim(),
-      main: option.dataset.main || (option.textContent || "").trim(),
-      meta: option.dataset.meta || option.dataset.unidade || "",
-      rg: option.dataset.rg || "",
-      search: option.dataset.search || option.textContent || "",
+      label:    (option.textContent || "").trim(),
+      main:     option.dataset.main     || (option.textContent || "").trim(),
+      meta:     option.dataset.meta     || option.dataset.unidade || "",
+      rg:       option.dataset.rg       || "",
+      search:   option.dataset.search   || option.textContent    || "",
       selected: option.selected,
-      unidade: option.dataset.unidade || "",
-      value: option.value,
+      unidade:  option.dataset.unidade  || "",
+      value:    option.value,
     };
   }
 
-  /* ── Inicialização do picker ────────────────────────────────────── */
+  /* ── Inicialização do picker ──────────────────────────────────── */
 
   function initPicker(select) {
     if (!select || select.dataset.cvSearchPickerReady === "true") return;
     select.dataset.cvSearchPickerReady = "true";
 
     /* Configuração via data-* */
-    const mode         = select.dataset.pickerMode    || "compact";
-    const placeholder  = select.dataset.placeholder   || "Digite para buscar";
-    const emptyMsg     = select.dataset.emptyMessage  || "Nenhum resultado encontrado.";
-    const emptyPanelMsg = select.dataset.emptySelected || "Nenhum item selecionado.";
-    const panelTitle   = select.dataset.panelTitle    || "SELECIONADOS";
-    const termosName   = select.dataset.cvTermosName  || "";
+    const mode         = select.dataset.pickerMode        || "multi";   /* single | multi */
+    const variant      = select.dataset.pickerVariant     || "compact"; /* compact | detailed */
+    const placeholder  = select.dataset.placeholder       || "Digite para buscar";
+    const emptyMsg     = select.dataset.emptyMessage      || "Nenhum resultado encontrado.";
+    const emptyPanelMsg = select.dataset.emptySelected    || "Nenhum item selecionado.";
+    const panelTitle   = select.dataset.panelTitle        || "SELECIONADOS";
+    const termosName   = select.dataset.cvTermosName      || "";
+    const showTermCtrl = select.dataset.pickerTermControl === "true" || !!termosName;
+    const isError      = select.dataset.pickerError       === "true";
     const listboxId    = `${select.id || select.name || "cv-picker"}-results`;
 
     /* Estado */
@@ -71,7 +74,6 @@
       termSelect = scope.querySelector(`select[name="${CSS.escape(termosName)}"]`);
     }
     if (termSelect) {
-      /* Carrega estado inicial do select de termos */
       Array.from(termSelect.selectedOptions).forEach((o) => {
         if (o.value) selectedForTerm.add(o.value);
       });
@@ -79,49 +81,63 @@
 
     /* ── Construção do DOM ──────────────────────────────────────── */
 
-    const root = el("div", `cv-search-picker cv-search-picker--${mode}`);
+    const root = el("div", `cv-search-picker cv-search-picker--${variant}`);
+    if (mode === "single") root.classList.add("cv-search-picker--single");
+    if (select.disabled)   root.classList.add("cv-search-picker--disabled");
+    if (isError)           root.classList.add("cv-search-picker--error");
 
     /* Área de busca */
-    const searchWrap = el("div", "cv-search-picker__search");
-    const input      = el("input", "cv-search-picker__input");
-    const dropdown   = el("div", "cv-search-picker__dropdown");
-    const list       = el("div", "cv-search-picker__list");
-    const emptyEl    = el("div", "cv-search-picker__empty", emptyMsg);
+    const searchWrap = el("div",    "cv-search-picker__search");
+    const inputWrap  = el("div",    "cv-search-picker__input-wrap");
+    const input      = el("input",  "cv-search-picker__input");
+    const clearBtn   = el("button", "cv-search-picker__clear", "×");
+    const dropdown   = el("div",    "cv-search-picker__dropdown");
+    const list       = el("div",    "cv-search-picker__list");
+    const emptyEl    = el("div",    "cv-search-picker__empty", emptyMsg);
 
-    input.type          = "search";
-    input.placeholder   = placeholder;
-    input.autocomplete  = "off";
-    input.disabled      = select.disabled;
+    input.type         = "search";
+    input.placeholder  = placeholder;
+    input.autocomplete = "off";
+    input.disabled     = select.disabled;
     input.setAttribute("role", "combobox");
     input.setAttribute("aria-expanded", "false");
     input.setAttribute("aria-controls", listboxId);
     input.setAttribute("aria-autocomplete", "list");
+
+    clearBtn.type = "button";
+    clearBtn.setAttribute("aria-label", "Limpar busca");
+
     list.id = listboxId;
     list.setAttribute("role", "listbox");
-    list.setAttribute("aria-multiselectable", "true");
+    list.setAttribute("aria-multiselectable", mode === "multi" ? "true" : "false");
     dropdown.hidden = true;
 
     dropdown.appendChild(list);
     dropdown.appendChild(emptyEl);
-    searchWrap.appendChild(input);
+    inputWrap.appendChild(input);
+    inputWrap.appendChild(clearBtn);
+    searchWrap.appendChild(inputWrap);
     searchWrap.appendChild(dropdown);
-
-    /* Painel de selecionados */
-    const panel       = el("section", "cv-search-picker__panel");
-    const panelHeader = el("div",     "cv-search-picker__panel-header");
-    const titleEl     = el("h4",      "cv-search-picker__panel-title", panelTitle);
-    const counter     = el("span",    "cv-search-picker__counter", "0");
-    const grid        = el("div",     "cv-search-picker__grid");
-    const panelEmpty  = el("p",       "cv-search-picker__panel-empty", emptyPanelMsg);
-
-    panelHeader.appendChild(titleEl);
-    panelHeader.appendChild(counter);
-    panel.appendChild(panelHeader);
-    panel.appendChild(grid);
-    panel.appendChild(panelEmpty);
-
     root.appendChild(searchWrap);
-    root.appendChild(panel);
+
+    /* Painel de selecionados — apenas no modo multi */
+    let panel = null, grid = null, counter = null, panelEmpty = null;
+    if (mode === "multi") {
+      panel      = el("section", "cv-search-picker__panel");
+      const panelHeader = el("div",  "cv-search-picker__panel-header");
+      const titleEl     = el("h4",   "cv-search-picker__panel-title", panelTitle);
+      counter    = el("span", "cv-search-picker__counter", "0");
+      grid       = el("div",  "cv-search-picker__grid");
+      panelEmpty = el("p",    "cv-search-picker__panel-empty", emptyPanelMsg);
+
+      panelHeader.appendChild(titleEl);
+      panelHeader.appendChild(counter);
+      panel.appendChild(panelHeader);
+      panel.appendChild(grid);
+      panel.appendChild(panelEmpty);
+      root.appendChild(panel);
+    }
+
     select.insertAdjacentElement("afterend", root);
 
     /* ── Helpers de estado ──────────────────────────────────────── */
@@ -133,6 +149,9 @@
     function filteredItems() {
       const term = normalize(query);
       if (!term) return [];
+      if (mode === "single") {
+        return options.filter((o) => normalize(o.search).includes(term));
+      }
       return options.filter((o) => !o.selected && normalize(o.search).includes(term));
     }
 
@@ -150,6 +169,10 @@
       dispatchChange(termSelect);
     }
 
+    function setHasQuery(val) {
+      root.classList.toggle("cv-search-picker--has-query", val);
+    }
+
     function setOpen(next) {
       isOpen = next && !!query && !select.disabled;
       dropdown.hidden = !isOpen;
@@ -162,13 +185,26 @@
 
     function selectItem(value) {
       const item = options.find((o) => o.value === value);
-      if (!item || item.disabled || item.selected) return;
-      item.selected = true;
-      /* Novos itens entram com "Gerar" ativo por padrão */
-      if (termSelect) selectedForTerm.add(value);
-      query       = "";
+      if (!item || item.disabled) return;
+
+      if (mode === "single") {
+        /* Deseleciona tudo e seleciona só o item escolhido */
+        options.forEach((o) => { o.selected = false; });
+        item.selected = true;
+        input.value   = item.label;
+        query         = "";
+        setHasQuery(true); /* mantém o clear visível com o valor preenchido */
+      } else {
+        if (item.selected) return;
+        item.selected = true;
+        if (showTermCtrl) selectedForTerm.add(value);
+        query       = "";
+        activeIndex = -1;
+        input.value = "";
+        setHasQuery(false);
+      }
+
       activeIndex = -1;
-      input.value = "";
       syncSelect(true);
       syncTermSelect();
       render();
@@ -195,19 +231,28 @@
       renderSelectedCards();
     }
 
-    /* ── Render: Resultados do dropdown ────────────────────────── */
+    /* ── Render: Resultados do dropdown ─────────────────────────── */
 
-    function renderResultItem(item, index) {
-      const btn  = el("button", "cv-search-picker__result");
-      const main = el("span", "cv-search-picker__result-main", item.main || item.label);
-      const meta = el("span", "cv-search-picker__result-meta", item.meta || "Sem unidade informada");
+    function renderOptionItem(item, index) {
+      const btn    = el("button", "cv-search-picker__option");
+      const marker = el("span",   "cv-search-picker__option-marker", "✓");
+      const body   = el("div",    "cv-search-picker__option-body");
+      const main   = el("span",   "cv-search-picker__option-main", item.main || item.label);
+
       btn.type = "button";
       btn.dataset.value = item.value;
       btn.setAttribute("role", "option");
-      btn.setAttribute("aria-selected", "false");
-      btn.classList.toggle("cv-search-picker__result--active", index === activeIndex);
-      btn.appendChild(main);
-      btn.appendChild(meta);
+      btn.setAttribute("aria-selected", item.selected ? "true" : "false");
+      btn.classList.toggle("cv-search-picker__option--active",   index === activeIndex);
+      btn.classList.toggle("cv-search-picker__option--selected", item.selected);
+
+      body.appendChild(main);
+      if (item.meta) {
+        body.appendChild(el("span", "cv-search-picker__option-meta", item.meta));
+      }
+
+      btn.appendChild(marker);
+      btn.appendChild(body);
       btn.addEventListener("mousedown", (e) => e.preventDefault());
       btn.addEventListener("click", () => selectItem(item.value));
       return btn;
@@ -217,9 +262,9 @@
       const visible = filteredItems();
       list.innerHTML = "";
       if (activeIndex >= visible.length) activeIndex = visible.length - 1;
-      visible.forEach((item, i) => list.appendChild(renderResultItem(item, i)));
-      emptyEl.hidden   = !query || visible.length > 0;
-      dropdown.hidden  = !isOpen || (!query && visible.length === 0);
+      visible.forEach((item, i) => list.appendChild(renderOptionItem(item, i)));
+      emptyEl.hidden  = !query || visible.length > 0;
+      dropdown.hidden = !isOpen || (!query && visible.length === 0);
     }
 
     /* ── Render: Controle de Termo ──────────────────────────────── */
@@ -252,7 +297,7 @@
     /* ── Render: Cards selecionados ─────────────────────────────── */
 
     function buildCard(item) {
-      const card   = el("div",  "cv-search-picker__card");
+      const card = el("div", "cv-search-picker__card");
       card.dataset.value = item.value;
 
       const body = el("div",  "cv-search-picker__card-body");
@@ -266,24 +311,24 @@
       body.appendChild(name);
       body.appendChild(meta);
 
-      /* Linha de detalhe: visível no modo --detailed */
+      /* Detalhe: CPF / RG — exibido pelo CSS apenas no modo --detailed */
       const detailParts = [];
-      if (item.cpf) detailParts.push(`CPF: ${item.cpf}`);
-      if (item.rg)  detailParts.push(`RG: ${item.rg}`);
+      if (item.cpf) detailParts.push("CPF: " + item.cpf);
+      if (item.rg)  detailParts.push("RG: "  + item.rg);
       if (detailParts.length) {
         body.appendChild(el("span", "cv-search-picker__card-detail", detailParts.join("  •  ")));
       }
 
       const removeBtn = el("button", "cv-search-picker__card-remove", "×");
       removeBtn.type = "button";
-      removeBtn.setAttribute("aria-label", `Remover ${item.label}`);
+      removeBtn.setAttribute("aria-label", "Remover " + item.label);
       removeBtn.addEventListener("click", () => removeItem(item.value));
 
       card.appendChild(body);
       card.appendChild(removeBtn);
 
-      /* Controle de Termo — somente quando há select de termos vinculado */
-      if (termSelect) {
+      /* Controle de Termo */
+      if (showTermCtrl) {
         card.appendChild(buildTermControl(item.value));
         card.classList.toggle("cv-search-picker__card--has-termo", selectedForTerm.has(item.value));
       }
@@ -292,18 +337,19 @@
     }
 
     function renderSelectedCards() {
+      if (!grid) return;
       const sel = selectedItems();
       grid.innerHTML = "";
       sel.forEach((item) => grid.appendChild(buildCard(item)));
-      panelEmpty.hidden     = sel.length > 0;
-      counter.textContent   = String(sel.length);
+      if (panelEmpty) panelEmpty.hidden = sel.length > 0;
+      if (counter)    counter.textContent = String(sel.length);
     }
 
     /* ── Render principal ───────────────────────────────────────── */
 
     function render() {
       renderResults();
-      renderSelectedCards();
+      if (mode === "multi") renderSelectedCards();
     }
 
     /* ── Eventos ────────────────────────────────────────────────── */
@@ -315,8 +361,24 @@
     input.addEventListener("input", () => {
       query       = input.value;
       activeIndex = 0;
+      setHasQuery(!!query);
       setOpen(!!query);
       renderResults();
+    });
+
+    clearBtn.addEventListener("mousedown", (e) => e.preventDefault());
+    clearBtn.addEventListener("click", () => {
+      /* No modo single, limpar também deseleciona o item */
+      if (mode === "single") {
+        options.forEach((o) => { o.selected = false; });
+        syncSelect(true);
+      }
+      query       = "";
+      input.value = "";
+      activeIndex = -1;
+      setHasQuery(false);
+      setOpen(false);
+      input.focus();
     });
 
     input.addEventListener("keydown", (e) => {
@@ -356,10 +418,25 @@
     select.addEventListener("change", () => {
       const sel = new Set(Array.from(select.selectedOptions).map((o) => o.value));
       options.forEach((o) => { o.selected = sel.has(o.value); });
+      if (mode === "single") {
+        const selItem = options.find((o) => o.selected);
+        input.value = selItem ? selItem.label : "";
+        setHasQuery(!!input.value);
+      }
       render();
     });
 
     syncSelect(false);
+
+    /* No modo single: inicializa o input com o valor já selecionado */
+    if (mode === "single") {
+      const selItem = options.find((o) => o.selected);
+      if (selItem) {
+        input.value = selItem.label;
+        setHasQuery(true);
+      }
+    }
+
     render();
   }
 

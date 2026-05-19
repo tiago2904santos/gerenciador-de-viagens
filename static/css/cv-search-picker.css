@@ -1,170 +1,301 @@
 /* ============================================================
-   cv-search-picker — Generic search-and-select picker component
-   Estrutura: search input + dropdown + selected panel + term control
-   Variantes: --compact (2 colunas) | --detailed (1 coluna)
-   Usa apenas tokens globais. Sem valores hardcoded de cor/espaço/raio.
+   cv-search-picker — Componente premium de busca e seleção
+   Estrutura: input de busca + dropdown + painel de selecionados
+              + controle de Termo de Autorização por item
+   Variantes: compact (2 colunas) | detailed (1 coluna + detalhe)
+   Modos: multi (painel) | single (valor no input)
+   Usa apenas tokens globais. Sem valores hardcoded.
    ============================================================ */
 
-/* ─── Component Tokens ─────────────────────────────────────────────── */
+/* ─── Tokens ────────────────────────────────────────────────── */
 .cv-search-picker {
-  --cv-sp-input-height:       var(--control-height-lg);
-  --cv-sp-input-bg:           var(--color-input-bg);
-  --cv-sp-input-border:       var(--color-input-border);
-  --cv-sp-input-border-focus: var(--color-accent);
-  --cv-sp-input-text:         var(--color-input-text);
-  --cv-sp-input-placeholder:  var(--color-input-placeholder);
-  --cv-sp-input-shadow:       var(--shadow-inner);
-  --cv-sp-input-focus-shadow: 0 0 0 3px var(--color-accent-border-soft), var(--shadow-inner);
-  --cv-sp-input-radius:       var(--radius-control);
-  --cv-sp-dropdown-bg:        var(--color-card);
-  --cv-sp-dropdown-border:    var(--color-accent);
-  --cv-sp-dropdown-shadow:    var(--shadow-md);
-  --cv-sp-dropdown-radius:    var(--radius-control);
-  --cv-sp-result-hover-bg:    var(--color-card-muted);
-  --cv-sp-card-bg:            var(--color-card);
-  --cv-sp-card-border:        var(--color-border-soft);
-  --cv-sp-card-radius:        var(--radius-control);
-  --cv-sp-card-shadow:        var(--shadow-xs);
-  --cv-sp-card-termo-border:  var(--color-success-border-soft);
-  --cv-sp-counter-bg:         var(--color-primary);
-  --cv-sp-counter-color:      var(--color-white);
-  --cv-sp-term-bg:            var(--color-input-bg);
-  --cv-sp-term-border:        var(--color-border-soft);
-  --cv-sp-term-radius:        var(--radius-control);
+  /* Input de busca */
+  --cv-sp-h:              var(--control-height-lg);
+  --cv-sp-bg:             var(--color-input-bg);
+  --cv-sp-border:         var(--color-input-border);
+  --cv-sp-border-hover:   var(--color-border-strong);
+  --cv-sp-border-focus:   var(--color-secondary);
+  --cv-sp-radius:         var(--radius-control);
+  --cv-sp-text:           var(--color-input-text);
+  --cv-sp-placeholder:    var(--color-input-placeholder);
+  --cv-sp-shadow:         var(--shadow-xs);
+  --cv-sp-focus-ring:     0 0 0 3px var(--color-info-border);
+  /* Dropdown */
+  --cv-sp-dd-bg:          var(--color-card);
+  --cv-sp-dd-shadow:      var(--shadow-md);
+  --cv-sp-dd-radius:      var(--radius-control);
+  --cv-sp-opt-hover:      var(--color-primary-soft);
+  --cv-sp-opt-sel-bg:     var(--color-primary-soft);
+  --cv-sp-opt-sel-text:   var(--color-primary);
+  /* Painel de selecionados */
+  --cv-sp-card-bg:        var(--color-card);
+  --cv-sp-card-border:    var(--color-border-soft);
+  --cv-sp-card-radius:    var(--radius-control);
+  --cv-sp-card-shadow:    var(--shadow-xs);
+  --cv-sp-card-termo-border: var(--color-success-border-soft);
+  --cv-sp-counter-bg:     var(--color-primary);
+  --cv-sp-counter-text:   var(--color-white);
+  /* Controle de Termo */
+  --cv-sp-term-bg:        var(--color-input-bg);
+  --cv-sp-term-border:    var(--color-border-soft);
+  --cv-sp-term-radius:    var(--radius-control);
 }
 
-/* ─── Root ─────────────────────────────────────────────────────────── */
+/* Overrides para estado de erro */
+.cv-search-picker--error {
+  --cv-sp-border:       var(--color-danger-border-strong);
+  --cv-sp-border-hover: var(--color-danger);
+  --cv-sp-border-focus: var(--color-danger);
+  --cv-sp-bg:           var(--color-danger-soft);
+  --cv-sp-focus-ring:   0 0 0 3px var(--color-danger-border-soft);
+}
+
+/* ─── Root ──────────────────────────────────────────────────── */
 .cv-search-picker {
-  display: grid;
-  gap: var(--space-4);
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
   width: 100%;
 }
 
 /* Esconde selects nativos gerenciados pelo componente */
 .cv-search-picker__native,
-.cv-search-picker__termos-native,
-.cv-search-picker-termos-field {
-  display: none;
+.cv-search-picker__termos-native {
+  display: none !important;
 }
 
-/* ─── Search Input ─────────────────────────────────────────────────── */
+/* ─── Área de busca ─────────────────────────────────────────── */
 .cv-search-picker__search {
   position: relative;
 }
 
+/* Wrapper do input: segura o botão limpar em absolute */
+.cv-search-picker__input-wrap {
+  position: relative;
+}
+
 .cv-search-picker__input {
-  background: var(--cv-sp-input-bg);
-  border: 1px solid var(--cv-sp-input-border);
-  border-radius: var(--cv-sp-input-radius);
-  box-shadow: var(--cv-sp-input-shadow);
-  color: var(--cv-sp-input-text);
+  appearance: none;
+  background: var(--cv-sp-bg);
+  border: 1.5px solid var(--cv-sp-border);
+  border-radius: var(--cv-sp-radius);
+  box-shadow: var(--cv-sp-shadow);
+  color: var(--cv-sp-text);
   font: inherit;
-  font-size: var(--font-size-sm);
-  height: var(--cv-sp-input-height);
+  font-size: var(--font-size-md);
+  height: var(--cv-sp-h);
   outline: 0;
-  padding: 0 var(--space-4);
+  padding: 0 var(--space-10) 0 var(--space-5);
   transition:
     border-color var(--transition-base),
     border-radius var(--transition-fast),
-    box-shadow var(--transition-base);
+    box-shadow var(--transition-base),
+    background-color var(--transition-fast);
   width: 100%;
 }
 
 .cv-search-picker__input::placeholder {
-  color: var(--cv-sp-input-placeholder);
+  color: var(--cv-sp-placeholder);
+  font-weight: var(--font-weight-medium);
 }
 
-/* Focus sem dropdown aberto: ring normal */
+/* Foco sem dropdown */
 .cv-search-picker:not(.cv-search-picker--open) .cv-search-picker__input:focus {
-  border-color: var(--cv-sp-input-border-focus);
-  box-shadow: var(--cv-sp-input-focus-shadow);
+  border-color: var(--cv-sp-border-focus);
+  box-shadow: var(--cv-sp-focus-ring);
 }
 
-/* Design conectado: input + dropdown como bloco único */
+/* Hover */
+.cv-search-picker__input:hover:not(:focus) {
+  border-color: var(--cv-sp-border-hover);
+}
+
+/* Design conectado quando dropdown está aberto */
 .cv-search-picker--open .cv-search-picker__input {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
-  border-color: var(--cv-sp-input-border-focus);
+  border-color: var(--cv-sp-border-focus);
   box-shadow: none;
 }
 
-/* ─── Dropdown ─────────────────────────────────────────────────────── */
+/* ── Botão limpar ───────────────────────────────────────────── */
+.cv-search-picker__clear {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-pill);
+  color: var(--color-muted);
+  cursor: pointer;
+  display: none;          /* mostrado via JS: .cv-search-picker--has-query */
+  font-size: var(--font-size-md);
+  height: 28px;
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+  position: absolute;
+  right: var(--space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  transition: color var(--transition-fast), background-color var(--transition-fast);
+  width: 28px;
+}
+
+.cv-search-picker--has-query .cv-search-picker__clear {
+  display: inline-flex;
+}
+
+.cv-search-picker__clear:hover {
+  background: var(--color-bg-strong);
+  color: var(--color-heading);
+}
+
+/* ─── Dropdown ──────────────────────────────────────────────── */
 .cv-search-picker__dropdown {
-  animation: cv-sp-enter var(--transition-base) both;
-  background: var(--cv-sp-dropdown-bg);
-  border: 1px solid var(--cv-sp-dropdown-border);
+  animation: cv-sp-in var(--transition-base) both;
+  background: var(--cv-sp-dd-bg);
+  border: 1.5px solid var(--cv-sp-border-focus);
   border-top: none;
-  border-radius: 0 0 var(--cv-sp-dropdown-radius) var(--cv-sp-dropdown-radius);
-  box-shadow: var(--cv-sp-dropdown-shadow);
+  border-radius: 0 0 var(--cv-sp-dd-radius) var(--cv-sp-dd-radius);
+  box-shadow: var(--cv-sp-dd-shadow);
   left: 0;
-  max-height: 320px;
   overflow: hidden;
   position: absolute;
   right: 0;
-  top: var(--cv-sp-input-height);
+  top: var(--cv-sp-h);
   transform-origin: top;
   z-index: var(--z-dropdown);
 }
 
-@keyframes cv-sp-enter {
+@keyframes cv-sp-in {
   from { opacity: 0; transform: translateY(-4px) scaleY(0.97); }
   to   { opacity: 1; transform: translateY(0)    scaleY(1);    }
 }
 
+/* Lista de opções com scroll interno */
 .cv-search-picker__list {
-  display: grid;
-  max-height: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 288px;
   overflow-y: auto;
   padding: var(--space-2);
+  /* Scrollbar discreta */
+  scrollbar-color: var(--color-border-strong) transparent;
+  scrollbar-width: thin;
 }
 
-/* ─── Result Items ─────────────────────────────────────────────────── */
-.cv-search-picker__result {
+.cv-search-picker__list::-webkit-scrollbar {
+  width: 4px;
+}
+.cv-search-picker__list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.cv-search-picker__list::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: var(--radius-pill);
+}
+
+/* ─── Opções do dropdown ────────────────────────────────────── */
+.cv-search-picker__option {
+  align-items: center;
   background: transparent;
   border: 0;
   border-radius: var(--radius-sm);
-  color: var(--color-text);
   cursor: pointer;
-  display: grid;
+  display: flex;
   font: inherit;
-  gap: var(--space-1);
-  padding: var(--space-3);
+  gap: var(--space-3);
+  min-height: var(--control-height-md);
+  padding: var(--space-2) var(--space-3);
   text-align: left;
   transition: background-color var(--transition-fast);
   width: 100%;
 }
 
-.cv-search-picker__result:hover,
-.cv-search-picker__result--active {
-  background: var(--cv-sp-result-hover-bg);
+.cv-search-picker__option:hover,
+.cv-search-picker__option--active {
+  background: var(--cv-sp-opt-hover);
 }
 
-.cv-search-picker__result-main {
+.cv-search-picker__option--selected {
+  background: var(--cv-sp-opt-sel-bg);
+  color: var(--cv-sp-opt-sel-text);
+}
+
+/* Marcador de seleção (checkmark) */
+.cv-search-picker__option-marker {
+  align-items: center;
+  background: var(--color-border-soft);
+  border-radius: var(--radius-pill);
+  color: transparent;
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-size: 10px;
+  font-weight: var(--font-weight-black);
+  height: 18px;
+  justify-content: center;
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+  width: 18px;
+}
+
+.cv-search-picker__option--selected .cv-search-picker__option-marker {
+  background: var(--color-secondary);
+  color: var(--color-white);
+}
+
+/* Texto da opção */
+.cv-search-picker__option-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  text-align: left;
+}
+
+.cv-search-picker__option-main {
   color: var(--color-heading);
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-extrabold);
+  font-weight: var(--font-weight-semibold);
   line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.cv-search-picker__result-meta {
+.cv-search-picker__option--selected .cv-search-picker__option-main {
+  color: var(--cv-sp-opt-sel-text);
+}
+
+.cv-search-picker__option-meta {
   color: var(--color-muted);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
+/* Estado vazio no dropdown */
 .cv-search-picker__empty {
   color: var(--color-muted);
   font-size: var(--font-size-sm);
-  padding: var(--space-4);
+  padding: var(--space-4) var(--space-4);
+  text-align: center;
 }
 
-/* ─── Panel (área de selecionados) ─────────────────────────────────── */
+/* ─── Painel de selecionados ────────────────────────────────── */
 .cv-search-picker__panel {
-  display: grid;
+  border-top: 1px solid var(--color-border-soft);
+  display: flex;
+  flex-direction: column;
   gap: var(--space-4);
+  padding-top: var(--space-5);
 }
 
+/* Cabeçalho do painel */
 .cv-search-picker__panel-header {
   align-items: center;
   display: flex;
@@ -181,42 +312,43 @@
   text-transform: uppercase;
 }
 
+/* Badge contador */
 .cv-search-picker__counter {
   align-items: center;
   background: var(--cv-sp-counter-bg);
   border-radius: var(--radius-pill);
-  color: var(--cv-sp-counter-color);
+  color: var(--cv-sp-counter-text);
   display: inline-flex;
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   font-weight: var(--font-weight-bold);
-  height: 32px;
+  height: 24px;
   justify-content: center;
-  min-width: 32px;
+  min-width: 24px;
   padding: 0 var(--space-2);
 }
 
-/* ─── Card Grid ────────────────────────────────────────────────────── */
+/* Grid de cards */
 .cv-search-picker__grid {
   display: grid;
-  gap: var(--space-2);
-  grid-template-columns: 1fr;   /* padrão: 1 coluna (detailed) */
+  gap: var(--space-3);
+  grid-template-columns: 1fr;
 }
 
 .cv-search-picker--compact .cv-search-picker__grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-/* Card ímpar restante ocupa linha inteira (compact) */
+/* Card ímpar no final ocupa linha inteira (compact) */
 .cv-search-picker--compact .cv-search-picker__card:only-child,
 .cv-search-picker--compact .cv-search-picker__card:last-child:nth-child(odd) {
   grid-column: 1 / -1;
 }
 
-/* ─── Card Selecionado ─────────────────────────────────────────────── */
+/* ─── Card selecionado ──────────────────────────────────────── */
 .cv-search-picker__card {
   align-items: start;
   background: var(--cv-sp-card-bg);
-  border: 1px solid var(--cv-sp-card-border);
+  border: 1.5px solid var(--cv-sp-card-border);
   border-radius: var(--cv-sp-card-radius);
   box-shadow: var(--cv-sp-card-shadow);
   display: grid;
@@ -224,25 +356,28 @@
   grid-template-columns: minmax(0, 1fr) auto;
   min-width: 0;
   padding: var(--space-3) var(--space-4);
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
-/* Card com termo ativo: borda verde sutil */
+/* Card com Termo de Autorização gerado */
 .cv-search-picker__card--has-termo {
   border-color: var(--cv-sp-card-termo-border);
   box-shadow: 0 0 0 1px var(--cv-sp-card-termo-border), var(--cv-sp-card-shadow);
 }
 
 .cv-search-picker__card-body {
-  display: grid;
-  gap: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
   min-width: 0;
 }
 
 .cv-search-picker__card-name {
   color: var(--color-heading);
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-extrabold);
+  font-weight: var(--font-weight-bold);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -250,7 +385,7 @@
 
 .cv-search-picker__card-meta {
   color: var(--color-muted);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -261,7 +396,6 @@
   color: var(--color-muted);
   display: none;
   font-size: var(--font-size-xs);
-  margin-top: var(--space-1);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -271,9 +405,10 @@
   display: block;
 }
 
+/* Botão remover */
 .cv-search-picker__card-remove {
   align-items: center;
-  background: var(--color-card-muted);
+  background: transparent;
   border: 1px solid var(--color-border-soft);
   border-radius: var(--radius-pill);
   color: var(--color-muted);
@@ -282,14 +417,14 @@
   flex: 0 0 auto;
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-black);
-  height: 30px;
+  height: 26px;
   justify-content: center;
   line-height: 1;
   transition:
     background-color var(--transition-fast),
     border-color var(--transition-fast),
     color var(--transition-fast);
-  width: 30px;
+  width: 26px;
 }
 
 .cv-search-picker__card-remove:hover,
@@ -300,16 +435,24 @@
   outline: 0;
 }
 
+/* Estado vazio do painel */
 .cv-search-picker__panel-empty {
+  align-items: center;
+  background: var(--color-bg-subtle);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--cv-sp-card-radius);
   color: var(--color-muted);
+  display: flex;
   font-size: var(--font-size-sm);
+  justify-content: center;
   margin: 0;
+  min-height: 68px;
+  padding: var(--space-4);
+  text-align: center;
 }
 
-/* ─── Term Control ─────────────────────────────────────────────────── */
-/* Controle de Termo de Autorização por servidor.
-   Fica dentro do card, ocupa a linha inteira (grid-column: 1 / -1). */
-
+/* ─── Controle de Termo de Autorização ──────────────────────── */
+/* Faixa que ocupa a linha inteira dentro do card */
 .cv-term-control {
   align-items: center;
   border-top: 1px solid var(--color-border-soft);
@@ -323,7 +466,7 @@
 .cv-term-control__label {
   color: var(--color-muted-strong);
   font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-extrabold);
+  font-weight: var(--font-weight-semibold);
 }
 
 .cv-term-control__choice {
@@ -332,23 +475,23 @@
   border-radius: var(--cv-sp-term-radius);
   display: grid;
   gap: 2px;
-  grid-template-columns: repeat(2, minmax(86px, 1fr));
-  padding: 3px;
+  grid-template-columns: repeat(2, minmax(72px, 1fr));
+  padding: 2px;
 }
 
 .cv-term-control__option {
   align-items: center;
   background: transparent;
   border: 1px solid transparent;
-  border-radius: calc(var(--cv-sp-term-radius) - 3px);
+  border-radius: calc(var(--cv-sp-term-radius) - 2px);
   color: var(--color-muted);
   cursor: pointer;
   display: inline-flex;
   font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--font-weight-semibold);
   justify-content: center;
   line-height: 1.2;
-  min-height: var(--control-height-sm);
+  min-height: 30px;
   padding: 0 var(--space-2);
   text-align: center;
   transition:
@@ -356,6 +499,7 @@
     border-color var(--transition-fast),
     box-shadow var(--transition-fast),
     color var(--transition-fast);
+  white-space: nowrap;
   width: 100%;
 }
 
@@ -381,15 +525,31 @@
   color: var(--color-success);
 }
 
-/* ─── Estado: Desabilitado ─────────────────────────────────────────── */
-.cv-search-picker--disabled .cv-search-picker__input {
-  background: var(--color-input-disabled-bg);
-  color: var(--color-input-disabled-text);
-  cursor: not-allowed;
+/* ─── Mensagem de erro abaixo do componente ─────────────────── */
+.cv-search-picker__error-msg {
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+  margin: calc(var(--space-5) * -1) 0 0;   /* compensa o gap do flex */
+}
+
+/* ─── Estado disabled ───────────────────────────────────────── */
+.cv-search-picker--disabled {
   pointer-events: none;
 }
 
-/* ─── Responsivo ───────────────────────────────────────────────────── */
+.cv-search-picker--disabled .cv-search-picker__input {
+  background: var(--color-input-disabled-bg);
+  border-color: var(--color-input-border);
+  box-shadow: none;
+  color: var(--color-input-disabled-text);
+  cursor: not-allowed;
+}
+
+.cv-search-picker--disabled .cv-search-picker__card {
+  opacity: 0.6;
+}
+
+/* ─── Responsivo ────────────────────────────────────────────── */
 @media (max-width: 720px) {
   .cv-search-picker--compact .cv-search-picker__grid {
     grid-template-columns: 1fr;
@@ -401,11 +561,6 @@
   }
 
   .cv-term-control {
-    align-items: start;
     grid-template-columns: 1fr;
-  }
-
-  .cv-term-control__choice {
-    width: 100%;
   }
 }
