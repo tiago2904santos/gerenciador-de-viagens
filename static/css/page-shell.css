@@ -83,7 +83,7 @@
   --cv-wizard-section-border:         var(--border-form-section);
   --cv-wizard-section-shadow:         var(--shadow-sm);
   --cv-wizard-section-radius:         var(--radius-card);
-  --cv-wizard-section-header-padding: var(--space-4) var(--space-6);
+  --cv-wizard-section-header-padding: var(--space-4) var(--space-6) var(--space-4) var(--space-8);
   --cv-wizard-section-body-padding:   var(--space-5) var(--space-6);
   --cv-wizard-section-stack-gap:      var(--space-4);
 
@@ -907,11 +907,22 @@ html[data-theme="light"] {
   align-items:     center;
   background:      var(--cv-wizard-section-header-bg);
   border-bottom:   1px solid var(--cv-wizard-section-border);
-  border-left:     3px solid var(--color-accent);
   display:         flex;
   gap:             var(--space-4);
   justify-content: space-between;
   padding:         var(--cv-wizard-section-header-padding);
+  position:        relative;
+}
+
+.cv-wizard-section-header::before {
+  background:    var(--color-accent);
+  border-radius: var(--radius-pill);
+  bottom:        var(--space-2);
+  content:       "";
+  left:          var(--space-3);
+  position:      absolute;
+  top:           var(--space-2);
+  width:         var(--space-2);
 }
 
 .cv-wizard-section-header__copy {
