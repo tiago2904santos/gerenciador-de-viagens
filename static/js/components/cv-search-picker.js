@@ -248,7 +248,24 @@
       if (enabled) selectedForTerm.add(value);
       else selectedForTerm.delete(value);
       syncTermSelect();
-      renderSelectedCards();
+
+      /* Atualiza apenas o card afetado, sem reconstruir a grade inteira
+         (evita o flash de fechar/reabrir ao clicar no toggle). */
+      if (!grid) return;
+      const card = grid.querySelector('[data-value="' + CSS.escape(value) + '"]');
+      if (!card) return;
+
+      card.classList.toggle("cv-search-picker__selected-card--has-term", enabled);
+
+      const toggle = card.querySelector(".cv-search-picker__term-control .cv-field-side-action");
+      if (toggle) {
+        toggle.setAttribute("aria-pressed", enabled ? "true" : "false");
+        toggle.textContent = enabled ? "Gerar termo" : "Nao gerar";
+        toggle.classList.toggle("cv-field-side-action--success", enabled);
+        toggle.classList.toggle("cv-field-side-action--danger", !enabled);
+        toggle.classList.toggle("is-active",   enabled);
+        toggle.classList.toggle("is-inactive", !enabled);
+      }
     }
 
     function updateDriverControls() {
