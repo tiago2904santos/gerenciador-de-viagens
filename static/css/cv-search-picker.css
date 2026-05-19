@@ -766,6 +766,10 @@
   grid-template-columns: 0 minmax(0, 1fr) auto;
 }
 
+.cv-search-picker--disabled .cv-search-picker__remove {
+  display: none;
+}
+
 @media (max-width: 720px) {
   .cv-search-picker--compact .cv-search-picker__selected-list {
     grid-template-columns: 1fr;
