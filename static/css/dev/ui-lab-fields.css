@@ -1171,7 +1171,7 @@ html[data-theme="dark"] .ui-lab-page {
 .cv-custom-select--open .cv-custom-select__trigger {
   background:
     linear-gradient(var(--cv-select-bg-hover), var(--cv-select-bg-hover)) padding-box,
-    linear-gradient(var(--cv-select-border-focus), var(--cv-select-border-focus)) border-box;
+    linear-gradient(var(--cv-select-border), var(--cv-select-border)) border-box;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
   box-shadow: none;
@@ -1213,7 +1213,7 @@ html[data-theme="dark"] .ui-lab-page {
 .cv-custom-select__menu {
   animation:      cv-cs-menu-enter 160ms ease both;
   background:     var(--cv-cs-menu-bg);
-  border:         1px solid var(--cv-select-border-focus);
+  border:         1px solid var(--cv-select-border);
   border-top:     none;
   border-radius:  0 0 var(--cv-cs-menu-radius) var(--cv-cs-menu-radius);
   box-shadow:     var(--cv-cs-menu-shadow);

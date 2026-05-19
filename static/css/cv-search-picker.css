@@ -28,8 +28,8 @@
   --control-inactive-bg: var(--state-warning-bg-active);
   --control-inactive-border: var(--state-warning-border-hover);
   --control-inactive-text: var(--state-warning-text-active);
-  --danger-bg: var(--state-danger-bg-active);
-  --danger-border: var(--state-danger-border-hover);
+  --danger-bg: color-mix(in srgb, var(--color-danger) 92%, black 8%);
+  --danger-border: color-mix(in srgb, var(--color-danger) 78%, black 22%);
   --danger-text: var(--state-danger-text-active);
   --remove-rail-width: calc(var(--space-10) + var(--space-2));
   --selected-card-open-gap: var(--space-2);
