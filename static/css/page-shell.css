@@ -79,7 +79,7 @@
 
   /* --- Wizard Section Cards --- */
   --cv-wizard-section-bg:             var(--surface-form-section);
-  --cv-wizard-section-header-bg:      var(--surface-field-group);
+  --cv-wizard-section-header-bg:      var(--surface-form-panel);
   --cv-wizard-section-border:         var(--border-form-section);
   --cv-wizard-section-shadow:         var(--shadow-sm);
   --cv-wizard-section-radius:         var(--radius-card);
@@ -186,8 +186,8 @@ html[data-theme="dark"] {
   --surface-field-group:    rgba(255, 255, 255, 0.04);
   --border-field-group:     rgba(255, 255, 255, 0.09);
 
-  --cv-wizard-section-bg:        var(--theme-surface-card);
-  --cv-wizard-section-header-bg: color-mix(in srgb, var(--color-primary) 14%, var(--theme-surface-card) 86%);
+  --cv-wizard-section-bg:        var(--surface-form-section);
+  --cv-wizard-section-header-bg: var(--surface-form-panel);
   --cv-wizard-section-border:    var(--theme-border-card);
   --cv-wizard-section-shadow:    var(--theme-shadow-hero);
 
@@ -292,8 +292,8 @@ html[data-theme="light"] {
   --surface-field-group:    #edf3f9;
   --border-field-group:     #d0dce8;
 
-  --cv-wizard-section-bg:        var(--color-surface);
-  --cv-wizard-section-header-bg: var(--surface-field-group);
+  --cv-wizard-section-bg:        var(--surface-form-panel);
+  --cv-wizard-section-header-bg: var(--surface-form-section);
   --cv-wizard-section-border:    var(--border-form-section);
   --cv-wizard-section-shadow:    var(--shadow-sm);
 
