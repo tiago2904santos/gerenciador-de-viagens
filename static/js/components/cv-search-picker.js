@@ -307,26 +307,24 @@
 
     function buildTermControl(value) {
       const enabled = selectedForTerm.has(value);
-      const row     = el("div",  "cv-search-picker__term-control");
-      const label   = el("span", "cv-search-picker__term-label", "Termo de Autorizacao");
-      const choice  = el("div",  "cv-search-picker__term-options cv-state-segmented");
+      const row    = el("div",  "cv-search-picker__term-control");
+      const label  = el("span", "cv-search-picker__term-label", "Termo de Autorizacao");
+      const toggle = el("button", "cv-search-picker__term-toggle");
 
-      const btnNo  = el("button", "cv-search-picker__term-option cv-search-picker__term-option--no cv-state-button cv-state-button--warning",  "Nao gerar");
-      const btnYes = el("button", "cv-search-picker__term-option cv-search-picker__term-option--yes cv-state-button cv-state-button--success", "Gerar");
+      toggle.type = "button";
+      toggle.setAttribute("aria-pressed", enabled ? "true" : "false");
+      toggle.setAttribute("aria-label", "Alternar geracao de termo de autorizacao");
 
-      btnNo.type  = "button";
-      btnYes.type = "button";
-      btnNo.setAttribute("aria-pressed",  !enabled ? "true" : "false");
-      btnYes.setAttribute("aria-pressed",  enabled ? "true" : "false");
-      btnNo.classList.toggle("cv-search-picker__term-option--active",  !enabled);
-      btnYes.classList.toggle("cv-search-picker__term-option--active",  enabled);
-      btnNo.addEventListener("click",  () => setTermValue(value, false));
-      btnYes.addEventListener("click", () => setTermValue(value, true));
+      toggle.appendChild(el("span", "cv-search-picker__term-toggle-off", "Nao gerar"));
+      toggle.appendChild(el("span", "cv-search-picker__term-toggle-on",  "✓ Gerar"));
 
-      choice.appendChild(btnNo);
-      choice.appendChild(btnYes);
+      toggle.addEventListener("click", () => {
+        const current = toggle.getAttribute("aria-pressed") === "true";
+        setTermValue(value, !current);
+      });
+
       row.appendChild(label);
-      row.appendChild(choice);
+      row.appendChild(toggle);
       return row;
     }
 
