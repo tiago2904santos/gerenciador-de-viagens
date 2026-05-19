@@ -965,3 +965,254 @@ html[data-theme="dark"] .ui-lab-page {
     width: fit-content;
   }
 }
+
+
+/* ==========================================================================
+   Custom Select Premium — .cv-custom-select
+   Dropdown 100% customizado. O <select> nativo permanece oculto apenas
+   para submissão do formulário — o usuário nunca interage com ele.
+   ========================================================================== */
+
+/* ─── Tokens do menu e opções ──────────────────────────────────────────── */
+.ui-lab-page {
+  --cv-cs-menu-bg:                var(--cv-dropdown-bg);
+  --cv-cs-menu-border:            var(--cv-dropdown-border);
+  --cv-cs-menu-shadow:            var(--shadow-lg);
+  --cv-cs-menu-radius:            var(--cv-field-radius);
+  --cv-cs-option-hover-bg:        var(--cv-option-hover-bg);
+  --cv-cs-option-selected-bg:     var(--cv-option-selected-bg);
+  --cv-cs-option-selected-color:  var(--color-primary);
+  --cv-cs-option-check-color:     var(--cv-option-marker-bg);
+  --cv-cs-z-index:                200;
+}
+
+/* ─── Wrapper root ──────────────────────────────────────────────────────── */
+.cv-custom-select {
+  position: relative;
+  width: 100%;
+}
+
+/* ─── Native select oculto (mantido para form submit) ───────────────────── */
+.cv-custom-select__native {
+  clip: rect(0 0 0 0);
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  position: absolute;
+  width: 1px;
+}
+
+/* ─── Trigger (controle fechado visível) ────────────────────────────────── */
+.cv-custom-select__trigger {
+  align-items: center;
+  background:
+    linear-gradient(var(--cv-select-bg), var(--cv-select-bg)) padding-box,
+    linear-gradient(var(--cv-select-border), var(--cv-select-border)) border-box;
+  border: 1px solid transparent;
+  border-radius: var(--cv-field-radius);
+  box-shadow: var(--cv-select-shadow);
+  box-sizing: border-box;
+  color: var(--cv-field-color);
+  cursor: pointer;
+  display: flex;
+  font-family: inherit;
+  font-size: var(--cv-field-font-size);
+  gap: var(--space-2);
+  height: var(--cv-field-height);
+  min-height: var(--cv-field-height);
+  padding: 0 var(--cv-field-padding-x);
+  text-align: left;
+  transition: background 150ms ease, box-shadow 150ms ease;
+  width: 100%;
+}
+
+.cv-custom-select__trigger:hover:not(:disabled) {
+  background:
+    linear-gradient(var(--cv-select-bg-hover), var(--cv-select-bg-hover)) padding-box,
+    linear-gradient(var(--cv-select-border-hover), var(--cv-select-border-hover)) border-box;
+}
+
+.cv-custom-select__trigger:focus-visible {
+  background:
+    linear-gradient(var(--cv-select-bg-hover), var(--cv-select-bg-hover)) padding-box,
+    linear-gradient(var(--cv-select-border-focus), var(--cv-select-border-focus)) border-box;
+  box-shadow: var(--cv-select-focus-shadow);
+  outline: none;
+}
+
+.cv-custom-select--open .cv-custom-select__trigger {
+  background:
+    linear-gradient(var(--cv-select-bg-hover), var(--cv-select-bg-hover)) padding-box,
+    linear-gradient(var(--cv-select-border-focus), var(--cv-select-border-focus)) border-box;
+  box-shadow: var(--cv-select-focus-shadow);
+}
+
+/* ─── Texto do valor / placeholder ─────────────────────────────────────── */
+.cv-custom-select__value {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cv-custom-select__value--placeholder {
+  color: var(--cv-field-placeholder);
+}
+
+/* ─── Chevron ───────────────────────────────────────────────────────────── */
+.cv-custom-select__chevron {
+  align-items: center;
+  color: var(--cv-select-chevron);
+  display: flex;
+  flex-shrink: 0;
+  transition: transform 200ms ease;
+}
+
+.cv-custom-select--open .cv-custom-select__chevron {
+  transform: rotate(180deg);
+}
+
+/* ─── Menu dropdown ─────────────────────────────────────────────────────── */
+.cv-custom-select__menu {
+  background:     var(--cv-cs-menu-bg);
+  border:         1px solid var(--cv-cs-menu-border);
+  border-radius:  var(--cv-cs-menu-radius);
+  box-shadow:     var(--cv-cs-menu-shadow);
+  box-sizing:     border-box;
+  left:           0;
+  list-style:     none;
+  margin:         var(--space-1) 0 0;
+  max-height:     248px;
+  min-width:      100%;
+  overflow-y:     auto;
+  overscroll-behavior: contain;
+  padding:        var(--space-1) 0;
+  position:       absolute;
+  scrollbar-width: thin;
+  top:            100%;
+  width:          100%;
+  z-index:        var(--cv-cs-z-index);
+}
+
+.cv-custom-select__menu::-webkit-scrollbar       { width: 4px; }
+.cv-custom-select__menu::-webkit-scrollbar-track  { background: transparent; }
+.cv-custom-select__menu::-webkit-scrollbar-thumb  {
+  background:    var(--cv-cs-menu-border);
+  border-radius: 4px;
+}
+
+/* ─── Opções ────────────────────────────────────────────────────────────── */
+.cv-custom-select__option {
+  align-items:  center;
+  cursor:       pointer;
+  display:      flex;
+  font-size:    var(--cv-field-font-size);
+  gap:          var(--space-2);
+  min-height:   var(--control-height-sm);
+  padding:      var(--space-2) var(--cv-field-padding-x);
+  transition:   background 80ms ease;
+  user-select:  none;
+}
+
+.cv-custom-select__option:hover:not(.cv-custom-select__option--disabled) {
+  background: var(--cv-cs-option-hover-bg);
+}
+
+.cv-custom-select__option--focused {
+  background: var(--cv-cs-option-hover-bg);
+}
+
+.cv-custom-select__option--selected {
+  background: var(--cv-cs-option-selected-bg);
+  color:      var(--cv-cs-option-selected-color);
+}
+
+.cv-custom-select__option--selected.cv-custom-select__option--focused {
+  filter: brightness(0.97);
+}
+
+.cv-custom-select__option--disabled {
+  color:        var(--cv-field-placeholder);
+  cursor:       not-allowed;
+  opacity:      0.55;
+}
+
+/* Check icon */
+.cv-custom-select__option-check {
+  align-items:  center;
+  color:        var(--cv-cs-option-check-color);
+  display:      flex;
+  flex-shrink:  0;
+  opacity:      0;
+  width:        16px;
+}
+
+.cv-custom-select__option--selected .cv-custom-select__option-check {
+  opacity: 1;
+}
+
+/* Label do texto da opção */
+.cv-custom-select__option-label {
+  flex:          1;
+  overflow:      hidden;
+  text-overflow: ellipsis;
+  white-space:   nowrap;
+}
+
+/* ─── Estado disabled ───────────────────────────────────────────────────── */
+.cv-custom-select--disabled .cv-custom-select__trigger,
+.cv-custom-select__trigger:disabled {
+  background:
+    linear-gradient(var(--cv-field-disabled-bg), var(--cv-field-disabled-bg)) padding-box,
+    linear-gradient(var(--cv-select-border), var(--cv-select-border)) border-box;
+  color:   var(--color-input-disabled-text);
+  cursor:  not-allowed;
+  opacity: 0.7;
+}
+
+.cv-custom-select--disabled .cv-custom-select__chevron {
+  opacity: 0.45;
+}
+
+/* ─── Estado de erro ────────────────────────────────────────────────────── */
+.cv-custom-select--error .cv-custom-select__trigger {
+  background:
+    linear-gradient(var(--cv-field-error-bg), var(--cv-field-error-bg)) padding-box,
+    linear-gradient(var(--cv-field-error-border), var(--cv-field-error-border)) border-box;
+}
+
+.cv-custom-select--error .cv-custom-select__trigger:focus-visible,
+.cv-custom-select--error.cv-custom-select--open .cv-custom-select__trigger {
+  box-shadow: var(--cv-select-error-shadow);
+}
+
+.cv-custom-select--error .cv-custom-select__chevron {
+  color: var(--cv-field-error);
+}
+
+/* ─── Variantes de tamanho ──────────────────────────────────────────────── */
+.cv-custom-select--sm .cv-custom-select__trigger {
+  font-size:  var(--font-size-xs);
+  height:     var(--control-height-sm);
+  min-height: var(--control-height-sm);
+}
+
+.cv-custom-select--lg .cv-custom-select__trigger {
+  font-size:  var(--font-size-md);
+  height:     var(--control-height-lg);
+  min-height: var(--control-height-lg);
+}
+
+/* ─── Integração com cv-field-with-action ───────────────────────────────── */
+.cv-field-with-action .cv-custom-select {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* ─── Responsivo mobile ─────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .cv-custom-select__menu {
+    max-height: 200px;
+  }
+}

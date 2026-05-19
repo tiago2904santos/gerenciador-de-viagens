@@ -100,9 +100,9 @@
         </div>
         <div class="cv-field-panel__body">
           <div class="cv-field-panel__note">
-            O dropdown aberto continua sendo nativo do navegador e tem limites seguros de estilo.
-            Se o projeto precisar de lista 100% customizada, o proximo componente deve ser um
-            Custom Select / Combobox separado.
+            ⚠️ O dropdown aberto deste bloco ainda usa o menu nativo do navegador.
+            O componente visual aprovado é o <strong>Custom Select Premium</strong> abaixo —
+            use <code>.cv-custom-select</code> com <code>data-cv-select</code> para dropdown 100% customizado.
           </div>
 
           <div class="cv-field-grid cv-field-grid--3">
@@ -285,6 +285,217 @@
             <code>.cv-select--sm</code>, <code>.cv-select--md</code>, <code>.cv-select--lg</code>,
             <code>.cv-select--disabled</code>, <code>.cv-select--error</code> e
             <code>.cv-field-with-action</code>.
+          </div>
+        </div>
+      </article>
+
+      <article class="cv-field-panel" id="fields-custom-select">
+        <div class="cv-field-panel__header">
+          <span class="cv-field-panel__eyebrow">Custom Select Premium</span>
+          <h3 class="cv-field-panel__title">Dropdown 100% customizado — sem menu nativo do browser</h3>
+          <p class="cv-field-panel__description">
+            O componente <code>.cv-custom-select</code> substitui o <code>&lt;select&gt;</code>
+            nativo por trigger premium, dropdown proprio e opcoes customizadas. O select nativo
+            fica oculto e serve apenas para submissao do formulario. Ao abrir, voce ve a lista
+            customizada — nunca o menu azul do navegador.
+          </p>
+        </div>
+        <div class="cv-field-panel__body">
+
+          <div class="cv-field-panel__note">
+            O <code>&lt;select&gt;</code> nativo permanece apenas como fallback/submissao.
+            O componente visual aprovado e o Custom Select. JS: <code>cv-custom-select.js</code>.
+          </div>
+
+          {# 1. Padrao · Placeholder · Preenchido #}
+          <div class="cv-field-grid cv-field-grid--3">
+            <div class="cv-field">
+              <label class="cv-field__label" for="cs-padrao">Select padrao</label>
+              <div class="cv-custom-select" data-cv-select>
+                <select id="cs-padrao" name="cs-padrao">
+                  <option value="1" selected>Analista administrativa</option>
+                  <option value="2">Motorista</option>
+                  <option value="3">Tecnico</option>
+                </select>
+              </div>
+            </div>
+            <div class="cv-field">
+              <label class="cv-field__label" for="cs-placeholder">Com placeholder</label>
+              <div class="cv-custom-select" data-cv-select>
+                <select id="cs-placeholder" name="cs-placeholder">
+                  <option value="" selected>Selecione uma opcao</option>
+                  <option value="gb">Gabinete</option>
+                  <option value="ad">Administrativo</option>
+                  <option value="op">Operacional</option>
+                </select>
+              </div>
+            </div>
+            <div class="cv-field">
+              <label class="cv-field__label" for="cs-preenchido">Preenchido</label>
+              <div class="cv-custom-select" data-cv-select>
+                <select id="cs-preenchido" name="cs-preenchido">
+                  <option value="1" selected>SEJUS / PR</option>
+                  <option value="2">SEAP / PR</option>
+                  <option value="3">Gabinete</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {# 2. Disabled · Erro · Tamanho sm #}
+          <div class="cv-field-grid cv-field-grid--3">
+            <div class="cv-field">
+              <label class="cv-field__label" for="cs-disabled">Disabled</label>
+              <div class="cv-custom-select cv-custom-select--disabled" data-cv-select>
+                <select id="cs-disabled" name="cs-disabled" disabled>
+                  <option value="1">Indisponivel</option>
+                </select>
+              </div>
+            </div>
+            <div class="cv-field cv-field--error">
+              <div class="cv-field__label-row">
+                <label class="cv-field__label" for="cs-error">Com erro <span class="cv-field__required" aria-hidden="true">*</span></label>
+                <span class="cv-field__error-badge">Erro</span>
+              </div>
+              <div class="cv-custom-select cv-custom-select--error" data-cv-select>
+                <select id="cs-error" name="cs-error" aria-invalid="true" aria-describedby="cs-error-msg">
+                  <option value="">Selecao invalida</option>
+                  <option value="v">Opcao valida</option>
+                </select>
+              </div>
+              <p class="cv-field__error" id="cs-error-msg">Selecione uma opcao compativel com o cadastro.</p>
+            </div>
+            <div class="cv-field">
+              <label class="cv-field__label" for="cs-sm">Pequeno (sm)</label>
+              <div class="cv-custom-select cv-custom-select--sm" data-cv-select>
+                <select id="cs-sm" name="cs-sm">
+                  <option value="PR" selected>PR</option>
+                  <option value="SC">SC</option>
+                  <option value="SP">SP</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {# 3. Medio · Grande #}
+          <div class="cv-field-grid cv-field-grid--3">
+            <div class="cv-field">
+              <label class="cv-field__label" for="cs-md">Medio (padrao)</label>
+              <div class="cv-custom-select cv-custom-select--md" data-cv-select>
+                <select id="cs-md" name="cs-md">
+                  <option value="1" selected>Documento institucional</option>
+                  <option value="2">Viagem administrativa</option>
+                </select>
+              </div>
+            </div>
+            <div class="cv-field">
+              <label class="cv-field__label" for="cs-lg">Grande (lg)</label>
+              <div class="cv-custom-select cv-custom-select--lg" data-cv-select>
+                <select id="cs-lg" name="cs-lg">
+                  <option value="1" selected>Fluxo documental completo</option>
+                  <option value="2">Fluxo simplificado</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {# 4. Com botao lateral #}
+          <div class="cv-field-grid cv-field-grid--2">
+            <div class="cv-field">
+              <label class="cv-field__label" for="cs-action-cargo">Com botao lateral</label>
+              <div class="cv-field-with-action">
+                <div class="cv-custom-select" data-cv-select>
+                  <select id="cs-action-cargo" name="cs-action-cargo">
+                    <option value="">Selecione um cargo</option>
+                    <option value="1">Analista administrativa</option>
+                    <option value="2">Motorista</option>
+                    <option value="3">Tecnico</option>
+                  </select>
+                </div>
+                <button class="cv-field-action cv-field-action--manage" type="button">Gerenciar cargo</button>
+              </div>
+            </div>
+            <div class="cv-field">
+              <label class="cv-field__label" for="cs-action-comb">Botao lateral longo</label>
+              <div class="cv-field-with-action">
+                <div class="cv-custom-select" data-cv-select>
+                  <select id="cs-action-comb" name="cs-action-comb">
+                    <option value="">Selecione um combustivel</option>
+                    <option value="1">Gasolina</option>
+                    <option value="2">Diesel</option>
+                    <option value="3">Etanol</option>
+                  </select>
+                </div>
+                <button class="cv-field-action cv-field-action--manage" type="button">Gerenciar combustiveis</button>
+              </div>
+            </div>
+          </div>
+
+          {# 5. Em grid de 4 colunas #}
+          <div class="cv-field-grid cv-field-grid--4">
+            <div class="cv-field">
+              <label class="cv-field__label" for="cs-grid-a">Status</label>
+              <div class="cv-custom-select" data-cv-select>
+                <select id="cs-grid-a" name="cs-grid-a">
+                  <option value="1" selected>Rascunho</option>
+                  <option value="2">Pendente</option>
+                  <option value="3">Aprovado</option>
+                </select>
+              </div>
+            </div>
+            <div class="cv-field">
+              <label class="cv-field__label" for="cs-grid-b">UF</label>
+              <div class="cv-custom-select" data-cv-select>
+                <select id="cs-grid-b" name="cs-grid-b">
+                  <option value="PR" selected>PR</option>
+                  <option value="SC">SC</option>
+                  <option value="SP">SP</option>
+                </select>
+              </div>
+            </div>
+            <div class="cv-field">
+              <label class="cv-field__label" for="cs-grid-c">Tipo</label>
+              <div class="cv-custom-select" data-cv-select>
+                <select id="cs-grid-c" name="cs-grid-c">
+                  <option value="1" selected>Caracterizada</option>
+                  <option value="2">Administrativa</option>
+                </select>
+              </div>
+            </div>
+            <div class="cv-field">
+              <label class="cv-field__label" for="cs-grid-d">Cargo</label>
+              <div class="cv-custom-select" data-cv-select>
+                <select id="cs-grid-d" name="cs-grid-d">
+                  <option value="1" selected>Analista</option>
+                  <option value="2">Tecnico</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {# 6. Largura total #}
+          <div class="cv-field-grid cv-field-grid--1">
+            <div class="cv-field cv-field--full">
+              <label class="cv-field__label" for="cs-full">Largura total</label>
+              <div class="cv-custom-select" data-cv-select>
+                <select id="cs-full" name="cs-full">
+                  <option value="" selected>Selecione a unidade responsavel</option>
+                  <option value="1">Unidade administrativa responsavel pelo documento</option>
+                  <option value="2">Unidade operacional externa</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="cv-field-panel__note">
+            Classes: <code>.cv-custom-select</code>, <code>.cv-custom-select__trigger</code>,
+            <code>.cv-custom-select__value</code>, <code>.cv-custom-select__chevron</code>,
+            <code>.cv-custom-select__menu</code>, <code>.cv-custom-select__option</code>,
+            <code>.cv-custom-select__option--selected</code>, <code>.cv-custom-select--open</code>,
+            <code>.cv-custom-select--disabled</code>, <code>.cv-custom-select--error</code>,
+            <code>.cv-custom-select--sm</code>, <code>.cv-custom-select--lg</code>.
+            JS: <code>static/js/components/cv-custom-select.js</code>.
+            Atributo: <code>data-cv-select</code>.
           </div>
         </div>
       </article>
