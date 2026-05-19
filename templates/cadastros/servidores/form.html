@@ -19,9 +19,9 @@
             {{ form.rg }}
             {{ form.sem_rg }}
             {% if form.sem_rg.value %}
-              {% include "components/ui/buttons/field_action_button.html" with label="Não possui RG" variant="danger" type="button" extra_class="cv-field-side-action--toggle" aria_label="Alternar situação do RG" aria_pressed=True data_rg_toggle=True only %}
+              {% include "components/ui/buttons/field_action_button.html" with label="Não possui RG" variant="danger" type="button" extra_class="cv-field-side-action--toggle cv-field-side-action--state is-inactive" aria_label="Alternar situação do RG" aria_pressed=True data_rg_toggle=True only %}
             {% else %}
-              {% include "components/ui/buttons/field_action_button.html" with label="Possui RG" variant="success" type="button" extra_class="cv-field-side-action--toggle" aria_label="Alternar situação do RG" aria_pressed=False data_rg_toggle=True only %}
+              {% include "components/ui/buttons/field_action_button.html" with label="Possui RG" variant="success" type="button" extra_class="cv-field-side-action--toggle cv-field-side-action--state is-active" aria_label="Alternar situação do RG" aria_pressed=False data_rg_toggle=True only %}
             {% endif %}
           </div>
           {% if form.rg.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.rg.errors only %}{% endif %}
@@ -30,10 +30,7 @@
 
         {% include "components/forms/input_with_action.html" with field=form.unidade action_url=unidades_manage_url action_label="Gerenciar unidades" action_icon="settings" action_variant="secondary" size_class="field-size-4" only %}
       </div>
-      {% include "components/ui/layouts/footer_actions.html" with secondary_label="Voltar" secondary_url=back_url only %}
-      {% include "components/ui/layouts/footer_actions.html" with primary_label="Salvar" secondary_url=back_url only %}
-
-      {% include "components/ui/buttons/floating_primary_action.html" with label=submit_label icon=submit_icon|default:"check" type="submit" only %}
+      {% include "components/ui/layouts/footer_actions.html" with secondary_label="Voltar" secondary_url=back_url primary_label="Salvar" primary_icon="check" only %}
     </form>
   </div>
 {% endblock %}

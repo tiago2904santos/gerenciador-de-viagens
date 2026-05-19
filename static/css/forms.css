@@ -908,6 +908,8 @@ html[data-theme="light-dark"] input[type="checkbox"] {
 
 .app-form-field,
 .field {
+  align-content: start;
+  align-self: start;
   display: grid;
   gap: var(--space-field-gap);
 }

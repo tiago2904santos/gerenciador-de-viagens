@@ -62,10 +62,69 @@ class BaseCadastroForm(forms.ModelForm):
                 attrs.setdefault("data-mask", "upper")
 
 
+class ServidorFiltroSelectMultiple(forms.SelectMultiple):
+    def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+        option = super().create_option(name, value, label, selected, index, subindex=subindex, attrs=attrs)
+        servidor = getattr(value, "instance", None)
+        if servidor is None:
+            return option
+
+        cargo = servidor.cargo.nome if servidor.cargo_id and servidor.cargo else ""
+        unidade = str(servidor.unidade) if servidor.unidade_id and servidor.unidade else ""
+        cpf = servidor.cpf_formatado or ""
+        rg = servidor.rg_formatado or ""
+        main = " • ".join(part for part in [servidor.nome, cargo, f"CPF {cpf}" if cpf else ""] if part)
+        search = " ".join(part for part in [servidor.nome, cargo, cpf, rg, unidade] if part)
+        option["attrs"].update(
+            {
+                "data-cargo": cargo,
+                "data-cpf": cpf,
+                "data-main": main,
+                "data-meta": unidade or "Sem unidade vinculada",
+                "data-rg": rg,
+                "data-search": search,
+                "data-unidade": unidade,
+            }
+        )
+        return option
+
+
 class UnidadeForm(BaseCadastroForm):
+    servidores = forms.ModelMultipleChoiceField(
+        label="Servidores",
+        required=False,
+        queryset=Servidor.objects.none(),
+        widget=ServidorFiltroSelectMultiple(
+            attrs={
+                "class": "form-select app-multiselect__native",
+                "data-app-multiselect": "true",
+                "data-empty-selected": "Nenhum servidor vinculado.",
+                "data-empty-message": "Nenhum servidor encontrado.",
+                "data-placeholder": "Digite nome, cargo, CPF ou RG",
+                "data-search-placeholder": "Digite nome, cargo, CPF ou RG",
+            }
+        ),
+    )
+
     class Meta:
         model = Unidade
         fields = ["nome", "sigla"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["servidores"].queryset = Servidor.objects.select_related("cargo", "unidade").order_by("nome")
+        if self.instance.pk and not self.is_bound:
+            self.initial["servidores"] = list(self.instance.servidores.values_list("pk", flat=True))
+
+    def save(self, commit=True):
+        unidade = super().save(commit=commit)
+        if commit:
+            servidores = self.cleaned_data.get("servidores")
+            if servidores is not None:
+                selected_ids = {servidor.pk for servidor in servidores}
+                Servidor.objects.filter(pk__in=selected_ids).update(unidade=unidade)
+                Servidor.objects.filter(unidade=unidade).exclude(pk__in=selected_ids).update(unidade=None)
+        return unidade
 
     def clean_nome(self):
         return self.cleaned_data["nome"].strip()

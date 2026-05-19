@@ -5,4 +5,7 @@
   <div class="field-size-1">
     {% include "components/forms/form_field.html" with field=form.sigla only %}
   </div>
+  <div class="field-size-4">
+    {% include "components/forms/form_field.html" with field=form.servidores label="Filtrar servidores" help_text="Digite para buscar servidores cadastrados e vincular a esta unidade." only %}
+  </div>
 </div>

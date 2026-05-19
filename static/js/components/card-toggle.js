@@ -48,9 +48,14 @@
     if (button) {
       button.classList.toggle("cv-field-side-action--success", !active);
       button.classList.toggle("cv-field-side-action--danger", active);
+      button.classList.toggle("is-active", !active);
+      button.classList.toggle("is-inactive", active);
+      button.dataset.rgState = active ? "inactive" : "active";
       button.setAttribute("aria-pressed", active ? "true" : "false");
       const label = button.querySelector("span:last-child");
-      if (label) label.textContent = active ? "Não possui RG" : "Possui RG";
+      const activeLabel = button.dataset.rgLabelActive || "Possui RG";
+      const inactiveLabel = button.dataset.rgLabelInactive || "Não possui RG";
+      if (label) label.textContent = active ? inactiveLabel : activeLabel;
     }
 
     if (active && (rgTechnicalValue === "NAOPOSSUIRG" || rgTechnicalValue.includes("POSSUI"))) {
@@ -68,26 +73,34 @@
   }
 
   function initServidorSemRg() {
-    const form = document.querySelector("[data-servidor-sem-rg-form]");
-    if (!form) return;
+    document.querySelectorAll("[data-servidor-sem-rg-form]").forEach((form) => {
+      const semRg = form.querySelector("#id_sem_rg");
+      if (!semRg) return;
 
-    const semRg = form.querySelector("#id_sem_rg");
-    const button = form.querySelector("[data-rg-toggle]");
-    if (!semRg) return;
+      applyServidorSemRgUi(form, { clearRgOnLock: false });
+      semRg.addEventListener("change", () => applyServidorSemRgUi(form, { clearRgOnLock: true }));
+    });
+  }
 
-    applyServidorSemRgUi(form, { clearRgOnLock: false });
-    semRg.addEventListener("change", () => applyServidorSemRgUi(form, { clearRgOnLock: true }));
-    if (button) {
-      button.addEventListener("click", () => {
-        semRg.checked = !semRg.checked;
-        semRg.dispatchEvent(new Event("change", { bubbles: true }));
-      });
-    }
+  function initServidorSemRgButton() {
+    document.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-rg-toggle]");
+      if (!button) return;
+
+      const form = button.closest("[data-servidor-sem-rg-form]");
+      const semRg = form ? form.querySelector("#id_sem_rg") : null;
+      if (!form || !semRg) return;
+
+      event.preventDefault();
+      semRg.checked = !semRg.checked;
+      semRg.dispatchEvent(new Event("change", { bubbles: true }));
+    });
   }
 
   function boot() {
     initCardToggles();
     initServidorSemRg();
+    initServidorSemRgButton();
   }
 
   if (document.readyState === "loading") {

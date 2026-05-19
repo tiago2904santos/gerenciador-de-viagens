@@ -13,7 +13,7 @@
   <button class="cv-field-side-action cv-field-side-action--{{ variant|default:'secondary' }}{% if extra_class %} {{ extra_class }}{% endif %}"
           type="{{ type|default:'button' }}"
           {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
-          {% if data_rg_toggle %}aria-pressed="{{ aria_pressed|yesno:'true,false' }}" data-rg-toggle{% endif %}>
+          {% if data_rg_toggle %}aria-pressed="{{ aria_pressed|yesno:'true,false' }}" data-rg-toggle data-rg-label-active="Possui RG" data-rg-label-inactive="Não possui RG"{% endif %}>
     {% if icon %}
       <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon=icon only %}</span>
     {% endif %}
