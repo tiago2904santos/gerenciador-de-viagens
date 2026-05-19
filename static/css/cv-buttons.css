@@ -170,26 +170,39 @@ html[data-theme="dark"] {
   --cv-btn-footer-color: #cddbeb;
   --cv-btn-footer-hover-color: #ffffff;
 
-  --state-success-bg: color-mix(in srgb, var(--color-success) 18%, var(--theme-surface-card) 82%);
-  --state-success-bg-hover: color-mix(in srgb, var(--color-success) 26%, var(--theme-surface-card) 74%);
+  --state-success-bg: color-mix(in srgb, var(--color-success) 26%, var(--theme-surface-card) 74%);
+  --state-success-bg-hover: color-mix(in srgb, var(--color-success) 34%, var(--theme-surface-card) 66%);
   --state-success-bg-active: color-mix(in srgb, var(--color-success) 58%, var(--theme-surface-card) 42%);
   --state-success-text: color-mix(in srgb, var(--color-success) 48%, var(--color-white) 52%);
-  --state-warning-bg: color-mix(in srgb, var(--color-accent) 18%, var(--theme-surface-card) 82%);
-  --state-warning-bg-hover: color-mix(in srgb, var(--color-accent) 26%, var(--theme-surface-card) 74%);
+  --state-warning-bg: color-mix(in srgb, var(--color-accent) 26%, var(--theme-surface-card) 74%);
+  --state-warning-bg-hover: color-mix(in srgb, var(--color-accent) 34%, var(--theme-surface-card) 66%);
   --state-warning-bg-active: color-mix(in srgb, var(--color-accent) 54%, var(--theme-surface-card) 46%);
   --state-warning-text: color-mix(in srgb, var(--color-accent) 48%, var(--color-white) 52%);
   --state-warning-text-active: var(--theme-text-heading);
-  --state-danger-bg: color-mix(in srgb, var(--color-danger) 18%, var(--theme-surface-card) 82%);
-  --state-danger-bg-hover: color-mix(in srgb, var(--color-danger) 26%, var(--theme-surface-card) 74%);
+  --state-danger-bg: color-mix(in srgb, var(--color-danger) 20%, var(--theme-surface-card) 80%);
+  --state-danger-bg-hover: color-mix(in srgb, var(--color-danger) 30%, var(--theme-surface-card) 70%);
   --state-danger-bg-active: color-mix(in srgb, var(--color-danger) 56%, var(--theme-surface-card) 44%);
-  --state-danger-text: color-mix(in srgb, var(--color-danger) 42%, var(--color-white) 58%);
-  --state-neutral-bg: color-mix(in srgb, var(--theme-text-muted) 12%, var(--theme-surface-card) 88%);
-  --state-neutral-bg-hover: color-mix(in srgb, var(--theme-text-muted) 18%, var(--theme-surface-card) 82%);
+  --state-danger-border: color-mix(in srgb, var(--color-danger) 86%, var(--theme-border-card) 14%);
+  --state-danger-text: color-mix(in srgb, var(--color-danger) 64%, var(--color-white) 36%);
+  --state-danger-glow: 0 0 0 1px color-mix(in srgb, var(--color-danger) 44%, transparent), 0 0 26px color-mix(in srgb, var(--color-danger) 58%, transparent);
+  --state-neutral-bg: color-mix(in srgb, var(--theme-text-muted) 18%, var(--theme-surface-card) 82%);
+  --state-neutral-bg-hover: color-mix(in srgb, var(--theme-text-muted) 26%, var(--theme-surface-card) 74%);
   --state-neutral-bg-active: color-mix(in srgb, var(--color-primary-bright) 28%, var(--theme-surface-card) 72%);
 
   --cv-icon-btn-tooltip-bg: rgba(7, 17, 29, 0.98);
   --cv-icon-btn-tooltip-color: #f7fbff;
   --cv-icon-btn-tooltip-border: rgba(191, 211, 234, 0.22);
+}
+
+html[data-theme="light"] {
+  --state-success-bg: color-mix(in srgb, var(--color-success) 6%, var(--theme-surface-card, var(--color-surface)) 94%);
+  --state-success-bg-hover: color-mix(in srgb, var(--color-success) 12%, var(--theme-surface-card, var(--color-surface)) 88%);
+  --state-warning-bg: color-mix(in srgb, var(--color-accent) 6%, var(--theme-surface-card, var(--color-surface)) 94%);
+  --state-warning-bg-hover: color-mix(in srgb, var(--color-accent) 12%, var(--theme-surface-card, var(--color-surface)) 88%);
+  --state-danger-bg: color-mix(in srgb, var(--color-danger) 6%, var(--theme-surface-card, var(--color-surface)) 94%);
+  --state-danger-bg-hover: color-mix(in srgb, var(--color-danger) 12%, var(--theme-surface-card, var(--color-surface)) 88%);
+  --state-neutral-bg: color-mix(in srgb, var(--theme-text-muted, var(--color-muted)) 5%, var(--theme-surface-card, var(--color-surface)) 95%);
+  --state-neutral-bg-hover: color-mix(in srgb, var(--theme-text-muted, var(--color-muted)) 10%, var(--theme-surface-card, var(--color-surface)) 90%);
 }
 
 /* =========================================================
@@ -1243,8 +1256,7 @@ html[data-theme="dark"] {
   width: 18px;
 }
 
-.cv-field-side-action:hover,
-.cv-field-side-action:focus {
+.cv-field-side-action:hover {
   transform: translateY(-1px);
 }
 
@@ -1259,13 +1271,12 @@ html[data-theme="dark"] {
 }
 
 .cv-field-side-action--neutral {
-  background: transparent;
+  background: var(--state-neutral-bg);
   border-color: var(--cv-btn-neutral-border);
   color: var(--cv-btn-neutral-color);
 }
 
-.cv-field-side-action--neutral:hover,
-.cv-field-side-action--neutral:focus {
+.cv-field-side-action--neutral:hover {
   background: var(--cv-btn-neutral-hover-bg);
   border-color: var(--cv-btn-neutral-hover-border);
   color: var(--cv-btn-neutral-hover-color);
@@ -1298,14 +1309,13 @@ html[data-theme="dark"] {
 }
 
 .cv-field-side-action--success {
-  background: transparent;
+  background: var(--state-success-bg);
   border-color: var(--state-success-border);
   box-shadow: var(--state-success-glow), var(--shadow-xs);
   color: var(--state-success-text);
 }
 
-.cv-field-side-action--success:hover,
-.cv-field-side-action--success:focus {
+.cv-field-side-action--success:hover {
   background: var(--state-success-bg-hover);
   border-color: var(--state-success-border-hover);
   box-shadow: var(--state-success-glow), var(--shadow-sm);
@@ -1313,14 +1323,13 @@ html[data-theme="dark"] {
 }
 
 .cv-field-side-action--warning {
-  background: transparent;
+  background: var(--state-warning-bg);
   border-color: var(--state-warning-border);
   box-shadow: var(--state-warning-glow), var(--shadow-xs);
   color: var(--state-warning-text);
 }
 
-.cv-field-side-action--warning:hover,
-.cv-field-side-action--warning:focus {
+.cv-field-side-action--warning:hover {
   background: var(--state-warning-bg-hover);
   border-color: var(--state-warning-border-hover);
   box-shadow: var(--state-warning-glow), var(--shadow-sm);
@@ -1328,14 +1337,13 @@ html[data-theme="dark"] {
 }
 
 .cv-field-side-action--danger {
-  background: transparent;
+  background: var(--state-danger-bg);
   border-color: var(--state-danger-border);
   box-shadow: var(--state-danger-glow), var(--shadow-xs);
   color: var(--state-danger-text);
 }
 
-.cv-field-side-action--danger:hover,
-.cv-field-side-action--danger:focus {
+.cv-field-side-action--danger:hover {
   background: var(--state-danger-bg-hover);
   border-color: var(--state-danger-border-hover);
   box-shadow: var(--state-danger-glow), var(--shadow-sm);

@@ -589,36 +589,42 @@
             <div class="cv-field">
               <label class="cv-field__label" for="field-action-cargo">Cargo</label>
               <div class="cv-field-with-action">
-                <span class="cv-select__wrapper">
-                  <select class="cv-select__control" id="field-action-cargo">
-                    <option>Analista administrativa</option>
-                    <option>Tecnico</option>
+                <div class="cv-custom-select" data-cv-select>
+                  <select id="field-action-cargo" name="field-action-cargo">
+                    <option value="1" selected>Analista administrativa</option>
+                    <option value="2">Tecnico</option>
+                    <option value="3">Coordenador</option>
+                    <option value="4">Motorista</option>
                   </select>
-                </span>
+                </div>
                 <button class="cv-field-action cv-field-action--manage" type="button">Gerenciar cargo</button>
               </div>
             </div>
             <div class="cv-field">
               <label class="cv-field__label" for="field-action-unidade">Unidade</label>
               <div class="cv-field-with-action">
-                <span class="cv-select__wrapper">
-                  <select class="cv-select__control" id="field-action-unidade">
-                    <option>SEJUS / PR</option>
-                    <option>SEAP / PR</option>
+                <div class="cv-custom-select" data-cv-select>
+                  <select id="field-action-unidade" name="field-action-unidade">
+                    <option value="1" selected>SEJUS / PR</option>
+                    <option value="2">SEAP / PR</option>
+                    <option value="3">SESP / PR</option>
+                    <option value="4">SESA / PR</option>
                   </select>
-                </span>
+                </div>
                 <button class="cv-field-action cv-field-action--manage" type="button">Gerenciar unidade</button>
               </div>
             </div>
             <div class="cv-field">
               <label class="cv-field__label" for="field-action-combustivel">Combustivel</label>
               <div class="cv-field-with-action">
-                <span class="cv-select__wrapper">
-                  <select class="cv-select__control" id="field-action-combustivel">
-                    <option>Diesel S10</option>
-                    <option>Gasolina comum</option>
+                <div class="cv-custom-select" data-cv-select>
+                  <select id="field-action-combustivel" name="field-action-combustivel">
+                    <option value="1" selected>Diesel S10</option>
+                    <option value="2">Gasolina comum</option>
+                    <option value="3">Etanol</option>
+                    <option value="4">GNV</option>
                   </select>
-                </span>
+                </div>
                 <button class="cv-field-action cv-field-action--manage" type="button">Gerenciar combustiveis</button>
               </div>
             </div>
@@ -656,146 +662,11 @@
               </div>
             </div>
             <div class="cv-field-state-card">
-              <h4 class="cv-field-state-card__title">Ativo, inativo e disabled</h4>
-              <p class="cv-field-state-card__description">Estados fortes sem parecer Bootstrap ou botao HTML comum.</p>
-              <div class="cv-state-button-demo-row">
-                <button class="cv-state-button cv-state-button--success cv-state-button--active" type="button" aria-pressed="true">Ativo</button>
-                <button class="cv-state-button cv-state-button--danger cv-state-button--inactive" type="button" aria-pressed="false">Inativo</button>
-                <button class="cv-state-button cv-state-button--neutral" type="button" disabled>Disabled</button>
-              </div>
-            </div>
-            <div class="cv-field-state-card">
               <h4 class="cv-field-state-card__title">Toggle binario</h4>
               <p class="cv-field-state-card__description">Mesmo padrao usado pelos estados de RG.</p>
               <div class="cv-state-button-demo-row">
                 <button class="cv-field-side-action cv-field-side-action--success cv-field-side-action--toggle cv-field-side-action--state is-active" type="button" aria-pressed="true">Possui RG</button>
                 <button class="cv-field-side-action cv-field-side-action--danger cv-field-side-action--toggle cv-field-side-action--state is-inactive" type="button" aria-pressed="false">Nao possui RG</button>
-              </div>
-            </div>
-            <div class="cv-field-state-card">
-              <h4 class="cv-field-state-card__title">Segmented control</h4>
-              <p class="cv-field-state-card__description">Referencia para Gerar / Nao gerar e escolhas binarias por item.</p>
-              <div class="cv-state-segmented" role="group" aria-label="Termo de autorizacao">
-                <button class="cv-state-button cv-state-button--success" type="button" aria-pressed="true">Gerar</button>
-                <button class="cv-state-button cv-state-button--warning" type="button" aria-pressed="false">Nao gerar</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </article>
-
-      <article class="cv-field-panel" id="fields-select-search">
-        <div class="cv-field-panel__header">
-          <span class="cv-field-panel__eyebrow">Select com busca / multiselect</span>
-          <h3 class="cv-field-panel__title">Modelo premium aprovado visualmente</h3>
-          <p class="cv-field-panel__description">
-            O prototipo visual deixa claro o comportamento futuro: busca, chips, dropdown, vazio,
-            selecionados e erro. Sem JS na pagina de referencia.
-          </p>
-        </div>
-        <div class="cv-field-panel__body">
-          <div class="cv-field-grid cv-field-grid--2">
-            <div class="cv-multiselect">
-              <div class="cv-field">
-                <label class="cv-field__label" for="multiselect-viajantes">Multiselect com chips e dropdown aberto</label>
-                <div class="cv-multiselect__control">
-                  <div class="cv-multiselect__header">
-                    <input class="cv-multiselect__search" type="search" id="multiselect-viajantes" value="ser" placeholder="Buscar servidor, viajante ou documento">
-                    <span class="cv-multiselect__count">3 selecionados</span>
-                  </div>
-                  <div class="cv-multiselect__chips" aria-label="Itens selecionados">
-                    <span class="cv-multiselect__chip">
-                      <span class="cv-multiselect__chip-label">Ana Souza</span>
-                      <button class="cv-multiselect__chip-remove" type="button" aria-label="Remover Ana Souza">&times;</button>
-                    </span>
-                    <span class="cv-multiselect__chip">
-                      <span class="cv-multiselect__chip-label">Bruno Lima</span>
-                      <button class="cv-multiselect__chip-remove" type="button" aria-label="Remover Bruno Lima">&times;</button>
-                    </span>
-                    <span class="cv-multiselect__chip">
-                      <span class="cv-multiselect__chip-label">Camila Reis</span>
-                      <button class="cv-multiselect__chip-remove" type="button" aria-label="Remover Camila Reis">&times;</button>
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div class="cv-multiselect__dropdown" role="listbox" aria-label="Sugestoes de viajantes">
-                <div class="cv-multiselect__option cv-multiselect__option--selected" aria-selected="true">
-                  <span class="cv-multiselect__option-marker" aria-hidden="true"></span>
-                  <span class="cv-multiselect__option-label">Ana Souza</span>
-                  <span class="cv-multiselect__option-meta">Servidor</span>
-                </div>
-                <div class="cv-multiselect__option cv-multiselect__option--active">
-                  <span class="cv-multiselect__option-marker" aria-hidden="true"></span>
-                  <span class="cv-multiselect__option-label">Bruno Lima</span>
-                  <span class="cv-multiselect__option-meta">Hover / foco</span>
-                </div>
-                <div class="cv-multiselect__option">
-                  <span class="cv-multiselect__option-marker" aria-hidden="true"></span>
-                  <span class="cv-multiselect__option-label">Destino - Londrina</span>
-                  <span class="cv-multiselect__option-meta">Documento vinculado</span>
-                </div>
-              </div>
-            </div>
-            <div class="cv-multiselect">
-              <div class="cv-field">
-                <label class="cv-field__label" for="multiselect-search-empty">Select com busca vazio</label>
-                <div class="cv-multiselect__control">
-                  <div class="cv-multiselect__header">
-                    <input class="cv-multiselect__search" type="search" id="multiselect-search-empty" placeholder="Buscar itens">
-                    <span class="cv-multiselect__count">Estado vazio</span>
-                  </div>
-                  <div class="cv-multiselect__empty">Nenhum item selecionado. Comece digitando para buscar.</div>
-                </div>
-              </div>
-              <div class="cv-field">
-                <label class="cv-field__label" for="multiselect-search-filled">Select com busca preenchido</label>
-                <div class="cv-multiselect__control">
-                  <div class="cv-multiselect__header">
-                    <input class="cv-multiselect__search" type="search" id="multiselect-search-filled" value="Unidade administrativa" placeholder="Buscar unidade">
-                    <span class="cv-multiselect__count">1 selecionado</span>
-                  </div>
-                  <div class="cv-multiselect__chips" aria-label="Item selecionado">
-                    <span class="cv-multiselect__chip">
-                      <span class="cv-multiselect__chip-label">SEJUS / PR</span>
-                      <button class="cv-multiselect__chip-remove" type="button" aria-label="Remover SEJUS / PR">&times;</button>
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="cv-field-grid cv-field-grid--2">
-            <div class="cv-field cv-field--error">
-              <div class="cv-field__label-row">
-                <label class="cv-field__label" for="multiselect-error">Multiselect em erro <span class="cv-field__required" aria-hidden="true">*</span></label>
-                <span class="cv-field__error-badge">Erro</span>
-              </div>
-              <div class="cv-multiselect__control">
-                <div class="cv-multiselect__header">
-                  <input class="cv-multiselect__search" type="search" id="multiselect-error" placeholder="Buscar destino" aria-invalid="true" aria-describedby="multiselect-error-text">
-                  <span class="cv-multiselect__count">Obrigatorio</span>
-                </div>
-                <div class="cv-multiselect__empty">Selecione ao menos um destino para continuar.</div>
-              </div>
-              <p class="cv-field__error" id="multiselect-error-text">Selecao obrigatoria para vincular o documento.</p>
-            </div>
-            <div class="cv-multiselect cv-multiselect--disabled">
-              <div class="cv-field cv-field--disabled">
-                <label class="cv-field__label" for="multiselect-disabled">Multiselect disabled</label>
-                <div class="cv-multiselect__control">
-                  <div class="cv-multiselect__header">
-                    <input class="cv-multiselect__search" type="search" id="multiselect-disabled" value="Indisponivel" disabled>
-                    <span class="cv-multiselect__count">Bloqueado</span>
-                  </div>
-                  <div class="cv-multiselect__chips" aria-label="Item selecionado indisponivel">
-                    <span class="cv-multiselect__chip">
-                      <span class="cv-multiselect__chip-label">Documento travado</span>
-                      <button class="cv-multiselect__chip-remove" type="button" aria-label="Remover Documento travado" disabled>&times;</button>
-                    </span>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -1094,7 +965,7 @@
 
             <div class="cv-search-picker-demo-card">
               <p class="cv-search-picker-demo-card__title">3 — Multiselect detalhado</p>
-              <p class="cv-search-picker-demo-card__description">Cards com metadados completos para revisao de equipe.</p>
+              <p class="cv-search-picker-demo-card__description">Cards com metadados completos: Nome • Cargo / Unidade • CPF • RG.</p>
               <select
                 id="lab-picker-multi-detailed"
                 name="lab-picker-multi-detailed"
@@ -1103,7 +974,7 @@
                 data-picker-mode="multi"
                 data-picker-variant="detailed"
                 data-picker-label="Equipe"
-                data-picker-hint="Inclui CPF e RG fake mascarados nos selecionados."
+                data-picker-hint="Busque por nome, cargo, CPF ou RG."
                 data-panel-title="EQUIPE DO OFICIO"
                 data-placeholder="Buscar por nome, CPF ou RG"
                 data-empty-message="Nenhum resultado encontrado."
@@ -1132,6 +1003,7 @@
               data-picker-mode="multi"
               data-picker-variant="compact"
               data-picker-term-control="true"
+              data-picker-driver-control="true"
               data-picker-label="Servidores"
               data-picker-hint="Cada selecionado controla se o termo sera gerado."
               data-cv-termos-name="lab-termos-tc"
@@ -1161,6 +1033,7 @@
               data-picker-mode="multi"
               data-picker-variant="detailed"
               data-picker-term-control="true"
+              data-picker-driver-control="true"
               data-picker-label="Equipe com autorizacao"
               data-picker-hint="Use o controle segmentado de cada card para alternar o termo."
               data-cv-termos-name="lab-termos-td"

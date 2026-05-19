@@ -33,9 +33,9 @@
   --danger-text: var(--state-danger-text-active);
   --remove-rail-width: calc(var(--space-10) + var(--space-2));
   --selected-card-open-gap: var(--space-2);
-  --driver-bg: var(--state-neutral-bg-active);
-  --driver-border: var(--state-neutral-border-hover);
-  --driver-text: var(--state-neutral-text-active);
+  --driver-bg: var(--cv-btn-secondary-active-bg, var(--color-primary-soft));
+  --driver-border: var(--cv-btn-secondary-active-border, var(--color-primary));
+  --driver-text: var(--cv-btn-secondary-active-color, var(--color-primary-strong));
   --cv-search-picker-height: var(--control-height-lg);
   --cv-search-picker-radius: var(--radius-control);
   --cv-search-picker-card-radius: var(--radius-card);
@@ -216,7 +216,7 @@
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-black);
   grid-column: 1;
-  grid-row: 1 / span 2;
+  grid-row: 1;
   height: auto;
   margin: calc(var(--space-3) * -1) 0 calc(var(--space-3) * -1) calc(var(--space-3) * -1);
   min-width: 0;
@@ -232,6 +232,16 @@
     transform var(--transition-base),
     width var(--transition-base);
   width: var(--remove-rail-width);
+}
+
+/* Com driver: remove cobre as 2 linhas (corpo + driver-control) */
+.cv-search-picker__selected-card--with-driver > .cv-search-picker__remove {
+  grid-row: 1 / span 2;
+}
+
+/* Cards simples (sem term nem driver): rail de excluir mais estreito */
+.cv-search-picker__selected-card:not(.cv-search-picker__selected-card--with-term):not(.cv-search-picker__selected-card--with-driver) {
+  --remove-rail-width: var(--space-9);
 }
 
 .cv-search-picker__selected-card:hover > .cv-search-picker__remove {
@@ -515,7 +525,11 @@
 .cv-search-picker__selected-card--with-term:hover {
   column-gap: var(--space-1);          /* gap pequeno entre rail X e corpo */
   grid-template-columns: var(--remove-rail-width) minmax(0, 1fr) auto;
-  row-gap: var(--space-4);             /* gap maior acima do botão motorista */
+}
+
+/* row-gap só quando o botão de motorista existir */
+.cv-search-picker__selected-card--with-driver:hover {
+  row-gap: var(--space-4);
 }
 
 .cv-search-picker__selected-card--has-term {
@@ -584,7 +598,12 @@
 }
 
 .cv-search-picker--detailed .cv-search-picker__selected-list {
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.cv-search-picker--detailed .cv-search-picker__selected-card:only-child,
+.cv-search-picker--detailed .cv-search-picker__selected-card:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
 }
 
 .cv-search-picker__term-control {
@@ -608,11 +627,6 @@
 
 /* O toggle de Termo usa cv-field-side-action--state (dot colorido).
    Os estilos visuais já existem em cv-buttons.css — nenhuma regra extra. */
-
-.cv-search-picker__selected-card--with-term .cv-search-picker__remove {
-  grid-column: 1;
-  grid-row: 1 / span 2;
-}
 
 .cv-search-picker__driver-control {
   grid-column: 2 / -1;
@@ -747,6 +761,11 @@
   opacity: 0.72;
 }
 
+.cv-search-picker--disabled .cv-search-picker__selected-card:hover {
+  column-gap: 0;
+  grid-template-columns: 0 minmax(0, 1fr) auto;
+}
+
 @media (max-width: 720px) {
   .cv-search-picker--compact .cv-search-picker__selected-list {
     grid-template-columns: 1fr;
@@ -766,7 +785,7 @@
     padding-top: var(--space-3);
   }
 
-  .cv-search-picker__selected-card--with-term .cv-search-picker__remove {
+  .cv-search-picker__selected-card--with-driver .cv-search-picker__remove {
     grid-column: 1;
     grid-row: 1 / span 2;
   }

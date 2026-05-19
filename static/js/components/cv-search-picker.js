@@ -66,8 +66,9 @@
     const emptyPanelMsg = select.dataset.emptySelected    || "Nenhum item selecionado.";
     const panelTitle   = select.dataset.panelTitle        || "SELECIONADOS";
     const termosName   = select.dataset.cvTermosName      || "";
-    const showTermCtrl = select.dataset.pickerTermControl === "true" || !!termosName;
-    const isError      = select.dataset.pickerError       === "true";
+    const showTermCtrl   = select.dataset.pickerTermControl   === "true" || !!termosName;
+    const showDriverCtrl = select.dataset.pickerDriverControl === "true";
+    const isError        = select.dataset.pickerError         === "true";
     const listboxId    = `${select.id || select.name || "cv-picker"}-results`;
 
     /* Estado */
@@ -377,27 +378,50 @@
       const card = el("div", "cv-search-picker__selected-card");
       card.dataset.value = item.value;
 
-      const body = el("div",  "cv-search-picker__selected-main");
+      const body  = el("div", "cv-search-picker__selected-main");
       const title = el("div", "cv-search-picker__selected-title-row");
-      const name = el("span", "cv-search-picker__selected-name", item.label);
-      const driverChip = el("span", "cv-search-picker__driver-chip", "Motorista");
-      const metaParts = [item.cargo, item.unidade].filter(Boolean);
-      const meta = el(
-        "span",
-        "cv-search-picker__selected-meta",
-        metaParts.length ? metaParts.join(" • ") : "Dados complementares não informados",
-      );
-      title.appendChild(name);
-      title.appendChild(driverChip);
-      body.appendChild(title);
-      body.appendChild(meta);
 
-      /* Detalhe: CPF / RG — exibido pelo CSS apenas no modo --detailed */
-      const detailParts = [];
-      if (item.cpf) detailParts.push("CPF: " + maskDocument(item.cpf, "cpf"));
-      if (item.rg)  detailParts.push("RG: "  + maskDocument(item.rg, "rg"));
-      if (detailParts.length) {
-        body.appendChild(el("span", "cv-search-picker__selected-detail", detailParts.join("  •  ")));
+      if (variant === "detailed") {
+        /* ── Layout detalhado ──────────────────────────────────────
+           Linha 1: Nome • Cargo
+           Linha 2: Unidade lotado • CPF • RG (sem máscara)
+        ─────────────────────────────────────────────────────────── */
+        const nameParts = [item.label, item.cargo].filter(Boolean);
+        const name = el("span", "cv-search-picker__selected-name", nameParts.join("  •  "));
+        title.appendChild(name);
+        if (showDriverCtrl) title.appendChild(el("span", "cv-search-picker__driver-chip", "Motorista"));
+        body.appendChild(title);
+
+        const metaParts = [item.unidade, item.cpf, item.rg].filter(Boolean);
+        body.appendChild(el(
+          "span",
+          "cv-search-picker__selected-meta",
+          metaParts.length ? metaParts.join("  •  ") : "Dados complementares nao informados",
+        ));
+      } else {
+        /* ── Layout compacto ───────────────────────────────────────
+           Linha 1: Nome
+           Linha 2: Cargo • Unidade
+           Linha 3 (detail): CPF mascarado • RG mascarado
+        ─────────────────────────────────────────────────────────── */
+        const name = el("span", "cv-search-picker__selected-name", item.label);
+        title.appendChild(name);
+        if (showDriverCtrl) title.appendChild(el("span", "cv-search-picker__driver-chip", "Motorista"));
+        body.appendChild(title);
+
+        const metaParts = [item.cargo, item.unidade].filter(Boolean);
+        body.appendChild(el(
+          "span",
+          "cv-search-picker__selected-meta",
+          metaParts.length ? metaParts.join(" • ") : "Dados complementares nao informados",
+        ));
+
+        const detailParts = [];
+        if (item.cpf) detailParts.push("CPF: " + maskDocument(item.cpf, "cpf"));
+        if (item.rg)  detailParts.push("RG: "  + maskDocument(item.rg, "rg"));
+        if (detailParts.length) {
+          body.appendChild(el("span", "cv-search-picker__selected-detail", detailParts.join("  •  ")));
+        }
       }
 
       const removeBtn = el("button", "cv-search-picker__remove", "x");
@@ -416,7 +440,11 @@
         card.classList.toggle("cv-search-picker__selected-card--has-term", selectedForTerm.has(item.value));
       }
 
-      card.appendChild(buildDriverControl(item));
+      /* Botão de motorista — apenas quando explicitamente habilitado */
+      if (showDriverCtrl) {
+        card.classList.add("cv-search-picker__selected-card--with-driver");
+        card.appendChild(buildDriverControl(item));
+      }
 
       return card;
     }
