@@ -219,33 +219,43 @@
               {% endfor %}
             </ol>
           </nav>
-          <main class="main-form-panel">
-            <section class="form-section" aria-labelledby="structure-wizard-primary">
-              <header class="section-header">
-                <div class="section-header__copy">
-                  <h3 class="section-header__title" id="structure-wizard-primary">Seção exemplo 1</h3>
-                  <p class="section-header__description">Subtítulo da seção exemplo da etapa 2.</p>
+          <main class="main-form-panel main-form-panel--stack">
+            <div class="cv-wizard-section-stack">
+
+              <section class="cv-wizard-section-card" aria-labelledby="structure-wizard-primary">
+                <header class="cv-wizard-section-header">
+                  <div class="cv-wizard-section-header__copy">
+                    <h3 class="cv-wizard-section-title" id="structure-wizard-primary">Seção exemplo 1</h3>
+                    <p class="cv-wizard-section-subtitle">Subtítulo da seção exemplo da etapa 2.</p>
+                  </div>
+                </header>
+                <div class="cv-wizard-section-body">
+                  <div class="field-grid">
+                    {% for field in ui_lab_fields.wizard_primary %}
+                      {% include "dev/ui_lab/partials/_demo_field.html" with field=field only %}
+                    {% endfor %}
+                  </div>
                 </div>
-              </header>
-              <div class="field-grid">
-                {% for field in ui_lab_fields.wizard_primary %}
-                  {% include "dev/ui_lab/partials/_demo_field.html" with field=field only %}
-                {% endfor %}
-              </div>
-            </section>
-            <section class="form-section" aria-labelledby="structure-wizard-secondary">
-              <header class="section-header">
-                <div class="section-header__copy">
-                  <h3 class="section-header__title" id="structure-wizard-secondary">Seção exemplo 2</h3>
-                  <p class="section-header__description">Subtítulo da seção exemplo.</p>
+              </section>
+
+              <section class="cv-wizard-section-card" aria-labelledby="structure-wizard-secondary">
+                <header class="cv-wizard-section-header">
+                  <div class="cv-wizard-section-header__copy">
+                    <h3 class="cv-wizard-section-title" id="structure-wizard-secondary">Seção exemplo 2</h3>
+                    <p class="cv-wizard-section-subtitle">Subtítulo da seção exemplo.</p>
+                  </div>
+                </header>
+                <div class="cv-wizard-section-body">
+                  <div class="field-grid">
+                    {% for field in ui_lab_fields.wizard_secondary %}
+                      {% include "dev/ui_lab/partials/_demo_field.html" with field=field only %}
+                    {% endfor %}
+                  </div>
                 </div>
-              </header>
-              <div class="field-grid">
-                {% for field in ui_lab_fields.wizard_secondary %}
-                  {% include "dev/ui_lab/partials/_demo_field.html" with field=field only %}
-                {% endfor %}
-              </div>
-            </section>
+              </section>
+
+            </div>
+
             <footer class="footer-actions">
               <div class="footer-actions__secondary">
                 <button class="btn btn-secondary" type="button">Salvar rascunho</button>
