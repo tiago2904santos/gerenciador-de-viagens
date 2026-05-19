@@ -91,18 +91,200 @@
       <article class="cv-field-panel" id="fields-select-simple">
         <div class="cv-field-panel__header">
           <span class="cv-field-panel__eyebrow">Select simples</span>
-          <h3 class="cv-field-panel__title">Selects com a mesma altura e acabamento do input</h3>
+          <h3 class="cv-field-panel__title">Select simples premium e reutilizavel</h3>
           <p class="cv-field-panel__description">
-            O select nao pode parecer nativo mal acabado. A seta, o fundo e a borda seguem o mesmo
-            sistema do input.
+            Use <code>.cv-select__wrapper</code> envolvendo <code>.cv-select__control</code>.
+            O controle fechado ganha chevron customizado, profundidade sutil, foco consistente e
+            alinhamento com acoes laterais.
           </p>
         </div>
         <div class="cv-field-panel__body">
+          <div class="cv-field-panel__note">
+            O dropdown aberto continua sendo nativo do navegador e tem limites seguros de estilo.
+            Se o projeto precisar de lista 100% customizada, o proximo componente deve ser um
+            Custom Select / Combobox separado.
+          </div>
+
+          <div class="cv-field-grid cv-field-grid--3">
+            <div class="cv-field">
+              <label class="cv-field__label" for="field-select-default">Select padrao</label>
+              <span class="cv-select__wrapper">
+                <select class="cv-select__control" id="field-select-default">
+                  <option>Analista administrativa</option>
+                  <option>Motorista</option>
+                  <option>Tecnico</option>
+                </select>
+              </span>
+            </div>
+            <div class="cv-field">
+              <label class="cv-field__label" for="field-select-placeholder">Com placeholder</label>
+              <span class="cv-select__wrapper">
+                <select class="cv-select__control" id="field-select-placeholder">
+                  <option value="" selected>Selecione uma opcao</option>
+                  <option>Gabinete</option>
+                  <option>Administrativo</option>
+                  <option>Operacional</option>
+                </select>
+              </span>
+            </div>
+            <div class="cv-field cv-field--filled-demo">
+              <label class="cv-field__label" for="field-select-filled">Preenchido</label>
+              <span class="cv-select__wrapper">
+                <select class="cv-select__control" id="field-select-filled">
+                  <option>SEJUS / PR</option>
+                  <option>SEAP / PR</option>
+                  <option>Gabinete</option>
+                </select>
+              </span>
+            </div>
+            <div class="cv-field cv-field--focus-demo">
+              <label class="cv-field__label" for="field-select-focus">Foco</label>
+              <span class="cv-select__wrapper">
+                <select class="cv-select__control" id="field-select-focus">
+                  <option>Foco visual aplicado</option>
+                  <option>Opcao secundaria</option>
+                </select>
+              </span>
+            </div>
+            <div class="cv-field cv-field--disabled">
+              <label class="cv-field__label" for="field-select-disabled">Disabled</label>
+              <span class="cv-select__wrapper cv-select--disabled">
+                <select class="cv-select__control" id="field-select-disabled" disabled>
+                  <option>Indisponivel</option>
+                </select>
+              </span>
+            </div>
+            <div class="cv-field cv-field--error">
+              <label class="cv-field__label" for="field-select-error">Erro</label>
+              <span class="cv-select__wrapper cv-select--error">
+                <select class="cv-select__control" id="field-select-error" aria-invalid="true" aria-describedby="field-select-error-text">
+                  <option>Selecao invalida</option>
+                  <option>Opcao valida</option>
+                </select>
+              </span>
+              <p class="cv-field__error" id="field-select-error-text">Selecione uma opcao compativel com o cadastro.</p>
+            </div>
+          </div>
+
+          <div class="cv-field-grid cv-field-grid--3">
+            <div class="cv-field">
+              <label class="cv-field__label" for="field-select-sm">Pequeno</label>
+              <span class="cv-select__wrapper cv-select--sm">
+                <select class="cv-select__control" id="field-select-sm">
+                  <option>PR</option>
+                  <option>SC</option>
+                  <option>SP</option>
+                </select>
+              </span>
+            </div>
+            <div class="cv-field">
+              <label class="cv-field__label" for="field-select-md">Medio</label>
+              <span class="cv-select__wrapper cv-select--md">
+                <select class="cv-select__control" id="field-select-md">
+                  <option>Documento institucional</option>
+                  <option>Viagem administrativa</option>
+                </select>
+              </span>
+            </div>
+            <div class="cv-field">
+              <label class="cv-field__label" for="field-select-lg">Grande</label>
+              <span class="cv-select__wrapper cv-select--lg">
+                <select class="cv-select__control" id="field-select-lg">
+                  <option>Fluxo documental completo</option>
+                  <option>Fluxo simplificado</option>
+                </select>
+              </span>
+            </div>
+          </div>
+
           <div class="cv-field-grid cv-field-grid--2">
             <div class="cv-field">
-              <label class="cv-field__label" for="field-cargo">Cargo</label>
-              <select class="cv-field__control cv-field__control--select" id="field-cargo">
-                <option>Analista administrativa</option>
+              <label class="cv-field__label" for="field-select-action-cargo">Com botao lateral</label>
+              <div class="cv-field-with-action">
+                <span class="cv-select__wrapper">
+                  <select class="cv-select__control" id="field-select-action-cargo">
+                    <option>Analista administrativa</option>
+                    <option>Motorista</option>
+                    <option>Tecnico</option>
+                  </select>
+                </span>
+                <button class="cv-field-action cv-field-action--manage" type="button">Gerenciar cargo</button>
+              </div>
+            </div>
+            <div class="cv-field">
+              <label class="cv-field__label" for="field-select-action-long">Botao lateral longo</label>
+              <div class="cv-field-with-action">
+                <span class="cv-select__wrapper">
+                  <select class="cv-select__control" id="field-select-action-long">
+                    <option>Gasolina</option>
+                    <option>Diesel</option>
+                    <option>Etanol</option>
+                  </select>
+                </span>
+                <button class="cv-field-action cv-field-action--manage" type="button">Gerenciar combustiveis</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="cv-field-grid cv-field-grid--4">
+            <div class="cv-field">
+              <label class="cv-field__label" for="field-select-grid-a">Grid</label>
+              <span class="cv-select__wrapper">
+                <select class="cv-select__control" id="field-select-grid-a">
+                  <option>Rascunho</option>
+                  <option>Pendente</option>
+                </select>
+              </span>
+            </div>
+            <div class="cv-field">
+              <label class="cv-field__label" for="field-select-grid-b">UF</label>
+              <span class="cv-select__wrapper">
+                <select class="cv-select__control" id="field-select-grid-b">
+                  <option>PR</option>
+                  <option>SC</option>
+                </select>
+              </span>
+            </div>
+            <div class="cv-field">
+              <label class="cv-field__label" for="field-select-grid-c">Tipo</label>
+              <span class="cv-select__wrapper">
+                <select class="cv-select__control" id="field-select-grid-c">
+                  <option>Caracterizada</option>
+                  <option>Administrativa</option>
+                </select>
+              </span>
+            </div>
+            <div class="cv-field">
+              <label class="cv-field__label" for="field-select-grid-d">Status</label>
+              <span class="cv-select__wrapper">
+                <select class="cv-select__control" id="field-select-grid-d">
+                  <option>Ativo</option>
+                  <option>Inativo</option>
+                </select>
+              </span>
+            </div>
+          </div>
+
+          <div class="cv-field-grid cv-field-grid--1">
+            <div class="cv-field cv-field--full">
+              <label class="cv-field__label" for="field-select-full">Largura total</label>
+              <span class="cv-select__wrapper">
+                <select class="cv-select__control" id="field-select-full">
+                  <option>Unidade administrativa responsavel pelo documento</option>
+                  <option>Unidade operacional externa</option>
+                </select>
+              </span>
+            </div>
+          </div>
+
+          <div class="cv-field-panel__note">
+            Classes documentadas: <code>.cv-select__wrapper</code>, <code>.cv-select__control</code>,
+            <code>.cv-select--sm</code>, <code>.cv-select--md</code>, <code>.cv-select--lg</code>,
+            <code>.cv-select--disabled</code>, <code>.cv-select--error</code> e
+            <code>.cv-field-with-action</code>.
+          </div>
+        </div>
+      </article>
                 <option>Motorista</option>
                 <option>Tecnico</option>
               </select>
