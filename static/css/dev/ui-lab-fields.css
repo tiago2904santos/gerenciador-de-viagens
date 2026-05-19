@@ -154,10 +154,15 @@ html[data-theme="dark"] .ui-lab-page {
    ========================================================= */
 
 .cv-field-grid {
+  align-items: start;
   display: grid;
   gap: var(--cv-field-grid-gap);
   grid-template-columns: repeat(var(--cv-field-grid-columns, 1), minmax(0, 1fr));
   min-width: 0;
+}
+
+.cv-field-grid .cv-multiselect {
+  grid-column: 1 / -1;
 }
 
 .cv-field-grid--2 {
@@ -344,18 +349,6 @@ html[data-theme="dark"] .ui-lab-page {
   width: 100%;
 }
 
-.cv-select__wrapper::before {
-  background: var(--theme-border-card);
-  bottom: var(--space-2);
-  content: "";
-  pointer-events: none;
-  position: absolute;
-  right: var(--space-6);
-  top: var(--space-2);
-  width: 1px;
-  z-index: 1;
-}
-
 .cv-select__wrapper::after {
   border-bottom: 2px solid currentColor;
   border-right: 2px solid currentColor;
@@ -389,8 +382,8 @@ html[data-theme="dark"] .ui-lab-page {
   font-family: var(--font-sans);
   font-size: var(--cv-field-font-size);
   font-weight: var(--font-weight-semibold);
+  height: var(--cv-field-height);
   line-height: 1.2;
-  min-height: var(--cv-field-height);
   padding: 0 calc(var(--space-6) + var(--space-4)) 0 var(--cv-field-padding-x);
   transition:
     background-color var(--transition-fast),
@@ -429,14 +422,10 @@ html[data-theme="dark"] .ui-lab-page {
     linear-gradient(var(--cv-select-border-hover), var(--cv-select-border-hover)) border-box;
 }
 
-.cv-select__wrapper:focus-within::after {
-  color: var(--cv-field-color);
-  transform: translateY(calc(var(--space-2) * -1)) rotate(45deg);
-}
-
+.cv-select__wrapper:focus-within::after,
 .cv-field--focus-demo .cv-select__wrapper::after {
-  color: var(--cv-field-color);
-  transform: translateY(calc(var(--space-2) * -1)) rotate(45deg);
+  color: var(--cv-select-border-focus);
+  transform: translateY(calc(var(--space-1) * -1)) rotate(225deg);
 }
 
 .cv-select__control:disabled,
@@ -478,17 +467,7 @@ html[data-theme="dark"] .ui-lab-page {
   color: var(--cv-field-error);
 }
 
-.cv-select--sm .cv-select__control {
-  min-height: var(--control-height-sm);
-}
-
-.cv-select--md .cv-select__control {
-  min-height: var(--control-height-md);
-}
-
-.cv-select--lg .cv-select__control {
-  min-height: var(--control-height-lg);
-}
+/* Tamanho único — um só select, mesmo tamanho dos inputs */
 
 .cv-field__control--numeric,
 .cv-field__control--money {
@@ -624,11 +603,50 @@ html[data-theme="dark"] .ui-lab-page {
   min-width: 0;
 }
 
+.cv-field-action {
+  align-items: center;
+  appearance: none;
+  background:
+    linear-gradient(var(--theme-surface-card), var(--theme-surface-card)) padding-box,
+    linear-gradient(var(--cv-field-border), var(--cv-field-border)) border-box;
+  border: 1px solid transparent;
+  border-radius: var(--cv-field-radius);
+  box-shadow: var(--shadow-sm);
+  color: var(--theme-text-body);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: inherit;
+  font-size: var(--cv-field-font-size);
+  font-weight: var(--font-weight-medium);
+  gap: var(--space-2);
+  height: var(--cv-field-height);
+  justify-content: center;
+  padding: 0 var(--space-4);
+  transition: background var(--transition-fast), box-shadow var(--transition-fast);
+  white-space: nowrap;
+}
+
+.cv-field-action:hover:not(:disabled) {
+  background:
+    linear-gradient(var(--cv-field-bg-hover), var(--cv-field-bg-hover)) padding-box,
+    linear-gradient(var(--cv-field-border-hover), var(--cv-field-border-hover)) border-box;
+}
+
+.cv-field-action--clear {
+  color: var(--cv-field-error);
+}
+
+.cv-field-action--clear:hover:not(:disabled) {
+  background:
+    linear-gradient(var(--color-danger-soft), var(--color-danger-soft)) padding-box,
+    linear-gradient(var(--cv-field-error-border), var(--cv-field-error-border)) border-box;
+}
+
 .cv-field__control-row .cv-field-action,
 .cv-field-with-action .cv-field-action {
-  --cv-btn-height: var(--cv-field-height);
   align-self: stretch;
   flex: 0 0 auto;
+  height: auto;
 }
 
 /* =========================================================
@@ -668,8 +686,12 @@ html[data-theme="dark"] .ui-lab-page {
 }
 
 .cv-field--focus-demo .cv-field__control,
-.cv-field--focus-demo .cv-multiselect__control,
 .cv-field-state-card--focus .cv-field__control {
+  border-color: var(--cv-field-focus-border);
+  box-shadow: var(--cv-field-shadow-focus);
+}
+
+.cv-field--focus-demo .cv-multiselect__control {
   border-color: var(--cv-field-focus-border);
   box-shadow: var(--cv-field-shadow-focus);
 }
@@ -698,10 +720,8 @@ html[data-theme="dark"] .ui-lab-page {
   border: 1px solid var(--cv-field-border);
   border-radius: var(--cv-field-radius);
   box-shadow: var(--cv-field-shadow);
-  display: grid;
-  gap: var(--space-2);
-  min-height: var(--cv-field-height);
-  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
   transition:
     background-color var(--transition-fast),
     border-color var(--transition-fast),
@@ -721,9 +741,17 @@ html[data-theme="dark"] .ui-lab-page {
 .cv-multiselect__header {
   align-items: center;
   display: flex;
+  flex: 0 0 auto;
   gap: var(--space-2);
+  height: var(--cv-field-height);
   justify-content: space-between;
   min-width: 0;
+  padding: 0 var(--cv-field-padding-x);
+}
+
+/* Separador quando há chips abaixo */
+.cv-multiselect__chips:not(:empty) {
+  border-top: 1px solid var(--cv-field-border);
 }
 
 .cv-multiselect__search {
@@ -732,8 +760,8 @@ html[data-theme="dark"] .ui-lab-page {
   color: var(--cv-field-color);
   flex: 1 1 auto;
   font-size: var(--cv-field-font-size);
+  font-weight: var(--font-weight-medium);
   line-height: 1.4;
-  min-height: var(--space-6);
   min-width: 0;
   outline: none;
   padding: 0;
@@ -741,14 +769,33 @@ html[data-theme="dark"] .ui-lab-page {
 
 .cv-multiselect__search::placeholder {
   color: var(--cv-field-placeholder);
+  font-weight: normal;
   opacity: 1;
+}
+
+/* Botão nativo de limpar do input[type=search] */
+.cv-multiselect__search::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--theme-text-muted);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  height: 14px;
+  mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 14 14' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 2l10 10M12 2L2 12' stroke='white' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+  mask-size: cover;
+  opacity: 0.5;
+  width: 14px;
 }
 
 .cv-multiselect__chips {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
-  min-height: var(--space-6);
+  padding: var(--space-2) var(--cv-field-padding-x) var(--space-3);
+}
+
+.cv-multiselect__chips:empty {
+  display: none;
 }
 
 .cv-multiselect__chip {
@@ -835,7 +882,6 @@ html[data-theme="dark"] .ui-lab-page {
 
 .cv-multiselect__option--selected {
   background: var(--cv-option-selected-bg);
-  box-shadow: inset var(--space-1) 0 0 var(--cv-option-selected-border);
 }
 
 .cv-multiselect__option-marker {
@@ -860,7 +906,10 @@ html[data-theme="dark"] .ui-lab-page {
   border-right: 2px solid var(--cv-option-marker-color);
   content: "";
   height: var(--space-2);
-  transform: translateY(calc(var(--space-1) * -1)) rotate(45deg);
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -60%) rotate(45deg);
   width: var(--space-1);
 }
 
@@ -880,12 +929,14 @@ html[data-theme="dark"] .ui-lab-page {
 }
 
 .cv-multiselect__count {
-  background: var(--theme-surface-card-soft);
-  border: 1px solid var(--theme-border-card);
+  background: var(--cv-chip-bg);
+  border: 1px solid var(--cv-chip-border);
   border-radius: var(--radius-pill);
+  color: var(--cv-chip-color);
   flex: 0 0 auto;
+  font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
-  padding: var(--space-1) var(--space-2);
+  padding: var(--space-1) var(--space-3);
 }
 
 .cv-multiselect__empty {
@@ -901,6 +952,7 @@ html[data-theme="dark"] .ui-lab-page {
 
 .cv-multiselect--disabled .cv-multiselect__control {
   background: var(--cv-field-disabled-bg);
+  border-color: var(--cv-field-border);
   box-shadow: none;
   color: var(--color-input-disabled-text);
   cursor: not-allowed;
@@ -956,11 +1008,6 @@ html[data-theme="dark"] .ui-lab-page {
     width: 100%;
   }
 
-  .cv-multiselect__header {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
   .cv-multiselect__chip {
     width: fit-content;
   }
@@ -975,19 +1022,31 @@ html[data-theme="dark"] .ui-lab-page {
 
 /* ─── Tokens do menu e opções ──────────────────────────────────────────── */
 .ui-lab-page {
-  --cv-cs-menu-bg:                var(--cv-dropdown-bg);
-  --cv-cs-menu-border:            var(--cv-dropdown-border);
-  --cv-cs-menu-shadow:            var(--shadow-lg);
-  --cv-cs-menu-radius:            var(--cv-field-radius);
-  --cv-cs-option-hover-bg:        var(--cv-option-hover-bg);
-  --cv-cs-option-selected-bg:     var(--cv-option-selected-bg);
-  --cv-cs-option-selected-color:  var(--color-primary);
-  --cv-cs-option-check-color:     var(--cv-option-marker-bg);
-  --cv-cs-z-index:                200;
+  --cv-cs-trigger-shadow:          var(--shadow-sm);
+  --cv-cs-chevron-color:           var(--theme-text-muted);
+  --cv-cs-value-weight:            var(--font-weight-medium);
+  --cv-cs-menu-bg:                 var(--cv-dropdown-bg);
+  --cv-cs-menu-border:             var(--cv-dropdown-border);
+  --cv-cs-menu-shadow:             var(--shadow-md);
+  --cv-cs-menu-radius:             var(--cv-field-radius);
+  --cv-cs-option-hover-bg:         var(--cv-option-hover-bg);
+  --cv-cs-option-selected-bg:      var(--cv-option-selected-bg);
+  --cv-cs-option-selected-color:   var(--color-primary);
+  --cv-cs-option-selected-weight:  var(--font-weight-semibold);
+  --cv-cs-option-check-color:      var(--cv-option-marker-bg);
+  --cv-cs-option-padding-x:        var(--space-4);
+  --cv-cs-z-index:                 200;
+}
+
+html[data-theme="dark"] .ui-lab-page {
+  --cv-cs-trigger-shadow:          none;
+  --cv-cs-option-selected-color:   var(--color-info-text);
 }
 
 /* ─── Wrapper root ──────────────────────────────────────────────────────── */
 .cv-custom-select {
+  max-width: 100%;
+  min-width: 0;
   position: relative;
   width: 100%;
 }
@@ -1011,16 +1070,19 @@ html[data-theme="dark"] .ui-lab-page {
     linear-gradient(var(--cv-select-border), var(--cv-select-border)) border-box;
   border: 1px solid transparent;
   border-radius: var(--cv-field-radius);
-  box-shadow: var(--cv-select-shadow);
+  box-shadow: var(--cv-cs-trigger-shadow);
   box-sizing: border-box;
   color: var(--cv-field-color);
   cursor: pointer;
   display: flex;
   font-family: inherit;
   font-size: var(--cv-field-font-size);
+  font-weight: var(--cv-cs-value-weight);
   gap: var(--space-2);
   height: var(--cv-field-height);
+  max-width: 100%;
   min-height: var(--cv-field-height);
+  min-width: 0;
   padding: 0 var(--cv-field-padding-x);
   text-align: left;
   transition: background 150ms ease, box-shadow 150ms ease;
@@ -1045,7 +1107,9 @@ html[data-theme="dark"] .ui-lab-page {
   background:
     linear-gradient(var(--cv-select-bg-hover), var(--cv-select-bg-hover)) padding-box,
     linear-gradient(var(--cv-select-border-focus), var(--cv-select-border-focus)) border-box;
-  box-shadow: var(--cv-select-focus-shadow);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  box-shadow: none;
 }
 
 /* ─── Texto do valor / placeholder ─────────────────────────────────────── */
@@ -1063,26 +1127,35 @@ html[data-theme="dark"] .ui-lab-page {
 /* ─── Chevron ───────────────────────────────────────────────────────────── */
 .cv-custom-select__chevron {
   align-items: center;
-  color: var(--cv-select-chevron);
+  color: var(--cv-cs-chevron-color);
   display: flex;
   flex-shrink: 0;
-  transition: transform 200ms ease;
+  transition: transform 200ms ease, color 150ms ease;
 }
 
 .cv-custom-select--open .cv-custom-select__chevron {
+  color: var(--cv-select-border-focus);
   transform: rotate(180deg);
+}
+
+/* ─── Animação de entrada do menu ───────────────────────────────────────── */
+@keyframes cv-cs-menu-enter {
+  from { opacity: 0; transform: translateY(-4px) scaleY(0.97); }
+  to   { opacity: 1; transform: translateY(0) scaleY(1); }
 }
 
 /* ─── Menu dropdown ─────────────────────────────────────────────────────── */
 .cv-custom-select__menu {
+  animation:      cv-cs-menu-enter 160ms ease both;
   background:     var(--cv-cs-menu-bg);
-  border:         1px solid var(--cv-cs-menu-border);
-  border-radius:  var(--cv-cs-menu-radius);
+  border:         1px solid var(--cv-select-border-focus);
+  border-top:     none;
+  border-radius:  0 0 var(--cv-cs-menu-radius) var(--cv-cs-menu-radius);
   box-shadow:     var(--cv-cs-menu-shadow);
   box-sizing:     border-box;
   left:           0;
   list-style:     none;
-  margin:         var(--space-1) 0 0;
+  margin:         0;
   max-height:     248px;
   min-width:      100%;
   overflow-y:     auto;
@@ -1091,6 +1164,7 @@ html[data-theme="dark"] .ui-lab-page {
   position:       absolute;
   scrollbar-width: thin;
   top:            100%;
+  transform-origin: top;
   width:          100%;
   z-index:        var(--cv-cs-z-index);
 }
@@ -1124,8 +1198,9 @@ html[data-theme="dark"] .ui-lab-page {
 }
 
 .cv-custom-select__option--selected {
-  background: var(--cv-cs-option-selected-bg);
-  color:      var(--cv-cs-option-selected-color);
+  background:  var(--cv-cs-option-selected-bg);
+  color:       var(--cv-cs-option-selected-color);
+  font-weight: var(--cv-cs-option-selected-weight);
 }
 
 .cv-custom-select__option--selected.cv-custom-select__option--focused {
@@ -1191,18 +1266,7 @@ html[data-theme="dark"] .ui-lab-page {
   color: var(--cv-field-error);
 }
 
-/* ─── Variantes de tamanho ──────────────────────────────────────────────── */
-.cv-custom-select--sm .cv-custom-select__trigger {
-  font-size:  var(--font-size-xs);
-  height:     var(--control-height-sm);
-  min-height: var(--control-height-sm);
-}
-
-.cv-custom-select--lg .cv-custom-select__trigger {
-  font-size:  var(--font-size-md);
-  height:     var(--control-height-lg);
-  min-height: var(--control-height-lg);
-}
+/* Tamanho único — mesmo tamanho dos inputs padrão */
 
 /* ─── Integração com cv-field-with-action ───────────────────────────────── */
 .cv-field-with-action .cv-custom-select {
