@@ -143,6 +143,7 @@
   appearance: none;
   background: transparent;
   border: 0;
+  box-shadow: none;
   color: var(--field-text);
   flex: 1 1 auto;
   font: inherit;
@@ -154,6 +155,12 @@
   outline: 0;
   padding: 0;
   width: 100%;
+}
+
+.cv-search-picker__input:focus,
+.cv-search-picker__input:focus-visible {
+  box-shadow: none;
+  outline: none;
 }
 
 .cv-search-picker__input::placeholder {

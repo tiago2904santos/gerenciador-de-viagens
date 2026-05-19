@@ -803,6 +803,7 @@ html[data-theme="dark"] .ui-lab-page {
 .cv-multiselect__search {
   background: transparent;
   border: 0;
+  box-shadow: none;
   color: var(--cv-field-color);
   flex: 1 1 auto;
   font-size: var(--cv-field-font-size);
@@ -811,6 +812,12 @@ html[data-theme="dark"] .ui-lab-page {
   min-width: 0;
   outline: none;
   padding: 0;
+}
+
+.cv-multiselect__search:focus,
+.cv-multiselect__search:focus-visible {
+  box-shadow: none;
+  outline: none;
 }
 
 .cv-multiselect__search::placeholder {
