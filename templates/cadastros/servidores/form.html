@@ -13,10 +13,20 @@
 
         {% include "components/forms/form_field.html" with field=form.cpf size_class="field-size-1" only %}
         {% include "components/forms/form_field.html" with field=form.telefone size_class="field-size-1" only %}
-        <div class="field-size-1 field-rg-wrap" data-rg-field-wrap>
-          {% include "components/forms/form_field.html" with field=form.rg only %}
+        <div class="field app-form-field field-size-2 field-rg-wrap" data-rg-field-wrap>
+          <label class="app-form-label" for="{{ form.rg.id_for_label }}">{{ form.rg.label }}</label>
+          <div class="cv-field-row">
+            {{ form.rg }}
+            {{ form.sem_rg }}
+            {% if form.sem_rg.value %}
+              {% include "components/ui/buttons/field_action_button.html" with label="Não possui RG" variant="danger" type="button" extra_class="cv-field-side-action--toggle" aria_label="Alternar situação do RG" aria_pressed=True data_rg_toggle=True only %}
+            {% else %}
+              {% include "components/ui/buttons/field_action_button.html" with label="Possui RG" variant="success" type="button" extra_class="cv-field-side-action--toggle" aria_label="Alternar situação do RG" aria_pressed=False data_rg_toggle=True only %}
+            {% endif %}
+          </div>
+          {% if form.rg.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.rg.errors only %}{% endif %}
+          {% if form.sem_rg.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.sem_rg.errors only %}{% endif %}
         </div>
-        {% include "components/forms/card_toggle.html" with field=form.sem_rg title="Não possui RG" description="Bloqueia o campo RG" compact=True size_class="field-size-1" only %}
 
         {% include "components/forms/input_with_action.html" with field=form.unidade action_url=unidades_manage_url action_label="Gerenciar unidades" action_icon="settings" action_variant="secondary" size_class="field-size-4" only %}
       </div>

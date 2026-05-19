@@ -1241,6 +1241,36 @@ html[data-theme="dark"] {
   color: var(--cv-btn-primary-color);
 }
 
+.cv-field-side-action--success {
+  background: var(--color-success-soft);
+  border-color: var(--color-success);
+  color: var(--color-success);
+}
+
+.cv-field-side-action--success:hover,
+.cv-field-side-action--success:focus {
+  background: var(--color-success);
+  border-color: var(--color-success);
+  color: var(--color-white);
+}
+
+.cv-field-side-action--danger {
+  background: var(--color-danger-soft);
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+.cv-field-side-action--danger:hover,
+.cv-field-side-action--danger:focus {
+  background: var(--color-danger);
+  border-color: var(--color-danger);
+  color: var(--color-white);
+}
+
+.cv-field-side-action--toggle {
+  min-width: 138px;
+}
+
 @media (max-width: 640px) {
   .cv-field-row {
     align-items: stretch;
