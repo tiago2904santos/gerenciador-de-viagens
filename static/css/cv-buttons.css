@@ -1259,7 +1259,7 @@ html[data-theme="dark"] {
 }
 
 .cv-field-side-action--neutral {
-  background: var(--cv-btn-neutral-bg);
+  background: transparent;
   border-color: var(--cv-btn-neutral-border);
   color: var(--cv-btn-neutral-color);
 }
@@ -1298,9 +1298,9 @@ html[data-theme="dark"] {
 }
 
 .cv-field-side-action--success {
-  background: var(--state-success-bg);
+  background: transparent;
   border-color: var(--state-success-border);
-  box-shadow: var(--state-success-glow), var(--shadow-xs);
+  box-shadow: var(--shadow-xs);
   color: var(--state-success-text);
 }
 
@@ -1313,9 +1313,9 @@ html[data-theme="dark"] {
 }
 
 .cv-field-side-action--warning {
-  background: var(--state-warning-bg);
+  background: transparent;
   border-color: var(--state-warning-border);
-  box-shadow: var(--state-warning-glow), var(--shadow-xs);
+  box-shadow: var(--shadow-xs);
   color: var(--state-warning-text);
 }
 
@@ -1328,9 +1328,9 @@ html[data-theme="dark"] {
 }
 
 .cv-field-side-action--danger {
-  background: var(--state-danger-bg);
+  background: transparent;
   border-color: var(--state-danger-border);
-  box-shadow: var(--state-danger-glow), var(--shadow-xs);
+  box-shadow: var(--shadow-xs);
   color: var(--state-danger-text);
 }
 
