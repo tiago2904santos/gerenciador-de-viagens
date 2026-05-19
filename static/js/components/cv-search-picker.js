@@ -309,14 +309,20 @@
       const enabled = selectedForTerm.has(value);
       const row    = el("div",  "cv-search-picker__term-control");
       const label  = el("span", "cv-search-picker__term-label", "Termo de Autorizacao");
-      const toggle = el("button", "cv-search-picker__term-toggle");
+
+      /* Reutiliza o padrão cv-field-side-action--state (dot colorido + filled bg)
+         usado nos demais toggles binários do sistema (ex: Possui RG). */
+      const stateClass = enabled
+        ? "cv-field-side-action--success is-active"
+        : "cv-field-side-action--danger is-inactive";
+      const toggle = el(
+        "button",
+        "cv-field-side-action cv-field-side-action--toggle cv-field-side-action--state " + stateClass,
+        enabled ? "Gerar termo" : "Nao gerar",
+      );
 
       toggle.type = "button";
       toggle.setAttribute("aria-pressed", enabled ? "true" : "false");
-      toggle.setAttribute("aria-label", "Alternar geracao de termo de autorizacao");
-
-      toggle.appendChild(el("span", "cv-search-picker__term-toggle-off", "Nao gerar"));
-      toggle.appendChild(el("span", "cv-search-picker__term-toggle-on",  "✓ Gerar"));
 
       toggle.addEventListener("click", () => {
         const current = toggle.getAttribute("aria-pressed") === "true";
