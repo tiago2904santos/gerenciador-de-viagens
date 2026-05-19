@@ -177,19 +177,18 @@ class OficioDadosViajantesForm(OficioForm):
             "custeio_observacao": forms.TextInput(attrs={"class": "form-control"}),
             "servidores": ServidorEquipeSelectMultiple(
                 attrs={
-                    "class": "form-select cv-search-picker__native",
-                    "data-cv-search-picker": "true",
-                    "data-picker-mode": "compact",
-                    "data-panel-title": "VIAJANTES SELECIONADOS",
-                    "data-cv-termos-name": "servidores_termo_autorizacao",
+                    "class": "form-select app-multiselect__native",
+                    "data-app-multiselect": "true",
                     "data-empty-selected": "Nenhum viajante selecionado.",
                     "data-empty-message": "Nenhum servidor encontrado.",
                     "data-placeholder": "Digite nome, RG ou CPF",
+                    "data-search-placeholder": "Digite nome, RG ou CPF",
                 },
             ),
             "servidores_termo_autorizacao": ServidorEquipeSelectMultiple(
                 attrs={
-                    "class": "form-select cv-search-picker__termos-native",
+                    "class": "form-select app-termos-selector__native",
+                    "data-termos-selector-target": "true",
                 },
             ),
         }

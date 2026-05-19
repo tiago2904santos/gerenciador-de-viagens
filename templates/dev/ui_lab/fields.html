@@ -958,6 +958,166 @@
         </div>
       </article>
 
+      <article class="cv-field-panel" id="fields-search-picker">
+        <div class="cv-field-panel__header">
+          <span class="cv-field-panel__eyebrow">Search Picker — componente funcional</span>
+          <h3 class="cv-field-panel__title">cv-search-picker</h3>
+          <p class="cv-field-panel__description">
+            Componente real com JS ativo. Busca inline, dropdown conectado, painel de selecionados
+            e Termo de Autorizacao por servidor. Modo <code>--compact</code> (2 colunas) e
+            <code>--detailed</code> (1 coluna com CPF/RG). Digite qualquer coisa para testar.
+          </p>
+        </div>
+        <div class="cv-field-panel__body">
+
+          {# selects de termos — ficam fora do grid, ocultos pelo CSS #}
+          <select name="lab-termos-compact" id="lab-termos-compact" multiple class="cv-search-picker__termos-native">
+            <option value="1">Ana Souza</option>
+            <option value="2">Bruno Lima</option>
+            <option value="3">Camila Reis</option>
+            <option value="4">Diego Martins</option>
+            <option value="5">Elena Costa</option>
+          </select>
+          <select name="lab-termos-detailed" id="lab-termos-detailed" multiple class="cv-search-picker__termos-native">
+            <option value="1">Ana Souza</option>
+            <option value="2">Bruno Lima</option>
+            <option value="3">Camila Reis</option>
+            <option value="4">Diego Martins</option>
+            <option value="5">Elena Costa</option>
+          </select>
+
+          <div class="cv-field-grid cv-field-grid--2">
+
+            {# ── Compact ──────────────────────────────────────── #}
+            <div>
+              <p class="cv-field__label">Equipe — modo compact (2 colunas)</p>
+              <select
+                id="lab-picker-compact"
+                class="cv-search-picker__native"
+                data-cv-search-picker="true"
+                data-picker-mode="compact"
+                data-panel-title="VIAJANTES SELECIONADOS"
+                data-placeholder="Digite nome, cargo ou unidade"
+                data-empty-message="Nenhum servidor encontrado."
+                data-empty-selected="Nenhum viajante selecionado."
+                data-cv-termos-name="lab-termos-compact"
+                multiple
+              >
+                <option value="1"
+                  data-cargo="Analista"
+                  data-cpf="123.456.789-09"
+                  data-main="Ana Souza • CPF 123.456.789-09 • Analista"
+                  data-meta="SEJUS / PR"
+                  data-rg="12.345.678-9"
+                  data-search="Ana Souza 12.345.678-9 123.456.789-09 Analista SEJUS"
+                  data-unidade="SEJUS / PR">Ana Souza</option>
+                <option value="2"
+                  data-cargo="Tecnico"
+                  data-cpf="987.654.321-00"
+                  data-main="Bruno Lima • CPF 987.654.321-00 • Tecnico"
+                  data-meta="SEAP / PR"
+                  data-rg="98.765.432-1"
+                  data-search="Bruno Lima 98.765.432-1 987.654.321-00 Tecnico SEAP"
+                  data-unidade="SEAP / PR">Bruno Lima</option>
+                <option value="3"
+                  data-cargo="Analista Juridica"
+                  data-cpf="456.123.789-01"
+                  data-main="Camila Reis • CPF 456.123.789-01 • Analista Juridica"
+                  data-meta="SESP / PR"
+                  data-rg="45.612.378-9"
+                  data-search="Camila Reis 45.612.378-9 456.123.789-01 Analista SESP"
+                  data-unidade="SESP / PR">Camila Reis</option>
+                <option value="4"
+                  data-cargo="Coordenador"
+                  data-cpf="321.654.987-02"
+                  data-main="Diego Martins • CPF 321.654.987-02 • Coordenador"
+                  data-meta="SESA / PR"
+                  data-rg="32.165.498-7"
+                  data-search="Diego Martins 32.165.498-7 321.654.987-02 Coordenador SESA"
+                  data-unidade="SESA / PR">Diego Martins</option>
+                <option value="5"
+                  data-cargo="Tecnica"
+                  data-cpf="654.321.987-03"
+                  data-main="Elena Costa • CPF 654.321.987-03 • Tecnica"
+                  data-meta="SEDU / PR"
+                  data-rg="65.432.198-7"
+                  data-search="Elena Costa 65.432.198-7 654.321.987-03 Tecnica SEDU"
+                  data-unidade="SEDU / PR">Elena Costa</option>
+              </select>
+            </div>
+
+            {# ── Detailed ─────────────────────────────────────── #}
+            <div>
+              <p class="cv-field__label">Equipe — modo detailed (com CPF e RG)</p>
+              <select
+                id="lab-picker-detailed"
+                class="cv-search-picker__native"
+                data-cv-search-picker="true"
+                data-picker-mode="detailed"
+                data-panel-title="EQUIPE DO OFICIO"
+                data-placeholder="Buscar por nome, CPF ou RG"
+                data-empty-message="Nenhum resultado encontrado."
+                data-empty-selected="Nenhum servidor na equipe."
+                data-cv-termos-name="lab-termos-detailed"
+                multiple
+              >
+                <option value="1"
+                  data-cargo="Analista"
+                  data-cpf="123.456.789-09"
+                  data-main="Ana Souza • CPF 123.456.789-09 • Analista"
+                  data-meta="SEJUS / PR"
+                  data-rg="12.345.678-9"
+                  data-search="Ana Souza 12.345.678-9 123.456.789-09 Analista SEJUS"
+                  data-unidade="SEJUS / PR">Ana Souza</option>
+                <option value="2"
+                  data-cargo="Tecnico"
+                  data-cpf="987.654.321-00"
+                  data-main="Bruno Lima • CPF 987.654.321-00 • Tecnico"
+                  data-meta="SEAP / PR"
+                  data-rg="98.765.432-1"
+                  data-search="Bruno Lima 98.765.432-1 987.654.321-00 Tecnico SEAP"
+                  data-unidade="SEAP / PR">Bruno Lima</option>
+                <option value="3"
+                  data-cargo="Analista Juridica"
+                  data-cpf="456.123.789-01"
+                  data-main="Camila Reis • CPF 456.123.789-01 • Analista Juridica"
+                  data-meta="SESP / PR"
+                  data-rg="45.612.378-9"
+                  data-search="Camila Reis 45.612.378-9 456.123.789-01 Analista SESP"
+                  data-unidade="SESP / PR">Camila Reis</option>
+                <option value="4"
+                  data-cargo="Coordenador"
+                  data-cpf="321.654.987-02"
+                  data-main="Diego Martins • CPF 321.654.987-02 • Coordenador"
+                  data-meta="SESA / PR"
+                  data-rg="32.165.498-7"
+                  data-search="Diego Martins 32.165.498-7 321.654.987-02 Coordenador SESA"
+                  data-unidade="SESA / PR">Diego Martins</option>
+                <option value="5"
+                  data-cargo="Tecnica"
+                  data-cpf="654.321.987-03"
+                  data-main="Elena Costa • CPF 654.321.987-03 • Tecnica"
+                  data-meta="SEDU / PR"
+                  data-rg="65.432.198-7"
+                  data-search="Elena Costa 65.432.198-7 654.321.987-03 Tecnica SEDU"
+                  data-unidade="SEDU / PR">Elena Costa</option>
+              </select>
+            </div>
+
+          </div>
+
+          <div class="cv-field-panel__note">
+            Componente funcional. Teste: (1) clique num input e comece a digitar — ex: "ana", "bru",
+            "analista"; (2) selecione servidores com Enter ou clique; (3) ajuste o
+            <strong>Termo de Autorizacao</strong> de cada card individualmente;
+            (4) remova com o botao &times;.
+            Seletores de termos (ocultos) sao sincronizados em tempo real para compatibilidade
+            com submit de formulario.
+          </div>
+
+        </div>
+      </article>
+
       <article class="cv-field-panel" id="fields-real-examples">
         <div class="cv-field-panel__header">
           <span class="cv-field-panel__eyebrow">Exemplos reais do sistema</span>

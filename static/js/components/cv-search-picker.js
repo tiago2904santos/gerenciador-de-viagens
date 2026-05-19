@@ -63,11 +63,12 @@
     let isOpen      = false;
     let selectedForTerm = new Set();
 
-    /* Select de termos (hidden, gerenciado pelo componente) */
+    /* Select de termos (hidden, gerenciado pelo componente).
+       Busca dentro do form mais próximo; fora de form, usa o document. */
     let termSelect = null;
     if (termosName) {
-      const form = select.closest("form");
-      if (form) termSelect = form.querySelector(`select[name="${CSS.escape(termosName)}"]`);
+      const scope = select.closest("form") || document;
+      termSelect = scope.querySelector(`select[name="${CSS.escape(termosName)}"]`);
     }
     if (termSelect) {
       /* Carrega estado inicial do select de termos */
