@@ -76,6 +76,7 @@
     let activeIndex = -1;
     let isOpen      = false;
     let selectedForTerm = new Set();
+    let driverValue = select.dataset.pickerDriverValue || "";
 
     /* Select de termos (hidden, gerenciado pelo componente).
        Busca dentro do form mais próximo; fora de form, usa o document. */
@@ -235,6 +236,7 @@
       if (!item || item.disabled || !item.selected) return;
       item.selected = false;
       selectedForTerm.delete(value);
+      if (driverValue === value) driverValue = "";
       syncSelect(true);
       syncTermSelect();
       render();
@@ -247,6 +249,22 @@
       else selectedForTerm.delete(value);
       syncTermSelect();
       renderSelectedCards();
+    }
+
+    function updateDriverControls() {
+      if (!grid) return;
+      grid.querySelectorAll(".cv-search-picker__driver-toggle").forEach((button) => {
+        const active = button.dataset.value === driverValue;
+        const card = button.closest(".cv-search-picker__selected-card");
+        button.setAttribute("aria-pressed", active ? "true" : "false");
+        button.classList.toggle("cv-search-picker__driver-toggle--active", active);
+        if (card) card.classList.toggle("cv-search-picker__selected-card--driver", active);
+      });
+    }
+
+    function setDriverValue(value) {
+      driverValue = driverValue === value ? "" : value;
+      updateDriverControls();
     }
 
     /* ── Render: Resultados do dropdown ─────────────────────────── */
@@ -291,10 +309,10 @@
       const enabled = selectedForTerm.has(value);
       const row     = el("div",  "cv-search-picker__term-control");
       const label   = el("span", "cv-search-picker__term-label", "Termo de Autorizacao");
-      const choice  = el("div",  "cv-search-picker__term-options");
+      const choice  = el("div",  "cv-search-picker__term-options cv-state-segmented");
 
-      const btnNo  = el("button", "cv-search-picker__term-option cv-search-picker__term-option--no",  "Nao gerar");
-      const btnYes = el("button", "cv-search-picker__term-option cv-search-picker__term-option--yes", "Gerar");
+      const btnNo  = el("button", "cv-search-picker__term-option cv-search-picker__term-option--no cv-state-button cv-state-button--warning",  "Nao gerar");
+      const btnYes = el("button", "cv-search-picker__term-option cv-search-picker__term-option--yes cv-state-button cv-state-button--success", "Gerar");
 
       btnNo.type  = "button";
       btnYes.type = "button";
@@ -312,6 +330,26 @@
       return row;
     }
 
+    function buildDriverControl(item) {
+      const active = driverValue === item.value;
+      const row = el("div", "cv-search-picker__driver-control");
+      const button = el("button", "cv-search-picker__driver-toggle");
+      const marker = el("span", "cv-search-picker__driver-marker", "");
+      const text = el("span", "cv-search-picker__driver-text", "Este servidor e o motorista");
+
+      button.type = "button";
+      button.dataset.value = item.value;
+      button.setAttribute("aria-pressed", active ? "true" : "false");
+      button.setAttribute("aria-label", (active ? "Desmarcar " : "Marcar ") + item.label + " como motorista");
+      button.classList.toggle("cv-search-picker__driver-toggle--active", active);
+      button.addEventListener("click", () => setDriverValue(item.value));
+
+      button.appendChild(marker);
+      button.appendChild(text);
+      row.appendChild(button);
+      return row;
+    }
+
     /* ── Render: Cards selecionados ─────────────────────────────── */
 
     function buildCard(item) {
@@ -319,14 +357,18 @@
       card.dataset.value = item.value;
 
       const body = el("div",  "cv-search-picker__selected-main");
+      const title = el("div", "cv-search-picker__selected-title-row");
       const name = el("span", "cv-search-picker__selected-name", item.label);
+      const driverChip = el("span", "cv-search-picker__driver-chip", "Motorista");
       const metaParts = [item.cargo, item.unidade].filter(Boolean);
       const meta = el(
         "span",
         "cv-search-picker__selected-meta",
         metaParts.length ? metaParts.join(" • ") : "Dados complementares não informados",
       );
-      body.appendChild(name);
+      title.appendChild(name);
+      title.appendChild(driverChip);
+      body.appendChild(title);
       body.appendChild(meta);
 
       /* Detalhe: CPF / RG — exibido pelo CSS apenas no modo --detailed */
@@ -344,12 +386,16 @@
 
       card.appendChild(body);
       card.appendChild(removeBtn);
+      card.classList.toggle("cv-search-picker__selected-card--driver", driverValue === item.value);
 
       /* Controle de Termo */
       if (showTermCtrl) {
+        card.classList.add("cv-search-picker__selected-card--with-term");
         card.appendChild(buildTermControl(item.value));
         card.classList.toggle("cv-search-picker__selected-card--has-term", selectedForTerm.has(item.value));
       }
+
+      card.appendChild(buildDriverControl(item));
 
       return card;
     }

@@ -21,7 +21,7 @@
   function buildOption(label, modifier, active, onClick) {
     const button = createElement(
       "button",
-      `oficio-viajante-card__termo-option oficio-viajante-card__termo-option--${modifier}`,
+      `oficio-viajante-card__termo-option oficio-viajante-card__termo-option--${modifier} cv-state-button cv-state-button--${modifier === "yes" ? "success" : "warning"}`,
       label,
     );
     button.type = "button";
@@ -60,7 +60,7 @@
       const enabled = selectedForTerm.has(value);
       const row = createElement("div", "oficio-viajante-card__termo");
       const label = createElement("span", "oficio-viajante-card__termo-label", "Termo de Autorização");
-      const choices = createElement("div", "oficio-viajante-card__termo-choice");
+      const choices = createElement("div", "oficio-viajante-card__termo-choice cv-state-segmented");
 
       choices.appendChild(buildOption("Não gerar", "no", !enabled, () => setTermValue(value, false)));
       choices.appendChild(buildOption("Gerar", "yes", enabled, () => setTermValue(value, true)));

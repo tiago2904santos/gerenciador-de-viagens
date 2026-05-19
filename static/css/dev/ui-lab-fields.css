@@ -727,6 +727,13 @@ html[data-theme="dark"] .ui-lab-page {
   margin: 0;
 }
 
+.cv-state-button-demo-row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
 .cv-field-state-card .cv-field__control {
   min-height: var(--cv-field-height);
 }
@@ -913,6 +920,11 @@ html[data-theme="dark"] .ui-lab-page {
   max-height: calc(var(--cv-field-height) * 5 + var(--space-4));
   overflow: auto;
   padding: var(--space-2);
+}
+
+.cv-multiselect:focus-within .cv-multiselect__dropdown {
+  box-shadow: var(--cv-field-shadow-focus), var(--cv-dropdown-shadow);
+  clip-path: inset(0 calc(var(--space-1) * -1) calc(var(--space-1) * -1) calc(var(--space-1) * -1));
 }
 
 .cv-multiselect__option {
@@ -1213,7 +1225,7 @@ html[data-theme="dark"] .ui-lab-page {
   min-width:      100%;
   overflow-y:     auto;
   overscroll-behavior: contain;
-  padding:        var(--space-1) 0;
+  padding:        0;
   position:       absolute;
   scrollbar-width: thin;
   top:            100%;

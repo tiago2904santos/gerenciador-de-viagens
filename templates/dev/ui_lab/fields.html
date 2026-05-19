@@ -633,6 +633,57 @@
         </div>
       </article>
 
+      <article class="cv-field-panel" id="fields-state-buttons">
+        <div class="cv-field-panel__header">
+          <span class="cv-field-panel__eyebrow">Botoes de estado</span>
+          <h3 class="cv-field-panel__title">Familia premium para success, warning, danger e neutral</h3>
+          <p class="cv-field-panel__description">
+            Padrao global reutilizavel para estados, toggles e controles segmentados. A linguagem
+            visual segue o botao lateral de campo: fundo translucido, borda semantica, glow suave,
+            dot de estado e foco acessivel.
+          </p>
+        </div>
+        <div class="cv-field-panel__body">
+          <div class="cv-field-state-grid">
+            <div class="cv-field-state-card">
+              <h4 class="cv-field-state-card__title">Estados simples</h4>
+              <p class="cv-field-state-card__description">Success, warning, danger e neutral compartilham a mesma gramatica.</p>
+              <div class="cv-state-button-demo-row">
+                <button class="cv-state-button cv-state-button--success" type="button">Success</button>
+                <button class="cv-state-button cv-state-button--warning" type="button">Warning</button>
+                <button class="cv-state-button cv-state-button--danger" type="button">Danger</button>
+                <button class="cv-state-button cv-state-button--neutral" type="button">Neutral</button>
+              </div>
+            </div>
+            <div class="cv-field-state-card">
+              <h4 class="cv-field-state-card__title">Ativo, inativo e disabled</h4>
+              <p class="cv-field-state-card__description">Estados fortes sem parecer Bootstrap ou botao HTML comum.</p>
+              <div class="cv-state-button-demo-row">
+                <button class="cv-state-button cv-state-button--success cv-state-button--active" type="button" aria-pressed="true">Ativo</button>
+                <button class="cv-state-button cv-state-button--danger cv-state-button--inactive" type="button" aria-pressed="false">Inativo</button>
+                <button class="cv-state-button cv-state-button--neutral" type="button" disabled>Disabled</button>
+              </div>
+            </div>
+            <div class="cv-field-state-card">
+              <h4 class="cv-field-state-card__title">Toggle binario</h4>
+              <p class="cv-field-state-card__description">Mesmo padrao usado pelos estados de RG.</p>
+              <div class="cv-state-button-demo-row">
+                <button class="cv-field-side-action cv-field-side-action--success cv-field-side-action--toggle cv-field-side-action--state is-active" type="button" aria-pressed="true">Possui RG</button>
+                <button class="cv-field-side-action cv-field-side-action--danger cv-field-side-action--toggle cv-field-side-action--state is-inactive" type="button" aria-pressed="false">Nao possui RG</button>
+              </div>
+            </div>
+            <div class="cv-field-state-card">
+              <h4 class="cv-field-state-card__title">Segmented control</h4>
+              <p class="cv-field-state-card__description">Referencia para Gerar / Nao gerar e escolhas binarias por item.</p>
+              <div class="cv-state-segmented" role="group" aria-label="Termo de autorizacao">
+                <button class="cv-state-button cv-state-button--success" type="button" aria-pressed="true">Gerar</button>
+                <button class="cv-state-button cv-state-button--warning" type="button" aria-pressed="false">Nao gerar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
       <article class="cv-field-panel" id="fields-select-search">
         <div class="cv-field-panel__header">
           <span class="cv-field-panel__eyebrow">Select com busca / multiselect</span>
