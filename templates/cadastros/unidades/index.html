@@ -1,7 +1,5 @@
 {% extends "base.html" %}
-
 {% block title %}Unidades{% endblock %}
-
 {% block content %}
   {% include "components/lists/list_page_quick_add.html" with title=page_title description=page_description eyebrow="Cadastros" brand_mark="UN" search_placeholder="Buscar unidades" empty_message="Nenhuma unidade cadastrada ainda." rows=rows q=q quick_add_form=quick_add_form quick_add_panel_id="quick-add-unidade" quick_add_label="Cadastrar unidade" quick_add_submit_label="Salvar unidade" quick_add_body_template="cadastros/unidades/partials/_quick_add_inline_fields.html" %}
 {% endblock %}
