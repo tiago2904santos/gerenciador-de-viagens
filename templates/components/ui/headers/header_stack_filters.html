@@ -45,9 +45,6 @@
       {% endif %}
     </div>
     <div class="page-header-rail__actions">
-      {% if form_action is not None %}
-        {% include "components/ui/buttons/button.html" with label="Buscar" variant="tool" type="submit" icon="search" only %}
-      {% endif %}
       {% if search_clear_url %}
         {% include "components/ui/buttons/button.html" with href=search_clear_url label="Limpar filtros" variant="secondary" icon="x" only %}
       {% endif %}

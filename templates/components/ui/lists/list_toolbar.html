@@ -8,7 +8,6 @@
     {% if q and search_clear_url %}
       {% include "components/ui/buttons/button.html" with href=search_clear_url label="Limpar" variant="secondary" icon="x" only %}
     {% endif %}
-    {% include "components/ui/buttons/button.html" with label="Buscar" variant="tool" type="submit" icon="search" only %}
     {% if action_label and action_url %}
       {% include "components/ui/buttons/button.html" with href=action_url label=action_label variant="primary" icon="plus" only %}
     {% endif %}

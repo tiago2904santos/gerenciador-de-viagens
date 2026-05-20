@@ -118,7 +118,8 @@ class UnidadeForm(BaseCadastroForm):
 
     def save(self, commit=True):
         unidade = super().save(commit=commit)
-        if commit:
+        should_sync_servidores = not self.is_bound or "servidores" in self.data
+        if commit and should_sync_servidores:
             servidores = self.cleaned_data.get("servidores")
             if servidores is not None:
                 selected_ids = {servidor.pk for servidor in servidores}

@@ -1,0 +1,16 @@
+<div class="field-grid">
+  <div class="field-size-3">
+    <div class="field">
+      <label class="app-form-label" for="{{ form.nome.id_for_label }}">{{ form.nome.label }}</label>
+      {{ form.nome.as_widget }}
+      {% if form.nome.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.nome.errors only %}{% endif %}
+    </div>
+  </div>
+  <div class="field-size-1">
+    <div class="field">
+      <label class="app-form-label" for="{{ form.sigla.id_for_label }}">{{ form.sigla.label }}</label>
+      {{ form.sigla.as_widget }}
+      {% if form.sigla.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.sigla.errors only %}{% endif %}
+    </div>
+  </div>
+</div>

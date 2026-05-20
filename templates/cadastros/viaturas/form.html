@@ -16,8 +16,7 @@
         {% include "components/forms/form_field.html" with field=form.tipo size_class="field-size-2" only %}
         {% include "components/forms/form_field.html" with field=form.motoristas size_class="field-size-4" only %}
       </div>
-      {% include "components/ui/layouts/footer_actions.html" with secondary_label="Voltar" secondary_url=back_url only %}
-      {% include "components/ui/buttons/floating_primary_action.html" with label=submit_label icon=submit_icon|default:"check" type="submit" only %}
+      {% include "components/ui/layouts/footer_actions.html" with secondary_label="Voltar" secondary_url=back_url primary_label="Salvar" primary_icon="check" only %}
     </form>
   </div>
 {% endblock %}

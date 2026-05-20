@@ -159,6 +159,7 @@ def apresentar_linha_lista_simples_unidade(unidade, edit_url="#", delete_url="#"
             build_meta("Sigla", unidade.sigla or "—"),
         ],
         "edit_url": edit_url,
+        "edit_fields_json": json.dumps({"nome": unidade.nome, "sigla": unidade.sigla or ""}, ensure_ascii=False),
         "delete_url": delete_url,
     }
 
