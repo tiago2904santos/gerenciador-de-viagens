@@ -135,7 +135,7 @@ def apresentar_linha_lista_simples_cargo(cargo, edit_url="#", delete_url="#", se
 
 def apresentar_linha_lista_simples_combustivel(combustivel, edit_url="#", delete_url="#", set_default_url=None):
     row = {
-        "avatar": "CB",
+        "avatar": "CT",
         "title": combustivel.nome,
         "badges": [],
         "meta": [],
