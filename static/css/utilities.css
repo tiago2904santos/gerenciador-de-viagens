@@ -116,101 +116,138 @@
   --cv-chip-font-size: var(--font-size-xs);
   --cv-chip-font-weight: var(--font-weight-extrabold);
   --cv-chip-border-width: 1px;
-  --cv-chip-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.46), 0 10px 24px rgba(15, 34, 54, 0.10);
-  --cv-chip-shadow-hover: inset 0 1px 0 rgba(255, 255, 255, 0.58), 0 14px 30px rgba(15, 34, 54, 0.14);
-  --cv-chip-focus-ring: 0 0 0 3px rgba(21, 91, 154, 0.24);
-  --cv-chip-disabled-opacity: 0.54;
+  --cv-chip-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.60), 0 2px 8px rgba(15, 34, 54, 0.15);
+  --cv-chip-shadow-hover: inset 0 1px 0 rgba(255, 255, 255, 0.75), 0 4px 14px rgba(15, 34, 54, 0.22);
+  --cv-chip-focus-ring: 0 0 0 3px rgba(21, 91, 154, 0.28);
+  --cv-chip-disabled-opacity: 0.48;
 
-  --cv-chip-bg: rgba(255, 255, 255, 0.74);
-  --cv-chip-border: rgba(87, 112, 139, 0.30);
-  --cv-chip-color: #17314f;
-  --cv-chip-glow: rgba(21, 91, 154, 0.12);
+  /* Base (neutro/genérico) — light */
+  --cv-chip-bg: rgba(255, 255, 255, 0.88);
+  --cv-chip-border: rgba(75, 105, 138, 0.38);
+  --cv-chip-color: #12283f;
+  --cv-chip-glow: rgba(21, 91, 154, 0.18);
 
-  --cv-chip-success-bg: linear-gradient(180deg, rgba(229, 248, 240, 0.94), rgba(194, 238, 219, 0.78));
-  --cv-chip-success-border: rgba(20, 128, 87, 0.34);
-  --cv-chip-success-color: #0b684a;
-  --cv-chip-success-glow: rgba(22, 128, 90, 0.20);
-  --cv-chip-warning-bg: linear-gradient(180deg, rgba(255, 246, 219, 0.96), rgba(250, 224, 151, 0.80));
-  --cv-chip-warning-border: rgba(185, 129, 18, 0.38);
-  --cv-chip-warning-color: #7a5207;
-  --cv-chip-warning-glow: rgba(216, 162, 27, 0.22);
-  --cv-chip-danger-bg: linear-gradient(180deg, rgba(255, 237, 235, 0.97), rgba(248, 198, 194, 0.82));
-  --cv-chip-danger-border: rgba(180, 35, 24, 0.34);
-  --cv-chip-danger-color: #8e1d15;
-  --cv-chip-danger-glow: rgba(180, 35, 24, 0.18);
-  --cv-chip-info-bg: linear-gradient(180deg, rgba(231, 246, 255, 0.97), rgba(190, 229, 250, 0.82));
-  --cv-chip-info-border: rgba(21, 118, 180, 0.34);
-  --cv-chip-info-color: #0b5a87;
-  --cv-chip-info-glow: rgba(21, 118, 180, 0.20);
-  --cv-chip-pending-bg: linear-gradient(180deg, rgba(237, 244, 252, 0.96), rgba(207, 222, 239, 0.82));
-  --cv-chip-pending-border: rgba(85, 112, 145, 0.34);
-  --cv-chip-pending-color: #314a68;
-  --cv-chip-pending-glow: rgba(85, 112, 145, 0.18);
-  --cv-chip-muted-bg: linear-gradient(180deg, rgba(244, 248, 252, 0.92), rgba(223, 232, 242, 0.78));
-  --cv-chip-muted-border: rgba(103, 123, 145, 0.30);
-  --cv-chip-muted-color: #53677d;
-  --cv-chip-muted-glow: rgba(103, 123, 145, 0.12);
-  --cv-chip-neutral-bg: linear-gradient(180deg, rgba(250, 252, 255, 0.96), rgba(224, 233, 244, 0.82));
-  --cv-chip-neutral-border: rgba(87, 112, 139, 0.28);
-  --cv-chip-neutral-color: #243b57;
-  --cv-chip-neutral-glow: rgba(87, 112, 139, 0.14);
-  --cv-chip-entity-bg: linear-gradient(180deg, rgba(234, 242, 255, 0.96), rgba(199, 218, 248, 0.82));
-  --cv-chip-entity-border: rgba(47, 98, 168, 0.34);
-  --cv-chip-entity-color: #133f73;
-  --cv-chip-entity-glow: rgba(47, 98, 168, 0.20);
-  --cv-chip-filter-bg: linear-gradient(180deg, rgba(255, 247, 226, 0.96), rgba(232, 215, 176, 0.82));
-  --cv-chip-filter-border: rgba(171, 128, 34, 0.34);
-  --cv-chip-filter-color: #5c4715;
-  --cv-chip-filter-glow: rgba(216, 162, 27, 0.18);
+  /* Sucesso — verde jade vibrante */
+  --cv-chip-success-bg: linear-gradient(160deg, #c4f0dc, #8fe0bc);
+  --cv-chip-success-border: rgba(8, 125, 78, 0.55);
+  --cv-chip-success-color: #054d32;
+  --cv-chip-success-glow: rgba(12, 158, 95, 0.30);
+
+  /* Aviso — âmbar dourado encorpado */
+  --cv-chip-warning-bg: linear-gradient(160deg, #fde7a0, #f8c235);
+  --cv-chip-warning-border: rgba(162, 105, 8, 0.58);
+  --cv-chip-warning-color: #5a3200;
+  --cv-chip-warning-glow: rgba(205, 145, 15, 0.34);
+
+  /* Perigo — vermelho sofisticado */
+  --cv-chip-danger-bg: linear-gradient(160deg, #fac2be, #f4837b);
+  --cv-chip-danger-border: rgba(180, 28, 20, 0.55);
+  --cv-chip-danger-color: #6a1009;
+  --cv-chip-danger-glow: rgba(185, 30, 22, 0.30);
+
+  /* Info — azul vivo */
+  --cv-chip-info-bg: linear-gradient(160deg, #b8dcf8, #78bef5);
+  --cv-chip-info-border: rgba(10, 92, 162, 0.52);
+  --cv-chip-info-color: #062e60;
+  --cv-chip-info-glow: rgba(12, 102, 172, 0.30);
+
+  /* Pendente — azul-aço médio */
+  --cv-chip-pending-bg: linear-gradient(160deg, #c4d9f0, #95bbda);
+  --cv-chip-pending-border: rgba(52, 88, 132, 0.50);
+  --cv-chip-pending-color: #1b3554;
+  --cv-chip-pending-glow: rgba(55, 95, 142, 0.28);
+
+  /* Muted — slate contrastado */
+  --cv-chip-muted-bg: linear-gradient(160deg, #c8d8e8, #a4bbd0);
+  --cv-chip-muted-border: rgba(68, 96, 128, 0.46);
+  --cv-chip-muted-color: #2b4258;
+  --cv-chip-muted-glow: rgba(75, 108, 142, 0.22);
+
+  /* Neutro — azul-frio firme */
+  --cv-chip-neutral-bg: linear-gradient(160deg, #d4e3f4, #b0c8e0);
+  --cv-chip-neutral-border: rgba(62, 93, 128, 0.44);
+  --cv-chip-neutral-color: #172d46;
+  --cv-chip-neutral-glow: rgba(68, 102, 140, 0.24);
+
+  /* Entidade — cobalto rico */
+  --cv-chip-entity-bg: linear-gradient(160deg, #b4ccf6, #72a4f0);
+  --cv-chip-entity-border: rgba(25, 68, 155, 0.55);
+  --cv-chip-entity-color: #081e54;
+  --cv-chip-entity-glow: rgba(28, 75, 162, 0.32);
+
+  /* Filtro — ouro vibrante */
+  --cv-chip-filter-bg: linear-gradient(160deg, #fbe08e, #f4b610);
+  --cv-chip-filter-border: rgba(140, 92, 6, 0.55);
+  --cv-chip-filter-color: #3e2100;
+  --cv-chip-filter-glow: rgba(178, 132, 12, 0.30);
 }
 
 html[data-theme="dark"],
 html[data-theme="dark-dark"],
 html[data-theme="light-dark"] {
-  --cv-chip-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10), 0 0 0 1px rgba(255, 255, 255, 0.03), 0 12px 28px rgba(0, 0, 0, 0.24);
-  --cv-chip-shadow-hover: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 0 22px var(--cv-chip-glow), 0 16px 34px rgba(0, 0, 0, 0.32);
-  --cv-chip-focus-ring: 0 0 0 3px rgba(112, 184, 255, 0.26);
-  --cv-chip-bg: rgba(12, 28, 47, 0.76);
-  --cv-chip-border: rgba(171, 200, 232, 0.22);
-  --cv-chip-color: #d8e9fb;
-  --cv-chip-glow: rgba(112, 184, 255, 0.18);
+  --cv-chip-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.13), 0 0 0 1px rgba(255, 255, 255, 0.04), 0 4px 18px rgba(0, 0, 0, 0.40);
+  --cv-chip-shadow-hover: inset 0 1px 0 rgba(255, 255, 255, 0.20), 0 0 28px var(--cv-chip-glow), 0 8px 24px rgba(0, 0, 0, 0.46);
+  --cv-chip-focus-ring: 0 0 0 3px rgba(112, 184, 255, 0.32);
 
-  --cv-chip-success-bg: linear-gradient(180deg, rgba(21, 120, 86, 0.28), rgba(9, 65, 51, 0.44));
-  --cv-chip-success-border: rgba(88, 238, 178, 0.34);
-  --cv-chip-success-color: #9af2cc;
-  --cv-chip-success-glow: rgba(60, 230, 160, 0.26);
-  --cv-chip-warning-bg: linear-gradient(180deg, rgba(185, 131, 23, 0.30), rgba(88, 63, 10, 0.46));
-  --cv-chip-warning-border: rgba(255, 206, 93, 0.36);
-  --cv-chip-warning-color: #ffe08d;
-  --cv-chip-warning-glow: rgba(255, 196, 74, 0.28);
-  --cv-chip-danger-bg: linear-gradient(180deg, rgba(165, 45, 38, 0.30), rgba(85, 22, 25, 0.48));
-  --cv-chip-danger-border: rgba(255, 118, 109, 0.36);
-  --cv-chip-danger-color: #ffb3ad;
-  --cv-chip-danger-glow: rgba(255, 95, 88, 0.26);
-  --cv-chip-info-bg: linear-gradient(180deg, rgba(24, 112, 165, 0.30), rgba(10, 57, 91, 0.48));
-  --cv-chip-info-border: rgba(105, 213, 255, 0.34);
-  --cv-chip-info-color: #a8e8ff;
-  --cv-chip-info-glow: rgba(76, 203, 255, 0.26);
-  --cv-chip-pending-bg: linear-gradient(180deg, rgba(92, 120, 152, 0.30), rgba(37, 55, 78, 0.50));
-  --cv-chip-pending-border: rgba(172, 204, 236, 0.28);
-  --cv-chip-pending-color: #c7d9ed;
-  --cv-chip-pending-glow: rgba(142, 183, 229, 0.20);
-  --cv-chip-muted-bg: linear-gradient(180deg, rgba(80, 98, 119, 0.22), rgba(24, 38, 56, 0.46));
-  --cv-chip-muted-border: rgba(177, 198, 220, 0.18);
-  --cv-chip-muted-color: #aebfd1;
-  --cv-chip-muted-glow: rgba(150, 178, 207, 0.14);
-  --cv-chip-neutral-bg: linear-gradient(180deg, rgba(92, 112, 136, 0.24), rgba(29, 45, 66, 0.46));
-  --cv-chip-neutral-border: rgba(184, 210, 238, 0.22);
-  --cv-chip-neutral-color: #d1dfef;
-  --cv-chip-neutral-glow: rgba(160, 198, 235, 0.18);
-  --cv-chip-entity-bg: linear-gradient(180deg, rgba(22, 96, 172, 0.30), rgba(10, 48, 91, 0.50));
-  --cv-chip-entity-border: rgba(115, 184, 255, 0.34);
-  --cv-chip-entity-color: #b4dfff;
-  --cv-chip-entity-glow: rgba(92, 170, 255, 0.28);
-  --cv-chip-filter-bg: linear-gradient(180deg, rgba(198, 151, 35, 0.28), rgba(85, 65, 18, 0.46));
-  --cv-chip-filter-border: rgba(255, 215, 120, 0.34);
-  --cv-chip-filter-color: #ffe3a0;
-  --cv-chip-filter-glow: rgba(255, 204, 90, 0.22);
+  /* Base — dark */
+  --cv-chip-bg: rgba(12, 28, 47, 0.82);
+  --cv-chip-border: rgba(171, 200, 232, 0.32);
+  --cv-chip-color: #e0edfc;
+  --cv-chip-glow: rgba(112, 184, 255, 0.26);
+
+  /* Sucesso — verde neon profundo */
+  --cv-chip-success-bg: linear-gradient(160deg, rgba(18, 155, 100, 0.52), rgba(8, 80, 58, 0.68));
+  --cv-chip-success-border: rgba(65, 235, 160, 0.56);
+  --cv-chip-success-color: #68edb8;
+  --cv-chip-success-glow: rgba(42, 225, 150, 0.46);
+
+  /* Aviso — ouro vibrante */
+  --cv-chip-warning-bg: linear-gradient(160deg, rgba(215, 158, 28, 0.50), rgba(105, 78, 12, 0.68));
+  --cv-chip-warning-border: rgba(255, 204, 58, 0.58);
+  --cv-chip-warning-color: #ffcd64;
+  --cv-chip-warning-glow: rgba(255, 190, 42, 0.48);
+
+  /* Perigo — vermelho intenso */
+  --cv-chip-danger-bg: linear-gradient(160deg, rgba(205, 55, 46, 0.50), rgba(108, 28, 32, 0.68));
+  --cv-chip-danger-border: rgba(255, 98, 88, 0.56);
+  --cv-chip-danger-color: #ff9088;
+  --cv-chip-danger-glow: rgba(255, 72, 62, 0.44);
+
+  /* Info — ciano elétrico */
+  --cv-chip-info-bg: linear-gradient(160deg, rgba(28, 138, 208, 0.50), rgba(12, 68, 118, 0.68));
+  --cv-chip-info-border: rgba(80, 202, 255, 0.56);
+  --cv-chip-info-color: #7cd8ff;
+  --cv-chip-info-glow: rgba(55, 195, 255, 0.44);
+
+  /* Pendente — azul-aço médio */
+  --cv-chip-pending-bg: linear-gradient(160deg, rgba(88, 125, 168, 0.48), rgba(40, 65, 96, 0.66));
+  --cv-chip-pending-border: rgba(148, 192, 240, 0.50);
+  --cv-chip-pending-color: #a8ccE4;
+  --cv-chip-pending-glow: rgba(122, 175, 230, 0.38);
+
+  /* Muted — slate médio */
+  --cv-chip-muted-bg: linear-gradient(160deg, rgba(88, 112, 140, 0.42), rgba(30, 48, 70, 0.60));
+  --cv-chip-muted-border: rgba(162, 190, 222, 0.40);
+  --cv-chip-muted-color: #96b2c8;
+  --cv-chip-muted-glow: rgba(138, 175, 212, 0.28);
+
+  /* Neutro — azul-frio profundo */
+  --cv-chip-neutral-bg: linear-gradient(160deg, rgba(92, 118, 150, 0.46), rgba(34, 56, 82, 0.62));
+  --cv-chip-neutral-border: rgba(172, 208, 245, 0.44);
+  --cv-chip-neutral-color: #bdd4ec;
+  --cv-chip-neutral-glow: rgba(148, 195, 240, 0.34);
+
+  /* Entidade — cobalto elétrico */
+  --cv-chip-entity-bg: linear-gradient(160deg, rgba(28, 115, 208, 0.50), rgba(12, 58, 120, 0.68));
+  --cv-chip-entity-border: rgba(92, 178, 255, 0.56);
+  --cv-chip-entity-color: #92d0ff;
+  --cv-chip-entity-glow: rgba(70, 162, 255, 0.44);
+
+  /* Filtro — ouro quente */
+  --cv-chip-filter-bg: linear-gradient(160deg, rgba(218, 168, 42, 0.48), rgba(100, 76, 16, 0.65));
+  --cv-chip-filter-border: rgba(255, 212, 95, 0.56);
+  --cv-chip-filter-color: #ffcc7a;
+  --cv-chip-filter-glow: rgba(255, 196, 60, 0.42);
 }
 
 .cv-chip,
