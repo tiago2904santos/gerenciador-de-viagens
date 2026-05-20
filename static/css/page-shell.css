@@ -120,7 +120,7 @@
   --footer-actions-padding-x: var(--form-section-padding-x);
   --footer-actions-padding-y: var(--space-4);
   --footer-actions-gap:       var(--space-3);
-  --footer-actions-margin-top: var(--space-5);
+  --footer-actions-padding-bottom: 0;
 
   /* --- List Panel --- */
   --list-panel-radius:    var(--radius-lg);
@@ -1082,15 +1082,10 @@ html[data-theme="light"] {
   flex-wrap:       wrap;
   gap:             var(--footer-actions-gap);
   justify-content: space-between;
-  padding:         var(--footer-actions-padding-y) var(--footer-actions-padding-x);
-}
-
-.main-form-panel > .footer-actions {
-  margin-top: var(--footer-actions-margin-top);
+  padding:         var(--footer-actions-padding-y) var(--footer-actions-padding-x) var(--footer-actions-padding-bottom);
 }
 
 .form-section > .footer-actions {
-  margin-top: var(--footer-actions-margin-top);
   padding-inline: 0;
 }
 
@@ -1175,7 +1170,7 @@ html[data-theme="light"] {
   box-sizing:     border-box;
   display:        flex;
   flex-direction: column;
-  overflow:       hidden;
+  overflow:       visible;
   width:          100%;
 }
 
@@ -1875,6 +1870,7 @@ html[data-theme="dark"] .quick-add-footer-button[aria-expanded="true"] {
   border: 0;
   border-radius: 0;
   box-shadow: none;
+  overflow: visible;
 }
 
 .simple-list-item {
