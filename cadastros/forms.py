@@ -96,12 +96,16 @@ class UnidadeForm(BaseCadastroForm):
         queryset=Servidor.objects.none(),
         widget=ServidorFiltroSelectMultiple(
             attrs={
-                "class": "form-select app-multiselect__native",
-                "data-app-multiselect": "true",
+                "class": "cv-search-picker__native",
+                "data-cv-search-picker": "true",
+                "data-picker-mode": "multi",
+                "data-picker-variant": "compact",
+                "data-picker-label": "Servidores",
+                "data-picker-hint": "Busque por nome, cargo, CPF ou RG.",
+                "data-panel-title": "SERVIDORES VINCULADOS",
                 "data-empty-selected": "Nenhum servidor vinculado.",
                 "data-empty-message": "Nenhum servidor encontrado.",
                 "data-placeholder": "Digite nome, cargo, CPF ou RG",
-                "data-search-placeholder": "Digite nome, cargo, CPF ou RG",
             }
         ),
     )
@@ -368,11 +372,18 @@ class ViaturaForm(BaseCadastroForm):
                 },
             ),
             "tipo": forms.Select(attrs={"class": "form-select"}),
-            "motoristas": forms.SelectMultiple(
+            "motoristas": ServidorFiltroSelectMultiple(
                 attrs={
-                    "class": "form-select",
-                    "size": "6",
-                    "aria-label": "Motoristas",
+                    "class": "cv-search-picker__native",
+                    "data-cv-search-picker": "true",
+                    "data-picker-mode": "multi",
+                    "data-picker-variant": "compact",
+                    "data-picker-label": "Motoristas",
+                    "data-picker-hint": "Busque por nome, cargo ou unidade.",
+                    "data-panel-title": "MOTORISTAS SELECIONADOS",
+                    "data-placeholder": "Digite nome, cargo ou unidade",
+                    "data-empty-message": "Nenhum motorista encontrado.",
+                    "data-empty-selected": "Nenhum motorista selecionado.",
                 },
             ),
         }

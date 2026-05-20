@@ -1,5 +1,29 @@
 {% if field.field.widget.input_type == 'checkbox' %}
   {% include "components/forms/card_toggle.html" with field=field title=label|default:field.label description=help_text size_class=size_class only %}
+{% elif field.field.widget.input_type == 'select' and field.field.widget.allow_multiple_selected %}
+<div class="field app-form-field cv-field{% if size_class %} {{ size_class }}{% endif %}">
+  {% include "components/ui/forms/multiselect.html" with field=field only %}
+  {% if help_text %}<p class="field-help app-form-help">{{ help_text }}</p>{% endif %}
+  {% if field.errors %}{% include "components/ui/feedback/field_error.html" with errors=field.errors only %}{% endif %}
+</div>
+{% elif field.field.widget.input_type == 'select' %}
+<div class="field app-form-field cv-field{% if size_class %} {{ size_class }}{% endif %}">
+  <label class="app-form-label cv-field__label" for="{{ field.id_for_label }}">{{ label|default:field.label }}</label>
+  {% if action_url or action_label %}
+    <div class="cv-field-with-action">
+      {% include "components/ui/forms/select.html" with field=field only %}
+      {% if action_url %}
+        <a class="cv-field-action cv-field-action--manage" href="{{ action_url }}">{{ action_label }}</a>
+      {% else %}
+        <button class="cv-field-action cv-field-action--manage" type="{{ action_type|default:'button' }}">{{ action_label }}</button>
+      {% endif %}
+    </div>
+  {% else %}
+    {% include "components/ui/forms/select.html" with field=field only %}
+  {% endif %}
+  {% if help_text %}<p class="field-help app-form-help">{{ help_text }}</p>{% endif %}
+  {% if field.errors %}{% include "components/ui/feedback/field_error.html" with errors=field.errors only %}{% endif %}
+</div>
 {% else %}
 <div class="field app-form-field{% if size_class %} {{ size_class }}{% endif %}">
   <label class="app-form-label" for="{{ field.id_for_label }}">{{ label|default:field.label }}</label>
