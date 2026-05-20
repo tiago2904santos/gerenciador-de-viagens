@@ -156,19 +156,85 @@ UI_LAB_PAGE_DEFINITIONS = [
 ]
 
 UI_LAB_STATUS_EXAMPLES = [
-    {"label": "Rascunho", "modifier": "draft"},
-    {"label": "Finalizado", "modifier": "done"},
-    {"label": "Pendente", "modifier": "pending"},
-    {"label": "Assinado", "modifier": "signed"},
-    {"label": "Cancelado", "modifier": "cancelled"},
-    {"label": "Ativo", "modifier": "active"},
-    {"label": "Inativo", "modifier": "inactive"},
-    {"label": "Bloqueado", "modifier": "locked"},
-    {"label": "Retificado", "modifier": "corrected"},
-    {"label": "Com pendencia", "modifier": "issue"},
-    {"label": "Sem RG", "modifier": "missing"},
-    {"label": "Ligado", "modifier": "on"},
-    {"label": "Desligado", "modifier": "off"},
+    {"label": "Rascunho", "tone": "warning"},
+    {"label": "Finalizado", "tone": "success"},
+    {"label": "Pendente", "tone": "pending"},
+    {"label": "Assinado", "tone": "success"},
+    {"label": "Cancelado", "tone": "danger"},
+    {"label": "Ativo", "tone": "success"},
+    {"label": "Inativo", "tone": "muted"},
+    {"label": "Bloqueado", "tone": "danger"},
+    {"label": "Retificado", "tone": "info"},
+    {"label": "Com pendência", "tone": "warning"},
+    {"label": "Sem RG", "tone": "neutral"},
+    {"label": "Ligado", "tone": "success"},
+    {"label": "Desligado", "tone": "muted"},
+]
+
+UI_LAB_CHIP_GROUPS = [
+    {
+        "title": "Status documentais",
+        "description": "Ciclo de vida de documentos e decisões formais.",
+        "items": [
+            ("Rascunho", "warning"), ("Em preenchimento", "info"), ("Pendente", "pending"),
+            ("Em análise", "info"), ("Aguardando validação", "pending"), ("Aguardando assinatura", "pending"),
+            ("Assinado", "success"), ("Finalizado", "success"), ("Cancelado", "danger"),
+            ("Indeferido", "danger"), ("Deferido", "success"), ("Retificado", "info"),
+            ("Com pendência", "warning"), ("Expirado", "danger"), ("Arquivado", "muted"),
+        ],
+    },
+    {
+        "title": "Status operacionais",
+        "description": "Disponibilidade e estado operacional de recursos.",
+        "items": [
+            ("Ativo", "success"), ("Inativo", "muted"), ("Bloqueado", "danger"),
+            ("Suspenso", "warning"), ("Ligado", "success"), ("Desligado", "muted"),
+            ("Disponível", "success"), ("Indisponível", "danger"), ("Ocupado", "warning"),
+            ("Em uso", "info"), ("Reservado", "pending"), ("Manutenção", "warning"),
+        ],
+    },
+    {
+        "title": "Cadastro e integridade",
+        "description": "Completude, verificação e pendências estruturais.",
+        "items": [
+            ("Completo", "success"), ("Incompleto", "warning"), ("Verificado", "success"),
+            ("Não verificado", "pending"), ("Com erro", "danger"), ("Sem erro", "success"),
+            ("Sem RG", "neutral"), ("Com RG", "info"), ("Sem assinatura", "warning"),
+            ("Assinatura pendente", "pending"),
+        ],
+    },
+    {
+        "title": "Chips de entidade",
+        "description": "Identificação rápida de objetos recorrentes no domínio.",
+        "family": "entity",
+        "items": [
+            ("Servidor", "entity"), ("Viajante", "entity"), ("Viatura", "entity"),
+            ("Motorista", "entity"), ("Destino", "entity"), ("Trecho", "entity"),
+            ("Unidade", "entity"), ("Evento", "entity"), ("Documento", "entity"),
+            ("Roteiro", "entity"),
+        ],
+    },
+    {
+        "title": "Filtros aplicados",
+        "description": "Chips removíveis usados em barras de filtro e buscas.",
+        "family": "filter",
+        "removable": True,
+        "items": [
+            ("Curitiba", "filter"), ("Últimos 30 dias", "filter"), ("Ativos", "filter"),
+            ("Com pendência", "filter"), ("Tipo: Ofício", "filter"), ("Ordenação: recentes", "filter"),
+        ],
+    },
+]
+
+UI_LAB_CHIP_VARIATIONS = [
+    {"label": "Simples", "tone": "info"},
+    {"label": "Com ícone", "tone": "success", "icon": "✓"},
+    {"label": "Selecionável", "tone": "entity", "family": "interactive", "selected": True},
+    {"label": "Toggle", "tone": "warning", "family": "interactive", "icon": "●"},
+    {"label": "Removível", "tone": "filter", "family": "removable", "removable": True},
+    {"label": "Contagem", "tone": "info", "count": "12"},
+    {"label": "Compacto", "tone": "neutral", "size": "compact"},
+    {"label": "Desabilitado", "tone": "muted", "disabled": True},
 ]
 
 UI_LAB_PLAN_ITEMS = {
@@ -523,6 +589,8 @@ def _build_ui_lab_context(active_slug):
         "ui_lab_cards": UI_LAB_CARDS,
         "ui_lab_roteiros_cards": UI_LAB_ROTEIROS_CARDS,
         "ui_lab_status_examples": UI_LAB_STATUS_EXAMPLES,
+        "ui_lab_chip_groups": UI_LAB_CHIP_GROUPS,
+        "ui_lab_chip_variations": UI_LAB_CHIP_VARIATIONS,
         "ui_lab_plan_items": UI_LAB_PLAN_ITEMS.get(active_slug, []),
     }
 

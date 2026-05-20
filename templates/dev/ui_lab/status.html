@@ -4,20 +4,57 @@
   {% include "dev/ui_lab/partials/_lab_page_title.html" %}
   {% include "dev/ui_lab/partials/_lab_nav.html" %}
 
-  <section class="ui-lab-section">
+  <section class="ui-lab-section ui-lab-section--status">
     <div class="ui-lab-section__header">
       <p class="ui-lab-section__eyebrow">Status Lab</p>
       <h2 class="ui-lab-section__title">Badges, chips e estados</h2>
       <p class="ui-lab-section__description">
-        Esta página vai concentrar estados documentais e chips reutilizáveis.
+        Padrão oficial para chips de status, entidades, filtros aplicados e estados interativos.
       </p>
     </div>
-    {% include "dev/ui_lab/partials/_component_placeholder.html" with title="Badges / Chips / Status" status_label=ui_lab_current_page.status_label status_modifier=ui_lab_current_page.status_modifier description=ui_lab_current_page.summary items=ui_lab_plan_items only %}
 
-    <div class="ui-lab-chip-grid">
-      {% for status in ui_lab_status_examples %}
-        <span class="ui-lab-status-pill ui-lab-status-pill--{{ status.modifier }}">{{ status.label }}</span>
+    <div class="ui-lab-status-showcase">
+      <div class="ui-lab-status-showcase__copy">
+        <span class="ui-lab-preview-card__label">Sistema de chips</span>
+        <h3>Semântica reutilizável com presença visual premium</h3>
+        <p>
+          A base usa tokens globais, mantém glow controlado no tema escuro e leva a mesma
+          profundidade para o tema claro com bordas luminosas, contraste e superfície viva.
+        </p>
+      </div>
+      <div class="ui-lab-status-showcase__chips" aria-label="Exemplos principais">
+        {% for chip in ui_lab_status_examples %}
+          {% include "components/ui/badges/chip.html" with label=chip.label tone=chip.tone family="status" only %}
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="ui-lab-status-grid">
+      {% for group in ui_lab_chip_groups %}
+        <article class="ui-lab-status-card">
+          <header class="ui-lab-status-card__header">
+            <span class="ui-lab-preview-card__label">{{ group.title }}</span>
+            <p>{{ group.description }}</p>
+          </header>
+          <div class="ui-lab-status-card__chips">
+            {% for item in group.items %}
+              {% include "components/ui/badges/chip.html" with label=item.0 tone=item.1 family=group.family|default:"status" removable=group.removable only %}
+            {% endfor %}
+          </div>
+        </article>
       {% endfor %}
     </div>
+
+    <article class="ui-lab-status-card ui-lab-status-card--wide">
+      <header class="ui-lab-status-card__header">
+        <span class="ui-lab-preview-card__label">Variações de interação</span>
+        <p>Estados de uso para listas, filtros e seleções sem criar componentes por página.</p>
+      </header>
+      <div class="ui-lab-status-card__chips">
+        {% for chip in ui_lab_chip_variations %}
+          {% include "components/ui/badges/chip.html" with label=chip.label tone=chip.tone family=chip.family|default:"status" size=chip.size icon=chip.icon removable=chip.removable count=chip.count selected=chip.selected disabled=chip.disabled only %}
+        {% endfor %}
+      </div>
+    </article>
   </section>
 {% endblock %}
