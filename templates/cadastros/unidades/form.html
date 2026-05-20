@@ -1,6 +1,4 @@
 {% extends "base.html" %}
-{% load static %}
-
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block content %}
@@ -14,9 +12,4 @@
       {% include "components/ui/buttons/floating_primary_action.html" with label=submit_label icon=submit_icon|default:"plus" type="submit" only %}
     </form>
   </div>
-{% endblock %}
-
-{% block extra_js %}
-  {{ block.super }}
-  <script src="{% static 'js/components/app-multiselect.js' %}?v=20260519-unidades-servidores" defer></script>
 {% endblock %}

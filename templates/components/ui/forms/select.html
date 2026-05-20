@@ -1,27 +1,7 @@
 {% comment %}
-cv-select component — <select> nativo envolvido pelo cv-select-wrapper.
-Compativel com Django form submit (preserva name, id, required, disabled).
-
-Parametros:
-  name        — atributo name do <select>
-  id          — atributo id do <select>
-  options     — lista de {value, label, selected}
-  placeholder — texto da opcao vazia inicial (value="")
-  disabled    — booleano
-  required    — booleano
-  error       — booleano (aplica --error no wrapper)
-  success     — booleano (aplica --success no wrapper)
-  extra_class — classes adicionais no wrapper
+cv-custom-select global — clonagem 1:1 do modelo aprovado no UI Lab.
+O <select> nativo permanece no DOM para submit Django; o JS monta trigger/menu.
 {% endcomment %}
-<div class="cv-select-wrapper{% if error %} cv-select-wrapper--error{% elif success %} cv-select-wrapper--success{% endif %}{% if disabled %} cv-select-wrapper--disabled{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}">
-  <select class="cv-select-native"
-          name="{{ name }}"
-          id="{{ id }}"
-          {% if required %}required{% endif %}
-          {% if disabled %}disabled{% endif %}>
-    {% if placeholder %}<option value="">{{ placeholder }}</option>{% endif %}
-    {% for option in options %}
-      <option value="{{ option.value }}"{% if option.selected %} selected{% endif %}>{{ option.label }}</option>
-    {% endfor %}
-  </select>
+<div class="cv-custom-select{% if field.errors %} cv-custom-select--error{% endif %}{% if field.field.disabled %} cv-custom-select--disabled{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}" data-cv-select>
+  {{ field.as_widget }}
 </div>
