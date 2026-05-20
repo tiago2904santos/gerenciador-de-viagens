@@ -1,8 +1,11 @@
 {% if rows %}
-  <div class="simple-list" role="list">
+  <div class="simple-list" role="list" data-cv-list-container>
     {% for row in rows %}
       {% include "components/lists/simple_list_row.html" with row=row %}
     {% endfor %}
+  </div>
+  <div data-cv-empty-state hidden>
+    {% include "components/lists/list_empty.html" with message=empty_message action_label=empty_action_label action_url=empty_action_url only %}
   </div>
 {% else %}
   {% include "components/lists/list_empty.html" with message=empty_message action_label=empty_action_label action_url=empty_action_url only %}

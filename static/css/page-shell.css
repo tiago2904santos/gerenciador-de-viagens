@@ -117,9 +117,10 @@
   --quick-add-primary-border: rgba(255, 255, 255, 0.4);
 
   /* --- Footer Actions --- */
-  --footer-actions-padding-x: var(--space-6);
-  --footer-actions-padding-y: var(--space-5);
+  --footer-actions-padding-x: var(--form-section-padding-x);
+  --footer-actions-padding-y: var(--space-4);
   --footer-actions-gap:       var(--space-3);
+  --footer-actions-margin-top: var(--space-5);
 
   /* --- List Panel --- */
   --list-panel-radius:    var(--radius-lg);
@@ -1082,6 +1083,15 @@ html[data-theme="light"] {
   gap:             var(--footer-actions-gap);
   justify-content: space-between;
   padding:         var(--footer-actions-padding-y) var(--footer-actions-padding-x);
+}
+
+.main-form-panel > .footer-actions {
+  margin-top: var(--footer-actions-margin-top);
+}
+
+.form-section > .footer-actions {
+  margin-top: var(--footer-actions-margin-top);
+  padding-inline: 0;
 }
 
 .footer-actions__secondary,

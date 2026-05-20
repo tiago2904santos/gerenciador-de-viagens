@@ -1,5 +1,5 @@
 {# Lista simples com header Quick Add. Usa os mesmos tokens/estruturas do UI Lab. #}
-<div class="page-shell page-shell--list">
+<div class="page-shell page-shell--list" data-cv-realtime-filter-scope>
   <div class="page-header-stack header-stack--quick-add">
     <div class="page-header-band">
       <div class="page-header-band__content">
@@ -23,11 +23,12 @@
             name="q"
             placeholder="{{ search_placeholder|default:'Buscar itens' }}"
             aria-label="{{ search_placeholder|default:'Buscar itens' }}"
+            data-cv-filter="search"
             {% if q %}value="{{ q }}"{% endif %}
           >
         </div>
         <div class="header-filter-bar__actions">
-          {% include "components/ui/buttons/button.html" with href=request.path label="Limpar filtros" variant="secondary" icon="x" only %}
+          {% include "components/ui/buttons/button.html" with href=request.path label="Limpar filtros" variant="secondary" icon="x" data_cv_filter_clear=True only %}
         </div>
       </form>
 

@@ -8,17 +8,22 @@
 {% endblock %}
 
 {% block content %}
-  <div class="app-page--main-card-list page-shell page-shell--list">
+  <div class="app-page--main-card-list page-shell page-shell--list" data-cv-realtime-filter-scope>
     {% include "components/ui/headers/header_stack_filters.html" with eyebrow="ROTEIROS" title=page_title icon_label="RT" form_action=request.path search_name="q" search_value=q search_placeholder="Buscar por sede, destino ou observações" search_clear_url=search_clear_url status_options=status_options status_value=status primary_action_label="Novo roteiro" primary_action_url=create_url only %}
 
     <div class="list-panel">
-      <div class="list-content list-grid list-grid--roteiros app-list-grid">
+      <div class="list-content list-grid list-grid--roteiros app-list-grid" data-cv-list-container>
         {% for card in cards %}
           {% include "components/lists/main_list_card.html" with card=card only %}
         {% empty %}
           {% include "components/lists/list_empty.html" with message=empty_message action_label="Novo roteiro" action_url=create_url only %}
         {% endfor %}
       </div>
+      {% if cards %}
+        <div data-cv-empty-state hidden>
+          {% include "components/lists/list_empty.html" with message=empty_message only %}
+        </div>
+      {% endif %}
     </div>
   </div>
 {% endblock %}

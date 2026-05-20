@@ -7,6 +7,7 @@
      {% if link_target %}target="{{ link_target }}"{% endif %}
      {% if link_rel %}rel="{{ link_rel }}"{% endif %}
      {% if data_quick_add_close %}data-quick-add-close{% endif %}
+     {% if data_cv_filter_clear %}data-cv-filter-clear{% endif %}
   >
     {% if icon and not icon_after %}
       <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon=icon only %}</span>
@@ -22,6 +23,7 @@
           {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
           {% if disabled %}disabled{% endif %}
           {% if data_quick_add_close %}data-quick-add-close{% endif %}
+          {% if data_cv_filter_clear %}data-cv-filter-clear{% endif %}
   >
     {% if icon and not icon_after %}
       <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon=icon only %}</span>

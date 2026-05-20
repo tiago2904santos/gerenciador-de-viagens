@@ -27,6 +27,7 @@
           name="{{ search_name|default:'q' }}"
           placeholder="{{ search_placeholder|default:'Buscar...' }}"
           aria-label="{{ search_placeholder|default:'Buscar' }}"
+          data-cv-filter="search"
           {% if search_value %}value="{{ search_value }}"{% endif %}
         >
       </div>
@@ -34,7 +35,7 @@
         <div class="header-filter-bar__row">
           <div class="header-filter-bar__fields">
             <div class="header-filter-field">
-              <select class="header-filter-select" name="{{ status_name|default:'status' }}" aria-label="{{ status_label|default:'Status' }}">
+              <select class="header-filter-select" name="{{ status_name|default:'status' }}" aria-label="{{ status_label|default:'Status' }}" data-cv-filter="status">
                 {% for option in status_options %}
                   <option value="{{ option.value }}"{% if option.value == status_value %} selected{% endif %}>{{ option.label }}</option>
                 {% endfor %}
@@ -46,7 +47,7 @@
     </div>
     <div class="page-header-rail__actions">
       {% if search_clear_url %}
-        {% include "components/ui/buttons/button.html" with href=search_clear_url label="Limpar filtros" variant="secondary" icon="x" only %}
+        {% include "components/ui/buttons/button.html" with href=search_clear_url label="Limpar filtros" variant="secondary" icon="x" data_cv_filter_clear=True only %}
       {% endif %}
       {% if primary_action_label and primary_action_url %}
         {% include "components/ui/buttons/button.html" with href=primary_action_url label=primary_action_label variant="primary" icon="plus" only %}
