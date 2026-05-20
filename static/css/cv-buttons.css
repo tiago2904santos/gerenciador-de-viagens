@@ -12,7 +12,7 @@
    ========================================================= */
 :root {
   /* Régua única */
-  --cv-btn-height: 36px;
+  --cv-btn-height: 42px;
   --cv-btn-size: var(--cv-btn-height);
   --cv-btn-icon-size: 17px;
   --cv-btn-padding-x: 13px;

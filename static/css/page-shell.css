@@ -209,9 +209,9 @@ html[data-theme="dark"] {
   --surface-filter-bar:     rgba(255, 255, 255, 0.03);
   --border-filter-bar:      var(--theme-border-card);
 
-  --surface-list-row:       transparent;
+  --surface-list-row:       var(--surface-form-section); /* mesmo fundo das seções de formulário */
   --border-list-row:        rgba(255, 255, 255, 0.07);
-  --surface-list-row-hover: rgba(255, 255, 255, 0.05);
+  --surface-list-row-hover: rgba(255, 255, 255, 0.08);
 
   --surface-footer-actions: var(--color-surface-muted);
   --border-footer-actions:  var(--theme-border-card);
@@ -315,7 +315,7 @@ html[data-theme="light"] {
   --surface-filter-bar:     #f4f8fc;
   --border-filter-bar:      #dde6ef;
 
-  --surface-list-row:       transparent;
+  --surface-list-row:       var(--surface-form-section); /* mesmo fundo das seções de formulário */
   --border-list-row:        #e5edf5;
   --surface-list-row-hover: var(--color-primary-soft);
 
@@ -1882,7 +1882,8 @@ html[data-theme="dark"] .quick-add-footer-button[aria-expanded="true"] {
   border: 0;
   border-radius: 0;
   box-shadow: none;
-  overflow: visible;
+  overflow: invisible;
+  border-radius: var(--radius-lg);
 }
 
 .simple-list-item {
