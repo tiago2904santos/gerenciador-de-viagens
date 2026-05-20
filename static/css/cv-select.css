@@ -529,3 +529,383 @@ html[data-theme="dark"] .cv-select-native option {
     min-width: 160px;
   }
 }
+
+/* ==========================================================================
+   UI Lab clone — Custom Select Premium / Inline Action
+   Fonte 1:1: static/css/dev/ui-lab-fields.css + templates/dev/ui_lab/selects_filters.html
+   ========================================================================== */
+
+:root {
+  --cv-field-height: var(--control-height-md);
+  --cv-field-radius: var(--radius-control);
+  --cv-field-padding-x: var(--space-3);
+  --cv-field-padding-y: 0;
+  --cv-field-font-size: var(--font-size-sm);
+  --cv-field-label-size: var(--font-size-sm);
+  --cv-field-label-weight: var(--font-weight-semibold);
+  --cv-field-bg: var(--theme-input-bg);
+  --cv-field-bg-hover: var(--theme-surface-card);
+  --cv-field-color: var(--theme-input-text);
+  --cv-field-border: var(--theme-input-border);
+  --cv-field-border-hover: var(--color-border-strong);
+  --cv-field-border-focus: var(--route-button-primary-border);
+  --cv-field-shadow: var(--shadow-xs);
+  --cv-field-shadow-focus: 0 0 0 var(--space-1) var(--cv-field-focus-ring), var(--shadow-xs);
+  --cv-field-placeholder: var(--color-input-placeholder);
+  --cv-field-focus-border: var(--route-button-primary-border);
+  --cv-field-focus-ring: var(--route-focus-ring);
+  --cv-field-error: var(--color-danger);
+  --cv-field-error-bg: var(--color-danger-soft);
+  --cv-field-error-border: var(--color-danger-border-strong);
+  --cv-field-error-shadow: 0 0 0 var(--space-1) var(--color-danger-border-soft), var(--shadow-xs);
+  --cv-field-success: var(--color-success);
+  --cv-field-success-shadow: 0 0 0 var(--space-1) var(--color-success-soft), var(--shadow-xs);
+  --cv-field-disabled-bg: var(--color-input-disabled-bg);
+  --cv-field-readonly-bg: var(--route-field-disabled-bg);
+  --cv-field-help-color: var(--color-help);
+  --cv-field-grid-gap: var(--space-4);
+  --cv-field-section-gap: var(--space-4);
+  --cv-select-bg: var(--cv-field-bg);
+  --cv-select-bg-hover: var(--cv-field-bg-hover);
+  --cv-select-border: var(--cv-field-border);
+  --cv-select-border-hover: var(--cv-field-border-hover);
+  --cv-select-border-focus: var(--cv-field-border-focus);
+  --cv-select-chevron: var(--cv-field-placeholder);
+  --cv-select-shadow: var(--shadow-xs);
+  --cv-select-focus-shadow: var(--cv-field-shadow-focus);
+  --cv-select-error-shadow: var(--cv-field-error-shadow);
+  --cv-chip-bg: var(--color-primary-soft);
+  --cv-chip-bg-hover: var(--theme-list-row-hover);
+  --cv-chip-border: var(--color-info-border-strong);
+  --cv-chip-color: var(--color-primary-strong);
+  --cv-chip-remove-bg-hover: var(--color-danger-soft);
+  --cv-chip-remove-color: var(--theme-text-muted);
+  --cv-dropdown-bg: var(--theme-surface-card);
+  --cv-dropdown-border: var(--theme-border-card);
+  --cv-dropdown-shadow: var(--shadow-soft);
+  --cv-option-hover-bg: var(--theme-list-row-hover);
+  --cv-option-selected-bg: var(--color-primary-soft);
+  --cv-option-selected-border: var(--color-info-border-strong);
+  --cv-option-marker-bg: var(--color-primary);
+  --cv-option-marker-color: var(--color-white);
+  --cv-cs-trigger-shadow: var(--shadow-sm);
+  --cv-cs-chevron-color: var(--theme-text-muted);
+  --cv-cs-value-weight: var(--font-weight-medium);
+  --cv-cs-menu-bg: var(--cv-dropdown-bg);
+  --cv-cs-menu-border: var(--cv-dropdown-border);
+  --cv-cs-menu-shadow: var(--shadow-md);
+  --cv-cs-menu-radius: var(--cv-field-radius);
+  --cv-cs-option-hover-bg: var(--cv-option-hover-bg);
+  --cv-cs-option-selected-bg: var(--cv-option-selected-bg);
+  --cv-cs-option-selected-color: var(--color-primary);
+  --cv-cs-option-selected-weight: var(--font-weight-semibold);
+  --cv-cs-option-check-color: var(--cv-option-marker-bg);
+  --cv-cs-option-padding-x: var(--space-4);
+  --cv-cs-z-index: 200;
+}
+
+html[data-theme="dark"] {
+  --cv-field-bg-hover: var(--theme-surface-card-soft);
+  --cv-field-error-bg: var(--cv-field-bg);
+  --cv-chip-bg: var(--color-info-bg);
+  --cv-chip-border: var(--color-info-border);
+  --cv-chip-color: var(--color-info-text);
+  --cv-option-selected-bg: var(--color-info-bg);
+  --cv-option-selected-border: var(--color-info-border);
+  --cv-cs-trigger-shadow: none;
+  --cv-cs-option-selected-color: var(--color-info-text);
+}
+
+.cv-field {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.app-form-field .cv-field__label,
+.cv-field__label {
+  color: var(--color-label-strong);
+  font-size: var(--cv-field-label-size);
+  font-weight: var(--cv-field-label-weight);
+  line-height: 1.2;
+}
+
+.cv-field__control-row,
+.cv-field-with-action {
+  align-items: stretch;
+  display: flex;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.cv-field__control-row .cv-field__control,
+.cv-field-with-action .cv-field__control,
+.cv-field-with-action .cv-select__wrapper,
+.cv-field-with-action .cv-custom-select {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.cv-field-action {
+  align-items: center;
+  appearance: none;
+  background:
+    linear-gradient(var(--theme-surface-card), var(--theme-surface-card)) padding-box,
+    linear-gradient(var(--cv-field-border), var(--cv-field-border)) border-box;
+  border: 1px solid transparent;
+  border-radius: var(--cv-field-radius);
+  box-shadow: var(--shadow-sm);
+  color: var(--theme-text-body);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: inherit;
+  font-size: var(--cv-field-font-size);
+  font-weight: var(--font-weight-medium);
+  gap: var(--space-2);
+  height: var(--cv-field-height);
+  justify-content: center;
+  padding: 0 var(--space-4);
+  text-decoration: none;
+  transition: background var(--transition-fast), box-shadow var(--transition-fast);
+  white-space: nowrap;
+}
+
+.cv-field-action:hover:not(:disabled) {
+  background:
+    linear-gradient(var(--cv-field-bg-hover), var(--cv-field-bg-hover)) padding-box,
+    linear-gradient(var(--cv-field-border-hover), var(--cv-field-border-hover)) border-box;
+}
+
+.cv-field-action--clear {
+  color: var(--cv-field-error);
+}
+
+.cv-field-action--clear:hover:not(:disabled) {
+  background:
+    linear-gradient(var(--color-danger-soft), var(--color-danger-soft)) padding-box,
+    linear-gradient(var(--cv-field-error-border), var(--cv-field-error-border)) border-box;
+}
+
+.cv-field__control-row .cv-field-action,
+.cv-field-with-action .cv-field-action {
+  align-self: stretch;
+  flex: 0 0 auto;
+  height: auto;
+}
+
+.cv-custom-select {
+  max-width: 100%;
+  min-width: 0;
+  position: relative;
+  width: 100%;
+}
+
+.cv-custom-select__native {
+  clip: rect(0 0 0 0);
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  position: absolute;
+  width: 1px;
+}
+
+.cv-custom-select__trigger {
+  align-items: center;
+  background:
+    linear-gradient(var(--cv-select-bg), var(--cv-select-bg)) padding-box,
+    linear-gradient(var(--cv-select-border), var(--cv-select-border)) border-box;
+  border: 1px solid transparent;
+  border-radius: var(--cv-field-radius);
+  box-shadow: var(--cv-cs-trigger-shadow);
+  box-sizing: border-box;
+  color: var(--cv-field-color);
+  cursor: pointer;
+  display: flex;
+  font-family: inherit;
+  font-size: var(--cv-field-font-size);
+  font-weight: var(--cv-cs-value-weight);
+  gap: var(--space-2);
+  height: var(--cv-field-height);
+  max-width: 100%;
+  min-height: var(--cv-field-height);
+  min-width: 0;
+  padding: 0 var(--cv-field-padding-x);
+  text-align: left;
+  transition: background 150ms ease, box-shadow 150ms ease;
+  width: 100%;
+}
+
+.cv-custom-select__trigger:hover:not(:disabled) {
+  background:
+    linear-gradient(var(--cv-select-bg-hover), var(--cv-select-bg-hover)) padding-box,
+    linear-gradient(var(--cv-select-border-hover), var(--cv-select-border-hover)) border-box;
+}
+
+.cv-custom-select__trigger:focus-visible {
+  background:
+    linear-gradient(var(--cv-select-bg-hover), var(--cv-select-bg-hover)) padding-box,
+    linear-gradient(var(--cv-select-border-focus), var(--cv-select-border-focus)) border-box;
+  box-shadow: var(--cv-select-focus-shadow);
+  outline: none;
+}
+
+.cv-custom-select--open .cv-custom-select__trigger {
+  background:
+    linear-gradient(var(--cv-select-bg-hover), var(--cv-select-bg-hover)) padding-box,
+    linear-gradient(var(--cv-select-border), var(--cv-select-border)) border-box;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  box-shadow: none;
+}
+
+.cv-custom-select__value {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cv-custom-select__value--placeholder {
+  color: var(--cv-field-placeholder);
+}
+
+.cv-custom-select__chevron {
+  align-items: center;
+  color: var(--cv-cs-chevron-color);
+  display: flex;
+  flex-shrink: 0;
+  transition: transform 200ms ease, color 150ms ease;
+}
+
+.cv-custom-select--open .cv-custom-select__chevron {
+  color: var(--cv-select-border-focus);
+  transform: rotate(180deg);
+}
+
+@keyframes cv-cs-menu-enter {
+  from { opacity: 0; transform: translateY(-4px) scaleY(0.97); }
+  to   { opacity: 1; transform: translateY(0) scaleY(1); }
+}
+
+.cv-custom-select__menu {
+  animation: cv-cs-menu-enter 160ms ease both;
+  background: var(--cv-cs-menu-bg);
+  border: 1px solid var(--cv-select-border);
+  border-top: none;
+  border-radius: 0 0 var(--cv-cs-menu-radius) var(--cv-cs-menu-radius);
+  box-shadow: var(--cv-cs-menu-shadow);
+  box-sizing: border-box;
+  left: 0;
+  list-style: none;
+  margin: 0;
+  max-height: 248px;
+  min-width: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0;
+  position: absolute;
+  scrollbar-width: thin;
+  top: 100%;
+  transform-origin: top;
+  width: 100%;
+  z-index: var(--cv-cs-z-index);
+}
+
+.cv-custom-select__menu::-webkit-scrollbar { width: 4px; }
+.cv-custom-select__menu::-webkit-scrollbar-track { background: transparent; }
+.cv-custom-select__menu::-webkit-scrollbar-thumb {
+  background: var(--cv-cs-menu-border);
+  border-radius: 4px;
+}
+
+.cv-custom-select__option {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  font-size: var(--cv-field-font-size);
+  gap: var(--space-2);
+  min-height: var(--control-height-sm);
+  padding: var(--space-2) var(--cv-field-padding-x);
+  transition: background 80ms ease;
+  user-select: none;
+}
+
+.cv-custom-select__option:hover:not(.cv-custom-select__option--disabled) {
+  background: var(--cv-cs-option-hover-bg);
+}
+
+.cv-custom-select__option--focused {
+  background: var(--cv-cs-option-hover-bg);
+}
+
+.cv-custom-select__option--selected {
+  background: var(--cv-cs-option-selected-bg);
+  color: var(--cv-cs-option-selected-color);
+  font-weight: var(--cv-cs-option-selected-weight);
+}
+
+.cv-custom-select__option--selected.cv-custom-select__option--focused {
+  filter: brightness(0.97);
+}
+
+.cv-custom-select__option--disabled {
+  color: var(--cv-field-placeholder);
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.cv-custom-select__option-check {
+  align-items: center;
+  color: var(--cv-cs-option-check-color);
+  display: flex;
+  flex-shrink: 0;
+  opacity: 0;
+  width: 16px;
+}
+
+.cv-custom-select__option--selected .cv-custom-select__option-check {
+  opacity: 1;
+}
+
+.cv-custom-select__option-label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cv-custom-select--disabled .cv-custom-select__trigger,
+.cv-custom-select__trigger:disabled {
+  background:
+    linear-gradient(var(--cv-field-disabled-bg), var(--cv-field-disabled-bg)) padding-box,
+    linear-gradient(var(--cv-select-border), var(--cv-select-border)) border-box;
+  color: var(--color-input-disabled-text);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.cv-custom-select--disabled .cv-custom-select__chevron {
+  opacity: 0.45;
+}
+
+.cv-custom-select--error .cv-custom-select__trigger {
+  background:
+    linear-gradient(var(--cv-field-error-bg), var(--cv-field-error-bg)) padding-box,
+    linear-gradient(var(--cv-field-error-border), var(--cv-field-error-border)) border-box;
+}
+
+.cv-custom-select--error .cv-custom-select__trigger:focus-visible,
+.cv-custom-select--error.cv-custom-select--open .cv-custom-select__trigger {
+  box-shadow: var(--cv-select-error-shadow);
+}
+
+.cv-custom-select--error .cv-custom-select__chevron {
+  color: var(--cv-field-error);
+}
+
+@media (max-width: 600px) {
+  .cv-custom-select__menu {
+    max-height: 200px;
+  }
+}
