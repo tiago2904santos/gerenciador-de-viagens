@@ -110,15 +110,15 @@
 :root {
   /* Dimensões — chip é menor que o state button (control-height-md = 44px) */
   --cv-chip-radius:            var(--radius-pill);
-  --cv-chip-height:            28px;
-  --cv-chip-height-compact:    22px;
+  --cv-chip-height:            26px;
+  --cv-chip-height-compact:    20px;
   --cv-chip-padding-x:         var(--space-3);
-  --cv-chip-padding-x-compact: 8px;
+  --cv-chip-padding-x-compact: var(--space-2);
   --cv-chip-gap:               6px;
-  --cv-chip-icon-size:         14px;
-  --cv-chip-font-size:         var(--font-size-xs);
+  --cv-chip-icon-size:         13px;
+  --cv-chip-font-size:         var(--font-size-2xs);
   --cv-chip-font-weight:       var(--font-weight-bold);
-  --cv-chip-letter-spacing:    0.04em;
+  --cv-chip-letter-spacing:    0.055em;
   --cv-chip-border-width:      1px;
   --cv-chip-focus-ring:        0 0 0 3px rgba(21, 91, 154, 0.22);
   --cv-chip-disabled-opacity:  0.48;
@@ -168,19 +168,19 @@
   --cv-chip-info-bg:     color-mix(in srgb, var(--color-info) 16%, var(--theme-surface-card, var(--color-surface)) 84%);
   --cv-chip-info-border: color-mix(in srgb, var(--color-info) 68%, var(--theme-border-card, var(--color-border)) 32%);
   --cv-chip-info-color:  color-mix(in srgb, var(--color-info) 84%, var(--color-heading) 16%);
-  --cv-chip-info-glow:   0 0 0 1px color-mix(in srgb, var(--color-info) 24%, transparent), 0 0 18px color-mix(in srgb, var(--color-info) 32%, transparent);
+  --cv-chip-info-glow:   0 0 0 1px color-mix(in srgb, var(--color-info) 20%, transparent), 0 0 14px color-mix(in srgb, var(--color-info) 26%, transparent);
 
   /* Pendente — mesma fórmula com --color-primary */
   --cv-chip-pending-bg:     color-mix(in srgb, var(--color-primary) 14%, var(--theme-surface-card, var(--color-surface)) 86%);
   --cv-chip-pending-border: color-mix(in srgb, var(--color-primary) 62%, var(--theme-border-card, var(--color-border)) 38%);
   --cv-chip-pending-color:  color-mix(in srgb, var(--color-primary) 82%, var(--color-heading) 18%);
-  --cv-chip-pending-glow:   0 0 0 1px color-mix(in srgb, var(--color-primary) 22%, transparent), 0 0 16px color-mix(in srgb, var(--color-primary) 26%, transparent);
+  --cv-chip-pending-glow:   0 0 0 1px color-mix(in srgb, var(--color-primary) 18%, transparent), 0 0 12px color-mix(in srgb, var(--color-primary) 22%, transparent);
 
   /* Entidade — primário mais rico */
   --cv-chip-entity-bg:     color-mix(in srgb, var(--color-primary) 16%, var(--theme-surface-card, var(--color-surface)) 84%);
   --cv-chip-entity-border: color-mix(in srgb, var(--color-primary) 70%, var(--theme-border-card, var(--color-border)) 30%);
   --cv-chip-entity-color:  color-mix(in srgb, var(--color-primary) 86%, var(--color-heading) 14%);
-  --cv-chip-entity-glow:   0 0 0 1px color-mix(in srgb, var(--color-primary) 24%, transparent), 0 0 18px color-mix(in srgb, var(--color-primary) 30%, transparent);
+  --cv-chip-entity-glow:   0 0 0 1px color-mix(in srgb, var(--color-primary) 20%, transparent), 0 0 14px color-mix(in srgb, var(--color-primary) 24%, transparent);
 }
 
 /* Dark — espelha o padrão do state button (16% → 26% bg, text misturado com white) */
@@ -200,11 +200,22 @@ html[data-theme="light-dark"] {
   --cv-chip-entity-color:  color-mix(in srgb, var(--color-primary) 52%, var(--color-white) 48%);
 }
 
-/* Light explícito — espelha 6% do state button */
+/* Light explícito — bg espelha 6% do state button + glow 30% mais suave */
 html[data-theme="light"] {
   --cv-chip-info-bg:    color-mix(in srgb, var(--color-info) 6%, var(--theme-surface-card, var(--color-surface)) 94%);
   --cv-chip-pending-bg: color-mix(in srgb, var(--color-primary) 5%, var(--theme-surface-card, var(--color-surface)) 95%);
   --cv-chip-entity-bg:  color-mix(in srgb, var(--color-primary) 5%, var(--theme-surface-card, var(--color-surface)) 95%);
+
+  /* Glow reduzido: outer blur 18→10px, percentagens -30% */
+  --cv-chip-success-glow: 0 0 0 1px color-mix(in srgb, var(--color-success) 16%, transparent), 0 0 10px color-mix(in srgb, var(--color-success) 22%, transparent);
+  --cv-chip-warning-glow: 0 0 0 1px color-mix(in srgb, var(--color-accent) 16%, transparent), 0 0 10px color-mix(in srgb, var(--color-accent) 20%, transparent);
+  --cv-chip-danger-glow:  0 0 0 1px color-mix(in srgb, var(--color-danger) 14%, transparent), 0 0 10px color-mix(in srgb, var(--color-danger) 20%, transparent);
+  --cv-chip-neutral-glow: 0 0 0 1px color-mix(in srgb, var(--theme-text-muted) 10%, transparent), 0 0 8px color-mix(in srgb, var(--theme-text-muted) 10%, transparent);
+  --cv-chip-muted-glow:   var(--cv-chip-neutral-glow);
+  --cv-chip-info-glow:    0 0 0 1px color-mix(in srgb, var(--color-info) 14%, transparent), 0 0 9px color-mix(in srgb, var(--color-info) 18%, transparent);
+  --cv-chip-pending-glow: 0 0 0 1px color-mix(in srgb, var(--color-primary) 12%, transparent), 0 0 8px color-mix(in srgb, var(--color-primary) 16%, transparent);
+  --cv-chip-entity-glow:  0 0 0 1px color-mix(in srgb, var(--color-primary) 14%, transparent), 0 0 9px color-mix(in srgb, var(--color-primary) 18%, transparent);
+  --cv-chip-filter-glow:  var(--cv-chip-warning-glow);
 }
 
 .cv-chip,
