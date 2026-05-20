@@ -1,9 +1,12 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Unidades{% endblock %}
 
 {% block content %}
-  {% url "cadastros:unidade_create" as create_url %}
-  {% include "components/lists/list_page_simple.html" with title=page_title description=page_description eyebrow="Cadastros" brand_mark="UN" search_placeholder="Buscar unidades" action_label="Nova unidade" action_url=create_url header_action_label="" header_action_url="" empty_message="Nenhuma unidade cadastrada ainda." rows=rows q=q %}
-  {% include "components/ui/buttons/floating_action.html" with href=create_url label="Nova unidade" icon="plus" variant="primary" aria_label="Cadastrar unidade" only %}
+  {% include "components/lists/list_page_quick_add.html" with title=page_title description=page_description eyebrow="Cadastros" brand_mark="UN" search_placeholder="Buscar unidades" empty_message="Nenhuma unidade cadastrada ainda." rows=rows q=q quick_add_form=quick_add_form quick_add_panel_id="quick-add-unidade" quick_add_label="Cadastrar unidade" quick_add_submit_label="Salvar unidade" quick_add_body_template="cadastros/unidades/partials/_quick_add_fields.html" %}
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'js/components/app-multiselect.js' %}?v=20260519-unidades-servidores" defer></script>
 {% endblock %}

@@ -78,8 +78,6 @@
   }
 
   initQuickAddToggles();
-  initButtonLoadingDemos();
-  initButtonToggleDemos();
 }());
 
 /* --------------------------------------------------------------------------

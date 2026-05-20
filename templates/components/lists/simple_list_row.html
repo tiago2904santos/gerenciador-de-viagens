@@ -1,9 +1,10 @@
-<div class="simple-list__row" role="listitem">
-  <div class="simple-list__main">
-    <div class="simple-list__title">
-      <span class="simple-list__title-text">{{ row.title }}</span>
+<div class="simple-list-item" role="listitem">
+  <div class="simple-list-item__avatar" aria-hidden="true">{{ row.avatar|default:"CV" }}</div>
+  <div class="simple-list-item__body">
+    <div class="simple-list-item__title">
+      <span class="simple-list-item__title-text">{{ row.title }}</span>
       {% if row.badges %}
-        <span class="simple-list__badges">
+        <span class="simple-list-item__badges">
           {% for badge in row.badges %}
             {% include "components/ui/lists/status_pill.html" with label=badge.text variant=badge.variant|default:'accent' only %}
           {% endfor %}
@@ -11,39 +12,47 @@
       {% endif %}
     </div>
     {% if row.meta %}
-      <div class="simple-list__meta">
-        {% for item in row.meta %}
-          <span class="simple-list__meta-item">
-            <span class="simple-list__meta-label">{{ item.label }}</span>
-            <span class="simple-list__meta-value">{{ item.value }}</span>
-          </span>
-        {% endfor %}
+      <div class="simple-list-item__meta">
+        {% if row.meta.0.label %}
+          {% for item in row.meta %}
+            <span class="simple-list-item__meta-item">
+              <span class="simple-list-item__meta-label">{{ item.label }}</span>
+              <span class="simple-list-item__meta-value">{{ item.value }}</span>
+            </span>
+          {% endfor %}
+        {% else %}
+          <span class="simple-list-item__meta-item">{{ row.meta }}</span>
+        {% endif %}
       </div>
     {% endif %}
   </div>
-  <div class="simple-list__actions">
+  <div class="simple-list-item__aside">
     {% if row.set_default_url %}
-      <form method="post" action="{{ row.set_default_url }}" class="simple-list__inline-form">
+      <form method="post" action="{{ row.set_default_url }}" class="simple-list-item__inline-form">
         {% csrf_token %}
         {% include "components/ui/buttons/button.html" with label="Definir como padrão" variant="secondary" size="sm" type="submit" only %}
       </form>
     {% endif %}
     <div class="cv-icon-btn-group">
-      {% if row.edit_fields_json %}
-        <button
-          class="cv-icon-btn cv-icon-btn--edit"
-          type="button"
-          data-quick-edit
-          data-edit-url="{{ row.edit_url }}"
-          data-edit-fields="{{ row.edit_fields_json }}"
-          aria-label="Editar"
-          data-tooltip="Editar"
-          title="Editar"
-        >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="edit" only %}</button>
-      {% else %}
-        {% include "components/ui/buttons/icon_button.html" with href=row.edit_url action="edit" aria_label="Editar" tooltip="Editar" only %}
+      {% if row.edit_url %}
+        {% if row.edit_fields_json %}
+          <button
+            class="cv-icon-btn cv-icon-btn--edit"
+            type="button"
+            data-quick-edit
+            data-edit-url="{{ row.edit_url }}"
+            data-edit-fields="{{ row.edit_fields_json }}"
+            aria-label="Editar"
+            data-tooltip="Editar"
+            title="Editar"
+          >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="edit" only %}</button>
+        {% else %}
+          {% include "components/ui/buttons/icon_button.html" with href=row.edit_url action="edit" aria_label="Editar" tooltip="Editar" only %}
+        {% endif %}
       {% endif %}
-      {% include "components/ui/buttons/icon_button.html" with href=row.delete_url action="delete" aria_label="Excluir" tooltip="Excluir" only %}
+      {% if row.delete_url %}
+        {% include "components/ui/buttons/icon_button.html" with href=row.delete_url action="delete" aria_label="Excluir" tooltip="Excluir" only %}
+      {% endif %}
     </div>
   </div>
 </div>

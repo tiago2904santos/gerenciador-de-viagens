@@ -341,6 +341,8 @@ UI_LAB_SIMPLE_ROWS = [
     {
         "avatar": "A1",
         "title": "Item exemplo 1",
+        "edit_url": "#",
+        "delete_url": "#",
         "meta": "Descricao exemplo · Metadado exemplo",
         "status_label": "Status exemplo",
         "status_modifier": "done",
@@ -349,6 +351,8 @@ UI_LAB_SIMPLE_ROWS = [
     {
         "avatar": "A2",
         "title": "Item exemplo 2",
+        "edit_url": "#",
+        "delete_url": "#",
         "meta": "Descricao exemplo · Metadado exemplo",
         "status_label": "Status exemplo",
         "status_modifier": "draft",
@@ -357,6 +361,8 @@ UI_LAB_SIMPLE_ROWS = [
     {
         "avatar": "A3",
         "title": "Item exemplo 3",
+        "edit_url": "#",
+        "delete_url": "#",
         "meta": "Descricao exemplo · Metadado exemplo",
         "status_label": "Status exemplo",
         "status_modifier": "review",
@@ -365,6 +371,8 @@ UI_LAB_SIMPLE_ROWS = [
     {
         "avatar": "A4",
         "title": "Item exemplo 4",
+        "edit_url": "#",
+        "delete_url": "#",
         "meta": "Descricao exemplo · Metadado exemplo",
         "status_label": "Status exemplo",
         "status_modifier": "done",

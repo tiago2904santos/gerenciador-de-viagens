@@ -231,6 +231,11 @@ def estado_delete(request, pk):
 
 def unidades_index(request):
     q = request.GET.get("q", "").strip()
+    form = UnidadeForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        criar_unidade(form)
+        messages.success(request, "Unidade criada com sucesso.")
+        return redirect("cadastros:unidades_index")
     unidades = listar_unidades(q=q)
     rows = [
         apresentar_linha_lista_simples_unidade(
@@ -248,6 +253,7 @@ def unidades_index(request):
             "page_description": "Unidades administrativas reutilizadas nos fluxos.",
             "rows": rows,
             "q": q,
+            "quick_add_form": form,
         },
     )
 

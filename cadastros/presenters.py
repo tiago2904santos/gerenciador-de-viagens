@@ -118,6 +118,7 @@ def apresentar_viatura_card(viatura, edit_url="#", delete_url="#"):
 
 def apresentar_linha_lista_simples_cargo(cargo, edit_url="#", delete_url="#", set_default_url=None):
     row = {
+        "avatar": "CG",
         "title": cargo.nome,
         "badges": [],
         "meta": [],
@@ -134,6 +135,7 @@ def apresentar_linha_lista_simples_cargo(cargo, edit_url="#", delete_url="#", se
 
 def apresentar_linha_lista_simples_combustivel(combustivel, edit_url="#", delete_url="#", set_default_url=None):
     row = {
+        "avatar": "CB",
         "title": combustivel.nome,
         "badges": [],
         "meta": [],
@@ -150,13 +152,13 @@ def apresentar_linha_lista_simples_combustivel(combustivel, edit_url="#", delete
 
 def apresentar_linha_lista_simples_unidade(unidade, edit_url="#", delete_url="#"):
     return {
+        "avatar": "UN",
         "title": unidade.nome,
         "badges": [],
         "meta": [
             build_meta("Sigla", unidade.sigla or "—"),
         ],
         "edit_url": edit_url,
-        "edit_fields_json": json.dumps({"nome": unidade.nome, "sigla": unidade.sigla or ""}, ensure_ascii=False),
         "delete_url": delete_url,
     }
 
@@ -168,6 +170,7 @@ def apresentar_linha_lista_simples_cidade(cidade, edit_url="#", delete_url="#"):
     if getattr(cidade, "capital", False):
         badges.append(build_badge("Capital", "accent"))
     return {
+        "avatar": "CD",
         "title": cidade.nome,
         "badges": badges,
         "meta": [
@@ -182,6 +185,7 @@ def apresentar_linha_lista_simples_cidade(cidade, edit_url="#", delete_url="#"):
 def apresentar_linha_lista_simples_estado(estado, edit_url="#", delete_url="#"):
     cod = str(estado.codigo_ibge) if estado.codigo_ibge is not None else "—"
     return {
+        "avatar": "UF",
         "title": estado.nome,
         "badges": [],
         "meta": [
@@ -199,6 +203,7 @@ def apresentar_linha_lista_simples_servidor(servidor, edit_url="#", delete_url="
         unidade_label = servidor.unidade.sigla or servidor.unidade.nome
     cargo_label = servidor.cargo.nome if servidor.cargo else "—"
     return {
+        "avatar": "SV",
         "title": servidor.nome,
         "badges": [],
         "meta": [
@@ -218,6 +223,7 @@ def apresentar_linha_lista_simples_viatura(viatura, edit_url="#", delete_url="#"
     modelo = (viatura.modelo or "").strip()
     title = f"{modelo} — {placa_fmt}" if modelo else placa_fmt
     return {
+        "avatar": "VT",
         "title": title,
         "badges": [],
         "meta": [

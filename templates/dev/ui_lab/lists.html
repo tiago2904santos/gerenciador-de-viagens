@@ -48,8 +48,8 @@
 
           <div class="list-panel">
             <div class="simple-list" role="list" aria-label="Lista de itens (demonstração)">
-              {% for item in ui_lab_simple_rows %}
-                {% include "dev/ui_lab/partials/_simple_list_item.html" with item=item compact_actions=True only %}
+              {% for row in ui_lab_simple_rows %}
+                {% include "components/lists/simple_list_row.html" with row=row only %}
               {% endfor %}
             </div>
             <div class="pagination-shell">
@@ -115,8 +115,8 @@
 
           <div class="list-panel">
             <div class="simple-list" role="list" aria-label="Lista com quick add (demonstração)">
-              {% for item in ui_lab_simple_rows %}
-                {% include "dev/ui_lab/partials/_simple_list_item.html" with item=item compact_actions=True only %}
+              {% for row in ui_lab_simple_rows %}
+                {% include "components/lists/simple_list_row.html" with row=row only %}
               {% endfor %}
             </div>
             <div class="pagination-shell">

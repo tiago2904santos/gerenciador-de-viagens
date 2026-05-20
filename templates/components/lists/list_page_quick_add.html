@@ -28,9 +28,7 @@
         </div>
         <div class="header-filter-bar__actions">
           {% include "components/ui/buttons/button.html" with label="Buscar" variant="tool" type="submit" icon="search" only %}
-          {% if q %}
-            {% include "components/ui/buttons/button.html" with href=request.path label="Limpar filtros" variant="secondary" icon="x" only %}
-          {% endif %}
+          {% include "components/ui/buttons/button.html" with href=request.path label="Limpar filtros" variant="secondary" icon="x" only %}
         </div>
       </form>
 
@@ -48,7 +46,7 @@
       </form>
     </div>
 
-    <button class="quick-add-footer-button" type="button" data-quick-add-toggle aria-controls="{{ quick_add_panel_id }}" aria-expanded="{% if quick_add_form.errors %}true{% else %}false{% endif %}">
+    <button class="quick-add-footer-button btn btn-secondary" type="button" data-quick-add-toggle aria-controls="{{ quick_add_panel_id }}" aria-expanded="{% if quick_add_form.errors %}true{% else %}false{% endif %}">
       <span class="quick-add-footer-button__icon" aria-hidden="true">+</span>
       <span class="quick-add-footer-button__label">{{ quick_add_label|default:"Cadastrar item" }}</span>
     </button>
