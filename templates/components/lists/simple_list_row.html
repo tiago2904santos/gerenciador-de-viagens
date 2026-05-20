@@ -28,20 +28,22 @@
         {% include "components/ui/buttons/button.html" with label="Definir como padrão" variant="secondary" size="sm" type="submit" only %}
       </form>
     {% endif %}
-    {% if row.edit_fields_json %}
-      <button
-        class="cv-icon-btn cv-icon-btn--edit cv-icon-btn--sm"
-        type="button"
-        data-quick-edit
-        data-edit-url="{{ row.edit_url }}"
-        data-edit-fields="{{ row.edit_fields_json }}"
-        aria-label="Editar"
-        data-tooltip="Editar"
-        title="Editar"
-      >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="edit" only %}</button>
-    {% else %}
-      {% include "components/ui/buttons/icon_button.html" with href=row.edit_url action="edit" aria_label="Editar" tooltip="Editar" size="sm" only %}
-    {% endif %}
-    {% include "components/ui/buttons/icon_button.html" with href=row.delete_url action="delete" aria_label="Excluir" tooltip="Excluir" size="sm" only %}
+    <div class="cv-icon-btn-group">
+      {% if row.edit_fields_json %}
+        <button
+          class="cv-icon-btn cv-icon-btn--edit"
+          type="button"
+          data-quick-edit
+          data-edit-url="{{ row.edit_url }}"
+          data-edit-fields="{{ row.edit_fields_json }}"
+          aria-label="Editar"
+          data-tooltip="Editar"
+          title="Editar"
+        >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="edit" only %}</button>
+      {% else %}
+        {% include "components/ui/buttons/icon_button.html" with href=row.edit_url action="edit" aria_label="Editar" tooltip="Editar" only %}
+      {% endif %}
+      {% include "components/ui/buttons/icon_button.html" with href=row.delete_url action="delete" aria_label="Excluir" tooltip="Excluir" only %}
+    </div>
   </div>
 </div>

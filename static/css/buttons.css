@@ -53,33 +53,32 @@
 
 .btn-secondary,
 .app-btn--secondary {
-  background: var(--color-card);
-  border-color: var(--color-border-strong);
-  color: var(--color-primary);
+  background:   var(--theme-btn-secondary-bg);
+  border-color: var(--theme-btn-secondary-border);
+  color:        var(--theme-btn-secondary-text);
 }
 
 .btn-secondary:hover,
 .btn-secondary:focus,
 .app-btn--secondary:hover,
 .app-btn--secondary:focus {
-  background: var(--color-surface-soft);
-  border-color: var(--color-secondary);
+  background:   var(--theme-btn-secondary-hover-bg);
+  border-color: var(--theme-btn-secondary-hover-border);
 }
 
 .btn-muted,
 .app-btn--muted {
-  background: var(--theme-btn-muted-bg);
+  background:   var(--theme-btn-muted-bg);
   border-color: var(--theme-btn-muted-border);
-  color: var(--color-primary);
+  color:        var(--theme-btn-muted-text);
 }
 
 .btn-muted:hover,
 .btn-muted:focus,
 .app-btn--muted:hover,
 .app-btn--muted:focus {
-  background: var(--theme-btn-muted-hover-bg);
+  background:   var(--theme-btn-muted-hover-bg);
   border-color: var(--theme-btn-muted-hover-border);
-  color: var(--color-primary-strong);
 }
 
 .btn-danger,

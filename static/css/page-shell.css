@@ -83,7 +83,7 @@
   --cv-wizard-section-border:         var(--border-form-section);
   --cv-wizard-section-shadow:         var(--shadow-sm);
   --cv-wizard-section-radius:         var(--radius-card);
-  --cv-wizard-section-header-padding: var(--space-4) var(--space-6) var(--space-4) var(--space-8);
+  --cv-wizard-section-header-padding: var(--space-4) var(--space-6) var(--space-4) var(--space-10);
   --cv-wizard-section-body-padding:   var(--space-5) var(--space-6);
   --cv-wizard-section-stack-gap:      var(--space-4);
 
@@ -809,6 +809,21 @@ html[data-theme="light"] {
   padding:       0;
 }
 
+/* Último card: perde o radius inferior — o footer completa a forma */
+.main-form-panel--stack .cv-wizard-section-card:last-of-type {
+  border-bottom-left-radius:  0;
+  border-bottom-right-radius: 0;
+}
+
+/* Footer funde-se ao último card como área de ação inferior */
+.main-form-panel--stack > .footer-actions {
+  background:    var(--cv-wizard-section-bg);
+  border-radius: 0 0 var(--cv-wizard-section-radius) var(--cv-wizard-section-radius);
+  border-top:    1px solid var(--cv-wizard-section-border);
+  box-shadow:    var(--cv-wizard-section-shadow);
+  margin-top:    calc(-1 * var(--cv-wizard-section-stack-gap));
+}
+
 
 /* =========================================================
    10. Form Section
@@ -904,25 +919,31 @@ html[data-theme="light"] {
 }
 
 .cv-wizard-section-header {
-  align-items:     center;
-  background:      var(--cv-wizard-section-header-bg);
-  border-bottom:   1px solid var(--cv-wizard-section-border);
-  display:         flex;
-  gap:             var(--space-4);
-  justify-content: space-between;
-  padding:         var(--cv-wizard-section-header-padding);
-  position:        relative;
+  align-items:      center;
+  background:       var(--cv-wizard-section-header-bg);
+  background-image: linear-gradient(to right, color-mix(in srgb, var(--color-accent) 7%, transparent) 0px, transparent 76px);
+  border-bottom:    1px solid var(--cv-wizard-section-border);
+  display:          flex;
+  gap:              var(--space-4);
+  justify-content:  space-between;
+  padding:          var(--cv-wizard-section-header-padding);
+  position:         relative;
 }
 
 .cv-wizard-section-header::before {
-  background:    var(--color-accent);
+  background:    linear-gradient(180deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 50%, transparent) 100%);
   border-radius: var(--radius-pill);
-  bottom:        var(--space-2);
+  box-shadow:
+    0 0 5px 1px  color-mix(in srgb, var(--color-accent) 35%, transparent),
+    0 0 12px 2px color-mix(in srgb, var(--color-accent) 15%, transparent),
+    0 0 22px 4px color-mix(in srgb, var(--color-accent) 6%, transparent);
   content:       "";
-  left:          var(--space-3);
+  height:        calc(100% - var(--space-5));
+  left:          var(--space-6);
   position:      absolute;
-  top:           var(--space-2);
-  width:         var(--space-2);
+  top:           50%;
+  transform:     translateY(-50%);
+  width:         6px;
 }
 
 .cv-wizard-section-header__copy {
@@ -941,8 +962,8 @@ html[data-theme="light"] {
 
 .cv-wizard-section-title {
   color:          var(--theme-text-heading);
-  font-size:      var(--font-size-sm);
-  font-weight:    var(--font-weight-semibold);
+  font-size:      var(--font-size-md);
+  font-weight:    var(--font-weight-bold);
   letter-spacing: 0.05em;
   line-height:    1.3;
   margin:         0;
@@ -1053,7 +1074,7 @@ html[data-theme="light"] {
   flex-wrap:       wrap;
   gap:             var(--footer-actions-gap);
   justify-content: space-between;
-  padding:         var(--footer-actions-padding-y) 0 0;
+  padding:         var(--footer-actions-padding-y) var(--footer-actions-padding-x);
 }
 
 .footer-actions__secondary,
@@ -1341,7 +1362,7 @@ html[data-theme="light"] {
     align-items:    stretch;
     flex-direction: column-reverse;
     gap:            var(--space-2);
-    padding:        var(--space-4) 0 0;
+    padding:        var(--space-4) var(--space-4);
   }
 
   .footer-actions__secondary,
@@ -2151,6 +2172,14 @@ html[data-theme="dark"] .quick-add-footer-button[aria-expanded="true"] {
   gap:            var(--space-2);
   padding-bottom: 1px;
   width:          var(--layout-quick-create-actions-width);
+}
+
+.quick-add-inline__actions .btn {
+  border-radius: var(--radius-md);
+}
+
+.quick-add-inline__actions .btn-primary {
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 .quick-add-inline__hint {
