@@ -34,9 +34,9 @@
               <div class="header-filter-bar__search">
                 <input class="header-filter-input" type="search" placeholder="Buscar itens..." aria-label="Buscar">
               </div>
-              <div class="header-filter-bar__actions">
-                <button class="header-filter-button" type="button">Limpar filtros</button>
-              </div>
+            </div>
+            <div class="page-header-rail__actions">
+              {% include "components/ui/buttons/button.html" with label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" only %}
             </div>
             <div class="quick-add-inline__panel quick-add-panel" id="ui-lab-structure-quick-add" hidden>
               <div class="quick-add-inline__body">
@@ -48,13 +48,12 @@
                   </div>
                 </div>
                 <div class="quick-add-inline__actions">
-                  <button class="btn btn-secondary" type="button" data-ui-lab-close>Cancelar</button>
-                  <button class="btn btn-primary" type="button">Salvar</button>
+                  <button class="cv-btn cv-btn--primary" type="button">Salvar</button>
                 </div>
               </div>
             </div>
           </div>
-          <button class="quick-add-footer-button btn btn-secondary" type="button" data-ui-lab-toggle aria-controls="ui-lab-structure-quick-add" aria-expanded="false">
+          <button class="quick-add-footer-button" type="button" data-ui-lab-toggle aria-controls="ui-lab-structure-quick-add" aria-expanded="false">
             <span class="quick-add-footer-button__icon" aria-hidden="true">+</span>
             <span class="quick-add-footer-button__label">Cadastrar item</span>
           </button>
@@ -98,14 +97,7 @@
                 {% endfor %}
               </div>
             </section>
-            <footer class="footer-actions">
-              <div class="footer-actions__secondary">
-                <button class="btn btn-secondary" type="button">Botão 1</button>
-              </div>
-              <div class="footer-actions__primary">
-                <button class="btn btn-primary" type="button">Botão 2</button>
-              </div>
-            </footer>
+            {% include "components/ui/layouts/footer_actions.html" with secondary_label="Voltar" primary_label="Salvar" only %}
           </main>
         </div>
       </article>
@@ -160,14 +152,7 @@
                 {% endfor %}
               </div>
             </section>
-            <footer class="footer-actions">
-              <div class="footer-actions__secondary">
-                <button class="btn btn-secondary" type="button">Botão 1</button>
-              </div>
-              <div class="footer-actions__primary">
-                <button class="btn btn-primary" type="button">Botão 2</button>
-              </div>
-            </footer>
+            {% include "components/ui/layouts/footer_actions.html" with secondary_label="Voltar" primary_label="Salvar" only %}
           </main>
         </div>
       </article>
@@ -195,7 +180,7 @@
                 <p class="page-header-rail__subtitle">Etapa 2 de 6 — Subtítulo genérico da etapa atual.</p>
               </div>
               <div class="page-header-rail__actions">
-                <button class="btn btn-secondary" type="button">Voltar à lista</button>
+                <button class="cv-btn cv-btn--secondary" type="button">Voltar à lista</button>
               </div>
             </div>
           </div>
@@ -250,14 +235,7 @@
 
             </div>
 
-            <footer class="footer-actions">
-              <div class="footer-actions__secondary">
-                <button class="btn btn-secondary" type="button">Salvar rascunho</button>
-              </div>
-              <div class="footer-actions__primary">
-                <button class="btn btn-primary" type="button">Próximo →</button>
-              </div>
-            </footer>
+            {% include "components/ui/layouts/footer_actions.html" with secondary_label="Salvar rascunho" primary_label="Próximo" only %}
           </main>
         </div>
       </article>

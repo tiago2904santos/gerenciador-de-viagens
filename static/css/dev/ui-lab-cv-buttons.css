@@ -23,16 +23,18 @@
   --cv-btn-control-radius: var(--radius-control);
 
   /* Alturas derivadas */
-  --cv-btn-height-xs: 28px;
-  --cv-btn-height-sm: 32px;
-  --cv-btn-height-md: var(--cv-btn-height);
-  --cv-btn-height-lg: 40px;
+  --cv-btn-height-xs:      28px;
+  --cv-btn-height-sm:      32px;
+  --cv-btn-height-md:      var(--cv-btn-height);
+  --cv-btn-height-lg:      40px;
+  --cv-btn-height-control: var(--control-height-md); /* 44px — emparelha com inputs */
 
   /* Padding por tamanho, mantido para compatibilidade */
-  --cv-btn-padding-x-xs: 9px;
-  --cv-btn-padding-x-sm: 11px;
-  --cv-btn-padding-x-md: var(--cv-btn-padding-x);
-  --cv-btn-padding-x-lg: 15px;
+  --cv-btn-padding-x-xs:      9px;
+  --cv-btn-padding-x-sm:      11px;
+  --cv-btn-padding-x-md:      var(--cv-btn-padding-x);
+  --cv-btn-padding-x-lg:      15px;
+  --cv-btn-padding-x-control: 16px;
 
   /* Transicao — reusa token existente */
   --cv-btn-transition:
@@ -417,6 +419,14 @@ html[data-theme="dark"] {
   min-height: var(--cv-btn-height-lg);
   padding: 0 var(--cv-btn-padding-x-lg);
   font-size: 1rem;
+}
+
+/* Altura de controle — emparelha com inputs (--control-height-md: 44px).
+   Regra absoluta: todo botão ao lado de um input deve usar esta variante. */
+.cv-btn--control {
+  min-height: var(--cv-btn-height-control);
+  padding: 0 var(--cv-btn-padding-x-control);
+  border-radius: var(--cv-btn-control-radius);
 }
 
 /* Icon sizes */

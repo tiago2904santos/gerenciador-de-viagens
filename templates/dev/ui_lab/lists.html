@@ -39,9 +39,9 @@
                 <div class="header-filter-bar__search">
                   <input class="header-filter-input" type="search" placeholder="Buscar itens..." aria-label="Buscar">
                 </div>
-                <div class="header-filter-bar__actions">
-                  <button class="header-filter-button" type="button">Limpar filtros</button>
-                </div>
+              </div>
+              <div class="page-header-rail__actions">
+                {% include "components/ui/buttons/button.html" with label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" only %}
               </div>
             </div>
           </div>
@@ -87,9 +87,9 @@
                 <div class="header-filter-bar__search">
                   <input class="header-filter-input" type="search" placeholder="Buscar itens..." aria-label="Buscar">
                 </div>
-                <div class="header-filter-bar__actions">
-                  <button class="header-filter-button" type="button">Limpar filtros</button>
-                </div>
+              </div>
+              <div class="page-header-rail__actions">
+                {% include "components/ui/buttons/button.html" with label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" only %}
               </div>
               <div class="quick-add-inline__panel quick-add-panel" id="ui-lab-lists-quick-add" hidden>
                 <div class="quick-add-inline__body">
@@ -101,13 +101,12 @@
                     </div>
                   </div>
                   <div class="quick-add-inline__actions">
-                    <button class="btn btn-secondary" type="button" data-ui-lab-close>Cancelar</button>
-                    <button class="btn btn-primary" type="button">Salvar</button>
+                    <button class="cv-btn cv-btn--primary" type="button">Salvar</button>
                   </div>
                 </div>
               </div>
           </div>
-          <button class="quick-add-footer-button btn btn-secondary" type="button" data-ui-lab-toggle aria-controls="ui-lab-lists-quick-add" aria-expanded="false">
+          <button class="quick-add-footer-button" type="button" data-ui-lab-toggle aria-controls="ui-lab-lists-quick-add" aria-expanded="false">
             <span class="quick-add-footer-button__icon" aria-hidden="true">+</span>
             <span class="quick-add-footer-button__label">Cadastrar item</span>
           </button>
@@ -186,15 +185,15 @@
                       </select>
                     </div>
                   </div>
-                  <div class="header-filter-bar__actions">
-                    <button class="header-filter-button" type="button">Limpar filtros</button>
-                  </div>
                 </div>
                 <div class="header-applied-filters" aria-label="Filtros ativos">
                   <span class="header-applied-chip">Status exemplo <span aria-hidden="true">×</span></span>
                   <span class="header-applied-chip">Últimos 30 dias <span aria-hidden="true">×</span></span>
                   <span class="header-applied-chip">Mais recentes <span aria-hidden="true">×</span></span>
                 </div>
+              </div>
+              <div class="page-header-rail__actions">
+                {% include "components/ui/buttons/button.html" with label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" only %}
               </div>
             </div>
           </div>

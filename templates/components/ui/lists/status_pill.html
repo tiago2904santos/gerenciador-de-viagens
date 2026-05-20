@@ -1,6 +1,8 @@
-{# Wrapper de status pill — delega ao chip global.
-   Mapeia variantes legadas (draft, active, accent, completed) para tones do cv-chip.
-   Parâmetros: label, variant, extra_class #}
+{% comment %}
+Wrapper de status pill — delega ao chip global.
+Mapeia variantes legadas (draft, active, accent, completed) para tones do cv-chip.
+Parâmetros: label, variant, extra_class
+{% endcomment %}
 {% with pill_v=variant|default:'muted' %}
 {% if pill_v == 'draft' %}
   {% include "components/ui/badges/chip.html" with tone="warning" label=label extra_class=extra_class only %}

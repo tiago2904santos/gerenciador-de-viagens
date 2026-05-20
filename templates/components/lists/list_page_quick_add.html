@@ -39,14 +39,13 @@
             {% include quick_add_body_template with form=quick_add_form only %}
           </div>
           <div class="quick-add-inline__actions">
-            {% include "components/ui/buttons/button.html" with label="Cancelar" variant="secondary" type="button" icon="x" data_quick_add_close=True only %}
             {% include "components/ui/buttons/button.html" with label=quick_add_submit_label|default:"Salvar" variant="primary" type="submit" icon="check" only %}
           </div>
         </div>
       </form>
     </div>
 
-    <button class="quick-add-footer-button btn btn-secondary" type="button" data-quick-add-toggle aria-controls="{{ quick_add_panel_id }}" aria-expanded="{% if quick_add_form.errors %}true{% else %}false{% endif %}">
+    <button class="quick-add-footer-button" type="button" data-quick-add-toggle aria-controls="{{ quick_add_panel_id }}" aria-expanded="{% if quick_add_form.errors %}true{% else %}false{% endif %}">
       <span class="quick-add-footer-button__icon" aria-hidden="true">+</span>
       <span class="quick-add-footer-button__label">{{ quick_add_label|default:"Cadastrar item" }}</span>
     </button>

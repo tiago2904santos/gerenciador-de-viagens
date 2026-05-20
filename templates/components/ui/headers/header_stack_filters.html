@@ -47,10 +47,10 @@
     </div>
     <div class="page-header-rail__actions">
       {% if search_clear_url %}
-        {% include "components/ui/buttons/button.html" with href=search_clear_url label="Limpar filtros" variant="secondary" icon="x" data_cv_filter_clear=True only %}
+        {% include "components/ui/buttons/button.html" with href=search_clear_url label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" data_cv_filter_clear=True only %}
       {% endif %}
       {% if primary_action_label and primary_action_url %}
-        {% include "components/ui/buttons/button.html" with href=primary_action_url label=primary_action_label variant="primary" icon="plus" only %}
+        {% include "components/ui/buttons/button.html" with href=primary_action_url label=primary_action_label variant="primary" icon="plus" extra_class="cv-btn--control" only %}
       {% endif %}
     </div>
   </div>

@@ -128,12 +128,12 @@
   /* --- List Panel --- */
   --list-panel-radius:    var(--radius-lg);
   --filter-bar-padding-x: var(--space-5);
-  --filter-bar-padding-y: var(--space-4);
+  --filter-bar-padding-y: var(--space-3);
   --filter-bar-gap:       var(--space-3);
-  --list-row-padding-x:   var(--space-4);
+  --list-row-padding-x:   var(--space-5);
   --list-row-padding-y:   var(--space-3);
   --list-row-avatar-size: 36px;
-  --pagination-padding-x: var(--space-5);
+  --pagination-padding-x: var(--space-6);
   --pagination-padding-y: var(--space-4);
 
   /* --- Quick Create Inline --- */
@@ -1652,7 +1652,7 @@ html[data-theme="light"] {
   box-sizing:  border-box;
   display:     flex;
   gap:         var(--space-3);
-  padding:     var(--space-4) var(--space-6);
+  padding:     var(--space-4) var(--space-5);
   width:       100%;
 }
 
@@ -1837,11 +1837,20 @@ html[data-theme="light"] {
   box-shadow:   none;
 }
 
+html[data-theme="dark"] .quick-add-footer-button {
+  background: var(--color-card-muted); /* #213246 */
+  color:      var(--theme-text-body);
+}
+
+html[data-theme="dark"] .quick-add-footer-button:hover {
+  background: color-mix(in srgb, var(--color-card-muted) 80%, var(--color-white) 20%);
+}
+
 html[data-theme="dark"] .quick-add-footer-button.is-active,
 html[data-theme="dark"] .quick-add-footer-button[aria-expanded="true"] {
-  background:   var(--surface-quick-add-tab, var(--surface-filter-bar));
-  border-color: var(--border-quick-add-tab, var(--border-filter-bar));
-  color:        var(--color-quick-add-tab, inherit);
+  background:   var(--color-card-muted); /* #213246 — igual ao estado fechado */
+  border-color: var(--border-filter-bar);
+  color:        var(--theme-text-body);
 }
 
 .quick-add-footer-button__icon {
@@ -1913,15 +1922,14 @@ html[data-theme="dark"] .quick-add-footer-button[aria-expanded="true"] {
 }
 
 .simple-list-item__title {
-  align-items:    center;
-  color:         var(--theme-text-heading);
-  display:       flex;
-  flex-wrap:     wrap;
-  font-size:     var(--font-size-sm);
-  font-weight:   var(--font-weight-semibold);
-  gap:           var(--space-2);
-  overflow:      hidden;
-  text-overflow: ellipsis;
+  align-items:  center;
+  color:        var(--theme-text-heading);
+  display:      flex;
+  flex-wrap:    wrap;
+  font-size:    var(--font-size-sm);
+  font-weight:  var(--font-weight-semibold);
+  gap:          var(--space-2);
+  overflow:     visible; /* não clipar o glow dos chips — truncamento fica em __title-text */
 }
 
 .simple-list-item__title-text {

@@ -474,4 +474,44 @@
       </div>
     </div>
   </section>
+
+  <section class="ui-lab-section">
+    <div class="ui-lab-section__header">
+      <p class="ui-lab-section__eyebrow">State Buttons</p>
+      <h2 class="ui-lab-section__title">Botoes de estado</h2>
+      <p class="ui-lab-section__description">
+        Familia premium para success, warning, danger e neutral.
+        Padrao global reutilizavel para estados, toggles e controles segmentados. A linguagem
+        visual segue o botao lateral de campo: fundo translucido, borda semantica, glow suave,
+        dot de estado e foco acessivel.
+      </p>
+    </div>
+
+    <div class="cv-field-lab">
+      <article class="cv-field-panel" id="fields-state-buttons">
+        <div class="cv-field-panel__body">
+          <div class="cv-field-state-grid">
+            <div class="cv-field-state-card">
+              <h4 class="cv-field-state-card__title">Estados simples</h4>
+              <p class="cv-field-state-card__description">Success, warning, danger e neutral compartilham a mesma gramatica.</p>
+              <div class="cv-state-button-demo-row">
+                <button class="cv-state-button cv-state-button--success" type="button">Success</button>
+                <button class="cv-state-button cv-state-button--warning" type="button">Warning</button>
+                <button class="cv-state-button cv-state-button--danger" type="button">Danger</button>
+                <button class="cv-state-button cv-state-button--neutral" type="button">Neutral</button>
+              </div>
+            </div>
+            <div class="cv-field-state-card">
+              <h4 class="cv-field-state-card__title">Toggle binario</h4>
+              <p class="cv-field-state-card__description">Mesmo padrao usado pelos estados de RG.</p>
+              <div class="cv-state-button-demo-row">
+                <button class="cv-field-side-action cv-field-side-action--success cv-field-side-action--toggle cv-field-side-action--state is-active" type="button" aria-pressed="true">Possui RG</button>
+                <button class="cv-field-side-action cv-field-side-action--danger cv-field-side-action--toggle cv-field-side-action--state is-inactive" type="button" aria-pressed="false">Nao possui RG</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
 {% endblock %}
