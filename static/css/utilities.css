@@ -116,71 +116,71 @@
   --cv-chip-font-size: var(--font-size-xs);
   --cv-chip-font-weight: var(--font-weight-extrabold);
   --cv-chip-border-width: 1px;
-  /* Sombra mínima no light — foco em borda e cor, não em elevação */
-  --cv-chip-shadow: 0 1px 2px rgba(15, 34, 54, 0.07);
-  --cv-chip-shadow-hover: 0 2px 5px rgba(15, 34, 54, 0.12);
+  /* Mesma gramática visual do cv-state-button */
+  --cv-chip-shadow: var(--shadow-xs);
+  --cv-chip-shadow-hover: var(--shadow-sm);
   --cv-chip-focus-ring: 0 0 0 3px rgba(21, 91, 154, 0.22);
   --cv-chip-disabled-opacity: 0.48;
 
-  /* Base — light */
-  --cv-chip-bg: #f7f9fb;
-  --cv-chip-border: #8096b0;
-  --cv-chip-color: #334c63;
-  --cv-chip-glow: rgba(80, 115, 155, 0.18);
+  /* Base — neutral */
+  --cv-chip-bg:     var(--state-neutral-bg);
+  --cv-chip-border: var(--state-neutral-border);
+  --cv-chip-color:  var(--state-neutral-text);
+  --cv-chip-glow:   var(--state-neutral-glow);
 
   /* Sucesso */
-  --cv-chip-success-bg: #f0faf5;
-  --cv-chip-success-border: var(--route-status-final-border);
-  --cv-chip-success-color: var(--route-status-final-text);
-  --cv-chip-success-glow: rgba(22, 128, 90, 0.20);
+  --cv-chip-success-bg:     var(--state-success-bg);
+  --cv-chip-success-border: var(--state-success-border);
+  --cv-chip-success-color:  var(--state-success-text);
+  --cv-chip-success-glow:   var(--state-success-glow);
 
   /* Aviso */
-  --cv-chip-warning-bg: #fffbee;
-  --cv-chip-warning-border: var(--route-status-draft-border);
-  --cv-chip-warning-color: var(--route-status-draft-text);
-  --cv-chip-warning-glow: rgba(216, 162, 27, 0.20);
+  --cv-chip-warning-bg:     var(--state-warning-bg);
+  --cv-chip-warning-border: var(--state-warning-border);
+  --cv-chip-warning-color:  var(--state-warning-text);
+  --cv-chip-warning-glow:   var(--state-warning-glow);
 
   /* Perigo */
-  --cv-chip-danger-bg: #fef3f2;
-  --cv-chip-danger-border: #bc2a20;
-  --cv-chip-danger-color: #6b100a;
-  --cv-chip-danger-glow: rgba(188, 42, 32, 0.20);
+  --cv-chip-danger-bg:     var(--state-danger-bg);
+  --cv-chip-danger-border: var(--state-danger-border);
+  --cv-chip-danger-color:  var(--state-danger-text);
+  --cv-chip-danger-glow:   var(--state-danger-glow);
 
-  /* Info */
-  --cv-chip-info-bg: #f0f7fe;
-  --cv-chip-info-border: #1878c0;
-  --cv-chip-info-color: #08406a;
-  --cv-chip-info-glow: rgba(24, 120, 192, 0.20);
+  /* Info — mesma fórmula com --color-info */
+  --cv-chip-info-bg:     color-mix(in srgb, var(--color-info) 16%, var(--theme-surface-card, var(--color-surface)) 84%);
+  --cv-chip-info-border: color-mix(in srgb, var(--color-info) 68%, var(--theme-border-card, var(--color-border)) 32%);
+  --cv-chip-info-color:  color-mix(in srgb, var(--color-info) 84%, var(--color-heading) 16%);
+  --cv-chip-info-glow:   0 0 0 1px color-mix(in srgb, var(--color-info) 22%, transparent), 0 0 16px color-mix(in srgb, var(--color-info) 28%, transparent);
 
-  /* Pendente */
-  --cv-chip-pending-bg: #f2f6fc;
-  --cv-chip-pending-border: #4a78aa;
-  --cv-chip-pending-color: #1e3a5c;
-  --cv-chip-pending-glow: rgba(74, 120, 170, 0.20);
+  /* Pendente — fórmula com --color-primary */
+  --cv-chip-pending-bg:     color-mix(in srgb, var(--color-primary) 14%, var(--theme-surface-card, var(--color-surface)) 86%);
+  --cv-chip-pending-border: color-mix(in srgb, var(--color-primary) 58%, var(--theme-border-card, var(--color-border)) 42%);
+  --cv-chip-pending-color:  color-mix(in srgb, var(--color-primary) 80%, var(--color-heading) 20%);
+  --cv-chip-pending-glow:   0 0 0 1px color-mix(in srgb, var(--color-primary) 18%, transparent), 0 0 14px color-mix(in srgb, var(--color-primary) 22%, transparent);
 
-  /* Muted */
-  --cv-chip-muted-bg: #f5f8fb;
-  --cv-chip-muted-border: var(--route-status-muted-border);
-  --cv-chip-muted-color: var(--route-status-muted-text);
-  --cv-chip-muted-glow: rgba(100, 130, 165, 0.16);
+  /* Muted — neutral */
+  --cv-chip-muted-bg:     var(--state-neutral-bg);
+  --cv-chip-muted-border: var(--state-neutral-border);
+  --cv-chip-muted-color:  var(--state-neutral-text);
+  --cv-chip-muted-glow:   var(--state-neutral-glow);
 
   /* Neutro */
-  --cv-chip-neutral-bg: #f7f9fb;
-  --cv-chip-neutral-border: #8096b0;
-  --cv-chip-neutral-color: #334c63;
-  --cv-chip-neutral-glow: rgba(110, 140, 175, 0.16);
+  --cv-chip-neutral-bg:     var(--state-neutral-bg);
+  --cv-chip-neutral-border: var(--state-neutral-border);
+  --cv-chip-neutral-color:  var(--state-neutral-text);
+  --cv-chip-neutral-glow:   var(--state-neutral-glow);
 
-  /* Entidade */
-  --cv-chip-entity-bg: #f2f4fe;
-  --cv-chip-entity-border: #2650b8;
-  --cv-chip-entity-color: #0e2462;
-  --cv-chip-entity-glow: rgba(38, 80, 184, 0.20);
+  /* Entidade — fórmula com --color-info, tom mais azul */
+  --cv-chip-entity-bg:     color-mix(in srgb, var(--color-primary) 16%, var(--theme-surface-card, var(--color-surface)) 84%);
+  --cv-chip-entity-border: color-mix(in srgb, var(--color-primary) 70%, var(--theme-border-card, var(--color-border)) 30%);
+  --cv-chip-entity-color:  color-mix(in srgb, var(--color-primary) 86%, var(--color-heading) 14%);
+  --cv-chip-entity-glow:   0 0 0 1px color-mix(in srgb, var(--color-primary) 22%, transparent), 0 0 16px color-mix(in srgb, var(--color-primary) 28%, transparent);
 
-  /* Filtro */
-  --cv-chip-filter-bg: #fffbee;
-  --cv-chip-filter-border: var(--route-status-draft-border);
-  --cv-chip-filter-color: var(--route-status-draft-text);
-  --cv-chip-filter-glow: rgba(216, 162, 27, 0.18);
+  /* Filtro — warning */
+  --cv-chip-filter-bg:     var(--state-warning-bg);
+  --cv-chip-filter-border: var(--state-warning-border);
+  --cv-chip-filter-color:  var(--state-warning-text);
+  --cv-chip-filter-glow:   var(--state-warning-glow);
 }
 
 html[data-theme="dark"],
