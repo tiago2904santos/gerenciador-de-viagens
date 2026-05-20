@@ -6,9 +6,9 @@
     </div>
     {% if painel.disponivel %}
       {% if painel.ja_assinado %}
-        <span class="oficio-documentos-sig-badge oficio-documentos-sig-badge--signed" role="status">Assinado</span>
+        {% include "components/ui/badges/chip.html" with label="Assinado" tone="success" only %}
       {% else %}
-        <span class="oficio-documentos-sig-badge oficio-documentos-sig-badge--unsigned" role="status">Não assinado</span>
+        {% include "components/ui/badges/chip.html" with label="Não assinado" tone="warning" only %}
       {% endif %}
     {% endif %}
   </header>

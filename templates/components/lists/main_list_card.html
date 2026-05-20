@@ -7,7 +7,9 @@
     <div class="roteiro-list-card__title-row">
       <h3 class="roteiro-list-card__title">{{ card.title|default:"Registro" }}</h3>
       {% if card.status_chip_label %}
-        <span class="status-chip roteiro-list-card__status-chip {{ card.status_chip_class|default:'status-chip--muted' }}">{{ card.status_chip_label }}</span>
+        {% with sc_tone=card.status_chip_class|cut:"status-chip--"|default:"muted" %}
+          {% include "components/ui/lists/status_pill.html" with label=card.status_chip_label variant=sc_tone extra_class="roteiro-list-card__status-chip" only %}
+        {% endwith %}
       {% endif %}
     </div>
     {% if card.subtitle %}

@@ -64,7 +64,7 @@
                         <p>{{ documento.descricao }}</p>
                       </div>
                       <div class="assinaturas-document-card__status-area">
-                        <span class="assinaturas-status-badge assinaturas-status-badge--{{ documento.status_key }}">{{ documento.status_label }}</span>
+                        {% include "components/ui/badges/chip.html" with label=documento.status_label tone=documento.status_key only %}
                         {% if documento.pode_gerar_solicitacao %}
                           <form method="post" action="{{ documento.gerar_solicitacao_url }}">
                             {% csrf_token %}

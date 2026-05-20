@@ -3,11 +3,15 @@
     <div>
       {% if card %}
         {% if card.status %}
-          <span class="status-chip {{ card.status_class|default:'status-chip--muted' }}">{{ card.status }}</span>
+          {% with sc_tone=card.status_class|cut:"status-chip--"|default:"muted" %}
+            {% include "components/ui/lists/status_pill.html" with label=card.status variant=sc_tone only %}
+          {% endwith %}
         {% endif %}
         <h3>{{ card.title|default:"Documento" }}</h3>
       {% else %}
-        <span class="status-chip {{ status_class|default:'status-chip--draft' }}">{{ status|default:"Rascunho" }}</span>
+        {% with sc_tone=status_class|cut:"status-chip--"|default:"draft" %}
+          {% include "components/ui/lists/status_pill.html" with label=status|default:"Rascunho" variant=sc_tone only %}
+        {% endwith %}
         <h3>{{ title|default:"Documento" }}</h3>
       {% endif %}
       {% if card.subtitle %}

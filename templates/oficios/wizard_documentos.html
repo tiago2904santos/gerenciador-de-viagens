@@ -190,7 +190,7 @@
               <div class="oficio-documentos-traveller-line__name-row">
                 <strong class="oficio-documentos-traveller-line__name">{{ viajante.nome }}</strong>
                 {% if viajante.is_motorista %}
-                  <span class="oficio-documentos-traveller-line__badge">Motorista</span>
+                  {% include "components/ui/badges/chip.html" with label="Motorista" tone="info" size="compact" only %}
                 {% endif %}
               </div>
               {% if viajante.cargo or viajante.funcao or viajante.unidade %}
@@ -260,7 +260,9 @@
             <div class="oficio-documentos-route-card__title-row">
               <h3 class="oficio-documentos-route-card__title">{{ card.title|default:"Roteiro" }}</h3>
               {% if card.status_chip_label %}
-                <span class="status-chip oficio-documentos-route-card__status-chip {{ card.status_chip_class|default:'status-chip--muted' }}">{{ card.status_chip_label }}</span>
+                {% with sc_tone=card.status_chip_class|cut:"status-chip--"|default:"muted" %}
+                  {% include "components/ui/lists/status_pill.html" with label=card.status_chip_label variant=sc_tone extra_class="oficio-documentos-route-card__status-chip" only %}
+                {% endwith %}
               {% endif %}
             </div>
             {% if card.subtitle %}
@@ -449,7 +451,7 @@
             <h4 class="oficio-documentos-card__title">Antecedência e fundamento registrado</h4>
             <p class="oficio-documentos-card__subtitle">Resumo da regra aplicada ao ofício</p>
           </div>
-          <span class="oficio-documentos-status-chip oficio-documentos-status-chip--{{ jr.chip_variant }}">{{ jr.chip_label }}</span>
+          {% include "components/ui/badges/chip.html" with label=jr.chip_label tone=jr.chip_variant only %}
         </header>
         <div class="oficio-documentos-card__body oficio-documentos-card__body--justification">
           <div class="oficio-documentos-justification-stack">
@@ -487,9 +489,9 @@
           <a class="btn btn-secondary app-btn app-btn--secondary" href="{% url 'oficios:baixar_documento' oficio.pk 'pdf' %}">{{ documentos_ctx.generation_status.pdf_link_label }}</a>
           {% if documentos_ctx.generation_status.oficio_pdf_botoes_assinatura and documentos_ctx.documentos_inline.oficio.disponivel %}
             {% if documentos_ctx.generation_status.oficio_pdf_signature_status == "signed" %}
-              <span class="oficio-documentos-sig-badge oficio-documentos-sig-badge--signed" role="status">PDF assinado</span>
+              {% include "components/ui/badges/chip.html" with label="PDF assinado" tone="success" only %}
             {% elif documentos_ctx.generation_status.oficio_pdf_signature_status == "unsigned" %}
-              <span class="oficio-documentos-sig-badge oficio-documentos-sig-badge--unsigned" role="status">PDF sem assinatura digital</span>
+              {% include "components/ui/badges/chip.html" with label="PDF sem assinatura digital" tone="warning" only %}
             {% endif %}
             <a
               class="btn btn-secondary app-btn app-btn--secondary"

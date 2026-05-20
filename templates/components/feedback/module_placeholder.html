@@ -11,7 +11,7 @@
 
   {% if status %}
     <div class="module-placeholder-card__status">
-      <span class="status-chip {{ status_class|default:'status-chip--muted' }}">{{ status }}</span>
+      {% include "components/ui/badges/chip.html" with label=status variant=status_variant|default:"muted" only %}
     </div>
   {% endif %}
 

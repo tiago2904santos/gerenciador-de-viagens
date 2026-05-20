@@ -26,7 +26,7 @@
       <ul class="signature-info-list">
         <li class="signature-info-item">
           <span class="signature-info-item__label">Status</span>
-          <span class="signature-status-badge">{{ pedido.get_status_display }}</span>
+          {% include "components/ui/badges/chip.html" with label=pedido.get_status_display tone="danger" only %}
         </li>
         <li class="signature-info-item">
           <span class="signature-info-item__label">Documento</span>

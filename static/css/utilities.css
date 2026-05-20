@@ -158,11 +158,11 @@
   --cv-chip-neutral-color:  var(--state-neutral-text);
   --cv-chip-neutral-glow:   var(--state-neutral-glow);
 
-  /* Filtro — herda do state-warning (âmbar) */
-  --cv-chip-filter-bg:     var(--state-warning-bg);
-  --cv-chip-filter-border: var(--state-warning-border);
-  --cv-chip-filter-color:  var(--state-warning-text);
-  --cv-chip-filter-glow:   var(--state-warning-glow);
+  /* Filtro e Entidade — herdam do info (azul), mesma família do Retificado */
+  --cv-chip-filter-bg:     var(--cv-chip-info-bg);
+  --cv-chip-filter-border: var(--cv-chip-info-border);
+  --cv-chip-filter-color:  var(--cv-chip-info-color);
+  --cv-chip-filter-glow:   var(--cv-chip-info-glow);
 
   /* Info — mesma fórmula do state-success com --color-info */
   --cv-chip-info-bg:     color-mix(in srgb, var(--color-info) 16%, var(--theme-surface-card, var(--color-surface)) 84%);
@@ -215,7 +215,7 @@ html[data-theme="light"] {
   --cv-chip-info-glow:    0 0 0 1px color-mix(in srgb, var(--color-info) 14%, transparent), 0 0 9px color-mix(in srgb, var(--color-info) 18%, transparent);
   --cv-chip-pending-glow: 0 0 0 1px color-mix(in srgb, var(--color-primary) 12%, transparent), 0 0 8px color-mix(in srgb, var(--color-primary) 16%, transparent);
   --cv-chip-entity-glow:  0 0 0 1px color-mix(in srgb, var(--color-primary) 14%, transparent), 0 0 9px color-mix(in srgb, var(--color-primary) 18%, transparent);
-  --cv-chip-filter-glow:  var(--cv-chip-warning-glow);
+  --cv-chip-filter-glow:  var(--cv-chip-info-glow);
 }
 
 .cv-chip,
