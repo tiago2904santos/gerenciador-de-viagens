@@ -443,6 +443,215 @@
         </div>
       </article>
 
+      {# ── Dropdown de acao ─────────────────────────────────────────────── #}
+      <article class="cv-field-panel" id="fields-action-dropdown">
+        <div class="cv-field-panel__header">
+          <span class="cv-field-panel__eyebrow">Action Dropdown</span>
+          <h3 class="cv-field-panel__title">Menus de acao flutuantes — .cv-action-dropdown</h3>
+          <p class="cv-field-panel__description">
+            Trigger do tipo <code>cv-btn</code> + menu flutuante com itens de acao, separadores e variante danger.
+            Controlado por <code>cv-select.js</code> via <code>data-cv-dropdown</code>.
+            Navegacao por teclado completa (ArrowUp, ArrowDown, Escape, Tab).
+          </p>
+        </div>
+        <div class="cv-field-panel__body">
+
+          {# 1. Variantes de trigger #}
+          <div class="cv-field-grid cv-field-grid--3">
+            <div class="cv-field">
+              <label class="cv-field__label">Trigger secundario</label>
+              <div class="cv-action-dropdown" data-cv-dropdown>
+                <button type="button" class="cv-btn cv-btn--secondary cv-btn--control" data-cv-dropdown-trigger aria-haspopup="true" aria-expanded="false">
+                  <span>Acoes</span>
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <ul class="cv-action-dropdown__menu" role="menu" data-cv-dropdown-menu hidden>
+                  <li role="none"><button type="button" role="menuitem" class="cv-action-dropdown__item">Visualizar</button></li>
+                  <li role="none"><button type="button" role="menuitem" class="cv-action-dropdown__item">Editar</button></li>
+                  <li role="none"><button type="button" role="menuitem" class="cv-action-dropdown__item">Duplicar</button></li>
+                  <li role="separator"><hr class="cv-action-dropdown__separator"></li>
+                  <li role="none"><button type="button" role="menuitem" class="cv-action-dropdown__item cv-action-dropdown__item--danger">Excluir</button></li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="cv-field">
+              <label class="cv-field__label">Trigger muted (compacto)</label>
+              <div class="cv-action-dropdown" data-cv-dropdown>
+                <button type="button" class="cv-btn cv-btn--muted cv-btn--control" data-cv-dropdown-trigger aria-haspopup="true" aria-expanded="false">
+                  <span>Mais opcoes</span>
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <ul class="cv-action-dropdown__menu" role="menu" data-cv-dropdown-menu hidden>
+                  <li role="none"><button type="button" role="menuitem" class="cv-action-dropdown__item">Exportar PDF</button></li>
+                  <li role="none"><button type="button" role="menuitem" class="cv-action-dropdown__item">Exportar DOCX</button></li>
+                  <li role="none"><button type="button" role="menuitem" class="cv-action-dropdown__item">Copiar link</button></li>
+                  <li role="none"><button type="button" role="menuitem" class="cv-action-dropdown__item" disabled aria-disabled="true">Assinar (bloqueado)</button></li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="cv-field">
+              <label class="cv-field__label">Trigger primario com icone</label>
+              <div class="cv-action-dropdown" data-cv-dropdown>
+                <button type="button" class="cv-btn cv-btn--primary cv-btn--control" data-cv-dropdown-trigger aria-haspopup="true" aria-expanded="false">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+                  <span>Gerenciar</span>
+                </button>
+                <ul class="cv-action-dropdown__menu cv-action-dropdown__menu--left" role="menu" data-cv-dropdown-menu hidden>
+                  <li role="none"><button type="button" role="menuitem" class="cv-action-dropdown__item">Abrir detalhes</button></li>
+                  <li role="none"><button type="button" role="menuitem" class="cv-action-dropdown__item">Editar cadastro</button></li>
+                  <li role="separator"><hr class="cv-action-dropdown__separator"></li>
+                  <li role="none"><button type="button" role="menuitem" class="cv-action-dropdown__item cv-action-dropdown__item--danger">Remover acesso</button></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {# 2. Dropdown em contexto de lista (icone tres pontos) #}
+          <div class="cv-field-panel__note">
+            <strong>Uso tipico em lista:</strong> o trigger pode ser um <code>cv-btn--ghost</code> com icone de tres pontos.
+            O menu abre flutuante acima ou abaixo dependendo do espaco disponivel (reposicionamento automatico via JS).
+          </div>
+
+          <div style="display:flex; gap: var(--space-3); align-items:center; flex-wrap:wrap;">
+            <div class="cv-action-dropdown" data-cv-dropdown>
+              <button type="button" class="cv-btn cv-btn--muted" style="width:36px;height:36px;padding:0;" data-cv-dropdown-trigger aria-haspopup="true" aria-expanded="false" aria-label="Acoes do item">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+              </button>
+              <ul class="cv-action-dropdown__menu" role="menu" data-cv-dropdown-menu hidden>
+                <li role="none"><button type="button" role="menuitem" class="cv-action-dropdown__item">Ver oficio</button></li>
+                <li role="none"><button type="button" role="menuitem" class="cv-action-dropdown__item">Editar</button></li>
+                <li role="separator"><hr class="cv-action-dropdown__separator"></li>
+                <li role="none"><button type="button" role="menuitem" class="cv-action-dropdown__item cv-action-dropdown__item--danger">Cancelar oficio</button></li>
+              </ul>
+            </div>
+
+            <span class="cv-field__help">Icone vertical 3 pontos — dropdown de contexto de linha em lista</span>
+          </div>
+
+          <div class="cv-field-panel__note">
+            Classes: <code>.cv-action-dropdown</code>, <code>.cv-action-dropdown__menu</code>,
+            <code>.cv-action-dropdown__item</code>, <code>.cv-action-dropdown__item--danger</code>,
+            <code>.cv-action-dropdown__separator</code>.
+            Atributos: <code>data-cv-dropdown</code>, <code>data-cv-dropdown-trigger</code>,
+            <code>data-cv-dropdown-menu</code>.
+            JS: <code>static/js/cv-select.js</code>.
+          </div>
+        </div>
+      </article>
+
+      {# ── Filter Dropdown ───────────────────────────────────────────────── #}
+      <article class="cv-field-panel" id="fields-filter-dropdown">
+        <div class="cv-field-panel__header">
+          <span class="cv-field-panel__eyebrow">Filter Dropdown</span>
+          <h3 class="cv-field-panel__title">Dropdown de filtro com checkmarks — .cv-filter-dropdown</h3>
+          <p class="cv-field-panel__description">
+            Trigger pill + lista de opcoes selecionaveis com checkmark. Emite o evento
+            <code>cv:filter-change</code> no wrapper com <code>{name, values}</code> para
+            integracao com sistemas de filtro em tempo real.
+          </p>
+        </div>
+        <div class="cv-field-panel__body">
+
+          <div class="cv-field-grid cv-field-grid--3">
+            <div class="cv-field">
+              <label class="cv-field__label">Status</label>
+              <div class="cv-filter-dropdown" data-cv-filter-dropdown="status">
+                <button type="button" class="cv-filter-dropdown__trigger" data-cv-filter-dropdown-trigger aria-expanded="false">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>
+                  Status
+                  <span class="cv-filter-dropdown__trigger-badge" hidden>0</span>
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <ul class="cv-filter-dropdown__menu" role="listbox" aria-multiselectable="true" data-cv-filter-dropdown-menu hidden>
+                  <li class="cv-filter-dropdown__option" role="option" data-cv-filter-dropdown-option data-value="rascunho" data-selected="false">
+                    <svg class="cv-filter-dropdown__option-check" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+                    Rascunho
+                  </li>
+                  <li class="cv-filter-dropdown__option" role="option" data-cv-filter-dropdown-option data-value="pendente" data-selected="false">
+                    <svg class="cv-filter-dropdown__option-check" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+                    Pendente
+                  </li>
+                  <li class="cv-filter-dropdown__option" role="option" data-cv-filter-dropdown-option data-value="assinado" data-selected="false">
+                    <svg class="cv-filter-dropdown__option-check" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+                    Assinado
+                  </li>
+                  <li class="cv-filter-dropdown__option" role="option" data-cv-filter-dropdown-option data-value="cancelado" data-selected="false">
+                    <svg class="cv-filter-dropdown__option-check" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+                    Cancelado
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="cv-field">
+              <label class="cv-field__label">Tipo de documento</label>
+              <div class="cv-filter-dropdown" data-cv-filter-dropdown="tipo">
+                <button type="button" class="cv-filter-dropdown__trigger" data-cv-filter-dropdown-trigger aria-expanded="false">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>
+                  Tipo
+                  <span class="cv-filter-dropdown__trigger-badge" hidden>0</span>
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <ul class="cv-filter-dropdown__menu" role="listbox" aria-multiselectable="true" data-cv-filter-dropdown-menu hidden>
+                  <li class="cv-filter-dropdown__option" role="option" data-cv-filter-dropdown-option data-value="oficio" data-selected="true">
+                    <svg class="cv-filter-dropdown__option-check" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+                    Oficio
+                  </li>
+                  <li class="cv-filter-dropdown__option" role="option" data-cv-filter-dropdown-option data-value="roteiro" data-selected="false">
+                    <svg class="cv-filter-dropdown__option-check" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+                    Roteiro
+                  </li>
+                  <li class="cv-filter-dropdown__option" role="option" data-cv-filter-dropdown-option data-value="termo" data-selected="false">
+                    <svg class="cv-filter-dropdown__option-check" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+                    Termo
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="cv-field">
+              <label class="cv-field__label">Periodo</label>
+              <div class="cv-filter-dropdown" data-cv-filter-dropdown="periodo">
+                <button type="button" class="cv-filter-dropdown__trigger" data-cv-filter-dropdown-trigger aria-expanded="false">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  Periodo
+                  <span class="cv-filter-dropdown__trigger-badge" hidden>0</span>
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <ul class="cv-filter-dropdown__menu" role="listbox" aria-multiselectable="true" data-cv-filter-dropdown-menu hidden>
+                  <li class="cv-filter-dropdown__option" role="option" data-cv-filter-dropdown-option data-value="hoje" data-selected="false">
+                    <svg class="cv-filter-dropdown__option-check" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+                    Hoje
+                  </li>
+                  <li class="cv-filter-dropdown__option" role="option" data-cv-filter-dropdown-option data-value="ultimos7" data-selected="false">
+                    <svg class="cv-filter-dropdown__option-check" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+                    Ultimos 7 dias
+                  </li>
+                  <li class="cv-filter-dropdown__option" role="option" data-cv-filter-dropdown-option data-value="ultimos30" data-selected="false">
+                    <svg class="cv-filter-dropdown__option-check" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+                    Ultimos 30 dias
+                  </li>
+                  <li class="cv-filter-dropdown__option" role="option" data-cv-filter-dropdown-option data-value="este-ano" data-selected="false">
+                    <svg class="cv-filter-dropdown__option-check" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+                    Este ano
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="cv-field-panel__note">
+            Classes: <code>.cv-filter-dropdown</code>, <code>.cv-filter-dropdown__trigger</code>,
+            <code>.cv-filter-dropdown__menu</code>, <code>.cv-filter-dropdown__option</code>,
+            <code>.cv-filter-dropdown__option--selected</code>, <code>.cv-filter-dropdown__trigger-badge</code>.
+            Evento disparado: <code>cv:filter-change</code> com <code>detail.name</code> e <code>detail.values[]</code>.
+            JS: <code>static/js/cv-select.js</code>.
+          </div>
+        </div>
+      </article>
+
     </div>
   </section>
 {% endblock %}

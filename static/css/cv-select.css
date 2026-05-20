@@ -1,0 +1,531 @@
+/* ==========================================================================
+   cv-select.css
+   Sistema global de select / dropdown / multiselect
+   Central de Viagens 3.0
+
+   Componentes:
+     .cv-select-wrapper      — wrapper de <select> nativo com seta customizada
+     .cv-action-dropdown     — dropdown de acoes (botao trigger + menu flutuante)
+     .cv-filter-dropdown     — variante de filtro com chips integrados
+
+   Tokens sao definidos aqui em :root e sobrescritos por tema.
+   Nenhum hex de cor nas regras de componente — apenas tokens.
+   ========================================================================== */
+
+/* =========================================================
+   01. Design Tokens — :root
+   ========================================================= */
+
+:root {
+  /* Sizing */
+  --cv-select-height:         var(--control-height-md);
+  --cv-select-radius:         var(--radius-control);
+  --cv-select-padding-x:      var(--space-3);
+  --cv-select-font-size:      var(--font-size-sm);
+  --cv-select-font-weight:    var(--font-weight-medium);
+  --cv-select-gap:            var(--space-2);
+
+  /* Colors — adapts to theme via tokens */
+  --cv-select-bg:             var(--color-surface);
+  --cv-select-border:         var(--color-border-strong);
+  --cv-select-border-hover:   var(--color-secondary);
+  --cv-select-border-focus:   var(--color-primary);
+  --cv-select-color:          var(--color-text);
+  --cv-select-placeholder:    var(--color-subtle);
+  --cv-select-icon-color:     var(--color-muted);
+  --cv-select-shadow:         var(--shadow-xs);
+  --cv-select-focus-ring:     0 0 0 3px color-mix(in srgb, var(--color-primary) 18%, transparent);
+
+  /* Disabled */
+  --cv-select-disabled-bg:    var(--color-surface-muted);
+  --cv-select-disabled-color: var(--color-muted);
+  --cv-select-disabled-border:var(--color-border);
+
+  /* Error / Success */
+  --cv-select-error-border:   var(--color-danger);
+  --cv-select-error-ring:     0 0 0 3px color-mix(in srgb, var(--color-danger) 18%, transparent);
+  --cv-select-success-border: var(--color-success);
+  --cv-select-success-ring:   0 0 0 3px color-mix(in srgb, var(--color-success) 18%, transparent);
+
+  /* Dropdown menu */
+  --cv-dropdown-menu-bg:      var(--color-surface);
+  --cv-dropdown-menu-border:  var(--color-border-strong);
+  --cv-dropdown-menu-shadow:  var(--shadow-lg);
+  --cv-dropdown-menu-radius:  var(--radius-control);
+  --cv-dropdown-z-index:      200;
+  --cv-dropdown-max-height:   280px;
+  --cv-dropdown-item-height:  40px;
+  --cv-dropdown-item-px:      var(--space-3);
+  --cv-dropdown-item-hover:   var(--color-primary-soft);
+  --cv-dropdown-item-active:  var(--color-primary-soft);
+  --cv-dropdown-item-active-color: var(--color-primary-strong);
+  --cv-dropdown-item-danger-color: var(--color-danger);
+  --cv-dropdown-item-danger-hover: color-mix(in srgb, var(--color-danger) 8%, transparent);
+  --cv-dropdown-separator:    var(--color-border);
+
+  /* Action button dropdown trigger */
+  --cv-action-dropdown-trigger-radius: var(--radius-pill);
+}
+
+/* =========================================================
+   02. Theme overrides — Dark
+   ========================================================= */
+
+html[data-theme="dark"] {
+  --cv-select-bg:             var(--theme-surface-card);
+  --cv-select-border:         var(--theme-border-card);
+  --cv-select-border-hover:   var(--color-secondary);
+  --cv-select-color:          var(--theme-text-body);
+  --cv-select-placeholder:    var(--theme-text-muted);
+  --cv-select-icon-color:     var(--theme-text-muted);
+  --cv-select-disabled-bg:    color-mix(in srgb, var(--theme-surface-card) 70%, transparent);
+  --cv-dropdown-menu-bg:      var(--theme-surface-card);
+  --cv-dropdown-menu-border:  var(--theme-border-card);
+}
+
+/* =========================================================
+   03. Theme overrides — Light
+   ========================================================= */
+
+html[data-theme="light"] {
+  --cv-select-bg:             var(--color-surface);
+  --cv-select-border:         var(--color-border-strong);
+  --cv-dropdown-menu-bg:      var(--color-surface);
+  --cv-dropdown-menu-border:  var(--color-border-strong);
+}
+
+/* =========================================================
+   04. Native Select Wrapper — .cv-select-wrapper
+   Envolve um <select> nativo com seta visual customizada.
+   Nao remove name/id/required — compativel com Django forms.
+   ========================================================= */
+
+.cv-select-wrapper {
+  border-radius: var(--cv-select-radius);
+  display: grid;
+  min-width: 0;
+  position: relative;
+  width: 100%;
+}
+
+/* Seta customizada via pseudo-elemento */
+.cv-select-wrapper::after {
+  border-bottom: 2px solid var(--cv-select-icon-color);
+  border-right: 2px solid var(--cv-select-icon-color);
+  content: "";
+  height: 8px;
+  pointer-events: none;
+  position: absolute;
+  right: var(--space-4);
+  top: 50%;
+  transform: translateY(-65%) rotate(45deg);
+  transform-origin: center;
+  transition:
+    border-color var(--transition-fast),
+    transform var(--transition-fast);
+  width: 8px;
+  z-index: 1;
+}
+
+/* <select> dentro do wrapper — reseta aparencia nativa */
+.cv-select-wrapper select,
+.cv-select-native {
+  appearance: none;
+  background: var(--cv-select-bg);
+  border: 1px solid var(--cv-select-border);
+  border-radius: var(--cv-select-radius);
+  box-shadow: var(--cv-select-shadow);
+  box-sizing: border-box;
+  color: var(--cv-select-color);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: var(--cv-select-font-size);
+  font-weight: var(--cv-select-font-weight);
+  height: var(--cv-select-height);
+  line-height: 1.2;
+  padding: 0 calc(var(--space-6) + var(--space-4)) 0 var(--cv-select-padding-x);
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+  width: 100%;
+}
+
+.cv-select-wrapper select:hover:not(:disabled),
+.cv-select-native:hover:not(:disabled) {
+  border-color: var(--cv-select-border-hover);
+}
+
+.cv-select-wrapper:focus-within::after {
+  border-color: var(--cv-select-border-focus);
+  transform: translateY(-35%) rotate(225deg);
+}
+
+.cv-select-wrapper select:focus,
+.cv-select-wrapper select:focus-visible,
+.cv-select-native:focus,
+.cv-select-native:focus-visible {
+  border-color: var(--cv-select-border-focus);
+  box-shadow: var(--cv-select-focus-ring);
+  outline: none;
+}
+
+/* Placeholder (primeira opção vazia) */
+.cv-select-wrapper select option[value=""],
+.cv-select-native option[value=""] {
+  color: var(--cv-select-placeholder);
+}
+
+/* Disabled */
+.cv-select-wrapper--disabled::after,
+.cv-select-wrapper select:disabled + * {
+  opacity: 0.45;
+}
+
+.cv-select-wrapper select:disabled,
+.cv-select-native:disabled {
+  background: var(--cv-select-disabled-bg);
+  border-color: var(--cv-select-disabled-border);
+  color: var(--cv-select-disabled-color);
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+.cv-select-wrapper--disabled::after {
+  border-color: var(--cv-select-disabled-color);
+  opacity: 0.45;
+}
+
+/* Error */
+.cv-select-wrapper--error select,
+.cv-select-wrapper--error .cv-select-native {
+  border-color: var(--cv-select-error-border);
+}
+
+.cv-select-wrapper--error select:focus,
+.cv-select-wrapper--error .cv-select-native:focus {
+  box-shadow: var(--cv-select-error-ring);
+}
+
+.cv-select-wrapper--error::after {
+  border-color: var(--cv-select-error-border);
+}
+
+/* Success */
+.cv-select-wrapper--success select,
+.cv-select-wrapper--success .cv-select-native {
+  border-color: var(--cv-select-success-border);
+}
+
+.cv-select-wrapper--success select:focus,
+.cv-select-wrapper--success .cv-select-native:focus {
+  box-shadow: var(--cv-select-success-ring);
+}
+
+.cv-select-wrapper--success::after {
+  border-color: var(--cv-select-success-border);
+}
+
+/* Opções no tema escuro */
+html[data-theme="dark"] .cv-select-wrapper select option,
+html[data-theme="dark"] .cv-select-native option {
+  background: var(--theme-surface-card);
+  color: var(--theme-text-body);
+}
+
+/* =========================================================
+   05. Global native select styling
+   Todo <select> dentro de .main-form-panel e .list-panel
+   recebe automaticamente o estilo do design system sem
+   necessidade de alterar templates existentes.
+   ========================================================= */
+
+.main-form-panel select:not([class]),
+.list-panel select:not([class]),
+.main-form-panel .form-select,
+.list-panel .form-select {
+  appearance: none;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2352657a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")
+    no-repeat right var(--space-3) center / 16px 16px,
+    var(--cv-select-bg);
+  border: 1px solid var(--cv-select-border);
+  border-radius: var(--cv-select-radius);
+  box-shadow: var(--cv-select-shadow);
+  box-sizing: border-box;
+  color: var(--cv-select-color);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: var(--cv-select-font-size);
+  height: var(--cv-select-height);
+  padding: 0 calc(var(--space-6) + var(--space-2)) 0 var(--cv-select-padding-x);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+  width: 100%;
+}
+
+.main-form-panel select:not([class]):hover:not(:disabled),
+.list-panel select:not([class]):hover:not(:disabled) {
+  border-color: var(--cv-select-border-hover);
+}
+
+.main-form-panel select:not([class]):focus,
+.list-panel select:not([class]):focus {
+  border-color: var(--cv-select-border-focus);
+  box-shadow: var(--cv-select-focus-ring);
+  outline: none;
+}
+
+/* =========================================================
+   06. Action Dropdown — .cv-action-dropdown
+   Trigger button (qualquer cv-btn) + menu flutuante com
+   itens de acao. Controlado por JS via data-cv-dropdown.
+   ========================================================= */
+
+.cv-action-dropdown {
+  display: inline-block;
+  position: relative;
+}
+
+/* Menu flutuante */
+.cv-action-dropdown__menu {
+  animation: cv-dropdown-enter 160ms ease both;
+  background: var(--cv-dropdown-menu-bg);
+  border: 1px solid var(--cv-dropdown-menu-border);
+  border-radius: var(--cv-dropdown-menu-radius);
+  box-shadow: var(--cv-dropdown-menu-shadow);
+  list-style: none;
+  margin: 0;
+  max-height: var(--cv-dropdown-max-height);
+  min-width: 180px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--space-1);
+  position: absolute;
+  right: 0;
+  scrollbar-width: thin;
+  top: calc(100% + var(--space-1));
+  white-space: nowrap;
+  z-index: var(--cv-dropdown-z-index);
+}
+
+/* Alinhamento a esquerda */
+.cv-action-dropdown__menu--left {
+  left: 0;
+  right: auto;
+}
+
+/* Abertura para cima */
+.cv-action-dropdown__menu--up {
+  bottom: calc(100% + var(--space-1));
+  top: auto;
+}
+
+@keyframes cv-dropdown-enter {
+  from { opacity: 0; transform: translateY(-6px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Item de acao */
+.cv-action-dropdown__item {
+  align-items: center;
+  border-radius: calc(var(--cv-dropdown-menu-radius) - var(--space-1));
+  color: var(--color-text);
+  cursor: pointer;
+  display: flex;
+  font-size: var(--cv-select-font-size);
+  font-weight: var(--cv-select-font-weight);
+  gap: var(--space-2);
+  min-height: var(--cv-dropdown-item-height);
+  padding: 0 var(--cv-dropdown-item-px);
+  text-decoration: none;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+  user-select: none;
+  width: 100%;
+}
+
+.cv-action-dropdown__item:hover,
+.cv-action-dropdown__item:focus-visible {
+  background: var(--cv-dropdown-item-hover);
+  color: var(--cv-dropdown-item-active-color);
+  outline: none;
+}
+
+/* Item desabilitado */
+.cv-action-dropdown__item:disabled,
+.cv-action-dropdown__item[aria-disabled="true"] {
+  color: var(--cv-select-placeholder);
+  cursor: not-allowed;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+/* Item destrutivo / danger */
+.cv-action-dropdown__item--danger {
+  color: var(--cv-dropdown-item-danger-color);
+}
+
+.cv-action-dropdown__item--danger:hover,
+.cv-action-dropdown__item--danger:focus-visible {
+  background: var(--cv-dropdown-item-danger-hover);
+  color: var(--cv-dropdown-item-danger-color);
+}
+
+/* Ícone dentro do item */
+.cv-action-dropdown__item-icon {
+  align-items: center;
+  display: inline-flex;
+  flex-shrink: 0;
+  height: 16px;
+  justify-content: center;
+  opacity: 0.72;
+  width: 16px;
+}
+
+.cv-action-dropdown__item:hover .cv-action-dropdown__item-icon,
+.cv-action-dropdown__item:focus-visible .cv-action-dropdown__item-icon {
+  opacity: 1;
+}
+
+/* Separador */
+.cv-action-dropdown__separator {
+  background: var(--cv-dropdown-separator);
+  border: 0;
+  height: 1px;
+  margin: var(--space-1) calc(var(--cv-dropdown-item-px) * -1 + var(--space-1));
+}
+
+/* Estado aberto — o trigger pode receber classe is-open via JS */
+.cv-action-dropdown--open > [data-cv-dropdown-trigger],
+.cv-action-dropdown > [data-cv-dropdown-trigger][aria-expanded="true"] {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 22%, transparent);
+}
+
+/* =========================================================
+   07. Filter Dropdown — .cv-filter-dropdown
+   Variante usada em filter-bar com chips de filtro aplicado.
+   ========================================================= */
+
+.cv-filter-dropdown {
+  display: inline-block;
+  position: relative;
+}
+
+.cv-filter-dropdown__trigger {
+  align-items: center;
+  background: var(--cv-select-bg);
+  border: 1px solid var(--cv-select-border);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--cv-select-shadow);
+  box-sizing: border-box;
+  color: var(--cv-select-color);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: inherit;
+  font-size: var(--cv-select-font-size);
+  font-weight: var(--cv-select-font-weight);
+  gap: var(--cv-select-gap);
+  height: var(--cv-select-height);
+  padding: 0 var(--cv-select-padding-x);
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+  white-space: nowrap;
+}
+
+.cv-filter-dropdown__trigger:hover:not(:disabled) {
+  border-color: var(--cv-select-border-hover);
+}
+
+.cv-filter-dropdown__trigger:focus-visible,
+.cv-filter-dropdown--open .cv-filter-dropdown__trigger,
+.cv-filter-dropdown__trigger[aria-expanded="true"] {
+  border-color: var(--cv-select-border-focus);
+  box-shadow: var(--cv-select-focus-ring);
+  outline: none;
+}
+
+.cv-filter-dropdown__trigger-badge {
+  align-items: center;
+  background: var(--color-primary);
+  border-radius: var(--radius-pill);
+  color: var(--color-white);
+  display: inline-flex;
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-bold);
+  height: 18px;
+  justify-content: center;
+  min-width: 18px;
+  padding: 0 var(--space-1);
+}
+
+.cv-filter-dropdown__menu {
+  animation: cv-dropdown-enter 160ms ease both;
+  background: var(--cv-dropdown-menu-bg);
+  border: 1px solid var(--cv-dropdown-menu-border);
+  border-radius: var(--cv-dropdown-menu-radius);
+  box-shadow: var(--cv-dropdown-menu-shadow);
+  left: 0;
+  list-style: none;
+  margin: 0;
+  max-height: var(--cv-dropdown-max-height);
+  min-width: 220px;
+  overflow-y: auto;
+  padding: var(--space-1);
+  position: absolute;
+  top: calc(100% + var(--space-1));
+  z-index: var(--cv-dropdown-z-index);
+}
+
+.cv-filter-dropdown__option {
+  align-items: center;
+  border-radius: calc(var(--cv-dropdown-menu-radius) - var(--space-1));
+  color: var(--color-text);
+  cursor: pointer;
+  display: flex;
+  font-size: var(--cv-select-font-size);
+  gap: var(--space-2);
+  min-height: var(--cv-dropdown-item-height);
+  padding: 0 var(--cv-dropdown-item-px);
+  transition: background-color var(--transition-fast);
+  user-select: none;
+}
+
+.cv-filter-dropdown__option:hover {
+  background: var(--cv-dropdown-item-hover);
+}
+
+.cv-filter-dropdown__option--selected {
+  background: var(--cv-dropdown-item-active);
+  color: var(--cv-dropdown-item-active-color);
+  font-weight: var(--font-weight-semibold);
+}
+
+.cv-filter-dropdown__option-check {
+  align-items: center;
+  display: inline-flex;
+  flex-shrink: 0;
+  height: 16px;
+  justify-content: center;
+  opacity: 0;
+  width: 16px;
+}
+
+.cv-filter-dropdown__option--selected .cv-filter-dropdown__option-check {
+  color: var(--color-primary);
+  opacity: 1;
+}
+
+/* =========================================================
+   08. Responsive
+   ========================================================= */
+
+@media (max-width: 600px) {
+  .cv-action-dropdown__menu,
+  .cv-filter-dropdown__menu {
+    max-height: 220px;
+    min-width: 160px;
+  }
+}
