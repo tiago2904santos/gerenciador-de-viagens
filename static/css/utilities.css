@@ -154,6 +154,12 @@
   color: var(--color-warning);
 }
 
+.status-chip--default {
+  background: var(--color-accent-soft);
+  border-color: var(--color-accent-border-soft);
+  color: var(--color-accent-hover);
+}
+
 html[data-theme="dark"] .status-chip--muted,
 html[data-theme="dark-dark"] .status-chip--muted,
 html[data-theme="light-dark"] .status-chip--muted {

@@ -128,7 +128,7 @@ def apresentar_linha_lista_simples_cargo(cargo, edit_url="#", delete_url="#", se
         "set_default_url": set_default_url,
     }
     if getattr(cargo, "is_padrao", False):
-        row["badges"].append(build_badge("Padrão", "accent"))
+        row["badges"].append(build_badge("Padrão", "default"))
         row["set_default_url"] = None
     return row
 
@@ -145,7 +145,7 @@ def apresentar_linha_lista_simples_combustivel(combustivel, edit_url="#", delete
         "set_default_url": set_default_url,
     }
     if getattr(combustivel, "is_padrao", False):
-        row["badges"].append(build_badge("Padrão", "accent"))
+        row["badges"].append(build_badge("Padrão", "default"))
         row["set_default_url"] = None
     return row
 

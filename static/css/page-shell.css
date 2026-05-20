@@ -34,6 +34,9 @@
    3. Field Grid usa sempre 4 colunas no desktop.
    ========================================================================== */
 
+/* Garante que [hidden] esconda elementos mesmo quando o componente define display explícito. */
+[hidden] { display: none !important; }
+
 
 /* =========================================================
    01. Design Tokens — Estrutura, Layout e Aliases

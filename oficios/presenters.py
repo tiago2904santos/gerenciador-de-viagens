@@ -420,7 +420,7 @@ def apresentar_modelo_motivo_card(modelo):
 def apresentar_linha_lista_simples_modelo_motivo(modelo, edit_url="#", delete_url="#"):
     badges = []
     if modelo.is_padrao:
-        badges.append(build_badge("Padrão", "accent"))
+        badges.append(build_badge("Padrão", "default"))
     texto = (modelo.texto or "").strip()
     if len(texto) > 90:
         texto = f"{texto[:90]}..."

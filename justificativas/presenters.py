@@ -16,7 +16,7 @@ def apresentar_linha_lista_simples_modelo_justificativa(
     """Mesmo contrato de `apresentar_linha_lista_simples_modelo_motivo` (lista simples)."""
     badges = []
     if modelo.is_padrao:
-        badges.append(build_badge("Padrão", "accent"))
+        badges.append(build_badge("Padrão", "default"))
     texto = (modelo.texto or "").strip()
     if len(texto) > 90:
         texto = f"{texto[:90]}..."
