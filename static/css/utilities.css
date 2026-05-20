@@ -116,70 +116,71 @@
   --cv-chip-font-size: var(--font-size-xs);
   --cv-chip-font-weight: var(--font-weight-extrabold);
   --cv-chip-border-width: 1px;
-  --cv-chip-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.60), 0 2px 8px rgba(15, 34, 54, 0.15);
-  --cv-chip-shadow-hover: inset 0 1px 0 rgba(255, 255, 255, 0.75), 0 4px 14px rgba(15, 34, 54, 0.22);
-  --cv-chip-focus-ring: 0 0 0 3px rgba(21, 91, 154, 0.28);
+  /* Sombra mínima no light — foco em borda e cor, não em elevação */
+  --cv-chip-shadow: 0 1px 2px rgba(15, 34, 54, 0.07);
+  --cv-chip-shadow-hover: 0 2px 5px rgba(15, 34, 54, 0.12);
+  --cv-chip-focus-ring: 0 0 0 3px rgba(21, 91, 154, 0.22);
   --cv-chip-disabled-opacity: 0.48;
 
-  /* Base (neutro/genérico) — light */
-  --cv-chip-bg: rgba(255, 255, 255, 0.88);
-  --cv-chip-border: rgba(75, 105, 138, 0.38);
-  --cv-chip-color: #12283f;
-  --cv-chip-glow: rgba(21, 91, 154, 0.18);
+  /* Base — light */
+  --cv-chip-bg: #f7f9fb;
+  --cv-chip-border: #8096b0;
+  --cv-chip-color: #334c63;
+  --cv-chip-glow: rgba(80, 115, 155, 0.18);
 
-  /* Sucesso — alinhado com route-status-final */
-  --cv-chip-success-bg: var(--route-status-final-bg);
+  /* Sucesso */
+  --cv-chip-success-bg: #f0faf5;
   --cv-chip-success-border: var(--route-status-final-border);
   --cv-chip-success-color: var(--route-status-final-text);
-  --cv-chip-success-glow: rgba(22, 128, 90, 0.28);
+  --cv-chip-success-glow: rgba(22, 128, 90, 0.20);
 
-  /* Aviso — alinhado com route-status-draft */
-  --cv-chip-warning-bg: var(--route-status-draft-bg);
+  /* Aviso */
+  --cv-chip-warning-bg: #fffbee;
   --cv-chip-warning-border: var(--route-status-draft-border);
   --cv-chip-warning-color: var(--route-status-draft-text);
-  --cv-chip-warning-glow: rgba(216, 162, 27, 0.28);
+  --cv-chip-warning-glow: rgba(216, 162, 27, 0.20);
 
   /* Perigo */
-  --cv-chip-danger-bg: #fde8e6;
+  --cv-chip-danger-bg: #fef3f2;
   --cv-chip-danger-border: #bc2a20;
   --cv-chip-danger-color: #6b100a;
-  --cv-chip-danger-glow: rgba(188, 42, 32, 0.28);
+  --cv-chip-danger-glow: rgba(188, 42, 32, 0.20);
 
   /* Info */
-  --cv-chip-info-bg: #e3f1fc;
+  --cv-chip-info-bg: #f0f7fe;
   --cv-chip-info-border: #1878c0;
   --cv-chip-info-color: #08406a;
-  --cv-chip-info-glow: rgba(24, 120, 192, 0.26);
+  --cv-chip-info-glow: rgba(24, 120, 192, 0.20);
 
   /* Pendente */
-  --cv-chip-pending-bg: #e6eef8;
+  --cv-chip-pending-bg: #f2f6fc;
   --cv-chip-pending-border: #4a78aa;
   --cv-chip-pending-color: #1e3a5c;
-  --cv-chip-pending-glow: rgba(74, 120, 170, 0.26);
+  --cv-chip-pending-glow: rgba(74, 120, 170, 0.20);
 
-  /* Muted — alinhado com route-status-muted */
-  --cv-chip-muted-bg: var(--route-status-muted-bg);
+  /* Muted */
+  --cv-chip-muted-bg: #f5f8fb;
   --cv-chip-muted-border: var(--route-status-muted-border);
   --cv-chip-muted-color: var(--route-status-muted-text);
-  --cv-chip-muted-glow: rgba(100, 130, 165, 0.20);
+  --cv-chip-muted-glow: rgba(100, 130, 165, 0.16);
 
   /* Neutro */
-  --cv-chip-neutral-bg: #eef2f7;
+  --cv-chip-neutral-bg: #f7f9fb;
   --cv-chip-neutral-border: #8096b0;
-  --cv-chip-neutral-color: #1e3352;
-  --cv-chip-neutral-glow: rgba(110, 140, 175, 0.22);
+  --cv-chip-neutral-color: #334c63;
+  --cv-chip-neutral-glow: rgba(110, 140, 175, 0.16);
 
   /* Entidade */
-  --cv-chip-entity-bg: #e6eefe;
+  --cv-chip-entity-bg: #f2f4fe;
   --cv-chip-entity-border: #2650b8;
   --cv-chip-entity-color: #0e2462;
-  --cv-chip-entity-glow: rgba(38, 80, 184, 0.28);
+  --cv-chip-entity-glow: rgba(38, 80, 184, 0.20);
 
-  /* Filtro — alinhado com route-status-draft */
-  --cv-chip-filter-bg: var(--route-status-draft-bg);
+  /* Filtro */
+  --cv-chip-filter-bg: #fffbee;
   --cv-chip-filter-border: var(--route-status-draft-border);
   --cv-chip-filter-color: var(--route-status-draft-text);
-  --cv-chip-filter-glow: rgba(216, 162, 27, 0.26);
+  --cv-chip-filter-glow: rgba(216, 162, 27, 0.18);
 }
 
 html[data-theme="dark"],
