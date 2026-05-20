@@ -127,11 +127,11 @@
   --cv-chip-color: #12283f;
   --cv-chip-glow: rgba(21, 91, 154, 0.18);
 
-  /* Sucesso — verde jade vibrante */
-  --cv-chip-success-bg: linear-gradient(160deg, #c4f0dc, #8fe0bc);
-  --cv-chip-success-border: rgba(8, 125, 78, 0.55);
-  --cv-chip-success-color: #054d32;
-  --cv-chip-success-glow: rgba(12, 158, 95, 0.30);
+  /* Sucesso — alinhado com route-status-final */
+  --cv-chip-success-bg: var(--route-status-final-bg);
+  --cv-chip-success-border: var(--route-status-final-border);
+  --cv-chip-success-color: var(--route-status-final-text);
+  --cv-chip-success-glow: rgba(22, 128, 90, 0.28);
 
   /* Aviso — âmbar dourado encorpado */
   --cv-chip-warning-bg: linear-gradient(160deg, #fde7a0, #f8c235);
@@ -195,11 +195,8 @@ html[data-theme="light-dark"] {
   --cv-chip-color: #e0edfc;
   --cv-chip-glow: rgba(112, 184, 255, 0.26);
 
-  /* Sucesso — verde neon profundo */
-  --cv-chip-success-bg: linear-gradient(160deg, rgba(18, 155, 100, 0.52), rgba(8, 80, 58, 0.68));
-  --cv-chip-success-border: rgba(65, 235, 160, 0.56);
-  --cv-chip-success-color: #68edb8;
-  --cv-chip-success-glow: rgba(42, 225, 150, 0.46);
+  /* Sucesso — alinhado com route-status-final (herda dark via var()) */
+  --cv-chip-success-glow: rgba(57, 168, 126, 0.42);
 
   /* Aviso — ouro vibrante */
   --cv-chip-warning-bg: linear-gradient(160deg, rgba(215, 158, 28, 0.50), rgba(105, 78, 12, 0.68));
