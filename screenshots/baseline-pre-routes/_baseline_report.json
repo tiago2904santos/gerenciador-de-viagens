@@ -1,0 +1,64 @@
+{
+  "telas": [
+    {
+      "nome": "ui-lab-lists",
+      "rota": "/dev/ui-lab/lists/",
+      "screenshot": "ui-lab-lists.png",
+      "status": "ok"
+    },
+    {
+      "nome": "ui-lab-fields",
+      "rota": "/dev/ui-lab/fields/",
+      "screenshot": "ui-lab-fields.png",
+      "status": "ok"
+    },
+    {
+      "nome": "ui-lab-selects-filters",
+      "rota": "/dev/ui-lab/selects-filters/",
+      "screenshot": "ui-lab-selects-filters.png",
+      "status": "ok"
+    },
+    {
+      "nome": "cadastros-cargos",
+      "rota": "/cadastros/cargos/",
+      "screenshot": "cadastros-cargos.png",
+      "status": "ok"
+    },
+    {
+      "nome": "cadastros-servidores",
+      "rota": "/cadastros/servidores/",
+      "screenshot": "cadastros-servidores.png",
+      "status": "ok"
+    },
+    {
+      "nome": "cadastros-viaturas",
+      "rota": "/cadastros/viaturas/",
+      "screenshot": "cadastros-viaturas.png",
+      "status": "ok"
+    },
+    {
+      "nome": "oficios-index",
+      "rota": "/oficios/",
+      "screenshot": "oficios-index.png",
+      "status": "ok"
+    },
+    {
+      "nome": "roteiros-index",
+      "rota": "/roteiros/",
+      "screenshot": "roteiros-index.png",
+      "status": "ok"
+    },
+    {
+      "nome": "cadastros-configuracao",
+      "rota": "/cadastros/configuracao/",
+      "screenshot": "cadastros-configuracao.png",
+      "status": "ok"
+    }
+  ],
+  "console_errors_warnings": [],
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "base_url": "http://localhost:8000"
+}
