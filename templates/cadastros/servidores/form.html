@@ -9,7 +9,7 @@
       {% include "components/ui/layouts/form_section.html" with title="Identificação" description="Nome, cargo e CPF são obrigatórios. RG e telefone são opcionais." section_id="servidores-form-id" only %}
       <div class="field-grid">
         {% include "components/forms/form_field.html" with field=form.nome size_class="field-size-2" only %}
-        {% include "components/forms/input_with_action.html" with field=form.cargo action_url=cargos_manage_url action_label="Gerenciar cargos" action_icon="settings" action_variant="secondary" size_class="field-size-2" only %}
+        {% include "components/forms/input_with_action.html" with field=form.cargo action_url=cargos_manage_url action_label="Gerenciar cargos" size_class="field-size-2" only %}
 
         {% include "components/forms/form_field.html" with field=form.cpf size_class="field-size-1" only %}
         {% include "components/forms/form_field.html" with field=form.telefone size_class="field-size-1" only %}
@@ -28,7 +28,7 @@
           {% if form.sem_rg.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.sem_rg.errors only %}{% endif %}
         </div>
 
-        {% include "components/forms/input_with_action.html" with field=form.unidade action_url=unidades_manage_url action_label="Gerenciar unidades" action_icon="settings" action_variant="secondary" size_class="field-size-4" only %}
+        {% include "components/forms/form_field.html" with field=form.unidade size_class="field-size-4" only %}
       </div>
       {% include "components/ui/layouts/footer_actions.html" with secondary_label="Voltar" secondary_url=back_url primary_label="Salvar" primary_icon="check" only %}
     </form>

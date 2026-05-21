@@ -62,28 +62,48 @@ class BaseCadastroForm(forms.ModelForm):
                 attrs.setdefault("data-mask", "upper")
 
 
+def _servidor_option_attrs(servidor):
+    cargo = servidor.cargo.nome if servidor.cargo_id and servidor.cargo else ""
+    unidade = str(servidor.unidade) if servidor.unidade_id and servidor.unidade else ""
+    cpf = servidor.cpf_formatado or ""
+    rg = servidor.rg_formatado or ""
+    main = " • ".join(part for part in [servidor.nome, cargo, f"CPF {cpf}" if cpf else ""] if part)
+    search = " ".join(part for part in [servidor.nome, cargo, cpf, rg, unidade] if part)
+    return {
+        "data-option-kind": "servidor",
+        "data-cargo": cargo,
+        "data-cpf": cpf,
+        "data-main": main,
+        "data-meta": unidade or "Sem unidade vinculada",
+        "data-rg": rg,
+        "data-search": search,
+        "data-unidade": unidade,
+        "data-unidade-id": str(servidor.unidade_id or ""),
+    }
+
+
 class ServidorFiltroSelectMultiple(forms.SelectMultiple):
     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
         option = super().create_option(name, value, label, selected, index, subindex=subindex, attrs=attrs)
         servidor = getattr(value, "instance", None)
         if servidor is None:
             return option
+        option["attrs"].update(_servidor_option_attrs(servidor))
+        return option
 
-        cargo = servidor.cargo.nome if servidor.cargo_id and servidor.cargo else ""
-        unidade = str(servidor.unidade) if servidor.unidade_id and servidor.unidade else ""
-        cpf = servidor.cpf_formatado or ""
-        rg = servidor.rg_formatado or ""
-        main = " • ".join(part for part in [servidor.nome, cargo, f"CPF {cpf}" if cpf else ""] if part)
-        search = " ".join(part for part in [servidor.nome, cargo, cpf, rg, unidade] if part)
+
+class UnidadeSearchSelect(forms.Select):
+    def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+        option = super().create_option(name, value, label, selected, index, subindex=subindex, attrs=attrs)
+        unidade = getattr(value, "instance", None)
+        if unidade is None:
+            return option
+        rotulo = str(unidade)
         option["attrs"].update(
             {
-                "data-cargo": cargo,
-                "data-cpf": cpf,
-                "data-main": main,
-                "data-meta": unidade or "Sem unidade vinculada",
-                "data-rg": rg,
-                "data-search": search,
-                "data-unidade": unidade,
+                "data-main": rotulo,
+                "data-meta": unidade.nome if unidade.sigla else "",
+                "data-search": " ".join(part for part in [unidade.sigla, unidade.nome] if part),
             }
         )
         return option
@@ -287,7 +307,18 @@ class ServidorForm(BaseCadastroForm):
         self.fields["cargo"].queryset = Cargo.objects.order_by("nome")
         self.fields["unidade"].required = False
         self.fields["unidade"].empty_label = "Selecione (opcional)"
-        self.fields["unidade"].widget.attrs["class"] = "form-select"
+        self.fields["unidade"].widget = UnidadeSearchSelect(
+            attrs={
+                "class": "cv-search-picker__native",
+                "data-cv-search-picker": "true",
+                "data-picker-mode": "single",
+                "data-picker-variant": "compact",
+                "data-picker-label": "Unidade",
+                "data-picker-hint": "Busque por sigla ou nome da unidade.",
+                "data-placeholder": "Buscar unidade",
+                "data-empty-message": "Nenhuma unidade encontrada.",
+            }
+        )
         self.fields["unidade"].queryset = Unidade.objects.order_by("nome")
 
         if not self.instance.pk and not self.data:
@@ -359,9 +390,16 @@ class ServidorForm(BaseCadastroForm):
 
 
 class ViaturaForm(BaseCadastroForm):
+    tem_motorista_fixo = forms.BooleanField(
+        label="Possui motorista fixo",
+        required=False,
+        initial=False,
+        widget=_TOGGLE_WIDGET,
+    )
+
     class Meta:
         model = Viatura
-        fields = ["placa", "modelo", "combustivel", "tipo", "motoristas"]
+        fields = ["placa", "modelo", "combustivel", "tipo", "unidade", "motoristas"]
         widgets = {
             "placa": forms.TextInput(
                 attrs={
@@ -379,9 +417,8 @@ class ViaturaForm(BaseCadastroForm):
                     "data-picker-mode": "multi",
                     "data-picker-variant": "compact",
                     "data-picker-label": "Motoristas",
-                    "data-picker-hint": "Busque por nome, cargo ou unidade.",
                     "data-panel-title": "MOTORISTAS SELECIONADOS",
-                    "data-placeholder": "Digite nome, cargo ou unidade",
+                    "data-placeholder": "Digite nome, cargo ou CPF",
                     "data-empty-message": "Nenhum motorista encontrado.",
                     "data-empty-selected": "Nenhum motorista selecionado.",
                 },
@@ -395,16 +432,38 @@ class ViaturaForm(BaseCadastroForm):
         self.fields["combustivel"].widget.attrs["class"] = "form-select"
         self.fields["combustivel"].queryset = Combustivel.objects.order_by("nome")
         self.fields["tipo"].required = True
+        self.fields["unidade"].required = False
+        self.fields["unidade"].empty_label = "Selecione (opcional)"
+        self.fields["unidade"].label = "Unidade (opcional)"
+        self.fields["unidade"].widget = UnidadeSearchSelect(
+            attrs={
+                "class": "cv-search-picker__native",
+                "data-cv-search-picker": "true",
+                "data-picker-mode": "single",
+                "data-picker-variant": "compact",
+                "data-placeholder": "Buscar unidade",
+                "data-empty-message": "Nenhuma unidade encontrada.",
+            }
+        )
+        self.fields["unidade"].queryset = Unidade.objects.order_by("nome")
         self.fields["motoristas"].required = False
-        self.fields["motoristas"].queryset = Servidor.objects.order_by("nome")
-        self.fields["motoristas"].label = "Motoristas"
+        self.fields["motoristas"].queryset = Servidor.objects.select_related("cargo", "unidade").order_by("nome")
+        if self.instance.pk and not self.is_bound:
+            self.initial["tem_motorista_fixo"] = self.instance.motoristas.exists()
         if not self.instance.pk and not self.data:
             padrao = Combustivel.objects.filter(is_padrao=True).first()
             if padrao:
                 self.initial.setdefault("combustivel", padrao.pk)
             self.initial.setdefault("tipo", Viatura.TIPO_DESCARACTERIZADA)
+            self.initial.setdefault("tem_motorista_fixo", False)
         if self.instance.pk:
             self.initial["placa"] = format_placa(self.instance.placa)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if not cleaned_data.get("tem_motorista_fixo"):
+            cleaned_data["motoristas"] = []
+        return cleaned_data
 
     def clean_placa(self):
         raw = normalize_plate(self.cleaned_data.get("placa", ""))

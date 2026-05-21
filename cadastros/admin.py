@@ -74,7 +74,7 @@ class ServidorAdmin(admin.ModelAdmin):
 
 @admin.register(Viatura)
 class ViaturaAdmin(admin.ModelAdmin):
-    list_display = ("placa", "modelo", "combustivel", "tipo")
-    search_fields = ("placa", "modelo", "combustivel__nome", "tipo")
-    list_filter = ("combustivel", "tipo")
+    list_display = ("placa", "modelo", "unidade", "combustivel", "tipo")
+    search_fields = ("placa", "modelo", "unidade__nome", "unidade__sigla", "combustivel__nome", "tipo")
+    list_filter = ("unidade", "combustivel", "tipo")
     ordering = ("placa",)

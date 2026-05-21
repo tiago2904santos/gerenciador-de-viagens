@@ -8,14 +8,18 @@
 </div>
 {% elif field.field.widget.input_type == 'select' %}
 <div class="field app-form-field cv-field{% if size_class %} {{ size_class }}{% endif %}">
+  {% if "cv-search-picker__native" not in field.field.widget.attrs.class %}
   <label class="app-form-label cv-field__label" for="{{ field.id_for_label }}">{{ label|default:field.label }}</label>
-  {% if action_url or action_label %}
-    <div class="cv-field-with-action">
+  {% endif %}
+  {% if "cv-search-picker__native" in field.field.widget.attrs.class %}
+    {{ field.as_widget }}
+  {% elif action_url or action_label %}
+    <div class="cv-field-with-action cv-field-with-action--manage-reveal">
       {% include "components/ui/forms/select.html" with field=field only %}
       {% if action_url %}
-        <a class="cv-field-action cv-field-action--manage" href="{{ action_url }}">{{ action_label }}</a>
-      {% else %}
-        <button class="cv-field-action cv-field-action--manage" type="{{ action_type|default:'button' }}">{{ action_label }}</button>
+        {% include "components/ui/buttons/field_manage_button.html" with href=action_url action_label=action_label only %}
+      {% elif action_label %}
+        {% include "components/ui/buttons/field_manage_button.html" with action_label=action_label type=action_type|default:"button" only %}
       {% endif %}
     </div>
   {% else %}
@@ -28,12 +32,12 @@
 <div class="field app-form-field{% if size_class %} {{ size_class }}{% endif %}">
   <label class="app-form-label" for="{{ field.id_for_label }}">{{ label|default:field.label }}</label>
   {% if action_url or action_label %}
-    <div class="cv-field-row">
+    <div class="cv-field-with-action cv-field-with-action--manage-reveal">
       {{ field.as_widget }}
       {% if action_url %}
-        {% include "components/ui/buttons/field_action_button.html" with href=action_url label=action_label icon=action_icon variant=action_variant|default:"secondary" only %}
-      {% else %}
-        {% include "components/ui/buttons/field_action_button.html" with label=action_label icon=action_icon variant=action_variant|default:"secondary" type=action_type|default:"button" only %}
+        {% include "components/ui/buttons/field_manage_button.html" with href=action_url action_label=action_label only %}
+      {% elif action_label %}
+        {% include "components/ui/buttons/field_manage_button.html" with action_label=action_label type=action_type|default:"button" only %}
       {% endif %}
     </div>
   {% else %}

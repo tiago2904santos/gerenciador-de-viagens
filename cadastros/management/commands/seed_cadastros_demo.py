@@ -127,6 +127,7 @@ class Command(BaseCommand):
                     modelo=f"{DEMO_TAG} MODELO {i + 1:02d}",
                     combustivel=combustiveis[i],
                     tipo=Viatura.TIPO_CARACTERIZADA,
+                    unidade=unidades[i],
                 )
                 v.motoristas.add(servidores[i])
                 viaturas.append(v)

@@ -797,8 +797,29 @@ html[data-theme="light"] {
   box-sizing:     border-box;
   display:        flex;
   flex-direction: column;
-  overflow:       hidden;
+  overflow:       visible;
   width:          100%;
+}
+
+/* Primeira seção e rodapé seguem o radius do painel (evita quinas no topo/base) */
+.main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--quick-add) > .form-section:first-child {
+  border-top-left-radius:  var(--form-panel-radius);
+  border-top-right-radius: var(--form-panel-radius);
+}
+
+.main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--quick-add) > .footer-actions:last-child {
+  border-bottom-left-radius:  var(--form-panel-radius);
+  border-bottom-right-radius: var(--form-panel-radius);
+}
+
+.main-form-panel .field-grid,
+.main-form-panel .field-grid-rows,
+.main-form-panel .field,
+.main-form-panel .cv-field,
+.main-form-panel .cv-search-picker,
+.main-form-panel .cv-custom-select,
+.main-form-panel .cv-field-with-action {
+  overflow: visible;
 }
 
 .main-form-panel--quick-add {
@@ -1008,6 +1029,14 @@ html[data-theme="light"] {
   gap:                   var(--field-grid-gap);
   grid-template-columns: repeat(4, minmax(0, 1fr));
   width:                 100%;
+}
+
+.field-grid > .field,
+.field-grid > .app-form-field,
+.field-grid--cols-3 > .field,
+.field-grid--cols-3 > .app-form-field {
+  min-width: 0;
+  width:     100%;
 }
 
 
@@ -2264,6 +2293,14 @@ html[data-theme="dark"] .quick-add-footer-button[aria-expanded="true"] {
    Complementam o .field-grid padrão de 4 colunas.
    Usar quando a seção inteira precisa de colunagem diferente.
    ========================================================= */
+
+/* Empilha várias grades (linhas) com o mesmo espaçamento entre campos */
+.field-grid-rows {
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--field-grid-gap);
+  width:          100%;
+}
 
 /* 3 colunas: trios de campos — nome + CPF + telefone */
 .field-grid--cols-3 {

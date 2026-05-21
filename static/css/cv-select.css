@@ -240,9 +240,10 @@ html[data-theme="dark"] .cv-select-native option {
    necessidade de alterar templates existentes.
    ========================================================= */
 
-.main-form-panel select:not([class]),
+/* Native select em .main-form-panel: ver forms.css (gradiente --field-bg).
+   List-panel mantém estilo legado abaixo. */
+
 .list-panel select:not([class]),
-.main-form-panel .form-select,
 .list-panel .form-select {
   appearance: none;
   background:
@@ -265,12 +266,10 @@ html[data-theme="dark"] .cv-select-native option {
   width: 100%;
 }
 
-.main-form-panel select:not([class]):hover:not(:disabled),
 .list-panel select:not([class]):hover:not(:disabled) {
   border-color: var(--cv-select-border-hover);
 }
 
-.main-form-panel select:not([class]):focus,
 .list-panel select:not([class]):focus {
   border-color: var(--cv-select-border-focus);
   box-shadow: var(--cv-select-focus-ring);
@@ -543,7 +542,7 @@ html[data-theme="dark"] .cv-select-native option {
   --cv-field-font-size: var(--font-size-sm);
   --cv-field-label-size: var(--font-size-sm);
   --cv-field-label-weight: var(--font-weight-semibold);
-  --cv-field-bg: var(--theme-input-bg);
+  --cv-field-bg: var(--theme-input-bg, var(--color-input-bg));
   --cv-field-bg-hover: var(--theme-surface-card);
   --cv-field-color: var(--theme-input-text);
   --cv-field-border: var(--theme-input-border);
@@ -632,7 +631,7 @@ html[data-theme="dark"] {
 
 .cv-field__control-row,
 .cv-field-with-action {
-  align-items: stretch;
+  align-items: center;
   display: flex;
   gap: var(--space-2);
   min-width: 0;
@@ -688,9 +687,11 @@ html[data-theme="dark"] {
 
 .cv-field__control-row .cv-field-action,
 .cv-field-with-action .cv-field-action {
-  align-self: stretch;
+  align-self: center;
   flex: 0 0 auto;
-  height: auto;
+  height: var(--cv-field-height);
+  max-height: var(--cv-field-height);
+  min-height: var(--cv-field-height);
 }
 
 .cv-custom-select {
@@ -750,7 +751,7 @@ html[data-theme="dark"] {
   outline: none;
 }
 
-.cv-custom-select--open .cv-custom-select__trigger {
+.cv-custom-select--open:not(.cv-custom-select--menu-portal) .cv-custom-select__trigger {
   background:
     linear-gradient(var(--cv-select-bg-hover), var(--cv-select-bg-hover)) padding-box,
     linear-gradient(var(--cv-select-border), var(--cv-select-border)) border-box;
@@ -789,6 +790,9 @@ html[data-theme="dark"] {
 }
 
 .cv-custom-select__menu {
+  --cv-cs-menu-bg: var(--cv-dropdown-bg);
+  --cv-cs-menu-border: var(--cv-dropdown-border);
+  --cv-cs-menu-radius: var(--cv-field-radius);
   animation: cv-cs-menu-enter 160ms ease both;
   background: var(--cv-cs-menu-bg);
   border: 1px solid var(--cv-select-border);
@@ -801,6 +805,7 @@ html[data-theme="dark"] {
   margin: 0;
   max-height: 248px;
   min-width: 100%;
+  overflow: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: 0;
@@ -810,6 +815,14 @@ html[data-theme="dark"] {
   transform-origin: top;
   width: 100%;
   z-index: var(--cv-cs-z-index);
+}
+
+.cv-custom-select__menu.cv-floating-dropdown--active {
+  background: var(--cv-cs-menu-bg);
+  border-radius: var(--cv-cs-menu-radius);
+  border-top: 1px solid var(--cv-select-border);
+  overflow: hidden;
+  z-index: calc(var(--cv-cs-z-index) + 10);
 }
 
 .cv-custom-select__menu::-webkit-scrollbar { width: 4px; }
@@ -829,6 +842,16 @@ html[data-theme="dark"] {
   padding: var(--space-2) var(--cv-field-padding-x);
   transition: background 80ms ease;
   user-select: none;
+}
+
+.cv-custom-select__option:first-child {
+  border-top-left-radius: calc(var(--cv-cs-menu-radius) - var(--space-1));
+  border-top-right-radius: calc(var(--cv-cs-menu-radius) - var(--space-1));
+}
+
+.cv-custom-select__option:last-child {
+  border-bottom-left-radius: calc(var(--cv-cs-menu-radius) - var(--space-1));
+  border-bottom-right-radius: calc(var(--cv-cs-menu-radius) - var(--space-1));
 }
 
 .cv-custom-select__option:hover:not(.cv-custom-select__option--disabled) {

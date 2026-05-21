@@ -91,7 +91,7 @@ def get_servidor_by_id(pk):
 
 def listar_viaturas(q=None):
     queryset = (
-        Viatura.objects.select_related("combustivel")
+        Viatura.objects.select_related("combustivel", "unidade")
         .prefetch_related("motoristas")
         .order_by("placa")
     )
@@ -102,6 +102,8 @@ def listar_viaturas(q=None):
                 | Q(modelo__icontains=q)
                 | Q(combustivel__nome__icontains=q)
                 | Q(tipo__icontains=q)
+                | Q(unidade__nome__icontains=q)
+                | Q(unidade__sigla__icontains=q)
                 | Q(motoristas__nome__icontains=q)
             )
             .distinct()
@@ -111,7 +113,7 @@ def listar_viaturas(q=None):
 
 def get_viatura_by_id(pk):
     return get_object_or_404(
-        Viatura.objects.select_related("combustivel").prefetch_related("motoristas"),
+        Viatura.objects.select_related("combustivel", "unidade").prefetch_related("motoristas"),
         pk=pk,
     )
 

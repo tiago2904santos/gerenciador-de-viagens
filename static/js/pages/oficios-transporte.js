@@ -42,6 +42,20 @@
     this.resultsEl = root.querySelector("[data-oficio-viatura-results]");
     this.emptyEl = root.querySelector("[data-oficio-viatura-empty]");
     this.selectedViaturaId = (this.viaturaInput && this.viaturaInput.value) || "";
+    this.equipeServidorIds = (root.dataset.equipeServidorIds || "")
+      .split(",")
+      .map(function (id) {
+        return id.trim();
+      })
+      .filter(Boolean);
+    this.viaturaBuscaWrap = root.querySelector(".oficio-viatura-busca__wrap");
+    this.viaturaFloatingMenu =
+      window.CvFloatingDropdown &&
+      window.CvFloatingDropdown.attach &&
+      this.dropdown &&
+      this.buscaInput
+        ? window.CvFloatingDropdown.attach(this.dropdown, this.buscaInput)
+        : null;
     this.modHidden = root.querySelector("[data-oficio-motorista-modo]");
     this.servidorPanel = root.querySelector("[data-oficio-motorista-servidor]");
     this.manualPanel = root.querySelector("[data-oficio-motorista-manual]");
@@ -72,6 +86,9 @@
   };
 
   OficioTransporte.prototype.closeViaturaDropdown = function () {
+    if (this.viaturaFloatingMenu) {
+      this.viaturaFloatingMenu.close();
+    }
     if (this.dropdown) {
       this.dropdown.hidden = true;
       this.dropdown.setAttribute("hidden", "hidden");
@@ -122,6 +139,13 @@
     this.buscaInput.addEventListener("change", function () {
       self.syncPlacaHiddenFromBusca();
     });
+
+    this.buscaInput.addEventListener("focus", function () {
+      const term = (self.buscaInput.value || "").trim();
+      if (!term && self.equipeServidorIds.length) {
+        self.runViaturaSearch();
+      }
+    });
   };
 
   OficioTransporte.prototype.syncPlacaHiddenFromBusca = function () {
@@ -139,7 +163,7 @@
     const term = (this.buscaInput.value || "").trim();
     if (!this.dropdown || !this.resultsEl) return;
 
-    if (term.length < 2) {
+    if (term.length < 2 && !this.equipeServidorIds.length) {
       this.closeViaturaDropdown();
       return;
     }
@@ -160,6 +184,9 @@
             self.emptyEl.hidden = false;
             self.emptyEl.removeAttribute("hidden");
           }
+          if (self.viaturaFloatingMenu) {
+            self.viaturaFloatingMenu.open();
+          }
           if (self.buscaInput) {
             self.buscaInput.setAttribute("aria-expanded", "true");
           }
@@ -174,6 +201,9 @@
         });
         self.dropdown.hidden = false;
         self.dropdown.removeAttribute("hidden");
+        if (self.viaturaFloatingMenu) {
+          self.viaturaFloatingMenu.open();
+        }
         if (self.buscaInput) {
           self.buscaInput.setAttribute("aria-expanded", "true");
         }

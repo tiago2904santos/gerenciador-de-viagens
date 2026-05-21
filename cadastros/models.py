@@ -239,6 +239,14 @@ class Viatura(TimeStampedModel):
         related_name="viaturas",
     )
     tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, blank=True, default="")
+    unidade = models.ForeignKey(
+        Unidade,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="viaturas",
+        verbose_name="Unidade",
+    )
     motoristas = models.ManyToManyField(
         Servidor,
         blank=True,

@@ -683,6 +683,20 @@ html[data-theme="light"] {
   color: var(--cv-btn-preview-color);
 }
 
+/* Settings — gerenciar cadastros auxiliares (engrenagem) */
+.cv-icon-btn--settings {
+  background: var(--cv-btn-neutral-bg);
+  border-color: var(--cv-btn-neutral-border);
+  color: var(--cv-btn-neutral-color);
+}
+
+.cv-icon-btn--settings:hover,
+.cv-icon-btn--settings:focus {
+  background: var(--cv-btn-secondary-hover-bg);
+  border-color: var(--cv-btn-secondary-hover-border);
+  color: var(--cv-btn-secondary-hover-color);
+}
+
 /* Sign — assinar (primary blue, caneta) */
 .cv-icon-btn--sign {
   background: var(--cv-btn-primary-bg);

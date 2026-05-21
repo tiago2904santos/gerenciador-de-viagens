@@ -60,6 +60,20 @@
   border: 1px solid var(--route-section-border);
   border-radius: var(--radius-section);
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+  overflow: visible;
+}
+
+.app-form-shell .field,
+.app-form-shell .field-grid,
+.form-shell .field,
+.form-shell .field-grid,
+.app-form-shell .cv-search-picker,
+.form-shell .cv-search-picker,
+.app-form-shell .cv-custom-select,
+.form-shell .cv-custom-select,
+.app-form-shell .oficio-viatura-busca__wrap,
+.form-shell .oficio-viatura-busca__wrap {
+  overflow: visible;
 }
 
 .form-section-header {
@@ -1134,4 +1148,303 @@ html[data-theme="light-dark"] input[type="checkbox"] {
   font-size: var(--font-size-sm);
   font-weight: 900;
   line-height: 1.2;
+}
+
+/* ==========================================================================
+   Painel de formulário (cadastros) — altura e alinhamento unificados
+   ========================================================================== */
+
+.main-form-panel {
+  --field-bg: var(--cv-field-bg);
+  --field-bg-soft: var(--cv-field-bg-hover);
+  --field-border: var(--cv-field-border);
+  --field-border-hover: var(--cv-field-border-hover);
+  --field-border-focus: var(--cv-field-border-focus);
+  --field-text: var(--cv-field-color);
+}
+
+.main-form-panel > .field-grid-rows {
+  box-sizing: border-box;
+  padding: var(--form-section-padding-y) var(--form-section-padding-x);
+  width: 100%;
+}
+
+.main-form-panel .field,
+.main-form-panel .app-form-field,
+.main-form-panel .cv-field {
+  --field-bg: var(--cv-field-bg);
+  --field-bg-soft: var(--cv-field-bg-hover);
+  --field-border: var(--cv-field-border);
+  --field-border-hover: var(--cv-field-border-hover);
+  --field-border-focus: var(--cv-field-border-focus);
+  --field-text: var(--cv-field-color);
+  --field-focus-ring: var(--cv-field-focus-ring);
+  --form-control-height: var(--control-height-md);
+  align-content: start;
+  gap: var(--space-2);
+}
+
+.main-form-panel .app-form-label,
+.main-form-panel .cv-field__label,
+.main-form-panel .cv-search-picker__label {
+  color: var(--color-label);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+  margin: 0;
+  min-height: calc(var(--font-size-sm) * 1.2);
+}
+
+.main-form-panel .form-control {
+  background:
+    linear-gradient(var(--field-bg), var(--field-bg)) padding-box,
+    linear-gradient(var(--field-border), var(--field-border)) border-box;
+  border: 1px solid transparent;
+  border-radius: var(--cv-field-radius);
+  box-shadow: var(--cv-field-shadow);
+  box-sizing: border-box;
+  color: var(--field-text);
+  height: var(--form-control-height);
+  line-height: 1.25;
+  max-height: var(--form-control-height);
+  min-height: var(--form-control-height);
+  padding: 0 var(--cv-field-padding-x);
+  transition:
+    background var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.main-form-panel .form-control:hover:not(:disabled):not([readonly]) {
+  background:
+    linear-gradient(var(--field-bg-soft), var(--field-bg-soft)) padding-box,
+    linear-gradient(var(--field-border-hover), var(--field-border-hover)) border-box;
+}
+
+.main-form-panel .form-control:focus {
+  background:
+    linear-gradient(var(--field-bg-soft), var(--field-bg-soft)) padding-box,
+    linear-gradient(var(--field-border-focus), var(--field-border-focus)) border-box;
+  box-shadow: var(--cv-field-shadow-focus);
+  outline: none;
+}
+
+.main-form-panel .form-control::placeholder {
+  color: var(--cv-field-placeholder);
+  opacity: 1;
+}
+
+.main-form-panel select:not([class]),
+.main-form-panel .form-select,
+.main-form-panel select.form-select {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2352657a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")
+    no-repeat right var(--space-3) center / 16px 16px,
+    linear-gradient(var(--field-bg), var(--field-bg)) padding-box,
+    linear-gradient(var(--field-border), var(--field-border)) border-box;
+  border: 1px solid transparent;
+  border-radius: var(--cv-field-radius);
+  box-shadow: var(--cv-field-shadow);
+  box-sizing: border-box;
+  color: var(--field-text);
+  height: var(--form-control-height);
+  max-height: var(--form-control-height);
+  min-height: var(--form-control-height);
+  padding: 0 calc(var(--space-6) + var(--space-2)) 0 var(--cv-field-padding-x);
+  transition:
+    background var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.main-form-panel select:not([class]):hover:not(:disabled),
+.main-form-panel .form-select:hover:not(:disabled),
+.main-form-panel select.form-select:hover:not(:disabled) {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2352657a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")
+    no-repeat right var(--space-3) center / 16px 16px,
+    linear-gradient(var(--field-bg-soft), var(--field-bg-soft)) padding-box,
+    linear-gradient(var(--field-border-hover), var(--field-border-hover)) border-box;
+}
+
+.main-form-panel select:not([class]):focus,
+.main-form-panel .form-select:focus,
+.main-form-panel select.form-select:focus {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2352657a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")
+    no-repeat right var(--space-3) center / 16px 16px,
+    linear-gradient(var(--field-bg-soft), var(--field-bg-soft)) padding-box,
+    linear-gradient(var(--field-border-focus), var(--field-border-focus)) border-box;
+  box-shadow: var(--cv-field-shadow-focus);
+  outline: none;
+}
+
+.main-form-panel .cv-custom-select__trigger {
+  background:
+    linear-gradient(var(--field-bg), var(--field-bg)) padding-box,
+    linear-gradient(var(--field-border), var(--field-border)) border-box;
+  border: 1px solid transparent;
+  box-shadow: var(--cv-field-shadow);
+  color: var(--field-text);
+}
+
+.main-form-panel .cv-custom-select__trigger:hover:not(:disabled) {
+  background:
+    linear-gradient(var(--field-bg-soft), var(--field-bg-soft)) padding-box,
+    linear-gradient(var(--field-border-hover), var(--field-border-hover)) border-box;
+}
+
+.main-form-panel .cv-custom-select__trigger:focus-visible,
+.main-form-panel .cv-custom-select--open .cv-custom-select__trigger {
+  background:
+    linear-gradient(var(--field-bg-soft), var(--field-bg-soft)) padding-box,
+    linear-gradient(var(--field-border-focus), var(--field-border-focus)) border-box;
+  box-shadow: var(--cv-field-shadow-focus);
+}
+
+.main-form-panel .cv-custom-select--open:not(.cv-custom-select--menu-portal) .cv-custom-select__trigger {
+  box-shadow: none;
+}
+
+.main-form-panel .cv-custom-select__trigger,
+.main-form-panel .cv-search-picker__control {
+  box-sizing: border-box;
+  height: var(--form-control-height);
+  max-height: var(--form-control-height);
+  min-height: var(--form-control-height);
+}
+
+.main-form-panel .cv-search-picker__input {
+  line-height: 1.25;
+  min-height: 0;
+  padding: 0;
+}
+
+.main-form-panel .cv-field-with-action {
+  align-items: center;
+  min-height: var(--form-control-height);
+}
+
+.main-form-panel .cv-field-with-action .cv-custom-select,
+.main-form-panel .cv-field-with-action .cv-field__control {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.main-form-panel .cv-field-with-action .cv-custom-select__trigger {
+  width: 100%;
+}
+
+/* Gerenciar: input encolhe no hover; botão absoluto por cima, à direita */
+.main-form-panel .cv-field-with-action--manage-reveal {
+  --field-manage-btn-size: var(--form-control-height);
+  --field-manage-btn-gap: var(--space-2);
+  display: block;
+  gap: 0;
+  min-height: var(--form-control-height);
+  overflow: visible;
+  position: relative;
+}
+
+.main-form-panel .cv-field-with-action--manage-reveal > .cv-custom-select,
+.main-form-panel .cv-field-with-action--manage-reveal > .cv-field__control,
+.main-form-panel .cv-field-with-action--manage-reveal > .form-control,
+.main-form-panel .cv-field-with-action--manage-reveal > .form-select,
+.main-form-panel .cv-field-with-action--manage-reveal > select {
+  box-sizing: border-box;
+  display: block;
+  max-width: 100%;
+  min-width: 0;
+  position: relative;
+  transition: width var(--transition-fast), max-width var(--transition-fast);
+  width: 100%;
+  z-index: 2;
+}
+
+.main-form-panel .cv-field-with-action--manage-reveal:hover > .cv-custom-select,
+.main-form-panel .cv-field-with-action--manage-reveal:focus-within > .cv-custom-select,
+.main-form-panel .cv-field-with-action--manage-reveal:hover > .cv-field__control,
+.main-form-panel .cv-field-with-action--manage-reveal:focus-within > .cv-field__control,
+.main-form-panel .cv-field-with-action--manage-reveal:hover > .form-control,
+.main-form-panel .cv-field-with-action--manage-reveal:focus-within > .form-control,
+.main-form-panel .cv-field-with-action--manage-reveal:hover > .form-select,
+.main-form-panel .cv-field-with-action--manage-reveal:focus-within > .form-select,
+.main-form-panel .cv-field-with-action--manage-reveal:hover > select,
+.main-form-panel .cv-field-with-action--manage-reveal:focus-within > select {
+  max-width: calc(100% - var(--field-manage-btn-size) - var(--field-manage-btn-gap));
+  width: calc(100% - var(--field-manage-btn-size) - var(--field-manage-btn-gap));
+}
+
+.main-form-panel .cv-field-with-action--manage-reveal .cv-custom-select__trigger {
+  width: 100%;
+}
+
+.main-form-panel .cv-field-with-action--manage-reveal > .cv-icon-btn--field-manage {
+  height: var(--field-manage-btn-size);
+  max-height: var(--field-manage-btn-size);
+  min-height: var(--field-manage-btn-size);
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: opacity var(--transition-fast);
+  width: var(--field-manage-btn-size);
+  z-index: 1;
+}
+
+.main-form-panel .cv-field-with-action--manage-reveal:hover > .cv-icon-btn--field-manage,
+.main-form-panel .cv-field-with-action--manage-reveal:focus-within > .cv-icon-btn--field-manage {
+  opacity: 1;
+  pointer-events: auto;
+  z-index: 5;
+}
+
+/* Search picker single: só label interna + controle (sem painel de selecionados) */
+.main-form-panel .cv-search-picker:not(:has(.cv-search-picker__selected-panel)) {
+  gap: var(--space-2);
+}
+
+.main-form-panel .cv-search-picker__field {
+  gap: var(--space-2);
+}
+
+/* Motoristas / multiselect: busca alinhada; painel de chips abaixo */
+.main-form-panel .cv-search-picker:has(.cv-search-picker__selected-panel) {
+  gap: var(--space-3);
+}
+
+/* Painel de motoristas fixos — desce ao ativar "Com Motorista" */
+.main-form-panel .viatura-motoristas-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  overflow: hidden;
+  transition:
+    grid-template-rows 0.35s ease,
+    opacity 0.3s ease;
+  width: 100%;
+}
+
+.main-form-panel .viatura-motoristas-panel--open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.main-form-panel .viatura-motoristas-panel__inner {
+  min-height: 0;
+  overflow: hidden;
+  transform: translateY(-0.5rem);
+  transition: transform 0.35s ease;
+}
+
+.main-form-panel .viatura-motoristas-panel--open .viatura-motoristas-panel__inner {
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .main-form-panel .viatura-motoristas-panel,
+  .main-form-panel .viatura-motoristas-panel__inner {
+    transition: none;
+  }
 }

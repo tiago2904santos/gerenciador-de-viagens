@@ -25,20 +25,38 @@
     select.dispatchEvent(new Event("change", { bubbles: true }));
   }
 
+  const UNIDADE_VALUE_PREFIX = "__unidade__";
+
   function readOption(option) {
+    const kind = option.dataset.optionKind || "servidor";
+    const memberIds = (option.dataset.memberIds || "")
+      .split(",")
+      .map((id) => id.trim())
+      .filter(Boolean);
     return {
-      cargo:    option.dataset.cargo    || "",
-      cpf:      option.dataset.cpf      || "",
-      disabled: option.disabled,
-      label:    (option.textContent || "").trim(),
-      main:     option.dataset.main     || (option.textContent || "").trim(),
-      meta:     option.dataset.meta     || option.dataset.unidade || "",
-      rg:       option.dataset.rg       || "",
-      search:   option.dataset.search   || option.textContent    || "",
-      selected: option.selected,
-      unidade:  option.dataset.unidade  || "",
-      value:    option.value,
+      cargo:     option.dataset.cargo    || "",
+      cpf:       option.dataset.cpf      || "",
+      disabled:  option.disabled,
+      kind,
+      label:     (option.textContent || "").trim(),
+      main:      option.dataset.main     || (option.textContent || "").trim(),
+      memberIds,
+      meta:      option.dataset.meta     || option.dataset.unidade || "",
+      rg:        option.dataset.rg       || "",
+      search:    option.dataset.search   || option.textContent    || "",
+      selected:  option.selected,
+      unidade:   option.dataset.unidade  || "",
+      unidadeId: option.dataset.unidadeId || "",
+      value:     option.value,
     };
+  }
+
+  function isUnidadeValue(value) {
+    return (value || "").startsWith(UNIDADE_VALUE_PREFIX);
+  }
+
+  function unidadePkFromValue(value) {
+    return (value || "").replace(UNIDADE_VALUE_PREFIX, "");
   }
 
   function maskDocument(value, kind) {
@@ -160,10 +178,26 @@
 
     select.insertAdjacentElement("afterend", root);
 
+    const floatingMenu =
+      window.CvFloatingDropdown && window.CvFloatingDropdown.attach
+        ? window.CvFloatingDropdown.attach(dropdown, control)
+        : null;
+    if (floatingMenu) root.classList.add("cv-search-picker--menu-portal");
+
     /* ── Helpers de estado ──────────────────────────────────────── */
 
     function selectedItems() {
-      return options.filter((o) => o.selected);
+      return options.filter((o) => o.selected && o.kind !== "unidade");
+    }
+
+    function servidorOptions() {
+      return options.filter((o) => o.kind !== "unidade");
+    }
+
+    function unidadeFullySelected(item) {
+      if (!item.memberIds.length) return false;
+      const selected = new Set(selectedItems().map((o) => o.value));
+      return item.memberIds.every((id) => selected.has(id));
     }
 
     function filteredItems() {
@@ -172,12 +206,23 @@
       if (mode === "single") {
         return options.filter((o) => normalize(o.search).includes(term));
       }
-      return options.filter((o) => !o.selected && normalize(o.search).includes(term));
+      return options.filter((o) => {
+        if (o.kind === "unidade") {
+          return !unidadeFullySelected(o) && normalize(o.search).includes(term);
+        }
+        return !o.selected && normalize(o.search).includes(term);
+      });
     }
 
     function syncSelect(dispatch) {
       const sel = new Set(selectedItems().map((o) => o.value));
-      Array.from(select.options).forEach((o) => { o.selected = sel.has(o.value); });
+      Array.from(select.options).forEach((o) => {
+        if (isUnidadeValue(o.value)) {
+          o.selected = false;
+          return;
+        }
+        o.selected = sel.has(o.value);
+      });
       if (dispatch) dispatchChange(select);
     }
 
@@ -194,14 +239,28 @@
     }
 
     function setOpen(next) {
-      isOpen = next && !!query && !select.disabled;
+      const shouldOpen = next && !!query && !select.disabled;
+      if (shouldOpen && !isOpen && floatingMenu) floatingMenu.open();
+      if (!shouldOpen && isOpen && floatingMenu) floatingMenu.close();
+      isOpen = shouldOpen;
       dropdown.hidden = !isOpen;
       input.setAttribute("aria-expanded", isOpen ? "true" : "false");
       root.classList.toggle("cv-search-picker--open", isOpen);
+      if (isOpen && floatingMenu) floatingMenu.reposition();
       renderResults();
     }
 
     /* ── Seleção / Remoção ──────────────────────────────────────── */
+
+    function selectServidorValues(ids) {
+      const idSet = new Set(ids.map(String));
+      servidorOptions().forEach((o) => {
+        if (idSet.has(String(o.value))) {
+          o.selected = true;
+          if (showTermCtrl) selectedForTerm.add(o.value);
+        }
+      });
+    }
 
     function selectItem(value) {
       const item = options.find((o) => o.value === value);
@@ -214,6 +273,12 @@
         input.value   = item.label;
         query         = "";
         setHasQuery(true); /* mantém o clear visível com o valor preenchido */
+      } else if (item.kind === "unidade") {
+        selectServidorValues(item.memberIds);
+        query       = "";
+        activeIndex = -1;
+        input.value = "";
+        setHasQuery(false);
       } else {
         if (item.selected) return;
         item.selected = true;
@@ -297,8 +362,11 @@
       btn.dataset.value = item.value;
       btn.setAttribute("role", "option");
       btn.setAttribute("aria-selected", item.selected ? "true" : "false");
-      btn.classList.toggle("cv-search-picker__option--active",   index === activeIndex);
+      btn.classList.toggle("cv-search-picker__option--active", index === activeIndex);
       btn.classList.toggle("cv-search-picker__option--selected", item.selected);
+      if (item.kind === "unidade") {
+        btn.classList.add("cv-search-picker__option--unidade");
+      }
 
       body.appendChild(main);
       if (item.meta) {

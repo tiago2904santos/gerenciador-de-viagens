@@ -34,6 +34,7 @@ class OficioWizardTransporteTests(TestCase):
             modelo="Renault Duster",
             combustivel=self.comb,
             tipo=Viatura.TIPO_DESCARACTERIZADA,
+            unidade=self.unidade_m,
         )
         self.viatura.motoristas.add(self.motorista_viatura)
 
@@ -277,6 +278,17 @@ class OficioWizardTransporteTests(TestCase):
         ids = [row["id"] for row in response.json()["results"]]
         self.assertIn(self.viatura.pk, ids)
 
+    def test_api_busca_q_retorna_por_unidade_vinculada_a_viatura(self):
+        self.viatura.motoristas.clear()
+        oficio = self._oficio_com_etapa1_minima()
+        response = self.client.get(
+            reverse("oficios:api_viatura_por_placa", args=[oficio.pk]),
+            data={"q": "ASCOM"},
+        )
+        self.assertEqual(response.status_code, 200)
+        ids = [row["id"] for row in response.json()["results"]]
+        self.assertIn(self.viatura.pk, ids)
+
     def test_api_busca_q_retorna_por_motorista(self):
         oficio = self._oficio_com_etapa1_minima()
         response = self.client.get(
@@ -295,6 +307,18 @@ class OficioWizardTransporteTests(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["results"], [])
+
+    def test_api_prefiltro_equipe_sem_termo(self):
+        self.servidor.unidade = self.unidade_m
+        self.servidor.save(update_fields=["unidade"])
+        oficio = self._oficio_com_etapa1_minima()
+        response = self.client.get(
+            reverse("oficios:api_viatura_por_placa", args=[oficio.pk]),
+            data={"q": ""},
+        )
+        self.assertEqual(response.status_code, 200)
+        ids = [row["id"] for row in response.json()["results"]]
+        self.assertIn(self.viatura.pk, ids)
 
     def test_post_transporte_nao_apaga_dados_viajantes(self):
         oficio = self._oficio_com_etapa1_minima()

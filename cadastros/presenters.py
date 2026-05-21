@@ -99,15 +99,23 @@ def _motoristas_label(viatura):
     return ", ".join(s.nome for s in lista)
 
 
+def _viatura_unidade_label(viatura):
+    if viatura.unidade_id:
+        return viatura.unidade.sigla or viatura.unidade.nome
+    return "—"
+
+
 def apresentar_viatura_card(viatura, edit_url="#", delete_url="#"):
     placa_fmt = _format_placa(viatura.placa)
     modelo = (viatura.modelo or "").strip()
     title = f"{modelo} — {placa_fmt}" if modelo else placa_fmt
-    subt = viatura.get_tipo_display() if viatura.tipo else "Tipo não informado"
+    unidade_label = _viatura_unidade_label(viatura)
+    subt = unidade_label if unidade_label != "—" else (viatura.get_tipo_display() if viatura.tipo else "Tipo não informado")
     return {
         "title": title,
         "subtitle": subt,
         "meta": [
+            build_meta("Unidade", unidade_label),
             build_meta("Combustível", viatura.combustivel.nome if viatura.combustivel else "-"),
             build_meta("Tipo", viatura.get_tipo_display() if viatura.tipo else "-"),
             build_meta("Motoristas", _motoristas_label(viatura)),
@@ -229,6 +237,7 @@ def apresentar_linha_lista_simples_viatura(viatura, edit_url="#", delete_url="#"
         "badges": [],
         "meta": [
             build_meta("Placa", placa_fmt),
+            build_meta("Unidade", _viatura_unidade_label(viatura)),
             build_meta("Combustível", viatura.combustivel.nome if viatura.combustivel else "—"),
             build_meta("Tipo", viatura.get_tipo_display() if viatura.tipo else "—"),
             build_meta("Motoristas", _motoristas_label(viatura)),

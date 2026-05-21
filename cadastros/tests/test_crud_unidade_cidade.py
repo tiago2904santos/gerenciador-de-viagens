@@ -39,8 +39,12 @@ class UnidadeCrudTests(TestCase):
     def test_post_exclusao_unidade_com_viatura_bloqueia_exclusao(self):
         unidade = Unidade.objects.create(nome="Unidade B", sigla="UB")
         combustivel = Combustivel.objects.create(nome="GASOLINA")
-        Viatura.objects.create(placa="ZZZ0001", combustivel=combustivel, tipo=Viatura.TIPO_CARACTERIZADA)
-        Servidor.objects.create(nome="SERVIDOR B", unidade=unidade)
+        Viatura.objects.create(
+            placa="ZZZ0001",
+            combustivel=combustivel,
+            tipo=Viatura.TIPO_CARACTERIZADA,
+            unidade=unidade,
+        )
         response = self.client.post(reverse("cadastros:unidade_delete", args=[unidade.pk]))
         self.assertRedirects(response, reverse("cadastros:unidades_index"))
         self.assertTrue(Unidade.objects.filter(pk=unidade.pk).exists())

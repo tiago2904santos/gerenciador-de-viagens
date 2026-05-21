@@ -148,6 +148,12 @@
     this.root.appendChild(trigger);
     this.root.appendChild(menu);
 
+    this._floatingMenu =
+      window.CvFloatingDropdown && window.CvFloatingDropdown.attach
+        ? window.CvFloatingDropdown.attach(menu, trigger)
+        : null;
+    if (this._floatingMenu) this.root.classList.add('cv-custom-select--menu-portal');
+
     // 6. Valor inicial
     this._syncFromNative();
 
@@ -205,6 +211,7 @@
     this.root.classList.add('cv-custom-select--open');
     this.menu.hidden = false;
     this.trigger.setAttribute('aria-expanded', 'true');
+    if (this._floatingMenu) this._floatingMenu.open();
 
     // Focar opção selecionada ou a primeira disponível
     var startIdx = -1;
@@ -224,6 +231,7 @@
     this.menu.hidden = true;
     this.trigger.setAttribute('aria-expanded', 'false');
     this.trigger.removeAttribute('aria-activedescendant');
+    if (this._floatingMenu) this._floatingMenu.close();
     this._clearFocus();
   };
 

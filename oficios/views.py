@@ -662,7 +662,7 @@ def wizard_verificar_pdf_oficio(request, pk):
 @require_GET
 def api_viatura_por_placa(request, pk):
     """Busca viaturas por texto (`q`) ou compatível com consulta só por placa (`placa`)."""
-    get_oficio_by_id(pk)
+    oficio = get_oficio_by_id(pk)
     legado_placa = request.GET.get("placa", "").strip()
     q = request.GET.get("q", "").strip()
 
@@ -681,10 +681,12 @@ def api_viatura_por_placa(request, pk):
             }
         )
 
-    if len(q) < 2:
+    equipe_ids = list(oficio.servidores.values_list("pk", flat=True))
+
+    if len(q) < 2 and not equipe_ids:
         return JsonResponse({"results": []})
 
-    encontradas = buscar_viaturas_para_oficio(q)
+    encontradas = buscar_viaturas_para_oficio(q, equipe_servidor_ids=equipe_ids or None)
     return JsonResponse({"results": [viatura_para_resultado_busca(v) for v in encontradas]})
 
 

@@ -4,24 +4,47 @@
    oculto apenas para compatibilidade de formulario.
    ========================================================================== */
 
+/* Tokens globais — o dropdown flutuante (body) precisa destes valores */
+:root {
+  --cv-sp-field-bg: var(--theme-input-bg, var(--color-input-bg));
+  --cv-sp-field-bg-soft: var(--theme-surface-card-soft, var(--color-card-soft));
+  --cv-sp-field-border: var(--theme-input-border, var(--color-input-border));
+  --cv-sp-field-border-hover: var(--color-border-strong);
+  --cv-sp-field-border-focus: var(--route-button-primary-border, var(--color-secondary));
+  --cv-sp-field-text: var(--theme-input-text, var(--color-input-text));
+  --cv-sp-field-placeholder: var(--color-input-placeholder);
+  --cv-sp-field-focus-ring: var(--route-focus-ring, var(--color-info-border));
+  --cv-sp-dropdown-bg: var(--theme-surface-card, var(--color-card));
+  --cv-sp-dropdown-border: var(--cv-sp-field-border-focus);
+  --cv-sp-dropdown-shadow: var(--shadow-panel);
+  --cv-sp-dropdown-option-hover: var(--theme-list-row-hover, var(--color-primary-soft));
+  --cv-sp-dropdown-option-selected: var(--color-primary-soft);
+  --cv-sp-selected-panel-bg: var(--theme-surface-card-soft, var(--color-card-soft));
+  --cv-sp-selected-panel-border: var(--theme-border-card, var(--color-border));
+  --cv-sp-selected-card-bg: var(--theme-surface-card, var(--color-card));
+  --cv-sp-selected-card-border: var(--theme-border-card, var(--color-border-soft));
+  --cv-sp-radius: var(--radius-control);
+  --cv-sp-card-radius: var(--radius-card);
+}
+
 .cv-search-picker {
-  --field-bg: var(--theme-input-bg, var(--color-input-bg));
-  --field-bg-soft: var(--theme-surface-card-soft, var(--color-card-soft));
-  --field-border: var(--theme-input-border, var(--color-input-border));
-  --field-border-hover: var(--color-border-strong);
-  --field-border-focus: var(--route-button-primary-border, var(--color-secondary));
-  --field-text: var(--theme-input-text, var(--color-input-text));
-  --field-placeholder: var(--color-input-placeholder);
-  --field-focus-ring: var(--route-focus-ring, var(--color-info-border));
-  --dropdown-bg: var(--theme-surface-card, var(--color-card));
-  --dropdown-border: var(--field-border-focus);
-  --dropdown-shadow: var(--shadow-panel);
-  --dropdown-option-hover: var(--theme-list-row-hover, var(--color-primary-soft));
-  --dropdown-option-selected: var(--color-primary-soft);
-  --selected-panel-bg: var(--theme-surface-card-soft, var(--color-card-soft));
-  --selected-panel-border: var(--theme-border-card, var(--color-border));
-  --selected-card-bg: var(--theme-surface-card, var(--color-card));
-  --selected-card-border: var(--theme-border-card, var(--color-border-soft));
+  --field-bg: var(--cv-sp-field-bg);
+  --field-bg-soft: var(--cv-sp-field-bg-soft);
+  --field-border: var(--cv-sp-field-border);
+  --field-border-hover: var(--cv-sp-field-border-hover);
+  --field-border-focus: var(--cv-sp-field-border-focus);
+  --field-text: var(--cv-sp-field-text);
+  --field-placeholder: var(--cv-sp-field-placeholder);
+  --field-focus-ring: var(--cv-sp-field-focus-ring);
+  --dropdown-bg: var(--cv-sp-dropdown-bg);
+  --dropdown-border: var(--cv-sp-dropdown-border);
+  --dropdown-shadow: var(--cv-sp-dropdown-shadow);
+  --dropdown-option-hover: var(--cv-sp-dropdown-option-hover);
+  --dropdown-option-selected: var(--cv-sp-dropdown-option-selected);
+  --selected-panel-bg: var(--cv-sp-selected-panel-bg);
+  --selected-panel-border: var(--cv-sp-selected-panel-border);
+  --selected-card-bg: var(--cv-sp-selected-card-bg);
+  --selected-card-border: var(--cv-sp-selected-card-border);
   --control-active-bg: var(--state-success-bg-active);
   --control-active-border: var(--state-success-border-hover);
   --control-active-text: var(--state-success-text-active);
@@ -36,9 +59,9 @@
   --driver-bg: var(--cv-btn-secondary-active-bg, var(--color-primary-soft));
   --driver-border: var(--cv-btn-secondary-active-border, var(--color-primary));
   --driver-text: var(--cv-btn-secondary-active-color, var(--color-primary-strong));
-  --cv-search-picker-height: var(--control-height-lg);
-  --cv-search-picker-radius: var(--radius-control);
-  --cv-search-picker-card-radius: var(--radius-card);
+  --cv-search-picker-height: var(--control-height-md);
+  --cv-search-picker-radius: var(--cv-sp-radius);
+  --cv-search-picker-card-radius: var(--cv-sp-card-radius);
   --cv-search-picker-focus-shadow: 0 0 0 var(--space-1) var(--field-focus-ring), var(--shadow-xs);
   display: grid;
   gap: var(--space-4);
@@ -60,16 +83,37 @@
 }
 
 .cv-search-picker__label {
-  color: var(--color-label-strong);
+  color: var(--color-label, var(--color-label-strong));
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
+  font-weight: 700;
+  letter-spacing: 0.01em;
   line-height: 1.2;
+  margin: 0;
 }
 
 .cv-search-picker__hint {
   color: var(--theme-text-muted, var(--color-muted));
   font-size: var(--font-size-xs);
   line-height: 1.45;
+}
+
+/* Controle e dropdown repetem tokens — dropdown no body não herda do .cv-search-picker */
+.cv-search-picker__control,
+.cv-search-picker__dropdown {
+  --field-bg: var(--cv-sp-field-bg);
+  --field-bg-soft: var(--cv-sp-field-bg-soft);
+  --field-border: var(--cv-sp-field-border);
+  --field-border-hover: var(--cv-sp-field-border-hover);
+  --field-border-focus: var(--cv-sp-field-border-focus);
+  --field-text: var(--cv-sp-field-text);
+  --field-placeholder: var(--cv-sp-field-placeholder);
+  --field-focus-ring: var(--cv-sp-field-focus-ring);
+  --dropdown-bg: var(--cv-sp-dropdown-bg);
+  --dropdown-border: var(--cv-sp-dropdown-border);
+  --dropdown-shadow: var(--cv-sp-dropdown-shadow);
+  --dropdown-option-hover: var(--cv-sp-dropdown-option-hover);
+  --dropdown-option-selected: var(--cv-sp-dropdown-option-selected);
+  --cv-search-picker-radius: var(--cv-sp-radius);
 }
 
 .cv-search-picker__control {
@@ -106,7 +150,8 @@
   box-shadow: var(--cv-search-picker-focus-shadow);
 }
 
-.cv-search-picker--open .cv-search-picker__control {
+/* Com menu no body, mantém cantos arredondados no campo */
+.cv-search-picker--open:not(.cv-search-picker--menu-portal) .cv-search-picker__control {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
   box-shadow: none;
@@ -293,6 +338,14 @@
   z-index: var(--z-dropdown);
 }
 
+.cv-search-picker__dropdown.cv-floating-dropdown--active {
+  background: var(--dropdown-bg);
+  border-radius: var(--cv-search-picker-radius);
+  border-top: 1px solid var(--dropdown-border);
+  overflow: hidden;
+  z-index: calc(var(--z-dropdown) + 10);
+}
+
 .cv-search-picker--open .cv-search-picker__dropdown {
   box-shadow: var(--cv-search-picker-focus-shadow), var(--dropdown-shadow);
   clip-path: inset(0 calc(var(--space-1) * -1) calc(var(--space-1) * -1) calc(var(--space-1) * -1));
@@ -310,6 +363,7 @@
 }
 
 .cv-search-picker__list {
+  background: var(--dropdown-bg);
   display: grid;
   gap: var(--space-1);
   max-height: calc(var(--control-height-lg) * 5);
@@ -355,6 +409,16 @@
   width: 100%;
 }
 
+.cv-search-picker__option:first-child {
+  border-top-left-radius: calc(var(--cv-search-picker-radius) - var(--space-1));
+  border-top-right-radius: calc(var(--cv-search-picker-radius) - var(--space-1));
+}
+
+.cv-search-picker__option:last-child {
+  border-bottom-left-radius: calc(var(--cv-search-picker-radius) - var(--space-1));
+  border-bottom-right-radius: calc(var(--cv-search-picker-radius) - var(--space-1));
+}
+
 .cv-search-picker__option:hover,
 .cv-search-picker__option--active {
   background: var(--dropdown-option-hover);
@@ -382,6 +446,22 @@
 .cv-search-picker__option--selected .cv-search-picker__option-marker {
   background: var(--color-primary);
   border-color: var(--color-primary);
+}
+
+.cv-search-picker__option--unidade .cv-search-picker__option-marker {
+  border-radius: var(--radius-sm);
+  border-style: dashed;
+}
+
+.cv-search-picker__option--unidade .cv-search-picker__option-main::before {
+  color: var(--color-description);
+  content: "Unidade";
+  display: inline-block;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.04em;
+  margin-right: var(--space-2);
+  text-transform: uppercase;
 }
 
 .cv-search-picker__option--selected .cv-search-picker__option-marker::after {

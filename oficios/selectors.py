@@ -89,7 +89,11 @@ def listar_servidores_para_oficio():
 
 
 def listar_viaturas_para_oficio():
-    return Viatura.objects.select_related("combustivel").prefetch_related("motoristas").order_by("placa")
+    return (
+        Viatura.objects.select_related("combustivel", "unidade")
+        .prefetch_related("motoristas")
+        .order_by("placa")
+    )
 
 
 def get_viatura_por_placa_normalizada(placa_bruta: str):
@@ -97,20 +101,56 @@ def get_viatura_por_placa_normalizada(placa_bruta: str):
     if len(placa) != 7:
         return None
     try:
-        return Viatura.objects.select_related("combustivel").get(placa=placa)
+        return Viatura.objects.select_related("combustivel", "unidade").get(placa=placa)
     except Viatura.DoesNotExist:
         return None
 
 
-def buscar_viaturas_para_oficio(termo: str, *, limit: int = 25):
-    """Busca viaturas por placa, modelo, unidade (via motoristas) ou nome de motorista cadastrado."""
+def _filtro_viaturas_equipe_oficio(equipe_servidor_ids: list[int] | None):
+    if not equipe_servidor_ids:
+        return Q()
+    unidade_ids = list(
+        Servidor.objects.filter(pk__in=equipe_servidor_ids, unidade_id__isnull=False)
+        .values_list("unidade_id", flat=True)
+        .distinct()
+    )
+    filtro = Q(motoristas__in=equipe_servidor_ids)
+    if unidade_ids:
+        filtro |= Q(unidade_id__in=unidade_ids) | Q(motoristas__unidade_id__in=unidade_ids)
+    return filtro
+
+
+def buscar_viaturas_para_oficio(
+    termo: str,
+    *,
+    limit: int = 25,
+    equipe_servidor_ids: list[int] | None = None,
+):
+    """Busca viaturas por placa, modelo, unidade vinculada ou nome de motorista cadastrado."""
     termo = (termo or "").strip()
+
     if len(termo) < 2:
-        return Viatura.objects.none()
+        equipe_filter = _filtro_viaturas_equipe_oficio(equipe_servidor_ids)
+        if not equipe_filter:
+            return Viatura.objects.none()
+        return (
+            Viatura.objects.filter(equipe_filter)
+            .distinct()
+            .select_related("combustivel", "unidade")
+            .prefetch_related(
+                Prefetch(
+                    "motoristas",
+                    queryset=Servidor.objects.select_related("unidade", "cargo").order_by("nome"),
+                ),
+            )
+            .order_by("placa")[:limit]
+        )
 
     plate_key = normalize_plate(termo)
     filters = (
         Q(modelo__icontains=termo)
+        | Q(unidade__nome__icontains=termo)
+        | Q(unidade__sigla__icontains=termo)
         | Q(motoristas__nome__icontains=termo)
         | Q(motoristas__unidade__nome__icontains=termo)
         | Q(motoristas__unidade__sigla__icontains=termo)
@@ -120,7 +160,7 @@ def buscar_viaturas_para_oficio(termo: str, *, limit: int = 25):
 
     return (
         Viatura.objects.filter(filters)
-        .select_related("combustivel")
+        .select_related("combustivel", "unidade")
         .prefetch_related(
             Prefetch(
                 "motoristas",
@@ -137,11 +177,14 @@ def viatura_para_resultado_busca(v: Viatura) -> dict:
     nomes = ", ".join(m.nome for m in motoristas[:5])
     if len(motoristas) > 5:
         nomes += "…"
-    unidade_txt = "—"
-    for m in motoristas:
-        if m.unidade_id:
-            unidade_txt = str(m.unidade)
-            break
+    if v.unidade_id:
+        unidade_txt = str(v.unidade)
+    else:
+        unidade_txt = "—"
+        for m in motoristas:
+            if m.unidade_id:
+                unidade_txt = str(m.unidade)
+                break
     return {
         "id": v.pk,
         "placa": v.placa,
