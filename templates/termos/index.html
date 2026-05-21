@@ -8,7 +8,7 @@
       <h1 class="app-page__title">{{ page_title }}</h1>
       <p class="app-page__description">{{ page_description }}</p>
       <p>
-        <a class="btn btn-primary app-btn" href="{{ oficios_url }}">Ir para ofícios</a>
+        {% include "components/ui/buttons/button.html" with href=oficios_url label="Ir para ofícios" variant="primary" only %}
       </p>
       <p class="text-muted">
         Com um ofício completo, use os links na etapa <strong>Documentos</strong> ou as rotas

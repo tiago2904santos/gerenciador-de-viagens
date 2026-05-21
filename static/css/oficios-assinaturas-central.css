@@ -10,6 +10,7 @@
 .assinaturas-document-stack { display: flex; flex-direction: column; gap: 1.25rem; }
 .assinaturas-document-card { border: 1px solid rgba(15,23,42,.1); border-radius: 14px; background: #fff; box-shadow: 0 2px 12px rgba(15,23,42,.06); overflow: hidden; }
 .assinaturas-document-card__header { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; padding: 1rem 1.15rem; border-bottom: 1px solid rgba(15,23,42,.06); }
+.assinaturas-document-card__error { margin: 0; padding: 0 var(--space-card-x, var(--space-4)); }
 .assinaturas-document-card__eyebrow { font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; color: #64748b; margin: 0 0 .2rem; }
 .assinaturas-document-card__header h3 { margin: 0 0 .25rem; font-size: 1.05rem; font-weight: 650; color: #0f172a; }
 .assinaturas-document-card__header p { margin: 0; font-size: .88rem; color: #475569; max-width: 36rem; }
