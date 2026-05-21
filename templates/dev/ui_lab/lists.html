@@ -22,7 +22,7 @@
           <span class="ui-lab-preview-card__label">Lista standard</span>
           <span class="ui-lab-status-pill ui-lab-status-pill--done">Pronto</span>
         </div>
-        <div class="page-shell page-shell--list ui-lab-list-panel--flush-footer">
+        <div class="page-shell page-shell--list ui-lab-list-panel--flush-footer" data-cv-realtime-filter-scope>
           <div class="page-header-stack">
             <div class="page-header-band">
               <div class="page-header-band__content">
@@ -37,11 +37,11 @@
               <div class="page-header-rail__marker" aria-hidden="true">TP</div>
               <div class="header-filter-bar">
                 <div class="header-filter-bar__search">
-                  <input class="header-filter-input" type="search" placeholder="Buscar itens..." aria-label="Buscar">
+                  <input class="header-filter-input" type="search" placeholder="Buscar itens..." aria-label="Buscar" data-cv-filter="search">
                 </div>
               </div>
               <div class="page-header-rail__actions">
-                {% include "components/ui/buttons/button.html" with label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" only %}
+                {% include "components/ui/buttons/button.html" with label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" data_cv_filter_clear=True only %}
               </div>
             </div>
           </div>
@@ -52,8 +52,11 @@
                 {% include "components/lists/simple_list_row.html" with row=row only %}
               {% endfor %}
             </div>
+            <div data-cv-empty-state hidden>
+              {% include "components/lists/list_empty.html" with message="Nenhum item encontrado com os filtros atuais." only %}
+            </div>
             <div class="pagination-shell">
-              <span class="pagination-shell__info">1-4 de 12 itens</span>
+              <span class="pagination-shell__info" data-cv-results-count data-cv-results-count-template="{% verbatim %}{{visible}}{% endverbatim %} visíveis" aria-live="polite"></span>
               <div class="pagination-shell__controls">
                 <button class="btn btn-secondary" type="button" disabled aria-label="Página anterior">←</button>
                 <button class="btn btn-primary" type="button" aria-current="page">1</button>
@@ -71,7 +74,7 @@
           <span class="ui-lab-preview-card__label">Lista standard + quick add</span>
           <span class="ui-lab-status-pill ui-lab-status-pill--review">Quick add</span>
         </div>
-        <div class="page-shell page-shell--list ui-lab-list-panel--flush-footer">
+        <div class="page-shell page-shell--list ui-lab-list-panel--flush-footer" data-cv-realtime-filter-scope>
           <div class="page-header-stack header-stack--quick-add">
             <div class="page-header-band">
               <div class="page-header-band__content">
@@ -85,11 +88,11 @@
               <div class="page-header-rail__marker" aria-hidden="true">TP</div>
               <div class="header-filter-bar">
                 <div class="header-filter-bar__search">
-                  <input class="header-filter-input" type="search" placeholder="Buscar itens..." aria-label="Buscar">
+                  <input class="header-filter-input" type="search" placeholder="Buscar itens..." aria-label="Buscar" data-cv-filter="search">
                 </div>
               </div>
               <div class="page-header-rail__actions">
-                {% include "components/ui/buttons/button.html" with label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" only %}
+                {% include "components/ui/buttons/button.html" with label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" data_cv_filter_clear=True only %}
               </div>
               <div class="quick-add-inline__panel quick-add-panel" id="ui-lab-lists-quick-add" hidden>
                 <div class="quick-add-inline__body">
@@ -110,7 +113,6 @@
             <span class="quick-add-footer-button__icon" aria-hidden="true">+</span>
             <span class="quick-add-footer-button__label">Cadastrar item</span>
           </button>
-        </div>
 
           <div class="list-panel">
             <div class="simple-list" role="list" aria-label="Lista com quick add (demonstração)">
@@ -118,8 +120,11 @@
                 {% include "components/lists/simple_list_row.html" with row=row only %}
               {% endfor %}
             </div>
+            <div data-cv-empty-state hidden>
+              {% include "components/lists/list_empty.html" with message="Nenhum item encontrado com os filtros atuais." only %}
+            </div>
             <div class="pagination-shell">
-              <span class="pagination-shell__info">1-4 de 12 itens</span>
+              <span class="pagination-shell__info" data-cv-results-count data-cv-results-count-template="{% verbatim %}{{visible}}{% endverbatim %} visíveis" aria-live="polite"></span>
               <div class="pagination-shell__controls">
                 <button class="btn btn-secondary" type="button" disabled aria-label="Página anterior">←</button>
                 <button class="btn btn-primary" type="button" aria-current="page">1</button>
@@ -137,7 +142,7 @@
           <span class="ui-lab-preview-card__label">Lista com cards</span>
           <span class="ui-lab-status-pill ui-lab-status-pill--done">Cards</span>
         </div>
-        <div class="page-shell page-shell--list ui-lab-list-panel--flush-footer">
+        <div class="page-shell page-shell--list ui-lab-list-panel--flush-footer" data-cv-realtime-filter-scope>
           <div class="page-header-stack">
             <div class="page-header-band">
               <div class="page-header-band__content">
@@ -152,7 +157,7 @@
               <div class="page-header-rail__marker" aria-hidden="true">TP</div>
               <div class="header-filter-bar header-filter-bar--advanced">
                 <div class="header-filter-bar__search">
-                  <input class="header-filter-input" type="search" placeholder="Buscar itens..." aria-label="Buscar">
+                  <input class="header-filter-input" type="search" placeholder="Buscar itens..." aria-label="Buscar" data-cv-filter="search">
                 </div>
                 <div class="header-filter-bar__row">
                   <div class="header-filter-bar__fields">
@@ -175,13 +180,11 @@
                       </select>
                     </div>
                     <div class="header-filter-field header-filter-field--status">
-                      <select class="header-filter-select" aria-label="Status">
-                        <option value="">Status</option>
-                        <option value="all">Todos</option>
-                        <option value="active">Ativo</option>
-                        <option value="pending">Pendente</option>
-                        <option value="done">Finalizado</option>
-                        <option value="issues">Com pendência</option>
+                      <select class="header-filter-select" aria-label="Status" data-cv-filter="status">
+                        <option value="">Todos os status</option>
+                        <option value="rascunho">Rascunho</option>
+                        <option value="ativo">Ativo</option>
+                        <option value="finalizado">Finalizado</option>
                       </select>
                     </div>
                   </div>
@@ -193,7 +196,7 @@
                 </div>
               </div>
               <div class="page-header-rail__actions">
-                {% include "components/ui/buttons/button.html" with label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" only %}
+                {% include "components/ui/buttons/button.html" with label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" data_cv_filter_clear=True only %}
               </div>
             </div>
           </div>
@@ -202,6 +205,12 @@
               {% for card in ui_lab_roteiros_cards %}
                 {% include "roteiros/partials/roteiro_list_card.html" with card=card only %}
               {% endfor %}
+            </div>
+            <div data-cv-empty-state hidden>
+              {% include "components/lists/list_empty.html" with message="Nenhum card encontrado com os filtros atuais." only %}
+            </div>
+            <div class="pagination-shell">
+              <span class="pagination-shell__info" data-cv-results-count data-cv-results-count-template="{% verbatim %}{{visible}}{% endverbatim %} visíveis" aria-live="polite"></span>
             </div>
           </div>
         </div>

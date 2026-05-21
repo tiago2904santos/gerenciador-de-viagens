@@ -1,53 +1,65 @@
 /**
- * realtime-filters.js — Filtros em tempo real para listas da Central de Viagens
- *
- * Padrão de data-attributes:
- *   data-cv-realtime-filter-scope        — Elemento raiz do escopo de filtragem
- *   data-cv-filter="search"              — Input de texto para busca
- *   data-cv-filter="status"              — Select para filtro de status
- *   data-cv-filter-item                  — Cada item filtrável da lista
- *   data-search-text="..."              — Texto indexado para busca (no item)
- *   data-status-value="..."             — Valor de status do item (no item)
- *   data-cv-results-count               — Elemento que exibe contagem de resultados
- *   data-cv-empty-state                 — Elemento de empty state (usa hidden)
- *   data-cv-filter-clear                — Botão/link que limpa todos os filtros
+ * Filtros em tempo real — Central de Viagens
+ * Contrato: data-cv-realtime-filter-scope, data-cv-filter, data-cv-filter-item, etc.
  */
-
 (function () {
-  "use strict";
+  'use strict';
 
-  /**
-   * Normaliza texto: remove acentos, converte para minúsculas e trim.
-   * @param {string} value
-   * @returns {string}
-   */
+  var BOUND = 'data-cv-filter-bound';
+  var scopeStore = typeof WeakMap !== 'undefined' ? new WeakMap() : null;
+  var scopeStateFallback = typeof WeakMap === 'undefined' ? new Map() : null;
+
+  function resolveRoot(root) {
+    if (!root) return document;
+    if (root.nodeType === 9 || root.nodeType === 1 || root.nodeType === 11) return root;
+    return document;
+  }
+
   function normalizeText(value) {
-    return String(value || "")
-      .normalize("NFD")
-      .replace(/[̀-ͯ]/g, "")
+    return String(value || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
       .toLowerCase()
       .trim();
   }
 
-  /**
-   * Verifica se um item corresponde a todos os filtros ativos.
-   * @param {Element} item
-   * @param {{ search: string, status: string }} filters
-   * @returns {boolean}
-   */
+  function searchTerms(query) {
+    var norm = normalizeText(query);
+    if (!norm) return [];
+    return norm.split(/\s+/).filter(Boolean);
+  }
+
+  function readFilters(scope) {
+    var filters = { search: '', status: '' };
+    var filterInputs = scope.querySelectorAll('[data-cv-filter]');
+    Array.prototype.forEach.call(filterInputs, function (input) {
+      var type = input.getAttribute('data-cv-filter') || input.dataset.cvFilter || '';
+      var value = (input.value || '').trim();
+      if (type === 'search') {
+        filters.searchRaw = value;
+        filters.search = normalizeText(value);
+        filters.searchTerms = searchTerms(value);
+      } else if (type === 'status') {
+        filters.status = value;
+        filters.statusNorm = value ? normalizeText(value) : '';
+      }
+    });
+    return filters;
+  }
+
   function matchesFilter(item, filters) {
-    // Filtro de texto
-    if (filters.search) {
-      var searchText = normalizeText(item.dataset.searchText || item.textContent);
-      if (searchText.indexOf(filters.search) === -1) {
-        return false;
+    if (filters.searchTerms && filters.searchTerms.length) {
+      var searchText = normalizeText(item.getAttribute('data-search-text') || item.textContent || '');
+      for (var i = 0; i < filters.searchTerms.length; i++) {
+        if (searchText.indexOf(filters.searchTerms[i]) === -1) {
+          return false;
+        }
       }
     }
 
-    // Filtro de status
     if (filters.status) {
-      var statusValue = normalizeText(item.dataset.statusValue || "");
-      if (statusValue !== normalizeText(filters.status)) {
+      var statusValue = normalizeText(item.getAttribute('data-status-value') || '');
+      if (!statusValue || statusValue !== filters.statusNorm) {
         return false;
       }
     }
@@ -55,74 +67,89 @@
     return true;
   }
 
-  /**
-   * Aplica todos os filtros ativos num escopo.
-   * @param {Element} scope
-   */
+  function updateCountEl(countEl, visibleCount, totalCount) {
+    if (!countEl) return;
+    var template = countEl.getAttribute('data-cv-results-count-template') || countEl.dataset.cvResultsCountTemplate;
+    if (template) {
+      countEl.textContent = template
+        .replace(/\{\{visible\}\}/g, String(visibleCount))
+        .replace(/\{\{total\}\}/g, String(totalCount));
+    } else {
+      countEl.textContent = String(visibleCount);
+    }
+    if (countEl.hasAttribute('hidden') && visibleCount >= 0) {
+      countEl.removeAttribute('hidden');
+    }
+  }
+
+  function emitUpdated(scope, detail) {
+    try {
+      scope.dispatchEvent(
+        new CustomEvent('cv:filters:updated', {
+          bubbles: true,
+          detail: detail,
+        })
+      );
+    } catch (e) {
+      /* ignore */
+    }
+  }
+
   function applyFilters(scope) {
-    var filters = {
-      search: "",
-      status: ""
-    };
+    if (!scope || !scope.querySelectorAll) {
+      return { total: 0, visible: 0, hidden: 0, state: readFilters(scope || document) };
+    }
 
-    // Lê todos os inputs/selects de filtro dentro do escopo
-    var filterInputs = Array.prototype.slice.call(
-      scope.querySelectorAll("[data-cv-filter]")
-    );
-    filterInputs.forEach(function (input) {
-      var type = input.dataset.cvFilter;
-      var value = (input.value || "").trim();
-      if (type === "search") {
-        filters.search = normalizeText(value);
-      } else if (type === "status") {
-        filters.status = value;
-      }
-    });
-
-    // Filtra os itens
-    var items = Array.prototype.slice.call(
-      scope.querySelectorAll("[data-cv-filter-item]")
-    );
+    var filters = readFilters(scope);
+    var items = Array.prototype.slice.call(scope.querySelectorAll('[data-cv-filter-item]'));
     var visibleCount = 0;
 
     items.forEach(function (item) {
       if (matchesFilter(item, filters)) {
         item.hidden = false;
+        item.removeAttribute('hidden');
         visibleCount++;
       } else {
         item.hidden = true;
       }
     });
 
-    // Atualiza contador de resultados
-    var countEl = scope.querySelector("[data-cv-results-count]");
-    if (countEl) {
-      countEl.textContent = visibleCount;
-    }
+    updateCountEl(scope.querySelector('[data-cv-results-count]'), visibleCount, items.length);
 
-    // Mostra/oculta empty state
-    var emptyState = scope.querySelector("[data-cv-empty-state]");
+    var emptyState = scope.querySelector('[data-cv-empty-state]');
     if (emptyState) {
       if (items.length > 0 && visibleCount === 0) {
         emptyState.hidden = false;
+        emptyState.removeAttribute('hidden');
       } else {
         emptyState.hidden = true;
       }
     }
+
+    var result = {
+      scope: scope,
+      total: items.length,
+      visible: visibleCount,
+      hidden: Math.max(0, items.length - visibleCount),
+      state: filters,
+    };
+
+    if (scopeStore) {
+      scopeStore.set(scope, result);
+    } else if (scopeStateFallback) {
+      scopeStateFallback.set(scope, result);
+    }
+
+    emitUpdated(scope, result);
+    return result;
   }
 
-  /**
-   * Cria função debounced.
-   * @param {Function} fn
-   * @param {number} delay
-   * @returns {Function}
-   */
   function debounce(fn, delay) {
     var timer = null;
     return function () {
       var args = arguments;
       var ctx = this;
-      if (timer) { window.clearTimeout(timer); }
+      if (timer) window.clearTimeout(timer);
       timer = window.setTimeout(function () {
         fn.apply(ctx, args);
         timer = null;
@@ -130,70 +157,113 @@
     };
   }
 
-  /**
-   * Inicializa os filtros em tempo real para todos os escopos encontrados.
-   */
-  function initRealtimeFilters() {
-    var scopes = Array.prototype.slice.call(
-      document.querySelectorAll("[data-cv-realtime-filter-scope]")
-    );
+  function clear(scope) {
+    if (!scope) return applyFilters(document);
+    var filterInputs = scope.querySelectorAll('[data-cv-filter]');
+    Array.prototype.forEach.call(filterInputs, function (input) {
+      input.value = '';
+    });
+    return applyFilters(scope);
+  }
 
-    scopes.forEach(function (scope) {
-      var filterInputs = Array.prototype.slice.call(
-        scope.querySelectorAll("[data-cv-filter]")
-      );
+  function getState(scope) {
+    if (!scope) return null;
+    if (scopeStore && scopeStore.has(scope)) {
+      return scopeStore.get(scope);
+    }
+    if (scopeStateFallback && scopeStateFallback.has(scope)) {
+      return scopeStateFallback.get(scope);
+    }
+    return applyFilters(scope);
+  }
 
-      filterInputs.forEach(function (input) {
-        var tagName = input.tagName.toLowerCase();
-        var isSelect = tagName === "select";
-        var isText = tagName === "input" && (input.type === "text" || input.type === "search" || input.type === "");
+  function update(scope) {
+    return applyFilters(scope);
+  }
 
-        if (isText) {
-          // Debounce em inputs de texto (250ms)
-          var debouncedApply = debounce(function () {
-            applyFilters(scope);
-          }, 250);
-          input.addEventListener("input", debouncedApply);
-        } else if (isSelect) {
-          // Selects aplicam imediatamente
-          input.addEventListener("change", function () {
-            applyFilters(scope);
-          });
-        }
-      });
+  function bindScope(scope) {
+    if (!scope || scope.getAttribute(BOUND) === 'true') {
+      return false;
+    }
+    scope.setAttribute(BOUND, 'true');
 
-      // Botão/link de limpar filtros
-      var clearButtons = Array.prototype.slice.call(
-        scope.querySelectorAll("[data-cv-filter-clear]")
-      );
-      clearButtons.forEach(function (btn) {
-        btn.addEventListener("click", function (e) {
-          // Previne a navegação e limpa os filtros localmente
-          e.preventDefault();
-          filterInputs.forEach(function (input) {
-            input.value = "";
-          });
+    var filterInputs = Array.prototype.slice.call(scope.querySelectorAll('[data-cv-filter]'));
+
+    filterInputs.forEach(function (input) {
+      var tagName = (input.tagName || '').toLowerCase();
+      var isSelect = tagName === 'select';
+      var isText =
+        tagName === 'input' &&
+        (input.type === 'text' || input.type === 'search' || input.type === '');
+
+      if (isText) {
+        var debouncedApply = debounce(function () {
+          applyFilters(scope);
+        }, 250);
+        input.addEventListener('input', debouncedApply);
+      } else if (isSelect) {
+        input.addEventListener('change', function () {
           applyFilters(scope);
         });
-      });
-
-      // Aplica filtros iniciais (respeita valor já preenchido pelo servidor)
-      applyFilters(scope);
+      }
     });
+
+    var clearButtons = Array.prototype.slice.call(scope.querySelectorAll('[data-cv-filter-clear]'));
+    clearButtons.forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        clear(scope);
+      });
+    });
+
+    applyFilters(scope);
+    return true;
   }
 
-  // Inicializa no DOMContentLoaded
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initRealtimeFilters);
-  } else {
-    initRealtimeFilters();
+  function findScopes(root) {
+    var scope = resolveRoot(root);
+    if (scope.matches && scope.matches('[data-cv-realtime-filter-scope]')) {
+      return [scope];
+    }
+    return Array.prototype.slice.call(
+      scope.querySelectorAll('[data-cv-realtime-filter-scope]')
+    );
   }
 
-  // Expõe API pública para uso externo se necessário
-  window.CVRealtimeFilters = {
-    init: initRealtimeFilters,
+  function init(root) {
+    var scopes = findScopes(root);
+    scopes.forEach(bindScope);
+    return scopes.length;
+  }
+
+  var filtersApi = {
+    init: init,
+    update: update,
+    clear: clear,
+    getState: getState,
     applyFilters: applyFilters,
     normalizeText: normalizeText,
-    matchesFilter: matchesFilter
+    matchesFilter: matchesFilter,
   };
-}());
+
+  window.CV = window.CV || {};
+  window.CV.filters = filtersApi;
+
+  window.CVRealtimeFilters = {
+    init: init,
+    applyFilters: applyFilters,
+    update: update,
+    clear: clear,
+    getState: getState,
+    normalizeText: normalizeText,
+    matchesFilter: matchesFilter,
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () {
+      init(document);
+    });
+  } else {
+    init(document);
+  }
+})();

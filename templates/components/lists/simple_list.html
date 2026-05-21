@@ -1,4 +1,5 @@
 {% if rows %}
+  <span class="pagination-shell__info" data-cv-results-count data-cv-results-count-template="{% verbatim %}{{visible}} de {{total}}{% endverbatim %} visíveis" hidden aria-live="polite"></span>
   <div class="simple-list" role="list" data-cv-list-container>
     {% for row in rows %}
       {% include "components/lists/simple_list_row.html" with row=row %}
