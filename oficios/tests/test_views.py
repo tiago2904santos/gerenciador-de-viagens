@@ -39,8 +39,8 @@ class OficioViewsTests(TestCase):
         self.assertEqual(oficio.data_criacao, timezone.localdate())
 
         response = self.client.get(response.url)
-        self.assertContains(response, "oficio-data-grid--three")
-        self.assertContains(response, "oficio-data-grid--full")
+        self.assertContains(response, "cv-wizard-section-card")
+        self.assertContains(response, "field-grid")
         self.assertContains(response, oficio.numero_formatado)
         self.assertContains(response, oficio.data_criacao.strftime("%d/%m/%Y"))
         self.assertNotContains(response, "Gerado automaticamente ao salvar.")
@@ -49,7 +49,7 @@ class OficioViewsTests(TestCase):
         self.assertContains(response, "page-header-status-chip")
         self.assertContains(response, "page-stepper")
         self.assertContains(response, "page-shell--wizard")
-        self.assertContains(response, "motivo-card__header")
+        self.assertContains(response, "wizard-inner-section__header--actions")
         self.assertContains(response, "Modelo de motivo")
         self.assertContains(response, reverse("oficios:modelos_motivo_index"))
         self.assertNotContains(

@@ -3,28 +3,34 @@
   <ol class="page-stepper__list">
     {% for step in steps %}
       <li class="page-stepper__item {{ step.state_class }}{% if step.extra_class %} {{ step.extra_class }}{% endif %}"{% if step.aria_current %} aria-current="{{ step.aria_current }}"{% endif %}>
-        {% if step.url and step.state_class != 'is-disabled' %}
-          <a class="page-stepper__link" href="{{ step.url }}"{% if step.aria_current %} aria-current="{{ step.aria_current }}"{% endif %}>
-        {% else %}
-          <span class="page-stepper__link"{% if step.state_class == 'is-disabled' %} aria-disabled="true"{% endif %}{% if step.aria_current %} aria-current="{{ step.aria_current }}"{% endif %}>
-        {% endif %}
-          <div class="page-stepper__track">
-            <div class="page-stepper__connector page-stepper__connector--before"></div>
-            <div class="page-stepper__marker" aria-hidden="{{ step.marker_aria_hidden|yesno:'true,false' }}">
+        <div class="page-stepper__track">
+          <div class="page-stepper__connector page-stepper__connector--before"></div>
+          {% if step.url and step.state_class != 'is-disabled' %}
+            <a class="page-stepper__marker page-stepper__marker--link" href="{{ step.url }}"{% if step.aria_current %} aria-current="{{ step.aria_current }}"{% endif %} aria-hidden="{{ step.marker_aria_hidden|yesno:'true,false' }}">
+              <span class="page-stepper__marker-icon">{{ step.marker }}</span>
+            </a>
+          {% else %}
+            <div class="page-stepper__marker" aria-hidden="{{ step.marker_aria_hidden|yesno:'true,false' }}"{% if step.state_class == 'is-disabled' %} aria-disabled="true"{% endif %}>
               <span class="page-stepper__marker-icon">{{ step.marker }}</span>
             </div>
-            <div class="page-stepper__connector page-stepper__connector--after"></div>
-          </div>
-          <div class="page-stepper__content">
+          {% endif %}
+          <div class="page-stepper__connector page-stepper__connector--after"></div>
+        </div>
+        <div class="page-stepper__content">
+          {% if step.url and step.state_class != 'is-disabled' %}
+            <a class="page-stepper__content-link" href="{{ step.url }}"{% if step.aria_current %} aria-current="{{ step.aria_current }}"{% endif %}>
+          {% else %}
+            <span class="page-stepper__content-link"{% if step.state_class == 'is-disabled' %} aria-disabled="true"{% endif %}{% if step.aria_current %} aria-current="{{ step.aria_current }}"{% endif %}>
+          {% endif %}
             <span class="page-stepper__eyebrow">{{ step.step_label }}</span>
             <span class="page-stepper__label">{{ step.title }}</span>
             <span class="page-stepper__status">{{ step.status }}</span>
-          </div>
-        {% if step.url and step.state_class != 'is-disabled' %}
-          </a>
-        {% else %}
-          </span>
-        {% endif %}
+          {% if step.url and step.state_class != 'is-disabled' %}
+            </a>
+          {% else %}
+            </span>
+          {% endif %}
+        </div>
       </li>
     {% endfor %}
   </ol>

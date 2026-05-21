@@ -1,7 +1,6 @@
 {% load static %}
 
-<div class="roteiro-editor app-page-shell app-page-shell--wizard oficio-wizard-page oficio-roteiro-page roteiro-form--legacy-roteiro {% if is_avulso %}roteiro-editor--avulso{% endif %}{% if roteiro_editor_oficio %} roteiro-editor--oficio{% endif %}" data-glance-state="closed">
-  <div class="app-page-shell__inner oficio-wizard-shell cv-wizard-section-stack">
+<div class="roteiro-editor roteiro-form--legacy-roteiro {% if is_avulso %}roteiro-editor--avulso{% endif %}{% if roteiro_editor_oficio %} roteiro-editor--oficio{% endif %}" data-glance-state="closed">
     {% if roteiro_editor_oficio or is_avulso %}
       <div class="roteiro-editor__intro cv-wizard-section-card" role="region" aria-labelledby="roteiro-editor-intro-title">
         <header class="cv-wizard-section-header roteiro-editor__intro-header">
@@ -64,7 +63,6 @@
       {% include "components/domain/calculadora_rota.html" %}
       {% include "roteiros/partials/roteiro/actions.html" %}
     </form>
-  </div>
 </div>
 
 {{ roteiro_editor_state_json|default:'{}'|json_script:"roteiro-editor-state-data" }}

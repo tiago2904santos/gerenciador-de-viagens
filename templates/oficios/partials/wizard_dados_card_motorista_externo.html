@@ -1,0 +1,44 @@
+{# Motorista fora da equipe / carona — Card 4 condicional #}
+<section
+  class="cv-wizard-section-card{% if not motorista_extras_visivel %} form-field--hidden{% endif %}"
+  aria-labelledby="oficio-wizard-motorista-externo-title"
+  data-oficio-driver-external-card
+  {% if not motorista_extras_visivel %}hidden{% endif %}
+>
+  <header class="cv-wizard-section-header">
+    <div class="cv-wizard-section-header__copy">
+      <h3 class="cv-wizard-section-title" id="oficio-wizard-motorista-externo-title">Motorista externo / carona</h3>
+      <p class="cv-wizard-section-subtitle">Quando o motorista não integra a equipe do ofício, informe os dados do ofício de referência.</p>
+    </div>
+  </header>
+  <div class="cv-wizard-section-body" data-oficio-driver-source>
+    {{ transporte_form.motorista_modo }}
+
+    <div class="field-group" data-cv-state-toggle data-cv-state-default="sim" aria-label="Carona">
+      <span class="field-group__label">Carona</span>
+      <div class="cv-state-toggle cv-state-toggle--binary" role="group">
+        <button type="button" class="cv-state-toggle__option is-active" data-cv-state-value="sim" aria-pressed="true">Sim</button>
+        <button type="button" class="cv-state-toggle__option" data-cv-state-value="nao" aria-pressed="false">Não</button>
+      </div>
+      <input type="hidden" name="oficio_carona_ui" value="sim" data-cv-state-input data-oficio-driver-carona-toggle>
+      <p class="field-help">Indicador visual; persistência usa os campos de motorista e protocolo abaixo.</p>
+    </div>
+
+    <div class="oficio-motorista-manual" data-oficio-motorista-manual>
+      <div class="field-grid">
+        <div class="field field-size-4">
+          {% include "components/forms/form_field.html" with field=transporte_form.motorista_manual_nome label="Nome do motorista" only %}
+        </div>
+      </div>
+    </div>
+
+    <div class="field-grid" data-oficio-motorista-extras>
+      <div class="field field-size-2">
+        {% include "components/forms/oficio_motorista_split_field.html" with field=transporte_form.motorista_oficio_referencia label="Nº do ofício do motorista" ano=motorista_oficio_ano numero_inicial=motorista_oficio_numero_inicial only %}
+      </div>
+      <div class="field field-size-2">
+        {% include "components/forms/form_field.html" with field=transporte_form.motorista_protocolo_ref label="Protocolo do ofício do motorista" only %}
+      </div>
+    </div>
+  </div>
+</section>

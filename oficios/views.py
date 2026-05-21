@@ -156,7 +156,14 @@ def _prepare_transporte_form(form):
     form.fields["transporte_combustivel_manual"].queryset = Combustivel.objects.order_by("nome")
 
 
-def _wizard_dados_viajantes_context(*, form, oficio, avaliacao=None, mostrar_pendencias_documento=False):
+def _wizard_dados_viajantes_context(
+    *,
+    form,
+    transporte_form,
+    oficio,
+    avaliacao=None,
+    mostrar_pendencias_documento=False,
+):
     avaliacao = avaliacao or avaliar_oficio_dados_viajantes(oficio=oficio, form=form)
     transp_av = avaliar_oficio_transporte(oficio)
     pendencias = avaliacao["pendencias"]
@@ -168,6 +175,15 @@ def _wizard_dados_viajantes_context(*, form, oficio, avaliacao=None, mostrar_pen
         custeio_value = getattr(form.instance, "custeio", "") if getattr(form, "instance", None) else ""
     mostrar_custeio_observacao = custeio_value == "OUTRA_INSTITUICAO"
     modelos_queryset = form.fields["modelo_motivo"].queryset
+    equipe_ids = list(oficio.servidores.values_list("pk", flat=True))
+    modo_motorista = oficio.motorista_modo or Oficio.MOTORISTA_MODO_SERVIDOR
+    motorista_extras_visivel = modo_motorista == Oficio.MOTORISTA_MODO_MANUAL or (
+        bool(oficio.motorista_id) and oficio.motorista_id not in equipe_ids
+    )
+    if transporte_form.is_bound:
+        ref_raw = (transporte_form.data.get("motorista_oficio_referencia") or "").strip()
+    else:
+        ref_raw = (oficio.motorista_oficio_referencia or "").strip()
     return {
         "page_title": "Cadastro de ofício",
         **_wizard_shell_ctx(
@@ -184,10 +200,20 @@ def _wizard_dados_viajantes_context(*, form, oficio, avaliacao=None, mostrar_pen
         "tem_modelos_motivo": modelos_queryset.exists(),
         "modelo_motivo_selecionado": bool(form["modelo_motivo"].value()),
         "servidor_create_url": reverse("cadastros:servidor_create"),
+        "viatura_create_url": reverse("cadastros:viatura_create"),
+        "api_viatura_placa_url": reverse("oficios:api_viatura_por_placa", args=[oficio.pk]),
+        "equipe_servidor_ids_csv": ",".join(str(pk) for pk in equipe_ids),
+        "motorista_extras_visivel": motorista_extras_visivel,
+        "motorista_oficio_ano": oficio.ano or timezone.localdate().year,
+        "motorista_oficio_numero_inicial": _motorista_oficio_numero_display(ref_raw),
         "form": form,
+        "transporte_form": transporte_form,
         "oficio": oficio,
         "wizard_back_url": reverse("oficios:index"),
-        "wizard_back_label": "Voltar para lista",
+        "wizard_back_label": "Voltar à lista",
+        "wizard_footer_mode": "step1_minimal",
+        "wizard_show_document_actions": False,
+        "wizard_show_save_draft": False,
         **_wizard_footer_ctx(oficio),
     }
 
@@ -250,6 +276,8 @@ def _wizard_transporte_context(*, form, oficio):
         "api_viatura_placa_url": reverse("oficios:api_viatura_por_placa", args=[oficio.pk]),
         "wizard_back_url": reverse("oficios:dados_viajantes", args=[oficio.pk]),
         "wizard_back_label": "Voltar",
+        "wizard_show_document_actions": True,
+        "wizard_show_save_draft": True,
         **_wizard_footer_ctx(oficio),
     }
 
@@ -319,12 +347,24 @@ def editar(request, pk):
 def dados_viajantes(request, pk):
     oficio = get_oficio_by_id(pk)
     form = OficioDadosViajantesForm(request.POST or None, instance=oficio)
+    transporte_form = OficioTransporteForm(request.POST or None, instance=oficio)
     _prepare_dados_viajantes_form(form)
-    if request.method == "POST" and form.is_valid():
-        nav_action = _wizard_normalizar_acao(request.POST)
-        persist_action = _wizard_persist_action_para_dados_viajantes(nav_action)
-        oficio = atualizar_oficio_dados_viajantes(oficio, form, action=persist_action)
-        return _redirect_after_dados_viajantes_save(request, oficio, nav_action=nav_action, created=False)
+    _prepare_transporte_form(transporte_form)
+    if request.method == "POST":
+        dados_ok = form.is_valid()
+        save_transport = request.POST.get("transporte_embed") == "1"
+        transp_ok = (not save_transport) or transporte_form.is_valid()
+        if dados_ok and transp_ok:
+            nav_action = _wizard_normalizar_acao(request.POST)
+            persist_action = _wizard_persist_action_para_dados_viajantes(nav_action)
+            oficio = atualizar_oficio_dados_viajantes(oficio, form, action=persist_action)
+            if save_transport:
+                oficio = atualizar_oficio_transporte(
+                    oficio,
+                    transporte_form,
+                    action="save_continue" if nav_action == "wizard_next" else "save_draft",
+                )
+            return _redirect_after_dados_viajantes_save(request, oficio, nav_action=nav_action, created=False)
     avaliacao = avaliar_oficio_dados_viajantes(form=form, oficio=oficio)
     mostrar_pendencias_documento = request.GET.get("documento_incompleto") == "1"
     return render(
@@ -332,6 +372,7 @@ def dados_viajantes(request, pk):
         "oficios/wizard_dados_viajantes.html",
         _wizard_dados_viajantes_context(
             form=form,
+            transporte_form=transporte_form,
             oficio=oficio,
             avaliacao=avaliacao,
             mostrar_pendencias_documento=mostrar_pendencias_documento,
@@ -575,6 +616,8 @@ def wizard_documentos(request, pk):
             "wizard_back_url": reverse("oficios:wizard_justificativa", args=[oficio.pk]),
             "wizard_back_label": "Voltar",
             "wizard_finalizar": True,
+            "wizard_show_document_actions": True,
+            "wizard_show_save_draft": True,
             "documentos_ctx": apresentar_oficio_wizard_documentos_context(oficio),
             "pendencias_documentos": pendencias,
             "mostrar_pendencias": bool(pendencias),

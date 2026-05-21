@@ -41,6 +41,18 @@ class OficioWizardDadosViajantesTests(TestCase):
             "custeio": Oficio.CUSTEIO_UNIDADE_DPC,
             "custeio_observacao": "",
             "servidores": [str(self.servidor.pk)],
+            "servidores_termo_autorizacao_present": "1",
+            "servidores_termo_autorizacao": [str(self.servidor.pk)],
+            "porte_transporte_armas": "sim",
+            "motorista_modo": "SERVIDOR",
+            "motorista": str(self.servidor.pk),
+            "transporte_placa_manual": "",
+            "transporte_modelo_manual": "",
+            "transporte_combustivel_manual": "",
+            "transporte_tipo_manual": "",
+            "motorista_manual_nome": "",
+            "motorista_oficio_referencia": "",
+            "motorista_protocolo_ref": "",
             "action": "save_draft",
         }
         data.update(overrides)
@@ -70,12 +82,14 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertContains(response, "Roteiro e diárias")
         self.assertContains(response, "Justificativa")
         self.assertContains(response, "Documentos")
-        self.assertContains(response, "N° do Ofício:")
+        self.assertContains(response, "N° do Ofício")
         self.assertContains(response, oficio.numero_formatado)
         self.assertContains(response, "Data criação:")
         self.assertContains(response, oficio.data_criacao.strftime("%d/%m/%Y"))
-        self.assertContains(response, "oficio-data-grid--three")
-        self.assertContains(response, "oficio-data-grid--full")
+        self.assertContains(response, "cv-wizard-section-card")
+        self.assertContains(response, "field-grid")
+        self.assertNotContains(response, "DOCX")
+        self.assertContains(response, "Avançar →")
         self.assertNotContains(response, "Gerado automaticamente ao salvar.")
         self.assertNotContains(response, "será definida automaticamente ao salvar")
         self.assertNotContains(response, "Status:")
@@ -96,7 +110,7 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertContains(response, "app-termos-selector__native")
         self.assertContains(response, "js/oficios_termos_selector.js")
         self.assertContains(response, "Equipe do ofício")
-        self.assertContains(response, "Busque servidores finalizados e mantenha a seleção visível enquanto monta o ofício.")
+        self.assertContains(response, "A busca mostra apenas viajantes finalizados e continua disponível após cada seleção.")
         self.assertContains(response, "Cadastrar novo viajante")
         self.assertContains(response, "Digite nome, RG ou CPF")
         self.assertContains(response, "A busca mostra apenas viajantes finalizados e continua disponível após cada seleção.")
@@ -119,7 +133,8 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertContains(response, "Modelo de motivo")
         self.assertContains(response, 'name="modelo_motivo"')
         self.assertContains(response, 'name="motivo"')
-        self.assertContains(response, "motivo-card__body")
+        self.assertContains(response, "wizard-inner-section")
+        self.assertContains(response, "id=\"oficio-wizard-motivo\"")
         self.assertNotContains(
             response,
             "Escolha um modelo para iniciar com texto pré-preenchido ou escreva manualmente o motivo.",
@@ -223,6 +238,7 @@ class OficioWizardDadosViajantesTests(TestCase):
             reverse("oficios:dados_viajantes", args=[oficio.pk]),
             data=self._payload(
                 servidores=[str(self.servidor.pk), str(self.outro_servidor.pk)],
+                servidores_termo_autorizacao=[str(self.servidor.pk), str(self.outro_servidor.pk)],
                 action="save_draft",
             ),
         )
@@ -413,10 +429,9 @@ class OficioWizardDadosViajantesTests(TestCase):
 
     def test_custeio_observacao_inicia_oculto_quando_nao_e_outra_instituicao(self):
         response = self.client.get(self._novo_rascunho_url())
-        self.assertContains(
-            response,
-            'class="oficio-data-observacao form-field--hidden" data-custeio-observacao-wrapper',
-        )
+        self.assertContains(response, "oficio-data-observacao")
+        self.assertContains(response, "form-field--hidden")
+        self.assertContains(response, "data-custeio-observacao-wrapper")
 
     def test_custeio_observacao_aparece_quando_outra_instituicao(self):
         oficio = Oficio.objects.create(
@@ -426,10 +441,11 @@ class OficioWizardDadosViajantesTests(TestCase):
             custeio=Oficio.CUSTEIO_OUTRA_INSTITUICAO,
         )
         response = self.client.get(reverse("oficios:dados_viajantes", args=[oficio.pk]))
-        self.assertContains(response, 'class="oficio-data-observacao" data-custeio-observacao-wrapper')
+        self.assertContains(response, "oficio-data-observacao")
+        self.assertContains(response, "data-custeio-observacao-wrapper")
         self.assertNotContains(
             response,
-            'class="oficio-data-observacao form-field--hidden" data-custeio-observacao-wrapper',
+            'oficio-data-observacao form-field--hidden',
         )
 
     def test_post_custeio_outra_instituicao_sem_observacao_salva_rascunho(self):

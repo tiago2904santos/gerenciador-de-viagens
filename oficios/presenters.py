@@ -309,9 +309,12 @@ def apresentar_oficio_wizard_header(etapa_atual, oficio=None):
     }
     if oficio is not None:
         ctx["status_label"] = oficio.get_status_display()
-        ctx["status_variant"] = (
-            "draft" if oficio.status == Oficio.STATUS_RASCUNHO else "active"
-        )
+        if oficio.status == Oficio.STATUS_RASCUNHO:
+            ctx["status_variant"] = "draft"
+        elif oficio.status == Oficio.STATUS_ARQUIVADO:
+            ctx["status_variant"] = "pending"
+        else:
+            ctx["status_variant"] = "active"
     return ctx
 
 

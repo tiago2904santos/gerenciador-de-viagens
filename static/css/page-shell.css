@@ -575,20 +575,22 @@ html[data-theme="light"] {
 .page-stepper__list {
   align-items: flex-start;
   display:     flex;
+  gap:         0;
   list-style:  none;
   margin:      0;
-  min-width:   max-content;
   padding:     0;
+  width:       100%;
 }
 
 /* Item — coluna: trilha no topo, rótulos abaixo */
 .page-stepper__item {
   align-items:    center;
   display:        flex;
-  flex:           1;
+  flex:           1 1 0;
   flex-direction: column;
   gap:            var(--space-2);
-  min-width:      80px;
+  min-width:      0;
+  padding:        0 var(--space-1);
 }
 
 /* Trilha: linha-esquerda + marcador + linha-direita */
@@ -777,9 +779,103 @@ html[data-theme="light"] {
 
 /* ─── Foco acessível ─────────────────────────────────────── */
 
-.page-stepper__item:focus-visible .page-stepper__marker {
+.page-stepper__item:focus-visible .page-stepper__marker,
+.page-stepper__marker--link:focus-visible {
   outline:        2px solid var(--border-focus);
   outline-offset: 3px;
+}
+
+.page-stepper__marker--link {
+  color:           inherit;
+  text-decoration: none;
+}
+
+.page-stepper__content-link {
+  align-items:     center;
+  color:           inherit;
+  display:         flex;
+  flex-direction:  column;
+  gap:             2px;
+  max-width:       100%;
+  text-align:      center;
+  text-decoration: none;
+}
+
+.page-stepper__content-link:hover .page-stepper__label {
+  color: var(--stepper-label-active);
+}
+
+/* Seções internas leves dentro de um card wizard */
+.wizard-inner-section {
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--form-section-inner-gap);
+  padding-bottom: var(--space-4);
+}
+
+.wizard-inner-section:last-child {
+  padding-bottom: 0;
+}
+
+.wizard-inner-section + .wizard-inner-section {
+  border-top: 1px solid var(--border-form-section);
+  padding-top: var(--space-4);
+}
+
+.wizard-inner-section__header {
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--space-1);
+}
+
+.wizard-inner-section__header--actions {
+  align-items:     flex-start;
+  flex-direction:  row;
+  gap:             var(--space-3);
+  justify-content: space-between;
+}
+
+.wizard-inner-section__header-copy {
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--space-1);
+  min-width:      0;
+}
+
+.wizard-inner-section__title {
+  color:          var(--theme-text-heading);
+  font-size:      var(--font-size-sm);
+  font-weight:    var(--font-weight-bold);
+  letter-spacing: 0.04em;
+  margin:         0;
+  text-transform: uppercase;
+}
+
+.wizard-inner-section__description {
+  color:       var(--theme-text-muted);
+  font-size:   var(--font-size-sm);
+  line-height: 1.45;
+  margin:      0;
+}
+
+.field__static-value {
+  color:       var(--theme-text-heading);
+  font-size:   var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  margin:      0;
+}
+
+.footer-actions--primary-only {
+  justify-content: flex-end;
+}
+
+.footer-actions--primary-only .footer-actions__primary {
+  margin-left: auto;
+}
+
+/* Stepper fora do painel stack — card isolado como no UI Lab */
+.page-shell--wizard > .page-stepper {
+  margin-bottom: var(--cv-wizard-section-stack-gap);
 }
 
 

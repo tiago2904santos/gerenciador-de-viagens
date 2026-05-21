@@ -3,97 +3,113 @@
 
 {% block wizard_content %}
   {% if mostrar_pendencias_documento and pendencias %}
-    <div class="oficio-wizard-pendencias oficio-wizard-pendencias--inline" role="status">
-      <h3>Pendências para concluir esta etapa</h3>
-      <ul>
-        {% for pendencia in pendencias %}
-          <li>{{ pendencia }}</li>
-        {% endfor %}
-      </ul>
+    <div class="oficio-wizard-pendencias cv-wizard-section-card" role="status">
+      <header class="cv-wizard-section-header">
+        <h3 class="cv-wizard-section-title">Pendências para concluir esta etapa</h3>
+      </header>
+      <div class="cv-wizard-section-body">
+        <ul>
+          {% for pendencia in pendencias %}
+            <li>{{ pendencia }}</li>
+          {% endfor %}
+        </ul>
+      </div>
     </div>
   {% endif %}
 
-  <div class="form-section app-form-section">
-    {% include "components/forms/form_section.html" with title="Dados do ofício" description="Identificação administrativa, protocolo e custeio." only %}
-    <div class="oficio-data-block app-form-grid-panel">
-      <div class="oficio-data-grid oficio-data-grid--three">
-        <div class="oficio-data-info">
-          <span class="oficio-data-info__label">N° do Ofício:</span>
-          <p class="oficio-data-info__value">
-            {{ wizard_summary.numero_label }}
-          </p>
+  <input type="hidden" name="transporte_embed" value="1">
+  <div data-oficio-wizard-step1 data-oficio-driver-source>
+    {# CARD 1 — Dados principais #}
+    <section class="cv-wizard-section-card" aria-labelledby="oficio-wizard-dados-principais">
+      <header class="cv-wizard-section-header">
+        <div class="cv-wizard-section-header__copy">
+          <h3 class="cv-wizard-section-title" id="oficio-wizard-dados-principais">Dados principais</h3>
         </div>
-        <div class="oficio-data-grid__field">
-          {% include "components/forms/form_field.html" with field=form.protocolo label="Protocolo" only %}
-        </div>
-        <div class="oficio-data-info">
-          <span class="oficio-data-info__label">Data criação:</span>
-          <p class="oficio-data-info__value">
-            {{ wizard_summary.data_criacao_label }}
-          </p>
-        </div>
-      </div>
-      <div class="oficio-data-grid oficio-data-grid--full">
-        <div class="oficio-data-grid__field">
-          {% include "components/forms/form_field.html" with field=form.custeio label="Custeio" only %}
-        </div>
-      </div>
-      <div class="oficio-data-observacao{% if not mostrar_custeio_observacao %} form-field--hidden{% endif %}" data-custeio-observacao-wrapper>
-        {% include "components/forms/form_field.html" with field=form.custeio_observacao label="Nome da Instituição" only %}
-      </div>
-    </div>
-  </div>
+      </header>
+      <div class="cv-wizard-section-body">
+        <section class="wizard-inner-section" aria-labelledby="oficio-wizard-dados-oficio">
+          <header class="wizard-inner-section__header">
+            <h4 class="wizard-inner-section__title" id="oficio-wizard-dados-oficio">Dados do ofício</h4>
+            <p class="wizard-inner-section__description">Identificação administrativa, protocolo e custeio.</p>
+          </header>
+          <div class="field-grid field-grid--cols-3">
+            <div class="field field-size-1">
+              <span class="field__label">N° do Ofício</span>
+              <p class="field__static-value">{{ wizard_summary.numero_label }}</p>
+            </div>
+            <div class="field field-size-1">
+              {% include "components/forms/form_field.html" with field=form.protocolo label="Protocolo" only %}
+            </div>
+            <div class="field field-size-1">
+              <span class="field__label">Data criação:</span>
+              <p class="field__static-value">{{ wizard_summary.data_criacao_label }}</p>
+            </div>
+            <div class="field field-size-2">
+              {% include "components/forms/form_field.html" with field=form.custeio label="Custeio" only %}
+            </div>
+            <div class="field field-size-4 oficio-data-observacao{% if not mostrar_custeio_observacao %} form-field--hidden{% endif %}" data-custeio-observacao-wrapper>
+              {% include "components/forms/form_field.html" with field=form.custeio_observacao label="Nome da Instituição" only %}
+            </div>
+          </div>
+        </section>
 
-  <div class="form-section motivo-card">
-    <div class="motivo-card__header">
-      <div class="motivo-card__heading">
-        <h3 class="motivo-card__title">Motivo</h3>
-        <p class="motivo-card__description">Use um modelo salvo ou descreva o motivo da viagem.</p>
+        <section class="wizard-inner-section" aria-labelledby="oficio-wizard-motivo">
+          <header class="wizard-inner-section__header wizard-inner-section__header--actions">
+            <div class="wizard-inner-section__header-copy">
+              <h4 class="wizard-inner-section__title" id="oficio-wizard-motivo">Motivo</h4>
+              <p class="wizard-inner-section__description">Use um modelo salvo ou descreva o motivo da viagem.</p>
+            </div>
+            {% include "components/buttons/action_button.html" with href=modelos_motivo_url label="Gerenciar modelos" variant="secondary" only %}
+          </header>
+          <div class="field-grid">
+            <div class="field field-size-4">
+              <label for="{{ form.modelo_motivo.id_for_label }}">{{ form.modelo_motivo.label }}</label>
+              <select name="{{ form.modelo_motivo.html_name }}" id="{{ form.modelo_motivo.id_for_label }}" class="form-select" data-modelo-motivo-select="true">
+                <option value="">Selecione um modelo (opcional)</option>
+                {% for modelo in form.fields.modelo_motivo.queryset %}
+                  <option value="{{ modelo.pk }}" data-texto-motivo="{{ modelo.texto }}"{% if form.modelo_motivo.value|stringformat:'s' == modelo.pk|stringformat:'s' %} selected{% endif %}>{{ modelo.nome }}</option>
+                {% endfor %}
+              </select>
+              {% if form.modelo_motivo.errors %}<p class="field-error">{{ form.modelo_motivo.errors|striptags }}</p>{% endif %}
+              {% if not tem_modelos_motivo %}
+                <p class="field-help">Nenhum modelo cadastrado. <a href="{{ modelos_motivo_url }}">Abrir gerenciamento de modelos</a></p>
+              {% endif %}
+            </div>
+            <div class="field field-size-4">
+              {% include "components/forms/form_field.html" with field=form.motivo only %}
+            </div>
+          </div>
+        </section>
       </div>
-      <div class="motivo-card__actions">
-        {% include "components/buttons/action_button.html" with href=modelos_motivo_url label="Gerenciar modelos" variant="secondary" only %}
-      </div>
-    </div>
-    <div class="motivo-card__body app-form-grid-panel">
-      <div class="motivo-card__model field">
-        <label for="{{ form.modelo_motivo.id_for_label }}">{{ form.modelo_motivo.label }}</label>
-        <select name="{{ form.modelo_motivo.html_name }}" id="{{ form.modelo_motivo.id_for_label }}" class="form-select" data-modelo-motivo-select="true">
-          <option value="">Selecione um modelo (opcional)</option>
-          {% for modelo in form.fields.modelo_motivo.queryset %}
-            <option value="{{ modelo.pk }}" data-texto-motivo="{{ modelo.texto }}"{% if form.modelo_motivo.value|stringformat:'s' == modelo.pk|stringformat:'s' %} selected{% endif %}>{{ modelo.nome }}</option>
-          {% endfor %}
-        </select>
-        {% if form.modelo_motivo.errors %}<p class="field-error">{{ form.modelo_motivo.errors|striptags }}</p>{% endif %}
-        {% if not tem_modelos_motivo %}
-          <p class="field-help">Nenhum modelo cadastrado. Crie um modelo para agilizar o preenchimento.</p>
-          <p class="field-help"><a href="{{ modelos_motivo_url }}">Abrir gerenciamento de modelos</a></p>
-        {% elif modelo_motivo_selecionado %}
-          <p class="field-help">O texto pode ser editado antes de salvar.</p>
-        {% endif %}
-      </div>
-      <div class="motivo-card__textarea">
-        {% include "components/forms/form_field.html" with field=form.motivo only %}
-      </div>
-    </div>
-  </div>
+    </section>
 
-  <div class="form-section oficio-equipe-section">
-    <div class="oficio-equipe-section__header">
-      <div class="oficio-equipe-section__copy">
-        <h3>Equipe do ofício</h3>
-        <p>Busque servidores finalizados e mantenha a seleção visível enquanto monta o ofício.</p>
+    {# CARD 2 — Equipe e motorista #}
+    <section class="cv-wizard-section-card" aria-labelledby="oficio-wizard-equipe-title">
+      <header class="cv-wizard-section-header">
+        <div class="cv-wizard-section-header__copy">
+          <h3 class="cv-wizard-section-title" id="oficio-wizard-equipe-title">Equipe do ofício e motorista</h3>
+          <p class="cv-wizard-section-subtitle">Selecione os viajantes; um deles pode ser o motorista do deslocamento.</p>
+        </div>
+        <div class="cv-wizard-section-header__actions">
+          {% include "components/buttons/action_button.html" with href=servidor_create_url label="Cadastrar novo viajante" variant="secondary" only %}
+        </div>
+      </header>
+      <div class="cv-wizard-section-body">
+        <div class="field field-size-4">
+          {% include "components/forms/form_field.html" with field=form.servidores label="Buscar viajante" help_text="A busca mostra apenas viajantes finalizados e continua disponível após cada seleção." only %}
+        </div>
+        <div class="oficio-termos-selector-field" data-oficio-termos-selector>
+          <input type="hidden" name="servidores_termo_autorizacao_present" value="1">
+          {{ form.servidores_termo_autorizacao }}
+        </div>
+        <div class="field field-size-4" data-oficio-driver-team-motorista>
+          {% include "components/forms/form_field.html" with field=transporte_form.motorista label="Motorista (entre os viajantes)" help_text="Se escolher um viajante da equipe, o bloco de motorista externo não será necessário." only %}
+        </div>
       </div>
-      {% include "components/buttons/action_button.html" with href=servidor_create_url label="Cadastrar novo viajante" variant="secondary" only %}
-    </div>
-    <div class="form-grid app-form-grid">
-      <div class="field-span-12">
-        {% include "components/forms/form_field.html" with field=form.servidores label="BUSCAR VIAJANTE" help_text="A busca mostra apenas viajantes finalizados e continua disponível após cada seleção." only %}
-      </div>
-    </div>
-    <div class="oficio-termos-selector-field" data-oficio-termos-selector>
-      <input type="hidden" name="servidores_termo_autorizacao_present" value="1">
-      {{ form.servidores_termo_autorizacao }}
-    </div>
+    </section>
+
+    {% include "oficios/partials/wizard_dados_card_viatura.html" %}
+    {% include "oficios/partials/wizard_dados_card_motorista_externo.html" %}
   </div>
 {% endblock %}
 
@@ -102,4 +118,6 @@
   <script src="{% static 'js/components/app-multiselect.js' %}?v=20260512" defer></script>
   <script src="{% static 'js/oficios_termos_selector.js' %}?v=20260512" defer></script>
   <script src="{% static 'js/pages/oficios-dados-viajantes.js' %}?v=20260512" defer></script>
+  <script src="{% static 'js/pages/oficios-transporte.js' %}?v=20260512" defer></script>
+  <script src="{% static 'js/pages/oficios-wizard-driver-state.js' %}?v=20260520" defer></script>
 {% endblock %}
