@@ -623,11 +623,18 @@
 
   /* ── Boot ───────────────────────────────────────────────────────── */
 
-  function boot() {
-    document.querySelectorAll(SELECTOR).forEach(initPicker);
+  function init(root) {
+    const scope = root && root.querySelectorAll ? root : document;
+    scope.querySelectorAll(SELECTOR).forEach(initPicker);
   }
 
-  window.CvSearchPicker = { boot };
+  function boot() {
+    init(document);
+  }
+
+  window.CvSearchPicker = { boot, init };
+  window.CV = window.CV || {};
+  window.CV.searchPicker = window.CvSearchPicker;
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", boot);

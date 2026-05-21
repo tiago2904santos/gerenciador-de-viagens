@@ -372,8 +372,16 @@
     setGlanceValue: setGlanceValue,
     renderGlanceTravelers: renderGlanceTravelers,
     refreshSelectPickers: function(root) {
-      if (window.OficioSelectPicker) {
-        window.OficioSelectPicker.refresh(root || document);
+      var scope = root || document;
+      if (window.CV && window.CV.fields && typeof window.CV.fields.init === 'function') {
+        window.CV.fields.init(scope);
+        return;
+      }
+      if (window.CvCustomSelect && typeof window.CvCustomSelect.init === 'function') {
+        window.CvCustomSelect.init(scope);
+      }
+      if (window.OficioSelectPicker && typeof window.OficioSelectPicker.refresh === 'function') {
+        window.OficioSelectPicker.refresh(scope);
       }
     }
   };

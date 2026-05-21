@@ -5,8 +5,12 @@ document.documentElement.dataset.appReady = "true";
     return toggle.getAttribute("aria-controls") || toggle.getAttribute("data-quick-add-toggle");
   }
 
-  function scanPanelMasks(panel) {
+  function initPanelFields(panel) {
     if (!panel) return;
+    if (window.CV && window.CV.fields && typeof window.CV.fields.init === "function") {
+      window.CV.fields.init(panel);
+      return;
+    }
     if (window.MaskEngine && typeof window.MaskEngine.scan === "function") {
       window.MaskEngine.scan(panel);
     } else if (window.CV && window.CV.masks && typeof window.CV.masks.scan === "function") {
@@ -59,7 +63,7 @@ document.documentElement.dataset.appReady = "true";
         panel.hidden = false;
         window.requestAnimationFrame(function () {
           panel.classList.add("is-open");
-          scanPanelMasks();
+          initPanelFields(panel);
         });
         toggle.setAttribute("aria-expanded", "true");
         toggle.classList.add("is-active");
@@ -125,14 +129,14 @@ document.documentElement.dataset.appReady = "true";
         if (toggle.getAttribute("aria-expanded") !== "true") {
           toggle.click();
         } else {
-          scanPanelMasks();
+          initPanelFields(panel);
         }
 
         // Foca o primeiro campo editável
         var firstInput = panel.querySelector("input:not([type=hidden]), select, textarea");
         if (firstInput) {
           window.setTimeout(function () {
-            scanPanelMasks(panel);
+            initPanelFields(panel);
             firstInput.focus();
             firstInput.select();
           }, 60);

@@ -98,14 +98,43 @@ Evento: `cv:state-toggle:change` — `detail`: `{ value, input, toggle, fromUser
 
 Hooks: `window.AppAutosaveSnapshots[model]`, `window.AppAutosaveValidators[model]`.
 
-## Selects / dropdowns
+## Fields Init (`fields-init.js`)
 
-| Motor | Seletor principal |
-|-------|-------------------|
-| `cv-custom-select.js` | `select[data-cv-select]` (ver arquivo) |
-| `cv-search-picker.js` | `select[data-cv-search-picker]` |
-| `cv-select.js` | `[data-cv-dropdown]`, `[data-cv-filter-dropdown]` |
-| `app-multiselect.js` | boot explícito na página |
+Orquestrador carregado após os motores em `base.html`.
+
+| API | Uso |
+|-----|-----|
+| `window.CV.fields.init(root?)` | Inicializa máscaras, toggles, selects, pickers e dropdowns na subárvore |
+| `window.CV.initFields` | Alias de `CV.fields.init` |
+| `window.CV.fields.initSelects(root?)` | Apenas `cv-custom-select` |
+| `window.CV.fields.initSearchPickers(root?)` | Apenas search picker |
+| `window.CV.fields.initDropdowns(root?)` | Apenas `cv-select` |
+| `window.CV.fields.initMultiselects(root?)` | Apenas `app-multiselect` (se script carregado) |
+
+Evento: `cv:fields:init` — `detail.initialized`: `{ masks, stateToggles, selects, searchPickers, dropdowns, multiselects, filterableMultiselects }`.
+
+Ordem interna: masks → stateToggle → customSelect → searchPicker → dropdowns → multiselect → filterableMultiselect.
+
+Exemplo após DOM dinâmico:
+
+```javascript
+window.CV.fields.init(panelElement);
+```
+
+Quick Add chama `CV.fields.init(panel)` automaticamente em `core/app.js`.  
+`OficioWizard.refreshSelectPickers(root)` delega para `CV.fields.init(root)`.
+
+## Selects / dropdowns (motores individuais)
+
+| Motor | Seletor | API |
+|-------|---------|-----|
+| `cv-custom-select.js` | `[data-cv-select]` (wrapper) | `CV.customSelect.init(root)` |
+| `cv-search-picker.js` | `select[data-cv-search-picker]` | `CV.searchPicker.init(root)` |
+| `cv-select.js` | `[data-cv-dropdown]`, `[data-cv-filter-dropdown]` | `CV.dropdowns.init(root)` |
+| `app-multiselect.js` | `select[data-app-multiselect]` | `CV.multiselect.init(root)` |
+| `filterable-multiselect.js` | `input[data-filterable-multiselect-input]` | `CV.filterableMultiselect.init(root)` (se carregado) |
+
+Marcadores de idempotência: `_cvSelect`, `data-cv-search-picker-ready`, `_cvDropdownReady`, `data-app-multiselect-ready`, `data-cv-select-bound`.
 
 ## Configurações CEP
 

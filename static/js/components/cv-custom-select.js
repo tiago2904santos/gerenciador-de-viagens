@@ -400,10 +400,12 @@
   // ─────────────────────────────────────────────────────────────────────────
   // Init global
   // ─────────────────────────────────────────────────────────────────────────
-  function initAll() {
-    var els = document.querySelectorAll('[data-cv-select]');
+  function initAll(root) {
+    var scope = root && root.querySelectorAll ? root : document;
+    var els = scope.querySelectorAll('[data-cv-select]');
     for (var i = 0; i < els.length; i++) {
       if (!els[i]._cvSelect) {
+        els[i].setAttribute('data-cv-select-bound', 'true');
         var inst = new CustomSelect(els[i]);
         els[i]._cvSelect = inst;
       }
@@ -411,11 +413,12 @@
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initAll);
+    document.addEventListener('DOMContentLoaded', function () { initAll(document); });
   } else {
-    initAll();
+    initAll(document);
   }
 
-  // Expor para uso externo (re-init dinâmico, Django forms, etc.)
   window.CvCustomSelect = { init: initAll, CustomSelect: CustomSelect };
+  window.CV = window.CV || {};
+  window.CV.customSelect = window.CvCustomSelect;
 }());

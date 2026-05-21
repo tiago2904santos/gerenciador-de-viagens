@@ -134,8 +134,8 @@
      Action Dropdown — [data-cv-dropdown]
      ───────────────────────────────────────────────────────────────────────── */
 
-  function initCvDropdowns() {
-    qsa('[data-cv-dropdown]').forEach(function (wrapper) {
+  function initCvDropdowns(root) {
+    qsa('[data-cv-dropdown]', root).forEach(function (wrapper) {
       if (wrapper._cvDropdownReady) return;
       wrapper._cvDropdownReady = true;
 
@@ -187,8 +187,8 @@
      com { name, values } para integracao com outros sistemas de filtro.
      ───────────────────────────────────────────────────────────────────────── */
 
-  function initCvFilterDropdowns() {
-    qsa('[data-cv-filter-dropdown]').forEach(function (wrapper) {
+  function initCvFilterDropdowns(root) {
+    qsa('[data-cv-filter-dropdown]', root).forEach(function (wrapper) {
       if (wrapper._cvFilterDropdownReady) return;
       wrapper._cvFilterDropdownReady = true;
 
@@ -312,23 +312,25 @@
      Inicializacao
      ───────────────────────────────────────────────────────────────────────── */
 
-  function init() {
-    initCvDropdowns();
-    initCvFilterDropdowns();
+  function init(root) {
+    var scope = root && root.querySelectorAll ? root : document;
+    initCvDropdowns(scope);
+    initCvFilterDropdowns(scope);
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', function () { init(document); });
   } else {
-    init();
+    init(document);
   }
 
-  // API publica para re-inicializacao (ex.: apos injecao de HTML dinamico)
   window.CvSelect = {
     init: init,
     initDropdowns: initCvDropdowns,
     initFilterDropdowns: initCvFilterDropdowns,
     closeAll: closeAllDropdowns
   };
+  window.CV = window.CV || {};
+  window.CV.dropdowns = window.CvSelect;
 
 }());
