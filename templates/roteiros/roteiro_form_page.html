@@ -18,12 +18,14 @@
 {% endblock %}
 
 {% block content %}
-  <div class="page-shell page-shell--wizard app-page--roteiros-form">
+  <div class="page-shell page-shell--wizard app-page--roteiros-form app-page-shell--wizard">
     {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="ROTEIROS" title=page_title description="Sede, destinos, trechos, retorno e diárias no mesmo fluxo." icon_label="RT" module_label="Roteiros" back_label="Voltar para lista" back_url=back_url only %}
 
-    <div class="app-form-shell app-form-shell--roteiro roteiro-form-shell">
-      {{ initial_trechos_data|json_script:"initialTrechosData" }}
-      {% include "roteiros/partials/roteiro_form.html" with is_avulso=True %}
-    </div>
+    <main class="main-form-panel main-form-panel--stack">
+      <div class="cv-wizard-section-stack app-form-shell app-form-shell--roteiro roteiro-form-shell">
+        {{ initial_trechos_data|json_script:"initialTrechosData" }}
+        {% include "roteiros/partials/roteiro_form.html" with is_avulso=True %}
+      </div>
+    </main>
   </div>
 {% endblock %}

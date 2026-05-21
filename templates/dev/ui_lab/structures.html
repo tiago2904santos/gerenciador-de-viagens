@@ -184,26 +184,7 @@
               </div>
             </div>
           </div>
-          <nav class="page-stepper page-stepper--horizontal" aria-label="Etapas do formulário">
-            <ol class="page-stepper__list">
-              {% for step in ui_lab_steps %}
-                <li class="page-stepper__item {{ step.state_class }}"{% if step.aria_current %} aria-current="{{ step.aria_current }}"{% endif %}>
-                  <div class="page-stepper__track">
-                    <div class="page-stepper__connector page-stepper__connector--before"></div>
-                    <div class="page-stepper__marker" aria-hidden="{{ step.marker_aria_hidden|yesno:'true,false' }}">
-                      <span class="page-stepper__marker-icon">{{ step.marker }}</span>
-                    </div>
-                    <div class="page-stepper__connector page-stepper__connector--after"></div>
-                  </div>
-                  <div class="page-stepper__content">
-                    <span class="page-stepper__eyebrow">{{ step.step_label }}</span>
-                    <span class="page-stepper__label">{{ step.title }}</span>
-                    <span class="page-stepper__status">{{ step.status }}</span>
-                  </div>
-                </li>
-              {% endfor %}
-            </ol>
-          </nav>
+          {% include "components/ui/navigation/page_stepper.html" with steps=ui_lab_steps only %}
           <main class="main-form-panel main-form-panel--stack">
             <div class="cv-wizard-section-stack">
 

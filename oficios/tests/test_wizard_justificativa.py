@@ -107,7 +107,7 @@ class WizardJustificativaTests(TestCase):
         self._roteiro_com_saida(oficio, 11)
         response = self.client.get(reverse("oficios:wizard_justificativa", args=[oficio.pk]))
         self.assertContains(response, "Justificativa")
-        self.assertContains(response, "oficio-stepper")
+        self.assertContains(response, "page-stepper")
 
     def test_exige_justificativa_menor_igual_10_dias(self):
         oficio = self._oficio_ate_transporte()

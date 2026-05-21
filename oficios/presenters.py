@@ -281,7 +281,7 @@ def apresentar_acoes_oficio(
     return [a for a in actions if a]
 
 
-def apresentar_oficio_wizard_header(etapa_atual):
+def apresentar_oficio_wizard_header(etapa_atual, oficio=None):
     titles = {
         "dados_viajantes": "Dados e viajantes",
         "transporte": "Transporte",
@@ -291,10 +291,28 @@ def apresentar_oficio_wizard_header(etapa_atual):
         "assinaturas": "Central de assinaturas",
         "resumo": "Documentos",
     }
-    return {
-        "title": "Cadastro de ofício",
-        "subtitle": titles.get(etapa_atual, "Dados e viajantes"),
+    step_numbers = {
+        "dados_viajantes": 1,
+        "transporte": 2,
+        "roteiro": 3,
+        "justificativa": 4,
+        "documentos": 5,
+        "assinaturas": 6,
+        "resumo": 5,
     }
+    subtitle = titles.get(etapa_atual, "Dados e viajantes")
+    step_number = step_numbers.get(etapa_atual, 1)
+    ctx = {
+        "title": "Cadastro de ofício",
+        "subtitle": subtitle,
+        "description": f"Etapa {step_number} de 6 — {subtitle}",
+    }
+    if oficio is not None:
+        ctx["status_label"] = oficio.get_status_display()
+        ctx["status_variant"] = (
+            "draft" if oficio.status == Oficio.STATUS_RASCUNHO else "active"
+        )
+    return ctx
 
 
 def _map_justificativa_etapa_para_completion(etapa: dict) -> str:
@@ -322,6 +340,51 @@ def apresentar_status_etapa_oficio(status):
         "status": status,
         "label": labels.get(status, "Não iniciada"),
     }
+
+
+def _oficio_step_state_class(step: dict) -> str:
+    state = step.get("state") or step.get("completion_state") or "not_started"
+    if state == "current":
+        return "is-current"
+    if state == "complete":
+        return "is-complete"
+    if state == "locked":
+        return "is-disabled"
+    if state in ("incomplete",):
+        return "is-missing"
+    if state in ("not_started", "not_required"):
+        return "is-pending"
+    return "is-pending"
+
+
+def _oficio_step_marker(step: dict) -> tuple[str, bool]:
+    state = step.get("state") or step.get("completion_state") or "not_started"
+    if state == "complete":
+        return "✓", True
+    if state == "locked":
+        return str(step.get("number") or ""), True
+    return str(step.get("number") or ""), False
+
+
+def apresentar_oficio_wizard_page_steps(steps):
+    """Adapta steps do wizard de ofício para o componente global page_stepper."""
+    page_steps = []
+    for step in steps or []:
+        state_class = _oficio_step_state_class(step)
+        marker, marker_hidden = _oficio_step_marker(step)
+        page_steps.append(
+            {
+                "url": step.get("url") or "",
+                "state_class": state_class,
+                "step_label": f"Etapa {step.get('number', '')}",
+                "title": step.get("title") or "",
+                "status": step.get("state_label") or "",
+                "marker": marker,
+                "marker_aria_hidden": marker_hidden,
+                "aria_current": "step" if state_class == "is-current" else "",
+            }
+        )
+    return page_steps
 
 
 def apresentar_oficio_wizard_steps(

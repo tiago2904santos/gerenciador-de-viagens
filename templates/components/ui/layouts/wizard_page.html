@@ -1,3 +1,12 @@
+{# wizard_page.html — shell wizard (UI Lab Structures); slots via variáveis de include #}
 <div class="page-shell page-shell--wizard{% if extra_class %} {{ extra_class }}{% endif %}">
-  {% include "components/ui/headers/header_stack_back_action.html" with eyebrow=eyebrow title=title description=description icon_label=icon_label module_label=module_label back_url=back_url back_label=back_label only %}
+  {% include "components/ui/headers/header_stack_back_action.html" with eyebrow=eyebrow title=title description=description icon_label=icon_label module_label=module_label back_url=back_url back_label=back_label status_label=status_label status_variant=status_variant only %}
+  {% if steps %}
+    {% include "components/ui/navigation/page_stepper.html" with steps=steps aria_label=stepper_aria_label only %}
+  {% endif %}
+  {% if panel_content_template %}
+    <main class="main-form-panel main-form-panel--stack">
+      {% include panel_content_template %}
+    </main>
+  {% endif %}
 </div>

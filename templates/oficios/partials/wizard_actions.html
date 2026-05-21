@@ -1,21 +1,25 @@
-<div class="form-actions app-form-actions oficio-wizard__actions app-wizard__actions">
-  <button type="submit" name="action" value="wizard_back" class="btn btn-secondary app-btn app-btn--secondary">{{ wizard_back_label|default:"Voltar" }}</button>
-  {% if oficio %}
-    <a class="btn btn-secondary app-btn app-btn--secondary" href="{% url 'oficios:baixar_documento' oficio.pk 'docx' %}">DOCX</a>
-    <a class="btn btn-secondary app-btn app-btn--secondary" href="{% url 'oficios:baixar_documento' oficio.pk 'pdf' %}">PDF</a>
-    <a class="btn btn-secondary app-btn app-btn--secondary" href="{% url 'oficios:baixar_justificativa_documento' oficio.pk 'pdf' %}">Justificativa PDF</a>
-    <a class="btn btn-secondary app-btn app-btn--secondary" href="{% url 'oficios:baixar_plano_trabalho_documento' oficio.pk 'docx' %}">Plano DOCX</a>
-    <a class="btn btn-secondary app-btn app-btn--secondary" href="{% url 'oficios:baixar_ordem_servico_documento' oficio.pk 'docx' %}">Ordem serviço DOCX</a>
-    <a class="btn btn-secondary app-btn app-btn--secondary" href="{% url 'termos:preview_termo_oficio' oficio.pk %}">Termos</a>
-  {% endif %}
-  {% if not oficio_completo|default:False %}
-    <button class="btn btn-secondary app-btn app-btn--secondary" type="submit" name="action" value="save_draft_list">Salvar como rascunho</button>
-  {% endif %}
-  {% if wizard_finalizar %}
-    {% if oficio_completo|default:False %}
-      <button class="btn btn-primary app-btn app-btn--primary" type="submit" name="action" value="finalizar">Finalizar Ofício</button>
+<footer class="footer-actions form-actions app-form-actions oficio-wizard__actions app-wizard__actions">
+  <div class="footer-actions__secondary">
+    <button type="submit" name="action" value="wizard_back" class="btn btn-secondary app-btn app-btn--secondary cv-btn cv-btn--secondary">{{ wizard_back_label|default:"Voltar" }}</button>
+    {% if oficio %}
+      <a class="btn btn-secondary app-btn app-btn--secondary cv-btn cv-btn--secondary" href="{% url 'oficios:baixar_documento' oficio.pk 'docx' %}">DOCX</a>
+      <a class="btn btn-secondary app-btn app-btn--secondary cv-btn cv-btn--secondary" href="{% url 'oficios:baixar_documento' oficio.pk 'pdf' %}">PDF</a>
+      <a class="btn btn-secondary app-btn app-btn--secondary cv-btn cv-btn--secondary" href="{% url 'oficios:baixar_justificativa_documento' oficio.pk 'pdf' %}">Justificativa PDF</a>
+      <a class="btn btn-secondary app-btn app-btn--secondary cv-btn cv-btn--secondary" href="{% url 'oficios:baixar_plano_trabalho_documento' oficio.pk 'docx' %}">Plano DOCX</a>
+      <a class="btn btn-secondary app-btn app-btn--secondary cv-btn cv-btn--secondary" href="{% url 'oficios:baixar_ordem_servico_documento' oficio.pk 'docx' %}">Ordem serviço DOCX</a>
+      <a class="btn btn-secondary app-btn app-btn--secondary cv-btn cv-btn--secondary" href="{% url 'termos:preview_termo_oficio' oficio.pk %}">Termos</a>
     {% endif %}
-  {% else %}
-    <button class="btn btn-primary app-btn app-btn--primary" type="submit" name="action" value="wizard_next">Avançar</button>
-  {% endif %}
-</div>
+    {% if not oficio_completo|default:False %}
+      <button class="btn btn-secondary app-btn app-btn--secondary cv-btn cv-btn--secondary" type="submit" name="action" value="save_draft_list">Salvar como rascunho</button>
+    {% endif %}
+  </div>
+  <div class="footer-actions__primary">
+    {% if wizard_finalizar %}
+      {% if oficio_completo|default:False %}
+        <button class="btn btn-primary app-btn app-btn--primary cv-btn cv-btn--primary" type="submit" name="action" value="finalizar">Finalizar Ofício</button>
+      {% endif %}
+    {% else %}
+      <button class="btn btn-primary app-btn app-btn--primary cv-btn cv-btn--primary" type="submit" name="action" value="wizard_next">Avançar</button>
+    {% endif %}
+  </div>
+</footer>

@@ -54,8 +54,9 @@ from .presenters import apresentar_acoes_oficio
 from .presenters import apresentar_linha_lista_simples_modelo_motivo
 from .presenters import apresentar_oficio_card
 from .presenters import apresentar_oficio_wizard_documentos_context
-from .presenters import apresentar_oficio_wizard_header
 from .presenters import apresentar_oficio_wizard_summary
+from .presenters import apresentar_oficio_wizard_header
+from .presenters import apresentar_oficio_wizard_page_steps
 from .presenters import apresentar_oficio_wizard_steps
 from .selectors import get_oficio_by_id
 from .selectors import get_modelo_motivo_by_id
@@ -105,6 +106,25 @@ def _wizard_footer_ctx(oficio):
     return {"oficio_completo": oficio_esta_completo_para_finalizar(oficio)}
 
 
+def _wizard_steps_ctx(*, oficio=None, etapa_atual="dados_viajantes", **kwargs):
+    steps = apresentar_oficio_wizard_steps(
+        oficio=oficio,
+        etapa_atual=etapa_atual,
+        **kwargs,
+    )
+    return {
+        "wizard_steps": steps,
+        "wizard_page_steps": apresentar_oficio_wizard_page_steps(steps),
+    }
+
+
+def _wizard_shell_ctx(*, oficio=None, etapa_atual, **step_kwargs):
+    return {
+        "wizard_header": apresentar_oficio_wizard_header(etapa_atual, oficio=oficio),
+        **_wizard_steps_ctx(oficio=oficio, etapa_atual=etapa_atual, **step_kwargs),
+    }
+
+
 def _wizard_roteiro_step_status(oficio):
     if not getattr(oficio, "roteiro_id", None):
         return "incomplete"
@@ -150,8 +170,7 @@ def _wizard_dados_viajantes_context(*, form, oficio, avaliacao=None, mostrar_pen
     modelos_queryset = form.fields["modelo_motivo"].queryset
     return {
         "page_title": "Cadastro de ofício",
-        "wizard_header": apresentar_oficio_wizard_header("dados_viajantes"),
-        "wizard_steps": apresentar_oficio_wizard_steps(
+        **_wizard_shell_ctx(
             oficio=oficio,
             etapa_atual="dados_viajantes",
             dados_viajantes_status=avaliacao["status"],
@@ -213,8 +232,7 @@ def _wizard_transporte_context(*, form, oficio):
         ref_raw = (oficio.motorista_oficio_referencia or "").strip()
     return {
         "page_title": "Cadastro de ofício",
-        "wizard_header": apresentar_oficio_wizard_header("transporte"),
-        "wizard_steps": apresentar_oficio_wizard_steps(
+        **_wizard_shell_ctx(
             oficio=oficio,
             etapa_atual="transporte",
             dados_viajantes_status=dados_av["status"],
@@ -415,8 +433,7 @@ def wizard_roteiro(request, pk):
     context.update(
         {
             "page_title": "Cadastro de ofício",
-            "wizard_header": apresentar_oficio_wizard_header("roteiro"),
-            "wizard_steps": apresentar_oficio_wizard_steps(
+            **_wizard_shell_ctx(
                 oficio=oficio,
                 etapa_atual="roteiro",
                 dados_viajantes_status=dados_av["status"],
@@ -428,6 +445,7 @@ def wizard_roteiro(request, pk):
             "wizard_back_url": reverse("oficios:transporte", args=[oficio.pk]),
             "wizard_back_label": "Voltar",
             "roteiro_editor_oficio": True,
+            "wizard_use_outer_form": False,
             **_wizard_footer_ctx(oficio),
         }
     )
@@ -480,8 +498,7 @@ def wizard_justificativa(request, pk):
         "oficios/wizard_justificativa.html",
         {
             "page_title": "Cadastro de ofício",
-            "wizard_header": apresentar_oficio_wizard_header("justificativa"),
-            "wizard_steps": apresentar_oficio_wizard_steps(
+            **_wizard_shell_ctx(
                 oficio=oficio,
                 etapa_atual="justificativa",
                 dados_viajantes_status=dados_av["status"],
@@ -544,8 +561,7 @@ def wizard_documentos(request, pk):
         "oficios/wizard_documentos.html",
         {
             "page_title": "Cadastro de ofício",
-            "wizard_header": apresentar_oficio_wizard_header("documentos"),
-            "wizard_steps": apresentar_oficio_wizard_steps(
+            **_wizard_shell_ctx(
                 oficio=oficio,
                 etapa_atual="documentos",
                 dados_viajantes_status=dados_av["status"],
@@ -604,8 +620,7 @@ def wizard_assinaturas_documentos(request, pk):
         "oficios/wizard_assinaturas.html",
         {
             "page_title": "Central de assinaturas",
-            "wizard_header": apresentar_oficio_wizard_header("assinaturas"),
-            "wizard_steps": apresentar_oficio_wizard_steps(
+            **_wizard_shell_ctx(
                 oficio=oficio,
                 etapa_atual="assinaturas",
                 dados_viajantes_status=dados_av["status"],
@@ -616,6 +631,9 @@ def wizard_assinaturas_documentos(request, pk):
             ),
             "wizard_summary": apresentar_oficio_wizard_summary(oficio),
             "oficio": oficio,
+            "wizard_use_outer_form": False,
+            "wizard_back_url": reverse("oficios:wizard_documentos", args=[oficio.pk]),
+            "wizard_back_label": "Voltar para documentos",
             "documentos_assinatura": central_ctx["documentos_assinatura"],
             "assinaturas_kpis": central_ctx["assinaturas_kpis"],
         },
