@@ -15,16 +15,6 @@
     }
   }
 
-  function getCookie(name) {
-    var prefix = name + '=';
-    var parts = document.cookie.split(';');
-    for (var i = 0; i < parts.length; i++) {
-      var p = parts[i].trim();
-      if (p.indexOf(prefix) === 0) return decodeURIComponent(p.slice(prefix.length));
-    }
-    return '';
-  }
-
   function showElement(el) {
     if (!el) return;
     el.hidden = false;
@@ -446,11 +436,6 @@
     showError('');
     setLoading(true);
 
-    var token =
-      getCookie('csrftoken') ||
-      (form.querySelector('[name=csrfmiddlewaretoken]') &&
-        form.querySelector('[name=csrfmiddlewaretoken]').value);
-
     var payload = usePreviewPayload
       ? previewPayload
       : (hasSaved ? { roteiro_id: rid, force_recalculate: !!force } : null);
@@ -460,39 +445,50 @@
       return;
     }
 
-    fetch(targetUrl, {
-      method: 'POST',
-      credentials: 'same-origin',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': token || '',
-      },
-      body: JSON.stringify(payload),
-    })
-      .then(function (r) {
-        return r.json().then(function (body) {
-          return { ok: r.ok, status: r.status, body: body };
-        });
-      })
+    var request =
+      window.CV && window.CV.http && window.CV.http.fetchJson
+        ? window.CV.http.fetchJson(targetUrl, {
+            method: 'POST',
+            form: form,
+            body: payload,
+          })
+        : fetch(targetUrl, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken':
+                (form.querySelector('[name=csrfmiddlewaretoken]') || {}).value || '',
+              'X-Requested-With': 'XMLHttpRequest',
+            },
+            body: JSON.stringify(payload),
+          }).then(function (r) {
+            return r.json().then(function (body) {
+              return { ok: r.ok, status: r.status, data: body };
+            });
+          });
+
+    request
       .then(function (res) {
-        if (!res.body || !res.body.ok) {
-          showError((res.body && res.body.message) || 'Não foi possível calcular a rota.');
+        var body = res.data;
+        if (!res.ok || !body || !body.ok) {
+          showError((body && body.message) || 'Não foi possível calcular a rota.');
           return;
         }
-        var route = res.body.route;
+        var route = body.route;
         if (usePreviewPayload && roteiro && typeof roteiro.applyRoutePreviewResult === 'function') {
-          roteiro.applyRoutePreviewResult(res.body, { overwriteAdditional: !!force });
+          roteiro.applyRoutePreviewResult(body, { overwriteAdditional: !!force });
         }
         initial.route = route;
-        initial.legs = Array.isArray(res.body.legs) ? res.body.legs : [];
-        initial.points = Array.isArray(res.body.points) ? res.body.points : [];
+        initial.legs = Array.isArray(body.legs) ? body.legs : [];
+        initial.points = Array.isArray(body.points) ? body.points : [];
         persistRouteInForm(route, initial.points);
         initial.status = route.status || 'calculada';
         hadGeometry = !!(route.geometry && route.geometry.type === 'LineString');
         updateSummary(route, { status: initial.status });
 
-        var gw = route.geometry_warning || res.body.geometry_warning;
-        var drew = drawRoute(route.geometry, gw, res.body.legs, res.body.points);
+        var gw = route.geometry_warning || body.geometry_warning;
+        var drew = drawRoute(route.geometry, gw, body.legs, body.points);
         if (!drew && route.distance_km != null && !gw) {
           showError(MSG_GEOM_DESENHO);
         } else if (!drew && gw) {

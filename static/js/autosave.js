@@ -9,6 +9,9 @@
   }
 
   function csrfFromForm(form) {
+    if (window.CV && window.CV.http && typeof window.CV.http.getCsrfToken === 'function') {
+      return window.CV.http.getCsrfToken(form);
+    }
     var tokenInput = form.querySelector('input[name="csrfmiddlewaretoken"]');
     return (tokenInput && tokenInput.value) || '';
   }
@@ -108,32 +111,46 @@
       setState('saving');
       emit('autosave:before', payload);
       abortController = new AbortController();
-      inFlight = fetch(url, {
-        method: 'POST',
-        credentials: 'same-origin',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': csrfFromForm(form),
-          'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: JSON.stringify(payload),
-        signal: abortController.signal
-      }).then(function (response) {
-        var contentType = (response.headers && response.headers.get('content-type')) || '';
-        if (contentType.indexOf('application/json') === -1) {
-          throw new Error('Resposta inválida do servidor de autosave.');
-        }
-        return response.json().then(function (data) {
-          if (!response.ok || !data.ok) throw new Error((data && data.message) || 'Falha no autosave.');
+      var request = window.CV && window.CV.http && window.CV.http.fetchJson
+        ? window.CV.http.fetchJson(url, {
+            method: 'POST',
+            form: form,
+            body: payload,
+            signal: abortController.signal
+          })
+        : fetch(url, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': csrfFromForm(form),
+              'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify(payload),
+            signal: abortController.signal
+          }).then(function (response) {
+            var contentType = (response.headers && response.headers.get('content-type')) || '';
+            if (contentType.indexOf('application/json') === -1) {
+              throw new Error('Resposta inválida do servidor de autosave.');
+            }
+            return response.json().then(function (data) {
+              return { ok: response.ok, status: response.status, data: data };
+            });
+          });
+
+      inFlight = request.then(function (result) {
+          var data = result.data;
+          if (!result.ok || !data || !data.ok) {
+            throw new Error((data && data.message) || 'Falha no autosave.');
+          }
           dirtyFields.clear();
           dirtySnapshots.clear();
           applyCreation(data);
           setState('saved');
-          debug('resposta sucesso', response.status, data);
+          debug('resposta sucesso', result.status, data);
           emit('autosave:success', data);
           return true;
-        });
-      }).catch(function (error) {
+        }).catch(function (error) {
         if (error && error.name === 'AbortError') return false;
         setState('error');
         console.error('[autosave] erro', error);
