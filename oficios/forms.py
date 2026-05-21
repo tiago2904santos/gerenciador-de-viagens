@@ -179,18 +179,23 @@ class OficioDadosViajantesForm(OficioForm):
             "custeio_observacao": forms.TextInput(attrs={"class": "form-control"}),
             "servidores": ServidorEquipeSelectMultiple(
                 attrs={
-                    "class": "form-select app-multiselect__native",
-                    "data-app-multiselect": "true",
-                    "data-empty-selected": "Nenhum viajante selecionado.",
+                    "class": "form-select cv-search-picker__native",
+                    "data-cv-search-picker": "true",
+                    "data-picker-mode": "multi",
+                    "data-picker-variant": "detailed",
+                    "data-picker-term-control": "true",
+                    "data-picker-label": "Viajantes",
+                    "data-picker-hint": "Busque por nome, CPF ou RG. Em cada card, defina se o termo de autorização será gerado.",
+                    "data-cv-termos-name": "servidores_termo_autorizacao",
+                    "data-panel-title": "EQUIPE DO OFÍCIO",
+                    "data-placeholder": "Buscar por nome, CPF ou RG",
                     "data-empty-message": "Nenhum servidor encontrado.",
-                    "data-placeholder": "Digite nome, RG ou CPF",
-                    "data-search-placeholder": "Digite nome, RG ou CPF",
+                    "data-empty-selected": "Nenhum viajante selecionado.",
                 },
             ),
             "servidores_termo_autorizacao": ServidorEquipeSelectMultiple(
                 attrs={
-                    "class": "form-select app-termos-selector__native",
-                    "data-termos-selector-target": "true",
+                    "class": "form-select cv-search-picker__termos-native",
                 },
             ),
         }

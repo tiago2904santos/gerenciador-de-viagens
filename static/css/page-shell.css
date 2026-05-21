@@ -89,6 +89,7 @@
   --cv-wizard-section-header-padding: var(--space-4) var(--space-6) var(--space-4) var(--space-10);
   --cv-wizard-section-body-padding:   var(--space-5) var(--space-6);
   --cv-wizard-section-stack-gap:      var(--space-4);
+  --cv-wizard-section-stack-gap-comfortable: var(--space-5);
 
   /* --- Stepper --- */
   --stepper-padding-x:   var(--space-6);
@@ -1071,6 +1072,10 @@ html[data-theme="light"] {
   flex-direction: column;
   gap:            var(--cv-wizard-section-stack-gap);
   width:          100%;
+}
+
+.cv-wizard-section-stack--comfortable {
+  gap: var(--cv-wizard-section-stack-gap-comfortable);
 }
 
 .cv-wizard-section-card {

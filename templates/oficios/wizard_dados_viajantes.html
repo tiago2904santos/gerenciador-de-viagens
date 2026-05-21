@@ -85,7 +85,6 @@
       <header class="cv-wizard-section-header">
         <div class="cv-wizard-section-header__copy">
           <h3 class="cv-wizard-section-title" id="oficio-wizard-equipe-title">Equipe do ofício e motorista</h3>
-          <p class="cv-wizard-section-subtitle">Selecione os viajantes; um deles pode ser o motorista do deslocamento.</p>
         </div>
         <div class="cv-wizard-section-header__actions">
           {% include "components/buttons/action_button.html" with href=servidor_create_url label="Cadastrar novo viajante" variant="secondary" only %}
@@ -93,11 +92,11 @@
       </header>
       <div class="cv-wizard-section-body">
         <div class="field field-size-4">
-          {% include "components/forms/form_field.html" with field=form.servidores label="Buscar viajante" help_text="A busca mostra apenas viajantes finalizados e continua disponível após cada seleção." only %}
-        </div>
-        <div class="oficio-termos-selector-field" data-oficio-termos-selector>
           <input type="hidden" name="servidores_termo_autorizacao_present" value="1">
-          {{ form.servidores_termo_autorizacao }}
+          {% include "components/forms/form_field.html" with field=form.servidores only %}
+          <div hidden aria-hidden="true">
+            {{ form.servidores_termo_autorizacao }}
+          </div>
         </div>
         <div class="field field-size-4" data-oficio-driver-team-motorista>
           {% include "components/forms/form_field.html" with field=transporte_form.motorista label="Motorista (entre os viajantes)" help_text="Se escolher um viajante da equipe, o bloco de motorista externo não será necessário." only %}
@@ -112,8 +111,6 @@
 
 {% block extra_js %}
   {{ block.super }}
-  <script src="{% static 'js/components/app-multiselect.js' %}?v=20260512" defer></script>
-  <script src="{% static 'js/oficios_termos_selector.js' %}?v=20260512" defer></script>
   <script src="{% static 'js/pages/oficios-dados-viajantes.js' %}?v=20260512" defer></script>
   <script src="{% static 'js/pages/oficios-transporte.js' %}?v=20260512" defer></script>
   <script src="{% static 'js/pages/oficios-wizard-driver-state.js' %}?v=20260520" defer></script>
