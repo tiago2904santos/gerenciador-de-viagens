@@ -1,26 +1,33 @@
+/**
+ * MaskEngine — máscaras por data-mask (idempotente, re-scan em DOM dinâmico).
+ */
 (function () {
+  'use strict';
+
+  var BOUND = 'data-mask-bound';
+
   function onlyDigits(value) {
-    return (value || "").replace(/\D/g, "");
+    return String(value || '').replace(/\D/g, '');
   }
 
   function onlyAlnum(value) {
-    return (value || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+    return String(value || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
   }
 
   function maskCpf(value) {
-    const v = onlyDigits(value).slice(0, 11);
+    var v = onlyDigits(value).slice(0, 11);
     if (v.length <= 3) return v;
-    if (v.length <= 6) return `${v.slice(0, 3)}.${v.slice(3)}`;
-    if (v.length <= 9) return `${v.slice(0, 3)}.${v.slice(3, 6)}.${v.slice(6)}`;
-    return `${v.slice(0, 3)}.${v.slice(3, 6)}.${v.slice(6, 9)}-${v.slice(9)}`;
+    if (v.length <= 6) return v.slice(0, 3) + '.' + v.slice(3);
+    if (v.length <= 9) return v.slice(0, 3) + '.' + v.slice(3, 6) + '.' + v.slice(6);
+    return v.slice(0, 3) + '.' + v.slice(3, 6) + '.' + v.slice(6, 9) + '-' + v.slice(9);
   }
 
   function maskRg(value) {
-    const v = onlyAlnum(value).slice(0, 9);
+    var v = onlyAlnum(value).slice(0, 9);
     if (v.length <= 2) return v;
-    if (v.length <= 5) return `${v.slice(0, 2)}.${v.slice(2)}`;
-    if (v.length <= 8) return `${v.slice(0, 2)}.${v.slice(2, 5)}.${v.slice(5)}`;
-    return `${v.slice(0, 2)}.${v.slice(2, 5)}.${v.slice(5, 8)}-${v.slice(8)}`;
+    if (v.length <= 5) return v.slice(0, 2) + '.' + v.slice(2);
+    if (v.length <= 8) return v.slice(0, 2) + '.' + v.slice(2, 5) + '.' + v.slice(5);
+    return v.slice(0, 2) + '.' + v.slice(2, 5) + '.' + v.slice(5, 8) + '-' + v.slice(8);
   }
 
   function maskPlaca(value) {
@@ -28,53 +35,98 @@
   }
 
   function maskCep(value) {
-    const v = onlyDigits(value).slice(0, 8);
+    var v = onlyDigits(value).slice(0, 8);
     if (v.length <= 5) return v;
-    return `${v.slice(0, 5)}-${v.slice(5)}`;
+    return v.slice(0, 5) + '-' + v.slice(5);
   }
 
   function maskProtocolo(value) {
-    const v = onlyDigits(value).slice(0, 9);
+    var v = onlyDigits(value).slice(0, 9);
     if (v.length <= 2) return v;
-    if (v.length <= 5) return `${v.slice(0, 2)}.${v.slice(2)}`;
-    if (v.length <= 8) return `${v.slice(0, 2)}.${v.slice(2, 5)}.${v.slice(5)}`;
-    return `${v.slice(0, 2)}.${v.slice(2, 5)}.${v.slice(5, 8)}-${v.slice(8)}`;
+    if (v.length <= 5) return v.slice(0, 2) + '.' + v.slice(2);
+    if (v.length <= 8) return v.slice(0, 2) + '.' + v.slice(2, 5) + '.' + v.slice(5);
+    return v.slice(0, 2) + '.' + v.slice(2, 5) + '.' + v.slice(5, 8) + '-' + v.slice(8);
   }
 
   function maskTelefone(value) {
-    const v = onlyDigits(value).slice(0, 11);
-    if (!v) return "";
-    if (v.length <= 2) return `(${v}`;
-    if (v.length <= 6) return `(${v.slice(0, 2)}) ${v.slice(2)}`;
-    if (v.length <= 10) return `(${v.slice(0, 2)}) ${v.slice(2, 6)}-${v.slice(6)}`;
-    return `(${v.slice(0, 2)}) ${v.slice(2, 7)}-${v.slice(7)}`;
+    var v = onlyDigits(value).slice(0, 11);
+    if (!v) return '';
+    if (v.length <= 2) return '(' + v;
+    if (v.length <= 6) return '(' + v.slice(0, 2) + ') ' + v.slice(2);
+    if (v.length <= 10) return '(' + v.slice(0, 2) + ') ' + v.slice(2, 6) + '-' + v.slice(6);
+    return '(' + v.slice(0, 2) + ') ' + v.slice(2, 7) + '-' + v.slice(7);
   }
 
   function maskUpper(value) {
-    return (value || "").toUpperCase();
+    return String(value || '').toUpperCase();
   }
 
-  function applyMask(input) {
-    const mask = input.dataset.mask;
-    if (mask === "upper") input.value = maskUpper(input.value);
-    if (mask === "cpf") input.value = maskCpf(input.value);
-    if (mask === "rg") input.value = maskRg(input.value);
-    if (mask === "placa") input.value = maskPlaca(input.value);
-    if (mask === "cep") input.value = maskCep(input.value);
-    if (mask === "telefone") input.value = maskTelefone(input.value);
-    if (mask === "protocolo") input.value = maskProtocolo(input.value);
+  var formatters = {
+    upper: maskUpper,
+    cpf: maskCpf,
+    rg: maskRg,
+    placa: maskPlaca,
+    cep: maskCep,
+    telefone: maskTelefone,
+    protocolo: maskProtocolo,
+  };
+
+  function format(value, mask) {
+    var fn = formatters[mask];
+    if (!fn) return value == null ? '' : String(value);
+    return fn(value);
   }
 
-  function initMasks() {
-    document.querySelectorAll("input[data-mask]").forEach((input) => {
-      applyMask(input);
-      input.addEventListener("input", () => applyMask(input));
+  function isMaskable(el) {
+    if (!el || !el.dataset) return false;
+    if (!el.dataset.mask) return false;
+    if (el.disabled || el.readOnly) return false;
+    var tag = (el.tagName || '').toLowerCase();
+    return tag === 'input' || tag === 'textarea';
+  }
+
+  function apply(input) {
+    if (!isMaskable(input)) return;
+    var mask = input.dataset.mask;
+    var next = format(input.value, mask);
+    if (input.value !== next) {
+      input.value = next;
+    }
+  }
+
+  function bind(input) {
+    if (!isMaskable(input)) return;
+    if (input.getAttribute(BOUND) === 'true') return;
+    input.setAttribute(BOUND, 'true');
+    apply(input);
+    input.addEventListener('input', function () {
+      apply(input);
     });
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initMasks);
+  function scan(root) {
+    var scope = root && root.querySelectorAll ? root : document;
+    if (!scope || !scope.querySelectorAll) return;
+    scope.querySelectorAll('input[data-mask], textarea[data-mask]').forEach(bind);
+  }
+
+  var MaskEngine = {
+    scan: scan,
+    apply: apply,
+    format: format,
+  };
+
+  window.MaskEngine = MaskEngine;
+  window.CV = window.CV || {};
+  window.CV.masks = MaskEngine;
+
+  function boot() {
+    scan(document);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
   } else {
-    initMasks();
+    boot();
   }
 })();

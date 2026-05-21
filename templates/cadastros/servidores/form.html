@@ -4,7 +4,7 @@
   <div class="page-shell page-shell--standard-simple">
     {% include "components/ui/headers/header_stack_simple.html" with eyebrow="CADASTROS" title=page_title description=page_description icon_label="SV" module_label="Servidores" only %}
 
-    <form class="main-form-panel" method="post" novalidate data-servidor-sem-rg-form>
+    <form class="main-form-panel" method="post" novalidate data-servidor-sem-rg-form data-cv-state-toggle data-cv-state-binary>
       {% csrf_token %}
       {% include "components/ui/layouts/form_section.html" with title="Identificação" description="Nome, cargo e CPF são obrigatórios. RG e telefone são opcionais." section_id="servidores-form-id" only %}
       <div class="field-grid">

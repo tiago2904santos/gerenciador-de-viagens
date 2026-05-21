@@ -41,13 +41,52 @@ Painel: `#id` com classe `quick-add-panel` (ou equivalente com transição `is-o
 
 API: `window.CVRealtimeFilters.init(scope?)`.
 
-## Máscaras (`masks.js`)
+## Máscaras (`masks.js` / `MaskEngine`)
 
-| Atributo | Valores |
-|----------|---------|
-| `data-mask` | `upper`, `cpf`, `rg`, `placa`, `cep`, `telefone`, `protocolo` |
+| Atributo | Elemento | Valores |
+|----------|----------|---------|
+| `data-mask` | `input`, `textarea` | `upper`, `cpf`, `rg`, `placa`, `cep`, `telefone`, `protocolo` |
+| `data-mask-bound` | campo (interno) | `true` após bind — evita listeners duplicados |
 
-Re-scan dinâmico: pendente Fase 2 (`MaskEngine.scan(root)`).
+API:
+
+| Método | Uso |
+|--------|-----|
+| `MaskEngine.scan(root?)` | Inicializa campos em `document` ou subárvore |
+| `MaskEngine.apply(input)` | Aplica máscara ao valor atual |
+| `MaskEngine.format(value, mask)` | Formata string sem DOM |
+
+Aliases: `window.CV.masks` = `window.MaskEngine`.
+
+Exemplo após DOM dinâmico (Quick Add):
+
+```javascript
+window.MaskEngine.scan(panelElement);
+```
+
+Chamado automaticamente em `core/app.js` ao abrir painel Quick Add / quick edit.
+
+## State Toggle (`state-toggle.js`)
+
+| Atributo | Elemento | Uso |
+|----------|----------|-----|
+| `data-cv-state-toggle` | container (ex.: `form`) | Escopo do toggle |
+| `data-cv-state-binary` | container | Modo botão único + checkbox |
+| `data-cv-state-option` | botão | Opção em grupo (com `data-value`) |
+| `data-value` | opção | Valor aplicado ao input |
+| `data-cv-state-input` | input / seletor | Campo sincronizado (opcional; padrão: primeiro checkbox) |
+| `data-cv-state-trigger` | botão | Gatilho binário (alternativa a `data-rg-toggle`) |
+| `data-active-label` | botão/container | Label quando ativo |
+| `data-inactive-label` | botão/container | Label quando inativo |
+| `data-rg-toggle` | botão | Legado — RG servidor (binário) |
+| `data-motorista-fixo-toggle` | botão | Legado — motorista viatura (binário) |
+| `data-cv-state-bound` | container (interno) | Idempotência |
+
+Classes visuais: `is-active`, `is-inactive`, `cv-field-side-action--success`, `cv-field-side-action--danger`.
+
+API: `window.CV.stateToggle.init(root?)`, `window.CV.stateToggle.update(group, value)`.
+
+Evento: `cv:state-toggle:change` — `detail`: `{ value, input, toggle, fromUser? }`.
 
 ## Autosave (`autosave.js`)
 

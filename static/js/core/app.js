@@ -5,6 +5,15 @@ document.documentElement.dataset.appReady = "true";
     return toggle.getAttribute("aria-controls") || toggle.getAttribute("data-quick-add-toggle");
   }
 
+  function scanPanelMasks(panel) {
+    if (!panel) return;
+    if (window.MaskEngine && typeof window.MaskEngine.scan === "function") {
+      window.MaskEngine.scan(panel);
+    } else if (window.CV && window.CV.masks && typeof window.CV.masks.scan === "function") {
+      window.CV.masks.scan(panel);
+    }
+  }
+
   function initQuickAddToggles() {
     var toggles = Array.prototype.slice.call(document.querySelectorAll("[data-quick-add-toggle]"));
 
@@ -50,6 +59,7 @@ document.documentElement.dataset.appReady = "true";
         panel.hidden = false;
         window.requestAnimationFrame(function () {
           panel.classList.add("is-open");
+          scanPanelMasks();
         });
         toggle.setAttribute("aria-expanded", "true");
         toggle.classList.add("is-active");
@@ -114,12 +124,18 @@ document.documentElement.dataset.appReady = "true";
         // Abre o painel
         if (toggle.getAttribute("aria-expanded") !== "true") {
           toggle.click();
+        } else {
+          scanPanelMasks();
         }
 
         // Foca o primeiro campo editável
         var firstInput = panel.querySelector("input:not([type=hidden]), select, textarea");
         if (firstInput) {
-          window.setTimeout(function () { firstInput.focus(); firstInput.select(); }, 60);
+          window.setTimeout(function () {
+            scanPanelMasks(panel);
+            firstInput.focus();
+            firstInput.select();
+          }, 60);
         }
       });
     });

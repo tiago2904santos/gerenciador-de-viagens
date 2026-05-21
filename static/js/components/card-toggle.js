@@ -36,7 +36,6 @@
     const semRg = form.querySelector("#id_sem_rg");
     const rg = form.querySelector("#id_rg");
     const wrap = form.querySelector("[data-rg-field-wrap]");
-    const button = form.querySelector("[data-rg-toggle]");
     if (!semRg || !rg || !wrap) return;
 
     const active = semRg.checked;
@@ -45,19 +44,6 @@
     rg.setAttribute("aria-disabled", active ? "true" : "false");
     wrap.classList.toggle("field--locked", active);
 
-    if (button) {
-      button.classList.toggle("cv-field-side-action--success", !active);
-      button.classList.toggle("cv-field-side-action--danger", active);
-      button.classList.toggle("is-active", !active);
-      button.classList.toggle("is-inactive", active);
-      button.dataset.rgState = active ? "inactive" : "active";
-      button.setAttribute("aria-pressed", active ? "true" : "false");
-      const label = button.querySelector("span:last-child");
-      const activeLabel = button.dataset.rgLabelActive || "Possui RG";
-      const inactiveLabel = button.dataset.rgLabelInactive || "Não possui RG";
-      if (label) label.textContent = active ? inactiveLabel : activeLabel;
-    }
-
     if (active && (rgTechnicalValue === "NAOPOSSUIRG" || rgTechnicalValue.includes("POSSUI"))) {
       rg.value = "";
     } else if (opts && opts.clearRgOnLock && active) {
@@ -65,10 +51,16 @@
         rg.dataset.previousValue = rg.value;
       }
       rg.value = "";
+      if (window.MaskEngine && typeof window.MaskEngine.apply === "function") {
+        window.MaskEngine.apply(rg);
+      }
     } else if (!active && rg.value === "NAO POSSUI RG") {
       rg.value = "";
     } else if (!active && rg.dataset.previousValue && !rg.value) {
       rg.value = rg.dataset.previousValue;
+      if (window.MaskEngine && typeof window.MaskEngine.apply === "function") {
+        window.MaskEngine.apply(rg);
+      }
     }
   }
 
@@ -77,30 +69,21 @@
       const semRg = form.querySelector("#id_sem_rg");
       if (!semRg) return;
 
+      if (window.CV && window.CV.stateToggle && typeof window.CV.stateToggle.init === "function") {
+        window.CV.stateToggle.init(form);
+      }
+
       applyServidorSemRgUi(form, { clearRgOnLock: false });
-      semRg.addEventListener("change", () => applyServidorSemRgUi(form, { clearRgOnLock: true }));
-    });
-  }
 
-  function initServidorSemRgButton() {
-    document.addEventListener("click", (event) => {
-      const button = event.target.closest("[data-rg-toggle]");
-      if (!button) return;
-
-      const form = button.closest("[data-servidor-sem-rg-form]");
-      const semRg = form ? form.querySelector("#id_sem_rg") : null;
-      if (!form || !semRg) return;
-
-      event.preventDefault();
-      semRg.checked = !semRg.checked;
-      semRg.dispatchEvent(new Event("change", { bubbles: true }));
+      const onChange = () => applyServidorSemRgUi(form, { clearRgOnLock: true });
+      semRg.addEventListener("change", onChange);
+      form.addEventListener("cv:state-toggle:change", onChange);
     });
   }
 
   function boot() {
     initCardToggles();
     initServidorSemRg();
-    initServidorSemRgButton();
   }
 
   if (document.readyState === "loading") {

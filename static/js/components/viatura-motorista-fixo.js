@@ -1,71 +1,51 @@
 (function () {
-  "use strict";
+  'use strict';
 
   function applyViaturaMotoristaFixoUi(form, opts) {
-    const temMotoristaFixo = form.querySelector("#id_tem_motorista_fixo");
-    const panel = form.querySelector("[data-viatura-motoristas-panel]");
-    const button = form.querySelector("[data-motorista-fixo-toggle]");
-    const motoristasSelect = form.querySelector("#id_motoristas");
+    var temMotoristaFixo = form.querySelector('#id_tem_motorista_fixo');
+    var panel = form.querySelector('[data-viatura-motoristas-panel]');
+    var motoristasSelect = form.querySelector('#id_motoristas');
     if (!temMotoristaFixo || !panel) return;
 
-    const hasFixed = temMotoristaFixo.checked;
-    panel.classList.toggle("viatura-motoristas-panel--open", hasFixed);
-    panel.setAttribute("aria-hidden", hasFixed ? "false" : "true");
-
-    if (button) {
-      button.classList.toggle("cv-field-side-action--success", hasFixed);
-      button.classList.toggle("cv-field-side-action--danger", !hasFixed);
-      button.classList.toggle("is-active", hasFixed);
-      button.classList.toggle("is-inactive", !hasFixed);
-      button.setAttribute("aria-pressed", hasFixed ? "true" : "false");
-      const label = button.querySelector("span:last-child");
-      const activeLabel = button.dataset.mfLabelActive || "Com Motorista";
-      const inactiveLabel = button.dataset.mfLabelInactive || "Sem Motorista";
-      if (label) label.textContent = hasFixed ? activeLabel : inactiveLabel;
-    }
+    var hasFixed = temMotoristaFixo.checked;
+    panel.classList.toggle('viatura-motoristas-panel--open', hasFixed);
+    panel.setAttribute('aria-hidden', hasFixed ? 'false' : 'true');
 
     if (!hasFixed && motoristasSelect && opts && opts.clearOnHide) {
-      Array.from(motoristasSelect.options).forEach((option) => {
+      Array.prototype.forEach.call(motoristasSelect.options, function (option) {
         option.selected = false;
       });
-      motoristasSelect.dispatchEvent(new Event("change", { bubbles: true }));
+      motoristasSelect.dispatchEvent(new Event('change', { bubbles: true }));
     }
   }
 
   function initViaturaMotoristaFixoForms() {
-    document.querySelectorAll("[data-viatura-motorista-form]").forEach((form) => {
-      const temMotoristaFixo = form.querySelector("#id_tem_motorista_fixo");
+    document.querySelectorAll('[data-viatura-motorista-form]').forEach(function (form) {
+      var temMotoristaFixo = form.querySelector('#id_tem_motorista_fixo');
       if (!temMotoristaFixo) return;
 
+      if (window.CV && window.CV.stateToggle && typeof window.CV.stateToggle.init === 'function') {
+        window.CV.stateToggle.init(form);
+      }
+
       applyViaturaMotoristaFixoUi(form, { clearOnHide: false });
-      temMotoristaFixo.addEventListener("change", () =>
-        applyViaturaMotoristaFixoUi(form, { clearOnHide: true }),
-      );
-    });
-  }
 
-  function initViaturaMotoristaFixoButton() {
-    document.addEventListener("click", (event) => {
-      const button = event.target.closest("[data-motorista-fixo-toggle]");
-      if (!button) return;
+      temMotoristaFixo.addEventListener('change', function () {
+        applyViaturaMotoristaFixoUi(form, { clearOnHide: true });
+      });
 
-      const form = button.closest("[data-viatura-motorista-form]");
-      const temMotoristaFixo = form ? form.querySelector("#id_tem_motorista_fixo") : null;
-      if (!form || !temMotoristaFixo) return;
-
-      event.preventDefault();
-      temMotoristaFixo.checked = !temMotoristaFixo.checked;
-      temMotoristaFixo.dispatchEvent(new Event("change", { bubbles: true }));
+      form.addEventListener('cv:state-toggle:change', function () {
+        applyViaturaMotoristaFixoUi(form, { clearOnHide: true });
+      });
     });
   }
 
   function boot() {
     initViaturaMotoristaFixoForms();
-    initViaturaMotoristaFixoButton();
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", boot);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
   } else {
     boot();
   }
