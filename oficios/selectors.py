@@ -120,21 +120,41 @@ def _filtro_viaturas_equipe_oficio(equipe_servidor_ids: list[int] | None):
     return filtro
 
 
+def _unidade_ids_dos_servidores(servidor_ids: list[int] | None) -> list[int]:
+    """IDs únicos das unidades vinculadas a um conjunto de servidores."""
+    if not servidor_ids:
+        return []
+    return list(
+        Servidor.objects.filter(pk__in=servidor_ids, unidade_id__isnull=False)
+        .values_list("unidade_id", flat=True)
+        .distinct()
+    )
+
+
 def buscar_viaturas_para_oficio(
     termo: str,
     *,
     limit: int = 25,
     equipe_servidor_ids: list[int] | None = None,
+    motorista_id: int | None = None,
 ):
-    """Busca viaturas por placa, modelo, unidade vinculada ou nome de motorista cadastrado."""
+    """Busca viaturas por placa, modelo, unidade vinculada ou nome de motorista cadastrado.
+
+    Quando ``motorista_id`` é informado, as viaturas vinculadas a ele são retornadas
+    primeiro (prioridade máxima). Em seguida vêm as viaturas das unidades dos servidores
+    da equipe. O resultado final é ordenado por placa dentro de cada grupo.
+    """
     termo = (termo or "").strip()
 
     if len(termo) < 2:
         equipe_filter = _filtro_viaturas_equipe_oficio(equipe_servidor_ids)
-        if not equipe_filter:
+        if not equipe_filter and not motorista_id:
             return Viatura.objects.none()
+        combined = equipe_filter
+        if motorista_id:
+            combined = combined | Q(motoristas=motorista_id) if combined else Q(motoristas=motorista_id)
         return (
-            Viatura.objects.filter(equipe_filter)
+            Viatura.objects.filter(combined)
             .distinct()
             .select_related("combustivel", "unidade")
             .prefetch_related(
@@ -172,7 +192,20 @@ def buscar_viaturas_para_oficio(
     )
 
 
-def viatura_para_resultado_busca(v: Viatura) -> dict:
+def viatura_para_resultado_busca(
+    v: Viatura,
+    *,
+    motorista_id: int | None = None,
+    unidade_match_ids: list[int] | None = None,
+) -> dict:
+    """Resultado serializado de uma viatura para o picker do ofício.
+
+    Os parâmetros ``motorista_id`` e ``unidade_match_ids`` são opcionais e usados
+    apenas para definir o ``suggestion_reason`` (chip de motivo) e ordenação no
+    cliente. Quando ausentes, ``suggestion_reason`` fica vazio.
+    """
+    from django.urls import reverse
+
     motoristas = list(v.motoristas.all())
     nomes = ", ".join(m.nome for m in motoristas[:5])
     if len(motoristas) > 5:
@@ -185,15 +218,36 @@ def viatura_para_resultado_busca(v: Viatura) -> dict:
             if m.unidade_id:
                 unidade_txt = str(m.unidade)
                 break
+
+    combustivel_label = str(v.combustivel) if v.combustivel_id and v.combustivel else ""
+
+    suggestion_reason = ""
+    if motorista_id and any(m.pk == int(motorista_id) for m in motoristas):
+        suggestion_reason = "motorista"
+    elif unidade_match_ids:
+        if v.unidade_id and v.unidade_id in unidade_match_ids:
+            suggestion_reason = "unidade"
+        elif any(m.unidade_id in unidade_match_ids for m in motoristas if m.unidade_id):
+            suggestion_reason = "unidade"
+
+    try:
+        edit_url = reverse("cadastros:viatura_update", args=[v.pk])
+    except Exception:
+        edit_url = ""
+
     return {
         "id": v.pk,
         "placa": v.placa,
         "placa_formatada": v.placa_formatada,
         "modelo": v.modelo or "",
         "combustivel_id": v.combustivel_id,
+        "combustivel": combustivel_label,
         "tipo": v.tipo or "",
+        "unidade_id": v.unidade_id,
         "unidade_resumo": unidade_txt,
         "motoristas_resumo": nomes or "—",
+        "edit_url": edit_url,
+        "suggestion_reason": suggestion_reason,
     }
 
 

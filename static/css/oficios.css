@@ -1180,9 +1180,12 @@
 }
 
 .oficio-viatura-busca__result-main {
-  display: block;
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
   font-size: var(--font-size-md);
   font-weight: 600;
+  gap: var(--space-2);
 }
 
 .oficio-viatura-busca__result-meta {
@@ -1190,6 +1193,77 @@
   display: block;
   font-size: var(--font-size-sm);
   line-height: 1.35;
+}
+
+/* Chip de motivo da sugestão (Motorista / Unidade) */
+.oficio-viatura-busca__result-reason {
+  background: var(--surface-field-group, rgba(255, 255, 255, 0.06));
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.12));
+  border-radius: var(--radius-pill);
+  color: var(--text-secondary, var(--theme-text-muted));
+  font-size: var(--font-size-2xs, var(--font-size-xs));
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.04em;
+  line-height: 1;
+  padding: var(--space-1) var(--space-2);
+  text-transform: uppercase;
+}
+
+.oficio-viatura-busca__result-reason--motorista {
+  background: color-mix(in srgb, var(--color-accent, #d8a21b) 18%, transparent);
+  border-color: var(--stepper-done-border, var(--border-subtle));
+  color: var(--color-accent, var(--stepper-done-color));
+}
+
+.oficio-viatura-busca__result-reason--unidade {
+  background: color-mix(in srgb, var(--color-primary, #0b3a66) 14%, transparent);
+  border-color: var(--border-stepper, var(--border-subtle));
+  color: var(--color-primary-bright, var(--text-primary));
+}
+
+/* Garante que o painel manual fique de fato escondido quando a viatura
+   está vinculada (a classe utilitária .form-field--hidden é sobrescrita
+   por especificidade em alguns contextos do wizard). */
+.oficio-viatura-manual.form-field--hidden {
+  display: none !important;
+}
+
+/* Card compacto da viatura selecionada — uma linha de pills */
+.oficio-viatura-selected {
+  margin-block-start: var(--space-2);
+}
+
+.oficio-viatura-selected.form-field--hidden {
+  display: none !important;
+}
+
+.oficio-viatura-selected__pills {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.oficio-viatura-selected__pill {
+  background: var(--surface-stepper, var(--surface-card));
+  border: 1px solid var(--border-stepper, var(--border-subtle));
+  border-radius: var(--radius-pill);
+  color: var(--text-primary, var(--theme-text-heading));
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.2;
+  padding: var(--space-1) var(--space-3);
+  white-space: nowrap;
+}
+
+.oficio-viatura-selected__pill--placa {
+  background: color-mix(in srgb, var(--color-accent, #d8a21b) 16%, var(--surface-stepper, transparent));
+  border-color: var(--stepper-done-border, var(--border-subtle));
+  color: var(--color-accent, var(--stepper-done-color));
+}
+
+.oficio-viatura-selected__edit {
+  margin-inline-start: auto;
 }
 
 .oficio-viatura-busca__empty {

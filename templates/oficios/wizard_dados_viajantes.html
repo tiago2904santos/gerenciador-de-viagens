@@ -30,7 +30,6 @@
         <section class="wizard-inner-section" aria-labelledby="oficio-wizard-dados-oficio">
           <header class="wizard-inner-section__header">
             <h4 class="wizard-inner-section__title" id="oficio-wizard-dados-oficio">Dados do ofício</h4>
-            <p class="wizard-inner-section__description">Identificação administrativa, protocolo e custeio.</p>
           </header>
           {# Linha 1: N° do Ofício (readonly) | Protocolo | Custeio #}
           <div class="field-grid field-grid--cols-3">
@@ -63,7 +62,6 @@
         <section class="wizard-inner-section" aria-labelledby="oficio-wizard-motivo">
           <header class="wizard-inner-section__header">
             <h4 class="wizard-inner-section__title" id="oficio-wizard-motivo">Motivo</h4>
-            <p class="wizard-inner-section__description">Use um modelo salvo ou descreva o motivo da viagem.</p>
           </header>
           <div class="field-grid">
             {% include "components/forms/input_with_action.html" with field=form.modelo_motivo action_url=modelos_motivo_url action_label="Gerenciar modelos" size_class="field-size-4" only %}

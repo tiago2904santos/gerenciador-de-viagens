@@ -184,6 +184,19 @@ def _wizard_dados_viajantes_context(
         ref_raw = (transporte_form.data.get("motorista_oficio_referencia") or "").strip()
     else:
         ref_raw = (oficio.motorista_oficio_referencia or "").strip()
+
+    # Dados auxiliares para o card compacto de viatura selecionada (modo edição).
+    viatura_selecionada_unidade = ""
+    viatura_selecionada_edit_url = ""
+    if oficio.viatura_id and oficio.viatura:
+        viatura_selecionada_unidade = str(oficio.viatura.unidade) if oficio.viatura.unidade_id else "—"
+        try:
+            viatura_selecionada_edit_url = reverse(
+                "cadastros:viatura_update", args=[oficio.viatura_id]
+            )
+        except Exception:
+            viatura_selecionada_edit_url = ""
+
     return {
         "page_title": "Cadastro de ofício",
         **_wizard_shell_ctx(
@@ -203,6 +216,8 @@ def _wizard_dados_viajantes_context(
         "viatura_create_url": reverse("cadastros:viatura_create"),
         "api_viatura_placa_url": reverse("oficios:api_viatura_por_placa", args=[oficio.pk]),
         "equipe_servidor_ids_csv": ",".join(str(pk) for pk in equipe_ids),
+        "viatura_selecionada_unidade": viatura_selecionada_unidade,
+        "viatura_selecionada_edit_url": viatura_selecionada_edit_url,
         "motorista_extras_visivel": motorista_extras_visivel,
         "motorista_oficio_ano": oficio.ano or timezone.localdate().year,
         "motorista_oficio_numero_inicial": _motorista_oficio_numero_display(ref_raw),
@@ -722,7 +737,15 @@ def wizard_verificar_pdf_oficio(request, pk):
 
 @require_GET
 def api_viatura_por_placa(request, pk):
-    """Busca viaturas por texto (`q`) ou compatível com consulta só por placa (`placa`)."""
+    """Busca viaturas por texto (`q`) ou compatível com consulta só por placa (`placa`).
+
+    Parâmetros opcionais para o picker do wizard:
+    - ``motorista_id``: prioriza viaturas vinculadas ao motorista selecionado
+      (chip ``suggestion_reason="motorista"``).
+    - Por padrão também considera ``equipe`` do ofício para sugestões por unidade.
+    """
+    from .selectors import _unidade_ids_dos_servidores
+
     oficio = get_oficio_by_id(pk)
     legado_placa = request.GET.get("placa", "").strip()
     q = request.GET.get("q", "").strip()
@@ -744,11 +767,33 @@ def api_viatura_por_placa(request, pk):
 
     equipe_ids = list(oficio.servidores.values_list("pk", flat=True))
 
-    if len(q) < 2 and not equipe_ids:
+    motorista_id_raw = request.GET.get("motorista_id", "").strip()
+    try:
+        motorista_id = int(motorista_id_raw) if motorista_id_raw else None
+    except (TypeError, ValueError):
+        motorista_id = None
+
+    if len(q) < 2 and not equipe_ids and not motorista_id:
         return JsonResponse({"results": []})
 
-    encontradas = buscar_viaturas_para_oficio(q, equipe_servidor_ids=equipe_ids or None)
-    return JsonResponse({"results": [viatura_para_resultado_busca(v) for v in encontradas]})
+    encontradas = buscar_viaturas_para_oficio(
+        q,
+        equipe_servidor_ids=equipe_ids or None,
+        motorista_id=motorista_id,
+    )
+    unidade_match_ids = _unidade_ids_dos_servidores(equipe_ids)
+    results = [
+        viatura_para_resultado_busca(
+            v,
+            motorista_id=motorista_id,
+            unidade_match_ids=unidade_match_ids,
+        )
+        for v in encontradas
+    ]
+    # Ordenar: motorista_match -> unidade_match -> demais (mantém ordem por placa do queryset).
+    reason_order = {"motorista": 0, "unidade": 1}
+    results.sort(key=lambda r: reason_order.get(r.get("suggestion_reason") or "", 2))
+    return JsonResponse({"results": results})
 
 
 def _redirect_se_oficio_documento_incompleto(request, oficio):

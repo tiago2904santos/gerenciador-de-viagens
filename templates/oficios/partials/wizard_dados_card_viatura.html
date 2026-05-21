@@ -3,7 +3,6 @@
   <header class="cv-wizard-section-header">
     <div class="cv-wizard-section-header__copy">
       <h3 class="cv-wizard-section-title" id="oficio-wizard-viatura-title">Viatura</h3>
-      <p class="cv-wizard-section-subtitle">Selecione ou informe a viatura utilizada na viagem.</p>
     </div>
     <div class="cv-wizard-section-header__actions">
       {% include "components/buttons/action_button.html" with href=viatura_create_url label="Cadastrar nova viatura" variant="secondary" only %}
@@ -15,6 +14,8 @@
       class="oficio-transporte-root oficio-transporte-root--embedded"
       data-api-viatura-url="{{ api_viatura_placa_url }}"
       data-equipe-servidor-ids="{{ equipe_servidor_ids_csv }}"
+      data-viatura-unidade-resumo="{{ viatura_selecionada_unidade|default:'' }}"
+      data-viatura-edit-url="{{ viatura_selecionada_edit_url|default:'' }}"
     >
       {{ transporte_form.viatura }}
       {{ transporte_form.transporte_placa_manual }}
@@ -30,22 +31,44 @@
               </p>
             </div>
           </div>
-          <p class="field-help">Busque uma viatura cadastrada ou preencha os dados manualmente.</p>
         </div>
-        <p class="oficio-viatura-localizada field-help form-field--hidden" data-oficio-viatura-found hidden>
-          Viatura localizada no cadastro. Os dados vinculados não serão alterados aqui.
-        </p>
-        <div class="field field-size-2">
-          {% include "components/forms/form_field.html" with field=transporte_form.transporte_modelo_manual label="Modelo" only %}
+
+        {# Card compacto da viatura selecionada — exibido somente quando há viatura vinculada #}
+        <div class="field field-size-4 oficio-viatura-selected form-field--hidden"
+             data-oficio-viatura-selected
+             hidden
+             aria-live="polite">
+          <div class="oficio-viatura-selected__pills" data-oficio-viatura-selected-pills>
+            <span class="oficio-viatura-selected__pill oficio-viatura-selected__pill--placa"
+                  data-oficio-viatura-selected-placa></span>
+            <span class="oficio-viatura-selected__pill" data-oficio-viatura-selected-unidade></span>
+            <span class="oficio-viatura-selected__pill" data-oficio-viatura-selected-combustivel></span>
+            <span class="oficio-viatura-selected__pill" data-oficio-viatura-selected-tipo></span>
+            <a class="oficio-viatura-selected__edit cv-btn cv-btn--secondary cv-btn--sm"
+               href="#"
+               data-oficio-viatura-selected-edit
+               hidden>
+              Editar
+            </a>
+          </div>
         </div>
-        <div class="field field-size-2">
-          {% include "components/forms/form_field.html" with field=transporte_form.transporte_tipo_manual label="Tipo de viatura" only %}
-        </div>
-        <div class="field field-size-2">
-          {% include "components/forms/form_field.html" with field=transporte_form.transporte_combustivel_manual label="Combustível" only %}
-        </div>
-        <div class="field field-size-2">
-          {% include "components/forms/form_field.html" with field=transporte_form.porte_transporte_armas label="Porte/transporte de armas" only %}
+
+        {# Campos manuais — exibidos quando NÃO há viatura selecionada #}
+        <div class="field field-size-4 oficio-viatura-manual" data-oficio-viatura-manual-panel>
+          <div class="field-grid field-grid--cols-2">
+            <div class="field field-size-2">
+              {% include "components/forms/form_field.html" with field=transporte_form.transporte_modelo_manual label="Modelo" only %}
+            </div>
+            <div class="field field-size-2">
+              {% include "components/forms/form_field.html" with field=transporte_form.transporte_tipo_manual label="Tipo de viatura" only %}
+            </div>
+            <div class="field field-size-2">
+              {% include "components/forms/form_field.html" with field=transporte_form.transporte_combustivel_manual label="Combustível" only %}
+            </div>
+            <div class="field field-size-2">
+              {% include "components/forms/form_field.html" with field=transporte_form.porte_transporte_armas label="Porte/transporte de armas" only %}
+            </div>
+          </div>
         </div>
       </div>
     </div>

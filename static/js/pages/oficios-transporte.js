@@ -56,6 +56,14 @@
       this.buscaInput
         ? window.CvFloatingDropdown.attach(this.dropdown, this.buscaInput)
         : null;
+    // Card compacto da viatura selecionada (placa | unidade | combustível | tipo + editar)
+    this.selectedCard = root.querySelector("[data-oficio-viatura-selected]");
+    this.selectedPlaca = root.querySelector("[data-oficio-viatura-selected-placa]");
+    this.selectedUnidade = root.querySelector("[data-oficio-viatura-selected-unidade]");
+    this.selectedCombustivel = root.querySelector("[data-oficio-viatura-selected-combustivel]");
+    this.selectedTipo = root.querySelector("[data-oficio-viatura-selected-tipo]");
+    this.selectedEdit = root.querySelector("[data-oficio-viatura-selected-edit]");
+    this.manualPanelVeic = root.querySelector("[data-oficio-viatura-manual-panel]");
     this.modHidden = root.querySelector("[data-oficio-motorista-modo]");
     this.servidorPanel = root.querySelector("[data-oficio-motorista-servidor]");
     this.manualPanel = root.querySelector("[data-oficio-motorista-manual]");
@@ -158,17 +166,33 @@
     }
   };
 
+  OficioTransporte.prototype.getMotoristaIdFromTeam = function () {
+    const sel = this.motoristaSelect;
+    if (!sel || !sel.value) return "";
+    const id = parseInt(sel.value, 10);
+    if (!id) return "";
+    const ids = (this.root.dataset.equipeServidorIds || "")
+      .split(",")
+      .map(function (x) { return parseInt(x, 10) || 0; })
+      .filter(Boolean);
+    return ids.indexOf(id) !== -1 ? String(id) : "";
+  };
+
   OficioTransporte.prototype.runViaturaSearch = function () {
     const self = this;
     const term = (this.buscaInput.value || "").trim();
     if (!this.dropdown || !this.resultsEl) return;
 
-    if (term.length < 2 && !this.equipeServidorIds.length) {
+    const motoristaId = this.getMotoristaIdFromTeam();
+
+    if (term.length < 2 && !this.equipeServidorIds.length && !motoristaId) {
       this.closeViaturaDropdown();
       return;
     }
 
-    const url = `${this.apiUrl}?q=${encodeURIComponent(term)}`;
+    const params = ["q=" + encodeURIComponent(term)];
+    if (motoristaId) params.push("motorista_id=" + encodeURIComponent(motoristaId));
+    const url = this.apiUrl + "?" + params.join("&");
     window
       .fetch(url, { credentials: "same-origin", headers: { Accept: "application/json" } })
       .then(function (response) {
@@ -219,9 +243,21 @@
     btn.type = "button";
     btn.className = "oficio-viatura-busca__result";
     btn.setAttribute("role", "option");
+    if (item.suggestion_reason) {
+      btn.setAttribute("data-suggestion-reason", item.suggestion_reason);
+    }
     const main = document.createElement("span");
     main.className = "oficio-viatura-busca__result-main";
     main.textContent = [item.placa_formatada, item.modelo].filter(Boolean).join(" • ") || "Viatura";
+    // Chip de motivo: motorista / unidade
+    if (item.suggestion_reason === "motorista" || item.suggestion_reason === "unidade") {
+      const chip = document.createElement("span");
+      chip.className =
+        "oficio-viatura-busca__result-reason oficio-viatura-busca__result-reason--" +
+        item.suggestion_reason;
+      chip.textContent = item.suggestion_reason === "motorista" ? "Motorista" : "Unidade";
+      main.appendChild(chip);
+    }
     const sub = document.createElement("span");
     sub.className = "oficio-viatura-busca__result-meta";
     sub.textContent =
@@ -273,7 +309,59 @@
       dispatchFieldEvents(this.tipoSelect);
     }
     this.selectedViaturaId = String(item.id);
+    this.renderSelectedCard(item);
     this.setViaturaLocked(true);
+  };
+
+  OficioTransporte.prototype.renderSelectedCard = function (item) {
+    if (!this.selectedCard) return;
+    if (this.selectedPlaca) this.selectedPlaca.textContent = item.placa_formatada || "";
+    if (this.selectedUnidade) this.selectedUnidade.textContent = item.unidade_resumo || "—";
+    if (this.selectedCombustivel) {
+      // item.combustivel pode vir do endpoint enriquecido; fallback para texto do select.
+      let label = item.combustivel || "";
+      if (!label && this.combustivelSelect && this.combustivelSelect.value) {
+        const opt = this.combustivelSelect.options[this.combustivelSelect.selectedIndex];
+        label = (opt && opt.text) || "";
+      }
+      this.selectedCombustivel.textContent = label || "—";
+    }
+    if (this.selectedTipo) {
+      let tipoLabel = item.tipo || "";
+      if (!tipoLabel && this.tipoSelect && this.tipoSelect.value) {
+        const opt = this.tipoSelect.options[this.tipoSelect.selectedIndex];
+        tipoLabel = (opt && opt.text) || "";
+      }
+      this.selectedTipo.textContent = tipoLabel || "—";
+    }
+    if (this.selectedEdit) {
+      if (item.edit_url) {
+        this.selectedEdit.setAttribute("href", item.edit_url);
+        this.selectedEdit.hidden = false;
+        this.selectedEdit.removeAttribute("hidden");
+      } else {
+        this.selectedEdit.setAttribute("href", "#");
+        this.selectedEdit.hidden = true;
+        this.selectedEdit.setAttribute("hidden", "hidden");
+      }
+    }
+  };
+
+  OficioTransporte.prototype.clearSelectedCard = function () {
+    if (!this.selectedCard) return;
+    [
+      this.selectedPlaca,
+      this.selectedUnidade,
+      this.selectedCombustivel,
+      this.selectedTipo,
+    ].forEach(function (el) {
+      if (el) el.textContent = "";
+    });
+    if (this.selectedEdit) {
+      this.selectedEdit.setAttribute("href", "#");
+      this.selectedEdit.hidden = true;
+      this.selectedEdit.setAttribute("hidden", "hidden");
+    }
   };
 
   OficioTransporte.prototype.bindMotoristaToggle = function () {
@@ -387,13 +475,47 @@
       this.foundBanner.hidden = !locked;
       this.foundBanner.classList.toggle("form-field--hidden", !locked);
     }
+    // Alterna visibilidade entre card compacto (locked) e painel manual (unlocked).
+    if (this.selectedCard) {
+      this.selectedCard.hidden = !locked;
+      this.selectedCard.classList.toggle("form-field--hidden", !locked);
+    }
+    if (this.manualPanelVeic) {
+      this.manualPanelVeic.classList.toggle("form-field--hidden", !!locked);
+      this.manualPanelVeic.setAttribute("aria-hidden", locked ? "true" : "false");
+    }
+    if (!locked) {
+      this.clearSelectedCard();
+    }
   };
 
   OficioTransporte.prototype.syncViaturaLockFromDom = function () {
     const id = this.viaturaInput && this.viaturaInput.value;
     if (id) {
       this.selectedViaturaId = String(id);
+      // Reidrata card compacto a partir dos campos manuais já preenchidos no SSR
+      // e da busca (placa_formatada vem do label salvo).
+      const placa = (this.buscaInput && this.buscaInput.value) || "";
+      const tipoLabel = (function (sel) {
+        if (!sel || !sel.value) return "";
+        const opt = sel.options[sel.selectedIndex];
+        return (opt && opt.text) || "";
+      })(this.tipoSelect);
+      const combLabel = (function (sel) {
+        if (!sel || !sel.value) return "";
+        const opt = sel.options[sel.selectedIndex];
+        return (opt && opt.text) || "";
+      })(this.combustivelSelect);
+      this.renderSelectedCard({
+        placa_formatada: placa,
+        unidade_resumo: this.root.dataset.viaturaUnidadeResumo || "—",
+        combustivel: combLabel,
+        tipo: tipoLabel,
+        edit_url: this.root.dataset.viaturaEditUrl || "",
+      });
       this.setViaturaLocked(true);
+    } else {
+      this.setViaturaLocked(false);
     }
   };
 
