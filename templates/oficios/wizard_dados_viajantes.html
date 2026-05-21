@@ -32,22 +32,22 @@
             <h4 class="wizard-inner-section__title" id="oficio-wizard-dados-oficio">Dados do ofício</h4>
             <p class="wizard-inner-section__description">Identificação administrativa, protocolo e custeio.</p>
           </header>
-          {# Linha 1: N° do Ofício | Protocolo | Custeio | Data de criação #}
-          <div class="field-grid">
-            <div class="field field-size-1">
-              <span class="field__label">N° do Ofício</span>
-              <p class="field__static-value">{{ wizard_summary.numero_label }}</p>
+          {# Linha 1: N° do Ofício (readonly) | Protocolo | Custeio #}
+          <div class="field-grid field-grid--cols-3">
+            <div class="field app-form-field">
+              <label class="app-form-label" for="oficio-wizard-numero-readonly">N° do Ofício</label>
+              <input
+                type="text"
+                class="form-control"
+                id="oficio-wizard-numero-readonly"
+                value="{{ wizard_summary.numero_label }}"
+                readonly
+                aria-readonly="true"
+                tabindex="-1"
+              >
             </div>
-            <div class="field field-size-1">
-              {% include "components/forms/form_field.html" with field=form.protocolo label="Protocolo" only %}
-            </div>
-            <div class="field field-size-1">
-              {% include "components/forms/form_field.html" with field=form.custeio label="Custeio" only %}
-            </div>
-            <div class="field field-size-1">
-              <span class="field__label">Data criação:</span>
-              <p class="field__static-value">{{ wizard_summary.data_criacao_label }}</p>
-            </div>
+            {% include "components/forms/form_field.html" with field=form.protocolo label="Protocolo" only %}
+            {% include "components/forms/form_field.html" with field=form.custeio label="Custeio" only %}
             {# Linha 2: Nome da Instituição — somente quando custeio = Outra instituição #}
             <div
               class="field field-size-4{% if not mostrar_custeio_observacao %} form-field--hidden{% endif %}"
@@ -61,27 +61,17 @@
         </section>
 
         <section class="wizard-inner-section" aria-labelledby="oficio-wizard-motivo">
-          <header class="wizard-inner-section__header wizard-inner-section__header--actions">
-            <div class="wizard-inner-section__header-copy">
-              <h4 class="wizard-inner-section__title" id="oficio-wizard-motivo">Motivo</h4>
-              <p class="wizard-inner-section__description">Use um modelo salvo ou descreva o motivo da viagem.</p>
-            </div>
-            {% include "components/ui/buttons/field_action_button.html" with href=modelos_motivo_url label="Gerenciar modelos" variant="secondary" icon="settings" aria_label="Gerenciar modelos" only %}
+          <header class="wizard-inner-section__header">
+            <h4 class="wizard-inner-section__title" id="oficio-wizard-motivo">Motivo</h4>
+            <p class="wizard-inner-section__description">Use um modelo salvo ou descreva o motivo da viagem.</p>
           </header>
           <div class="field-grid">
-            <div class="field field-size-4">
-              <label for="{{ form.modelo_motivo.id_for_label }}">{{ form.modelo_motivo.label }}</label>
-              <select name="{{ form.modelo_motivo.html_name }}" id="{{ form.modelo_motivo.id_for_label }}" class="form-select" data-modelo-motivo-select="true">
-                <option value="">Selecione um modelo (opcional)</option>
-                {% for modelo in form.fields.modelo_motivo.queryset %}
-                  <option value="{{ modelo.pk }}" data-texto-motivo="{{ modelo.texto }}"{% if form.modelo_motivo.value|stringformat:'s' == modelo.pk|stringformat:'s' %} selected{% endif %}>{{ modelo.nome }}</option>
-                {% endfor %}
-              </select>
-              {% if form.modelo_motivo.errors %}<p class="field-error">{{ form.modelo_motivo.errors|striptags }}</p>{% endif %}
-              {% if not tem_modelos_motivo %}
+            {% include "components/forms/input_with_action.html" with field=form.modelo_motivo action_url=modelos_motivo_url action_label="Gerenciar modelos" size_class="field-size-4" only %}
+            {% if not tem_modelos_motivo %}
+              <div class="field field-size-4">
                 <p class="field-help">Nenhum modelo cadastrado. <a href="{{ modelos_motivo_url }}">Abrir gerenciamento de modelos</a></p>
-              {% endif %}
-            </div>
+              </div>
+            {% endif %}
             <div class="field field-size-4">
               {% include "components/forms/form_field.html" with field=form.motivo only %}
             </div>

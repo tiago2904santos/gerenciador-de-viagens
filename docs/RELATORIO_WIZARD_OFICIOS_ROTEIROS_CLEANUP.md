@@ -116,7 +116,7 @@ Pasta: `screenshots/wizard-parity-clean/` — ver `README.md` na pasta para capt
 **Antes:** `field-grid--cols-3` com 5 campos em ordem: N° do Ofício | Protocolo | Data criação | Custeio (size-2) | Nome da Instituição (size-4)
 - Problemas: Custeio ficava numa segunda linha sozinho (size-2 numa grid de 3); Data de criação estava antes do Custeio; coluna estreita causava quebra do texto da data.
 
-**Depois:** `field-grid` (4-col padrão) com campos reordenados: N° do Ofício (size-1) | Protocolo (size-1) | Custeio (size-1) | Data de criação (size-1) na linha 1. Nome da Instituição (size-4) na linha 2, condicional.
+**Depois:** `field-grid--cols-3` com N° do Ofício (`readonly`), Protocolo e Custeio na linha 1. Data de criação removida do card. Nome da Instituição (size-4) na linha 2, condicional.
 
 Responsividade natural pelo sistema global:
 - Desktop (> 840px): 4 colunas na mesma linha ✅
@@ -139,8 +139,7 @@ Evita que valores curtos de display como datas (`21/05/2026`) quebrem em colunas
 
 ### Component usado no botão Gerenciar modelos
 
-`components/ui/buttons/field_action_button.html` com `variant="secondary"` e `icon="settings"` — mesmo padrão do UI Lab/Cadastros para ações laterais “Gerenciar cargo/unidade/combustíveis” (`cv-field-side-action cv-field-side-action--secondary`).
-Substitui `action_button.html` no header da inner-section Motivo.
+`components/forms/input_with_action.html` no campo **Modelo de motivo** — mesmo padrão do select **Cargo** em servidores: `cv-field-with-action--manage-reveal` + `field_manage_button.html` (ícone circular oculto até hover/focus).
 
 ### Ajuste do textarea Motivo
 
