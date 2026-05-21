@@ -171,9 +171,11 @@ class OficioDadosViajantesForm(OficioForm):
         widgets = {
             "protocolo": forms.TextInput(attrs={"class": "form-control", "data-mask": "protocolo"}),
             "motivo": forms.Textarea(
-                attrs={"class": "form-control", "rows": 4, "data-motivo-textarea": "true"},
+                attrs={"class": "form-control", "rows": 2, "data-motivo-textarea": "true"},
             ),
-            "custeio": forms.Select(attrs={"class": "form-select"}),
+            "custeio": forms.Select(
+                attrs={"class": "form-select", "data-oficio-custeio-field": "true"},
+            ),
             "custeio_observacao": forms.TextInput(attrs={"class": "form-control"}),
             "servidores": ServidorEquipeSelectMultiple(
                 attrs={

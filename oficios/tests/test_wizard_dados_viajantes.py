@@ -429,7 +429,8 @@ class OficioWizardDadosViajantesTests(TestCase):
 
     def test_custeio_observacao_inicia_oculto_quando_nao_e_outra_instituicao(self):
         response = self.client.get(self._novo_rascunho_url())
-        self.assertContains(response, "oficio-data-observacao")
+        self.assertContains(response, "data-oficio-custeio-field")
+        self.assertContains(response, "data-oficio-instituicao-field")
         self.assertContains(response, "form-field--hidden")
         self.assertContains(response, "data-custeio-observacao-wrapper")
 
@@ -441,11 +442,11 @@ class OficioWizardDadosViajantesTests(TestCase):
             custeio=Oficio.CUSTEIO_OUTRA_INSTITUICAO,
         )
         response = self.client.get(reverse("oficios:dados_viajantes", args=[oficio.pk]))
-        self.assertContains(response, "oficio-data-observacao")
+        self.assertContains(response, "data-oficio-instituicao-field")
         self.assertContains(response, "data-custeio-observacao-wrapper")
         self.assertNotContains(
             response,
-            'oficio-data-observacao form-field--hidden',
+            'data-oficio-instituicao-field form-field--hidden',
         )
 
     def test_post_custeio_outra_instituicao_sem_observacao_salva_rascunho(self):

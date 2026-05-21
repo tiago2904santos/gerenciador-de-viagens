@@ -20,23 +20,32 @@
     });
   }
 
-  function shouldShowCusteioObservacao(value) {
-    return (value || "").toUpperCase() === "OUTRA_INSTITUICAO";
+  function getOutraInstituicaoValue(wrapper) {
+    return (wrapper && wrapper.getAttribute("data-oficio-custeio-outra-value")) || "OUTRA_INSTITUICAO";
   }
 
-  function updateCusteioObservacaoVisibility(select, wrapper) {
-    const visible = shouldShowCusteioObservacao(select.value);
+  function shouldShowCusteioObservacao(value, outraValue) {
+    return (value || "").toUpperCase() === (outraValue || "OUTRA_INSTITUICAO").toUpperCase();
+  }
+
+  function updateCusteioObservacaoVisibility(select, wrapper, outraValue) {
+    const visible = shouldShowCusteioObservacao(select.value, outraValue);
     wrapper.classList.toggle("form-field--hidden", !visible);
   }
 
   function initCusteioObservacao() {
-    const select = document.querySelector("select[name='custeio']");
-    const wrapper = document.querySelector("[data-custeio-observacao-wrapper]");
+    const select =
+      document.querySelector("[data-oficio-custeio-field]") ||
+      document.querySelector("select[name='custeio']");
+    const wrapper =
+      document.querySelector("[data-oficio-instituicao-field]") ||
+      document.querySelector("[data-custeio-observacao-wrapper]");
     if (!select || !wrapper) return;
+    const outraValue = getOutraInstituicaoValue(wrapper);
     select.addEventListener("change", function () {
-      updateCusteioObservacaoVisibility(select, wrapper);
+      updateCusteioObservacaoVisibility(select, wrapper, outraValue);
     });
-    updateCusteioObservacaoVisibility(select, wrapper);
+    updateCusteioObservacaoVisibility(select, wrapper, outraValue);
   }
 
   if (document.readyState === "loading") {

@@ -109,6 +109,64 @@ Pasta: `screenshots/wizard-parity-clean/` — ver `README.md` na pasta para capt
 - Campo persistido `carona` no model + migration.
 - Consolidar viatura só na etapa 1 no fluxo de navegação.
 
+## Ajuste — Dados principais do Ofício (Etapa 1)
+
+### Grid — antes / depois
+
+**Antes:** `field-grid--cols-3` com 5 campos em ordem: N° do Ofício | Protocolo | Data criação | Custeio (size-2) | Nome da Instituição (size-4)
+- Problemas: Custeio ficava numa segunda linha sozinho (size-2 numa grid de 3); Data de criação estava antes do Custeio; coluna estreita causava quebra do texto da data.
+
+**Depois:** `field-grid` (4-col padrão) com campos reordenados: N° do Ofício (size-1) | Protocolo (size-1) | Custeio (size-1) | Data de criação (size-1) na linha 1. Nome da Instituição (size-4) na linha 2, condicional.
+
+Responsividade natural pelo sistema global:
+- Desktop (> 840px): 4 colunas na mesma linha ✅
+- Tablet (≤ 840px): 2 colunas por linha (2+2) ✅
+- Mobile (≤ 600px): 1 coluna ✅
+
+### Regra de exibição do campo Nome da Instituição
+
+Controlado pelo JS em `static/js/pages/oficios-dados-viajantes.js`:
+- Detecção: `data-oficio-custeio-field` (fallback `select[name='custeio']`) + valor de `data-oficio-custeio-outra-value` (default `OUTRA_INSTITUICAO`)
+- Trigger: event `change` no select + execução imediata no `DOMContentLoaded`
+- DOM: `data-oficio-instituicao-field` / `data-custeio-observacao-wrapper` + classe `form-field--hidden` para esconder
+- Estado inicial: controlado pela variável de contexto `mostrar_custeio_observacao` do Django
+- Nenhuma alteração no JS foi necessária; estava funcional
+
+### Correção da data quebrando
+
+Adicionado `white-space: nowrap` na regra `.field__static-value` em `page-shell.css`.
+Evita que valores curtos de display como datas (`21/05/2026`) quebrem em colunas estreitas.
+
+### Component usado no botão Gerenciar modelos
+
+`components/ui/buttons/field_action_button.html` com `variant="secondary"` e `icon="settings"` — mesmo padrão do UI Lab/Cadastros para ações laterais “Gerenciar cargo/unidade/combustíveis” (`cv-field-side-action cv-field-side-action--secondary`).
+Substitui `action_button.html` no header da inner-section Motivo.
+
+### Ajuste do textarea Motivo
+
+Alterado `rows=4` → `rows=2` no widget `motivo` da classe `OficioDadosViajantesForm` em `oficios/forms.py`.
+Sem mudança em CSS, sem inline style.
+
+### Arquivos alterados
+
+| Arquivo | Mudança |
+|---|---|
+| `templates/oficios/wizard_dados_viajantes.html` | `field-grid` 4 colunas; reordenação; data attributes condicional; `field_action_button` no Motivo |
+| `oficios/forms.py` | `rows=2` no textarea motivo; `data-oficio-custeio-field` no select custeio |
+| `static/js/pages/oficios-dados-viajantes.js` | Seletores `data-oficio-*` + valor configurável de “Outra instituição” |
+| `static/css/page-shell.css` | `white-space: nowrap` em `.field__static-value` |
+
+### Testes executados
+
+- `python manage.py check` → 0 issues ✅
+- Smoke manual via preview: grid correto, condicional funcionando, data sem quebra, textarea 2 linhas ✅
+
+### Pendências
+
+Nenhuma crítica. Custeio com `field-size-1` funciona bem; se o select precisar de mais largura em algum viewport, ajustar para `field-size-2` e mover Data criação para a linha 2.
+
+---
+
 ## 14. Decisão
 
 **A. Liberado para continuar paridade de steps 2–6**

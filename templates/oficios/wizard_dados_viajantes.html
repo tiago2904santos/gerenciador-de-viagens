@@ -32,7 +32,8 @@
             <h4 class="wizard-inner-section__title" id="oficio-wizard-dados-oficio">Dados do ofício</h4>
             <p class="wizard-inner-section__description">Identificação administrativa, protocolo e custeio.</p>
           </header>
-          <div class="field-grid field-grid--cols-3">
+          {# Linha 1: N° do Ofício | Protocolo | Custeio | Data de criação #}
+          <div class="field-grid">
             <div class="field field-size-1">
               <span class="field__label">N° do Ofício</span>
               <p class="field__static-value">{{ wizard_summary.numero_label }}</p>
@@ -41,13 +42,19 @@
               {% include "components/forms/form_field.html" with field=form.protocolo label="Protocolo" only %}
             </div>
             <div class="field field-size-1">
+              {% include "components/forms/form_field.html" with field=form.custeio label="Custeio" only %}
+            </div>
+            <div class="field field-size-1">
               <span class="field__label">Data criação:</span>
               <p class="field__static-value">{{ wizard_summary.data_criacao_label }}</p>
             </div>
-            <div class="field field-size-2">
-              {% include "components/forms/form_field.html" with field=form.custeio label="Custeio" only %}
-            </div>
-            <div class="field field-size-4 oficio-data-observacao{% if not mostrar_custeio_observacao %} form-field--hidden{% endif %}" data-custeio-observacao-wrapper>
+            {# Linha 2: Nome da Instituição — somente quando custeio = Outra instituição #}
+            <div
+              class="field field-size-4{% if not mostrar_custeio_observacao %} form-field--hidden{% endif %}"
+              data-custeio-observacao-wrapper
+              data-oficio-instituicao-field
+              data-oficio-custeio-outra-value="{{ outra_instituicao_custeio_value|default:'OUTRA_INSTITUICAO' }}"
+            >
               {% include "components/forms/form_field.html" with field=form.custeio_observacao label="Nome da Instituição" only %}
             </div>
           </div>
@@ -59,7 +66,7 @@
               <h4 class="wizard-inner-section__title" id="oficio-wizard-motivo">Motivo</h4>
               <p class="wizard-inner-section__description">Use um modelo salvo ou descreva o motivo da viagem.</p>
             </div>
-            {% include "components/buttons/action_button.html" with href=modelos_motivo_url label="Gerenciar modelos" variant="secondary" only %}
+            {% include "components/ui/buttons/field_action_button.html" with href=modelos_motivo_url label="Gerenciar modelos" variant="secondary" icon="settings" aria_label="Gerenciar modelos" only %}
           </header>
           <div class="field-grid">
             <div class="field field-size-4">

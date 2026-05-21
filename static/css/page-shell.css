@@ -863,6 +863,7 @@ html[data-theme="light"] {
   font-size:   var(--font-size-md);
   font-weight: var(--font-weight-semibold);
   margin:      0;
+  white-space: nowrap;
 }
 
 .footer-actions--primary-only {
