@@ -1,4 +1,8 @@
-{# Viatura — campos do OficioTransporteForm (mesmos names do step transporte) #}
+{% comment %}
+Viatura — picker single visualmente derivado do cv-search-picker detalhado.
+Os campos manuais do OficioTransporteForm permanecem como fallback
+quando nenhuma viatura cadastrada está vinculada.
+{% endcomment %}
 <section class="cv-wizard-section-card" aria-labelledby="oficio-wizard-viatura-title" data-oficio-viatura-card>
   <header class="cv-wizard-section-header">
     <div class="cv-wizard-section-header__copy">
@@ -16,58 +20,62 @@
       data-equipe-servidor-ids="{{ equipe_servidor_ids_csv }}"
       data-viatura-unidade-resumo="{{ viatura_selecionada_unidade|default:'' }}"
       data-viatura-edit-url="{{ viatura_selecionada_edit_url|default:'' }}"
+      data-viatura-modelo-saved="{{ viatura_selecionada_modelo|default:'' }}"
+      data-viatura-combustivel-label="{{ viatura_selecionada_combustivel|default:'' }}"
+      data-viatura-tipo-label="{{ viatura_selecionada_tipo|default:'' }}"
     >
       {{ transporte_form.viatura }}
       {{ transporte_form.transporte_placa_manual }}
-      <div class="field-grid field-grid--cols-1" data-oficio-viatura-panel>
-        <div class="field field-size-4 oficio-viatura-busca">
-          <label for="{{ transporte_form.transporte_busca_ui.id_for_label }}">{{ transporte_form.transporte_busca_ui.label }}</label>
-          <div class="oficio-viatura-busca__wrap">
+
+      {% comment %}
+      Picker visualmente clonado do cv-search-picker (mode=single, variant=detailed).
+      CSS reutilizado integralmente; JS dedicado em oficios-transporte.js.
+      {% endcomment %}
+      <div
+        class="cv-search-picker cv-search-picker--single cv-search-picker--detailed oficio-viatura-picker"
+        data-oficio-vehicle-picker
+      >
+        <div class="cv-search-picker__field">
+          <div class="cv-search-picker__label">Viatura</div>
+          <div class="cv-search-picker__hint">Busque por placa, unidade, combustível ou tipo. Sugestões vêm do motorista e da equipe do ofício.</div>
+          <div class="cv-search-picker__control">
+            <span class="cv-search-picker__icon" aria-hidden="true"></span>
             {{ transporte_form.transporte_busca_ui }}
-            <div class="oficio-viatura-busca__dropdown" data-oficio-viatura-dropdown hidden>
-              <div class="oficio-viatura-busca__list" data-oficio-viatura-results role="listbox"></div>
-              <p class="oficio-viatura-busca__empty field-help" data-oficio-viatura-empty hidden>
-                Nenhuma viatura encontrada. Preencha manualmente ou cadastre uma nova viatura.
-              </p>
+            <button class="cv-search-picker__clear" type="button" aria-label="Limpar busca" data-oficio-viatura-clear>x</button>
+          </div>
+          <div class="cv-search-picker__dropdown" data-oficio-viatura-dropdown hidden>
+            <div class="cv-search-picker__list" data-oficio-viatura-results role="listbox"></div>
+            <div class="cv-search-picker__empty" data-oficio-viatura-empty hidden>
+              Nenhuma viatura encontrada. Preencha manualmente ou cadastre uma nova viatura.
             </div>
           </div>
         </div>
 
-        {# Card compacto da viatura selecionada — exibido somente quando há viatura vinculada #}
-        <div class="field field-size-4 oficio-viatura-selected form-field--hidden"
-             data-oficio-viatura-selected
-             hidden
-             aria-live="polite">
-          <div class="oficio-viatura-selected__pills" data-oficio-viatura-selected-pills>
-            <span class="oficio-viatura-selected__pill oficio-viatura-selected__pill--placa"
-                  data-oficio-viatura-selected-placa></span>
-            <span class="oficio-viatura-selected__pill" data-oficio-viatura-selected-unidade></span>
-            <span class="oficio-viatura-selected__pill" data-oficio-viatura-selected-combustivel></span>
-            <span class="oficio-viatura-selected__pill" data-oficio-viatura-selected-tipo></span>
-            <a class="oficio-viatura-selected__edit cv-btn cv-btn--secondary cv-btn--sm"
-               href="#"
-               data-oficio-viatura-selected-edit
-               hidden>
-              Editar
-            </a>
+        <section class="cv-search-picker__selected-panel">
+          <div class="cv-search-picker__selected-header">
+            <h4 class="cv-search-picker__selected-title">VIATURA SELECIONADA</h4>
           </div>
-        </div>
+          <div class="cv-search-picker__selected-list" data-oficio-viatura-selected-list></div>
+          <p class="cv-search-picker__selected-empty" data-oficio-viatura-selected-empty>
+            Nenhuma viatura selecionada — preencha os dados manuais abaixo ou busque uma cadastrada.
+          </p>
+        </section>
+      </div>
 
-        {# Campos manuais — exibidos quando NÃO há viatura selecionada #}
-        <div class="field field-size-4 oficio-viatura-manual" data-oficio-viatura-manual-panel>
-          <div class="field-grid field-grid--cols-2">
-            <div class="field field-size-2">
-              {% include "components/forms/form_field.html" with field=transporte_form.transporte_modelo_manual label="Modelo" only %}
-            </div>
-            <div class="field field-size-2">
-              {% include "components/forms/form_field.html" with field=transporte_form.transporte_tipo_manual label="Tipo de viatura" only %}
-            </div>
-            <div class="field field-size-2">
-              {% include "components/forms/form_field.html" with field=transporte_form.transporte_combustivel_manual label="Combustível" only %}
-            </div>
-            <div class="field field-size-2">
-              {% include "components/forms/form_field.html" with field=transporte_form.porte_transporte_armas label="Porte/transporte de armas" only %}
-            </div>
+      {% comment %} Campos manuais — exibidos quando NÃO há viatura cadastrada vinculada {% endcomment %}
+      <div class="oficio-viatura-manual" data-oficio-viatura-manual-panel>
+        <div class="field-grid field-grid--cols-2">
+          <div class="field field-size-2">
+            {% include "components/forms/form_field.html" with field=transporte_form.transporte_modelo_manual label="Modelo" only %}
+          </div>
+          <div class="field field-size-2">
+            {% include "components/forms/form_field.html" with field=transporte_form.transporte_tipo_manual label="Tipo de viatura" only %}
+          </div>
+          <div class="field field-size-2">
+            {% include "components/forms/form_field.html" with field=transporte_form.transporte_combustivel_manual label="Combustível" only %}
+          </div>
+          <div class="field field-size-2">
+            {% include "components/forms/form_field.html" with field=transporte_form.porte_transporte_armas label="Porte/transporte de armas" only %}
           </div>
         </div>
       </div>

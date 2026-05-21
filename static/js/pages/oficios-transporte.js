@@ -48,21 +48,19 @@
         return id.trim();
       })
       .filter(Boolean);
-    this.viaturaBuscaWrap = root.querySelector(".oficio-viatura-busca__wrap");
+    this.pickerRoot = root.querySelector("[data-oficio-vehicle-picker]");
+    this.controlEl = root.querySelector(".cv-search-picker__control");
+    this.clearBtn = root.querySelector("[data-oficio-viatura-clear]");
     this.viaturaFloatingMenu =
       window.CvFloatingDropdown &&
       window.CvFloatingDropdown.attach &&
       this.dropdown &&
-      this.buscaInput
-        ? window.CvFloatingDropdown.attach(this.dropdown, this.buscaInput)
+      this.controlEl
+        ? window.CvFloatingDropdown.attach(this.dropdown, this.controlEl)
         : null;
-    // Card compacto da viatura selecionada (placa | unidade | combustível | tipo + editar)
-    this.selectedCard = root.querySelector("[data-oficio-viatura-selected]");
-    this.selectedPlaca = root.querySelector("[data-oficio-viatura-selected-placa]");
-    this.selectedUnidade = root.querySelector("[data-oficio-viatura-selected-unidade]");
-    this.selectedCombustivel = root.querySelector("[data-oficio-viatura-selected-combustivel]");
-    this.selectedTipo = root.querySelector("[data-oficio-viatura-selected-tipo]");
-    this.selectedEdit = root.querySelector("[data-oficio-viatura-selected-edit]");
+    // Painel "VIATURA SELECIONADA" — card visualmente igual ao multiselect detalhado
+    this.selectedList = root.querySelector("[data-oficio-viatura-selected-list]");
+    this.selectedEmpty = root.querySelector("[data-oficio-viatura-selected-empty]");
     this.manualPanelVeic = root.querySelector("[data-oficio-viatura-manual-panel]");
     this.modHidden = root.querySelector("[data-oficio-motorista-modo]");
     this.servidorPanel = root.querySelector("[data-oficio-motorista-servidor]");
@@ -74,6 +72,7 @@
     this.toggleBtn = root.querySelector("[data-oficio-motorista-toggle]");
     this.motoristaSelect = root.querySelector("select[name='motorista']");
     this.bindViaturaBusca();
+    this.bindViaturaClear();
     this.bindMotoristaToggle();
     this.bindMotoristaSelectWatch();
     this.applyInitialMotoristaModo();
@@ -83,7 +82,8 @@
   }
 
   OficioTransporte.prototype.handleDocClick = function (event) {
-    const wrap = this.root.querySelector(".oficio-viatura-busca__wrap");
+    // Considera tanto o picker novo (cv-search-picker) quanto o wrap legado.
+    const wrap = this.pickerRoot || this.root.querySelector(".oficio-viatura-busca__wrap");
     if (!wrap || !this.dropdown) return;
     if (!wrap.contains(event.target)) {
       if (this.runViaturaSearchDebounced && this.runViaturaSearchDebounced.cancel) {
@@ -238,41 +238,60 @@
   };
 
   OficioTransporte.prototype.buildResultButton = function (item) {
+    // Estrutura idêntica ao cv-search-picker.renderOptionItem
+    // (marker + content; content tem __option-main e __option-meta).
     const self = this;
     const btn = document.createElement("button");
     btn.type = "button";
-    btn.className = "oficio-viatura-busca__result";
+    btn.className = "cv-search-picker__option";
+    btn.dataset.value = String(item.id);
     btn.setAttribute("role", "option");
+    btn.setAttribute("aria-selected", "false");
     if (item.suggestion_reason) {
-      btn.setAttribute("data-suggestion-reason", item.suggestion_reason);
+      btn.dataset.suggestionReason = item.suggestion_reason;
     }
+
+    const marker = document.createElement("span");
+    marker.className = "cv-search-picker__option-marker";
+
+    const body = document.createElement("div");
+    body.className = "cv-search-picker__option-content";
+
     const main = document.createElement("span");
-    main.className = "oficio-viatura-busca__result-main";
-    main.textContent = [item.placa_formatada, item.modelo].filter(Boolean).join(" • ") || "Viatura";
-    // Chip de motivo: motorista / unidade
+    main.className = "cv-search-picker__option-main";
+    const placaLabel = item.placa_formatada || "Viatura";
+    const modeloLabel = item.modelo || "";
+    main.textContent = modeloLabel ? placaLabel + "  •  " + modeloLabel : placaLabel;
+
+    // Chip de motivo (Motorista / Unidade) inline com o nome,
+    // mesmo padrão visual do driver-chip do multiselect.
     if (item.suggestion_reason === "motorista" || item.suggestion_reason === "unidade") {
       const chip = document.createElement("span");
       chip.className =
-        "oficio-viatura-busca__result-reason oficio-viatura-busca__result-reason--" +
+        "cv-search-picker__driver-chip oficio-viatura-reason oficio-viatura-reason--" +
         item.suggestion_reason;
       chip.textContent = item.suggestion_reason === "motorista" ? "Motorista" : "Unidade";
       main.appendChild(chip);
     }
-    const sub = document.createElement("span");
-    sub.className = "oficio-viatura-busca__result-meta";
-    sub.textContent =
-      "Unidade: " +
-      (item.unidade_resumo || "—") +
-      " • Motorista: " +
-      (item.motoristas_resumo || "—");
-    btn.appendChild(main);
-    btn.appendChild(sub);
-    btn.addEventListener("mousedown", function (event) {
-      event.preventDefault();
-    });
-    btn.addEventListener("click", function () {
-      self.applyViaturaFromResult(item);
-    });
+
+    const meta = document.createElement("span");
+    meta.className = "cv-search-picker__option-meta";
+    const metaParts = [
+      item.unidade_resumo,
+      item.combustivel,
+      item.tipo,
+    ].filter(function (p) { return p && p !== "—"; });
+    meta.textContent = metaParts.length
+      ? metaParts.join("  •  ")
+      : "Dados complementares não informados";
+
+    body.appendChild(main);
+    body.appendChild(meta);
+    btn.appendChild(marker);
+    btn.appendChild(body);
+
+    btn.addEventListener("mousedown", function (event) { event.preventDefault(); });
+    btn.addEventListener("click", function () { self.applyViaturaFromResult(item); });
     return btn;
   };
 
@@ -314,54 +333,131 @@
   };
 
   OficioTransporte.prototype.renderSelectedCard = function (item) {
-    if (!this.selectedCard) return;
-    if (this.selectedPlaca) this.selectedPlaca.textContent = item.placa_formatada || "";
-    if (this.selectedUnidade) this.selectedUnidade.textContent = item.unidade_resumo || "—";
-    if (this.selectedCombustivel) {
-      // item.combustivel pode vir do endpoint enriquecido; fallback para texto do select.
-      let label = item.combustivel || "";
-      if (!label && this.combustivelSelect && this.combustivelSelect.value) {
-        const opt = this.combustivelSelect.options[this.combustivelSelect.selectedIndex];
-        label = (opt && opt.text) || "";
-      }
-      this.selectedCombustivel.textContent = label || "—";
+    // Constrói um card com a MESMA estrutura visual do
+    // cv-search-picker.buildCard (variant=detailed):
+    //  ┌─────────────────────────────────────────────┐
+    //  │ ABC-1234 • FORD KA                  [Editar]│
+    //  │ DU01 • Gasolina • Caracterizada     [   x  ]│
+    //  └─────────────────────────────────────────────┘
+    if (!this.selectedList) return;
+    this.selectedList.innerHTML = "";
+
+    const card = document.createElement("div");
+    card.className = "cv-search-picker__selected-card oficio-viatura-selected-card";
+    card.dataset.value = String(item.id || "");
+
+    const body = document.createElement("div");
+    body.className = "cv-search-picker__selected-main";
+
+    const titleRow = document.createElement("div");
+    titleRow.className = "cv-search-picker__selected-title-row";
+
+    const name = document.createElement("span");
+    name.className = "cv-search-picker__selected-name";
+    const placaLabel = item.placa_formatada || "—";
+    const modeloLabel = item.modelo || "";
+    name.textContent = modeloLabel ? placaLabel + "  •  " + modeloLabel : placaLabel;
+    titleRow.appendChild(name);
+
+    if (item.suggestion_reason === "motorista" || item.suggestion_reason === "unidade") {
+      const chip = document.createElement("span");
+      chip.className =
+        "cv-search-picker__driver-chip oficio-viatura-reason oficio-viatura-reason--" +
+        item.suggestion_reason;
+      chip.textContent = item.suggestion_reason === "motorista" ? "Motorista" : "Unidade";
+      titleRow.appendChild(chip);
     }
-    if (this.selectedTipo) {
-      let tipoLabel = item.tipo || "";
-      if (!tipoLabel && this.tipoSelect && this.tipoSelect.value) {
-        const opt = this.tipoSelect.options[this.tipoSelect.selectedIndex];
-        tipoLabel = (opt && opt.text) || "";
-      }
-      this.selectedTipo.textContent = tipoLabel || "—";
+    body.appendChild(titleRow);
+
+    const metaParts = [
+      item.unidade_resumo,
+      item.combustivel,
+      item.tipo,
+    ].filter(function (p) { return p && p !== "—"; });
+    const metaEl = document.createElement("span");
+    metaEl.className = "cv-search-picker__selected-meta";
+    metaEl.textContent = metaParts.length
+      ? metaParts.join("  •  ")
+      : "Dados complementares não informados";
+    body.appendChild(metaEl);
+    card.appendChild(body);
+
+    // Botão Editar — visual semelhante ao driver-toggle do multiselect
+    if (item.edit_url) {
+      const editRow = document.createElement("div");
+      editRow.className = "cv-search-picker__driver-control oficio-viatura-edit-row";
+
+      const editLink = document.createElement("a");
+      editLink.className =
+        "cv-search-picker__driver-toggle oficio-viatura-edit-link";
+      editLink.href = item.edit_url;
+      editLink.setAttribute("aria-label", "Editar viatura selecionada");
+      const marker = document.createElement("span");
+      marker.className = "cv-search-picker__driver-marker";
+      const text = document.createElement("span");
+      text.className = "cv-search-picker__driver-text";
+      text.textContent = "Editar viatura";
+      editLink.appendChild(marker);
+      editLink.appendChild(text);
+      editRow.appendChild(editLink);
+      card.appendChild(editRow);
     }
-    if (this.selectedEdit) {
-      if (item.edit_url) {
-        this.selectedEdit.setAttribute("href", item.edit_url);
-        this.selectedEdit.hidden = false;
-        this.selectedEdit.removeAttribute("hidden");
-      } else {
-        this.selectedEdit.setAttribute("href", "#");
-        this.selectedEdit.hidden = true;
-        this.selectedEdit.setAttribute("hidden", "hidden");
-      }
+
+    // Botão remover/limpar — usa o mesmo padrão visual do __remove (x)
+    const removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.className = "cv-search-picker__remove";
+    removeBtn.setAttribute("aria-label", "Remover viatura selecionada");
+    removeBtn.textContent = "x";
+    const self = this;
+    removeBtn.addEventListener("click", function () {
+      self.clearViaturaSelection();
+    });
+    card.appendChild(removeBtn);
+
+    this.selectedList.appendChild(card);
+    if (this.selectedEmpty) {
+      this.selectedEmpty.hidden = true;
+      this.selectedEmpty.setAttribute("hidden", "hidden");
     }
   };
 
   OficioTransporte.prototype.clearSelectedCard = function () {
-    if (!this.selectedCard) return;
-    [
-      this.selectedPlaca,
-      this.selectedUnidade,
-      this.selectedCombustivel,
-      this.selectedTipo,
-    ].forEach(function (el) {
-      if (el) el.textContent = "";
-    });
-    if (this.selectedEdit) {
-      this.selectedEdit.setAttribute("href", "#");
-      this.selectedEdit.hidden = true;
-      this.selectedEdit.setAttribute("hidden", "hidden");
+    if (this.selectedList) this.selectedList.innerHTML = "";
+    if (this.selectedEmpty) {
+      this.selectedEmpty.hidden = false;
+      this.selectedEmpty.removeAttribute("hidden");
     }
+  };
+
+  OficioTransporte.prototype.clearViaturaSelection = function () {
+    // Limpa todos os campos vinculados à viatura cadastrada e
+    // libera o painel manual.
+    if (this.viaturaInput) {
+      this.viaturaInput.value = "";
+      dispatchFieldEvents(this.viaturaInput);
+    }
+    if (this.placaHidden) {
+      this.placaHidden.value = "";
+      dispatchFieldEvents(this.placaHidden);
+    }
+    if (this.buscaInput) {
+      this.buscaInput.value = "";
+      delete this.buscaInput.dataset.selectedLabel;
+      dispatchFieldEvents(this.buscaInput);
+    }
+    this.selectedViaturaId = "";
+    this.setViaturaLocked(false);
+  };
+
+  OficioTransporte.prototype.bindViaturaClear = function () {
+    const self = this;
+    if (!this.clearBtn) return;
+    this.clearBtn.addEventListener("click", function (event) {
+      event.preventDefault();
+      self.clearViaturaSelection();
+      if (self.buscaInput) self.buscaInput.focus();
+    });
   };
 
   OficioTransporte.prototype.bindMotoristaToggle = function () {
@@ -475,11 +571,7 @@
       this.foundBanner.hidden = !locked;
       this.foundBanner.classList.toggle("form-field--hidden", !locked);
     }
-    // Alterna visibilidade entre card compacto (locked) e painel manual (unlocked).
-    if (this.selectedCard) {
-      this.selectedCard.hidden = !locked;
-      this.selectedCard.classList.toggle("form-field--hidden", !locked);
-    }
+    // Mostra/esconde painel de campos manuais com base no estado.
     if (this.manualPanelVeic) {
       this.manualPanelVeic.classList.toggle("form-field--hidden", !!locked);
       this.manualPanelVeic.setAttribute("aria-hidden", locked ? "true" : "false");
@@ -487,27 +579,36 @@
     if (!locked) {
       this.clearSelectedCard();
     }
+    if (this.pickerRoot) {
+      this.pickerRoot.classList.toggle("oficio-viatura-picker--has-selection", !!locked);
+    }
   };
 
   OficioTransporte.prototype.syncViaturaLockFromDom = function () {
     const id = this.viaturaInput && this.viaturaInput.value;
     if (id) {
       this.selectedViaturaId = String(id);
-      // Reidrata card compacto a partir dos campos manuais já preenchidos no SSR
-      // e da busca (placa_formatada vem do label salvo).
+      // Reidrata o card a partir do contexto SSR.
       const placa = (this.buscaInput && this.buscaInput.value) || "";
-      const tipoLabel = (function (sel) {
-        if (!sel || !sel.value) return "";
-        const opt = sel.options[sel.selectedIndex];
-        return (opt && opt.text) || "";
-      })(this.tipoSelect);
-      const combLabel = (function (sel) {
-        if (!sel || !sel.value) return "";
-        const opt = sel.options[sel.selectedIndex];
-        return (opt && opt.text) || "";
-      })(this.combustivelSelect);
+      const modeloSaved = this.root.dataset.viaturaModeloSaved || "";
+      const tipoLabel =
+        this.root.dataset.viaturaTipoLabel ||
+        (function (sel) {
+          if (!sel || !sel.value) return "";
+          const opt = sel.options[sel.selectedIndex];
+          return (opt && opt.text) || "";
+        })(this.tipoSelect);
+      const combLabel =
+        this.root.dataset.viaturaCombustivelLabel ||
+        (function (sel) {
+          if (!sel || !sel.value) return "";
+          const opt = sel.options[sel.selectedIndex];
+          return (opt && opt.text) || "";
+        })(this.combustivelSelect);
       this.renderSelectedCard({
+        id: id,
         placa_formatada: placa,
+        modelo: modeloSaved || ((this.modeloInput && this.modeloInput.value) || ""),
         unidade_resumo: this.root.dataset.viaturaUnidadeResumo || "—",
         combustivel: combLabel,
         tipo: tipoLabel,

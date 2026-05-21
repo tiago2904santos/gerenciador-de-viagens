@@ -241,10 +241,13 @@ class OficioTransporteForm(forms.ModelForm):
         required=False,
         widget=forms.TextInput(
             attrs={
-                "class": "form-control",
+                "class": "cv-search-picker__input",
                 "data-oficio-viatura-busca": "true",
-                "placeholder": "Digite placa, modelo, unidade ou motorista",
+                "placeholder": "Buscar por placa, unidade, combustível ou tipo",
                 "autocomplete": "off",
+                "type": "search",
+                "role": "combobox",
+                "aria-autocomplete": "list",
             },
         ),
     )

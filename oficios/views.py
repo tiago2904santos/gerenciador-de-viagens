@@ -185,11 +185,18 @@ def _wizard_dados_viajantes_context(
     else:
         ref_raw = (oficio.motorista_oficio_referencia or "").strip()
 
-    # Dados auxiliares para o card compacto de viatura selecionada (modo edição).
+    # Dados auxiliares para o card de viatura selecionada (modo edição).
     viatura_selecionada_unidade = ""
     viatura_selecionada_edit_url = ""
+    viatura_selecionada_modelo = ""
+    viatura_selecionada_combustivel = ""
+    viatura_selecionada_tipo = ""
     if oficio.viatura_id and oficio.viatura:
-        viatura_selecionada_unidade = str(oficio.viatura.unidade) if oficio.viatura.unidade_id else "—"
+        v = oficio.viatura
+        viatura_selecionada_unidade = str(v.unidade) if v.unidade_id else "—"
+        viatura_selecionada_modelo = v.modelo or ""
+        viatura_selecionada_combustivel = str(v.combustivel) if v.combustivel_id else ""
+        viatura_selecionada_tipo = v.tipo or ""
         try:
             viatura_selecionada_edit_url = reverse(
                 "cadastros:viatura_update", args=[oficio.viatura_id]
@@ -218,6 +225,9 @@ def _wizard_dados_viajantes_context(
         "equipe_servidor_ids_csv": ",".join(str(pk) for pk in equipe_ids),
         "viatura_selecionada_unidade": viatura_selecionada_unidade,
         "viatura_selecionada_edit_url": viatura_selecionada_edit_url,
+        "viatura_selecionada_modelo": viatura_selecionada_modelo,
+        "viatura_selecionada_combustivel": viatura_selecionada_combustivel,
+        "viatura_selecionada_tipo": viatura_selecionada_tipo,
         "motorista_extras_visivel": motorista_extras_visivel,
         "motorista_oficio_ano": oficio.ano or timezone.localdate().year,
         "motorista_oficio_numero_inicial": _motorista_oficio_numero_display(ref_raw),

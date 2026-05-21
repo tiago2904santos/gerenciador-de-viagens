@@ -1221,20 +1221,44 @@
   color: var(--color-primary-bright, var(--text-primary));
 }
 
-/* Garante que o painel manual fique de fato escondido quando a viatura
-   está vinculada (a classe utilitária .form-field--hidden é sobrescrita
-   por especificidade em alguns contextos do wizard). */
+/* Painel manual de viatura — escondido quando há viatura cadastrada vinculada.
+   Usa !important porque .form-field--hidden compete com .field-grid em
+   especificidade em alguns contextos do wizard. */
 .oficio-viatura-manual.form-field--hidden {
   display: none !important;
 }
 
-/* Card compacto da viatura selecionada — uma linha de pills */
-.oficio-viatura-selected {
-  margin-block-start: var(--space-2);
+/* Picker de viatura: variação tonal do chip de motivo (Motorista / Unidade)
+   sobre a base visual do .cv-search-picker__driver-chip. */
+.oficio-viatura-reason--motorista {
+  background: color-mix(in srgb, var(--color-accent, #d8a21b) 18%, transparent);
+  border-color: var(--stepper-done-border, var(--border-subtle));
+  color: var(--color-accent, var(--stepper-done-color));
 }
 
-.oficio-viatura-selected.form-field--hidden {
-  display: none !important;
+.oficio-viatura-reason--unidade {
+  background: color-mix(in srgb, var(--color-primary, #0b3a66) 14%, transparent);
+  border-color: var(--border-stepper, var(--border-subtle));
+  color: var(--color-primary-bright, var(--text-primary));
+}
+
+/* Card da viatura selecionada — usa o slot do __driver-control para o
+   botão Editar (visual = botão "marcar motorista" do multiselect).
+   Diferença: aqui o botão fica SEMPRE visível, não apenas no :hover. */
+.oficio-viatura-selected-card .oficio-viatura-edit-row {
+  max-height: none;
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
+.oficio-viatura-edit-link {
+  text-decoration: none;
+}
+
+.oficio-viatura-edit-link:hover,
+.oficio-viatura-edit-link:focus-visible {
+  text-decoration: none;
 }
 
 .oficio-viatura-selected__pills {
