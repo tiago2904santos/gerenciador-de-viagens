@@ -34,6 +34,7 @@ class ServidorEquipeSelectMultiple(forms.SelectMultiple):
         ]
         main = " • ".join(part for part in main_parts if part)
         search = " ".join(part for part in [servidor.nome, rg, cpf, cargo, unidade] if part)
+        unidade_id = str(servidor.unidade_id) if servidor.unidade_id else ""
         option["attrs"].update(
             {
                 "data-cargo": cargo,
@@ -43,8 +44,40 @@ class ServidorEquipeSelectMultiple(forms.SelectMultiple):
                 "data-rg": rg,
                 "data-search": search,
                 "data-unidade": unidade,
+                "data-unidade-id": unidade_id,
             },
         )
+        return option
+
+
+class ViaturaSelectSingle(forms.Select):
+    def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+        option = super().create_option(name, value, label, selected, index, subindex=subindex, attrs=attrs)
+        viatura = getattr(value, "instance", None)
+        if viatura is None:
+            return option
+
+        placa = viatura.placa_formatada
+        modelo = viatura.modelo or ""
+        combustivel = str(viatura.combustivel) if viatura.combustivel_id and viatura.combustivel else ""
+        tipo_display = dict(Viatura.TIPO_CHOICES).get(viatura.tipo, "") if viatura.tipo else ""
+        unidade = str(viatura.unidade) if viatura.unidade_id and viatura.unidade else ""
+
+        motorista_ids = ",".join(str(m.pk) for m in viatura.motoristas.all())
+        unidade_id = str(viatura.unidade_id) if viatura.unidade_id else ""
+        meta_parts = [p for p in [modelo, combustivel, tipo_display, unidade] if p]
+        linha2_parts = [p for p in [combustivel, tipo_display, unidade] if p]
+        search = " ".join(p for p in [viatura.placa, placa.replace("-", ""), modelo, combustivel, tipo_display, unidade] if p)
+
+        option["label"] = " · ".join(p for p in [placa, modelo] if p)
+        option["attrs"].update({
+            "data-main": placa,
+            "data-meta": " · ".join(meta_parts),
+            "data-cargo": " · ".join(linha2_parts),
+            "data-motorista-ids": motorista_ids,
+            "data-unidade-id": unidade_id,
+            "data-search": search,
+        })
         return option
 
 
@@ -69,6 +102,7 @@ class ServidorMotoristaSelect(forms.Select):
         ]
         main = " • ".join(part for part in main_parts if part)
         search = " ".join(part for part in [servidor.nome, rg, cpf, cargo, unidade] if part)
+        unidade_id = str(servidor.unidade_id) if servidor.unidade_id else ""
         option["attrs"].update(
             {
                 "data-cargo": cargo,
@@ -78,6 +112,7 @@ class ServidorMotoristaSelect(forms.Select):
                 "data-rg": rg,
                 "data-search": search,
                 "data-unidade": unidade,
+                "data-unidade-id": unidade_id,
             },
         )
         return option
@@ -165,6 +200,7 @@ class OficioDadosViajantesForm(OficioForm):
             "motivo",
             "custeio",
             "custeio_observacao",
+            "viatura",
             "servidores",
             "servidores_termo_autorizacao",
         ]
@@ -177,6 +213,19 @@ class OficioDadosViajantesForm(OficioForm):
                 attrs={"class": "form-select", "data-oficio-custeio-field": "true"},
             ),
             "custeio_observacao": forms.TextInput(attrs={"class": "form-control"}),
+            "viatura": ViaturaSelectSingle(
+                attrs={
+                    "class": "form-select cv-search-picker__native",
+                    "data-cv-search-picker": "true",
+                    "data-picker-mode": "single",
+                    "data-picker-variant": "detailed",
+                    "data-picker-label": "Viatura",
+                    "data-picker-hint": "Busque por placa, modelo, combustível ou tipo.",
+                    "data-placeholder": "Buscar por placa ou modelo",
+                    "data-empty-message": "Nenhuma viatura encontrada.",
+                    "data-empty-selected": "Nenhuma viatura selecionada.",
+                },
+            ),
             "servidores": ServidorEquipeSelectMultiple(
                 attrs={
                     "class": "form-select cv-search-picker__native",
@@ -184,6 +233,7 @@ class OficioDadosViajantesForm(OficioForm):
                     "data-picker-mode": "multi",
                     "data-picker-variant": "detailed",
                     "data-picker-term-control": "true",
+                    "data-picker-driver-control": "true",
                     "data-picker-label": "Viajantes",
                     "data-picker-hint": "Busque por nome, CPF ou RG. Em cada card, defina se o termo de autorização será gerado.",
                     "data-cv-termos-name": "servidores_termo_autorizacao",
@@ -204,6 +254,7 @@ class OficioDadosViajantesForm(OficioForm):
         super().__init__(*args, **kwargs)
         self.fields["modelo_motivo"].queryset = ModeloMotivoOficio.objects.order_by("ordem", "nome")
         self.fields["custeio"].required = False
+        self.fields["viatura"].empty_label = ""
         self.fields["servidores"].required = False
         self.fields["servidores_termo_autorizacao"].queryset = self.fields["servidores"].queryset
         self.fields["servidores_termo_autorizacao"].required = False
@@ -289,13 +340,14 @@ class OficioTransporteForm(forms.ModelForm):
             ),
             "motorista": ServidorMotoristaSelect(
                 attrs={
-                    "class": "form-select app-motorista-picker__native",
-                    "data-app-motorista-picker": "true",
-                    "data-empty-selected": "Nenhum servidor selecionado.",
+                    "class": "form-select cv-search-picker__native",
+                    "data-cv-search-picker": "true",
+                    "data-picker-mode": "single",
+                    "data-picker-variant": "detailed",
+                    "data-empty-selected": "Nenhum motorista selecionado.",
                     "data-empty-message": "Nenhum servidor encontrado.",
-                    "data-placeholder": "Digite nome, RG ou CPF",
+                    "data-placeholder": "Buscar por nome, CPF ou RG",
                     "data-panel-title": "MOTORISTA SELECIONADO",
-                    "data-status-waiting": "Aguardando seleção",
                 },
             ),
             "motorista_manual_nome": forms.TextInput(

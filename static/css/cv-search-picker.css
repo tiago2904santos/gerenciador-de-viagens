@@ -874,3 +874,16 @@
     grid-row: 1 / span 2;
   }
 }
+
+
+
+.cv-search-picker--single.cv-search-picker--detailed .cv-search-picker__selected-card > .cv-search-picker__remove {
+  margin: calc(var(--space-4) * -1) 0 calc(var(--space-4) * -1) calc(var(--space-5) * -1);
+}
+
+.cv-search-picker--single.cv-search-picker--detailed .cv-search-picker__selected-name {
+  font-size: var(--font-size-md);
+  overflow: visible;
+  text-overflow: unset;
+  white-space: normal;
+}

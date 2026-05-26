@@ -376,6 +376,30 @@
             </select>
           </div>
 
+          {# ── 8. Viatura picker detalhado ─────────────────────────────── #}
+          <div class="cv-search-picker-demo-card cv-search-picker-demo-card--wide">
+            <p class="cv-search-picker-demo-card__title">8 — Viatura picker detalhado</p>
+            <p class="cv-search-picker-demo-card__description">Variante detalhada para selecao de viatura — sem controles de motorista ou termo.</p>
+            <select
+              id="lab-picker-viatura"
+              name="lab-picker-viatura"
+              class="cv-search-picker__native"
+              data-cv-search-picker="true"
+              data-picker-mode="single"
+              data-picker-variant="detailed"
+              data-picker-label="Viatura"
+              data-picker-hint="Busque por placa, modelo, combustivel ou tipo."
+              data-placeholder="Buscar por placa ou modelo"
+              data-empty-message="Nenhuma viatura encontrada."
+            >
+              <option value="1" selected data-main="ABC-1234" data-meta="Toyota Hilux · Diesel · Caracterizada · SEJUS / PR" data-search="ABC-1234 ABC1234 Toyota Hilux Diesel Caracterizada SEJUS">ABC-1234 · Toyota Hilux · Diesel · Caracterizada · SEJUS / PR</option>
+              <option value="2" data-main="DEF-5678" data-meta="Ford Ranger · Flex · Caracterizada · SEAP / PR" data-search="DEF-5678 DEF5678 Ford Ranger Flex Caracterizada SEAP">DEF-5678 · Ford Ranger · Flex · Caracterizada · SEAP / PR</option>
+              <option value="3" data-main="GHI-9012" data-meta="Fiat Ducato · Diesel · Descaracterizada · SESP / PR" data-search="GHI-9012 GHI9012 Fiat Ducato Diesel Descaracterizada SESP">GHI-9012 · Fiat Ducato · Diesel · Descaracterizada · SESP / PR</option>
+              <option value="4" data-main="JKL-3456" data-meta="Chevrolet S10 · Flex · Descaracterizada · SESA / PR" data-search="JKL-3456 JKL3456 Chevrolet S10 Flex Descaracterizada SESA">JKL-3456 · Chevrolet S10 · Flex · Descaracterizada · SESA / PR</option>
+              <option value="5" data-main="MNO-7890" data-meta="Volkswagen Amarok · Diesel · Caracterizada · SEDU / PR" data-search="MNO-7890 MNO7890 Volkswagen Amarok Diesel Caracterizada SEDU">MNO-7890 · Volkswagen Amarok · Diesel · Caracterizada · SEDU / PR</option>
+            </select>
+          </div>
+
           {# ── 6 & 7. Estados especiais ────────────────────────────────── #}
           <div class="cv-field-grid cv-field-grid--2">
 

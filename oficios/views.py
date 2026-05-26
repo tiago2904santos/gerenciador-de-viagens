@@ -148,6 +148,7 @@ def _prepare_dados_viajantes_form(form):
     servidores_qs = listar_servidores_para_oficio()
     form.fields["servidores"].queryset = servidores_qs
     form.fields["servidores_termo_autorizacao"].queryset = servidores_qs
+    form.fields["viatura"].queryset = listar_viaturas_para_oficio()
 
 
 def _prepare_transporte_form(form):

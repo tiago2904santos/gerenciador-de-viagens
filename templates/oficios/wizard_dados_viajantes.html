@@ -89,15 +89,10 @@
         </div>
       </header>
       <div class="cv-wizard-section-body">
-        <div class="field field-size-4">
-          <input type="hidden" name="servidores_termo_autorizacao_present" value="1">
-          {% include "components/forms/form_field.html" with field=form.servidores only %}
-          <div hidden aria-hidden="true">
-            {{ form.servidores_termo_autorizacao }}
-          </div>
-        </div>
-        <div class="field field-size-4" data-oficio-driver-team-motorista>
-          {% include "components/forms/form_field.html" with field=transporte_form.motorista label="Motorista (entre os viajantes)" help_text="Se escolher um viajante da equipe, o bloco de motorista externo não será necessário." only %}
+        <input type="hidden" name="servidores_termo_autorizacao_present" value="1">
+        {% include "components/forms/form_field.html" with field=form.servidores only %}
+        <div hidden aria-hidden="true">
+          {{ form.servidores_termo_autorizacao }}
         </div>
       </div>
     </section>
@@ -112,4 +107,5 @@
   <script src="{% static 'js/pages/oficios-dados-viajantes.js' %}?v=20260512" defer></script>
   <script src="{% static 'js/pages/oficios-transporte.js' %}?v=20260512" defer></script>
   <script src="{% static 'js/pages/oficios-wizard-driver-state.js' %}?v=20260520" defer></script>
+  <script src="{% static 'js/pages/oficios-viatura-sugestoes.js' %}?v=20260526" defer></script>
 {% endblock %}

@@ -158,18 +158,21 @@
     field.appendChild(dropdown);
     root.appendChild(field);
 
-    /* Painel de selecionados — apenas no modo multi */
+    /* Painel de selecionados — multi sempre; single só quando detailed */
+    const showPanel = mode === "multi" || variant === "detailed";
     let panel = null, grid = null, counter = null, panelEmpty = null;
-    if (mode === "multi") {
+    if (showPanel) {
       panel      = el("section", "cv-search-picker__selected-panel");
       const panelHeader = el("div",  "cv-search-picker__selected-header");
       const titleEl     = el("h4",   "cv-search-picker__selected-title", panelTitle);
-      counter    = el("span", "cv-search-picker__selected-count", "0");
       grid       = el("div",  "cv-search-picker__selected-list");
       panelEmpty = el("p",    "cv-search-picker__selected-empty", emptyPanelMsg);
 
       panelHeader.appendChild(titleEl);
-      panelHeader.appendChild(counter);
+      if (mode === "multi") {
+        counter = el("span", "cv-search-picker__selected-count", "0");
+        panelHeader.appendChild(counter);
+      }
       panel.appendChild(panelHeader);
       panel.appendChild(grid);
       panel.appendChild(panelEmpty);
@@ -270,9 +273,14 @@
         /* Deseleciona tudo e seleciona só o item escolhido */
         options.forEach((o) => { o.selected = false; });
         item.selected = true;
-        input.value   = item.label;
         query         = "";
-        setHasQuery(true); /* mantém o clear visível com o valor preenchido */
+        if (showPanel) {
+          input.value = "";
+          setHasQuery(false);
+        } else {
+          input.value = item.label;
+          setHasQuery(true); /* mantém o clear visível com o valor preenchido */
+        }
       } else if (item.kind === "unidade") {
         selectServidorValues(item.memberIds);
         query       = "";
@@ -451,21 +459,19 @@
 
       if (variant === "detailed") {
         /* ── Layout detalhado ──────────────────────────────────────
-           Linha 1: Nome • Cargo
-           Linha 2: Unidade lotado • CPF • RG (sem máscara)
+           Linha 1: Nome • Unidade lotada
+           Linha 2: Cargo • CPF • RG (sem máscara)
         ─────────────────────────────────────────────────────────── */
-        const nameParts = [item.label, item.cargo].filter(Boolean);
+        const nameParts = [item.label, item.unidade].filter(Boolean);
         const name = el("span", "cv-search-picker__selected-name", nameParts.join("  •  "));
         title.appendChild(name);
         if (showDriverCtrl) title.appendChild(el("span", "cv-search-picker__driver-chip", "Motorista"));
         body.appendChild(title);
 
-        const metaParts = [item.unidade, item.cpf, item.rg].filter(Boolean);
-        body.appendChild(el(
-          "span",
-          "cv-search-picker__selected-meta",
-          metaParts.length ? metaParts.join("  •  ") : "Dados complementares nao informados",
-        ));
+        const metaParts = [item.cargo, item.cpf, item.rg].filter(Boolean);
+        if (metaParts.length) {
+          body.appendChild(el("span", "cv-search-picker__selected-meta", metaParts.join("  •  ")));
+        }
       } else {
         /* ── Layout compacto ───────────────────────────────────────
            Linha 1: Nome
@@ -530,7 +536,7 @@
 
     function render() {
       renderResults();
-      if (mode === "multi") renderSelectedCards();
+      if (showPanel) renderSelectedCards();
     }
 
     /* ── Eventos ────────────────────────────────────────────────── */
@@ -599,7 +605,7 @@
     select.addEventListener("change", () => {
       const sel = new Set(Array.from(select.selectedOptions).map((o) => o.value));
       options.forEach((o) => { o.selected = sel.has(o.value); });
-      if (mode === "single") {
+      if (mode === "single" && !showPanel) {
         const selItem = options.find((o) => o.selected);
         input.value = selItem ? selItem.label : "";
         setHasQuery(!!input.value);
@@ -609,8 +615,8 @@
 
     syncSelect(false);
 
-    /* No modo single: inicializa o input com o valor já selecionado */
-    if (mode === "single") {
+    /* No modo single sem painel: inicializa o input com o valor já selecionado */
+    if (mode === "single" && !showPanel) {
       const selItem = options.find((o) => o.selected);
       if (selItem) {
         input.value = selItem.label;

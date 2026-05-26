@@ -107,6 +107,13 @@
 }
 
 
+/* Wizard Ofício: campos diretos no section-body devem ocupar largura total */
+.cv-wizard-section-body > .cv-field,
+.cv-wizard-section-body > .field {
+  align-self: stretch;
+  width: 100%;
+}
+
 /* Wizard Ofício: wrappers empilham linhas internas, não field-span no container */
 .oficio-data-block.app-form-grid-panel,
 .motivo-card__body.app-form-grid-panel {
@@ -2673,4 +2680,77 @@
 .oficio-documentos-pdf-hint {
   font-size: 0.85rem;
   margin: 0.35rem 0 0 0.25rem;
+}
+
+/* ── Sugestões de viatura (step 1 do wizard) ──────────────────────────── */
+.viatura-sugestoes {
+  display: grid;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.viatura-sugestoes__label {
+  color: var(--color-label);
+  font-size: var(--font-size-xs);
+  font-weight: 900;
+  letter-spacing: var(--letter-spacing-label);
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.viatura-sugestoes__chips {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.viatura-sugestao-chip {
+  align-items: center;
+  background: var(--color-card-muted);
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-control);
+  color: var(--color-text);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: var(--font-size-sm);
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.viatura-sugestao-chip:hover,
+.viatura-sugestao-chip:focus-visible {
+  background: var(--color-card);
+  border-color: var(--color-accent);
+  outline: 0;
+}
+
+.viatura-sugestao-chip strong {
+  color: var(--color-heading);
+  font-weight: 800;
+  letter-spacing: 0.03em;
+}
+
+.viatura-sugestao-badge {
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border-soft);
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 1px var(--space-2);
+  text-transform: uppercase;
+}
+
+.viatura-sugestao-badge--motorista {
+  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.viatura-sugestao-badge--unidade {
+  background: color-mix(in srgb, var(--color-primary) 14%, transparent);
+  border-color: var(--color-primary-bright);
+  color: var(--color-primary-bright);
 }
