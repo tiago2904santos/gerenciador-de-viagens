@@ -18,7 +18,7 @@
   --cv-sp-dropdown-border: var(--cv-sp-field-border-focus);
   --cv-sp-dropdown-shadow: var(--shadow-panel);
   --cv-sp-dropdown-option-hover: var(--theme-list-row-hover, var(--color-primary-soft));
-  --cv-sp-dropdown-option-selected: var(--color-primary-soft);
+  --cv-sp-dropdown-option-selected: var(--color-info-bg);
   --cv-sp-selected-panel-bg: var(--theme-surface-card-soft, var(--color-card-soft));
   --cv-sp-selected-panel-border: var(--theme-border-card, var(--color-border));
   --cv-sp-selected-card-bg: var(--theme-surface-card, var(--color-card));

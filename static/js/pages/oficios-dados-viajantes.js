@@ -3,13 +3,24 @@
     const form = select.closest("form");
     if (!form) return;
     const motivo = form.querySelector("[data-motivo-textarea='true']");
-    if (!motivo || (motivo.value || "").trim()) return;
+    if (!motivo) return;
+
     const selected = select.options[select.selectedIndex];
-    if (!selected) return;
-    const texto = selected.dataset.textoMotivo || "";
-    if (texto.trim()) {
-      motivo.value = texto;
-    }
+    // Se o usuário voltou para a opção vazia, não apaga o motivo já digitado
+    if (!selected || !selected.value) return;
+
+    const texto = (selected.dataset.textoMotivo || "").trim();
+    motivo.value = texto;
+
+    // Dispara eventos para compatibilidade com outros listeners (ex.: contadores de caracteres)
+    motivo.dispatchEvent(new Event("input",  { bubbles: true }));
+    motivo.dispatchEvent(new Event("change", { bubbles: true }));
+
+    // Ajusta altura ao conteúdo inserido
+    motivo.style.height = "auto";
+    motivo.style.height = motivo.scrollHeight + "px";
+
+    motivo.focus();
   }
 
   function initModeloMotivo() {
@@ -31,6 +42,7 @@
   function updateCusteioObservacaoVisibility(select, wrapper, outraValue) {
     const visible = shouldShowCusteioObservacao(select.value, outraValue);
     wrapper.classList.toggle("form-field--hidden", !visible);
+    wrapper.hidden = !visible;
   }
 
   function initCusteioObservacao() {

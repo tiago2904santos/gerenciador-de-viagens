@@ -1,36 +1,46 @@
-{# Motorista fora da equipe / carona — Card 4 condicional #}
+{# Card 4 — Motorista (aparece quando viatura selecionada + sem driver na equipe) #}
 <section
-  class="cv-wizard-section-card{% if not motorista_extras_visivel %} form-field--hidden{% endif %}"
-  aria-labelledby="oficio-wizard-motorista-externo-title"
+  class="cv-wizard-section-card{% if not show_motorista_card %} form-field--hidden{% endif %}"
+  aria-labelledby="oficio-wizard-motorista-title"
   data-oficio-driver-external-card
-  {% if not motorista_extras_visivel %}hidden{% endif %}
+  {% if not show_motorista_card %}hidden{% endif %}
 >
   <header class="cv-wizard-section-header">
     <div class="cv-wizard-section-header__copy">
-      <h3 class="cv-wizard-section-title" id="oficio-wizard-motorista-externo-title">Motorista externo / carona</h3>
+      <h3 class="cv-wizard-section-title" id="oficio-wizard-motorista-title">Motorista</h3>
+    </div>
+    <div class="cv-wizard-section-header__actions">
+      {% include "oficios/partials/_motorista_modo_toggle.html" with modo_atual=transporte_form.motorista_modo.value only %}
     </div>
   </header>
-  <div class="cv-wizard-section-body" data-oficio-driver-source>
+
+  <div class="cv-wizard-section-body">
     {{ transporte_form.motorista_modo }}
 
-    <div class="field-group" data-cv-state-toggle data-cv-state-default="sim" aria-label="Carona">
-      <span class="field-group__label">Carona</span>
-      <div class="cv-state-toggle cv-state-toggle--binary" role="group">
-        <button type="button" class="cv-state-toggle__option is-active" data-cv-state-value="sim" aria-pressed="true">Sim</button>
-        <button type="button" class="cv-state-toggle__option" data-cv-state-value="nao" aria-pressed="false">Não</button>
-      </div>
-      <input type="hidden" name="oficio_carona_ui" value="sim" data-cv-state-input data-oficio-driver-carona-toggle>
-      <p class="field-help">Indicador visual; persistência usa os campos de motorista e protocolo abaixo.</p>
-    </div>
-
-    <div class="oficio-motorista-manual" data-oficio-motorista-manual>
-      <div class="field-grid">
-        <div class="field field-size-4">
-          {% include "components/forms/form_field.html" with field=transporte_form.motorista_manual_nome label="Nome do motorista" only %}
-        </div>
+    {# ── Modo SERVIDOR: busca no sistema ────────────────────────── #}
+    <div data-oficio-motorista-servidor>
+      <div class="field app-form-field cv-field">
+        <label class="app-form-label cv-field__label" for="{{ transporte_form.motorista.id_for_label }}">
+          Nome do motorista
+        </label>
+        {{ motorista_compact_widget }}
       </div>
     </div>
 
+    {# ── Modo MANUAL: input livre ─────────────────────────────── #}
+    <div data-oficio-motorista-manual>
+      <div class="field app-form-field">
+        <label class="app-form-label" for="{{ transporte_form.motorista_manual_nome.id_for_label }}">
+          Nome do motorista
+        </label>
+        {{ transporte_form.motorista_manual_nome }}
+        {% if transporte_form.motorista_manual_nome.errors %}
+          {% include "components/ui/feedback/field_error.html" with errors=transporte_form.motorista_manual_nome.errors only %}
+        {% endif %}
+      </div>
+    </div>
+
+    {# ── Ofício de referência do motorista ────────────────────── #}
     <div class="field-grid" data-oficio-motorista-extras>
       <div class="field field-size-2">
         {% include "components/forms/oficio_motorista_split_field.html" with field=transporte_form.motorista_oficio_referencia label="Nº do ofício do motorista" ano=motorista_oficio_ano numero_inicial=motorista_oficio_numero_inicial only %}

@@ -1,0 +1,17 @@
+{# Segmented toggle SERVIDOR ↔ MANUAL — incluso no label-row de cada painel #}
+<div class="cv-segment-toggle" role="group" aria-label="Modo de preenchimento do motorista" data-oficio-motorista-modo-toggle>
+  <button
+    type="button"
+    class="cv-segment-toggle__btn"
+    data-oficio-motorista-modo-btn
+    data-value="SERVIDOR"
+    aria-pressed="{% if modo_atual != 'MANUAL' %}true{% else %}false{% endif %}"
+  >No sistema</button>
+  <button
+    type="button"
+    class="cv-segment-toggle__btn"
+    data-oficio-motorista-modo-btn
+    data-value="MANUAL"
+    aria-pressed="{% if modo_atual == 'MANUAL' %}true{% else %}false{% endif %}"
+  >Manual</button>
+</div>

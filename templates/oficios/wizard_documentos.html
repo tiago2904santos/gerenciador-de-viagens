@@ -186,11 +186,11 @@
         {% with n=documentos_ctx.viajantes_cards|length %}
         <div class="oficio-documentos-travellers-lines oficio-documentos-travellers-lines--n{{ n }}">
           {% for viajante in documentos_ctx.viajantes_cards %}
-            <article class="oficio-documentos-traveller-line">
+            <article class="oficio-documentos-traveller-line{% if viajante.is_motorista %} oficio-documentos-traveller-line--motorista{% endif %}">
               <div class="oficio-documentos-traveller-line__name-row">
                 <strong class="oficio-documentos-traveller-line__name">{{ viajante.nome }}</strong>
                 {% if viajante.is_motorista %}
-                  {% include "components/ui/badges/chip.html" with label="Motorista" tone="info" size="compact" only %}
+                  {% include "components/ui/badges/chip.html" with label="Motorista" tone="warning" size="compact" only %}
                 {% endif %}
               </div>
               {% if viajante.cargo or viajante.funcao or viajante.unidade %}

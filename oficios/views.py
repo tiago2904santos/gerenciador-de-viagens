@@ -11,6 +11,7 @@ from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_GET
 from django.views.decorators.http import require_POST
 
@@ -178,9 +179,11 @@ def _wizard_dados_viajantes_context(
     modelos_queryset = form.fields["modelo_motivo"].queryset
     equipe_ids = list(oficio.servidores.values_list("pk", flat=True))
     modo_motorista = oficio.motorista_modo or Oficio.MOTORISTA_MODO_SERVIDOR
-    motorista_extras_visivel = modo_motorista == Oficio.MOTORISTA_MODO_MANUAL or (
-        bool(oficio.motorista_id) and oficio.motorista_id not in equipe_ids
-    )
+    # Card de motorista externo: só aparece quando viatura selecionada + motorista não é da equipe
+    _driver_in_equipe = bool(oficio.motorista_id) and oficio.motorista_id in equipe_ids
+    show_motorista_card = bool(oficio.viatura_id) and not _driver_in_equipe
+    # Campos de protocolo do motorista: visíveis no card (sempre que o card aparece)
+    motorista_extras_visivel = show_motorista_card
     if transporte_form.is_bound:
         ref_raw = (transporte_form.data.get("motorista_oficio_referencia") or "").strip()
     else:
@@ -229,9 +232,13 @@ def _wizard_dados_viajantes_context(
         "viatura_selecionada_modelo": viatura_selecionada_modelo,
         "viatura_selecionada_combustivel": viatura_selecionada_combustivel,
         "viatura_selecionada_tipo": viatura_selecionada_tipo,
+        "show_motorista_card": show_motorista_card,
         "motorista_extras_visivel": motorista_extras_visivel,
         "motorista_oficio_ano": oficio.ano or timezone.localdate().year,
         "motorista_oficio_numero_inicial": _motorista_oficio_numero_display(ref_raw),
+        "motorista_compact_widget": mark_safe(
+            transporte_form["motorista"].as_widget(attrs={"data-picker-variant": "compact"})
+        ),
         "form": form,
         "transporte_form": transporte_form,
         "oficio": oficio,

@@ -629,6 +629,15 @@ html[data-theme="dark"] {
   line-height: 1.2;
 }
 
+/* Label row: label à esquerda, controle auxiliar à direita */
+.cv-field__label-row {
+  align-items: center;
+  display: flex;
+  gap: var(--space-2);
+  justify-content: space-between;
+  min-width: 0;
+}
+
 .cv-field__control-row,
 .cv-field-with-action {
   align-items: center;

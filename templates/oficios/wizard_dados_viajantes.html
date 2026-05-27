@@ -18,7 +18,7 @@
   {% endif %}
 
   <input type="hidden" name="transporte_embed" value="1">
-  <div data-oficio-wizard-step1 data-oficio-driver-source>
+  <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable" data-oficio-wizard-step1 data-oficio-driver-source>
     {# CARD 1 — Dados principais #}
     <section class="cv-wizard-section-card" aria-labelledby="oficio-wizard-dados-principais">
       <header class="cv-wizard-section-header">
@@ -53,6 +53,7 @@
               data-custeio-observacao-wrapper
               data-oficio-instituicao-field
               data-oficio-custeio-outra-value="{{ outra_instituicao_custeio_value|default:'OUTRA_INSTITUICAO' }}"
+              {% if not mostrar_custeio_observacao %}hidden{% endif %}
             >
               {% include "components/forms/form_field.html" with field=form.custeio_observacao label="Nome da Instituição" only %}
             </div>
@@ -104,8 +105,8 @@
 
 {% block extra_js %}
   {{ block.super }}
-  <script src="{% static 'js/pages/oficios-dados-viajantes.js' %}?v=20260512" defer></script>
+  <script src="{% static 'js/pages/oficios-dados-viajantes.js' %}?v=20260527b" defer></script>
   <script src="{% static 'js/pages/oficios-transporte.js' %}?v=20260512" defer></script>
-  <script src="{% static 'js/pages/oficios-wizard-driver-state.js' %}?v=20260520" defer></script>
-  <script src="{% static 'js/pages/oficios-viatura-sugestoes.js' %}?v=20260526c" defer></script>
+  <script src="{% static 'js/pages/oficios-wizard-driver-state.js' %}?v=20260526k" defer></script>
+  <script src="{% static 'js/pages/oficios-viatura-sugestoes.js' %}?v=20260527c" defer></script>
 {% endblock %}

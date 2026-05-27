@@ -114,6 +114,13 @@
   width: 100%;
 }
 
+/* Textarea de Motivo no wizard: apenas resize vertical, altura mínima de 2 linhas */
+textarea[data-motivo-textarea] {
+  min-height: calc(2 * 1.5em + 1rem); /* 2 linhas (1.5em cada) + padding vertical */
+  resize: vertical;
+  width: 100%;
+}
+
 /* Wizard Ofício: wrappers empilham linhas internas, não field-span no container */
 .oficio-data-block.app-form-grid-panel,
 .motivo-card__body.app-form-grid-panel {
@@ -941,7 +948,27 @@
 }
 
 .oficio-wizard__actions {
-  flex-wrap: wrap;
+  flex-wrap:  wrap;
+  /* Fica por cima dos cards */
+  position:   relative;
+  z-index:    2;
+  /* Mesmas dimensões do cv-wizard-section-header */
+  min-height: calc(2 * var(--space-4) + var(--control-height-sm));
+  padding:    var(--space-4) var(--space-6);
+  gap:        var(--space-3);
+  /* Fecha o contorno: page-shell já põe border-top, adicionamos os 3 lados restantes */
+  border-left:   1px solid var(--cv-wizard-section-border);
+  border-right:  1px solid var(--cv-wizard-section-border);
+  border-bottom: 1px solid var(--cv-wizard-section-border);
+}
+
+/* Botões do footer iguais aos botões de ação do header */
+.oficio-wizard__actions .cv-btn {
+  font-size:  var(--font-size-sm);
+  height:     var(--control-height-sm);
+  min-height: var(--control-height-sm);
+  max-height: var(--control-height-sm);
+  padding:    0 var(--space-4);
 }
 
 @media (max-width: 960px) {
@@ -1742,6 +1769,25 @@
   padding: var(--space-3) var(--space-4);
 }
 
+/* ── Card do motorista: tom dourado no tema escuro ─────────────── */
+.oficio-documentos-traveller-line--motorista {
+  background:   color-mix(in srgb, var(--color-accent) 9%, var(--color-card-muted));
+  border-color: color-mix(in srgb, var(--color-accent) 40%, var(--color-border-soft));
+}
+
+.oficio-documentos-traveller-line--motorista .oficio-documentos-traveller-line__name {
+  color: var(--color-accent);
+}
+
+/* tema claro: volta ao neutro */
+html[data-theme="light"] .oficio-documentos-traveller-line--motorista {
+  background:   var(--color-card-muted);
+  border-color: var(--color-border-soft);
+}
+html[data-theme="light"] .oficio-documentos-traveller-line--motorista .oficio-documentos-traveller-line__name {
+  color: var(--color-heading);
+}
+
 /* flex-basis de 30% → cabe exatamente 3 por linha (3×30%=90%<100%, 4×30%=120%>100%) */
 /* flex-basis de 45% → cabe exatamente 2 por linha (2×45%=90%<100%, 3×45%=135%>100%) */
 /* flex-grow: 1 → última linha preenche a largura restante automaticamente         */
@@ -2072,19 +2118,22 @@
   padding: var(--space-1) var(--space-3);
 }
 
-.oficio-documentos-route-card__status-chip.status-chip--draft {
+.oficio-documentos-route-card__status-chip.status-chip--draft,
+.oficio-documentos-route-card__status-chip.cv-chip--warning {
   background: var(--route-status-draft-bg);
   border-color: var(--route-status-draft-border);
   color: var(--route-status-draft-text);
 }
 
-.oficio-documentos-route-card__status-chip.status-chip--completed {
+.oficio-documentos-route-card__status-chip.status-chip--completed,
+.oficio-documentos-route-card__status-chip.cv-chip--success {
   background: var(--route-status-final-bg);
   border-color: var(--route-status-final-border);
   color: var(--route-status-final-text);
 }
 
-.oficio-documentos-route-card__status-chip.status-chip--muted {
+.oficio-documentos-route-card__status-chip.status-chip--muted,
+.oficio-documentos-route-card__status-chip.cv-chip--muted {
   background: var(--route-status-muted-bg);
   border-color: var(--route-status-muted-border);
   color: var(--route-status-muted-text);
@@ -2721,7 +2770,8 @@
 }
 
 .viatura-sugestao-chip:hover,
-.viatura-sugestao-chip:focus-visible {
+.viatura-sugestao-chip:focus-visible,
+.viatura-sugestao-chip--active {
   background: var(--color-card);
   border-color: var(--color-accent);
   outline: 0;
@@ -2754,3 +2804,220 @@
   border-color: var(--color-primary-bright);
   color: var(--color-primary-bright);
 }
+
+.viatura-sugestao-badge--ativa {
+  background: color-mix(in srgb, var(--color-success) 16%, transparent);
+  border-color: var(--color-success);
+  color: var(--color-success);
+}
+
+/* Sugestões injetadas dentro do painel do picker */
+.viatura-sugestoes--in-panel {
+  border-bottom: 1px solid var(--color-border-soft);
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+}
+
+/* Quando há sugestões visíveis, esconde a mensagem de "nenhuma viatura" */
+.cv-search-picker__selected-panel:has(.viatura-sugestoes:not([hidden])) .cv-search-picker__selected-empty {
+  display: none;
+}
+
+/* ── Card de motorista externo (step 1) ──────────────────────────── */
+/* =====================================================================
+   cv-segment-toggle — Segmented control moderno (opção A / opção B)
+   Sem conotação de certo/errado: apenas opções mutuamente exclusivas.
+   Usa [data-value] + [aria-pressed] para identidade visual por opção.
+   ===================================================================== */
+
+.cv-segment-toggle {
+  align-items: center;
+  /* trilho padrão (escuro): tinte dourado */
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface-strong));
+  border: 1px solid color-mix(in srgb, var(--color-accent) 35%, var(--color-border));
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  flex-shrink: 0;
+  gap: 2px;
+  padding: 3px;
+}
+
+.cv-segment-toggle__btn {
+  align-items: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: calc(var(--radius-pill) - 2px);
+  /* tema escuro: texto inativo dourado apagado */
+  color: color-mix(in srgb, var(--color-accent) 60%, var(--color-muted-strong));
+  cursor: pointer;
+  display: inline-flex;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  gap: var(--space-1);
+  letter-spacing: 0.02em;
+  line-height: 1;
+  padding: 5px var(--space-3);
+  /* Cores e sombra: curva suave; transform: spring com overshoot */
+  transition:
+    background  200ms cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow  200ms cubic-bezier(0.4, 0, 0.2, 1),
+    color       160ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform   260ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  user-select: none;
+  white-space: nowrap;
+  will-change: transform, background;
+}
+
+/* tema claro: texto inativo azul apagado */
+html[data-theme="light"] .cv-segment-toggle__btn {
+  color: color-mix(in srgb, var(--color-primary-bright) 60%, var(--color-muted-strong));
+}
+
+.cv-segment-toggle__btn:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+html[data-theme="light"] .cv-segment-toggle__btn:focus-visible {
+  outline-color: var(--color-primary-bright);
+}
+
+/* hover inativo: dourado pleno no escuro */
+.cv-segment-toggle__btn:hover:not([aria-pressed="true"]) {
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  color: var(--color-accent);
+}
+
+/* hover inativo: azul pleno no claro */
+html[data-theme="light"] .cv-segment-toggle__btn:hover:not([aria-pressed="true"]) {
+  background: color-mix(in srgb, var(--color-primary-bright) 10%, transparent);
+  color: var(--color-primary-bright);
+}
+
+/* ── Ativo: base (tema escuro = dourado) ─────────────────────── */
+.cv-segment-toggle__btn[aria-pressed="true"] {
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-hover));
+  border-color: var(--color-accent-hover);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.30),
+    0 0 0 1px color-mix(in srgb, var(--color-accent) 45%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  color: #071a33;   /* texto escuro sobre fundo dourado */
+  transform: scale(1.01);
+}
+
+/* ── Tema claro: ativo = azul ────────────────────────────────── */
+html[data-theme="light"] .cv-segment-toggle__btn[aria-pressed="true"] {
+  background: var(--color-primary-bright);
+  border-color: color-mix(in srgb, var(--color-primary-bright) 70%, #000);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.18),
+    0 0 0 1px color-mix(in srgb, var(--color-primary-bright) 45%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.20);
+  color: #fff;
+  transform: scale(1.01);
+}
+
+/* ── Trilho: tinte dourado no escuro, azul no claro ─────────── */
+html[data-theme="light"] .cv-segment-toggle {
+  background: color-mix(in srgb, var(--color-primary-bright) 10%, var(--color-surface-strong));
+  border-color: color-mix(in srgb, var(--color-primary-bright) 35%, var(--color-border));
+}
+
+/* Escuro já usa o default (tinte azul do trilho que estabelecemos) */
+
+/* ── Animação de entrada quando o botão acaba de ser ativado ─── */
+@keyframes cv-segment-pop {
+  0%   { transform: scale(0.88);  opacity: 0.55; }
+  55%  { transform: scale(1.06);  opacity: 1;    }
+  100% { transform: scale(1.01);  opacity: 1;    }
+}
+
+/* Classe adicionada por JS apenas na troca; removida ao reiniciar */
+.cv-segment-toggle__btn--pop {
+  animation: cv-segment-pop 280ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Fade-out suave no botão que acabou de ser desativado */
+@keyframes cv-segment-fade-out {
+  from { opacity: 1; }
+  to   { opacity: 1; } /* só usa transition; este keyframe reservado */
+}
+
+[data-oficio-motorista-servidor],
+[data-oficio-motorista-manual] {
+  display: grid;
+  gap: var(--space-3);
+}
+
+[data-oficio-motorista-extras] {
+  margin-top: var(--space-2);
+}
+
+/*
+ * Driver toggle — prefixo [data-oficio-wizard-step1] garante especificidade
+ * (0,3,0) que bate qualquer regra de cv-search-picker.css (0,2,0).
+ *
+ * Lógica de cores:
+ *   Tema claro  → azul   (--color-primary-bright)
+ *   Tema escuro → dourado (--color-accent)
+ *
+ * Estados:
+ *   Inativo  → fundo selected-card-bg, borda/texto cor suave
+ *   Hover    → mesma borda forte + glow ring + difusão
+ *   Ativo    → igual ao hover (mesmo visual)
+ */
+
+/* ── Tema claro — inativo ──────────────────────────────────────── */
+[data-oficio-wizard-step1] .cv-search-picker__driver-toggle {
+  background:   var(--selected-card-bg);
+  border-color: color-mix(in srgb, var(--color-primary-bright) 50%, var(--color-border-soft));
+  color:        color-mix(in srgb, var(--color-primary-bright) 75%, var(--color-text));
+}
+
+/* ── Tema claro — hover / focus / ativo ────────────────────────── */
+[data-oficio-wizard-step1] .cv-search-picker__driver-toggle:hover,
+[data-oficio-wizard-step1] .cv-search-picker__driver-toggle:focus-visible,
+[data-oficio-wizard-step1] .cv-search-picker__driver-toggle--active,
+[data-oficio-wizard-step1] .cv-search-picker__driver-toggle[aria-pressed="true"] {
+  background:   color-mix(in srgb, var(--color-primary-bright) 14%, var(--selected-card-bg));
+  border-color: var(--color-primary-bright);
+  box-shadow:   0 0 0 1px color-mix(in srgb, var(--color-primary-bright) 30%, transparent),
+                0 2px 8px  color-mix(in srgb, var(--color-primary-bright) 18%, transparent);
+  color:        var(--color-primary-bright);
+}
+
+/* ── Tema escuro — inativo ─────────────────────────────────────── */
+html[data-theme="dark"] [data-oficio-wizard-step1] .cv-search-picker__driver-toggle {
+  background:   var(--selected-card-bg);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, var(--color-border-soft));
+  color:        color-mix(in srgb, var(--color-accent) 75%, var(--color-text));
+}
+
+/* ── Tema escuro — hover / focus / ativo ───────────────────────── */
+html[data-theme="dark"] [data-oficio-wizard-step1] .cv-search-picker__driver-toggle:hover,
+html[data-theme="dark"] [data-oficio-wizard-step1] .cv-search-picker__driver-toggle:focus-visible,
+html[data-theme="dark"] [data-oficio-wizard-step1] .cv-search-picker__driver-toggle--active,
+html[data-theme="dark"] [data-oficio-wizard-step1] .cv-search-picker__driver-toggle[aria-pressed="true"] {
+  background:   color-mix(in srgb, var(--color-accent) 22%, var(--selected-card-bg));
+  border-color: var(--color-accent);
+  box-shadow:   0 0 0 1px color-mix(in srgb, var(--color-accent) 35%, transparent),
+                0 2px 10px color-mix(in srgb, var(--color-accent) 22%, transparent);
+  color:        var(--color-accent);
+}
+
+/* ── Driver chip nos selecionados: dourado no tema escuro ────────── */
+/*
+ * Os tokens --driver-* são declarados em .cv-search-picker (não em :root),
+ * então o override precisa ser no mesmo nível ou mais específico.
+ */
+html[data-theme="dark"] [data-oficio-wizard-step1] .cv-search-picker {
+  --driver-bg:     color-mix(in srgb, var(--color-accent) 18%, transparent);
+  --driver-border: color-mix(in srgb, var(--color-accent) 65%, transparent);
+  --driver-text:   var(--color-accent);
+}
+
+/* ── Sugestões de viatura: sem corte (JS já limita a 8 chips) ───── */
+/* max-height removido — overflow: hidden cortava chips na segunda linha */

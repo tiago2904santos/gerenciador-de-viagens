@@ -14,8 +14,10 @@
     if (!container || !chipsEl) return;
 
     /* ── Mapas de nome e unidade ─────────────────────────────────── */
-    var servidorNomeMap  = {};   // id → primeiro nome
-    var unidadeNomeMap   = {};   // unidadeId → nome da unidade
+    var servidorNomeMap    = {};   // id → primeiro nome
+    var unidadeNomeMap     = {};   // unidadeId → nome da unidade
+    var servidorUnidadeMap = {};   // id → unidadeId (equipe)
+    var motoristaUnidadeMap = {};  // id → unidadeId (motorista select)
 
     function buildMaps() {
       var sources = [];
@@ -32,6 +34,20 @@
           }
         });
       });
+      if (equipeSelect) {
+        Array.from(equipeSelect.options).forEach(function (o) {
+          if (o.value && o.value.indexOf("__") !== 0) {
+            servidorUnidadeMap[o.value] = o.dataset.unidadeId || "";
+          }
+        });
+      }
+      if (motoristaSelect) {
+        Array.from(motoristaSelect.options).forEach(function (o) {
+          if (o.value && o.value.indexOf("__") !== 0) {
+            motoristaUnidadeMap[o.value] = o.dataset.unidadeId || "";
+          }
+        });
+      }
     }
     buildMaps();
 
@@ -47,54 +63,85 @@
         };
       });
 
-    /* Mapa de unidade dos servidores (equipe), construído uma vez */
-    var servidorUnidadeMap = {};
-    if (equipeSelect) {
-      Array.from(equipeSelect.options).forEach(function (o) {
-        if (o.value && o.value.indexOf("__") !== 0) {
-          servidorUnidadeMap[o.value] = o.dataset.unidadeId || "";
-        }
-      });
+    /* ── Identifica o motorista ativo ────────────────────────────── */
+    function getActiveDriverId() {
+      /* Motorista no campo externo (card "Motorista") */
+      var motId = (motoristaSelect && motoristaSelect.value) || "";
+      if (motId) return motId;
+      /* Driver toggle ativo na equipe picker */
+      var activeToggle = step1 && step1.querySelector(
+        ".cv-search-picker__driver-toggle[aria-pressed='true']"
+      );
+      return (activeToggle && activeToggle.dataset.value) || "";
     }
 
-    /* ── Seleciona viatura no picker ─────────────────────────────── */
+    function getDriverUnit(driverId) {
+      return servidorUnidadeMap[driverId] || motoristaUnidadeMap[driverId] || "";
+    }
+
+    /* ── Seleciona / deseleciona viatura no picker ───────────────── */
     function selectViatura(id) {
       Array.from(viaturaSelect.options).forEach(function (o) { o.selected = o.value === id; });
       viaturaSelect.dispatchEvent(new Event("input",  { bubbles: true }));
       viaturaSelect.dispatchEvent(new Event("change", { bubbles: true }));
     }
 
+    function deselectViatura() {
+      Array.from(viaturaSelect.options).forEach(function (o) { o.selected = false; });
+      viaturaSelect.dispatchEvent(new Event("input",  { bubbles: true }));
+      viaturaSelect.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+
+    /* ── Atualiza classe --active nos chips já renderizados ─────── */
+    function updateActiveChips() {
+      var currentId = viaturaSelect.value || "";
+      Array.from(chipsEl.querySelectorAll(".viatura-sugestao-chip")).forEach(function (btn) {
+        btn.classList.toggle("viatura-sugestao-chip--active", btn.dataset.viaturaId === currentId);
+      });
+    }
+
     /* ── Renderiza chips ─────────────────────────────────────────── */
     function renderChips(sugestoes) {
+      var currentId = viaturaSelect.value || "";
       chipsEl.innerHTML = "";
       sugestoes.forEach(function (s) {
         var btn = document.createElement("button");
-        btn.type      = "button";
-        btn.className = "viatura-sugestao-chip";
+        btn.type           = "button";
+        btn.dataset.viaturaId = s.id;
+        btn.className      = "viatura-sugestao-chip" +
+          (s.id === currentId ? " viatura-sugestao-chip--active" : "");
 
-        /* Placa em negrito + modelo */
-        var parts  = s.label.split(" · ");
+        /* ── Conteúdo: placa (negrito) + descrição ── */
+        var parts = s.label.split(" · ");
+
         var strong = document.createElement("strong");
         strong.textContent = parts[0] || s.label;
         btn.appendChild(strong);
+
         if (parts[1]) {
           btn.appendChild(document.createTextNode(" · " + parts[1]));
         }
 
-        /* Badge com nome real da unidade ou primeiro nome do motorista */
+        /* ── Badge de razão ── */
         var badge = document.createElement("span");
         badge.className   = "viatura-sugestao-badge viatura-sugestao-badge--" + s.reason;
         badge.textContent = s.badgeText;
         btn.appendChild(badge);
 
-        btn.addEventListener("click", function () { selectViatura(s.id); });
+        btn.addEventListener("click", function () {
+          if (viaturaSelect.value === s.id) {
+            deselectViatura();
+          } else {
+            selectViatura(s.id);
+          }
+        });
         chipsEl.appendChild(btn);
       });
     }
 
     /* ── Computa sugestões ───────────────────────────────────────── */
     function computeSugestoes() {
-      var currentMotoristaId = (motoristaSelect && motoristaSelect.value) || "";
+      var activeDriverId = getActiveDriverId();
 
       var equipeIds = new Set(
         equipeSelect
@@ -104,16 +151,20 @@
           : []
       );
 
-      /* Unidades da equipe + motorista */
+      /*
+       * Escopo de unidades:
+       * — Se há motorista ativo → apenas a unidade dele (ignora equipe)
+       * — Caso contrário → unidades de todos da equipe
+       */
       var selectedUnidades = new Set();
-      equipeIds.forEach(function (id) {
-        var uid = servidorUnidadeMap[id];
-        if (uid) selectedUnidades.add(uid);
-      });
-      if (currentMotoristaId && motoristaSelect) {
-        var motOpt    = motoristaSelect.querySelector("option[value='" + currentMotoristaId + "']");
-        var motUnidade = (motOpt && motOpt.dataset.unidadeId) || "";
-        if (motUnidade) selectedUnidades.add(motUnidade);
+      if (activeDriverId) {
+        var driverUnit = getDriverUnit(activeDriverId);
+        if (driverUnit) selectedUnidades.add(driverUnit);
+      } else {
+        equipeIds.forEach(function (id) {
+          var uid = servidorUnidadeMap[id];
+          if (uid) selectedUnidades.add(uid);
+        });
       }
 
       var sugestoes = [];
@@ -122,16 +173,18 @@
       viaturas.forEach(function (v) {
         if (seen.has(v.id)) return;
 
-        /* Motorista direto (campo motorista) */
-        var porMotoristaDirecto = currentMotoristaId && v.motoristaIds.has(currentMotoristaId);
+        /* Motorista direto (driver ativo) */
+        var porMotoristaDirecto = activeDriverId && v.motoristaIds.has(activeDriverId);
 
-        /* Membro da equipe é motorista desta viatura */
+        /* Sem motorista ativo: membro da equipe é motorista desta viatura */
         var matchingEquipeMembro = null;
-        equipeIds.forEach(function (eid) {
-          if (!matchingEquipeMembro && v.motoristaIds.has(eid)) matchingEquipeMembro = eid;
-        });
+        if (!activeDriverId) {
+          equipeIds.forEach(function (eid) {
+            if (!matchingEquipeMembro && v.motoristaIds.has(eid)) matchingEquipeMembro = eid;
+          });
+        }
 
-        /* Mesma unidade */
+        /* Mesma unidade (escopo filtrado pelo motorista ativo) */
         var porUnidade = v.unidadeId && selectedUnidades.has(v.unidadeId);
 
         if (porMotoristaDirecto || matchingEquipeMembro || porUnidade) {
@@ -140,7 +193,7 @@
           var reason, badgeText;
           if (porMotoristaDirecto || matchingEquipeMembro) {
             reason    = "motorista";
-            var motId = porMotoristaDirecto ? currentMotoristaId : matchingEquipeMembro;
+            var motId = porMotoristaDirecto ? activeDriverId : matchingEquipeMembro;
             badgeText = servidorNomeMap[motId] || "Motorista";
           } else {
             reason    = "unidade";
@@ -151,7 +204,7 @@
         }
       });
 
-      /* Motorista direto primeiro */
+      /* Motorista direto sempre primeiro */
       sugestoes.sort(function (a, b) {
         return (b.reason === "motorista" ? 1 : 0) - (a.reason === "motorista" ? 1 : 0);
       });
@@ -162,15 +215,16 @@
     /* ── Atualiza UI ─────────────────────────────────────────────── */
     function update() {
       var sugestoes = computeSugestoes();
+
       if (sugestoes.length === 0) {
         container.hidden = true;
         return;
       }
       container.hidden = false;
-      renderChips(sugestoes.slice(0, 6));
+      renderChips(sugestoes.slice(0, 8));
     }
 
-    /* ── Auto-fill ao marcar motorista (driver toggle) ───────────── */
+    /* ── Auto-fill ao marcar driver ──────────────────────────────── */
     function tryAutoFillFromDriver(driverId) {
       if (!driverId) return;
       var matches = viaturas.filter(function (v) { return v.motoristaIds.has(driverId); });
@@ -179,13 +233,16 @@
       }
     }
 
-    /* ── Auto-fill ao selecionar campo motorista ─────────────────── */
     function tryAutoFillFromMotoristaSelect() {
       var id = (motoristaSelect && motoristaSelect.value) || "";
       if (id) tryAutoFillFromDriver(id);
     }
 
     /* ── Listeners ───────────────────────────────────────────────── */
+    /* Quando a viatura muda via picker, re-renderiza chips (inclui estado ativo) */
+    viaturaSelect.addEventListener("change", update);
+    viaturaSelect.addEventListener("input",  update);
+
     if (equipeSelect) {
       equipeSelect.addEventListener("change", update);
     }
@@ -196,8 +253,6 @@
       });
     }
 
-    /* Driver toggle no equipe picker — setDriverValue não dispara evento;
-       usamos delegação de clique + setTimeout para ler aria-pressed depois */
     if (step1) {
       step1.addEventListener("click", function (e) {
         var toggle = e.target.closest(".cv-search-picker__driver-toggle");
@@ -205,7 +260,6 @@
         var driverId = toggle.dataset.value || "";
         setTimeout(function () {
           update();
-          /* Só auto-fill se o toggle acabou de ser ATIVADO */
           if (toggle.getAttribute("aria-pressed") === "true") {
             tryAutoFillFromDriver(driverId);
           }
