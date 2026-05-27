@@ -118,6 +118,21 @@ class ServidorMotoristaSelect(forms.Select):
         return option
 
 
+class ModeloMotivoSelect(forms.Select):
+    def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+        option = super().create_option(name, value, label, selected, index, subindex=subindex, attrs=attrs)
+        modelo = getattr(value, "instance", None)
+        if modelo is None:
+            return option
+
+        option["attrs"].update(
+            {
+                "data-texto-motivo": (modelo.texto or "").strip(),
+            },
+        )
+        return option
+
+
 class OficioForm(forms.ModelForm):
     class Meta:
         model = Oficio
@@ -191,7 +206,7 @@ class OficioDadosViajantesForm(OficioForm):
         queryset=ModeloMotivoOficio.objects.none(),
         required=False,
         empty_label="Selecione um modelo (opcional)",
-        widget=forms.Select(attrs={"class": "form-select", "data-modelo-motivo-select": "true"}),
+        widget=ModeloMotivoSelect(attrs={"class": "form-select", "data-modelo-motivo-select": "true"}),
     )
 
     class Meta(OficioForm.Meta):
@@ -207,7 +222,11 @@ class OficioDadosViajantesForm(OficioForm):
         widgets = {
             "protocolo": forms.TextInput(attrs={"class": "form-control", "data-mask": "protocolo"}),
             "motivo": forms.Textarea(
-                attrs={"class": "form-control", "rows": 2, "data-motivo-textarea": "true"},
+                attrs={
+                    "class": "cv-field__control cv-field__control--textarea",
+                    "rows": 4,
+                    "data-motivo-textarea": "true",
+                },
             ),
             "custeio": forms.Select(
                 attrs={"class": "form-select", "data-oficio-custeio-field": "true"},
@@ -253,6 +272,8 @@ class OficioDadosViajantesForm(OficioForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["modelo_motivo"].queryset = ModeloMotivoOficio.objects.order_by("ordem", "nome")
+        self.fields["protocolo"].required = False
+        self.fields["motivo"].required = False
         self.fields["custeio"].required = False
         self.fields["viatura"].empty_label = ""
         self.fields["servidores"].required = False
@@ -265,6 +286,9 @@ class OficioDadosViajantesForm(OficioForm):
 
     def clean_protocolo(self):
         protocolo = normalize_protocolo(self.cleaned_data.get("protocolo", ""))
+        action = (self.data.get("action") or "").strip() if self.is_bound else ""
+        if action in {"wizard_next", "save_continue"}:
+            return protocolo
         if protocolo and len(protocolo) != 9:
             raise forms.ValidationError("Informe um protocolo válido com 9 dígitos.")
         return protocolo

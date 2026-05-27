@@ -20,6 +20,11 @@
     if (!input) return null;
     if (input.type === 'checkbox') return !!input.checked;
     if (input.type === 'radio') return !!input.checked ? input.value : null;
+    if (input.tagName === 'SELECT' && input.multiple) {
+      return Array.prototype.slice.call(input.selectedOptions).map(function (option) {
+        return option.value;
+      });
+    }
     return input.value;
   }
 
@@ -280,6 +285,8 @@
       if (instance) instance.resume();
     }
   };
+  window.CV = window.CV || {};
+  window.CV.autosave = window.AppAutosave;
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function () { window.AppAutosave.init(); });

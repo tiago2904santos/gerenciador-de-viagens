@@ -1,7 +1,7 @@
 <footer class="footer-actions oficio-wizard__actions app-wizard__actions{% if wizard_footer_mode == 'step1_minimal' %} footer-actions--primary-only{% endif %}">
   {% if wizard_footer_mode == 'step1_minimal' %}
     <div class="footer-actions__primary">
-      <button class="cv-btn cv-btn--primary" type="submit" name="action" value="wizard_next">Avançar →</button>
+      <button class="cv-btn cv-btn--primary" type="submit" name="action" value="wizard_next" formnovalidate>Avançar →</button>
     </div>
   {% else %}
     <div class="footer-actions__secondary">
@@ -24,7 +24,7 @@
           <button class="cv-btn cv-btn--primary" type="submit" name="action" value="finalizar">Finalizar Ofício</button>
         {% endif %}
       {% else %}
-        <button class="cv-btn cv-btn--primary" type="submit" name="action" value="wizard_next">Avançar →</button>
+        <button class="cv-btn cv-btn--primary" type="submit" name="action" value="wizard_next" formnovalidate>Avançar →</button>
       {% endif %}
     </div>
   {% endif %}

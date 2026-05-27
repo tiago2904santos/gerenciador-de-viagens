@@ -1,4 +1,5 @@
 from pathlib import Path
+import json
 import re
 
 from django.contrib.auth import get_user_model
@@ -78,7 +79,7 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertTemplateUsed(response, "oficios/wizard_dados_viajantes.html")
         self.assertContains(response, "Cadastro de ofício")
         self.assertContains(response, "Dados e viajantes")
-        self.assertContains(response, "Transporte")
+        self.assertNotContains(response, "Etapa 2 Transporte")
         self.assertContains(response, "Roteiro e diárias")
         self.assertContains(response, "Justificativa")
         self.assertContains(response, "Documentos")
@@ -128,10 +129,12 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertContains(response, "cv-field-with-action--manage-reveal")
         self.assertContains(response, "cv-icon-btn--field-manage")
         self.assertContains(response, reverse("oficios:modelos_motivo_index"))
-        self.assertContains(response, "Use um modelo salvo ou descreva o motivo da viagem.")
         self.assertContains(response, "Modelo de motivo")
         self.assertContains(response, 'name="modelo_motivo"')
+        self.assertContains(response, 'data-texto-motivo="Texto padrão ativo"')
         self.assertContains(response, 'name="motivo"')
+        self.assertContains(response, "cv-field__control cv-field__control--textarea")
+        self.assertContains(response, 'rows="4"')
         self.assertContains(response, "wizard-inner-section")
         self.assertContains(response, "id=\"oficio-wizard-motivo\"")
         self.assertNotContains(
@@ -164,13 +167,83 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertEqual(list(oficio.servidores.all()), [self.servidor])
         self.assertEqual(list(oficio.servidores_termo_autorizacao.all()), [self.servidor])
 
-    def test_post_novo_save_continue_cria_e_redireciona_para_transporte(self):
+    def test_post_novo_save_continue_cria_e_redireciona_para_roteiro(self):
         response = self.client.post(self._novo_rascunho_url(), data=self._payload(action="save_continue"))
 
         self.assertEqual(response.status_code, 302)
         oficio = Oficio.objects.get()
-        self.assertEqual(response.url, reverse("oficios:transporte", args=[oficio.pk]))
+        self.assertEqual(response.url, reverse("oficios:wizard_roteiro", args=[oficio.pk]))
         self.assertEqual(oficio.status, Oficio.STATUS_GERADO)
+
+    def test_post_wizard_next_permite_rascunho_incompleto_e_avanca(self):
+        oficio = Oficio.objects.create(numero=1, ano=timezone.localdate().year, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+
+        response = self.client.post(
+            reverse("oficios:dados_viajantes", args=[oficio.pk]),
+            data={
+                "protocolo": "123",
+                "motivo": "",
+                "custeio": Oficio.CUSTEIO_UNIDADE_DPC,
+                "servidores_termo_autorizacao_present": "1",
+                "viatura": str(self.viatura.pk),
+                "porte_transporte_armas": "sim",
+                "motorista_modo": "SERVIDOR",
+                "motorista": "",
+                "action": "wizard_next",
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("oficios:wizard_roteiro", args=[oficio.pk]))
+
+    def test_dados_viajantes_autosave_atualiza_campo(self):
+        oficio = Oficio.objects.create(numero=1, ano=timezone.localdate().year, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        payload = {
+            "object_id": str(oficio.pk),
+            "form_id": "oficio-form",
+            "model": "oficio",
+            "dirty_fields": ["motivo"],
+            "fields": {"motivo": "Texto salvo automaticamente"},
+            "snapshots": {},
+        }
+
+        response = self.client.post(
+            reverse("oficios:dados_viajantes_autosave", args=[oficio.pk]),
+            data=json.dumps(payload),
+            content_type="application/json",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        oficio.refresh_from_db()
+        self.assertEqual(oficio.motivo, "Texto salvo automaticamente")
+
+    def test_dados_viajantes_autosave_salva_motorista_da_equipe(self):
+        oficio = Oficio.objects.create(numero=1, ano=timezone.localdate().year, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        oficio.servidores.add(self.servidor)
+        payload = {
+            "object_id": str(oficio.pk),
+            "form_id": "oficio-form",
+            "model": "oficio",
+            "dirty_fields": ["motorista", "motorista_modo"],
+            "fields": {
+                "motorista": str(self.servidor.pk),
+                "motorista_modo": Oficio.MOTORISTA_MODO_SERVIDOR,
+            },
+            "snapshots": {},
+        }
+
+        response = self.client.post(
+            reverse("oficios:dados_viajantes_autosave", args=[oficio.pk]),
+            data=json.dumps(payload),
+            content_type="application/json",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        oficio.refresh_from_db()
+        self.assertEqual(oficio.motorista, self.servidor)
+        self.assertEqual(oficio.motorista_modo, Oficio.MOTORISTA_MODO_SERVIDOR)
 
     def test_get_dados_viajantes_renderiza_oficio_existente(self):
         oficio = Oficio.objects.create(

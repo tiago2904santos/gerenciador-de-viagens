@@ -17,7 +17,7 @@ from roteiros.models import Roteiro
 
 
 class OficioWizardRoteiroDiariasTests(TestCase):
-    """Etapa 3 do ofício reutiliza o editor de roteiros e multiplica diárias pelos viajantes."""
+    """Etapa 2 do ofício reutiliza o editor de roteiros e multiplica diárias pelos viajantes."""
 
     def setUp(self):
         self.user = get_user_model().objects.create_user(
@@ -84,6 +84,7 @@ class OficioWizardRoteiroDiariasTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "oficios/wizard_roteiro.html")
         self.assertContains(response, 'id="roteiro-editor-form"')
+        self.assertContains(response, "Etapa 2")
 
         oficio.refresh_from_db()
         self.assertIsNotNone(oficio.roteiro_id)

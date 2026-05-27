@@ -576,7 +576,7 @@ html[data-theme="light"] {
 .page-stepper__list {
   align-items: flex-start;
   display:     flex;
-  gap:         0;
+  gap:         var(--space-8);
   list-style:  none;
   margin:      0;
   padding:     0;
@@ -591,14 +591,15 @@ html[data-theme="light"] {
   flex-direction: column;
   gap:            var(--space-2);
   min-width:      0;
-  padding:        0 var(--space-1);
+  padding:        0;
 }
 
 /* Trilha: linha-esquerda + marcador + linha-direita */
 .page-stepper__track {
   align-items: center;
   display:     flex;
-  width:       100%;
+  margin-inline: calc(var(--space-8) / -2);
+  width:       calc(100% + var(--space-8));
 }
 
 /* Linha conectora entre marcadores */
@@ -877,7 +878,9 @@ html[data-theme="light"] {
 
 /* Stepper fora do painel stack — card isolado como no UI Lab */
 .page-shell--wizard > .page-stepper {
-  margin-bottom: var(--cv-wizard-section-stack-gap);
+  position: sticky;
+  top: 24px;
+  z-index: var(--z-footer-actions);
 }
 
 

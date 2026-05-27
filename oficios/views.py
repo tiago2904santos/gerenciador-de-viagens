@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.http import Http404
 from django.http import JsonResponse
+from django.http import QueryDict
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
@@ -14,6 +15,11 @@ from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_GET
 from django.views.decorators.http import require_POST
+
+from core.autosave import AutosavePayloadError
+from core.autosave import autosave_json_response
+from core.autosave import filter_allowed_fields
+from core.autosave import parse_autosave_payload
 
 from justificativas.forms import JustificativaOficioForm
 from justificativas.presenters import apresentar_justificativa_wizard_context
@@ -167,7 +173,6 @@ def _wizard_dados_viajantes_context(
     mostrar_pendencias_documento=False,
 ):
     avaliacao = avaliacao or avaliar_oficio_dados_viajantes(oficio=oficio, form=form)
-    transp_av = avaliar_oficio_transporte(oficio)
     pendencias = avaliacao["pendencias"]
     summary = apresentar_oficio_wizard_summary(oficio)
     custeio_value = ""
@@ -179,6 +184,11 @@ def _wizard_dados_viajantes_context(
     modelos_queryset = form.fields["modelo_motivo"].queryset
     equipe_ids = list(oficio.servidores.values_list("pk", flat=True))
     modo_motorista = oficio.motorista_modo or Oficio.MOTORISTA_MODO_SERVIDOR
+    servidores_attrs = form.fields["servidores"].widget.attrs
+    if oficio.motorista_id and oficio.motorista_id in equipe_ids:
+        servidores_attrs["data-picker-driver-value"] = str(oficio.motorista_id)
+    else:
+        servidores_attrs.pop("data-picker-driver-value", None)
     # Card de motorista externo: só aparece quando viatura selecionada + motorista não é da equipe
     _driver_in_equipe = bool(oficio.motorista_id) and oficio.motorista_id in equipe_ids
     show_motorista_card = bool(oficio.viatura_id) and not _driver_in_equipe
@@ -214,7 +224,6 @@ def _wizard_dados_viajantes_context(
             oficio=oficio,
             etapa_atual="dados_viajantes",
             dados_viajantes_status=avaliacao["status"],
-            transporte_status=transp_av["status"],
         ),
         "pendencias": pendencias,
         "mostrar_pendencias_documento": mostrar_pendencias_documento,
@@ -247,6 +256,8 @@ def _wizard_dados_viajantes_context(
         "wizard_footer_mode": "step1_minimal",
         "wizard_show_document_actions": False,
         "wizard_show_save_draft": False,
+        "wizard_autosave_url": reverse("oficios:dados_viajantes_autosave", args=[oficio.pk]),
+        "wizard_autosave_step": "dados_viajantes",
         **_wizard_footer_ctx(oficio),
     }
 
@@ -267,7 +278,7 @@ def _redirect_after_dados_viajantes_save(request, oficio, *, nav_action: str, cr
             if created
             else "Dados e viajantes atualizados com sucesso.",
         )
-        return redirect("oficios:transporte", pk=oficio.pk)
+        return redirect("oficios:wizard_roteiro", pk=oficio.pk)
     messages.success(
         request,
         "Ofício cadastrado com sucesso." if created else "Dados e viajantes atualizados com sucesso.",
@@ -311,6 +322,8 @@ def _wizard_transporte_context(*, form, oficio):
         "wizard_back_label": "Voltar",
         "wizard_show_document_actions": True,
         "wizard_show_save_draft": True,
+        "wizard_autosave_url": reverse("oficios:transporte_autosave", args=[oficio.pk]),
+        "wizard_autosave_step": "transporte",
         **_wizard_footer_ctx(oficio),
     }
 
@@ -327,6 +340,88 @@ def _redirect_after_transporte_save(request, oficio, *, nav_action: str):
         return redirect("oficios:wizard_roteiro", pk=oficio.pk)
     messages.success(request, "Rascunho do transporte salvo.")
     return redirect("oficios:transporte", pk=oficio.pk)
+
+
+def _querydict_from_pairs(pairs):
+    data = QueryDict(mutable=True)
+    for name, value in pairs.items():
+        if isinstance(value, (list, tuple, set)):
+            data.setlist(name, [str(item) for item in value if item not in (None, "")])
+        elif value is not None:
+            data[name] = str(value)
+    return data
+
+
+def _merge_payload_fields(data, clean_fields):
+    for name, value in clean_fields.items():
+        if isinstance(value, list):
+            data.setlist(name, [str(item) for item in value if item not in (None, "")])
+        elif value is None:
+            data[name] = ""
+        else:
+            data[name] = str(value)
+    return data
+
+
+def _oficio_dados_viajantes_autosave_data(oficio):
+    return _querydict_from_pairs(
+        {
+            "protocolo": oficio.protocolo or "",
+            "modelo_motivo": "",
+            "motivo": oficio.motivo or "",
+            "custeio": oficio.custeio or Oficio.CUSTEIO_UNIDADE_DPC,
+            "custeio_observacao": oficio.custeio_observacao or "",
+            "viatura": oficio.viatura_id or "",
+            "servidores": list(oficio.servidores.values_list("pk", flat=True)),
+            "servidores_termo_autorizacao_present": "1",
+            "servidores_termo_autorizacao": list(
+                oficio.servidores_termo_autorizacao.values_list("pk", flat=True),
+            ),
+            "transporte_embed": "1",
+            "porte_transporte_armas": "sim" if oficio.porte_transporte_armas else "nao",
+            "transporte_placa_manual": oficio.transporte_placa_manual or "",
+            "transporte_modelo_manual": oficio.transporte_modelo_manual or "",
+            "transporte_combustivel_manual": oficio.transporte_combustivel_manual_id or "",
+            "transporte_tipo_manual": oficio.transporte_tipo_manual or "",
+            "motorista_modo": oficio.motorista_modo or Oficio.MOTORISTA_MODO_SERVIDOR,
+            "motorista": oficio.motorista_id or "",
+            "motorista_manual_nome": oficio.motorista_manual_nome or "",
+            "motorista_oficio_referencia": oficio.motorista_oficio_referencia or "",
+            "motorista_protocolo_ref": oficio.motorista_protocolo_ref or "",
+        }
+    )
+
+
+def _oficio_transporte_autosave_data(oficio):
+    return _querydict_from_pairs(
+        {
+            "viatura": oficio.viatura_id or "",
+            "porte_transporte_armas": "sim" if oficio.porte_transporte_armas else "nao",
+            "transporte_placa_manual": oficio.transporte_placa_manual or "",
+            "transporte_modelo_manual": oficio.transporte_modelo_manual or "",
+            "transporte_combustivel_manual": oficio.transporte_combustivel_manual_id or "",
+            "transporte_tipo_manual": oficio.transporte_tipo_manual or "",
+            "motorista_modo": oficio.motorista_modo or Oficio.MOTORISTA_MODO_SERVIDOR,
+            "motorista": oficio.motorista_id or "",
+            "motorista_manual_nome": oficio.motorista_manual_nome or "",
+            "motorista_oficio_referencia": oficio.motorista_oficio_referencia or "",
+            "motorista_protocolo_ref": oficio.motorista_protocolo_ref or "",
+        }
+    )
+
+
+def _oficio_autosave_version(oficio):
+    oficio.refresh_from_db()
+    return int(timezone.localtime(oficio.updated_at).timestamp())
+
+
+def _justificativa_autosave_data(inst):
+    return _querydict_from_pairs(
+        {
+            "modelo": inst.modelo_id or "",
+            "texto": inst.texto or "",
+        }
+    )
 
 
 def index(request):
@@ -380,18 +475,22 @@ def editar(request, pk):
 def dados_viajantes(request, pk):
     oficio = get_oficio_by_id(pk)
     form = OficioDadosViajantesForm(request.POST or None, instance=oficio)
-    transporte_form = OficioTransporteForm(request.POST or None, instance=oficio)
+    transporte_form = OficioTransporteForm(request.POST or None, instance=Oficio.objects.get(pk=oficio.pk))
     _prepare_dados_viajantes_form(form)
     _prepare_transporte_form(transporte_form)
     if request.method == "POST":
+        nav_action = _wizard_normalizar_acao(request.POST)
         dados_ok = form.is_valid()
         save_transport = request.POST.get("transporte_embed") == "1"
-        transp_ok = (not save_transport) or transporte_form.is_valid()
+        transporte_valido = bool(save_transport and transporte_form.is_valid())
+        transp_ok = (not save_transport) or transporte_valido or nav_action == "wizard_next"
         if dados_ok and transp_ok:
-            nav_action = _wizard_normalizar_acao(request.POST)
             persist_action = _wizard_persist_action_para_dados_viajantes(nav_action)
             oficio = atualizar_oficio_dados_viajantes(oficio, form, action=persist_action)
-            if save_transport:
+            if transporte_valido:
+                transporte_form = OficioTransporteForm(request.POST, instance=oficio)
+                _prepare_transporte_form(transporte_form)
+                transporte_form.is_valid()
                 oficio = atualizar_oficio_transporte(
                     oficio,
                     transporte_form,
@@ -413,6 +512,56 @@ def dados_viajantes(request, pk):
     )
 
 
+def _autosave_form_errors(*forms):
+    errors = {}
+    for form in forms:
+        for field, messages_list in form.errors.items():
+            errors[field] = [str(item) for item in messages_list]
+    return errors
+
+
+@require_POST
+def dados_viajantes_autosave(request, pk):
+    oficio = get_oficio_by_id(pk)
+    try:
+        payload = parse_autosave_payload(request, expected_model="oficio")
+    except AutosavePayloadError as exc:
+        return autosave_json_response(ok=False, message=str(exc))
+
+    dados_fields = set(OficioDadosViajantesForm.Meta.fields) | {"modelo_motivo"}
+    transporte_fields = set(OficioTransporteForm.Meta.fields)
+    allowed_fields = dados_fields | transporte_fields
+    clean_fields = filter_allowed_fields(payload.fields, payload.dirty_fields, allowed_fields)
+    if not clean_fields:
+        return autosave_json_response(ok=True, object_id=oficio.pk, version=_oficio_autosave_version(oficio))
+
+    data = _merge_payload_fields(_oficio_dados_viajantes_autosave_data(oficio), clean_fields)
+    dirty_names = set(clean_fields)
+    if dirty_names & dados_fields:
+        form = OficioDadosViajantesForm(data, instance=oficio)
+        _prepare_dados_viajantes_form(form)
+        if not form.is_valid():
+            return autosave_json_response(
+                ok=False,
+                message="Alguns campos ainda precisam de ajuste antes do autosave.",
+                errors=_autosave_form_errors(form),
+            )
+        oficio = atualizar_oficio_dados_viajantes(oficio, form, action="save_draft")
+
+    if dirty_names & transporte_fields:
+        transporte_form = OficioTransporteForm(data, instance=oficio)
+        _prepare_transporte_form(transporte_form)
+        if not transporte_form.is_valid():
+            return autosave_json_response(
+                ok=False,
+                message="Alguns campos de transporte ainda precisam de ajuste antes do autosave.",
+                errors=_autosave_form_errors(transporte_form),
+            )
+        oficio = atualizar_oficio_transporte(oficio, transporte_form, action="save_draft")
+
+    return autosave_json_response(ok=True, object_id=oficio.pk, version=_oficio_autosave_version(oficio))
+
+
 def transporte(request, pk):
     oficio = get_oficio_by_id(pk)
     form = OficioTransporteForm(request.POST or None, instance=oficio)
@@ -430,6 +579,36 @@ def transporte(request, pk):
         "oficios/wizard_transporte.html",
         _wizard_transporte_context(form=form, oficio=oficio),
     )
+
+
+@require_POST
+def transporte_autosave(request, pk):
+    oficio = get_oficio_by_id(pk)
+    try:
+        payload = parse_autosave_payload(request, expected_model="oficio")
+    except AutosavePayloadError as exc:
+        return autosave_json_response(ok=False, message=str(exc))
+
+    clean_fields = filter_allowed_fields(
+        payload.fields,
+        payload.dirty_fields,
+        set(OficioTransporteForm.Meta.fields),
+    )
+    if not clean_fields:
+        return autosave_json_response(ok=True, object_id=oficio.pk, version=_oficio_autosave_version(oficio))
+
+    data = _merge_payload_fields(_oficio_transporte_autosave_data(oficio), clean_fields)
+    form = OficioTransporteForm(data, instance=oficio)
+    _prepare_transporte_form(form)
+    if not form.is_valid():
+        return autosave_json_response(
+            ok=False,
+            message="Alguns campos de transporte ainda precisam de ajuste antes do autosave.",
+            errors=_autosave_form_errors(form),
+        )
+
+    oficio = atualizar_oficio_transporte(oficio, form, action="save_draft")
+    return autosave_json_response(ok=True, object_id=oficio.pk, version=_oficio_autosave_version(oficio))
 
 
 def wizard_roteiro(request, pk):
@@ -461,7 +640,7 @@ def wizard_roteiro(request, pk):
                 return redirect("oficios:wizard_documentos", pk=oficio.pk)
             if nav_action == "wizard_back":
                 messages.success(request, "Roteiro e diárias salvos.")
-                return redirect("oficios:transporte", pk=oficio.pk)
+                return redirect("oficios:dados_viajantes", pk=oficio.pk)
             if nav_action == "save_draft_list":
                 messages.success(request, "Roteiro e diárias salvos. Retornamos à lista de ofícios.")
                 return redirect("oficios:index")
@@ -491,7 +670,6 @@ def wizard_roteiro(request, pk):
         )
 
     dados_av = avaliar_oficio_dados_viajantes(oficio=oficio)
-    transp_av = avaliar_oficio_transporte(oficio)
     roteiro_status = _wizard_roteiro_step_status(oficio)
     context = montar_contexto_editor_roteiro(
         evento=None,
@@ -511,12 +689,11 @@ def wizard_roteiro(request, pk):
                 oficio=oficio,
                 etapa_atual="roteiro",
                 dados_viajantes_status=dados_av["status"],
-                transporte_status=transp_av["status"],
                 roteiro_status=roteiro_status,
             ),
             "wizard_summary": apresentar_oficio_wizard_summary(oficio),
             "oficio": oficio,
-            "wizard_back_url": reverse("oficios:transporte", args=[oficio.pk]),
+            "wizard_back_url": reverse("oficios:dados_viajantes", args=[oficio.pk]),
             "wizard_back_label": "Voltar",
             "roteiro_editor_oficio": True,
             "wizard_use_outer_form": False,
@@ -587,9 +764,41 @@ def wizard_justificativa(request, pk):
             "justificativa_ctx": apresentar_justificativa_wizard_context(oficio),
             "justificativa_obrigatoria": obrigatoria,
             "modelos_justificativa_url": reverse("justificativas:index"),
+            "wizard_autosave_url": reverse("oficios:justificativa_autosave", args=[oficio.pk]),
+            "wizard_autosave_step": "justificativa",
             **_wizard_footer_ctx(oficio),
         },
     )
+
+
+@require_POST
+def justificativa_autosave(request, pk):
+    oficio = get_oficio_by_id(pk)
+    inst = get_or_create_justificativa_oficio(oficio)
+    try:
+        payload = parse_autosave_payload(request, expected_model="oficio")
+    except AutosavePayloadError as exc:
+        return autosave_json_response(ok=False, message=str(exc))
+
+    clean_fields = filter_allowed_fields(
+        payload.fields,
+        payload.dirty_fields,
+        set(JustificativaOficioForm.Meta.fields),
+    )
+    if not clean_fields:
+        return autosave_json_response(ok=True, object_id=oficio.pk, version=_oficio_autosave_version(oficio))
+
+    data = _merge_payload_fields(_justificativa_autosave_data(inst), clean_fields)
+    form = JustificativaOficioForm(data, instance=inst, obrigatoria=False)
+    if not form.is_valid():
+        return autosave_json_response(
+            ok=False,
+            message="Alguns campos da justificativa ainda precisam de ajuste antes do autosave.",
+            errors=_autosave_form_errors(form),
+        )
+
+    atualizar_justificativa_oficio(oficio, form, action="save_draft")
+    return autosave_json_response(ok=True, object_id=oficio.pk, version=_oficio_autosave_version(oficio))
 
 
 def wizard_documentos(request, pk):

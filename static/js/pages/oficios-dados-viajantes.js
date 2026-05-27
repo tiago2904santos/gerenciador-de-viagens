@@ -1,4 +1,31 @@
 (function () {
+  function setRevealVisible(el, visible) {
+    if (!el) return;
+
+    if (el._revealTimer) {
+      clearTimeout(el._revealTimer);
+      el._revealTimer = null;
+    }
+
+    if (visible) {
+      el.hidden = false;
+      el.classList.remove("form-field--hidden");
+      requestAnimationFrame(function () {
+        el.classList.add("is-open");
+      });
+      return;
+    }
+
+    if (el.hidden) return;
+
+    el.classList.remove("is-open");
+    el._revealTimer = setTimeout(function () {
+      el.hidden = true;
+      el.classList.add("form-field--hidden");
+      el._revealTimer = null;
+    }, 320);
+  }
+
   function onModeloMotivoChange(select) {
     const form = select.closest("form");
     if (!form) return;
@@ -16,19 +43,17 @@
     motivo.dispatchEvent(new Event("input",  { bubbles: true }));
     motivo.dispatchEvent(new Event("change", { bubbles: true }));
 
-    // Ajusta altura ao conteúdo inserido
-    motivo.style.height = "auto";
-    motivo.style.height = motivo.scrollHeight + "px";
-
     motivo.focus();
   }
 
   function initModeloMotivo() {
     const select = document.querySelector("[data-modelo-motivo-select='true']");
     if (!select) return;
-    select.addEventListener("change", function () {
+    const syncMotivo = function () {
       onModeloMotivoChange(select);
-    });
+    };
+    select.addEventListener("change", syncMotivo);
+    select.addEventListener("input", syncMotivo);
   }
 
   function getOutraInstituicaoValue(wrapper) {
@@ -41,8 +66,7 @@
 
   function updateCusteioObservacaoVisibility(select, wrapper, outraValue) {
     const visible = shouldShowCusteioObservacao(select.value, outraValue);
-    wrapper.classList.toggle("form-field--hidden", !visible);
-    wrapper.hidden = !visible;
+    setRevealVisible(wrapper, visible);
   }
 
   function initCusteioObservacao() {

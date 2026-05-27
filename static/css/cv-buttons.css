@@ -242,7 +242,7 @@ html[data-theme="light"] {
 }
 
 .cv-btn:active {
-  transform: translateY(1px);
+  transform: translateY(1px) scale(0.985);
   filter: brightness(0.985);
   box-shadow: var(--shadow-xs);
 }
@@ -611,7 +611,7 @@ html[data-theme="light"] {
 
 .cv-icon-btn:active {
   box-shadow: var(--shadow-xs);
-  transform: translateY(1px);
+  transform: translateY(1px) scale(0.97);
 }
 
 .cv-icon-btn:focus-visible {
@@ -1469,7 +1469,7 @@ html[data-theme="light"] {
 }
 
 .cv-state-button:active {
-  transform: translateY(1px);
+  transform: translateY(1px) scale(0.985);
 }
 
 .cv-state-button[aria-pressed="true"],

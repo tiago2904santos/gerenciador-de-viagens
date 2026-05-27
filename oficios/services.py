@@ -168,11 +168,32 @@ def criar_oficio_dados_viajantes(form, action="save_draft"):
 
 @transaction.atomic
 def atualizar_oficio_dados_viajantes(oficio, form, action="save_draft"):
-    data_criacao_original = oficio.data_criacao
+    original = Oficio.objects.get(pk=oficio.pk)
+    data_criacao_original = original.data_criacao
+    transporte_original = {
+        "viatura": original.viatura,
+        "porte_transporte_armas": original.porte_transporte_armas,
+        "transporte_placa_manual": original.transporte_placa_manual,
+        "transporte_modelo_manual": original.transporte_modelo_manual,
+        "transporte_combustivel_manual": original.transporte_combustivel_manual,
+        "transporte_tipo_manual": original.transporte_tipo_manual,
+        "motorista_modo": original.motorista_modo,
+        "motorista": original.motorista,
+        "motorista_manual_nome": original.motorista_manual_nome,
+        "motorista_manual_rg": original.motorista_manual_rg,
+        "motorista_manual_cpf": original.motorista_manual_cpf,
+        "motorista_manual_cargo": original.motorista_manual_cargo,
+        "motorista_manual_unidade": original.motorista_manual_unidade,
+        "motorista_manual_observacao": original.motorista_manual_observacao,
+        "motorista_oficio_referencia": original.motorista_oficio_referencia,
+        "motorista_protocolo_ref": original.motorista_protocolo_ref,
+    }
     atualizado = form.save(commit=False)
     atualizado.numero = oficio.numero
     atualizado.ano = oficio.ano
     atualizado.data_criacao = data_criacao_original
+    for field_name, value in transporte_original.items():
+        setattr(atualizado, field_name, value)
     atualizado.custeio = atualizado.custeio or Oficio.CUSTEIO_UNIDADE_DPC
     modelo_motivo = form.cleaned_data.get("modelo_motivo")
     aplicar_modelo_motivo_no_oficio(atualizado, modelo_motivo, form.cleaned_data.get("motivo"))

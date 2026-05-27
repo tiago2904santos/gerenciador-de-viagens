@@ -49,7 +49,7 @@
             {% include "components/forms/form_field.html" with field=form.custeio label="Custeio" only %}
             {# Linha 2: Nome da Instituição — somente quando custeio = Outra instituição #}
             <div
-              class="field field-size-4{% if not mostrar_custeio_observacao %} form-field--hidden{% endif %}"
+              class="field field-size-4{% if not mostrar_custeio_observacao %} form-field--hidden{% else %} is-open{% endif %}"
               data-custeio-observacao-wrapper
               data-oficio-instituicao-field
               data-oficio-custeio-outra-value="{{ outra_instituicao_custeio_value|default:'OUTRA_INSTITUICAO' }}"
@@ -71,8 +71,12 @@
                 <p class="field-help">Nenhum modelo cadastrado. <a href="{{ modelos_motivo_url }}">Abrir gerenciamento de modelos</a></p>
               </div>
             {% endif %}
-            <div class="field field-size-4">
-              {% include "components/forms/form_field.html" with field=form.motivo only %}
+            <div class="field field-size-4 app-form-field cv-field oficio-motivo-field oficio-reveal-panel is-open" data-oficio-custeio-observacao-panel>
+              <label class="cv-field__label" for="{{ form.motivo.id_for_label }}">Motivo</label>
+              {{ form.motivo }}
+              {% if form.motivo.errors %}
+                {% include "components/ui/feedback/field_error.html" with errors=form.motivo.errors only %}
+              {% endif %}
             </div>
           </div>
         </section>
@@ -105,8 +109,8 @@
 
 {% block extra_js %}
   {{ block.super }}
-  <script src="{% static 'js/pages/oficios-dados-viajantes.js' %}?v=20260527b" defer></script>
+  <script src="{% static 'js/pages/oficios-dados-viajantes.js' %}?v=20260527d" defer></script>
   <script src="{% static 'js/pages/oficios-transporte.js' %}?v=20260512" defer></script>
-  <script src="{% static 'js/pages/oficios-wizard-driver-state.js' %}?v=20260526k" defer></script>
+  <script src="{% static 'js/pages/oficios-wizard-driver-state.js' %}?v=20260527j" defer></script>
   <script src="{% static 'js/pages/oficios-viatura-sugestoes.js' %}?v=20260527c" defer></script>
 {% endblock %}

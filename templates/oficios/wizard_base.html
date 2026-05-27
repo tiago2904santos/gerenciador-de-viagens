@@ -4,7 +4,7 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260526">
+  <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260527l">
 {% endblock %}
 
 {% block content %}
@@ -16,7 +16,18 @@
     <main class="main-form-panel main-form-panel--stack oficio-wizard__main">
       <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
         {% if wizard_use_outer_form|default:True %}
-          <form class="oficio-wizard__form" method="post" novalidate>
+          <form
+            class="oficio-wizard__form"
+            method="post"
+            novalidate
+            {% if wizard_autosave_url %}
+              data-autosave="true"
+              data-autosave-model="oficio"
+              data-autosave-step="{{ wizard_autosave_step }}"
+              data-autosave-url="{{ wizard_autosave_url }}"
+              data-autosave-object-id="{{ oficio.pk|default:'' }}"
+            {% endif %}
+          >
             {% csrf_token %}
         {% endif %}
 

@@ -284,7 +284,6 @@ def apresentar_acoes_oficio(
 def apresentar_oficio_wizard_header(etapa_atual, oficio=None):
     titles = {
         "dados_viajantes": "Dados e viajantes",
-        "transporte": "Transporte",
         "roteiro": "Roteiro e diárias",
         "justificativa": "Justificativa",
         "documentos": "Documentos",
@@ -293,19 +292,18 @@ def apresentar_oficio_wizard_header(etapa_atual, oficio=None):
     }
     step_numbers = {
         "dados_viajantes": 1,
-        "transporte": 2,
-        "roteiro": 3,
-        "justificativa": 4,
-        "documentos": 5,
-        "assinaturas": 6,
-        "resumo": 5,
+        "roteiro": 2,
+        "justificativa": 3,
+        "documentos": 4,
+        "assinaturas": 5,
+        "resumo": 4,
     }
     subtitle = titles.get(etapa_atual, "Dados e viajantes")
     step_number = step_numbers.get(etapa_atual, 1)
     ctx = {
         "title": "Cadastro de ofício",
         "subtitle": subtitle,
-        "description": f"Etapa {step_number} de 6 — {subtitle}",
+        "description": f"Etapa {step_number} de 5 — {subtitle}",
     }
     if oficio is not None:
         ctx["status_label"] = oficio.get_status_display()
@@ -416,11 +414,10 @@ def apresentar_oficio_wizard_steps(
         assinaturas_status = documentos_status
     steps = [
         {"key": "dados_viajantes", "number": 1, "title": "Dados e viajantes"},
-        {"key": "transporte", "number": 2, "title": "Transporte"},
-        {"key": "roteiro", "number": 3, "title": "Roteiro e diárias"},
-        {"key": "justificativa", "number": 4, "title": "Justificativa"},
-        {"key": "documentos", "number": 5, "title": "Documentos"},
-        {"key": "assinaturas", "number": 6, "title": "Central de assinaturas"},
+        {"key": "roteiro", "number": 2, "title": "Roteiro e diárias"},
+        {"key": "justificativa", "number": 3, "title": "Justificativa"},
+        {"key": "documentos", "number": 4, "title": "Documentos"},
+        {"key": "assinaturas", "number": 5, "title": "Central de assinaturas"},
     ]
     for step in steps:
         key = step["key"]
@@ -428,10 +425,6 @@ def apresentar_oficio_wizard_steps(
             step["url"] = reverse("oficios:dados_viajantes", args=[oficio.pk]) if oficio else ""
             step["state"] = "current" if etapa_atual == key else dados_viajantes_status
             step["completion_state"] = dados_viajantes_status
-        elif key == "transporte":
-            step["url"] = reverse("oficios:transporte", args=[oficio.pk]) if oficio else ""
-            step["state"] = "current" if etapa_atual == key else transporte_status
-            step["completion_state"] = transporte_status
         elif key == "roteiro":
             step["url"] = reverse("oficios:wizard_roteiro", args=[oficio.pk]) if oficio else ""
             step["state"] = "current" if etapa_atual == key else roteiro_status

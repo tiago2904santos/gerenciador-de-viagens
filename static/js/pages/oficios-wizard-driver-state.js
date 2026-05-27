@@ -26,8 +26,26 @@
 
   function setCardVisible(card, visible) {
     if (!card) return;
-    card.hidden = !visible;
-    card.classList.toggle('form-field--hidden', !visible);
+    if (card._revealTimer) {
+      clearTimeout(card._revealTimer);
+      card._revealTimer = null;
+    }
+
+    if (visible) {
+      card.hidden = false;
+      card.classList.remove('form-field--hidden');
+      window.requestAnimationFrame(function () {
+        card.classList.add('is-open');
+      });
+    } else {
+      if (card.hidden) return;
+      card.classList.remove('is-open');
+      card._revealTimer = window.setTimeout(function () {
+        card.hidden = true;
+        card.classList.add('form-field--hidden');
+        card._revealTimer = null;
+      }, 320);
+    }
     card.setAttribute('aria-hidden', visible ? 'false' : 'true');
   }
 
@@ -49,6 +67,74 @@
     if (!hidden || hidden.value === modo) return;   /* evita loop */
     hidden.value = modo;
     hidden.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+
+  function activeDriverValue(root) {
+    var active = root.querySelector(DRIVER_TOGGLE + '[aria-pressed="true"]');
+    return (active && active.dataset.value) || '';
+  }
+
+  function selectHasValue(select, value) {
+    if (!select || !value) return false;
+    return !!select.querySelector('option[value="' + CSS.escape(value) + '"]');
+  }
+
+  function clearManualMotorista(card) {
+    if (!card) return;
+    var manInput = card.querySelector(PANEL_MANUAL + ' input:not([type="hidden"])');
+    if (manInput && manInput.value) {
+      manInput.value = '';
+      dispatchFieldEvents(manInput);
+    }
+  }
+
+  function syncEquipeDriverToMotorista(root) {
+    var value = activeDriverValue(root);
+    var motSel = root.querySelector(MOTORISTA_SEL);
+    if (!motSel) return value;
+
+    var previousDriverValue = motSel.dataset.oficioEquipeDriverValue || '';
+
+    if (value && selectHasValue(motSel, value)) {
+      if (motSel.value !== value) {
+        motSel.value = value;
+        dispatchFieldEvents(motSel);
+      }
+      motSel.dataset.oficioEquipeDriverValue = value;
+      setModoHidden(root, 'SERVIDOR');
+      return value;
+    }
+
+    if (previousDriverValue && motSel.value === previousDriverValue) {
+      motSel.value = '';
+      dispatchFieldEvents(motSel);
+    }
+    delete motSel.dataset.oficioEquipeDriverValue;
+    return value;
+  }
+
+  function rememberDriverToggleState(toggle) {
+    if (!toggle) return;
+    toggle.dataset.oficioPressedBefore = toggle.getAttribute('aria-pressed') === 'true' ? 'true' : 'false';
+  }
+
+  function ensureDriverToggleState(root, toggle) {
+    if (!toggle) return;
+    if (!Object.prototype.hasOwnProperty.call(toggle.dataset, 'oficioPressedBefore')) return;
+    var before = toggle.dataset.oficioPressedBefore || 'false';
+    var current = toggle.getAttribute('aria-pressed') === 'true' ? 'true' : 'false';
+    delete toggle.dataset.oficioPressedBefore;
+
+    if (before !== current) return;
+
+    var shouldActivate = before !== 'true';
+    root.querySelectorAll(DRIVER_TOGGLE).forEach(function (button) {
+      var active = shouldActivate && button === toggle;
+      var card = button.closest('.cv-search-picker__selected-card');
+      button.setAttribute('aria-pressed', active ? 'true' : 'false');
+      button.classList.toggle('cv-search-picker__driver-toggle--active', active);
+      if (card) card.classList.toggle('cv-search-picker__selected-card--driver', active);
+    });
   }
 
   /* ── Sincroniza visual do cv-segment-toggle ─────────────────── */
@@ -84,6 +170,19 @@
     setPanelVisible(panelServ, !isManual);
     setPanelVisible(panelMan,  isManual);
     setModoHidden(root, modo);
+  }
+
+  function syncTrailingCard(root, showMotorista) {
+    var viaturaCard = root.querySelector('[data-oficio-viatura-card]');
+    var motoristaCard = root.querySelector(EXTERNAL_CARD);
+
+    if (viaturaCard) {
+      viaturaCard.classList.toggle('is-wizard-trailing-card', !showMotorista);
+    }
+    if (motoristaCard) {
+      motoristaCard.classList.toggle('is-wizard-trailing-card', !!showMotorista);
+      motoristaCard.classList.toggle('is-open', !!showMotorista);
+    }
   }
 
   function switchToManual(root) {
@@ -125,16 +224,22 @@
   }
 
   function sync(root) {
+    var driverValue = syncEquipeDriverToMotorista(root);
     var show = hasViatura(root) && !isDriverActive(root);
     var card  = root.querySelector(EXTERNAL_CARD);
+    syncTrailingCard(root, show);
     setCardVisible(card, show);
 
-    /* Se um driver foi ativado na equipe, limpa o motorista externo */
-    if (!show && card && !card.hidden) {
+    if (driverValue) {
+      clearManualMotorista(card);
+      return;
+    }
+
+    /* Se o card sumiu por falta de viatura, limpa motorista externo */
+    if (!show && card && !card.hidden && !hasViatura(root)) {
       var motSel = root.querySelector(MOTORISTA_SEL);
       if (motSel && motSel.value) { motSel.value = ''; dispatchFieldEvents(motSel); }
-      var manInput = card.querySelector(PANEL_MANUAL + ' input:not([type="hidden"])');
-      if (manInput && manInput.value) { manInput.value = ''; dispatchFieldEvents(manInput); }
+      clearManualMotorista(card);
     }
   }
 
@@ -163,10 +268,17 @@
     }
 
     /* Driver toggle na equipe (aria-pressed muda após click) */
+    root.addEventListener('mousedown', function (e) {
+      rememberDriverToggleState(e.target.closest(DRIVER_TOGGLE));
+    }, true);
+
     root.addEventListener('click', function (e) {
       var toggle = e.target.closest(DRIVER_TOGGLE);
       if (!toggle) return;
-      setTimeout(function () { sync(root); }, 0);
+      setTimeout(function () {
+        ensureDriverToggleState(root, toggle);
+        sync(root);
+      }, 0);
     });
 
     /* Toggle SERVIDOR ↔ MANUAL */

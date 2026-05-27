@@ -17,7 +17,7 @@ from roteiros.models import Roteiro
 
 
 class WizardJustificativaTests(TestCase):
-    """Etapa 4 — Justificativa — rotas e fluxo condicional."""
+    """Etapa 3 — Justificativa — rotas e fluxo condicional."""
 
     def setUp(self):
         ConfiguracaoSistema.get_singleton()
