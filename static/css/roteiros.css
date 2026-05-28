@@ -718,6 +718,33 @@
   padding-bottom: var(--space-3);
 }
 
+.roteiro-editor__bate-volta-grid {
+  gap: var(--space-4);
+}
+
+.roteiro-editor__bate-volta-grid > .field {
+  min-width: 0;
+}
+
+.roteiro-editor__bate-volta-note {
+  margin-top: var(--space-4);
+}
+
+.roteiro-editor__native-date-input {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  opacity: 0;
+  pointer-events: none;
+  width: 1px;
+  height: 1px;
+}
+
+.roteiro-editor__calendar-btn {
+  flex: 0 0 auto;
+  padding-inline: var(--space-3);
+}
+
 .roteiro-editor__bate-volta-title {
   color: var(--theme-text-heading);
   font-size: 16px;

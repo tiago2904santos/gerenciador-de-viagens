@@ -161,6 +161,70 @@ export function initRoteirosEditor() {
     var parsed = parseInt(value, 10);
     return Number.isNaN(parsed) ? null : parsed;
   }
+  function pad2(v) { v = parseInt(v, 10); return v < 10 ? '0' + v : String(v); }
+  function currentYearString() {
+    return String(new Date().getFullYear());
+  }
+  function normalizeDateInput(value) {
+    var raw = String(value || '').trim();
+    if (!raw) return '';
+    var iso = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (iso) return iso[3] + '/' + iso[2] + '/' + iso[1];
+    var digits = raw.replace(/\D/g, '').slice(0, 8);
+    if (!digits) return '';
+    if (digits.length <= 2) return digits;
+    if (digits.length <= 4) return digits.slice(0, 2) + '/' + digits.slice(2);
+    return digits.slice(0, 2) + '/' + digits.slice(2, 4) + '/' + digits.slice(4);
+  }
+  function completeDateWithCurrentYear(value) {
+    var raw = String(value || '').trim();
+    if (!raw) return '';
+    var iso = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (iso) return iso[3] + '/' + iso[2] + '/' + iso[1];
+    var normalized = normalizeDateInput(raw);
+    if (!normalized) return '';
+    var parts = normalized.split('/');
+    if (parts.length === 2 && parts[0] && parts[1]) {
+      return parts[0] + '/' + parts[1] + '/' + currentYearString();
+    }
+    if (parts.length === 3 && parts[0] && parts[1] && parts[2]) {
+      return parts[0] + '/' + parts[1] + '/' + parts[2];
+    }
+    var digits = raw.replace(/\D/g, '').slice(0, 8);
+    if (digits.length === 4) {
+      return digits.slice(0, 2) + '/' + digits.slice(2, 4) + '/' + currentYearString();
+    }
+    if (digits.length === 8) {
+      return digits.slice(0, 2) + '/' + digits.slice(2, 4) + '/' + digits.slice(4);
+    }
+    return normalized;
+  }
+  function parseDateInput(value) {
+    var raw = String(value || '').trim();
+    if (!raw) return '';
+    var iso = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (iso) return iso[0];
+    var normalized = completeDateWithCurrentYear(raw);
+    if (!normalized) return '';
+    var parts = normalized.split('/');
+    if (parts.length !== 3) return '';
+    return parts[2] + '-' + parts[1] + '-' + parts[0];
+  }
+  function syncBateVoltaDatePair(textEl, nativeEl) {
+    if (!textEl || !nativeEl) return;
+    if (document.activeElement === nativeEl) {
+      textEl.value = normalizeDateInput(nativeEl.value);
+      return;
+    }
+    var completed = completeDateWithCurrentYear(textEl.value || nativeEl.value);
+    if (completed) {
+      textEl.value = completed;
+    } else if (document.activeElement !== textEl) {
+      textEl.value = normalizeDateInput(nativeEl.value || textEl.value);
+    }
+    var parsed = parseDateInput(textEl.value);
+    nativeEl.value = parsed || '';
+  }
   function normalizeLocationLabel(value) {
     return String(value || '').trim().toUpperCase();
   }
@@ -243,8 +307,8 @@ export function initRoteirosEditor() {
     var destinosValidos = getDestinos().filter(function(destino) { return destino.estado_id && destino.cidade_id; });
     if (!destinosValidos.length) return [];
     var destino = destinosValidos[0];
-    var dataInicio = $('id_bate_volta_data_inicio').value || '';
-    var dataFim = $('id_bate_volta_data_fim').value || '';
+    var dataInicio = ($('id_bate_volta_data_inicio_native') || {}).value || '';
+    var dataFim = ($('id_bate_volta_data_fim_native') || {}).value || '';
     var idaHora = $('id_bate_volta_ida_saida_hora').value || '';
     var voltaHora = $('id_bate_volta_volta_saida_hora').value || '';
     var idaMin = parseMinutesValue($('id_bate_volta_ida_tempo_min').value);
@@ -343,8 +407,8 @@ export function initRoteirosEditor() {
         $('id_origem_estado').value || '',
         $('id_origem_cidade').value || '',
         destinos,
-        $('id_bate_volta_data_inicio').value || '',
-        $('id_bate_volta_data_fim').value || '',
+        ($('id_bate_volta_data_inicio_native') || {}).value || '',
+        ($('id_bate_volta_data_fim_native') || {}).value || '',
         $('id_bate_volta_ida_saida_hora').value || '',
         $('id_bate_volta_ida_tempo_min').value || '',
         $('id_bate_volta_volta_saida_hora').value || '',
@@ -1076,8 +1140,8 @@ export function initRoteirosEditor() {
       destinos_atuais: [],
       bate_volta_diario: {
         ativo: !!($('id_bate_volta_diario_ativo') && $('id_bate_volta_diario_ativo').checked),
-        data_inicio: ($('id_bate_volta_data_inicio') || {}).value || '',
-        data_fim: ($('id_bate_volta_data_fim') || {}).value || '',
+        data_inicio: ($('id_bate_volta_data_inicio_native') || {}).value || '',
+        data_fim: ($('id_bate_volta_data_fim_native') || {}).value || '',
         ida_saida_hora: ($('id_bate_volta_ida_saida_hora') || {}).value || '',
         ida_tempo_min: ($('id_bate_volta_ida_tempo_min') || {}).value || '',
         volta_saida_hora: ($('id_bate_volta_volta_saida_hora') || {}).value || '',
@@ -1232,8 +1296,10 @@ export function initRoteirosEditor() {
       .then(function() {
         var loop = cur.bate_volta_diario || {};
         if ($('id_bate_volta_diario_ativo')) $('id_bate_volta_diario_ativo').checked = !!loop.ativo;
-        if ($('id_bate_volta_data_inicio')) $('id_bate_volta_data_inicio').value = loop.data_inicio || '';
-        if ($('id_bate_volta_data_fim')) $('id_bate_volta_data_fim').value = loop.data_fim || '';
+        if ($('id_bate_volta_data_inicio')) $('id_bate_volta_data_inicio').value = normalizeDateInput(loop.data_inicio || '');
+        if ($('id_bate_volta_data_inicio_native')) $('id_bate_volta_data_inicio_native').value = parseDateInput(loop.data_inicio || '') || loop.data_inicio || '';
+        if ($('id_bate_volta_data_fim')) $('id_bate_volta_data_fim').value = normalizeDateInput(loop.data_fim || '');
+        if ($('id_bate_volta_data_fim_native')) $('id_bate_volta_data_fim_native').value = parseDateInput(loop.data_fim || '') || loop.data_fim || '';
         if ($('id_bate_volta_ida_saida_hora')) $('id_bate_volta_ida_saida_hora').value = loop.ida_saida_hora || '';
         if ($('id_bate_volta_ida_tempo_min')) $('id_bate_volta_ida_tempo_min').value = loop.ida_tempo_min != null ? loop.ida_tempo_min : '';
         if ($('id_bate_volta_volta_saida_hora')) $('id_bate_volta_volta_saida_hora').value = loop.volta_saida_hora || '';
@@ -1427,7 +1493,7 @@ export function initRoteirosEditor() {
       }, 120);
     });
   }
-  ['id_bate_volta_diario_ativo','id_bate_volta_data_inicio','id_bate_volta_data_fim','id_bate_volta_ida_saida_hora','id_bate_volta_volta_saida_hora'].forEach(function(id) {
+  ['id_bate_volta_diario_ativo','id_bate_volta_ida_saida_hora','id_bate_volta_volta_saida_hora'].forEach(function(id) {
     var field = $(id);
     if (!field) return;
     field.addEventListener('change', function() {
@@ -1435,6 +1501,56 @@ export function initRoteirosEditor() {
       toggleBateVoltaPanel();
       scheduleLoopTrechosRender({ preferSeed: false, force: true });
       scheduleAutosave();
+    });
+  });
+  [
+    { text: 'id_bate_volta_data_inicio', native: 'id_bate_volta_data_inicio_native' },
+    { text: 'id_bate_volta_data_fim', native: 'id_bate_volta_data_fim_native' }
+  ].forEach(function(pair) {
+    var textInput = $(pair.text);
+    var nativeInput = $(pair.native);
+    if (!textInput || !nativeInput) return;
+    textInput.addEventListener('input', function() {
+      if (applyingState) return;
+      syncBateVoltaDatePair(textInput, nativeInput);
+      scheduleLoopTrechosRender({ preferSeed: false, force: true });
+      scheduleAutosave();
+    });
+    textInput.addEventListener('change', function() {
+      if (applyingState) return;
+      syncBateVoltaDatePair(textInput, nativeInput);
+      toggleBateVoltaPanel();
+      scheduleLoopTrechosRender({ preferSeed: false, force: true });
+      scheduleAutosave();
+    });
+    textInput.addEventListener('blur', function() {
+      if (applyingState) return;
+      syncBateVoltaDatePair(textInput, nativeInput);
+      toggleBateVoltaPanel();
+      scheduleLoopTrechosRender({ preferSeed: false, force: true });
+      scheduleAutosave();
+    });
+    nativeInput.addEventListener('change', function() {
+      if (applyingState) return;
+      syncBateVoltaDatePair(textInput, nativeInput);
+      toggleBateVoltaPanel();
+      scheduleLoopTrechosRender({ preferSeed: false, force: true });
+      scheduleAutosave();
+    });
+  });
+  Array.from(document.querySelectorAll('[data-bate-volta-calendar]')).forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var targetSel = btn.getAttribute('data-target') || '';
+      var nativeSel = btn.getAttribute('data-target-native') || '';
+      var textInput = targetSel ? $(targetSel.replace(/^#/, '')) : null;
+      var nativeInput = nativeSel ? $(nativeSel.replace(/^#/, '')) : null;
+      if (!textInput || !nativeInput) return;
+      if (typeof nativeInput.showPicker === 'function') {
+        try { nativeInput.showPicker(); } catch (e) { nativeInput.focus(); }
+      } else {
+        nativeInput.focus();
+        nativeInput.click();
+      }
     });
   });
   [

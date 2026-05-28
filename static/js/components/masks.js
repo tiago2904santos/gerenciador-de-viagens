@@ -40,6 +40,25 @@
     return v.slice(0, 5) + '-' + v.slice(5);
   }
 
+  function maskDate(value) {
+    var raw = String(value || '').trim();
+    if (!raw) return '';
+    var iso = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (iso) return iso[3] + '/' + iso[2] + '/' + iso[1];
+    var v = onlyDigits(raw).slice(0, 8);
+    if (v.length <= 2) return v;
+    if (v.length <= 4) return v.slice(0, 2) + '/' + v.slice(2);
+    return v.slice(0, 2) + '/' + v.slice(2, 4) + '/' + v.slice(4);
+  }
+
+  function maskTime(value) {
+    var raw = String(value || '').trim();
+    if (!raw) return '';
+    var v = onlyDigits(raw).slice(0, 4);
+    if (v.length <= 2) return v;
+    return v.slice(0, 2) + ':' + v.slice(2);
+  }
+
   function maskProtocolo(value) {
     var v = onlyDigits(value).slice(0, 9);
     if (v.length <= 2) return v;
@@ -67,6 +86,8 @@
     rg: maskRg,
     placa: maskPlaca,
     cep: maskCep,
+    date: maskDate,
+    time: maskTime,
     telefone: maskTelefone,
     protocolo: maskProtocolo,
   };
