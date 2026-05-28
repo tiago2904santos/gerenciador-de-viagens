@@ -1,11 +1,10 @@
-{# SEÇÃO 1+2: FONTE DO ROTEIRO + SEDE E DESTINOS #}
-<section class="cv-wizard-section-card roteiro-editor__section--fonte-destinos"
-         aria-labelledby="sec-fonte-destinos"
-         data-destinos-component>
+﻿{# SEÇÃO 1: FONTE DO ROTEIRO #}
+<section class="cv-wizard-section-card roteiro-editor__section--fonte"
+         aria-labelledby="sec-fonte">
   <header class="cv-wizard-section-header">
     <div class="cv-wizard-section-header__copy">
-      <h3 class="cv-wizard-section-title" id="sec-fonte-destinos">1–2. Fonte e destinos</h3>
-      <p class="cv-wizard-section-subtitle">Escolha um roteiro salvo ou monte um roteiro novo definindo sede e destinos.</p>
+      <h3 class="cv-wizard-section-title" id="sec-fonte">1. Fonte</h3>
+      <p class="cv-wizard-section-subtitle">Escolha um roteiro salvo ou monte um roteiro novo definindo a sede.</p>
     </div>
     {% if has_event_routes %}
     <div class="cv-wizard-section-header__actions">
@@ -30,7 +29,7 @@
   </header>
 
   <div class="cv-wizard-section-body">
-    {# Radios ocultos — lidos pelo JS para detectar e submeter o modo #}
+    {# Radios ocultos â€” lidos pelo JS para detectar e submeter o modo #}
     <input type="radio" name="roteiro_modo" id="id_roteiro_modo_evento" value="EVENTO_EXISTENTE"
            {% if roteiro_modo == 'EVENTO_EXISTENTE' %}checked{% endif %}
            {% if not has_event_routes %}disabled{% endif %}
@@ -39,10 +38,9 @@
            {% if roteiro_modo != 'EVENTO_EXISTENTE' %}checked{% endif %}
            hidden>
 
-    {# ── Painel: Roteiro salvo ── #}
+    {# â”€â”€ Painel: Roteiro salvo â”€â”€ #}
     <div id="roteiro-selector-wrapper"
-         class="roteiro-editor__routes-panel"
-         {% if roteiro_modo != 'EVENTO_EXISTENTE' %}hidden{% endif %}>
+         class="roteiro-editor__routes-panel">
 
       <section class="wizard-inner-section" aria-labelledby="sec-roteiro-salvo-title">
         <header class="wizard-inner-section__header">
@@ -74,7 +72,7 @@
       </section>
     </div>
 
-    {# ── Painel: Roteiro novo — Sede e Destinos ── #}
+    {# Painel: Roteiro novo — Sede #}
     <div id="panel-roteiro-novo"
          {% if roteiro_modo == 'EVENTO_EXISTENTE' %}hidden{% endif %}>
 
@@ -125,42 +123,23 @@
         </div>
       </section>
 
-      {# Destinos #}
-      <div class="field app-form-field">
-        <select name="origem_estado" id="id_origem_estado"
-                class="cv-search-picker__native"
-                data-cv-search-picker="true"
-                data-picker-mode="single"
-                data-picker-variant="compact"
-                data-placeholder="Buscar estado..."
-                data-empty-message="Nenhum estado encontrado.">
-          <option value="">---------</option>
-          {% for estado in estados %}
-          <option value="{{ estado.pk }}" {% if sede_estado_id == estado.pk %}selected{% endif %}>{{ estado.nome }} ({{ estado.sigla }})</option>
-          {% endfor %}
-        </select>
-        {% if form.origem_estado.errors %}
-          {% include "components/ui/feedback/field_error.html" with errors=form.origem_estado.errors only %}
-        {% endif %}
-      </div>
-      <div class="field app-form-field">
-        <select name="origem_cidade" id="id_origem_cidade"
-                class="cv-search-picker__native"
-                data-cv-search-picker="true"
-                data-picker-mode="single"
-                data-picker-variant="compact"
-                data-placeholder="Buscar cidade..."
-                data-empty-message="Nenhuma cidade encontrada."
-                {% if not sede_estado_id %}disabled{% endif %}>
-          <option value="">---------</option>
-          {% for cidade in sede_cidades_qs %}
-          <option value="{{ cidade.pk }}" {% if sede_cidade_id == cidade.pk %}selected{% endif %}>{{ cidade.nome }}</option>
-          {% endfor %}
-        </select>
-        {% if form.origem_cidade.errors %}
-          {% include "components/ui/feedback/field_error.html" with errors=form.origem_cidade.errors only %}
-        {% endif %}
-      </div>
+      <section class="wizard-inner-section" aria-labelledby="sec-destinos-title" id="sec-destinos">
+        <header class="wizard-inner-section__header">
+          <h4 class="wizard-inner-section__title" id="sec-destinos-title">Destinos</h4>
+          <p class="wizard-inner-section__description">Cada destino usa o mesmo padrão visual da sede para manter o fluxo consistente.</p>
+        </header>
+        <div class="cv-search-picker">
+          <section class="cv-search-picker__selected-panel roteiro-destinos-panel" aria-label="Destinos adicionados">
+            <div class="cv-search-picker__selected-header roteiro-destinos-panel__header">
+              <h4 class="cv-search-picker__selected-title">Destinos adicionados</h4>
+              <button type="button" id="btn-adicionar-destino" class="cv-btn cv-btn--secondary cv-btn--sm">
+                <span>+ Adicionar destino</span>
+              </button>
+            </div>
+            <div id="destinos-container" class="cv-search-picker__selected-list roteiro-destinos-list"></div>
+          </section>
+        </div>
+      </section>
 
     </div>{# /panel-roteiro-novo #}
   </div>
@@ -207,3 +186,7 @@
   }).observe(panelSalvo, { attributes: true, attributeFilter: ['hidden'] });
 })();
 </script>
+
+
+
+
