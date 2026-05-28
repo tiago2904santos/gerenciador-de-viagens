@@ -1119,9 +1119,7 @@
   padding-right: var(--space-4);
 }
 
-.roteiro-destinos-panel__header {
-  padding-right: var(--space-4);
-}
+
 
 .roteiro-destinos-list {
   gap: var(--space-3);
