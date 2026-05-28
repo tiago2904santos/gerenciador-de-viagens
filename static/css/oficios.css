@@ -145,6 +145,16 @@
   outline: none;
 }
 
+.oficio-wizard .cv-field--readonly .cv-field__control,
+.oficio-wizard .cv-field__control[readonly] {
+  background: var(--cv-field-readonly-bg);
+  border-color: var(--color-border-strong);
+  box-shadow: none;
+  color: var(--cv-field-color);
+  cursor: default;
+  opacity: 1;
+}
+
 .oficio-wizard .cv-field__control--textarea {
   height: 88px;
   min-height: 88px;

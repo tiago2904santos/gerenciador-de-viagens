@@ -1182,7 +1182,6 @@ html[data-theme="light"] {
   align-items:           start;
   display:               grid;
   gap:                   var(--field-grid-gap);
-  grid-template-columns: repeat(4, minmax(0, 1fr));
   width:                 100%;
 }
 

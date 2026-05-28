@@ -21,6 +21,7 @@ export function initRoteirosEditor() {
   var form = document.getElementById('roteiro-editor-form');
   if (!form || form.dataset.ready === '1') return;
   form.dataset.ready = '1';
+  var isOficio = !!document.querySelector('.roteiro-editor--oficio');
   function $(id) { return document.getElementById(id); }
   var initialRoteiroState = JSON.parse($('roteiro-editor-state-data').textContent || '{}');
   var routes = JSON.parse($('roteiro-editor-routes-data').textContent || '[]');
@@ -169,13 +170,20 @@ export function initRoteirosEditor() {
   }
   function isLoopModeActive(state) {
     if (state && state.bate_volta_diario && state.bate_volta_diario.ativo) return true;
-    return !!($('id_bate_volta_diario_ativo') && $('id_bate_volta_diario_ativo').checked);
+    var input = $('id_bate_volta_diario_ativo');
+    if (!input) return false;
+    if (input.type === 'checkbox') return !!input.checked;
+    return String(input.value || '').toLowerCase() === 'true';
   }
   function toggleBateVoltaPanel() {
     var active = isLoopModeActive();
+    var body = $('bate-volta-body');
     var panel = $('bate-volta-panel');
     var status = $('bate-volta-status-text');
     var chip = $('bate-volta-status-chip');
+    if (body) {
+      body.hidden = !active;
+    }
     if (panel) {
       panel.classList.toggle('is-muted', !active);
     }
@@ -368,8 +376,20 @@ export function initRoteirosEditor() {
     return prefix + '-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2);
   }
   function loadCities(select, estadoId, selectedId) {
-    if (!estadoId) { select.innerHTML = '<option value="">---------</option>'; select.disabled = true; refreshSelectPickers(select); return Promise.resolve(); }
+    /* Remove cv-search-picker existente para reinicializar com as novas opções */
+    function resetSearchPicker() {
+      if (select.dataset.cvSearchPickerReady) {
+        delete select.dataset.cvSearchPickerReady;
+        var nextEl = select.nextElementSibling;
+        if (nextEl && nextEl.classList && nextEl.classList.contains('cv-search-picker')) {
+          nextEl.parentNode.removeChild(nextEl);
+        }
+      }
+    }
+    var pickerScope = select.parentNode || select;
+    if (!estadoId) { resetSearchPicker(); select.innerHTML = '<option value="">---------</option>'; select.disabled = true; refreshSelectPickers(pickerScope); return Promise.resolve(); }
     function applyCities(cidades) {
+      resetSearchPicker();
       select.innerHTML = '<option value="">---------</option>';
       cidades.forEach(function(cidade) {
         var opt = document.createElement('option');
@@ -379,7 +399,7 @@ export function initRoteirosEditor() {
         select.appendChild(opt);
       });
       select.disabled = false;
-      refreshSelectPickers(select);
+      refreshSelectPickers(pickerScope);
     }
     if (citiesCache[String(estadoId)]) {
       applyCities(citiesCache[String(estadoId)]);
@@ -390,7 +410,7 @@ export function initRoteirosEditor() {
       var cidades = Array.isArray(data) ? data : (data.cidades || []);
       citiesCache[String(estadoId)] = cidades;
       applyCities(cidades);
-    }).catch(function() { select.disabled = false; refreshSelectPickers(select); });
+    }).catch(function() { select.disabled = false; refreshSelectPickers(pickerScope); });
   }
   function currentTrechosMap() {
     // Preserva campos manuais usando a chave estavel do trecho; a ordem visual pode mudar.
@@ -769,7 +789,7 @@ export function initRoteirosEditor() {
   }
   function getDestinoRows() { return Array.from($('destinos-container').querySelectorAll('.destino-row')); }
   function reindexDestinoRows() { getDestinoRows().forEach(function(row, idx) { row.dataset.index = String(idx); var es = row.querySelector('.destino-estado'); var ci = row.querySelector('.destino-cidade'); if (es) es.name = 'destino_estado_'+idx; if (ci) ci.name = 'destino_cidade_'+idx; }); }
-  function refreshDestinoButtons() { var rows = getDestinoRows(); rows.forEach(function(row) { var btn = row.querySelector('.btn-remover-destino'); if (btn) btn.disabled = rows.length <= 1; }); }
+  function refreshDestinoButtons() { var rows = getDestinoRows(); var single = rows.length <= 1; rows.forEach(function(row) { var btn = row.querySelector('.btn-remover-destino'); if (btn) { btn.hidden = single; var col = btn.closest('.roteiro-editor__remove-col'); if (col) col.hidden = single; } }); }
   function estadoOptionsMarkup(selectedId) { var se = $('id_origem_estado'); return (se ? Array.from(se.options) : []).map(function(opt) { var v = String(opt.value||''); if (!v) return '<option value="">---------</option>'; var sel = String(selectedId||'')=== v?' selected':''; return '<option value="'+esc(v)+'"'+sel+'>'+esc(String(opt.textContent||'').trim())+'</option>'; }).join(''); }
   function bindDestinoDragAndDrop(row) {
     row.addEventListener('dragstart', function(e) { row.classList.add('is-dragging'); e.dataTransfer.effectAllowed='move'; e.dataTransfer.setData('text/plain', row.dataset.index||'0'); });
@@ -789,14 +809,52 @@ export function initRoteirosEditor() {
   }
   function addDestinoRow(destino) {
     var idx = getDestinoRows().length; var row = document.createElement('div');
-    row.className = 'destino-row roteiro-editor__destination-card'; row.draggable = true; row.dataset.index = String(idx);
+    row.className = isOficio
+      ? 'destino-row'
+      : 'destino-row roteiro-editor__destination-card';
+    row.draggable = true; row.dataset.index = String(idx);
     // A identidade do destino precisa sobreviver a reorder/remocao para nao zerar trechos preenchidos.
     row.dataset.key = (destino && (destino.key || destino.destino_key || destino.id)) ? String(destino.key || destino.destino_key || destino.id) : makeStableKey('destino');
     var selE = destino && destino.estado_id ? destino.estado_id : (destinoEstadoDefaultId || '');
-    row.innerHTML = '<div class="roteiro-editor__drag-col"><button type="button" class="roteiro-editor__drag-handle destino-drag-handle" aria-label="Arrastar para reordenar">&#8942;</button></div>' +
-      '<div class="roteiro-editor__destination-fields"><div><label class="roteiro-editor__field-label"></label><select name="destino_estado_'+idx+'" class="destino-estado form-select" data-oficio-picker-search="always" data-oficio-picker-search-placeholder="Filtrar UF...">'+estadoOptionsMarkup(selE)+'</select></div>' +
-      '<div><label class="roteiro-editor__field-label"></label><select name="destino_cidade_'+idx+'" class="destino-cidade form-select" data-oficio-picker-search="always" data-oficio-picker-search-placeholder="Filtrar cidade..."><option value="">Município</option></select></div></div>' +
-      '<div class="roteiro-editor__remove-col"><button type="button" class="btn-remover-destino roteiro-editor__icon-btn" title="Remover destino" aria-label="Remover destino">&times;</button></div>';
+    if (isOficio) {
+      row.innerHTML =
+        '<button type="button" class="destino-drag-handle roteiro-editor__drag-handle" aria-label="Arrastar para reordenar">&#8942;</button>' +
+        '<div class="destino-picker-field">' +
+          '<select name="destino_estado_'+idx+'" class="destino-estado cv-search-picker__native"' +
+          ' data-cv-search-picker="true" data-picker-mode="single" data-picker-variant="compact"' +
+          ' data-placeholder="Buscar estado..." data-empty-message="Nenhum estado encontrado.">'+estadoOptionsMarkup(selE)+'</select>' +
+        '</div>' +
+        '<div class="destino-picker-field">' +
+          '<select name="destino_cidade_'+idx+'" class="destino-cidade cv-search-picker__native"' +
+          ' data-cv-search-picker="true" data-picker-mode="single" data-picker-variant="compact"' +
+          ' data-placeholder="Buscar cidade..." data-empty-message="Nenhuma cidade encontrada." disabled>' +
+          '<option value="">---------</option>' +
+          '</select>' +
+        '</div>' +
+        '<button type="button" class="btn-remover-destino" title="Remover destino" aria-label="Remover destino" hidden>&times;</button>';
+    } else {
+      row.innerHTML =
+        '<div class="roteiro-editor__drag-col">' +
+          '<button type="button" class="roteiro-editor__drag-handle destino-drag-handle" aria-label="Arrastar para reordenar">&#8942;</button>' +
+        '</div>' +
+        '<div class="roteiro-editor__destination-fields">' +
+          '<div class="destino-picker-field">' +
+            '<select name="destino_estado_'+idx+'" class="destino-estado cv-search-picker__native"' +
+            ' data-cv-search-picker="true" data-picker-mode="single" data-picker-variant="compact"' +
+            ' data-placeholder="Buscar estado..." data-empty-message="Nenhum estado encontrado.">'+estadoOptionsMarkup(selE)+'</select>' +
+          '</div>' +
+          '<div class="destino-picker-field">' +
+            '<select name="destino_cidade_'+idx+'" class="destino-cidade cv-search-picker__native"' +
+            ' data-cv-search-picker="true" data-picker-mode="single" data-picker-variant="compact"' +
+            ' data-placeholder="Buscar cidade..." data-empty-message="Nenhuma cidade encontrada." disabled>' +
+            '<option value="">---------</option>' +
+            '</select>' +
+          '</div>' +
+        '</div>' +
+        '<div class="roteiro-editor__remove-col" hidden>' +
+          '<button type="button" class="btn-remover-destino roteiro-editor__icon-btn" title="Remover destino" aria-label="Remover destino" hidden>&times;</button>' +
+        '</div>';
+    }
     $('destinos-container').appendChild(row); refreshSelectPickers(row);
     var cs = row.querySelector('.destino-cidade');
     var p = selE ? loadCities(cs, selE, (destino && destino.cidade_id) ? destino.cidade_id : null) : Promise.resolve();

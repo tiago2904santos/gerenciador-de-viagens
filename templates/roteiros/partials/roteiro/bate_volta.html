@@ -5,17 +5,25 @@
       <h3 class="cv-wizard-section-title" id="sec-bate-volta">3. Modo bate-volta diário</h3>
       <p class="cv-wizard-section-subtitle">Gerador automático de loop diário</p>
     </div>
-    <div class="cv-wizard-section-header__actions">
-      <span class="cv-chip cv-chip--neutral roteiro-editor__chip" id="bate-volta-status-chip" aria-hidden="true">Inativo</span>
-      <div class="form-check form-switch m-0">
-        <input class="form-check-input" type="checkbox" role="switch"
-               id="id_bate_volta_diario_ativo" name="bate_volta_diario_ativo"
-               {% if roteiro_editor_state_json.bate_volta_diario.ativo %}checked{% endif %}>
-        <label class="form-check-label" for="id_bate_volta_diario_ativo">Ativar bate-volta diário</label>
-      </div>
+    <div class="cv-wizard-section-header__actions roteiro-editor__switch-row"
+         data-cv-state-toggle
+         data-cv-state-binary
+         data-cv-state-input="#id_bate_volta_diario_ativo"
+         data-active-label="Com bate-volta diário"
+         data-inactive-label="Sem bate-volta diário">
+      <input type="hidden"
+             id="id_bate_volta_diario_ativo" name="bate_volta_diario_ativo"
+             value="{% if roteiro_editor_state_json.bate_volta_diario.ativo %}true{% else %}false{% endif %}">
+      <button type="button"
+              class="cv-field-side-action cv-field-side-action--toggle cv-field-side-action--state {% if roteiro_editor_state_json.bate_volta_diario.ativo %}is-active cv-field-side-action--success{% else %}is-inactive cv-field-side-action--danger{% endif %}"
+              data-cv-state-trigger
+              aria-label="Alternar bate-volta diário"
+              aria-pressed="{% if roteiro_editor_state_json.bate_volta_diario.ativo %}true{% else %}false{% endif %}">
+        <span>{% if roteiro_editor_state_json.bate_volta_diario.ativo %}Com bate-volta diário{% else %}Sem bate-volta diário{% endif %}</span>
+      </button>
     </div>
   </header>
-  <div class="cv-wizard-section-body">
+  <div class="cv-wizard-section-body" id="bate-volta-body" {% if not roteiro_editor_state_json.bate_volta_diario.ativo %}hidden{% endif %}>
     <div id="bate-volta-panel" class="field-grid field-grid--cols-4">
       <div class="field field-size-1">
         <label class="roteiro-editor__field-label" for="id_bate_volta_data_inicio">Data inicial</label>

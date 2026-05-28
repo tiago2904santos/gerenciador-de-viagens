@@ -1,5 +1,5 @@
-/* ==========================================================================
-   ROTEIROS — EDITOR AVULSO
+﻿/* ==========================================================================
+   ROTEIROS â€” EDITOR AVULSO
    Engenharia de CSS: tokenizacao sem alterar contrato visual da tela.
    ========================================================================== */
 
@@ -7,7 +7,7 @@
    1. Shell principal
    -------------------------------------------------------------------------- */
 
-/* Superfície do shell e botões de formulário premium: static/css/forms.css
+/* SuperfÃ­cie do shell e botÃµes de formulÃ¡rio premium: static/css/forms.css
    (.app-form-shell, .app-page__shell > .app-form-shell). */
 
 .roteiro-form--legacy-roteiro .btn-adicionar-destino,
@@ -15,7 +15,7 @@
   border-radius: var(--radius-pill);
 }
 
-/* Shell do wizard: sem “buraco” visual; intro legível em todos os temas */
+/* Shell do wizard: sem â€œburacoâ€ visual; intro legÃ­vel em todos os temas */
 .roteiro-editor {
   --re-accent: var(--theme-accent-eyebrow);
   --re-accent-border: rgba(11, 58, 102, 0.55);
@@ -111,7 +111,7 @@
   gap: var(--space-4);
 }
 
-/* Seções */
+/* SeÃ§Ãµes */
 .roteiro-editor__section {
   background: var(--route-card-bg);
   border: 0;
@@ -302,7 +302,7 @@
    3. Fonte do roteiro e estrutura de campos
    -------------------------------------------------------------------------- */
 
-/* Grid de campos — ver forms.css (.app-form-grid-panel + .roteiro-editor__grid). */
+/* Grid de campos â€” ver forms.css (.app-form-grid-panel + .roteiro-editor__grid). */
 
 .roteiro-editor__field-label {
   color: var(--theme-text-muted-strong);
@@ -327,7 +327,7 @@
   margin-top: var(--space-2);
 }
 
-/* Radios → cards */
+/* Radios â†’ cards */
 .roteiro-editor__choice-grid {
   background: var(--route-card-inner-bg);
   display: grid;
@@ -571,6 +571,8 @@
   margin-top: 0;
 }
 
+/* â”€â”€ Painel de destinos (Roteiro novo) â”€â”€ */
+
 /* Scrollbar estilizado da lista de roteiros */
 .roteiro-routes-list {
   scrollbar-color: rgba(191, 211, 234, 0.6) transparent;
@@ -697,7 +699,7 @@
   font-size: 12px;
 }
 
-/* Superfícies internas (substitui bg-white) */
+/* SuperfÃ­cies internas (substitui bg-white) */
 .roteiro-editor__panel-surface {
   background: var(--route-card-inner-bg);
   border: 1px solid var(--route-card-inner-border);
@@ -788,6 +790,29 @@
   background: var(--route-card-inner-bg);
 }
 
+.roteiro-editor--oficio .wizard-inner-section .field-grid.roteiro-sede-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+.roteiro-editor--oficio .wizard-inner-section .field-grid.roteiro-sede-grid > .field {
+  min-width: 0;
+  width: 100%;
+}
+.roteiro-editor--oficio .wizard-inner-section .field-grid.roteiro-sede-grid .cv-search-picker__control {
+  height: var(--control-height-md);
+  max-height: var(--control-height-md);
+  min-height: var(--control-height-md);
+}
+.roteiro-editor--oficio .wizard-inner-section .field-grid.roteiro-sede-grid .cv-search-picker__input {
+  line-height: 1.25;
+  min-height: 0;
+}
+
+@media (max-width: 600px) {
+  .roteiro-editor--oficio .wizard-inner-section .field-grid.roteiro-sede-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
 .roteiro-editor__destinos-list {
   display: flex;
   flex-direction: column;
@@ -803,7 +828,8 @@
   gap: 0;
   grid-template-columns: auto 1fr auto;
   margin: 0;
-  padding: var(--space-2) var(--space-3);
+  overflow: hidden;
+  padding: 0;
 }
 
 @media (max-width: 720px) {
@@ -821,10 +847,10 @@
 }
 
 .roteiro-editor__drag-col {
-  align-items: flex-start;
+  align-items: center;
   display: flex;
   justify-content: center;
-  padding-top: 24px;
+  padding: 0 var(--space-3);
 }
 
 .roteiro-editor__drag-handle {
@@ -850,6 +876,7 @@
   gap: var(--space-3);
   grid-template-columns: 1fr 1fr;
   min-width: 0;
+  padding: var(--space-3);
 }
 
 @media (max-width: 720px) {
@@ -858,32 +885,41 @@
   }
 }
 
-.roteiro-editor__remove-col {
-  align-items: flex-start;
+/* Wrapper de cada picker (UF / Cidade) dentro do destino-row */
+.destino-picker-field {
   display: flex;
-  justify-content: flex-end;
-  padding-top: 24px;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.roteiro-editor__remove-col {
+  align-items: stretch;
+  display: flex;
 }
 
 .roteiro-editor__icon-btn.btn-remover-destino {
   align-items: center;
   background: var(--route-button-danger-bg);
-  border: 1px solid var(--route-button-danger-border);
-  border-radius: var(--radius-pill);
+  border: none;
+  border-left: 1px solid var(--route-button-danger-border);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
   color: var(--route-button-danger-text);
-  display: inline-flex;
-  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-self: stretch;
+  font-size: 16px;
   font-weight: 700;
-  height: calc(var(--control-height-md) - 4px);
   justify-content: center;
   line-height: 1;
-  min-width: 40px;
-  padding: 0;
+  min-width: 44px;
+  padding: 0 var(--space-3);
+  transition: background var(--transition-fast), color var(--transition-fast);
 }
 
-.roteiro-editor__icon-btn.btn-remover-destino:disabled {
-  opacity: 0.75;
-  pointer-events: none;
+.roteiro-editor__icon-btn.btn-remover-destino:hover {
+  background: var(--color-danger, #c0392b);
+  color: #fff;
 }
 
 .roteiro-editor__add-btn#btn-adicionar-destino {
@@ -1077,8 +1113,80 @@
   }
 }
 
+/* â”€â”€ OfÃ­cio wizard: linha de destino â€” formato simples (igual Ã  Sede) â”€â”€ */
+.destino-row {
+  align-items: stretch;
+  display: flex;
+  gap: var(--space-2);
+}
+
+.destino-row .destino-drag-handle.roteiro-editor__drag-handle {
+  flex: 0 0 128px;
+  min-width: 128px;
+}
+
+.destino-picker-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  flex: 1 1 0;
+  min-width: 0;
+}
+.destino-picker-field .cv-search-picker {
+  width: 100%;
+}
+
+/* BotÃ£o remover â€” aparece somente quando hÃ¡ 2+ destinos */
+.btn-remover-destino {
+  align-items: center;
+  background: transparent;
+  border: 1px solid var(--route-button-danger-border);
+  border-radius: var(--radius-control);
+  color: var(--route-button-danger-text);
+  cursor: pointer;
+  display: flex;
+  flex: 0 0 auto;
+  font-size: 16px;
+  height: var(--control-height-md);
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  width: var(--control-height-md);
+}
+.roteiro-editor--oficio .destino-row > .btn-remover-destino {
+  display: none;
+}
+.destino-row > .btn-remover-destino {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-fast), background var(--transition-fast), color var(--transition-fast);
+}
+.destino-row:hover > .btn-remover-destino,
+.destino-row:focus-within > .btn-remover-destino {
+  opacity: 1;
+  pointer-events: auto;
+}
+.btn-remover-destino:hover {
+  background: var(--route-button-danger-bg);
+  color: var(--route-button-danger-text);
+}
+
+@media (max-width: 600px) {
+  .destino-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .destino-row .destino-drag-handle.roteiro-editor__drag-handle,
+  .btn-remover-destino {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
 /* --------------------------------------------------------------------------
-   5. Bate-volta diário
+   5. Bate-volta diÃ¡rio
    -------------------------------------------------------------------------- */
 
 /* Trechos */
@@ -1476,7 +1584,7 @@
   padding: 0 !important;
 }
 
-/* Alertas, barra de ações e controles premium: static/css/forms.css (.app-form-shell). */
+/* Alertas, barra de aÃ§Ãµes e controles premium: static/css/forms.css (.app-form-shell). */
 
 /* Roteiro avulso: sections internas com titulo real da etapa. */
 .roteiro-editor--avulso .roteiro-editor__section {
@@ -2563,9 +2671,9 @@ html[data-theme="light-dark"] .roteiro-mapa__action-btn--secondary:focus-visible
   color: var(--route-button-secondary-text);
 }
 
-/* Opções de <select> (dark-dark / light-dark): forms.css (.app-form-shell). */
+/* OpÃ§Ãµes de <select> (dark-dark / light-dark): forms.css (.app-form-shell). */
 
-/* Hotfix de contraste: títulos e descrições internos de Sede/Destinos/Loop */
+/* Hotfix de contraste: tÃ­tulos e descriÃ§Ãµes internos de Sede/Destinos/Loop */
 html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__nest-block--sede .roteiro-editor__sede-card-header,
 html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__nest-block--sede .roteiro-editor__sede-card-header,
 html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__nest-block--destinos .roteiro-editor__destinos-card-header,
@@ -2624,3 +2732,4 @@ html[data-theme="dark-light"] .roteiro-editor--avulso .roteiro-editor__reference
     0 0 0 1px var(--route-status-draft-border),
     0 10px 22px rgba(216, 162, 27, 0.14);
 }
+

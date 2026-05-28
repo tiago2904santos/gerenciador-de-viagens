@@ -33,15 +33,14 @@
           </header>
           {# Linha 1: N° do Ofício (readonly) | Protocolo | Custeio #}
           <div class="field-grid field-grid--cols-3">
-            <div class="field app-form-field">
-              <label class="app-form-label" for="oficio-wizard-numero-readonly">N° do Ofício</label>
+            <div class="cv-field cv-field--readonly">
+              <label class="cv-field__label" for="oficio-wizard-numero-readonly">N° do Ofício</label>
               <input
                 type="text"
-                class="form-control"
+                class="cv-field__control"
                 id="oficio-wizard-numero-readonly"
                 value="{{ wizard_summary.numero_label }}"
                 readonly
-                aria-readonly="true"
                 tabindex="-1"
               >
             </div>
