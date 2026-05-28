@@ -557,6 +557,48 @@
   overflow: auto;
 }
 
+/* Panel sem padding-right: scrollbar fica colado na borda */
+.roteiro-routes-panel {
+  padding-right: 0;
+}
+
+.roteiro-routes-panel__header {
+  padding-right: var(--space-4);
+}
+
+/* Sem margin-top duplicada */
+.roteiro-routes-panel .roteiro-editor__route-list {
+  margin-top: 0;
+}
+
+/* Scrollbar estilizado da lista de roteiros */
+.roteiro-routes-list {
+  scrollbar-color: rgba(191, 211, 234, 0.6) transparent;
+}
+
+.roteiro-routes-list::-webkit-scrollbar {
+  width: 28px;
+}
+
+.roteiro-routes-list::-webkit-scrollbar-track {
+  background: transparent;
+  margin: var(--space-1) 0;
+}
+
+.roteiro-routes-list::-webkit-scrollbar-thumb {
+  background: rgba(191, 211, 234, 0.45);
+  border-radius: var(--radius-pill);
+  transition: background 0.2s;
+}
+
+.roteiro-routes-list::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent, #d8a21b);
+}
+
+.roteiro-routes-list::-webkit-scrollbar-button {
+  display: none;
+}
+
 .roteiro-editor--avulso .roteiro-editor__routes-panel--source .roteiro-editor__route-list {
   background: var(--route-card-bg);
   border: 0;

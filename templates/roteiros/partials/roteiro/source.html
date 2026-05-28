@@ -1,10 +1,10 @@
 {# SEÇÃO 1+2: FONTE DO ROTEIRO + SEDE E DESTINOS #}
 <section class="cv-wizard-section-card roteiro-editor__section--fonte-destinos"
-         aria-labelledby="sec-fonte-roteiro"
+         aria-labelledby="sec-fonte-destinos"
          data-destinos-component>
   <header class="cv-wizard-section-header">
     <div class="cv-wizard-section-header__copy">
-      <h3 class="cv-wizard-section-title" id="sec-fonte-roteiro">1–2. Fonte e destinos</h3>
+      <h3 class="cv-wizard-section-title" id="sec-fonte-destinos">1–2. Fonte e destinos</h3>
       <p class="cv-wizard-section-subtitle">Escolha um roteiro salvo ou monte um roteiro novo definindo sede e destinos.</p>
     </div>
     {% if has_event_routes %}
@@ -14,133 +14,167 @@
                 class="cv-segment-toggle__btn"
                 id="toggle-btn-salvo"
                 aria-pressed="{% if roteiro_modo == 'EVENTO_EXISTENTE' %}true{% else %}false{% endif %}"
-                data-roteiro-toggle="EVENTO_EXISTENTE">Roteiro salvo</button>
+                data-roteiro-toggle="EVENTO_EXISTENTE">
+          <span>Roteiro salvo</span>
+        </button>
         <button type="button"
                 class="cv-segment-toggle__btn"
                 id="toggle-btn-novo"
                 aria-pressed="{% if roteiro_modo != 'EVENTO_EXISTENTE' %}true{% else %}false{% endif %}"
-                data-roteiro-toggle="ROTEIRO_PROPRIO">Roteiro novo</button>
+                data-roteiro-toggle="ROTEIRO_PROPRIO">
+          <span>Roteiro novo</span>
+        </button>
       </div>
     </div>
     {% endif %}
   </header>
 
   <div class="cv-wizard-section-body">
-    {# Hidden radio inputs (required by JS for mode detection and form submission) #}
+    {# Radios ocultos — lidos pelo JS para detectar e submeter o modo #}
     <input type="radio" name="roteiro_modo" id="id_roteiro_modo_evento" value="EVENTO_EXISTENTE"
            {% if roteiro_modo == 'EVENTO_EXISTENTE' %}checked{% endif %}
            {% if not has_event_routes %}disabled{% endif %}
-           class="visually-hidden">
+           hidden>
     <input type="radio" name="roteiro_modo" id="id_roteiro_modo_proprio" value="ROTEIRO_PROPRIO"
            {% if roteiro_modo != 'EVENTO_EXISTENTE' %}checked{% endif %}
-           class="visually-hidden">
+           hidden>
 
-    {# ── Panel: Roteiro salvo ── #}
+    {# ── Painel: Roteiro salvo ── #}
     <div id="roteiro-selector-wrapper"
-         class="roteiro-editor__routes-panel roteiro-editor__routes-panel--source"
+         class="roteiro-editor__routes-panel"
          {% if roteiro_modo != 'EVENTO_EXISTENTE' %}hidden{% endif %}>
-      <div class="wizard-inner-section">
-        <div class="wizard-inner-section__header">
-          <h4 class="wizard-inner-section__title">Roteiros salvos</h4>
+
+      <section class="wizard-inner-section" aria-labelledby="sec-roteiro-salvo-title">
+        <header class="wizard-inner-section__header">
+          <h4 class="wizard-inner-section__title" id="sec-roteiro-salvo-title">Roteiros salvos</h4>
           <p class="wizard-inner-section__description">Reaproveite um roteiro já validado para acelerar o preenchimento.</p>
+        </header>
+        <div class="field-grid">
+          <div class="field field-size-4 app-form-field">
+            <label class="app-form-label" for="id_roteiro_busca">Buscar roteiro salvo</label>
+            <input type="search" id="id_roteiro_busca" class="form-control"
+                   placeholder="Buscar por destino, tipo ou trecho..."
+                   {% if not has_event_routes %}disabled{% endif %}
+                   autocomplete="off">
+          </div>
         </div>
-      </div>
-      <label class="roteiro-editor__field-label" for="id_roteiro_busca">Buscar roteiro salvo</label>
-      <div class="field-grid field-grid--cols-12">
-        <div class="field field-size-12">
-          <input type="search" id="id_roteiro_busca" class="app-form-field"
-                 placeholder="Buscar por destino, tipo ou trecho..."
-                 {% if not has_event_routes %}disabled{% endif %}
-                 autocomplete="off">
+        <input type="hidden" name="roteiro_id" id="id_roteiro_id"
+               value="{{ roteiro_id|default:'' }}"
+               data-route-selected-input
+               {% if not has_event_routes %}disabled{% endif %}>
+        <div class="cv-search-picker">
+          <section class="cv-search-picker__selected-panel roteiro-routes-panel">
+            <div class="cv-search-picker__selected-header roteiro-routes-panel__header">
+              <h4 class="cv-search-picker__selected-title">Roteiros encontrados</h4>
+            </div>
+            <div id="roteiro-lista" class="roteiro-editor__route-list oficio-roteiro-route-list roteiro-routes-list"></div>
+          </section>
         </div>
-      </div>
-      <input type="hidden" name="roteiro_id" id="id_roteiro_id"
-             value="{{ roteiro_id|default:'' }}"
-             data-route-selected-input
-             {% if not has_event_routes %}disabled{% endif %}>
-      <div id="roteiro-lista" class="roteiro-editor__route-list oficio-roteiro-route-list"></div>
-      <div class="roteiro-editor__helper" id="roteiro-selector-resumo"></div>
+        <p class="field-help mt-2" id="roteiro-selector-resumo"></p>
+      </section>
     </div>
 
-    {# ── Panel: Roteiro novo — Sede e Destinos ── #}
+    {# ── Painel: Roteiro novo — Sede e Destinos ── #}
     <div id="panel-roteiro-novo"
          {% if roteiro_modo == 'EVENTO_EXISTENTE' %}hidden{% endif %}>
 
       {# Sede #}
-      <div id="sec-sede" class="wizard-inner-section roteiro-editor__nest-block roteiro-editor__nest-block--sede">
-        <div class="wizard-inner-section__header">
-          <h4 class="wizard-inner-section__title">Sede</h4>
+      <section class="wizard-inner-section" aria-labelledby="sec-sede-title" id="sec-sede">
+        <header class="wizard-inner-section__header">
+          <h4 class="wizard-inner-section__title" id="sec-sede-title">Sede</h4>
           <p class="wizard-inner-section__description">Defina a unidade de origem da viagem (UF e cidade).</p>
-        </div>
+        </header>
         <div class="field-grid field-grid--cols-2">
-          <div class="field field-size-1">
-            <label class="roteiro-editor__field-label" for="id_origem_estado">UF</label>
-            <select name="origem_estado" id="id_origem_estado" class="form-select" data-cv-select>
-              <option value="">---------</option>
-              {% for estado in estados %}
-              <option value="{{ estado.pk }}" {% if sede_estado_id == estado.pk %}selected{% endif %}>{{ estado.nome }} ({{ estado.sigla }})</option>
-              {% endfor %}
-            </select>
-            {% if form.origem_estado.errors %}<div class="invalid-feedback d-block">{{ form.origem_estado.errors.0 }}</div>{% endif %}
+          <div class="field app-form-field">
+            <label class="app-form-label" for="id_origem_estado">UF</label>
+            <div class="cv-custom-select" data-cv-select>
+              <select name="origem_estado" id="id_origem_estado">
+                <option value="">---------</option>
+                {% for estado in estados %}
+                <option value="{{ estado.pk }}" {% if sede_estado_id == estado.pk %}selected{% endif %}>{{ estado.nome }} ({{ estado.sigla }})</option>
+                {% endfor %}
+              </select>
+            </div>
+            {% if form.origem_estado.errors %}
+              {% include "components/ui/feedback/field_error.html" with errors=form.origem_estado.errors only %}
+            {% endif %}
           </div>
-          <div class="field field-size-1">
-            <label class="roteiro-editor__field-label" for="id_origem_cidade">Cidade</label>
-            <select name="origem_cidade" id="id_origem_cidade" class="form-select" data-cv-select>
-              <option value="">---------</option>
-              {% for cidade in sede_cidades_qs %}
-              <option value="{{ cidade.pk }}" {% if sede_cidade_id == cidade.pk %}selected{% endif %}>{{ cidade.nome }}</option>
-              {% endfor %}
-            </select>
-            {% if form.origem_cidade.errors %}<div class="invalid-feedback d-block">{{ form.origem_cidade.errors.0 }}</div>{% endif %}
+          <div class="field app-form-field">
+            <label class="app-form-label" for="id_origem_cidade">Cidade</label>
+            <div class="cv-custom-select" data-cv-select>
+              <select name="origem_cidade" id="id_origem_cidade">
+                <option value="">---------</option>
+                {% for cidade in sede_cidades_qs %}
+                <option value="{{ cidade.pk }}" {% if sede_cidade_id == cidade.pk %}selected{% endif %}>{{ cidade.nome }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            {% if form.origem_cidade.errors %}
+              {% include "components/ui/feedback/field_error.html" with errors=form.origem_cidade.errors only %}
+            {% endif %}
           </div>
         </div>
-      </div>
+      </section>
 
       {# Destinos #}
-      <div id="sec-destinos" class="wizard-inner-section roteiro-editor__nest-block roteiro-editor__nest-block--destinos">
-        <div class="wizard-inner-section__header">
-          <h4 class="wizard-inner-section__title">Destinos</h4>
+      <section class="wizard-inner-section" aria-labelledby="sec-destinos-title" id="sec-destinos">
+        <header class="wizard-inner-section__header">
+          <h4 class="wizard-inner-section__title" id="sec-destinos-title">Destinos</h4>
           <p class="wizard-inner-section__description">Reordene por arrastar e soltar para atualizar automaticamente a sequência dos trechos.</p>
+        </header>
+        <div class="cv-search-picker">
+          <section class="cv-search-picker__selected-panel roteiro-destinos-panel" aria-label="Destinos adicionados">
+            <div class="cv-search-picker__selected-header">
+              <h4 class="cv-search-picker__selected-title">Destinos adicionados</h4>
+              <button type="button" id="btn-adicionar-destino" class="cv-btn cv-btn--secondary cv-btn--sm">
+                <span>+ Adicionar destino</span>
+              </button>
+            </div>
+            <div id="destinos-container" class="roteiro-editor__destinos-list oficio-roteiro-destinos-stack roteiro-destinos-list"></div>
+          </section>
         </div>
-        <div id="destinos-container" class="roteiro-editor__destinos-list oficio-roteiro-destinos-stack"></div>
-        <button type="button" id="btn-adicionar-destino" class="cv-btn cv-btn--secondary mt-2 w-100">Adicionar destino</button>
-      </div>
-    </div>
+      </section>
+
+    </div>{# /panel-roteiro-novo #}
   </div>
 </section>
 
 <script>
 (function () {
-  var panelSalvo = document.getElementById('roteiro-selector-wrapper');
-  var panelNovo  = document.getElementById('panel-roteiro-novo');
+  var panelSalvo  = document.getElementById('roteiro-selector-wrapper');
+  var panelNovo   = document.getElementById('panel-roteiro-novo');
   var radioEvento = document.getElementById('id_roteiro_modo_evento');
   var radioProprio = document.getElementById('id_roteiro_modo_proprio');
-  var btnSalvo = document.getElementById('toggle-btn-salvo');
-  var btnNovo  = document.getElementById('toggle-btn-novo');
+  var btnSalvo    = document.getElementById('toggle-btn-salvo');
+  var btnNovo     = document.getElementById('toggle-btn-novo');
 
-  if (!btnSalvo || !btnNovo || !panelSalvo || !panelNovo) return;
+  if (!panelSalvo || !panelNovo) return;
 
   function syncButtons(isSalvo) {
-    btnSalvo.setAttribute('aria-pressed', isSalvo ? 'true' : 'false');
-    btnNovo.setAttribute('aria-pressed', isSalvo ? 'false' : 'true');
+    if (btnSalvo) btnSalvo.setAttribute('aria-pressed', isSalvo ? 'true' : 'false');
+    if (btnNovo)  btnNovo.setAttribute('aria-pressed', isSalvo ? 'false' : 'true');
     panelNovo.hidden = isSalvo;
   }
 
-  btnSalvo.addEventListener('click', function () {
-    if (radioEvento && !radioEvento.disabled) {
-      radioEvento.checked = true;
-      radioEvento.dispatchEvent(new Event('change', { bubbles: true }));
-    }
-  });
+  if (btnSalvo) {
+    btnSalvo.addEventListener('click', function () {
+      if (radioEvento && !radioEvento.disabled) {
+        radioEvento.checked = true;
+        radioEvento.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    });
+  }
 
-  btnNovo.addEventListener('click', function () {
-    if (radioProprio) {
-      radioProprio.checked = true;
-      radioProprio.dispatchEvent(new Event('change', { bubbles: true }));
-    }
-  });
+  if (btnNovo) {
+    btnNovo.addEventListener('click', function () {
+      if (radioProprio) {
+        radioProprio.checked = true;
+        radioProprio.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    });
+  }
 
-  // React when index.js calls setModeUi() and sets panelSalvo.hidden directly
+  /* Reage quando index.js chama setModeUi() e altera panelSalvo.hidden diretamente */
   new MutationObserver(function () {
     syncButtons(!panelSalvo.hidden);
   }).observe(panelSalvo, { attributes: true, attributeFilter: ['hidden'] });
