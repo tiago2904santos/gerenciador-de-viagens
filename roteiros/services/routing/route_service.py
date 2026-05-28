@@ -8,10 +8,11 @@ from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
 
-from roteiros.models import Roteiro
+from roteiros.models import Roteiro, RoteiroTrecho
 
 from .openrouteservice import get_openrouteservice_provider
 from .route_exceptions import RouteConfigurationError, RouteDailyRoundTripBlockedError
+from .route_metrics import summarize_route_leg_metrics
 from .route_point_builder import build_route_points_for_roteiro
 from .route_signature import build_route_signature
 
@@ -79,6 +80,42 @@ def _points_for_frontend(points: List[dict]) -> List[Dict[str, Any]]:
     return out
 
 
+def _roteiro_is_round_trip(roteiro: Roteiro) -> bool:
+    if roteiro.trechos.filter(tipo=RoteiroTrecho.TIPO_RETORNO).exists():
+        return True
+    try:
+        points, bate = build_route_points_for_roteiro(roteiro)
+        if bate:
+            return True
+        return any(_infer_point_kind(p.get("id")) == "retorno" for p in points)
+    except Exception:
+        return False
+
+
+def _metrics_from_roteiro_trechos(roteiro: Roteiro) -> Dict[str, Any]:
+    ida_trechos = list(
+        roteiro.trechos.filter(tipo=RoteiroTrecho.TIPO_IDA).order_by("ordem", "id")
+    )
+    legs = [
+        {
+            "kind": "trecho",
+            "distance_km": float(t.distancia_km) if t.distancia_km is not None else 0,
+            "travel_minutes": int(t.tempo_cru_estimado_min or 0),
+        }
+        for t in ida_trechos
+    ]
+    if _roteiro_is_round_trip(roteiro):
+        legs.append({"kind": "retorno"})
+    dist_eff = _effective_distance_km(roteiro)
+    dur_eff = _effective_duration_min(roteiro)
+    return summarize_route_leg_metrics(
+        legs,
+        distance_km_total=dist_eff,
+        duration_minutes_total=dur_eff,
+        round_trip=_roteiro_is_round_trip(roteiro),
+    )
+
+
 def _effective_distance_km(roteiro: Roteiro) -> float | None:
     if roteiro.rota_distancia_manual_km is not None:
         return float(roteiro.rota_distancia_manual_km)
@@ -106,7 +143,7 @@ def _route_payload_from_roteiro(
     dur_auto = roteiro.rota_duracao_calculada_min
     dist_eff = _effective_distance_km(roteiro)
     dur_eff = _effective_duration_min(roteiro)
-    return {
+    payload = {
         "provider": roteiro.rota_fonte or "",
         "distance_km": dist_eff,
         "distance_km_auto": dist_auto,
@@ -126,6 +163,11 @@ def _route_payload_from_roteiro(
         "duracao_manual_min": roteiro.rota_duracao_manual_min,
         "ajuste_justificativa": (roteiro.rota_ajuste_justificativa or "").strip(),
     }
+    try:
+        payload.update(_metrics_from_roteiro_trechos(roteiro))
+    except Exception:
+        pass
+    return payload
 
 
 @transaction.atomic

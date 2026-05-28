@@ -1,76 +1,93 @@
-<section class="cv-wizard-section-card roteiro-editor__section--mapa" aria-labelledby="roteiro-mapa-titulo">
+{# SEÇÃO 4: MAPA DA ROTA #}
+<section class="cv-wizard-section-card roteiro-editor__section--mapa"
+         id="sec-mapa-rota"
+         aria-labelledby="sec-mapa-rota-title">
   <header class="cv-wizard-section-header">
     <div class="cv-wizard-section-header__copy">
-      <h3 class="cv-wizard-section-title" id="roteiro-mapa-titulo">4. Mapa da rota</h3>
-    </div>
-    <div class="cv-wizard-section-header__actions">
-      <div class="roteiro-mapa__actions roteiro-mapa__actions--header">
-        <button type="button"
-                class="cv-btn cv-btn--secondary roteiro-mapa__action-btn roteiro-mapa__action-btn--primary"
-                id="btn-calcular-rota-mapa">
-          <span class="roteiro-mapa__action-icon" aria-hidden="true"></span>
-          Calcular rota
-        </button>
-        <button type="button"
-                class="cv-btn cv-btn--secondary roteiro-mapa__action-btn roteiro-mapa__action-btn--secondary"
-                id="btn-recalcular-rota-mapa"
-                hidden>
-          <span class="roteiro-mapa__action-icon" aria-hidden="true"></span>
-          Recalcular rota
-        </button>
-        <button type="button"
-                class="cv-btn cv-btn--secondary roteiro-mapa__action-btn roteiro-mapa__action-btn--secondary"
-                id="btn-fit-rota-mapa"
-                hidden>
-          Ver rota inteira
-        </button>
-      </div>
+      <h3 class="cv-wizard-section-title" id="sec-mapa-rota-title">4. Mapa da rota</h3>
     </div>
   </header>
+
   <div class="cv-wizard-section-body">
-    <p class="roteiro-mapa__stale-hint text-warning-emphasis small mb-2"
+    <p class="roteiro-mapa__stale-hint text-warning-emphasis small"
        id="roteiro-mapa-stale-hint"
        hidden
        role="status">
       A ordem dos destinos mudou. Recalcule a rota para atualizar distância e tempo estimados.
     </p>
 
-    <div class="roteiro-mapa__summary" id="roteiro-mapa-summary" hidden>
-      <dl class="roteiro-mapa__stats field-grid field-grid--cols-4">
-        <div class="field field-size-1">
-          <dt>Distância</dt>
-          <dd id="roteiro-mapa-distancia">—</dd>
-        </div>
-        <div class="field field-size-1">
-          <dt>Tempo</dt>
-          <dd id="roteiro-mapa-tempo">—</dd>
-        </div>
-        <div class="field field-size-1">
-          <dt>Fonte do cálculo</dt>
-          <dd id="roteiro-mapa-fonte">—</dd>
-        </div>
-        <div class="field field-size-1">
-          <dt>Cálculo realizado em</dt>
-          <dd id="roteiro-mapa-calculada-em">—</dd>
-        </div>
-      </dl>
+    <div class="roteiro-mapa__metrics field-grid field-grid--cols-4" id="roteiro-mapa-summary">
+      <div class="field cv-field cv-field--readonly field-size-1">
+        <label class="cv-field__label" for="roteiro-mapa-distancia">Distância (ida e volta)</label>
+        <input type="text"
+               class="cv-field__control"
+               id="roteiro-mapa-distancia"
+               value="—"
+               readonly
+               tabindex="-1"
+               aria-readonly="true"
+               aria-describedby="roteiro-mapa-distancia-hint">
+      </div>
+      <div class="field cv-field cv-field--readonly field-size-1">
+        <label class="cv-field__label" for="roteiro-mapa-tempo">Tempo (ida e volta)</label>
+        <input type="text"
+               class="cv-field__control"
+               id="roteiro-mapa-tempo"
+               value="—"
+               readonly
+               tabindex="-1"
+               aria-readonly="true"
+               aria-describedby="roteiro-mapa-tempo-hint">
+      </div>
+      <div class="field cv-field cv-field--readonly field-size-1">
+        <label class="cv-field__label" for="roteiro-mapa-distancia-ida">Distância de ida</label>
+        <input type="text"
+               class="cv-field__control"
+               id="roteiro-mapa-distancia-ida"
+               value="—"
+               readonly
+               tabindex="-1"
+               aria-readonly="true">
+      </div>
+      <div class="field cv-field cv-field--readonly field-size-1">
+        <label class="cv-field__label" for="roteiro-mapa-tempo-ida">Tempo de ida</label>
+        <input type="text"
+               class="cv-field__control"
+               id="roteiro-mapa-tempo-ida"
+               value="—"
+               readonly
+               tabindex="-1"
+               aria-readonly="true">
+      </div>
     </div>
 
     <div class="roteiro-mapa__canvas-shell">
-      <div class="roteiro-mapa__canvas-head">
-        <div class="roteiro-mapa__heading">
-          <span class="roteiro-mapa__title-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
-              <path d="M3 6.8 8.8 4l6.4 2.2L21 3.8V17l-5.8 2.8-6.4-2.2L3 20z"></path>
-              <path d="M8.8 4v13.6M15.2 6.2v13.6"></path>
-            </svg>
-          </span>
-          <div class="roteiro-mapa__title-block">
-            <h4 class="roteiro-mapa__title">Visualização do trajeto</h4>
-            <p class="roteiro-mapa__subtitle">Visualização interativa do trajeto com zoom e navegação.</p>
-          </div>
+      <div class="roteiro-mapa__canvas-head"
+           role="toolbar"
+           aria-label="Ações do mapa da rota">
+        <div class="roteiro-mapa__actions roteiro-mapa__actions--canvas">
+          <button type="button"
+                  class="cv-btn cv-btn--secondary"
+                  id="btn-calcular-rota-mapa">
+            <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="route" only %}</span>
+            <span>Calcular rota</span>
+          </button>
+          <button type="button"
+                  class="cv-btn cv-btn--secondary"
+                  id="btn-recalcular-rota-mapa"
+                  hidden>
+            <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="route" only %}</span>
+            <span>Recalcular rota</span>
+          </button>
+          <button type="button"
+                  class="cv-btn cv-btn--secondary"
+                  id="btn-fit-rota-mapa"
+                  hidden>
+            Ver rota inteira
+          </button>
         </div>
       </div>
+
       <div class="roteiro-mapa__frame roteiro-mapa__frame--placeholder"
            id="roteiro-mapa-container"
            data-testid="roteiro-mapa-container"></div>

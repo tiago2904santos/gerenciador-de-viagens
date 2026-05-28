@@ -28,6 +28,7 @@ from roteiros.services.routing.route_exceptions import (
     RouteProviderUnavailable,
     RouteValidationError,
 )
+from roteiros.services.routing.route_metrics import summarize_route_leg_metrics
 from roteiros.services.routing.route_time_rules import (
     calculate_additional_time_minutes,
     round_trip_minutes_to_15,
@@ -829,6 +830,52 @@ class RoteirosRoutingTests(TestCase):
         self.assertRegex(html, r'id="roteiro-mapa-stale-hint"[^>]*hidden')
         self.assertNotIn("Selecione a sede e os destinos para calcular a rota.", html)
 
+    def test_summarize_route_leg_metrics_separa_ida_e_ida_volta(self):
+        legs = [
+            {"kind": "trecho", "distance_km": 100.0, "travel_minutes": 60},
+            {"kind": "trecho", "distance_km": 200.0, "travel_minutes": 120},
+            {"kind": "retorno", "distance_km": 400.0, "travel_minutes": 240},
+        ]
+        metrics = summarize_route_leg_metrics(
+            legs,
+            distance_km_total=700.0,
+            duration_minutes_total=420,
+        )
+        self.assertTrue(metrics["has_round_trip"])
+        self.assertEqual(metrics["distance_km_ida"], 350.0)
+        self.assertEqual(metrics["duration_minutes_ida"], 210)
+        self.assertEqual(metrics["duration_human_ida"], "3h30min")
+        self.assertEqual(metrics["distance_km_round_trip"], 700.0)
+        self.assertEqual(metrics["duration_minutes_round_trip"], 420)
+        self.assertEqual(metrics["duration_human_round_trip"], "7h")
+
+    def test_summarize_route_leg_metrics_sem_retorno_so_ida(self):
+        legs = [
+            {"kind": "trecho", "distance_km": 423.5, "travel_minutes": 300},
+        ]
+        metrics = summarize_route_leg_metrics(
+            legs,
+            distance_km_total=423.5,
+            duration_minutes_total=300,
+        )
+        self.assertFalse(metrics["has_round_trip"])
+        self.assertEqual(metrics["distance_km_ida"], 423.5)
+        self.assertNotIn("distance_km_round_trip", metrics)
+
+    def test_summarize_route_leg_metrics_round_trip_forcado_por_flag(self):
+        legs = [{"kind": "trecho", "distance_km": 200.0, "travel_minutes": 120}]
+        metrics = summarize_route_leg_metrics(
+            legs,
+            distance_km_total=852.38,
+            duration_minutes_total=675,
+            round_trip=True,
+        )
+        self.assertTrue(metrics["has_round_trip"])
+        self.assertEqual(metrics["distance_km_round_trip"], 852.38)
+        self.assertEqual(metrics["distance_km_ida"], 426.19)
+        self.assertEqual(metrics["duration_minutes_ida"], 337)
+        self.assertEqual(metrics["duration_minutes_round_trip"], 675)
+
     def test_round_trip_minutes_to_15_regra_resto_5(self):
         cases = [
             (1, 0),
@@ -952,6 +999,13 @@ class RoteirosRoutingTests(TestCase):
         self.assertEqual(out["legs"][0]["color_index"], 0)
         self.assertEqual(out["legs"][1]["color_index"], 1)
         self.assertEqual(out["legs"][2]["color_index"], 0)
+        route = out["route"]
+        self.assertTrue(route["has_round_trip"])
+        self.assertEqual(route["distance_km_round_trip"], 700.0)
+        self.assertGreater(route["distance_km_ida"], 0)
+        self.assertEqual(route["distance_km_ida"], round(route["distance_km_round_trip"] / 2, 2))
+        self.assertTrue(route["duration_human_ida"])
+        self.assertTrue(route["duration_human_round_trip"])
 
     def test_preview_fallback_quando_segments_incompativeis(self):
         mock_fc = {

@@ -1,5 +1,13 @@
 import { createEditorState } from './state.js';
-import { createTrechosModule } from './trechos.js';
+import {
+  createTrechosModule,
+  TRECHOS_EMPTY_HTML,
+  TRECHO_CARD_SELECTOR,
+  buildTrechoCard,
+  initTrechosFields,
+  setTrechoDateValue,
+  queryTrechoCards,
+} from './trechos.js';
 import { createRetornoModule } from './retorno.js';
 import { createDiariasModule } from './diarias.js';
 import { createMapaModule } from './mapa.js';
@@ -97,7 +105,15 @@ export function initRoteirosEditor() {
   var autoEstimarTimer = null;
   var citiesCache = {};
   var lastTrechosSignature = null;
-  var TRECHOS_EMPTY_HTML = '<div class="roteiro-editor__empty"><p class="roteiro-editor__empty-title">Trechos ainda não disponíveis</p><p class="roteiro-editor__empty-text">Os trechos aparecem aqui após definir os destinos.</p></div>';
+  function getTrechoCards() {
+    return queryTrechoCards($('trechos-gerados-container'));
+  }
+  function mountTrechosHtml(html) {
+    var container = $('trechos-gerados-container');
+    if (!container) return;
+    container.innerHTML = html;
+    initTrechosFields(container);
+  }
   function refreshSelectPickers(root) {
     if (window.OficioWizard && typeof window.OficioWizard.refreshSelectPickers === 'function') {
       window.OficioWizard.refreshSelectPickers(root || form);
@@ -175,67 +191,29 @@ export function initRoteirosEditor() {
     if (digits.length <= 2) return digits;
     return digits.slice(0, 2) + '/' + digits.slice(2, 4);
   }
-  function normalizeDateYearInput(value, allowPartial) {
+  function parseDateInput(value) {
     var raw = String(value || '').trim();
-    var digits = raw.replace(/\D/g, '').slice(0, 4);
-    if (digits.length === 4) return digits;
-    return allowPartial ? digits : currentYearString();
-  }
-  function splitBateVoltaDateValue(value) {
-    var raw = String(value || '').trim();
-    if (!raw) {
-      return { dm: '', year: currentYearString() };
-    }
+    if (!raw) return '';
     var iso = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-    if (iso) {
-      return { dm: iso[3] + '/' + iso[2], year: iso[1] };
-    }
-    var digits = raw.replace(/\D/g, '').slice(0, 8);
-    if (digits.length >= 8) {
-      return { dm: digits.slice(0, 2) + '/' + digits.slice(2, 4), year: digits.slice(4, 8) };
-    }
-    if (digits.length >= 4) {
-      return { dm: digits.slice(0, 2) + '/' + digits.slice(2, 4), year: currentYearString() };
-    }
+    if (iso) return iso[1] + '-' + iso[2] + '-' + iso[3];
     var normalized = normalizeDateInput(raw);
-    if (!normalized) {
-      return { dm: '', year: currentYearString() };
-    }
+    if (!normalized) return '';
     var parts = normalized.split('/');
-    if (parts.length >= 2) {
-      return { dm: parts[0] + '/' + parts[1], year: currentYearString() };
-    }
-    return { dm: normalized, year: currentYearString() };
+    if (parts.length < 2) return '';
+    var day = pad2(parts[0]);
+    var month = pad2(parts[1]);
+    var year = parts[2] ? String(parts[2]).replace(/\D/g, '').slice(0, 4) : currentYearString();
+    if (!year || year.length < 4) year = currentYearString();
+    return year + '-' + month + '-' + day;
   }
-  function buildBateVoltaNativeDate(dmValue, yearValue) {
-    var dm = normalizeDateInput(dmValue);
-    var parts = dm.split('/');
-    if (parts.length !== 2 || !parts[0] || !parts[1]) return '';
-    var year = normalizeDateYearInput(yearValue, false);
-    return year + '-' + pad2(parts[1]) + '-' + pad2(parts[0]);
-  }
-  function syncBateVoltaDatePair(textEl, yearEl, nativeEl) {
-    if (!textEl || !yearEl || !nativeEl) return;
+  function syncBateVoltaDatePair(textEl, nativeEl) {
+    if (!textEl || !nativeEl) return;
     if (document.activeElement === nativeEl) {
-      var nativeParts = splitBateVoltaDateValue(nativeEl.value);
-      textEl.value = nativeParts.dm;
-      yearEl.value = nativeParts.year || currentYearString();
-      yearEl.readOnly = true;
+      textEl.value = normalizeDateInput(nativeEl.value);
       return;
     }
-    var dmValue = normalizeDateInput(textEl.value || nativeEl.value);
-    var yearValue = normalizeDateYearInput(yearEl.value || nativeEl.value, document.activeElement === yearEl && !yearEl.readOnly);
-    if (document.activeElement !== textEl) {
-      textEl.value = dmValue;
-    } else if (textEl.value !== dmValue) {
-      textEl.value = dmValue;
-    }
-    if (document.activeElement !== yearEl) {
-      yearEl.value = yearValue || currentYearString();
-      yearEl.readOnly = true;
-    }
-    var parsed = buildBateVoltaNativeDate(textEl.value, yearEl.value);
-    nativeEl.value = parsed || '';
+    textEl.value = normalizeDateInput(textEl.value || nativeEl.value);
+    nativeEl.value = parseDateInput(textEl.value) || '';
   }
   function normalizeLocationLabel(value) {
     return String(value || '').trim().toUpperCase();
@@ -487,7 +465,7 @@ export function initRoteirosEditor() {
   function currentTrechosMap() {
     // Preserva campos manuais usando a chave estavel do trecho; a ordem visual pode mudar.
     var map = {};
-    $('trechos-gerados-container').querySelectorAll('.card[data-key]').forEach(function(card) {
+    getTrechoCards().forEach(function(card) {
       var o = card.dataset.ordem;
       map[card.dataset.key] = { id: card.dataset.trechoId || '', ordem: parseInt(o, 10) || 0, origem_nome: card.dataset.origemNome || '', destino_nome: card.dataset.destinoNome || '',
         origem_estado_id: card.dataset.origemEstadoId || '', origem_cidade_id: card.dataset.origemCidadeId || '',
@@ -567,21 +545,20 @@ export function initRoteirosEditor() {
     var totEl = card.querySelector('.trecho-tempo-total');     if (totEl) totEl.value = total ? hhmm(total) : '';
     var sdEl = card.querySelector('[name="trecho_' + o + '_saida_data"]');
     var shEl = card.querySelector('[name="trecho_' + o + '_saida_hora"]');
-    var cdEl = card.querySelector('[name="trecho_' + o + '_chegada_data"]');
     var chEl = card.querySelector('[name="trecho_' + o + '_chegada_hora"]');
-    if (suggestArrival && sdEl && shEl && cdEl && chEl) {
+    if (suggestArrival && sdEl && shEl) {
       if (!sdEl.value || !shEl.value) {
-        cdEl.value = '';
-        chEl.value = '';
+        setTrechoDateValue(card, 'chegada', '');
+        if (chEl) chEl.value = '';
       } else if (total > 0) {
         var cheg = calcularChegada(sdEl.value, shEl.value, cru, add);
         if (cheg) {
-          cdEl.value = cheg.data;
-          chEl.value = cheg.hora;
+          setTrechoDateValue(card, 'chegada', cheg.data);
+          if (chEl) chEl.value = cheg.hora;
         }
       } else {
-        cdEl.value = '';
-        chEl.value = '';
+        setTrechoDateValue(card, 'chegada', '');
+        if (chEl) chEl.value = '';
       }
     }
   }
@@ -673,8 +650,17 @@ export function initRoteirosEditor() {
       });
     if (!destinos.length) return null;
     var retornoCard = $('retorno-card');
-    var retornoCidadeId = retornoCard ? parseInt(retornoCard.dataset.destinoCidadeId || '', 10) : NaN;
-    var incluirRetorno = !!(retornoCard && retornoCard.dataset.origemCidadeId && retornoCard.dataset.destinoCidadeId);
+    var retornoCidadeId = NaN;
+    if (retornoCard && retornoCard.dataset.destinoCidadeId) {
+      retornoCidadeId = parseInt(retornoCard.dataset.destinoCidadeId, 10);
+    } else {
+      retornoCidadeId = origemCidadeId;
+    }
+    var incluirRetorno = !!(
+      origemCidadeId &&
+      destinos.length &&
+      !Number.isNaN(retornoCidadeId)
+    );
     return {
       origem_cidade_id: origemCidadeId,
       destinos: destinos,
@@ -713,15 +699,19 @@ export function initRoteirosEditor() {
         recalcRetorno(true);
         return;
       }
-      var card = $('trechos-gerados-container').querySelector('.card[data-key="' + String(leg.uuid || '') + '"]');
+      var card = $('trechos-gerados-container').querySelector(
+        '.roteiro-trecho-card[data-key="' + String(leg.uuid || '') + '"]'
+      );
       if (!card) {
-        card = Array.from($('trechos-gerados-container').querySelectorAll('.card[data-key]')).find(function(c) {
+        card = getTrechoCards().find(function(c) {
           return String(c.dataset.origemCidadeId || '') === String(leg.from_cidade_id || '') &&
             String(c.dataset.destinoCidadeId || '') === String(leg.to_cidade_id || '');
         });
       }
       if (!card && Number.isInteger(leg.index)) {
-        card = $('trechos-gerados-container').querySelector('.card[data-ordem="' + String(leg.index) + '"]');
+        card = $('trechos-gerados-container').querySelector(
+          '.roteiro-trecho-card[data-ordem="' + String(leg.index) + '"]'
+        );
       }
       if (!card) return;
       var ord = card.dataset.ordem;
@@ -788,7 +778,7 @@ export function initRoteirosEditor() {
   }
   function runAutoEstimarTrechos() {
     if (!urlTrechosEstimar || applyingState || isLoopModeActive()) return;
-    var cards = Array.from($('trechos-gerados-container').querySelectorAll('.card[data-key]'));
+    var cards = getTrechoCards();
     var pending = cards.filter(function(card) {
       var distInp = card.querySelector('[name^="trecho_"][name$="_distancia_km"]');
       var cruInp = card.querySelector('[name^="trecho_"][name$="_tempo_cru_estimado_min"]');
@@ -821,43 +811,6 @@ export function initRoteirosEditor() {
         });
       });
     }, Promise.resolve());
-  }
-  function buildTrechoCard(trecho, value) {
-    var o = trecho.ordem; var dist = value.distancia_km || ''; var cru = value.tempo_cru_estimado_min || '';
-    var add = (value.tempo_adicional_min != null && value.tempo_adicional_min !== '') ? value.tempo_adicional_min : 0;
-    var fonte = value.rota_fonte || '';
-    var trechoId = value.id || trecho.id || '';
-    return '<div class="card roteiro-editor__trecho-card oficio-roteiro-trecho-card" data-key="'+esc(trecho.key)+'" data-trecho-id="'+esc(trechoId)+'" data-ordem="'+o+'" data-origem-nome="'+esc(trecho.origem_nome)+'" data-destino-nome="'+esc(trecho.destino_nome)+'" data-origem-estado-id="'+esc(trecho.origem_estado_id)+'" data-origem-cidade-id="'+esc(trecho.origem_cidade_id)+'" data-destino-estado-id="'+esc(trecho.destino_estado_id)+'" data-destino-cidade-id="'+esc(trecho.destino_cidade_id)+'">' +
-      '<div class="card-header py-3"><span class="fw-semibold">Trecho '+(o+1)+' \u2014 '+esc(trecho.origem_nome)+' \u2192 '+esc(trecho.destino_nome)+'</span></div>' +
-      '<div class="card-body">' +
-        '<input type="hidden" name="trecho_'+o+'_origem_nome" value="'+esc(trecho.origem_nome)+'">' +
-        '<input type="hidden" name="trecho_'+o+'_id" value="'+esc(trechoId)+'">' +
-        '<input type="hidden" name="trecho_'+o+'_destino_nome" value="'+esc(trecho.destino_nome)+'">' +
-        '<input type="hidden" name="trecho_'+o+'_origem_estado_id" value="'+esc(trecho.origem_estado_id)+'">' +
-        '<input type="hidden" name="trecho_'+o+'_origem_cidade_id" value="'+esc(trecho.origem_cidade_id)+'">' +
-        '<input type="hidden" name="trecho_'+o+'_destino_estado_id" value="'+esc(trecho.destino_estado_id)+'">' +
-        '<input type="hidden" name="trecho_'+o+'_destino_cidade_id" value="'+esc(trecho.destino_cidade_id)+'">' +
-        '<div class="row g-3">' +
-          '<div class="col-md-6"><div class="roteiro-editor__subpanel h-100"><div class="roteiro-editor__subpanel-title">Saída</div><div class="row g-2">' +
-            '<div class="col-12"><label class="roteiro-editor__field-label">Cidade</label><input type="text" class="form-control" value="'+esc(trecho.origem_nome)+'" readonly></div>' +
-            '<div class="col-md-6"><label class="roteiro-editor__field-label">Data</label><input type="date" class="form-control" name="trecho_'+o+'_saida_data" value="'+esc(value.saida_data||'')+'" ></div>' +
-            '<div class="col-md-6"><label class="roteiro-editor__field-label">Hora</label><input type="time" class="form-control" name="trecho_'+o+'_saida_hora" value="'+esc(value.saida_hora||'')+'" ></div>' +
-          '</div></div></div>' +
-          '<div class="col-md-6"><div class="roteiro-editor__subpanel h-100"><div class="roteiro-editor__subpanel-title">Chegada</div><div class="row g-2">' +
-            '<div class="col-12"><label class="roteiro-editor__field-label">Cidade</label><input type="text" class="form-control" value="'+esc(trecho.destino_nome)+'" readonly></div>' +
-            '<div class="col-md-6"><label class="roteiro-editor__field-label">Data</label><input type="date" class="form-control" name="trecho_'+o+'_chegada_data" value="'+esc(value.chegada_data||'')+'" ></div>' +
-            '<div class="col-md-6"><label class="roteiro-editor__field-label">Hora</label><input type="time" class="form-control" name="trecho_'+o+'_chegada_hora" value="'+esc(value.chegada_hora||'')+'" ></div>' +
-          '</div></div></div>' +
-          '<div class="col-12"><div class="roteiro-editor__grid oficio-roteiro-time-calc-grid align-items-end">' +
-            '<div class="field-span-4"><label class="roteiro-editor__field-label">Tempo de viagem</label><input type="text" class="form-control trecho-tempo-viagem-hhmm" value="'+esc(formatDurationInput(cru))+'" placeholder="00:00" inputmode="numeric" maxlength="5" autocomplete="off"><input type="hidden" name="trecho_'+o+'_tempo_cru_estimado_min" value="'+esc(cru)+'" ></div>' +
-            '<div class="field-span-4"><label class="roteiro-editor__field-label">Tempo adicional</label><div class="input-group"><button type="button" class="btn btn-outline-secondary trecho-tempo-add-btn" data-tempo-add-delta="-15" aria-label="Menos 15 minutos">−</button><input type="text" class="form-control trecho-tempo-adicional-hhmm" value="'+esc(add ? formatDurationInput(add) : '')+'" placeholder="00:00" inputmode="numeric" maxlength="5" autocomplete="off"><button type="button" class="btn btn-outline-secondary trecho-tempo-add-btn" data-tempo-add-delta="15" aria-label="Mais 15 minutos">+</button></div><input type="hidden" name="trecho_'+o+'_tempo_adicional_min" value="'+esc(add)+'" ></div>' +
-            '<div class="field-span-4"><label class="roteiro-editor__field-label">Tempo total</label><input type="text" class="form-control trecho-tempo-total" value="" readonly></div>' +
-          '</div></div>' +
-        '</div>' +
-        '<input type="hidden" name="trecho_'+o+'_distancia_km" value="'+esc(dist)+'">' +
-        '<input type="hidden" name="trecho_'+o+'_duracao_estimada_min" value="'+esc(value.duracao_estimada_min||'')+'">' +
-        '<input type="hidden" name="trecho_'+o+'_rota_fonte" value="'+esc(fonte)+'">' +
-      '</div></div>';
   }
   function getDestinoRows() {
     var container = $('destinos-container');
@@ -997,7 +950,7 @@ export function initRoteirosEditor() {
     });
   }
   function updateRetornoCities() {
-    var cards = Array.from($('trechos-gerados-container').querySelectorAll('.card[data-key]'));
+    var cards = getTrechoCards();
     var sede = selectedText($('id_origem_cidade'));
     var sedeId = ($('id_origem_cidade') || {}).value || '';
     var ultima = cards.length ? (cards[cards.length-1].dataset.destinoNome||'') : '';
@@ -1040,30 +993,49 @@ export function initRoteirosEditor() {
         });
       }
       if (!explicitTrechos.length) {
-        $('trechos-gerados-container').innerHTML = TRECHOS_EMPTY_HTML;
+        mountTrechosHtml(TRECHOS_EMPTY_HTML);
         updateRetornoCities();
         recalcRetorno(false);
         updateResumo();
         lastTrechosSignature = signature;
+        notifyRouteStateChanged();
         return;
       }
-      $('trechos-gerados-container').innerHTML = explicitTrechos.map(function(trecho, idx) {
-        return buildTrechoCard(
-          {
-            ordem: idx,
-            key: String(trecho.key || trecho.destino_key || trecho.id || ('explicit-' + idx + '-' + String(trecho.origem_cidade_id || '') + '->' + String(trecho.destino_cidade_id || ''))),
-            id: trecho.id || '',
-            origem_estado_id: trecho.origem_estado_id,
-            origem_cidade_id: trecho.origem_cidade_id,
-            destino_estado_id: trecho.destino_estado_id,
-            destino_cidade_id: trecho.destino_cidade_id,
-            origem_nome: trecho.origem_nome || '',
-            destino_nome: trecho.destino_nome || ''
-          },
-          Object.assign({}, trecho, { ordem: idx })
-        );
-      }).join('');
-      $('trechos-gerados-container').querySelectorAll('.card[data-key]').forEach(function(card) { recalcCard(card, false); });
+      mountTrechosHtml(
+        explicitTrechos
+          .map(function(trecho, idx) {
+            return buildTrechoCard(
+              {
+                ordem: idx,
+                key: String(
+                  trecho.key ||
+                    trecho.destino_key ||
+                    trecho.id ||
+                    'explicit-' +
+                      idx +
+                      '-' +
+                      String(trecho.origem_cidade_id || '') +
+                      '->' +
+                      String(trecho.destino_cidade_id || '')
+                ),
+                id: trecho.id || '',
+                origem_estado_id: trecho.origem_estado_id,
+                origem_cidade_id: trecho.origem_cidade_id,
+                destino_estado_id: trecho.destino_estado_id,
+                destino_cidade_id: trecho.destino_cidade_id,
+                origem_nome: trecho.origem_nome || '',
+                destino_nome: trecho.destino_nome || '',
+              },
+              Object.assign({}, trecho, { ordem: idx }),
+              esc,
+              formatDurationInput
+            );
+          })
+          .join('')
+      );
+      getTrechoCards().forEach(function(card) {
+        recalcCard(card, false);
+      });
       if (isLoopModeActive(seedState)) {
         syncRetornoFromLoopTrechos(loopRetorno ? [loopRetorno] : [], seedState && seedState.retorno);
       } else {
@@ -1082,11 +1054,12 @@ export function initRoteirosEditor() {
     var sedeNome = selectedText($('id_origem_cidade'));
     var destinos = getDestinos().filter(function(d) { return d.estado_id && d.cidade_id; });
     if (!sedeEid || !sedeCid || !destinos.length) {
-      $('trechos-gerados-container').innerHTML = TRECHOS_EMPTY_HTML;
+      mountTrechosHtml(TRECHOS_EMPTY_HTML);
       updateRetornoCities();
       recalcRetorno(false);
       updateResumo();
       lastTrechosSignature = signature;
+      notifyRouteStateChanged();
       return;
     }
     var cm = currentTrechosMap();
@@ -1111,12 +1084,23 @@ export function initRoteirosEditor() {
       ocId = d.cidade_id;
       oNome = d.cidade_nome || '';
     });
-    $('trechos-gerados-container').innerHTML = trechos.map(function(t) {
-      var cv = cm[t.key] || {};
-      var sv = sm[t.key] || sm[String(t.destino_cidade_id || '')] || {};
-      return buildTrechoCard(t, preferSeed ? Object.assign({}, cv, sv) : Object.assign({}, sv, cv));
-    }).join('');
-    $('trechos-gerados-container').querySelectorAll('.card[data-key]').forEach(function(c) { recalcCard(c, false); });
+    mountTrechosHtml(
+      trechos
+        .map(function(t) {
+          var cv = cm[t.key] || {};
+          var sv = sm[t.key] || sm[String(t.destino_cidade_id || '')] || {};
+          return buildTrechoCard(
+            t,
+            preferSeed ? Object.assign({}, cv, sv) : Object.assign({}, sv, cv),
+            esc,
+            formatDurationInput
+          );
+        })
+        .join('')
+    );
+    getTrechoCards().forEach(function(c) {
+      recalcCard(c, false);
+    });
     updateRetornoCities();
     recalcRetorno(false);
     updateResumo();
@@ -1125,7 +1109,7 @@ export function initRoteirosEditor() {
     notifyRouteStateChanged();
   }
   function updateResumo() {
-    var cards = Array.from($('trechos-gerados-container').querySelectorAll('.card[data-key]'));
+    var cards = getTrechoCards();
     var totMin = 0; var totKm = 0;
     cards.forEach(function(c) { totMin += parseInt(c.dataset.tempoTotalMin||0,10)||0; var de = c.querySelector('[name$="_distancia_km"]'); if (de && de.value) { var v = parseFloat(de.value); if (!Number.isNaN(v)) totKm += v; } });
     form.dataset.resumoTrechos = String(cards.length);
@@ -1159,7 +1143,7 @@ export function initRoteirosEditor() {
         volta_saida_hora: ($('id_bate_volta_volta_saida_hora') || {}).value || '',
         volta_tempo_min: ($('id_bate_volta_volta_tempo_min') || {}).value || ''
       },
-      trechos: Array.from($('trechos-gerados-container').querySelectorAll('.card[data-key]')).map(function(c) {
+      trechos: getTrechoCards().map(function(c) {
         var o = parseInt(c.dataset.ordem||'0',10)||0;
         return { id: c.dataset.trechoId||'', key: c.dataset.key||'', ordem: o, origem_nome: c.dataset.origemNome||'', destino_nome: c.dataset.destinoNome||'',
           origem_estado_id: c.dataset.origemEstadoId||null, origem_cidade_id: c.dataset.origemCidadeId||null,
@@ -1308,20 +1292,18 @@ export function initRoteirosEditor() {
       .then(function() {
         var loop = cur.bate_volta_diario || {};
         if ($('id_bate_volta_diario_ativo')) $('id_bate_volta_diario_ativo').checked = !!loop.ativo;
-        if ($('id_bate_volta_data_inicio')) $('id_bate_volta_data_inicio').value = splitBateVoltaDateValue(loop.data_inicio || '').dm;
-        if ($('id_bate_volta_data_inicio_year')) {
-          var inicioParts = splitBateVoltaDateValue(loop.data_inicio || '');
-          $('id_bate_volta_data_inicio_year').value = inicioParts.year || currentYearString();
-          $('id_bate_volta_data_inicio_year').readOnly = true;
+        var bvNativeStart = $('id_bate_volta_data_inicio_native');
+        var bvNativeEnd = $('id_bate_volta_data_fim_native');
+        var bvStartIso = parseDateInput(loop.data_inicio || '') || '';
+        var bvEndIso = parseDateInput(loop.data_fim || '') || '';
+        var bvPickerRoot = bvNativeStart ? bvNativeStart.closest('[data-cv-date-picker]') : null;
+        var bvPickerApi = bvPickerRoot ? bvPickerRoot._cvDatePicker : null;
+        if (bvPickerApi) {
+          bvPickerApi.setRange(bvStartIso, bvEndIso);
+        } else {
+          if (bvNativeStart) bvNativeStart.value = bvStartIso;
+          if (bvNativeEnd) bvNativeEnd.value = bvEndIso;
         }
-        if ($('id_bate_volta_data_inicio_native')) $('id_bate_volta_data_inicio_native').value = buildBateVoltaNativeDate(($('id_bate_volta_data_inicio') || {}).value || '', ($('id_bate_volta_data_inicio_year') || {}).value || '');
-        if ($('id_bate_volta_data_fim')) $('id_bate_volta_data_fim').value = splitBateVoltaDateValue(loop.data_fim || '').dm;
-        if ($('id_bate_volta_data_fim_year')) {
-          var fimParts = splitBateVoltaDateValue(loop.data_fim || '');
-          $('id_bate_volta_data_fim_year').value = fimParts.year || currentYearString();
-          $('id_bate_volta_data_fim_year').readOnly = true;
-        }
-        if ($('id_bate_volta_data_fim_native')) $('id_bate_volta_data_fim_native').value = buildBateVoltaNativeDate(($('id_bate_volta_data_fim') || {}).value || '', ($('id_bate_volta_data_fim_year') || {}).value || '');
         if ($('id_bate_volta_ida_saida_hora')) $('id_bate_volta_ida_saida_hora').value = loop.ida_saida_hora || '';
         if ($('id_bate_volta_ida_tempo_min')) $('id_bate_volta_ida_tempo_min').value = loop.ida_tempo_min != null ? loop.ida_tempo_min : '';
         if ($('id_bate_volta_volta_saida_hora')) $('id_bate_volta_volta_saida_hora').value = loop.volta_saida_hora || '';
@@ -1423,12 +1405,15 @@ export function initRoteirosEditor() {
   if (btnAdicionarDestino) {
     btnAdicionarDestino.addEventListener('click', function() { addDestinoRow({ estado_id: destinoEstadoDefaultId||null, cidade_id: null }).then(function() { renderTrechos(captureCurrentState()); scheduleRealtimeDiarias(); scheduleAutosave(); }); });
   }
-  $('id_origem_estado').addEventListener('change', function() { if (applyingState) return; loadCities($('id_origem_cidade'), $('id_origem_estado').value, null).then(function() { renderTrechos(captureCurrentState()); scheduleRealtimeDiarias(); scheduleAutosave(); }); });
-  $('id_origem_cidade').addEventListener('change', function() { if (applyingState) return; renderTrechos(captureCurrentState()); scheduleRealtimeDiarias(); scheduleAutosave(); });
+  $('id_origem_estado').addEventListener('change', function() { if (applyingState) return; loadCities($('id_origem_cidade'), $('id_origem_estado').value, null).then(function() { renderTrechos(captureCurrentState()); scheduleRealtimeDiarias(); scheduleAutosave(); notifyRouteStateChanged(); }); });
+  $('id_origem_cidade').addEventListener('change', function() { if (applyingState) return; renderTrechos(captureCurrentState()); scheduleRealtimeDiarias(); scheduleAutosave(); notifyRouteStateChanged(); });
+  window.addEventListener('roteiros:route-calculated', function() {
+    scheduleAutosave();
+  });
   $('trechos-gerados-container').addEventListener('click', function(e) {
     var stepBtn = e.target.closest('.trecho-tempo-add-btn');
     if (stepBtn && !applyingState) {
-      var card = stepBtn.closest('.card[data-key]');
+      var card = stepBtn.closest(TRECHO_CARD_SELECTOR);
       if (card) {
         var delta = parseInt(stepBtn.getAttribute('data-tempo-add-delta') || '0', 10);
         if (delta) {
@@ -1448,12 +1433,19 @@ export function initRoteirosEditor() {
     }
   });
   $('trechos-gerados-container').addEventListener('input', function(e) {
-    var c = e.target.closest('.card[data-key]'); if (!c || applyingState) return;
-    if (e.target.classList.contains('trecho-tempo-viagem-hhmm') || e.target.classList.contains('trecho-tempo-adicional-hhmm')) {
-      applyHhmmInputMask(e.target);
-    }
-    var n = e.target.name||'';
-    if (n.indexOf('_saida_')!==-1||n.indexOf('_tempo_adicional_min')!==-1||n.indexOf('_tempo_cru_estimado_min')!==-1||e.target.classList.contains('trecho-tempo-viagem-hhmm')||e.target.classList.contains('trecho-tempo-adicional-hhmm')) {
+    var c = e.target.closest(TRECHO_CARD_SELECTOR);
+    if (!c || applyingState) return;
+    var n = e.target.name || '';
+    var isTrechoDate = e.target.matches('[data-cv-date-picker-value]') && n.indexOf('_data') !== -1;
+    if (
+      n.indexOf('_saida_') !== -1 ||
+      n.indexOf('_chegada_') !== -1 ||
+      n.indexOf('_tempo_adicional_min') !== -1 ||
+      n.indexOf('_tempo_cru_estimado_min') !== -1 ||
+      e.target.classList.contains('trecho-tempo-viagem-hhmm') ||
+      e.target.classList.contains('trecho-tempo-adicional-hhmm') ||
+      isTrechoDate
+    ) {
       if (n.indexOf('_tempo_adicional_min') !== -1) e.target.dataset.manual = '1';
       if (e.target.classList.contains('trecho-tempo-adicional-hhmm')) {
         var h = c.querySelector('[name="trecho_' + c.dataset.ordem + '_tempo_adicional_min"]');
@@ -1464,9 +1456,19 @@ export function initRoteirosEditor() {
     updateResumo(); scheduleRealtimeDiarias(); scheduleAutosave();
   });
   $('trechos-gerados-container').addEventListener('change', function(e) {
-    var c = e.target.closest('.card[data-key]'); if (!c || applyingState) return;
-    var n = e.target.name||'';
-    if (n.indexOf('_saida_')!==-1||n.indexOf('_tempo_adicional_min')!==-1||n.indexOf('_tempo_cru_estimado_min')!==-1||e.target.classList.contains('trecho-tempo-viagem-hhmm')||e.target.classList.contains('trecho-tempo-adicional-hhmm')) {
+    var c = e.target.closest(TRECHO_CARD_SELECTOR);
+    if (!c || applyingState) return;
+    var n = e.target.name || '';
+    var isTrechoDate = e.target.matches('[data-cv-date-picker-value]') && n.indexOf('_data') !== -1;
+    if (
+      n.indexOf('_saida_') !== -1 ||
+      n.indexOf('_chegada_') !== -1 ||
+      n.indexOf('_tempo_adicional_min') !== -1 ||
+      n.indexOf('_tempo_cru_estimado_min') !== -1 ||
+      e.target.classList.contains('trecho-tempo-viagem-hhmm') ||
+      e.target.classList.contains('trecho-tempo-adicional-hhmm') ||
+      isTrechoDate
+    ) {
       if (n.indexOf('_tempo_adicional_min') !== -1) e.target.dataset.manual = '1';
       if (e.target.classList.contains('trecho-tempo-adicional-hhmm')) {
         var h2 = c.querySelector('[name="trecho_' + c.dataset.ordem + '_tempo_adicional_min"]');
@@ -1523,107 +1525,17 @@ export function initRoteirosEditor() {
       toggleBateVoltaPanel();
       scheduleLoopTrechosRender({ preferSeed: false, force: true });
       scheduleAutosave();
+      notifyRouteStateChanged();
     });
   });
-  [
-    { text: 'id_bate_volta_data_inicio', year: 'id_bate_volta_data_inicio_year', native: 'id_bate_volta_data_inicio_native' },
-    { text: 'id_bate_volta_data_fim', year: 'id_bate_volta_data_fim_year', native: 'id_bate_volta_data_fim_native' }
-  ].forEach(function(pair) {
-    var textInput = $(pair.text);
-    var yearInput = $(pair.year);
-    var nativeInput = $(pair.native);
-    if (!textInput || !yearInput || !nativeInput) return;
-    if (!textInput.value) {
-      textInput.value = '';
-    } else {
-      textInput.value = normalizeDateInput(textInput.value);
-    }
-    if (!yearInput.value) {
-      yearInput.value = currentYearString();
-    }
-    yearInput.readOnly = true;
-    yearInput.addEventListener('click', function() {
-      if (applyingState) return;
-      if (yearInput.readOnly) {
-        yearInput.readOnly = false;
-        try { yearInput.select(); } catch (e) { /* ignore */ }
-      }
-    });
-    yearInput.addEventListener('focus', function() {
-      if (applyingState) return;
-      if (yearInput.readOnly) {
-        yearInput.readOnly = false;
-        try { yearInput.select(); } catch (e) { /* ignore */ }
-      }
-    });
-    textInput.addEventListener('input', function() {
-      if (applyingState) return;
-      syncBateVoltaDatePair(textInput, yearInput, nativeInput);
-      scheduleLoopTrechosRender({ preferSeed: false, force: true });
-      scheduleAutosave();
-    });
-    textInput.addEventListener('change', function() {
-      if (applyingState) return;
-      syncBateVoltaDatePair(textInput, yearInput, nativeInput);
-      toggleBateVoltaPanel();
-      scheduleLoopTrechosRender({ preferSeed: false, force: true });
-      scheduleAutosave();
-    });
-    textInput.addEventListener('blur', function() {
-      if (applyingState) return;
-      syncBateVoltaDatePair(textInput, yearInput, nativeInput);
-      toggleBateVoltaPanel();
-      scheduleLoopTrechosRender({ preferSeed: false, force: true });
-      scheduleAutosave();
-    });
-    yearInput.addEventListener('input', function() {
-      if (applyingState) return;
-      if (yearInput.readOnly) return;
-      var digits = String(yearInput.value || '').replace(/\D/g, '').slice(0, 4);
-      yearInput.value = digits;
-      syncBateVoltaDatePair(textInput, yearInput, nativeInput);
-      scheduleLoopTrechosRender({ preferSeed: false, force: true });
-      scheduleAutosave();
-    });
-    yearInput.addEventListener('change', function() {
-      if (applyingState) return;
-      syncBateVoltaDatePair(textInput, yearInput, nativeInput);
-      toggleBateVoltaPanel();
-      scheduleLoopTrechosRender({ preferSeed: false, force: true });
-      scheduleAutosave();
-    });
-    yearInput.addEventListener('blur', function() {
-      if (applyingState) return;
-      if (!yearInput.value || String(yearInput.value).replace(/\D/g, '').length < 4) {
-        yearInput.value = currentYearString();
-      }
-      yearInput.readOnly = true;
-      syncBateVoltaDatePair(textInput, yearInput, nativeInput);
-      toggleBateVoltaPanel();
-      scheduleLoopTrechosRender({ preferSeed: false, force: true });
-      scheduleAutosave();
-    });
+  ['id_bate_volta_data_inicio_native', 'id_bate_volta_data_fim_native'].forEach(function(id) {
+    var nativeInput = $(id);
+    if (!nativeInput) return;
     nativeInput.addEventListener('change', function() {
       if (applyingState) return;
-      syncBateVoltaDatePair(textInput, yearInput, nativeInput);
       toggleBateVoltaPanel();
       scheduleLoopTrechosRender({ preferSeed: false, force: true });
       scheduleAutosave();
-    });
-  });
-  Array.from(document.querySelectorAll('[data-bate-volta-calendar]')).forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      var targetSel = btn.getAttribute('data-target') || '';
-      var nativeSel = btn.getAttribute('data-target-native') || '';
-      var textInput = targetSel ? $(targetSel.replace(/^#/, '')) : null;
-      var nativeInput = nativeSel ? $(nativeSel.replace(/^#/, '')) : null;
-      if (!textInput || !nativeInput) return;
-      if (typeof nativeInput.showPicker === 'function') {
-        try { nativeInput.showPicker(); } catch (e) { nativeInput.focus(); }
-      } else {
-        nativeInput.focus();
-        nativeInput.click();
-      }
     });
   });
   [
@@ -1696,6 +1608,11 @@ export function initRoteirosEditor() {
     buildRoutePreviewPayload: buildRoutePreviewPayload,
     applyRoutePreviewResult: applyRoutePreviewResult,
     getPreviewEndpointUrl: function() { return urlCalcularRotaPreview; },
+    isLoopModeActive: isLoopModeActive,
   };
+  window.dispatchEvent(new CustomEvent('roteiros:editor-ready'));
+  if (typeof window.RoteirosMapBoot === 'function') {
+    window.RoteirosMapBoot();
+  }
   })();
 }

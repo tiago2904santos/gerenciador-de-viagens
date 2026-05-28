@@ -171,6 +171,7 @@
   --z-stepper:              2;
   --z-footer-actions:       10;
   --z-footer-actions-fixed: 10;
+  --z-sticky-stepper:       1100; /* acima do Leaflet (~400–800) no wizard */
   --z-overlay:              60;
 }
 
@@ -878,9 +879,11 @@ html[data-theme="light"] {
 
 /* Stepper fora do painel stack — card isolado como no UI Lab */
 .page-shell--wizard > .page-stepper {
+  background: var(--surface-stepper);
+  isolation: isolate;
   position: sticky;
   top: 24px;
-  z-index: var(--z-footer-actions);
+  z-index: var(--z-sticky-stepper);
 }
 
 

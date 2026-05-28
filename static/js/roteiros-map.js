@@ -104,18 +104,32 @@
     }
   }
 
+  function setFieldText(el, text) {
+    if (!el) return;
+    var value = text == null ? '' : String(text);
+    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+      el.value = value;
+      return;
+    }
+    el.textContent = value;
+  }
+
   function setCalcularEnabled(on) {
     var b = $('btn-calcular-rota-mapa');
     if (!b) return;
     b.disabled = !on;
     b.setAttribute('aria-disabled', on ? 'false' : 'true');
-    if (on) b.classList.remove('roteiro-mapa__btn--blocked');
-    else b.classList.add('roteiro-mapa__btn--blocked');
   }
 
   function isDailyRoundTripActive() {
+    var roteiro = window.RoteirosEditor;
+    if (roteiro && typeof roteiro.isLoopModeActive === 'function') {
+      return roteiro.isLoopModeActive();
+    }
     var toggle = document.getElementById('id_bate_volta_diario_ativo');
-    return !!(toggle && toggle.checked);
+    if (!toggle) return false;
+    if (toggle.type === 'checkbox') return !!toggle.checked;
+    return String(toggle.value || '').toLowerCase() === 'true';
   }
 
   function setRecalcularEnabled(on) {
@@ -140,50 +154,138 @@
     }
   }
 
-  function resolveCalculatedAt(route) {
-    if (!route) return '—';
-    return route.calculated_at_display || route.calculated_at || currentDateTimeBr();
+  function durationHuman(minutes) {
+    var total = parseInt(minutes, 10);
+    if (Number.isNaN(total) || total < 0) return '—';
+    var h = Math.floor(total / 60);
+    var m = total % 60;
+    if (h && m) return String(h) + 'h' + String(m) + 'min';
+    if (h) return String(h) + 'h';
+    return String(m) + 'min';
   }
 
-  function updateSummary(route, extra) {
-    var box = $('roteiro-mapa-summary');
-    if (!box) return;
-    showElement(box);
-    var dist = $('roteiro-mapa-distancia');
-    var tempo = $('roteiro-mapa-tempo');
-    var fonte = $('roteiro-mapa-fonte');
-    var em = $('roteiro-mapa-calculada-em');
+  function formatDistanceKm(value) {
+    if (value == null || value === '') return '—';
+    var num = Number(value);
+    if (Number.isNaN(num)) return '—';
+    return String(num) + ' km';
+  }
+
+  function previewIncludesReturn() {
+    var roteiro = window.RoteirosEditor;
+    if (!roteiro || typeof roteiro.buildRoutePreviewPayload !== 'function') return false;
+    var payload = roteiro.buildRoutePreviewPayload();
+    return !!(payload && payload.incluir_retorno);
+  }
+
+  function hasRoundTripRoute(route, legs, points) {
+    if (route && route.has_round_trip) return true;
+    if (previewIncludesReturn()) return true;
+    if (Array.isArray(legs) && legs.some(function (leg) { return leg && leg.kind === 'retorno'; })) {
+      return true;
+    }
+    if (Array.isArray(points) && points.some(function (point) {
+      return point && String(point.kind || '').toLowerCase() === 'retorno';
+    })) {
+      return true;
+    }
+    return false;
+  }
+
+  function effectiveRoundDistanceKm(route) {
+    if (!route) return null;
+    if (route.distancia_manual_km != null) return Number(route.distancia_manual_km);
+    if (route.distance_km_round_trip != null) return Number(route.distance_km_round_trip);
+    if (route.distance_km != null) return Number(route.distance_km);
+    return null;
+  }
+
+  function effectiveRoundMinutes(route) {
+    if (!route) return null;
+    if (route.duracao_manual_min != null) return parseInt(route.duracao_manual_min, 10);
+    if (route.duration_minutes_round_trip != null) {
+      return parseInt(route.duration_minutes_round_trip, 10);
+    }
+    if (route.duration_minutes != null) return parseInt(route.duration_minutes, 10);
+    return null;
+  }
+
+  function halfDistanceKm(value) {
+    var num = Number(value);
+    if (Number.isNaN(num)) return null;
+    return Math.round((num / 2) * 100) / 100;
+  }
+
+  function halfDurationMinutes(value) {
+    var num = parseInt(value, 10);
+    if (Number.isNaN(num) || num < 0) return null;
+    return Math.floor(num / 2);
+  }
+
+  function updateSummary(route, legs, points) {
+    var distRoundTrip = $('roteiro-mapa-distancia');
+    var tempoRoundTrip = $('roteiro-mapa-tempo');
+    var distIda = $('roteiro-mapa-distancia-ida');
+    var tempoIda = $('roteiro-mapa-tempo-ida');
     if (!route) {
-      if (dist) dist.textContent = '—';
-      if (tempo) tempo.textContent = '—';
-      if (fonte) fonte.textContent = '—';
-      if (em) em.textContent = '—';
+      setFieldText(distRoundTrip, '—');
+      setFieldText(tempoRoundTrip, '—');
+      setFieldText(distIda, '—');
+      setFieldText(tempoIda, '—');
       return;
     }
-    if (dist) {
+
+    var isRoundTrip = hasRoundTripRoute(
+      route,
+      legs || initial.legs || [],
+      points || initial.points || []
+    );
+    var roundDist = isRoundTrip ? effectiveRoundDistanceKm(route) : null;
+    var roundMin = isRoundTrip ? effectiveRoundMinutes(route) : null;
+
+    if (distRoundTrip) {
       var dAuto = route.distance_km_auto;
-      var dShow = route.distance_km;
-      var txt = dShow != null ? String(dShow) + ' km' : '—';
-      if (dAuto != null && route.distancia_manual_km != null) {
-        txt =
-          String(route.distancia_manual_km) +
-          ' km (ajustado; automático: ' +
-          String(dAuto) +
-          ' km)';
+      var roundTxt = isRoundTrip ? formatDistanceKm(roundDist) : '—';
+      if (isRoundTrip && dAuto != null && route.distancia_manual_km != null) {
+        roundTxt =
+          formatDistanceKm(route.distancia_manual_km) +
+          ' (ajustado; automático: ' +
+          formatDistanceKm(dAuto) +
+          ')';
       }
-      dist.textContent = txt;
+      setFieldText(distRoundTrip, roundTxt);
     }
-    if (tempo) {
+
+    if (tempoRoundTrip) {
       var tAuto = route.duration_human_auto;
-      var tShow = route.duration_human;
-      var txtT = tShow || '—';
-      if (route.duracao_manual_min != null && tAuto) {
-        txtT = tShow + ' (ajustado; automático: ' + tAuto + ')';
+      var roundTime = isRoundTrip ? durationHuman(roundMin) : '—';
+      if (isRoundTrip && route.duracao_manual_min != null && tAuto) {
+        roundTime = (route.duration_human || roundTime) + ' (ajustado; automático: ' + tAuto + ')';
       }
-      tempo.textContent = txtT;
+      setFieldText(tempoRoundTrip, roundTime);
     }
-    if (fonte) fonte.textContent = route.provider || '—';
-    if (em) em.textContent = resolveCalculatedAt(route);
+
+    if (isRoundTrip) {
+      setFieldText(
+        distIda,
+        roundDist != null && !Number.isNaN(roundDist)
+          ? formatDistanceKm(halfDistanceKm(roundDist))
+          : '—'
+      );
+      setFieldText(
+        tempoIda,
+        roundMin != null && !Number.isNaN(roundMin)
+          ? durationHuman(halfDurationMinutes(roundMin))
+          : '—'
+      );
+      return;
+    }
+
+    setFieldText(distIda, formatDistanceKm(route.distance_km));
+    setFieldText(
+      tempoIda,
+      route.duration_human || durationHuman(route.duration_minutes) || '—'
+    );
   }
 
   function setFramePlaceholder(on) {
@@ -485,7 +587,7 @@
         persistRouteInForm(route, initial.points);
         initial.status = route.status || 'calculada';
         hadGeometry = !!(route.geometry && route.geometry.type === 'LineString');
-        updateSummary(route, { status: initial.status });
+        updateSummary(route, initial.legs, initial.points);
 
         var gw = route.geometry_warning || body.geometry_warning;
         var drew = drawRoute(route.geometry, gw, body.legs, body.points);
@@ -500,6 +602,15 @@
         toggleRecalc(true);
         toggleFit(!!lastRouteBounds);
         hideElement($('roteiro-mapa-stale-hint'));
+        try {
+          window.dispatchEvent(
+            new CustomEvent('roteiros:route-calculated', {
+              detail: { route: route, saved: !!rid, preview: !!usePreviewPayload },
+            })
+          );
+        } catch (e) {
+          /* ignore */
+        }
       })
       .catch(function () {
         showError('Falha de rede ao calcular a rota. Tente novamente.');
@@ -539,7 +650,7 @@
       hideElement($('btn-recalcular-rota-mapa'));
       hideElement($('btn-fit-rota-mapa'));
       hideElement(stale);
-      updateSummary(null, null);
+      updateSummary(null, null, null);
       ensureMap();
       setFramePlaceholder(true);
       toggleRecalc(false);
@@ -547,7 +658,7 @@
       setCalcularEnabled(true);
       if (initial.route) {
         persistRouteInForm(initial.route, initial.points);
-        updateSummary(initial.route, { status: initial.status });
+        updateSummary(initial.route, initial.legs, initial.points);
         var gwInit = initial.route.geometry_warning;
         var drew = drawRoute(initial.route.geometry, gwInit, initial.legs, initial.points);
         if (!drew && initial.route.geometry_warning) {
@@ -564,7 +675,7 @@
         }
         toggleFit(!!lastRouteBounds);
       } else {
-        updateSummary(null, null);
+        updateSummary(null, null, null);
         toggleRecalc(false);
         toggleFit(false);
         ensureMap();
@@ -632,11 +743,30 @@
     showElement($('roteiro-mapa-stale-hint'));
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
+  var mapBooted = false;
+  function bootMap() {
+    if (mapBooted) {
+      refreshRouteReadyState();
+      return;
+    }
+    mapBooted = true;
     init();
   }
 
+  function scheduleMapBoot() {
+    if (window.RoteirosEditor) {
+      bootMap();
+      return;
+    }
+    window.addEventListener('roteiros:editor-ready', bootMap, { once: true });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', scheduleMapBoot);
+  } else {
+    scheduleMapBoot();
+  }
+
   window.RoteirosMap = { onDestinosReordered: onDestinosReordered };
+  window.RoteirosMapBoot = bootMap;
 })();

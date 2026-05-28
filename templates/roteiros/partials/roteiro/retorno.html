@@ -60,30 +60,33 @@
       <div class="wizard-inner-section__header">
         <h4 class="wizard-inner-section__title">Tempo de viagem</h4>
       </div>
-      <div class="field-grid field-grid--cols-3 oficio-roteiro-time-calc-grid">
-        <div class="field field-size-1">
-          <label class="roteiro-editor__field-label" for="id_retorno_tempo_viagem_hhmm">Tempo de viagem</label>
-          <input type="text" class="app-form-field" id="id_retorno_tempo_viagem_hhmm"
-                 value="" placeholder="00:00" inputmode="numeric" maxlength="5" autocomplete="off">
+      <div class="field-grid field-grid--cols-3 oficio-roteiro-time-calc-grid roteiro-time-calc-grid">
+        <div class="field cv-field field-size-1">
+          <label class="cv-field__label" for="id_retorno_tempo_viagem_hhmm">Tempo de viagem</label>
+          <input type="text" class="cv-field__control" id="id_retorno_tempo_viagem_hhmm"
+                 value="" placeholder="00:00" data-mask="time"
+                 inputmode="numeric" maxlength="5" autocomplete="off">
           <input type="hidden" name="retorno_tempo_cru_estimado_min" id="id_retorno_tempo_cru_estimado_min"
                  value="{{ retorno_state.tempo_cru_estimado_min|default:'' }}">
         </div>
-        <div class="field field-size-1">
-          <label class="roteiro-editor__field-label" for="id_retorno_tempo_adicional_hhmm">Tempo adicional</label>
-          <div class="input-group">
-            <button type="button" class="cv-btn cv-btn--secondary"
+        <div class="field cv-field field-size-1">
+          <label class="cv-field__label" for="id_retorno_tempo_adicional_hhmm">Tempo adicional</label>
+          <div class="roteiro-time-calc-stepper">
+            <button type="button" class="cv-btn cv-btn--secondary cv-btn--control"
                     id="retorno_tempo_add_menos" data-tempo-add-delta="-15" aria-label="Menos 15 minutos">−</button>
-            <input type="text" class="app-form-field" id="id_retorno_tempo_adicional_hhmm"
-                   value="" placeholder="00:00" inputmode="numeric" maxlength="5" autocomplete="off">
-            <button type="button" class="cv-btn cv-btn--secondary"
+            <input type="text" class="cv-field__control" id="id_retorno_tempo_adicional_hhmm"
+                   value="" placeholder="00:00" data-mask="time"
+                   inputmode="numeric" maxlength="5" autocomplete="off">
+            <button type="button" class="cv-btn cv-btn--secondary cv-btn--control"
                     id="retorno_tempo_add_mais" data-tempo-add-delta="15" aria-label="Mais 15 minutos">+</button>
           </div>
           <input type="hidden" name="retorno_tempo_adicional_min" id="id_retorno_tempo_adicional_min"
                  value="{{ retorno_state.tempo_adicional_min|default:0 }}">
         </div>
-        <div class="field field-size-1">
-          <label class="roteiro-editor__field-label" for="id_retorno_tempo_total">Tempo total</label>
-          <input type="text" class="app-form-field" id="id_retorno_tempo_total" value="" readonly>
+        <div class="field cv-field cv-field--readonly field-size-1">
+          <label class="cv-field__label" for="id_retorno_tempo_total">Tempo total</label>
+          <input type="text" class="cv-field__control" id="id_retorno_tempo_total" value="" readonly
+                 tabindex="-1" aria-readonly="true">
         </div>
       </div>
       <input type="hidden" name="retorno_distancia_km" id="id_retorno_distancia_km"

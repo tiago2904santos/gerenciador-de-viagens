@@ -140,6 +140,14 @@
     input.dispatchEvent(new Event('change', { bubbles: true }));
   }
 
+  function setValueAndNotify(input, value) {
+    if (!input) return;
+    if (input.value !== value) {
+      input.value = value;
+      dispatchChange(input);
+    }
+  }
+
   function getInitialDate(root, input, fallback) {
     return (
       parseIsoDate(input && input.value) ||
@@ -171,6 +179,8 @@
     var startLabel = root.querySelector('[data-cv-date-picker-start-label]');
     var endLabel = root.querySelector('[data-cv-date-picker-end-label]');
     var summary = root.querySelector('[data-cv-date-picker-summary]');
+    var startDisplay = root.querySelector('[data-cv-date-picker-start-display]');
+    var endDisplay = root.querySelector('[data-cv-date-picker-end-display]');
     var activeDate = new Date();
     var selectedSingle = null;
     var selectedStart = null;
@@ -188,8 +198,10 @@
         if (!selectedSingle) selectedSingle = getInitialDate(root, display, new Date());
         activeDate = startOfMonth(selectedSingle || new Date());
       } else {
-        selectedStart = parseIsoDate(startHidden && startHidden.value) || parseDisplayDate(startHidden && startHidden.value);
-        selectedEnd = parseIsoDate(endHidden && endHidden.value) || parseDisplayDate(endHidden && endHidden.value);
+        selectedStart = parseIsoDate(startHidden && startHidden.value) || parseDisplayDate(startHidden && startHidden.value)
+          || parseDisplayDate(startDisplay && startDisplay.value);
+        selectedEnd = parseIsoDate(endHidden && endHidden.value) || parseDisplayDate(endHidden && endHidden.value)
+          || parseDisplayDate(endDisplay && endDisplay.value);
         if (!selectedStart && selectedEnd) {
           selectedStart = selectedEnd;
           selectedEnd = null;
@@ -202,19 +214,30 @@
       }
     }
 
+    function positionPanel() {
+      var anchor = startDisplay || trigger;
+      var rect = anchor.getBoundingClientRect();
+      panel.style.top = (rect.bottom + 8) + 'px';
+      panel.style.left = rect.left + 'px';
+      panel.style.width = Math.max(rect.width, 320) + 'px';
+    }
+
     function setOpen(nextOpen) {
       isOpen = !!nextOpen;
       panel.hidden = !isOpen;
       root.classList.toggle('cv-date-picker--open', isOpen);
       trigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
       if (isOpen) {
+        positionPanel();
         render();
       }
     }
 
     function closePicker() {
       setOpen(false);
-      trigger.focus();
+      if (!startDisplay && trigger && !trigger.hidden) {
+        trigger.focus();
+      }
     }
 
     function openPicker() {
@@ -296,11 +319,13 @@
         }
       }
 
-      if (startHidden) {
-        startHidden.value = selectedStart ? formatIsoDate(selectedStart) : '';
+      setValueAndNotify(startHidden, selectedStart ? formatIsoDate(selectedStart) : '');
+      setValueAndNotify(endHidden, selectedEnd ? formatIsoDate(selectedEnd) : '');
+      if (startDisplay) {
+        startDisplay.value = selectedStart ? formatDisplayDate(selectedStart) : '';
       }
-      if (endHidden) {
-        endHidden.value = selectedEnd ? formatIsoDate(selectedEnd) : '';
+      if (endDisplay) {
+        endDisplay.value = selectedEnd ? formatDisplayDate(selectedEnd) : '';
       }
       if (startLabel) {
         startLabel.textContent = selectedStart ? formatDisplayDate(selectedStart) : 'Escolher';
@@ -388,7 +413,8 @@
     }
 
     function onDocumentClick(event) {
-      if (!root.contains(event.target)) {
+      var path = event.composedPath ? event.composedPath() : [event.target];
+      if (path.indexOf(root) === -1) {
         setOpen(false);
       }
     }
@@ -445,6 +471,66 @@
 
     document.addEventListener('click', onDocumentClick);
     document.addEventListener('keydown', onKeydown);
+
+    if (startDisplay) {
+      startDisplay.addEventListener('click', openPicker);
+      startDisplay.addEventListener('focus', openPicker);
+      startDisplay.addEventListener('change', function () {
+        var parsed = parseDisplayDate(startDisplay.value);
+        if (parsed) {
+          selectedStart = parsed;
+          if (selectedEnd && isBeforeDay(selectedEnd, selectedStart)) selectedEnd = null;
+          activeDate = startOfMonth(selectedStart);
+        } else if (!startDisplay.value.trim()) {
+          selectedStart = null;
+        }
+        setValueAndNotify(startHidden, selectedStart ? formatIsoDate(selectedStart) : '');
+        setValueAndNotify(endHidden, selectedEnd ? formatIsoDate(selectedEnd) : '');
+        render();
+      });
+    }
+
+    if (endDisplay) {
+      endDisplay.addEventListener('click', openPicker);
+      endDisplay.addEventListener('focus', openPicker);
+      endDisplay.addEventListener('change', function () {
+        var parsed = parseDisplayDate(endDisplay.value);
+        if (parsed) {
+          if (selectedStart && isBeforeDay(parsed, selectedStart)) {
+            selectedEnd = selectedStart;
+            selectedStart = parsed;
+            if (startDisplay) startDisplay.value = formatDisplayDate(selectedStart);
+            activeDate = startOfMonth(selectedStart);
+          } else {
+            selectedEnd = parsed;
+          }
+        } else if (!endDisplay.value.trim()) {
+          selectedEnd = null;
+        }
+        setValueAndNotify(startHidden, selectedStart ? formatIsoDate(selectedStart) : '');
+        setValueAndNotify(endHidden, selectedEnd ? formatIsoDate(selectedEnd) : '');
+        render();
+      });
+    }
+
+    root._cvDatePicker = {
+      open: openPicker,
+      close: closePicker,
+      clear: clearSelection,
+      setRange: function (startIso, endIso) {
+        selectedStart = parseIsoDate(startIso) || null;
+        selectedEnd = parseIsoDate(endIso) || null;
+        if (selectedStart && selectedEnd && isBeforeDay(selectedEnd, selectedStart)) {
+          var tmp = selectedStart;
+          selectedStart = selectedEnd;
+          selectedEnd = tmp;
+        }
+        if (selectedStart) activeDate = startOfMonth(selectedStart);
+        setValueAndNotify(startHidden, selectedStart ? formatIsoDate(selectedStart) : '');
+        setValueAndNotify(endHidden, selectedEnd ? formatIsoDate(selectedEnd) : '');
+        render();
+      },
+    };
   }
 
   function init(root) {
