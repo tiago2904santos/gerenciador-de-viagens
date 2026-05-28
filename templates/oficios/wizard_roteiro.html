@@ -16,10 +16,8 @@
 {% endblock %}
 
 {% block wizard_content %}
-  <div class="app-form-shell app-form-shell--roteiro roteiro-form-shell">
-    {{ initial_trechos_data|json_script:"initialTrechosData" }}
-    {% include "roteiros/includes/_roteiro_editor.html" %}
-  </div>
+  {{ initial_trechos_data|json_script:"initialTrechosData" }}
+  {% include "roteiros/includes/_roteiro_editor.html" %}
 {% endblock %}
 
 {% block wizard_actions %}{% endblock %}

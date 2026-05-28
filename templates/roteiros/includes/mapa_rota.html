@@ -1,12 +1,33 @@
-<section class="roteiro-mapa card roteiro-editor__map-card roteiro-editor__section roteiro-editor__section--mapa" aria-labelledby="roteiro-mapa-titulo">
-  <header class="roteiro-editor__section-header roteiro-mapa__section-head" id="sec-mapa-rota">
-    <div class="roteiro-mapa__section-title-group">
-      <span class="roteiro-mapa__section-kicker">ROTEIRO</span>
-      <h3 class="roteiro-editor__section-title" id="roteiro-mapa-titulo">4. Mapa da rota</h3>
+<section class="cv-wizard-section-card roteiro-editor__section--mapa" aria-labelledby="roteiro-mapa-titulo">
+  <header class="cv-wizard-section-header">
+    <div class="cv-wizard-section-header__copy">
+      <h3 class="cv-wizard-section-title" id="roteiro-mapa-titulo">4. Mapa da rota</h3>
+    </div>
+    <div class="cv-wizard-section-header__actions">
+      <div class="roteiro-mapa__actions roteiro-mapa__actions--header">
+        <button type="button"
+                class="cv-btn cv-btn--secondary roteiro-mapa__action-btn roteiro-mapa__action-btn--primary"
+                id="btn-calcular-rota-mapa">
+          <span class="roteiro-mapa__action-icon" aria-hidden="true"></span>
+          Calcular rota
+        </button>
+        <button type="button"
+                class="cv-btn cv-btn--secondary roteiro-mapa__action-btn roteiro-mapa__action-btn--secondary"
+                id="btn-recalcular-rota-mapa"
+                hidden>
+          <span class="roteiro-mapa__action-icon" aria-hidden="true"></span>
+          Recalcular rota
+        </button>
+        <button type="button"
+                class="cv-btn cv-btn--secondary roteiro-mapa__action-btn roteiro-mapa__action-btn--secondary"
+                id="btn-fit-rota-mapa"
+                hidden>
+          Ver rota inteira
+        </button>
+      </div>
     </div>
   </header>
-  <div class="card-body">
-
+  <div class="cv-wizard-section-body">
     <p class="roteiro-mapa__stale-hint text-warning-emphasis small mb-2"
        id="roteiro-mapa-stale-hint"
        hidden
@@ -15,20 +36,20 @@
     </p>
 
     <div class="roteiro-mapa__summary" id="roteiro-mapa-summary" hidden>
-      <dl class="roteiro-mapa__stats">
-        <div>
+      <dl class="roteiro-mapa__stats field-grid field-grid--cols-4">
+        <div class="field field-size-1">
           <dt>Distância</dt>
           <dd id="roteiro-mapa-distancia">—</dd>
         </div>
-        <div>
+        <div class="field field-size-1">
           <dt>Tempo</dt>
           <dd id="roteiro-mapa-tempo">—</dd>
         </div>
-        <div>
+        <div class="field field-size-1">
           <dt>Fonte do cálculo</dt>
           <dd id="roteiro-mapa-fonte">—</dd>
         </div>
-        <div>
+        <div class="field field-size-1">
           <dt>Cálculo realizado em</dt>
           <dd id="roteiro-mapa-calculada-em">—</dd>
         </div>
@@ -49,30 +70,12 @@
             <p class="roteiro-mapa__subtitle">Visualização interativa do trajeto com zoom e navegação.</p>
           </div>
         </div>
-        <div class="roteiro-mapa__actions roteiro-mapa__actions--canvas">
-          <button type="button"
-                  class="btn roteiro-editor__btn-pill roteiro-mapa__action-btn roteiro-mapa__action-btn--primary"
-                  id="btn-calcular-rota-mapa">
-            <span class="roteiro-mapa__action-icon" aria-hidden="true"></span>
-            Calcular rota
-          </button>
-          <button type="button"
-                  class="btn roteiro-editor__btn-pill roteiro-mapa__action-btn roteiro-mapa__action-btn--secondary"
-                  id="btn-recalcular-rota-mapa"
-                  hidden>
-            <span class="roteiro-mapa__action-icon" aria-hidden="true"></span>
-            Recalcular rota
-          </button>
-          <button type="button"
-                  class="btn roteiro-editor__btn-pill roteiro-mapa__action-btn roteiro-mapa__action-btn--secondary"
-                  id="btn-fit-rota-mapa"
-                  hidden>
-            Ver rota inteira
-          </button>
-        </div>
       </div>
-      <div class="roteiro-mapa__frame roteiro-mapa__frame--placeholder" id="roteiro-mapa-container" data-testid="roteiro-mapa-container"></div>
+      <div class="roteiro-mapa__frame roteiro-mapa__frame--placeholder"
+           id="roteiro-mapa-container"
+           data-testid="roteiro-mapa-container"></div>
     </div>
+
     <div class="roteiro-mapa__error alert alert-warning py-2 small"
          id="roteiro-mapa-error"
          hidden

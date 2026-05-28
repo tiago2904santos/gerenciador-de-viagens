@@ -15,7 +15,7 @@
 
     <main class="main-form-panel main-form-panel--stack oficio-wizard__main">
       <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
-        {% if wizard_use_outer_form|default:True %}
+        {% if wizard_use_outer_form != False %}
           <form
             class="oficio-wizard__form"
             method="post"
@@ -37,7 +37,7 @@
           {% include "oficios/partials/wizard_actions.html" with wizard_footer_mode=wizard_footer_mode wizard_back_url=wizard_back_url wizard_back_label=wizard_back_label oficio=oficio wizard_finalizar=wizard_finalizar oficio_completo=oficio_completo|default:False only %}
         {% endblock %}
 
-        {% if wizard_use_outer_form|default:True %}
+        {% if wizard_use_outer_form != False %}
           </form>
         {% endif %}
       </div>

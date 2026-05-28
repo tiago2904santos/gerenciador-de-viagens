@@ -1,19 +1,7 @@
 {% load static %}
 
-<div class="roteiro-editor roteiro-form--legacy-roteiro {% if is_avulso %}roteiro-editor--avulso{% endif %}{% if roteiro_editor_oficio %} roteiro-editor--oficio{% endif %}" data-glance-state="closed">
-    {% if roteiro_editor_oficio or is_avulso %}
-      <div class="roteiro-editor__intro cv-wizard-section-card" role="region" aria-labelledby="roteiro-editor-intro-title">
-        <header class="cv-wizard-section-header roteiro-editor__intro-header">
-          <div class="cv-wizard-section-header__copy">
-            <span class="roteiro-editor__intro-kicker cv-wizard-section-subtitle" id="roteiro-editor-intro-kicker">{% if roteiro_editor_oficio %}Etapa 2 — Ofício{% elif is_avulso %}Cadastro avulso{% else %}Etapa 2{% endif %}</span>
-            <h2 class="roteiro-editor__intro-title cv-wizard-section-title" id="roteiro-editor-intro-title">{% if roteiro_editor_oficio %}Roteiro e diárias{% else %}Roteiro e trechos{% endif %}</h2>
-            <p class="roteiro-editor__intro-text cv-wizard-section-subtitle">Organize sede, destinos, trechos, retorno e diárias em um fluxo único e contínuo.</p>
-          </div>
-        </header>
-      </div>
-    {% endif %}
-
-    <form method="post" id="roteiro-editor-form" novalidate class="oficio-stage-form roteiro-editor__form"
+<div class="roteiro-wizard__editor {% if is_avulso %}roteiro-editor--avulso{% endif %}{% if roteiro_editor_oficio %} roteiro-editor--oficio{% endif %}" data-glance-state="closed">
+    <form method="post" id="roteiro-editor-form" novalidate class="roteiro-wizard__form"
           {% if roteiro_form_action %}action="{{ roteiro_form_action }}"{% endif %}
           data-autosave="true"
           data-autosave-model="roteiro"
@@ -55,7 +43,6 @@
       {% endif %}
 
       {% include "roteiros/partials/roteiro/source.html" %}
-      {% include "components/domain/sede_destinos.html" %}
       {% include "roteiros/partials/roteiro/bate_volta.html" %}
       {% include "roteiros/includes/mapa_rota.html" %}
       {% include "components/domain/trechos.html" %}
