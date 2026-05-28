@@ -802,6 +802,7 @@ export function initRoteirosEditor() {
     rows.forEach(function(row) {
       var btn = row.querySelector('.btn-remover-destino');
       if (btn) btn.hidden = single;
+      row.classList.toggle('destino-row--single', single);
     });
   }
   function estadoOptionsMarkup(selectedId) {
@@ -823,18 +824,16 @@ export function initRoteirosEditor() {
           '</div>' +
           '<div class="field-grid roteiro-sede-grid roteiro-destino-grid">' +
             '<div class="field app-form-field">' +
-              '<label class="app-form-label" for="destino_estado_' + idx + '">UF</label>' +
               '<select name="destino_estado_' + idx + '" id="destino_estado_' + idx + '" class="destino-estado cv-search-picker__native" data-cv-search-picker="true" data-picker-mode="single" data-picker-variant="compact" data-placeholder="Buscar estado..." data-empty-message="Nenhum estado encontrado.">' + estadoOptionsMarkup(selE) + '</select>' +
             '</div>' +
             '<div class="field app-form-field">' +
-              '<label class="app-form-label" for="destino_cidade_' + idx + '">Cidade</label>' +
               '<select name="destino_cidade_' + idx + '" id="destino_cidade_' + idx + '" class="destino-cidade cv-search-picker__native" data-cv-search-picker="true" data-picker-mode="single" data-picker-variant="compact" data-placeholder="Buscar cidade..." data-empty-message="Nenhuma cidade encontrada." disabled>' +
                 '<option value="">---------</option>' +
               '</select>' +
             '</div>' +
           '</div>' +
         '</div>' +
-        '<button type="button" class="cv-search-picker__remove btn-remover-destino" title="Remover destino" aria-label="Remover destino" hidden>x</button>' +
+        '<button type="button" class="cv-search-picker__remove btn-remover-destino" title="Remover destino" aria-label="Remover destino">x</button>' +
       '</div>';
   }
   function bindDestinoRow(row) {
