@@ -1863,16 +1863,12 @@
   color: var(--route-field-disabled-text);
 }
 
-.roteiro-editor--avulso #retorno-card .oficio-roteiro-time-calc-grid {
+.roteiro-editor--avulso .roteiro-time-calc-grid {
   background: var(--route-card-inner-bg);
   border: solid 1px var(--route-card-inner-border);
   border-radius: var(--radius-md);
   gap: calc(var(--space-3) + 2px);
   padding: var(--space-5);
-}
-
-.roteiro-editor--avulso #retorno-card .oficio-roteiro-time-calc-grid .form-control {
-  background: var(--color-card);
 }
 
 .roteiro-editor--avulso .oficio-roteiro-trecho-card .card-header {
@@ -1953,16 +1949,6 @@
   background: var(--color-card);
   color: var(--theme-text-muted);
 }
-
-.roteiro-editor--avulso .roteiro-trecho-card .roteiro-time-calc-grid,
-.roteiro-editor--avulso .oficio-roteiro-trecho-card .oficio-roteiro-time-calc-grid {
-  background: var(--route-card-inner-bg);
-  border: solid 1px var(--route-card-inner-border);
-  border-radius: var(--radius-md);
-  gap: calc(var(--space-3) + 2px);
-  padding: var(--space-5);
-}
-
 
 @media (max-width: 991.98px) {
   .roteiro-editor--avulso #retorno-card .row.g-3,
@@ -2570,8 +2556,8 @@ html[data-theme="light-dark"] .roteiro-editor--avulso #retorno-card .form-contro
   color: var(--route-field-disabled-text);
 }
 
-html[data-theme="dark-dark"] .roteiro-editor--avulso #retorno-card .oficio-roteiro-time-calc-grid,
-html[data-theme="light-dark"] .roteiro-editor--avulso #retorno-card .oficio-roteiro-time-calc-grid,
+html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-time-calc-grid,
+html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-time-calc-grid,
 html[data-theme="dark-dark"] .roteiro-editor--avulso #retorno-card .roteiro-editor__subpanel,
 html[data-theme="light-dark"] .roteiro-editor--avulso #retorno-card .roteiro-editor__subpanel,
 html[data-theme="dark-dark"] .roteiro-editor--avulso .oficio-roteiro-trecho-card .roteiro-editor__subpanel,
@@ -3009,8 +2995,12 @@ html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__nest-block
 html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__nest-block--sede > .roteiro-editor__grid,
 html[data-theme="dark-dark"] .roteiro-editor--avulso #retorno-card .roteiro-editor__subpanel,
 html[data-theme="light-dark"] .roteiro-editor--avulso #retorno-card .roteiro-editor__subpanel,
+html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-time-calc-grid,
+html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-time-calc-grid,
 html[data-theme="dark-dark"] .roteiro-editor--avulso #retorno-card .oficio-roteiro-time-calc-grid,
 html[data-theme="light-dark"] .roteiro-editor--avulso #retorno-card .oficio-roteiro-time-calc-grid,
+html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-trecho-card .roteiro-time-calc-grid,
+html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-trecho-card .roteiro-time-calc-grid,
 html[data-theme="dark-dark"] .roteiro-editor--avulso .oficio-roteiro-trecho-card .roteiro-editor__subpanel,
 html[data-theme="light-dark"] .roteiro-editor--avulso .oficio-roteiro-trecho-card .roteiro-editor__subpanel,
 html[data-theme="dark-dark"] .roteiro-editor--avulso .oficio-roteiro-trecho-card .oficio-roteiro-time-calc-grid,
