@@ -387,6 +387,127 @@
         </div>
       </article>
 
+      <article class="cv-field-panel" id="fields-calendar">
+        <div class="cv-field-panel__header">
+          <span class="cv-field-panel__eyebrow">Calendario funcional</span>
+          <h3 class="cv-field-panel__title">Dois modelos no UI Lab: data unica e intervalo de datas</h3>
+          <p class="cv-field-panel__description">
+            O botao abre o calendario. No modo unico voce escolhe uma data. No modo intervalo,
+            o mesmo calendario permite marcar ida e volta, como em compra de passagem.
+          </p>
+        </div>
+        <div class="cv-field-panel__body">
+          <div class="cv-field-grid cv-field-grid--2">
+            <div class="cv-date-picker-demo">
+              <div class="cv-date-picker-demo__header">
+                <h4 class="cv-date-picker-demo__title">Data unica</h4>
+                <p class="cv-date-picker-demo__description">
+                  Um clique abre o calendario e grava apenas uma data.
+                </p>
+              </div>
+
+              <div class="cv-date-picker" data-cv-date-picker data-mode="single" data-initial-date="18/05/2026">
+                <div class="cv-field">
+                  <label class="cv-field__label" for="lab-date-single-display">Data do evento</label>
+                  <div class="cv-date-picker__control">
+                    <input
+                      class="cv-field__control cv-date-picker__display"
+                      id="lab-date-single-display"
+                      type="text"
+                      readonly
+                      placeholder="Selecionar data"
+                      value="18/05/2026"
+                      data-cv-date-picker-display
+                    >
+                    <button
+                      class="cv-date-picker__trigger"
+                      type="button"
+                      data-cv-date-picker-trigger
+                      aria-expanded="false"
+                      aria-label="Abrir calendario"
+                    >
+                      Calendario
+                    </button>
+                  </div>
+                  <input type="hidden" name="data_evento_unica" value="2026-05-18" data-cv-date-picker-value>
+                  <p class="cv-date-picker__summary" data-cv-date-picker-summary>18 de maio de 2026</p>
+                </div>
+
+                <div class="cv-date-picker__panel" hidden data-cv-date-picker-panel>
+                  <div class="cv-date-picker__panel-header">
+                    <button class="cv-date-picker__nav" type="button" data-cv-date-picker-prev aria-label="Mes anterior">Anterior</button>
+                    <div class="cv-date-picker__month" data-cv-date-picker-month></div>
+                    <button class="cv-date-picker__nav" type="button" data-cv-date-picker-next aria-label="Proximo mes">Proximo</button>
+                  </div>
+                  <div class="cv-date-picker__weekdays" data-cv-date-picker-weekdays></div>
+                  <div class="cv-date-picker__days" data-cv-date-picker-days></div>
+                  <div class="cv-date-picker__footer">
+                    <button type="button" class="cv-date-picker__footer-action" data-cv-date-picker-today>Hoje</button>
+                    <button type="button" class="cv-date-picker__footer-action" data-cv-date-picker-clear>Limpar</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="cv-date-picker-demo">
+              <div class="cv-date-picker-demo__header">
+                <h4 class="cv-date-picker-demo__title">Intervalo de datas</h4>
+                <p class="cv-date-picker-demo__description">
+                  Mesma grade para escolher ida e volta, como um calendario de passagem aerea.
+                </p>
+              </div>
+
+              <div class="cv-date-picker" data-cv-date-picker data-mode="range" data-initial-date="18/05/2026">
+                <div class="cv-field">
+                  <label class="cv-field__label" for="lab-date-range-display">Periodo do evento</label>
+                  <div class="cv-date-picker__control cv-date-picker__control--range">
+                    <input
+                      class="cv-field__control cv-date-picker__display"
+                      id="lab-date-range-display"
+                      type="text"
+                      readonly
+                      placeholder="Selecionar ida e volta"
+                      value="18/05/2026 a 20/05/2026"
+                      data-cv-date-picker-display
+                    >
+                    <button
+                      class="cv-date-picker__trigger"
+                      type="button"
+                      data-cv-date-picker-trigger
+                      aria-expanded="false"
+                      aria-label="Abrir calendario"
+                    >
+                      Calendario
+                    </button>
+                  </div>
+                  <div class="cv-date-picker__meta">
+                    <span class="cv-date-picker__pill">Ida: <strong data-cv-date-picker-start-label>18/05/2026</strong></span>
+                    <span class="cv-date-picker__pill">Volta: <strong data-cv-date-picker-end-label>20/05/2026</strong></span>
+                  </div>
+                  <input type="hidden" name="data_evento_inicio" value="2026-05-18" data-cv-date-picker-start-value>
+                  <input type="hidden" name="data_evento_fim" value="2026-05-20" data-cv-date-picker-end-value>
+                  <p class="cv-date-picker__summary" data-cv-date-picker-summary>18 de maio de 2026 a 20 de maio de 2026</p>
+                </div>
+
+                <div class="cv-date-picker__panel" hidden data-cv-date-picker-panel>
+                  <div class="cv-date-picker__panel-header">
+                    <button class="cv-date-picker__nav" type="button" data-cv-date-picker-prev aria-label="Mes anterior">Anterior</button>
+                    <div class="cv-date-picker__month" data-cv-date-picker-month></div>
+                    <button class="cv-date-picker__nav" type="button" data-cv-date-picker-next aria-label="Proximo mes">Proximo</button>
+                  </div>
+                  <div class="cv-date-picker__weekdays" data-cv-date-picker-weekdays></div>
+                  <div class="cv-date-picker__days" data-cv-date-picker-days></div>
+                  <div class="cv-date-picker__footer">
+                    <button type="button" class="cv-date-picker__footer-action" data-cv-date-picker-today>Hoje</button>
+                    <button type="button" class="cv-date-picker__footer-action" data-cv-date-picker-clear>Limpar</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
       <article class="cv-field-panel" id="fields-side-action">
         <div class="cv-field-panel__header">
           <span class="cv-field-panel__eyebrow">Botao lateral</span>

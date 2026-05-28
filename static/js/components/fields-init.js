@@ -70,6 +70,17 @@
     });
   }
 
+  function initDatePickers(root) {
+    return safeCall('datePicker', function () {
+      var api = (window.CV && window.CV.datePicker) || window.CvDatePicker;
+      if (api && typeof api.init === 'function') {
+        api.init(root);
+        return 1;
+      }
+      return 0;
+    });
+  }
+
   function initDropdowns(root) {
     return safeCall('dropdowns', function () {
       var api = (window.CV && window.CV.dropdowns) || window.CvSelect;
@@ -126,6 +137,7 @@
       stateToggles: initStateToggles(scope),
       selects: initSelects(scope),
       searchPickers: initSearchPickers(scope),
+      datePickers: initDatePickers(scope),
       dropdowns: initDropdowns(scope),
       multiselects: initMultiselects(scope),
       filterableMultiselects: initFilterableMultiselects(scope),
@@ -138,6 +150,7 @@
     init: init,
     initSelects: initSelects,
     initSearchPickers: initSearchPickers,
+    initDatePickers: initDatePickers,
     initDropdowns: initDropdowns,
     initMultiselects: initMultiselects,
   };

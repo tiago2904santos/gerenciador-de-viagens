@@ -27,10 +27,10 @@
     <div id="bate-volta-panel" class="field-grid field-grid--cols-3 roteiro-editor__bate-volta-grid">
       <div class="field cv-field field-size-1">
         <label class="cv-field__label" for="id_bate_volta_data_inicio">Data inicial</label>
-        <div class="cv-field__control-row">
-          <input type="text" class="cv-field__control" id="id_bate_volta_data_inicio"
-                 value="{{ roteiro_editor_state_json.bate_volta_diario.data_inicio|default:'' }}"
-                 placeholder="00/00/0000" inputmode="numeric" maxlength="10" autocomplete="off" data-mask="date">
+        <div class="cv-field__control-row roteiro-editor__date-inline">
+          <input type="text" class="cv-field__control roteiro-editor__date-full" id="id_bate_volta_data_inicio"
+                 value=""
+                 placeholder="00/00/0000" inputmode="numeric" maxlength="10" autocomplete="off">
           <input type="date" id="id_bate_volta_data_inicio_native" name="bate_volta_data_inicio" value="{{ roteiro_editor_state_json.bate_volta_diario.data_inicio|default:'' }}" tabindex="-1" aria-hidden="true" class="roteiro-editor__native-date-input">
           <button type="button" class="cv-field-action roteiro-editor__calendar-btn" data-bate-volta-calendar data-target="#id_bate_volta_data_inicio" data-target-native="#id_bate_volta_data_inicio_native" aria-label="Abrir calendário da data inicial">Calendário</button>
         </div>
@@ -50,10 +50,10 @@
       </div>
       <div class="field cv-field field-size-1">
         <label class="cv-field__label" for="id_bate_volta_data_fim">Data final</label>
-        <div class="cv-field__control-row">
-          <input type="text" class="cv-field__control" id="id_bate_volta_data_fim"
-                 value="{{ roteiro_editor_state_json.bate_volta_diario.data_fim|default:'' }}"
-                 placeholder="00/00/0000" inputmode="numeric" maxlength="10" autocomplete="off" data-mask="date">
+        <div class="cv-field__control-row roteiro-editor__date-inline">
+          <input type="text" class="cv-field__control roteiro-editor__date-full" id="id_bate_volta_data_fim"
+                 value=""
+                 placeholder="00/00/0000" inputmode="numeric" maxlength="10" autocomplete="off">
           <input type="date" id="id_bate_volta_data_fim_native" name="bate_volta_data_fim" value="{{ roteiro_editor_state_json.bate_volta_diario.data_fim|default:'' }}" tabindex="-1" aria-hidden="true" class="roteiro-editor__native-date-input">
           <button type="button" class="cv-field-action roteiro-editor__calendar-btn" data-bate-volta-calendar data-target="#id_bate_volta_data_fim" data-target-native="#id_bate_volta_data_fim_native" aria-label="Abrir calendário da data final">Calendário</button>
         </div>

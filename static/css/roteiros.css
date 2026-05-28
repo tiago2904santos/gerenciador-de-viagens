@@ -726,6 +726,26 @@
   min-width: 0;
 }
 
+.roteiro-editor__date-inline {
+  align-items: stretch;
+  gap: var(--space-2);
+}
+
+.roteiro-editor__date-inline > .roteiro-editor__date-dm {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.roteiro-editor__date-inline > .roteiro-editor__date-year {
+  flex: 0 0 92px;
+  min-width: 92px;
+  text-align: center;
+}
+
+.roteiro-editor__date-inline > .roteiro-editor__date-year[readonly] {
+  cursor: pointer;
+}
+
 .roteiro-editor__bate-volta-note {
   margin-top: var(--space-4);
 }

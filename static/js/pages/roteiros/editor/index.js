@@ -169,60 +169,72 @@ export function initRoteirosEditor() {
     var raw = String(value || '').trim();
     if (!raw) return '';
     var iso = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-    if (iso) return iso[3] + '/' + iso[2] + '/' + iso[1];
-    var digits = raw.replace(/\D/g, '').slice(0, 8);
+    if (iso) return iso[3] + '/' + iso[2];
+    var digits = raw.replace(/\D/g, '').slice(0, 4);
     if (!digits) return '';
     if (digits.length <= 2) return digits;
-    if (digits.length <= 4) return digits.slice(0, 2) + '/' + digits.slice(2);
-    return digits.slice(0, 2) + '/' + digits.slice(2, 4) + '/' + digits.slice(4);
+    return digits.slice(0, 2) + '/' + digits.slice(2, 4);
   }
-  function completeDateWithCurrentYear(value) {
+  function normalizeDateYearInput(value, allowPartial) {
     var raw = String(value || '').trim();
-    if (!raw) return '';
-    var iso = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-    if (iso) return iso[3] + '/' + iso[2] + '/' + iso[1];
-    var normalized = normalizeDateInput(raw);
-    if (!normalized) return '';
-    var parts = normalized.split('/');
-    if (parts.length === 2 && parts[0] && parts[1]) {
-      return parts[0] + '/' + parts[1] + '/' + currentYearString();
+    var digits = raw.replace(/\D/g, '').slice(0, 4);
+    if (digits.length === 4) return digits;
+    return allowPartial ? digits : currentYearString();
+  }
+  function splitBateVoltaDateValue(value) {
+    var raw = String(value || '').trim();
+    if (!raw) {
+      return { dm: '', year: currentYearString() };
     }
-    if (parts.length === 3 && parts[0] && parts[1] && parts[2]) {
-      return parts[0] + '/' + parts[1] + '/' + parts[2];
+    var iso = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (iso) {
+      return { dm: iso[3] + '/' + iso[2], year: iso[1] };
     }
     var digits = raw.replace(/\D/g, '').slice(0, 8);
-    if (digits.length === 4) {
-      return digits.slice(0, 2) + '/' + digits.slice(2, 4) + '/' + currentYearString();
+    if (digits.length >= 8) {
+      return { dm: digits.slice(0, 2) + '/' + digits.slice(2, 4), year: digits.slice(4, 8) };
     }
-    if (digits.length === 8) {
-      return digits.slice(0, 2) + '/' + digits.slice(2, 4) + '/' + digits.slice(4);
+    if (digits.length >= 4) {
+      return { dm: digits.slice(0, 2) + '/' + digits.slice(2, 4), year: currentYearString() };
     }
-    return normalized;
-  }
-  function parseDateInput(value) {
-    var raw = String(value || '').trim();
-    if (!raw) return '';
-    var iso = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-    if (iso) return iso[0];
-    var normalized = completeDateWithCurrentYear(raw);
-    if (!normalized) return '';
+    var normalized = normalizeDateInput(raw);
+    if (!normalized) {
+      return { dm: '', year: currentYearString() };
+    }
     var parts = normalized.split('/');
-    if (parts.length !== 3) return '';
-    return parts[2] + '-' + parts[1] + '-' + parts[0];
+    if (parts.length >= 2) {
+      return { dm: parts[0] + '/' + parts[1], year: currentYearString() };
+    }
+    return { dm: normalized, year: currentYearString() };
   }
-  function syncBateVoltaDatePair(textEl, nativeEl) {
-    if (!textEl || !nativeEl) return;
+  function buildBateVoltaNativeDate(dmValue, yearValue) {
+    var dm = normalizeDateInput(dmValue);
+    var parts = dm.split('/');
+    if (parts.length !== 2 || !parts[0] || !parts[1]) return '';
+    var year = normalizeDateYearInput(yearValue, false);
+    return year + '-' + pad2(parts[1]) + '-' + pad2(parts[0]);
+  }
+  function syncBateVoltaDatePair(textEl, yearEl, nativeEl) {
+    if (!textEl || !yearEl || !nativeEl) return;
     if (document.activeElement === nativeEl) {
-      textEl.value = normalizeDateInput(nativeEl.value);
+      var nativeParts = splitBateVoltaDateValue(nativeEl.value);
+      textEl.value = nativeParts.dm;
+      yearEl.value = nativeParts.year || currentYearString();
+      yearEl.readOnly = true;
       return;
     }
-    var completed = completeDateWithCurrentYear(textEl.value || nativeEl.value);
-    if (completed) {
-      textEl.value = completed;
-    } else if (document.activeElement !== textEl) {
-      textEl.value = normalizeDateInput(nativeEl.value || textEl.value);
+    var dmValue = normalizeDateInput(textEl.value || nativeEl.value);
+    var yearValue = normalizeDateYearInput(yearEl.value || nativeEl.value, document.activeElement === yearEl && !yearEl.readOnly);
+    if (document.activeElement !== textEl) {
+      textEl.value = dmValue;
+    } else if (textEl.value !== dmValue) {
+      textEl.value = dmValue;
     }
-    var parsed = parseDateInput(textEl.value);
+    if (document.activeElement !== yearEl) {
+      yearEl.value = yearValue || currentYearString();
+      yearEl.readOnly = true;
+    }
+    var parsed = buildBateVoltaNativeDate(textEl.value, yearEl.value);
     nativeEl.value = parsed || '';
   }
   function normalizeLocationLabel(value) {
@@ -1296,10 +1308,20 @@ export function initRoteirosEditor() {
       .then(function() {
         var loop = cur.bate_volta_diario || {};
         if ($('id_bate_volta_diario_ativo')) $('id_bate_volta_diario_ativo').checked = !!loop.ativo;
-        if ($('id_bate_volta_data_inicio')) $('id_bate_volta_data_inicio').value = normalizeDateInput(loop.data_inicio || '');
-        if ($('id_bate_volta_data_inicio_native')) $('id_bate_volta_data_inicio_native').value = parseDateInput(loop.data_inicio || '') || loop.data_inicio || '';
-        if ($('id_bate_volta_data_fim')) $('id_bate_volta_data_fim').value = normalizeDateInput(loop.data_fim || '');
-        if ($('id_bate_volta_data_fim_native')) $('id_bate_volta_data_fim_native').value = parseDateInput(loop.data_fim || '') || loop.data_fim || '';
+        if ($('id_bate_volta_data_inicio')) $('id_bate_volta_data_inicio').value = splitBateVoltaDateValue(loop.data_inicio || '').dm;
+        if ($('id_bate_volta_data_inicio_year')) {
+          var inicioParts = splitBateVoltaDateValue(loop.data_inicio || '');
+          $('id_bate_volta_data_inicio_year').value = inicioParts.year || currentYearString();
+          $('id_bate_volta_data_inicio_year').readOnly = true;
+        }
+        if ($('id_bate_volta_data_inicio_native')) $('id_bate_volta_data_inicio_native').value = buildBateVoltaNativeDate(($('id_bate_volta_data_inicio') || {}).value || '', ($('id_bate_volta_data_inicio_year') || {}).value || '');
+        if ($('id_bate_volta_data_fim')) $('id_bate_volta_data_fim').value = splitBateVoltaDateValue(loop.data_fim || '').dm;
+        if ($('id_bate_volta_data_fim_year')) {
+          var fimParts = splitBateVoltaDateValue(loop.data_fim || '');
+          $('id_bate_volta_data_fim_year').value = fimParts.year || currentYearString();
+          $('id_bate_volta_data_fim_year').readOnly = true;
+        }
+        if ($('id_bate_volta_data_fim_native')) $('id_bate_volta_data_fim_native').value = buildBateVoltaNativeDate(($('id_bate_volta_data_fim') || {}).value || '', ($('id_bate_volta_data_fim_year') || {}).value || '');
         if ($('id_bate_volta_ida_saida_hora')) $('id_bate_volta_ida_saida_hora').value = loop.ida_saida_hora || '';
         if ($('id_bate_volta_ida_tempo_min')) $('id_bate_volta_ida_tempo_min').value = loop.ida_tempo_min != null ? loop.ida_tempo_min : '';
         if ($('id_bate_volta_volta_saida_hora')) $('id_bate_volta_volta_saida_hora').value = loop.volta_saida_hora || '';
@@ -1504,35 +1526,86 @@ export function initRoteirosEditor() {
     });
   });
   [
-    { text: 'id_bate_volta_data_inicio', native: 'id_bate_volta_data_inicio_native' },
-    { text: 'id_bate_volta_data_fim', native: 'id_bate_volta_data_fim_native' }
+    { text: 'id_bate_volta_data_inicio', year: 'id_bate_volta_data_inicio_year', native: 'id_bate_volta_data_inicio_native' },
+    { text: 'id_bate_volta_data_fim', year: 'id_bate_volta_data_fim_year', native: 'id_bate_volta_data_fim_native' }
   ].forEach(function(pair) {
     var textInput = $(pair.text);
+    var yearInput = $(pair.year);
     var nativeInput = $(pair.native);
-    if (!textInput || !nativeInput) return;
+    if (!textInput || !yearInput || !nativeInput) return;
+    if (!textInput.value) {
+      textInput.value = '';
+    } else {
+      textInput.value = normalizeDateInput(textInput.value);
+    }
+    if (!yearInput.value) {
+      yearInput.value = currentYearString();
+    }
+    yearInput.readOnly = true;
+    yearInput.addEventListener('click', function() {
+      if (applyingState) return;
+      if (yearInput.readOnly) {
+        yearInput.readOnly = false;
+        try { yearInput.select(); } catch (e) { /* ignore */ }
+      }
+    });
+    yearInput.addEventListener('focus', function() {
+      if (applyingState) return;
+      if (yearInput.readOnly) {
+        yearInput.readOnly = false;
+        try { yearInput.select(); } catch (e) { /* ignore */ }
+      }
+    });
     textInput.addEventListener('input', function() {
       if (applyingState) return;
-      syncBateVoltaDatePair(textInput, nativeInput);
+      syncBateVoltaDatePair(textInput, yearInput, nativeInput);
       scheduleLoopTrechosRender({ preferSeed: false, force: true });
       scheduleAutosave();
     });
     textInput.addEventListener('change', function() {
       if (applyingState) return;
-      syncBateVoltaDatePair(textInput, nativeInput);
+      syncBateVoltaDatePair(textInput, yearInput, nativeInput);
       toggleBateVoltaPanel();
       scheduleLoopTrechosRender({ preferSeed: false, force: true });
       scheduleAutosave();
     });
     textInput.addEventListener('blur', function() {
       if (applyingState) return;
-      syncBateVoltaDatePair(textInput, nativeInput);
+      syncBateVoltaDatePair(textInput, yearInput, nativeInput);
+      toggleBateVoltaPanel();
+      scheduleLoopTrechosRender({ preferSeed: false, force: true });
+      scheduleAutosave();
+    });
+    yearInput.addEventListener('input', function() {
+      if (applyingState) return;
+      if (yearInput.readOnly) return;
+      var digits = String(yearInput.value || '').replace(/\D/g, '').slice(0, 4);
+      yearInput.value = digits;
+      syncBateVoltaDatePair(textInput, yearInput, nativeInput);
+      scheduleLoopTrechosRender({ preferSeed: false, force: true });
+      scheduleAutosave();
+    });
+    yearInput.addEventListener('change', function() {
+      if (applyingState) return;
+      syncBateVoltaDatePair(textInput, yearInput, nativeInput);
+      toggleBateVoltaPanel();
+      scheduleLoopTrechosRender({ preferSeed: false, force: true });
+      scheduleAutosave();
+    });
+    yearInput.addEventListener('blur', function() {
+      if (applyingState) return;
+      if (!yearInput.value || String(yearInput.value).replace(/\D/g, '').length < 4) {
+        yearInput.value = currentYearString();
+      }
+      yearInput.readOnly = true;
+      syncBateVoltaDatePair(textInput, yearInput, nativeInput);
       toggleBateVoltaPanel();
       scheduleLoopTrechosRender({ preferSeed: false, force: true });
       scheduleAutosave();
     });
     nativeInput.addEventListener('change', function() {
       if (applyingState) return;
-      syncBateVoltaDatePair(textInput, nativeInput);
+      syncBateVoltaDatePair(textInput, yearInput, nativeInput);
       toggleBateVoltaPanel();
       scheduleLoopTrechosRender({ preferSeed: false, force: true });
       scheduleAutosave();

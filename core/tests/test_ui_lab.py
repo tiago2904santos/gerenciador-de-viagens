@@ -79,10 +79,22 @@ class UILabRouteTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Lists Lab")
-        self.assertContains(response, "List Shell")
-        self.assertContains(response, "Empty State")
+        self.assertContains(response, "Lista standard")
+        self.assertContains(response, "Lista standard + quick add")
+        self.assertContains(response, "Lista com cards")
         self.assertContains(response, "simple-list")
         self.assertContains(response, "card-list")
+
+    @override_settings(DEBUG=True)
+    def test_ui_lab_fields_page_contains_calendar_demo(self):
+        self._reload_core_urls()
+
+        response = self.client.get("/dev/ui-lab/fields/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Calendario funcional")
+        self.assertContains(response, "Data unica")
+        self.assertContains(response, "Intervalo de datas")
 
     @override_settings(DEBUG=True)
     def test_ui_lab_returns_404_for_invalid_route(self):
