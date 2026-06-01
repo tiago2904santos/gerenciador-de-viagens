@@ -723,73 +723,63 @@
    -------------------------------------------------------------------------- */
 
 html {
-  --cv-date-picker-selected-bg-start: #e7eef8;
-  --cv-date-picker-selected-bg-end: #cddced;
-  --cv-date-picker-selected-border: #9fb6cf;
-  --cv-date-picker-selected-color: #132238;
-  --cv-date-picker-selected-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.8),
-    0 1px 2px rgba(0, 0, 0, 0.12);
-  --cv-date-picker-selected-halo: #9fb6cf;
-  --cv-date-picker-day-hover-bg: #edf3fa;
-  --cv-date-picker-day-hover-border: #c7d5e5;
-  --cv-date-picker-day-hover-color: var(--theme-text-heading);
-  --cv-date-picker-day-hover-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
-  --cv-date-picker-selected-hover-bg-start: #d9e4f2;
-  --cv-date-picker-selected-hover-bg-end: #c1d4e6;
-  --cv-date-picker-selected-hover-border: #90a9c2;
-  --cv-date-picker-selected-hover-color: #132238;
-  --cv-date-picker-selected-hover-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.82),
-    0 1px 2px rgba(0, 0, 0, 0.12);
+  --cv-date-picker-selected-bg-start: var(--stepper-active-bg);
+  --cv-date-picker-selected-bg-end: var(--stepper-active-bg);
+  --cv-date-picker-selected-border: transparent;
+  --cv-date-picker-selected-color: var(--stepper-active-color);
+  --cv-date-picker-selected-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+  --cv-date-picker-selected-halo: var(--stepper-active-bg);
+  --cv-date-picker-day-hover-bg: transparent;
+  --cv-date-picker-day-hover-border: transparent;
+  --cv-date-picker-day-hover-color: inherit;
+  --cv-date-picker-day-hover-shadow: none;
+  --cv-date-picker-selected-hover-bg-start: var(--stepper-active-bg);
+  --cv-date-picker-selected-hover-bg-end: var(--stepper-active-bg);
+  --cv-date-picker-selected-hover-border: transparent;
+  --cv-date-picker-selected-hover-color: var(--stepper-active-color);
+  --cv-date-picker-selected-hover-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
 }
 
 html[data-theme="dark"],
 html[data-theme="dark-dark"],
 html[data-theme="light-dark"] {
-  --cv-date-picker-selected-bg-start: #b57b00;
-  --cv-date-picker-selected-bg-end: #b57b00;
-  --cv-date-picker-selected-border: #8b5d00;
-  --cv-date-picker-selected-color: #fff3c7;
+  --cv-date-picker-selected-bg-start: var(--stepper-active-bg);
+  --cv-date-picker-selected-bg-end: var(--stepper-active-bg);
+  --cv-date-picker-selected-border: transparent;
+  --cv-date-picker-selected-color: var(--stepper-active-color);
   --cv-date-picker-selected-shadow:
-    inset 0 1px 0 rgba(255, 230, 160, 0.68),
     0 1px 2px rgba(0, 0, 0, 0.22);
-  --cv-date-picker-selected-halo: #b57b00;
-  --cv-date-picker-day-hover-bg: #2a2311;
-  --cv-date-picker-day-hover-border: #5b430b;
-  --cv-date-picker-day-hover-color: #fff3c7;
-  --cv-date-picker-day-hover-shadow: inset 0 1px 0 rgba(255, 232, 170, 0.18);
-  --cv-date-picker-selected-hover-bg-start: #c48a00;
-  --cv-date-picker-selected-hover-bg-end: #b67d00;
-  --cv-date-picker-selected-hover-border: #9b6900;
-  --cv-date-picker-selected-hover-color: #fff7d6;
-  --cv-date-picker-selected-hover-shadow:
-    inset 0 1px 0 rgba(255, 236, 183, 0.7),
-    0 1px 2px rgba(0, 0, 0, 0.22);
+  --cv-date-picker-selected-halo: var(--stepper-active-bg);
+  --cv-date-picker-day-hover-bg: transparent;
+  --cv-date-picker-day-hover-border: transparent;
+  --cv-date-picker-day-hover-color: inherit;
+  --cv-date-picker-day-hover-shadow: none;
+  --cv-date-picker-selected-hover-bg-start: var(--stepper-active-bg);
+  --cv-date-picker-selected-hover-bg-end: var(--stepper-active-bg);
+  --cv-date-picker-selected-hover-border: transparent;
+  --cv-date-picker-selected-hover-color: var(--stepper-active-color);
+  --cv-date-picker-selected-hover-shadow: 0 1px 2px rgba(0, 0, 0, 0.22);
 }
 
 html[data-theme="light"],
 html[data-theme="dark-light"],
 html[data-theme="light-light"] {
-  --cv-date-picker-selected-bg-start: #285e89;
-  --cv-date-picker-selected-bg-end: #285e89;
-  --cv-date-picker-selected-border: #1f4f74;
-  --cv-date-picker-selected-color: #ffffff;
+  --cv-date-picker-selected-bg-start: var(--stepper-active-bg);
+  --cv-date-picker-selected-bg-end: var(--stepper-active-bg);
+  --cv-date-picker-selected-border: transparent;
+  --cv-date-picker-selected-color: var(--stepper-active-color);
   --cv-date-picker-selected-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.18),
     0 1px 2px rgba(0, 0, 0, 0.16);
-  --cv-date-picker-selected-halo: #285e89;
-  --cv-date-picker-day-hover-bg: #d9e8f5;
-  --cv-date-picker-day-hover-border: #9eb7cf;
-  --cv-date-picker-day-hover-color: #132238;
-  --cv-date-picker-day-hover-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
-  --cv-date-picker-selected-hover-bg-start: #356f9c;
-  --cv-date-picker-selected-hover-bg-end: #2f648f;
-  --cv-date-picker-selected-hover-border: #23567c;
-  --cv-date-picker-selected-hover-color: #ffffff;
-  --cv-date-picker-selected-hover-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.22),
-    0 1px 2px rgba(0, 0, 0, 0.16);
+  --cv-date-picker-selected-halo: var(--stepper-active-bg);
+  --cv-date-picker-day-hover-bg: transparent;
+  --cv-date-picker-day-hover-border: transparent;
+  --cv-date-picker-day-hover-color: inherit;
+  --cv-date-picker-day-hover-shadow: none;
+  --cv-date-picker-selected-hover-bg-start: var(--stepper-active-bg);
+  --cv-date-picker-selected-hover-bg-end: var(--stepper-active-bg);
+  --cv-date-picker-selected-hover-border: transparent;
+  --cv-date-picker-selected-hover-color: var(--stepper-active-color);
+  --cv-date-picker-selected-hover-shadow: 0 1px 2px rgba(0, 0, 0, 0.16);
 }
 
 .cv-date-picker {
@@ -1045,7 +1035,7 @@ html[data-theme="light-light"] {
 }
 
 .cv-date-picker__day:hover {
-  transform: scale(1.04);
+  transform: translateY(-1px) scale(1.03);
   z-index: 3;
 }
 
@@ -1055,7 +1045,7 @@ html[data-theme="light-light"] {
 }
 
 .cv-date-picker__day--today {
-  border-color: rgba(255, 255, 255, 0.18);
+  border-color: transparent;
 }
 
 .cv-date-picker__day--selected,
@@ -1125,13 +1115,11 @@ html[data-theme="light-dark"] .cv-date-picker .cv-date-picker__day--multi-end,
 html[data-theme="dark"] .cv-date-picker .cv-date-picker__day--multi-single,
 html[data-theme="dark-dark"] .cv-date-picker .cv-date-picker__day--multi-single,
 html[data-theme="light-dark"] .cv-date-picker .cv-date-picker__day--multi-single {
-  background-color: #b57b00 !important;
+  background-color: var(--stepper-active-bg) !important;
   background-image: none !important;
-  border-color: #8b5d00 !important;
-  color: #fff3c7 !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 230, 160, 0.68),
-    0 1px 2px rgba(0, 0, 0, 0.22) !important;
+  border-color: transparent !important;
+  color: var(--stepper-active-color) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.22) !important;
 }
 
 html[data-theme="light"] .cv-date-picker .cv-date-picker__day--multi-selected,
@@ -1149,13 +1137,11 @@ html[data-theme="light-light"] .cv-date-picker .cv-date-picker__day--multi-end,
 html[data-theme="light"] .cv-date-picker .cv-date-picker__day--multi-single,
 html[data-theme="dark-light"] .cv-date-picker .cv-date-picker__day--multi-single,
 html[data-theme="light-light"] .cv-date-picker .cv-date-picker__day--multi-single {
-  background-color: #285e89 !important;
+  background-color: var(--stepper-active-bg) !important;
   background-image: none !important;
-  border-color: #1f4f74 !important;
-  color: #ffffff !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.18),
-    0 1px 2px rgba(0, 0, 0, 0.16) !important;
+  border-color: transparent !important;
+  color: var(--stepper-active-color) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16) !important;
 }
 
 html[data-theme="dark"] .cv-date-picker .cv-date-picker__day--multi-selected:hover,
@@ -1173,7 +1159,7 @@ html[data-theme="light-dark"] .cv-date-picker .cv-date-picker__day--multi-end:ho
 html[data-theme="dark"] .cv-date-picker .cv-date-picker__day--multi-single:hover,
 html[data-theme="dark-dark"] .cv-date-picker .cv-date-picker__day--multi-single:hover,
 html[data-theme="light-dark"] .cv-date-picker .cv-date-picker__day--multi-single:hover {
-  transform: scale(1.04);
+  transform: translateY(-1px) scale(1.03);
   z-index: 3;
 }
 
@@ -1192,7 +1178,7 @@ html[data-theme="light-light"] .cv-date-picker .cv-date-picker__day--multi-end:h
 html[data-theme="light"] .cv-date-picker .cv-date-picker__day--multi-single:hover,
 html[data-theme="dark-light"] .cv-date-picker .cv-date-picker__day--multi-single:hover,
 html[data-theme="light-light"] .cv-date-picker .cv-date-picker__day--multi-single:hover {
-  transform: scale(1.04);
+  transform: translateY(-1px) scale(1.03);
   z-index: 3;
 }
 
