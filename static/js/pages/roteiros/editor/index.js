@@ -367,9 +367,9 @@ export function initRoteirosEditor() {
     last = last || fallbackRetorno || {};
     $('id_retorno_saida_cidade').value = last.origem_nome || (fallbackRetorno && fallbackRetorno.saida_cidade) || '';
     $('id_retorno_chegada_cidade').value = last.destino_nome || (fallbackRetorno && fallbackRetorno.chegada_cidade) || '';
-    $('id_retorno_saida_data').value = last.saida_data || (fallbackRetorno && fallbackRetorno.saida_data) || '';
+    setRoteiroDatePickerValue('id_retorno_saida_data', 'id_retorno_saida_data_display', last.saida_data || (fallbackRetorno && fallbackRetorno.saida_data) || '');
     $('id_retorno_saida_hora').value = last.saida_hora || (fallbackRetorno && fallbackRetorno.saida_hora) || '';
-    $('id_retorno_chegada_data').value = last.chegada_data || (fallbackRetorno && fallbackRetorno.chegada_data) || '';
+    setRoteiroDatePickerValue('id_retorno_chegada_data', 'id_retorno_chegada_data_display', last.chegada_data || (fallbackRetorno && fallbackRetorno.chegada_data) || '');
     $('id_retorno_chegada_hora').value = last.chegada_hora || (fallbackRetorno && fallbackRetorno.chegada_hora) || '';
     $('id_retorno_tempo_cru_estimado_min').value = last.tempo_cru_estimado_min || '';
     $('id_retorno_tempo_adicional_min').value = last.tempo_adicional_min || '0';
@@ -963,6 +963,70 @@ export function initRoteirosEditor() {
       rc.dataset.destinoCidadeId = sedeId || '';
     }
   }
+  function getTrechosDatePicker() {
+    return $('trechos-date-picker');
+  }
+  function formatIsoDateToDisplay(isoDate) {
+    var raw = String(isoDate || '').trim();
+    if (!raw) return '';
+    var match = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!match) return raw;
+    return match[3] + '/' + match[2] + '/' + match[1];
+  }
+  function setRoteiroDatePickerValue(hiddenId, displayId, isoDate) {
+    var hidden = $(hiddenId);
+    var display = $(displayId);
+    var picker = null;
+    if (hidden && hidden.closest) {
+      picker = hidden.closest('[data-cv-date-picker]');
+    }
+    if (!picker && display && display.closest) {
+      picker = display.closest('[data-cv-date-picker]');
+    }
+    if (picker && picker._cvDatePicker && typeof picker._cvDatePicker.setSingle === 'function') {
+      picker._cvDatePicker.setSingle(isoDate || '');
+      return;
+    }
+    if (hidden) hidden.value = isoDate || '';
+    if (display) display.value = formatIsoDateToDisplay(isoDate);
+  }
+  function syncTrechosDatePickerLimit() {
+    var picker = getTrechosDatePicker();
+    if (!picker) return;
+    var cards = getTrechoCards();
+    var expected = cards.length ? (cards.length + 1) : 0;
+    picker.dataset.maxDates = String(expected);
+  }
+  function applyTrechosDateSelection(dates) {
+    var cards = getTrechoCards();
+    var expected = cards.length ? (cards.length + 1) : 0;
+    var selectedDates = Array.isArray(dates)
+      ? dates.map(function(date) { return String(date || '').trim(); }).filter(function(date) { return !!date; })
+      : [];
+    if (!expected || selectedDates.length !== expected) {
+      return false;
+    }
+    var prevApplyingState = applyingState;
+    applyingState = true;
+    try {
+      cards.forEach(function(card, idx) {
+        setTrechoDateValue(card, 'saida', selectedDates[idx], { silent: true });
+        recalcCard(card, true);
+        setTrechoDateValue(card, 'chegada', selectedDates[idx], { silent: true });
+      });
+      updateRetornoCities();
+      setRoteiroDatePickerValue('id_retorno_saida_data', 'id_retorno_saida_data_display', selectedDates[cards.length] || '');
+      setRoteiroDatePickerValue('id_retorno_chegada_data', 'id_retorno_chegada_data_display', selectedDates[cards.length] || '');
+      recalcRetorno(false);
+    } finally {
+      applyingState = prevApplyingState;
+    }
+    updateResumo();
+    scheduleRealtimeDiarias();
+    scheduleAutosave();
+    notifyRouteStateChanged();
+    return true;
+  }
   function renderTrechos(seedState, options) {
     // Re-renderizar trechos nao pode sobrescrever data/hora/tempo manual com vazio/default.
     // Por isso os valores atuais da tela sao combinados com o seed antes de montar os cards.
@@ -997,6 +1061,7 @@ export function initRoteirosEditor() {
         updateRetornoCities();
         recalcRetorno(false);
         updateResumo();
+        syncTrechosDatePickerLimit();
         lastTrechosSignature = signature;
         notifyRouteStateChanged();
         return;
@@ -1043,6 +1108,7 @@ export function initRoteirosEditor() {
       }
       recalcRetorno(false);
       updateResumo();
+      syncTrechosDatePickerLimit();
       scheduleAutoEstimarTrechos();
       lastTrechosSignature = signature;
       notifyRouteStateChanged();
@@ -1058,6 +1124,7 @@ export function initRoteirosEditor() {
       updateRetornoCities();
       recalcRetorno(false);
       updateResumo();
+      syncTrechosDatePickerLimit();
       lastTrechosSignature = signature;
       notifyRouteStateChanged();
       return;
@@ -1104,6 +1171,7 @@ export function initRoteirosEditor() {
     updateRetornoCities();
     recalcRetorno(false);
     updateResumo();
+    syncTrechosDatePickerLimit();
     scheduleAutoEstimarTrechos();
     lastTrechosSignature = signature;
     notifyRouteStateChanged();
@@ -1312,8 +1380,10 @@ export function initRoteirosEditor() {
         toggleBateVoltaPanel();
         renderTrechos(cur, { preferSeed: true });
         var ret = cur.retorno || {};
-        $('id_retorno_saida_data').value = ret.saida_data||''; $('id_retorno_saida_hora').value = ret.saida_hora||'';
-        $('id_retorno_chegada_data').value = ret.chegada_data||''; $('id_retorno_chegada_hora').value = ret.chegada_hora||'';
+        setRoteiroDatePickerValue('id_retorno_saida_data', 'id_retorno_saida_data_display', ret.saida_data || '');
+        $('id_retorno_saida_hora').value = ret.saida_hora||'';
+        setRoteiroDatePickerValue('id_retorno_chegada_data', 'id_retorno_chegada_data_display', ret.chegada_data || '');
+        $('id_retorno_chegada_hora').value = ret.chegada_hora||'';
         $('id_retorno_distancia_km').value = ret.distancia_km||'';
         $('id_retorno_tempo_cru_estimado_min').value = ret.tempo_cru_estimado_min != null ? ret.tempo_cru_estimado_min : '';
         $('id_retorno_tempo_adicional_min').value = ret.tempo_adicional_min != null ? ret.tempo_adicional_min : 0;
@@ -1558,6 +1628,18 @@ export function initRoteirosEditor() {
       syncBateVoltaDurationInputs();
     });
   });
+
+  // Calendário de trechos: data inicial → primeiro trecho, data final → último trecho
+  var trDatePicker = $('trechos-date-picker');
+  if (trDatePicker) {
+    trDatePicker.addEventListener('cv:multi-confirm', function(event) {
+      if (applyingState) return;
+      var dates = (event && event.detail && event.detail.dates) || [];
+      applyTrechosDateSelection(dates);
+    });
+    syncTrechosDatePickerLimit();
+  }
+
   if ($('roteiro-lista')) {
     $('roteiro-lista').addEventListener('click', function(e) {
       var btn = e.target.closest('[data-route-id]'); if (!btn) return;

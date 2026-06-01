@@ -275,13 +275,16 @@ export function initTrechosFields(container) {
 }
 
 /** Atualiza data ISO (hidden + display) após cálculo de chegada. */
-export function setTrechoDateValue(card, role, isoDate) {
+export function setTrechoDateValue(card, role, isoDate, options) {
   if (!card) return;
+  var opts = options || {};
   var o = card.dataset.ordem;
   var hidden = card.querySelector('[name="trecho_' + o + '_' + role + '_data"]');
   if (hidden) {
     hidden.value = isoDate || '';
-    hidden.dispatchEvent(new Event('change', { bubbles: true }));
+    if (!opts.silent) {
+      hidden.dispatchEvent(new Event('change', { bubbles: true }));
+    }
   }
   var picker = card.querySelector('[data-trecho-date="' + role + '"]');
   if (picker) {

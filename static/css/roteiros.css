@@ -867,15 +867,17 @@
   border: 1px solid var(--theme-border-card);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-soft);
+  box-sizing: border-box;
   display: grid;
   gap: var(--space-3);
-  max-width: 420px;
   padding: var(--space-4);
   position: fixed;
-  z-index: 500;
+  width: 320px;
+  z-index: 1090; /* abaixo do sticky-stepper (1100) e acima do conteúdo do form */
 }
 
-.cv-date-picker--open .cv-date-picker__panel {
+.cv-date-picker--open .cv-date-picker__panel,
+.cv-date-picker__panel--entering {
   animation: cv-date-picker-enter 150ms ease-out both;
 }
 
@@ -1018,6 +1020,7 @@
   gap: var(--space-2);
   justify-content: flex-end;
 }
+
 
 /* --------------------------------------------------------------------------
    Bate-volta layout
@@ -1670,7 +1673,7 @@
 .roteiro-trecho-card__leg {
   background: var(--route-card-inner-bg);
   border: 1px solid var(--route-card-inner-border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   display: flex;
   flex-direction: column;
   height: 100%;

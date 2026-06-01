@@ -5,98 +5,129 @@
       <h3 class="cv-wizard-section-title" id="sec-retorno">6. Retorno final</h3>
     </div>
   </header>
-  <div class="cv-wizard-section-body" id="retorno-card">
-
-    {# Saída #}
-    <div class="wizard-inner-section">
-      <div class="wizard-inner-section__header">
-        <h4 class="wizard-inner-section__title">Saída</h4>
-      </div>
-      <div class="field-grid field-grid--cols-3">
-        <div class="field field-size-1">
-          <label class="roteiro-editor__field-label" for="id_retorno_saida_cidade">Cidade de saída</label>
-          <input type="text" id="id_retorno_saida_cidade" class="app-form-field"
-                 value="{{ retorno_state.saida_cidade|default:'' }}" readonly>
-        </div>
-        <div class="field field-size-1">
-          <label class="roteiro-editor__field-label" for="id_retorno_saida_data">Data</label>
-          <input type="date" name="retorno_saida_data" id="id_retorno_saida_data" class="app-form-field"
-                 value="{{ retorno_state.saida_data|default:'' }}">
-        </div>
-        <div class="field field-size-1">
-          <label class="roteiro-editor__field-label" for="id_retorno_saida_hora">Hora</label>
-          <input type="time" name="retorno_saida_hora" id="id_retorno_saida_hora" class="app-form-field"
-                 value="{{ retorno_state.saida_hora|default:'' }}">
-        </div>
-      </div>
-    </div>
-
-    {# Chegada #}
-    <div class="wizard-inner-section">
-      <div class="wizard-inner-section__header">
-        <h4 class="wizard-inner-section__title">Chegada</h4>
-      </div>
-      <div class="field-grid field-grid--cols-3">
-        <div class="field field-size-1">
-          <label class="roteiro-editor__field-label" for="id_retorno_chegada_cidade">Cidade de chegada</label>
-          <input type="text" id="id_retorno_chegada_cidade" class="app-form-field"
-                 value="{{ retorno_state.chegada_cidade|default:'' }}" readonly>
-        </div>
-        <div class="field field-size-1">
-          <label class="roteiro-editor__field-label" for="id_retorno_chegada_data">Data</label>
-          <input type="date" name="retorno_chegada_data" id="id_retorno_chegada_data" class="app-form-field"
-                 value="{{ retorno_state.chegada_data|default:'' }}">
-        </div>
-        <div class="field field-size-1">
-          <label class="roteiro-editor__field-label" for="id_retorno_chegada_hora">Hora</label>
-          <input type="time" name="retorno_chegada_hora" id="id_retorno_chegada_hora" class="app-form-field"
-                 value="{{ retorno_state.chegada_hora|default:'' }}">
-        </div>
-      </div>
-    </div>
-
-    {# Tempo de viagem #}
-    <div class="wizard-inner-section">
-      <div class="wizard-inner-section__header">
-        <h4 class="wizard-inner-section__title">Tempo de viagem</h4>
-      </div>
-      <div class="field-grid field-grid--cols-3 oficio-roteiro-time-calc-grid roteiro-time-calc-grid">
-        <div class="field cv-field field-size-1">
-          <label class="cv-field__label" for="id_retorno_tempo_viagem_hhmm">Tempo de viagem</label>
-          <input type="text" class="cv-field__control" id="id_retorno_tempo_viagem_hhmm"
-                 value="" placeholder="00:00" data-mask="time"
-                 inputmode="numeric" maxlength="5" autocomplete="off">
-          <input type="hidden" name="retorno_tempo_cru_estimado_min" id="id_retorno_tempo_cru_estimado_min"
-                 value="{{ retorno_state.tempo_cru_estimado_min|default:'' }}">
-        </div>
-        <div class="field cv-field field-size-1">
-          <label class="cv-field__label" for="id_retorno_tempo_adicional_hhmm">Tempo adicional</label>
-          <div class="roteiro-time-calc-stepper">
-            <button type="button" class="cv-btn cv-btn--secondary cv-btn--control"
-                    id="retorno_tempo_add_menos" data-tempo-add-delta="-15" aria-label="Menos 15 minutos">−</button>
-            <input type="text" class="cv-field__control" id="id_retorno_tempo_adicional_hhmm"
-                   value="" placeholder="00:00" data-mask="time"
-                   inputmode="numeric" maxlength="5" autocomplete="off">
-            <button type="button" class="cv-btn cv-btn--secondary cv-btn--control"
-                    id="retorno_tempo_add_mais" data-tempo-add-delta="15" aria-label="Mais 15 minutos">+</button>
+  <div class="cv-wizard-section-body">
+    <article class="roteiro-trecho-card oficio-roteiro-trecho-card" id="retorno-card">
+      <header class="roteiro-trecho-card__header">
+        <h4 class="roteiro-trecho-card__title">Retorno final</h4>
+      </header>
+      <div class="roteiro-trecho-card__body">
+        <div class="roteiro-trecho-card__route-row field-grid field-grid--cols-2">
+          <div class="roteiro-trecho-card__leg">
+            <div class="roteiro-trecho-card__leg-title">Saída</div>
+            <div class="field-grid field-grid--cols-2 roteiro-trecho-card__leg-grid">
+              <div class="field cv-field cv-field--readonly roteiro-trecho-card__leg-cidade">
+                <label class="cv-field__label" for="id_retorno_saida_cidade">Cidade de saída</label>
+                <input type="text" id="id_retorno_saida_cidade" class="cv-field__control" value="{{ retorno_state.saida_cidade|default:'' }}" readonly tabindex="-1" aria-readonly="true">
+              </div>
+              <div class="field cv-field field-size-1">
+                <label class="cv-field__label" for="id_retorno_saida_data_display">Data</label>
+                <div class="cv-date-picker" data-cv-date-picker data-mode="single" data-trecho-date="saida" data-initial-date="{{ retorno_state.saida_data|default:'' }}">
+                  <div class="cv-date-picker__control">
+                    <input type="text" class="cv-field__control" id="id_retorno_saida_data_display" placeholder="dd/mm/aaaa" autocomplete="off" inputmode="numeric" maxlength="10" value="" data-cv-date-picker-display>
+                    <button type="button" class="cv-date-picker__trigger cv-date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-label="Abrir calendário">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                      </svg>
+                    </button>
+                  </div>
+                  <input type="hidden" name="retorno_saida_data" id="id_retorno_saida_data" value="{{ retorno_state.saida_data|default:'' }}" data-cv-date-picker-value>
+                  <div class="cv-date-picker__panel" hidden data-cv-date-picker-panel>
+                    <div class="cv-date-picker__panel-header">
+                      <button class="cv-date-picker__nav" type="button" data-cv-date-picker-prev aria-label="Mês anterior">Anterior</button>
+                      <div class="cv-date-picker__month" data-cv-date-picker-month></div>
+                      <button class="cv-date-picker__nav" type="button" data-cv-date-picker-next aria-label="Próximo mês">Próximo</button>
+                    </div>
+                    <div class="cv-date-picker__weekdays" data-cv-date-picker-weekdays></div>
+                    <div class="cv-date-picker__days" data-cv-date-picker-days></div>
+                    <div class="cv-date-picker__footer">
+                      <button type="button" class="cv-date-picker__footer-action" data-cv-date-picker-today>Hoje</button>
+                      <button type="button" class="cv-date-picker__footer-action" data-cv-date-picker-clear>Limpar</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="field cv-field field-size-1">
+                <label class="cv-field__label" for="id_retorno_saida_hora">Hora</label>
+                <input type="text" class="cv-field__control" name="retorno_saida_hora" id="id_retorno_saida_hora" data-mask="time" value="{{ retorno_state.saida_hora|default:'' }}" placeholder="00:00" inputmode="numeric" maxlength="5" autocomplete="off">
+              </div>
+            </div>
           </div>
-          <input type="hidden" name="retorno_tempo_adicional_min" id="id_retorno_tempo_adicional_min"
-                 value="{{ retorno_state.tempo_adicional_min|default:0 }}">
+
+          <div class="roteiro-trecho-card__leg">
+            <div class="roteiro-trecho-card__leg-title">Chegada</div>
+            <div class="field-grid field-grid--cols-2 roteiro-trecho-card__leg-grid">
+              <div class="field cv-field cv-field--readonly roteiro-trecho-card__leg-cidade">
+                <label class="cv-field__label" for="id_retorno_chegada_cidade">Cidade de chegada</label>
+                <input type="text" id="id_retorno_chegada_cidade" class="cv-field__control" value="{{ retorno_state.chegada_cidade|default:'' }}" readonly tabindex="-1" aria-readonly="true">
+              </div>
+              <div class="field cv-field field-size-1">
+                <label class="cv-field__label" for="id_retorno_chegada_data_display">Data</label>
+                <div class="cv-date-picker" data-cv-date-picker data-mode="single" data-trecho-date="chegada" data-initial-date="{{ retorno_state.chegada_data|default:'' }}">
+                  <div class="cv-date-picker__control">
+                    <input type="text" class="cv-field__control" id="id_retorno_chegada_data_display" placeholder="dd/mm/aaaa" autocomplete="off" inputmode="numeric" maxlength="10" value="" data-cv-date-picker-display>
+                    <button type="button" class="cv-date-picker__trigger cv-date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-label="Abrir calendário">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                      </svg>
+                    </button>
+                  </div>
+                  <input type="hidden" name="retorno_chegada_data" id="id_retorno_chegada_data" value="{{ retorno_state.chegada_data|default:'' }}" data-cv-date-picker-value>
+                  <div class="cv-date-picker__panel" hidden data-cv-date-picker-panel>
+                    <div class="cv-date-picker__panel-header">
+                      <button class="cv-date-picker__nav" type="button" data-cv-date-picker-prev aria-label="Mês anterior">Anterior</button>
+                      <div class="cv-date-picker__month" data-cv-date-picker-month></div>
+                      <button class="cv-date-picker__nav" type="button" data-cv-date-picker-next aria-label="Próximo mês">Próximo</button>
+                    </div>
+                    <div class="cv-date-picker__weekdays" data-cv-date-picker-weekdays></div>
+                    <div class="cv-date-picker__days" data-cv-date-picker-days></div>
+                    <div class="cv-date-picker__footer">
+                      <button type="button" class="cv-date-picker__footer-action" data-cv-date-picker-today>Hoje</button>
+                      <button type="button" class="cv-date-picker__footer-action" data-cv-date-picker-clear>Limpar</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="field cv-field field-size-1">
+                <label class="cv-field__label" for="id_retorno_chegada_hora">Hora</label>
+                <input type="text" class="cv-field__control" name="retorno_chegada_hora" id="id_retorno_chegada_hora" data-mask="time" value="{{ retorno_state.chegada_hora|default:'' }}" placeholder="00:00" inputmode="numeric" maxlength="5" autocomplete="off">
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="field cv-field cv-field--readonly field-size-1">
-          <label class="cv-field__label" for="id_retorno_tempo_total">Tempo total</label>
-          <input type="text" class="cv-field__control" id="id_retorno_tempo_total" value="" readonly
-                 tabindex="-1" aria-readonly="true">
+
+        <div class="wizard-inner-section roteiro-trecho-card__time-section">
+          <div class="field-grid field-grid--cols-3 oficio-roteiro-time-calc-grid roteiro-time-calc-grid roteiro-trecho-card__time-grid">
+            <div class="field cv-field field-size-1">
+              <label class="cv-field__label" for="id_retorno_tempo_viagem_hhmm">Tempo de viagem</label>
+              <input type="text" class="cv-field__control" id="id_retorno_tempo_viagem_hhmm" value="" placeholder="00:00" data-mask="time" inputmode="numeric" maxlength="5" autocomplete="off">
+              <input type="hidden" name="retorno_tempo_cru_estimado_min" id="id_retorno_tempo_cru_estimado_min" value="{{ retorno_state.tempo_cru_estimado_min|default:'' }}">
+            </div>
+            <div class="field cv-field field-size-1">
+              <label class="cv-field__label" for="id_retorno_tempo_adicional_hhmm">Tempo adicional</label>
+              <div class="roteiro-time-calc-stepper roteiro-trecho-card__time-stepper">
+                <button type="button" class="cv-btn cv-btn--secondary cv-btn--control trecho-tempo-add-btn" id="retorno_tempo_add_menos" data-tempo-add-delta="-15" aria-label="Menos 15 minutos">−</button>
+                <input type="text" class="cv-field__control trecho-tempo-adicional-hhmm" id="id_retorno_tempo_adicional_hhmm" value="" placeholder="00:00" data-mask="time" inputmode="numeric" maxlength="5" autocomplete="off">
+                <button type="button" class="cv-btn cv-btn--secondary cv-btn--control trecho-tempo-add-btn" id="retorno_tempo_add_mais" data-tempo-add-delta="15" aria-label="Mais 15 minutos">+</button>
+              </div>
+              <input type="hidden" name="retorno_tempo_adicional_min" id="id_retorno_tempo_adicional_min" value="{{ retorno_state.tempo_adicional_min|default:0 }}">
+            </div>
+            <div class="field cv-field cv-field--readonly field-size-1">
+              <label class="cv-field__label" for="id_retorno_tempo_total">Tempo total</label>
+              <input type="text" class="cv-field__control trecho-tempo-total" id="id_retorno_tempo_total" value="" readonly tabindex="-1" aria-readonly="true">
+            </div>
+          </div>
+          <input type="hidden" name="retorno_distancia_km" id="id_retorno_distancia_km" value="{{ retorno_state.distancia_km|default:'' }}">
+          <input type="hidden" name="retorno_duracao_estimada_min" id="id_retorno_duracao_estimada_min" value="{{ retorno_state.duracao_estimada_min|default:'' }}">
+          <input type="hidden" name="retorno_rota_fonte" id="id_retorno_rota_fonte" value="{{ retorno_state.rota_fonte|default:'' }}">
+          <div class="roteiro-editor__helper text-danger d-none" id="retorno-erro"></div>
         </div>
       </div>
-      <input type="hidden" name="retorno_distancia_km" id="id_retorno_distancia_km"
-             value="{{ retorno_state.distancia_km|default:'' }}">
-      <input type="hidden" name="retorno_duracao_estimada_min" id="id_retorno_duracao_estimada_min"
-             value="{{ retorno_state.duracao_estimada_min|default:'' }}">
-      <input type="hidden" name="retorno_rota_fonte" id="id_retorno_rota_fonte"
-             value="{{ retorno_state.rota_fonte|default:'' }}">
-      <div class="roteiro-editor__helper text-danger d-none" id="retorno-erro"></div>
-    </div>
-
+    </article>
   </div>
 </section>

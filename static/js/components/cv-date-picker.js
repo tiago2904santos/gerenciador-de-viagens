@@ -162,7 +162,7 @@
     if (!root || root.dataset.cvDatePickerReady === 'true') return;
     root.dataset.cvDatePickerReady = 'true';
 
-    var mode = root.dataset.mode === 'range' ? 'range' : 'single';
+    var mode = root.dataset.mode === 'range' ? 'range' : root.dataset.mode === 'multi' ? 'multi' : 'single';
     var trigger = root.querySelector('[data-cv-date-picker-trigger]');
     var display = root.querySelector('[data-cv-date-picker-display]');
     var panel = root.querySelector('[data-cv-date-picker-panel]');
@@ -185,17 +185,26 @@
     var selectedSingle = null;
     var selectedStart = null;
     var selectedEnd = null;
+    var selectedDates = []; // multi mode
     var isOpen = false;
     var focusedDate = null;
     var dayButtons = [];
+    var confirmBtn = root.querySelector('[data-cv-date-picker-confirm]');
 
     function syncStateFromInputs() {
+      if (mode === 'multi') {
+        selectedDates = [];
+        activeDate = startOfMonth(new Date());
+        return;
+      }
       if (mode === 'single') {
-        selectedSingle = getInitialDate(root, singleHidden, selectedSingle || new Date());
+        selectedSingle = getInitialDate(root, singleHidden, null);
         if (singleHidden && singleHidden.value) {
           selectedSingle = parseIsoDate(singleHidden.value) || parseDisplayDate(singleHidden.value);
         }
-        if (!selectedSingle) selectedSingle = getInitialDate(root, display, new Date());
+        if (!selectedSingle) {
+          selectedSingle = getInitialDate(root, display, null);
+        }
         activeDate = startOfMonth(selectedSingle || new Date());
       } else {
         selectedStart = parseIsoDate(startHidden && startHidden.value) || parseDisplayDate(startHidden && startHidden.value)
@@ -215,11 +224,40 @@
     }
 
     function positionPanel() {
+      if (panel.parentElement !== document.body) {
+        document.body.appendChild(panel);
+      }
       var anchor = startDisplay || trigger;
       var rect = anchor.getBoundingClientRect();
-      panel.style.top = (rect.bottom + 8) + 'px';
-      panel.style.left = rect.left + 'px';
-      panel.style.width = Math.max(rect.width, 320) + 'px';
+      var margin = 8;
+      var vw = window.innerWidth || document.documentElement.clientWidth || 0;
+      var vh = window.innerHeight || document.documentElement.clientHeight || 0;
+      var width = Math.max(rect.width, 320);
+      if (vw) {
+        width = Math.min(width, Math.max(vw - (margin * 2), 280));
+      }
+      panel.style.position = 'fixed';
+      panel.style.width = width + 'px';
+      panel.style.zIndex = '2000';
+
+      var left = rect.right - width;
+      if (vw) {
+        left = Math.min(left, vw - width - margin);
+        left = Math.max(left, margin);
+      }
+
+      var top = rect.bottom + 8;
+      var panelHeight = panel.offsetHeight || 0;
+      if (vh && panelHeight) {
+        var belowSpace = vh - top - margin;
+        if (belowSpace < panelHeight && rect.top - 8 - panelHeight > margin) {
+          top = rect.top - 8 - panelHeight;
+        }
+        top = Math.max(margin, Math.min(top, vh - panelHeight - margin));
+      }
+
+      panel.style.top = top + 'px';
+      panel.style.left = left + 'px';
     }
 
     function setOpen(nextOpen) {
@@ -229,7 +267,13 @@
       trigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
       if (isOpen) {
         positionPanel();
+        // Garante animação mesmo com o panel fora do root (portal)
+        panel.classList.remove('cv-date-picker__panel--entering');
+        void panel.offsetWidth; // force reflow
+        panel.classList.add('cv-date-picker__panel--entering');
         render();
+      } else {
+        panel.classList.remove('cv-date-picker__panel--entering');
       }
     }
 
@@ -250,7 +294,9 @@
     }
 
     function clearSelection() {
-      if (mode === 'single') {
+      if (mode === 'multi') {
+        selectedDates = [];
+      } else if (mode === 'single') {
         selectedSingle = null;
       } else {
         selectedStart = null;
@@ -263,6 +309,41 @@
 
     function pickDate(date) {
       var picked = cloneDate(date);
+
+      if (mode === 'multi') {
+        var found = false;
+        for (var mi = 0; mi < selectedDates.length; mi++) {
+          if (isSameDay(selectedDates[mi], picked)) {
+            selectedDates.splice(mi, 1);
+            found = true;
+            break;
+          }
+        }
+        if (!found) {
+          // Respeita o limite definido pelo atributo data-max-dates (ex: número de trechos)
+          var maxDates = parseInt(root.dataset.maxDates, 10);
+          if (!isNaN(maxDates) && maxDates > 0 && selectedDates.length >= maxDates) {
+            return; // já atingiu o máximo permitido
+          }
+          selectedDates.push(picked);
+          selectedDates.sort(function (a, b) { return a.getTime() - b.getTime(); });
+        }
+        syncOutputs();
+        var expectedMultiDates = parseInt(root.dataset.maxDates, 10);
+        if (!isNaN(expectedMultiDates) && expectedMultiDates > 0 && selectedDates.length === expectedMultiDates) {
+          var isoList = selectedDates.map(function (d) { return formatIsoDate(d); });
+          root.dispatchEvent(new CustomEvent('cv:multi-confirm', {
+            bubbles: true,
+            detail: { dates: isoList },
+          }));
+          selectedDates = [];
+          syncOutputs();
+          closePicker();
+          return;
+        }
+        render();
+        return;
+      }
 
       if (mode === 'single') {
         selectedSingle = picked;
@@ -296,6 +377,41 @@
     }
 
     function syncOutputs() {
+      if (mode === 'multi') {
+        var expectedMultiDates = parseInt(root.dataset.maxDates, 10);
+        var hasExpectedMultiDates = !isNaN(expectedMultiDates) && expectedMultiDates > 0;
+        var multiSummary = summary;
+        var multiCount = selectedDates.length;
+        var multiLabel = '';
+
+        if (multiCount > 0) {
+          multiLabel = selectedDates.map(function (date, index) {
+            return (index + 1) + '. ' + formatDisplayDate(date);
+          }).join(' • ');
+        }
+
+        if (multiSummary) {
+          if (!hasExpectedMultiDates) {
+            multiSummary.textContent = multiCount
+              ? multiLabel
+              : 'Adicione destinos para habilitar o preenchimento das datas.';
+          } else if (multiCount) {
+            multiSummary.textContent = multiCount + '/' + expectedMultiDates + ' datas selecionadas'
+              + (multiLabel ? ' - ' + multiLabel : '');
+          } else {
+            multiSummary.textContent = 'Selecione ' + expectedMultiDates + ' datas para preencher os trechos e o retorno final.';
+          }
+        }
+
+        if (confirmBtn) {
+          var n = selectedDates.length;
+          confirmBtn.textContent = n > 0
+            ? 'Aplicar ' + n + (n === 1 ? ' data' : ' datas')
+            : 'Aplicar datas';
+          confirmBtn.disabled = !n || (hasExpectedMultiDates && n !== expectedMultiDates) || !hasExpectedMultiDates;
+        }
+        return;
+      }
       if (mode === 'single') {
         if (display) {
           display.value = selectedSingle ? formatDisplayDate(selectedSingle) : '';
@@ -359,6 +475,15 @@
       var button = document.createElement('button');
       var isCurrentMonth = isSameMonth(date, activeDate);
       var isToday = isSameDay(date, new Date());
+
+      // multi mode: verifica se este dia está na lista de selecionados
+      var isMultiSel = false;
+      if (mode === 'multi') {
+        for (var mi = 0; mi < selectedDates.length; mi++) {
+          if (isSameDay(selectedDates[mi], date)) { isMultiSel = true; break; }
+        }
+      }
+
       var isStart = mode === 'single' ? isSameDay(date, selectedSingle) : isSameDay(date, selectedStart);
       var isEnd = mode === 'range' && isSameDay(date, selectedEnd);
       var isInRange = mode === 'range' && selectedStart && selectedEnd &&
@@ -369,14 +494,15 @@
       button.className = 'cv-date-picker__day';
       button.textContent = String(date.getDate());
       button.setAttribute('aria-label', formatLongDate(date));
-      button.setAttribute('aria-pressed', (isStart || isEnd || isSameDay(date, selectedSingle)) ? 'true' : 'false');
+      button.setAttribute('aria-pressed', (isStart || isEnd || isSameDay(date, selectedSingle) || isMultiSel) ? 'true' : 'false');
       button.dataset.date = formatIsoDate(date);
       button.classList.toggle('cv-date-picker__day--muted', !isCurrentMonth);
       button.classList.toggle('cv-date-picker__day--today', isToday);
-      button.classList.toggle('cv-date-picker__day--selected', isStart || isEnd || isSameDay(date, selectedSingle));
+      button.classList.toggle('cv-date-picker__day--selected', isStart || isEnd || isSameDay(date, selectedSingle) || isMultiSel);
       button.classList.toggle('cv-date-picker__day--range', isInRange);
       button.classList.toggle('cv-date-picker__day--range-start', isStart);
       button.classList.toggle('cv-date-picker__day--range-end', isEnd);
+
       button.addEventListener('click', function () {
         pickDate(date);
       });
@@ -414,7 +540,8 @@
 
     function onDocumentClick(event) {
       var path = event.composedPath ? event.composedPath() : [event.target];
-      if (path.indexOf(root) === -1) {
+      // O panel pode estar em document.body (portal), checar root E panel separadamente
+      if (path.indexOf(root) === -1 && path.indexOf(panel) === -1) {
         setOpen(false);
       }
     }
@@ -472,6 +599,28 @@
     document.addEventListener('click', onDocumentClick);
     document.addEventListener('keydown', onKeydown);
 
+    // Reposicionar ao scrollar ou redimensionar para o panel acompanhar o anchor
+    function onScrollOrResize() {
+      if (isOpen) positionPanel();
+    }
+    window.addEventListener('scroll', onScrollOrResize, { passive: true, capture: true });
+    window.addEventListener('resize', onScrollOrResize, { passive: true });
+
+    if (confirmBtn) {
+      confirmBtn.addEventListener('click', function () {
+        if (selectedDates.length === 0) return;
+        var isoList = selectedDates.map(function (d) { return formatIsoDate(d); });
+        root.dispatchEvent(new CustomEvent('cv:multi-confirm', {
+          bubbles: true,
+          detail: { dates: isoList },
+        }));
+        selectedDates = [];
+        syncOutputs();
+        render();
+        closePicker();
+      });
+    }
+
     if (startDisplay) {
       startDisplay.addEventListener('click', openPicker);
       startDisplay.addEventListener('focus', openPicker);
@@ -517,6 +666,13 @@
       open: openPicker,
       close: closePicker,
       clear: clearSelection,
+      setSingle: function (isoDate) {
+        if (mode !== 'single') return;
+        selectedSingle = parseIsoDate(isoDate) || parseDisplayDate(isoDate) || null;
+        activeDate = startOfMonth(selectedSingle || new Date());
+        syncOutputs();
+        render();
+      },
       setRange: function (startIso, endIso) {
         selectedStart = parseIsoDate(startIso) || null;
         selectedEnd = parseIsoDate(endIso) || null;
