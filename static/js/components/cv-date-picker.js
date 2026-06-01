@@ -194,7 +194,21 @@
     function syncStateFromInputs() {
       if (mode === 'multi') {
         selectedDates = [];
-        activeDate = startOfMonth(new Date());
+        if (root.dataset.selectedDates) {
+          try {
+            selectedDates = JSON.parse(root.dataset.selectedDates) || [];
+          } catch (e) {
+            selectedDates = String(root.dataset.selectedDates || '')
+              .split(',')
+              .map(function (date) { return String(date || '').trim(); })
+              .filter(function (date) { return !!date; });
+          }
+          selectedDates = selectedDates.map(function (date) {
+            return parseIsoDate(date) || parseDisplayDate(date) || null;
+          }).filter(function (date) { return !!date; });
+          selectedDates.sort(function (a, b) { return a.getTime() - b.getTime(); });
+        }
+        activeDate = startOfMonth(selectedDates[0] || new Date());
         return;
       }
       if (mode === 'single') {
@@ -296,6 +310,7 @@
     function clearSelection() {
       if (mode === 'multi') {
         selectedDates = [];
+        root.dataset.selectedDates = '[]';
       } else if (mode === 'single') {
         selectedSingle = null;
       } else {
@@ -332,12 +347,11 @@
         var expectedMultiDates = parseInt(root.dataset.maxDates, 10);
         if (!isNaN(expectedMultiDates) && expectedMultiDates > 0 && selectedDates.length === expectedMultiDates) {
           var isoList = selectedDates.map(function (d) { return formatIsoDate(d); });
+          root.dataset.selectedDates = JSON.stringify(isoList);
           root.dispatchEvent(new CustomEvent('cv:multi-confirm', {
             bubbles: true,
             detail: { dates: isoList },
           }));
-          selectedDates = [];
-          syncOutputs();
           closePicker();
           return;
         }
@@ -410,6 +424,9 @@
             : 'Aplicar datas';
           confirmBtn.disabled = !n || (hasExpectedMultiDates && n !== expectedMultiDates) || !hasExpectedMultiDates;
         }
+        root.dataset.selectedDates = JSON.stringify(selectedDates.map(function (date) {
+          return formatIsoDate(date);
+        }));
         return;
       }
       if (mode === 'single') {
@@ -489,19 +506,38 @@
       var isInRange = mode === 'range' && selectedStart && selectedEnd &&
         !isBeforeDay(date, selectedStart) &&
         !isAfterDay(date, selectedEnd);
+      var isMultiRange = false;
+      var isMultiStart = false;
+      var isMultiMiddle = false;
+      var isMultiEnd = false;
+      var isMultiSingle = false;
+      if (mode === 'multi' && selectedDates.length) {
+        var multiStart = selectedDates[0];
+        var multiEnd = selectedDates[selectedDates.length - 1];
+        isMultiRange = !!multiStart && !!multiEnd && !isBeforeDay(date, multiStart) && !isAfterDay(date, multiEnd);
+        isMultiStart = isMultiRange && isSameDay(date, multiStart);
+        isMultiEnd = isMultiRange && isSameDay(date, multiEnd);
+        isMultiMiddle = isMultiRange && !isMultiStart && !isMultiEnd;
+        isMultiSingle = selectedDates.length === 1 && isMultiStart;
+      }
 
       button.type = 'button';
       button.className = 'cv-date-picker__day';
       button.textContent = String(date.getDate());
       button.setAttribute('aria-label', formatLongDate(date));
-      button.setAttribute('aria-pressed', (isStart || isEnd || isSameDay(date, selectedSingle) || isMultiSel) ? 'true' : 'false');
+      button.setAttribute('aria-pressed', (isStart || isEnd || isSameDay(date, selectedSingle) || isMultiRange) ? 'true' : 'false');
       button.dataset.date = formatIsoDate(date);
       button.classList.toggle('cv-date-picker__day--muted', !isCurrentMonth);
       button.classList.toggle('cv-date-picker__day--today', isToday);
-      button.classList.toggle('cv-date-picker__day--selected', isStart || isEnd || isSameDay(date, selectedSingle) || isMultiSel);
+      button.classList.toggle('cv-date-picker__day--selected', mode !== 'multi' && (isStart || isEnd || isSameDay(date, selectedSingle)));
       button.classList.toggle('cv-date-picker__day--range', isInRange);
       button.classList.toggle('cv-date-picker__day--range-start', isStart);
       button.classList.toggle('cv-date-picker__day--range-end', isEnd);
+      button.classList.toggle('cv-date-picker__day--multi-selected', isMultiRange);
+      button.classList.toggle('cv-date-picker__day--multi-start', isMultiStart);
+      button.classList.toggle('cv-date-picker__day--multi-middle', isMultiMiddle);
+      button.classList.toggle('cv-date-picker__day--multi-end', isMultiEnd);
+      button.classList.toggle('cv-date-picker__day--multi-single', isMultiSingle);
 
       button.addEventListener('click', function () {
         pickDate(date);
@@ -610,13 +646,11 @@
       confirmBtn.addEventListener('click', function () {
         if (selectedDates.length === 0) return;
         var isoList = selectedDates.map(function (d) { return formatIsoDate(d); });
+        root.dataset.selectedDates = JSON.stringify(isoList);
         root.dispatchEvent(new CustomEvent('cv:multi-confirm', {
           bubbles: true,
           detail: { dates: isoList },
         }));
-        selectedDates = [];
-        syncOutputs();
-        render();
         closePicker();
       });
     }
