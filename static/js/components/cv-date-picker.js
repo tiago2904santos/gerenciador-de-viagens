@@ -181,11 +181,15 @@
     var summary = root.querySelector('[data-cv-date-picker-summary]');
     var startDisplay = root.querySelector('[data-cv-date-picker-start-display]');
     var endDisplay = root.querySelector('[data-cv-date-picker-end-display]');
+    var context = root.querySelector('[data-cv-date-picker-context]');
+    var contextStep = root.querySelector('[data-cv-date-picker-context-step]');
+    var contextRoute = root.querySelector('[data-cv-date-picker-context-route]');
     var activeDate = new Date();
     var selectedSingle = null;
     var selectedStart = null;
     var selectedEnd = null;
     var selectedDates = []; // multi mode
+    var routeSteps = [];
     var isOpen = false;
     var focusedDate = null;
     var dayButtons = [];
@@ -234,6 +238,51 @@
           selectedEnd = tmp;
         }
         activeDate = startOfMonth(selectedStart || selectedEnd || new Date());
+      }
+    }
+
+    function readRouteSteps() {
+      if (mode !== 'multi') return [];
+      var raw = root.dataset.routeSteps || '';
+      if (!raw) return [];
+      try {
+        var parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) return [];
+        return parsed.map(function (step) {
+          return {
+            from: String(step && step.from ? step.from : '').trim(),
+            to: String(step && step.to ? step.to : '').trim(),
+            label: String(step && step.label ? step.label : '').trim(),
+          };
+        }).filter(function (step) {
+          return !!step.label;
+        });
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function renderRouteContext() {
+      if (!context || mode !== 'multi') return;
+      routeSteps = readRouteSteps();
+      if (!routeSteps.length) {
+        context.hidden = true;
+        if (contextStep) contextStep.textContent = '';
+        if (contextRoute) contextRoute.textContent = '';
+        return;
+      }
+
+      var totalSteps = routeSteps.length;
+      var currentStepIndex = Math.min(selectedDates.length, totalSteps - 1);
+      var currentStepNumber = Math.min(selectedDates.length + 1, totalSteps);
+      var currentStep = routeSteps[currentStepIndex] || routeSteps[0];
+
+      context.hidden = false;
+      if (contextStep) {
+        contextStep.textContent = 'Trecho ' + currentStepNumber + ' de ' + totalSteps;
+      }
+      if (contextRoute) {
+        contextRoute.textContent = currentStep.label || ((currentStep.from || '') + ' > ' + (currentStep.to || ''));
       }
     }
 
@@ -391,6 +440,11 @@
     }
 
     function syncOutputs() {
+      if (mode !== 'multi' && context) {
+        context.hidden = true;
+        if (contextStep) contextStep.textContent = '';
+        if (contextRoute) contextRoute.textContent = '';
+      }
       if (mode === 'multi') {
         var expectedMultiDates = parseInt(root.dataset.maxDates, 10);
         var hasExpectedMultiDates = !isNaN(expectedMultiDates) && expectedMultiDates > 0;
@@ -427,6 +481,7 @@
         root.dataset.selectedDates = JSON.stringify(selectedDates.map(function (date) {
           return formatIsoDate(date);
         }));
+        renderRouteContext();
         return;
       }
       if (mode === 'single') {
@@ -538,6 +593,30 @@
       button.classList.toggle('cv-date-picker__day--multi-middle', isMultiMiddle);
       button.classList.toggle('cv-date-picker__day--multi-end', isMultiEnd);
       button.classList.toggle('cv-date-picker__day--multi-single', isMultiSingle);
+
+      if (mode === 'multi' && isMultiSel) {
+        var multiStepIndex = -1;
+        for (var stepIndex = 0; stepIndex < selectedDates.length; stepIndex += 1) {
+          if (isSameDay(selectedDates[stepIndex], date)) {
+            multiStepIndex = stepIndex;
+            break;
+          }
+        }
+        var hasMiddleStep = multiStepIndex > 0 && multiStepIndex < selectedDates.length - 1;
+        if (hasMiddleStep) {
+          var badge = document.createElement('span');
+          badge.className = 'cv-date-picker__day-badge';
+          badge.textContent = String(multiStepIndex + 1);
+          button.appendChild(badge);
+          if (routeSteps[multiStepIndex] && routeSteps[multiStepIndex].label) {
+            button.title = routeSteps[multiStepIndex].label;
+            button.setAttribute(
+              'aria-label',
+              formatLongDate(date) + ' - ' + routeSteps[multiStepIndex].label
+            );
+          }
+        }
+      }
 
       button.addEventListener('click', function () {
         pickDate(date);

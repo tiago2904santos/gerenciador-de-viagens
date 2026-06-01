@@ -18,6 +18,10 @@ var CALENDAR_ICON_SVG =
 
 var DATE_PICKER_PANEL_HTML =
   '<div class="cv-date-picker__panel" hidden data-cv-date-picker-panel>' +
+  '<div class="cv-date-picker__context" data-cv-date-picker-context hidden>' +
+  '<span class="cv-date-picker__context-step" data-cv-date-picker-context-step></span>' +
+  '<strong class="cv-date-picker__context-route" data-cv-date-picker-context-route></strong>' +
+  '</div>' +
   '<div class="cv-date-picker__panel-header">' +
   '<button class="cv-date-picker__nav" type="button" data-cv-date-picker-prev aria-label="Mês anterior">Anterior</button>' +
   '<div class="cv-date-picker__month" data-cv-date-picker-month></div>' +

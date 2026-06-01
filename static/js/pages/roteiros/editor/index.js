@@ -996,6 +996,32 @@ export function initRoteirosEditor() {
     var cards = getTrechoCards();
     var expected = cards.length ? (cards.length + 1) : 0;
     picker.dataset.maxDates = String(expected);
+    picker.dataset.routeSteps = JSON.stringify(buildTrechosRouteSteps(cards));
+  }
+  function buildTrechosRouteSteps(cards) {
+    var items = Array.isArray(cards) ? cards : getTrechoCards();
+    var origin = selectedText($('id_origem_cidade')) || (items[0] && items[0].dataset.origemNome) || '';
+    if (!origin || !items.length) return [];
+    var steps = [];
+    var from = origin;
+    items.forEach(function(card) {
+      var to = String(card.dataset.destinoNome || '').trim();
+      steps.push({
+        from: from,
+        to: to,
+        label: (from || '') + ' > ' + (to || ''),
+      });
+      from = to || from;
+    });
+    steps.push({
+      from: from,
+      to: origin,
+      label: (from || '') + ' > ' + origin,
+      is_return: true,
+    });
+    return steps.filter(function(step) {
+      return !!String(step.from || '').trim() && !!String(step.to || '').trim();
+    });
   }
   function applyTrechosDateSelection(dates) {
     var cards = getTrechoCards();
