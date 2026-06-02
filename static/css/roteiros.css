@@ -1968,7 +1968,7 @@ html[data-theme="light-light"] .cv-date-picker .cv-date-picker__day--multi-singl
   align-items: stretch;
   display: grid;
   gap: var(--space-2);
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: 1fr auto auto;
 }
 
 .roteiro-time-calc-stepper .cv-btn--control {
@@ -2616,15 +2616,26 @@ html[data-theme="light-light"] .cv-date-picker .cv-date-picker__day--multi-singl
 }
 
 .roteiro-editor--avulso .roteiro-editor__diarias-finance-grid {
+  align-items: stretch;
   display: grid;
   gap: var(--space-3);
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.roteiro-editor--avulso .roteiro-editor__diarias-finance-grid > .field-size-2 {
+  grid-column: span 1;
 }
 
 .roteiro-editor--avulso .roteiro-editor__summary-stack {
   display: grid;
   gap: var(--space-3);
   grid-template-columns: 1fr;
+}
+
+.roteiro-editor--avulso .roteiro-editor__diarias-secondary-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
 }
 
 .roteiro-editor--avulso .roteiro-editor__summary-item {
@@ -2640,6 +2651,7 @@ html[data-theme="light-light"] .cv-date-picker .cv-date-picker__day--multi-singl
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.88) inset,
     0 14px 24px rgba(15, 34, 54, 0.07);
+  height: 100%;
   position: relative;
 }
 
@@ -2666,6 +2678,10 @@ html[data-theme="light-light"] .cv-date-picker .cv-date-picker__day--multi-singl
   color: var(--theme-stat-value);
   font-size: 3.5rem;
   letter-spacing: -0.02em;
+}
+
+.roteiro-editor--avulso .roteiro-editor__summary-value--principal + .roteiro-editor__summary-label {
+  margin-top: var(--space-4);
 }
 
 .roteiro-editor--avulso .roteiro-editor__summary-divider {

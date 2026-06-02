@@ -219,7 +219,6 @@ export function buildTrechoCard(trecho, value, esc, formatDurationInput) {
     ) +
     '</div>' +
     '<div class="wizard-inner-section roteiro-trecho-card__time-section">' +
-    '<div class="wizard-inner-section__header"><h5 class="wizard-inner-section__title">Tempo de viagem</h5></div>' +
     '<div class="field-grid field-grid--cols-3 oficio-roteiro-time-calc-grid roteiro-time-calc-grid roteiro-trecho-card__time-grid">' +
     '<div class="field cv-field field-size-1">' +
     '<label class="cv-field__label">Tempo de viagem</label>' +
@@ -235,10 +234,10 @@ export function buildTrechoCard(trecho, value, esc, formatDurationInput) {
     '<div class="field cv-field field-size-1">' +
     '<label class="cv-field__label">Tempo adicional</label>' +
     '<div class="roteiro-time-calc-stepper roteiro-trecho-card__time-stepper">' +
-    '<button type="button" class="cv-btn cv-btn--secondary cv-btn--control trecho-tempo-add-btn" data-tempo-add-delta="-15" aria-label="Menos 15 minutos">−</button>' +
     '<input type="text" class="cv-field__control trecho-tempo-adicional-hhmm" value="' +
     esc(add ? fmt(add) : '') +
     '" placeholder="00:00" data-mask="time" inputmode="numeric" maxlength="5" autocomplete="off">' +
+    '<button type="button" class="cv-btn cv-btn--secondary cv-btn--control trecho-tempo-add-btn" data-tempo-add-delta="-15" aria-label="Menos 15 minutos">−</button>' +
     '<button type="button" class="cv-btn cv-btn--secondary cv-btn--control trecho-tempo-add-btn" data-tempo-add-delta="15" aria-label="Mais 15 minutos">+</button>' +
     '</div>' +
     '<input type="hidden" name="trecho_' +

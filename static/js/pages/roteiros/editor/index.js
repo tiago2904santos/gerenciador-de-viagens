@@ -1263,6 +1263,15 @@ export function initRoteirosEditor() {
     var status = $('diarias-status'); if (!status) return;
     status.dataset.state = state || 'pending';
     status.textContent = text || 'Aguardando dados para cálculo.';
+    var chip = $('diarias-header-chip');
+    if (chip) {
+      if (state === 'updated') {
+        chip.querySelector('.cv-chip__label').textContent = text || 'Cálculo atualizado.';
+        chip.classList.remove('d-none');
+      } else {
+        chip.classList.add('d-none');
+      }
+    }
   }
   function applyDiarias(result) {
     var totais = result && result.totais ? result.totais : null;
