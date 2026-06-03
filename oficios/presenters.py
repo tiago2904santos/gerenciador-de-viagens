@@ -523,9 +523,20 @@ def apresentar_oficio_wizard_documentos_context(oficio):
     transporte = _montar_transporte_resumo_documentos(oficio)
     viajantes_cards = _montar_viajantes_cards_documentos(oficio)
     roteiro = oficio.roteiro
+
+    def cidade_uf_label(cidade, estado):
+        cidade_label = str(cidade).upper() if cidade else ""
+        if "/" in cidade_label:
+            return cidade_label
+        estado_label = getattr(estado, "sigla", "") or str(estado or "")
+        return f"{cidade_label}/{estado_label}".upper() if estado_label else cidade_label
+
     destinos = []
+    destinos_rota_labels = []
     if roteiro:
-        destinos = [f"{d.cidade} ({d.estado.sigla})" for d in roteiro.destinos.order_by("ordem")]
+        destinos_qs = list(roteiro.destinos.select_related("cidade", "estado").order_by("ordem"))
+        destinos = [f"{d.cidade} ({d.estado.sigla})" for d in destinos_qs]
+        destinos_rota_labels = [cidade_uf_label(d.cidade, d.estado) for d in destinos_qs]
 
     primeira = get_primeira_saida_oficio(oficio)
     primeira_label = "—"
@@ -556,11 +567,14 @@ def apresentar_oficio_wizard_documentos_context(oficio):
     texto_j = (j_obj.texto or "").strip() if j_obj else ""
 
     sede = "—"
+    sede_rota_label = "—"
     if roteiro:
         if roteiro.origem_cidade_id:
             sede = str(roteiro.origem_cidade)
+            sede_rota_label = cidade_uf_label(roteiro.origem_cidade, roteiro.origem_estado)
         elif roteiro.origem_estado_id:
             sede = str(roteiro.origem_estado)
+            sede_rota_label = str(roteiro.origem_estado).upper()
 
     destino_principal = destinos[0] if destinos else "—"
 
@@ -571,6 +585,7 @@ def apresentar_oficio_wizard_documentos_context(oficio):
         roteiro_card = apresentar_roteiro_card(roteiro)
         roteiro_card.pop("actions", None)
         roteiro_card["subtitle"] = "Roteiro utilizado para geração dos documentos"
+        roteiro_card["title"] = " > ".join([sede_rota_label, *destinos_rota_labels])
 
     justificativa_resumo = _montar_justificativa_resumo_documentos(j_et, j_obj, texto_j)
 

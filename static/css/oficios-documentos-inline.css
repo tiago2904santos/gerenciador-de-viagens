@@ -70,6 +70,10 @@
   padding-top: var(--space-5, 1.25rem);
 }
 
+.oficio-documentos-route-section .cv-wizard-section-body {
+  padding: 0;
+}
+
 .oficio-documentos-summary-section .oficio-documentos-admin-facts {
   background: transparent;
   border: 0;
@@ -95,6 +99,14 @@
   overflow: visible;
 }
 
+.oficio-documentos-route-section .oficio-documentos-route-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--form-section-inner-gap);
+  padding: var(--cv-wizard-section-body-padding);
+  padding-top: 0;
+}
+
 .oficio-documentos-summary-section .oficio-documentos-card__header,
 .oficio-documentos-route-section .oficio-documentos-route-card__head,
 .oficio-documentos-justification-section .oficio-documentos-card__header {
@@ -102,10 +114,211 @@
   padding: var(--space-5, 0.75rem) 0 var(--space-1, 0.75rem);
 }
 
+.oficio-documentos-route-section .oficio-documentos-route-card__head {
+  margin-bottom: 0;
+  padding: 0;
+}
+
+.oficio-documentos-route-section .oficio-documentos-route-card__title {
+  padding-top: var(--space-5);
+}
+
 .oficio-documentos-summary-section .oficio-documentos-card__body,
 .oficio-documentos-route-section .oficio-documentos-route-card__body,
 .oficio-documentos-justification-section .oficio-documentos-card__body {
   padding: 0;
+}
+
+/* Route card — grid de 3 colunas adaptável ao nº de trechos */
+.oficio-documentos-route-summary-grid {
+  align-items: stretch;
+  display: grid;
+  gap: var(--space-3, 0.75rem);
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+/* Trechos individuais: col 1, 1 linha cada */
+.oficio-documentos-route-trecho-item {
+  grid-column: 1;
+}
+
+/* Col 2: Valor total */
+.oficio-documentos-route-valor-card {
+  grid-column: 2;
+}
+
+/* Col 3: container flex que estica para preencher as linhas */
+.oficio-documentos-route-col4 {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3, 0.75rem);
+  grid-column: 3;
+}
+
+.oficio-documentos-route-col4 {
+  justify-content: flex-start;
+}
+
+.oficio-documentos-route-col4 > .roteiro-editor__summary-item {
+  flex: 1 1 0;
+}
+
+/* 2 trechos: valor (col 3) e col4 ancorados na linha 1, span 2 */
+.oficio-documentos-route-card--trechos-2 .oficio-documentos-route-valor-card,
+.oficio-documentos-route-card--trechos-2 .oficio-documentos-route-col4 {
+  grid-row: 1 / span 2;
+}
+
+.oficio-documentos-route-section .oficio-documentos-route-card--trechos-2 .oficio-documentos-route-diarias-valor {
+  font-size: clamp(1.6rem, 2.8vw, 2rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin-bottom: var(--space-3);
+}
+
+.oficio-documentos-route-section .oficio-documentos-route-card--trechos-2 .oficio-documentos-route-valor-card .roteiro-editor__summary-label:last-of-type {
+  margin-top: auto;
+}
+
+.oficio-documentos-route-card--trechos-2 .oficio-documentos-route-diarias-extenso {
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  display: -webkit-box;
+  font-size: var(--font-size-sm, 0.875rem);
+  font-weight: 600;
+  overflow: hidden;
+}
+
+/* 3 trechos: valor + extenso (col 3), col4 ancorados na linha 1, span 3 */
+.oficio-documentos-route-card--trechos-3 .oficio-documentos-route-valor-card,
+.oficio-documentos-route-card--trechos-3 .oficio-documentos-route-col4 {
+  grid-row: 1 / span 3;
+}
+
+.oficio-documentos-route-section .oficio-documentos-route-card--trechos-3 .oficio-documentos-route-diarias-valor {
+  font-size: clamp(3rem, 6vw, 4.5rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  margin-bottom: var(--space-5);
+}
+
+.oficio-documentos-route-section .oficio-documentos-route-card--trechos-3 .oficio-documentos-route-valor-card .roteiro-editor__summary-label:last-of-type {
+  margin-top: auto;
+}
+
+.oficio-documentos-route-card--trechos-3 .oficio-documentos-route-diarias-extenso {
+  font-size: var(--font-size-sm, 0.875rem);
+  font-weight: 600;
+}
+
+.oficio-documentos-route-card--trechos-3 .oficio-documentos-route-col4 .roteiro-editor__summary-value {
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  line-height: 1.15;
+}
+
+/* 4+ trechos: lista com scroll (col 1, span 3), diárias ancoradas na linha 1 */
+.oficio-documentos-route-card--trechos-many .oficio-documentos-route-trechos-scroll-card {
+  grid-column: 1;
+  grid-row: 1 / span 3;
+}
+
+.oficio-documentos-route-card--trechos-many .oficio-documentos-route-valor-card,
+.oficio-documentos-route-card--trechos-many .oficio-documentos-route-col4 {
+  grid-row: 1 / span 3;
+}
+
+.oficio-documentos-route-section .oficio-documentos-route-card--trechos-many .oficio-documentos-route-diarias-valor {
+  font-size: clamp(3rem, 6vw, 4.5rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  margin-bottom: var(--space-5);
+}
+
+.oficio-documentos-route-section .oficio-documentos-route-card--trechos-many .oficio-documentos-route-valor-card .roteiro-editor__summary-label:last-of-type {
+  margin-top: auto;
+}
+
+.oficio-documentos-route-card--trechos-many .oficio-documentos-route-diarias-extenso {
+  font-size: var(--font-size-sm, 0.875rem);
+  font-weight: 600;
+}
+
+.oficio-documentos-route-card--trechos-many .oficio-documentos-route-col4 .roteiro-editor__summary-value {
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  line-height: 1.15;
+}
+
+/* Scroll list (4+ trechos) */
+.oficio-documentos-route-trechos-scroll-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  height: 100%;
+  max-height: 250px;
+  padding-right: 0;
+}
+
+.oficio-documentos-route-trechos-scroll-card .roteiro-routes-panel__header {
+  flex-shrink: 0;
+  padding: 0 var(--space-4) var(--space-1);
+}
+
+.oficio-documentos-route-trechos-scroll-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: var(--space-1);
+  scrollbar-color: rgba(191, 211, 234, 0.6) transparent;
+  scrollbar-width: thin;
+}
+
+.oficio-documentos-route-trecho-scroll-item {
+  flex-shrink: 0;
+}
+
+/* Compartilhados */
+.oficio-documentos-route-trecho-times {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1, 0.25rem);
+}
+
+.oficio-documentos-route-trecho-arrow {
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+.oficio-documentos-route-composicao-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.oficio-documentos-route-composicao-list li {
+  display: inline;
+}
+
+@media (max-width: 700px) {
+  .oficio-documentos-route-summary-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .oficio-documentos-route-card--trechos-2 .oficio-documentos-route-valor-card,
+  .oficio-documentos-route-card--trechos-2 .oficio-documentos-route-col4,
+  .oficio-documentos-route-card--trechos-3 .oficio-documentos-route-valor-card,
+  .oficio-documentos-route-card--trechos-3 .oficio-documentos-route-col4,
+  .oficio-documentos-route-card--trechos-many .oficio-documentos-route-valor-card,
+  .oficio-documentos-route-card--trechos-many .oficio-documentos-route-col4 {
+    grid-row: auto;
+  }
 }
 
 .oficio-documentos-summary-section .oficio-documentos-card__eyebrow,
@@ -138,8 +351,9 @@
   grid-row: span 2;
 }
 
-/* Cards de resumo da viatura (mesmo padrão que calculadora de diárias) */
-.oficio-documentos-summary-section .roteiro-editor__summary-item {
+/* Cards de resumo — summary e route sections */
+.oficio-documentos-summary-section .roteiro-editor__summary-item,
+.oficio-documentos-route-section .roteiro-editor__summary-item {
   background: var(--color-card-muted);
   border: 1px solid var(--color-border-soft);
   border-radius: var(--radius-control);
@@ -149,11 +363,13 @@
   padding: var(--space-3) var(--space-4);
 }
 
-.oficio-documentos-summary-section .roteiro-editor__summary-item--principal {
+.oficio-documentos-summary-section .roteiro-editor__summary-item--principal,
+.oficio-documentos-route-section .roteiro-editor__summary-item--principal {
   height: 100%;
 }
 
-.oficio-documentos-summary-section .roteiro-editor__summary-label {
+.oficio-documentos-summary-section .roteiro-editor__summary-label,
+.oficio-documentos-route-section .roteiro-editor__summary-label {
   color: var(--color-muted);
   font-size: 10px;
   font-weight: 900;
@@ -161,7 +377,8 @@
   text-transform: uppercase;
 }
 
-.oficio-documentos-summary-section .roteiro-editor__summary-value {
+.oficio-documentos-summary-section .roteiro-editor__summary-value,
+.oficio-documentos-route-section .roteiro-editor__summary-value {
   color: var(--color-heading);
   font-size: var(--font-size-md, 1rem);
   font-weight: 800;
