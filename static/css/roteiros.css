@@ -26,6 +26,12 @@
   width: 100%;
 }
 
+#roteiro-editor-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cv-wizard-section-stack-gap-comfortable);
+}
+
 .roteiro-editor .app-page-shell__inner.oficio-wizard-shell {
   gap: var(--space-4);
 }

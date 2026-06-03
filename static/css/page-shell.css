@@ -1156,10 +1156,7 @@ html[data-theme="light"] {
 }
 
 .cv-wizard-section-subtitle {
-  color:       var(--theme-text-muted);
-  font-size:   var(--font-size-sm);
-  line-height: 1.5;
-  margin:      0;
+  display:     none;
 }
 
 .cv-wizard-section-body {

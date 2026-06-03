@@ -3,7 +3,7 @@
 
 {% block extra_css %}
   {{ block.super }}
-  <link rel="stylesheet" href="{% static 'css/oficios-documentos-inline.css' %}?v=20260512">
+  <link rel="stylesheet" href="{% static 'css/oficios-documentos-inline.css' %}?v=20260603">
 {% endblock %}
 
 {% block wizard_content %}
@@ -26,18 +26,25 @@
     </section>
   {% endif %}
 
-  <section class="document-inline-stack" aria-labelledby="documentos-conferencia-title">
-    <h2 class="document-inline-stack__heading" id="documentos-conferencia-title">Documentos para conferência</h2>
+  <section class="cv-wizard-section-card oficio-documentos-preview-section document-inline-stack" aria-labelledby="documentos-conferencia-title">
+    <header class="cv-wizard-section-header">
+      <div class="cv-wizard-section-header__copy">
+        <h3 class="cv-wizard-section-title" id="documentos-conferencia-title">Documentos para conferência</h3>
+        <p class="cv-wizard-section-subtitle">Confira os documentos gerados antes de avançar para a central de assinaturas.</p>
+      </div>
+    </header>
+
+    <div class="cv-wizard-section-body oficio-documentos-preview-section__body">
 
     {% with di=documentos_ctx.documentos_inline %}
-      <details class="document-inline-card" open>
+      <details class="document-inline-card document-inline-card--lazy" data-lazy-inline>
         <summary class="document-inline-card__header">
           <span class="document-inline-card__title">{{ di.oficio.titulo }}</span>
           {% if di.oficio.disponivel %}
             <span class="document-inline-card__header-end">
               <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do documento">
-                <a class="btn btn-secondary app-btn app-btn--secondary document-inline-actions__btn" href="{{ di.oficio.url }}" target="_blank" rel="noopener noreferrer">Abrir em nova aba</a>
-                <a class="btn btn-secondary app-btn app-btn--secondary document-inline-actions__btn" href="{% url 'oficios:baixar_documento' oficio.pk 'pdf' %}">Baixar PDF</a>
+                <a class="cv-btn cv-btn--secondary document-inline-actions__btn" href="{{ di.oficio.url }}" target="_blank" rel="noopener noreferrer">Abrir em nova aba</a>
+                <a class="cv-btn cv-btn--secondary document-inline-actions__btn" href="{% url 'oficios:baixar_documento' oficio.pk 'pdf' %}">Baixar PDF</a>
               </span>
             </span>
           {% endif %}
@@ -47,7 +54,7 @@
             <div class="document-inline-viewer">
               <iframe
                 class="document-inline-viewer__frame"
-                src="{{ di.oficio.url }}"
+                data-src="{{ di.oficio.url }}"
                 title="Visualização do ofício em PDF"
                 loading="lazy"
               ></iframe>
@@ -64,8 +71,8 @@
           {% if di.justificativa.disponivel %}
             <span class="document-inline-card__header-end">
               <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do documento">
-                <a class="btn btn-secondary app-btn app-btn--secondary document-inline-actions__btn" href="{{ di.justificativa.url }}" target="_blank" rel="noopener noreferrer">Abrir em nova aba</a>
-                <a class="btn btn-secondary app-btn app-btn--secondary document-inline-actions__btn" href="{% url 'oficios:baixar_justificativa_documento' oficio.pk 'pdf' %}">Baixar PDF</a>
+                <a class="cv-btn cv-btn--secondary document-inline-actions__btn" href="{{ di.justificativa.url }}" target="_blank" rel="noopener noreferrer">Abrir em nova aba</a>
+                <a class="cv-btn cv-btn--secondary document-inline-actions__btn" href="{% url 'oficios:baixar_justificativa_documento' oficio.pk 'pdf' %}">Baixar PDF</a>
               </span>
             </span>
           {% endif %}
@@ -89,21 +96,38 @@
       <details class="document-inline-card document-inline-card--termos">
         <summary class="document-inline-card__header">
           <span class="document-inline-card__title">Termos de Autorização</span>
+          {% if not di.termos_vazio %}
+            <span class="document-inline-card__header-end">
+              <span class="document-inline-actions document-inline-actions--header" aria-label="Ações dos termos">
+                {% if di.termos|length == 1 %}
+                  {% for t in di.termos %}
+                    {% if t.disponivel %}
+                      <a class="cv-btn cv-btn--secondary document-inline-actions__btn" href="{{ t.inline_url }}" target="_blank" rel="noopener noreferrer">Abrir em nova aba</a>
+                      <a class="cv-btn cv-btn--secondary document-inline-actions__btn" href="{{ t.download_pdf_url }}">Baixar PDF</a>
+                    {% endif %}
+                  {% endfor %}
+                {% else %}
+                  <button class="cv-btn cv-btn--secondary document-inline-actions__btn" type="button" data-open-all-termos>Abrir em nova aba</button>
+                  <button class="cv-btn cv-btn--secondary document-inline-actions__btn" type="button" data-download-all-termos>Baixar PDF</button>
+                {% endif %}
+              </span>
+            </span>
+          {% endif %}
         </summary>
         <div class="document-inline-card__body document-inline-card__body--termos">
           {% if di.termos_vazio %}
             <p class="document-inline-empty">{{ di.termos_empty_message }}</p>
           {% else %}
             {% for t in di.termos %}
-              <details class="document-inline-card document-inline-card--nested document-inline-card--lazy" data-lazy-inline>
+              <details class="document-inline-card document-inline-card--nested document-inline-card--lazy" data-lazy-inline data-termo-inline-url="{{ t.inline_url }}" data-termo-download-pdf-url="{{ t.download_pdf_url }}">
                 <summary class="document-inline-card__header">
                   <span class="document-inline-card__title">{{ t.titulo }}</span>
                   {% if t.disponivel %}
                     <span class="document-inline-card__header-end">
                       <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do termo">
-                        <a class="btn btn-secondary app-btn app-btn--secondary document-inline-actions__btn" href="{{ t.inline_url }}" target="_blank" rel="noopener noreferrer">Abrir em nova aba</a>
-                        <a class="btn btn-secondary app-btn app-btn--secondary document-inline-actions__btn" href="{{ t.download_pdf_url }}">Baixar PDF</a>
-                        <a class="btn btn-secondary app-btn app-btn--secondary document-inline-actions__btn" href="{{ t.download_docx_url }}">Baixar DOCX</a>
+                        <a class="cv-btn cv-btn--secondary document-inline-actions__btn" href="{{ t.inline_url }}" target="_blank" rel="noopener noreferrer">Abrir em nova aba</a>
+                        <a class="cv-btn cv-btn--secondary document-inline-actions__btn" href="{{ t.download_pdf_url }}">Baixar PDF</a>
+                        <a class="cv-btn cv-btn--secondary document-inline-actions__btn" href="{{ t.download_docx_url }}">Baixar DOCX</a>
                       </span>
                     </span>
                   {% endif %}
@@ -128,10 +152,20 @@
         </div>
       </details>
     {% endwith %}
+    </div>
   </section>
 
-  <div class="oficio-documentos-grid">
-    <article class="oficio-documentos-card oficio-documentos-card--admin">
+  <section class="cv-wizard-section-card oficio-documentos-summary-section" aria-labelledby="oficio-documentos-summary-title">
+    <header class="cv-wizard-section-header">
+      <div class="cv-wizard-section-header__copy">
+        <h3 class="cv-wizard-section-title" id="oficio-documentos-summary-title">Resumo do ofício</h3>
+        <p class="cv-wizard-section-subtitle">Dados utilizados para montar os documentos desta etapa.</p>
+      </div>
+    </header>
+
+    <div class="cv-wizard-section-body">
+      <div class="oficio-documentos-grid">
+    <section class="oficio-documentos-admin-facts" aria-label="Dados administrativos">
       <header class="oficio-documentos-card__header">
         <div>
           <h4 class="oficio-documentos-card__title">Dados administrativos</h4>
@@ -149,7 +183,7 @@
         </div>
       </header>
       <div class="oficio-documentos-card__body">
-        <dl class="oficio-documentos-facts">
+        <dl class="oficio-documentos-facts oficio-documentos-facts--admin">
           <div class="oficio-documentos-fact">
             <dt>Número do ofício</dt>
             <dd>{{ documentos_ctx.detalhe.numero_formatado }}</dd>
@@ -168,7 +202,7 @@
           </div>
         </dl>
       </div>
-    </article>
+    </section>
 
     <article class="oficio-documentos-card oficio-documentos-card--travellers" aria-label="Viajantes">
       <header class="oficio-documentos-card__header oficio-documentos-travellers__header">
@@ -177,10 +211,6 @@
           <h4 class="oficio-documentos-card__title">Viajantes</h4>
           <p class="oficio-documentos-card__subtitle">Servidores vinculados ao ofício</p>
         </div>
-        <span class="oficio-documentos-count-pill" aria-label="Total de viajantes">
-          {{ documentos_ctx.viajantes_cards|length }}
-          {% if documentos_ctx.viajantes_cards|length == 1 %}viajante{% else %}viajantes{% endif %}
-        </span>
       </header>
       <div class="oficio-documentos-card__body">
         {% with n=documentos_ctx.viajantes_cards|length %}
@@ -217,39 +247,55 @@
       </header>
       <div class="oficio-documentos-card__body">
         {% with t=documentos_ctx.transporte %}
-          <div class="oficio-documentos-vehicle-executive">
-            <section class="oficio-documentos-vehicle-executive__hero" aria-label="Identificação da viatura">
-              <span class="oficio-documentos-vehicle-executive__label">Viatura</span>
-              <strong class="oficio-documentos-vehicle-executive__plate">{{ t.viatura|default:t.placa }}</strong>
-              <span class="oficio-documentos-vehicle-executive__model">{{ t.modelo }}</span>
-            </section>
-            <dl class="oficio-documentos-vehicle-executive__facts" aria-label="Detalhes da viatura">
-              <div>
-                <dt>Tipo</dt>
-                <dd>{{ t.tipo_viatura|default:t.tipo }}</dd>
-              </div>
-              <div>
-                <dt>Combustível</dt>
-                <dd>{{ t.combustivel }}</dd>
-              </div>
-              <div>
-                <dt>Porte/transporte de armas</dt>
-                <dd>{{ t.porte_armas }}</dd>
-              </div>
-              <div>
-                <dt>Unidade</dt>
-                <dd>{{ t.unidade }}</dd>
-              </div>
-            </dl>
-            <section class="oficio-documentos-vehicle-executive__driver" aria-label="Motorista">
-              <span class="oficio-documentos-vehicle-executive__driver-label">Motorista</span>
-              <strong class="oficio-documentos-vehicle-executive__driver-value">{{ t.motorista }}</strong>
-            </section>
+          <div class="oficio-documentos-vehicle-lines">
+            {# Col 1 — Placa + Modelo, span 2 linhas #}
+            <div class="roteiro-editor__summary-item roteiro-editor__summary-item--principal oficio-documentos-viatura-item--principal">
+              <span class="roteiro-editor__summary-label">Placa</span>
+              <span class="roteiro-editor__summary-value oficio-documentos-viatura-placa-value">{{ t.viatura|default:t.placa }}</span>
+              <span class="roteiro-editor__summary-label">Modelo</span>
+              <span class="roteiro-editor__summary-value oficio-documentos-viatura-modelo-value">{{ t.modelo }}</span>
+            </div>
+            {# Col 2 #}
+            <div class="roteiro-editor__summary-item roteiro-editor__summary-item--secondary">
+              <span class="roteiro-editor__summary-label">Tipo</span>
+              <span class="roteiro-editor__summary-value">{{ t.tipo_viatura|default:t.tipo }}</span>
+            </div>
+            <div class="roteiro-editor__summary-item roteiro-editor__summary-item--secondary">
+              <span class="roteiro-editor__summary-label">Porte de arma</span>
+              <span class="roteiro-editor__summary-value">{{ t.porte_armas }}</span>
+            </div>
+            {# Col 3 #}
+            <div class="roteiro-editor__summary-item roteiro-editor__summary-item--secondary">
+              <span class="roteiro-editor__summary-label">Combustível</span>
+              <span class="roteiro-editor__summary-value">{{ t.combustivel }}</span>
+            </div>
+            <div class="roteiro-editor__summary-item roteiro-editor__summary-item--secondary">
+              <span class="roteiro-editor__summary-label">Unidade lotada</span>
+              <span class="roteiro-editor__summary-value">{{ t.unidade }}</span>
+            </div>
+            {% if t.mostrar_motorista_externo %}
+              <section class="oficio-documentos-vehicle-executive__driver oficio-documentos-vehicle-executive__driver--external" aria-label="Motorista carona">
+                <strong class="oficio-documentos-vehicle-executive__driver-value">{{ t.motorista }}</strong>
+                <span class="oficio-documentos-motorista-carona-chip">Motorista carona</span>
+              </section>
+            {% endif %}
           </div>
         {% endwith %}
       </div>
     </article>
 
+      </div>
+    </div>
+  </section>
+
+  <section class="cv-wizard-section-card oficio-documentos-route-section" aria-labelledby="oficio-documentos-route-title">
+    <header class="cv-wizard-section-header">
+      <div class="cv-wizard-section-header__copy">
+        <h3 class="cv-wizard-section-title" id="oficio-documentos-route-title">Roteiro e diárias</h3>
+      </div>
+    </header>
+
+    <div class="cv-wizard-section-body">
     {% if documentos_ctx.roteiro_card %}
       {% with card=documentos_ctx.roteiro_card %}
         <article
@@ -443,6 +489,17 @@
       </article>
     {% endif %}
 
+    </div>
+  </section>
+
+  <section class="cv-wizard-section-card oficio-documentos-justification-section" aria-labelledby="oficio-documentos-justification-title">
+    <header class="cv-wizard-section-header">
+      <div class="cv-wizard-section-header__copy">
+        <h3 class="cv-wizard-section-title" id="oficio-documentos-justification-title">Justificativa</h3>
+      </div>
+    </header>
+
+    <div class="cv-wizard-section-body">
     {% with jr=documentos_ctx.justificativa_resumo %}
       <article class="oficio-documentos-card oficio-documentos-card--justification">
         <header class="oficio-documentos-card__header oficio-documentos-justification__header">
@@ -476,7 +533,8 @@
         </div>
       </article>
     {% endwith %}
-  </div>
+    </div>
+  </section>
 {% endblock %}
 
 {% block wizard_actions %}
@@ -538,5 +596,5 @@
 
 {% block extra_js %}
   {{ block.super }}
-  <script src="{% static 'js/pages/oficios-documentos-inline.js' %}?v=20260512" defer></script>
+  <script src="{% static 'js/pages/oficios-documentos-inline.js' %}?v=20260603" defer></script>
 {% endblock %}

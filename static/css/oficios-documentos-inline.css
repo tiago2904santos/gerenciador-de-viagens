@@ -1,26 +1,251 @@
 .document-inline-stack {
-  margin-bottom: var(--space-6, 1.5rem);
+  margin-bottom: 0;
 }
 
-.document-inline-stack__heading {
-  font-size: var(--font-size-lg, 1.125rem);
-  font-weight: 700;
-  color: var(--color-heading, #071a33);
-  margin: 0 0 var(--space-4, 1rem);
+.oficio-wizard__form:has(.oficio-documentos-preview-section) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-7, 2rem);
+}
+
+.oficio-wizard__form:has(.oficio-documentos-preview-section) .oficio-documentos-pendencias,
+.oficio-wizard__form:has(.oficio-documentos-preview-section) .oficio-documentos-pendencias--alert {
+  order: 0;
+}
+
+.oficio-documentos-summary-section {
+  order: 10;
+}
+
+.oficio-documentos-route-section {
+  order: 20;
+}
+
+.oficio-documentos-justification-section {
+  order: 30;
+}
+
+.oficio-documentos-preview-section {
+  order: 40;
+}
+
+.oficio-wizard__form:has(.oficio-documentos-preview-section) .oficio-wizard__actions {
+  order: 50;
+}
+
+.oficio-wizard__form:has(.oficio-documentos-preview-section) .oficio-documentos-pdf-hint {
+  order: 51;
+}
+
+.oficio-documentos-preview-section__body {
+  display: grid;
+  gap: var(--space-4, 1rem);
+}
+
+.oficio-documentos-summary-section .cv-wizard-section-body {
+  padding-top: 0;
+}
+
+.oficio-documentos-summary-section .oficio-documentos-grid {
+  gap: var(--space-6, 1.5rem);
+  margin: 0;
+}
+
+.oficio-documentos-summary-section .oficio-documentos-grid > * + * {
+  position: relative;
+}
+
+.oficio-documentos-summary-section .oficio-documentos-grid > * + *::before {
+  background: var(--cv-wizard-section-border, var(--color-border-soft, #e3eaf2));
+  content: "";
+  height: 1px;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.oficio-documentos-route-section .cv-wizard-section-body,
+.oficio-documentos-justification-section .cv-wizard-section-body {
+  padding-top: var(--space-5, 1.25rem);
+}
+
+.oficio-documentos-summary-section .oficio-documentos-admin-facts {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  overflow: visible;
+}
+
+.oficio-documentos-summary-section .oficio-documentos-admin-facts > .oficio-documentos-card__header {
+  display: none;
+}
+
+.oficio-documentos-summary-section .oficio-documentos-admin-facts > .oficio-documentos-card__body {
+  padding: var(--space-5) 0 0;
+}
+
+.oficio-documentos-summary-section .oficio-documentos-card,
+.oficio-documentos-route-section .oficio-documentos-route-card,
+.oficio-documentos-justification-section .oficio-documentos-card--justification {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: visible;
+}
+
+.oficio-documentos-summary-section .oficio-documentos-card__header,
+.oficio-documentos-route-section .oficio-documentos-route-card__head,
+.oficio-documentos-justification-section .oficio-documentos-card__header {
+  border-bottom: 0;
+  padding: var(--space-5, 0.75rem) 0 var(--space-1, 0.75rem);
+}
+
+.oficio-documentos-summary-section .oficio-documentos-card__body,
+.oficio-documentos-route-section .oficio-documentos-route-card__body,
+.oficio-documentos-justification-section .oficio-documentos-card__body {
+  padding: 0;
+}
+
+.oficio-documentos-summary-section .oficio-documentos-card__eyebrow,
+.oficio-documentos-summary-section .oficio-documentos-card__subtitle,
+.oficio-documentos-summary-section .oficio-documentos-vehicle-executive__label,
+.oficio-documentos-route-section .oficio-documentos-route-card__eyebrow,
+.oficio-documentos-route-section .oficio-documentos-route-card__subtitle,
+.oficio-documentos-route-section .oficio-documentos-route-card__tagline,
+.oficio-documentos-justification-section .oficio-documentos-card__eyebrow,
+.oficio-documentos-justification-section .oficio-documentos-card__subtitle,
+.oficio-documentos-justification-section .oficio-documentos-model-card__label,
+.oficio-documentos-justification-section .oficio-documentos-antecedence-card__label,
+.oficio-documentos-justification-section .oficio-documentos-justification-text-card__label {
+  display: none;
+}
+
+.oficio-documentos-route-section .oficio-documentos-route-card__title,
+.oficio-documentos-justification-section .oficio-documentos-card__title {
+  font-size: var(--font-size-md, 1rem);
+}
+
+.oficio-documentos-summary-section .oficio-documentos-vehicle-lines {
+  display: grid;
+  gap: var(--space-3, 0.75rem);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: auto auto;
+}
+
+.oficio-documentos-summary-section .oficio-documentos-viatura-item--principal {
+  grid-row: span 2;
+}
+
+/* Cards de resumo da viatura (mesmo padrão que calculadora de diárias) */
+.oficio-documentos-summary-section .roteiro-editor__summary-item {
+  background: var(--color-card-muted);
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-control);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 0.5rem);
+  padding: var(--space-3) var(--space-4);
+}
+
+.oficio-documentos-summary-section .roteiro-editor__summary-item--principal {
+  height: 100%;
+}
+
+.oficio-documentos-summary-section .roteiro-editor__summary-label {
+  color: var(--color-muted);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.oficio-documentos-summary-section .roteiro-editor__summary-value {
+  color: var(--color-heading);
+  font-size: var(--font-size-md, 1rem);
+  font-weight: 800;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.oficio-documentos-summary-section .oficio-documentos-viatura-placa-value {
+  font-size: clamp(2.2rem, 5vw, 3rem);
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  margin-bottom: var(--space-3);
+}
+
+.oficio-documentos-summary-section .oficio-documentos-viatura-modelo-value {
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+/* Coluna direita: dois cards empilhados */
+.oficio-documentos-viatura-secondary-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3, 0.75rem);
+}
+
+.oficio-documentos-viatura-secondary-stack .roteiro-editor__summary-item {
+  flex: 1;
+}
+
+/* Driver externo mantém visual de destaque */
+.oficio-documentos-summary-section .oficio-documentos-vehicle-lines > .oficio-documentos-vehicle-executive__driver {
+  background: var(--color-card-muted);
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-control);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: var(--space-3) var(--space-4);
+}
+
+.oficio-documentos-summary-section .oficio-documentos-vehicle-executive__driver-value {
+  color: var(--color-heading);
+  font-size: clamp(2.2rem, 5vw, 3.4rem);
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  line-height: 0.95;
+}
+
+.oficio-documentos-summary-section .oficio-documentos-vehicle-executive__driver {
+  background: color-mix(in srgb, var(--color-accent, #d9a40f) 9%, var(--color-card-muted));
+  border-color: color-mix(in srgb, var(--color-accent, #d9a40f) 40%, var(--color-border-soft));
+  grid-column: 1 / -1;
+}
+
+.oficio-documentos-summary-section .oficio-documentos-vehicle-executive__driver-label {
+  display: none;
+}
+
+.oficio-documentos-motorista-carona-chip {
+  align-self: flex-start;
+  border: 1px solid color-mix(in srgb, var(--color-accent, #d9a40f) 60%, transparent);
+  border-radius: var(--radius-pill, 999px);
+  color: var(--color-accent, #d9a40f);
+  font-size: var(--font-size-xs, 0.75rem);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  padding: 0.2rem 0.55rem;
+  text-transform: uppercase;
 }
 
 .document-inline-card {
-  border: 1px solid var(--color-border-soft, #e3eaf2);
-  border-radius: 16px;
-  background: var(--color-surface, #fff);
-  margin-bottom: var(--space-3, 0.75rem);
-  box-shadow: var(--shadow-sm, 0 1px 2px rgba(7, 26, 51, 0.06));
+  border: 1px solid var(--cv-wizard-section-border, var(--color-border-soft, #e3eaf2));
+  border-radius: var(--radius-control, 12px);
+  background: var(--surface-form-section, var(--color-surface, #fff));
+  box-shadow: none;
   overflow: hidden;
-  margin: var(--space-5);
+  margin: 0;
 }
 
 .document-inline-card--nested {
-  margin-bottom: var(--space-2, 0.5rem);
+  margin-top: var(--space-3, 0.75rem);
 }
 
 .document-inline-card__header {
@@ -65,7 +290,7 @@
 
 .document-inline-viewer {
   border: 1px solid var(--color-border-soft, #e3eaf2);
-  border-radius: 12px;
+  border-radius: var(--radius-control, 12px);
   overflow: hidden;
   background: var(--color-surface-muted, #f8fafd);
   min-height: 200px;
@@ -104,12 +329,29 @@
 
 .document-inline-actions__btn {
   font-size: var(--font-size-sm, 0.875rem);
-  padding: 0.35rem 0.75rem;
   white-space: nowrap;
   text-decoration: none;
 }
 
 @media (max-width: 480px) {
+  .oficio-documentos-summary-section .oficio-documentos-vehicle-lines {
+    grid-template-columns: 1fr;
+  }
+
+  .oficio-documentos-summary-section .oficio-documentos-viatura-item--principal {
+    grid-row: span 1;
+  }
+
+  .oficio-documentos-summary-section .oficio-documentos-vehicle-executive__driver {
+    grid-column: auto;
+  }
+
+  .oficio-documentos-summary-section .oficio-documentos-vehicle-executive__facts > div:nth-child(1)::after,
+  .oficio-documentos-summary-section .oficio-documentos-vehicle-executive__facts > div:nth-child(4)::before {
+    content: "";
+    margin: 0;
+  }
+
   .document-inline-actions--header {
     width: 100%;
     justify-content: stretch;

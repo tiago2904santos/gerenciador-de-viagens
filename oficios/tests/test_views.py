@@ -139,6 +139,9 @@ class OficioViewsTests(TestCase):
         inline_url = reverse("termos:termo_servidor_pdf_inline", args=[oficio.pk, self.servidor.pk])
         self.assertContains(response, inline_url)
         self.assertContains(response, f'data-src="{inline_url}"')
+        self.assertContains(response, f'data-termo-inline-url="{inline_url}"')
+        self.assertNotContains(response, "data-open-all-termos")
+        self.assertNotContains(response, "data-download-all-termos")
         self.assertContains(
             response,
             reverse("termos:baixar_termo_servidor", args=[oficio.pk, self.servidor.pk, "pdf"]),
@@ -147,6 +150,75 @@ class OficioViewsTests(TestCase):
             response,
             reverse("termos:baixar_termo_servidor", args=[oficio.pk, self.servidor.pk, "docx"]),
         )
+
+    @mock.patch("documentos.services.warm_cache.ensure_document_artifact_cached")
+    @mock.patch("oficios.services.validar_oficio_para_documento", return_value={"status": "complete", "pendencias": []})
+    @mock.patch("oficios.views.validar_oficio_para_documento", return_value={"status": "complete", "pendencias": []})
+    @mock.patch(
+        "oficios.document_generation.get_document_generation_status",
+        return_value={
+            "docx_available": True,
+            "pdf_available": True,
+            "pdf_cached": False,
+            "pdf_engine": "test",
+            "pdf_message": "",
+            "pdf_link_label": "PDF",
+            "documentos_persist_artefatos": False,
+            "oficio_pdf_botoes_assinatura": False,
+        },
+    )
+    def test_wizard_documentos_multiplos_termos_exibe_acoes_em_lote(
+        self,
+        _m_generation,
+        _m_view_val,
+        _m_service_val,
+        _m_cache,
+    ):
+        servidor_2 = Servidor.objects.create(nome="Servidor Teste 2", cargo=self.cargo, cpf="12345678902")
+        oficio = Oficio.objects.create(
+            numero=1,
+            ano=2026,
+            motivo="Motivo",
+            custeio=Oficio.CUSTEIO_UNIDADE_DPC,
+        )
+        oficio.servidores.add(self.servidor, servidor_2)
+        oficio.servidores_termo_autorizacao.add(self.servidor, servidor_2)
+        response = self.client.get(reverse("oficios:wizard_documentos", args=[oficio.pk]))
+        self.assertContains(response, "data-open-all-termos")
+        self.assertContains(response, "data-download-all-termos")
+        self.assertContains(response, "data-termo-inline-url=", count=2)
+        self.assertContains(response, "data-termo-download-pdf-url=", count=2)
+
+    @mock.patch("documentos.services.warm_cache.ensure_document_artifact_cached")
+    def test_wizard_documentos_omite_motorista_do_transporte_quando_esta_no_oficio(self, _m_cache):
+        oficio = Oficio.objects.create(
+            numero=1,
+            ano=2026,
+            motivo="Motivo",
+            motorista=self.servidor,
+            custeio=Oficio.CUSTEIO_UNIDADE_DPC,
+        )
+        oficio.servidores.add(self.servidor)
+        response = self.client.get(reverse("oficios:wizard_documentos", args=[oficio.pk]))
+        self.assertContains(response, "oficio-documentos-traveller-line--motorista")
+        self.assertNotContains(response, "Motorista carona")
+        self.assertNotContains(response, "oficio-documentos-vehicle-executive__driver--external")
+
+    @mock.patch("documentos.services.warm_cache.ensure_document_artifact_cached")
+    def test_wizard_documentos_exibe_motorista_carona_no_transporte_quando_externo(self, _m_cache):
+        motorista = Servidor.objects.create(nome="Motorista Carona", cargo=self.cargo, cpf="12345678903")
+        oficio = Oficio.objects.create(
+            numero=1,
+            ano=2026,
+            motivo="Motivo",
+            motorista=motorista,
+            custeio=Oficio.CUSTEIO_UNIDADE_DPC,
+        )
+        oficio.servidores.add(self.servidor)
+        response = self.client.get(reverse("oficios:wizard_documentos", args=[oficio.pk]))
+        self.assertContains(response, "oficio-documentos-vehicle-executive__driver--external")
+        self.assertContains(response, "Motorista carona")
+        self.assertContains(response, "MOTORISTA CARONA")
 
     @mock.patch("documentos.services.warm_cache.ensure_document_artifact_cached")
     @mock.patch("oficios.services.validar_oficio_para_documento", return_value={"status": "complete", "pendencias": []})

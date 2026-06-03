@@ -134,6 +134,9 @@
   --control-height-sm: 34px;
   --control-height-md: 44px;
   --control-height-lg: 52px;
+  --text-area-height-md: 88px;
+  --text-area-height-lg: 176px;
+  --text-area-height-justificativa: 220px;
   --cv-btn-height: 36px;
   --cv-btn-padding-x: 13px;
   --cv-btn-gap: 5px;

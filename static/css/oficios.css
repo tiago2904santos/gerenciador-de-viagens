@@ -156,13 +156,19 @@
 }
 
 .oficio-wizard .cv-field__control--textarea {
-  height: 88px;
-  min-height: 88px;
+  height: var(--text-area-height-md);
+  min-height: var(--text-area-height-md);
   max-height: none;
   padding-bottom: var(--space-3);
   padding-top: var(--space-3);
   resize: vertical;
   line-height: 1.5;
+}
+
+.justificativa-panel .cv-field__control--textarea {
+  height: var(--text-area-height-justificativa);
+  min-height: var(--text-area-height-lg);
+  margin-bottom: var(--app-space-5);
 }
 
 .oficio-reveal-panel {
@@ -1014,6 +1020,7 @@
 }
 
 .oficio-wizard__actions {
+  background: var(--surface-form-section);
   flex-wrap:  wrap;
   /* Fica por cima dos cards */
   position:   relative;
@@ -1023,6 +1030,7 @@
   padding:    var(--space-4) var(--space-6);
   gap:        var(--space-3);
   /* Fecha o contorno: page-shell já põe border-top, adicionamos os 3 lados restantes */
+  border-top:    1px solid var(--cv-wizard-section-border);
   border-left:   1px solid var(--cv-wizard-section-border);
   border-right:  1px solid var(--cv-wizard-section-border);
   border-bottom: 1px solid var(--cv-wizard-section-border);
@@ -1428,9 +1436,79 @@
 /* --------------------------------------------------------------------------
    8. Motivo (Oficios) + Modelos de motivo
    -------------------------------------------------------------------------- */
+.justificativa-panel {
+  background: var(--theme-surface-card);
+  border: 1px solid var(--theme-border-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-5);
+}
+
+.justificativa-panel .cv-field-panel__header {
+  border-bottom: 1px solid var(--theme-border-card);
+  display: grid;
+  gap: var(--space-1);
+  padding-bottom: var(--space-3);
+}
+
+.justificativa-panel .cv-field-panel__eyebrow {
+  color: var(--color-help);
+  font-size: var(--font-size-xs);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.justificativa-panel .cv-field-panel__title {
+  color: var(--theme-text-heading);
+  font-size: var(--font-size-lg);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.justificativa-panel .cv-field-panel__description {
+  color: var(--theme-text-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.justificativa-panel .cv-field-panel__body {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.justificativa-panel .cv-field-grid {
+  gap: var(--space-6);
+}
+
+.justificativa-panel .cv-field-grid > .field + .field {
+  margin-top: var(--space-6);
+}
+
+.justificativa-panel .cv-field {
+  min-width: 0;
+}
+
+.justificativa-panel .cv-field-with-action {
+  width: 100%;
+}
+
+.justificativa-panel .cv-field-panel__note {
+  border-top: 1px solid var(--theme-border-card);
+  color: var(--theme-text-muted);
+  padding-top: var(--space-3);
+}
+
+.justificativa-panel .cv-field-panel__note .field-help {
+  margin-bottom: 0;
+}
+
 .motivo-card {
   display: grid;
-  gap: var(--space-3);
+  gap: var(--space-4);
 }
 
 .motivo-card__header {
@@ -1457,6 +1535,15 @@
   color: var(--color-muted);
   font-size: var(--font-size-sm);
   margin: 0;
+}
+
+.motivo-card__footer {
+  border-top: 1px solid var(--color-border-soft);
+  padding-top: var(--space-3);
+}
+
+.motivo-card__footer .field-help {
+  margin-bottom: 0;
 }
 
 .motivo-card__actions {
@@ -2097,6 +2184,21 @@ html[data-theme="light"] .oficio-documentos-traveller-line--motorista .oficio-do
 
 .oficio-documentos-card__body {
   padding: var(--space-4);
+}
+
+.oficio-documentos-admin-facts {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  overflow: visible;
+}
+
+.oficio-documentos-admin-facts > .oficio-documentos-card__header {
+  display: none;
+}
+
+.oficio-documentos-admin-facts > .oficio-documentos-card__body {
+  padding: 0;
 }
 
 .oficio-documentos-facts {

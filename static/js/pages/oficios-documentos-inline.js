@@ -8,6 +8,49 @@
     });
   });
 
+  function collectTermUrls(root, attr) {
+    return Array.prototype.slice
+      .call(root.querySelectorAll("[" + attr + "]"))
+      .map(function (el) {
+        return el.getAttribute(attr);
+      })
+      .filter(Boolean);
+  }
+
+  function clickUrls(urls, options) {
+    var opts = options || {};
+    urls.forEach(function (url, index) {
+      window.setTimeout(function () {
+        var link = document.createElement("a");
+        link.href = url;
+        if (opts.newTab) {
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+        }
+        link.style.display = "none";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      }, index * 120);
+    });
+  }
+
+  document.querySelectorAll("[data-open-all-termos]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var card = btn.closest(".document-inline-card--termos");
+      if (!card) return;
+      clickUrls(collectTermUrls(card, "data-termo-inline-url"), { newTab: true });
+    });
+  });
+
+  document.querySelectorAll("[data-download-all-termos]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var card = btn.closest(".document-inline-card--termos");
+      if (!card) return;
+      clickUrls(collectTermUrls(card, "data-termo-download-pdf-url"));
+    });
+  });
+
   function hydrateIframe(root) {
     var frame = root.querySelector(".document-inline-viewer__frame[data-src]");
     if (!frame) return;

@@ -1244,6 +1244,15 @@ html[data-theme="light"] {
   width: 100%;
 }
 
+textarea.cv-field-control__input {
+  height: var(--text-area-height-md);
+  min-height: var(--text-area-height-md);
+  padding-bottom: var(--space-3);
+  padding-top: var(--space-3);
+  resize: vertical;
+  line-height: 1.5;
+}
+
 .cv-field-control__select {
   appearance: none;
   padding-right: var(--space-6);

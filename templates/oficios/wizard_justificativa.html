@@ -2,44 +2,21 @@
 {% load static %}
 
 {% block wizard_content %}
-  <div class="form-section motivo-card">
-    <div class="motivo-card__header">
-      <div class="motivo-card__heading">
-        <h3 class="motivo-card__title">Justificativa</h3>
-        <p class="motivo-card__description">Use um modelo salvo ou descreva a justificativa da viagem.</p>
-      </div>
-      <div class="motivo-card__actions">
-        {% include "components/buttons/action_button.html" with href=modelos_justificativa_url label="Gerenciar modelos" variant="secondary" only %}
+  <section class="cv-field-panel justificativa-panel" aria-labelledby="justificativa-panel-title">
+    <div class="cv-field-panel__header">
+      <h3 class="cv-field-panel__title" id="justificativa-panel-title">Justificativa</h3>
+    </div>
+
+    <div class="cv-field-panel__body">
+      <div class="cv-field-grid cv-field-grid--1">
+        {% include "components/forms/input_with_action.html" with field=form.modelo action_url=modelos_justificativa_url action_label="Gerenciar modelos" only %}
+        {% include "components/forms/form_field.html" with field=form.texto label="Justificativa" only %}
       </div>
     </div>
-    <div class="motivo-card__body app-form-grid-panel">
-      <div class="motivo-card__model field">
-        <label for="{{ form.modelo.id_for_label }}">Modelo de justificativa</label>
-        <select
-          name="{{ form.modelo.html_name }}"
-          id="{{ form.modelo.id_for_label }}"
-          class="form-select"
-          data-modelo-justificativa-select="true"
-        >
-          <option value="">Selecione um modelo (opcional)</option>
-          {% for modelo in form.fields.modelo.queryset %}
-            <option
-              value="{{ modelo.pk }}"
-              data-texto-justificativa="{{ modelo.texto|escape }}"
-              {% if form.modelo.value|stringformat:'s' == modelo.pk|stringformat:'s' %}selected{% endif %}
-            >{{ modelo.nome }}</option>
-          {% endfor %}
-        </select>
-        {% if form.modelo.errors %}<p class="field-error">{{ form.modelo.errors|striptags }}</p>{% endif %}
-      </div>
-      <div class="motivo-card__textarea">
-        {% include "components/forms/form_field.html" with field=form.texto label="Justificativa" help_text=justificativa_ctx.help_texto only %}
-      </div>
-    </div>
-  </div>
+  </section>
 {% endblock %}
 
 {% block extra_js %}
   {{ block.super }}
-  <script src="{% static 'js/pages/oficios-justificativa-wizard.js' %}?v=20260512" defer></script>
+  <script src="{% static 'js/pages/oficios-justificativa-wizard.js' %}?v=20260603" defer></script>
 {% endblock %}

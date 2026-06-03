@@ -273,6 +273,11 @@
   color: var(--route-field-text);
 }
 
+.app-form-shell textarea,
+.form-shell textarea {
+  min-height: var(--text-area-height-md);
+}
+
 .app-form-shell .oficio-equipe-picker__input {
   border-style: solid;
   border-width: 1px;

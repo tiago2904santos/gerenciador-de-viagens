@@ -136,15 +136,24 @@ def _montar_viajantes_cards_documentos(oficio):
 def _montar_transporte_resumo_documentos(oficio):
     """Strings formatadas para o cartão Transporte na etapa documentos (sem lógica no template)."""
     motorista = _motorista_label_oficio(oficio)
+    motorista_no_oficio = bool(
+        oficio.motorista_id and oficio.servidores.filter(pk=oficio.motorista_id).exists(),
+    )
+    motorista_externo = bool(
+        motorista != "â€”"
+        and (
+            oficio.motorista_modo == Oficio.MOTORISTA_MODO_MANUAL
+            or (oficio.motorista_id and not motorista_no_oficio)
+        )
+    )
     porte = "Sim" if oficio.porte_transporte_armas else "Não"
-    unidade = str(oficio.solicitante) if oficio.solicitante_id else "—"
-
     if oficio.viatura_id:
         v = oficio.viatura
         placa = v.placa_formatada
         modelo = (v.modelo or "").strip() or "—"
         tipo = v.get_tipo_display() if (v.tipo or "").strip() else "—"
         combustivel = str(v.combustivel) if v.combustivel_id else "—"
+        unidade = str(v.unidade) if v.unidade_id else (str(oficio.solicitante) if oficio.solicitante_id else "—")
     else:
         placa = _viatura_placa_curta_oficio(oficio)
         modelo = (oficio.transporte_modelo_manual or "").strip() or "—"
@@ -153,6 +162,7 @@ def _montar_transporte_resumo_documentos(oficio):
         combustivel = (
             str(oficio.transporte_combustivel_manual) if oficio.transporte_combustivel_manual_id else "—"
         )
+        unidade = str(oficio.solicitante) if oficio.solicitante_id else "—"
 
     return {
         "viatura": placa,
@@ -164,6 +174,7 @@ def _montar_transporte_resumo_documentos(oficio):
         "porte_armas": porte,
         "unidade": unidade,
         "motorista": motorista,
+        "mostrar_motorista_externo": motorista_externo,
     }
 
 

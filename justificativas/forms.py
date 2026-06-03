@@ -5,6 +5,21 @@ from .models import ModeloJustificativa
 from .selectors import listar_modelos_justificativa
 
 
+class ModeloJustificativaSelect(forms.Select):
+    def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+        option = super().create_option(name, value, label, selected, index, subindex=subindex, attrs=attrs)
+        modelo = getattr(value, "instance", None)
+        if modelo is None:
+            return option
+
+        option["attrs"].update(
+            {
+                "data-texto-justificativa": (modelo.texto or "").strip(),
+            },
+        )
+        return option
+
+
 class JustificativaOficioForm(forms.ModelForm):
     """Formulário da etapa de justificativa no wizard do ofício."""
 
@@ -12,11 +27,16 @@ class JustificativaOficioForm(forms.ModelForm):
         model = Justificativa
         fields = ("modelo", "texto")
         widgets = {
-            "modelo": forms.Select(attrs={"class": "form-select app-form-control"}),
+            "modelo": ModeloJustificativaSelect(
+                attrs={
+                    "class": "form-select cv-field__control cv-field__control--select",
+                    "data-modelo-justificativa-select": "true",
+                },
+            ),
             "texto": forms.Textarea(
                 attrs={
-                    "class": "form-control app-form-control",
-                    "rows": 8,
+                    "class": "cv-field__control cv-field__control--textarea",
+                    "rows": 6,
                     "placeholder": "",
                     "data-justificativa-textarea": "true",
                 }
