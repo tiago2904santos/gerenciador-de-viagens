@@ -6,51 +6,45 @@
 {% block title %}{{ page_title }}{% endblock %}
 {% block content %}
   <div class="page-shell page-shell--standard">
-    {% include "components/ui/headers/header_band_status.html" with eyebrow="ROTEIROS" title=page_title only %}
+    {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="ROTEIROS" title=page_title icon_label="RT" module_label="Roteiros" back_label="Voltar para lista" back_url=back_url only %}
 
-    <section class="main-form-panel roteiro-detail">
-      <div class="form-section">
-        {% include "components/ui/layouts/form_section.html" with title="Sede e resumo" description="Dados persistidos conforme o fluxo anterior (sedes, trechos e diárias)." only %}
-        {% include "components/domain/resumo_rota.html" with roteiro=roteiro trechos=trechos %}
-      </div>
+    <main class="main-form-panel">
+      {% include "components/ui/layouts/form_section.html" with title="Sede e resumo" description="Dados persistidos conforme o fluxo anterior (sedes, trechos e diárias)." section_id="roteiro-detail-sede" only %}
+      {% include "components/domain/resumo_rota.html" with roteiro=roteiro trechos=trechos %}
+      </section>
 
-      <div class="form-section">
-        {% include "components/ui/layouts/form_section.html" with title="Destinos (ordem)" only %}
-        {% if destinos_detalhe %}
-          <ol class="roteiro-sequencia">
-            {% for d in destinos_detalhe %}
-              <li>{{ d.ordem }}. {{ d.label }}</li>
-            {% endfor %}
-          </ol>
-        {% else %}
-          <p class="text-muted">Nenhum destino cadastrado.</p>
-        {% endif %}
-      </div>
+      {% include "components/ui/layouts/form_section.html" with title="Destinos (ordem)" section_id="roteiro-detail-destinos" only %}
+      {% if destinos_detalhe %}
+        <ol class="roteiro-sequencia">
+          {% for d in destinos_detalhe %}
+            <li>{{ d.ordem }}. {{ d.label }}</li>
+          {% endfor %}
+        </ol>
+      {% else %}
+        <p style="color: var(--color-muted); margin: 0">Nenhum destino cadastrado.</p>
+      {% endif %}
+      </section>
 
-      <div class="form-section">
-        {% include "components/ui/layouts/form_section.html" with title="Trechos" only %}
-        {% if trechos %}
-          <div class="roteiro-sequencia" role="list">
-            {% for trecho in trechos %}
-              {% include "components/domain/trecho_card.html" with trecho=trecho %}
-            {% endfor %}
-          </div>
-        {% else %}
-          <div class="empty-state roteiro-detail__empty">
-            <p>Nenhum trecho persistido.</p>
-          </div>
-        {% endif %}
-      </div>
-
+      {% include "components/ui/layouts/form_section.html" with title="Trechos" section_id="roteiro-detail-trechos" only %}
+      {% if trechos %}
+        <div class="roteiro-sequencia" role="list">
+          {% for trecho in trechos %}
+            {% include "components/domain/trecho_card.html" with trecho=trecho %}
+          {% endfor %}
+        </div>
+      {% else %}
+        {% include "components/ui/feedback/empty_state.html" with message="Nenhum trecho persistido." only %}
+      {% endif %}
       <footer class="footer-actions">
         <div class="footer-actions__secondary">
-          {% include "components/ui/buttons/button.html" with label="Voltar" variant="back" icon="arrow-left" href=back_url only %}
+          {% include "components/ui/buttons/button.html" with href=back_url label="Voltar" variant="back" icon="arrow-left" only %}
         </div>
         <div class="footer-actions__primary">
-          {% include "components/ui/buttons/button.html" with label="Editar" variant="primary" icon="edit" href=edit_url only %}
-          {% include "components/ui/buttons/button.html" with label="Excluir" variant="danger" icon="trash" href=delete_url only %}
+          {% include "components/ui/buttons/button.html" with href=delete_url label="Excluir" variant="danger" icon="trash" only %}
+          {% include "components/ui/buttons/button.html" with href=edit_url label="Editar" variant="primary" icon="edit" only %}
         </div>
       </footer>
-    </section>
+      </section>
+    </main>
   </div>
 {% endblock %}

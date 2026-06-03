@@ -3,17 +3,20 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block content %}
-  <div class="app-page">
-    <div class="app-page__shell">
-      <h1 class="app-page__title">{{ page_title }}</h1>
-      <p class="app-page__description">{{ page_description }}</p>
-      <p>
-        {% include "components/ui/buttons/button.html" with href=oficios_url label="Ir para ofícios" variant="primary" only %}
-      </p>
-      <p class="text-muted">
-        Com um ofício completo, use os links na etapa <strong>Documentos</strong> ou as rotas
-        <code>/termos/oficio/&lt;id&gt;/…</code> para preview, download por servidor e lote ZIP.
-      </p>
-    </div>
+  <div class="page-shell page-shell--standard-simple">
+    {% include "components/ui/headers/header_stack_simple.html" with eyebrow="OFÍCIOS" title=page_title description=page_description icon_label="TM" module_label="Termos" only %}
+    <main class="main-form-panel">
+      {% include "components/ui/layouts/form_section.html" with title="Como usar" description="Os termos são gerados a partir de ofícios completos." section_id="termos-info-section" only %}
+      <div class="field-grid">
+        <div class="field-size-4">
+          <p style="margin: 0 0 var(--space-4); color: var(--color-muted)">
+            Com um ofício completo, use os links na etapa <strong>Documentos</strong> ou as rotas
+            <code>/termos/oficio/&lt;id&gt;/…</code> para preview, download por servidor e lote ZIP.
+          </p>
+          {% include "components/ui/buttons/button.html" with href=oficios_url label="Ir para ofícios" variant="primary" icon="arrow-right" icon_after=True only %}
+        </div>
+      </div>
+      </section>
+    </main>
   </div>
 {% endblock %}

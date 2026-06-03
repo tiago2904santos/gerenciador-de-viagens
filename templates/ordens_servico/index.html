@@ -3,11 +3,10 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block content %}
-  <div class="app-page">
-    <div class="app-page__shell">
-      <div class="app-page__list-card app-page__list-card--placeholder">
-        {% include "components/feedback/module_placeholder.html" with title=page_title description=page_description eyebrow="Documentos" status="Planejado" status_variant="warning" dep_1="Consolidar contratos entre ofício e ordem de serviço" dep_2="Definir regras de execução e encerramento" dep_3="Padronizar geração documental com assinaturas" only %}
-      </div>
-    </div>
+  <div class="page-shell page-shell--standard-simple">
+    {% include "components/ui/headers/header_stack_simple.html" with eyebrow="DOCUMENTOS" title=page_title description=page_description icon_label="OS" module_label="Ordens de Serviço" only %}
+    <main class="main-form-panel">
+      {% include "components/feedback/module_placeholder.html" with title=page_title description=page_description eyebrow="Documentos" status="Planejado" status_variant="warning" dep_1="Consolidar contratos entre ofício e ordem de serviço" dep_2="Definir regras de execução e encerramento" dep_3="Padronizar geração documental com assinaturas" only %}
+    </main>
   </div>
 {% endblock %}

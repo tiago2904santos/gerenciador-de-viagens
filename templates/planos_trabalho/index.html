@@ -4,11 +4,10 @@
 
 {% block content %}
   {% url "roteiros:index" as cta_url %}
-  <div class="app-page">
-    <div class="app-page__shell">
-      <div class="app-page__list-card app-page__list-card--placeholder">
-        {% include "components/feedback/module_placeholder.html" with title=page_title description=page_description eyebrow="Fluxos" status="Depende do núcleo documental" status_variant="warning" dep_1="Consolidar motor de etapas do plano de trabalho" dep_2="Integrar base de roteiros e servidores" dep_3="Definir contratos de assinatura por documento" cta_label="Abrir Roteiros" cta_url=cta_url only %}
-      </div>
-    </div>
+  <div class="page-shell page-shell--standard-simple">
+    {% include "components/ui/headers/header_stack_simple.html" with eyebrow="DOCUMENTOS" title=page_title description=page_description icon_label="PT" module_label="Planos de Trabalho" only %}
+    <main class="main-form-panel">
+      {% include "components/feedback/module_placeholder.html" with title=page_title description=page_description eyebrow="Fluxos" status="Depende do núcleo documental" status_variant="warning" dep_1="Consolidar motor de etapas do plano de trabalho" dep_2="Integrar base de roteiros e servidores" dep_3="Definir contratos de assinatura por documento" cta_label="Abrir Roteiros" cta_url=cta_url only %}
+    </main>
   </div>
 {% endblock %}

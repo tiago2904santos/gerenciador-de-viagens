@@ -1028,12 +1028,12 @@
   border-bottom: 1px solid var(--cv-wizard-section-border);
 }
 
-/* Botões do footer iguais aos botões de ação do header */
+/* Botões do footer: altura padrão do sistema de botões */
 .oficio-wizard__actions .cv-btn {
   font-size:  var(--font-size-sm);
-  height:     var(--control-height-sm);
-  min-height: var(--control-height-sm);
-  max-height: var(--control-height-sm);
+  height:     var(--cv-btn-height);
+  min-height: var(--cv-btn-height);
+  max-height: var(--cv-btn-height);
   padding:    0 var(--space-4);
 }
 

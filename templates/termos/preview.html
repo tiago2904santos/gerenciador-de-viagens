@@ -1,27 +1,29 @@
 {% extends "base.html" %}
 {% block title %}{{ page_title }}{% endblock %}
 {% block content %}
-  <div class="app-page">
-    <div class="app-page__shell">
-      <h1 class="app-page__title">{{ page_title }}</h1>
-      <p class="app-page__description">
-        <a href="{% url 'oficios:dados_viajantes' oficio.pk %}">Voltar à edição do ofício</a>
-        · <a href="?format=json">JSON</a>
-      </p>
-      {% if preview.erro %}
-        <p class="text-danger">{{ preview.erro }}</p>
-      {% else %}
-        <section class="app-panel">
-          <h2>Servidores com Termo de Autorização</h2>
-          <ul>
-            {% for servidor in preview.servidores %}
-              <li>{{ servidor.nome }}</li>
-            {% empty %}
-              <li>Nenhum servidor selecionado para Termo de Autorização neste ofício.</li>
-            {% endfor %}
-          </ul>
-        </section>
-      {% endif %}
-    </div>
+  <div class="page-shell page-shell--standard-simple">
+    {% url "oficios:dados_viajantes" oficio.pk as oficio_url %}
+    {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="OFÍCIOS" title=page_title icon_label="TM" module_label="Termos" back_label="Voltar ao ofício" back_url=oficio_url only %}
+    <main class="main-form-panel">
+      {% include "components/ui/layouts/form_section.html" with title="Pré-visualização" section_id="termos-preview-section" only %}
+      <div class="field-grid">
+        <div class="field-size-4">
+          {% if preview.erro %}
+            {% include "components/ui/feedback/alert.html" with variant="danger" message=preview.erro only %}
+          {% else %}
+            <p class="section-header__description" style="margin: 0 0 var(--space-3)"><strong>Servidores com Termo de Autorização</strong></p>
+            <ul style="margin: 0 0 var(--space-4); padding-left: var(--space-5); color: var(--color-muted)">
+              {% for servidor in preview.servidores %}
+                <li>{{ servidor.nome }}</li>
+              {% empty %}
+                <li>Nenhum servidor selecionado para Termo de Autorização neste ofício.</li>
+              {% endfor %}
+            </ul>
+            {% include "components/ui/buttons/button.html" with href="?format=json" label="Ver JSON" variant="secondary" icon="code" only %}
+          {% endif %}
+        </div>
+      </div>
+      </section>
+    </main>
   </div>
 {% endblock %}

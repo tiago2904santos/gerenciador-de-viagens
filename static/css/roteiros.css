@@ -3083,9 +3083,9 @@ html[data-theme="light-dark"] .roteiro-editor input[type="checkbox"] {
 
 .roteiro-mapa__canvas-head .cv-btn {
   font-size: var(--font-size-xs);
-  height: var(--control-height-sm);
-  max-height: var(--control-height-sm);
-  min-height: var(--control-height-sm);
+  height: var(--cv-btn-height);
+  max-height: var(--cv-btn-height);
+  min-height: var(--cv-btn-height);
   padding: 0 var(--space-3);
 }
 

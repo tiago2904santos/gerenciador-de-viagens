@@ -4,11 +4,10 @@
 
 {% block content %}
   {% url "roteiros:index" as cta_url %}
-  <div class="app-page">
-    <div class="app-page__shell">
-      <div class="app-page__list-card app-page__list-card--placeholder">
-        {% include "components/feedback/module_placeholder.html" with title=page_title description=page_description eyebrow="Eventos" status="Em preparação" status_variant="success" dep_1="Definir vínculo opcional com documentos e ofícios" dep_2="Consolidar regras de agrupamento por evento" dep_3="Conectar agenda operacional com roteiros" cta_label="Abrir Roteiros" cta_url=cta_url only %}
-      </div>
-    </div>
+  <div class="page-shell page-shell--standard-simple">
+    {% include "components/ui/headers/header_stack_simple.html" with eyebrow="EVENTOS" title=page_title description=page_description icon_label="EV" module_label="Eventos" only %}
+    <main class="main-form-panel">
+      {% include "components/feedback/module_placeholder.html" with title=page_title description=page_description eyebrow="Eventos" status="Em preparação" status_variant="success" dep_1="Definir vínculo opcional com documentos e ofícios" dep_2="Consolidar regras de agrupamento por evento" dep_3="Conectar agenda operacional com roteiros" cta_label="Abrir Roteiros" cta_url=cta_url only %}
+    </main>
   </div>
 {% endblock %}

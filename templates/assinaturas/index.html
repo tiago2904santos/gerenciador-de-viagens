@@ -4,11 +4,10 @@
 
 {% block content %}
   {% url "cadastros:configuracao" as cta_url %}
-  <div class="app-page">
-    <div class="app-page__shell">
-      <div class="app-page__list-card app-page__list-card--placeholder">
-        {% include "components/feedback/module_placeholder.html" with title=page_title description=page_description eyebrow="Integridade" status="Depende do núcleo documental" status_variant="warning" dep_1="Consolidar trilha de assinatura por tipo documental" dep_2="Definir validação de estado e ordem de assinatura" dep_3="Integrar carimbos finais de emissão" cta_label="Abrir Configurações de assinatura" cta_url=cta_url only %}
-      </div>
-    </div>
+  <div class="page-shell page-shell--standard-simple">
+    {% include "components/ui/headers/header_stack_simple.html" with eyebrow="INTEGRIDADE" title=page_title description=page_description icon_label="AS" module_label="Assinaturas" only %}
+    <main class="main-form-panel">
+      {% include "components/feedback/module_placeholder.html" with title=page_title description=page_description eyebrow="Integridade" status="Depende do núcleo documental" status_variant="warning" dep_1="Consolidar trilha de assinatura por tipo documental" dep_2="Definir validação de estado e ordem de assinatura" dep_3="Integrar carimbos finais de emissão" cta_label="Abrir Configurações de assinatura" cta_url=cta_url only %}
+    </main>
   </div>
 {% endblock %}
