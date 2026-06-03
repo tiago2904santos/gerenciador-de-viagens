@@ -218,7 +218,6 @@ export function buildTrechoCard(trecho, value, esc, formatDurationInput) {
       esc
     ) +
     '</div>' +
-    '<div class="wizard-inner-section roteiro-trecho-card__time-section">' +
     '<div class="field-grid field-grid--cols-3 oficio-roteiro-time-calc-grid roteiro-time-calc-grid roteiro-trecho-card__time-grid">' +
     '<div class="field cv-field field-size-1">' +
     '<label class="cv-field__label">Tempo de viagem</label>' +
@@ -249,7 +248,7 @@ export function buildTrechoCard(trecho, value, esc, formatDurationInput) {
     '<div class="field cv-field cv-field--readonly field-size-1">' +
     '<label class="cv-field__label">Tempo total</label>' +
     '<input type="text" class="cv-field__control trecho-tempo-total" value="" readonly tabindex="-1" aria-readonly="true">' +
-    '</div></div></div>' +
+    '</div></div>' +
     '<input type="hidden" name="trecho_' +
     o +
     '_distancia_km" value="' +

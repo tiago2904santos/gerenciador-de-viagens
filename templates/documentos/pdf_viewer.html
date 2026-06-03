@@ -18,24 +18,24 @@
   >
     <header class="doc-pdf-toolbar" role="toolbar" aria-label="Ferramentas do visualizador">
       <div class="doc-pdf-toolbar__left">
-        <button type="button" class="btn btn-secondary app-btn app-btn--secondary doc-pdf-toolbar__btn" id="doc-pdf-back" aria-label="Voltar">Voltar</button>
+        <button type="button" class="cv-btn cv-btn--secondary doc-pdf-toolbar__btn" id="doc-pdf-back" aria-label="Voltar">Voltar</button>
         <span class="doc-pdf-toolbar__title" title="{{ pdf_filename }}">{{ pdf_filename }}</span>
       </div>
       <div class="doc-pdf-toolbar__center">
-        <button type="button" class="btn btn-secondary app-btn app-btn--secondary doc-pdf-toolbar__btn" id="doc-pdf-prev" aria-label="Página anterior">Anterior</button>
+        <button type="button" class="cv-btn cv-btn--secondary doc-pdf-toolbar__btn" id="doc-pdf-prev" aria-label="Página anterior">Anterior</button>
         <span class="doc-pdf-toolbar__page" id="doc-pdf-page-label" aria-live="polite">—</span>
-        <button type="button" class="btn btn-secondary app-btn app-btn--secondary doc-pdf-toolbar__btn" id="doc-pdf-next" aria-label="Página seguinte">Seguinte</button>
+        <button type="button" class="cv-btn cv-btn--secondary doc-pdf-toolbar__btn" id="doc-pdf-next" aria-label="Página seguinte">Seguinte</button>
         <label class="doc-pdf-zoom">
           <span class="doc-pdf-zoom__label">Zoom</span>
           <input type="range" id="doc-pdf-zoom" min="50" max="200" value="100" aria-valuemin="50" aria-valuemax="200" aria-valuenow="100" />
         </label>
       </div>
       <div class="doc-pdf-toolbar__right">
-        <a class="btn btn-secondary app-btn app-btn--secondary doc-pdf-toolbar__btn" href="{{ pdf_conteudo_url }}" target="_blank" rel="noopener">Abrir PDF</a>
-        <a class="btn btn-secondary app-btn app-btn--secondary doc-pdf-toolbar__btn" href="{{ pdf_conteudo_url }}" download="{{ pdf_filename }}">Descarregar</a>
-        <button type="button" class="btn btn-secondary app-btn app-btn--secondary doc-pdf-toolbar__btn" id="doc-pdf-print">Imprimir</button>
+        <a class="cv-btn cv-btn--secondary doc-pdf-toolbar__btn" href="{{ pdf_conteudo_url }}" target="_blank" rel="noopener">Abrir PDF</a>
+        <a class="cv-btn cv-btn--secondary doc-pdf-toolbar__btn" href="{{ pdf_conteudo_url }}" download="{{ pdf_filename }}">Descarregar</a>
+        <button type="button" class="cv-btn cv-btn--secondary doc-pdf-toolbar__btn" id="doc-pdf-print">Imprimir</button>
         {% if share_temporario_url %}
-          <button type="button" class="btn btn-secondary app-btn app-btn--secondary doc-pdf-toolbar__btn" id="doc-pdf-copy-share" type="button" data-share-url="{{ share_temporario_url }}">Copiar link temporário</button>
+          <button type="button" class="cv-btn cv-btn--secondary doc-pdf-toolbar__btn" id="doc-pdf-copy-share" type="button" data-share-url="{{ share_temporario_url }}">Copiar link temporário</button>
         {% endif %}
       </div>
     </header>

@@ -1910,7 +1910,11 @@ html[data-theme="light-light"] .cv-date-picker .cv-date-picker__day--multi-singl
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-  padding: var(--space-4) var(--space-5) var(--space-5);
+  padding: var(--space-4) var(--space-5);
+}
+
+#retorno-card {
+  padding-bottom: 0;
 }
 
 .roteiro-trecho-card__route-row {
@@ -2111,14 +2115,6 @@ html[data-theme="light-light"] .cv-date-picker .cv-date-picker__day--multi-singl
 .roteiro-editor--avulso #retorno-card .form-control[readonly] {
   background: var(--route-field-disabled-bg);
   color: var(--route-field-disabled-text);
-}
-
-.roteiro-editor--avulso .roteiro-time-calc-grid {
-  background: var(--route-card-inner-bg);
-  border: solid 1px var(--route-card-inner-border);
-  border-radius: var(--radius-md);
-  gap: calc(var(--space-3) + 2px);
-  padding: var(--space-5);
 }
 
 .roteiro-editor--avulso .oficio-roteiro-trecho-card .card-header {
@@ -2380,6 +2376,12 @@ html[data-theme="light-light"] .cv-date-picker .cv-date-picker__day--multi-singl
 
 .roteiro-editor--avulso .roteiro-editor__actions {
   order: 8;
+}
+
+/* Footer integrado ao card de diárias */
+.roteiro-editor__section--diarias > .footer-actions {
+  border-top:     1px solid var(--cv-wizard-section-border);
+  padding:        var(--footer-actions-padding-y) var(--footer-actions-padding-x);
 }
 
 .roteiro-editor--avulso .roteiro-editor__section:not(.roteiro-editor__reference-block) > .roteiro-editor__section-header .roteiro-editor__section-title {

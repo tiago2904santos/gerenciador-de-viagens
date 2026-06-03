@@ -419,7 +419,7 @@
   align-items: center;
   background: var(--route-card-bg);
   border: 1px solid var(--route-section-border);
-  border-radius: var(--radius-md);
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-3);

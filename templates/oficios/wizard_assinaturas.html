@@ -181,7 +181,10 @@
 
     <footer class="footer-actions assinaturas-wizard-footer form-actions app-form-actions">
       <div class="footer-actions__secondary">
-        <a class="btn btn-secondary app-btn app-btn--secondary cv-btn cv-btn--secondary" href="{% url 'oficios:wizard_documentos' oficio.pk %}">Voltar para documentos</a>
+        <a class="cv-btn cv-btn--back" href="{% url 'oficios:wizard_documentos' oficio.pk %}">
+          <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="arrow-left" only %}</span>
+          <span>Voltar para documentos</span>
+        </a>
       </div>
     </footer>
   </div>
