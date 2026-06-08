@@ -1,6 +1,6 @@
 {# Card 4 — Motorista (aparece quando viatura selecionada + sem driver na equipe) #}
 <section
-  class="cv-wizard-section-card oficio-reveal-panel{% if show_motorista_card %} is-open is-wizard-trailing-card{% endif %}{% if not show_motorista_card %} form-field--hidden{% endif %}"
+  class="cv-wizard-section-card oficio-reveal-panel{% if show_motorista_card %} is-open{% endif %}{% if not show_motorista_card %} form-field--hidden{% endif %}"
   aria-labelledby="oficio-wizard-motorista-title"
   data-oficio-driver-external-card
   {% if not show_motorista_card %}hidden{% endif %}
@@ -50,4 +50,7 @@
       </div>
     </div>
   </div>
+  {% if show_motorista_card %}
+    {% include "components/ui/layouts/card_footer_section.html" with primary_label="Avançar" primary_action="wizard_next" only %}
+  {% endif %}
 </section>

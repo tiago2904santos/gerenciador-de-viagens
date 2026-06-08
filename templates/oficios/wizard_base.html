@@ -4,7 +4,7 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260527l">
+  <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260608b">
 {% endblock %}
 
 {% block content %}
@@ -32,10 +32,6 @@
         {% endif %}
 
         {% block wizard_content %}{% endblock %}
-
-        {% block wizard_actions %}
-          {% include "oficios/partials/wizard_actions.html" with wizard_footer_mode=wizard_footer_mode wizard_back_url=wizard_back_url wizard_back_label=wizard_back_label oficio=oficio wizard_finalizar=wizard_finalizar oficio_completo=oficio_completo|default:False only %}
-        {% endblock %}
 
         {% if wizard_use_outer_form != False %}
           </form>

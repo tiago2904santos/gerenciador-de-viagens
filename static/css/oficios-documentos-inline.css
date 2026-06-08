@@ -5,7 +5,7 @@
 .oficio-wizard__form:has(.oficio-documentos-preview-section) {
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: var(--_stack-gap, var(--cv-wizard-section-stack-gap));
 }
 
 .oficio-wizard__form:has(.oficio-documentos-preview-section) .oficio-documentos-pendencias,
@@ -31,10 +31,6 @@
 
 .oficio-wizard__form:has(.oficio-documentos-preview-section) .oficio-wizard__actions {
   order: 50;
-}
-
-.oficio-wizard__form:has(.oficio-documentos-preview-section) .oficio-documentos-pdf-hint {
-  order: 51;
 }
 
 .oficio-documentos-preview-section__body {

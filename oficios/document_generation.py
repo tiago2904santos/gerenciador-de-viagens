@@ -126,7 +126,9 @@ def get_document_generation_status(oficio: Oficio) -> dict[str, Any]:
         out["oficio_pdf_artefato_id"] = str(art_cached.pk)
         has_signed = False
         try:
-            ass = art_cached.arquivo_assinado
+            # `DocumentoArtefato` não guarda mais uma versão assinada embutida,
+            # mas mantemos este cálculo compatível com instalações antigas.
+            ass = getattr(art_cached, "arquivo_assinado", None)
             if ass and getattr(ass, "name", ""):
                 has_signed = bool(ass.storage.exists(ass.name))
         except OSError:

@@ -47,19 +47,21 @@ class OficioViewsTests(TestCase):
         self.assertContains(response, "field-grid")
         self.assertContains(response, oficio.numero_formatado)
         self.assertContains(response, "oficio-wizard-numero-readonly")
-        self.assertNotContains(response, "Data criação:")
+        self.assertNotContains(response, "Data criaÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o:")
         self.assertNotContains(response, "Gerado automaticamente ao salvar.")
-        self.assertNotContains(response, "será definida automaticamente ao salvar")
-        self.assertNotContains(response, "Pendências para concluir esta etapa")
+        self.assertNotContains(response, "serÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡ definida automaticamente ao salvar")
+        self.assertNotContains(response, "PendÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âªncias para concluir esta etapa")
         self.assertContains(response, "page-header-status-chip")
         self.assertContains(response, "page-stepper")
         self.assertContains(response, "page-shell--wizard")
         self.assertContains(response, "cv-field-with-action--manage-reveal")
         self.assertContains(response, "Modelo de motivo")
         self.assertContains(response, reverse("oficios:modelos_motivo_index"))
+        self.assertContains(response, "cv-card-footer-section")
+        self.assertContains(response, "Avan\u00e7ar")
         self.assertNotContains(
             response,
-            "Escolha um modelo para iniciar com texto pré-preenchido ou escreva manualmente o motivo.",
+            "Escolha um modelo para iniciar com texto prÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©-preenchido ou escreva manualmente o motivo.",
         )
 
     def test_post_dados_viajantes_valido_atualiza_rascunho(self):
@@ -131,7 +133,9 @@ class OficioViewsTests(TestCase):
         )
         response = self.client.get(reverse("oficios:wizard_documentos", args=[oficio.pk]))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Baixar DOCX")
+        self.assertContains(response, "cv-icon-btn--preview")
+        self.assertContains(response, "cv-icon-btn--pdf")
+        self.assertContains(response, "cv-icon-btn--docx")
         self.assertContains(response, reverse("oficios:baixar_documento", args=[oficio.pk, "docx"]))
 
     @mock.patch("documentos.services.warm_cache.ensure_document_artifact_cached")
@@ -166,7 +170,9 @@ class OficioViewsTests(TestCase):
         response = self.client.get(reverse("oficios:wizard_documentos", args=[oficio.pk]))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Justificativa")
-        self.assertContains(response, "Baixar DOCX")
+        self.assertContains(response, "cv-icon-btn--preview")
+        self.assertContains(response, "cv-icon-btn--pdf")
+        self.assertContains(response, "cv-icon-btn--docx")
         self.assertContains(response, reverse("oficios:baixar_justificativa_documento", args=[oficio.pk, "docx"]))
 
     @mock.patch("documentos.services.warm_cache.ensure_document_artifact_cached")
@@ -176,6 +182,10 @@ class OficioViewsTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Documentos para conferência")
         self.assertNotContains(response, "Visualizar documento")
+        self.assertNotContains(response, "PDF pronto.")
+        self.assertContains(response, reverse("oficios:index"))
+        self.assertContains(response, "Voltar à lista")
+        self.assertContains(response, 'data-autosave-link="1"')
 
     @mock.patch("documentos.services.warm_cache.ensure_document_artifact_cached")
     def test_wizard_documentos_omite_secao_de_justificativa(self, _m_cache):
@@ -200,32 +210,74 @@ class OficioViewsTests(TestCase):
         self.assertNotContains(response, "Urgencia operacional")
 
     @mock.patch("documentos.services.warm_cache.ensure_document_artifact_cached")
-    @mock.patch("oficios.views.oficio_esta_completo_para_finalizar", return_value=True)
     @mock.patch("oficios.services.validar_oficio_para_documento", return_value={"status": "complete", "pendencias": []})
     @mock.patch("oficios.views.validar_oficio_para_documento", return_value={"status": "complete", "pendencias": []})
-    def test_wizard_documentos_footer_mostra_apenas_voltar_e_finalizar(
+    def test_wizard_documentos_footer_mostra_voltar_e_finalizar_quando_sem_pendencias(
         self,
         _m_view_val,
         _m_service_val,
-        _m_completo,
         _m_cache,
     ):
         oficio = Oficio.objects.create(numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
         response = self.client.get(reverse("oficios:wizard_documentos", args=[oficio.pk]))
         html = response.content.decode("utf-8")
-        start = html.index('<footer class="footer-actions oficio-wizard__actions app-wizard__actions">')
-        end = html.index("</footer>", start) + len("</footer>")
-        footer = html[start:end]
+        preview_start = html.index('<section class="cv-wizard-section-card oficio-documentos-preview-section document-inline-stack"')
+        summary_start = html.index('<section class="cv-wizard-section-card oficio-documentos-summary-section"', preview_start)
+        footer_start = html.index('<section class="cv-card-footer-section">', preview_start, summary_start)
+        footer_end = html.index('</section>', footer_start) + len('</section>')
+        footer = html[footer_start:footer_end]
 
         self.assertIn("Voltar", footer)
-        self.assertIn("Finalizar", footer)
+        self.assertIn("Finalizar Ofício", footer)
+        self.assertNotIn("Salvar rascunho", footer)
         self.assertNotIn("DOCX", footer)
         self.assertNotIn("PDF", footer)
         self.assertNotIn("Central de assinaturas", footer)
         self.assertNotIn("Justificativa PDF", footer)
         self.assertNotIn("Plano DOCX", footer)
         self.assertNotIn("Ordem", footer)
-        self.assertNotIn("Salvar como rascunho", footer)
+
+    @mock.patch("documentos.services.warm_cache.ensure_document_artifact_cached")
+    @mock.patch("oficios.services.validar_oficio_para_documento", return_value={"status": "incomplete", "pendencias": ["Pendencia de teste"]})
+    @mock.patch("oficios.views.validar_oficio_para_documento", return_value={"status": "incomplete", "pendencias": ["Pendencia de teste"]})
+    def test_wizard_documentos_footer_mostra_voltar_e_salvar_rascunho_quando_ha_pendencias(
+        self,
+        _m_view_val,
+        _m_service_val,
+        _m_cache,
+    ):
+        oficio = Oficio.objects.create(numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        response = self.client.get(reverse("oficios:wizard_documentos", args=[oficio.pk]))
+        html = response.content.decode("utf-8")
+        preview_start = html.index('<section class="cv-wizard-section-card oficio-documentos-preview-section document-inline-stack"')
+        summary_start = html.index('<section class="cv-wizard-section-card oficio-documentos-summary-section"', preview_start)
+        footer_start = html.index('<section class="cv-card-footer-section">', preview_start, summary_start)
+        footer_end = html.index('</section>', footer_start) + len('</section>')
+        footer = html[footer_start:footer_end]
+
+        self.assertIn("Voltar", footer)
+        self.assertIn("Salvar rascunho", footer)
+        self.assertNotIn("Finalizar Ofício", footer)
+        self.assertNotIn("DOCX", footer)
+        self.assertNotIn("PDF", footer)
+        self.assertNotIn("Central de assinaturas", footer)
+        self.assertNotIn("Justificativa PDF", footer)
+        self.assertNotIn("Plano DOCX", footer)
+        self.assertNotIn("Ordem", footer)
+
+    def test_post_wizard_documentos_save_draft_list_salva_e_redireciona_para_lista(self):
+        oficio = Oficio.objects.create(numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        updated_before = oficio.updated_at
+        response = self.client.post(
+            reverse("oficios:wizard_documentos", args=[oficio.pk]),
+            data={"action": "save_draft_list"},
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("oficios:index"))
+        oficio.refresh_from_db()
+        self.assertEqual(oficio.status, Oficio.STATUS_RASCUNHO)
+        self.assertGreater(oficio.updated_at, updated_before)
 
     @mock.patch("documentos.services.warm_cache.ensure_document_artifact_cached")
     @mock.patch("oficios.services.validar_oficio_para_documento", return_value={"status": "complete", "pendencias": []})
@@ -265,6 +317,9 @@ class OficioViewsTests(TestCase):
         self.assertContains(response, f'data-termo-inline-url="{inline_url}"')
         self.assertNotContains(response, "data-open-all-termos")
         self.assertNotContains(response, "data-download-all-termos")
+        self.assertContains(response, "cv-icon-btn--preview")
+        self.assertContains(response, "cv-icon-btn--pdf")
+        self.assertContains(response, "cv-icon-btn--docx")
         self.assertContains(
             response,
             reverse("termos:baixar_termo_servidor", args=[oficio.pk, self.servidor.pk, "pdf"]),
@@ -311,6 +366,10 @@ class OficioViewsTests(TestCase):
         self.assertContains(response, "data-download-all-termos")
         self.assertContains(response, "data-termo-inline-url=", count=2)
         self.assertContains(response, "data-termo-download-pdf-url=", count=2)
+        self.assertContains(response, "cv-icon-btn--preview")
+        self.assertContains(response, "cv-icon-btn--pdf")
+        self.assertContains(response, "cv-icon-btn--docx")
+        self.assertContains(response, reverse("termos:baixar_termo_lote_zip", args=[oficio.pk, "docx"]))
 
     @mock.patch("documentos.services.warm_cache.ensure_document_artifact_cached")
     def test_wizard_documentos_omite_motorista_do_transporte_quando_esta_no_oficio(self, _m_cache):
@@ -375,7 +434,7 @@ class OficioViewsTests(TestCase):
         oficio.servidores.add(self.servidor)
         response = self.client.get(reverse("oficios:wizard_documentos", args=[oficio.pk]))
         inline_url = reverse("termos:termo_servidor_pdf_inline", args=[oficio.pk, self.servidor.pk])
-        self.assertContains(response, "Nenhum servidor selecionado para Termo de Autorização.")
+        self.assertContains(response, "Nenhum servidor selecionado para Termo de AutorizaÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o.")
         self.assertNotContains(response, inline_url)
 
     def test_get_detalhe_redireciona_para_dados_viajantes(self):
@@ -431,8 +490,8 @@ class OficioViewsTests(TestCase):
         self.assertEqual(new_get.status_code, 200)
         self.assertContains(new_get, "Novo modelo de motivo")
         self.assertContains(new_get, "Texto do modelo")
-        self.assertNotContains(new_get, "Modelo padrão")
-        self.assertNotContains(new_get, "Is padrão")
+        self.assertNotContains(new_get, "Modelo padrÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o")
+        self.assertNotContains(new_get, "Is padrÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o")
 
         new_post = self.client.post(
             reverse("oficios:modelo_motivo_novo"),
@@ -468,8 +527,8 @@ class OficioViewsTests(TestCase):
         self.client.post(
             reverse("oficios:modelo_motivo_novo"),
             data={
-                "nome": "Modelo Ativo Padrão",
-                "texto": "Texto ativo padrão",
+                "nome": "Modelo Ativo PadrÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o",
+                "texto": "Texto ativo padrÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o",
                 "is_padrao": "on",
             },
         )
@@ -484,7 +543,7 @@ class OficioViewsTests(TestCase):
 
         response = self.client.get(reverse("oficios:modelos_motivo_index"))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Padrão")
+        self.assertContains(response, "PadrÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o")
 
     def test_templates_modelos_motivo_sem_href_falso_css_ou_js_inline(self):
         template_paths = [

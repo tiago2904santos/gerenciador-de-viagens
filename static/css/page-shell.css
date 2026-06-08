@@ -88,8 +88,8 @@
   --cv-wizard-section-radius:         var(--radius-card);
   --cv-wizard-section-header-padding: var(--space-4) var(--space-6) var(--space-4) var(--space-10);
   --cv-wizard-section-body-padding:   var(--space-5) var(--space-6);
-  --cv-wizard-section-stack-gap:      var(--space-4);
-  --cv-wizard-section-stack-gap-comfortable: var(--space-5);
+  --cv-wizard-section-stack-gap:             var(--space-4);
+  --cv-wizard-section-stack-gap-comfortable: var(--space-8);
 
   /* --- Stepper --- */
   --stepper-padding-x:   var(--space-6);
@@ -946,15 +946,19 @@ html[data-theme="light"] {
 }
 
 
-/* Footer funde-se ao último card como área de ação inferior */
-.main-form-panel--stack > .footer-actions,
-.main-form-panel--stack .cv-wizard-section-stack > form > .footer-actions,
-.main-form-panel--stack .cv-wizard-section-stack > .footer-actions {
+/* =========================================================
+   Footer colado ao último card do stack.
+   Aplica-se em 100% das páginas que usam .cv-wizard-section-stack.
+   margin-top negativo cancela exatamente o gap do stack pai
+   (usa --_stack-gap herdada, que varia conforme a variante usada).
+   ========================================================= */
+.cv-wizard-section-stack > .footer-actions,
+.cv-wizard-section-stack > form > .footer-actions {
   background:    var(--cv-wizard-section-bg);
   border-radius: 0 0 var(--cv-wizard-section-radius) var(--cv-wizard-section-radius);
   border-top:    1px solid var(--cv-wizard-section-border);
   box-shadow:    var(--cv-wizard-section-shadow);
-  margin-top:    calc(-1 * var(--cv-wizard-section-stack-gap));
+  margin-top:    calc(-1 * var(--_stack-gap, var(--cv-wizard-section-stack-gap)));
 }
 
 /* Ponte: seções legadas do wizard dentro do stack (ofícios/roteiros) */
@@ -1069,14 +1073,25 @@ html[data-theme="light"] {
    ========================================================= */
 
 .cv-wizard-section-stack {
+  --_stack-gap:   var(--cv-wizard-section-stack-gap);
   display:        flex;
   flex-direction: column;
-  gap:            var(--cv-wizard-section-stack-gap);
+  gap:            var(--_stack-gap);
   width:          100%;
 }
 
 .cv-wizard-section-stack--comfortable {
-  gap: var(--cv-wizard-section-stack-gap-comfortable);
+  --_stack-gap: var(--cv-wizard-section-stack-gap-comfortable);
+  gap:          var(--_stack-gap);
+}
+
+/* O form dentro do stack herda --_stack-gap e replica o mesmo layout flex,
+   garantindo gap entre os cards mesmo quando estão dentro de um <form>. */
+.cv-wizard-section-stack > form {
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--_stack-gap, var(--cv-wizard-section-stack-gap));
+  width:          100%;
 }
 
 .cv-wizard-section-card {
@@ -1086,6 +1101,49 @@ html[data-theme="light"] {
   box-shadow:    var(--cv-wizard-section-shadow);
   overflow:      hidden;
   width:         100%;
+}
+
+/* =========================================================
+   cv-card-footer — rodapé padronizado do último card.
+   Fica dentro do cv-wizard-section-card ou form-section,
+   após o corpo de conteúdo, separado por uma linha.
+   ========================================================= */
+.cv-card-footer {
+  align-items:     center;
+  border-top:      1px solid var(--cv-wizard-section-border, var(--border-form-section));
+  display:         flex;
+  gap:             var(--space-3);
+  justify-content: space-between;
+  padding:         var(--space-4) var(--space-6);
+}
+
+.cv-card-footer__secondary,
+.cv-card-footer__primary {
+  align-items: center;
+  display:     flex;
+  gap:         var(--space-3);
+}
+
+.cv-card-footer--end {
+  justify-content: flex-end;
+}
+
+.cv-card-footer-section {
+  display: grid;
+}
+
+.cv-card-footer-section__divider {
+  border-top: 1px solid var(--cv-wizard-section-border, var(--border-form-section));
+}
+
+.cv-card-footer-section > .cv-card-footer {
+  border-top: 0;
+}
+
+/* Dentro de form-section (páginas de formulário simples) */
+.form-section > .cv-card-footer {
+  margin-inline: calc(-1 * var(--form-section-padding-x, var(--space-6)));
+  padding-inline: var(--form-section-padding-x, var(--space-6));
 }
 
 .cv-wizard-section-header {

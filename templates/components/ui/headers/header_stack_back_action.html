@@ -23,7 +23,7 @@
       <div class="page-header-rail__actions">
         {% if primary_action_label %}
           {% if primary_action_url %}
-            <a class="cv-btn cv-btn--primary" href="{{ primary_action_url }}">
+            <a class="cv-btn cv-btn--primary" href="{{ primary_action_url }}" data-autosave-link="1">
               <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="check" only %}</span>
               <span>{{ primary_action_label }}</span>
             </a>
@@ -35,7 +35,7 @@
           {% endif %}
         {% elif back_label %}
           {% if back_url %}
-            <a class="cv-btn cv-btn--back-list" href="{{ back_url }}">
+            <a class="cv-btn cv-btn--back-list" href="{{ back_url }}" data-autosave-link="1">
               <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="list" only %}</span>
               <span>{{ back_label }}</span>
             </a>

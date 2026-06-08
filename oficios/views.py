@@ -313,8 +313,8 @@ def _wizard_transporte_context(*, form, oficio):
         "motorista_oficio_ano": ano_motorista_ctx,
         "motorista_oficio_numero_inicial": _motorista_oficio_numero_display(ref_raw),
         "api_viatura_placa_url": reverse("oficios:api_viatura_por_placa", args=[oficio.pk]),
-        "wizard_back_url": reverse("oficios:dados_viajantes", args=[oficio.pk]),
-        "wizard_back_label": "Voltar",
+        "wizard_back_url": reverse("oficios:index"),
+        "wizard_back_label": "Voltar à lista",
         "wizard_show_document_actions": True,
         "wizard_show_save_draft": True,
         "wizard_autosave_url": reverse("oficios:transporte_autosave", args=[oficio.pk]),
@@ -687,8 +687,8 @@ def wizard_roteiro(request, pk):
             ),
             "wizard_summary": apresentar_oficio_wizard_summary(oficio),
             "oficio": oficio,
-            "wizard_back_url": reverse("oficios:dados_viajantes", args=[oficio.pk]),
-            "wizard_back_label": "Voltar",
+            "wizard_back_url": reverse("oficios:index"),
+            "wizard_back_label": "Voltar à lista",
             "roteiro_editor_oficio": True,
             "wizard_use_outer_form": False,
             **_wizard_footer_ctx(oficio),
@@ -753,8 +753,8 @@ def wizard_justificativa(request, pk):
             "wizard_summary": apresentar_oficio_wizard_summary(oficio),
             "oficio": oficio,
             "form": form,
-            "wizard_back_url": reverse("oficios:wizard_roteiro", args=[oficio.pk]),
-            "wizard_back_label": "Voltar",
+            "wizard_back_url": reverse("oficios:index"),
+            "wizard_back_label": "Voltar à lista",
             "justificativa_ctx": apresentar_justificativa_wizard_context(oficio),
             "justificativa_obrigatoria": obrigatoria,
             "modelos_justificativa_url": reverse("justificativas:index"),
@@ -824,6 +824,7 @@ def wizard_documentos(request, pk):
             messages.info(request, "Retornando à etapa anterior.")
             return redirect("oficios:wizard_justificativa", pk=pk)
         if nav_action == "save_draft_list":
+            oficio.save(update_fields=["updated_at"])
             messages.success(request, "Retornamos à lista de ofícios.")
             return redirect("oficios:index")
         messages.success(request, "Rascunho salvo.")
@@ -848,8 +849,8 @@ def wizard_documentos(request, pk):
             ),
             "wizard_summary": apresentar_oficio_wizard_summary(oficio),
             "oficio": oficio,
-            "wizard_back_url": reverse("oficios:wizard_justificativa", args=[oficio.pk]),
-            "wizard_back_label": "Voltar",
+            "wizard_back_url": reverse("oficios:index"),
+            "wizard_back_label": "Voltar à lista",
             "wizard_finalizar": True,
             "wizard_show_document_actions": False,
             "wizard_show_save_draft": False,

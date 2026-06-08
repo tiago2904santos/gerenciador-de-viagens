@@ -1,6 +1,10 @@
 import datetime
+from types import SimpleNamespace
+from unittest import mock
 
 from django.test import TestCase
+from django.core.files.base import ContentFile
+from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 
@@ -10,6 +14,7 @@ from cadastros.models import ConfiguracaoSistema
 from cadastros.models import Estado
 from cadastros.models import Servidor
 from cadastros.models import Viatura
+from documentos.models import DocumentoArtefato
 from oficios.forms import OficioDadosViajantesForm
 from oficios.forms import ModeloMotivoOficioForm
 from oficios.models import ModeloMotivoOficio
@@ -18,6 +23,7 @@ from oficios.services import atualizar_oficio_dados_viajantes
 from oficios.services import atualizar_modelo_motivo
 from oficios.services import avaliar_oficio_dados_viajantes
 from oficios.services import build_oficio_document_payload
+from oficios.document_generation import get_document_generation_status
 from oficios.services import criar_modelo_motivo
 from oficios.services import criar_oficio_dados_viajantes
 from oficios.services import excluir_modelo_motivo
@@ -117,6 +123,46 @@ class OficioServicesTests(TestCase):
         )
         payload = build_oficio_document_payload(oficio)
         self.assertEqual(payload["protocolo"], "12.345.678-9")
+
+    @override_settings(DOCUMENTOS_ARTIFACT_CACHE=True, DOCUMENTOS_PERSIST_ARTEFATOS=True)
+    @mock.patch("oficios.document_generation.get_cached_document_artifact")
+    @mock.patch("oficios.document_generation.build_template_cache_signature", return_value="tpl-sig")
+    @mock.patch("oficios.document_generation.build_document_cache_key", return_value="cache-key")
+    @mock.patch("oficios.document_generation.build_oficio_docxtpl_context", return_value={"ctx": True})
+    @mock.patch("oficios.document_generation.build_canonical_document_payload", return_value={"payload": True})
+    @mock.patch("oficios.document_generation.resolve_pdf_engine", return_value=SimpleNamespace(attempt_chain=["weasyprint"]))
+    @mock.patch("oficios.services.validar_oficio_para_documento", return_value={"status": "complete", "pendencias": []})
+    def test_get_document_generation_status_nao_depende_de_arquivo_assinado(
+        self,
+        _m_validar,
+        _m_resolve,
+        _m_payload,
+        _m_ctx,
+        _m_cache_key,
+        _m_tpl_sig,
+        m_get_cached,
+    ):
+        oficio = Oficio.objects.create(
+            numero=1,
+            ano=2026,
+            motivo="Motivo",
+            custeio=Oficio.CUSTEIO_UNIDADE_DPC,
+        )
+        oficio.servidores.add(self.servidor)
+        artefato = DocumentoArtefato.objects.create(
+            tipo="oficio",
+            formato="pdf",
+            oficio=oficio,
+            hash_sha256="0" * 64,
+            arquivo=ContentFile(b"%PDF-1.4\n%%EOF\n", name="oficio.pdf"),
+        )
+        m_get_cached.return_value = artefato
+
+        status = get_document_generation_status(oficio)
+
+        self.assertEqual(status["oficio_pdf_signature_status"], "unsigned")
+        self.assertEqual(status["oficio_pdf_artefato_id"], str(artefato.pk))
+        self.assertTrue(status["oficio_pdf_botoes_assinatura"])
 
     def test_services_modelo_motivo_mantem_padrao_unico(self):
         form_1 = ModeloMotivoOficioForm(data={"nome": "Modelo A", "texto": "A", "ativo": True, "ordem": 1, "is_padrao": True})

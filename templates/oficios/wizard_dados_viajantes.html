@@ -89,7 +89,7 @@
           <h3 class="cv-wizard-section-title" id="oficio-wizard-equipe-title">Equipe do ofício e motorista</h3>
         </div>
         <div class="cv-wizard-section-header__actions">
-          {% include "components/buttons/action_button.html" with href=servidor_create_url label="Cadastrar novo viajante" variant="secondary" only %}
+          {% include "components/buttons/action_button.html" with href=servidor_create_url label="Cadastrar novo viajante" variant="secondary" data_autosave_link=True only %}
         </div>
       </header>
       <div class="cv-wizard-section-body">
@@ -110,6 +110,6 @@
   {{ block.super }}
   <script src="{% static 'js/pages/oficios-dados-viajantes.js' %}?v=20260527d" defer></script>
   <script src="{% static 'js/pages/oficios-transporte.js' %}?v=20260512" defer></script>
-  <script src="{% static 'js/pages/oficios-wizard-driver-state.js' %}?v=20260527j" defer></script>
+  <script src="{% static 'js/pages/oficios-wizard-driver-state.js' %}?v=20260608" defer></script>
   <script src="{% static 'js/pages/oficios-viatura-sugestoes.js' %}?v=20260527c" defer></script>
 {% endblock %}

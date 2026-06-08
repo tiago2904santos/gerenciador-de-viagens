@@ -173,14 +173,8 @@
   }
 
   function syncTrailingCard(root, showMotorista) {
-    var viaturaCard = root.querySelector('[data-oficio-viatura-card]');
     var motoristaCard = root.querySelector(EXTERNAL_CARD);
-
-    if (viaturaCard) {
-      viaturaCard.classList.toggle('is-wizard-trailing-card', !showMotorista);
-    }
     if (motoristaCard) {
-      motoristaCard.classList.toggle('is-wizard-trailing-card', !!showMotorista);
       motoristaCard.classList.toggle('is-open', !!showMotorista);
     }
   }

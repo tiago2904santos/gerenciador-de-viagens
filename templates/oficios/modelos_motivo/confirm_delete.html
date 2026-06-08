@@ -18,7 +18,7 @@
           {% include "components/ui/feedback/alert.html" with variant="warning" message="Esta ação remove o modelo da lista de sugestões, mas não altera ofícios já criados." only %}
         </div>
       </div>
-      {% include "components/ui/layouts/footer_actions.html" with secondary_label="Cancelar" secondary_url=back_url primary_label="Excluir modelo" primary_variant="danger" primary_icon="trash" only %}
+      {% include "components/ui/layouts/card_footer_actions.html" with secondary_label="Cancelar" secondary_url=back_url primary_label="Excluir" primary_variant="danger" only %}
     </form>
   </div>
 {% endblock %}

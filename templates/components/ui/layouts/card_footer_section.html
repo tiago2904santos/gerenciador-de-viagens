@@ -1,0 +1,4 @@
+<section class="cv-card-footer-section{% if extra_class %} {{ extra_class }}{% endif %}">
+  <div class="cv-card-footer-section__divider" aria-hidden="true"></div>
+  {% include "components/ui/layouts/card_footer_actions.html" with secondary_label=secondary_label secondary_url=secondary_url secondary_action=secondary_action primary_label=primary_label primary_url=primary_url primary_action=primary_action primary_variant=primary_variant only %}
+</section>

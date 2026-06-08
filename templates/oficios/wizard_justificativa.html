@@ -2,17 +2,37 @@
 {% load static %}
 
 {% block wizard_content %}
-  <section class="cv-field-panel justificativa-panel" aria-labelledby="justificativa-panel-title">
-    <div class="cv-field-panel__header">
-      <h3 class="cv-field-panel__title" id="justificativa-panel-title">Justificativa</h3>
+  <section class="cv-wizard-section-card oficio-justificativa-card" aria-labelledby="justificativa-panel-title">
+    <header class="cv-wizard-section-header">
+      <div class="cv-wizard-section-header__copy">
+        <h3 class="cv-wizard-section-title" id="justificativa-panel-title">Justificativa</h3>
+      </div>
+      <div class="cv-wizard-section-header__actions">
+        {% include "components/buttons/action_button.html" with href=modelos_justificativa_url label="Gerenciar modelos" variant="secondary" data_autosave_link=True only %}
+      </div>
+    </header>
+
+    <div class="cv-wizard-section-body oficio-justificativa-card__body">
+      <section class="wizard-inner-section" aria-labelledby="justificativa-modelo-title">
+        <header class="wizard-inner-section__header wizard-inner-section__header--actions">
+          <div class="wizard-inner-section__header-copy">
+            <h4 class="wizard-inner-section__title" id="justificativa-modelo-title">Modelo</h4>
+            <p class="wizard-inner-section__description">Selecione um modelo opcional ou siga sem preencher.</p>
+          </div>
+        </header>
+        {% include "components/forms/form_field.html" with field=form.modelo label="Modelo" help_text="Selecione um modelo opcional ou siga sem preencher." only %}
+      </section>
+
+      <section class="wizard-inner-section" aria-labelledby="justificativa-texto-title">
+        <header class="wizard-inner-section__header">
+          <h4 class="wizard-inner-section__title" id="justificativa-texto-title">Justificativa</h4>
+          <p class="wizard-inner-section__description">Escreva o texto que será usado no ofício.</p>
+        </header>
+        {% include "components/forms/form_field.html" with field=form.texto label="Justificativa" only %}
+      </section>
     </div>
 
-    <div class="cv-field-panel__body">
-      <div class="cv-field-grid cv-field-grid--1">
-        {% include "components/forms/input_with_action.html" with field=form.modelo action_url=modelos_justificativa_url action_label="Gerenciar modelos" only %}
-        {% include "components/forms/form_field.html" with field=form.texto label="Justificativa" only %}
-      </div>
-    </div>
+    {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar" secondary_action="wizard_back" primary_label="Avançar" primary_action="wizard_next" only %}
   </section>
 {% endblock %}
 

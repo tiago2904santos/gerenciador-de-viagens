@@ -6,7 +6,7 @@
         <div class="page-stepper__track">
           <div class="page-stepper__connector page-stepper__connector--before"></div>
           {% if step.url and step.state_class != 'is-disabled' %}
-            <a class="page-stepper__marker page-stepper__marker--link" href="{{ step.url }}"{% if step.aria_current %} aria-current="{{ step.aria_current }}"{% endif %} aria-hidden="{{ step.marker_aria_hidden|yesno:'true,false' }}">
+            <a class="page-stepper__marker page-stepper__marker--link" href="{{ step.url }}"{% if step.aria_current %} aria-current="{{ step.aria_current }}"{% endif %} aria-hidden="{{ step.marker_aria_hidden|yesno:'true,false' }}" data-autosave-link="1">
               <span class="page-stepper__marker-icon">{{ step.marker }}</span>
             </a>
           {% else %}
@@ -18,7 +18,7 @@
         </div>
         <div class="page-stepper__content">
           {% if step.url and step.state_class != 'is-disabled' %}
-            <a class="page-stepper__content-link" href="{{ step.url }}"{% if step.aria_current %} aria-current="{{ step.aria_current }}"{% endif %}>
+            <a class="page-stepper__content-link" href="{{ step.url }}"{% if step.aria_current %} aria-current="{{ step.aria_current }}"{% endif %} data-autosave-link="1">
           {% else %}
             <span class="page-stepper__content-link"{% if step.state_class == 'is-disabled' %} aria-disabled="true"{% endif %}{% if step.aria_current %} aria-current="{{ step.aria_current }}"{% endif %}>
           {% endif %}

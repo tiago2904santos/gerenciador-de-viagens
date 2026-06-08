@@ -17,7 +17,7 @@ from roteiros.models import Roteiro
 
 
 class WizardJustificativaTests(TestCase):
-    """Etapa 3 — Justificativa — rotas e fluxo condicional."""
+    """Etapa 3 â€” Justificativa â€” rotas e fluxo condicional."""
 
     def setUp(self):
         ConfiguracaoSistema.get_singleton()
@@ -99,11 +99,18 @@ class WizardJustificativaTests(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "oficios/wizard_justificativa.html")
-        self.assertContains(response, "cv-field-panel justificativa-panel")
-        self.assertContains(response, "Justificativa")
+        self.assertContains(response, "cv-wizard-section-card oficio-justificativa-card")
+        self.assertContains(response, "wizard-inner-section")
         self.assertContains(response, "Gerenciar modelos")
+        self.assertContains(response, "Justificativa")
         self.assertContains(response, "data-modelo-justificativa-select")
         self.assertContains(response, reverse("justificativas:index"))
+        self.assertContains(response, reverse('oficios:index'))
+        self.assertContains(response, 'Voltar à lista')
+        self.assertContains(response, "cv-card-footer-section")
+        self.assertContains(response, 'data-autosave-link="1"')
+        self.assertContains(response, "Avançar")
+        self.assertNotContains(response, "cv-field-panel justificativa-panel")
 
     def test_stepper_contem_justificativa(self):
         oficio = self._oficio_ate_transporte()

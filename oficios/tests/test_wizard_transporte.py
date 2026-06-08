@@ -78,11 +78,9 @@ class OficioWizardTransporteTests(TestCase):
         self.assertTemplateUsed(response, "oficios/wizard_transporte.html")
         self.assertContains(response, "Viatura")
         self.assertContains(response, "Motorista")
-        self.assertContains(response, "Cadastrar nova viatura")
-        self.assertContains(response, reverse("cadastros:viatura_create"))
+        self.assertContains(response, "Adicionar servidor")
         self.assertContains(response, reverse("cadastros:servidor_create"))
-        self.assertContains(response, "Digite placa, modelo, unidade ou motorista")
-        self.assertContains(response, "BUSCAR VIATURA")
+        self.assertContains(response, 'data-autosave-link="1"')
 
     def test_post_save_draft_viatura_cadastrada(self):
         oficio = self._oficio_com_etapa1_minima()

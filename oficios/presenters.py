@@ -616,6 +616,7 @@ def apresentar_oficio_wizard_documentos_context(oficio):
         "oficio": {
             "titulo": "Documento original (Ofício)",
             "url": reverse("oficios:oficio_pdf_inline", args=[oficio.pk]),
+            "download_pdf_url": reverse("oficios:baixar_documento", args=[oficio.pk, "pdf"]),
             "download_docx_url": reverse("oficios:baixar_documento", args=[oficio.pk, "docx"]),
             "disponivel": disponivel,
             "mensagem": doc_msg,
@@ -623,6 +624,8 @@ def apresentar_oficio_wizard_documentos_context(oficio):
         "justificativa": {
             "titulo": "Justificativa",
             "url": reverse("oficios:justificativa_pdf_inline", args=[oficio.pk]),
+            "download_pdf_url": reverse("oficios:baixar_justificativa_documento", args=[oficio.pk, "pdf"]),
+            "download_docx_url": reverse("oficios:baixar_justificativa_documento", args=[oficio.pk, "docx"]),
             "disponivel": disponivel,
             "mensagem": doc_msg,
         },
@@ -631,6 +634,9 @@ def apresentar_oficio_wizard_documentos_context(oficio):
         "termos_empty_message": "Nenhum servidor selecionado para Termo de Autorização.",
         "termos_download_todos_pdf_url": (
             reverse("termos:baixar_termos_todos_pdf", args=[oficio.pk]) if termos_items else None
+        ),
+        "termos_download_todos_docx_url": (
+            reverse("termos:baixar_termo_lote_zip", args=[oficio.pk, "docx"]) if termos_items else None
         ),
         "mensagem_indisponivel": doc_msg,
     }

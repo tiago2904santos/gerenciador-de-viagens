@@ -1045,25 +1045,15 @@
   padding:    0 var(--space-4);
 }
 
-.main-form-panel--stack .cv-wizard-section-card.is-wizard-trailing-card {
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-}
-
-.main-form-panel--stack .cv-wizard-section-card.is-wizard-trailing-card > .cv-wizard-section-body {
-  padding-bottom: calc(var(--space-6) + var(--space-4));
-}
-
-.main-form-panel--stack .cv-wizard-section-card[data-oficio-driver-external-card].is-wizard-trailing-card > .cv-wizard-section-body {
-  padding-bottom: calc(var(--space-6) + var(--space-4));
-}
 
 .oficio-wizard__main .cv-wizard-section-stack--comfortable {
-  gap: var(--space-6);
+  --_stack-gap: var(--space-6);
+  gap:          var(--_stack-gap);
 }
 
+.oficio-wizard__main .cv-wizard-section-stack > form > .footer-actions,
 .oficio-wizard__main .cv-wizard-section-stack > .footer-actions {
-  margin-top: 0;
+  margin-top: calc(-1 * var(--space-6));
 }
 
 @media (max-width: 960px) {
@@ -1432,79 +1422,6 @@
   padding: var(--space-4);
 }
 
-
-/* --------------------------------------------------------------------------
-   8. Motivo (Oficios) + Modelos de motivo
-   -------------------------------------------------------------------------- */
-.justificativa-panel {
-  background: var(--theme-surface-card);
-  border: 1px solid var(--theme-border-card);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-soft);
-  display: grid;
-  gap: var(--space-4);
-  padding: var(--space-5);
-}
-
-.justificativa-panel .cv-field-panel__header {
-  border-bottom: 1px solid var(--theme-border-card);
-  display: grid;
-  gap: var(--space-1);
-  padding-bottom: var(--space-3);
-}
-
-.justificativa-panel .cv-field-panel__eyebrow {
-  color: var(--color-help);
-  font-size: var(--font-size-xs);
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.justificativa-panel .cv-field-panel__title {
-  color: var(--theme-text-heading);
-  font-size: var(--font-size-lg);
-  font-weight: 900;
-  letter-spacing: -0.02em;
-  margin: 0;
-}
-
-.justificativa-panel .cv-field-panel__description {
-  color: var(--theme-text-muted);
-  line-height: 1.5;
-  margin: 0;
-}
-
-.justificativa-panel .cv-field-panel__body {
-  display: grid;
-  gap: var(--space-4);
-}
-
-.justificativa-panel .cv-field-grid {
-  gap: var(--space-6);
-}
-
-.justificativa-panel .cv-field-grid > .field + .field {
-  margin-top: var(--space-6);
-}
-
-.justificativa-panel .cv-field {
-  min-width: 0;
-}
-
-.justificativa-panel .cv-field-with-action {
-  width: 100%;
-}
-
-.justificativa-panel .cv-field-panel__note {
-  border-top: 1px solid var(--theme-border-card);
-  color: var(--theme-text-muted);
-  padding-top: var(--space-3);
-}
-
-.justificativa-panel .cv-field-panel__note .field-help {
-  margin-bottom: 0;
-}
 
 .motivo-card {
   display: grid;

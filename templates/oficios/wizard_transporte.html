@@ -15,7 +15,7 @@
           <p>Escolha um servidor cadastrado ou use o modo manual quando o motorista for externo à equipe.</p>
         </div>
         <div class="oficio-transporte-card__header-actions oficio-transporte-card__header-actions--split">
-          {% include "components/buttons/action_button.html" with href=servidor_create_url label="Adicionar servidor" variant="secondary" only %}
+          {% include "components/buttons/action_button.html" with href=servidor_create_url label="Adicionar servidor" variant="secondary" data_autosave_link=True only %}
           <button type="button" class="btn btn-secondary" data-oficio-motorista-toggle>
             {% if form.motorista_modo.value == "MANUAL" %}Usar motorista cadastrado{% else %}Usar motorista manual{% endif %}
           </button>

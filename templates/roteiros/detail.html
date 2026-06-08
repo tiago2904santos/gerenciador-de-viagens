@@ -35,15 +35,6 @@
       {% else %}
         {% include "components/ui/feedback/empty_state.html" with message="Nenhum trecho persistido." only %}
       {% endif %}
-      <footer class="footer-actions">
-        <div class="footer-actions__secondary">
-          {% include "components/ui/buttons/button.html" with href=back_url label="Voltar" variant="back" icon="arrow-left" only %}
-        </div>
-        <div class="footer-actions__primary">
-          {% include "components/ui/buttons/button.html" with href=delete_url label="Excluir" variant="danger" icon="trash" only %}
-          {% include "components/ui/buttons/button.html" with href=edit_url label="Editar" variant="primary" icon="edit" only %}
-        </div>
-      </footer>
       </section>
     </main>
   </div>

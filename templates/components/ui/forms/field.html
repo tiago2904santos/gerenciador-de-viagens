@@ -17,7 +17,7 @@
     <div class="cv-field-with-action cv-field-with-action--manage-reveal">
       {% include "components/ui/forms/select.html" with field=field only %}
       {% if action_url %}
-        {% include "components/ui/buttons/field_manage_button.html" with href=action_url action_label=action_label only %}
+        {% include "components/ui/buttons/field_manage_button.html" with href=action_url action_label=action_label data_autosave_link=True only %}
       {% elif action_label %}
         {% include "components/ui/buttons/field_manage_button.html" with action_label=action_label type=action_type|default:"button" only %}
       {% endif %}
@@ -35,7 +35,7 @@
     <div class="cv-field-with-action cv-field-with-action--manage-reveal">
       {{ field.as_widget }}
       {% if action_url %}
-        {% include "components/ui/buttons/field_manage_button.html" with href=action_url action_label=action_label only %}
+        {% include "components/ui/buttons/field_manage_button.html" with href=action_url action_label=action_label data_autosave_link=True only %}
       {% elif action_label %}
         {% include "components/ui/buttons/field_manage_button.html" with action_label=action_label type=action_type|default:"button" only %}
       {% endif %}

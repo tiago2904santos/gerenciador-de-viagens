@@ -44,9 +44,9 @@
           {% if di.oficio.disponivel %}
             <span class="document-inline-card__header-end">
               <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do documento">
-                <a class="cv-btn cv-btn--secondary document-inline-actions__btn" href="{{ di.oficio.url }}" target="_blank" rel="noopener noreferrer">Abrir em nova aba</a>
-                <a class="cv-btn cv-btn--secondary document-inline-actions__btn" href="{% url 'oficios:baixar_documento' oficio.pk 'pdf' %}">Baixar PDF</a>
-                <a class="cv-btn cv-btn--secondary document-inline-actions__btn" href="{{ di.oficio.download_docx_url }}">Baixar DOCX</a>
+                {% include "components/ui/buttons/icon_button.html" with href=di.oficio.url action="preview" aria_label="Visualizar documento" tooltip="Visualizar documento" only %}
+                {% include "components/ui/buttons/icon_button.html" with href=di.oficio.download_pdf_url action="pdf" aria_label="Baixar PDF" tooltip="Baixar PDF" only %}
+                {% include "components/ui/buttons/icon_button.html" with href=di.oficio.download_docx_url action="docx" aria_label="Baixar DOCX" tooltip="Baixar DOCX" only %}
               </span>
             </span>
           {% endif %}
@@ -73,9 +73,9 @@
           {% if di.justificativa.disponivel %}
             <span class="document-inline-card__header-end">
               <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do documento">
-                <a class="cv-btn cv-btn--secondary document-inline-actions__btn" href="{{ di.justificativa.url }}" target="_blank" rel="noopener noreferrer">Abrir em nova aba</a>
-                <a class="cv-btn cv-btn--secondary document-inline-actions__btn" href="{% url 'oficios:baixar_justificativa_documento' oficio.pk 'pdf' %}">Baixar PDF</a>
-                <a class="cv-btn cv-btn--secondary document-inline-actions__btn" href="{% url 'oficios:baixar_justificativa_documento' oficio.pk 'docx' %}">Baixar DOCX</a>
+                {% include "components/ui/buttons/icon_button.html" with href=di.justificativa.url action="preview" aria_label="Visualizar documento" tooltip="Visualizar documento" only %}
+                {% include "components/ui/buttons/icon_button.html" with href=di.justificativa.download_pdf_url action="pdf" aria_label="Baixar PDF" tooltip="Baixar PDF" only %}
+                {% include "components/ui/buttons/icon_button.html" with href=di.justificativa.download_docx_url action="docx" aria_label="Baixar DOCX" tooltip="Baixar DOCX" only %}
               </span>
             </span>
           {% endif %}
@@ -105,13 +105,31 @@
                 {% if di.termos|length == 1 %}
                   {% for t in di.termos %}
                     {% if t.disponivel %}
-                      <a class="cv-btn cv-btn--secondary document-inline-actions__btn" href="{{ t.inline_url }}" target="_blank" rel="noopener noreferrer">Abrir em nova aba</a>
-                      <a class="cv-btn cv-btn--secondary document-inline-actions__btn" href="{{ t.download_pdf_url }}">Baixar PDF</a>
+                      <span class="cv-icon-btn-group">
+                        <a class="cv-icon-btn cv-icon-btn--preview" href="{{ t.inline_url }}" target="_blank" rel="noopener noreferrer" aria-label="Visualizar termo" data-tooltip="Visualizar termo" title="Visualizar termo">
+                          {% include "dev/ui_lab/partials/_cv_icon.html" with icon="eye" only %}
+                        </a>
+                        <a class="cv-icon-btn cv-icon-btn--pdf" href="{{ t.download_pdf_url }}" aria-label="Baixar termo em PDF" data-tooltip="Baixar termo em PDF" title="Baixar termo em PDF">
+                          {% include "dev/ui_lab/partials/_cv_icon.html" with icon="pdf" only %}
+                        </a>
+                        <a class="cv-icon-btn cv-icon-btn--docx" href="{{ t.download_docx_url }}" aria-label="Baixar termo em DOCX" data-tooltip="Baixar termo em DOCX" title="Baixar termo em DOCX">
+                          {% include "dev/ui_lab/partials/_cv_icon.html" with icon="docx" only %}
+                        </a>
+                      </span>
                     {% endif %}
                   {% endfor %}
                 {% else %}
-                  <button class="cv-btn cv-btn--secondary document-inline-actions__btn" type="button" data-open-all-termos>Abrir em nova aba</button>
-                  <a class="cv-btn cv-btn--secondary document-inline-actions__btn" href="{{ di.termos_download_todos_pdf_url }}">Baixar PDF</a>
+                  <span class="cv-icon-btn-group">
+                    <button class="cv-icon-btn cv-icon-btn--preview" type="button" data-open-all-termos aria-label="Visualizar termos" data-tooltip="Visualizar termos" title="Visualizar termos">
+                      {% include "dev/ui_lab/partials/_cv_icon.html" with icon="eye" only %}
+                    </button>
+                    <a class="cv-icon-btn cv-icon-btn--pdf" href="{{ di.termos_download_todos_pdf_url }}" data-download-all-termos aria-label="Baixar termos em PDF" data-tooltip="Baixar termos em PDF" title="Baixar termos em PDF">
+                      {% include "dev/ui_lab/partials/_cv_icon.html" with icon="pdf" only %}
+                    </a>
+                    <a class="cv-icon-btn cv-icon-btn--docx" href="{{ di.termos_download_todos_docx_url }}" aria-label="Baixar termos em DOCX" data-tooltip="Baixar termos em DOCX" title="Baixar termos em DOCX">
+                      {% include "dev/ui_lab/partials/_cv_icon.html" with icon="docx" only %}
+                    </a>
+                  </span>
                 {% endif %}
               </span>
             </span>
@@ -125,15 +143,6 @@
               <details class="document-inline-card document-inline-card--nested document-inline-card--lazy" data-lazy-inline data-termo-inline-url="{{ t.inline_url }}" data-termo-download-pdf-url="{{ t.download_pdf_url }}">
                 <summary class="document-inline-card__header">
                   <span class="document-inline-card__title">{{ t.titulo }}</span>
-                  {% if t.disponivel %}
-                    <span class="document-inline-card__header-end">
-                      <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do termo">
-                        <a class="cv-btn cv-btn--secondary document-inline-actions__btn" href="{{ t.inline_url }}" target="_blank" rel="noopener noreferrer">Abrir em nova aba</a>
-                        <a class="cv-btn cv-btn--secondary document-inline-actions__btn" href="{{ t.download_pdf_url }}">Baixar PDF</a>
-                        <a class="cv-btn cv-btn--secondary document-inline-actions__btn" href="{{ t.download_docx_url }}">Baixar DOCX</a>
-                      </span>
-                    </span>
-                  {% endif %}
                 </summary>
                 <div class="document-inline-card__body">
                   {% if t.disponivel %}
@@ -156,6 +165,11 @@
       </details>
     {% endwith %}
     </div>
+    {% if mostrar_pendencias %}
+      {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar à lista" secondary_action="save_draft_list" secondary_icon="list" primary_label="Salvar rascunho" primary_action="save_draft_list" primary_icon="document" only %}
+    {% else %}
+      {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar à lista" secondary_action="save_draft_list" secondary_icon="list" primary_label="Finalizar Ofício" primary_action="finalizar" primary_icon="check" only %}
+    {% endif %}
   </section>
 
   <section class="cv-wizard-section-card oficio-documentos-summary-section" aria-labelledby="oficio-documentos-summary-title">
@@ -439,35 +453,9 @@
     {% endif %}
 
     </div>
-  </section>
 
 {% endblock %}
 
-{% block wizard_actions %}
-  <footer class="footer-actions oficio-wizard__actions app-wizard__actions">
-    <div class="footer-actions__secondary">
-      <button type="submit" name="action" value="wizard_back" class="cv-btn cv-btn--back">
-        <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="arrow-left" only %}</span>
-        <span>{{ wizard_back_label|default:"Voltar" }}</span>
-      </button>
-    </div>
-    <div class="footer-actions__primary">
-      {% if wizard_finalizar %}
-        {% if oficio_completo|default:False %}
-          <button class="cv-btn cv-btn--primary" type="submit" name="action" value="finalizar">Finalizar Ofício</button>
-        {% endif %}
-      {% else %}
-        <button class="cv-btn cv-btn--next" type="submit" name="action" value="wizard_next">
-          <span>Avançar</span>
-          <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="arrow-right" only %}</span>
-        </button>
-      {% endif %}
-    </div>
-  </footer>
-  {% if documentos_ctx.generation_status %}
-    <p class="doc-muted oficio-documentos-pdf-hint" role="status">{{ documentos_ctx.generation_status.pdf_message }}</p>
-  {% endif %}
-{% endblock %}
 
 {% block extra_js %}
   {{ block.super }}
