@@ -30,15 +30,8 @@ class DocumentoArtefato(models.Model):
     cache_key = models.CharField(max_length=128, db_index=True, blank=True, default="")
     generator_version = models.CharField(max_length=32, blank=True, default="")
     engine = models.CharField(max_length=32, blank=True, default="")
-    hash_sha256_assinado = models.CharField(max_length=64, blank=True, default="")
     arquivo = models.FileField(upload_to="documentos/gerados/%Y/%m/")
-    arquivo_assinado = models.FileField(
-        upload_to="documentos/assinados/%Y/%m/",
-        blank=True,
-    )
-    assinatura_backend = models.CharField(max_length=32, blank=True, default="")
     criado_em = models.DateTimeField(auto_now_add=True)
-    assinado_em = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ["-criado_em"]

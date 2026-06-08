@@ -17,7 +17,6 @@ from .services.access import artefato_pdf_download_filename
 from .services.access import build_pdf_http_response_for_artefato
 from .services.access import ensure_request_may_view_artefato_pdf
 from .services.access import select_artefato_pdf_fieldfile
-from .services.signing.workflow import assinar_artefato_pdf
 from .services.temporary_links import build_artefato_pdf_public_conteudo_url
 from .services.temporary_links import create_artefato_pdf_temp_token
 from .services.temporary_links import parse_artefato_pdf_temp_token
@@ -92,19 +91,3 @@ def artefato_pdf_visualizar(request, pk):
     )
 
 
-def build_assinatura_pdf_http_response(request, artefato: DocumentoArtefato) -> HttpResponse:
-    """Gera resposta HTTP com o PDF assinado (bytes finais + cabeçalhos)."""
-    result = assinar_artefato_pdf(request, artefato)
-    signed = result["pdf_bytes"]
-    meta = result["meta"]
-    nome = f"assinado_{artefato.tipo}.pdf"
-    response = HttpResponse(signed, content_type="application/pdf")
-    response["Content-Disposition"] = f'attachment; filename="{nome}"'
-    response["X-Signature-Backend"] = meta.get("backend", "")
-    return response
-
-
-@require_POST
-def assinar_artefato_documento(request, pk):
-    artefato = get_object_or_404(DocumentoArtefato, pk=pk)
-    return build_assinatura_pdf_http_response(request, artefato)

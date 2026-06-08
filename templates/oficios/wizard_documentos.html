@@ -4,7 +4,7 @@
 {% block extra_css %}
   {{ block.super }}
   <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260603">
-  <link rel="stylesheet" href="{% static 'css/oficios-documentos-inline.css' %}?v=20260603">
+  <link rel="stylesheet" href="{% static 'css/oficios-documentos-inline.css' %}?v=20260608">
 {% endblock %}
 
 {% block wizard_content %}
@@ -31,7 +31,7 @@
     <header class="cv-wizard-section-header">
       <div class="cv-wizard-section-header__copy">
         <h3 class="cv-wizard-section-title" id="documentos-conferencia-title">Documentos para conferência</h3>
-        <p class="cv-wizard-section-subtitle">Confira os documentos gerados antes de avançar para a central de assinaturas.</p>
+        <p class="cv-wizard-section-subtitle">Confira e baixe os documentos gerados para o ofício.</p>
       </div>
     </header>
 
@@ -46,6 +46,7 @@
               <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do documento">
                 <a class="cv-btn cv-btn--secondary document-inline-actions__btn" href="{{ di.oficio.url }}" target="_blank" rel="noopener noreferrer">Abrir em nova aba</a>
                 <a class="cv-btn cv-btn--secondary document-inline-actions__btn" href="{% url 'oficios:baixar_documento' oficio.pk 'pdf' %}">Baixar PDF</a>
+                <a class="cv-btn cv-btn--secondary document-inline-actions__btn" href="{{ di.oficio.download_docx_url }}">Baixar DOCX</a>
               </span>
             </span>
           {% endif %}
@@ -74,6 +75,7 @@
               <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do documento">
                 <a class="cv-btn cv-btn--secondary document-inline-actions__btn" href="{{ di.justificativa.url }}" target="_blank" rel="noopener noreferrer">Abrir em nova aba</a>
                 <a class="cv-btn cv-btn--secondary document-inline-actions__btn" href="{% url 'oficios:baixar_justificativa_documento' oficio.pk 'pdf' %}">Baixar PDF</a>
+                <a class="cv-btn cv-btn--secondary document-inline-actions__btn" href="{% url 'oficios:baixar_justificativa_documento' oficio.pk 'docx' %}">Baixar DOCX</a>
               </span>
             </span>
           {% endif %}
@@ -109,7 +111,7 @@
                   {% endfor %}
                 {% else %}
                   <button class="cv-btn cv-btn--secondary document-inline-actions__btn" type="button" data-open-all-termos>Abrir em nova aba</button>
-                  <button class="cv-btn cv-btn--secondary document-inline-actions__btn" type="button" data-download-all-termos>Baixar PDF</button>
+                  <a class="cv-btn cv-btn--secondary document-inline-actions__btn" href="{{ di.termos_download_todos_pdf_url }}">Baixar PDF</a>
                 {% endif %}
               </span>
             </span>
@@ -439,49 +441,6 @@
     </div>
   </section>
 
-  <section class="cv-wizard-section-card oficio-documentos-justification-section" aria-labelledby="oficio-documentos-justification-title">
-    <header class="cv-wizard-section-header">
-      <div class="cv-wizard-section-header__copy">
-        <h3 class="cv-wizard-section-title" id="oficio-documentos-justification-title">Justificativa</h3>
-      </div>
-    </header>
-
-    <div class="cv-wizard-section-body">
-    {% with jr=documentos_ctx.justificativa_resumo %}
-      <article class="oficio-documentos-card oficio-documentos-card--justification">
-        <header class="oficio-documentos-card__header oficio-documentos-justification__header">
-          <div class="oficio-documentos-justification__intro">
-            <span class="oficio-documentos-card__eyebrow">Justificativa</span>
-            <h4 class="oficio-documentos-card__title">Antecedência e fundamento registrado</h4>
-            <p class="oficio-documentos-card__subtitle">Resumo da regra aplicada ao ofício</p>
-          </div>
-          {% include "components/ui/badges/chip.html" with label=jr.chip_label tone=jr.chip_variant only %}
-        </header>
-        <div class="oficio-documentos-card__body oficio-documentos-card__body--justification">
-          <div class="oficio-documentos-justification-stack">
-            <div class="oficio-documentos-justification-grid">
-              <section class="oficio-documentos-model-card" aria-label="Modelo">
-                <span class="oficio-documentos-model-card__label">Modelo utilizado</span>
-                <strong class="oficio-documentos-model-card__value">{{ jr.modelo_nome }}</strong>
-              </section>
-              <section class="oficio-documentos-antecedence-card" aria-label="Antecedência">
-                <span class="oficio-documentos-antecedence-card__label">Dias de antecedência</span>
-                <strong class="oficio-documentos-antecedence-card__value">{{ jr.antecedencia_label }}</strong>
-                <span class="oficio-documentos-antecedence-card__help">{{ jr.antecedencia_helper }}</span>
-              </section>
-            </div>
-            <section class="oficio-documentos-justification-text-card" aria-label="Texto registrado">
-              <span class="oficio-documentos-justification-text-card__label">Texto registrado</span>
-              <div class="oficio-documentos-justification-text-card__body">
-                {{ jr.texto_registrado|linebreaks }}
-              </div>
-            </section>
-          </div>
-        </div>
-      </article>
-    {% endwith %}
-    </div>
-  </section>
 {% endblock %}
 
 {% block wizard_actions %}
@@ -491,37 +450,6 @@
         <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="arrow-left" only %}</span>
         <span>{{ wizard_back_label|default:"Voltar" }}</span>
       </button>
-      {% if oficio %}
-        <a class="cv-btn cv-btn--secondary" href="{% url 'oficios:baixar_documento' oficio.pk 'docx' %}">DOCX</a>
-        {% if documentos_ctx.generation_status %}
-          {% if documentos_ctx.generation_status.pdf_available %}
-            <a class="cv-btn cv-btn--secondary" href="{% url 'oficios:baixar_documento' oficio.pk 'pdf' %}">{{ documentos_ctx.generation_status.pdf_link_label }}</a>
-            {% if documentos_ctx.generation_status.oficio_pdf_botoes_assinatura and documentos_ctx.documentos_inline.oficio.disponivel %}
-              {% if documentos_ctx.generation_status.oficio_pdf_signature_status == "signed" %}
-                {% include "components/ui/badges/chip.html" with label="PDF assinado" tone="success" only %}
-              {% elif documentos_ctx.generation_status.oficio_pdf_signature_status == "unsigned" %}
-                {% include "components/ui/badges/chip.html" with label="PDF sem assinatura digital" tone="warning" only %}
-              {% endif %}
-              <a class="cv-btn cv-btn--secondary" href="{% url 'oficios:wizard_assinaturas' oficio.pk %}">Central de assinaturas</a>
-            {% elif documentos_ctx.documentos_inline.oficio.disponivel and documentos_ctx.generation_status.pdf_available %}
-              {% if not documentos_ctx.generation_status.documentos_persist_artefatos %}
-                <span class="doc-muted oficio-documentos-sig-hint" role="note">Assinatura digital desativada: defina <code>DOCUMENTOS_PERSIST_ARTEFATOS=true</code> no ambiente.</span>
-              {% endif %}
-            {% endif %}
-          {% else %}
-            <span class="cv-btn cv-btn--secondary oficio-documentos-pdf-btn--muted" role="note" title="{{ documentos_ctx.generation_status.pdf_message }}">PDF indisponível</span>
-          {% endif %}
-        {% else %}
-          <a class="cv-btn cv-btn--secondary" href="{% url 'oficios:baixar_documento' oficio.pk 'pdf' %}">PDF</a>
-        {% endif %}
-        <a class="cv-btn cv-btn--secondary" href="{% url 'oficios:baixar_justificativa_documento' oficio.pk 'pdf' %}">Justificativa PDF</a>
-        <a class="cv-btn cv-btn--secondary" href="{% url 'oficios:baixar_plano_trabalho_documento' oficio.pk 'docx' %}">Plano DOCX</a>
-        <a class="cv-btn cv-btn--secondary" href="{% url 'oficios:baixar_ordem_servico_documento' oficio.pk 'docx' %}">Ordem serviço DOCX</a>
-        <a class="cv-btn cv-btn--secondary" href="{% url 'termos:preview_termo_oficio' oficio.pk %}">Termos</a>
-      {% endif %}
-      {% if not oficio_completo|default:False %}
-        <button class="cv-btn cv-btn--secondary" type="submit" name="action" value="save_draft_list">Salvar como rascunho</button>
-      {% endif %}
     </div>
     <div class="footer-actions__primary">
       {% if wizard_finalizar %}

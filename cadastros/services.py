@@ -5,7 +5,6 @@ from core.deletion import excluir_com_protecao
 from core.normalizers import normalize_digits
 from core.normalizers import normalize_spaces
 from core.normalizers import remove_accents
-from .models import AssinaturaConfiguracao
 from .models import Cargo
 from .models import Cidade
 from .models import Combustivel
@@ -99,11 +98,6 @@ def resolver_sede_ids_desde_configuracao():
 @transaction.atomic
 def salvar_configuracao_sistema(form):
     configuracao = form.save(commit=False)
-    if "assinatura_planos_trabalho" in form.cleaned_data:
-        configuracao.coordenador_adm_plano_trabalho = form.cleaned_data.get(
-            "assinatura_planos_trabalho"
-        )
-
     cidade_ok = False
     if "uf" in form.cleaned_data:
         uf = form.cleaned_data.get("uf") or ""
@@ -117,35 +111,7 @@ def salvar_configuracao_sistema(form):
 
     configuracao.save()
     form.save_m2m()
-    salvar_assinaturas_configuracao(configuracao, form.cleaned_data)
     return configuracao, cidade_ok
-
-
-def salvar_assinaturas_configuracao(configuracao, cleaned_data):
-    mapping = [
-        ("assinatura_oficio", AssinaturaConfiguracao.TIPO_OFICIO, 1),
-        ("assinatura_justificativas", AssinaturaConfiguracao.TIPO_JUSTIFICATIVA, 1),
-        ("assinatura_planos_trabalho", AssinaturaConfiguracao.TIPO_PLANO_TRABALHO, 1),
-        ("assinatura_ordens_servico", AssinaturaConfiguracao.TIPO_ORDEM_SERVICO, 1),
-    ]
-    for field_name, tipo, ordem in mapping:
-        servidor = cleaned_data.get(field_name)
-        AssinaturaConfiguracao.objects.update_or_create(
-            configuracao=configuracao,
-            tipo=tipo,
-            ordem=ordem,
-            defaults={"servidor": servidor, "ativo": bool(servidor)},
-        )
-
-    AssinaturaConfiguracao.objects.filter(
-        configuracao=configuracao,
-        tipo=AssinaturaConfiguracao.TIPO_OFICIO,
-        ordem=2,
-    ).delete()
-    AssinaturaConfiguracao.objects.filter(
-        configuracao=configuracao,
-        tipo=AssinaturaConfiguracao.TIPO_TERMO_AUTORIZACAO,
-    ).delete()
 
 
 @transaction.atomic

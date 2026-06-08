@@ -148,3 +148,16 @@ def empacotar_termos_zip(documentos: list[DocumentoGerado]) -> bytes:
         for doc in documentos:
             zf.writestr(doc.nome_arquivo, doc.conteudo)
     return buf.getvalue()
+
+
+def fundir_termos_pdf(documentos: list[DocumentoGerado]) -> bytes:
+    from pypdf import PdfReader, PdfWriter
+
+    writer = PdfWriter()
+    for doc in documentos:
+        reader = PdfReader(io.BytesIO(doc.conteudo))
+        for page in reader.pages:
+            writer.add_page(page)
+    buf = io.BytesIO()
+    writer.write(buf)
+    return buf.getvalue()

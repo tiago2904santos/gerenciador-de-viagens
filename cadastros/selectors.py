@@ -124,21 +124,6 @@ def get_configuracao_sistema():
 
 def build_configuracao_context():
     configuracao = get_configuracao_sistema()
-    assinaturas = {}
-    for assinatura in configuracao.assinaturas.select_related("servidor", "servidor__cargo").order_by(
-        "tipo",
-        "ordem",
-    ):
-        if not assinatura.ativo or not assinatura.servidor_id:
-            continue
-        assinaturas.setdefault(assinatura.tipo, []).append(
-            {
-                "ordem": assinatura.ordem,
-                "servidor": assinatura.servidor,
-                "nome": assinatura.servidor.nome,
-            },
-        )
-
     cidade_doc = configuracao.cidade_endereco or ""
     return {
         "nome_orgao": configuracao.nome_orgao,
@@ -164,5 +149,4 @@ def build_configuracao_context():
         "prazo_justificativa_dias": configuracao.prazo_justificativa_dias,
         "pt_ultimo_numero": configuracao.pt_ultimo_numero,
         "pt_ano": configuracao.pt_ano,
-        "assinaturas": assinaturas,
     }

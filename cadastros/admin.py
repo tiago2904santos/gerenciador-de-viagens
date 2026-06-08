@@ -1,6 +1,5 @@
 ﻿from django.contrib import admin
 
-from .models import AssinaturaConfiguracao
 from .models import Cargo
 from .models import Cidade
 from .models import Combustivel
@@ -19,13 +18,6 @@ class ConfiguracaoSistemaAdmin(admin.ModelAdmin):
         if ConfiguracaoSistema.objects.exists():
             return False
         return super().has_add_permission(request)
-
-
-@admin.register(AssinaturaConfiguracao)
-class AssinaturaConfiguracaoAdmin(admin.ModelAdmin):
-    list_display = ("configuracao", "tipo", "ordem", "servidor", "ativo", "updated_at")
-    list_filter = ("tipo", "ativo")
-    ordering = ("tipo", "ordem")
 
 
 @admin.register(Cargo)

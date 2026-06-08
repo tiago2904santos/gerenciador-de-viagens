@@ -36,13 +36,6 @@
       </div>
       </section>
 
-      {% include "components/ui/layouts/form_section.html" with title="Assinaturas documentais" description="Assinantes preferenciais por tipo de documento; não é assinatura digital." section_id="config-assinaturas-section" only %}
-      <div class="field-grid">
-        {% include "components/forms/form_field.html" with field=form.assinatura_oficio size_class="field-size-2" only %}
-        {% include "components/forms/form_field.html" with field=form.assinatura_justificativas size_class="field-size-2" only %}
-        {% include "components/forms/form_field.html" with field=form.assinatura_planos_trabalho size_class="field-size-2" only %}
-        {% include "components/forms/form_field.html" with field=form.assinatura_ordens_servico size_class="field-size-2" only %}
-      </div>
       {% include "components/ui/layouts/footer_actions.html" with secondary_label="Voltar" secondary_url=back_url primary_label="Salvar" primary_icon="check" only %}
       </section>
 

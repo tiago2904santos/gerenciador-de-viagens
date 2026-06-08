@@ -1,4 +1,5 @@
 from pathlib import Path
+from datetime import timedelta
 from unittest import mock
 
 from django.contrib.auth import get_user_model
@@ -9,8 +10,11 @@ from django.utils import timezone
 from cadastros.models import Cargo
 from cadastros.models import Servidor
 from cadastros.models import Unidade
+from justificativas.models import ModeloJustificativa
+from justificativas.models import Justificativa
 from oficios.models import Oficio
 from oficios.selectors import listar_modelos_motivo
+from roteiros.models import Roteiro
 
 
 class OficioViewsTests(TestCase):
@@ -97,12 +101,131 @@ class OficioViewsTests(TestCase):
         )
 
     @mock.patch("documentos.services.warm_cache.ensure_document_artifact_cached")
+    @mock.patch(
+        "oficios.document_generation.get_document_generation_status",
+        return_value={
+            "docx_available": True,
+            "pdf_available": True,
+            "pdf_cached": False,
+            "pdf_engine": "test",
+            "pdf_message": "",
+            "pdf_link_label": "PDF",
+            "documentos_persist_artefatos": False,
+            "oficio_pdf_botoes_assinatura": False,
+        },
+    )
+    @mock.patch("oficios.services.validar_oficio_para_documento", return_value={"status": "complete", "pendencias": []})
+    @mock.patch("oficios.views.validar_oficio_para_documento", return_value={"status": "complete", "pendencias": []})
+    def test_wizard_documentos_exibe_baixar_docx_no_documento_original(
+        self,
+        _m_view_val,
+        _m_service_val,
+        _m_generation,
+        _m_cache,
+    ):
+        oficio = Oficio.objects.create(
+            numero=1,
+            ano=2026,
+            motivo="Motivo",
+            custeio=Oficio.CUSTEIO_UNIDADE_DPC,
+        )
+        response = self.client.get(reverse("oficios:wizard_documentos", args=[oficio.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Baixar DOCX")
+        self.assertContains(response, reverse("oficios:baixar_documento", args=[oficio.pk, "docx"]))
+
+    @mock.patch("documentos.services.warm_cache.ensure_document_artifact_cached")
+    @mock.patch(
+        "oficios.document_generation.get_document_generation_status",
+        return_value={
+            "docx_available": True,
+            "pdf_available": True,
+            "pdf_cached": False,
+            "pdf_engine": "test",
+            "pdf_message": "",
+            "pdf_link_label": "PDF",
+            "documentos_persist_artefatos": False,
+            "oficio_pdf_botoes_assinatura": False,
+        },
+    )
+    @mock.patch("oficios.services.validar_oficio_para_documento", return_value={"status": "complete", "pendencias": []})
+    @mock.patch("oficios.views.validar_oficio_para_documento", return_value={"status": "complete", "pendencias": []})
+    def test_wizard_documentos_exibe_baixar_docx_na_justificativa(
+        self,
+        _m_view_val,
+        _m_service_val,
+        _m_generation,
+        _m_cache,
+    ):
+        oficio = Oficio.objects.create(
+            numero=1,
+            ano=2026,
+            motivo="Motivo",
+            custeio=Oficio.CUSTEIO_UNIDADE_DPC,
+        )
+        response = self.client.get(reverse("oficios:wizard_documentos", args=[oficio.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Justificativa")
+        self.assertContains(response, "Baixar DOCX")
+        self.assertContains(response, reverse("oficios:baixar_justificativa_documento", args=[oficio.pk, "docx"]))
+
+    @mock.patch("documentos.services.warm_cache.ensure_document_artifact_cached")
     def test_wizard_documentos_exibe_secao_conferencia(self, _m_cache):
         oficio = Oficio.objects.create(numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
         response = self.client.get(reverse("oficios:wizard_documentos", args=[oficio.pk]))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Documentos para conferência")
         self.assertNotContains(response, "Visualizar documento")
+
+    @mock.patch("documentos.services.warm_cache.ensure_document_artifact_cached")
+    def test_wizard_documentos_omite_secao_de_justificativa(self, _m_cache):
+        oficio = Oficio.objects.create(numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        roteiro = Roteiro.objects.create(saida_dt=timezone.now() + timedelta(days=7))
+        oficio.roteiro = roteiro
+        oficio.save(update_fields=["roteiro"])
+        modelo = ModeloJustificativa.objects.create(
+            nome="Urgencia operacional",
+            texto="Modelo de justificativa para teste.",
+        )
+        Justificativa.objects.create(
+            oficio=oficio,
+            modelo=modelo,
+            texto="Justificativa registrada para teste.",
+        )
+        response = self.client.get(reverse("oficios:wizard_documentos", args=[oficio.pk]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "oficio-documentos-justification-section")
+        self.assertNotContains(response, "Justificativa registrada para teste.")
+        self.assertNotContains(response, "Urgencia operacional")
+
+    @mock.patch("documentos.services.warm_cache.ensure_document_artifact_cached")
+    @mock.patch("oficios.views.oficio_esta_completo_para_finalizar", return_value=True)
+    @mock.patch("oficios.services.validar_oficio_para_documento", return_value={"status": "complete", "pendencias": []})
+    @mock.patch("oficios.views.validar_oficio_para_documento", return_value={"status": "complete", "pendencias": []})
+    def test_wizard_documentos_footer_mostra_apenas_voltar_e_finalizar(
+        self,
+        _m_view_val,
+        _m_service_val,
+        _m_completo,
+        _m_cache,
+    ):
+        oficio = Oficio.objects.create(numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        response = self.client.get(reverse("oficios:wizard_documentos", args=[oficio.pk]))
+        html = response.content.decode("utf-8")
+        start = html.index('<footer class="footer-actions oficio-wizard__actions app-wizard__actions">')
+        end = html.index("</footer>", start) + len("</footer>")
+        footer = html[start:end]
+
+        self.assertIn("Voltar", footer)
+        self.assertIn("Finalizar", footer)
+        self.assertNotIn("DOCX", footer)
+        self.assertNotIn("PDF", footer)
+        self.assertNotIn("Central de assinaturas", footer)
+        self.assertNotIn("Justificativa PDF", footer)
+        self.assertNotIn("Plano DOCX", footer)
+        self.assertNotIn("Ordem", footer)
+        self.assertNotIn("Salvar como rascunho", footer)
 
     @mock.patch("documentos.services.warm_cache.ensure_document_artifact_cached")
     @mock.patch("oficios.services.validar_oficio_para_documento", return_value={"status": "complete", "pendencias": []})

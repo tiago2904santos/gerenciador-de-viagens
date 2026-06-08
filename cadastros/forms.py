@@ -17,7 +17,6 @@ from core.utils.masks import (
     validar_cpf_digitos,
 )
 
-from .models import AssinaturaConfiguracao
 from .models import Cargo
 from .models import Cidade
 from .models import Combustivel
@@ -484,36 +483,7 @@ class ViaturaForm(BaseCadastroForm):
 
 
 class ConfiguracaoSistemaForm(forms.ModelForm):
-    """Singleton institucional: unidade, cidade em documentos e assinantes por tipo."""
-
-    assinatura_oficio = forms.ModelChoiceField(
-        queryset=Servidor.objects.none(),
-        required=False,
-        empty_label="---------",
-        label="Assinante ofício",
-        widget=forms.Select(attrs={"class": "form-select"}),
-    )
-    assinatura_justificativas = forms.ModelChoiceField(
-        queryset=Servidor.objects.none(),
-        required=False,
-        empty_label="---------",
-        label="Assinante justificativa",
-        widget=forms.Select(attrs={"class": "form-select"}),
-    )
-    assinatura_planos_trabalho = forms.ModelChoiceField(
-        queryset=Servidor.objects.none(),
-        required=False,
-        empty_label="---------",
-        label="Assinante plano de trabalho",
-        widget=forms.Select(attrs={"class": "form-select"}),
-    )
-    assinatura_ordens_servico = forms.ModelChoiceField(
-        queryset=Servidor.objects.none(),
-        required=False,
-        empty_label="---------",
-        label="Assinante ordem de serviço",
-        widget=forms.Select(attrs={"class": "form-select"}),
-    )
+    """Singleton institucional: unidade, cidade em documentos."""
 
     class Meta:
         model = ConfiguracaoSistema
@@ -583,35 +553,6 @@ class ConfiguracaoSistemaForm(forms.ModelForm):
         if self.instance and self.instance.pk and not self.data:
             self.initial["cep"] = format_cep(self.instance.cep)
             self.initial["telefone"] = format_telefone(self.instance.telefone)
-
-        extra_ids = []
-        if self.instance and self.instance.pk:
-            extra_ids = list(self.instance.assinaturas.values_list("servidor_id", flat=True))
-            extra_ids.append(self.instance.coordenador_adm_plano_trabalho_id)
-        qs = _servidores_assinantes_queryset(extra_ids)
-
-        for fname in (
-            "assinatura_oficio",
-            "assinatura_justificativas",
-            "assinatura_planos_trabalho",
-            "assinatura_ordens_servico",
-        ):
-            self.fields[fname].queryset = qs
-
-        if self.instance and self.instance.pk:
-            mapping = [
-                ("assinatura_oficio", AssinaturaConfiguracao.TIPO_OFICIO, 1),
-                ("assinatura_justificativas", AssinaturaConfiguracao.TIPO_JUSTIFICATIVA, 1),
-                ("assinatura_planos_trabalho", AssinaturaConfiguracao.TIPO_PLANO_TRABALHO, 1),
-                ("assinatura_ordens_servico", AssinaturaConfiguracao.TIPO_ORDEM_SERVICO, 1),
-            ]
-            for field_name, tipo, ordem in mapping:
-                rec = self.instance.assinaturas.filter(tipo=tipo, ordem=ordem).first()
-                sid = rec.servidor_id if rec and rec.servidor_id else None
-                if not sid and tipo == AssinaturaConfiguracao.TIPO_PLANO_TRABALHO:
-                    sid = self.instance.coordenador_adm_plano_trabalho_id
-                if sid:
-                    self.fields[field_name].initial = sid
 
     def clean_divisao(self):
         raw = (self.cleaned_data.get("divisao") or "").strip()

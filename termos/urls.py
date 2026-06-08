@@ -19,6 +19,11 @@ urlpatterns = [
         name="baixar_termo_servidor",
     ),
     path(
+        "oficio/<int:pk>/todos/pdf/",
+        views.baixar_termos_todos_pdf,
+        name="baixar_termos_todos_pdf",
+    ),
+    path(
         "oficio/<int:pk>/lote/<str:formato>/",
         views.baixar_termo_lote_zip,
         name="baixar_termo_lote_zip",

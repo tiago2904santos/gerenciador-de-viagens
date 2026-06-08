@@ -22,6 +22,7 @@ from oficios.services import redirect_para_corrigir_documento_oficio
 from oficios.services import validar_oficio_para_documento
 
 from .services import empacotar_termos_zip
+from .services import fundir_termos_pdf
 from .services import gerar_termo_lote
 from .services import gerar_termo_um
 from .services import listar_servidores_com_termo
@@ -119,6 +120,26 @@ def baixar_termo_servidor(request, pk, servidor_pk, formato):
     response["Content-Disposition"] = f'attachment; filename="{doc.nome_arquivo}"'
     response["X-Content-Type-Options"] = "nosniff"
     response["X-Document-SHA256"] = doc.hash_sha256
+    return response
+
+
+def baixar_termos_todos_pdf(request, pk):
+    oficio = get_oficio_by_id(pk)
+    aval = validar_oficio_para_documento(oficio)
+    if aval["pendencias"]:
+        messages.error(request, "Termos nao gerados: oficio incompleto.")
+        return redirect(f"{redirect_para_corrigir_documento_oficio(oficio)}?documento_incompleto=1")
+
+    if not listar_servidores_com_termo(oficio).exists():
+        messages.error(request, "Nenhum servidor selecionado para Termo de Autorizacao.")
+        return redirect("termos:index")
+
+    docs = gerar_termo_lote(oficio, DocumentoFormato.PDF)
+    pdf_bytes = fundir_termos_pdf(docs)
+    nome = f"termos_oficio_{oficio.numero_formatado.replace('/', '-')}.pdf"
+    response = HttpResponse(pdf_bytes, content_type="application/pdf")
+    response["Content-Disposition"] = f'attachment; filename="{nome}"'
+    response["X-Content-Type-Options"] = "nosniff"
     return response
 
 

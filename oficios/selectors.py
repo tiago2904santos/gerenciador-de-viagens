@@ -13,35 +13,6 @@ from .models import ModeloMotivoOficio
 from .models import Oficio
 
 
-def map_assinatura_pdf_oficio_por_ids(oficio_ids: list[int]) -> dict[int, str]:
-    """
-    Para cada ofício, devolve a situação do PDF de ofício mais recente: ``assinado`` ou ``aguardando``.
-    Usado na listagem para complementar ofícios finalizados (sem N+1 por cartão).
-    """
-    from django.conf import settings
-
-    if not oficio_ids or not getattr(settings, "DOCUMENTOS_PERSIST_ARTEFATOS", False):
-        return {}
-
-    from documentos.models import DocumentoArtefato
-    from documentos.services.types import DocumentoTipo
-
-    ids = sorted({int(pk) for pk in oficio_ids})
-    qs = DocumentoArtefato.objects.filter(
-        oficio_id__in=ids,
-        tipo=DocumentoTipo.OFICIO.value,
-        formato="pdf",
-    ).order_by("oficio_id", "-criado_em")
-    out: dict[int, str] = {}
-    for art in qs:
-        oid = int(art.oficio_id)
-        if oid in out:
-            continue
-        signed = bool(art.assinado_em) or bool(getattr(art, "arquivo_assinado", None) and art.arquivo_assinado.name)
-        out[oid] = "assinado" if signed else "aguardando"
-    return out
-
-
 def listar_oficios(q: str | None = None, status: str | None = None):
     queryset = (
         Oficio.objects.select_related("roteiro", "viatura", "motorista", "solicitante")

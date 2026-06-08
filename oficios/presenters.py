@@ -40,7 +40,7 @@ def _oficio_faixa_lateral_class(status: str) -> str:
     return "roteiro-list-card--faixa-neutro"
 
 
-def apresentar_oficio_card(oficio, *, assinatura_pdf: str | None = None):
+def apresentar_oficio_card(oficio):
     card = {
         "number_label": "N° do Ofício",
         "number": oficio.numero_formatado,
@@ -63,11 +63,6 @@ def apresentar_oficio_card(oficio, *, assinatura_pdf: str | None = None):
             build_meta("Viajantes", str(oficio.servidores.count())),
         ],
     }
-    if oficio.status == Oficio.STATUS_FINALIZADO and assinatura_pdf in ("assinado", "aguardando"):
-        suffix = "Assinado" if assinatura_pdf == "assinado" else "Aguardando assinatura"
-        card["status"] = f"Finalizado — {suffix}"
-        card["status_chip_label"] = card["status"]
-        card["side_items"].append(build_meta("Assinatura", suffix))
     return card
 
 
@@ -298,7 +293,6 @@ def apresentar_oficio_wizard_header(etapa_atual, oficio=None):
         "roteiro": "Roteiro e diárias",
         "justificativa": "Justificativa",
         "documentos": "Documentos",
-        "assinaturas": "Central de assinaturas",
         "resumo": "Documentos",
     }
     step_numbers = {
@@ -306,7 +300,6 @@ def apresentar_oficio_wizard_header(etapa_atual, oficio=None):
         "roteiro": 2,
         "justificativa": 3,
         "documentos": 4,
-        "assinaturas": 5,
         "resumo": 4,
     }
     subtitle = titles.get(etapa_atual, "Dados e viajantes")
@@ -314,7 +307,7 @@ def apresentar_oficio_wizard_header(etapa_atual, oficio=None):
     ctx = {
         "title": "Cadastro de ofício",
         "subtitle": subtitle,
-        "description": f"Etapa {step_number} de 5 — {subtitle}",
+        "description": f"Etapa {step_number} de 4 — {subtitle}",
     }
     if oficio is not None:
         ctx["status_label"] = oficio.get_status_display()
@@ -407,7 +400,6 @@ def apresentar_oficio_wizard_steps(
     roteiro_status=None,
     justificativa_status=None,
     documentos_status=None,
-    assinaturas_status=None,
 ):
     dados_viajantes_status = dados_viajantes_status or "not_started"
     transporte_status = transporte_status or "not_started"
@@ -421,14 +413,11 @@ def apresentar_oficio_wizard_steps(
     else:
         justificativa_status = justificativa_status or "not_started"
     documentos_status = documentos_status or "not_started"
-    if assinaturas_status is None:
-        assinaturas_status = documentos_status
     steps = [
         {"key": "dados_viajantes", "number": 1, "title": "Dados e viajantes"},
         {"key": "roteiro", "number": 2, "title": "Roteiro e diárias"},
         {"key": "justificativa", "number": 3, "title": "Justificativa"},
         {"key": "documentos", "number": 4, "title": "Documentos"},
-        {"key": "assinaturas", "number": 5, "title": "Central de assinaturas"},
     ]
     for step in steps:
         key = step["key"]
@@ -448,10 +437,6 @@ def apresentar_oficio_wizard_steps(
             step["url"] = reverse("oficios:wizard_documentos", args=[oficio.pk]) if oficio else ""
             step["state"] = "current" if etapa_atual == key else documentos_status
             step["completion_state"] = documentos_status
-        elif key == "assinaturas":
-            step["url"] = reverse("oficios:wizard_assinaturas", args=[oficio.pk]) if oficio else ""
-            step["state"] = "current" if etapa_atual == key else assinaturas_status
-            step["completion_state"] = assinaturas_status
         else:
             step["url"] = ""
             step["state"] = "locked"
@@ -631,6 +616,7 @@ def apresentar_oficio_wizard_documentos_context(oficio):
         "oficio": {
             "titulo": "Documento original (Ofício)",
             "url": reverse("oficios:oficio_pdf_inline", args=[oficio.pk]),
+            "download_docx_url": reverse("oficios:baixar_documento", args=[oficio.pk, "docx"]),
             "disponivel": disponivel,
             "mensagem": doc_msg,
         },
@@ -643,6 +629,9 @@ def apresentar_oficio_wizard_documentos_context(oficio):
         "termos": termos_items,
         "termos_vazio": not termos_items,
         "termos_empty_message": "Nenhum servidor selecionado para Termo de Autorização.",
+        "termos_download_todos_pdf_url": (
+            reverse("termos:baixar_termos_todos_pdf", args=[oficio.pk]) if termos_items else None
+        ),
         "mensagem_indisponivel": doc_msg,
     }
 

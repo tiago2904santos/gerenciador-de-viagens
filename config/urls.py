@@ -18,6 +18,5 @@ urlpatterns = [
     path("ordens-servico/", include("ordens_servico.urls")),
     path("prestacoes-contas/", include("prestacoes_contas.urls")),
     path("diario-bordo/", include("diario_bordo.urls")),
-    path("assinaturas/", include("assinaturas.urls")),
     path("integracoes/google-drive/", include("integracoes.google_drive.urls")),
 ]

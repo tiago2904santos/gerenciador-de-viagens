@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import datetime
 import enum
-import hashlib
 import json
 import uuid
 from decimal import Decimal
@@ -97,33 +96,9 @@ def persist_geracao(
             payload_snapshot=payload_snapshot,
             hash_sha256=doc.hash_sha256,
             arquivo=arquivo,
-            assinatura_backend="",
             cache_key=cache_key or "",
             engine=engine or "",
             generator_version=gen_ver,
         )
 
 
-def atualizar_apos_assinatura(
-    artefato: DocumentoArtefato,
-    *,
-    pdf_assinado: bytes,
-    backend: str,
-) -> DocumentoArtefato:
-    digest = hashlib.sha256(pdf_assinado).hexdigest()
-    nome = f"assinado_{artefato.pk}.pdf"
-    artefato.arquivo_assinado.save(nome, ContentFile(pdf_assinado), save=False)
-    artefato.hash_sha256_assinado = digest
-    artefato.assinatura_backend = backend
-    from django.utils import timezone
-
-    artefato.assinado_em = timezone.now()
-    artefato.save(
-        update_fields=[
-            "arquivo_assinado",
-            "hash_sha256_assinado",
-            "assinatura_backend",
-            "assinado_em",
-        ],
-    )
-    return artefato

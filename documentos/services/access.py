@@ -30,14 +30,6 @@ def ensure_request_may_view_artefato_pdf(request: HttpRequest, artefato: Documen
 
 
 def select_artefato_pdf_fieldfile(artefato: DocumentoArtefato) -> FieldFile | None:
-    """Campo de ficheiro a servir: assinado se existir no storage, senão o original."""
-    ass = artefato.arquivo_assinado
-    if ass and getattr(ass, "name", ""):
-        try:
-            if ass.storage.exists(ass.name):
-                return ass
-        except OSError:
-            return None
     arq = artefato.arquivo
     if arq and getattr(arq, "name", ""):
         try:

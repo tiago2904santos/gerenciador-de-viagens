@@ -37,7 +37,6 @@ INSTALLED_APPS = [
     "ordens_servico",
     "prestacoes_contas",
     "diario_bordo",
-    "assinaturas",
     "integracoes.google_drive",
 ]
 
@@ -139,12 +138,3 @@ DOCUMENTOS_SIMPLE_PDF_FALLBACK = os.getenv("DOCUMENTOS_SIMPLE_PDF_FALLBACK", "")
     "yes",
 )
 
-SIGNATURE_BACKEND = (os.getenv("SIGNATURE_BACKEND") or "disabled").strip().lower()
-SIGNATURE_PKCS12_PATH = (os.getenv("SIGNATURE_PKCS12_PATH") or "").strip() or None
-SIGNATURE_PKCS12_PASSWORD = (os.getenv("SIGNATURE_PKCS12_PASSWORD") or "").strip() or None
-SIGNATURE_REASON = os.getenv("SIGNATURE_REASON", "Documento institucional")
-SIGNATURE_LOCATION = os.getenv("SIGNATURE_LOCATION", "")
-SIGNATURE_VISIBLE = os.getenv("SIGNATURE_VISIBLE", "true").lower() in ("1", "true", "yes")
-SIGNATURE_FIELD_NAME = (os.getenv("SIGNATURE_FIELD_NAME") or "AssinaturaCentralViagens").strip()
-
-TIMESTAMP_URL = (os.getenv("TIMESTAMP_URL") or "").strip() or None
