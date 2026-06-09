@@ -114,6 +114,13 @@
   width: 100%;
 }
 
+/* Na etapa de justificativa, o campo "Modelo" precisa esticar a linha inteira. */
+.oficio-justificativa-card .wizard-inner-section > .field,
+.oficio-justificativa-card .wizard-inner-section > .app-form-field {
+  align-self: stretch;
+  width: 100%;
+}
+
 /* Textarea de Motivo no wizard: visual idêntico ao input, só com altura maior */
 .oficio-wizard .cv-field__control,
 .oficio-wizard .cv-field__select {

@@ -13,22 +13,14 @@
     </header>
 
     <div class="cv-wizard-section-body oficio-justificativa-card__body">
-      <section class="wizard-inner-section" aria-labelledby="justificativa-modelo-title">
-        <header class="wizard-inner-section__header wizard-inner-section__header--actions">
-          <div class="wizard-inner-section__header-copy">
-            <h4 class="wizard-inner-section__title" id="justificativa-modelo-title">Modelo</h4>
-            <p class="wizard-inner-section__description">Selecione um modelo opcional ou siga sem preencher.</p>
-          </div>
-        </header>
-        {% include "components/forms/form_field.html" with field=form.modelo label="Modelo" help_text="Selecione um modelo opcional ou siga sem preencher." only %}
+      <section class="wizard-inner-section">
+        {% include "components/forms/form_field.html" with field=form.modelo label="Modelo" only %}
       </section>
 
-      <section class="wizard-inner-section" aria-labelledby="justificativa-texto-title">
-        <header class="wizard-inner-section__header">
-          <h4 class="wizard-inner-section__title" id="justificativa-texto-title">Justificativa</h4>
-          <p class="wizard-inner-section__description">Escreva o texto que será usado no ofício.</p>
-        </header>
-        {% include "components/forms/form_field.html" with field=form.texto label="Justificativa" only %}
+      <section class="wizard-inner-section">
+        <div class="oficio-justificativa-card__wide-field" style="width: 100%; align-self: stretch;">
+          {% include "components/forms/form_field.html" with field=form.texto label="Justificativa" only %}
+        </div>
       </section>
     </div>
 

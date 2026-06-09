@@ -301,7 +301,6 @@
       }
       panel.style.position = 'fixed';
       panel.style.width = width + 'px';
-      panel.style.zIndex = '2000';
 
       var left = rect.right - width;
       if (vw) {

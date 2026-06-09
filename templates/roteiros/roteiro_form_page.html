@@ -1,29 +1,34 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
-<link rel="stylesheet" href="{% static 'css/domain.css' %}">
-<link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260601y">
-{% endblock %}
-
 {% block title %}{% if object %}Editar roteiro{% else %}Novo roteiro{% endif %}{% endblock %}
 
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260609a">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+  <link rel="stylesheet" href="{% static 'css/domain.css' %}">
+  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260601y">
+{% endblock %}
+
 {% block extra_js %}
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-<script src="{% static 'js/roteiros_wizard.js' %}"></script>
-<script type="module" src="{% static 'js/roteiros.js' %}?v=20260602"></script>
-<script src="{% static 'js/roteiros-map.js' %}"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="{% static 'js/roteiros_wizard.js' %}"></script>
+  <script type="module" src="{% static 'js/roteiros.js' %}?v=20260602"></script>
+  <script src="{% static 'js/roteiros-map.js' %}"></script>
 {% endblock %}
 
 {% block content %}
-  <div class="page-shell page-shell--wizard app-page--roteiros-form app-page-shell--wizard">
-    {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="ROTEIROS" title=page_title description="Sede, destinos, trechos, retorno e diárias no mesmo fluxo." icon_label="RT" module_label="Roteiros" back_label="Voltar para lista" back_url=back_url only %}
+  <div class="page-shell page-shell--wizard oficio-wizard app-wizard">
+    {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="ROTEIROS" title=wizard_header.title description=wizard_header.description icon_label="RT" module_label="Roteiros" back_label=wizard_back_label back_url=wizard_back_url status_label=wizard_header.status_label status_variant=wizard_header.status_variant only %}
 
-    <main class="main-form-panel main-form-panel--stack">
-      <div class="cv-wizard-section-stack app-form-shell app-form-shell--roteiro roteiro-form-shell">
+    {% if wizard_page_steps %}
+      {% include "components/ui/navigation/page_stepper.html" with steps=wizard_page_steps only %}
+    {% endif %}
+
+    <main class="main-form-panel main-form-panel--stack oficio-wizard__main">
+      <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
         {{ initial_trechos_data|json_script:"initialTrechosData" }}
-        {% include "roteiros/partials/roteiro_form.html" with is_avulso=True %}
+        {% include "roteiros/includes/_roteiro_editor.html" %}
       </div>
     </main>
   </div>

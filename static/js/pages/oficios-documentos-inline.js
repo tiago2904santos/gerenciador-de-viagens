@@ -43,14 +43,6 @@
     });
   });
 
-  document.querySelectorAll("[data-download-all-termos]").forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      var card = btn.closest(".document-inline-card--termos");
-      if (!card) return;
-      clickUrls(collectTermUrls(card, "data-termo-download-pdf-url"));
-    });
-  });
-
   function hydrateIframe(root) {
     var frame = root.querySelector(".document-inline-viewer__frame[data-src]");
     if (!frame) return;

@@ -132,6 +132,16 @@ def novo(request):
             "page_title": "Novo roteiro",
             "page_description": "Sede, destinos, trechos, retorno e diárias no mesmo fluxo do legacy.",
             "back_url": reverse("roteiros:index"),
+            "wizard_header": {
+                "title": "Novo roteiro",
+                "description": "Roteiro e diárias",
+                "status_label": "",
+                "status_variant": "",
+            },
+            "wizard_back_label": "Voltar para lista",
+            "wizard_back_url": reverse("roteiros:index"),
+            "wizard_page_steps": [],
+            "roteiro_editor_oficio": True,
             **context,
         },
     )
@@ -181,6 +191,8 @@ def editar(request, pk):
         roteiro_state=roteiro_state,
         route_options=route_options,
     )
+    roteiro_status_label = roteiro.get_status_display() if hasattr(roteiro, "get_status_display") else ""
+    roteiro_status_variant = "draft" if roteiro.status == Roteiro.STATUS_RASCUNHO else "active"
     return render(
         request,
         "roteiros/roteiro_form_page.html",
@@ -189,6 +201,16 @@ def editar(request, pk):
             "page_description": "Ajuste sede, destinos, trechos e retorno.",
             "back_url": reverse("roteiros:detalhe", args=[roteiro.pk]),
             "delete_url": reverse("roteiros:excluir", args=[roteiro.pk]),
+            "wizard_header": {
+                "title": "Editar roteiro",
+                "description": "Roteiro e diárias",
+                "status_label": roteiro_status_label,
+                "status_variant": roteiro_status_variant,
+            },
+            "wizard_back_label": "Voltar para detalhes",
+            "wizard_back_url": reverse("roteiros:detalhe", args=[roteiro.pk]),
+            "wizard_page_steps": [],
+            "roteiro_editor_oficio": True,
             **context,
         },
     )

@@ -161,6 +161,29 @@ class TermoServidorPdfInlineTests(TestCase):
         self.assertEqual(response["X-Document-SHA256"], "deadbeef")
         m_gerar.assert_called_once_with(self.oficio, self.servidor_ok, DocumentoFormato.PDF)
 
+    @mock.patch("termos.views.validar_oficio_para_documento", return_value={"pendencias": []})
+    @mock.patch("termos.views.fundir_termos_pdf")
+    @mock.patch("termos.views.gerar_termo_lote")
+    def test_download_todos_pdf_usa_arquivo_consolidado(self, m_lote, m_fundir, _m_val):
+        self.oficio.servidores_termo_autorizacao.add(self.servidor_ok)
+        docs = [
+            SimpleNamespace(conteudo=b"%PDF-1.4\n1", nome_arquivo="termo-1.pdf"),
+            SimpleNamespace(conteudo=b"%PDF-1.4\n2", nome_arquivo="termo-2.pdf"),
+        ]
+        m_lote.return_value = docs
+        m_fundir.return_value = b"%PDF-1.4\nmerged"
+
+        url = reverse("termos:baixar_termos_todos_pdf", args=[self.oficio.pk])
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/pdf")
+        self.assertIn("attachment", response["Content-Disposition"])
+        self.assertIn("termos_oficio_", response["Content-Disposition"])
+        self.assertEqual(response.content, b"%PDF-1.4\nmerged")
+        m_lote.assert_called_once_with(self.oficio, DocumentoFormato.PDF)
+        m_fundir.assert_called_once_with(docs)
+
     def test_template_html_oficial_renderiza_dados_reais(self):
         payload = build_termo_payload(self.oficio, self.servidor_ok)
         html = render_to_string("documentos/pdf/termo_autorizacao.html", payload)
