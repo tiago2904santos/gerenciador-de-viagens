@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+import hashlib
 import io
 import zipfile
 
 from cadastros.models import Servidor
+from cadastros.models import Viatura
+from cadastros.selectors import build_configuracao_context
+from core.utils.masks import format_placa
 
 from documentos.services.facade import DocumentoFacade
 from documentos.services.facade import DocumentoGerado
@@ -15,8 +19,16 @@ from documentos.services.types import DocumentoTipo
 from documentos.services.formatters import format_institucional_rodape_linha
 
 from oficios.documents import VarianteTermo
+from oficios.documents import _document_text
+from oficios.documents import _format_date
+from oficios.documents import _oficio_termo_payload
+from oficios.documents import _resolver_variante_padrao
+from oficios.documents import _transporte_payload
+from oficios.documents import _viagem_payload
 from oficios.documents import build_termo_payload
 from oficios.models import Oficio
+
+from .models import TermoAutorizacao
 
 
 _TEMPLATE_DOCX_BY_VARIANTE = {
@@ -140,6 +152,187 @@ def gerar_termo_lote(oficio: Oficio, formato: DocumentoFormato) -> list[Document
     for servidor in listar_servidores_com_termo(oficio):
         out.append(gerar_termo_um(oficio, servidor, formato))
     return out
+
+
+def _participante_payload(servidor: Servidor | None) -> dict:
+    if servidor is None:
+        return {
+            "id": "",
+            "nome": "",
+            "cargo": "",
+            "rg_formatado": "",
+            "cpf": "",
+            "cpf_formatado": "",
+            "unidade": "",
+            "telefone_formatado": "",
+            "email": "",
+        }
+    return {
+        "id": servidor.pk,
+        "nome": _document_text(servidor.nome),
+        "cargo": _document_text(servidor.cargo.nome if servidor.cargo_id else ""),
+        "rg_formatado": servidor.rg_formatado,
+        "cpf": servidor.cpf or "",
+        "cpf_formatado": servidor.cpf_formatado,
+        "unidade": _document_text(servidor.unidade.nome if servidor.unidade_id else ""),
+        "telefone_formatado": servidor.telefone_formatado,
+        "email": "",
+    }
+
+
+def _viatura_payload(viatura: Viatura | None) -> dict:
+    if viatura is None:
+        return {
+            "tem_viatura": False,
+            "placa": "-",
+            "modelo": "-",
+            "tipo": "-",
+            "combustivel": "-",
+            "motorista": "-",
+            "porte_armas": "Sim",
+            "unidade": "-",
+        }
+    return {
+        "tem_viatura": True,
+        "placa": format_placa(viatura.placa),
+        "modelo": _document_text(viatura.modelo),
+        "tipo": _document_text(viatura.get_tipo_display() if viatura.tipo else ""),
+        "combustivel": _document_text(str(viatura.combustivel) if viatura.combustivel_id else ""),
+        "motorista": "-",
+        "porte_armas": "Sim",
+        "unidade": _document_text(viatura.unidade if viatura.unidade_id else ""),
+    }
+
+
+def _periodo_texto(termo: TermoAutorizacao) -> str:
+    inicio, fim = termo.periodo_efetivo()
+    if not inicio:
+        return "-"
+    if not fim or fim == inicio:
+        return inicio.strftime("%d/%m/%Y")
+    return f"{inicio.strftime('%d/%m/%Y')} a {fim.strftime('%d/%m/%Y')}"
+
+
+def _viagem_payload_termo(termo: TermoAutorizacao) -> dict:
+    if termo.oficio_id and not termo.destino_cidade_id and not termo.data_evento_inicio:
+        return _viagem_payload(termo.oficio)
+
+    destino = termo.destino_efetivo() or "-"
+    inicio, fim = termo.periodo_efetivo()
+    saida = inicio.strftime("%d/%m/%Y") if inicio else "-"
+    retorno = fim.strftime("%d/%m/%Y") if fim else saida
+    return {
+        "destino_principal": destino,
+        "destinos_texto": destino,
+        "saida": saida,
+        "retorno": retorno,
+        "periodo": _periodo_texto(termo),
+        "roteiro_ida": [destino] if destino != "-" else [],
+        "roteiro_ida_texto": destino,
+        "roteiro_retorno": [],
+        "roteiro_retorno_texto": "-",
+        "quantidade_diarias": "-",
+        "valor_diarias": "-",
+        "valor_diarias_extenso": "-",
+        "motivo": "Termo de autorizacao para deslocamento em evento.",
+    }
+
+
+def _oficio_payload_termo(termo: TermoAutorizacao) -> dict:
+    if termo.oficio_id:
+        return _oficio_termo_payload(termo.oficio)
+    return {
+        "numero_formatado": f"Termo #{termo.pk or 'novo'}",
+        "protocolo_formatado": "-",
+        "data_criacao": _format_date(termo.created_at.date() if termo.created_at else None),
+        "assunto": "Termo de autorizacao avulso",
+        "origem": build_configuracao_context().get("unidade") or "-",
+        "destino": "Direcao/chefia competente",
+    }
+
+
+def _transporte_payload_termo(termo: TermoAutorizacao) -> dict:
+    if termo.viatura_id:
+        return _viatura_payload(termo.viatura)
+    if termo.oficio_id:
+        return _transporte_payload(termo.oficio)
+    return _viatura_payload(None)
+
+
+def _resolver_variante_termo_cadastro(termo: TermoAutorizacao, servidor: Servidor | None) -> str:
+    if servidor is None:
+        return VarianteTermo.SEMIPREENCHIDO
+    if termo.viatura_id:
+        return VarianteTermo.COMPLETO_COM_VIATURA
+    if termo.oficio_id:
+        return _resolver_variante_padrao(termo.oficio)
+    return VarianteTermo.COMPLETO_SEM_VIATURA
+
+
+def build_termo_cadastro_payload(
+    termo: TermoAutorizacao,
+    servidor: Servidor | None = None,
+) -> dict:
+    institucional = build_configuracao_context()
+    payload = {
+        "institucional": institucional,
+        "oficio": _oficio_payload_termo(termo),
+    }
+    variante = _resolver_variante_termo_cadastro(termo, servidor)
+    payload["termo"] = {
+        "variante": variante,
+        "participante": _participante_payload(servidor),
+        "viagem": _viagem_payload_termo(termo),
+        "transporte": _transporte_payload_termo(termo),
+        "oficio": _oficio_payload_termo(termo),
+        "textos": {
+            "titulo": "TERMO DE AUTORIZACAO",
+            "corpo_autorizacao": (
+                "Autorizo o servidor acima identificado a realizar o deslocamento descrito neste "
+                "termo, observadas as normas administrativas aplicaveis ao servico publico e ao "
+                "uso do transporte informado."
+            ),
+            "declaracao": (
+                "O servidor declara ciencia das informacoes registradas, do periodo autorizado "
+                "e das responsabilidades funcionais decorrentes da viagem."
+            ),
+            "observacoes": "-",
+        },
+    }
+    return payload
+
+
+def servidores_para_termo_cadastro(termo: TermoAutorizacao) -> list[Servidor | None]:
+    servidores = list(termo.servidores_efetivos())
+    return servidores or [None]
+
+
+def gerar_termo_cadastro_um(
+    termo: TermoAutorizacao,
+    servidor: Servidor | None,
+    formato: DocumentoFormato,
+) -> DocumentoGerado:
+    payload = build_termo_cadastro_payload(termo, servidor)
+    variante_efetiva = payload["termo"]["variante"]
+    template_docx = _TEMPLATE_DOCX_BY_VARIANTE.get(variante_efetiva, "termo_autorizacao.docx")
+    facade = _facade_termo_com_template(template_docx)
+    ref_servidor = servidor.pk if servidor is not None else "sem-servidor"
+    ref = f"termo-{termo.pk}-cadastro-{ref_servidor}"
+    return facade.gerar(
+        tipo=DocumentoTipo.TERMO_AUTORIZACAO,
+        formato=formato,
+        payload=payload,
+        reference=ref,
+        docxtpl_context=_legacy_docx_context(payload),
+    )
+
+
+def gerar_termo_cadastro_lote(termo: TermoAutorizacao, formato: DocumentoFormato) -> list[DocumentoGerado]:
+    return [gerar_termo_cadastro_um(termo, servidor, formato) for servidor in servidores_para_termo_cadastro(termo)]
+
+
+def sha256_bytes(content: bytes) -> str:
+    return hashlib.sha256(content).hexdigest()
 
 
 def empacotar_termos_zip(documentos: list[DocumentoGerado]) -> bytes:

@@ -1,1 +1,85 @@
-{% include "components/lists/main_list_card.html" with card=card only %}
+<article
+  class="oficio-lc oficio-lc--{{ card.status_variant|default:'outro' }}"
+  data-cv-filter-item
+  data-search-text="{{ card.numero_display }} {{ card.protocolo_display }} {{ card.destino_display }}{% for s in card.servidores %} {{ s.name }}{% endfor %}"
+  {% if card.status_variant %}data-status-value="{{ card.status_variant }}"{% endif %}
+>
+  <div class="oficio-lc__header">
+    <div class="oficio-lc__meta">
+      <div class="oficio-lc__meta-chip">
+        <span class="oficio-lc__meta-label">Ofício</span>
+        <span class="oficio-lc__meta-value">{{ card.numero_display }}</span>
+      </div>
+      {% if card.protocolo_display %}
+      <div class="oficio-lc__meta-chip">
+        <span class="oficio-lc__meta-label">Protocolo</span>
+        <span class="oficio-lc__meta-value">{{ card.protocolo_display }}</span>
+      </div>
+      {% endif %}
+      {% if card.destino_display %}
+      <div class="oficio-lc__meta-chip oficio-lc__meta-chip--destino">
+        <span class="oficio-lc__meta-label">Destino</span>
+        <span class="oficio-lc__meta-value">{{ card.destino_display }}</span>
+      </div>
+      {% endif %}
+      {% if card.data_evento_display %}
+      <div class="oficio-lc__meta-chip">
+        <span class="oficio-lc__meta-label">Data do evento</span>
+        <span class="oficio-lc__meta-value">{{ card.data_evento_display }}</span>
+      </div>
+      {% endif %}
+    </div>
+    <div class="oficio-lc__badges">
+      {% include "components/ui/badges/chip.html" with label=card.status_chip_label tone=card.status_chip_tone size="compact" only %}
+      {% if card.temporal_label %}
+        {% include "components/ui/badges/chip.html" with label=card.temporal_label tone=card.temporal_tone size="compact" only %}
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="oficio-lc__body">
+    {% if card.servidores %}
+    <div class="oficio-lc__team">
+      {% for s in card.servidores %}
+        <span class="oficio-lc__avatar" title="{{ s.name }}">{{ s.initials }}</span>
+      {% endfor %}
+      {% if card.servidores_extra > 0 %}
+        <span class="oficio-lc__avatar oficio-lc__avatar--extra">+{{ card.servidores_extra }}</span>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {% if card.veiculo_display or card.motorista_display %}
+    <div class="oficio-lc__transport">
+      {% if card.veiculo_display %}
+        <span class="oficio-lc__transport-vehicle">{{ card.veiculo_display }}</span>
+      {% endif %}
+      {% if card.veiculo_display and card.motorista_display %}
+        <span class="oficio-lc__transport-sep" aria-hidden="true">·</span>
+      {% endif %}
+      {% if card.motorista_display %}
+        <span class="oficio-lc__transport-driver">{{ card.motorista_display }}</span>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {% if card.tem_termos or card.justificativa_status %}
+    <div class="oficio-lc__docs">
+      {% if card.tem_termos %}
+        <span class="oficio-lc__doc-tag">Termos: {{ card.termos_count }} serv.</span>
+      {% endif %}
+      {% if card.justificativa_status %}
+        <span class="oficio-lc__doc-tag oficio-lc__doc-tag--{{ card.justificativa_tone }}">Just.: {{ card.justificativa_status }}</span>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+
+  {% if card.actions %}
+  <footer class="oficio-lc__footer">
+    {% for action in card.actions %}
+      {% include "components/ui/buttons/button.html" with label=action.label variant=action.variant href=action.href icon=action.icon size="sm" only %}
+    {% endfor %}
+  </footer>
+  {% endif %}
+</article>

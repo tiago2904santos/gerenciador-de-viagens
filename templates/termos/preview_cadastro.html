@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260609-termos">
+  <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260609">
+{% endblock %}
+
+{% block content %}
+  <div class="page-shell page-shell--standard-simple termos-page">
+    {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="TERMOS" title=page_title icon_label="TM" module_label="Termos" back_label="Editar termo" back_url=editar_url only %}
+
+    <main class="main-form-panel">
+      <section class="cv-wizard-section-card">
+        <header class="cv-wizard-section-header">
+          <div class="cv-wizard-section-header__copy">
+            <h2 class="cv-wizard-section-title">Resumo do termo</h2>
+            <p class="cv-wizard-section-subtitle">Dados efetivos usados na geracao do documento.</p>
+          </div>
+        </header>
+        <div class="cv-wizard-section-body">
+          <dl class="termo-preview-grid">
+            <div>
+              <dt>Destino</dt>
+              <dd>{{ preview.destino }}</dd>
+            </div>
+            <div>
+              <dt>Periodo</dt>
+              <dd>{{ preview.periodo }}</dd>
+            </div>
+            <div>
+              <dt>Oficio vinculado</dt>
+              <dd>{% if preview.oficio %}{{ preview.oficio.numero_formatado }}{% else %}Nao vinculado{% endif %}</dd>
+            </div>
+            <div>
+              <dt>Viatura</dt>
+              <dd>{% if preview.viatura %}{{ preview.viatura }}{% else %}Nao informada{% endif %}</dd>
+            </div>
+          </dl>
+
+          <h3 class="termo-preview-title">Servidores</h3>
+          <ul class="termo-preview-list">
+            {% for servidor in preview.servidores %}
+              <li>{{ servidor.nome }}</li>
+            {% empty %}
+              <li>Sem servidor selecionado. O documento sera semipreenchido.</li>
+            {% endfor %}
+          </ul>
+
+          <div class="termo-actions">
+            <a class="cv-btn cv-btn--primary" href="{% url 'termos:termo_cadastro_pdf_inline' termo.pk %}" target="_blank" rel="noopener"><span>Ver PDF</span></a>
+            <a class="cv-btn cv-btn--secondary" href="{% url 'termos:baixar_termo_cadastro_pdf' termo.pk %}"><span>Baixar PDF</span></a>
+            <a class="cv-btn cv-btn--secondary" href="{% url 'termos:baixar_termo_cadastro_docx' termo.pk %}"><span>Baixar DOCX</span></a>
+            <a class="cv-btn cv-btn--secondary" href="?format=json"><span>Ver JSON</span></a>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+{% endblock %}

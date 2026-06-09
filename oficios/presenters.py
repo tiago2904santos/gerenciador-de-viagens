@@ -8,6 +8,7 @@ from core.utils.masks import format_protocolo
 from decimal import Decimal
 
 from django.urls import reverse
+from django.utils import timezone
 
 from .models import Oficio
 
@@ -40,30 +41,136 @@ def _oficio_faixa_lateral_class(status: str) -> str:
     return "roteiro-list-card--faixa-neutro"
 
 
+def _destino_display_oficio(oficio) -> str:
+    if not oficio.roteiro_id:
+        return ""
+    destinos = list(oficio.roteiro.destinos.all())
+    if not destinos:
+        return ""
+    parts = [f"{d.cidade} ({d.estado.sigla})" for d in destinos[:2]]
+    result = ", ".join(parts)
+    if len(destinos) > 2:
+        result += f" +{len(destinos) - 2}"
+    return result
+
+
+def _data_evento_display_oficio(oficio) -> str:
+    if not oficio.roteiro_id:
+        return ""
+    roteiro = oficio.roteiro
+    saida_dt = roteiro.saida_dt
+    if not saida_dt:
+        return ""
+    tz = timezone.get_current_timezone()
+    saida_date = saida_dt.astimezone(tz).date() if timezone.is_aware(saida_dt) else saida_dt.date()
+    chegada_dt = roteiro.retorno_chegada_dt or roteiro.chegada_dt
+    if chegada_dt:
+        chegada_date = chegada_dt.astimezone(tz).date() if timezone.is_aware(chegada_dt) else chegada_dt.date()
+        if saida_date == chegada_date:
+            return saida_date.strftime("%d/%m/%Y")
+        if saida_date.year == chegada_date.year:
+            return f"{saida_date.strftime('%d/%m')} a {chegada_date.strftime('%d/%m/%Y')}"
+        return f"{saida_date.strftime('%d/%m/%Y')} a {chegada_date.strftime('%d/%m/%Y')}"
+    return saida_date.strftime("%d/%m/%Y")
+
+
+def _temporal_badge_oficio(oficio):
+    if not oficio.roteiro_id:
+        return None, "muted"
+    roteiro = oficio.roteiro
+    saida_dt = roteiro.saida_dt
+    if not saida_dt:
+        return None, "muted"
+    tz = timezone.get_current_timezone()
+    today = timezone.localdate()
+    saida_date = saida_dt.astimezone(tz).date() if timezone.is_aware(saida_dt) else saida_dt.date()
+    chegada_dt = roteiro.retorno_chegada_dt or roteiro.chegada_dt
+    end_date = saida_date
+    if chegada_dt:
+        end_date = chegada_dt.astimezone(tz).date() if timezone.is_aware(chegada_dt) else chegada_dt.date()
+    if today < saida_date:
+        dias = (saida_date - today).days
+        if dias == 1:
+            return "falta 1 dia", "warning"
+        return f"faltam {dias} dias", "info"
+    if saida_date <= today <= end_date:
+        if today == saida_date:
+            return "começa hoje", "success"
+        return "em andamento", "success"
+    dias = (today - end_date).days
+    if dias == 0:
+        return "foi hoje", "muted"
+    if dias == 1:
+        return "foi ontem", "muted"
+    return f"há {dias} dias", "muted"
+
+
 def apresentar_oficio_card(oficio):
-    card = {
-        "number_label": "N° do Ofício",
-        "number": oficio.numero_formatado,
-        "status": oficio.get_status_display(),
-        "status_class": _status_variant(oficio.status),
+    servidores = list(oficio.servidores.all())
+    servidores_display = [
+        {"initials": _iniciais_nome_servidor(s.nome), "name": s.nome}
+        for s in servidores[:5]
+    ]
+
+    destino = _destino_display_oficio(oficio)
+    data_evento = _data_evento_display_oficio(oficio)
+    temporal_label, temporal_tone = _temporal_badge_oficio(oficio)
+
+    veiculo_display = ""
+    if oficio.viatura_id:
+        v = oficio.viatura
+        modelo = (v.modelo or "").strip()
+        veiculo_display = f"{v.placa_formatada} – {modelo}" if modelo else v.placa_formatada
+    elif (oficio.transporte_placa_manual or "").strip():
+        placa = format_placa(oficio.transporte_placa_manual)
+        modelo = (oficio.transporte_modelo_manual or "").strip()
+        veiculo_display = f"{placa} – {modelo}" if modelo else placa
+
+    motorista_display = _motorista_label_oficio(oficio)
+    if motorista_display == "—":
+        motorista_display = ""
+
+    termos_count = len(list(oficio.servidores_termo_autorizacao.all()))
+
+    just_status = ""
+    just_tone = "muted"
+    try:
+        j = oficio.justificativa
+        if (j.texto or "").strip():
+            just_status = "Preenchida"
+            just_tone = "success"
+        elif j.obrigatoria:
+            just_status = "Pendente"
+            just_tone = "warning"
+    except Exception:
+        pass
+
+    status_chip_tone = (
+        "success" if oficio.status in {Oficio.STATUS_GERADO, Oficio.STATUS_FINALIZADO}
+        else ("muted" if oficio.status == Oficio.STATUS_ARQUIVADO else "warning")
+    )
+
+    return {
+        "numero_display": oficio.numero_formatado,
+        "protocolo_display": format_protocolo(oficio.protocolo) or "",
+        "destino_display": destino,
+        "data_evento_display": data_evento,
         "status_chip_label": oficio.get_status_display(),
-        "status_chip_class": _status_variant(oficio.status),
+        "status_chip_tone": status_chip_tone,
         "status_variant": oficio.status.lower() if oficio.status else "outro",
-        "faixa_lateral_class": _oficio_faixa_lateral_class(oficio.status),
-        "title": f"Ofício {oficio.numero_formatado}",
-        "subtitle": oficio.motivo[:120] if oficio.motivo else "Sem motivo",
-        "side_title": "Ofício",
-        "side_items": [
-            build_meta("Status", oficio.get_status_display()),
-        ],
-        "meta": [
-            build_meta("Protocolo", format_protocolo(oficio.protocolo) or "—"),
-            build_meta("Data criação", oficio.data_criacao.strftime("%d/%m/%Y")),
-            build_meta("Custeio", oficio.get_custeio_display()),
-            build_meta("Viajantes", str(oficio.servidores.count())),
-        ],
+        "temporal_label": temporal_label,
+        "temporal_tone": temporal_tone,
+        "servidores": servidores_display,
+        "servidores_count": len(servidores),
+        "servidores_extra": max(0, len(servidores) - 5),
+        "veiculo_display": veiculo_display,
+        "motorista_display": motorista_display,
+        "tem_termos": termos_count > 0,
+        "termos_count": termos_count,
+        "justificativa_status": just_status,
+        "justificativa_tone": just_tone,
+        "actions": [],
     }
-    return card
 
 
 def _motorista_label_oficio(oficio):

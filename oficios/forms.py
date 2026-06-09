@@ -7,6 +7,9 @@ from core.normalizers import normalize_spaces
 from core.utils.masks import format_placa
 from core.utils.masks import normalize_protocolo
 
+from cadastros.form_widgets import ServidorEquipeSelectMultiple
+from cadastros.form_widgets import ServidorMotoristaSelect
+from cadastros.form_widgets import ViaturaSelectSingle
 from cadastros.models import Viatura
 
 from .models import ModeloMotivoOficio
@@ -15,7 +18,7 @@ from .models import Oficio
 REG_MOTORISTA_OFICIO_REF = re.compile(r"^(\d{1,3})/(\d{4})$")
 
 
-class ServidorEquipeSelectMultiple(forms.SelectMultiple):
+class _LegacyServidorEquipeSelectMultiple(forms.SelectMultiple):
     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
         option = super().create_option(name, value, label, selected, index, subindex=subindex, attrs=attrs)
         servidor = getattr(value, "instance", None)
@@ -50,7 +53,7 @@ class ServidorEquipeSelectMultiple(forms.SelectMultiple):
         return option
 
 
-class ViaturaSelectSingle(forms.Select):
+class _LegacyViaturaSelectSingle(forms.Select):
     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
         option = super().create_option(name, value, label, selected, index, subindex=subindex, attrs=attrs)
         viatura = getattr(value, "instance", None)
@@ -81,7 +84,7 @@ class ViaturaSelectSingle(forms.Select):
         return option
 
 
-class ServidorMotoristaSelect(forms.Select):
+class _LegacyServidorMotoristaSelect(forms.Select):
     """Select simples com metadados nos options (picker de busca no cliente)."""
 
     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):

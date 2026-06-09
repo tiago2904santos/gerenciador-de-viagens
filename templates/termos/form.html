@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260609-termos">
+  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260609-termos">
+  <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260609">
+{% endblock %}
+
+{% block content %}
+  {{ oficios_summary|json_script:"termos-oficios-summary" }}
+  <div class="page-shell page-shell--wizard termos-page">
+    {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="TERMOS" title=page_title description="Cadastro independente de termo de autorizacao" icon_label="TM" module_label="Termos" back_label="Voltar a lista" back_url=index_url only %}
+
+    <form method="post" class="termo-form" data-termo-form>
+      {% csrf_token %}
+
+      <nav class="termo-anchor-stepper" aria-label="Etapas do cadastro">
+        <a href="#termo-card-oficio" class="termo-anchor-stepper__item is-active" data-termo-anchor>1. Oficio</a>
+        <a href="#termo-card-evento" class="termo-anchor-stepper__item" data-termo-anchor>2. Evento</a>
+        <a href="#termo-card-servidores" class="termo-anchor-stepper__item" data-termo-anchor>3. Servidores</a>
+        <a href="#termo-card-viatura" class="termo-anchor-stepper__item" data-termo-anchor>4. Viatura</a>
+        <a href="#termo-card-geracao" class="termo-anchor-stepper__item" data-termo-anchor>5. Geracao</a>
+      </nav>
+
+      <main class="main-form-panel main-form-panel--stack oficio-wizard__main">
+        {% if form.non_field_errors %}
+          {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
+        {% endif %}
+
+        <section class="cv-wizard-section-card" id="termo-card-oficio">
+          <header class="cv-wizard-section-header">
+            <div class="cv-wizard-section-header__copy">
+              <h2 class="cv-wizard-section-title">1. Oficio vinculado</h2>
+              <p class="cv-wizard-section-subtitle">Opcional. O vinculo permanece vivo e serve como fallback.</p>
+            </div>
+          </header>
+          <div class="cv-wizard-section-body">
+            {% include "components/forms/form_field.html" with field=form.oficio only %}
+            <div class="termo-oficio-summary" data-termo-oficio-summary>
+              <p class="termo-oficio-summary__empty">Nenhum oficio vinculado. O termo usara os dados informados abaixo.</p>
+              <dl class="termo-oficio-summary__grid" hidden>
+                <div>
+                  <dt>Destino do oficio</dt>
+                  <dd data-termo-oficio-destino>-</dd>
+                </div>
+                <div>
+                  <dt>Periodo do oficio</dt>
+                  <dd data-termo-oficio-periodo>-</dd>
+                </div>
+                <div>
+                  <dt>Servidores do termo</dt>
+                  <dd data-termo-oficio-servidores>-</dd>
+                </div>
+                <div>
+                  <dt>Viatura do oficio</dt>
+                  <dd data-termo-oficio-viatura>-</dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+        </section>
+
+        <section class="cv-wizard-section-card" id="termo-card-evento">
+          <header class="cv-wizard-section-header">
+            <div class="cv-wizard-section-header__copy">
+              <h2 class="cv-wizard-section-title">2. Evento</h2>
+              <p class="cv-wizard-section-subtitle">Destino e data do evento sao obrigatorios quando nao vierem do oficio.</p>
+            </div>
+          </header>
+          <div class="cv-wizard-section-body">
+            <div class="field-grid field-grid--cols-2">
+              {% include "components/forms/form_field.html" with field=form.destino_estado only %}
+              {% include "components/forms/form_field.html" with field=form.destino_cidade only %}
+            </div>
+
+            <div class="termo-date-picker cv-date-picker" data-cv-date-picker data-mode="range">
+              <div class="field-grid field-grid--cols-2">
+                <div class="cv-field">
+                  <label class="cv-field__label" for="id_data_evento_inicio_display">Data inicial</label>
+                  <div class="cv-date-picker__control">
+                    <input type="text" class="cv-field__control" id="id_data_evento_inicio_display"
+                           placeholder="dd/mm/aaaa" autocomplete="off" inputmode="numeric" maxlength="10"
+                           data-cv-date-picker-start-display>
+                    <button type="button" class="cv-date-picker__trigger cv-date-picker__trigger--icon"
+                            data-cv-date-picker-trigger aria-expanded="false" aria-label="Abrir calendario">
+                      <span aria-hidden="true">cal</span>
+                    </button>
+                  </div>
+                </div>
+                <div class="cv-field">
+                  <label class="cv-field__label" for="id_data_evento_fim_display">Data final</label>
+                  <input type="text" class="cv-field__control" id="id_data_evento_fim_display"
+                         placeholder="dd/mm/aaaa" autocomplete="off" inputmode="numeric" maxlength="10"
+                         data-cv-date-picker-end-display>
+                </div>
+              </div>
+              {{ form.data_evento_inicio }}
+              {{ form.data_evento_fim }}
+              <p class="cv-date-picker__summary" data-cv-date-picker-summary>Selecione a data inicial e final do evento.</p>
+              <div class="cv-date-picker__panel" hidden data-cv-date-picker-panel>
+                <div class="cv-date-picker__panel-header">
+                  <button class="cv-date-picker__nav" type="button" data-cv-date-picker-prev aria-label="Mes anterior">Anterior</button>
+                  <div class="cv-date-picker__month" data-cv-date-picker-month></div>
+                  <button class="cv-date-picker__nav" type="button" data-cv-date-picker-next aria-label="Proximo mes">Proximo</button>
+                </div>
+                <div class="cv-date-picker__weekdays" data-cv-date-picker-weekdays></div>
+                <div class="cv-date-picker__days" data-cv-date-picker-days></div>
+                <div class="cv-date-picker__footer">
+                  <button type="button" class="cv-date-picker__footer-action" data-cv-date-picker-today>Hoje</button>
+                  <button type="button" class="cv-date-picker__footer-action" data-cv-date-picker-clear>Limpar</button>
+                </div>
+              </div>
+              {% if form.data_evento_inicio.errors %}
+                {% include "components/ui/feedback/field_error.html" with errors=form.data_evento_inicio.errors only %}
+              {% endif %}
+              {% if form.data_evento_fim.errors %}
+                {% include "components/ui/feedback/field_error.html" with errors=form.data_evento_fim.errors only %}
+              {% endif %}
+            </div>
+          </div>
+        </section>
+
+        <section class="cv-wizard-section-card" id="termo-card-servidores">
+          <header class="cv-wizard-section-header">
+            <div class="cv-wizard-section-header__copy">
+              <h2 class="cv-wizard-section-title">3. Servidores</h2>
+              <p class="cv-wizard-section-subtitle">Opcional. Com varios servidores, sera gerado um termo para cada um.</p>
+            </div>
+            <div class="cv-wizard-section-header__actions">
+              {% include "components/buttons/action_button.html" with href=servidor_create_url label="Cadastrar servidor" variant="secondary" data_autosave_link=True only %}
+            </div>
+          </header>
+          <div class="cv-wizard-section-body">
+            {% include "components/forms/form_field.html" with field=form.servidores only %}
+          </div>
+        </section>
+
+        <section class="cv-wizard-section-card" id="termo-card-viatura">
+          <header class="cv-wizard-section-header">
+            <div class="cv-wizard-section-header__copy">
+              <h2 class="cv-wizard-section-title">4. Viatura</h2>
+              <p class="cv-wizard-section-subtitle">Opcional. Se vazio, o termo pode usar a viatura do oficio vinculado.</p>
+            </div>
+            <div class="cv-wizard-section-header__actions">
+              {% include "components/buttons/action_button.html" with href=viatura_create_url label="Cadastrar viatura" variant="secondary" only %}
+            </div>
+          </header>
+          <div class="cv-wizard-section-body">
+            {% include "components/forms/form_field.html" with field=form.viatura only %}
+          </div>
+        </section>
+
+        <section class="cv-wizard-section-card" id="termo-card-geracao">
+          <header class="cv-wizard-section-header">
+            <div class="cv-wizard-section-header__copy">
+              <h2 class="cv-wizard-section-title">5. Geracao</h2>
+              <p class="cv-wizard-section-subtitle">Salve o cadastro para liberar preview e downloads.</p>
+            </div>
+          </header>
+          <div class="cv-wizard-section-body">
+            <div class="termo-actions">
+              <button class="cv-btn cv-btn--primary" type="submit" name="action" value="save"><span>Salvar termo</span></button>
+              <button class="cv-btn cv-btn--secondary" type="submit" name="action" value="save_preview"><span>Salvar e abrir preview</span></button>
+              {% if termo and termo.pk %}
+                <a class="cv-btn cv-btn--secondary" href="{% url 'termos:termo_cadastro_pdf_inline' termo.pk %}" target="_blank" rel="noopener"><span>Ver PDF</span></a>
+                <a class="cv-btn cv-btn--secondary" href="{% url 'termos:baixar_termo_cadastro_pdf' termo.pk %}"><span>Baixar PDF</span></a>
+                <a class="cv-btn cv-btn--secondary" href="{% url 'termos:baixar_termo_cadastro_docx' termo.pk %}"><span>Baixar DOCX</span></a>
+              {% endif %}
+            </div>
+          </div>
+        </section>
+      </main>
+    </form>
+  </div>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'js/pages/termos-form.js' %}?v=20260609" defer></script>
+{% endblock %}

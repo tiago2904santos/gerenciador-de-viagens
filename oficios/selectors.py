@@ -8,6 +8,7 @@ from cadastros.models import Servidor
 from cadastros.models import Unidade
 from cadastros.models import Viatura
 from roteiros.models import Roteiro
+from roteiros.models import RoteiroDestino
 
 from .models import ModeloMotivoOficio
 from .models import Oficio
@@ -15,8 +16,23 @@ from .models import Oficio
 
 def listar_oficios(q: str | None = None, status: str | None = None):
     queryset = (
-        Oficio.objects.select_related("roteiro", "viatura", "motorista", "solicitante")
-        .prefetch_related("servidores")
+        Oficio.objects.select_related(
+            "roteiro",
+            "roteiro__origem_cidade",
+            "roteiro__origem_estado",
+            "viatura",
+            "motorista",
+            "solicitante",
+        )
+        .prefetch_related(
+            Prefetch("servidores", queryset=Servidor.objects.order_by("nome")),
+            Prefetch("servidores_termo_autorizacao", queryset=Servidor.objects.order_by("nome")),
+            Prefetch(
+                "roteiro__destinos",
+                queryset=RoteiroDestino.objects.select_related("cidade", "estado").order_by("ordem"),
+            ),
+            "justificativa",
+        )
         .order_by("-data_criacao", "-created_at")
     )
     if status:

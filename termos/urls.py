@@ -7,6 +7,12 @@ app_name = "termos"
 
 urlpatterns = [
     path("", views.index, name="index"),
+    path("novo/", views.novo, name="novo"),
+    path("<int:pk>/editar/", views.editar, name="editar"),
+    path("<int:pk>/preview/", views.preview_cadastro, name="preview_cadastro"),
+    path("<int:pk>/pdf-inline/", views.termo_cadastro_pdf_inline, name="termo_cadastro_pdf_inline"),
+    path("<int:pk>/pdf/", views.baixar_termo_cadastro_pdf, name="baixar_termo_cadastro_pdf"),
+    path("<int:pk>/docx/", views.baixar_termo_cadastro_docx, name="baixar_termo_cadastro_docx"),
     path("oficio/<int:pk>/preview/", views.preview_termo_oficio, name="preview_termo_oficio"),
     path(
         "oficio/<int:pk>/servidor/<int:servidor_pk>/pdf-inline/",
