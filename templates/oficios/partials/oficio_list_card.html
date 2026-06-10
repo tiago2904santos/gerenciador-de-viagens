@@ -48,7 +48,7 @@
           {% if s.has_termo %}
           <div class="oficio-lc__traveller-termo cv-icon-btn-group">
             {% if s.termo_open_url %}
-            <a class="cv-icon-btn cv-icon-btn--preview" href="{{ s.termo_open_url }}" aria-label="Visualizar termo de autorização de {{ s.name }}" data-tooltip="Visualizar termo" title="Visualizar termo">
+            <a class="cv-icon-btn cv-icon-btn--preview" href="{{ s.termo_open_url }}" target="_blank" rel="noopener noreferrer" aria-label="Visualizar termo de autorização de {{ s.name }}" data-tooltip="Visualizar termo" title="Visualizar termo">
               {% include "dev/ui_lab/partials/_cv_icon.html" with icon="eye" only %}
             </a>
             {% endif %}
@@ -154,6 +154,9 @@
           </div>
           <div class="oficio-lc__traveller-termo cv-icon-btn-group">
             {% include "components/ui/buttons/icon_button.html" with href=card.justificativa_url action="edit" aria_label="Editar justificativa" tooltip="Editar justificativa" only %}
+            {% include "components/ui/buttons/icon_button.html" with href=card.justificativa_visualizar_url action="preview" aria_label="Visualizar justificativa" tooltip="Visualizar justificativa" only %}
+            {% include "components/ui/buttons/icon_button.html" with href=card.justificativa_pdf_url action="pdf" aria_label="Baixar justificativa em PDF" tooltip="PDF" only %}
+            {% include "components/ui/buttons/icon_button.html" with href=card.justificativa_docx_url action="docx" aria_label="Baixar justificativa em DOCX" tooltip="DOCX" only %}
           </div>
         </div>
       </div>
