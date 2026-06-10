@@ -3,6 +3,7 @@ from core.presenters.meta import build_meta
 from django.urls import reverse
 from django.utils import timezone
 
+from .models import Justificativa
 from .models import ModeloJustificativa
 from .services import avaliar_etapa_justificativa_oficio
 from .services import avaliar_justificativa_oficio
@@ -33,6 +34,39 @@ def apresentar_linha_lista_simples_modelo_justificativa(
             if not modelo.is_padrao
             else ""
         ),
+    }
+
+
+def apresentar_linha_lista_simples_justificativa(justificativa: Justificativa):
+    oficio = justificativa.oficio
+    texto = (justificativa.texto or "").strip()
+    if len(texto) > 110:
+        texto = f"{texto[:110]}..."
+
+    badges = [build_badge(justificativa.get_status_display(), "success")]
+    if justificativa.obrigatoria:
+        badges.append(build_badge("Obrigatoria", "danger"))
+
+    return {
+        "avatar": "JT",
+        "title": f"Oficio {oficio.numero_formatado}",
+        "badges": badges,
+        "meta": [
+            build_meta("Modelo", justificativa.modelo.nome if justificativa.modelo_id else "-"),
+            build_meta("Texto", texto or "-"),
+            build_meta("Atualizada", timezone.localtime(justificativa.updated_at).strftime("%d/%m/%Y %H:%M")),
+        ],
+        "search_extra": " ".join(
+            part
+            for part in [
+                oficio.protocolo,
+                oficio.assunto,
+                justificativa.modelo.nome if justificativa.modelo_id else "",
+                texto,
+            ]
+            if part
+        ),
+        "edit_url": reverse("oficios:wizard_justificativa", args=[oficio.pk]),
     }
 
 

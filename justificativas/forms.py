@@ -1,8 +1,34 @@
 from django import forms
 
+from oficios.models import Oficio
+
 from .models import Justificativa
 from .models import ModeloJustificativa
 from .selectors import listar_modelos_justificativa
+
+
+class OficioJustificativaSelectMultiple(forms.SelectMultiple):
+    def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+        option = super().create_option(name, value, label, selected, index, subindex=subindex, attrs=attrs)
+        oficio = getattr(value, "instance", None)
+        if oficio is None:
+            return option
+
+        numero = f"Oficio {oficio.numero_formatado}"
+        protocolo = oficio.protocolo or ""
+        assunto = oficio.assunto or ""
+        data = oficio.data_criacao.strftime("%d/%m/%Y") if oficio.data_criacao else ""
+        search = " ".join(part for part in [numero, protocolo, assunto, data, str(oficio.pk)] if part)
+        option["label"] = " - ".join(part for part in [numero, protocolo] if part)
+        option["attrs"].update(
+            {
+                "data-main": numero,
+                "data-cargo": " - ".join(part for part in [protocolo, data] if part),
+                "data-meta": assunto,
+                "data-search": search,
+            },
+        )
+        return option
 
 
 class ModeloJustificativaSelect(forms.Select):
@@ -54,6 +80,63 @@ class JustificativaOficioForm(forms.ModelForm):
     def clean_texto(self):
         texto = (self.cleaned_data.get("texto") or "").strip()
         if self._obrigatoria and not texto:
+            raise forms.ValidationError("Informe o texto da justificativa.")
+        return texto
+
+
+class JustificativaQuickAddForm(forms.Form):
+    oficios = forms.ModelMultipleChoiceField(
+        label="Oficios",
+        queryset=Oficio.objects.none(),
+        required=True,
+        widget=OficioJustificativaSelectMultiple(
+            attrs={
+                "class": "form-select cv-search-picker__native",
+                "data-cv-search-picker": "true",
+                "data-picker-mode": "multi",
+                "data-picker-variant": "detailed",
+                "data-picker-label": "Oficios",
+                "data-picker-hint": "Selecione um ou mais oficios para receber a mesma justificativa.",
+                "data-panel-title": "OFICIOS DA JUSTIFICATIVA",
+                "data-placeholder": "Buscar por numero, protocolo ou assunto",
+                "data-empty-message": "Nenhum oficio encontrado.",
+                "data-empty-selected": "Nenhum oficio selecionado.",
+            },
+        ),
+    )
+    modelo = forms.ModelChoiceField(
+        label="Modelo",
+        queryset=ModeloJustificativa.objects.none(),
+        required=False,
+        empty_label="Selecione um modelo (opcional)",
+        widget=ModeloJustificativaSelect(
+            attrs={
+                "class": "form-select cv-field__control cv-field__control--select",
+                "data-modelo-justificativa-select": "true",
+            },
+        ),
+    )
+    texto = forms.CharField(
+        label="Justificativa",
+        required=True,
+        widget=forms.Textarea(
+            attrs={
+                "class": "cv-field__control cv-field__control--textarea",
+                "rows": 6,
+                "placeholder": "",
+                "data-justificativa-textarea": "true",
+            },
+        ),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["oficios"].queryset = Oficio.objects.order_by("-data_criacao", "-created_at")
+        self.fields["modelo"].queryset = listar_modelos_justificativa()
+
+    def clean_texto(self):
+        texto = (self.cleaned_data.get("texto") or "").strip()
+        if not texto:
             raise forms.ValidationError("Informe o texto da justificativa.")
         return texto
 

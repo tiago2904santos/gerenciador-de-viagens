@@ -104,7 +104,7 @@ class WizardJustificativaTests(TestCase):
         self.assertContains(response, "Gerenciar modelos")
         self.assertContains(response, "Justificativa")
         self.assertContains(response, "data-modelo-justificativa-select")
-        self.assertContains(response, reverse("justificativas:index"))
+        self.assertContains(response, reverse("justificativas:modelos_index"))
         self.assertContains(response, reverse('oficios:index'))
         self.assertContains(response, 'Voltar à lista')
         self.assertContains(response, "cv-card-footer-section")

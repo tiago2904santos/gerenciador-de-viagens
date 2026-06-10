@@ -15,6 +15,13 @@ def get_or_none_justificativa_by_oficio(oficio):
     return Justificativa.objects.filter(oficio=oficio).first()
 
 
+def listar_justificativas():
+    return (
+        Justificativa.objects.select_related("oficio", "modelo")
+        .order_by("-updated_at", "-created_at")
+    )
+
+
 def listar_modelos_justificativa(*, incluir_inativos=False):
     qs = ModeloJustificativa.objects.all()
     if not incluir_inativos:

@@ -1,0 +1,25 @@
+.justificativas-page {
+  gap: var(--space-5);
+}
+
+.justificativa-quick-add__body {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.justificativa-quick-add__section {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.justificativa-quick-add__wide-field {
+  width: 100%;
+}
+
+.justificativa-quick-add .cv-field__control--textarea {
+  min-height: var(--text-area-height-justificativa);
+}
+
+.justificativas-list-panel {
+  margin-top: 0;
+}

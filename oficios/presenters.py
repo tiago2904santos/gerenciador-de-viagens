@@ -74,6 +74,25 @@ def _data_evento_display_oficio(oficio) -> str:
     return saida_date.strftime("%d/%m/%Y")
 
 
+def _label_cidade_uf_trecho(cidade, estado) -> str:
+    cidade_txt = str(cidade).upper() if cidade else ""
+    estado_txt = getattr(estado, "sigla", "") if estado else ""
+    if "/" in cidade_txt:
+        return cidade_txt
+    if estado_txt:
+        return f"{cidade_txt}/{estado_txt}"
+    return cidade_txt
+
+
+def _format_dt_trecho(dt) -> str:
+    if not dt:
+        return ""
+    tz = timezone.get_current_timezone()
+    if timezone.is_aware(dt):
+        dt = dt.astimezone(tz)
+    return dt.strftime("%d/%m/%Y %H:%M")
+
+
 def _temporal_badge_oficio(oficio):
     if not oficio.roteiro_id:
         return None, "muted"
@@ -149,40 +168,23 @@ def apresentar_oficio_card(oficio):
     data_evento = _data_evento_display_oficio(oficio)
     temporal_label, temporal_tone = _temporal_badge_oficio(oficio)
 
-    # Layout condicional: 1 servidor + 1 destino → grade de 3 colunas
-    destinos_roteiro = list(oficio.roteiro.destinos.all()) if oficio.roteiro_id else []
-    is_single_layout = len(servidores) == 1 and len(destinos_roteiro) == 1
-
-    single_destino = None
-    if is_single_layout and oficio.roteiro_id:
+    # Trechos e diárias do roteiro
+    trechos_display = []
+    valor_diarias_display = ""
+    valor_diarias_extenso = ""
+    if oficio.roteiro_id:
         roteiro = oficio.roteiro
-        tz = timezone.get_current_timezone()
-        sede_label = ""
-        if roteiro.origem_cidade_id:
-            sigla = roteiro.origem_estado.sigla if roteiro.origem_estado_id else ""
-            sede_label = f"{roteiro.origem_cidade} ({sigla})" if sigla else str(roteiro.origem_cidade)
-        d0 = destinos_roteiro[0]
-        dest_sigla = d0.estado.sigla if d0.estado_id else ""
-        destino_label = f"{d0.cidade} ({dest_sigla})" if dest_sigla else str(d0.cidade)
-        saida_display = ""
-        if roteiro.saida_dt:
-            dt = roteiro.saida_dt
-            if timezone.is_aware(dt):
-                dt = dt.astimezone(tz)
-            saida_display = dt.strftime("%d/%m %H:%M")
-        chegada_display = ""
-        chegada_dt = roteiro.retorno_chegada_dt or roteiro.chegada_dt
-        if chegada_dt:
-            dt = chegada_dt
-            if timezone.is_aware(dt):
-                dt = dt.astimezone(tz)
-            chegada_display = dt.strftime("%d/%m %H:%M")
-        single_destino = {
-            "sede_label": sede_label,
-            "destino_label": destino_label,
-            "saida_display": saida_display,
-            "chegada_display": chegada_display,
-        }
+        for t in roteiro.trechos.all():
+            orig = _label_cidade_uf_trecho(t.origem_cidade, t.origem_estado)
+            dest = _label_cidade_uf_trecho(t.destino_cidade, t.destino_estado)
+            trechos_display.append({
+                "rota": f"{orig} → {dest}",
+                "saida": _format_dt_trecho(t.saida_dt),
+                "chegada": _format_dt_trecho(t.chegada_dt),
+            })
+        if roteiro.valor_diarias:
+            valor_diarias_display = _format_brl_diarias(roteiro.valor_diarias)
+            valor_diarias_extenso = (roteiro.valor_diarias_extenso or "").strip()
 
     # Transporte
     veiculo_placa = ""
@@ -243,10 +245,18 @@ def apresentar_oficio_card(oficio):
         else ("muted" if oficio.status == Oficio.STATUS_ARQUIVADO else "warning")
     )
 
+    data_criacao_display = ""
+    if oficio.data_criacao:
+        try:
+            data_criacao_display = oficio.data_criacao.strftime("%d/%m/%Y")
+        except Exception:
+            pass
+
     return {
         "oficio_pk": oficio.pk,
         "numero_display": oficio.numero_formatado,
         "protocolo_display": format_protocolo(oficio.protocolo) or "",
+        "data_criacao_display": data_criacao_display,
         "destino_display": destino,
         "data_evento_display": data_evento,
         "status_chip_label": oficio.get_status_display(),
@@ -259,11 +269,11 @@ def apresentar_oficio_card(oficio):
         "veiculo_placa": veiculo_placa,
         "veiculo_modelo": veiculo_modelo,
         "veiculo_display": veiculo_display,
-        "veiculo_initials": (veiculo_placa or "")[:2].upper() or "VT",
         "motorista_is_carona": motorista_is_carona,
         "motorista_display": motorista_display,
-        "is_single_layout": is_single_layout,
-        "single_destino": single_destino,
+        "trechos": trechos_display,
+        "valor_diarias_display": valor_diarias_display,
+        "valor_diarias_extenso": valor_diarias_extenso,
         "justificativa": justificativa,
         "documentos_url": reverse("oficios:wizard_documentos", args=[oficio.pk]),
         "editar_url": reverse("oficios:dados_viajantes", args=[oficio.pk]),

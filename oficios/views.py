@@ -757,7 +757,7 @@ def wizard_justificativa(request, pk):
             "wizard_back_label": "Voltar à lista",
             "justificativa_ctx": apresentar_justificativa_wizard_context(oficio),
             "justificativa_obrigatoria": obrigatoria,
-            "modelos_justificativa_url": reverse("justificativas:index"),
+            "modelos_justificativa_url": reverse("justificativas:modelos_index"),
             "wizard_autosave_url": reverse("oficios:justificativa_autosave", args=[oficio.pk]),
             "wizard_autosave_step": "justificativa",
             **_wizard_footer_ctx(oficio),

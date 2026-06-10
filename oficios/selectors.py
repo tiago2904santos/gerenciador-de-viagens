@@ -9,6 +9,7 @@ from cadastros.models import Unidade
 from cadastros.models import Viatura
 from roteiros.models import Roteiro
 from roteiros.models import RoteiroDestino
+from roteiros.models import RoteiroTrecho
 
 from .models import ModeloMotivoOficio
 from .models import Oficio
@@ -30,6 +31,12 @@ def listar_oficios(q: str | None = None, status: str | None = None):
             Prefetch(
                 "roteiro__destinos",
                 queryset=RoteiroDestino.objects.select_related("cidade", "estado").order_by("ordem"),
+            ),
+            Prefetch(
+                "roteiro__trechos",
+                queryset=RoteiroTrecho.objects.select_related(
+                    "origem_cidade", "origem_estado", "destino_cidade", "destino_estado"
+                ).order_by("ordem"),
             ),
             "justificativa",
         )

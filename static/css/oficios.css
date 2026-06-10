@@ -3137,11 +3137,10 @@ html[data-theme="dark"] [data-oficio-wizard-step1] .cv-search-picker {
 
 /* ── Ofício List Card (oficio-lc) ───────────────────────────────── */
 .oficio-lc {
-  background: var(--color-card);
-  border: 1px solid var(--color-border-soft);
-  border-left: 5px solid var(--color-border-strong);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
+  background: var(--cv-wizard-section-bg, var(--color-card));
+  border: 1px solid var(--cv-wizard-section-border, var(--color-border-soft));
+  border-radius: var(--cv-wizard-section-radius, var(--radius-card));
+  box-shadow: var(--cv-wizard-section-shadow, var(--shadow-card));
   overflow: hidden;
   transition:
     box-shadow var(--transition-base),
@@ -3153,86 +3152,56 @@ html[data-theme="dark"] [data-oficio-wizard-step1] .cv-search-picker {
   transform: translateY(-2px);
 }
 
-.oficio-lc--finalizado,
-.oficio-lc--gerado {
-  border-left-color: var(--color-success);
-}
-
-.oficio-lc--rascunho {
-  border-left-color: var(--color-accent);
-}
-
-.oficio-lc--arquivado {
-  border-left-color: var(--color-muted);
-}
-
 .oficio-lc__layout {
   display: grid;
 }
 
-/* ── HEADER ── */
-.oficio-lc__header {
-  align-items: flex-start;
-  background: var(--color-card-muted);
-  border-bottom: 1px solid var(--color-border-soft);
+/* ── IDENTIFICAÇÃO: Número · Protocolo · Data de Criação (topo do card) ── */
+.oficio-lc__id-row {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-3);
-  justify-content: space-between;
-  padding: var(--space-4);
 }
 
-.oficio-lc__chip-list {
-  align-items: stretch;
+/* ── LINHA SECUNDÁRIA DE INFO (Destino · Data do Evento) ── */
+.oficio-lc__info-row {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2);
-  min-width: 0;
 }
 
-.oficio-lc__chip {
-  background: var(--color-card);
-  border: 1px solid var(--color-border-soft);
-  border-radius: var(--radius-control);
+.oficio-lc__info-item {
   display: flex;
+  flex: 1 1 120px;
   flex-direction: column;
-  gap: 2px;
-  padding: var(--space-2) var(--space-3);
-}
-
-.oficio-lc__chip--wide {
-  flex: 1 1 auto;
-  max-width: 320px;
+  gap: var(--space-1);
   min-width: 0;
+  padding: var(--space-4) var(--space-4);
 }
 
-.oficio-lc__chip-label {
+.oficio-lc__info-item--wide {
+  flex-basis: 200px;
+}
+
+.oficio-lc__info-label {
   color: var(--color-muted);
-  font-size: 10px;
-  font-weight: 900;
-  letter-spacing: 0.07em;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  letter-spacing: 0.05em;
   line-height: 1.2;
   text-transform: uppercase;
 }
 
-.oficio-lc__chip-value {
+.oficio-lc__info-value {
   color: var(--color-heading);
-  font-size: var(--font-size-sm);
-  font-weight: 700;
-  line-height: 1.3;
+  font-size: var(--font-size-xl);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.oficio-lc__header-badges {
-  align-items: center;
-  display: flex;
-  flex-shrink: 0;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-}
-
+/* ── BADGES DE STATUS ── */
 .oficio-lc__status-badge {
   border-radius: var(--radius-pill);
   font-size: var(--font-size-xs);
@@ -3264,197 +3233,289 @@ html[data-theme="dark"] [data-oficio-wizard-step1] .cv-search-picker {
   color: var(--color-primary);
 }
 
-/* ── SERVIDORES — seção de largura total ── */
+/* ── SEÇÕES INTERNAS ── */
 .oficio-lc__section {
-  border-bottom: 1px solid var(--color-border-soft);
-  display: grid;
-  gap: var(--space-3);
-  padding: var(--space-4);
+  padding: var(--space-5) var(--space-6);
 }
 
-.oficio-lc__section-header {
-  align-items: baseline;
-  display: flex;
-  gap: var(--space-2);
-  justify-content: space-between;
+.oficio-lc__section + .oficio-lc__section {
+  position: relative;
 }
 
-.oficio-lc__section-title {
+.oficio-lc__section + .oficio-lc__section::before {
+  background: var(--cv-wizard-section-border, var(--color-border-soft));
+  content: "";
+  height: 1px;
+  left: var(--space-6);
+  position: absolute;
+  right: var(--space-6);
+  top: 0;
+}
+
+.oficio-lc__section-heading {
   color: var(--color-muted);
-  font-size: 10px;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  margin: 0;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin: 0 0 var(--space-3);
   text-transform: uppercase;
 }
 
-.oficio-lc__section-meta {
-  color: var(--color-muted);
-  font-size: var(--font-size-xs);
-  font-weight: 600;
-}
-
-.oficio-lc__server-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-/* Linha de servidor */
-.oficio-lc__server-row {
-  align-items: center;
-  background: var(--color-card-muted);
-  border: 1px solid var(--color-border-soft);
-  border-radius: var(--radius-control);
-  display: flex;
-  gap: var(--space-3);
-  padding: var(--space-2) var(--space-3);
-}
-
-/* Destaque visual para o motorista dentro do ofício */
-.oficio-lc__server-row--motorista {
-  background: color-mix(in srgb, var(--color-primary) 5%, var(--color-card-muted));
-  border-color: color-mix(in srgb, var(--color-primary) 22%, transparent);
-}
-
-/* Avatar */
-.oficio-lc__server-avatar {
-  align-items: center;
-  background: var(--color-primary-bright);
-  border-radius: 50%;
-  color: var(--color-white);
-  display: inline-flex;
-  flex-shrink: 0;
-  font-size: 11px;
-  font-weight: 900;
-  height: 34px;
-  justify-content: center;
-  letter-spacing: 0.02em;
-  width: 34px;
-}
-
-.oficio-lc__server-row--motorista .oficio-lc__server-avatar {
-  background: var(--color-primary);
-}
-
-/* Bloco de texto (nome + meta) */
-.oficio-lc__server-body {
-  display: flex;
-  flex: 1 1 0;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.oficio-lc__server-name-line {
-  align-items: center;
+/* ── VIAJANTES: cards horizontais por quantidade ── */
+.oficio-lc__travellers {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
 }
 
-.oficio-lc__server-name {
-  color: var(--color-text);
-  font-size: var(--font-size-sm);
-  font-weight: 700;
+/* base: 3 por linha (5+ servidores) */
+.oficio-lc__traveller {
+  align-items: center;
+  background: var(--color-card-muted);
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-control);
+  display: flex;
+  flex-basis: 30%;
+  flex-direction: row;
+  flex-grow: 1;
+  flex-shrink: 0;
+  gap: var(--space-3);
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  padding: var(--space-3) var(--space-4);
 }
 
-.oficio-lc__server-meta {
-  color: var(--color-muted-strong);
+/* coluna de texto: nome + meta */
+.oficio-lc__traveller-body {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.oficio-lc__travellers--n0 .oficio-lc__traveller,
+.oficio-lc__travellers--n1 .oficio-lc__traveller {
+  flex-basis: 100%;
+}
+
+.oficio-lc__travellers--n2 .oficio-lc__traveller {
+  flex-basis: 45%;
+}
+
+.oficio-lc__travellers--n3 .oficio-lc__traveller {
+  flex-basis: 30%;
+}
+
+.oficio-lc__travellers--n4 .oficio-lc__traveller {
+  flex-basis: 45%;
+}
+
+/* Motorista — tinte dourado (tema escuro por padrão) — idêntico ao oficio-documentos-traveller-line--motorista */
+.oficio-lc__traveller--motorista {
+  background: color-mix(in srgb, var(--color-accent) 9%, var(--color-card-muted));
+  border-color: color-mix(in srgb, var(--color-accent) 40%, var(--color-border-soft));
+}
+
+.oficio-lc__traveller--motorista .oficio-lc__traveller-name {
+  color: var(--color-accent);
+}
+
+/* tema claro: volta ao neutro */
+html[data-theme="light"] .oficio-lc__traveller--motorista {
+  background: var(--color-card-muted);
+  border-color: var(--color-border-soft);
+}
+
+html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-name {
+  color: var(--color-heading);
+}
+
+.oficio-lc__traveller-name-row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.oficio-lc__traveller-name {
+  color: var(--color-heading);
+  font-size: var(--font-size-sm);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  min-width: 0;
+}
+
+.oficio-lc__traveller-meta {
+  color: var(--color-muted);
   font-size: var(--font-size-xs);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  font-weight: 500;
+  line-height: 1.3;
+  min-width: 0;
 }
 
-/* Chip MOTORISTA */
-.oficio-lc__motorista-chip {
-  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
-  border: 1px solid color-mix(in srgb, var(--color-primary) 28%, transparent);
+.oficio-lc__traveller-badge {
+  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
   border-radius: var(--radius-pill);
-  color: var(--color-primary);
+  color: var(--color-accent);
   flex-shrink: 0;
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.06em;
-  padding: 2px var(--space-2);
+  padding: 1px var(--space-2);
   text-transform: uppercase;
   white-space: nowrap;
 }
 
-/* Botões de termo (direita da linha) */
-.oficio-lc__server-termo {
+.oficio-lc__traveller-termo {
   align-items: center;
   display: flex;
   flex-shrink: 0;
+  flex-wrap: wrap;
   gap: var(--space-1);
   margin-left: auto;
 }
 
-/* ── LOWER GRID: veículo + justificativa ── */
-.oficio-lc__lower-grid {
-  border-bottom: 1px solid var(--color-border-soft);
-  display: grid;
-  gap: var(--space-4);
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  padding: var(--space-4);
-}
-
-/* Painel de veículo */
-.oficio-lc__panel {
+/* ── VIATURA E CONDUÇÃO ── */
+.oficio-lc__transport-row {
+  align-items: stretch;
   display: grid;
   gap: var(--space-3);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  min-height: 180px;
 }
 
-.oficio-lc__panel-title {
+.oficio-lc__transport-card {
+  background: var(--color-card-muted);
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-control);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 160px;
+  overflow: hidden;
+  padding: var(--space-3) var(--space-4);
+  max-height: 185px;
+}
+
+.oficio-lc__transport-label {
   color: var(--color-muted);
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.08em;
-  margin: 0;
+  margin-top: var(--space-2);
   text-transform: uppercase;
 }
 
-.oficio-lc__vehicle-box,
-.oficio-lc__driver-box {
-  background: var(--color-card-muted);
-  border: 1px solid var(--color-border-soft);
-  border-radius: var(--radius-control);
-  display: grid;
-  gap: 3px;
-  padding: var(--space-3);
+.oficio-lc__transport-label:first-child {
+  margin-top: 0;
 }
 
-.oficio-lc__box-kicker {
-  color: var(--color-muted);
-  font-size: 10px;
+.oficio-lc__transport-placa {
+  color: var(--color-heading);
+  font-size: clamp(28px, 3vw, 48px);
   font-weight: 900;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1;
 }
 
-.oficio-lc__vehicle-primary {
+.oficio-lc__transport-modelo {
+  color: var(--color-heading);
+  font-size: var(--font-size-sm);
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.oficio-lc__transport-driver {
   color: var(--color-heading);
   font-size: var(--font-size-md);
   font-weight: 800;
+  line-height: 1.3;
+  word-break: break-word;
 }
 
-.oficio-lc__driver-name {
-  color: var(--color-text);
+.oficio-lc__transport-hint {
+  color: var(--color-muted);
+  font-size: var(--font-size-xs);
+}
+
+/* coluna de trechos: mais larga, scroll interno */
+.oficio-lc__transport-card--trechos {
+  /* mesma largura que as demais — herda flex: 1 1 0 */
+}
+
+.oficio-lc__transport-card--valor {
+  /* mesma largura que as demais — herda flex: 1 1 0 */
+}
+
+/* lista de trechos com scroll — preenche o espaço restante do card */
+.oficio-lc__trechos-list {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-color: var(--color-border-strong) transparent;
+  scrollbar-width: thin;
+}
+
+.oficio-lc__trechos-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.oficio-lc__trechos-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.oficio-lc__trechos-list::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: 2px;
+}
+
+.oficio-lc__trecho {
+  background: var(--color-card-muted);
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-3);
+}
+
+.oficio-lc__trecho-rota {
+  color: var(--color-heading);
   font-size: var(--font-size-sm);
-  font-weight: 600;
+  font-weight: 800;
+  line-height: 1.25;
+  word-break: break-word;
 }
 
-.oficio-lc__box-support {
-  color: var(--color-muted-strong);
+.oficio-lc__trecho-times {
+  color: var(--color-muted);
+  font-size: var(--font-size-xs);
+  margin-top: 2px;
+}
+
+/* valor total das diárias */
+.oficio-lc__valor-total {
+  color: var(--color-heading);
+  font-size: clamp(32px, 3.5vw, 56px);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  margin-top: var(--space-1);
+}
+
+.oficio-lc__valor-extenso {
+  color: var(--color-muted);
   font-size: var(--font-size-sm);
-  margin: 0;
+  font-weight: 700;
+  line-height: 1.4;
+  word-break: break-word;
 }
 
+/* ── Estilos auxiliares ── */
 .oficio-lc__text--empty {
   color: var(--color-muted);
   font-style: italic;
@@ -3485,19 +3546,10 @@ html[data-theme="dark"] [data-oficio-wizard-step1] .cv-search-picker {
   justify-content: space-between;
 }
 
-.oficio-lc__subcard-title {
-  color: var(--color-heading);
-  font-size: var(--font-size-sm);
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  margin: 0;
-  text-transform: uppercase;
-}
-
 .oficio-lc__subcard-subtitle {
   color: var(--color-muted);
   font-size: var(--font-size-xs);
-  margin: 3px 0 0;
+  margin: 0;
 }
 
 .oficio-lc__badge {
@@ -3520,8 +3572,8 @@ html[data-theme="dark"] [data-oficio-wizard-step1] .cv-search-picker {
 }
 
 .oficio-lc__badge--muted {
-  background: var(--color-card);
-  border: 1px solid var(--color-border-soft);
+  background: var(--route-card-inner-bg, var(--color-card));
+  border: 1px solid var(--route-card-inner-border, var(--color-border-soft));
   color: var(--color-muted-strong);
 }
 
@@ -3539,7 +3591,7 @@ html[data-theme="dark"] [data-oficio-wizard-step1] .cv-search-picker {
   gap: var(--space-2);
 }
 
-/* ── Botões de ação de documento ── */
+/* ── BOTÕES DE DOCUMENTO ── */
 .oficio-lc__doc-btn {
   align-items: center;
   border: 1px solid transparent;
@@ -3605,8 +3657,9 @@ html[data-theme="dark"] [data-oficio-wizard-step1] .cv-search-picker {
 
 /* ── FOOTER ── */
 .oficio-lc__footer {
-  background: var(--color-card-muted);
-  padding: var(--space-3) var(--space-4);
+  background: var(--cv-wizard-section-bg, var(--color-surface));
+  border-top: 1px solid var(--cv-wizard-section-border, var(--color-border-soft));
+  padding: var(--space-3) var(--space-6);
 }
 
 .oficio-lc__footer-actions {
@@ -3616,76 +3669,46 @@ html[data-theme="dark"] [data-oficio-wizard-step1] .cv-search-picker {
   gap: var(--space-2);
 }
 
-/* ── SINGLE LAYOUT: grade de 3 colunas (1 servidor + 1 destino) ── */
-.oficio-lc__single-grid {
-  border-bottom: 1px solid var(--color-border-soft);
-  display: grid;
-  gap: var(--space-4);
-  grid-template-columns: repeat(3, 1fr);
-  padding: var(--space-4);
+/* ── RESPONSIVO ── */
+
+/* mobile estreito: 1 viajante por linha */
+@media (max-width: 599px) {
+  .oficio-lc__traveller {
+    flex-basis: 100%;
+  }
 }
 
-.oficio-lc__single-col {
-  display: grid;
-  gap: var(--space-3);
+/* tablet: no máximo 2 por linha */
+@media (min-width: 600px) and (max-width: 799px) {
+  .oficio-lc__traveller {
+    flex-basis: 45%;
+  }
 }
 
-/* Avatar variante — veículo */
-.oficio-lc__server-avatar--vehicle {
-  background: var(--color-accent);
-  color: var(--color-white);
-}
-
-/* Avatar variante — rota/destino */
-.oficio-lc__server-avatar--route {
-  background: var(--color-success);
-  color: var(--color-white);
-  font-size: 15px;
-  font-weight: 900;
-}
-
-/* Separador → na linha de cidades/datas */
-.oficio-lc__route-sep {
-  color: var(--color-muted);
-  flex-shrink: 0;
-  font-size: var(--font-size-xs);
-}
-
-/* ── Responsivo ── */
 @media (max-width: 900px) {
-  .oficio-lc__single-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-@media (max-width: 768px) {
-  .oficio-lc__lower-grid {
+  .oficio-lc__id-row,
+  .oficio-lc__transport-row {
     grid-template-columns: 1fr;
   }
 
-  .oficio-lc__chip--wide {
-    max-width: none;
+  .oficio-lc__transport-row {
+    height: auto;
+  }
+
+  .oficio-lc__transport-card {
+    max-height: none;
   }
 }
 
-@media (max-width: 600px) {
-  .oficio-lc__single-grid {
+/* mobile: id-row e info-row viram uma coluna */
+@media (max-width: 520px) {
+  .oficio-lc__id-row,
+  .oficio-lc__info-row {
+    display: grid;
     grid-template-columns: 1fr;
   }
-}
 
-@media (max-width: 480px) {
-  .oficio-lc__header {
-    flex-direction: column;
-    gap: var(--space-2);
-  }
-
-  .oficio-lc__header-badges {
-    width: 100%;
-  }
-
-  .oficio-lc__server-termo {
-    flex-wrap: wrap;
-    justify-content: flex-end;
+  .oficio-lc__info-item {
+    border-right: none;
   }
 }
