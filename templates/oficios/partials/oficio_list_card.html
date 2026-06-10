@@ -46,63 +46,203 @@
       </div>
     </div>
 
-    {# ── CORE GRID: servidores (esq.) | veículo e motorista (dir.) ── #}
-    <div class="oficio-lc__core-grid">
+    {# ════════════════════════════════════════════════════════════════
+       LAYOUT CONDICIONAL
+       • is_single_layout → 3 colunas: servidor | viatura | roteiro
+       • demais casos    → servidores full-width + lower-grid
+    ════════════════════════════════════════════════════════════════ #}
 
-      {# Painel de servidores #}
-      <section class="oficio-lc__panel oficio-lc__panel--travelers">
-        <div class="oficio-lc__panel-header">
-          <h3 class="oficio-lc__panel-title">Servidores</h3>
-          <span class="oficio-lc__panel-meta">{{ card.servidores_count }} servidor{% if card.servidores_count != 1 %}es{% endif %}</span>
-        </div>
-        <div class="oficio-lc__traveler-list">
-          {% for s in card.servidores %}
-          <div class="oficio-lc__traveler-pill">
-            <span class="oficio-lc__traveler-initials">{{ s.initials }}</span>
-            <span class="oficio-lc__traveler-name">{{ s.name }}</span>
-          </div>
-          {% empty %}
-          <p class="oficio-lc__empty-hint">Nenhum servidor informado</p>
-          {% endfor %}
-        </div>
-      </section>
+    {% if card.is_single_layout %}
 
-      {# Painel de transporte #}
-      <section class="oficio-lc__panel oficio-lc__panel--transport">
-        <div class="oficio-lc__panel-header">
-          <h3 class="oficio-lc__panel-title">Veículo e motorista</h3>
-        </div>
-        <div class="oficio-lc__transport-layout">
+    {# ── 3 COLUNAS: 1 servidor + 1 destino ── #}
+    <div class="oficio-lc__single-grid">
 
-          <div class="oficio-lc__vehicle-box">
-            <span class="oficio-lc__box-kicker">Veículo</span>
-            {% if card.veiculo_placa %}
-              <div class="oficio-lc__vehicle-primary">{{ card.veiculo_placa }}</div>
-              {% if card.veiculo_modelo %}
-                <p class="oficio-lc__box-support">{{ card.veiculo_modelo }}</p>
-              {% endif %}
-            {% else %}
-              <div class="oficio-lc__vehicle-primary oficio-lc__text--empty">Não informado</div>
+      {# Col 1 — Servidor #}
+      <div class="oficio-lc__single-col">
+        <div class="oficio-lc__section-header">
+          <h3 class="oficio-lc__section-title">Servidor</h3>
+        </div>
+        {% with s=card.servidores.0 %}
+        <div class="oficio-lc__server-row{% if s.is_motorista %} oficio-lc__server-row--motorista{% endif %}">
+          <span class="oficio-lc__server-avatar">{{ s.initials }}</span>
+          <div class="oficio-lc__server-body">
+            <div class="oficio-lc__server-name-line">
+              <span class="oficio-lc__server-name">{{ s.name }}</span>
+              {% if s.is_motorista %}<span class="oficio-lc__motorista-chip">Motorista</span>{% endif %}
+            </div>
+            {% if s.cargo or s.unidade %}
+            <span class="oficio-lc__server-meta">{% if s.cargo %}{{ s.cargo }}{% endif %}{% if s.cargo and s.unidade %} · {% endif %}{% if s.unidade %}{{ s.unidade }}{% endif %}</span>
             {% endif %}
           </div>
-
-          <div class="oficio-lc__driver-box">
-            <span class="oficio-lc__box-kicker">Motorista</span>
-            {% if card.motorista_display %}
-              <div class="oficio-lc__driver-name">{{ card.motorista_display }}</div>
-            {% else %}
-              <div class="oficio-lc__driver-name oficio-lc__text--empty">Não informado</div>
+          {% if s.has_termo %}
+          <div class="oficio-lc__server-termo">
+            {% if s.termo_open_url %}
+            <a href="{{ s.termo_open_url }}" class="oficio-lc__doc-btn oficio-lc__doc-btn--primary" title="Abrir termo — {{ s.name }}">
+              <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
+              <span>Termo</span>
+            </a>
+            {% endif %}
+            {% if s.termo_docx_url %}
+            <a href="{{ s.termo_docx_url }}" class="oficio-lc__doc-btn oficio-lc__doc-btn--secondary" title="DOCX" data-direct-download="true">
+              <i class="bi bi-filetype-docx" aria-hidden="true"></i>
+            </a>
+            {% endif %}
+            {% if s.termo_pdf_url %}
+            <a href="{{ s.termo_pdf_url }}" class="oficio-lc__doc-btn oficio-lc__doc-btn--pdf" title="PDF" data-direct-download="true">
+              <i class="bi bi-filetype-pdf" aria-hidden="true"></i>
+            </a>
             {% endif %}
           </div>
-
+          {% endif %}
         </div>
-      </section>
+        {% endwith %}
+      </div>
+
+      {# Col 2 — Viatura (mesmo estilo do servidor) #}
+      <div class="oficio-lc__single-col">
+        <div class="oficio-lc__section-header">
+          <h3 class="oficio-lc__section-title">Veículo</h3>
+        </div>
+        <div class="oficio-lc__server-row">
+          <span class="oficio-lc__server-avatar oficio-lc__server-avatar--vehicle">{{ card.veiculo_initials }}</span>
+          <div class="oficio-lc__server-body">
+            <span class="oficio-lc__server-name">{% if card.veiculo_placa %}{{ card.veiculo_placa }}{% else %}<span class="oficio-lc__text--empty">Não informado</span>{% endif %}</span>
+            {% if card.veiculo_modelo %}
+            <span class="oficio-lc__server-meta">{{ card.veiculo_modelo }}</span>
+            {% endif %}
+            {% if card.motorista_is_carona and card.motorista_display %}
+            <span class="oficio-lc__server-meta">{{ card.motorista_display }} · <em>Motorista externo</em></span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      {# Col 3 — Destino + datas (mesmo estilo do servidor) #}
+      <div class="oficio-lc__single-col">
+        <div class="oficio-lc__section-header">
+          <h3 class="oficio-lc__section-title">Roteiro</h3>
+        </div>
+        {% if card.single_destino %}
+        <div class="oficio-lc__server-row">
+          <span class="oficio-lc__server-avatar oficio-lc__server-avatar--route">→</span>
+          <div class="oficio-lc__server-body">
+            <div class="oficio-lc__server-name-line">
+              <span class="oficio-lc__server-name">{{ card.single_destino.sede_label }}</span>
+              <span class="oficio-lc__route-sep">→</span>
+              <span class="oficio-lc__server-name">{{ card.single_destino.destino_label }}</span>
+            </div>
+            {% if card.single_destino.saida_display %}
+            <span class="oficio-lc__server-meta">{{ card.single_destino.saida_display }}{% if card.single_destino.chegada_display %} → {{ card.single_destino.chegada_display }}{% endif %}</span>
+            {% endif %}
+          </div>
+        </div>
+        {% else %}
+        <p class="oficio-lc__empty-hint">Sem roteiro informado</p>
+        {% endif %}
+      </div>
 
     </div>
 
-    {# ── SECONDARY: justificativa + termos de autorização ── #}
-    {% if card.justificativa or card.termos %}
-    <div class="oficio-lc__secondary">
+    {# Justificativa abaixo do single-grid (se existir) #}
+    {% if card.justificativa %}
+    <div class="oficio-lc__lower-grid">
+      <section class="oficio-lc__subcard oficio-lc__subcard--justificativa">
+        <div class="oficio-lc__subcard-header">
+          <div>
+            <h3 class="oficio-lc__subcard-title">Justificativa</h3>
+            {% if card.justificativa.created_at_display != '—' %}
+              <p class="oficio-lc__subcard-subtitle">Criada em {{ card.justificativa.created_at_display }}</p>
+            {% endif %}
+          </div>
+          <span class="oficio-lc__badge {{ card.justificativa.status_css_class }}">{{ card.justificativa.status_label }}</span>
+        </div>
+        <div class="oficio-lc__subcard-body">
+          <p class="oficio-lc__subcard-text">{{ card.justificativa.texto_resumido }}</p>
+        </div>
+        <div class="oficio-lc__subcard-actions">
+          <a href="{{ card.justificativa.detail_url }}" class="oficio-lc__doc-btn oficio-lc__doc-btn--primary">
+            <i class="bi bi-pencil-square" aria-hidden="true"></i>
+            <span>Abrir</span>
+          </a>
+        </div>
+      </section>
+    </div>
+    {% endif %}
+
+    {% else %}
+
+    {# ── LAYOUT PADRÃO: múltiplos servidores ou múltiplos destinos ── #}
+
+    {# Servidores — seção de largura total #}
+    <section class="oficio-lc__section">
+      <div class="oficio-lc__section-header">
+        <h3 class="oficio-lc__section-title">Servidores</h3>
+        <span class="oficio-lc__section-meta">{{ card.servidores_count }} servidor{% if card.servidores_count != 1 %}es{% endif %}</span>
+      </div>
+      <div class="oficio-lc__server-list">
+        {% for s in card.servidores %}
+        <div class="oficio-lc__server-row{% if s.is_motorista %} oficio-lc__server-row--motorista{% endif %}">
+          <span class="oficio-lc__server-avatar">{{ s.initials }}</span>
+          <div class="oficio-lc__server-body">
+            <div class="oficio-lc__server-name-line">
+              <span class="oficio-lc__server-name">{{ s.name }}</span>
+              {% if s.is_motorista %}<span class="oficio-lc__motorista-chip">Motorista</span>{% endif %}
+            </div>
+            {% if s.cargo or s.unidade %}
+            <span class="oficio-lc__server-meta">{% if s.cargo %}{{ s.cargo }}{% endif %}{% if s.cargo and s.unidade %} · {% endif %}{% if s.unidade %}{{ s.unidade }}{% endif %}</span>
+            {% endif %}
+          </div>
+          {% if s.has_termo %}
+          <div class="oficio-lc__server-termo">
+            {% if s.termo_open_url %}
+            <a href="{{ s.termo_open_url }}" class="oficio-lc__doc-btn oficio-lc__doc-btn--primary" title="Abrir termo — {{ s.name }}">
+              <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
+              <span>Termo</span>
+            </a>
+            {% endif %}
+            {% if s.termo_docx_url %}
+            <a href="{{ s.termo_docx_url }}" class="oficio-lc__doc-btn oficio-lc__doc-btn--secondary" title="DOCX — {{ s.name }}" data-direct-download="true">
+              <i class="bi bi-filetype-docx" aria-hidden="true"></i>
+            </a>
+            {% endif %}
+            {% if s.termo_pdf_url %}
+            <a href="{{ s.termo_pdf_url }}" class="oficio-lc__doc-btn oficio-lc__doc-btn--pdf" title="PDF — {{ s.name }}" data-direct-download="true">
+              <i class="bi bi-filetype-pdf" aria-hidden="true"></i>
+            </a>
+            {% endif %}
+          </div>
+          {% endif %}
+        </div>
+        {% empty %}
+        <p class="oficio-lc__empty-hint">Nenhum servidor informado</p>
+        {% endfor %}
+      </div>
+    </section>
+
+    {# Veículo + Justificativa lado a lado #}
+    <div class="oficio-lc__lower-grid">
+
+      <section class="oficio-lc__panel oficio-lc__panel--vehicle">
+        <h3 class="oficio-lc__panel-title">Veículo{% if card.motorista_is_carona %} e Motorista{% endif %}</h3>
+        <div class="oficio-lc__vehicle-box">
+          <span class="oficio-lc__box-kicker">Veículo</span>
+          {% if card.veiculo_placa %}
+            <div class="oficio-lc__vehicle-primary">{{ card.veiculo_placa }}</div>
+            {% if card.veiculo_modelo %}
+              <p class="oficio-lc__box-support">{{ card.veiculo_modelo }}</p>
+            {% endif %}
+          {% else %}
+            <div class="oficio-lc__vehicle-primary oficio-lc__text--empty">Não informado</div>
+          {% endif %}
+        </div>
+        {% if card.motorista_is_carona and card.motorista_display %}
+        <div class="oficio-lc__driver-box">
+          <span class="oficio-lc__box-kicker">Motorista</span>
+          <div class="oficio-lc__driver-name">{{ card.motorista_display }}</div>
+          <p class="oficio-lc__box-support">Externo ao ofício</p>
+        </div>
+        {% endif %}
+      </section>
 
       {% if card.justificativa %}
       <section class="oficio-lc__subcard oficio-lc__subcard--justificativa">
@@ -127,46 +267,10 @@
       </section>
       {% endif %}
 
-      {% if card.termos %}
-      <section class="oficio-lc__subcard oficio-lc__subcard--termos">
-        <div class="oficio-lc__subcard-header">
-          <div>
-            <h3 class="oficio-lc__subcard-title">Termos de autorização</h3>
-            <p class="oficio-lc__subcard-subtitle">{{ card.termos.count_label }}</p>
-          </div>
-        </div>
-        <div class="oficio-lc__subcard-body">
-          <div class="oficio-lc__term-list">
-            {% for termo in card.termos.items %}
-            <div class="oficio-lc__term-row">
-              <span class="oficio-lc__term-name">{{ termo.name }}</span>
-              <div class="oficio-lc__term-actions">
-                {% if termo.open_url %}
-                <a href="{{ termo.open_url }}" class="oficio-lc__doc-btn oficio-lc__doc-btn--primary" title="Abrir termo de {{ termo.name }}">
-                  <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
-                  <span>Abrir</span>
-                </a>
-                {% endif %}
-                {% if termo.download_docx_url %}
-                <a href="{{ termo.download_docx_url }}" class="oficio-lc__doc-btn oficio-lc__doc-btn--secondary" title="Baixar DOCX — {{ termo.name }}" data-direct-download="true">
-                  <i class="bi bi-filetype-docx" aria-hidden="true"></i>
-                </a>
-                {% endif %}
-                {% if termo.download_pdf_url %}
-                <a href="{{ termo.download_pdf_url }}" class="oficio-lc__doc-btn oficio-lc__doc-btn--pdf" title="Baixar PDF — {{ termo.name }}" data-direct-download="true">
-                  <i class="bi bi-filetype-pdf" aria-hidden="true"></i>
-                </a>
-                {% endif %}
-              </div>
-            </div>
-            {% endfor %}
-          </div>
-        </div>
-      </section>
-      {% endif %}
-
     </div>
+
     {% endif %}
+    {# ── fim do layout condicional ── #}
 
     {# ── FOOTER: ações principais do ofício ── #}
     <div class="oficio-lc__footer">

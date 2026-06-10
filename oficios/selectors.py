@@ -25,7 +25,7 @@ def listar_oficios(q: str | None = None, status: str | None = None):
             "solicitante",
         )
         .prefetch_related(
-            Prefetch("servidores", queryset=Servidor.objects.order_by("nome")),
+            Prefetch("servidores", queryset=Servidor.objects.select_related("cargo", "unidade").order_by("nome")),
             Prefetch("servidores_termo_autorizacao", queryset=Servidor.objects.order_by("nome")),
             Prefetch(
                 "roteiro__destinos",

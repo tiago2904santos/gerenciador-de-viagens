@@ -63,15 +63,13 @@
     var root = form.querySelector("[data-termo-oficio-summary]");
     var search = form.querySelector("#id_oficio_busca");
     var list = form.querySelector("#termo-oficio-lista");
-    if (!select || !root || !search || !list) return;
+    if (!select || !search || !list) return;
 
-    var empty = root.querySelector(".termo-oficio-summary__empty");
-    var grid = root.querySelector(".termo-oficio-summary__grid");
-    var destino = root.querySelector("[data-termo-oficio-destino]");
-    var periodo = root.querySelector("[data-termo-oficio-periodo]");
-    var servidores = root.querySelector("[data-termo-oficio-servidores]");
-    var viatura = root.querySelector("[data-termo-oficio-viatura]");
-    var summaryText = form.querySelector("#termo-selector-resumo");
+    var grid = root ? root.querySelector(".termo-oficio-summary__grid") : null;
+    var destino = root ? root.querySelector("[data-termo-oficio-destino]") : null;
+    var periodo = root ? root.querySelector("[data-termo-oficio-periodo]") : null;
+    var servidores = root ? root.querySelector("[data-termo-oficio-servidores]") : null;
+    var viatura = root ? root.querySelector("[data-termo-oficio-viatura]") : null;
 
     var items = Object.keys(summaries).map(function (key) {
       return summaries[key];
@@ -84,20 +82,14 @@
     function renderSummary() {
       var summary = selectedSummary();
       var hasSummary = !!summary;
-      if (empty) empty.hidden = hasSummary;
+      if (root) root.hidden = !hasSummary;
       if (grid) grid.hidden = !hasSummary;
       if (!hasSummary) {
-        if (summaryText) {
-          summaryText.textContent = "Nenhum oficio vinculado.";
-        }
         if (destino) destino.textContent = "-";
         if (periodo) periodo.textContent = "-";
         if (servidores) servidores.textContent = "-";
         if (viatura) viatura.textContent = "-";
         return;
-      }
-      if (summaryText) {
-        summaryText.textContent = [summary.label, summary.destino, summary.protocolo].filter(Boolean).join(" - ");
       }
       if (destino) destino.textContent = summary.destino || "-";
       if (periodo) periodo.textContent = summary.periodo || "-";

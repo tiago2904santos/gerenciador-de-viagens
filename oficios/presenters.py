@@ -107,16 +107,84 @@ def _temporal_badge_oficio(oficio):
 
 def apresentar_oficio_card(oficio):
     servidores = list(oficio.servidores.all())
-    servidores_display = [
-        {"initials": _iniciais_nome_servidor(s.nome), "name": s.nome}
-        for s in servidores
-    ]
+    termos_pks = {s.pk for s in oficio.servidores_termo_autorizacao.all()}
+    servidor_pks = {s.pk for s in servidores}
+    motorista_pk = oficio.motorista_id
+
+    # Motorista é carona quando: (a) modo manual, ou (b) servidor cadastrado mas fora do ofício
+    if oficio.motorista_modo == Oficio.MOTORISTA_MODO_MANUAL and (oficio.motorista_manual_nome or "").strip():
+        motorista_is_carona = True
+    elif motorista_pk and motorista_pk not in servidor_pks:
+        motorista_is_carona = True
+    else:
+        motorista_is_carona = False
+
+    # Servidores — com cargo, unidade, badge motorista e botões de termo embutidos
+    servidores_display = []
+    for s in servidores:
+        cargo_nome = s.cargo.nome if s.cargo_id and s.cargo else ""
+        unidade_nome = str(s.unidade) if s.unidade_id else ""
+        has_termo = s.pk in termos_pks
+        termo_open_url = termo_pdf_url = termo_docx_url = ""
+        if has_termo:
+            try:
+                termo_open_url = reverse("termos:termo_servidor_pdf_inline", args=[oficio.pk, s.pk])
+                termo_pdf_url = reverse("termos:baixar_termo_servidor", args=[oficio.pk, s.pk, "pdf"])
+                termo_docx_url = reverse("termos:baixar_termo_servidor", args=[oficio.pk, s.pk, "docx"])
+            except Exception:
+                pass
+        servidores_display.append({
+            "initials": _iniciais_nome_servidor(s.nome),
+            "name": s.nome,
+            "cargo": cargo_nome,
+            "unidade": unidade_nome,
+            "is_motorista": bool(motorista_pk and s.pk == motorista_pk),
+            "has_termo": has_termo,
+            "termo_open_url": termo_open_url,
+            "termo_pdf_url": termo_pdf_url,
+            "termo_docx_url": termo_docx_url,
+        })
 
     destino = _destino_display_oficio(oficio)
     data_evento = _data_evento_display_oficio(oficio)
     temporal_label, temporal_tone = _temporal_badge_oficio(oficio)
 
-    # Transporte — separado em placa e modelo para o layout de card
+    # Layout condicional: 1 servidor + 1 destino → grade de 3 colunas
+    destinos_roteiro = list(oficio.roteiro.destinos.all()) if oficio.roteiro_id else []
+    is_single_layout = len(servidores) == 1 and len(destinos_roteiro) == 1
+
+    single_destino = None
+    if is_single_layout and oficio.roteiro_id:
+        roteiro = oficio.roteiro
+        tz = timezone.get_current_timezone()
+        sede_label = ""
+        if roteiro.origem_cidade_id:
+            sigla = roteiro.origem_estado.sigla if roteiro.origem_estado_id else ""
+            sede_label = f"{roteiro.origem_cidade} ({sigla})" if sigla else str(roteiro.origem_cidade)
+        d0 = destinos_roteiro[0]
+        dest_sigla = d0.estado.sigla if d0.estado_id else ""
+        destino_label = f"{d0.cidade} ({dest_sigla})" if dest_sigla else str(d0.cidade)
+        saida_display = ""
+        if roteiro.saida_dt:
+            dt = roteiro.saida_dt
+            if timezone.is_aware(dt):
+                dt = dt.astimezone(tz)
+            saida_display = dt.strftime("%d/%m %H:%M")
+        chegada_display = ""
+        chegada_dt = roteiro.retorno_chegada_dt or roteiro.chegada_dt
+        if chegada_dt:
+            dt = chegada_dt
+            if timezone.is_aware(dt):
+                dt = dt.astimezone(tz)
+            chegada_display = dt.strftime("%d/%m %H:%M")
+        single_destino = {
+            "sede_label": sede_label,
+            "destino_label": destino_label,
+            "saida_display": saida_display,
+            "chegada_display": chegada_display,
+        }
+
+    # Transporte
     veiculo_placa = ""
     veiculo_modelo = ""
     veiculo_display = ""
@@ -133,30 +201,6 @@ def apresentar_oficio_card(oficio):
     motorista_display = _motorista_label_oficio(oficio)
     if motorista_display == "—":
         motorista_display = ""
-
-    # Termos de autorização
-    termos_list = list(oficio.servidores_termo_autorizacao.all())
-    if termos_list:
-        count = len(termos_list)
-        count_label = f"{count} servidor{'es' if count != 1 else ''}"
-        termos_items = []
-        for servidor in termos_list:
-            try:
-                open_url = reverse("termos:termo_servidor_pdf_inline", args=[oficio.pk, servidor.pk])
-                download_pdf_url = reverse("termos:baixar_termo_servidor", args=[oficio.pk, servidor.pk, "pdf"])
-                download_docx_url = reverse("termos:baixar_termo_servidor", args=[oficio.pk, servidor.pk, "docx"])
-            except Exception:
-                open_url = download_pdf_url = download_docx_url = ""
-            termos_items.append({
-                "name": servidor.nome,
-                "initials": _iniciais_nome_servidor(servidor.nome),
-                "open_url": open_url,
-                "download_pdf_url": download_pdf_url,
-                "download_docx_url": download_docx_url,
-            })
-        termos = {"count_label": count_label, "items": termos_items}
-    else:
-        termos = None
 
     # Justificativa
     justificativa = None
@@ -215,8 +259,11 @@ def apresentar_oficio_card(oficio):
         "veiculo_placa": veiculo_placa,
         "veiculo_modelo": veiculo_modelo,
         "veiculo_display": veiculo_display,
+        "veiculo_initials": (veiculo_placa or "")[:2].upper() or "VT",
+        "motorista_is_carona": motorista_is_carona,
         "motorista_display": motorista_display,
-        "termos": termos,
+        "is_single_layout": is_single_layout,
+        "single_destino": single_destino,
         "justificativa": justificativa,
         "documentos_url": reverse("oficios:wizard_documentos", args=[oficio.pk]),
         "editar_url": reverse("oficios:dados_viajantes", args=[oficio.pk]),
