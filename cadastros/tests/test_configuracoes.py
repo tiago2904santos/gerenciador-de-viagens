@@ -7,6 +7,8 @@ from django.urls import reverse
 
 from cadastros.forms import ConfiguracaoSistemaForm
 from cadastros.models import ConfiguracaoSistema
+from cadastros.models import Estado
+from cadastros.services import resolver_sede_ids_desde_configuracao
 
 
 class ConfiguracaoSistemaFormTests(TestCase):
@@ -123,3 +125,28 @@ class ApiConsultaCepTests(TestCase):
         self.assertEqual(response.json()["bairro"], "CENTRO")
         self.assertEqual(response.json()["cidade"], "CURITIBA")
         self.assertEqual(response.json()["uf"], "PR")
+
+
+class ResolverSedeConfiguracaoTests(TestCase):
+    def setUp(self):
+        self.configuracao = ConfiguracaoSistema.get_singleton()
+        self.estado_pr = Estado.objects.create(nome="Parana", sigla="PR")
+
+    @patch("cadastros.services.consultar_cep_externo")
+    def test_retorna_uf_do_cep_mesmo_sem_municipio_cadastrado(self, mock_consultar_cep):
+        self.configuracao.cep = "80000000"
+        self.configuracao.cidade_sede_padrao = None
+        self.configuracao.uf = ""
+        self.configuracao.cidade_endereco = ""
+        self.configuracao.save()
+
+        mock_consultar_cep.return_value = {
+            "uf": "PR",
+            "cidade": "Cidade Inexistente",
+        }
+
+        estado_id, cidade_id, aviso = resolver_sede_ids_desde_configuracao()
+
+        self.assertEqual(estado_id, self.estado_pr.pk)
+        self.assertIsNone(cidade_id)
+        self.assertIn("município não está cadastrado", aviso)

@@ -77,11 +77,20 @@ def resolver_sede_ids_desde_configuracao():
                 "Não foi possível identificar cidade/UF pelo CEP das Configurações. "
                 "Informe a sede manualmente ou ajuste o CEP nas Configurações.",
             )
-        uf = (payload.get("uf") or "").strip()
+        uf = (payload.get("uf") or "").strip().upper()
         loc = (payload.get("cidade") or "").strip()
         cidade_cep = resolver_cidade_sede_por_endereco(uf, loc)
         if cidade_cep and cidade_cep.estado_id:
             return (int(cidade_cep.estado_id), int(cidade_cep.pk), "")
+        if uf:
+            estado = Estado.objects.filter(sigla=uf).only("id").first()
+            if estado:
+                return (
+                    int(estado.pk),
+                    None,
+                    "O CEP das Configurações foi encontrado, mas o município não está cadastrado na base. "
+                    "Cadastre a cidade ou informe a sede manualmente.",
+                )
         return (
             None,
             None,

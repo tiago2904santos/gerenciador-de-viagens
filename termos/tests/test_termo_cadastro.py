@@ -37,6 +37,8 @@ class TermoAutorizacaoCadastroTests(TestCase):
         self.cidade = Cidade.objects.create(nome="Curitiba", estado=self.estado, uf="PR")
         self.cidade_destino = Cidade.objects.create(nome="Londrina", estado=self.estado, uf="PR")
         self.cidade_destino_2 = Cidade.objects.create(nome="Maringa", estado=self.estado, uf="PR")
+        self.estado_sc = Estado.objects.create(nome="Santa Catarina", sigla="SC")
+        self.cidade_sc = Cidade.objects.create(nome="Joinville", estado=self.estado_sc, uf="SC")
         self.servidor_1 = Servidor.objects.create(
             nome="Servidor Um",
             cargo=self.cargo,
@@ -88,6 +90,36 @@ class TermoAutorizacaoCadastroTests(TestCase):
         self.assertFalse(form.is_valid())
         self.assertIn("destino_cidade", form.errors)
         self.assertIn("data_evento_inicio", form.errors)
+
+    @mock.patch("termos.forms.resolver_sede_ids_desde_configuracao")
+    def test_form_carrega_sede_padrao_da_configuracao(self, m_resolver):
+        m_resolver.return_value = (self.estado.pk, self.cidade.pk, "")
+
+        form = TermoAutorizacaoForm()
+
+        self.assertEqual(form.fields["destino_estado"].initial, self.estado.pk)
+        self.assertIsNone(form.fields["destino_cidade"].initial)
+        self.assertEqual(form.fields["destino_estado"].widget.attrs["data-picker-initial-value"], str(self.estado.pk))
+        self.assertEqual(form.fields["destino_cidade"].widget.attrs["data-picker-initial-value"], "")
+        self.assertEqual(list(form.fields["destino_cidade"].queryset), [self.cidade, self.cidade_destino, self.cidade_destino_2])
+
+    @mock.patch("termos.forms.resolver_sede_ids_desde_configuracao")
+    def test_form_carrega_apenas_uf_quando_cidade_da_sede_nao_resolve(self, m_resolver):
+        m_resolver.return_value = (self.estado.pk, None, "")
+
+        form = TermoAutorizacaoForm()
+
+        self.assertEqual(form.fields["destino_estado"].initial, self.estado.pk)
+        self.assertIsNone(form.fields["destino_cidade"].initial)
+        self.assertEqual(form.fields["destino_estado"].widget.attrs["data-picker-initial-value"], str(self.estado.pk))
+        self.assertEqual(form.fields["destino_cidade"].widget.attrs["data-picker-initial-value"], "")
+        self.assertEqual(list(form.fields["destino_cidade"].queryset), [self.cidade, self.cidade_destino, self.cidade_destino_2])
+
+    def test_form_filtra_cidades_pela_uf_selecionada(self):
+        form = TermoAutorizacaoForm(data={"destino_estado": str(self.estado_sc.pk)})
+
+        cidade_ids = list(form.fields["destino_cidade"].queryset.values_list("pk", flat=True))
+        self.assertEqual(cidade_ids, [self.cidade_sc.pk])
 
     def test_form_aceita_termo_avulso_sem_servidor_e_sem_viatura(self):
         form = TermoAutorizacaoForm(
@@ -208,7 +240,21 @@ class TermoAutorizacaoCadastroTests(TestCase):
         response_novo = self.client.get(reverse("termos:novo"))
         self.assertEqual(response_novo.status_code, 200)
         self.assertContains(response_novo, "Cadastro de termo")
-        self.assertContains(response_novo, "data-cv-date-picker")
+        self.assertNotContains(response_novo, "page-stepper page-stepper--horizontal")
+        self.assertContains(response_novo, "id=\"id_oficio_busca\"")
+        self.assertContains(response_novo, "id=\"termo-oficio-lista\"")
+        self.assertContains(response_novo, "id=\"termo-evento-date-picker\"")
+
+        termo = TermoAutorizacao.objects.create(
+            destino_estado=self.estado,
+            destino_cidade=self.cidade_destino,
+            data_evento_inicio=date(2026, 6, 10),
+            data_evento_fim=date(2026, 6, 10),
+        )
+        response_edit = self.client.get(reverse("termos:editar", args=[termo.pk]))
+        self.assertEqual(response_edit.status_code, 200)
+        self.assertNotContains(response_edit, "page-stepper page-stepper--horizontal")
+        self.assertContains(response_edit, "id=\"id_oficio_busca\"")
 
     @mock.patch("termos.views.gerar_termo_cadastro_lote")
     def test_download_docx_multiplo_retorna_zip(self, m_lote):

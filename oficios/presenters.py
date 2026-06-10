@@ -109,39 +109,88 @@ def apresentar_oficio_card(oficio):
     servidores = list(oficio.servidores.all())
     servidores_display = [
         {"initials": _iniciais_nome_servidor(s.nome), "name": s.nome}
-        for s in servidores[:5]
+        for s in servidores
     ]
 
     destino = _destino_display_oficio(oficio)
     data_evento = _data_evento_display_oficio(oficio)
     temporal_label, temporal_tone = _temporal_badge_oficio(oficio)
 
+    # Transporte — separado em placa e modelo para o layout de card
+    veiculo_placa = ""
+    veiculo_modelo = ""
     veiculo_display = ""
     if oficio.viatura_id:
         v = oficio.viatura
-        modelo = (v.modelo or "").strip()
-        veiculo_display = f"{v.placa_formatada} – {modelo}" if modelo else v.placa_formatada
+        veiculo_placa = v.placa_formatada
+        veiculo_modelo = (v.modelo or "").strip()
+        veiculo_display = f"{veiculo_placa} – {veiculo_modelo}" if veiculo_modelo else veiculo_placa
     elif (oficio.transporte_placa_manual or "").strip():
-        placa = format_placa(oficio.transporte_placa_manual)
-        modelo = (oficio.transporte_modelo_manual or "").strip()
-        veiculo_display = f"{placa} – {modelo}" if modelo else placa
+        veiculo_placa = format_placa(oficio.transporte_placa_manual)
+        veiculo_modelo = (oficio.transporte_modelo_manual or "").strip()
+        veiculo_display = f"{veiculo_placa} – {veiculo_modelo}" if veiculo_modelo else veiculo_placa
 
     motorista_display = _motorista_label_oficio(oficio)
     if motorista_display == "—":
         motorista_display = ""
 
-    termos_count = len(list(oficio.servidores_termo_autorizacao.all()))
+    # Termos de autorização
+    termos_list = list(oficio.servidores_termo_autorizacao.all())
+    if termos_list:
+        count = len(termos_list)
+        count_label = f"{count} servidor{'es' if count != 1 else ''}"
+        termos_items = []
+        for servidor in termos_list:
+            try:
+                open_url = reverse("termos:termo_servidor_pdf_inline", args=[oficio.pk, servidor.pk])
+                download_pdf_url = reverse("termos:baixar_termo_servidor", args=[oficio.pk, servidor.pk, "pdf"])
+                download_docx_url = reverse("termos:baixar_termo_servidor", args=[oficio.pk, servidor.pk, "docx"])
+            except Exception:
+                open_url = download_pdf_url = download_docx_url = ""
+            termos_items.append({
+                "name": servidor.nome,
+                "initials": _iniciais_nome_servidor(servidor.nome),
+                "open_url": open_url,
+                "download_pdf_url": download_pdf_url,
+                "download_docx_url": download_docx_url,
+            })
+        termos = {"count_label": count_label, "items": termos_items}
+    else:
+        termos = None
 
-    just_status = ""
-    just_tone = "muted"
+    # Justificativa
+    justificativa = None
     try:
         j = oficio.justificativa
-        if (j.texto or "").strip():
-            just_status = "Preenchida"
-            just_tone = "success"
-        elif j.obrigatoria:
-            just_status = "Pendente"
-            just_tone = "warning"
+        texto = (j.texto or "").strip()
+        if texto:
+            status_label = "Preenchida"
+            status_css_class = "oficio-lc__badge--success"
+        elif getattr(j, "obrigatoria", False):
+            status_label = "Pendente"
+            status_css_class = "oficio-lc__badge--warning"
+        else:
+            status_label = ""
+            status_css_class = ""
+
+        if status_label:
+            created_at_display = "—"
+            raw_dt = getattr(j, "created_at", None)
+            if raw_dt:
+                tz = timezone.get_current_timezone()
+                if timezone.is_aware(raw_dt):
+                    raw_dt = raw_dt.astimezone(tz)
+                created_at_display = raw_dt.strftime("%d/%m/%Y")
+            texto_resumido = (texto[:200] + "…") if len(texto) > 200 else texto
+            if not texto_resumido:
+                texto_resumido = "Texto ainda não informado."
+            justificativa = {
+                "status_label": status_label,
+                "status_css_class": status_css_class,
+                "created_at_display": created_at_display,
+                "texto_resumido": texto_resumido,
+                "detail_url": reverse("oficios:wizard_justificativa", args=[oficio.pk]),
+            }
     except Exception:
         pass
 
@@ -151,6 +200,7 @@ def apresentar_oficio_card(oficio):
     )
 
     return {
+        "oficio_pk": oficio.pk,
         "numero_display": oficio.numero_formatado,
         "protocolo_display": format_protocolo(oficio.protocolo) or "",
         "destino_display": destino,
@@ -162,14 +212,15 @@ def apresentar_oficio_card(oficio):
         "temporal_tone": temporal_tone,
         "servidores": servidores_display,
         "servidores_count": len(servidores),
-        "servidores_extra": max(0, len(servidores) - 5),
+        "veiculo_placa": veiculo_placa,
+        "veiculo_modelo": veiculo_modelo,
         "veiculo_display": veiculo_display,
         "motorista_display": motorista_display,
-        "tem_termos": termos_count > 0,
-        "termos_count": termos_count,
-        "justificativa_status": just_status,
-        "justificativa_tone": just_tone,
-        "actions": [],
+        "termos": termos,
+        "justificativa": justificativa,
+        "documentos_url": reverse("oficios:wizard_documentos", args=[oficio.pk]),
+        "editar_url": reverse("oficios:dados_viajantes", args=[oficio.pk]),
+        "excluir_url": reverse("oficios:excluir", args=[oficio.pk]),
     }
 
 

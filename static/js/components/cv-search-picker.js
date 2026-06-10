@@ -88,6 +88,11 @@
     const showDriverCtrl = select.dataset.pickerDriverControl === "true";
     const isError        = select.dataset.pickerError         === "true";
     const listboxId    = `${select.id || select.name || "cv-picker"}-results`;
+    const initialValue = (select.dataset.pickerInitialValue || "").trim();
+
+    if (initialValue && !select.value) {
+      select.value = initialValue;
+    }
 
     /* Estado */
     const options = Array.from(select.options).map(readOption).filter((o) => o.value !== "");
@@ -614,6 +619,12 @@
     });
 
     syncSelect(false);
+
+    if (mode === "single" && initialValue && !select.value) {
+      select.value = initialValue;
+      const selected = new Set(Array.from(select.selectedOptions).map((o) => o.value));
+      options.forEach((o) => { o.selected = selected.has(o.value); });
+    }
 
     /* No modo single sem painel: inicializa o input com o valor já selecionado */
     if (mode === "single" && !showPanel) {

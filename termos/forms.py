@@ -8,6 +8,7 @@ from cadastros.models import Cidade
 from cadastros.models import Estado
 from cadastros.models import Servidor
 from cadastros.models import Viatura
+from cadastros.services import resolver_sede_ids_desde_configuracao
 from oficios.models import Oficio
 
 from .models import TermoAutorizacao
@@ -52,15 +53,8 @@ class TermoAutorizacaoForm(forms.ModelForm):
         widgets = {
             "oficio": OficioSelectSingle(
                 attrs={
-                    "class": "form-select cv-search-picker__native",
-                    "data-cv-search-picker": "true",
-                    "data-picker-mode": "single",
-                    "data-picker-variant": "detailed",
-                    "data-picker-label": "Oficio vinculado",
-                    "data-picker-hint": "Opcional. Use para reaproveitar destino, datas, servidores e viatura.",
-                    "data-placeholder": "Buscar oficio por numero, protocolo ou assunto",
-                    "data-empty-selected": "Nenhum oficio vinculado.",
-                    "data-empty-message": "Nenhum oficio encontrado.",
+                    "class": "termo-oficio-source-select",
+                    "hidden": True,
                 },
             ),
             "destino_estado": forms.Select(
@@ -118,15 +112,35 @@ class TermoAutorizacaoForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        estado_id, cidade_id = self._resolve_destino_inicial()
+
         self.fields["oficio"].required = False
         self.fields["oficio"].empty_label = ""
         self.fields["oficio"].queryset = Oficio.objects.select_related("roteiro", "viatura").order_by("-data_criacao", "-created_at")
+
         self.fields["destino_estado"].required = False
         self.fields["destino_estado"].empty_label = ""
         self.fields["destino_estado"].queryset = Estado.objects.order_by("nome")
+        self.fields["destino_estado"].initial = estado_id
+        self.initial["destino_estado"] = estado_id
+        self.fields["destino_estado"].widget.attrs["data-picker-initial-value"] = str(estado_id or "")
+
         self.fields["destino_cidade"].required = False
         self.fields["destino_cidade"].empty_label = ""
-        self.fields["destino_cidade"].queryset = Cidade.objects.select_related("estado").order_by("estado__sigla", "nome")
+        if estado_id:
+            self.fields["destino_cidade"].queryset = (
+                Cidade.objects.select_related("estado")
+                .filter(estado_id=estado_id)
+                .order_by("nome")
+            )
+            self.fields["destino_cidade"].widget.attrs.pop("disabled", None)
+        else:
+            self.fields["destino_cidade"].queryset = Cidade.objects.select_related("estado").none()
+            self.fields["destino_cidade"].widget.attrs["disabled"] = True
+        self.fields["destino_cidade"].initial = cidade_id
+        self.initial["destino_cidade"] = cidade_id
+        self.fields["destino_cidade"].widget.attrs["data-picker-initial-value"] = str(cidade_id or "")
+
         self.fields["data_evento_inicio"].required = False
         self.fields["data_evento_fim"].required = False
         self.fields["servidores"].required = False
@@ -138,6 +152,30 @@ class TermoAutorizacaoForm(forms.ModelForm):
             .prefetch_related("motoristas")
             .order_by("placa")
         )
+
+    def _resolve_destino_inicial(self):
+        cidade_id = None
+        estado_id = None
+
+        if self.is_bound:
+            cidade_id = self.data.get("destino_cidade") or None
+            estado_id = self.data.get("destino_estado") or None
+        elif self.instance and self.instance.pk:
+            cidade_id = self.instance.destino_cidade_id
+            estado_id = self.instance.destino_estado_id
+        else:
+            cfg_estado_id, _cfg_cidade_id, _ = resolver_sede_ids_desde_configuracao()
+            estado_id = estado_id or cfg_estado_id
+            cidade_id = None
+
+        cidade_obj = None
+        if cidade_id:
+            cidade_obj = Cidade.objects.select_related("estado").filter(pk=cidade_id).first()
+            if cidade_obj:
+                cidade_id = cidade_obj.pk
+                estado_id = cidade_obj.estado_id
+
+        return estado_id, cidade_id
 
     def clean(self):
         cleaned = super().clean()

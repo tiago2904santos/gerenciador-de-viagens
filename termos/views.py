@@ -1,5 +1,7 @@
 import json
 
+from datetime import datetime
+
 from django.contrib import messages
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import Http404
@@ -83,11 +85,136 @@ def _oficio_summary(oficio):
     return {
         "id": oficio.pk,
         "label": f"Oficio {oficio.numero_formatado}",
+        "numero": oficio.numero_formatado,
+        "protocolo": oficio.protocolo or "",
         "destino": destino,
         "periodo": periodo,
         "servidores": oficio.servidores_termo_autorizacao.count(),
         "viatura": str(oficio.viatura) if oficio.viatura_id else "",
+        "search_text": " ".join(
+            part
+            for part in [
+                oficio.numero_formatado,
+                oficio.protocolo or "",
+                destino,
+                periodo,
+                oficio.assunto or "",
+            ]
+            if part
+        ),
     }
+
+
+def _termo_evento_selected_dates_json(form):
+    def as_iso(value):
+        if not value:
+            return ""
+        if hasattr(value, "isoformat"):
+            return value.isoformat()
+        value = str(value).strip()
+        if len(value) == 10 and value[4:5] == "-" and value[7:8] == "-":
+            return value
+        return ""
+
+    if form.is_bound:
+        inicio = as_iso(form.data.get("data_evento_inicio"))
+        fim = as_iso(form.data.get("data_evento_fim"))
+    else:
+        inicio = as_iso(getattr(form.instance, "data_evento_inicio", None))
+        fim = as_iso(getattr(form.instance, "data_evento_fim", None))
+
+    if not inicio and not fim:
+        return "[]"
+    if inicio and not fim:
+        return json.dumps([inicio], cls=DjangoJSONEncoder)
+    if fim and not inicio:
+        return json.dumps([fim], cls=DjangoJSONEncoder)
+    if inicio == fim:
+        return json.dumps([inicio], cls=DjangoJSONEncoder)
+    return json.dumps([inicio, fim], cls=DjangoJSONEncoder)
+
+
+def _termo_evento_display_values(form):
+    def as_display(value):
+        if not value:
+            return ""
+        if hasattr(value, "strftime"):
+            return value.strftime("%d/%m/%Y")
+        value = str(value).strip()
+        if len(value) == 10 and value[4:5] == "-" and value[7:8] == "-":
+            try:
+                parsed = datetime.strptime(value, "%Y-%m-%d")
+            except ValueError:
+                return value
+            return parsed.strftime("%d/%m/%Y")
+        return value
+
+    if form.is_bound:
+        return {
+            "inicio": as_display(form.data.get("data_evento_inicio")),
+            "fim": as_display(form.data.get("data_evento_fim")),
+        }
+    return {
+        "inicio": as_display(getattr(form.instance, "data_evento_inicio", None)),
+        "fim": as_display(getattr(form.instance, "data_evento_fim", None)),
+    }
+
+
+def _termo_page_steps(form, termo=None):
+    oficio_val = None
+    servidores_val = []
+    viatura_val = None
+    if form.is_bound:
+        oficio_val = form.data.get("oficio") or None
+        servidores_val = form.data.getlist("servidores") if hasattr(form.data, "getlist") else []
+        viatura_val = form.data.get("viatura") or None
+    elif termo and termo.pk:
+        oficio_val = termo.oficio_id
+        servidores_val = list(termo.servidores.values_list("pk", flat=True))
+        viatura_val = termo.viatura_id
+
+    return [
+        {
+            "marker": "1",
+            "step_label": "OFÍCIO",
+            "title": "Oficio vinculado",
+            "status": "Opcional",
+            "url": "#termo-card-oficio",
+            "state_class": "is-complete" if oficio_val else "",
+        },
+        {
+            "marker": "2",
+            "step_label": "EVENTO",
+            "title": "Evento",
+            "status": "Obrigatório",
+            "url": "#termo-card-evento",
+            "state_class": "is-current",
+            "aria_current": "step",
+        },
+        {
+            "marker": "3",
+            "step_label": "SERVIDORES",
+            "title": "Servidores",
+            "status": "Opcional",
+            "url": "#termo-card-servidores",
+            "state_class": "is-complete" if servidores_val else "",
+        },
+        {
+            "marker": "4",
+            "step_label": "VIATURA",
+            "title": "Viatura",
+            "status": "Opcional",
+            "url": "#termo-card-viatura",
+            "state_class": "is-complete" if viatura_val else "",
+        },
+        {
+            "marker": "5",
+            "step_label": "REVISÃO",
+            "title": "Salvar termo",
+            "status": "Acoes finais",
+            "url": "#termo-form-footer",
+        },
+    ]
 
 
 def _form_context(*, form, termo=None):
@@ -103,7 +230,11 @@ def _form_context(*, form, termo=None):
         "index_url": reverse("termos:index"),
         "servidor_create_url": reverse("cadastros:servidor_create"),
         "viatura_create_url": reverse("cadastros:viatura_create"),
+        "api_cidades_por_estado_url": reverse("roteiros:api_cidades_por_estado", kwargs={"estado_id": 0}),
         "oficios_summary": summaries,
+        "termo_page_steps": _termo_page_steps(form, termo=termo),
+        "termo_evento_selected_dates_json": _termo_evento_selected_dates_json(form),
+        "termo_evento_display": _termo_evento_display_values(form),
     }
 
 

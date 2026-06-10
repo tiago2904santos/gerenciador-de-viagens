@@ -2,38 +2,40 @@
   gap: var(--space-5);
 }
 
-.termo-anchor-stepper {
+.termo-oficio-source-select {
+  display: none;
+}
+
+.termo-card__body {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: var(--space-2);
-  margin: var(--space-5) 0 var(--space-4);
-}
-
-.termo-anchor-stepper__item {
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  color: var(--color-muted);
-  font-weight: 800;
-  padding: var(--space-3);
-  text-align: center;
-  text-decoration: none;
-}
-
-.termo-anchor-stepper__item:hover,
-.termo-anchor-stepper__item.is-active {
-  background: var(--stepper-active-bg);
-  border-color: transparent;
-  color: var(--stepper-active-color);
+  gap: var(--space-4);
 }
 
 .termo-form .cv-wizard-section-card {
   scroll-margin-top: 24px;
 }
 
+.termo-oficio-selector-wrapper {
+  margin-top: 0;
+}
+
+.termo-oficio-summary-panel {
+  background: var(--cv-sp-selected-panel-bg);
+  border: 1px solid var(--cv-sp-selected-panel-border);
+  border-radius: var(--cv-sp-card-radius);
+}
+
+.termo-oficio-summary-panel .cv-search-picker__selected-header {
+  padding-right: var(--space-4);
+}
+
+.termo-oficio-summary-panel .termo-oficio-summary {
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+
 .termo-oficio-summary {
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  margin-top: var(--space-4);
   padding: var(--space-4);
 }
 
@@ -65,14 +67,45 @@
   margin: var(--space-1) 0 0;
 }
 
-.termo-date-picker {
-  margin-top: var(--space-4);
+.termo-evento-body {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.termo-evento-periodo {
+  margin-top: var(--space-2);
+}
+
+.termo-evento-dates {
+  gap: var(--space-4);
+}
+
+.termo-evento-dates .cv-field {
+  min-width: 0;
+}
+
+.termo-evento-dates .cv-date-picker__control {
+  align-items: stretch;
+  display: flex;
+  gap: var(--space-2);
+}
+
+.termo-evento-dates .cv-date-picker__control .cv-field__control {
+  flex: 1 1 auto;
+}
+
+.termo-evento-dates .cv-date-picker__trigger--icon {
+  flex: 0 0 auto;
 }
 
 .termo-actions {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-3);
+}
+
+.termo-actions--footer {
+  margin-top: var(--space-4);
 }
 
 .termos-list {
@@ -130,12 +163,12 @@
 }
 
 @media (max-width: 860px) {
-  .termo-anchor-stepper {
+  .termo-oficio-summary__grid,
+  .termo-preview-grid {
     grid-template-columns: 1fr;
   }
 
-  .termo-oficio-summary__grid,
-  .termo-preview-grid {
+  .termo-evento-dates {
     grid-template-columns: 1fr;
   }
 

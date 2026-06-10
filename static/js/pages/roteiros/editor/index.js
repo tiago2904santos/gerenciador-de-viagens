@@ -1468,7 +1468,6 @@ export function initRoteirosEditor() {
       var rid=String(r.id); var ac=rid===selId?' is-active':'';
       return '<button type="button" class="oficio-roteiro-route-item'+ac+'" data-route-id="'+esc(rid)+'">' +
         '<span class="route-title">'+esc(r.label||'Roteiro #'+rid)+'</span>' +
-        '<span class="route-destinos">'+esc(routeDestinationsSummary(r))+'</span>' +
         '<span class="route-periodo">'+esc(routePeriodSummary(r))+'</span></button>';
     }).join('');
   }
