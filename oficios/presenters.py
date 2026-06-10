@@ -275,7 +275,11 @@ def apresentar_oficio_card(oficio):
         "valor_diarias_display": valor_diarias_display,
         "valor_diarias_extenso": valor_diarias_extenso,
         "justificativa": justificativa,
+        "justificativa_url": reverse("oficios:wizard_justificativa", args=[oficio.pk]),
         "documentos_url": reverse("oficios:wizard_documentos", args=[oficio.pk]),
+        "visualizar_url": reverse("oficios:oficio_pdf_inline", args=[oficio.pk]),
+        "pdf_url": reverse("oficios:baixar_documento", args=[oficio.pk, "pdf"]),
+        "docx_url": reverse("oficios:baixar_documento", args=[oficio.pk, "docx"]),
         "editar_url": reverse("oficios:dados_viajantes", args=[oficio.pk]),
         "excluir_url": reverse("oficios:excluir", args=[oficio.pk]),
     }

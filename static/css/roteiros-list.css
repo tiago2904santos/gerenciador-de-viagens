@@ -24,8 +24,19 @@
 
 .app-page--main-card-list .list-grid.list-grid--roteiros.app-list-grid {
   display: grid;
-  gap: var(--space-3);
+  gap: var(--space-6);
   grid-template-columns: minmax(0, 1fr);
+}
+
+.oficios-list-page > .list-panel {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.oficios-list-page > .list-panel > .list-content {
+  padding-block: 0;
 }
 
 .app-page--main-card-list .list-grid--roteiros .roteiro-list-card {

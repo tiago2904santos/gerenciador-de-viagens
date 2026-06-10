@@ -46,21 +46,20 @@
           </div>
 
           {% if s.has_termo %}
-          <div class="oficio-lc__traveller-termo">
+          <div class="oficio-lc__traveller-termo cv-icon-btn-group">
             {% if s.termo_open_url %}
-            <a href="{{ s.termo_open_url }}" class="oficio-lc__doc-btn oficio-lc__doc-btn--primary" title="Abrir termo — {{ s.name }}">
-              <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
-              <span>Termo</span>
-            </a>
-            {% endif %}
-            {% if s.termo_docx_url %}
-            <a href="{{ s.termo_docx_url }}" class="oficio-lc__doc-btn oficio-lc__doc-btn--secondary" title="DOCX" data-direct-download="true">
-              <i class="bi bi-filetype-docx" aria-hidden="true"></i>
+            <a class="cv-icon-btn cv-icon-btn--preview" href="{{ s.termo_open_url }}" aria-label="Visualizar termo de autorização de {{ s.name }}" data-tooltip="Visualizar termo" title="Visualizar termo">
+              {% include "dev/ui_lab/partials/_cv_icon.html" with icon="eye" only %}
             </a>
             {% endif %}
             {% if s.termo_pdf_url %}
-            <a href="{{ s.termo_pdf_url }}" class="oficio-lc__doc-btn oficio-lc__doc-btn--pdf" title="PDF" data-direct-download="true">
-              <i class="bi bi-filetype-pdf" aria-hidden="true"></i>
+            <a class="cv-icon-btn cv-icon-btn--pdf" href="{{ s.termo_pdf_url }}" aria-label="Baixar termo de autorização em PDF de {{ s.name }}" data-tooltip="PDF" title="PDF" data-direct-download="true">
+              {% include "dev/ui_lab/partials/_cv_icon.html" with icon="pdf" only %}
+            </a>
+            {% endif %}
+            {% if s.termo_docx_url %}
+            <a class="cv-icon-btn cv-icon-btn--docx" href="{{ s.termo_docx_url }}" aria-label="Baixar termo de autorização em DOCX de {{ s.name }}" data-tooltip="DOCX" title="DOCX" data-direct-download="true">
+              {% include "dev/ui_lab/partials/_cv_icon.html" with icon="docx" only %}
             </a>
             {% endif %}
           </div>
@@ -133,22 +132,45 @@
     </div>
 
     {# ── JUSTIFICATIVA ── #}
-    
+    <div class="oficio-lc__section oficio-lc__section--justificativas">
+      <div class="oficio-lc__travellers oficio-lc__travellers--n1">
+        <div class="oficio-lc__traveller oficio-lc__traveller--justificativa">
+          <div class="oficio-lc__traveller-body">
+            <div class="oficio-lc__traveller-name-row">
+              <span class="oficio-lc__traveller-name">JUSTIFICATIVA</span>
+              {% if card.justificativa %}
+                <span class="oficio-lc__traveller-badge">{{ card.justificativa.status_label }}</span>
+              {% else %}
+                <span class="oficio-lc__traveller-badge">Pendente</span>
+              {% endif %}
+            </div>
+            <span class="oficio-lc__traveller-meta">
+              {% if card.justificativa %}
+                {{ card.justificativa.texto_resumido }}
+              {% else %}
+                Nenhuma justificativa informada.
+              {% endif %}
+            </span>
+          </div>
+          <div class="oficio-lc__traveller-termo cv-icon-btn-group">
+            {% include "components/ui/buttons/icon_button.html" with href=card.justificativa_url action="edit" aria_label="Editar justificativa" tooltip="Editar justificativa" only %}
+          </div>
+        </div>
+      </div>
+    </div>
+
     {# ── FOOTER ── #}
     <div class="oficio-lc__footer">
       <div class="oficio-lc__footer-actions">
-        <a href="{{ card.documentos_url }}" class="oficio-lc__doc-btn oficio-lc__doc-btn--primary">
-          <i class="bi bi-file-earmark-text" aria-hidden="true"></i>
-          <span>Documentos</span>
-        </a>
-        <a href="{{ card.editar_url }}" class="oficio-lc__doc-btn oficio-lc__doc-btn--secondary">
-          <i class="bi bi-pencil" aria-hidden="true"></i>
-          <span>Editar</span>
-        </a>
-        <a href="{{ card.excluir_url }}" class="oficio-lc__doc-btn oficio-lc__doc-btn--danger">
-          <i class="bi bi-trash" aria-hidden="true"></i>
-          <span>Excluir</span>
-        </a>
+        <div class="oficio-lc__footer-actions-main cv-icon-btn-group">
+          {% include "components/ui/buttons/icon_button.html" with href=card.editar_url action="edit" aria_label="Editar ofício" tooltip="Editar" only %}
+          {% include "components/ui/buttons/icon_button.html" with href=card.visualizar_url action="preview" aria_label="Visualizar ofício" tooltip="Visualizar" only %}
+          {% include "components/ui/buttons/icon_button.html" with href=card.pdf_url action="pdf" aria_label="Baixar PDF do ofício" tooltip="PDF" only %}
+          {% include "components/ui/buttons/icon_button.html" with href=card.docx_url action="docx" aria_label="Baixar DOCX do ofício" tooltip="DOCX" only %}
+        </div>
+        <div class="oficio-lc__footer-actions-danger cv-icon-btn-group">
+          {% include "components/ui/buttons/icon_button.html" with href=card.excluir_url action="delete" aria_label="Excluir ofício" tooltip="Excluir" only %}
+        </div>
       </div>
     </div>
 

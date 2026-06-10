@@ -3156,7 +3156,6 @@ html[data-theme="dark"] [data-oficio-wizard-step1] .cv-search-picker {
   display: grid;
 }
 
-
 /* ── IDENTIFICAÇÃO: Número · Protocolo · Data de Criação (topo do card) ── */
 .oficio-lc__id-row {
   align-items: center;
@@ -3179,16 +3178,16 @@ html[data-theme="dark"] [data-oficio-wizard-step1] .cv-search-picker {
     0 0 12px 2px color-mix(in srgb, var(--color-accent) 15%, transparent),
     0 0 22px 4px color-mix(in srgb, var(--color-accent) 6%, transparent);
   content: "";
-  height: 1.8em;
+  height: 2.9em;
   left: var(--space-6);
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 6px;
+  width: 8px;
 }
 
 .oficio-lc__id-row .oficio-lc__info-item {
-  padding: var(--space-4) 0;
+  padding: var(--space-4) 0 var(--space-4) var(--space-1);
 }
 
 /* ── LINHA SECUNDÁRIA DE INFO (Destino · Data do Evento) ── */
@@ -3359,6 +3358,15 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
   color: var(--color-heading);
 }
 
+.oficio-lc__traveller--justificativa {
+  background: var(--color-card-muted);
+  border-color: var(--color-border-soft);
+}
+
+.oficio-lc__traveller--justificativa .oficio-lc__traveller-meta {
+  white-space: normal;
+}
+
 .oficio-lc__traveller-name-row {
   align-items: center;
   display: flex;
@@ -3413,7 +3421,8 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
   display: grid;
   gap: var(--space-3);
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  min-height: 180px;
+  min-height: 167px;
+  max-height: 185px;
 }
 
 .oficio-lc__transport-card {
@@ -3452,7 +3461,7 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
 
 .oficio-lc__transport-modelo {
   color: var(--color-heading);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-md);
   font-weight: 800;
   line-height: 1.35;
 }
@@ -3537,7 +3546,7 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
 }
 
 .oficio-lc__valor-extenso {
-  color: var(--color-muted);
+  color: var(--color-heading);
   font-size: var(--font-size-sm);
   font-weight: 700;
   line-height: 1.4;
@@ -3696,6 +3705,18 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
+  justify-content: space-between;
+  width: 100%;
+}
+
+.oficio-lc__footer-actions-main,
+.oficio-lc__footer-actions-danger {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.oficio-lc__footer-actions-danger {
+  margin-left: auto;
 }
 
 /* ── RESPONSIVO ── */

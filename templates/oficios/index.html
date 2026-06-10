@@ -4,11 +4,11 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/roteiros-list.css' %}">
+  <link rel="stylesheet" href="{% static 'css/roteiros-list.css' %}?v=20260610-oficios-panel">
 {% endblock %}
 
 {% block content %}
-  <div class="app-page--main-card-list page-shell page-shell--list" data-cv-realtime-filter-scope>
+  <div class="app-page--main-card-list page-shell page-shell--list oficios-list-page" data-cv-realtime-filter-scope>
     {% include "components/ui/headers/header_stack_filters.html" with eyebrow="OFÍCIOS" title=page_title icon_label="OF" form_action=request.path search_name="q" search_value=q search_placeholder="Buscar por protocolo, motivo ou número" search_clear_url=search_clear_url status_options=status_options status_value=status primary_action_label="Novo ofício" primary_action_url=create_url only %}
 
     <div class="list-panel">
