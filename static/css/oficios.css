@@ -3156,10 +3156,39 @@ html[data-theme="dark"] [data-oficio-wizard-step1] .cv-search-picker {
   display: grid;
 }
 
+
 /* ── IDENTIFICAÇÃO: Número · Protocolo · Data de Criação (topo do card) ── */
 .oficio-lc__id-row {
+  align-items: center;
+  background: var(--cv-wizard-section-header-bg);
+  background-image: linear-gradient(to right, color-mix(in srgb, var(--color-accent) 7%, transparent) 0px, transparent 76px);
+  border-bottom: 1px solid var(--cv-wizard-section-border);
   display: flex;
   flex-wrap: wrap;
+  gap: var(--space-4);
+  min-height: calc(2 * var(--space-4) + var(--control-height-sm));
+  padding: 0 var(--space-6) 0 var(--space-10);
+  position: relative;
+}
+
+.oficio-lc__id-row::before {
+  background: linear-gradient(180deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 50%, transparent) 100%);
+  border-radius: var(--radius-pill);
+  box-shadow:
+    0 0 5px 1px color-mix(in srgb, var(--color-accent) 35%, transparent),
+    0 0 12px 2px color-mix(in srgb, var(--color-accent) 15%, transparent),
+    0 0 22px 4px color-mix(in srgb, var(--color-accent) 6%, transparent);
+  content: "";
+  height: 1.8em;
+  left: var(--space-6);
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+}
+
+.oficio-lc__id-row .oficio-lc__info-item {
+  padding: var(--space-4) 0;
 }
 
 /* ── LINHA SECUNDÁRIA DE INFO (Destino · Data do Evento) ── */
