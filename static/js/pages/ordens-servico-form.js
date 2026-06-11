@@ -138,26 +138,45 @@
     );
   }
 
-  function syncAddDestinationButton(form) {
-    var button = form.querySelector("[data-os-add-destino]");
+  function focusDestinationPicker(form) {
     var destinationSection = form.querySelector("#os-evento-destinos");
-    if (!button || !destinationSection) return;
+    if (!destinationSection) return;
 
-    button.addEventListener("click", function () {
-      var pickers = Array.prototype.slice.call(destinationSection.querySelectorAll(".cv-search-picker__input"))
-        .filter(function (input) {
-          return !input.disabled;
-        });
-      var emptyPicker = pickers.find(function (input) {
-        return !String(input.value || "").trim();
+    var pickers = Array.prototype.slice.call(destinationSection.querySelectorAll(".cv-search-picker__input"))
+      .filter(function (input) {
+        return !input.disabled;
       });
-      var target = emptyPicker || pickers[0];
-      if (target) {
+    var emptyPicker = pickers.find(function (input) {
+      return !String(input.value || "").trim();
+    });
+    var target = emptyPicker || pickers[0];
+    if (target) {
+      window.setTimeout(function () {
         target.focus();
-        target.click();
-      }
+      }, 0);
+    }
+  }
+
+  function syncAddDestinationButton(form) {
+    if (!form.querySelector("[data-os-add-destino]") || form.dataset.osAddDestinoBound === "true") return;
+    form.dataset.osAddDestinoBound = "true";
+
+    document.addEventListener("click", function (event) {
+      var button = event.target.closest("[data-os-add-destino]");
+      if (!button || !form.contains(button)) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      focusDestinationPicker(form);
     });
   }
+
+  window.OSFocusDestino = function (button) {
+    var form = button && button.closest ? button.closest("[data-os-form]") : document.querySelector("[data-os-form]");
+    if (form) {
+      focusDestinationPicker(form);
+    }
+  };
 
   function setMultiSelectValues(select, ids, form) {
     if (!select) return;
@@ -274,7 +293,7 @@
       .filter(function (o) { return o.selected; })
       .map(function (o) { return o.value; });
 
-    if (!selectedIds.length) return;
+    if (!selectedIds.length) { return; }
 
     var allServidorIds = new Set();
     var startDates     = [];
@@ -310,14 +329,34 @@
       motivoField.dispatchEvent(new Event("input",  { bubbles: true }));
       motivoField.dispatchEvent(new Event("change", { bubbles: true }));
     }
+
+    /* Destino — usa o primeiro ofício que tiver estado */
+    var destinoStateId = "";
+    var destinoCityId = "";
+    for (var i = 0; i < selectedIds.length; i++) {
+      var sd = summaries[selectedIds[i]];
+      if (sd && sd.estado_id) {
+        destinoStateId = String(sd.estado_id);
+        destinoCityId = String(sd.cidade_id || "");
+        break;
+      }
+    }
+    if (destinoStateId) {
+      var stateSelect = form.querySelector("select[name='destino_estado']");
+      var citySelect  = form.querySelector("select[name='destino_cidade']");
+      if (stateSelect && citySelect) {
+        stateSelect.value = destinoStateId;
+        stateSelect.dispatchEvent(new Event("change", { bubbles: true }));
+        loadCitiesForState(form, citySelect, destinoStateId, destinoCityId);
+      }
+    }
   }
 
   function initOficioAutoFill(form, summaries) {
     var select = form.querySelector("select[name='oficios']");
     if (!select) return;
-    select.addEventListener("change", function () {
-      onOficiosChange(form, summaries);
-    });
+    select.addEventListener("change", function () { onOficiosChange(form, summaries); });
+    select.addEventListener("input",  function () { onOficiosChange(form, summaries); });
   }
 
   /* ── Bootstrap ──────────────────────────────────────────────── */

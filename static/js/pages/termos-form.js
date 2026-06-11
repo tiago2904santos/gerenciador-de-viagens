@@ -58,6 +58,78 @@
     }
   }
 
+  function isoToDisplay(iso) {
+    if (!iso) return "";
+    var p = (iso || "").split("-");
+    if (p.length !== 3) return "";
+    return [p[2], p[1], p[0]].join("/");
+  }
+
+  function setDateFields(form, startIso, endIso) {
+    var startHidden  = form.querySelector("input[name='data_evento_inicio']");
+    var endHidden    = form.querySelector("input[name='data_evento_fim']");
+    var startDisplay = form.querySelector("[data-termo-evento-start-display]");
+    var endDisplay   = form.querySelector("[data-termo-evento-end-display]");
+    var picker       = form.querySelector("#termo-evento-date-picker");
+    var safeEnd = endIso || startIso;
+    if (startHidden)  startHidden.value  = startIso || "";
+    if (endHidden)    endHidden.value    = safeEnd  || "";
+    if (startDisplay) startDisplay.value = isoToDisplay(startIso);
+    if (endDisplay)   endDisplay.value   = isoToDisplay(safeEnd);
+    if (picker) {
+      var dates = [];
+      if (startIso) dates.push(startIso);
+      if (safeEnd && safeEnd !== startIso) dates.push(safeEnd);
+      picker.dataset.selectedDates = JSON.stringify(dates);
+    }
+  }
+
+  function setMultiSelectValues(select, ids, form) {
+    if (!select) return;
+    var idSet = new Set(ids.map(String));
+    Array.from(select.options).forEach(function (opt) {
+      opt.selected = idSet.has(String(opt.value));
+    });
+    resetSearchPicker(select);
+    initSearchPickers(form);
+  }
+
+  function autoFillFromOficio(form, summary) {
+    if (!summary) return;
+
+    if (summary.data_inicio) {
+      setDateFields(form, summary.data_inicio, summary.data_fim || summary.data_inicio);
+    }
+
+    var stateId = String(summary.estado_id || "");
+    var cityId  = String(summary.cidade_id  || "");
+    if (stateId) {
+      var stateSelect = form.querySelector("select[name='destino_estado']");
+      var citySelect  = form.querySelector("select[name='destino_cidade']");
+      if (stateSelect && citySelect) {
+        stateSelect.value = stateId;
+        resetSearchPicker(stateSelect);
+        initSearchPickers(form);
+        loadCitiesForState(form, citySelect, stateId, cityId);
+      }
+    }
+
+    if (summary.servidor_ids && summary.servidor_ids.length) {
+      var servidoresSelect = form.querySelector("select[name='servidores']");
+      setMultiSelectValues(servidoresSelect, summary.servidor_ids, form);
+    }
+
+    var viaturaId = String(summary.viatura_id || "");
+    if (viaturaId) {
+      var viaturaSelect = form.querySelector("select[name='viatura']");
+      if (viaturaSelect) {
+        viaturaSelect.value = viaturaId;
+        resetSearchPicker(viaturaSelect);
+        initSearchPickers(form);
+      }
+    }
+  }
+
   function syncOficioSummary(form, summaries) {
     var select = form.querySelector("select[name='oficio']");
     var root = form.querySelector("[data-termo-oficio-summary]");
@@ -144,6 +216,7 @@
     select.addEventListener("change", function () {
       renderList(search.value);
       renderSummary();
+      autoFillFromOficio(form, selectedSummary());
     });
     search.addEventListener("input", function () {
       renderList(search.value);

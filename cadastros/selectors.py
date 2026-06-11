@@ -1,6 +1,7 @@
 ﻿from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
+from .models import AssinaturaConfiguracao
 from .models import Cargo
 from .models import ConfiguracaoSistema
 from .models import Cidade
@@ -125,6 +126,13 @@ def get_configuracao_sistema():
 def build_configuracao_context():
     configuracao = get_configuracao_sistema()
     cidade_doc = configuracao.cidade_endereco or ""
+    assinaturas: dict = {}
+    for ass in configuracao.assinaturas.filter(ativo=True).select_related("servidor__cargo").order_by("tipo", "ordem"):
+        assinaturas.setdefault(ass.tipo, []).append({
+            "servidor": ass.servidor,
+            "nome": ass.servidor.nome if ass.servidor else "",
+            "ordem": ass.ordem,
+        })
     return {
         "nome_orgao": configuracao.nome_orgao,
         "sigla_orgao": configuracao.sigla_orgao,
@@ -149,4 +157,5 @@ def build_configuracao_context():
         "prazo_justificativa_dias": configuracao.prazo_justificativa_dias,
         "pt_ultimo_numero": configuracao.pt_ultimo_numero,
         "pt_ano": configuracao.pt_ano,
+        "assinaturas": assinaturas,
     }

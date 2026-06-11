@@ -36,7 +36,22 @@
       </div>
       </section>
 
+      {% include "components/ui/layouts/form_section.html" with title="Chefia" description="Nome e cargo da chefia utilizados como fallback de assinatura nos documentos." section_id="config-chefia-section" only %}
+      <div class="field-grid">
+        {% include "components/forms/form_field.html" with field=form.nome_chefia size_class="field-size-2" only %}
+        {% include "components/forms/form_field.html" with field=form.cargo_chefia size_class="field-size-2" only %}
+      </div>
       </section>
+
+      {% include "components/ui/layouts/form_section.html" with title="Assinantes padrão por documento" description="Servidor selecionado como assinante padrão em cada tipo de documento gerado pelo sistema." section_id="config-assinaturas-section" only %}
+      <div class="field-grid">
+        {% include "components/forms/form_field.html" with field=assinaturas_form.assinante_oficio size_class="field-size-2" only %}
+        {% include "components/forms/form_field.html" with field=assinaturas_form.assinante_justificativa size_class="field-size-2" only %}
+        {% include "components/forms/form_field.html" with field=assinaturas_form.assinante_plano_trabalho size_class="field-size-2" only %}
+        {% include "components/forms/form_field.html" with field=assinaturas_form.assinante_ordem_servico size_class="field-size-2" only %}
+      </div>
+      </section>
+
       {% include "components/ui/layouts/card_footer_actions.html" with secondary_label="Voltar" secondary_url=back_url primary_label="Salvar" only %}
 
     </form>

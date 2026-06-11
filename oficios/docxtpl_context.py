@@ -165,16 +165,23 @@ def _build_sede(inst: dict[str, Any]) -> str:
     return format_document_display(_txt(inst.get("sede"))) if _txt(inst.get("sede")) else ""
 
 
-def _assinatura_nome_cargo(inst: dict[str, Any]) -> tuple[str, str]:
+def _assinatura_nome_cargo(inst: dict[str, Any], tipo: str | None = None) -> tuple[str, str]:
     ass = inst.get("assinaturas") or {}
     rows: list[dict[str, Any]] = []
     if isinstance(ass, dict):
-        for _tipo, lst in ass.items():
-            if not isinstance(lst, list):
-                continue
-            for row in lst:
-                if isinstance(row, dict) and (_txt(row.get("nome")) or row.get("servidor")):
-                    rows.append(row)
+        if tipo and tipo in ass:
+            lst = ass[tipo]
+            if isinstance(lst, list):
+                for row in lst:
+                    if isinstance(row, dict) and (_txt(row.get("nome")) or row.get("servidor")):
+                        rows.append(row)
+        else:
+            for _tipo_key, lst in ass.items():
+                if not isinstance(lst, list):
+                    continue
+                for row in lst:
+                    if isinstance(row, dict) and (_txt(row.get("nome")) or row.get("servidor")):
+                        rows.append(row)
     rows.sort(key=lambda r: int(r.get("ordem") or 0))
     if not rows:
         return _txt(inst.get("nome_chefia")), _txt(inst.get("cargo_chefia"))
@@ -409,7 +416,7 @@ def build_oficio_docxtpl_context(oficio: Oficio) -> dict[str, Any]:
 
 def _build_oficio_docxtpl_context_impl(oficio: Oficio) -> dict[str, Any]:
     inst = build_configuracao_context()
-    nome_chefia, cargo_chefia = _assinatura_nome_cargo(inst)
+    nome_chefia, cargo_chefia = _assinatura_nome_cargo(inst, "OFICIO")
     nome_orgao_raw = _txt(inst.get("nome_orgao"))
     unidade_campo_raw = _txt(inst.get("unidade"))
     sigla_raw = _txt(inst.get("sigla_orgao"))
@@ -487,7 +494,7 @@ def build_justificativa_docxtpl_context(oficio: Oficio) -> dict[str, Any]:
 
 def _build_justificativa_docxtpl_context_impl(oficio: Oficio) -> dict[str, Any]:
     inst = build_configuracao_context()
-    nome_a, cargo_a = _assinatura_nome_cargo(inst)
+    nome_a, cargo_a = _assinatura_nome_cargo(inst, "JUSTIFICATIVA")
     unidade = _txt(inst.get("unidade")) or _txt(inst.get("nome_orgao")) or _txt(inst.get("sigla_orgao"))
     texto = ""
     try:

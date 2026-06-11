@@ -12,6 +12,7 @@ from core.utils.masks import only_digits
 from .forms import CargoForm
 from .forms import CidadeForm
 from .forms import CombustivelForm
+from .forms import ConfiguracaoAssinaturasForm
 from .forms import ConfiguracaoSistemaForm
 from .forms import EstadoForm
 from .forms import ServidorForm
@@ -807,9 +808,12 @@ def configuracao_sistema(request):
     from .models import ConfiguracaoSistema
 
     obj = ConfiguracaoSistema.get_singleton()
-    form = ConfiguracaoSistemaForm(request.POST or None, instance=obj)
-    if request.method == "POST" and form.is_valid():
+    post_data = request.POST or None
+    form = ConfiguracaoSistemaForm(post_data, instance=obj)
+    assinaturas_form = ConfiguracaoAssinaturasForm(post_data, configuracao=obj)
+    if request.method == "POST" and form.is_valid() and assinaturas_form.is_valid():
         _, cidade_resolvida = salvar_configuracao_sistema(form)
+        assinaturas_form.save(obj)
         if (
             "uf" in form.cleaned_data
             and (form.cleaned_data.get("uf") or form.cleaned_data.get("cidade_endereco"))
@@ -828,6 +832,7 @@ def configuracao_sistema(request):
             "page_title": "Configurações do sistema",
             "page_description": "Unidade, cidade em documentos e assinantes padrão por tipo.",
             "form": form,
+            "assinaturas_form": assinaturas_form,
             "submit_label": "Salvar configuração",
             "submit_icon": "check",
             "back_url": reverse("core:dashboard"),

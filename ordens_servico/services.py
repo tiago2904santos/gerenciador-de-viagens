@@ -1,4 +1,4 @@
-"""Geração do documento de ordem de serviço (payload canónico + modelo DOCX legado)."""
+"""Geração do documento de Ordem de Serviço."""
 
 from __future__ import annotations
 
@@ -6,6 +6,7 @@ import logging
 
 from django.conf import settings as django_settings
 
+from documentos.services.adapters.docxtpl_render import render_docx_bytes
 from documentos.services.document_cache import build_document_cache_key
 from documentos.services.document_cache import build_template_cache_signature
 from documentos.services.document_cache import get_cached_document_artifact
@@ -13,6 +14,7 @@ from documentos.services.document_cache import read_artifact_file_bytes
 from documentos.services.facade import build_default_facade
 from documentos.services.pdf_engine import resolve_pdf_engine
 from documentos.services.persistence import persist_geracao
+from documentos.services.resources_paths import resolve_resource_docx
 from documentos.services.responses import build_download_response
 from documentos.services.timing import measure_step
 from documentos.services.types import DocumentoFormato
@@ -20,6 +22,9 @@ from documentos.services.types import DocumentoTipo
 
 from oficios.documents import build_canonical_document_payload
 from oficios.models import Oficio
+
+from .docxtpl_context import build_os_docxtpl_context
+from .models import OrdemServico
 
 logger = logging.getLogger(__name__)
 
@@ -45,10 +50,7 @@ def _ordem_cache_key(oficio: Oficio, formato: DocumentoFormato, payload: dict) -
 
 
 def gerar_resposta_ordem_servico_documento(oficio: Oficio, formato: DocumentoFormato):
-    """
-    Modelo `ordem_servico.docx` usa placeholders aninhados (ex.: ``{{ oficio.numero_formatado }}``).
-    O contexto passado ao docxtpl é o payload canónico; não é necessário ``docxtpl_context`` plano.
-    """
+    """Gera OS vinculada a um Ofício (fluxo do wizard de oficios)."""
     with measure_step(
         "ordem_servico_gerar_resposta_documento",
         {"oficio_id": oficio.pk, "formato": formato.value},
@@ -101,3 +103,21 @@ def gerar_resposta_ordem_servico_documento(oficio: Oficio, formato: DocumentoFor
         except Exception:
             logger.exception("Não foi possível persistir artefato de ordem de serviço.")
         return response
+
+
+def gerar_os_docx_response(ordem: OrdemServico):
+    """Gera e retorna HttpResponse com o DOCX da Ordem de Serviço."""
+    ctx = build_os_docxtpl_context(ordem)
+    template_path = resolve_resource_docx("ordem_servico.docx")
+    conteudo = render_docx_bytes(template_path=template_path, context=ctx)
+    reference = (
+        f"os-{ordem.numero:03d}-{ordem.ano}"
+        if ordem.numero and ordem.ano
+        else f"os-{ordem.pk}"
+    )
+    return build_download_response(
+        content=conteudo,
+        tipo=DocumentoTipo.ORDEM_SERVICO,
+        formato=DocumentoFormato.DOCX,
+        reference=reference,
+    )

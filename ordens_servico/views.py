@@ -13,6 +13,7 @@ from django.views.decorators.http import require_http_methods
 
 from .forms import OrdemServicoForm
 from .models import OrdemServico
+from .services import gerar_os_docx_response
 
 
 def index(request):
@@ -40,6 +41,8 @@ def _os_queryset():
 def _build_oficio_summary(oficio):
     data_inicio = data_fim = None
     cidade_ids = []
+    estado_id = ""
+    cidade_id = ""
 
     roteiro = oficio.roteiro
     if roteiro:
@@ -50,12 +53,15 @@ def _build_oficio_summary(oficio):
             data_fim = retorno.date().isoformat()
         elif data_inicio:
             data_fim = data_inicio
-        cidade_ids = list(
+        destinos_values = list(
             roteiro.destinos
             .filter(cidade__isnull=False)
-            .values_list("cidade_id", flat=True)
+            .values("cidade_id", "estado_id")
             .order_by("ordem", "pk")
         )
+        cidade_ids = [d["cidade_id"] for d in destinos_values]
+        estado_id = destinos_values[0]["estado_id"] or "" if destinos_values else ""
+        cidade_id = destinos_values[0]["cidade_id"] or "" if destinos_values else ""
 
     servidor_ids = list(oficio.servidores.values_list("pk", flat=True))
 
@@ -65,6 +71,8 @@ def _build_oficio_summary(oficio):
         "data_inicio": data_inicio or "",
         "data_fim": data_fim or "",
         "cidade_ids": cidade_ids,
+        "estado_id": estado_id,
+        "cidade_id": cidade_id,
         "servidor_ids": servidor_ids,
         "motivo": oficio.motivo or "",
     }
@@ -146,7 +154,7 @@ def _form_context(*, form, ordem=None):
         "api_cidades_por_estado_url": reverse("roteiros:api_cidades_por_estado", kwargs={"estado_id": 0}),
         "evento_selected_dates_json": _evento_selected_dates_json(form),
         "evento_display": _evento_display_values(form),
-        "os_oficios_summary": json.dumps(summaries, cls=DjangoJSONEncoder, ensure_ascii=False),
+        "os_oficios_summary": summaries,
     }
 
 
@@ -176,3 +184,9 @@ def editar(request, pk):
     else:
         form = OrdemServicoForm(instance=ordem)
     return render(request, "ordens_servico/form.html", _form_context(form=form, ordem=ordem))
+
+
+@require_http_methods(["GET"])
+def baixar_docx(request, pk):
+    ordem = get_object_or_404(_os_queryset(), pk=pk)
+    return gerar_os_docx_response(ordem)

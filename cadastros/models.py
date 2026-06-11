@@ -371,3 +371,49 @@ class ConfiguracaoSistema(TimeStampedModel):
         super().save(*args, **kwargs)
 
 
+class AssinaturaConfiguracao(TimeStampedModel):
+    """Assinante padrão por tipo de documento (Ofício, Justificativa, etc.)."""
+
+    OFICIO = "OFICIO"
+    JUSTIFICATIVA = "JUSTIFICATIVA"
+    PLANO_TRABALHO = "PLANO_TRABALHO"
+    ORDEM_SERVICO = "ORDEM_SERVICO"
+
+    TIPO_CHOICES = [
+        (OFICIO, "Ofício"),
+        (JUSTIFICATIVA, "Justificativa"),
+        (PLANO_TRABALHO, "Plano de Trabalho"),
+        (ORDEM_SERVICO, "Ordem de Serviço"),
+    ]
+
+    configuracao = models.ForeignKey(
+        ConfiguracaoSistema,
+        on_delete=models.CASCADE,
+        related_name="assinaturas",
+    )
+    tipo = models.CharField(max_length=30, choices=TIPO_CHOICES)
+    servidor = models.ForeignKey(
+        Servidor,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+        verbose_name="Servidor",
+    )
+    ordem = models.PositiveSmallIntegerField(default=1)
+    ativo = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name = "Assinatura (configuração)"
+        verbose_name_plural = "Assinaturas (configuração)"
+        constraints = [
+            models.UniqueConstraint(
+                fields=("configuracao", "tipo", "ordem"),
+                name="uniq_assinatura_cfg_tipo_ordem_v2",
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.get_tipo_display()} – {self.servidor or '—'}"
+
+

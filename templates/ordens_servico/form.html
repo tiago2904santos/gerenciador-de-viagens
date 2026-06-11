@@ -110,7 +110,7 @@
                   <section class="cv-search-picker__selected-panel roteiro-destinos-panel" aria-label="Destinos adicionados">
                     <div class="cv-search-picker__selected-header roteiro-destinos-panel__header">
                       <h4 class="cv-search-picker__selected-title">Destinos adicionados</h4>
-                      <button type="button" id="btn-adicionar-destino" class="cv-btn cv-btn--secondary cv-btn--sm" data-os-add-destino>
+                      <button type="button" id="btn-adicionar-destino" class="cv-btn cv-btn--secondary cv-btn--sm" data-os-add-destino onclick="event.preventDefault(); event.stopPropagation(); window.OSFocusDestino && window.OSFocusDestino(this); return false;">
                         <span>+ Adicionar destino</span>
                       </button>
                     </div>
@@ -205,6 +205,9 @@
           <div class="cv-wizard-section-body">
             <div class="termo-actions termo-actions--footer">
               <button class="cv-btn cv-btn--primary" type="submit"><span>Salvar OS</span></button>
+              {% if ordem and ordem.pk %}
+                <a class="cv-btn cv-btn--secondary" href="{% url 'ordens_servico:baixar_docx' ordem.pk %}" target="_blank"><span>Baixar DOCX</span></a>
+              {% endif %}
               <a class="cv-btn cv-btn--secondary" href="{{ index_url }}"><span>Cancelar</span></a>
             </div>
           </div>
@@ -217,5 +220,5 @@
 
 {% block extra_js %}
   <script src="{% static 'js/pages/oficios-dados-viajantes.js' %}" defer></script>
-  <script src="{% static 'js/pages/ordens-servico-form.js' %}?v=20260611-evento-termos" defer></script>
+  <script src="{% static 'js/pages/ordens-servico-form.js' %}?v=20260611-fix-double-encode" defer></script>
 {% endblock %}

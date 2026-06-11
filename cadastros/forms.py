@@ -17,6 +17,7 @@ from core.utils.masks import (
     validar_cpf_digitos,
 )
 
+from .models import AssinaturaConfiguracao
 from .models import Cargo
 from .models import Cidade
 from .models import Combustivel
@@ -498,6 +499,8 @@ class ConfiguracaoSistemaForm(forms.ModelForm):
             "uf",
             "telefone",
             "email",
+            "nome_chefia",
+            "cargo_chefia",
         ]
         widgets = {
             "divisao": forms.TextInput(attrs={"class": "form-control", "data-mask": "upper"}),
@@ -539,6 +542,8 @@ class ConfiguracaoSistemaForm(forms.ModelForm):
                     "autocomplete": "off",
                 }
             ),
+            "nome_chefia": forms.TextInput(attrs={"class": "form-control", "data-mask": "upper"}),
+            "cargo_chefia": forms.TextInput(attrs={"class": "form-control", "data-mask": "upper"}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -549,6 +554,8 @@ class ConfiguracaoSistemaForm(forms.ModelForm):
         self.fields["cep"].label = "CEP"
         self.fields["uf"].label = "UF"
         self.fields["email"].label = "E-mail"
+        self.fields["nome_chefia"].label = "Nome da chefia"
+        self.fields["cargo_chefia"].label = "Cargo da chefia"
 
         if self.instance and self.instance.pk and not self.data:
             self.initial["cep"] = format_cep(self.instance.cep)
@@ -593,4 +600,48 @@ class ConfiguracaoSistemaForm(forms.ModelForm):
         if len(uf) != 2 or not uf.isalpha():
             raise forms.ValidationError("UF deve conter 2 letras.")
         return uf
+
+
+_TIPO_FIELD_MAP = [
+    (AssinaturaConfiguracao.OFICIO, "assinante_oficio", "Assinante padrão – Ofício"),
+    (AssinaturaConfiguracao.JUSTIFICATIVA, "assinante_justificativa", "Assinante padrão – Justificativa"),
+    (AssinaturaConfiguracao.PLANO_TRABALHO, "assinante_plano_trabalho", "Assinante padrão – Plano de Trabalho"),
+    (AssinaturaConfiguracao.ORDEM_SERVICO, "assinante_ordem_servico", "Assinante padrão – Ordem de Serviço"),
+]
+
+
+class ConfiguracaoAssinaturasForm(forms.Form):
+    """Seleção de assinante padrão por tipo de documento."""
+
+    def __init__(self, *args, configuracao=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        qs = _servidores_assinantes_queryset()
+        existing: dict[str, "Servidor | None"] = {}
+        if configuracao and configuracao.pk:
+            for ass in configuracao.assinaturas.filter(ordem=1).select_related("servidor"):
+                existing[ass.tipo] = ass.servidor
+
+        for tipo, field_name, label in _TIPO_FIELD_MAP:
+            self.fields[field_name] = forms.ModelChoiceField(
+                queryset=qs,
+                required=False,
+                label=label,
+                initial=existing.get(tipo),
+                widget=forms.Select(attrs={"class": "form-select"}),
+            )
+            if configuracao and configuracao.pk and not self.data:
+                self.initial[field_name] = existing.get(tipo)
+
+    def save(self, configuracao):
+        for tipo, field_name, _label in _TIPO_FIELD_MAP:
+            servidor = self.cleaned_data.get(field_name)
+            if servidor:
+                AssinaturaConfiguracao.objects.update_or_create(
+                    configuracao=configuracao,
+                    tipo=tipo,
+                    ordem=1,
+                    defaults={"servidor": servidor, "ativo": True},
+                )
+            else:
+                AssinaturaConfiguracao.objects.filter(configuracao=configuracao, tipo=tipo, ordem=1).delete()
 

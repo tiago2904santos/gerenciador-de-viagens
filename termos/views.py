@@ -74,14 +74,25 @@ def _oficio_summary(oficio):
     roteiro = oficio.roteiro
     destino = ""
     periodo = ""
+    data_inicio = ""
+    data_fim = ""
+    estado_id = ""
+    cidade_id = ""
     if roteiro:
         destino_obj = roteiro.destinos.select_related("cidade", "estado").order_by("ordem", "pk").first()
         destino = str(destino_obj) if destino_obj else ""
+        if destino_obj:
+            estado_id = destino_obj.estado_id or ""
+            cidade_id = destino_obj.cidade_id or ""
         if roteiro.saida_dt:
             inicio = roteiro.saida_dt.strftime("%d/%m/%Y")
+            data_inicio = roteiro.saida_dt.date().isoformat()
             retorno = roteiro.retorno_chegada_dt or roteiro.retorno_saida_dt
             fim = retorno.strftime("%d/%m/%Y") if retorno else inicio
+            data_fim = retorno.date().isoformat() if retorno else data_inicio
             periodo = inicio if fim == inicio else f"{inicio} a {fim}"
+    servidor_ids = [s.pk for s in oficio.servidores_termo_autorizacao.all()]
+    viatura_id = oficio.viatura_id or ""
     return {
         "id": oficio.pk,
         "label": f"Oficio {oficio.numero_formatado}",
@@ -89,8 +100,14 @@ def _oficio_summary(oficio):
         "protocolo": oficio.protocolo or "",
         "destino": destino,
         "periodo": periodo,
-        "servidores": oficio.servidores_termo_autorizacao.count(),
-        "viatura": str(oficio.viatura) if oficio.viatura_id else "",
+        "data_inicio": data_inicio,
+        "data_fim": data_fim,
+        "estado_id": estado_id,
+        "cidade_id": cidade_id,
+        "servidor_ids": servidor_ids,
+        "viatura_id": viatura_id,
+        "servidores": len(servidor_ids),
+        "viatura": str(oficio.viatura) if viatura_id else "",
         "search_text": " ".join(
             part
             for part in [
@@ -218,7 +235,7 @@ def _termo_page_steps(form, termo=None):
 
 
 def _form_context(*, form, termo=None):
-    oficios = form.fields["oficio"].queryset
+    oficios = form.fields["oficio"].queryset.prefetch_related("servidores_termo_autorizacao")
     summaries = {}
     for oficio in oficios:
         summary = _oficio_summary(oficio)
