@@ -1,6 +1,7 @@
 from django.db.models import Prefetch
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 
 from core.normalizers import normalize_plate
 
@@ -15,7 +16,27 @@ from .models import ModeloMotivoOficio
 from .models import Oficio
 
 
-def listar_oficios(q: str | None = None, status: str | None = None):
+_SORT_MAP = {
+    "criacao_desc": ["-data_criacao", "-created_at"],
+    "criacao_asc":  ["data_criacao",  "created_at"],
+    "viagem_asc":   ["roteiro__saida_dt",  "-data_criacao"],
+    "viagem_desc":  ["-roteiro__saida_dt", "-data_criacao"],
+    "numero_desc":  ["-numero", "-ano"],
+    "numero_asc":   ["numero",  "ano"],
+}
+
+
+def listar_oficios(
+    q: str | None = None,
+    status: str | None = None,
+    temporal: str | None = None,
+    criacao_de: str | None = None,
+    criacao_ate: str | None = None,
+    viagem_de: str | None = None,
+    viagem_ate: str | None = None,
+    sort: str | None = None,
+):
+    order_fields = _SORT_MAP.get(sort or "criacao_desc", ["-data_criacao", "-created_at"])
     queryset = (
         Oficio.objects.select_related(
             "roteiro",
@@ -40,7 +61,7 @@ def listar_oficios(q: str | None = None, status: str | None = None):
             ),
             "justificativa",
         )
-        .order_by("-data_criacao", "-created_at")
+        .order_by(*order_fields)
     )
     if status:
         queryset = queryset.filter(status=status)
@@ -57,6 +78,44 @@ def listar_oficios(q: str | None = None, status: str | None = None):
         if query.isdigit():
             filters |= Q(numero=int(query)) | Q(ano=int(query))
         queryset = queryset.filter(filters).distinct()
+    if temporal:
+        today = timezone.localdate()
+        if temporal == "futuro":
+            queryset = queryset.filter(roteiro__isnull=False, roteiro__saida_dt__date__gt=today)
+        elif temporal == "andamento":
+            queryset = queryset.filter(
+                roteiro__isnull=False,
+                roteiro__saida_dt__date__lte=today,
+            ).filter(
+                Q(roteiro__retorno_chegada_dt__date__gte=today)
+                | Q(roteiro__retorno_chegada_dt__isnull=True, roteiro__chegada_dt__date__gte=today)
+                | Q(roteiro__retorno_chegada_dt__isnull=True, roteiro__chegada_dt__isnull=True)
+            )
+        elif temporal == "passado":
+            queryset = queryset.filter(roteiro__isnull=False).filter(
+                Q(roteiro__retorno_chegada_dt__date__lt=today)
+                | Q(roteiro__retorno_chegada_dt__isnull=True, roteiro__chegada_dt__date__lt=today)
+            )
+    if criacao_de:
+        try:
+            queryset = queryset.filter(data_criacao__date__gte=criacao_de)
+        except Exception:
+            pass
+    if criacao_ate:
+        try:
+            queryset = queryset.filter(data_criacao__date__lte=criacao_ate)
+        except Exception:
+            pass
+    if viagem_de:
+        try:
+            queryset = queryset.filter(roteiro__isnull=False, roteiro__saida_dt__date__gte=viagem_de)
+        except Exception:
+            pass
+    if viagem_ate:
+        try:
+            queryset = queryset.filter(roteiro__isnull=False, roteiro__saida_dt__date__lte=viagem_ate)
+        except Exception:
+            pass
     return queryset
 
 

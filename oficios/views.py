@@ -420,9 +420,25 @@ def _justificativa_autosave_data(inst):
 
 
 def index(request):
-    q = request.GET.get("q", "").strip()
-    status = request.GET.get("status", "").strip()
-    oficios = listar_oficios(q=q, status=status or None)
+    q           = request.GET.get("q",          "").strip()
+    status      = request.GET.get("status",     "").strip()
+    temporal    = request.GET.get("temporal",   "").strip()
+    criacao_de  = request.GET.get("criacao_de", "").strip()
+    criacao_ate = request.GET.get("criacao_ate","").strip()
+    viagem_de   = request.GET.get("viagem_de",  "").strip()
+    viagem_ate  = request.GET.get("viagem_ate", "").strip()
+    sort        = request.GET.get("sort",       "").strip()
+
+    oficios = listar_oficios(
+        q=q or None,
+        status=status or None,
+        temporal=temporal or None,
+        criacao_de=criacao_de or None,
+        criacao_ate=criacao_ate or None,
+        viagem_de=viagem_de or None,
+        viagem_ate=viagem_ate or None,
+        sort=sort or None,
+    )
     cards = []
     for oficio in oficios:
         card = apresentar_oficio_card(oficio)
@@ -432,20 +448,43 @@ def index(request):
             visualizar_documento_url=reverse("oficios:wizard_documentos", args=[oficio.pk]),
         )
         cards.append(card)
+
+    has_filters = any([q, status, temporal, criacao_de, criacao_ate, viagem_de, viagem_ate, sort])
+
     return render(
         request,
         "oficios/index.html",
         {
             "page_title": "Ofícios",
-            "page_description": "CRUD mínimo inicial para gestão de ofícios e evolução documental.",
-            "q": q,
-            "status": status,
-            "cards": cards,
-            "create_url": reverse("oficios:novo"),
+            "q":           q,
+            "status":      status,
+            "temporal":    temporal,
+            "criacao_de":  criacao_de,
+            "criacao_ate": criacao_ate,
+            "viagem_de":   viagem_de,
+            "viagem_ate":  viagem_ate,
+            "sort":        sort,
+            "has_filters": has_filters,
+            "cards":       cards,
+            "create_url":  reverse("oficios:novo"),
             "search_clear_url": reverse("oficios:index"),
             "status_options": [{"value": "", "label": "Todos os status"}]
-            + [{"value": value, "label": label} for value, label in Oficio.STATUS_CHOICES],
-            "empty_message": "Nenhum ofício cadastrado ainda.",
+            + [{"value": v, "label": l} for v, l in Oficio.STATUS_CHOICES],
+            "temporal_options": [
+                {"value": "",          "label": "Qualquer período"},
+                {"value": "futuro",    "label": "Futuras"},
+                {"value": "andamento", "label": "Em andamento"},
+                {"value": "passado",   "label": "Passadas"},
+            ],
+            "sort_options": [
+                {"value": "criacao_desc", "label": "Criação: mais recente"},
+                {"value": "criacao_asc",  "label": "Criação: mais antiga"},
+                {"value": "viagem_asc",   "label": "Viagem: mais próxima"},
+                {"value": "viagem_desc",  "label": "Viagem: mais distante"},
+                {"value": "numero_desc",  "label": "Número: maior"},
+                {"value": "numero_asc",   "label": "Número: menor"},
+            ],
+            "empty_message": "Nenhum ofício encontrado com os filtros aplicados.",
         },
     )
 

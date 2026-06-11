@@ -84,6 +84,7 @@
     const emptyPanelMsg = select.dataset.emptySelected    || "Nenhum item selecionado.";
     const panelTitle   = select.dataset.panelTitle        || "SELECIONADOS";
     const termosName   = select.dataset.cvTermosName      || "";
+    const openAllOnFocus = select.dataset.pickerOpenAll === "true";
     const showTermCtrl   = select.dataset.pickerTermControl   === "true" || !!termosName;
     const showDriverCtrl = select.dataset.pickerDriverControl === "true";
     const isError        = select.dataset.pickerError         === "true";
@@ -210,6 +211,9 @@
 
     function filteredItems() {
       const term = normalize(query);
+      if (!term && openAllOnFocus && isOpen) {
+        return options.filter((o) => !o.disabled);
+      }
       if (!term) return [];
       if (mode === "single") {
         return options.filter((o) => normalize(o.search).includes(term));
@@ -247,7 +251,7 @@
     }
 
     function setOpen(next) {
-      const shouldOpen = next && !!query && !select.disabled;
+      const shouldOpen = next && (!!query || openAllOnFocus) && !select.disabled;
       if (shouldOpen && !isOpen && floatingMenu) floatingMenu.open();
       if (!shouldOpen && isOpen && floatingMenu) floatingMenu.close();
       isOpen = shouldOpen;
@@ -547,7 +551,7 @@
     /* ── Eventos ────────────────────────────────────────────────── */
 
     input.addEventListener("focus", () => {
-      if (query) setOpen(true);
+      if (query || openAllOnFocus) setOpen(true);
     });
 
     input.addEventListener("input", () => {

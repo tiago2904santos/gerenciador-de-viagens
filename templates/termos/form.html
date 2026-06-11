@@ -6,7 +6,7 @@
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260609-termos">
   <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260609-termos">
-  <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260609">
+  <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260611-evento-periodo">
 {% endblock %}
 
 {% block content %}
@@ -104,20 +104,10 @@
             data-selected-dates='{{ termo_evento_selected_dates_json|escape }}'
             id="termo-evento-date-picker"
           >
+           
             <div class="cv-wizard-section-body termo-evento-body">
-              <div class="field-grid field-grid--cols-2 termo-evento-location-grid">
-                {% include "components/forms/form_field.html" with field=form.destino_estado only %}
-                {% include "components/forms/form_field.html" with field=form.destino_cidade only %}
-              </div>
-
-              <section class="wizard-inner-section termo-evento-periodo" aria-labelledby="termo-evento-periodo-title">
-                <header class="wizard-inner-section__header">
-                  <div class="wizard-inner-section__header-copy">
-                    <h3 class="wizard-inner-section__title" id="termo-evento-periodo-title">Periodo do evento</h3>
-                    <p class="wizard-inner-section__description">Selecione uma ou duas datas. O termo converte a selecao em data inicial e final.</p>
-                  </div>
-                </header>
-                <div class="field-grid field-grid--cols-2 termo-evento-dates">
+              <section class="wizard-inner-section termo-evento-periodo" aria-label="Periodo do evento">
+                <div class="field-grid roteiro-sede-grid termo-evento-dates">
                   <div class="field cv-field">
                     <label class="cv-field__label" for="id_data_evento_inicio_display">Data inicial</label>
                     <div class="cv-date-picker__control">
@@ -192,6 +182,46 @@
                   {% include "components/ui/feedback/field_error.html" with errors=form.data_evento_fim.errors only %}
                 {% endif %}
               </section>
+              <section class="wizard-inner-section termo-evento-destinos" aria-labelledby="termo-evento-destinos-title" id="termo-evento-destinos">
+                <header class="wizard-inner-section__header">
+                  <h4 class="wizard-inner-section__title" id="termo-evento-destinos-title">Destinos</h4>
+                  <p class="wizard-inner-section__description">Cada destino usa o mesmo padrao visual da sede para manter o fluxo consistente.</p>
+                </header>
+                <div class="cv-search-picker">
+                  <section class="cv-search-picker__selected-panel roteiro-destinos-panel" aria-label="Destinos adicionados">
+                    <div class="cv-search-picker__selected-header roteiro-destinos-panel__header">
+                      <h4 class="cv-search-picker__selected-title">Destinos adicionados</h4>
+                      <button type="button" id="btn-adicionar-destino" class="cv-btn cv-btn--secondary cv-btn--sm" data-termo-add-destino>
+                        <span>+ Adicionar destino</span>
+                      </button>
+                    </div>
+                    <div class="cv-search-picker__selected-list roteiro-destinos-list">
+                      <div class="cv-search-picker__selected-card destino-row destino-row--single termo-destino-row">
+                        <div class="cv-search-picker__selected-main">
+                          <div class="cv-search-picker__selected-title-row">
+                            <span class="cv-search-picker__selected-name">Destino</span>
+                          </div>
+                          <div class="field-grid roteiro-sede-grid roteiro-destino-grid">
+                            <div class="field app-form-field">
+                              {{ form.destino_estado }}
+                            </div>
+                            <div class="field app-form-field">
+                              {{ form.destino_cidade }}
+                            </div>
+                          </div>
+                        </div>
+                        <button type="button" class="cv-search-picker__remove btn-remover-destino" title="Remover destino" aria-label="Remover destino" hidden>x</button>
+                      </div>
+                    </div>
+                  </section>
+                </div>
+                {% if form.destino_estado.errors %}
+                  {% include "components/ui/feedback/field_error.html" with errors=form.destino_estado.errors only %}
+                {% endif %}
+                {% if form.destino_cidade.errors %}
+                  {% include "components/ui/feedback/field_error.html" with errors=form.destino_cidade.errors only %}
+                {% endif %}
+              </section>
             </div>
             <div class="cv-date-picker__panel" hidden data-cv-date-picker-panel>
               <div class="cv-date-picker__context" data-cv-date-picker-context hidden>
@@ -257,5 +287,5 @@
 {% endblock %}
 
 {% block extra_js %}
-  <script src="{% static 'js/pages/termos-form.js' %}?v=20260609" defer></script>
+  <script src="{% static 'js/pages/termos-form.js' %}?v=20260611-destinos" defer></script>
 {% endblock %}

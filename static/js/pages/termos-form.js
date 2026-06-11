@@ -250,6 +250,24 @@
     );
   }
 
+  function syncAddDestinationButton(form) {
+    var button = form.querySelector("[data-termo-add-destino]");
+    var destinationSection = form.querySelector("#termo-evento-destinos");
+    if (!button || !destinationSection) return;
+
+    button.addEventListener("click", function () {
+      var pickers = Array.prototype.slice.call(destinationSection.querySelectorAll(".cv-search-picker__input"));
+      var emptyPicker = pickers.find(function (input) {
+        return !String(input.value || "").trim();
+      });
+      var firstPicker = pickers[0];
+      var target = emptyPicker || firstPicker;
+      if (target) {
+        target.focus();
+      }
+    });
+  }
+
   function syncEventDates(form) {
     var root = form.querySelector("#termo-evento-date-picker");
     var startHidden = form.querySelector("input[name='data_evento_inicio']");
@@ -341,6 +359,7 @@
 
     syncOficioSummary(form, readSummaries());
     syncDestinationCities(form);
+    syncAddDestinationButton(form);
     syncEventDates(form);
   });
 })();

@@ -2,9 +2,31 @@
   gap: var(--space-5);
 }
 
+.justificativa-quick-add {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.justificativa-quick-add.is-open {
+  max-height: 1400px;
+}
+
+.justificativas-page .page-header-rail--filters-quick-add .justificativa-quick-add__body {
+  align-items: stretch;
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-4) 0;
+}
+
 .justificativa-quick-add__body {
   display: grid;
   gap: var(--space-4);
+}
+
+.justificativa-quick-add__fields {
+  display: grid;
+  gap: var(--space-4);
+  width: 100%;
 }
 
 .justificativa-quick-add__section {
@@ -12,12 +34,150 @@
   gap: var(--space-3);
 }
 
+.justificativa-quick-add__field {
+  min-width: 0;
+  width: 100%;
+}
+
+.justificativa-quick-add .cv-field,
+.justificativa-quick-add .cv-custom-select,
+.justificativa-quick-add .cv-field-with-action {
+  overflow: visible;
+}
+
+.justificativa-quick-add .cv-field-with-action {
+  align-items: center;
+  min-height: var(--form-control-height, var(--control-height-md));
+}
+
+.justificativa-quick-add .cv-field-with-action .cv-custom-select,
+.justificativa-quick-add .cv-field-with-action .cv-field__control {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.justificativa-quick-add .cv-field-with-action .cv-custom-select__trigger {
+  width: 100%;
+}
+
+.justificativa-quick-add .cv-field-with-action--manage-reveal {
+  --field-manage-btn-size: var(--form-control-height, var(--control-height-md));
+  --field-manage-btn-gap: var(--space-2);
+  display: block;
+  gap: 0;
+  min-height: var(--form-control-height, var(--control-height-md));
+  overflow: visible;
+  position: relative;
+}
+
+.justificativa-quick-add .cv-field-with-action--manage-reveal > .cv-custom-select,
+.justificativa-quick-add .cv-field-with-action--manage-reveal > .cv-field__control,
+.justificativa-quick-add .cv-field-with-action--manage-reveal > .form-control,
+.justificativa-quick-add .cv-field-with-action--manage-reveal > .form-select,
+.justificativa-quick-add .cv-field-with-action--manage-reveal > select {
+  box-sizing: border-box;
+  display: block;
+  max-width: 100%;
+  min-width: 0;
+  position: relative;
+  transition: width var(--transition-fast), max-width var(--transition-fast);
+  width: 100%;
+  z-index: 2;
+}
+
+.justificativa-quick-add .cv-field-with-action--manage-reveal:hover > .cv-custom-select,
+.justificativa-quick-add .cv-field-with-action--manage-reveal:focus-within > .cv-custom-select,
+.justificativa-quick-add .cv-field-with-action--manage-reveal:hover > .cv-field__control,
+.justificativa-quick-add .cv-field-with-action--manage-reveal:focus-within > .cv-field__control,
+.justificativa-quick-add .cv-field-with-action--manage-reveal:hover > .form-control,
+.justificativa-quick-add .cv-field-with-action--manage-reveal:focus-within > .form-control,
+.justificativa-quick-add .cv-field-with-action--manage-reveal:hover > .form-select,
+.justificativa-quick-add .cv-field-with-action--manage-reveal:focus-within > .form-select,
+.justificativa-quick-add .cv-field-with-action--manage-reveal:hover > select,
+.justificativa-quick-add .cv-field-with-action--manage-reveal:focus-within > select {
+  max-width: calc(100% - var(--field-manage-btn-size) - var(--field-manage-btn-gap));
+  width: calc(100% - var(--field-manage-btn-size) - var(--field-manage-btn-gap));
+}
+
+.justificativa-quick-add .cv-field-with-action--manage-reveal > .cv-icon-btn--field-manage {
+  height: var(--field-manage-btn-size);
+  max-height: var(--field-manage-btn-size);
+  min-height: var(--field-manage-btn-size);
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: opacity var(--transition-fast);
+  width: var(--field-manage-btn-size);
+  z-index: 1;
+}
+
+.justificativa-quick-add .cv-field-with-action--manage-reveal:hover > .cv-icon-btn--field-manage,
+.justificativa-quick-add .cv-field-with-action--manage-reveal:focus-within > .cv-icon-btn--field-manage {
+  opacity: 1;
+  pointer-events: auto;
+  z-index: 5;
+}
+
 .justificativa-quick-add__wide-field {
+  width: 100%;
+}
+
+.justificativas-page .page-header-rail--filters-quick-add .justificativa-quick-add__actions {
+  justify-content: flex-end;
+  margin-left: 0;
   width: 100%;
 }
 
 .justificativa-quick-add .cv-field__control--textarea {
   min-height: var(--text-area-height-justificativa);
+}
+
+.quick-add-footer-button.justificativa-quick-add__toggle--ready,
+.quick-add-footer-button.justificativa-quick-add__toggle--ready[aria-expanded="true"],
+html[data-theme="dark"] .quick-add-footer-button.justificativa-quick-add__toggle--ready,
+html[data-theme="dark"] .quick-add-footer-button.justificativa-quick-add__toggle--ready[aria-expanded="true"] {
+  background: var(--color-primary);
+  color: var(--color-white);
+}
+
+.quick-add-footer-button.justificativa-quick-add__toggle--ready:hover,
+.quick-add-footer-button.justificativa-quick-add__toggle--ready:focus-visible,
+html[data-theme="dark"] .quick-add-footer-button.justificativa-quick-add__toggle--ready:hover,
+html[data-theme="dark"] .quick-add-footer-button.justificativa-quick-add__toggle--ready:focus-visible {
+  background: var(--color-primary-hover, var(--color-primary));
+  color: var(--color-white);
+}
+
+.justificativa-quick-add__toggle {
+  transition:
+    background-color 220ms ease,
+    border-color 220ms ease,
+    color 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.justificativa-quick-add__toggle .quick-add-footer-button__icon,
+.justificativa-quick-add__toggle .quick-add-footer-button__label {
+  transition:
+    opacity 140ms ease,
+    transform 180ms ease;
+}
+
+.justificativa-quick-add__toggle--changing .quick-add-footer-button__icon,
+.justificativa-quick-add__toggle--changing .quick-add-footer-button__label {
+  opacity: 0;
+  transform: translateY(4px);
+}
+
+
+@media (max-width: 720px) {
+  .justificativas-page .page-header-rail--filters-quick-add .justificativa-quick-add__actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
 }
 
 .justificativas-list-panel {

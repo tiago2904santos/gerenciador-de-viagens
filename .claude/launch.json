@@ -4,8 +4,8 @@
     {
       "name": "django",
       "runtimeExecutable": "python",
-      "runtimeArgs": ["manage.py", "runserver", "8000"],
-      "port": 8000
+      "runtimeArgs": ["manage.py", "runserver", "$PORT"],
+      "autoPort": true
     }
   ]
 }

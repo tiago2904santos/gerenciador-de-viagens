@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260611-os">
+  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260611-os-evento">
+  <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260611-os-evento-card">
+{% endblock %}
+
+{% block content %}
+  {{ os_oficios_summary|json_script:"os-oficios-summary" }}
+
+  <div class="page-shell termos-page os-page">
+    {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="DOCUMENTOS" title=page_title description="Cadastro de ordem de serviço" icon_label="OS" module_label="Ordens de Serviço" back_label="Voltar à lista" back_url=index_url only %}
+
+    <form method="post" class="termo-form os-form" data-os-form data-api-cidades-url="{{ api_cidades_por_estado_url }}">
+      {% csrf_token %}
+
+      <main class="main-form-panel main-form-panel--stack oficio-wizard__main">
+        {% if form.non_field_errors %}
+          {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
+        {% endif %}
+
+        {# ── 1. Ofícios vinculados ─────────────────────────────── #}
+        <section class="cv-wizard-section-card termo-card" id="os-card-oficios">
+          <header class="cv-wizard-section-header">
+            <div class="cv-wizard-section-header__copy">
+              <h2 class="cv-wizard-section-title">1. Ofícios vinculados</h2>
+              <p class="cv-wizard-section-subtitle">Opcional. Vincule um ou mais ofícios — destino, período, servidores e motivo serão preenchidos automaticamente.</p>
+            </div>
+          </header>
+          <div class="cv-wizard-section-body">
+            {% include "components/forms/form_field.html" with field=form.oficios only %}
+          </div>
+        </section>
+
+        {# ── 2. Período do evento ──────────────────────────────── #}
+        <section class="cv-wizard-section-card termo-card termo-card--evento" id="os-card-evento">
+          <header class="cv-wizard-section-header">
+            <div class="cv-wizard-section-header__copy">
+              <h2 class="cv-wizard-section-title">2. Evento</h2>
+              <p class="cv-wizard-section-subtitle">Periodo da atividade.</p>
+            </div>
+          </header>
+          <div
+            class="cv-date-picker termo-date-picker"
+            data-cv-date-picker
+            data-mode="multi"
+            data-max-dates="2"
+            data-selected-dates='{{ evento_selected_dates_json|escape }}'
+            id="os-evento-date-picker"
+          >
+            <div class="cv-wizard-section-body termo-evento-body">
+              <section class="wizard-inner-section termo-evento-periodo" aria-label="Periodo do evento">
+                <div class="field-grid roteiro-sede-grid termo-evento-dates">
+                  <div class="field cv-field">
+                    <label class="cv-field__label" for="id_os_data_inicio_display">Data inicial</label>
+                    <div class="cv-date-picker__control">
+                      <input
+                        type="text"
+                        class="cv-field__control"
+                        id="id_os_data_inicio_display"
+                        placeholder="dd/mm/aaaa"
+                        autocomplete="off"
+                        inputmode="numeric"
+                        maxlength="10"
+                        value="{{ evento_display.inicio|default:'' }}"
+                        data-termo-evento-start-display
+                        readonly
+                      >
+                      <button type="button" class="cv-date-picker__trigger cv-date-picker__trigger--icon" data-cv-date-picker-trigger data-termo-evento-open-picker data-termo-evento-open-start aria-label="Abrir calendário">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="field cv-field">
+                    <label class="cv-field__label" for="id_os_data_fim_display">Data final</label>
+                    <div class="cv-date-picker__control">
+                      <input
+                        type="text"
+                        class="cv-field__control"
+                        id="id_os_data_fim_display"
+                        placeholder="dd/mm/aaaa"
+                        autocomplete="off"
+                        inputmode="numeric"
+                        maxlength="10"
+                        value="{{ evento_display.fim|default:'' }}"
+                        data-termo-evento-end-display
+                        readonly
+                      >
+                      <button type="button" class="cv-date-picker__trigger cv-date-picker__trigger--icon" data-cv-date-picker-trigger data-termo-evento-open-picker data-termo-evento-open-end aria-label="Abrir calendário">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                {{ form.data_evento_inicio }}
+                {{ form.data_evento_fim }}
+                {% if form.data_evento_inicio.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.data_evento_inicio.errors only %}{% endif %}
+                {% if form.data_evento_fim.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.data_evento_fim.errors only %}{% endif %}
+              </section>
+              <section class="wizard-inner-section termo-evento-destinos" aria-labelledby="os-evento-destinos-title" id="os-evento-destinos">
+                <header class="wizard-inner-section__header">
+                  <h4 class="wizard-inner-section__title" id="os-evento-destinos-title">Destinos</h4>
+                  <p class="wizard-inner-section__description">Cada destino usa o mesmo padrao visual da sede para manter o fluxo consistente.</p>
+                </header>
+                <div class="cv-search-picker">
+                  <section class="cv-search-picker__selected-panel roteiro-destinos-panel" aria-label="Destinos adicionados">
+                    <div class="cv-search-picker__selected-header roteiro-destinos-panel__header">
+                      <h4 class="cv-search-picker__selected-title">Destinos adicionados</h4>
+                      <button type="button" id="btn-adicionar-destino" class="cv-btn cv-btn--secondary cv-btn--sm" data-os-add-destino>
+                        <span>+ Adicionar destino</span>
+                      </button>
+                    </div>
+                    <div class="cv-search-picker__selected-list roteiro-destinos-list">
+                      <div class="cv-search-picker__selected-card destino-row destino-row--single termo-destino-row">
+                        <div class="cv-search-picker__selected-main">
+                          <div class="cv-search-picker__selected-title-row">
+                            <span class="cv-search-picker__selected-name">Destino</span>
+                          </div>
+                          <div class="field-grid roteiro-sede-grid roteiro-destino-grid">
+                            <div class="field app-form-field">
+                              {{ form.destino_estado }}
+                            </div>
+                            <div class="field app-form-field">
+                              {{ form.destino_cidade }}
+                            </div>
+                          </div>
+                        </div>
+                        <button type="button" class="cv-search-picker__remove btn-remover-destino" title="Remover destino" aria-label="Remover destino" hidden>x</button>
+                      </div>
+                    </div>
+                  </section>
+                </div>
+                {% if form.destino_estado.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.destino_estado.errors only %}{% endif %}
+                {% if form.destino_cidade.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.destino_cidade.errors only %}{% endif %}
+              </section>
+            </div>
+            <div class="cv-date-picker__panel" hidden data-cv-date-picker-panel>
+              <div class="cv-date-picker__context" data-cv-date-picker-context hidden>
+                <span class="cv-date-picker__context-step" data-cv-date-picker-context-step></span>
+                <strong class="cv-date-picker__context-route" data-cv-date-picker-context-route></strong>
+              </div>
+              <div class="cv-date-picker__panel-header">
+                <button class="cv-date-picker__nav" type="button" data-cv-date-picker-prev aria-label="Mês anterior">Anterior</button>
+                <div class="cv-date-picker__month" data-cv-date-picker-month></div>
+                <button class="cv-date-picker__nav" type="button" data-cv-date-picker-next aria-label="Próximo mês">Próximo</button>
+              </div>
+              <div class="cv-date-picker__weekdays" data-cv-date-picker-weekdays></div>
+              <div class="cv-date-picker__days" data-cv-date-picker-days></div>
+              <div class="cv-date-picker__footer">
+                <button type="button" class="cv-date-picker__footer-action" data-cv-date-picker-today>Hoje</button>
+                <button type="button" class="cv-date-picker__footer-action" data-cv-date-picker-clear>Limpar</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {# ── 3. Destinos ───────────────────────────────────────── #}
+        {# ── 4. Servidores ─────────────────────────────────────── #}
+        <section class="cv-wizard-section-card termo-card" id="os-card-servidores">
+          <header class="cv-wizard-section-header">
+            <div class="cv-wizard-section-header__copy">
+              <h2 class="cv-wizard-section-title">3. Servidores</h2>
+              <p class="cv-wizard-section-subtitle">Opcional. Servidores que executarão esta OS.</p>
+            </div>
+            <div class="cv-wizard-section-header__actions">
+              {% include "components/buttons/action_button.html" with href=servidor_create_url label="Cadastrar servidor" variant="secondary" data_autosave_link=True only %}
+            </div>
+          </header>
+          <div class="cv-wizard-section-body">
+            {% include "components/forms/form_field.html" with field=form.servidores only %}
+          </div>
+        </section>
+
+        {# ── 5. Motivo ─────────────────────────────────────────── #}
+        <section class="cv-wizard-section-card termo-card" id="os-card-motivo">
+          <header class="cv-wizard-section-header">
+            <div class="cv-wizard-section-header__copy">
+              <h2 class="cv-wizard-section-title">4. Motivo</h2>
+              <p class="cv-wizard-section-subtitle">Opcional. Use um modelo ou escreva o texto livremente.</p>
+            </div>
+          </header>
+          <div class="cv-wizard-section-body">
+            <div class="field-grid">
+              {% include "components/forms/input_with_action.html" with field=form.modelo_motivo action_url=modelos_motivo_url action_label="Gerenciar modelos" size_class="field-size-4" only %}
+              {% if not tem_modelos_motivo %}
+                <div class="field field-size-4">
+                  <p class="field-help">Nenhum modelo cadastrado. <a href="{{ modelos_motivo_url }}">Abrir gerenciamento de modelos</a></p>
+                </div>
+              {% endif %}
+              <div class="field field-size-4 app-form-field cv-field oficio-motivo-field oficio-reveal-panel is-open">
+                <label class="cv-field__label" for="{{ form.motivo.id_for_label }}">Motivo</label>
+                {{ form.motivo }}
+                {% if form.motivo.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.motivo.errors only %}{% endif %}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {# ── Rodapé ────────────────────────────────────────────── #}
+        <section class="cv-wizard-section-card termo-card" id="os-form-footer">
+          <div class="cv-wizard-section-body">
+            <div class="termo-actions termo-actions--footer">
+              <button class="cv-btn cv-btn--primary" type="submit"><span>Salvar OS</span></button>
+              <a class="cv-btn cv-btn--secondary" href="{{ index_url }}"><span>Cancelar</span></a>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </form>
+  </div>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'js/pages/oficios-dados-viajantes.js' %}" defer></script>
+  <script src="{% static 'js/pages/ordens-servico-form.js' %}?v=20260611-evento-termos" defer></script>
+{% endblock %}

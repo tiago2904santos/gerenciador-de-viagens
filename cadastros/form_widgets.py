@@ -71,6 +71,25 @@ class ViaturaSelectSingle(forms.Select):
         return option
 
 
+class CidadeSelectMultiple(forms.SelectMultiple):
+    def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+        option = super().create_option(name, value, label, selected, index, subindex=subindex, attrs=attrs)
+        cidade = getattr(value, "instance", None)
+        if cidade is None:
+            return option
+        uf = cidade.uf or ""
+        estado_nome = str(cidade.estado) if cidade.estado_id and cidade.estado else uf
+        main = f"{cidade.nome}/{uf}" if uf else cidade.nome
+        option["label"] = main
+        option["attrs"].update({
+            "data-main": main,
+            "data-meta": estado_nome,
+            "data-search": f"{cidade.nome} {uf} {estado_nome}",
+            "data-uf": uf,
+        })
+        return option
+
+
 class ServidorMotoristaSelect(forms.Select):
     """Select simples com metadados nos options para o picker de busca."""
 

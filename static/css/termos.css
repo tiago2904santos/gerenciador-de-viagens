@@ -69,15 +69,16 @@
 
 .termo-evento-body {
   display: grid;
-  gap: var(--space-4);
+  gap: 0;
 }
 
 .termo-evento-periodo {
-  margin-top: var(--space-2);
+  margin-top: 0;
 }
 
 .termo-evento-dates {
   gap: var(--space-4);
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
 }
 
 .termo-evento-dates .cv-field {
@@ -92,6 +93,7 @@
 
 .termo-evento-dates .cv-date-picker__control .cv-field__control {
   flex: 1 1 auto;
+  min-width: 0;
 }
 
 .termo-evento-dates .cv-date-picker__trigger--icon {

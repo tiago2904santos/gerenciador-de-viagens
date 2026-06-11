@@ -24,6 +24,9 @@
         <span class="oficio-lc__info-value">{{ card.data_criacao_display }}</span>
       </div>
       {% endif %}
+      {% if card.temporal_label %}
+      {% include "components/ui/badges/chip.html" with tone=card.temporal_tone label=card.temporal_label extra_class="oficio-lc__temporal-chip" only %}
+      {% endif %}
     </div>
 
 

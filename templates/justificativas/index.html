@@ -10,51 +10,80 @@
 
 {% block content %}
   <div class="page-shell justificativas-page" data-cv-realtime-filter-scope>
-    {% include "components/ui/headers/header_stack_filters.html" with eyebrow="JUSTIFICATIVAS" title=page_title icon_label="JT" form_action=request.path search_name="q" search_value=q search_placeholder="Buscar justificativas" search_clear_url=request.path %}
-
-    <form method="post" class="justificativa-quick-add" data-justificativa-quick-add>
-      {% csrf_token %}
-      <section class="cv-wizard-section-card justificativa-quick-add__card" aria-labelledby="justificativa-quick-add-title">
-        <header class="cv-wizard-section-header">
-          <div class="cv-wizard-section-header__copy">
-            <h2 class="cv-wizard-section-title" id="justificativa-quick-add-title">Quick add</h2>
-            <p class="cv-wizard-section-subtitle">{{ page_description }}</p>
+    <div class="page-header-stack header-stack--quick-add">
+      <div class="page-header-band">
+        <div class="page-header-band__content">
+          <div class="page-header-band__text">
+            <span class="page-header-band__eyebrow">JUSTIFICATIVAS</span>
+            <h1 class="page-header-band__title">{{ page_title }}</h1>
           </div>
-          <div class="cv-wizard-section-header__actions">
-            {% include "components/buttons/action_button.html" with href=modelos_url label="Gerenciar modelos" variant="secondary" only %}
-          </div>
-        </header>
+        </div>
+      </div>
 
-        <div class="cv-wizard-section-body justificativa-quick-add__body">
+      <div class="page-header-rail page-header-rail--filters page-header-rail--filters-quick-add">
+        <div class="page-header-rail__marker" aria-hidden="true">JT</div>
+
+        <form class="header-filter-bar" method="get" action="{{ request.path }}">
+          <div class="header-filter-bar__search">
+            <input
+              class="header-filter-input"
+              type="search"
+              name="q"
+              placeholder="Buscar justificativas"
+              aria-label="Buscar justificativas"
+              data-cv-filter="search"
+              {% if q %}value="{{ q }}"{% endif %}
+            >
+          </div>
+          <div class="header-filter-bar__actions">
+            {% include "components/ui/buttons/button.html" with href=request.path label="Limpar filtros" variant="secondary" icon="x" data_cv_filter_clear=True only %}
+          </div>
+        </form>
+
+        <form
+          class="quick-add-inline__panel quick-add-panel justificativa-quick-add{% if form.errors %} is-open{% endif %}"
+          id="justificativa-quick-add-panel"
+          method="post"
+          action="{{ request.path }}"
+          aria-label="Quick add de justificativa"
+          data-justificativa-quick-add
+          {% if not form.errors %}hidden{% endif %}
+          novalidate
+        >
+          {% csrf_token %}
           {% if form.non_field_errors %}
             {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
           {% endif %}
 
-          <section class="wizard-inner-section justificativa-quick-add__section" aria-labelledby="justificativa-oficios-title">
-            <header class="wizard-inner-section__header">
-              <div class="wizard-inner-section__header-copy">
-                <h3 class="wizard-inner-section__title" id="justificativa-oficios-title">Oficios</h3>
+          <div class="quick-add-inline__body justificativa-quick-add__body">
+            <div class="quick-add-inline__fields justificativa-quick-add__fields">
+              <div class="justificativa-quick-add__field">
+                {% include "components/forms/form_field.html" with field=form.oficios only %}
               </div>
-            </header>
-            {% include "components/forms/form_field.html" with field=form.oficios only %}
-          </section>
-
-          <section class="wizard-inner-section justificativa-quick-add__section" aria-labelledby="justificativa-texto-title">
-            <header class="wizard-inner-section__header">
-              <div class="wizard-inner-section__header-copy">
-                <h3 class="wizard-inner-section__title" id="justificativa-texto-title">Justificativa</h3>
+              <div class="justificativa-quick-add__field">
+                {% include "components/forms/input_with_action.html" with field=form.modelo action_url=modelos_url action_label="Gerenciar modelos" only %}
               </div>
-            </header>
-            {% include "components/forms/form_field.html" with field=form.modelo label="Modelo" only %}
-            <div class="justificativa-quick-add__wide-field">
-              {% include "components/forms/form_field.html" with field=form.texto label="Justificativa" only %}
+              <div class="justificativa-quick-add__field justificativa-quick-add__field--wide">
+                {% include "components/forms/form_field.html" with field=form.texto label="Justificativa" only %}
+              </div>
             </div>
-          </section>
-        </div>
-
-        {% include "components/ui/layouts/card_footer_section.html" with primary_label="Criar justificativa" primary_action="quick_add" only %}
-      </section>
-    </form>
+          </div>
+        </form>
+      </div>
+      <button
+        class="quick-add-footer-button justificativa-quick-add__toggle"
+        type="button"
+        data-quick-add-toggle
+        data-justificativa-action-toggle
+        data-idle-label="Cadastrar justificativa"
+        data-ready-label="Criar justificativa"
+        aria-controls="justificativa-quick-add-panel"
+        aria-expanded="{% if form.errors %}true{% else %}false{% endif %}"
+      >
+        <span class="quick-add-footer-button__icon" aria-hidden="true">+</span>
+        <span class="quick-add-footer-button__label" data-justificativa-action-label>Cadastrar justificativa</span>
+      </button>
+    </div>
 
     <div class="list-panel justificativas-list-panel">
       {% include "components/lists/simple_list.html" with rows=rows empty_message="Nenhuma justificativa cadastrada." %}
@@ -63,5 +92,5 @@
 {% endblock %}
 
 {% block extra_js %}
-  <script src="{% static 'js/pages/oficios-justificativa-wizard.js' %}?v=20260603" defer></script>
+  <script src="{% static 'js/pages/oficios-justificativa-wizard.js' %}?v=20260610a" defer></script>
 {% endblock %}

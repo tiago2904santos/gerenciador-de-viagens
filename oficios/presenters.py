@@ -111,17 +111,17 @@ def _temporal_badge_oficio(oficio):
         dias = (saida_date - today).days
         if dias == 1:
             return "falta 1 dia", "warning"
-        return f"faltam {dias} dias", "info"
+        return f"faltam {dias} dias", "warning"
     if saida_date <= today <= end_date:
         if today == saida_date:
-            return "começa hoje", "success"
-        return "em andamento", "success"
+            return "começa hoje", "info"
+        return "em andamento", "info"
     dias = (today - end_date).days
     if dias == 0:
-        return "foi hoje", "muted"
+        return "foi hoje", "success"
     if dias == 1:
-        return "foi ontem", "muted"
-    return f"há {dias} dias", "muted"
+        return "foi ontem", "success"
+    return f"há {dias} dias", "success"
 
 
 def apresentar_oficio_card(oficio):

@@ -96,7 +96,6 @@ class JustificativaQuickAddForm(forms.Form):
                 "data-picker-mode": "multi",
                 "data-picker-variant": "detailed",
                 "data-picker-label": "Oficios",
-                "data-picker-hint": "Selecione um ou mais oficios para receber a mesma justificativa.",
                 "data-panel-title": "OFICIOS DA JUSTIFICATIVA",
                 "data-placeholder": "Buscar por numero, protocolo ou assunto",
                 "data-empty-message": "Nenhum oficio encontrado.",
