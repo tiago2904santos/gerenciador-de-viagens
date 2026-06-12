@@ -157,5 +157,6 @@ def build_configuracao_context():
         "prazo_justificativa_dias": configuracao.prazo_justificativa_dias,
         "pt_ultimo_numero": configuracao.pt_ultimo_numero,
         "pt_ano": configuracao.pt_ano,
+        "pt_sufixo_numero": getattr(configuracao, "pt_sufixo_numero", ""),
         "assinaturas": assinaturas,
     }

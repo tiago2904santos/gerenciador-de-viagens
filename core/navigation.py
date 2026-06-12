@@ -59,6 +59,7 @@ NAVIGATION_ITEMS = [
     {"id": "oficios", "label": "Ofícios", "url_name": "oficios:index", "icon": "OF"},
     {"id": "termos", "label": "Termos", "url_name": "termos:index", "icon": "TM"},
     {"id": "ordens_servico", "label": "Ordens de Serviço", "url_name": "ordens_servico:index", "icon": "OS", "active_when": ["ordens_servico:"]},
+    {"id": "planos_trabalho", "label": "Planos de Trabalho", "url_name": "planos_trabalho:index", "icon": "PT", "active_when": ["planos_trabalho:"]},
     {
         "id": "justificativas",
         "label": "Justificativas",

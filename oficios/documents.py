@@ -1,7 +1,7 @@
 """
 Payloads canônicos para o núcleo documental (templates DOCX/PDF).
 
-Os modelos DOCX ``termo_autorizacao.docx``, ``plano_trabalho.docx`` e ``ordem_servico.docx``
+Os modelos DOCX ``termo_autorizacao.docx`` e ``ordem_servico.docx``
 usam placeholders **aninhados** (ex.: ``{{ oficio.numero_formatado }}``, ``{{ termo.participante.nome }}``).
 Para esses tipos, a ``DocumentoFacade`` recebe o payload canónico diretamente (sem ``docxtpl_context`` plano).
 O ofício e a justificativa legados usam chaves planas e ``oficios.docxtpl_context``.
@@ -128,7 +128,9 @@ def build_canonical_document_payload(oficio: Oficio, tipo: DocumentoTipo) -> dic
 
         if tipo == DocumentoTipo.TERMO_AUTORIZACAO:
             raise ValueError("Use build_termo_payload com participante e variante.")
-        if tipo in (DocumentoTipo.PLANO_TRABALHO, DocumentoTipo.ORDEM_SERVICO):
+        if tipo == DocumentoTipo.PLANO_TRABALHO:
+            raise ValueError("Plano de trabalho agora é gerado pelo módulo planos_trabalho.")
+        if tipo == DocumentoTipo.ORDEM_SERVICO:
             payload["em_elaboracao"] = True
         return payload
 

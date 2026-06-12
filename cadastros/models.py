@@ -327,6 +327,13 @@ class ConfiguracaoSistema(TimeStampedModel):
     )
     pt_ultimo_numero = models.PositiveIntegerField(default=0)
     pt_ano = models.PositiveIntegerField(default=0)
+    pt_sufixo_numero = models.CharField(
+        max_length=20,
+        blank=True,
+        default="ASCOM",
+        verbose_name="Sufixo do número (Plano de Trabalho)",
+        help_text="Sufixo aplicado à numeração do plano (ex.: 20/2026/ASCOM).",
+    )
 
     class Meta:
         verbose_name = "Configuração do sistema"
@@ -364,6 +371,7 @@ class ConfiguracaoSistema(TimeStampedModel):
         self.bairro = norm_upper_words(self.bairro)
         self.numero = norm_upper_words(self.numero)
         self.uf = (self.uf or "").strip().upper()[:2]
+        self.pt_sufixo_numero = norm_upper_words(self.pt_sufixo_numero)
         self.cep = normalize_digits(self.cep)
         self.telefone = normalize_digits(self.telefone)
         # Mantém compatível com código que ainda lê `sede`: mesmo valor que cidade_endereco.

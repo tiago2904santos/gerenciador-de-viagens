@@ -43,14 +43,19 @@ class PdfInlineRoutesTests(TestCase):
 
     @mock.patch("oficios.views.validar_oficio_para_documento", return_value={"pendencias": []})
     @mock.patch("oficios.views.download_documento_or_redirect_pdf_error")
-    def test_justificativa_plano_ordem_urls_resolvem(self, m_dl, _m_val):
+    def test_justificativa_ordem_urls_resolvem(self, m_dl, _m_val):
         m_dl.return_value = self._mock_download_pdf()
         for name in (
             "oficios:justificativa_pdf_inline",
-            "oficios:plano_trabalho_pdf_inline",
             "oficios:ordem_servico_pdf_inline",
         ):
             url = reverse(name, args=[self.oficio.pk])
             response = self.client.get(url)
             self.assertEqual(response.status_code, 200, msg=name)
             self.assertIn("inline", response["Content-Disposition"], msg=name)
+
+    def test_plano_trabalho_pdf_inline_removido_do_oficio(self):
+        from django.urls import NoReverseMatch
+
+        with self.assertRaises(NoReverseMatch):
+            reverse("oficios:plano_trabalho_pdf_inline", args=[self.oficio.pk])

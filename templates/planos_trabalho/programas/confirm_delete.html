@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+  <div class="page-shell page-shell--standard-simple">
+    {% include "components/ui/headers/header_stack_simple.html" with eyebrow="PLANOS DE TRABALHO" title=page_title description=page_description icon_label="PT" module_label="Programas Solicitantes" only %}
+    <form class="main-form-panel" method="post">
+      {% csrf_token %}
+      {% include "components/ui/layouts/form_section.html" with title="Confirmação de exclusão" description="Confirma a exclusão do programa solicitante." section_id="pt-programa-delete-section" only %}
+      <div class="field-grid">
+        <div class="field-size-4">
+          <p style="margin: 0 0 var(--space-3)">Confirma a exclusão do programa <strong>{{ programa.nome }}</strong>?</p>
+          {% include "components/ui/feedback/alert.html" with variant="warning" message="Planos já criados que usam este programa não são alterados." only %}
+        </div>
+      </div>
+      {% include "components/ui/layouts/card_footer_actions.html" with secondary_label="Cancelar" secondary_url=cancel_url primary_label="Excluir" primary_variant="danger" only %}
+    </form>
+  </div>
+{% endblock %}

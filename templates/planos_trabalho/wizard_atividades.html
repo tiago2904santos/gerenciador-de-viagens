@@ -1,0 +1,27 @@
+{% extends "planos_trabalho/wizard_base.html" %}
+{% load static %}
+
+{% block wizard_content %}
+  <section class="cv-wizard-section-card termo-card" aria-labelledby="pt-atividades-title">
+    <header class="cv-wizard-section-header">
+      <div class="cv-wizard-section-header__copy">
+        <h3 class="cv-wizard-section-title" id="pt-atividades-title">Atividades, metas e recursos</h3>
+        <p class="cv-wizard-section-subtitle">Atividades, metas e recursos são interligados e terão um módulo dedicado.</p>
+      </div>
+    </header>
+
+    <div class="cv-wizard-section-body">
+      <div class="document-inline-card">
+        <div class="document-inline-card__body">
+          <p class="document-inline-empty">
+            Em desenvolvimento — aqui entrarão as atividades a serem desenvolvidas, as metas
+            estabelecidas e os recursos necessários do plano de trabalho. Por enquanto, estes
+            blocos saem em branco no documento gerado.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar" secondary_action="wizard_back" primary_label="Avançar" primary_action="wizard_next" only %}
+  </section>
+{% endblock %}

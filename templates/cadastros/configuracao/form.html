@@ -43,6 +43,12 @@
       </div>
       </section>
 
+      {% include "components/ui/layouts/form_section.html" with title="Plano de Trabalho" description="Parâmetros da numeração dos planos de trabalho gerados pelo sistema." section_id="config-plano-trabalho-section" only %}
+      <div class="field-grid">
+        {% include "components/forms/form_field.html" with field=form.pt_sufixo_numero size_class="field-size-2" only %}
+      </div>
+      </section>
+
       {% include "components/ui/layouts/form_section.html" with title="Assinantes padrão por documento" description="Servidor selecionado como assinante padrão em cada tipo de documento gerado pelo sistema." section_id="config-assinaturas-section" only %}
       <div class="field-grid">
         {% include "components/forms/form_field.html" with field=assinaturas_form.assinante_oficio size_class="field-size-2" only %}

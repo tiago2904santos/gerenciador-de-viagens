@@ -81,6 +81,10 @@
   grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
 }
 
+#pt-card-evento .termo-evento-dates {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+
 .termo-evento-dates .cv-field {
   min-width: 0;
 }
@@ -172,6 +176,10 @@
 
   .termo-evento-dates {
     grid-template-columns: 1fr;
+  }
+
+  #pt-card-evento .termo-evento-dates {
+    grid-template-columns: 1fr !important;
   }
 
   .termo-list-card {

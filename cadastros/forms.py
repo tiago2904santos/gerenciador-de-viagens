@@ -501,6 +501,7 @@ class ConfiguracaoSistemaForm(forms.ModelForm):
             "email",
             "nome_chefia",
             "cargo_chefia",
+            "pt_sufixo_numero",
         ]
         widgets = {
             "divisao": forms.TextInput(attrs={"class": "form-control", "data-mask": "upper"}),
@@ -544,6 +545,14 @@ class ConfiguracaoSistemaForm(forms.ModelForm):
             ),
             "nome_chefia": forms.TextInput(attrs={"class": "form-control", "data-mask": "upper"}),
             "cargo_chefia": forms.TextInput(attrs={"class": "form-control", "data-mask": "upper"}),
+            "pt_sufixo_numero": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "data-mask": "upper",
+                    "maxlength": "20",
+                    "autocomplete": "off",
+                }
+            ),
         }
 
     def __init__(self, *args, **kwargs):
@@ -556,6 +565,7 @@ class ConfiguracaoSistemaForm(forms.ModelForm):
         self.fields["email"].label = "E-mail"
         self.fields["nome_chefia"].label = "Nome da chefia"
         self.fields["cargo_chefia"].label = "Cargo da chefia"
+        self.fields["pt_sufixo_numero"].label = "Sufixo do nº do Plano de Trabalho"
 
         if self.instance and self.instance.pk and not self.data:
             self.initial["cep"] = format_cep(self.instance.cep)

@@ -36,11 +36,6 @@ urlpatterns = [
         name="justificativa_pdf_inline",
     ),
     path(
-        "<int:pk>/documentos/plano-trabalho-pdf-inline/",
-        views.plano_trabalho_pdf_inline,
-        name="plano_trabalho_pdf_inline",
-    ),
-    path(
         "<int:pk>/documentos/ordem-servico-pdf-inline/",
         views.ordem_servico_pdf_inline,
         name="ordem_servico_pdf_inline",
@@ -49,11 +44,6 @@ urlpatterns = [
         "<int:pk>/documentos/justificativa/<str:formato>/",
         views.baixar_justificativa_documento,
         name="baixar_justificativa_documento",
-    ),
-    path(
-        "<int:pk>/documentos/plano-trabalho/<str:formato>/",
-        views.baixar_plano_trabalho_documento,
-        name="baixar_plano_trabalho_documento",
     ),
     path(
         "<int:pk>/documentos/ordem-servico/<str:formato>/",

@@ -48,7 +48,6 @@ from documentos.services.timing import measure_step
 from documentos.services.types import DocumentoFormato
 from documentos.services.types import DocumentoTipo
 from ordens_servico.services import gerar_resposta_ordem_servico_documento
-from planos_trabalho.services import gerar_resposta_plano_trabalho_documento
 from .forms import OficioDadosViajantesForm
 from .forms import OficioTransporteForm
 from .forms import ModeloMotivoOficioForm
@@ -1027,20 +1026,6 @@ def justificativa_pdf_inline(request, pk):
 
 
 @require_GET
-def plano_trabalho_pdf_inline(request, pk):
-    oficio = get_oficio_by_id(pk)
-    ref = f"{oficio.numero_formatado.replace('/', '-')}-plano-trabalho"
-    return _pdf_inline_response(
-        request,
-        oficio,
-        gerar=lambda: gerar_resposta_plano_trabalho_documento(oficio, DocumentoFormato.PDF),
-        tipo=DocumentoTipo.PLANO_TRABALHO,
-        reference=ref,
-        step_name="http_plano_trabalho_pdf_inline",
-    )
-
-
-@require_GET
 def ordem_servico_pdf_inline(request, pk):
     oficio = get_oficio_by_id(pk)
     ref = f"{oficio.numero_formatado.replace('/', '-')}-ordem-servico"
@@ -1099,30 +1084,6 @@ def baixar_justificativa_documento(request, pk, formato):
             oficio_id=oficio.pk,
             formato=formato_documento,
             gerar=lambda: gerar_resposta_justificativa_documento(oficio, formato_documento),
-        )
-
-
-def baixar_plano_trabalho_documento(request, pk, formato):
-    oficio = get_oficio_by_id(pk)
-    try:
-        formato_documento = DocumentoFormato(formato)
-    except ValueError as exc:
-        raise Http404("Formato documental nao suportado.") from exc
-
-    avaliacao = validar_oficio_para_documento(oficio)
-    if avaliacao["pendencias"]:
-        messages.error(request, "Documento nao gerado porque o oficio esta incompleto.")
-        alvo = redirect_para_corrigir_documento_oficio(oficio)
-        return redirect(f"{alvo}?documento_incompleto=1")
-    with measure_step(
-        "http_baixar_plano_trabalho_documento",
-        {"oficio_id": oficio.pk, "formato": formato_documento.value},
-    ):
-        return download_documento_or_redirect_pdf_error(
-            request,
-            oficio_id=oficio.pk,
-            formato=formato_documento,
-            gerar=lambda: gerar_resposta_plano_trabalho_documento(oficio, formato_documento),
         )
 
 

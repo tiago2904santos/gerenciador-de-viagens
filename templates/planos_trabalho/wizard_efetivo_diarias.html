@@ -1,0 +1,145 @@
+{% extends "planos_trabalho/wizard_base.html" %}
+{% load static %}
+
+{% block extra_css %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260612-pt">
+{% endblock %}
+
+{% block wizard_content %}
+  <div data-pt-efetivo-diarias data-api-calcular-url="{{ api_calcular_diarias_url }}">
+
+    {# ── 1. Efetivo por cargo ───────────────────────────────── #}
+    <section class="cv-wizard-section-card termo-card" id="pt-card-efetivo">
+      <header class="cv-wizard-section-header">
+        <div class="cv-wizard-section-header__copy">
+          <h3 class="cv-wizard-section-title">Efetivo</h3>
+          <p class="cv-wizard-section-subtitle">Composição da equipe por cargo e quantidade. O total entra no cálculo das diárias.</p>
+        </div>
+        <div class="cv-wizard-section-header__actions">
+          {% include "components/buttons/action_button.html" with href=cargo_create_url label="Cadastrar cargo" variant="secondary" data_autosave_link=True only %}
+        </div>
+      </header>
+      <div class="cv-wizard-section-body">
+        {{ formset.management_form }}
+        {% if formset.non_form_errors %}
+          {% include "components/ui/feedback/field_error.html" with errors=formset.non_form_errors only %}
+        {% endif %}
+        <div class="pt-efetivo-rows" data-pt-efetivo-rows>
+          {% for efetivo_form in formset %}
+            <div class="field-grid pt-efetivo-row" data-pt-efetivo-row>
+              {% for hidden in efetivo_form.hidden_fields %}{{ hidden }}{% endfor %}
+              <div class="field field-size-2 app-form-field">
+                <label class="cv-field__label" for="{{ efetivo_form.cargo.id_for_label }}">Cargo</label>
+                {{ efetivo_form.cargo }}
+                {% if efetivo_form.cargo.errors %}{% include "components/ui/feedback/field_error.html" with errors=efetivo_form.cargo.errors only %}{% endif %}
+              </div>
+              <div class="field field-size-1 app-form-field">
+                <label class="cv-field__label" for="{{ efetivo_form.quantidade.id_for_label }}">Quantidade</label>
+                {{ efetivo_form.quantidade }}
+                {% if efetivo_form.quantidade.errors %}{% include "components/ui/feedback/field_error.html" with errors=efetivo_form.quantidade.errors only %}{% endif %}
+              </div>
+              <div class="field field-size-1 app-form-field pt-efetivo-row__remove">
+                {% if efetivo_form.instance.pk %}
+                  <label class="cv-field__label">Remover</label>
+                  {{ efetivo_form.DELETE }}
+                {% else %}
+                  <label class="cv-field__label" aria-hidden="true">&nbsp;</label>
+                  <button type="button" class="cv-btn cv-btn--secondary cv-btn--sm" data-pt-efetivo-remove hidden><span>Remover</span></button>
+                  <div hidden>{{ efetivo_form.DELETE }}</div>
+                {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+        <template data-pt-efetivo-template>
+          <div class="field-grid pt-efetivo-row" data-pt-efetivo-row>
+            {% for hidden in formset.empty_form.hidden_fields %}{{ hidden }}{% endfor %}
+            <div class="field field-size-2 app-form-field">
+              <label class="cv-field__label" for="{{ formset.empty_form.cargo.id_for_label }}">Cargo</label>
+              {{ formset.empty_form.cargo }}
+            </div>
+            <div class="field field-size-1 app-form-field">
+              <label class="cv-field__label" for="{{ formset.empty_form.quantidade.id_for_label }}">Quantidade</label>
+              {{ formset.empty_form.quantidade }}
+            </div>
+            <div class="field field-size-1 app-form-field pt-efetivo-row__remove">
+              <label class="cv-field__label" aria-hidden="true">&nbsp;</label>
+              <button type="button" class="cv-btn cv-btn--secondary cv-btn--sm" data-pt-efetivo-remove><span>Remover</span></button>
+              <div hidden>{{ formset.empty_form.DELETE }}</div>
+            </div>
+          </div>
+        </template>
+        <div class="termo-actions" style="margin-top: var(--space-3);">
+          <button type="button" class="cv-btn cv-btn--secondary cv-btn--sm" data-pt-efetivo-add><span>+ Adicionar cargo</span></button>
+        </div>
+      </div>
+    </section>
+
+    {# ── 2. Deslocamento (4 inputs do motor de diárias) ─────── #}
+    <section class="cv-wizard-section-card termo-card" id="pt-card-diarias">
+      <header class="cv-wizard-section-header">
+        <div class="cv-wizard-section-header__copy">
+          <h3 class="cv-wizard-section-title">Deslocamento e diárias</h3>
+          <p class="cv-wizard-section-subtitle">Informe a saída e a chegada na sede — o sistema calcula a composição das diárias automaticamente.</p>
+        </div>
+      </header>
+      <div class="cv-wizard-section-body">
+        <div class="field-grid">
+          {% include "components/forms/form_field.html" with field=diarias_form.saida_sede_data label="Data de saída da sede" size_class="field-size-1" only %}
+          {% include "components/forms/form_field.html" with field=diarias_form.saida_sede_hora label="Hora de saída" size_class="field-size-1" only %}
+          {% include "components/forms/form_field.html" with field=diarias_form.chegada_sede_data label="Data de chegada na sede" size_class="field-size-1" only %}
+          {% include "components/forms/form_field.html" with field=diarias_form.chegada_sede_hora label="Hora de chegada" size_class="field-size-1" only %}
+        </div>
+
+        <section class="wizard-inner-section" aria-labelledby="pt-diarias-resultado-title" style="margin-top: var(--space-4);">
+          <header class="wizard-inner-section__header">
+            <h4 class="wizard-inner-section__title" id="pt-diarias-resultado-title">Resultado do cálculo</h4>
+          </header>
+          <div class="oficio-lc__transport-row" data-pt-diarias-resultado>
+            <div class="oficio-lc__transport-card">
+              <span class="oficio-lc__transport-label">Composição por servidor</span>
+              <div class="oficio-lc__transport-placa" data-pt-resultado-composicao>
+                {% if diarias_resultado.ok %}{{ diarias_resultado.composicao }}{% else %}—{% endif %}
+              </div>
+              <span class="oficio-lc__transport-label">Efetivo total</span>
+              <div class="oficio-lc__transport-modelo" data-pt-resultado-efetivo>
+                {% if diarias_resultado.ok %}{{ diarias_resultado.quantidade_servidores }} servidor(es){% else %}—{% endif %}
+              </div>
+            </div>
+            <div class="oficio-lc__transport-card">
+              <span class="oficio-lc__transport-label">Valor por servidor</span>
+              <div class="oficio-lc__transport-placa" data-pt-resultado-unitario>
+                {% if diarias_resultado.ok %}R${{ diarias_resultado.valor_unitario_display }}{% else %}—{% endif %}
+              </div>
+              <span class="oficio-lc__transport-label">Por extenso</span>
+              <div class="oficio-lc__valor-extenso" data-pt-resultado-unitario-extenso>
+                {% if diarias_resultado.ok %}{{ diarias_resultado.valor_unitario_extenso }}{% else %}—{% endif %}
+              </div>
+            </div>
+            <div class="oficio-lc__transport-card oficio-lc__transport-card--valor">
+              <span class="oficio-lc__transport-label">Valor total do plano</span>
+              <div class="oficio-lc__valor-total" data-pt-resultado-total>
+                {% if diarias_resultado.ok %}R${{ diarias_resultado.valor_total_display }}{% else %}—{% endif %}
+              </div>
+              <span class="oficio-lc__transport-label">Por extenso</span>
+              <div class="oficio-lc__valor-extenso" data-pt-resultado-total-extenso>
+                {% if diarias_resultado.ok %}{{ diarias_resultado.valor_total_extenso }}{% else %}—{% endif %}
+              </div>
+            </div>
+          </div>
+          <p class="field-help" data-pt-diarias-erros>
+            {% if not diarias_resultado.ok %}{{ diarias_resultado.erros|join:" " }}{% endif %}
+          </p>
+        </section>
+      </div>
+
+      {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar" secondary_action="wizard_back" primary_label="Salvar e avançar" primary_action="wizard_next" only %}
+    </section>
+  </div>
+{% endblock %}
+
+{% block extra_js %}
+  {{ block.super }}
+  <script src="{% static 'js/pages/planos-trabalho-wizard.js' %}?v=20260612a" defer></script>
+{% endblock %}

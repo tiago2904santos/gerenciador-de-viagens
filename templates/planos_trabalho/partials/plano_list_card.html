@@ -1,0 +1,60 @@
+<article
+  class="oficio-lc oficio-lc--{{ card.status_state|default:'outro' }}"
+  data-cv-filter-item
+  data-search-text="{{ card.numero_label }} {{ card.destino }} {{ card.programa }} {{ card.coordenador }}"
+  data-status-value="{{ card.status_state }}"
+>
+  <div class="oficio-lc__layout">
+
+    {# ── IDENTIFICAÇÃO ── #}
+    <div class="oficio-lc__id-row">
+      <div class="oficio-lc__info-item">
+        <span class="oficio-lc__info-label">Plano de Trabalho</span>
+        <span class="oficio-lc__info-value">{{ card.numero_label }}</span>
+      </div>
+      <div class="oficio-lc__info-item">
+        <span class="oficio-lc__info-label">Criado em</span>
+        <span class="oficio-lc__info-value">{{ card.data_criacao_label }}</span>
+      </div>
+      {% include "components/ui/badges/chip.html" with tone=card.status_state label=card.status_label extra_class="oficio-lc__temporal-chip" only %}
+    </div>
+
+    {# ── DADOS DO EVENTO ── #}
+    <div class="oficio-lc__section">
+      <div class="oficio-lc__transport-row">
+        <div class="oficio-lc__transport-card">
+          <span class="oficio-lc__transport-label">Destino</span>
+          <div class="oficio-lc__transport-placa">{{ card.destino }}</div>
+          <span class="oficio-lc__transport-label">Período</span>
+          <div class="oficio-lc__transport-modelo">{{ card.periodo }}</div>
+        </div>
+        <div class="oficio-lc__transport-card">
+          <span class="oficio-lc__transport-label">Programa</span>
+          <div class="oficio-lc__transport-modelo">{{ card.programa }}</div>
+          <span class="oficio-lc__transport-label">Coordenador adm.</span>
+          <div class="oficio-lc__transport-modelo">{{ card.coordenador }}</div>
+        </div>
+        <div class="oficio-lc__transport-card oficio-lc__transport-card--valor">
+          <span class="oficio-lc__transport-label">Efetivo</span>
+          <div class="oficio-lc__valor-total">{{ card.efetivo_total }} servidor(es)</div>
+        </div>
+      </div>
+    </div>
+
+    {# ── FOOTER ── #}
+    <div class="oficio-lc__footer">
+      <div class="oficio-lc__footer-actions">
+        <div class="oficio-lc__footer-actions-main cv-icon-btn-group">
+          {% include "components/ui/buttons/icon_button.html" with href=card.editar_url action="edit" aria_label="Editar plano" tooltip="Editar" only %}
+          {% include "components/ui/buttons/icon_button.html" with href=card.pdf_inline_url action="preview" aria_label="Visualizar plano" tooltip="Visualizar" only %}
+          {% include "components/ui/buttons/icon_button.html" with href=card.baixar_pdf_url action="pdf" aria_label="Baixar PDF do plano" tooltip="PDF" only %}
+          {% include "components/ui/buttons/icon_button.html" with href=card.baixar_docx_url action="docx" aria_label="Baixar DOCX do plano" tooltip="DOCX" only %}
+        </div>
+        <div class="oficio-lc__footer-actions-danger cv-icon-btn-group">
+          {% include "components/ui/buttons/icon_button.html" with href=card.excluir_url action="delete" aria_label="Excluir plano" tooltip="Excluir" only %}
+        </div>
+      </div>
+    </div>
+
+  </div>
+</article>

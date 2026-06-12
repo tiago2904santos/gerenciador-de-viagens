@@ -1,0 +1,117 @@
+{% extends "planos_trabalho/wizard_base.html" %}
+{% load static %}
+
+{% block extra_css %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'css/oficios-documentos-inline.css' %}?v=20260612-pt">
+{% endblock %}
+
+{% block wizard_content %}
+  {% if mostrar_pendencias %}
+    <section class="oficio-documentos-pendencias oficio-documentos-pendencias--alert" aria-live="polite">
+      <div class="oficio-documentos-pendencias__inner">
+        <span class="oficio-documentos-pendencias__marker" aria-hidden="true"></span>
+        <div class="oficio-documentos-pendencias__body">
+          <h3 class="oficio-documentos-pendencias__title">Pendências encontradas</h3>
+          <p class="oficio-documentos-pendencias__lead">
+            Corrija os itens abaixo antes de finalizar o plano ou gerar DOCX/PDF.
+          </p>
+          <ul class="oficio-documentos-pendencias__items">
+            {% for p in pendencias_documentos %}
+              <li>{{ p }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </section>
+  {% endif %}
+
+  <section class="cv-wizard-section-card oficio-documentos-preview-section document-inline-stack" aria-labelledby="pt-documentos-title">
+    <header class="cv-wizard-section-header">
+      <div class="cv-wizard-section-header__copy">
+        <h3 class="cv-wizard-section-title" id="pt-documentos-title">Documento para conferência</h3>
+        <p class="cv-wizard-section-subtitle">Confira e baixe o plano de trabalho gerado.</p>
+      </div>
+    </header>
+
+    <div class="cv-wizard-section-body oficio-documentos-preview-section__body">
+      <details class="document-inline-card document-inline-card--lazy" data-lazy-inline open>
+        <summary class="document-inline-card__header">
+          <span class="document-inline-card__title">Plano de Trabalho {{ plano.numero_formatado }}</span>
+          {% if documento_disponivel %}
+            <span class="document-inline-card__header-end">
+              <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do documento">
+                {% include "components/ui/buttons/icon_button.html" with href=pdf_inline_url action="preview" aria_label="Visualizar documento" tooltip="Visualizar documento" only %}
+                {% include "components/ui/buttons/icon_button.html" with href=baixar_pdf_url action="pdf" aria_label="Baixar PDF" tooltip="Baixar PDF" only %}
+                {% include "components/ui/buttons/icon_button.html" with href=baixar_docx_url action="docx" aria_label="Baixar DOCX" tooltip="Baixar DOCX" only %}
+              </span>
+            </span>
+          {% endif %}
+        </summary>
+        <div class="document-inline-card__body">
+          {% if documento_disponivel %}
+            <div class="document-inline-viewer">
+              <iframe
+                class="document-inline-viewer__frame"
+                data-src="{{ pdf_inline_url }}"
+                src="{{ pdf_inline_url }}"
+                title="Visualização do plano de trabalho em PDF"
+                loading="lazy"
+              ></iframe>
+            </div>
+          {% else %}
+            <p class="document-inline-empty">Complete as etapas anteriores para visualizar o documento.</p>
+          {% endif %}
+        </div>
+      </details>
+    </div>
+
+    {% if mostrar_pendencias %}
+      {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar" secondary_action="wizard_back" primary_label="Salvar rascunho" primary_action="save_draft_list" only %}
+    {% else %}
+      {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar" secondary_action="wizard_back" primary_label="Finalizar plano" primary_action="finalizar" only %}
+    {% endif %}
+  </section>
+
+  <section class="cv-wizard-section-card oficio-documentos-summary-section" aria-labelledby="pt-resumo-title">
+    <header class="cv-wizard-section-header">
+      <div class="cv-wizard-section-header__copy">
+        <h3 class="cv-wizard-section-title" id="pt-resumo-title">Resumo do plano</h3>
+        <p class="cv-wizard-section-subtitle">Dados utilizados para montar o documento.</p>
+      </div>
+    </header>
+    <div class="cv-wizard-section-body">
+      <div class="oficio-lc__transport-row">
+        <div class="oficio-lc__transport-card">
+          <span class="oficio-lc__transport-label">Número</span>
+          <div class="oficio-lc__transport-placa">{{ plano.numero_formatado }}</div>
+          <span class="oficio-lc__transport-label">Destino</span>
+          <div class="oficio-lc__transport-modelo">{{ resumo.destino }}</div>
+          <span class="oficio-lc__transport-label">Período</span>
+          <div class="oficio-lc__transport-modelo">{{ resumo.periodo }}</div>
+          <span class="oficio-lc__transport-label">Horário de atendimento</span>
+          <div class="oficio-lc__transport-modelo">{{ resumo.horario }}</div>
+        </div>
+        <div class="oficio-lc__transport-card">
+          <span class="oficio-lc__transport-label">Programa solicitante</span>
+          <div class="oficio-lc__transport-modelo">{{ resumo.programa }}</div>
+          <span class="oficio-lc__transport-label">Efetivo</span>
+          <div class="oficio-lc__transport-modelo">{{ resumo.efetivo }}</div>
+        </div>
+        <div class="oficio-lc__transport-card oficio-lc__transport-card--valor">
+          <span class="oficio-lc__transport-label">Valor do plano</span>
+          <div class="oficio-lc__valor-extenso">{{ resumo.valor_plano }}</div>
+        </div>
+      </div>
+      <div class="oficio-lc__transport-card" style="margin-top: var(--space-3);">
+        <span class="oficio-lc__transport-label">Coordenação</span>
+        <div class="oficio-lc__valor-extenso" style="white-space: pre-line;">{{ resumo.coordenacao }}</div>
+      </div>
+    </div>
+  </section>
+{% endblock %}
+
+{% block extra_js %}
+  {{ block.super }}
+  <script src="{% static 'js/pages/oficios-documentos-inline.js' %}?v=20260612-pt" defer></script>
+{% endblock %}
