@@ -4,6 +4,7 @@ from django.db import models
 from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
+from django.utils.text import slugify
 
 from cadastros.models import Cargo
 from cadastros.models import Cidade
@@ -11,6 +12,7 @@ from cadastros.models import ConfiguracaoSistema
 from cadastros.models import Estado
 from cadastros.models import Servidor
 from cadastros.models import TimeStampedModel
+from cadastros.models import Unidade
 from core.normalizers import normalize_spaces
 from core.normalizers import normalize_upper
 
@@ -52,6 +54,38 @@ class HorarioAtendimento(TimeStampedModel):
 
     def save(self, *args, **kwargs):
         self.faixa = normalize_spaces(self.faixa)
+        super().save(*args, **kwargs)
+
+
+class AtividadePlanoTrabalho(TimeStampedModel):
+    """Catálogo gerenciável de atividades do Plano de Trabalho.
+
+    Cada atividade carrega a meta exibida no documento e, opcionalmente, o
+    recurso necessário associado — quando uma atividade é selecionada na etapa 3
+    do wizard, sua meta e seu recurso entram automaticamente no plano.
+    """
+
+    codigo = models.CharField("Código", max_length=40, unique=True)
+    nome = models.CharField("Nome", max_length=255)
+    meta = models.TextField("Meta")
+    recurso_necessario = models.TextField("Recurso necessário", blank=True, default="")
+    ordem = models.PositiveIntegerField("Ordem", default=100)
+    ativo = models.BooleanField("Ativo", default=True)
+
+    class Meta:
+        ordering = ["ordem", "nome"]
+        verbose_name = "Atividade (Plano de Trabalho)"
+        verbose_name_plural = "Atividades (Plano de Trabalho)"
+
+    def __str__(self):
+        return f"{self.codigo} — {self.nome}"
+
+    def save(self, *args, **kwargs):
+        if self.codigo:
+            self.codigo = slugify(self.codigo).replace("-", "_").upper()
+        self.nome = normalize_spaces(self.nome)
+        self.meta = (self.meta or "").strip()
+        self.recurso_necessario = (self.recurso_necessario or "").strip()
         super().save(*args, **kwargs)
 
 
@@ -112,6 +146,10 @@ class PlanoTrabalho(TimeStampedModel):
         default="09:00 até 17:00",
     )
     consideracao_final = models.TextField("Considerações finais", blank=True, default="")
+    # Quando True, o texto é mantido sincronizado com destino/programa (texto padrão);
+    # vira False assim que o usuário edita o campo manualmente.
+    contextualizacao_auto = models.BooleanField(default=True)
+    consideracao_auto = models.BooleanField(default=True)
 
     coordenador_adm_modo = models.CharField(
         max_length=10,
@@ -166,7 +204,15 @@ class PlanoTrabalho(TimeStampedModel):
         blank=True,
     )
 
-    # Etapa 3 — atividades, metas e recursos (módulo dedicado futuro)
+    # Etapa 3 — atividades, metas e recursos.
+    # A seleção fica em ``atividades_selecionadas``; os campos de texto abaixo são
+    # regenerados a partir dela (services.sincronizar_atividades) e consumidos pelo DOCX.
+    atividades_selecionadas = models.ManyToManyField(
+        "AtividadePlanoTrabalho",
+        blank=True,
+        related_name="planos",
+        verbose_name="Atividades previstas",
+    )
     metas = models.TextField(blank=True, default="")
     atividades = models.TextField(blank=True, default="")
     recursos_necessarios = models.TextField(blank=True, default="")
@@ -231,23 +277,19 @@ class PlanoTrabalho(TimeStampedModel):
         return int(agregado["total"] or 0)
 
     def coordenador_nome_cargo(self, papel: str) -> tuple[str, str]:
-        """Resolve (nome, cargo) do coordenador `adm` ou `op` conforme o modo."""
+        """Resolve (nome, cargo) do coordenador `adm` ou `op` priorizando servidor selecionado."""
         if papel == "adm":
-            modo = self.coordenador_adm_modo
             servidor = self.coordenador_adm if self.coordenador_adm_id else None
             nome_manual = self.coordenador_adm_nome_manual
             cargo_manual = self.coordenador_adm_cargo_manual
         else:
-            modo = self.coordenador_op_modo
             servidor = self.coordenador_op if self.coordenador_op_id else None
             nome_manual = self.coordenador_op_nome_manual
             cargo_manual = self.coordenador_op_cargo_manual
-        if modo == self.COORDENADOR_MODO_MANUAL:
-            return (nome_manual or "").strip(), (cargo_manual or "").strip()
         if servidor is not None:
             cargo = servidor.cargo.nome if servidor.cargo_id else ""
             return (servidor.nome or "").strip(), (cargo or "").strip()
-        return "", ""
+        return (nome_manual or "").strip(), (cargo_manual or "").strip()
 
     @property
     def tem_coordenador_operacional(self) -> bool:
@@ -329,6 +371,14 @@ class EfetivoPlano(TimeStampedModel):
         related_name="efetivos",
         verbose_name="Plano de trabalho",
     )
+    unidade = models.ForeignKey(
+        Unidade,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="efetivos_plano_trabalho",
+        verbose_name="Unidade",
+    )
     cargo = models.ForeignKey(
         Cargo,
         on_delete=models.PROTECT,
@@ -338,15 +388,16 @@ class EfetivoPlano(TimeStampedModel):
     quantidade = models.PositiveIntegerField("Quantidade", default=1)
 
     class Meta:
-        ordering = ["plano", "cargo__nome"]
+        ordering = ["plano", "unidade__nome", "cargo__nome"]
         verbose_name = "Efetivo do plano de trabalho"
         verbose_name_plural = "Efetivos do plano de trabalho"
         constraints = [
             models.UniqueConstraint(
-                fields=["plano", "cargo"],
-                name="planos_trabalho_efetivo_plano_cargo_unique",
+                fields=["plano", "unidade", "cargo"],
+                name="planos_trabalho_efetivo_plano_unidade_cargo_unique",
             )
         ]
 
     def __str__(self):
-        return f"{self.plano_id}: {self.quantidade} x {self.cargo}"
+        unidade = f" / {self.unidade}" if self.unidade_id else ""
+        return f"{self.plano_id}: {self.quantidade} x {self.cargo}{unidade}"

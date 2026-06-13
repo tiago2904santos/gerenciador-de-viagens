@@ -2,13 +2,16 @@ from __future__ import annotations
 
 from django import forms
 from django.forms import inlineformset_factory
+from django.utils.text import slugify
 
 from cadastros.models import Cargo
 from cadastros.models import Cidade
 from cadastros.models import Estado
 from cadastros.models import Servidor
+from cadastros.models import Unidade
 from cadastros.services import resolver_sede_ids_desde_configuracao
 
+from .models import AtividadePlanoTrabalho
 from .models import EfetivoPlano
 from .models import HorarioAtendimento
 from .models import PlanoDestino
@@ -124,14 +127,14 @@ class PlanoIdentificacaoForm(forms.ModelForm):
             "coordenador_adm_nome_manual": forms.TextInput(
                 attrs={"class": "cv-field__control", "placeholder": "Nome completo", "autocomplete": "off"},
             ),
-            "coordenador_adm_cargo_manual": forms.TextInput(
-                attrs={"class": "cv-field__control", "placeholder": "Cargo", "autocomplete": "off"},
+            "coordenador_adm_cargo_manual": forms.Select(
+                attrs={"class": "form-select"},
             ),
             "coordenador_op_nome_manual": forms.TextInput(
                 attrs={"class": "cv-field__control", "placeholder": "Nome completo", "autocomplete": "off"},
             ),
-            "coordenador_op_cargo_manual": forms.TextInput(
-                attrs={"class": "cv-field__control", "placeholder": "Cargo", "autocomplete": "off"},
+            "coordenador_op_cargo_manual": forms.Select(
+                attrs={"class": "form-select"},
             ),
         }
 
@@ -204,6 +207,18 @@ class PlanoIdentificacaoForm(forms.ModelForm):
         self.initial["destino_cidade"] = cidade_id
         self.fields["destino_cidade"].widget.attrs["data-picker-initial-value"] = str(cidade_id or "")
         self.destination_rows = self._build_destination_rows(estado_id, cidade_id)
+
+        cargo_choices = [("", "Selecione um cargo")]
+        cargo_choices.extend([(cargo.nome, cargo.nome) for cargo in Cargo.objects.order_by("nome")])
+        for campo in ("coordenador_adm_cargo_manual", "coordenador_op_cargo_manual"):
+            valor_atual = ""
+            if self.is_bound:
+                valor_atual = (self.data.get(campo) or "").strip()
+            elif self.instance and self.instance.pk:
+                valor_atual = (getattr(self.instance, campo, "") or "").strip()
+            if valor_atual and valor_atual not in {valor for valor, _ in cargo_choices}:
+                cargo_choices.append((valor_atual, valor_atual))
+            self.fields[campo].widget.choices = cargo_choices
 
         servidores_qs = Servidor.objects.select_related("cargo", "unidade").order_by("nome")
         for campo, titulo in (
@@ -324,19 +339,8 @@ class PlanoIdentificacaoForm(forms.ModelForm):
         if inicio and fim and fim < inicio:
             self.add_error("data_evento_fim", "A data final não pode ser anterior à data inicial.")
 
-        modo_adm = cleaned.get("coordenador_adm_modo") or PlanoTrabalho.COORDENADOR_MODO_SERVIDOR
-        if modo_adm == PlanoTrabalho.COORDENADOR_MODO_MANUAL:
-            cleaned["coordenador_adm"] = None
-        else:
-            cleaned["coordenador_adm_nome_manual"] = ""
-            cleaned["coordenador_adm_cargo_manual"] = ""
-
-        modo_op = cleaned.get("coordenador_op_modo") or PlanoTrabalho.COORDENADOR_MODO_SERVIDOR
-        if modo_op == PlanoTrabalho.COORDENADOR_MODO_MANUAL:
-            cleaned["coordenador_op"] = None
-        else:
-            cleaned["coordenador_op_nome_manual"] = ""
-            cleaned["coordenador_op_cargo_manual"] = ""
+        self._normalize_coordenador(cleaned, "adm")
+        self._normalize_coordenador(cleaned, "op")
 
         if self.programa_outros_selected:
             if not (cleaned.get("programa_outros") or "").strip():
@@ -375,6 +379,28 @@ class PlanoIdentificacaoForm(forms.ModelForm):
 
         return cleaned
 
+    def _normalize_coordenador(self, cleaned, papel):
+        servidor_key = f"coordenador_{papel}"
+        modo_key = f"coordenador_{papel}_modo"
+        nome_key = f"coordenador_{papel}_nome_manual"
+        cargo_key = f"coordenador_{papel}_cargo_manual"
+
+        servidor = cleaned.get(servidor_key)
+        nome_manual = (cleaned.get(nome_key) or "").strip()
+        cargo_manual = (cleaned.get(cargo_key) or "").strip()
+
+        cleaned[nome_key] = nome_manual
+        cleaned[cargo_key] = cargo_manual
+
+        if servidor:
+            cleaned[modo_key] = PlanoTrabalho.COORDENADOR_MODO_SERVIDOR
+            cleaned[nome_key] = ""
+            cleaned[cargo_key] = ""
+            return
+
+        cleaned[modo_key] = PlanoTrabalho.COORDENADOR_MODO_MANUAL
+        cleaned[servidor_key] = None
+
     def save(self, commit=True):
         instance = super().save(commit=False)
         if getattr(self, "cleaned_destinos", None):
@@ -412,18 +438,12 @@ class PlanoDiariasForm(forms.ModelForm):
             "chegada_sede_hora",
         ]
         widgets = {
-            "saida_sede_data": forms.DateInput(
-                attrs={"type": "date", "class": "cv-field__control", "data-pt-diarias-input": "true"},
-                format="%Y-%m-%d",
-            ),
+            "saida_sede_data": forms.HiddenInput(attrs={"data-cv-date-picker-value": "true", "data-pt-diarias-input": "true"}),
             "saida_sede_hora": forms.TimeInput(
                 attrs={"type": "time", "class": "cv-field__control", "data-pt-diarias-input": "true"},
                 format="%H:%M",
             ),
-            "chegada_sede_data": forms.DateInput(
-                attrs={"type": "date", "class": "cv-field__control", "data-pt-diarias-input": "true"},
-                format="%Y-%m-%d",
-            ),
+            "chegada_sede_data": forms.HiddenInput(attrs={"data-cv-date-picker-value": "true", "data-pt-diarias-input": "true"}),
             "chegada_sede_hora": forms.TimeInput(
                 attrs={"type": "time", "class": "cv-field__control", "data-pt-diarias-input": "true"},
                 format="%H:%M",
@@ -452,8 +472,19 @@ class PlanoDiariasForm(forms.ModelForm):
 class EfetivoPlanoForm(forms.ModelForm):
     class Meta:
         model = EfetivoPlano
-        fields = ["cargo", "quantidade"]
+        fields = ["unidade", "cargo", "quantidade"]
         widgets = {
+            "unidade": forms.Select(
+                attrs={
+                    "class": "cv-search-picker__native",
+                    "data-cv-search-picker": "true",
+                    "data-picker-mode": "single",
+                    "data-picker-variant": "compact",
+                    "data-placeholder": "Buscar unidade...",
+                    "data-empty-message": "Nenhuma unidade encontrada.",
+                    "data-pt-efetivo-unidade": "true",
+                }
+            ),
             "cargo": forms.Select(attrs={"class": "form-select", "data-pt-efetivo-cargo": "true"}),
             "quantidade": forms.NumberInput(
                 attrs={"class": "cv-field__control", "min": "1", "step": "1", "data-pt-efetivo-qtd": "true"},
@@ -462,8 +493,26 @@ class EfetivoPlanoForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["unidade"].queryset = Unidade.objects.order_by("nome")
+        self.fields["unidade"].empty_label = ""
         self.fields["cargo"].queryset = Cargo.objects.order_by("nome")
         self.fields["cargo"].empty_label = "Selecione o cargo"
+
+    def clean(self):
+        cleaned = super().clean()
+        if cleaned.get("DELETE"):
+            return cleaned
+
+        unidade = cleaned.get("unidade")
+        cargo = cleaned.get("cargo")
+        quantidade = cleaned.get("quantidade")
+        if not any([unidade, cargo, quantidade]):
+            return cleaned
+        if not unidade:
+            self.add_error("unidade", "Selecione a unidade.")
+        if not cargo:
+            self.add_error("cargo", "Selecione o cargo.")
+        return cleaned
 
 
 EfetivoPlanoFormSet = inlineformset_factory(
@@ -485,6 +534,48 @@ class ProgramaSolicitanteForm(forms.ModelForm):
             "nome": forms.TextInput(attrs={"class": "cv-field__control", "data-mask": "upper"}),
             "ordem": forms.NumberInput(attrs={"class": "cv-field__control", "min": "0", "step": "1"}),
         }
+
+
+class AtividadePlanoTrabalhoForm(forms.ModelForm):
+    """CRUD do catálogo de atividades (meta obrigatória, recurso opcional)."""
+
+    class Meta:
+        model = AtividadePlanoTrabalho
+        fields = ["codigo", "nome", "meta", "recurso_necessario", "ordem", "ativo"]
+        widgets = {
+            "codigo": forms.TextInput(
+                attrs={"class": "cv-field__control", "placeholder": "Ex.: CIN", "autocomplete": "off"},
+            ),
+            "nome": forms.TextInput(
+                attrs={"class": "cv-field__control", "autocomplete": "off"},
+            ),
+            "meta": forms.Textarea(
+                attrs={"rows": 4, "class": "cv-field__control cv-field__control--textarea"},
+            ),
+            "recurso_necessario": forms.Textarea(
+                attrs={"rows": 4, "class": "cv-field__control cv-field__control--textarea"},
+            ),
+            "ordem": forms.NumberInput(attrs={"class": "cv-field__control", "min": "0", "step": "10"}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["meta"].required = True
+        self.fields["recurso_necessario"].required = False
+
+    def clean_codigo(self):
+        codigo = (self.cleaned_data.get("codigo") or "").strip()
+        if not codigo:
+            raise forms.ValidationError("Informe o código da atividade.")
+        normalizado = slugify(codigo).replace("-", "_").upper()
+        if not normalizado:
+            raise forms.ValidationError("Código inválido.")
+        qs = AtividadePlanoTrabalho.objects.filter(codigo=normalizado)
+        if self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise forms.ValidationError("Já existe uma atividade com este código.")
+        return normalizado
 
 
 class HorarioAtendimentoForm(forms.ModelForm):

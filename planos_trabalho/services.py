@@ -22,6 +22,7 @@ from roteiros.services.diarias import calculate_periodized_diarias
 from roteiros.services.diarias import formatar_valor_diarias
 from roteiros.services.valor_extenso import valor_por_extenso_ptbr
 
+from .models import AtividadePlanoTrabalho
 from .models import PlanoTrabalho
 
 logger = logging.getLogger(__name__)
@@ -67,10 +68,22 @@ TEXTO_COORDENADOR_OP = (
 # ── Textos padrão ────────────────────────────────────────────────────────────
 
 
+_MUNICIPIO_PLACEHOLDER = "________"
+
+
 def _municipio_display(plano: PlanoTrabalho) -> str:
-    if plano.destino_cidade_id:
-        return format_city_uf(f"{plano.destino_cidade.nome}/{plano.destino_cidade.uf}")
-    return "________"
+    labels: list[str] = []
+    if plano.pk:
+        for destino in plano.destinos.select_related("cidade").order_by("ordem", "pk"):
+            if destino.cidade_id:
+                labels.append(format_city_uf(f"{destino.cidade.nome}/{destino.cidade.uf}"))
+    if not labels and plano.destino_cidade_id:
+        labels.append(format_city_uf(f"{plano.destino_cidade.nome}/{plano.destino_cidade.uf}"))
+    vistos: list[str] = []
+    for label in labels:
+        if label and label not in vistos:
+            vistos.append(label)
+    return ", ".join(vistos) if vistos else _MUNICIPIO_PLACEHOLDER
 
 
 def _programa_display(plano: PlanoTrabalho) -> str:
@@ -91,8 +104,34 @@ def texto_padrao_consideracao_final(plano: PlanoTrabalho) -> str:
     return TEXTO_PADRAO_CONSIDERACAO_FINAL.format(municipio=_municipio_display(plano))
 
 
+def textos_padrao_templates() -> dict[str, str]:
+    """Modelos brutos (com tokens {municipio}/{programa}) para a pré-visualização no cliente."""
+    return {
+        "contextualizacao": TEXTO_PADRAO_CONTEXTUALIZACAO,
+        "consideracao_final": TEXTO_PADRAO_CONSIDERACAO_FINAL,
+    }
+
+
+def sincronizar_textos_padrao(plano: PlanoTrabalho) -> list[str]:
+    """Regenera os textos cujo flag `*_auto` está ativo (sem tocar nos editados à mão).
+
+    Retorna a lista de campos alterados, para uso em ``save(update_fields=...)``.
+    """
+    alterados: list[str] = []
+    if plano.contextualizacao_auto:
+        plano.contextualizacao = texto_padrao_contextualizacao(plano)
+        alterados.append("contextualizacao")
+    if plano.consideracao_auto:
+        plano.consideracao_final = texto_padrao_consideracao_final(plano)
+        alterados.append("consideracao_final")
+    return alterados
+
+
 def aplicar_textos_padrao(plano: PlanoTrabalho) -> list[str]:
-    """Preenche contextualização/considerações quando vazias. Retorna campos alterados."""
+    """Preenche contextualização/considerações quando vazias. Retorna campos alterados.
+
+    Mantida por compatibilidade; o fluxo do wizard usa ``sincronizar_textos_padrao``.
+    """
     alterados: list[str] = []
     if not (plano.contextualizacao or "").strip():
         plano.contextualizacao = texto_padrao_contextualizacao(plano)
@@ -320,6 +359,96 @@ def montar_valor_do_plano_texto(plano: PlanoTrabalho) -> str:
     )
 
 
+# ── Atividades, metas e recursos (etapa 3) ───────────────────────────────────
+
+
+CODIGO_UNIDADE_MOVEL = "UNIDADE_MOVEL"
+
+TEXTO_UNIDADE_MOVEL = (
+    "Estrutura: Unidade móvel da PCPR equipada para atendimento e confecção de documentos."
+)
+
+
+def atividades_catalogo_ativas() -> list[AtividadePlanoTrabalho]:
+    """Catálogo de atividades ativas, na ordem oficial (ordem, nome)."""
+    return list(AtividadePlanoTrabalho.objects.filter(ativo=True).order_by("ordem", "nome"))
+
+
+def _atividades_selecionadas_ordenadas(plano: PlanoTrabalho) -> list[AtividadePlanoTrabalho]:
+    """Atividades marcadas no plano, sempre na ordem oficial do catálogo."""
+    if not plano.pk:
+        return []
+    return list(plano.atividades_selecionadas.order_by("ordem", "nome"))
+
+
+def montar_atividades_texto(itens: list[AtividadePlanoTrabalho]) -> str:
+    """Lista das atividades selecionadas (uma por linha)."""
+    return "\n".join(f"• {item.nome}" for item in itens)
+
+
+def montar_metas_texto(itens: list[AtividadePlanoTrabalho]) -> str:
+    """Metas correspondentes às atividades, na ordem oficial, sem duplicar."""
+    metas: list[str] = []
+    vistos: set[str] = set()
+    for item in itens:
+        meta = (item.meta or "").strip()
+        if meta and meta not in vistos:
+            vistos.add(meta)
+            metas.append(meta)
+    return "\n\n".join(metas)
+
+
+def montar_recursos_texto(itens: list[AtividadePlanoTrabalho]) -> str:
+    """Texto-base de recursos a partir das atividades (recurso é opcional)."""
+    if not itens:
+        return ""
+    atividades = "; ".join(item.nome for item in itens)
+    recursos_itens: list[str] = []
+    vistos: set[str] = set()
+    for item in itens:
+        recurso = (item.recurso_necessario or "").strip()
+        if recurso and recurso not in vistos:
+            vistos.add(recurso)
+            recursos_itens.append(f"• {recurso}")
+    linhas = [
+        (
+            "Recursos operacionais, materiais de atendimento, equipamentos de apoio "
+            "e suporte logístico compatíveis com as atividades selecionadas."
+        ),
+        f"Escopo previsto: {atividades}.",
+    ]
+    if recursos_itens:
+        linhas.append("Recursos específicos por atividade:")
+        linhas.extend(recursos_itens)
+    if any(item.codigo == CODIGO_UNIDADE_MOVEL for item in itens):
+        linhas.append("Prever unidade móvel institucional e o suporte operacional associado.")
+    return "\n".join(linhas)
+
+
+def montar_unidade_movel_texto(itens: list[AtividadePlanoTrabalho]) -> str:
+    """Texto do placeholder {{unidade_movel}} — só quando a atividade está marcada."""
+    if any(item.codigo == CODIGO_UNIDADE_MOVEL for item in itens):
+        return TEXTO_UNIDADE_MOVEL
+    return ""
+
+
+def sincronizar_atividades(plano: PlanoTrabalho, *, save: bool = True) -> list[str]:
+    """Regenera os textos de etapa 3 a partir das atividades selecionadas.
+
+    Retorna a lista de campos alterados (para ``save(update_fields=...)``).
+    Deve ser chamada após persistir o M2M ``atividades_selecionadas``.
+    """
+    itens = _atividades_selecionadas_ordenadas(plano)
+    plano.atividades = montar_atividades_texto(itens)
+    plano.metas = montar_metas_texto(itens)
+    plano.recursos_necessarios = montar_recursos_texto(itens)
+    plano.unidade_movel_texto = montar_unidade_movel_texto(itens)
+    campos = ["atividades", "metas", "recursos_necessarios", "unidade_movel_texto"]
+    if save:
+        plano.save(update_fields=[*campos, "updated_at"])
+    return campos
+
+
 # ── Avaliação de etapas (stepper) ────────────────────────────────────────────
 
 
@@ -344,6 +473,12 @@ def avaliar_etapa_efetivo_diarias(plano: PlanoTrabalho) -> str:
         return "complete"
     if tem_efetivo or plano.saida_sede_data or plano.chegada_sede_data:
         return "incomplete"
+    return "not_started"
+
+
+def avaliar_etapa_atividades(plano: PlanoTrabalho) -> str:
+    if plano.pk and plano.atividades_selecionadas.exists():
+        return "complete"
     return "not_started"
 
 

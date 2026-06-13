@@ -23,11 +23,13 @@ from documentos.services.timing import measure_step
 from documentos.services.types import DocumentoFormato
 from documentos.services.types import DocumentoTipo
 
+from .forms import AtividadePlanoTrabalhoForm
 from .forms import EfetivoPlanoFormSet
 from .forms import HorarioAtendimentoForm
 from .forms import PlanoDiariasForm
 from .forms import PlanoIdentificacaoForm
 from .forms import ProgramaSolicitanteForm
+from .models import AtividadePlanoTrabalho
 from .models import PlanoTrabalho
 from .models import HorarioAtendimento
 from .models import ProgramaSolicitante
@@ -36,8 +38,9 @@ from .presenters import apresentar_plano_wizard_header
 from .presenters import apresentar_plano_wizard_page_steps
 from .presenters import apresentar_plano_wizard_steps
 from .presenters import apresentar_plano_wizard_summary
-from .services import aplicar_textos_padrao
+from .services import atividades_catalogo_ativas
 from .services import atualizar_snapshot_diarias
+from .services import avaliar_etapa_atividades
 from .services import avaliar_etapa_efetivo_diarias
 from .services import avaliar_etapa_identificacao
 from .services import avaliar_pendencias_documento
@@ -46,8 +49,13 @@ from .services import criar_plano_rascunho
 from .services import gerar_resposta_plano_documento
 from .services import marcar_plano_gerado
 from .services import montar_efetivo_texto
+from .services import sincronizar_atividades
 from .services import montar_texto_coordenacao
 from .services import montar_valor_do_plano_texto
+from .services import sincronizar_textos_padrao
+from .services import texto_padrao_consideracao_final
+from .services import texto_padrao_contextualizacao
+from .services import textos_padrao_templates
 
 
 # ── Helpers do wizard (clone do shell de ofícios) ───────────────────────────
@@ -79,7 +87,7 @@ def _wizard_steps_ctx(*, plano=None, etapa_atual="identificacao"):
         etapa_atual=etapa_atual,
         identificacao_status=avaliar_etapa_identificacao(plano) if plano else None,
         efetivo_diarias_status=avaliar_etapa_efetivo_diarias(plano) if plano else None,
-        atividades_status="not_started",
+        atividades_status=avaliar_etapa_atividades(plano) if plano else None,
         documentos_status="complete" if plano and plano.status == PlanoTrabalho.STATUS_GERADO else "not_started",
     )
     return {
@@ -275,6 +283,12 @@ def editar(request, pk):
 # ── Etapa 1 — Identificação e atuação ───────────────────────────────────────
 
 
+def _texto_auto_flag(form, plano, post_name, attr):
+    if form.is_bound:
+        return (form.data.get(post_name, "1") or "0").strip() != "0"
+    return getattr(plano, attr)
+
+
 def _identificacao_context(*, form, plano):
     return {
         "page_title": "Plano de Trabalho",
@@ -283,13 +297,16 @@ def _identificacao_context(*, form, plano):
         "api_cidades_por_estado_url": reverse("roteiros:api_cidades_por_estado", kwargs={"estado_id": 0}),
         "evento_selected_dates_json": _evento_selected_dates_json(form),
         "evento_display": _evento_display_values(form),
-        "servidor_create_url": reverse("cadastros:servidor_create"),
+        "cargos_url": reverse("cadastros:cargos_index"),
         "programas_url": reverse("planos_trabalho:programas_index"),
         "horarios_url": reverse("planos_trabalho:horarios_index"),
         "wizard_autosave_url": reverse("planos_trabalho:identificacao_autosave", args=[plano.pk]),
         "wizard_autosave_step": "identificacao",
         "coordenador_adm_modo_atual": plano.coordenador_adm_modo,
         "coordenador_op_modo_atual": plano.coordenador_op_modo,
+        "pt_textos_padrao_templates": textos_padrao_templates(),
+        "contextualizacao_auto": _texto_auto_flag(form, plano, "contextualizacao_auto", "contextualizacao_auto"),
+        "consideracao_auto": _texto_auto_flag(form, plano, "consideracao_auto", "consideracao_auto"),
     }
 
 
@@ -300,9 +317,10 @@ def wizard_identificacao(request, pk):
         nav_action = _wizard_normalizar_acao(request.POST)
         if form.is_valid():
             plano = form.save()
-            campos_texto = aplicar_textos_padrao(plano)
-            if campos_texto:
-                plano.save(update_fields=[*campos_texto, "updated_at"])
+            plano.contextualizacao_auto = (request.POST.get("contextualizacao_auto", "1") or "0").strip() != "0"
+            plano.consideracao_auto = (request.POST.get("consideracao_auto", "1") or "0").strip() != "0"
+            campos_texto = sincronizar_textos_padrao(plano)
+            plano.save(update_fields=[*{*campos_texto, "contextualizacao_auto", "consideracao_auto"}, "updated_at"])
             if plano.saida_sede_data and plano.chegada_sede_data:
                 atualizar_snapshot_diarias(plano)
             if nav_action == "wizard_next":
@@ -313,6 +331,13 @@ def wizard_identificacao(request, pk):
                 return redirect("planos_trabalho:index")
             messages.success(request, "Identificação salva.")
             return redirect("planos_trabalho:wizard_identificacao", pk=plano.pk)
+    else:
+        # GET: mostra o texto padrão já preenchido (destino + programa) enquanto o
+        # campo estiver no modo automático — o usuário pode sobrescrever quando quiser.
+        if plano.contextualizacao_auto:
+            form.initial["contextualizacao"] = texto_padrao_contextualizacao(plano)
+        if plano.consideracao_auto:
+            form.initial["consideracao_final"] = texto_padrao_consideracao_final(plano)
     return render(
         request,
         "planos_trabalho/wizard_identificacao.html",
@@ -341,7 +366,19 @@ def identificacao_autosave(request, pk):
             message="Alguns campos ainda precisam de ajuste antes do autosave.",
             errors=_autosave_form_errors(form),
         )
-    form.save()
+    plano = form.save()
+    # Edição direta do texto desliga o modo automático; mudança de destino/programa
+    # mantém o texto padrão sincronizado quando ainda estiver no modo automático.
+    flag_updates: list[str] = []
+    if "contextualizacao" in clean_fields:
+        plano.contextualizacao_auto = False
+        flag_updates.append("contextualizacao_auto")
+    if "consideracao_final" in clean_fields:
+        plano.consideracao_auto = False
+        flag_updates.append("consideracao_auto")
+    campos_texto = sincronizar_textos_padrao(plano)
+    if campos_texto or flag_updates:
+        plano.save(update_fields=[*{*campos_texto, *flag_updates}, "updated_at"])
     return autosave_json_response(ok=True, object_id=plano.pk, version=_plano_autosave_version(plano))
 
 
@@ -355,9 +392,33 @@ def _efetivo_diarias_context(*, formset, diarias_form, plano, resultado=None):
         **_wizard_shell_ctx(plano=plano, etapa_atual="efetivo_diarias"),
         "formset": formset,
         "diarias_form": diarias_form,
+        "diarias_display": _diarias_display_values(diarias_form),
         "diarias_resultado": resultado,
-        "cargo_create_url": reverse("cadastros:cargo_create"),
+        "cargos_url": reverse("cadastros:cargos_index"),
         "api_calcular_diarias_url": reverse("planos_trabalho:api_calcular_diarias", args=[plano.pk]),
+    }
+
+
+def _diarias_display_values(form):
+    def as_display(value):
+        if not value:
+            return ""
+        if hasattr(value, "strftime"):
+            return value.strftime("%d/%m/%Y")
+        value = str(value).strip()
+        if len(value) == 10 and value[4:5] == "-" and value[7:8] == "-":
+            partes = value.split("-")
+            return f"{partes[2]}/{partes[1]}/{partes[0]}"
+        return value
+
+    if form.is_bound:
+        return {
+            "saida_data": as_display(form.data.get("saida_sede_data")),
+            "chegada_data": as_display(form.data.get("chegada_sede_data")),
+        }
+    return {
+        "saida_data": as_display(getattr(form.instance, "saida_sede_data", None)),
+        "chegada_data": as_display(getattr(form.instance, "chegada_sede_data", None)),
     }
 
 
@@ -440,24 +501,176 @@ def api_calcular_diarias(request, pk):
     )
 
 
-# ── Etapa 3 — Atividades, metas e recursos (placeholder) ─────────────────────
+# ── Etapa 3 — Atividades, metas e recursos ───────────────────────────────────
+
+
+def _atividades_context(*, plano, catalogo, selected_codes):
+    """Monta catálogo (com flag de seleção), JSON p/ o preview ao vivo e listas iniciais."""
+    catalogo_view = [
+        {
+            "codigo": item.codigo,
+            "nome": item.nome,
+            "meta": item.meta,
+            "recurso_necessario": item.recurso_necessario,
+            "selected": item.codigo in selected_codes,
+        }
+        for item in catalogo
+    ]
+    catalogo_data = [
+        {
+            "codigo": item.codigo,
+            "nome": item.nome,
+            "meta": item.meta,
+            "recurso": item.recurso_necessario,
+        }
+        for item in catalogo
+    ]
+    selecionados = [item for item in catalogo if item.codigo in selected_codes]
+    metas_preview = []
+    vistas = set()
+    for item in selecionados:
+        meta = (item.meta or "").strip()
+        if meta and meta not in vistas:
+            vistas.add(meta)
+            metas_preview.append(meta)
+    recursos_preview = []
+    vistos = set()
+    for item in selecionados:
+        recurso = (item.recurso_necessario or "").strip()
+        if recurso and recurso not in vistos:
+            vistos.add(recurso)
+            recursos_preview.append(recurso)
+    return {
+        "page_title": "Plano de Trabalho",
+        **_wizard_shell_ctx(plano=plano, etapa_atual="atividades"),
+        "atividades_catalogo": catalogo_view,
+        "atividades_catalogo_data": catalogo_data,
+        "atividades_selecionadas_total": len(selecionados),
+        "metas_preview": metas_preview,
+        "recursos_preview": recursos_preview,
+        "atividades_manager_url": reverse("planos_trabalho:atividades_index"),
+    }
 
 
 def wizard_atividades(request, pk):
     plano = _get_plano(pk)
+    catalogo = atividades_catalogo_ativas()
     if request.method == "POST":
         nav_action = _wizard_normalizar_acao(request.POST)
+        codigos = request.POST.getlist("atividades_codigos")
+        selecionadas = [item for item in catalogo if item.codigo in codigos]
+        plano.atividades_selecionadas.set(selecionadas)
+        sincronizar_atividades(plano)
         if nav_action == "wizard_back":
+            messages.success(request, "Atividades salvas.")
             return redirect("planos_trabalho:wizard_efetivo_diarias", pk=plano.pk)
         if nav_action == "save_draft_list":
+            messages.success(request, "Plano salvo. Retornamos à lista.")
             return redirect("planos_trabalho:index")
-        return redirect("planos_trabalho:wizard_documentos", pk=plano.pk)
+        if nav_action == "wizard_next":
+            messages.success(request, "Atividades salvas. Continue com o resumo e os documentos.")
+            return redirect("planos_trabalho:wizard_documentos", pk=plano.pk)
+        messages.success(request, "Atividades salvas.")
+        return redirect("planos_trabalho:wizard_atividades", pk=plano.pk)
+
+    selected_codes = set(plano.atividades_selecionadas.values_list("codigo", flat=True))
     return render(
         request,
         "planos_trabalho/wizard_atividades.html",
+        _atividades_context(plano=plano, catalogo=catalogo, selected_codes=selected_codes),
+    )
+
+
+# ── Catálogo de atividades (clone do CRUD de programas) ──────────────────────
+
+
+def _truncar(texto: str, limite: int = 90) -> str:
+    texto = (texto or "").strip()
+    return texto if len(texto) <= limite else texto[: limite - 1].rstrip() + "…"
+
+
+def atividades_index(request):
+    atividades = AtividadePlanoTrabalho.objects.order_by("ordem", "nome")
+    linhas = [
         {
-            "page_title": "Plano de Trabalho",
-            **_wizard_shell_ctx(plano=plano, etapa_atual="atividades"),
+            "title": atividade.nome,
+            "badges": [atividade.codigo],
+            "meta": [
+                {"label": "Meta", "value": _truncar(atividade.meta)},
+                {"label": "Recurso", "value": _truncar(atividade.recurso_necessario) or "—"},
+                {"label": "Status", "value": "Ativa" if atividade.ativo else "Inativa"},
+                {"label": "Ordem", "value": str(atividade.ordem)},
+            ],
+            "edit_url": reverse("planos_trabalho:atividade_editar", args=[atividade.pk]),
+            "delete_url": reverse("planos_trabalho:atividade_excluir", args=[atividade.pk]),
+        }
+        for atividade in atividades
+    ]
+    return render(
+        request,
+        "planos_trabalho/atividades/index.html",
+        {
+            "page_title": "Gerenciamento de atividades",
+            "page_description": "Cadastre, edite e organize atividades com metas e recursos.",
+            "linhas": linhas,
+            "create_url": reverse("planos_trabalho:atividade_novo"),
+            "back_url": reverse("planos_trabalho:index"),
+        },
+    )
+
+
+def atividade_novo(request):
+    form = AtividadePlanoTrabalhoForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Atividade cadastrada.")
+        return redirect("planos_trabalho:atividades_index")
+    return render(
+        request,
+        "planos_trabalho/atividades/form.html",
+        {
+            "page_title": "Nova atividade",
+            "page_description": "Ao adicionar uma atividade, o preenchimento de meta é obrigatório.",
+            "form": form,
+            "back_url": reverse("planos_trabalho:atividades_index"),
+        },
+    )
+
+
+def atividade_editar(request, pk):
+    atividade = get_object_or_404(AtividadePlanoTrabalho, pk=pk)
+    form = AtividadePlanoTrabalhoForm(request.POST or None, instance=atividade)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Atividade atualizada.")
+        return redirect("planos_trabalho:atividades_index")
+    return render(
+        request,
+        "planos_trabalho/atividades/form.html",
+        {
+            "page_title": f"Editar atividade — {atividade.nome}",
+            "page_description": "Atualize a meta e o recurso necessário desta atividade.",
+            "form": form,
+            "atividade": atividade,
+            "back_url": reverse("planos_trabalho:atividades_index"),
+        },
+    )
+
+
+def atividade_excluir(request, pk):
+    atividade = get_object_or_404(AtividadePlanoTrabalho, pk=pk)
+    if request.method == "POST":
+        nome = atividade.nome
+        atividade.delete()
+        messages.success(request, f"Atividade “{nome}” excluída.")
+        return redirect("planos_trabalho:atividades_index")
+    return render(
+        request,
+        "planos_trabalho/atividades/confirm_delete.html",
+        {
+            "page_title": "Excluir atividade",
+            "atividade": atividade,
+            "cancel_url": reverse("planos_trabalho:atividades_index"),
         },
     )
 

@@ -10,6 +10,7 @@ from cadastros.models import Cidade
 from cadastros.models import ConfiguracaoSistema
 from cadastros.models import Estado
 from cadastros.models import Servidor
+from cadastros.models import Unidade
 
 from planos_trabalho.models import EfetivoPlano
 from planos_trabalho.models import PlanoTrabalho
@@ -53,7 +54,8 @@ def criar_plano_maringa(maringa, *, efetivo=6):
         chegada_sede_hora=time(14, 0),
     )
     cargo = Cargo.objects.get_or_create(nome="Policial Civil")[0]
-    EfetivoPlano.objects.create(plano=plano, cargo=cargo, quantidade=efetivo)
+    unidade = Unidade.objects.get_or_create(nome="Assessoria de Comunicação Social", sigla="ASCOM")[0]
+    EfetivoPlano.objects.create(plano=plano, unidade=unidade, cargo=cargo, quantidade=efetivo)
     return plano
 
 

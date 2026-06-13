@@ -28,6 +28,35 @@
             {% include "components/forms/form_field.html" with field=form.programa_outros label="Outro programa" only %}
           </div>
         </div>
+        <section class="wizard-inner-section" aria-labelledby="pt-coordenadores-title" style="margin-top: var(--space-5);">
+          <div class="field-grid">
+            <div class="field field-size-2 app-form-field" data-pt-coordenador-panel="adm">
+              {{ form.coordenador_adm_modo }}
+              <div class="field-grid">
+                {% include "components/forms/form_field.html" with field=form.coordenador_adm label="Coordenador administrativo" size_class="field-size-2" only %}
+                <div class="field-size-2">
+                  <div class="field-grid field-grid--cols-3">
+                    {% include "components/forms/form_field.html" with field=form.coordenador_adm_nome_manual label="Nome" size_class="field-size-2" only %}
+                    {% include "components/forms/input_with_action.html" with field=form.coordenador_adm_cargo_manual label="Cargo" action_url=cargos_url action_label="Gerenciar cargos" size_class="field-size-1" only %}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="field field-size-2 app-form-field" data-pt-coordenador-panel="op">
+              {{ form.coordenador_op_modo }}
+              <div class="field-grid">
+                {% include "components/forms/form_field.html" with field=form.coordenador_op label="Coordenador operacional (opcional)" size_class="field-size-2" only %}
+                <div class="field-size-2">
+                  <div class="field-grid field-grid--cols-3">
+                    {% include "components/forms/form_field.html" with field=form.coordenador_op_nome_manual label="Nome" size_class="field-size-2" only %}
+                    {% include "components/forms/input_with_action.html" with field=form.coordenador_op_cargo_manual label="Cargo" action_url=cargos_url action_label="Gerenciar cargos" size_class="field-size-1" only %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
     </section>
 
@@ -114,7 +143,7 @@
                 </div>
                 <div class="cv-search-picker__selected-list roteiro-destinos-list">
                   {% for row in form.destination_rows %}
-                    <div class="cv-search-picker__selected-card destino-row destino-row--single termo-destino-row" data-pt-destino-row data-pt-destino-index="{{ row.index }}">
+                    <div class="cv-search-picker__selected-card destino-row{% if row.is_primary %} destino-row--single{% endif %} termo-destino-row" data-pt-destino-row data-pt-destino-index="{{ row.index }}">
                       <div class="cv-search-picker__selected-main">
                         <div class="cv-search-picker__selected-title-row">
                           <span class="cv-search-picker__selected-name">Destino{% if not row.is_primary %} {{ forloop.counter }}{% endif %}</span>
@@ -168,7 +197,7 @@
             {% if form.destino_estado.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.destino_estado.errors only %}{% endif %}
             {% if form.destino_cidade.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.destino_cidade.errors only %}{% endif %}
             <template data-pt-destino-template>
-              <div class="cv-search-picker__selected-card destino-row destino-row--single termo-destino-row" data-pt-destino-row data-pt-destino-index="__index__">
+              <div class="cv-search-picker__selected-card destino-row termo-destino-row" data-pt-destino-row data-pt-destino-index="__index__">
                 <div class="cv-search-picker__selected-main">
                   <div class="cv-search-picker__selected-title-row">
                     <span class="cv-search-picker__selected-name">Destino</span>
@@ -235,75 +264,18 @@
       </div>
     </section>
 
-    {# ── 3. Coordenadores (modo dual clonado do motorista) ───── #}
-    <section class="cv-wizard-section-card termo-card" id="pt-card-coordenadores">
-      <header class="cv-wizard-section-header">
-        <div class="cv-wizard-section-header__copy">
-          <h3 class="cv-wizard-section-title">Coordenadores</h3>
-          <p class="cv-wizard-section-subtitle">O coordenador administrativo é obrigatório; o operacional é opcional — deixe em branco quando não houver.</p>
-        </div>
-        <div class="cv-wizard-section-header__actions">
-          {% include "components/buttons/action_button.html" with href=servidor_create_url label="Cadastrar servidor" variant="secondary" data_autosave_link=True only %}
-        </div>
-      </header>
-      <div class="cv-wizard-section-body">
-        <div class="field-grid">
-
-          <div class="field field-size-2 app-form-field" data-pt-coordenador-panel="adm">
-            <div class="cv-field__label-row" style="display:flex; align-items:center; justify-content:space-between; gap: var(--space-2);">
-              <label class="cv-field__label">Coordenador administrativo</label>
-              <div class="cv-segment-toggle" role="group" aria-label="Modo de preenchimento do coordenador administrativo" data-pt-coordenador-toggle="adm">
-                <button type="button" class="cv-segment-toggle__btn" data-pt-coordenador-btn="adm" data-value="SERVIDOR" aria-pressed="{% if coordenador_adm_modo_atual != 'MANUAL' %}true{% else %}false{% endif %}">No sistema</button>
-                <button type="button" class="cv-segment-toggle__btn" data-pt-coordenador-btn="adm" data-value="MANUAL" aria-pressed="{% if coordenador_adm_modo_atual == 'MANUAL' %}true{% else %}false{% endif %}">Manual</button>
-              </div>
-            </div>
-            {{ form.coordenador_adm_modo }}
-            <div data-pt-coordenador-servidor="adm" {% if coordenador_adm_modo_atual == 'MANUAL' %}hidden{% endif %}>
-              {{ form.coordenador_adm }}
-              {% if form.coordenador_adm.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.coordenador_adm.errors only %}{% endif %}
-            </div>
-            <div data-pt-coordenador-manual="adm" {% if coordenador_adm_modo_atual != 'MANUAL' %}hidden{% endif %}>
-              <div class="field-grid">
-                {% include "components/forms/form_field.html" with field=form.coordenador_adm_nome_manual label="Nome" size_class="field-size-2" only %}
-                {% include "components/forms/form_field.html" with field=form.coordenador_adm_cargo_manual label="Cargo" size_class="field-size-2" only %}
-              </div>
-            </div>
-          </div>
-
-          <div class="field field-size-2 app-form-field" data-pt-coordenador-panel="op">
-            <div class="cv-field__label-row" style="display:flex; align-items:center; justify-content:space-between; gap: var(--space-2);">
-              <label class="cv-field__label">Coordenador operacional (opcional)</label>
-              <div class="cv-segment-toggle" role="group" aria-label="Modo de preenchimento do coordenador operacional" data-pt-coordenador-toggle="op">
-                <button type="button" class="cv-segment-toggle__btn" data-pt-coordenador-btn="op" data-value="SERVIDOR" aria-pressed="{% if coordenador_op_modo_atual != 'MANUAL' %}true{% else %}false{% endif %}">No sistema</button>
-                <button type="button" class="cv-segment-toggle__btn" data-pt-coordenador-btn="op" data-value="MANUAL" aria-pressed="{% if coordenador_op_modo_atual == 'MANUAL' %}true{% else %}false{% endif %}">Manual</button>
-              </div>
-            </div>
-            {{ form.coordenador_op_modo }}
-            <div data-pt-coordenador-servidor="op" {% if coordenador_op_modo_atual == 'MANUAL' %}hidden{% endif %}>
-              {{ form.coordenador_op }}
-              {% if form.coordenador_op.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.coordenador_op.errors only %}{% endif %}
-            </div>
-            <div data-pt-coordenador-manual="op" {% if coordenador_op_modo_atual != 'MANUAL' %}hidden{% endif %}>
-              <div class="field-grid">
-                {% include "components/forms/form_field.html" with field=form.coordenador_op_nome_manual label="Nome" size_class="field-size-2" only %}
-                {% include "components/forms/form_field.html" with field=form.coordenador_op_cargo_manual label="Cargo" size_class="field-size-2" only %}
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </section>
-
-    {# ── 4. Textos do documento ──────────────────────────────── #}
-    <section class="cv-wizard-section-card termo-card" id="pt-card-textos">
+    {# ── 3. Textos do documento ──────────────────────────────── #}
+    {{ pt_textos_padrao_templates|json_script:"pt-textos-padrao-data" }}
+    <section class="cv-wizard-section-card termo-card" id="pt-card-textos" data-pt-textos>
       <header class="cv-wizard-section-header">
         <div class="cv-wizard-section-header__copy">
           <h3 class="cv-wizard-section-title">Textos do documento</h3>
-          <p class="cv-wizard-section-subtitle">Deixe em branco para o sistema gerar o texto padrão com o destino e o programa selecionados.</p>
+          <p class="cv-wizard-section-subtitle">Já preenchidos com o texto padrão a partir do destino e do programa. Edite livremente quando quiser — o que você escrever é mantido.</p>
         </div>
       </header>
       <div class="cv-wizard-section-body">
+        <input type="hidden" name="contextualizacao_auto" value="{% if contextualizacao_auto %}1{% else %}0{% endif %}" data-pt-texto-auto-flag="contextualizacao">
+        <input type="hidden" name="consideracao_auto" value="{% if consideracao_auto %}1{% else %}0{% endif %}" data-pt-texto-auto-flag="consideracao_final">
         <div class="field-grid">
           {% include "components/forms/form_field.html" with field=form.contextualizacao label="Breve contextualização" size_class="field-size-4" only %}
           {% include "components/forms/form_field.html" with field=form.consideracao_final label="Considerações finais" size_class="field-size-4" only %}
@@ -317,5 +289,5 @@
 
 {% block extra_js %}
   {{ block.super }}
-  <script src="{% static 'js/pages/planos-trabalho-wizard.js' %}?v=20260612c" defer></script>
+  <script src="{% static 'js/pages/planos-trabalho-wizard.js' %}?v=20260613a" defer></script>
 {% endblock %}

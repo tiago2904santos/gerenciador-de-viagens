@@ -37,6 +37,26 @@ class TextosPadraoTests(TestCase):
         self.assertIn("Maringá/PR", plano.contextualizacao)
         self.assertEqual(plano.consideracao_final, "Texto editado pelo usuário.")
 
+    def test_sincronizar_textos_padrao_respeita_flags(self):
+        from planos_trabalho.services import sincronizar_textos_padrao
+
+        plano = criar_plano_maringa(self.maringa)
+        plano.contextualizacao = "Mantido pelo usuário."
+        plano.contextualizacao_auto = False
+        plano.consideracao_auto = True
+        alterados = sincronizar_textos_padrao(plano)
+        self.assertEqual(alterados, ["consideracao_final"])
+        self.assertEqual(plano.contextualizacao, "Mantido pelo usuário.")
+        self.assertIn("Maringá/PR", plano.consideracao_final)
+
+    def test_templates_expostos_para_o_cliente(self):
+        from planos_trabalho.services import textos_padrao_templates
+
+        templates = textos_padrao_templates()
+        self.assertIn("{municipio}", templates["contextualizacao"])
+        self.assertIn("{programa}", templates["contextualizacao"])
+        self.assertIn("{municipio}", templates["consideracao_final"])
+
 
 class PeriodoExtensoTests(TestCase):
     def test_mesmo_mes(self):

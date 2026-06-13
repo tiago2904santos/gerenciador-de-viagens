@@ -5,6 +5,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from cadastros.models import Cargo
+from cadastros.models import Unidade
 
 from planos_trabalho.forms import PlanoIdentificacaoForm
 from planos_trabalho.models import EfetivoPlano
@@ -53,6 +54,49 @@ class PlanoWizardViewsTests(TestCase):
         ):
             response = self.client.get(reverse(name, args=[plano.pk]))
             self.assertEqual(response.status_code, 200, msg=name)
+
+    def test_get_identificacao_pre_preenche_textos_padrao(self):
+        plano = criar_plano_maringa(self.maringa)
+        response = self.client.get(reverse("planos_trabalho:wizard_identificacao", args=[plano.pk]))
+        self.assertEqual(response.status_code, 200)
+        conteudo = response.content.decode("utf-8")
+        self.assertIn("Maringá/PR", conteudo)
+        self.assertIn("PCPR na Comunidade", conteudo)
+
+    def test_edicao_manual_do_texto_nao_e_sobrescrita(self):
+        plano = criar_plano_maringa(self.maringa)
+        response = self.client.post(
+            reverse("planos_trabalho:wizard_identificacao", args=[plano.pk]),
+            {
+                "action": "save_draft",
+                "programa": "",
+                "programa_outros": "",
+                "destino_estado": self.maringa.estado_id,
+                "destino_cidade": self.maringa.pk,
+                "data_evento_inicio": "2026-06-25",
+                "data_evento_fim": "2026-06-27",
+                "horario_atendimento": "09:00 até 17:00",
+                "contextualizacao": "Texto que o usuário escreveu à mão.",
+                "consideracao_final": "",
+                "contextualizacao_auto": "0",
+                "consideracao_auto": "1",
+                "coordenador_adm_modo": "SERVIDOR",
+                "coordenador_adm": "",
+                "coordenador_adm_nome_manual": "",
+                "coordenador_adm_cargo_manual": "",
+                "coordenador_op_modo": "SERVIDOR",
+                "coordenador_op": "",
+                "coordenador_op_nome_manual": "",
+                "coordenador_op_cargo_manual": "",
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        plano.refresh_from_db()
+        self.assertFalse(plano.contextualizacao_auto)
+        self.assertEqual(plano.contextualizacao, "Texto que o usuário escreveu à mão.")
+        # Considerações continuam automáticas e refletem o destino.
+        self.assertTrue(plano.consideracao_auto)
+        self.assertIn("Maringá/PR", plano.consideracao_final)
 
     def test_post_identificacao_salva_e_preenche_textos_padrao(self):
         plano = criar_plano_maringa(self.maringa)
@@ -125,6 +169,42 @@ class PlanoWizardViewsTests(TestCase):
         self.assertEqual(plano.programa_outros, "Programa piloto do interior")
         self.assertIn("Programa Piloto do Interior", plano.contextualizacao)
 
+    def test_post_identificacao_aceita_coordenador_manual_quando_servidor_nao_existe(self):
+        plano = criar_plano_maringa(self.maringa)
+        cargo = Cargo.objects.create(nome="ANALISTA DE PROJETOS")
+        response = self.client.post(
+            reverse("planos_trabalho:wizard_identificacao", args=[plano.pk]),
+            {
+                "action": "wizard_next",
+                "programa": "",
+                "programa_outros": "",
+                "destino_estado": self.maringa.estado_id,
+                "destino_cidade": self.maringa.pk,
+                "data_evento_inicio": "2026-06-25",
+                "data_evento_fim": "2026-06-27",
+                "horario_atendimento": "09:00 até 17:00",
+                "contextualizacao": "",
+                "consideracao_final": "",
+                "coordenador_adm_modo": "",
+                "coordenador_adm": "",
+                "coordenador_adm_nome_manual": "Maria da Silva",
+                "coordenador_adm_cargo_manual": cargo.nome,
+                "coordenador_op_modo": "",
+                "coordenador_op": "",
+                "coordenador_op_nome_manual": "",
+                "coordenador_op_cargo_manual": "",
+            },
+        )
+        self.assertRedirects(
+            response,
+            reverse("planos_trabalho:wizard_efetivo_diarias", args=[plano.pk]),
+        )
+        plano.refresh_from_db()
+        self.assertEqual(plano.coordenador_adm_modo, PlanoTrabalho.COORDENADOR_MODO_MANUAL)
+        self.assertIsNone(plano.coordenador_adm)
+        self.assertEqual(plano.coordenador_adm_nome_manual, "Maria da Silva")
+        self.assertEqual(plano.coordenador_adm_cargo_manual, cargo.nome)
+
     def test_post_identificacao_salva_multiplos_destinos(self):
         plano = criar_plano_maringa(self.maringa)
         response = self.client.post(
@@ -179,6 +259,7 @@ class PlanoWizardViewsTests(TestCase):
     def test_post_efetivo_diarias_salva_e_calcula_snapshot(self):
         plano = criar_plano_maringa(self.maringa, efetivo=6)
         efetivo = plano.efetivos.first()
+        unidade = efetivo.unidade
         response = self.client.post(
             reverse("planos_trabalho:wizard_efetivo_diarias", args=[plano.pk]),
             {
@@ -189,6 +270,7 @@ class PlanoWizardViewsTests(TestCase):
                 "efetivo-MAX_NUM_FORMS": "1000",
                 "efetivo-0-id": efetivo.pk,
                 "efetivo-0-plano": plano.pk,
+                "efetivo-0-unidade": unidade.pk,
                 "efetivo-0-cargo": efetivo.cargo_id,
                 "efetivo-0-quantidade": "6",
                 "saida_sede_data": "2026-06-24",
@@ -204,6 +286,42 @@ class PlanoWizardViewsTests(TestCase):
         plano.refresh_from_db()
         self.assertEqual(plano.diarias_composicao, "4 x 100% + 1 x 15%")
         self.assertEqual(str(plano.diarias_valor_total), "7234.68")
+
+    def test_post_efetivo_diarias_aceita_multiplas_linhas_com_unidades_distintas(self):
+        plano = criar_plano_maringa(self.maringa, efetivo=6)
+        efetivo = plano.efetivos.first()
+        unidade_extra = Unidade.objects.create(nome="Delegacia Regional", sigla="DR")
+        cargo_extra = Cargo.objects.create(nome="Investigador")
+        response = self.client.post(
+            reverse("planos_trabalho:wizard_efetivo_diarias", args=[plano.pk]),
+            {
+                "action": "wizard_next",
+                "efetivo-TOTAL_FORMS": "2",
+                "efetivo-INITIAL_FORMS": "1",
+                "efetivo-MIN_NUM_FORMS": "1",
+                "efetivo-MAX_NUM_FORMS": "1000",
+                "efetivo-0-id": efetivo.pk,
+                "efetivo-0-plano": plano.pk,
+                "efetivo-0-unidade": efetivo.unidade_id,
+                "efetivo-0-cargo": efetivo.cargo_id,
+                "efetivo-0-quantidade": "6",
+                "efetivo-1-id": "",
+                "efetivo-1-plano": plano.pk,
+                "efetivo-1-unidade": unidade_extra.pk,
+                "efetivo-1-cargo": cargo_extra.pk,
+                "efetivo-1-quantidade": "2",
+                "saida_sede_data": "2026-06-24",
+                "saida_sede_hora": "07:00",
+                "chegada_sede_data": "2026-06-28",
+                "chegada_sede_hora": "14:00",
+            },
+        )
+        self.assertRedirects(
+            response,
+            reverse("planos_trabalho:wizard_atividades", args=[plano.pk]),
+        )
+        plano.refresh_from_db()
+        self.assertEqual(plano.efetivos.count(), 2)
 
     def test_api_calcular_diarias_ao_vivo(self):
         plano = criar_plano_maringa(self.maringa, efetivo=6)

@@ -4,20 +4,17 @@
 {% block extra_css %}
   {{ block.super }}
   <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260612-pt">
+  <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260612e-pt">
 {% endblock %}
 
 {% block wizard_content %}
   <div data-pt-efetivo-diarias data-api-calcular-url="{{ api_calcular_diarias_url }}">
 
-    {# ── 1. Efetivo por cargo ───────────────────────────────── #}
     <section class="cv-wizard-section-card termo-card" id="pt-card-efetivo">
       <header class="cv-wizard-section-header">
         <div class="cv-wizard-section-header__copy">
           <h3 class="cv-wizard-section-title">Efetivo</h3>
-          <p class="cv-wizard-section-subtitle">Composição da equipe por cargo e quantidade. O total entra no cálculo das diárias.</p>
-        </div>
-        <div class="cv-wizard-section-header__actions">
-          {% include "components/buttons/action_button.html" with href=cargo_create_url label="Cadastrar cargo" variant="secondary" data_autosave_link=True only %}
+          <p class="cv-wizard-section-subtitle">Composição da equipe por unidade, cargo e quantidade. O total entra no cálculo das diárias.</p>
         </div>
       </header>
       <div class="cv-wizard-section-body">
@@ -25,58 +22,63 @@
         {% if formset.non_form_errors %}
           {% include "components/ui/feedback/field_error.html" with errors=formset.non_form_errors only %}
         {% endif %}
-        <div class="pt-efetivo-rows" data-pt-efetivo-rows>
-          {% for efetivo_form in formset %}
-            <div class="field-grid pt-efetivo-row" data-pt-efetivo-row>
-              {% for hidden in efetivo_form.hidden_fields %}{{ hidden }}{% endfor %}
-              <div class="field field-size-2 app-form-field">
-                <label class="cv-field__label" for="{{ efetivo_form.cargo.id_for_label }}">Cargo</label>
-                {{ efetivo_form.cargo }}
-                {% if efetivo_form.cargo.errors %}{% include "components/ui/feedback/field_error.html" with errors=efetivo_form.cargo.errors only %}{% endif %}
-              </div>
-              <div class="field field-size-1 app-form-field">
-                <label class="cv-field__label" for="{{ efetivo_form.quantidade.id_for_label }}">Quantidade</label>
-                {{ efetivo_form.quantidade }}
-                {% if efetivo_form.quantidade.errors %}{% include "components/ui/feedback/field_error.html" with errors=efetivo_form.quantidade.errors only %}{% endif %}
-              </div>
-              <div class="field field-size-1 app-form-field pt-efetivo-row__remove">
-                {% if efetivo_form.instance.pk %}
-                  <label class="cv-field__label">Remover</label>
-                  {{ efetivo_form.DELETE }}
-                {% else %}
-                  <label class="cv-field__label" aria-hidden="true">&nbsp;</label>
-                  <button type="button" class="cv-btn cv-btn--secondary cv-btn--sm" data-pt-efetivo-remove hidden><span>Remover</span></button>
-                  <div hidden>{{ efetivo_form.DELETE }}</div>
-                {% endif %}
-              </div>
+        <div class="cv-search-picker">
+          <section class="cv-search-picker__selected-panel roteiro-destinos-panel" aria-label="Efetivos do plano">
+            <div class="cv-search-picker__selected-header roteiro-destinos-panel__header">
+              <h4 class="cv-search-picker__selected-title">Efetivos adicionados</h4>
+              <button type="button" class="cv-btn cv-btn--secondary cv-btn--sm" data-pt-efetivo-add>
+                <span>+ Adicionar efetivo</span>
+              </button>
             </div>
-          {% endfor %}
+            <div class="cv-search-picker__selected-list roteiro-destinos-list pt-efetivo-rows" data-pt-efetivo-rows>
+              {% for efetivo_form in formset %}
+                <div class="cv-search-picker__selected-card destino-row{% if forloop.first and formset|length == 1 %} destino-row--single{% endif %} termo-destino-row pt-efetivo-card" data-pt-efetivo-row>
+                  {% for hidden in efetivo_form.hidden_fields %}{{ hidden }}{% endfor %}
+                  <div hidden>{{ efetivo_form.DELETE }}</div>
+                  <div class="cv-search-picker__selected-main">
+                    <div class="field-grid pt-efetivo-card__grid">
+                      <div class="field field-size-2 app-form-field">
+                        <label class="cv-field__label" for="{{ efetivo_form.unidade.id_for_label }}">Unidade</label>
+                        {{ efetivo_form.unidade }}
+                        {% if efetivo_form.unidade.errors %}{% include "components/ui/feedback/field_error.html" with errors=efetivo_form.unidade.errors only %}{% endif %}
+                      </div>
+                      {% include "components/forms/input_with_action.html" with field=efetivo_form.cargo action_url=cargos_url action_label="Gerenciar cargos" size_class="field-size-1" only %}
+                      <div class="field field-size-1 app-form-field">
+                        <label class="cv-field__label" for="{{ efetivo_form.quantidade.id_for_label }}">Quantidade</label>
+                        {{ efetivo_form.quantidade }}
+                        {% if efetivo_form.quantidade.errors %}{% include "components/ui/feedback/field_error.html" with errors=efetivo_form.quantidade.errors only %}{% endif %}
+                      </div>
+                    </div>
+                  </div>
+                  <button type="button" class="cv-search-picker__remove btn-remover-destino" title="Remover efetivo" aria-label="Remover efetivo" {% if forloop.first and formset|length == 1 %}hidden{% endif %} data-pt-efetivo-remove>x</button>
+                </div>
+              {% endfor %}
+            </div>
+          </section>
         </div>
         <template data-pt-efetivo-template>
-          <div class="field-grid pt-efetivo-row" data-pt-efetivo-row>
+          <div class="cv-search-picker__selected-card destino-row termo-destino-row pt-efetivo-card" data-pt-efetivo-row>
             {% for hidden in formset.empty_form.hidden_fields %}{{ hidden }}{% endfor %}
-            <div class="field field-size-2 app-form-field">
-              <label class="cv-field__label" for="{{ formset.empty_form.cargo.id_for_label }}">Cargo</label>
-              {{ formset.empty_form.cargo }}
+            <div hidden>{{ formset.empty_form.DELETE }}</div>
+            <div class="cv-search-picker__selected-main">
+              <div class="field-grid pt-efetivo-card__grid">
+                <div class="field field-size-2 app-form-field">
+                  <label class="cv-field__label" for="{{ formset.empty_form.unidade.id_for_label }}">Unidade</label>
+                  {{ formset.empty_form.unidade }}
+                </div>
+                {% include "components/forms/input_with_action.html" with field=formset.empty_form.cargo action_url=cargos_url action_label="Gerenciar cargos" size_class="field-size-1" only %}
+                <div class="field field-size-1 app-form-field">
+                  <label class="cv-field__label" for="{{ formset.empty_form.quantidade.id_for_label }}">Quantidade</label>
+                  {{ formset.empty_form.quantidade }}
+                </div>
+              </div>
             </div>
-            <div class="field field-size-1 app-form-field">
-              <label class="cv-field__label" for="{{ formset.empty_form.quantidade.id_for_label }}">Quantidade</label>
-              {{ formset.empty_form.quantidade }}
-            </div>
-            <div class="field field-size-1 app-form-field pt-efetivo-row__remove">
-              <label class="cv-field__label" aria-hidden="true">&nbsp;</label>
-              <button type="button" class="cv-btn cv-btn--secondary cv-btn--sm" data-pt-efetivo-remove><span>Remover</span></button>
-              <div hidden>{{ formset.empty_form.DELETE }}</div>
-            </div>
+            <button type="button" class="cv-search-picker__remove btn-remover-destino" title="Remover efetivo" aria-label="Remover efetivo" data-pt-efetivo-remove>x</button>
           </div>
         </template>
-        <div class="termo-actions" style="margin-top: var(--space-3);">
-          <button type="button" class="cv-btn cv-btn--secondary cv-btn--sm" data-pt-efetivo-add><span>+ Adicionar cargo</span></button>
-        </div>
       </div>
     </section>
 
-    {# ── 2. Deslocamento (4 inputs do motor de diárias) ─────── #}
     <section class="cv-wizard-section-card termo-card" id="pt-card-diarias">
       <header class="cv-wizard-section-header">
         <div class="cv-wizard-section-header__copy">
@@ -85,10 +87,82 @@
         </div>
       </header>
       <div class="cv-wizard-section-body">
-        <div class="field-grid">
-          {% include "components/forms/form_field.html" with field=diarias_form.saida_sede_data label="Data de saída da sede" size_class="field-size-1" only %}
+        <div class="field-grid pt-diarias-grid">
+          <div class="field cv-field">
+            <label class="cv-field__label" for="id_pt_saida_sede_data_display">Data de saída da sede</label>
+            <div class="cv-date-picker" data-cv-date-picker data-mode="single" data-initial-date="{{ diarias_display.saida_data|default:'' }}">
+              <div class="cv-date-picker__control">
+                <input
+                  type="text"
+                  class="cv-field__control"
+                  id="id_pt_saida_sede_data_display"
+                  placeholder="dd/mm/aaaa"
+                  autocomplete="off"
+                  inputmode="numeric"
+                  maxlength="10"
+                  value="{{ diarias_display.saida_data|default:'' }}"
+                  data-cv-date-picker-display
+                  readonly
+                >
+                <button type="button" class="cv-date-picker__trigger cv-date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-label="Abrir calendário">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                </button>
+              </div>
+              {{ diarias_form.saida_sede_data }}
+              <div class="cv-date-picker__panel" hidden data-cv-date-picker-panel>
+                <div class="cv-date-picker__panel-header">
+                  <button class="cv-date-picker__nav" type="button" data-cv-date-picker-prev aria-label="Mês anterior">Anterior</button>
+                  <div class="cv-date-picker__month" data-cv-date-picker-month></div>
+                  <button class="cv-date-picker__nav" type="button" data-cv-date-picker-next aria-label="Próximo mês">Próximo</button>
+                </div>
+                <div class="cv-date-picker__weekdays" data-cv-date-picker-weekdays></div>
+                <div class="cv-date-picker__days" data-cv-date-picker-days></div>
+                <div class="cv-date-picker__footer">
+                  <button type="button" class="cv-date-picker__footer-action" data-cv-date-picker-today>Hoje</button>
+                  <button type="button" class="cv-date-picker__footer-action" data-cv-date-picker-clear>Limpar</button>
+                </div>
+              </div>
+            </div>
+            {% if diarias_form.saida_sede_data.errors %}{% include "components/ui/feedback/field_error.html" with errors=diarias_form.saida_sede_data.errors only %}{% endif %}
+          </div>
           {% include "components/forms/form_field.html" with field=diarias_form.saida_sede_hora label="Hora de saída" size_class="field-size-1" only %}
-          {% include "components/forms/form_field.html" with field=diarias_form.chegada_sede_data label="Data de chegada na sede" size_class="field-size-1" only %}
+          <div class="field cv-field">
+            <label class="cv-field__label" for="id_pt_chegada_sede_data_display">Data de chegada na sede</label>
+            <div class="cv-date-picker" data-cv-date-picker data-mode="single" data-initial-date="{{ diarias_display.chegada_data|default:'' }}">
+              <div class="cv-date-picker__control">
+                <input
+                  type="text"
+                  class="cv-field__control"
+                  id="id_pt_chegada_sede_data_display"
+                  placeholder="dd/mm/aaaa"
+                  autocomplete="off"
+                  inputmode="numeric"
+                  maxlength="10"
+                  value="{{ diarias_display.chegada_data|default:'' }}"
+                  data-cv-date-picker-display
+                  readonly
+                >
+                <button type="button" class="cv-date-picker__trigger cv-date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-label="Abrir calendário">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                </button>
+              </div>
+              {{ diarias_form.chegada_sede_data }}
+              <div class="cv-date-picker__panel" hidden data-cv-date-picker-panel>
+                <div class="cv-date-picker__panel-header">
+                  <button class="cv-date-picker__nav" type="button" data-cv-date-picker-prev aria-label="Mês anterior">Anterior</button>
+                  <div class="cv-date-picker__month" data-cv-date-picker-month></div>
+                  <button class="cv-date-picker__nav" type="button" data-cv-date-picker-next aria-label="Próximo mês">Próximo</button>
+                </div>
+                <div class="cv-date-picker__weekdays" data-cv-date-picker-weekdays></div>
+                <div class="cv-date-picker__days" data-cv-date-picker-days></div>
+                <div class="cv-date-picker__footer">
+                  <button type="button" class="cv-date-picker__footer-action" data-cv-date-picker-today>Hoje</button>
+                  <button type="button" class="cv-date-picker__footer-action" data-cv-date-picker-clear>Limpar</button>
+                </div>
+              </div>
+            </div>
+            {% if diarias_form.chegada_sede_data.errors %}{% include "components/ui/feedback/field_error.html" with errors=diarias_form.chegada_sede_data.errors only %}{% endif %}
+          </div>
           {% include "components/forms/form_field.html" with field=diarias_form.chegada_sede_hora label="Hora de chegada" size_class="field-size-1" only %}
         </div>
 
@@ -141,5 +215,5 @@
 
 {% block extra_js %}
   {{ block.super }}
-  <script src="{% static 'js/pages/planos-trabalho-wizard.js' %}?v=20260612a" defer></script>
+  <script src="{% static 'js/pages/planos-trabalho-wizard.js' %}?v=20260612c" defer></script>
 {% endblock %}

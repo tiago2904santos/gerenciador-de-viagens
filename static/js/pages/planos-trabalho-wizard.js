@@ -167,6 +167,19 @@
       var holder = document.createElement("div");
       holder.innerHTML = html.trim();
       var row = holder.firstElementChild;
+      var existingRows = Array.prototype.slice.call(form.querySelectorAll("[data-pt-destino-row]"));
+      var referenceRow = existingRows.length ? existingRows[existingRows.length - 1] : null;
+      var referenceState = referenceRow ? referenceRow.querySelector("[data-pt-destino-state]") : null;
+      var referenceStateId = referenceState
+        ? String(referenceState.value || referenceState.dataset.pickerInitialValue || "").trim()
+        : "";
+      if (referenceStateId) {
+        var newStateSelect = row.querySelector("[data-pt-destino-state]");
+        if (newStateSelect) {
+          newStateSelect.value = referenceStateId;
+          newStateSelect.dataset.pickerInitialValue = referenceStateId;
+        }
+      }
       list.appendChild(row);
       bindDestinationRow(form, row);
       initPickers(form);
@@ -195,6 +208,111 @@
 
     programaSelect.addEventListener("change", applyProgramaMode);
     applyProgramaMode();
+  }
+
+  /* ── Textos padrão: pré-preenchimento ao vivo (editável) ───── */
+
+  var _PT_MINORES = { de: 1, da: 1, do: 1, das: 1, dos: 1, e: 1, a: 1, o: 1, no: 1, na: 1, em: 1, "à": 1 };
+
+  function ptTitleCase(value) {
+    return String(value || "")
+      .toLowerCase()
+      .split(/\s+/)
+      .map(function (word, index) {
+        if (!word) return word;
+        if (index > 0 && _PT_MINORES[word]) return word;
+        return word.charAt(0).toUpperCase() + word.slice(1);
+      })
+      .join(" ");
+  }
+
+  function computeMunicipio(form) {
+    var labels = [];
+    Array.prototype.slice.call(form.querySelectorAll("[data-pt-destino-row]")).forEach(function (row) {
+      if (row.hidden) return;
+      var stateSelect = row.querySelector("[data-pt-destino-state]");
+      var citySelect = row.querySelector("[data-pt-destino-city]");
+      if (!citySelect || !citySelect.value) return;
+      var cityOption = citySelect.options[citySelect.selectedIndex];
+      var cityText = cityOption ? cityOption.text.trim() : "";
+      if (!cityText) return;
+      var uf = "";
+      if (stateSelect && stateSelect.options[stateSelect.selectedIndex]) {
+        var match = stateSelect.options[stateSelect.selectedIndex].text.match(/\(([A-Za-z]{2})\)/);
+        if (match) uf = match[1].toUpperCase();
+      }
+      var label = ptTitleCase(cityText) + (uf ? "/" + uf : "");
+      if (labels.indexOf(label) < 0) labels.push(label);
+    });
+    return labels.length ? labels.join(", ") : "________";
+  }
+
+  function computePrograma(form) {
+    var select = form.querySelector("[data-pt-programa-select]");
+    if (!select) return "________";
+    var outroValue = select.dataset.ptProgramaOutroValue || "__outro__";
+    if (select.value === outroValue) {
+      var input = form.querySelector("input[name='programa_outros']");
+      var raw = input ? input.value.trim() : "";
+      return raw ? ptTitleCase(raw) : "________";
+    }
+    if (!select.value) return "________";
+    var option = select.options[select.selectedIndex];
+    return option ? ptTitleCase(option.text.trim()) : "________";
+  }
+
+  function initTextosPadrao(form) {
+    var dataEl = document.getElementById("pt-textos-padrao-data");
+    if (!dataEl) return;
+    var templates = {};
+    try { templates = JSON.parse(dataEl.textContent || "{}"); } catch (e) { templates = {}; }
+
+    var programmatic = false;
+    var fields = [
+      { name: "contextualizacao", flag: "contextualizacao" },
+      { name: "consideracao_final", flag: "consideracao_final" },
+    ];
+
+    fields.forEach(function (field) {
+      field.textarea = form.querySelector("textarea[name='" + field.name + "']");
+      field.flagInput = form.querySelector("[data-pt-texto-auto-flag='" + field.flag + "']");
+      if (field.textarea) {
+        field.textarea.addEventListener("input", function () {
+          if (programmatic) return;
+          if (field.flagInput) field.flagInput.value = "0";
+        });
+      }
+    });
+
+    function regenerate() {
+      var municipio = computeMunicipio(form);
+      var programa = computePrograma(form);
+      fields.forEach(function (field) {
+        if (!field.textarea || !field.flagInput) return;
+        if (field.flagInput.value !== "1") return; // usuário já editou manualmente
+        var template = templates[field.name] || "";
+        if (!template) return;
+        programmatic = true;
+        field.textarea.value = template
+          .replace(/\{municipio\}/g, municipio)
+          .replace(/\{programa\}/g, programa);
+        programmatic = false;
+      });
+    }
+
+    form.addEventListener("change", function (event) {
+      var target = event.target;
+      if (!target) return;
+      if (
+        target.matches("[data-pt-destino-city], [data-pt-destino-state], [data-pt-programa-select]") ||
+        target.name === "programa_outros"
+      ) {
+        regenerate();
+      }
+    });
+    form.addEventListener("input", function (event) {
+      if (event.target && event.target.name === "programa_outros") regenerate();
+    });
   }
 
   /* ── Date picker sync (clonado de ordens-servico-form.js) ──── */
@@ -256,35 +374,6 @@
     renderFromDates();
   }
 
-  /* ── Coordenadores: toggle SERVIDOR ↔ MANUAL (clone do motorista) ── */
-
-  function initCoordenadorToggle(form, papel) {
-    var hidden = form.querySelector("input[name='coordenador_" + papel + "_modo']");
-    var buttons = Array.prototype.slice.call(
-      form.querySelectorAll("[data-pt-coordenador-btn='" + papel + "']"),
-    );
-    var servidorPanel = form.querySelector("[data-pt-coordenador-servidor='" + papel + "']");
-    var manualPanel = form.querySelector("[data-pt-coordenador-manual='" + papel + "']");
-    if (!hidden || !buttons.length) return;
-
-    function applyMode(mode) {
-      hidden.value = mode;
-      hidden.dispatchEvent(new Event("change", { bubbles: true }));
-      buttons.forEach(function (btn) {
-        btn.setAttribute("aria-pressed", btn.dataset.value === mode ? "true" : "false");
-      });
-      if (servidorPanel) servidorPanel.hidden = mode === "MANUAL";
-      if (manualPanel) manualPanel.hidden = mode !== "MANUAL";
-    }
-
-    buttons.forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        applyMode(btn.dataset.value);
-      });
-    });
-    applyMode(hidden.value || "SERVIDOR");
-  }
-
   /* ── Etapa 2: linhas de efetivo (formset dinâmico) ─────────── */
 
   function initEfetivoFormset(scope) {
@@ -302,26 +391,53 @@
       var row = holder.firstElementChild;
       rowsContainer.appendChild(row);
       totalInput.value = String(index + 1);
-      var removeBtn = row.querySelector("[data-pt-efetivo-remove]");
-      if (removeBtn) {
-        removeBtn.hidden = false;
-        removeBtn.addEventListener("click", function () {
-          row.remove();
-          notifyEfetivoChanged(scope);
-        });
-      }
       bindEfetivoInputs(scope, row);
+      initPickers(scope);
+      updateEfetivoRemoveButtons(scope);
     });
 
     Array.prototype.slice.call(rowsContainer.querySelectorAll("[data-pt-efetivo-row]")).forEach(function (row) {
       bindEfetivoInputs(scope, row);
     });
+    updateEfetivoRemoveButtons(scope);
   }
 
   function bindEfetivoInputs(scope, row) {
+    var removeBtn = row.querySelector("[data-pt-efetivo-remove]");
+    if (removeBtn && row.dataset.ptEfetivoRemoveReady !== "true") {
+      row.dataset.ptEfetivoRemoveReady = "true";
+      removeBtn.addEventListener("click", function () {
+        var deleteInput = row.querySelector("input[name$='-DELETE']");
+        var idInput = row.querySelector("input[name$='-id']");
+        if (deleteInput && idInput && idInput.value) {
+          deleteInput.checked = true;
+          row.hidden = true;
+        } else {
+          row.remove();
+        }
+        updateEfetivoRemoveButtons(scope);
+        notifyEfetivoChanged(scope);
+      });
+    }
+
     Array.prototype.slice.call(row.querySelectorAll("input, select")).forEach(function (input) {
       input.addEventListener("change", function () { notifyEfetivoChanged(scope); });
       input.addEventListener("input", function () { notifyEfetivoChanged(scope); });
+    });
+  }
+
+  function updateEfetivoRemoveButtons(scope) {
+    var visibleRows = Array.prototype.slice.call(scope.querySelectorAll("[data-pt-efetivo-row]")).filter(function (row) {
+      if (row.hidden) return false;
+      var deleteInput = row.querySelector("input[name$='-DELETE']");
+      return !(deleteInput && deleteInput.checked);
+    });
+
+    visibleRows.forEach(function (row, index) {
+      var removeBtn = row.querySelector("[data-pt-efetivo-remove]");
+      if (!removeBtn) return;
+      removeBtn.hidden = visibleRows.length <= 1 && index === 0;
+      row.classList.toggle("destino-row--single", visibleRows.length <= 1 && index === 0);
     });
   }
 
@@ -330,9 +446,11 @@
     Array.prototype.slice.call(scope.querySelectorAll("[data-pt-efetivo-row]")).forEach(function (row) {
       var deleteInput = row.querySelector("input[name$='-DELETE']");
       if (deleteInput && deleteInput.checked) return;
+      if (row.hidden) return;
+      var unidade = row.querySelector("select[name$='-unidade']");
       var cargo = row.querySelector("select[name$='-cargo']");
       var qtd = row.querySelector("input[name$='-quantidade']");
-      if (!cargo || !cargo.value) return;
+      if (!unidade || !unidade.value || !cargo || !cargo.value) return;
       var n = parseInt((qtd && qtd.value) || "0", 10);
       if (!isNaN(n) && n > 0) total += n;
     });
@@ -416,6 +534,123 @@
     });
   }
 
+  /* ── Etapa 3: seleção de atividades + preview ao vivo ──────── */
+
+  function pad2(value) {
+    return value < 10 ? "0" + value : String(value);
+  }
+
+  function buildCatalogMap() {
+    var dataEl = document.getElementById("pt-atividades-data");
+    var map = {};
+    if (!dataEl) return map;
+    var list = [];
+    try { list = JSON.parse(dataEl.textContent || "[]"); } catch (e) { list = []; }
+    list.forEach(function (item) {
+      if (item && item.codigo) map[item.codigo] = item;
+    });
+    return map;
+  }
+
+  function renderLiveList(listEl, emptyEl, countEl, values) {
+    if (countEl) countEl.textContent = String(values.length);
+    if (listEl) {
+      listEl.innerHTML = "";
+      values.forEach(function (text, index) {
+        var li = document.createElement("li");
+        li.className = "pt-live-entry";
+        var idx = document.createElement("span");
+        idx.className = "pt-live-entry-index";
+        idx.textContent = pad2(index + 1);
+        var span = document.createElement("span");
+        span.className = "pt-live-entry-text";
+        span.textContent = text;
+        li.appendChild(idx);
+        li.appendChild(span);
+        listEl.appendChild(li);
+      });
+    }
+    if (emptyEl) emptyEl.hidden = values.length > 0;
+  }
+
+  function initAtividades(scope) {
+    var catalog = buildCatalogMap();
+    var counter = scope.querySelector("[data-pt-activity-counter]");
+    var checkboxes = Array.prototype.slice.call(scope.querySelectorAll("[data-pt-activity-checkbox]"));
+    var selectAll = scope.querySelector("[data-pt-activity-select-all]");
+    var clearBtn = scope.querySelector("[data-pt-activity-clear]");
+    var search = scope.querySelector("[data-pt-activity-search]");
+    var items = Array.prototype.slice.call(scope.querySelectorAll("[data-pt-activity-item]"));
+    var emptyFilter = scope.querySelector("[data-pt-activity-empty]");
+
+    var metasList = scope.querySelector("[data-pt-live-metas-list]");
+    var metasEmpty = scope.querySelector("[data-pt-live-metas-empty]");
+    var metasCount = scope.querySelector("[data-pt-live-metas-count]");
+    var recursosList = scope.querySelector("[data-pt-live-recursos-list]");
+    var recursosEmpty = scope.querySelector("[data-pt-live-recursos-empty]");
+    var recursosCount = scope.querySelector("[data-pt-live-recursos-count]");
+
+    function refresh() {
+      var checked = checkboxes.filter(function (cb) { return cb.checked; });
+      if (counter) {
+        counter.textContent = checked.length + " selecionadas";
+        counter.classList.toggle("is-active", checked.length > 0);
+      }
+      var metas = [];
+      var metasSeen = {};
+      var recursos = [];
+      var recursosSeen = {};
+      checked.forEach(function (cb) {
+        var item = catalog[cb.value];
+        if (!item) return;
+        var meta = (item.meta || "").trim();
+        if (meta && !metasSeen[meta]) { metasSeen[meta] = true; metas.push(meta); }
+        var recurso = (item.recurso || "").trim();
+        if (recurso && !recursosSeen[recurso]) { recursosSeen[recurso] = true; recursos.push(recurso); }
+      });
+      renderLiveList(metasList, metasEmpty, metasCount, metas);
+      renderLiveList(recursosList, recursosEmpty, recursosCount, recursos);
+    }
+
+    checkboxes.forEach(function (cb) {
+      cb.addEventListener("change", refresh);
+    });
+
+    if (selectAll) {
+      selectAll.addEventListener("click", function () {
+        checkboxes.forEach(function (cb) {
+          var item = cb.closest("[data-pt-activity-item]");
+          if (item && item.hidden) return; // respeita o filtro de busca
+          cb.checked = true;
+        });
+        refresh();
+      });
+    }
+
+    if (clearBtn) {
+      clearBtn.addEventListener("click", function () {
+        checkboxes.forEach(function (cb) { cb.checked = false; });
+        refresh();
+      });
+    }
+
+    if (search) {
+      search.addEventListener("input", function () {
+        var term = (search.value || "").trim().toLowerCase();
+        var anyVisible = false;
+        items.forEach(function (item) {
+          var name = item.dataset.nome || "";
+          var match = !term || name.indexOf(term) >= 0;
+          item.hidden = !match;
+          if (match) anyVisible = true;
+        });
+        if (emptyFilter) emptyFilter.hidden = anyVisible;
+      });
+    }
+
+    refresh();
+  }
+
   /* ── Bootstrap ──────────────────────────────────────────────── */
 
   document.addEventListener("DOMContentLoaded", function () {
@@ -424,14 +659,18 @@
       syncProgramaOutros(identificacao);
       syncDestinationCities(identificacao);
       syncEventDates(identificacao);
-      initCoordenadorToggle(identificacao, "adm");
-      initCoordenadorToggle(identificacao, "op");
+      initTextosPadrao(identificacao);
     }
 
     var efetivoDiarias = document.querySelector("[data-pt-efetivo-diarias]");
     if (efetivoDiarias) {
       initEfetivoFormset(efetivoDiarias);
       initDiariasLiveCalc(efetivoDiarias);
+    }
+
+    var atividades = document.querySelector("[data-pt-atividades]");
+    if (atividades) {
+      initAtividades(atividades);
     }
   });
 })();
