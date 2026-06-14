@@ -43,6 +43,7 @@ class TextosPadraoTests(TestCase):
         plano = criar_plano_maringa(self.maringa)
         plano.contextualizacao = "Mantido pelo usuário."
         plano.contextualizacao_auto = False
+        plano.coordenacao_auto = False
         plano.consideracao_auto = True
         alterados = sincronizar_textos_padrao(plano)
         self.assertEqual(alterados, ["consideracao_final"])
@@ -55,7 +56,21 @@ class TextosPadraoTests(TestCase):
         templates = textos_padrao_templates()
         self.assertIn("{municipio}", templates["contextualizacao"])
         self.assertIn("{programa}", templates["contextualizacao"])
+        self.assertIn("{cargo_nome}", templates["coordenacao_adm"])
+        self.assertIn("{designado}", templates["coordenacao_adm"])
+        self.assertIn("{cargo_nome}", templates["coordenacao_op"])
+        self.assertIn("{artigo}", templates["coordenacao_op"])
         self.assertIn("{municipio}", templates["consideracao_final"])
+
+    def test_sincronizar_textos_padrao_preenche_coordenacao(self):
+        from planos_trabalho.services import sincronizar_textos_padrao
+
+        plano = criar_plano_maringa(self.maringa)
+        plano.coordenador_adm = criar_servidor()
+        alterados = sincronizar_textos_padrao(plano)
+        self.assertIn("coordenacao", alterados)
+        self.assertIn("Coordenador Administrativo", plano.coordenacao)
+        self.assertIn("Papiloscopista Juliana Villela de Barros", plano.coordenacao)
 
 
 class PeriodoExtensoTests(TestCase):
@@ -87,9 +102,18 @@ class CoordenacaoTests(TestCase):
     def test_coordenador_adm_servidor_do_banco(self):
         self.plano.coordenador_adm = criar_servidor()
         texto = montar_texto_coordenacao(self.plano)
-        self.assertIn("Coordenador(a) Administrativo(a)", texto)
+        self.assertIn("Coordenador Administrativo", texto)
         self.assertIn("Papiloscopista Juliana Villela de Barros", texto)
         self.assertNotIn("Operacional", texto)
+
+    def test_coordenador_adm_feminino(self):
+        self.plano.coordenador_adm = criar_servidor()
+        self.plano.coordenador_adm_genero = PlanoTrabalho.COORDENADOR_GENERO_FEMININO
+        texto = montar_texto_coordenacao(self.plano)
+        self.assertIn("Fica designada", texto)
+        self.assertIn("Coordenadora Administrativa", texto)
+        self.assertIn("a Papiloscopista Juliana Villela de Barros", texto)
+        self.assertIn("a qual ficará responsável", texto)
 
     def test_coordenador_adm_manual(self):
         self.plano.coordenador_adm_modo = PlanoTrabalho.COORDENADOR_MODO_MANUAL
@@ -104,7 +128,7 @@ class CoordenacaoTests(TestCase):
         self.plano.coordenador_op_nome_manual = "José Pereira"
         self.plano.coordenador_op_cargo_manual = "Escrivão"
         texto = montar_texto_coordenacao(self.plano)
-        self.assertIn("Coordenador(a) Operacional", texto)
+        self.assertIn("Coordenador Operacional", texto)
         self.assertIn("Escrivão José Pereira", texto)
 
     def test_coordenador_operacional_em_branco_nao_gera_texto(self):

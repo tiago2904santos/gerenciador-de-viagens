@@ -103,6 +103,12 @@ class PlanoTrabalho(TimeStampedModel):
         (COORDENADOR_MODO_SERVIDOR, "Servidor"),
         (COORDENADOR_MODO_MANUAL, "Manual"),
     ]
+    COORDENADOR_GENERO_MASCULINO = "MASCULINO"
+    COORDENADOR_GENERO_FEMININO = "FEMININO"
+    COORDENADOR_GENERO_CHOICES = [
+        (COORDENADOR_GENERO_MASCULINO, "Masculino"),
+        (COORDENADOR_GENERO_FEMININO, "Feminino"),
+    ]
 
     numero = models.PositiveIntegerField(null=True, blank=True, db_index=True)
     ano = models.PositiveIntegerField(null=True, blank=True, db_index=True)
@@ -145,10 +151,12 @@ class PlanoTrabalho(TimeStampedModel):
         blank=True,
         default="09:00 até 17:00",
     )
+    coordenacao = models.TextField("Coordenador do evento", blank=True, default="")
     consideracao_final = models.TextField("Considerações finais", blank=True, default="")
     # Quando True, o texto é mantido sincronizado com destino/programa (texto padrão);
     # vira False assim que o usuário edita o campo manualmente.
     contextualizacao_auto = models.BooleanField(default=True)
+    coordenacao_auto = models.BooleanField(default=True)
     consideracao_auto = models.BooleanField(default=True)
 
     coordenador_adm_modo = models.CharField(
@@ -166,6 +174,12 @@ class PlanoTrabalho(TimeStampedModel):
     )
     coordenador_adm_nome_manual = models.CharField(max_length=255, blank=True, default="")
     coordenador_adm_cargo_manual = models.CharField(max_length=120, blank=True, default="")
+    coordenador_adm_genero = models.CharField(
+        max_length=10,
+        choices=COORDENADOR_GENERO_CHOICES,
+        blank=True,
+        default=COORDENADOR_GENERO_MASCULINO,
+    )
 
     coordenador_op_modo = models.CharField(
         max_length=10,
@@ -182,6 +196,12 @@ class PlanoTrabalho(TimeStampedModel):
     )
     coordenador_op_nome_manual = models.CharField(max_length=255, blank=True, default="")
     coordenador_op_cargo_manual = models.CharField(max_length=120, blank=True, default="")
+    coordenador_op_genero = models.CharField(
+        max_length=10,
+        choices=COORDENADOR_GENERO_CHOICES,
+        blank=True,
+        default=COORDENADOR_GENERO_MASCULINO,
+    )
 
     # Etapa 2 — deslocamento e diárias (saída/chegada na sede)
     saida_sede_data = models.DateField("Data de saída da sede", null=True, blank=True)
@@ -291,6 +311,12 @@ class PlanoTrabalho(TimeStampedModel):
             return (servidor.nome or "").strip(), (cargo or "").strip()
         return (nome_manual or "").strip(), (cargo_manual or "").strip()
 
+    def coordenador_genero(self, papel: str) -> str:
+        valor = self.coordenador_adm_genero if papel == "adm" else self.coordenador_op_genero
+        if valor == self.COORDENADOR_GENERO_FEMININO:
+            return self.COORDENADOR_GENERO_FEMININO
+        return self.COORDENADOR_GENERO_MASCULINO
+
     @property
     def tem_coordenador_operacional(self) -> bool:
         nome, _cargo = self.coordenador_nome_cargo("op")
@@ -330,8 +356,10 @@ class PlanoTrabalho(TimeStampedModel):
         self.horario_atendimento = normalize_spaces(self.horario_atendimento)
         self.coordenador_adm_nome_manual = normalize_spaces(self.coordenador_adm_nome_manual)
         self.coordenador_adm_cargo_manual = normalize_spaces(self.coordenador_adm_cargo_manual)
+        self.coordenador_adm_genero = self.coordenador_genero("adm")
         self.coordenador_op_nome_manual = normalize_spaces(self.coordenador_op_nome_manual)
         self.coordenador_op_cargo_manual = normalize_spaces(self.coordenador_op_cargo_manual)
+        self.coordenador_op_genero = self.coordenador_genero("op")
         super().save(*args, **kwargs)
 
 

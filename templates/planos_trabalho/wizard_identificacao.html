@@ -4,7 +4,7 @@
 {% block extra_css %}
   {{ block.super }}
   <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260612-pt">
-  <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260612b-pt">
+  <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260614-pt-textos-coordenacao">
 {% endblock %}
 
 {% block wizard_content %}
@@ -33,18 +33,20 @@
             <div class="field field-size-2 app-form-field" data-pt-coordenador-panel="adm">
               {{ form.coordenador_adm_modo }}
               {{ form.coordenador_adm_nome_manual }}
-              <div class="field-grid field-grid--cols-3">
+              <div class="field-grid field-grid--cols-4">
                 {% include "components/forms/form_field.html" with field=form.coordenador_adm label="Nome" size_class="field-size-2" only %}
                 {% include "components/forms/input_with_action.html" with field=form.coordenador_adm_cargo_manual label="Cargo" action_url=cargos_url action_label="Gerenciar cargos" size_class="field-size-1" only %}
+                {% include "components/forms/form_field.html" with field=form.coordenador_adm_genero label="Gênero" size_class="field-size-1" only %}
               </div>
             </div>
 
             <div class="field field-size-2 app-form-field" data-pt-coordenador-panel="op">
               {{ form.coordenador_op_modo }}
               {{ form.coordenador_op_nome_manual }}
-              <div class="field-grid field-grid--cols-3">
+              <div class="field-grid field-grid--cols-4">
                 {% include "components/forms/form_field.html" with field=form.coordenador_op label="Nome" size_class="field-size-2" only %}
                 {% include "components/forms/input_with_action.html" with field=form.coordenador_op_cargo_manual label="Cargo" action_url=cargos_url action_label="Gerenciar cargos" size_class="field-size-1" only %}
+                {% include "components/forms/form_field.html" with field=form.coordenador_op_genero label="Gênero" size_class="field-size-1" only %}
               </div>
             </div>
           </div>
@@ -267,9 +269,11 @@
       </header>
       <div class="cv-wizard-section-body">
         <input type="hidden" name="contextualizacao_auto" value="{% if contextualizacao_auto %}1{% else %}0{% endif %}" data-pt-texto-auto-flag="contextualizacao">
+        <input type="hidden" name="coordenacao_auto" value="{% if coordenacao_auto %}1{% else %}0{% endif %}" data-pt-texto-auto-flag="coordenacao">
         <input type="hidden" name="consideracao_auto" value="{% if consideracao_auto %}1{% else %}0{% endif %}" data-pt-texto-auto-flag="consideracao_final">
         <div class="field-grid">
           {% include "components/forms/form_field.html" with field=form.contextualizacao label="Breve contextualização" size_class="field-size-4" only %}
+          {% include "components/forms/form_field.html" with field=form.coordenacao label="Coordenador do evento" size_class="field-size-4" only %}
           {% include "components/forms/form_field.html" with field=form.consideracao_final label="Considerações finais" size_class="field-size-4" only %}
         </div>
       </div>
@@ -281,5 +285,5 @@
 
 {% block extra_js %}
   {{ block.super }}
-  <script src="{% static 'js/pages/planos-trabalho-wizard.js' %}?v=20260614-coordenador-unico" defer></script>
+  <script src="{% static 'js/pages/planos-trabalho-wizard.js' %}?v=20260614f" defer></script>
 {% endblock %}

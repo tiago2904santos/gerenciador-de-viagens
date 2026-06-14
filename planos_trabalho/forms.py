@@ -11,6 +11,7 @@ from cadastros.models import Estado
 from cadastros.models import Servidor
 from cadastros.models import Unidade
 from cadastros.services import resolver_sede_ids_desde_configuracao
+from core.normalizers import normalize_upper
 
 from .models import AtividadePlanoTrabalho
 from .models import EfetivoPlano
@@ -31,7 +32,10 @@ def _servidor_picker_widget(panel_title: str, field_label: str) -> forms.Select:
             "data-picker-label": field_label,
             "data-panel-title": panel_title,
             "data-placeholder": "Nome completo",
-            "data-empty-message": "Nenhum servidor encontrado. Continue digitando para usar este nome.",
+            "data-picker-allow-free-text": "true",
+            "data-picker-free-text-message": "Pressione Enter para confirmar este nome.",
+            "data-picker-uppercase": "true",
+            "data-empty-message": "Pressione Enter para confirmar este nome.",
         },
     )
 
@@ -71,15 +75,18 @@ class PlanoIdentificacaoForm(forms.ModelForm):
             "data_evento_fim",
             "horario_atendimento",
             "contextualizacao",
+            "coordenacao",
             "consideracao_final",
             "coordenador_adm_modo",
             "coordenador_adm",
             "coordenador_adm_nome_manual",
             "coordenador_adm_cargo_manual",
+            "coordenador_adm_genero",
             "coordenador_op_modo",
             "coordenador_op",
             "coordenador_op_nome_manual",
             "coordenador_op_cargo_manual",
+            "coordenador_op_genero",
         ]
         widgets = {
             "programa_outros": forms.TextInput(
@@ -125,6 +132,13 @@ class PlanoIdentificacaoForm(forms.ModelForm):
                     "placeholder": "Deixe em branco para gerar automaticamente a partir do destino.",
                 },
             ),
+            "coordenacao": forms.Textarea(
+                attrs={
+                    "rows": 4,
+                    "class": "cv-field__control cv-field__control--textarea",
+                    "placeholder": "Deixe em branco para gerar automaticamente a partir dos coordenadores.",
+                },
+            ),
             "coordenador_adm_modo": forms.HiddenInput(attrs={"data-pt-coordenador-modo": "adm"}),
             "coordenador_op_modo": forms.HiddenInput(attrs={"data-pt-coordenador-modo": "op"}),
             "coordenador_adm_nome_manual": forms.HiddenInput(
@@ -133,11 +147,17 @@ class PlanoIdentificacaoForm(forms.ModelForm):
             "coordenador_adm_cargo_manual": forms.Select(
                 attrs={"class": "form-select"},
             ),
+            "coordenador_adm_genero": forms.Select(
+                attrs={"class": "form-select", "data-pt-coordenador-genero": "adm"},
+            ),
             "coordenador_op_nome_manual": forms.HiddenInput(
                 attrs={"data-pt-coordenador-nome-manual": "op"},
             ),
             "coordenador_op_cargo_manual": forms.Select(
                 attrs={"class": "form-select"},
+            ),
+            "coordenador_op_genero": forms.Select(
+                attrs={"class": "form-select", "data-pt-coordenador-genero": "op"},
             ),
         }
 
@@ -259,6 +279,12 @@ class PlanoIdentificacaoForm(forms.ModelForm):
 
     def clean_horario_atendimento(self):
         return (self.cleaned_data.get("horario_atendimento") or "").strip()
+
+    def clean_coordenador_adm_genero(self):
+        return self.cleaned_data.get("coordenador_adm_genero") or PlanoTrabalho.COORDENADOR_GENERO_MASCULINO
+
+    def clean_coordenador_op_genero(self):
+        return self.cleaned_data.get("coordenador_op_genero") or PlanoTrabalho.COORDENADOR_GENERO_MASCULINO
 
     def _resolve_destino_inicial(self):
         cidade_id = None
@@ -393,7 +419,7 @@ class PlanoIdentificacaoForm(forms.ModelForm):
         cargo_key = f"coordenador_{papel}_cargo_manual"
 
         servidor = cleaned.get(servidor_key)
-        nome_manual = (cleaned.get(nome_key) or "").strip()
+        nome_manual = normalize_upper(cleaned.get(nome_key) or "")
         cargo_manual = (cleaned.get(cargo_key) or "").strip()
 
         cleaned[nome_key] = nome_manual
@@ -447,12 +473,12 @@ class PlanoDiariasForm(forms.ModelForm):
             "chegada_sede_hora",
         ]
         widgets = {
-            "saida_sede_data": forms.HiddenInput(attrs={"data-cv-date-picker-value": "true", "data-pt-diarias-input": "true"}),
+            "saida_sede_data": forms.HiddenInput(attrs={"data-pt-diarias-saida-data": "true", "data-pt-diarias-input": "true"}),
             "saida_sede_hora": forms.TimeInput(
                 attrs={"type": "time", "class": "cv-field__control", "data-pt-diarias-input": "true"},
                 format="%H:%M",
             ),
-            "chegada_sede_data": forms.HiddenInput(attrs={"data-cv-date-picker-value": "true", "data-pt-diarias-input": "true"}),
+            "chegada_sede_data": forms.HiddenInput(attrs={"data-pt-diarias-chegada-data": "true", "data-pt-diarias-input": "true"}),
             "chegada_sede_hora": forms.TimeInput(
                 attrs={"type": "time", "class": "cv-field__control", "data-pt-diarias-input": "true"},
                 format="%H:%M",
@@ -504,6 +530,7 @@ class EfetivoPlanoForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields["unidade"].queryset = Unidade.objects.order_by("nome")
         self.fields["unidade"].empty_label = ""
+        self.fields["unidade"].required = False
         self.fields["cargo"].queryset = Cargo.objects.order_by("nome")
         self.fields["cargo"].empty_label = "Selecione o cargo"
 
@@ -517,10 +544,10 @@ class EfetivoPlanoForm(forms.ModelForm):
         quantidade = cleaned.get("quantidade")
         if not any([unidade, cargo, quantidade]):
             return cleaned
-        if not unidade:
-            self.add_error("unidade", "Selecione a unidade.")
         if not cargo:
             self.add_error("cargo", "Selecione o cargo.")
+        if not quantidade:
+            self.add_error("quantidade", "Informe a quantidade.")
         return cleaned
 
 

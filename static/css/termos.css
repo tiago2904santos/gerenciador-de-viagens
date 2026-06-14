@@ -86,7 +86,7 @@
 }
 
 #pt-card-efetivo .pt-efetivo-card__grid {
-  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
 }
 
 #pt-card-diarias .pt-diarias-grid {
@@ -467,4 +467,24 @@ html[data-theme="light"] .pt-activity-item:has(.pt-activity-checkbox:checked) .p
   .pt-activity-live-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* Quantidade stepper: hide native number spinner */
+.pt-quantidade-stepper input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.pt-quantidade-stepper input[type="number"]::-webkit-inner-spin-button,
+.pt-quantidade-stepper input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+#pt-card-textos #id_contextualizacao {
+  min-height: 180px;
+}
+
+#pt-card-textos #id_coordenacao {
+  min-height: 160px;
 }

@@ -87,6 +87,9 @@
     const openAllOnFocus = select.dataset.pickerOpenAll === "true";
     const showTermCtrl   = select.dataset.pickerTermControl   === "true" || !!termosName;
     const showDriverCtrl = select.dataset.pickerDriverControl === "true";
+    const allowFreeText  = select.dataset.pickerAllowFreeText === "true";
+    const freeTextMsg    = select.dataset.pickerFreeTextMessage || "Pressione Enter para confirmar este nome.";
+    const forceUppercase = select.dataset.pickerUppercase === "true";
     const isError        = select.dataset.pickerError         === "true";
     const listboxId    = `${select.id || select.name || "cv-picker"}-results`;
     const initialValue = (select.dataset.pickerInitialValue || "").trim();
@@ -262,6 +265,34 @@
       renderResults();
     }
 
+    function normalizeInputValue() {
+      if (!forceUppercase || !input.value) return;
+      const upperValue = input.value.toLocaleUpperCase("pt-BR");
+      if (upperValue === input.value) return;
+      const start = input.selectionStart;
+      const end = input.selectionEnd;
+      input.value = upperValue;
+      try {
+        input.setSelectionRange(start, end);
+      } catch (e) {
+        /* Alguns tipos/ambientes nao permitem restaurar selecao. */
+      }
+    }
+
+    function commitFreeText() {
+      if (!allowFreeText) return false;
+      const value = (input.value || "").trim();
+      if (!value) return false;
+      input.value = value;
+      query = value;
+      select.dispatchEvent(new CustomEvent("cv-search-picker:free-text-commit", {
+        bubbles: true,
+        detail: { value },
+      }));
+      setOpen(false);
+      return true;
+    }
+
     /* ── Seleção / Remoção ──────────────────────────────────────── */
 
     function selectServidorValues(ids) {
@@ -402,8 +433,9 @@
       list.innerHTML = "";
       if (activeIndex >= visible.length) activeIndex = visible.length - 1;
       visible.forEach((item, i) => list.appendChild(renderOptionItem(item, i)));
-      emptyEl.hidden  = !query || visible.length > 0;
-      dropdown.hidden = !isOpen || (!query && visible.length === 0);
+      emptyEl.textContent = allowFreeText ? freeTextMsg : emptyMsg;
+      emptyEl.hidden  = allowFreeText || !query || visible.length > 0;
+      dropdown.hidden = !isOpen || (!query && visible.length === 0) || (allowFreeText && query && visible.length === 0);
     }
 
     /* ── Render: Controle de Termo ──────────────────────────────── */
@@ -555,6 +587,7 @@
     });
 
     input.addEventListener("input", () => {
+      normalizeInputValue();
       query       = input.value;
       activeIndex = 0;
       setHasQuery(!!query);
@@ -588,6 +621,7 @@
         e.preventDefault();
         const item = visible[Math.max(activeIndex, 0)];
         if (item) selectItem(item.value);
+        else commitFreeText();
         return;
       }
       if (e.key === "ArrowDown") {

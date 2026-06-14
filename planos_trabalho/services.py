@@ -51,16 +51,16 @@ TEXTO_PADRAO_CONSIDERACAO_FINAL = (
 )
 
 TEXTO_COORDENADOR_ADM = (
-    "Fica designado(a) como Coordenador(a) Administrativo(a) do Plano o(a) {cargo_nome}, "
-    "o(a) qual ficará responsável pelo acompanhamento da execução administrativa do presente "
+    "Fica {designado} como {coordenador_administrativo} do Plano {artigo} {cargo_nome}, "
+    "{artigo} qual ficará responsável pelo acompanhamento da execução administrativa do presente "
     "Plano de Trabalho, organização das escalas de servidores, controle de materiais e "
     "equipamentos, consolidação de dados estatísticos, elaboração de relatório final e demais "
     "providências necessárias ao regular cumprimento da ação."
 )
 
 TEXTO_COORDENADOR_OP = (
-    "Fica designado(a) como Coordenador(a) Operacional do Evento o(a) {cargo_nome}, "
-    "o(a) qual ficará responsável pela execução operacional da ação no local do evento, "
+    "Fica {designado} como {coordenador_operacional} {artigo} {cargo_nome}, "
+    "{artigo} qual ficará responsável pela execução operacional da ação no local do evento, "
     "acompanhamento das equipes e suporte às demandas surgidas durante o atendimento."
 )
 
@@ -104,10 +104,16 @@ def texto_padrao_consideracao_final(plano: PlanoTrabalho) -> str:
     return TEXTO_PADRAO_CONSIDERACAO_FINAL.format(municipio=_municipio_display(plano))
 
 
+def texto_padrao_coordenacao(plano: PlanoTrabalho) -> str:
+    return montar_texto_coordenacao(plano)
+
+
 def textos_padrao_templates() -> dict[str, str]:
     """Modelos brutos (com tokens {municipio}/{programa}) para a pré-visualização no cliente."""
     return {
         "contextualizacao": TEXTO_PADRAO_CONTEXTUALIZACAO,
+        "coordenacao_adm": TEXTO_COORDENADOR_ADM,
+        "coordenacao_op": TEXTO_COORDENADOR_OP,
         "consideracao_final": TEXTO_PADRAO_CONSIDERACAO_FINAL,
     }
 
@@ -121,6 +127,9 @@ def sincronizar_textos_padrao(plano: PlanoTrabalho) -> list[str]:
     if plano.contextualizacao_auto:
         plano.contextualizacao = texto_padrao_contextualizacao(plano)
         alterados.append("contextualizacao")
+    if plano.coordenacao_auto:
+        plano.coordenacao = texto_padrao_coordenacao(plano)
+        alterados.append("coordenacao")
     if plano.consideracao_auto:
         plano.consideracao_final = texto_padrao_consideracao_final(plano)
         alterados.append("consideracao_final")
@@ -136,10 +145,29 @@ def aplicar_textos_padrao(plano: PlanoTrabalho) -> list[str]:
     if not (plano.contextualizacao or "").strip():
         plano.contextualizacao = texto_padrao_contextualizacao(plano)
         alterados.append("contextualizacao")
+    if not (plano.coordenacao or "").strip():
+        texto = texto_padrao_coordenacao(plano)
+        if texto:
+            plano.coordenacao = texto
+            alterados.append("coordenacao")
     if not (plano.consideracao_final or "").strip():
         plano.consideracao_final = texto_padrao_consideracao_final(plano)
         alterados.append("consideracao_final")
     return alterados
+
+
+def _termos_genero_coordenador(genero: str) -> dict[str, str]:
+    feminino = genero == PlanoTrabalho.COORDENADOR_GENERO_FEMININO
+    return {
+        "designado": "designada" if feminino else "designado",
+        "artigo": "a" if feminino else "o",
+        "coordenador_administrativo": (
+            "Coordenadora Administrativa" if feminino else "Coordenador Administrativo"
+        ),
+        "coordenador_operacional": (
+            "Coordenadora Operacional do Evento" if feminino else "Coordenador Operacional do Evento"
+        ),
+    }
 
 
 def montar_texto_coordenacao(plano: PlanoTrabalho) -> str:
@@ -152,7 +180,12 @@ def montar_texto_coordenacao(plano: PlanoTrabalho) -> str:
             for parte in (format_document_display(cargo_adm), format_document_display(nome_adm))
             if parte
         )
-        paragrafos.append(TEXTO_COORDENADOR_ADM.format(cargo_nome=cargo_nome))
+        paragrafos.append(
+            TEXTO_COORDENADOR_ADM.format(
+                cargo_nome=cargo_nome,
+                **_termos_genero_coordenador(plano.coordenador_genero("adm")),
+            ),
+        )
     nome_op, cargo_op = plano.coordenador_nome_cargo("op")
     if nome_op:
         cargo_nome = " ".join(
@@ -160,7 +193,12 @@ def montar_texto_coordenacao(plano: PlanoTrabalho) -> str:
             for parte in (format_document_display(cargo_op), format_document_display(nome_op))
             if parte
         )
-        paragrafos.append(TEXTO_COORDENADOR_OP.format(cargo_nome=cargo_nome))
+        paragrafos.append(
+            TEXTO_COORDENADOR_OP.format(
+                cargo_nome=cargo_nome,
+                **_termos_genero_coordenador(plano.coordenador_genero("op")),
+            ),
+        )
     return "\n".join(paragrafos)
 
 

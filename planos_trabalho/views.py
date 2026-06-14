@@ -54,6 +54,7 @@ from .services import montar_texto_coordenacao
 from .services import montar_valor_do_plano_texto
 from .services import sincronizar_textos_padrao
 from .services import texto_padrao_consideracao_final
+from .services import texto_padrao_coordenacao
 from .services import texto_padrao_contextualizacao
 from .services import textos_padrao_templates
 
@@ -143,15 +144,18 @@ def _plano_identificacao_autosave_data(plano: PlanoTrabalho):
         "data_evento_fim": plano.data_evento_fim.isoformat() if plano.data_evento_fim else "",
         "horario_atendimento": plano.horario_atendimento or "",
         "contextualizacao": plano.contextualizacao or "",
+        "coordenacao": plano.coordenacao or "",
         "consideracao_final": plano.consideracao_final or "",
         "coordenador_adm_modo": plano.coordenador_adm_modo or PlanoTrabalho.COORDENADOR_MODO_SERVIDOR,
         "coordenador_adm": plano.coordenador_adm_id or "",
         "coordenador_adm_nome_manual": plano.coordenador_adm_nome_manual or "",
         "coordenador_adm_cargo_manual": plano.coordenador_adm_cargo_manual or "",
+        "coordenador_adm_genero": plano.coordenador_adm_genero or PlanoTrabalho.COORDENADOR_GENERO_MASCULINO,
         "coordenador_op_modo": plano.coordenador_op_modo or PlanoTrabalho.COORDENADOR_MODO_SERVIDOR,
         "coordenador_op": plano.coordenador_op_id or "",
         "coordenador_op_nome_manual": plano.coordenador_op_nome_manual or "",
         "coordenador_op_cargo_manual": plano.coordenador_op_cargo_manual or "",
+        "coordenador_op_genero": plano.coordenador_op_genero or PlanoTrabalho.COORDENADOR_GENERO_MASCULINO,
     }
     destinos = list(plano.destinos.order_by("ordem", "pk"))
     for idx, destino in enumerate(destinos[1:], 1):
@@ -306,6 +310,7 @@ def _identificacao_context(*, form, plano):
         "coordenador_op_modo_atual": plano.coordenador_op_modo,
         "pt_textos_padrao_templates": textos_padrao_templates(),
         "contextualizacao_auto": _texto_auto_flag(form, plano, "contextualizacao_auto", "contextualizacao_auto"),
+        "coordenacao_auto": _texto_auto_flag(form, plano, "coordenacao_auto", "coordenacao_auto"),
         "consideracao_auto": _texto_auto_flag(form, plano, "consideracao_auto", "consideracao_auto"),
     }
 
@@ -318,9 +323,15 @@ def wizard_identificacao(request, pk):
         if form.is_valid():
             plano = form.save()
             plano.contextualizacao_auto = (request.POST.get("contextualizacao_auto", "1") or "0").strip() != "0"
+            plano.coordenacao_auto = (request.POST.get("coordenacao_auto", "1") or "0").strip() != "0"
             plano.consideracao_auto = (request.POST.get("consideracao_auto", "1") or "0").strip() != "0"
             campos_texto = sincronizar_textos_padrao(plano)
-            plano.save(update_fields=[*{*campos_texto, "contextualizacao_auto", "consideracao_auto"}, "updated_at"])
+            plano.save(
+                update_fields=[
+                    *{*campos_texto, "contextualizacao_auto", "coordenacao_auto", "consideracao_auto"},
+                    "updated_at",
+                ],
+            )
             if plano.saida_sede_data and plano.chegada_sede_data:
                 atualizar_snapshot_diarias(plano)
             if nav_action == "wizard_next":
@@ -336,6 +347,8 @@ def wizard_identificacao(request, pk):
         # campo estiver no modo automático — o usuário pode sobrescrever quando quiser.
         if plano.contextualizacao_auto:
             form.initial["contextualizacao"] = texto_padrao_contextualizacao(plano)
+        if plano.coordenacao_auto:
+            form.initial["coordenacao"] = texto_padrao_coordenacao(plano)
         if plano.consideracao_auto:
             form.initial["consideracao_final"] = texto_padrao_consideracao_final(plano)
     return render(
@@ -373,6 +386,9 @@ def identificacao_autosave(request, pk):
     if "contextualizacao" in clean_fields:
         plano.contextualizacao_auto = False
         flag_updates.append("contextualizacao_auto")
+    if "coordenacao" in clean_fields:
+        plano.coordenacao_auto = False
+        flag_updates.append("coordenacao_auto")
     if "consideracao_final" in clean_fields:
         plano.consideracao_auto = False
         flag_updates.append("consideracao_auto")
@@ -385,6 +401,29 @@ def identificacao_autosave(request, pk):
 # ── Etapa 2 — Efetivo e diárias ──────────────────────────────────────────────
 
 
+def _diarias_selected_dates_json(form):
+    def as_iso(value):
+        if not value:
+            return ""
+        if hasattr(value, "isoformat"):
+            return value.isoformat()
+        value = str(value).strip()
+        if len(value) == 10 and value[4:5] == "-" and value[7:8] == "-":
+            return value
+        return ""
+
+    if form.is_bound:
+        saida = as_iso(form.data.get("saida_sede_data"))
+        chegada = as_iso(form.data.get("chegada_sede_data"))
+    else:
+        saida = as_iso(getattr(form.instance, "saida_sede_data", None))
+        chegada = as_iso(getattr(form.instance, "chegada_sede_data", None))
+
+    dates = [d for d in [saida, chegada] if d]
+    dates = list(dict.fromkeys(dates))  # dedup preservando ordem
+    return json.dumps(dates)
+
+
 def _efetivo_diarias_context(*, formset, diarias_form, plano, resultado=None):
     resultado = resultado or calcular_diarias_plano(plano)
     return {
@@ -393,6 +432,7 @@ def _efetivo_diarias_context(*, formset, diarias_form, plano, resultado=None):
         "formset": formset,
         "diarias_form": diarias_form,
         "diarias_display": _diarias_display_values(diarias_form),
+        "diarias_selected_dates_json": _diarias_selected_dates_json(diarias_form),
         "diarias_resultado": resultado,
         "cargos_url": reverse("cadastros:cargos_index"),
         "api_calcular_diarias_url": reverse("planos_trabalho:api_calcular_diarias", args=[plano.pk]),
@@ -720,7 +760,11 @@ def wizard_documentos(request, pk):
                 "horario": plano.horario_atendimento or "—",
                 "efetivo": montar_efetivo_texto(plano) or "—",
                 "valor_plano": resumo_diarias or "—",
-                "coordenacao": montar_texto_coordenacao(plano) or "—",
+                "coordenacao": (
+                    (plano.coordenacao or "").strip()
+                    or (montar_texto_coordenacao(plano) if plano.coordenacao_auto else "")
+                    or "—"
+                ),
             },
         },
     )

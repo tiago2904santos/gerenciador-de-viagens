@@ -44,7 +44,8 @@ def build_plano_docxtpl_context(plano: PlanoTrabalho) -> dict[str, Any]:
         "unidade_movel": _txt(plano.unidade_movel_texto),
         "valor_do_plano": montar_valor_do_plano_texto(plano),
         "recursos_necessarios": _txt(plano.recursos_necessarios),
-        "coordenacao": montar_texto_coordenacao(plano),
+        "coordenacao": _txt(plano.coordenacao)
+        or (montar_texto_coordenacao(plano) if plano.coordenacao_auto else ""),
         "consideracao_final": _txt(plano.consideracao_final),
         "sede": _build_sede(inst),
         "data_extenso": format_data_extenso(timezone.localdate()),

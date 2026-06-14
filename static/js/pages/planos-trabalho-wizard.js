@@ -111,6 +111,17 @@
       });
   }
 
+  function updateDestinoRemoveButtons(form) {
+    var rows = Array.prototype.slice.call(form.querySelectorAll("[data-pt-destino-row]")).filter(function (r) {
+      return !r.hidden;
+    });
+    rows.forEach(function (row) {
+      var btn = row.querySelector("[data-pt-remove-destino]");
+      if (btn) btn.hidden = rows.length <= 1;
+      row.classList.toggle("destino-row--single", rows.length <= 1);
+    });
+  }
+
   function bindDestinationRow(form, row) {
     if (!row || row.dataset.ptDestinoReady === "true") return;
     row.dataset.ptDestinoReady = "true";
@@ -142,6 +153,7 @@
     if (removeButton) {
       removeButton.addEventListener("click", function () {
         row.remove();
+        updateDestinoRemoveButtons(form);
       });
     }
   }
@@ -150,6 +162,7 @@
     Array.prototype.slice.call(form.querySelectorAll("[data-pt-destino-row]")).forEach(function (row) {
       bindDestinationRow(form, row);
     });
+    updateDestinoRemoveButtons(form);
 
     var addButton = form.querySelector("[data-pt-add-destino]");
     var template = form.querySelector("template[data-pt-destino-template]");
@@ -182,6 +195,7 @@
       }
       list.appendChild(row);
       bindDestinationRow(form, row);
+      updateDestinoRemoveButtons(form);
       initPickers(form);
     });
   }
@@ -261,6 +275,78 @@
     return option ? ptTitleCase(option.text.trim()) : "________";
   }
 
+  function formatCargoNome(cargo, nome) {
+    return [ptTitleCase(cargo), ptTitleCase(nome)].filter(Boolean).join(" ");
+  }
+
+  function termosGeneroCoordenador(genero) {
+    var feminino = genero === "FEMININO";
+    return {
+      designado: feminino ? "designada" : "designado",
+      artigo: feminino ? "a" : "o",
+      coordenador_administrativo: feminino ? "Coordenadora Administrativa" : "Coordenador Administrativo",
+      coordenador_operacional: feminino ? "Coordenadora Operacional do Evento" : "Coordenador Operacional do Evento",
+    };
+  }
+
+  function preencherTemplateCoordenador(template, data, papel) {
+    var termos = termosGeneroCoordenador(data.genero);
+    var coordenadorKey = papel === "adm" ? "coordenador_administrativo" : "coordenador_operacional";
+    return String(template || "")
+      .replace(/\{cargo_nome\}/g, formatCargoNome(data.cargo, data.nome))
+      .replace(/\{designado\}/g, termos.designado)
+      .replace(/\{artigo\}/g, termos.artigo)
+      .replace(/\{coordenador_administrativo\}/g, termos.coordenador_administrativo)
+      .replace(/\{coordenador_operacional\}/g, termos[coordenadorKey]);
+  }
+
+  function getCoordenadorData(form, papel) {
+    var panel = form.querySelector("[data-pt-coordenador-panel='" + papel + "']");
+    if (!panel) return { nome: "", cargo: "", genero: "MASCULINO" };
+    var servidorSelect = panel.querySelector("select[data-pt-coordenador-picker]");
+    var generoSelect = panel.querySelector("[name='coordenador_" + papel + "_genero']");
+    var option = selectedOption(servidorSelect);
+    if (option) {
+      return {
+        nome: (option.dataset.main || option.textContent || "").trim(),
+        cargo: (option.dataset.cargo || "").trim(),
+        genero: (generoSelect && generoSelect.value) || "MASCULINO",
+      };
+    }
+    var manualInput = panel.querySelector("[data-pt-coordenador-nome-manual]");
+    var cargoSelect = panel.querySelector("[name='coordenador_" + papel + "_cargo_manual']");
+    var pickerRoot = servidorSelect ? servidorSelect.nextElementSibling : null;
+    var pickerInput = pickerRoot && pickerRoot.classList.contains("cv-search-picker")
+      ? pickerRoot.querySelector(".cv-search-picker__input")
+      : null;
+    return {
+      nome: ((manualInput && manualInput.value) || (pickerInput && pickerInput.value) || "").trim(),
+      cargo: ((cargoSelect && cargoSelect.value) || "").trim(),
+      genero: (generoSelect && generoSelect.value) || "MASCULINO",
+    };
+  }
+
+  function computeCoordenacao(form, templates) {
+    var paragrafos = [];
+    var adm = getCoordenadorData(form, "adm");
+    if (adm.nome) {
+      paragrafos.push(preencherTemplateCoordenador(templates.coordenacao_adm, adm, "adm"));
+    }
+    var op = getCoordenadorData(form, "op");
+    if (op.nome) {
+      paragrafos.push(preencherTemplateCoordenador(templates.coordenacao_op, op, "op"));
+    }
+    return paragrafos.filter(Boolean).join("\n");
+  }
+
+  function isCoordenadorTextTarget(target) {
+    if (!target) return false;
+    if (target.matches && target.matches("[data-pt-coordenador-picker], [data-pt-coordenador-nome-manual], [data-pt-coordenador-modo]")) {
+      return true;
+    }
+    return /^coordenador_(adm|op)_(cargo_manual|nome_manual|modo|genero)$/.test(target.name || "");
+  }
+
   function initTextosPadrao(form) {
     var dataEl = document.getElementById("pt-textos-padrao-data");
     if (!dataEl) return;
@@ -270,6 +356,7 @@
     var programmatic = false;
     var fields = [
       { name: "contextualizacao", flag: "contextualizacao" },
+      { name: "coordenacao", flag: "coordenacao" },
       { name: "consideracao_final", flag: "consideracao_final" },
     ];
 
@@ -291,11 +378,14 @@
         if (!field.textarea || !field.flagInput) return;
         if (field.flagInput.value !== "1") return; // usuário já editou manualmente
         var template = templates[field.name] || "";
-        if (!template) return;
+        var nextValue = field.name === "coordenacao"
+          ? computeCoordenacao(form, templates)
+          : template
+            .replace(/\{municipio\}/g, municipio)
+            .replace(/\{programa\}/g, programa);
+        if (field.name !== "coordenacao" && !template) return;
         programmatic = true;
-        field.textarea.value = template
-          .replace(/\{municipio\}/g, municipio)
-          .replace(/\{programa\}/g, programa);
+        field.textarea.value = nextValue;
         programmatic = false;
       });
     }
@@ -305,7 +395,8 @@
       if (!target) return;
       if (
         target.matches("[data-pt-destino-city], [data-pt-destino-state], [data-pt-programa-select]") ||
-        target.name === "programa_outros"
+        target.name === "programa_outros" ||
+        isCoordenadorTextTarget(target)
       ) {
         regenerate();
       }
@@ -502,6 +593,56 @@
     renderFromDates();
   }
 
+  /* ── Date picker de diárias (multi, max-dates=2) ────────────── */
+
+  function syncDiariasDateRange(scope) {
+    var root = scope.querySelector("#pt-diarias-date-picker");
+    var saidaHidden = scope.querySelector("[data-pt-diarias-saida-data]");
+    var chegadaHidden = scope.querySelector("[data-pt-diarias-chegada-data]");
+    var saidaDisplay = scope.querySelector("[data-pt-diarias-saida-display]");
+    var chegadaDisplay = scope.querySelector("[data-pt-diarias-chegada-display]");
+    if (!root || !saidaHidden || !chegadaHidden) return;
+
+    function parseSelectedDates() {
+      var raw = root.dataset.selectedDates || "[]";
+      var vals = [];
+      try { vals = JSON.parse(raw) || []; } catch (e) {}
+      vals = vals.map(parseIso).filter(Boolean);
+      if (!vals.length) {
+        var s = parseIso(saidaHidden.value);
+        var e = parseIso(chegadaHidden.value);
+        if (s) vals.push(s);
+        if (e && e !== s) vals.push(e);
+      }
+      vals.sort();
+      return vals;
+    }
+
+    function renderFromDates() {
+      var dates = parseSelectedDates();
+      var saida = dates[0] || "";
+      var chegada = dates[dates.length - 1] || saida;
+      saidaHidden.value = saida;
+      chegadaHidden.value = chegada;
+      if (saidaDisplay) saidaDisplay.value = isoToDisplay(saida);
+      if (chegadaDisplay) chegadaDisplay.value = isoToDisplay(chegada);
+      saidaHidden.dispatchEvent(new Event("change", { bubbles: true }));
+      chegadaHidden.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+
+    var observer = new MutationObserver(function (mutations) {
+      if (mutations.some(function (m) { return m.attributeName === "data-selected-dates"; })) {
+        renderFromDates();
+      }
+    });
+    observer.observe(root, { attributes: true, attributeFilter: ["data-selected-dates"] });
+    root.addEventListener("cv:multi-confirm", renderFromDates);
+
+    var outerForm = scope.closest("form") || scope;
+    outerForm.addEventListener("submit", renderFromDates);
+    renderFromDates();
+  }
+
   /* ── Etapa 2: linhas de efetivo (formset dinâmico) ─────────── */
 
   function initEfetivoFormset(scope) {
@@ -510,6 +651,20 @@
     var addButton = scope.querySelector("[data-pt-efetivo-add]");
     var totalInput = scope.querySelector("input[name='efetivo-TOTAL_FORMS']");
     if (!rowsContainer || !template || !addButton || !totalInput) return;
+
+    rowsContainer.addEventListener("click", function (e) {
+      var btn = e.target.closest("[data-pt-quantidade-delta]");
+      if (!btn) return;
+      var stepper = btn.closest(".pt-quantidade-stepper");
+      if (!stepper) return;
+      var input = stepper.querySelector("input");
+      if (!input) return;
+      var delta = parseInt(btn.getAttribute("data-pt-quantidade-delta") || "0", 10);
+      var cur = parseInt(input.value || "1", 10) || 1;
+      input.value = String(Math.max(1, cur + delta));
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+    });
 
     addButton.addEventListener("click", function () {
       var index = parseInt(totalInput.value || "0", 10);
@@ -789,6 +944,7 @@
     var efetivoDiarias = document.querySelector("[data-pt-efetivo-diarias]");
     if (efetivoDiarias) {
       initEfetivoFormset(efetivoDiarias);
+      syncDiariasDateRange(efetivoDiarias);
       initDiariasLiveCalc(efetivoDiarias);
     }
 

@@ -373,6 +373,10 @@
       if (idx >= 0) self._select(idx);
     });
 
+    this.native.addEventListener('change', function () {
+      self._syncFromNative();
+    });
+
     // Menu — hover (sync foco visual)
     this.menu.addEventListener('mousemove', function (e) {
       var optEl = e.target;

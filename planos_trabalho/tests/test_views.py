@@ -77,8 +77,10 @@ class PlanoWizardViewsTests(TestCase):
                 "data_evento_fim": "2026-06-27",
                 "horario_atendimento": "09:00 até 17:00",
                 "contextualizacao": "Texto que o usuário escreveu à mão.",
+                "coordenacao": "Texto manual do coordenador.",
                 "consideracao_final": "",
                 "contextualizacao_auto": "0",
+                "coordenacao_auto": "0",
                 "consideracao_auto": "1",
                 "coordenador_adm_modo": "SERVIDOR",
                 "coordenador_adm": "",
@@ -94,6 +96,8 @@ class PlanoWizardViewsTests(TestCase):
         plano.refresh_from_db()
         self.assertFalse(plano.contextualizacao_auto)
         self.assertEqual(plano.contextualizacao, "Texto que o usuário escreveu à mão.")
+        self.assertFalse(plano.coordenacao_auto)
+        self.assertEqual(plano.coordenacao, "Texto manual do coordenador.")
         # Considerações continuam automáticas e refletem o destino.
         self.assertTrue(plano.consideracao_auto)
         self.assertIn("Maringá/PR", plano.consideracao_final)
@@ -133,6 +137,8 @@ class PlanoWizardViewsTests(TestCase):
         self.assertIn("Maringá/PR", plano.contextualizacao)
         self.assertIn("Programa Justiça no Bairro", plano.contextualizacao)
         self.assertIn("Maringá/PR", plano.consideracao_final)
+        self.assertIn("Coordenador Administrativo", plano.coordenacao)
+        self.assertIn("Papiloscopista Juliana Villela de Barros", plano.coordenacao)
         self.assertEqual(plano.coordenador_adm_modo, PlanoTrabalho.COORDENADOR_MODO_SERVIDOR)
         self.assertEqual(plano.coordenador_adm_id, servidor.pk)
         self.assertEqual(plano.coordenador_adm_nome_manual, "")
@@ -205,7 +211,7 @@ class PlanoWizardViewsTests(TestCase):
         plano.refresh_from_db()
         self.assertEqual(plano.coordenador_adm_modo, PlanoTrabalho.COORDENADOR_MODO_MANUAL)
         self.assertIsNone(plano.coordenador_adm)
-        self.assertEqual(plano.coordenador_adm_nome_manual, "Maria da Silva")
+        self.assertEqual(plano.coordenador_adm_nome_manual, "MARIA DA SILVA")
         self.assertEqual(plano.coordenador_adm_cargo_manual, cargo.nome)
 
     def test_post_identificacao_nome_igual_servidor_sem_fk_continua_manual(self):
