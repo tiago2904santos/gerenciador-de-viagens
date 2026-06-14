@@ -163,7 +163,8 @@
     root.dataset.cvDatePickerReady = 'true';
 
     var mode = root.dataset.mode === 'range' ? 'range' : root.dataset.mode === 'multi' ? 'multi' : 'single';
-    var trigger = root.querySelector('[data-cv-date-picker-trigger]');
+    var triggers = Array.prototype.slice.call(root.querySelectorAll('[data-cv-date-picker-trigger]'));
+    var trigger = triggers[0];
     var display = root.querySelector('[data-cv-date-picker-display]');
     var panel = root.querySelector('[data-cv-date-picker-panel]');
     var monthLabel = root.querySelector('[data-cv-date-picker-month]');
@@ -326,7 +327,9 @@
       isOpen = !!nextOpen;
       panel.hidden = !isOpen;
       root.classList.toggle('cv-date-picker--open', isOpen);
-      trigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      triggers.forEach(function (btn) {
+        btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      });
       if (isOpen) {
         positionPanel();
         // Garante animação mesmo com o panel fora do root (portal)
@@ -672,12 +675,14 @@
     syncOutputs();
     render();
 
-    trigger.addEventListener('click', function () {
-      if (isOpen) {
-        closePicker();
-      } else {
-        openPicker();
-      }
+    triggers.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (isOpen) {
+          closePicker();
+        } else {
+          openPicker();
+        }
+      });
     });
 
     if (display) {

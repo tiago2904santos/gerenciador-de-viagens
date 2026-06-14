@@ -1321,7 +1321,7 @@ html[data-theme="light-dark"] input[type="checkbox"] {
 .main-form-panel .cv-search-picker__input {
   line-height: 1.25;
   min-height: 0;
-  padding: 0;
+  padding: 0 5px;
 }
 
 .main-form-panel .cv-field-with-action {

@@ -261,23 +261,6 @@
 
 .pt-activity-counter {
   display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 150px;
-  padding: var(--space-1) var(--space-3);
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--color-border);
-  background: var(--color-card-muted);
-  color: var(--color-heading);
-  font-size: var(--font-size-sm);
-  font-weight: 800;
-  transition: color 0.18s ease, background 0.18s ease, border-color 0.18s ease;
-}
-
-.pt-activity-counter.is-active {
-  border-color: color-mix(in srgb, var(--color-accent) 40%, var(--color-border-soft));
-  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-card-muted));
-  color: var(--color-accent);
 }
 
 .pt-activity-grid {
@@ -329,19 +312,10 @@
   text-overflow: ellipsis;
 }
 
-.pt-activity-item__badge {
+/* Chip "Selecionada" (cv-chip padrão) só aparece quando o card está marcado. */
+.pt-activity-item__chip {
   display: none;
   flex-shrink: 0;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--color-accent-border-soft);
-  background: var(--color-accent-soft);
-  color: var(--theme-badge-accent-text, var(--color-accent-hover));
-  font-size: var(--font-size-xs);
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  padding: var(--space-1) var(--space-2);
 }
 
 /* Selecionado = mesmo tom dourado do card de motorista nos ofícios. */
@@ -354,8 +328,8 @@
   color: var(--color-accent);
 }
 
-.pt-activity-item:has(.pt-activity-checkbox:checked) .pt-activity-item__badge {
-  display: inline-block;
+.pt-activity-item:has(.pt-activity-checkbox:checked) .pt-activity-item__chip {
+  display: inline-flex;
 }
 
 /* Tema claro: fundo volta ao neutro (igual ao motorista), mantendo a fita dourada e o chip. */
@@ -405,7 +379,7 @@ html[data-theme="light"] .pt-activity-item:has(.pt-activity-checkbox:checked) .p
 }
 
 .pt-activity-live--recursos::before {
-  background: var(--color-success);
+  background: var(--color-info);
 }
 
 .pt-activity-live-head {
@@ -425,27 +399,6 @@ html[data-theme="light"] .pt-activity-item:has(.pt-activity-checkbox:checked) .p
   text-transform: uppercase;
 }
 
-.pt-activity-live-count {
-  display: inline-flex;
-  min-width: 34px;
-  height: 24px;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--color-accent-border-soft);
-  background: var(--color-accent-soft);
-  color: var(--theme-badge-accent-text, var(--color-accent-hover));
-  font-size: 0.76rem;
-  font-weight: 800;
-  padding: 0.08rem 0.5rem;
-}
-
-.pt-activity-live--recursos .pt-activity-live-count {
-  border-color: var(--color-success-border-soft);
-  background: var(--color-success-soft);
-  color: var(--color-success);
-}
-
 .pt-activity-live-subtitle {
   margin: var(--space-2) 0 var(--space-3);
   color: var(--color-muted);
@@ -460,37 +413,28 @@ html[data-theme="light"] .pt-activity-item:has(.pt-activity-checkbox:checked) .p
   gap: var(--space-2);
   max-height: 320px;
   overflow: auto;
+  scrollbar-color: var(--field-border-hover) transparent;
+  scrollbar-width: thin;
+}
+
+.pt-activity-live-list::-webkit-scrollbar {
+  width: var(--space-1);
+}
+
+.pt-activity-live-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.pt-activity-live-list::-webkit-scrollbar-thumb {
+  background: var(--field-border-hover);
+  border-radius: var(--radius-pill);
 }
 
 .pt-live-entry {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-3);
   border: 1px solid var(--color-border-soft);
   border-radius: var(--radius-control);
   background: var(--color-surface);
   padding: var(--space-2) var(--space-3);
-}
-
-.pt-live-entry-index {
-  flex: 0 0 auto;
-  min-width: 28px;
-  height: 24px;
-  border-radius: 8px;
-  border: 1px solid var(--color-accent-border-soft);
-  background: var(--color-accent-soft);
-  color: var(--theme-badge-accent-text, var(--color-accent-hover));
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.69rem;
-  font-weight: 900;
-}
-
-.pt-activity-live--recursos .pt-live-entry-index {
-  border-color: var(--color-success-border-soft);
-  background: var(--color-success-soft);
-  color: var(--color-success);
 }
 
 .pt-live-entry-text {

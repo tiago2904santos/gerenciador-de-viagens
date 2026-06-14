@@ -546,6 +546,7 @@ def _atividades_context(*, plano, catalogo, selected_codes):
         "atividades_catalogo": catalogo_view,
         "atividades_catalogo_data": catalogo_data,
         "atividades_selecionadas_total": len(selecionados),
+        "atividades_counter_label": f"{len(selecionados)} selecionadas",
         "metas_preview": metas_preview,
         "recursos_preview": recursos_preview,
         "atividades_manager_url": reverse("planos_trabalho:atividades_index"),

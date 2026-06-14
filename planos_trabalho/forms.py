@@ -4,6 +4,7 @@ from django import forms
 from django.forms import inlineformset_factory
 from django.utils.text import slugify
 
+from cadastros.form_widgets import ServidorMotoristaSelect
 from cadastros.models import Cargo
 from cadastros.models import Cidade
 from cadastros.models import Estado
@@ -19,16 +20,18 @@ from .models import PlanoTrabalho
 from .models import ProgramaSolicitante
 
 
-def _servidor_picker_widget(panel_title: str) -> forms.Select:
-    return forms.Select(
+def _servidor_picker_widget(panel_title: str, field_label: str) -> forms.Select:
+    return ServidorMotoristaSelect(
         attrs={
             "class": "form-select cv-search-picker__native",
             "data-cv-search-picker": "true",
+            "data-pt-coordenador-picker": "true",
             "data-picker-mode": "single",
             "data-picker-variant": "compact",
+            "data-picker-label": field_label,
             "data-panel-title": panel_title,
-            "data-placeholder": "Buscar por nome",
-            "data-empty-message": "Nenhum servidor encontrado.",
+            "data-placeholder": "Nome completo",
+            "data-empty-message": "Nenhum servidor encontrado. Continue digitando para usar este nome.",
         },
     )
 
@@ -124,14 +127,14 @@ class PlanoIdentificacaoForm(forms.ModelForm):
             ),
             "coordenador_adm_modo": forms.HiddenInput(attrs={"data-pt-coordenador-modo": "adm"}),
             "coordenador_op_modo": forms.HiddenInput(attrs={"data-pt-coordenador-modo": "op"}),
-            "coordenador_adm_nome_manual": forms.TextInput(
-                attrs={"class": "cv-field__control", "placeholder": "Nome completo", "autocomplete": "off"},
+            "coordenador_adm_nome_manual": forms.HiddenInput(
+                attrs={"data-pt-coordenador-nome-manual": "adm"},
             ),
             "coordenador_adm_cargo_manual": forms.Select(
                 attrs={"class": "form-select"},
             ),
-            "coordenador_op_nome_manual": forms.TextInput(
-                attrs={"class": "cv-field__control", "placeholder": "Nome completo", "autocomplete": "off"},
+            "coordenador_op_nome_manual": forms.HiddenInput(
+                attrs={"data-pt-coordenador-nome-manual": "op"},
             ),
             "coordenador_op_cargo_manual": forms.Select(
                 attrs={"class": "form-select"},
@@ -221,14 +224,14 @@ class PlanoIdentificacaoForm(forms.ModelForm):
             self.fields[campo].widget.choices = cargo_choices
 
         servidores_qs = Servidor.objects.select_related("cargo", "unidade").order_by("nome")
-        for campo, titulo in (
-            ("coordenador_adm", "COORDENADOR ADMINISTRATIVO"),
-            ("coordenador_op", "COORDENADOR OPERACIONAL"),
+        for campo, titulo, papel, rotulo in (
+            ("coordenador_adm", "COORDENADOR ADMINISTRATIVO", "adm", "Coordenador administrativo"),
+            ("coordenador_op", "COORDENADOR OPERACIONAL", "op", "Coordenador operacional (opcional)"),
         ):
             field = self.fields[campo]
             field.queryset = servidores_qs
             field.empty_label = ""
-            widget = _servidor_picker_widget(titulo)
+            widget = _servidor_picker_widget(titulo, rotulo)
             widget.choices = field.choices
             field.widget = widget
             valor = None
@@ -239,6 +242,10 @@ class PlanoIdentificacaoForm(forms.ModelForm):
             elif self.initial.get(campo):
                 valor = getattr(self.initial.get(campo), "pk", self.initial.get(campo))
             field.widget.attrs["data-picker-initial-value"] = str(valor or "")
+            field.widget.attrs["data-pt-coordenador-picker"] = papel
+            field.widget.attrs["data-pt-coordenador-manual-name"] = f"coordenador_{papel}_nome_manual"
+            field.widget.attrs["data-pt-coordenador-cargo-name"] = f"coordenador_{papel}_cargo_manual"
+            field.widget.attrs["data-pt-coordenador-modo-name"] = f"coordenador_{papel}_modo"
 
     def clean_programa(self):
         valor = (self.cleaned_data.get("programa") or "").strip()
@@ -400,6 +407,8 @@ class PlanoIdentificacaoForm(forms.ModelForm):
 
         cleaned[modo_key] = PlanoTrabalho.COORDENADOR_MODO_MANUAL
         cleaned[servidor_key] = None
+        if not nome_manual:
+            cleaned[cargo_key] = ""
 
     def save(self, commit=True):
         instance = super().save(commit=False)

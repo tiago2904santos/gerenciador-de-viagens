@@ -315,6 +315,134 @@
     });
   }
 
+  /* ── Coordenadores: picker com texto livre no mesmo input ───── */
+
+  function dispatchFieldEvent(field, eventName) {
+    if (!field) return;
+    field.dispatchEvent(new Event(eventName, { bubbles: true }));
+  }
+
+  function selectedOption(select) {
+    if (!select || !select.value) return null;
+    return select.options[select.selectedIndex] || null;
+  }
+
+  function setSelectValue(select, value, options) {
+    if (!select) return;
+    options = options || {};
+    var nextValue = String(value || "");
+    if (nextValue && !Array.prototype.slice.call(select.options).some(function (option) {
+      return option.value === nextValue;
+    })) {
+      var option = document.createElement("option");
+      option.value = nextValue;
+      option.textContent = nextValue;
+      select.appendChild(option);
+    }
+    select.value = nextValue;
+    if (!options.silent) dispatchFieldEvent(select, "change");
+  }
+
+  function setHiddenValue(input, value, options) {
+    if (!input) return;
+    options = options || {};
+    var nextValue = String(value || "");
+    if (input.value === nextValue) return;
+    input.value = nextValue;
+    if (!options.silent) dispatchFieldEvent(input, "change");
+  }
+
+  function clearServidorSelection(select) {
+    if (!select || !select.value) return false;
+    Array.prototype.slice.call(select.options).forEach(function (option) {
+      option.selected = false;
+    });
+    select.value = "";
+    dispatchFieldEvent(select, "input");
+    return true;
+  }
+
+  function initCoordenadorPanel(panel) {
+    if (!panel || panel.dataset.ptCoordenadorReady === "true") return;
+    panel.dataset.ptCoordenadorReady = "true";
+
+    var servidorSelect = panel.querySelector("select[data-pt-coordenador-picker]");
+    if (!servidorSelect) return;
+
+    var manualName = servidorSelect.dataset.ptCoordenadorManualName || "";
+    var cargoName = servidorSelect.dataset.ptCoordenadorCargoName || "";
+    var modoName = servidorSelect.dataset.ptCoordenadorModoName || "";
+    var manualInput = manualName ? panel.querySelector("[name='" + manualName + "']") : null;
+    var cargoSelect = cargoName ? panel.querySelector("[name='" + cargoName + "']") : null;
+    var modoInput = modoName ? panel.querySelector("[name='" + modoName + "']") : null;
+    var pickerRoot = servidorSelect.nextElementSibling;
+    var pickerInput = pickerRoot && pickerRoot.classList.contains("cv-search-picker")
+      ? pickerRoot.querySelector(".cv-search-picker__input")
+      : null;
+    var clearButton = pickerRoot ? pickerRoot.querySelector(".cv-search-picker__clear") : null;
+    if (!pickerInput) return;
+
+    var syncing = false;
+
+    function applyServidorSelection(option, options) {
+      if (!option) return;
+      options = options || {};
+      syncing = true;
+      setHiddenValue(manualInput, "", options);
+      setHiddenValue(modoInput, "SERVIDOR", options);
+      setSelectValue(cargoSelect, option.dataset.cargo || "", options);
+      syncing = false;
+    }
+
+    function applyManualName(options) {
+      options = options || {};
+      var name = (pickerInput.value || "").trim();
+      var hadServidor = clearServidorSelection(servidorSelect);
+      setHiddenValue(manualInput, name);
+      setHiddenValue(modoInput, name ? "MANUAL" : "");
+      if (!name || hadServidor || options.clearCargo) {
+        setSelectValue(cargoSelect, "");
+      }
+    }
+
+    servidorSelect.addEventListener("change", function () {
+      if (syncing) return;
+      var option = selectedOption(servidorSelect);
+      if (option) {
+        applyServidorSelection(option);
+      } else if (!(pickerInput.value || "").trim()) {
+        applyManualName({ clearCargo: true });
+      }
+    });
+
+    pickerInput.addEventListener("input", function () {
+      if (syncing) return;
+      applyManualName();
+    });
+
+    if (clearButton) {
+      clearButton.addEventListener("click", function () {
+        window.setTimeout(function () {
+          applyManualName({ clearCargo: true });
+        }, 0);
+      });
+    }
+
+    var initialOption = selectedOption(servidorSelect);
+    if (initialOption) {
+      applyServidorSelection(initialOption, { silent: true });
+    } else if (manualInput && manualInput.value) {
+      pickerInput.value = manualInput.value;
+      if (pickerRoot) pickerRoot.classList.add("cv-search-picker--has-query");
+      setHiddenValue(modoInput, "MANUAL", { silent: true });
+    }
+  }
+
+  function initCoordenadores(form) {
+    initPickers(form);
+    Array.prototype.slice.call(form.querySelectorAll("[data-pt-coordenador-panel]")).forEach(initCoordenadorPanel);
+  }
+
   /* ── Date picker sync (clonado de ordens-servico-form.js) ──── */
 
   function syncEventDates(form) {
@@ -536,8 +664,10 @@
 
   /* ── Etapa 3: seleção de atividades + preview ao vivo ──────── */
 
-  function pad2(value) {
-    return value < 10 ? "0" + value : String(value);
+  function setChipLabel(wrapper, text) {
+    if (!wrapper) return;
+    var label = wrapper.querySelector(".cv-chip__label");
+    if (label) label.textContent = text;
   }
 
   function buildCatalogMap() {
@@ -553,19 +683,15 @@
   }
 
   function renderLiveList(listEl, emptyEl, countEl, values) {
-    if (countEl) countEl.textContent = String(values.length);
+    setChipLabel(countEl, String(values.length));
     if (listEl) {
       listEl.innerHTML = "";
-      values.forEach(function (text, index) {
+      values.forEach(function (text) {
         var li = document.createElement("li");
         li.className = "pt-live-entry";
-        var idx = document.createElement("span");
-        idx.className = "pt-live-entry-index";
-        idx.textContent = pad2(index + 1);
         var span = document.createElement("span");
         span.className = "pt-live-entry-text";
         span.textContent = text;
-        li.appendChild(idx);
         li.appendChild(span);
         listEl.appendChild(li);
       });
@@ -592,10 +718,7 @@
 
     function refresh() {
       var checked = checkboxes.filter(function (cb) { return cb.checked; });
-      if (counter) {
-        counter.textContent = checked.length + " selecionadas";
-        counter.classList.toggle("is-active", checked.length > 0);
-      }
+      setChipLabel(counter, checked.length + " selecionadas");
       var metas = [];
       var metasSeen = {};
       var recursos = [];
@@ -660,6 +783,7 @@
       syncDestinationCities(identificacao);
       syncEventDates(identificacao);
       initTextosPadrao(identificacao);
+      initCoordenadores(identificacao);
     }
 
     var efetivoDiarias = document.querySelector("[data-pt-efetivo-diarias]");

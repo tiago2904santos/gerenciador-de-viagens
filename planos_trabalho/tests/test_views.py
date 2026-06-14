@@ -133,7 +133,10 @@ class PlanoWizardViewsTests(TestCase):
         self.assertIn("Maringá/PR", plano.contextualizacao)
         self.assertIn("Programa Justiça no Bairro", plano.contextualizacao)
         self.assertIn("Maringá/PR", plano.consideracao_final)
+        self.assertEqual(plano.coordenador_adm_modo, PlanoTrabalho.COORDENADOR_MODO_SERVIDOR)
         self.assertEqual(plano.coordenador_adm_id, servidor.pk)
+        self.assertEqual(plano.coordenador_adm_nome_manual, "")
+        self.assertEqual(plano.coordenador_adm_cargo_manual, "")
 
     def test_post_identificacao_aceita_programa_outro(self):
         plano = criar_plano_maringa(self.maringa)
@@ -203,6 +206,43 @@ class PlanoWizardViewsTests(TestCase):
         self.assertEqual(plano.coordenador_adm_modo, PlanoTrabalho.COORDENADOR_MODO_MANUAL)
         self.assertIsNone(plano.coordenador_adm)
         self.assertEqual(plano.coordenador_adm_nome_manual, "Maria da Silva")
+        self.assertEqual(plano.coordenador_adm_cargo_manual, cargo.nome)
+
+    def test_post_identificacao_nome_igual_servidor_sem_fk_continua_manual(self):
+        plano = criar_plano_maringa(self.maringa)
+        servidor = criar_servidor(nome="Maria da Silva", cargo_nome="Investigadora")
+        cargo = Cargo.objects.create(nome="ANALISTA DE PROJETOS")
+        response = self.client.post(
+            reverse("planos_trabalho:wizard_identificacao", args=[plano.pk]),
+            {
+                "action": "wizard_next",
+                "programa": "",
+                "programa_outros": "",
+                "destino_estado": self.maringa.estado_id,
+                "destino_cidade": self.maringa.pk,
+                "data_evento_inicio": "2026-06-25",
+                "data_evento_fim": "2026-06-27",
+                "horario_atendimento": "09:00 atÃ© 17:00",
+                "contextualizacao": "",
+                "consideracao_final": "",
+                "coordenador_adm_modo": "",
+                "coordenador_adm": "",
+                "coordenador_adm_nome_manual": servidor.nome,
+                "coordenador_adm_cargo_manual": cargo.nome,
+                "coordenador_op_modo": "",
+                "coordenador_op": "",
+                "coordenador_op_nome_manual": "",
+                "coordenador_op_cargo_manual": "",
+            },
+        )
+        self.assertRedirects(
+            response,
+            reverse("planos_trabalho:wizard_efetivo_diarias", args=[plano.pk]),
+        )
+        plano.refresh_from_db()
+        self.assertEqual(plano.coordenador_adm_modo, PlanoTrabalho.COORDENADOR_MODO_MANUAL)
+        self.assertIsNone(plano.coordenador_adm)
+        self.assertEqual(plano.coordenador_adm_nome_manual, servidor.nome)
         self.assertEqual(plano.coordenador_adm_cargo_manual, cargo.nome)
 
     def test_post_identificacao_salva_multiplos_destinos(self):

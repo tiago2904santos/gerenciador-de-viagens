@@ -3,7 +3,7 @@
 
 {% block extra_css %}
   {{ block.super }}
-  <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260613-pt">
+  <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260613c-pt">
 {% endblock %}
 
 {% block wizard_content %}
@@ -20,7 +20,9 @@
       <div class="cv-wizard-section-body">
         <div class="pt-activity-tools">
           <div class="pt-activity-tools-main">
-            <span class="pt-activity-counter" data-pt-activity-counter>{{ atividades_selecionadas_total }} selecionadas</span>
+            <span class="pt-activity-counter" data-pt-activity-counter>
+              {% include "components/ui/badges/chip.html" with tone="warning" label=atividades_counter_label only %}
+            </span>
             <button type="button" class="cv-btn cv-btn--secondary cv-btn--sm" data-pt-activity-select-all>Selecionar todos</button>
             <button type="button" class="cv-btn cv-btn--secondary cv-btn--sm" data-pt-activity-clear>Limpar seleção</button>
             <a href="{{ atividades_manager_url }}" class="cv-btn cv-btn--secondary cv-btn--sm" target="_blank" rel="noopener">Gerenciar atividades</a>
@@ -52,7 +54,9 @@
                   {% if atividade.selected %}checked{% endif %}
                 >
                 <span class="pt-activity-item__label">{{ atividade.nome }}</span>
-                <span class="pt-activity-item__badge">Selecionada</span>
+                <span class="pt-activity-item__chip">
+                  {% include "components/ui/badges/chip.html" with tone="warning" size="compact" label="Selecionada" only %}
+                </span>
               </label>
             {% endfor %}
           </div>
@@ -82,13 +86,14 @@
           <div class="pt-activity-live pt-activity-live--metas">
             <div class="pt-activity-live-head">
               <h4 class="pt-activity-live-title">Metas</h4>
-              <span class="pt-activity-live-count" data-pt-live-metas-count>{{ metas_preview|length }}</span>
+              <span data-pt-live-metas-count>
+                {% include "components/ui/badges/chip.html" with tone="warning" size="compact" label=metas_preview|length only %}
+              </span>
             </div>
             <p class="pt-activity-live-subtitle">Cada meta aparece conforme a atividade é marcada.</p>
             <ul class="pt-activity-live-list" data-pt-live-metas-list>
               {% for meta in metas_preview %}
                 <li class="pt-live-entry">
-                  <span class="pt-live-entry-index">{{ forloop.counter|stringformat:"02d" }}</span>
                   <span class="pt-live-entry-text">{{ meta }}</span>
                 </li>
               {% endfor %}
@@ -102,13 +107,14 @@
           <div class="pt-activity-live pt-activity-live--recursos">
             <div class="pt-activity-live-head">
               <h4 class="pt-activity-live-title">Recursos</h4>
-              <span class="pt-activity-live-count" data-pt-live-recursos-count>{{ recursos_preview|length }}</span>
+              <span data-pt-live-recursos-count>
+                {% include "components/ui/badges/chip.html" with tone="info" size="compact" label=recursos_preview|length only %}
+              </span>
             </div>
             <p class="pt-activity-live-subtitle">Recursos necessários por atividade selecionada.</p>
             <ul class="pt-activity-live-list" data-pt-live-recursos-list>
               {% for recurso in recursos_preview %}
                 <li class="pt-live-entry">
-                  <span class="pt-live-entry-index">{{ forloop.counter|stringformat:"02d" }}</span>
                   <span class="pt-live-entry-text">{{ recurso }}</span>
                 </li>
               {% endfor %}
@@ -130,5 +136,5 @@
 
 {% block extra_js %}
   {{ block.super }}
-  <script src="{% static 'js/pages/planos-trabalho-wizard.js' %}?v=20260613-pt" defer></script>
+  <script src="{% static 'js/pages/planos-trabalho-wizard.js' %}?v=20260613b-pt" defer></script>
 {% endblock %}

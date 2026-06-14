@@ -32,27 +32,19 @@
           <div class="field-grid">
             <div class="field field-size-2 app-form-field" data-pt-coordenador-panel="adm">
               {{ form.coordenador_adm_modo }}
-              <div class="field-grid">
-                {% include "components/forms/form_field.html" with field=form.coordenador_adm label="Coordenador administrativo" size_class="field-size-2" only %}
-                <div class="field-size-2">
-                  <div class="field-grid field-grid--cols-3">
-                    {% include "components/forms/form_field.html" with field=form.coordenador_adm_nome_manual label="Nome" size_class="field-size-2" only %}
-                    {% include "components/forms/input_with_action.html" with field=form.coordenador_adm_cargo_manual label="Cargo" action_url=cargos_url action_label="Gerenciar cargos" size_class="field-size-1" only %}
-                  </div>
-                </div>
+              {{ form.coordenador_adm_nome_manual }}
+              <div class="field-grid field-grid--cols-3">
+                {% include "components/forms/form_field.html" with field=form.coordenador_adm label="Nome" size_class="field-size-2" only %}
+                {% include "components/forms/input_with_action.html" with field=form.coordenador_adm_cargo_manual label="Cargo" action_url=cargos_url action_label="Gerenciar cargos" size_class="field-size-1" only %}
               </div>
             </div>
 
             <div class="field field-size-2 app-form-field" data-pt-coordenador-panel="op">
               {{ form.coordenador_op_modo }}
-              <div class="field-grid">
-                {% include "components/forms/form_field.html" with field=form.coordenador_op label="Coordenador operacional (opcional)" size_class="field-size-2" only %}
-                <div class="field-size-2">
-                  <div class="field-grid field-grid--cols-3">
-                    {% include "components/forms/form_field.html" with field=form.coordenador_op_nome_manual label="Nome" size_class="field-size-2" only %}
-                    {% include "components/forms/input_with_action.html" with field=form.coordenador_op_cargo_manual label="Cargo" action_url=cargos_url action_label="Gerenciar cargos" size_class="field-size-1" only %}
-                  </div>
-                </div>
+              {{ form.coordenador_op_nome_manual }}
+              <div class="field-grid field-grid--cols-3">
+                {% include "components/forms/form_field.html" with field=form.coordenador_op label="Nome" size_class="field-size-2" only %}
+                {% include "components/forms/input_with_action.html" with field=form.coordenador_op_cargo_manual label="Cargo" action_url=cargos_url action_label="Gerenciar cargos" size_class="field-size-1" only %}
               </div>
             </div>
           </div>
@@ -289,5 +281,5 @@
 
 {% block extra_js %}
   {{ block.super }}
-  <script src="{% static 'js/pages/planos-trabalho-wizard.js' %}?v=20260613a" defer></script>
+  <script src="{% static 'js/pages/planos-trabalho-wizard.js' %}?v=20260614-coordenador-unico" defer></script>
 {% endblock %}
