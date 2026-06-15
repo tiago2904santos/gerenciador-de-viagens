@@ -433,14 +433,13 @@ def montar_metas_texto(itens: list[AtividadePlanoTrabalho]) -> str:
         if meta and meta not in vistos:
             vistos.add(meta)
             metas.append(meta)
-    return "\n\n".join(metas)
+    return "\n".join(f"• {m}" for m in metas)
 
 
 def montar_recursos_texto(itens: list[AtividadePlanoTrabalho]) -> str:
     """Texto-base de recursos a partir das atividades (recurso é opcional)."""
     if not itens:
         return ""
-    atividades = "; ".join(item.nome for item in itens)
     recursos_itens: list[str] = []
     vistos: set[str] = set()
     for item in itens:
@@ -448,18 +447,11 @@ def montar_recursos_texto(itens: list[AtividadePlanoTrabalho]) -> str:
         if recurso and recurso not in vistos:
             vistos.add(recurso)
             recursos_itens.append(f"• {recurso}")
-    linhas = [
-        (
-            "Recursos operacionais, materiais de atendimento, equipamentos de apoio "
-            "e suporte logístico compatíveis com as atividades selecionadas."
-        ),
-        f"Escopo previsto: {atividades}.",
-    ]
+    linhas: list[str] = []
     if recursos_itens:
-        linhas.append("Recursos específicos por atividade:")
         linhas.extend(recursos_itens)
     if any(item.codigo == CODIGO_UNIDADE_MOVEL for item in itens):
-        linhas.append("Prever unidade móvel institucional e o suporte operacional associado.")
+        linhas.append("• Prever unidade móvel institucional e o suporte operacional associado.")
     return "\n".join(linhas)
 
 
