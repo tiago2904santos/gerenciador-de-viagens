@@ -170,7 +170,7 @@
           </div>
         </div>
 
-        <section class="wizard-inner-section" aria-labelledby="pt-diarias-resultado-title" style="margin-top: var(--space-4);">
+        <section class="wizard-inner-section" aria-labelledby="pt-diarias-resultado-title">
           <header class="wizard-inner-section__header">
             <h4 class="wizard-inner-section__title" id="pt-diarias-resultado-title">Resultado do cálculo</h4>
           </header>
@@ -187,7 +187,7 @@
             </div>
             <div class="oficio-lc__transport-card">
               <span class="oficio-lc__transport-label">Valor por servidor</span>
-              <div class="oficio-lc__transport-placa" data-pt-resultado-unitario>
+              <div class="oficio-lc__valor-total" data-pt-resultado-unitario>
                 {% if diarias_resultado.ok %}R${{ diarias_resultado.valor_unitario_display }}{% else %}—{% endif %}
               </div>
               <span class="oficio-lc__transport-label">Por extenso</span>
@@ -219,5 +219,5 @@
 
 {% block extra_js %}
   {{ block.super }}
-  <script src="{% static 'js/pages/planos-trabalho-wizard.js' %}?v=20260614c" defer></script>
+  <script src="{% static 'js/pages/planos-trabalho-wizard.js' %}?v=20260614-autosave" defer></script>
 {% endblock %}

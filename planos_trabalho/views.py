@@ -436,7 +436,80 @@ def _efetivo_diarias_context(*, formset, diarias_form, plano, resultado=None):
         "diarias_resultado": resultado,
         "cargos_url": reverse("cadastros:cargos_index"),
         "api_calcular_diarias_url": reverse("planos_trabalho:api_calcular_diarias", args=[plano.pk]),
+        "wizard_autosave_url": reverse("planos_trabalho:efetivo_diarias_autosave", args=[plano.pk]),
+        "wizard_autosave_step": "efetivo_diarias",
     }
+
+
+def _plano_diarias_autosave_data(plano: PlanoTrabalho):
+    data = {
+        "saida_sede_data": plano.saida_sede_data.isoformat() if plano.saida_sede_data else "",
+        "saida_sede_hora": plano.saida_sede_hora.strftime("%H:%M") if plano.saida_sede_hora else "",
+        "chegada_sede_data": plano.chegada_sede_data.isoformat() if plano.chegada_sede_data else "",
+        "chegada_sede_hora": plano.chegada_sede_hora.strftime("%H:%M") if plano.chegada_sede_hora else "",
+    }
+    return _querydict_from_pairs(data)
+
+
+def _apply_efetivo_snapshot(plano: PlanoTrabalho, rows):
+    """Reconcilia o efetivo do plano com o snapshot recebido do autosave.
+
+    Linhas com `cargo` e `quantidade` válidos são criadas/atualizadas; linhas
+    incompletas são ignoradas (placeholders no formulário). IDs ausentes no
+    snapshot são removidos do banco para refletir o estado atual da tela.
+    """
+    from cadastros.models import Cargo, Unidade  # import lazy para evitar ciclos
+
+    existentes = {efetivo.pk: efetivo for efetivo in plano.efetivos.all()}
+    mantidos: set[int] = set()
+    saida: list[dict] = []
+    vistos: set[tuple] = set()
+
+    for index, row in enumerate(rows or []):
+        if not isinstance(row, dict):
+            continue
+        cargo_id = _to_int_or_none(row.get("cargo"))
+        quantidade = _to_int_or_none(row.get("quantidade"))
+        unidade_id = _to_int_or_none(row.get("unidade"))
+        client_idx = _to_int_or_none(row.get("idx"))
+        if client_idx is None:
+            client_idx = index
+        if not cargo_id or not quantidade or quantidade <= 0:
+            continue
+        if not Cargo.objects.filter(pk=cargo_id).exists():
+            continue
+        if unidade_id and not Unidade.objects.filter(pk=unidade_id).exists():
+            unidade_id = None
+        chave = (unidade_id, cargo_id)
+        if chave in vistos:
+            continue
+        vistos.add(chave)
+        row_id = _to_int_or_none(row.get("id"))
+        if row_id and row_id in existentes:
+            efetivo = existentes[row_id]
+            efetivo.unidade_id = unidade_id
+            efetivo.cargo_id = cargo_id
+            efetivo.quantidade = quantidade
+            efetivo.save(update_fields=["unidade", "cargo", "quantidade", "updated_at"])
+            mantidos.add(row_id)
+        else:
+            efetivo = plano.efetivos.create(unidade_id=unidade_id, cargo_id=cargo_id, quantidade=quantidade)
+            mantidos.add(efetivo.pk)
+        saida.append({"idx": client_idx, "id": efetivo.pk})
+
+    remover = [pk for pk in existentes if pk not in mantidos]
+    if remover:
+        plano.efetivos.filter(pk__in=remover).delete()
+    return saida
+
+
+def _to_int_or_none(value):
+    if value in (None, ""):
+        return None
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
 
 
 def _diarias_display_values(form):
@@ -541,6 +614,55 @@ def api_calcular_diarias(request, pk):
     )
 
 
+@require_POST
+def efetivo_diarias_autosave(request, pk):
+    plano = _get_plano(pk)
+    try:
+        payload = parse_autosave_payload(request, expected_model="plano_trabalho")
+    except AutosavePayloadError as exc:
+        return autosave_json_response(ok=False, message=str(exc))
+
+    # Campos planos da etapa 2 (saída/chegada na sede)
+    allowed_fields = set(PlanoDiariasForm.Meta.fields)
+    clean_fields = filter_allowed_fields(payload.fields, payload.dirty_fields, allowed_fields)
+    if clean_fields:
+        data = _merge_payload_fields(_plano_diarias_autosave_data(plano), clean_fields)
+        diarias_form = PlanoDiariasForm(data, instance=plano)
+        if not diarias_form.is_valid():
+            return autosave_json_response(
+                ok=False,
+                message="Alguns campos ainda precisam de ajuste antes do autosave.",
+                errors=_autosave_form_errors(diarias_form),
+            )
+        plano = diarias_form.save()
+
+    # Snapshot do efetivo (formset inline)
+    efetivo_result = None
+    efetivo_snapshot = payload.snapshots.get("efetivo")
+    if isinstance(efetivo_snapshot, list):
+        efetivo_result = _apply_efetivo_snapshot(plano, efetivo_snapshot)
+
+    if plano.saida_sede_data and plano.chegada_sede_data:
+        atualizar_snapshot_diarias(plano)
+
+    snapshots_payload = {}
+    if efetivo_result is not None:
+        snapshots_payload["efetivo"] = efetivo_result
+
+    now = timezone.localtime()
+    return JsonResponse(
+        {
+            "ok": True,
+            "object_id": plano.pk,
+            "created": False,
+            "saved_at": now.isoformat(),
+            "saved_at_display": now.strftime("%d/%m/%Y %H:%M"),
+            "version": _plano_autosave_version(plano),
+            "snapshots": snapshots_payload,
+        }
+    )
+
+
 # ── Etapa 3 — Atividades, metas e recursos ───────────────────────────────────
 
 
@@ -590,7 +712,31 @@ def _atividades_context(*, plano, catalogo, selected_codes):
         "metas_preview": metas_preview,
         "recursos_preview": recursos_preview,
         "atividades_manager_url": reverse("planos_trabalho:atividades_index"),
+        "wizard_autosave_url": reverse("planos_trabalho:atividades_autosave", args=[plano.pk]),
+        "wizard_autosave_step": "atividades",
     }
+
+
+@require_POST
+def atividades_autosave(request, pk):
+    plano = _get_plano(pk)
+    try:
+        payload = parse_autosave_payload(request, expected_model="plano_trabalho")
+    except AutosavePayloadError as exc:
+        return autosave_json_response(ok=False, message=str(exc))
+
+    snapshot = payload.snapshots.get("atividades")
+    if isinstance(snapshot, dict):
+        raw_codigos = snapshot.get("codigos") or []
+        if not isinstance(raw_codigos, list):
+            return autosave_json_response(ok=False, message="Códigos inválidos no autosave.")
+        codigos = [str(item).strip() for item in raw_codigos if str(item).strip()]
+        catalogo = atividades_catalogo_ativas()
+        selecionadas = [item for item in catalogo if item.codigo in codigos]
+        plano.atividades_selecionadas.set(selecionadas)
+        sincronizar_atividades(plano)
+
+    return autosave_json_response(ok=True, object_id=plano.pk, version=_plano_autosave_version(plano))
 
 
 def wizard_atividades(request, pk):

@@ -336,7 +336,7 @@
     if (op.nome) {
       paragrafos.push(preencherTemplateCoordenador(templates.coordenacao_op, op, "op"));
     }
-    return paragrafos.filter(Boolean).join("\n");
+    return paragrafos.filter(Boolean).join("\n\n");
   }
 
   function isCoordenadorTextTarget(target) {
@@ -399,6 +399,14 @@
         isCoordenadorTextTarget(target)
       ) {
         regenerate();
+      }
+      // When cargo_manual changes, also mark the companion fields dirty so the
+      // autosave payload includes enough context to clear any stale servidor data.
+      var cargoManualMatch = /^coordenador_(adm|op)_cargo_manual$/.exec(target.name || "");
+      if (cargoManualMatch && window.AppAutosave) {
+        var papel = cargoManualMatch[1];
+        window.AppAutosave.markDirty(form, "coordenador_" + papel, 900);
+        window.AppAutosave.markDirty(form, "coordenador_" + papel + "_nome_manual", 900);
       }
     });
     form.addEventListener("input", function (event) {
@@ -675,6 +683,8 @@
       rowsContainer.appendChild(row);
       totalInput.value = String(index + 1);
       bindEfetivoInputs(scope, row);
+      var cvSelect = (window.CV && window.CV.customSelect) || window.CvCustomSelect;
+      if (cvSelect && cvSelect.init) cvSelect.init(row);
       initPickers(scope);
       updateEfetivoRemoveButtons(scope);
     });
@@ -733,7 +743,7 @@
       var unidade = row.querySelector("select[name$='-unidade']");
       var cargo = row.querySelector("select[name$='-cargo']");
       var qtd = row.querySelector("input[name$='-quantidade']");
-      if (!unidade || !unidade.value || !cargo || !cargo.value) return;
+      if (!cargo || !cargo.value) return;
       var n = parseInt((qtd && qtd.value) || "0", 10);
       if (!isNaN(n) && n > 0) total += n;
     });
@@ -929,6 +939,113 @@
     refresh();
   }
 
+  /* ── Autosave: provedor de snapshots por etapa ─────────────── */
+
+  function collectEfetivoSnapshot(form) {
+    var rows = Array.prototype.slice.call(form.querySelectorAll("[data-pt-efetivo-row]"));
+    var out = [];
+    rows.forEach(function (row, index) {
+      if (row.hidden) return;
+      var deleteInput = row.querySelector("input[name$='-DELETE']");
+      if (deleteInput && deleteInput.checked) return;
+      var idInput = row.querySelector("input[name$='-id']");
+      var unidade = row.querySelector("select[name$='-unidade']");
+      var cargo = row.querySelector("select[name$='-cargo']");
+      var qtd = row.querySelector("input[name$='-quantidade']");
+      out.push({
+        idx: index,
+        id: idInput && idInput.value ? idInput.value : "",
+        unidade: unidade ? unidade.value : "",
+        cargo: cargo ? cargo.value : "",
+        quantidade: qtd ? qtd.value : "",
+      });
+    });
+    return out;
+  }
+
+  function collectAtividadesSnapshot(form) {
+    var checkboxes = Array.prototype.slice.call(form.querySelectorAll("[data-pt-activity-checkbox]"));
+    var codigos = checkboxes.filter(function (cb) { return cb.checked; }).map(function (cb) { return cb.value; });
+    return { codigos: codigos };
+  }
+
+  window.AppAutosaveSnapshots = window.AppAutosaveSnapshots || {};
+  window.AppAutosaveSnapshots.plano_trabalho = function (form) {
+    var step = form.dataset.autosaveStep || "";
+    var snapshots = {};
+    if (step === "efetivo_diarias") {
+      snapshots.efetivo = collectEfetivoSnapshot(form);
+    } else if (step === "atividades") {
+      snapshots.atividades = collectAtividadesSnapshot(form);
+    }
+    return snapshots;
+  };
+
+  function findAutosaveForm(scope) {
+    return scope.closest("form[data-autosave='true']");
+  }
+
+  function markSnapshot(form, name, delay) {
+    if (!form || !window.AppAutosave || !window.AppAutosave.markSnapshotChanged) return;
+    window.AppAutosave.markSnapshotChanged(form, name, delay);
+  }
+
+  function applyEfetivoIdsFromResponse(scope, snapshotResult) {
+    if (!Array.isArray(snapshotResult)) return;
+    var rows = Array.prototype.slice.call(scope.querySelectorAll("[data-pt-efetivo-row]"));
+    snapshotResult.forEach(function (entry) {
+      var idx = typeof entry.idx === "number" ? entry.idx : parseInt(entry.idx, 10);
+      if (isNaN(idx) || !rows[idx]) return;
+      var idInput = rows[idx].querySelector("input[name$='-id']");
+      if (idInput && entry.id && !idInput.value) idInput.value = String(entry.id);
+    });
+  }
+
+  function wireEfetivoAutosave(scope) {
+    var form = findAutosaveForm(scope);
+    if (!form) return;
+    var rowsContainer = scope.querySelector("[data-pt-efetivo-rows]");
+    if (!rowsContainer) return;
+
+    function ping() { markSnapshot(form, "efetivo", 900); }
+
+    rowsContainer.addEventListener("change", function (event) {
+      var target = event.target;
+      if (!target) return;
+      if (target.matches && target.matches("select[name$='-unidade'], select[name$='-cargo'], input[name$='-quantidade'], input[name$='-DELETE']")) {
+        ping();
+      }
+    });
+    rowsContainer.addEventListener("input", function (event) {
+      var target = event.target;
+      if (!target || !target.matches) return;
+      if (target.matches("input[name$='-quantidade']")) ping();
+    });
+
+    var addButton = scope.querySelector("[data-pt-efetivo-add]");
+    if (addButton) addButton.addEventListener("click", function () { window.setTimeout(ping, 50); });
+
+    form.addEventListener("autosave:success", function (event) {
+      var data = event.detail || {};
+      if (data && data.snapshots && data.snapshots.efetivo) {
+        applyEfetivoIdsFromResponse(scope, data.snapshots.efetivo);
+      }
+    });
+  }
+
+  function wireAtividadesAutosave(scope) {
+    var form = findAutosaveForm(scope);
+    if (!form) return;
+    function ping() { markSnapshot(form, "atividades", 600); }
+    Array.prototype.slice.call(scope.querySelectorAll("[data-pt-activity-checkbox]")).forEach(function (cb) {
+      cb.addEventListener("change", ping);
+    });
+    var selectAll = scope.querySelector("[data-pt-activity-select-all]");
+    var clearBtn = scope.querySelector("[data-pt-activity-clear]");
+    if (selectAll) selectAll.addEventListener("click", function () { window.setTimeout(ping, 50); });
+    if (clearBtn) clearBtn.addEventListener("click", function () { window.setTimeout(ping, 50); });
+  }
+
   /* ── Bootstrap ──────────────────────────────────────────────── */
 
   document.addEventListener("DOMContentLoaded", function () {
@@ -946,11 +1063,13 @@
       initEfetivoFormset(efetivoDiarias);
       syncDiariasDateRange(efetivoDiarias);
       initDiariasLiveCalc(efetivoDiarias);
+      wireEfetivoAutosave(efetivoDiarias);
     }
 
     var atividades = document.querySelector("[data-pt-atividades]");
     if (atividades) {
       initAtividades(atividades);
+      wireAtividadesAutosave(atividades);
     }
   });
 })();

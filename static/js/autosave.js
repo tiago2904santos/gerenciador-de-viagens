@@ -283,6 +283,18 @@
     resume: function (form) {
       var instance = forms.get(form);
       if (instance) instance.resume();
+    },
+    markSnapshotChanged: function (form, name, delay) {
+      var instance = forms.get(form);
+      if (!instance) return;
+      instance.markSnapshotChanged(name);
+      instance.schedule(typeof delay === 'number' ? delay : 900);
+    },
+    markDirty: function (form, fieldName, delay) {
+      var instance = forms.get(form);
+      if (!instance) return;
+      instance.markDirty(fieldName);
+      instance.schedule(typeof delay === 'number' ? delay : 900);
     }
   };
   window.CV = window.CV || {};

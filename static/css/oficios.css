@@ -3453,10 +3453,13 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
 
 .oficio-lc__transport-placa {
   color: var(--color-heading);
-  font-size: clamp(28px, 3vw, 48px);
+  font-size: clamp(14px, 2.2vw, 32px);
   font-weight: 900;
   letter-spacing: 0.02em;
   line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .oficio-lc__transport-modelo {

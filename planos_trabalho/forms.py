@@ -433,8 +433,6 @@ class PlanoIdentificacaoForm(forms.ModelForm):
 
         cleaned[modo_key] = PlanoTrabalho.COORDENADOR_MODO_MANUAL
         cleaned[servidor_key] = None
-        if not nome_manual:
-            cleaned[cargo_key] = ""
 
     def save(self, commit=True):
         instance = super().save(commit=False)

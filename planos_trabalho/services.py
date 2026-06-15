@@ -34,10 +34,10 @@ _MESES_PT = (
 
 TEXTO_PADRAO_CONTEXTUALIZACAO = (
     "A Assessoria de Comunicação Social da Polícia Civil do Paraná (PCPR), no âmbito do "
-    "programa “PCPR na Comunidade”, promoverá ação itinerante no município de {municipio}.\n"
+    'programa "PCPR na Comunidade", promoverá ação itinerante no município de {municipio}.\n\n'
     "A iniciativa visa atender à solicitação formulada pelo {programa} (Ofício em anexo), "
     "levando serviços essenciais de polícia judiciária às populações urbanas, rurais e "
-    "ribeirinhas, especialmente em localidades de difícil acesso.\n"
+    "ribeirinhas, especialmente em localidades de difícil acesso.\n\n"
     "A ação tem como foco principal garantir o acesso à documentação básica e prestar "
     "orientações de polícia judiciária, promovendo cidadania e fortalecendo a aproximação "
     "institucional com a comunidade."
@@ -199,7 +199,7 @@ def montar_texto_coordenacao(plano: PlanoTrabalho) -> str:
                 **_termos_genero_coordenador(plano.coordenador_genero("op")),
             ),
         )
-    return "\n".join(paragrafos)
+    return "\n\n".join(paragrafos)
 
 
 # ── Períodos e efetivo ───────────────────────────────────────────────────────
