@@ -1,0 +1,117 @@
+{% comment %}
+Card de resumo de um evento — usado na etapa 4 (resumo/documentos) e na etapa 1
+(eventos já salvos, multi-evento). Mesmo visual nos dois lugares.
+
+Espera:
+  ev                     : dict do evento (apresentar_resumo_evento_card / _resumo_evento_de_plano)
+  numero                 : número do plano
+  coordenador_adm_nome   : nome do coordenador administrativo (nível plano)
+  coordenador_adm_cargo  : cargo do coordenador administrativo
+  is_multi               : bool — plano multi-evento
+  total_eventos          : total de eventos (subtítulo em multi)
+  mostrar_acoes          : bool — exibe editar/remover (usa ev.editar_url / ev.excluir_url)
+{% endcomment %}
+<section class="cv-wizard-section-card" aria-label="{% if is_multi %}Resumo do evento {{ ev.ordem }}{% else %}Resumo do plano{% endif %}">
+  <header class="cv-wizard-section-header pt-resumo-card-header">
+    <div class="cv-wizard-section-header__copy">
+      <h3 class="cv-wizard-section-title">
+        {% if is_multi %}Resumo do evento {{ ev.ordem }}{% else %}Resumo do plano{% endif %}
+      </h3>
+      <p class="cv-wizard-section-subtitle">
+        {% if is_multi %}Evento {{ ev.ordem }}{% if total_eventos %} de {{ total_eventos }}{% endif %} · {{ ev.programa }}{% else %}Dados utilizados para montar o documento.{% endif %}
+      </p>
+    </div>
+    {% if mostrar_acoes and ev.editar_url %}
+      <div class="pt-resumo-card-actions">
+        {# formaction: os botões vivem dentro do <form> do wizard (sem forms aninhados). #}
+        <button type="submit" formmethod="post" formaction="{{ ev.editar_url }}" formnovalidate
+                class="cv-icon-btn cv-icon-btn--edit" aria-label="Editar evento" data-tooltip="Editar evento" title="Editar evento">
+          {% include "dev/ui_lab/partials/_cv_icon.html" with icon="edit" only %}
+        </button>
+        <button type="submit" formmethod="post" formaction="{{ ev.excluir_url }}" formnovalidate
+                onclick="return confirm('Remover este evento do plano?');"
+                class="cv-icon-btn cv-icon-btn--delete" aria-label="Remover evento" data-tooltip="Remover evento" title="Remover evento">
+          {% include "dev/ui_lab/partials/_cv_icon.html" with icon="delete" only %}
+        </button>
+      </div>
+    {% endif %}
+  </header>
+
+  <div class="cv-wizard-section-body">
+    <div class="pt-resumo-evento">
+
+      {# ── Linha 1: identificação (4 colunas) ───────────────────── #}
+      <div class="pt-resumo-grid pt-resumo-grid--4">
+        <div class="pt-resumo-box">
+          <span class="pt-resumo-box__label">Número do plano</span>
+          <span class="pt-resumo-box__value">{{ numero }}</span>
+        </div>
+        <div class="pt-resumo-box">
+          <span class="pt-resumo-box__label">Destino</span>
+          <span class="pt-resumo-box__value">{{ ev.destino }}</span>
+        </div>
+        <div class="pt-resumo-box">
+          <span class="pt-resumo-box__label">Data do evento</span>
+          <span class="pt-resumo-box__value">{{ ev.data_evento_extenso|upper }}</span>
+        </div>
+        <div class="pt-resumo-box">
+          <span class="pt-resumo-box__label">Horário de atendimento</span>
+          <span class="pt-resumo-box__value">{{ ev.horario }}</span>
+        </div>
+      </div>
+
+      {# ── Linha 2: solicitante + coordenação ───────────────────── #}
+      <div class="pt-resumo-grid {% if ev.coordenador_op_presente %}pt-resumo-grid--3{% else %}pt-resumo-grid--2{% endif %}">
+        <div class="pt-resumo-box">
+          <span class="pt-resumo-box__label">Solicitante</span>
+          <span class="pt-resumo-box__value">{{ ev.programa }}</span>
+        </div>
+        <div class="pt-resumo-box">
+          <span class="pt-resumo-box__label">Coordenador administrativo</span>
+          <span class="pt-resumo-box__value">{{ coordenador_adm_nome }}{% if coordenador_adm_cargo %} <span class="pt-resumo-soft">· {{ coordenador_adm_cargo }}</span>{% endif %}</span>
+        </div>
+        {% if ev.coordenador_op_presente %}
+          <div class="pt-resumo-box">
+            <span class="pt-resumo-box__label">Coordenador operacional</span>
+            <span class="pt-resumo-box__value">{{ ev.coordenador_op }}{% if ev.coordenador_op_cargo %} <span class="pt-resumo-soft">· {{ ev.coordenador_op_cargo }}</span>{% endif %}</span>
+          </div>
+        {% endif %}
+      </div>
+
+      {# ── Linha 3: efetivo · valor/diárias · atividades (3 colunas) #}
+      <div class="pt-resumo-grid3">
+        <div class="pt-resumo-box pt-resumo-efetivo">
+          <span class="pt-resumo-box__label">Efetivo{% if ev.efetivo_total %} ({{ ev.efetivo_total }} servidor{{ ev.efetivo_total|pluralize:"es" }}){% endif %}</span>
+          <div class="pt-resumo-list">
+            {% for it in ev.efetivo_itens %}
+              <span class="pt-resumo-list__item">
+                <span class="pt-resumo-list__qty">{{ it.quantidade }}</span>
+                <span class="pt-resumo-list__text">{{ it.cargo }}{% if it.unidade %} <span class="pt-resumo-soft">· {{ it.unidade }}</span>{% endif %}</span>
+              </span>
+            {% empty %}
+              <span class="pt-resumo-atividades__empty">Nenhum efetivo informado.</span>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="pt-resumo-box pt-resumo-valor">
+          <span class="pt-resumo-box__label pt-resumo-box__label--accent">Valor total</span>
+          <span class="pt-resumo-valor__amount">{{ ev.valor_total_display }}</span>
+          <span class="pt-resumo-box__label pt-resumo-box__label--accent">Quantidade de diárias</span>
+          <span class="pt-resumo-box__value pt-resumo-box__value--lg">{{ ev.diarias_composicao }}</span>
+        </div>
+
+        <div class="pt-resumo-box pt-resumo-atividades">
+          <span class="pt-resumo-box__label">Atividades{% if ev.atividades_count %} ({{ ev.atividades_count }}){% endif %}</span>
+          <div class="pt-resumo-atividades__list">
+            {% for nome in ev.atividades %}
+              <span class="pt-resumo-atividades__item">{{ nome }}</span>
+            {% empty %}
+              <span class="pt-resumo-atividades__empty">Nenhuma atividade selecionada.</span>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

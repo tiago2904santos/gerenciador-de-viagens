@@ -5,7 +5,7 @@
   {{ block.super }}
   <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260612-pt">
   <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260614-pt-textos-coordenacao">
-  <link rel="stylesheet" href="{% static 'css/planos-trabalho-eventos.css' %}?v=20260615-pt-eventos">
+  <link rel="stylesheet" href="{% static 'css/planos-trabalho-eventos.css' %}?v=20260616-pt-resumo15">
 {% endblock %}
 
 {% block wizard_content %}
@@ -16,35 +16,19 @@
 
     {# ── 0. Eventos já adicionados (modo multi-evento) ──────────── #}
     {% if is_multi_evento %}
-      <section class="cv-wizard-section-card termo-card" id="pt-card-eventos-salvos">
-        <header class="cv-wizard-section-header">
-          <div class="cv-wizard-section-header__copy">
-            <h3 class="cv-wizard-section-title">Eventos do plano</h3>
-            <p class="cv-wizard-section-subtitle">
-              {% if em_edicao_evento %}Você está editando um evento já salvo. As alterações abaixo afetam apenas esse evento.{% else %}Eventos já adicionados ao plano. Os campos abaixo são para um <strong>novo</strong> evento.{% endif %}
-            </p>
-          </div>
-        </header>
-        <div class="cv-wizard-section-body">
-          <div class="pte-events">
-            {% if em_edicao_evento %}
-              <div class="pte-events__banner" role="status">
-                {% include "dev/ui_lab/partials/_cv_icon.html" with icon="edit" extra_class="pte-events__banner-icon" only %}
-                <span>Editando um evento existente — preencha as etapas e salve. Para criar um novo evento, finalize este e use “Adicionar evento ao plano” na última etapa.</span>
-              </div>
-            {% endif %}
-            {% if eventos_cards %}
-              <div class="pte-events__grid">
-                {% for card in eventos_cards %}
-                  {% include "planos_trabalho/partials/evento_card.html" with card=card em_edicao=False only %}
-                {% endfor %}
-              </div>
-            {% elif not em_edicao_evento %}
-              <p class="cv-card__hint"><em>Nenhum outro evento ainda. Preencha os campos e use “Adicionar evento ao plano” na etapa final para salvar e começar o próximo.</em></p>
-            {% endif %}
-          </div>
+      {% if em_edicao_evento %}
+        <div class="pte-events__banner" role="status">
+          {% include "dev/ui_lab/partials/_cv_icon.html" with icon="edit" extra_class="pte-events__banner-icon" only %}
+          <span>Editando um evento existente — preencha as etapas e salve. Para criar um novo evento, finalize este e use “Adicionar evento ao plano” na última etapa.</span>
         </div>
-      </section>
+      {% endif %}
+      {% for ev in eventos_resumo %}
+        {% include "planos_trabalho/partials/resumo_evento_card.html" with ev=ev numero=resumo_header.numero coordenador_adm_nome=resumo_header.coordenador_adm_nome coordenador_adm_cargo=resumo_header.coordenador_adm_cargo is_multi=True total_eventos=total_eventos_commitados mostrar_acoes=True only %}
+      {% empty %}
+        {% if not em_edicao_evento %}
+          <p class="cv-card__hint"><em>Nenhum outro evento ainda. Preencha os campos e use “Adicionar evento ao plano” na etapa final para salvar e começar o próximo.</em></p>
+        {% endif %}
+      {% endfor %}
     {% endif %}
 
     {# ── 1. Programa solicitante ─────────────────────────────── #}

@@ -4,8 +4,9 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-# Respeita .env; se LOGIN_ENFORCED nao estiver definido, desliga login obrigatorio em dev (testes manuais / agentes).
-load_dotenv(Path(__file__).resolve().parents[2] / ".env", override=False)
+# Respeita ENV_FILE; se LOGIN_ENFORCED nao estiver definido, desliga login obrigatorio em dev (testes manuais / agentes).
+BASE_DIR = Path(__file__).resolve().parents[2]
+load_dotenv(BASE_DIR / os.getenv("ENV_FILE", ".env"), override=False)
 if "LOGIN_ENFORCED" not in os.environ:
     os.environ["LOGIN_ENFORCED"] = "false"
 
@@ -26,7 +27,11 @@ if "DOCUMENTOS_PDF_AUTO_FALLBACK" not in os.environ:
 if "DOCUMENTOS_PREGENERATE_PDF" not in os.environ:
     DOCUMENTOS_PREGENERATE_PDF = False
 
-required_db_vars = ["DB_NAME", "DB_USER", "DB_PASSWORD"]
+db_engine = os.getenv("DB_ENGINE", "django.db.backends.postgresql")
+required_db_vars = ["DB_NAME"]
+if db_engine != "django.db.backends.sqlite3":
+    required_db_vars.extend(["DB_USER", "DB_PASSWORD"])
+
 missing_db_vars = [name for name in required_db_vars if not os.getenv(name)]
 
 if missing_db_vars:
@@ -36,7 +41,7 @@ if missing_db_vars:
 
 DATABASES = {
     "default": {
-        "ENGINE": os.getenv("DB_ENGINE", "django.db.backends.postgresql"),
+        "ENGINE": db_engine,
         "NAME": os.getenv("DB_NAME"),
         "USER": os.getenv("DB_USER"),
         "PASSWORD": os.getenv("DB_PASSWORD"),

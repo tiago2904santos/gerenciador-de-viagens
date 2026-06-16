@@ -131,6 +131,22 @@ def _resumo_evento_de_evento(evento):
     return card
 
 
+def apresentar_resumo_evento_card(evento):
+    """Card de resumo de um evento (mesmo visual da etapa 4). Uso público."""
+    return _resumo_evento_de_evento(evento)
+
+
+def apresentar_resumo_header(plano):
+    """Dados de nível do plano usados no cabeçalho dos cards de resumo de evento."""
+    nome_adm, cargo_adm = plano.coordenador_nome_cargo("adm")
+    return {
+        "numero": plano.numero_formatado,
+        "coordenador_adm_nome": nome_adm or "—",
+        "coordenador_adm_cargo": cargo_adm or "",
+        "is_multi": plano.is_multi_evento,
+    }
+
+
 def apresentar_resumo_documentos(plano):
     """Resumo de conferência (etapa 4) — clone do card 'Resumo do ofício'.
 

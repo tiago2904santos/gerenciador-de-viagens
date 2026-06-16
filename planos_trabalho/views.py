@@ -35,9 +35,10 @@ from .models import EventoPlano
 from .models import PlanoTrabalho
 from .models import HorarioAtendimento
 from .models import ProgramaSolicitante
-from .presenters import apresentar_evento_card
 from .presenters import apresentar_plano_card
 from .presenters import apresentar_resumo_documentos
+from .presenters import apresentar_resumo_evento_card
+from .presenters import apresentar_resumo_header
 from .presenters import apresentar_plano_wizard_header
 from .presenters import apresentar_plano_wizard_page_steps
 from .presenters import apresentar_plano_wizard_steps
@@ -305,7 +306,8 @@ def _texto_auto_flag(form, plano, post_name, attr):
 
 
 def _identificacao_context(*, form, plano):
-    eventos_cards = [apresentar_evento_card(e) for e in eventos_para_cards(plano)]
+    eventos_commitados = eventos_para_cards(plano)
+    eventos_resumo = [apresentar_resumo_evento_card(e) for e in eventos_commitados]
     return {
         "page_title": "Plano de Trabalho",
         **_wizard_shell_ctx(plano=plano, etapa_atual="identificacao"),
@@ -326,7 +328,9 @@ def _identificacao_context(*, form, plano):
         "consideracao_auto": _texto_auto_flag(form, plano, "consideracao_auto", "consideracao_auto"),
         # Multi-evento
         "is_multi_evento": plano.is_multi_evento,
-        "eventos_cards": eventos_cards,
+        "eventos_resumo": eventos_resumo,
+        "resumo_header": apresentar_resumo_header(plano),
+        "total_eventos_commitados": len(eventos_resumo),
         "em_edicao_evento": plano.evento_em_edicao_id,
     }
 
@@ -1000,7 +1004,6 @@ def wizard_documentos(request, pk):
             "mostrar_pendencias": bool(pendencias),
             "documento_disponivel": not pendencias,
             "is_multi_evento": plano.is_multi_evento,
-            "eventos_cards": [apresentar_evento_card(e) for e in eventos_para_cards(plano)],
             "evento_adicionar_url": reverse("planos_trabalho:evento_adicionar", args=[plano.pk]),
             "pdf_inline_url": reverse("planos_trabalho:pdf_inline", args=[plano.pk]),
             "baixar_docx_url": reverse("planos_trabalho:baixar_documento", args=[plano.pk, "docx"]),

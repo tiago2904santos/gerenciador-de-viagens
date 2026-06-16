@@ -6,7 +6,14 @@ from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parents[2]
 
-load_dotenv(BASE_DIR / ".env")
+
+def env_path(name, default):
+    value = Path(os.getenv(name, default))
+    return value if value.is_absolute() else BASE_DIR / value
+
+
+ENV_FILE = os.getenv("ENV_FILE", ".env")
+load_dotenv(BASE_DIR / ENV_FILE)
 
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-insecure-key")
 DEBUG = os.getenv("DEBUG", "False").lower() == "true"
@@ -92,6 +99,7 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = env_path("STATIC_ROOT", "staticfiles")
 
 # Rotas (OpenRouteService via backend — nunca expor OPENROUTESERVICE_API_KEY ao navegador)
 ROUTE_PROVIDER = (os.getenv("ROUTE_PROVIDER") or "openrouteservice").strip().lower()
@@ -103,7 +111,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Armazenamento de artefatos documentais gerados (assinatura, auditoria).
 MEDIA_URL = "media/"
-MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_ROOT = env_path("MEDIA_ROOT", "media")
 
 # Núcleo documental (DOCX/PDF, conversão opcional, assinatura).
 DOCUMENTOS_RESOURCES_DIR = BASE_DIR / "documentos" / "resources"
@@ -137,4 +145,3 @@ DOCUMENTOS_SIMPLE_PDF_FALLBACK = os.getenv("DOCUMENTOS_SIMPLE_PDF_FALLBACK", "")
     "true",
     "yes",
 )
-
