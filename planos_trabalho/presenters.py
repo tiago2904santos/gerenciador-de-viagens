@@ -44,6 +44,118 @@ def apresentar_evento_card(evento):
     }
 
 
+def _efetivo_itens(efetivos):
+    """Linhas de efetivo (cargo · unidade · quantidade) para a lista do resumo."""
+    itens = []
+    for item in efetivos.select_related("cargo", "unidade").order_by("cargo__nome"):
+        if not item.quantidade or not item.cargo_id:
+            continue
+        cargo_nome = (item.cargo.nome or "").strip()
+        if not cargo_nome:
+            continue
+        unidade = ""
+        if item.unidade_id and item.unidade:
+            sigla = (getattr(item.unidade, "sigla", "") or "").strip()
+            unidade = sigla or (item.unidade.nome or "").strip()
+        itens.append(
+            {"quantidade": int(item.quantidade), "cargo": cargo_nome, "unidade": unidade}
+        )
+    return itens
+
+
+def _resumo_evento_de_plano(plano):
+    """Bloco de resumo (etapa 4) derivado dos campos do plano — evento único."""
+    from roteiros.services.diarias import formatar_valor_diarias
+    from roteiros.services.valor_extenso import valor_por_extenso_ptbr
+    from .services import format_periodo_evento_extenso, montar_efetivo_texto
+
+    nome_op, cargo_op = plano.coordenador_nome_cargo("op")
+    atividades = (
+        list(plano.atividades_selecionadas.order_by("ordem", "nome")) if plano.pk else []
+    )
+    valor_total_display = ""
+    valor_unitario_display = ""
+    valor_extenso = ""
+    if plano.diarias_valor_total is not None:
+        valor_total_display = f"R$ {formatar_valor_diarias(plano.diarias_valor_total)}"
+        valor_extenso = valor_por_extenso_ptbr(plano.diarias_valor_total)
+    if plano.diarias_valor_unitario is not None:
+        valor_unitario_display = f"R$ {formatar_valor_diarias(plano.diarias_valor_unitario)}"
+
+    return {
+        "ordem": 1,
+        "titulo": "Evento",
+        "programa": plano.programa_display or "—",
+        "destino": plano.destino_display,
+        "periodo": plano.periodo_display,
+        "data_evento_extenso": format_periodo_evento_extenso(
+            plano.data_evento_inicio, plano.data_evento_fim
+        ) or "—",
+        "horario": (plano.horario_atendimento or "").strip() or "—",
+        "coordenador_op": nome_op or "—",
+        "coordenador_op_cargo": cargo_op or "",
+        "coordenador_op_presente": bool(nome_op),
+        "efetivo_total": plano.total_efetivo,
+        "efetivo_texto": montar_efetivo_texto(plano),
+        "efetivo_itens": _efetivo_itens(plano.efetivos) if plano.pk else [],
+        "valor_total_display": valor_total_display or "—",
+        "valor_unitario_display": valor_unitario_display or "—",
+        "valor_extenso": valor_extenso or "—",
+        "diarias_composicao": (plano.diarias_composicao or "").strip() or "—",
+        "atividades": [a.nome for a in atividades],
+        "atividades_count": len(atividades),
+    }
+
+
+def _resumo_evento_de_evento(evento):
+    """Bloco de resumo (etapa 4) de um evento commitado — multi-evento."""
+    from roteiros.services.valor_extenso import valor_por_extenso_ptbr
+    from .services import format_periodo_evento_extenso
+
+    card = apresentar_evento_card(evento)
+    card["valor_total_display"] = card.get("valor_total_display") or "—"
+    card["valor_unitario_display"] = card.get("valor_unitario_display") or "—"
+    card["diarias_composicao"] = card.get("diarias_composicao") or "—"
+    card["coordenador_op_presente"] = bool(
+        card.get("coordenador_op") and card["coordenador_op"] != "—"
+    )
+    card["data_evento_extenso"] = format_periodo_evento_extenso(
+        evento.data_evento_inicio, evento.data_evento_fim
+    ) or "—"
+    card["valor_extenso"] = (
+        valor_por_extenso_ptbr(evento.diarias_valor_total)
+        if evento.diarias_valor_total is not None
+        else "—"
+    )
+    card["efetivo_itens"] = _efetivo_itens(evento.efetivos)
+    return card
+
+
+def apresentar_resumo_documentos(plano):
+    """Resumo de conferência (etapa 4) — clone do card 'Resumo do ofício'.
+
+    Identidade do plano (número, data de criação, coordenador administrativo) fica
+    no cabeçalho; cada evento ganha um bloco de fatos próprio. Em evento único há um
+    único bloco derivado do plano; em multi-evento, um bloco por evento commitado.
+    """
+    nome_adm, cargo_adm = plano.coordenador_nome_cargo("adm")
+
+    if plano.is_multi_evento:
+        eventos = [_resumo_evento_de_evento(e) for e in plano.eventos_ordenados]
+    else:
+        eventos = [_resumo_evento_de_plano(plano)]
+
+    return {
+        "numero": plano.numero_formatado,
+        "data_criacao": plano.data_criacao.strftime("%d/%m/%Y"),
+        "coordenador_adm_nome": nome_adm or "—",
+        "coordenador_adm_cargo": cargo_adm or "",
+        "is_multi": plano.is_multi_evento,
+        "total_eventos": len(eventos),
+        "eventos": eventos,
+    }
+
+
 ETAPAS = [
     {"key": "identificacao", "number": 1, "title": "Identificação e atuação", "url_name": "planos_trabalho:wizard_identificacao"},
     {"key": "efetivo_diarias", "number": 2, "title": "Efetivo e diárias", "url_name": "planos_trabalho:wizard_efetivo_diarias"},

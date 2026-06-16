@@ -37,6 +37,7 @@ from .models import HorarioAtendimento
 from .models import ProgramaSolicitante
 from .presenters import apresentar_evento_card
 from .presenters import apresentar_plano_card
+from .presenters import apresentar_resumo_documentos
 from .presenters import apresentar_plano_wizard_header
 from .presenters import apresentar_plano_wizard_page_steps
 from .presenters import apresentar_plano_wizard_steps
@@ -1004,6 +1005,7 @@ def wizard_documentos(request, pk):
             "pdf_inline_url": reverse("planos_trabalho:pdf_inline", args=[plano.pk]),
             "baixar_docx_url": reverse("planos_trabalho:baixar_documento", args=[plano.pk, "docx"]),
             "baixar_pdf_url": reverse("planos_trabalho:baixar_documento", args=[plano.pk, "pdf"]),
+            "resumo_documentos": apresentar_resumo_documentos(plano),
             "resumo": {
                 "destino": plano.destino_display,
                 "periodo": plano.periodo_display,

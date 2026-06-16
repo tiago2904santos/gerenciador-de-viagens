@@ -4,7 +4,7 @@
 {% block extra_css %}
   {{ block.super }}
   <link rel="stylesheet" href="{% static 'css/oficios-documentos-inline.css' %}?v=20260612-pt">
-  <link rel="stylesheet" href="{% static 'css/planos-trabalho-eventos.css' %}?v=20260615-pt-eventos">
+  <link rel="stylesheet" href="{% static 'css/planos-trabalho-eventos.css' %}?v=20260616-pt-resumo15">
 {% endblock %}
 
 {% block wizard_content %}
@@ -26,38 +26,6 @@
       </div>
     </section>
   {% endif %}
-
-  {# ── Eventos do plano (multi-evento) ─────────────────────────── #}
-  <section class="cv-wizard-section-card" aria-labelledby="pt-eventos-title">
-    <header class="cv-wizard-section-header">
-      <div class="cv-wizard-section-header__copy">
-        <h3 class="cv-wizard-section-title" id="pt-eventos-title">Eventos do plano</h3>
-        <p class="cv-wizard-section-subtitle">
-          {% if is_multi_evento %}Este plano cobre múltiplos eventos. Os dados preenchidos nas etapas anteriores formam o evento atual.{% else %}Este plano cobre um único evento. Para incluir outro evento na mesma viagem, adicione-o abaixo.{% endif %}
-        </p>
-      </div>
-    </header>
-    <div class="cv-wizard-section-body">
-      <div class="pte-events">
-        {% if eventos_cards %}
-          <div class="pte-events__grid">
-            {% for card in eventos_cards %}
-              {% include "planos_trabalho/partials/evento_card.html" with card=card em_edicao=False only %}
-            {% endfor %}
-          </div>
-        {% endif %}
-        <div class="pte-events__banner" role="note">
-          {% include "dev/ui_lab/partials/_cv_icon.html" with icon="plus" extra_class="pte-events__banner-icon" only %}
-          <span>“Adicionar evento ao plano” salva os dados atuais como um evento e limpa o formulário para você preencher o próximo. O evento atual continua incluído no documento mesmo sem clicar.</span>
-        </div>
-        {# formaction: o botão está dentro do <form> do wizard (sem forms aninhados). #}
-        <button type="submit" formmethod="post" formaction="{{ evento_adicionar_url }}" formnovalidate
-                class="cv-btn cv-btn--secondary">
-          <span>+ Adicionar evento ao plano</span>
-        </button>
-      </div>
-    </div>
-  </section>
 
   <section class="cv-wizard-section-card oficio-documentos-preview-section document-inline-stack" aria-labelledby="pt-documentos-title">
     <header class="cv-wizard-section-header">
@@ -106,40 +74,115 @@
     {% endif %}
   </section>
 
-  <section class="cv-wizard-section-card oficio-documentos-summary-section" aria-labelledby="pt-resumo-title">
-    <header class="cv-wizard-section-header">
-      <div class="cv-wizard-section-header__copy">
-        <h3 class="cv-wizard-section-title" id="pt-resumo-title">Resumo do plano</h3>
-        <p class="cv-wizard-section-subtitle">Dados utilizados para montar o documento.</p>
-      </div>
-    </header>
-    <div class="cv-wizard-section-body">
-      <div class="oficio-lc__transport-row">
-        <div class="oficio-lc__transport-card">
-          <span class="oficio-lc__transport-label">Número</span>
-          <div class="oficio-lc__transport-placa">{{ plano.numero_formatado }}</div>
-          <span class="oficio-lc__transport-label">Destino</span>
-          <div class="oficio-lc__transport-modelo">{{ resumo.destino }}</div>
-          <span class="oficio-lc__transport-label">Período</span>
-          <div class="oficio-lc__transport-modelo">{{ resumo.periodo }}</div>
-          <span class="oficio-lc__transport-label">Horário de atendimento</span>
-          <div class="oficio-lc__transport-modelo">{{ resumo.horario }}</div>
+  {% with rd=resumo_documentos %}
+    {% for ev in rd.eventos %}
+      <section class="cv-wizard-section-card" aria-label="{% if rd.is_multi %}Resumo do evento {{ ev.ordem }}{% else %}Resumo do plano{% endif %}">
+        <header class="cv-wizard-section-header">
+          <div class="cv-wizard-section-header__copy">
+            <h3 class="cv-wizard-section-title">
+              {% if rd.is_multi %}Resumo do evento {{ ev.ordem }}{% else %}Resumo do plano{% endif %}
+            </h3>
+            <p class="cv-wizard-section-subtitle">
+              {% if rd.is_multi %}Evento {{ ev.ordem }} de {{ rd.total_eventos }} · {{ ev.programa }}{% else %}Dados utilizados para montar o documento.{% endif %}
+            </p>
+          </div>
+        </header>
+
+        <div class="cv-wizard-section-body">
+          <div class="pt-resumo-evento">
+
+            {# ── Linha 1: identificação (4 colunas) ───────────────────── #}
+            <div class="pt-resumo-grid pt-resumo-grid--4">
+              <div class="pt-resumo-box">
+                <span class="pt-resumo-box__label">Número do plano</span>
+                <span class="pt-resumo-box__value">{{ rd.numero }}</span>
+              </div>
+              <div class="pt-resumo-box">
+                <span class="pt-resumo-box__label">Destino</span>
+                <span class="pt-resumo-box__value">{{ ev.destino }}</span>
+              </div>
+              <div class="pt-resumo-box">
+                <span class="pt-resumo-box__label">Data do evento</span>
+                <span class="pt-resumo-box__value">{{ ev.data_evento_extenso|upper }}</span>
+              </div>
+              <div class="pt-resumo-box">
+                <span class="pt-resumo-box__label">Horário de atendimento</span>
+                <span class="pt-resumo-box__value">{{ ev.horario }}</span>
+              </div>
+            </div>
+
+            {# ── Linha 2: solicitante + coordenação ───────────────────── #}
+            <div class="pt-resumo-grid {% if ev.coordenador_op_presente %}pt-resumo-grid--3{% else %}pt-resumo-grid--2{% endif %}">
+              <div class="pt-resumo-box">
+                <span class="pt-resumo-box__label">Solicitante</span>
+                <span class="pt-resumo-box__value">{{ ev.programa }}</span>
+              </div>
+              <div class="pt-resumo-box">
+                <span class="pt-resumo-box__label">Coordenador administrativo</span>
+                <span class="pt-resumo-box__value">{{ rd.coordenador_adm_nome }}{% if rd.coordenador_adm_cargo %} <span class="pt-resumo-soft">· {{ rd.coordenador_adm_cargo }}</span>{% endif %}</span>
+              </div>
+              {% if ev.coordenador_op_presente %}
+                <div class="pt-resumo-box">
+                  <span class="pt-resumo-box__label">Coordenador operacional</span>
+                  <span class="pt-resumo-box__value">{{ ev.coordenador_op }}{% if ev.coordenador_op_cargo %} <span class="pt-resumo-soft">· {{ ev.coordenador_op_cargo }}</span>{% endif %}</span>
+                </div>
+              {% endif %}
+            </div>
+
+            {# ── Linha 3: efetivo · valor/diárias · atividades (3 colunas) #}
+            <div class="pt-resumo-grid3">
+              <div class="pt-resumo-box pt-resumo-efetivo">
+                <span class="pt-resumo-box__label">Efetivo{% if ev.efetivo_total %} ({{ ev.efetivo_total }} servidor{{ ev.efetivo_total|pluralize:"es" }}){% endif %}</span>
+                <div class="pt-resumo-list">
+                  {% for it in ev.efetivo_itens %}
+                    <span class="pt-resumo-list__item">
+                      <span class="pt-resumo-list__qty">{{ it.quantidade }}</span>
+                      <span class="pt-resumo-list__text">{{ it.cargo }}{% if it.unidade %} <span class="pt-resumo-soft">· {{ it.unidade }}</span>{% endif %}</span>
+                    </span>
+                  {% empty %}
+                    <span class="pt-resumo-atividades__empty">Nenhum efetivo informado.</span>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <div class="pt-resumo-box pt-resumo-valor">
+                <span class="pt-resumo-box__label pt-resumo-box__label--accent">Valor total</span>
+                <span class="pt-resumo-valor__amount">{{ ev.valor_total_display }}</span>
+                <span class="pt-resumo-box__label pt-resumo-box__label--accent">Quantidade de diárias</span>
+                <span class="pt-resumo-box__value pt-resumo-box__value--lg">{{ ev.diarias_composicao }}</span>
+              </div>
+
+              <div class="pt-resumo-box pt-resumo-atividades">
+                <span class="pt-resumo-box__label">Atividades{% if ev.atividades_count %} ({{ ev.atividades_count }}){% endif %}</span>
+                <div class="pt-resumo-atividades__list">
+                  {% for nome in ev.atividades %}
+                    <span class="pt-resumo-atividades__item">{{ nome }}</span>
+                  {% empty %}
+                    <span class="pt-resumo-atividades__empty">Nenhuma atividade selecionada.</span>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="oficio-lc__transport-card">
-          <span class="oficio-lc__transport-label">Programa solicitante</span>
-          <div class="oficio-lc__transport-modelo">{{ resumo.programa }}</div>
-          <span class="oficio-lc__transport-label">Efetivo</span>
-          <div class="oficio-lc__transport-modelo">{{ resumo.efetivo }}</div>
-        </div>
-        <div class="oficio-lc__transport-card oficio-lc__transport-card--valor">
-          <span class="oficio-lc__transport-label">Valor do plano</span>
-          <div class="oficio-lc__valor-extenso">{{ resumo.valor_plano }}</div>
-        </div>
+      </section>
+    {% endfor %}
+  {% endwith %}
+
+  {# ── Adicionar outro evento ao plano ─────────────────────────── #}
+  <section class="cv-wizard-section-card pt-add-evento">
+    <div class="cv-wizard-section-body pt-add-evento__inner">
+      <div class="pt-add-evento__copy">
+        {% include "dev/ui_lab/partials/_cv_icon.html" with icon="plus" extra_class="pt-add-evento__icon" only %}
+        <p class="pt-add-evento__text">
+          “Adicionar evento ao plano” salva os dados atuais como um evento e limpa o formulário para você preencher o próximo. O evento atual já está incluído no documento mesmo sem clicar.
+        </p>
       </div>
-      <div class="oficio-lc__transport-card" style="margin-top: var(--space-3);">
-        <span class="oficio-lc__transport-label">Coordenação</span>
-        <div class="oficio-lc__valor-extenso" style="white-space: pre-line;">{{ resumo.coordenacao }}</div>
-      </div>
+      {# formaction: o botão está dentro do <form> do wizard (sem forms aninhados). #}
+      <button type="submit" formmethod="post" formaction="{{ evento_adicionar_url }}" formnovalidate
+              class="cv-btn cv-btn--secondary pt-add-evento__btn">
+        <span>+ Adicionar evento ao plano</span>
+      </button>
     </div>
   </section>
 {% endblock %}
