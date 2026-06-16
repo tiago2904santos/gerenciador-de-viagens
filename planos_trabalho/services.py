@@ -495,64 +495,6 @@ def _evento_data_curta(evento: EventoPlano) -> tuple[str, bool]:
     return f"{inicio.strftime('%d/%m/%Y')} a {fim.strftime('%d/%m/%Y')}", False
 
 
-def _bloco_por_evento(plano: PlanoTrabalho, corpo_fn) -> str:
-    """Para cada evento: 'Header:\\n<corpo>', separados por linha em branco. Pula vazios."""
-    blocos: list[str] = []
-    for evento in plano.eventos_ordenados:
-        corpo = (corpo_fn(evento) or "").strip()
-        if not corpo:
-            continue
-        header = _evento_data_header(evento)
-        blocos.append(f"{header}:\n{corpo}" if header else corpo)
-    return "\n\n".join(blocos)
-
-
-def montar_metas_multi_texto(plano: PlanoTrabalho) -> str:
-    return _bloco_por_evento(plano, lambda e: montar_metas_texto(_atividades_evento_ordenadas(e)))
-
-
-def montar_atividades_multi_texto(plano: PlanoTrabalho) -> str:
-    return _bloco_por_evento(plano, lambda e: montar_atividades_texto(_atividades_evento_ordenadas(e)))
-
-
-def montar_recursos_multi_texto(plano: PlanoTrabalho) -> str:
-    return _bloco_por_evento(plano, lambda e: montar_recursos_texto(_atividades_evento_ordenadas(e)))
-
-
-def montar_atuacao_texto(plano: PlanoTrabalho) -> str:
-    """Bloco do placeholder {{atuacao}} (seção 4). Single = estrutura fixa; multi = por evento."""
-    if not plano.is_multi_evento:
-        data_ev = format_periodo_evento_extenso(plano.data_evento_inicio, plano.data_evento_fim)
-        destinos = format_city_uf(plano.destino_display) if plano.destino_cidade_id else ""
-        linhas = [
-            f"Datas: {data_ev};",
-            f"Local: {destinos};",
-            f"Horário de atendimento: {(plano.horario_atendimento or '').strip()};",
-            f"Efetivo total: {montar_efetivo_texto(plano)};",
-        ]
-        unidade_movel = montar_unidade_movel_texto(_atividades_selecionadas_ordenadas(plano))
-        if unidade_movel:
-            linhas.append(unidade_movel)
-        return "\n".join(linhas)
-
-    blocos: list[str] = []
-    for evento in plano.eventos_ordenados:
-        header = _evento_data_header(evento)
-        programa = (evento.programa_display or "").strip()
-        titulo = f"{header} - {programa}:" if programa else f"{header}:"
-        linhas = [
-            titulo,
-            f"Local: {format_city_uf(evento.destino_display)};",
-            f"Horário de atendimento: {(evento.horario_atendimento or '').strip()};",
-            f"Efetivo total: {montar_efetivo_evento_texto(evento)};",
-        ]
-        unidade_movel = montar_unidade_movel_texto(_atividades_evento_ordenadas(evento))
-        if unidade_movel:
-            linhas.append(unidade_movel)
-        blocos.append("\n".join(linhas))
-    return "\n\n".join(blocos)
-
-
 def _valor_bloco_texto(label: str, composicao: str, unitario_val, total_val) -> str:
     if total_val is None or unitario_val is None:
         return ""
@@ -1197,6 +1139,8 @@ def gerar_resposta_plano_documento(plano: PlanoTrabalho, formato: DocumentoForma
         reference = (
             f"{plano.numero:02d}-{plano.ano}" if plano.numero and plano.ano else f"plano-{plano.pk}"
         )
+        # Multi-evento usa um template dedicado (loops por evento); single mantém o padrão.
+        docx_template = "plano_trabalho_multievento.docx" if plano.is_multi_evento else None
         facade = build_default_facade()
         doc = facade.gerar(
             tipo=DocumentoTipo.PLANO_TRABALHO,
@@ -1204,6 +1148,7 @@ def gerar_resposta_plano_documento(plano: PlanoTrabalho, formato: DocumentoForma
             payload=payload,
             reference=reference,
             docxtpl_context=contexto,
+            docx_template_path=docx_template,
         )
         response = build_download_response(
             content=doc.conteudo,

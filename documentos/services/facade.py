@@ -60,6 +60,7 @@ class DocumentoFacade:
         payload: Mapping[str, object],
         reference: str | None = None,
         docxtpl_context: Mapping[str, object] | None = None,
+        docx_template_path: str | None = None,
     ) -> DocumentoGerado:
         if not self._document_registry.has(tipo):
             from documentos.services.exceptions import UnsupportedDocumentType
@@ -82,13 +83,16 @@ class DocumentoFacade:
             {"tipo": tipo.value, "formato": formato.value, "reference": ref or "—"},
         ):
             if formato == DocumentoFormato.DOCX:
-                conteudo = self._render_docx(template_def, docx_ctx)
+                conteudo = self._render_docx(
+                    template_def, docx_ctx, template_path_override=docx_template_path
+                )
             else:
                 conteudo, pdf_engine_used = self._render_pdf(
                     tipo,
                     template_def,
                     payload,
                     docxtpl_context=docxtpl_context,
+                    docx_template_path=docx_template_path,
                 )
 
         digest = hashlib.sha256(conteudo).hexdigest()
@@ -119,13 +123,16 @@ class DocumentoFacade:
         self,
         template_def: DocumentTemplateDefinition,
         payload: Mapping[str, object],
+        *,
+        template_path_override: str | None = None,
     ) -> bytes:
-        path = resolve_resource_docx(template_def.template_path)
+        template_path = template_path_override or template_def.template_path
+        path = resolve_resource_docx(template_path)
         if not path.exists():
             raise FileNotFoundError(f"Template DOCX ausente: {path}")
         with measure_step(
             "render_docx",
-            {"template_path": template_def.template_path},
+            {"template_path": template_path},
         ):
             return render_docx_bytes(template_path=path, context=payload)
 
@@ -135,10 +142,11 @@ class DocumentoFacade:
         *,
         docxtpl_context: Mapping[str, object] | None,
         payload: Mapping[str, object],
+        template_path_override: str | None = None,
     ) -> bytes:
         docx_def = self._templates.get(tipo, DocumentoFormato.DOCX)
         docx_ctx = docxtpl_context if docxtpl_context is not None else payload
-        return self._render_docx(docx_def, docx_ctx)
+        return self._render_docx(docx_def, docx_ctx, template_path_override=template_path_override)
 
     def _render_pdf(
         self,
@@ -147,6 +155,7 @@ class DocumentoFacade:
         payload: Mapping[str, object],
         *,
         docxtpl_context: Mapping[str, object] | None = None,
+        docx_template_path: str | None = None,
     ) -> tuple[bytes, str]:
         explicit = (getattr(settings, "DOCUMENTOS_DEFAULT_PDF_ENGINE", "auto") or "auto").strip().lower()
         if explicit not in (
@@ -186,6 +195,7 @@ class DocumentoFacade:
                         tipo,
                         docxtpl_context=docxtpl_context,
                         payload=payload,
+                        template_path_override=docx_template_path,
                     )
                 return docx_cache
 

@@ -22,7 +22,7 @@ class FacadePdfSingleDocxTests(SimpleTestCase):
         )
         calls: list[int] = []
 
-        def track_render(self, template_def, payload):
+        def track_render(self, template_def, payload, *, template_path_override=None):
             calls.append(1)
             return b"PK\x03\x04fake-docx"
 

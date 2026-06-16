@@ -13,7 +13,6 @@ from oficios.docxtpl_context import _assinatura_nome_cargo
 from oficios.docxtpl_context import _build_endereco
 from oficios.docxtpl_context import _build_sede
 
-from .models import EventoPlano
 from .models import PlanoTrabalho
 
 
@@ -40,6 +39,44 @@ def _destinos_unicos(plano: PlanoTrabalho) -> str:
     return ", ".join(labels)
 
 
+def _build_eventos_doc(plano: PlanoTrabalho) -> list[dict[str, str]]:
+    """Lista de eventos para o template multi (``{% for ev in eventos %}``).
+
+    Cada item traz os textos já prontos de uma seção do evento: cabeçalho de data,
+    título da atuação, local/horário/efetivo e os blocos de metas/atividades/recursos.
+    """
+    from .services import (
+        _atividades_evento_ordenadas,
+        _evento_data_header,
+        montar_atividades_texto,
+        montar_efetivo_evento_texto,
+        montar_metas_texto,
+        montar_recursos_texto,
+        montar_unidade_movel_texto,
+    )
+
+    rows: list[dict[str, str]] = []
+    for evento in plano.eventos_ordenados:
+        itens = _atividades_evento_ordenadas(evento)
+        header = _evento_data_header(evento)
+        programa = _txt(evento.programa_display)
+        titulo = f"{header} - {programa}" if programa else header
+        rows.append(
+            {
+                "data_header": header,
+                "titulo": titulo,
+                "local": format_city_uf(evento.destino_display),
+                "horario": _txt(evento.horario_atendimento),
+                "efetivo": montar_efetivo_evento_texto(evento),
+                "unidade_movel": montar_unidade_movel_texto(itens),
+                "metas": montar_metas_texto(itens),
+                "atividades": montar_atividades_texto(itens),
+                "recursos": montar_recursos_texto(itens),
+            }
+        )
+    return rows
+
+
 def _data_evento_agregada(plano: PlanoTrabalho) -> str:
     from .services import format_periodo_evento_extenso
 
@@ -58,13 +95,9 @@ def build_plano_docxtpl_context(plano: PlanoTrabalho) -> dict[str, Any]:
         _atividades_combinadas_multi,
         _atividades_selecionadas_ordenadas,
         format_data_extenso,
-        montar_atividades_multi_texto,
         montar_atividades_texto,
-        montar_atuacao_texto,
         montar_efetivo_texto,
-        montar_metas_multi_texto,
         montar_metas_texto,
-        montar_recursos_multi_texto,
         montar_recursos_texto,
         montar_texto_coordenacao,
         montar_unidade_movel_texto,
@@ -74,10 +107,10 @@ def build_plano_docxtpl_context(plano: PlanoTrabalho) -> dict[str, Any]:
 
     multi = bool(plano.is_multi_evento and plano.pk)
     if multi:
+        # As seções metas/atividades/atuação/recursos vêm do loop ``eventos`` no
+        # template multi; aqui só preparamos o que ainda é placeholder único.
         _itens = _atividades_combinadas_multi(plano)
-        metas_txt = montar_metas_multi_texto(plano)
-        atividades_txt = montar_atividades_multi_texto(plano)
-        recursos_txt = montar_recursos_multi_texto(plano)
+        metas_txt = atividades_txt = recursos_txt = ""
         valor_txt = montar_valor_multi_texto(plano)
     else:
         _itens = _atividades_selecionadas_ordenadas(plano)
@@ -97,11 +130,9 @@ def build_plano_docxtpl_context(plano: PlanoTrabalho) -> dict[str, Any]:
         "numero_plano_trabalho": plano.numero_formatado if plano.numero else "—",
         "unidade": _txt(inst.get("unidade")) or _txt(inst.get("nome_orgao")),
         "contextualizacao": _txt(plano.contextualizacao),
+        # Single-event usa estes placeholders; no multi as seções saem do loop ``eventos``.
         "metas": metas_txt,
         "atividades": atividades_txt,
-        # Seção 4 (ATUAÇÃO) num placeholder único: single = estrutura fixa, multi = por evento.
-        "atuacao": montar_atuacao_texto(plano),
-        # Mantidos para retrocompatibilidade do template (single-event usa estes).
         "data_evento": _data_evento_agregada(plano),
         "destinos": destinos_display,
         "horario_de_atendimento": _txt(plano.horario_atendimento),
@@ -126,10 +157,10 @@ def build_plano_docxtpl_context(plano: PlanoTrabalho) -> dict[str, Any]:
         "data_extenso": format_data_extenso(timezone.localdate()),
         "nome_chefia": format_document_display(nome_chefia) if nome_chefia else "",
         "cargo_chefia": format_document_display(cargo_chefia) if cargo_chefia else "",
-        # Flag usada pelo template para alternar a seção ATUAÇÃO ({%p if is_multi_evento %}).
-        # As demais seções multi-evento (metas/atividades/valor/recursos) já vêm prontas,
-        # agrupadas por evento, nas variáveis de texto acima.
         "is_multi_evento": multi,
+        # Lista consumida pelo template multi (plano_trabalho_multievento.docx) nos
+        # loops {% for ev in eventos %} das seções Metas/Atividades/Atuação/Recursos.
+        "eventos": _build_eventos_doc(plano) if multi else [],
     }
 
     return contexto
