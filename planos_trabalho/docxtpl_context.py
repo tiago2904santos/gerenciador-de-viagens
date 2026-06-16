@@ -39,6 +39,55 @@ def _destinos_unicos(plano: PlanoTrabalho) -> str:
     return ", ".join(labels)
 
 
+def _build_valor_multi_richtext(plano: PlanoTrabalho):
+    """Retorna RichText com labels ('Valor do evento dia/dias:' e 'Valor total:') em negrito."""
+    from decimal import Decimal
+
+    from docxtpl import RichText
+
+    from roteiros.services.diarias import formatar_valor_diarias
+    from roteiros.services.valor_extenso import valor_por_extenso_ptbr
+
+    from .services import _evento_data_curta
+
+    def _add_bloco(rt: RichText, bold_label: str, sufixo: str, composicao: str, unitario_val, total_val, *, first: bool) -> bool:
+        if total_val is None or unitario_val is None:
+            return first
+        total = Decimal(total_val)
+        unitario = Decimal(unitario_val)
+        if not first:
+            rt.add("\n\n")
+        rt.add(bold_label, bold=True)
+        rt.add(
+            f"{sufixo}: R${formatar_valor_diarias(total)} ({valor_por_extenso_ptbr(total)}).\n"
+            f"Valor correspondente a {composicao}, por servidor, no valor unitário "
+            f"de R${formatar_valor_diarias(unitario)} ({valor_por_extenso_ptbr(unitario)})."
+        )
+        return False
+
+    rt = RichText()
+    first = True
+    for evento in plano.eventos_ordenados:
+        curta, dia_unico = _evento_data_curta(evento)
+        tipo = "dia" if dia_unico else "dias"
+        bold_label = f"Valor do evento {tipo}:"
+        sufixo = f" {curta}" if curta else ""
+        first = _add_bloco(
+            rt, bold_label, sufixo,
+            evento.diarias_composicao, evento.diarias_valor_unitario, evento.diarias_valor_total,
+            first=first,
+        )
+
+    _add_bloco(
+        rt, "Valor total:", "",
+        plano.diarias_combinada_composicao,
+        plano.diarias_combinada_valor_unitario,
+        plano.diarias_combinada_valor_total,
+        first=first,
+    )
+    return rt
+
+
 def _build_eventos_doc(plano: PlanoTrabalho) -> list[dict[str, str]]:
     """Lista de eventos para o template multi (``{% for ev in eventos %}``).
 
@@ -101,7 +150,6 @@ def build_plano_docxtpl_context(plano: PlanoTrabalho) -> dict[str, Any]:
         montar_recursos_texto,
         montar_texto_coordenacao,
         montar_unidade_movel_texto,
-        montar_valor_multi_texto,
         montar_valor_do_plano_texto,
     )
 
@@ -111,7 +159,7 @@ def build_plano_docxtpl_context(plano: PlanoTrabalho) -> dict[str, Any]:
         # template multi; aqui só preparamos o que ainda é placeholder único.
         _itens = _atividades_combinadas_multi(plano)
         metas_txt = atividades_txt = recursos_txt = ""
-        valor_txt = montar_valor_multi_texto(plano)
+        valor_txt = _build_valor_multi_richtext(plano)
     else:
         _itens = _atividades_selecionadas_ordenadas(plano)
         metas_txt = montar_metas_texto(_itens)
