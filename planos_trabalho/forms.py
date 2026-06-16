@@ -14,7 +14,9 @@ from cadastros.services import resolver_sede_ids_desde_configuracao
 from core.normalizers import normalize_upper
 
 from .models import AtividadePlanoTrabalho
+from .models import EfetivoEvento
 from .models import EfetivoPlano
+from .models import EventoPlano
 from .models import HorarioAtendimento
 from .models import PlanoDestino
 from .models import PlanoTrabalho
@@ -449,7 +451,8 @@ class PlanoIdentificacaoForm(forms.ModelForm):
         return instance
 
     def _save_destinos(self, instance):
-        PlanoDestino.objects.filter(plano=instance).delete()
+        # Apenas os destinos do rascunho (evento nulo); os de eventos commitados ficam.
+        PlanoDestino.objects.filter(plano=instance, evento__isnull=True).delete()
         destinos = getattr(self, "cleaned_destinos", []) or []
         PlanoDestino.objects.bulk_create(
             [
@@ -553,6 +556,112 @@ EfetivoPlanoFormSet = inlineformset_factory(
     PlanoTrabalho,
     EfetivoPlano,
     form=EfetivoPlanoForm,
+    extra=0,
+    min_num=1,
+    validate_min=False,
+    can_delete=True,
+)
+
+
+class EventoPlanoForm(forms.ModelForm):
+    """Form de um evento (modo multi-evento)."""
+
+    class Meta:
+        model = EventoPlano
+        fields = [
+            "ordem",
+            "programa",
+            "programa_outros",
+            "data_evento_inicio",
+            "data_evento_fim",
+            "horario_atendimento",
+        ]
+        widgets = {
+            "ordem": forms.HiddenInput(),
+            "programa": forms.Select(attrs={"class": "form-select", "data-pt-evento-programa": "true"}),
+            "programa_outros": forms.TextInput(
+                attrs={"class": "cv-field__control", "data-pt-evento-programa-outros": "true"},
+            ),
+            "data_evento_inicio": forms.HiddenInput(attrs={"data-pt-evento-inicio": "true"}),
+            "data_evento_fim": forms.HiddenInput(attrs={"data-pt-evento-fim": "true"}),
+            "horario_atendimento": forms.TextInput(
+                attrs={"class": "cv-field__control", "data-pt-evento-horario": "true"},
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["programa"].queryset = ProgramaSolicitante.objects.filter(ativo=True).order_by("ordem", "nome")
+        self.fields["programa"].required = False
+        self.fields["programa_outros"].required = False
+        self.fields["horario_atendimento"].required = False
+        self.fields["data_evento_inicio"].required = False
+        self.fields["data_evento_fim"].required = False
+
+
+EventoPlanoFormSet = inlineformset_factory(
+    PlanoTrabalho,
+    EventoPlano,
+    form=EventoPlanoForm,
+    extra=0,
+    min_num=0,
+    validate_min=False,
+    can_delete=True,
+)
+
+
+class EfetivoEventoForm(forms.ModelForm):
+    """Form de efetivo vinculado a um evento."""
+
+    class Meta:
+        model = EfetivoEvento
+        fields = ["unidade", "cargo", "quantidade"]
+        widgets = {
+            "unidade": forms.Select(
+                attrs={
+                    "class": "cv-search-picker__native",
+                    "data-cv-search-picker": "true",
+                    "data-picker-mode": "single",
+                    "data-picker-variant": "compact",
+                    "data-placeholder": "Buscar unidade...",
+                    "data-empty-message": "Nenhuma unidade encontrada.",
+                    "data-pt-efetivo-unidade": "true",
+                }
+            ),
+            "cargo": forms.Select(attrs={"class": "form-select", "data-pt-efetivo-cargo": "true"}),
+            "quantidade": forms.NumberInput(
+                attrs={"class": "cv-field__control", "min": "1", "step": "1", "data-pt-efetivo-qtd": "true"},
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["unidade"].queryset = Unidade.objects.order_by("nome")
+        self.fields["unidade"].empty_label = ""
+        self.fields["unidade"].required = False
+        self.fields["cargo"].queryset = Cargo.objects.order_by("nome")
+        self.fields["cargo"].empty_label = "Selecione o cargo"
+
+    def clean(self):
+        cleaned = super().clean()
+        if cleaned.get("DELETE"):
+            return cleaned
+        cargo = cleaned.get("cargo")
+        quantidade = cleaned.get("quantidade")
+        unidade = cleaned.get("unidade")
+        if not any([unidade, cargo, quantidade]):
+            return cleaned
+        if not cargo:
+            self.add_error("cargo", "Selecione o cargo.")
+        if not quantidade:
+            self.add_error("quantidade", "Informe a quantidade.")
+        return cleaned
+
+
+EfetivoEventoFormSet = inlineformset_factory(
+    EventoPlano,
+    EfetivoEvento,
+    form=EfetivoEventoForm,
     extra=0,
     min_num=1,
     validate_min=False,

@@ -4,6 +4,7 @@
 {% block extra_css %}
   {{ block.super }}
   <link rel="stylesheet" href="{% static 'css/oficios-documentos-inline.css' %}?v=20260612-pt">
+  <link rel="stylesheet" href="{% static 'css/planos-trabalho-eventos.css' %}?v=20260615-pt-eventos">
 {% endblock %}
 
 {% block wizard_content %}
@@ -25,6 +26,38 @@
       </div>
     </section>
   {% endif %}
+
+  {# ── Eventos do plano (multi-evento) ─────────────────────────── #}
+  <section class="cv-wizard-section-card" aria-labelledby="pt-eventos-title">
+    <header class="cv-wizard-section-header">
+      <div class="cv-wizard-section-header__copy">
+        <h3 class="cv-wizard-section-title" id="pt-eventos-title">Eventos do plano</h3>
+        <p class="cv-wizard-section-subtitle">
+          {% if is_multi_evento %}Este plano cobre múltiplos eventos. Os dados preenchidos nas etapas anteriores formam o evento atual.{% else %}Este plano cobre um único evento. Para incluir outro evento na mesma viagem, adicione-o abaixo.{% endif %}
+        </p>
+      </div>
+    </header>
+    <div class="cv-wizard-section-body">
+      <div class="pte-events">
+        {% if eventos_cards %}
+          <div class="pte-events__grid">
+            {% for card in eventos_cards %}
+              {% include "planos_trabalho/partials/evento_card.html" with card=card em_edicao=False only %}
+            {% endfor %}
+          </div>
+        {% endif %}
+        <div class="pte-events__banner" role="note">
+          {% include "dev/ui_lab/partials/_cv_icon.html" with icon="plus" extra_class="pte-events__banner-icon" only %}
+          <span>“Adicionar evento ao plano” salva os dados atuais como um evento e limpa o formulário para você preencher o próximo. O evento atual continua incluído no documento mesmo sem clicar.</span>
+        </div>
+        {# formaction: o botão está dentro do <form> do wizard (sem forms aninhados). #}
+        <button type="submit" formmethod="post" formaction="{{ evento_adicionar_url }}" formnovalidate
+                class="cv-btn cv-btn--secondary">
+          <span>+ Adicionar evento ao plano</span>
+        </button>
+      </div>
+    </div>
+  </section>
 
   <section class="cv-wizard-section-card oficio-documentos-preview-section document-inline-stack" aria-labelledby="pt-documentos-title">
     <header class="cv-wizard-section-header">

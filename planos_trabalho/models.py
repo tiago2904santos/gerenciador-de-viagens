@@ -203,6 +203,22 @@ class PlanoTrabalho(TimeStampedModel):
         default=COORDENADOR_GENERO_MASCULINO,
     )
 
+    # Multi-evento (modelo "scratchpad"): as etapas 1–3 sempre editam os campos
+    # plano-level acima (o "rascunho do evento atual"). Ao "Adicionar evento ao
+    # plano" na etapa 4, esse rascunho é commitado para um ``EventoPlano`` e os
+    # campos de evento são limpos para o próximo. ``is_multi_evento`` vira True no
+    # primeiro commit. Default False mantém o fluxo single-event sem regressão.
+    is_multi_evento = models.BooleanField(default=False)
+    # Quando setado, o rascunho atual representa a edição de um evento já commitado
+    # (clicou "Editar" no card). Em branco = rascunho de um evento novo.
+    evento_em_edicao = models.ForeignKey(
+        "EventoPlano",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+    )
+
     # Etapa 2 — deslocamento e diárias (saída/chegada na sede)
     saida_sede_data = models.DateField("Data de saída da sede", null=True, blank=True)
     saida_sede_hora = models.TimeField("Hora de saída da sede", null=True, blank=True)
@@ -218,6 +234,22 @@ class PlanoTrabalho(TimeStampedModel):
     )
     diarias_valor_total = models.DecimalField(
         "Valor total do plano",
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True,
+    )
+    # Multi-evento: cálculo do trajeto sede → todos eventos → sede.
+    diarias_combinada_composicao = models.CharField(max_length=120, blank=True, default="")
+    diarias_combinada_valor_unitario = models.DecimalField(
+        "Valor por servidor (combinado)",
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True,
+    )
+    diarias_combinada_valor_total = models.DecimalField(
+        "Valor total do plano (combinado)",
         max_digits=12,
         decimal_places=2,
         null=True,
@@ -262,7 +294,15 @@ class PlanoTrabalho(TimeStampedModel):
 
     @property
     def destino_display(self) -> str:
-        destinos = list(self.destinos.select_related("cidade", "estado").order_by("ordem", "pk")) if self.pk else []
+        destinos = (
+            list(
+                self.destinos.filter(evento__isnull=True)
+                .select_related("cidade", "estado")
+                .order_by("ordem", "pk")
+            )
+            if self.pk
+            else []
+        )
         if destinos:
             labels = [f"{destino.cidade.nome}/{destino.cidade.uf}" for destino in destinos if destino.cidade_id]
             if labels:
@@ -291,10 +331,28 @@ class PlanoTrabalho(TimeStampedModel):
 
     @property
     def total_efetivo(self) -> int:
+        """Efetivo do rascunho atual (linhas EfetivoPlano). Em multi, é o evento em edição."""
         if not self.pk:
             return 0
         agregado = self.efetivos.aggregate(total=models.Sum("quantidade"))
         return int(agregado["total"] or 0)
+
+    @property
+    def total_efetivo_combinado(self) -> int:
+        """Maior efetivo entre eventos commitados (divisor da diária combinada).
+
+        A mesma equipe viaja para todos os eventos — premissa do cálculo combinado.
+        """
+        if not self.pk or not self.is_multi_evento:
+            return self.total_efetivo
+        totais = [e.total_efetivo for e in self.eventos.all()]
+        return max(totais) if totais else 0
+
+    @property
+    def eventos_ordenados(self):
+        if not self.pk:
+            return []
+        return list(self.eventos.order_by("ordem", "data_evento_inicio", "pk"))
 
     def coordenador_nome_cargo(self, papel: str) -> tuple[str, str]:
         """Resolve (nome, cargo) do coordenador `adm` ou `op` priorizando servidor selecionado."""
@@ -370,6 +428,15 @@ class PlanoDestino(TimeStampedModel):
         related_name="destinos",
         verbose_name="Plano de trabalho",
     )
+    # Quando setado, o destino pertence a um evento específico (modo multi).
+    # Quando null, o destino é do plano (modo single — comportamento atual).
+    evento = models.ForeignKey(
+        "EventoPlano",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="destinos",
+    )
     estado = models.ForeignKey(
         Estado,
         on_delete=models.PROTECT,
@@ -429,3 +496,196 @@ class EfetivoPlano(TimeStampedModel):
     def __str__(self):
         unidade = f" / {self.unidade}" if self.unidade_id else ""
         return f"{self.plano_id}: {self.quantidade} x {self.cargo}{unidade}"
+
+
+class EventoPlano(TimeStampedModel):
+    """Evento que compõe um plano de trabalho.
+
+    No modo single-event (``PlanoTrabalho.is_multi_evento=False``) este modelo não é usado —
+    todos os dados ficam diretamente no plano. No modo multi-evento, cada evento carrega seu
+    próprio programa, datas, horário, atividades e efetivo; metas/recursos/atividades-texto
+    são re-sincronizados a partir de ``atividades_selecionadas``.
+    """
+
+    plano = models.ForeignKey(
+        PlanoTrabalho,
+        on_delete=models.CASCADE,
+        related_name="eventos",
+        verbose_name="Plano de trabalho",
+    )
+    ordem = models.PositiveIntegerField(default=1)
+
+    programa = models.ForeignKey(
+        ProgramaSolicitante,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="eventos_plano_trabalho",
+        verbose_name="Programa solicitante",
+    )
+    programa_outros = models.CharField("Programa (outros)", max_length=200, blank=True, default="")
+
+    data_evento_inicio = models.DateField("Data inicial do evento", null=True, blank=True)
+    data_evento_fim = models.DateField("Data final do evento", null=True, blank=True)
+    horario_atendimento = models.CharField(
+        "Horário de atendimento",
+        max_length=60,
+        blank=True,
+        default="09:00 até 17:00",
+    )
+
+    # Coordenador operacional — varia por evento (o administrativo é plano-level).
+    coordenador_op_modo = models.CharField(
+        max_length=10,
+        choices=PlanoTrabalho.COORDENADOR_MODO_CHOICES,
+        default=PlanoTrabalho.COORDENADOR_MODO_SERVIDOR,
+    )
+    coordenador_op = models.ForeignKey(
+        Servidor,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="eventos_plano_coordenador_op",
+        verbose_name="Coordenador operacional",
+    )
+    coordenador_op_nome_manual = models.CharField(max_length=255, blank=True, default="")
+    coordenador_op_cargo_manual = models.CharField(max_length=120, blank=True, default="")
+    coordenador_op_genero = models.CharField(
+        max_length=10,
+        choices=PlanoTrabalho.COORDENADOR_GENERO_CHOICES,
+        blank=True,
+        default=PlanoTrabalho.COORDENADOR_GENERO_MASCULINO,
+    )
+
+    atividades_selecionadas = models.ManyToManyField(
+        AtividadePlanoTrabalho,
+        blank=True,
+        related_name="eventos",
+        verbose_name="Atividades previstas",
+    )
+    metas = models.TextField(blank=True, default="")
+    atividades_texto = models.TextField(blank=True, default="")
+    recursos_necessarios = models.TextField(blank=True, default="")
+    unidade_movel_texto = models.TextField(blank=True, default="")
+
+    # Snapshot da diária individual (sede → este evento → sede).
+    diarias_composicao = models.CharField(max_length=120, blank=True, default="")
+    diarias_valor_unitario = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True,
+    )
+    diarias_valor_total = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True,
+    )
+
+    class Meta:
+        ordering = ["ordem", "data_evento_inicio", "pk"]
+        verbose_name = "Evento do plano de trabalho"
+        verbose_name_plural = "Eventos do plano de trabalho"
+
+    def __str__(self):
+        if self.data_evento_inicio:
+            return f"Evento {self.ordem} ({self.data_evento_inicio:%d/%m/%Y})"
+        return f"Evento {self.ordem}"
+
+    @property
+    def total_efetivo(self) -> int:
+        if not self.pk:
+            return 0
+        agregado = self.efetivos.aggregate(total=models.Sum("quantidade"))
+        return int(agregado["total"] or 0)
+
+    @property
+    def destino_principal(self):
+        if not self.pk:
+            return None
+        return self.destinos.select_related("cidade").order_by("ordem", "pk").first()
+
+    @property
+    def periodo_display(self) -> str:
+        inicio = self.data_evento_inicio
+        fim = self.data_evento_fim or inicio
+        if not inicio:
+            return "Período não informado"
+        if not fim or fim == inicio:
+            return inicio.strftime("%d/%m/%Y")
+        return f"{inicio.strftime('%d/%m/%Y')} a {fim.strftime('%d/%m/%Y')}"
+
+    @property
+    def programa_display(self) -> str:
+        if self.programa_id:
+            return str(self.programa)
+        return self.programa_outros or ""
+
+    @property
+    def destino_display(self) -> str:
+        destinos = list(self.destinos.select_related("cidade").order_by("ordem", "pk")) if self.pk else []
+        labels = [f"{d.cidade.nome}/{d.cidade.uf}" for d in destinos if d.cidade_id]
+        return ", ".join(labels) if labels else "Destino não informado"
+
+    def coordenador_nome_cargo(self) -> tuple[str, str]:
+        """Resolve (nome, cargo) do coordenador operacional do evento."""
+        if self.coordenador_op_id:
+            servidor = self.coordenador_op
+            cargo = servidor.cargo.nome if servidor.cargo_id else ""
+            return (servidor.nome or "").strip(), (cargo or "").strip()
+        return (self.coordenador_op_nome_manual or "").strip(), (self.coordenador_op_cargo_manual or "").strip()
+
+    def coordenador_genero(self) -> str:
+        if self.coordenador_op_genero == PlanoTrabalho.COORDENADOR_GENERO_FEMININO:
+            return PlanoTrabalho.COORDENADOR_GENERO_FEMININO
+        return PlanoTrabalho.COORDENADOR_GENERO_MASCULINO
+
+    def save(self, *args, **kwargs):
+        self.programa_outros = normalize_spaces(self.programa_outros)
+        self.horario_atendimento = normalize_spaces(self.horario_atendimento)
+        self.coordenador_op_nome_manual = normalize_spaces(self.coordenador_op_nome_manual)
+        self.coordenador_op_cargo_manual = normalize_spaces(self.coordenador_op_cargo_manual)
+        self.coordenador_op_genero = self.coordenador_genero()
+        super().save(*args, **kwargs)
+
+
+class EfetivoEvento(TimeStampedModel):
+    """Composição do efetivo de um evento (modo multi-evento)."""
+
+    evento = models.ForeignKey(
+        EventoPlano,
+        on_delete=models.CASCADE,
+        related_name="efetivos",
+        verbose_name="Evento",
+    )
+    unidade = models.ForeignKey(
+        Unidade,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="efetivos_evento_plano_trabalho",
+        verbose_name="Unidade",
+    )
+    cargo = models.ForeignKey(
+        Cargo,
+        on_delete=models.PROTECT,
+        related_name="efetivos_evento_plano_trabalho",
+        verbose_name="Cargo",
+    )
+    quantidade = models.PositiveIntegerField("Quantidade", default=1)
+
+    class Meta:
+        ordering = ["evento", "unidade__nome", "cargo__nome"]
+        verbose_name = "Efetivo do evento"
+        verbose_name_plural = "Efetivos do evento"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["evento", "unidade", "cargo"],
+                name="planos_trabalho_efetivo_evento_unidade_cargo_unique",
+            )
+        ]
+
+    def __str__(self):
+        unidade = f" / {self.unidade}" if self.unidade_id else ""
+        return f"{self.evento_id}: {self.quantidade} x {self.cargo}{unidade}"

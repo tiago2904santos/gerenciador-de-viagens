@@ -6,6 +6,44 @@ from django.urls import reverse
 
 from .models import PlanoTrabalho
 
+
+def apresentar_evento_card(evento):
+    """Card de um evento commitado (etapa 1, estilo do card de ofício)."""
+    from roteiros.services.diarias import formatar_valor_diarias
+    from .services import montar_efetivo_evento_texto
+
+    nome_op, cargo_op = evento.coordenador_nome_cargo()
+    atividades = list(evento.atividades_selecionadas.order_by("ordem", "nome")) if evento.pk else []
+
+    valor_total_display = ""
+    valor_unitario_display = ""
+    if evento.diarias_valor_total is not None:
+        valor_total_display = f"R$ {formatar_valor_diarias(evento.diarias_valor_total)}"
+    if evento.diarias_valor_unitario is not None:
+        valor_unitario_display = f"R$ {formatar_valor_diarias(evento.diarias_valor_unitario)}"
+
+    return {
+        "id": evento.pk,
+        "ordem": evento.ordem,
+        "titulo": f"Evento {evento.ordem}",
+        "programa": evento.programa_display or "—",
+        "destino": evento.destino_display,
+        "periodo": evento.periodo_display,
+        "horario": (evento.horario_atendimento or "").strip() or "—",
+        "coordenador_op": nome_op or "—",
+        "coordenador_op_cargo": cargo_op or "",
+        "efetivo_total": evento.total_efetivo,
+        "efetivo_texto": montar_efetivo_evento_texto(evento),
+        "valor_total_display": valor_total_display,
+        "valor_unitario_display": valor_unitario_display,
+        "diarias_composicao": (evento.diarias_composicao or "").strip(),
+        "atividades": [a.nome for a in atividades],
+        "atividades_count": len(atividades),
+        "editar_url": reverse("planos_trabalho:evento_editar", args=[evento.plano_id, evento.pk]),
+        "excluir_url": reverse("planos_trabalho:evento_remover", args=[evento.plano_id, evento.pk]),
+    }
+
+
 ETAPAS = [
     {"key": "identificacao", "number": 1, "title": "Identificação e atuação", "url_name": "planos_trabalho:wizard_identificacao"},
     {"key": "efetivo_diarias", "number": 2, "title": "Efetivo e diárias", "url_name": "planos_trabalho:wizard_efetivo_diarias"},
@@ -126,16 +164,40 @@ def apresentar_plano_wizard_summary(plano):
 
 def apresentar_plano_card(plano):
     coordenador_nome, _cargo = plano.coordenador_nome_cargo("adm")
+    if plano.is_multi_evento:
+        eventos = list(plano.eventos.all()) if plano.pk else []
+        n = len(eventos)
+        programa_label = f"{n} eventos" if n != 1 else "1 evento"
+        # Em multi, os campos do plano refletem o rascunho — agrega dos eventos.
+        destinos = []
+        for e in eventos:
+            d = e.destino_display
+            if d and d != "Destino não informado" and d not in destinos:
+                destinos.append(d)
+        destino_label = ", ".join(destinos) or "—"
+        inicios = [e.data_evento_inicio for e in eventos if e.data_evento_inicio]
+        fins = [e.data_evento_fim or e.data_evento_inicio for e in eventos if e.data_evento_inicio]
+        if inicios:
+            ini, fim = min(inicios), max(fins)
+            periodo_label = ini.strftime("%d/%m/%Y") if ini == fim else f"{ini.strftime('%d/%m/%Y')} a {fim.strftime('%d/%m/%Y')}"
+        else:
+            periodo_label = "—"
+        efetivo_total = plano.total_efetivo_combinado
+    else:
+        programa_label = plano.programa_display or "—"
+        destino_label = plano.destino_display
+        periodo_label = plano.periodo_display
+        efetivo_total = plano.total_efetivo
     return {
         "id": plano.pk,
         "numero_label": plano.numero_formatado,
         "status_label": plano.get_status_display(),
         "status_state": str(plano.status or "").lower(),
-        "destino": plano.destino_display,
-        "periodo": plano.periodo_display,
-        "programa": plano.programa_display or "—",
+        "destino": destino_label,
+        "periodo": periodo_label,
+        "programa": programa_label,
         "coordenador": coordenador_nome or "—",
-        "efetivo_total": plano.total_efetivo,
+        "efetivo_total": efetivo_total,
         "data_criacao_label": plano.data_criacao.strftime("%d/%m/%Y"),
         "editar_url": reverse("planos_trabalho:wizard_identificacao", args=[plano.pk]),
         "documentos_url": reverse("planos_trabalho:wizard_documentos", args=[plano.pk]),

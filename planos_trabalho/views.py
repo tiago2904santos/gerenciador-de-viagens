@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 
 from django.contrib import messages
+from django.db.models import Max
 from django.http import Http404
 from django.http import JsonResponse
 from django.http import QueryDict
@@ -30,9 +31,11 @@ from .forms import PlanoDiariasForm
 from .forms import PlanoIdentificacaoForm
 from .forms import ProgramaSolicitanteForm
 from .models import AtividadePlanoTrabalho
+from .models import EventoPlano
 from .models import PlanoTrabalho
 from .models import HorarioAtendimento
 from .models import ProgramaSolicitante
+from .presenters import apresentar_evento_card
 from .presenters import apresentar_plano_card
 from .presenters import apresentar_plano_wizard_header
 from .presenters import apresentar_plano_wizard_page_steps
@@ -40,6 +43,8 @@ from .presenters import apresentar_plano_wizard_steps
 from .presenters import apresentar_plano_wizard_summary
 from .services import atividades_catalogo_ativas
 from .services import atualizar_snapshot_diarias
+from .services import atualizar_snapshot_diarias_combinadas
+from .services import calcular_diarias_combinadas
 from .services import avaliar_etapa_atividades
 from .services import avaliar_etapa_efetivo_diarias
 from .services import avaliar_etapa_identificacao
@@ -49,6 +54,11 @@ from .services import criar_plano_rascunho
 from .services import gerar_resposta_plano_documento
 from .services import marcar_plano_gerado
 from .services import montar_efetivo_texto
+from .services import adicionar_evento_ao_plano
+from .services import editar_evento_no_scratchpad
+from .services import eventos_para_cards
+from .services import remover_evento
+from .services import sincronizar_scratchpad
 from .services import sincronizar_atividades
 from .services import montar_texto_coordenacao
 from .services import montar_valor_do_plano_texto
@@ -157,7 +167,7 @@ def _plano_identificacao_autosave_data(plano: PlanoTrabalho):
         "coordenador_op_cargo_manual": plano.coordenador_op_cargo_manual or "",
         "coordenador_op_genero": plano.coordenador_op_genero or PlanoTrabalho.COORDENADOR_GENERO_MASCULINO,
     }
-    destinos = list(plano.destinos.order_by("ordem", "pk"))
+    destinos = list(plano.destinos.filter(evento__isnull=True).order_by("ordem", "pk"))
     for idx, destino in enumerate(destinos[1:], 1):
         data[f"destino_estado_{idx}"] = destino.estado_id
         data[f"destino_cidade_{idx}"] = destino.cidade_id
@@ -294,6 +304,7 @@ def _texto_auto_flag(form, plano, post_name, attr):
 
 
 def _identificacao_context(*, form, plano):
+    eventos_cards = [apresentar_evento_card(e) for e in eventos_para_cards(plano)]
     return {
         "page_title": "Plano de Trabalho",
         **_wizard_shell_ctx(plano=plano, etapa_atual="identificacao"),
@@ -312,6 +323,10 @@ def _identificacao_context(*, form, plano):
         "contextualizacao_auto": _texto_auto_flag(form, plano, "contextualizacao_auto", "contextualizacao_auto"),
         "coordenacao_auto": _texto_auto_flag(form, plano, "coordenacao_auto", "coordenacao_auto"),
         "consideracao_auto": _texto_auto_flag(form, plano, "consideracao_auto", "consideracao_auto"),
+        # Multi-evento
+        "is_multi_evento": plano.is_multi_evento,
+        "eventos_cards": eventos_cards,
+        "em_edicao_evento": plano.evento_em_edicao_id,
     }
 
 
@@ -545,6 +560,8 @@ def wizard_efetivo_diarias(request, pk):
             formset.save()
             plano = diarias_form.save()
             resultado = atualizar_snapshot_diarias(plano)
+            if plano.is_multi_evento:
+                atualizar_snapshot_diarias_combinadas(plano)
             if nav_action == "wizard_back":
                 messages.success(request, "Efetivo e diárias salvos.")
                 return redirect("planos_trabalho:wizard_identificacao", pk=plano.pk)
@@ -598,6 +615,45 @@ def api_calcular_diarias(request, pk):
         except (TypeError, ValueError):
             total_efetivo = None
 
+    # Modo multi-evento: se vier "eventos" no payload, calcula por evento + combinado.
+    if plano.is_multi_evento:
+        resultado_combinado = calcular_diarias_combinadas(plano)
+        per_evento = []
+        from .services import calcular_diarias_evento
+        for evento in plano.eventos.order_by("ordem", "data_evento_inicio", "pk"):
+            r = calcular_diarias_evento(plano, evento)
+            per_evento.append(
+                {
+                    "evento_id": evento.pk,
+                    "ordem": evento.ordem,
+                    "ok": r["ok"],
+                    "composicao": r.get("composicao", ""),
+                    "valor_unitario_display": r.get("valor_unitario_display", ""),
+                    "valor_total_display": r.get("valor_total_display", ""),
+                    "valor_unitario_extenso": r.get("valor_unitario_extenso", ""),
+                    "valor_total_extenso": r.get("valor_total_extenso", ""),
+                    "quantidade_servidores": r.get("quantidade_servidores", 0),
+                    "erros": r.get("erros", []),
+                }
+            )
+        return JsonResponse(
+            {
+                "ok": resultado_combinado["ok"],
+                "modo": "multi",
+                "per_evento": per_evento,
+                "combinada": {
+                    "ok": resultado_combinado["ok"],
+                    "composicao": resultado_combinado.get("composicao", ""),
+                    "valor_unitario_display": resultado_combinado.get("valor_unitario_display", ""),
+                    "valor_total_display": resultado_combinado.get("valor_total_display", ""),
+                    "valor_unitario_extenso": resultado_combinado.get("valor_unitario_extenso", ""),
+                    "valor_total_extenso": resultado_combinado.get("valor_total_extenso", ""),
+                    "quantidade_servidores": resultado_combinado.get("quantidade_servidores", 0),
+                    "erros": resultado_combinado.get("erros", []),
+                },
+            }
+        )
+
     resultado = calcular_diarias_plano(plano, total_efetivo=total_efetivo)
     if not resultado["ok"]:
         return JsonResponse({"ok": False, "erros": resultado["erros"]})
@@ -612,6 +668,46 @@ def api_calcular_diarias(request, pk):
             "quantidade_servidores": resultado["quantidade_servidores"],
         }
     )
+
+
+@require_POST
+def evento_adicionar(request, pk):
+    """Commita o rascunho atual como um evento e devolve à etapa 1 em branco.
+
+    Chamado pelo botão "Adicionar evento ao plano" na etapa 4. No primeiro uso, o
+    plano vira multi-evento. Se o rascunho estiver vazio, nada é criado.
+    """
+    plano = _get_plano(pk)
+    evento = adicionar_evento_ao_plano(plano)
+    if evento is None:
+        messages.warning(request, "Preencha os dados do evento antes de adicioná-lo ao plano.")
+        return redirect("planos_trabalho:wizard_documentos", pk=plano.pk)
+    messages.success(
+        request,
+        f"Evento {evento.ordem} salvo. Preencha a etapa 1 para adicionar o próximo evento.",
+    )
+    return redirect("planos_trabalho:wizard_identificacao", pk=plano.pk)
+
+
+@require_POST
+def evento_editar(request, pk, evento_pk):
+    """Carrega um evento commitado no rascunho para edição (salvando o rascunho atual)."""
+    plano = _get_plano(pk)
+    evento = get_object_or_404(EventoPlano, pk=evento_pk, plano=plano)
+    editar_evento_no_scratchpad(plano, evento)
+    messages.success(request, f"Editando o evento {evento.ordem}.")
+    return redirect("planos_trabalho:wizard_identificacao", pk=plano.pk)
+
+
+@require_POST
+def evento_remover(request, pk, evento_pk):
+    plano = _get_plano(pk)
+    evento = get_object_or_404(EventoPlano, pk=evento_pk, plano=plano)
+    remover_evento(plano, evento)
+    if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        return JsonResponse({"ok": True, "is_multi_evento": plano.is_multi_evento})
+    messages.success(request, "Evento removido do plano.")
+    return redirect("planos_trabalho:wizard_identificacao", pk=plano.pk)
 
 
 @require_POST
@@ -643,7 +739,10 @@ def efetivo_diarias_autosave(request, pk):
         efetivo_result = _apply_efetivo_snapshot(plano, efetivo_snapshot)
 
     if plano.saida_sede_data and plano.chegada_sede_data:
+        # Sempre atualiza a diária do rascunho (evento atual); em multi, também a combinada.
         atualizar_snapshot_diarias(plano)
+        if plano.is_multi_evento:
+            atualizar_snapshot_diarias_combinadas(plano)
 
     snapshots_payload = {}
     if efetivo_result is not None:
@@ -867,6 +966,9 @@ def atividade_excluir(request, pk):
 
 def wizard_documentos(request, pk):
     plano = _get_plano(pk)
+    # Em multi-evento, garante que o rascunho atual esteja refletido como evento
+    # antes de avaliar pendências e gerar o documento (sem limpar o rascunho).
+    sincronizar_scratchpad(plano)
     pendencias = avaliar_pendencias_documento(plano)
 
     if request.method == "POST":
@@ -896,6 +998,9 @@ def wizard_documentos(request, pk):
             "pendencias_documentos": pendencias,
             "mostrar_pendencias": bool(pendencias),
             "documento_disponivel": not pendencias,
+            "is_multi_evento": plano.is_multi_evento,
+            "eventos_cards": [apresentar_evento_card(e) for e in eventos_para_cards(plano)],
+            "evento_adicionar_url": reverse("planos_trabalho:evento_adicionar", args=[plano.pk]),
             "pdf_inline_url": reverse("planos_trabalho:pdf_inline", args=[plano.pk]),
             "baixar_docx_url": reverse("planos_trabalho:baixar_documento", args=[plano.pk, "docx"]),
             "baixar_pdf_url": reverse("planos_trabalho:baixar_documento", args=[plano.pk, "pdf"]),
