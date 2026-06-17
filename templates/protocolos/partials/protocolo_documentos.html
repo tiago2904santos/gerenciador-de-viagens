@@ -1,0 +1,34 @@
+{% comment %}Seção Documentos. Parâmetros: documentos, protocolo{% endcomment %}
+<section class="app-section card app-card" id="documentos">
+  <div class="app-section__header cluster cluster--between cluster--start">
+    <div class="stack">
+      <h2 class="app-section__title">Documentos</h2>
+      <p class="app-section__subtitle">Documentos enviados ao eProtocolo.</p>
+    </div>
+    {% if protocolo %}
+      {% include "components/ui/buttons/button.html" with href=protocolo.get_enviar_documento_url label="Enviar documento" variant="secondary" size="sm" icon="plus" only %}
+    {% endif %}
+  </div>
+  <div class="app-section__body stack">
+    {% for doc in documentos %}
+      <article class="card app-card stack">
+        <div class="cluster cluster--between cluster--start">
+          <strong>{{ doc.nome_arquivo|default:"(sem nome)" }}</strong>
+          <span class="cluster">
+            {% include "components/ui/badges/chip.html" with tone="info" size="compact" label=doc.get_tipo_documento_display only %}
+            {% if doc.assinado %}{% include "components/ui/badges/chip.html" with tone="success" size="compact" label="Assinado" only %}{% endif %}
+            {% if doc.esta_no_volume %}{% include "components/ui/badges/chip.html" with tone="neutral" size="compact" label="No volume" only %}{% endif %}
+          </span>
+        </div>
+        <dl class="stack">
+          <div class="cluster"><dt class="app-section__subtitle">Código eProtocolo</dt><dd>{{ doc.codigo_documento_eprotocolo|default:"—" }}</dd></div>
+          <div class="cluster"><dt class="app-section__subtitle">Enviado em</dt><dd>{{ doc.enviado_em|date:"d/m/Y H:i"|default:"—" }}</dd></div>
+          <div class="cluster"><dt class="app-section__subtitle">MD5</dt><dd>{{ doc.md5|default:"—" }}</dd></div>
+          <div class="cluster"><dt class="app-section__subtitle">Tamanho</dt><dd>{% if doc.tamanho_bytes %}{{ doc.tamanho_bytes|filesizeformat }}{% else %}—{% endif %}</dd></div>
+        </dl>
+      </article>
+    {% empty %}
+      <p class="app-section__subtitle">Nenhum documento enviado ainda.</p>
+    {% endfor %}
+  </div>
+</section>

@@ -1,5 +1,6 @@
 {% extends "oficios/wizard_base.html" %}
 {% load static %}
+{% load protocolos_tags %}
 
 {% block wizard_content %}
   <section class="cv-wizard-section-card oficio-justificativa-card" aria-labelledby="justificativa-panel-title">
@@ -26,6 +27,8 @@
 
     {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar" secondary_action="wizard_back" primary_label="Avançar" primary_action="wizard_next" only %}
   </section>
+
+  {% if oficio.justificativa.pk %}{% bloco_protocolo oficio.justificativa %}{% endif %}
 {% endblock %}
 
 {% block extra_js %}

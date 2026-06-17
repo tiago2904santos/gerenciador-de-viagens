@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load protocolos_tags %}
 
 {% block title %}{{ page_title }}{% endblock %}
 
@@ -215,6 +216,7 @@
 
       </main>
     </form>
+    {% if ordem.pk %}{% bloco_protocolo ordem %}{% endif %}
   </div>
 {% endblock %}
 

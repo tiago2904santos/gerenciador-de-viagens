@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<div class="page-shell page-shell--standard stack">
+
+  {# ── HEADER / PAINEL OPERACIONAL ── #}
+  <div class="page-header-stack">
+    <div class="page-header-band">
+      <div class="page-header-band__content">
+        <div class="page-header-band__text">
+          <span class="page-header-band__eyebrow">PROTOCOLO</span>
+          <h1 class="page-header-band__title">{{ protocolo.numero_display }}</h1>
+        </div>
+        {% include "protocolos/partials/protocolo_status.html" with protocolo=protocolo only %}
+      </div>
+    </div>
+    <div class="page-header-rail">
+      <div class="page-header-rail__marker" aria-hidden="true">PR</div>
+      <div class="page-header-rail__content stack">
+        <p class="page-header-rail__subtitle">{{ eprotocolo_descricao }}</p>
+        <div class="cluster">
+          <form method="post" action="{{ protocolo.get_atualizar_url }}">
+            {% csrf_token %}
+            {% include "components/ui/buttons/button.html" with type="submit" label="Atualizar situação" variant="primary" size="sm" icon="search" only %}
+          </form>
+          {% include "components/ui/buttons/button.html" with href=protocolo.get_enviar_documento_url label="Enviar documento" variant="secondary" size="sm" icon="document" only %}
+          {% include "components/ui/buttons/button.html" with href=protocolo.get_solicitar_assinatura_url label="Solicitar assinatura" variant="secondary" size="sm" icon="sign" only %}
+          {% include "components/ui/buttons/button.html" with href=protocolo.get_tramitar_url label="Tramitar" variant="secondary" size="sm" icon="arrow-right" only %}
+          <form method="post" action="{{ protocolo.get_concluir_url }}">
+            {% csrf_token %}
+            {% include "components/ui/buttons/button.html" with type="submit" label="Concluir cadastro" variant="secondary" size="sm" icon="check" only %}
+          </form>
+          {% url 'protocolos:index' as index_url %}
+          {% include "components/ui/buttons/button.html" with href=index_url label="Voltar à lista" variant="ghost" size="sm" icon="arrow-left" only %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# ── NAVEGAÇÃO ENTRE SEÇÕES (âncoras, sem JS) ── #}
+  <nav class="cluster" aria-label="Seções do protocolo">
+    {% include "components/ui/badges/chip.html" with tone="filter" label="Resumo" only %}
+    <a href="#documentos">{% include "components/ui/badges/chip.html" with tone="filter" label="Documentos" only %}</a>
+    <a href="#assinaturas">{% include "components/ui/badges/chip.html" with tone="filter" label="Assinaturas" only %}</a>
+    <a href="#pendencias">{% include "components/ui/badges/chip.html" with tone="filter" label="Pendências" only %}</a>
+    <a href="#tramitacoes">{% include "components/ui/badges/chip.html" with tone="filter" label="Tramitações" only %}</a>
+    <a href="#movimentacoes">{% include "components/ui/badges/chip.html" with tone="filter" label="Movimentações" only %}</a>
+    <a href="#logs">{% include "components/ui/badges/chip.html" with tone="filter" label="Logs" only %}</a>
+  </nav>
+
+  {# ── RESUMO ── #}
+  <section class="app-section card app-card" id="resumo">
+    <div class="app-section__header stack">
+      <h2 class="app-section__title">Resumo</h2>
+    </div>
+    <div class="app-section__body">
+      <dl class="stack">
+        <div class="cluster"><dt class="app-section__subtitle">Origem</dt><dd>{{ protocolo.get_origem_tipo_display }}</dd></div>
+        {% if protocolo.origem_label and protocolo.origem_label != "—" %}
+        <div class="cluster"><dt class="app-section__subtitle">Documento vinculado</dt><dd>{{ protocolo.origem_label }}</dd></div>
+        {% endif %}
+        <div class="cluster"><dt class="app-section__subtitle">Assunto</dt><dd>{{ protocolo.assunto_resumo|default:"—" }}</dd></div>
+        <div class="cluster"><dt class="app-section__subtitle">Descrição</dt><dd>{{ protocolo.descricao_resumo|default:"—" }}</dd></div>
+        <div class="cluster"><dt class="app-section__subtitle">Órgão</dt><dd>{{ protocolo.nome_orgao|default:protocolo.cod_orgao|default:"—" }}</dd></div>
+        <div class="cluster"><dt class="app-section__subtitle">Local de origem</dt><dd>{{ protocolo.nome_local_origem|default:protocolo.cod_local_origem|default:"—" }}</dd></div>
+        <div class="cluster"><dt class="app-section__subtitle">Local atual</dt><dd>{{ protocolo.nome_local_atual|default:protocolo.cod_local_atual|default:"—" }}</dd></div>
+        <div class="cluster"><dt class="app-section__subtitle">Responsável atual</dt><dd>{{ protocolo.nome_responsavel_atual|default:"—" }}{% if protocolo.cpf_responsavel_atual %} · {{ protocolo.cpf_responsavel_mascarado }}{% endif %}</dd></div>
+        <div class="cluster"><dt class="app-section__subtitle">Status local</dt><dd>{{ protocolo.get_status_local_display }}</dd></div>
+        <div class="cluster"><dt class="app-section__subtitle">Criado no sistema</dt><dd>{{ protocolo.criado_no_sistema_em|date:"d/m/Y H:i" }}</dd></div>
+        <div class="cluster"><dt class="app-section__subtitle">Última sincronização</dt><dd>{{ protocolo.ultima_sincronizacao_em|date:"d/m/Y H:i"|default:"—" }}</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  {% include "protocolos/partials/protocolo_documentos.html" with documentos=documentos protocolo=protocolo only %}
+  {% include "protocolos/partials/protocolo_assinaturas.html" with assinaturas=assinaturas protocolo=protocolo only %}
+  {% include "protocolos/partials/protocolo_pendencias.html" with pendencias=pendencias only %}
+  {% include "protocolos/partials/protocolo_tramitacoes.html" with tramitacoes=tramitacoes only %}
+  {% include "protocolos/partials/protocolo_movimentacoes.html" with movimentacoes=movimentacoes only %}
+  {% include "protocolos/partials/protocolo_logs.html" with logs=logs only %}
+
+</div>
+{% endblock %}

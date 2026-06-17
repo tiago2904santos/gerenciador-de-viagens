@@ -1,0 +1,23 @@
+{% comment %}Seção Movimentações (linha do tempo completa). Parâmetros: movimentacoes{% endcomment %}
+<section class="app-section card app-card" id="movimentacoes">
+  <div class="app-section__header stack">
+    <h2 class="app-section__title">Movimentações</h2>
+    <p class="app-section__subtitle">Linha do tempo completa do protocolo.</p>
+  </div>
+  <div class="app-section__body stack">
+    {% for mov in movimentacoes %}
+      <article class="card app-card stack">
+        <div class="cluster cluster--between cluster--start">
+          <strong>{{ mov.tipo|default:"Movimentação" }}</strong>
+          <span class="app-section__subtitle">{{ mov.data_movimentacao|date:"d/m/Y H:i"|default:"—" }}</span>
+        </div>
+        {% if mov.descricao %}<p>{{ mov.descricao }}</p>{% endif %}
+        {% if mov.local or mov.usuario %}
+          <p class="app-section__subtitle">{% if mov.local %}{{ mov.local }}{% endif %}{% if mov.local and mov.usuario %} · {% endif %}{% if mov.usuario %}{{ mov.usuario }}{% endif %}</p>
+        {% endif %}
+      </article>
+    {% empty %}
+      <p class="app-section__subtitle">Nenhuma movimentação registrada.</p>
+    {% endfor %}
+  </div>
+</section>

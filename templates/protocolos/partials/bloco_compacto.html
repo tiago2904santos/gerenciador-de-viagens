@@ -1,0 +1,41 @@
+{% comment %}
+Bloco compacto de integração eProtocolo, embutido no detalhe/resumo de um documento.
+Renderizado pela tag {% load protocolos_tags %}{% bloco_protocolo documento %}.
+
+IMPORTANTE: usa apenas LINKS (GET), nunca <form>, pois costuma ser embutido dentro
+do <form> de wizards (formulários aninhados são HTML inválido). As ações que mudam
+estado vão para páginas de confirmação com formulário de topo.
+
+Parâmetros (via tag): protocolo, gerar_url, eprotocolo_configurado, eprotocolo_descricao
+{% endcomment %}
+<section class="app-section card app-card stack" aria-label="Integração eProtocolo">
+  <div class="app-section__header cluster cluster--between cluster--start">
+    <div class="stack">
+      <h3 class="app-section__title">Integração eProtocolo</h3>
+      <p class="app-section__subtitle">{{ eprotocolo_descricao }}</p>
+    </div>
+    {% if protocolo %}
+      {% include "protocolos/partials/protocolo_status.html" with protocolo=protocolo only %}
+    {% endif %}
+  </div>
+
+  <div class="app-section__body stack">
+    {% if protocolo %}
+      <dl class="stack">
+        <div class="cluster"><dt class="app-section__subtitle">Protocolo</dt><dd>{{ protocolo.numero_display }}</dd></div>
+        <div class="cluster"><dt class="app-section__subtitle">Status</dt><dd>{{ protocolo.get_status_local_display }}</dd></div>
+        {% if protocolo.nome_local_atual %}<div class="cluster"><dt class="app-section__subtitle">Local atual</dt><dd>{{ protocolo.nome_local_atual }}</dd></div>{% endif %}
+        <div class="cluster"><dt class="app-section__subtitle">Última atualização</dt><dd>{{ protocolo.ultima_sincronizacao_em|date:"d/m/Y H:i"|default:protocolo.ultima_movimentacao_em|date:"d/m/Y H:i"|default:"—" }}</dd></div>
+      </dl>
+      <div class="cluster">
+        {% include "components/ui/buttons/button.html" with href=protocolo.get_detail_url label="Ver protocolo" variant="primary" size="sm" icon="eye" only %}
+        {% include "components/ui/buttons/button.html" with href=protocolo.get_atualizar_url label="Atualizar situação" variant="secondary" size="sm" icon="search" only %}
+      </div>
+    {% else %}
+      <p class="app-section__subtitle">Este documento ainda não possui protocolo no eProtocolo.</p>
+      {% if gerar_url %}
+        {% include "components/ui/buttons/button.html" with href=gerar_url label="Gerar protocolo" variant="primary" size="sm" icon="plus" only %}
+      {% endif %}
+    {% endif %}
+  </div>
+</section>

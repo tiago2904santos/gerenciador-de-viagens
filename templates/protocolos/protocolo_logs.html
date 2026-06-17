@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<div class="page-shell page-shell--standard stack">
+  <div class="page-header-stack">
+    <div class="page-header-band">
+      <div class="page-header-band__content">
+        <div class="page-header-band__text">
+          <span class="page-header-band__eyebrow">PROTOCOLO {{ protocolo.numero_display }}</span>
+          <h1 class="page-header-band__title">Logs de integração</h1>
+        </div>
+        {% url 'protocolos:detail' protocolo.pk as detail_url %}
+        {% include "components/ui/buttons/button.html" with href=detail_url label="Ver protocolo" variant="secondary" size="sm" icon="eye" only %}
+      </div>
+    </div>
+  </div>
+  {% include "protocolos/partials/protocolo_logs.html" with logs=logs only %}
+</div>
+{% endblock %}

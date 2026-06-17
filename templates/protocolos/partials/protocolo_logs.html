@@ -1,0 +1,32 @@
+{% comment %}Seção Logs técnicos (sem dados sensíveis). Parâmetros: logs{% endcomment %}
+<section class="app-section card app-card" id="logs">
+  <div class="app-section__header stack">
+    <h2 class="app-section__title">Logs de integração</h2>
+    <p class="app-section__subtitle">Diagnóstico técnico. Tokens, segredos e CPFs nunca são registrados.</p>
+  </div>
+  <div class="app-section__body stack">
+    {% for log in logs %}
+      <article class="card app-card stack">
+        <div class="cluster cluster--between cluster--start">
+          <strong>{{ log.acao }}</strong>
+          <span class="cluster">
+            {% if log.sucesso %}
+              {% include "components/ui/badges/chip.html" with tone="success" size="compact" label="OK" only %}
+            {% else %}
+              {% include "components/ui/badges/chip.html" with tone="danger" size="compact" label="Erro" only %}
+            {% endif %}
+            {% if log.modo_mock %}{% include "components/ui/badges/chip.html" with tone="muted" size="compact" label="mock" only %}{% endif %}
+            {% if log.status_code %}{% include "components/ui/badges/chip.html" with tone="neutral" size="compact" label=log.status_code only %}{% endif %}
+          </span>
+        </div>
+        <dl class="stack">
+          <div class="cluster"><dt class="app-section__subtitle">Quando</dt><dd>{{ log.criado_em|date:"d/m/Y H:i:s" }}</dd></div>
+          {% if log.endpoint %}<div class="cluster"><dt class="app-section__subtitle">Endpoint</dt><dd>{{ log.metodo }} {{ log.endpoint }}</dd></div>{% endif %}
+          {% if log.erro %}<div class="cluster"><dt class="app-section__subtitle">Erro</dt><dd>{{ log.erro }}</dd></div>{% endif %}
+        </dl>
+      </article>
+    {% empty %}
+      <p class="app-section__subtitle">Nenhum log registrado.</p>
+    {% endfor %}
+  </div>
+</section>

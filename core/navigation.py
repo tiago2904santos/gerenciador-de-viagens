@@ -66,6 +66,13 @@ NAVIGATION_ITEMS = [
         "url_name": "justificativas:index",
         "icon": "JS",
     },
+    {
+        "id": "protocolos",
+        "label": "Protocolos",
+        "url_name": "protocolos:index",
+        "icon": "PR",
+        "active_when": ["protocolos:"],
+    },
 ]
 
 if settings.DEBUG:

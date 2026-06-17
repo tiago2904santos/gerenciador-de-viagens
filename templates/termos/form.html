@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load protocolos_tags %}
 
 {% block title %}{{ page_title }}{% endblock %}
 
@@ -283,6 +284,7 @@
         </section>
       </main>
     </form>
+    {% if termo.pk %}{% bloco_protocolo termo %}{% endif %}
   </div>
 {% endblock %}
 

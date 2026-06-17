@@ -1,0 +1,23 @@
+{% comment %}Seção Tramitações (linha do tempo). Parâmetros: tramitacoes{% endcomment %}
+<section class="app-section card app-card" id="tramitacoes">
+  <div class="app-section__header stack">
+    <h2 class="app-section__title">Tramitações</h2>
+    <p class="app-section__subtitle">Histórico de trâmites entre locais.</p>
+  </div>
+  <div class="app-section__body stack">
+    {% for tram in tramitacoes %}
+      <article class="card app-card stack">
+        <div class="cluster cluster--between cluster--start">
+          <strong>{{ tram.nome_local_de|default:tram.cod_local_de|default:"—" }} → {{ tram.nome_local_para|default:tram.cod_local_para|default:"—" }}</strong>
+          <span class="app-section__subtitle">{{ tram.data_tramitacao|date:"d/m/Y H:i"|default:"—" }}</span>
+        </div>
+        <dl class="stack">
+          {% if tram.nome_destinatario %}<div class="cluster"><dt class="app-section__subtitle">Destinatário</dt><dd>{{ tram.nome_destinatario }}{% if tram.cpf_destinatario %} · {{ tram.cpf_destinatario_mascarado }}{% endif %}</dd></div>{% endif %}
+          {% if tram.parecer %}<div class="cluster"><dt class="app-section__subtitle">Parecer</dt><dd>{{ tram.parecer }}</dd></div>{% endif %}
+        </dl>
+      </article>
+    {% empty %}
+      <p class="app-section__subtitle">Nenhuma tramitação registrada.</p>
+    {% endfor %}
+  </div>
+</section>

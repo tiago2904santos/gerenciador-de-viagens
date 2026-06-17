@@ -1,0 +1,74 @@
+{% comment %}
+Card de protocolo para a lista. Usa apenas componentes/utilitários do design system.
+Parâmetros: protocolo
+{% endcomment %}
+<article
+  class="card app-card stack"
+  data-cv-filter-item
+  data-search-text="{{ protocolo.numero_display }} {{ protocolo.assunto_resumo }} {{ protocolo.nome_local_atual }} {{ protocolo.nome_responsavel_atual }}"
+>
+  <header class="cluster cluster--between cluster--start">
+    <div class="stack">
+      <span class="app-section__subtitle">Protocolo</span>
+      <strong class="app-section__title">{{ protocolo.numero_display }}</strong>
+    </div>
+    {% include "protocolos/partials/protocolo_status.html" with protocolo=protocolo only %}
+  </header>
+
+  <dl class="stack">
+    {% if protocolo.origem_label and protocolo.origem_label != "—" %}
+    <div class="cluster">
+      <dt class="app-section__subtitle">Origem</dt>
+      <dd>{{ protocolo.origem_label }}</dd>
+    </div>
+    {% endif %}
+    {% if protocolo.assunto_resumo %}
+    <div class="cluster">
+      <dt class="app-section__subtitle">Assunto</dt>
+      <dd>{{ protocolo.assunto_resumo }}</dd>
+    </div>
+    {% endif %}
+    {% if protocolo.nome_local_atual %}
+    <div class="cluster">
+      <dt class="app-section__subtitle">Local atual</dt>
+      <dd>{{ protocolo.nome_local_atual }}</dd>
+    </div>
+    {% endif %}
+    {% if protocolo.nome_responsavel_atual %}
+    <div class="cluster">
+      <dt class="app-section__subtitle">Responsável</dt>
+      <dd>{{ protocolo.nome_responsavel_atual }}{% if protocolo.cpf_responsavel_atual %} · {{ protocolo.cpf_responsavel_mascarado }}{% endif %}</dd>
+    </div>
+    {% endif %}
+    <div class="cluster">
+      <dt class="app-section__subtitle">Pendências</dt>
+      <dd>
+        {% if protocolo.pendencias_abertas_count %}
+          {% include "components/ui/badges/chip.html" with tone="warning" size="compact" label=protocolo.pendencias_abertas_count only %}
+        {% else %}
+          <span class="app-section__subtitle">Nenhuma</span>
+        {% endif %}
+      </dd>
+    </div>
+    <div class="cluster">
+      <dt class="app-section__subtitle">Última movimentação</dt>
+      <dd>{{ protocolo.ultima_movimentacao_em|date:"d/m/Y H:i"|default:"—" }}</dd>
+    </div>
+    <div class="cluster">
+      <dt class="app-section__subtitle">Última sincronização</dt>
+      <dd>{{ protocolo.ultima_sincronizacao_em|date:"d/m/Y H:i"|default:"—" }}</dd>
+    </div>
+  </dl>
+
+  <footer class="cluster">
+    {% include "components/ui/buttons/button.html" with href=protocolo.get_detail_url label="Visualizar" variant="primary" size="sm" icon="eye" only %}
+    <form method="post" action="{% url 'protocolos:atualizar' protocolo.pk %}">
+      {% csrf_token %}
+      {% include "components/ui/buttons/button.html" with type="submit" label="Atualizar situação" variant="secondary" size="sm" icon="search" only %}
+    </form>
+    {% include "components/ui/buttons/button.html" with href=protocolo.get_enviar_documento_url label="Anexar documento" variant="secondary" size="sm" icon="document" only %}
+    {% include "components/ui/buttons/button.html" with href=protocolo.get_solicitar_assinatura_url label="Solicitar assinatura" variant="secondary" size="sm" icon="sign" only %}
+    {% include "components/ui/buttons/button.html" with href=protocolo.get_tramitar_url label="Tramitar" variant="secondary" size="sm" icon="arrow-right" only %}
+    {% include "components/ui/buttons/button.html" with href=protocolo.get_movimentacoes_url label="Movimentações" variant="ghost" size="sm" icon="list" only %}
+  </footer>
+</article>

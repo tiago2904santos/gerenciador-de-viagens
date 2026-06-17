@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "prestacoes_contas",
     "diario_bordo",
     "integracoes.google_drive",
+    "protocolos",
 ]
 
 _MIDDLEWARE_CORE = [
@@ -145,3 +146,44 @@ DOCUMENTOS_SIMPLE_PDF_FALLBACK = os.getenv("DOCUMENTOS_SIMPLE_PDF_FALLBACK", "")
     "true",
     "yes",
 )
+
+
+def _env_flag(name, default="false"):
+    return os.getenv(name, default).strip().lower() in ("1", "true", "yes")
+
+
+# ---------------------------------------------------------------------------
+# Integração eProtocolo (Paraná)
+#
+# Credenciais sensíveis (CLIENT_SECRET, CONSUMER_ID, etc.) ficam apenas no .env
+# e nunca são versionadas. Códigos institucionais não sensíveis (órgão, locais,
+# assunto, espécie, palavra-chave) também são configuráveis aqui ou no admin.
+#
+# AMBIENTE controla o comportamento do client:
+#   - "mock"        → nunca chama a rede; respostas determinísticas (dev/testes).
+#   - "homologacao" → chama a API real de homologação se houver credenciais.
+#   - "producao"    → chama a API real de produção se houver credenciais.
+# Sem credenciais válidas, o client cai em modo mock automaticamente para que o
+# sistema nunca quebre por ausência de configuração.
+# ---------------------------------------------------------------------------
+EPROTOCOLO = {
+    "AMBIENTE": (os.getenv("EPROTOCOLO_AMBIENTE") or "mock").strip().lower(),
+    "BASE_URL": (os.getenv("EPROTOCOLO_BASE_URL") or "").strip(),
+    "TOKEN_URL": (os.getenv("EPROTOCOLO_TOKEN_URL") or "").strip(),
+    "CLIENT_ID": (os.getenv("EPROTOCOLO_CLIENT_ID") or "").strip(),
+    "CLIENT_SECRET": (os.getenv("EPROTOCOLO_CLIENT_SECRET") or "").strip(),
+    "CONSUMER_ID": (os.getenv("EPROTOCOLO_CONSUMER_ID") or "").strip(),
+    "TIMEOUT": int(os.getenv("EPROTOCOLO_TIMEOUT", "30") or "30"),
+    "VERIFY_SSL": _env_flag("EPROTOCOLO_VERIFY_SSL", "true"),
+    # Códigos institucionais padrão (não sensíveis) — usados pelos mappers
+    # quando o documento não traz a informação. Podem ficar vazios.
+    "COD_ORGAO_PADRAO": (os.getenv("EPROTOCOLO_COD_ORGAO_PADRAO") or "").strip(),
+    "NOME_ORGAO_PADRAO": (os.getenv("EPROTOCOLO_NOME_ORGAO_PADRAO") or "").strip(),
+    "COD_LOCAL_ORIGEM_PADRAO": (os.getenv("EPROTOCOLO_COD_LOCAL_ORIGEM_PADRAO") or "").strip(),
+    "COD_LOCAL_DESTINO_PADRAO": (os.getenv("EPROTOCOLO_COD_LOCAL_DESTINO_PADRAO") or "").strip(),
+    "COD_ASSUNTO_VIAGEM": (os.getenv("EPROTOCOLO_COD_ASSUNTO_VIAGEM") or "").strip(),
+    "COD_ESPECIE_OFICIO": (os.getenv("EPROTOCOLO_COD_ESPECIE_OFICIO") or "").strip(),
+    "COD_PALAVRA_CHAVE_VIAGEM": (os.getenv("EPROTOCOLO_COD_PALAVRA_CHAVE_VIAGEM") or "").strip(),
+    "COD_TIPO_TRAMITACAO_PADRAO": (os.getenv("EPROTOCOLO_COD_TIPO_TRAMITACAO_PADRAO") or "").strip(),
+    "CPF_USUARIO_SISTEMA": (os.getenv("EPROTOCOLO_CPF_USUARIO_SISTEMA") or "").strip(),
+}
