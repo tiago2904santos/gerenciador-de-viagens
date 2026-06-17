@@ -23,7 +23,7 @@ from integracoes.eprotocolo import mappers
 from integracoes.eprotocolo import services as epro
 from integracoes.eprotocolo import settings as cfg
 from integracoes.eprotocolo.client import mascarar_dados
-from integracoes.eprotocolo.exceptions import EProtocoloError
+from integracoes.eprotocolo.exceptions import EProtocoloConfigError, EProtocoloError
 from integracoes.eprotocolo.schemas import ResultadoOperacao
 
 from .models import (
@@ -37,6 +37,8 @@ from .models import (
 )
 
 logger = logging.getLogger(__name__)
+
+ORIGEM_EPROTOCOLO_REAL = "eprotocolo_real"
 
 
 # ---------------------------------------------------------------------------
@@ -70,6 +72,114 @@ def registrar_log(protocolo, acao, *, resultado: ResultadoOperacao | None = None
         request_payload=mascarar_dados(request_payload or {}),
         response_payload=mascarar_dados(response_payload or {}),
     )
+
+
+def garantir_mutacao_real_controlada(operacao, protocolo, *, real=False, confirmado=False):
+    """Exige as travas do ambiente real_controlado antes de qualquer mutacao."""
+    if cfg.is_real_controlado():
+        cfg.garantir_operacao_real_permitida(
+            operacao,
+            protocolo=getattr(protocolo, "numero", None) or protocolo,
+            real=real,
+            confirmado=confirmado,
+            quantidade=1,
+        )
+
+
+def consultar_protocolo_real(numero: str) -> dict:
+    """Consulta read-only completa de um unico protocolo real/controlado."""
+    cfg.garantir_operacao_real_permitida("consultar", protocolo=numero, quantidade=1)
+    numero = (numero or "").strip()
+    if not numero:
+        raise EProtocoloConfigError("Informe um protocolo para consulta real.")
+
+    consulta = epro.consultar_protocolo(numero)
+    documentos = epro.listar_documentos_protocolo(numero)
+    documentos_volume = epro.listar_documentos_volume(numero)
+    tramitacoes = epro.listar_tramitacoes(numero)
+    movimentacoes = epro.listar_movimentacoes(numero)
+    pendencias = epro.listar_pendencias(numero)
+
+    assinaturas = []
+    for item in _extrair_itens(documentos.dados, "documentos"):
+        codigo = _primeiro_valor(item, "codigoDocumento", "codigo", "id")
+        if not codigo:
+            continue
+        try:
+            assinaturas.append(epro.listar_assinaturas_documento(numero, codigo).dados or {})
+        except EProtocoloError:
+            logger.warning("Falha ao consultar assinaturas do documento %s", codigo)
+
+    registrar_log(
+        None,
+        "consultar_real",
+        resultado=ResultadoOperacao(
+            sucesso=True,
+            dados={
+                "numero": numero,
+                "documentos": len(_extrair_itens(documentos.dados, "documentos")),
+                "documentosVolume": len(_extrair_itens(documentos_volume.dados, "documentos")),
+                "tramitacoes": len(_extrair_itens(tramitacoes.dados, "tramitacoes")),
+                "movimentacoes": len(_extrair_itens(movimentacoes.dados, "movimentacoes")),
+                "pendencias": len(_extrair_itens(pendencias.dados, "pendencias")),
+                "assinaturas": len(assinaturas),
+            },
+            mock=consulta.mock,
+        ),
+        endpoint="consulta_readonly_real",
+        metodo="GET",
+    )
+
+    return {
+        "protocolo": consulta.dados or {},
+        "documentos": documentos.dados or {},
+        "documentos_volume": documentos_volume.dados or {},
+        "tramitacoes": tramitacoes.dados or {},
+        "movimentacoes": movimentacoes.dados or {},
+        "pendencias": pendencias.dados or {},
+        "assinaturas": assinaturas,
+        "mock": consulta.mock,
+    }
+
+
+@transaction.atomic
+def importar_protocolo_real(numero: str) -> Protocolo:
+    """Espelha um protocolo real no banco local sem alterar o eProtocolo."""
+    cfg.garantir_operacao_real_permitida("importar", protocolo=numero, quantidade=1)
+    dados = consultar_protocolo_real(numero)
+    protocolo_dados = dados["protocolo"]
+
+    protocolo, _created = Protocolo.objects.update_or_create(
+        numero=numero,
+        defaults={
+            "origem_tipo": ORIGEM_EPROTOCOLO_REAL,
+            "status_local": Protocolo.STATUS_CRIADO,
+            "situacao_eprotocolo": protocolo_dados.get("situacao", ""),
+            "cod_orgao": protocolo_dados.get("codOrgao", ""),
+            "nome_orgao": protocolo_dados.get("nomeOrgao", ""),
+            "cod_local_atual": protocolo_dados.get("codLocalAtual", ""),
+            "nome_local_atual": protocolo_dados.get("nomeLocalAtual", ""),
+            "cpf_responsavel_atual": _somente_digitos(protocolo_dados.get("cpfResponsavelAtual", "")),
+            "nome_responsavel_atual": protocolo_dados.get("nomeResponsavelAtual", ""),
+            "payload_atual_json": mascarar_dados(protocolo_dados),
+            "modo_mock": bool(dados.get("mock")),
+            "ultima_sincronizacao_em": timezone.now(),
+        },
+    )
+
+    _sincronizar_documentos_payload(protocolo, dados["documentos"], esta_no_volume=False)
+    _sincronizar_documentos_payload(protocolo, dados["documentos_volume"], esta_no_volume=True)
+    _sincronizar_tramitacoes_payload(protocolo, dados["tramitacoes"])
+    _sincronizar_movimentacoes_payload(protocolo, dados["movimentacoes"])
+    _sincronizar_pendencias_payload(protocolo, dados["pendencias"])
+    registrar_log(
+        protocolo,
+        "importar_real_readonly",
+        resultado=ResultadoOperacao(sucesso=True, dados={"numero": numero}, mock=bool(dados.get("mock"))),
+        endpoint="importar_readonly_real",
+        metodo="GET",
+    )
+    return protocolo
 
 
 # ---------------------------------------------------------------------------
@@ -119,7 +229,13 @@ def _aplicar_dados_criacao(protocolo: Protocolo, resultado: ResultadoOperacao, p
 # Criação / vínculo
 # ---------------------------------------------------------------------------
 @transaction.atomic
-def criar_protocolo_a_partir_de_documento(documento, *, criar_no_eprotocolo=True) -> Protocolo:
+def criar_protocolo_a_partir_de_documento(
+    documento,
+    *,
+    criar_no_eprotocolo=True,
+    real=False,
+    confirmado=False,
+) -> Protocolo:
     """Cria um Protocolo local vinculado a um documento interno.
 
     Quando ``criar_no_eprotocolo`` é True (padrão), também chama a integração
@@ -138,6 +254,9 @@ def criar_protocolo_a_partir_de_documento(documento, *, criar_no_eprotocolo=True
         return protocolo
 
     payload = gerar_payload_protocolo(protocolo)
+    garantir_mutacao_real_controlada(
+        "criar_protocolo", protocolo.numero or "novo", real=real, confirmado=confirmado
+    )
     try:
         resultado = epro.criar_protocolo(payload)
     except EProtocoloError as exc:
@@ -187,7 +306,12 @@ def vincular_protocolo_manual(numero, *, documento=None, assunto="", descricao="
 # ---------------------------------------------------------------------------
 # Documentos
 # ---------------------------------------------------------------------------
-def enviar_documento_principal(protocolo: Protocolo) -> ProtocoloDocumento | None:
+def enviar_documento_principal(
+    protocolo: Protocolo,
+    *,
+    real=False,
+    confirmado=False,
+) -> ProtocoloDocumento | None:
     """Gera o PDF do documento de origem e o envia ao eProtocolo.
 
     Best-effort: se o PDF não puder ser gerado neste ambiente (dependências de
@@ -201,13 +325,29 @@ def enviar_documento_principal(protocolo: Protocolo) -> ProtocoloDocumento | Non
         registrar_log(protocolo, "enviar_documento_principal",
                       erro=EProtocoloError("PDF do documento indisponível neste ambiente."))
         return None
-    return anexar_documento(protocolo, tipo=tipo, nome_arquivo=nome_arquivo, conteudo=conteudo)
+    return anexar_documento(
+        protocolo,
+        tipo=tipo,
+        nome_arquivo=nome_arquivo,
+        conteudo=conteudo,
+        real=real,
+        confirmado=confirmado,
+    )
 
 
-def anexar_documento(protocolo: Protocolo, *, tipo, nome_arquivo, conteudo: bytes,
-                     origem_object=None) -> ProtocoloDocumento:
+def anexar_documento(
+    protocolo: Protocolo,
+    *,
+    tipo,
+    nome_arquivo,
+    conteudo: bytes,
+    origem_object=None,
+    real=False,
+    confirmado=False,
+) -> ProtocoloDocumento:
     """Envia um PDF (bytes) ao eProtocolo e registra o ProtocoloDocumento local."""
     numero = protocolo.numero or ""
+    garantir_mutacao_real_controlada("anexar_documento", protocolo, real=real, confirmado=confirmado)
     try:
         resultado = epro.enviar_documento(numero, conteudo, nome_arquivo,
                                           metadata={"tipo": tipo})
@@ -249,7 +389,8 @@ def anexar_documento(protocolo: Protocolo, *, tipo, nome_arquivo, conteudo: byte
     return documento
 
 
-def concluir_cadastro_eprotocolo(protocolo: Protocolo) -> ResultadoOperacao:
+def concluir_cadastro_eprotocolo(protocolo: Protocolo, *, real=False, confirmado=False) -> ResultadoOperacao:
+    garantir_mutacao_real_controlada("concluir", protocolo, real=real, confirmado=confirmado)
     try:
         resultado = epro.concluir_protocolo(protocolo.numero or "")
     except EProtocoloError as exc:
@@ -268,7 +409,8 @@ def concluir_cadastro_eprotocolo(protocolo: Protocolo) -> ResultadoOperacao:
 # Assinaturas
 # ---------------------------------------------------------------------------
 def solicitar_assinatura_documento(protocolo: Protocolo, documento, cpf, nome=None,
-                                   observacao="") -> ProtocoloAssinatura:
+                                   observacao="", real=False, confirmado=False) -> ProtocoloAssinatura:
+    garantir_mutacao_real_controlada("criar_pendencia", protocolo, real=real, confirmado=confirmado)
     cpf_digitos = "".join(ch for ch in (cpf or "") if ch.isdigit())
     payload = {
         "tipo": "ASSINATURA",
@@ -322,7 +464,9 @@ def solicitar_assinatura_documento(protocolo: Protocolo, documento, cpf, nome=No
 # Tramitação
 # ---------------------------------------------------------------------------
 def tramitar(protocolo: Protocolo, cod_local_para, *, cpf_destinatario=None,
-             parecer=None, nome_local_para="", nome_destinatario="") -> ProtocoloTramitacao:
+             parecer=None, nome_local_para="", nome_destinatario="",
+             real=False, confirmado=False) -> ProtocoloTramitacao:
+    garantir_mutacao_real_controlada("tramitar", protocolo, real=real, confirmado=confirmado)
     cpf_digitos = "".join(ch for ch in (cpf_destinatario or "") if ch.isdigit())
     payload = {
         "codLocalDe": protocolo.cod_local_atual or protocolo.cod_local_origem,
@@ -443,8 +587,11 @@ def _sincronizar_movimentacoes(protocolo, numero):
         resultado = epro.listar_movimentacoes(numero)
     except EProtocoloError:
         return
-    itens = (resultado.dados or {}).get("movimentacoes", []) or []
-    for item in itens:
+    _sincronizar_movimentacoes_payload(protocolo, resultado.dados or {})
+
+
+def _sincronizar_movimentacoes_payload(protocolo, payload):
+    for item in _extrair_itens(payload, "movimentacoes"):
         descricao = item.get("descricao", "")
         tipo = item.get("tipo", "")
         if protocolo.movimentacoes.filter(tipo=tipo, descricao=descricao).exists():
@@ -461,7 +608,11 @@ def _sincronizar_tramitacoes(protocolo, numero):
         resultado = epro.listar_tramitacoes(numero)
     except EProtocoloError:
         return
-    for item in (resultado.dados or {}).get("tramitacoes", []) or []:
+    _sincronizar_tramitacoes_payload(protocolo, resultado.dados or {})
+
+
+def _sincronizar_tramitacoes_payload(protocolo, payload):
+    for item in _extrair_itens(payload, "tramitacoes"):
         cod_para = item.get("codLocalPara", "")
         data = _parse_data(item.get("dataTramitacao"))
         if protocolo.tramitacoes.filter(cod_local_para=cod_para, data_tramitacao=data).exists():
@@ -481,7 +632,11 @@ def _sincronizar_pendencias(protocolo, numero):
         resultado = epro.listar_pendencias(numero)
     except EProtocoloError:
         return
-    for item in (resultado.dados or {}).get("pendencias", []) or []:
+    _sincronizar_pendencias_payload(protocolo, resultado.dados or {})
+
+
+def _sincronizar_pendencias_payload(protocolo, payload):
+    for item in _extrair_itens(payload, "pendencias"):
         codigo = item.get("codigoPendencia", "")
         defaults = {
             "tipo": item.get("tipo", ""),
@@ -491,6 +646,70 @@ def _sincronizar_pendencias(protocolo, numero):
         }
         if codigo:
             protocolo.pendencias.update_or_create(codigo_pendencia=codigo, defaults=defaults)
+
+
+def _sincronizar_documentos_payload(protocolo, payload, *, esta_no_volume=False):
+    for item in _extrair_itens(payload, "documentos"):
+        codigo = _primeiro_valor(item, "codigoDocumento", "codigo", "id")
+        nome = _primeiro_valor(item, "nomeArquivo", "nome", "arquivo", default="")
+        defaults = {
+            "tipo_documento": _primeiro_valor(item, "tipo", "tipoDocumento", default=ProtocoloDocumento.TIPO_ANEXO) or ProtocoloDocumento.TIPO_ANEXO,
+            "nome_arquivo": nome,
+            "md5": _primeiro_valor(item, "md5", "hashMd5", default=""),
+            "tamanho_bytes": _inteiro_ou_none(_primeiro_valor(item, "tamanhoBytes", "tamanho", default=None)),
+            "enviado_em": _parse_data(_primeiro_valor(item, "enviadoEm", "dataEnvio", "criadoEm", default=None)),
+            "esta_no_volume": bool(item.get("estaNoVolume", esta_no_volume)),
+            "assinado": bool(item.get("assinado", False)),
+            "payload_json": mascarar_dados(item),
+        }
+        if codigo:
+            protocolo.documentos.update_or_create(
+                codigo_documento_eprotocolo=str(codigo),
+                defaults=defaults,
+            )
+        elif nome and not protocolo.documentos.filter(nome_arquivo=nome).exists():
+            ProtocoloDocumento.objects.create(protocolo=protocolo, **defaults)
+
+
+def _extrair_itens(payload, chave):
+    if isinstance(payload, list):
+        return [item for item in payload if isinstance(item, dict)]
+    if not isinstance(payload, dict):
+        return []
+    candidatos = (
+        payload.get(chave),
+        payload.get("itens"),
+        payload.get("items"),
+        payload.get("data"),
+        payload.get("resultado"),
+    )
+    for candidato in candidatos:
+        if isinstance(candidato, list):
+            return [item for item in candidato if isinstance(item, dict)]
+    return []
+
+
+def _primeiro_valor(dados, *chaves, default=None):
+    if not isinstance(dados, dict):
+        return default
+    for chave in chaves:
+        valor = dados.get(chave)
+        if valor not in (None, ""):
+            return valor
+    return default
+
+
+def _somente_digitos(valor):
+    return "".join(ch for ch in str(valor or "") if ch.isdigit())
+
+
+def _inteiro_ou_none(valor):
+    if valor in (None, ""):
+        return None
+    try:
+        return int(valor)
+    except (TypeError, ValueError):
+        return None
 
 
 def _parse_data(valor):

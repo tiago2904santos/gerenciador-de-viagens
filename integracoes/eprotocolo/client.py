@@ -49,14 +49,24 @@ def _mascarar(valor):
     if isinstance(valor, dict):
         limpo = {}
         for chave, item in valor.items():
-            if str(chave).strip().lower() in _CAMPOS_SENSIVEIS:
+            chave_normalizada = str(chave).strip().lower()
+            if chave_normalizada in _CAMPOS_SENSIVEIS:
                 limpo[chave] = "***"
+            elif "cpf" in chave_normalizada:
+                limpo[chave] = _mascarar_cpf(item)
             else:
                 limpo[chave] = _mascarar(item)
         return limpo
     if isinstance(valor, (list, tuple)):
         return [_mascarar(item) for item in valor]
     return valor
+
+
+def _mascarar_cpf(valor):
+    digitos = "".join(ch for ch in str(valor or "") if ch.isdigit())
+    if len(digitos) != 11:
+        return "***"
+    return f"{digitos[0:3]}.***.***-{digitos[9:11]}"
 
 
 class _TokenCache:

@@ -15,9 +15,25 @@ AMBIENTE_MOCK = "mock"
 AMBIENTE_TREINAMENTO = "treinamento"
 AMBIENTE_HOMOLOGACAO = "homologacao"
 AMBIENTE_PRODUCAO = "producao"
+AMBIENTE_REAL_CONTROLADO = "real_controlado"
 
 # Ambientes que disparam chamadas HTTP reais quando há credenciais.
-AMBIENTES_REAIS = (AMBIENTE_TREINAMENTO, AMBIENTE_HOMOLOGACAO, AMBIENTE_PRODUCAO)
+AMBIENTES_REAIS = (
+    AMBIENTE_TREINAMENTO,
+    AMBIENTE_HOMOLOGACAO,
+    AMBIENTE_PRODUCAO,
+    AMBIENTE_REAL_CONTROLADO,
+)
+
+OPERACOES_READONLY = ("consultar", "importar")
+OPERACOES_MUTACAO = (
+    "anexar_documento",
+    "criar_pendencia",
+    "tramitar",
+    "criar_protocolo",
+    "concluir",
+)
+OPERACOES_REAIS_ALLOWLIST = OPERACOES_READONLY + OPERACOES_MUTACAO
 
 # Credenciais/URLs sem as quais o modo real não pode operar.
 CAMPOS_OBRIGATORIOS_REAL = (
@@ -50,9 +66,21 @@ def is_producao() -> bool:
     return ambiente() == AMBIENTE_PRODUCAO
 
 
+def is_real_controlado() -> bool:
+    return ambiente() == AMBIENTE_REAL_CONTROLADO
+
+
 def is_real() -> bool:
     """True quando o ambiente configurado pretende falar com a API real."""
     return ambiente() in AMBIENTES_REAIS
+
+
+def real_readonly() -> bool:
+    return bool(get("REAL_READONLY", True))
+
+
+def real_mutations_enabled() -> bool:
+    return bool(get("REAL_MUTATIONS_ENABLED", False))
 
 
 def em_modo_mock() -> bool:
@@ -89,6 +117,8 @@ def eprotocolo_esta_configurado() -> bool:
 def descricao_ambiente() -> str:
     """Texto curto e amigável do estado atual da integração (para a UI)."""
     if eprotocolo_esta_configurado():
+        if is_real_controlado():
+            return "Integração ativa (real_controlado, somente consulta)"
         return f"Integração ativa ({ambiente()})"
     if ambiente() == AMBIENTE_MOCK:
         return "Modo mock (sem integração real)"
@@ -128,6 +158,52 @@ def validar_configuracao() -> dict:
         "client_id": mascarar_segredo(cfg.get("CLIENT_ID")),
         "client_secret_configurado": bool((cfg.get("CLIENT_SECRET") or "").strip()),
         "consumer_id": mascarar_segredo(cfg.get("CONSUMER_ID")),
+        "timeout": cfg.get("TIMEOUT", 30),
+        "verify_ssl": bool(cfg.get("VERIFY_SSL", True)),
+        "read_only": real_readonly(),
+        "mutations_enabled": real_mutations_enabled(),
+        "real_controlado": amb == AMBIENTE_REAL_CONTROLADO,
         "campos_faltantes": faltantes,
         "ok": (not real) or not faltantes,
     }
+
+
+def garantir_operacao_real_permitida(
+    operacao,
+    protocolo=None,
+    *,
+    real=False,
+    confirmado=False,
+    quantidade=1,
+):
+    """Bloqueia mutacoes reais acidentais no ambiente real_controlado."""
+    from .exceptions import EProtocoloConfigError
+
+    if operacao not in OPERACOES_REAIS_ALLOWLIST:
+        raise EProtocoloConfigError(f"Operacao real nao permitida: {operacao}.")
+
+    if not is_real_controlado():
+        raise EProtocoloConfigError(
+            f"Operacao real controlada exige EPROTOCOLO_AMBIENTE=real_controlado "
+            f"(atual: {ambiente()})."
+        )
+
+    if quantidade != 1:
+        raise EProtocoloConfigError("Operacao real deve ser limitada a um protocolo por vez.")
+
+    if operacao in OPERACOES_READONLY:
+        return True
+
+    if real_readonly():
+        raise EProtocoloConfigError("Operacao real bloqueada: EPROTOCOLO_REAL_READONLY=True.")
+    if not real_mutations_enabled():
+        raise EProtocoloConfigError(
+            "Operacao real bloqueada: EPROTOCOLO_REAL_MUTATIONS_ENABLED=False."
+        )
+    if not real:
+        raise EProtocoloConfigError("Operacao real bloqueada: flag --real ausente.")
+    if not protocolo:
+        raise EProtocoloConfigError("Operacao real bloqueada: protocolo explicito ausente.")
+    if not confirmado:
+        raise EProtocoloConfigError("Operacao real bloqueada: confirmacao manual ausente.")
+    return True

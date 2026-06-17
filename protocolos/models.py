@@ -51,9 +51,11 @@ class Protocolo(models.Model):
 
     ORIGEM_INTERNA = "interna"
     ORIGEM_MANUAL = "manual"
+    ORIGEM_EPROTOCOLO_REAL = "eprotocolo_real"
     ORIGEM_CHOICES = [
         (ORIGEM_INTERNA, "Documento interno"),
         (ORIGEM_MANUAL, "Externo / manual"),
+        (ORIGEM_EPROTOCOLO_REAL, "eProtocolo real"),
     ]
 
     numero = models.CharField(
@@ -66,9 +68,7 @@ class Protocolo(models.Model):
     situacao_eprotocolo = models.CharField(
         "Situação no eProtocolo", max_length=60, blank=True, default="",
     )
-    origem_tipo = models.CharField(
-        max_length=10, choices=ORIGEM_CHOICES, default=ORIGEM_INTERNA,
-    )
+    origem_tipo = models.CharField(max_length=20, choices=ORIGEM_CHOICES, default=ORIGEM_INTERNA)
 
     # -- vínculo genérico com documento interno ----------------------------
     origem_content_type = models.ForeignKey(
@@ -165,6 +165,8 @@ class Protocolo(models.Model):
     def origem_label(self) -> str:
         if self.origem_object is not None:
             return str(self.origem_object)
+        if self.origem_tipo == self.ORIGEM_EPROTOCOLO_REAL:
+            return "eProtocolo real"
         if self.origem_tipo == self.ORIGEM_MANUAL:
             return "Externo / manual"
         return "—"

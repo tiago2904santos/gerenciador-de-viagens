@@ -175,6 +175,8 @@ EPROTOCOLO = {
     "CONSUMER_ID": (os.getenv("EPROTOCOLO_CONSUMER_ID") or "").strip(),
     "TIMEOUT": int(os.getenv("EPROTOCOLO_TIMEOUT", "30") or "30"),
     "VERIFY_SSL": _env_flag("EPROTOCOLO_VERIFY_SSL", "true"),
+    "REAL_READONLY": _env_flag("EPROTOCOLO_REAL_READONLY", "true"),
+    "REAL_MUTATIONS_ENABLED": _env_flag("EPROTOCOLO_REAL_MUTATIONS_ENABLED", "false"),
     # Códigos institucionais padrão (não sensíveis) — usados pelos mappers
     # quando o documento não traz a informação. Podem ficar vazios.
     "COD_ORGAO_PADRAO": (os.getenv("EPROTOCOLO_COD_ORGAO_PADRAO") or "").strip(),
