@@ -276,16 +276,14 @@ def criar_oficio_rascunho():
 
 def get_next_available_numero_oficio(ano):
     resolved_year = ano or timezone.localdate().year
-    numeros_ocupados = set(
+    ultimo_numero = (
         Oficio.objects.filter(ano=resolved_year)
         .exclude(numero__isnull=True)
-        .order_by("numero")
+        .order_by("-numero")
         .values_list("numero", flat=True)
+        .first()
     )
-    numero = 1
-    while numero in numeros_ocupados:
-        numero += 1
-    return numero
+    return (ultimo_numero or 0) + 1
 
 
 @transaction.atomic

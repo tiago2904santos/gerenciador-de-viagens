@@ -60,12 +60,12 @@ class OficioServicesTests(TestCase):
         self.assertEqual(oficio.status, Oficio.STATUS_RASCUNHO)
         self.assertEqual(list(oficio.servidores.all()), [self.servidor])
 
-    def test_get_next_available_numero_reaproveita_menor_lacuna(self):
+    def test_get_next_available_numero_continua_apos_maior_numero(self):
         ano = timezone.localdate().year
         primeiro = Oficio.objects.create(numero=1, ano=ano, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
         Oficio.objects.create(numero=2, ano=ano, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
         primeiro.delete()
-        self.assertEqual(get_next_available_numero_oficio(ano), 1)
+        self.assertEqual(get_next_available_numero_oficio(ano), 3)
 
     def test_atualizar_oficio_dados_viajantes_preserva_transporte_data_e_numero(self):
         oficio = Oficio.objects.create(
