@@ -8,11 +8,14 @@ nunca o client HTTP do eProtocolo diretamente. Feedback ao usuário sempre via
 from __future__ import annotations
 
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_POST
+
+_login = login_required(login_url="core:login")
 
 from integracoes.eprotocolo import settings as epro_cfg
 from integracoes.eprotocolo.exceptions import EProtocoloError
@@ -44,6 +47,7 @@ def _avisar_modo(request):
 # ---------------------------------------------------------------------------
 # Lista
 # ---------------------------------------------------------------------------
+@_login
 def index(request):
     busca = request.GET.get("q", "").strip()
     status = request.GET.get("status", "").strip()
@@ -66,6 +70,7 @@ def index(request):
 # ---------------------------------------------------------------------------
 # Detalhe
 # ---------------------------------------------------------------------------
+@_login
 def detail(request, pk):
     try:
         protocolo = selectors.obter_protocolo_detalhado(pk)
@@ -89,6 +94,7 @@ def detail(request, pk):
 # ---------------------------------------------------------------------------
 # Criação manual
 # ---------------------------------------------------------------------------
+@_login
 def novo(request):
     if not permissions.pode_criar_protocolo(request.user):
         messages.error(request, "Você não tem permissão para criar protocolos.")
@@ -120,6 +126,7 @@ def novo(request):
 # ---------------------------------------------------------------------------
 # Criar a partir de documento interno (compact block → "Gerar protocolo")
 # ---------------------------------------------------------------------------
+@_login
 def vincular(request):
     if not permissions.pode_criar_protocolo(request.user):
         messages.error(request, "Você não tem permissão para gerar protocolos.")
@@ -175,6 +182,7 @@ def vincular(request):
 # ---------------------------------------------------------------------------
 # Atualizar / sincronizar
 # ---------------------------------------------------------------------------
+@_login
 def atualizar(request, pk):
     protocolo = get_object_or_404(Protocolo, pk=pk)
     if request.method == "GET":
@@ -200,6 +208,7 @@ def atualizar(request, pk):
 # ---------------------------------------------------------------------------
 # Enviar documento
 # ---------------------------------------------------------------------------
+@_login
 def enviar_documento(request, pk):
     protocolo = get_object_or_404(Protocolo, pk=pk)
     if not permissions.pode_enviar_documento(request.user):
@@ -249,6 +258,7 @@ def enviar_documento(request, pk):
 # ---------------------------------------------------------------------------
 # Concluir cadastro
 # ---------------------------------------------------------------------------
+@_login
 @require_POST
 def concluir(request, pk):
     protocolo = get_object_or_404(Protocolo, pk=pk)
@@ -264,6 +274,7 @@ def concluir(request, pk):
 # ---------------------------------------------------------------------------
 # Solicitar assinatura
 # ---------------------------------------------------------------------------
+@_login
 def solicitar_assinatura(request, pk):
     protocolo = get_object_or_404(Protocolo, pk=pk)
     if not permissions.pode_solicitar_assinatura(request.user):
@@ -303,6 +314,7 @@ def solicitar_assinatura(request, pk):
 # ---------------------------------------------------------------------------
 # Tramitar
 # ---------------------------------------------------------------------------
+@_login
 def tramitar(request, pk):
     protocolo = get_object_or_404(Protocolo, pk=pk)
     if not permissions.pode_tramitar(request.user):
@@ -343,6 +355,7 @@ def tramitar(request, pk):
 # ---------------------------------------------------------------------------
 # Movimentações / Logs (páginas focadas)
 # ---------------------------------------------------------------------------
+@_login
 def movimentacoes(request, pk):
     protocolo = get_object_or_404(Protocolo, pk=pk)
     contexto = {
@@ -354,6 +367,7 @@ def movimentacoes(request, pk):
     return render(request, "protocolos/protocolo_movimentacoes.html", contexto)
 
 
+@_login
 def logs(request, pk):
     protocolo = get_object_or_404(Protocolo, pk=pk)
     contexto = {

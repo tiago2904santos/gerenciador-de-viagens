@@ -56,7 +56,17 @@ class EProtocoloTimeoutError(EProtocoloUnavailableError):
     mensagem_usuario = "Tempo limite excedido ao chamar o eProtocolo."
 
 
-class EProtocoloNaoConfiguradoError(EProtocoloError):
+class EProtocoloConfigError(EProtocoloError):
+    """Configuração ausente/incompleta para operar em modo real.
+
+    Ex.: ``BASE_URL``/``TOKEN_URL``/``CLIENT_ID``/``CLIENT_SECRET``/``CONSUMER_ID``
+    não preenchidos quando o ambiente exige chamada real.
+    """
+
+    mensagem_usuario = "A integração do eProtocolo está com configuração incompleta."
+
+
+class EProtocoloNaoConfiguradoError(EProtocoloConfigError):
     """Integração não configurada (sem credenciais) e modo real exigido."""
 
     mensagem_usuario = "A integração real do eProtocolo ainda não está configurada."

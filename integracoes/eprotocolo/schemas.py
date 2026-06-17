@@ -17,18 +17,56 @@ from dataclasses import field
 
 
 class Endpoints:
-    """Caminhos relativos à BASE_URL. Confirmar com a documentação oficial."""
+    """Caminhos relativos à BASE_URL do barramento ``spi-servicos`` (v3).
 
-    CRIAR_PROTOCOLO = "/protocolo"
-    CONSULTAR_PROTOCOLO = "/protocolo/{numero}"
-    CONCLUIR_PROTOCOLO = "/protocolo/{numero}/concluir"
-    DOCUMENTOS = "/protocolo/{numero}/documentos"
-    DOCUMENTOS_VOLUME = "/protocolo/{numero}/volume/documentos"
-    PENDENCIAS = "/protocolo/{numero}/pendencias"
-    PENDENCIA_CANCELAR = "/protocolo/{numero}/pendencias/{codigo}/cancelar"
-    TRAMITACOES = "/protocolo/{numero}/tramitacoes"
-    MOVIMENTACOES = "/protocolo/{numero}/movimentacoes"
-    ASSINATURAS_DOCUMENTO = "/protocolo/{numero}/documentos/{codigo}/assinaturas"
+    A BASE_URL (incluindo host e eventual segmento ``spi-servicos``) vem do
+    ``.env``; aqui ficam apenas os paths versionados. Confirmar com a
+    documentação oficial antes do go-live; em modo mock não são usados.
+    """
+
+    # Protocolos
+    CRIAR_PROTOCOLO = "/v3/protocolos"
+    CONSULTAR_PROTOCOLO = "/v3/protocolos/{numero}"
+    CONCLUIR_PROTOCOLO = "/v3/protocolos/{numero}/concluir"
+    DOCUMENTOS = "/v3/protocolos/{numero}/documentos"
+    DOCUMENTOS_VOLUME = "/v3/volumes/{numero}/documentos"
+    PENDENCIAS = "/v3/protocolos/{numero}/pendencias"
+    PENDENCIA_CANCELAR = "/v3/protocolos/{numero}/pendencias/{codigo}/cancelar"
+    TRAMITACOES = "/v3/protocolos/{numero}/tramitacoes"
+    MOVIMENTACOES = "/v3/protocolos/{numero}/movimentacoes"
+    ASSINATURAS_DOCUMENTO = "/v3/protocolos/{numero}/documentos/{codigo}/assinaturas"
+
+    # Tabelas auxiliares (consulta — usadas por ping/diagnóstico)
+    ORGAOS = "/v3/orgaos"
+    LOCAIS = "/v3/locais"
+    ASSUNTOS = "/v3/assuntos"
+    ESPECIES = "/v3/especies"
+
+
+# Escopos OAuth2 esperados no ``spi-servicos`` (referência para solicitação à
+# Celepar/SEAP). NÃO são hardcoded em chamadas — servem só de documentação e
+# para o comando de diagnóstico listar o que precisa ser liberado.
+ESCOPOS_ESPERADOS = (
+    "spiserv.protocolos.consultar",
+    "spiserv.protocolos.incluir",
+    "spiserv.protocolos.concluir",
+    "spiserv.protocolos.alterar",
+    "spiserv.protocolos.documentos.consultar",
+    "spiserv.protocolos.documentos.incluir",
+    "spiserv.volumes.documentos.consultar",
+    "spiserv.protocolos.movimentacoes.consultar",
+    "spiserv.protocolos.tramitacoes.consultar",
+    "spiserv.protocolos.tramitacoes.incluir",
+    "spiserv.protocolos.pendencias.consultar",
+    "spiserv.protocolos.pendencias.incluir",
+    "spiserv.protocolos.pendencias.cancelar",
+    "spiserv.protocolos.documentos.assinaturas.consultar",
+    "spiserv.protocolos.documentos.assinaturas.incluir",
+    "spiserv.orgaos.consultar",
+    "spiserv.locais.consultar",
+    "spiserv.assuntos.consultar",
+    "spiserv.especies.consultar",
+)
 
 
 @dataclass

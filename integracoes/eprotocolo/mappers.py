@@ -16,6 +16,17 @@ Regras de robustez:
 from __future__ import annotations
 
 from . import settings as cfg
+from .exceptions import EProtocoloValidationError
+
+
+# Códigos institucionais exigidos para criar um protocolo de Ofício no modo
+# real. Sem eles a API rejeita a criação; validamos antes de chamar a rede.
+CAMPOS_INSTITUCIONAIS_OBRIGATORIOS = {
+    "codOrgao": "EPROTOCOLO_COD_ORGAO_PADRAO",
+    "codLocalOrigem": "EPROTOCOLO_COD_LOCAL_ORIGEM_PADRAO",
+    "codAssunto": "EPROTOCOLO_COD_ASSUNTO_VIAGEM",
+    "codEspecie": "EPROTOCOLO_COD_ESPECIE_OFICIO",
+}
 
 
 def _defaults_institucionais() -> dict:
@@ -78,6 +89,40 @@ def mapear_oficio_para_protocolo(oficio) -> dict:
         "servidores": _servidores_resumo(getattr(oficio, "servidores", None) or _Vazio()),
         "destinos": destinos,
     })
+    return payload
+
+
+def validar_payload_institucional(payload: dict) -> list[str]:
+    """Retorna a lista de campos institucionais obrigatórios ainda vazios."""
+    faltantes = []
+    for campo, env in CAMPOS_INSTITUCIONAIS_OBRIGATORIOS.items():
+        if not (str(payload.get(campo) or "")).strip():
+            faltantes.append(f"{campo} ({env})")
+    return faltantes
+
+
+def mapear_oficio_para_payload_eprotocolo(oficio) -> dict:
+    """Mapper validado de Ofício → payload do eProtocolo (modo real).
+
+    Diferente de :func:`mapear_oficio_para_protocolo` (que nunca quebra, p/ mock),
+    esta função valida os campos obrigatórios e levanta
+    :class:`EProtocoloValidationError` com mensagem clara quando algo essencial
+    está faltando — para uso no fluxo de homologação real.
+    """
+    payload = mapear_oficio_para_protocolo(oficio)
+
+    if not (str(payload.get("numeroDocumento") or "")).strip():
+        raise EProtocoloValidationError(
+            "Ofício sem número definido — não é possível gerar o protocolo."
+        )
+    if not (payload.get("assunto") or "").strip():
+        raise EProtocoloValidationError("Ofício sem assunto/motivo para o protocolo.")
+
+    faltantes = validar_payload_institucional(payload)
+    if faltantes:
+        raise EProtocoloValidationError(
+            "Códigos institucionais ausentes no .env: " + ", ".join(faltantes)
+        )
     return payload
 
 

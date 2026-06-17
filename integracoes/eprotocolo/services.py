@@ -35,6 +35,54 @@ def calcular_md5(conteudo: bytes) -> str:
 
 
 # ---------------------------------------------------------------------------
+# Diagnóstico / autenticação (usados por eprotocolo_check / eprotocolo_ping)
+# ---------------------------------------------------------------------------
+def testar_autenticacao() -> ResultadoOperacao:
+    """Confirma que é possível obter um token (ou simula em modo mock).
+
+    Nunca retorna o token; apenas indica sucesso. Erros sobem como
+    ``EProtocoloError`` para tratamento amigável na camada de comando/view.
+    """
+    if cfg.em_modo_mock():
+        return _mock(mocks.autenticar(), "Autenticação simulada (modo mock).")
+    get_client().garantir_token()
+    return _real({"autenticado": True}, "Autenticação no eProtocolo bem-sucedida.")
+
+
+def testar_conexao() -> ResultadoOperacao:
+    """Faz uma consulta simples (órgãos) para validar o acesso ao barramento."""
+    if cfg.em_modo_mock():
+        return _mock(mocks.listar_orgaos(), "Conexão simulada (modo mock).")
+    dados = get_client().get(Endpoints.ORGAOS)
+    return _real(dados, "Conexão com o eProtocolo bem-sucedida.")
+
+
+def listar_orgaos() -> ResultadoOperacao:
+    if cfg.em_modo_mock():
+        return _mock(mocks.listar_orgaos())
+    return _real(get_client().get(Endpoints.ORGAOS))
+
+
+def listar_locais(cod_orgao: str | None = None) -> ResultadoOperacao:
+    if cfg.em_modo_mock():
+        return _mock(mocks.listar_locais(cod_orgao))
+    params = {"codOrgao": cod_orgao} if cod_orgao else None
+    return _real(get_client().get(Endpoints.LOCAIS, params=params))
+
+
+def listar_assuntos() -> ResultadoOperacao:
+    if cfg.em_modo_mock():
+        return _mock(mocks.listar_assuntos())
+    return _real(get_client().get(Endpoints.ASSUNTOS))
+
+
+def listar_especies() -> ResultadoOperacao:
+    if cfg.em_modo_mock():
+        return _mock(mocks.listar_especies())
+    return _real(get_client().get(Endpoints.ESPECIES))
+
+
+# ---------------------------------------------------------------------------
 # Protocolo
 # ---------------------------------------------------------------------------
 def criar_protocolo(payload: dict) -> ResultadoOperacao:

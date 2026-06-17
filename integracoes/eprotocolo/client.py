@@ -132,6 +132,16 @@ class EProtocoloClient:
         self._token_cache.set(token, int(dados.get("expires_in", 300) or 300))
         return token
 
+    def garantir_token(self) -> bool:
+        """Obtém um token válido apenas para diagnóstico (ping).
+
+        Retorna ``True`` em caso de sucesso. NUNCA devolve o token em si — assim
+        comandos/diagnóstico podem confirmar a autenticação sem risco de
+        vazamento. Erros são propagados como exceptions próprias.
+        """
+        self._obter_token()
+        return True
+
     def _headers(self) -> dict:
         return {
             "Authorization": f"Bearer {self._obter_token()}",

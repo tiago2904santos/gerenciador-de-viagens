@@ -127,3 +127,31 @@ def listar_movimentacoes(numero: str) -> dict:
 
 def listar_assinaturas_documento(numero: str, codigo_documento: str) -> dict:
     return {"numero": numero, "codigoDocumento": codigo_documento, "assinaturas": [], "_mock": True}
+
+
+# ---------------------------------------------------------------------------
+# Tabelas auxiliares / diagnóstico
+# ---------------------------------------------------------------------------
+def autenticar() -> dict:
+    """Simula a obtenção de token (sem expor nada real)."""
+    return {"autenticado": True, "tokenType": "Bearer", "expiresIn": 300, "_mock": True}
+
+
+def listar_orgaos() -> dict:
+    return {"orgaos": [{"codigo": "0000", "nome": "Órgão (mock)"}], "_mock": True}
+
+
+def listar_locais(cod_orgao: str | None = None) -> dict:
+    return {
+        "codOrgao": cod_orgao or "",
+        "locais": [{"codigo": "0001", "nome": "Local de Trâmite (mock)"}],
+        "_mock": True,
+    }
+
+
+def listar_assuntos() -> dict:
+    return {"assuntos": [{"codigo": "0001", "nome": "Assunto (mock)"}], "_mock": True}
+
+
+def listar_especies() -> dict:
+    return {"especies": [{"codigo": "0001", "nome": "Ofício (mock)"}], "_mock": True}
