@@ -48,4 +48,5 @@ def bloco_protocolo(documento):
         "gerar_url": gerar_url,
         "eprotocolo_configurado": epro_cfg.eprotocolo_esta_configurado(),
         "eprotocolo_descricao": epro_cfg.descricao_ambiente(),
+        "eprotocolo_modo_demo": epro_cfg.em_modo_mock(),
     }

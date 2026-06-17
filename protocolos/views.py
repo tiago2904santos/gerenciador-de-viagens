@@ -28,15 +28,24 @@ from .models import Protocolo, ProtocoloDocumento
 # Contexto comum
 # ---------------------------------------------------------------------------
 def _contexto_integracao() -> dict:
+    modo_demo = epro_cfg.em_modo_mock()
     return {
         "eprotocolo_configurado": epro_cfg.eprotocolo_esta_configurado(),
         "eprotocolo_descricao": epro_cfg.descricao_ambiente(),
-        "eprotocolo_modo_mock": epro_cfg.em_modo_mock(),
+        "eprotocolo_modo_mock": modo_demo,
+        "eprotocolo_modo_demo": modo_demo,
+        "eprotocolo_demo_label": "Modo demonstracao" if modo_demo else epro_cfg.descricao_ambiente(),
+        "eprotocolo_ambiente_label": "Treinamento" if modo_demo else epro_cfg.ambiente(),
     }
 
 
 def _avisar_modo(request):
     if not epro_cfg.eprotocolo_esta_configurado():
+        messages.warning(
+            request,
+            "Operacao registrada em ambiente de treinamento/mock. Nenhuma chamada real foi feita.",
+        )
+        return
         messages.warning(
             request,
             "Integração eProtocolo em modo mock — nenhuma chamada real foi feita. "
@@ -49,13 +58,17 @@ def _avisar_modo(request):
 # ---------------------------------------------------------------------------
 @_login
 def index(request):
+    if epro_cfg.em_modo_mock():
+        services.garantir_protocolos_demo_treinamento()
     busca = request.GET.get("q", "").strip()
     status = request.GET.get("status", "").strip()
     protocolos = selectors.listar_protocolos(busca=busca, status=status)
+    protocolos_resumo = {protocolo.pk: services.resumo_operacional(protocolo) for protocolo in protocolos}
 
     contexto = {
         "page_title": "Central de Protocolos",
         "protocolos": protocolos,
+        "protocolos_resumo": protocolos_resumo,
         "q": busca,
         "status": status,
         "status_options": selectors.status_local_options(),
@@ -80,6 +93,7 @@ def detail(request, pk):
     contexto = {
         "page_title": f"Protocolo {protocolo.numero_display}",
         "protocolo": protocolo,
+        "resumo_operacional": services.resumo_operacional(protocolo),
         "documentos": protocolo.documentos.all(),
         "assinaturas": protocolo.assinaturas.all(),
         "pendencias": protocolo.pendencias.all(),
@@ -199,7 +213,11 @@ def atualizar(request, pk):
     try:
         services.sincronizar_protocolo(protocolo)
         _avisar_modo(request)
-        messages.success(request, "Situação do protocolo atualizada.")
+        messages.success(
+            request,
+            "Situacao atualizada em ambiente de treinamento."
+            if epro_cfg.em_modo_mock() else "Situacao do protocolo atualizada.",
+        )
     except EProtocoloError as exc:
         messages.error(request, getattr(exc, "mensagem_usuario", str(exc)))
     return redirect("protocolos:detail", pk=pk)
@@ -225,7 +243,11 @@ def enviar_documento(request, pk):
                         messages.warning(request, "Não foi possível gerar o PDF do documento vinculado.")
                     else:
                         _avisar_modo(request)
-                        messages.success(request, "Documento principal enviado.")
+                        messages.success(
+                            request,
+                            "Documento enviado em modo simulado."
+                            if epro_cfg.em_modo_mock() else "Documento principal enviado.",
+                        )
                 else:
                     arquivo = form.cleaned_data["arquivo"]
                     conteudo = arquivo.read()
@@ -237,7 +259,11 @@ def enviar_documento(request, pk):
                         conteudo=conteudo,
                     )
                     _avisar_modo(request)
-                    messages.success(request, "Documento enviado e registrado.")
+                    messages.success(
+                        request,
+                        "Documento enviado em modo simulado."
+                        if epro_cfg.em_modo_mock() else "Documento enviado e registrado.",
+                    )
                 return redirect("protocolos:detail", pk=pk)
             except EProtocoloError as exc:
                 messages.error(request, getattr(exc, "mensagem_usuario", str(exc)))
@@ -265,7 +291,11 @@ def concluir(request, pk):
     try:
         services.concluir_cadastro_eprotocolo(protocolo)
         _avisar_modo(request)
-        messages.success(request, "Cadastro do protocolo concluído.")
+        messages.success(
+            request,
+            "Cadastro concluido em modo treinamento."
+            if epro_cfg.em_modo_mock() else "Cadastro do protocolo concluido.",
+        )
     except EProtocoloError as exc:
         messages.error(request, getattr(exc, "mensagem_usuario", str(exc)))
     return redirect("protocolos:detail", pk=pk)
@@ -293,7 +323,11 @@ def solicitar_assinatura(request, pk):
                     observacao=form.cleaned_data.get("observacao", ""),
                 )
                 _avisar_modo(request)
-                messages.success(request, "Solicitação de assinatura registrada.")
+                messages.success(
+                    request,
+                    "Assinatura solicitada em modo treinamento."
+                    if epro_cfg.em_modo_mock() else "Solicitacao de assinatura registrada.",
+                )
                 return redirect("protocolos:detail", pk=pk)
             except EProtocoloError as exc:
                 messages.error(request, getattr(exc, "mensagem_usuario", str(exc)))
@@ -334,7 +368,11 @@ def tramitar(request, pk):
                     nome_destinatario=form.cleaned_data.get("nome_destinatario", ""),
                 )
                 _avisar_modo(request)
-                messages.success(request, "Protocolo tramitado.")
+                messages.success(
+                    request,
+                    "Tramitacao simulada registrada."
+                    if epro_cfg.em_modo_mock() else "Protocolo tramitado.",
+                )
                 return redirect("protocolos:detail", pk=pk)
             except EProtocoloError as exc:
                 messages.error(request, getattr(exc, "mensagem_usuario", str(exc)))

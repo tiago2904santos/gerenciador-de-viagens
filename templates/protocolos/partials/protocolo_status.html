@@ -4,10 +4,10 @@ Parâmetros: protocolo
 {% endcomment %}
 <span class="cluster">
   {% include "components/ui/badges/chip.html" with tone=protocolo.status_local_variant label=protocolo.get_status_local_display only %}
-  {% if protocolo.situacao_eprotocolo %}
+  {% if not compacto and protocolo.situacao_eprotocolo %}
     {% include "components/ui/badges/chip.html" with tone="info" size="compact" label=protocolo.situacao_eprotocolo only %}
   {% endif %}
-  {% if protocolo.modo_mock %}
+  {% if not compacto and protocolo.modo_mock %}
     {% include "components/ui/badges/chip.html" with tone="muted" size="compact" label="mock" only %}
   {% endif %}
 </span>

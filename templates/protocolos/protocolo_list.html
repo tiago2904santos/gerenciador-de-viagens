@@ -3,18 +3,30 @@
 
 {% block title %}{{ page_title }}{% endblock %}
 
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260617-protocolos-documentos">
+  <link rel="stylesheet" href="{% static 'css/roteiros-list.css' %}?v=20260617-protocolos-demo">
+  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260617-protocolos-demo">
+  <link rel="stylesheet" href="{% static 'css/protocolos-resumo.css' %}?v=20260617-rebuild">
+{% endblock %}
+
 {% block content %}
-<div class="page-shell page-shell--list" data-cv-realtime-filter-scope>
+<div class="app-page--main-card-list page-shell page-shell--list oficios-list-page" data-cv-realtime-filter-scope>
 
   <form class="page-header-stack" method="get" action="{{ request.path }}">
     {# ── BAND ── #}
     <div class="page-header-band">
       <div class="page-header-band__content">
         <div class="page-header-band__text">
-          <span class="page-header-band__eyebrow">EPROTOCOLO</span>
+          <span class="page-header-band__eyebrow">PROTOCOLOS</span>
           <h1 class="page-header-band__title">{{ page_title }}</h1>
         </div>
-        {% include "components/ui/badges/chip.html" with tone=eprotocolo_configurado|yesno:"success,warning" label=eprotocolo_descricao only %}
+        <span class="cluster">
+          {% include "components/ui/badges/chip.html" with tone=eprotocolo_configurado|yesno:"success,warning" label=eprotocolo_descricao only %}
+          {% if eprotocolo_modo_demo %}
+            {% include "components/ui/badges/chip.html" with tone="info" label="Ambiente: Treinamento" size="compact" only %}
+          {% endif %}
+        </span>
       </div>
     </div>
 
@@ -54,14 +66,33 @@
   </form>
 
   <div class="list-panel">
-    <div class="stack" data-cv-list-container>
+    {% if eprotocolo_modo_demo %}
+      <section class="app-section card app-card">
+        <div class="app-section__header cluster cluster--between cluster--start">
+          <div class="stack">
+            <h2 class="app-section__title">Painel de demonstracao</h2>
+            <p class="app-section__subtitle">Dados simulados em treinamento/mock. Nenhuma acao e enviada ao eProtocolo real.</p>
+          </div>
+          {% include "components/ui/badges/chip.html" with tone="muted" label="sem API real" size="compact" only %}
+        </div>
+      </section>
+    {% endif %}
+
+    <div class="list-content list-grid list-grid--roteiros app-list-grid" data-cv-list-container>
       {% for protocolo in protocolos %}
         {% include "protocolos/partials/protocolo_card.html" with protocolo=protocolo only %}
       {% empty %}
         {% include "components/lists/list_empty.html" with title="Nenhum protocolo" message=empty_message action_label="Novo protocolo" action_url=create_url only %}
       {% endfor %}
     </div>
+    {% if protocolos %}
+      <div data-cv-empty-state hidden>
+        {% include "components/lists/list_empty.html" with message=empty_message only %}
+      </div>
+    {% endif %}
   </div>
+
+  {% include "components/ui/buttons/floating_action.html" with href=create_url label="Novo protocolo" variant="primary" icon="plus" aria_label="Novo protocolo" only %}
 
 </div>
 {% endblock %}

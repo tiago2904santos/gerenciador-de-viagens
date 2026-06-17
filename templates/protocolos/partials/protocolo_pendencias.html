@@ -1,14 +1,14 @@
-{% comment %}Seção Pendências. Parâmetros: pendencias{% endcomment %}
+{% comment %}Secao Pendencias. Parametros: pendencias{% endcomment %}
 <section class="app-section card app-card" id="pendencias">
   <div class="app-section__header stack">
-    <h2 class="app-section__title">Pendências</h2>
-    <p class="app-section__subtitle">Pendências abertas e concluídas do protocolo.</p>
+    <h2 class="app-section__title">Pendencias</h2>
+    <p class="app-section__subtitle">Pendencias abertas, concluidas e canceladas do protocolo.</p>
   </div>
   <div class="app-section__body stack">
     {% for pend in pendencias %}
       <article class="card app-card stack">
         <div class="cluster cluster--between cluster--start">
-          <strong>{{ pend.tipo|default:"Pendência" }}</strong>
+          <strong>{{ pend.tipo|default:"Pendencia" }}</strong>
           {% if pend.status == "concluida" %}
             {% include "components/ui/badges/chip.html" with tone="success" size="compact" label=pend.get_status_display only %}
           {% elif pend.status == "cancelada" %}
@@ -17,15 +17,17 @@
             {% include "components/ui/badges/chip.html" with tone="warning" size="compact" label=pend.get_status_display only %}
           {% endif %}
         </div>
-        <dl class="stack">
-          <div class="cluster"><dt class="app-section__subtitle">Destinatário</dt><dd>{{ pend.nome_destinatario|default:"—" }}{% if pend.cpf_destinatario %} · {{ pend.cpf_destinatario_mascarado }}{% endif %}</dd></div>
-          {% if pend.documento_id %}<div class="cluster"><dt class="app-section__subtitle">Documento</dt><dd>{{ pend.documento.nome_arquivo }}</dd></div>{% endif %}
-          <div class="cluster"><dt class="app-section__subtitle">Criado em</dt><dd>{{ pend.criado_em|date:"d/m/Y H:i"|default:"—" }}</dd></div>
-          <div class="cluster"><dt class="app-section__subtitle">Concluído em</dt><dd>{{ pend.concluido_em|date:"d/m/Y H:i"|default:"—" }}</dd></div>
+        <dl class="document-meta">
+          <div><dt>Descricao</dt><dd>{{ pend.payload_json.descricao|default:pend.tipo|default:"-" }}</dd></div>
+          <div><dt>Documento</dt><dd>{% if pend.documento_id %}{{ pend.documento.nome_arquivo }}{% else %}-{% endif %}</dd></div>
+          <div><dt>Destinatario</dt><dd>{{ pend.nome_destinatario|default:"-" }}{% if pend.cpf_destinatario %} - {{ pend.cpf_destinatario_mascarado }}{% endif %}</dd></div>
+          <div><dt>Status</dt><dd>{{ pend.get_status_display }}</dd></div>
+          <div><dt>Criada em</dt><dd>{{ pend.criado_em|date:"d/m/Y H:i"|default:"-" }}</dd></div>
+          <div><dt>Prazo</dt><dd>{{ pend.payload_json.prazo|default:"-" }}</dd></div>
         </dl>
       </article>
     {% empty %}
-      <p class="app-section__subtitle">Nenhuma pendência registrada.</p>
+      {% include "components/ui/feedback/empty_state.html" with title="Sem pendencias" message="Nenhuma pendencia registrada." only %}
     {% endfor %}
   </div>
 </section>

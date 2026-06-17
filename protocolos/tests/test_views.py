@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+from unittest import mock
+
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
 
@@ -39,6 +42,26 @@ class ListaDetalheTests(BaseViewTest):
     def test_detalhe_inexistente_404(self):
         resp = self.client.get(reverse("protocolos:detail", args=[999999]))
         self.assertEqual(resp.status_code, 404)
+
+    def test_lista_mock_exibe_protocolos_demo(self):
+        resp = self.client.get(reverse("protocolos:index"))
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "24.123.456-7")
+        self.assertContains(resp, "Oficio no 012/2026")
+        self.assertContains(resp, "Ambiente: Treinamento")
+
+    def test_detalhe_demo_exibe_secoes_operacionais(self):
+        services.garantir_protocolos_demo_treinamento()
+        protocolo = Protocolo.objects.get(numero="24.123.456-7")
+        resp = self.client.get(reverse("protocolos:detail", args=[protocolo.pk]))
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "Documentos")
+        self.assertContains(resp, "Assinaturas")
+        self.assertContains(resp, "Pendencias")
+        self.assertContains(resp, "Tramitacoes")
+        self.assertContains(resp, "Movimentacoes")
+        self.assertContains(resp, "Logs de integracao")
+        self.assertContains(resp, "Nenhuma acao foi enviada ao eProtocolo real")
 
 
 class CriacaoVinculoTests(BaseViewTest):
@@ -111,6 +134,32 @@ class AcoesTests(BaseViewTest):
         self.assertEqual(resp.status_code, 302)
         self.assertTrue(self.protocolo.tramitacoes.exists())
 
+    def test_acoes_mock_nao_chamam_client_real(self):
+        with mock.patch("integracoes.eprotocolo.services.get_client", side_effect=AssertionError("API real")):
+            self.client.post(reverse("protocolos:atualizar", args=[self.protocolo.pk]))
+            self.client.post(reverse("protocolos:solicitar_assinatura", args=[self.protocolo.pk]), {
+                "cpf": "111.444.777-35", "nome": "Fulano",
+            })
+            self.client.post(reverse("protocolos:tramitar", args=[self.protocolo.pk]), {
+                "cod_local_para": "0002", "nome_local_para": "Setor B", "parecer": "ok",
+            })
+            self.client.post(reverse("protocolos:concluir", args=[self.protocolo.pk]))
+
+    def test_enviar_documento_mock_nao_chama_client_real(self):
+        arquivo = SimpleUploadedFile(
+            "teste.pdf",
+            b"%PDF-1.4 conteudo demo",
+            content_type="application/pdf",
+        )
+        with mock.patch("integracoes.eprotocolo.services.get_client", side_effect=AssertionError("API real")):
+            resp = self.client.post(reverse("protocolos:enviar_documento", args=[self.protocolo.pk]), {
+                "tipo_documento": "ANEXO",
+                "arquivo": arquivo,
+                "nome_arquivo": "teste.pdf",
+            })
+        self.assertEqual(resp.status_code, 302)
+        self.assertTrue(self.protocolo.documentos.exists())
+
 
 class BlocoCompactoTagTests(BaseViewTest):
     def test_bloco_em_documento_sem_protocolo_mostra_gerar(self):
@@ -119,6 +168,8 @@ class BlocoCompactoTagTests(BaseViewTest):
         tpl = Template("{% load protocolos_tags %}{% bloco_protocolo oficio %}")
         html = tpl.render(Context({"oficio": oficio}))
         self.assertIn("Gerar protocolo", html)
+        self.assertIn("Ambiente: Treinamento", html)
+        self.assertIn("Vincular existente", html)
 
     def test_bloco_em_documento_com_protocolo_mostra_ver(self):
         from django.template import Context, Template

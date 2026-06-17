@@ -14,6 +14,7 @@ Responsabilidades:
 from __future__ import annotations
 
 import logging
+from datetime import timedelta
 
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
@@ -39,6 +40,95 @@ from .models import (
 logger = logging.getLogger(__name__)
 
 ORIGEM_EPROTOCOLO_REAL = "eprotocolo_real"
+
+
+DEMO_PROTOCOLS = (
+    {
+        "numero": "24.123.456-7",
+        "origem": "Oficio no 012/2026",
+        "assunto": "Solicitacao de diarias para deslocamento institucional",
+        "descricao": "Processo simulado de treinamento para demonstracao da Central de Protocolos.",
+        "status": Protocolo.STATUS_EM_TRAMITACAO,
+        "situacao": "EM_TRAMITACAO",
+        "local": "Gabinete do Delegado-Geral Adjunto",
+        "responsavel": "Setor de Analise",
+        "pendencia": "Assinatura pendente",
+        "documentos": [
+            ("OFICIO", "Oficio_012_2026.pdf", "DOC-012-OFICIO", True, False),
+            ("TERMO_AUTORIZACAO", "Termo_Autorizacao_Servidor.pdf", "DOC-012-TERMO", True, False),
+            ("JUSTIFICATIVA", "Justificativa_Diarias.pdf", "DOC-012-JUST", False, False),
+        ],
+        "tramitacoes": [
+            ("ASCOM", "Gabinete do Delegado-Geral Adjunto", "Encaminha-se para analise e providencias."),
+        ],
+        "movimentacoes": [
+            ("Protocolo criado", "Protocolo de treinamento criado."),
+            ("Documento incluido", "Oficio principal incluido em modo simulado."),
+            ("Tramitacao recebida", "Tramitacao recebida pelo setor atual."),
+        ],
+    },
+    {
+        "numero": "24.987.654-3",
+        "origem": "Termo de Autorizacao",
+        "assunto": "Autorizacao de deslocamento para equipe operacional",
+        "descricao": "Fluxo simulado aguardando duas assinaturas.",
+        "status": Protocolo.STATUS_AGUARDANDO_ASSINATURA,
+        "situacao": "AGUARDANDO_ASSINATURA",
+        "local": "ASCOM",
+        "responsavel": "Nucleo de Expediente",
+        "pendencia": "Duas assinaturas pendentes",
+        "documentos": [
+            ("TERMO_AUTORIZACAO", "Termo_Autorizacao_Servidor.pdf", "DOC-TERMO-987", True, False),
+            ("OFICIO", "Oficio_987_2026.pdf", "DOC-OFICIO-987", True, False),
+        ],
+        "assinaturas": [
+            ("Termo_Autorizacao_Servidor.pdf", "Fulano de Tal", "Investigador de Policia", "11144477735"),
+            ("Oficio_987_2026.pdf", "Beltrana de Souza", "Delegada de Policia", "22255588846"),
+        ],
+        "movimentacoes": [
+            ("Assinatura solicitada", "Assinaturas solicitadas em ambiente de treinamento."),
+        ],
+    },
+    {
+        "numero": "25.111.222-0",
+        "origem": "Justificativa",
+        "assunto": "Complementacao de justificativa para pagamento de diarias",
+        "descricao": "Processo simulado com pendencia documental aberta.",
+        "status": Protocolo.STATUS_COM_PENDENCIA,
+        "situacao": "COM_PENDENCIA",
+        "local": "Setor de Protocolo",
+        "responsavel": "Analise Documental",
+        "pendencia": "Complementar documento PDF",
+        "documentos": [
+            ("JUSTIFICATIVA", "Justificativa_Diarias.pdf", "DOC-JUST-111", False, False),
+        ],
+        "movimentacoes": [
+            ("Pendencia criada", "Complementacao de documento PDF solicitada."),
+        ],
+    },
+    {
+        "numero": "23.555.888-1",
+        "origem": "Ordem de Servico",
+        "assunto": "Ordem de servico concluida para deslocamento institucional",
+        "descricao": "Processo simulado concluido com historico completo.",
+        "status": Protocolo.STATUS_CONCLUIDO,
+        "situacao": "CONCLUIDO",
+        "local": "Arquivo Geral",
+        "responsavel": "Setor de Arquivo",
+        "documentos": [
+            ("ORDEM_SERVICO", "Ordem_Servico_055_2026.pdf", "DOC-OS-555", True, True),
+            ("OFICIO", "Oficio_055_2026.pdf", "DOC-OFICIO-555", True, True),
+            ("TERMO_AUTORIZACAO", "Termo_Autorizacao_Equipe.pdf", "DOC-TERMO-555", True, True),
+            ("JUSTIFICATIVA", "Justificativa_Final.pdf", "DOC-JUST-555", True, True),
+            ("ANEXO", "Relatorio_Encerramento.pdf", "DOC-REL-555", True, True),
+        ],
+        "movimentacoes": [
+            ("Protocolo criado", "Protocolo de treinamento criado."),
+            ("Documento assinado", "Documento principal assinado em modo simulado."),
+            ("Protocolo concluido", "Cadastro concluido em ambiente de treinamento."),
+        ],
+    },
+)
 
 
 # ---------------------------------------------------------------------------
@@ -72,6 +162,207 @@ def registrar_log(protocolo, acao, *, resultado: ResultadoOperacao | None = None
         request_payload=mascarar_dados(request_payload or {}),
         response_payload=mascarar_dados(response_payload or {}),
     )
+
+
+def ambiente_demo_ativo() -> bool:
+    """True quando a Central deve operar visualmente em treinamento/mock."""
+    return cfg.em_modo_mock()
+
+
+@transaction.atomic
+def garantir_protocolos_demo_treinamento():
+    """Cria dados simulados idempotentes para demonstracao em mock/treinamento."""
+    if not ambiente_demo_ativo():
+        return []
+
+    criados_ou_atualizados = []
+    base_time = timezone.now()
+    for indice, item in enumerate(DEMO_PROTOCOLS):
+        protocolo, _created = Protocolo.objects.update_or_create(
+            numero=item["numero"],
+            defaults={
+                "origem_tipo": Protocolo.ORIGEM_MANUAL,
+                "status_local": item["status"],
+                "situacao_eprotocolo": item["situacao"],
+                "assunto_resumo": item["assunto"],
+                "descricao_resumo": item["descricao"],
+                "cod_orgao": "PCPR",
+                "nome_orgao": "Policia Civil do Parana",
+                "cod_local_origem": "ASCOM",
+                "nome_local_origem": "Assessoria de Comunicacao",
+                "cod_local_atual": item["local"].split()[0][:12].upper(),
+                "nome_local_atual": item["local"],
+                "cpf_responsavel_atual": "",
+                "nome_responsavel_atual": item["responsavel"],
+                "ultima_sincronizacao_em": base_time - timedelta(minutes=15 + indice * 20),
+                "ultima_movimentacao_em": base_time - timedelta(hours=2 + indice),
+                "modo_mock": True,
+                "ativo": True,
+                "payload_atual_json": mascarar_dados({
+                    "_demo": True,
+                    "origemDemo": item["origem"],
+                    "palavraChave1": item.get("palavra_chave", "Viagem institucional"),
+                    "interessado": item.get("interessado", item["responsavel"]),
+                    "ambiente": "treinamento_demo",
+                }),
+            },
+        )
+        _popular_demo_documentos(protocolo, item, base_time)
+        _popular_demo_assinaturas(protocolo, item, base_time)
+        _popular_demo_pendencias(protocolo, item, base_time)
+        _popular_demo_tramitacoes(protocolo, item, base_time)
+        _popular_demo_movimentacoes(protocolo, item, base_time)
+        _popular_demo_logs(protocolo, item)
+        criados_ou_atualizados.append(protocolo)
+    return criados_ou_atualizados
+
+
+def resumo_operacional(protocolo: Protocolo) -> dict:
+    """Metricas compactas usadas pela lista e detalhe."""
+    documentos = protocolo.documentos.count()
+    pendencias = protocolo.pendencias_abertas.count()
+    assinaturas_pendentes = protocolo.assinaturas.filter(
+        status=ProtocoloAssinatura.STATUS_PENDENTE
+    ).count()
+    ultima_movimentacao = protocolo.movimentacoes.order_by("-data_movimentacao", "-pk").first()
+    return {
+        "documentos": documentos,
+        "pendencias": pendencias,
+        "assinaturas_pendentes": assinaturas_pendentes,
+        "tramitacoes": protocolo.tramitacoes.count(),
+        "movimentacoes": protocolo.movimentacoes.count(),
+        "logs": protocolo.logs.count(),
+        "ultima_movimentacao": ultima_movimentacao,
+    }
+
+
+def _popular_demo_documentos(protocolo, item, base_time):
+    for indice, (tipo, nome, codigo, no_volume, assinado) in enumerate(item.get("documentos", [])):
+        protocolo.documentos.update_or_create(
+            codigo_documento_eprotocolo=codigo,
+            defaults={
+                "tipo_documento": tipo,
+                "nome_arquivo": nome,
+                "md5": epro.calcular_md5(f"{protocolo.numero}:{codigo}".encode("utf-8")),
+                "tamanho_bytes": 180000 + indice * 42000,
+                "enviado_em": base_time - timedelta(days=indice + 1, hours=1),
+                "esta_no_volume": no_volume,
+                "assinado": assinado,
+                "payload_json": {"_demo": True, "status": "Assinado" if assinado else "Enviado"},
+            },
+        )
+
+
+def _popular_demo_assinaturas(protocolo, item, base_time):
+    docs_por_nome = {doc.nome_arquivo: doc for doc in protocolo.documentos.all()}
+    for indice, (nome_doc, assinante, cargo, cpf) in enumerate(item.get("assinaturas", [])):
+        doc = docs_por_nome.get(nome_doc)
+        assinatura, _ = ProtocoloAssinatura.objects.update_or_create(
+            protocolo=protocolo,
+            documento=doc,
+            cpf_assinante=cpf,
+            defaults={
+                "nome_assinante": f"{assinante} - {cargo}",
+                "status": ProtocoloAssinatura.STATUS_PENDENTE,
+                "observacao": "Solicitacao simulada em ambiente de treinamento.",
+                "solicitado_em": base_time - timedelta(hours=indice + 3),
+                "payload_json": {"_demo": True, "cargo": cargo},
+            },
+        )
+        ProtocoloPendencia.objects.update_or_create(
+            protocolo=protocolo,
+            documento=doc,
+            codigo_pendencia=f"ASS-{protocolo.numero}-{indice}",
+            defaults={
+                "tipo": "Assinatura pendente",
+                "status": ProtocoloPendencia.STATUS_PENDENTE,
+                "cpf_destinatario": cpf,
+                "nome_destinatario": assinatura.nome_assinante,
+                "criado_em": assinatura.solicitado_em,
+                "payload_json": {"_demo": True},
+            },
+        )
+
+
+def _popular_demo_pendencias(protocolo, item, base_time):
+    pendencia = item.get("pendencia")
+    if not pendencia:
+        return
+    ProtocoloPendencia.objects.update_or_create(
+        protocolo=protocolo,
+        codigo_pendencia=f"PEND-{protocolo.numero}",
+        defaults={
+            "tipo": pendencia,
+            "status": ProtocoloPendencia.STATUS_PENDENTE,
+            "nome_destinatario": item["responsavel"],
+            "criado_em": base_time - timedelta(hours=4),
+            "payload_json": {"_demo": True, "prazo": "3 dias uteis"},
+        },
+    )
+
+
+def _popular_demo_tramitacoes(protocolo, item, base_time):
+    tramitacoes = item.get("tramitacoes") or [
+        ("Assessoria de Comunicacao", item["local"], "Tramitacao simulada registrada.")
+    ]
+    for indice, (origem, destino, parecer) in enumerate(tramitacoes):
+        tramitacao = protocolo.tramitacoes.filter(
+            nome_local_de=origem,
+            nome_local_para=destino,
+            parecer=parecer,
+        ).first()
+        defaults = {
+            "cod_local_de": origem[:30],
+            "cod_local_para": destino[:30],
+            "nome_local_de": origem,
+            "nome_local_para": destino,
+            "nome_destinatario": item["responsavel"],
+            "parecer": parecer,
+            "data_tramitacao": base_time - timedelta(hours=indice + 2),
+            "payload_json": {"_demo": True},
+        }
+        if tramitacao:
+            for campo, valor in defaults.items():
+                setattr(tramitacao, campo, valor)
+            tramitacao.save()
+        else:
+            ProtocoloTramitacao.objects.create(protocolo=protocolo, **defaults)
+
+
+def _popular_demo_movimentacoes(protocolo, item, base_time):
+    for indice, (tipo, descricao) in enumerate(item.get("movimentacoes", [])):
+        if protocolo.movimentacoes.filter(tipo=tipo, descricao=descricao).exists():
+            continue
+        ProtocoloMovimentacao.objects.create(
+            protocolo=protocolo,
+            tipo=tipo,
+            descricao=descricao,
+            local=item["local"],
+            usuario=item["responsavel"],
+            data_movimentacao=base_time - timedelta(hours=indice + 1),
+            payload_json={"_demo": True},
+        )
+
+
+def _popular_demo_logs(protocolo, item):
+    logs = [
+        ("GET", f"/v3/protocolos/{protocolo.numero}", 200, "consulta_simulada"),
+        ("GET", f"/v3/protocolos/{protocolo.numero}/movimentacoes", 200, "movimentacoes_simuladas"),
+        ("POST", f"/v3/protocolos/{protocolo.numero}/documentos", None, "documento_simulado"),
+    ]
+    for metodo, endpoint, status_code, acao in logs:
+        if protocolo.logs.filter(acao=acao, endpoint=endpoint).exists():
+            continue
+        ProtocoloLog.objects.create(
+            protocolo=protocolo,
+            acao=acao,
+            endpoint=endpoint,
+            metodo=metodo,
+            status_code=status_code,
+            sucesso=True,
+            modo_mock=True,
+            response_payload={"_demo": True, "resultado": "Simulado", "situacao": item["situacao"]},
+        )
 
 
 def garantir_mutacao_real_controlada(operacao, protocolo, *, real=False, confirmado=False):

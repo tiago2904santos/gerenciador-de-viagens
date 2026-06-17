@@ -1,41 +1,47 @@
 {% comment %}
-Bloco compacto de integração eProtocolo, embutido no detalhe/resumo de um documento.
-Renderizado pela tag {% load protocolos_tags %}{% bloco_protocolo documento %}.
-
-IMPORTANTE: usa apenas LINKS (GET), nunca <form>, pois costuma ser embutido dentro
-do <form> de wizards (formulários aninhados são HTML inválido). As ações que mudam
-estado vão para páginas de confirmação com formulário de topo.
-
-Parâmetros (via tag): protocolo, gerar_url, eprotocolo_configurado, eprotocolo_descricao
+Bloco compacto de integracao eProtocolo, embutido em documentos internos.
+Usa links GET para nao criar formularios aninhados.
 {% endcomment %}
-<section class="app-section card app-card stack" aria-label="Integração eProtocolo">
+<section class="app-section card app-card stack" aria-label="Integracao eProtocolo">
   <div class="app-section__header cluster cluster--between cluster--start">
     <div class="stack">
-      <h3 class="app-section__title">Integração eProtocolo</h3>
-      <p class="app-section__subtitle">{{ eprotocolo_descricao }}</p>
+      <h3 class="app-section__title">Integracao eProtocolo</h3>
+      <p class="app-section__subtitle">
+        {% if eprotocolo_modo_demo %}Ambiente: Treinamento{% else %}{{ eprotocolo_descricao }}{% endif %}
+      </p>
     </div>
-    {% if protocolo %}
-      {% include "protocolos/partials/protocolo_status.html" with protocolo=protocolo only %}
-    {% endif %}
+    <span class="cluster">
+      {% if eprotocolo_modo_demo %}
+        {% include "components/ui/badges/chip.html" with tone="info" label="modo demonstracao" size="compact" only %}
+      {% endif %}
+      {% if protocolo %}
+        {% include "protocolos/partials/protocolo_status.html" with protocolo=protocolo only %}
+      {% endif %}
+    </span>
   </div>
 
   <div class="app-section__body stack">
     {% if protocolo %}
-      <dl class="stack">
-        <div class="cluster"><dt class="app-section__subtitle">Protocolo</dt><dd>{{ protocolo.numero_display }}</dd></div>
-        <div class="cluster"><dt class="app-section__subtitle">Status</dt><dd>{{ protocolo.get_status_local_display }}</dd></div>
-        {% if protocolo.nome_local_atual %}<div class="cluster"><dt class="app-section__subtitle">Local atual</dt><dd>{{ protocolo.nome_local_atual }}</dd></div>{% endif %}
-        <div class="cluster"><dt class="app-section__subtitle">Última atualização</dt><dd>{{ protocolo.ultima_sincronizacao_em|date:"d/m/Y H:i"|default:protocolo.ultima_movimentacao_em|date:"d/m/Y H:i"|default:"—" }}</dd></div>
+      <dl class="document-meta">
+        <div><dt>Protocolo vinculado</dt><dd>{{ protocolo.numero_display }}</dd></div>
+        <div><dt>Status</dt><dd>{{ protocolo.get_status_local_display }}</dd></div>
+        <div><dt>Local atual</dt><dd>{{ protocolo.nome_local_atual|default:protocolo.cod_local_atual|default:"-" }}</dd></div>
+        <div><dt>Ultima atualizacao</dt><dd>{{ protocolo.ultima_sincronizacao_em|date:"d/m/Y H:i"|default:protocolo.ultima_movimentacao_em|date:"d/m/Y H:i"|default:"-" }}</dd></div>
       </dl>
       <div class="cluster">
         {% include "components/ui/buttons/button.html" with href=protocolo.get_detail_url label="Ver protocolo" variant="primary" size="sm" icon="eye" only %}
-        {% include "components/ui/buttons/button.html" with href=protocolo.get_atualizar_url label="Atualizar situação" variant="secondary" size="sm" icon="search" only %}
+        {% include "components/ui/buttons/button.html" with href=protocolo.get_atualizar_url label="Atualizar situacao" variant="secondary" size="sm" icon="search" only %}
+        {% include "components/ui/buttons/button.html" with href=protocolo.get_enviar_documento_url label="Enviar PDF" variant="secondary" size="sm" icon="document" only %}
       </div>
     {% else %}
-      <p class="app-section__subtitle">Este documento ainda não possui protocolo no eProtocolo.</p>
-      {% if gerar_url %}
-        {% include "components/ui/buttons/button.html" with href=gerar_url label="Gerar protocolo" variant="primary" size="sm" icon="plus" only %}
-      {% endif %}
+      <p class="app-section__subtitle">Nenhum protocolo vinculado a este documento. Gere um protocolo de treinamento ou vincule um protocolo existente.</p>
+      <div class="cluster">
+        {% if gerar_url %}
+          {% include "components/ui/buttons/button.html" with href=gerar_url label="Gerar protocolo" variant="primary" size="sm" icon="plus" only %}
+        {% endif %}
+        {% url 'protocolos:novo' as novo_protocolo_url %}
+        {% include "components/ui/buttons/button.html" with href=novo_protocolo_url label="Vincular existente" variant="secondary" size="sm" icon="link" only %}
+      </div>
     {% endif %}
   </div>
 </section>

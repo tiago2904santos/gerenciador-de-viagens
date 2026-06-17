@@ -3538,6 +3538,60 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
   margin-top: 2px;
 }
 
+.oficio-lc__transport-card--documentos {
+  max-height: none;
+  min-height: 0;
+  width: 100%;
+}
+
+.oficio-lc__transport-card--documentos .oficio-lc__trechos-list {
+  flex: 0 1 auto;
+  max-height: 11.5rem;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.oficio-lc__trecho--documento {
+  align-items: center;
+  display: flex;
+  gap: var(--space-3);
+  min-width: 0;
+  width: 100%;
+}
+
+.oficio-lc__trecho-body {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.oficio-lc__trecho--documento .oficio-lc__trecho-rota {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.oficio-lc__trecho--documento .oficio-lc__trecho-rota > span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.oficio-lc__trecho--documento .oficio-lc__trecho-times {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.oficio-lc__trecho-actions {
+  align-items: center;
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: nowrap;
+  gap: var(--space-1);
+}
+
 /* valor total das diárias */
 .oficio-lc__valor-total {
   color: var(--color-heading);

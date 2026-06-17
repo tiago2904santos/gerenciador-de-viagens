@@ -11,6 +11,8 @@ crus apenas onde necessário e mascarados na exibição (ver ``cpf_mascarado``).
 
 from __future__ import annotations
 
+import re
+
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
@@ -165,6 +167,9 @@ class Protocolo(models.Model):
     def origem_label(self) -> str:
         if self.origem_object is not None:
             return str(self.origem_object)
+        origem_demo = (self.payload_atual_json or {}).get("origemDemo")
+        if origem_demo:
+            return origem_demo
         if self.origem_tipo == self.ORIGEM_EPROTOCOLO_REAL:
             return "eProtocolo real"
         if self.origem_tipo == self.ORIGEM_MANUAL:
@@ -176,6 +181,71 @@ class Protocolo(models.Model):
         if self.origem_content_type_id:
             return self.origem_content_type.model_class().__name__
         return ""
+
+    @property
+    def documento_especie_display(self) -> str:
+        if self.origem_content_type_id:
+            return self.origem_content_type.model_class()._meta.verbose_name.title()
+        origem_demo = (self.payload_atual_json or {}).get("origemDemo", "")
+        if origem_demo:
+            return re.sub(r"\s+(?:no\.?)?\s*\d+/\d{4}.*$", "", origem_demo, flags=re.IGNORECASE).strip() or origem_demo
+        if self.origem_tipo == self.ORIGEM_EPROTOCOLO_REAL:
+            return "eProtocolo real"
+        if self.origem_tipo == self.ORIGEM_MANUAL:
+            return "Externo / manual"
+        return "-"
+
+    @property
+    def documento_numero_ano_display(self) -> str:
+        if self.origem_object is not None:
+            numero_formatado = getattr(self.origem_object, "numero_formatado", "")
+            if numero_formatado:
+                return numero_formatado
+            numero = getattr(self.origem_object, "numero", None)
+            ano = getattr(self.origem_object, "ano", None)
+            if numero and ano:
+                return f"{numero}/{ano}"
+        origem_demo = (self.payload_atual_json or {}).get("origemDemo", "")
+        match = re.search(r"(\d+/\d{4})", origem_demo)
+        if match:
+            return match.group(1)
+        payload = self.payload_atual_json or {}
+        numero = payload.get("numeroDocumento")
+        ano = payload.get("anoDocumento")
+        if numero and ano:
+            return f"{numero}/{ano}"
+        return "-"
+
+    @property
+    def palavra_chave_1_display(self) -> str:
+        payload = self.payload_atual_json or {}
+        for chave in ("palavraChave1", "palavraChave", "nomePalavraChave", "codPalavraChave"):
+            valor = payload.get(chave)
+            if valor:
+                return str(valor)
+        palavras = payload.get("palavrasChave")
+        if isinstance(palavras, list) and palavras:
+            primeira = palavras[0]
+            if isinstance(primeira, dict):
+                return str(primeira.get("nome") or primeira.get("descricao") or primeira.get("codigo") or "-")
+            return str(primeira)
+        return "-"
+
+    @property
+    def interessado_display(self) -> str:
+        payload = self.payload_atual_json or {}
+        for chave in ("interessado", "nomeInteressado", "requerente", "solicitante"):
+            valor = payload.get(chave)
+            if valor:
+                return str(valor)
+        for chave in ("interessados", "servidores"):
+            itens = payload.get(chave)
+            if isinstance(itens, list) and itens:
+                primeiro = itens[0]
+                if isinstance(primeiro, dict):
+                    return str(primeiro.get("nome") or primeiro.get("nomeInteressado") or "-")
+                return str(primeiro)
+        return self.nome_responsavel_atual or "-"
 
     @property
     def pendencias_abertas(self):

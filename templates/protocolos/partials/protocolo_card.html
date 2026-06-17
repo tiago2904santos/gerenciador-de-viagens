@@ -1,74 +1,164 @@
 {% comment %}
-Card de protocolo para a lista. Usa apenas componentes/utilitários do design system.
-Parâmetros: protocolo
+Card de protocolo baseado nos resumos aprovados de Oficios/Planos de Trabalho.
+Parametros: protocolo
 {% endcomment %}
 <article
-  class="card app-card stack"
+  class="cv-wizard-section-card protocolo-resumo-card protocolo-resumo-card--{{ protocolo.status_local|default:'outro' }}"
   data-cv-filter-item
-  data-search-text="{{ protocolo.numero_display }} {{ protocolo.assunto_resumo }} {{ protocolo.nome_local_atual }} {{ protocolo.nome_responsavel_atual }}"
+  data-search-text="{{ protocolo.numero_display }} {{ protocolo.documento_numero_ano_display }} {{ protocolo.origem_label }} {{ protocolo.assunto_resumo }} {{ protocolo.descricao_resumo }} {{ protocolo.nome_local_atual }} {{ protocolo.nome_responsavel_atual }} {{ protocolo.interessado_display }}"
+  data-status-value="{{ protocolo.status_local }}"
 >
-  <header class="cluster cluster--between cluster--start">
-    <div class="stack">
-      <span class="app-section__subtitle">Protocolo</span>
-      <strong class="app-section__title">{{ protocolo.numero_display }}</strong>
+  <header class="cv-wizard-section-header protocolo-resumo-card__header">
+    <div class="cv-wizard-section-header__copy protocolo-resumo-card__heading">
+      <span class="protocolo-resumo-card__eyebrow">eProtocolo</span>
+      <h3 class="cv-wizard-section-title protocolo-resumo-card__title">
+        Protocolo {{ protocolo.numero_display }}
+      </h3>
+      <p class="cv-wizard-section-subtitle protocolo-resumo-card__subtitle">
+        {{ protocolo.nome_local_atual|default:protocolo.cod_local_atual|default:"Local atual nao informado" }}
+        {% if protocolo.nome_responsavel_atual %} - {{ protocolo.nome_responsavel_atual }}{% endif %}
+      </p>
     </div>
-    {% include "protocolos/partials/protocolo_status.html" with protocolo=protocolo only %}
+    <div class="protocolo-resumo-card__status">
+      {% include "protocolos/partials/protocolo_status.html" with protocolo=protocolo compacto=True only %}
+    </div>
   </header>
 
-  <dl class="stack">
-    {% if protocolo.origem_label and protocolo.origem_label != "—" %}
-    <div class="cluster">
-      <dt class="app-section__subtitle">Origem</dt>
-      <dd>{{ protocolo.origem_label }}</dd>
-    </div>
-    {% endif %}
-    {% if protocolo.assunto_resumo %}
-    <div class="cluster">
-      <dt class="app-section__subtitle">Assunto</dt>
-      <dd>{{ protocolo.assunto_resumo }}</dd>
-    </div>
-    {% endif %}
-    {% if protocolo.nome_local_atual %}
-    <div class="cluster">
-      <dt class="app-section__subtitle">Local atual</dt>
-      <dd>{{ protocolo.nome_local_atual }}</dd>
-    </div>
-    {% endif %}
-    {% if protocolo.nome_responsavel_atual %}
-    <div class="cluster">
-      <dt class="app-section__subtitle">Responsável</dt>
-      <dd>{{ protocolo.nome_responsavel_atual }}{% if protocolo.cpf_responsavel_atual %} · {{ protocolo.cpf_responsavel_mascarado }}{% endif %}</dd>
-    </div>
-    {% endif %}
-    <div class="cluster">
-      <dt class="app-section__subtitle">Pendências</dt>
-      <dd>
-        {% if protocolo.pendencias_abertas_count %}
-          {% include "components/ui/badges/chip.html" with tone="warning" size="compact" label=protocolo.pendencias_abertas_count only %}
-        {% else %}
-          <span class="app-section__subtitle">Nenhuma</span>
-        {% endif %}
-      </dd>
-    </div>
-    <div class="cluster">
-      <dt class="app-section__subtitle">Última movimentação</dt>
-      <dd>{{ protocolo.ultima_movimentacao_em|date:"d/m/Y H:i"|default:"—" }}</dd>
-    </div>
-    <div class="cluster">
-      <dt class="app-section__subtitle">Última sincronização</dt>
-      <dd>{{ protocolo.ultima_sincronizacao_em|date:"d/m/Y H:i"|default:"—" }}</dd>
-    </div>
-  </dl>
+  <div class="cv-wizard-section-body">
+    <div class="protocolo-resumo">
+      <div class="protocolo-resumo-grid protocolo-resumo-grid--4">
+        <div class="protocolo-resumo-box protocolo-resumo-box--principal">
+          <span class="protocolo-resumo-box__label">Numero do protocolo</span>
+          <span class="protocolo-resumo-box__value protocolo-resumo-box__value--xl">{{ protocolo.numero_display }}</span>
+        </div>
+        <div class="protocolo-resumo-box">
+          <span class="protocolo-resumo-box__label">Numero/ano do documento</span>
+          <span class="protocolo-resumo-box__value">{{ protocolo.documento_numero_ano_display|default:"-" }}</span>
+        </div>
+        <div class="protocolo-resumo-box">
+          <span class="protocolo-resumo-box__label">Local atual</span>
+          <span class="protocolo-resumo-box__value">{{ protocolo.nome_local_atual|default:protocolo.cod_local_atual|default:"-" }}</span>
+        </div>
+        <div class="protocolo-resumo-box">
+          <span class="protocolo-resumo-box__label">Ultima sincronizacao</span>
+          <span class="protocolo-resumo-box__value">{{ protocolo.ultima_sincronizacao_em|date:"d/m/Y H:i"|default:"-" }}</span>
+        </div>
+      </div>
 
-  <footer class="cluster">
-    {% include "components/ui/buttons/button.html" with href=protocolo.get_detail_url label="Visualizar" variant="primary" size="sm" icon="eye" only %}
-    <form method="post" action="{% url 'protocolos:atualizar' protocolo.pk %}">
-      {% csrf_token %}
-      {% include "components/ui/buttons/button.html" with type="submit" label="Atualizar situação" variant="secondary" size="sm" icon="search" only %}
-    </form>
-    {% include "components/ui/buttons/button.html" with href=protocolo.get_enviar_documento_url label="Anexar documento" variant="secondary" size="sm" icon="document" only %}
-    {% include "components/ui/buttons/button.html" with href=protocolo.get_solicitar_assinatura_url label="Solicitar assinatura" variant="secondary" size="sm" icon="sign" only %}
-    {% include "components/ui/buttons/button.html" with href=protocolo.get_tramitar_url label="Tramitar" variant="secondary" size="sm" icon="arrow-right" only %}
-    {% include "components/ui/buttons/button.html" with href=protocolo.get_movimentacoes_url label="Movimentações" variant="ghost" size="sm" icon="list" only %}
+      <div class="protocolo-resumo-grid protocolo-resumo-grid--2 protocolo-resumo-grid--separated">
+        <div class="protocolo-resumo-box protocolo-resumo-box--texto">
+          <span class="protocolo-resumo-box__label">Descricao do protocolo</span>
+          <span class="protocolo-resumo-box__value">{{ protocolo.descricao_resumo|default:"-" }}</span>
+        </div>
+        <div class="protocolo-resumo-box protocolo-resumo-box--texto">
+          <span class="protocolo-resumo-box__label">Assunto</span>
+          <span class="protocolo-resumo-box__value">{{ protocolo.assunto_resumo|default:"-" }}</span>
+        </div>
+        <div class="protocolo-resumo-box">
+          <span class="protocolo-resumo-box__label">Palavra-Chave 1</span>
+          <span class="protocolo-resumo-box__value">{{ protocolo.palavra_chave_1_display|default:"-" }}</span>
+        </div>
+        <div class="protocolo-resumo-box">
+          <span class="protocolo-resumo-box__label">Interessado</span>
+          <span class="protocolo-resumo-box__value">{{ protocolo.interessado_display|default:"-" }}</span>
+        </div>
+      </div>
+
+      <div class="protocolo-resumo-grid3 protocolo-resumo-grid--separated">
+        <section class="protocolo-resumo-box protocolo-resumo-box--lista" aria-label="Pendencias e assinaturas">
+          <span class="protocolo-resumo-box__label">Pendencias e assinaturas</span>
+          <div class="protocolo-resumo-list">
+            <span class="protocolo-resumo-list__item">
+              <strong>Pendencias abertas</strong>
+              <span>{% if protocolo.pendencias_abertas_count %}{{ protocolo.pendencias_abertas_count }} aberta(s){% else %}Nenhuma{% endif %}</span>
+            </span>
+            <span class="protocolo-resumo-list__item">
+              <strong>Assinaturas</strong>
+              <span>{{ protocolo.assinaturas.count }} solicitada(s)</span>
+            </span>
+          </div>
+        </section>
+
+        <section class="protocolo-resumo-box protocolo-resumo-box--lista" aria-label="Tramitacoes">
+          <span class="protocolo-resumo-box__label">Tramitacoes</span>
+          <div class="protocolo-resumo-list protocolo-resumo-list--scroll">
+            {% for tram in protocolo.tramitacoes.all|slice:":4" %}
+              <span class="protocolo-resumo-list__item">
+                <strong>{{ tram.nome_local_de|default:tram.cod_local_de|default:"-" }} -> {{ tram.nome_local_para|default:tram.cod_local_para|default:"-" }}</strong>
+                <span>{{ tram.data_tramitacao|date:"d/m/Y H:i"|default:"sem data" }}</span>
+              </span>
+            {% empty %}
+              <span class="protocolo-resumo-list__item">
+                <strong>Nenhuma tramitacao registrada</strong>
+                <span>Ambiente de treinamento</span>
+              </span>
+            {% endfor %}
+          </div>
+        </section>
+
+        <section class="protocolo-resumo-box protocolo-resumo-box--lista protocolo-resumo-box--documentos" aria-label="Documentos atualizados">
+          <span class="protocolo-resumo-box__label">Documentos atualizados</span>
+          <div class="protocolo-resumo-docs">
+            {% for doc in protocolo.documentos.all %}
+              <div class="protocolo-resumo-doc">
+                <div class="protocolo-resumo-doc__body">
+                  <span class="protocolo-resumo-doc__title">
+                    {{ doc.nome_arquivo|default:"Documento sem nome" }}
+                    {% if doc.assinado %}
+                      <span class="protocolo-resumo-doc__badge">Assinado</span>
+                    {% elif doc.esta_no_volume %}
+                      <span class="protocolo-resumo-doc__badge">No volume</span>
+                    {% elif doc.enviado %}
+                      <span class="protocolo-resumo-doc__badge">Enviado</span>
+                    {% else %}
+                      <span class="protocolo-resumo-doc__badge">Pendente</span>
+                    {% endif %}
+                  </span>
+                  <span class="protocolo-resumo-doc__meta">
+                    {{ doc.get_tipo_documento_display }}
+                    {% if doc.codigo_documento_eprotocolo %} - {{ doc.codigo_documento_eprotocolo }}{% endif %}
+                    {% if doc.enviado_em %} - {{ doc.enviado_em|date:"d/m/Y H:i" }}{% endif %}
+                    {% if doc.tamanho_bytes %} - {{ doc.tamanho_bytes|filesizeformat }}{% endif %}
+                  </span>
+                </div>
+                <div class="protocolo-resumo-doc__actions cv-icon-btn-group">
+                  {% if doc.arquivo_pdf %}
+                    {% include "components/ui/buttons/icon_button.html" with href=doc.arquivo_pdf.url action="preview" size="sm" aria_label="Abrir documento" tooltip="Abrir documento" only %}
+                    {% include "components/ui/buttons/icon_button.html" with href=doc.arquivo_pdf.url action="pdf" size="sm" aria_label="Baixar PDF" tooltip="PDF" only %}
+                  {% else %}
+                    {% include "components/ui/buttons/icon_button.html" with href=protocolo.get_detail_url|add:"#documentos" action="preview" size="sm" aria_label="Abrir documento" tooltip="Abrir documento" only %}
+                    {% include "components/ui/buttons/icon_button.html" with href=protocolo.get_detail_url|add:"#documentos" action="pdf" size="sm" aria_label="Ver PDF no protocolo" tooltip="PDF" only %}
+                  {% endif %}
+                  {% include "components/ui/buttons/icon_button.html" with href=protocolo.get_solicitar_assinatura_url action="docx" size="sm" aria_label="Solicitar assinatura" tooltip="Solicitar assinatura" only %}
+                </div>
+              </div>
+            {% empty %}
+              <div class="protocolo-resumo-doc">
+                <div class="protocolo-resumo-doc__body">
+                  <span class="protocolo-resumo-doc__title">Nenhum documento registrado</span>
+                  <span class="protocolo-resumo-doc__meta">Envie ou sincronize documentos do protocolo.</span>
+                </div>
+                <div class="protocolo-resumo-doc__actions cv-icon-btn-group">
+                  {% include "components/ui/buttons/icon_button.html" with href=protocolo.get_enviar_documento_url action="pdf" size="sm" aria_label="Enviar novo documento" tooltip="Enviar PDF" only %}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <footer class="protocolo-resumo-card__footer">
+    <div class="cv-icon-btn-group">
+      {% include "components/ui/buttons/icon_button.html" with href=protocolo.get_detail_url action="preview" aria_label="Visualizar protocolo" tooltip="Visualizar" only %}
+      {% include "components/ui/buttons/icon_button.html" with href=protocolo.get_atualizar_url action="edit" aria_label="Atualizar situacao" tooltip="Atualizar situacao" only %}
+      {% include "components/ui/buttons/icon_button.html" with href=protocolo.get_detail_url|add:"#documentos" action="pdf" aria_label="Documentos do protocolo" tooltip="Documentos" only %}
+      {% include "components/ui/buttons/icon_button.html" with href=protocolo.get_detail_url|add:"#assinaturas" action="docx" aria_label="Assinaturas do protocolo" tooltip="Assinaturas" only %}
+      {% include "components/ui/buttons/icon_button.html" with href=protocolo.get_detail_url|add:"#tramitacoes" action="preview" aria_label="Tramitacoes do protocolo" tooltip="Tramitacoes" only %}
+    </div>
+    <div class="cv-icon-btn-group">
+      {% include "components/ui/buttons/icon_button.html" with href=protocolo.get_logs_url action="delete" aria_label="Logs do protocolo" tooltip="Logs" only %}
+    </div>
   </footer>
 </article>

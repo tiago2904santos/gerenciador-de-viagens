@@ -6,25 +6,33 @@
 {% block content %}
 <div class="page-shell page-shell--standard stack">
 
-  {# ── HEADER / PAINEL OPERACIONAL ── #}
   <div class="page-header-stack">
     <div class="page-header-band">
       <div class="page-header-band__content">
         <div class="page-header-band__text">
           <span class="page-header-band__eyebrow">PROTOCOLO</span>
-          <h1 class="page-header-band__title">{{ protocolo.numero_display }}</h1>
+          <h1 class="page-header-band__title">Protocolo no {{ protocolo.numero_display }}</h1>
         </div>
-        {% include "protocolos/partials/protocolo_status.html" with protocolo=protocolo only %}
+        <span class="cluster">
+          {% include "protocolos/partials/protocolo_status.html" with protocolo=protocolo only %}
+          {% if eprotocolo_modo_demo %}
+            {% include "components/ui/badges/chip.html" with tone="info" label="Ambiente: Treinamento" size="compact" only %}
+          {% endif %}
+        </span>
       </div>
     </div>
     <div class="page-header-rail">
       <div class="page-header-rail__marker" aria-hidden="true">PR</div>
       <div class="page-header-rail__content stack">
-        <p class="page-header-rail__subtitle">{{ eprotocolo_descricao }}</p>
+        <p class="page-header-rail__subtitle">
+          {{ protocolo.nome_local_atual|default:protocolo.cod_local_atual|default:"Local atual nao informado" }}
+          {% if protocolo.nome_responsavel_atual %} - {{ protocolo.nome_responsavel_atual }}{% endif %}
+          {% if protocolo.ultima_sincronizacao_em %} - atualizado em {{ protocolo.ultima_sincronizacao_em|date:"d/m/Y H:i" }}{% endif %}
+        </p>
         <div class="cluster">
           <form method="post" action="{{ protocolo.get_atualizar_url }}">
             {% csrf_token %}
-            {% include "components/ui/buttons/button.html" with type="submit" label="Atualizar situação" variant="primary" size="sm" icon="search" only %}
+            {% include "components/ui/buttons/button.html" with type="submit" label="Atualizar situacao" variant="primary" size="sm" icon="search" only %}
           </form>
           {% include "components/ui/buttons/button.html" with href=protocolo.get_enviar_documento_url label="Enviar documento" variant="secondary" size="sm" icon="document" only %}
           {% include "components/ui/buttons/button.html" with href=protocolo.get_solicitar_assinatura_url label="Solicitar assinatura" variant="secondary" size="sm" icon="sign" only %}
@@ -34,48 +42,86 @@
             {% include "components/ui/buttons/button.html" with type="submit" label="Concluir cadastro" variant="secondary" size="sm" icon="check" only %}
           </form>
           {% url 'protocolos:index' as index_url %}
-          {% include "components/ui/buttons/button.html" with href=index_url label="Voltar à lista" variant="ghost" size="sm" icon="arrow-left" only %}
+          {% include "components/ui/buttons/button.html" with href=index_url label="Voltar a lista" variant="ghost" size="sm" icon="arrow-left" only %}
         </div>
       </div>
     </div>
   </div>
 
-  {# ── NAVEGAÇÃO ENTRE SEÇÕES (âncoras, sem JS) ── #}
-  <nav class="cluster" aria-label="Seções do protocolo">
-    {% include "components/ui/badges/chip.html" with tone="filter" label="Resumo" only %}
+  <section class="app-section">
+    <div class="list-grid">
+      <article class="summary-card">
+        <span class="summary-label">Status</span>
+        <strong>{{ protocolo.get_status_local_display }}</strong>
+        <p>{{ protocolo.situacao_eprotocolo|default:"Situacao local" }}</p>
+      </article>
+      <article class="summary-card">
+        <span class="summary-label">Local atual</span>
+        <strong>{{ protocolo.nome_local_atual|default:protocolo.cod_local_atual|default:"-" }}</strong>
+        <p>{{ protocolo.nome_responsavel_atual|default:"Responsavel nao informado" }}</p>
+      </article>
+      <article class="summary-card">
+        <span class="summary-label">Documentos</span>
+        <strong>{{ resumo_operacional.documentos }}</strong>
+        <p>enviados ou espelhados</p>
+      </article>
+      <article class="summary-card">
+        <span class="summary-label">Assinaturas</span>
+        <strong>{{ resumo_operacional.assinaturas_pendentes }}</strong>
+        <p>pendente(s)</p>
+      </article>
+      <article class="summary-card">
+        <span class="summary-label">Pendencias</span>
+        <strong>{{ resumo_operacional.pendencias }}</strong>
+        <p>aberta(s)</p>
+      </article>
+      <article class="summary-card">
+        <span class="summary-label">Ultima movimentacao</span>
+        <strong>{% if resumo_operacional.ultima_movimentacao %}{{ resumo_operacional.ultima_movimentacao.tipo }}{% else %}-{% endif %}</strong>
+        <p>{% if resumo_operacional.ultima_movimentacao %}{{ resumo_operacional.ultima_movimentacao.data_movimentacao|date:"d/m/Y H:i" }}{% else %}Nenhuma movimentacao{% endif %}</p>
+      </article>
+    </div>
+  </section>
+
+  <nav class="cluster" aria-label="Secoes do protocolo">
+    <a href="#resumo">{% include "components/ui/badges/chip.html" with tone="filter" label="Resumo" only %}</a>
     <a href="#documentos">{% include "components/ui/badges/chip.html" with tone="filter" label="Documentos" only %}</a>
     <a href="#assinaturas">{% include "components/ui/badges/chip.html" with tone="filter" label="Assinaturas" only %}</a>
-    <a href="#pendencias">{% include "components/ui/badges/chip.html" with tone="filter" label="Pendências" only %}</a>
-    <a href="#tramitacoes">{% include "components/ui/badges/chip.html" with tone="filter" label="Tramitações" only %}</a>
-    <a href="#movimentacoes">{% include "components/ui/badges/chip.html" with tone="filter" label="Movimentações" only %}</a>
+    <a href="#pendencias">{% include "components/ui/badges/chip.html" with tone="filter" label="Pendencias" only %}</a>
+    <a href="#tramitacoes">{% include "components/ui/badges/chip.html" with tone="filter" label="Tramitacoes" only %}</a>
+    <a href="#movimentacoes">{% include "components/ui/badges/chip.html" with tone="filter" label="Movimentacoes" only %}</a>
     <a href="#logs">{% include "components/ui/badges/chip.html" with tone="filter" label="Logs" only %}</a>
   </nav>
 
-  {# ── RESUMO ── #}
   <section class="app-section card app-card" id="resumo">
-    <div class="app-section__header stack">
-      <h2 class="app-section__title">Resumo</h2>
+    <div class="app-section__header cluster cluster--between cluster--start">
+      <div class="stack">
+        <h2 class="app-section__title">Resumo</h2>
+        {% if eprotocolo_modo_demo %}
+          <p class="app-section__subtitle">Este protocolo esta em ambiente de treinamento/mock. Nenhuma acao foi enviada ao eProtocolo real.</p>
+        {% endif %}
+      </div>
+      {% if eprotocolo_modo_demo %}
+        {% include "components/ui/badges/chip.html" with tone="muted" label="simulado" size="compact" only %}
+      {% endif %}
     </div>
     <div class="app-section__body">
-      <dl class="stack">
-        <div class="cluster"><dt class="app-section__subtitle">Origem</dt><dd>{{ protocolo.get_origem_tipo_display }}</dd></div>
-        {% if protocolo.origem_label and protocolo.origem_label != "—" %}
-        <div class="cluster"><dt class="app-section__subtitle">Documento vinculado</dt><dd>{{ protocolo.origem_label }}</dd></div>
-        {% endif %}
-        <div class="cluster"><dt class="app-section__subtitle">Assunto</dt><dd>{{ protocolo.assunto_resumo|default:"—" }}</dd></div>
-        <div class="cluster"><dt class="app-section__subtitle">Descrição</dt><dd>{{ protocolo.descricao_resumo|default:"—" }}</dd></div>
-        <div class="cluster"><dt class="app-section__subtitle">Órgão</dt><dd>{{ protocolo.nome_orgao|default:protocolo.cod_orgao|default:"—" }}</dd></div>
-        <div class="cluster"><dt class="app-section__subtitle">Local de origem</dt><dd>{{ protocolo.nome_local_origem|default:protocolo.cod_local_origem|default:"—" }}</dd></div>
-        <div class="cluster"><dt class="app-section__subtitle">Local atual</dt><dd>{{ protocolo.nome_local_atual|default:protocolo.cod_local_atual|default:"—" }}</dd></div>
-        <div class="cluster"><dt class="app-section__subtitle">Responsável atual</dt><dd>{{ protocolo.nome_responsavel_atual|default:"—" }}{% if protocolo.cpf_responsavel_atual %} · {{ protocolo.cpf_responsavel_mascarado }}{% endif %}</dd></div>
-        <div class="cluster"><dt class="app-section__subtitle">Status local</dt><dd>{{ protocolo.get_status_local_display }}</dd></div>
-        <div class="cluster"><dt class="app-section__subtitle">Criado no sistema</dt><dd>{{ protocolo.criado_no_sistema_em|date:"d/m/Y H:i" }}</dd></div>
-        <div class="cluster"><dt class="app-section__subtitle">Última sincronização</dt><dd>{{ protocolo.ultima_sincronizacao_em|date:"d/m/Y H:i"|default:"—" }}</dd></div>
+      <dl class="document-meta">
+        <div><dt>Documento de origem</dt><dd>{{ protocolo.origem_label }}</dd></div>
+        <div><dt>Tipo de origem</dt><dd>{{ protocolo.get_origem_tipo_display }}</dd></div>
+        <div><dt>Assunto</dt><dd>{{ protocolo.assunto_resumo|default:"-" }}</dd></div>
+        <div><dt>Descricao</dt><dd>{{ protocolo.descricao_resumo|default:"-" }}</dd></div>
+        <div><dt>Orgao</dt><dd>{{ protocolo.nome_orgao|default:protocolo.cod_orgao|default:"-" }}</dd></div>
+        <div><dt>Local de origem</dt><dd>{{ protocolo.nome_local_origem|default:protocolo.cod_local_origem|default:"-" }}</dd></div>
+        <div><dt>Local atual</dt><dd>{{ protocolo.nome_local_atual|default:protocolo.cod_local_atual|default:"-" }}</dd></div>
+        <div><dt>Situacao</dt><dd>{{ protocolo.situacao_eprotocolo|default:"-" }}</dd></div>
+        <div><dt>Criado no sistema</dt><dd>{{ protocolo.criado_no_sistema_em|date:"d/m/Y H:i" }}</dd></div>
+        <div><dt>Ultima atualizacao</dt><dd>{{ protocolo.ultima_sincronizacao_em|date:"d/m/Y H:i"|default:"-" }}</dd></div>
       </dl>
     </div>
   </section>
 
-  {% include "protocolos/partials/protocolo_documentos.html" with documentos=documentos protocolo=protocolo only %}
+  {% include "protocolos/partials/protocolo_documentos.html" with documentos=documentos protocolo=protocolo eprotocolo_modo_demo=eprotocolo_modo_demo only %}
   {% include "protocolos/partials/protocolo_assinaturas.html" with assinaturas=assinaturas protocolo=protocolo only %}
   {% include "protocolos/partials/protocolo_pendencias.html" with pendencias=pendencias only %}
   {% include "protocolos/partials/protocolo_tramitacoes.html" with tramitacoes=tramitacoes only %}

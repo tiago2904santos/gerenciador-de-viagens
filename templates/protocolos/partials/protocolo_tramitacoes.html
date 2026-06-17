@@ -1,23 +1,33 @@
-{% comment %}Seção Tramitações (linha do tempo). Parâmetros: tramitacoes{% endcomment %}
+{% comment %}Secao Tramitacoes em linha do tempo. Parametros: tramitacoes{% endcomment %}
 <section class="app-section card app-card" id="tramitacoes">
   <div class="app-section__header stack">
-    <h2 class="app-section__title">Tramitações</h2>
-    <p class="app-section__subtitle">Histórico de trâmites entre locais.</p>
+    <h2 class="app-section__title">Tramitacoes</h2>
+    <p class="app-section__subtitle">Historico de tramites entre locais.</p>
   </div>
   <div class="app-section__body stack">
     {% for tram in tramitacoes %}
-      <article class="card app-card stack">
-        <div class="cluster cluster--between cluster--start">
-          <strong>{{ tram.nome_local_de|default:tram.cod_local_de|default:"—" }} → {{ tram.nome_local_para|default:tram.cod_local_para|default:"—" }}</strong>
-          <span class="app-section__subtitle">{{ tram.data_tramitacao|date:"d/m/Y H:i"|default:"—" }}</span>
+      <article class="document-card">
+        <div class="document-card-header">
+          <div class="stack">
+            <strong>{{ tram.nome_local_de|default:tram.cod_local_de|default:"-" }} -> {{ tram.nome_local_para|default:tram.cod_local_para|default:"-" }}</strong>
+            <span class="app-section__subtitle">{{ tram.data_tramitacao|date:"d/m/Y H:i"|default:"-" }}</span>
+          </div>
+          {% if forloop.first %}
+            {% include "components/ui/badges/chip.html" with tone="info" size="compact" label="ultima" only %}
+          {% else %}
+            {% include "components/ui/badges/chip.html" with tone="neutral" size="compact" label="historico" only %}
+          {% endif %}
         </div>
-        <dl class="stack">
-          {% if tram.nome_destinatario %}<div class="cluster"><dt class="app-section__subtitle">Destinatário</dt><dd>{{ tram.nome_destinatario }}{% if tram.cpf_destinatario %} · {{ tram.cpf_destinatario_mascarado }}{% endif %}</dd></div>{% endif %}
-          {% if tram.parecer %}<div class="cluster"><dt class="app-section__subtitle">Parecer</dt><dd>{{ tram.parecer }}</dd></div>{% endif %}
+        <dl class="document-meta">
+          <div><dt>Origem</dt><dd>{{ tram.nome_local_de|default:tram.cod_local_de|default:"-" }}</dd></div>
+          <div><dt>Destino</dt><dd>{{ tram.nome_local_para|default:tram.cod_local_para|default:"-" }}</dd></div>
+          <div><dt>Responsavel</dt><dd>{{ tram.nome_destinatario|default:"-" }}{% if tram.cpf_destinatario %} - {{ tram.cpf_destinatario_mascarado }}{% endif %}</dd></div>
+          <div><dt>Parecer</dt><dd>{{ tram.parecer|default:"-" }}</dd></div>
+          <div><dt>Status</dt><dd>{% if forloop.first %}Recebida{% else %}Enviada{% endif %}</dd></div>
         </dl>
       </article>
     {% empty %}
-      <p class="app-section__subtitle">Nenhuma tramitação registrada.</p>
+      {% include "components/ui/feedback/empty_state.html" with title="Sem tramitacoes" message="Nenhuma tramitacao registrada." only %}
     {% endfor %}
   </div>
 </section>
