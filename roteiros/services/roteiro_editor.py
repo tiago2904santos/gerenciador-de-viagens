@@ -110,15 +110,28 @@ def preparar_estado_editor_roteiro_para_get(initial=None, roteiro=None):
         return destinos_atuais, trechos_list, roteiro_state
 
     initial = initial or {}
-    destinos_atuais = [{"estado_id": None, "cidade_id": None, "cidade": None, "estado": None}]
+    destino_estado = initial.get("destino_estado") or initial.get("destino_estado_id")
+    destino_cidade = initial.get("destino_cidade") or initial.get("destino_cidade_id")
+    destinos_atuais = [
+        {
+            "estado_id": destino_estado,
+            "cidade_id": destino_cidade,
+            "cidade": None,
+            "estado": None,
+        }
+    ]
     trechos_list = []
     roteiro_state = roteiro_logic._build_roteiro_state_from_estrutura(
         trechos_list,
-        [{"estado_id": None, "cidade_id": None}],
+        [{"estado_id": destino_estado, "cidade_id": destino_cidade}],
         initial.get("origem_estado"),
         initial.get("origem_cidade"),
-        "",
+        initial.get("seed_source_label", ""),
     )
+    if initial.get("saida_data"):
+        roteiro_state["bate_volta_diario"]["data_inicio"] = initial.get("saida_data")
+    if initial.get("retorno_data"):
+        roteiro_state["bate_volta_diario"]["data_fim"] = initial.get("retorno_data")
     roteiro_state["roteiro_modo"] = "ROTEIRO_PROPRIO"
     return destinos_atuais, trechos_list, roteiro_state
 
@@ -199,9 +212,10 @@ def montar_contexto_editor_roteiro(
 
 
 @transaction.atomic
-def criar_roteiro(form, roteiro_state, validated, diarias_resultado):
+def criar_roteiro(form, roteiro_state, validated, diarias_resultado, *, evento=None):
     roteiro = form.save(commit=False)
-    roteiro.tipo = Roteiro.TIPO_AVULSO
+    roteiro.evento = evento
+    roteiro.tipo = Roteiro.TIPO_EVENTO if evento is not None else Roteiro.TIPO_AVULSO
     roteiro.origem_estado = validated.get("sede_estado")
     roteiro.origem_cidade = validated.get("sede_cidade")
     roteiro.save()

@@ -47,6 +47,7 @@ from documentos.services.responses import build_inline_pdf_response_from_downloa
 from documentos.services.timing import measure_step
 from documentos.services.types import DocumentoFormato
 from documentos.services.types import DocumentoTipo
+from eventos.services import resolve_evento_from_request
 from ordens_servico.services import gerar_resposta_ordem_servico_documento
 from .forms import OficioDadosViajantesForm
 from .forms import OficioTransporteForm
@@ -88,6 +89,27 @@ from .services import validar_oficio_para_documento
 
 
 logger = logging.getLogger(__name__)
+
+
+def _evento_etapa_url(evento_id, etapa):
+    if evento_id:
+        return reverse("eventos:guiado_etapa", kwargs={"pk": evento_id, "etapa": etapa})
+    return ""
+
+
+def _oficio_back_url(oficio):
+    return _evento_etapa_url(getattr(oficio, "evento_id", None), 3) or reverse("oficios:index")
+
+
+def _oficio_back_label(oficio):
+    return "Dados do evento" if getattr(oficio, "evento_id", None) else "Voltar à lista"
+
+
+def _redirect_lista_oficio(request, oficio, message):
+    messages.success(request, message)
+    if getattr(oficio, "evento_id", None):
+        return redirect("eventos:guiado_etapa", pk=oficio.evento_id, etapa=3)
+    return redirect("oficios:index")
 
 
 def _wizard_normalizar_acao(post, *, default: str = "wizard_next") -> str:
@@ -245,8 +267,8 @@ def _wizard_dados_viajantes_context(
         "form": form,
         "transporte_form": transporte_form,
         "oficio": oficio,
-        "wizard_back_url": reverse("oficios:index"),
-        "wizard_back_label": "Voltar à lista",
+        "wizard_back_url": _oficio_back_url(oficio),
+        "wizard_back_label": _oficio_back_label(oficio),
         "wizard_footer_mode": "step1_minimal",
         "wizard_show_document_actions": False,
         "wizard_show_save_draft": False,
@@ -258,13 +280,13 @@ def _wizard_dados_viajantes_context(
 
 def _redirect_after_dados_viajantes_save(request, oficio, *, nav_action: str, created=False):
     if nav_action in ("wizard_back", "save_draft_list"):
-        messages.success(
+        return _redirect_lista_oficio(
             request,
+            oficio,
             "Ofício cadastrado com sucesso."
             if created
-            else "Dados e viajantes salvos. Retornamos à lista de ofícios.",
+            else "Dados e viajantes salvos.",
         )
-        return redirect("oficios:index")
     if nav_action == "wizard_next":
         messages.success(
             request,
@@ -312,8 +334,8 @@ def _wizard_transporte_context(*, form, oficio):
         "motorista_oficio_ano": ano_motorista_ctx,
         "motorista_oficio_numero_inicial": _motorista_oficio_numero_display(ref_raw),
         "api_viatura_placa_url": reverse("oficios:api_viatura_por_placa", args=[oficio.pk]),
-        "wizard_back_url": reverse("oficios:index"),
-        "wizard_back_label": "Voltar à lista",
+        "wizard_back_url": _oficio_back_url(oficio),
+        "wizard_back_label": _oficio_back_label(oficio),
         "wizard_show_document_actions": True,
         "wizard_show_save_draft": True,
         "wizard_autosave_url": reverse("oficios:transporte_autosave", args=[oficio.pk]),
@@ -327,8 +349,7 @@ def _redirect_after_transporte_save(request, oficio, *, nav_action: str):
         messages.success(request, "Transporte salvo.")
         return redirect("oficios:dados_viajantes", pk=oficio.pk)
     if nav_action == "save_draft_list":
-        messages.success(request, "Transporte salvo. Retornamos à lista de ofícios.")
-        return redirect("oficios:index")
+        return _redirect_lista_oficio(request, oficio, "Transporte salvo.")
     if nav_action == "wizard_next":
         messages.success(request, "Transporte salvo. Continue para a próxima etapa quando estiver pronto.")
         return redirect("oficios:wizard_roteiro", pk=oficio.pk)
@@ -489,7 +510,8 @@ def index(request):
 
 
 def novo(request):
-    oficio = criar_oficio_rascunho()
+    evento = resolve_evento_from_request(request)
+    oficio = criar_oficio_rascunho(evento=evento)
     return redirect("oficios:dados_viajantes", pk=oficio.pk)
 
 
@@ -674,8 +696,7 @@ def wizard_roteiro(request, pk):
                 messages.success(request, "Roteiro e diárias salvos.")
                 return redirect("oficios:dados_viajantes", pk=oficio.pk)
             if nav_action == "save_draft_list":
-                messages.success(request, "Roteiro e diárias salvos. Retornamos à lista de ofícios.")
-                return redirect("oficios:index")
+                return _redirect_lista_oficio(request, oficio, "Roteiro e diárias salvos.")
             messages.success(request, "Rascunho do roteiro salvo.")
             return redirect("oficios:wizard_roteiro", pk=oficio.pk)
         for error in validated.get("errors", []):
@@ -725,8 +746,8 @@ def wizard_roteiro(request, pk):
             ),
             "wizard_summary": apresentar_oficio_wizard_summary(oficio),
             "oficio": oficio,
-            "wizard_back_url": reverse("oficios:index"),
-            "wizard_back_label": "Voltar à lista",
+            "wizard_back_url": _oficio_back_url(oficio),
+            "wizard_back_label": _oficio_back_label(oficio),
             "roteiro_editor_oficio": True,
             "wizard_use_outer_form": False,
             **_wizard_footer_ctx(oficio),
@@ -761,8 +782,7 @@ def wizard_justificativa(request, pk):
             messages.success(request, "Justificativa salva.")
             return redirect("oficios:wizard_roteiro", pk=oficio.pk)
         if nav_action == "save_draft_list":
-            messages.success(request, "Justificativa salva. Retornamos à lista de ofícios.")
-            return redirect("oficios:index")
+            return _redirect_lista_oficio(request, oficio, "Justificativa salva.")
         if nav_action == "wizard_next":
             messages.success(
                 request,
@@ -791,8 +811,8 @@ def wizard_justificativa(request, pk):
             "wizard_summary": apresentar_oficio_wizard_summary(oficio),
             "oficio": oficio,
             "form": form,
-            "wizard_back_url": reverse("oficios:index"),
-            "wizard_back_label": "Voltar à lista",
+            "wizard_back_url": _oficio_back_url(oficio),
+            "wizard_back_label": _oficio_back_label(oficio),
             "justificativa_ctx": apresentar_justificativa_wizard_context(oficio),
             "justificativa_obrigatoria": obrigatoria,
             "modelos_justificativa_url": reverse("justificativas:modelos_index"),
@@ -853,8 +873,7 @@ def wizard_documentos(request, pk):
                 return redirect("oficios:wizard_documentos", pk=pk)
             oficio.status = Oficio.STATUS_FINALIZADO
             oficio.save(update_fields=["status", "updated_at"])
-            messages.success(request, "Ofício finalizado com sucesso.")
-            return redirect("oficios:index")
+            return _redirect_lista_oficio(request, oficio, "Ofício finalizado com sucesso.")
         if nav_action == "wizard_back":
             from documentos.services.warm_cache import ensure_document_artifact_cached
 
@@ -863,8 +882,7 @@ def wizard_documentos(request, pk):
             return redirect("oficios:wizard_justificativa", pk=pk)
         if nav_action == "save_draft_list":
             oficio.save(update_fields=["updated_at"])
-            messages.success(request, "Retornamos à lista de ofícios.")
-            return redirect("oficios:index")
+            return _redirect_lista_oficio(request, oficio, "Rascunho salvo.")
         messages.success(request, "Rascunho salvo.")
         return redirect("oficios:wizard_documentos", pk=pk)
 
@@ -887,8 +905,8 @@ def wizard_documentos(request, pk):
             ),
             "wizard_summary": apresentar_oficio_wizard_summary(oficio),
             "oficio": oficio,
-            "wizard_back_url": reverse("oficios:index"),
-            "wizard_back_label": "Voltar à lista",
+            "wizard_back_url": _oficio_back_url(oficio),
+            "wizard_back_label": _oficio_back_label(oficio),
             "wizard_finalizar": True,
             "wizard_show_document_actions": False,
             "wizard_show_save_draft": False,
@@ -1113,6 +1131,7 @@ def baixar_ordem_servico_documento(request, pk, formato):
 
 def excluir(request, pk):
     oficio = get_oficio_by_id(pk)
+    evento_id = oficio.evento_id
     if request.method == "POST":
         try:
             excluir_oficio(oficio)
@@ -1121,8 +1140,12 @@ def excluir(request, pk):
                 request,
                 "Não foi possível excluir o ofício porque ele está vinculado a outros registros.",
             )
+            if evento_id:
+                return redirect("eventos:guiado_etapa", pk=evento_id, etapa=3)
             return redirect("oficios:index")
         messages.success(request, "Ofício excluído com sucesso.")
+        if evento_id:
+            return redirect("eventos:guiado_etapa", pk=evento_id, etapa=3)
         return redirect("oficios:index")
     return render(
         request,
@@ -1131,7 +1154,7 @@ def excluir(request, pk):
             "page_title": "Excluir ofício",
             "page_description": "A exclusão é física e pode ser bloqueada quando houver vínculos.",
             "object": oficio,
-            "back_url": reverse("oficios:index"),
+            "back_url": _oficio_back_url(oficio),
         },
     )
 

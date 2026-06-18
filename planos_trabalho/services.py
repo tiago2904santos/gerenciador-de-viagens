@@ -1166,11 +1166,41 @@ def marcar_plano_gerado(plano: PlanoTrabalho) -> None:
         plano.save(update_fields=["status", "updated_at"])
 
 
-def criar_plano_rascunho() -> PlanoTrabalho:
+def criar_plano_rascunho(evento=None) -> PlanoTrabalho:
+    seed = {}
+    if evento is not None:
+        from eventos.services import build_evento_document_seed
+
+        seed = build_evento_document_seed(evento)
+
     plano = PlanoTrabalho(data_criacao=timezone.localdate())
+    plano.evento = evento
     plano.atribuir_numero()
     config = ConfiguracaoSistema.get_singleton()
     if config.coordenador_adm_plano_trabalho_id:
         plano.coordenador_adm = config.coordenador_adm_plano_trabalho
+    elif getattr(evento, "responsavel_id", None):
+        plano.coordenador_adm = evento.responsavel
+    if getattr(evento, "responsavel_id", None):
+        plano.coordenador_op = evento.responsavel
+    cidade = seed.get("cidade")
+    estado = seed.get("estado")
+    if cidade is not None:
+        plano.destino_cidade = cidade
+        plano.destino_estado = getattr(cidade, "estado", None) or estado
+    elif estado is not None:
+        plano.destino_estado = estado
+    plano.data_evento_inicio = seed.get("data_inicio")
+    plano.data_evento_fim = seed.get("data_fim") or seed.get("data_inicio")
+    if evento is not None:
+        plano.programa_outros = getattr(evento, "titulo", "") or ""
+        if getattr(evento, "horario_inicio", None) and getattr(evento, "horario_fim", None):
+            plano.horario_atendimento = (
+                f"{evento.horario_inicio:%H:%M} ate {evento.horario_fim:%H:%M}"
+            )
+    motivo = (seed.get("motivo") or "").strip()
+    if motivo:
+        plano.contextualizacao = motivo
+        plano.contextualizacao_auto = False
     plano.save()
     return plano

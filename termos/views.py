@@ -19,6 +19,8 @@ from cadastros.models import Servidor
 from documentos.services.responses import build_inline_pdf_response
 from documentos.services.types import DocumentoFormato
 from documentos.services.types import DocumentoTipo
+from eventos.services import build_evento_document_seed
+from eventos.services import resolve_evento_from_request
 
 from oficios.selectors import get_oficio_by_id
 from oficios.services import redirect_para_corrigir_documento_oficio
@@ -68,6 +70,27 @@ def _termo_queryset():
         "destino_cidade",
         "viatura",
     ).prefetch_related("servidores")
+
+
+def _evento_etapa_url(evento_id):
+    if evento_id:
+        return reverse("eventos:guiado_etapa", kwargs={"pk": evento_id, "etapa": 5})
+    return ""
+
+
+def _termo_lista_url(termo=None, evento=None):
+    evento_id = getattr(evento, "pk", None) or getattr(termo, "evento_id", None)
+    return _evento_etapa_url(evento_id) or reverse("termos:index")
+
+
+def _termo_back_label(termo=None, evento=None):
+    return "Dados do evento" if (getattr(evento, "pk", None) or getattr(termo, "evento_id", None)) else "Voltar a lista"
+
+
+def _redirect_termo_lista(termo):
+    if getattr(termo, "evento_id", None):
+        return redirect("eventos:guiado_etapa", pk=termo.evento_id, etapa=5)
+    return redirect("termos:editar", pk=termo.pk)
 
 
 def _oficio_summary(oficio):
@@ -234,7 +257,7 @@ def _termo_page_steps(form, termo=None):
     ]
 
 
-def _form_context(*, form, termo=None):
+def _form_context(*, form, termo=None, evento=None):
     oficios = form.fields["oficio"].queryset.prefetch_related("servidores_termo_autorizacao")
     summaries = {}
     for oficio in oficios:
@@ -244,7 +267,8 @@ def _form_context(*, form, termo=None):
         "page_title": "Cadastro de termo",
         "form": form,
         "termo": termo,
-        "index_url": reverse("termos:index"),
+        "index_url": _termo_lista_url(termo=termo, evento=evento),
+        "back_label": _termo_back_label(termo=termo, evento=evento),
         "servidor_create_url": reverse("cadastros:servidor_create"),
         "viatura_create_url": reverse("cadastros:viatura_create"),
         "api_cidades_por_estado_url": reverse("roteiros:api_cidades_por_estado", kwargs={"estado_id": 0}),
@@ -257,7 +281,29 @@ def _form_context(*, form, termo=None):
 
 @require_http_methods(["GET", "POST"])
 def novo(request):
-    termo = TermoAutorizacao()
+    evento = resolve_evento_from_request(request)
+    seed = build_evento_document_seed(evento) if evento is not None else {}
+    termo = TermoAutorizacao(
+        evento=evento,
+        oficio=seed.get("oficio"),
+        destino_estado=seed.get("estado"),
+        destino_cidade=seed.get("cidade"),
+        data_evento_inicio=seed.get("data_inicio"),
+        data_evento_fim=seed.get("data_fim") or seed.get("data_inicio"),
+        viatura=seed.get("viatura"),
+    )
+    servidores_seed = seed.get("servidores_termo") or seed.get("servidores") or []
+    initial = {}
+    if seed.get("oficio"):
+        initial["oficio"] = seed["oficio"].pk
+    if seed.get("estado"):
+        initial["destino_estado"] = seed["estado"].pk
+    if seed.get("cidade"):
+        initial["destino_cidade"] = seed["cidade"].pk
+    if servidores_seed:
+        initial["servidores"] = [servidor.pk for servidor in servidores_seed]
+    if seed.get("viatura"):
+        initial["viatura"] = seed["viatura"].pk
     if request.method == "POST":
         form = TermoAutorizacaoForm(request.POST, instance=termo)
         if form.is_valid():
@@ -265,10 +311,10 @@ def novo(request):
             messages.success(request, "Termo cadastrado.")
             if request.POST.get("action") == "save_preview":
                 return redirect("termos:preview_cadastro", pk=termo.pk)
-            return redirect("termos:editar", pk=termo.pk)
+            return _redirect_termo_lista(termo)
     else:
-        form = TermoAutorizacaoForm(instance=termo)
-    return render(request, "termos/form.html", _form_context(form=form, termo=None))
+        form = TermoAutorizacaoForm(instance=termo, initial=initial)
+    return render(request, "termos/form.html", _form_context(form=form, termo=None, evento=evento))
 
 
 @require_http_methods(["GET", "POST"])
@@ -281,7 +327,7 @@ def editar(request, pk):
             messages.success(request, "Termo atualizado.")
             if request.POST.get("action") == "save_preview":
                 return redirect("termos:preview_cadastro", pk=termo.pk)
-            return redirect("termos:editar", pk=termo.pk)
+            return _redirect_termo_lista(termo)
     else:
         form = TermoAutorizacaoForm(instance=termo)
     return render(request, "termos/form.html", _form_context(form=form, termo=termo))

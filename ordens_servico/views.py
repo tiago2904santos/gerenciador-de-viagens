@@ -11,6 +11,9 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
+from eventos.services import build_evento_document_seed
+from eventos.services import resolve_evento_from_request
+
 from .forms import OrdemServicoForm
 from .models import OrdemServico
 from .services import gerar_os_docx_response
@@ -36,6 +39,27 @@ def index(request):
 
 def _os_queryset():
     return OrdemServico.objects.prefetch_related("destinos__estado", "servidores", "oficios")
+
+
+def _evento_etapa_url(evento_id):
+    if evento_id:
+        return reverse("eventos:guiado_etapa", kwargs={"pk": evento_id, "etapa": 4})
+    return ""
+
+
+def _ordem_lista_url(ordem=None, evento=None):
+    evento_id = getattr(evento, "pk", None) or getattr(ordem, "evento_id", None)
+    return _evento_etapa_url(evento_id) or reverse("ordens_servico:index")
+
+
+def _ordem_back_label(ordem=None, evento=None):
+    return "Dados do evento" if (getattr(evento, "pk", None) or getattr(ordem, "evento_id", None)) else "Voltar a lista"
+
+
+def _redirect_ordem_lista(ordem):
+    if getattr(ordem, "evento_id", None):
+        return redirect("eventos:guiado_etapa", pk=ordem.evento_id, etapa=4)
+    return redirect("ordens_servico:editar", pk=ordem.pk)
 
 
 def _build_oficio_summary(oficio):
@@ -133,7 +157,7 @@ def _evento_display_values(form):
     }
 
 
-def _form_context(*, form, ordem=None):
+def _form_context(*, form, ordem=None, evento=None):
     oficios_qs = form.fields["oficios"].queryset.select_related("roteiro").prefetch_related(
         "roteiro__destinos__cidade",
         "servidores",
@@ -147,7 +171,8 @@ def _form_context(*, form, ordem=None):
         "page_title": "Nova Ordem de Serviço" if ordem is None or not ordem.pk else f"Editar {ordem.numero_formatado}",
         "form": form,
         "ordem": ordem,
-        "index_url": reverse("ordens_servico:index"),
+        "index_url": _ordem_lista_url(ordem=ordem, evento=evento),
+        "back_label": _ordem_back_label(ordem=ordem, evento=evento),
         "servidor_create_url": reverse("cadastros:servidor_create"),
         "modelos_motivo_url": reverse("oficios:modelos_motivo_index"),
         "tem_modelos_motivo": form.fields["modelo_motivo"].queryset.exists(),
@@ -160,16 +185,32 @@ def _form_context(*, form, ordem=None):
 
 @require_http_methods(["GET", "POST"])
 def nova(request):
-    ordem = OrdemServico()
+    evento = resolve_evento_from_request(request)
+    seed = build_evento_document_seed(evento) if evento is not None else {}
+    ordem = OrdemServico(
+        evento=evento,
+        data_evento_inicio=seed.get("data_inicio"),
+        data_evento_fim=seed.get("data_fim") or seed.get("data_inicio"),
+        motivo=seed.get("motivo") or "",
+    )
+    initial = {}
+    if seed.get("estado"):
+        initial["destino_estado"] = seed["estado"].pk
+    if seed.get("cidade"):
+        initial["destino_cidade"] = seed["cidade"].pk
+    if seed.get("servidores"):
+        initial["servidores"] = [servidor.pk for servidor in seed["servidores"]]
+    if seed.get("oficios"):
+        initial["oficios"] = [oficio.pk for oficio in seed["oficios"]]
     if request.method == "POST":
         form = OrdemServicoForm(request.POST, instance=ordem)
         if form.is_valid():
             ordem = form.save()
             messages.success(request, "Ordem de Serviço cadastrada.")
-            return redirect("ordens_servico:editar", pk=ordem.pk)
+            return _redirect_ordem_lista(ordem)
     else:
-        form = OrdemServicoForm(instance=ordem)
-    return render(request, "ordens_servico/form.html", _form_context(form=form, ordem=None))
+        form = OrdemServicoForm(instance=ordem, initial=initial)
+    return render(request, "ordens_servico/form.html", _form_context(form=form, ordem=None, evento=evento))
 
 
 @require_http_methods(["GET", "POST"])
@@ -180,7 +221,7 @@ def editar(request, pk):
         if form.is_valid():
             ordem = form.save()
             messages.success(request, "Ordem de Serviço atualizada.")
-            return redirect("ordens_servico:editar", pk=ordem.pk)
+            return _redirect_ordem_lista(ordem)
     else:
         form = OrdemServicoForm(instance=ordem)
     return render(request, "ordens_servico/form.html", _form_context(form=form, ordem=ordem))

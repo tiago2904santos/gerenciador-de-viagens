@@ -403,7 +403,13 @@ class PlanoTrabalho(TimeStampedModel):
             if config.pt_ano != ano_atual:
                 config.pt_ano = ano_atual
                 config.pt_ultimo_numero = 0
-            config.pt_ultimo_numero += 1
+            ultimo_numero_banco = (
+                cls.objects.filter(ano=ano_atual)
+                .aggregate(ultimo=models.Max("numero"))
+                .get("ultimo")
+                or 0
+            )
+            config.pt_ultimo_numero = max(config.pt_ultimo_numero, ultimo_numero_banco) + 1
             config.save(update_fields=["pt_ano", "pt_ultimo_numero", "updated_at"])
             sufixo = (getattr(config, "pt_sufixo_numero", "") or "").strip()
             return config.pt_ultimo_numero, ano_atual, sufixo

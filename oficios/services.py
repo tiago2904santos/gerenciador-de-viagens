@@ -264,13 +264,29 @@ def avaliar_oficio_transporte(oficio):
 
 
 @transaction.atomic
-def criar_oficio_rascunho():
+def criar_oficio_rascunho(evento=None):
+    seed = {}
+    if evento is not None:
+        from eventos.services import build_evento_document_seed
+
+        seed = build_evento_document_seed(evento)
     oficio = Oficio.objects.create(
+        evento=evento,
         data_criacao=timezone.localdate(),
         status=Oficio.STATUS_RASCUNHO,
         custeio=Oficio.CUSTEIO_UNIDADE_DPC,
+        motivo=seed.get("motivo") or "",
+        solicitante=getattr(evento, "unidade_responsavel", None) if evento is not None else None,
+        viatura=seed.get("viatura"),
+        motorista=seed.get("motorista"),
     )
     reservar_numero_oficio(oficio, ano=oficio.data_criacao.year)
+    servidores = seed.get("servidores") or []
+    servidores_termo = seed.get("servidores_termo") or servidores
+    if servidores:
+        oficio.servidores.set(servidores)
+    if servidores_termo:
+        oficio.servidores_termo_autorizacao.set(servidores_termo)
     return oficio
 
 

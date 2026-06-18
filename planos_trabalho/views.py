@@ -23,6 +23,7 @@ from documentos.services.responses import build_inline_pdf_response_from_downloa
 from documentos.services.timing import measure_step
 from documentos.services.types import DocumentoFormato
 from documentos.services.types import DocumentoTipo
+from eventos.services import resolve_evento_from_request
 
 from .forms import AtividadePlanoTrabalhoForm
 from .forms import EfetivoPlanoFormSet
@@ -77,6 +78,7 @@ from .services import textos_padrao_templates
 def _get_plano(pk) -> PlanoTrabalho:
     return get_object_or_404(
         PlanoTrabalho.objects.select_related(
+            "evento",
             "programa",
             "destino_estado",
             "destino_cidade__estado",
@@ -92,6 +94,26 @@ def _wizard_normalizar_acao(post, *, default: str = "wizard_next") -> str:
     if action == "save_continue":
         return "wizard_next"
     return action
+
+
+def _evento_etapa_url(evento_id):
+    if evento_id:
+        return reverse("eventos:guiado_etapa", kwargs={"pk": evento_id, "etapa": 4})
+    return ""
+
+
+def _plano_lista_url(plano=None):
+    return _evento_etapa_url(getattr(plano, "evento_id", None)) or reverse("planos_trabalho:index")
+
+
+def _plano_lista_label(plano=None):
+    return "Dados do evento" if getattr(plano, "evento_id", None) else "Voltar a lista"
+
+
+def _redirect_plano_lista(plano):
+    if getattr(plano, "evento_id", None):
+        return redirect("eventos:guiado_etapa", pk=plano.evento_id, etapa=4)
+    return redirect("planos_trabalho:index")
 
 
 def _wizard_steps_ctx(*, plano=None, etapa_atual="identificacao"):
@@ -114,8 +136,8 @@ def _wizard_shell_ctx(*, plano=None, etapa_atual):
         "wizard_header": apresentar_plano_wizard_header(etapa_atual, plano=plano),
         "wizard_summary": apresentar_plano_wizard_summary(plano) if plano else None,
         "plano": plano,
-        "wizard_back_url": reverse("planos_trabalho:index"),
-        "wizard_back_label": "Voltar à lista",
+        "wizard_back_url": _plano_lista_url(plano),
+        "wizard_back_label": _plano_lista_label(plano),
         **_wizard_steps_ctx(plano=plano, etapa_atual=etapa_atual),
     }
 
@@ -286,7 +308,8 @@ def index(request):
 
 
 def novo(request):
-    plano = criar_plano_rascunho()
+    evento = resolve_evento_from_request(request)
+    plano = criar_plano_rascunho(evento=evento)
     messages.success(request, f"Plano de Trabalho {plano.numero_formatado} criado como rascunho.")
     return redirect("planos_trabalho:wizard_identificacao", pk=plano.pk)
 
@@ -359,7 +382,7 @@ def wizard_identificacao(request, pk):
                 return redirect("planos_trabalho:wizard_efetivo_diarias", pk=plano.pk)
             if nav_action == "save_draft_list":
                 messages.success(request, "Plano salvo. Retornamos à lista.")
-                return redirect("planos_trabalho:index")
+                return _redirect_plano_lista(plano)
             messages.success(request, "Identificação salva.")
             return redirect("planos_trabalho:wizard_identificacao", pk=plano.pk)
     else:
@@ -578,7 +601,7 @@ def wizard_efetivo_diarias(request, pk):
                 return redirect("planos_trabalho:wizard_atividades", pk=plano.pk)
             if nav_action == "save_draft_list":
                 messages.success(request, "Plano salvo. Retornamos à lista.")
-                return redirect("planos_trabalho:index")
+                return _redirect_plano_lista(plano)
             messages.success(request, "Efetivo e diárias salvos.")
             return redirect("planos_trabalho:wizard_efetivo_diarias", pk=plano.pk)
     return render(
@@ -857,7 +880,7 @@ def wizard_atividades(request, pk):
             return redirect("planos_trabalho:wizard_efetivo_diarias", pk=plano.pk)
         if nav_action == "save_draft_list":
             messages.success(request, "Plano salvo. Retornamos à lista.")
-            return redirect("planos_trabalho:index")
+            return _redirect_plano_lista(plano)
         if nav_action == "wizard_next":
             messages.success(request, "Atividades salvas. Continue com o resumo e os documentos.")
             return redirect("planos_trabalho:wizard_documentos", pk=plano.pk)
@@ -985,12 +1008,12 @@ def wizard_documentos(request, pk):
                 return redirect("planos_trabalho:wizard_documentos", pk=pk)
             marcar_plano_gerado(plano)
             messages.success(request, "Plano de trabalho finalizado com sucesso.")
-            return redirect("planos_trabalho:index")
+            return _redirect_plano_lista(plano)
         if nav_action == "wizard_back":
             return redirect("planos_trabalho:wizard_atividades", pk=pk)
         if nav_action == "save_draft_list":
             messages.success(request, "Retornamos à lista de planos.")
-            return redirect("planos_trabalho:index")
+            return _redirect_plano_lista(plano)
         return redirect("planos_trabalho:wizard_documentos", pk=pk)
 
     resumo_diarias = montar_valor_do_plano_texto(plano)
@@ -1079,8 +1102,11 @@ def excluir(request, pk):
     plano = _get_plano(pk)
     if request.method == "POST":
         numero = plano.numero_formatado
+        evento_id = plano.evento_id
         plano.delete()
         messages.success(request, f"Plano de Trabalho {numero} excluído.")
+        if evento_id:
+            return redirect("eventos:guiado_etapa", pk=evento_id, etapa=4)
         return redirect("planos_trabalho:index")
     return render(
         request,
@@ -1088,7 +1114,7 @@ def excluir(request, pk):
         {
             "page_title": "Excluir plano de trabalho",
             "plano": plano,
-            "cancel_url": reverse("planos_trabalho:index"),
+            "cancel_url": _plano_lista_url(plano),
         },
     )
 

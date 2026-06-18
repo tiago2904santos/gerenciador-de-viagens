@@ -13,7 +13,7 @@
 {% block content %}
   {{ oficios_summary|json_script:"termos-oficios-summary" }}
   <div class="page-shell termos-page">
-    {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="TERMOS" title=page_title description="Cadastro independente de termo de autorizacao" icon_label="TM" module_label="Termos" back_label="Voltar a lista" back_url=index_url only %}
+    {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="TERMOS" title=page_title description="Cadastro independente de termo de autorizacao" icon_label="TM" module_label="Termos" back_label=back_label back_url=index_url only %}
 
     <form
       method="post"

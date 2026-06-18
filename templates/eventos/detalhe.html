@@ -1,82 +1,263 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}{{ page_title }}{% endblock %}
 
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260618-eventos">
+  <link rel="stylesheet" href="{% static 'css/roteiros-list.css' %}?v=20260618-eventos">
+  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260618-eventos">
+  <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260618-eventos">
+  <link rel="stylesheet" href="{% static 'css/planos-trabalho-eventos.css' %}?v=20260618-eventos">
+{% endblock %}
+
 {% block content %}
-  <div class="page-shell page-shell--standard-simple">
-    {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="EVENTOS" title=evento.titulo description=evento.periodo_display icon_label="EV" module_label="Eventos" back_label="Voltar à lista" back_url="/eventos/" only %}
+  <div class="page-shell page-shell--wizard oficio-wizard app-wizard">
+    {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="CADASTRO DE OFICIO" title=evento.titulo description=evento.periodo_display icon_label="EV" module_label="Eventos" back_label="Voltar para lista" back_url="/eventos/" status_label=evento.get_status_display status_variant="active" only %}
 
-    <main class="main-form-panel">
+    {% if evento_chips %}
       <section class="cv-wizard-section-card">
-        <header class="cv-wizard-section-header">
-          <div class="cv-wizard-section-header__copy">
-            <h2 class="cv-wizard-section-title">Resumo do evento</h2>
-            <p class="cv-wizard-section-subtitle">{{ evento.destino_display }}</p>
-          </div>
-          <div class="cv-wizard-section-header__actions">
-            <a class="cv-btn cv-btn--secondary" href="{% url 'eventos:editar' evento.pk %}"><span>Editar evento</span></a>
-          </div>
-        </header>
-        <div class="cv-wizard-section-body">
-          <p>{{ evento.descricao|default:"Sem descrição informada." }}</p>
-          <p>Ofícios vinculados: {{ evento.oficios.count }}</p>
-        </div>
-      </section>
-
-      <section class="cv-wizard-section-card">
-        <header class="cv-wizard-section-header">
-          <div class="cv-wizard-section-header__copy">
-            <h2 class="cv-wizard-section-title">Prestação de Contas</h2>
-            <p class="cv-wizard-section-subtitle">Status: {{ prestacao_context.status }}</p>
-          </div>
-        </header>
         <div class="cv-wizard-section-body">
           <div class="field-grid">
-            <div class="field field-size-2">
-              <h3>Relatório técnico</h3>
-              {% if prestacao_context.relatorio %}
-                <p>{{ prestacao_context.relatorio.get_status_display }}</p>
-                <a class="cv-btn cv-btn--secondary" href="{% url 'prestacoes:editar_relatorio' prestacao_context.relatorio.pk %}"><span>Abrir relatório técnico</span></a>
-              {% else %}
-                <p>Não criado.</p>
-                <a class="cv-btn cv-btn--primary" href="{% url 'prestacoes:criar_relatorio_evento' evento.pk %}"><span>Criar relatório técnico</span></a>
-              {% endif %}
-            </div>
-            <div class="field field-size-2">
-              <h3>Diário de bordo</h3>
-              {% if prestacao_context.diario %}
-                <p>{{ prestacao_context.diario.get_status_display }} - {{ prestacao_context.diario.registros.count }} registro(s)</p>
-                <a class="cv-btn cv-btn--secondary" href="{% url 'prestacoes:editar_diario' prestacao_context.diario.pk %}"><span>Abrir diário de bordo</span></a>
-              {% else %}
-                <p>Não criado.</p>
-                <a class="cv-btn cv-btn--primary" href="{% url 'prestacoes:criar_diario_evento' evento.pk %}"><span>Criar diário de bordo</span></a>
-              {% endif %}
-            </div>
             <div class="field field-size-4">
-              <h3>Prestação</h3>
-              {% if prestacao_context.prestacao %}
-                <p>{{ prestacao_context.prestacao.get_status_display }}</p>
-                <a class="cv-btn cv-btn--secondary" href="{% url 'prestacoes:editar_prestacao' prestacao_context.prestacao.pk %}"><span>Abrir prestação de contas</span></a>
-              {% else %}
-                <p>Não criada.</p>
-                <a class="cv-btn cv-btn--primary" href="{% url 'prestacoes:prestacao_evento' evento.pk %}"><span>Criar prestação de contas</span></a>
-              {% endif %}
-            </div>
-            <div class="field field-size-4">
-              <h3>Pendências</h3>
-              {% if prestacao_context.pendencias %}
-                <ul>
-                  {% for pendencia in prestacao_context.pendencias %}
-                    <li>{{ pendencia }}</li>
-                  {% endfor %}
-                </ul>
-              {% else %}
-                <p>Nenhuma pendência básica identificada.</p>
-              {% endif %}
+              {% for chip in evento_chips %}
+                {% include "components/ui/badges/chip.html" with label=chip.label variant=chip.variant only %}
+              {% endfor %}
             </div>
           </div>
         </div>
       </section>
+    {% endif %}
+
+    {% include "components/ui/navigation/page_stepper.html" with steps=evento_page_steps aria_label="Etapas do evento" only %}
+
+    <main class="main-form-panel main-form-panel--stack oficio-wizard__main">
+      <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
+        {% if etapa_atual == 1 %}
+          <section class="cv-wizard-section-card">
+            <header class="cv-wizard-section-header">
+              <div class="cv-wizard-section-header__copy">
+                <h2 class="cv-wizard-section-title">Dados do evento</h2>
+                <p class="cv-wizard-section-subtitle">{{ evento.destino_display }}</p>
+              </div>
+              <div class="cv-wizard-section-header__actions">
+                <a class="cv-btn cv-btn--secondary" href="{% url 'eventos:editar' evento.pk %}"><span>Editar evento</span></a>
+              </div>
+            </header>
+            <div class="cv-wizard-section-body">
+              <div class="field-grid">
+                <div class="field field-size-2">
+                  <div class="pt-resumo-box">
+                    <span class="pt-resumo-box__label">Periodo</span>
+                    <span class="pt-resumo-box__value">{{ evento.periodo_display }}</span>
+                  </div>
+                </div>
+                <div class="field field-size-2">
+                  <div class="pt-resumo-box">
+                    <span class="pt-resumo-box__label">Destino</span>
+                    <span class="pt-resumo-box__value">{{ evento.destino_display }}</span>
+                  </div>
+                </div>
+                <div class="field field-size-4">
+                  <div class="pt-resumo-box">
+                    <span class="pt-resumo-box__label">Contexto</span>
+                    <span class="pt-resumo-box__value">{{ evento.descricao|default:"Sem descricao informada." }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        {% endif %}
+
+        {% if etapa_atual == 2 %}
+          <section class="cv-wizard-section-card">
+            <header class="cv-wizard-section-header">
+              <div class="cv-wizard-section-header__copy">
+                <h2 class="cv-wizard-section-title">Roteiros</h2>
+                <p class="cv-wizard-section-subtitle">Rotas e diarias vinculadas a este evento.</p>
+              </div>
+              <div class="cv-wizard-section-header__actions">
+                {% include "components/ui/buttons/button.html" with href=create_urls.roteiro label="Novo roteiro" variant="primary" icon="plus" only %}
+              </div>
+            </header>
+            <div class="cv-wizard-section-body">
+              <div class="list-content list-grid list-grid--roteiros app-list-grid">
+                {% for card in roteiro_cards %}
+                  {% include "components/lists/main_list_card.html" with card=card only %}
+                {% empty %}
+                  {% include "components/lists/list_empty.html" with message="Nenhum roteiro vinculado a este evento." action_label="Novo roteiro" action_url=create_urls.roteiro only %}
+                {% endfor %}
+              </div>
+            </div>
+          </section>
+        {% endif %}
+
+        {% if etapa_atual == 3 %}
+          <section class="cv-wizard-section-card">
+            <header class="cv-wizard-section-header">
+              <div class="cv-wizard-section-header__copy">
+                <h2 class="cv-wizard-section-title">Oficios / Justificativas</h2>
+                <p class="cv-wizard-section-subtitle">Oficios oficiais e justificativas geradas no fluxo de oficio.</p>
+              </div>
+              <div class="cv-wizard-section-header__actions">
+                {% include "components/ui/buttons/button.html" with href=create_urls.oficio label="Novo oficio" variant="primary" icon="plus" only %}
+              </div>
+            </header>
+            <div class="cv-wizard-section-body">
+              <div class="list-content app-list-grid">
+                {% for card in oficio_cards %}
+                  {% include "oficios/partials/oficio_list_card.html" with card=card only %}
+                {% empty %}
+                  {% include "components/lists/list_empty.html" with message="Nenhum oficio vinculado a este evento." action_label="Novo oficio" action_url=create_urls.oficio only %}
+                {% endfor %}
+              </div>
+            </div>
+          </section>
+        {% endif %}
+
+        {% if etapa_atual == 4 %}
+          <section class="cv-wizard-section-card">
+            <header class="cv-wizard-section-header">
+              <div class="cv-wizard-section-header__copy">
+                <h2 class="cv-wizard-section-title">PT / OS</h2>
+                <p class="cv-wizard-section-subtitle">Planos de trabalho e ordens de servico do evento.</p>
+              </div>
+              <div class="cv-wizard-section-header__actions">
+                {% include "components/ui/buttons/button.html" with href=create_urls.plano label="Novo plano" variant="primary" icon="plus" only %}
+                {% include "components/ui/buttons/button.html" with href=create_urls.ordem label="Nova OS" variant="secondary" icon="plus" only %}
+              </div>
+            </header>
+            <div class="cv-wizard-section-body">
+              <div class="list-content app-list-grid">
+                {% for card in plano_cards %}
+                  {% include "planos_trabalho/partials/plano_list_card.html" with card=card only %}
+                {% endfor %}
+                {% for ordem in ordens %}
+                  <article class="os-list-card">
+                    <div class="os-list-card__info">
+                      <h3 class="os-list-card__title">{{ ordem.numero_formatado }}</h3>
+                      <p class="os-list-card__meta">{{ ordem.periodo_display }}</p>
+                      <p class="os-list-card__meta">{{ ordem.destinos_display }}</p>
+                      <p class="os-list-card__meta">Servidores: {{ ordem.servidores.count }}</p>
+                    </div>
+                    <div class="os-list-card__actions">
+                      <a class="cv-btn cv-btn--secondary" href="{% url 'ordens_servico:editar' ordem.pk %}"><span>Abrir</span></a>
+                    </div>
+                  </article>
+                {% endfor %}
+                {% if not plano_cards and not ordens %}
+                  {% include "components/lists/list_empty.html" with message="Nenhum plano ou OS vinculado a este evento." action_label="Novo plano" action_url=create_urls.plano only %}
+                {% endif %}
+              </div>
+            </div>
+          </section>
+        {% endif %}
+
+        {% if etapa_atual == 5 %}
+          <section class="cv-wizard-section-card">
+            <header class="cv-wizard-section-header">
+              <div class="cv-wizard-section-header__copy">
+                <h2 class="cv-wizard-section-title">Termos</h2>
+                <p class="cv-wizard-section-subtitle">Termos de autorizacao vinculados ao evento.</p>
+              </div>
+              <div class="cv-wizard-section-header__actions">
+                {% include "components/ui/buttons/button.html" with href=create_urls.termo label="Novo termo" variant="primary" icon="plus" only %}
+              </div>
+            </header>
+            <div class="cv-wizard-section-body">
+              <div class="termos-list">
+                {% for termo in termos %}
+                  <article class="termo-list-card">
+                    <div>
+                      <h3 class="termo-list-card__title">{{ termo.destino_display }}</h3>
+                      <p class="termo-list-card__meta">
+                        {{ termo.periodo_display }}
+                        {% if termo.oficio_id %} - Oficio {{ termo.oficio.numero_formatado }}{% endif %}
+                      </p>
+                      <p class="termo-list-card__meta">
+                        Servidores:
+                        {% if termo.servidores.exists %}
+                          {{ termo.servidores.count }}
+                        {% elif termo.oficio_id %}
+                          fallback do oficio
+                        {% else %}
+                          sem servidor
+                        {% endif %}
+                        {% if termo.viatura_id %} - Viatura {{ termo.viatura }}{% endif %}
+                      </p>
+                    </div>
+                    <div class="termo-list-card__actions">
+                      <a class="cv-btn cv-btn--secondary" href="{% url 'termos:editar' termo.pk %}"><span>Abrir</span></a>
+                      <a class="cv-btn cv-btn--secondary" href="{% url 'termos:preview_cadastro' termo.pk %}"><span>Preview</span></a>
+                    </div>
+                  </article>
+                {% empty %}
+                  <div class="termos-empty">
+                    <h3>Nenhum termo vinculado</h3>
+                    <p>Use o cadastro oficial de termos para criar o documento deste evento.</p>
+                    {% include "components/ui/buttons/button.html" with href=create_urls.termo label="Novo termo" variant="primary" only %}
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          </section>
+
+          <section class="cv-wizard-section-card">
+            <header class="cv-wizard-section-header">
+              <div class="cv-wizard-section-header__copy">
+                <h2 class="cv-wizard-section-title">Prestacao de contas</h2>
+                <p class="cv-wizard-section-subtitle">Status: {{ prestacao_context.status }}</p>
+              </div>
+            </header>
+            <div class="cv-wizard-section-body">
+              <div class="field-grid">
+                <div class="field field-size-2">
+                  <h3>Relatorio tecnico</h3>
+                  {% if prestacao_context.relatorio %}
+                    <p>{{ prestacao_context.relatorio.get_status_display }}</p>
+                    <a class="cv-btn cv-btn--secondary" href="{% url 'prestacoes:editar_relatorio' prestacao_context.relatorio.pk %}"><span>Abrir relatorio tecnico</span></a>
+                  {% else %}
+                    <p>Nao criado.</p>
+                    <a class="cv-btn cv-btn--primary" href="{% url 'prestacoes:criar_relatorio_evento' evento.pk %}"><span>Criar relatorio tecnico</span></a>
+                  {% endif %}
+                </div>
+                <div class="field field-size-2">
+                  <h3>Diario de bordo</h3>
+                  {% if prestacao_context.diario %}
+                    <p>{{ prestacao_context.diario.get_status_display }} - {{ prestacao_context.diario.registros.count }} registro(s)</p>
+                    <a class="cv-btn cv-btn--secondary" href="{% url 'prestacoes:editar_diario' prestacao_context.diario.pk %}"><span>Abrir diario de bordo</span></a>
+                  {% else %}
+                    <p>Nao criado.</p>
+                    <a class="cv-btn cv-btn--primary" href="{% url 'prestacoes:criar_diario_evento' evento.pk %}"><span>Criar diario de bordo</span></a>
+                  {% endif %}
+                </div>
+                <div class="field field-size-4">
+                  <h3>Prestacao</h3>
+                  {% if prestacao_context.prestacao %}
+                    <p>{{ prestacao_context.prestacao.get_status_display }}</p>
+                    <a class="cv-btn cv-btn--secondary" href="{% url 'prestacoes:editar_prestacao' prestacao_context.prestacao.pk %}"><span>Abrir prestacao de contas</span></a>
+                  {% else %}
+                    <p>Nao criada.</p>
+                    <a class="cv-btn cv-btn--primary" href="{% url 'prestacoes:prestacao_evento' evento.pk %}"><span>Criar prestacao de contas</span></a>
+                  {% endif %}
+                </div>
+                <div class="field field-size-4">
+                  <h3>Pendencias</h3>
+                  {% if prestacao_context.pendencias %}
+                    <ul>
+                      {% for pendencia in prestacao_context.pendencias %}
+                        <li>{{ pendencia }}</li>
+                      {% endfor %}
+                    </ul>
+                  {% else %}
+                    <p>Nenhuma pendencia basica identificada.</p>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </section>
+        {% endif %}
+      </div>
     </main>
   </div>
 {% endblock %}

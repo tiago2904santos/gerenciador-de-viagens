@@ -1,5 +1,8 @@
 import json
 import logging
+from datetime import datetime
+from datetime import time
+from urllib.parse import urlencode
 
 from django.contrib import messages
 from django.http import Http404, JsonResponse
@@ -14,6 +17,8 @@ from core.autosave import (
     filter_allowed_fields,
     parse_autosave_payload,
 )
+from eventos.services import build_evento_document_seed
+from eventos.services import resolve_evento_from_request
 from .services.routing.route_exceptions import (
     RouteAuthenticationError,
     RouteConfigurationError,
@@ -64,6 +69,52 @@ from .services.estimativa_local import ROTA_FONTE_ESTIMATIVA_LOCAL
 from .services.routing.trecho_route_service import calcular_rota_trecho
 
 
+def _evento_etapa_url(evento_id):
+    if evento_id:
+        return reverse("eventos:guiado_etapa", kwargs={"pk": evento_id, "etapa": 2})
+    return ""
+
+
+def _roteiro_return_url(roteiro=None, evento=None):
+    evento_id = getattr(evento, "pk", None) or getattr(roteiro, "evento_id", None)
+    return _evento_etapa_url(evento_id) or reverse("roteiros:index")
+
+
+def _roteiro_form_action(request, evento=None):
+    if evento is None:
+        return request.path
+    return f"{request.path}?{urlencode({'evento': evento.pk})}"
+
+
+def _initial_roteiro_evento(evento):
+    initial = obter_initial_roteiro()
+    if evento is None:
+        return initial
+    seed = build_evento_document_seed(evento)
+    cidade = seed.get("cidade")
+    estado = seed.get("estado")
+    if estado:
+        initial["destino_estado"] = estado.pk
+        initial["destino_estado_id"] = estado.pk
+    if cidade:
+        initial["destino_cidade"] = cidade.pk
+        initial["destino_cidade_id"] = cidade.pk
+    inicio = seed.get("data_inicio")
+    fim = seed.get("data_fim") or inicio
+    if inicio:
+        saida_hora = evento.horario_inicio or time(8, 0)
+        saida_dt = datetime.combine(inicio, saida_hora)
+        initial["saida_dt"] = saida_dt
+        initial["saida_data"] = inicio.isoformat()
+    if fim:
+        retorno_hora = evento.horario_fim or time(16, 0)
+        retorno_dt = datetime.combine(fim, retorno_hora)
+        initial["retorno_saida_dt"] = retorno_dt
+        initial["retorno_data"] = fim.isoformat()
+    initial["seed_source_label"] = "Pre-preenchido pelo evento."
+    return initial
+
+
 def index(request):
     q = request.GET.get("q", "").strip()
     status = request.GET.get("status", "").strip()
@@ -88,9 +139,11 @@ def index(request):
 
 
 def novo(request):
-    initial = obter_initial_roteiro()
+    evento = resolve_evento_from_request(request)
+    initial = _initial_roteiro_evento(evento)
     form = RoteiroForm(request.POST or None, initial=initial)
-    form.instance.tipo = Roteiro.TIPO_AVULSO
+    form.instance.evento = evento
+    form.instance.tipo = Roteiro.TIPO_EVENTO if evento is not None else Roteiro.TIPO_AVULSO
     if request.method != "POST" and initial:
         form.instance.origem_cidade_id = initial.get("origem_cidade")
         form.instance.origem_estado_id = initial.get("origem_estado")
@@ -105,8 +158,10 @@ def novo(request):
             request.POST, route_state_map, roteiro=None
         )
         if form.is_valid() and validated["ok"]:
-            roteiro = criar_roteiro(form, roteiro_state, validated, diarias_resultado)
+            roteiro = criar_roteiro(form, roteiro_state, validated, diarias_resultado, evento=evento)
             messages.success(request, "Roteiro cadastrado com sucesso.")
+            if evento is not None:
+                return redirect("eventos:guiado_etapa", pk=evento.pk, etapa=2)
             return redirect("roteiros:detalhe", pk=roteiro.pk)
         for error in validated.get("errors", []):
             form.add_error(None, error)
@@ -117,7 +172,7 @@ def novo(request):
         )
 
     context = apresentar_contexto_formulario_roteiro_avulso(
-        evento=None,
+        evento=evento,
         form=form,
         obj=None,
         destinos_atuais=destinos_atuais,
@@ -131,17 +186,18 @@ def novo(request):
         {
             "page_title": "Novo roteiro",
             "page_description": "Sede, destinos, trechos, retorno e diárias no mesmo fluxo do legacy.",
-            "back_url": reverse("roteiros:index"),
+            "back_url": _roteiro_return_url(evento=evento),
             "wizard_header": {
                 "title": "Novo roteiro",
                 "description": "Roteiro e diárias",
                 "status_label": "",
                 "status_variant": "",
             },
-            "wizard_back_label": "Voltar para lista",
-            "wizard_back_url": reverse("roteiros:index"),
+            "wizard_back_label": "Dados do evento" if evento is not None else "Voltar para lista",
+            "wizard_back_url": _roteiro_return_url(evento=evento),
             "wizard_page_steps": [],
             "roteiro_editor_oficio": True,
+            "roteiro_form_action": _roteiro_form_action(request, evento),
             **context,
         },
     )
@@ -150,15 +206,19 @@ def novo(request):
 def detalhe(request, pk):
     roteiro = get_roteiro_by_id(pk)
     trechos = listar_trechos_do_roteiro(roteiro)
+    context = apresentar_pagina_detalhe_roteiro(roteiro, trechos)
+    if roteiro.evento_id:
+        context["back_url"] = _roteiro_return_url(roteiro=roteiro)
     return render(
         request,
         "roteiros/detail.html",
-        apresentar_pagina_detalhe_roteiro(roteiro, trechos),
+        context,
     )
 
 
 def editar(request, pk):
     roteiro = get_roteiro_by_id(pk)
+    evento = roteiro.evento if roteiro.evento_id else None
     form = RoteiroForm(request.POST or None, instance=roteiro)
 
     preparar_querysets_formulario_roteiro(
@@ -173,6 +233,8 @@ def editar(request, pk):
         if form.is_valid() and validated["ok"]:
             atualizar_roteiro(roteiro, form, roteiro_state, validated, diarias_resultado)
             messages.success(request, "Roteiro atualizado com sucesso.")
+            if roteiro.evento_id:
+                return redirect("eventos:guiado_etapa", pk=roteiro.evento_id, etapa=2)
             return redirect("roteiros:detalhe", pk=roteiro.pk)
         for error in validated.get("errors", []):
             form.add_error(None, error)
@@ -183,7 +245,7 @@ def editar(request, pk):
         )
 
     context = apresentar_contexto_formulario_roteiro_avulso(
-        evento=None,
+        evento=evento,
         form=form,
         obj=roteiro,
         destinos_atuais=destinos_atuais,
@@ -199,7 +261,7 @@ def editar(request, pk):
         {
             "page_title": "Editar roteiro",
             "page_description": "Ajuste sede, destinos, trechos e retorno.",
-            "back_url": reverse("roteiros:detalhe", args=[roteiro.pk]),
+            "back_url": _roteiro_return_url(roteiro=roteiro) if roteiro.evento_id else reverse("roteiros:detalhe", args=[roteiro.pk]),
             "delete_url": reverse("roteiros:excluir", args=[roteiro.pk]),
             "wizard_header": {
                 "title": "Editar roteiro",
@@ -207,10 +269,11 @@ def editar(request, pk):
                 "status_label": roteiro_status_label,
                 "status_variant": roteiro_status_variant,
             },
-            "wizard_back_label": "Voltar para detalhes",
-            "wizard_back_url": reverse("roteiros:detalhe", args=[roteiro.pk]),
+            "wizard_back_label": "Dados do evento" if roteiro.evento_id else "Voltar para detalhes",
+            "wizard_back_url": _roteiro_return_url(roteiro=roteiro) if roteiro.evento_id else reverse("roteiros:detalhe", args=[roteiro.pk]),
             "wizard_page_steps": [],
             "roteiro_editor_oficio": True,
+            "roteiro_form_action": request.path,
             **context,
         },
     )
@@ -218,11 +281,16 @@ def editar(request, pk):
 
 def excluir(request, pk):
     roteiro = get_roteiro_by_id(pk)
+    evento_id = roteiro.evento_id
     if request.method == "POST":
         if not excluir_roteiro(roteiro):
             messages.error(request, "Este roteiro possui vínculos e não pode ser excluído.")
+            if evento_id:
+                return redirect("eventos:guiado_etapa", pk=evento_id, etapa=2)
             return redirect("roteiros:detalhe", pk=roteiro.pk)
         messages.success(request, "Roteiro excluído com sucesso.")
+        if evento_id:
+            return redirect("eventos:guiado_etapa", pk=evento_id, etapa=2)
         return redirect("roteiros:index")
 
     return render(
@@ -232,7 +300,7 @@ def excluir(request, pk):
             "page_title": "Excluir roteiro",
             "page_description": "Confirme a exclusão do roteiro selecionado.",
             "object": roteiro,
-            "back_url": reverse("roteiros:detalhe", args=[roteiro.pk]),
+            "back_url": _roteiro_return_url(roteiro=roteiro) if evento_id else reverse("roteiros:detalhe", args=[roteiro.pk]),
         },
     )
 
@@ -487,6 +555,7 @@ def calcular_rota_preview(request):
 
 @require_http_methods(["POST"])
 def roteiro_autosave_create(request):
+    evento = resolve_evento_from_request(request)
     try:
         payload = parse_autosave_payload(request, expected_model="roteiro")
     except AutosavePayloadError as exc:
@@ -497,6 +566,10 @@ def roteiro_autosave_create(request):
         return autosave_json_response(ok=False, message="Conteúdo insuficiente para criar rascunho.")
 
     roteiro = build_roteiro_draft()
+    if evento is not None:
+        roteiro.evento = evento
+        roteiro.tipo = Roteiro.TIPO_EVENTO
+        roteiro.save(update_fields=["evento", "tipo", "updated_at"])
     version = apply_roteiro_autosave(roteiro, clean_fields, payload.snapshots)
     return autosave_json_response(ok=True, object_id=roteiro.pk, created=True, version=version)
 

@@ -1,4 +1,5 @@
 {% load static %}
+{% url 'roteiros:roteiro-autosave-create' as roteiro_autosave_create_url %}
 
 <div class="roteiro-wizard__editor {% if is_avulso %}roteiro-editor--avulso{% endif %}{% if roteiro_editor_oficio %} roteiro-editor--oficio{% endif %}" data-glance-state="closed">
     <form method="post" id="roteiro-editor-form" novalidate class="roteiro-wizard__form"
@@ -6,7 +7,7 @@
           data-autosave="true"
           data-autosave-model="roteiro"
           data-autosave-url="{% if object %}{% url 'roteiros:roteiro-autosave' object.pk %}{% endif %}"
-          data-autosave-create-url="{% url 'roteiros:roteiro-autosave-create' %}"
+          data-autosave-create-url="{{ roteiro_autosave_create_url }}{% if evento %}?evento={{ evento.pk }}{% endif %}"
           data-autosave-edit-url-template="/roteiros/__ID__/autosave/"
           data-autosave-object-id="{{ object.pk|default:'' }}"
           data-api-cidades-url="{{ api_cidades_por_estado_url }}"

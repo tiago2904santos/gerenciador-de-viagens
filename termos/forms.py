@@ -158,6 +158,9 @@ class TermoAutorizacaoForm(forms.ModelForm):
         if self.is_bound:
             cidade_id = self.data.get("destino_cidade") or None
             estado_id = self.data.get("destino_estado") or None
+        elif self.initial.get("destino_cidade") or self.initial.get("destino_estado"):
+            cidade_id = self.initial.get("destino_cidade") or None
+            estado_id = self.initial.get("destino_estado") or None
         elif self.instance and self.instance.pk:
             cidade_id = self.instance.destino_cidade_id
             estado_id = self.instance.destino_estado_id
