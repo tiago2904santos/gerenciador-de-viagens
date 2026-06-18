@@ -123,6 +123,13 @@ class Roteiro(models.Model):
         choices=TIPO_CHOICES,
         default=TIPO_AVULSO,
     )
+    evento = models.ForeignKey(
+        "eventos.Evento",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="roteiros",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

@@ -12,6 +12,13 @@ from oficios.models import Oficio
 class OrdemServico(TimeStampedModel):
     numero = models.PositiveIntegerField(null=True, blank=True, db_index=True)
     ano = models.PositiveIntegerField(null=True, blank=True, db_index=True)
+    evento = models.ForeignKey(
+        "eventos.Evento",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="ordens_servico",
+    )
     oficios = models.ManyToManyField(
         Oficio,
         blank=True,

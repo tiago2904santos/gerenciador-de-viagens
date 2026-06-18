@@ -41,6 +41,13 @@ class Oficio(TimeStampedModel):
     assunto = models.CharField(max_length=255, blank=True, default="")
     motivo = models.TextField(blank=True, default="")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_RASCUNHO)
+    evento = models.ForeignKey(
+        "eventos.Evento",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="oficios",
+    )
     roteiro = models.ForeignKey(
         Roteiro,
         on_delete=models.SET_NULL,

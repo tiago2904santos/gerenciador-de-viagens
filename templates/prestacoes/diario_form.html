@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Diário de Bordo{% endblock %}
+
+{% block content %}
+  <div class="page-shell page-shell--standard-simple">
+    {% if evento %}
+      {% url 'eventos:detalhe' evento.pk as back_url %}
+    {% else %}
+      {% url 'eventos:index' as back_url %}
+    {% endif %}
+    {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="PRESTAÇÃO" title="Diário de Bordo" description="Registros operacionais do deslocamento." icon_label="DB" module_label="Prestação de Contas" back_label="Voltar" back_url=back_url only %}
+
+    <form method="post">
+      {% csrf_token %}
+      <main class="main-form-panel">
+        <section class="cv-wizard-section-card">
+          <header class="cv-wizard-section-header">
+            <div class="cv-wizard-section-header__copy">
+              <h2 class="cv-wizard-section-title">Dados do diário</h2>
+              <p class="cv-wizard-section-subtitle">Base do diário vinculável ao evento ou reutilizável no futuro.</p>
+            </div>
+            {% if diario.pk %}
+              <div class="cv-wizard-section-header__actions">
+                <a class="cv-btn cv-btn--secondary" href="{% url 'prestacoes:adicionar_registro_diario' diario.pk %}"><span>Adicionar registro</span></a>
+              </div>
+            {% endif %}
+          </header>
+          <div class="cv-wizard-section-body">
+            {% if form.non_field_errors %}
+              {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
+            {% endif %}
+            <div class="field-grid">
+              {% include "components/forms/form_field.html" with field=form.evento size_class="field-size-4" only %}
+              {% include "components/forms/form_field.html" with field=form.titulo size_class="field-size-4" only %}
+              {% include "components/forms/form_field.html" with field=form.destino size_class="field-size-2" only %}
+              {% include "components/forms/form_field.html" with field=form.periodo size_class="field-size-2" only %}
+              {% include "components/forms/form_field.html" with field=form.status size_class="field-size-2" only %}
+              {% include "components/forms/form_field.html" with field=form.assinatura_status size_class="field-size-2" only %}
+            </div>
+          </div>
+        </section>
+
+        {% if diario.pk %}
+          <section class="cv-wizard-section-card">
+            <header class="cv-wizard-section-header">
+              <div class="cv-wizard-section-header__copy">
+                <h2 class="cv-wizard-section-title">Registros</h2>
+                <p class="cv-wizard-section-subtitle">{{ diario.registros.count }} registro(s) no diário.</p>
+              </div>
+            </header>
+            <div class="cv-wizard-section-body">
+              {% for registro in diario.registros.all %}
+                <p>{{ registro.data|date:"d/m/Y" }} - {{ registro.origem|default:"Origem não informada" }} para {{ registro.destino|default:"Destino não informado" }}</p>
+              {% empty %}
+                <p>Nenhum registro adicionado.</p>
+              {% endfor %}
+            </div>
+          </section>
+        {% endif %}
+
+        <section class="cv-wizard-section-card">
+          <div class="cv-wizard-section-body">
+            <div class="termo-actions termo-actions--footer">
+              {% include "components/ui/buttons/button.html" with type="submit" label="Salvar diário" variant="primary" only %}
+              {% include "components/ui/buttons/button.html" with href=back_url label="Cancelar" variant="secondary" only %}
+            </div>
+          </div>
+        </section>
+      </main>
+    </form>
+  </div>
+{% endblock %}

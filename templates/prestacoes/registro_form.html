@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Registro do Diário{% endblock %}
+
+{% block content %}
+  <div class="page-shell page-shell--standard-simple">
+    {% url 'prestacoes:editar_diario' diario.pk as back_url %}
+    {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="PRESTAÇÃO" title="Registro do Diário" description=diario.titulo icon_label="DB" module_label="Prestação de Contas" back_label="Voltar ao diário" back_url=back_url only %}
+
+    <form method="post">
+      {% csrf_token %}
+      <main class="main-form-panel">
+        <section class="cv-wizard-section-card">
+          <header class="cv-wizard-section-header">
+            <div class="cv-wizard-section-header__copy">
+              <h2 class="cv-wizard-section-title">Dados do registro</h2>
+              <p class="cv-wizard-section-subtitle">Informe deslocamento, quilometragem e atividades.</p>
+            </div>
+          </header>
+          <div class="cv-wizard-section-body">
+            {% if form.non_field_errors %}
+              {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
+            {% endif %}
+            <div class="field-grid">
+              {% include "components/forms/form_field.html" with field=form.data size_class="field-size-2" only %}
+              {% include "components/forms/form_field.html" with field=form.hora_saida size_class="field-size-1" only %}
+              {% include "components/forms/form_field.html" with field=form.hora_chegada size_class="field-size-1" only %}
+              {% include "components/forms/form_field.html" with field=form.origem size_class="field-size-2" only %}
+              {% include "components/forms/form_field.html" with field=form.destino size_class="field-size-2" only %}
+              {% include "components/forms/form_field.html" with field=form.viatura size_class="field-size-2" only %}
+              {% include "components/forms/form_field.html" with field=form.motorista size_class="field-size-2" only %}
+              {% include "components/forms/form_field.html" with field=form.km_inicial size_class="field-size-2" only %}
+              {% include "components/forms/form_field.html" with field=form.km_final size_class="field-size-2" only %}
+              {% include "components/forms/form_field.html" with field=form.atividades size_class="field-size-4" only %}
+              {% include "components/forms/form_field.html" with field=form.observacoes size_class="field-size-4" only %}
+            </div>
+          </div>
+        </section>
+
+        <section class="cv-wizard-section-card">
+          <div class="cv-wizard-section-body">
+            <div class="termo-actions termo-actions--footer">
+              {% include "components/ui/buttons/button.html" with type="submit" label="Adicionar registro" variant="primary" only %}
+              {% include "components/ui/buttons/button.html" with href=back_url label="Cancelar" variant="secondary" only %}
+            </div>
+          </div>
+        </section>
+      </main>
+    </form>
+  </div>
+{% endblock %}

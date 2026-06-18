@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+  <div class="page-shell page-shell--standard-simple">
+    {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="EVENTOS" title=evento.titulo description=evento.periodo_display icon_label="EV" module_label="Eventos" back_label="Voltar à lista" back_url="/eventos/" only %}
+
+    <main class="main-form-panel">
+      <section class="cv-wizard-section-card">
+        <header class="cv-wizard-section-header">
+          <div class="cv-wizard-section-header__copy">
+            <h2 class="cv-wizard-section-title">Resumo do evento</h2>
+            <p class="cv-wizard-section-subtitle">{{ evento.destino_display }}</p>
+          </div>
+          <div class="cv-wizard-section-header__actions">
+            <a class="cv-btn cv-btn--secondary" href="{% url 'eventos:editar' evento.pk %}"><span>Editar evento</span></a>
+          </div>
+        </header>
+        <div class="cv-wizard-section-body">
+          <p>{{ evento.descricao|default:"Sem descrição informada." }}</p>
+          <p>Ofícios vinculados: {{ evento.oficios.count }}</p>
+        </div>
+      </section>
+
+      <section class="cv-wizard-section-card">
+        <header class="cv-wizard-section-header">
+          <div class="cv-wizard-section-header__copy">
+            <h2 class="cv-wizard-section-title">Prestação de Contas</h2>
+            <p class="cv-wizard-section-subtitle">Status: {{ prestacao_context.status }}</p>
+          </div>
+        </header>
+        <div class="cv-wizard-section-body">
+          <div class="field-grid">
+            <div class="field field-size-2">
+              <h3>Relatório técnico</h3>
+              {% if prestacao_context.relatorio %}
+                <p>{{ prestacao_context.relatorio.get_status_display }}</p>
+                <a class="cv-btn cv-btn--secondary" href="{% url 'prestacoes:editar_relatorio' prestacao_context.relatorio.pk %}"><span>Abrir relatório técnico</span></a>
+              {% else %}
+                <p>Não criado.</p>
+                <a class="cv-btn cv-btn--primary" href="{% url 'prestacoes:criar_relatorio_evento' evento.pk %}"><span>Criar relatório técnico</span></a>
+              {% endif %}
+            </div>
+            <div class="field field-size-2">
+              <h3>Diário de bordo</h3>
+              {% if prestacao_context.diario %}
+                <p>{{ prestacao_context.diario.get_status_display }} - {{ prestacao_context.diario.registros.count }} registro(s)</p>
+                <a class="cv-btn cv-btn--secondary" href="{% url 'prestacoes:editar_diario' prestacao_context.diario.pk %}"><span>Abrir diário de bordo</span></a>
+              {% else %}
+                <p>Não criado.</p>
+                <a class="cv-btn cv-btn--primary" href="{% url 'prestacoes:criar_diario_evento' evento.pk %}"><span>Criar diário de bordo</span></a>
+              {% endif %}
+            </div>
+            <div class="field field-size-4">
+              <h3>Prestação</h3>
+              {% if prestacao_context.prestacao %}
+                <p>{{ prestacao_context.prestacao.get_status_display }}</p>
+                <a class="cv-btn cv-btn--secondary" href="{% url 'prestacoes:editar_prestacao' prestacao_context.prestacao.pk %}"><span>Abrir prestação de contas</span></a>
+              {% else %}
+                <p>Não criada.</p>
+                <a class="cv-btn cv-btn--primary" href="{% url 'prestacoes:prestacao_evento' evento.pk %}"><span>Criar prestação de contas</span></a>
+              {% endif %}
+            </div>
+            <div class="field field-size-4">
+              <h3>Pendências</h3>
+              {% if prestacao_context.pendencias %}
+                <ul>
+                  {% for pendencia in prestacao_context.pendencias %}
+                    <li>{{ pendencia }}</li>
+                  {% endfor %}
+                </ul>
+              {% else %}
+                <p>Nenhuma pendência básica identificada.</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+{% endblock %}

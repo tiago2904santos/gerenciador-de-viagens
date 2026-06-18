@@ -3,11 +3,40 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block content %}
-  {% url "roteiros:index" as cta_url %}
   <div class="page-shell page-shell--standard-simple">
-    {% include "components/ui/headers/header_stack_simple.html" with eyebrow="EVENTOS" title=page_title description=page_description icon_label="EV" module_label="Eventos" only %}
+    {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="EVENTOS" title=page_title description=page_description icon_label="EV" module_label="Eventos" primary_action_label="Novo evento" primary_action_url=novo_url only %}
     <main class="main-form-panel">
-      {% include "components/feedback/module_placeholder.html" with title=page_title description=page_description eyebrow="Eventos" status="Em preparação" status_variant="success" dep_1="Definir vínculo opcional com documentos e ofícios" dep_2="Consolidar regras de agrupamento por evento" dep_3="Conectar agenda operacional com roteiros" cta_label="Abrir Roteiros" cta_url=cta_url only %}
+      <section class="cv-wizard-section-card">
+        <header class="cv-wizard-section-header">
+          <div class="cv-wizard-section-header__copy">
+            <h2 class="cv-wizard-section-title">Eventos cadastrados</h2>
+            <p class="cv-wizard-section-subtitle">Agrupadores opcionais para documentos, relatórios e prestação de contas.</p>
+          </div>
+        </header>
+        <div class="cv-wizard-section-body">
+          <div class="os-list">
+            {% for evento in eventos %}
+              <article class="os-list-card">
+                <div class="os-list-card__info">
+                  <h3 class="os-list-card__title">{{ evento.titulo }}</h3>
+                  <p class="os-list-card__meta">{{ evento.periodo_display }}</p>
+                  <p class="os-list-card__meta">{{ evento.destino_display }}</p>
+                  <p class="os-list-card__meta">Ofícios vinculados: {{ evento.oficios.count }}</p>
+                </div>
+                <div class="os-list-card__actions">
+                  <a class="cv-btn cv-btn--secondary" href="{% url 'eventos:detalhe' evento.pk %}"><span>Abrir</span></a>
+                </div>
+              </article>
+            {% empty %}
+              <div class="os-empty">
+                <h3>Nenhum evento cadastrado</h3>
+                <p>Crie um evento para agrupar documentos e iniciar a prestação de contas pós-evento.</p>
+                {% include "components/ui/buttons/button.html" with href=novo_url label="Criar primeiro evento" variant="primary" only %}
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </section>
     </main>
   </div>
 {% endblock %}

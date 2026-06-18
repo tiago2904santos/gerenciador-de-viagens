@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+  <div class="page-shell page-shell--standard-simple">
+    {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="EVENTOS" title=page_title description="Cadastro simples de agrupador documental." icon_label="EV" module_label="Eventos" back_label="Voltar à lista" back_url=index_url only %}
+
+    <form method="post">
+      {% csrf_token %}
+      <main class="main-form-panel">
+        <section class="cv-wizard-section-card">
+          <header class="cv-wizard-section-header">
+            <div class="cv-wizard-section-header__copy">
+              <h2 class="cv-wizard-section-title">Dados do evento</h2>
+              <p class="cv-wizard-section-subtitle">O evento é opcional para documentos, mas organiza a etapa pós-evento.</p>
+            </div>
+          </header>
+          <div class="cv-wizard-section-body">
+            {% if form.non_field_errors %}
+              {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
+            {% endif %}
+            <div class="field-grid">
+              {% include "components/forms/form_field.html" with field=form.titulo size_class="field-size-4" only %}
+              {% include "components/forms/form_field.html" with field=form.descricao size_class="field-size-4" only %}
+              {% include "components/forms/form_field.html" with field=form.destino_uf size_class="field-size-1" only %}
+              {% include "components/forms/form_field.html" with field=form.destino_cidade size_class="field-size-3" only %}
+              {% include "components/forms/form_field.html" with field=form.data_inicio size_class="field-size-2" only %}
+              {% include "components/forms/form_field.html" with field=form.data_fim size_class="field-size-2" only %}
+              {% include "components/forms/form_field.html" with field=form.horario_inicio size_class="field-size-2" only %}
+              {% include "components/forms/form_field.html" with field=form.horario_fim size_class="field-size-2" only %}
+              {% include "components/forms/form_field.html" with field=form.unidade_responsavel size_class="field-size-2" only %}
+              {% include "components/forms/form_field.html" with field=form.responsavel size_class="field-size-2" only %}
+              {% include "components/forms/form_field.html" with field=form.status size_class="field-size-2" only %}
+              {% include "components/forms/form_field.html" with field=form.drive_folder_url size_class="field-size-2" only %}
+            </div>
+          </div>
+        </section>
+
+        <section class="cv-wizard-section-card">
+          <div class="cv-wizard-section-body">
+            <div class="termo-actions termo-actions--footer">
+              {% include "components/ui/buttons/button.html" with type="submit" label="Salvar evento" variant="primary" only %}
+              {% include "components/ui/buttons/button.html" with href=index_url label="Cancelar" variant="secondary" only %}
+            </div>
+          </div>
+        </section>
+      </main>
+    </form>
+  </div>
+{% endblock %}

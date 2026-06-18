@@ -115,6 +115,13 @@ class PlanoTrabalho(TimeStampedModel):
     sufixo_numero = models.CharField(max_length=20, blank=True, default="")
     data_criacao = models.DateField(default=timezone.localdate, db_index=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_RASCUNHO)
+    evento = models.ForeignKey(
+        "eventos.Evento",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="planos_trabalho",
+    )
 
     # Etapa 1 — identificação e atuação
     contextualizacao = models.TextField("Contextualização", blank=True, default="")

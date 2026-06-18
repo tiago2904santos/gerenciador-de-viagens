@@ -11,6 +11,13 @@ from oficios.models import Oficio
 
 
 class TermoAutorizacao(TimeStampedModel):
+    evento = models.ForeignKey(
+        "eventos.Evento",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="termos_autorizacao",
+    )
     oficio = models.ForeignKey(
         Oficio,
         on_delete=models.SET_NULL,

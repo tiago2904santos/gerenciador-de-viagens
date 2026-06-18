@@ -36,6 +36,13 @@ class Justificativa(TimeStampedModel):
         (STATUS_FINALIZADA, "Finalizada"),
     ]
 
+    evento = models.ForeignKey(
+        "eventos.Evento",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="justificativas",
+    )
     oficio = models.OneToOneField(
         "oficios.Oficio",
         on_delete=models.CASCADE,
