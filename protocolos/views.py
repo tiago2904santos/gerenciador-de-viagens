@@ -53,6 +53,52 @@ def _avisar_modo(request):
         )
 
 
+def _protocolo_detail_page_steps(protocolo: Protocolo) -> list[dict]:
+    base_url = protocolo.get_detail_url()
+    return [
+        {
+            "url": f"{base_url}#resumo",
+            "state_class": "is-current",
+            "step_label": "Etapa 1",
+            "title": "Resumo",
+            "status": "Dados do processo",
+            "marker": "1",
+            "marker_aria_hidden": False,
+            "aria_current": "step",
+        },
+        {
+            "url": f"{base_url}#fluxo",
+            "state_class": "",
+            "step_label": "Etapa 2",
+            "title": "Fluxo",
+            "status": "Pendencias e tramites",
+            "marker": "2",
+            "marker_aria_hidden": False,
+            "aria_current": "",
+        },
+        {
+            "url": f"{base_url}#documentos",
+            "state_class": "",
+            "step_label": "Etapa 3",
+            "title": "Documentos",
+            "status": f"{protocolo.documentos.count()} registrado(s)",
+            "marker": "3",
+            "marker_aria_hidden": False,
+            "aria_current": "",
+        },
+        {
+            "url": f"{base_url}#logs",
+            "state_class": "",
+            "step_label": "Etapa 4",
+            "title": "Logs",
+            "status": "Auditoria",
+            "marker": "4",
+            "marker_aria_hidden": False,
+            "aria_current": "",
+        },
+    ]
+
+
 # ---------------------------------------------------------------------------
 # Lista
 # ---------------------------------------------------------------------------
@@ -100,6 +146,7 @@ def detail(request, pk):
         "tramitacoes": protocolo.tramitacoes.all(),
         "movimentacoes": protocolo.movimentacoes.all(),
         "logs": protocolo.logs.all()[:50],
+        "protocolo_page_steps": _protocolo_detail_page_steps(protocolo),
         **_contexto_integracao(),
     }
     return render(request, "protocolos/protocolo_detail.html", contexto)

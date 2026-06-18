@@ -186,9 +186,17 @@ class Protocolo(models.Model):
     def documento_especie_display(self) -> str:
         if self.origem_content_type_id:
             return self.origem_content_type.model_class()._meta.verbose_name.title()
+        payload = self.payload_atual_json or {}
+        for chave in ("especie", "nomeEspecie", "especieDocumento", "tipoDocumento"):
+            valor = payload.get(chave)
+            if valor:
+                return str(valor)
         origem_demo = (self.payload_atual_json or {}).get("origemDemo", "")
         if origem_demo:
             return re.sub(r"\s+(?:no\.?)?\s*\d+/\d{4}.*$", "", origem_demo, flags=re.IGNORECASE).strip() or origem_demo
+        primeiro_documento = next(iter(self.documentos.all()), None)
+        if primeiro_documento:
+            return primeiro_documento.get_tipo_documento_display()
         if self.origem_tipo == self.ORIGEM_EPROTOCOLO_REAL:
             return "eProtocolo real"
         if self.origem_tipo == self.ORIGEM_MANUAL:
@@ -210,6 +218,10 @@ class Protocolo(models.Model):
         if match:
             return match.group(1)
         payload = self.payload_atual_json or {}
+        for chave in ("documento", "numeroAnoDocumento", "numeroDocumentoAno", "numeroDocumentoFormatado"):
+            valor = payload.get(chave)
+            if valor:
+                return str(valor)
         numero = payload.get("numeroDocumento")
         ano = payload.get("anoDocumento")
         if numero and ano:
@@ -224,6 +236,8 @@ class Protocolo(models.Model):
             if valor:
                 return str(valor)
         palavras = payload.get("palavrasChave")
+        if isinstance(palavras, str) and palavras:
+            return palavras
         if isinstance(palavras, list) and palavras:
             primeira = palavras[0]
             if isinstance(primeira, dict):
@@ -232,20 +246,140 @@ class Protocolo(models.Model):
         return "-"
 
     @property
+    def assunto_display(self) -> str:
+        if self.assunto_resumo:
+            return self.assunto_resumo
+        payload = self.payload_atual_json or {}
+        for chave in ("assunto", "nomeAssunto", "descricaoAssunto"):
+            valor = payload.get(chave)
+            if valor:
+                return str(valor)
+        return "-"
+
+    @property
+    def descricao_display(self) -> str:
+        if self.descricao_resumo:
+            return self.descricao_resumo
+        payload = self.payload_atual_json or {}
+        for chave in ("descricao", "detalhamento", "descricaoProtocolo", "detalhamentoProtocolo"):
+            valor = payload.get(chave)
+            if valor:
+                return str(valor)
+        return "-"
+
+    @property
     def interessado_display(self) -> str:
+        primeiro = self._primeiro_interessado_payload()
+        if isinstance(primeiro, dict):
+            for chave in ("nome", "nomeInteressado", "razaoSocial", "descricao"):
+                valor = primeiro.get(chave)
+                if valor:
+                    return str(valor)
+        elif primeiro:
+            return str(primeiro)
+
         payload = self.payload_atual_json or {}
         for chave in ("interessado", "nomeInteressado", "requerente", "solicitante"):
             valor = payload.get(chave)
             if valor:
                 return str(valor)
-        for chave in ("interessados", "servidores"):
+        return self.nome_responsavel_atual or "-"
+
+    def _primeiro_interessado_payload(self):
+        payload = self.payload_atual_json or {}
+        for chave in ("interessados", "interessado1", "servidores"):
             itens = payload.get(chave)
             if isinstance(itens, list) and itens:
-                primeiro = itens[0]
-                if isinstance(primeiro, dict):
-                    return str(primeiro.get("nome") or primeiro.get("nomeInteressado") or "-")
-                return str(primeiro)
-        return self.nome_responsavel_atual or "-"
+                return itens[0]
+            if isinstance(itens, dict):
+                return itens
+        return None
+
+    @property
+    def interessado_tipo_display(self) -> str:
+        interessado = self._primeiro_interessado_payload()
+        if isinstance(interessado, dict):
+            for chave in ("tipo", "tipoInteressado", "categoria"):
+                valor = interessado.get(chave)
+                if valor:
+                    return str(valor)
+        return "SECAO"
+
+    @property
+    def interessado_tipo_documento_display(self) -> str:
+        interessado = self._primeiro_interessado_payload()
+        if isinstance(interessado, dict):
+            for chave in ("tipoDocumento", "tipoDoc", "tipoIdentificacao"):
+                valor = interessado.get(chave)
+                if valor:
+                    return str(valor)
+        if self.cpf_responsavel_atual:
+            return "CPF"
+        return "-"
+
+    @property
+    def interessado_identificacao_display(self) -> str:
+        interessado = self._primeiro_interessado_payload()
+        if isinstance(interessado, dict):
+            for chave in ("identificacao", "documento", "cpf", "cnpj", "numeroDocumento"):
+                valor = interessado.get(chave)
+                if valor:
+                    return str(valor)
+        return self.cpf_responsavel_mascarado or "-"
+
+    @property
+    def cidade_display(self) -> str:
+        payload = self.payload_atual_json or {}
+        for chave in ("cidade", "nomeCidade", "municipio", "nomeMunicipio"):
+            valor = payload.get(chave)
+            if valor:
+                return str(valor)
+        return "CURITIBA / PR" if self.modo_mock else "-"
+
+    @property
+    def acesso_display(self) -> str:
+        payload = self.payload_atual_json or {}
+        for chave in ("acesso", "nivelAcesso", "tipoAcesso"):
+            valor = payload.get(chave)
+            if valor:
+                return str(valor)
+        return "Restrito" if self.modo_mock else "-"
+
+    @property
+    def prioridade_display(self) -> str:
+        payload = self.payload_atual_json or {}
+        for chave in ("prioridade", "prioritario", "urgente"):
+            valor = payload.get(chave)
+            if valor not in (None, ""):
+                if isinstance(valor, bool):
+                    return "Sim" if valor else "Nao"
+                return str(valor)
+        return "Nao"
+
+    @property
+    def cadastro_display(self) -> str:
+        payload = self.payload_atual_json or {}
+        for chave in ("cadastro", "dataCadastro", "criadoEm", "dataCriacao"):
+            valor = payload.get(chave)
+            if valor:
+                return str(valor)
+        data = self.criado_no_eprotocolo_em or self.criado_no_sistema_em
+        return data.strftime("%d/%m/%Y") if data else "-"
+
+    @property
+    def informacao_pendencia_display(self) -> str:
+        payload = self.payload_atual_json or {}
+        for chave in ("informacaoPendencia", "informacoesPendencia", "complementoPendencia"):
+            valor = payload.get(chave)
+            if valor:
+                return str(valor)
+        pendencia = self.pendencias_abertas.first()
+        if pendencia:
+            destino = pendencia.nome_destinatario or pendencia.cpf_destinatario_mascarado
+            if destino:
+                return f"{pendencia.tipo or 'Pendencia'} com {destino}"
+            return pendencia.tipo or "-"
+        return "-"
 
     @property
     def pendencias_abertas(self):
