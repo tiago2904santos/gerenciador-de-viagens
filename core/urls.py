@@ -16,6 +16,7 @@ if settings.DEBUG:
     urlpatterns += [
         path("dev/ui-lab/", views.ui_lab_index, name="ui_lab"),
         path("dev/ui-lab/structures/", views.ui_lab_structures, name="ui_lab_structures"),
+        path("dev/ui-lab/eventos/cadastro/", views.ui_lab_eventos_cadastro, name="ui_lab_eventos_cadastro"),
         path("dev/ui-lab/lists/", views.ui_lab_lists, name="ui_lab_lists"),
         path("dev/ui-lab/headers/", views.ui_lab_headers, name="ui_lab_headers"),
         path("dev/ui-lab/buttons/", views.ui_lab_buttons, name="ui_lab_buttons"),

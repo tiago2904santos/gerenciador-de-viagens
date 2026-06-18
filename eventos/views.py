@@ -35,11 +35,16 @@ def _evento_queryset():
 
 
 def _form_context(form, evento=None):
+    is_edit = bool(evento and evento.pk)
     return {
-        "page_title": "Novo Evento" if not evento or not evento.pk else f"Editar {evento.titulo}",
+        "page_title": "Editar Evento" if is_edit else "Cadastro de Evento",
+        "page_description": "Agrupe documentos, roteiros, anexos e prestação de contas sem tornar o evento obrigatório.",
         "form": form,
         "evento": evento,
         "index_url": reverse("eventos:index"),
+        "panel_url": reverse("eventos:detalhe", kwargs={"pk": evento.pk}) if is_edit else "",
+        "status_label": evento.get_status_display() if is_edit else "Novo",
+        "status_variant": "active" if is_edit else "draft",
     }
 
 

@@ -3,6 +3,9 @@ from django.http import Http404
 from django.shortcuts import render
 from django.urls import reverse
 
+from eventos.forms import EventoForm
+from eventos.models import Evento
+
 from .forms import LoginForm
 
 
@@ -31,6 +34,17 @@ UI_LAB_PAGE_DEFINITIONS = [
         "status_label": "Pronto",
         "status_modifier": "done",
         "route_name": "core:ui_lab_structures",
+    },
+    {
+        "slug": "eventos-cadastro",
+        "label": "Eventos / Cadastro",
+        "mark": "EV",
+        "title": "Cadastro de Evento",
+        "subtitle": "Laboratorio visual do formulario de Eventos usando padroes existentes.",
+        "summary": "Header, cards, grid, campos, chips e rodape clonados dos cadastros maduros.",
+        "status_label": "Em revisao",
+        "status_modifier": "review",
+        "route_name": "core:ui_lab_eventos_cadastro",
     },
     {
         "slug": "lists",
@@ -627,6 +641,46 @@ def ui_lab_index(request):
 
 def ui_lab_structures(request):
     return _render_ui_lab(request, "dev/ui_lab/structures.html", "structures")
+
+
+def ui_lab_eventos_cadastro(request):
+    create_form = EventoForm(
+        initial={
+            "titulo": "Operacao integrada de atendimento institucional",
+            "descricao": "Evento com descricao longa para validar quebra de linha, responsividade e leitura em modo claro e escuro.",
+            "destino_uf": "PR",
+            "destino_cidade": "Curitiba",
+            "data_inicio": "2026-06-17",
+            "data_fim": "2026-06-18",
+            "horario_inicio": "08:00",
+            "horario_fim": "18:00",
+            "status": Evento.STATUS_RASCUNHO,
+            "drive_folder_url": "https://drive.google.com/drive/folders/exemplo",
+        }
+    )
+    edit_evento = Evento(
+        pk=999,
+        titulo="Evento institucional em revisao",
+        descricao="Estado de edicao com dados ja persistidos para validar CTA do painel e status.",
+        destino_uf="PR",
+        destino_cidade="Londrina",
+        data_inicio="2026-07-02",
+        data_fim="2026-07-04",
+        horario_inicio="09:00",
+        horario_fim="17:30",
+        status=Evento.STATUS_EM_PREPARACAO,
+        drive_folder_url="",
+    )
+    edit_form = EventoForm(instance=edit_evento)
+    context = _build_ui_lab_context("eventos-cadastro")
+    context.update(
+        {
+            "evento_create_form": create_form,
+            "evento_edit_form": edit_form,
+            "evento_edit_mock": edit_evento,
+        }
+    )
+    return render(request, "dev/ui_lab/eventos_cadastro.html", context)
 
 
 def ui_lab_headers(request):

@@ -1,0 +1,70 @@
+{% extends "dev/ui_lab/base.html" %}
+
+{% block ui_lab_content %}
+  {% include "dev/ui_lab/partials/_lab_page_title.html" %}
+  {% include "dev/ui_lab/partials/_lab_nav.html" %}
+
+  <section class="ui-lab-section">
+    <div class="ui-lab-section__header">
+      <p class="ui-lab-section__eyebrow">Eventos Lab</p>
+      <h2 class="ui-lab-section__title">Cadastro clonado dos padroes existentes</h2>
+      <p class="ui-lab-section__description">
+        A composicao abaixo usa o mesmo shell de formulario longo de Ordem de Servico e Termos,
+        os cards do wizard global, os campos do form real e os chips globais do design system.
+      </p>
+    </div>
+
+    <div class="ui-lab-stack">
+      <article class="ui-lab-preview-card">
+        <div class="ui-lab-preview-card__header">
+          <span class="ui-lab-preview-card__label">Estado de criacao</span>
+          <span class="ui-lab-status-pill ui-lab-status-pill--review">Em revisao</span>
+        </div>
+        <div class="page-shell page-shell--wizard">
+          {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="EVENTOS" title="Cadastro de Evento" description="Agrupe documentos, roteiros, anexos e prestacao de contas sem tornar o evento obrigatorio." icon_label="EV" module_label="Eventos" back_label="Voltar à lista" back_url="#" status_label="Novo" status_variant="draft" only %}
+          <main class="main-form-panel main-form-panel--stack">
+            <form method="post" action="#">
+              <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
+                {% include "eventos/includes/_evento_form_sections.html" with form=evento_create_form section_prefix="evento-lab-create" only %}
+                <div class="footer-actions">
+                  <div class="footer-actions__secondary">
+                    {% include "components/ui/buttons/button.html" with label="Cancelar" variant="secondary" only %}
+                  </div>
+                  <div class="footer-actions__primary">
+                    {% include "components/ui/buttons/button.html" with label="Salvar evento" variant="primary" only %}
+                  </div>
+                </div>
+              </div>
+            </form>
+          </main>
+        </div>
+      </article>
+
+      <article class="ui-lab-preview-card">
+        <div class="ui-lab-preview-card__header">
+          <span class="ui-lab-preview-card__label">Estado de edicao</span>
+          <span class="ui-lab-status-pill ui-lab-status-pill--done">Comparacao</span>
+        </div>
+        <div class="page-shell page-shell--wizard">
+          {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="EVENTOS" title="Editar Evento" description="Agrupe documentos, roteiros, anexos e prestacao de contas sem tornar o evento obrigatorio." icon_label="EV" module_label="Eventos" back_label="Voltar à lista" back_url="#" status_label=evento_edit_mock.get_status_display status_variant="active" only %}
+          <main class="main-form-panel main-form-panel--stack">
+            <form method="post" action="#">
+              <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
+                {% include "eventos/includes/_evento_form_sections.html" with form=evento_edit_form section_prefix="evento-lab-edit" only %}
+                <div class="footer-actions">
+                  <div class="footer-actions__secondary">
+                    {% include "components/ui/buttons/button.html" with label="Cancelar" variant="secondary" only %}
+                    {% include "components/ui/buttons/button.html" with label="Abrir painel do evento" variant="secondary" only %}
+                  </div>
+                  <div class="footer-actions__primary">
+                    {% include "components/ui/buttons/button.html" with label="Salvar evento" variant="primary" only %}
+                  </div>
+                </div>
+              </div>
+            </form>
+          </main>
+        </div>
+      </article>
+    </div>
+  </section>
+{% endblock %}
