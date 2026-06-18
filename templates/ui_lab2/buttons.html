@@ -1,0 +1,94 @@
+{% extends "ui_lab2/base.html" %}
+
+{% block ui_lab2_content %}
+  <section class="ui-lab-section">
+    <div class="ui-lab-section__header">
+      <p class="ui-lab-section__eyebrow">Funcao · Acionar</p>
+      <h2 class="ui-lab-section__title">Botoes</h2>
+      <p class="ui-lab-section__description">
+        Familia <code>cv-btn</code> (CSS em <code>cv-buttons.css</code>) e os botoes especializados
+        do design system: botao base via include, botao de gerenciar campo, acao lateral de campo,
+        botao de icone, acao de rodape e acoes flutuantes. Apuracao de uso em {{ usage_audit_date }}.
+      </p>
+    </div>
+
+    <div class="ui-lab2-grid">
+
+      {# ── familia cv-btn (clone literal) ───────────────────────── #}
+      {% include "ui_lab2/partials/_component_open.html" with name="cv-btn · variantes" source=".cv-btn / .cv-btn--{variant}" note="Clone literal. Estrutura sempre <button class=\"cv-btn cv-btn--...\"><span>...</span></button>." %}
+        <div class="ui-lab2-row">
+          <button class="cv-btn cv-btn--primary" type="button"><span>Primario</span></button>
+          <button class="cv-btn cv-btn--secondary" type="button"><span>Secundario</span></button>
+          <button class="cv-btn cv-btn--danger" type="button"><span>Perigo</span></button>
+        </div>
+      {% include "ui_lab2/partials/_component_close.html" with used_in=usage.cv_btn %}
+
+      {% include "ui_lab2/partials/_component_open.html" with name="cv-btn · tamanhos e estados" source=".cv-btn--sm / [disabled]" note="Modificador de tamanho e estado desabilitado." %}
+        <div class="ui-lab2-col">
+          <div class="ui-lab2-row">
+            <span class="ui-lab2-variant-label">Tamanho sm</span>
+            <button class="cv-btn cv-btn--primary cv-btn--sm" type="button"><span>Primario sm</span></button>
+            <button class="cv-btn cv-btn--secondary cv-btn--sm" type="button"><span>Secundario sm</span></button>
+          </div>
+          <div class="ui-lab2-row">
+            <span class="ui-lab2-variant-label">Desabilitado</span>
+            <button class="cv-btn cv-btn--primary" type="button" disabled><span>Primario</span></button>
+            <button class="cv-btn cv-btn--secondary" type="button" disabled><span>Secundario</span></button>
+          </div>
+        </div>
+      {% include "ui_lab2/partials/_component_close.html" with used_in=usage.cv_btn %}
+
+      {# ── button.html (componente base via include) ────────────── #}
+      {% include "ui_lab2/partials/_component_open.html" with name="button.html (componente)" source="components/ui/buttons/button.html" note="Include parametrizavel (href, variant, size, icon). action_button.html e o wrapper compativel." %}
+        <div class="ui-lab2-row">
+          {% include "components/ui/buttons/button.html" with label="Salvar" variant="primary" icon="check" type="button" only %}
+          {% include "components/ui/buttons/button.html" with label="Cancelar" variant="secondary" href="#" only %}
+          {% include "components/ui/buttons/button.html" with label="Adicionar" variant="secondary" icon="plus" type="button" only %}
+          {% include "components/ui/buttons/button.html" with label="Avancar" variant="primary" icon="arrow-right" icon_after=True type="button" only %}
+        </div>
+      {% include "ui_lab2/partials/_component_close.html" with used_in=usage.button_component %}
+
+      {# ── field_manage_button (engrenagem) ─────────────────────── #}
+      {% include "ui_lab2/partials/_component_open.html" with name="field_manage_button" source="components/ui/buttons/field_manage_button.html" note="Botao circular de engrenagem acoplado a selects (gerenciar opcoes). Renderizado por field.html." %}
+        <div class="ui-lab2-row">
+          {% include "components/ui/buttons/field_manage_button.html" with href="#" action_label="Gerenciar unidades" only %}
+          {% include "components/ui/buttons/field_manage_button.html" with action_label="Gerenciar opcoes" only %}
+        </div>
+      {% include "ui_lab2/partials/_component_close.html" with used_in=usage.field_manage_button %}
+
+      {# ── field_action_button (acao lateral de campo) ──────────── #}
+      {% include "ui_lab2/partials/_component_open.html" with name="field_action_button" source="components/ui/buttons/field_action_button.html" note="Acao lateral acoplada a um campo (ex: toggle RG, motorista fixo)." %}
+        <div class="ui-lab2-row">
+          {% include "components/ui/buttons/field_action_button.html" with label="Cadastrar" variant="secondary" icon="plus" only %}
+          {% include "components/ui/buttons/field_action_button.html" with label="Possui RG" variant="primary" icon="check" only %}
+        </div>
+      {% include "ui_lab2/partials/_component_close.html" with used_in=usage.field_action_button %}
+
+      {# ── icon_button ──────────────────────────────────────────── #}
+      {% include "ui_lab2/partials/_component_open.html" with name="icon_button" source="components/ui/buttons/icon_button.html" note="Botao so de icone com tooltip. action define icone e cor (edit, delete, preview, download...)." %}
+        <div class="ui-lab2-row">
+          {% include "components/ui/buttons/icon_button.html" with action="edit" aria_label="Editar" tooltip="Editar" href="#" only %}
+          {% include "components/ui/buttons/icon_button.html" with action="delete" aria_label="Excluir" tooltip="Excluir" only %}
+          {% include "components/ui/buttons/icon_button.html" with action="preview" aria_label="Pre-visualizar" tooltip="Pre-visualizar" href="#" only %}
+          {% include "components/ui/buttons/icon_button.html" with action="download" aria_label="Baixar" tooltip="Baixar" href="#" only %}
+        </div>
+      {% include "ui_lab2/partials/_component_close.html" with used_in=usage.icon_button %}
+
+      {# ── footer_action ────────────────────────────────────────── #}
+      {% include "ui_lab2/partials/_component_open.html" with name="footer_action" source="components/ui/buttons/footer_action.html" note="Acao de rodape de card/secao (padrao 'adicionar'). Componente disponivel no design system." %}
+        <div class="ui-lab2-row">
+          {% include "components/ui/buttons/footer_action.html" with label="Adicionar item" icon="plus" only %}
+          {% include "components/ui/buttons/footer_action.html" with label="Adicionar trecho" icon="route" only %}
+        </div>
+      {% include "ui_lab2/partials/_component_close.html" with used_in=usage.footer_action %}
+
+      {# ── floating_primary_action ──────────────────────────────── #}
+      {% include "ui_lab2/partials/_component_open.html" with name="floating_primary_action" source="components/ui/buttons/floating_primary_action.html" note="Acao flutuante de salvar usada nos cadastros simples. (position:fixed neutralizado no preview)." %}
+        <div class="ui-lab2-static">
+          {% include "components/ui/buttons/floating_primary_action.html" with label="Salvar" icon="check" type="button" only %}
+        </div>
+      {% include "ui_lab2/partials/_component_close.html" with used_in=usage.floating_primary_action %}
+
+    </div>
+  </section>
+{% endblock %}

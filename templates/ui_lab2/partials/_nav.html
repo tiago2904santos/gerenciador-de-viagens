@@ -1,0 +1,17 @@
+<nav class="ui-lab-nav" aria-label="Navegacao do UI Lab 2.0">
+  <a class="ui-lab-nav__link{% if not ui_lab2_current %} is-active{% endif %}"
+     href="{{ ui_lab2_index_url }}"
+     {% if not ui_lab2_current %}aria-current="page"{% endif %}>
+    <span class="ui-lab-nav__label">Overview</span>
+  </a>
+  {% for category in ui_lab2_categories %}
+    <a class="ui-lab-nav__link{% if ui_lab2_current and category.slug == ui_lab2_current.slug %} is-active{% endif %}"
+       href="{{ category.url }}"
+       {% if ui_lab2_current and category.slug == ui_lab2_current.slug %}aria-current="page"{% endif %}>
+      <span class="ui-lab-nav__label">{{ category.label }}</span>
+      <span class="ui-lab-status-pill ui-lab-status-pill--{{ category.status_modifier }}">
+        {{ category.status_label }}
+      </span>
+    </a>
+  {% endfor %}
+</nav>

@@ -1,0 +1,131 @@
+/* UI Lab 2.0 — catalogo de componentes por funcao.
+   Reaproveita as classes do UI Lab 1.0 (ui-lab-*) e adiciona apenas o que e
+   especifico do catalogo: wrapper de componente, superficie de preview e
+   bloco "Usado em". */
+
+.ui-lab2-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--space-4);
+}
+
+/* Cada componente do catalogo */
+.ui-lab2-component {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.ui-lab2-component__source {
+  font-size: var(--font-size-xs);
+  color: var(--theme-text-muted);
+  background: var(--surface-filter-bar);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+  padding: 2px 10px;
+}
+
+.ui-lab2-component__note {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--theme-text-muted);
+}
+
+/* Superficie onde o clone e renderizado */
+.ui-lab2-component__preview {
+  border: 1px dashed var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--surface-panel);
+  padding: var(--space-4);
+  overflow: auto;
+}
+
+.ui-lab2-component__preview > * {
+  margin-inline: auto;
+}
+
+/* Permite mostrar variacoes lado a lado dentro de um preview */
+.ui-lab2-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.ui-lab2-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.ui-lab2-variant-label {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  color: var(--theme-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Bloco "Usado em" */
+.ui-lab2-usage {
+  border-top: 1px solid var(--border-subtle);
+  padding-top: var(--space-3);
+}
+
+.ui-lab2-usage__title {
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  color: var(--theme-text-heading);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.ui-lab2-usage__count {
+  display: inline-block;
+  min-width: 18px;
+  margin-left: 4px;
+  padding: 0 6px;
+  text-align: center;
+  border-radius: var(--radius-pill);
+  background: var(--surface-filter-bar);
+  border: 1px solid var(--border-subtle);
+  color: var(--theme-text-muted);
+}
+
+.ui-lab2-usage__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ui-lab2-usage__list li code {
+  font-size: var(--font-size-xs);
+  color: var(--theme-text-muted-strong, var(--theme-text-muted));
+  word-break: break-all;
+}
+
+.ui-lab2-usage--empty .ui-lab2-usage__title {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: var(--font-weight-bold);
+  color: var(--theme-text-muted);
+}
+
+/* Neutraliza position:fixed de acoes flutuantes dentro do preview do lab */
+.ui-lab2-static .cv-floating-action {
+  position: static;
+  inset: auto;
+}
+
+.ui-lab2-placeholder {
+  border: 1px dashed var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--surface-panel);
+  padding: var(--space-6);
+  text-align: center;
+  color: var(--theme-text-muted);
+}

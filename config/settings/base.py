@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "diario_bordo",
     "integracoes.google_drive",
     "protocolos",
+    "ui_lab2",
 ]
 
 _MIDDLEWARE_CORE = [

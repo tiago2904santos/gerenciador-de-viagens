@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import admin
 from django.urls import include
 from django.urls import path
@@ -22,3 +23,8 @@ urlpatterns = [
     path("protocolos/", include("protocolos.urls")),
     path("integracoes/google-drive/", include("integracoes.google_drive.urls")),
 ]
+
+if settings.DEBUG:
+    urlpatterns += [
+        path("dev/ui-lab-2/", include("ui_lab2.urls")),
+    ]

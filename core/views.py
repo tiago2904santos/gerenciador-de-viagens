@@ -47,6 +47,17 @@ UI_LAB_PAGE_DEFINITIONS = [
         "route_name": "core:ui_lab_eventos_cadastro",
     },
     {
+        "slug": "eventos-lista",
+        "label": "Eventos / Lista",
+        "mark": "EV",
+        "title": "Lista & Painel de Eventos",
+        "subtitle": "Laboratorio da lista e do card de eventos clonando Roteiros e Oficios.",
+        "summary": "Lista de eventos em cards, filtro em tempo real, chips de status e estado vazio.",
+        "status_label": "Em revisao",
+        "status_modifier": "review",
+        "route_name": "core:ui_lab_eventos_lista",
+    },
+    {
         "slug": "lists",
         "label": "Lists",
         "mark": "LS",
@@ -574,6 +585,169 @@ UI_LAB_ROTEIROS_CARDS = [
     },
 ]
 
+
+UI_LAB_EVENTOS_STATUS_OPTIONS = [
+    {"value": "", "label": "Todos os status"},
+    {"value": "rascunho", "label": "Rascunho"},
+    {"value": "em_preparacao", "label": "Em preparacao"},
+    {"value": "documentos_gerados", "label": "Documentos gerados"},
+    {"value": "em_execucao", "label": "Em execucao"},
+    {"value": "prestacao_pendente", "label": "Prestacao pendente"},
+    {"value": "finalizado", "label": "Finalizado"},
+    {"value": "cancelado", "label": "Cancelado"},
+]
+
+
+def _ui_lab_evento_card(
+    *,
+    titulo,
+    status_variant,
+    status_label,
+    status_tone,
+    destino,
+    periodo,
+    responsavel,
+    unidade,
+    oficios,
+    documentos,
+    pendencias,
+    drive,
+    href="#",
+):
+    """Monta um card de evento no formato esperado por main_list_card.html.
+
+    Mesmo contrato usado por Roteiros/Oficios: title, subtitle, status chip,
+    meta (coluna esquerda), number/side_items (coluna direita) e actions.
+    """
+
+    return {
+        "title": titulo,
+        "subtitle": f"{destino} · {periodo}",
+        "status_variant": status_variant,
+        "status_chip_label": status_label,
+        "status_chip_class": f"status-chip--{status_tone}",
+        "meta": [
+            {"label": "Destino", "value": destino},
+            {"label": "Periodo", "value": periodo},
+            {"label": "Responsavel", "value": responsavel},
+            {"label": "Unidade", "value": unidade},
+        ],
+        "side_title": "Resumo",
+        "number_label": "Documentos",
+        "number": str(documentos),
+        "side_items": [
+            {"label": "Oficios", "value": str(oficios), "strong": True},
+            {"label": "Pendencias", "value": str(pendencias)},
+            {"label": "Drive", "value": drive},
+        ],
+        "actions": [
+            {"label": "Abrir painel", "variant": "secondary", "href": href},
+        ],
+    }
+
+
+UI_LAB_EVENTOS_CARDS = [
+    _ui_lab_evento_card(
+        titulo="Reuniao de planejamento regional",
+        status_variant="rascunho",
+        status_label="Rascunho",
+        status_tone="warning",
+        destino="Curitiba/PR",
+        periodo="A definir",
+        responsavel="Nao definido",
+        unidade="DPC",
+        oficios=0,
+        documentos=0,
+        pendencias=3,
+        drive="Nao vinculado",
+    ),
+    _ui_lab_evento_card(
+        titulo="Operacao Integrada Litoral",
+        status_variant="em_preparacao",
+        status_label="Em preparacao",
+        status_tone="info",
+        destino="Paranagua/PR",
+        periodo="20/06 a 22/06/2026",
+        responsavel="Del. Marina Alves",
+        unidade="1a DRP",
+        oficios=2,
+        documentos=3,
+        pendencias=2,
+        drive="Vinculado",
+    ),
+    _ui_lab_evento_card(
+        titulo="Capacitacao de Agentes",
+        status_variant="documentos_gerados",
+        status_label="Documentos gerados",
+        status_tone="info",
+        destino="Londrina/PR",
+        periodo="01/07 a 03/07/2026",
+        responsavel="Insp. Carlos Lima",
+        unidade="Academia",
+        oficios=4,
+        documentos=6,
+        pendencias=1,
+        drive="Vinculado",
+    ),
+    _ui_lab_evento_card(
+        titulo="Forca-Tarefa Fronteira",
+        status_variant="em_execucao",
+        status_label="Em execucao",
+        status_tone="pending",
+        destino="Foz do Iguacu/PR",
+        periodo="12/06 a 16/06/2026",
+        responsavel="Cap. Ana Souza",
+        unidade="BPFRON",
+        oficios=6,
+        documentos=9,
+        pendencias=0,
+        drive="Vinculado",
+    ),
+    _ui_lab_evento_card(
+        titulo="Seminario Estadual de Seguranca",
+        status_variant="prestacao_pendente",
+        status_label="Prestacao pendente",
+        status_tone="warning",
+        destino="Maringa/PR",
+        periodo="02/05 a 04/05/2026",
+        responsavel="Del. Paulo Reis",
+        unidade="DRACO",
+        oficios=3,
+        documentos=5,
+        pendencias=2,
+        drive="Vinculado",
+    ),
+    _ui_lab_evento_card(
+        titulo="Diligencia Externa - Operacao Aurora",
+        status_variant="finalizado",
+        status_label="Finalizado",
+        status_tone="success",
+        destino="Sao Paulo/SP",
+        periodo="10/04 a 12/04/2026",
+        responsavel="Esc. Julia Nunes",
+        unidade="DENARC",
+        oficios=5,
+        documentos=8,
+        pendencias=0,
+        drive="Vinculado",
+    ),
+    _ui_lab_evento_card(
+        titulo="Visita Tecnica Interinstitucional",
+        status_variant="cancelado",
+        status_label="Cancelado",
+        status_tone="danger",
+        destino="Cascavel/PR",
+        periodo="18/03/2026",
+        responsavel="Nao definido",
+        unidade="DPC",
+        oficios=1,
+        documentos=1,
+        pendencias=0,
+        drive="Nao vinculado",
+    ),
+]
+
+
 def _build_ui_lab_pages():
     pages = []
     for page in UI_LAB_PAGE_DEFINITIONS:
@@ -681,6 +855,17 @@ def ui_lab_eventos_cadastro(request):
         }
     )
     return render(request, "dev/ui_lab/eventos_cadastro.html", context)
+
+
+def ui_lab_eventos_lista(request):
+    context = _build_ui_lab_context("eventos-lista")
+    context.update(
+        {
+            "eventos_lab_cards": UI_LAB_EVENTOS_CARDS,
+            "eventos_lab_status_options": UI_LAB_EVENTOS_STATUS_OPTIONS,
+        }
+    )
+    return render(request, "dev/ui_lab/eventos_lista.html", context)
 
 
 def ui_lab_headers(request):
