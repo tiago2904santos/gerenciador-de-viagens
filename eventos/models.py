@@ -1,6 +1,10 @@
 # Eventos serao agrupadores OPCIONAIS de documentos, nao fluxo obrigatorio.
 from django.db import models
 
+from core.normalizers import normalize_spaces
+from core.normalizers import normalize_upper
+from cadastros.models import TimeStampedModel
+
 
 class Evento(models.Model):
     """Agrupador OPCIONAL de documentos relacionados a uma viagem/acao.
@@ -29,7 +33,22 @@ class Evento(models.Model):
         (STATUS_CANCELADO, "Cancelado"),
     ]
 
-    titulo = models.CharField("Titulo", max_length=255)
+    TIPO_PCPR_COMUNIDADE = "pcpr_comunidade"
+    TIPO_OPERACAO_POLICIAL = "operacao_policial"
+    TIPO_PARANA_EM_ACAO = "parana_em_acao"
+    TIPO_EXPO = "expo"
+    TIPO_JUSTICA_BAIRRO = "justica_bairro"
+    TIPO_OUTROS = "outros"
+    TIPO_CHOICES = [
+        (TIPO_PCPR_COMUNIDADE, "PCPR na Comunidade"),
+        (TIPO_OPERACAO_POLICIAL, "Operação Policial"),
+        (TIPO_PARANA_EM_ACAO, "Paraná em Ação"),
+        (TIPO_EXPO, "Expo"),
+        (TIPO_JUSTICA_BAIRRO, "Justiça no Bairro"),
+        (TIPO_OUTROS, "Outros"),
+    ]
+
+    titulo = models.CharField("Titulo", max_length=255, blank=True, default="")
     descricao = models.TextField("Descricao/objetivo", blank=True, default="")
     destino_uf = models.CharField("UF do destino", max_length=2, blank=True, default="")
     destino_cidade = models.CharField("Cidade do destino", max_length=255, blank=True, default="")
@@ -53,6 +72,10 @@ class Evento(models.Model):
         related_name="eventos_responsavel",
         verbose_name="Responsavel",
     )
+    tipo = models.CharField("Tipo do evento", max_length=30, choices=TIPO_CHOICES, blank=True, default="")
+    tipo_outro = models.CharField("Tipo personalizado (quando Outros)", max_length=120, blank=True, default="")
+    destinos_extras = models.JSONField("Destinos adicionais", default=list, blank=True)
+    motivo = models.TextField("Motivo", blank=True, default="")
     status = models.CharField(max_length=30, choices=STATUS_CHOICES, default=STATUS_RASCUNHO)
     drive_folder_id = models.CharField("ID da pasta no Drive", max_length=255, blank=True, default="")
     drive_folder_url = models.URLField("URL da pasta no Drive", blank=True, default="")
@@ -82,6 +105,29 @@ class Evento(models.Model):
         if cidade and uf:
             return f"{cidade}/{uf}"
         return cidade or uf or "Destino nao informado"
+
+
+class ModeloMotivoEvento(TimeStampedModel):
+    nome = models.CharField(max_length=120, unique=True)
+    texto = models.TextField()
+    ativo = models.BooleanField(default=True)
+    ordem = models.PositiveIntegerField(default=100)
+    is_padrao = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["ordem", "nome"]
+        verbose_name = "Modelo de motivo de evento"
+        verbose_name_plural = "Modelos de motivo de evento"
+
+    def __str__(self):
+        return self.nome
+
+    def save(self, *args, **kwargs):
+        self.nome = normalize_upper(self.nome)
+        self.texto = normalize_spaces(self.texto)
+        if self.is_padrao:
+            ModeloMotivoEvento.objects.exclude(pk=self.pk).update(is_padrao=False)
+        super().save(*args, **kwargs)
 
 
 class EventoAnexo(models.Model):
