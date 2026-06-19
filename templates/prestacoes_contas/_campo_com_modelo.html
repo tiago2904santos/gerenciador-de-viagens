@@ -1,0 +1,17 @@
+{% comment %}
+Um campo de texto longo do RT: select de modelos (estilo "motivo") + botão gerenciar + textarea.
+Espera a variável `c` (dict com select, textarea, label, manage_url, tem_modelos).
+{% endcomment %}
+{% include "components/ui/forms/field.html" with field=c.select action_url=c.manage_url action_label="Gerenciar modelos" size_class="field-size-4" only %}
+{% if not c.tem_modelos %}
+  <div class="field field-size-4">
+    <p class="field-help">Nenhum modelo cadastrado para este campo. <a href="{{ c.manage_url }}">Cadastrar modelo</a></p>
+  </div>
+{% endif %}
+<div class="field field-size-4 app-form-field cv-field">
+  <label class="cv-field__label" for="{{ c.textarea.id_for_label }}">{{ c.label }}</label>
+  {{ c.textarea }}
+  {% if c.textarea.errors %}
+    {% include "components/ui/feedback/field_error.html" with errors=c.textarea.errors only %}
+  {% endif %}
+</div>

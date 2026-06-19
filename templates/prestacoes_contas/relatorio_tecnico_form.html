@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260619-rt-form">
+  <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}?v=20260619-rt-summary">
+{% endblock %}
+
+{% block extra_js %}
+  <script>
+    (function () {
+      function preencher(select) {
+        var alvo = select.getAttribute('data-rt-target');
+        if (!alvo) return;
+        var textarea = document.querySelector('[data-rt-textarea="' + alvo + '"]');
+        if (!textarea) return;
+        var opt = select.options[select.selectedIndex];
+        var texto = opt ? (opt.getAttribute('data-texto-modelo') || '').trim() : '';
+        if (!texto) return;
+        textarea.value = texto;
+        textarea.dispatchEvent(new Event('input', { bubbles: true }));
+        textarea.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+
+      function setOtherVisible(wrapper, visible) {
+        if (!wrapper) return;
+        wrapper.hidden = !visible;
+        wrapper.classList.toggle('is-open', visible);
+      }
+
+      function syncOther(select) {
+        var campo = select.getAttribute('data-rt-other-select');
+        if (!campo) return;
+        var otherValue = select.getAttribute('data-rt-other-value') || '__outro__';
+        var wrapper = document.querySelector('[data-rt-other-wrapper="' + campo + '"]');
+        var input = document.querySelector('[data-rt-other-input="' + campo + '"]');
+        var visible = select.value === otherValue;
+        setOtherVisible(wrapper, visible);
+        if (visible && input) {
+          input.removeAttribute('disabled');
+        } else if (input) {
+          input.setAttribute('disabled', 'disabled');
+          input.value = '';
+        }
+      }
+
+      function init() {
+        var selects = document.querySelectorAll('[data-rt-modelo-select="true"]');
+        Array.prototype.forEach.call(selects, function (sel) {
+          sel.addEventListener('change', function () { preencher(this); });
+        });
+        var otherSelects = document.querySelectorAll('[data-rt-other-select]');
+        Array.prototype.forEach.call(otherSelects, function (sel) {
+          sel.addEventListener('change', function () { syncOther(this); });
+          syncOther(sel);
+        });
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
+      }
+    })();
+  </script>
+{% endblock %}
+
+{% block content %}
+  <div class="page-shell page-shell--wizard oficio-wizard app-wizard">
+    {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="PRESTAÇÕES" title=page_title icon_label="PC" module_label="Prestações de Contas" back_label="Voltar à lista" back_url="/prestacoes-contas/" status_label="Relatório Técnico" status_variant="draft" only %}
+
+    <main class="main-form-panel main-form-panel--stack oficio-wizard__main">
+      <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
+        <form method="post" class="oficio-wizard__form" novalidate>
+          {% csrf_token %}
+
+          {% if form.non_field_errors %}
+            {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
+          {% endif %}
+
+          {# CARD 1 — Identificação #}
+          <section class="cv-wizard-section-card rt-summary-card" aria-labelledby="rt-identificacao-title">
+            <header class="cv-wizard-section-header">
+              <div class="cv-wizard-section-header__copy">
+                <h2 class="cv-wizard-section-title" id="rt-identificacao-title">Resumo do ofício</h2>
+                <p class="cv-wizard-section-subtitle">Dados do ofício, viajante e custeios informados no relatório.</p>
+              </div>
+            </header>
+            <div class="cv-wizard-section-body">
+              <dl class="document-meta">
+                <div class="document-meta-item">
+                  <dt>Ofício</dt>
+                  <dd>{{ identificacao.numero }}</dd>
+                </div>
+                <div class="document-meta-item">
+                  <dt>Protocolo</dt>
+                  <dd>{{ identificacao.protocolo }}</dd>
+                </div>
+                <div class="document-meta-item">
+                  <dt>Destino</dt>
+                  <dd>{{ identificacao.destino }}</dd>
+                </div>
+                <div class="document-meta-item rt-summary-card__meta-highlight">
+                  <dt>Período da viagem</dt>
+                  <dd>{{ identificacao.periodo }}</dd>
+                </div>
+                <div class="document-meta-item rt-summary-card__meta-highlight rt-summary-card__meta-server">
+                  <dt>Servidor</dt>
+                  <dd>{{ identificacao.nome_servidor }}</dd>
+                </div>
+                <div class="document-meta-item rt-summary-card__meta-highlight">
+                  <dt>RG</dt>
+                  <dd>{{ identificacao.rg_servidor }}</dd>
+                </div>
+                <div class="document-meta-item rt-summary-card__meta-highlight">
+                  <dt>Cargo</dt>
+                  <dd>{{ identificacao.cargo }}</dd>
+                </div>
+              </dl>
+              <div class="rt-summary-card__cost-grid">
+                {% for item in campos_custeio %}
+                  <div class="rt-cost-field{% if item.uses_other %} rt-cost-field--select{% endif %}">
+                    <label class="rt-cost-field__label" for="{{ item.field.id_for_label }}">{{ item.label }}</label>
+                    {{ item.field }}
+                    {% if item.field.errors %}
+                      {% include "components/ui/feedback/field_error.html" with errors=item.field.errors only %}
+                    {% endif %}
+                    {% if item.uses_other %}
+                      <div class="rt-cost-field__other" data-rt-other-wrapper="{{ item.campo }}" hidden>
+                        <label class="rt-cost-field__other-label" for="{{ item.other.id_for_label }}">Informe {{ item.label|lower }}</label>
+                        {{ item.other }}
+                        {% if item.other.errors %}
+                          {% include "components/ui/feedback/field_error.html" with errors=item.other.errors only %}
+                        {% endif %}
+                      </div>
+                    {% endif %}
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          </section>
+
+          {# CARD 2 — Conteúdo (campos com modelo) #}
+          <section class="cv-wizard-section-card" aria-labelledby="rt-conteudo-title">
+            <header class="cv-wizard-section-header">
+              <div class="cv-wizard-section-header__copy">
+                <h2 class="cv-wizard-section-title" id="rt-conteudo-title">Conteúdo do relatório</h2>
+                <p class="cv-wizard-section-subtitle">Escolha um modelo para cada campo ou escreva livremente.</p>
+              </div>
+            </header>
+            <div class="cv-wizard-section-body">
+              {% for c in campos_modelo %}
+                <section class="wizard-inner-section" aria-label="{{ c.label }}">
+                  <div class="field-grid">
+                    {% include "prestacoes_contas/_campo_com_modelo.html" with c=c only %}
+                  </div>
+                </section>
+              {% endfor %}
+            </div>
+          </section>
+
+          {# Footer actions #}
+          <div class="footer-actions">
+            <div class="footer-actions__secondary">
+              {% include "components/ui/buttons/button.html" with href="/prestacoes-contas/" label="Cancelar" variant="secondary" only %}
+            </div>
+            <div class="footer-actions__primary">
+              {% include "components/ui/buttons/button.html" with type="submit" label="Gerar e baixar DOCX" variant="primary" only %}
+            </div>
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+{% endblock %}

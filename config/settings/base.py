@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "diario_bordo",
     "integracoes.google_drive",
     "protocolos",
+    "prestacoes_contas",
     "ui_lab2",
 ]
 

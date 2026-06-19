@@ -15,6 +15,7 @@ from cadastros.models import Estado
 from cadastros.models import Servidor
 from cadastros.models import Viatura
 from documentos.models import DocumentoArtefato
+from eventos.models import Evento
 from oficios.forms import OficioDadosViajantesForm
 from oficios.forms import ModeloMotivoOficioForm
 from oficios.models import ModeloMotivoOficio
@@ -28,6 +29,7 @@ from oficios.services import criar_modelo_motivo
 from oficios.services import criar_oficio_dados_viajantes
 from oficios.services import excluir_modelo_motivo
 from oficios.services import get_next_available_numero_oficio
+from oficios.services import garantir_roteiro_vinculado_ao_oficio
 from oficios.services import redirect_para_corrigir_documento_oficio
 from oficios.services import validar_oficio_para_documento
 from roteiros.models import Roteiro
@@ -66,6 +68,33 @@ class OficioServicesTests(TestCase):
         Oficio.objects.create(numero=2, ano=ano, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
         primeiro.delete()
         self.assertEqual(get_next_available_numero_oficio(ano), 1)
+
+    def test_garantir_roteiro_oficio_evento_preenche_ida_e_volta(self):
+        estado = Estado.objects.create(nome="Parana", sigla="PR")
+        cidade = Cidade.objects.create(nome="Londrina", estado=estado, uf="PR")
+        evento = Evento.objects.create(
+            destino_uf="PR",
+            destino_cidade="Londrina",
+            data_inicio=datetime.date(2026, 7, 10),
+            data_fim=datetime.date(2026, 7, 12),
+            horario_inicio=datetime.time(9, 30),
+            horario_fim=datetime.time(18, 45),
+        )
+        oficio = Oficio.objects.create(evento=evento, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+
+        oficio = garantir_roteiro_vinculado_ao_oficio(oficio)
+        roteiro = oficio.roteiro
+        saida_local = timezone.localtime(roteiro.saida_dt)
+        retorno_local = timezone.localtime(roteiro.retorno_saida_dt)
+
+        self.assertIsNotNone(roteiro)
+        self.assertEqual(saida_local.date(), datetime.date(2026, 7, 10))
+        self.assertEqual(saida_local.time().replace(tzinfo=None), datetime.time(9, 30))
+        self.assertEqual(retorno_local.date(), datetime.date(2026, 7, 12))
+        self.assertEqual(retorno_local.time().replace(tzinfo=None), datetime.time(18, 45))
+        self.assertTrue(
+            roteiro.destinos.filter(estado=estado, cidade=cidade).exists()
+        )
 
     def test_atualizar_oficio_dados_viajantes_preserva_transporte_data_e_numero(self):
         oficio = Oficio.objects.create(

@@ -1,4 +1,6 @@
 import re
+from datetime import datetime
+from datetime import time
 
 from django.db import transaction
 from django.urls import reverse
@@ -102,6 +104,7 @@ def _try_cached_download(
 from .models import ModeloMotivoOficio
 from .models import Oficio
 from roteiros.models import Roteiro
+from roteiros.models import RoteiroDestino
 
 
 class OficioVinculadoError(Exception):
@@ -110,16 +113,62 @@ class OficioVinculadoError(Exception):
 
 @transaction.atomic
 def garantir_roteiro_vinculado_ao_oficio(oficio: Oficio) -> Oficio:
-    """Garante um roteiro em rascunho vinculado ao ofício para edição na etapa 3."""
+    """Garante um roteiro em rascunho vinculado ao oficio para edicao na etapa 3."""
     if oficio.roteiro_id:
+        _preencher_roteiro_oficio_com_evento(oficio.roteiro, getattr(oficio, "evento", None))
         return oficio
     roteiro = Roteiro.objects.create(
         tipo=Roteiro.TIPO_AVULSO,
         status=Roteiro.STATUS_RASCUNHO,
     )
+    _preencher_roteiro_oficio_com_evento(roteiro, getattr(oficio, "evento", None))
     oficio.roteiro = roteiro
     oficio.save(update_fields=["roteiro", "updated_at"])
     return oficio
+
+
+def _combine_evento_dt(data, hora):
+    if not data:
+        return None
+    value = datetime.combine(data, hora)
+    if timezone.is_naive(value):
+        return timezone.make_aware(value, timezone.get_current_timezone())
+    return value
+
+
+def _preencher_roteiro_oficio_com_evento(roteiro: Roteiro, evento) -> None:
+    if roteiro is None or evento is None:
+        return
+
+    from eventos.services import build_evento_document_seed
+
+    seed = build_evento_document_seed(evento)
+    cidade = seed.get("cidade")
+    estado = seed.get("estado") or getattr(cidade, "estado", None)
+    data_inicio = seed.get("data_inicio")
+    data_fim = seed.get("data_fim") or data_inicio
+    ida_hora = getattr(evento, "horario_inicio", None) or time(8, 0)
+    volta_hora = getattr(evento, "horario_fim", None) or time(16, 0)
+
+    changed_fields = []
+    if not roteiro.saida_dt:
+        roteiro.saida_dt = _combine_evento_dt(data_inicio, ida_hora)
+        if roteiro.saida_dt:
+            changed_fields.append("saida_dt")
+    if not roteiro.retorno_saida_dt:
+        roteiro.retorno_saida_dt = _combine_evento_dt(data_fim, volta_hora)
+        if roteiro.retorno_saida_dt:
+            changed_fields.append("retorno_saida_dt")
+    if changed_fields:
+        roteiro.save(update_fields=[*changed_fields, "updated_at"])
+
+    if cidade and estado and not roteiro.destinos.exists():
+        RoteiroDestino.objects.create(
+            roteiro=roteiro,
+            estado=estado,
+            cidade=cidade,
+            ordem=1,
+        )
 
 
 @transaction.atomic

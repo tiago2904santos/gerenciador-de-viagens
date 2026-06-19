@@ -280,6 +280,27 @@ def _route_columns(trechos: list[RoteiroTrecho]) -> tuple[str, str]:
     return "\n".join(saida_lines), "\n".join(chegada_lines)
 
 
+def _retorno_from_roteiro_header(r, ida: list[RoteiroTrecho]) -> RoteiroTrecho:
+    trecho = RoteiroTrecho(
+        roteiro=r,
+        tipo=RoteiroTrecho.TIPO_RETORNO,
+        saida_dt=r.retorno_saida_dt,
+        chegada_dt=r.retorno_chegada_dt,
+    )
+    origem = ida[-1] if ida else None
+    if origem:
+        trecho.origem_estado = origem.destino_estado
+        trecho.origem_cidade = origem.destino_cidade
+    else:
+        destino = r.destinos.select_related("cidade", "estado").order_by("ordem", "pk").first()
+        if destino:
+            trecho.origem_estado = destino.estado
+            trecho.origem_cidade = destino.cidade
+    trecho.destino_estado = r.origem_estado
+    trecho.destino_cidade = r.origem_cidade
+    return trecho
+
+
 def _roteiro_trechos(oficio: Oficio) -> tuple[list[RoteiroTrecho], list[RoteiroTrecho]]:
     r = oficio.roteiro
     if not r:
@@ -288,8 +309,7 @@ def _roteiro_trechos(oficio: Oficio) -> tuple[list[RoteiroTrecho], list[RoteiroT
     ida = [t for t in qs if t.tipo == RoteiroTrecho.TIPO_IDA]
     volta = [t for t in qs if t.tipo == RoteiroTrecho.TIPO_RETORNO]
     if not volta and (r.retorno_saida_dt or r.retorno_chegada_dt):
-        # Um bloco de retorno só no cabeçalho do roteiro (sem trecho RETORNO).
-        volta = []
+        volta = [_retorno_from_roteiro_header(r, ida)]
     return ida, volta
 
 

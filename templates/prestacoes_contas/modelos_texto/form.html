@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+  <div class="page-shell page-shell--standard-simple">
+    {% include "components/ui/headers/header_stack_simple.html" with eyebrow="PRESTAÇÕES" title=page_title description=page_description icon_label="PC" module_label="Modelos de Texto" only %}
+
+    <form class="main-form-panel" method="post" novalidate>
+      {% csrf_token %}
+      {% include "components/ui/layouts/form_section.html" with title="Dados do modelo" description="Escolha o campo, o nome e o texto do modelo." section_id="modelos-texto-form-section" only %}
+      <div class="field-grid">
+        {% include "components/forms/form_field.html" with field=form.campo size_class="field-size-2" only %}
+        {% include "components/forms/form_field.html" with field=form.nome size_class="field-size-2" only %}
+        {% include "components/forms/form_field.html" with field=form.texto size_class="field-size-4" only %}
+      </div>
+      {% include "components/ui/layouts/card_footer_actions.html" with secondary_label="Voltar" secondary_url=back_url primary_label=submit_label|default:"Salvar" only %}
+    </form>
+  </div>
+{% endblock %}

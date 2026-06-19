@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+  <div class="page-shell page-shell--standard-simple">
+    {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="PRESTAÇÕES" title=page_title description=page_description icon_label="PC" module_label="Prestações de Contas" only %}
+
+    <main class="main-form-panel">
+      <section class="cv-wizard-section-card">
+        <header class="cv-wizard-section-header">
+          <div class="cv-wizard-section-header__copy">
+            <h2 class="cv-wizard-section-title">Prestações cadastradas</h2>
+            <p class="cv-wizard-section-subtitle">Uma prestação de contas por servidor por ofício.</p>
+          </div>
+        </header>
+        <div class="cv-wizard-section-body">
+          <div class="os-list">
+            {% for prestacao in prestacoes %}
+              <article class="os-list-card">
+                <div class="os-list-card__info">
+                  <h3 class="os-list-card__title">{{ prestacao.servidor.nome }}</h3>
+                  <p class="os-list-card__meta">
+                    Ofício {{ prestacao.oficio.numero_formatado }}
+                    {% if prestacao.oficio.evento %}
+                      — {{ prestacao.oficio.evento.titulo }}
+                    {% endif %}
+                  </p>
+                  <p class="os-list-card__meta">
+                    {{ prestacao.servidor.cargo }}
+                    {% if prestacao.servidor.unidade %}
+                      · {{ prestacao.servidor.unidade }}
+                    {% endif %}
+                  </p>
+                </div>
+                <div class="os-list-card__actions">
+                  {% include "components/ui/lists/status_pill.html" with label=prestacao.status_display variant=prestacao.status_variant only %}
+                  {% if prestacao.relatorio_tecnico %}
+                    <a class="cv-btn cv-btn--secondary" href="{% url 'prestacoes_contas:rt_criar' prestacao.pk %}">
+                      <span>Editar RT</span>
+                    </a>
+                    <a class="cv-btn cv-btn--primary" href="{% url 'prestacoes_contas:rt_download' prestacao.relatorio_tecnico.pk %}">
+                      <span>Baixar RT</span>
+                    </a>
+                  {% else %}
+                    <a class="cv-btn cv-btn--secondary" href="{% url 'prestacoes_contas:rt_criar' prestacao.pk %}">
+                      <span>Criar RT</span>
+                    </a>
+                  {% endif %}
+                </div>
+              </article>
+            {% empty %}
+              <div class="os-empty">
+                <h3>Nenhuma prestação de contas registrada</h3>
+                <p>As prestações são criadas automaticamente quando um ofício é gerado.</p>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+{% endblock %}

@@ -1,0 +1,192 @@
+from django import forms
+
+from core.normalizers import normalize_spaces
+
+from .models import ModeloTextoRelatorioTecnico
+from .models import RelatorioTecnico
+
+
+# Campos de texto longo que recebem select de modelos + textarea (estilo "motivo" do ofício).
+CAMPOS_COM_MODELO = [
+    ("atividade", "Objetivo da participação"),
+    ("conclusao", "Conclusão"),
+    ("medidas", "Medidas a serem adotadas pelo órgão"),
+    ("info_complementares", "Informações complementares"),
+]
+
+
+OUTRO_VALUE = "__outro__"
+CAMPOS_CUSTEIO_COM_OUTRO = [
+    ("translado", "Translado"),
+    ("combustivel", "Combustível"),
+    ("passagem", "Passagem"),
+]
+CUSTEIO_CHOICES = [
+    ("", "Selecione"),
+    ("Não houve", "Não houve"),
+    ("Houve", "Houve"),
+    (OUTRO_VALUE, "Outro"),
+]
+_CUSTEIO_VALORES_FIXOS = {value for value, _label in CUSTEIO_CHOICES if value and value != OUTRO_VALUE}
+
+
+class ModeloTextoSelect(forms.Select):
+    """Select que injeta o texto do modelo em cada <option> via data-attr."""
+
+    def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+        option = super().create_option(name, value, label, selected, index, subindex=subindex, attrs=attrs)
+        modelo = getattr(value, "instance", None)
+        if modelo is not None:
+            option["attrs"]["data-texto-modelo"] = (modelo.texto or "").strip()
+        return option
+
+
+class RelatorioTecnicoForm(forms.ModelForm):
+    translado_outro = forms.CharField(
+        label="Translado - outro",
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control cv-field__control", "data-rt-other-input": "translado"}),
+    )
+    combustivel_outro = forms.CharField(
+        label="Combustível - outro",
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control cv-field__control", "data-rt-other-input": "combustivel"}),
+    )
+    passagem_outro = forms.CharField(
+        label="Passagem - outro",
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control cv-field__control", "data-rt-other-input": "passagem"}),
+    )
+
+    class Meta:
+        model = RelatorioTecnico
+        fields = [
+            "diaria",
+            "translado",
+            "combustivel",
+            "passagem",
+            "atividade",
+            "conclusao",
+            "medidas",
+            "info_complementares",
+        ]
+        labels = {
+            "diaria": "Diária",
+            "translado": "Translado",
+            "combustivel": "Combustível",
+            "passagem": "Passagem",
+            "atividade": "Objetivo da participação",
+            "conclusao": "Conclusão",
+            "medidas": "Medidas a serem adotadas pelo órgão",
+            "info_complementares": "Informações complementares",
+        }
+        help_texts = {
+            "diaria": 'Ex.: "R$ 150,00" ou "não houve"',
+            "translado": 'Ex.: "R$ 45,00" ou "não houve"',
+            "combustivel": 'Ex.: "R$ 120,00" ou "não houve"',
+            "passagem": 'Ex.: "R$ 280,00" ou "não houve"',
+        }
+
+    def __init__(self, *args, relatorio=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._relatorio = relatorio
+
+        self.fields["diaria"].widget.attrs.setdefault("class", "form-control cv-field__control")
+        for campo, label in CAMPOS_CUSTEIO_COM_OUTRO:
+            self.fields[campo] = forms.ChoiceField(
+                label=label,
+                choices=CUSTEIO_CHOICES,
+                required=False,
+                widget=forms.Select(
+                    attrs={
+                        "class": "form-select cv-field__control cv-field__control--select",
+                        "data-rt-other-select": campo,
+                        "data-rt-other-value": OUTRO_VALUE,
+                    },
+                ),
+            )
+            self.fields[f"{campo}_outro"].widget.attrs.setdefault(
+                "placeholder",
+                f"Informe {label.lower()}",
+            )
+            self._set_initial_custeio_value(campo)
+
+        # Textareas dos campos com modelo: classe padrão + data-attr para o JS encontrar.
+        rows = {"atividade": 4, "conclusao": 4, "medidas": 3, "info_complementares": 3}
+        for campo, _label in CAMPOS_COM_MODELO:
+            self.fields[campo].required = False
+            self.fields[campo].widget = forms.Textarea(
+                attrs={
+                    "class": "cv-field__control cv-field__control--textarea",
+                    "rows": rows.get(campo, 4),
+                    "data-rt-textarea": campo,
+                },
+            )
+
+        # Um select de modelos por campo, filtrado por `campo`.
+        for campo, label in CAMPOS_COM_MODELO:
+            field_name = f"modelo_{campo}"
+            field = forms.ModelChoiceField(
+                label=f"Modelo de {label.lower()}",
+                queryset=ModeloTextoRelatorioTecnico.objects.filter(campo=campo).order_by("ordem", "nome"),
+                required=False,
+                empty_label="Selecione um modelo (opcional)",
+                widget=ModeloTextoSelect(
+                    attrs={
+                        "class": "form-select",
+                        "data-rt-modelo-select": "true",
+                        "data-rt-target": campo,
+                    },
+                ),
+            )
+            field.label_from_instance = lambda obj: obj.nome
+            self.fields[field_name] = field
+
+    def _set_initial_custeio_value(self, campo):
+        if self.is_bound:
+            return
+        valor = normalize_spaces(self.initial.get(campo) or getattr(self.instance, campo, "") or "")
+        if not valor:
+            return
+        if valor in _CUSTEIO_VALORES_FIXOS:
+            self.initial[campo] = valor
+            return
+        self.initial[campo] = OUTRO_VALUE
+        self.initial[f"{campo}_outro"] = valor
+
+    def clean(self):
+        cleaned = super().clean()
+        for campo, label in CAMPOS_CUSTEIO_COM_OUTRO:
+            valor = cleaned.get(campo) or ""
+            outro = normalize_spaces(cleaned.get(f"{campo}_outro") or "")
+            if valor == OUTRO_VALUE:
+                if not outro:
+                    self.add_error(f"{campo}_outro", f"Informe o valor de {label.lower()}.")
+                cleaned[campo] = outro
+            else:
+                cleaned[campo] = normalize_spaces(valor)
+        return cleaned
+
+
+class ModeloTextoRelatorioTecnicoForm(forms.ModelForm):
+    campo = forms.ChoiceField(
+        label="Campo do relatório",
+        choices=ModeloTextoRelatorioTecnico.CAMPO_CHOICES,
+        widget=forms.Select(attrs={"class": "form-select"}),
+    )
+    nome = forms.CharField(
+        label="Nome",
+        help_text="Use um nome curto para identificar o modelo.",
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+    )
+    texto = forms.CharField(
+        label="Texto do modelo",
+        help_text="Este texto será copiado para o campo do relatório e poderá ser editado antes de gerar.",
+        widget=forms.Textarea(
+            attrs={"class": "form-control", "rows": 6, "style": "width: 100%; height: 150px;"},
+        ),
+    )
+
+    class Meta:
+        model = ModeloTextoRelatorioTecnico
+        fields = ["campo", "nome", "texto"]
