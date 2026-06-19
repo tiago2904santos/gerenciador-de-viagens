@@ -5,7 +5,7 @@
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260619-rt-form">
-  <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}?v=20260619-rt-summary">
+  <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}?v=20260619-rt-summary-ribbons2">
 {% endblock %}
 
 {% block extra_js %}
@@ -81,7 +81,7 @@
           {% endif %}
 
           {# CARD 1 — Identificação #}
-          <section class="cv-wizard-section-card rt-summary-card" aria-labelledby="rt-identificacao-title">
+          <section class="cv-wizard-section-card rt-summary-card oficio-documentos-summary-section" aria-labelledby="rt-identificacao-title">
             <header class="cv-wizard-section-header">
               <div class="cv-wizard-section-header__copy">
                 <h2 class="cv-wizard-section-title" id="rt-identificacao-title">Resumo do ofício</h2>
@@ -89,51 +89,65 @@
               </div>
             </header>
             <div class="cv-wizard-section-body">
-              <dl class="document-meta">
-                <div class="document-meta-item">
-                  <dt>Ofício</dt>
-                  <dd>{{ identificacao.numero }}</dd>
-                </div>
-                <div class="document-meta-item">
-                  <dt>Protocolo</dt>
-                  <dd>{{ identificacao.protocolo }}</dd>
-                </div>
-                <div class="document-meta-item">
-                  <dt>Destino</dt>
-                  <dd>{{ identificacao.destino }}</dd>
-                </div>
-                <div class="document-meta-item rt-summary-card__meta-highlight">
-                  <dt>Período da viagem</dt>
-                  <dd>{{ identificacao.periodo }}</dd>
-                </div>
-                <div class="document-meta-item rt-summary-card__meta-highlight rt-summary-card__meta-server">
-                  <dt>Servidor</dt>
-                  <dd>{{ identificacao.nome_servidor }}</dd>
-                </div>
-                <div class="document-meta-item rt-summary-card__meta-highlight">
-                  <dt>RG</dt>
-                  <dd>{{ identificacao.rg_servidor }}</dd>
-                </div>
-                <div class="document-meta-item rt-summary-card__meta-highlight">
-                  <dt>Cargo</dt>
-                  <dd>{{ identificacao.cargo }}</dd>
-                </div>
-              </dl>
+              <div class="oficio-documentos-grid">
+                <section class="oficio-documentos-admin-facts" aria-label="Dados administrativos">
+                  <div class="oficio-documentos-card__body">
+                    <dl class="oficio-documentos-facts oficio-documentos-facts--admin rt-summary-card__facts">
+                      <div class="oficio-documentos-fact">
+                        <dt>Número do ofício</dt>
+                        <dd>{{ identificacao.numero }}</dd>
+                      </div>
+                      <div class="oficio-documentos-fact">
+                        <dt>Protocolo</dt>
+                        <dd>{{ identificacao.protocolo }}</dd>
+                      </div>
+                      <div class="oficio-documentos-fact">
+                        <dt>Destino</dt>
+                        <dd>{{ identificacao.destino }}</dd>
+                      </div>
+                      <div class="oficio-documentos-fact">
+                        <dt>Período da viagem</dt>
+                        <dd>{{ identificacao.periodo }}</dd>
+                      </div>
+                    </dl>
+                  </div>
+                </section>
+
+                <div class="rt-summary-card__section-ribbon" aria-hidden="true"></div>
+
+                <article class="oficio-documentos-card oficio-documentos-card--travellers rt-summary-card__traveller-card" aria-label="Servidor da prestação">
+                  <header class="oficio-documentos-card__header oficio-documentos-travellers__header">
+                    <div class="oficio-documentos-travellers__titles">
+                      <span class="oficio-documentos-card__eyebrow">Equipe</span>
+                      <h4 class="oficio-documentos-card__title">Servidor</h4>
+                      <p class="oficio-documentos-card__subtitle">Servidor vinculado à prestação de contas</p>
+                    </div>
+                  </header>
+                  <div class="oficio-documentos-card__body">
+                    <div class="oficio-documentos-travellers-lines oficio-documentos-travellers-lines--n1">
+                      <article class="oficio-documentos-traveller-line{% if identificacao.is_motorista %} oficio-documentos-traveller-line--motorista{% endif %}">
+                        <div class="oficio-documentos-traveller-line__name-row">
+                          <strong class="oficio-documentos-traveller-line__name">{{ identificacao.nome_servidor }}</strong>
+                          {% if identificacao.is_motorista %}
+                            {% include "components/ui/badges/chip.html" with label="Motorista" tone="warning" size="compact" only %}
+                          {% endif %}
+                        </div>
+                        <span class="oficio-documentos-traveller-line__cargo">
+                          {{ identificacao.cargo }}{% if identificacao.unidade %} · {{ identificacao.unidade }}{% endif %}{% if identificacao.rg_servidor and identificacao.rg_servidor != "—" %} · RG {{ identificacao.rg_servidor }}{% endif %}
+                        </span>
+                      </article>
+                    </div>
+                  </div>
+                </article>
+              </div>
+              <div class="rt-summary-card__section-ribbon" aria-hidden="true"></div>
               <div class="rt-summary-card__cost-grid">
                 {% for item in campos_custeio %}
-                  <div class="rt-cost-field{% if item.uses_other %} rt-cost-field--select{% endif %}">
-                    <label class="rt-cost-field__label" for="{{ item.field.id_for_label }}">{{ item.label }}</label>
-                    {{ item.field }}
-                    {% if item.field.errors %}
-                      {% include "components/ui/feedback/field_error.html" with errors=item.field.errors only %}
-                    {% endif %}
+                  <div class="rt-cost-field-group{% if item.uses_other %} rt-cost-field-group--select{% endif %}">
+                    {% include "components/forms/form_field.html" with field=item.field label=item.label only %}
                     {% if item.uses_other %}
                       <div class="rt-cost-field__other" data-rt-other-wrapper="{{ item.campo }}" hidden>
-                        <label class="rt-cost-field__other-label" for="{{ item.other.id_for_label }}">Informe {{ item.label|lower }}</label>
-                        {{ item.other }}
-                        {% if item.other.errors %}
-                          {% include "components/ui/feedback/field_error.html" with errors=item.other.errors only %}
-                        {% endif %}
+                        {% include "components/forms/form_field.html" with field=item.other label="Informe "|add:item.label|lower only %}
                       </div>
                     {% endif %}
                   </div>
@@ -142,34 +156,36 @@
             </div>
           </section>
 
-          {# CARD 2 — Conteúdo (campos com modelo) #}
-          <section class="cv-wizard-section-card" aria-labelledby="rt-conteudo-title">
-            <header class="cv-wizard-section-header">
-              <div class="cv-wizard-section-header__copy">
-                <h2 class="cv-wizard-section-title" id="rt-conteudo-title">Conteúdo do relatório</h2>
-                <p class="cv-wizard-section-subtitle">Escolha um modelo para cada campo ou escreva livremente.</p>
+          {# Cards de conteúdo do relatório #}
+          {% for c in campos_modelo %}
+            <section class="cv-wizard-section-card rt-topic-card" aria-labelledby="rt-topic-{{ c.campo }}-title">
+              <header class="cv-wizard-section-header">
+                <div class="cv-wizard-section-header__copy">
+                  <h2 class="cv-wizard-section-title" id="rt-topic-{{ c.campo }}-title">{{ c.label }}</h2>
+                  <p class="cv-wizard-section-subtitle">Escolha um modelo para este tópico ou escreva livremente.</p>
+                </div>
+              </header>
+              <div class="cv-wizard-section-body">
+                <div class="field-grid">
+                  {% include "prestacoes_contas/_campo_com_modelo.html" with c=c only %}
+                </div>
               </div>
-            </header>
-            <div class="cv-wizard-section-body">
-              {% for c in campos_modelo %}
-                <section class="wizard-inner-section" aria-label="{{ c.label }}">
-                  <div class="field-grid">
-                    {% include "prestacoes_contas/_campo_com_modelo.html" with c=c only %}
-                  </div>
+              {% if forloop.last %}
+                <section class="cv-card-footer-section">
+                  <div class="cv-card-footer-section__divider" aria-hidden="true"></div>
+                  <footer class="cv-card-footer">
+                    <div class="cv-card-footer__secondary">
+                      {% include "components/ui/buttons/button.html" with href="/prestacoes-contas/" label="Voltar à lista" variant="secondary" icon="arrow-left" only %}
+                    </div>
+                    <div class="cv-card-footer__primary">
+                      {% include "components/ui/buttons/button.html" with label="Gerar DOCX" variant="secondary" icon="download" icon_after=True type="submit" name="action" value="download_docx" only %}
+                      {% include "components/ui/buttons/button.html" with label="Gerar PDF" variant="primary" icon="download" icon_after=True type="submit" name="action" value="download_pdf" only %}
+                    </div>
+                  </footer>
                 </section>
-              {% endfor %}
-            </div>
-          </section>
-
-          {# Footer actions #}
-          <div class="footer-actions">
-            <div class="footer-actions__secondary">
-              {% include "components/ui/buttons/button.html" with href="/prestacoes-contas/" label="Cancelar" variant="secondary" only %}
-            </div>
-            <div class="footer-actions__primary">
-              {% include "components/ui/buttons/button.html" with type="submit" label="Gerar e baixar DOCX" variant="primary" only %}
-            </div>
-          </div>
+              {% endif %}
+            </section>
+          {% endfor %}
         </form>
       </div>
     </main>

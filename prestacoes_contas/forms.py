@@ -8,6 +8,7 @@ from .models import RelatorioTecnico
 
 # Campos de texto longo que recebem select de modelos + textarea (estilo "motivo" do ofício).
 CAMPOS_COM_MODELO = [
+    ("motivo", "Descrição do evento"),
     ("atividade", "Objetivo da participação"),
     ("conclusao", "Conclusão"),
     ("medidas", "Medidas a serem adotadas pelo órgão"),
@@ -25,8 +26,14 @@ CUSTEIO_CHOICES = [
     ("", "Selecione"),
     ("Não houve", "Não houve"),
     ("Houve", "Houve"),
+    ("Cartão Prime", "Cartão Prime"),
     (OUTRO_VALUE, "Outro"),
 ]
+DEFAULT_CUSTEIO_VALUES = {
+    "translado": "Não houve",
+    "combustivel": "Cartão Prime",
+    "passagem": "Não houve",
+}
 _CUSTEIO_VALORES_FIXOS = {value for value, _label in CUSTEIO_CHOICES if value and value != OUTRO_VALUE}
 
 
@@ -65,6 +72,7 @@ class RelatorioTecnicoForm(forms.ModelForm):
             "translado",
             "combustivel",
             "passagem",
+            "motivo",
             "atividade",
             "conclusao",
             "medidas",
@@ -75,6 +83,7 @@ class RelatorioTecnicoForm(forms.ModelForm):
             "translado": "Translado",
             "combustivel": "Combustível",
             "passagem": "Passagem",
+            "motivo": "Descrição do evento",
             "atividade": "Objetivo da participação",
             "conclusao": "Conclusão",
             "medidas": "Medidas a serem adotadas pelo órgão",
@@ -99,7 +108,7 @@ class RelatorioTecnicoForm(forms.ModelForm):
                 required=False,
                 widget=forms.Select(
                     attrs={
-                        "class": "form-select cv-field__control cv-field__control--select",
+                        "class": "form-select",
                         "data-rt-other-select": campo,
                         "data-rt-other-value": OUTRO_VALUE,
                     },
@@ -112,7 +121,7 @@ class RelatorioTecnicoForm(forms.ModelForm):
             self._set_initial_custeio_value(campo)
 
         # Textareas dos campos com modelo: classe padrão + data-attr para o JS encontrar.
-        rows = {"atividade": 4, "conclusao": 4, "medidas": 3, "info_complementares": 3}
+        rows = {"motivo": 4, "atividade": 4, "conclusao": 4, "medidas": 3, "info_complementares": 3}
         for campo, _label in CAMPOS_COM_MODELO:
             self.fields[campo].required = False
             self.fields[campo].widget = forms.Textarea(
@@ -146,6 +155,8 @@ class RelatorioTecnicoForm(forms.ModelForm):
         if self.is_bound:
             return
         valor = normalize_spaces(self.initial.get(campo) or getattr(self.instance, campo, "") or "")
+        if not valor:
+            valor = DEFAULT_CUSTEIO_VALUES.get(campo, "")
         if not valor:
             return
         if valor in _CUSTEIO_VALORES_FIXOS:

@@ -92,12 +92,14 @@ class RelatorioTecnico(models.Model):
 class ModeloTextoRelatorioTecnico(models.Model):
     """Textos reutilizáveis para preencher rapidamente os campos do RT."""
 
+    CAMPO_MOTIVO = "motivo"
     CAMPO_ATIVIDADE = "atividade"
     CAMPO_CONCLUSAO = "conclusao"
     CAMPO_MEDIDAS = "medidas"
     CAMPO_INFO = "info_complementares"
 
     CAMPO_CHOICES = [
+        (CAMPO_MOTIVO, "Descrição do evento"),
         (CAMPO_ATIVIDADE, "Objetivo da participação"),
         (CAMPO_CONCLUSAO, "Conclusão"),
         (CAMPO_MEDIDAS, "Medidas a serem adotadas pelo órgão"),

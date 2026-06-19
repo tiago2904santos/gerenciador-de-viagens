@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.contrib import messages
 from django.db.models import Q
 from django.http import HttpResponse
@@ -7,6 +9,8 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from core.presenters.meta import build_meta
+from core.utils.masks import format_protocolo
+from documentos.services.exceptions import DocumentValidationError
 
 from .forms import CAMPOS_COM_MODELO
 from .forms import CAMPOS_CUSTEIO_COM_OUTRO
@@ -16,15 +20,19 @@ from .models import ModeloTextoRelatorioTecnico
 from .models import PrestacaoContas
 from .models import RelatorioTecnico
 from .services import gerar_relatorio_tecnico_docx
+from .services import gerar_relatorio_tecnico_pdf
 from .services import nome_arquivo_rt
 
 
-def _diaria_inicial_do_oficio(oficio) -> str:
+def _diaria_inicial_da_prestacao(prestacao) -> str:
     try:
         from documentos.services.formatters import format_currency_br
+        oficio = prestacao.oficio
         roteiro = oficio.roteiro
         if roteiro and roteiro.valor_diarias:
-            return format_currency_br(roteiro.valor_diarias)
+            total_servidores = oficio.servidores.count() or 1
+            valor_por_servidor = Decimal(roteiro.valor_diarias) / Decimal(total_servidores)
+            return format_currency_br(valor_por_servidor)
     except Exception:
         pass
     return ""
@@ -111,13 +119,16 @@ def _build_identificacao(pc) -> dict:
     servidor = pc.servidor
     return {
         "numero": oficio.numero_formatado,
-        "protocolo": oficio.protocolo or "—",
+        "protocolo": format_protocolo(oficio.protocolo) or "—",
         "data_oficio": oficio.data_criacao.strftime("%d/%m/%Y") if oficio.data_criacao else "—",
+        "custeio": oficio.get_custeio_display() if oficio.custeio else "—",
         "destino": _destino_display(oficio) or "—",
         "periodo": _periodo_display(oficio) or "—",
         "nome_servidor": servidor.nome,
         "rg_servidor": servidor.rg_formatado,
         "cargo": str(servidor.cargo) if servidor.cargo_id else "—",
+        "unidade": str(servidor.unidade) if servidor.unidade_id else "",
+        "is_motorista": oficio.motorista_id == servidor.id,
     }
 
 
@@ -163,11 +174,14 @@ def rt_criar(request, pc_pk):
             form.save()
             prestacao.status = PrestacaoContas.STATUS_EM_PREENCHIMENTO
             prestacao.save(update_fields=["status", "atualizado_em"])
-            return redirect("prestacoes_contas:rt_download", pk=relatorio.pk)
+            formato = "pdf" if request.POST.get("action") == "download_pdf" else "docx"
+            return redirect("prestacoes_contas:rt_download_formato", pk=relatorio.pk, formato=formato)
     else:
         initial = {}
         if not relatorio.diaria:
-            initial["diaria"] = _diaria_inicial_do_oficio(prestacao.oficio)
+            initial["diaria"] = _diaria_inicial_da_prestacao(prestacao)
+        if not relatorio.motivo:
+            initial["motivo"] = prestacao.oficio.motivo or ""
         form = RelatorioTecnicoForm(instance=relatorio, relatorio=relatorio, initial=initial)
 
     return render(
@@ -185,7 +199,7 @@ def rt_criar(request, pc_pk):
     )
 
 
-def rt_download(request, pk):
+def rt_download(request, pk, formato="docx"):
     relatorio = get_object_or_404(
         RelatorioTecnico.objects.select_related(
             "prestacao__oficio__roteiro",
@@ -194,13 +208,22 @@ def rt_download(request, pk):
         pk=pk,
     )
 
-    conteudo = gerar_relatorio_tecnico_docx(relatorio)
-    nome = nome_arquivo_rt(relatorio)
+    formato = (formato or "docx").strip().lower()
+    if formato == "pdf":
+        try:
+            conteudo = gerar_relatorio_tecnico_pdf(relatorio)
+        except DocumentValidationError as exc:
+            messages.error(request, str(exc))
+            return redirect("prestacoes_contas:rt_criar", pc_pk=relatorio.prestacao_id)
+        content_type = "application/pdf"
+    else:
+        conteudo = gerar_relatorio_tecnico_docx(relatorio)
+        formato = "docx"
+        content_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 
-    response = HttpResponse(
-        conteudo,
-        content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    )
+    nome = nome_arquivo_rt(relatorio, formato=formato)
+
+    response = HttpResponse(conteudo, content_type=content_type)
     response["Content-Disposition"] = f'attachment; filename="{nome}"'
     return response
 
