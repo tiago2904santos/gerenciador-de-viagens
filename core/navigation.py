@@ -56,7 +56,7 @@ NAVIGATION_ITEMS = [
         ],
     },
     {"id": "roteiros", "label": "Roteiros", "url_name": "roteiros:index", "icon": "RT"},
-    {"id": "eventos", "label": "Eventos", "url_name": "eventos:index", "icon": "EV", "active_when": ["eventos:", "prestacoes:"]},
+    {"id": "eventos", "label": "Eventos", "url_name": "eventos:index", "icon": "EV", "active_when": ["eventos:"]},
     {"id": "oficios", "label": "Ofícios", "url_name": "oficios:index", "icon": "OF"},
     {"id": "termos", "label": "Termos", "url_name": "termos:index", "icon": "TM"},
     {"id": "ordens_servico", "label": "Ordens de Serviço", "url_name": "ordens_servico:index", "icon": "OS", "active_when": ["ordens_servico:"]},

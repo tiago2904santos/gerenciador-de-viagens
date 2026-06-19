@@ -4,7 +4,7 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260618-eventos">
+  <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260618-eventos-fab">
   <link rel="stylesheet" href="{% static 'css/roteiros-list.css' %}?v=20260618-eventos">
   <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260618-eventos">
   <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260618-eventos">
@@ -15,247 +15,493 @@
   <div class="page-shell page-shell--wizard oficio-wizard app-wizard">
     {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="CADASTRO DE OFICIO" title=evento.titulo description=evento.periodo_display icon_label="EV" module_label="Eventos" back_label="Voltar para lista" back_url="/eventos/" status_label=evento.get_status_display status_variant="active" only %}
 
-    {% if evento_chips %}
-      <section class="cv-wizard-section-card">
-        <div class="cv-wizard-section-body">
-          <div class="field-grid">
-            <div class="field field-size-4">
-              {% for chip in evento_chips %}
-                {% include "components/ui/badges/chip.html" with label=chip.label variant=chip.variant only %}
-              {% endfor %}
-            </div>
-          </div>
-        </div>
-      </section>
-    {% endif %}
-
     {% include "components/ui/navigation/page_stepper.html" with steps=evento_page_steps aria_label="Etapas do evento" only %}
 
     <main class="main-form-panel main-form-panel--stack oficio-wizard__main">
       <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
         {% if etapa_atual == 1 %}
-          <section class="cv-wizard-section-card">
-            <header class="cv-wizard-section-header">
-              <div class="cv-wizard-section-header__copy">
-                <h2 class="cv-wizard-section-title">Dados do evento</h2>
-                <p class="cv-wizard-section-subtitle">{{ evento.destino_display }}</p>
-              </div>
-              <div class="cv-wizard-section-header__actions">
-                <a class="cv-btn cv-btn--secondary" href="{% url 'eventos:editar' evento.pk %}"><span>Editar evento</span></a>
-              </div>
-            </header>
-            <div class="cv-wizard-section-body">
-              <div class="field-grid">
-                <div class="field field-size-2">
-                  <div class="pt-resumo-box">
-                    <span class="pt-resumo-box__label">Periodo</span>
-                    <span class="pt-resumo-box__value">{{ evento.periodo_display }}</span>
+          {% load static %}
+          <form method="post" class="oficio-wizard__form" novalidate data-api-cidades-url="{% url 'eventos:api_cidades_por_uf' uf='0' %}">
+            {% csrf_token %}
+            {% with form=evento_form %}
+
+            {% if form.non_field_errors %}
+              {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
+            {% endif %}
+
+            {# CARD 1 — O que é o evento #}
+            <section class="cv-wizard-section-card" aria-labelledby="evento-wizard-tipo-title-d">
+              <header class="cv-wizard-section-header">
+                <div class="cv-wizard-section-header__copy">
+                  <h2 class="cv-wizard-section-title" id="evento-wizard-tipo-title-d">O que é o evento</h2>
+                </div>
+              </header>
+              <div class="cv-wizard-section-body">
+                <div class="field-grid">
+                  {% include "components/forms/form_field.html" with field=form.tipo size_class="field-size-4" only %}
+                </div>
+
+                <div class="field-grid" id="tipo-outro-wrapper-d" hidden>
+                  <div class="field field-size-4 app-form-field cv-field">
+                    <label class="cv-field__label" for="{{ form.tipo_outro.id_for_label }}">{{ form.tipo_outro.label }}</label>
+                    {{ form.tipo_outro }}
+                    {% if form.tipo_outro.errors %}
+                      {% include "components/ui/feedback/field_error.html" with errors=form.tipo_outro.errors only %}
+                    {% endif %}
                   </div>
                 </div>
-                <div class="field field-size-2">
-                  <div class="pt-resumo-box">
-                    <span class="pt-resumo-box__label">Destino</span>
-                    <span class="pt-resumo-box__value">{{ evento.destino_display }}</span>
+
+                <hr style="border: none; border-top: 1px solid var(--cv-border-default, rgba(255,255,255,0.08)); margin: 0.5rem 0 0;">
+
+                <section class="wizard-inner-section" aria-labelledby="evento-wizard-motivo-d">
+                  <header class="wizard-inner-section__header">
+                    <h4 class="wizard-inner-section__title" id="evento-wizard-motivo-d">Motivo</h4>
+                  </header>
+                  <div class="field-grid">
+                    {% include "components/forms/input_with_action.html" with field=form.modelo_motivo action_url=modelos_motivo_url action_label="Gerenciar modelos" size_class="field-size-4" only %}
                   </div>
+                  <div class="field-grid">
+                    <div class="field field-size-4 app-form-field cv-field">
+                      <label class="cv-field__label" for="{{ form.motivo.id_for_label }}">{{ form.motivo.label }}</label>
+                      {{ form.motivo }}
+                      {% if form.motivo.errors %}
+                        {% include "components/ui/feedback/field_error.html" with errors=form.motivo.errors only %}
+                      {% endif %}
+                    </div>
+                  </div>
+                </section>
+              </div>
+            </section>
+
+            {# CARD 2 — Datas e destinos #}
+            <section class="cv-wizard-section-card termo-card termo-card--evento" id="evento-card-dados-d">
+              <header class="cv-wizard-section-header">
+                <div class="cv-wizard-section-header__copy">
+                  <h2 class="cv-wizard-section-title">2. Evento</h2>
+                  <p class="cv-wizard-section-subtitle">Destino e periodo sao obrigatorios para avançar.</p>
                 </div>
-                <div class="field field-size-4">
-                  <div class="pt-resumo-box">
-                    <span class="pt-resumo-box__label">Contexto</span>
-                    <span class="pt-resumo-box__value">{{ evento.descricao|default:"Sem descricao informada." }}</span>
+              </header>
+
+              <div class="cv-date-picker termo-date-picker" data-cv-date-picker data-mode="range" id="evento-date-picker-d">
+                <div class="cv-wizard-section-body termo-evento-body">
+                  <section class="wizard-inner-section termo-evento-periodo" aria-label="Periodo do evento">
+                    <div class="field-grid roteiro-sede-grid termo-evento-dates">
+                      <div class="field cv-field">
+                        <label class="cv-field__label" for="id_data_inicio_display_d">Data inicial</label>
+                        <div class="cv-date-picker__control">
+                          <input type="text" class="cv-field__control" id="id_data_inicio_display_d" placeholder="dd/mm/aaaa" autocomplete="off" inputmode="numeric" maxlength="10" data-cv-date-picker-start-display readonly>
+                          <button type="button" class="cv-date-picker__trigger cv-date-picker__trigger--icon" data-cv-date-picker-trigger aria-label="Abrir calendario">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                          </button>
+                        </div>
+                      </div>
+                      <div class="field cv-field">
+                        <label class="cv-field__label" for="id_data_fim_display_d">Data final</label>
+                        <div class="cv-date-picker__control">
+                          <input type="text" class="cv-field__control" id="id_data_fim_display_d" placeholder="dd/mm/aaaa" autocomplete="off" inputmode="numeric" maxlength="10" data-cv-date-picker-end-display readonly>
+                          <button type="button" class="cv-date-picker__trigger cv-date-picker__trigger--icon" data-cv-date-picker-trigger aria-label="Abrir calendario">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    {{ form.data_inicio }}
+                    {{ form.data_fim }}
+                    {% if form.data_inicio.errors %}
+                      {% include "components/ui/feedback/field_error.html" with errors=form.data_inicio.errors only %}
+                    {% endif %}
+                    {% if form.data_fim.errors %}
+                      {% include "components/ui/feedback/field_error.html" with errors=form.data_fim.errors only %}
+                    {% endif %}
+                  </section>
+
+                  <section class="wizard-inner-section termo-evento-destinos" aria-labelledby="evento-destinos-title-d" id="evento-wizard-destinos-d">
+                    <header class="wizard-inner-section__header">
+                      <h4 class="wizard-inner-section__title" id="evento-destinos-title-d">Destinos</h4>
+                    </header>
+                    {# Campo hidden que recebe o JSON com todos os destinos antes do submit #}
+                    <input type="hidden" name="destinos_json" id="id-destinos-json-d">
+                    <div class="cv-search-picker">
+                      <section class="cv-search-picker__selected-panel roteiro-destinos-panel" aria-label="Destinos adicionados">
+                        <div class="cv-search-picker__selected-header roteiro-destinos-panel__header">
+                          <h4 class="cv-search-picker__selected-title">Destinos adicionados</h4>
+                          <button type="button" class="cv-btn cv-btn--secondary cv-btn--sm" id="btn-adicionar-destino-d" data-evento-add-destino-d>
+                            <span>+ Adicionar destino</span>
+                          </button>
+                        </div>
+                        <div class="cv-search-picker__selected-list roteiro-destinos-list" id="destinos-lista-d">
+                          <div class="cv-search-picker__selected-card destino-row termo-destino-row" data-destino-index="0">
+                            <div class="cv-search-picker__selected-main">
+                              <div class="field-grid roteiro-sede-grid roteiro-destino-grid">
+                                <div class="field app-form-field">
+                                  {% include "components/forms/form_field.html" with field=form.destino_uf only %}
+                                </div>
+                                <div class="field app-form-field cv-field">
+                                  <select
+                                    name="destino_cidade"
+                                    class="cv-field__control"
+                                    data-destino-cidade-picker
+                                    id="{{ form.destino_cidade.id_for_label }}"
+                                    data-initial-value="{{ form.destino_cidade.value|default:'' }}"
+                                    disabled
+                                  >
+                                    <option value="">---------</option>
+                                  </select>
+                                  {% if form.destino_cidade.errors %}
+                                    {% include "components/ui/feedback/field_error.html" with errors=form.destino_cidade.errors only %}
+                                  {% endif %}
+                                </div>
+                              </div>
+                            </div>
+                            <button type="button" class="cv-search-picker__remove btn-remover-destino" data-remover-destino title="Remover destino" aria-label="Remover destino" hidden>×</button>
+                          </div>
+                        </div>
+                      </section>
+                    </div>
+
+                    {# Template para novas linhas de destino (clonado via JS) #}
+                    <template id="tmpl-destino-extra-d">
+                      <div class="cv-search-picker__selected-card destino-row termo-destino-row" data-destino-index="">
+                        <div class="cv-search-picker__selected-main">
+                          <div class="cv-search-picker__selected-title-row">
+                            <span class="cv-search-picker__selected-name">Destino</span>
+                          </div>
+                          <div class="field-grid roteiro-sede-grid roteiro-destino-grid">
+                            <div class="field app-form-field cv-field">
+                              <select class="cv-search-picker__native" data-cv-search-picker="true" data-picker-mode="single" data-picker-variant="compact" data-placeholder="Buscar estado..." data-empty-message="Nenhum estado encontrado." data-destino-uf-extra aria-label="Estado">
+                                <option value="">Selecione o estado</option>
+                                {% for value, label in form.destino_uf.field.choices %}{% if value %}<option value="{{ value }}">{{ label }}</option>{% endif %}{% endfor %}
+                              </select>
+                            </div>
+                            <div class="field app-form-field cv-field">
+                              <select
+                                class="cv-search-picker__native"
+                                data-cv-search-picker="true"
+                                data-picker-mode="single"
+                                data-picker-variant="compact"
+                                data-placeholder="Buscar cidade..."
+                                data-empty-message="Nenhuma cidade encontrada."
+                                data-destino-cidade-extra
+                                aria-label="Cidade"
+                                disabled
+                              >
+                                <option value="">---------</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                        <button type="button" class="cv-search-picker__remove btn-remover-destino" data-remover-destino title="Remover destino" aria-label="Remover destino">×</button>
+                      </div>
+                    </template>
+                  </section>
+                </div>
+
+                <div class="cv-date-picker__panel" hidden data-cv-date-picker-panel>
+                  <div class="cv-date-picker__context" data-cv-date-picker-context hidden>
+                    <span class="cv-date-picker__context-step" data-cv-date-picker-context-step></span>
+                    <strong class="cv-date-picker__context-route" data-cv-date-picker-context-route></strong>
+                  </div>
+                  <div class="cv-date-picker__panel-header">
+                    <button class="cv-date-picker__nav" type="button" data-cv-date-picker-prev aria-label="Mes anterior">Anterior</button>
+                    <div class="cv-date-picker__month" data-cv-date-picker-month></div>
+                    <button class="cv-date-picker__nav" type="button" data-cv-date-picker-next aria-label="Proximo mes">Proximo</button>
+                  </div>
+                  <div class="cv-date-picker__weekdays" data-cv-date-picker-weekdays></div>
+                  <div class="cv-date-picker__days" data-cv-date-picker-days></div>
+                  <div class="cv-date-picker__footer">
+                    <button type="button" class="cv-date-picker__footer-action" data-cv-date-picker-today>Hoje</button>
+                    <button type="button" class="cv-date-picker__footer-action" data-cv-date-picker-clear>Limpar</button>
                   </div>
                 </div>
               </div>
-            </div>
-          </section>
+              {% url 'eventos:index' as back_url_eventos %}
+              {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar à lista" secondary_url=back_url_eventos primary_label="Salvar e avançar" primary_action="wizard_next" only %}
+              {% endwith %}
+            </section>
+
+            
+          </form>
+
+          <script src="{% static 'js/pages/oficios-dados-viajantes.js' %}?v=20260618-eventos-det" defer></script>
+          <script>
+            (function () {
+              var CIDADES_CACHE_D = {};
+
+              function normStrD(s) {
+                return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+              }
+
+              function populateCidadesD(cidadeSel, data, initialValue) {
+                var normInitial = normStrD(initialValue);
+                cidadeSel.innerHTML = '<option value="">---------</option>';
+                data.forEach(function (c) {
+                  var opt = document.createElement('option');
+                  opt.value = c.id;
+                  opt.textContent = c.nome;
+                  if (normInitial && normStrD(c.id) === normInitial) opt.selected = true;
+                  cidadeSel.appendChild(opt);
+                });
+                cidadeSel.disabled = false;
+              }
+
+              function loadCidadesForUfD(form, cidadeSel, uf, initialValue) {
+                uf = String(uf || '').trim();
+                var urlTemplate = (form && form.dataset.apiCidadesUrl) || '';
+                cidadeSel.innerHTML = '<option value="">---------</option>';
+                if (!uf || !urlTemplate) {
+                  cidadeSel.disabled = true;
+                  return;
+                }
+                var cached = CIDADES_CACHE_D[uf];
+                if (cached) { populateCidadesD(cidadeSel, cached, initialValue); return; }
+                cidadeSel.disabled = true;
+                var url = urlTemplate.replace('/0/', '/' + encodeURIComponent(uf) + '/');
+                fetch(url, { headers: { Accept: 'application/json' } })
+                  .then(function (r) { return r.json(); })
+                  .then(function (data) {
+                    CIDADES_CACHE_D[uf] = data;
+                    populateCidadesD(cidadeSel, data, initialValue);
+                  })
+                  .catch(function () { cidadeSel.disabled = true; });
+              }
+
+              function syncTipoOutroD() {
+                var select = document.querySelector('#evento-card-dados-d').closest('form').querySelector('[data-tipo-evento-select="true"]');
+                if (!select) select = document.querySelector('[name="tipo"]');
+                var wrapper = document.getElementById('tipo-outro-wrapper-d');
+                if (!select || !wrapper) return;
+                wrapper.hidden = select.value !== 'outros';
+              }
+              function initTipoOutroD() {
+                var select = document.querySelector('[name="tipo"]');
+                if (!select) return;
+                select.addEventListener('change', syncTipoOutroD);
+                select.addEventListener('input', syncTipoOutroD);
+                syncTipoOutroD();
+              }
+
+              function initCidadePickerD(form) {
+                var ufSel = form.querySelector('select[name="destino_uf"]');
+                var cidadeSel = form.querySelector('[data-destino-cidade-picker]');
+                if (!ufSel || !cidadeSel) return;
+                var initialValue = cidadeSel.dataset.initialValue || '';
+                ufSel.addEventListener('change', function () {
+                  loadCidadesForUfD(form, cidadeSel, ufSel.value, '');
+                });
+                if (ufSel.value) {
+                  loadCidadesForUfD(form, cidadeSel, ufSel.value, initialValue);
+                }
+              }
+
+              function serializeDestinosD() {
+                var lista = document.getElementById('destinos-lista-d');
+                var jsonInput = document.getElementById('id-destinos-json-d');
+                if (!lista || !jsonInput) return;
+                var rows = lista.querySelectorAll('[data-destino-index]');
+                var result = [];
+                rows.forEach(function (row) {
+                  var idx = row.dataset.destinoIndex;
+                  var uf, cidade;
+                  if (idx === '0') {
+                    var ufSel = row.querySelector('select[name="destino_uf"]');
+                    var cidadeSel = row.querySelector('[data-destino-cidade-picker]');
+                    uf = ufSel ? ufSel.value : '';
+                    cidade = cidadeSel ? cidadeSel.value : '';
+                  } else {
+                    var ufSelExtra = row.querySelector('[data-destino-uf-extra]');
+                    var cidadeSelExtra = row.querySelector('[data-destino-cidade-extra]');
+                    uf = ufSelExtra ? ufSelExtra.value : '';
+                    cidade = cidadeSelExtra ? cidadeSelExtra.value : '';
+                  }
+                  result.push({ uf: uf, cidade: cidade });
+                });
+                jsonInput.value = JSON.stringify(result);
+              }
+
+              var SEDE_UF_D = '{{ sede_uf|escapejs }}';
+
+              function refreshRemoveButtonsD(lista) {
+                var rows = lista.querySelectorAll('[data-destino-index]');
+                var count = rows.length;
+                rows.forEach(function (row) {
+                  var btn = row.querySelector('[data-remover-destino]');
+                  if (btn) btn.hidden = count <= 1;
+                });
+              }
+
+              function initAddDestinoD() {
+                var btn = document.getElementById('btn-adicionar-destino-d');
+                var lista = document.getElementById('destinos-lista-d');
+                var tmpl = document.getElementById('tmpl-destino-extra-d');
+                var cardEl = document.getElementById('evento-card-dados-d');
+                var form = cardEl ? cardEl.closest('form') : null;
+                if (!btn || !lista || !tmpl) return;
+
+                var extraCount = 0;
+
+                function wireRow(row) {
+                  var removeBtn = row.querySelector('[data-remover-destino]');
+                  if (removeBtn) {
+                    removeBtn.addEventListener('click', function () {
+                      row.parentNode.removeChild(row);
+                      refreshRemoveButtonsD(lista);
+                    });
+                  }
+                  var ufExtra = row.querySelector('[data-destino-uf-extra]');
+                  var cidadeExtra = row.querySelector('[data-destino-cidade-extra]');
+                  if (ufExtra && cidadeExtra) {
+                    ufExtra.addEventListener('change', function () {
+                      loadCidadesForUfD(form, cidadeExtra, ufExtra.value, '');
+                    });
+                  }
+                }
+
+                // Wire row 0 remove button
+                var row0 = lista.querySelector('[data-destino-index="0"]');
+                if (row0) wireRow(row0);
+                refreshRemoveButtonsD(lista);
+
+                btn.addEventListener('click', function () {
+                  extraCount += 1;
+                  var clone = tmpl.content.cloneNode(true);
+                  var row = clone.querySelector('[data-destino-index]');
+                  if (row) row.dataset.destinoIndex = String(extraCount);
+                  var ufSel = clone.querySelector('[data-destino-uf-extra]');
+                  if (ufSel) ufSel.removeAttribute('data-cv-search-picker-ready');
+                  lista.appendChild(clone);
+                  var newRow = lista.querySelector('[data-destino-index="' + extraCount + '"]');
+                  if (newRow) {
+                    wireRow(newRow);
+                    refreshRemoveButtonsD(lista);
+                    if (window.CV && window.CV.fields && window.CV.fields.initSearchPickers) {
+                      window.CV.fields.initSearchPickers(newRow);
+                    }
+                    // Auto-fill sede UF
+                    if (SEDE_UF_D) {
+                      var ufExtra = newRow.querySelector('[data-destino-uf-extra]');
+                      if (ufExtra) {
+                        ufExtra.value = SEDE_UF_D;
+                        ufExtra.dispatchEvent(new Event('change', { bubbles: true }));
+                      }
+                    }
+                  }
+                });
+
+                if (form) {
+                  form.addEventListener('submit', function () { serializeDestinosD(); });
+                }
+              }
+
+              function initD() {
+                var form = document.querySelector('.oficio-wizard__form');
+                initTipoOutroD();
+                if (form) initCidadePickerD(form);
+                initAddDestinoD();
+              }
+
+              if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initD);
+              } else {
+                initD();
+              }
+            })();
+          </script>
         {% endif %}
 
         {% if etapa_atual == 2 %}
-          <section class="cv-wizard-section-card">
-            <header class="cv-wizard-section-header">
-              <div class="cv-wizard-section-header__copy">
-                <h2 class="cv-wizard-section-title">Roteiros</h2>
-                <p class="cv-wizard-section-subtitle">Rotas e diarias vinculadas a este evento.</p>
-              </div>
-              <div class="cv-wizard-section-header__actions">
-                {% include "components/ui/buttons/button.html" with href=create_urls.roteiro label="Novo roteiro" variant="primary" icon="plus" only %}
-              </div>
-            </header>
-            <div class="cv-wizard-section-body">
-              <div class="list-content list-grid list-grid--roteiros app-list-grid">
-                {% for card in roteiro_cards %}
-                  {% include "components/lists/main_list_card.html" with card=card only %}
-                {% empty %}
-                  {% include "components/lists/list_empty.html" with message="Nenhum roteiro vinculado a este evento." action_label="Novo roteiro" action_url=create_urls.roteiro only %}
-                {% endfor %}
-              </div>
-            </div>
-          </section>
+          <div class="list-content list-grid list-grid--roteiros app-list-grid">
+            {% for card in roteiro_cards %}
+              {% include "components/lists/main_list_card.html" with card=card only %}
+            {% empty %}
+              {% include "components/lists/list_empty.html" with message="Nenhum roteiro vinculado a este evento." action_label="Novo roteiro" action_url=create_urls.roteiro only %}
+            {% endfor %}
+          </div>
+          <div class="cv-fab-container">
+            {% include "components/ui/buttons/button.html" with href=create_urls.roteiro label="Novo roteiro" variant="primary" icon="plus" extra_class="cv-fab" only %}
+          </div>
         {% endif %}
 
         {% if etapa_atual == 3 %}
-          <section class="cv-wizard-section-card">
-            <header class="cv-wizard-section-header">
-              <div class="cv-wizard-section-header__copy">
-                <h2 class="cv-wizard-section-title">Oficios / Justificativas</h2>
-                <p class="cv-wizard-section-subtitle">Oficios oficiais e justificativas geradas no fluxo de oficio.</p>
-              </div>
-              <div class="cv-wizard-section-header__actions">
-                {% include "components/ui/buttons/button.html" with href=create_urls.oficio label="Novo oficio" variant="primary" icon="plus" only %}
-              </div>
-            </header>
-            <div class="cv-wizard-section-body">
-              <div class="list-content app-list-grid">
-                {% for card in oficio_cards %}
-                  {% include "oficios/partials/oficio_list_card.html" with card=card only %}
-                {% empty %}
-                  {% include "components/lists/list_empty.html" with message="Nenhum oficio vinculado a este evento." action_label="Novo oficio" action_url=create_urls.oficio only %}
-                {% endfor %}
-              </div>
-            </div>
-          </section>
+          <div class="list-content app-list-grid">
+            {% for card in oficio_cards %}
+              {% include "oficios/partials/oficio_list_card.html" with card=card only %}
+            {% empty %}
+              {% include "components/lists/list_empty.html" with message="Nenhum oficio vinculado a este evento." action_label="Novo oficio" action_url=create_urls.oficio only %}
+            {% endfor %}
+          </div>
+          <div class="cv-fab-container">
+            {% include "components/ui/buttons/button.html" with href=create_urls.oficio label="Novo oficio" variant="primary" icon="plus" extra_class="cv-fab" only %}
+          </div>
         {% endif %}
 
         {% if etapa_atual == 4 %}
-          <section class="cv-wizard-section-card">
-            <header class="cv-wizard-section-header">
-              <div class="cv-wizard-section-header__copy">
-                <h2 class="cv-wizard-section-title">PT / OS</h2>
-                <p class="cv-wizard-section-subtitle">Planos de trabalho e ordens de servico do evento.</p>
-              </div>
-              <div class="cv-wizard-section-header__actions">
-                {% include "components/ui/buttons/button.html" with href=create_urls.plano label="Novo plano" variant="primary" icon="plus" only %}
-                {% include "components/ui/buttons/button.html" with href=create_urls.ordem label="Nova OS" variant="secondary" icon="plus" only %}
-              </div>
-            </header>
-            <div class="cv-wizard-section-body">
-              <div class="list-content app-list-grid">
-                {% for card in plano_cards %}
-                  {% include "planos_trabalho/partials/plano_list_card.html" with card=card only %}
-                {% endfor %}
-                {% for ordem in ordens %}
-                  <article class="os-list-card">
-                    <div class="os-list-card__info">
-                      <h3 class="os-list-card__title">{{ ordem.numero_formatado }}</h3>
-                      <p class="os-list-card__meta">{{ ordem.periodo_display }}</p>
-                      <p class="os-list-card__meta">{{ ordem.destinos_display }}</p>
-                      <p class="os-list-card__meta">Servidores: {{ ordem.servidores.count }}</p>
-                    </div>
-                    <div class="os-list-card__actions">
-                      <a class="cv-btn cv-btn--secondary" href="{% url 'ordens_servico:editar' ordem.pk %}"><span>Abrir</span></a>
-                    </div>
-                  </article>
-                {% endfor %}
-                {% if not plano_cards and not ordens %}
-                  {% include "components/lists/list_empty.html" with message="Nenhum plano ou OS vinculado a este evento." action_label="Novo plano" action_url=create_urls.plano only %}
-                {% endif %}
-              </div>
-            </div>
-          </section>
+          <div class="list-content app-list-grid">
+            {% for card in plano_cards %}
+              {% include "planos_trabalho/partials/plano_list_card.html" with card=card only %}
+            {% endfor %}
+            {% for ordem in ordens %}
+              <article class="os-list-card">
+                <div class="os-list-card__info">
+                  <h3 class="os-list-card__title">{{ ordem.numero_formatado }}</h3>
+                  <p class="os-list-card__meta">{{ ordem.periodo_display }}</p>
+                  <p class="os-list-card__meta">{{ ordem.destinos_display }}</p>
+                  <p class="os-list-card__meta">Servidores: {{ ordem.servidores.count }}</p>
+                </div>
+                <div class="os-list-card__actions">
+                  <a class="cv-btn cv-btn--secondary" href="{% url 'ordens_servico:editar' ordem.pk %}"><span>Abrir</span></a>
+                </div>
+              </article>
+            {% endfor %}
+            {% if not plano_cards and not ordens %}
+              {% include "components/lists/list_empty.html" with message="Nenhum plano ou OS vinculado a este evento." action_label="Novo plano" action_url=create_urls.plano only %}
+            {% endif %}
+          </div>
+          <div class="cv-fab-container">
+            {% include "components/ui/buttons/button.html" with href=create_urls.plano label="Novo plano" variant="primary" icon="plus" extra_class="cv-fab" only %}
+            {% include "components/ui/buttons/button.html" with href=create_urls.ordem label="Nova OS" variant="secondary" icon="plus" extra_class="cv-fab" only %}
+          </div>
         {% endif %}
 
         {% if etapa_atual == 5 %}
-          <section class="cv-wizard-section-card">
-            <header class="cv-wizard-section-header">
-              <div class="cv-wizard-section-header__copy">
-                <h2 class="cv-wizard-section-title">Termos</h2>
-                <p class="cv-wizard-section-subtitle">Termos de autorizacao vinculados ao evento.</p>
+          <div class="termos-list">
+            {% for termo in termos %}
+              <article class="termo-list-card">
+                <div>
+                  <h3 class="termo-list-card__title">{{ termo.destino_display }}</h3>
+                  <p class="termo-list-card__meta">
+                    {{ termo.periodo_display }}
+                    {% if termo.oficio_id %} - Oficio {{ termo.oficio.numero_formatado }}{% endif %}
+                  </p>
+                  <p class="termo-list-card__meta">
+                    Servidores:
+                    {% if termo.servidores.exists %}
+                      {{ termo.servidores.count }}
+                    {% elif termo.oficio_id %}
+                      fallback do oficio
+                    {% else %}
+                      sem servidor
+                    {% endif %}
+                    {% if termo.viatura_id %} - Viatura {{ termo.viatura }}{% endif %}
+                  </p>
+                </div>
+                <div class="termo-list-card__actions">
+                  <a class="cv-btn cv-btn--secondary" href="{% url 'termos:editar' termo.pk %}"><span>Abrir</span></a>
+                  <a class="cv-btn cv-btn--secondary" href="{% url 'termos:preview_cadastro' termo.pk %}"><span>Preview</span></a>
+                </div>
+              </article>
+            {% empty %}
+              <div class="termos-empty">
+                <h3>Nenhum termo vinculado</h3>
+                <p>Use o cadastro oficial de termos para criar o documento deste evento.</p>
+                {% include "components/ui/buttons/button.html" with href=create_urls.termo label="Novo termo" variant="primary" only %}
               </div>
-              <div class="cv-wizard-section-header__actions">
-                {% include "components/ui/buttons/button.html" with href=create_urls.termo label="Novo termo" variant="primary" icon="plus" only %}
-              </div>
-            </header>
-            <div class="cv-wizard-section-body">
-              <div class="termos-list">
-                {% for termo in termos %}
-                  <article class="termo-list-card">
-                    <div>
-                      <h3 class="termo-list-card__title">{{ termo.destino_display }}</h3>
-                      <p class="termo-list-card__meta">
-                        {{ termo.periodo_display }}
-                        {% if termo.oficio_id %} - Oficio {{ termo.oficio.numero_formatado }}{% endif %}
-                      </p>
-                      <p class="termo-list-card__meta">
-                        Servidores:
-                        {% if termo.servidores.exists %}
-                          {{ termo.servidores.count }}
-                        {% elif termo.oficio_id %}
-                          fallback do oficio
-                        {% else %}
-                          sem servidor
-                        {% endif %}
-                        {% if termo.viatura_id %} - Viatura {{ termo.viatura }}{% endif %}
-                      </p>
-                    </div>
-                    <div class="termo-list-card__actions">
-                      <a class="cv-btn cv-btn--secondary" href="{% url 'termos:editar' termo.pk %}"><span>Abrir</span></a>
-                      <a class="cv-btn cv-btn--secondary" href="{% url 'termos:preview_cadastro' termo.pk %}"><span>Preview</span></a>
-                    </div>
-                  </article>
-                {% empty %}
-                  <div class="termos-empty">
-                    <h3>Nenhum termo vinculado</h3>
-                    <p>Use o cadastro oficial de termos para criar o documento deste evento.</p>
-                    {% include "components/ui/buttons/button.html" with href=create_urls.termo label="Novo termo" variant="primary" only %}
-                  </div>
-                {% endfor %}
-              </div>
-            </div>
-          </section>
+            {% endfor %}
+          </div>
 
-          <section class="cv-wizard-section-card">
-            <header class="cv-wizard-section-header">
-              <div class="cv-wizard-section-header__copy">
-                <h2 class="cv-wizard-section-title">Prestacao de contas</h2>
-                <p class="cv-wizard-section-subtitle">Status: {{ prestacao_context.status }}</p>
-              </div>
-            </header>
-            <div class="cv-wizard-section-body">
-              <div class="field-grid">
-                <div class="field field-size-2">
-                  <h3>Relatorio tecnico</h3>
-                  {% if prestacao_context.relatorio %}
-                    <p>{{ prestacao_context.relatorio.get_status_display }}</p>
-                    <a class="cv-btn cv-btn--secondary" href="{% url 'prestacoes:editar_relatorio' prestacao_context.relatorio.pk %}"><span>Abrir relatorio tecnico</span></a>
-                  {% else %}
-                    <p>Nao criado.</p>
-                    <a class="cv-btn cv-btn--primary" href="{% url 'prestacoes:criar_relatorio_evento' evento.pk %}"><span>Criar relatorio tecnico</span></a>
-                  {% endif %}
-                </div>
-                <div class="field field-size-2">
-                  <h3>Diario de bordo</h3>
-                  {% if prestacao_context.diario %}
-                    <p>{{ prestacao_context.diario.get_status_display }} - {{ prestacao_context.diario.registros.count }} registro(s)</p>
-                    <a class="cv-btn cv-btn--secondary" href="{% url 'prestacoes:editar_diario' prestacao_context.diario.pk %}"><span>Abrir diario de bordo</span></a>
-                  {% else %}
-                    <p>Nao criado.</p>
-                    <a class="cv-btn cv-btn--primary" href="{% url 'prestacoes:criar_diario_evento' evento.pk %}"><span>Criar diario de bordo</span></a>
-                  {% endif %}
-                </div>
-                <div class="field field-size-4">
-                  <h3>Prestacao</h3>
-                  {% if prestacao_context.prestacao %}
-                    <p>{{ prestacao_context.prestacao.get_status_display }}</p>
-                    <a class="cv-btn cv-btn--secondary" href="{% url 'prestacoes:editar_prestacao' prestacao_context.prestacao.pk %}"><span>Abrir prestacao de contas</span></a>
-                  {% else %}
-                    <p>Nao criada.</p>
-                    <a class="cv-btn cv-btn--primary" href="{% url 'prestacoes:prestacao_evento' evento.pk %}"><span>Criar prestacao de contas</span></a>
-                  {% endif %}
-                </div>
-                <div class="field field-size-4">
-                  <h3>Pendencias</h3>
-                  {% if prestacao_context.pendencias %}
-                    <ul>
-                      {% for pendencia in prestacao_context.pendencias %}
-                        <li>{{ pendencia }}</li>
-                      {% endfor %}
-                    </ul>
-                  {% else %}
-                    <p>Nenhuma pendencia basica identificada.</p>
-                  {% endif %}
-                </div>
-              </div>
-            </div>
-          </section>
+
+          <div class="cv-fab-container">
+            {% include "components/ui/buttons/button.html" with href=create_urls.termo label="Novo termo" variant="primary" icon="plus" extra_class="cv-fab" only %}
+          </div>
         {% endif %}
       </div>
     </main>

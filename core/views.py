@@ -592,7 +592,6 @@ UI_LAB_EVENTOS_STATUS_OPTIONS = [
     {"value": "em_preparacao", "label": "Em preparacao"},
     {"value": "documentos_gerados", "label": "Documentos gerados"},
     {"value": "em_execucao", "label": "Em execucao"},
-    {"value": "prestacao_pendente", "label": "Prestacao pendente"},
     {"value": "finalizado", "label": "Finalizado"},
     {"value": "cancelado", "label": "Cancelado"},
 ]
@@ -701,20 +700,6 @@ UI_LAB_EVENTOS_CARDS = [
         oficios=6,
         documentos=9,
         pendencias=0,
-        drive="Vinculado",
-    ),
-    _ui_lab_evento_card(
-        titulo="Seminario Estadual de Seguranca",
-        status_variant="prestacao_pendente",
-        status_label="Prestacao pendente",
-        status_tone="warning",
-        destino="Maringa/PR",
-        periodo="02/05 a 04/05/2026",
-        responsavel="Del. Paulo Reis",
-        unidade="DRACO",
-        oficios=3,
-        documentos=5,
-        pendencias=2,
         drive="Vinculado",
     ),
     _ui_lab_evento_card(

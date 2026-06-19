@@ -10,7 +10,7 @@
         <header class="cv-wizard-section-header">
           <div class="cv-wizard-section-header__copy">
             <h2 class="cv-wizard-section-title">Eventos cadastrados</h2>
-            <p class="cv-wizard-section-subtitle">Agrupadores opcionais para documentos, relatórios e prestação de contas.</p>
+            <p class="cv-wizard-section-subtitle">Agrupadores opcionais para documentos e relatórios.</p>
           </div>
         </header>
         <div class="cv-wizard-section-body">
@@ -30,7 +30,7 @@
             {% empty %}
               <div class="os-empty">
                 <h3>Nenhum evento cadastrado</h3>
-                <p>Crie um evento para agrupar documentos e iniciar a prestação de contas pós-evento.</p>
+                <p>Crie um evento para agrupar documentos relacionados.</p>
                 {% include "components/ui/buttons/button.html" with href=novo_url label="Criar primeiro evento" variant="primary" only %}
               </div>
             {% endfor %}

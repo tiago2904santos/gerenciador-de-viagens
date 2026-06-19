@@ -17,8 +17,6 @@ urlpatterns = [
     path("justificativas/", include("justificativas.urls")),
     path("planos-trabalho/", include("planos_trabalho.urls")),
     path("ordens-servico/", include("ordens_servico.urls")),
-    path("prestacoes/", include("prestacoes.urls")),
-    path("prestacoes-contas/", include("prestacoes_contas.urls")),
     path("diario-bordo/", include("diario_bordo.urls")),
     path("protocolos/", include("protocolos.urls")),
     path("integracoes/google-drive/", include("integracoes.google_drive.urls")),

@@ -13,14 +13,13 @@ class Evento(models.Model):
     forma avulsa nos apps de origem. O evento apenas agrega os documentos reais
     (via FK opcional `evento` em cada documento) e reaproveita informacoes
     comuns (destino, datas, responsavel) para pre-preencher Oficio, Termo,
-    Plano de Trabalho, Ordem de Servico, Relatorio Tecnico e Diario de Bordo.
+    Plano de Trabalho e Ordem de Servico.
     """
 
     STATUS_RASCUNHO = "rascunho"
     STATUS_EM_PREPARACAO = "em_preparacao"
     STATUS_DOCUMENTOS_GERADOS = "documentos_gerados"
     STATUS_EM_EXECUCAO = "em_execucao"
-    STATUS_PRESTACAO_PENDENTE = "prestacao_pendente"
     STATUS_FINALIZADO = "finalizado"
     STATUS_CANCELADO = "cancelado"
     STATUS_CHOICES = [
@@ -28,7 +27,6 @@ class Evento(models.Model):
         (STATUS_EM_PREPARACAO, "Em preparacao"),
         (STATUS_DOCUMENTOS_GERADOS, "Documentos gerados"),
         (STATUS_EM_EXECUCAO, "Em execucao"),
-        (STATUS_PRESTACAO_PENDENTE, "Prestacao pendente"),
         (STATUS_FINALIZADO, "Finalizado"),
         (STATUS_CANCELADO, "Cancelado"),
     ]
