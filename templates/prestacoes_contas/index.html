@@ -39,7 +39,7 @@
                     <a class="cv-btn cv-btn--secondary" href="{% url 'prestacoes_contas:rt_criar' prestacao.pk %}">
                       <span>Editar RT</span>
                     </a>
-                    <a class="cv-btn cv-btn--primary" href="{% url 'prestacoes_contas:rt_download' prestacao.relatorio_tecnico.pk %}">
+                    <a class="cv-btn cv-btn--secondary" href="{% url 'prestacoes_contas:rt_download' prestacao.relatorio_tecnico.pk %}">
                       <span>Baixar RT</span>
                     </a>
                   {% else %}
@@ -47,6 +47,9 @@
                       <span>Criar RT</span>
                     </a>
                   {% endif %}
+                  <a class="cv-btn cv-btn--primary" href="{% url 'prestacoes_contas:diario_criar' prestacao.pk %}">
+                    <span>Diário de Bordo</span>
+                  </a>
                 </div>
               </article>
             {% empty %}

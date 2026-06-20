@@ -10,6 +10,9 @@ urlpatterns = [
     path("prestacao/<int:pc_pk>/rt/", views.rt_criar, name="rt_criar"),
     path("rt/<int:pk>/download/", views.rt_download, name="rt_download"),
     path("rt/<int:pk>/download/<str:formato>/", views.rt_download, name="rt_download_formato"),
+    path("prestacao/<int:pc_pk>/diario/", views.diario_criar, name="diario_criar"),
+    path("diario/<int:pk>/download/", views.diario_download, name="diario_download"),
+    path("diario/<int:pk>/download/<str:formato>/", views.diario_download, name="diario_download_formato"),
     # Modelos de texto reutilizáveis
     path("modelos-texto/", views.modelos_index, name="modelos_index"),
     path("modelos-texto/novo/", views.modelo_novo, name="modelo_novo"),

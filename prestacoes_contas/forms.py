@@ -1,9 +1,67 @@
 from django import forms
+from django.forms import modelformset_factory
 
 from core.normalizers import normalize_spaces
 
+from .models import DiarioBordoTrecho
 from .models import ModeloTextoRelatorioTecnico
 from .models import RelatorioTecnico
+
+
+ABASTECIMENTO_CHOICES = [
+    ("", "—"),
+    ("sim", "Sim"),
+    ("nao", "Não"),
+]
+
+
+class DiarioBordoTrechoForm(forms.ModelForm):
+    """KM inicial/final e necessidade de abastecimento de um trecho do diário."""
+
+    abastecimento = forms.ChoiceField(
+        label="Necessidade de abastecimento",
+        choices=ABASTECIMENTO_CHOICES,
+        required=False,
+        widget=forms.Select(attrs={"class": "form-select cv-field__control"}),
+    )
+
+    class Meta:
+        model = DiarioBordoTrecho
+        fields = ["km_inicial", "km_final", "abastecimento"]
+        widgets = {
+            "km_inicial": forms.NumberInput(
+                attrs={"class": "cv-field__control", "min": "0", "inputmode": "numeric", "placeholder": "0"},
+            ),
+            "km_final": forms.NumberInput(
+                attrs={"class": "cv-field__control", "min": "0", "inputmode": "numeric", "placeholder": "0"},
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["km_inicial"].required = False
+        self.fields["km_final"].required = False
+        if not self.is_bound:
+            valor = getattr(self.instance, "abastecimento", None)
+            self.fields["abastecimento"].initial = (
+                "sim" if valor is True else "nao" if valor is False else ""
+            )
+
+    def clean_abastecimento(self):
+        valor = self.cleaned_data.get("abastecimento")
+        if valor == "sim":
+            return True
+        if valor == "nao":
+            return False
+        return None
+
+
+DiarioBordoTrechoFormSet = modelformset_factory(
+    DiarioBordoTrecho,
+    form=DiarioBordoTrechoForm,
+    extra=0,
+    can_delete=False,
+)
 
 
 # Campos de texto longo que recebem select de modelos + textarea (estilo "motivo" do ofício).

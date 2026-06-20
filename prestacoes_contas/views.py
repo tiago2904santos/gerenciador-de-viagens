@@ -12,10 +12,16 @@ from core.presenters.meta import build_meta
 from core.utils.masks import format_protocolo
 from documentos.services.exceptions import DocumentValidationError
 
+from .diario_services import gerar_diario_bordo_pdf
+from .diario_services import gerar_diario_bordo_xlsx
+from .diario_services import nome_arquivo_diario
+from .diario_services import sincronizar_trechos
 from .forms import CAMPOS_COM_MODELO
 from .forms import CAMPOS_CUSTEIO_COM_OUTRO
+from .forms import DiarioBordoTrechoFormSet
 from .forms import ModeloTextoRelatorioTecnicoForm
 from .forms import RelatorioTecnicoForm
+from .models import DiarioBordo
 from .models import ModeloTextoRelatorioTecnico
 from .models import PrestacaoContas
 from .models import RelatorioTecnico
@@ -132,6 +138,77 @@ def _build_identificacao(pc) -> dict:
     }
 
 
+def _build_prestacao_steps(prestacao, atual: str) -> list:
+    """Etapas do wizard da prestação: 1) Relatório Técnico, 2) Diário de Bordo."""
+    rt_url = reverse("prestacoes_contas:rt_criar", args=[prestacao.pk])
+    diario_url = reverse("prestacoes_contas:diario_criar", args=[prestacao.pk])
+    etapas = [
+        ("rt", "Etapa 1", "Relatório Técnico", rt_url),
+        ("diario", "Etapa 2", "Diário de Bordo", diario_url),
+    ]
+    steps = []
+    atingiu_atual = False
+    for chave, step_label, titulo, url in etapas:
+        if chave == atual:
+            state_class = "is-current"
+            aria_current = "step"
+            atingiu_atual = True
+            status = "Em edição"
+        elif atingiu_atual:
+            state_class = ""
+            aria_current = ""
+            status = "A seguir"
+        else:
+            state_class = "is-complete"
+            aria_current = ""
+            status = "Concluído"
+        steps.append(
+            {
+                "marker": "✓" if state_class == "is-complete" else str(len(steps) + 1),
+                "step_label": step_label,
+                "title": titulo,
+                "status": status,
+                "state_class": state_class,
+                "aria_current": aria_current,
+                "url": url,
+            }
+        )
+    return steps
+
+
+def _trecho_display(linha) -> dict:
+    """Dados somente-leitura de um trecho (origem/destino/datas) para o card do diário."""
+    from django.utils import timezone as tz
+
+    trecho = linha.trecho
+
+    def cidade(c, e):
+        if c is not None:
+            return str(getattr(c, "nome", c)).upper()
+        if e is not None:
+            return str(getattr(e, "sigla", e)).upper()
+        return "—"
+
+    def fmt(dt):
+        if not dt:
+            return {"data": "", "hora": ""}
+        local = tz.localtime(dt) if tz.is_aware(dt) else dt
+        return {"data": local.strftime("%d/%m/%Y"), "hora": local.strftime("%H:%M")}
+
+    origem = cidade(getattr(trecho, "origem_cidade", None), getattr(trecho, "origem_estado", None)) if trecho else "—"
+    destino = cidade(getattr(trecho, "destino_cidade", None), getattr(trecho, "destino_estado", None)) if trecho else "—"
+    saida = fmt(getattr(trecho, "saida_dt", None)) if trecho else {"data": "", "hora": ""}
+    chegada = fmt(getattr(trecho, "chegada_dt", None)) if trecho else {"data": "", "hora": ""}
+    return {
+        "ordem": linha.ordem + 1,
+        "origem": origem,
+        "destino": destino,
+        "rota": f"{origem} → {destino}",
+        "saida": saida,
+        "chegada": chegada,
+    }
+
+
 def index(request):
     prestacoes = (
         PrestacaoContas.objects.select_related(
@@ -195,8 +272,94 @@ def rt_criar(request, pc_pk):
             "relatorio": relatorio,
             "prestacao": prestacao,
             "identificacao": identificacao,
+            "wizard_page_steps": _build_prestacao_steps(prestacao, "rt"),
         },
     )
+
+
+def diario_criar(request, pc_pk):
+    """Etapa 2 do wizard: diário de bordo do veículo a partir do roteiro do ofício."""
+    prestacao = get_object_or_404(
+        PrestacaoContas.objects.select_related(
+            "oficio__roteiro",
+            "oficio__viatura",
+            "oficio__motorista",
+            "servidor__cargo",
+            "servidor__unidade",
+        ),
+        pk=pc_pk,
+    )
+
+    diario, _ = DiarioBordo.objects.get_or_create(prestacao=prestacao)
+    sincronizar_trechos(diario)
+    queryset = diario.trechos.select_related(
+        "trecho__origem_cidade",
+        "trecho__origem_estado",
+        "trecho__destino_cidade",
+        "trecho__destino_estado",
+    ).order_by("ordem", "pk")
+
+    if request.method == "POST":
+        formset = DiarioBordoTrechoFormSet(request.POST, queryset=queryset)
+        if formset.is_valid():
+            formset.save()
+            if prestacao.status == PrestacaoContas.STATUS_PENDENTE:
+                prestacao.status = PrestacaoContas.STATUS_EM_PREENCHIMENTO
+                prestacao.save(update_fields=["status", "atualizado_em"])
+            formato = "pdf" if request.POST.get("action") == "download_pdf" else "xlsx"
+            return redirect("prestacoes_contas:diario_download_formato", pk=diario.pk, formato=formato)
+    else:
+        formset = DiarioBordoTrechoFormSet(queryset=queryset)
+
+    linhas = list(queryset)
+    trechos = [
+        {"form": form, "display": _trecho_display(linha)}
+        for form, linha in zip(formset.forms, linhas)
+    ]
+
+    return render(
+        request,
+        "prestacoes_contas/diario_bordo_form.html",
+        {
+            "page_title": "Diário de Bordo",
+            "prestacao": prestacao,
+            "diario": diario,
+            "formset": formset,
+            "trechos": trechos,
+            "identificacao": _build_identificacao(prestacao),
+            "wizard_page_steps": _build_prestacao_steps(prestacao, "diario"),
+        },
+    )
+
+
+def diario_download(request, pk, formato="xlsx"):
+    diario = get_object_or_404(
+        DiarioBordo.objects.select_related(
+            "prestacao__oficio__roteiro",
+            "prestacao__oficio__viatura",
+            "prestacao__oficio__motorista",
+            "prestacao__servidor",
+        ),
+        pk=pk,
+    )
+
+    formato = (formato or "xlsx").strip().lower()
+    if formato == "pdf":
+        try:
+            conteudo = gerar_diario_bordo_pdf(diario)
+        except DocumentValidationError as exc:
+            messages.error(request, str(exc))
+            return redirect("prestacoes_contas:diario_criar", pc_pk=diario.prestacao_id)
+        content_type = "application/pdf"
+    else:
+        conteudo = gerar_diario_bordo_xlsx(diario)
+        formato = "xlsx"
+        content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+
+    nome = nome_arquivo_diario(diario, formato=formato)
+    response = HttpResponse(conteudo, content_type=content_type)
+    response["Content-Disposition"] = f'attachment; filename="{nome}"'
+    return response
 
 
 def rt_download(request, pk, formato="docx"):

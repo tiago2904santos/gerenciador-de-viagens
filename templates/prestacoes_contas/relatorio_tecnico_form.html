@@ -71,6 +71,10 @@
   <div class="page-shell page-shell--wizard oficio-wizard app-wizard">
     {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="PRESTAÇÕES" title=page_title icon_label="PC" module_label="Prestações de Contas" back_label="Voltar à lista" back_url="/prestacoes-contas/" status_label="Relatório Técnico" status_variant="draft" only %}
 
+    {% if wizard_page_steps %}
+      {% include "components/ui/navigation/page_stepper.html" with steps=wizard_page_steps only %}
+    {% endif %}
+
     <main class="main-form-panel main-form-panel--stack oficio-wizard__main">
       <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
         <form method="post" class="oficio-wizard__form" novalidate>
