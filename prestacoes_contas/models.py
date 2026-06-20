@@ -1,8 +1,16 @@
 from django.db import models
+from django.core.validators import FileExtensionValidator
 
 from cadastros.models import Servidor
 from oficios.models import Oficio
 from roteiros.models import RoteiroTrecho
+
+
+PRESTACAO_DOCUMENTO_EXTENSOES = ["pdf", "png", "jpg", "jpeg"]
+
+
+def prestacao_documento_upload_to(instance, filename):
+    return f"prestacoes_contas/{instance.pk or 'nova'}/{filename}"
 
 
 class PrestacaoContas(models.Model):
@@ -38,6 +46,24 @@ class PrestacaoContas(models.Model):
         null=True,
         blank=True,
         related_name="+",
+    )
+    numero_solicitacao = models.CharField(
+        "Número da solicitação",
+        max_length=60,
+        blank=True,
+        default="",
+    )
+    despacho_assinado = models.FileField(
+        "Despacho assinado do ofício",
+        upload_to=prestacao_documento_upload_to,
+        blank=True,
+        validators=[FileExtensionValidator(PRESTACAO_DOCUMENTO_EXTENSOES)],
+    )
+    comprovante_saque_transferencia = models.FileField(
+        "Comprovante de saque/transferência",
+        upload_to=prestacao_documento_upload_to,
+        blank=True,
+        validators=[FileExtensionValidator(PRESTACAO_DOCUMENTO_EXTENSOES)],
     )
     status = models.CharField(max_length=30, choices=STATUS_CHOICES, default=STATUS_PENDENTE)
     observacoes = models.TextField(blank=True, default="")

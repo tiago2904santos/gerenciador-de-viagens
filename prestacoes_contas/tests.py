@@ -1,21 +1,28 @@
 from datetime import date
 from datetime import datetime
 from decimal import Decimal
+import json
+import tempfile
 from unittest import mock
 
 from django.contrib.auth import get_user_model
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
+from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 
 from cadastros.models import Cargo
 from cadastros.models import ConfiguracaoSistema
 from cadastros.models import Servidor
+from oficios.docxtpl_context import build_oficio_docxtpl_context
 from oficios.models import Oficio
+from prestacoes_contas.models import DiarioBordo
 from prestacoes_contas.models import PrestacaoContas
 from prestacoes_contas.models import RelatorioTecnico
 from prestacoes_contas.services import build_relatorio_tecnico_context
 from roteiros.models import Roteiro
+from roteiros.models import RoteiroTrecho
 
 
 class PrestacaoContasSignalsTests(TestCase):
@@ -192,3 +199,195 @@ class RelatorioTecnicoDocumentoTests(TestCase):
             response.url,
             reverse("prestacoes_contas:rt_download_formato", args=[self.relatorio.pk, "pdf"]),
         )
+
+    def test_index_salva_numero_solicitacao_da_prestacao(self):
+        prefix = f"prestacao-{self.prestacao.pk}"
+        response = self.client.post(
+            reverse("prestacoes_contas:index"),
+            data={
+                "action": "save_solicitacao",
+                "prestacao_id": str(self.prestacao.pk),
+                f"{prefix}-numero_solicitacao": "SOL-123",
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.prestacao.refresh_from_db()
+        self.assertEqual(self.prestacao.numero_solicitacao, "SOL-123")
+
+    def test_autosave_salva_numero_solicitacao_prefixado_da_lista(self):
+        prefix = f"prestacao-{self.prestacao.pk}"
+        field_name = f"{prefix}-numero_solicitacao"
+        payload = {
+            "object_id": str(self.prestacao.pk),
+            "form_id": "",
+            "model": "prestacao_contas",
+            "dirty_fields": [field_name],
+            "fields": {field_name: "SOL-AUTO"},
+            "snapshots": {},
+        }
+
+        response = self.client.post(
+            reverse("prestacoes_contas:prestacao_autosave", args=[self.prestacao.pk]),
+            data=json.dumps(payload),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.prestacao.refresh_from_db()
+        self.assertEqual(self.prestacao.numero_solicitacao, "SOL-AUTO")
+
+    def test_documentos_salva_numero_e_anexos(self):
+        with tempfile.TemporaryDirectory() as tmpdir, override_settings(MEDIA_ROOT=tmpdir):
+            response = self.client.post(
+                reverse("prestacoes_contas:documentos", args=[self.prestacao.pk]),
+                data={
+                    "numero_solicitacao": "SOL-456",
+                    "despacho_assinado": SimpleUploadedFile(
+                        "despacho.pdf",
+                        b"%PDF-1.4\n%%EOF\n",
+                        content_type="application/pdf",
+                    ),
+                    "comprovante_saque_transferencia": SimpleUploadedFile(
+                        "comprovante.png",
+                        (
+                            b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR"
+                            b"\x00\x00\x00\x01\x00\x00\x00\x01\x08\x02"
+                            b"\x00\x00\x00\x90wS\xde\x00\x00\x00\x0cIDAT"
+                            b"\x08\xd7c\xf8\xff\xff?\x00\x05\xfe\x02\xfeA"
+                            b"\xe2!\xbc\x00\x00\x00\x00IEND\xaeB`\x82"
+                        ),
+                        content_type="image/png",
+                    ),
+                    "action": "save_continue",
+                },
+            )
+
+            self.assertEqual(response.status_code, 302)
+            self.assertEqual(response.url, reverse("prestacoes_contas:rt_criar", args=[self.prestacao.pk]))
+            self.prestacao.refresh_from_db()
+            self.assertEqual(self.prestacao.numero_solicitacao, "SOL-456")
+            self.assertTrue(self.prestacao.despacho_assinado.name.endswith(".pdf"))
+            self.assertTrue(self.prestacao.comprovante_saque_transferencia.name.endswith(".png"))
+
+    def test_autosave_documentos_salva_numero_solicitacao(self):
+        payload = {
+            "object_id": str(self.prestacao.pk),
+            "form_id": "",
+            "model": "prestacao_contas",
+            "dirty_fields": ["numero_solicitacao"],
+            "fields": {"numero_solicitacao": "SOL-DOCS"},
+            "snapshots": {},
+        }
+
+        response = self.client.post(
+            reverse("prestacoes_contas:prestacao_autosave", args=[self.prestacao.pk]),
+            data=json.dumps(payload),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.prestacao.refresh_from_db()
+        self.assertEqual(self.prestacao.numero_solicitacao, "SOL-DOCS")
+
+    def test_autosave_arquivo_documentos_salva_anexo(self):
+        with tempfile.TemporaryDirectory() as tmpdir, override_settings(MEDIA_ROOT=tmpdir):
+            response = self.client.post(
+                reverse("prestacoes_contas:prestacao_arquivo_autosave", args=[self.prestacao.pk]),
+                data={
+                    "numero_solicitacao": "SOL-FILE",
+                    "despacho_assinado": SimpleUploadedFile(
+                        "despacho.pdf",
+                        b"%PDF-1.4\n%%EOF\n",
+                        content_type="application/pdf",
+                    ),
+                },
+            )
+
+            self.assertEqual(response.status_code, 200)
+            self.prestacao.refresh_from_db()
+            self.assertEqual(self.prestacao.numero_solicitacao, "SOL-FILE")
+            self.assertTrue(self.prestacao.despacho_assinado.name.endswith(".pdf"))
+
+    def test_autosave_rt_salva_campos_do_relatorio(self):
+        payload = {
+            "object_id": str(self.relatorio.pk),
+            "form_id": "",
+            "model": "relatorio_tecnico",
+            "dirty_fields": ["atividade", "combustivel_outro"],
+            "fields": {
+                "atividade": "Atividade autosave",
+                "combustivel_outro": "Combustível próprio",
+            },
+            "snapshots": {},
+        }
+
+        response = self.client.post(
+            reverse("prestacoes_contas:rt_autosave", args=[self.relatorio.pk]),
+            data=json.dumps(payload),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.relatorio.refresh_from_db()
+        self.assertEqual(self.relatorio.atividade, "Atividade autosave")
+        self.assertEqual(self.relatorio.combustivel, "Combustível próprio")
+
+    def test_autosave_diario_salva_km_e_abastecimento(self):
+        roteiro = Roteiro.objects.create()
+        self.oficio.roteiro = roteiro
+        self.oficio.save(update_fields=["roteiro", "updated_at"])
+        RoteiroTrecho.objects.create(
+            roteiro=roteiro,
+            tipo=RoteiroTrecho.TIPO_IDA,
+            ordem=0,
+        )
+        diario = DiarioBordo.objects.create(prestacao=self.prestacao)
+        payload = {
+            "object_id": str(diario.pk),
+            "form_id": "",
+            "model": "diario_bordo",
+            "dirty_fields": ["form-0-km_inicial", "form-0-abastecimento"],
+            "fields": {
+                "form-0-km_inicial": "12.345",
+                "form-0-abastecimento": "nao",
+            },
+            "snapshots": {},
+        }
+
+        response = self.client.post(
+            reverse("prestacoes_contas:diario_autosave", args=[diario.pk]),
+            data=json.dumps(payload),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        linha = diario.trechos.get()
+        self.assertEqual(linha.km_inicial, 12345)
+        self.assertFalse(linha.abastecimento)
+
+    def test_numero_solicitacao_preenche_coluna_do_oficio(self):
+        self.prestacao.numero_solicitacao = "SOL-789"
+        self.prestacao.save(update_fields=["numero_solicitacao", "atualizado_em"])
+
+        contexto = build_oficio_docxtpl_context(self.oficio)
+
+        self.assertEqual(contexto["col_solicitacao"], "SOL-789")
+
+    def test_coluna_solicitacao_preserva_linha_vazia_para_outro_servidor(self):
+        servidor_b = Servidor.objects.create(nome="Servidor ZZ", cargo=self.cargo, cpf="22233344455")
+        self.oficio.servidores.add(servidor_b)
+        self.prestacao.numero_solicitacao = "SOL-789"
+        self.prestacao.save(update_fields=["numero_solicitacao", "atualizado_em"])
+
+        contexto = build_oficio_docxtpl_context(self.oficio)
+
+        self.assertEqual(contexto["col_solicitacao"], "SOL-789\n\n\n")
+
+    @mock.patch("prestacoes_contas.views.gerar_prestacao_consolidado_pdf", return_value=b"%PDF-1.4\n%%EOF\n")
+    def test_download_pdf_consolidado(self, _mock_pdf):
+        response = self.client.get(reverse("prestacoes_contas:consolidado_download", args=[self.prestacao.pk]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/pdf")
+        self.assertIn(".pdf", response["Content-Disposition"])

@@ -16,42 +16,58 @@
         </header>
         <div class="cv-wizard-section-body">
           <div class="os-list">
-            {% for prestacao in prestacoes %}
-              <article class="os-list-card">
-                <div class="os-list-card__info">
-                  <h3 class="os-list-card__title">{{ prestacao.servidor.nome }}</h3>
-                  <p class="os-list-card__meta">
-                    Ofício {{ prestacao.oficio.numero_formatado }}
-                    {% if prestacao.oficio.evento %}
-                      — {{ prestacao.oficio.evento.titulo }}
+            {% for row in prestacoes_rows %}
+              {% with prestacao=row.prestacao solicitacao_form=row.solicitacao_form %}
+                {% url 'prestacoes_contas:documentos' prestacao.pk as documentos_url %}
+                {% url 'prestacoes_contas:rt_criar' prestacao.pk as rt_url %}
+                {% url 'prestacoes_contas:diario_criar' prestacao.pk as diario_url %}
+                {% url 'prestacoes_contas:consolidado' prestacao.pk as consolidado_url %}
+                {% url 'prestacoes_contas:prestacao_autosave' prestacao.pk as prestacao_autosave_url %}
+                <article class="os-list-card">
+                  <div class="os-list-card__info">
+                    <h3 class="os-list-card__title">{{ prestacao.servidor.nome }}</h3>
+                    <p class="os-list-card__meta">
+                      Ofício {{ prestacao.oficio.numero_formatado }}
+                      {% if prestacao.oficio.evento %}
+                        — {{ prestacao.oficio.evento.titulo }}
+                      {% endif %}
+                    </p>
+                    <p class="os-list-card__meta">
+                      {{ prestacao.servidor.cargo }}
+                      {% if prestacao.servidor.unidade %}
+                        · {{ prestacao.servidor.unidade }}
+                      {% endif %}
+                    </p>
+                    <form method="post"
+                          class="oficio-wizard__form"
+                          novalidate
+                          data-autosave="true"
+                          data-autosave-model="prestacao_contas"
+                          data-autosave-step="lista"
+                          data-autosave-url="{{ prestacao_autosave_url }}"
+                          data-autosave-object-id="{{ prestacao.pk }}">
+                      {% csrf_token %}
+                      <input type="hidden" name="action" value="save_solicitacao">
+                      <input type="hidden" name="prestacao_id" value="{{ prestacao.pk }}">
+                      {% include "components/forms/form_field.html" with field=solicitacao_form.numero_solicitacao only %}
+                      {% include "components/ui/buttons/button.html" with label="Salvar solicitação" variant="secondary" size="sm" type="submit" only %}
+                    </form>
+                  </div>
+                  <div class="os-list-card__actions">
+                    {% include "components/ui/lists/status_pill.html" with label=prestacao.status_display variant=prestacao.status_variant only %}
+                    {% include "components/ui/buttons/button.html" with href=documentos_url label="Abrir prestação" variant="primary" icon="arrow-right" icon_after=True only %}
+                    {% if prestacao.relatorio_tecnico %}
+                      {% url 'prestacoes_contas:rt_download' prestacao.relatorio_tecnico.pk as rt_download_url %}
+                      {% include "components/ui/buttons/button.html" with href=rt_url label="Editar RT" variant="secondary" only %}
+                      {% include "components/ui/buttons/button.html" with href=rt_download_url label="Baixar RT" variant="secondary" only %}
+                    {% else %}
+                      {% include "components/ui/buttons/button.html" with href=rt_url label="Criar RT" variant="secondary" only %}
                     {% endif %}
-                  </p>
-                  <p class="os-list-card__meta">
-                    {{ prestacao.servidor.cargo }}
-                    {% if prestacao.servidor.unidade %}
-                      · {{ prestacao.servidor.unidade }}
-                    {% endif %}
-                  </p>
-                </div>
-                <div class="os-list-card__actions">
-                  {% include "components/ui/lists/status_pill.html" with label=prestacao.status_display variant=prestacao.status_variant only %}
-                  {% if prestacao.relatorio_tecnico %}
-                    <a class="cv-btn cv-btn--secondary" href="{% url 'prestacoes_contas:rt_criar' prestacao.pk %}">
-                      <span>Editar RT</span>
-                    </a>
-                    <a class="cv-btn cv-btn--secondary" href="{% url 'prestacoes_contas:rt_download' prestacao.relatorio_tecnico.pk %}">
-                      <span>Baixar RT</span>
-                    </a>
-                  {% else %}
-                    <a class="cv-btn cv-btn--secondary" href="{% url 'prestacoes_contas:rt_criar' prestacao.pk %}">
-                      <span>Criar RT</span>
-                    </a>
-                  {% endif %}
-                  <a class="cv-btn cv-btn--primary" href="{% url 'prestacoes_contas:diario_criar' prestacao.pk %}">
-                    <span>Diário de Bordo</span>
-                  </a>
-                </div>
-              </article>
+                    {% include "components/ui/buttons/button.html" with href=diario_url label="Diário de Bordo" variant="secondary" only %}
+                    {% include "components/ui/buttons/button.html" with href=consolidado_url label="PDF Final" variant="secondary" only %}
+                  </div>
+                </article>
+              {% endwith %}
             {% empty %}
               <div class="os-empty">
                 <h3>Nenhuma prestação de contas registrada</h3>

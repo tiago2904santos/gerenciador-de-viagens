@@ -9,62 +9,7 @@
 {% endblock %}
 
 {% block extra_js %}
-  <script>
-    (function () {
-      function preencher(select) {
-        var alvo = select.getAttribute('data-rt-target');
-        if (!alvo) return;
-        var textarea = document.querySelector('[data-rt-textarea="' + alvo + '"]');
-        if (!textarea) return;
-        var opt = select.options[select.selectedIndex];
-        var texto = opt ? (opt.getAttribute('data-texto-modelo') || '').trim() : '';
-        if (!texto) return;
-        textarea.value = texto;
-        textarea.dispatchEvent(new Event('input', { bubbles: true }));
-        textarea.dispatchEvent(new Event('change', { bubbles: true }));
-      }
-
-      function setOtherVisible(wrapper, visible) {
-        if (!wrapper) return;
-        wrapper.hidden = !visible;
-        wrapper.classList.toggle('is-open', visible);
-      }
-
-      function syncOther(select) {
-        var campo = select.getAttribute('data-rt-other-select');
-        if (!campo) return;
-        var otherValue = select.getAttribute('data-rt-other-value') || '__outro__';
-        var wrapper = document.querySelector('[data-rt-other-wrapper="' + campo + '"]');
-        var input = document.querySelector('[data-rt-other-input="' + campo + '"]');
-        var visible = select.value === otherValue;
-        setOtherVisible(wrapper, visible);
-        if (visible && input) {
-          input.removeAttribute('disabled');
-        } else if (input) {
-          input.setAttribute('disabled', 'disabled');
-          input.value = '';
-        }
-      }
-
-      function init() {
-        var selects = document.querySelectorAll('[data-rt-modelo-select="true"]');
-        Array.prototype.forEach.call(selects, function (sel) {
-          sel.addEventListener('change', function () { preencher(this); });
-        });
-        var otherSelects = document.querySelectorAll('[data-rt-other-select]');
-        Array.prototype.forEach.call(otherSelects, function (sel) {
-          sel.addEventListener('change', function () { syncOther(this); });
-          syncOther(sel);
-        });
-      }
-
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-      } else {
-        init();
-      }
-    })();
-  </script>
+  <script src="{% static 'js/pages/prestacoes-contas-rt.js' %}?v=20260620-prestacao"></script>
 {% endblock %}
 
 {% block content %}
@@ -77,7 +22,14 @@
 
     <main class="main-form-panel main-form-panel--stack oficio-wizard__main">
       <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
-        <form method="post" class="oficio-wizard__form" novalidate>
+        <form method="post"
+              class="oficio-wizard__form"
+              novalidate
+              data-autosave="true"
+              data-autosave-model="relatorio_tecnico"
+              data-autosave-step="rt"
+              data-autosave-url="{{ autosave_url }}"
+              data-autosave-object-id="{{ relatorio.pk }}">
           {% csrf_token %}
 
           {% if form.non_field_errors %}
@@ -187,7 +139,7 @@
                   <div class="cv-card-footer-section__divider" aria-hidden="true"></div>
                   <footer class="cv-card-footer">
                     <div class="cv-card-footer__secondary">
-                      {% include "components/ui/buttons/button.html" with href="/prestacoes-contas/" label="Voltar à lista" variant="secondary" icon="arrow-left" only %}
+                      {% include "components/ui/buttons/button.html" with href=documentos_url label="Voltar aos documentos" variant="secondary" icon="arrow-left" only %}
                     </div>
                     <div class="cv-card-footer__primary">
                       {% include "components/ui/buttons/button.html" with label="Gerar DOCX" variant="secondary" icon="download" icon_after=True type="submit" name="action" value="download_docx" only %}

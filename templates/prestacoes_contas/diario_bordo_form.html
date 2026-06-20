@@ -17,7 +17,14 @@
 
     <main class="main-form-panel main-form-panel--stack oficio-wizard__main">
       <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
-        <form method="post" class="oficio-wizard__form" novalidate>
+        <form method="post"
+              class="oficio-wizard__form"
+              novalidate
+              data-autosave="true"
+              data-autosave-model="diario_bordo"
+              data-autosave-step="diario"
+              data-autosave-url="{{ autosave_url }}"
+              data-autosave-object-id="{{ diario.pk }}">
           {% csrf_token %}
           {{ formset.management_form }}
 
@@ -160,7 +167,7 @@
                     <div class="cv-card-footer-section__divider" aria-hidden="true"></div>
                     <footer class="cv-card-footer">
                       <div class="cv-card-footer__secondary">
-                        {% include "components/ui/buttons/button.html" with href=wizard_page_steps.0.url label="Voltar ao Relatório Técnico" variant="secondary" icon="arrow-left" only %}
+                        {% include "components/ui/buttons/button.html" with href=rt_url label="Voltar ao Relatório Técnico" variant="secondary" icon="arrow-left" only %}
                       </div>
                       <div class="cv-card-footer__primary">
                         {% include "components/ui/buttons/button.html" with label="Gerar XLSX" variant="secondary" icon="download" icon_after=True type="submit" name="action" value="download_xlsx" only %}
@@ -180,7 +187,7 @@
                 <div class="cv-card-footer-section__divider" aria-hidden="true"></div>
                 <footer class="cv-card-footer">
                   <div class="cv-card-footer__secondary">
-                    {% include "components/ui/buttons/button.html" with href=wizard_page_steps.0.url label="Voltar ao Relatório Técnico" variant="secondary" icon="arrow-left" only %}
+                    {% include "components/ui/buttons/button.html" with href=rt_url label="Voltar ao Relatório Técnico" variant="secondary" icon="arrow-left" only %}
                   </div>
                 </footer>
               </section>

@@ -1,4 +1,5 @@
 from decimal import Decimal
+import re
 
 from django.contrib import messages
 from django.db.models import Q
@@ -7,7 +8,14 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.utils import timezone
+from django.views.decorators.http import require_POST
 
+from core.autosave import AutosavePayloadError
+from core.autosave import autosave_json_response
+from core.autosave import filter_allowed_fields
+from core.autosave import parse_autosave_payload
+from core.normalizers import normalize_spaces
 from core.presenters.meta import build_meta
 from core.utils.masks import format_protocolo
 from documentos.services.exceptions import DocumentValidationError
@@ -20,8 +28,12 @@ from .diario_services import nome_arquivo_diario
 from .diario_services import sincronizar_trechos
 from .forms import CAMPOS_COM_MODELO
 from .forms import CAMPOS_CUSTEIO_COM_OUTRO
+from .forms import CUSTEIO_CHOICES
 from .forms import DiarioBordoTrechoFormSet
 from .forms import ModeloTextoRelatorioTecnicoForm
+from .forms import OUTRO_VALUE
+from .forms import PrestacaoDocumentosForm
+from .forms import PrestacaoSolicitacaoForm
 from .forms import RelatorioTecnicoForm
 from .models import DiarioBordo
 from .models import ModeloTextoRelatorioTecnico
@@ -29,6 +41,8 @@ from .models import PrestacaoContas
 from .models import RelatorioTecnico
 from .services import gerar_relatorio_tecnico_docx
 from .services import gerar_relatorio_tecnico_pdf
+from .services import gerar_prestacao_consolidado_pdf
+from .services import nome_arquivo_prestacao_consolidado
 from .services import nome_arquivo_rt
 
 
@@ -141,12 +155,16 @@ def _build_identificacao(pc) -> dict:
 
 
 def _build_prestacao_steps(prestacao, atual: str) -> list:
-    """Etapas do wizard da prestação: 1) Relatório Técnico, 2) Diário de Bordo."""
+    """Etapas do wizard da prestação de contas."""
+    documentos_url = reverse("prestacoes_contas:documentos", args=[prestacao.pk])
     rt_url = reverse("prestacoes_contas:rt_criar", args=[prestacao.pk])
     diario_url = reverse("prestacoes_contas:diario_criar", args=[prestacao.pk])
+    consolidado_url = reverse("prestacoes_contas:consolidado", args=[prestacao.pk])
     etapas = [
-        ("rt", "Etapa 1", "Relatório Técnico", rt_url),
-        ("diario", "Etapa 2", "Diário de Bordo", diario_url),
+        ("documentos", "Etapa 1", "Documentos", documentos_url),
+        ("rt", "Etapa 2", "Relatório Técnico", rt_url),
+        ("diario", "Etapa 3", "Diário de Bordo", diario_url),
+        ("consolidado", "Etapa 4", "PDF Final", consolidado_url),
     ]
     steps = []
     atingiu_atual = False
@@ -176,6 +194,96 @@ def _build_prestacao_steps(prestacao, atual: str) -> list:
             }
         )
     return steps
+
+
+def _autosave_version(obj, field_name="atualizado_em") -> int:
+    obj.refresh_from_db()
+    value = getattr(obj, field_name, None)
+    if value is None:
+        return 0
+    return int(timezone.localtime(value).timestamp())
+
+
+def _autosave_form_errors(form):
+    return {
+        field: [str(item) for item in messages_list]
+        for field, messages_list in form.errors.items()
+    }
+
+
+def _prestacao_autosave_fields(payload):
+    fields = {}
+    for name, value in payload.fields.items():
+        clean_name = str(name or "").strip()
+        if clean_name == "numero_solicitacao" or clean_name.endswith("-numero_solicitacao"):
+            fields["numero_solicitacao"] = value
+    dirty_fields = ["numero_solicitacao"] if fields else []
+    return filter_allowed_fields(fields, dirty_fields, {"numero_solicitacao"})
+
+
+def _salvar_prestacao_autosave(prestacao, clean_fields):
+    if "numero_solicitacao" not in clean_fields:
+        return
+    prestacao.numero_solicitacao = normalize_spaces(clean_fields["numero_solicitacao"] or "")
+    prestacao.save(update_fields=["numero_solicitacao", "atualizado_em"])
+
+
+def _salvar_rt_autosave(relatorio, clean_fields):
+    if not clean_fields:
+        return
+    fixed_custeio = {value for value, _label in CUSTEIO_CHOICES if value and value != OUTRO_VALUE}
+    update_fields = set()
+    for campo, value in clean_fields.items():
+        if campo.endswith("_outro"):
+            base = campo.removesuffix("_outro")
+            if base in {item[0] for item in CAMPOS_CUSTEIO_COM_OUTRO}:
+                text = normalize_spaces(value or "")
+                if text:
+                    setattr(relatorio, base, text)
+                    update_fields.add(base)
+            continue
+        if campo in {item[0] for item in CAMPOS_CUSTEIO_COM_OUTRO}:
+            text = normalize_spaces(value or "")
+            if text == OUTRO_VALUE:
+                continue
+            if text in fixed_custeio or not text:
+                setattr(relatorio, campo, text)
+                update_fields.add(campo)
+            continue
+        setattr(relatorio, campo, normalize_spaces(value or ""))
+        update_fields.add(campo)
+    if update_fields:
+        relatorio.save(update_fields=[*update_fields, "atualizado_em"])
+
+
+def _parse_km_autosave(value):
+    digitos = re.sub(r"\D", "", str(value or ""))
+    return int(digitos) if digitos else None
+
+
+def _salvar_diario_autosave(diario, payload):
+    linhas = list(
+        diario.trechos.select_related("trecho").order_by("ordem", "pk")
+    )
+    changed = False
+    for dirty_name in payload.dirty_fields:
+        match = re.match(r"^form-(\d+)-(km_inicial|km_final|abastecimento)$", str(dirty_name or ""))
+        if not match:
+            continue
+        index = int(match.group(1))
+        field = match.group(2)
+        if index >= len(linhas):
+            continue
+        linha = linhas[index]
+        value = payload.fields.get(dirty_name)
+        if field in {"km_inicial", "km_final"}:
+            setattr(linha, field, _parse_km_autosave(value))
+        elif field == "abastecimento":
+            linha.abastecimento = str(value or "") != "nao"
+        linha.save(update_fields=[field])
+        changed = True
+    if changed:
+        diario.save(update_fields=["atualizado_em"])
 
 
 def _trecho_display(linha) -> dict:
@@ -212,7 +320,19 @@ def _trecho_display(linha) -> dict:
 
 
 def index(request):
-    prestacoes = (
+    if request.method == "POST" and request.POST.get("action") == "save_solicitacao":
+        prestacao_id = request.POST.get("prestacao_id")
+        prestacao = get_object_or_404(PrestacaoContas, pk=prestacao_id)
+        prefix = f"prestacao-{prestacao.pk}"
+        form = PrestacaoSolicitacaoForm(request.POST, instance=prestacao, prefix=prefix)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Número da solicitação salvo.")
+        else:
+            messages.error(request, "Confira o número da solicitação informado.")
+        return redirect("prestacoes_contas:index")
+
+    prestacoes = list(
         PrestacaoContas.objects.select_related(
             "oficio",
             "servidor",
@@ -222,14 +342,102 @@ def index(request):
         .prefetch_related("relatorio_tecnico")
         .order_by("-criado_em")
     )
+    prestacoes_rows = [
+        {
+            "prestacao": prestacao,
+            "solicitacao_form": PrestacaoSolicitacaoForm(
+                instance=prestacao,
+                prefix=f"prestacao-{prestacao.pk}",
+            ),
+        }
+        for prestacao in prestacoes
+    ]
     return render(
         request,
         "prestacoes_contas/index.html",
         {
             "page_title": "Prestações de Contas",
             "page_description": "Acompanhamento das prestações de contas por servidor e ofício.",
-            "prestacoes": prestacoes,
+            "prestacoes_rows": prestacoes_rows,
         },
+    )
+
+
+def documentos(request, pc_pk):
+    prestacao = get_object_or_404(
+        PrestacaoContas.objects.select_related(
+            "oficio__roteiro",
+            "servidor__cargo",
+            "servidor__unidade",
+        ),
+        pk=pc_pk,
+    )
+
+    if request.method == "POST":
+        form = PrestacaoDocumentosForm(request.POST, request.FILES, instance=prestacao)
+        if form.is_valid():
+            form.save()
+            if prestacao.status == PrestacaoContas.STATUS_PENDENTE:
+                prestacao.status = PrestacaoContas.STATUS_EM_PREENCHIMENTO
+                prestacao.save(update_fields=["status", "atualizado_em"])
+            messages.success(request, "Documentos da prestação salvos.")
+            if request.POST.get("action") == "save_continue":
+                return redirect("prestacoes_contas:rt_criar", pc_pk=prestacao.pk)
+            return redirect("prestacoes_contas:documentos", pc_pk=prestacao.pk)
+    else:
+        form = PrestacaoDocumentosForm(instance=prestacao)
+
+    return render(
+        request,
+        "prestacoes_contas/documentos_form.html",
+        {
+            "page_title": "Documentos da Prestação",
+            "form": form,
+            "prestacao": prestacao,
+            "identificacao": _build_identificacao(prestacao),
+            "wizard_page_steps": _build_prestacao_steps(prestacao, "documentos"),
+            "rt_url": reverse("prestacoes_contas:rt_criar", args=[prestacao.pk]),
+            "autosave_url": reverse("prestacoes_contas:prestacao_autosave", args=[prestacao.pk]),
+            "arquivo_autosave_url": reverse("prestacoes_contas:prestacao_arquivo_autosave", args=[prestacao.pk]),
+        },
+    )
+
+
+@require_POST
+def prestacao_autosave(request, pc_pk):
+    prestacao = get_object_or_404(PrestacaoContas, pk=pc_pk)
+    try:
+        payload = parse_autosave_payload(request, expected_model="prestacao_contas")
+    except AutosavePayloadError as exc:
+        return autosave_json_response(ok=False, message=str(exc))
+
+    clean_fields = _prestacao_autosave_fields(payload)
+    _salvar_prestacao_autosave(prestacao, clean_fields)
+    return autosave_json_response(
+        ok=True,
+        object_id=prestacao.pk,
+        version=_autosave_version(prestacao),
+    )
+
+
+@require_POST
+def prestacao_arquivo_autosave(request, pc_pk):
+    prestacao = get_object_or_404(PrestacaoContas, pk=pc_pk)
+    form = PrestacaoDocumentosForm(request.POST, request.FILES, instance=prestacao)
+    if not form.is_valid():
+        return autosave_json_response(
+            ok=False,
+            message="Alguns anexos ainda precisam de ajuste antes do autosave.",
+            errors=_autosave_form_errors(form),
+        )
+    form.save()
+    if prestacao.status == PrestacaoContas.STATUS_PENDENTE:
+        prestacao.status = PrestacaoContas.STATUS_EM_PREENCHIMENTO
+        prestacao.save(update_fields=["status", "atualizado_em"])
+    return autosave_json_response(
+        ok=True,
+        object_id=prestacao.pk,
+        version=_autosave_version(prestacao),
     )
 
 
@@ -276,7 +484,43 @@ def rt_criar(request, pc_pk):
             "identificacao": identificacao,
             "wizard_page_steps": _build_prestacao_steps(prestacao, "rt"),
             "diaria_info": diaria_info(prestacao),
+            "documentos_url": reverse("prestacoes_contas:documentos", args=[prestacao.pk]),
+            "autosave_url": reverse("prestacoes_contas:rt_autosave", args=[relatorio.pk]),
         },
+    )
+
+
+@require_POST
+def rt_autosave(request, pk):
+    relatorio = get_object_or_404(RelatorioTecnico, pk=pk)
+    try:
+        payload = parse_autosave_payload(request, expected_model="relatorio_tecnico")
+    except AutosavePayloadError as exc:
+        return autosave_json_response(ok=False, message=str(exc))
+
+    allowed_fields = {
+        "diaria",
+        "translado",
+        "combustivel",
+        "passagem",
+        "translado_outro",
+        "combustivel_outro",
+        "passagem_outro",
+        "motivo",
+        "atividade",
+        "conclusao",
+        "medidas",
+        "info_complementares",
+    }
+    clean_fields = filter_allowed_fields(payload.fields, payload.dirty_fields, allowed_fields)
+    _salvar_rt_autosave(relatorio, clean_fields)
+    if clean_fields and relatorio.prestacao.status == PrestacaoContas.STATUS_PENDENTE:
+        relatorio.prestacao.status = PrestacaoContas.STATUS_EM_PREENCHIMENTO
+        relatorio.prestacao.save(update_fields=["status", "atualizado_em"])
+    return autosave_json_response(
+        ok=True,
+        object_id=relatorio.pk,
+        version=_autosave_version(relatorio),
     )
 
 
@@ -334,7 +578,28 @@ def diario_criar(request, pc_pk):
             "diaria_info": diaria_info(prestacao),
             "editar_roteiro_url": reverse("prestacoes_contas:diario_editar_roteiro", args=[prestacao.pk]),
             "rt_url": reverse("prestacoes_contas:rt_criar", args=[prestacao.pk]),
+            "autosave_url": reverse("prestacoes_contas:diario_autosave", args=[diario.pk]),
         },
+    )
+
+
+@require_POST
+def diario_autosave(request, pk):
+    diario = get_object_or_404(DiarioBordo.objects.select_related("prestacao"), pk=pk)
+    sincronizar_trechos(diario)
+    try:
+        payload = parse_autosave_payload(request, expected_model="diario_bordo")
+    except AutosavePayloadError as exc:
+        return autosave_json_response(ok=False, message=str(exc))
+
+    _salvar_diario_autosave(diario, payload)
+    if payload.dirty_fields and diario.prestacao.status == PrestacaoContas.STATUS_PENDENTE:
+        diario.prestacao.status = PrestacaoContas.STATUS_EM_PREENCHIMENTO
+        diario.prestacao.save(update_fields=["status", "atualizado_em"])
+    return autosave_json_response(
+        ok=True,
+        object_id=diario.pk,
+        version=_autosave_version(diario),
     )
 
 
@@ -410,6 +675,88 @@ def rt_download(request, pk, formato="docx"):
     nome = nome_arquivo_rt(relatorio, formato=formato)
 
     response = HttpResponse(conteudo, content_type=content_type)
+    response["Content-Disposition"] = f'attachment; filename="{nome}"'
+    return response
+
+
+def consolidado(request, pc_pk):
+    prestacao = get_object_or_404(
+        PrestacaoContas.objects.select_related(
+            "oficio__roteiro",
+            "servidor__cargo",
+            "servidor__unidade",
+        ).prefetch_related("relatorio_tecnico"),
+        pk=pc_pk,
+    )
+    try:
+        prestacao.relatorio_tecnico
+        relatorio_ok = True
+    except RelatorioTecnico.DoesNotExist:
+        relatorio_ok = False
+    diario_ok = DiarioBordo.objects.filter(prestacao=prestacao).exists()
+    itens = [
+        {
+            "label": "Número da solicitação",
+            "status": bool((prestacao.numero_solicitacao or "").strip()),
+            "value": prestacao.numero_solicitacao or "Pendente",
+        },
+        {
+            "label": "Despacho assinado do ofício",
+            "status": bool(prestacao.despacho_assinado),
+            "value": prestacao.despacho_assinado.name if prestacao.despacho_assinado else "Pendente",
+        },
+        {
+            "label": "Relatório Técnico",
+            "status": relatorio_ok,
+            "value": "Criado" if relatorio_ok else "Será criado com os dados atuais",
+        },
+        {
+            "label": "Diário de Bordo",
+            "status": diario_ok,
+            "value": "Criado" if diario_ok else "Será criado com os dados atuais",
+        },
+        {
+            "label": "Comprovante de saque/transferência",
+            "status": bool(prestacao.comprovante_saque_transferencia),
+            "value": (
+                prestacao.comprovante_saque_transferencia.name
+                if prestacao.comprovante_saque_transferencia
+                else "Pendente"
+            ),
+        },
+    ]
+
+    return render(
+        request,
+        "prestacoes_contas/consolidado.html",
+        {
+            "page_title": "PDF Final",
+            "prestacao": prestacao,
+            "identificacao": _build_identificacao(prestacao),
+            "wizard_page_steps": _build_prestacao_steps(prestacao, "consolidado"),
+            "itens_consolidado": itens,
+            "download_url": reverse("prestacoes_contas:consolidado_download", args=[prestacao.pk]),
+            "diario_url": reverse("prestacoes_contas:diario_criar", args=[prestacao.pk]),
+        },
+    )
+
+
+def consolidado_download(request, pc_pk):
+    prestacao = get_object_or_404(
+        PrestacaoContas.objects.select_related(
+            "oficio__roteiro",
+            "servidor",
+        ),
+        pk=pc_pk,
+    )
+    try:
+        conteudo = gerar_prestacao_consolidado_pdf(prestacao)
+    except DocumentValidationError as exc:
+        messages.error(request, str(exc))
+        return redirect("prestacoes_contas:consolidado", pc_pk=prestacao.pk)
+
+    nome = nome_arquivo_prestacao_consolidado(prestacao)
+    response = HttpResponse(conteudo, content_type="application/pdf")
     response["Content-Disposition"] = f'attachment; filename="{nome}"'
     return response
 

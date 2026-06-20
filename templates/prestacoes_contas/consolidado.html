@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260620-prestacao-final">
+  <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}?v=20260620-prestacao-final">
+{% endblock %}
+
+{% block content %}
+  <div class="page-shell page-shell--wizard oficio-wizard app-wizard">
+    {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="PRESTAÇÕES" title=page_title icon_label="PC" module_label="Prestações de Contas" back_label="Voltar à lista" back_url="/prestacoes-contas/" status_label="PDF Final" status_variant="draft" only %}
+
+    {% include "components/ui/navigation/page_stepper.html" with steps=wizard_page_steps only %}
+
+    <main class="main-form-panel main-form-panel--stack oficio-wizard__main">
+      <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
+        <section class="cv-wizard-section-card rt-summary-card oficio-documentos-summary-section" aria-labelledby="prestacao-final-resumo-title">
+          <header class="cv-wizard-section-header">
+            <div class="cv-wizard-section-header__copy">
+              <h2 class="cv-wizard-section-title" id="prestacao-final-resumo-title">Resumo do ofício</h2>
+              <p class="cv-wizard-section-subtitle">O PDF final será montado na ordem: ofício, despacho, RT, diário e comprovante.</p>
+            </div>
+          </header>
+          <div class="cv-wizard-section-body">
+            <div class="oficio-documentos-grid">
+              <section class="oficio-documentos-admin-facts" aria-label="Dados administrativos">
+                <div class="oficio-documentos-card__body">
+                  <dl class="oficio-documentos-facts oficio-documentos-facts--admin rt-summary-card__facts">
+                    <div class="oficio-documentos-fact">
+                      <dt>Número do ofício</dt>
+                      <dd>{{ identificacao.numero }}</dd>
+                    </div>
+                    <div class="oficio-documentos-fact">
+                      <dt>Protocolo</dt>
+                      <dd>{{ identificacao.protocolo }}</dd>
+                    </div>
+                    <div class="oficio-documentos-fact">
+                      <dt>Servidor</dt>
+                      <dd>{{ identificacao.nome_servidor }}</dd>
+                    </div>
+                    <div class="oficio-documentos-fact">
+                      <dt>Número da solicitação</dt>
+                      <dd>{{ prestacao.numero_solicitacao|default:"—" }}</dd>
+                    </div>
+                  </dl>
+                </div>
+              </section>
+            </div>
+          </div>
+        </section>
+
+        <section class="cv-wizard-section-card" aria-labelledby="prestacao-final-itens-title">
+          <header class="cv-wizard-section-header">
+            <div class="cv-wizard-section-header__copy">
+              <h2 class="cv-wizard-section-title" id="prestacao-final-itens-title">Itens do PDF</h2>
+              <p class="cv-wizard-section-subtitle">Pendências impedem a geração apenas quando o arquivo final é solicitado.</p>
+            </div>
+          </header>
+          <div class="cv-wizard-section-body">
+            <div class="os-list">
+              {% for item in itens_consolidado %}
+                <article class="os-list-card">
+                  <div class="os-list-card__info">
+                    <h3 class="os-list-card__title">{{ item.label }}</h3>
+                    <p class="os-list-card__meta">{{ item.value }}</p>
+                  </div>
+                  <div class="os-list-card__actions">
+                    {% if item.status %}
+                      {% include "components/ui/lists/status_pill.html" with label="OK" variant="success" only %}
+                    {% else %}
+                      {% include "components/ui/lists/status_pill.html" with label="Pendente" variant="warning" only %}
+                    {% endif %}
+                  </div>
+                </article>
+              {% endfor %}
+            </div>
+          </div>
+          <section class="cv-card-footer-section">
+            <div class="cv-card-footer-section__divider" aria-hidden="true"></div>
+            <footer class="cv-card-footer">
+              <div class="cv-card-footer__secondary">
+                {% include "components/ui/buttons/button.html" with href=diario_url label="Voltar ao Diário de Bordo" variant="secondary" icon="arrow-left" only %}
+              </div>
+              <div class="cv-card-footer__primary">
+                {% include "components/ui/buttons/button.html" with href=download_url label="Gerar PDF final" variant="primary" icon="download" icon_after=True only %}
+              </div>
+            </footer>
+          </section>
+        </section>
+      </div>
+    </main>
+  </div>
+{% endblock %}

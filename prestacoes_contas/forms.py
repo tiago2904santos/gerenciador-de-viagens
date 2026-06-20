@@ -7,6 +7,7 @@ from core.normalizers import normalize_spaces
 
 from .models import DiarioBordoTrecho
 from .models import ModeloTextoRelatorioTecnico
+from .models import PrestacaoContas
 from .models import RelatorioTecnico
 
 
@@ -123,6 +124,62 @@ class ModeloTextoSelect(forms.Select):
         if modelo is not None:
             option["attrs"]["data-texto-modelo"] = (modelo.texto or "").strip()
         return option
+
+
+class PrestacaoDocumentosForm(forms.ModelForm):
+    class Meta:
+        model = PrestacaoContas
+        fields = [
+            "numero_solicitacao",
+            "despacho_assinado",
+            "comprovante_saque_transferencia",
+        ]
+        labels = {
+            "numero_solicitacao": "Número da solicitação",
+            "despacho_assinado": "Despacho assinado do ofício",
+            "comprovante_saque_transferencia": "Comprovante de saque/transferência",
+        }
+        help_texts = {
+            "despacho_assinado": "Anexe PDF, PNG, JPG ou JPEG.",
+            "comprovante_saque_transferencia": "Anexe PDF, PNG, JPG ou JPEG.",
+        }
+        widgets = {
+            "numero_solicitacao": forms.TextInput(
+                attrs={
+                    "class": "form-control cv-field__control",
+                    "placeholder": "Informe o número da solicitação",
+                    "autocomplete": "off",
+                },
+            ),
+            "despacho_assinado": forms.ClearableFileInput(
+                attrs={
+                    "class": "form-control cv-field__control prestacao-file-input",
+                    "accept": "application/pdf,image/png,image/jpeg,image/*",
+                },
+            ),
+            "comprovante_saque_transferencia": forms.ClearableFileInput(
+                attrs={
+                    "class": "form-control cv-field__control prestacao-file-input",
+                    "accept": "application/pdf,image/png,image/jpeg,image/*",
+                },
+            ),
+        }
+
+
+class PrestacaoSolicitacaoForm(forms.ModelForm):
+    class Meta:
+        model = PrestacaoContas
+        fields = ["numero_solicitacao"]
+        labels = {"numero_solicitacao": "Número da solicitação"}
+        widgets = {
+            "numero_solicitacao": forms.TextInput(
+                attrs={
+                    "class": "form-control cv-field__control",
+                    "placeholder": "Número da solicitação",
+                    "autocomplete": "off",
+                },
+            ),
+        }
 
 
 class RelatorioTecnicoForm(forms.ModelForm):

@@ -8,6 +8,7 @@ from __future__ import annotations
 from datetime import date, datetime
 from decimal import Decimal
 from typing import Any
+from typing import Mapping
 
 from django.utils import timezone
 
@@ -222,13 +223,26 @@ def _build_column_lines(items: list[str], blank_lines: int = 1) -> str:
     return "\n".join(lines)
 
 
-def _viajantes(oficio: Oficio) -> list[dict[str, str]]:
-    out: list[dict[str, str]] = []
+def _build_optional_column_lines(items: list[str], blank_lines: int = 1) -> str:
+    cleaned = [str(x or "").strip() for x in items]
+    if not any(cleaned):
+        return ""
+    lines: list[str] = []
+    for index, item in enumerate(cleaned):
+        lines.append(item)
+        if index < len(cleaned) - 1:
+            lines.extend([""] * blank_lines)
+    return "\n".join(lines)
+
+
+def _viajantes(oficio: Oficio) -> list[dict[str, Any]]:
+    out: list[dict[str, Any]] = []
     for s in oficio.servidores.select_related("cargo").order_by("nome"):
         nm = _txt(s.nome)
         cg = _txt(s.cargo.nome if s.cargo_id else "")
         out.append(
             {
+                "id": s.pk,
                 "nome": format_document_display(nm) if nm else "",
                 "cargo": format_document_display(cg) if cg else "",
                 "rg": _txt(s.rg_formatado),
@@ -428,13 +442,36 @@ def _diarias(oficio: Oficio) -> tuple[str, str]:
     return q, ""
 
 
-def build_oficio_docxtpl_context(oficio: Oficio) -> dict[str, Any]:
+def _solicitacoes_por_servidor(oficio: Oficio) -> dict[int, str]:
+    solicitacoes: dict[int, str] = {}
+    try:
+        for prestacao in oficio.prestacoes_contas.all():
+            numero = _txt(getattr(prestacao, "numero_solicitacao", ""))
+            if numero:
+                solicitacoes[prestacao.servidor_id] = numero
+    except Exception:
+        pass
+    return solicitacoes
+
+
+def build_oficio_docxtpl_context(
+    oficio: Oficio,
+    *,
+    solicitacoes_por_servidor: Mapping[int, str] | None = None,
+) -> dict[str, Any]:
     oid = getattr(oficio, "pk", None)
     with measure_step("build_oficio_docxtpl_context", {"oficio_id": oid}):
-        return _build_oficio_docxtpl_context_impl(oficio)
+        return _build_oficio_docxtpl_context_impl(
+            oficio,
+            solicitacoes_por_servidor=solicitacoes_por_servidor,
+        )
 
 
-def _build_oficio_docxtpl_context_impl(oficio: Oficio) -> dict[str, Any]:
+def _build_oficio_docxtpl_context_impl(
+    oficio: Oficio,
+    *,
+    solicitacoes_por_servidor: Mapping[int, str] | None = None,
+) -> dict[str, Any]:
     inst = build_configuracao_context()
     nome_chefia, cargo_chefia = _assinatura_nome_cargo(inst, "OFICIO")
     nome_orgao_raw = _txt(inst.get("nome_orgao"))
@@ -453,6 +490,9 @@ def _build_oficio_docxtpl_context_impl(oficio: Oficio) -> dict[str, Any]:
 
     protocolo = format_protocolo(oficio.protocolo)
     assunto_doc = resolver_assunto_oficio(oficio)
+    solicitacoes = solicitacoes_por_servidor
+    if solicitacoes is None:
+        solicitacoes = _solicitacoes_por_servidor(oficio)
 
     ctx: dict[str, Any] = {
         "oficio": oficio.numero_formatado if oficio.numero and oficio.ano else "—",
@@ -483,7 +523,10 @@ def _build_oficio_docxtpl_context_impl(oficio: Oficio) -> dict[str, Any]:
         "col_ida_chegada": ida_chegada,
         "col_volta_saida": volta_saida,
         "col_volta_chegada": volta_chegada,
-        "col_solicitacao": "",
+        "col_solicitacao": _build_optional_column_lines(
+            [_txt(solicitacoes.get(v["id"], "")) for v in viajantes],
+            blank_lines=2,
+        ),
         "assunto_linha": assunto_doc["assunto_linha"],
         "assunto_oficio": assunto_doc["assunto_oficio"],
         "assunto_termo": assunto_doc["assunto_termo"],

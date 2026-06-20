@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from io import BytesIO
 from datetime import timedelta
 from pathlib import Path
 
@@ -7,6 +8,7 @@ from django.conf import settings
 from django.utils import timezone
 
 from cadastros.selectors import build_configuracao_context
+from documentos.services.facade import build_default_facade
 from documentos.services.adapters.docxtpl_render import render_docx_bytes
 from documentos.services.adapters.libreoffice_pdf import convert_docx_to_pdf_libreoffice
 from documentos.services.adapters.libreoffice_pdf import convert_docx_to_pdf_unoserver
@@ -17,8 +19,15 @@ from documentos.services.formatters import format_document_display
 from documentos.services.libreoffice_resolve import resolve_libreoffice_binary
 from documentos.services.pdf_engine import build_pdf_unavailable_message
 from documentos.services.pdf_engine import resolve_pdf_engine
+from documentos.services.types import DocumentoFormato
+from documentos.services.types import DocumentoTipo
 from oficios.assunto_oficio import resolver_assunto_oficio
+from oficios.documents import build_canonical_document_payload
+from oficios.docxtpl_context import build_oficio_docxtpl_context
 
+from .diario_services import gerar_diario_bordo_pdf
+from .diario_services import sincronizar_trechos
+from .models import DiarioBordo
 from .models import RelatorioTecnico
 
 _MESES = [
@@ -210,3 +219,138 @@ def nome_arquivo_rt(relatorio: RelatorioTecnico, formato: str = "docx") -> str:
     oficio = pc.oficio.numero_formatado.replace("/", "-")
     ext = "pdf" if formato == "pdf" else "docx"
     return f"RT_{nome}_OFICIO_{oficio}.{ext}"
+
+
+def _pdf_bytes_from_file_field(field, label: str) -> bytes:
+    if not field:
+        raise DocumentValidationError(f"Anexe o arquivo: {label}.")
+    name = str(getattr(field, "name", "") or "")
+    suffix = Path(name).suffix.lower()
+    if suffix == ".pdf":
+        with field.open("rb") as arquivo:
+            return arquivo.read()
+    if suffix in {".png", ".jpg", ".jpeg"}:
+        with field.open("rb") as arquivo:
+            return _image_bytes_to_pdf(arquivo.read())
+    raise DocumentValidationError(f"Formato inválido em {label}. Use PDF, PNG, JPG ou JPEG.")
+
+
+def _image_bytes_to_pdf(content: bytes) -> bytes:
+    from PIL import Image
+    from PIL import ImageSequence
+
+    def normalize(frame):
+        frame = frame.copy()
+        if frame.mode in ("RGBA", "LA") or (frame.mode == "P" and "transparency" in frame.info):
+            background = Image.new("RGB", frame.size, "white")
+            rgba = frame.convert("RGBA")
+            background.paste(rgba, mask=rgba.getchannel("A"))
+            return background
+        return frame.convert("RGB")
+
+    with Image.open(BytesIO(content)) as image:
+        frames = [normalize(frame) for frame in ImageSequence.Iterator(image)]
+
+    if not frames:
+        raise DocumentValidationError("Não foi possível ler a imagem anexada.")
+
+    output = BytesIO()
+    first, *rest = frames
+    first.save(output, format="PDF", save_all=True, append_images=rest)
+    return output.getvalue()
+
+
+def _append_pdf(writer, pdf_bytes: bytes, label: str) -> None:
+    from pypdf import PdfReader
+
+    try:
+        reader = PdfReader(BytesIO(pdf_bytes))
+        if getattr(reader, "is_encrypted", False):
+            reader.decrypt("")
+        if not reader.pages:
+            raise DocumentValidationError(f"O PDF de {label} não possui páginas.")
+        for page in reader.pages:
+            writer.add_page(page)
+    except DocumentValidationError:
+        raise
+    except Exception as exc:
+        raise DocumentValidationError(f"Não foi possível ler o PDF de {label}.") from exc
+
+
+def _merge_pdf_parts(parts: list[tuple[str, bytes]]) -> bytes:
+    from pypdf import PdfWriter
+
+    writer = PdfWriter()
+    for label, content in parts:
+        _append_pdf(writer, content, label)
+    output = BytesIO()
+    writer.write(output)
+    writer.close()
+    return output.getvalue()
+
+
+def _solicitacoes_do_oficio(prestacao) -> dict[int, str]:
+    solicitacoes = {}
+    try:
+        qs = prestacao.oficio.prestacoes_contas.all()
+        for item in qs:
+            numero = str(item.numero_solicitacao or "").strip()
+            if numero:
+                solicitacoes[item.servidor_id] = numero
+    except Exception:
+        pass
+    numero_atual = str(prestacao.numero_solicitacao or "").strip()
+    if numero_atual:
+        solicitacoes[prestacao.servidor_id] = numero_atual
+    return solicitacoes
+
+
+def gerar_oficio_prestacao_pdf(prestacao) -> bytes:
+    oficio = prestacao.oficio
+    payload = build_canonical_document_payload(oficio, DocumentoTipo.OFICIO)
+    docxtpl = build_oficio_docxtpl_context(
+        oficio,
+        solicitacoes_por_servidor=_solicitacoes_do_oficio(prestacao),
+    )
+    reference = oficio.numero_formatado.replace("/", "-")
+    doc = build_default_facade().gerar(
+        tipo=DocumentoTipo.OFICIO,
+        formato=DocumentoFormato.PDF,
+        payload=payload,
+        reference=reference,
+        docxtpl_context=docxtpl,
+    )
+    return doc.conteudo
+
+
+def gerar_prestacao_consolidado_pdf(prestacao) -> bytes:
+    if not str(prestacao.numero_solicitacao or "").strip():
+        raise DocumentValidationError("Informe o número da solicitação antes de gerar o PDF final.")
+
+    relatorio, _ = RelatorioTecnico.objects.get_or_create(prestacao=prestacao)
+    diario, _ = DiarioBordo.objects.get_or_create(prestacao=prestacao)
+    sincronizar_trechos(diario)
+
+    parts = [
+        ("ofício", gerar_oficio_prestacao_pdf(prestacao)),
+        (
+            "despacho assinado do ofício",
+            _pdf_bytes_from_file_field(prestacao.despacho_assinado, "despacho assinado do ofício"),
+        ),
+        ("relatório técnico", gerar_relatorio_tecnico_pdf(relatorio)),
+        ("diário de bordo", gerar_diario_bordo_pdf(diario)),
+        (
+            "comprovante de saque/transferência",
+            _pdf_bytes_from_file_field(
+                prestacao.comprovante_saque_transferencia,
+                "comprovante de saque/transferência",
+            ),
+        ),
+    ]
+    return _merge_pdf_parts(parts)
+
+
+def nome_arquivo_prestacao_consolidado(prestacao) -> str:
+    nome = prestacao.servidor.nome.replace(" ", "_").upper()
+    oficio = prestacao.oficio.numero_formatado.replace("/", "-")
+    return f"PRESTACAO_{nome}_OFICIO_{oficio}.pdf"

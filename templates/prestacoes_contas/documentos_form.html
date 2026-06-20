@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260620-prestacao-docs">
+  <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}?v=20260620-prestacao-docs">
+{% endblock %}
+
+{% block content %}
+  <div class="page-shell page-shell--wizard oficio-wizard app-wizard">
+    {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="PRESTAÇÕES" title=page_title icon_label="PC" module_label="Prestações de Contas" back_label="Voltar à lista" back_url="/prestacoes-contas/" status_label="Documentos" status_variant="draft" only %}
+
+    {% include "components/ui/navigation/page_stepper.html" with steps=wizard_page_steps only %}
+
+    <main class="main-form-panel main-form-panel--stack oficio-wizard__main">
+      <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
+        <form method="post"
+              enctype="multipart/form-data"
+              class="oficio-wizard__form"
+              novalidate
+              data-autosave="true"
+              data-autosave-model="prestacao_contas"
+              data-autosave-step="documentos"
+              data-autosave-url="{{ autosave_url }}"
+              data-autosave-object-id="{{ prestacao.pk }}"
+              data-file-autosave-url="{{ arquivo_autosave_url }}">
+          {% csrf_token %}
+
+          {% if form.non_field_errors %}
+            {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
+          {% endif %}
+
+          <section class="cv-wizard-section-card rt-summary-card oficio-documentos-summary-section" aria-labelledby="prestacao-docs-resumo-title">
+            <header class="cv-wizard-section-header">
+              <div class="cv-wizard-section-header__copy">
+                <h2 class="cv-wizard-section-title" id="prestacao-docs-resumo-title">Resumo do ofício</h2>
+                <p class="cv-wizard-section-subtitle">Dados usados para vincular os documentos desta prestação.</p>
+              </div>
+            </header>
+            <div class="cv-wizard-section-body">
+              <div class="oficio-documentos-grid">
+                <section class="oficio-documentos-admin-facts" aria-label="Dados administrativos">
+                  <div class="oficio-documentos-card__body">
+                    <dl class="oficio-documentos-facts oficio-documentos-facts--admin rt-summary-card__facts">
+                      <div class="oficio-documentos-fact">
+                        <dt>Número do ofício</dt>
+                        <dd>{{ identificacao.numero }}</dd>
+                      </div>
+                      <div class="oficio-documentos-fact">
+                        <dt>Protocolo</dt>
+                        <dd>{{ identificacao.protocolo }}</dd>
+                      </div>
+                      <div class="oficio-documentos-fact">
+                        <dt>Destino</dt>
+                        <dd>{{ identificacao.destino }}</dd>
+                      </div>
+                      <div class="oficio-documentos-fact">
+                        <dt>Período da viagem</dt>
+                        <dd>{{ identificacao.periodo }}</dd>
+                      </div>
+                    </dl>
+                  </div>
+                </section>
+
+                <article class="oficio-documentos-card oficio-documentos-card--travellers rt-summary-card__traveller-card" aria-label="Servidor da prestação">
+                  <header class="oficio-documentos-card__header oficio-documentos-travellers__header">
+                    <div class="oficio-documentos-travellers__titles">
+                      <span class="oficio-documentos-card__eyebrow">Equipe</span>
+                      <h4 class="oficio-documentos-card__title">Servidor</h4>
+                      <p class="oficio-documentos-card__subtitle">Servidor vinculado à prestação de contas</p>
+                    </div>
+                  </header>
+                  <div class="oficio-documentos-card__body">
+                    <div class="oficio-documentos-travellers-lines oficio-documentos-travellers-lines--n1">
+                      <article class="oficio-documentos-traveller-line{% if identificacao.is_motorista %} oficio-documentos-traveller-line--motorista{% endif %}">
+                        <div class="oficio-documentos-traveller-line__name-row">
+                          <strong class="oficio-documentos-traveller-line__name">{{ identificacao.nome_servidor }}</strong>
+                          {% if identificacao.is_motorista %}
+                            {% include "components/ui/badges/chip.html" with label="Motorista" tone="warning" size="compact" only %}
+                          {% endif %}
+                        </div>
+                        <span class="oficio-documentos-traveller-line__cargo">
+                          {{ identificacao.cargo }}{% if identificacao.unidade %} · {{ identificacao.unidade }}{% endif %}{% if identificacao.rg_servidor and identificacao.rg_servidor != "—" %} · RG {{ identificacao.rg_servidor }}{% endif %}
+                        </span>
+                      </article>
+                    </div>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </section>
+
+          <section class="cv-wizard-section-card" aria-labelledby="prestacao-docs-title">
+            <header class="cv-wizard-section-header">
+              <div class="cv-wizard-section-header__copy">
+                <h2 class="cv-wizard-section-title" id="prestacao-docs-title">Arquivos e solicitação</h2>
+                <p class="cv-wizard-section-subtitle">O número da solicitação será levado para a coluna de solicitação do ofício.</p>
+              </div>
+            </header>
+            <div class="cv-wizard-section-body">
+              <div class="field-grid">
+                {% include "components/forms/form_field.html" with field=form.numero_solicitacao only %}
+                {% include "components/forms/form_field.html" with field=form.despacho_assinado help_text=form.despacho_assinado.help_text only %}
+                {% include "components/forms/form_field.html" with field=form.comprovante_saque_transferencia help_text=form.comprovante_saque_transferencia.help_text only %}
+              </div>
+            </div>
+            <section class="cv-card-footer-section">
+              <div class="cv-card-footer-section__divider" aria-hidden="true"></div>
+              <footer class="cv-card-footer">
+                <div class="cv-card-footer__secondary">
+                  {% include "components/ui/buttons/button.html" with href="/prestacoes-contas/" label="Voltar à lista" variant="secondary" icon="arrow-left" only %}
+                </div>
+                <div class="cv-card-footer__primary">
+                  {% include "components/ui/buttons/button.html" with label="Salvar" variant="secondary" type="submit" name="action" value="save" only %}
+                  {% include "components/ui/buttons/button.html" with label="Salvar e ir para RT" variant="primary" icon="arrow-right" icon_after=True type="submit" name="action" value="save_continue" only %}
+                </div>
+              </footer>
+            </section>
+          </section>
+        </form>
+      </div>
+    </main>
+  </div>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'js/pages/prestacoes-contas-documentos.js' %}?v=20260620-autosave-files" defer></script>
+{% endblock %}
