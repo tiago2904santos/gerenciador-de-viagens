@@ -2,6 +2,7 @@ from django.db import models
 
 from cadastros.models import Servidor
 from oficios.models import Oficio
+from roteiros.models import RoteiroTrecho
 
 
 class PrestacaoContas(models.Model):
@@ -87,6 +88,59 @@ class RelatorioTecnico(models.Model):
 
     def __str__(self):
         return f"RT — {self.prestacao}"
+
+
+class DiarioBordo(models.Model):
+    """Diário de bordo do veículo gerado a partir do roteiro do ofício da prestação.
+
+    Os dados de cabeçalho (motorista, viatura, ofício, e-protocolo) vêm do ofício;
+    os trechos vêm do roteiro. O usuário complementa KM inicial/final e a
+    necessidade de abastecimento de cada trecho (ver ``DiarioBordoTrecho``).
+    """
+
+    prestacao = models.OneToOneField(
+        PrestacaoContas,
+        on_delete=models.CASCADE,
+        related_name="diario_bordo",
+    )
+    criado_em = models.DateTimeField(auto_now_add=True)
+    atualizado_em = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Diário de Bordo"
+        verbose_name_plural = "Diários de Bordo"
+
+    def __str__(self):
+        return f"Diário de bordo — {self.prestacao}"
+
+
+class DiarioBordoTrecho(models.Model):
+    """Linha do diário de bordo, espelhando um trecho do roteiro do ofício."""
+
+    diario = models.ForeignKey(
+        DiarioBordo,
+        on_delete=models.CASCADE,
+        related_name="trechos",
+    )
+    trecho = models.ForeignKey(
+        RoteiroTrecho,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="diario_bordo_trechos",
+    )
+    ordem = models.PositiveIntegerField(default=0)
+    km_inicial = models.PositiveIntegerField(null=True, blank=True)
+    km_final = models.PositiveIntegerField(null=True, blank=True)
+    abastecimento = models.BooleanField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["diario", "ordem", "pk"]
+        verbose_name = "Trecho do diário de bordo"
+        verbose_name_plural = "Trechos do diário de bordo"
+
+    def __str__(self):
+        return f"Trecho {self.ordem} — {self.diario_id}"
 
 
 class ModeloTextoRelatorioTecnico(models.Model):
