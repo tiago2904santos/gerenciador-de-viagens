@@ -5,7 +5,7 @@
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260619-rt-form">
-  <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}?v=20260619-rt-summary-ribbons2">
+  <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}?v=20260620-ribbon-simple">
 {% endblock %}
 
 {% block extra_js %}
@@ -82,6 +82,14 @@
 
           {% if form.non_field_errors %}
             {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
+          {% endif %}
+
+          {% if diaria_info.alterada %}
+            <div class="diario-diaria-alert" role="alert">
+              <strong>Diária alterada no roteiro desta prestação.</strong>
+              Valor: {{ diaria_info.valor_oficio_label }} (ofício) → {{ diaria_info.valor_ajustado_label }} (ajustado).
+              Descreva o motivo da alteração no campo <strong>Informações complementares</strong> abaixo.
+            </div>
           {% endif %}
 
           {# CARD 1 — Identificação #}

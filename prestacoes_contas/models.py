@@ -30,6 +30,15 @@ class PrestacaoContas(models.Model):
         on_delete=models.CASCADE,
         related_name="prestacoes_contas",
     )
+    # Cópia editável do roteiro (o que realmente ocorreu na viagem). Quando
+    # preenchida, substitui o roteiro do ofício no diário sem alterar o ofício.
+    roteiro_ajustado = models.ForeignKey(
+        "roteiros.Roteiro",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+    )
     status = models.CharField(max_length=30, choices=STATUS_CHOICES, default=STATUS_PENDENTE)
     observacoes = models.TextField(blank=True, default="")
     criado_em = models.DateTimeField(auto_now_add=True)

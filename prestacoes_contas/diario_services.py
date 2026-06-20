@@ -27,6 +27,96 @@ from .models import DiarioBordo
 from .models import DiarioBordoTrecho
 
 
+def roteiro_efetivo(prestacao):
+    """Roteiro usado pelo diário: a cópia ajustada, se existir; senão o do ofício."""
+    return prestacao.roteiro_ajustado or getattr(prestacao.oficio, "roteiro", None)
+
+
+def _copiar_campos_concretos(origem, destino, excluir: set) -> None:
+    for campo in origem._meta.concrete_fields:
+        if campo.primary_key or campo.name in excluir:
+            continue
+        setattr(destino, campo.attname, getattr(origem, campo.attname))
+
+
+def clonar_roteiro(origem):
+    """Cria uma cópia independente do roteiro (cabeçalho + destinos + trechos)."""
+    from roteiros.models import Roteiro
+    from roteiros.models import RoteiroDestino
+
+    novo = Roteiro()
+    _copiar_campos_concretos(origem, novo, excluir={"evento"})
+    novo.pk = None
+    novo.evento = None
+    novo.tipo = Roteiro.TIPO_AVULSO
+    novo.save()
+
+    for destino in origem.destinos.all():
+        nd = RoteiroDestino()
+        _copiar_campos_concretos(destino, nd, excluir={"roteiro"})
+        nd.pk = None
+        nd.roteiro = novo
+        nd.save()
+
+    for trecho in origem.trechos.all():
+        nt = RoteiroTrecho()
+        _copiar_campos_concretos(trecho, nt, excluir={"roteiro"})
+        nt.pk = None
+        nt.roteiro = novo
+        nt.save()
+
+    return novo
+
+
+def garantir_roteiro_ajustado(prestacao):
+    """Garante a cópia editável do roteiro na prestação (clona do ofício na 1ª vez)."""
+    if prestacao.roteiro_ajustado_id:
+        return prestacao.roteiro_ajustado
+    origem = getattr(prestacao.oficio, "roteiro", None)
+    if origem is None:
+        return None
+    copia = clonar_roteiro(origem)
+    prestacao.roteiro_ajustado = copia
+    prestacao.save(update_fields=["roteiro_ajustado", "atualizado_em"])
+    return copia
+
+
+def diaria_info(prestacao) -> dict:
+    """Compara a diária do roteiro ajustado com a do ofício para sinalizar alteração."""
+    copia = prestacao.roteiro_ajustado
+    if copia is None:
+        return {"alterada": False, "ajustado": False}
+    original = getattr(prestacao.oficio, "roteiro", None)
+
+    def valor(r):
+        return getattr(r, "valor_diarias", None) if r else None
+
+    def qtd(r):
+        return (getattr(r, "quantidade_diarias", "") or "").strip() if r else ""
+
+    def moeda(v):
+        if v is None:
+            return "—"
+        try:
+            from documentos.services.formatters import format_currency_br
+
+            return format_currency_br(v)
+        except Exception:
+            return str(v)
+
+    alterada = (valor(original) != valor(copia)) or (qtd(original) != qtd(copia))
+    return {
+        "alterada": alterada,
+        "ajustado": True,
+        "valor_oficio": valor(original),
+        "valor_ajustado": valor(copia),
+        "valor_oficio_label": moeda(valor(original)),
+        "valor_ajustado_label": moeda(valor(copia)),
+        "qtd_oficio": qtd(original) or "—",
+        "qtd_ajustado": qtd(copia) or "—",
+    }
+
+
 def _upper(value: object) -> str:
     return str(value or "").strip().upper()
 
@@ -68,17 +158,25 @@ def trechos_ordenados(roteiro) -> list[RoteiroTrecho]:
 
 def sincronizar_trechos(diario: DiarioBordo) -> list[DiarioBordoTrecho]:
     """Garante uma linha de diário por trecho do roteiro, preservando o que já foi digitado."""
-    roteiro = getattr(diario.prestacao.oficio, "roteiro", None)
+    roteiro = roteiro_efetivo(diario.prestacao)
     trechos = trechos_ordenados(roteiro)
-    existentes = {dt.trecho_id: dt for dt in diario.trechos.all()}
+    existentes = list(diario.trechos.all().order_by("ordem", "pk"))
+    por_trecho = {dt.trecho_id: dt for dt in existentes}
+    ids_atuais = {t.id for t in trechos}
+    # Linhas cujo trecho deixou de existir (ex.: roteiro foi clonado/recriado):
+    # ficam disponíveis para reaproveitar, preservando KM/abastecimento por ordem.
+    sobrando = [dt for dt in existentes if dt.trecho_id not in ids_atuais]
 
     usados = []
     for i, trecho in enumerate(trechos):
-        linha = existentes.get(trecho.id)
+        linha = por_trecho.get(trecho.id)
+        if linha is None and sobrando:
+            linha = sobrando.pop(0)
         if linha is None:
-            linha = DiarioBordoTrecho(diario=diario, trecho=trecho)
-        if linha.ordem != i:
-            linha.ordem = i
+            # Padrão: necessidade de abastecimento = Sim.
+            linha = DiarioBordoTrecho(diario=diario, abastecimento=True)
+        linha.trecho = trecho
+        linha.ordem = i
         linha.save()
         usados.append(linha.pk)
 

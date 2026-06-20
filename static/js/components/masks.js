@@ -80,6 +80,12 @@
     return String(value || '').toUpperCase();
   }
 
+  function maskMilhar(value) {
+    var v = onlyDigits(value).replace(/^0+(?=\d)/, '');
+    if (!v) return '';
+    return v.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  }
+
   var formatters = {
     upper: maskUpper,
     cpf: maskCpf,
@@ -90,6 +96,7 @@
     time: maskTime,
     telefone: maskTelefone,
     protocolo: maskProtocolo,
+    milhar: maskMilhar,
   };
 
   function format(value, mask) {

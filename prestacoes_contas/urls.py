@@ -11,6 +11,7 @@ urlpatterns = [
     path("rt/<int:pk>/download/", views.rt_download, name="rt_download"),
     path("rt/<int:pk>/download/<str:formato>/", views.rt_download, name="rt_download_formato"),
     path("prestacao/<int:pc_pk>/diario/", views.diario_criar, name="diario_criar"),
+    path("prestacao/<int:pc_pk>/diario/editar-roteiro/", views.diario_editar_roteiro, name="diario_editar_roteiro"),
     path("diario/<int:pk>/download/", views.diario_download, name="diario_download"),
     path("diario/<int:pk>/download/<str:formato>/", views.diario_download, name="diario_download_formato"),
     # Modelos de texto reutilizáveis

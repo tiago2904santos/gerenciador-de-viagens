@@ -1,3 +1,5 @@
+import re
+
 from django import forms
 from django.forms import modelformset_factory
 
@@ -9,7 +11,6 @@ from .models import RelatorioTecnico
 
 
 ABASTECIMENTO_CHOICES = [
-    ("", "—"),
     ("sim", "Sim"),
     ("nao", "Não"),
 ]
@@ -22,38 +23,56 @@ class DiarioBordoTrechoForm(forms.ModelForm):
         label="Necessidade de abastecimento",
         choices=ABASTECIMENTO_CHOICES,
         required=False,
-        widget=forms.Select(attrs={"class": "form-select cv-field__control"}),
+        widget=forms.Select(),
+    )
+    km_inicial = forms.CharField(
+        required=False,
+        widget=forms.TextInput(
+            attrs={
+                "class": "cv-field__control",
+                "inputmode": "numeric",
+                "placeholder": "0",
+                "autocomplete": "off",
+                "data-mask": "milhar",
+            },
+        ),
+    )
+    km_final = forms.CharField(
+        required=False,
+        widget=forms.TextInput(
+            attrs={
+                "class": "cv-field__control",
+                "inputmode": "numeric",
+                "placeholder": "0",
+                "autocomplete": "off",
+                "data-mask": "milhar",
+            },
+        ),
     )
 
     class Meta:
         model = DiarioBordoTrecho
         fields = ["km_inicial", "km_final", "abastecimento"]
-        widgets = {
-            "km_inicial": forms.NumberInput(
-                attrs={"class": "cv-field__control", "min": "0", "inputmode": "numeric", "placeholder": "0"},
-            ),
-            "km_final": forms.NumberInput(
-                attrs={"class": "cv-field__control", "min": "0", "inputmode": "numeric", "placeholder": "0"},
-            ),
-        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["km_inicial"].required = False
-        self.fields["km_final"].required = False
         if not self.is_bound:
             valor = getattr(self.instance, "abastecimento", None)
-            self.fields["abastecimento"].initial = (
-                "sim" if valor is True else "nao" if valor is False else ""
-            )
+            # Padrão: "Sim" (inclusive quando ainda não preenchido).
+            self.fields["abastecimento"].initial = "nao" if valor is False else "sim"
 
     def clean_abastecimento(self):
-        valor = self.cleaned_data.get("abastecimento")
-        if valor == "sim":
-            return True
-        if valor == "nao":
-            return False
-        return None
+        return self.cleaned_data.get("abastecimento") != "nao"
+
+    def _parse_km(self, campo):
+        digitos = re.sub(r"\D", "", str(self.cleaned_data.get(campo) or ""))
+        return int(digitos) if digitos else None
+
+    def clean_km_inicial(self):
+        return self._parse_km("km_inicial")
+
+    def clean_km_final(self):
+        return self._parse_km("km_final")
 
 
 DiarioBordoTrechoFormSet = modelformset_factory(

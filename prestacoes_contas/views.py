@@ -12,6 +12,8 @@ from core.presenters.meta import build_meta
 from core.utils.masks import format_protocolo
 from documentos.services.exceptions import DocumentValidationError
 
+from .diario_services import diaria_info
+from .diario_services import garantir_roteiro_ajustado
 from .diario_services import gerar_diario_bordo_pdf
 from .diario_services import gerar_diario_bordo_xlsx
 from .diario_services import nome_arquivo_diario
@@ -273,6 +275,7 @@ def rt_criar(request, pc_pk):
             "prestacao": prestacao,
             "identificacao": identificacao,
             "wizard_page_steps": _build_prestacao_steps(prestacao, "rt"),
+            "diaria_info": diaria_info(prestacao),
         },
     )
 
@@ -328,8 +331,28 @@ def diario_criar(request, pc_pk):
             "trechos": trechos,
             "identificacao": _build_identificacao(prestacao),
             "wizard_page_steps": _build_prestacao_steps(prestacao, "diario"),
+            "diaria_info": diaria_info(prestacao),
+            "editar_roteiro_url": reverse("prestacoes_contas:diario_editar_roteiro", args=[prestacao.pk]),
+            "rt_url": reverse("prestacoes_contas:rt_criar", args=[prestacao.pk]),
         },
     )
+
+
+def diario_editar_roteiro(request, pc_pk):
+    """Abre o editor de roteiro sobre a cópia da prestação (clona do ofício na 1ª vez)."""
+    from urllib.parse import urlencode
+
+    prestacao = get_object_or_404(
+        PrestacaoContas.objects.select_related("oficio__roteiro"),
+        pk=pc_pk,
+    )
+    copia = garantir_roteiro_ajustado(prestacao)
+    diario_url = reverse("prestacoes_contas:diario_criar", args=[prestacao.pk])
+    if copia is None:
+        messages.error(request, "Este ofício não possui roteiro para editar.")
+        return redirect(diario_url)
+    editar_url = reverse("roteiros:editar", args=[copia.pk])
+    return redirect(f"{editar_url}?{urlencode({'next': diario_url})}")
 
 
 def diario_download(request, pk, formato="xlsx"):

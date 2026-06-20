@@ -216,9 +216,22 @@ def detalhe(request, pk):
     )
 
 
+def _next_url_seguro(request):
+    """URL local de retorno (?next=), validada contra open redirect."""
+    from django.utils.http import url_has_allowed_host_and_scheme
+
+    candidato = request.GET.get("next") or ""
+    if candidato and url_has_allowed_host_and_scheme(
+        candidato, allowed_hosts={request.get_host()}, require_https=request.is_secure()
+    ):
+        return candidato
+    return ""
+
+
 def editar(request, pk):
     roteiro = get_roteiro_by_id(pk)
     evento = roteiro.evento if roteiro.evento_id else None
+    next_url = _next_url_seguro(request)
     form = RoteiroForm(request.POST or None, instance=roteiro)
 
     preparar_querysets_formulario_roteiro(
@@ -233,6 +246,8 @@ def editar(request, pk):
         if form.is_valid() and validated["ok"]:
             atualizar_roteiro(roteiro, form, roteiro_state, validated, diarias_resultado)
             messages.success(request, "Roteiro atualizado com sucesso.")
+            if next_url:
+                return redirect(next_url)
             if roteiro.evento_id:
                 return redirect("eventos:guiado_etapa", pk=roteiro.evento_id, etapa=2)
             return redirect("roteiros:detalhe", pk=roteiro.pk)
@@ -261,7 +276,7 @@ def editar(request, pk):
         {
             "page_title": "Editar roteiro",
             "page_description": "Ajuste sede, destinos, trechos e retorno.",
-            "back_url": _roteiro_return_url(roteiro=roteiro) if roteiro.evento_id else reverse("roteiros:detalhe", args=[roteiro.pk]),
+            "back_url": next_url or (_roteiro_return_url(roteiro=roteiro) if roteiro.evento_id else reverse("roteiros:detalhe", args=[roteiro.pk])),
             "delete_url": reverse("roteiros:excluir", args=[roteiro.pk]),
             "wizard_header": {
                 "title": "Editar roteiro",
@@ -269,11 +284,11 @@ def editar(request, pk):
                 "status_label": roteiro_status_label,
                 "status_variant": roteiro_status_variant,
             },
-            "wizard_back_label": "Dados do evento" if roteiro.evento_id else "Voltar para detalhes",
-            "wizard_back_url": _roteiro_return_url(roteiro=roteiro) if roteiro.evento_id else reverse("roteiros:detalhe", args=[roteiro.pk]),
+            "wizard_back_label": "Voltar" if next_url else ("Dados do evento" if roteiro.evento_id else "Voltar para detalhes"),
+            "wizard_back_url": next_url or (_roteiro_return_url(roteiro=roteiro) if roteiro.evento_id else reverse("roteiros:detalhe", args=[roteiro.pk])),
             "wizard_page_steps": [],
             "roteiro_editor_oficio": True,
-            "roteiro_form_action": request.path,
+            "roteiro_form_action": request.get_full_path(),
             **context,
         },
     )
