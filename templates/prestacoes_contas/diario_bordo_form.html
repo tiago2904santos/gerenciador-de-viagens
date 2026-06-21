@@ -7,6 +7,11 @@
   <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260620-diario">
   <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260620-diario">
   <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}?v=20260620-diario3">
+  <link rel="stylesheet" href="{% static 'css/prestacoes-documento-preview.css' %}?v=20260621-preview">
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'js/pages/oficios-documentos-inline.js' %}?v=20260621-preview" defer></script>
 {% endblock %}
 
 {% block content %}
@@ -194,6 +199,10 @@
             </section>
           {% endfor %}
         </form>
+
+        {% if trechos %}
+          {% include "prestacoes_contas/partials/documento_preview.html" with preview_anchor="diario-preview" preview_title="Pré-visualização do diário" preview_subtitle="O PDF é gerado com os dados salvos do diário. Reabra o card após editar para atualizar." preview_doc_title="Diário de Bordo" preview_inline_url=preview_inline_url preview_pdf_url=preview_pdf_url preview_xlsx_url=preview_xlsx_url only %}
+        {% endif %}
       </div>
     </main>
   </div>

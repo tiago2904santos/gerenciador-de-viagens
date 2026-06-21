@@ -13,6 +13,10 @@ def prestacao_documento_upload_to(instance, filename):
     return f"prestacoes_contas/{instance.pk or 'nova'}/{filename}"
 
 
+def prestacao_documento_anexo_upload_to(instance, filename):
+    return f"prestacoes_contas/{instance.prestacao_id or 'nova'}/{filename}"
+
+
 class PrestacaoContas(models.Model):
     STATUS_PENDENTE = "pendente"
     STATUS_EM_PREENCHIMENTO = "em_preenchimento"
@@ -97,6 +101,37 @@ class PrestacaoContas(models.Model):
             self.STATUS_APROVADA: "success",
             self.STATUS_REPROVADA: "danger",
         }.get(self.status, "muted")
+
+
+class PrestacaoDocumentoAnexo(models.Model):
+    TIPO_DESPACHO = "despacho"
+    TIPO_COMPROVANTE = "comprovante"
+
+    TIPO_CHOICES = [
+        (TIPO_DESPACHO, "Despacho assinado do ofício"),
+        (TIPO_COMPROVANTE, "Comprovante de saque/transferência"),
+    ]
+
+    prestacao = models.ForeignKey(
+        PrestacaoContas,
+        on_delete=models.CASCADE,
+        related_name="documentos_anexos",
+    )
+    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, db_index=True)
+    arquivo = models.FileField(
+        upload_to=prestacao_documento_anexo_upload_to,
+        validators=[FileExtensionValidator(PRESTACAO_DOCUMENTO_EXTENSOES)],
+    )
+    nome_original = models.CharField(max_length=255, blank=True, default="")
+    criado_em = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["tipo", "criado_em", "pk"]
+        verbose_name = "Anexo da prestação de contas"
+        verbose_name_plural = "Anexos da prestação de contas"
+
+    def __str__(self):
+        return self.nome_original or self.arquivo.name
 
 
 class RelatorioTecnico(models.Model):

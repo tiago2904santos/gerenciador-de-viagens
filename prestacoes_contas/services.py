@@ -28,6 +28,7 @@ from oficios.docxtpl_context import build_oficio_docxtpl_context
 from .diario_services import gerar_diario_bordo_pdf
 from .diario_services import sincronizar_trechos
 from .models import DiarioBordo
+from .models import PrestacaoDocumentoAnexo
 from .models import RelatorioTecnico
 
 _MESES = [
@@ -235,6 +236,27 @@ def _pdf_bytes_from_file_field(field, label: str) -> bytes:
     raise DocumentValidationError(f"Formato inválido em {label}. Use PDF, PNG, JPG ou JPEG.")
 
 
+def _pdf_parts_from_anexos(prestacao, tipo: str, label: str, legacy_field_name: str) -> list[tuple[str, bytes]]:
+    parts = []
+    seen = set()
+    anexos = prestacao.documentos_anexos.filter(tipo=tipo).order_by("criado_em", "pk")
+    for index, anexo in enumerate(anexos, start=1):
+        name = str(getattr(anexo.arquivo, "name", "") or "")
+        if not name or name in seen:
+            continue
+        seen.add(name)
+        parts.append((f"{label} {index}", _pdf_bytes_from_file_field(anexo.arquivo, label)))
+
+    legacy = getattr(prestacao, legacy_field_name, None)
+    legacy_name = str(getattr(legacy, "name", "") or "")
+    if legacy_name and legacy_name not in seen:
+        parts.append((label, _pdf_bytes_from_file_field(legacy, label)))
+
+    if not parts:
+        raise DocumentValidationError(f"Anexe o arquivo: {label}.")
+    return parts
+
+
 def _image_bytes_to_pdf(content: bytes) -> bytes:
     from PIL import Image
     from PIL import ImageSequence
@@ -330,6 +352,29 @@ def gerar_prestacao_consolidado_pdf(prestacao) -> bytes:
     relatorio, _ = RelatorioTecnico.objects.get_or_create(prestacao=prestacao)
     diario, _ = DiarioBordo.objects.get_or_create(prestacao=prestacao)
     sincronizar_trechos(diario)
+
+    despacho_parts = _pdf_parts_from_anexos(
+        prestacao,
+        PrestacaoDocumentoAnexo.TIPO_DESPACHO,
+        "despacho assinado do ofício",
+        "despacho_assinado",
+    )
+    comprovante_parts = _pdf_parts_from_anexos(
+        prestacao,
+        PrestacaoDocumentoAnexo.TIPO_COMPROVANTE,
+        "comprovante de saque/transferência",
+        "comprovante_saque_transferencia",
+    )
+
+    return _merge_pdf_parts(
+        [
+            ("ofício", gerar_oficio_prestacao_pdf(prestacao)),
+            *despacho_parts,
+            ("relatório técnico", gerar_relatorio_tecnico_pdf(relatorio)),
+            ("diário de bordo", gerar_diario_bordo_pdf(diario)),
+            *comprovante_parts,
+        ]
+    )
 
     parts = [
         ("ofício", gerar_oficio_prestacao_pdf(prestacao)),

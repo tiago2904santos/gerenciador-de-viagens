@@ -6,6 +6,11 @@
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260620-prestacao-final">
   <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}?v=20260620-prestacao-final">
+  <link rel="stylesheet" href="{% static 'css/prestacoes-documento-preview.css' %}?v=20260621-preview">
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'js/pages/oficios-documentos-inline.js' %}?v=20260621-preview" defer></script>
 {% endblock %}
 
 {% block content %}
@@ -89,6 +94,8 @@
             </footer>
           </section>
         </section>
+
+        {% include "prestacoes_contas/partials/documento_preview.html" with preview_anchor="consolidado-preview" preview_title="Pré-visualização do PDF final" preview_subtitle="Documento consolidado na ordem: ofício, despacho, RT, diário e comprovante." preview_doc_title="PDF Final" preview_inline_url=preview_inline_url preview_pdf_url=download_url only %}
       </div>
     </main>
   </div>

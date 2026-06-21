@@ -5,7 +5,7 @@
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260620-prestacao-docs">
-  <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}?v=20260620-prestacao-docs">
+  <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}?v=20260621-selection-select">
 {% endblock %}
 
 {% block content %}
@@ -27,6 +27,7 @@
               data-autosave-object-id="{{ prestacao.pk }}"
               data-file-autosave-url="{{ arquivo_autosave_url }}">
           {% csrf_token %}
+          {{ form.numero_solicitacao.as_hidden }}
 
           {% if form.non_field_errors %}
             {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
@@ -35,7 +36,11 @@
           <section class="cv-wizard-section-card rt-summary-card oficio-documentos-summary-section" aria-labelledby="prestacao-docs-resumo-title">
             <header class="cv-wizard-section-header">
               <div class="cv-wizard-section-header__copy">
-                <h2 class="cv-wizard-section-title" id="prestacao-docs-resumo-title">Resumo do ofício</h2>
+                <h2 class="cv-wizard-section-title"
+                    id="prestacao-docs-resumo-title"
+                    data-solicitacao-title>
+                  Solicitação {{ prestacao.numero_solicitacao|default:"" }}
+                </h2>
                 <p class="cv-wizard-section-subtitle">Dados usados para vincular os documentos desta prestação.</p>
               </div>
             </header>
@@ -101,9 +106,20 @@
             </header>
             <div class="cv-wizard-section-body">
               <div class="field-grid">
-                {% include "components/forms/form_field.html" with field=form.numero_solicitacao only %}
-                {% include "components/forms/form_field.html" with field=form.despacho_assinado help_text=form.despacho_assinado.help_text only %}
-                {% include "components/forms/form_field.html" with field=form.comprovante_saque_transferencia help_text=form.comprovante_saque_transferencia.help_text only %}
+                <div class="field app-form-field">
+                  <label class="app-form-label" for="{{ form.despacho_arquivos.id_for_label }}">{{ form.despacho_arquivos.label }}</label>
+                  {{ form.despacho_arquivos }}
+                  {% include "prestacoes_contas/partials/documento_anexos.html" with anexos=despacho_anexos only %}
+                  {% if form.despacho_arquivos.help_text %}<p class="field-help app-form-help">{{ form.despacho_arquivos.help_text }}</p>{% endif %}
+                  {% if form.despacho_arquivos.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.despacho_arquivos.errors only %}{% endif %}
+                </div>
+                <div class="field app-form-field">
+                  <label class="app-form-label" for="{{ form.comprovante_arquivos.id_for_label }}">{{ form.comprovante_arquivos.label }}</label>
+                  {{ form.comprovante_arquivos }}
+                  {% include "prestacoes_contas/partials/documento_anexos.html" with anexos=comprovante_anexos only %}
+                  {% if form.comprovante_arquivos.help_text %}<p class="field-help app-form-help">{{ form.comprovante_arquivos.help_text }}</p>{% endif %}
+                  {% if form.comprovante_arquivos.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.comprovante_arquivos.errors only %}{% endif %}
+                </div>
               </div>
             </div>
             <section class="cv-card-footer-section">
@@ -126,5 +142,5 @@
 {% endblock %}
 
 {% block extra_js %}
-  <script src="{% static 'js/pages/prestacoes-contas-documentos.js' %}?v=20260620-autosave-files" defer></script>
+  <script src="{% static 'js/pages/prestacoes-contas-documentos.js' %}?v=20260621-selection-select" defer></script>
 {% endblock %}

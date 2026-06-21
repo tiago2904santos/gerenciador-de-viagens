@@ -3786,6 +3786,21 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
   margin-left: auto;
 }
 
+/* ── Campo "Número da solicitação" (prestação de contas) ── */
+.oficio-lc__solicitacao-form {
+  align-items: flex-end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.oficio-lc__solicitacao-form .app-form-field,
+.oficio-lc__solicitacao-form .field {
+  flex: 1 1 220px;
+  margin: 0;
+  min-width: 0;
+}
+
 /* ── RESPONSIVO ── */
 
 /* mobile estreito: 1 viajante por linha */

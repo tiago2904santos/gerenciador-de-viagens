@@ -57,6 +57,11 @@
         hydrateIframe(card);
       }
     });
+    // Cards que já abrem expandidos (ex.: visualizador único por página) precisam
+    // ser hidratados no carregamento, pois o evento "toggle" não dispara sozinho.
+    if (card.open) {
+      hydrateIframe(card);
+    }
   });
 
   function bindVerifyPdfButton(btn, urlAttr) {

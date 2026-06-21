@@ -10,6 +10,7 @@ urlpatterns = [
     path("prestacao/<int:pc_pk>/documentos/", views.documentos, name="documentos"),
     path("prestacao/<int:pc_pk>/autosave/", views.prestacao_autosave, name="prestacao_autosave"),
     path("prestacao/<int:pc_pk>/autosave-arquivo/", views.prestacao_arquivo_autosave, name="prestacao_arquivo_autosave"),
+    path("prestacao/<int:pc_pk>/anexo/<int:anexo_pk>/excluir/", views.prestacao_documento_excluir, name="prestacao_documento_excluir"),
     path("prestacao/<int:pc_pk>/rt/", views.rt_criar, name="rt_criar"),
     path("rt/<int:pk>/autosave/", views.rt_autosave, name="rt_autosave"),
     path("rt/<int:pk>/download/", views.rt_download, name="rt_download"),

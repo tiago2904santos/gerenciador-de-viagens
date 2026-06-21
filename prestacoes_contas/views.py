@@ -1,4 +1,5 @@
 from decimal import Decimal
+from pathlib import Path
 import re
 
 from django.contrib import messages
@@ -9,6 +10,7 @@ from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.html import escape
 from django.views.decorators.http import require_POST
 
 from core.autosave import AutosavePayloadError
@@ -38,7 +40,10 @@ from .forms import RelatorioTecnicoForm
 from .models import DiarioBordo
 from .models import ModeloTextoRelatorioTecnico
 from .models import PrestacaoContas
+from .models import PrestacaoDocumentoAnexo
 from .models import RelatorioTecnico
+from .presenters import apresentar_prestacao_card
+from .selectors import listar_prestacoes
 from .services import gerar_relatorio_tecnico_docx
 from .services import gerar_relatorio_tecnico_pdf
 from .services import gerar_prestacao_consolidado_pdf
@@ -152,6 +157,43 @@ def _build_identificacao(pc) -> dict:
         "unidade": str(servidor.unidade) if servidor.unidade_id else "",
         "is_motorista": oficio.motorista_id == servidor.id,
     }
+
+
+def _marcar_prestacao_em_preenchimento(prestacao):
+    if prestacao.status == PrestacaoContas.STATUS_PENDENTE:
+        prestacao.status = PrestacaoContas.STATUS_EM_PREENCHIMENTO
+        prestacao.save(update_fields=["status", "atualizado_em"])
+
+
+def _documento_anexos_rows(prestacao, tipo):
+    rows = []
+    for anexo in prestacao.documentos_anexos.filter(tipo=tipo).order_by("criado_em", "pk"):
+        rows.append(
+            {
+                "id": anexo.pk,
+                "nome": anexo.nome_original or Path(anexo.arquivo.name).name,
+                "url": anexo.arquivo.url,
+                "delete_url": reverse(
+                    "prestacoes_contas:prestacao_documento_excluir",
+                    args=[prestacao.pk, anexo.pk],
+                ),
+            },
+        )
+    return rows
+
+
+def _documento_anexos_resumo(prestacao, tipo):
+    anexos = [
+        anexo
+        for anexo in prestacao.documentos_anexos.all()
+        if anexo.tipo == tipo
+    ]
+    if not anexos:
+        return {"status": False, "value": "Pendente"}
+    if len(anexos) == 1:
+        nome = anexos[0].nome_original or Path(anexos[0].arquivo.name).name
+        return {"status": True, "value": nome}
+    return {"status": True, "value": f"{len(anexos)} arquivos anexados"}
 
 
 def _build_prestacao_steps(prestacao, atual: str) -> list:
@@ -286,6 +328,25 @@ def _salvar_diario_autosave(diario, payload):
         diario.save(update_fields=["atualizado_em"])
 
 
+def _is_inline_request(request) -> bool:
+    """Indica se o PDF deve ser servido embutido (iframe) em vez de baixado."""
+    return (request.GET.get("inline") or "").strip() in {"1", "true", "sim"}
+
+
+def _preview_error_response(exc) -> HttpResponse:
+    """Mensagem amigável renderizada dentro do iframe quando a geração falha."""
+    html = (
+        '<!doctype html><html lang="pt-br"><head><meta charset="utf-8">'
+        '<style>body{margin:0;display:flex;align-items:center;justify-content:center;'
+        "min-height:100vh;font-family:system-ui,sans-serif;color:#52657a;background:#f8fafd;}"
+        ".msg{max-width:32rem;padding:1.5rem;text-align:center;line-height:1.5;}</style>"
+        "</head><body><div class=\"msg\">"
+        "<strong>Não foi possível gerar a pré-visualização.</strong><br>"
+        f"{escape(str(exc))}</div></body></html>"
+    )
+    return HttpResponse(html, content_type="text/html; charset=utf-8", status=422)
+
+
 def _trecho_display(linha) -> dict:
     """Dados somente-leitura de um trecho (origem/destino/datas) para o card do diário."""
     from django.utils import timezone as tz
@@ -332,33 +393,64 @@ def index(request):
             messages.error(request, "Confira o número da solicitação informado.")
         return redirect("prestacoes_contas:index")
 
-    prestacoes = list(
-        PrestacaoContas.objects.select_related(
-            "oficio",
-            "servidor",
-            "servidor__cargo",
-            "servidor__unidade",
-        )
-        .prefetch_related("relatorio_tecnico")
-        .order_by("-criado_em")
+    q         = request.GET.get("q",         "").strip()
+    status    = request.GET.get("status",    "").strip()
+    temporal  = request.GET.get("temporal",  "").strip()
+    viagem_de = request.GET.get("viagem_de", "").strip()
+    viagem_ate = request.GET.get("viagem_ate", "").strip()
+    sort      = request.GET.get("sort",      "").strip()
+
+    prestacoes = listar_prestacoes(
+        q=q or None,
+        status=status or None,
+        temporal=temporal or None,
+        viagem_de=viagem_de or None,
+        viagem_ate=viagem_ate or None,
+        sort=sort or None,
     )
-    prestacoes_rows = [
-        {
-            "prestacao": prestacao,
-            "solicitacao_form": PrestacaoSolicitacaoForm(
-                instance=prestacao,
-                prefix=f"prestacao-{prestacao.pk}",
-            ),
-        }
-        for prestacao in prestacoes
-    ]
+
+    cards = []
+    for prestacao in prestacoes:
+        solicitacao_form = PrestacaoSolicitacaoForm(
+            instance=prestacao,
+            prefix=f"prestacao-{prestacao.pk}",
+        )
+        cards.append(apresentar_prestacao_card(prestacao, solicitacao_form))
+
+    has_filters = any([q, status, temporal, viagem_de, viagem_ate, sort])
+
     return render(
         request,
         "prestacoes_contas/index.html",
         {
             "page_title": "Prestações de Contas",
             "page_description": "Acompanhamento das prestações de contas por servidor e ofício.",
-            "prestacoes_rows": prestacoes_rows,
+            "cards": cards,
+            "q":          q,
+            "status":     status,
+            "temporal":   temporal,
+            "viagem_de":  viagem_de,
+            "viagem_ate": viagem_ate,
+            "sort":       sort,
+            "has_filters": has_filters,
+            "search_clear_url": reverse("prestacoes_contas:index"),
+            "status_options": [{"value": "", "label": "Todos os status"}]
+            + [{"value": v, "label": l} for v, l in PrestacaoContas.STATUS_CHOICES],
+            "temporal_options": [
+                {"value": "",          "label": "Qualquer período"},
+                {"value": "futuro",    "label": "Futuras"},
+                {"value": "andamento", "label": "Em andamento"},
+                {"value": "passado",   "label": "Passadas"},
+            ],
+            "sort_options": [
+                {"value": "criacao_desc",  "label": "Criação: mais recente"},
+                {"value": "criacao_asc",   "label": "Criação: mais antiga"},
+                {"value": "viagem_asc",    "label": "Viagem: mais próxima"},
+                {"value": "viagem_desc",   "label": "Viagem: mais distante"},
+                {"value": "servidor_asc",  "label": "Servidor: A–Z"},
+                {"value": "servidor_desc", "label": "Servidor: Z–A"},
+            ],
+            "empty_message": "Nenhuma prestação de contas encontrada com os filtros aplicados.",
         },
     )
 
@@ -369,7 +461,7 @@ def documentos(request, pc_pk):
             "oficio__roteiro",
             "servidor__cargo",
             "servidor__unidade",
-        ),
+        ).prefetch_related("documentos_anexos"),
         pk=pc_pk,
     )
 
@@ -377,9 +469,7 @@ def documentos(request, pc_pk):
         form = PrestacaoDocumentosForm(request.POST, request.FILES, instance=prestacao)
         if form.is_valid():
             form.save()
-            if prestacao.status == PrestacaoContas.STATUS_PENDENTE:
-                prestacao.status = PrestacaoContas.STATUS_EM_PREENCHIMENTO
-                prestacao.save(update_fields=["status", "atualizado_em"])
+            _marcar_prestacao_em_preenchimento(prestacao)
             messages.success(request, "Documentos da prestação salvos.")
             if request.POST.get("action") == "save_continue":
                 return redirect("prestacoes_contas:rt_criar", pc_pk=prestacao.pk)
@@ -399,6 +489,8 @@ def documentos(request, pc_pk):
             "rt_url": reverse("prestacoes_contas:rt_criar", args=[prestacao.pk]),
             "autosave_url": reverse("prestacoes_contas:prestacao_autosave", args=[prestacao.pk]),
             "arquivo_autosave_url": reverse("prestacoes_contas:prestacao_arquivo_autosave", args=[prestacao.pk]),
+            "despacho_anexos": _documento_anexos_rows(prestacao, PrestacaoDocumentoAnexo.TIPO_DESPACHO),
+            "comprovante_anexos": _documento_anexos_rows(prestacao, PrestacaoDocumentoAnexo.TIPO_COMPROVANTE),
         },
     )
 
@@ -431,9 +523,26 @@ def prestacao_arquivo_autosave(request, pc_pk):
             errors=_autosave_form_errors(form),
         )
     form.save()
-    if prestacao.status == PrestacaoContas.STATUS_PENDENTE:
-        prestacao.status = PrestacaoContas.STATUS_EM_PREENCHIMENTO
-        prestacao.save(update_fields=["status", "atualizado_em"])
+    _marcar_prestacao_em_preenchimento(prestacao)
+    return autosave_json_response(
+        ok=True,
+        object_id=prestacao.pk,
+        version=_autosave_version(prestacao),
+    )
+
+
+@require_POST
+def prestacao_documento_excluir(request, pc_pk, anexo_pk):
+    prestacao = get_object_or_404(PrestacaoContas, pk=pc_pk)
+    anexo = get_object_or_404(
+        PrestacaoDocumentoAnexo,
+        pk=anexo_pk,
+        prestacao=prestacao,
+    )
+    if anexo.arquivo:
+        anexo.arquivo.delete(save=False)
+    anexo.delete()
+    _marcar_prestacao_em_preenchimento(prestacao)
     return autosave_json_response(
         ok=True,
         object_id=prestacao.pk,
@@ -486,6 +595,9 @@ def rt_criar(request, pc_pk):
             "diaria_info": diaria_info(prestacao),
             "documentos_url": reverse("prestacoes_contas:documentos", args=[prestacao.pk]),
             "autosave_url": reverse("prestacoes_contas:rt_autosave", args=[relatorio.pk]),
+            "preview_inline_url": reverse("prestacoes_contas:rt_download_formato", args=[relatorio.pk, "pdf"]) + "?inline=1",
+            "preview_pdf_url": reverse("prestacoes_contas:rt_download_formato", args=[relatorio.pk, "pdf"]),
+            "preview_docx_url": reverse("prestacoes_contas:rt_download_formato", args=[relatorio.pk, "docx"]),
         },
     )
 
@@ -579,6 +691,9 @@ def diario_criar(request, pc_pk):
             "editar_roteiro_url": reverse("prestacoes_contas:diario_editar_roteiro", args=[prestacao.pk]),
             "rt_url": reverse("prestacoes_contas:rt_criar", args=[prestacao.pk]),
             "autosave_url": reverse("prestacoes_contas:diario_autosave", args=[diario.pk]),
+            "preview_inline_url": reverse("prestacoes_contas:diario_download_formato", args=[diario.pk, "pdf"]) + "?inline=1",
+            "preview_pdf_url": reverse("prestacoes_contas:diario_download_formato", args=[diario.pk, "pdf"]),
+            "preview_xlsx_url": reverse("prestacoes_contas:diario_download_formato", args=[diario.pk, "xlsx"]),
         },
     )
 
@@ -631,11 +746,14 @@ def diario_download(request, pk, formato="xlsx"):
         pk=pk,
     )
 
+    inline = _is_inline_request(request)
     formato = (formato or "xlsx").strip().lower()
     if formato == "pdf":
         try:
             conteudo = gerar_diario_bordo_pdf(diario)
         except DocumentValidationError as exc:
+            if inline:
+                return _preview_error_response(exc)
             messages.error(request, str(exc))
             return redirect("prestacoes_contas:diario_criar", pc_pk=diario.prestacao_id)
         content_type = "application/pdf"
@@ -645,8 +763,9 @@ def diario_download(request, pk, formato="xlsx"):
         content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
     nome = nome_arquivo_diario(diario, formato=formato)
+    disposition = "inline" if inline and formato == "pdf" else "attachment"
     response = HttpResponse(conteudo, content_type=content_type)
-    response["Content-Disposition"] = f'attachment; filename="{nome}"'
+    response["Content-Disposition"] = f'{disposition}; filename="{nome}"'
     return response
 
 
@@ -659,11 +778,14 @@ def rt_download(request, pk, formato="docx"):
         pk=pk,
     )
 
+    inline = _is_inline_request(request)
     formato = (formato or "docx").strip().lower()
     if formato == "pdf":
         try:
             conteudo = gerar_relatorio_tecnico_pdf(relatorio)
         except DocumentValidationError as exc:
+            if inline:
+                return _preview_error_response(exc)
             messages.error(request, str(exc))
             return redirect("prestacoes_contas:rt_criar", pc_pk=relatorio.prestacao_id)
         content_type = "application/pdf"
@@ -674,8 +796,9 @@ def rt_download(request, pk, formato="docx"):
 
     nome = nome_arquivo_rt(relatorio, formato=formato)
 
+    disposition = "inline" if inline and formato == "pdf" else "attachment"
     response = HttpResponse(conteudo, content_type=content_type)
-    response["Content-Disposition"] = f'attachment; filename="{nome}"'
+    response["Content-Disposition"] = f'{disposition}; filename="{nome}"'
     return response
 
 
@@ -685,7 +808,7 @@ def consolidado(request, pc_pk):
             "oficio__roteiro",
             "servidor__cargo",
             "servidor__unidade",
-        ).prefetch_related("relatorio_tecnico"),
+        ).prefetch_related("relatorio_tecnico", "documentos_anexos"),
         pk=pc_pk,
     )
     try:
@@ -694,6 +817,8 @@ def consolidado(request, pc_pk):
     except RelatorioTecnico.DoesNotExist:
         relatorio_ok = False
     diario_ok = DiarioBordo.objects.filter(prestacao=prestacao).exists()
+    despacho_resumo = _documento_anexos_resumo(prestacao, PrestacaoDocumentoAnexo.TIPO_DESPACHO)
+    comprovante_resumo = _documento_anexos_resumo(prestacao, PrestacaoDocumentoAnexo.TIPO_COMPROVANTE)
     itens = [
         {
             "label": "Número da solicitação",
@@ -702,8 +827,8 @@ def consolidado(request, pc_pk):
         },
         {
             "label": "Despacho assinado do ofício",
-            "status": bool(prestacao.despacho_assinado),
-            "value": prestacao.despacho_assinado.name if prestacao.despacho_assinado else "Pendente",
+            "status": despacho_resumo["status"],
+            "value": despacho_resumo["value"],
         },
         {
             "label": "Relatório Técnico",
@@ -717,12 +842,8 @@ def consolidado(request, pc_pk):
         },
         {
             "label": "Comprovante de saque/transferência",
-            "status": bool(prestacao.comprovante_saque_transferencia),
-            "value": (
-                prestacao.comprovante_saque_transferencia.name
-                if prestacao.comprovante_saque_transferencia
-                else "Pendente"
-            ),
+            "status": comprovante_resumo["status"],
+            "value": comprovante_resumo["value"],
         },
     ]
 
@@ -736,6 +857,7 @@ def consolidado(request, pc_pk):
             "wizard_page_steps": _build_prestacao_steps(prestacao, "consolidado"),
             "itens_consolidado": itens,
             "download_url": reverse("prestacoes_contas:consolidado_download", args=[prestacao.pk]),
+            "preview_inline_url": reverse("prestacoes_contas:consolidado_download", args=[prestacao.pk]) + "?inline=1",
             "diario_url": reverse("prestacoes_contas:diario_criar", args=[prestacao.pk]),
         },
     )
@@ -749,15 +871,19 @@ def consolidado_download(request, pc_pk):
         ),
         pk=pc_pk,
     )
+    inline = _is_inline_request(request)
     try:
         conteudo = gerar_prestacao_consolidado_pdf(prestacao)
     except DocumentValidationError as exc:
+        if inline:
+            return _preview_error_response(exc)
         messages.error(request, str(exc))
         return redirect("prestacoes_contas:consolidado", pc_pk=prestacao.pk)
 
     nome = nome_arquivo_prestacao_consolidado(prestacao)
+    disposition = "inline" if inline else "attachment"
     response = HttpResponse(conteudo, content_type="application/pdf")
-    response["Content-Disposition"] = f'attachment; filename="{nome}"'
+    response["Content-Disposition"] = f'{disposition}; filename="{nome}"'
     return response
 
 

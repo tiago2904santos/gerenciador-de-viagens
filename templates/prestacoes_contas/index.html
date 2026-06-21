@@ -1,82 +1,145 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}{{ page_title }}{% endblock %}
 
-{% block content %}
-  <div class="page-shell page-shell--standard-simple">
-    {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="PRESTAÇÕES" title=page_title description=page_description icon_label="PC" module_label="Prestações de Contas" only %}
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/roteiros-list.css' %}?v=20260610-oficios-panel">
+  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260610-oficios-datepicker">
+{% endblock %}
 
-    <main class="main-form-panel">
-      <section class="cv-wizard-section-card">
-        <header class="cv-wizard-section-header">
-          <div class="cv-wizard-section-header__copy">
-            <h2 class="cv-wizard-section-title">Prestações cadastradas</h2>
-            <p class="cv-wizard-section-subtitle">Uma prestação de contas por servidor por ofício.</p>
-          </div>
-        </header>
-        <div class="cv-wizard-section-body">
-          <div class="os-list">
-            {% for row in prestacoes_rows %}
-              {% with prestacao=row.prestacao solicitacao_form=row.solicitacao_form %}
-                {% url 'prestacoes_contas:documentos' prestacao.pk as documentos_url %}
-                {% url 'prestacoes_contas:rt_criar' prestacao.pk as rt_url %}
-                {% url 'prestacoes_contas:diario_criar' prestacao.pk as diario_url %}
-                {% url 'prestacoes_contas:consolidado' prestacao.pk as consolidado_url %}
-                {% url 'prestacoes_contas:prestacao_autosave' prestacao.pk as prestacao_autosave_url %}
-                <article class="os-list-card">
-                  <div class="os-list-card__info">
-                    <h3 class="os-list-card__title">{{ prestacao.servidor.nome }}</h3>
-                    <p class="os-list-card__meta">
-                      Ofício {{ prestacao.oficio.numero_formatado }}
-                      {% if prestacao.oficio.evento %}
-                        — {{ prestacao.oficio.evento.titulo }}
-                      {% endif %}
-                    </p>
-                    <p class="os-list-card__meta">
-                      {{ prestacao.servidor.cargo }}
-                      {% if prestacao.servidor.unidade %}
-                        · {{ prestacao.servidor.unidade }}
-                      {% endif %}
-                    </p>
-                    <form method="post"
-                          class="oficio-wizard__form"
-                          novalidate
-                          data-autosave="true"
-                          data-autosave-model="prestacao_contas"
-                          data-autosave-step="lista"
-                          data-autosave-url="{{ prestacao_autosave_url }}"
-                          data-autosave-object-id="{{ prestacao.pk }}">
-                      {% csrf_token %}
-                      <input type="hidden" name="action" value="save_solicitacao">
-                      <input type="hidden" name="prestacao_id" value="{{ prestacao.pk }}">
-                      {% include "components/forms/form_field.html" with field=solicitacao_form.numero_solicitacao only %}
-                      {% include "components/ui/buttons/button.html" with label="Salvar solicitação" variant="secondary" size="sm" type="submit" only %}
-                    </form>
-                  </div>
-                  <div class="os-list-card__actions">
-                    {% include "components/ui/lists/status_pill.html" with label=prestacao.status_display variant=prestacao.status_variant only %}
-                    {% include "components/ui/buttons/button.html" with href=documentos_url label="Abrir prestação" variant="primary" icon="arrow-right" icon_after=True only %}
-                    {% if prestacao.relatorio_tecnico %}
-                      {% url 'prestacoes_contas:rt_download' prestacao.relatorio_tecnico.pk as rt_download_url %}
-                      {% include "components/ui/buttons/button.html" with href=rt_url label="Editar RT" variant="secondary" only %}
-                      {% include "components/ui/buttons/button.html" with href=rt_download_url label="Baixar RT" variant="secondary" only %}
-                    {% else %}
-                      {% include "components/ui/buttons/button.html" with href=rt_url label="Criar RT" variant="secondary" only %}
-                    {% endif %}
-                    {% include "components/ui/buttons/button.html" with href=diario_url label="Diário de Bordo" variant="secondary" only %}
-                    {% include "components/ui/buttons/button.html" with href=consolidado_url label="PDF Final" variant="secondary" only %}
-                  </div>
-                </article>
-              {% endwith %}
-            {% empty %}
-              <div class="os-empty">
-                <h3>Nenhuma prestação de contas registrada</h3>
-                <p>As prestações são criadas automaticamente quando um ofício é gerado.</p>
+{% block content %}
+<div class="app-page--main-card-list page-shell page-shell--list oficios-list-page" data-cv-realtime-filter-scope>
+
+  <form class="page-header-stack" method="get" action="{{ request.path }}">
+
+    {# ── BAND ── #}
+    <div class="page-header-band">
+      <div class="page-header-band__content">
+        <div class="page-header-band__text">
+          <span class="page-header-band__eyebrow">PRESTAÇÕES</span>
+          <h1 class="page-header-band__title">{{ page_title }}</h1>
+        </div>
+      </div>
+    </div>
+
+    {# ── RAIL ── #}
+    <div class="page-header-rail page-header-rail--filters">
+      <div class="page-header-rail__marker" aria-hidden="true">PC</div>
+
+      <div class="header-filter-bar header-filter-bar--advanced">
+
+        {# Linha 1 — busca #}
+        <div class="header-filter-bar__search">
+          <input
+            class="header-filter-input"
+            type="search"
+            name="q"
+            placeholder="Buscar por servidor, ofício, protocolo ou solicitação…"
+            aria-label="Buscar prestações"
+            data-cv-filter="search"
+            {% if q %}value="{{ q }}"{% endif %}
+          >
+        </div>
+
+        {# Linha 2 — filtros + ações #}
+        <div class="header-filter-bar__row">
+          <div class="header-filter-bar__fields">
+
+            {# Status da prestação #}
+            <div class="header-filter-field">
+              <select class="header-filter-select" name="status" aria-label="Status da prestação">
+                {% for opt in status_options %}
+                  <option value="{{ opt.value }}"{% if opt.value == status %} selected{% endif %}>{{ opt.label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            {# Período temporal #}
+            <div class="header-filter-field">
+              <select class="header-filter-select" name="temporal" aria-label="Período da viagem">
+                {% for opt in temporal_options %}
+                  <option value="{{ opt.value }}"{% if opt.value == temporal %} selected{% endif %}>{{ opt.label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            {# Ordenação #}
+            <div class="header-filter-field">
+              <select class="header-filter-select" name="sort" aria-label="Ordenar por">
+                {% for opt in sort_options %}
+                  <option value="{{ opt.value }}"{% if opt.value == sort or not sort and forloop.first %} selected{% endif %}>{{ opt.label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            {# Calendário — intervalo de viagem #}
+            <div class="cv-date-picker header-filter-datepicker" data-cv-date-picker data-mode="range"{% if viagem_de %} data-initial-date="{{ viagem_de }}"{% endif %}>
+              <div class="cv-date-picker__control cv-date-picker__control--range">
+                <input
+                  class="cv-field__control"
+                  type="text"
+                  readonly
+                  placeholder="Período da viagem"
+                  aria-label="Filtrar por período da viagem"
+                  data-cv-date-picker-display
+                >
+                <button type="button" class="cv-date-picker__trigger cv-date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-label="Abrir calendário">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                  </svg>
+                </button>
               </div>
-            {% endfor %}
+              <input type="hidden" name="viagem_de"  data-cv-date-picker-start-value {% if viagem_de %}value="{{ viagem_de }}"{% endif %}>
+              <input type="hidden" name="viagem_ate" data-cv-date-picker-end-value   {% if viagem_ate %}value="{{ viagem_ate }}"{% endif %}>
+              <div class="cv-date-picker__panel" hidden data-cv-date-picker-panel>
+                <div class="cv-date-picker__panel-header">
+                  <button type="button" class="cv-date-picker__nav" data-cv-date-picker-prev aria-label="Mês anterior">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+                  </button>
+                  <div class="cv-date-picker__month" data-cv-date-picker-month></div>
+                  <button type="button" class="cv-date-picker__nav" data-cv-date-picker-next aria-label="Próximo mês">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+                  </button>
+                </div>
+                <div class="cv-date-picker__weekdays" data-cv-date-picker-weekdays></div>
+                <div class="cv-date-picker__days" data-cv-date-picker-days></div>
+                <div class="cv-date-picker__footer">
+                  <button type="button" class="cv-date-picker__footer-action" data-cv-date-picker-today>Hoje</button>
+                  <button type="button" class="cv-date-picker__footer-action" data-cv-date-picker-clear>Limpar</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          {# Ações sempre visíveis #}
+          <div class="page-header-rail__actions">
+            {% include "components/ui/buttons/button.html" with href=search_clear_url label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" only %}
           </div>
         </div>
-      </section>
-    </main>
+
+      </div>
+    </div>
+  </form>
+
+  <div class="list-panel">
+    <div class="list-content list-grid list-grid--roteiros app-list-grid" data-cv-list-container>
+      {% for card in cards %}
+        {% include "prestacoes_contas/partials/prestacao_list_card.html" with card=card only %}
+      {% empty %}
+        {% include "components/lists/list_empty.html" with message=empty_message only %}
+      {% endfor %}
+    </div>
+    {% if cards %}
+      <div data-cv-empty-state hidden>
+        {% include "components/lists/list_empty.html" with message=empty_message only %}
+      </div>
+    {% endif %}
   </div>
+
+</div>
 {% endblock %}

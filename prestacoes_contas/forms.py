@@ -1,13 +1,18 @@
 import re
+from pathlib import Path
 
 from django import forms
+from django.core.validators import FileExtensionValidator
 from django.forms import modelformset_factory
+from django.forms.renderers import TemplatesSetting
 
 from core.normalizers import normalize_spaces
 
 from .models import DiarioBordoTrecho
 from .models import ModeloTextoRelatorioTecnico
+from .models import PRESTACAO_DOCUMENTO_EXTENSOES
 from .models import PrestacaoContas
+from .models import PrestacaoDocumentoAnexo
 from .models import RelatorioTecnico
 
 
@@ -126,13 +131,62 @@ class ModeloTextoSelect(forms.Select):
         return option
 
 
+class PrestacaoMultipleFileInput(forms.FileInput):
+    allow_multiple_selected = True
+    template_name = "prestacoes_contas/widgets/multiple_file_input.html"
+    project_template_renderer = TemplatesSetting()
+
+    def _render(self, template_name, context, renderer=None):
+        return super()._render(template_name, context, self.project_template_renderer)
+
+
+class PrestacaoMultipleFileField(forms.FileField):
+    widget = PrestacaoMultipleFileInput
+
+    def clean(self, data, initial=None):
+        if not data:
+            return []
+        single_file_clean = super().clean
+        if isinstance(data, (list, tuple)):
+            return [single_file_clean(item, initial) for item in data]
+        return [single_file_clean(data, initial)]
+
+
 class PrestacaoDocumentosForm(forms.ModelForm):
+    despacho_arquivos = PrestacaoMultipleFileField(
+        label="Despacho assinado do ofício",
+        required=False,
+        validators=[FileExtensionValidator(PRESTACAO_DOCUMENTO_EXTENSOES)],
+        help_text="Anexe PDF, PNG, JPG ou JPEG.",
+        widget=PrestacaoMultipleFileInput(
+            attrs={
+                "class": "form-control cv-field__control prestacao-file-input",
+                "accept": "application/pdf,image/png,image/jpeg,image/*",
+            },
+        ),
+    )
+    comprovante_arquivos = PrestacaoMultipleFileField(
+        label="Comprovante de saque/transferência",
+        required=False,
+        validators=[FileExtensionValidator(PRESTACAO_DOCUMENTO_EXTENSOES)],
+        help_text="Anexe PDF, PNG, JPG ou JPEG.",
+        widget=PrestacaoMultipleFileInput(
+            attrs={
+                "class": "form-control cv-field__control prestacao-file-input",
+                "accept": "application/pdf,image/png,image/jpeg,image/*",
+            },
+        ),
+    )
+
+    DOCUMENTO_TIPOS = {
+        "despacho_arquivos": PrestacaoDocumentoAnexo.TIPO_DESPACHO,
+        "comprovante_arquivos": PrestacaoDocumentoAnexo.TIPO_COMPROVANTE,
+    }
+
     class Meta:
         model = PrestacaoContas
         fields = [
             "numero_solicitacao",
-            "despacho_assinado",
-            "comprovante_saque_transferencia",
         ]
         labels = {
             "numero_solicitacao": "Número da solicitação",
@@ -151,19 +205,23 @@ class PrestacaoDocumentosForm(forms.ModelForm):
                     "autocomplete": "off",
                 },
             ),
-            "despacho_assinado": forms.ClearableFileInput(
-                attrs={
-                    "class": "form-control cv-field__control prestacao-file-input",
-                    "accept": "application/pdf,image/png,image/jpeg,image/*",
-                },
-            ),
-            "comprovante_saque_transferencia": forms.ClearableFileInput(
-                attrs={
-                    "class": "form-control cv-field__control prestacao-file-input",
-                    "accept": "application/pdf,image/png,image/jpeg,image/*",
-                },
-            ),
         }
+
+    def save(self, commit=True):
+        prestacao = super().save(commit=commit)
+        if commit:
+            self.save_anexos(prestacao)
+        return prestacao
+
+    def save_anexos(self, prestacao):
+        for field_name, tipo in self.DOCUMENTO_TIPOS.items():
+            for arquivo in self.cleaned_data.get(field_name) or []:
+                PrestacaoDocumentoAnexo.objects.create(
+                    prestacao=prestacao,
+                    tipo=tipo,
+                    arquivo=arquivo,
+                    nome_original=Path(getattr(arquivo, "name", "") or "").name,
+                )
 
 
 class PrestacaoSolicitacaoForm(forms.ModelForm):

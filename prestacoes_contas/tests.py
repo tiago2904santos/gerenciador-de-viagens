@@ -19,6 +19,7 @@ from oficios.docxtpl_context import build_oficio_docxtpl_context
 from oficios.models import Oficio
 from prestacoes_contas.models import DiarioBordo
 from prestacoes_contas.models import PrestacaoContas
+from prestacoes_contas.models import PrestacaoDocumentoAnexo
 from prestacoes_contas.models import RelatorioTecnico
 from prestacoes_contas.services import build_relatorio_tecnico_context
 from roteiros.models import Roteiro
@@ -243,22 +244,31 @@ class RelatorioTecnicoDocumentoTests(TestCase):
                 reverse("prestacoes_contas:documentos", args=[self.prestacao.pk]),
                 data={
                     "numero_solicitacao": "SOL-456",
-                    "despacho_assinado": SimpleUploadedFile(
-                        "despacho.pdf",
-                        b"%PDF-1.4\n%%EOF\n",
-                        content_type="application/pdf",
-                    ),
-                    "comprovante_saque_transferencia": SimpleUploadedFile(
-                        "comprovante.png",
-                        (
-                            b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR"
-                            b"\x00\x00\x00\x01\x00\x00\x00\x01\x08\x02"
-                            b"\x00\x00\x00\x90wS\xde\x00\x00\x00\x0cIDAT"
-                            b"\x08\xd7c\xf8\xff\xff?\x00\x05\xfe\x02\xfeA"
-                            b"\xe2!\xbc\x00\x00\x00\x00IEND\xaeB`\x82"
+                    "despacho_arquivos": [
+                        SimpleUploadedFile(
+                            "despacho.pdf",
+                            b"%PDF-1.4\n%%EOF\n",
+                            content_type="application/pdf",
                         ),
-                        content_type="image/png",
-                    ),
+                        SimpleUploadedFile(
+                            "despacho-extra.pdf",
+                            b"%PDF-1.4\n%%EOF\n",
+                            content_type="application/pdf",
+                        ),
+                    ],
+                    "comprovante_arquivos": [
+                        SimpleUploadedFile(
+                            "comprovante.png",
+                            (
+                                b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR"
+                                b"\x00\x00\x00\x01\x00\x00\x00\x01\x08\x02"
+                                b"\x00\x00\x00\x90wS\xde\x00\x00\x00\x0cIDAT"
+                                b"\x08\xd7c\xf8\xff\xff?\x00\x05\xfe\x02\xfeA"
+                                b"\xe2!\xbc\x00\x00\x00\x00IEND\xaeB`\x82"
+                            ),
+                            content_type="image/png",
+                        ),
+                    ],
                     "action": "save_continue",
                 },
             )
@@ -267,8 +277,20 @@ class RelatorioTecnicoDocumentoTests(TestCase):
             self.assertEqual(response.url, reverse("prestacoes_contas:rt_criar", args=[self.prestacao.pk]))
             self.prestacao.refresh_from_db()
             self.assertEqual(self.prestacao.numero_solicitacao, "SOL-456")
-            self.assertTrue(self.prestacao.despacho_assinado.name.endswith(".pdf"))
-            self.assertTrue(self.prestacao.comprovante_saque_transferencia.name.endswith(".png"))
+            self.assertEqual(
+                PrestacaoDocumentoAnexo.objects.filter(
+                    prestacao=self.prestacao,
+                    tipo=PrestacaoDocumentoAnexo.TIPO_DESPACHO,
+                ).count(),
+                2,
+            )
+            self.assertEqual(
+                PrestacaoDocumentoAnexo.objects.filter(
+                    prestacao=self.prestacao,
+                    tipo=PrestacaoDocumentoAnexo.TIPO_COMPROVANTE,
+                ).count(),
+                1,
+            )
 
     def test_autosave_documentos_salva_numero_solicitacao(self):
         payload = {
@@ -296,18 +318,52 @@ class RelatorioTecnicoDocumentoTests(TestCase):
                 reverse("prestacoes_contas:prestacao_arquivo_autosave", args=[self.prestacao.pk]),
                 data={
                     "numero_solicitacao": "SOL-FILE",
-                    "despacho_assinado": SimpleUploadedFile(
-                        "despacho.pdf",
-                        b"%PDF-1.4\n%%EOF\n",
-                        content_type="application/pdf",
-                    ),
+                    "despacho_arquivos": [
+                        SimpleUploadedFile(
+                            "despacho.pdf",
+                            b"%PDF-1.4\n%%EOF\n",
+                            content_type="application/pdf",
+                        ),
+                        SimpleUploadedFile(
+                            "despacho-extra.pdf",
+                            b"%PDF-1.4\n%%EOF\n",
+                            content_type="application/pdf",
+                        ),
+                    ],
                 },
             )
 
             self.assertEqual(response.status_code, 200)
             self.prestacao.refresh_from_db()
             self.assertEqual(self.prestacao.numero_solicitacao, "SOL-FILE")
-            self.assertTrue(self.prestacao.despacho_assinado.name.endswith(".pdf"))
+            self.assertEqual(
+                PrestacaoDocumentoAnexo.objects.filter(
+                    prestacao=self.prestacao,
+                    tipo=PrestacaoDocumentoAnexo.TIPO_DESPACHO,
+                ).count(),
+                2,
+            )
+
+    def test_excluir_anexo_documentos(self):
+        with tempfile.TemporaryDirectory() as tmpdir, override_settings(MEDIA_ROOT=tmpdir):
+            anexo = PrestacaoDocumentoAnexo.objects.create(
+                prestacao=self.prestacao,
+                tipo=PrestacaoDocumentoAnexo.TIPO_DESPACHO,
+                arquivo=SimpleUploadedFile(
+                    "despacho.pdf",
+                    b"%PDF-1.4\n%%EOF\n",
+                    content_type="application/pdf",
+                ),
+                nome_original="despacho.pdf",
+            )
+
+            response = self.client.post(
+                reverse("prestacoes_contas:prestacao_documento_excluir", args=[self.prestacao.pk, anexo.pk]),
+                HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            )
+
+            self.assertEqual(response.status_code, 200)
+            self.assertFalse(PrestacaoDocumentoAnexo.objects.filter(pk=anexo.pk).exists())
 
     def test_autosave_rt_salva_campos_do_relatorio(self):
         payload = {
@@ -383,6 +439,48 @@ class RelatorioTecnicoDocumentoTests(TestCase):
         contexto = build_oficio_docxtpl_context(self.oficio)
 
         self.assertEqual(contexto["col_solicitacao"], "SOL-789\n\n\n")
+
+    def test_consolidado_mostra_anexos_documentos_como_ok(self):
+        with tempfile.TemporaryDirectory() as tmpdir, override_settings(MEDIA_ROOT=tmpdir):
+            PrestacaoDocumentoAnexo.objects.create(
+                prestacao=self.prestacao,
+                tipo=PrestacaoDocumentoAnexo.TIPO_DESPACHO,
+                arquivo=SimpleUploadedFile(
+                    "despacho.pdf",
+                    b"%PDF-1.4\n%%EOF\n",
+                    content_type="application/pdf",
+                ),
+                nome_original="despacho.pdf",
+            )
+            PrestacaoDocumentoAnexo.objects.create(
+                prestacao=self.prestacao,
+                tipo=PrestacaoDocumentoAnexo.TIPO_COMPROVANTE,
+                arquivo=SimpleUploadedFile(
+                    "comprovante-a.pdf",
+                    b"%PDF-1.4\n%%EOF\n",
+                    content_type="application/pdf",
+                ),
+                nome_original="comprovante-a.pdf",
+            )
+            PrestacaoDocumentoAnexo.objects.create(
+                prestacao=self.prestacao,
+                tipo=PrestacaoDocumentoAnexo.TIPO_COMPROVANTE,
+                arquivo=SimpleUploadedFile(
+                    "comprovante-b.pdf",
+                    b"%PDF-1.4\n%%EOF\n",
+                    content_type="application/pdf",
+                ),
+                nome_original="comprovante-b.pdf",
+            )
+
+            response = self.client.get(reverse("prestacoes_contas:consolidado", args=[self.prestacao.pk]))
+
+        self.assertEqual(response.status_code, 200)
+        itens = response.context["itens_consolidado"]
+        self.assertTrue(itens[1]["status"])
+        self.assertEqual(itens[1]["value"], "despacho.pdf")
+        self.assertTrue(itens[4]["status"])
+        self.assertEqual(itens[4]["value"], "2 arquivos anexados")
 
     @mock.patch("prestacoes_contas.views.gerar_prestacao_consolidado_pdf", return_value=b"%PDF-1.4\n%%EOF\n")
     def test_download_pdf_consolidado(self, _mock_pdf):

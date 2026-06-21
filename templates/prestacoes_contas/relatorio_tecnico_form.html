@@ -6,10 +6,12 @@
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260619-rt-form">
   <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}?v=20260620-ribbon-simple">
+  <link rel="stylesheet" href="{% static 'css/prestacoes-documento-preview.css' %}?v=20260621-preview">
 {% endblock %}
 
 {% block extra_js %}
   <script src="{% static 'js/pages/prestacoes-contas-rt.js' %}?v=20260620-prestacao"></script>
+  <script src="{% static 'js/pages/oficios-documentos-inline.js' %}?v=20260621-preview" defer></script>
 {% endblock %}
 
 {% block content %}
@@ -151,6 +153,8 @@
             </section>
           {% endfor %}
         </form>
+
+        {% include "prestacoes_contas/partials/documento_preview.html" with preview_anchor="rt-preview" preview_title="Pré-visualização do relatório" preview_subtitle="O PDF é gerado com os dados salvos do relatório. Reabra o card após editar para atualizar." preview_doc_title="Relatório Técnico" preview_inline_url=preview_inline_url preview_pdf_url=preview_pdf_url preview_docx_url=preview_docx_url only %}
       </div>
     </main>
   </div>
