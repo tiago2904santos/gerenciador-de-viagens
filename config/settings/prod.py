@@ -31,7 +31,28 @@ DATABASES = {
     }
 }
 
+# WhiteNoise: serve arquivos estáticos diretamente pelo Python sem depender do Nginx para /static/.
+# Deve ficar logo após SecurityMiddleware.
+_whitenoise = "whitenoise.middleware.WhiteNoiseMiddleware"
+if _whitenoise not in MIDDLEWARE:
+    try:
+        _idx = MIDDLEWARE.index("django.middleware.security.SecurityMiddleware")
+        MIDDLEWARE.insert(_idx + 1, _whitenoise)
+    except ValueError:
+        MIDDLEWARE.insert(0, _whitenoise)
+
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+}
+
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_REFERRER_POLICY = "same-origin"
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True

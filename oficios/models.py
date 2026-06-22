@@ -170,15 +170,14 @@ class Oficio(TimeStampedModel):
     @classmethod
     def get_next_available_numero(cls, ano: int | None = None) -> int:
         resolved_year = ano or timezone.localdate().year
-        numeros_ocupados = set(
+        ultimo_numero = (
             cls.objects.filter(ano=resolved_year)
             .exclude(numero__isnull=True)
+            .order_by("-numero")
             .values_list("numero", flat=True)
+            .first()
         )
-        numero = 1
-        while numero in numeros_ocupados:
-            numero += 1
-        return numero
+        return (ultimo_numero or 0) + 1
 
     def save(self, *args, **kwargs):
         self.protocolo = normalize_protocolo(self.protocolo)

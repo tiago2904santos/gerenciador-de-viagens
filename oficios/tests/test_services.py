@@ -96,6 +96,7 @@ class OficioServicesTests(TestCase):
             roteiro.destinos.filter(estado=estado, cidade=cidade).exists()
         )
 
+
     def test_atualizar_oficio_dados_viajantes_preserva_transporte_data_e_numero(self):
         oficio = Oficio.objects.create(
             numero=1,
