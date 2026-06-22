@@ -52,6 +52,20 @@ STORAGES = {
     },
 }
 
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "file": {
+            "class": "logging.FileHandler",
+            "filename": "/var/www/gerenciador-viagens/logs/django.log",
+        },
+    },
+    "loggers": {
+        "django": {"handlers": ["file"], "level": "ERROR", "propagate": True},
+    },
+}
+
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_REFERRER_POLICY = "same-origin"
 SESSION_COOKIE_SECURE = True
