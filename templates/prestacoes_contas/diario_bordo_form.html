@@ -200,7 +200,7 @@
           {% endfor %}
         </form>
 
-        {% include "prestacoes_contas/partials/assinatura_card.html" with assinatura=assinatura next_url=assinatura_next_url only %}
+        {% include "prestacoes_contas/partials/assinatura_card.html" with assinatura=assinatura next_url=assinatura_next_url csrf_token=csrf_token only %}
 
         {% if trechos %}
           {% include "prestacoes_contas/partials/documento_preview.html" with preview_anchor="diario-preview" preview_title="Pré-visualização do diário" preview_subtitle="O PDF é gerado com os dados salvos do diário. Reabra o card após editar para atualizar." preview_doc_title="Diário de Bordo" preview_inline_url=preview_inline_url preview_pdf_url=preview_pdf_url preview_xlsx_url=preview_xlsx_url only %}

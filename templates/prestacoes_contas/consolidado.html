@@ -117,7 +117,7 @@
         </section>
 
         {% for a in assinaturas %}
-          {% include "prestacoes_contas/partials/assinatura_card.html" with assinatura=a next_url=assinatura_next_url only %}
+          {% include "prestacoes_contas/partials/assinatura_card.html" with assinatura=a next_url=assinatura_next_url csrf_token=csrf_token only %}
         {% endfor %}
 
         {% include "prestacoes_contas/partials/documento_preview.html" with preview_anchor="consolidado-preview" preview_title="Pré-visualização do PDF final" preview_subtitle="Documento consolidado na ordem: ofício, despacho, RT, diário e comprovante." preview_doc_title="PDF Final" preview_inline_url=preview_inline_url preview_pdf_url=download_url only %}

@@ -181,6 +181,19 @@ class AssinaturaCardRenderTests(TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertContains(r, "Assinatura eletrônica")
         self.assertContains(r, "Gerar link de assinatura")
+        # Regressão: o card é incluído com `only`, então `csrf_token` precisa ser
+        # repassado explicitamente — sem isso o form POST falha com "CSRF token missing".
+        self.assertContains(r, "csrfmiddlewaretoken")
+
+    def test_gerar_link_via_form_admin(self):
+        # POST do formulário do card não pode ser barrado por CSRF.
+        url = reverse("prestacoes_contas:assinatura_gerar", args=[self.prestacao.pk])
+        with mock.patch.object(svc, "_gerar_origem_bytes", return_value=b"%PDF-1.4\n%%EOF\n"):
+            r = self.client.post(url, {"tipo": "rt", "next": reverse("prestacoes_contas:rt_criar", args=[self.prestacao.pk])})
+        self.assertEqual(r.status_code, 302)
+        self.assertEqual(
+            AssinaturaDocumento.objects.filter(prestacao=self.prestacao, tipo="rt").count(), 1
+        )
 
     def test_diario_page_mostra_card_sem_motorista(self):
         r = self.client.get(reverse("prestacoes_contas:diario_criar", args=[self.prestacao.pk]))

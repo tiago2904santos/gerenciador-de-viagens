@@ -154,7 +154,7 @@
           {% endfor %}
         </form>
 
-        {% include "prestacoes_contas/partials/assinatura_card.html" with assinatura=assinatura next_url=assinatura_next_url only %}
+        {% include "prestacoes_contas/partials/assinatura_card.html" with assinatura=assinatura next_url=assinatura_next_url csrf_token=csrf_token only %}
 
         {% include "prestacoes_contas/partials/documento_preview.html" with preview_anchor="rt-preview" preview_title="Pré-visualização do relatório" preview_subtitle="O PDF é gerado com os dados salvos do relatório. Reabra o card após editar para atualizar." preview_doc_title="Relatório Técnico" preview_inline_url=preview_inline_url preview_pdf_url=preview_pdf_url preview_docx_url=preview_docx_url only %}
       </div>
