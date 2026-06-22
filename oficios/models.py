@@ -169,6 +169,8 @@ class Oficio(TimeStampedModel):
 
     @classmethod
     def get_next_available_numero(cls, ano: int | None = None) -> int:
+        from django.conf import settings
+
         resolved_year = ano or timezone.localdate().year
         ultimo_numero = (
             cls.objects.filter(ano=resolved_year)
@@ -177,7 +179,9 @@ class Oficio(TimeStampedModel):
             .values_list("numero", flat=True)
             .first()
         )
-        return (ultimo_numero or 0) + 1
+        proximo = (ultimo_numero or 0) + 1
+        piso = getattr(settings, "OFICIO_NUMERO_INICIAL", {}).get(resolved_year, 0)
+        return max(proximo, piso)
 
     def save(self, *args, **kwargs):
         self.protocolo = normalize_protocolo(self.protocolo)

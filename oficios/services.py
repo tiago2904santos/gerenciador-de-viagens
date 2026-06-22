@@ -340,15 +340,8 @@ def criar_oficio_rascunho(evento=None):
 
 
 def get_next_available_numero_oficio(ano):
-    resolved_year = ano or timezone.localdate().year
-    ultimo_numero = (
-        Oficio.objects.filter(ano=resolved_year)
-        .exclude(numero__isnull=True)
-        .order_by("-numero")
-        .values_list("numero", flat=True)
-        .first()
-    )
-    return (ultimo_numero or 0) + 1
+    # Fonte única da lógica de numeração (inclui o piso por ano via settings).
+    return Oficio.get_next_available_numero(ano)
 
 
 @transaction.atomic

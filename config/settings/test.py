@@ -17,3 +17,7 @@ DATABASES = {
 }
 
 PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
+
+# A exceção de piso de numeração é específica de produção; a suíte valida o
+# algoritmo genérico (sequência a partir de 1, reaproveitamento de lacunas).
+OFICIO_NUMERO_INICIAL = {}
