@@ -28,6 +28,8 @@ DATABASES = {
         "PASSWORD": os.environ.get("DB_PASSWORD"),
         "HOST": os.environ.get("DB_HOST", "127.0.0.1"),
         "PORT": os.environ.get("DB_PORT", "5432"),
+        "CONN_MAX_AGE": 600,
+        "CONN_HEALTH_CHECKS": True,
     }
 }
 
@@ -47,6 +49,20 @@ STORAGES = {
     },
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+}
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "file": {
+            "class": "logging.FileHandler",
+            "filename": "/var/www/gerenciador-viagens/logs/django.log",
+        },
+    },
+    "loggers": {
+        "django": {"handlers": ["file"], "level": "ERROR", "propagate": True},
     },
 }
 
