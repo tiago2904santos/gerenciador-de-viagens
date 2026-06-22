@@ -577,6 +577,31 @@
   }
 }
 
+@media (max-width: 600px) {
+  .oficio-documentos-route-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .oficio-documentos-route-trecho-item,
+  .oficio-documentos-route-valor-card,
+  .oficio-documentos-route-col4,
+  .oficio-documentos-route-card--trechos-many .oficio-documentos-route-trechos-scroll-card {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .document-inline-card__header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .document-inline-card__header-end,
+  .document-inline-actions {
+    justify-content: flex-start;
+    width: 100%;
+  }
+}
+
 .document-inline-empty {
   margin: 0;
   padding: var(--space-3, 0.75rem);

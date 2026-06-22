@@ -48,7 +48,19 @@
   }
 
   .app-main {
-    padding: 32px;
+    padding: 24px;
+  }
+}
+
+@media (max-width: 600px) {
+  .app-main {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 420px) {
+  .app-main {
+    padding: 12px;
   }
 }
 

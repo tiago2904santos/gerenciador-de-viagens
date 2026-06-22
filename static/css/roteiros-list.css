@@ -576,3 +576,33 @@
     min-width: 0;
   }
 }
+
+@media (max-width: 600px) {
+  .roteiro-list-card {
+    border-left-width: 5px;
+    padding: var(--space-3);
+  }
+
+  .roteiro-list-card__title-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .roteiro-list-card__status-chip {
+    align-self: flex-start;
+  }
+
+  .roteiro-list-card__diarias-box,
+  .roteiro-list-card__diarias-main,
+  .roteiro-list-card__diarias-metric,
+  .roteiro-list-card__trecho {
+    min-width: 0;
+  }
+
+  .roteiro-list-card__diarias-panel-line--moeda,
+  .roteiro-list-card__diarias-panel-line--strong,
+  .roteiro-list-card__diarias-extenso {
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+}

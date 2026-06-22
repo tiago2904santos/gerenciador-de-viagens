@@ -3845,6 +3845,162 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
   }
 }
 
+@media (max-width: 900px) {
+  .oficio-lc__transport-row {
+    max-height: none;
+    min-height: 0;
+  }
+}
+
+@media (max-width: 700px) {
+  .oficio-wizard__main .cv-wizard-section-stack--comfortable {
+    --_stack-gap: var(--space-5);
+  }
+
+  .oficio-wizard .cv-wizard-section-title {
+    font-size: clamp(1.08rem, 5vw, 1.45rem);
+    letter-spacing: 0.04em;
+    overflow-wrap: anywhere;
+  }
+
+  .oficio-lc {
+    border-radius: var(--radius-lg);
+  }
+
+  .oficio-lc__id-row {
+    gap: var(--space-2);
+    min-height: 0;
+    padding: var(--space-4) var(--space-4) var(--space-4) var(--space-8);
+  }
+
+  .oficio-lc__id-row::before {
+    height: 2.1em;
+    left: var(--space-4);
+    width: 6px;
+  }
+
+  .oficio-lc__id-row .oficio-lc__info-item {
+    padding: 0;
+  }
+
+  .oficio-lc__section {
+    padding: var(--space-4);
+  }
+
+  .oficio-lc__section + .oficio-lc__section::before {
+    left: var(--space-4);
+    right: var(--space-4);
+  }
+
+  .oficio-lc__info-item {
+    flex-basis: 100%;
+    padding: var(--space-3) 0;
+  }
+
+  .oficio-lc__info-value {
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+
+  .oficio-lc__temporal-chip {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .oficio-lc__traveller {
+    flex-basis: 100%;
+  }
+
+  .oficio-lc__transport-row {
+    gap: var(--space-3);
+    grid-template-columns: 1fr;
+    max-height: none;
+    min-height: 0;
+  }
+
+  .oficio-lc__transport-card {
+    max-height: none;
+    min-height: 0;
+    min-width: 0;
+  }
+
+  .oficio-lc__valor-total {
+    font-size: clamp(1.65rem, 9vw, 2.45rem);
+    overflow-wrap: anywhere;
+  }
+
+  .oficio-lc__footer {
+    padding: var(--space-3) var(--space-4);
+  }
+}
+
+@media (max-width: 599px) {
+  .oficio-lc__traveller {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .oficio-lc__traveller-name,
+  .oficio-lc__traveller-meta {
+    overflow-wrap: anywhere;
+  }
+
+  .oficio-lc__traveller-termo {
+    justify-content: flex-start;
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .oficio-lc__traveller-termo.cv-icon-btn-group {
+    gap: var(--space-2);
+  }
+
+  .oficio-lc__footer-actions {
+    align-items: stretch;
+  }
+
+  .oficio-lc__footer-actions-main,
+  .oficio-lc__footer-actions-danger {
+    justify-content: flex-start;
+  }
+
+  .oficio-lc__footer-actions-danger {
+    margin-left: 0;
+  }
+
+  .oficio-equipe-picker__selected-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 420px) {
+  .oficio-lc__section {
+    padding: var(--space-3);
+  }
+
+  .oficio-lc__section + .oficio-lc__section::before {
+    left: var(--space-3);
+    right: var(--space-3);
+  }
+
+  .oficio-lc__id-row {
+    padding: var(--space-3) var(--space-3) var(--space-3) var(--space-7);
+  }
+
+  .oficio-lc__id-row::before {
+    left: var(--space-3);
+  }
+
+  .oficio-lc__traveller,
+  .oficio-lc__transport-card {
+    padding: var(--space-3);
+  }
+
+  .oficio-viajante-card__termo-choice {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* --------------------------------------------------------------------------
    FAB — Floating Action Button container (eventos wizard etapas 2-5)
    -------------------------------------------------------------------------- */
