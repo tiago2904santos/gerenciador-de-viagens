@@ -17,6 +17,7 @@ from cadastros.models import ConfiguracaoSistema
 from cadastros.models import Servidor
 from oficios.docxtpl_context import build_oficio_docxtpl_context
 from oficios.models import Oficio
+from prestacoes_contas.forms import RelatorioTecnicoForm
 from prestacoes_contas.models import DiarioBordo
 from prestacoes_contas.models import PrestacaoContas
 from prestacoes_contas.models import PrestacaoDocumentoAnexo
@@ -71,6 +72,11 @@ class RelatorioTecnicoDiariaTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'value="R$100,00"')
+        relatorio = RelatorioTecnico.objects.get(prestacao=prestacao)
+        self.assertEqual(relatorio.diaria, "R$100,00")
+        self.assertEqual(relatorio.translado, "Não houve")
+        self.assertEqual(relatorio.combustivel, "Cartão Prime")
+        self.assertEqual(relatorio.passagem, "Não houve")
 
     def test_salvar_oficio_sincroniza_prestacoes_para_equipe_existente(self):
         oficio = Oficio.objects.create(
@@ -169,6 +175,25 @@ class RelatorioTecnicoDocumentoTests(TestCase):
 
         self.assertEqual(contexto["data_atual_extenso"], "24 de junho de 2026")
 
+    def test_contexto_rt_usa_padrao_quando_campos_custeio_estao_em_branco(self):
+        roteiro = Roteiro.objects.create(valor_diarias=Decimal("210.00"))
+        self.oficio.roteiro = roteiro
+        self.oficio.save(update_fields=["roteiro", "updated_at"])
+        RelatorioTecnico.objects.filter(pk=self.relatorio.pk).update(
+            diaria="",
+            translado="",
+            combustivel="",
+            passagem="",
+        )
+        self.relatorio.refresh_from_db()
+
+        contexto = build_relatorio_tecnico_context(self.relatorio)
+
+        self.assertEqual(contexto["diaria"], "R$210,00")
+        self.assertEqual(contexto["translado"], "Não houve")
+        self.assertEqual(contexto["combustivel"], "Cartão Prime")
+        self.assertEqual(contexto["passagem"], "Não houve")
+
     @mock.patch("prestacoes_contas.views.gerar_relatorio_tecnico_pdf", return_value=b"%PDF-1.4\n%%EOF\n")
     def test_download_pdf_do_rt(self, _mock_pdf):
         response = self.client.get(
@@ -178,6 +203,29 @@ class RelatorioTecnicoDocumentoTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "application/pdf")
         self.assertIn(".pdf", response["Content-Disposition"])
+
+    @mock.patch("prestacoes_contas.views.gerar_relatorio_tecnico_docx", return_value=b"docx")
+    def test_download_rt_materializa_campos_padrao_antes_de_gerar(self, _mock_docx):
+        roteiro = Roteiro.objects.create(valor_diarias=Decimal("210.00"))
+        self.oficio.roteiro = roteiro
+        self.oficio.save(update_fields=["roteiro", "updated_at"])
+        RelatorioTecnico.objects.filter(pk=self.relatorio.pk).update(
+            diaria="",
+            translado="",
+            combustivel="",
+            passagem="",
+        )
+
+        response = self.client.get(
+            reverse("prestacoes_contas:rt_download_formato", args=[self.relatorio.pk, "docx"]),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.relatorio.refresh_from_db()
+        self.assertEqual(self.relatorio.diaria, "R$210,00")
+        self.assertEqual(self.relatorio.translado, "Não houve")
+        self.assertEqual(self.relatorio.combustivel, "Cartão Prime")
+        self.assertEqual(self.relatorio.passagem, "Não houve")
 
     def test_post_do_formulario_pode_solicitar_pdf(self):
         data = {
@@ -199,6 +247,22 @@ class RelatorioTecnicoDocumentoTests(TestCase):
         self.assertEqual(
             response.url,
             reverse("prestacoes_contas:rt_download_formato", args=[self.relatorio.pk, "pdf"]),
+        )
+
+    def test_formulario_rt_exibe_opcoes_especificas_para_campos_de_custeio(self):
+        form = RelatorioTecnicoForm(instance=self.relatorio)
+
+        self.assertEqual(
+            list(form.fields["translado"].choices),
+            [("Não houve", "Não houve"), ("__outro__", "Outro")],
+        )
+        self.assertEqual(
+            list(form.fields["combustivel"].choices),
+            [("Cartão Prime", "Cartão Prime"), ("__outro__", "Outro")],
+        )
+        self.assertEqual(
+            list(form.fields["passagem"].choices),
+            [("Não houve", "Não houve"), ("__outro__", "Outro")],
         )
 
     def test_index_salva_numero_solicitacao_da_prestacao(self):
@@ -388,6 +452,32 @@ class RelatorioTecnicoDocumentoTests(TestCase):
         self.relatorio.refresh_from_db()
         self.assertEqual(self.relatorio.atividade, "Atividade autosave")
         self.assertEqual(self.relatorio.combustivel, "Combustível próprio")
+
+    def test_autosave_rt_nao_apaga_custeio_com_valor_vazio_de_tela_antiga(self):
+        payload = {
+            "object_id": str(self.relatorio.pk),
+            "form_id": "",
+            "model": "relatorio_tecnico",
+            "dirty_fields": ["translado", "combustivel", "passagem"],
+            "fields": {
+                "translado": "",
+                "combustivel": "",
+                "passagem": "",
+            },
+            "snapshots": {},
+        }
+
+        response = self.client.post(
+            reverse("prestacoes_contas:rt_autosave", args=[self.relatorio.pk]),
+            data=json.dumps(payload),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.relatorio.refresh_from_db()
+        self.assertEqual(self.relatorio.translado, "Não houve")
+        self.assertEqual(self.relatorio.combustivel, "Cartão Prime")
+        self.assertEqual(self.relatorio.passagem, "Não houve")
 
     def test_autosave_diario_salva_km_e_abastecimento(self):
         roteiro = Roteiro.objects.create()

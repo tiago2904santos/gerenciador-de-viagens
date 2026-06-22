@@ -1,4 +1,3 @@
-from decimal import Decimal
 from pathlib import Path
 import re
 
@@ -37,13 +36,13 @@ from .diario_services import nome_arquivo_diario
 from .diario_services import sincronizar_trechos
 from .forms import CAMPOS_COM_MODELO
 from .forms import CAMPOS_CUSTEIO_COM_OUTRO
-from .forms import CUSTEIO_CHOICES
 from .forms import DiarioBordoTrechoFormSet
 from .forms import ModeloTextoRelatorioTecnicoForm
 from .forms import OUTRO_VALUE
 from .forms import PrestacaoDocumentosForm
 from .forms import PrestacaoSolicitacaoForm
 from .forms import RelatorioTecnicoForm
+from .forms import get_custeio_valores_fixos
 from .models import DiarioBordo
 from .models import ModeloTextoRelatorioTecnico
 from .models import PrestacaoContas
@@ -54,22 +53,10 @@ from .selectors import listar_prestacoes
 from .services import gerar_relatorio_tecnico_docx
 from .services import gerar_relatorio_tecnico_pdf
 from .services import gerar_prestacao_consolidado_pdf
+from .services import diaria_inicial_da_prestacao
+from .services import garantir_campos_padrao_relatorio_tecnico
 from .services import nome_arquivo_prestacao_consolidado
 from .services import nome_arquivo_rt
-
-
-def _diaria_inicial_da_prestacao(prestacao) -> str:
-    try:
-        from documentos.services.formatters import format_currency_br
-        oficio = prestacao.oficio
-        roteiro = oficio.roteiro
-        if roteiro and roteiro.valor_diarias:
-            total_servidores = oficio.servidores.count() or 1
-            valor_por_servidor = Decimal(roteiro.valor_diarias) / Decimal(total_servidores)
-            return format_currency_br(valor_por_servidor)
-    except Exception:
-        pass
-    return ""
 
 
 def _destino_display(oficio) -> str:
@@ -280,7 +267,6 @@ def _salvar_prestacao_autosave(prestacao, clean_fields):
 def _salvar_rt_autosave(relatorio, clean_fields):
     if not clean_fields:
         return
-    fixed_custeio = {value for value, _label in CUSTEIO_CHOICES if value and value != OUTRO_VALUE}
     update_fields = set()
     for campo, value in clean_fields.items():
         if campo.endswith("_outro"):
@@ -295,7 +281,7 @@ def _salvar_rt_autosave(relatorio, clean_fields):
             text = normalize_spaces(value or "")
             if text == OUTRO_VALUE:
                 continue
-            if text in fixed_custeio or not text:
+            if text in get_custeio_valores_fixos(campo):
                 setattr(relatorio, campo, text)
                 update_fields.add(campo)
             continue
@@ -561,17 +547,16 @@ def prestacao_documento_excluir(request, pc_pk, anexo_pk):
 # Assinatura eletrônica (RT e Diário de Bordo)
 # ─────────────────────────────────────────────────────────────────
 
-def _whatsapp_url(link_absoluto, signer, doc_labels) -> str:
+def _whatsapp_data(link_absoluto, signer, doc_labels) -> dict:
+    """Telefone (com DDI) e mensagem; o front monta a URL por app/aparelho no clique."""
     docs_txt = " e ".join(doc_labels)
     msg = (
         "Olá! Para concluir a prestação de contas, preciso da sua assinatura no "
         f"{docs_txt}. Acesse o link, confirme sua identidade e assine: {link_absoluto}"
     )
-    base = "https://wa.me/"
     telefone = (getattr(signer, "telefone", "") or "").strip() if signer else ""
-    if len(telefone) == 11 and telefone.isdigit():
-        base = f"https://wa.me/55{telefone}"
-    return f"{base}?text={quote(msg)}"
+    fone = f"55{telefone}" if (len(telefone) == 11 and telefone.isdigit()) else ""
+    return {"phone": fone, "msg": msg}
 
 
 def _assinatura_card(request, prestacao, tipo, status_map) -> dict:
@@ -593,12 +578,12 @@ def _assinatura_card(request, prestacao, tipo, status_map) -> dict:
     assinada = bool(doc and doc.status == AssinaturaDocumento.STATUS_ASSINADA)
     link_ativo = bool(doc and doc.link_ativo)
     link_abs = ""
-    whatsapp = ""
+    wa = {"phone": "", "msg": ""}
     if link_ativo:
         link_abs = request.build_absolute_uri(
             reverse("prestacoes_contas:assinatura_landing", args=[doc.link_token])
         )
-        whatsapp = _whatsapp_url(link_abs, signer, [label])
+        wa = _whatsapp_data(link_abs, signer, [label])
 
     return {
         "tipo": tipo,
@@ -612,7 +597,8 @@ def _assinatura_card(request, prestacao, tipo, status_map) -> dict:
         "link_ativo": link_ativo,
         "link_absoluto": link_abs,
         "expira_em": doc.link_expira_em if link_ativo else None,
-        "whatsapp_url": whatsapp,
+        "whatsapp_phone": wa["phone"],
+        "whatsapp_msg": wa["msg"],
         "gerar_url": reverse("prestacoes_contas:assinatura_gerar", args=[prestacao.pk]),
         "cancelar_url": reverse("prestacoes_contas:assinatura_cancelar", args=[prestacao.pk, tipo]),
     }
@@ -666,6 +652,7 @@ def rt_criar(request, pc_pk):
     )
 
     relatorio, _ = RelatorioTecnico.objects.get_or_create(prestacao=prestacao)
+    garantir_campos_padrao_relatorio_tecnico(relatorio)
     identificacao = _build_identificacao(prestacao)
 
     if request.method == "POST":
@@ -679,7 +666,7 @@ def rt_criar(request, pc_pk):
     else:
         initial = {}
         if not relatorio.diaria:
-            initial["diaria"] = _diaria_inicial_da_prestacao(prestacao)
+            initial["diaria"] = diaria_inicial_da_prestacao(prestacao)
         if not relatorio.motivo:
             initial["motivo"] = prestacao.oficio.motivo or ""
         form = RelatorioTecnicoForm(instance=relatorio, relatorio=relatorio, initial=initial)
@@ -890,6 +877,7 @@ def rt_download(request, pk, formato="docx"):
     )
 
     inline = _is_inline_request(request)
+    garantir_campos_padrao_relatorio_tecnico(relatorio)
     formato = (formato or "docx").strip().lower()
     if formato == "pdf":
         try:

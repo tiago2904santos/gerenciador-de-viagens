@@ -112,12 +112,41 @@ CUSTEIO_CHOICES = [
     ("Cartão Prime", "Cartão Prime"),
     (OUTRO_VALUE, "Outro"),
 ]
+CUSTEIO_CHOICES_BY_FIELD = {
+    "translado": [
+        ("Não houve", "Não houve"),
+        (OUTRO_VALUE, "Outro"),
+    ],
+    "combustivel": [
+        ("Cartão Prime", "Cartão Prime"),
+        (OUTRO_VALUE, "Outro"),
+    ],
+    "passagem": [
+        ("Não houve", "Não houve"),
+        (OUTRO_VALUE, "Outro"),
+    ],
+}
 DEFAULT_CUSTEIO_VALUES = {
     "translado": "Não houve",
     "combustivel": "Cartão Prime",
     "passagem": "Não houve",
 }
-_CUSTEIO_VALORES_FIXOS = {value for value, _label in CUSTEIO_CHOICES if value and value != OUTRO_VALUE}
+_CUSTEIO_VALORES_FIXOS = {
+    campo: {
+        value
+        for value, _label in CUSTEIO_CHOICES_BY_FIELD.get(campo, CUSTEIO_CHOICES)
+        if value and value != OUTRO_VALUE
+    }
+    for campo, _label in CAMPOS_CUSTEIO_COM_OUTRO
+}
+
+
+def get_custeio_choices(campo):
+    return CUSTEIO_CHOICES_BY_FIELD.get(campo, CUSTEIO_CHOICES)
+
+
+def get_custeio_valores_fixos(campo):
+    return _CUSTEIO_VALORES_FIXOS.get(campo, set())
 
 
 class ModeloTextoSelect(forms.Select):
@@ -296,7 +325,7 @@ class RelatorioTecnicoForm(forms.ModelForm):
         for campo, label in CAMPOS_CUSTEIO_COM_OUTRO:
             self.fields[campo] = forms.ChoiceField(
                 label=label,
-                choices=CUSTEIO_CHOICES,
+                choices=get_custeio_choices(campo),
                 required=False,
                 widget=forms.Select(
                     attrs={
@@ -351,7 +380,7 @@ class RelatorioTecnicoForm(forms.ModelForm):
             valor = DEFAULT_CUSTEIO_VALUES.get(campo, "")
         if not valor:
             return
-        if valor in _CUSTEIO_VALORES_FIXOS:
+        if valor in get_custeio_valores_fixos(campo):
             self.initial[campo] = valor
             return
         self.initial[campo] = OUTRO_VALUE

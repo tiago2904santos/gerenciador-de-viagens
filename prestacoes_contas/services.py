@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from decimal import Decimal
 from io import BytesIO
 from datetime import timedelta
 from pathlib import Path
@@ -8,6 +9,7 @@ from django.conf import settings
 from django.utils import timezone
 
 from cadastros.selectors import build_configuracao_context
+from core.normalizers import normalize_spaces
 from documentos.services.facade import build_default_facade
 from documentos.services.adapters.docxtpl_render import render_docx_bytes
 from documentos.services.adapters.libreoffice_pdf import convert_docx_to_pdf_libreoffice
@@ -15,6 +17,7 @@ from documentos.services.adapters.libreoffice_pdf import convert_docx_to_pdf_uno
 from documentos.services.adapters.word_pdf import convert_docx_to_pdf_word_com
 from documentos.services.exceptions import DocumentValidationError
 from documentos.services.formatters import format_city_uf
+from documentos.services.formatters import format_currency_br
 from documentos.services.formatters import format_document_display
 from documentos.services.libreoffice_resolve import resolve_libreoffice_binary
 from documentos.services.pdf_engine import build_pdf_unavailable_message
@@ -27,6 +30,7 @@ from oficios.docxtpl_context import build_oficio_docxtpl_context
 
 from .diario_services import gerar_diario_bordo_pdf
 from .diario_services import sincronizar_trechos
+from .forms import DEFAULT_CUSTEIO_VALUES
 from .models import DiarioBordo
 from .models import PrestacaoDocumentoAnexo
 from .models import RelatorioTecnico
@@ -100,6 +104,41 @@ def _sede() -> str:
         return ""
 
 
+def diaria_inicial_da_prestacao(prestacao) -> str:
+    try:
+        oficio = prestacao.oficio
+        roteiro = oficio.roteiro
+        if roteiro and roteiro.valor_diarias:
+            total_servidores = oficio.servidores.count() or 1
+            valor_por_servidor = Decimal(roteiro.valor_diarias) / Decimal(total_servidores)
+            return format_currency_br(valor_por_servidor)
+    except Exception:
+        pass
+    return ""
+
+
+def relatorio_tecnico_default_values(prestacao) -> dict:
+    values = dict(DEFAULT_CUSTEIO_VALUES)
+    diaria = diaria_inicial_da_prestacao(prestacao)
+    if diaria:
+        values["diaria"] = diaria
+    return values
+
+
+def garantir_campos_padrao_relatorio_tecnico(relatorio: RelatorioTecnico) -> list[str]:
+    defaults = relatorio_tecnico_default_values(relatorio.prestacao)
+    update_fields = []
+    for campo in ("diaria", "translado", "combustivel", "passagem"):
+        valor_atual = normalize_spaces(getattr(relatorio, campo, "") or "")
+        valor_padrao = normalize_spaces(defaults.get(campo) or "")
+        if not valor_atual and valor_padrao:
+            setattr(relatorio, campo, valor_padrao)
+            update_fields.append(campo)
+    if update_fields:
+        relatorio.save(update_fields=[*update_fields, "atualizado_em"])
+    return update_fields
+
+
 def _endereco_institucional(inst: dict) -> str:
     logradouro = format_document_display(inst.get("logradouro"))
     numero = str(inst.get("numero") or "").strip()
@@ -139,6 +178,7 @@ def build_relatorio_tecnico_context(relatorio: RelatorioTecnico) -> dict:
     servidor = pc.servidor
     data_rt = _data_relatorio_tecnico(oficio)
     inst = build_configuracao_context()
+    defaults = relatorio_tecnico_default_values(pc)
 
     divisao_cabecalho = _upper_header_value(inst.get("divisao"))
     unidade_cabecalho = _upper_header_value(inst.get("unidade"))
@@ -161,10 +201,10 @@ def build_relatorio_tecnico_context(relatorio: RelatorioTecnico) -> dict:
         "email": str(inst.get("email") or "").strip().lower(),
         "nome_servidor": servidor.nome,
         "rg_servidor": servidor.rg_formatado,
-        "diaria": relatorio.diaria,
-        "translado": relatorio.translado,
-        "combustivel": relatorio.combustivel,
-        "passagem": relatorio.passagem,
+        "diaria": normalize_spaces(relatorio.diaria or "") or defaults.get("diaria", ""),
+        "translado": normalize_spaces(relatorio.translado or "") or defaults.get("translado", ""),
+        "combustivel": normalize_spaces(relatorio.combustivel or "") or defaults.get("combustivel", ""),
+        "passagem": normalize_spaces(relatorio.passagem or "") or defaults.get("passagem", ""),
         "motivo": relatorio.motivo or oficio.motivo or "",
         "atividade": relatorio.atividade,
         "conclusao": relatorio.conclusao,
@@ -174,6 +214,7 @@ def build_relatorio_tecnico_context(relatorio: RelatorioTecnico) -> dict:
 
 
 def gerar_relatorio_tecnico_docx(relatorio: RelatorioTecnico) -> bytes:
+    garantir_campos_padrao_relatorio_tecnico(relatorio)
     context = build_relatorio_tecnico_context(relatorio)
     template_path = Path(settings.BASE_DIR) / "documentos" / "resources" / "relatorio-tecnico.docx"
     return render_docx_bytes(template_path=template_path, context=context)
