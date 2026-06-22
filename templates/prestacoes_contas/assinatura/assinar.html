@@ -1,0 +1,102 @@
+{% extends "prestacoes_contas/assinatura/base_publico.html" %}
+{% load static %}
+
+{% block title %}Assinar {{ doc_label }}{% endblock %}
+
+{% block head_extra %}
+  <script>
+    window.__ASGN_WORKER__ = "{{ worker_src|escapejs }}";
+  </script>
+{% endblock %}
+
+{% block content %}
+<section class="asgn-card asgn-card--wide" id="asgn-app"
+         data-pdf-url="{{ pdf_url }}"
+         data-nome="{{ nome|escape }}">
+  <header class="asgn-sign-head">
+    <h1 class="asgn-title">Assinar {{ doc_label }}</h1>
+    <span class="asgn-progress">{{ indice }} de {{ total }}</span>
+  </header>
+
+  {% if erro %}<div class="asgn-alert" role="alert">{{ erro }}</div>{% endif %}
+
+  <ol class="asgn-steps">
+    <li>Crie sua assinatura</li>
+    <li>Arraste para a posição no documento</li>
+    <li>Envie</li>
+  </ol>
+
+  <div class="asgn-toolbar">
+    <button type="button" class="asgn-btn asgn-btn--ghost" id="asgn-open-builder">✍ Criar assinatura</button>
+    <div class="asgn-pager">
+      <button type="button" id="asgn-prev" class="asgn-iconbtn" aria-label="Página anterior">‹</button>
+      <span id="asgn-page-label" class="asgn-pager__label">1 / 1</span>
+      <button type="button" id="asgn-next" class="asgn-iconbtn" aria-label="Próxima página">›</button>
+    </div>
+  </div>
+
+  <div class="asgn-viewer" id="asgn-viewer">
+    <div class="asgn-stage" id="asgn-stage">
+      <canvas id="asgn-canvas"></canvas>
+      <div class="asgn-drag" id="asgn-drag" hidden>
+        <img id="asgn-drag-img" alt="Sua assinatura" draggable="false">
+        <span class="asgn-drag__handle" id="asgn-resize" aria-hidden="true"></span>
+      </div>
+    </div>
+  </div>
+  <p class="asgn-hint" id="asgn-hint">Crie sua assinatura para posicioná-la no documento.</p>
+
+  <form method="post" id="asgn-form" action="{{ post_url }}">
+    {% csrf_token %}
+    <input type="hidden" name="assinatura_png" id="f-png">
+    <input type="hidden" name="modo" id="f-modo">
+    <input type="hidden" name="fonte" id="f-fonte">
+    <input type="hidden" name="pagina" id="f-pagina" value="0">
+    <input type="hidden" name="pos_x" id="f-x">
+    <input type="hidden" name="pos_y" id="f-y">
+    <input type="hidden" name="largura" id="f-w">
+    <input type="hidden" name="altura" id="f-h">
+    <button type="submit" class="asgn-btn asgn-btn--primary asgn-btn--block" id="asgn-submit" disabled>
+      Enviar assinatura
+    </button>
+  </form>
+</section>
+
+<div class="asgn-sheet" id="asgn-sheet" hidden>
+  <div class="asgn-sheet__backdrop" id="asgn-sheet-backdrop"></div>
+  <div class="asgn-sheet__panel" role="dialog" aria-label="Criar assinatura">
+    <div class="asgn-tabs">
+      <button type="button" class="asgn-tab is-active" data-tab="fonte">Escolher fonte</button>
+      <button type="button" class="asgn-tab" data-tab="desenho">Desenhar à mão</button>
+    </div>
+
+    <div class="asgn-tabpane" data-pane="fonte">
+      <label class="asgn-field__label" for="asgn-name-input">Nome que aparecerá na assinatura</label>
+      <input class="asgn-input" id="asgn-name-input" maxlength="60" value="{{ nome }}">
+      <div class="asgn-fontlist" id="asgn-fontlist">
+        {% for f in fontes %}
+        <button type="button" class="asgn-fontchip" data-key="{{ f.key }}"
+                data-family="{{ f.family }}" style="font-family: {{ f.family }};">{{ nome }}</button>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="asgn-tabpane" data-pane="desenho" hidden>
+      <div class="asgn-drawwrap">
+        <canvas id="asgn-draw" class="asgn-draw"></canvas>
+      </div>
+      <button type="button" class="asgn-btn asgn-btn--ghost asgn-btn--sm" id="asgn-draw-clear">Limpar</button>
+    </div>
+
+    <div class="asgn-sheet__actions">
+      <button type="button" class="asgn-btn asgn-btn--ghost" id="asgn-sheet-cancel">Cancelar</button>
+      <button type="button" class="asgn-btn asgn-btn--primary" id="asgn-sheet-apply" disabled>Usar assinatura</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block body_js %}
+  <script src="{{ pdfjs_src }}"></script>
+  <script src="{% static 'js/pages/prestacoes-assinatura.js' %}?v=20260621" defer></script>
+{% endblock %}

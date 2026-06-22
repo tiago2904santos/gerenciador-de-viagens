@@ -95,6 +95,31 @@
           </section>
         </section>
 
+        <section class="cv-wizard-section-card" aria-labelledby="prestacao-assinaturas-title">
+          <header class="cv-wizard-section-header">
+            <div class="cv-wizard-section-header__copy">
+              <h2 class="cv-wizard-section-title" id="prestacao-assinaturas-title">Assinaturas</h2>
+              <p class="cv-wizard-section-subtitle">Colete a assinatura do RT (servidor) e do Diário (motorista). O PDF Final usa os arquivos assinados quando existem.</p>
+            </div>
+          </header>
+          {% if assinatura_combinado_possivel %}
+          <div class="cv-wizard-section-body">
+            <form method="post" action="{{ assinatura_gerar_url }}" class="assinatura-card__combo">
+              {% csrf_token %}
+              <input type="hidden" name="tipos" value="rt">
+              <input type="hidden" name="tipos" value="db">
+              <input type="hidden" name="next" value="{{ assinatura_next_url }}">
+              {% include "components/ui/buttons/button.html" with type="submit" label="Gerar link único (RT + Diário)" variant="primary" icon="link" only %}
+              <span class="assinatura-card__expira">Um só link onde o signatário assina os dois documentos em sequência.</span>
+            </form>
+          </div>
+          {% endif %}
+        </section>
+
+        {% for a in assinaturas %}
+          {% include "prestacoes_contas/partials/assinatura_card.html" with assinatura=a next_url=assinatura_next_url only %}
+        {% endfor %}
+
         {% include "prestacoes_contas/partials/documento_preview.html" with preview_anchor="consolidado-preview" preview_title="Pré-visualização do PDF final" preview_subtitle="Documento consolidado na ordem: ofício, despacho, RT, diário e comprovante." preview_doc_title="PDF Final" preview_inline_url=preview_inline_url preview_pdf_url=download_url only %}
       </div>
     </main>

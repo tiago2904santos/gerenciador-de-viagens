@@ -366,12 +366,15 @@ def gerar_prestacao_consolidado_pdf(prestacao) -> bytes:
         "comprovante_saque_transferencia",
     )
 
+    from .assinatura_services import pdf_db_assinado_ou_gerado
+    from .assinatura_services import pdf_rt_assinado_ou_gerado
+
     return _merge_pdf_parts(
         [
             ("ofício", gerar_oficio_prestacao_pdf(prestacao)),
             *despacho_parts,
-            ("relatório técnico", gerar_relatorio_tecnico_pdf(relatorio)),
-            ("diário de bordo", gerar_diario_bordo_pdf(diario)),
+            ("relatório técnico", pdf_rt_assinado_ou_gerado(prestacao)),
+            ("diário de bordo", pdf_db_assinado_ou_gerado(prestacao)),
             *comprovante_parts,
         ]
     )

@@ -1,0 +1,12 @@
+{% extends "prestacoes_contas/assinatura/base_publico.html" %}
+
+{% block title %}Link indisponível{% endblock %}
+
+{% block content %}
+<section class="asgn-card asgn-card--center">
+  <div class="asgn-warn" aria-hidden="true">!</div>
+  <h1 class="asgn-title">Não foi possível abrir</h1>
+  <p class="asgn-lead">{{ mensagem }}</p>
+  <p class="asgn-help">Se você acredita que isso é um engano, peça um novo link a quem o enviou.</p>
+</section>
+{% endblock %}

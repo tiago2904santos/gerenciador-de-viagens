@@ -21,7 +21,14 @@ from core.normalizers import normalize_spaces
 from core.presenters.meta import build_meta
 from core.utils.masks import format_protocolo
 from documentos.services.exceptions import DocumentValidationError
+from urllib.parse import quote
 
+from .assinatura_services import AssinaturaError
+from .assinatura_services import assinaturas_status
+from .assinatura_services import cancelar_assinatura
+from .assinatura_services import emitir_link
+from .assinatura_services import signer_do_documento
+from .models import AssinaturaDocumento
 from .diario_services import diaria_info
 from .diario_services import garantir_roteiro_ajustado
 from .diario_services import gerar_diario_bordo_pdf
@@ -550,6 +557,103 @@ def prestacao_documento_excluir(request, pc_pk, anexo_pk):
     )
 
 
+# ─────────────────────────────────────────────────────────────────
+# Assinatura eletrônica (RT e Diário de Bordo)
+# ─────────────────────────────────────────────────────────────────
+
+def _whatsapp_url(link_absoluto, signer, doc_labels) -> str:
+    docs_txt = " e ".join(doc_labels)
+    msg = (
+        "Olá! Para concluir a prestação de contas, preciso da sua assinatura no "
+        f"{docs_txt}. Acesse o link, confirme sua identidade e assine: {link_absoluto}"
+    )
+    base = "https://wa.me/"
+    telefone = (getattr(signer, "telefone", "") or "").strip() if signer else ""
+    if len(telefone) == 11 and telefone.isdigit():
+        base = f"https://wa.me/55{telefone}"
+    return f"{base}?text={quote(msg)}"
+
+
+def _assinatura_card(request, prestacao, tipo, status_map) -> dict:
+    doc = status_map.get(tipo)
+    signer = signer_do_documento(prestacao, tipo)
+    label = dict(AssinaturaDocumento.TIPO_CHOICES)[tipo]
+    cpf_ok = bool(signer and len((getattr(signer, "cpf", "") or "").strip()) == 11)
+    motivo = ""
+    if signer is None:
+        motivo = (
+            "Defina o motorista do ofício para gerar o link."
+            if tipo == AssinaturaDocumento.TIPO_DB
+            else "Servidor da prestação não definido."
+        )
+    elif not cpf_ok:
+        quem = "motorista" if tipo == AssinaturaDocumento.TIPO_DB else "servidor"
+        motivo = f"Cadastre o CPF do {quem} ({signer}) para gerar o link de assinatura."
+
+    assinada = bool(doc and doc.status == AssinaturaDocumento.STATUS_ASSINADA)
+    link_ativo = bool(doc and doc.link_ativo)
+    link_abs = ""
+    whatsapp = ""
+    if link_ativo:
+        link_abs = request.build_absolute_uri(
+            reverse("prestacoes_contas:assinatura_landing", args=[doc.link_token])
+        )
+        whatsapp = _whatsapp_url(link_abs, signer, [label])
+
+    return {
+        "tipo": tipo,
+        "label": label,
+        "signatario": str(signer) if signer else "—",
+        "assinada": assinada,
+        "assinado_em": doc.assinado_em if assinada else None,
+        "codigo": doc.codigo_verificacao if assinada else "",
+        "pode_assinar": cpf_ok,
+        "motivo": motivo,
+        "link_ativo": link_ativo,
+        "link_absoluto": link_abs,
+        "expira_em": doc.link_expira_em if link_ativo else None,
+        "whatsapp_url": whatsapp,
+        "gerar_url": reverse("prestacoes_contas:assinatura_gerar", args=[prestacao.pk]),
+        "cancelar_url": reverse("prestacoes_contas:assinatura_cancelar", args=[prestacao.pk, tipo]),
+    }
+
+
+@require_POST
+def assinatura_gerar(request, pc_pk):
+    prestacao = get_object_or_404(
+        PrestacaoContas.objects.select_related("oficio__motorista", "servidor"),
+        pk=pc_pk,
+    )
+    tipos = request.POST.getlist("tipos")
+    if not tipos and request.POST.get("tipo"):
+        tipos = [request.POST.get("tipo")]
+    forcar = request.POST.get("forcar") == "1"
+    next_url = request.POST.get("next") or reverse(
+        "prestacoes_contas:consolidado", args=[prestacao.pk]
+    )
+    try:
+        token, _docs = emitir_link(prestacao, tipos, forcar=forcar)
+    except (AssinaturaError, DocumentValidationError) as exc:
+        messages.error(request, str(exc))
+        return redirect(next_url)
+    link = request.build_absolute_uri(
+        reverse("prestacoes_contas:assinatura_landing", args=[token])
+    )
+    messages.success(request, f"Link de assinatura gerado. Envie ao signatário: {link}")
+    return redirect(next_url)
+
+
+@require_POST
+def assinatura_cancelar(request, pc_pk, tipo):
+    prestacao = get_object_or_404(PrestacaoContas, pk=pc_pk)
+    next_url = request.POST.get("next") or reverse(
+        "prestacoes_contas:consolidado", args=[prestacao.pk]
+    )
+    cancelar_assinatura(prestacao, tipo)
+    messages.success(request, "Link/assinatura removidos. Você pode gerar um novo link.")
+    return redirect(next_url)
+
+
 def rt_criar(request, pc_pk):
     """Página única de criação/edição do RT de uma prestação, com dados do ofício exibidos."""
     prestacao = get_object_or_404(
@@ -593,6 +697,8 @@ def rt_criar(request, pc_pk):
             "identificacao": identificacao,
             "wizard_page_steps": _build_prestacao_steps(prestacao, "rt"),
             "diaria_info": diaria_info(prestacao),
+            "assinatura": _assinatura_card(request, prestacao, AssinaturaDocumento.TIPO_RT, assinaturas_status(prestacao)),
+            "assinatura_next_url": reverse("prestacoes_contas:rt_criar", args=[prestacao.pk]),
             "documentos_url": reverse("prestacoes_contas:documentos", args=[prestacao.pk]),
             "autosave_url": reverse("prestacoes_contas:rt_autosave", args=[relatorio.pk]),
             "preview_inline_url": reverse("prestacoes_contas:rt_download_formato", args=[relatorio.pk, "pdf"]) + "?inline=1",
@@ -688,6 +794,8 @@ def diario_criar(request, pc_pk):
             "identificacao": _build_identificacao(prestacao),
             "wizard_page_steps": _build_prestacao_steps(prestacao, "diario"),
             "diaria_info": diaria_info(prestacao),
+            "assinatura": _assinatura_card(request, prestacao, AssinaturaDocumento.TIPO_DB, assinaturas_status(prestacao)),
+            "assinatura_next_url": reverse("prestacoes_contas:diario_criar", args=[prestacao.pk]),
             "editar_roteiro_url": reverse("prestacoes_contas:diario_editar_roteiro", args=[prestacao.pk]),
             "rt_url": reverse("prestacoes_contas:rt_criar", args=[prestacao.pk]),
             "autosave_url": reverse("prestacoes_contas:diario_autosave", args=[diario.pk]),
@@ -750,7 +858,8 @@ def diario_download(request, pk, formato="xlsx"):
     formato = (formato or "xlsx").strip().lower()
     if formato == "pdf":
         try:
-            conteudo = gerar_diario_bordo_pdf(diario)
+            from .assinatura_services import pdf_db_assinado_ou_gerado
+            conteudo = pdf_db_assinado_ou_gerado(diario.prestacao)
         except DocumentValidationError as exc:
             if inline:
                 return _preview_error_response(exc)
@@ -766,6 +875,8 @@ def diario_download(request, pk, formato="xlsx"):
     disposition = "inline" if inline and formato == "pdf" else "attachment"
     response = HttpResponse(conteudo, content_type=content_type)
     response["Content-Disposition"] = f'{disposition}; filename="{nome}"'
+    if disposition == "inline":
+        response["X-Frame-Options"] = "SAMEORIGIN"
     return response
 
 
@@ -782,7 +893,8 @@ def rt_download(request, pk, formato="docx"):
     formato = (formato or "docx").strip().lower()
     if formato == "pdf":
         try:
-            conteudo = gerar_relatorio_tecnico_pdf(relatorio)
+            from .assinatura_services import pdf_rt_assinado_ou_gerado
+            conteudo = pdf_rt_assinado_ou_gerado(relatorio.prestacao)
         except DocumentValidationError as exc:
             if inline:
                 return _preview_error_response(exc)
@@ -799,6 +911,8 @@ def rt_download(request, pk, formato="docx"):
     disposition = "inline" if inline and formato == "pdf" else "attachment"
     response = HttpResponse(conteudo, content_type=content_type)
     response["Content-Disposition"] = f'{disposition}; filename="{nome}"'
+    if disposition == "inline":
+        response["X-Frame-Options"] = "SAMEORIGIN"
     return response
 
 
@@ -847,6 +961,16 @@ def consolidado(request, pc_pk):
         },
     ]
 
+    status_map = assinaturas_status(prestacao)
+    assinatura_rt = _assinatura_card(request, prestacao, AssinaturaDocumento.TIPO_RT, status_map)
+    assinatura_db = _assinatura_card(request, prestacao, AssinaturaDocumento.TIPO_DB, status_map)
+    combinado_possivel = (
+        assinatura_rt["pode_assinar"]
+        and assinatura_db["pode_assinar"]
+        and not assinatura_rt["assinada"]
+        and not assinatura_db["assinada"]
+    )
+
     return render(
         request,
         "prestacoes_contas/consolidado.html",
@@ -856,6 +980,10 @@ def consolidado(request, pc_pk):
             "identificacao": _build_identificacao(prestacao),
             "wizard_page_steps": _build_prestacao_steps(prestacao, "consolidado"),
             "itens_consolidado": itens,
+            "assinaturas": [assinatura_rt, assinatura_db],
+            "assinatura_combinado_possivel": combinado_possivel,
+            "assinatura_gerar_url": reverse("prestacoes_contas:assinatura_gerar", args=[prestacao.pk]),
+            "assinatura_next_url": reverse("prestacoes_contas:consolidado", args=[prestacao.pk]),
             "download_url": reverse("prestacoes_contas:consolidado_download", args=[prestacao.pk]),
             "preview_inline_url": reverse("prestacoes_contas:consolidado_download", args=[prestacao.pk]) + "?inline=1",
             "diario_url": reverse("prestacoes_contas:diario_criar", args=[prestacao.pk]),
@@ -884,6 +1012,8 @@ def consolidado_download(request, pc_pk):
     disposition = "inline" if inline else "attachment"
     response = HttpResponse(conteudo, content_type="application/pdf")
     response["Content-Disposition"] = f'{disposition}; filename="{nome}"'
+    if disposition == "inline":
+        response["X-Frame-Options"] = "SAMEORIGIN"
     return response
 
 

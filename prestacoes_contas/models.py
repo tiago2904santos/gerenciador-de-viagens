@@ -17,6 +17,18 @@ def prestacao_documento_anexo_upload_to(instance, filename):
     return f"prestacoes_contas/{instance.prestacao_id or 'nova'}/{filename}"
 
 
+def assinatura_origem_upload_to(instance, filename):
+    return f"prestacoes_contas/{instance.prestacao_id or 'nova'}/assinaturas/origem_{instance.tipo}_{filename}"
+
+
+def assinatura_png_upload_to(instance, filename):
+    return f"prestacoes_contas/{instance.prestacao_id or 'nova'}/assinaturas/png_{instance.tipo}_{filename}"
+
+
+def assinatura_assinado_upload_to(instance, filename):
+    return f"prestacoes_contas/{instance.prestacao_id or 'nova'}/assinaturas/assinado_{instance.tipo}_{filename}"
+
+
 class PrestacaoContas(models.Model):
     STATUS_PENDENTE = "pendente"
     STATUS_EM_PREENCHIMENTO = "em_preenchimento"
@@ -211,6 +223,115 @@ class DiarioBordoTrecho(models.Model):
 
     def __str__(self):
         return f"Trecho {self.ordem} — {self.diario_id}"
+
+
+class AssinaturaDocumento(models.Model):
+    """Assinatura eletrônica de um documento da prestação (RT ou Diário de Bordo).
+
+    Registro canônico — há no máximo um por ``(prestacao, tipo)``. O "link" enviado
+    ao signatário é representado por ``link_token`` (compartilhado entre RT e DB quando
+    se gera um link único). O signatário confirma identidade (5 primeiros dígitos do
+    CPF + nome), posiciona a assinatura e envia; o PDF carimbado fica em
+    ``arquivo_assinado`` e passa a ser usado pelo sistema.
+    """
+
+    TIPO_RT = "rt"
+    TIPO_DB = "db"
+    TIPO_CHOICES = [
+        (TIPO_RT, "Relatório Técnico"),
+        (TIPO_DB, "Diário de Bordo"),
+    ]
+
+    STATUS_PENDENTE = "pendente"
+    STATUS_ASSINADA = "assinada"
+    STATUS_CANCELADA = "cancelada"
+    STATUS_CHOICES = [
+        (STATUS_PENDENTE, "Pendente"),
+        (STATUS_ASSINADA, "Assinada"),
+        (STATUS_CANCELADA, "Cancelada"),
+    ]
+
+    MODO_FONTE = "fonte"
+    MODO_DESENHO = "desenho"
+    MODO_CHOICES = [
+        (MODO_FONTE, "Fonte"),
+        (MODO_DESENHO, "Desenho"),
+    ]
+
+    prestacao = models.ForeignKey(
+        PrestacaoContas,
+        on_delete=models.CASCADE,
+        related_name="assinaturas",
+    )
+    tipo = models.CharField(max_length=4, choices=TIPO_CHOICES, db_index=True)
+    signer = models.ForeignKey(
+        Servidor,
+        on_delete=models.PROTECT,
+        related_name="assinaturas_documentos",
+    )
+    nome_esperado = models.CharField(max_length=255, blank=True, default="")
+    status = models.CharField(max_length=12, choices=STATUS_CHOICES, default=STATUS_PENDENTE)
+
+    # Link enviado ao signatário (token compartilhado entre RT/DB no "link único").
+    link_token = models.CharField(max_length=64, blank=True, default="", db_index=True)
+    link_criado_em = models.DateTimeField(null=True, blank=True)
+    link_expira_em = models.DateTimeField(null=True, blank=True)
+
+    # Verificação de identidade.
+    identidade_confirmada_em = models.DateTimeField(null=True, blank=True)
+
+    # Snapshot do PDF não assinado (garante que o carimbo bate com o que foi exibido).
+    arquivo_origem = models.FileField(upload_to=assinatura_origem_upload_to, blank=True)
+
+    # Resultado da assinatura.
+    modo = models.CharField(max_length=10, choices=MODO_CHOICES, blank=True, default="")
+    fonte = models.CharField(max_length=60, blank=True, default="")
+    assinatura_png = models.FileField(upload_to=assinatura_png_upload_to, blank=True)
+    pagina = models.PositiveIntegerField(default=0)
+    pos_x = models.FloatField(null=True, blank=True)
+    pos_y = models.FloatField(null=True, blank=True)
+    largura = models.FloatField(null=True, blank=True)
+    altura = models.FloatField(null=True, blank=True)
+    arquivo_assinado = models.FileField(upload_to=assinatura_assinado_upload_to, blank=True)
+    assinado_em = models.DateTimeField(null=True, blank=True)
+    assinado_ip = models.CharField(max_length=64, blank=True, default="")
+    codigo_verificacao = models.CharField(max_length=12, blank=True, default="")
+
+    criado_em = models.DateTimeField(auto_now_add=True)
+    atualizado_em = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["prestacao", "tipo"]
+        verbose_name = "Assinatura de documento"
+        verbose_name_plural = "Assinaturas de documentos"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["prestacao", "tipo"],
+                name="uniq_assinatura_prestacao_tipo",
+            )
+        ]
+
+    def __str__(self):
+        return f"Assinatura {self.get_tipo_display()} — {self.prestacao_id}"
+
+    @property
+    def assinada(self) -> bool:
+        return self.status == self.STATUS_ASSINADA and bool(self.arquivo_assinado)
+
+    @property
+    def link_expirado(self) -> bool:
+        from django.utils import timezone as _tz
+
+        return bool(self.link_expira_em and self.link_expira_em < _tz.now())
+
+    @property
+    def link_ativo(self) -> bool:
+        return bool(self.link_token) and not self.link_expirado and not self.assinada
+
+    @property
+    def cpf_prefixo_esperado(self) -> str:
+        cpf = (self.signer.cpf or "").strip() if self.signer_id else ""
+        return cpf[:5]
 
 
 class ModeloTextoRelatorioTecnico(models.Model):

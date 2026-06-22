@@ -1,0 +1,41 @@
+{% extends "prestacoes_contas/assinatura/base_publico.html" %}
+
+{% block title %}Confirmar identidade{% endblock %}
+
+{% block content %}
+<section class="asgn-card">
+  <h1 class="asgn-title">Confirme sua identidade</h1>
+  <p class="asgn-lead">Documento a assinar: <strong>{{ doc_label }}</strong></p>
+
+  {% if erro %}<div class="asgn-alert" role="alert">{{ erro }}</div>{% endif %}
+
+  {% if bloqueado %}
+    <p class="asgn-lead">Muitas tentativas incorretas. Aguarde alguns minutos e abra o link novamente.</p>
+  {% else %}
+  <form method="post" class="asgn-form" novalidate autocomplete="off">
+    {% csrf_token %}
+
+    <div class="asgn-field">
+      <span class="asgn-field__label">Seu nome completo</span>
+      <div class="asgn-name">{{ nome }}</div>
+    </div>
+
+    <label class="asgn-check">
+      <input type="checkbox" name="confirma_nome">
+      <span>Confirmo que sou <strong>{{ nome }}</strong> e que o nome está correto.</span>
+    </label>
+
+    <div class="asgn-field">
+      <label class="asgn-field__label" for="cpf5">5 primeiros dígitos do seu CPF</label>
+      <input class="asgn-input asgn-input--cpf" id="cpf5" name="cpf5"
+             inputmode="numeric" pattern="[0-9]*" maxlength="5"
+             autocomplete="off" placeholder="00000" required>
+    </div>
+
+    <button class="asgn-btn asgn-btn--primary" type="submit">Continuar para assinar</button>
+  </form>
+  {% endif %}
+
+  <p class="asgn-help">O nome está incorreto? Entre em contato com quem enviou o link.</p>
+</section>
+{% endblock %}

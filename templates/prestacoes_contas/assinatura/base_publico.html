@@ -1,0 +1,22 @@
+{% load static %}
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>{% block title %}Assinatura de documento{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/prestacoes-assinatura.css' %}?v=20260621">
+  {% block head_extra %}{% endblock %}
+</head>
+<body class="asgn">
+  <header class="asgn-top">
+    <span class="asgn-top__mark" aria-hidden="true">CV</span>
+    <span class="asgn-top__name">Central de Viagens</span>
+  </header>
+  <main class="asgn-main">
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="asgn-foot">Assinatura eletrônica &middot; uso restrito ao signatário.</footer>
+  {% block body_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,22 @@
+{% extends "prestacoes_contas/assinatura/base_publico.html" %}
+
+{% block content %}
+<section class="asgn-card">
+  <h1 class="asgn-title">Assinatura de documentos</h1>
+  <p class="asgn-lead">Você recebeu <strong>{{ total }}</strong> documento(s) para assinar. Você vai confirmar sua identidade e assinar cada um.</p>
+
+  <ul class="asgn-doclist">
+    {% for d in docs %}
+    <li class="asgn-doc{% if d.assinada %} is-done{% endif %}">
+      <div class="asgn-doc__info">
+        <span class="asgn-doc__label">{{ d.label }}</span>
+        <span class="asgn-doc__who">{{ d.signatario }}</span>
+      </div>
+      <span class="asgn-doc__status">{% if d.assinada %}✓ Assinado{% else %}Pendente{% endif %}</span>
+    </li>
+    {% endfor %}
+  </ul>
+
+  <a class="asgn-btn asgn-btn--primary" href="{{ continuar_url }}">Começar</a>
+</section>
+{% endblock %}

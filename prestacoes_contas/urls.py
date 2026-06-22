@@ -1,6 +1,7 @@
 from django.urls import path
 
 from . import views
+from . import assinatura_views
 
 
 app_name = "prestacoes_contas"
@@ -22,6 +23,15 @@ urlpatterns = [
     path("diario/<int:pk>/download/<str:formato>/", views.diario_download, name="diario_download_formato"),
     path("prestacao/<int:pc_pk>/consolidado/", views.consolidado, name="consolidado"),
     path("prestacao/<int:pc_pk>/consolidado/download/", views.consolidado_download, name="consolidado_download"),
+    # Assinatura eletrônica — geração de link (admin)
+    path("prestacao/<int:pc_pk>/assinatura/gerar/", views.assinatura_gerar, name="assinatura_gerar"),
+    path("prestacao/<int:pc_pk>/assinatura/<str:tipo>/cancelar/", views.assinatura_cancelar, name="assinatura_cancelar"),
+    # Assinatura eletrônica — fluxo público (sem login)
+    path("assinar/<str:token>/", assinatura_views.publico_landing, name="assinatura_landing"),
+    path("assinar/<str:token>/concluido/", assinatura_views.publico_concluido, name="assinatura_concluido"),
+    path("assinar/<str:token>/<str:tipo>/identidade/", assinatura_views.publico_identidade, name="assinatura_identidade"),
+    path("assinar/<str:token>/<str:tipo>/assinar/", assinatura_views.publico_assinar, name="assinatura_assinar"),
+    path("assinar/<str:token>/<str:tipo>/pdf/", assinatura_views.publico_pdf_origem, name="assinatura_pdf_origem"),
     # Modelos de texto reutilizáveis
     path("modelos-texto/", views.modelos_index, name="modelos_index"),
     path("modelos-texto/novo/", views.modelo_novo, name="modelo_novo"),
