@@ -124,7 +124,7 @@ def apresentar_viatura_card(viatura, edit_url="#", delete_url="#"):
     }
 
 
-def apresentar_linha_lista_simples_cargo(cargo, edit_url="#", delete_url="#", set_default_url=None):
+def apresentar_linha_lista_simples_cargo(cargo, edit_url="#", delete_url="#", set_default_url=None, delete_modal=False):
     row = {
         "avatar": "CG",
         "title": cargo.nome,
@@ -133,6 +133,7 @@ def apresentar_linha_lista_simples_cargo(cargo, edit_url="#", delete_url="#", se
         "edit_url": edit_url,
         "edit_fields_json": json.dumps({"nome": cargo.nome}, ensure_ascii=False),
         "delete_url": delete_url,
+        "delete_modal": delete_modal,
         "set_default_url": set_default_url,
     }
     if getattr(cargo, "is_padrao", False):

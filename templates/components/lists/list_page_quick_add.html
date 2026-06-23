@@ -1,6 +1,6 @@
 {# Lista simples com header Quick Add. Usa os mesmos tokens/estruturas do UI Lab. #}
 <div class="page-shell page-shell--list" data-cv-realtime-filter-scope>
-  <div class="page-header-stack header-stack--quick-add">
+  <div class="page-header-stack header-stack--quick-add{% if quick_add_compact %} header-stack--quick-add-compact{% endif %}">
     <div class="page-header-band">
       <div class="page-header-band__content">
         <div class="page-header-band__text">
@@ -39,14 +39,16 @@
           <div class="quick-add-inline__fields">
             {% include quick_add_body_template with form=quick_add_form only %}
           </div>
+          {% if not quick_add_compact %}
           <div class="quick-add-inline__actions">
             {% include "components/ui/buttons/button.html" with label=quick_add_submit_label|default:"Salvar" variant="primary" type="submit" icon="check" only %}
           </div>
+          {% endif %}
         </div>
       </form>
     </div>
 
-    <button class="quick-add-footer-button" type="button" data-quick-add-toggle aria-controls="{{ quick_add_panel_id }}" aria-expanded="{% if quick_add_form.errors %}true{% else %}false{% endif %}">
+    <button class="quick-add-footer-button" type="button" data-quick-add-toggle{% if quick_add_compact %} data-quick-add-submit-when-open data-quick-add-save-label="{{ quick_add_submit_label|default:'Salvar' }}"{% endif %} aria-controls="{{ quick_add_panel_id }}" aria-expanded="{% if quick_add_form.errors %}true{% else %}false{% endif %}">
       <span class="quick-add-footer-button__icon" aria-hidden="true">+</span>
       <span class="quick-add-footer-button__label">{{ quick_add_label|default:"Cadastrar item" }}</span>
     </button>
@@ -56,4 +58,8 @@
     {% include "components/lists/simple_list.html" with rows=rows empty_message=empty_message %}
     {% include "components/lists/pagination.html" %}
   </div>
+
+  {% if delete_modal_enabled %}
+    {% include "components/ui/modals/delete_confirm_modal.html" %}
+  {% endif %}
 </div>

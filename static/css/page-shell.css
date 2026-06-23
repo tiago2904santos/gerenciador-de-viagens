@@ -2237,6 +2237,24 @@ body.has-delete-modal-open {
   width:       auto;
 }
 
+/* Variante compacta (cargo/combustível): apenas o input.
+   Sem label, sem botão e com o divisor indo de ponta a ponta do card. */
+
+.header-stack--quick-add-compact .quick-add-inline__body {
+  padding: var(--space-4) 0 0; /* só o gap entre o divisor e o input */
+}
+
+.header-stack--quick-add-compact .page-header-rail--filters-quick-add .quick-add-panel {
+  border-radius: 0;
+  box-shadow:    none;
+  flex-shrink:   0;             /* não deixa o flex encolher de volta */
+  width:         calc(100% + (2 * var(--space-5)));  /* estica até as bordas do card */
+  margin-left:   calc(-1 * var(--space-5));
+  margin-right:  calc(-1 * var(--space-5));
+  padding-left:  var(--space-5);
+  padding-right: var(--space-5);
+}
+
 /* =========================================================
    23b. Quick-Add Panel — animação de expansão
    Controlado por JS: remove [hidden] → adiciona .is-open.
@@ -2282,6 +2300,7 @@ body.has-delete-modal-open {
   height:          var(--control-height-md);
   justify-content: center;
   padding:         0 var(--space-4);
+  transition:      background 0.45s ease, color 0.45s ease, border-color 0.45s ease, box-shadow 0.45s ease;
   width:           100%;
 }
 
@@ -2301,6 +2320,19 @@ body.has-delete-modal-open {
   box-shadow:   none;
 }
 
+.quick-add-footer-button.is-filled {
+  background:   var(--cv-btn-primary-bg);
+  border-color: var(--cv-btn-primary-border);
+  box-shadow:   0 6px 14px rgba(11, 58, 102, 0.16);
+  color:        var(--cv-btn-primary-color);
+}
+
+.quick-add-footer-button.is-filled:hover {
+  background:   var(--cv-btn-primary-hover-bg);
+  border-color: var(--cv-btn-primary-hover-border);
+  box-shadow:   0 10px 18px rgba(11, 58, 102, 0.22);
+}
+
 html[data-theme="dark"] .quick-add-footer-button {
   background: var(--color-card-muted); /* #213246 */
   color:      var(--theme-text-body);
@@ -2315,6 +2347,17 @@ html[data-theme="dark"] .quick-add-footer-button[aria-expanded="true"] {
   background:   var(--color-card-muted); /* #213246 — igual ao estado fechado */
   border-color: var(--border-filter-bar);
   color:        var(--theme-text-body);
+}
+
+html[data-theme="dark"] .quick-add-footer-button.is-filled {
+  background:   var(--cv-btn-primary-bg);
+  border-color: var(--cv-btn-primary-border);
+  color:        var(--cv-btn-primary-color);
+}
+
+html[data-theme="dark"] .quick-add-footer-button.is-filled:hover {
+  background:   var(--cv-btn-primary-hover-bg);
+  border-color: var(--cv-btn-primary-hover-border);
 }
 
 .quick-add-footer-button__icon {

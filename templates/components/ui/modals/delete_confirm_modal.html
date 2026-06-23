@@ -12,12 +12,12 @@
       <span class="delete-confirm-modal__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="delete" only %}</span>
       <div class="delete-confirm-modal__copy">
         <span class="delete-confirm-modal__eyebrow">Confirmar exclusão</span>
-        <h2 class="delete-confirm-modal__title" id="delete-confirm-title">Excluir servidor?</h2>
+        <h2 class="delete-confirm-modal__title" id="delete-confirm-title">{{ delete_modal_title|default:"Excluir registro?" }}</h2>
       </div>
     </header>
 
     <p class="delete-confirm-modal__message" id="delete-confirm-description">
-      Você está prestes a excluir <strong data-delete-confirm-label>este servidor</strong>.
+      Você está prestes a excluir <strong data-delete-confirm-label>{{ delete_modal_entity|default:"este registro" }}</strong>.
       Se houver vínculos com outros registros, a exclusão será bloqueada.
     </p>
 

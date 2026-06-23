@@ -211,6 +211,7 @@ class CargoForm(BaseCadastroForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["nome"].label = "Cargo"
         self.fields["is_padrao"].required = False
         self.fields["is_padrao"].label = "Cargo padrão"
 

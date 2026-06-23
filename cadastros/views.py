@@ -466,6 +466,7 @@ def cargos_index(request):
             cargo,
             edit_url=reverse("cadastros:cargo_update", args=[cargo.pk]),
             delete_url=reverse("cadastros:cargo_delete", args=[cargo.pk]),
+            delete_modal=True,
             set_default_url=(
                 reverse("cadastros:cargo_set_default", args=[cargo.pk]) if not cargo.is_padrao else None
             ),
@@ -537,24 +538,15 @@ def cargo_set_default(request, pk):
 
 def cargo_delete(request, pk):
     cargo = get_cargo_by_id(pk)
-    if request.method == "POST":
-        try:
-            excluir_cargo(cargo)
-        except CadastroVinculadoError:
-            _vinculo_error(request)
-            return redirect("cadastros:cargos_index")
-        messages.success(request, "Cargo excluído com sucesso.")
+    if request.method != "POST":
         return redirect("cadastros:cargos_index")
-    return render(
-        request,
-        "cadastros/cargos/confirm_delete.html",
-        {
-            "page_title": "Excluir cargo",
-            "page_description": "Esta ação excluirá o cadastro. Se houver vínculos com outros registros, a exclusão será bloqueada.",
-            "object": cargo,
-            "back_url": reverse("cadastros:cargos_index"),
-        },
-    )
+    try:
+        excluir_cargo(cargo)
+    except CadastroVinculadoError:
+        _vinculo_error(request)
+        return redirect("cadastros:cargos_index")
+    messages.success(request, "Cargo excluído com sucesso.")
+    return redirect("cadastros:cargos_index")
 
 
 def combustiveis_index(request):

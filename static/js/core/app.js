@@ -82,17 +82,61 @@ document.documentElement.dataset.appReady = "true";
         openPanel();
       }
 
-      toggle.addEventListener("click", function () {
-        if (toggle.getAttribute("aria-expanded") === "true") {
-          closePanel();
+      function submitPanel() {
+        if (typeof panel.requestSubmit === "function") {
+          panel.requestSubmit();
         } else {
-          openPanel();
+          panel.submit();
         }
+      }
+
+      toggle.addEventListener("click", function () {
+        if (toggle.getAttribute("aria-expanded") !== "true") {
+          openPanel();
+          return;
+        }
+        // Painel aberto: no modo compacto o botão de rodapé salva quando há
+        // valor preenchido e apenas recolhe quando está vazio.
+        if (toggle.hasAttribute("data-quick-add-submit-when-open")) {
+          var field = panel.querySelector("input:not([type=hidden]), select, textarea");
+          var filled = field && String(field.value || "").trim() !== "";
+          if (filled) {
+            submitPanel();
+          } else {
+            closePanel();
+          }
+          return;
+        }
+        closePanel();
       });
 
       closeButtons.forEach(function (button) {
         button.addEventListener("click", closePanel);
       });
+
+      if (toggle.hasAttribute("data-quick-add-submit-when-open")) {
+        var labelEl = toggle.querySelector(".quick-add-footer-button__label");
+        var originalLabel = labelEl ? labelEl.textContent : null;
+        var saveLabel = toggle.getAttribute("data-quick-add-save-label") || "Salvar";
+
+        function updateToggleState() {
+          var field = panel.querySelector("input:not([type=hidden]), select, textarea");
+          var filled = field && String(field.value || "").trim() !== "";
+          toggle.classList.toggle("is-filled", filled);
+          if (labelEl) {
+            labelEl.textContent = filled ? saveLabel : originalLabel;
+          }
+        }
+
+        panel.addEventListener("input", updateToggleState);
+
+        var origClose = closePanel;
+        closePanel = function () {
+          origClose();
+          toggle.classList.remove("is-filled");
+          if (labelEl) labelEl.textContent = originalLabel;
+        };
+      }
     });
   }
 
