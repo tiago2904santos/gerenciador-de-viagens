@@ -142,7 +142,7 @@ def apresentar_linha_lista_simples_cargo(cargo, edit_url="#", delete_url="#", se
     return row
 
 
-def apresentar_linha_lista_simples_combustivel(combustivel, edit_url="#", delete_url="#", set_default_url=None):
+def apresentar_linha_lista_simples_combustivel(combustivel, edit_url="#", delete_url="#", set_default_url=None, delete_modal=False):
     row = {
         "avatar": "CB",
         "title": combustivel.nome,
@@ -151,6 +151,7 @@ def apresentar_linha_lista_simples_combustivel(combustivel, edit_url="#", delete
         "edit_url": edit_url,
         "edit_fields_json": json.dumps({"nome": combustivel.nome}, ensure_ascii=False),
         "delete_url": delete_url,
+        "delete_modal": delete_modal,
         "set_default_url": set_default_url,
     }
     if getattr(combustivel, "is_padrao", False):
@@ -159,7 +160,7 @@ def apresentar_linha_lista_simples_combustivel(combustivel, edit_url="#", delete
     return row
 
 
-def apresentar_linha_lista_simples_unidade(unidade, edit_url="#", delete_url="#"):
+def apresentar_linha_lista_simples_unidade(unidade, edit_url="#", delete_url="#", delete_modal=False):
     return {
         "avatar": "UN",
         "title": unidade.nome,
@@ -170,10 +171,11 @@ def apresentar_linha_lista_simples_unidade(unidade, edit_url="#", delete_url="#"
         "edit_url": edit_url,
         "edit_fields_json": json.dumps({"nome": unidade.nome, "sigla": unidade.sigla or ""}, ensure_ascii=False),
         "delete_url": delete_url,
+        "delete_modal": delete_modal,
     }
 
 
-def apresentar_linha_lista_simples_cidade(cidade, edit_url="#", delete_url="#"):
+def apresentar_linha_lista_simples_cidade(cidade, edit_url="#", delete_url="#", delete_modal=False):
     sigla = cidade.estado.sigla if getattr(cidade, "estado", None) else cidade.uf
     cap = "Sim" if getattr(cidade, "capital", False) else "Não"
     badges = []
@@ -189,10 +191,11 @@ def apresentar_linha_lista_simples_cidade(cidade, edit_url="#", delete_url="#"):
         ],
         "edit_url": edit_url,
         "delete_url": delete_url,
+        "delete_modal": delete_modal,
     }
 
 
-def apresentar_linha_lista_simples_estado(estado, edit_url="#", delete_url="#"):
+def apresentar_linha_lista_simples_estado(estado, edit_url="#", delete_url="#", delete_modal=False):
     cod = str(estado.codigo_ibge) if estado.codigo_ibge is not None else "—"
     return {
         "avatar": "UF",
@@ -204,6 +207,7 @@ def apresentar_linha_lista_simples_estado(estado, edit_url="#", delete_url="#"):
         ],
         "edit_url": edit_url,
         "delete_url": delete_url,
+        "delete_modal": delete_modal,
     }
 
 
@@ -229,7 +233,7 @@ def apresentar_linha_lista_simples_servidor(servidor, edit_url="#", delete_url="
     }
 
 
-def apresentar_linha_lista_simples_viatura(viatura, edit_url="#", delete_url="#"):
+def apresentar_linha_lista_simples_viatura(viatura, edit_url="#", delete_url="#", delete_modal=False):
     placa_fmt = _format_placa(viatura.placa)
     modelo = (viatura.modelo or "").strip()
     title = f"{modelo} — {placa_fmt}" if modelo else placa_fmt
@@ -246,4 +250,5 @@ def apresentar_linha_lista_simples_viatura(viatura, edit_url="#", delete_url="#"
         ],
         "edit_url": edit_url,
         "delete_url": delete_url,
+        "delete_modal": delete_modal,
     }

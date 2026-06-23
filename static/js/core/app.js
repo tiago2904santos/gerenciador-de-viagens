@@ -123,9 +123,7 @@ document.documentElement.dataset.appReady = "true";
           var field = panel.querySelector("input:not([type=hidden]), select, textarea");
           var filled = field && String(field.value || "").trim() !== "";
           toggle.classList.toggle("is-filled", filled);
-          if (labelEl) {
-            labelEl.textContent = filled ? saveLabel : originalLabel;
-          }
+          if (labelEl) labelEl.textContent = filled ? saveLabel : originalLabel;
         }
 
         panel.addEventListener("input", updateToggleState);

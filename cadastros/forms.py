@@ -109,6 +109,26 @@ class UnidadeSearchSelect(forms.Select):
         return option
 
 
+class UnidadePorExtensoSearchSelect(forms.Select):
+    """Picker de unidade exibindo o nome completo (por extenso) ao invés da sigla."""
+
+    def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+        option = super().create_option(name, value, label, selected, index, subindex=subindex, attrs=attrs)
+        unidade = getattr(value, "instance", None)
+        if unidade is None:
+            return option
+        nome = unidade.nome or unidade.sigla or ""
+        option["label"] = nome
+        option["attrs"].update(
+            {
+                "data-main": nome,
+                "data-meta": unidade.sigla or "",
+                "data-search": " ".join(part for part in [unidade.nome, unidade.sigla] if part),
+            }
+        )
+        return option
+
+
 class UnidadeForm(BaseCadastroForm):
     servidores = forms.ModelMultipleChoiceField(
         label="Servidores",
@@ -235,6 +255,7 @@ class CombustivelForm(BaseCadastroForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["nome"].label = "Combustível"
         self.fields["is_padrao"].required = False
         self.fields["is_padrao"].label = "Combustível padrão"
 
@@ -387,13 +408,6 @@ class ServidorForm(BaseCadastroForm):
 
 
 class ViaturaForm(BaseCadastroForm):
-    tem_motorista_fixo = forms.BooleanField(
-        label="Possui motorista fixo",
-        required=False,
-        initial=False,
-        widget=_TOGGLE_WIDGET,
-    )
-
     class Meta:
         model = Viatura
         fields = ["placa", "modelo", "combustivel", "tipo", "unidade", "motoristas"]
@@ -445,22 +459,13 @@ class ViaturaForm(BaseCadastroForm):
         self.fields["unidade"].queryset = Unidade.objects.order_by("nome")
         self.fields["motoristas"].required = False
         self.fields["motoristas"].queryset = Servidor.objects.select_related("cargo", "unidade").order_by("nome")
-        if self.instance.pk and not self.is_bound:
-            self.initial["tem_motorista_fixo"] = self.instance.motoristas.exists()
         if not self.instance.pk and not self.data:
             padrao = Combustivel.objects.filter(is_padrao=True).first()
             if padrao:
                 self.initial.setdefault("combustivel", padrao.pk)
             self.initial.setdefault("tipo", Viatura.TIPO_DESCARACTERIZADA)
-            self.initial.setdefault("tem_motorista_fixo", False)
         if self.instance.pk:
             self.initial["placa"] = format_placa(self.instance.placa)
-
-    def clean(self):
-        cleaned_data = super().clean()
-        if not cleaned_data.get("tem_motorista_fixo"):
-            cleaned_data["motoristas"] = []
-        return cleaned_data
 
     def clean_placa(self):
         raw = normalize_plate(self.cleaned_data.get("placa", ""))
@@ -495,14 +500,10 @@ class ConfiguracaoSistemaForm(forms.ModelForm):
             "cidade_endereco",
             "uf",
             "telefone",
+            "ramal",
             "email",
-            "nome_chefia",
-            "cargo_chefia",
-            "pt_sufixo_numero",
         ]
         widgets = {
-            "divisao": forms.TextInput(attrs={"class": "form-control", "data-mask": "upper"}),
-            "unidade": forms.TextInput(attrs={"class": "form-control", "data-mask": "upper"}),
             "cep": forms.TextInput(
                 attrs={
                     "class": "form-control",
@@ -516,14 +517,6 @@ class ConfiguracaoSistemaForm(forms.ModelForm):
             "numero": forms.TextInput(attrs={"class": "form-control", "autocomplete": "off"}),
             "bairro": forms.TextInput(attrs={"class": "form-control", "data-mask": "upper"}),
             "cidade_endereco": forms.TextInput(attrs={"class": "form-control", "data-mask": "upper"}),
-            "uf": forms.TextInput(
-                attrs={
-                    "class": "form-control",
-                    "data-mask": "upper",
-                    "maxlength": "2",
-                    "autocomplete": "off",
-                }
-            ),
             "telefone": forms.TextInput(
                 attrs={
                     "class": "form-control",
@@ -533,6 +526,14 @@ class ConfiguracaoSistemaForm(forms.ModelForm):
                     "autocomplete": "off",
                 }
             ),
+            "ramal": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "autocomplete": "off",
+                    "maxlength": "20",
+                    "placeholder": "Ex.: 1234",
+                }
+            ),
             "email": forms.EmailInput(
                 attrs={
                     "class": "form-control",
@@ -540,41 +541,63 @@ class ConfiguracaoSistemaForm(forms.ModelForm):
                     "autocomplete": "off",
                 }
             ),
-            "nome_chefia": forms.TextInput(attrs={"class": "form-control", "data-mask": "upper"}),
-            "cargo_chefia": forms.TextInput(attrs={"class": "form-control", "data-mask": "upper"}),
-            "pt_sufixo_numero": forms.TextInput(
-                attrs={
-                    "class": "form-control",
-                    "data-mask": "upper",
-                    "maxlength": "20",
-                    "autocomplete": "off",
-                }
-            ),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self.fields["divisao"].required = False
+        self.fields["divisao"].empty_label = ""
         self.fields["divisao"].label = "Divisão"
+        self.fields["divisao"].widget = UnidadePorExtensoSearchSelect(
+            attrs={
+                "class": "cv-search-picker__native",
+                "data-cv-search-picker": "true",
+                "data-picker-mode": "single",
+                "data-picker-variant": "compact",
+                "data-picker-label": "Divisão",
+                "data-picker-hint": "Busque por sigla ou nome da unidade.",
+                "data-placeholder": "Buscar divisão",
+                "data-empty-message": "Nenhuma unidade encontrada.",
+            }
+        )
+        self.fields["divisao"].queryset = Unidade.objects.order_by("nome")
+
+        self.fields["unidade"].required = False
+        self.fields["unidade"].empty_label = ""
         self.fields["unidade"].label = "Unidade"
+        self.fields["unidade"].widget = UnidadePorExtensoSearchSelect(
+            attrs={
+                "class": "cv-search-picker__native",
+                "data-cv-search-picker": "true",
+                "data-picker-mode": "single",
+                "data-picker-variant": "compact",
+                "data-picker-label": "Unidade",
+                "data-picker-hint": "Busque por sigla ou nome da unidade.",
+                "data-placeholder": "Buscar unidade",
+                "data-empty-message": "Nenhuma unidade encontrada.",
+            }
+        )
+        self.fields["unidade"].queryset = Unidade.objects.order_by("nome")
+
         self.fields["cidade_endereco"].label = "Cidade"
         self.fields["cep"].label = "CEP"
-        self.fields["uf"].label = "UF"
         self.fields["email"].label = "E-mail"
-        self.fields["nome_chefia"].label = "Nome da chefia"
-        self.fields["cargo_chefia"].label = "Cargo da chefia"
-        self.fields["pt_sufixo_numero"].label = "Sufixo do nº do Plano de Trabalho"
+        self.fields["ramal"].label = "Ramal (opcional)"
+        self.fields["ramal"].required = False
+
+        self.fields["uf"] = forms.ChoiceField(
+            label="UF",
+            required=False,
+            choices=_uf_choices_por_extenso(self.instance.uf if self.instance else ""),
+            widget=forms.Select(attrs={"class": "form-select"}),
+        )
+        if self.instance and self.instance.pk:
+            self.initial["uf"] = self.instance.uf
 
         if self.instance and self.instance.pk and not self.data:
             self.initial["cep"] = format_cep(self.instance.cep)
             self.initial["telefone"] = format_telefone(self.instance.telefone)
-
-    def clean_divisao(self):
-        raw = (self.cleaned_data.get("divisao") or "").strip()
-        return " ".join(raw.split()).upper() if raw else ""
-
-    def clean_unidade(self):
-        raw = (self.cleaned_data.get("unidade") or "").strip()
-        return " ".join(raw.split()).upper() if raw else ""
 
     def clean_cidade_endereco(self):
         raw = (self.cleaned_data.get("cidade_endereco") or "").strip()
@@ -600,6 +623,10 @@ class ConfiguracaoSistemaForm(forms.ModelForm):
         email = (self.cleaned_data.get("email") or "").strip()
         return email
 
+    def clean_ramal(self):
+        ramal = (self.cleaned_data.get("ramal") or "").strip()
+        return ramal
+
     def clean_uf(self):
         uf = (self.cleaned_data.get("uf") or "").strip().upper()
         if not uf:
@@ -609,12 +636,44 @@ class ConfiguracaoSistemaForm(forms.ModelForm):
         return uf
 
 
+def _uf_choices_por_extenso(uf_atual=""):
+    estados = list(Estado.objects.order_by("nome").values_list("sigla", "nome"))
+    choices = [("", "")]
+    siglas_existentes = {sigla for sigla, _ in estados}
+    for sigla, nome in estados:
+        choices.append((sigla, nome))
+    uf_atual = (uf_atual or "").strip().upper()
+    if uf_atual and uf_atual not in siglas_existentes:
+        choices.append((uf_atual, uf_atual))
+    return choices
+
+
 _TIPO_FIELD_MAP = [
     (AssinaturaConfiguracao.OFICIO, "assinante_oficio", "Assinante padrão – Ofício"),
     (AssinaturaConfiguracao.JUSTIFICATIVA, "assinante_justificativa", "Assinante padrão – Justificativa"),
     (AssinaturaConfiguracao.PLANO_TRABALHO, "assinante_plano_trabalho", "Assinante padrão – Plano de Trabalho"),
     (AssinaturaConfiguracao.ORDEM_SERVICO, "assinante_ordem_servico", "Assinante padrão – Ordem de Serviço"),
 ]
+
+
+class _AssinanteServidorSelect(forms.Select):
+    """Select com metadados nas options para o cv-search-picker."""
+
+    def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+        option = super().create_option(name, value, label, selected, index, subindex=subindex, attrs=attrs)
+        servidor = getattr(value, "instance", None)
+        if servidor is None:
+            return option
+        option["attrs"].update(_servidor_option_attrs(servidor))
+        return option
+
+
+_ASSINANTE_PICKER_LABELS = {
+    "assinante_oficio": "Assinante do Ofício",
+    "assinante_justificativa": "Assinante da Justificativa",
+    "assinante_plano_trabalho": "Assinante do Plano de Trabalho",
+    "assinante_ordem_servico": "Assinante da Ordem de Serviço",
+}
 
 
 class ConfiguracaoAssinaturasForm(forms.Form):
@@ -629,13 +688,26 @@ class ConfiguracaoAssinaturasForm(forms.Form):
                 existing[ass.tipo] = ass.servidor
 
         for tipo, field_name, label in _TIPO_FIELD_MAP:
+            picker_label = _ASSINANTE_PICKER_LABELS.get(field_name, label)
             self.fields[field_name] = forms.ModelChoiceField(
                 queryset=qs,
                 required=False,
                 label=label,
                 initial=existing.get(tipo),
-                widget=forms.Select(attrs={"class": "form-select"}),
+                widget=_AssinanteServidorSelect(
+                    attrs={
+                        "class": "cv-search-picker__native",
+                        "data-cv-search-picker": "true",
+                        "data-picker-mode": "single",
+                        "data-picker-variant": "compact",
+                        "data-picker-label": picker_label,
+                        "data-picker-hint": "Busque por nome, cargo ou CPF.",
+                        "data-placeholder": "Buscar servidor",
+                        "data-empty-message": "Nenhum servidor encontrado.",
+                    }
+                ),
             )
+            self.fields[field_name].empty_label = ""
             if configuracao and configuracao.pk and not self.data:
                 self.initial[field_name] = existing.get(tipo)
 

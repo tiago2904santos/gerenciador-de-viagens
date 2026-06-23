@@ -6,6 +6,7 @@ from django.utils import timezone
 from cadastros.models import Cidade
 from cadastros.models import ConfiguracaoSistema
 from cadastros.models import Estado
+from cadastros.models import Unidade
 from oficios.docxtpl_context import build_justificativa_docxtpl_context
 from oficios.docxtpl_context import build_oficio_docxtpl_context
 from oficios.models import Oficio
@@ -26,7 +27,7 @@ class BuildOficioCapitalizacaoTests(TestCase):
     def test_cabecalho_institucional_maiusculo_corpo_legivel(self):
         cfg = ConfiguracaoSistema.get_singleton()
         cfg.nome_orgao = "DEPARTAMENTO DE POLÍCIA"
-        cfg.unidade = "DELEGACIA REGIONAL DE POLÍCIA DE LONDRINA"
+        cfg.unidade = Unidade.objects.create(nome="DELEGACIA REGIONAL DE POLÍCIA DE LONDRINA")
         cfg.save(update_fields=["nome_orgao", "unidade"])
         oficio = Oficio.objects.create()
         ctx = build_oficio_docxtpl_context(oficio)
@@ -38,7 +39,7 @@ class BuildOficioCapitalizacaoTests(TestCase):
     def test_cabecalho_orgao_maiusculo_com_entrada_title_case(self):
         cfg = ConfiguracaoSistema.get_singleton()
         cfg.nome_orgao = "Departamento de Polícia"
-        cfg.unidade = "Delegacia Regional de Londrina"
+        cfg.unidade = Unidade.objects.create(nome="Delegacia Regional de Londrina")
         cfg.save(update_fields=["nome_orgao", "unidade"])
         oficio = Oficio.objects.create()
         ctx = build_oficio_docxtpl_context(oficio)
@@ -47,8 +48,8 @@ class BuildOficioCapitalizacaoTests(TestCase):
 
     def test_justificativa_rodape_nao_todo_maiusculo(self):
         cfg = ConfiguracaoSistema.get_singleton()
-        cfg.divisao = "ASSESSORIA DE COMUNICAÇÃO SOCIAL"
-        cfg.unidade = "UNIDADE TESTE"
+        cfg.divisao = Unidade.objects.create(nome="ASSESSORIA DE COMUNICAÇÃO SOCIAL")
+        cfg.unidade = Unidade.objects.create(nome="UNIDADE TESTE")
         cfg.logradouro = "RUA EXEMPLO"
         cfg.numero = "1"
         cfg.bairro = "BAIRRO"

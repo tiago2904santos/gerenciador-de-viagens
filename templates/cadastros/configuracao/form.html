@@ -4,63 +4,83 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block content %}
-  <div class="page-shell page-shell--standard">
+  <div class="page-shell page-shell--wizard">
     {% include "components/ui/headers/header_stack_simple.html" with eyebrow="CADASTROS" title=page_title description=page_description icon_label="CF" module_label="Configurações" only %}
 
-    <form
-      class="main-form-panel"
-      method="post"
-      novalidate
-      data-configuracoes-form
-      data-cep-lookup-url-template="{% url 'cadastros:api_consulta_cep' '00000000' %}"
-    >
-      {% csrf_token %}
+    <main class="main-form-panel main-form-panel--stack">
+      <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
+        <form
+          method="post"
+          novalidate
+          data-configuracoes-form
+          data-cep-lookup-url-template="{% url 'cadastros:api_consulta_cep' '00000000' %}"
+        >
+          {% csrf_token %}
 
-      {% include "components/ui/layouts/form_section.html" with title="Dados da unidade" description="Identificação da divisão e da unidade." section_id="config-unidade-section" only %}
-      <div class="field-grid">
-        {% include "components/forms/form_field.html" with field=form.divisao size_class="field-size-2" only %}
-        {% include "components/forms/form_field.html" with field=form.unidade size_class="field-size-2" only %}
+          {# CARD 1 — Dados da unidade e Endereço dos documentos #}
+          <section class="cv-wizard-section-card" aria-labelledby="config-card-unidade-endereco-title">
+            <header class="cv-wizard-section-header">
+              <div class="cv-wizard-section-header__copy">
+                <h3 class="cv-wizard-section-title" id="config-card-unidade-endereco-title">Dados da unidade e Endereço dos documentos</h3>
+              </div>
+            </header>
+
+            <div class="cv-wizard-section-body">
+              <section class="wizard-inner-section" aria-labelledby="config-unidade-section">
+                <header class="wizard-inner-section__header">
+                  <h4 class="wizard-inner-section__title" id="config-unidade-section">Dados da unidade</h4>
+                </header>
+                <div class="field-grid field-grid--cols-2">
+                  {% include "components/forms/form_field.html" with field=form.divisao size_class="field-size-1" only %}
+                  {% include "components/forms/form_field.html" with field=form.unidade size_class="field-size-1" only %}
+                </div>
+              </section>
+
+              <section class="wizard-inner-section" aria-labelledby="config-endereco-section">
+                <header class="wizard-inner-section__header">
+                  <h4 class="wizard-inner-section__title" id="config-endereco-section">Endereço dos documentos</h4>
+                </header>
+                <div class="field-grid field-grid--cols-4">
+                  {% include "components/forms/form_field.html" with field=form.cep size_class="field-size-1" only %}
+                  {% include "components/forms/form_field.html" with field=form.numero size_class="field-size-1" only %}
+                  {% include "components/forms/form_field.html" with field=form.logradouro size_class="field-size-2" only %}
+                </div>
+                <div class="field-grid field-grid--cols-3">
+                  {% include "components/forms/form_field.html" with field=form.bairro size_class="field-size-1" only %}
+                  {% include "components/forms/form_field.html" with field=form.cidade_endereco size_class="field-size-1" only %}
+                  {% include "components/forms/form_field.html" with field=form.uf size_class="field-size-1" only %}
+                </div>
+                <div class="field-grid field-grid--cols-4">
+                  {% include "components/forms/form_field.html" with field=form.email size_class="field-size-2" only %}
+                  {% include "components/forms/form_field.html" with field=form.telefone size_class="field-size-1" only %}
+                  {% include "components/forms/form_field.html" with field=form.ramal size_class="field-size-1" only %}
+                </div>
+              </section>
+            </div>
+          </section>
+
+          {# CARD 2 — Assinantes padrão por documento #}
+          <section class="cv-wizard-section-card" aria-labelledby="config-card-assinantes-title">
+            <header class="cv-wizard-section-header">
+              <div class="cv-wizard-section-header__copy">
+                <h3 class="cv-wizard-section-title" id="config-card-assinantes-title">Assinantes padrão por documento</h3>
+              </div>
+            </header>
+
+            <div class="cv-wizard-section-body">
+              <div class="field-grid field-grid--cols-2">
+                {% include "components/forms/form_field.html" with field=assinaturas_form.assinante_oficio size_class="field-size-1" only %}
+                {% include "components/forms/form_field.html" with field=assinaturas_form.assinante_justificativa size_class="field-size-1" only %}
+                {% include "components/forms/form_field.html" with field=assinaturas_form.assinante_plano_trabalho size_class="field-size-1" only %}
+                {% include "components/forms/form_field.html" with field=assinaturas_form.assinante_ordem_servico size_class="field-size-1" only %}
+              </div>
+            </div>
+
+            {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar" secondary_url=back_url primary_label="Salvar" only %}
+          </section>
+        </form>
       </div>
-      </section>
-
-      {% include "components/ui/layouts/form_section.html" with title="Endereço dos documentos" description="Dados institucionais utilizados no rodapé dos documentos gerados pelo sistema." section_id="config-endereco-section" only %}
-      <div class="field-grid">
-        {% include "components/forms/form_field.html" with field=form.cep size_class="field-size-1" only %}
-        {% include "components/forms/form_field.html" with field=form.logradouro size_class="field-size-3" only %}
-        {% include "components/forms/form_field.html" with field=form.numero size_class="field-size-1" only %}
-        {% include "components/forms/form_field.html" with field=form.bairro size_class="field-size-1" only %}
-        {% include "components/forms/form_field.html" with field=form.cidade_endereco size_class="field-size-1" only %}
-        {% include "components/forms/form_field.html" with field=form.uf size_class="field-size-1" only %}
-        {% include "components/forms/form_field.html" with field=form.telefone size_class="field-size-2" only %}
-        {% include "components/forms/form_field.html" with field=form.email size_class="field-size-2" only %}
-      </div>
-      </section>
-
-      {% include "components/ui/layouts/form_section.html" with title="Chefia" description="Nome e cargo da chefia utilizados como fallback de assinatura nos documentos." section_id="config-chefia-section" only %}
-      <div class="field-grid">
-        {% include "components/forms/form_field.html" with field=form.nome_chefia size_class="field-size-2" only %}
-        {% include "components/forms/form_field.html" with field=form.cargo_chefia size_class="field-size-2" only %}
-      </div>
-      </section>
-
-      {% include "components/ui/layouts/form_section.html" with title="Plano de Trabalho" description="Parâmetros da numeração dos planos de trabalho gerados pelo sistema." section_id="config-plano-trabalho-section" only %}
-      <div class="field-grid">
-        {% include "components/forms/form_field.html" with field=form.pt_sufixo_numero size_class="field-size-2" only %}
-      </div>
-      </section>
-
-      {% include "components/ui/layouts/form_section.html" with title="Assinantes padrão por documento" description="Servidor selecionado como assinante padrão em cada tipo de documento gerado pelo sistema." section_id="config-assinaturas-section" only %}
-      <div class="field-grid">
-        {% include "components/forms/form_field.html" with field=assinaturas_form.assinante_oficio size_class="field-size-2" only %}
-        {% include "components/forms/form_field.html" with field=assinaturas_form.assinante_justificativa size_class="field-size-2" only %}
-        {% include "components/forms/form_field.html" with field=assinaturas_form.assinante_plano_trabalho size_class="field-size-2" only %}
-        {% include "components/forms/form_field.html" with field=assinaturas_form.assinante_ordem_servico size_class="field-size-2" only %}
-      </div>
-      </section>
-
-      {% include "components/ui/layouts/card_footer_actions.html" with secondary_label="Voltar" secondary_url=back_url primary_label="Salvar" only %}
-
-    </form>
+    </main>
   </div>
 {% endblock %}
 

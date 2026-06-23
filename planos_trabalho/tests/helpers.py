@@ -27,7 +27,7 @@ def criar_base_geografica():
 def configurar_sistema(curitiba):
     config = ConfiguracaoSistema.get_singleton()
     config.cidade_sede_padrao = curitiba
-    config.unidade = "Assessoria de Comunicação Social"
+    config.unidade = Unidade.objects.create(nome="Assessoria de Comunicação Social")
     config.cidade_endereco = "Curitiba"
     config.uf = "PR"
     config.nome_chefia = "João Mário Nunes de Góes"

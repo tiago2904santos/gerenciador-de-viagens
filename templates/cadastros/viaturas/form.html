@@ -1,57 +1,51 @@
 {% extends "base.html" %}
-{% load static %}
-
 {% block title %}{{ page_title }}{% endblock %}
-
 {% block content %}
-  <div class="page-shell page-shell--standard-simple">
-    {% include "components/ui/headers/header_stack_simple.html" with eyebrow="CADASTROS" title=page_title description=page_description icon_label="VT" module_label="Cadastros" only %}
+  <div class="page-shell page-shell--wizard">
+    {% include "components/ui/headers/header_stack_simple.html" with eyebrow="CADASTROS" title=page_title description=page_description icon_label="VT" module_label="Viaturas" only %}
 
-    <form class="main-form-panel" method="post" novalidate data-viatura-motorista-form data-cv-state-toggle data-cv-state-binary>
-      {% csrf_token %}
-      {% include "components/ui/layouts/form_section.html" with title="Dados da viatura" description="Informe placa, modelo, combustível, tipo e unidade. Motoristas fixos são opcionais." section_id="viaturas-form-section" only %}
+    <main class="main-form-panel main-form-panel--stack">
+      <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
+        <form method="post" novalidate>
+          {% csrf_token %}
+          <section class="cv-wizard-section-card" aria-labelledby="viaturas-form-card-title">
+            <header class="cv-wizard-section-header">
+              <div class="cv-wizard-section-header__copy">
+                <h3 class="cv-wizard-section-title" id="viaturas-form-card-title">Dados da viatura</h3>
+              </div>
+            </header>
 
-      <div class="field-grid-rows">
-        <div class="field-grid">
-          {% include "components/forms/form_field.html" with field=form.placa size_class="field-size-2" only %}
-          {% include "components/forms/form_field.html" with field=form.modelo size_class="field-size-2" only %}
-        </div>
+            <div class="cv-wizard-section-body cv-wizard-section-body--sections">
+              <section class="wizard-inner-section">
+                <div class="field-grid field-grid--cols-4">
+                  {% include "components/forms/form_field.html" with field=form.placa size_class="field-size-1" only %}
+                  {% include "components/forms/form_field.html" with field=form.modelo size_class="field-size-1" only %}
+                  {% include "components/forms/form_field.html" with field=form.tipo size_class="field-size-1" only %}
+                  {% include "components/forms/input_with_action.html" with field=form.combustivel action_url=combustiveis_manage_url action_label="Gerenciar combustíveis" size_class="field-size-1" only %}
+                </div>
+              </section>
 
-        <div class="field-grid">
-          {% include "components/forms/form_field.html" with field=form.tipo size_class="field-size-2" only %}
-          {% include "components/forms/input_with_action.html" with field=form.combustivel action_url=combustiveis_manage_url action_label="Gerenciar combustíveis" size_class="field-size-2" only %}
-        </div>
+              <section class="wizard-inner-section">
+                <div class="field-grid">
+                  <div class="field app-form-field cv-field field-size-4">
+                    <label class="app-form-label cv-field__label" for="{{ form.unidade.id_for_label }}">{{ form.unidade.label }}</label>
+                    {{ form.unidade.as_widget }}
+                    {% if form.unidade.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.unidade.errors only %}{% endif %}
+                  </div>
+                </div>
+              </section>
 
-        <div class="field-grid">
-          <div class="field app-form-field cv-field field-size-4 field-viatura-unidade-wrap">
-            <label class="app-form-label cv-field__label" for="{{ form.unidade.id_for_label }}">{{ form.unidade.label }}</label>
-            <div class="cv-field-row">
-              {{ form.unidade }}
-              {{ form.tem_motorista_fixo }}
-              {% if form.tem_motorista_fixo.value %}
-                {% include "components/ui/buttons/field_action_button.html" with label="Com Motorista" variant="success" type="button" extra_class="cv-field-side-action--toggle cv-field-side-action--state is-active" aria_label="Alternar motorista fixo" aria_pressed=True data_motorista_fixo_toggle=True only %}
-              {% else %}
-                {% include "components/ui/buttons/field_action_button.html" with label="Sem Motorista" variant="danger" type="button" extra_class="cv-field-side-action--toggle cv-field-side-action--state is-inactive" aria_label="Alternar motorista fixo" aria_pressed=False data_motorista_fixo_toggle=True only %}
-              {% endif %}
+              <section class="wizard-inner-section">
+                <div class="field-grid">
+                  {% include "components/forms/form_field.html" with field=form.motoristas size_class="field-size-4" only %}
+                </div>
+              </section>
             </div>
-            {% if form.unidade.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.unidade.errors only %}{% endif %}
-            {% if form.tem_motorista_fixo.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.tem_motorista_fixo.errors only %}{% endif %}
-          </div>
-        </div>
 
-        <div class="viatura-motoristas-panel{% if form.tem_motorista_fixo.value %} viatura-motoristas-panel--open{% endif %}"
-             data-viatura-motoristas-panel
-             aria-hidden="{% if form.tem_motorista_fixo.value %}false{% else %}true{% endif %}">
-          <div class="viatura-motoristas-panel__inner field-grid">
-            {% include "components/forms/form_field.html" with field=form.motoristas size_class="field-size-4" only %}
-          </div>
-        </div>
+            {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar" secondary_url=back_url primary_label="Salvar" only %}
+          </section>
+        </form>
       </div>
-      {% include "components/ui/layouts/card_footer_actions.html" with secondary_label="Voltar" secondary_url=back_url primary_label="Salvar" only %}
-    </form>
+    </main>
   </div>
-{% endblock %}
-
-{% block extra_js %}
-  <script src="{% static 'js/components/viatura-motorista-fixo.js' %}?v=20260520c" defer></script>
 {% endblock %}

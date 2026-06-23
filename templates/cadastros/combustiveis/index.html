@@ -1,5 +1,5 @@
 {% extends "base.html" %}
 {% block title %}Combustíveis{% endblock %}
 {% block content %}
-  {% include "components/lists/list_page_quick_add.html" with title=page_title description=page_description eyebrow="Cadastros" brand_mark="CB" search_placeholder="Buscar combustíveis" empty_message="Nenhum combustível cadastrado ainda." rows=rows q=q quick_add_form=quick_add_form quick_add_panel_id="quick-add-combustivel" quick_add_label="Cadastrar combustível" quick_add_submit_label="Salvar combustível" quick_add_body_template="cadastros/combustiveis/partials/_quick_add_fields.html" %}
+  {% include "components/lists/list_page_quick_add.html" with title=page_title description=page_description eyebrow="Cadastros" search_placeholder="Buscar combustíveis" empty_message="Nenhum combustível cadastrado ainda." rows=rows q=q quick_add_form=quick_add_form quick_add_panel_id="quick-add-combustivel" quick_add_label="Cadastrar combustível" quick_add_submit_label="Salvar combustível" quick_add_body_template="cadastros/combustiveis/partials/_quick_add_fields.html" quick_add_compact=True disable_realtime_filter=True hide_realtime_count=True delete_modal_enabled=True delete_modal_title="Excluir combustível?" delete_modal_entity="este combustível" %}
 {% endblock %}

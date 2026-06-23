@@ -70,7 +70,7 @@ from .services_via_cep import ViaCEPNotFoundError
 from .services_via_cep import ViaCEPServiceError
 
 
-SERVIDORES_PER_PAGE = 25
+CADASTROS_PER_PAGE = 15
 
 
 def _render_listagem(request, template_name, context):
@@ -161,13 +161,16 @@ def index(request):
 def estados_index(request):
     q = request.GET.get("q", "").strip()
     estados = listar_estados(q=q)
+    paginator = Paginator(estados, CADASTROS_PER_PAGE)
+    page_obj = paginator.get_page(request.GET.get("page"))
     rows = [
         apresentar_linha_lista_simples_estado(
             estado,
             edit_url=reverse("cadastros:estado_update", args=[estado.pk]),
             delete_url=reverse("cadastros:estado_delete", args=[estado.pk]),
+            delete_modal=True,
         )
-        for estado in estados
+        for estado in page_obj.object_list
     ]
     return _render_listagem(
         request,
@@ -178,6 +181,9 @@ def estados_index(request):
             "rows": rows,
             "q": q,
             "page_eyebrow": "Cadastros internos",
+            "page_obj": page_obj,
+            "pagination_pages": _pagination_pages(page_obj),
+            "page_querystring": urlencode({"q": q}) if q else "",
         },
     )
 
@@ -253,13 +259,16 @@ def unidades_index(request):
         messages.success(request, "Unidade criada com sucesso.")
         return redirect("cadastros:unidades_index")
     unidades = listar_unidades(q=q)
+    paginator = Paginator(unidades, CADASTROS_PER_PAGE)
+    page_obj = paginator.get_page(request.GET.get("page"))
     rows = [
         apresentar_linha_lista_simples_unidade(
             unidade,
             edit_url=reverse("cadastros:unidade_update", args=[unidade.pk]),
             delete_url=reverse("cadastros:unidade_delete", args=[unidade.pk]),
+            delete_modal=True,
         )
-        for unidade in unidades
+        for unidade in page_obj.object_list
     ]
     return _render_listagem(
         request,
@@ -270,6 +279,9 @@ def unidades_index(request):
             "rows": rows,
             "q": q,
             "quick_add_form": form,
+            "page_obj": page_obj,
+            "pagination_pages": _pagination_pages(page_obj),
+            "page_querystring": urlencode({"q": q}) if q else "",
         },
     )
 
@@ -325,28 +337,22 @@ def unidade_delete(request, pk):
             return redirect("cadastros:unidades_index")
         messages.success(request, "Unidade excluída com sucesso.")
         return redirect("cadastros:unidades_index")
-    return render(
-        request,
-        "cadastros/unidades/confirm_delete.html",
-        {
-            "page_title": "Excluir unidade",
-            "page_description": "Esta ação excluirá o cadastro. Se houver vínculos com outros registros, a exclusão será bloqueada.",
-            "object": unidade,
-            "back_url": reverse("cadastros:unidades_index"),
-        },
-    )
+    return redirect("cadastros:unidades_index")
 
 
 def cidades_index(request):
     q = request.GET.get("q", "").strip()
     cidades = listar_cidades(q=q)
+    paginator = Paginator(cidades, CADASTROS_PER_PAGE)
+    page_obj = paginator.get_page(request.GET.get("page"))
     rows = [
         apresentar_linha_lista_simples_cidade(
             cidade,
             edit_url=reverse("cadastros:cidade_update", args=[cidade.pk]),
             delete_url=reverse("cadastros:cidade_delete", args=[cidade.pk]),
+            delete_modal=True,
         )
-        for cidade in cidades
+        for cidade in page_obj.object_list
     ]
     export_base = reverse("cadastros:cidades_export_csv")
     export_csv_url = f"{export_base}?{urlencode({'q': q})}" if q else export_base
@@ -360,6 +366,9 @@ def cidades_index(request):
             "q": q,
             "export_csv_url": export_csv_url,
             "page_eyebrow": "Cadastros",
+            "page_obj": page_obj,
+            "pagination_pages": _pagination_pages(page_obj),
+            "page_querystring": urlencode({"q": q}) if q else "",
         },
     )
 
@@ -461,6 +470,8 @@ def cargos_index(request):
         messages.success(request, "Cargo criado com sucesso.")
         return redirect("cadastros:cargos_index")
     cargos = listar_cargos(q=q)
+    paginator = Paginator(cargos, CADASTROS_PER_PAGE)
+    page_obj = paginator.get_page(request.GET.get("page"))
     rows = [
         apresentar_linha_lista_simples_cargo(
             cargo,
@@ -471,7 +482,7 @@ def cargos_index(request):
                 reverse("cadastros:cargo_set_default", args=[cargo.pk]) if not cargo.is_padrao else None
             ),
         )
-        for cargo in cargos
+        for cargo in page_obj.object_list
     ]
     return _render_listagem(
         request,
@@ -482,6 +493,9 @@ def cargos_index(request):
             "rows": rows,
             "q": q,
             "quick_add_form": form,
+            "page_obj": page_obj,
+            "pagination_pages": _pagination_pages(page_obj),
+            "page_querystring": urlencode({"q": q}) if q else "",
         },
     )
 
@@ -557,6 +571,8 @@ def combustiveis_index(request):
         messages.success(request, "Combustível criado com sucesso.")
         return redirect("cadastros:combustiveis_index")
     combustiveis = listar_combustiveis(q=q)
+    paginator = Paginator(combustiveis, CADASTROS_PER_PAGE)
+    page_obj = paginator.get_page(request.GET.get("page"))
     rows = [
         apresentar_linha_lista_simples_combustivel(
             combustivel,
@@ -567,8 +583,9 @@ def combustiveis_index(request):
                 if not combustivel.is_padrao
                 else None
             ),
+            delete_modal=True,
         )
-        for combustivel in combustiveis
+        for combustivel in page_obj.object_list
     ]
     return _render_listagem(
         request,
@@ -579,6 +596,9 @@ def combustiveis_index(request):
             "rows": rows,
             "q": q,
             "quick_add_form": form,
+            "page_obj": page_obj,
+            "pagination_pages": _pagination_pages(page_obj),
+            "page_querystring": urlencode({"q": q}) if q else "",
         },
     )
 
@@ -643,22 +663,13 @@ def combustivel_delete(request, pk):
             return redirect("cadastros:combustiveis_index")
         messages.success(request, "Combustível excluído com sucesso.")
         return redirect("cadastros:combustiveis_index")
-    return render(
-        request,
-        "cadastros/combustiveis/confirm_delete.html",
-        {
-            "page_title": "Excluir combustível",
-            "page_description": "Esta ação excluirá o cadastro. Se houver vínculos com outros registros, a exclusão será bloqueada.",
-            "object": combustivel,
-            "back_url": reverse("cadastros:combustiveis_index"),
-        },
-    )
+    return redirect("cadastros:combustiveis_index")
 
 
 def servidores_index(request):
     q = request.GET.get("q", "").strip()
     servidores = listar_servidores(q=q)
-    paginator = Paginator(servidores, SERVIDORES_PER_PAGE)
+    paginator = Paginator(servidores, CADASTROS_PER_PAGE)
     page_obj = paginator.get_page(request.GET.get("page"))
     rows = [
         apresentar_linha_lista_simples_servidor(
@@ -746,13 +757,16 @@ def servidor_delete(request, pk):
 def viaturas_index(request):
     q = request.GET.get("q", "").strip()
     viaturas = listar_viaturas(q=q)
+    paginator = Paginator(viaturas, CADASTROS_PER_PAGE)
+    page_obj = paginator.get_page(request.GET.get("page"))
     rows = [
         apresentar_linha_lista_simples_viatura(
             viatura,
             edit_url=reverse("cadastros:viatura_update", args=[viatura.pk]),
             delete_url=reverse("cadastros:viatura_delete", args=[viatura.pk]),
+            delete_modal=True,
         )
-        for viatura in viaturas
+        for viatura in page_obj.object_list
     ]
     return _render_listagem(
         request,
@@ -762,6 +776,9 @@ def viaturas_index(request):
             "page_description": "Viaturas cadastradas para uso operacional.",
             "rows": rows,
             "q": q,
+            "page_obj": page_obj,
+            "pagination_pages": _pagination_pages(page_obj),
+            "page_querystring": urlencode({"q": q}) if q else "",
         },
     )
 

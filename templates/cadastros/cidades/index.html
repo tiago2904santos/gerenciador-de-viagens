@@ -4,5 +4,5 @@
 
 {% block content %}
   {% url "cadastros:cidade_create" as create_url %}
-  {% include "components/lists/list_page_standard.html" with title=page_title description=page_description eyebrow=page_eyebrow|default:"Cadastros" search_placeholder="Buscar cidades" action_label="Nova cidade" action_url=create_url action_aria_label="Cadastrar cidade" empty_message="Nenhuma cidade cadastrada ainda." rows=rows q=q %}
+  {% include "components/lists/list_page_standard.html" with title=page_title description=page_description eyebrow=page_eyebrow|default:"Cadastros" search_placeholder="Buscar cidades" action_label="Nova cidade" action_url=create_url action_aria_label="Cadastrar cidade" empty_message="Nenhuma cidade cadastrada ainda." rows=rows q=q disable_realtime_filter=True hide_realtime_count=True delete_modal_enabled=True delete_modal_title="Excluir cidade?" delete_modal_entity="esta cidade" %}
 {% endblock %}

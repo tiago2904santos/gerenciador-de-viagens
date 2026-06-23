@@ -1,5 +1,5 @@
 {# Lista simples com header Quick Add. Usa os mesmos tokens/estruturas do UI Lab. #}
-<div class="page-shell page-shell--list" data-cv-realtime-filter-scope>
+<div class="page-shell page-shell--list"{% if not disable_realtime_filter %} data-cv-realtime-filter-scope{% endif %}>
   <div class="page-header-stack header-stack--quick-add{% if quick_add_compact %} header-stack--quick-add-compact{% endif %}">
     <div class="page-header-band">
       <div class="page-header-band__content">
@@ -55,8 +55,8 @@
   </div>
 
   <div class="list-panel">
-    {% include "components/lists/simple_list.html" with rows=rows empty_message=empty_message %}
     {% include "components/lists/pagination.html" %}
+    {% include "components/lists/simple_list.html" with rows=rows empty_message=empty_message hide_realtime_count=hide_realtime_count %}
   </div>
 
   {% if delete_modal_enabled %}

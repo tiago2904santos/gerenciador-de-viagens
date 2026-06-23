@@ -15,6 +15,7 @@ from django.utils import timezone
 from cadastros.models import Cargo
 from cadastros.models import ConfiguracaoSistema
 from cadastros.models import Servidor
+from cadastros.models import Unidade
 from oficios.docxtpl_context import build_oficio_docxtpl_context
 from oficios.models import Oficio
 from prestacoes_contas.forms import RelatorioTecnicoForm
@@ -117,8 +118,8 @@ class RelatorioTecnicoDocumentoTests(TestCase):
 
     def test_contexto_preenche_cabecalho_e_rodape_do_template(self):
         cfg = ConfiguracaoSistema.get_singleton()
-        cfg.divisao = "DIVISAO POLICIAL"
-        cfg.unidade = "UNIDADE TESTE"
+        cfg.divisao = Unidade.objects.create(nome="DIVISAO POLICIAL")
+        cfg.unidade = Unidade.objects.create(nome="UNIDADE TESTE")
         cfg.logradouro = "RUA CENTRAL"
         cfg.numero = "123"
         cfg.bairro = "CENTRO"

@@ -305,8 +305,22 @@ class ConfiguracaoSistema(TimeStampedModel):
     prazo_justificativa_dias = models.PositiveIntegerField(default=10)
     nome_orgao = models.CharField(max_length=200, blank=True)
     sigla_orgao = models.CharField(max_length=20, blank=True)
-    divisao = models.CharField(max_length=120, blank=True, default="")
-    unidade = models.CharField(max_length=120, blank=True, default="")
+    divisao = models.ForeignKey(
+        Unidade,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+        verbose_name="Divisão",
+    )
+    unidade = models.ForeignKey(
+        Unidade,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+        verbose_name="Unidade",
+    )
     cep = models.CharField(max_length=9, blank=True, default="")
     logradouro = models.CharField(max_length=160, blank=True, default="")
     bairro = models.CharField(max_length=120, blank=True, default="")
@@ -314,6 +328,7 @@ class ConfiguracaoSistema(TimeStampedModel):
     uf = models.CharField(max_length=2, blank=True, default="")
     numero = models.CharField(max_length=20, blank=True, default="")
     telefone = models.CharField(max_length=20, blank=True, default="")
+    ramal = models.CharField(max_length=20, blank=True, default="")
     email = models.EmailField(blank=True, default="")
     sede = models.CharField(max_length=200, blank=True, default="")
     nome_chefia = models.CharField(max_length=120, blank=True, default="")
@@ -362,8 +377,6 @@ class ConfiguracaoSistema(TimeStampedModel):
 
         self.nome_orgao = norm_upper_words(self.nome_orgao)
         self.sigla_orgao = norm_upper_words(self.sigla_orgao)
-        self.divisao = norm_upper_words(self.divisao)
-        self.unidade = norm_upper_words(self.unidade)
         self.sede = norm_upper_words(self.sede)
         self.nome_chefia = norm_upper_words(self.nome_chefia)
         self.cargo_chefia = norm_upper_words(self.cargo_chefia)
