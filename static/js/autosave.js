@@ -1,5 +1,9 @@
 (function () {
   'use strict';
+  var DELAY_INPUT = 1200;
+  var DELAY_CHANGE = 900;
+  var DELAY_BLUR = 350;
+  var DELAY_RETRY = 450;
   var DEBUG_AUTOSAVE = !!window.DEBUG_AUTOSAVE;
   function debug() {
     if (!DEBUG_AUTOSAVE) return;
@@ -166,7 +170,7 @@
         abortController = null;
         if (queueAfterFlight) {
           queueAfterFlight = false;
-          schedule(450);
+          schedule(DELAY_RETRY);
         }
       });
       return inFlight;
@@ -180,7 +184,7 @@
         dirtyFields: Array.from(dirtyFields),
         dirtySnapshots: Array.from(dirtySnapshots)
       });
-      inputTimer = window.setTimeout(send, typeof delay === 'number' ? delay : 1200);
+      inputTimer = window.setTimeout(send, typeof delay === 'number' ? delay : DELAY_INPUT);
     }
 
     function markDirty(fieldName) {
@@ -197,20 +201,20 @@
       if (!target || !target.name || target.type === 'hidden') return;
       markDirty(target.name);
       debug('campo alterado', { name: target.name, id: target.id || '', value: fieldValue(target) });
-      schedule(1200);
+      schedule(DELAY_INPUT);
     }, true);
     form.addEventListener('change', function (event) {
       var target = event.target;
       if (!target || !target.name) return;
       markDirty(target.name);
       debug('campo alterado', { name: target.name, id: target.id || '', value: fieldValue(target) });
-      schedule(900);
+      schedule(DELAY_CHANGE);
     }, true);
     form.addEventListener('blur', function (event) {
       var target = event.target;
       if (!target || !target.name) return;
       markDirty(target.name);
-      schedule(350);
+      schedule(DELAY_BLUR);
     }, true);
 
     form.addEventListener('submit', function () {
@@ -288,13 +292,13 @@
       var instance = forms.get(form);
       if (!instance) return;
       instance.markSnapshotChanged(name);
-      instance.schedule(typeof delay === 'number' ? delay : 900);
+      instance.schedule(typeof delay === 'number' ? delay : DELAY_CHANGE);
     },
     markDirty: function (form, fieldName, delay) {
       var instance = forms.get(form);
       if (!instance) return;
       instance.markDirty(fieldName);
-      instance.schedule(typeof delay === 'number' ? delay : 900);
+      instance.schedule(typeof delay === 'number' ? delay : DELAY_CHANGE);
     }
   };
   window.CV = window.CV || {};

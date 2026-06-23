@@ -6,6 +6,8 @@ from .base import *
 DEBUG = False
 SECRET_KEY = os.environ["SECRET_KEY"]
 
+OFICIO_NUMERO_INICIAL = {2026: 75}
+
 ALLOWED_HOSTS = [
     host.strip()
     for host in os.environ.get("ALLOWED_HOSTS", "").split(",")
@@ -58,7 +60,7 @@ LOGGING = {
     "handlers": {
         "file": {
             "class": "logging.FileHandler",
-            "filename": "/var/www/gerenciador-viagens/logs/django.log",
+            "filename": os.getenv("DJANGO_LOG_FILE", "/var/www/gerenciador-viagens/logs/django.log"),
         },
     },
     "loggers": {

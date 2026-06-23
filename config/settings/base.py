@@ -115,7 +115,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Quando definido, o próximo número gerado nunca fica abaixo do piso para aquele ano;
 # a sequência segue normalmente em diante (piso, piso+1, ...). Não afeta números já existentes.
 # Ex.: {2026: 75} faz o próximo ofício de 2026 ser 75/2026 (se o maior atual for < 75).
-OFICIO_NUMERO_INICIAL = {2026: 75}
+OFICIO_NUMERO_INICIAL = {}
 
 # Armazenamento de artefatos documentais gerados (assinatura, auditoria).
 MEDIA_URL = "media/"

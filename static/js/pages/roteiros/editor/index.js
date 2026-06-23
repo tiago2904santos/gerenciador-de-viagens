@@ -7,7 +7,7 @@ import {
   initTrechosFields,
   setTrechoDateValue,
   queryTrechoCards,
-} from './trechos.js?v=20260602';
+} from './trechos.js';
 import { createRetornoModule } from './retorno.js';
 import { createDiariasModule } from './diarias.js';
 import { createMapaModule } from './mapa.js';

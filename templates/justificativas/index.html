@@ -4,8 +4,8 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260609-termos">
-  <link rel="stylesheet" href="{% static 'css/justificativas.css' %}?v=20260610">
+  <link rel="stylesheet" href="{% static 'css/oficios.css' %}">
+  <link rel="stylesheet" href="{% static 'css/justificativas.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -92,5 +92,5 @@
 {% endblock %}
 
 {% block extra_js %}
-  <script src="{% static 'js/pages/oficios-justificativa-wizard.js' %}?v=20260610a" defer></script>
+  <script src="{% static 'js/pages/oficios-justificativa-wizard.js' %}" defer></script>
 {% endblock %}

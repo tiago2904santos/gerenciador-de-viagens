@@ -1,4 +1,4 @@
-import { initRoteirosEditor } from './pages/roteiros/editor/index.js?v=20260602';
+import { initRoteirosEditor } from './pages/roteiros/editor/index.js';
 
 function bootRoteirosEditor() {
   const form = document.getElementById('roteiro-editor-form');

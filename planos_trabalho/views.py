@@ -23,6 +23,7 @@ from documentos.services.responses import build_inline_pdf_response_from_downloa
 from documentos.services.timing import measure_step
 from documentos.services.types import DocumentoFormato
 from documentos.services.types import DocumentoTipo
+from eventos.constants import ETAPA_PT_OS
 from eventos.services import resolve_evento_from_request
 
 from .forms import AtividadePlanoTrabalhoForm
@@ -112,7 +113,7 @@ def _plano_lista_label(plano=None):
 
 def _redirect_plano_lista(plano):
     if getattr(plano, "evento_id", None):
-        return redirect("eventos:guiado_etapa", pk=plano.evento_id, etapa=4)
+        return redirect("eventos:guiado_etapa", pk=plano.evento_id, etapa=ETAPA_PT_OS)
     return redirect("planos_trabalho:index")
 
 
@@ -1106,7 +1107,7 @@ def excluir(request, pk):
         plano.delete()
         messages.success(request, f"Plano de Trabalho {numero} excluído.")
         if evento_id:
-            return redirect("eventos:guiado_etapa", pk=evento_id, etapa=4)
+            return redirect("eventos:guiado_etapa", pk=evento_id, etapa=ETAPA_PT_OS)
         return redirect("planos_trabalho:index")
     return render(
         request,

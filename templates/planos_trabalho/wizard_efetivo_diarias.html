@@ -3,8 +3,8 @@
 
 {% block extra_css %}
   {{ block.super }}
-  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260612-pt">
-  <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260614g-pt">
+  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}">
+  <link rel="stylesheet" href="{% static 'css/termos.css' %}">
 {% endblock %}
 
 {% block wizard_content %}
@@ -219,5 +219,5 @@
 
 {% block extra_js %}
   {{ block.super }}
-  <script src="{% static 'js/pages/planos-trabalho-wizard.js' %}?v=20260614-autosave" defer></script>
+  <script src="{% static 'js/pages/planos-trabalho-wizard.js' %}" defer></script>
 {% endblock %}

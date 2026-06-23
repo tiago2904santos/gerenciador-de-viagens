@@ -11,6 +11,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
+from eventos.constants import ETAPA_PT_OS
 from eventos.services import build_evento_document_seed
 from eventos.services import resolve_evento_from_request
 
@@ -58,7 +59,7 @@ def _ordem_back_label(ordem=None, evento=None):
 
 def _redirect_ordem_lista(ordem):
     if getattr(ordem, "evento_id", None):
-        return redirect("eventos:guiado_etapa", pk=ordem.evento_id, etapa=4)
+        return redirect("eventos:guiado_etapa", pk=ordem.evento_id, etapa=ETAPA_PT_OS)
     return redirect("ordens_servico:editar", pk=ordem.pk)
 
 

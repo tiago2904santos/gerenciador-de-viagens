@@ -1,9 +1,13 @@
+import logging
+
 from django.db.models import Prefetch
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
 from core.normalizers import normalize_plate
+
+logger = logging.getLogger(__name__)
 
 from cadastros.models import Servidor
 from cadastros.models import Unidade
@@ -100,22 +104,22 @@ def listar_oficios(
         try:
             queryset = queryset.filter(data_criacao__date__gte=criacao_de)
         except Exception:
-            pass
+            logger.exception("Erro ao filtrar ofícios por criacao_de=%r", criacao_de)
     if criacao_ate:
         try:
             queryset = queryset.filter(data_criacao__date__lte=criacao_ate)
         except Exception:
-            pass
+            logger.exception("Erro ao filtrar ofícios por criacao_ate=%r", criacao_ate)
     if viagem_de:
         try:
             queryset = queryset.filter(roteiro__isnull=False, roteiro__saida_dt__date__gte=viagem_de)
         except Exception:
-            pass
+            logger.exception("Erro ao filtrar ofícios por viagem_de=%r", viagem_de)
     if viagem_ate:
         try:
             queryset = queryset.filter(roteiro__isnull=False, roteiro__saida_dt__date__lte=viagem_ate)
         except Exception:
-            pass
+            logger.exception("Erro ao filtrar ofícios por viagem_ate=%r", viagem_ate)
     return queryset
 
 

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import base64
 
+from django.conf import settings
 from django.contrib.auth.decorators import login_not_required
 from django.http import HttpResponse
 from django.shortcuts import redirect
@@ -26,8 +27,8 @@ from .assinatura_services import validar_identidade
 from .models import AssinaturaDocumento
 
 
-_MAX_TENTATIVAS = 5
-_BLOQUEIO_MINUTOS = 15
+_MAX_TENTATIVAS = getattr(settings, "ASSINATURA_MAX_TENTATIVAS", 5)
+_BLOQUEIO_MINUTOS = getattr(settings, "ASSINATURA_BLOQUEIO_MINUTOS", 15)
 
 # Fontes manuscritas oferecidas ao signatário (self-hosted; ver static/css).
 FONTES_ASSINATURA = [

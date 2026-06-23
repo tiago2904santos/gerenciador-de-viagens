@@ -5,9 +5,9 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260611-os">
-  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260611-os-evento">
-  <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260611-os-evento-card">
+  <link rel="stylesheet" href="{% static 'css/oficios.css' %}">
+  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}">
+  <link rel="stylesheet" href="{% static 'css/termos.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -222,5 +222,5 @@
 
 {% block extra_js %}
   <script src="{% static 'js/pages/oficios-dados-viajantes.js' %}" defer></script>
-  <script src="{% static 'js/pages/ordens-servico-form.js' %}?v=20260611-fix-double-encode" defer></script>
+  <script src="{% static 'js/pages/ordens-servico-form.js' %}" defer></script>
 {% endblock %}

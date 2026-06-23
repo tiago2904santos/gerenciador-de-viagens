@@ -335,6 +335,8 @@ class ConfiguracaoSistema(TimeStampedModel):
         help_text="Sufixo aplicado à numeração do plano (ex.: 20/2026/ASCOM).",
     )
 
+    SINGLETON_PK = 1
+
     class Meta:
         verbose_name = "Configuração do sistema"
         verbose_name_plural = "Configurações do sistema"
@@ -352,7 +354,7 @@ class ConfiguracaoSistema(TimeStampedModel):
 
     @classmethod
     def get_singleton(cls):
-        obj, _ = cls.objects.get_or_create(pk=1, defaults={"prazo_justificativa_dias": 10})
+        obj, _ = cls.objects.get_or_create(pk=cls.SINGLETON_PK, defaults={"prazo_justificativa_dias": 10})
         return obj
 
     def save(self, *args, **kwargs):

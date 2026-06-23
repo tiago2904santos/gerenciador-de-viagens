@@ -17,6 +17,7 @@ from core.autosave import (
     filter_allowed_fields,
     parse_autosave_payload,
 )
+from eventos.constants import ETAPA_ROTEIROS
 from eventos.services import build_evento_document_seed
 from eventos.services import resolve_evento_from_request
 from .services.routing.route_exceptions import (
@@ -161,7 +162,7 @@ def novo(request):
             roteiro = criar_roteiro(form, roteiro_state, validated, diarias_resultado, evento=evento)
             messages.success(request, "Roteiro cadastrado com sucesso.")
             if evento is not None:
-                return redirect("eventos:guiado_etapa", pk=evento.pk, etapa=2)
+                return redirect("eventos:guiado_etapa", pk=evento.pk, etapa=ETAPA_ROTEIROS)
             return redirect("roteiros:detalhe", pk=roteiro.pk)
         for error in validated.get("errors", []):
             form.add_error(None, error)
@@ -249,7 +250,7 @@ def editar(request, pk):
             if next_url:
                 return redirect(next_url)
             if roteiro.evento_id:
-                return redirect("eventos:guiado_etapa", pk=roteiro.evento_id, etapa=2)
+                return redirect("eventos:guiado_etapa", pk=roteiro.evento_id, etapa=ETAPA_ROTEIROS)
             return redirect("roteiros:detalhe", pk=roteiro.pk)
         for error in validated.get("errors", []):
             form.add_error(None, error)
@@ -301,11 +302,11 @@ def excluir(request, pk):
         if not excluir_roteiro(roteiro):
             messages.error(request, "Este roteiro possui vínculos e não pode ser excluído.")
             if evento_id:
-                return redirect("eventos:guiado_etapa", pk=evento_id, etapa=2)
+                return redirect("eventos:guiado_etapa", pk=evento_id, etapa=ETAPA_ROTEIROS)
             return redirect("roteiros:detalhe", pk=roteiro.pk)
         messages.success(request, "Roteiro excluído com sucesso.")
         if evento_id:
-            return redirect("eventos:guiado_etapa", pk=evento_id, etapa=2)
+            return redirect("eventos:guiado_etapa", pk=evento_id, etapa=ETAPA_ROTEIROS)
         return redirect("roteiros:index")
 
     return render(

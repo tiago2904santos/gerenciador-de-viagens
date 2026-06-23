@@ -5,9 +5,9 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260609-termos">
-  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260609-termos">
-  <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260611-evento-periodo">
+  <link rel="stylesheet" href="{% static 'css/oficios.css' %}">
+  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}">
+  <link rel="stylesheet" href="{% static 'css/termos.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -289,5 +289,5 @@
 {% endblock %}
 
 {% block extra_js %}
-  <script src="{% static 'js/pages/termos-form.js' %}?v=20260611-autofill" defer></script>
+  <script src="{% static 'js/pages/termos-form.js' %}" defer></script>
 {% endblock %}

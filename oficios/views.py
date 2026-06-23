@@ -42,11 +42,13 @@ from cadastros.models import Combustivel
 from cadastros.models import Servidor
 from documentos.selectors import get_latest_artefato_pdf_for_oficio
 from documentos.services.downloads import download_documento_or_redirect_pdf_error
+from documentos.services.warm_cache import ensure_document_artifact_cached
 from documentos.services.warm_cache import pdf_artefato_original_acessivel
 from documentos.services.responses import build_inline_pdf_response_from_download_response
 from documentos.services.timing import measure_step
 from documentos.services.types import DocumentoFormato
 from documentos.services.types import DocumentoTipo
+from eventos.constants import ETAPA_OFICIOS
 from eventos.services import resolve_evento_from_request
 from ordens_servico.services import gerar_resposta_ordem_servico_documento
 from .forms import OficioDadosViajantesForm
@@ -108,7 +110,7 @@ def _oficio_back_label(oficio):
 def _redirect_lista_oficio(request, oficio, message):
     messages.success(request, message)
     if getattr(oficio, "evento_id", None):
-        return redirect("eventos:guiado_etapa", pk=oficio.evento_id, etapa=3)
+        return redirect("eventos:guiado_etapa", pk=oficio.evento_id, etapa=ETAPA_OFICIOS)
     return redirect("oficios:index")
 
 
@@ -196,7 +198,7 @@ def _wizard_dados_viajantes_context(
         custeio_value = form.data.get("custeio", "")
     else:
         custeio_value = getattr(form.instance, "custeio", "") if getattr(form, "instance", None) else ""
-    mostrar_custeio_observacao = custeio_value == "OUTRA_INSTITUICAO"
+    mostrar_custeio_observacao = custeio_value == Oficio.CUSTEIO_OUTRA_INSTITUICAO
     modelos_queryset = form.fields["modelo_motivo"].queryset
     equipe_ids = list(oficio.servidores.values_list("pk", flat=True))
     modo_motorista = oficio.motorista_modo or Oficio.MOTORISTA_MODO_SERVIDOR
@@ -529,7 +531,7 @@ def editar(request, pk):
 def dados_viajantes(request, pk):
     oficio = get_oficio_by_id(pk)
     form = OficioDadosViajantesForm(request.POST or None, instance=oficio)
-    transporte_form = OficioTransporteForm(request.POST or None, instance=Oficio.objects.get(pk=oficio.pk))
+    transporte_form = OficioTransporteForm(request.POST or None, instance=oficio)
     _prepare_dados_viajantes_form(form)
     _prepare_transporte_form(transporte_form)
     if request.method == "POST":
@@ -856,8 +858,6 @@ def justificativa_autosave(request, pk):
 def wizard_documentos(request, pk):
     oficio = get_oficio_by_id(pk)
     if request.method == "GET":
-        from documentos.services.warm_cache import ensure_document_artifact_cached
-
         ensure_document_artifact_cached(oficio)
     aval_doc = validar_oficio_para_documento(oficio)
     pendencias = list(aval_doc["pendencias"])
@@ -875,8 +875,6 @@ def wizard_documentos(request, pk):
             oficio.save(update_fields=["status", "updated_at"])
             return _redirect_lista_oficio(request, oficio, "Ofício finalizado com sucesso.")
         if nav_action == "wizard_back":
-            from documentos.services.warm_cache import ensure_document_artifact_cached
-
             ensure_document_artifact_cached(oficio)
             messages.info(request, "Retornando à etapa anterior.")
             return redirect("oficios:wizard_justificativa", pk=pk)
@@ -1141,11 +1139,11 @@ def excluir(request, pk):
                 "Não foi possível excluir o ofício porque ele está vinculado a outros registros.",
             )
             if evento_id:
-                return redirect("eventos:guiado_etapa", pk=evento_id, etapa=3)
+                return redirect("eventos:guiado_etapa", pk=evento_id, etapa=ETAPA_OFICIOS)
             return redirect("oficios:index")
         messages.success(request, "Ofício excluído com sucesso.")
         if evento_id:
-            return redirect("eventos:guiado_etapa", pk=evento_id, etapa=3)
+            return redirect("eventos:guiado_etapa", pk=evento_id, etapa=ETAPA_OFICIOS)
         return redirect("oficios:index")
     return render(
         request,

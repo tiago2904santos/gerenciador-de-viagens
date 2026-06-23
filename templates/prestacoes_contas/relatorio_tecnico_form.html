@@ -4,14 +4,14 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260619-rt-form">
-  <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}?v=20260620-ribbon-simple">
-  <link rel="stylesheet" href="{% static 'css/prestacoes-documento-preview.css' %}?v=20260621-preview">
+  <link rel="stylesheet" href="{% static 'css/oficios.css' %}">
+  <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}">
+  <link rel="stylesheet" href="{% static 'css/prestacoes-documento-preview.css' %}">
 {% endblock %}
 
 {% block extra_js %}
-  <script src="{% static 'js/pages/prestacoes-contas-rt.js' %}?v=20260620-prestacao"></script>
-  <script src="{% static 'js/pages/oficios-documentos-inline.js' %}?v=20260621-preview" defer></script>
+  <script src="{% static 'js/pages/prestacoes-contas-rt.js' %}"></script>
+  <script src="{% static 'js/pages/oficios-documentos-inline.js' %}" defer></script>
 {% endblock %}
 
 {% block content %}

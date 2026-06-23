@@ -4,8 +4,8 @@
 
 {% block extra_css %}
   {{ block.super }}
-  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260603">
-  <link rel="stylesheet" href="{% static 'css/oficios-documentos-inline.css' %}?v=20260622-mobile">
+  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}">
+  <link rel="stylesheet" href="{% static 'css/oficios-documentos-inline.css' %}">
 {% endblock %}
 
 {% block wizard_content %}
@@ -463,5 +463,5 @@
 
 {% block extra_js %}
   {{ block.super }}
-  <script src="{% static 'js/pages/oficios-documentos-inline.js' %}?v=20260603" defer></script>
+  <script src="{% static 'js/pages/oficios-documentos-inline.js' %}" defer></script>
 {% endblock %}

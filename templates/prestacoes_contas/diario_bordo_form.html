@@ -4,14 +4,14 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260620-diario">
-  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260620-diario">
-  <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}?v=20260620-diario3">
-  <link rel="stylesheet" href="{% static 'css/prestacoes-documento-preview.css' %}?v=20260621-preview">
+  <link rel="stylesheet" href="{% static 'css/oficios.css' %}">
+  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}">
+  <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}">
+  <link rel="stylesheet" href="{% static 'css/prestacoes-documento-preview.css' %}">
 {% endblock %}
 
 {% block extra_js %}
-  <script src="{% static 'js/pages/oficios-documentos-inline.js' %}?v=20260621-preview" defer></script>
+  <script src="{% static 'js/pages/oficios-documentos-inline.js' %}" defer></script>
 {% endblock %}
 
 {% block content %}

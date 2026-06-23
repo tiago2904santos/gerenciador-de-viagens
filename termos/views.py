@@ -19,6 +19,7 @@ from cadastros.models import Servidor
 from documentos.services.responses import build_inline_pdf_response
 from documentos.services.types import DocumentoFormato
 from documentos.services.types import DocumentoTipo
+from eventos.constants import ETAPA_TERMOS
 from eventos.services import build_evento_document_seed
 from eventos.services import resolve_evento_from_request
 
@@ -89,7 +90,7 @@ def _termo_back_label(termo=None, evento=None):
 
 def _redirect_termo_lista(termo):
     if getattr(termo, "evento_id", None):
-        return redirect("eventos:guiado_etapa", pk=termo.evento_id, etapa=5)
+        return redirect("eventos:guiado_etapa", pk=termo.evento_id, etapa=ETAPA_TERMOS)
     return redirect("termos:editar", pk=termo.pk)
 
 

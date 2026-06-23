@@ -1,5 +1,6 @@
-from pathlib import Path
 import re
+from pathlib import Path
+from urllib.parse import quote
 
 from django.contrib import messages
 from django.db.models import Q
@@ -20,7 +21,6 @@ from core.normalizers import normalize_spaces
 from core.presenters.meta import build_meta
 from core.utils.masks import format_protocolo
 from documentos.services.exceptions import DocumentValidationError
-from urllib.parse import quote
 
 from .assinatura_services import AssinaturaError
 from .assinatura_services import assinaturas_status
@@ -48,6 +48,13 @@ from .models import ModeloTextoRelatorioTecnico
 from .models import PrestacaoContas
 from .models import PrestacaoDocumentoAnexo
 from .models import RelatorioTecnico
+from .presenters import _build_campos_custeio
+from .presenters import _build_campos_modelo
+from .presenters import _build_identificacao
+from .presenters import _build_prestacao_steps
+from .presenters import _destino_display
+from .presenters import _periodo_display
+from .presenters import _trecho_display
 from .presenters import apresentar_prestacao_card
 from .selectors import listar_prestacoes
 from .services import gerar_relatorio_tecnico_docx
@@ -57,100 +64,6 @@ from .services import diaria_inicial_da_prestacao
 from .services import garantir_campos_padrao_relatorio_tecnico
 from .services import nome_arquivo_prestacao_consolidado
 from .services import nome_arquivo_rt
-
-
-def _destino_display(oficio) -> str:
-    try:
-        destinos = list(oficio.roteiro.destinos.select_related("cidade", "estado").order_by("ordem"))
-        if not destinos:
-            return ""
-        parts = [f"{d.cidade} ({d.estado.sigla})" for d in destinos[:3]]
-        result = ", ".join(parts)
-        if len(destinos) > 3:
-            result += f" +{len(destinos) - 3}"
-        return result
-    except Exception:
-        return ""
-
-
-def _periodo_display(oficio) -> str:
-    try:
-        from django.utils import timezone as tz_module
-        roteiro = oficio.roteiro
-        saida_dt = roteiro.saida_dt
-        if not saida_dt:
-            return ""
-        current_tz = tz_module.get_current_timezone()
-        saida = saida_dt.astimezone(current_tz).date() if tz_module.is_aware(saida_dt) else saida_dt.date()
-        chegada_dt = getattr(roteiro, "retorno_chegada_dt", None) or getattr(roteiro, "chegada_dt", None)
-        if chegada_dt:
-            chegada = chegada_dt.astimezone(current_tz).date() if tz_module.is_aware(chegada_dt) else chegada_dt.date()
-            if saida == chegada:
-                return saida.strftime("%d/%m/%Y")
-            return f"{saida.strftime('%d/%m/%Y')} a {chegada.strftime('%d/%m/%Y')}"
-        return saida.strftime("%d/%m/%Y")
-    except Exception:
-        return ""
-
-
-def _build_campos_modelo(form) -> list:
-    """Para cada campo de texto longo: select de modelos + textarea + URL de gerência."""
-    base_url = reverse("prestacoes_contas:modelos_index")
-    campos = []
-    for campo, label in CAMPOS_COM_MODELO:
-        select = form[f"modelo_{campo}"]
-        campos.append(
-            {
-                "campo": campo,
-                "label": label,
-                "select": select,
-                "textarea": form[campo],
-                "manage_url": f"{base_url}#grupo-{campo}",
-                "tem_modelos": select.field.queryset.exists(),
-            }
-        )
-    return campos
-
-
-def _build_campos_custeio(form) -> list:
-    campos = [
-        {
-            "campo": "diaria",
-            "label": "Diária",
-            "field": form["diaria"],
-            "other": None,
-            "uses_other": False,
-        }
-    ]
-    for campo, label in CAMPOS_CUSTEIO_COM_OUTRO:
-        campos.append(
-            {
-                "campo": campo,
-                "label": label,
-                "field": form[campo],
-                "other": form[f"{campo}_outro"],
-                "uses_other": True,
-            }
-        )
-    return campos
-
-
-def _build_identificacao(pc) -> dict:
-    oficio = pc.oficio
-    servidor = pc.servidor
-    return {
-        "numero": oficio.numero_formatado,
-        "protocolo": format_protocolo(oficio.protocolo) or "—",
-        "data_oficio": oficio.data_criacao.strftime("%d/%m/%Y") if oficio.data_criacao else "—",
-        "custeio": oficio.get_custeio_display() if oficio.custeio else "—",
-        "destino": _destino_display(oficio) or "—",
-        "periodo": _periodo_display(oficio) or "—",
-        "nome_servidor": servidor.nome,
-        "rg_servidor": servidor.rg_formatado,
-        "cargo": str(servidor.cargo) if servidor.cargo_id else "—",
-        "unidade": str(servidor.unidade) if servidor.unidade_id else "",
-        "is_motorista": oficio.motorista_id == servidor.id,
-    }
 
 
 def _marcar_prestacao_em_preenchimento(prestacao):
@@ -188,48 +101,6 @@ def _documento_anexos_resumo(prestacao, tipo):
         nome = anexos[0].nome_original or Path(anexos[0].arquivo.name).name
         return {"status": True, "value": nome}
     return {"status": True, "value": f"{len(anexos)} arquivos anexados"}
-
-
-def _build_prestacao_steps(prestacao, atual: str) -> list:
-    """Etapas do wizard da prestação de contas."""
-    documentos_url = reverse("prestacoes_contas:documentos", args=[prestacao.pk])
-    rt_url = reverse("prestacoes_contas:rt_criar", args=[prestacao.pk])
-    diario_url = reverse("prestacoes_contas:diario_criar", args=[prestacao.pk])
-    consolidado_url = reverse("prestacoes_contas:consolidado", args=[prestacao.pk])
-    etapas = [
-        ("documentos", "Etapa 1", "Documentos", documentos_url),
-        ("rt", "Etapa 2", "Relatório Técnico", rt_url),
-        ("diario", "Etapa 3", "Diário de Bordo", diario_url),
-        ("consolidado", "Etapa 4", "PDF Final", consolidado_url),
-    ]
-    steps = []
-    atingiu_atual = False
-    for chave, step_label, titulo, url in etapas:
-        if chave == atual:
-            state_class = "is-current"
-            aria_current = "step"
-            atingiu_atual = True
-            status = "Em edição"
-        elif atingiu_atual:
-            state_class = ""
-            aria_current = ""
-            status = "A seguir"
-        else:
-            state_class = "is-complete"
-            aria_current = ""
-            status = "Concluído"
-        steps.append(
-            {
-                "marker": "✓" if state_class == "is-complete" else str(len(steps) + 1),
-                "step_label": step_label,
-                "title": titulo,
-                "status": status,
-                "state_class": state_class,
-                "aria_current": aria_current,
-                "url": url,
-            }
-        )
-    return steps
 
 
 def _autosave_version(obj, field_name="atualizado_em") -> int:
@@ -338,39 +209,6 @@ def _preview_error_response(exc) -> HttpResponse:
         f"{escape(str(exc))}</div></body></html>"
     )
     return HttpResponse(html, content_type="text/html; charset=utf-8", status=422)
-
-
-def _trecho_display(linha) -> dict:
-    """Dados somente-leitura de um trecho (origem/destino/datas) para o card do diário."""
-    from django.utils import timezone as tz
-
-    trecho = linha.trecho
-
-    def cidade(c, e):
-        if c is not None:
-            return str(getattr(c, "nome", c)).upper()
-        if e is not None:
-            return str(getattr(e, "sigla", e)).upper()
-        return "—"
-
-    def fmt(dt):
-        if not dt:
-            return {"data": "", "hora": ""}
-        local = tz.localtime(dt) if tz.is_aware(dt) else dt
-        return {"data": local.strftime("%d/%m/%Y"), "hora": local.strftime("%H:%M")}
-
-    origem = cidade(getattr(trecho, "origem_cidade", None), getattr(trecho, "origem_estado", None)) if trecho else "—"
-    destino = cidade(getattr(trecho, "destino_cidade", None), getattr(trecho, "destino_estado", None)) if trecho else "—"
-    saida = fmt(getattr(trecho, "saida_dt", None)) if trecho else {"data": "", "hora": ""}
-    chegada = fmt(getattr(trecho, "chegada_dt", None)) if trecho else {"data": "", "hora": ""}
-    return {
-        "ordem": linha.ordem + 1,
-        "origem": origem,
-        "destino": destino,
-        "rota": f"{origem} → {destino}",
-        "saida": saida,
-        "chegada": chegada,
-    }
 
 
 def index(request):
