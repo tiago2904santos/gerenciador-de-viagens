@@ -44,14 +44,25 @@
             data-edit-fields="{{ row.edit_fields_json }}"
             aria-label="Editar"
             data-tooltip="Editar"
-            title="Editar"
           >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="edit" only %}</button>
         {% else %}
           {% include "components/ui/buttons/icon_button.html" with href=row.edit_url action="edit" aria_label="Editar" tooltip="Editar" only %}
         {% endif %}
       {% endif %}
       {% if row.delete_url %}
-        {% include "components/ui/buttons/icon_button.html" with href=row.delete_url action="delete" aria_label="Excluir" tooltip="Excluir" only %}
+        {% if row.delete_modal %}
+          <button
+            class="cv-icon-btn cv-icon-btn--delete"
+            type="button"
+            data-delete-modal-trigger
+            data-delete-url="{{ row.delete_url }}"
+            data-delete-label="{{ row.title }}"
+            aria-label="Excluir"
+            data-tooltip="Excluir"
+          >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="delete" only %}</button>
+        {% else %}
+          {% include "components/ui/buttons/icon_button.html" with href=row.delete_url action="delete" aria_label="Excluir" tooltip="Excluir" only %}
+        {% endif %}
       {% endif %}
     </div>
   </div>

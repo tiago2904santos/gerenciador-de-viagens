@@ -185,6 +185,12 @@
     if (!scope || scope.getAttribute(BOUND) === 'true') {
       return false;
     }
+    // Cede o controle quando o motor server-side (live-search-submit) é o
+    // responsável pelo filtro neste escopo: evita os dois motores brigando.
+    if (scope.querySelector && scope.querySelector('[data-cv-live-submit-form]')) {
+      scope.setAttribute(BOUND, 'true');
+      return false;
+    }
     scope.setAttribute(BOUND, 'true');
 
     var filterInputs = Array.prototype.slice.call(scope.querySelectorAll('[data-cv-filter]'));

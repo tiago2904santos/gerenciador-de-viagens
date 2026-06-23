@@ -107,13 +107,13 @@
                   {% for t in di.termos %}
                     {% if t.disponivel %}
                       <span class="cv-icon-btn-group">
-                        <a class="cv-icon-btn cv-icon-btn--preview" href="{{ t.inline_url }}" target="_blank" rel="noopener noreferrer" aria-label="Visualizar termo" data-tooltip="Visualizar termo" title="Visualizar termo">
+                        <a class="cv-icon-btn cv-icon-btn--preview" href="{{ t.inline_url }}" target="_blank" rel="noopener noreferrer" aria-label="Visualizar termo" data-tooltip="Visualizar termo">
                           {% include "dev/ui_lab/partials/_cv_icon.html" with icon="eye" only %}
                         </a>
-                        <a class="cv-icon-btn cv-icon-btn--pdf" href="{{ t.download_pdf_url }}" aria-label="Baixar termo em PDF" data-tooltip="Baixar termo em PDF" title="Baixar termo em PDF">
+                        <a class="cv-icon-btn cv-icon-btn--pdf" href="{{ t.download_pdf_url }}" aria-label="Baixar termo em PDF" data-tooltip="Baixar termo em PDF">
                           {% include "dev/ui_lab/partials/_cv_icon.html" with icon="pdf" only %}
                         </a>
-                        <a class="cv-icon-btn cv-icon-btn--docx" href="{{ t.download_docx_url }}" aria-label="Baixar termo em DOCX" data-tooltip="Baixar termo em DOCX" title="Baixar termo em DOCX">
+                        <a class="cv-icon-btn cv-icon-btn--docx" href="{{ t.download_docx_url }}" aria-label="Baixar termo em DOCX" data-tooltip="Baixar termo em DOCX">
                           {% include "dev/ui_lab/partials/_cv_icon.html" with icon="docx" only %}
                         </a>
                       </span>
@@ -121,13 +121,13 @@
                   {% endfor %}
                 {% else %}
                   <span class="cv-icon-btn-group">
-                    <button class="cv-icon-btn cv-icon-btn--preview" type="button" data-open-all-termos aria-label="Visualizar termos" data-tooltip="Visualizar termos" title="Visualizar termos">
+                    <button class="cv-icon-btn cv-icon-btn--preview" type="button" data-open-all-termos aria-label="Visualizar termos" data-tooltip="Visualizar termos">
                       {% include "dev/ui_lab/partials/_cv_icon.html" with icon="eye" only %}
                     </button>
-                    <a class="cv-icon-btn cv-icon-btn--pdf" href="{{ di.termos_download_todos_pdf_url }}" data-download-all-termos aria-label="Baixar termos em PDF" data-tooltip="Baixar termos em PDF" title="Baixar termos em PDF">
+                    <a class="cv-icon-btn cv-icon-btn--pdf" href="{{ di.termos_download_todos_pdf_url }}" data-download-all-termos aria-label="Baixar termos em PDF" data-tooltip="Baixar termos em PDF">
                       {% include "dev/ui_lab/partials/_cv_icon.html" with icon="pdf" only %}
                     </a>
-                    <a class="cv-icon-btn cv-icon-btn--docx" href="{{ di.termos_download_todos_docx_url }}" aria-label="Baixar termos em DOCX" data-tooltip="Baixar termos em DOCX" title="Baixar termos em DOCX">
+                    <a class="cv-icon-btn cv-icon-btn--docx" href="{{ di.termos_download_todos_docx_url }}" aria-label="Baixar termos em DOCX" data-tooltip="Baixar termos em DOCX">
                       {% include "dev/ui_lab/partials/_cv_icon.html" with icon="docx" only %}
                     </a>
                   </span>

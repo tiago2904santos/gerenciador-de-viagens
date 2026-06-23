@@ -1,36 +1,49 @@
 {% extends "base.html" %}
 {% block title %}{{ page_title }}{% endblock %}
 {% block content %}
-  <div class="page-shell page-shell--standard-simple">
+  <div class="page-shell page-shell--wizard">
     {% include "components/ui/headers/header_stack_simple.html" with eyebrow="CADASTROS" title=page_title description=page_description icon_label="SV" module_label="Servidores" only %}
 
-    <form class="main-form-panel" method="post" novalidate data-servidor-sem-rg-form data-cv-state-toggle data-cv-state-binary>
-      {% csrf_token %}
-      {% include "components/ui/layouts/form_section.html" with title="Identificação" description="Nome, cargo e CPF são obrigatórios. RG e telefone são opcionais." section_id="servidores-form-id" only %}
-      <div class="field-grid">
-        {% include "components/forms/form_field.html" with field=form.nome size_class="field-size-2" only %}
-        {% include "components/forms/input_with_action.html" with field=form.cargo action_url=cargos_manage_url action_label="Gerenciar cargos" size_class="field-size-2" only %}
+    <main class="main-form-panel main-form-panel--stack">
+      <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
+        <form method="post" novalidate>
+          {% csrf_token %}
+          <section class="cv-wizard-section-card" aria-labelledby="servidores-form-card-title">
+            <header class="cv-wizard-section-header">
+              <div class="cv-wizard-section-header__copy">
+                <h3 class="cv-wizard-section-title" id="servidores-form-card-title">Dados do servidor</h3>
+              </div>
+            </header>
 
-        {% include "components/forms/form_field.html" with field=form.cpf size_class="field-size-1" only %}
-        {% include "components/forms/form_field.html" with field=form.telefone size_class="field-size-1" only %}
-        <div class="field app-form-field field-size-2 field-rg-wrap" data-rg-field-wrap>
-          <label class="app-form-label" for="{{ form.rg.id_for_label }}">{{ form.rg.label }}</label>
-          <div class="cv-field-row">
-            {{ form.rg }}
-            {{ form.sem_rg }}
-            {% if form.sem_rg.value %}
-              {% include "components/ui/buttons/field_action_button.html" with label="Não possui RG" variant="danger" type="button" extra_class="cv-field-side-action--toggle cv-field-side-action--state is-inactive" aria_label="Alternar situação do RG" aria_pressed=True data_rg_toggle=True only %}
-            {% else %}
-              {% include "components/ui/buttons/field_action_button.html" with label="Possui RG" variant="success" type="button" extra_class="cv-field-side-action--toggle cv-field-side-action--state is-active" aria_label="Alternar situação do RG" aria_pressed=False data_rg_toggle=True only %}
-            {% endif %}
-          </div>
-          {% if form.rg.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.rg.errors only %}{% endif %}
-          {% if form.sem_rg.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.sem_rg.errors only %}{% endif %}
-        </div>
+            <div class="cv-wizard-section-body">
+              <section class="wizard-inner-section" aria-labelledby="servidores-form-id">
+                <div class="field-grid field-grid--cols-2">
+                  {% include "components/forms/form_field.html" with field=form.nome size_class="field-size-1" only %}
+                  {% include "components/forms/input_with_action.html" with field=form.cargo action_url=cargos_manage_url action_label="Gerenciar cargos" size_class="field-size-1" only %}
+                </div>
 
-        {% include "components/forms/form_field.html" with field=form.unidade size_class="field-size-4" only %}
+                <div class="field-grid field-grid--cols-3">
+                  {% include "components/forms/form_field.html" with field=form.cpf size_class="field-size-1" only %}
+                  {% include "components/forms/form_field.html" with field=form.telefone size_class="field-size-1" only %}
+                  <div class="field app-form-field field-size-1 field-rg-wrap" data-rg-field-wrap>
+                    <label class="app-form-label" for="{{ form.rg.id_for_label }}">{{ form.rg.label }}</label>
+                    <div class="cv-field-row">
+                      {{ form.rg }}
+                    </div>
+                    {% if form.rg.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.rg.errors only %}{% endif %}
+                  </div>
+                </div>
+
+                <div class="field-grid">
+                  {% include "components/forms/form_field.html" with field=form.unidade size_class="field-size-4" only %}
+                </div>
+              </section>
+            </div>
+
+            {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar" secondary_url=back_url primary_label="Salvar" only %}
+          </section>
+        </form>
       </div>
-      {% include "components/ui/layouts/card_footer_actions.html" with secondary_label="Voltar" secondary_url=back_url primary_label="Salvar" only %}
-    </form>
+    </main>
   </div>
 {% endblock %}

@@ -2,6 +2,8 @@
 <div class="page-shell page-shell--list" data-cv-realtime-filter-scope>
   {% include "components/ui/headers/header_stack_filters.html" with eyebrow=eyebrow title=title icon_label=brand_mark form_action=search_form_action search_name="q" search_value=q search_placeholder=search_placeholder search_clear_url=search_clear_url primary_action_label=header_action_label|default_if_none:action_label primary_action_url=header_action_url|default_if_none:action_url %}
 
-  {% include "components/lists/list_grid.html" with cards=cards empty_message=empty_message empty_action_label=action_label empty_action_url=action_url only %}
-  {% include "components/lists/pagination.html" %}
+  <div class="list-panel">
+    {% include "components/lists/list_grid.html" with cards=cards empty_message=empty_message empty_action_label=action_label empty_action_url=action_url only %}
+    {% include "components/lists/pagination.html" %}
+  </div>
 </div>

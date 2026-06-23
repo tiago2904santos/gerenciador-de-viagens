@@ -75,28 +75,32 @@
    2. Estado vazio
    -------------------------------------------------------------------------- */
 .empty-state {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(248, 251, 255, 0.95));
-  border: 1px dashed rgba(18, 58, 99, 0.26);
+  background: color-mix(in srgb, var(--color-surface) 72%, transparent);
+  border: 1px dashed color-mix(in srgb, var(--color-border-soft) 82%, transparent);
   border-radius: var(--radius-md);
-  color: var(--color-muted);
+  color: var(--theme-text-muted);
   grid-column: 1 / -1;
-  padding: var(--space-6);
+  padding: var(--space-5);
   text-align: center;
 }
 
-.empty-state h3 {
-  color: var(--color-text);
-  font-size: var(--font-size-lg);
-  margin-bottom: var(--space-2);
-}
-
+.empty-state__message,
 .empty-state p {
+  color: var(--theme-text-muted);
+  font-size: var(--font-size-md);
+  font-weight: 600;
   margin: 0 auto;
-  max-width: 60ch;
+  max-width: 48ch;
 }
 
-.empty-state .btn {
-  margin-top: var(--space-4);
+html[data-theme="dark"] .empty-state {
+  background: color-mix(in srgb, var(--color-surface) 38%, #0b1422);
+  border-color: color-mix(in srgb, var(--color-border-soft) 55%, transparent);
+}
+
+html[data-theme="dark"] .empty-state__message,
+html[data-theme="dark"] .empty-state p {
+  color: color-mix(in srgb, var(--theme-text-body) 82%, white);
 }
 
 .list-pagination {

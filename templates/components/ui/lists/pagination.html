@@ -1,15 +1,45 @@
 {% if page_obj and page_obj.paginator.num_pages > 1 %}
 <nav class="pagination-shell" aria-label="Paginação">
-  <p class="pagination-shell__info">
-    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }} · {{ page_obj.paginator.count }} registro{{ page_obj.paginator.count|pluralize }}
+  <p class="pagination-shell__info" aria-live="polite">
+    <span class="pagination-shell__info-pill">
+      <span class="pagination-shell__info-label">Mostrando</span>
+      <strong>{{ page_obj.start_index }}-{{ page_obj.end_index }}</strong>
+      <span class="pagination-shell__info-separator">de</span>
+      <strong>{{ page_obj.paginator.count }}</strong>
+      <span>registros</span>
+    </span>
   </p>
   <div class="pagination-shell__controls">
     {% if page_obj.has_previous %}
-      <a class="cv-btn cv-btn--secondary cv-btn--sm" href="?{% if q %}q={{ q }}&{% endif %}page=1">Primeira</a>
-      <a class="cv-btn cv-btn--secondary cv-btn--sm" href="?{% if q %}q={{ q }}&{% endif %}page={{ page_obj.previous_page_number }}">Anterior</a>
+      <a class="pagination-shell__nav" href="?{% if page_querystring %}{{ page_querystring }}&{% endif %}page={{ page_obj.previous_page_number }}" aria-label="Página anterior">
+        <span class="pagination-shell__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="arrow-left" only %}</span>
+      </a>
+    {% else %}
+      <span class="pagination-shell__nav is-disabled" aria-disabled="true">
+        <span class="pagination-shell__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="arrow-left" only %}</span>
+      </span>
     {% endif %}
+
+    <span class="pagination-shell__pages" aria-label="Páginas">
+      {% for number in pagination_pages|default:page_obj.paginator.page_range %}
+        {% if number == "..." %}
+          <span class="pagination-shell__ellipsis" aria-hidden="true">...</span>
+        {% elif number == page_obj.number %}
+          <span class="pagination-shell__page is-current" aria-current="page">{{ number }}</span>
+        {% else %}
+          <a class="pagination-shell__page" href="?{% if page_querystring %}{{ page_querystring }}&{% endif %}page={{ number }}" aria-label="Ir para a página {{ number }}">{{ number }}</a>
+        {% endif %}
+      {% endfor %}
+    </span>
+
     {% if page_obj.has_next %}
-      <a class="cv-btn cv-btn--primary cv-btn--sm" href="?{% if q %}q={{ q }}&{% endif %}page={{ page_obj.next_page_number }}">Próxima</a>
+      <a class="pagination-shell__nav pagination-shell__nav--primary" href="?{% if page_querystring %}{{ page_querystring }}&{% endif %}page={{ page_obj.next_page_number }}" aria-label="Próxima página">
+        <span class="pagination-shell__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="arrow-right" only %}</span>
+      </a>
+    {% else %}
+      <span class="pagination-shell__nav is-disabled" aria-disabled="true">
+        <span class="pagination-shell__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="arrow-right" only %}</span>
+      </span>
     {% endif %}
   </div>
 </nav>

@@ -51,17 +51,17 @@
           {% if s.has_termo %}
           <div class="oficio-lc__traveller-termo cv-icon-btn-group">
             {% if s.termo_open_url %}
-            <a class="cv-icon-btn cv-icon-btn--preview" href="{{ s.termo_open_url }}" target="_blank" rel="noopener noreferrer" aria-label="Visualizar termo de autorização de {{ s.name }}" data-tooltip="Visualizar termo" title="Visualizar termo">
+            <a class="cv-icon-btn cv-icon-btn--preview" href="{{ s.termo_open_url }}" target="_blank" rel="noopener noreferrer" aria-label="Visualizar termo de autorização de {{ s.name }}" data-tooltip="Visualizar termo">
               {% include "dev/ui_lab/partials/_cv_icon.html" with icon="eye" only %}
             </a>
             {% endif %}
             {% if s.termo_pdf_url %}
-            <a class="cv-icon-btn cv-icon-btn--pdf" href="{{ s.termo_pdf_url }}" aria-label="Baixar termo de autorização em PDF de {{ s.name }}" data-tooltip="PDF" title="PDF" data-direct-download="true">
+            <a class="cv-icon-btn cv-icon-btn--pdf" href="{{ s.termo_pdf_url }}" aria-label="Baixar termo de autorização em PDF de {{ s.name }}" data-tooltip="PDF" data-direct-download="true">
               {% include "dev/ui_lab/partials/_cv_icon.html" with icon="pdf" only %}
             </a>
             {% endif %}
             {% if s.termo_docx_url %}
-            <a class="cv-icon-btn cv-icon-btn--docx" href="{{ s.termo_docx_url }}" aria-label="Baixar termo de autorização em DOCX de {{ s.name }}" data-tooltip="DOCX" title="DOCX" data-direct-download="true">
+            <a class="cv-icon-btn cv-icon-btn--docx" href="{{ s.termo_docx_url }}" aria-label="Baixar termo de autorização em DOCX de {{ s.name }}" data-tooltip="DOCX" data-direct-download="true">
               {% include "dev/ui_lab/partials/_cv_icon.html" with icon="docx" only %}
             </a>
             {% endif %}

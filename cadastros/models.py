@@ -213,6 +213,7 @@ class Servidor(TimeStampedModel):
     def save(self, *args, **kwargs):
         self.nome = normalize_upper(self.nome)
         self.cpf = normalize_digits(self.cpf)
+        self.sem_rg = not (self.rg or "").strip() or (self.rg or "").strip().upper() == RG_NAO_POSSUI_CANONICAL
         if self.sem_rg:
             self.rg = RG_NAO_POSSUI_CANONICAL
         else:

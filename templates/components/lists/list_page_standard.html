@@ -1,11 +1,15 @@
 {# Lista Standard oficial, promovida do modelo aprovado no UI Lab. #}
-<div class="page-shell page-shell--list" data-cv-realtime-filter-scope>
+<div class="page-shell page-shell--list"{% if not disable_realtime_filter %} data-cv-realtime-filter-scope{% endif %}>
   {% include "components/ui/headers/header_stack_filters.html" with eyebrow=eyebrow title=title icon_label=brand_mark form_action=request.path search_name="q" search_value=q search_placeholder=search_placeholder search_clear_url=request.path %}
 
   <div class="list-panel">
-    {% include "components/lists/simple_list.html" with rows=rows empty_message=empty_message empty_action_label=action_label empty_action_url=action_url %}
     {% include "components/lists/pagination.html" %}
+    {% include "components/lists/simple_list.html" with rows=rows empty_message=empty_message empty_action_label=action_label empty_action_url=action_url hide_realtime_count=hide_realtime_count %}
   </div>
+
+  {% if delete_modal_enabled %}
+    {% include "components/ui/modals/delete_confirm_modal.html" %}
+  {% endif %}
 
   {% if action_label and action_url %}
     {% include "components/ui/buttons/floating_action.html" with href=action_url label=action_label icon="plus" variant="primary" aria_label=action_aria_label|default:action_label only %}

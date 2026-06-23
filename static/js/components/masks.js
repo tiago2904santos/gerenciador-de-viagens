@@ -24,9 +24,10 @@
 
   function maskRg(value) {
     var v = onlyAlnum(value).slice(0, 9);
-    if (v.length <= 2) return v;
-    if (v.length <= 5) return v.slice(0, 2) + '.' + v.slice(2);
-    if (v.length <= 8) return v.slice(0, 2) + '.' + v.slice(2, 5) + '.' + v.slice(5);
+    if (v.length <= 1) return v;
+    if (v.length <= 4) return v.slice(0, 1) + '.' + v.slice(1);
+    if (v.length <= 7) return v.slice(0, 1) + '.' + v.slice(1, 4) + '.' + v.slice(4);
+    if (v.length === 8) return v.slice(0, 1) + '.' + v.slice(1, 4) + '.' + v.slice(4, 7) + '-' + v.slice(7);
     return v.slice(0, 2) + '.' + v.slice(2, 5) + '.' + v.slice(5, 8) + '-' + v.slice(8);
   }
 

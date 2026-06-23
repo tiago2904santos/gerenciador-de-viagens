@@ -2,6 +2,7 @@
 from urllib.parse import urlencode
 
 from django.contrib import messages
+from django.core.paginator import Paginator
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.shortcuts import redirect
@@ -69,8 +70,22 @@ from .services_via_cep import ViaCEPNotFoundError
 from .services_via_cep import ViaCEPServiceError
 
 
+SERVIDORES_PER_PAGE = 25
+
+
 def _render_listagem(request, template_name, context):
     return render(request, template_name, context)
+
+
+def _pagination_pages(page_obj, *, on_each_side=1, on_ends=1):
+    return [
+        page_number if isinstance(page_number, int) else "..."
+        for page_number in page_obj.paginator.get_elided_page_range(
+            page_obj.number,
+            on_each_side=on_each_side,
+            on_ends=on_ends,
+        )
+    ]
 
 
 def _vinculo_error(request):
@@ -651,13 +666,16 @@ def combustivel_delete(request, pk):
 def servidores_index(request):
     q = request.GET.get("q", "").strip()
     servidores = listar_servidores(q=q)
+    paginator = Paginator(servidores, SERVIDORES_PER_PAGE)
+    page_obj = paginator.get_page(request.GET.get("page"))
     rows = [
         apresentar_linha_lista_simples_servidor(
             servidor,
             edit_url=reverse("cadastros:servidor_update", args=[servidor.pk]),
             delete_url=reverse("cadastros:servidor_delete", args=[servidor.pk]),
+            delete_modal=True,
         )
-        for servidor in servidores
+        for servidor in page_obj.object_list
     ]
     return _render_listagem(
         request,
@@ -667,6 +685,9 @@ def servidores_index(request):
             "page_description": "Servidores vinculados aos fluxos documentais.",
             "rows": rows,
             "q": q,
+            "page_obj": page_obj,
+            "pagination_pages": _pagination_pages(page_obj),
+            "page_querystring": urlencode({"q": q}) if q else "",
         },
     )
 
@@ -718,6 +739,8 @@ def servidor_update(request, pk):
 
 def servidor_delete(request, pk):
     servidor = get_servidor_by_id(pk)
+    if request.method != "POST":
+        return redirect("cadastros:servidores_index")
     if request.method == "POST":
         try:
             excluir_servidor(servidor)
@@ -726,16 +749,6 @@ def servidor_delete(request, pk):
             return redirect("cadastros:servidores_index")
         messages.success(request, "Servidor excluído com sucesso.")
         return redirect("cadastros:servidores_index")
-    return render(
-        request,
-        "cadastros/servidores/confirm_delete.html",
-        {
-            "page_title": "Excluir servidor",
-            "page_description": "Esta ação excluirá o cadastro. Se houver vínculos com outros registros, a exclusão será bloqueada.",
-            "object": servidor,
-            "back_url": reverse("cadastros:servidores_index"),
-        },
-    )
 
 
 def viaturas_index(request):

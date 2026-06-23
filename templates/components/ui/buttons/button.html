@@ -9,6 +9,7 @@
      {% if data_autosave_link %}data-autosave-link="1"{% endif %}
      {% if data_quick_add_close %}data-quick-add-close{% endif %}
      {% if data_cv_filter_clear %}data-cv-filter-clear{% endif %}
+     {% if data_delete_modal_cancel %}data-delete-modal-cancel{% endif %}
   >
     {% if icon and not icon_after %}
       <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon=icon only %}</span>
@@ -28,6 +29,7 @@
           {% if data_autosave_link %}data-autosave-link="1"{% endif %}
           {% if data_quick_add_close %}data-quick-add-close{% endif %}
           {% if data_cv_filter_clear %}data-cv-filter-clear{% endif %}
+          {% if data_delete_modal_cancel %}data-delete-modal-cancel{% endif %}
   >
     {% if icon and not icon_after %}
       <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon=icon only %}</span>

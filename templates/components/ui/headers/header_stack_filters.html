@@ -1,6 +1,6 @@
 {# header_stack_filters.html — ver docs/ui-components.md #}
 {% if form_action %}
-  <form class="page-header-stack{% if extra_class %} {{ extra_class }}{% endif %}" method="get" action="{{ form_action }}">
+  <form class="page-header-stack{% if extra_class %} {{ extra_class }}{% endif %}" method="get" action="{{ form_action }}" data-cv-live-submit-form>
 {% else %}
   <div class="page-header-stack{% if extra_class %} {{ extra_class }}{% endif %}">
 {% endif %}
@@ -28,6 +28,7 @@
           placeholder="{{ search_placeholder|default:'Buscar...' }}"
           aria-label="{{ search_placeholder|default:'Buscar' }}"
           data-cv-filter="search"
+          data-cv-live-submit-input
           {% if search_value %}value="{{ search_value }}"{% endif %}
         >
       </div>

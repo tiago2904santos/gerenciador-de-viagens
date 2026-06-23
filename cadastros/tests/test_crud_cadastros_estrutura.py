@@ -158,6 +158,38 @@ class ServidorCrudTests(TestCase):
         response = self.client.post(reverse("cadastros:servidor_delete", args=[servidor.pk]))
         self.assertRedirects(response, reverse("cadastros:servidores_index"))
 
+    def test_servidores_index_limita_25_por_pagina(self):
+        for index in range(30):
+            Servidor.objects.create(nome=f"SERVIDOR PAGINADO {index:02d}", cargo=self.cargo)
+
+        response = self.client.get(reverse("cadastros:servidores_index"), {"q": "PAGINADO"})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["page_obj"].paginator.per_page, 25)
+        self.assertEqual(len(response.context["rows"]), 25)
+        self.assertContains(response, "Mostrando")
+        self.assertContains(response, ">1-25<")
+        self.assertContains(response, ">30<")
+        self.assertContains(response, "?q=PAGINADO&page=2")
+        self.assertNotContains(response, "data-cv-results-count")
+        self.assertNotContains(response, "data-cv-realtime-filter-scope")
+        self.assertContains(response, "data-delete-confirm-modal")
+        self.assertContains(response, "data-delete-modal-trigger")
+        self.assertContains(response, 'data-delete-url="/cadastros/servidores/1/excluir/"')
+        self.assertNotContains(response, 'href="/cadastros/servidores/1/excluir/"')
+
+        response = self.client.get(reverse("cadastros:servidores_index"), {"q": "PAGINADO", "page": 2})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context["rows"]), 5)
+        self.assertContains(response, ">26-30<")
+        self.assertContains(response, ">30<")
+
+    def test_servidor_delete_get_redireciona_para_lista(self):
+        servidor = Servidor.objects.create(nome="SERVIDOR SEM PAGINA DE DELETE", cargo=self.cargo)
+
+        response = self.client.get(reverse("cadastros:servidor_delete", args=[servidor.pk]))
+
+        self.assertRedirects(response, reverse("cadastros:servidores_index"))
+
 
 @override_settings(ALLOWED_HOSTS=["testserver", "localhost"])
 class ViaturaCrudTests(TestCase):

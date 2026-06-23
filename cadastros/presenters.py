@@ -206,7 +206,7 @@ def apresentar_linha_lista_simples_estado(estado, edit_url="#", delete_url="#"):
     }
 
 
-def apresentar_linha_lista_simples_servidor(servidor, edit_url="#", delete_url="#"):
+def apresentar_linha_lista_simples_servidor(servidor, edit_url="#", delete_url="#", delete_modal=False):
     unidade_label = "—"
     if servidor.unidade:
         unidade_label = servidor.unidade.sigla or servidor.unidade.nome
@@ -224,6 +224,7 @@ def apresentar_linha_lista_simples_servidor(servidor, edit_url="#", delete_url="
         ],
         "edit_url": edit_url,
         "delete_url": delete_url,
+        "delete_modal": delete_modal,
     }
 
 

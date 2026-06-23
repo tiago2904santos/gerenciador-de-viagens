@@ -289,15 +289,9 @@ class ServidorForm(BaseCadastroForm):
             },
         ),
     )
-    sem_rg = forms.BooleanField(
-        label="Não possui RG",
-        required=False,
-        widget=_TOGGLE_WIDGET,
-    )
-
     class Meta:
         model = Servidor
-        fields = ["nome", "cargo", "cpf", "sem_rg", "rg", "telefone", "unidade"]
+        fields = ["nome", "cargo", "cpf", "rg", "telefone", "unidade"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -327,14 +321,11 @@ class ServidorForm(BaseCadastroForm):
                 self.initial.setdefault("cargo", padrao.pk)
 
         if self.instance.pk and not self.data:
-            self.initial["sem_rg"] = self.instance.sem_rg
             if self.instance.cpf:
                 self.initial["cpf"] = format_cpf(self.instance.cpf)
             if self.instance.telefone:
                 self.initial["telefone"] = format_telefone(self.instance.telefone)
-            if self.instance.sem_rg or self.instance.rg == RG_NAO_POSSUI_CANONICAL:
-                self.initial["rg"] = RG_NAO_POSSUI_DISPLAY
-            elif self.instance.rg and self.instance.rg.isdigit():
+            if self.instance.rg and not self.instance.sem_rg and self.instance.rg != RG_NAO_POSSUI_CANONICAL and self.instance.rg.isdigit():
                 self.initial["rg"] = format_rg(self.instance.rg)
 
     def clean_nome(self):
@@ -362,10 +353,10 @@ class ServidorForm(BaseCadastroForm):
         return digits
 
     def clean_rg(self):
-        if self.cleaned_data.get("sem_rg"):
-            return RG_NAO_POSSUI_CANONICAL
         raw = "".join(c for c in self.cleaned_data.get("rg", "").upper() if c.isalnum())
         if raw.upper() in {RG_NAO_POSSUI_CANONICAL.replace(" ", ""), "NAOPOSSUIRG"}:
+            return RG_NAO_POSSUI_CANONICAL
+        if not raw:
             return RG_NAO_POSSUI_CANONICAL
         if raw:
             qs = Servidor.objects.filter(rg=raw)
@@ -374,6 +365,11 @@ class ServidorForm(BaseCadastroForm):
             if qs.exists():
                 raise forms.ValidationError("Já existe um cadastro com este RG.")
         return raw
+
+    def clean(self):
+        cleaned_data = super().clean()
+        cleaned_data["sem_rg"] = cleaned_data.get("rg") == RG_NAO_POSSUI_CANONICAL
+        return cleaned_data
 
     def clean_telefone(self):
         digits = only_digits(self.cleaned_data.get("telefone", ""))
