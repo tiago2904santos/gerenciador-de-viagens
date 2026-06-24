@@ -105,7 +105,7 @@ def _legacy_docx_context(payload: dict) -> dict:
         "unidade": institucional.get("unidade") or termo.get("oficio", {}).get("origem") or "",
         "divisao": institucional.get("divisao") or "",
         "endereco": endereco,
-        "telefone": institucional.get("telefone_formatado") or institucional.get("telefone") or "",
+        "telefone": participante.get("telefone_formatado") or "",
         "email": institucional.get("email") or "",
         "unidade_rodape": format_institucional_rodape_linha(institucional),
         "data_do_evento": viagem.get("periodo") or viagem.get("saida") or "",
