@@ -46,10 +46,10 @@ class UiLab2DemoForm(forms.Form):
             attrs={"class": "cv-field__control cv-field__control--textarea", "rows": 4}
         ),
     )
-    data = forms.DateField(
+    data = forms.CharField(
         label="Data",
         required=False,
-        widget=forms.DateInput(attrs={"class": "cv-field__control", "type": "date"}),
+        widget=forms.TextInput(attrs={"class": "cv-field__control", "placeholder": "dd/mm/aaaa", "readonly": "readonly"}),
     )
     horario = forms.TimeField(
         label="Horario",

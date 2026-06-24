@@ -121,6 +121,24 @@
   width: 100%;
 }
 
+.oficio-justificativa-card .cv-field__control--textarea {
+  scrollbar-color: var(--color-border-strong) transparent;
+  scrollbar-width: thin;
+}
+
+.oficio-justificativa-card .cv-field__control--textarea::-webkit-scrollbar {
+  width: 4px;
+}
+
+.oficio-justificativa-card .cv-field__control--textarea::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.oficio-justificativa-card .cv-field__control--textarea::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: 2px;
+}
+
 /* Textarea de Motivo no wizard: visual idêntico ao input, só com altura maior */
 .oficio-wizard .cv-field__control,
 .oficio-wizard .cv-field__select {

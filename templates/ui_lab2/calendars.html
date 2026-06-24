@@ -7,7 +7,7 @@
       <h2 class="ui-lab-section__title">Calendarios & Datas</h2>
       <p class="ui-lab-section__description">
         O sistema usa um unico calendario customizado, <code>cv-date-picker</code>
-        (JS em <code>static/js/components/cv-date-picker.js</code>, CSS em <code>page-shell.css</code>),
+        (JS em <code>static/js/components/cv-date-picker.js</code>, CSS em <code>static/css/components/cv-date-picker.css</code>),
         que aparece clonado inline em varios cadastros em tres modos: data unica, periodo (ida/volta)
         e multiplas datas com limite. Abaixo cada modo esta funcional. Apuracao de uso em {{ usage_audit_date }}.
       </p>
@@ -114,19 +114,6 @@
       {% include "ui_lab2/partials/_component_close.html" with used_in=usage.cv_date_picker %}
 
       {# ── inputs nativos de data/hora ──────────────────────────── #}
-      {% include "ui_lab2/partials/_component_open.html" with name="Input de data nativo" source="<input type=\"date\" class=\"cv-field__control\">" note="Usado nos campos de data via form_field (eventos, planos de trabalho)." %}
-        <div class="field-grid">
-          <div class="field cv-field field-size-2">
-            <label class="cv-field__label">Data inicial</label>
-            <input type="date" class="cv-field__control" value="2026-06-17">
-          </div>
-          <div class="field cv-field field-size-2">
-            <label class="cv-field__label">Data final</label>
-            <input type="date" class="cv-field__control" value="2026-06-18">
-          </div>
-        </div>
-      {% include "ui_lab2/partials/_component_close.html" with used_in=usage.input_date_time %}
-
       {% include "ui_lab2/partials/_component_open.html" with name="Input de hora nativo" source="<input type=\"time\" class=\"cv-field__control\">" note="Horario de inicio/fim nos cadastros de evento." %}
         <div class="field-grid">
           <div class="field cv-field field-size-2">
