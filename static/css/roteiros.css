@@ -940,8 +940,8 @@ html[data-theme="light-light"] {
 }
 
 .cv-date-picker__panel {
-  --cv-date-picker-day-gap: 2px;
-  --cv-date-picker-day-size: 40px;
+  --cv-date-picker-day-gap: 0px;
+  --cv-date-picker-day-size: 42px;
   --cv-date-picker-grid-width: calc((7 * var(--cv-date-picker-day-size)) + (6 * var(--cv-date-picker-day-gap)));
   background: var(--route-card-inner-bg, var(--theme-surface-card));
   border: 1px solid var(--route-card-inner-border, var(--theme-border-card));
@@ -1039,7 +1039,7 @@ html[data-theme="light-light"] {
   column-gap: var(--cv-date-picker-day-gap);
   grid-template-columns: repeat(7, var(--cv-date-picker-day-size));
   justify-content: center;
-  row-gap: var(--space-1);
+  row-gap: 2px;
 }
 
 .cv-date-picker__weekday {
@@ -1062,6 +1062,7 @@ html[data-theme="light-light"] {
   cursor: pointer;
   display: inline-flex;
   font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
   font-weight: var(--font-weight-semibold);
   height: 40px;
   isolation: isolate;
@@ -1206,14 +1207,11 @@ html[data-theme="light-light"] .cv-date-picker__day-badge {
 .cv-date-picker__day--multi-selected:nth-child(7n)::before {
   border-bottom-right-radius: var(--radius-pill);
   border-top-right-radius: var(--radius-pill);
-  transform: translate(calc(-50% - (var(--cv-date-picker-day-gap) / 2)), -50%);
-  width: calc(100% + var(--cv-date-picker-day-gap));
 }
 
 .cv-date-picker__day--multi-selected:nth-child(7n + 1)::before {
   border-bottom-left-radius: var(--radius-pill);
   border-top-left-radius: var(--radius-pill);
-  transform: translate(calc(-50% + (var(--cv-date-picker-day-gap) / 2)), -50%);
 }
 
 .cv-date-picker__day--multi-single {
