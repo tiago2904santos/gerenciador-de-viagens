@@ -8,6 +8,7 @@ from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.utils.http import url_has_allowed_host_and_scheme
 
 from core.utils.masks import only_digits
 from .forms import CargoForm
@@ -93,6 +94,17 @@ def _vinculo_error(request):
         request,
         "Não foi possível excluir este cadastro porque ele está vinculado a outros registros.",
     )
+
+
+def _safe_next_url(request, fallback_url):
+    next_url = request.POST.get("next") or request.GET.get("next")
+    if next_url and url_has_allowed_host_and_scheme(
+        next_url,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        return next_url
+    return fallback_url
 
 
 def index(request):
@@ -696,11 +708,13 @@ def servidores_index(request):
 
 
 def servidor_create(request):
+    index_url = reverse("cadastros:servidores_index")
+    next_url = _safe_next_url(request, index_url)
     form = ServidorForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
         criar_servidor(form)
         messages.success(request, "Servidor criado com sucesso.")
-        return redirect("cadastros:servidores_index")
+        return redirect(next_url)
     return render(
         request,
         "cadastros/servidores/form.html",
@@ -710,7 +724,8 @@ def servidor_create(request):
             "form": form,
             "submit_label": "Criar servidor",
             "submit_icon": "plus",
-            "back_url": reverse("cadastros:servidores_index"),
+            "next_url": next_url,
+            "back_url": next_url,
             "cargos_manage_url": reverse("cadastros:cargos_index"),
             "unidades_manage_url": reverse("cadastros:unidades_index"),
         },
@@ -784,11 +799,13 @@ def viaturas_index(request):
 
 
 def viatura_create(request):
+    index_url = reverse("cadastros:viaturas_index")
+    next_url = _safe_next_url(request, index_url)
     form = ViaturaForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
         criar_viatura(form)
         messages.success(request, "Viatura criada com sucesso.")
-        return redirect("cadastros:viaturas_index")
+        return redirect(next_url)
     return render(
         request,
         "cadastros/viaturas/form.html",
@@ -798,7 +815,8 @@ def viatura_create(request):
             "form": form,
             "submit_label": "Criar viatura",
             "submit_icon": "plus",
-            "back_url": reverse("cadastros:viaturas_index"),
+            "next_url": next_url,
+            "back_url": next_url,
             "combustiveis_manage_url": reverse("cadastros:combustiveis_index"),
         },
     )

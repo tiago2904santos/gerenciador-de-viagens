@@ -1227,6 +1227,14 @@ html[data-theme="light"] {
   gap: 0;
 }
 
+.cv-wizard-section-body--sections > .wizard-inner-section:not(:last-child) {
+  padding-bottom: var(--space-5);
+}
+
+.cv-wizard-section-body--sections > .wizard-inner-section + .wizard-inner-section {
+  padding-top: var(--space-5);
+}
+
 
 /* =========================================================
    12. Field Grid
@@ -3350,6 +3358,54 @@ html[data-theme="dark"] .quick-add-footer-button.is-filled:hover {
   .page-stepper__status {
     display: none;
   }
+}
+
+#quick-add-modelo-motivo .quick-add-inline__fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+#quick-add-modelo-motivo .quick-add-inline__fields > .field-grid {
+  margin: 0;
+}
+
+#quick-add-modelo-motivo .app-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+#quick-add-modelo-motivo .cv-field__control--textarea {
+  background: var(--cv-field-bg);
+  border: 1px solid var(--cv-field-border);
+  border-radius: var(--cv-field-radius);
+  box-shadow: var(--cv-field-shadow);
+  box-sizing: border-box;
+  color: var(--cv-field-color);
+  font-size: var(--cv-field-font-size);
+  height: var(--text-area-height-md);
+  line-height: 1.5;
+  min-height: var(--text-area-height-md);
+  padding: var(--space-3) var(--cv-field-padding-x);
+  resize: vertical;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    color var(--transition-fast);
+  width: 100%;
+}
+
+#quick-add-modelo-motivo .cv-field__control--textarea:hover:not(:disabled):not([readonly]) {
+  background: var(--cv-field-bg-hover);
+  border-color: var(--cv-field-border-hover);
+}
+
+#quick-add-modelo-motivo .cv-field__control--textarea:focus-visible {
+  border-color: var(--cv-field-focus-border);
+  box-shadow: var(--cv-field-shadow-focus);
+  outline: none;
 }
 
 

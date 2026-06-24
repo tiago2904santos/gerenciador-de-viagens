@@ -259,6 +259,13 @@ export function initRoteirosEditor() {
       voltaText.value = formatDurationInput(parseMinutesValue(voltaHidden.value));
     }
   }
+  function syncBateVoltaReturnDurationFromOutbound(normalized, parsed) {
+    var voltaHidden = $('id_bate_volta_volta_tempo_min');
+    var voltaText = $('id_bate_volta_volta_tempo_hhmm');
+    if (!voltaHidden || !voltaText) return;
+    voltaHidden.value = parsed != null ? String(parsed) : '';
+    voltaText.value = normalized || '';
+  }
   function stateHasReturnToSede(state) {
     var sedeId = String((state && state.sede_cidade_id) || ($('id_origem_cidade') || {}).value || '');
     var sedeNome = normalizeLocationLabel(selectedText($('id_origem_cidade')));
@@ -1643,7 +1650,7 @@ export function initRoteirosEditor() {
     });
   });
   [
-    { text: 'id_bate_volta_ida_tempo_hhmm', hidden: 'id_bate_volta_ida_tempo_min' },
+    { text: 'id_bate_volta_ida_tempo_hhmm', hidden: 'id_bate_volta_ida_tempo_min', syncReturn: true },
     { text: 'id_bate_volta_volta_tempo_hhmm', hidden: 'id_bate_volta_volta_tempo_min' }
   ].forEach(function(pair) {
     var textInput = $(pair.text);
@@ -1655,6 +1662,9 @@ export function initRoteirosEditor() {
       var parsed = parseDurationInput(normalized);
       hiddenInput.value = parsed != null ? String(parsed) : '';
       if (normalized !== this.value) this.value = normalized;
+      if (pair.syncReturn) {
+        syncBateVoltaReturnDurationFromOutbound(normalized, parsed);
+      }
       scheduleLoopTrechosRender({ preferSeed: false, force: true });
       scheduleAutosave();
     });

@@ -32,6 +32,14 @@ class OficioViewsTests(TestCase):
         response = self.client.get(reverse("oficios:index"))
         self.assertEqual(response.status_code, 200)
 
+    def test_index_usa_modal_para_excluir_oficio(self):
+        oficio = Oficio.objects.create(numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        response = self.client.get(reverse("oficios:index"))
+        self.assertContains(response, "data-delete-confirm-modal")
+        self.assertContains(response, "data-delete-modal-trigger")
+        self.assertContains(response, f'data-delete-url="{reverse("oficios:excluir", args=[oficio.pk])}"')
+        self.assertNotContains(response, f'href="{reverse("oficios:excluir", args=[oficio.pk])}"')
+
     def test_get_novo_cria_rascunho_e_redireciona(self):
         response = self.client.get(reverse("oficios:novo"))
         self.assertEqual(response.status_code, 302)
@@ -479,12 +487,22 @@ class OficioViewsTests(TestCase):
         detail_response = self.client.get(reverse("oficios:detalhe", args=[oficio.pk]))
         self.assertEqual(detail_response.status_code, 404)
 
+    def test_get_excluir_redireciona_para_lista(self):
+        oficio = Oficio.objects.create(numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        response = self.client.get(reverse("oficios:excluir", args=[oficio.pk]))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("oficios:index"))
+
     def test_crud_modelo_motivo_views(self):
         list_response = self.client.get(reverse("oficios:modelos_motivo_index"))
         self.assertEqual(list_response.status_code, 200)
         self.assertContains(list_response, "Nenhum modelo de motivo cadastrado.")
         self.assertContains(list_response, "Novo modelo")
         self.assertContains(list_response, "Buscar modelos de motivo")
+        self.assertContains(list_response, 'id="quick-add-modelo-motivo"')
+        self.assertContains(list_response, 'name="nome"')
+        self.assertContains(list_response, 'name="texto"')
+        self.assertContains(list_response, "cv-field__control--textarea")
 
         new_get = self.client.get(reverse("oficios:modelo_motivo_novo"))
         self.assertEqual(new_get.status_code, 200)
@@ -494,7 +512,7 @@ class OficioViewsTests(TestCase):
         self.assertNotContains(new_get, "Is padrÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o")
 
         new_post = self.client.post(
-            reverse("oficios:modelo_motivo_novo"),
+            reverse("oficios:modelos_motivo_index"),
             data={
                 "nome": "Padrao equipe",
                 "texto": "Texto base",

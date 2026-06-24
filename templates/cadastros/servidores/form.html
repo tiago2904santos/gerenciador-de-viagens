@@ -8,6 +8,7 @@
       <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
         <form method="post" novalidate>
           {% csrf_token %}
+          {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
           <section class="cv-wizard-section-card" aria-labelledby="servidores-form-card-title">
             <header class="cv-wizard-section-header">
               <div class="cv-wizard-section-header__copy">

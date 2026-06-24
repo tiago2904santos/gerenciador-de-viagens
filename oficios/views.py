@@ -12,6 +12,7 @@ from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_GET
 from django.views.decorators.http import require_POST
@@ -103,6 +104,25 @@ def _oficio_back_url(oficio):
 
 def _oficio_back_label(oficio):
     return "Dados do evento" if getattr(oficio, "evento_id", None) else "Voltar à lista"
+
+
+def _cadastro_create_url(create_url_name, next_url):
+    return f"{reverse(create_url_name)}?{urlencode({'next': next_url})}"
+
+
+def _url_with_next(url_name, next_url):
+    return f"{reverse(url_name)}?{urlencode({'next': next_url})}"
+
+
+def _safe_next_url(request, fallback_url):
+    next_url = request.POST.get("next") or request.GET.get("next")
+    if next_url and url_has_allowed_host_and_scheme(
+        next_url,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        return next_url
+    return fallback_url
 
 
 def _redirect_lista_oficio(request, oficio, message):
@@ -245,11 +265,20 @@ def _wizard_dados_viajantes_context(
         "mostrar_pendencias_documento": mostrar_pendencias_documento,
         "wizard_summary": summary,
         "mostrar_custeio_observacao": mostrar_custeio_observacao,
-        "modelos_motivo_url": reverse("oficios:modelos_motivo_index"),
+        "modelos_motivo_url": _url_with_next(
+            "oficios:modelos_motivo_index",
+            reverse("oficios:dados_viajantes", args=[oficio.pk]),
+        ),
         "tem_modelos_motivo": modelos_queryset.exists(),
         "modelo_motivo_selecionado": bool(form["modelo_motivo"].value()),
-        "servidor_create_url": reverse("cadastros:servidor_create"),
-        "viatura_create_url": reverse("cadastros:viatura_create"),
+        "servidor_create_url": _cadastro_create_url(
+            "cadastros:servidor_create",
+            reverse("oficios:dados_viajantes", args=[oficio.pk]),
+        ),
+        "viatura_create_url": _cadastro_create_url(
+            "cadastros:viatura_create",
+            reverse("oficios:dados_viajantes", args=[oficio.pk]),
+        ),
         "api_viatura_placa_url": reverse("oficios:api_viatura_por_placa", args=[oficio.pk]),
         "equipe_servidor_ids_csv": ",".join(str(pk) for pk in equipe_ids),
         "viatura_selecionada_unidade": viatura_selecionada_unidade,
@@ -327,8 +356,14 @@ def _wizard_transporte_context(*, form, oficio):
         "wizard_summary": summary,
         "form": form,
         "oficio": oficio,
-        "viatura_create_url": reverse("cadastros:viatura_create"),
-        "servidor_create_url": reverse("cadastros:servidor_create"),
+        "viatura_create_url": _cadastro_create_url(
+            "cadastros:viatura_create",
+            reverse("oficios:transporte", args=[oficio.pk]),
+        ),
+        "servidor_create_url": _cadastro_create_url(
+            "cadastros:servidor_create",
+            reverse("oficios:transporte", args=[oficio.pk]),
+        ),
         "equipe_servidor_ids_csv": ",".join(str(pk) for pk in equipe_ids),
         "motorista_extras_visivel": motorista_extras_visivel,
         "motorista_oficio_ano": ano_motorista_ctx,
@@ -1147,26 +1182,24 @@ def excluir(request, pk):
         if evento_id:
             return redirect("eventos:guiado_etapa", pk=evento_id, etapa=3)
         return redirect("oficios:index")
-    return render(
-        request,
-        "oficios/confirm_delete.html",
-        {
-            "page_title": "Excluir ofício",
-            "page_description": "A exclusão é física e pode ser bloqueada quando houver vínculos.",
-            "object": oficio,
-            "back_url": _oficio_back_url(oficio),
-        },
-    )
+    return redirect(_oficio_back_url(oficio))
 
 
 def modelos_motivo_index(request):
     q = request.GET.get("q", "").strip()
+    back_url = _safe_next_url(request, reverse("oficios:novo"))
+    form = ModeloMotivoOficioForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        criar_modelo_motivo(form)
+        messages.success(request, "Modelo de motivo criado com sucesso.")
+        return redirect(_url_with_next("oficios:modelos_motivo_index", back_url))
     modelos = listar_modelos_motivo(q=q or None, incluir_inativos=True)
     rows = [
         apresentar_linha_lista_simples_modelo_motivo(
             modelo,
             edit_url=reverse("oficios:modelo_motivo_editar", args=[modelo.pk]),
             delete_url=reverse("oficios:modelo_motivo_excluir", args=[modelo.pk]),
+            delete_modal=True,
         )
         for modelo in modelos
     ]
@@ -1178,6 +1211,9 @@ def modelos_motivo_index(request):
             "page_description": "Cadastre textos reutilizáveis para preencher rapidamente o motivo dos ofícios.",
             "q": q,
             "rows": rows,
+            "quick_add_form": form,
+            "quick_add_next_url": back_url,
+            "back_to_oficio_url": back_url,
             "new_url": reverse("oficios:modelo_motivo_novo"),
         },
     )

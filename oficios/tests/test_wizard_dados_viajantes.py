@@ -1,6 +1,7 @@
 from pathlib import Path
 import json
 import re
+from urllib.parse import urlencode
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -152,6 +153,17 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertNotContains(response, 'href="#"')
         self.assertNotContains(response, 'style="')
         self.assertNotContains(response, "oficio-wizard__aside")
+        oficio_url = reverse("oficios:dados_viajantes", args=[oficio.pk])
+        servidor_create_url = (
+            f"{reverse('cadastros:servidor_create')}?"
+            f"{urlencode({'next': oficio_url})}"
+        )
+        viatura_create_url = (
+            f"{reverse('cadastros:viatura_create')}?"
+            f"{urlencode({'next': oficio_url})}"
+        )
+        self.assertContains(response, servidor_create_url)
+        self.assertContains(response, viatura_create_url)
 
     def test_post_novo_save_draft_cria_e_redireciona_para_etapa(self):
         response = self.client.post(self._novo_rascunho_url(), data=self._payload(action="save_draft"))
@@ -167,6 +179,23 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertEqual(oficio.status, Oficio.STATUS_RASCUNHO)
         self.assertEqual(list(oficio.servidores.all()), [self.servidor])
         self.assertEqual(list(oficio.servidores_termo_autorizacao.all()), [self.servidor])
+
+    def test_get_dados_viajantes_seleciona_modelo_motivo_padrao(self):
+        modelo_padrao = ModeloMotivoOficio.objects.create(
+            nome="MODELO PADRAO OFICIO",
+            texto="Texto padrao para motivo",
+            is_padrao=True,
+        )
+        oficio = Oficio.objects.create(numero=1, ano=timezone.localdate().year, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+
+        response = self.client.get(reverse("oficios:dados_viajantes", args=[oficio.pk]))
+
+        self.assertEqual(response.status_code, 200)
+        form = response.context["form"]
+        self.assertEqual(str(form["modelo_motivo"].value()), str(modelo_padrao.pk))
+        self.assertEqual(form["motivo"].value(), modelo_padrao.texto)
+        self.assertContains(response, f'value="{modelo_padrao.pk}" selected')
+        self.assertContains(response, modelo_padrao.texto)
 
     def test_post_novo_save_continue_cria_e_redireciona_para_roteiro(self):
         response = self.client.post(self._novo_rascunho_url(), data=self._payload(action="save_continue"))

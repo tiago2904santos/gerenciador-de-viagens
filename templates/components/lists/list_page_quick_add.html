@@ -35,6 +35,7 @@
 
       <form class="quick-add-inline__panel quick-add-panel" id="{{ quick_add_panel_id }}" method="post" action="{{ request.path }}" data-create-action="{{ request.path }}" hidden novalidate>
         {% csrf_token %}
+        {% if quick_add_next_url %}<input type="hidden" name="next" value="{{ quick_add_next_url }}">{% endif %}
         <div class="quick-add-inline__body">
           <div class="quick-add-inline__fields">
             {% include quick_add_body_template with form=quick_add_form only %}

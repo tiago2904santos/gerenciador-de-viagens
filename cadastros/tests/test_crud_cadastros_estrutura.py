@@ -190,6 +190,43 @@ class ServidorCrudTests(TestCase):
 
         self.assertRedirects(response, reverse("cadastros:servidores_index"))
 
+    def test_servidor_create_respeita_next_interno_seguro(self):
+        next_url = reverse("cadastros:cargos_index")
+        create_url = f"{reverse('cadastros:servidor_create')}?next={next_url}"
+
+        response = self.client.get(create_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["back_url"], next_url)
+
+        response = self.client.post(
+            create_url,
+            {
+                "nome": " servidor com retorno ",
+                "cargo": str(self.cargo.pk),
+                "cpf": "111.444.777-35",
+                "rg": "",
+                "unidade": "",
+            },
+        )
+
+        self.assertRedirects(response, next_url)
+
+    def test_servidor_create_ignora_next_externo(self):
+        create_url = f"{reverse('cadastros:servidor_create')}?next=https://example.com/fora"
+
+        response = self.client.post(
+            create_url,
+            {
+                "nome": " servidor retorno externo ",
+                "cargo": str(self.cargo.pk),
+                "cpf": "111.444.777-35",
+                "rg": "",
+                "unidade": "",
+            },
+        )
+
+        self.assertRedirects(response, reverse("cadastros:servidores_index"))
+
 
 @override_settings(ALLOWED_HOSTS=["testserver", "localhost"])
 class ViaturaCrudTests(TestCase):
@@ -268,6 +305,26 @@ class ViaturaCrudTests(TestCase):
 
         response = self.client.post(reverse("cadastros:viatura_delete", args=[viatura.pk]))
         self.assertRedirects(response, reverse("cadastros:viaturas_index"))
+
+    def test_viatura_create_respeita_next_interno_seguro(self):
+        next_url = reverse("cadastros:combustiveis_index")
+        create_url = f"{reverse('cadastros:viatura_create')}?next={next_url}"
+
+        response = self.client.get(create_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["back_url"], next_url)
+
+        response = self.client.post(
+            create_url,
+            {
+                "placa": "bbb1234",
+                "modelo": "Duster",
+                "combustivel": str(self.combustivel.pk),
+                "tipo": Viatura.TIPO_CARACTERIZADA,
+            },
+        )
+
+        self.assertRedirects(response, next_url)
 
 
 @override_settings(ALLOWED_HOSTS=["testserver", "localhost"])

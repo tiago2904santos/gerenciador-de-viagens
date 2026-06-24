@@ -940,8 +940,11 @@ html[data-theme="light-light"] {
 }
 
 .cv-date-picker__panel {
-  background: var(--theme-surface-card);
-  border: 1px solid var(--theme-border-card);
+  --cv-date-picker-day-gap: 2px;
+  --cv-date-picker-day-size: 40px;
+  --cv-date-picker-grid-width: calc((7 * var(--cv-date-picker-day-size)) + (6 * var(--cv-date-picker-day-gap)));
+  background: var(--route-card-inner-bg, var(--theme-surface-card));
+  border: 1px solid var(--route-card-inner-border, var(--theme-border-card));
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-soft);
   box-sizing: border-box;
@@ -949,8 +952,8 @@ html[data-theme="light-light"] {
   gap: var(--space-3);
   padding: var(--space-4);
   position: fixed;
-  width: 320px;
-  z-index: 1090; /* abaixo do sticky-stepper (1100) e acima do conteúdo do form */
+  width: min(calc(var(--cv-date-picker-grid-width) + (2 * var(--space-4))), calc(100vw - 16px));
+  z-index: calc(var(--z-sticky-stepper, 1100) + 20);
 }
 
 .cv-date-picker--open .cv-date-picker__panel,
@@ -1033,8 +1036,10 @@ html[data-theme="light-light"] {
 .cv-date-picker__weekdays,
 .cv-date-picker__days {
   display: grid;
-  gap: var(--space-1);
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  column-gap: var(--cv-date-picker-day-gap);
+  grid-template-columns: repeat(7, var(--cv-date-picker-day-size));
+  justify-content: center;
+  row-gap: var(--space-1);
 }
 
 .cv-date-picker__weekday {
@@ -1059,9 +1064,10 @@ html[data-theme="light-light"] {
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   height: 40px;
+  isolation: isolate;
   justify-content: center;
   min-width: 0;
-  width: 110%;
+  width: 100%;
   padding: 0;
   position: relative;
   transition:
@@ -1071,6 +1077,19 @@ html[data-theme="light-light"] {
     color var(--transition-fast),
     box-shadow var(--transition-fast);
   will-change: transform;
+}
+
+.cv-date-picker__day::before {
+  border-radius: 50%;
+  content: "";
+  height: 40px;
+  left: 50%;
+  pointer-events: none;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  z-index: -1;
 }
 
 .cv-date-picker__day:hover {
@@ -1132,39 +1151,69 @@ html[data-theme="light-light"] .cv-date-picker__day-badge {
 .cv-date-picker__day--range-start,
 .cv-date-picker__day--range-end,
 .cv-date-picker__day--multi-selected {
-  background:
-    linear-gradient(180deg, var(--cv-date-picker-selected-bg-start) 0%, var(--cv-date-picker-selected-bg-end) 100%);
-  border-color: var(--cv-date-picker-selected-border);
-  box-shadow: var(--cv-date-picker-selected-shadow);
   color: var(--cv-date-picker-selected-color);
-  background-clip: padding-box;
   z-index: 2;
 }
 
+.cv-date-picker__day--selected::before,
+.cv-date-picker__day--range-start::before,
+.cv-date-picker__day--range-end::before,
+.cv-date-picker__day--multi-single::before {
+  background:
+    linear-gradient(180deg, var(--cv-date-picker-selected-bg-start) 0%, var(--cv-date-picker-selected-bg-end) 100%);
+  border: 1px solid var(--cv-date-picker-selected-border);
+  box-shadow: var(--cv-date-picker-selected-shadow);
+}
+
+.cv-date-picker__day--multi-selected:not(.cv-date-picker__day--multi-single)::before {
+  background:
+    linear-gradient(180deg, var(--cv-date-picker-selected-bg-start) 0%, var(--cv-date-picker-selected-bg-end) 100%);
+  border-radius: 0;
+  box-shadow: none;
+  height: 40px;
+  width: calc(100% + var(--cv-date-picker-day-gap));
+}
+
 .cv-date-picker__day--multi-start {
-  border-bottom-right-radius: 0;
-  border-top-right-radius: 0;
-  margin-left: calc(var(--space-1) * -1);
-  margin-right: calc(var(--space-1) * -1);
   border-right-color: var(--cv-date-picker-selected-border);
   z-index: 2;
 }
 
+.cv-date-picker__day--multi-selected.cv-date-picker__day--multi-start::before,
+.cv-date-picker__day--multi-single::before {
+  border-bottom-left-radius: var(--radius-pill);
+  border-top-left-radius: var(--radius-pill);
+}
+
 .cv-date-picker__day--multi-middle {
   border-radius: 0;
-  margin-left: calc(var(--space-1) * -1);
-  margin-right: calc(var(--space-1) * -1);
   border-left-color: var(--cv-date-picker-selected-border);
   border-right-color: var(--cv-date-picker-selected-border);
   z-index: 2;
 }
 
 .cv-date-picker__day--multi-end {
-  border-bottom-left-radius: 0;
-  border-top-left-radius: 0;
-  margin-left: calc(var(--space-1) * -1);
   border-left-color: var(--cv-date-picker-selected-border);
   z-index: 2;
+}
+
+.cv-date-picker__day--multi-selected.cv-date-picker__day--multi-end::before,
+.cv-date-picker__day--multi-single::before {
+  border-bottom-right-radius: var(--radius-pill);
+  border-top-right-radius: var(--radius-pill);
+}
+
+.cv-date-picker__day--multi-selected:nth-child(7n)::before {
+  border-bottom-right-radius: var(--radius-pill);
+  border-top-right-radius: var(--radius-pill);
+  transform: translate(calc(-50% - (var(--cv-date-picker-day-gap) / 2)), -50%);
+  width: calc(100% + var(--cv-date-picker-day-gap));
+}
+
+.cv-date-picker__day--multi-selected:nth-child(7n + 1)::before {
+  border-bottom-left-radius: var(--radius-pill);
+  border-top-left-radius: var(--radius-pill);
+  transform: translate(calc(-50% + (var(--cv-date-picker-day-gap) / 2)), -50%);
 }
 
 .cv-date-picker__day--multi-single {
@@ -1195,10 +1244,18 @@ html[data-theme="light-dark"] .cv-date-picker .cv-date-picker__day--multi-end,
 html[data-theme="dark"] .cv-date-picker .cv-date-picker__day--multi-single,
 html[data-theme="dark-dark"] .cv-date-picker .cv-date-picker__day--multi-single,
 html[data-theme="light-dark"] .cv-date-picker .cv-date-picker__day--multi-single {
-  background-color: var(--stepper-active-bg) !important;
+  background-color: transparent !important;
   background-image: none !important;
   border-color: transparent !important;
   color: var(--stepper-active-color) !important;
+  box-shadow: none !important;
+}
+
+html[data-theme="dark"] .cv-date-picker .cv-date-picker__day--multi-single::before,
+html[data-theme="dark-dark"] .cv-date-picker .cv-date-picker__day--multi-single::before,
+html[data-theme="light-dark"] .cv-date-picker .cv-date-picker__day--multi-single::before {
+  background: var(--stepper-active-bg) !important;
+  border-color: transparent !important;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.22) !important;
 }
 
@@ -1217,10 +1274,18 @@ html[data-theme="light-light"] .cv-date-picker .cv-date-picker__day--multi-end,
 html[data-theme="light"] .cv-date-picker .cv-date-picker__day--multi-single,
 html[data-theme="dark-light"] .cv-date-picker .cv-date-picker__day--multi-single,
 html[data-theme="light-light"] .cv-date-picker .cv-date-picker__day--multi-single {
-  background-color: var(--stepper-active-bg) !important;
+  background-color: transparent !important;
   background-image: none !important;
   border-color: transparent !important;
   color: var(--stepper-active-color) !important;
+  box-shadow: none !important;
+}
+
+html[data-theme="light"] .cv-date-picker .cv-date-picker__day--multi-single::before,
+html[data-theme="dark-light"] .cv-date-picker .cv-date-picker__day--multi-single::before,
+html[data-theme="light-light"] .cv-date-picker .cv-date-picker__day--multi-single::before {
+  background: var(--stepper-active-bg) !important;
+  border-color: transparent !important;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16) !important;
 }
 
@@ -1420,9 +1485,12 @@ html[data-theme="light-light"] .cv-date-picker .cv-date-picker__day--multi-singl
 }
 
 .roteiro-editor--oficio .wizard-inner-section .field-grid.roteiro-sede-grid {
+  gap: var(--space-3) var(--space-4);
   grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
 }
 .roteiro-editor--oficio .wizard-inner-section .field-grid.roteiro-sede-grid > .field {
+  display: grid;
+  gap: var(--space-2);
   min-width: 0;
   width: 100%;
 }

@@ -282,6 +282,13 @@ class OficioDadosViajantesForm(OficioForm):
         self.fields["servidores"].required = False
         self.fields["servidores_termo_autorizacao"].queryset = self.fields["servidores"].queryset
         self.fields["servidores_termo_autorizacao"].required = False
+        if not self.is_bound and not (self.instance.motivo or "").strip():
+            modelo_padrao = self.fields["modelo_motivo"].queryset.filter(is_padrao=True).first()
+            if modelo_padrao:
+                if not self.initial.get("modelo_motivo"):
+                    self.initial["modelo_motivo"] = modelo_padrao.pk
+                if not (self.initial.get("motivo") or "").strip():
+                    self.initial["motivo"] = modelo_padrao.texto
         if not self.is_bound and self.instance.pk and not self.instance.servidores_termo_autorizacao.exists():
             self.initial["servidores_termo_autorizacao"] = list(
                 self.instance.servidores.values_list("pk", flat=True),
@@ -500,7 +507,7 @@ class ModeloMotivoOficioForm(forms.ModelForm):
     texto = forms.CharField(
         label="Texto do modelo",
         help_text="Este texto será copiado para o motivo do ofício e poderá ser editado antes de salvar.",
-        widget=forms.Textarea(attrs={"class": "form-control", "rows": 4}),
+        widget=forms.Textarea(attrs={"class": "cv-field__control cv-field__control--textarea", "rows": 4}),
     )
     is_padrao = forms.BooleanField(
         label="Modelo padrão",

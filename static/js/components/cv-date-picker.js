@@ -296,7 +296,7 @@
       var margin = 8;
       var vw = window.innerWidth || document.documentElement.clientWidth || 0;
       var vh = window.innerHeight || document.documentElement.clientHeight || 0;
-      var width = 320;
+      var width = 324;
       if (vw) {
         width = Math.min(width, Math.max(vw - (margin * 2), 280));
       }

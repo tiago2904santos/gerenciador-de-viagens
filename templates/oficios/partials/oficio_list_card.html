@@ -175,7 +175,17 @@
           {% include "components/ui/buttons/icon_button.html" with href=card.docx_url action="docx" aria_label="Baixar DOCX do ofício" tooltip="DOCX" only %}
         </div>
         <div class="oficio-lc__footer-actions-danger cv-icon-btn-group">
-          {% include "components/ui/buttons/icon_button.html" with href=card.excluir_url action="delete" aria_label="Excluir ofício" tooltip="Excluir" only %}
+          <button
+            class="cv-icon-btn cv-icon-btn--delete"
+            type="button"
+            aria-label="Excluir ofício"
+            data-tooltip="Excluir"
+            data-delete-modal-trigger
+            data-delete-url="{{ card.excluir_url }}"
+            data-delete-label="{{ card.numero_display }}"
+          >
+            {% include "dev/ui_lab/partials/_cv_icon.html" with icon="delete" only %}
+          </button>
         </div>
       </div>
     </div>

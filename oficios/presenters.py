@@ -694,7 +694,7 @@ def apresentar_modelo_motivo_card(modelo):
     }
 
 
-def apresentar_linha_lista_simples_modelo_motivo(modelo, edit_url="#", delete_url="#"):
+def apresentar_linha_lista_simples_modelo_motivo(modelo, edit_url="#", delete_url="#", delete_modal=False):
     badges = []
     if modelo.is_padrao:
         badges.append(build_badge("Padrão", "default"))
@@ -709,6 +709,7 @@ def apresentar_linha_lista_simples_modelo_motivo(modelo, edit_url="#", delete_ur
         ],
         "edit_url": edit_url,
         "delete_url": delete_url,
+        "delete_modal": delete_modal,
         "set_default_url": (
             reverse("oficios:modelo_motivo_definir_padrao", args=[modelo.pk])
             if not modelo.is_padrao

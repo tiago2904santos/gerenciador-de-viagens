@@ -152,6 +152,19 @@
   outline: none;
 }
 
+.oficio-wizard .form-control:-webkit-autofill,
+.oficio-wizard .form-control:-webkit-autofill:hover,
+.oficio-wizard .form-control:-webkit-autofill:focus,
+.oficio-wizard .cv-field__control:-webkit-autofill,
+.oficio-wizard .cv-field__control:-webkit-autofill:hover,
+.oficio-wizard .cv-field__control:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px var(--field-bg-soft, var(--color-input-bg)) inset, var(--cv-field-shadow-focus);
+  -webkit-text-fill-color: var(--field-text, var(--color-input-text));
+  border-color: var(--field-border-focus, var(--cv-field-focus-border));
+  caret-color: var(--field-text, var(--color-input-text));
+  color: var(--field-text, var(--color-input-text));
+}
+
 .oficio-wizard .cv-field--readonly .cv-field__control,
 .oficio-wizard .cv-field__control[readonly] {
   background: var(--cv-field-readonly-bg);
