@@ -28,7 +28,16 @@ def listar_roteiros(q=None, status=None):
             "destinos__estado",
             Prefetch("trechos", queryset=trechos_qs),
         )
-        .annotate(trechos_count=Count("trechos", distinct=True))
+        .annotate(
+            trechos_count=Count("trechos", distinct=True),
+            destinos_count=Count("destinos", distinct=True),
+        )
+        .exclude(
+            destinos_count=0,
+            trechos_count=0,
+            saida_dt__isnull=True,
+            origem_cidade__isnull=True,
+        )
         .order_by("-updated_at")
     )
     if status:

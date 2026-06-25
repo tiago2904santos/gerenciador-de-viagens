@@ -211,6 +211,59 @@ def montar_contexto_editor_roteiro(
     )
 
 
+def encontrar_roteiro_duplicado(validated, roteiro_state, *, evento=None, excluir_pk=None):
+    """Retorna Roteiro idêntico (mesma sede, mesma sequência de destinos e mesma saída) ou None."""
+    sede_cidade = validated.get("sede_cidade")
+    if not sede_cidade:
+        return None
+
+    destino_ids = [
+        item.get("cidade_id")
+        for item in (roteiro_state.get("destinos_atuais") or [])
+        if item.get("cidade_id")
+    ]
+    if not destino_ids:
+        return None
+
+    saida_dt = None
+    trechos = validated.get("trechos") or []
+    if trechos:
+        primeiro = trechos[0]
+        saida_data = primeiro.get("saida_data")
+        saida_hora = primeiro.get("saida_hora")
+        if saida_data and saida_hora:
+            naive = datetime.combine(saida_data, saida_hora)
+            saida_dt = (
+                timezone.make_aware(naive, timezone.get_current_timezone())
+                if timezone.is_naive(naive)
+                else naive
+            )
+
+    qs = Roteiro.objects.filter(origem_cidade_id=sede_cidade.pk).prefetch_related("destinos")
+    if excluir_pk:
+        qs = qs.exclude(pk=excluir_pk)
+    if saida_dt is not None:
+        qs = qs.filter(saida_dt=saida_dt)
+    if evento is not None:
+        qs = qs.filter(evento_id=evento.pk)
+
+    for outro in qs:
+        ids_outro = [d.cidade_id for d in outro.destinos.all().order_by("ordem")]
+        if ids_outro == destino_ids:
+            return outro
+    return None
+
+
+def _limpar_rascunhos_vazios(roteiro_atual_pk):
+    """Apaga rascunhos órfãos sem sede, destinos, trechos ou saída — geralmente sobras de race da autosave."""
+    Roteiro.objects.filter(
+        destinos__isnull=True,
+        trechos__isnull=True,
+        saida_dt__isnull=True,
+        origem_cidade__isnull=True,
+    ).exclude(pk=roteiro_atual_pk).delete()
+
+
 @transaction.atomic
 def criar_roteiro(form, roteiro_state, validated, diarias_resultado, *, evento=None):
     roteiro = form.save(commit=False)
@@ -223,6 +276,7 @@ def criar_roteiro(form, roteiro_state, validated, diarias_resultado, *, evento=N
         roteiro, roteiro_state, validated, diarias_resultado=diarias_resultado
     )
     _apply_saved_map_route_from_post(roteiro, form.data)
+    _limpar_rascunhos_vazios(roteiro.pk)
     return roteiro
 
 
@@ -237,6 +291,7 @@ def atualizar_roteiro(instance, form, roteiro_state, validated, diarias_resultad
         roteiro, roteiro_state, validated, diarias_resultado=diarias_resultado
     )
     _apply_saved_map_route_from_post(roteiro, form.data)
+    _limpar_rascunhos_vazios(roteiro.pk)
     return roteiro
 
 

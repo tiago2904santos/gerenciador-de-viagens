@@ -1,7 +1,15 @@
 from core.presenters.meta import build_meta
 
 
-def apresentar_linha_lista_simples_termo(termo, *, edit_url="#", delete_url="#", delete_modal=False):
+def apresentar_linha_lista_simples_termo(
+    termo,
+    *,
+    edit_url="#",
+    delete_url="#",
+    delete_modal=False,
+    pdf_url="",
+    docx_url="",
+):
     servidores = termo.servidores_efetivos()
     servidores_count = servidores.count()
     if servidores_count:
@@ -27,4 +35,6 @@ def apresentar_linha_lista_simples_termo(termo, *, edit_url="#", delete_url="#",
         "edit_url": edit_url,
         "delete_url": delete_url,
         "delete_modal": delete_modal,
+        "pdf_url": pdf_url,
+        "docx_url": docx_url,
     }

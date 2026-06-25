@@ -164,13 +164,13 @@ def _roteiro_faixa_lateral_class(roteiro):
 def apresentar_roteiro_card(roteiro):
     origem_txt = _label_cidade_uf(roteiro.origem_cidade, roteiro.origem_estado)
     destinos_todos = list(roteiro.destinos.all()) if roteiro.pk else []
-    destino_principal_txt = "—"
-    if destinos_todos:
-        primeiro = destinos_todos[0]
-        destino_principal_txt = _label_cidade_uf(primeiro.cidade, primeiro.estado)
+    destinos_txt_list = [
+        _label_cidade_uf(destino.cidade, destino.estado) for destino in destinos_todos
+    ]
+    destinos_txt_list = [txt for txt in destinos_txt_list if txt and txt != "—"]
 
-    if destino_principal_txt != "—":
-        titulo_rota = f"{origem_txt} → {destino_principal_txt}"
+    if destinos_txt_list:
+        titulo_rota = " → ".join([origem_txt, *destinos_txt_list])
     else:
         titulo_rota = origem_txt if origem_txt != "—" else f"Roteiro #{roteiro.pk}"
 

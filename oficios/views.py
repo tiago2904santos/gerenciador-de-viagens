@@ -1123,21 +1123,21 @@ def baixar_justificativa_documento(request, pk, formato):
     except ValueError as exc:
         raise Http404("Formato documental nao suportado.") from exc
 
-    avaliacao = validar_oficio_para_documento(oficio)
-    if avaliacao["pendencias"]:
-        messages.error(request, "Documento nao gerado porque o oficio esta incompleto.")
-        alvo = redirect_para_corrigir_documento_oficio(oficio)
-        return redirect(f"{alvo}?documento_incompleto=1")
     with measure_step(
         "http_baixar_justificativa_documento",
         {"oficio_id": oficio.pk, "formato": formato_documento.value},
     ):
-        return download_documento_or_redirect_pdf_error(
+        response = download_documento_or_redirect_pdf_error(
             request,
             oficio_id=oficio.pk,
             formato=formato_documento,
             gerar=lambda: gerar_resposta_justificativa_documento(oficio, formato_documento),
         )
+    if hasattr(response, "headers") and response.get("Content-Disposition", "").startswith("attachment"):
+        ext = "pdf" if formato_documento == DocumentoFormato.PDF else "docx"
+        safe_numero = oficio.numero_formatado.replace("/", "-")
+        response["Content-Disposition"] = f'attachment; filename="Justificativa {safe_numero}.{ext}"'
+    return response
 
 
 def baixar_ordem_servico_documento(request, pk, formato):

@@ -37,8 +37,8 @@ def _build_common_context(config):
         contatos.append(f"E-mail: {email}")
 
     rodape_contato = " | ".join(contatos)
-    divisao_str = str(config.divisao) if config.divisao_id else ""
-    unidade_str = str(config.unidade) if config.unidade_id else ""
+    divisao_str = config.divisao.nome if config.divisao_id else ""
+    unidade_str = config.unidade.nome if config.unidade_id else ""
     unidade_rodape = " - ".join(
         [item for item in [divisao_str, unidade_str] if item.strip()],
     ).strip()
