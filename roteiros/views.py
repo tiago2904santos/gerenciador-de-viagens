@@ -51,6 +51,7 @@ from .services import (
     calcular_diarias_roteiro_request,
     carregar_opcoes_rotas_avulsas_salvas,
     criar_roteiro,
+    encontrar_roteiro_duplicado,
     excluir_roteiro,
     normalizar_destinos_e_trechos_apos_erro_post,
     obter_initial_roteiro,
@@ -159,31 +160,57 @@ def _pagination_pages(page_obj, *, on_each_side=1, on_ends=1):
     ]
 
 
+def _resolver_rascunho_autosave(request):
+    raw = (request.POST.get("autosave_obj_id") or "").strip()
+    if not raw:
+        return None
+    try:
+        pk = int(raw)
+    except (TypeError, ValueError):
+        return None
+    return Roteiro.objects.filter(pk=pk).first()
+
+
 def novo(request):
     evento = resolve_evento_from_request(request)
     initial = _initial_roteiro_evento(evento)
-    form = RoteiroForm(request.POST or None, initial=initial)
-    form.instance.evento = evento
-    form.instance.tipo = Roteiro.TIPO_EVENTO if evento is not None else Roteiro.TIPO_AVULSO
+
+    rascunho = _resolver_rascunho_autosave(request) if request.method == "POST" else None
+    form = RoteiroForm(request.POST or None, initial=initial, instance=rascunho)
+    if rascunho is None:
+        form.instance.evento = evento
+        form.instance.tipo = Roteiro.TIPO_EVENTO if evento is not None else Roteiro.TIPO_AVULSO
     if request.method != "POST" and initial:
         form.instance.origem_cidade_id = initial.get("origem_cidade")
         form.instance.origem_estado_id = initial.get("origem_estado")
 
     preparar_querysets_formulario_roteiro(
-        form, method=request.method, post=request.POST, instance=None
+        form, method=request.method, post=request.POST, instance=rascunho
     )
     route_options, route_state_map = carregar_opcoes_rotas_avulsas_salvas()
 
     if request.method == "POST":
         roteiro_state, validated, diarias_resultado = validar_submissao_editor_roteiro(
-            request.POST, route_state_map, roteiro=None
+            request.POST, route_state_map, roteiro=rascunho
         )
         if form.is_valid() and validated["ok"]:
-            roteiro = criar_roteiro(form, roteiro_state, validated, diarias_resultado, evento=evento)
-            messages.success(request, "Roteiro cadastrado com sucesso.")
-            if evento is not None:
-                return redirect("eventos:guiado_etapa", pk=evento.pk, etapa=2)
-            return redirect("roteiros:editar", pk=roteiro.pk)
+            duplicado = encontrar_roteiro_duplicado(
+                validated, roteiro_state, evento=evento, excluir_pk=getattr(rascunho, "pk", None)
+            )
+            if duplicado is not None:
+                form.add_error(
+                    None,
+                    f"Já existe um roteiro idêntico salvo (#{duplicado.pk}). Edite o existente ou ajuste os dados.",
+                )
+            else:
+                if rascunho is not None:
+                    roteiro = atualizar_roteiro(rascunho, form, roteiro_state, validated, diarias_resultado)
+                else:
+                    roteiro = criar_roteiro(form, roteiro_state, validated, diarias_resultado, evento=evento)
+                messages.success(request, "Roteiro cadastrado com sucesso.")
+                if evento is not None:
+                    return redirect("eventos:guiado_etapa", pk=evento.pk, etapa=2)
+                return redirect("roteiros:index")
         for error in validated.get("errors", []):
             form.add_error(None, error)
         destinos_atuais, trechos_list = normalizar_destinos_e_trechos_apos_erro_post(roteiro_state)
@@ -252,13 +279,22 @@ def editar(request, pk):
             request.POST, route_state_map, roteiro=roteiro
         )
         if form.is_valid() and validated["ok"]:
-            atualizar_roteiro(roteiro, form, roteiro_state, validated, diarias_resultado)
-            messages.success(request, "Roteiro atualizado com sucesso.")
-            if next_url:
-                return redirect(next_url)
-            if roteiro.evento_id:
-                return redirect("eventos:guiado_etapa", pk=roteiro.evento_id, etapa=2)
-            return redirect("roteiros:index")
+            duplicado = encontrar_roteiro_duplicado(
+                validated, roteiro_state, evento=evento, excluir_pk=roteiro.pk
+            )
+            if duplicado is not None:
+                form.add_error(
+                    None,
+                    f"Já existe um roteiro idêntico salvo (#{duplicado.pk}). Edite o existente ou ajuste os dados.",
+                )
+            else:
+                atualizar_roteiro(roteiro, form, roteiro_state, validated, diarias_resultado)
+                messages.success(request, "Roteiro atualizado com sucesso.")
+                if next_url:
+                    return redirect(next_url)
+                if roteiro.evento_id:
+                    return redirect("eventos:guiado_etapa", pk=roteiro.evento_id, etapa=2)
+                return redirect("roteiros:index")
         for error in validated.get("errors", []):
             form.add_error(None, error)
         destinos_atuais, trechos_list = normalizar_destinos_e_trechos_apos_erro_post(roteiro_state)

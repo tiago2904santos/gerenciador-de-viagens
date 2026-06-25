@@ -87,6 +87,8 @@ def index(request):
             edit_url=reverse("termos:editar", args=[termo.pk]),
             delete_url=reverse("termos:excluir", args=[termo.pk]),
             delete_modal=True,
+            pdf_url=reverse("termos:baixar_termo_cadastro_pdf", args=[termo.pk]),
+            docx_url=reverse("termos:baixar_termo_cadastro_docx", args=[termo.pk]),
         )
         for termo in page_obj.object_list
     ]
@@ -542,13 +544,17 @@ def termo_cadastro_servidor_pdf_inline(request, pk, servidor_pk):
     )
 
 
+def _termo_cadastro_docs_com_generico(termo, formato):
+    """Termo genérico + termos individuais de cada servidor selecionado."""
+    docs = [gerar_termo_cadastro_um(termo, None, formato)]
+    docs.extend(gerar_termo_cadastro_lote(termo, formato))
+    return docs
+
+
 @require_GET
 def baixar_termo_cadastro_pdf(request, pk):
     termo = get_object_or_404(_termo_queryset(), pk=pk)
-    docs = _termo_cadastro_docs_or_none(termo, DocumentoFormato.PDF)
-    if docs is None:
-        messages.error(request, "Nenhum termo gerado.")
-        return redirect("termos:editar", pk=termo.pk)
+    docs = _termo_cadastro_docs_com_generico(termo, DocumentoFormato.PDF)
     content = docs[0].conteudo if len(docs) == 1 else fundir_termos_pdf(docs)
     response = HttpResponse(content, content_type="application/pdf")
     response["Content-Disposition"] = f'attachment; filename="termo_{termo.pk}.pdf"'
@@ -560,10 +566,7 @@ def baixar_termo_cadastro_pdf(request, pk):
 @require_GET
 def baixar_termo_cadastro_docx(request, pk):
     termo = get_object_or_404(_termo_queryset(), pk=pk)
-    docs = _termo_cadastro_docs_or_none(termo, DocumentoFormato.DOCX)
-    if docs is None:
-        messages.error(request, "Nenhum termo gerado.")
-        return redirect("termos:editar", pk=termo.pk)
+    docs = _termo_cadastro_docs_com_generico(termo, DocumentoFormato.DOCX)
     if len(docs) == 1:
         doc = docs[0]
         response = HttpResponse(doc.conteudo, content_type=doc.content_type)

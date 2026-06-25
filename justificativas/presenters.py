@@ -43,6 +43,8 @@ def apresentar_linha_lista_simples_justificativa(
     edit_url: str | None = None,
     delete_url: str | None = None,
     delete_modal: bool = False,
+    pdf_url: str | None = None,
+    docx_url: str | None = None,
 ):
     oficio = justificativa.oficio
     texto = (justificativa.texto or "").strip()
@@ -75,6 +77,8 @@ def apresentar_linha_lista_simples_justificativa(
         "edit_url": edit_url or reverse("oficios:wizard_justificativa", args=[oficio.pk]),
         "delete_url": delete_url,
         "delete_modal": delete_modal,
+        "pdf_url": pdf_url or reverse("oficios:baixar_justificativa_documento", args=[oficio.pk, "pdf"]),
+        "docx_url": docx_url or reverse("oficios:baixar_justificativa_documento", args=[oficio.pk, "docx"]),
     }
 
 

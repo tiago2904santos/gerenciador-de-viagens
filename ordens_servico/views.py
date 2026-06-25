@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from datetime import datetime
+from urllib.parse import urlencode
 
 from django.contrib import messages
 from django.core.serializers.json import DjangoJSONEncoder
@@ -180,7 +181,7 @@ def _evento_display_values(form):
     }
 
 
-def _form_context(*, form, ordem=None, evento=None):
+def _form_context(*, request, form, ordem=None, evento=None):
     oficios_qs = form.fields["oficios"].queryset.select_related("roteiro").prefetch_related(
         "roteiro__destinos__cidade",
         "servidores",
@@ -190,13 +191,18 @@ def _form_context(*, form, ordem=None, evento=None):
         s = _build_oficio_summary(oficio)
         summaries[str(s["id"])] = s
 
+    servidor_create_url = (
+        f"{reverse('cadastros:servidor_create')}"
+        f"?{urlencode({'next': request.get_full_path()})}"
+    )
+
     return {
         "page_title": "Nova Ordem de Serviço" if ordem is None or not ordem.pk else f"Editar {ordem.numero_formatado}",
         "form": form,
         "ordem": ordem,
         "index_url": _ordem_lista_url(ordem=ordem, evento=evento),
         "back_label": _ordem_back_label(ordem=ordem, evento=evento),
-        "servidor_create_url": reverse("cadastros:servidor_create"),
+        "servidor_create_url": servidor_create_url,
         "modelos_motivo_url": reverse("oficios:modelos_motivo_index"),
         "tem_modelos_motivo": form.fields["modelo_motivo"].queryset.exists(),
         "api_cidades_por_estado_url": reverse("roteiros:api_cidades_por_estado", kwargs={"estado_id": 0}),
@@ -233,7 +239,7 @@ def nova(request):
             return _redirect_ordem_lista(ordem)
     else:
         form = OrdemServicoForm(instance=ordem, initial=initial)
-    return render(request, "ordens_servico/form.html", _form_context(form=form, ordem=None, evento=evento))
+    return render(request, "ordens_servico/form.html", _form_context(request=request, form=form, ordem=None, evento=evento))
 
 
 @require_http_methods(["GET", "POST"])
@@ -247,7 +253,7 @@ def editar(request, pk):
             return _redirect_ordem_lista(ordem)
     else:
         form = OrdemServicoForm(instance=ordem)
-    return render(request, "ordens_servico/form.html", _form_context(form=form, ordem=ordem))
+    return render(request, "ordens_servico/form.html", _form_context(request=request, form=form, ordem=ordem))
 
 
 @require_http_methods(["GET"])

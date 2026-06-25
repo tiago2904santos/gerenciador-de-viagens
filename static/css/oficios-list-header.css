@@ -11,19 +11,24 @@
   row-gap: 10px;
 }
 
-/* ── Linha 1: busca + limpar filtros lado a lado ─────────────────────────── */
+/* ── Linha única: busca + filtros + limpar filtros lado a lado ───────────── */
 .oficios-filter-bar__search-row {
   align-items: center;
   display: flex !important;
   flex: 1 1 100% !important;
+  flex-wrap: wrap;
   gap: 10px;
   min-width: 0;
 }
 
 .oficios-filter-bar__search-wrap {
-  flex: 1 1 auto;
-  min-width: 0;
+  flex: 1 1 220px;
+  min-width: 220px;
   position: relative;
+}
+
+.oficios-filter-bar__search-row > .oficios-filter-clear {
+  margin-left: auto;
 }
 
 .oficios-filter-bar__search-icon {

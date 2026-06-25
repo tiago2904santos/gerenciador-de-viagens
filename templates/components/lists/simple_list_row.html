@@ -34,6 +34,12 @@
       </form>
     {% endif %}
     <div class="cv-icon-btn-group">
+      {% if row.pdf_url %}
+        {% include "components/ui/buttons/icon_button.html" with href=row.pdf_url action="pdf" aria_label="Baixar em PDF" tooltip="PDF" only %}
+      {% endif %}
+      {% if row.docx_url %}
+        {% include "components/ui/buttons/icon_button.html" with href=row.docx_url action="docx" aria_label="Baixar em DOCX" tooltip="DOCX" only %}
+      {% endif %}
       {% if row.edit_url %}
         {% if row.edit_fields_json %}
           <button
