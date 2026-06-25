@@ -41,3 +41,7 @@ def listar_modelos_justificativa_busca(q: str | None = None, *, incluir_inativos
 
 def get_modelo_justificativa_by_id(pk):
     return get_object_or_404(ModeloJustificativa, pk=pk)
+
+
+def get_justificativa_by_id(pk):
+    return get_object_or_404(Justificativa, pk=pk)

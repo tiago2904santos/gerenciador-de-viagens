@@ -286,3 +286,8 @@ def atualizar_modelo_justificativa(instance, form):
 @transaction.atomic
 def excluir_modelo_justificativa(instance):
     instance.delete()
+
+
+@transaction.atomic
+def excluir_justificativa(instance):
+    instance.delete()
