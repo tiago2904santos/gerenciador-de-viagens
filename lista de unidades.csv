@@ -1,0 +1,97 @@
+Cidade, Divisao, Sigla_da_divisao, unidade, Sigla_da_unidade
+Curitiba, Secretaria de Estado da Segurança Pública, SESP, Secretaria de Estado da Segurança Pública, SESP
+Curitiba, Direção Superior, DGPC, Delegacia-Geral da Polícia Civil, DGPC
+Curitiba, Direção Superior, DGPC, Delegacia-Geral Adjunta, DGA
+Curitiba, Direção Superior, DGPC, Conselho da Polícia Civil, CPC
+Curitiba, Apoio Administrativo, ADM, Assessoria de Comunicação, ASCOM
+Curitiba, Apoio Administrativo, ADM, Assessoria de Planejamento Estratégico, ASPLAN
+Curitiba, Apoio Administrativo, ADM, Assessoria de Relações Institucionais, ARI
+Curitiba, Apoio Administrativo, ADM, Assessoria Jurídica, ASJUR
+Curitiba, Apoio Administrativo, ADM, Assessoria de Informática e Tecnologia, AIT
+Curitiba, Apoio Administrativo, ADM, Grupo Auxiliar Financeiro, GAF
+Curitiba, Apoio Administrativo, ADM, Departamento de Recursos Humanos, DRH
+Curitiba, Apoio Administrativo, ADM, Departamento de Logística e Patrimônio, DLP
+Curitiba, Apoio Administrativo, ADM, Assessoria de Cerimonial, ACER
+Curitiba, Apoio Administrativo, ADM, Divisão de Infraestrutura, DINFRA
+Curitiba, Apoio Administrativo, ADM, Protocolo Geral, PROT
+Curitiba, Controle e Ensino, CGPC, Corregedoria-Geral da Polícia Civil, CGPC
+Curitiba, Controle e Ensino, ESPC, Escola Superior de Polícia Civil, ESPC
+Curitiba, Inteligência, AIPC, Agência de Inteligência da Polícia Civil, AIPC
+Curitiba, Divisão de Homicídios e Proteção à Pessoa, DHPP, Delegacia de Homicídios, DH
+Curitiba, Divisão de Homicídios e Proteção à Pessoa, DHPP, Delegacia de Proteção à Pessoa, DPP
+Curitiba, Divisão Estadual de Narcóticos, DENARC, Subdivisão de Repressão Penal, SRP
+Curitiba, Divisão Estadual de Narcóticos, DENARC, Subdivisão de Inteligência e Informações, SII
+Curitiba, Divisão Estadual de Narcóticos, DENARC, Núcleo Regional de Repressão a Tráfico Ilícito de Drogas - Curitiba, NRTID-CWB
+Ponta Grossa, Divisão Estadual de Narcóticos, DENARC, Núcleo Regional de Repressão a Tráfico Ilícito de Drogas - Ponta Grossa, NRTID-PG
+Londrina, Divisão Estadual de Narcóticos, DENARC, Núcleo Regional de Repressão a Tráfico Ilícito de Drogas - Londrina, NRTID-LON
+Maringá, Divisão Estadual de Narcóticos, DENARC, Núcleo Regional de Repressão a Tráfico Ilícito de Drogas - Maringá, NRTID-MGA
+Cascavel, Divisão Estadual de Narcóticos, DENARC, Núcleo Regional de Repressão a Tráfico Ilícito de Drogas - Cascavel, NRTID-CAS
+Foz do Iguaçu, Divisão Estadual de Narcóticos, DENARC, Núcleo Regional de Repressão a Tráfico Ilícito de Drogas - Foz do Iguaçu, NRTID-FOZ
+Curitiba, Divisão Estadual de Narcóticos, DENARC, Núcleo Regional de Repressão a Tráfico Ilícito de Drogas - RMC, NRTID-MET
+Curitiba, Divisão Estadual de Combate à Corrupção, DECCOR, Delegacia de Combate à Corrupção - 1ª Divisão, DECCOR-1
+Curitiba, Divisão de Investigações Criminais, DIC, Delegacia de Furtos e Roubos, DFR
+Curitiba, Divisão de Investigações Criminais, DIC, Delegacia de Furtos e Roubos de Veículos, DFRV
+Curitiba, Divisão de Investigações Criminais, DIC, Delegacia de Furtos e Roubos de Cargas, DFRC
+Curitiba, Divisão de Investigações Criminais, DIC, Delegacia de Vigilância e Capturas, DVC
+Curitiba, Divisão Policial Especializada, DPE, Delegacia da Mulher, DM
+Curitiba, Divisão Policial Especializada, DPE, Coordenação Estadual das Delegacias da Mulher, COORDEAM
+Curitiba, Divisão Policial Especializada, DPE, Núcleo de Proteção à Criança e ao Adolescente Vítimas de Crimes, NUCRIA
+Curitiba, Divisão Policial Especializada, DPE, Delegacia do Adolescente, DA
+Curitiba, Divisão Policial Especializada, DPE, Delegacia de Crimes contra a Economia e Proteção ao Consumidor, DELCON
+Curitiba, Divisão Policial Especializada, DPE, Delegacia de Delitos de Trânsito, DEDETRAN
+Curitiba, Divisão Policial Especializada, DPE, Delegacia de Proteção ao Meio Ambiente, DPMA
+Curitiba, Divisão Policial Especializada, DPE, Delegacia de Explosivos Armas e Munições, DEAM
+Curitiba, Divisão Policial Especializada, DPE, Delegacia de Estelionato, DE
+Curitiba, Divisão Policial Especializada, DPE, Núcleo de Combate aos Cibercrimes, NUCIBER
+Curitiba, Divisão Policial Especializada, DPE, Delegacia Móvel de Atendimento ao Futebol e Eventos, DEMAFE
+Curitiba, Operações Especiais, COPE, Centro de Operações Policiais Especiais, COPE
+Curitiba, Operações Especiais, TIGRE, Tático Integrado de Grupos de Repressão Especial, TIGRE
+São José dos Pinhais, Operações Especiais, GOA, Grupamento de Operações Aéreas, GOA
+Curitiba, Divisão Policial da Capital, DPCAP, Central de Flagrantes Curitiba, CF
+Curitiba, Divisão Policial da Capital, DPCAP, 1º Distrito Policial, 01DP
+Curitiba, Divisão Policial da Capital, DPCAP, 2º Distrito Policial, 02DP
+Curitiba, Divisão Policial da Capital, DPCAP, 3º Distrito Policial, 03DP
+Curitiba, Divisão Policial da Capital, DPCAP, 4º Distrito Policial, 04DP
+Curitiba, Divisão Policial da Capital, DPCAP, 5º Distrito Policial, 05DP
+Curitiba, Divisão Policial da Capital, DPCAP, 6º Distrito Policial, 06DP
+Curitiba, Divisão Policial da Capital, DPCAP, 7º Distrito Policial, 07DP
+Curitiba, Divisão Policial da Capital, DPCAP, 8º Distrito Policial, 08DP
+Curitiba, Divisão Policial da Capital, DPCAP, 9º Distrito Policial, 09DP
+Curitiba, Divisão Policial da Capital, DPCAP, 10º Distrito Policial, 10DP
+Curitiba, Divisão Policial da Capital, DPCAP, 11º Distrito Policial, 11DP
+Curitiba, Divisão Policial da Capital, DPCAP, 12º Distrito Policial, 12DP
+Curitiba, Divisão Policial da Capital, DPCAP, 13º Distrito Policial, 13DP
+Curitiba, Divisão Policial Metropolitana, DPRMET, Sede Administrativa DPRMET, DPRMET-ADM
+Almirante Tamandaré, Divisão Policial Metropolitana, DPRMET, Delegacia de Almirante Tamandaré, DP-ALT
+Araucária, Divisão Policial Metropolitana, DPRMET, Delegacia de Araucária, DP-ARA
+Colombo, Divisão Policial Metropolitana, DPRMET, Delegacia de Colombo, DP-COL
+Pinhais, Divisão Policial Metropolitana, DPRMET, Delegacia de Pinhais, DP-PIN
+Piraquara, Divisão Policial Metropolitana, DPRMET, Delegacia de Piraquara, DP-PRQ
+São José dos Pinhais, Divisão Policial Metropolitana, DPRMET, Delegacia de São José dos Pinhais, DP-SJP
+Curitiba, Divisão Policial do Interior, DPI, Sede Administrativa DPI, DPI-ADM
+Paranaguá, Divisão Policial do Interior, DPI, 1ª Subdivisão Policial, 01SDP
+Laranjeiras do Sul, Divisão Policial do Interior, DPI, 2ª Subdivisão Policial, 02SDP
+São Mateus do Sul, Divisão Policial do Interior, DPI, 3ª Subdivisão Policial, 03SDP
+União da Vitória, Divisão Policial do Interior, DPI, 4ª Subdivisão Policial, 04SDP
+Pato Branco, Divisão Policial do Interior, DPI, 5ª Subdivisão Policial, 05SDP
+Foz do Iguaçu, Divisão Policial do Interior, DPI, 6ª Subdivisão Policial, 06SDP
+Umuarama, Divisão Policial do Interior, DPI, 7ª Subdivisão Policial, 07SDP
+Paranavaí, Divisão Policial do Interior, DPI, 8ª Subdivisão Policial, 08SDP
+Maringá, Divisão Policial do Interior, DPI, 9ª Subdivisão Policial, 09SDP
+Londrina, Divisão Policial do Interior, DPI, 10ª Subdivisão Policial, 10SDP
+Cornélio Procópio, Divisão Policial do Interior, DPI, 11ª Subdivisão Policial, 11SDP
+Jacarezinho, Divisão Policial do Interior, DPI, 12ª Subdivisão Policial, 12SDP
+Ponta Grossa, Divisão Policial do Interior, DPI, 13ª Subdivisão Policial, 13SDP
+Guarapuava, Divisão Policial do Interior, DPI, 14ª Subdivisão Policial, 14SDP
+Cascavel, Divisão Policial do Interior, DPI, 15ª Subdivisão Policial, 15SDP
+Campo Mourão, Divisão Policial do Interior, DPI, 16ª Subdivisão Policial, 16SDP
+Apucarana, Divisão Policial do Interior, DPI, 17ª Subdivisão Policial, 17SDP
+Telêmaco Borba, Divisão Policial do Interior, DPI, 18ª Subdivisão Policial, 18SDP
+Rolândia, Divisão Policial do Interior, DPI, 19ª Subdivisão Policial, 19SDP
+Toledo, Divisão Policial do Interior, DPI, 20ª Subdivisão Policial, 20SDP
+Cianorte, Divisão Policial do Interior, DPI, 21ª Subdivisão Policial, 21SDP
+Arapongas, Divisão Policial do Interior, DPI, 22ª Subdivisão Policial, 22SDP
+Castro, Divisão Policial do Interior, DPI, 23ª Subdivisão Policial, 23SDP
+Guaíra, Divisão Policial do Interior, DPI, Delegacia Regional de Guaíra, DR-GUA
+Irati, Divisão Policial do Interior, DPI, Delegacia Regional de Irati, DR-IRA
+Santo Antônio da Platina, Divisão Policial do Interior, DPI, Delegacia Regional de SAP, DR-SAP
