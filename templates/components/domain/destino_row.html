@@ -1,6 +1,11 @@
 <div class="cv-search-picker__selected-card destino-row{% if row_single %} destino-row--single{% endif %}{% if row_extra_class %} {{ row_extra_class }}{% endif %}"
+     data-destinos-row
      {% if pt_row %}data-pt-destino-row{% endif %}
      {% if has_pt_index %}data-pt-destino-index="{{ pt_index }}"{% endif %}
+     {% if termo_row %}data-termo-destino-row{% endif %}
+     {% if has_termo_index %}data-termo-destino-index="{{ termo_index }}"{% endif %}
+     {% if os_row %}data-os-destino-row{% endif %}
+     {% if has_os_index %}data-os-destino-index="{{ os_index }}"{% endif %}
      {% if has_destino_index %}data-destino-index="{{ destino_index }}"{% endif %}>
   <div class="cv-search-picker__selected-main">
     <div class="cv-search-picker__selected-title-row">
@@ -29,5 +34,7 @@
           aria-label="Remover destino"
           {% if row_single or remove_hidden %}hidden{% endif %}
           {% if pt_row %}data-pt-remove-destino{% endif %}
+          {% if termo_row %}data-termo-remove-destino{% endif %}
+          {% if os_row %}data-os-remove-destino{% endif %}
           {% if remover_destino %}data-remover-destino{% endif %}>x</button>
 </div>

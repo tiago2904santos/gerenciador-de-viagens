@@ -1,6 +1,7 @@
 <section class="wizard-inner-section termo-evento-destinos{% if section_extra_class %} {{ section_extra_class }}{% endif %}"
          aria-labelledby="{{ title_id|default:'destinos-title' }}"
-         id="{{ section_id|default:'sec-destinos' }}">
+         id="{{ section_id|default:'sec-destinos' }}"
+         data-destinos-section>
   <header class="wizard-inner-section__header">
     <h4 class="wizard-inner-section__title" id="{{ title_id|default:'destinos-title' }}">{{ title|default:'Destinos' }}</h4>
     <p class="wizard-inner-section__description">{{ description|default:'Cada destino usa o mesmo padrão visual da sede para manter o fluxo consistente.' }}</p>
@@ -14,7 +15,7 @@
                 {% if add_button_id %}id="{{ add_button_id }}"{% endif %}
                 {% if add_button_pt %}data-pt-add-destino{% endif %}
                 {% if add_button_termo %}data-termo-add-destino{% endif %}
-                {% if add_button_os %}data-os-add-destino onclick="event.preventDefault(); event.stopPropagation(); window.OSFocusDestino && window.OSFocusDestino(this); return false;"{% endif %}
+                {% if add_button_os %}data-os-add-destino{% endif %}
                 {% if add_button_evento %}data-evento-add-destino{% endif %}
                 {% if add_button_evento_d %}data-evento-add-destino-d{% endif %}>
           <span>+ Adicionar destino</span>

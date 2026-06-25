@@ -97,10 +97,8 @@ def _save_destinos_extras(evento, request):
         destinos = []
     if destinos and isinstance(destinos, list):
         primeiro = destinos[0] if destinos else {}
-        if not evento.destino_uf:
-            evento.destino_uf = primeiro.get("uf", "")
-        if not evento.destino_cidade:
-            evento.destino_cidade = primeiro.get("cidade", "")
+        evento.destino_uf = primeiro.get("uf", "")
+        evento.destino_cidade = primeiro.get("cidade", "")
         evento.destinos_extras = destinos[1:] if len(destinos) > 1 else []
     else:
         evento.destinos_extras = []

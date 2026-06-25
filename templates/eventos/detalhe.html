@@ -248,19 +248,44 @@
                   cidadeSel.appendChild(opt);
                 });
                 cidadeSel.disabled = false;
+                reinitPickerD(cidadeSel);
+              }
+
+              function reinitPickerD(select) {
+                if (!select || !window.CV || !window.CV.fields || !window.CV.fields.initSearchPickers) return;
+                if (select.dataset.cvSearchPickerReady === 'true') {
+                  delete select.dataset.cvSearchPickerReady;
+                  var nextEl = select.nextElementSibling;
+                  if (nextEl && nextEl.classList && nextEl.classList.contains('cv-search-picker')) {
+                    nextEl.parentNode.removeChild(nextEl);
+                  }
+                }
+                window.CV.fields.initSearchPickers(select.parentNode || document);
               }
 
               function loadCidadesForUfD(form, cidadeSel, uf, initialValue) {
+                if (window.CV && window.CV.destinos && typeof window.CV.destinos.loadCities === 'function') {
+                  return window.CV.destinos.loadCities({
+                    citySelect: cidadeSel,
+                    stateId: uf,
+                    selectedId: initialValue,
+                    form: form,
+                    cache: CIDADES_CACHE_D,
+                    requestAttr: 'eventoCitiesRequestD'
+                  });
+                }
                 uf = String(uf || '').trim();
                 var urlTemplate = (form && form.dataset.apiCidadesUrl) || '';
                 cidadeSel.innerHTML = '<option value="">---------</option>';
                 if (!uf || !urlTemplate) {
                   cidadeSel.disabled = true;
+                  reinitPickerD(cidadeSel);
                   return;
                 }
                 var cached = CIDADES_CACHE_D[uf];
                 if (cached) { populateCidadesD(cidadeSel, cached, initialValue); return; }
                 cidadeSel.disabled = true;
+                reinitPickerD(cidadeSel);
                 var url = urlTemplate.replace('/0/', '/' + encodeURIComponent(uf) + '/');
                 fetch(url, { headers: { Accept: 'application/json' } })
                   .then(function (r) { return r.json(); })
@@ -268,7 +293,10 @@
                     CIDADES_CACHE_D[uf] = data;
                     populateCidadesD(cidadeSel, data, initialValue);
                   })
-                  .catch(function () { cidadeSel.disabled = true; });
+                  .catch(function () {
+                    cidadeSel.disabled = true;
+                    reinitPickerD(cidadeSel);
+                  });
               }
 
               function syncTipoOutroD() {
@@ -306,19 +334,10 @@
                 var rows = lista.querySelectorAll('[data-destino-index]');
                 var result = [];
                 rows.forEach(function (row) {
-                  var idx = row.dataset.destinoIndex;
-                  var uf, cidade;
-                  if (idx === '0') {
-                    var ufSel = row.querySelector('select[name="destino_uf"]');
-                    var cidadeSel = row.querySelector('[data-destino-cidade-picker]');
-                    uf = ufSel ? ufSel.value : '';
-                    cidade = cidadeSel ? cidadeSel.value : '';
-                  } else {
-                    var ufSelExtra = row.querySelector('[data-destino-uf-extra]');
-                    var cidadeSelExtra = row.querySelector('[data-destino-cidade-extra]');
-                    uf = ufSelExtra ? ufSelExtra.value : '';
-                    cidade = cidadeSelExtra ? cidadeSelExtra.value : '';
-                  }
+                  var ufSel = row.querySelector('select[name="destino_uf"], [data-destino-uf-extra]');
+                  var cidadeSel = row.querySelector('[data-destino-cidade-picker], [data-destino-cidade-extra]');
+                  var uf = ufSel ? ufSel.value : '';
+                  var cidade = cidadeSel ? cidadeSel.value : '';
                   result.push({ uf: uf, cidade: cidade });
                 });
                 jsonInput.value = JSON.stringify(result);
@@ -327,6 +346,13 @@
               var SEDE_UF_D = '{{ sede_uf|escapejs }}';
 
               function refreshRemoveButtonsD(lista) {
+                if (window.CV && window.CV.destinos && typeof window.CV.destinos.updateSingleRowState === 'function') {
+                  window.CV.destinos.updateSingleRowState(lista, {
+                    rowSelector: '[data-destino-index]',
+                    removeSelector: '[data-remover-destino]'
+                  });
+                  return;
+                }
                 var rows = lista.querySelectorAll('[data-destino-index]');
                 var count = rows.length;
                 rows.forEach(function (row) {
@@ -344,6 +370,14 @@
                 if (!btn || !lista || !tmpl) return;
 
                 var extraCount = 0;
+
+                if (window.CV && window.CV.destinos && typeof window.CV.destinos.initDragDrop === 'function') {
+                  window.CV.destinos.initDragDrop(lista, {
+                    rowSelector: '[data-destino-index]',
+                    removeSelector: '[data-remover-destino]',
+                    onReorder: function() { refreshRemoveButtonsD(lista); }
+                  });
+                }
 
                 function wireRow(row) {
                   var removeBtn = row.querySelector('[data-remover-destino]');
@@ -368,6 +402,28 @@
                 refreshRemoveButtonsD(lista);
 
                 btn.addEventListener('click', function () {
+                  if (window.CV && window.CV.destinos && typeof window.CV.destinos.appendTemplateRow === 'function') {
+                    var appended = window.CV.destinos.appendTemplateRow({
+                      list: lista,
+                      template: tmpl,
+                      rowSelector: '[data-destino-index]',
+                      removeSelector: '[data-remover-destino]',
+                      indexAttr: 'destinoIndex',
+                      bindRow: wireRow,
+                      afterAppend: function(row) {
+                        refreshRemoveButtonsD(lista);
+                        if (SEDE_UF_D && row) {
+                          var ufExtra = row.querySelector('[data-destino-uf-extra]');
+                          if (ufExtra) {
+                            ufExtra.value = SEDE_UF_D;
+                            ufExtra.dispatchEvent(new Event('change', { bubbles: true }));
+                          }
+                        }
+                      }
+                    });
+                    if (appended) refreshRemoveButtonsD(lista);
+                    return;
+                  }
                   extraCount += 1;
                   var clone = tmpl.content.cloneNode(true);
                   var row = clone.querySelector('[data-destino-index]');

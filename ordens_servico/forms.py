@@ -157,6 +157,7 @@ class OrdemServicoForm(forms.ModelForm):
         self.fields["modelo_motivo"].queryset = (
             ModeloMotivoOficio.objects.filter(ativo=True).order_by("ordem", "nome")
         )
+        self.destination_rows = self._build_destination_rows(estado_id, cidade_id)
 
     def _resolve_destino_inicial(self):
         cidade_id = None
@@ -192,6 +193,53 @@ class OrdemServicoForm(forms.ModelForm):
 
         return estado_id, cidade_id
 
+    def _build_destination_rows(self, estado_id, cidade_id):
+        rows = []
+        if self.is_bound:
+            rows.append(self._destination_row_from_values(0, self.data.get("destino_estado"), self.data.get("destino_cidade")))
+            for idx in self._extra_destination_indexes():
+                rows.append(
+                    self._destination_row_from_values(
+                        idx,
+                        self.data.get(f"destino_estado_{idx}"),
+                        self.data.get(f"destino_cidade_{idx}"),
+                    )
+                )
+        elif self.instance and self.instance.pk:
+            destinos = list(self.instance.destinos.select_related("estado").order_by("nome", "pk"))
+            if destinos:
+                for idx, cidade in enumerate(destinos):
+                    rows.append(self._destination_row_from_values(idx, cidade.estado_id, cidade.pk))
+            else:
+                rows.append(self._destination_row_from_values(0, estado_id, cidade_id))
+        else:
+            rows.append(self._destination_row_from_values(0, estado_id, cidade_id))
+
+        return rows or [self._destination_row_from_values(0, estado_id, cidade_id)]
+
+    def _destination_row_from_values(self, index, estado_id, cidade_id):
+        estado_id = str(estado_id or "").strip()
+        cidade_id = str(cidade_id or "").strip()
+        cidade_qs = Cidade.objects.select_related("estado").none()
+        if estado_id:
+            cidade_qs = Cidade.objects.select_related("estado").filter(estado_id=estado_id).order_by("nome")
+        return {
+            "index": index,
+            "is_primary": index == 0,
+            "estado_id": estado_id,
+            "cidade_id": cidade_id,
+            "cidades": list(cidade_qs),
+        }
+
+    def _extra_destination_indexes(self):
+        return sorted(
+            {
+                int(name.rsplit("_", 1)[1])
+                for name in self.data.keys()
+                if name.startswith("destino_estado_") and name.rsplit("_", 1)[1].isdigit()
+            }
+        )
+
     def clean(self):
         cleaned = super().clean()
         cidade = cleaned.get("destino_cidade")
@@ -200,13 +248,33 @@ class OrdemServicoForm(forms.ModelForm):
         if estado and not cidade:
             self.add_error("destino_cidade", "Informe a cidade do destino.")
 
+        destinos = []
+        if cidade:
+            destinos.append(cidade.pk)
+        for idx in self._extra_destination_indexes():
+            estado_raw = (self.data.get(f"destino_estado_{idx}") or "").strip()
+            cidade_raw = (self.data.get(f"destino_cidade_{idx}") or "").strip()
+            if not estado_raw and not cidade_raw:
+                continue
+            if estado_raw and not cidade_raw:
+                self.add_error(None, f"Informe a cidade do destino adicional {idx}.")
+                continue
+            cidade_obj = Cidade.objects.select_related("estado").filter(pk=cidade_raw).first() if cidade_raw else None
+            if not cidade_obj:
+                self.add_error(None, f"Selecione uma cidade valida para o destino adicional {idx}.")
+                continue
+            destinos.append(cidade_obj.pk)
+        self.cleaned_destinos = destinos
+
         return cleaned
 
     def save(self, commit=True):
         ordem = super().save(commit=commit)
-        destino_cidade = self.cleaned_data.get("destino_cidade")
+        destino_ids = getattr(self, "cleaned_destinos", []) or []
+        if not destino_ids and self.cleaned_data.get("destino_cidade"):
+            destino_ids = [self.cleaned_data["destino_cidade"].pk]
 
         if commit:
-            ordem.destinos.set([destino_cidade] if destino_cidade else [])
+            ordem.destinos.set(destino_ids)
 
         return ordem

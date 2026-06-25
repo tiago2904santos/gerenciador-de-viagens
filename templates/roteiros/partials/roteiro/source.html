@@ -124,6 +124,9 @@
       </section>
 
       {% include "components/domain/destinos_section.html" with section_id="sec-destinos" title_id="sec-destinos-title" add_button_id="btn-adicionar-destino" list_id="destinos-container" %}
+      <template id="tmpl-destino-roteiro">
+        {% include "components/domain/destino_row.html" with state_select_template="roteiros/partials/roteiro/_destino_template_state.html" city_select_template="roteiros/partials/roteiro/_destino_template_city.html" %}
+      </template>
 
     </div>{# /panel-roteiro-novo #}
   </div>
@@ -170,6 +173,5 @@
   }).observe(panelSalvo, { attributes: true, attributeFilter: ['hidden'] });
 })();
 </script>
-
 
 

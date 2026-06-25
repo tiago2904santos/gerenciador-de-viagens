@@ -1,0 +1,247 @@
+/* ============================================================================
+   Cabeçalho da lista de ofícios — filtros reestilizados
+   ========================================================================== */
+
+.oficios-rail {
+  align-items: stretch;
+}
+
+.oficios-filter-bar {
+  gap: 10px;
+  row-gap: 10px;
+}
+
+/* ── Linha 1: busca + limpar filtros lado a lado ─────────────────────────── */
+.oficios-filter-bar__search-row {
+  align-items: center;
+  display: flex !important;
+  flex: 1 1 100% !important;
+  gap: 10px;
+  min-width: 0;
+}
+
+.oficios-filter-bar__search-wrap {
+  flex: 1 1 auto;
+  min-width: 0;
+  position: relative;
+}
+
+.oficios-filter-bar__search-icon {
+  align-items: center;
+  color: var(--color-filter-placeholder, rgba(255, 255, 255, 0.55));
+  display: inline-flex;
+  left: 14px;
+  pointer-events: none;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.oficios-filter-bar__search-input {
+  height: 42px;
+  padding-left: 40px !important;
+  width: 100%;
+}
+
+.oficios-filter-bar__search-input:focus {
+  box-shadow: 0 0 0 3px rgba(99, 165, 255, 0.18);
+}
+
+.oficios-filter-clear {
+  flex: 0 0 auto;
+  height: 42px;
+  white-space: nowrap;
+}
+
+/* ── Linha 2: filtros ────────────────────────────────────────────────────── */
+.oficios-filter-bar__row {
+  margin-top: 0;
+}
+
+.oficios-filter-bar__fields {
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ── Selects bonitos (cv-custom-select) ──────────────────────────────────── */
+.oficios-filter-cs {
+  flex: 0 1 auto !important;
+  max-width: 240px;
+  min-width: 200px;
+  width: auto !important;
+}
+
+/* ── Range de datas (botão pill estilo roteiros) ─────────────────────────── */
+.oficios-filter-range {
+  display: inline-flex;
+  flex: 0 1 auto;
+  min-width: 0;
+  position: relative;
+}
+
+.oficios-filter-range__btn {
+  align-items: center;
+  background: var(--surface-filter-input, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--border-filter-input, rgba(255, 255, 255, 0.1));
+  border-radius: 10px;
+  color: var(--theme-text-heading, #fff);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 0.92rem;
+  font-weight: 500;
+  gap: 10px;
+  height: 40px;
+  padding: 0 16px;
+  transition: border-color .15s ease, background .15s ease, box-shadow .15s ease;
+  white-space: nowrap;
+}
+
+.oficios-filter-range__btn:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: var(--border-active, rgba(99, 165, 255, 0.45));
+}
+
+.oficios-filter-range__btn:focus-visible {
+  border-color: var(--border-focus, rgba(99, 165, 255, 0.7));
+  box-shadow: 0 0 0 3px rgba(99, 165, 255, 0.18);
+  outline: none;
+}
+
+.oficios-filter-range__btn .cv-btn__icon {
+  align-items: center;
+  color: var(--color-filter-placeholder, rgba(255, 255, 255, 0.6));
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+.oficios-filter-range__label {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+}
+
+/* Estado ativo: tem range selecionado */
+.oficios-filter-range--active .oficios-filter-range__btn {
+  background: rgba(99, 165, 255, 0.12);
+  border-color: rgba(99, 165, 255, 0.55);
+  color: #fff;
+}
+
+.oficios-filter-range--active .oficios-filter-range__btn .cv-btn__icon {
+  color: rgba(99, 165, 255, 0.95);
+}
+
+/* Painel do calendário (movido para o body pelo JS — usa classe própria) */
+.oficios-date-panel {
+  left: 0;
+  margin-top: 6px;
+  right: auto;
+}
+
+/* ====================================================================
+   Range visual como pílula CONTÍNUA conectada (estilo roteiros/multi)
+   Resetamos o estilo nativo (que pinta o botão direto) e aplicamos
+   tudo no ::before com width 100% para conectar as células.
+   ==================================================================== */
+
+/* 1. Reset do estilo nativo no botão (background/border-radius direto) */
+.oficios-date-panel .cv-date-picker__day--range,
+.oficios-date-panel .cv-date-picker__day--range-start,
+.oficios-date-panel .cv-date-picker__day--range-end {
+  background: transparent !important;
+  border-color: transparent !important;
+  border-radius: 0 !important;
+  color: var(--cv-date-picker-selected-color, #fff);
+}
+
+/* 2. Pinta o ::before ocupando toda a célula (sem círculo de 40px) */
+.oficios-date-panel .cv-date-picker__day--range::before,
+.oficios-date-panel .cv-date-picker__day--range-start::before,
+.oficios-date-panel .cv-date-picker__day--range-end::before {
+  background: linear-gradient(180deg, var(--cv-date-picker-selected-bg-start) 0%, var(--cv-date-picker-selected-bg-end) 100%) !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  height: 100% !important;
+  left: 0 !important;
+  top: 0 !important;
+  transform: none !important;
+  width: 100% !important;
+}
+
+/* 3. Cantos arredondados no início/fim do range */
+.oficios-date-panel .cv-date-picker__day--range-start::before {
+  border-bottom-left-radius: var(--radius-pill, 999px) !important;
+  border-top-left-radius: var(--radius-pill, 999px) !important;
+}
+
+.oficios-date-panel .cv-date-picker__day--range-end::before {
+  border-bottom-right-radius: var(--radius-pill, 999px) !important;
+  border-top-right-radius: var(--radius-pill, 999px) !important;
+}
+
+/* 4. Quebra de semana: arredonda bordas inicial (seg) e final (dom) */
+.oficios-date-panel .cv-date-picker__day--range:nth-child(7n + 1)::before,
+.oficios-date-panel .cv-date-picker__day--range-start:nth-child(7n + 1)::before,
+.oficios-date-panel .cv-date-picker__day--range-end:nth-child(7n + 1)::before {
+  border-bottom-left-radius: var(--radius-pill, 999px) !important;
+  border-top-left-radius: var(--radius-pill, 999px) !important;
+}
+
+.oficios-date-panel .cv-date-picker__day--range:nth-child(7n)::before,
+.oficios-date-panel .cv-date-picker__day--range-start:nth-child(7n)::before,
+.oficios-date-panel .cv-date-picker__day--range-end:nth-child(7n)::before {
+  border-bottom-right-radius: var(--radius-pill, 999px) !important;
+  border-top-right-radius: var(--radius-pill, 999px) !important;
+}
+
+/* 5. Caso especial: start == end (um único dia selecionado) */
+.oficios-date-panel .cv-date-picker__day--range-start.cv-date-picker__day--range-end::before {
+  border-radius: var(--radius-pill, 999px) !important;
+}
+
+/* Botões de navegação como retângulos pill (igual roteiros) -------------- */
+.oficios-date-panel .cv-date-picker__nav {
+  background: var(--surface-filter-input, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--border-filter-input, rgba(255, 255, 255, 0.1));
+  border-radius: var(--radius-pill, 999px);
+  color: var(--theme-text-heading, #fff);
+  font-size: 0.85rem;
+  font-weight: 600;
+  height: auto;
+  letter-spacing: 0.02em;
+  min-height: 32px;
+  padding: 6px 16px;
+  width: auto;
+}
+
+.oficios-date-panel .cv-date-picker__nav:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--border-active, rgba(99, 165, 255, 0.45));
+}
+
+/* ── Responsivo ─────────────────────────────────────────────────────────── */
+@media (max-width: 720px) {
+  .oficios-filter-bar__search-row {
+    flex-wrap: wrap;
+  }
+
+  .oficios-filter-clear {
+    flex: 1 1 100%;
+  }
+
+  .oficios-filter-bar__fields {
+    gap: 8px;
+  }
+
+  .oficios-filter-cs,
+  .oficios-filter-range {
+    flex: 1 1 100% !important;
+    max-width: none;
+    min-width: 0;
+  }
+
+  .oficios-filter-range__btn {
+    justify-content: center;
+    width: 100%;
+  }
+}

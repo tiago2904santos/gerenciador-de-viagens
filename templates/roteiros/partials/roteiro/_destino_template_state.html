@@ -1,0 +1,13 @@
+<select name="destino_estado___index__"
+        id="destino_estado___index__"
+        class="destino-estado cv-search-picker__native"
+        data-cv-search-picker="true"
+        data-picker-mode="single"
+        data-picker-variant="compact"
+        data-placeholder="Buscar estado..."
+        data-empty-message="Nenhum estado encontrado.">
+  <option value="">---------</option>
+  {% for estado in estados %}
+    <option value="{{ estado.pk }}">{{ estado.nome }} ({{ estado.sigla }})</option>
+  {% endfor %}
+</select>
