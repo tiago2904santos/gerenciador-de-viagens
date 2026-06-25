@@ -6,6 +6,7 @@ from django.utils import timezone
 from core.presenters.actions import build_delete_action
 from core.presenters.actions import build_edit_action
 from core.presenters.actions import build_open_action
+from core.presenters.meta import build_meta
 from .models import Roteiro
 from .services import montar_contexto_editor_roteiro
 from .services.diarias import infer_tipo_destino_from_paradas
@@ -243,6 +244,32 @@ def apresentar_roteiro_card(roteiro):
         "trechos_resumo": trechos_resumo,
         "roteiro_card_layout": roteiro_card_layout,
         "actions": [build_open_action(edit_url), build_edit_action(edit_url), build_delete_action(delete_url)],
+    }
+
+
+def apresentar_linha_lista_simples_roteiro(roteiro, *, edit_url="#", delete_url="#", delete_modal=False):
+    card = apresentar_roteiro_card(roteiro)
+    periodo = "—"
+    if card["inicio_display"] or card["fim_display"]:
+        periodo = f"{card['inicio_display'] or '—'} a {card['fim_display'] or '—'}"
+
+    trechos_count = card["trechos_count"]
+    trechos_label = "1 trecho" if trechos_count == 1 else f"{trechos_count} trechos"
+
+    return {
+        "avatar": "RT",
+        "title": card["rota_display"],
+        "badges": [],
+        "meta": [
+            build_meta("Período", periodo),
+            build_meta("Trechos", trechos_label),
+            build_meta("Valor", card["valor_diarias_display"] or "—"),
+        ],
+        "search_extra": " ".join(t["rota"] for t in card["trechos"]),
+        "status_value": card["status_variant"],
+        "edit_url": edit_url,
+        "delete_url": delete_url,
+        "delete_modal": delete_modal,
     }
 
 

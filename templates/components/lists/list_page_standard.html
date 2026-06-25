@@ -1,6 +1,6 @@
 {# Lista Standard oficial, promovida do modelo aprovado no UI Lab. #}
 <div class="page-shell page-shell--list"{% if not disable_realtime_filter %} data-cv-realtime-filter-scope{% endif %}>
-  {% include "components/ui/headers/header_stack_filters.html" with eyebrow=eyebrow title=title icon_label=brand_mark form_action=request.path search_name="q" search_value=q search_placeholder=search_placeholder search_clear_url=request.path %}
+  {% include "components/ui/headers/header_stack_filters.html" with eyebrow=eyebrow title=title icon_label=brand_mark form_action=request.path search_name="q" search_value=q search_placeholder=search_placeholder search_clear_url=request.path status_options=status_options status_value=status_value %}
 
   <div class="list-panel">
     {% include "components/lists/pagination.html" %}

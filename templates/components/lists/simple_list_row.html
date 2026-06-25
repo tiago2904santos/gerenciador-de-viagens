@@ -1,4 +1,4 @@
-<div class="simple-list-item" role="listitem" data-cv-filter-item data-search-text="{{ row.title }}{% if row.search_extra %} {{ row.search_extra }}{% endif %}{% if row.meta %}{% if row.meta.0.label %}{% for item in row.meta %} {{ item.value }}{% endfor %}{% else %} {{ row.meta }}{% endif %}{% endif %}">
+<div class="simple-list-item" role="listitem" data-cv-filter-item data-search-text="{{ row.title }}{% if row.search_extra %} {{ row.search_extra }}{% endif %}{% if row.meta %}{% if row.meta.0.label %}{% for item in row.meta %} {{ item.value }}{% endfor %}{% else %} {{ row.meta }}{% endif %}{% endif %}"{% if row.status_value %} data-status-value="{{ row.status_value }}"{% endif %}>
   <div class="simple-list-item__avatar" aria-hidden="true">{{ row.avatar|default:"CV" }}</div>
   <div class="simple-list-item__body">
     <div class="simple-list-item__title">

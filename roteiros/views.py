@@ -5,6 +5,7 @@ from datetime import time
 from urllib.parse import urlencode
 
 from django.contrib import messages
+from django.core.paginator import Paginator
 from django.http import Http404, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
@@ -38,7 +39,7 @@ logger = logging.getLogger(__name__)
 from .models import Roteiro
 from .presenters import (
     apresentar_contexto_formulario_roteiro_avulso,
-    apresentar_roteiro_card,
+    apresentar_linha_lista_simples_roteiro,
 )
 from .selectors import (
     get_roteiro_by_id,
@@ -65,6 +66,8 @@ from .services.autosave import (
 )
 from .services.estimativa_local import ROTA_FONTE_ESTIMATIVA_LOCAL
 from .services.routing.trecho_route_service import calcular_rota_trecho
+
+ROTEIROS_PER_PAGE = 15
 
 
 def _evento_etapa_url(evento_id):
@@ -115,9 +118,18 @@ def _initial_roteiro_evento(evento):
 
 def index(request):
     q = request.GET.get("q", "").strip()
-    status = request.GET.get("status", "").strip()
-    roteiros = listar_roteiros(q=q, status=status or None)
-    cards = [apresentar_roteiro_card(roteiro) for roteiro in roteiros]
+    roteiros = listar_roteiros(q=q)
+    paginator = Paginator(roteiros, ROTEIROS_PER_PAGE)
+    page_obj = paginator.get_page(request.GET.get("page"))
+    rows = [
+        apresentar_linha_lista_simples_roteiro(
+            roteiro,
+            edit_url=reverse("roteiros:editar", args=[roteiro.pk]),
+            delete_url=reverse("roteiros:excluir", args=[roteiro.pk]),
+            delete_modal=True,
+        )
+        for roteiro in page_obj.object_list
+    ]
     return render(
         request,
         "roteiros/index.html",
@@ -127,13 +139,24 @@ def index(request):
             "create_url": reverse("roteiros:novo"),
             "search_clear_url": reverse("roteiros:index"),
             "empty_message": "Nenhum roteiro cadastrado ainda.",
-            "cards": cards,
+            "rows": rows,
             "q": q,
-            "status": status,
-            "status_options": [{"value": "", "label": "Todos os status"}]
-            + [{"value": value, "label": label} for value, label in Roteiro.STATUS_CHOICES],
+            "page_obj": page_obj,
+            "pagination_pages": _pagination_pages(page_obj),
+            "page_querystring": urlencode({"q": q}) if q else "",
         },
     )
+
+
+def _pagination_pages(page_obj, *, on_each_side=1, on_ends=1):
+    return [
+        page_number if isinstance(page_number, int) else "..."
+        for page_number in page_obj.paginator.get_elided_page_range(
+            page_obj.number,
+            on_each_side=on_each_side,
+            on_ends=on_ends,
+        )
+    ]
 
 
 def novo(request):
