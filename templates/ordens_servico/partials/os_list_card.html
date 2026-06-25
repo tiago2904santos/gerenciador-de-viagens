@@ -1,0 +1,117 @@
+<article
+  class="oficio-lc oficio-lc--outro os-lc"
+  data-cv-filter-item
+  data-search-text="{{ card.numero_display }} {{ card.destinos_display }} {{ card.motivo }}{% for s in card.servidores %} {{ s.name }}{% endfor %}{% for o in card.oficios_vinculados %} {{ o.numero }}{% endfor %}"
+>
+  <div class="oficio-lc__layout">
+
+    {# ── IDENTIFICAÇÃO: Número da OS · Período do evento · Data de Criação ── #}
+    <div class="oficio-lc__id-row">
+      <div class="oficio-lc__info-item">
+        <span class="oficio-lc__info-label">Número da OS</span>
+        <span class="oficio-lc__info-value">{{ card.numero_display }}</span>
+      </div>
+      {% if card.periodo_display %}
+      <div class="oficio-lc__info-item">
+        <span class="oficio-lc__info-label">Período do Evento</span>
+        <span class="oficio-lc__info-value">{{ card.periodo_display }}</span>
+      </div>
+      {% endif %}
+      {% if card.data_criacao_display %}
+      <div class="oficio-lc__info-item">
+        <span class="oficio-lc__info-label">Data de Criação</span>
+        <span class="oficio-lc__info-value">{{ card.data_criacao_display }}</span>
+      </div>
+      {% endif %}
+      {% if card.temporal_label %}
+      {% include "components/ui/badges/chip.html" with tone=card.temporal_tone label=card.temporal_label extra_class="oficio-lc__temporal-chip" only %}
+      {% endif %}
+    </div>
+
+    {# ── SERVIDORES ── #}
+    <div class="oficio-lc__section">
+      <div class="oficio-lc__travellers oficio-lc__travellers--n{{ card.servidores_count|default:0 }}">
+        {% for s in card.servidores %}
+        <div class="oficio-lc__traveller{% if s.is_motorista %} oficio-lc__traveller--motorista{% endif %}">
+          <div class="oficio-lc__traveller-body">
+            <div class="oficio-lc__traveller-name-row">
+              <span class="oficio-lc__traveller-name">{{ s.name }}</span>
+              {% if s.is_motorista %}
+              <span class="oficio-lc__traveller-badge">Motorista</span>
+              {% endif %}
+            </div>
+            {% if s.cargo or s.unidade %}
+            <span class="oficio-lc__traveller-meta">{% if s.cargo %}{{ s.cargo }}{% endif %}{% if s.cargo and s.unidade %} · {% endif %}{% if s.unidade %}{{ s.unidade }}{% endif %}</span>
+            {% endif %}
+          </div>
+        </div>
+        {% empty %}
+        <p class="oficio-lc__empty-hint">Nenhum servidor informado</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    {# ── DESTINO · OFÍCIOS VINCULADOS ── #}
+    <div class="oficio-lc__section">
+      <div class="oficio-lc__transport-row">
+
+        {# — Destino — #}
+        <div class="oficio-lc__transport-card">
+          <span class="oficio-lc__transport-label">Destino</span>
+          {% if card.destinos_display %}
+            <div class="oficio-lc__transport-modelo">{{ card.destinos_display }}</div>
+          {% else %}
+            <div class="oficio-lc__transport-modelo oficio-lc__text--empty">Não informado</div>
+          {% endif %}
+        </div>
+
+        {# — Ofícios vinculados — #}
+        {% if card.oficios_vinculados %}
+        <div class="oficio-lc__transport-card oficio-lc__transport-card--trechos">
+          <span class="oficio-lc__transport-label">Ofícios vinculados</span>
+          <div class="oficio-lc__trechos-list">
+            {% for o in card.oficios_vinculados %}
+            <div class="oficio-lc__trecho">
+              <div class="oficio-lc__trecho-rota">
+                {% if o.url %}<a href="{{ o.url }}">{{ o.numero }}</a>{% else %}{{ o.numero }}{% endif %}
+              </div>
+              {% if o.protocolo %}
+              <div class="oficio-lc__trecho-times">Protocolo {{ o.protocolo }}</div>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+
+      </div>
+    </div>
+
+    {# ── MOTIVO ── #}
+    <div class="oficio-lc__section oficio-lc__section--justificativas">
+      <div class="oficio-lc__travellers oficio-lc__travellers--n1">
+        <div class="oficio-lc__traveller oficio-lc__traveller--justificativa">
+          <div class="oficio-lc__traveller-body">
+            <div class="oficio-lc__traveller-name-row">
+              <span class="oficio-lc__traveller-name">MOTIVO</span>
+            </div>
+            <span class="oficio-lc__traveller-meta">
+              {% if card.motivo_resumido %}{{ card.motivo_resumido }}{% else %}Nenhum motivo informado.{% endif %}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# ── FOOTER ── #}
+    <div class="oficio-lc__footer">
+      <div class="oficio-lc__footer-actions">
+        <div class="oficio-lc__footer-actions-main cv-icon-btn-group">
+          {% include "components/ui/buttons/icon_button.html" with href=card.editar_url action="edit" aria_label="Editar Ordem de Serviço" tooltip="Editar" only %}
+          {% include "components/ui/buttons/icon_button.html" with href=card.docx_url action="docx" aria_label="Baixar DOCX da Ordem de Serviço" tooltip="DOCX" only %}
+        </div>
+      </div>
+    </div>
+
+  </div>
+</article>
