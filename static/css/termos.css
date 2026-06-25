@@ -110,6 +110,7 @@
 .termo-evento-dates {
   gap: var(--space-4);
   grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  padding-bottom: var(--space-4);
 }
 
 #pt-card-evento .termo-evento-dates {

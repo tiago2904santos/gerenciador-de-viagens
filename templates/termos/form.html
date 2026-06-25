@@ -183,7 +183,8 @@
                   {% include "components/ui/feedback/field_error.html" with errors=form.data_evento_fim.errors only %}
                 {% endif %}
               </section>
-              {% include "components/domain/destinos_section.html" with section_id="termo-evento-destinos" title_id="termo-evento-destinos-title" add_button_id="btn-adicionar-destino" add_button_termo=True rows_template="termos/partials/_destinos_rows.html" errors_template="termos/partials/_destinos_errors.html" %}
+              {% include "components/domain/destinos_section.html" with section_id="termo-evento-destinos" title_id="termo-evento-destinos-title" add_button_id="btn-adicionar-destino" add_button_termo=True list_id="termo-destinos-list" rows_template="termos/partials/_destinos_rows.html" errors_template="termos/partials/_destinos_errors.html" %}
+              {% include "termos/partials/_destinos_template.html" %}
             </div>
             <div class="cv-date-picker__panel" hidden data-cv-date-picker-panel>
               <div class="cv-date-picker__context" data-cv-date-picker-context hidden>
@@ -315,6 +316,6 @@
 {% endblock %}
 
 {% block extra_js %}
-  <script src="{% static 'js/pages/termos-form.js' %}?v=20260624-oficios-preview" defer></script>
+  <script src="{% static 'js/pages/termos-form.js' %}?v=20260625-managed-destinos" defer></script>
   <script src="{% static 'js/pages/oficios-documentos-inline.js' %}?v=20260624-termos" defer></script>
 {% endblock %}

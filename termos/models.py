@@ -42,6 +42,7 @@ class TermoAutorizacao(TimeStampedModel):
         related_name="termos_autorizacao",
         verbose_name="Cidade do destino",
     )
+    destinos_extras = models.JSONField("Destinos adicionais", default=list, blank=True)
     data_evento_inicio = models.DateField("Data inicial do evento", null=True, blank=True)
     data_evento_fim = models.DateField("Data final do evento", null=True, blank=True)
     servidores = models.ManyToManyField(
@@ -82,8 +83,20 @@ class TermoAutorizacao(TimeStampedModel):
         return f"{inicio.strftime('%d/%m/%Y')} a {fim.strftime('%d/%m/%Y')}"
 
     def destino_efetivo(self) -> str:
+        destinos = []
         if self.destino_cidade_id:
-            return f"{self.destino_cidade.nome}/{self.destino_cidade.uf}"
+            destinos.append(f"{self.destino_cidade.nome}/{self.destino_cidade.uf}")
+        for destino in self.destinos_extras or []:
+            if not isinstance(destino, dict):
+                continue
+            cidade = (destino.get("cidade") or "").strip()
+            uf = (destino.get("estado") or "").strip()
+            if cidade and uf:
+                destinos.append(f"{cidade}/{uf}")
+            elif cidade or uf:
+                destinos.append(cidade or uf)
+        if destinos:
+            return ", ".join(dict.fromkeys(destinos))
         if self.destino_estado_id:
             return self.destino_estado.sigla
         destino = self._primeiro_destino_oficio()

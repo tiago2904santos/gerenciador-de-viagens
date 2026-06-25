@@ -150,6 +150,7 @@ class TermoAutorizacaoForm(forms.ModelForm):
             .prefetch_related("motoristas")
             .order_by("placa")
         )
+        self.destination_rows = self._build_destination_rows(estado_id, cidade_id)
 
     def _resolve_destino_inicial(self):
         cidade_id = None
@@ -178,6 +179,58 @@ class TermoAutorizacaoForm(forms.ModelForm):
 
         return estado_id, cidade_id
 
+    def _build_destination_rows(self, estado_id, cidade_id):
+        rows = []
+        if self.is_bound:
+            rows.append(self._destination_row_from_values(0, self.data.get("destino_estado"), self.data.get("destino_cidade")))
+            for idx in self._extra_destination_indexes():
+                rows.append(
+                    self._destination_row_from_values(
+                        idx,
+                        self.data.get(f"destino_estado_{idx}"),
+                        self.data.get(f"destino_cidade_{idx}"),
+                    )
+                )
+        elif self.instance and self.instance.pk:
+            rows.append(self._destination_row_from_values(0, self.instance.destino_estado_id, self.instance.destino_cidade_id))
+            for idx, destino in enumerate(self.instance.destinos_extras or [], 1):
+                if not isinstance(destino, dict):
+                    continue
+                rows.append(
+                    self._destination_row_from_values(
+                        idx,
+                        destino.get("estado_id"),
+                        destino.get("cidade_id"),
+                    )
+                )
+        else:
+            rows.append(self._destination_row_from_values(0, estado_id, cidade_id))
+
+        return rows or [self._destination_row_from_values(0, estado_id, cidade_id)]
+
+    def _destination_row_from_values(self, index, estado_id, cidade_id):
+        estado_id = str(estado_id or "").strip()
+        cidade_id = str(cidade_id or "").strip()
+        cidade_qs = Cidade.objects.select_related("estado").none()
+        if estado_id:
+            cidade_qs = Cidade.objects.select_related("estado").filter(estado_id=estado_id).order_by("nome")
+        return {
+            "index": index,
+            "is_primary": index == 0,
+            "estado_id": estado_id,
+            "cidade_id": cidade_id,
+            "cidades": list(cidade_qs),
+        }
+
+    def _extra_destination_indexes(self):
+        return sorted(
+            {
+                int(name.rsplit("_", 1)[1])
+                for name in self.data.keys()
+                if name.startswith("destino_estado_") and name.rsplit("_", 1)[1].isdigit()
+            }
+        )
+
     def clean(self):
         cleaned = super().clean()
         oficio = cleaned.get("oficio")
@@ -204,7 +257,63 @@ class TermoAutorizacaoForm(forms.ModelForm):
         if not inicio and not self._oficio_tem_periodo(oficio):
             self.add_error("data_evento_inicio", "Informe a data do evento ou selecione um oficio com periodo.")
 
+        destinos = []
+        if cidade:
+            destinos.append((cidade.estado_id, cidade.pk))
+        for idx in self._extra_destination_indexes():
+            estado_raw = (self.data.get(f"destino_estado_{idx}") or "").strip()
+            cidade_raw = (self.data.get(f"destino_cidade_{idx}") or "").strip()
+            if not estado_raw and not cidade_raw:
+                continue
+            if estado_raw and not cidade_raw:
+                self.add_error(None, f"Informe a cidade do destino adicional {idx}.")
+                continue
+            cidade_obj = Cidade.objects.select_related("estado").filter(pk=cidade_raw).first() if cidade_raw else None
+            if not cidade_obj:
+                self.add_error(None, f"Selecione uma cidade valida para o destino adicional {idx}.")
+                continue
+            destinos.append((cidade_obj.estado_id, cidade_obj.pk))
+        self.cleaned_destinos = destinos
+
         return cleaned
+
+    def save(self, commit=True):
+        termo = super().save(commit=False)
+        destinos = getattr(self, "cleaned_destinos", []) or []
+        if destinos:
+            estado_id, cidade_id = destinos[0]
+            termo.destino_estado_id = estado_id
+            termo.destino_cidade_id = cidade_id
+            termo.destinos_extras = self._serialize_destinos(destinos[1:])
+        else:
+            termo.destinos_extras = []
+
+        if commit:
+            termo.save()
+            self.save_m2m()
+        return termo
+
+    @staticmethod
+    def _serialize_destinos(destinos):
+        cidade_ids = [cidade_id for _estado_id, cidade_id in destinos if cidade_id]
+        cidades = {
+            cidade.pk: cidade
+            for cidade in Cidade.objects.select_related("estado").filter(pk__in=cidade_ids)
+        }
+        out = []
+        for estado_id, cidade_id in destinos:
+            cidade = cidades.get(cidade_id)
+            if not cidade:
+                continue
+            out.append(
+                {
+                    "estado_id": cidade.estado_id or estado_id,
+                    "estado": cidade.estado.sigla if cidade.estado_id else "",
+                    "cidade_id": cidade.pk,
+                    "cidade": cidade.nome,
+                }
+            )
+        return out
 
     @staticmethod
     def _oficio_tem_destino(oficio):

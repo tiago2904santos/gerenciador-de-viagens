@@ -26,6 +26,10 @@
   /* ── cv-search-picker: reset + reinit ──────────────────────── */
 
   function resetPicker(select) {
+    if (window.CV && window.CV.destinos && typeof window.CV.destinos.resetSearchPicker === "function") {
+      window.CV.destinos.resetSearchPicker(select);
+      return;
+    }
     if (!select || select.dataset.cvSearchPickerReady !== "true") return;
     delete select.dataset.cvSearchPickerReady;
     var next = select.nextElementSibling;
@@ -35,12 +39,20 @@
   }
 
   function initPickers(scope) {
+    if (window.CV && window.CV.destinos && typeof window.CV.destinos.initSearchPickers === "function") {
+      window.CV.destinos.initSearchPickers(scope || document);
+      return;
+    }
     if (window.CvSearchPicker && window.CvSearchPicker.init) {
       window.CvSearchPicker.init(scope || document);
     }
   }
 
   function updateCitySelect(form, citySelect, cities, selectedCityId) {
+    if (window.CV && window.CV.destinos && typeof window.CV.destinos.setSelectOptions === "function") {
+      window.CV.destinos.setSelectOptions(citySelect, cities, selectedCityId, { scope: form });
+      return;
+    }
     var selected = String(selectedCityId || "");
     resetPicker(citySelect);
     citySelect.innerHTML = '<option value="">---------</option>';
@@ -60,6 +72,10 @@
   }
 
   function clearCitySelect(form, citySelect) {
+    if (window.CV && window.CV.destinos && typeof window.CV.destinos.clearSelect === "function") {
+      window.CV.destinos.clearSelect(citySelect, { scope: form });
+      return;
+    }
     resetPicker(citySelect);
     citySelect.innerHTML = '<option value="">---------</option>';
     citySelect.disabled = true;
@@ -112,6 +128,13 @@
   }
 
   function updateDestinoRemoveButtons(form) {
+    if (window.CV && window.CV.destinos && typeof window.CV.destinos.updateSingleRowState === "function") {
+      window.CV.destinos.updateSingleRowState(form, {
+        rowSelector: "[data-pt-destino-row]",
+        removeSelector: "[data-pt-remove-destino]"
+      });
+      return;
+    }
     var rows = Array.prototype.slice.call(form.querySelectorAll("[data-pt-destino-row]")).filter(function (r) {
       return !r.hidden;
     });
@@ -119,6 +142,20 @@
       var btn = row.querySelector("[data-pt-remove-destino]");
       if (btn) btn.hidden = rows.length <= 1;
       row.classList.toggle("destino-row--single", rows.length <= 1);
+    });
+  }
+
+  function reindexDestinoRows(form) {
+    if (!window.CV || !window.CV.destinos || typeof window.CV.destinos.reindexRows !== "function") return;
+    window.CV.destinos.reindexRows(form, {
+      rowSelector: "[data-pt-destino-row]",
+      indexAttr: "ptDestinoIndex",
+      onRow: function(row, index) {
+        var stateSelect = row.querySelector("[data-pt-destino-state]");
+        var citySelect = row.querySelector("[data-pt-destino-city]");
+        if (stateSelect) stateSelect.name = index === 0 ? "destino_estado" : "destino_estado_" + index;
+        if (citySelect) citySelect.name = index === 0 ? "destino_cidade" : "destino_cidade_" + index;
+      }
     });
   }
 
@@ -163,6 +200,16 @@
       bindDestinationRow(form, row);
     });
     updateDestinoRemoveButtons(form);
+    if (window.CV && window.CV.destinos && typeof window.CV.destinos.initDragDrop === "function") {
+      window.CV.destinos.initDragDrop(form.querySelector(".roteiro-destinos-list"), {
+        rowSelector: "[data-pt-destino-row]",
+        removeSelector: "[data-pt-remove-destino]",
+        onReorder: function() {
+          reindexDestinoRows(form);
+          updateDestinoRemoveButtons(form);
+        }
+      });
+    }
 
     var addButton = form.querySelector("[data-pt-add-destino]");
     var template = form.querySelector("template[data-pt-destino-template]");
@@ -170,6 +217,37 @@
     if (!addButton || !template || !list) return;
 
     addButton.addEventListener("click", function () {
+      if (window.CV && window.CV.destinos && typeof window.CV.destinos.appendTemplateRow === "function") {
+        var existingRowsForHelper = Array.prototype.slice.call(form.querySelectorAll("[data-pt-destino-row]"));
+        var referenceRowForHelper = existingRowsForHelper.length ? existingRowsForHelper[existingRowsForHelper.length - 1] : null;
+        var referenceStateForHelper = referenceRowForHelper ? referenceRowForHelper.querySelector("[data-pt-destino-state]") : null;
+        var referenceStateIdForHelper = referenceStateForHelper
+          ? String(referenceStateForHelper.value || referenceStateForHelper.dataset.pickerInitialValue || "").trim()
+          : "";
+        window.CV.destinos.appendTemplateRow({
+          list: list,
+          template: template,
+          rowSelector: "[data-pt-destino-row]",
+          removeSelector: "[data-pt-remove-destino]",
+          indexAttr: "ptDestinoIndex",
+          beforeAppend: function(row) {
+            if (!row || !referenceStateIdForHelper) return;
+            var newStateSelect = row.querySelector("[data-pt-destino-state]");
+            if (newStateSelect) {
+              newStateSelect.value = referenceStateIdForHelper;
+              newStateSelect.dataset.pickerInitialValue = referenceStateIdForHelper;
+            }
+          },
+          bindRow: function(row) {
+            bindDestinationRow(form, row);
+          },
+          afterAppend: function() {
+            updateDestinoRemoveButtons(form);
+            initPickers(form);
+          }
+        });
+        return;
+      }
       var indexes = Array.prototype.slice.call(form.querySelectorAll("[data-pt-destino-row]")).map(function (row) {
         return parseInt(row.dataset.ptDestinoIndex || "0", 10);
       }).filter(function (value) {

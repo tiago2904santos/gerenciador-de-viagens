@@ -27,6 +27,10 @@
   /* ── cv-search-picker: reset + reinit ──────────────────────── */
 
   function resetPicker(select) {
+    if (window.CV && window.CV.destinos && typeof window.CV.destinos.resetSearchPicker === "function") {
+      window.CV.destinos.resetSearchPicker(select);
+      return;
+    }
     if (!select || select.dataset.cvSearchPickerReady !== "true") return;
     delete select.dataset.cvSearchPickerReady;
     var next = select.nextElementSibling;
@@ -36,12 +40,20 @@
   }
 
   function initPickers(scope) {
+    if (window.CV && window.CV.destinos && typeof window.CV.destinos.initSearchPickers === "function") {
+      window.CV.destinos.initSearchPickers(scope || document);
+      return;
+    }
     if (window.CvSearchPicker && window.CvSearchPicker.init) {
       window.CvSearchPicker.init(scope || document);
     }
   }
 
   function updateCitySelect(form, citySelect, cities, selectedCityId) {
+    if (window.CV && window.CV.destinos && typeof window.CV.destinos.setSelectOptions === "function") {
+      window.CV.destinos.setSelectOptions(citySelect, cities, selectedCityId, { scope: form });
+      return;
+    }
     var selected = String(selectedCityId || "");
     resetPicker(citySelect);
     citySelect.innerHTML = '<option value="">---------</option>';
@@ -61,6 +73,10 @@
   }
 
   function clearCitySelect(form, citySelect) {
+    if (window.CV && window.CV.destinos && typeof window.CV.destinos.clearSelect === "function") {
+      window.CV.destinos.clearSelect(citySelect, { scope: form });
+      return;
+    }
     resetPicker(citySelect);
     citySelect.innerHTML = '<option value="">---------</option>';
     citySelect.disabled = true;
@@ -113,6 +129,30 @@
   }
 
   function syncDestinationCities(form) {
+    if (window.CV && window.CV.destinos && typeof window.CV.destinos.initManagedRows === "function") {
+      window.CV.destinos.initManagedRows({
+        form: form,
+        sectionSelector: "#os-evento-destinos",
+        addSelector: "[data-os-add-destino]",
+        templateSelector: "template[data-os-destino-template]",
+        rowSelector: "[data-os-destino-row]",
+        stateSelector: "[data-os-destino-state]",
+        citySelector: "[data-os-destino-city]",
+        removeSelector: "[data-os-remove-destino]",
+        indexAttr: "osDestinoIndex",
+        primaryStateName: "destino_estado",
+        primaryCityName: "destino_cidade",
+        extraStatePrefix: "destino_estado_",
+        extraCityPrefix: "destino_cidade_",
+        managedFlag: "osDestinosManaged",
+        readyAttr: "osDestinoReady",
+        loadCities: function (citySelect, stateId, selectedCityId) {
+          return loadCitiesForState(form, citySelect, stateId, selectedCityId);
+        }
+      });
+      return;
+    }
+
     var stateSelect = form.querySelector("select[name='destino_estado']");
     var citySelect = form.querySelector("select[name='destino_cidade']");
     if (!stateSelect || !citySelect) return;
@@ -141,6 +181,10 @@
   function focusDestinationPicker(form) {
     var destinationSection = form.querySelector("#os-evento-destinos");
     if (!destinationSection) return;
+    if (window.CV && window.CV.destinos && typeof window.CV.destinos.focusFirstEmptyPicker === "function") {
+      window.CV.destinos.focusFirstEmptyPicker(destinationSection);
+      return;
+    }
 
     var pickers = Array.prototype.slice.call(destinationSection.querySelectorAll(".cv-search-picker__input"))
       .filter(function (input) {
@@ -158,6 +202,7 @@
   }
 
   function syncAddDestinationButton(form) {
+    if (form.dataset.osDestinosManaged === "true") return;
     if (!form.querySelector("[data-os-add-destino]") || form.dataset.osAddDestinoBound === "true") return;
     form.dataset.osAddDestinoBound = "true";
 
