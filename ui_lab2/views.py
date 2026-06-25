@@ -243,7 +243,6 @@ COMPONENT_USAGE = {
         "templates/ordens_servico/form.html",
         "templates/planos_trabalho/wizard_base.html",
         "templates/roteiros/roteiro_form_page.html",
-        "templates/roteiros/detail.html",
         "templates/termos/form.html",
         "templates/termos/preview.html",
         "templates/termos/preview_cadastro.html",
@@ -313,7 +312,6 @@ COMPONENT_USAGE = {
     ],
     "form_errors": [],
     "empty_state": [
-        "templates/roteiros/detail.html",
         "templates/components/lists/list_empty.html",
     ],
     "module_placeholder": [],
@@ -350,7 +348,6 @@ COMPONENT_USAGE = {
         "templates/oficios/modelos_motivo/form.html",
         "templates/planos_trabalho/atividades/form.html",
         "templates/planos_trabalho/horarios/form.html",
-        "templates/roteiros/detail.html",
         "templates/termos/preview.html",
     ],
     # Fields

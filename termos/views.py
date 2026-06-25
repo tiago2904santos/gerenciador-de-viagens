@@ -1,9 +1,13 @@
 import json
+import re
 
 from datetime import datetime
+from urllib.parse import urlencode
 
 from django.contrib import messages
+from django.core.paginator import Paginator
 from django.core.serializers.json import DjangoJSONEncoder
+from django.db.models import Q
 from django.http import Http404
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -28,9 +32,11 @@ from oficios.services import validar_oficio_para_documento
 
 from .forms import TermoAutorizacaoForm
 from .models import TermoAutorizacao
+from .presenters import apresentar_linha_lista_simples_termo
 from .services import empacotar_termos_zip
 from .services import fundir_termos_pdf
 from .services import gerar_termo_cadastro_lote
+from .services import gerar_termo_cadastro_um
 from .services import gerar_termo_lote
 from .services import gerar_termo_um
 from .services import listar_servidores_com_termo
@@ -38,7 +44,12 @@ from .services import preview_termo_context
 from .services import sha256_bytes
 
 
+TERMOS_PER_PAGE = 15
+
+
 def index(request):
+    q = request.GET.get("q", "").strip()
+    q_digits = _digits(q)
     termos = (
         TermoAutorizacao.objects.select_related(
             "oficio",
@@ -49,17 +60,62 @@ def index(request):
         .prefetch_related("servidores")
         .order_by("-created_at")
     )
+    if q:
+        query = (
+            Q(destino_cidade__nome__icontains=q)
+            | Q(destino_cidade__uf__icontains=q)
+            | Q(destino_estado__nome__icontains=q)
+            | Q(destino_estado__sigla__icontains=q)
+            | Q(oficio__numero__icontains=q)
+            | Q(oficio__protocolo__icontains=q)
+            | Q(oficio__servidores__nome__icontains=q)
+            | Q(oficio__servidores_termo_autorizacao__nome__icontains=q)
+            | Q(servidores__nome__icontains=q)
+            | Q(viatura__placa__icontains=q)
+            | Q(viatura__modelo__icontains=q)
+            | Q(oficio__viatura__placa__icontains=q)
+            | Q(oficio__viatura__modelo__icontains=q)
+        )
+        if q_digits:
+            query |= Q(oficio__protocolo__icontains=q_digits) | Q(oficio__numero__icontains=q_digits)
+        termos = termos.filter(query).distinct()
+    paginator = Paginator(termos, TERMOS_PER_PAGE)
+    page_obj = paginator.get_page(request.GET.get("page"))
+    rows = [
+        apresentar_linha_lista_simples_termo(
+            termo,
+            edit_url=reverse("termos:editar", args=[termo.pk]),
+            delete_url=reverse("termos:excluir", args=[termo.pk]),
+            delete_modal=True,
+        )
+        for termo in page_obj.object_list
+    ]
     return render(
         request,
         "termos/index.html",
         {
             "page_title": "Termos de Autorizacao",
             "page_description": "Cadastre termos avulsos ou vinculados a oficios existentes.",
-            "termos": termos,
+            "rows": rows,
+            "q": q,
+            "page_obj": page_obj,
+            "pagination_pages": _pagination_pages(page_obj),
+            "page_querystring": urlencode({"q": q}) if q else "",
             "novo_url": reverse("termos:novo"),
             "oficios_url": reverse("oficios:index"),
         },
     )
+
+
+def _pagination_pages(page_obj, *, on_each_side=1, on_ends=1):
+    return [
+        page_number if isinstance(page_number, int) else "..."
+        for page_number in page_obj.paginator.get_elided_page_range(
+            page_obj.number,
+            on_each_side=on_each_side,
+            on_ends=on_ends,
+        )
+    ]
 
 
 def _termo_queryset():
@@ -93,17 +149,32 @@ def _redirect_termo_lista(termo):
     return redirect("termos:editar", pk=termo.pk)
 
 
+def _cadastro_create_url(create_url_name, next_url):
+    return f"{reverse(create_url_name)}?{urlencode({'next': next_url})}"
+
+
+def _digits(value):
+    return re.sub(r"\D", "", str(value or ""))
+
+
 def _oficio_summary(oficio):
     roteiro = oficio.roteiro
     destino = ""
+    roteiro_label = ""
     periodo = ""
     data_inicio = ""
     data_fim = ""
+    sede = ""
     estado_id = ""
     cidade_id = ""
     if roteiro:
-        destino_obj = roteiro.destinos.select_related("cidade", "estado").order_by("ordem", "pk").first()
+        sede_obj = roteiro.origem_cidade or roteiro.origem_estado
+        sede = str(sede_obj) if sede_obj else ""
+        destinos = list(roteiro.destinos.select_related("cidade", "estado").order_by("ordem", "pk"))
+        destino_obj = destinos[0] if destinos else None
         destino = str(destino_obj) if destino_obj else ""
+        destinos_label = ", ".join(str(item) for item in destinos if item)
+        roteiro_label = " -> ".join(part for part in [sede, destinos_label or destino] if part)
         if destino_obj:
             estado_id = destino_obj.estado_id or ""
             cidade_id = destino_obj.cidade_id or ""
@@ -114,14 +185,38 @@ def _oficio_summary(oficio):
             fim = retorno.strftime("%d/%m/%Y") if retorno else inicio
             data_fim = retorno.date().isoformat() if retorno else data_inicio
             periodo = inicio if fim == inicio else f"{inicio} a {fim}"
-    servidor_ids = [s.pk for s in oficio.servidores_termo_autorizacao.all()]
+    servidores_termo = list(oficio.servidores_termo_autorizacao.all())
+    servidores_oficio = list(oficio.servidores.all())
+    servidor_ids = [s.pk for s in servidores_termo]
+    servidores_nomes = []
+    seen_servidores = set()
+    for servidor in servidores_termo + servidores_oficio:
+        if servidor.pk in seen_servidores:
+            continue
+        seen_servidores.add(servidor.pk)
+        servidores_nomes.append(servidor.nome)
     viatura_id = oficio.viatura_id or ""
+    viatura = str(oficio.viatura) if viatura_id else ""
+    viatura_modelo = getattr(oficio.viatura, "modelo", "") if viatura_id else ""
     return {
         "id": oficio.pk,
         "label": f"Oficio {oficio.numero_formatado}",
         "numero": oficio.numero_formatado,
+        "numero_busca": " ".join(
+            part
+            for part in [
+                str(oficio.numero or ""),
+                f"{oficio.numero:02d}" if oficio.numero else "",
+                str(oficio.ano or ""),
+                _digits(oficio.numero_formatado),
+            ]
+            if part
+        ),
         "protocolo": oficio.protocolo or "",
+        "protocolo_busca": _digits(oficio.protocolo),
+        "sede": sede,
         "destino": destino,
+        "roteiro": roteiro_label,
         "periodo": periodo,
         "data_inicio": data_inicio,
         "data_fim": data_fim,
@@ -130,14 +225,27 @@ def _oficio_summary(oficio):
         "servidor_ids": servidor_ids,
         "viatura_id": viatura_id,
         "servidores": len(servidor_ids),
-        "viatura": str(oficio.viatura) if viatura_id else "",
+        "servidores_nomes": servidores_nomes,
+        "servidores_label": ", ".join(servidores_nomes),
+        "viatura": viatura,
+        "viatura_modelo": viatura_modelo,
         "search_text": " ".join(
             part
             for part in [
                 oficio.numero_formatado,
+                str(oficio.numero or ""),
+                f"{oficio.numero:02d}" if oficio.numero else "",
+                str(oficio.ano or ""),
+                _digits(oficio.numero_formatado),
                 oficio.protocolo or "",
+                _digits(oficio.protocolo),
+                sede,
                 destino,
+                roteiro_label,
                 periodo,
+                viatura,
+                viatura_modelo,
+                " ".join(servidores_nomes),
                 oficio.assunto or "",
             ]
             if part
@@ -257,8 +365,50 @@ def _termo_page_steps(form, termo=None):
     ]
 
 
-def _form_context(*, form, termo=None, evento=None):
-    oficios = form.fields["oficio"].queryset.prefetch_related("servidores_termo_autorizacao")
+def _termo_preview_documents(termo):
+    if not termo or not termo.pk:
+        return {}
+    servidores = list(termo.servidores_efetivos())
+    return {
+        "generico": {
+            "titulo": "Termo generico",
+            "inline_url": reverse("termos:termo_cadastro_generico_pdf_inline", args=[termo.pk]),
+        },
+        "servidores": [
+            {
+                "id": servidor.pk,
+                "titulo": f"Termo - {servidor.nome}",
+                "servidor_nome": servidor.nome,
+                "inline_url": reverse("termos:termo_cadastro_servidor_pdf_inline", args=[termo.pk, servidor.pk]),
+            }
+            for servidor in servidores
+        ],
+    }
+
+
+def _form_context(*, request, form, termo=None, evento=None):
+    next_url = request.get_full_path()
+    oficios = (
+        form.fields["oficio"]
+        .queryset.select_related(
+            "roteiro__origem_cidade",
+            "roteiro__origem_estado",
+            "viatura",
+            "viatura__combustivel",
+            "viatura__unidade",
+        )
+        .prefetch_related(
+            "roteiro__destinos",
+            "roteiro__destinos__cidade",
+            "roteiro__destinos__estado",
+            "servidores",
+            "servidores__cargo",
+            "servidores__unidade",
+            "servidores_termo_autorizacao",
+            "servidores_termo_autorizacao__cargo",
+            "servidores_termo_autorizacao__unidade",
+        )
+    )
     summaries = {}
     for oficio in oficios:
         summary = _oficio_summary(oficio)
@@ -269,10 +419,11 @@ def _form_context(*, form, termo=None, evento=None):
         "termo": termo,
         "index_url": _termo_lista_url(termo=termo, evento=evento),
         "back_label": _termo_back_label(termo=termo, evento=evento),
-        "servidor_create_url": reverse("cadastros:servidor_create"),
-        "viatura_create_url": reverse("cadastros:viatura_create"),
+        "servidor_create_url": _cadastro_create_url("cadastros:servidor_create", next_url),
+        "viatura_create_url": _cadastro_create_url("cadastros:viatura_create", next_url),
         "api_cidades_por_estado_url": reverse("roteiros:api_cidades_por_estado", kwargs={"estado_id": 0}),
         "oficios_summary": summaries,
+        "termo_preview_documents": _termo_preview_documents(termo),
         "termo_page_steps": _termo_page_steps(form, termo=termo),
         "termo_evento_selected_dates_json": _termo_evento_selected_dates_json(form),
         "termo_evento_display": _termo_evento_display_values(form),
@@ -309,12 +460,10 @@ def novo(request):
         if form.is_valid():
             termo = form.save()
             messages.success(request, "Termo cadastrado.")
-            if request.POST.get("action") == "save_preview":
-                return redirect("termos:preview_cadastro", pk=termo.pk)
             return _redirect_termo_lista(termo)
     else:
         form = TermoAutorizacaoForm(instance=termo, initial=initial)
-    return render(request, "termos/form.html", _form_context(form=form, termo=None, evento=evento))
+    return render(request, "termos/form.html", _form_context(request=request, form=form, termo=None, evento=evento))
 
 
 @require_http_methods(["GET", "POST"])
@@ -325,48 +474,18 @@ def editar(request, pk):
         if form.is_valid():
             termo = form.save()
             messages.success(request, "Termo atualizado.")
-            if request.POST.get("action") == "save_preview":
-                return redirect("termos:preview_cadastro", pk=termo.pk)
             return _redirect_termo_lista(termo)
     else:
         form = TermoAutorizacaoForm(instance=termo)
-    return render(request, "termos/form.html", _form_context(form=form, termo=termo))
+    return render(request, "termos/form.html", _form_context(request=request, form=form, termo=termo))
 
 
-def preview_cadastro(request, pk):
+@require_http_methods(["POST"])
+def excluir(request, pk):
     termo = get_object_or_404(_termo_queryset(), pk=pk)
-    servidores = list(termo.servidores_efetivos())
-    preview = {
-        "termo": termo,
-        "destino": termo.destino_display,
-        "periodo": termo.periodo_display,
-        "servidores": servidores,
-        "viatura": termo.viatura_efetiva(),
-        "oficio": termo.oficio,
-    }
-    if request.GET.get("format") == "json":
-        data = {
-            "id": termo.pk,
-            "destino": preview["destino"],
-            "periodo": preview["periodo"],
-            "servidores": [servidor.nome for servidor in servidores],
-            "viatura": str(preview["viatura"]) if preview["viatura"] else "",
-            "oficio": termo.oficio.numero_formatado if termo.oficio_id else "",
-        }
-        return HttpResponse(
-            json.dumps(data, cls=DjangoJSONEncoder, ensure_ascii=False, indent=2),
-            content_type="application/json; charset=utf-8",
-        )
-    return render(
-        request,
-        "termos/preview_cadastro.html",
-        {
-            "page_title": f"Preview termo #{termo.pk}",
-            "termo": termo,
-            "preview": preview,
-            "editar_url": reverse("termos:editar", args=[termo.pk]),
-        },
-    )
+    termo.delete()
+    messages.success(request, "Termo excluido.")
+    return redirect("termos:index")
 
 
 def _termo_cadastro_docs_or_none(termo, formato):
@@ -389,6 +508,37 @@ def termo_cadastro_pdf_inline(request, pk):
         reference=f"termo-{termo.pk}",
         now=timezone.now(),
         x_document_sha256=sha256_bytes(content),
+    )
+
+
+@require_GET
+def termo_cadastro_generico_pdf_inline(request, pk):
+    termo = get_object_or_404(_termo_queryset(), pk=pk)
+    doc = gerar_termo_cadastro_um(termo, None, DocumentoFormato.PDF)
+    return build_inline_pdf_response(
+        request,
+        content=doc.conteudo,
+        tipo=DocumentoTipo.TERMO_AUTORIZACAO,
+        reference=f"termo-{termo.pk}-generico",
+        now=timezone.now(),
+        x_document_sha256=doc.hash_sha256,
+    )
+
+
+@require_GET
+def termo_cadastro_servidor_pdf_inline(request, pk, servidor_pk):
+    termo = get_object_or_404(_termo_queryset(), pk=pk)
+    servidor = get_object_or_404(Servidor, pk=servidor_pk)
+    if not termo.servidores_efetivos().filter(pk=servidor.pk).exists():
+        raise Http404("Servidor nao selecionado para este termo.")
+    doc = gerar_termo_cadastro_um(termo, servidor, DocumentoFormato.PDF)
+    return build_inline_pdf_response(
+        request,
+        content=doc.conteudo,
+        tipo=DocumentoTipo.TERMO_AUTORIZACAO,
+        reference=f"termo-{termo.pk}-servidor-{servidor.pk}",
+        now=timezone.now(),
+        x_document_sha256=doc.hash_sha256,
     )
 
 

@@ -123,23 +123,7 @@
         </div>
       </section>
 
-      <section class="wizard-inner-section" aria-labelledby="sec-destinos-title" id="sec-destinos">
-        <header class="wizard-inner-section__header">
-          <h4 class="wizard-inner-section__title" id="sec-destinos-title">Destinos</h4>
-          <p class="wizard-inner-section__description">Cada destino usa o mesmo padrão visual da sede para manter o fluxo consistente.</p>
-        </header>
-        <div class="cv-search-picker">
-          <section class="cv-search-picker__selected-panel roteiro-destinos-panel" aria-label="Destinos adicionados">
-            <div class="cv-search-picker__selected-header roteiro-destinos-panel__header">
-              <h4 class="cv-search-picker__selected-title">Destinos adicionados</h4>
-              <button type="button" id="btn-adicionar-destino" class="cv-btn cv-btn--secondary cv-btn--sm">
-                <span>+ Adicionar destino</span>
-              </button>
-            </div>
-            <div id="destinos-container" class="cv-search-picker__selected-list roteiro-destinos-list"></div>
-          </section>
-        </div>
-      </section>
+      {% include "components/domain/destinos_section.html" with section_id="sec-destinos" title_id="sec-destinos-title" add_button_id="btn-adicionar-destino" list_id="destinos-container" %}
 
     </div>{# /panel-roteiro-novo #}
   </div>
@@ -186,7 +170,6 @@
   }).observe(panelSalvo, { attributes: true, attributeFilter: ['hidden'] });
 })();
 </script>
-
 
 
 

@@ -1,4 +1,4 @@
-import { initRoteirosEditor } from './pages/roteiros/editor/index.js?v=20260623-batevolta-tempo';
+import { initRoteirosEditor } from './pages/roteiros/editor/index.js?v=20260624-destino-dnd';
 
 function bootRoteirosEditor() {
   const form = document.getElementById('roteiro-editor-form');

@@ -162,19 +162,20 @@ class AcoesTests(BaseViewTest):
 
 
 class BlocoCompactoTagTests(BaseViewTest):
-    def test_bloco_em_documento_sem_protocolo_mostra_gerar(self):
+    def test_bloco_em_documento_sem_protocolo_nao_renderiza_componente(self):
         from django.template import Context, Template
         oficio = Oficio.objects.create(numero=7, ano=2026)
         tpl = Template("{% load protocolos_tags %}{% bloco_protocolo oficio %}")
         html = tpl.render(Context({"oficio": oficio}))
-        self.assertIn("Gerar protocolo", html)
-        self.assertIn("Ambiente: Treinamento", html)
-        self.assertIn("Vincular existente", html)
+        self.assertNotIn("Integracao eProtocolo", html)
+        self.assertNotIn("Gerar protocolo", html)
+        self.assertNotIn("Vincular existente", html)
 
-    def test_bloco_em_documento_com_protocolo_mostra_ver(self):
+    def test_bloco_em_documento_com_protocolo_nao_renderiza_componente(self):
         from django.template import Context, Template
         oficio = Oficio.objects.create(numero=8, ano=2026)
         services.criar_protocolo_a_partir_de_documento(oficio)
         tpl = Template("{% load protocolos_tags %}{% bloco_protocolo oficio %}")
         html = tpl.render(Context({"oficio": oficio}))
-        self.assertIn("Ver protocolo", html)
+        self.assertNotIn("Integracao eProtocolo", html)
+        self.assertNotIn("Ver protocolo", html)

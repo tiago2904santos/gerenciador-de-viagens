@@ -140,6 +140,9 @@
             {% if form.data_evento_inicio.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.data_evento_inicio.errors only %}{% endif %}
             {% if form.data_evento_fim.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.data_evento_fim.errors only %}{% endif %}
           </section>
+          {% include "components/domain/destinos_section.html" with section_id="pt-evento-destinos" title_id="pt-evento-destinos-title" description="Cada destino usa o mesmo padrão visual da sede para manter o fluxo consistente." panel_aria_label="Destinos adicionados" add_button_pt=True rows_template="planos_trabalho/partials/_destinos_rows.html" errors_template="planos_trabalho/partials/_destinos_errors.html" %}
+          {% include "planos_trabalho/partials/_destinos_template.html" %}
+          {% comment %}
           <section class="wizard-inner-section termo-evento-destinos" aria-labelledby="pt-evento-destinos-title" id="pt-evento-destinos">
             <header class="wizard-inner-section__header">
               <h4 class="wizard-inner-section__title" id="pt-evento-destinos-title">Destinos</h4>
@@ -255,6 +258,7 @@
               </div>
             </template>
           </section>
+          {% endcomment %}
         </div>
         <div class="cv-date-picker__panel" hidden data-cv-date-picker-panel>
           <div class="cv-date-picker__context" data-cv-date-picker-context hidden>

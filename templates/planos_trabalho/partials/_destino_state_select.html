@@ -1,0 +1,16 @@
+<select
+  class="cv-search-picker__native"
+  data-cv-search-picker="true"
+  data-picker-mode="single"
+  data-picker-variant="compact"
+  data-placeholder="Buscar estado..."
+  data-empty-message="Nenhum estado encontrado."
+  data-picker-initial-value="{{ row.estado_id }}"
+  data-pt-destino-state
+  name="{% if row.is_primary %}destino_estado{% else %}destino_estado_{{ row.index }}{% endif %}"
+>
+  <option value=""></option>
+  {% for estado in form.fields.destino_estado.queryset %}
+    <option value="{{ estado.pk }}"{% if row.estado_id == estado.pk|stringformat:'s' %} selected{% endif %}>{{ estado.nome }} ({{ estado.sigla }})</option>
+  {% endfor %}
+</select>

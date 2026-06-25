@@ -38,14 +38,12 @@ logger = logging.getLogger(__name__)
 from .models import Roteiro
 from .presenters import (
     apresentar_contexto_formulario_roteiro_avulso,
-    apresentar_pagina_detalhe_roteiro,
     apresentar_roteiro_card,
 )
 from .selectors import (
     get_roteiro_by_id,
     listar_cidades_para_select,
     listar_roteiros,
-    listar_trechos_do_roteiro,
 )
 from .services import (
     atualizar_roteiro,
@@ -162,7 +160,7 @@ def novo(request):
             messages.success(request, "Roteiro cadastrado com sucesso.")
             if evento is not None:
                 return redirect("eventos:guiado_etapa", pk=evento.pk, etapa=2)
-            return redirect("roteiros:detalhe", pk=roteiro.pk)
+            return redirect("roteiros:editar", pk=roteiro.pk)
         for error in validated.get("errors", []):
             form.add_error(None, error)
         destinos_atuais, trechos_list = normalizar_destinos_e_trechos_apos_erro_post(roteiro_state)
@@ -203,19 +201,6 @@ def novo(request):
     )
 
 
-def detalhe(request, pk):
-    roteiro = get_roteiro_by_id(pk)
-    trechos = listar_trechos_do_roteiro(roteiro)
-    context = apresentar_pagina_detalhe_roteiro(roteiro, trechos)
-    if roteiro.evento_id:
-        context["back_url"] = _roteiro_return_url(roteiro=roteiro)
-    return render(
-        request,
-        "roteiros/detail.html",
-        context,
-    )
-
-
 def _next_url_seguro(request):
     """URL local de retorno (?next=), validada contra open redirect."""
     from django.utils.http import url_has_allowed_host_and_scheme
@@ -250,7 +235,7 @@ def editar(request, pk):
                 return redirect(next_url)
             if roteiro.evento_id:
                 return redirect("eventos:guiado_etapa", pk=roteiro.evento_id, etapa=2)
-            return redirect("roteiros:detalhe", pk=roteiro.pk)
+            return redirect("roteiros:index")
         for error in validated.get("errors", []):
             form.add_error(None, error)
         destinos_atuais, trechos_list = normalizar_destinos_e_trechos_apos_erro_post(roteiro_state)
@@ -276,7 +261,7 @@ def editar(request, pk):
         {
             "page_title": "Editar roteiro",
             "page_description": "Ajuste sede, destinos, trechos e retorno.",
-            "back_url": next_url or (_roteiro_return_url(roteiro=roteiro) if roteiro.evento_id else reverse("roteiros:detalhe", args=[roteiro.pk])),
+            "back_url": next_url or (_roteiro_return_url(roteiro=roteiro) if roteiro.evento_id else reverse("roteiros:index")),
             "delete_url": reverse("roteiros:excluir", args=[roteiro.pk]),
             "wizard_header": {
                 "title": "Editar roteiro",
@@ -284,8 +269,8 @@ def editar(request, pk):
                 "status_label": roteiro_status_label,
                 "status_variant": roteiro_status_variant,
             },
-            "wizard_back_label": "Voltar" if next_url else ("Dados do evento" if roteiro.evento_id else "Voltar para detalhes"),
-            "wizard_back_url": next_url or (_roteiro_return_url(roteiro=roteiro) if roteiro.evento_id else reverse("roteiros:detalhe", args=[roteiro.pk])),
+            "wizard_back_label": "Voltar" if next_url else ("Dados do evento" if roteiro.evento_id else "Voltar para lista"),
+            "wizard_back_url": next_url or (_roteiro_return_url(roteiro=roteiro) if roteiro.evento_id else reverse("roteiros:index")),
             "wizard_page_steps": [],
             "roteiro_editor_oficio": True,
             "roteiro_form_action": request.get_full_path(),
@@ -302,7 +287,7 @@ def excluir(request, pk):
             messages.error(request, "Este roteiro possui vínculos e não pode ser excluído.")
             if evento_id:
                 return redirect("eventos:guiado_etapa", pk=evento_id, etapa=2)
-            return redirect("roteiros:detalhe", pk=roteiro.pk)
+            return redirect("roteiros:editar", pk=roteiro.pk)
         messages.success(request, "Roteiro excluído com sucesso.")
         if evento_id:
             return redirect("eventos:guiado_etapa", pk=evento_id, etapa=2)
@@ -315,7 +300,7 @@ def excluir(request, pk):
             "page_title": "Excluir roteiro",
             "page_description": "Confirme a exclusão do roteiro selecionado.",
             "object": roteiro,
-            "back_url": _roteiro_return_url(roteiro=roteiro) if evento_id else reverse("roteiros:detalhe", args=[roteiro.pk]),
+            "back_url": _roteiro_return_url(roteiro=roteiro) if evento_id else reverse("roteiros:editar", args=[roteiro.pk]),
         },
     )
 

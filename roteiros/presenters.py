@@ -86,8 +86,8 @@ def _inferir_tipo_destino(destinos):
     return infer_tipo_destino_from_paradas(paradas) if paradas else ""
 
 
-def _roteiro_faixa_lateral_class(roteiro):
-    now = timezone.now()
+def _roteiro_inicio_fim(roteiro):
+    """Resolve as datas de início e fim do roteiro, normalizando a ordem."""
     inicio = (
         getattr(roteiro, "saida_dt", None)
         or getattr(roteiro, "chegada_dt", None)
@@ -100,9 +100,51 @@ def _roteiro_faixa_lateral_class(roteiro):
         or getattr(roteiro, "saida_dt", None)
         or getattr(roteiro, "retorno_saida_dt", None)
     )
-
     if inicio and fim and fim < inicio:
         inicio, fim = fim, inicio
+    return inicio, fim
+
+
+def _format_roteiro_dt(dt):
+    if not dt:
+        return ""
+    tz = timezone.get_current_timezone()
+    if timezone.is_aware(dt):
+        dt = dt.astimezone(tz)
+    return dt.strftime("%d/%m/%Y %H:%M")
+
+
+def _temporal_badge_roteiro(roteiro):
+    """Chip de quanto falta / em andamento / quanto tempo passou."""
+    inicio, fim = _roteiro_inicio_fim(roteiro)
+    if not inicio:
+        return None, "muted"
+    tz = timezone.get_current_timezone()
+    today = timezone.localdate()
+    inicio_date = inicio.astimezone(tz).date() if timezone.is_aware(inicio) else inicio.date()
+    fim_date = inicio_date
+    if fim:
+        fim_date = fim.astimezone(tz).date() if timezone.is_aware(fim) else fim.date()
+    if today < inicio_date:
+        dias = (inicio_date - today).days
+        if dias == 1:
+            return "falta 1 dia", "warning"
+        return f"faltam {dias} dias", "warning"
+    if inicio_date <= today <= fim_date:
+        if today == inicio_date:
+            return "começa hoje", "info"
+        return "em andamento", "info"
+    dias = (today - fim_date).days
+    if dias == 0:
+        return "foi hoje", "success"
+    if dias == 1:
+        return "foi ontem", "success"
+    return f"há {dias} dias", "success"
+
+
+def _roteiro_faixa_lateral_class(roteiro):
+    now = timezone.now()
+    inicio, fim = _roteiro_inicio_fim(roteiro)
 
     status_code = getattr(roteiro, "status", "") or ""
     if status_code == Roteiro.STATUS_RASCUNHO:
@@ -131,7 +173,6 @@ def apresentar_roteiro_card(roteiro):
     else:
         titulo_rota = origem_txt if origem_txt != "—" else f"Roteiro #{roteiro.pk}"
 
-    detail_url = reverse("roteiros:detalhe", args=[roteiro.pk])
     edit_url = reverse("roteiros:editar", args=[roteiro.pk])
     delete_url = reverse("roteiros:excluir", args=[roteiro.pk])
 
@@ -171,8 +212,20 @@ def apresentar_roteiro_card(roteiro):
     if (not diaria_extenso or diaria_extenso == "(preencher manualmente)") and diaria_moeda:
         diaria_extenso = valor_por_extenso_ptbr(getattr(roteiro, "valor_diarias", None))
 
+    inicio_dt, fim_dt = _roteiro_inicio_fim(roteiro)
+    temporal_label, temporal_tone = _temporal_badge_roteiro(roteiro)
+
     return {
         "title": titulo_rota,
+        "rota_display": titulo_rota,
+        "inicio_display": _format_roteiro_dt(inicio_dt),
+        "fim_display": _format_roteiro_dt(fim_dt),
+        "temporal_label": temporal_label,
+        "temporal_tone": temporal_tone,
+        "valor_diarias_display": diaria_moeda or "",
+        "valor_diarias_extenso": diaria_extenso,
+        "editar_url": edit_url,
+        "excluir_url": delete_url,
         "subtitle": "Roteiro reutilizável para documentos",
         "status": status,
         "status_chip_label": status,
@@ -189,7 +242,7 @@ def apresentar_roteiro_card(roteiro):
         "trechos_count": trechos_count,
         "trechos_resumo": trechos_resumo,
         "roteiro_card_layout": roteiro_card_layout,
-        "actions": [build_open_action(detail_url), build_edit_action(edit_url), build_delete_action(delete_url)],
+        "actions": [build_open_action(edit_url), build_edit_action(edit_url), build_delete_action(delete_url)],
     }
 
 
@@ -214,22 +267,3 @@ def apresentar_contexto_formulario_roteiro_avulso(
         roteiro_state=roteiro_state,
         route_options=route_options,
     )
-
-
-def apresentar_pagina_detalhe_roteiro(roteiro, trechos):
-    pk = roteiro.pk
-    destinos = list(roteiro.destinos.all())
-    destinos_detalhe = [
-        {"ordem": idx + 1, "label": _label_cidade_uf(d.cidade, d.estado)}
-        for idx, d in enumerate(destinos)
-    ]
-    return {
-        "page_title": f"Roteiro #{pk}",
-        "page_description": "Resumo do roteiro, trechos e diárias calculadas.",
-        "roteiro": roteiro,
-        "trechos": trechos,
-        "destinos_detalhe": destinos_detalhe,
-        "edit_url": reverse("roteiros:editar", args=[pk]),
-        "delete_url": reverse("roteiros:excluir", args=[pk]),
-        "back_url": reverse("roteiros:index"),
-    }

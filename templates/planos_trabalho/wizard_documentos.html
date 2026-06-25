@@ -1,6 +1,5 @@
 {% extends "planos_trabalho/wizard_base.html" %}
 {% load static %}
-{% load protocolos_tags %}
 
 {% block extra_css %}
   {{ block.super }}
@@ -97,8 +96,6 @@
       </button>
     </div>
   </section>
-
-  {% if plano.pk %}{% bloco_protocolo plano %}{% endif %}
 {% endblock %}
 
 {% block extra_js %}

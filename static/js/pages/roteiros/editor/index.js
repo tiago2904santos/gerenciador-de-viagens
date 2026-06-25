@@ -103,6 +103,7 @@ export function initRoteirosEditor() {
   var routeSearchTimer = null;
   var loopRenderTimer = null;
   var autoEstimarTimer = null;
+  var destinoDragState = null;
   var citiesCache = {};
   var lastTrechosSignature = null;
   function getTrechoCards() {
@@ -841,6 +842,95 @@ export function initRoteirosEditor() {
       row.classList.toggle('destino-row--single', single);
     });
   }
+  function clearDestinoDropTargets() {
+    getDestinoRows().forEach(function(row) {
+      row.classList.remove('is-drop-target', 'is-drop-before', 'is-drop-after');
+    });
+  }
+  function getDestinoDropTarget(clientY, dragged) {
+    var rows = getDestinoRows().filter(function(row) { return row !== dragged; });
+    var target = null;
+    var closestDistance = Infinity;
+    rows.forEach(function(row) {
+      var rect = row.getBoundingClientRect();
+      var centerY = rect.top + (rect.height / 2);
+      var distance = Math.abs(clientY - centerY);
+      if (distance < closestDistance) {
+        target = {
+          row: row,
+          placeAfter: clientY >= centerY
+        };
+        closestDistance = distance;
+      }
+    });
+    return target;
+  }
+  function setDestinoDropTarget(target) {
+    clearDestinoDropTargets();
+    if (!target || !target.row) return;
+    target.row.classList.add('is-drop-target');
+    target.row.classList.add(target.placeAfter ? 'is-drop-after' : 'is-drop-before');
+  }
+  function markDestinoReordered(row) {
+    if (!row) return;
+    row.classList.add('is-reordered');
+    window.setTimeout(function() { row.classList.remove('is-reordered'); }, 460);
+  }
+  function moveDestinoRow(dragged, target) {
+    if (!dragged || !target || !target.row || dragged === target.row) return false;
+    var container = $('destinos-container');
+    if (!container) return false;
+    var reference = target.placeAfter ? target.row.nextSibling : target.row;
+    if (reference === dragged) return false;
+    container.insertBefore(dragged, reference);
+    clearDestinoDropTargets();
+    reindexDestinoRows();
+    markDestinoReordered(dragged);
+    renderTrechos(captureCurrentState(), { force: true });
+    scheduleRealtimeDiarias();
+    scheduleAutosave();
+    return true;
+  }
+  function cleanupDestinoPointerDrag() {
+    if (destinoDragState && destinoDragState.row) {
+      destinoDragState.row.classList.remove('is-dragging');
+    }
+    destinoDragState = null;
+    document.body.classList.remove('is-dragging-destino');
+    clearDestinoDropTargets();
+    document.removeEventListener('pointermove', handleDestinoPointerMove);
+    document.removeEventListener('pointerup', handleDestinoPointerUp);
+    document.removeEventListener('pointercancel', cancelDestinoPointerDrag);
+  }
+  function handleDestinoPointerMove(e) {
+    if (!destinoDragState) return;
+    var dx = e.clientX - destinoDragState.startX;
+    var dy = e.clientY - destinoDragState.startY;
+    if (!destinoDragState.active) {
+      if (Math.sqrt((dx * dx) + (dy * dy)) < 8) return;
+      destinoDragState.active = true;
+      destinoDragState.row.classList.add('is-dragging');
+      document.body.classList.add('is-dragging-destino');
+    }
+    e.preventDefault();
+    destinoDragState.currentTarget = getDestinoDropTarget(e.clientY, destinoDragState.row);
+    setDestinoDropTarget(destinoDragState.currentTarget);
+  }
+  function handleDestinoPointerUp(e) {
+    if (!destinoDragState) return;
+    if (!destinoDragState.active) {
+      cleanupDestinoPointerDrag();
+      return;
+    }
+    e.preventDefault();
+    var target = destinoDragState.currentTarget || getDestinoDropTarget(e.clientY, destinoDragState.row);
+    var dragged = destinoDragState.row;
+    cleanupDestinoPointerDrag();
+    moveDestinoRow(dragged, target);
+  }
+  function cancelDestinoPointerDrag() {
+    cleanupDestinoPointerDrag();
+  }
   function estadoOptionsMarkup(selectedId) {
     var se = $('id_origem_estado');
     return (se ? Array.from(se.options) : []).map(function(opt) {
@@ -873,37 +963,19 @@ export function initRoteirosEditor() {
       '</div>';
   }
   function bindDestinoRow(row) {
-    row.addEventListener('dragstart', function(e) {
-      row.classList.add('is-dragging');
-      e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/plain', row.dataset.index || '0');
-    });
-    row.addEventListener('dragend', function() {
-      row.classList.remove('is-dragging');
-      getDestinoRows().forEach(function(r) { r.classList.remove('is-drop-target'); });
-    });
-    row.addEventListener('dragover', function(e) {
-      e.preventDefault();
-      if (!row.classList.contains('is-dragging')) row.classList.add('is-drop-target');
-    });
-    row.addEventListener('dragleave', function() { row.classList.remove('is-drop-target'); });
-    row.addEventListener('drop', function(e) {
-      e.preventDefault();
-      var fromIdx = parseInt(e.dataTransfer.getData('text/plain') || '-1', 10);
-      var rows = getDestinoRows();
-      var dragged = rows[fromIdx];
-      if (!dragged || dragged === row) { row.classList.remove('is-drop-target'); return; }
-      var container = $('destinos-container');
-      var all = getDestinoRows();
-      var targetIdx = all.indexOf(row);
-      var draggedIdx = all.indexOf(dragged);
-      if (draggedIdx < targetIdx) container.insertBefore(dragged, row.nextSibling);
-      else container.insertBefore(dragged, row);
-      row.classList.remove('is-drop-target');
-      reindexDestinoRows();
-      renderTrechos(captureCurrentState(), { force: true });
-      scheduleRealtimeDiarias();
-      scheduleAutosave();
+    row.addEventListener('pointerdown', function(e) {
+      if (e.button !== 0 || getDestinoRows().length <= 1) return;
+      if (destinoDragState) cleanupDestinoPointerDrag();
+      destinoDragState = {
+        row: row,
+        startX: e.clientX,
+        startY: e.clientY,
+        currentTarget: null,
+        active: false
+      };
+      document.addEventListener('pointermove', handleDestinoPointerMove);
+      document.addEventListener('pointerup', handleDestinoPointerUp);
+      document.addEventListener('pointercancel', cancelDestinoPointerDrag);
     });
     return row;
   }
@@ -914,7 +986,7 @@ export function initRoteirosEditor() {
     var row = document.createElement('div');
     row.innerHTML = buildDestinoRowMarkup(idx, destino || {});
     row = row.firstElementChild;
-    row.draggable = true;
+    row.draggable = false;
     row.dataset.key = (destino && (destino.key || destino.destino_key || destino.id)) ? String(destino.key || destino.destino_key || destino.id) : makeStableKey('destino');
     container.appendChild(row);
     refreshSelectPickers(row);

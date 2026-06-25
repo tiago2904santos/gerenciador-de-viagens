@@ -35,6 +35,8 @@
                     </div>
                   </div>
                 </div>
+                {% include "components/domain/destinos_section.html" with section_id="sec-destinos" title_id="sec-destinos-title" add_button_id="btn-adicionar-destino" list_id="destinos-container" %}
+                {% comment %}
                 <div id="sec-destinos" class="roteiro-editor__nest-block roteiro-editor__nest-block--destinos">
                   <div class="roteiro-editor__destinos-stack oficio-roteiro-destinos-stack">
                     <div class="roteiro-editor__destinos-card-header">
@@ -45,5 +47,6 @@
                   </div>
                   <button type="button" id="btn-adicionar-destino" class="btn btn-outline-primary roteiro-editor__add-btn mt-2 w-100">Adicionar destino</button>
                 </div>
+                {% endcomment %}
               </div>
             </section>

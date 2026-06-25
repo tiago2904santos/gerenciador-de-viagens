@@ -1217,11 +1217,75 @@
 .destino-row {
   column-gap: 0;
   grid-template-columns: minmax(0, 1fr) 0;
+  position: relative;
+  transition:
+    box-shadow var(--transition-fast),
+    opacity var(--transition-fast),
+    transform var(--transition-fast);
+  user-select: none;
 }
 
 .destino-row:hover {
   column-gap: 0;
   grid-template-columns: minmax(0, 1fr) var(--remove-rail-width);
+}
+
+.destino-row.is-dragging {
+  box-shadow: 0 16px 34px color-mix(in srgb, var(--color-primary) 24%, transparent);
+  cursor: grabbing;
+  opacity: 0.72;
+  transform: scale(0.985);
+  z-index: 2;
+}
+
+.destino-row.is-drop-target {
+  box-shadow:
+    0 0 0 2px var(--color-primary-bright),
+    0 12px 28px color-mix(in srgb, var(--color-primary) 20%, transparent);
+  transform: translateY(-1px);
+}
+
+.destino-row.is-drop-target::before,
+.destino-row.is-drop-target::after {
+  background: linear-gradient(90deg, transparent, var(--color-primary-bright), transparent);
+  border-radius: 999px;
+  content: "";
+  height: 3px;
+  left: var(--space-3);
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  right: var(--space-3);
+}
+
+.destino-row.is-drop-before::before {
+  opacity: 1;
+  top: calc(var(--space-2) * -1);
+}
+
+.destino-row.is-drop-after::after {
+  bottom: calc(var(--space-2) * -1);
+  opacity: 1;
+}
+
+.destino-row.is-reordered {
+  animation: destino-reordered-pulse 460ms ease-out;
+}
+
+.is-dragging-destino,
+.is-dragging-destino * {
+  cursor: grabbing !important;
+}
+
+@keyframes destino-reordered-pulse {
+  0% {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary-bright) 75%, transparent);
+    transform: scale(1.012);
+  }
+  100% {
+    box-shadow: none;
+    transform: scale(1);
+  }
 }
 
 .destino-row--single {

@@ -1,0 +1,34 @@
+<section class="wizard-inner-section termo-evento-destinos{% if section_extra_class %} {{ section_extra_class }}{% endif %}"
+         aria-labelledby="{{ title_id|default:'destinos-title' }}"
+         id="{{ section_id|default:'sec-destinos' }}">
+  <header class="wizard-inner-section__header">
+    <h4 class="wizard-inner-section__title" id="{{ title_id|default:'destinos-title' }}">{{ title|default:'Destinos' }}</h4>
+    <p class="wizard-inner-section__description">{{ description|default:'Cada destino usa o mesmo padrão visual da sede para manter o fluxo consistente.' }}</p>
+  </header>
+  <div class="cv-search-picker">
+    <section class="cv-search-picker__selected-panel roteiro-destinos-panel" aria-label="{{ panel_aria_label|default:'Destinos adicionados' }}">
+      <div class="cv-search-picker__selected-header roteiro-destinos-panel__header">
+        <h4 class="cv-search-picker__selected-title">{{ panel_title|default:'Destinos adicionados' }}</h4>
+        <button type="button"
+                class="cv-btn cv-btn--secondary cv-btn--sm"
+                {% if add_button_id %}id="{{ add_button_id }}"{% endif %}
+                {% if add_button_pt %}data-pt-add-destino{% endif %}
+                {% if add_button_termo %}data-termo-add-destino{% endif %}
+                {% if add_button_os %}data-os-add-destino onclick="event.preventDefault(); event.stopPropagation(); window.OSFocusDestino && window.OSFocusDestino(this); return false;"{% endif %}
+                {% if add_button_evento %}data-evento-add-destino{% endif %}
+                {% if add_button_evento_d %}data-evento-add-destino-d{% endif %}>
+          <span>+ Adicionar destino</span>
+        </button>
+      </div>
+      <div class="cv-search-picker__selected-list roteiro-destinos-list"
+           {% if list_id %}id="{{ list_id }}"{% endif %}>
+        {% if rows_template %}
+          {% include rows_template %}
+        {% endif %}
+      </div>
+    </section>
+  </div>
+  {% if errors_template %}
+    {% include errors_template %}
+  {% endif %}
+</section>

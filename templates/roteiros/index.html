@@ -4,6 +4,7 @@
 {% block title %}Roteiros{% endblock %}
 
 {% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/oficios.css' %}">
   <link rel="stylesheet" href="{% static 'css/roteiros-list.css' %}">
 {% endblock %}
 
@@ -14,7 +15,7 @@
     <div class="list-panel">
       <div class="list-content list-grid list-grid--roteiros app-list-grid" data-cv-list-container>
         {% for card in cards %}
-          {% include "components/lists/main_list_card.html" with card=card only %}
+          {% include "roteiros/partials/roteiro_list_card.html" with card=card only %}
         {% empty %}
           {% include "components/lists/list_empty.html" with message=empty_message action_label="Novo roteiro" action_url=create_url only %}
         {% endfor %}

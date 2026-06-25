@@ -1,0 +1,13 @@
+<select
+  name="destino_cidade"
+  class="cv-field__control"
+  data-destino-cidade-picker
+  id="{{ form.destino_cidade.id_for_label }}"
+  data-initial-value="{{ form.destino_cidade.value|default:'' }}"
+  disabled
+>
+  <option value="">---------</option>
+</select>
+{% if form.destino_cidade.errors %}
+  {% include "components/ui/feedback/field_error.html" with errors=form.destino_cidade.errors only %}
+{% endif %}

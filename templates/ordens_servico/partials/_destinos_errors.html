@@ -1,0 +1,6 @@
+{% if form.destino_estado.errors %}
+  {% include "components/ui/feedback/field_error.html" with errors=form.destino_estado.errors only %}
+{% endif %}
+{% if form.destino_cidade.errors %}
+  {% include "components/ui/feedback/field_error.html" with errors=form.destino_cidade.errors only %}
+{% endif %}

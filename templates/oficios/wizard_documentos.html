@@ -1,6 +1,5 @@
 {% extends "oficios/wizard_base.html" %}
 {% load static %}
-{% load protocolos_tags %}
 
 {% block extra_css %}
   {{ block.super }}
@@ -455,9 +454,6 @@
 
     </div>
   </section>
-
-  {% if oficio.pk %}{% bloco_protocolo oficio %}{% endif %}
-
 {% endblock %}
 
 

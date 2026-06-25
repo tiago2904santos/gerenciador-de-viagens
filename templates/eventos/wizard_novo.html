@@ -161,6 +161,11 @@
                   {% endif %}
                 </section>
 
+                {% include "components/domain/destinos_section.html" with section_id="evento-wizard-destinos" title_id="evento-destinos-title" add_button_id="btn-adicionar-destino-evento" add_button_evento=True list_id="destinos-lista" rows_template="eventos/partials/_destinos_rows_novo.html" %}
+                <template id="tmpl-destino-extra">
+                  {% include "eventos/partials/_destino_extra_template.html" %}
+                </template>
+                {% comment %}
                 <section class="wizard-inner-section termo-evento-destinos" aria-labelledby="evento-destinos-title" id="evento-wizard-destinos">
                   <header class="wizard-inner-section__header">
                     <h4 class="wizard-inner-section__title" id="evento-destinos-title">Destinos</h4>
@@ -242,6 +247,7 @@
                     <button type="button" class="cv-search-picker__remove btn-remover-destino" data-remover-destino title="Remover destino" aria-label="Remover destino">×</button>
                   </div>
                 </template>
+                {% endcomment %}
               </div>
 
               <div class="cv-date-picker__panel" hidden data-cv-date-picker-panel>

@@ -171,9 +171,12 @@
 
     function renderList(filterText) {
       var term = normalize(filterText);
+      var tokens = term.split(/\s+/).filter(Boolean);
       var filtered = items.filter(function (summary) {
         var text = normalize(summary.search_text || [summary.label, summary.numero, summary.protocolo, summary.destino, summary.periodo].join(" "));
-        return !term || text.indexOf(term) !== -1;
+        return !tokens.length || tokens.every(function (token) {
+          return text.indexOf(token) !== -1;
+        });
       });
 
       list.innerHTML = "";
@@ -191,18 +194,35 @@
         button.type = "button";
         button.className = "oficio-roteiro-route-item" + (active ? " is-active" : "");
         button.dataset.routeId = String(summary.id);
-        var title = document.createElement("span");
-        title.className = "route-title";
-        title.textContent = summary.label || ("Oficio " + String(summary.id));
-        var destinos = document.createElement("span");
-        destinos.className = "route-destinos";
-        destinos.textContent = summary.destino || "Destino nao informado";
-        var periodo = document.createElement("span");
-        periodo.className = "route-periodo";
-        periodo.textContent = "Protocolo: " + (summary.protocolo || "-") + (summary.periodo ? " | Periodo: " + summary.periodo : "");
-        button.appendChild(title);
-        button.appendChild(destinos);
-        button.appendChild(periodo);
+
+        var firstLine = document.createElement("span");
+        firstLine.className = "route-title termo-oficio-route-line termo-oficio-route-line--primary";
+
+        var oficio = document.createElement("strong");
+        oficio.className = "termo-oficio-route__oficio";
+        oficio.textContent = summary.label || ("Oficio " + String(summary.id));
+
+        var protocolo = document.createElement("span");
+        protocolo.className = "termo-oficio-route__protocolo";
+        protocolo.textContent = "Protocolo " + (summary.protocolo || "-");
+
+        firstLine.appendChild(oficio);
+        firstLine.appendChild(protocolo);
+
+        var secondLine = document.createElement("span");
+        secondLine.className = "route-destinos termo-oficio-route-line";
+        secondLine.textContent = [
+          summary.roteiro || summary.destino || "Roteiro nao informado",
+          summary.periodo ? "Periodo: " + summary.periodo : "",
+        ].filter(Boolean).join(" | ");
+
+        var thirdLine = document.createElement("span");
+        thirdLine.className = "route-periodo termo-oficio-route-line termo-oficio-route-line--servers";
+        thirdLine.textContent = summary.servidores_label ? summary.servidores_label : "Sem servidores vinculados";
+
+        button.appendChild(firstLine);
+        button.appendChild(secondLine);
+        button.appendChild(thirdLine);
         button.addEventListener("click", function () {
           select.value = String(summary.id);
           select.dispatchEvent(new Event("change", { bubbles: true }));
