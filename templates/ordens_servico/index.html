@@ -1,51 +1,76 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}{{ page_title }}{% endblock %}
 
-{% block content %}
-  <div class="page-shell page-shell--standard-simple os-page">
-    {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="DOCUMENTOS" title=page_title description=page_description icon_label="OS" module_label="Ordens de Serviço" primary_action_label="Nova OS" primary_action_url=nova_url only %}
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/roteiros-list.css' %}?v=20260622-mobile">
+  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260610-oficios-datepicker">
+{% endblock %}
 
-    <main class="main-form-panel">
-      <section class="cv-wizard-section-card">
-        <header class="cv-wizard-section-header">
-          <div class="cv-wizard-section-header__copy">
-            <h2 class="cv-wizard-section-title">Ordens de Serviço cadastradas</h2>
-            <p class="cv-wizard-section-subtitle">OS avulsas ou vinculadas a ofícios existentes.</p>
-          </div>
-        </header>
-        <div class="cv-wizard-section-body">
-          <div class="os-list">
-            {% for ordem in ordens %}
-              <article class="os-list-card">
-                <div class="os-list-card__info">
-                  <h3 class="os-list-card__title">{{ ordem.numero_formatado }}</h3>
-                  <p class="os-list-card__meta">{{ ordem.periodo_display }}</p>
-                  <p class="os-list-card__meta">{{ ordem.destinos_display }}</p>
-                  <p class="os-list-card__meta">
-                    Servidores: {{ ordem.servidores.count }}
-                    {% if ordem.oficios.exists %}
-                      &mdash;
-                      {% for o in ordem.oficios.all %}
-                        Ofício {{ o.numero_formatado }}{% if not forloop.last %}, {% endif %}
-                      {% endfor %}
-                    {% endif %}
-                  </p>
-                </div>
-                <div class="os-list-card__actions">
-                  <a class="cv-btn cv-btn--secondary" href="{% url 'ordens_servico:editar' ordem.pk %}"><span>Editar</span></a>
-                </div>
-              </article>
-            {% empty %}
-              <div class="os-empty">
-                <h3>Nenhuma OS cadastrada</h3>
-                <p>Crie uma OS informando destino, data do evento e servidores, ou vincule ofícios existentes.</p>
-                {% include "components/ui/buttons/button.html" with href=nova_url label="Criar primeira OS" variant="primary" only %}
-              </div>
-            {% endfor %}
+{% block content %}
+<div class="app-page--main-card-list page-shell page-shell--list oficios-list-page" data-cv-realtime-filter-scope>
+
+  <form class="page-header-stack" method="get" action="{{ request.path }}" data-cv-live-submit-form>
+
+    {# ── BAND ── #}
+    <div class="page-header-band">
+      <div class="page-header-band__content">
+        <div class="page-header-band__text">
+          <span class="page-header-band__eyebrow">DOCUMENTOS</span>
+          <h1 class="page-header-band__title">{{ page_title }}</h1>
+        </div>
+      </div>
+    </div>
+
+    {# ── RAIL ── #}
+    <div class="page-header-rail page-header-rail--filters">
+      <div class="page-header-rail__marker" aria-hidden="true">OS</div>
+
+      <div class="header-filter-bar header-filter-bar--advanced">
+
+        {# Linha 1 — busca #}
+        <div class="header-filter-bar__search">
+          <input
+            class="header-filter-input"
+            type="search"
+            name="q"
+            placeholder="Buscar por número, motivo, destino ou servidor…"
+            aria-label="Buscar ordens de serviço"
+            data-cv-filter="search"
+            {% if q %}value="{{ q }}"{% endif %}
+          >
+        </div>
+
+        {# Linha 2 — ações #}
+        <div class="header-filter-bar__row">
+          <div class="header-filter-bar__fields"></div>
+
+          {# Ações sempre visíveis #}
+          <div class="page-header-rail__actions">
+            {% include "components/ui/buttons/button.html" with href=search_clear_url label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" only %}
+            {% include "components/ui/buttons/button.html" with href=nova_url label="Nova OS" variant="primary" icon="plus" extra_class="cv-btn--control" only %}
           </div>
         </div>
-      </section>
-    </main>
+
+      </div>
+    </div>
+  </form>
+
+  <div class="list-panel">
+    <div class="list-content list-grid list-grid--roteiros app-list-grid" data-cv-list-container>
+      {% for card in cards %}
+        {% include "ordens_servico/partials/os_list_card.html" with card=card only %}
+      {% empty %}
+        {% include "components/lists/list_empty.html" with message=empty_message action_label="Nova OS" action_url=nova_url only %}
+      {% endfor %}
+    </div>
+    {% if cards %}
+      <div data-cv-empty-state hidden>
+        {% include "components/lists/list_empty.html" with message=empty_message only %}
+      </div>
+    {% endif %}
   </div>
+
+</div>
 {% endblock %}

@@ -5,6 +5,7 @@ from datetime import datetime
 
 from django.contrib import messages
 from django.core.serializers.json import DjangoJSONEncoder
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
@@ -16,23 +17,45 @@ from eventos.services import resolve_evento_from_request
 
 from .forms import OrdemServicoForm
 from .models import OrdemServico
+from .presenters import apresentar_ordem_servico_card
 from .services import gerar_os_docx_response
 
 
 def index(request):
+    q = request.GET.get("q", "").strip()
     ordens = (
         OrdemServico.objects
-        .prefetch_related("destinos__estado", "servidores", "oficios")
+        .prefetch_related(
+            "destinos__estado",
+            "servidores__cargo",
+            "servidores__unidade",
+            "oficios",
+        )
         .order_by("-ano", "-numero")
     )
+    if q:
+        filters = (
+            Q(motivo__icontains=q)
+            | Q(destinos__nome__icontains=q)
+            | Q(servidores__nome__icontains=q)
+        )
+        if q.isdigit():
+            filters |= Q(numero=int(q)) | Q(ano=int(q)) | Q(oficios__numero=int(q))
+        ordens = ordens.filter(filters).distinct()
+
+    cards = [apresentar_ordem_servico_card(ordem) for ordem in ordens]
+
     return render(
         request,
         "ordens_servico/index.html",
         {
             "page_title": "Ordens de Serviço",
             "page_description": "Cadastre e gerencie ordens de serviço.",
-            "ordens": ordens,
+            "q": q,
+            "cards": cards,
             "nova_url": reverse("ordens_servico:nova"),
+            "search_clear_url": reverse("ordens_servico:index"),
+            "empty_message": "Nenhuma OS encontrada com os filtros aplicados." if q else "Nenhuma OS cadastrada ainda.",
         },
     )
 
