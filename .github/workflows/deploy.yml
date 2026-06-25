@@ -1,0 +1,27 @@
+name: Deploy para produção
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /var/www/gerenciador-viagens/app
+            git pull origin main
+            source /var/www/gerenciador-de-viagens/venv/bin/activate
+            pip install -r requirements/prod.txt --quiet
+            python manage.py migrate --noinput
+            python manage.py collectstatic --noinput --clear
+            systemctl restart gerenciador-viagens
+            echo "Deploy concluído!"
