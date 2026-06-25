@@ -37,7 +37,13 @@ def apresentar_linha_lista_simples_modelo_justificativa(
     }
 
 
-def apresentar_linha_lista_simples_justificativa(justificativa: Justificativa):
+def apresentar_linha_lista_simples_justificativa(
+    justificativa: Justificativa,
+    *,
+    edit_url: str | None = None,
+    delete_url: str | None = None,
+    delete_modal: bool = False,
+):
     oficio = justificativa.oficio
     texto = (justificativa.texto or "").strip()
     if len(texto) > 110:
@@ -66,7 +72,9 @@ def apresentar_linha_lista_simples_justificativa(justificativa: Justificativa):
             ]
             if part
         ),
-        "edit_url": reverse("oficios:wizard_justificativa", args=[oficio.pk]),
+        "edit_url": edit_url or reverse("oficios:wizard_justificativa", args=[oficio.pk]),
+        "delete_url": delete_url,
+        "delete_modal": delete_modal,
     }
 
 

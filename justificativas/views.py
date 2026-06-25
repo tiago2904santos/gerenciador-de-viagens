@@ -1,4 +1,7 @@
+from urllib.parse import urlencode
+
 from django.contrib import messages
+from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import redirect
 from django.shortcuts import render
@@ -9,13 +12,29 @@ from .forms import JustificativaQuickAddForm
 from .forms import ModeloJustificativaForm
 from .presenters import apresentar_linha_lista_simples_justificativa
 from .presenters import apresentar_linha_lista_simples_modelo_justificativa
+from .selectors import get_justificativa_by_id
 from .selectors import get_modelo_justificativa_by_id
 from .selectors import listar_justificativas
 from .selectors import listar_modelos_justificativa_busca
 from .services import atualizar_modelo_justificativa
 from .services import criar_justificativas_quick_add
 from .services import criar_modelo_justificativa
+from .services import excluir_justificativa
 from .services import excluir_modelo_justificativa
+
+
+JUSTIFICATIVAS_PER_PAGE = 15
+
+
+def _pagination_pages(page_obj, *, on_each_side=1, on_ends=1):
+    return [
+        page_number if isinstance(page_number, int) else "..."
+        for page_number in page_obj.paginator.get_elided_page_range(
+            page_obj.number,
+            on_each_side=on_each_side,
+            on_ends=on_ends,
+        )
+    ]
 
 
 def index(request):
@@ -36,19 +55,39 @@ def index(request):
             | Q(modelo__nome__icontains=q)
         )
 
-    rows = [apresentar_linha_lista_simples_justificativa(j) for j in justificativas]
+    paginator = Paginator(justificativas, JUSTIFICATIVAS_PER_PAGE)
+    page_obj = paginator.get_page(request.GET.get("page"))
+    rows = [
+        apresentar_linha_lista_simples_justificativa(
+            j,
+            delete_url=reverse("justificativas:justificativa_excluir", args=[j.pk]),
+            delete_modal=True,
+        )
+        for j in page_obj.object_list
+    ]
     return render(
         request,
         "justificativas/index.html",
         {
             "page_title": "Justificativas",
             "page_description": "Crie justificativas livres vinculadas a um ou mais oficios.",
-            "form": form,
+            "quick_add_form": form,
             "q": q,
             "rows": rows,
             "modelos_url": reverse("justificativas:modelos_index"),
+            "page_obj": page_obj,
+            "pagination_pages": _pagination_pages(page_obj),
+            "page_querystring": urlencode({"q": q}) if q else "",
         },
     )
+
+
+@require_POST
+def justificativa_excluir(request, pk):
+    justificativa = get_justificativa_by_id(pk)
+    excluir_justificativa(justificativa)
+    messages.success(request, "Justificativa excluída com sucesso.")
+    return redirect("justificativas:index")
 
 
 def modelos_index(request):
