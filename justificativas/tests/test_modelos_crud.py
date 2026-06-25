@@ -37,7 +37,8 @@ class JustificativasQuickAddTests(TestCase):
     def test_index_renderiza_quick_add(self):
         response = self.client.get(reverse("justificativas:index"))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Quick add")
+        self.assertContains(response, "quick-add-justificativa")
+        self.assertContains(response, "Cadastrar justificativa")
         self.assertContains(response, "OFICIOS DA JUSTIFICATIVA")
         self.assertContains(response, reverse("justificativas:modelos_index"))
 
