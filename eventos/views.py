@@ -1,6 +1,7 @@
 import json
 
 from django.contrib import messages
+from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
@@ -32,16 +33,76 @@ def api_cidades_por_uf(request, uf):
     return JsonResponse([{"id": c.nome, "nome": c.nome} for c in cidades], safe=False)
 
 
+def _index_queryset():
+    """Queryset enxuto para a listagem: prefetch dos documentos exibidos no card."""
+    return Evento.objects.select_related("unidade_responsavel", "responsavel").prefetch_related(
+        "oficios",
+        "planos_trabalho",
+        "ordens_servico",
+        "ordens_servico__servidores",
+        "ordens_servico__destinos__estado",
+        "termos_autorizacao",
+        "termos_autorizacao__destino_cidade__estado",
+    )
+
+
+_EVENTO_SORT_MAP = {
+    "data_desc": ["-data_inicio", "-criado_em"],
+    "data_asc": ["data_inicio", "criado_em"],
+    "criacao_desc": ["-criado_em"],
+    "criacao_asc": ["criado_em"],
+    "titulo_asc": ["titulo"],
+}
+
+
 def index(request):
-    eventos = Evento.objects.select_related("unidade_responsavel", "responsavel").prefetch_related("oficios").order_by("-data_inicio", "-criado_em")
+    from .presenters import apresentar_evento_card
+
+    q = request.GET.get("q", "").strip()
+    status = request.GET.get("status", "").strip()
+    sort = request.GET.get("sort", "").strip()
+
+    eventos = _index_queryset()
+
+    if q:
+        eventos = eventos.filter(
+            Q(titulo__icontains=q)
+            | Q(destino_cidade__icontains=q)
+            | Q(destino_uf__icontains=q)
+            | Q(tipo_outro__icontains=q)
+            | Q(responsavel__nome__icontains=q)
+            | Q(unidade_responsavel__nome__icontains=q)
+        ).distinct()
+
+    if status:
+        eventos = eventos.filter(status=status)
+
+    eventos = eventos.order_by(*_EVENTO_SORT_MAP.get(sort, _EVENTO_SORT_MAP["data_desc"]))
+
+    cards = [apresentar_evento_card(evento) for evento in eventos]
+
     return render(
         request,
         "eventos/index.html",
         {
             "page_title": "Eventos",
             "page_description": "Agrupadores opcionais para organizar documentos relacionados.",
-            "eventos": eventos,
+            "cards": cards,
+            "q": q,
+            "status": status,
+            "sort": sort,
             "novo_url": reverse("eventos:novo"),
+            "search_clear_url": reverse("eventos:index"),
+            "status_options": [{"value": "", "label": "Todos os status"}]
+            + [{"value": v, "label": l} for v, l in Evento.STATUS_CHOICES],
+            "sort_options": [
+                {"value": "data_desc", "label": "Data do evento: mais recente"},
+                {"value": "data_asc", "label": "Data do evento: mais antiga"},
+                {"value": "criacao_desc", "label": "Criação: mais recente"},
+                {"value": "criacao_asc", "label": "Criação: mais antiga"},
+                {"value": "titulo_asc", "label": "Título (A–Z)"},
+            ],
+            "empty_message": "Nenhum evento encontrado com os filtros aplicados.",
         },
     )
 

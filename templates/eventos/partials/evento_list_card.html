@@ -1,0 +1,158 @@
+{# Card de lista de Evento — agrega ofícios, planos de trabalho, OS e termos.
+   Espera: card (dict de apresentar_evento_card). #}
+<article
+  class="oficio-lc evento-lc evento-lc--{{ card.status_variant|default:'rascunho' }}"
+  data-cv-filter-item
+  data-search-text="{{ card.titulo }} {{ card.destino_display }} {{ card.tipo_display }} {{ card.responsavel_display }} {{ card.unidade_display }}"
+  data-status-value="{{ card.status_variant }}"
+>
+  <div class="oficio-lc__layout">
+
+    {# ── IDENTIFICAÇÃO: Título · Tipo · Status ── #}
+    <div class="oficio-lc__id-row evento-lc__id-row">
+      <div class="oficio-lc__info-item evento-lc__info-item--title">
+        <span class="oficio-lc__info-label">Evento</span>
+        <span class="oficio-lc__info-value evento-lc__title">{{ card.titulo }}</span>
+      </div>
+      {% if card.tipo_display %}
+      <div class="oficio-lc__info-item">
+        <span class="oficio-lc__info-label">Tipo</span>
+        <span class="oficio-lc__info-value">{{ card.tipo_display }}</span>
+      </div>
+      {% endif %}
+      <div class="evento-lc__id-badges">
+        {% include "components/ui/badges/chip.html" with tone=card.status_tone label=card.status_label size="compact" only %}
+        {% if card.temporal_label %}
+          {% include "components/ui/badges/chip.html" with tone=card.temporal_tone label=card.temporal_label size="compact" only %}
+        {% endif %}
+      </div>
+    </div>
+
+    {# ── DADOS DO EVENTO ── #}
+    <div class="oficio-lc__section evento-lc__info-grid">
+      <div class="oficio-lc__info-item">
+        <span class="oficio-lc__info-label">Período</span>
+        <span class="oficio-lc__info-value">{{ card.periodo_display }}</span>
+      </div>
+      <div class="oficio-lc__info-item">
+        <span class="oficio-lc__info-label">Destino</span>
+        <span class="oficio-lc__info-value">{{ card.destino_display }}</span>
+      </div>
+      {% if card.responsavel_display %}
+      <div class="oficio-lc__info-item">
+        <span class="oficio-lc__info-label">Responsável</span>
+        <span class="oficio-lc__info-value">{{ card.responsavel_display }}</span>
+      </div>
+      {% endif %}
+      {% if card.unidade_display %}
+      <div class="oficio-lc__info-item">
+        <span class="oficio-lc__info-label">Unidade</span>
+        <span class="oficio-lc__info-value">{{ card.unidade_display }}</span>
+      </div>
+      {% endif %}
+      {% if card.motivo_resumido %}
+      <div class="oficio-lc__info-item evento-lc__info-item--full">
+        <span class="oficio-lc__info-label">Motivo</span>
+        <span class="oficio-lc__info-value evento-lc__motivo">{{ card.motivo_resumido }}</span>
+      </div>
+      {% endif %}
+    </div>
+
+    {# ── DOCUMENTOS VINCULADOS ── #}
+    <div class="oficio-lc__section evento-lc__docs">
+      <div class="evento-lc__docs-grid">
+
+        {# Ofícios #}
+        <section class="evento-lc__doc-group">
+          <header class="evento-lc__doc-group-head">
+            <span class="evento-lc__doc-group-title">Ofícios</span>
+            <span class="evento-lc__doc-group-count">{{ card.oficios_count }}</span>
+          </header>
+          <div class="evento-lc__doc-list">
+            {% for item in card.oficios %}
+            <a class="evento-lc__doc-item" href="{{ item.url }}">
+              <span class="evento-lc__doc-item-name">{{ item.titulo }}</span>
+              {% include "components/ui/badges/chip.html" with tone=item.status_tone label=item.status_label size="compact" extra_class="evento-lc__doc-chip" only %}
+            </a>
+            {% empty %}
+            <span class="evento-lc__doc-empty">Nenhum ofício</span>
+            {% endfor %}
+          </div>
+        </section>
+
+        {# Planos de trabalho #}
+        <section class="evento-lc__doc-group">
+          <header class="evento-lc__doc-group-head">
+            <span class="evento-lc__doc-group-title">Planos de trabalho</span>
+            <span class="evento-lc__doc-group-count">{{ card.planos_count }}</span>
+          </header>
+          <div class="evento-lc__doc-list">
+            {% for item in card.planos %}
+            <a class="evento-lc__doc-item" href="{{ item.url }}">
+              <span class="evento-lc__doc-item-name">{{ item.titulo }}</span>
+              {% include "components/ui/badges/chip.html" with tone=item.status_tone label=item.status_label size="compact" extra_class="evento-lc__doc-chip" only %}
+            </a>
+            {% empty %}
+            <span class="evento-lc__doc-empty">Nenhum plano</span>
+            {% endfor %}
+          </div>
+        </section>
+
+        {# Ordens de serviço #}
+        <section class="evento-lc__doc-group">
+          <header class="evento-lc__doc-group-head">
+            <span class="evento-lc__doc-group-title">Ordens de serviço</span>
+            <span class="evento-lc__doc-group-count">{{ card.ordens_count }}</span>
+          </header>
+          <div class="evento-lc__doc-list">
+            {% for item in card.ordens %}
+            <a class="evento-lc__doc-item" href="{{ item.url }}">
+              <span class="evento-lc__doc-item-name">{{ item.titulo }}</span>
+              {% if item.servidores_count %}
+              <span class="evento-lc__doc-item-meta">{{ item.servidores_count }} serv.</span>
+              {% endif %}
+            </a>
+            {% empty %}
+            <span class="evento-lc__doc-empty">Nenhuma OS</span>
+            {% endfor %}
+          </div>
+        </section>
+
+        {# Termos de autorização #}
+        <section class="evento-lc__doc-group">
+          <header class="evento-lc__doc-group-head">
+            <span class="evento-lc__doc-group-title">Termos</span>
+            <span class="evento-lc__doc-group-count">{{ card.termos_count }}</span>
+          </header>
+          <div class="evento-lc__doc-list">
+            {% for item in card.termos %}
+            <a class="evento-lc__doc-item" href="{{ item.url }}">
+              <span class="evento-lc__doc-item-name">{{ item.titulo }}</span>
+              {% if item.periodo %}
+              <span class="evento-lc__doc-item-meta">{{ item.periodo }}</span>
+              {% endif %}
+            </a>
+            {% empty %}
+            <span class="evento-lc__doc-empty">Nenhum termo</span>
+            {% endfor %}
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    {# ── FOOTER ── #}
+    <div class="oficio-lc__footer evento-lc__footer">
+      <span class="evento-lc__footer-summary">{{ card.documentos_total }} documento{{ card.documentos_total|pluralize }} vinculado{{ card.documentos_total|pluralize }}</span>
+      <div class="oficio-lc__footer-actions">
+        <div class="oficio-lc__footer-actions-main cv-icon-btn-group">
+          {% include "components/ui/buttons/icon_button.html" with href=card.editar_url action="edit" aria_label="Editar evento" tooltip="Editar evento" only %}
+        </div>
+        <a class="cv-btn cv-btn--primary cv-btn--sm evento-lc__open-btn" href="{{ card.detalhe_url }}">
+          <span>Abrir evento</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</article>

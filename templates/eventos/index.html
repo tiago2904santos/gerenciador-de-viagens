@@ -1,42 +1,95 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}{{ page_title }}{% endblock %}
 
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/roteiros-list.css' %}?v=20260622-mobile">
+  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260610-oficios-datepicker">
+  <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260626-eventos">
+  <link rel="stylesheet" href="{% static 'css/oficios-list-header.css' %}?v=20260625g-single-row">
+  <link rel="stylesheet" href="{% static 'css/eventos-list.css' %}?v=20260626-eventos">
+{% endblock %}
+
 {% block content %}
-  <div class="page-shell page-shell--standard-simple">
-    {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="EVENTOS" title=page_title description=page_description icon_label="EV" module_label="Eventos" primary_action_label="Novo evento" primary_action_url=novo_url only %}
-    <main class="main-form-panel">
-      <section class="cv-wizard-section-card">
-        <header class="cv-wizard-section-header">
-          <div class="cv-wizard-section-header__copy">
-            <h2 class="cv-wizard-section-title">Eventos cadastrados</h2>
-            <p class="cv-wizard-section-subtitle">Agrupadores opcionais para documentos e relatórios.</p>
-          </div>
-        </header>
-        <div class="cv-wizard-section-body">
-          <div class="os-list">
-            {% for evento in eventos %}
-              <article class="os-list-card">
-                <div class="os-list-card__info">
-                  <h3 class="os-list-card__title">{{ evento.titulo }}</h3>
-                  <p class="os-list-card__meta">{{ evento.periodo_display }}</p>
-                  <p class="os-list-card__meta">{{ evento.destino_display }}</p>
-                  <p class="os-list-card__meta">Ofícios vinculados: {{ evento.oficios.count }}</p>
-                </div>
-                <div class="os-list-card__actions">
-                  <a class="cv-btn cv-btn--secondary" href="{% url 'eventos:detalhe' evento.pk %}"><span>Abrir</span></a>
-                </div>
-              </article>
-            {% empty %}
-              <div class="os-empty">
-                <h3>Nenhum evento cadastrado</h3>
-                <p>Crie um evento para agrupar documentos relacionados.</p>
-                {% include "components/ui/buttons/button.html" with href=novo_url label="Criar primeiro evento" variant="primary" only %}
-              </div>
-            {% endfor %}
-          </div>
+<div class="app-page--main-card-list page-shell page-shell--list eventos-list-page" data-cv-realtime-filter-scope>
+
+  <form class="page-header-stack" method="get" action="{{ request.path }}" data-cv-live-submit-form>
+
+    {# ── BAND ── #}
+    <div class="page-header-band">
+      <div class="page-header-band__content">
+        <div class="page-header-band__text">
+          <span class="page-header-band__eyebrow">EVENTOS</span>
+          <h1 class="page-header-band__title">{{ page_title }}</h1>
         </div>
-      </section>
-    </main>
+      </div>
+    </div>
+
+    {# ── RAIL ── #}
+    <div class="page-header-rail page-header-rail--filters oficios-rail">
+      <div class="header-filter-bar header-filter-bar--advanced oficios-filter-bar">
+
+        <div class="header-filter-bar__search oficios-filter-bar__search-row oficios-filter-bar__single-row">
+          <div class="oficios-filter-bar__search-wrap">
+            <span class="oficios-filter-bar__search-icon" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+                <circle cx="11" cy="11" r="7"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+            </span>
+            <input
+              class="header-filter-input oficios-filter-bar__search-input"
+              type="search"
+              name="q"
+              placeholder="Buscar por título, destino, tipo ou responsável…"
+              aria-label="Buscar eventos"
+              data-cv-filter="search"
+              {% if q %}value="{{ q }}"{% endif %}
+            >
+          </div>
+
+          {# Status #}
+          <div class="cv-custom-select oficios-filter-cs" data-cv-select>
+            <select name="status" aria-label="Status do evento">
+              {% for opt in status_options %}
+                <option value="{{ opt.value }}"{% if opt.value == status %} selected{% endif %}>{{ opt.label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          {# Ordenação #}
+          <div class="cv-custom-select oficios-filter-cs" data-cv-select>
+            <select name="sort" aria-label="Ordenar por">
+              {% for opt in sort_options %}
+                <option value="{{ opt.value }}"{% if opt.value == sort or not sort and forloop.first %} selected{% endif %}>{{ opt.label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          {% include "components/ui/buttons/button.html" with href=search_clear_url label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control oficios-filter-clear" only %}
+        </div>
+
+      </div>
+    </div>
+  </form>
+
+  <div class="list-panel">
+    <div class="list-content app-list-grid eventos-list-grid" data-cv-list-container>
+      {% for card in cards %}
+        {% include "eventos/partials/evento_list_card.html" with card=card only %}
+      {% empty %}
+        {% include "components/lists/list_empty.html" with message=empty_message action_label="Novo evento" action_url=novo_url only %}
+      {% endfor %}
+    </div>
+    {% if cards %}
+      <div data-cv-empty-state hidden>
+        {% include "components/lists/list_empty.html" with message=empty_message only %}
+      </div>
+    {% endif %}
   </div>
+
+  {% include "components/ui/buttons/floating_action.html" with href=novo_url label="Novo evento" variant="primary" icon="plus" aria_label="Novo evento" only %}
+
+</div>
 {% endblock %}

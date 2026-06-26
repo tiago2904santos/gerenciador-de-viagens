@@ -1,0 +1,181 @@
+/* ── Eventos list ─────────────────────────────────────────────────
+   Card de evento (evento-lc): reaproveita o shell do card de ofícios
+   (oficio-lc) e adiciona os grupos de documentos vinculados.
+   ----------------------------------------------------------------- */
+
+.eventos-list-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+/* ── Linha de identificação ── */
+.evento-lc__id-row {
+  align-items: center;
+}
+
+.evento-lc__title {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.evento-lc__info-item--title {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.evento-lc__id-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+
+/* ── Grade de dados do evento ── */
+.evento-lc__info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.6rem 1.25rem;
+}
+
+.evento-lc__info-item--full {
+  grid-column: 1 / -1;
+}
+
+.evento-lc__motivo {
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--cv-text-secondary, rgba(255, 255, 255, 0.78));
+}
+
+/* ── Documentos vinculados ── */
+.evento-lc__docs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.evento-lc__doc-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--cv-border-default, rgba(255, 255, 255, 0.08));
+  border-radius: 12px;
+  background: var(--cv-surface-subtle, rgba(255, 255, 255, 0.025));
+}
+
+.evento-lc__doc-group-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.evento-lc__doc-group-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--cv-text-muted, rgba(255, 255, 255, 0.6));
+}
+
+.evento-lc__doc-group-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.4rem;
+  height: 1.4rem;
+  padding: 0 0.4rem;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  background: var(--cv-accent-soft, rgba(99, 102, 241, 0.18));
+  color: var(--cv-accent-strong, #c7d2fe);
+}
+
+.evento-lc__doc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.evento-lc__doc-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: 8px;
+  text-decoration: none;
+  color: inherit;
+  background: var(--cv-surface-default, rgba(255, 255, 255, 0.04));
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.evento-lc__doc-item:hover {
+  background: var(--cv-surface-hover, rgba(255, 255, 255, 0.08));
+  transform: translateX(2px);
+}
+
+.evento-lc__doc-item-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.evento-lc__doc-item-meta {
+  font-size: 0.72rem;
+  color: var(--cv-text-muted, rgba(255, 255, 255, 0.55));
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.evento-lc__doc-chip {
+  flex-shrink: 0;
+}
+
+.evento-lc__doc-empty {
+  font-size: 0.78rem;
+  font-style: italic;
+  color: var(--cv-text-muted, rgba(255, 255, 255, 0.4));
+  padding: 0.2rem 0.1rem;
+}
+
+/* ── Footer ── */
+.evento-lc__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.evento-lc__footer-summary {
+  font-size: 0.78rem;
+  color: var(--cv-text-muted, rgba(255, 255, 255, 0.55));
+}
+
+.evento-lc__footer .oficio-lc__footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-left: auto;
+}
+
+.evento-lc__open-btn {
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .evento-lc__id-badges {
+    margin-left: 0;
+    width: 100%;
+  }
+  .evento-lc__docs-grid {
+    grid-template-columns: 1fr;
+  }
+}
