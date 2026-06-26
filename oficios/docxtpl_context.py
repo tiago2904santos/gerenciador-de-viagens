@@ -121,6 +121,9 @@ def _fmt_date(d: date | datetime | None) -> str:
     if not d:
         return ""
     if isinstance(d, datetime):
+        from django.utils import timezone as tz
+        if tz.is_aware(d):
+            d = tz.localtime(d)
         d = d.date()
     return d.strftime("%d/%m/%Y")
 
@@ -128,6 +131,9 @@ def _fmt_date(d: date | datetime | None) -> str:
 def _fmt_time(dt: datetime | None) -> str:
     if not dt:
         return ""
+    from django.utils import timezone as tz
+    if tz.is_aware(dt):
+        dt = tz.localtime(dt)
     return dt.strftime("%H:%M")
 
 
