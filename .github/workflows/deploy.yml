@@ -20,6 +20,7 @@ jobs:
             cd /var/www/gerenciador-viagens/app
             git pull origin main
             source /var/www/gerenciador-de-viagens/venv/bin/activate
+            export $(grep -v '^#' .env | xargs)
             pip install -r requirements/prod.txt --quiet
             python manage.py migrate --noinput
             python manage.py collectstatic --noinput --clear
