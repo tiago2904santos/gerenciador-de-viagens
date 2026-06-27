@@ -6,6 +6,29 @@ from django.utils import timezone
 from oficios.presenters import _iniciais_nome_servidor
 
 
+def _get_assinante_os() -> dict | None:
+    try:
+        from cadastros.models import AssinaturaConfiguracao
+        from cadastros.models import ConfiguracaoSistema
+        config = ConfiguracaoSistema.get_singleton()
+        ass = (
+            config.assinaturas
+            .filter(tipo=AssinaturaConfiguracao.ORDEM_SERVICO, ativo=True)
+            .select_related("servidor__cargo")
+            .order_by("ordem")
+            .first()
+        )
+        if ass and ass.servidor:
+            srv = ass.servidor
+            return {
+                "nome": srv.nome,
+                "cargo": srv.cargo.nome if srv.cargo_id and srv.cargo else "",
+            }
+    except Exception:
+        pass
+    return None
+
+
 def _temporal_badge_os(ordem):
     inicio = ordem.data_evento_inicio
     if not inicio:
@@ -129,6 +152,7 @@ def apresentar_ordem_servico_card(ordem):
         "oficios_vinculados": _oficios_vinculados_os(ordem),
         "motivo": motivo,
         "motivo_resumido": motivo_resumido,
+        "assinante": _get_assinante_os(),
         "editar_url": reverse("ordens_servico:editar", args=[ordem.pk]),
         "docx_url": reverse("ordens_servico:baixar_docx", args=[ordem.pk]),
         "pdf_url": reverse("ordens_servico:baixar_pdf", args=[ordem.pk]),

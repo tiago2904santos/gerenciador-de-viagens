@@ -52,9 +52,9 @@
     </div>
 
 
-    {# ── MOTIVO ── #}
+    {# ── MOTIVO + ASSINANTE ── #}
     <div class="oficio-lc__section oficio-lc__section--justificativas">
-      <div class="oficio-lc__travellers oficio-lc__travellers--n1">
+      <div class="oficio-lc__travellers oficio-lc__travellers--n{% if card.assinante %}2{% else %}1{% endif %}">
         <div class="oficio-lc__traveller oficio-lc__traveller--justificativa">
           <div class="oficio-lc__traveller-body">
             <div class="oficio-lc__traveller-name-row">
@@ -65,6 +65,19 @@
             </span>
           </div>
         </div>
+        {% if card.assinante %}
+        <div class="oficio-lc__traveller oficio-lc__traveller--justificativa">
+          <div class="oficio-lc__traveller-body">
+            <div class="oficio-lc__traveller-name-row">
+              <span class="oficio-lc__traveller-name">ASSINANTE</span>
+            </div>
+            <span class="oficio-lc__traveller-meta">{{ card.assinante.nome }}</span>
+            {% if card.assinante.cargo %}
+            <span class="oficio-lc__traveller-meta">{{ card.assinante.cargo }}</span>
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
       </div>
     </div>
 
