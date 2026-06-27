@@ -85,6 +85,18 @@ def _oficios_vinculados_os(ordem):
     return items
 
 
+def _periodo_display_curto(ordem) -> str:
+    inicio = ordem.data_evento_inicio
+    fim = ordem.data_evento_fim
+    if not inicio:
+        return ""
+    if not fim or fim == inicio:
+        return inicio.strftime("%d/%m")
+    if inicio.year == fim.year:
+        return f"{inicio.strftime('%d/%m')} a {fim.strftime('%d/%m')}"
+    return f"{inicio.strftime('%d/%m/%Y')} a {fim.strftime('%d/%m/%Y')}"
+
+
 def apresentar_ordem_servico_card(ordem):
     data_criacao_display = ""
     if ordem.created_at:
@@ -108,7 +120,7 @@ def apresentar_ordem_servico_card(ordem):
         "pk": ordem.pk,
         "numero_display": ordem.numero_formatado,
         "data_criacao_display": data_criacao_display,
-        "periodo_display": ordem.periodo_display,
+        "periodo_display": _periodo_display_curto(ordem),
         "destinos_display": _destinos_display_os(ordem),
         "temporal_label": temporal_label,
         "temporal_tone": temporal_tone,
@@ -119,4 +131,7 @@ def apresentar_ordem_servico_card(ordem):
         "motivo_resumido": motivo_resumido,
         "editar_url": reverse("ordens_servico:editar", args=[ordem.pk]),
         "docx_url": reverse("ordens_servico:baixar_docx", args=[ordem.pk]),
+        "pdf_url": reverse("ordens_servico:baixar_pdf", args=[ordem.pk]),
+        "visualizar_url": reverse("ordens_servico:pdf_inline", args=[ordem.pk]),
+        "excluir_url": reverse("ordens_servico:excluir", args=[ordem.pk]),
     }

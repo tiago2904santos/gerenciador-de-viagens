@@ -12,6 +12,7 @@ from .roteiro_editor import (
     obter_initial_roteiro,
     preparar_estado_editor_roteiro_para_get,
     preparar_querysets_formulario_roteiro,
+    roteiro_state_equivalente_ao_roteiro,
     validar_submissao_editor_roteiro,
 )
 
@@ -27,5 +28,6 @@ __all__ = [
     "obter_initial_roteiro",
     "preparar_estado_editor_roteiro_para_get",
     "preparar_querysets_formulario_roteiro",
+    "roteiro_state_equivalente_ao_roteiro",
     "validar_submissao_editor_roteiro",
 ]

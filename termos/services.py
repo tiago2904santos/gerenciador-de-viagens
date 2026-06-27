@@ -204,18 +204,33 @@ def _viatura_payload(viatura: Viatura | None) -> dict:
     }
 
 
+_MESES = {
+    1: "janeiro", 2: "fevereiro", 3: "março", 4: "abril",
+    5: "maio", 6: "junho", 7: "julho", 8: "agosto",
+    9: "setembro", 10: "outubro", 11: "novembro", 12: "dezembro",
+}
+
+
+def _fmt_extenso(d) -> str:
+    return f"{d.day} de {_MESES[d.month]} de {d.year}"
+
+
 def _periodo_texto(termo: TermoAutorizacao) -> str:
     inicio, fim = termo.periodo_efetivo()
     if not inicio:
         return "-"
     if not fim or fim == inicio:
-        return inicio.strftime("%d/%m/%Y")
-    return f"{inicio.strftime('%d/%m/%Y')} a {fim.strftime('%d/%m/%Y')}"
+        return f"no dia {_fmt_extenso(inicio)}"
+    if inicio.month == fim.month and inicio.year == fim.year:
+        return f"nos dias {inicio.day} a {fim.day} de {_MESES[inicio.month]} de {inicio.year}"
+    return f"nos dias {_fmt_extenso(inicio)} a {_fmt_extenso(fim)}"
 
 
 def _viagem_payload_termo(termo: TermoAutorizacao) -> dict:
     if termo.oficio_id and not termo.destino_cidade_id and not termo.data_evento_inicio:
-        return _viagem_payload(termo.oficio)
+        payload = _viagem_payload(termo.oficio)
+        payload["periodo"] = _periodo_texto(termo)
+        return payload
 
     destino = termo.destino_efetivo() or "-"
     inicio, fim = termo.periodo_efetivo()

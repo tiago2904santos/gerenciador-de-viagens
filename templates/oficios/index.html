@@ -6,7 +6,7 @@
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/roteiros-list.css' %}?v=20260622-mobile">
   <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260610-oficios-datepicker">
-  <link rel="stylesheet" href="{% static 'css/oficios-list-header.css' %}?v=20260625g-single-row">
+  <link rel="stylesheet" href="{% static 'css/oficios-list-header.css' %}?v=20260627-filter-style">
 {% endblock %}
 
 {% block content %}
@@ -50,7 +50,7 @@
 
           {# Período temporal #}
           <div class="cv-custom-select oficios-filter-cs" data-cv-select>
-            <select name="temporal" aria-label="Período da viagem">
+            <select name="temporal" aria-label="Período da viagem" data-cv-filter="select">
               {% for opt in temporal_options %}
                 <option value="{{ opt.value }}"{% if opt.value == temporal %} selected{% endif %}>{{ opt.label }}</option>
               {% endfor %}
@@ -59,7 +59,7 @@
 
           {# Ordenação #}
           <div class="cv-custom-select oficios-filter-cs" data-cv-select>
-            <select name="sort" aria-label="Ordenar por">
+            <select name="sort" aria-label="Ordenar por" data-cv-filter="select">
               {% for opt in sort_options %}
                 <option value="{{ opt.value }}"{% if opt.value == sort or not sort and forloop.first %} selected{% endif %}>{{ opt.label }}</option>
               {% endfor %}
@@ -69,7 +69,7 @@
           {# Calendário — modelo de roteiros (botão pill com painel ao abrir) #}
           <div class="cv-date-picker oficios-filter-range" data-cv-date-picker data-mode="range"{% if viagem_de %} data-initial-date="{{ viagem_de }}"{% endif %}>
             <button type="button"
-                    class="cv-field-side-action cv-field-side-action--secondary cv-date-picker__trigger oficios-filter-range__btn"
+                    class="oficios-filter-range__btn"
                     data-cv-date-picker-trigger
                     aria-expanded="false"
                     aria-label="Filtrar por período da viagem">
@@ -83,8 +83,8 @@
               </span>
               <span class="oficios-filter-range__label" data-cv-date-picker-display-text>Período da viagem</span>
             </button>
-            <input type="hidden" name="viagem_de"  data-cv-date-picker-start-value {% if viagem_de %}value="{{ viagem_de }}"{% endif %}>
-            <input type="hidden" name="viagem_ate" data-cv-date-picker-end-value   {% if viagem_ate %}value="{{ viagem_ate }}"{% endif %}>
+            <input type="hidden" name="viagem_de"  data-cv-date-picker-start-value data-cv-filter="date" {% if viagem_de %}value="{{ viagem_de }}"{% endif %}>
+            <input type="hidden" name="viagem_ate" data-cv-date-picker-end-value   data-cv-filter="date" {% if viagem_ate %}value="{{ viagem_ate }}"{% endif %}>
             <input type="hidden" data-cv-date-picker-display>
             <div class="cv-date-picker__panel oficios-date-panel" hidden data-cv-date-picker-panel>
               <div class="cv-date-picker__panel-header">

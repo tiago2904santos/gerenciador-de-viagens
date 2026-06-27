@@ -164,21 +164,9 @@
               </div>
             </div>
           </div>
+        {% include "components/ui/layouts/card_footer_section.html" with secondary_label=back_label secondary_url=index_url primary_label="Salvar OS" primary_action="save" only %}
         </section>
-
-        {# ── Rodapé ────────────────────────────────────────────── #}
-        <section class="cv-wizard-section-card termo-card" id="os-form-footer">
-          <div class="cv-wizard-section-body">
-            <div class="termo-actions termo-actions--footer">
-              <button class="cv-btn cv-btn--primary" type="submit"><span>Salvar OS</span></button>
-              {% if ordem and ordem.pk %}
-                <a class="cv-btn cv-btn--secondary" href="{% url 'ordens_servico:baixar_docx' ordem.pk %}" target="_blank"><span>Baixar DOCX</span></a>
-              {% endif %}
-              <a class="cv-btn cv-btn--secondary" href="{{ index_url }}"><span>Cancelar</span></a>
-            </div>
-          </div>
-        </section>
-
+        
       </main>
     </form>
   </div>

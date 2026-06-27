@@ -65,26 +65,6 @@
                   <h4 class="cv-search-picker__selected-title">Oficios encontrados</h4>
                 </div>
                 <div id="termo-oficio-lista" class="roteiro-editor__route-list oficio-roteiro-route-list roteiro-routes-list"></div>
-                <div class="termo-oficio-summary" data-termo-oficio-summary hidden>
-                  <dl class="termo-oficio-summary__grid" hidden>
-                    <div>
-                      <dt>Destino do oficio</dt>
-                      <dd data-termo-oficio-destino>-</dd>
-                    </div>
-                    <div>
-                      <dt>Periodo do oficio</dt>
-                      <dd data-termo-oficio-periodo>-</dd>
-                    </div>
-                    <div>
-                      <dt>Servidores do termo</dt>
-                      <dd data-termo-oficio-servidores>-</dd>
-                    </div>
-                    <div>
-                      <dt>Viatura do oficio</dt>
-                      <dd data-termo-oficio-viatura>-</dd>
-                    </div>
-                  </dl>
-                </div>
               </section>
             </section>
           </div>
@@ -252,7 +232,7 @@
 
         <div class="cv-wizard-section-body oficio-documentos-preview-section__body">
           {% with docs=termo_preview_documents %}
-            <details class="document-inline-card document-inline-card--lazy" data-lazy-inline open>
+            <details class="document-inline-card document-inline-card--lazy" data-lazy-inline>
               <summary class="document-inline-card__header">
                 <span class="document-inline-card__title">{{ docs.generico.titulo }} - {{ termo.destino_display }} - {{ termo.periodo_display }}</span>
                 <span class="document-inline-card__header-end">
@@ -274,7 +254,7 @@
               </div>
             </details>
 
-            <details class="document-inline-card document-inline-card--termos" open>
+            <details class="document-inline-card document-inline-card--termos">
               <summary class="document-inline-card__header">
                 <span class="document-inline-card__title">Termos por servidor</span>
               </summary>

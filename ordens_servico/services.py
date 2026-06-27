@@ -121,3 +121,28 @@ def gerar_os_docx_response(ordem: OrdemServico):
         formato=DocumentoFormato.DOCX,
         reference=reference,
     )
+
+
+def gerar_os_pdf_response(ordem: OrdemServico):
+    """Gera e retorna HttpResponse com o PDF da Ordem de Serviço."""
+    ctx = build_os_docxtpl_context(ordem)
+    reference = (
+        f"os-{ordem.numero:03d}-{ordem.ano}"
+        if ordem.numero and ordem.ano
+        else f"os-{ordem.pk}"
+    )
+    facade = build_default_facade()
+    doc = facade.gerar(
+        tipo=DocumentoTipo.ORDEM_SERVICO,
+        formato=DocumentoFormato.PDF,
+        payload={"institucional": {}, "oficio": {}},
+        docxtpl_context=ctx,
+        docx_template_path="ordem_servico.docx",
+        reference=reference,
+    )
+    return build_download_response(
+        content=doc.conteudo,
+        tipo=DocumentoTipo.ORDEM_SERVICO,
+        formato=DocumentoFormato.PDF,
+        reference=reference,
+    )

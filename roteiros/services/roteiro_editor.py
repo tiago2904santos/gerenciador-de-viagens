@@ -11,6 +11,7 @@ from cadastros.models import ConfiguracaoSistema
 
 from roteiros import roteiro_logic
 from roteiros.models import Roteiro
+from roteiros.models import RoteiroTrecho
 
 
 def _apply_saved_map_route_from_post(roteiro, post):
@@ -272,12 +273,127 @@ def criar_roteiro(form, roteiro_state, validated, diarias_resultado, *, evento=N
     roteiro.origem_estado = validated.get("sede_estado")
     roteiro.origem_cidade = validated.get("sede_cidade")
     roteiro.save()
+    diarias_para_roteiro = roteiro_logic._calculate_avulso_diarias_from_state(
+        roteiro_state, quantidade_servidores=1
+    ) if roteiro_state else diarias_resultado
     roteiro_logic._salvar_roteiro_avulso_from_roteiro_state(
-        roteiro, roteiro_state, validated, diarias_resultado=diarias_resultado
+        roteiro, roteiro_state, validated, diarias_resultado=diarias_para_roteiro
     )
     _apply_saved_map_route_from_post(roteiro, form.data)
     _limpar_rascunhos_vazios(roteiro.pk)
     return roteiro
+
+
+def _dt_to_local_tuple(dt):
+    if dt is None:
+        return None
+    if timezone.is_aware(dt):
+        dt = timezone.localtime(dt)
+    return (dt.year, dt.month, dt.day, dt.hour, dt.minute)
+
+
+def _combine_to_local_tuple(date_obj, time_obj):
+    if not date_obj or not time_obj:
+        return None
+    return (date_obj.year, date_obj.month, date_obj.day, time_obj.hour, time_obj.minute)
+
+
+def _decimal_equivalente(a, b):
+    if a in (None, "") and b in (None, ""):
+        return True
+    if a in (None, "") or b in (None, ""):
+        return False
+    try:
+        return Decimal(str(a)) == Decimal(str(b))
+    except (InvalidOperation, TypeError, ValueError):
+        return str(a) == str(b)
+
+
+def _int_equivalente(a, b):
+    def _norm(v):
+        if v in (None, ""):
+            return None
+        try:
+            return int(v)
+        except (TypeError, ValueError):
+            return None
+    return _norm(a) == _norm(b)
+
+
+def roteiro_state_equivalente_ao_roteiro(roteiro, roteiro_state, validated):
+    """True se o estado posto equivale ao roteiro persistido (skip save no-op)."""
+    if roteiro is None or roteiro.pk is None:
+        return False
+
+    sede_estado = validated.get("sede_estado")
+    sede_cidade = validated.get("sede_cidade")
+    sede_estado_id = sede_estado.pk if sede_estado else None
+    sede_cidade_id = sede_cidade.pk if sede_cidade else None
+    if (sede_estado_id, sede_cidade_id) != (roteiro.origem_estado_id, roteiro.origem_cidade_id):
+        return False
+
+    destinos_post = [
+        (item.get("cidade_id"), item.get("estado_id"))
+        for item in (roteiro_state.get("destinos_atuais") or [])
+        if item.get("cidade_id") and item.get("estado_id")
+    ]
+    destinos_db = [
+        (d.cidade_id, d.estado_id)
+        for d in roteiro.destinos.all().order_by("ordem", "id")
+    ]
+    if destinos_post != destinos_db:
+        return False
+
+    trechos_post = list(validated.get("trechos") or [])
+    trechos_db = list(
+        roteiro.trechos.filter(tipo=RoteiroTrecho.TIPO_IDA).order_by("ordem", "id")
+    )
+    if len(trechos_post) != len(trechos_db):
+        return False
+    for posted, db in zip(trechos_post, trechos_db):
+        if (
+            posted.get("origem_estado_id") != db.origem_estado_id
+            or posted.get("origem_cidade_id") != db.origem_cidade_id
+            or posted.get("destino_estado_id") != db.destino_estado_id
+            or posted.get("destino_cidade_id") != db.destino_cidade_id
+        ):
+            return False
+        if _combine_to_local_tuple(posted.get("saida_data"), posted.get("saida_hora")) != _dt_to_local_tuple(db.saida_dt):
+            return False
+        if _combine_to_local_tuple(posted.get("chegada_data"), posted.get("chegada_hora")) != _dt_to_local_tuple(db.chegada_dt):
+            return False
+        if not _decimal_equivalente(posted.get("distancia_km"), db.distancia_km):
+            return False
+        if not _int_equivalente(posted.get("tempo_cru_estimado_min"), db.tempo_cru_estimado_min):
+            return False
+        if not _int_equivalente(posted.get("tempo_adicional_min"), db.tempo_adicional_min):
+            return False
+        if not _int_equivalente(posted.get("duracao_estimada_min"), db.duracao_estimada_min):
+            return False
+
+    retorno_db = (
+        roteiro.trechos.filter(tipo=RoteiroTrecho.TIPO_RETORNO).order_by("ordem", "id").first()
+    )
+    ret_saida = _combine_to_local_tuple(validated.get("retorno_saida_data"), validated.get("retorno_saida_hora"))
+    ret_chegada = _combine_to_local_tuple(validated.get("retorno_chegada_data"), validated.get("retorno_chegada_hora"))
+    if (ret_saida or ret_chegada) and retorno_db is None:
+        return False
+    if retorno_db is not None:
+        if ret_saida != _dt_to_local_tuple(retorno_db.saida_dt):
+            return False
+        if ret_chegada != _dt_to_local_tuple(retorno_db.chegada_dt):
+            return False
+        retorno_state = roteiro_state.get("retorno") or {}
+        if not _decimal_equivalente(retorno_state.get("distancia_km"), retorno_db.distancia_km):
+            return False
+        if not _int_equivalente(retorno_state.get("tempo_cru_estimado_min"), retorno_db.tempo_cru_estimado_min):
+            return False
+        if not _int_equivalente(retorno_state.get("tempo_adicional_min"), retorno_db.tempo_adicional_min):
+            return False
+        if not _int_equivalente(retorno_state.get("duracao_estimada_min"), retorno_db.duracao_estimada_min):
+            return False
+
+    return True
 
 
 @transaction.atomic
@@ -287,8 +403,13 @@ def atualizar_roteiro(instance, form, roteiro_state, validated, diarias_resultad
     roteiro.origem_estado = validated.get("sede_estado")
     roteiro.origem_cidade = validated.get("sede_cidade")
     roteiro.save()
+    # O roteiro persiste diárias sempre para 1 servidor; o ofício aplica a multiplicação
+    # somente na geração do documento.
+    diarias_para_roteiro = roteiro_logic._calculate_avulso_diarias_from_state(
+        roteiro_state, quantidade_servidores=1
+    ) if roteiro_state else diarias_resultado
     roteiro_logic._salvar_roteiro_avulso_from_roteiro_state(
-        roteiro, roteiro_state, validated, diarias_resultado=diarias_resultado
+        roteiro, roteiro_state, validated, diarias_resultado=diarias_para_roteiro
     )
     _apply_saved_map_route_from_post(roteiro, form.data)
     _limpar_rascunhos_vazios(roteiro.pk)

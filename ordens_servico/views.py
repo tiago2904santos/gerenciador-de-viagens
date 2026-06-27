@@ -11,8 +11,11 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.views.decorators.http import require_GET
 from django.views.decorators.http import require_http_methods
 
+from documentos.services.responses import build_inline_pdf_response_from_download_response
+from documentos.services.types import DocumentoTipo
 from eventos.services import build_evento_document_seed
 from eventos.services import resolve_evento_from_request
 
@@ -20,6 +23,7 @@ from .forms import OrdemServicoForm
 from .models import OrdemServico
 from .presenters import apresentar_ordem_servico_card
 from .services import gerar_os_docx_response
+from .services import gerar_os_pdf_response
 
 
 def index(request):
@@ -203,7 +207,7 @@ def _form_context(*, request, form, ordem=None, evento=None):
         "index_url": _ordem_lista_url(ordem=ordem, evento=evento),
         "back_label": _ordem_back_label(ordem=ordem, evento=evento),
         "servidor_create_url": servidor_create_url,
-        "modelos_motivo_url": reverse("oficios:modelos_motivo_index"),
+        "modelos_motivo_url": f"{reverse('oficios:modelos_motivo_index')}?{urlencode({'next': request.get_full_path()})}",
         "tem_modelos_motivo": form.fields["modelo_motivo"].queryset.exists(),
         "api_cidades_por_estado_url": reverse("roteiros:api_cidades_por_estado", kwargs={"estado_id": 0}),
         "evento_selected_dates_json": _evento_selected_dates_json(form),
@@ -260,3 +264,35 @@ def editar(request, pk):
 def baixar_docx(request, pk):
     ordem = get_object_or_404(_os_queryset(), pk=pk)
     return gerar_os_docx_response(ordem)
+
+
+@require_GET
+def baixar_pdf(request, pk):
+    ordem = get_object_or_404(_os_queryset(), pk=pk)
+    return gerar_os_pdf_response(ordem)
+
+
+@require_GET
+def pdf_inline(request, pk):
+    ordem = get_object_or_404(_os_queryset(), pk=pk)
+    reference = (
+        f"os-{ordem.numero:03d}-{ordem.ano}"
+        if ordem.numero and ordem.ano
+        else f"os-{ordem.pk}"
+    )
+    download_resp = gerar_os_pdf_response(ordem)
+    return build_inline_pdf_response_from_download_response(
+        request,
+        download_resp,
+        tipo=DocumentoTipo.ORDEM_SERVICO,
+        reference=reference,
+    )
+
+
+@require_http_methods(["POST"])
+def excluir(request, pk):
+    ordem = get_object_or_404(OrdemServico, pk=pk)
+    numero = ordem.numero_formatado
+    ordem.delete()
+    messages.success(request, f"Ordem de Serviço {numero} excluída.")
+    return redirect("ordens_servico:index")

@@ -29,6 +29,7 @@ from justificativas.services import get_or_create_justificativa_oficio
 from justificativas.services import oficio_exige_justificativa
 
 from roteiros.forms import RoteiroForm
+from roteiros.models import Roteiro
 from roteiros.services import (
     atualizar_roteiro,
     carregar_opcoes_rotas_avulsas_salvas,
@@ -36,6 +37,7 @@ from roteiros.services import (
     normalizar_destinos_e_trechos_apos_erro_post,
     preparar_estado_editor_roteiro_para_get,
     preparar_querysets_formulario_roteiro,
+    roteiro_state_equivalente_ao_roteiro,
     validar_submissao_editor_roteiro,
 )
 
@@ -84,6 +86,8 @@ from .services import excluir_oficio
 from .services import gerar_resposta_documento_oficio
 from .services import gerar_resposta_justificativa_documento
 from .services import garantir_roteiro_vinculado_ao_oficio
+from .services import obter_roteiro_escolhido_do_post
+from .services import vincular_roteiro_ao_oficio_sem_copia
 from .services import redirect_para_corrigir_documento_oficio
 from .services import oficio_esta_completo_para_finalizar
 from .services import validar_oficio_para_documento
@@ -532,12 +536,12 @@ def index(request):
                 {"value": "passado",   "label": "Passadas"},
             ],
             "sort_options": [
+                {"value": "numero_desc",  "label": "Número: maior"},
+                {"value": "numero_asc",   "label": "Número: menor"},
                 {"value": "criacao_desc", "label": "Criação: mais recente"},
                 {"value": "criacao_asc",  "label": "Criação: mais antiga"},
                 {"value": "viagem_asc",   "label": "Viagem: mais próxima"},
                 {"value": "viagem_desc",  "label": "Viagem: mais distante"},
-                {"value": "numero_desc",  "label": "Número: maior"},
-                {"value": "numero_asc",   "label": "Número: menor"},
             ],
             "empty_message": "Nenhum ofício encontrado com os filtros aplicados.",
         },
@@ -709,15 +713,29 @@ def wizard_roteiro(request, pk):
     route_options, route_state_map = carregar_opcoes_rotas_avulsas_salvas()
 
     if request.method == "POST":
-        form = RoteiroForm(request.POST, instance=roteiro)
+        roteiro_vinculado = oficio.roteiro
+        form = RoteiroForm(request.POST, instance=roteiro_vinculado)
         preparar_querysets_formulario_roteiro(
-            form, method=request.method, post=request.POST, instance=roteiro
+            form, method=request.method, post=request.POST, instance=roteiro_vinculado
         )
         roteiro_state, validated, diarias_resultado = validar_submissao_editor_roteiro(
-            request.POST, route_state_map, roteiro=roteiro
+            request.POST, route_state_map, roteiro=roteiro_vinculado
         )
         if form.is_valid() and validated["ok"]:
-            atualizar_roteiro(roteiro, form, roteiro_state, validated, diarias_resultado)
+            roteiro_escolhido = obter_roteiro_escolhido_do_post(request.POST)
+            if roteiro_escolhido and roteiro_state_equivalente_ao_roteiro(roteiro_escolhido, roteiro_state, validated):
+                # Sem alterações: vincular diretamente ao roteiro selecionado
+                rascunho_antigo = roteiro_vinculado if (roteiro_vinculado and roteiro_vinculado.status == Roteiro.STATUS_RASCUNHO) else None
+                vincular_roteiro_ao_oficio_sem_copia(oficio, roteiro_escolhido, rascunho_antigo=rascunho_antigo)
+            else:
+                # Com alterações (ou roteiro próprio): salvar sempre num rascunho
+                # Nunca modificar um roteiro não-rascunho que pertence a outros ofícios
+                if roteiro_vinculado is None or roteiro_vinculado.status != Roteiro.STATUS_RASCUNHO:
+                    novo_rascunho = Roteiro.objects.create(tipo=Roteiro.TIPO_AVULSO, status=Roteiro.STATUS_RASCUNHO)
+                    oficio.roteiro = novo_rascunho
+                    oficio.save(update_fields=["roteiro", "updated_at"])
+                    form.instance = novo_rascunho
+                atualizar_roteiro(oficio.roteiro, form, roteiro_state, validated, diarias_resultado)
             nav_action = _wizard_normalizar_acao(request.POST)
             if nav_action == "wizard_next":
                 messages.success(
@@ -1188,6 +1206,13 @@ def excluir(request, pk):
 def modelos_motivo_index(request):
     q = request.GET.get("q", "").strip()
     back_url = _safe_next_url(request, reverse("oficios:novo"))
+    _os_prefix = reverse("ordens_servico:index")
+    if back_url.startswith(_os_prefix):
+        back_label = "Voltar para a Ordem de Serviço"
+        back_aria_label = "Voltar para o cadastro de Ordem de Serviço"
+    else:
+        back_label = "Voltar para o ofício"
+        back_aria_label = "Voltar para o cadastro de ofício"
     form = ModeloMotivoOficioForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
         criar_modelo_motivo(form)
@@ -1214,6 +1239,8 @@ def modelos_motivo_index(request):
             "quick_add_form": form,
             "quick_add_next_url": back_url,
             "back_to_oficio_url": back_url,
+            "back_label": back_label,
+            "back_aria_label": back_aria_label,
             "new_url": reverse("oficios:modelo_motivo_novo"),
         },
     )

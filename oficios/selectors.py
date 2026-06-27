@@ -36,7 +36,7 @@ def listar_oficios(
     viagem_ate: str | None = None,
     sort: str | None = None,
 ):
-    order_fields = _SORT_MAP.get(sort or "criacao_desc", ["-data_criacao", "-created_at"])
+    order_fields = _SORT_MAP.get(sort or "numero_desc", ["-numero", "-ano"])
     queryset = (
         Oficio.objects.select_related(
             "roteiro",
@@ -74,9 +74,23 @@ def listar_oficios(
             | Q(roteiro__observacoes__icontains=query)
             | Q(roteiro__origem_cidade__nome__icontains=query)
             | Q(roteiro__origem_estado__nome__icontains=query)
+            | Q(roteiro__destinos__cidade__nome__icontains=query)
+            | Q(servidores__nome__icontains=query)
         )
         if query.isdigit():
-            filters |= Q(numero=int(query)) | Q(ano=int(query))
+            num = int(query)
+            filters |= Q(numero=num) | Q(ano=num)
+        # Suporta formato "número/ano" (ex.: "80/2025" ou "80/25")
+        if "/" in query:
+            partes = query.split("/", 1)
+            try:
+                num_part = int(partes[0].strip())
+                ano_part = int(partes[1].strip())
+                if ano_part < 100:
+                    ano_part += 2000
+                filters |= Q(numero=num_part, ano=ano_part)
+            except (ValueError, IndexError):
+                pass
         queryset = queryset.filter(filters).distinct()
     if temporal:
         today = timezone.localdate()
@@ -106,14 +120,20 @@ def listar_oficios(
             queryset = queryset.filter(data_criacao__date__lte=criacao_ate)
         except Exception:
             pass
-    if viagem_de:
+    # Sobreposição de período: mostra ofícios cuja viagem cruza com [viagem_de, viagem_ate].
+    # Condição de sobreposição: saida <= viagem_ate  E  chegada >= viagem_de
+    if viagem_de or viagem_ate:
         try:
-            queryset = queryset.filter(roteiro__isnull=False, roteiro__saida_dt__date__gte=viagem_de)
-        except Exception:
-            pass
-    if viagem_ate:
-        try:
-            queryset = queryset.filter(roteiro__isnull=False, roteiro__saida_dt__date__lte=viagem_ate)
+            queryset = queryset.filter(roteiro__isnull=False)
+            if viagem_ate:
+                queryset = queryset.filter(roteiro__saida_dt__date__lte=viagem_ate)
+            if viagem_de:
+                fim_qs = (
+                    Q(roteiro__retorno_chegada_dt__date__gte=viagem_de)
+                    | Q(roteiro__retorno_chegada_dt__isnull=True, roteiro__chegada_dt__date__gte=viagem_de)
+                    | Q(roteiro__retorno_chegada_dt__isnull=True, roteiro__chegada_dt__isnull=True)
+                )
+                queryset = queryset.filter(fim_qs)
         except Exception:
             pass
     return queryset

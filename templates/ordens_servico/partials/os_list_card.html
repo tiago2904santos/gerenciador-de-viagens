@@ -17,10 +17,10 @@
         <span class="oficio-lc__info-value">{{ card.periodo_display }}</span>
       </div>
       {% endif %}
-      {% if card.data_criacao_display %}
+      {% if card.destinos_display %}
       <div class="oficio-lc__info-item">
-        <span class="oficio-lc__info-label">Data de Criação</span>
-        <span class="oficio-lc__info-value">{{ card.data_criacao_display }}</span>
+        <span class="oficio-lc__info-label">Destino</span>
+        <span class="oficio-lc__info-value">{{ card.destinos_display }}</span>
       </div>
       {% endif %}
       {% if card.temporal_label %}
@@ -51,41 +51,6 @@
       </div>
     </div>
 
-    {# ── DESTINO · OFÍCIOS VINCULADOS ── #}
-    <div class="oficio-lc__section">
-      <div class="oficio-lc__transport-row">
-
-        {# — Destino — #}
-        <div class="oficio-lc__transport-card">
-          <span class="oficio-lc__transport-label">Destino</span>
-          {% if card.destinos_display %}
-            <div class="oficio-lc__transport-modelo">{{ card.destinos_display }}</div>
-          {% else %}
-            <div class="oficio-lc__transport-modelo oficio-lc__text--empty">Não informado</div>
-          {% endif %}
-        </div>
-
-        {# — Ofícios vinculados — #}
-        {% if card.oficios_vinculados %}
-        <div class="oficio-lc__transport-card oficio-lc__transport-card--trechos">
-          <span class="oficio-lc__transport-label">Ofícios vinculados</span>
-          <div class="oficio-lc__trechos-list">
-            {% for o in card.oficios_vinculados %}
-            <div class="oficio-lc__trecho">
-              <div class="oficio-lc__trecho-rota">
-                {% if o.url %}<a href="{{ o.url }}">{{ o.numero }}</a>{% else %}{{ o.numero }}{% endif %}
-              </div>
-              {% if o.protocolo %}
-              <div class="oficio-lc__trecho-times">Protocolo {{ o.protocolo }}</div>
-              {% endif %}
-            </div>
-            {% endfor %}
-          </div>
-        </div>
-        {% endif %}
-
-      </div>
-    </div>
 
     {# ── MOTIVO ── #}
     <div class="oficio-lc__section oficio-lc__section--justificativas">
@@ -108,7 +73,22 @@
       <div class="oficio-lc__footer-actions">
         <div class="oficio-lc__footer-actions-main cv-icon-btn-group">
           {% include "components/ui/buttons/icon_button.html" with href=card.editar_url action="edit" aria_label="Editar Ordem de Serviço" tooltip="Editar" only %}
+          {% include "components/ui/buttons/icon_button.html" with href=card.visualizar_url action="preview" aria_label="Visualizar Ordem de Serviço" tooltip="Visualizar" only %}
+          {% include "components/ui/buttons/icon_button.html" with href=card.pdf_url action="pdf" aria_label="Baixar PDF da Ordem de Serviço" tooltip="PDF" only %}
           {% include "components/ui/buttons/icon_button.html" with href=card.docx_url action="docx" aria_label="Baixar DOCX da Ordem de Serviço" tooltip="DOCX" only %}
+        </div>
+        <div class="oficio-lc__footer-actions-danger cv-icon-btn-group">
+          <button
+            class="cv-icon-btn cv-icon-btn--delete"
+            type="button"
+            aria-label="Excluir Ordem de Serviço"
+            data-tooltip="Excluir"
+            data-delete-modal-trigger
+            data-delete-url="{{ card.excluir_url }}"
+            data-delete-label="{{ card.numero_display }}"
+          >
+            {% include "dev/ui_lab/partials/_cv_icon.html" with icon="delete" only %}
+          </button>
         </div>
       </div>
     </div>

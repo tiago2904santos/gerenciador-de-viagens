@@ -232,7 +232,8 @@
         button.appendChild(secondLine);
         button.appendChild(thirdLine);
         button.addEventListener("click", function () {
-          select.value = String(summary.id);
+          var alreadySelected = String(select.value || "") === String(summary.id);
+          select.value = alreadySelected ? "" : String(summary.id);
           select.dispatchEvent(new Event("change", { bubbles: true }));
           renderList(search.value);
           renderSummary();

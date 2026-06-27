@@ -574,11 +574,6 @@
   overflow: auto;
 }
 
-/* Panel sem padding-right: scrollbar fica colado na borda */
-.roteiro-routes-panel {
-  padding-right: 0;
-}
-
 .roteiro-routes-panel__header {
   padding-right: var(--space-4);
 }
