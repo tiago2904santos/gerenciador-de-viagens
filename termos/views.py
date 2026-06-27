@@ -148,7 +148,7 @@ def _termo_back_label(termo=None, evento=None):
 def _redirect_termo_lista(termo):
     if getattr(termo, "evento_id", None):
         return redirect("eventos:guiado_etapa", pk=termo.evento_id, etapa=5)
-    return redirect("termos:editar", pk=termo.pk)
+    return redirect("termos:index")
 
 
 def _cadastro_create_url(create_url_name, next_url):

@@ -127,6 +127,40 @@ def garantir_roteiro_vinculado_ao_oficio(oficio: Oficio) -> Oficio:
     return oficio
 
 
+def obter_roteiro_escolhido_do_post(post):
+    """Retorna o Roteiro salvo selecionado no picker, ou None (sem efeitos colaterais)."""
+    if (post.get("roteiro_modo") or "").strip() != "EVENTO_EXISTENTE":
+        return None
+    raw = post.get("roteiro_id") or post.get("roteiro_evento_id") or ""
+    try:
+        roteiro_id = int(str(raw).strip())
+    except (TypeError, ValueError):
+        return None
+    if not roteiro_id:
+        return None
+    return Roteiro.objects.filter(pk=roteiro_id, tipo=Roteiro.TIPO_AVULSO).first()
+
+
+@transaction.atomic
+def vincular_roteiro_ao_oficio_sem_copia(oficio: Oficio, roteiro_escolhido: Roteiro, rascunho_antigo=None) -> None:
+    """Vincula oficio diretamente ao roteiro existente (estado equivalente, sem alteracoes)."""
+    oficio.roteiro = roteiro_escolhido
+    oficio.save(update_fields=["roteiro", "updated_at"])
+
+    if (
+        rascunho_antigo is not None
+        and rascunho_antigo.pk != roteiro_escolhido.pk
+        and rascunho_antigo.status == Roteiro.STATUS_RASCUNHO
+        and not rascunho_antigo.destinos.exists()
+        and not rascunho_antigo.trechos.exists()
+        and not Oficio.objects.filter(roteiro=rascunho_antigo).exclude(pk=oficio.pk).exists()
+    ):
+        try:
+            rascunho_antigo.delete()
+        except ProtectedError:
+            pass
+
+
 def _combine_evento_dt(data, hora):
     if not data:
         return None

@@ -112,9 +112,14 @@ def listar_cidades_para_select(estado_id=None, q=None):
 
 
 def queryset_roteiros_avulsos_para_mapa_rotas(limit=50):
-    """Roteiros avulsos com relacionamentos para duplicar estado no editor (mesmo limite do legacy)."""
+    """Roteiros avulsos com destinos ou trechos cadastrados (esconde rascunhos vazios criados pelo wizard)."""
     return (
         Roteiro.objects.filter(tipo=Roteiro.TIPO_AVULSO)
+        .annotate(
+            qtd_destinos=Count("destinos", distinct=True),
+            qtd_trechos=Count("trechos", distinct=True),
+        )
+        .filter(Q(qtd_destinos__gt=0) | Q(qtd_trechos__gt=0))
         .select_related("origem_cidade", "origem_estado")
         .prefetch_related(
             "destinos",

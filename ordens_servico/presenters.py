@@ -6,6 +6,29 @@ from django.utils import timezone
 from oficios.presenters import _iniciais_nome_servidor
 
 
+def _get_assinante_os() -> dict | None:
+    try:
+        from cadastros.models import AssinaturaConfiguracao
+        from cadastros.models import ConfiguracaoSistema
+        config = ConfiguracaoSistema.get_singleton()
+        ass = (
+            config.assinaturas
+            .filter(tipo=AssinaturaConfiguracao.ORDEM_SERVICO, ativo=True)
+            .select_related("servidor__cargo")
+            .order_by("ordem")
+            .first()
+        )
+        if ass and ass.servidor:
+            srv = ass.servidor
+            return {
+                "nome": srv.nome,
+                "cargo": srv.cargo.nome if srv.cargo_id and srv.cargo else "",
+            }
+    except Exception:
+        pass
+    return None
+
+
 def _temporal_badge_os(ordem):
     inicio = ordem.data_evento_inicio
     if not inicio:
@@ -85,6 +108,18 @@ def _oficios_vinculados_os(ordem):
     return items
 
 
+def _periodo_display_curto(ordem) -> str:
+    inicio = ordem.data_evento_inicio
+    fim = ordem.data_evento_fim
+    if not inicio:
+        return ""
+    if not fim or fim == inicio:
+        return inicio.strftime("%d/%m")
+    if inicio.year == fim.year:
+        return f"{inicio.strftime('%d/%m')} a {fim.strftime('%d/%m')}"
+    return f"{inicio.strftime('%d/%m/%Y')} a {fim.strftime('%d/%m/%Y')}"
+
+
 def apresentar_ordem_servico_card(ordem):
     data_criacao_display = ""
     if ordem.created_at:
@@ -108,7 +143,7 @@ def apresentar_ordem_servico_card(ordem):
         "pk": ordem.pk,
         "numero_display": ordem.numero_formatado,
         "data_criacao_display": data_criacao_display,
-        "periodo_display": ordem.periodo_display,
+        "periodo_display": _periodo_display_curto(ordem),
         "destinos_display": _destinos_display_os(ordem),
         "temporal_label": temporal_label,
         "temporal_tone": temporal_tone,
@@ -117,6 +152,10 @@ def apresentar_ordem_servico_card(ordem):
         "oficios_vinculados": _oficios_vinculados_os(ordem),
         "motivo": motivo,
         "motivo_resumido": motivo_resumido,
+        "assinante": _get_assinante_os(),
         "editar_url": reverse("ordens_servico:editar", args=[ordem.pk]),
         "docx_url": reverse("ordens_servico:baixar_docx", args=[ordem.pk]),
+        "pdf_url": reverse("ordens_servico:baixar_pdf", args=[ordem.pk]),
+        "visualizar_url": reverse("ordens_servico:pdf_inline", args=[ordem.pk]),
+        "excluir_url": reverse("ordens_servico:excluir", args=[ordem.pk]),
     }

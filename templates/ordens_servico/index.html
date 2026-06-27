@@ -72,5 +72,9 @@
     {% endif %}
   </div>
 
+  {% include "components/ui/modals/delete_confirm_modal.html" with delete_modal_title="Excluir Ordem de Serviço?" delete_modal_entity="esta Ordem de Serviço" %}
+
+  {% include "components/ui/buttons/floating_action.html" with href=nova_url label="Nova OS" variant="primary" icon="plus" aria_label="Nova Ordem de Serviço" only %}
+
 </div>
 {% endblock %}
