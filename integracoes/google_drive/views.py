@@ -62,6 +62,7 @@ def oauth_iniciar(request):
         include_granted_scopes="true",
     )
     request.session["gdrive_oauth_state"] = state
+    request.session["gdrive_code_verifier"] = getattr(flow, "code_verifier", None)
     return redirect(auth_url)
 
 
@@ -85,6 +86,9 @@ def oauth_callback(request):
             redirect_uri=cfg.get("REDIRECT_URI", ""),
             state=state,
         )
+        code_verifier = request.session.get("gdrive_code_verifier")
+        if code_verifier:
+            flow.code_verifier = code_verifier
         flow.fetch_token(authorization_response=request.build_absolute_uri())
         creds = flow.credentials
 
