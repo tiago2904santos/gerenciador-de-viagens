@@ -17,4 +17,5 @@ urlpatterns = [
     # Organização em massa
     path("reorganizar/", views.reorganizar_tudo, name="reorganizar_tudo"),
     path("api/previa-reorganizacao/", views.previa_reorganizacao, name="previa_reorganizacao"),
+    path("api/status-reorganizacao/", views.status_reorganizacao, name="status_reorganizacao"),
 ]

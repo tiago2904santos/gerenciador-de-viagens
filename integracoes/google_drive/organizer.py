@@ -586,8 +586,11 @@ def planejar_evento(evento) -> list[str]:
 # Reorganização em massa (usada pelo comando e pelo botão da UI)
 # ---------------------------------------------------------------------------
 
-def reorganizar_tudo(evento_id: int | None = None) -> dict:
+def reorganizar_tudo(evento_id: int | None = None, progress=None) -> dict:
     """Reorganiza todos os eventos (+ ofícios sem evento) no Drive.
+
+    ``progress`` (opcional) é chamado como ``progress(eventos_processados, total)``
+    após cada evento, para acompanhamento em segundo plano.
 
     Retorna contagens: ``{"eventos", "avulsos", "erros"}``.
     """
@@ -599,6 +602,10 @@ def reorganizar_tudo(evento_id: int | None = None) -> dict:
     eventos = Evento.objects.all()
     if evento_id is not None:
         eventos = eventos.filter(pk=evento_id)
+    total = eventos.count()
+    processados = 0
+    if progress:
+        progress(0, total)
     for evento in eventos.iterator():
         try:
             organizar_evento(evento)
@@ -606,6 +613,9 @@ def reorganizar_tudo(evento_id: int | None = None) -> dict:
         except Exception as exc:  # noqa: BLE001
             resumo["erros"] += 1
             logger.error("[Drive] erro ao reorganizar evento %s: %s", evento.pk, exc, exc_info=True)
+        processados += 1
+        if progress:
+            progress(processados, total)
 
     if evento_id is None:
         for oficio in Oficio.objects.filter(evento__isnull=True).iterator():

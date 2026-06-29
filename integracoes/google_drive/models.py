@@ -23,6 +23,40 @@ class DriveCredenciais(models.Model):
         return f"OAuth Drive (atualizado {self.atualizado_em:%d/%m/%Y %H:%M})"
 
 
+class DriveReorganizacaoJob(models.Model):
+    """Acompanha uma reorganização em massa rodando em segundo plano.
+
+    Evita o timeout (erro interno) do request síncrono: o botão inicia o job,
+    retorna na hora, e a página acompanha o status por polling.
+    """
+
+    STATUS_EM_ANDAMENTO = "em_andamento"
+    STATUS_CONCLUIDA = "concluida"
+    STATUS_ERRO = "erro"
+    STATUS_CHOICES = [
+        (STATUS_EM_ANDAMENTO, "Em andamento"),
+        (STATUS_CONCLUIDA, "Concluída"),
+        (STATUS_ERRO, "Erro"),
+    ]
+
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_EM_ANDAMENTO, db_index=True)
+    total_eventos = models.PositiveIntegerField(default=0)
+    eventos_processados = models.PositiveIntegerField(default=0)
+    avulsos = models.PositiveIntegerField(default=0)
+    erros = models.PositiveIntegerField(default=0)
+    mensagem = models.TextField(blank=True, default="")
+    iniciado_em = models.DateTimeField(auto_now_add=True)
+    finalizado_em = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = "Job de reorganização do Drive"
+        verbose_name_plural = "Jobs de reorganização do Drive"
+        ordering = ["-iniciado_em"]
+
+    def __str__(self) -> str:
+        return f"Reorganização {self.get_status_display()} ({self.iniciado_em:%d/%m %H:%M})"
+
+
 class DriveArquivo(models.Model):
     """Registro de um DocumentoArtefato enviado ao Google Drive."""
 
