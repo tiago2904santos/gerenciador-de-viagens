@@ -173,6 +173,30 @@ def _env_flag(name, default="false"):
 # Sem credenciais válidas, o client cai em modo mock automaticamente para que o
 # sistema nunca quebre por ausência de configuração.
 # ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# Integração Google Drive
+#
+# Sem credenciais (MODO=mock), o sistema nunca chama a API — uploads são
+# apenas registrados em log. Para ativar:
+#   1. Crie um Service Account no Google Cloud, baixe a chave JSON.
+#   2. Compartilhe a pasta raiz do Drive com o email do service account.
+#   3. Defina GOOGLE_DRIVE_MODO=ativo, CREDENTIALS_PATH e PASTA_RAIZ_ID.
+#
+# Diagnóstico: python manage.py gdrive_check
+# Reprocessar pendentes: python manage.py gdrive_upload_pendentes
+# ---------------------------------------------------------------------------
+GOOGLE_DRIVE = {
+    "MODO": (os.getenv("GOOGLE_DRIVE_MODO") or "mock").strip().lower(),
+    # Credenciais OAuth 2.0 (geradas no Google Cloud Console)
+    "CLIENT_ID": (os.getenv("GOOGLE_CLIENT_ID") or "").strip(),
+    "CLIENT_SECRET": (os.getenv("GOOGLE_CLIENT_SECRET") or "").strip(),
+    "REDIRECT_URI": (os.getenv("GOOGLE_REDIRECT_URI") or "").strip(),
+    # ID da pasta raiz no Google Drive (trecho após /folders/ na URL)
+    "PASTA_RAIZ_ID": (os.getenv("GOOGLE_DRIVE_PASTA_RAIZ_ID") or "").strip(),
+    # Em modo mock, faz o upload simulado mas ainda persiste DriveArquivo no banco
+    "UPLOAD_EM_MOCK": _env_flag("GOOGLE_DRIVE_UPLOAD_EM_MOCK", "false"),
+}
+
 EPROTOCOLO = {
     "AMBIENTE": (os.getenv("EPROTOCOLO_AMBIENTE") or "mock").strip().lower(),
     "BASE_URL": (os.getenv("EPROTOCOLO_BASE_URL") or "").strip(),
