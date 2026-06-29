@@ -5,22 +5,23 @@ Estrutura-alvo (a partir da pasta raiz escolhida pelo usuário):
     Eventos/
       <Tipo - Cidade - Período>/
         <Ofício NN protocolo ... Servidores>/
-          Ofício NN-AAAA ... (Cidade).pdf
-          Ordem de serviço ...                 (arquivo solto)
-          Plano de trabalho ...                (arquivo solto)
-          Convite (Cidade).<ext>               (EventoAnexo)
-          Termos/                              (só se houver termos)
-            Termo de autorização ... Servidor (Cidade).pdf
+          Ofício NN-AAAA ... (Cidade).pdf            (canônico)
+          Plano de trabalho PP-AAAA ... (Cidade).pdf (canônico; PP = nº do plano)
+          Ordem de serviço ...                       (canônico)
+          Justificativa ...                          (canônico)
+          Convite (Cidade).<ext>                     (EventoAnexo)
+          Termos/ Termo de autorização ... Servidor (Cidade).pdf
           Prestação de contas/
-            Anexo solicitação ... (Cidade).<ext>     (EventoDocumentoSolicitacao)
-            Prestação <Servidor>/
-              Relatório técnico ...            (AssinaturaDocumento rt)
-              Diário de bordo ...              (AssinaturaDocumento db)
-              Despacho ...                     (despacho assinado)
-              Comprovante de saque ...         (comprovante)
+            Anexo solicitação ... (Cidade).<ext>
+            Prestação <Servidor>/ ... (RT, diário, despacho, comprovante)
+    Ofícios/ Planos de trabalho/ Ordens de serviço/ Termos/ Justificativas/
+        <- agregadoras globais por tipo (ATALHOS p/ os canônicos com evento)
+    Prestações de contas/  <- atalhos de pasta p/ cada "Prestação <Servidor>"
 
-Documentos sem evento caem em ``Avulsos/<Ofício…>`` (ou ``Avulsos/Ano/Mês`` se
-nem ofício houver). Tudo é idempotente: reexecutar move/renomeia ao invés de
+Documentos SEM evento têm o canônico direto na pasta de tipo global
+(``Planos de trabalho/<ofício>/arquivo``) — não existe mais "Avulsos".
+
+Tudo é idempotente: reexecutar move/renomeia (e reusa atalhos) em vez de
 duplicar (reusa ``get_or_create_pasta`` e os registros ``DriveArquivo`` /
 ``DriveArquivoExterno``).
 """
@@ -29,12 +30,13 @@ from __future__ import annotations
 
 import logging
 import mimetypes
-from datetime import datetime
 
 from . import naming
 from .services import get_client, is_mock, mimetype_para_formato
 
 logger = logging.getLogger(__name__)
+
+_SHORTCUT_MIME = "application/vnd.google-apps.shortcut"
 
 
 # ---------------------------------------------------------------------------
@@ -77,23 +79,38 @@ def _raiz() -> str | None:
 # Pastas
 # ---------------------------------------------------------------------------
 
-def pasta_do_oficio(client, oficio, servidores) -> str:
-    """Cria/retorna a pasta do ofício (sob Eventos/<evento> ou Avulsos)."""
+def _pasta_evento_folder(client, evento) -> str:
     raiz = _raiz()
+    eventos = client.get_or_create_pasta(naming.PASTA_EVENTOS, raiz)
+    return client.get_or_create_pasta(naming.pasta_evento(evento), eventos)
+
+
+def _pasta_tipo_global(client, tipo: str) -> str:
+    raiz = _raiz()
+    return client.get_or_create_pasta(naming.pasta_tipo(tipo), raiz)
+
+
+def _oficio_folder_no_evento(client, tipo: str, oficio, servidores) -> str:
+    """Pasta de tipo global + subpasta do ofício (caso sem evento)."""
+    tipo_folder = _pasta_tipo_global(client, tipo)
+    if oficio is not None:
+        return client.get_or_create_pasta(naming.pasta_oficio(oficio, servidores), tipo_folder)
+    return tipo_folder
+
+
+def _oficio_folder_com_evento(client, evento, oficio, servidores) -> str:
+    ev = _pasta_evento_folder(client, evento)
+    if oficio is not None:
+        return client.get_or_create_pasta(naming.pasta_oficio(oficio, servidores), ev)
+    return ev
+
+
+def _oficio_base_folder(client, oficio, servidores) -> str:
+    """Pasta canônica de um ofício (evento → Eventos/...; senão → Ofícios/...)."""
     evento = getattr(oficio, "evento", None)
     if evento is not None:
-        eventos = client.get_or_create_pasta(naming.PASTA_EVENTOS, raiz)
-        ev = client.get_or_create_pasta(naming.pasta_evento(evento), eventos)
-        return client.get_or_create_pasta(naming.pasta_oficio(oficio, servidores), ev)
-    avulsos = client.get_or_create_pasta(naming.PASTA_AVULSOS, raiz)
-    return client.get_or_create_pasta(naming.pasta_oficio(oficio, servidores), avulsos)
-
-
-def _pasta_avulsa_por_data(client, dt: datetime) -> str:
-    raiz = _raiz()
-    avulsos = client.get_or_create_pasta(naming.PASTA_AVULSOS, raiz)
-    ano = client.get_or_create_pasta(str(dt.year), avulsos)
-    return client.get_or_create_pasta(f"{dt.month:02d}", ano)
+        return _oficio_folder_com_evento(client, evento, oficio, servidores)
+    return _oficio_folder_no_evento(client, "oficio", oficio, servidores)
 
 
 def _pasta_prestacao(client, oficio_folder: str) -> str:
@@ -105,10 +122,20 @@ def _pasta_termos(client, oficio_folder: str) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Persistência: DocumentoArtefato (DriveArquivo)
+# Persistência: DocumentoArtefato (DriveArquivo) + atalho global por tipo
 # ---------------------------------------------------------------------------
 
-def _persistir_artefato(artefato, pasta_id: str, nome: str) -> tuple[str, str] | None:
+def _sync_atalho(client, reg, nome: str, target_id: str, atalho_pasta_id: str | None) -> None:
+    if not atalho_pasta_id:
+        return
+    novo = client.criar_ou_atualizar_atalho(
+        nome, target_id, atalho_pasta_id, existing_id=reg.atalho_id or None
+    )
+    reg.atalho_id = novo
+    reg.atalho_pasta_id = atalho_pasta_id
+
+
+def _persistir_artefato(artefato, pasta_id: str, nome: str, *, atalho_pasta_id: str | None = None) -> tuple[str, str] | None:
     from .models import DriveArquivo
 
     client = get_client()
@@ -117,9 +144,9 @@ def _persistir_artefato(artefato, pasta_id: str, nome: str) -> tuple[str, str] |
 
     if reg and reg.file_id and not reg.mock:
         client.mover_renomear(reg.file_id, nome, pasta_id)
-        if reg.nome != nome:
-            reg.nome = nome
-            reg.save(update_fields=["nome"])
+        reg.nome = nome
+        _sync_atalho(client, reg, nome, reg.file_id, atalho_pasta_id)
+        reg.save()
         return reg.file_id, reg.url
 
     conteudo = _ler_filefield(getattr(artefato, "arquivo", None))
@@ -127,58 +154,68 @@ def _persistir_artefato(artefato, pasta_id: str, nome: str) -> tuple[str, str] |
         return None
     file_id, url = client.upload(nome, conteudo, mime, pasta_id=pasta_id)
 
-    if reg:
-        reg.file_id, reg.url, reg.nome = file_id, url, nome
-        reg.mime_type, reg.mock = mime, is_mock()
-        reg.save()
-    else:
-        DriveArquivo.objects.create(
-            artefato=artefato,
-            file_id=file_id,
-            url=url,
-            nome=nome,
-            mime_type=mime,
-            mock=is_mock(),
-        )
+    if not reg:
+        reg = DriveArquivo(artefato=artefato)
+    reg.file_id, reg.url, reg.nome = file_id, url, nome
+    reg.mime_type, reg.mock = mime, is_mock()
+    _sync_atalho(client, reg, nome, file_id, atalho_pasta_id)
+    reg.save()
     return file_id, url
 
 
-def organizar_artefato(artefato) -> tuple[str, str] | None:
-    """Coloca um ``DocumentoArtefato`` gerado na pasta certa, com nome bonito.
-
-    Usado tanto no disparo automático (signal) quanto na reorganização em massa.
-    """
-    client = get_client()
-    oficio = getattr(artefato, "oficio", None)
-
+def _derivar_nome_artefato(tipo, formato, oficio, servidor, servidores, cidade) -> str:
     if oficio is None:
-        pasta_id = _pasta_avulsa_por_data(client, getattr(artefato, "criado_em", None) or datetime.now())
-        nome = f"{naming.sanitize_drive_name(artefato.tipo or 'documento')}.{(artefato.formato or 'pdf').lower()}"
-        return _persistir_artefato(artefato, pasta_id, nome)
+        suf = naming._suf_cidade(cidade)
+        rotulo = {
+            "plano_trabalho": "Plano de trabalho",
+            "ordem_servico": "Ordem de serviço",
+            "termo_autorizacao": "Termo de autorização",
+            "justificativa": "Justificativa",
+        }.get(tipo, "Ofício")
+        return naming._arquivo(f"{rotulo}{suf}", formato)
+    if tipo == "termo_autorizacao":
+        return naming.nome_termo(oficio, servidor, cidade, formato)
+    if tipo == "ordem_servico":
+        return naming.nome_os(oficio, servidores, cidade, formato)
+    if tipo == "justificativa":
+        return naming.nome_justificativa(oficio, cidade, formato)
+    if tipo == "plano_trabalho":
+        # planos sempre têm nome_drive; fallback genérico caso falte.
+        return naming._arquivo(f"Plano de trabalho{naming._suf_cidade(cidade)}", formato)
+    return naming.nome_oficio(oficio, servidores, cidade, formato)
 
-    servidores = list(oficio.servidores.all())
-    cidade = naming.cidade_evento(getattr(oficio, "evento", None), oficio)
-    oficio_folder = pasta_do_oficio(client, oficio, servidores)
+
+def organizar_artefato(artefato) -> tuple[str, str] | None:
+    """Coloca um ``DocumentoArtefato`` na pasta certa (canônico + atalho global)."""
+    client = get_client()
     tipo = artefato.tipo or "oficio"
     formato = artefato.formato or "pdf"
+    oficio = getattr(artefato, "oficio", None)
+    evento = getattr(artefato, "evento", None) or (getattr(oficio, "evento", None) if oficio else None)
+    servidores = list(oficio.servidores.all()) if oficio is not None else []
+    cidade = naming.cidade_evento(evento, oficio)
 
-    if tipo == "termo_autorizacao":
-        pasta_id = _pasta_termos(client, oficio_folder)
-        nome = naming.nome_termo(oficio, artefato.servidor, cidade, formato)
-    elif tipo == "ordem_servico":
-        pasta_id = oficio_folder
-        nome = naming.nome_os(oficio, servidores, cidade, formato)
-    elif tipo == "plano_trabalho":
-        pasta_id = oficio_folder
-        nome = naming.nome_plano(oficio, cidade, formato)
-    elif tipo == "justificativa":
-        pasta_id = oficio_folder
-        nome = naming.nome_justificativa(oficio, cidade, formato)
-    else:  # oficio
-        pasta_id = oficio_folder
-        nome = naming.nome_oficio(oficio, servidores, cidade, formato)
+    nome = (artefato.nome_drive or "").strip() or _derivar_nome_artefato(
+        tipo, formato, oficio, getattr(artefato, "servidor", None), servidores, cidade
+    )
 
-    return _persistir_artefato(artefato, pasta_id, nome)
+    if evento is not None:
+        oficio_folder = _oficio_folder_com_evento(client, evento, oficio, servidores)
+        if tipo == "termo_autorizacao":
+            canonica = _pasta_termos(client, oficio_folder)
+        else:
+            canonica = oficio_folder
+        atalho_pasta = _pasta_tipo_global(client, tipo)
+    else:
+        # Sem evento: canônico já vive na pasta de tipo global (sem atalho).
+        if tipo == "termo_autorizacao":
+            base = _oficio_folder_no_evento(client, tipo, oficio, servidores)
+            canonica = base
+        else:
+            canonica = _oficio_folder_no_evento(client, tipo, oficio, servidores)
+        atalho_pasta = None
+
+    return _persistir_artefato(artefato, canonica, nome, atalho_pasta_id=atalho_pasta)
 
 
 # ---------------------------------------------------------------------------
@@ -235,8 +272,34 @@ def colocar_arquivo_externo(obj, ff, *, campo: str, pasta_id: str, nome: str) ->
     return file_id, url
 
 
+def _atalho_pasta_externo(obj, *, campo: str, nome: str, target_id: str, pasta_id: str) -> str | None:
+    """Cria/atualiza um atalho (de pasta) rastreado em ``DriveArquivoExterno``."""
+    from django.contrib.contenttypes.models import ContentType
+
+    from .models import DriveArquivoExterno
+
+    client = get_client()
+    ct = ContentType.objects.get_for_model(obj.__class__)
+    reg = DriveArquivoExterno.objects.filter(
+        content_type=ct, object_id=obj.pk, campo=campo
+    ).first()
+    atalho_id = client.criar_ou_atualizar_atalho(
+        nome, target_id, pasta_id, existing_id=(reg.file_id if reg and reg.file_id else None)
+    )
+    if reg:
+        reg.file_id, reg.nome, reg.pasta_id, reg.mock = atalho_id, nome, pasta_id, is_mock()
+        reg.save()
+    else:
+        DriveArquivoExterno.objects.create(
+            content_type=ct, object_id=obj.pk, campo=campo,
+            file_id=atalho_id, nome=nome, pasta_id=pasta_id,
+            mime_type=_SHORTCUT_MIME, mock=is_mock(),
+        )
+    return atalho_id
+
+
 # ---------------------------------------------------------------------------
-# Anexos de evento / prestação — colocados pela reorganização e pelos signals
+# Anexos de evento / prestação
 # ---------------------------------------------------------------------------
 
 def organizar_evento_anexo(anexo) -> None:
@@ -246,15 +309,9 @@ def organizar_evento_anexo(anexo) -> None:
         return
     client = get_client()
     oficio = evento.oficios.first()
-    if oficio is None:
-        # Sem ofício ainda: guarda na pasta do evento.
-        raiz = _raiz()
-        eventos = client.get_or_create_pasta(naming.PASTA_EVENTOS, raiz)
-        pasta_id = client.get_or_create_pasta(naming.pasta_evento(evento), eventos)
-    else:
-        pasta_id = pasta_do_oficio(client, oficio, list(oficio.servidores.all()))
+    pasta_id = _oficio_folder_com_evento(client, evento, oficio, list(oficio.servidores.all()) if oficio else [])
 
-    cidade = naming.cidade_evento(evento)
+    cidade = naming.cidade_evento(evento, oficio)
     ext = naming.extensao(anexo.arquivo.name)
     if anexo.tipo == "convite":
         nome = naming.nome_convite(cidade, ext, titulo=anexo.titulo)
@@ -274,13 +331,11 @@ def organizar_solicitacao_evento(doc) -> None:
     if oficio is None:
         return
     servidores = list(oficio.servidores.all())
-    oficio_folder = pasta_do_oficio(client, oficio, servidores)
+    oficio_folder = _oficio_base_folder(client, oficio, servidores)
     prestacao_folder = _pasta_prestacao(client, oficio_folder)
     cidade = naming.cidade_evento(evento, oficio)
     ext = naming.extensao(doc.arquivo.name)
 
-    # Quando há uma única prestação no ofício conseguimos o nº da solicitação e o
-    # servidor; senão usamos um nome genérico de anexo de solicitação.
     prestacoes = list(oficio.prestacoes_contas.all())
     if len(prestacoes) == 1:
         p = prestacoes[0]
@@ -292,7 +347,7 @@ def organizar_solicitacao_evento(doc) -> None:
 
 
 def organizar_prestacao(prestacao) -> None:
-    """Coloca todos os arquivos de uma ``PrestacaoContas`` na pasta do servidor."""
+    """Arquivos da ``PrestacaoContas`` na pasta do servidor + atalho global."""
     oficio = getattr(prestacao, "oficio", None)
     servidor = getattr(prestacao, "servidor", None)
     if oficio is None:
@@ -300,13 +355,12 @@ def organizar_prestacao(prestacao) -> None:
     client = get_client()
     servidores = list(oficio.servidores.all())
     cidade = naming.cidade_evento(getattr(oficio, "evento", None), oficio)
-    oficio_folder = pasta_do_oficio(client, oficio, servidores)
+    oficio_folder = _oficio_base_folder(client, oficio, servidores)
     prestacao_folder = _pasta_prestacao(client, oficio_folder)
     serv_folder = client.get_or_create_pasta(
         naming.pasta_prestacao_servidor(servidor), prestacao_folder
     )
 
-    # Despacho assinado / comprovante (campos diretos da prestação)
     if getattr(prestacao, "despacho_assinado", None):
         ext = naming.extensao(prestacao.despacho_assinado.name)
         colocar_arquivo_externo(
@@ -321,7 +375,6 @@ def organizar_prestacao(prestacao) -> None:
             pasta_id=serv_folder, nome=naming.nome_comprovante(oficio, servidor, cidade, ext),
         )
 
-    # Anexos extras (despacho/comprovante adicionais)
     for anexo in prestacao.documentos_anexos.all():
         if not getattr(anexo, "arquivo", None):
             continue
@@ -332,7 +385,6 @@ def organizar_prestacao(prestacao) -> None:
             nome = naming.nome_despacho(oficio, servidor, cidade, ext)
         colocar_arquivo_externo(anexo, anexo.arquivo, campo="arquivo", pasta_id=serv_folder, nome=nome)
 
-    # Relatório técnico / diário de bordo assinados
     for assinatura in prestacao.assinaturas.all():
         if not getattr(assinatura, "arquivo_assinado", None):
             continue
@@ -348,13 +400,83 @@ def organizar_prestacao(prestacao) -> None:
             pasta_id=serv_folder, nome=nome,
         )
 
+    # Atalho de pasta na agregadora global "Prestações de contas".
+    raiz = _raiz()
+    global_folder = client.get_or_create_pasta(naming.PASTA_PRESTACOES_GLOBAL, raiz)
+    _atalho_pasta_externo(
+        prestacao, campo="atalho_prestacao",
+        nome=naming.nome_atalho_prestacao(oficio, servidor, cidade),
+        target_id=serv_folder, pasta_id=global_folder,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Backfill: regera termos/planos que nunca foram persistidos
+# ---------------------------------------------------------------------------
+
+def _garantir_termos(oficio) -> None:
+    """Regenera (e persiste) termos de servidores que ainda não têm artefato.
+
+    A persistência acontece dentro de ``gerar_termo_um`` (dedupe por hash).
+    """
+    from documentos.services.types import DocumentoFormato
+
+    try:
+        from termos.services import gerar_termo_um, listar_servidores_com_termo
+    except Exception:
+        return
+
+    existentes = set(
+        oficio.documentos_gerados.filter(tipo="termo_autorizacao").values_list("servidor_id", flat=True)
+    )
+    for servidor in listar_servidores_com_termo(oficio):
+        if servidor.pk in existentes:
+            continue
+        try:
+            gerar_termo_um(oficio, servidor, DocumentoFormato.PDF)
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("[Drive] backfill termo (oficio %s, serv %s) falhou: %s", oficio.pk, servidor.pk, exc)
+
+
+def _garantir_planos(evento) -> None:
+    """Regenera (e persiste) planos do evento que ainda não têm artefato.
+
+    A persistência acontece dentro de ``gerar_plano_documento`` (dedupe por hash).
+    """
+    from documentos.models import DocumentoArtefato
+    from documentos.services.types import DocumentoFormato
+
+    try:
+        from planos_trabalho.services import gerar_plano_documento
+    except Exception:
+        return
+
+    try:
+        planos = list(evento.planos_trabalho.all())
+    except Exception:
+        return
+
+    oficio = evento.oficios.first()
+    cidade = naming.cidade_evento(evento, oficio)
+    for plano in planos:
+        nome = naming.nome_plano(plano, cidade, oficio=oficio)
+        if DocumentoArtefato.objects.filter(
+            evento=evento, tipo="plano_trabalho", nome_drive=nome
+        ).exists():
+            continue
+        try:
+            gerar_plano_documento(plano, DocumentoFormato.PDF)
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("[Drive] backfill plano %s falhou: %s", getattr(plano, "pk", "?"), exc)
+
 
 # ---------------------------------------------------------------------------
 # Orquestração
 # ---------------------------------------------------------------------------
 
 def organizar_oficio(oficio) -> None:
-    """Organiza todos os artefatos e prestações de um ofício."""
+    """Organiza todos os artefatos e prestações de um ofício (+ backfill de termos)."""
+    _garantir_termos(oficio)
     for artefato in oficio.documentos_gerados.all():
         try:
             organizar_artefato(artefato)
@@ -368,9 +490,16 @@ def organizar_oficio(oficio) -> None:
 
 
 def organizar_evento(evento) -> None:
-    """Organiza todos os ofícios, anexos e solicitações de um evento."""
+    """Organiza ofícios, planos, anexos e solicitações de um evento."""
+    _garantir_planos(evento)
     for oficio in evento.oficios.all():
         organizar_oficio(oficio)
+    # Planos do evento sem ofício (não cobertos por organizar_oficio).
+    for artefato in evento.documentos_gerados.filter(oficio__isnull=True):
+        try:
+            organizar_artefato(artefato)
+        except Exception as exc:
+            logger.error("[Drive] erro ao organizar artefato %s: %s", artefato.pk, exc, exc_info=True)
     for anexo in evento.anexos.all():
         try:
             organizar_evento_anexo(anexo)
@@ -390,10 +519,26 @@ def organizar_evento(evento) -> None:
 def _caminho_base_oficio(oficio, servidores) -> str:
     evento = getattr(oficio, "evento", None)
     if evento is not None:
-        base = f"{naming.PASTA_EVENTOS}/{naming.pasta_evento(evento)}"
-    else:
-        base = naming.PASTA_AVULSOS
-    return f"{base}/{naming.pasta_oficio(oficio, servidores)}"
+        return f"{naming.PASTA_EVENTOS}/{naming.pasta_evento(evento)}/{naming.pasta_oficio(oficio, servidores)}"
+    return f"{naming.pasta_tipo('oficio')}/{naming.pasta_oficio(oficio, servidores)}"
+
+
+def _caminho_artefato(artefato, oficio, servidores, cidade) -> str:
+    tipo = artefato.tipo or "oficio"
+    formato = artefato.formato or "pdf"
+    nome = (artefato.nome_drive or "").strip() or _derivar_nome_artefato(
+        tipo, formato, oficio, getattr(artefato, "servidor", None), servidores, cidade
+    )
+    evento = getattr(artefato, "evento", None) or getattr(oficio, "evento", None)
+    if evento is not None:
+        base = f"{naming.PASTA_EVENTOS}/{naming.pasta_evento(evento)}/{naming.pasta_oficio(oficio, servidores)}"
+        if tipo == "termo_autorizacao":
+            return f"{base}/{naming.PASTA_TERMOS}/{nome}"
+        return f"{base}/{nome}"
+    base = naming.pasta_tipo(tipo)
+    if oficio is not None:
+        return f"{base}/{naming.pasta_oficio(oficio, servidores)}/{nome}"
+    return f"{base}/{nome}"
 
 
 def planejar_oficio(oficio) -> list[str]:
@@ -404,17 +549,7 @@ def planejar_oficio(oficio) -> list[str]:
     linhas: list[str] = []
 
     for art in oficio.documentos_gerados.all():
-        tipo, fmt = (art.tipo or "oficio"), (art.formato or "pdf")
-        if tipo == "termo_autorizacao":
-            linhas.append(f"{base}/{naming.PASTA_TERMOS}/{naming.nome_termo(oficio, art.servidor, cidade, fmt)}")
-        elif tipo == "ordem_servico":
-            linhas.append(f"{base}/{naming.nome_os(oficio, servidores, cidade, fmt)}")
-        elif tipo == "plano_trabalho":
-            linhas.append(f"{base}/{naming.nome_plano(oficio, cidade, fmt)}")
-        elif tipo == "justificativa":
-            linhas.append(f"{base}/{naming.nome_justificativa(oficio, cidade, fmt)}")
-        else:
-            linhas.append(f"{base}/{naming.nome_oficio(oficio, servidores, cidade, fmt)}")
+        linhas.append(_caminho_artefato(art, oficio, servidores, cidade))
 
     for p in oficio.prestacoes_contas.all():
         servf = f"{base}/{naming.PASTA_PRESTACAO}/{naming.pasta_prestacao_servidor(p.servidor)}"
@@ -452,7 +587,7 @@ def planejar_evento(evento) -> list[str]:
 # ---------------------------------------------------------------------------
 
 def reorganizar_tudo(evento_id: int | None = None) -> dict:
-    """Reorganiza todos os eventos (+ ofícios avulsos) no Drive.
+    """Reorganiza todos os eventos (+ ofícios sem evento) no Drive.
 
     Retorna contagens: ``{"eventos", "avulsos", "erros"}``.
     """

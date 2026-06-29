@@ -1124,8 +1124,12 @@ def avaliar_pendencias_documento(plano: PlanoTrabalho) -> list[str]:
 # ── Geração documental ───────────────────────────────────────────────────────
 
 
-def gerar_resposta_plano_documento(plano: PlanoTrabalho, formato: DocumentoFormato):
-    """Gera DOCX/PDF do plano usando o template plano_trabalho.docx (placeholders planos)."""
+def gerar_plano_documento(plano: PlanoTrabalho, formato: DocumentoFormato):
+    """Gera o documento do plano (DOCX/PDF) e o persiste como ``DocumentoArtefato``.
+
+    Retorna o ``DocumentoGerado``. A persistência é idempotente por conteúdo e
+    no-op quando desligada (testes); falhas não quebram a geração.
+    """
     from .docxtpl_context import build_plano_docxtpl_context
 
     from cadastros.selectors import build_configuracao_context
@@ -1150,14 +1154,46 @@ def gerar_resposta_plano_documento(plano: PlanoTrabalho, formato: DocumentoForma
             docxtpl_context=contexto,
             docx_template_path=docx_template,
         )
-        response = build_download_response(
-            content=doc.conteudo,
-            tipo=DocumentoTipo.PLANO_TRABALHO,
-            formato=formato,
-            reference=reference,
+        _persistir_plano_artefato(plano, doc)
+        return doc
+
+
+def _persistir_plano_artefato(plano: PlanoTrabalho, doc) -> None:
+    try:
+        from documentos.models import DocumentoArtefato
+        from documentos.services.persistence import persist_geracao
+        from integracoes.google_drive import naming
+
+        if DocumentoArtefato.objects.filter(
+            tipo=DocumentoTipo.PLANO_TRABALHO.value, hash_sha256=doc.hash_sha256
+        ).exists():
+            return
+        oficio = plano.evento.oficios.first() if plano.evento_id else None
+        cidade = naming.cidade_evento(getattr(plano, "evento", None), oficio)
+        persist_geracao(
+            doc,
+            evento_id=plano.evento_id,
+            oficio_id=(oficio.pk if oficio else None),
+            nome_drive=naming.nome_plano(plano, cidade, oficio=oficio),
         )
-        response["X-Document-SHA256"] = doc.hash_sha256
-        return response
+    except Exception:
+        logger.warning("Não foi possível persistir artefato do plano de trabalho.", exc_info=True)
+
+
+def gerar_resposta_plano_documento(plano: PlanoTrabalho, formato: DocumentoFormato):
+    """Gera DOCX/PDF do plano e devolve a resposta de download."""
+    doc = gerar_plano_documento(plano, formato)
+    reference = (
+        f"{plano.numero:02d}-{plano.ano}" if plano.numero and plano.ano else f"plano-{plano.pk}"
+    )
+    response = build_download_response(
+        content=doc.conteudo,
+        tipo=DocumentoTipo.PLANO_TRABALHO,
+        formato=formato,
+        reference=reference,
+    )
+    response["X-Document-SHA256"] = doc.hash_sha256
+    return response
 
 
 def marcar_plano_gerado(plano: PlanoTrabalho) -> None:
