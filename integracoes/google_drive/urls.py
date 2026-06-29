@@ -14,4 +14,7 @@ urlpatterns = [
     path("api/pastas/", views.api_listar_pastas, name="api_listar_pastas"),
     path("api/pastas/criar/", views.api_criar_pasta, name="api_criar_pasta"),
     path("api/pasta-raiz/salvar/", views.salvar_pasta_raiz, name="salvar_pasta_raiz"),
+    # Organização em massa
+    path("reorganizar/", views.reorganizar_tudo, name="reorganizar_tudo"),
+    path("api/previa-reorganizacao/", views.previa_reorganizacao, name="previa_reorganizacao"),
 ]

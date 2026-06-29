@@ -445,3 +445,40 @@ def planejar_evento(evento) -> list[str]:
     for oficio in evento.oficios.all():
         linhas.extend(planejar_oficio(oficio))
     return linhas
+
+
+# ---------------------------------------------------------------------------
+# Reorganização em massa (usada pelo comando e pelo botão da UI)
+# ---------------------------------------------------------------------------
+
+def reorganizar_tudo(evento_id: int | None = None) -> dict:
+    """Reorganiza todos os eventos (+ ofícios avulsos) no Drive.
+
+    Retorna contagens: ``{"eventos", "avulsos", "erros"}``.
+    """
+    from eventos.models import Evento
+    from oficios.models import Oficio
+
+    resumo = {"eventos": 0, "avulsos": 0, "erros": 0}
+
+    eventos = Evento.objects.all()
+    if evento_id is not None:
+        eventos = eventos.filter(pk=evento_id)
+    for evento in eventos.iterator():
+        try:
+            organizar_evento(evento)
+            resumo["eventos"] += 1
+        except Exception as exc:  # noqa: BLE001
+            resumo["erros"] += 1
+            logger.error("[Drive] erro ao reorganizar evento %s: %s", evento.pk, exc, exc_info=True)
+
+    if evento_id is None:
+        for oficio in Oficio.objects.filter(evento__isnull=True).iterator():
+            try:
+                organizar_oficio(oficio)
+                resumo["avulsos"] += 1
+            except Exception as exc:  # noqa: BLE001
+                resumo["erros"] += 1
+                logger.error("[Drive] erro ao reorganizar ofício avulso %s: %s", oficio.pk, exc, exc_info=True)
+
+    return resumo
