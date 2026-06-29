@@ -68,6 +68,8 @@ def persist_geracao(
     *,
     oficio_id: int | None = None,
     servidor_id: int | None = None,
+    evento_id: int | None = None,
+    nome_drive: str = "",
     payload_snapshot: Mapping[str, Any] | None = None,
     cache_key: str = "",
     engine: str = "",
@@ -86,6 +88,7 @@ def persist_geracao(
             "formato": doc.formato.value,
             "oficio_id": oficio_id,
             "servidor_id": servidor_id,
+            "evento_id": evento_id,
         },
     ):
         return DocumentoArtefato.objects.create(
@@ -93,6 +96,8 @@ def persist_geracao(
             formato=doc.formato.value,
             oficio_id=oficio_id,
             servidor_id=servidor_id,
+            evento_id=evento_id,
+            nome_drive=nome_drive or "",
             payload_snapshot=payload_snapshot,
             hash_sha256=doc.hash_sha256,
             arquivo=arquivo,

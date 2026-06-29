@@ -9,6 +9,7 @@ from django.conf import settings
 logger = logging.getLogger(__name__)
 
 _FOLDER_MIME = "application/vnd.google-apps.folder"
+_SHORTCUT_MIME = "application/vnd.google-apps.shortcut"
 _SCOPES = ["https://www.googleapis.com/auth/drive.file"]
 
 _MIMETYPES = {
@@ -78,6 +79,19 @@ class _MockClient:
             nova_pasta_id,
         )
         return file_id
+
+    def criar_ou_atualizar_atalho(
+        self, nome: str, target_id: str, pasta_id: str, existing_id: str | None = None
+    ) -> str:
+        fake_id = existing_id or f"mock-atalho-{pasta_id}-{nome}"
+        logger.info(
+            "[Drive MOCK] atalho nome=%s target=%s pasta_id=%s → %s",
+            nome,
+            target_id,
+            pasta_id,
+            fake_id,
+        )
+        return fake_id
 
     def listar_pastas(self, pai_id: str | None = None) -> list[dict]:
         return [
@@ -217,6 +231,26 @@ class _RealClient:
             nova_pasta_id,
         )
         return file_id
+
+    def criar_ou_atualizar_atalho(
+        self, nome: str, target_id: str, pasta_id: str, existing_id: str | None = None
+    ) -> str:
+        """Cria (ou renomeia/move) um atalho do Drive apontando para ``target_id``."""
+        if existing_id:
+            try:
+                self.mover_renomear(existing_id, nome, pasta_id)
+                return existing_id
+            except Exception as exc:
+                logger.warning("[Drive] atalho %s inválido, recriando: %s", existing_id, exc)
+        meta = {
+            "name": nome,
+            "mimeType": _SHORTCUT_MIME,
+            "parents": [pasta_id],
+            "shortcutDetails": {"targetId": target_id},
+        }
+        result = self._svc.files().create(body=meta, fields="id").execute()
+        logger.info("[Drive] atalho criado nome=%s target=%s → id=%s", nome, target_id, result["id"])
+        return result["id"]
 
 
 # ---------------------------------------------------------------------------

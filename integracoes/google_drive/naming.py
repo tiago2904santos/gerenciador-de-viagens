@@ -18,9 +18,26 @@ from core.utils.masks import format_protocolo
 
 # Nomes fixos de pastas da árvore.
 PASTA_EVENTOS = "Eventos"
-PASTA_AVULSOS = "Avulsos"
 PASTA_TERMOS = "Termos"
 PASTA_PRESTACAO = "Prestação de contas"
+# Pasta global (no topo) que agrega TODAS as prestações de contas.
+PASTA_PRESTACOES_GLOBAL = "Prestações de contas"
+
+# Pastas globais por tipo de documento (no topo, fora de "Eventos"). Usadas como
+# destino canônico quando o documento não tem evento e como agregadoras (atalhos)
+# quando tem.
+PASTA_TIPO_PLURAL = {
+    "oficio": "Ofícios",
+    "plano_trabalho": "Planos de trabalho",
+    "ordem_servico": "Ordens de serviço",
+    "termo_autorizacao": "Termos",
+    "justificativa": "Justificativas",
+}
+
+
+def pasta_tipo(tipo: str) -> str:
+    """Pasta global do tipo de documento (ex.: 'Planos de trabalho')."""
+    return PASTA_TIPO_PLURAL.get(tipo or "", "Documentos")
 
 _MESES_ABREV = [
     "",
@@ -218,13 +235,25 @@ def nome_os(oficio, servidores, cidade, formato="pdf") -> str:
     return _arquivo(" ".join(partes) + _suf_cidade(cidade), formato)
 
 
-def nome_plano(oficio, cidade, formato="pdf") -> str:
-    nd = num_doc(oficio.numero, oficio.ano)
-    proto = protocolo_fmt(oficio)
-    partes = [f"Plano de trabalho {nd}".strip()]
+def nome_plano(plano, cidade, *, oficio=None, formato="pdf") -> str:
+    """Nome do plano usando a numeração do PRÓPRIO plano (não do ofício)."""
+    nd = num_doc(getattr(plano, "numero", None), getattr(plano, "ano", None))
+    proto = protocolo_fmt(oficio) if oficio is not None else ""
+    base = "Plano de trabalho"
+    partes = [f"{base} {nd}".strip()]
     if proto:
         partes.append(f"protocolo {proto}")
     return _arquivo(" ".join(partes) + _suf_cidade(cidade), formato)
+
+
+def nome_atalho_prestacao(oficio, servidor, cidade) -> str:
+    """Nome do atalho de pasta na agregadora global de prestações."""
+    nome = primeiro_nome(servidor)
+    nd = num_doc(oficio.numero, oficio.ano) if oficio is not None else ""
+    partes = [f"Prestação {nome}".strip() if nome else "Prestação"]
+    if nd:
+        partes.append(f"- Ofício {nd}")
+    return sanitize_drive_name(" ".join(partes) + _suf_cidade(cidade))
 
 
 def nome_justificativa(oficio, cidade, formato="pdf") -> str:

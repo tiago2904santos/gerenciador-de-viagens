@@ -76,10 +76,11 @@ class OrganizerTests(TestCase):
             linhas,
         )
 
-    def test_oficio_sem_evento_vai_para_avulsos(self):
+    def test_oficio_sem_evento_vai_para_pasta_de_tipo(self):
         self.oficio.evento = None
         self.oficio.save()
         art = self._artefato("oficio")
         organizer.organizar_artefato(art)
         linhas = organizer.planejar_oficio(self.oficio)
-        self.assertTrue(any(linha.startswith("Avulsos/") for linha in linhas))
+        self.assertTrue(any(linha.startswith("Ofícios/") for linha in linhas))
+        self.assertFalse(any("Avulsos" in linha for linha in linhas))
