@@ -26,11 +26,21 @@
     </label>
 
     <div class="asgn-field">
-      <label class="asgn-field__label" for="cpf5">5 primeiros dígitos do seu CPF</label>
-      <input class="asgn-input asgn-input--cpf" id="cpf5" name="cpf5"
-             inputmode="numeric" pattern="[0-9]*" maxlength="5"
-             autocomplete="off" placeholder="00000" required>
+      <label class="asgn-field__label" for="cpf">Seu CPF</label>
+      <input class="asgn-input asgn-input--cpf" id="cpf" name="cpf"
+             inputmode="numeric" maxlength="14"
+             autocomplete="off" placeholder="000.000.000-00" required>
     </div>
+
+    <script>
+      document.getElementById('cpf').addEventListener('input', function () {
+        var v = this.value.replace(/\D/g, '').slice(0, 11);
+        if (v.length > 9) v = v.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, '$1.$2.$3-$4');
+        else if (v.length > 6) v = v.replace(/^(\d{3})(\d{3})(\d{3})/, '$1.$2.$3');
+        else if (v.length > 3) v = v.replace(/^(\d{3})(\d{3})/, '$1.$2');
+        this.value = v;
+      });
+    </script>
 
     <button class="asgn-btn asgn-btn--primary" type="submit">Continuar para assinar</button>
   </form>
