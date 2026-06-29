@@ -11,6 +11,8 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.utils import timezone
+from django.utils.dateparse import parse_date
 from django.views.decorators.http import require_GET
 from django.views.decorators.http import require_http_methods
 
@@ -28,15 +30,16 @@ from .services import gerar_os_pdf_response
 
 def index(request):
     q = request.GET.get("q", "").strip()
-    ordens = (
-        OrdemServico.objects
-        .prefetch_related(
-            "destinos__estado",
-            "servidores__cargo",
-            "servidores__unidade",
-            "oficios",
-        )
-        .order_by("-ano", "-numero")
+    temporal = request.GET.get("temporal", "").strip()
+    viagem_de = request.GET.get("viagem_de", "").strip()
+    viagem_ate = request.GET.get("viagem_ate", "").strip()
+    sort = request.GET.get("sort", "").strip()
+
+    ordens = OrdemServico.objects.prefetch_related(
+        "destinos__estado",
+        "servidores__cargo",
+        "servidores__unidade",
+        "oficios",
     )
     if q:
         filters = (
@@ -48,7 +51,33 @@ def index(request):
             filters |= Q(numero=int(q)) | Q(ano=int(q)) | Q(oficios__numero=int(q))
         ordens = ordens.filter(filters).distinct()
 
+    hoje = timezone.localdate()
+    if temporal == "futuro":
+        ordens = ordens.filter(data_evento_inicio__gt=hoje)
+    elif temporal == "andamento":
+        ordens = ordens.filter(data_evento_inicio__lte=hoje, data_evento_fim__gte=hoje)
+    elif temporal == "passado":
+        ordens = ordens.filter(data_evento_fim__lt=hoje)
+
+    viagem_de_date = parse_date(viagem_de) if viagem_de else None
+    viagem_ate_date = parse_date(viagem_ate) if viagem_ate else None
+    if viagem_de_date:
+        ordens = ordens.filter(Q(data_evento_fim__gte=viagem_de_date) | Q(data_evento_fim__isnull=True))
+    if viagem_ate_date:
+        ordens = ordens.filter(data_evento_inicio__lte=viagem_ate_date)
+
+    sort_map = {
+        "numero_desc": ("-ano", "-numero"),
+        "numero_asc": ("ano", "numero"),
+        "criacao_desc": ("-created_at",),
+        "criacao_asc": ("created_at",),
+        "viagem_asc": ("data_evento_inicio", "-ano", "-numero"),
+        "viagem_desc": ("-data_evento_inicio", "-ano", "-numero"),
+    }
+    ordens = ordens.order_by(*sort_map.get(sort or "numero_desc", sort_map["numero_desc"]))
+
     cards = [apresentar_ordem_servico_card(ordem) for ordem in ordens]
+    has_filters = any([q, temporal, viagem_de, viagem_ate, sort])
 
     return render(
         request,
@@ -57,13 +86,31 @@ def index(request):
             "page_title": "Ordens de Serviço",
             "page_description": "Cadastre e gerencie ordens de serviço.",
             "q": q,
+            "temporal": temporal,
+            "viagem_de": viagem_de,
+            "viagem_ate": viagem_ate,
+            "sort": sort,
+            "has_filters": has_filters,
             "cards": cards,
             "nova_url": reverse("ordens_servico:nova"),
             "search_clear_url": reverse("ordens_servico:index"),
-            "empty_message": "Nenhuma OS encontrada com os filtros aplicados." if q else "Nenhuma OS cadastrada ainda.",
+            "temporal_options": [
+                {"value": "", "label": "Qualquer período"},
+                {"value": "futuro", "label": "Futuras"},
+                {"value": "andamento", "label": "Em andamento"},
+                {"value": "passado", "label": "Passadas"},
+            ],
+            "sort_options": [
+                {"value": "numero_desc", "label": "Número: maior"},
+                {"value": "numero_asc", "label": "Número: menor"},
+                {"value": "criacao_desc", "label": "Criação: mais recente"},
+                {"value": "criacao_asc", "label": "Criação: mais antiga"},
+                {"value": "viagem_asc", "label": "Viagem: mais próxima"},
+                {"value": "viagem_desc", "label": "Viagem: mais distante"},
+            ],
+            "empty_message": "Nenhuma OS encontrada com os filtros aplicados." if has_filters else "Nenhuma OS cadastrada ainda.",
         },
     )
-
 
 def _os_queryset():
     return OrdemServico.objects.prefetch_related("destinos__estado", "servidores", "oficios")

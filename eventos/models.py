@@ -105,6 +105,32 @@ class Evento(models.Model):
         return cidade or uf or "Destino nao informado"
 
 
+EVENTO_SOLICITACAO_EXTENSOES = ["pdf", "png", "jpg", "jpeg"]
+
+
+def evento_solicitacao_upload_to(instance, filename):
+    return f"eventos/{instance.evento_id or 'novo'}/solicitacoes/{filename}"
+
+
+class EventoDocumentoSolicitacao(models.Model):
+    evento = models.ForeignKey(
+        Evento,
+        on_delete=models.CASCADE,
+        related_name="documentos_solicitacao",
+    )
+    arquivo = models.FileField(upload_to=evento_solicitacao_upload_to)
+    nome_original = models.CharField(max_length=255, blank=True, default="")
+    criado_em = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["criado_em"]
+        verbose_name = "Documento de solicitação do evento"
+        verbose_name_plural = "Documentos de solicitação do evento"
+
+    def __str__(self):
+        return self.nome_original or str(self.arquivo)
+
+
 class ModeloMotivoEvento(TimeStampedModel):
     nome = models.CharField(max_length=120, unique=True)
     texto = models.TextField()

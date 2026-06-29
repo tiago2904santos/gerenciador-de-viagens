@@ -1,0 +1,121 @@
+<article
+  class="oficio-lc evento-lc"
+  data-cv-filter-item
+  data-search-text="{{ card.titulo }} {{ card.destino }} {{ card.periodo }} {{ card.responsavel }}{% for oficio in card.oficios %} {{ oficio.numero }}{% for servidor in oficio.servidores %} {{ servidor.name }}{% endfor %}{% endfor %}{% for doc in card.documentos %} {{ doc.kind }} {{ doc.title }} {{ doc.detail }}{% endfor %}"
+>
+  <div class="oficio-lc__layout">
+    <div class="oficio-lc__id-row">
+      <div class="oficio-lc__info-item oficio-lc__info-item--wide">
+        <span class="oficio-lc__info-label">Evento</span>
+        <span class="oficio-lc__info-value">{{ card.titulo }}</span>
+        {% if card.evento_meta %}<span class="evento-lc__id-sub">{{ card.evento_meta }}</span>{% endif %}
+      </div>
+      {% include "components/ui/badges/chip.html" with tone=card.status_state label=card.status_label extra_class="oficio-lc__temporal-chip" only %}
+    </div>
+
+    <div class="evento-lc__sections">
+      <p class="evento-lc__section-label">Ofícios</p>
+      <div class="oficio-lc__trechos-list evento-lc__docs-list evento-lc__oficios-list">
+        {% for oficio in card.oficios %}
+          <div class="oficio-lc__trecho oficio-lc__trecho--documento evento-lc__oficio-row">
+            <div class="evento-lc__oficio-row-header">
+              <div class="oficio-lc__trecho-body">
+                <div class="oficio-lc__trecho-rota">
+                  <span>Ofício: {{ oficio.numero }}</span>
+                  {% if oficio.protocolo %}<span>Protocolo: {{ oficio.protocolo }}</span>{% endif %}
+                </div>
+              </div>
+              <div class="oficio-lc__trecho-actions cv-icon-btn-group">
+                {% include "components/ui/buttons/icon_button.html" with href=oficio.pdf_url action="pdf" aria_label="Baixar ofício em PDF" tooltip="PDF" only %}
+                {% include "components/ui/buttons/icon_button.html" with href=oficio.docx_url action="docx" aria_label="Baixar ofício em DOCX" tooltip="DOCX" only %}
+                {% include "components/ui/buttons/icon_button.html" with href=oficio.visualizar_url action="preview" aria_label="Visualizar ofício" tooltip="Visualizar" only %}
+                {% include "components/ui/buttons/icon_button.html" with href=oficio.editar_url action="edit" aria_label="Editar ofício" tooltip="Editar" only %}
+              </div>
+            </div>
+          </div>
+        {% empty %}
+          <p class="oficio-lc__empty-hint">Nenhum ofício vinculado a este evento.</p>
+        {% endfor %}
+      </div>
+
+      {% if card.documentos %}
+      <p class="evento-lc__section-label">Documentos</p>
+      {% endif %}
+      <div class="oficio-lc__trechos-list evento-lc__docs-list evento-lc__documentos-list">
+        {% for doc in card.documentos %}
+          <div class="oficio-lc__trecho oficio-lc__trecho--documento">
+            <div class="oficio-lc__trecho-body">
+              <div class="oficio-lc__trecho-rota">
+                <span>{{ doc.title }}</span>
+                <span class="oficio-lc__traveller-badge">{{ doc.kind }}</span>
+              </div>
+              <div class="oficio-lc__trecho-times">
+                {% if doc.meta %}{{ doc.meta }}{% endif %}{% if doc.meta and doc.detail %} · {% endif %}{% if doc.detail %}{{ doc.detail }}{% endif %}
+              </div>
+            </div>
+            <div class="oficio-lc__trecho-actions cv-icon-btn-group">
+              {% if doc.pdf_url %}{% include "components/ui/buttons/icon_button.html" with href=doc.pdf_url action="pdf" aria_label="Baixar PDF" tooltip="PDF" only %}{% endif %}
+              {% if doc.docx_url %}{% include "components/ui/buttons/icon_button.html" with href=doc.docx_url action="docx" aria_label="Baixar DOCX" tooltip="DOCX" only %}{% endif %}
+              {% if doc.visualizar_url %}{% include "components/ui/buttons/icon_button.html" with href=doc.visualizar_url action="preview" aria_label="Visualizar documento" tooltip="Visualizar" only %}{% endif %}
+              {% if doc.editar_url %}{% include "components/ui/buttons/icon_button.html" with href=doc.editar_url action="edit" aria_label="Editar documento" tooltip="Editar" only %}{% endif %}
+            </div>
+          </div>
+        {% empty %}
+          <p class="oficio-lc__empty-hint">Nenhum plano, convite ou OS vinculado a este evento.</p>
+        {% endfor %}
+      </div>
+
+      {% if card.servidores_flat %}
+      <p class="evento-lc__section-label">Servidores</p>
+      {% for oficio in card.oficios %}
+        {% if oficio.servidores %}
+        <div class="evento-lc__servidores-grupo">
+          <p class="evento-lc__servidores-oficio-label">Ofício {{ oficio.numero }}</p>
+          <div class="oficio-lc__travellers oficio-lc__travellers--n3">
+            {% for s in oficio.servidores %}
+            <div class="oficio-lc__traveller oficio-lc__traveller--motorista">
+              <div class="oficio-lc__traveller-body">
+                <div class="oficio-lc__traveller-name-row">
+                  <span class="oficio-lc__traveller-name">{{ s.name }}</span>
+                </div>
+                {% if s.cargo or s.unidade or s.telefone %}
+                <span class="oficio-lc__traveller-meta">{% if s.cargo %}{{ s.cargo }}{% endif %}{% if s.cargo and s.unidade %} · {% endif %}{% if s.unidade %}{{ s.unidade }}{% endif %}{% if s.telefone %} · {{ s.telefone }}{% endif %}</span>
+                {% endif %}
+              </div>
+              {% if s.has_termo and s.termo_open_url %}
+              <div class="oficio-lc__traveller-termo cv-icon-btn-group">
+                {% include "components/ui/buttons/icon_button.html" with href=s.termo_open_url action="preview" aria_label="Visualizar termo de autorização de "|add:s.name target="_blank" tooltip="Visualizar termo" only %}
+              </div>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+      {% endfor %}
+      {% endif %}
+    </div>
+
+    <div class="oficio-lc__footer">
+      <div class="oficio-lc__footer-actions">
+        <div class="oficio-lc__footer-actions-main cv-icon-btn-group">
+          {% include "components/ui/buttons/icon_button.html" with href=card.detail_url action="preview" aria_label="Abrir detalhe do evento" tooltip="Abrir detalhe" only %}
+          {% include "components/ui/buttons/icon_button.html" with href=card.editar_url action="edit" aria_label="Editar evento" tooltip="Editar evento" only %}
+        </div>
+        <div class="oficio-lc__footer-actions-danger cv-icon-btn-group">
+          <button
+            class="cv-icon-btn cv-icon-btn--delete"
+            type="button"
+            aria-label="Excluir evento"
+            data-tooltip="Excluir"
+            data-delete-modal-trigger
+            data-delete-url="{{ card.excluir_url }}"
+            data-delete-label="{{ card.titulo }}"
+          >
+            {% include "dev/ui_lab/partials/_cv_icon.html" with icon="delete" only %}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</article>

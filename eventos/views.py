@@ -1,24 +1,36 @@
 import json
+from pathlib import Path
 
 from django.contrib import messages
+from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.utils import timezone
+from django.utils.dateparse import parse_date
 from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_POST
 
 from cadastros.models import ConfiguracaoSistema
 from cadastros.models import Estado
 from roteiros.selectors import listar_cidades_para_select
 
 from oficios.presenters import apresentar_oficio_card
+from ordens_servico.presenters import apresentar_ordem_servico_card
 from planos_trabalho.presenters import apresentar_plano_card
 from roteiros.presenters import apresentar_roteiro_card
+
+from prestacoes_contas.forms import PrestacaoMultipleFileField
+from prestacoes_contas.forms import PrestacaoMultipleFileInput
 
 from .forms import EventoForm
 from .forms import EventoNovoCadastroForm
 from .models import Evento
+from .models import EventoDocumentoSolicitacao
+from .models import EVENTO_SOLICITACAO_EXTENSOES
+from .presenters import apresentar_evento_list_card
 from .services import build_evento_guided_context
 
 
@@ -33,18 +45,100 @@ def api_cidades_por_uf(request, uf):
 
 
 def index(request):
-    eventos = Evento.objects.select_related("unidade_responsavel", "responsavel").prefetch_related("oficios").order_by("-data_inicio", "-criado_em")
+    q = request.GET.get("q", "").strip()
+    temporal = request.GET.get("temporal", "").strip()
+    viagem_de = request.GET.get("viagem_de", "").strip()
+    viagem_ate = request.GET.get("viagem_ate", "").strip()
+    sort = request.GET.get("sort", "").strip()
+
+    eventos = Evento.objects.select_related("unidade_responsavel", "responsavel").prefetch_related(
+        "anexos",
+        "oficios",
+        "oficios__servidores",
+        "oficios__servidores__cargo",
+        "oficios__servidores__unidade",
+        "oficios__servidores_termo_autorizacao",
+        "oficios__viatura",
+        "oficios__motorista",
+        "oficios__roteiro",
+        "oficios__roteiro__destinos__cidade__estado",
+        "oficios__roteiro__trechos",
+        "planos_trabalho",
+        "planos_trabalho__programa",
+        "planos_trabalho__destino_cidade__estado",
+        "ordens_servico",
+        "ordens_servico__destinos__estado",
+    )
+    if q:
+        eventos = eventos.filter(
+            Q(titulo__icontains=q)
+            | Q(descricao__icontains=q)
+            | Q(motivo__icontains=q)
+            | Q(destino_cidade__icontains=q)
+            | Q(destino_uf__icontains=q)
+            | Q(responsavel__nome__icontains=q)
+            | Q(unidade_responsavel__nome__icontains=q)
+        )
+
+    hoje = timezone.localdate()
+    if temporal == "futuro":
+        eventos = eventos.filter(data_inicio__gt=hoje)
+    elif temporal == "andamento":
+        eventos = eventos.filter(data_inicio__lte=hoje, data_fim__gte=hoje)
+    elif temporal == "passado":
+        eventos = eventos.filter(data_fim__lt=hoje)
+
+    viagem_de_date = parse_date(viagem_de) if viagem_de else None
+    viagem_ate_date = parse_date(viagem_ate) if viagem_ate else None
+    if viagem_de_date:
+        eventos = eventos.filter(Q(data_fim__gte=viagem_de_date) | Q(data_fim__isnull=True))
+    if viagem_ate_date:
+        eventos = eventos.filter(data_inicio__lte=viagem_ate_date)
+
+    sort_map = {
+        "numero_desc": ("-data_inicio", "-criado_em"),
+        "numero_asc": ("data_inicio", "criado_em"),
+        "criacao_desc": ("-criado_em",),
+        "criacao_asc": ("criado_em",),
+        "viagem_asc": ("data_inicio", "-criado_em"),
+        "viagem_desc": ("-data_inicio", "-criado_em"),
+    }
+    eventos = eventos.order_by(*sort_map.get(sort or "numero_desc", sort_map["numero_desc"]))
+    has_filters = any([q, temporal, viagem_de, viagem_ate, sort])
+    cards = [apresentar_evento_list_card(evento) for evento in eventos]
+
     return render(
         request,
         "eventos/index.html",
         {
             "page_title": "Eventos",
             "page_description": "Agrupadores opcionais para organizar documentos relacionados.",
+            "q": q,
+            "temporal": temporal,
+            "viagem_de": viagem_de,
+            "viagem_ate": viagem_ate,
+            "sort": sort,
+            "has_filters": has_filters,
             "eventos": eventos,
+            "cards": cards,
             "novo_url": reverse("eventos:novo"),
+            "search_clear_url": reverse("eventos:index"),
+            "temporal_options": [
+                {"value": "", "label": "Qualquer período"},
+                {"value": "futuro", "label": "Futuras"},
+                {"value": "andamento", "label": "Em andamento"},
+                {"value": "passado", "label": "Passadas"},
+            ],
+            "sort_options": [
+                {"value": "numero_desc", "label": "Número: maior"},
+                {"value": "numero_asc", "label": "Número: menor"},
+                {"value": "criacao_desc", "label": "Criação: mais recente"},
+                {"value": "criacao_asc", "label": "Criação: mais antiga"},
+                {"value": "viagem_asc", "label": "Viagem: mais próxima"},
+                {"value": "viagem_desc", "label": "Viagem: mais distante"},
+            ],
         },
     )
-
 
 def _evento_queryset():
     return Evento.objects.select_related("unidade_responsavel", "responsavel").prefetch_related(
@@ -149,8 +243,6 @@ def detalhe(request, pk, etapa=1):
                     parts.append(destino)
                 elif evento.destino_uf:
                     parts.append(evento.destino_uf)
-                if evento.data_inicio:
-                    parts.append(evento.data_inicio.strftime("%d/%m/%Y"))
                 evento.titulo = " - ".join(parts) if parts else "Novo Evento"
             _save_destinos_extras(evento, request)
             evento.save()
@@ -158,6 +250,46 @@ def detalhe(request, pk, etapa=1):
             return redirect("eventos:guiado_etapa", pk=evento.pk, etapa=2)
     else:
         form = EventoNovoCadastroForm(instance=evento) if etapa == 1 else None
+
+    # — upload de documentos de solicitação (etapa 4) —
+    solicitacao_form_errors = []
+    if request.method == "POST" and request.POST.get("action") == "upload_solicitacao":
+        from django.core.validators import FileExtensionValidator
+        from django.core.exceptions import ValidationError
+
+        arquivos = request.FILES.getlist("solicitacao_arquivos")
+        validator = FileExtensionValidator(EVENTO_SOLICITACAO_EXTENSOES)
+        erros = False
+        for arquivo in arquivos:
+            try:
+                validator(arquivo)
+            except ValidationError:
+                erros = True
+                break
+        if erros or not arquivos:
+            if not arquivos:
+                messages.error(request, "Nenhum arquivo selecionado.")
+            else:
+                messages.error(request, "Formato inválido. Aceita apenas PDF, PNG, JPG ou JPEG.")
+        else:
+            for arquivo in arquivos:
+                EventoDocumentoSolicitacao.objects.create(
+                    evento=evento,
+                    arquivo=arquivo,
+                    nome_original=Path(arquivo.name).name,
+                )
+            messages.success(request, "Documentos de solicitação anexados com sucesso.")
+        return redirect("eventos:guiado_etapa", pk=evento.pk, etapa=4)
+
+    solicitacao_anexos = [
+        {
+            "id": a.pk,
+            "nome": a.nome_original or a.arquivo.name.split("/")[-1],
+            "url": a.arquivo.url,
+            "delete_url": reverse("eventos:excluir_solicitacao_anexo", args=[evento.pk, a.pk]),
+        }
+        for a in evento.documentos_solicitacao.all()
+    ]
 
     guided_context = build_evento_guided_context(evento, etapa_atual=etapa)
     config = ConfiguracaoSistema.get_singleton()
@@ -172,14 +304,37 @@ def detalhe(request, pk, etapa=1):
             "oficio_cards": [apresentar_oficio_card(oficio) for oficio in evento.oficios.all()],
             "roteiro_cards": [apresentar_roteiro_card(roteiro) for roteiro in evento.roteiros.all()],
             "plano_cards": [apresentar_plano_card(plano) for plano in evento.planos_trabalho.all()],
-            "ordens": evento.ordens_servico.all(),
+            "ordem_cards": [apresentar_ordem_servico_card(ordem) for ordem in evento.ordens_servico.all()],
             "termos": evento.termos_autorizacao.all(),
             "sede_uf": config.uf if config else "",
             "modelos_motivo_url": _reverse("oficios:modelos_motivo_index"),
+            "solicitacao_anexos": solicitacao_anexos,
             **guided_context,
         },
     )
 
 
+@require_POST
+def excluir_solicitacao_anexo(request, pk, anexo_pk):
+    evento = get_object_or_404(Evento, pk=pk)
+    try:
+        anexo = EventoDocumentoSolicitacao.objects.get(pk=anexo_pk, evento=evento)
+        anexo.arquivo.delete(save=False)
+        anexo.delete()
+        messages.success(request, "Documento removido.")
+    except EventoDocumentoSolicitacao.DoesNotExist:
+        messages.error(request, "Documento não encontrado.")
+    return redirect("eventos:guiado_etapa", pk=pk, etapa=4)
+
+
 def guiado_termos(request, pk):
     return detalhe(request, pk, etapa=5)
+
+
+@require_http_methods(["POST"])
+def excluir(request, pk):
+    evento = get_object_or_404(Evento, pk=pk)
+    titulo = evento.titulo or f"Evento #{pk}"
+    evento.delete()
+    messages.success(request, f'Evento "{titulo}" excluído.')
+    return redirect("eventos:index")

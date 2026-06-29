@@ -1,0 +1,49 @@
+<div class="field app-form-field">
+  {% if label %}
+    <label class="app-form-label" for="{{ field_id }}">{{ label }}</label>
+  {% endif %}
+  <div class="prestacao-file-widget" data-file-picker>
+    <div class="prestacao-file-picker">
+      <input type="file"
+             name="{{ field_name }}"
+             id="{{ field_id }}"
+             class="form-control cv-field__control prestacao-file-input"
+             accept="{{ accept|default:'application/pdf,image/png,image/jpeg,image/*' }}"
+             multiple
+             data-file-native="true">
+      <label class="prestacao-file-picker__action" for="{{ field_id }}">Selecionar arquivos</label>
+      <span class="prestacao-file-picker__value" data-file-picker-name data-default-label="Nenhum arquivo selecionado">Nenhum arquivo selecionado</span>
+      <button class="prestacao-file-picker__clear" type="button" data-file-clear-selection hidden>Limpar seleção</button>
+      <button class="prestacao-file-picker__upload" type="submit" data-file-upload-button disabled>Anexar</button>
+    </div>
+    <div class="prestacao-file-selection" data-file-selection-dropdown hidden>
+      <button class="prestacao-file-selection__toggle" type="button" aria-expanded="false" data-file-selection-toggle>
+        <span data-file-selection-summary>Arquivos selecionados</span>
+        <span class="prestacao-file-selection__chevron" aria-hidden="true"></span>
+      </button>
+      <div class="prestacao-file-selection__menu" data-file-selection-menu hidden>
+        <ul class="prestacao-file-selection__list" data-file-selection-list></ul>
+      </div>
+    </div>
+    <template data-file-selection-template>
+      <li class="prestacao-file-selection__item" data-file-selection-row>
+        <div class="prestacao-file-widget__meta">
+          <strong class="prestacao-file-widget__name" data-file-selection-name></strong>
+          <span class="prestacao-file-widget__subtitle" data-file-selection-size></span>
+        </div>
+        <div class="prestacao-file-widget__actions">
+          <button class="cv-icon-btn cv-icon-btn--delete prestacao-file-widget__action"
+                  type="button"
+                  aria-label="Remover arquivo da seleção"
+                  data-tooltip="Remover"
+                  data-file-remove-selection>
+            {% include "dev/ui_lab/partials/_cv_icon.html" with icon="delete" only %}
+          </button>
+        </div>
+      </li>
+    </template>
+  </div>
+  {% if help_text %}
+    <p class="field-help app-form-help">{{ help_text }}</p>
+  {% endif %}
+</div>

@@ -15,4 +15,10 @@ urlpatterns = [
     path("<int:pk>/guiado_etapa-<int:etapa>/", views.detalhe, name="guiado_etapa_legacy"),
     path("<int:pk>/guiado_termos/", views.guiado_termos, name="guiado_termos"),
     path("<int:pk>/editar/", views.editar, name="editar"),
+    path("<int:pk>/excluir/", views.excluir, name="excluir"),
+    path(
+        "<int:pk>/solicitacao-anexo/<int:anexo_pk>/excluir/",
+        views.excluir_solicitacao_anexo,
+        name="excluir_solicitacao_anexo",
+    ),
 ]
