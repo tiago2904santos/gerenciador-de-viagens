@@ -86,9 +86,16 @@ class AssinaturaServiceTests(TestCase):
     def test_validar_identidade(self, _m):
         _token, docs = svc.emitir_link(self.prestacao, ["rt"])
         doc = docs[0]
-        self.assertFalse(svc.validar_identidade(doc, "00000"))
-        self.assertTrue(svc.validar_identidade(doc, "11122"))
+        self.assertFalse(svc.validar_identidade(doc, "00000000000"))
+        self.assertFalse(svc.validar_identidade(doc, "11122"))  # prefixo incompleto não basta
+        self.assertTrue(svc.validar_identidade(doc, "11122233344"))
         self.assertIsNotNone(doc.identidade_confirmada_em)
+
+    @mock.patch.object(svc, "_gerar_origem_bytes", return_value=_pdf_uma_pagina())
+    def test_validar_identidade_aceita_cpf_formatado(self, _m):
+        _token, docs = svc.emitir_link(self.prestacao, ["rt"])
+        doc = docs[0]
+        self.assertTrue(svc.validar_identidade(doc, "111.222.333-44"))
 
 
 class AssinaturaPublicFlowTests(TestCase):
@@ -118,11 +125,11 @@ class AssinaturaPublicFlowTests(TestCase):
 
         # Identidade com CPF errado não passa.
         ident_url = reverse("prestacoes_contas:assinatura_identidade", args=[token, "rt"])
-        r = self.client.post(ident_url, {"cpf5": "00000", "confirma_nome": "on"})
+        r = self.client.post(ident_url, {"cpf": "00000000000", "confirma_nome": "on"})
         self.assertEqual(r.status_code, 200)
 
         # Identidade correta redireciona para assinar.
-        r = self.client.post(ident_url, {"cpf5": "11122", "confirma_nome": "on"})
+        r = self.client.post(ident_url, {"cpf": "11122233344", "confirma_nome": "on"})
         self.assertRedirects(r, reverse("prestacoes_contas:assinatura_assinar", args=[token, "rt"]))
 
         # Agora o PDF de origem é servido.
@@ -136,7 +143,7 @@ class AssinaturaPublicFlowTests(TestCase):
             {
                 "assinatura_png": _png_data_url(),
                 "modo": "fonte",
-                "fonte": "dancing",
+                "fonte": "classica",
                 "pagina": "0",
                 "pos_x": "0.5",
                 "pos_y": "0.7",
@@ -150,6 +157,7 @@ class AssinaturaPublicFlowTests(TestCase):
         self.assertEqual(doc.status, AssinaturaDocumento.STATUS_ASSINADA)
         self.assertTrue(doc.arquivo_assinado)
         self.assertTrue(doc.codigo_verificacao)
+        self.assertEqual(len(doc.hash_documento), 64)  # SHA-256 hex
 
         # O sistema passa a usar o arquivo assinado.
         conteudo = svc.pdf_rt_assinado_ou_gerado(self.prestacao)
@@ -159,9 +167,9 @@ class AssinaturaPublicFlowTests(TestCase):
         token, _doc = self._emitir()
         ident_url = reverse("prestacoes_contas:assinatura_identidade", args=[token, "rt"])
         for _ in range(5):
-            self.client.post(ident_url, {"cpf5": "00000", "confirma_nome": "on"})
+            self.client.post(ident_url, {"cpf": "00000000000", "confirma_nome": "on"})
         # 6ª tentativa: bloqueado, mesmo com CPF correto.
-        r = self.client.post(ident_url, {"cpf5": "11122", "confirma_nome": "on"})
+        r = self.client.post(ident_url, {"cpf": "11122233344", "confirma_nome": "on"})
         self.assertEqual(r.status_code, 200)
         self.assertContains(r, "Muitas tentativas")
 

@@ -31,10 +31,12 @@ _BLOQUEIO_MINUTOS = 15
 
 # Fontes manuscritas oferecidas ao signatário (self-hosted; ver static/css).
 FONTES_ASSINATURA = [
-    {"key": "dancing", "label": "Dancing Script", "family": "'Dancing Script', cursive"},
-    {"key": "greatvibes", "label": "Great Vibes", "family": "'Great Vibes', cursive"},
-    {"key": "sacramento", "label": "Sacramento", "family": "'Sacramento', cursive"},
-    {"key": "caveat", "label": "Caveat", "family": "'Caveat', cursive"},
+    {"key": "classica",     "label": "Clássica",     "family": "'Great Vibes', cursive"},
+    {"key": "profissional", "label": "Profissional", "family": "'Alex Brush', cursive"},
+    {"key": "moderna",      "label": "Moderna",      "family": "'Parisienne', cursive"},
+    {"key": "simples",      "label": "Simples",      "family": "'Sacramento', cursive"},
+    {"key": "natural",      "label": "Natural",      "family": "'Allura', cursive"},
+    {"key": "luxuosa",      "label": "Luxuosa",      "family": "'Herr Von Muellerhoff', cursive"},
 ]
 
 
@@ -127,10 +129,10 @@ def publico_identidade(request, token, tipo):
     erro = ""
     if request.method == "POST" and not bloqueado:
         confirma_nome = request.POST.get("confirma_nome") == "on"
-        cpf5 = request.POST.get("cpf5", "")
+        cpf = request.POST.get("cpf", "")
         if not confirma_nome:
             erro = "Confirme que o nome exibido é o seu para continuar."
-        elif validar_identidade(doc, cpf5):
+        elif validar_identidade(doc, cpf):
             request.session[_ok_key(token, tipo)] = True
             request.session.pop(_tries_key(token, tipo), None)
             request.session.pop(_block_key(token, tipo), None)
@@ -146,7 +148,7 @@ def publico_identidade(request, token, tipo):
                 bloqueado = True
                 erro = "Muitas tentativas. Tente novamente mais tarde."
             else:
-                erro = f"Os dígitos do CPF não conferem. Tentativas restantes: {restantes}."
+                erro = f"CPF não confere. Tentativas restantes: {restantes}."
 
     return render(
         request,

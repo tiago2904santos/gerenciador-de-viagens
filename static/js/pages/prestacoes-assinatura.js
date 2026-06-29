@@ -107,7 +107,7 @@
   function precarregarFontes() {
     if (!document.fonts || !document.fonts.load) return;
     fontChips.forEach(function (chip) {
-      document.fonts.load("64px " + familyName(chip.dataset.family));
+      document.fonts.load("64px '" + familyName(chip.dataset.family) + "'");
     });
   }
   precarregarFontes();
@@ -171,7 +171,7 @@
       updateApplyState();
     };
     if (document.fonts && document.fonts.load) {
-      document.fonts.load("64px " + fam).then(render, render);
+      document.fonts.load("64px '" + fam + "'").then(render, render);
     } else {
       render();
     }

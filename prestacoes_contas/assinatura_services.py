@@ -11,6 +11,7 @@ O carimbo é puro Python (reportlab + pypdf) e independe do motor de geração d
 
 from __future__ import annotations
 
+import hashlib
 import secrets
 from datetime import timedelta
 from io import BytesIO
@@ -168,11 +169,11 @@ def proximo_pendente(token: str):
 # Identidade
 # ─────────────────────────────────────────────────────────────────
 
-def validar_identidade(doc: AssinaturaDocumento, cpf5: str) -> bool:
-    """Confere os 5 primeiros dígitos do CPF do signatário."""
-    digitos = "".join(ch for ch in str(cpf5 or "") if ch.isdigit())[:5]
-    esperado = doc.cpf_prefixo_esperado
-    if len(esperado) < 5 or digitos != esperado:
+def validar_identidade(doc: AssinaturaDocumento, cpf: str) -> bool:
+    """Confere o CPF completo (11 dígitos) do signatário."""
+    digitos = "".join(ch for ch in str(cpf or "") if ch.isdigit())[:11]
+    esperado = doc.cpf_esperado
+    if len(esperado) != 11 or digitos != esperado:
         return False
     doc.identidade_confirmada_em = timezone.now()
     doc.save(update_fields=["identidade_confirmada_em", "atualizado_em"])
@@ -195,6 +196,7 @@ def _limpar_assinatura(doc: AssinaturaDocumento) -> None:
     doc.assinado_em = None
     doc.assinado_ip = ""
     doc.codigo_verificacao = ""
+    doc.hash_documento = ""
 
 
 def _carimbar_pdf(origem_bytes, png_bytes, *, pagina, x, y, w, h, nome, codigo) -> bytes:
@@ -273,6 +275,7 @@ def aplicar_assinatura(doc, *, png_bytes, modo, fonte, pagina, x, y, w, h, ip=""
     with doc.arquivo_origem.open("rb") as f:
         origem_bytes = f.read()
 
+    hash_doc = hashlib.sha256(origem_bytes).hexdigest()
     codigo = secrets.token_hex(4).upper()
     nome = doc.nome_esperado or (str(doc.signer) if doc.signer_id else "")
     assinado = _carimbar_pdf(
@@ -296,6 +299,7 @@ def aplicar_assinatura(doc, *, png_bytes, modo, fonte, pagina, x, y, w, h, ip=""
     doc.assinado_em = timezone.now()
     doc.assinado_ip = (ip or "")[:64]
     doc.codigo_verificacao = codigo
+    doc.hash_documento = hash_doc
     doc.status = AssinaturaDocumento.STATUS_ASSINADA
     doc.save()
 
