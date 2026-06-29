@@ -68,7 +68,7 @@ def oauth_iniciar(request):
 
 def oauth_callback(request):
     """Endpoint público — o Google redireciona aqui após autorização."""
-    from django.utils import timezone
+    from datetime import timezone as dt_tz
 
     from google_auth_oauthlib.flow import Flow
 
@@ -95,7 +95,7 @@ def oauth_callback(request):
         DriveCredenciais.objects.all().delete()
         expiry = creds.expiry
         if expiry and expiry.tzinfo is None:
-            expiry = expiry.replace(tzinfo=timezone.utc)
+            expiry = expiry.replace(tzinfo=dt_tz.utc)
 
         DriveCredenciais.objects.create(
             access_token=creds.token,
