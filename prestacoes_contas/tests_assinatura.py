@@ -143,7 +143,7 @@ class AssinaturaPublicFlowTests(TestCase):
             {
                 "assinatura_png": _png_data_url(),
                 "modo": "fonte",
-                "fonte": "dancing",
+                "fonte": "classica",
                 "pagina": "0",
                 "pos_x": "0.5",
                 "pos_y": "0.7",

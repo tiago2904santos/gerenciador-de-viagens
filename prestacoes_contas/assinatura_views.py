@@ -31,10 +31,12 @@ _BLOQUEIO_MINUTOS = 15
 
 # Fontes manuscritas oferecidas ao signatário (self-hosted; ver static/css).
 FONTES_ASSINATURA = [
-    {"key": "dancing", "label": "Dancing Script", "family": "'Dancing Script', cursive"},
-    {"key": "greatvibes", "label": "Great Vibes", "family": "'Great Vibes', cursive"},
-    {"key": "sacramento", "label": "Sacramento", "family": "'Sacramento', cursive"},
-    {"key": "caveat", "label": "Caveat", "family": "'Caveat', cursive"},
+    {"key": "classica",     "label": "Clássica",     "family": "'Great Vibes', cursive"},
+    {"key": "profissional", "label": "Profissional", "family": "'Alex Brush', cursive"},
+    {"key": "moderna",      "label": "Moderna",      "family": "'Parisienne', cursive"},
+    {"key": "simples",      "label": "Simples",      "family": "'Sacramento', cursive"},
+    {"key": "natural",      "label": "Natural",      "family": "'Allura', cursive"},
+    {"key": "luxuosa",      "label": "Luxuosa",      "family": "'Herr Von Muellerhoff', cursive"},
 ]
 
 
