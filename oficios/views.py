@@ -918,6 +918,7 @@ def wizard_documentos(request, pk):
 
     if request.method == "POST":
         nav_action = _wizard_normalizar_acao(request.POST, default="save_draft")
+
         if nav_action == "finalizar":
             aval = validar_oficio_para_documento(oficio)
             if aval["pendencias"]:

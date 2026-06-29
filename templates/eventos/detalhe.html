@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260618-eventos">
   <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260618-eventos">
   <link rel="stylesheet" href="{% static 'css/planos-trabalho-eventos.css' %}?v=20260618-eventos">
+  <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}?v=20260629">
 {% endblock %}
 
 {% block content %}
@@ -497,27 +498,72 @@
         {% endif %}
 
         {% if etapa_atual == 4 %}
+          <section class="cv-wizard-section-card" aria-labelledby="evento-solicitacao-title">
+            <header class="cv-wizard-section-header">
+              <div class="cv-wizard-section-header__copy">
+                <h3 class="cv-wizard-section-title" id="evento-solicitacao-title">Documentos de solicitação</h3>
+                <p class="cv-wizard-section-subtitle">
+                  Anexe ofícios solicitantes, convites, despachos assinados ou imagens que fundamentam este evento.
+                  Esses documentos complementam ou substituem a Ordem de Serviço e o Plano de Trabalho.
+                </p>
+              </div>
+            </header>
+            <div class="cv-wizard-section-body">
+              <form method="post" enctype="multipart/form-data" action="{% url 'eventos:guiado_etapa' pk=evento.pk etapa=4 %}">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="upload_solicitacao">
+                {% include "components/ui/forms/file_picker.html" with field_id="id_evt_solicitacao_arquivos" field_name="solicitacao_arquivos" label="Documentos de solicitação" help_text="Ofícios solicitantes, convites, despachos assinados ou imagens. Aceita PDF, PNG, JPG ou JPEG." only %}
+              </form>
+
+              {% if solicitacao_anexos %}
+                <ul class="prestacao-file-list" style="margin-top:0.75rem">
+                  {% for anexo in solicitacao_anexos %}
+                    <li class="prestacao-file-list__item">
+                      <div class="prestacao-file-widget__meta">
+                        <strong class="prestacao-file-widget__name" title="{{ anexo.nome }}">{{ anexo.nome }}</strong>
+                        <span class="prestacao-file-widget__subtitle">Documento de solicitação</span>
+                      </div>
+                      <div class="prestacao-file-widget__actions">
+                        <a class="cv-icon-btn cv-icon-btn--preview prestacao-file-widget__action"
+                           href="{{ anexo.url }}"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           aria-label="Visualizar arquivo"
+                           data-tooltip="Visualizar">
+                          {% include "dev/ui_lab/partials/_cv_icon.html" with icon="eye" only %}
+                        </a>
+                        <form method="post" action="{{ anexo.delete_url }}" style="display:inline">
+                          {% csrf_token %}
+                          <button class="cv-icon-btn cv-icon-btn--delete prestacao-file-widget__action"
+                                  type="submit"
+                                  aria-label="Excluir documento"
+                                  data-tooltip="Excluir"
+                                  onclick="return confirm('Remover este documento?')">
+                            {% include "dev/ui_lab/partials/_cv_icon.html" with icon="delete" only %}
+                          </button>
+                        </form>
+                      </div>
+                    </li>
+                  {% endfor %}
+                </ul>
+              {% else %}
+                <p class="document-inline-empty" style="margin-top:0.75rem">Nenhum documento de solicitação anexado ainda.</p>
+              {% endif %}
+            </div>
+          </section>
+
           <div class="list-content app-list-grid">
             {% for card in plano_cards %}
               {% include "planos_trabalho/partials/plano_list_card.html" with card=card only %}
             {% endfor %}
-            {% for ordem in ordens %}
-              <article class="os-list-card">
-                <div class="os-list-card__info">
-                  <h3 class="os-list-card__title">{{ ordem.numero_formatado }}</h3>
-                  <p class="os-list-card__meta">{{ ordem.periodo_display }}</p>
-                  <p class="os-list-card__meta">{{ ordem.destinos_display }}</p>
-                  <p class="os-list-card__meta">Servidores: {{ ordem.servidores.count }}</p>
-                </div>
-                <div class="os-list-card__actions">
-                  <a class="cv-btn cv-btn--secondary" href="{% url 'ordens_servico:editar' ordem.pk %}"><span>Abrir</span></a>
-                </div>
-              </article>
+            {% for card in ordem_cards %}
+              {% include "ordens_servico/partials/os_list_card.html" with card=card only %}
             {% endfor %}
-            {% if not plano_cards and not ordens %}
+            {% if not plano_cards and not ordem_cards %}
               {% include "components/lists/list_empty.html" with message="Nenhum plano ou OS vinculado a este evento." action_label="Novo plano" action_url=create_urls.plano only %}
             {% endif %}
           </div>
+
           <div class="cv-fab-container">
             {% include "components/ui/buttons/button.html" with href=create_urls.plano label="Novo plano" variant="primary" icon="plus" extra_class="cv-fab" only %}
             {% include "components/ui/buttons/button.html" with href=create_urls.ordem label="Nova OS" variant="secondary" icon="plus" extra_class="cv-fab" only %}
@@ -548,7 +594,7 @@
                 </div>
                 <div class="termo-list-card__actions">
                   <a class="cv-btn cv-btn--secondary" href="{% url 'termos:editar' termo.pk %}"><span>Abrir</span></a>
-                  <a class="cv-btn cv-btn--secondary" href="{% url 'termos:preview_cadastro' termo.pk %}"><span>Preview</span></a>
+                  <a class="cv-btn cv-btn--secondary" href="{% url 'termos:termo_cadastro_pdf_inline' termo.pk %}"><span>Preview</span></a>
                 </div>
               </article>
             {% empty %}

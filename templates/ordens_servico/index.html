@@ -6,56 +6,13 @@
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/roteiros-list.css' %}?v=20260622-mobile">
   <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260610-oficios-datepicker">
+  <link rel="stylesheet" href="{% static 'css/oficios-list-header.css' %}?v=20260627-filter-style">
 {% endblock %}
 
 {% block content %}
 <div class="app-page--main-card-list page-shell page-shell--list oficios-list-page" data-cv-realtime-filter-scope>
 
-  <form class="page-header-stack" method="get" action="{{ request.path }}" data-cv-live-submit-form>
-
-    {# ── BAND ── #}
-    <div class="page-header-band">
-      <div class="page-header-band__content">
-        <div class="page-header-band__text">
-          <span class="page-header-band__eyebrow">DOCUMENTOS</span>
-          <h1 class="page-header-band__title">{{ page_title }}</h1>
-        </div>
-      </div>
-    </div>
-
-    {# ── RAIL ── #}
-    <div class="page-header-rail page-header-rail--filters">
-      <div class="page-header-rail__marker" aria-hidden="true">OS</div>
-
-      <div class="header-filter-bar header-filter-bar--advanced">
-
-        {# Linha 1 — busca #}
-        <div class="header-filter-bar__search">
-          <input
-            class="header-filter-input"
-            type="search"
-            name="q"
-            placeholder="Buscar por número, motivo, destino ou servidor…"
-            aria-label="Buscar ordens de serviço"
-            data-cv-filter="search"
-            {% if q %}value="{{ q }}"{% endif %}
-          >
-        </div>
-
-        {# Linha 2 — ações #}
-        <div class="header-filter-bar__row">
-          <div class="header-filter-bar__fields"></div>
-
-          {# Ações sempre visíveis #}
-          <div class="page-header-rail__actions">
-            {% include "components/ui/buttons/button.html" with href=search_clear_url label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" only %}
-            {% include "components/ui/buttons/button.html" with href=nova_url label="Nova OS" variant="primary" icon="plus" extra_class="cv-btn--control" only %}
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </form>
+  {% include "components/lists/oficios_cloned_list_header.html" with eyebrow="DOCUMENTOS" search_placeholder="Buscar por número, motivo, destino ou servidor..." search_aria_label="Buscar ordens de serviço" %}
 
   <div class="list-panel">
     <div class="list-content list-grid list-grid--roteiros app-list-grid" data-cv-list-container>

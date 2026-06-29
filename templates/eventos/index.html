@@ -1,42 +1,40 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}{{ page_title }}{% endblock %}
 
+{% block extra_js %}
+  <script src="{% static 'js/components/oficio-collapse.js' %}" defer></script>
+{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/roteiros-list.css' %}?v=20260622-mobile">
+  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260610-oficios-datepicker">
+  <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260627-eventos-lista">
+  <link rel="stylesheet" href="{% static 'css/oficios-list-header.css' %}?v=20260627-filter-style">
+  <link rel="stylesheet" href="{% static 'css/eventos-list.css' %}?v=20260628-grp">
+{% endblock %}
+
 {% block content %}
-  <div class="page-shell page-shell--standard-simple">
-    {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="EVENTOS" title=page_title description=page_description icon_label="EV" module_label="Eventos" primary_action_label="Novo evento" primary_action_url=novo_url only %}
-    <main class="main-form-panel">
-      <section class="cv-wizard-section-card">
-        <header class="cv-wizard-section-header">
-          <div class="cv-wizard-section-header__copy">
-            <h2 class="cv-wizard-section-title">Eventos cadastrados</h2>
-            <p class="cv-wizard-section-subtitle">Agrupadores opcionais para documentos e relatórios.</p>
-          </div>
-        </header>
-        <div class="cv-wizard-section-body">
-          <div class="os-list">
-            {% for evento in eventos %}
-              <article class="os-list-card">
-                <div class="os-list-card__info">
-                  <h3 class="os-list-card__title">{{ evento.titulo }}</h3>
-                  <p class="os-list-card__meta">{{ evento.periodo_display }}</p>
-                  <p class="os-list-card__meta">{{ evento.destino_display }}</p>
-                  <p class="os-list-card__meta">Ofícios vinculados: {{ evento.oficios.count }}</p>
-                </div>
-                <div class="os-list-card__actions">
-                  <a class="cv-btn cv-btn--secondary" href="{% url 'eventos:detalhe' evento.pk %}"><span>Abrir</span></a>
-                </div>
-              </article>
-            {% empty %}
-              <div class="os-empty">
-                <h3>Nenhum evento cadastrado</h3>
-                <p>Crie um evento para agrupar documentos relacionados.</p>
-                {% include "components/ui/buttons/button.html" with href=novo_url label="Criar primeiro evento" variant="primary" only %}
-              </div>
-            {% endfor %}
-          </div>
+  <div class="app-page--main-card-list page-shell page-shell--list oficios-list-page eventos-list-page" data-cv-realtime-filter-scope>
+    {% include "components/lists/oficios_cloned_list_header.html" with eyebrow="EVENTOS" search_placeholder="Buscar por título, destino ou responsável..." search_aria_label="Buscar eventos" %}
+
+    <div class="list-panel">
+      <div class="list-content app-list-grid" data-cv-list-container>
+        {% for card in cards %}
+          {% include "eventos/partials/evento_list_card.html" with card=card only %}
+        {% empty %}
+          {% include "components/lists/list_empty.html" with message="Nenhum evento encontrado." action_label="Novo evento" action_url=novo_url only %}
+        {% endfor %}
+      </div>
+      {% if cards %}
+        <div data-cv-empty-state hidden>
+          {% include "components/lists/list_empty.html" with message="Nenhum evento encontrado com os filtros aplicados." only %}
         </div>
-      </section>
-    </main>
+      {% endif %}
+    </div>
+
+    {% include "components/ui/buttons/floating_action.html" with href=novo_url label="Novo evento" variant="primary" icon="plus" aria_label="Novo evento" only %}
+    {% include "components/ui/modals/delete_confirm_modal.html" with delete_modal_title="Excluir Evento?" delete_modal_entity="este evento" %}
   </div>
 {% endblock %}

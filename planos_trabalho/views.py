@@ -12,6 +12,7 @@ from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.dateparse import parse_date
 from django.views.decorators.http import require_GET
 from django.views.decorators.http import require_POST
 
@@ -264,12 +265,16 @@ def _autosave_form_errors(*forms):
 def index(request):
     q = request.GET.get("q", "").strip()
     status = request.GET.get("status", "").strip()
+    temporal = request.GET.get("temporal", "").strip()
+    viagem_de = request.GET.get("viagem_de", "").strip()
+    viagem_ate = request.GET.get("viagem_ate", "").strip()
+    sort = request.GET.get("sort", "").strip()
 
     planos = PlanoTrabalho.objects.select_related(
         "programa",
         "destino_cidade__estado",
         "coordenador_adm__cargo",
-    ).order_by("-ano", "-numero", "-created_at")
+    )
     if status:
         planos = planos.filter(status=status)
     if q:
@@ -285,7 +290,33 @@ def index(request):
             filtro = filtro | Q(numero=int(q)) | Q(ano=int(q))
         planos = planos.filter(filtro)
 
+    hoje = timezone.localdate()
+    if temporal == "futuro":
+        planos = planos.filter(data_evento_inicio__gt=hoje)
+    elif temporal == "andamento":
+        planos = planos.filter(data_evento_inicio__lte=hoje, data_evento_fim__gte=hoje)
+    elif temporal == "passado":
+        planos = planos.filter(data_evento_fim__lt=hoje)
+
+    viagem_de_date = parse_date(viagem_de) if viagem_de else None
+    viagem_ate_date = parse_date(viagem_ate) if viagem_ate else None
+    if viagem_de_date:
+        planos = planos.filter(data_evento_fim__gte=viagem_de_date)
+    if viagem_ate_date:
+        planos = planos.filter(data_evento_inicio__lte=viagem_ate_date)
+
+    sort_map = {
+        "numero_desc": ("-ano", "-numero", "-created_at"),
+        "numero_asc": ("ano", "numero", "created_at"),
+        "criacao_desc": ("-created_at",),
+        "criacao_asc": ("created_at",),
+        "viagem_asc": ("data_evento_inicio", "-ano", "-numero"),
+        "viagem_desc": ("-data_evento_inicio", "-ano", "-numero"),
+    }
+    planos = planos.order_by(*sort_map.get(sort or "numero_desc", sort_map["numero_desc"]))
+
     cards = [apresentar_plano_card(plano) for plano in planos]
+    has_filters = any([q, status, temporal, viagem_de, viagem_ate, sort])
     return render(
         request,
         "planos_trabalho/index.html",
@@ -294,7 +325,11 @@ def index(request):
             "page_description": "Cadastre e gerencie planos de trabalho com numeração própria.",
             "q": q,
             "status": status,
-            "has_filters": bool(q or status),
+            "temporal": temporal,
+            "viagem_de": viagem_de,
+            "viagem_ate": viagem_ate,
+            "sort": sort,
+            "has_filters": has_filters,
             "cards": cards,
             "create_url": reverse("planos_trabalho:novo"),
             "search_clear_url": reverse("planos_trabalho:index"),
@@ -302,10 +337,23 @@ def index(request):
             "horarios_url": reverse("planos_trabalho:horarios_index"),
             "status_options": [{"value": "", "label": "Todos os status"}]
             + [{"value": v, "label": l} for v, l in PlanoTrabalho.STATUS_CHOICES],
+            "temporal_options": [
+                {"value": "", "label": "Qualquer período"},
+                {"value": "futuro", "label": "Futuras"},
+                {"value": "andamento", "label": "Em andamento"},
+                {"value": "passado", "label": "Passadas"},
+            ],
+            "sort_options": [
+                {"value": "numero_desc", "label": "Número: maior"},
+                {"value": "numero_asc", "label": "Número: menor"},
+                {"value": "criacao_desc", "label": "Criação: mais recente"},
+                {"value": "criacao_asc", "label": "Criação: mais antiga"},
+                {"value": "viagem_asc", "label": "Viagem: mais próxima"},
+                {"value": "viagem_desc", "label": "Viagem: mais distante"},
+            ],
             "empty_message": "Nenhum plano de trabalho encontrado.",
         },
     )
-
 
 def novo(request):
     evento = resolve_evento_from_request(request)

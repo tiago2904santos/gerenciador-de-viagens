@@ -158,6 +158,7 @@ def apresentar_oficio_card(oficio):
             "cargo": cargo_nome,
             "unidade": unidade_nome,
             "is_motorista": bool(motorista_pk and s.pk == motorista_pk),
+            "telefone": s.telefone_formatado if s.telefone else "",
             "has_termo": has_termo,
             "termo_open_url": termo_open_url,
             "termo_pdf_url": termo_pdf_url,

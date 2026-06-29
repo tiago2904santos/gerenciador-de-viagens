@@ -6,62 +6,13 @@
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/roteiros-list.css' %}?v=20260612-pt">
   <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260612-pt">
+  <link rel="stylesheet" href="{% static 'css/oficios-list-header.css' %}?v=20260627-filter-style">
 {% endblock %}
 
 {% block content %}
 <div class="app-page--main-card-list page-shell page-shell--list oficios-list-page" data-cv-realtime-filter-scope>
 
-  <form class="page-header-stack" method="get" action="{{ request.path }}" data-cv-live-submit-form>
-
-    {# ── BAND ── #}
-    <div class="page-header-band">
-      <div class="page-header-band__content">
-        <div class="page-header-band__text">
-          <span class="page-header-band__eyebrow">PLANOS DE TRABALHO</span>
-          <h1 class="page-header-band__title">{{ page_title }}</h1>
-        </div>
-      </div>
-    </div>
-
-    {# ── RAIL ── #}
-    <div class="page-header-rail page-header-rail--filters">
-      <div class="page-header-rail__marker" aria-hidden="true">PT</div>
-
-      <div class="header-filter-bar header-filter-bar--advanced">
-
-        <div class="header-filter-bar__search">
-          <input
-            class="header-filter-input"
-            type="search"
-            name="q"
-            placeholder="Buscar por número, destino ou programa…"
-            aria-label="Buscar planos de trabalho"
-            data-cv-filter="search"
-            {% if q %}value="{{ q }}"{% endif %}
-          >
-        </div>
-
-        <div class="header-filter-bar__row">
-          <div class="header-filter-bar__fields">
-            <div class="header-filter-field">
-              <select class="header-filter-select" name="status" aria-label="Status">
-                {% for opt in status_options %}
-                  <option value="{{ opt.value }}"{% if opt.value == status %} selected{% endif %}>{{ opt.label }}</option>
-                {% endfor %}
-              </select>
-            </div>
-          </div>
-
-          <div class="page-header-rail__actions">
-            {% include "components/ui/buttons/button.html" with href=programas_url label="Programas" variant="secondary" extra_class="cv-btn--control" only %}
-            {% include "components/ui/buttons/button.html" with href=search_clear_url label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" only %}
-            {% include "components/ui/buttons/button.html" with href=create_url label="Novo plano" variant="primary" icon="plus" extra_class="cv-btn--control" only %}
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </form>
+  {% include "components/lists/oficios_cloned_list_header.html" with eyebrow="PLANOS DE TRABALHO" search_placeholder="Buscar por número, destino ou programa..." search_aria_label="Buscar planos de trabalho" %}
 
   <div class="list-panel">
     <div class="list-content list-grid list-grid--roteiros app-list-grid" data-cv-list-container>
@@ -77,6 +28,8 @@
       </div>
     {% endif %}
   </div>
+
+  {% include "components/ui/buttons/floating_action.html" with href=create_url label="Novo plano" variant="primary" icon="plus" aria_label="Novo plano" only %}
 
 </div>
 {% endblock %}
