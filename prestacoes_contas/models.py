@@ -230,9 +230,10 @@ class AssinaturaDocumento(models.Model):
 
     Registro canônico — há no máximo um por ``(prestacao, tipo)``. O "link" enviado
     ao signatário é representado por ``link_token`` (compartilhado entre RT e DB quando
-    se gera um link único). O signatário confirma identidade (5 primeiros dígitos do
-    CPF + nome), posiciona a assinatura e envia; o PDF carimbado fica em
-    ``arquivo_assinado`` e passa a ser usado pelo sistema.
+    se gera um link único). O signatário confirma identidade (CPF completo + nome),
+    posiciona a assinatura e envia; o PDF carimbado fica em ``arquivo_assinado`` e passa
+    a ser usado pelo sistema. O campo ``hash_documento`` armazena o SHA-256 do PDF
+    original no momento da assinatura, garantindo integridade do documento.
     """
 
     TIPO_RT = "rt"
@@ -296,6 +297,7 @@ class AssinaturaDocumento(models.Model):
     assinado_em = models.DateTimeField(null=True, blank=True)
     assinado_ip = models.CharField(max_length=64, blank=True, default="")
     codigo_verificacao = models.CharField(max_length=12, blank=True, default="")
+    hash_documento = models.CharField(max_length=64, blank=True, default="")
 
     criado_em = models.DateTimeField(auto_now_add=True)
     atualizado_em = models.DateTimeField(auto_now=True)
@@ -329,9 +331,9 @@ class AssinaturaDocumento(models.Model):
         return bool(self.link_token) and not self.link_expirado and not self.assinada
 
     @property
-    def cpf_prefixo_esperado(self) -> str:
+    def cpf_esperado(self) -> str:
         cpf = (self.signer.cpf or "").strip() if self.signer_id else ""
-        return cpf[:5]
+        return "".join(ch for ch in cpf if ch.isdigit())[:11]
 
 
 class ModeloTextoRelatorioTecnico(models.Model):
