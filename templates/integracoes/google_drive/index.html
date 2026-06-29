@@ -3,5 +3,95 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block content %}
-  {% include "components/lists/list_page.html" with title=page_title description=page_description eyebrow="Integracoes" search_placeholder="Buscar conexoes" empty_message="A integracao com Google Drive sera implementada em etapa futura." only %}
+<div class="app-page--main-card-list page-shell page-shell--list">
+
+  {# ── HEADER ── #}
+  <div class="page-header-stack">
+    <div class="page-header-band">
+      <div class="page-header-band__content">
+        <div class="page-header-band__text">
+          <span class="page-header-band__eyebrow">INTEGRAÇÕES</span>
+          <h1 class="page-header-band__title">{{ page_title }}</h1>
+        </div>
+        <span class="cluster">
+          {% if not drive_configurado %}
+            {% include "components/ui/badges/chip.html" with tone="warning" label="Não configurado" only %}
+          {% elif conectado %}
+            {% include "components/ui/badges/chip.html" with tone="success" label="Conectado" only %}
+          {% else %}
+            {% include "components/ui/badges/chip.html" with tone="neutral" label="Desconectado" only %}
+          {% endif %}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  {# ── CARD DE STATUS / CONEXÃO ── #}
+  <div class="page-shell__body">
+
+    {% if not drive_configurado %}
+      <div class="detail-card">
+        <div class="detail-card__section">
+          <p class="detail-card__label">Status</p>
+          <p>A integração com o Google Drive não está configurada. O administrador do sistema precisa adicionar as credenciais <code>GOOGLE_CLIENT_ID</code>, <code>GOOGLE_CLIENT_SECRET</code> e <code>GOOGLE_REDIRECT_URI</code> no arquivo <code>.env</code>.</p>
+        </div>
+      </div>
+
+    {% elif not conectado %}
+      <div class="detail-card">
+        <div class="detail-card__section">
+          <p class="detail-card__label">Sua conta Google Drive</p>
+          <p>Conecte sua conta Google para salvar documentos gerados pelo sistema diretamente no Google Drive.</p>
+        </div>
+        <div class="detail-card__section">
+          {% include "components/ui/buttons/button.html" with href=request.path|add:"autorizar/" label="Conectar ao Google Drive" variant="primary" icon="link" only %}
+        </div>
+      </div>
+
+    {% else %}
+      {# ── CONECTADO: ações ── #}
+      <div class="detail-card">
+        <div class="detail-card__section">
+          <p class="detail-card__label">Sua conta Google Drive</p>
+          <p>Conta conectada. Os documentos enviados pelo sistema aparecem abaixo.</p>
+        </div>
+        <div class="detail-card__section">
+          <form method="post" action="{% url 'google_drive:desconectar' %}">
+            {% csrf_token %}
+            {% include "components/ui/buttons/button.html" with label="Desconectar" variant="danger" type="submit" icon="x" only %}
+          </form>
+        </div>
+      </div>
+
+      {# ── LISTA DE ARQUIVOS ── #}
+      {% if arquivos %}
+        <div class="list-section">
+          <h2 class="list-section__title">Arquivos no Drive</h2>
+          <div class="main-list">
+            {% for arquivo in arquivos %}
+              <div class="main-list__item">
+                <div class="main-list__item-content">
+                  <span class="main-list__item-title">{{ arquivo.name }}</span>
+                  {% if arquivo.createdTime %}
+                    <span class="main-list__item-meta">{{ arquivo.createdTime|slice:":10" }}</span>
+                  {% endif %}
+                </div>
+                <div class="main-list__item-actions">
+                  {% if arquivo.webViewLink %}
+                    {% include "components/ui/buttons/button.html" with href=arquivo.webViewLink label="Abrir no Drive" variant="secondary" icon="external-link" link_target="_blank" link_rel="noopener noreferrer" only %}
+                  {% endif %}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <p class="empty-state__message">Nenhum arquivo enviado pelo sistema ainda.</p>
+        </div>
+      {% endif %}
+    {% endif %}
+
+  </div>
+</div>
 {% endblock %}

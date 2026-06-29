@@ -196,3 +196,16 @@ EPROTOCOLO = {
     "COD_TIPO_TRAMITACAO_PADRAO": (os.getenv("EPROTOCOLO_COD_TIPO_TRAMITACAO_PADRAO") or "").strip(),
     "CPF_USUARIO_SISTEMA": (os.getenv("EPROTOCOLO_CPF_USUARIO_SISTEMA") or "").strip(),
 }
+
+# ---------------------------------------------------------------------------
+# Integração Google Drive (OAuth 2.0)
+#
+# Credenciais geradas no Google Cloud Console (OAuth 2.0 — Aplicativo da Web).
+# Sem credenciais, a UI informa o estado e bloqueia o fluxo OAuth sem quebrar.
+# GOOGLE_DRIVE_CLIENT_ID / CLIENT_SECRET / REDIRECT_URI ficam apenas no .env.
+# ---------------------------------------------------------------------------
+GOOGLE_DRIVE = {
+    "CLIENT_ID": (os.getenv("GOOGLE_CLIENT_ID") or "").strip(),
+    "CLIENT_SECRET": (os.getenv("GOOGLE_CLIENT_SECRET") or "").strip(),
+    "REDIRECT_URI": (os.getenv("GOOGLE_REDIRECT_URI") or "").strip(),
+}
