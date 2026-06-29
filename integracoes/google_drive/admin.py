@@ -4,6 +4,7 @@ from integracoes.google_drive.models import (
     DriveArquivo,
     DriveArquivoExterno,
     DriveCredenciais,
+    DriveReorganizacaoJob,
 )
 
 
@@ -22,6 +23,19 @@ class DriveArquivoAdmin(admin.ModelAdmin):
     list_filter = ("mock",)
     search_fields = ("nome", "file_id")
     readonly_fields = ("artefato", "file_id", "url", "nome", "mime_type", "mock", "enviado_em")
+
+    def has_add_permission(self, request):
+        return False
+
+
+@admin.register(DriveReorganizacaoJob)
+class DriveReorganizacaoJobAdmin(admin.ModelAdmin):
+    list_display = ("__str__", "status", "eventos_processados", "total_eventos", "avulsos", "erros", "iniciado_em", "finalizado_em")
+    list_filter = ("status",)
+    readonly_fields = (
+        "status", "total_eventos", "eventos_processados", "avulsos", "erros",
+        "mensagem", "iniciado_em", "finalizado_em",
+    )
 
     def has_add_permission(self, request):
         return False

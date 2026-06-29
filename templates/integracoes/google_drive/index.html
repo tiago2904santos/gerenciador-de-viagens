@@ -197,11 +197,20 @@
 
         <div class="cv-wizard-section-body"
              id="gdrive-massa"
-             data-url-previa="{% url 'google_drive:previa_reorganizacao' %}">
+             data-url-previa="{% url 'google_drive:previa_reorganizacao' %}"
+             data-url-status="{% url 'google_drive:status_reorganizacao' %}">
           <p class="field-help-text">
             Eventos cadastrados: <strong>{{ total_eventos }}</strong>.
             {% if not modo_ativo %}<em>(Modo mock — nenhuma chamada real ao Drive.)</em>{% endif %}
           </p>
+
+          {# Status da reorganização (atualizado por polling). #}
+          <div class="gdrive-status" id="gdrive-status"{% if not job_reorg %} hidden{% endif %}>
+            <p class="field-label">Status da reorganização</p>
+            <p class="field-help-text" id="gdrive-status-texto">
+              {% if job_reorg %}{{ job_reorg.get_status_display }}{% endif %}
+            </p>
+          </div>
 
           <div class="gdrive-previa" id="gdrive-previa" hidden>
             <p class="field-label">Prévia (o que será criado/movido)</p>

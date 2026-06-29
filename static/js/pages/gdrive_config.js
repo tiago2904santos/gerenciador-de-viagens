@@ -263,11 +263,62 @@
     });
   }
 
+  function initStatusMassa(container) {
+    const urlStatus = container.dataset.urlStatus;
+    const box = document.getElementById("gdrive-status");
+    const texto = document.getElementById("gdrive-status-texto");
+    if (!urlStatus || !box || !texto) return;
+
+    let timer = null;
+
+    function render(data) {
+      if (!data || !data.existe) {
+        box.hidden = true;
+        return;
+      }
+      box.hidden = false;
+      if (data.em_andamento) {
+        const total = data.total_eventos || 0;
+        const feitos = data.eventos_processados || 0;
+        const sufixo = total ? ` (${feitos}/${total} eventos)` : "";
+        texto.textContent = "Em andamento…" + sufixo;
+      } else if (data.status === "concluida") {
+        const erros = data.erros ? `, ${data.erros} erro(s)` : "";
+        texto.textContent =
+          `Concluída: ${data.total_eventos} evento(s) e ${data.avulsos} avulso(s)${erros}.`;
+      } else if (data.status === "erro") {
+        texto.textContent = "Erro: " + (data.mensagem || "falha na reorganização.");
+      }
+    }
+
+    async function poll() {
+      try {
+        const resp = await fetch(urlStatus, { headers: { "X-Requested-With": "XMLHttpRequest" } });
+        const data = await resp.json();
+        render(data);
+        if (data && data.existe && data.em_andamento) {
+          timer = setTimeout(poll, 3000);
+        } else if (timer) {
+          clearTimeout(timer);
+          timer = null;
+        }
+      } catch (e) {
+        if (timer) clearTimeout(timer);
+        timer = null;
+      }
+    }
+
+    poll();
+  }
+
   function init() {
     const container = document.getElementById("gdrive-folder-browser");
     if (container) initFolderBrowser(container);
     const massa = document.getElementById("gdrive-massa");
-    if (massa) initPreviaMassa(massa);
+    if (massa) {
+      initPreviaMassa(massa);
+      initStatusMassa(massa);
+    }
   }
 
   if (document.readyState === "loading") {

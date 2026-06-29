@@ -11,10 +11,15 @@ from documentos.models import DocumentoArtefato
 from eventos.models import Evento
 from oficios.models import Oficio
 from integracoes.google_drive import services
-from integracoes.google_drive.models import DriveArquivo, DriveCredenciais
+from integracoes.google_drive.models import (
+    DriveArquivo,
+    DriveCredenciais,
+    DriveReorganizacaoJob,
+)
 
 
-@override_settings(GOOGLE_DRIVE={"MODO": "mock", "UPLOAD_EM_MOCK": True})
+# REORG_SINCRONO força a reorganização a rodar inline (sem thread) nos testes.
+@override_settings(GOOGLE_DRIVE={"MODO": "mock", "UPLOAD_EM_MOCK": True, "REORG_SINCRONO": True})
 class ReorganizarTudoViewTests(TestCase):
     def setUp(self):
         services._reset_client()
@@ -53,6 +58,34 @@ class ReorganizarTudoViewTests(TestCase):
         reg = DriveArquivo.objects.get(artefato__oficio=self.oficio)
         self.assertEqual(
             reg.nome, "Ofício 01-2026 protocolo 12.345.678-9 Ana (Maringá).pdf"
+        )
+
+    def test_post_cria_job_e_conclui(self):
+        self.client.post(reverse("google_drive:reorganizar_tudo"))
+        job = DriveReorganizacaoJob.objects.order_by("-iniciado_em").first()
+        self.assertIsNotNone(job)
+        self.assertEqual(job.status, DriveReorganizacaoJob.STATUS_CONCLUIDA)
+        self.assertIsNotNone(job.finalizado_em)
+
+    def test_status_endpoint_reflete_job(self):
+        self.client.post(reverse("google_drive:reorganizar_tudo"))
+        resp = self.client.get(reverse("google_drive:status_reorganizacao"))
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertTrue(data["existe"])
+        self.assertEqual(data["status"], "concluida")
+        self.assertFalse(data["em_andamento"])
+
+    def test_nao_inicia_se_ja_em_andamento(self):
+        DriveReorganizacaoJob.objects.create(status=DriveReorganizacaoJob.STATUS_EM_ANDAMENTO)
+        resp = self.client.post(reverse("google_drive:reorganizar_tudo"))
+        self.assertRedirects(resp, reverse("google_drive:index"))
+        # Não cria um segundo job em andamento.
+        self.assertEqual(
+            DriveReorganizacaoJob.objects.filter(
+                status=DriveReorganizacaoJob.STATUS_EM_ANDAMENTO
+            ).count(),
+            1,
         )
 
     def test_previa_lista_caminhos(self):
