@@ -247,7 +247,7 @@ def _carimbar_pdf(origem_bytes, png_bytes, *, pagina, x, y, w, h, nome, codigo) 
     c.setFont("Helvetica", 6)
     c.setFillColorRGB(0.30, 0.36, 0.43)
     cap_y = max(2.0, box_y_bottom - 8)
-    c.drawString(box_x, cap_y, legenda[:120])
+    c.drawCentredString(box_x + box_w / 2, cap_y, legenda[:120])
     c.save()
     overlay_buf.seek(0)
 
