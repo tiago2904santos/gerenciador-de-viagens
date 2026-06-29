@@ -20,7 +20,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         from documentos.models import DocumentoArtefato
         from integracoes.google_drive.models import DriveArquivo
-        from integracoes.google_drive.services import is_mock, mimetype_para_formato, upload_artefato
+        from integracoes.google_drive.services import upload_artefato
 
         enviados_ids = DriveArquivo.objects.values_list("artefato_id", flat=True)
         pendentes = (
@@ -43,22 +43,14 @@ class Command(BaseCommand):
         ok = 0
         erros = 0
         for art in pendentes:
+            # organizar_artefato (via upload_artefato) já cria o DriveArquivo.
             result = upload_artefato(art)
             if result is None:
                 erros += 1
                 self.stdout.write(self.style.ERROR(f"  ERRO  {art.pk}"))
                 continue
 
-            file_id, url = result
-            nome = art.arquivo.name.rsplit("/", 1)[-1] if art.arquivo else ""
-            DriveArquivo.objects.create(
-                artefato=art,
-                file_id=file_id,
-                url=url,
-                nome=nome,
-                mime_type=mimetype_para_formato(art.formato),
-                mock=is_mock(),
-            )
+            file_id, _url = result
             ok += 1
             self.stdout.write(f"  OK    {art.pk} → {file_id}")
 

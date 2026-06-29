@@ -66,9 +66,18 @@ class _MockClient:
         return fake_id, fake_url
 
     def get_or_create_pasta(self, nome: str, pai_id: str | None = None) -> str:
-        fake_id = f"mock-pasta-{nome}"
+        fake_id = f"mock-pasta-{pai_id or 'root'}-{nome}"
         logger.debug("[Drive MOCK] get_or_create_pasta nome=%s pai_id=%s", nome, pai_id)
         return fake_id
+
+    def mover_renomear(self, file_id: str, novo_nome: str, nova_pasta_id: str | None = None) -> str:
+        logger.info(
+            "[Drive MOCK] mover_renomear file_id=%s nome=%s pasta_id=%s",
+            file_id,
+            novo_nome,
+            nova_pasta_id,
+        )
+        return file_id
 
     def listar_pastas(self, pai_id: str | None = None) -> list[dict]:
         return [
@@ -190,6 +199,25 @@ class _RealClient:
         except Exception:
             return pasta_id
 
+    def mover_renomear(self, file_id: str, novo_nome: str, nova_pasta_id: str | None = None) -> str:
+        """Renomeia e/ou move um arquivo já existente (criado pelo app)."""
+        kwargs: dict = {"fileId": file_id, "body": {"name": novo_nome}, "fields": "id"}
+        if nova_pasta_id:
+            atual = self._svc.files().get(fileId=file_id, fields="parents").execute()
+            pais_atuais = atual.get("parents", []) or []
+            if nova_pasta_id not in pais_atuais or len(pais_atuais) > 1:
+                kwargs["addParents"] = nova_pasta_id
+                if pais_atuais:
+                    kwargs["removeParents"] = ",".join(pais_atuais)
+        self._svc.files().update(**kwargs).execute()
+        logger.info(
+            "[Drive] mover_renomear file_id=%s nome=%s pasta_id=%s",
+            file_id,
+            novo_nome,
+            nova_pasta_id,
+        )
+        return file_id
+
 
 # ---------------------------------------------------------------------------
 # Singleton lazy
@@ -237,23 +265,15 @@ def esta_autorizado() -> bool:
 # ---------------------------------------------------------------------------
 
 def upload_artefato(artefato) -> tuple[str, str] | None:
-    raiz_id = get_pasta_raiz_id() or None
+    """Envia um artefato ao Drive, organizado por evento/categoria com nome bonito.
 
+    Delega ao ``organizer`` (import tardio para evitar import circular). O
+    organizador é idempotente: cria/atualiza o ``DriveArquivo`` correspondente.
+    """
     try:
-        client = get_client()
-        now = datetime.now()
-        ano_id = client.get_or_create_pasta(str(now.year), raiz_id)
-        mes_id = client.get_or_create_pasta(f"{now.month:02d}", ano_id)
+        from . import organizer
 
-        artefato.arquivo.open("rb")
-        try:
-            conteudo = artefato.arquivo.read()
-        finally:
-            artefato.arquivo.close()
-
-        nome = artefato.arquivo.name.rsplit("/", 1)[-1]
-        mime = mimetype_para_formato(artefato.formato)
-        return client.upload(nome, conteudo, mime, pasta_id=mes_id)
+        return organizer.organizar_artefato(artefato)
     except Exception as exc:
         logger.error("[Drive] falha ao enviar artefato %s: %s", getattr(artefato, "pk", "?"), exc, exc_info=True)
         return None
