@@ -214,9 +214,60 @@
       .replace(/"/g, "&quot;");
   }
 
+  function initPreviaMassa(container) {
+    const urlPrevia = container.dataset.urlPrevia;
+    const btnPrevia = document.getElementById("gdrive-btn-previa");
+    const previaBox = document.getElementById("gdrive-previa");
+    const previaLista = document.getElementById("gdrive-previa-lista");
+    const previaAviso = document.getElementById("gdrive-previa-aviso");
+    if (!btnPrevia || !urlPrevia) return;
+
+    btnPrevia.addEventListener("click", async () => {
+      const original = btnPrevia.textContent;
+      btnPrevia.disabled = true;
+      btnPrevia.textContent = "Carregando…";
+      try {
+        const resp = await fetch(urlPrevia, { headers: { "X-Requested-With": "XMLHttpRequest" } });
+        const data = await resp.json();
+        previaLista.innerHTML = "";
+        if (data.erro) {
+          previaAviso.hidden = false;
+          previaAviso.textContent = "Erro ao gerar prévia: " + data.erro;
+        } else {
+          const linhas = data.linhas || [];
+          if (linhas.length === 0) {
+            const li = document.createElement("li");
+            li.textContent = "Nenhum arquivo a organizar.";
+            previaLista.appendChild(li);
+          } else {
+            linhas.forEach((linha) => {
+              const li = document.createElement("li");
+              li.textContent = linha;
+              previaLista.appendChild(li);
+            });
+          }
+          previaAviso.hidden = !data.truncado;
+          if (data.truncado) {
+            previaAviso.textContent = "Mostrando as primeiras " + linhas.length + " linhas (há mais).";
+          }
+        }
+        previaBox.hidden = false;
+      } catch (e) {
+        previaAviso.hidden = false;
+        previaAviso.textContent = "Falha ao carregar a prévia.";
+        previaBox.hidden = false;
+      } finally {
+        btnPrevia.disabled = false;
+        btnPrevia.textContent = original;
+      }
+    });
+  }
+
   function init() {
     const container = document.getElementById("gdrive-folder-browser");
     if (container) initFolderBrowser(container);
+    const massa = document.getElementById("gdrive-massa");
+    if (massa) initPreviaMassa(massa);
   }
 
   if (document.readyState === "loading") {

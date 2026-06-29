@@ -21,9 +21,13 @@ from integracoes.google_drive.services import (
 
 @login_required
 def index(request):
+    from eventos.models import Evento
+
     cfg = getattr(settings, "GOOGLE_DRIVE", {})
     creds = DriveCredenciais.objects.first()
     pasta_raiz_id = get_pasta_raiz_id()
+    modo = cfg.get("MODO", "mock").lower()
+    autorizado = esta_autorizado()
 
     return render(
         request,
@@ -31,13 +35,15 @@ def index(request):
         {
             "page_title": "Google Drive",
             "page_description": "Configuração da integração com o Google Drive.",
-            "modo": cfg.get("MODO", "mock"),
-            "autorizado": esta_autorizado(),
+            "modo": modo,
+            "autorizado": autorizado,
             "creds": creds,
             "pasta_raiz_id": pasta_raiz_id,
             "pasta_raiz_nome": creds.pasta_raiz_nome if creds else "",
             "total_arquivos": DriveArquivo.objects.count(),
-            "modo_ativo": cfg.get("MODO", "mock").lower() != "mock",
+            "modo_ativo": modo != "mock",
+            "pode_reorganizar": bool(pasta_raiz_id) and (autorizado or modo == "mock"),
+            "total_eventos": Evento.objects.count(),
         },
     )
 
@@ -183,3 +189,68 @@ def salvar_pasta_raiz(request):
     _reset_client()
     messages.success(request, f"Pasta \"{pasta_nome}\" definida como diretório de destino.")
     return redirect("google_drive:index")
+
+
+# ---------------------------------------------------------------------------
+# Organização em massa
+# ---------------------------------------------------------------------------
+
+def _pode_reorganizar() -> bool:
+    cfg = getattr(settings, "GOOGLE_DRIVE", {})
+    modo = cfg.get("MODO", "mock").lower()
+    return bool(get_pasta_raiz_id()) and (esta_autorizado() or modo == "mock")
+
+
+@login_required
+@require_POST
+def reorganizar_tudo(request):
+    if not _pode_reorganizar():
+        messages.error(
+            request,
+            "Conecte a conta Google e defina a pasta de destino antes de reorganizar.",
+        )
+        return redirect("google_drive:index")
+
+    from integracoes.google_drive import organizer
+
+    try:
+        resumo = organizer.reorganizar_tudo()
+        messages.success(
+            request,
+            "Reorganização concluída: "
+            f"{resumo['eventos']} evento(s) e {resumo['avulsos']} ofício(s) avulso(s) processados"
+            + (f", {resumo['erros']} erro(s) — veja os logs." if resumo["erros"] else "."),
+        )
+    except Exception as exc:
+        messages.error(request, f"Erro ao reorganizar: {exc}")
+
+    return redirect("google_drive:index")
+
+
+@login_required
+def previa_reorganizacao(request):
+    """Lista os caminhos planejados (dry-run) sem tocar no Drive."""
+    from eventos.models import Evento
+    from oficios.models import Oficio
+    from integracoes.google_drive import organizer
+
+    limite = 500
+    linhas: list[str] = []
+    truncado = False
+
+    try:
+        for evento in Evento.objects.all().iterator():
+            linhas.extend(organizer.planejar_evento(evento))
+            if len(linhas) >= limite:
+                truncado = True
+                break
+        if not truncado:
+            for oficio in Oficio.objects.filter(evento__isnull=True).iterator():
+                linhas.extend(organizer.planejar_oficio(oficio))
+                if len(linhas) >= limite:
+                    truncado = True
+                    break
+    except Exception as exc:
+        return JsonResponse({"erro": str(exc)}, status=500)
+
+    return JsonResponse({"linhas": linhas[:limite], "truncado": truncado, "total": len(linhas)})

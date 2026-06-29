@@ -83,7 +83,7 @@
             <h3 class="cv-wizard-section-title" id="gdrive-pasta-title">Diretório de destino</h3>
             <p class="cv-wizard-section-subtitle">
               Selecione ou crie a pasta no Drive onde os documentos serão salvos.
-              Os arquivos serão organizados em subpastas por ano e mês.
+              Os arquivos serão organizados por evento e categoria, com nomes padronizados.
             </p>
           </div>
           {% if pasta_raiz_id %}
@@ -179,6 +179,52 @@
           {% endif %}
         </div>
       </section>
+
+      {# ── CARD 3 — Organização em massa ── #}
+      {% if pode_reorganizar %}
+      <section class="cv-wizard-section-card" aria-labelledby="gdrive-massa-title">
+        <header class="cv-wizard-section-header">
+          <div class="cv-wizard-section-header__copy">
+            <h3 class="cv-wizard-section-title" id="gdrive-massa-title">Organização em massa</h3>
+            <p class="cv-wizard-section-subtitle">
+              Reorganiza no Drive <strong>todos os eventos</strong> e ofícios avulsos:
+              move e renomeia os arquivos já enviados e sobe os que faltam, a partir
+              das cópias locais. Documentos novos já são organizados automaticamente —
+              use isto para arrumar o que já existe.
+            </p>
+          </div>
+        </header>
+
+        <div class="cv-wizard-section-body"
+             id="gdrive-massa"
+             data-url-previa="{% url 'google_drive:previa_reorganizacao' %}">
+          <p class="field-help-text">
+            Eventos cadastrados: <strong>{{ total_eventos }}</strong>.
+            {% if not modo_ativo %}<em>(Modo mock — nenhuma chamada real ao Drive.)</em>{% endif %}
+          </p>
+
+          <div class="gdrive-previa" id="gdrive-previa" hidden>
+            <p class="field-label">Prévia (o que será criado/movido)</p>
+            <ul class="gdrive-previa-lista" id="gdrive-previa-lista"></ul>
+            <p class="field-help-text" id="gdrive-previa-aviso" hidden></p>
+          </div>
+        </div>
+
+        <section class="cv-card-footer-section">
+          <div class="cv-card-footer-section__divider" aria-hidden="true"></div>
+          <footer class="cv-card-footer cv-card-footer--end">
+            <button type="button" class="cv-btn cv-btn--secondary" id="gdrive-btn-previa">
+              Ver prévia
+            </button>
+            <form method="post" action="{% url 'google_drive:reorganizar_tudo' %}"
+                  onsubmit="return confirm('Reorganizar TODOS os eventos e ofícios avulsos no Drive? Isso move/renomeia arquivos já enviados e sobe os que faltam.')">
+              {% csrf_token %}
+              <button type="submit" class="cv-btn cv-btn--primary">Reorganizar tudo no Drive</button>
+            </form>
+          </footer>
+        </section>
+      </section>
+      {% endif %}
 
     </div>
   </main>
