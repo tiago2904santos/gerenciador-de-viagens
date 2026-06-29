@@ -1,3 +1,5 @@
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
 
@@ -43,3 +45,50 @@ class DriveArquivo(models.Model):
 
     def __str__(self) -> str:
         return f"Drive: {self.nome or self.file_id}"
+
+
+class DriveArquivoExterno(models.Model):
+    """Rastreia no Drive arquivos que NÃO são ``DocumentoArtefato``.
+
+    Cobre os ``FileField`` de prestação de contas (despacho, comprovante,
+    relatório técnico/diário assinados, anexos) e de evento (convite, ofício
+    solicitante, documentos de solicitação). Usa ``GenericForeignKey`` + nome do
+    campo para idempotência, evitando criar uma coluna ``drive_*`` em cada
+    modelo de origem.
+    """
+
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    origem = GenericForeignKey("content_type", "object_id")
+    campo = models.CharField(
+        max_length=64,
+        blank=True,
+        default="",
+        help_text="Nome do FileField de origem (vazio quando o modelo tem um único arquivo).",
+    )
+
+    file_id = models.CharField(max_length=200)
+    url = models.URLField(max_length=500, blank=True)
+    nome = models.CharField(max_length=255, blank=True)
+    pasta_id = models.CharField(max_length=200, blank=True, default="")
+    mime_type = models.CharField(max_length=64, blank=True)
+    mock = models.BooleanField(default=False)
+    enviado_em = models.DateTimeField(auto_now_add=True)
+    atualizado_em = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Arquivo externo no Drive"
+        verbose_name_plural = "Arquivos externos no Drive"
+        ordering = ["-enviado_em"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["content_type", "object_id", "campo"],
+                name="drive_arquivo_externo_unico_por_campo",
+            )
+        ]
+        indexes = [
+            models.Index(fields=["content_type", "object_id"]),
+        ]
+
+    def __str__(self) -> str:
+        return f"Drive externo: {self.nome or self.file_id}"
