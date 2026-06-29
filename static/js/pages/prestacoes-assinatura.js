@@ -104,6 +104,14 @@
   }, 200));
 
   // ── Builder: abas ──────────────────────────────────────────────
+  function precarregarFontes() {
+    if (!document.fonts || !document.fonts.load) return;
+    fontChips.forEach(function (chip) {
+      document.fonts.load("64px " + familyName(chip.dataset.family));
+    });
+  }
+  precarregarFontes();
+
   function showSheet(show) {
     sheet.hidden = !show;
     document.body.style.overflow = show ? "hidden" : "";

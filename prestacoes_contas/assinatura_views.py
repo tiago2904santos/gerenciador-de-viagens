@@ -210,6 +210,11 @@ def publico_assinar(request, token, tipo):
     )
 
 
+def _nome_display(doc) -> str:
+    raw = doc.nome_esperado or (str(doc.signer) if doc.signer_id else "")
+    return raw.title()
+
+
 def _assinar_context(request, token, tipo, doc):
     docs = documentos_do_link(token)
     ordem = [d.tipo for d in docs]
@@ -218,7 +223,7 @@ def _assinar_context(request, token, tipo, doc):
         "token": token,
         "tipo": tipo,
         "doc_label": doc.get_tipo_display(),
-        "nome": doc.nome_esperado or (str(doc.signer) if doc.signer_id else ""),
+        "nome": _nome_display(doc),
         "fontes": FONTES_ASSINATURA,
         "pdf_url": reverse("prestacoes_contas:assinatura_pdf_origem", args=[token, tipo]),
         "post_url": reverse("prestacoes_contas:assinatura_assinar", args=[token, tipo]),
