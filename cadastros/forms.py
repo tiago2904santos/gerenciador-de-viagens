@@ -586,14 +586,27 @@ class ConfiguracaoSistemaForm(forms.ModelForm):
         self.fields["ramal"].label = "Ramal (opcional)"
         self.fields["ramal"].required = False
 
-        self.fields["uf"] = forms.ChoiceField(
+        # UF não é editável diretamente: a sigla viaja num input hidden e o nome do
+        # estado é exibido em campo somente leitura, preenchido pela consulta de CEP.
+        self.fields["uf"].required = False
+        self.fields["uf"].widget = forms.HiddenInput(attrs={"data-uf-sigla": "true"})
+        self.fields["uf_nome"] = forms.CharField(
             label="UF",
             required=False,
-            choices=_uf_choices_por_extenso(self.instance.uf if self.instance else ""),
-            widget=forms.Select(attrs={"class": "form-select"}),
+            widget=forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "readonly": "readonly",
+                    "tabindex": "-1",
+                    "data-uf-nome": "true",
+                    "placeholder": "Preenchido pelo CEP",
+                }
+            ),
         )
-        if self.instance and self.instance.pk:
-            self.initial["uf"] = self.instance.uf
+        sigla_atual = (self.instance.uf if self.instance else "") or ""
+        if sigla_atual:
+            self.initial["uf"] = sigla_atual
+            self.initial["uf_nome"] = _nome_estado_por_sigla(sigla_atual)
 
         if self.instance and self.instance.pk and not self.data:
             self.initial["cep"] = format_cep(self.instance.cep)
@@ -636,16 +649,13 @@ class ConfiguracaoSistemaForm(forms.ModelForm):
         return uf
 
 
-def _uf_choices_por_extenso(uf_atual=""):
-    estados = list(Estado.objects.order_by("nome").values_list("sigla", "nome"))
-    choices = [("", "")]
-    siglas_existentes = {sigla for sigla, _ in estados}
-    for sigla, nome in estados:
-        choices.append((sigla, nome))
-    uf_atual = (uf_atual or "").strip().upper()
-    if uf_atual and uf_atual not in siglas_existentes:
-        choices.append((uf_atual, uf_atual))
-    return choices
+def _nome_estado_por_sigla(sigla):
+    """Retorna o nome do estado (ex.: PARANÁ) a partir da sigla (ex.: PR)."""
+    sigla = (sigla or "").strip().upper()
+    if not sigla:
+        return ""
+    estado = Estado.objects.filter(sigla=sigla).only("nome").first()
+    return estado.nome if estado else sigla
 
 
 _TIPO_FIELD_MAP = [

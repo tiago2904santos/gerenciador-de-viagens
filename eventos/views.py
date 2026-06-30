@@ -198,6 +198,49 @@ def _save_destinos_extras(evento, request):
         evento.destinos_extras = []
 
 
+def _roteiro_cards_do_evento(evento):
+    """Retorna cards de roteiros do evento: diretos (roteiro.evento) + via oficios."""
+    from roteiros.models import Roteiro
+
+    roteiros = (
+        Roteiro.objects.filter(Q(evento=evento) | Q(oficios__evento=evento))
+        .distinct()
+        .order_by("-created_at")
+        .prefetch_related("destinos__cidade__estado", "trechos")
+    )
+    return [apresentar_roteiro_card(r) for r in roteiros]
+
+
+def _termos_do_evento(evento):
+    """Retorna termos do evento: diretos (termo.evento) + via oficios vinculados ao evento."""
+    from termos.models import TermoAutorizacao
+
+    return (
+        TermoAutorizacao.objects.filter(Q(evento=evento) | Q(oficio__evento=evento))
+        .distinct()
+        .select_related("destino_cidade__estado", "destino_estado", "viatura", "oficio")
+        .prefetch_related("servidores")
+        .order_by("-created_at")
+    )
+
+
+def _garantir_termo_automatico(evento):
+    """Cria um TermoAutorizacao vazio vinculado ao evento se ainda não existir nenhum."""
+    from termos.models import TermoAutorizacao
+
+    if TermoAutorizacao.objects.filter(Q(evento=evento) | Q(oficio__evento=evento)).exists():
+        return
+    from eventos.services import resolve_evento_cidade_estado
+
+    cidade, estado = resolve_evento_cidade_estado(evento)
+    TermoAutorizacao.objects.create(
+        evento=evento,
+        destino_estado=estado,
+        destino_cidade=cidade,
+        data_evento_inicio=evento.data_inicio,
+        data_evento_fim=evento.data_fim or evento.data_inicio,
+    )
+
 
 @require_http_methods(["GET"])
 def novo(request):
@@ -246,6 +289,7 @@ def detalhe(request, pk, etapa=1):
                 evento.titulo = " - ".join(parts) if parts else "Novo Evento"
             _save_destinos_extras(evento, request)
             evento.save()
+            _garantir_termo_automatico(evento)
             messages.success(request, "Dados do evento atualizados.")
             return redirect("eventos:guiado_etapa", pk=evento.pk, etapa=2)
     else:
@@ -302,10 +346,10 @@ def detalhe(request, pk, etapa=1):
             "evento": evento,
             "evento_form": form,
             "oficio_cards": [apresentar_oficio_card(oficio) for oficio in evento.oficios.all()],
-            "roteiro_cards": [apresentar_roteiro_card(roteiro) for roteiro in evento.roteiros.all()],
+            "roteiro_cards": _roteiro_cards_do_evento(evento),
             "plano_cards": [apresentar_plano_card(plano) for plano in evento.planos_trabalho.all()],
             "ordem_cards": [apresentar_ordem_servico_card(ordem) for ordem in evento.ordens_servico.all()],
-            "termos": evento.termos_autorizacao.all(),
+            "termos": _termos_do_evento(evento),
             "sede_uf": config.uf if config else "",
             "modelos_motivo_url": _reverse("oficios:modelos_motivo_index"),
             "solicitacao_anexos": solicitacao_anexos,

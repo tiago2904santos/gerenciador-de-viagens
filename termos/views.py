@@ -136,18 +136,26 @@ def _evento_etapa_url(evento_id):
     return ""
 
 
-def _termo_lista_url(termo=None, evento=None):
+def _termo_evento_id(termo=None, evento=None):
+    """Resolve o evento_id de um termo, incluindo via oficio vinculado."""
     evento_id = getattr(evento, "pk", None) or getattr(termo, "evento_id", None)
-    return _evento_etapa_url(evento_id) or reverse("termos:index")
+    if not evento_id and termo and getattr(termo, "oficio_id", None):
+        evento_id = getattr(termo.oficio, "evento_id", None)
+    return evento_id
+
+
+def _termo_lista_url(termo=None, evento=None):
+    return _evento_etapa_url(_termo_evento_id(termo=termo, evento=evento)) or reverse("termos:index")
 
 
 def _termo_back_label(termo=None, evento=None):
-    return "Dados do evento" if (getattr(evento, "pk", None) or getattr(termo, "evento_id", None)) else "Voltar a lista"
+    return "Dados do evento" if _termo_evento_id(termo=termo, evento=evento) else "Voltar a lista"
 
 
 def _redirect_termo_lista(termo):
-    if getattr(termo, "evento_id", None):
-        return redirect("eventos:guiado_etapa", pk=termo.evento_id, etapa=5)
+    evento_id = _termo_evento_id(termo=termo)
+    if evento_id:
+        return redirect("eventos:guiado_etapa", pk=evento_id, etapa=5)
     return redirect("termos:index")
 
 

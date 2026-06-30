@@ -13,7 +13,7 @@
              data-file-native="true">
       <label class="prestacao-file-picker__action" for="{{ field_id }}">Selecionar arquivos</label>
       <span class="prestacao-file-picker__value" data-file-picker-name data-default-label="Nenhum arquivo selecionado">Nenhum arquivo selecionado</span>
-      <button class="prestacao-file-picker__clear" type="button" data-file-clear-selection hidden>Limpar seleção</button>
+      <div class="prestacao-file-picker__inline-actions" data-file-inline-actions hidden></div>
       <button class="prestacao-file-picker__upload" type="submit" data-file-upload-button disabled>Anexar</button>
     </div>
     <div class="prestacao-file-selection" data-file-selection-dropdown hidden>
@@ -32,10 +32,21 @@
           <span class="prestacao-file-widget__subtitle" data-file-selection-size></span>
         </div>
         <div class="prestacao-file-widget__actions">
+          <a class="cv-icon-btn cv-icon-btn--preview prestacao-file-widget__action"
+             href=""
+             target="_blank"
+             rel="noopener noreferrer"
+             aria-label="Abrir arquivo selecionado"
+             data-tooltip="Abrir"
+             title="Abrir"
+             data-file-preview-selection>
+            {% include "dev/ui_lab/partials/_cv_icon.html" with icon="eye" only %}
+          </a>
           <button class="cv-icon-btn cv-icon-btn--delete prestacao-file-widget__action"
                   type="button"
                   aria-label="Remover arquivo da seleção"
                   data-tooltip="Remover"
+                  title="Remover"
                   data-file-remove-selection>
             {% include "dev/ui_lab/partials/_cv_icon.html" with icon="delete" only %}
           </button>

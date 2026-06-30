@@ -15,6 +15,10 @@ from .base import *
 
 DEBUG = True
 
+# OAuth do Google Drive em dev usa callback http://localhost; o oauthlib
+# recusa transporte não-HTTPS por padrão. Liberado apenas em dev.
+os.environ.setdefault("OAUTHLIB_INSECURE_TRANSPORT", "1")
+
 # No Windows, WeasyPrint costuma faltar GTK; LibreOffice pode não estar instalado.
 # Habilita PDF mínimo (fpdf2) como último recurso, salvo override explícito no .env.
 if sys.platform == "win32" and "DOCUMENTOS_SIMPLE_PDF_FALLBACK" not in os.environ:

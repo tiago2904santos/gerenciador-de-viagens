@@ -77,10 +77,10 @@
               <div class="oficio-lc__traveller-body">
                 <div class="oficio-lc__traveller-name-row">
                   <span class="oficio-lc__traveller-name">{{ s.name }}</span>
+                  {% if s.cargo or s.unidade or s.telefone %}
+                  <span class="oficio-lc__traveller-meta">{% if s.cargo %}{{ s.cargo }}{% endif %}{% if s.cargo and s.unidade %} · {% endif %}{% if s.unidade %}{{ s.unidade }}{% endif %}{% if s.telefone %} · {{ s.telefone }}{% endif %}</span>
+                  {% endif %}
                 </div>
-                {% if s.cargo or s.unidade or s.telefone %}
-                <span class="oficio-lc__traveller-meta">{% if s.cargo %}{{ s.cargo }}{% endif %}{% if s.cargo and s.unidade %} · {% endif %}{% if s.unidade %}{{ s.unidade }}{% endif %}{% if s.telefone %} · {{ s.telefone }}{% endif %}</span>
-                {% endif %}
               </div>
               {% if s.has_termo and s.termo_open_url %}
               <div class="oficio-lc__traveller-termo cv-icon-btn-group">

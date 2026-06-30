@@ -233,6 +233,12 @@
   overflow: hidden;
 }
 
+.prestacao-file-selection__toggle[hidden] + .prestacao-file-selection__menu {
+  border-top: 1px solid var(--cv-field-border-focus, var(--color-primary));
+  border-top-left-radius: var(--radius-control, 8px);
+  border-top-right-radius: var(--radius-control, 8px);
+}
+
 .prestacao-file-selection__list {
   list-style: none;
   margin: 0;
@@ -251,9 +257,6 @@
   transition: background var(--transition-fast);
 }
 
-.prestacao-file-selection__item:first-child {
-  background: color-mix(in srgb, var(--color-white, #fff) 5%, transparent);
-}
 
 .prestacao-file-selection__item:hover {
   background: color-mix(in srgb, var(--color-primary, #0b3a66) 18%, transparent);
@@ -440,8 +443,20 @@
 }
 
 .prestacao-file-picker__upload:disabled {
-  cursor: not-allowed;
-  opacity: 0.45;
+  display: none;
+}
+
+.prestacao-file-picker__inline-actions {
+  align-items: center;
+  border-left: 1px solid var(--cv-field-border, var(--color-border-soft));
+  display: flex;
+  flex: 0 0 auto;
+  gap: var(--space-1);
+  padding: 0 var(--space-3);
+}
+
+.prestacao-file-picker__inline-actions[hidden] {
+  display: none;
 }
 
 @media (max-width: 900px) {

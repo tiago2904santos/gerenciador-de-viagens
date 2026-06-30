@@ -75,7 +75,9 @@
       if (fields.logradouro) fields.logradouro.value = payload.logradouro || "";
       if (fields.bairro) fields.bairro.value = payload.bairro || "";
       if (fields.cidade) fields.cidade.value = (payload.cidade || "").toUpperCase();
+      // UF: sigla vai no input hidden; o nome do estado é exibido no campo somente leitura.
       if (fields.uf) fields.uf.value = (payload.uf || "").toUpperCase();
+      if (fields.ufNome) fields.ufNome.value = (payload.estado || payload.uf || "").toUpperCase();
       return true;
     } catch (_error) {
       setFieldError(cepInput, "Não foi possível consultar o CEP agora.");
@@ -84,7 +86,7 @@
   }
 
   function initConfiguracoesForm(form) {
-    ["#id_divisao", "#id_unidade", "#id_logradouro", "#id_bairro", "#id_cidade_endereco", "#id_uf"].forEach(
+    ["#id_divisao", "#id_unidade", "#id_logradouro", "#id_bairro", "#id_cidade_endereco"].forEach(
       (selector) => {
         const input = form.querySelector(selector);
         if (!input) return;
@@ -107,6 +109,7 @@
       bairro: form.querySelector("#id_bairro"),
       cidade: form.querySelector("#id_cidade_endereco"),
       uf: form.querySelector("#id_uf"),
+      ufNome: form.querySelector("#id_uf_nome"),
     };
 
     let lastCepLookup = "";
@@ -125,13 +128,6 @@
 
     cepInput.addEventListener("input", maybeLookup);
     cepInput.addEventListener("blur", maybeLookup);
-
-    const ufInput = form.querySelector("#id_uf");
-    if (ufInput) {
-      ufInput.addEventListener("blur", () => {
-        ufInput.value = (ufInput.value || "").toUpperCase().slice(0, 2);
-      });
-    }
 
     const telefoneInput = form.querySelector("#id_telefone");
     if (telefoneInput) {

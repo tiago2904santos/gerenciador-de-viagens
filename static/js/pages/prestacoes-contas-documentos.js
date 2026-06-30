@@ -40,7 +40,6 @@
     if (!source || source.type !== "file") return;
     var picker = source.closest("[data-file-picker]");
     var nameTarget = picker ? picker.querySelector("[data-file-picker-name]") : null;
-    var clearButton = picker ? picker.querySelector("[data-file-clear-selection]") : null;
     var uploadButton = picker ? picker.querySelector("[data-file-upload-button]") : null;
     if (!nameTarget) return;
     var count = source.files ? source.files.length : 0;
@@ -53,7 +52,6 @@
       : nameTarget.getAttribute("data-default-label") || "Nenhum arquivo selecionado";
     }
     nameTarget.classList.toggle("prestacao-file-picker__value--selected", hasFiles);
-    if (clearButton) clearButton.hidden = !hasFiles;
     if (uploadButton) uploadButton.disabled = !hasFiles;
     renderSelectionDropdown(source);
   }
@@ -81,18 +79,20 @@
     var menu = picker ? picker.querySelector("[data-file-selection-menu]") : null;
     var list = picker ? picker.querySelector("[data-file-selection-list]") : null;
     var template = picker ? picker.querySelector("[data-file-selection-template]") : null;
+    var inlineSlot = picker ? picker.querySelector("[data-file-inline-actions]") : null;
     if (!dropdown || !toggle || !summary || !menu || !list || !template) return;
 
     revokeSelectionUrls(picker);
     var files = input.files ? Array.prototype.slice.call(input.files) : [];
     list.innerHTML = "";
-    dropdown.hidden = !files.length;
+    if (inlineSlot) inlineSlot.innerHTML = "";
+
+    if (inlineSlot) { inlineSlot.innerHTML = ""; inlineSlot.hidden = true; }
+
     if (!files.length) {
-      setSelectionDropdownOpen(dropdown, false);
+      dropdown.hidden = true;
       return;
     }
-    summary.textContent = files.length === 1 ? files[0].name : files.length + " arquivos selecionados";
-    setSelectionDropdownOpen(dropdown, true);
 
     files.forEach(function (file, index) {
       var row = template.content.firstElementChild.cloneNode(true);
@@ -110,6 +110,10 @@
       if (preview) preview.setAttribute("href", url);
       list.appendChild(row);
     });
+
+    if (toggle) toggle.hidden = true;
+    menu.hidden = false;
+    dropdown.hidden = false;
   }
 
   function setSelectionDropdownOpen(dropdown, isOpen) {
@@ -157,6 +161,7 @@
   }
 
   function fileSelectionIndex(button) {
+    if (button.closest("[data-file-inline-actions]")) return 0;
     var row = button.closest("[data-file-selection-index]");
     if (!row) return -1;
     var index = Number(row.getAttribute("data-file-selection-index"));

@@ -81,21 +81,6 @@ NAVIGATION_ITEMS = [
         "icon": "PC",
         "active_when": ["prestacoes_contas:"],
     },
-    {
-        "id": "integracoes",
-        "label": "Integrações",
-        "url_name": "google_drive:index",
-        "icon": "IG",
-        "active_when": ["google_drive:"],
-        "children": [
-            {
-                "id": "integracoes-google-drive",
-                "label": "Google Drive",
-                "url_name": "google_drive:index",
-                "active_when": ["google_drive:"],
-            },
-        ],
-    },
 ]
 
 if settings.DEBUG:

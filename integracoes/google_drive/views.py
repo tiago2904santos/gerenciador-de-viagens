@@ -77,7 +77,7 @@ def oauth_callback(request):
 
     if "error" in request.GET:
         messages.error(request, f"Autorização recusada: {request.GET['error']}")
-        return redirect("google_drive:index")
+        return redirect("cadastros:configuracao")
 
     try:
         flow = Flow.from_client_config(
@@ -108,7 +108,7 @@ def oauth_callback(request):
     except Exception as exc:
         messages.error(request, f"Erro ao completar autorização: {exc}")
 
-    return redirect("google_drive:index")
+    return redirect("cadastros:configuracao")
 
 
 @login_required
@@ -117,7 +117,7 @@ def oauth_revogar(request):
     DriveCredenciais.objects.all().delete()
     _reset_client()
     messages.success(request, "Conta Google desconectada.")
-    return redirect("google_drive:index")
+    return redirect("cadastros:configuracao")
 
 
 # ---------------------------------------------------------------------------
@@ -164,12 +164,12 @@ def salvar_pasta_raiz(request):
 
     if not pasta_id:
         messages.error(request, "Nenhuma pasta selecionada.")
-        return redirect("google_drive:index")
+        return redirect("cadastros:configuracao")
 
     creds = DriveCredenciais.objects.first()
     if not creds:
         messages.error(request, "Conta Google não conectada.")
-        return redirect("google_drive:index")
+        return redirect("cadastros:configuracao")
 
     if not pasta_nome:
         try:
@@ -182,4 +182,4 @@ def salvar_pasta_raiz(request):
     creds.save(update_fields=["pasta_raiz_id", "pasta_raiz_nome", "atualizado_em"])
     _reset_client()
     messages.success(request, f"Pasta \"{pasta_nome}\" definida como diretório de destino.")
-    return redirect("google_drive:index")
+    return redirect("cadastros:configuracao")

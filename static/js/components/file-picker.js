@@ -11,43 +11,52 @@
     picker._fpObjectUrls = [];
   }
 
+  function buildListItem(tpl, file, index, objectUrls) {
+    var row     = tpl.content.firstElementChild.cloneNode(true);
+    var nameEl  = row.querySelector("[data-file-selection-name]");
+    var sizeEl  = row.querySelector("[data-file-selection-size]");
+    var preview = row.querySelector("[data-file-preview-selection]");
+    var url     = URL.createObjectURL(file);
+    row.setAttribute("data-file-selection-index", String(index));
+    objectUrls.push(url);
+    if (nameEl) { nameEl.textContent = file.name; nameEl.title = file.name; }
+    if (sizeEl) sizeEl.textContent = "Selecionado · " + formatFileSize(file.size);
+    if (preview) preview.href = url;
+    return row;
+  }
+
   function renderDropdown(picker, input) {
-    var dropdown = picker.querySelector("[data-file-selection-dropdown]");
-    var summary  = picker.querySelector("[data-file-selection-summary]");
-    var menu     = picker.querySelector("[data-file-selection-menu]");
-    var list     = picker.querySelector("[data-file-selection-list]");
-    var tpl      = picker.querySelector("[data-file-selection-template]");
+    var dropdown    = picker.querySelector("[data-file-selection-dropdown]");
+    var summary     = picker.querySelector("[data-file-selection-summary]");
+    var menu        = picker.querySelector("[data-file-selection-menu]");
+    var list        = picker.querySelector("[data-file-selection-list]");
+    var tpl         = picker.querySelector("[data-file-selection-template]");
+    var toggle      = picker.querySelector("[data-file-selection-toggle]");
+    var inlineSlot  = picker.querySelector("[data-file-inline-actions]");
     if (!dropdown || !summary || !menu || !list || !tpl) return;
 
     revokeUrls(picker);
     var files = input.files ? Array.prototype.slice.call(input.files) : [];
     list.innerHTML = "";
-    dropdown.hidden = !files.length;
-    if (!files.length) return;
+    if (inlineSlot) { inlineSlot.innerHTML = ""; inlineSlot.hidden = true; }
 
-    summary.textContent = files.length === 1 ? files[0].name : files.length + " arquivos selecionados";
-    var toggle = picker.querySelector("[data-file-selection-toggle]");
-    if (toggle) toggle.setAttribute("aria-expanded", "true");
-    menu.hidden = false;
+    if (!files.length) {
+      dropdown.hidden = true;
+      return;
+    }
 
     files.forEach(function (file, index) {
-      var row     = tpl.content.firstElementChild.cloneNode(true);
-      var nameEl  = row.querySelector("[data-file-selection-name]");
-      var sizeEl  = row.querySelector("[data-file-selection-size]");
-      var preview = row.querySelector("[data-file-preview-selection]");
-      var url     = URL.createObjectURL(file);
-      row.setAttribute("data-file-selection-index", String(index));
-      picker._fpObjectUrls.push(url);
-      if (nameEl) { nameEl.textContent = file.name; nameEl.title = file.name; }
-      if (sizeEl) sizeEl.textContent = "Selecionado · " + formatFileSize(file.size);
-      if (preview) preview.href = url;
+      var row = buildListItem(tpl, file, index, picker._fpObjectUrls);
       list.appendChild(row);
     });
+
+    if (toggle) toggle.hidden = true;
+    menu.hidden = false;
+    dropdown.hidden = false;
   }
 
   function updatePickerState(picker, input) {
     var nameTarget   = picker.querySelector("[data-file-picker-name]");
-    var clearButton  = picker.querySelector("[data-file-clear-selection]");
     var uploadButton = picker.querySelector("[data-file-upload-button]");
     var count   = input.files ? input.files.length : 0;
     var hasFiles = count > 0;
@@ -60,7 +69,6 @@
           : nameTarget.getAttribute("data-default-label") || "Nenhum arquivo selecionado";
       nameTarget.classList.toggle("prestacao-file-picker__value--selected", hasFiles);
     }
-    if (clearButton) clearButton.hidden = !hasFiles;
     if (uploadButton) uploadButton.disabled = !hasFiles;
     renderDropdown(picker, input);
   }
@@ -104,8 +112,12 @@
 
       var removeBtn = event.target.closest("[data-file-remove-selection]");
       if (removeBtn) {
+        // Find index: check inline slot (single file = index 0) or list row
         var row = removeBtn.closest("[data-file-selection-index]");
-        var idx = row ? Number(row.getAttribute("data-file-selection-index")) : -1;
+        var idx = row ? Number(row.getAttribute("data-file-selection-index")) : 0;
+        // If button is in inline slot, always index 0
+        var inlineSlot = picker.querySelector("[data-file-inline-actions]");
+        if (inlineSlot && inlineSlot.contains(removeBtn)) idx = 0;
         removeFile(picker, input, idx);
         return;
       }
@@ -127,4 +139,4 @@
   } else {
     init();
   }
-})();
+}());

@@ -845,6 +845,11 @@ def viatura_update(request, pk):
 
 
 def configuracao_sistema(request):
+    from django.conf import settings
+
+    from integracoes.google_drive.models import DriveArquivo, DriveCredenciais
+    from integracoes.google_drive.services import esta_autorizado, get_pasta_raiz_id
+
     from .models import ConfiguracaoSistema
 
     obj = ConfiguracaoSistema.get_singleton()
@@ -865,6 +870,9 @@ def configuracao_sistema(request):
             )
         messages.success(request, "Configurações salvas com sucesso.")
         return redirect("cadastros:configuracao")
+
+    cfg_drive = getattr(settings, "GOOGLE_DRIVE", {})
+    drive_creds = DriveCredenciais.objects.first()
     return render(
         request,
         "cadastros/configuracao/form.html",
@@ -876,6 +884,13 @@ def configuracao_sistema(request):
             "submit_label": "Salvar configuração",
             "submit_icon": "check",
             "back_url": reverse("core:dashboard"),
+            # Google Drive
+            "drive_autorizado": esta_autorizado(),
+            "drive_creds": drive_creds,
+            "drive_pasta_raiz_id": get_pasta_raiz_id(),
+            "drive_pasta_raiz_nome": drive_creds.pasta_raiz_nome if drive_creds else "",
+            "drive_total_arquivos": DriveArquivo.objects.count(),
+            "drive_modo_ativo": cfg_drive.get("MODO", "mock").lower() != "mock",
         },
     )
 

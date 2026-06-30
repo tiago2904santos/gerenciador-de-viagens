@@ -1,6 +1,10 @@
 from django import forms
 
-from .models import Evento, ModeloMotivoEvento
+from cadastros.models import ConfiguracaoSistema
+from oficios.forms import ModeloMotivoSelect
+from oficios.models import ModeloMotivoOficio
+
+from .models import Evento
 
 _ESTADOS_CHOICES = [
     ("", "Selecione o estado"),
@@ -34,25 +38,10 @@ _ESTADOS_CHOICES = [
 ]
 
 
-class ModeloMotivoSelect(forms.Select):
-    def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
-        option = super().create_option(name, value, label, selected, index, subindex=subindex, attrs=attrs)
-        modelo = getattr(value, "instance", None)
-        if modelo is None:
-            return option
-
-        option["attrs"].update(
-            {
-                "data-texto-motivo": (modelo.texto or "").strip(),
-            },
-        )
-        return option
-
-
 class EventoNovoCadastroForm(forms.ModelForm):
     modelo_motivo = forms.ModelChoiceField(
         label="Modelo de motivo",
-        queryset=ModeloMotivoEvento.objects.none(),
+        queryset=ModeloMotivoOficio.objects.none(),
         required=False,
         empty_label="Selecione um modelo (opcional)",
         widget=ModeloMotivoSelect(attrs={"class": "form-select", "data-modelo-motivo-select": "true"}),
@@ -122,10 +111,17 @@ class EventoNovoCadastroForm(forms.ModelForm):
         self.fields["tipo"].required = False
         self.fields["data_inicio"].required = False
         self.fields["data_fim"].required = False
-        self.fields["modelo_motivo"].queryset = ModeloMotivoEvento.objects.filter(ativo=True)
+        self.fields["modelo_motivo"].queryset = ModeloMotivoOficio.objects.filter(ativo=True).order_by(
+            "ordem", "nome"
+        )
         # Populate tipo_outro from instance if available
         if self.instance and self.instance.pk:
             self.fields["tipo_outro"].initial = self.instance.tipo_outro
+        # Pré-preenche a UF de destino com o estado padrão das configurações (eventos sem destino definido)
+        if not self.is_bound and not (self.instance and self.instance.destino_uf):
+            uf_padrao = ConfiguracaoSistema.get_singleton().uf
+            if uf_padrao:
+                self.initial["destino_uf"] = uf_padrao
 
     def clean(self):
         cleaned = super().clean()

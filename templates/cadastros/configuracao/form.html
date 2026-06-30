@@ -45,7 +45,8 @@
                 <div class="field-grid field-grid--cols-3">
                   {% include "components/forms/form_field.html" with field=form.bairro size_class="field-size-1" only %}
                   {% include "components/forms/form_field.html" with field=form.cidade_endereco size_class="field-size-1" only %}
-                  {% include "components/forms/form_field.html" with field=form.uf size_class="field-size-1" only %}
+                  {% include "components/forms/form_field.html" with field=form.uf_nome size_class="field-size-1" only %}
+                  {{ form.uf }}
                 </div>
                 <div class="field-grid field-grid--cols-4">
                   {% include "components/forms/form_field.html" with field=form.email size_class="field-size-2" only %}
@@ -76,6 +77,164 @@
             {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar" secondary_url=back_url primary_label="Salvar" only %}
           </section>
         </form>
+
+        {# CARD 3 — Google Drive #}
+        <section class="cv-wizard-section-card" aria-labelledby="config-card-gdrive-title">
+          <header class="cv-wizard-section-header">
+            <div class="cv-wizard-section-header__copy">
+              <h3 class="cv-wizard-section-title" id="config-card-gdrive-title">Google Drive</h3>
+              <p class="cv-wizard-section-subtitle">
+                Conecte uma conta Google para salvar documentos automaticamente no Drive.
+              </p>
+            </div>
+            <div class="cv-wizard-section-header__meta">
+              {% if drive_autorizado %}
+                {% include "components/ui/badges/chip.html" with tone="success" label="Conectada" only %}
+              {% else %}
+                {% include "components/ui/badges/chip.html" with tone="warning" label="Não conectada" only %}
+              {% endif %}
+              {% if not drive_modo_ativo %}
+                {% include "components/ui/badges/chip.html" with tone="muted" label="Modo mock" size="compact" only %}
+              {% endif %}
+            </div>
+          </header>
+
+          <div class="cv-wizard-section-body">
+
+            {# Seção: Conta Google #}
+            <section class="wizard-inner-section" aria-labelledby="gdrive-conta-section">
+              <header class="wizard-inner-section__header">
+                <h4 class="wizard-inner-section__title" id="gdrive-conta-section">Conta Google</h4>
+              </header>
+              {% if drive_autorizado and drive_creds %}
+                <div class="gdrive-conta-info">
+                  <dl class="field-meta-list">
+                    <dt>Autorizado em</dt>
+                    <dd>{{ drive_creds.criado_em|date:"d/m/Y \à\s H:i" }}</dd>
+                    <dt>Última renovação</dt>
+                    <dd>{{ drive_creds.atualizado_em|date:"d/m/Y \à\s H:i" }}</dd>
+                    {% if drive_creds.token_expiry %}
+                      <dt>Token expira em</dt>
+                      <dd>{{ drive_creds.token_expiry|date:"d/m/Y H:i" }}</dd>
+                    {% endif %}
+                  </dl>
+                </div>
+                <div style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                  <form method="post" action="{% url 'google_drive:oauth_revogar' %}"
+                        onsubmit="return confirm('Desconectar a conta Google vai remover os tokens salvos. Continuar?')">
+                    {% csrf_token %}
+                    <button type="submit" class="cv-btn cv-btn--danger">Desconectar conta</button>
+                  </form>
+                  <a href="{% url 'google_drive:oauth_iniciar' %}" class="cv-btn cv-btn--secondary">
+                    Trocar conta
+                  </a>
+                </div>
+              {% else %}
+                <p class="field-help-text">
+                  Clique em <strong>Conectar</strong> para autorizar o acesso ao Google Drive.
+                  Você será redirecionado ao Google e voltará automaticamente após confirmar.
+                </p>
+                <div style="margin-top: 1rem;">
+                  <a href="{% url 'google_drive:oauth_iniciar' %}" class="cv-btn cv-btn--primary">
+                    Conectar conta Google
+                  </a>
+                </div>
+              {% endif %}
+            </section>
+
+            {# Seção: Diretório de destino #}
+            <section class="wizard-inner-section{% if not drive_autorizado %} is-disabled{% endif %}"
+                     aria-labelledby="gdrive-pasta-section"
+                     {% if not drive_autorizado %}aria-disabled="true"{% endif %}>
+              <header class="wizard-inner-section__header">
+                <h4 class="wizard-inner-section__title" id="gdrive-pasta-section">Diretório de destino</h4>
+                {% if drive_pasta_raiz_id %}
+                  <div>{% include "components/ui/badges/chip.html" with tone="success" label="Pasta configurada" only %}</div>
+                {% endif %}
+              </header>
+              {% if not drive_autorizado %}
+                <p class="field-help-text gdrive-disabled-hint">
+                  Conecte uma conta Google primeiro para poder navegar e selecionar pastas.
+                </p>
+              {% else %}
+                {% if drive_pasta_raiz_id %}
+                  <div class="gdrive-pasta-atual" style="margin-bottom: 1rem;">
+                    <p class="field-label">Pasta atual</p>
+                    <div class="gdrive-pasta-selecionada">
+                      <span class="gdrive-pasta-selecionada__icon" aria-hidden="true">📁</span>
+                      <span class="gdrive-pasta-selecionada__nome">{{ drive_pasta_raiz_nome|default:drive_pasta_raiz_id }}</span>
+                      <a href="https://drive.google.com/drive/folders/{{ drive_pasta_raiz_id }}"
+                         target="_blank" rel="noopener"
+                         class="gdrive-pasta-selecionada__link">Ver no Drive ↗</a>
+                    </div>
+                  </div>
+                {% endif %}
+
+                <div class="gdrive-folder-browser" id="gdrive-folder-browser"
+                     data-url-listar="{% url 'google_drive:api_listar_pastas' %}"
+                     data-url-criar="{% url 'google_drive:api_criar_pasta' %}"
+                     data-url-salvar="{% url 'google_drive:salvar_pasta_raiz' %}"
+                     data-csrf="{{ csrf_token }}">
+
+                  <div class="gdrive-browser-toolbar">
+                    <button type="button" class="cv-btn cv-btn--secondary cv-btn--sm" id="gdrive-btn-carregar">
+                      {% if drive_pasta_raiz_id %}Navegar pastas{% else %}Carregar pastas do Drive{% endif %}
+                    </button>
+                    <button type="button" class="cv-btn cv-btn--ghost cv-btn--sm" id="gdrive-btn-voltar" hidden>
+                      ← Voltar
+                    </button>
+                    <span class="gdrive-breadcrumb" id="gdrive-breadcrumb"></span>
+                  </div>
+
+                  <div class="gdrive-browser-body" id="gdrive-browser-body" hidden>
+                    <div class="gdrive-folder-list" id="gdrive-folder-list" role="list"></div>
+                    <p class="gdrive-folder-empty" id="gdrive-folder-empty" hidden>
+                      Nenhuma pasta encontrada neste diretório.
+                    </p>
+                    <div class="gdrive-loading" id="gdrive-loading" aria-live="polite">
+                      <span class="gdrive-spinner" aria-hidden="true"></span> Carregando…
+                    </div>
+                  </div>
+
+                  <div class="gdrive-new-folder" id="gdrive-new-folder" hidden>
+                    <div class="gdrive-new-folder__form">
+                      <input type="text" id="gdrive-nova-pasta-nome"
+                             class="cv-input"
+                             placeholder="Nome da nova pasta"
+                             maxlength="255"
+                             aria-label="Nome da nova pasta">
+                      <button type="button" class="cv-btn cv-btn--secondary cv-btn--sm" id="gdrive-btn-criar">
+                        Criar pasta
+                      </button>
+                    </div>
+                    <p class="field-help-text">A pasta será criada no diretório atual.</p>
+                  </div>
+
+                  <form method="post" action="{% url 'google_drive:salvar_pasta_raiz' %}" id="gdrive-form-salvar">
+                    {% csrf_token %}
+                    <input type="hidden" name="pasta_raiz_id" id="gdrive-input-pasta-id">
+                    <input type="hidden" name="pasta_raiz_nome" id="gdrive-input-pasta-nome">
+                  </form>
+
+                  <div class="gdrive-browser-actions" id="gdrive-browser-actions" hidden>
+                    <button type="button" class="cv-btn cv-btn--ghost cv-btn--sm" id="gdrive-btn-toggle-criar">
+                      + Criar nova pasta aqui
+                    </button>
+                    <button type="button" class="cv-btn cv-btn--primary" id="gdrive-btn-selecionar" disabled>
+                      Usar esta pasta como destino
+                    </button>
+                  </div>
+                </div>
+
+                <p class="field-help-text" style="margin-top: 0.5rem;">
+                  Total de arquivos já enviados ao Drive: <strong>{{ drive_total_arquivos }}</strong>
+                </p>
+              {% endif %}
+            </section>
+
+          </div>
+        </section>
+
       </div>
     </main>
   </div>
@@ -83,4 +242,5 @@
 
 {% block extra_js %}
   <script src="{% static 'js/pages/configuracoes.js' %}" defer></script>
+  <script src="{% static 'js/pages/gdrive_config.js' %}" defer></script>
 {% endblock %}

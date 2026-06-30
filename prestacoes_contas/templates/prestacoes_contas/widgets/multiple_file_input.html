@@ -3,7 +3,7 @@
     <input type="{{ widget.type }}" name="{{ widget.name }}"{% for name, value in widget.attrs.items %}{% if value is not False %} {{ name }}{% if value is not True %}="{{ value|stringformat:'s' }}"{% endif %}{% endif %}{% endfor %} data-file-native="true">
     <label class="prestacao-file-picker__action" for="{{ widget.attrs.id }}">Selecionar arquivos</label>
     <span class="prestacao-file-picker__value" data-file-picker-name data-default-label="Nenhum arquivo selecionado">Nenhum arquivo selecionado</span>
-    <button class="prestacao-file-picker__clear" type="button" data-file-clear-selection hidden>Limpar seleção</button>
+    <div class="prestacao-file-picker__inline-actions" data-file-inline-actions hidden></div>
     <button class="prestacao-file-picker__upload" type="button" data-file-upload-button disabled>Anexar</button>
   </div>
   <div class="prestacao-file-selection" data-file-selection-dropdown hidden>
