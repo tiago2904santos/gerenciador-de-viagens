@@ -9,6 +9,7 @@ from django.conf import settings
 logger = logging.getLogger(__name__)
 
 _FOLDER_MIME = "application/vnd.google-apps.folder"
+_SHORTCUT_MIME = "application/vnd.google-apps.shortcut"
 _SCOPES = ["https://www.googleapis.com/auth/drive.file"]
 
 _MIMETYPES = {
@@ -66,8 +67,30 @@ class _MockClient:
         return fake_id, fake_url
 
     def get_or_create_pasta(self, nome: str, pai_id: str | None = None) -> str:
-        fake_id = f"mock-pasta-{nome}"
+        fake_id = f"mock-pasta-{pai_id or 'root'}-{nome}"
         logger.debug("[Drive MOCK] get_or_create_pasta nome=%s pai_id=%s", nome, pai_id)
+        return fake_id
+
+    def mover_renomear(self, file_id: str, novo_nome: str, nova_pasta_id: str | None = None) -> str:
+        logger.info(
+            "[Drive MOCK] mover_renomear file_id=%s nome=%s pasta_id=%s",
+            file_id,
+            novo_nome,
+            nova_pasta_id,
+        )
+        return file_id
+
+    def criar_ou_atualizar_atalho(
+        self, nome: str, target_id: str, pasta_id: str, existing_id: str | None = None
+    ) -> str:
+        fake_id = existing_id or f"mock-atalho-{pasta_id}-{nome}"
+        logger.info(
+            "[Drive MOCK] atalho nome=%s target=%s pasta_id=%s → %s",
+            nome,
+            target_id,
+            pasta_id,
+            fake_id,
+        )
         return fake_id
 
     def listar_pastas(self, pai_id: str | None = None) -> list[dict]:
@@ -190,6 +213,45 @@ class _RealClient:
         except Exception:
             return pasta_id
 
+    def mover_renomear(self, file_id: str, novo_nome: str, nova_pasta_id: str | None = None) -> str:
+        """Renomeia e/ou move um arquivo já existente (criado pelo app)."""
+        kwargs: dict = {"fileId": file_id, "body": {"name": novo_nome}, "fields": "id"}
+        if nova_pasta_id:
+            atual = self._svc.files().get(fileId=file_id, fields="parents").execute()
+            pais_atuais = atual.get("parents", []) or []
+            if nova_pasta_id not in pais_atuais or len(pais_atuais) > 1:
+                kwargs["addParents"] = nova_pasta_id
+                if pais_atuais:
+                    kwargs["removeParents"] = ",".join(pais_atuais)
+        self._svc.files().update(**kwargs).execute()
+        logger.info(
+            "[Drive] mover_renomear file_id=%s nome=%s pasta_id=%s",
+            file_id,
+            novo_nome,
+            nova_pasta_id,
+        )
+        return file_id
+
+    def criar_ou_atualizar_atalho(
+        self, nome: str, target_id: str, pasta_id: str, existing_id: str | None = None
+    ) -> str:
+        """Cria (ou renomeia/move) um atalho do Drive apontando para ``target_id``."""
+        if existing_id:
+            try:
+                self.mover_renomear(existing_id, nome, pasta_id)
+                return existing_id
+            except Exception as exc:
+                logger.warning("[Drive] atalho %s inválido, recriando: %s", existing_id, exc)
+        meta = {
+            "name": nome,
+            "mimeType": _SHORTCUT_MIME,
+            "parents": [pasta_id],
+            "shortcutDetails": {"targetId": target_id},
+        }
+        result = self._svc.files().create(body=meta, fields="id").execute()
+        logger.info("[Drive] atalho criado nome=%s target=%s → id=%s", nome, target_id, result["id"])
+        return result["id"]
+
 
 # ---------------------------------------------------------------------------
 # Singleton lazy
@@ -237,23 +299,15 @@ def esta_autorizado() -> bool:
 # ---------------------------------------------------------------------------
 
 def upload_artefato(artefato) -> tuple[str, str] | None:
-    raiz_id = get_pasta_raiz_id() or None
+    """Envia um artefato ao Drive, organizado por evento/categoria com nome bonito.
 
+    Delega ao ``organizer`` (import tardio para evitar import circular). O
+    organizador é idempotente: cria/atualiza o ``DriveArquivo`` correspondente.
+    """
     try:
-        client = get_client()
-        now = datetime.now()
-        ano_id = client.get_or_create_pasta(str(now.year), raiz_id)
-        mes_id = client.get_or_create_pasta(f"{now.month:02d}", ano_id)
+        from . import organizer
 
-        artefato.arquivo.open("rb")
-        try:
-            conteudo = artefato.arquivo.read()
-        finally:
-            artefato.arquivo.close()
-
-        nome = artefato.arquivo.name.rsplit("/", 1)[-1]
-        mime = mimetype_para_formato(artefato.formato)
-        return client.upload(nome, conteudo, mime, pasta_id=mes_id)
+        return organizer.organizar_artefato(artefato)
     except Exception as exc:
         logger.error("[Drive] falha ao enviar artefato %s: %s", getattr(artefato, "pk", "?"), exc, exc_info=True)
         return None

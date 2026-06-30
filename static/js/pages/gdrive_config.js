@@ -214,9 +214,111 @@
       .replace(/"/g, "&quot;");
   }
 
+  function initPreviaMassa(container) {
+    const urlPrevia = container.dataset.urlPrevia;
+    const btnPrevia = document.getElementById("gdrive-btn-previa");
+    const previaBox = document.getElementById("gdrive-previa");
+    const previaLista = document.getElementById("gdrive-previa-lista");
+    const previaAviso = document.getElementById("gdrive-previa-aviso");
+    if (!btnPrevia || !urlPrevia) return;
+
+    btnPrevia.addEventListener("click", async () => {
+      const original = btnPrevia.textContent;
+      btnPrevia.disabled = true;
+      btnPrevia.textContent = "Carregando…";
+      try {
+        const resp = await fetch(urlPrevia, { headers: { "X-Requested-With": "XMLHttpRequest" } });
+        const data = await resp.json();
+        previaLista.innerHTML = "";
+        if (data.erro) {
+          previaAviso.hidden = false;
+          previaAviso.textContent = "Erro ao gerar prévia: " + data.erro;
+        } else {
+          const linhas = data.linhas || [];
+          if (linhas.length === 0) {
+            const li = document.createElement("li");
+            li.textContent = "Nenhum arquivo a organizar.";
+            previaLista.appendChild(li);
+          } else {
+            linhas.forEach((linha) => {
+              const li = document.createElement("li");
+              li.textContent = linha;
+              previaLista.appendChild(li);
+            });
+          }
+          previaAviso.hidden = !data.truncado;
+          if (data.truncado) {
+            previaAviso.textContent = "Mostrando as primeiras " + linhas.length + " linhas (há mais).";
+          }
+        }
+        previaBox.hidden = false;
+      } catch (e) {
+        previaAviso.hidden = false;
+        previaAviso.textContent = "Falha ao carregar a prévia.";
+        previaBox.hidden = false;
+      } finally {
+        btnPrevia.disabled = false;
+        btnPrevia.textContent = original;
+      }
+    });
+  }
+
+  function initStatusMassa(container) {
+    const urlStatus = container.dataset.urlStatus;
+    const box = document.getElementById("gdrive-status");
+    const texto = document.getElementById("gdrive-status-texto");
+    if (!urlStatus || !box || !texto) return;
+
+    let timer = null;
+
+    function render(data) {
+      if (!data || !data.existe) {
+        box.hidden = true;
+        return;
+      }
+      box.hidden = false;
+      if (data.em_andamento) {
+        const total = data.total_eventos || 0;
+        const feitos = data.eventos_processados || 0;
+        const sufixo = total ? ` (${feitos}/${total} eventos)` : "";
+        texto.textContent = "Em andamento…" + sufixo;
+      } else if (data.status === "concluida") {
+        const erros = data.erros ? `, ${data.erros} erro(s)` : "";
+        texto.textContent =
+          `Concluída: ${data.total_eventos} evento(s) e ${data.avulsos} avulso(s)${erros}.`;
+      } else if (data.status === "erro") {
+        texto.textContent = "Erro: " + (data.mensagem || "falha na reorganização.");
+      }
+    }
+
+    async function poll() {
+      try {
+        const resp = await fetch(urlStatus, { headers: { "X-Requested-With": "XMLHttpRequest" } });
+        const data = await resp.json();
+        render(data);
+        if (data && data.existe && data.em_andamento) {
+          timer = setTimeout(poll, 3000);
+        } else if (timer) {
+          clearTimeout(timer);
+          timer = null;
+        }
+      } catch (e) {
+        if (timer) clearTimeout(timer);
+        timer = null;
+      }
+    }
+
+    poll();
+  }
+
   function init() {
     const container = document.getElementById("gdrive-folder-browser");
     if (container) initFolderBrowser(container);
+    const massa = document.getElementById("gdrive-massa");
+    if (massa) {
+      initPreviaMassa(massa);
+      initStatusMassa(massa);
+    }
   }
 
   if (document.readyState === "loading") {

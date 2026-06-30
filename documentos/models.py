@@ -25,6 +25,20 @@ class DocumentoArtefato(models.Model):
         blank=True,
         related_name="documentos_gerados",
     )
+    evento = models.ForeignKey(
+        "eventos.Evento",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="documentos_gerados",
+        help_text="Evento de origem (usado por documentos que se ligam ao evento, ex.: plano de trabalho).",
+    )
+    nome_drive = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        help_text="Nome 'bonito' do arquivo no Drive, calculado na geração.",
+    )
     payload_snapshot = models.JSONField(default=dict, blank=True)
     hash_sha256 = models.CharField(max_length=64)
     cache_key = models.CharField(max_length=128, db_index=True, blank=True, default="")

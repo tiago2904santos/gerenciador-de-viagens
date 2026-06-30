@@ -1,3 +1,5 @@
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
 
@@ -21,6 +23,40 @@ class DriveCredenciais(models.Model):
         return f"OAuth Drive (atualizado {self.atualizado_em:%d/%m/%Y %H:%M})"
 
 
+class DriveReorganizacaoJob(models.Model):
+    """Acompanha uma reorganização em massa rodando em segundo plano.
+
+    Evita o timeout (erro interno) do request síncrono: o botão inicia o job,
+    retorna na hora, e a página acompanha o status por polling.
+    """
+
+    STATUS_EM_ANDAMENTO = "em_andamento"
+    STATUS_CONCLUIDA = "concluida"
+    STATUS_ERRO = "erro"
+    STATUS_CHOICES = [
+        (STATUS_EM_ANDAMENTO, "Em andamento"),
+        (STATUS_CONCLUIDA, "Concluída"),
+        (STATUS_ERRO, "Erro"),
+    ]
+
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_EM_ANDAMENTO, db_index=True)
+    total_eventos = models.PositiveIntegerField(default=0)
+    eventos_processados = models.PositiveIntegerField(default=0)
+    avulsos = models.PositiveIntegerField(default=0)
+    erros = models.PositiveIntegerField(default=0)
+    mensagem = models.TextField(blank=True, default="")
+    iniciado_em = models.DateTimeField(auto_now_add=True)
+    finalizado_em = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = "Job de reorganização do Drive"
+        verbose_name_plural = "Jobs de reorganização do Drive"
+        ordering = ["-iniciado_em"]
+
+    def __str__(self) -> str:
+        return f"Reorganização {self.get_status_display()} ({self.iniciado_em:%d/%m %H:%M})"
+
+
 class DriveArquivo(models.Model):
     """Registro de um DocumentoArtefato enviado ao Google Drive."""
 
@@ -34,6 +70,9 @@ class DriveArquivo(models.Model):
     nome = models.CharField(max_length=255, blank=True)
     mime_type = models.CharField(max_length=64, blank=True)
     mock = models.BooleanField(default=False)
+    # Atalho de aparição dupla (pasta global por tipo).
+    atalho_id = models.CharField(max_length=200, blank=True, default="")
+    atalho_pasta_id = models.CharField(max_length=200, blank=True, default="")
     enviado_em = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -43,3 +82,53 @@ class DriveArquivo(models.Model):
 
     def __str__(self) -> str:
         return f"Drive: {self.nome or self.file_id}"
+
+
+class DriveArquivoExterno(models.Model):
+    """Rastreia no Drive arquivos que NÃO são ``DocumentoArtefato``.
+
+    Cobre os ``FileField`` de prestação de contas (despacho, comprovante,
+    relatório técnico/diário assinados, anexos) e de evento (convite, ofício
+    solicitante, documentos de solicitação). Usa ``GenericForeignKey`` + nome do
+    campo para idempotência, evitando criar uma coluna ``drive_*`` em cada
+    modelo de origem.
+    """
+
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    origem = GenericForeignKey("content_type", "object_id")
+    campo = models.CharField(
+        max_length=64,
+        blank=True,
+        default="",
+        help_text="Nome do FileField de origem (vazio quando o modelo tem um único arquivo).",
+    )
+
+    file_id = models.CharField(max_length=200)
+    url = models.URLField(max_length=500, blank=True)
+    nome = models.CharField(max_length=255, blank=True)
+    pasta_id = models.CharField(max_length=200, blank=True, default="")
+    mime_type = models.CharField(max_length=64, blank=True)
+    mock = models.BooleanField(default=False)
+    # Atalho de aparição dupla (pasta global por tipo).
+    atalho_id = models.CharField(max_length=200, blank=True, default="")
+    atalho_pasta_id = models.CharField(max_length=200, blank=True, default="")
+    enviado_em = models.DateTimeField(auto_now_add=True)
+    atualizado_em = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Arquivo externo no Drive"
+        verbose_name_plural = "Arquivos externos no Drive"
+        ordering = ["-enviado_em"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["content_type", "object_id", "campo"],
+                name="drive_arquivo_externo_unico_por_campo",
+            )
+        ]
+        indexes = [
+            models.Index(fields=["content_type", "object_id"]),
+        ]
+
+    def __str__(self) -> str:
+        return f"Drive externo: {self.nome or self.file_id}"

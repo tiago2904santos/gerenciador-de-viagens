@@ -1,13 +1,22 @@
 import json
+import logging
+import threading
 
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
+from django.utils import timezone
 from django.views.decorators.http import require_POST
 
-from integracoes.google_drive.models import DriveArquivo, DriveCredenciais
+from integracoes.google_drive.models import (
+    DriveArquivo,
+    DriveCredenciais,
+    DriveReorganizacaoJob,
+)
+
+logger = logging.getLogger(__name__)
 from integracoes.google_drive.services import (
     _SCOPES,
     _reset_client,
@@ -21,9 +30,13 @@ from integracoes.google_drive.services import (
 
 @login_required
 def index(request):
+    from eventos.models import Evento
+
     cfg = getattr(settings, "GOOGLE_DRIVE", {})
     creds = DriveCredenciais.objects.first()
     pasta_raiz_id = get_pasta_raiz_id()
+    modo = cfg.get("MODO", "mock").lower()
+    autorizado = esta_autorizado()
 
     return render(
         request,
@@ -31,13 +44,16 @@ def index(request):
         {
             "page_title": "Google Drive",
             "page_description": "Configuração da integração com o Google Drive.",
-            "modo": cfg.get("MODO", "mock"),
-            "autorizado": esta_autorizado(),
+            "modo": modo,
+            "autorizado": autorizado,
             "creds": creds,
             "pasta_raiz_id": pasta_raiz_id,
             "pasta_raiz_nome": creds.pasta_raiz_nome if creds else "",
             "total_arquivos": DriveArquivo.objects.count(),
-            "modo_ativo": cfg.get("MODO", "mock").lower() != "mock",
+            "modo_ativo": modo != "mock",
+            "pode_reorganizar": bool(pasta_raiz_id) and (autorizado or modo == "mock"),
+            "total_eventos": Evento.objects.count(),
+            "job_reorg": DriveReorganizacaoJob.objects.order_by("-iniciado_em").first(),
         },
     )
 
@@ -183,3 +199,131 @@ def salvar_pasta_raiz(request):
     _reset_client()
     messages.success(request, f"Pasta \"{pasta_nome}\" definida como diretório de destino.")
     return redirect("cadastros:configuracao")
+
+
+# ---------------------------------------------------------------------------
+# Organização em massa
+# ---------------------------------------------------------------------------
+
+def _pode_reorganizar() -> bool:
+    cfg = getattr(settings, "GOOGLE_DRIVE", {})
+    modo = cfg.get("MODO", "mock").lower()
+    return bool(get_pasta_raiz_id()) and (esta_autorizado() or modo == "mock")
+
+
+def _executar_reorganizacao(job_id: int) -> None:
+    """Roda a reorganização e atualiza o job. Pensado para rodar numa thread."""
+    from django.db import connection
+
+    from integracoes.google_drive import organizer
+
+    def progress(processados, total):
+        DriveReorganizacaoJob.objects.filter(pk=job_id).update(
+            eventos_processados=processados, total_eventos=total
+        )
+
+    try:
+        resumo = organizer.reorganizar_tudo(progress=progress)
+        DriveReorganizacaoJob.objects.filter(pk=job_id).update(
+            status=DriveReorganizacaoJob.STATUS_CONCLUIDA,
+            total_eventos=resumo["eventos"],
+            eventos_processados=resumo["eventos"],
+            avulsos=resumo["avulsos"],
+            erros=resumo["erros"],
+            finalizado_em=timezone.now(),
+        )
+    except Exception as exc:  # noqa: BLE001
+        logger.error("[Drive] reorganização (job %s) falhou: %s", job_id, exc, exc_info=True)
+        DriveReorganizacaoJob.objects.filter(pk=job_id).update(
+            status=DriveReorganizacaoJob.STATUS_ERRO,
+            mensagem=str(exc),
+            finalizado_em=timezone.now(),
+        )
+    finally:
+        # Threads abrem a própria conexão; fechá-la evita vazamento.
+        connection.close()
+
+
+@login_required
+@require_POST
+def reorganizar_tudo(request):
+    if not _pode_reorganizar():
+        messages.error(
+            request,
+            "Conecte a conta Google e defina a pasta de destino antes de reorganizar.",
+        )
+        return redirect("cadastros:configuracao")
+
+    if DriveReorganizacaoJob.objects.filter(status=DriveReorganizacaoJob.STATUS_EM_ANDAMENTO).exists():
+        messages.info(request, "Já existe uma reorganização em andamento. Aguarde concluir.")
+        return redirect("cadastros:configuracao")
+
+    job = DriveReorganizacaoJob.objects.create(status=DriveReorganizacaoJob.STATUS_EM_ANDAMENTO)
+
+    # Em testes (ou se configurado), roda de forma síncrona para ser determinístico.
+    sincrono = getattr(settings, "GOOGLE_DRIVE", {}).get("REORG_SINCRONO", False)
+    if sincrono:
+        _executar_reorganizacao(job.pk)
+    else:
+        threading.Thread(target=_executar_reorganizacao, args=(job.pk,), daemon=True).start()
+
+    messages.success(
+        request,
+        "Reorganização iniciada em segundo plano. O andamento aparece neste card — "
+        "pode sair desta página; a tarefa continua rodando.",
+    )
+    return redirect("cadastros:configuracao")
+
+
+def _job_para_json(job: DriveReorganizacaoJob | None) -> dict:
+    if job is None:
+        return {"existe": False}
+    return {
+        "existe": True,
+        "status": job.status,
+        "status_display": job.get_status_display(),
+        "total_eventos": job.total_eventos,
+        "eventos_processados": job.eventos_processados,
+        "avulsos": job.avulsos,
+        "erros": job.erros,
+        "mensagem": job.mensagem,
+        "em_andamento": job.status == DriveReorganizacaoJob.STATUS_EM_ANDAMENTO,
+        "iniciado_em": job.iniciado_em.isoformat(),
+        "finalizado_em": job.finalizado_em.isoformat() if job.finalizado_em else None,
+    }
+
+
+@login_required
+def status_reorganizacao(request):
+    """JSON do job de reorganização mais recente (para polling na página)."""
+    job = DriveReorganizacaoJob.objects.order_by("-iniciado_em").first()
+    return JsonResponse(_job_para_json(job))
+
+
+@login_required
+def previa_reorganizacao(request):
+    """Lista os caminhos planejados (dry-run) sem tocar no Drive."""
+    from eventos.models import Evento
+    from oficios.models import Oficio
+    from integracoes.google_drive import organizer
+
+    limite = 500
+    linhas: list[str] = []
+    truncado = False
+
+    try:
+        for evento in Evento.objects.all().iterator():
+            linhas.extend(organizer.planejar_evento(evento))
+            if len(linhas) >= limite:
+                truncado = True
+                break
+        if not truncado:
+            for oficio in Oficio.objects.filter(evento__isnull=True).iterator():
+                linhas.extend(organizer.planejar_oficio(oficio))
+                if len(linhas) >= limite:
+                    truncado = True
+                    break
+    except Exception as exc:
+        return JsonResponse({"erro": str(exc)}, status=500)
+
+    return JsonResponse({"linhas": linhas[:limite], "truncado": truncado, "total": len(linhas)})

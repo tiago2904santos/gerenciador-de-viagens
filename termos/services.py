@@ -2,7 +2,10 @@ from __future__ import annotations
 
 import hashlib
 import io
+import logging
 import zipfile
+
+logger = logging.getLogger(__name__)
 
 from cadastros.models import Servidor
 from cadastros.models import Viatura
@@ -138,13 +141,42 @@ def gerar_termo_um(
     variante_efetiva = payload["termo"]["variante"]
     template_docx = _TEMPLATE_DOCX_BY_VARIANTE.get(variante_efetiva, "termo_autorizacao.docx")
     facade = _facade_termo_com_template(template_docx)
-    return facade.gerar(
+    doc = facade.gerar(
         tipo=DocumentoTipo.TERMO_AUTORIZACAO,
         formato=formato,
         payload=payload,
         reference=ref,
         docxtpl_context=_legacy_docx_context(payload),
     )
+    _persistir_termo_artefato(oficio, servidor, doc)
+    return doc
+
+
+def _persistir_termo_artefato(oficio: Oficio, servidor: Servidor, doc: DocumentoGerado) -> None:
+    """Persiste o termo como ``DocumentoArtefato`` (para auto-organização no Drive).
+
+    Idempotente por conteúdo (hash). É no-op quando a persistência está desligada
+    (ex.: testes). Falhas nunca quebram a geração do documento.
+    """
+    try:
+        from documentos.models import DocumentoArtefato
+        from documentos.services.persistence import persist_geracao
+        from integracoes.google_drive import naming
+
+        if DocumentoArtefato.objects.filter(
+            tipo=DocumentoTipo.TERMO_AUTORIZACAO.value, hash_sha256=doc.hash_sha256
+        ).exists():
+            return
+        cidade = naming.cidade_evento(getattr(oficio, "evento", None), oficio)
+        persist_geracao(
+            doc,
+            oficio_id=oficio.pk,
+            servidor_id=servidor.pk,
+            evento_id=getattr(oficio, "evento_id", None),
+            nome_drive=naming.nome_termo(oficio, servidor, cidade),
+        )
+    except Exception:
+        logger.warning("Não foi possível persistir artefato do termo.", exc_info=True)
 
 
 def gerar_termo_lote(oficio: Oficio, formato: DocumentoFormato) -> list[DocumentoGerado]:
