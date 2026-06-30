@@ -183,9 +183,10 @@ def apresentar_oficio_card(oficio):
                 "saida": _format_dt_trecho(t.saida_dt),
                 "chegada": _format_dt_trecho(t.chegada_dt),
             })
-        if roteiro.valor_diarias:
-            valor_diarias_display = _format_brl_diarias(roteiro.valor_diarias)
-            valor_diarias_extenso = (roteiro.valor_diarias_extenso or "").strip()
+        diarias_oficio = oficio.diarias_para_servidores()
+        if diarias_oficio:
+            valor_diarias_display = _format_brl_diarias(diarias_oficio["valor_decimal"])
+            valor_diarias_extenso = (diarias_oficio["valor_extenso"] or "").strip()
 
     # Transporte
     veiculo_placa = ""
@@ -732,6 +733,7 @@ def apresentar_oficio_wizard_documentos_context(oficio):
     transporte = _montar_transporte_resumo_documentos(oficio)
     viajantes_cards = _montar_viajantes_cards_documentos(oficio)
     roteiro = oficio.roteiro
+    diarias_oficio = oficio.diarias_para_servidores()
 
     def cidade_uf_label(cidade, estado):
         cidade_label = str(cidade).upper() if cidade else ""
@@ -881,10 +883,10 @@ def apresentar_oficio_wizard_documentos_context(oficio):
         "justificativa_etapa": j_et,
         "justificativa_texto": texto_j,
         "justificativa_resumo": justificativa_resumo,
-        "quantidade_diarias": (roteiro.quantidade_diarias if roteiro else "") or "—",
-        "valor_diarias": roteiro.valor_diarias if roteiro else None,
-        "valor_diarias_display": _format_brl_diarias(roteiro.valor_diarias if roteiro else None),
-        "valor_diarias_extenso": (roteiro.valor_diarias_extenso if roteiro else "") or "—",
+        "quantidade_diarias": (diarias_oficio["quantidade"] if diarias_oficio else "") or "—",
+        "valor_diarias": diarias_oficio["valor_decimal"] if diarias_oficio else None,
+        "valor_diarias_display": _format_brl_diarias(diarias_oficio["valor_decimal"] if diarias_oficio else None),
+        "valor_diarias_extenso": (diarias_oficio["valor_extenso"] if diarias_oficio else "") or "—",
         "generation_status": generation_status,
         "documentos_inline": documentos_inline,
     }

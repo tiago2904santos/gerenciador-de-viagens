@@ -385,8 +385,10 @@
     var generoSelect = panel.querySelector("[name='coordenador_" + papel + "_genero']");
     var option = selectedOption(servidorSelect);
     if (option) {
+      // O texto da option é apenas o nome do servidor; data-main traz a linha
+      // rica do dropdown (nome * RG * CPF * cargo) e NÃO deve virar o nome.
       return {
-        nome: (option.dataset.main || option.textContent || "").trim(),
+        nome: (option.textContent || "").trim(),
         cargo: (option.dataset.cargo || "").trim(),
         genero: (generoSelect && generoSelect.value) || "MASCULINO",
       };
@@ -504,6 +506,14 @@
     return select.options[select.selectedIndex] || null;
   }
 
+  function refreshCustomSelect(select) {
+    if (!select || !select.closest) return;
+    var root = select.closest("[data-cv-select]");
+    if (root && root._cvSelect && typeof root._cvSelect.refresh === "function") {
+      root._cvSelect.refresh();
+    }
+  }
+
   function setSelectValue(select, value, options) {
     if (!select) return;
     options = options || {};
@@ -568,6 +578,9 @@
       setHiddenValue(manualInput, "", options);
       setHiddenValue(modoInput, "SERVIDOR", options);
       setSelectValue(cargoSelect, option.dataset.cargo || "", options);
+      // Em modo silencioso (carga/edição) o setSelectValue não dispara "change",
+      // então o cv-custom-select do cargo não atualiza o texto visível sozinho.
+      refreshCustomSelect(cargoSelect);
       syncing = false;
     }
 

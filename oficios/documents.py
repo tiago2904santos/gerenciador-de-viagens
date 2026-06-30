@@ -240,6 +240,15 @@ def _viagem_payload(oficio: Oficio) -> dict[str, Any]:
             destino_principal = str(destino)
     roteiro_ida = _roteiro_linhas(roteiro, "IDA")
     roteiro_retorno = _roteiro_linhas(roteiro, "RETORNO")
+    diarias = oficio.diarias_para_servidores()
+    if diarias:
+        quantidade_diarias = _blank(diarias["quantidade"])
+        valor_diarias = _format_brl(diarias["valor_decimal"])
+        valor_diarias_extenso = _document_text(diarias["valor_extenso"])
+    else:
+        quantidade_diarias = _blank(getattr(roteiro, "quantidade_diarias", ""))
+        valor_diarias = _format_brl(getattr(roteiro, "valor_diarias", None))
+        valor_diarias_extenso = _document_text(getattr(roteiro, "valor_diarias_extenso", ""))
     return {
         "destino_principal": destino_principal,
         "destinos_texto": _destinos_texto(roteiro),
@@ -250,9 +259,9 @@ def _viagem_payload(oficio: Oficio) -> dict[str, Any]:
         "roteiro_ida_texto": "; ".join(roteiro_ida) or _destinos_texto(roteiro),
         "roteiro_retorno": roteiro_retorno,
         "roteiro_retorno_texto": "; ".join(roteiro_retorno) or "—",
-        "quantidade_diarias": _blank(getattr(roteiro, "quantidade_diarias", "")),
-        "valor_diarias": _format_brl(getattr(roteiro, "valor_diarias", None)),
-        "valor_diarias_extenso": _document_text(getattr(roteiro, "valor_diarias_extenso", "")),
+        "quantidade_diarias": quantidade_diarias,
+        "valor_diarias": valor_diarias,
+        "valor_diarias_extenso": valor_diarias_extenso,
         "motivo": _document_text(oficio.motivo),
     }
 

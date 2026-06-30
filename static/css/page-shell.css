@@ -3408,4 +3408,52 @@ html[data-theme="dark"] .quick-add-footer-button.is-filled:hover {
   outline: none;
 }
 
+#quick-add-atividade .quick-add-inline__fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+#quick-add-atividade .quick-add-inline__fields > .field-grid {
+  margin: 0;
+}
+
+#quick-add-atividade .app-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+#quick-add-atividade .cv-field__control--textarea {
+  background: var(--color-input-bg);
+  border: 1px solid var(--cv-field-border);
+  border-radius: var(--cv-field-radius);
+  box-shadow: var(--cv-field-shadow);
+  box-sizing: border-box;
+  color: var(--cv-field-color);
+  font-size: var(--cv-field-font-size);
+  height: var(--text-area-height-md);
+  line-height: 1.5;
+  min-height: var(--text-area-height-md);
+  padding: var(--space-3) var(--cv-field-padding-x);
+  resize: vertical;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    color var(--transition-fast);
+  width: 100%;
+}
+
+#quick-add-atividade .cv-field__control--textarea:hover:not(:disabled):not([readonly]) {
+  background: var(--color-input-bg);
+  border-color: var(--cv-field-border-hover);
+}
+
+#quick-add-atividade .cv-field__control--textarea:focus-visible {
+  border-color: var(--cv-field-focus-border);
+  box-shadow: var(--cv-field-shadow-focus);
+  outline: none;
+}
+
 

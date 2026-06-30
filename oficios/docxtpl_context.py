@@ -6,7 +6,6 @@ Contexto plano (flat) para templates DOCX legados (docxtpl), alinhado a
 from __future__ import annotations
 
 from datetime import date, datetime
-from decimal import Decimal
 from typing import Any
 from typing import Mapping
 
@@ -435,17 +434,17 @@ def _diarias(oficio: Oficio) -> tuple[str, str]:
     r = oficio.roteiro
     if not r:
         return "", ""
-    q = _txt(r.quantidade_diarias)
-    if r.valor_diarias is not None:
-        dec = r.valor_diarias if isinstance(r.valor_diarias, Decimal) else Decimal(str(r.valor_diarias))
-        valor_fmt = format_currency_br(dec)
-        extenso = _txt(r.valor_diarias_extenso)
-        if extenso:
-            valor = f"{valor_fmt} ({format_valor_extenso_display(extenso)})"
-        else:
-            valor = valor_fmt
-        return q, valor
-    return q, ""
+    diarias = oficio.diarias_para_servidores()
+    if not diarias:
+        return _txt(r.quantidade_diarias), ""
+    q = _txt(diarias["quantidade"])
+    valor_fmt = format_currency_br(diarias["valor_decimal"])
+    extenso = _txt(diarias["valor_extenso"])
+    if extenso:
+        valor = f"{valor_fmt} ({format_valor_extenso_display(extenso)})"
+    else:
+        valor = valor_fmt
+    return q, valor
 
 
 def _solicitacoes_por_servidor(oficio: Oficio) -> dict[int, str]:

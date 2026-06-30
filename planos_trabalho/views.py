@@ -16,7 +16,13 @@ from django.utils.dateparse import parse_date
 from django.views.decorators.http import require_GET
 from django.views.decorators.http import require_POST
 
+from urllib.parse import urlencode
+
+from django.utils.http import url_has_allowed_host_and_scheme
+
 from core.autosave import AutosavePayloadError
+from core.presenters.badges import build_badge
+from core.presenters.meta import build_meta
 from core.autosave import autosave_json_response
 from core.autosave import filter_allowed_fields
 from core.autosave import parse_autosave_payload
@@ -27,6 +33,7 @@ from documentos.services.types import DocumentoTipo
 from eventos.services import resolve_evento_from_request
 
 from .forms import AtividadePlanoTrabalhoForm
+from .forms import AtividadePlanoTrabalhoQuickAddForm
 from .forms import EfetivoPlanoFormSet
 from .forms import HorarioAtendimentoForm
 from .forms import PlanoDiariasForm
@@ -542,6 +549,33 @@ def _plano_diarias_autosave_data(plano: PlanoTrabalho):
     return _querydict_from_pairs(data)
 
 
+def _efetivo_rows_from_formset(formset):
+    """Converte o formset inline de efetivo em linhas para `_apply_efetivo_snapshot`.
+
+    Usa o `id` enviado (preenchido pelo autosave) em vez de depender do
+    management form (INITIAL_FORMS), que pode estar defasado quando o autosave
+    criou registros após o carregamento da página.
+    """
+    rows = []
+    for index, form in enumerate(formset.forms):
+        cleaned = getattr(form, "cleaned_data", None)
+        if not cleaned or cleaned.get("DELETE"):
+            continue
+        unidade = cleaned.get("unidade")
+        cargo = cleaned.get("cargo")
+        pk = form.instance.pk or _to_int_or_none(form.data.get(form.add_prefix("id")))
+        rows.append(
+            {
+                "idx": index,
+                "id": pk,
+                "unidade": unidade.pk if unidade else None,
+                "cargo": cargo.pk if cargo else None,
+                "quantidade": cleaned.get("quantidade"),
+            }
+        )
+    return rows
+
+
 def _apply_efetivo_snapshot(plano: PlanoTrabalho, rows):
     """Reconcilia o efetivo do plano com o snapshot recebido do autosave.
 
@@ -633,7 +667,10 @@ def wizard_efetivo_diarias(request, pk):
     if request.method == "POST":
         nav_action = _wizard_normalizar_acao(request.POST)
         if formset.is_valid() and diarias_form.is_valid():
-            formset.save()
+            # Reconcilia por id (e não via management form), pois o autosave pode
+            # ter criado efetivos após o carregamento da página — o que deixaria
+            # INITIAL_FORMS defasado e faria o formset.save() inserir duplicatas.
+            _apply_efetivo_snapshot(plano, _efetivo_rows_from_formset(formset))
             plano = diarias_form.save()
             resultado = atualizar_snapshot_diarias(plano)
             if plano.is_multi_evento:
@@ -886,7 +923,11 @@ def _atividades_context(*, plano, catalogo, selected_codes):
         "atividades_counter_label": f"{len(selecionados)} selecionadas",
         "metas_preview": metas_preview,
         "recursos_preview": recursos_preview,
-        "atividades_manager_url": reverse("planos_trabalho:atividades_index"),
+        "atividades_manager_url": (
+            reverse("planos_trabalho:atividades_index")
+            + "?"
+            + urlencode({"next": reverse("planos_trabalho:wizard_atividades", args=[plano.pk])})
+        ),
         "wizard_autosave_url": reverse("planos_trabalho:atividades_autosave", args=[plano.pk]),
         "wizard_autosave_step": "atividades",
     }
@@ -951,34 +992,79 @@ def _truncar(texto: str, limite: int = 90) -> str:
     return texto if len(texto) <= limite else texto[: limite - 1].rstrip() + "…"
 
 
+def _atividades_back_url(request):
+    """URL de retorno do gerenciador: etapa 3 do plano (via ?next=) ou a lista."""
+    candidato = request.POST.get("next") or request.GET.get("next") or ""
+    if candidato and url_has_allowed_host_and_scheme(candidato, allowed_hosts={request.get_host()}):
+        return candidato
+    return reverse("planos_trabalho:index")
+
+
+def _atividade_quick_add_field_values(atividade):
+    return json.dumps(
+        {
+            "nome": atividade.nome,
+            "recurso_necessario": atividade.recurso_necessario,
+            "meta": atividade.meta,
+        },
+        ensure_ascii=False,
+    )
+
+
 def atividades_index(request):
+    from django.db.models import Q
+
+    q = request.GET.get("q", "").strip()
+    back_url = _atividades_back_url(request)
+    form = AtividadePlanoTrabalhoQuickAddForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Atividade cadastrada.")
+        return redirect(_atividades_index_url(back_url))
+
     atividades = AtividadePlanoTrabalho.objects.order_by("ordem", "nome")
+    if q:
+        atividades = atividades.filter(
+            Q(nome__icontains=q) | Q(codigo__icontains=q) | Q(meta__icontains=q)
+        )
     linhas = [
         {
             "title": atividade.nome,
-            "badges": [atividade.codigo],
+            "badges": [build_badge("Inativa", "neutral")] if not atividade.ativo else [],
             "meta": [
-                {"label": "Meta", "value": _truncar(atividade.meta)},
-                {"label": "Recurso", "value": _truncar(atividade.recurso_necessario) or "—"},
-                {"label": "Status", "value": "Ativa" if atividade.ativo else "Inativa"},
-                {"label": "Ordem", "value": str(atividade.ordem)},
+                build_meta("Recurso", _truncar(atividade.recurso_necessario) or "—"),
+                build_meta("Meta", _truncar(atividade.meta)),
             ],
-            "edit_url": reverse("planos_trabalho:atividade_editar", args=[atividade.pk]),
+            "edit_url": _atividades_index_url(back_url, base=reverse("planos_trabalho:atividade_editar", args=[atividade.pk])),
+            "edit_fields_json": _atividade_quick_add_field_values(atividade),
             "delete_url": reverse("planos_trabalho:atividade_excluir", args=[atividade.pk]),
+            "delete_modal": True,
         }
         for atividade in atividades
     ]
+    is_wizard_back = back_url != reverse("planos_trabalho:index")
     return render(
         request,
         "planos_trabalho/atividades/index.html",
         {
             "page_title": "Gerenciamento de atividades",
             "page_description": "Cadastre, edite e organize atividades com metas e recursos.",
+            "q": q,
             "linhas": linhas,
-            "create_url": reverse("planos_trabalho:atividade_novo"),
-            "back_url": reverse("planos_trabalho:index"),
+            "quick_add_form": form,
+            "quick_add_next_url": back_url if is_wizard_back else "",
+            "back_url": back_url,
+            "back_label": "Voltar pra plano de trabalho" if is_wizard_back else "Voltar",
         },
     )
+
+
+def _atividades_index_url(back_url, base=None):
+    """URL do gerenciador (ou de uma ação) preservando o retorno à etapa 3."""
+    base = base or reverse("planos_trabalho:atividades_index")
+    if back_url and back_url != reverse("planos_trabalho:index"):
+        return f"{base}?{urlencode({'next': back_url})}"
+    return base
 
 
 def atividade_novo(request):
@@ -1000,23 +1086,19 @@ def atividade_novo(request):
 
 
 def atividade_editar(request, pk):
+    """Edição inline via quick add: processa o POST do painel e volta ao gerenciador."""
     atividade = get_object_or_404(AtividadePlanoTrabalho, pk=pk)
-    form = AtividadePlanoTrabalhoForm(request.POST or None, instance=atividade)
-    if request.method == "POST" and form.is_valid():
-        form.save()
-        messages.success(request, "Atividade atualizada.")
-        return redirect("planos_trabalho:atividades_index")
-    return render(
-        request,
-        "planos_trabalho/atividades/form.html",
-        {
-            "page_title": f"Editar atividade — {atividade.nome}",
-            "page_description": "Atualize a meta e o recurso necessário desta atividade.",
-            "form": form,
-            "atividade": atividade,
-            "back_url": reverse("planos_trabalho:atividades_index"),
-        },
-    )
+    back_url = _atividades_back_url(request)
+    if request.method == "POST":
+        form = AtividadePlanoTrabalhoQuickAddForm(request.POST, instance=atividade)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Atividade atualizada.")
+        else:
+            for erros in form.errors.values():
+                for erro in erros:
+                    messages.error(request, erro)
+    return redirect(_atividades_index_url(back_url))
 
 
 def atividade_excluir(request, pk):

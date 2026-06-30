@@ -93,6 +93,21 @@ def _convite_item(anexo):
     }
 
 
+def _solicitacao_item(doc):
+    arquivo_url = doc.arquivo.url if doc.arquivo else ""
+    nome = doc.nome_original or doc.arquivo.name.split("/")[-1]
+    return {
+        "kind": "Solicitação",
+        "title": nome,
+        "meta": doc.criado_em.strftime("%d/%m/%Y") if doc.criado_em else "",
+        "detail": "",
+        "visualizar_url": arquivo_url,
+        "pdf_url": arquivo_url,
+        "docx_url": "",
+        "editar_url": "",
+    }
+
+
 def _evento_meta(evento) -> str:
     parts = []
     raw = evento.destino_display
@@ -125,6 +140,7 @@ def apresentar_evento_list_card(evento):
     documentos.extend(_plano_item(plano) for plano in evento.planos_trabalho.all())
     documentos.extend(_convite_item(anexo) for anexo in evento.anexos.all() if anexo.tipo == EventoAnexo.TIPO_CONVITE)
     documentos.extend(_ordem_item(ordem) for ordem in evento.ordens_servico.all())
+    documentos.extend(_solicitacao_item(doc) for doc in evento.documentos_solicitacao.all())
 
     return {
         "pk": evento.pk,

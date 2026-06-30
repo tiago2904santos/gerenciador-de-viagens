@@ -195,6 +195,13 @@
     }
   };
 
+  // Re-sincroniza o display a partir do valor atual do <select> nativo.
+  // Útil quando o valor é alterado por código sem disparar "change" (ex.: init
+  // do coordenador que preenche o cargo do servidor em modo silencioso).
+  CustomSelect.prototype.refresh = function () {
+    this._syncFromNative();
+  };
+
   // ─────────────────────────────────────────────────────────────────────────
   // Open / Close
   // ─────────────────────────────────────────────────────────────────────────

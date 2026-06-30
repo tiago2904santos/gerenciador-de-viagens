@@ -190,6 +190,45 @@ class Oficio(TimeStampedModel):
         self.custeio_observacao = normalize_spaces(self.custeio_observacao)
         super().save(*args, **kwargs)
 
+    def diarias_para_servidores(self):
+        """Diárias deste ofício = valor por servidor (persistido no roteiro) × nº de servidores.
+
+        O roteiro guarda sempre o valor para 1 servidor; cada ofício aplica aqui a
+        multiplicação pelo seu próprio efetivo, de modo que adicionar/remover servidores
+        atualize o resumo e o documento final.
+        """
+        from decimal import Decimal
+
+        from roteiros.services.valor_extenso import valor_por_extenso_ptbr
+
+        roteiro = self.roteiro
+        if not roteiro or roteiro.valor_diarias is None:
+            return None
+
+        # Sem servidores ainda (rascunho): mantém o valor base de 1 servidor.
+        qtd_servidores = (self.servidores.count() if self.pk else 0) or 1
+        por_servidor = roteiro.valor_diarias
+        if not isinstance(por_servidor, Decimal):
+            por_servidor = Decimal(str(por_servidor))
+
+        if qtd_servidores == 1:
+            # Multiplicador 1: preserva exatamente o que está persistido no roteiro
+            # (inclusive o "por extenso" original, que pode diferir do recalculado).
+            return {
+                "quantidade": roteiro.quantidade_diarias or "",
+                "valor_decimal": por_servidor,
+                "valor_extenso": roteiro.valor_diarias_extenso or "",
+                "quantidade_servidores": 1,
+            }
+
+        total = por_servidor * qtd_servidores
+        return {
+            "quantidade": roteiro.quantidade_diarias or "",
+            "valor_decimal": total,
+            "valor_extenso": valor_por_extenso_ptbr(total),
+            "quantidade_servidores": qtd_servidores,
+        }
+
 
 class ModeloMotivoOficio(TimeStampedModel):
     nome = models.CharField(max_length=120, unique=True)

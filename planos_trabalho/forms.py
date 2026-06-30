@@ -721,6 +721,66 @@ class AtividadePlanoTrabalhoForm(forms.ModelForm):
         return normalizado
 
 
+class AtividadePlanoTrabalhoQuickAddForm(forms.ModelForm):
+    """Quick add do catálogo de atividades: 3 campos (atividade, recursos, metas).
+
+    O código é gerado automaticamente a partir do nome — assim a inclusão rápida
+    fica com a mesma cara do quick add de Modelos de motivo, sem campos extras.
+    """
+
+    class Meta:
+        model = AtividadePlanoTrabalho
+        fields = ["nome", "recurso_necessario", "meta"]
+        labels = {
+            "nome": "Atividade",
+            "recurso_necessario": "Recursos necessários",
+            "meta": "Metas",
+        }
+        widgets = {
+            "nome": forms.TextInput(
+                attrs={"class": "form-control", "autocomplete": "off", "placeholder": "Nome da atividade"},
+            ),
+            "recurso_necessario": forms.Textarea(
+                attrs={
+                    "rows": 3,
+                    "class": "cv-field__control cv-field__control--textarea",
+                    "placeholder": "Recursos necessários para a atividade",
+                },
+            ),
+            "meta": forms.Textarea(
+                attrs={
+                    "rows": 3,
+                    "class": "cv-field__control cv-field__control--textarea",
+                    "placeholder": "Meta exibida no documento",
+                },
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["nome"].required = True
+        self.fields["meta"].required = True
+        self.fields["recurso_necessario"].required = False
+
+    @staticmethod
+    def _gerar_codigo_unico(nome: str) -> str:
+        base = slugify(nome).replace("-", "_").upper() or "ATIVIDADE"
+        codigo = base
+        sufixo = 2
+        while AtividadePlanoTrabalho.objects.filter(codigo=codigo).exists():
+            codigo = f"{base}_{sufixo}"
+            sufixo += 1
+        return codigo
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if not instance.codigo:
+            instance.codigo = self._gerar_codigo_unico(instance.nome)
+        if commit:
+            instance.save()
+        return instance
+
+
 class HorarioAtendimentoForm(forms.ModelForm):
     class Meta:
         model = HorarioAtendimento

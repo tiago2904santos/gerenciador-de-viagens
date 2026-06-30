@@ -10,33 +10,73 @@
     <div class="oficio-lc__id-row">
       <div class="oficio-lc__info-item">
         <span class="oficio-lc__info-label">Plano de Trabalho</span>
-        <span class="oficio-lc__info-value">{{ card.numero_label }}</span>
-      </div>
-      <div class="oficio-lc__info-item">
-        <span class="oficio-lc__info-label">Criado em</span>
-        <span class="oficio-lc__info-value">{{ card.data_criacao_label }}</span>
+        <span class="oficio-lc__info-value">{{ card.numero_label }}{% if card.destino %} · {{ card.destino }}{% endif %}{% if card.periodo %} · {{ card.periodo }}{% endif %}</span>
       </div>
       {% include "components/ui/badges/chip.html" with tone=card.status_state label=card.status_label extra_class="oficio-lc__temporal-chip" only %}
     </div>
 
-    {# ── DADOS DO EVENTO ── #}
+    {# ── SOLICITANTE E COORDENADORES (mesmo visual dos servidores do ofício) ── #}
+    {% if card.participantes %}
+    <div class="oficio-lc__section">
+      <div class="oficio-lc__travellers oficio-lc__travellers--n{{ card.participantes|length }}">
+        {% for p in card.participantes %}
+        <div class="oficio-lc__traveller">
+          <div class="oficio-lc__traveller-body">
+            <div class="oficio-lc__traveller-name-row">
+              <span class="oficio-lc__traveller-name">{{ p.name }}</span>
+              <span class="oficio-lc__traveller-badge">{{ p.badge }}</span>
+            </div>
+            {% if p.meta %}
+            <span class="oficio-lc__traveller-meta">{{ p.meta }}</span>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {# ── ATIVIDADES SELECIONADAS · EFETIVO E VALORES ── #}
     <div class="oficio-lc__section">
       <div class="oficio-lc__transport-row">
-        <div class="oficio-lc__transport-card">
-          <span class="oficio-lc__transport-label">Destino</span>
-          <div class="oficio-lc__transport-placa">{{ card.destino }}</div>
-          <span class="oficio-lc__transport-label">Período</span>
-          <div class="oficio-lc__transport-modelo">{{ card.periodo }}</div>
+        {# — Card 1: Atividades selecionadas — #}
+        <div class="oficio-lc__transport-card oficio-lc__transport-card--trechos">
+          <span class="oficio-lc__transport-label">Atividades selecionadas{% if card.atividades_count %} ({{ card.atividades_count }}){% endif %}</span>
+          {% if card.atividades %}
+          <div class="oficio-lc__trechos-list">
+            {% for atividade in card.atividades %}
+            <div class="oficio-lc__trecho oficio-lc__trecho--atividade">
+              <div class="oficio-lc__trecho-rota">{{ atividade }}</div>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="oficio-lc__transport-modelo oficio-lc__text--empty">Nenhuma atividade selecionada</div>
+          {% endif %}
         </div>
-        <div class="oficio-lc__transport-card">
-          <span class="oficio-lc__transport-label">Programa</span>
-          <div class="oficio-lc__transport-modelo">{{ card.programa }}</div>
-          <span class="oficio-lc__transport-label">Coordenador adm.</span>
-          <div class="oficio-lc__transport-modelo">{{ card.coordenador }}</div>
-        </div>
+
+        {# — Card 2: Efetivo + valor por servidor — #}
         <div class="oficio-lc__transport-card oficio-lc__transport-card--valor">
           <span class="oficio-lc__transport-label">Efetivo</span>
-          <div class="oficio-lc__valor-total">{{ card.efetivo_total }} servidor(es)</div>
+          <div class="oficio-lc__valor-total">{{ card.efetivo_total }} servidores</div>
+          {% if card.valor_unitario_display %}
+          <span class="oficio-lc__transport-label">Valor por Servidor</span>
+          <div class="oficio-lc__valor-medio">{{ card.valor_unitario_display }}</div>
+          {% endif %}
+        </div>
+
+        {# — Card 3: Valor total do plano — #}
+        <div class="oficio-lc__transport-card oficio-lc__transport-card--valor">
+          <span class="oficio-lc__transport-label">Valor Total</span>
+          {% if card.valor_total_display %}
+          <div class="oficio-lc__valor-total">{{ card.valor_total_display }}</div>
+          {% else %}
+          <div class="oficio-lc__valor-total oficio-lc__text--empty">—</div>
+          {% endif %}
+          {% if card.diarias_composicao %}
+          <span class="oficio-lc__transport-label">Diárias</span>
+          <div class="oficio-lc__valor-medio">{{ card.diarias_composicao }}</div>
+          {% endif %}
         </div>
       </div>
     </div>

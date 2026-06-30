@@ -42,10 +42,10 @@
               {% if s.is_motorista %}
               <span class="oficio-lc__traveller-badge">Motorista</span>
               {% endif %}
-              {% if s.cargo or s.unidade %}
-              <span class="oficio-lc__traveller-meta">{% if s.cargo %}{{ s.cargo }}{% endif %}{% if s.cargo and s.unidade %} · {% endif %}{% if s.unidade %}{{ s.unidade }}{% endif %}</span>
-              {% endif %}
             </div>
+            {% if s.cargo or s.unidade %}
+            <span class="oficio-lc__traveller-meta">{% if s.cargo %}{{ s.cargo }}{% endif %}{% if s.cargo and s.unidade %} · {% endif %}{% if s.unidade %}{{ s.unidade }}{% endif %}</span>
+            {% endif %}
           </div>
 
           {% if s.has_termo %}

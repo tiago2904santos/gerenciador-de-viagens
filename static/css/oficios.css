@@ -3569,6 +3569,25 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
   margin-top: 2px;
 }
 
+/* Atividades selecionadas — mesmo tom dourado dos cards selecionados na etapa 3. */
+.oficio-lc__trecho--atividade {
+  background: color-mix(in srgb, var(--color-accent) 9%, var(--color-card-muted));
+  border-color: color-mix(in srgb, var(--color-accent) 40%, var(--color-border-soft));
+}
+
+.oficio-lc__trecho--atividade .oficio-lc__trecho-rota {
+  color: var(--color-accent);
+}
+
+html[data-theme="light"] .oficio-lc__trecho--atividade {
+  background: var(--color-card-muted);
+  border-color: color-mix(in srgb, var(--color-accent) 32%, var(--color-border-soft));
+}
+
+html[data-theme="light"] .oficio-lc__trecho--atividade .oficio-lc__trecho-rota {
+  color: var(--color-heading);
+}
+
 .oficio-lc__transport-card--documentos {
   max-height: none;
   min-height: 0;
@@ -3639,6 +3658,16 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
   font-weight: 700;
   line-height: 1.4;
   word-break: break-word;
+}
+
+/* valor em tamanho médio (ex.: valor por servidor, composição das diárias) */
+.oficio-lc__valor-medio {
+  color: var(--color-heading);
+  font-size: var(--font-size-xl);
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  margin-top: var(--space-1);
 }
 
 /* ── Estilos auxiliares ── */

@@ -291,6 +291,8 @@ def apresentar_plano_wizard_summary(plano):
 
 
 def apresentar_plano_card(plano):
+    from roteiros.services.diarias import formatar_valor_diarias
+
     coordenador_nome, _cargo = plano.coordenador_nome_cargo("adm")
     if plano.is_multi_evento:
         eventos = list(plano.eventos.all()) if plano.pk else []
@@ -311,11 +313,43 @@ def apresentar_plano_card(plano):
         else:
             periodo_label = "—"
         efetivo_total = plano.total_efetivo_combinado
+        totais = [e.diarias_valor_total for e in eventos if e.diarias_valor_total is not None]
+        valor_total = sum(totais) if totais else None
+        valor_unitario = plano.diarias_combinada_valor_unitario
+        diarias_composicao = (plano.diarias_combinada_composicao or "").strip()
     else:
         programa_label = plano.programa_display or "—"
         destino_label = plano.destino_display
         periodo_label = plano.periodo_display
         efetivo_total = plano.total_efetivo
+        valor_total = plano.diarias_valor_total
+        valor_unitario = plano.diarias_valor_unitario
+        diarias_composicao = (plano.diarias_composicao or "").strip()
+
+    valor_total_display = f"R$ {formatar_valor_diarias(valor_total)}" if valor_total is not None else ""
+    valor_unitario_display = f"R$ {formatar_valor_diarias(valor_unitario)}" if valor_unitario is not None else ""
+
+    # ── Participantes (solicitante + coordenadores) — mesmo visual dos servidores do ofício.
+    # Quem não foi informado simplesmente não aparece.
+    nome_op, cargo_op = plano.coordenador_nome_cargo("op")
+    candidatos = [
+        (plano.programa_display, "", "Solicitante"),
+        (coordenador_nome, _cargo, "Coord. adm."),
+        (nome_op, cargo_op, "Coord. op."),
+    ]
+    participantes = [
+        {"name": nome, "meta": meta or "", "badge": badge}
+        for nome, meta, badge in candidatos
+        if (nome or "").strip()
+    ]
+
+    # ── Atividades selecionadas no plano
+    atividades = (
+        [a.nome for a in plano.atividades_selecionadas.order_by("ordem", "nome")]
+        if plano.pk
+        else []
+    )
+
     return {
         "id": plano.pk,
         "numero_label": plano.numero_formatado,
@@ -325,7 +359,13 @@ def apresentar_plano_card(plano):
         "periodo": periodo_label,
         "programa": programa_label,
         "coordenador": coordenador_nome or "—",
+        "participantes": participantes,
+        "atividades": atividades,
+        "atividades_count": len(atividades),
         "efetivo_total": efetivo_total,
+        "valor_total_display": valor_total_display,
+        "valor_unitario_display": valor_unitario_display,
+        "diarias_composicao": diarias_composicao,
         "data_criacao_label": plano.data_criacao.strftime("%d/%m/%Y"),
         "editar_url": reverse("planos_trabalho:wizard_identificacao", args=[plano.pk]),
         "documentos_url": reverse("planos_trabalho:wizard_documentos", args=[plano.pk]),
