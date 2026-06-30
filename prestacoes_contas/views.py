@@ -146,7 +146,7 @@ def _build_identificacao(pc) -> dict:
         "destino": _destino_display(oficio) or "—",
         "periodo": _periodo_display(oficio) or "—",
         "nome_servidor": servidor.nome,
-        "rg_servidor": servidor.rg_formatado,
+        "cpf_servidor": servidor.cpf_formatado,
         "cargo": str(servidor.cargo) if servidor.cargo_id else "—",
         "unidade": str(servidor.unidade) if servidor.unidade_id else "",
         "is_motorista": oficio.motorista_id == servidor.id,

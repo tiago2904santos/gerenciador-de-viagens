@@ -200,7 +200,7 @@ def build_relatorio_tecnico_context(relatorio: RelatorioTecnico) -> dict:
         "telefone": inst.get("telefone_formatado") or inst.get("telefone") or "",
         "email": str(inst.get("email") or "").strip().lower(),
         "nome_servidor": servidor.nome,
-        "rg_servidor": servidor.rg_formatado,
+        "cpf_servidor": servidor.cpf_formatado,
         "diaria": normalize_spaces(relatorio.diaria or "") or defaults.get("diaria", ""),
         "translado": normalize_spaces(relatorio.translado or "") or defaults.get("translado", ""),
         "combustivel": normalize_spaces(relatorio.combustivel or "") or defaults.get("combustivel", ""),

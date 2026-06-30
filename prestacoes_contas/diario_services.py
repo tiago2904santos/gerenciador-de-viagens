@@ -184,14 +184,14 @@ def sincronizar_trechos(diario: DiarioBordo) -> list[DiarioBordoTrecho]:
     return list(diario.trechos.select_related("trecho").all())
 
 
-def _motorista_nome_rg(oficio: Oficio) -> tuple[str, str]:
+def _motorista_nome_cpf(oficio: Oficio) -> tuple[str, str]:
     if oficio.motorista_id:
         servidor = oficio.motorista
-        return servidor.nome, (servidor.rg_formatado or "")
+        return servidor.nome, (servidor.cpf_formatado or "")
     if oficio.motorista_modo == Oficio.MOTORISTA_MODO_MANUAL:
         return (
             (oficio.motorista_manual_nome or "").strip(),
-            (oficio.motorista_manual_rg or "").strip(),
+            (oficio.motorista_manual_cpf or "").strip(),
         )
     return "", ""
 
@@ -225,7 +225,7 @@ def _abastecimento_label(valor) -> str:
 def build_diario_bordo_context(diario: DiarioBordo) -> tuple[dict, list[dict]]:
     oficio = diario.prestacao.oficio
     inst = build_configuracao_context()
-    motorista_nome, motorista_rg = _motorista_nome_rg(oficio)
+    motorista_nome, motorista_cpf = _motorista_nome_cpf(oficio)
     viatura = _viatura_dados(oficio)
 
     header = {
@@ -239,7 +239,7 @@ def build_diario_bordo_context(diario: DiarioBordo) -> tuple[dict, list[dict]]:
         "placa": viatura["placa"],
         "placa_reservada": "",
         "motorista": _upper(motorista_nome),
-        "rg_motorista": motorista_rg,
+        "cpf_motorista": motorista_cpf,
     }
 
     linhas = []
