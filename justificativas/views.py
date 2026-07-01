@@ -8,6 +8,8 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.http import require_POST
 
+from core.normalizers import remove_accents
+
 from .forms import JustificativaQuickAddForm
 from .forms import ModeloJustificativaForm
 from .presenters import apresentar_linha_lista_simples_justificativa
@@ -48,11 +50,12 @@ def index(request):
     q = request.GET.get("q", "").strip()
     justificativas = listar_justificativas()
     if q:
+        q_unaccent = remove_accents(q)
         justificativas = justificativas.filter(
-            Q(oficio__protocolo__icontains=q)
-            | Q(oficio__assunto__icontains=q)
-            | Q(texto__icontains=q)
-            | Q(modelo__nome__icontains=q)
+            Q(oficio__protocolo__unaccent__icontains=q_unaccent)
+            | Q(oficio__assunto__unaccent__icontains=q_unaccent)
+            | Q(texto__unaccent__icontains=q_unaccent)
+            | Q(modelo__nome__unaccent__icontains=q_unaccent)
         )
 
     paginator = Paginator(justificativas, JUSTIFICATIVAS_PER_PAGE)

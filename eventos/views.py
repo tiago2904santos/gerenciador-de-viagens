@@ -15,6 +15,7 @@ from django.views.decorators.http import require_POST
 
 from cadastros.models import ConfiguracaoSistema
 from cadastros.models import Estado
+from core.normalizers import remove_accents
 from roteiros.selectors import listar_cidades_para_select
 
 from oficios.presenters import apresentar_oficio_card
@@ -70,14 +71,15 @@ def index(request):
         "ordens_servico__destinos__estado",
     )
     if q:
+        q_unaccent = remove_accents(q)
         eventos = eventos.filter(
-            Q(titulo__icontains=q)
-            | Q(descricao__icontains=q)
-            | Q(motivo__icontains=q)
-            | Q(destino_cidade__icontains=q)
-            | Q(destino_uf__icontains=q)
-            | Q(responsavel__nome__icontains=q)
-            | Q(unidade_responsavel__nome__icontains=q)
+            Q(titulo__unaccent__icontains=q_unaccent)
+            | Q(descricao__unaccent__icontains=q_unaccent)
+            | Q(motivo__unaccent__icontains=q_unaccent)
+            | Q(destino_cidade__unaccent__icontains=q_unaccent)
+            | Q(destino_uf__unaccent__icontains=q_unaccent)
+            | Q(responsavel__nome__unaccent__icontains=q_unaccent)
+            | Q(unidade_responsavel__nome__unaccent__icontains=q_unaccent)
         )
 
     hoje = timezone.localdate()

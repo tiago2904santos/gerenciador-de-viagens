@@ -3392,10 +3392,18 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
 .oficio-lc__traveller--justificativa {
   background: var(--color-card-muted);
   border-color: var(--color-border-soft);
+  min-height: 68px;
 }
 
 .oficio-lc__traveller--justificativa .oficio-lc__traveller-meta {
   white-space: normal;
+}
+
+/* ASSINANTE é curto por natureza (nome · cargo): evita quebrar em 2 linhas e destoar da altura dos servidores */
+.oficio-lc__traveller--assinante .oficio-lc__traveller-meta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .oficio-lc__traveller-name-row {
@@ -3417,6 +3425,7 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
 
 .oficio-lc__traveller-meta {
   color: var(--color-muted);
+  flex-basis: 100%;
   font-size: var(--font-size-xs);
   font-weight: 500;
   line-height: 1.3;

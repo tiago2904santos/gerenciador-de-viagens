@@ -108,6 +108,15 @@ def _solicitacao_item(doc):
     }
 
 
+def _titulo_sem_data(evento) -> str:
+    titulo = evento.titulo or f"Evento #{evento.pk}"
+    if evento.data_inicio:
+        sufixo = f" - {evento.data_inicio.strftime('%d/%m/%Y')}"
+        if titulo.endswith(sufixo):
+            titulo = titulo[: -len(sufixo)]
+    return titulo
+
+
 def _evento_meta(evento) -> str:
     parts = []
     raw = evento.destino_display
@@ -144,7 +153,7 @@ def apresentar_evento_list_card(evento):
 
     return {
         "pk": evento.pk,
-        "titulo": evento.titulo or f"Evento #{evento.pk}",
+        "titulo": _titulo_sem_data(evento),
         "status_label": evento.get_status_display(),
         "status_state": "success" if evento.status == evento.STATUS_FINALIZADO else "warning",
         "destino": _clean_evento_display(evento.destino_display),

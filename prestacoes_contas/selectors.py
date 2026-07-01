@@ -3,6 +3,7 @@ from django.db.models import Q
 from django.utils import timezone
 
 from cadastros.models import Servidor
+from core.normalizers import remove_accents
 from roteiros.models import RoteiroTrecho
 
 from .models import PrestacaoContas
@@ -58,11 +59,12 @@ def listar_prestacoes(
 
     if q:
         query = q.strip()
+        query_unaccent = remove_accents(query)
         filters = (
-            Q(servidor__nome__icontains=query)
-            | Q(oficio__protocolo__icontains=query)
-            | Q(numero_solicitacao__icontains=query)
-            | Q(servidor__cargo__nome__icontains=query)
+            Q(servidor__nome__unaccent__icontains=query_unaccent)
+            | Q(oficio__protocolo__unaccent__icontains=query_unaccent)
+            | Q(numero_solicitacao__unaccent__icontains=query_unaccent)
+            | Q(servidor__cargo__nome__unaccent__icontains=query_unaccent)
         )
         if query.isdigit():
             filters |= Q(oficio__numero=int(query)) | Q(oficio__ano=int(query))

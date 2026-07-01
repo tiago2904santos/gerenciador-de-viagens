@@ -7,6 +7,8 @@ from __future__ import annotations
 
 from django.db.models import Count, Q
 
+from core.normalizers import remove_accents
+
 from .models import Protocolo
 
 
@@ -26,12 +28,12 @@ def listar_protocolos(*, busca: str = "", status: str = "", apenas_ativos: bool 
     if status:
         qs = qs.filter(status_local=status)
     if busca:
-        termo = busca.strip()
+        termo = remove_accents(busca.strip())
         qs = qs.filter(
-            Q(numero__icontains=termo)
-            | Q(assunto_resumo__icontains=termo)
-            | Q(nome_local_atual__icontains=termo)
-            | Q(nome_responsavel_atual__icontains=termo)
+            Q(numero__unaccent__icontains=termo)
+            | Q(assunto_resumo__unaccent__icontains=termo)
+            | Q(nome_local_atual__unaccent__icontains=termo)
+            | Q(nome_responsavel_atual__unaccent__icontains=termo)
         )
     return qs.order_by("-criado_no_sistema_em")
 

@@ -24,12 +24,6 @@
   gap: var(--space-4);
 }
 
-.evento-lc__id-sub {
-  color: var(--color-muted);
-  font-size: var(--font-size-xs);
-  margin-top: var(--space-1);
-}
-
 .evento-lc__section-head {
   align-items: flex-start;
   display: flex;
