@@ -257,13 +257,17 @@ class TermoAutorizacaoCadastroTests(TestCase):
         self.assertNotContains(response_edit, "page-stepper page-stepper--horizontal")
         self.assertContains(response_edit, "id=\"id_oficio_busca\"")
 
+    @mock.patch("termos.views.gerar_termo_cadastro_um")
     @mock.patch("termos.views.gerar_termo_cadastro_lote")
-    def test_download_docx_multiplo_retorna_zip(self, m_lote):
+    def test_download_docx_multiplo_retorna_zip(self, m_lote, m_um):
         termo = TermoAutorizacao.objects.create(
             destino_estado=self.estado,
             destino_cidade=self.cidade_destino,
             data_evento_inicio=date(2026, 6, 10),
             data_evento_fim=date(2026, 6, 10),
+        )
+        m_um.return_value = SimpleNamespace(
+            conteudo=b"g", nome_arquivo="generico.docx", content_type="docx", hash_sha256="0"
         )
         m_lote.return_value = [
             SimpleNamespace(conteudo=b"a", nome_arquivo="a.docx", content_type="docx", hash_sha256="1"),
@@ -275,4 +279,4 @@ class TermoAutorizacaoCadastroTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "application/zip")
         with ZipFile(BytesIO(response.content)) as zf:
-            self.assertEqual(set(zf.namelist()), {"a.docx", "b.docx"})
+            self.assertEqual(set(zf.namelist()), {"generico.docx", "a.docx", "b.docx"})

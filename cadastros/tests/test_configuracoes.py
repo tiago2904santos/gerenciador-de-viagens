@@ -8,17 +8,20 @@ from django.urls import reverse
 from cadastros.forms import ConfiguracaoSistemaForm
 from cadastros.models import ConfiguracaoSistema
 from cadastros.models import Estado
+from cadastros.models import Unidade
 from cadastros.services import resolver_sede_ids_desde_configuracao
 
 
 class ConfiguracaoSistemaFormTests(TestCase):
     def setUp(self):
         self.instance = ConfiguracaoSistema.get_singleton()
+        self.divisao = Unidade.objects.create(nome="DIVISAO", sigla="DIV")
+        self.unidade = Unidade.objects.create(nome="UNIDADE", sigla="UNI")
 
     def _build_valid_data(self):
         return {
-            "divisao": "DIV",
-            "unidade": "UNI",
+            "divisao": self.divisao.pk,
+            "unidade": self.unidade.pk,
             "cep": "80000-000",
             "logradouro": "RUA TESTE",
             "numero": "123",
@@ -92,7 +95,7 @@ class ApiConsultaCepTests(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 400)
 
-    @patch("cadastros.views.requests.get")
+    @patch("cadastros.services_via_cep.requests.get")
     def test_retorna_404_para_cep_nao_encontrado(self, mock_get):
         self.client.force_login(self.user)
         api_response = Mock()
@@ -104,7 +107,7 @@ class ApiConsultaCepTests(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
-    @patch("cadastros.views.requests.get")
+    @patch("cadastros.services_via_cep.requests.get")
     def test_retorna_200_com_campos_esperados(self, mock_get):
         self.client.force_login(self.user)
         api_response = Mock()

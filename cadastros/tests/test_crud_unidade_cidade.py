@@ -1,4 +1,5 @@
-﻿from django.test import TestCase
+﻿from django.contrib.auth import get_user_model
+from django.test import TestCase
 from django.test import override_settings
 from django.urls import reverse
 
@@ -12,6 +13,11 @@ from cadastros.models import Viatura
 
 @override_settings(ALLOWED_HOSTS=["testserver", "localhost"])
 class UnidadeCrudTests(TestCase):
+    def setUp(self):
+        user_model = get_user_model()
+        self.user = user_model.objects.create_user(username="teste-unidade", password="senha-teste")
+        self.client.force_login(self.user)
+
     def test_get_listagem_unidades_retorna_200(self):
         response = self.client.get(reverse("cadastros:unidades_index"))
         self.assertEqual(response.status_code, 200)
@@ -53,6 +59,9 @@ class UnidadeCrudTests(TestCase):
 @override_settings(ALLOWED_HOSTS=["testserver", "localhost"])
 class CidadeCrudTests(TestCase):
     def setUp(self):
+        user_model = get_user_model()
+        self.user = user_model.objects.create_user(username="teste-cidade", password="senha-teste")
+        self.client.force_login(self.user)
         self.estado_pr, _ = Estado.objects.get_or_create(sigla="PR", defaults={"nome": "PARANA"})
 
     def test_get_listagem_cidades_retorna_200(self):
