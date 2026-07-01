@@ -77,6 +77,12 @@
   box-shadow: var(--shadow-xs);
   font-size: 18px;
   line-height: 1;
+  color: var(--color-primary-bright);
+}
+
+.gdrive-block__icon .cv-icon {
+  width: 20px;
+  height: 20px;
 }
 
 /* ── Meta da conta — grade de pílulas label/valor ─────────────────────────── */
@@ -172,8 +178,16 @@
 }
 
 .gdrive-pasta-selecionada__icon {
+  display: inline-flex;
   flex: 0 0 auto;
-  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: var(--color-success);
+}
+
+.gdrive-pasta-selecionada__icon .cv-icon {
+  width: 100%;
+  height: 100%;
 }
 
 .gdrive-pasta-selecionada__nome {
@@ -266,8 +280,16 @@
 }
 
 .gdrive-folder-item__icon {
+  display: inline-flex;
   flex: 0 0 auto;
-  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  color: var(--color-text-soft);
+}
+
+.gdrive-folder-item__icon .cv-icon {
+  width: 100%;
+  height: 100%;
 }
 
 .gdrive-folder-item__name {
@@ -366,8 +388,16 @@
 }
 
 .gdrive-stat__icon {
+  display: inline-flex;
   flex: 0 0 auto;
-  font-size: 16px;
+  width: 18px;
+  height: 18px;
+  color: var(--color-primary-bright);
+}
+
+.gdrive-stat__icon .cv-icon {
+  width: 100%;
+  height: 100%;
 }
 
 .gdrive-stat__text {
@@ -398,12 +428,18 @@
 
 .gdrive-status {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: var(--space-3);
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-md);
   background: var(--color-info-bg);
   border: 1px solid var(--color-info-border);
+}
+
+.gdrive-status__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
 }
 
 .gdrive-status__spinner { display: none; }
@@ -442,6 +478,42 @@
 
 .gdrive-status.is-done .gdrive-status__text { color: var(--color-success); }
 .gdrive-status.is-error .gdrive-status__text { color: var(--color-danger-text, var(--color-danger)); }
+
+.gdrive-status__percent {
+  margin-left: auto;
+  color: var(--color-info-text);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+.gdrive-status.is-done .gdrive-status__percent { color: var(--color-success); }
+.gdrive-status.is-error .gdrive-status__percent { display: none; }
+
+/* Barra de progresso da reorganização em massa */
+.gdrive-progress {
+  width: 100%;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-soft);
+  overflow: hidden;
+}
+
+.gdrive-progress__fill {
+  width: 0;
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary-bright);
+  transition: width 0.4s ease;
+}
+
+.gdrive-status.is-done .gdrive-progress__fill { background: var(--color-success); }
+.gdrive-status.is-error .gdrive-progress { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .gdrive-progress__fill { transition: none; }
+}
 
 /* Prévia */
 .gdrive-previa {

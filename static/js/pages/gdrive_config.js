@@ -1,6 +1,11 @@
 (function () {
   "use strict";
 
+  const FOLDER_ICON_SVG =
+    '<svg class="cv-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+    '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" ' +
+    'fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>';
+
   function initFolderBrowser(container) {
     const urlListar = container.dataset.urlListar;
     const urlCriar = container.dataset.urlCriar;
@@ -79,7 +84,7 @@
 
         item.innerHTML = `
           <button type="button" class="gdrive-folder-item__select" aria-label="Selecionar pasta ${pasta.name}">
-            <span class="gdrive-folder-item__icon" aria-hidden="true">📁</span>
+            <span class="gdrive-folder-item__icon" aria-hidden="true">${FOLDER_ICON_SVG}</span>
             <span class="gdrive-folder-item__name">${escapeHtml(pasta.name)}</span>
           </button>
           <button type="button" class="gdrive-folder-item__enter cv-btn cv-btn--ghost cv-btn--xs"
@@ -267,9 +272,18 @@
     const urlStatus = container.dataset.urlStatus;
     const box = document.getElementById("gdrive-status");
     const texto = document.getElementById("gdrive-status-texto");
+    const percentEl = document.getElementById("gdrive-status-percent");
+    const progressEl = document.getElementById("gdrive-progress");
+    const progressFill = document.getElementById("gdrive-progress-fill");
     if (!urlStatus || !box || !texto) return;
 
     let timer = null;
+
+    function setProgress(pct) {
+      if (progressFill) progressFill.style.width = pct + "%";
+      if (progressEl) progressEl.setAttribute("aria-valuenow", String(pct));
+      if (percentEl) percentEl.textContent = pct + "%";
+    }
 
     function render(data) {
       if (!data || !data.existe) {
@@ -277,16 +291,26 @@
         return;
       }
       box.hidden = false;
+      box.classList.remove("is-running", "is-done", "is-error");
+
+      const total = data.total_eventos || 0;
+      const feitos = data.eventos_processados || 0;
+      const pct = total > 0 ? Math.round((feitos / total) * 100) : data.em_andamento ? 0 : 100;
+
       if (data.em_andamento) {
-        const total = data.total_eventos || 0;
-        const feitos = data.eventos_processados || 0;
+        box.classList.add("is-running");
+        setProgress(pct);
         const sufixo = total ? ` (${feitos}/${total} eventos)` : "";
         texto.textContent = "Em andamento…" + sufixo;
       } else if (data.status === "concluida") {
+        box.classList.add("is-done");
+        setProgress(100);
         const erros = data.erros ? `, ${data.erros} erro(s)` : "";
         texto.textContent =
           `Concluída: ${data.total_eventos} evento(s) e ${data.avulsos} avulso(s)${erros}.`;
       } else if (data.status === "erro") {
+        box.classList.add("is-error");
+        if (percentEl) percentEl.textContent = "";
         texto.textContent = "Erro: " + (data.mensagem || "falha na reorganização.");
       }
     }
