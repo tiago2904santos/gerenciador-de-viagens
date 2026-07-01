@@ -100,7 +100,7 @@ def build_evento_document_seed(evento) -> dict:
         "estado": estado,
         "data_inicio": evento.data_inicio,
         "data_fim": evento.data_fim or evento.data_inicio,
-        "motivo": (evento.descricao or "").strip(),
+        "motivo": (evento.motivo or evento.descricao or "").strip(),
         "servidores": [],
         "servidores_termo": [],
         "viatura": None,

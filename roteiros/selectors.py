@@ -1,6 +1,10 @@
+from django.db.models import Case
 from django.db.models import Count
+from django.db.models import IntegerField
 from django.db.models import Prefetch
 from django.db.models import Q
+from django.db.models import Value
+from django.db.models import When
 from django.shortcuts import get_object_or_404
 
 from cadastros.models import Cidade, Estado
@@ -135,6 +139,52 @@ def queryset_roteiros_avulsos_para_mapa_rotas(limit=50):
         )
         .order_by("-pk")[:limit]
     )
+
+
+def queryset_roteiros_reutilizaveis_para_evento(evento=None, limit=50, excluir_pk=None):
+    """Roteiros avulsos (reuso global) + roteiros do evento atual (Etapa 2 ou ja usados por
+    algum oficio do evento), priorizando o roteiro do evento no topo da lista.
+
+    `excluir_pk` tira da lista o roteiro que ja esta vinculado ao documento em edicao
+    (nao faz sentido oferecer "reaproveitar" o proprio roteiro atual).
+    """
+    condicao = Q(tipo=Roteiro.TIPO_AVULSO)
+    if evento is not None:
+        condicao |= Q(evento=evento) | Q(oficios__evento=evento)
+
+    qs = (
+        Roteiro.objects.filter(condicao)
+        .annotate(
+            qtd_destinos=Count("destinos", distinct=True),
+            qtd_trechos=Count("trechos", distinct=True),
+        )
+        .filter(Q(qtd_destinos__gt=0) | Q(qtd_trechos__gt=0))
+        .distinct()
+        .select_related("origem_cidade", "origem_estado")
+        .prefetch_related(
+            "destinos",
+            "destinos__estado",
+            "destinos__cidade",
+            "trechos",
+            "trechos__origem_estado",
+            "trechos__origem_cidade",
+            "trechos__destino_estado",
+            "trechos__destino_cidade",
+        )
+    )
+    if excluir_pk:
+        qs = qs.exclude(pk=excluir_pk)
+    if evento is not None:
+        qs = qs.annotate(
+            is_do_evento=Case(
+                When(Q(evento=evento) | Q(oficios__evento=evento), then=Value(1)),
+                default=Value(0),
+                output_field=IntegerField(),
+            )
+        ).order_by("-is_do_evento", "-pk")
+    else:
+        qs = qs.order_by("-pk")
+    return qs[:limit]
 
 
 def obter_cidades_origem_destino_estimativa(origem_id, destino_id):

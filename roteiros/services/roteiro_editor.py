@@ -90,9 +90,14 @@ def preparar_querysets_formulario_roteiro(form, *, method, post, instance=None):
     roteiro_logic._setup_roteiro_querysets(form, fake_request, instance)
 
 
-def carregar_opcoes_rotas_avulsas_salvas():
-    """Lista opções de duplicação de roteiros avulsos e mapa de estado serializável (roteiro)."""
-    return roteiro_logic._build_roteiro_avulso_route_options()
+def carregar_opcoes_rotas_avulsas_salvas(evento=None, excluir_pk=None):
+    """Lista opções de duplicação de roteiros avulsos e mapa de estado serializável (roteiro).
+
+    Quando `evento` é informado, roteiros já vinculados a esse evento (Etapa 2 ou usados
+    por algum ofício do evento) entram na lista e ficam priorizados no topo. `excluir_pk`
+    tira da lista o roteiro que já está vinculado ao documento em edição.
+    """
+    return roteiro_logic._build_roteiro_avulso_route_options(evento=evento, excluir_pk=excluir_pk)
 
 
 def preparar_estado_editor_roteiro_para_get(initial=None, roteiro=None):
