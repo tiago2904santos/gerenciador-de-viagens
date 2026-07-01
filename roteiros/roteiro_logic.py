@@ -1349,16 +1349,17 @@ def _roteiro_virtual_para_trechos(initial):
     return r
 
 
-def _build_roteiro_avulso_route_options():
+def _build_roteiro_avulso_route_options(evento=None, excluir_pk=None):
     """
-    Build route_options from all avulso roteiros.
+    Build route_options from reusable roteiros: avulsos (globais) + roteiros do evento
+    informado (sempre priorizados no topo da lista quando evento e passado).
     Returns (options_list, state_map) mirroring _build_roteiro_route_options.
     """
     from roteiros import selectors
 
     options = []
     state_map = {}
-    roteiros = selectors.queryset_roteiros_avulsos_para_mapa_rotas()
+    roteiros = selectors.queryset_roteiros_reutilizaveis_para_evento(evento=evento, excluir_pk=excluir_pk)
     for roteiro in roteiros:
         destinos = [
             _roteiro_local_label(destino.cidade, destino.estado)
@@ -1374,7 +1375,7 @@ def _build_roteiro_avulso_route_options():
             'label': state.get('roteiro_evento_label') or f'Roteiro #{roteiro.pk}',
             'resumo': resumo,
             'status': roteiro.status,
-            'tipo_label': 'Avulso',
+            'tipo_label': 'Vinculado a evento' if roteiro.tipo == Roteiro.TIPO_EVENTO else 'Avulso',
             'state': _serialize_roteiro_state(state),
         })
     return options, state_map

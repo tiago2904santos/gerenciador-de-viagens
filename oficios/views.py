@@ -711,7 +711,9 @@ def wizard_roteiro(request, pk):
     roteiro = oficio.roteiro
     qtd_viajantes = oficio.servidores.count()
 
-    route_options, route_state_map = carregar_opcoes_rotas_avulsas_salvas()
+    route_options, route_state_map = carregar_opcoes_rotas_avulsas_salvas(
+        evento=oficio.evento, excluir_pk=roteiro.pk
+    )
 
     if request.method == "POST":
         roteiro_vinculado = oficio.roteiro
@@ -723,7 +725,7 @@ def wizard_roteiro(request, pk):
             request.POST, route_state_map, roteiro=roteiro_vinculado
         )
         if form.is_valid() and validated["ok"]:
-            roteiro_escolhido = obter_roteiro_escolhido_do_post(request.POST)
+            roteiro_escolhido = obter_roteiro_escolhido_do_post(request.POST, evento=oficio.evento)
             if roteiro_escolhido and roteiro_state_equivalente_ao_roteiro(roteiro_escolhido, roteiro_state, validated):
                 # Sem alterações: vincular diretamente ao roteiro selecionado
                 rascunho_antigo = roteiro_vinculado if (roteiro_vinculado and roteiro_vinculado.status == Roteiro.STATUS_RASCUNHO) else None

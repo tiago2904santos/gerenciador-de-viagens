@@ -21,7 +21,7 @@ from roteiros.selectors import listar_cidades_para_select
 from oficios.presenters import apresentar_oficio_card
 from ordens_servico.presenters import apresentar_ordem_servico_card
 from planos_trabalho.presenters import apresentar_plano_card
-from roteiros.presenters import apresentar_roteiro_card
+from roteiros.presenters import apresentar_linha_lista_simples_roteiro
 
 from prestacoes_contas.forms import PrestacaoMultipleFileField
 from prestacoes_contas.forms import PrestacaoMultipleFileInput
@@ -200,8 +200,8 @@ def _save_destinos_extras(evento, request):
         evento.destinos_extras = []
 
 
-def _roteiro_cards_do_evento(evento):
-    """Retorna cards de roteiros do evento: diretos (roteiro.evento) + via oficios."""
+def _roteiro_rows_do_evento(evento):
+    """Retorna linhas de roteiros do evento: diretos (roteiro.evento) + via oficios."""
     from roteiros.models import Roteiro
 
     roteiros = (
@@ -210,7 +210,15 @@ def _roteiro_cards_do_evento(evento):
         .order_by("-created_at")
         .prefetch_related("destinos__cidade__estado", "trechos")
     )
-    return [apresentar_roteiro_card(r) for r in roteiros]
+    return [
+        apresentar_linha_lista_simples_roteiro(
+            r,
+            edit_url=reverse("roteiros:editar", args=[r.pk]),
+            delete_url=reverse("roteiros:excluir", args=[r.pk]),
+            delete_modal=True,
+        )
+        for r in roteiros
+    ]
 
 
 def _termos_do_evento(evento):
@@ -348,7 +356,7 @@ def detalhe(request, pk, etapa=1):
             "evento": evento,
             "evento_form": form,
             "oficio_cards": [apresentar_oficio_card(oficio) for oficio in evento.oficios.all()],
-            "roteiro_cards": _roteiro_cards_do_evento(evento),
+            "roteiro_rows": _roteiro_rows_do_evento(evento),
             "plano_cards": [apresentar_plano_card(plano) for plano in evento.planos_trabalho.all()],
             "ordem_cards": [apresentar_ordem_servico_card(ordem) for ordem in evento.ordens_servico.all()],
             "termos": _termos_do_evento(evento),

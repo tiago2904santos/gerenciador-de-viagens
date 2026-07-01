@@ -5,6 +5,7 @@ from datetime import time
 from django.db import transaction
 from django.urls import reverse
 from django.db.models import ProtectedError
+from django.db.models import Q
 from django.utils import timezone
 
 from core.normalizers import normalize_spaces
@@ -134,7 +135,7 @@ def garantir_roteiro_vinculado_ao_oficio(oficio: Oficio) -> Oficio:
     return oficio
 
 
-def obter_roteiro_escolhido_do_post(post):
+def obter_roteiro_escolhido_do_post(post, evento=None):
     """Retorna o Roteiro salvo selecionado no picker, ou None (sem efeitos colaterais)."""
     if (post.get("roteiro_modo") or "").strip() != "EVENTO_EXISTENTE":
         return None
@@ -145,7 +146,10 @@ def obter_roteiro_escolhido_do_post(post):
         return None
     if not roteiro_id:
         return None
-    return Roteiro.objects.filter(pk=roteiro_id, tipo=Roteiro.TIPO_AVULSO).first()
+    condicao = Q(tipo=Roteiro.TIPO_AVULSO)
+    if evento is not None:
+        condicao |= Q(evento=evento) | Q(oficios__evento=evento)
+    return Roteiro.objects.filter(condicao, pk=roteiro_id).first()
 
 
 @transaction.atomic
@@ -181,6 +185,7 @@ def _preencher_roteiro_oficio_com_evento(roteiro: Roteiro, evento) -> None:
     if roteiro is None or evento is None:
         return
 
+    from cadastros.models import ConfiguracaoSistema
     from eventos.services import build_evento_document_seed
 
     seed = build_evento_document_seed(evento)
@@ -192,6 +197,13 @@ def _preencher_roteiro_oficio_com_evento(roteiro: Roteiro, evento) -> None:
     volta_hora = getattr(evento, "horario_fim", None) or time(16, 0)
 
     changed_fields = []
+    if not roteiro.origem_cidade_id and not roteiro.origem_estado_id:
+        config = ConfiguracaoSistema.get_singleton()
+        cidade_sede = getattr(config, "cidade_sede_padrao", None)
+        if cidade_sede:
+            roteiro.origem_cidade = cidade_sede
+            roteiro.origem_estado = cidade_sede.estado
+            changed_fields.extend(["origem_cidade", "origem_estado"])
     if not roteiro.saida_dt:
         roteiro.saida_dt = _combine_evento_dt(data_inicio, ida_hora)
         if roteiro.saida_dt:

@@ -187,7 +187,7 @@ def novo(request):
     preparar_querysets_formulario_roteiro(
         form, method=request.method, post=request.POST, instance=rascunho
     )
-    route_options, route_state_map = carregar_opcoes_rotas_avulsas_salvas()
+    route_options, route_state_map = carregar_opcoes_rotas_avulsas_salvas(evento=evento)
 
     if request.method == "POST":
         roteiro_state, validated, diarias_resultado = validar_submissao_editor_roteiro(
@@ -272,7 +272,7 @@ def editar(request, pk):
     preparar_querysets_formulario_roteiro(
         form, method=request.method, post=request.POST, instance=roteiro
     )
-    route_options, route_state_map = carregar_opcoes_rotas_avulsas_salvas()
+    route_options, route_state_map = carregar_opcoes_rotas_avulsas_salvas(evento=evento, excluir_pk=roteiro.pk)
 
     if request.method == "POST":
         roteiro_state, validated, diarias_resultado = validar_submissao_editor_roteiro(
