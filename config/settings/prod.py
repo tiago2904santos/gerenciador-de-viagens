@@ -68,6 +68,11 @@ LOGGING = {
 
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_REFERRER_POLICY = "same-origin"
+# Gunicorn só é acessível via socket unix atrás do Nginx (que seta
+# X-Forwarded-Proto). Sem isso, request.is_secure()/build_absolute_uri()
+# devolvem "http://" mesmo em produção, quebrando fluxos que dependem do
+# esquema real (ex.: redirect_uri do OAuth do Google).
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SECURE_HSTS_SECONDS = 31536000
