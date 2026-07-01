@@ -17,6 +17,7 @@ from core.autosave import autosave_json_response
 from core.autosave import filter_allowed_fields
 from core.autosave import parse_autosave_payload
 from core.normalizers import normalize_spaces
+from core.normalizers import remove_accents
 from core.presenters.meta import build_meta
 from core.utils.masks import format_protocolo
 from documentos.services.exceptions import DocumentValidationError
@@ -1020,7 +1021,8 @@ def modelos_index(request):
     for campo, label in ModeloTextoRelatorioTecnico.CAMPO_CHOICES:
         modelos = ModeloTextoRelatorioTecnico.objects.filter(campo=campo)
         if q:
-            modelos = modelos.filter(Q(nome__icontains=q) | Q(texto__icontains=q))
+            q_unaccent = remove_accents(q)
+            modelos = modelos.filter(Q(nome__unaccent__icontains=q_unaccent) | Q(texto__unaccent__icontains=q_unaccent))
 
         rows = []
         for modelo in modelos:

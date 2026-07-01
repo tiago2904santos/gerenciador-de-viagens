@@ -1,6 +1,8 @@
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
+from core.normalizers import remove_accents
+
 from .models import Justificativa
 from .models import ModeloJustificativa
 
@@ -34,8 +36,8 @@ def listar_modelos_justificativa_busca(q: str | None = None, *, incluir_inativos
     _ = incluir_inativos
     queryset = ModeloJustificativa.objects.order_by("nome")
     if q:
-        query = q.strip()
-        queryset = queryset.filter(Q(nome__icontains=query) | Q(texto__icontains=query))
+        query = remove_accents(q.strip())
+        queryset = queryset.filter(Q(nome__unaccent__icontains=query) | Q(texto__unaccent__icontains=query))
     return queryset
 
 

@@ -5,24 +5,12 @@
 >
   <div class="oficio-lc__layout">
 
-    {# ── IDENTIFICAÇÃO: Número da OS · Período do evento · Data de Criação ── #}
+    {# ── IDENTIFICAÇÃO ── #}
     <div class="oficio-lc__id-row">
       <div class="oficio-lc__info-item">
-        <span class="oficio-lc__info-label">Número da OS</span>
-        <span class="oficio-lc__info-value">{{ card.numero_display }}</span>
+        <span class="oficio-lc__info-label">Ordem de Serviço</span>
+        <span class="oficio-lc__info-value">{{ card.numero_display }}{% if card.destinos_display %} · {{ card.destinos_display }}{% endif %}{% if card.periodo_display %} · {{ card.periodo_display }}{% endif %}</span>
       </div>
-      {% if card.periodo_display %}
-      <div class="oficio-lc__info-item">
-        <span class="oficio-lc__info-label">Período do Evento</span>
-        <span class="oficio-lc__info-value">{{ card.periodo_display }}</span>
-      </div>
-      {% endif %}
-      {% if card.destinos_display %}
-      <div class="oficio-lc__info-item">
-        <span class="oficio-lc__info-label">Destino</span>
-        <span class="oficio-lc__info-value">{{ card.destinos_display }}</span>
-      </div>
-      {% endif %}
       {% if card.temporal_label %}
       {% include "components/ui/badges/chip.html" with tone=card.temporal_tone label=card.temporal_label extra_class="oficio-lc__temporal-chip" only %}
       {% endif %}
@@ -66,15 +54,12 @@
           </div>
         </div>
         {% if card.assinante %}
-        <div class="oficio-lc__traveller oficio-lc__traveller--justificativa">
+        <div class="oficio-lc__traveller oficio-lc__traveller--justificativa oficio-lc__traveller--assinante">
           <div class="oficio-lc__traveller-body">
             <div class="oficio-lc__traveller-name-row">
               <span class="oficio-lc__traveller-name">ASSINANTE</span>
             </div>
-            <span class="oficio-lc__traveller-meta">{{ card.assinante.nome }}</span>
-            {% if card.assinante.cargo %}
-            <span class="oficio-lc__traveller-meta">{{ card.assinante.cargo }}</span>
-            {% endif %}
+            <span class="oficio-lc__traveller-meta">{{ card.assinante.nome }}{% if card.assinante.cargo %} · {{ card.assinante.cargo }}{% endif %}</span>
           </div>
         </div>
         {% endif %}

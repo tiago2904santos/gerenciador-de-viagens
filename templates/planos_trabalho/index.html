@@ -32,4 +32,5 @@
   {% include "components/ui/buttons/floating_action.html" with href=create_url label="Novo plano" variant="primary" icon="plus" aria_label="Novo plano" only %}
 
 </div>
+{% include "components/ui/modals/delete_confirm_modal.html" with delete_modal_title="Excluir Plano de Trabalho?" delete_modal_entity="este plano de trabalho" %}
 {% endblock %}

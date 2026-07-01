@@ -62,15 +62,28 @@ def index(request):
 # OAuth
 # ---------------------------------------------------------------------------
 
+def _oauth_redirect_uri(request):
+    """Monta o redirect_uri a partir do host real da requisição.
+
+    Evita o mismatch de cookie de sessão que ocorre quando `GOOGLE_REDIRECT_URI`
+    fixa um host (ex.: localhost:8000) diferente do host usado para acessar a
+    aplicação (ex.: domínio de túnel/produção): o Google redireciona para o
+    host configurado, que não recebe o cookie de sessão gravado no host de
+    origem, e a troca do código falha com "Missing code verifier".
+    """
+    from django.urls import reverse
+
+    return request.build_absolute_uri(reverse("google_drive:oauth_callback"))
+
+
 @login_required
 def oauth_iniciar(request):
     from google_auth_oauthlib.flow import Flow
 
-    cfg = getattr(settings, "GOOGLE_DRIVE", {})
     flow = Flow.from_client_config(
         client_config_dict(),
         scopes=_SCOPES,
-        redirect_uri=cfg.get("REDIRECT_URI", ""),
+        redirect_uri=_oauth_redirect_uri(request),
     )
     auth_url, state = flow.authorization_url(
         access_type="offline",
@@ -88,7 +101,6 @@ def oauth_callback(request):
 
     from google_auth_oauthlib.flow import Flow
 
-    cfg = getattr(settings, "GOOGLE_DRIVE", {})
     state = request.session.get("gdrive_oauth_state")
 
     if "error" in request.GET:
@@ -99,7 +111,7 @@ def oauth_callback(request):
         flow = Flow.from_client_config(
             client_config_dict(),
             scopes=_SCOPES,
-            redirect_uri=cfg.get("REDIRECT_URI", ""),
+            redirect_uri=_oauth_redirect_uri(request),
             state=state,
         )
         code_verifier = request.session.get("gdrive_code_verifier")

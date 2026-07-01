@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
 from core.normalizers import normalize_plate
+from core.normalizers import remove_accents
 
 from cadastros.models import Servidor
 from cadastros.models import Unidade
@@ -67,15 +68,16 @@ def listar_oficios(
         queryset = queryset.filter(status=status)
     if q:
         query = q.strip()
+        query_unaccent = remove_accents(query)
         filters = (
-            Q(protocolo__icontains=query)
-            | Q(assunto__icontains=query)
-            | Q(motivo__icontains=query)
-            | Q(roteiro__observacoes__icontains=query)
-            | Q(roteiro__origem_cidade__nome__icontains=query)
-            | Q(roteiro__origem_estado__nome__icontains=query)
-            | Q(roteiro__destinos__cidade__nome__icontains=query)
-            | Q(servidores__nome__icontains=query)
+            Q(protocolo__unaccent__icontains=query_unaccent)
+            | Q(assunto__unaccent__icontains=query_unaccent)
+            | Q(motivo__unaccent__icontains=query_unaccent)
+            | Q(roteiro__observacoes__unaccent__icontains=query_unaccent)
+            | Q(roteiro__origem_cidade__nome__unaccent__icontains=query_unaccent)
+            | Q(roteiro__origem_estado__nome__unaccent__icontains=query_unaccent)
+            | Q(roteiro__destinos__cidade__nome__unaccent__icontains=query_unaccent)
+            | Q(servidores__nome__unaccent__icontains=query_unaccent)
         )
         if query.isdigit():
             num = int(query)
@@ -240,13 +242,14 @@ def buscar_viaturas_para_oficio(
         )
 
     plate_key = normalize_plate(termo)
+    termo_unaccent = remove_accents(termo)
     filters = (
-        Q(modelo__icontains=termo)
-        | Q(unidade__nome__icontains=termo)
-        | Q(unidade__sigla__icontains=termo)
-        | Q(motoristas__nome__icontains=termo)
-        | Q(motoristas__unidade__nome__icontains=termo)
-        | Q(motoristas__unidade__sigla__icontains=termo)
+        Q(modelo__unaccent__icontains=termo_unaccent)
+        | Q(unidade__nome__unaccent__icontains=termo_unaccent)
+        | Q(unidade__sigla__unaccent__icontains=termo_unaccent)
+        | Q(motoristas__nome__unaccent__icontains=termo_unaccent)
+        | Q(motoristas__unidade__nome__unaccent__icontains=termo_unaccent)
+        | Q(motoristas__unidade__sigla__unaccent__icontains=termo_unaccent)
     )
     if plate_key:
         filters |= Q(placa__icontains=plate_key)
@@ -332,8 +335,8 @@ def listar_modelos_motivo(q: str | None = None, incluir_inativos: bool = True):
     _ = incluir_inativos
     queryset = ModeloMotivoOficio.objects.order_by("nome")
     if q:
-        query = q.strip()
-        queryset = queryset.filter(Q(nome__icontains=query) | Q(texto__icontains=query))
+        query = remove_accents(q.strip())
+        queryset = queryset.filter(Q(nome__unaccent__icontains=query) | Q(texto__unaccent__icontains=query))
     return queryset
 
 

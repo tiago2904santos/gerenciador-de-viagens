@@ -16,6 +16,7 @@ from django.utils.dateparse import parse_date
 from django.views.decorators.http import require_GET
 from django.views.decorators.http import require_http_methods
 
+from core.normalizers import remove_accents
 from documentos.services.responses import build_inline_pdf_response_from_download_response
 from documentos.services.types import DocumentoTipo
 from eventos.services import build_evento_document_seed
@@ -42,10 +43,11 @@ def index(request):
         "oficios",
     )
     if q:
+        q_unaccent = remove_accents(q)
         filters = (
-            Q(motivo__icontains=q)
-            | Q(destinos__nome__icontains=q)
-            | Q(servidores__nome__icontains=q)
+            Q(motivo__unaccent__icontains=q_unaccent)
+            | Q(destinos__nome__unaccent__icontains=q_unaccent)
+            | Q(servidores__nome__unaccent__icontains=q_unaccent)
         )
         if q.isdigit():
             filters |= Q(numero=int(q)) | Q(ano=int(q)) | Q(oficios__numero=int(q))

@@ -19,6 +19,7 @@ from django.views.decorators.http import require_GET
 from django.views.decorators.http import require_http_methods
 
 from cadastros.models import Servidor
+from core.normalizers import remove_accents
 
 from documentos.services.responses import build_inline_pdf_response
 from documentos.services.types import DocumentoFormato
@@ -61,20 +62,21 @@ def index(request):
         .order_by("-created_at")
     )
     if q:
+        q_unaccent = remove_accents(q)
         query = (
-            Q(destino_cidade__nome__icontains=q)
-            | Q(destino_cidade__uf__icontains=q)
-            | Q(destino_estado__nome__icontains=q)
-            | Q(destino_estado__sigla__icontains=q)
+            Q(destino_cidade__nome__unaccent__icontains=q_unaccent)
+            | Q(destino_cidade__uf__unaccent__icontains=q_unaccent)
+            | Q(destino_estado__nome__unaccent__icontains=q_unaccent)
+            | Q(destino_estado__sigla__unaccent__icontains=q_unaccent)
             | Q(oficio__numero__icontains=q)
             | Q(oficio__protocolo__icontains=q)
-            | Q(oficio__servidores__nome__icontains=q)
-            | Q(oficio__servidores_termo_autorizacao__nome__icontains=q)
-            | Q(servidores__nome__icontains=q)
+            | Q(oficio__servidores__nome__unaccent__icontains=q_unaccent)
+            | Q(oficio__servidores_termo_autorizacao__nome__unaccent__icontains=q_unaccent)
+            | Q(servidores__nome__unaccent__icontains=q_unaccent)
             | Q(viatura__placa__icontains=q)
-            | Q(viatura__modelo__icontains=q)
+            | Q(viatura__modelo__unaccent__icontains=q_unaccent)
             | Q(oficio__viatura__placa__icontains=q)
-            | Q(oficio__viatura__modelo__icontains=q)
+            | Q(oficio__viatura__modelo__unaccent__icontains=q_unaccent)
         )
         if q_digits:
             query |= Q(oficio__protocolo__icontains=q_digits) | Q(oficio__numero__icontains=q_digits)

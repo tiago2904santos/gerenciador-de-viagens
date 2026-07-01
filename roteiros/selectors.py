@@ -4,6 +4,7 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
 from cadastros.models import Cidade, Estado
+from core.normalizers import remove_accents
 
 from .models import Roteiro
 from .models import RoteiroTrecho
@@ -43,13 +44,14 @@ def listar_roteiros(q=None, status=None):
     if status:
         queryset = queryset.filter(status=status)
     if q:
+        q_unaccent = remove_accents(q)
         queryset = queryset.filter(
-            Q(origem_cidade__nome__icontains=q)
-            | Q(origem_estado__sigla__icontains=q)
-            | Q(origem_estado__nome__icontains=q)
-            | Q(destinos__cidade__nome__icontains=q)
-            | Q(destinos__estado__sigla__icontains=q)
-            | Q(observacoes__icontains=q)
+            Q(origem_cidade__nome__unaccent__icontains=q_unaccent)
+            | Q(origem_estado__sigla__unaccent__icontains=q_unaccent)
+            | Q(origem_estado__nome__unaccent__icontains=q_unaccent)
+            | Q(destinos__cidade__nome__unaccent__icontains=q_unaccent)
+            | Q(destinos__estado__sigla__unaccent__icontains=q_unaccent)
+            | Q(observacoes__unaccent__icontains=q_unaccent)
             | Q(quantidade_diarias__icontains=q)
         ).distinct()
     return queryset
@@ -107,7 +109,7 @@ def listar_cidades_para_select(estado_id=None, q=None):
         return Cidade.objects.none()
     qs = Cidade.objects.filter(estado_id=estado_id).select_related("estado").order_by("nome")
     if q and str(q).strip():
-        qs = qs.filter(nome__icontains=q.strip())
+        qs = qs.filter(nome__unaccent__icontains=remove_accents(str(q).strip()))
     return qs
 
 

@@ -287,11 +287,14 @@ def index(request):
     if q:
         from django.db.models import Q
 
+        from core.normalizers import remove_accents
+
+        q_unaccent = remove_accents(q)
         filtro = (
-            Q(destino_cidade__nome__icontains=q)
-            | Q(programa__nome__icontains=q)
-            | Q(programa_outros__icontains=q)
-            | Q(contextualizacao__icontains=q)
+            Q(destino_cidade__nome__unaccent__icontains=q_unaccent)
+            | Q(programa__nome__unaccent__icontains=q_unaccent)
+            | Q(programa_outros__unaccent__icontains=q_unaccent)
+            | Q(contextualizacao__unaccent__icontains=q_unaccent)
         )
         if q.isdigit():
             filtro = filtro | Q(numero=int(q)) | Q(ano=int(q))
@@ -1024,8 +1027,13 @@ def atividades_index(request):
 
     atividades = AtividadePlanoTrabalho.objects.order_by("ordem", "nome")
     if q:
+        from core.normalizers import remove_accents
+
+        q_unaccent = remove_accents(q)
         atividades = atividades.filter(
-            Q(nome__icontains=q) | Q(codigo__icontains=q) | Q(meta__icontains=q)
+            Q(nome__unaccent__icontains=q_unaccent)
+            | Q(codigo__unaccent__icontains=q_unaccent)
+            | Q(meta__unaccent__icontains=q_unaccent)
         )
     linhas = [
         {
@@ -1228,25 +1236,16 @@ def baixar_documento(request, pk, formato):
     return response
 
 
+@require_POST
 def excluir(request, pk):
     plano = _get_plano(pk)
-    if request.method == "POST":
-        numero = plano.numero_formatado
-        evento_id = plano.evento_id
-        plano.delete()
-        messages.success(request, f"Plano de Trabalho {numero} excluído.")
-        if evento_id:
-            return redirect("eventos:guiado_etapa", pk=evento_id, etapa=4)
-        return redirect("planos_trabalho:index")
-    return render(
-        request,
-        "planos_trabalho/confirm_delete.html",
-        {
-            "page_title": "Excluir plano de trabalho",
-            "plano": plano,
-            "cancel_url": _plano_lista_url(plano),
-        },
-    )
+    numero = plano.numero_formatado
+    evento_id = plano.evento_id
+    plano.delete()
+    messages.success(request, f"Plano de Trabalho {numero} excluído.")
+    if evento_id:
+        return redirect("eventos:guiado_etapa", pk=evento_id, etapa=4)
+    return redirect("planos_trabalho:index")
 
 
 # ── Programas solicitantes (clone do CRUD de modelos de motivo) ──────────────

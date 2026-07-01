@@ -1,6 +1,8 @@
 ﻿from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
+from core.normalizers import remove_accents
+
 from .models import AssinaturaConfiguracao
 from .models import Cargo
 from .models import ConfiguracaoSistema
@@ -15,18 +17,20 @@ from .models import Viatura
 def listar_unidades(q=None):
     queryset = Unidade.objects.order_by("nome")
     if q:
-        queryset = queryset.filter(Q(nome__icontains=q) | Q(sigla__icontains=q))
+        q = remove_accents(q)
+        queryset = queryset.filter(Q(nome__unaccent__icontains=q) | Q(sigla__unaccent__icontains=q))
     return queryset
 
 
 def listar_cidades(q=None):
     queryset = Cidade.objects.select_related("estado").order_by("estado__sigla", "nome")
     if q:
+        q = remove_accents(q)
         queryset = queryset.filter(
-            Q(nome__icontains=q)
-            | Q(uf__icontains=q)
-            | Q(estado__nome__icontains=q)
-            | Q(estado__sigla__icontains=q)
+            Q(nome__unaccent__icontains=q)
+            | Q(uf__unaccent__icontains=q)
+            | Q(estado__nome__unaccent__icontains=q)
+            | Q(estado__sigla__unaccent__icontains=q)
         )
     return queryset
 
@@ -34,7 +38,8 @@ def listar_cidades(q=None):
 def listar_estados(q=None):
     queryset = Estado.objects.order_by("nome")
     if q:
-        queryset = queryset.filter(Q(nome__icontains=q) | Q(sigla__icontains=q))
+        q = remove_accents(q)
+        queryset = queryset.filter(Q(nome__unaccent__icontains=q) | Q(sigla__unaccent__icontains=q))
     return queryset
 
 
@@ -53,7 +58,7 @@ def get_estado_by_id(pk):
 def listar_cargos(q=None):
     queryset = Cargo.objects.order_by("nome")
     if q:
-        queryset = queryset.filter(Q(nome__icontains=q))
+        queryset = queryset.filter(Q(nome__unaccent__icontains=remove_accents(q)))
     return queryset
 
 
@@ -64,7 +69,7 @@ def get_cargo_by_id(pk):
 def listar_combustiveis(q=None):
     queryset = Combustivel.objects.order_by("nome")
     if q:
-        queryset = queryset.filter(Q(nome__icontains=q))
+        queryset = queryset.filter(Q(nome__unaccent__icontains=remove_accents(q)))
     return queryset
 
 
@@ -75,13 +80,14 @@ def get_combustivel_by_id(pk):
 def listar_servidores(q=None):
     queryset = Servidor.objects.select_related("cargo", "unidade").order_by("nome")
     if q:
+        q_unaccent = remove_accents(q)
         queryset = queryset.filter(
-            Q(nome__icontains=q)
+            Q(nome__unaccent__icontains=q_unaccent)
             | Q(cpf__icontains=q)
             | Q(rg__icontains=q)
-            | Q(cargo__nome__icontains=q)
-            | Q(unidade__nome__icontains=q)
-            | Q(unidade__sigla__icontains=q)
+            | Q(cargo__nome__unaccent__icontains=q_unaccent)
+            | Q(unidade__nome__unaccent__icontains=q_unaccent)
+            | Q(unidade__sigla__unaccent__icontains=q_unaccent)
         )
     return queryset
 
@@ -97,15 +103,16 @@ def listar_viaturas(q=None):
         .order_by("placa")
     )
     if q:
+        q_unaccent = remove_accents(q)
         queryset = (
             queryset.filter(
                 Q(placa__icontains=q)
-                | Q(modelo__icontains=q)
-                | Q(combustivel__nome__icontains=q)
-                | Q(tipo__icontains=q)
-                | Q(unidade__nome__icontains=q)
-                | Q(unidade__sigla__icontains=q)
-                | Q(motoristas__nome__icontains=q)
+                | Q(modelo__unaccent__icontains=q_unaccent)
+                | Q(combustivel__nome__unaccent__icontains=q_unaccent)
+                | Q(tipo__unaccent__icontains=q_unaccent)
+                | Q(unidade__nome__unaccent__icontains=q_unaccent)
+                | Q(unidade__sigla__unaccent__icontains=q_unaccent)
+                | Q(motoristas__nome__unaccent__icontains=q_unaccent)
             )
             .distinct()
         )
