@@ -1,3 +1,11 @@
+import os
+
+# Garante login obrigatório na suíte de testes independente do .env local
+# (dev costuma ter LOGIN_ENFORCED=false para facilitar testes manuais; sem
+# isso, base.py herdaria esse valor via load_dotenv e a suíte deixaria de
+# validar o middleware de autenticação).
+os.environ["LOGIN_ENFORCED"] = "true"
+
 from .base import *
 
 

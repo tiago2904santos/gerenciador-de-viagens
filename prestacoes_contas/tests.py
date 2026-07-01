@@ -195,7 +195,7 @@ class RelatorioTecnicoDocumentoTests(TestCase):
         self.assertEqual(contexto["combustivel"], "Cartão Prime")
         self.assertEqual(contexto["passagem"], "Não houve")
 
-    @mock.patch("prestacoes_contas.views.gerar_relatorio_tecnico_pdf", return_value=b"%PDF-1.4\n%%EOF\n")
+    @mock.patch("prestacoes_contas.services.gerar_relatorio_tecnico_pdf", return_value=b"%PDF-1.4\n%%EOF\n")
     def test_download_pdf_do_rt(self, _mock_pdf):
         response = self.client.get(
             reverse("prestacoes_contas:rt_download_formato", args=[self.relatorio.pk, "pdf"]),

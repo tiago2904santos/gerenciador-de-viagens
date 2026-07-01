@@ -72,6 +72,7 @@ from .services_via_cep import ViaCEPServiceError
 
 
 CADASTROS_PER_PAGE = 15
+SERVIDORES_PER_PAGE = 25
 
 
 def _render_listagem(request, template_name, context):
@@ -681,7 +682,7 @@ def combustivel_delete(request, pk):
 def servidores_index(request):
     q = request.GET.get("q", "").strip()
     servidores = listar_servidores(q=q)
-    paginator = Paginator(servidores, CADASTROS_PER_PAGE)
+    paginator = Paginator(servidores, SERVIDORES_PER_PAGE)
     page_obj = paginator.get_page(request.GET.get("page"))
     rows = [
         apresentar_linha_lista_simples_servidor(

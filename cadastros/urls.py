@@ -5,8 +5,18 @@ from . import views
 app_name = "cadastros"
 
 urlpatterns = [
+    path("", views.index, name="index"),
     path("configuracao/", views.configuracao_sistema, name="configuracao"),
     path("api/cep/<str:cep>/", views.api_consulta_cep, name="api_consulta_cep"),
+    path("estados/", views.estados_index, name="estados_index"),
+    path("estados/novo/", views.estado_create, name="estado_create"),
+    path("estados/<int:pk>/editar/", views.estado_update, name="estado_update"),
+    path("estados/<int:pk>/excluir/", views.estado_delete, name="estado_delete"),
+    path("cidades/", views.cidades_index, name="cidades_index"),
+    path("cidades/exportar/", views.cidades_export_csv, name="cidades_export_csv"),
+    path("cidades/nova/", views.cidade_create, name="cidade_create"),
+    path("cidades/<int:pk>/editar/", views.cidade_update, name="cidade_update"),
+    path("cidades/<int:pk>/excluir/", views.cidade_delete, name="cidade_delete"),
     path("unidades/", views.unidades_index, name="unidades_index"),
     path("unidades/novo/", views.unidade_create, name="unidade_create"),
     path("unidades/<int:pk>/editar/", views.unidade_update, name="unidade_update"),

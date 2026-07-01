@@ -172,16 +172,16 @@ class Oficio(TimeStampedModel):
         from django.conf import settings
 
         resolved_year = ano or timezone.localdate().year
-        ultimo_numero = (
+        piso = getattr(settings, "OFICIO_NUMERO_INICIAL", {}).get(resolved_year, 0)
+        numeros_usados = set(
             cls.objects.filter(ano=resolved_year)
             .exclude(numero__isnull=True)
-            .order_by("-numero")
             .values_list("numero", flat=True)
-            .first()
         )
-        proximo = (ultimo_numero or 0) + 1
-        piso = getattr(settings, "OFICIO_NUMERO_INICIAL", {}).get(resolved_year, 0)
-        return max(proximo, piso)
+        candidato = max(piso, 1)
+        while candidato in numeros_usados:
+            candidato += 1
+        return candidato
 
     def save(self, *args, **kwargs):
         self.protocolo = normalize_protocolo(self.protocolo)
