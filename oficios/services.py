@@ -111,6 +111,13 @@ class OficioVinculadoError(Exception):
     """Exclusão bloqueada porque o ofício possui vínculos protegidos."""
 
 
+def tocar_data_criacao_oficio(oficio: Oficio) -> Oficio:
+    """Marca uma edição relevante do ofício, atualizando data_criacao para hoje."""
+    oficio.data_criacao = timezone.localdate()
+    oficio.save(update_fields=["data_criacao", "updated_at"])
+    return oficio
+
+
 @transaction.atomic
 def garantir_roteiro_vinculado_ao_oficio(oficio: Oficio) -> Oficio:
     """Garante um roteiro em rascunho vinculado ao oficio para edicao na etapa 3."""
@@ -252,7 +259,6 @@ def criar_oficio_dados_viajantes(form, action="save_draft"):
 @transaction.atomic
 def atualizar_oficio_dados_viajantes(oficio, form, action="save_draft"):
     original = Oficio.objects.get(pk=oficio.pk)
-    data_criacao_original = original.data_criacao
     transporte_original = {
         "viatura": original.viatura,
         "porte_transporte_armas": original.porte_transporte_armas,
@@ -274,7 +280,7 @@ def atualizar_oficio_dados_viajantes(oficio, form, action="save_draft"):
     atualizado = form.save(commit=False)
     atualizado.numero = oficio.numero
     atualizado.ano = oficio.ano
-    atualizado.data_criacao = data_criacao_original
+    atualizado.data_criacao = timezone.localdate()
     for field_name, value in transporte_original.items():
         setattr(atualizado, field_name, value)
     atualizado.custeio = atualizado.custeio or Oficio.CUSTEIO_UNIDADE_DPC
@@ -289,11 +295,10 @@ def atualizar_oficio_dados_viajantes(oficio, form, action="save_draft"):
 @transaction.atomic
 def atualizar_oficio_transporte(oficio, form, action="save_draft"):
     _ = action
-    data_criacao_original = oficio.data_criacao
     atualizado = form.save(commit=False)
     atualizado.numero = oficio.numero
     atualizado.ano = oficio.ano
-    atualizado.data_criacao = data_criacao_original
+    atualizado.data_criacao = timezone.localdate()
     equipe_ids = set(oficio.servidores.values_list("pk", flat=True))
     if atualizado.viatura_id:
         atualizado.transporte_placa_manual = ""

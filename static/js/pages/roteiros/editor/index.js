@@ -1345,7 +1345,7 @@ export function initRoteirosEditor() {
       roteiro_modo: $('id_roteiro_modo_evento').checked ? 'EVENTO_EXISTENTE' : 'ROTEIRO_PROPRIO',
       roteiro_id: $('id_roteiro_modo_evento').checked ? (getSelectedRouteId() || null) : null,
       sede_estado_id: $('id_origem_estado').value||null, sede_cidade_id: $('id_origem_cidade').value||null,
-      destinos_atuais: [],
+      destinos_atuais: getDestinos(),
       bate_volta_diario: {
         ativo: !!($('id_bate_volta_diario_ativo') && $('id_bate_volta_diario_ativo').checked),
         data_inicio: ($('id_bate_volta_data_inicio_native') || {}).value || '',

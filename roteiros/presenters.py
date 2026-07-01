@@ -39,6 +39,8 @@ def _format_brl(valor):
 def _format_trecho_dt(dt):
     if not dt:
         return "—"
+    if timezone.is_aware(dt):
+        dt = dt.astimezone(timezone.get_current_timezone())
     return f"{dt:%d/%m/%Y %H:%M}"
 
 

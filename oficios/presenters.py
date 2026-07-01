@@ -797,6 +797,14 @@ def apresentar_oficio_wizard_documentos_context(oficio):
         roteiro_card.pop("actions", None)
         roteiro_card["subtitle"] = "Roteiro utilizado para geração dos documentos"
         roteiro_card["title"] = " > ".join([sede_rota_label, *destinos_rota_labels])
+        if diarias_oficio:
+            valor_moeda = _format_brl_diarias(diarias_oficio["valor_decimal"])
+            valor_extenso = (diarias_oficio["valor_extenso"] or "").strip()
+            roteiro_card["valor_diarias_display"] = valor_moeda
+            roteiro_card["diaria_moeda"] = valor_moeda
+            roteiro_card["valor_diarias_extenso"] = valor_extenso
+            roteiro_card["diaria_extenso"] = valor_extenso
+            roteiro_card["diaria_vazio"] = False
 
     justificativa_resumo = _montar_justificativa_resumo_documentos(j_et, j_obj, texto_j)
 

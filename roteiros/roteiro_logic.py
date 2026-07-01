@@ -1095,7 +1095,7 @@ def _validate_roteiro_state(state, oficio=None):
         errors.append('A cidade da sede deve pertencer ao estado selecionado.')
 
     destinos_list = [
-        (item.get('estado_id'), item.get('cidade_id'))
+        (_parse_int(item.get('estado_id')), _parse_int(item.get('cidade_id')))
         for item in state.get('destinos_atuais', [])
         if item.get('estado_id') and item.get('cidade_id')
     ]

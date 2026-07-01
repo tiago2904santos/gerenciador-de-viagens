@@ -1,4 +1,4 @@
-import { initRoteirosEditor } from './pages/roteiros/editor/index.js?v=20260625-destinos-shared';
+import { initRoteirosEditor } from './pages/roteiros/editor/index.js?v=20260701-destinos-autosave-fix';
 
 function bootRoteirosEditor() {
   const form = document.getElementById('roteiro-editor-form');
