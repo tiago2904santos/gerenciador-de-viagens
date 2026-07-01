@@ -4,7 +4,7 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/gdrive-config.css' %}?v=20260629-card">
+  <link rel="stylesheet" href="{% static 'css/gdrive-config.css' %}?v=20260701-progress">
 {% endblock %}
 
 {% block content %}
@@ -119,7 +119,7 @@
                   </svg>
                 </span>
                 <div class="gdrive-block__headtext">
-                  <h4 class="gdrive-block__title" id="gdrive-conta-section">Conta Google</h4>
+                <h4 class="gdrive-block__title" id="gdrive-conta-section">Conta Google</h4>
                   <p class="gdrive-block__sub">
                     {% if drive_autorizado and drive_creds %}Tokens armazenados e renovados automaticamente.{% else %}Nenhuma conta conectada ainda.{% endif %}
                   </p>
@@ -167,7 +167,7 @@
                      aria-labelledby="gdrive-pasta-section"
                      {% if not drive_autorizado %}aria-disabled="true"{% endif %}>
               <div class="gdrive-block__head">
-                <span class="gdrive-block__icon" aria-hidden="true">📁</span>
+                <span class="gdrive-block__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="folder" only %}</span>
                 <div class="gdrive-block__headtext">
                   <h4 class="gdrive-block__title" id="gdrive-pasta-section">Diretório de destino</h4>
                   <p class="gdrive-block__sub">Pasta no Drive onde os documentos serão salvos, organizados por evento e categoria.</p>
@@ -186,7 +186,7 @@
                   <div class="gdrive-pasta-atual">
                     <span class="gdrive-pasta-atual__label">Pasta atual</span>
                     <div class="gdrive-pasta-selecionada">
-                      <span class="gdrive-pasta-selecionada__icon" aria-hidden="true">📁</span>
+                      <span class="gdrive-pasta-selecionada__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="folder" only %}</span>
                       <span class="gdrive-pasta-selecionada__nome">{{ drive_pasta_raiz_nome|default:drive_pasta_raiz_id }}</span>
                       <a href="https://drive.google.com/drive/folders/{{ drive_pasta_raiz_id }}"
                          target="_blank" rel="noopener"
@@ -252,7 +252,7 @@
                 </div>
 
                 <div class="gdrive-stat">
-                  <span class="gdrive-stat__icon" aria-hidden="true">☁️</span>
+                  <span class="gdrive-stat__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="cloud" only %}</span>
                   <span class="gdrive-stat__text">Arquivos já enviados ao Drive</span>
                   <span class="gdrive-stat__value">{{ drive_total_arquivos }}</span>
                 </div>
@@ -263,7 +263,7 @@
             {% if drive_pode_reorganizar %}
               <section class="gdrive-block" aria-labelledby="gdrive-massa-section">
                 <div class="gdrive-block__head">
-                  <span class="gdrive-block__icon" aria-hidden="true">🗂️</span>
+                  <span class="gdrive-block__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="sync" only %}</span>
                   <div class="gdrive-block__headtext">
                     <h4 class="gdrive-block__title" id="gdrive-massa-section">Organização em massa</h4>
                     <p class="gdrive-block__sub">
@@ -277,17 +277,23 @@
                      data-url-previa="{% url 'google_drive:previa_reorganizacao' %}"
                      data-url-status="{% url 'google_drive:status_reorganizacao' %}">
                   <div class="gdrive-stat gdrive-stat--inline">
-                    <span class="gdrive-stat__icon" aria-hidden="true">📅</span>
+                    <span class="gdrive-stat__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="calendar" only %}</span>
                     <span class="gdrive-stat__text">Eventos cadastrados</span>
                     <span class="gdrive-stat__value">{{ drive_total_eventos }}</span>
                     {% if not drive_modo_ativo %}<span class="gdrive-mock-note">Modo mock — sem chamadas reais ao Drive.</span>{% endif %}
                   </div>
 
                   <div class="gdrive-status" id="gdrive-status"{% if not drive_job_reorg %} hidden{% endif %}>
-                    <span class="gdrive-status__spinner" aria-hidden="true"></span>
-                    <div class="gdrive-status__body">
-                      <span class="gdrive-status__label">Status da reorganização</span>
-                      <span class="gdrive-status__text" id="gdrive-status-texto">{% if drive_job_reorg %}{{ drive_job_reorg.get_status_display }}{% endif %}</span>
+                    <div class="gdrive-status__row">
+                      <span class="gdrive-status__spinner" aria-hidden="true"></span>
+                      <div class="gdrive-status__body">
+                        <span class="gdrive-status__label">Status da reorganização</span>
+                        <span class="gdrive-status__text" id="gdrive-status-texto">{% if drive_job_reorg %}{{ drive_job_reorg.get_status_display }}{% endif %}</span>
+                      </div>
+                      <span class="gdrive-status__percent" id="gdrive-status-percent"></span>
+                    </div>
+                    <div class="gdrive-progress" id="gdrive-progress" role="progressbar" aria-labelledby="gdrive-status-texto" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                      <div class="gdrive-progress__fill" id="gdrive-progress-fill"></div>
                     </div>
                   </div>
 
