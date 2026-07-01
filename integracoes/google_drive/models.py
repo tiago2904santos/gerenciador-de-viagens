@@ -68,7 +68,7 @@ class DriveArquivo(models.Model):
     file_id = models.CharField(max_length=200)
     url = models.URLField(max_length=500, blank=True)
     nome = models.CharField(max_length=255, blank=True)
-    mime_type = models.CharField(max_length=64, blank=True)
+    mime_type = models.CharField(max_length=255, blank=True)
     mock = models.BooleanField(default=False)
     # Atalho de aparição dupla (pasta global por tipo).
     atalho_id = models.CharField(max_length=200, blank=True, default="")
@@ -108,7 +108,7 @@ class DriveArquivoExterno(models.Model):
     url = models.URLField(max_length=500, blank=True)
     nome = models.CharField(max_length=255, blank=True)
     pasta_id = models.CharField(max_length=200, blank=True, default="")
-    mime_type = models.CharField(max_length=64, blank=True)
+    mime_type = models.CharField(max_length=255, blank=True)
     mock = models.BooleanField(default=False)
     # Atalho de aparição dupla (pasta global por tipo).
     atalho_id = models.CharField(max_length=200, blank=True, default="")
