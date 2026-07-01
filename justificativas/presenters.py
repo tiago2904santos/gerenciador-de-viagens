@@ -51,9 +51,7 @@ def apresentar_linha_lista_simples_justificativa(
     if len(texto) > 110:
         texto = f"{texto[:110]}..."
 
-    badges = [build_badge(justificativa.get_status_display(), "success")]
-    if justificativa.obrigatoria:
-        badges.append(build_badge("Obrigatoria", "danger"))
+    badges = []
 
     return {
         "avatar": "JT",
