@@ -90,6 +90,7 @@ from .services import obter_roteiro_escolhido_do_post
 from .services import vincular_roteiro_ao_oficio_sem_copia
 from .services import redirect_para_corrigir_documento_oficio
 from .services import oficio_esta_completo_para_finalizar
+from .services import tocar_data_criacao_oficio
 from .services import validar_oficio_para_documento
 
 
@@ -736,6 +737,7 @@ def wizard_roteiro(request, pk):
                     oficio.save(update_fields=["roteiro", "updated_at"])
                     form.instance = novo_rascunho
                 atualizar_roteiro(oficio.roteiro, form, roteiro_state, validated, diarias_resultado)
+            oficio = tocar_data_criacao_oficio(oficio)
             nav_action = _wizard_normalizar_acao(request.POST)
             if nav_action == "wizard_next":
                 messages.success(
@@ -926,7 +928,8 @@ def wizard_documentos(request, pk):
                     messages.error(request, msg)
                 return redirect("oficios:wizard_documentos", pk=pk)
             oficio.status = Oficio.STATUS_FINALIZADO
-            oficio.save(update_fields=["status", "updated_at"])
+            oficio.data_criacao = timezone.localdate()
+            oficio.save(update_fields=["status", "data_criacao", "updated_at"])
             return _redirect_lista_oficio(request, oficio, "Ofício finalizado com sucesso.")
         if nav_action == "wizard_back":
             from documentos.services.warm_cache import ensure_document_artifact_cached
