@@ -100,6 +100,59 @@ def carregar_opcoes_rotas_avulsas_salvas(evento=None, excluir_pk=None):
     return roteiro_logic._build_roteiro_avulso_route_options(evento=evento, excluir_pk=excluir_pk)
 
 
+def montar_initial_roteiro_evento_sem_datas(evento):
+    """Initial de sede+destino a partir do evento, sem datas/horarios.
+
+    Usado para pre-preencher a Etapa 2 do oficio quando ainda nao ha um
+    roteiro salvo do evento para pre-selecionar (ver `resolver_roteiro_padrao_evento`
+    em `oficios/services.py`). Cada oficio pode ter datas/horarios de viagem
+    proprios, entao so sede e destino sao herdados do evento aqui.
+    """
+    from cadastros.services import resolver_sede_ids_desde_configuracao
+
+    initial = {}
+    estado_id, cidade_id, _aviso = resolver_sede_ids_desde_configuracao()
+    if estado_id:
+        initial["origem_estado"] = estado_id
+    if cidade_id:
+        initial["origem_cidade"] = cidade_id
+    if evento is None:
+        return initial
+
+    from eventos.services import build_evento_document_seed
+
+    seed = build_evento_document_seed(evento)
+    cidade = seed.get("cidade")
+    estado = seed.get("estado")
+    if estado:
+        initial["destino_estado"] = estado.pk
+        initial["destino_estado_id"] = estado.pk
+    if cidade:
+        initial["destino_cidade"] = cidade.pk
+        initial["destino_cidade_id"] = cidade.pk
+    initial["seed_source_label"] = "Pre-preenchido pelo evento."
+    return initial
+
+
+def montar_estado_editor_roteiro_evento_selecionado(roteiro):
+    """Como `preparar_estado_editor_roteiro_para_get(roteiro=...)`, mas mantem o
+    roteiro_state em modo EVENTO_EXISTENTE (roteiro salvo pre-selecionado) em vez
+    de forcar ROTEIRO_PROPRIO. Usado quando o oficio ainda nao tem roteiro proprio
+    mas o evento ja tem um roteiro completo para reaproveitar por padrao.
+    """
+    destinos_atuais = roteiro_logic._destinos_roteiro_para_template(roteiro) or [
+        {"estado_id": None, "cidade_id": None, "cidade": None, "estado": None}
+    ]
+    destinos_list = [
+        (d.get("estado_id"), d.get("cidade_id"))
+        for d in destinos_atuais
+        if d.get("estado_id") and d.get("cidade_id")
+    ]
+    trechos_list = roteiro_logic._estrutura_trechos(roteiro, destinos_list) if destinos_list else []
+    roteiro_state = roteiro_logic._build_roteiro_state_from_roteiro_evento(roteiro)
+    return destinos_atuais, trechos_list, roteiro_state
+
+
 def preparar_estado_editor_roteiro_para_get(initial=None, roteiro=None):
     if roteiro:
         destinos_atuais = roteiro_logic._destinos_roteiro_para_template(roteiro) or [

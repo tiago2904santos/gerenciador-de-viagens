@@ -1,6 +1,4 @@
 import re
-from datetime import datetime
-from datetime import time
 
 from django.db import transaction
 from django.urls import reverse
@@ -119,20 +117,21 @@ def tocar_data_criacao_oficio(oficio: Oficio) -> Oficio:
     return oficio
 
 
-@transaction.atomic
-def garantir_roteiro_vinculado_ao_oficio(oficio: Oficio) -> Oficio:
-    """Garante um roteiro em rascunho vinculado ao oficio para edicao na etapa 3."""
-    if oficio.roteiro_id:
-        _preencher_roteiro_oficio_com_evento(oficio.roteiro, getattr(oficio, "evento", None))
-        return oficio
-    roteiro = Roteiro.objects.create(
-        tipo=Roteiro.TIPO_AVULSO,
-        status=Roteiro.STATUS_RASCUNHO,
-    )
-    _preencher_roteiro_oficio_com_evento(roteiro, getattr(oficio, "evento", None))
-    oficio.roteiro = roteiro
-    oficio.save(update_fields=["roteiro", "updated_at"])
-    return oficio
+def resolver_roteiro_padrao_evento(evento):
+    """Retorna o roteiro do evento pronto para reuso (completo), ou None.
+
+    Usado para pre-selecionar o roteiro do evento na Etapa 2 do oficio quando
+    o oficio ainda nao tem um roteiro proprio vinculado.
+    """
+    if evento is None:
+        return None
+
+    from roteiros.selectors import queryset_roteiros_reutilizaveis_para_evento
+
+    for roteiro in queryset_roteiros_reutilizaveis_para_evento(evento=evento):
+        if roteiro.evento_id == evento.pk or roteiro.oficios.filter(evento=evento).exists():
+            return roteiro
+    return None
 
 
 def obter_roteiro_escolhido_do_post(post, evento=None):
@@ -172,16 +171,12 @@ def vincular_roteiro_ao_oficio_sem_copia(oficio: Oficio, roteiro_escolhido: Rote
             pass
 
 
-def _combine_evento_dt(data, hora):
-    if not data:
-        return None
-    value = datetime.combine(data, hora)
-    if timezone.is_naive(value):
-        return timezone.make_aware(value, timezone.get_current_timezone())
-    return value
-
-
 def _preencher_roteiro_oficio_com_evento(roteiro: Roteiro, evento) -> None:
+    """Preenche sede e destino de um roteiro ja persistido a partir do evento.
+
+    So mexe em campos ainda vazios (safety net para roteiros antigos/ja vinculados).
+    Nao preenche datas: cada oficio pode ter horarios de viagem proprios.
+    """
     if roteiro is None or evento is None:
         return
 
@@ -191,10 +186,6 @@ def _preencher_roteiro_oficio_com_evento(roteiro: Roteiro, evento) -> None:
     seed = build_evento_document_seed(evento)
     cidade = seed.get("cidade")
     estado = seed.get("estado") or getattr(cidade, "estado", None)
-    data_inicio = seed.get("data_inicio")
-    data_fim = seed.get("data_fim") or data_inicio
-    ida_hora = getattr(evento, "horario_inicio", None) or time(8, 0)
-    volta_hora = getattr(evento, "horario_fim", None) or time(16, 0)
 
     changed_fields = []
     if not roteiro.origem_cidade_id and not roteiro.origem_estado_id:
@@ -204,14 +195,6 @@ def _preencher_roteiro_oficio_com_evento(roteiro: Roteiro, evento) -> None:
             roteiro.origem_cidade = cidade_sede
             roteiro.origem_estado = cidade_sede.estado
             changed_fields.extend(["origem_cidade", "origem_estado"])
-    if not roteiro.saida_dt:
-        roteiro.saida_dt = _combine_evento_dt(data_inicio, ida_hora)
-        if roteiro.saida_dt:
-            changed_fields.append("saida_dt")
-    if not roteiro.retorno_saida_dt:
-        roteiro.retorno_saida_dt = _combine_evento_dt(data_fim, volta_hora)
-        if roteiro.retorno_saida_dt:
-            changed_fields.append("retorno_saida_dt")
     if changed_fields:
         roteiro.save(update_fields=[*changed_fields, "updated_at"])
 
@@ -365,6 +348,12 @@ def avaliar_oficio_transporte(oficio):
 
 @transaction.atomic
 def criar_oficio_rascunho(evento=None):
+    """Cria um novo oficio a partir de um evento.
+
+    So herda o motivo do evento (e o roteiro, resolvido depois na Etapa 2 do
+    wizard). Servidores e viatura NAO sao copiados de outros oficios do mesmo
+    evento: cada oficio costuma ter uma equipe/viatura propria.
+    """
     seed = {}
     if evento is not None:
         from eventos.services import build_evento_document_seed
@@ -377,16 +366,8 @@ def criar_oficio_rascunho(evento=None):
         custeio=Oficio.CUSTEIO_UNIDADE_DPC,
         motivo=seed.get("motivo") or "",
         solicitante=getattr(evento, "unidade_responsavel", None) if evento is not None else None,
-        viatura=seed.get("viatura"),
-        motorista=seed.get("motorista"),
     )
     reservar_numero_oficio(oficio, ano=oficio.data_criacao.year)
-    servidores = seed.get("servidores") or []
-    servidores_termo = seed.get("servidores_termo") or servidores
-    if servidores:
-        oficio.servidores.set(servidores)
-    if servidores_termo:
-        oficio.servidores_termo_autorizacao.set(servidores_termo)
     return oficio
 
 

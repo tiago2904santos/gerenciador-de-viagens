@@ -76,7 +76,8 @@ class OficioWizardRoteiroDiariasTests(TestCase):
         )
         return Oficio.objects.get(pk=oficio.pk)
 
-    def test_get_cria_roteiro_vinculado_e_renderiza_editor(self):
+    def test_get_nao_cria_roteiro_e_renderiza_editor(self):
+        """Abrir a Etapa 2 sozinha nao deve gravar nenhum Roteiro no banco (so no save real)."""
         oficio = self._oficio_ate_transporte([self.servidor_a.pk])
         self.assertIsNone(oficio.roteiro_id)
 
@@ -91,8 +92,7 @@ class OficioWizardRoteiroDiariasTests(TestCase):
         self.assertContains(response, "Avançar")
 
         oficio.refresh_from_db()
-        self.assertIsNotNone(oficio.roteiro_id)
-        self.assertEqual(oficio.roteiro.tipo, Roteiro.TIPO_AVULSO)
+        self.assertIsNone(oficio.roteiro_id)
 
     def test_hidden_quantidade_servidores_reflete_viajantes(self):
         oficio = self._oficio_ate_transporte([self.servidor_a.pk, self.servidor_b.pk])
@@ -137,9 +137,7 @@ class OficioWizardRoteiroDiariasTests(TestCase):
         response = self.client.get(reverse("oficios:wizard_roteiro", args=[oficio.pk]))
         self.assertEqual(response.status_code, 200)
         oficio.refresh_from_db()
-        roteiro = oficio.roteiro
-        self.assertIsNone(roteiro.origem_estado_id)
-        self.assertIsNone(roteiro.origem_cidade_id)
+        self.assertIsNone(oficio.roteiro_id)
 
         self.assertContains(response, f'<option value="{est.pk}" selected')
         self.assertContains(response, f'<option value="{cidade_sede.pk}" selected')
@@ -175,8 +173,6 @@ class OficioWizardRoteiroDiariasTests(TestCase):
         self.assertEqual(response.status_code, 200)
         mock_consulta_cep.assert_called()
         oficio.refresh_from_db()
-        roteiro = oficio.roteiro
-        self.assertIsNone(roteiro.origem_estado_id)
-        self.assertIsNone(roteiro.origem_cidade_id)
+        self.assertIsNone(oficio.roteiro_id)
         self.assertContains(response, f'<option value="{est.pk}" selected')
         self.assertContains(response, f'<option value="{cidade_cep.pk}" selected')
