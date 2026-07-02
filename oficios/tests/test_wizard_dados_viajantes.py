@@ -357,6 +357,38 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertContains(response, f'<option value="{self.servidor.pk}" selected')
         self.assertContains(response, f'<option value="{self.outro_servidor.pk}" selected')
 
+    def test_post_dados_viajantes_salva_motorista_sem_porte_transporte_armas_no_payload(self):
+        # Nenhum template renderiza porte_transporte_armas; o payload real do navegador
+        # nunca envia esse campo. O motorista da equipe precisa ser salvo e permanecer na
+        # equipe mesmo assim (regressao: campo obrigatorio sem required=False fazia o form
+        # de transporte falhar silenciosamente e o motorista nunca era persistido).
+        oficio = Oficio.objects.create(
+            numero=1,
+            ano=2026,
+            motivo="Antigo",
+            custeio=Oficio.CUSTEIO_UNIDADE_DPC,
+        )
+
+        payload = self._payload(
+            servidores=[str(self.servidor.pk)],
+            servidores_termo_autorizacao=[],
+            transporte_embed="1",
+            viatura=str(self.viatura.pk),
+            motorista=str(self.servidor.pk),
+            action="wizard_next",
+        )
+        payload.pop("porte_transporte_armas", None)
+
+        response = self.client.post(reverse("oficios:dados_viajantes", args=[oficio.pk]), data=payload)
+
+        self.assertEqual(response.status_code, 302)
+        oficio.refresh_from_db()
+        self.assertEqual(oficio.motorista_id, self.servidor.pk)
+        self.assertIn(self.servidor.pk, set(oficio.servidores.values_list("pk", flat=True)))
+
+        resumo = self.client.get(reverse("oficios:wizard_documentos", args=[oficio.pk]))
+        self.assertNotContains(resumo, "Motorista carona")
+
     def test_post_dados_viajantes_salva_apenas_servidores_selecionados_para_termo(self):
         oficio = Oficio.objects.create(
             numero=1,
