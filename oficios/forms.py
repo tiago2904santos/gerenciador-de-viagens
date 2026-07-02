@@ -415,6 +415,7 @@ class OficioTransporteForm(forms.ModelForm):
         self.fields["motorista"].empty_label = ""
         self.fields["transporte_combustivel_manual"].required = False
         self.fields["transporte_tipo_manual"].required = False
+        self.fields["porte_transporte_armas"].required = False
         self.fields["transporte_tipo_manual"].choices = [("", "---------")] + list(Viatura.TIPO_CHOICES)
         if not self.is_bound and self.instance.pk:
             self.initial.setdefault(
@@ -457,6 +458,14 @@ class OficioTransporteForm(forms.ModelForm):
                 self.initial.setdefault("motorista_manual_nome", self.instance.motorista_manual_nome)
             self.initial.setdefault("motorista_oficio_referencia", self.instance.motorista_oficio_referencia)
             self.initial.setdefault("motorista_protocolo_ref", self.instance.motorista_protocolo_ref)
+
+    def clean_porte_transporte_armas(self):
+        raw = self.data.get("porte_transporte_armas")
+        if raw not in ("sim", "nao"):
+            if self.instance.pk:
+                return self.instance.porte_transporte_armas
+            return True
+        return raw == "sim"
 
     def clean_motorista_oficio_referencia(self):
         raw = (self.cleaned_data.get("motorista_oficio_referencia") or "").strip()
