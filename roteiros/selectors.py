@@ -117,15 +117,35 @@ def listar_cidades_para_select(estado_id=None, q=None):
     return qs
 
 
+def _anotar_e_filtrar_roteiros_completos(qs):
+    """So deixa passar roteiros totalmente preenchidos: sede, destino, pelo menos
+    um trecho de ida com saida/chegada e retorno com saida/chegada. Um roteiro
+    pela metade nunca deve aparecer como opcao de reuso."""
+    return qs.annotate(
+        qtd_destinos=Count("destinos", distinct=True),
+        qtd_trechos_ida_completos=Count(
+            "trechos",
+            filter=Q(
+                trechos__tipo=RoteiroTrecho.TIPO_IDA,
+                trechos__saida_dt__isnull=False,
+                trechos__chegada_dt__isnull=False,
+            ),
+            distinct=True,
+        ),
+    ).filter(
+        origem_cidade__isnull=False,
+        origem_estado__isnull=False,
+        retorno_saida_dt__isnull=False,
+        retorno_chegada_dt__isnull=False,
+        qtd_destinos__gt=0,
+        qtd_trechos_ida_completos__gt=0,
+    )
+
+
 def queryset_roteiros_avulsos_para_mapa_rotas(limit=50):
-    """Roteiros avulsos com destinos ou trechos cadastrados (esconde rascunhos vazios criados pelo wizard)."""
+    """Roteiros avulsos totalmente preenchidos (esconde rascunhos incompletos criados pelo wizard)."""
     return (
-        Roteiro.objects.filter(tipo=Roteiro.TIPO_AVULSO)
-        .annotate(
-            qtd_destinos=Count("destinos", distinct=True),
-            qtd_trechos=Count("trechos", distinct=True),
-        )
-        .filter(Q(qtd_destinos__gt=0) | Q(qtd_trechos__gt=0))
+        _anotar_e_filtrar_roteiros_completos(Roteiro.objects.filter(tipo=Roteiro.TIPO_AVULSO))
         .select_related("origem_cidade", "origem_estado")
         .prefetch_related(
             "destinos",
@@ -143,7 +163,8 @@ def queryset_roteiros_avulsos_para_mapa_rotas(limit=50):
 
 def queryset_roteiros_reutilizaveis_para_evento(evento=None, limit=50, excluir_pk=None):
     """Roteiros avulsos (reuso global) + roteiros do evento atual (Etapa 2 ou ja usados por
-    algum oficio do evento), priorizando o roteiro do evento no topo da lista.
+    algum oficio do evento), priorizando o roteiro do evento no topo da lista. Em ambos os
+    casos, so entram roteiros totalmente preenchidos (ver `_anotar_e_filtrar_roteiros_completos`).
 
     `excluir_pk` tira da lista o roteiro que ja esta vinculado ao documento em edicao
     (nao faz sentido oferecer "reaproveitar" o proprio roteiro atual).
@@ -153,12 +174,7 @@ def queryset_roteiros_reutilizaveis_para_evento(evento=None, limit=50, excluir_p
         condicao |= Q(evento=evento) | Q(oficios__evento=evento)
 
     qs = (
-        Roteiro.objects.filter(condicao)
-        .annotate(
-            qtd_destinos=Count("destinos", distinct=True),
-            qtd_trechos=Count("trechos", distinct=True),
-        )
-        .filter(Q(qtd_destinos__gt=0) | Q(qtd_trechos__gt=0))
+        _anotar_e_filtrar_roteiros_completos(Roteiro.objects.filter(condicao))
         .distinct()
         .select_related("origem_cidade", "origem_estado")
         .prefetch_related(

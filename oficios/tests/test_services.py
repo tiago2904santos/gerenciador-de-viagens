@@ -29,7 +29,8 @@ from oficios.services import criar_modelo_motivo
 from oficios.services import criar_oficio_dados_viajantes
 from oficios.services import excluir_modelo_motivo
 from oficios.services import get_next_available_numero_oficio
-from oficios.services import garantir_roteiro_vinculado_ao_oficio
+from oficios.services import criar_oficio_rascunho
+from oficios.services import _preencher_roteiro_oficio_com_evento
 from oficios.services import redirect_para_corrigir_documento_oficio
 from oficios.services import validar_oficio_para_documento
 from roteiros.models import Roteiro
@@ -69,9 +70,13 @@ class OficioServicesTests(TestCase):
         primeiro.delete()
         self.assertEqual(get_next_available_numero_oficio(ano), 1)
 
-    def test_garantir_roteiro_oficio_evento_preenche_ida_e_volta(self):
+    def test_preencher_roteiro_oficio_com_evento_so_preenche_sede_e_destino(self):
         estado = Estado.objects.create(nome="Parana", sigla="PR")
-        cidade = Cidade.objects.create(nome="Londrina", estado=estado, uf="PR")
+        cidade_sede = Cidade.objects.create(nome="Curitiba", estado=estado, uf="PR")
+        cidade_destino = Cidade.objects.create(nome="Londrina", estado=estado, uf="PR")
+        config = ConfiguracaoSistema.get_singleton()
+        config.cidade_sede_padrao = cidade_sede
+        config.save()
         evento = Evento.objects.create(
             destino_uf="PR",
             destino_cidade="Londrina",
@@ -80,21 +85,35 @@ class OficioServicesTests(TestCase):
             horario_inicio=datetime.time(9, 30),
             horario_fim=datetime.time(18, 45),
         )
-        oficio = Oficio.objects.create(evento=evento, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        roteiro = Roteiro.objects.create(tipo=Roteiro.TIPO_AVULSO, status=Roteiro.STATUS_RASCUNHO)
 
-        oficio = garantir_roteiro_vinculado_ao_oficio(oficio)
-        roteiro = oficio.roteiro
-        saida_local = timezone.localtime(roteiro.saida_dt)
-        retorno_local = timezone.localtime(roteiro.retorno_saida_dt)
+        _preencher_roteiro_oficio_com_evento(roteiro, evento)
+        roteiro.refresh_from_db()
 
-        self.assertIsNotNone(roteiro)
-        self.assertEqual(saida_local.date(), datetime.date(2026, 7, 10))
-        self.assertEqual(saida_local.time().replace(tzinfo=None), datetime.time(9, 30))
-        self.assertEqual(retorno_local.date(), datetime.date(2026, 7, 12))
-        self.assertEqual(retorno_local.time().replace(tzinfo=None), datetime.time(18, 45))
+        self.assertEqual(roteiro.origem_cidade_id, cidade_sede.pk)
+        self.assertEqual(roteiro.origem_estado_id, estado.pk)
         self.assertTrue(
-            roteiro.destinos.filter(estado=estado, cidade=cidade).exists()
+            roteiro.destinos.filter(estado=estado, cidade=cidade_destino).exists()
         )
+        self.assertIsNone(roteiro.saida_dt)
+        self.assertIsNone(roteiro.retorno_saida_dt)
+
+    def test_criar_oficio_rascunho_herda_motivo_mas_nao_servidores_ou_viatura(self):
+        evento = Evento.objects.create(
+            destino_uf="PR",
+            destino_cidade="Londrina",
+            motivo="Motivo do evento",
+        )
+        anterior = Oficio.objects.create(evento=evento, custeio=Oficio.CUSTEIO_UNIDADE_DPC, viatura=self.viatura)
+        anterior.servidores.add(self.servidor)
+
+        novo = criar_oficio_rascunho(evento=evento)
+
+        self.assertEqual(novo.motivo, "Motivo do evento")
+        self.assertIsNone(novo.viatura_id)
+        self.assertIsNone(novo.motorista_id)
+        self.assertEqual(list(novo.servidores.all()), [])
+        self.assertEqual(list(novo.servidores_termo_autorizacao.all()), [])
 
 
     def test_atualizar_oficio_dados_viajantes_preserva_transporte_data_e_numero(self):

@@ -34,6 +34,8 @@ from roteiros.services import (
     atualizar_roteiro,
     carregar_opcoes_rotas_avulsas_salvas,
     montar_contexto_editor_roteiro,
+    montar_estado_editor_roteiro_evento_selecionado,
+    montar_initial_roteiro_evento_sem_datas,
     normalizar_destinos_e_trechos_apos_erro_post,
     preparar_estado_editor_roteiro_para_get,
     preparar_querysets_formulario_roteiro,
@@ -85,7 +87,7 @@ from .services import excluir_modelo_motivo
 from .services import excluir_oficio
 from .services import gerar_resposta_documento_oficio
 from .services import gerar_resposta_justificativa_documento
-from .services import garantir_roteiro_vinculado_ao_oficio
+from .services import resolver_roteiro_padrao_evento
 from .services import obter_roteiro_escolhido_do_post
 from .services import vincular_roteiro_ao_oficio_sem_copia
 from .services import redirect_para_corrigir_documento_oficio
@@ -705,18 +707,34 @@ def transporte_autosave(request, pk):
     return autosave_json_response(ok=True, object_id=oficio.pk, version=_oficio_autosave_version(oficio))
 
 
+def _resolver_roteiro_rascunho_autosave(post):
+    """Resolve um rascunho de Roteiro ja criado por autosave nesta mesma edicao
+    (o JS guarda o pk em `autosave_obj_id` assim que o primeiro autosave cria a linha)."""
+    raw = (post.get("autosave_obj_id") or "").strip()
+    if not raw:
+        return None
+    try:
+        pk = int(raw)
+    except (TypeError, ValueError):
+        return None
+    return Roteiro.objects.filter(pk=pk).first()
+
+
 def wizard_roteiro(request, pk):
     oficio = get_oficio_by_id(pk)
-    oficio = garantir_roteiro_vinculado_ao_oficio(oficio)
-    roteiro = oficio.roteiro
+    # Nao cria mais um Roteiro vazio so por abrir a etapa: enquanto o oficio nao tiver
+    # roteiro proprio, o form so ganha uma linha no banco quando o autosave (mesmo
+    # mecanismo ja usado no fluxo avulso) detectar conteudo minimo, ou no save final.
+    roteiro_vinculado = oficio.roteiro
     qtd_viajantes = oficio.servidores.count()
 
     route_options, route_state_map = carregar_opcoes_rotas_avulsas_salvas(
-        evento=oficio.evento, excluir_pk=roteiro.pk
+        evento=oficio.evento, excluir_pk=roteiro_vinculado.pk if roteiro_vinculado else None
     )
 
     if request.method == "POST":
-        roteiro_vinculado = oficio.roteiro
+        if roteiro_vinculado is None:
+            roteiro_vinculado = _resolver_roteiro_rascunho_autosave(request.POST)
         form = RoteiroForm(request.POST, instance=roteiro_vinculado)
         preparar_querysets_formulario_roteiro(
             form, method=request.method, post=request.POST, instance=roteiro_vinculado
@@ -734,11 +752,12 @@ def wizard_roteiro(request, pk):
                 # Com alterações (ou roteiro próprio): salvar sempre num rascunho
                 # Nunca modificar um roteiro não-rascunho que pertence a outros ofícios
                 if roteiro_vinculado is None or roteiro_vinculado.status != Roteiro.STATUS_RASCUNHO:
-                    novo_rascunho = Roteiro.objects.create(tipo=Roteiro.TIPO_AVULSO, status=Roteiro.STATUS_RASCUNHO)
-                    oficio.roteiro = novo_rascunho
+                    roteiro_vinculado = Roteiro(tipo=Roteiro.TIPO_AVULSO, status=Roteiro.STATUS_RASCUNHO)
+                    form.instance = roteiro_vinculado
+                roteiro_salvo = atualizar_roteiro(roteiro_vinculado, form, roteiro_state, validated, diarias_resultado)
+                if oficio.roteiro_id != roteiro_salvo.pk:
+                    oficio.roteiro = roteiro_salvo
                     oficio.save(update_fields=["roteiro", "updated_at"])
-                    form.instance = novo_rascunho
-                atualizar_roteiro(oficio.roteiro, form, roteiro_state, validated, diarias_resultado)
             oficio = tocar_data_criacao_oficio(oficio)
             nav_action = _wizard_normalizar_acao(request.POST)
             if nav_action == "wizard_next":
@@ -759,12 +778,12 @@ def wizard_roteiro(request, pk):
         for error in validated.get("errors", []):
             form.add_error(None, error)
         destinos_atuais, trechos_list = normalizar_destinos_e_trechos_apos_erro_post(roteiro_state)
-    else:
+    elif roteiro_vinculado is not None:
         destinos_atuais, trechos_list, roteiro_state = preparar_estado_editor_roteiro_para_get(
-            roteiro=roteiro
+            roteiro=roteiro_vinculado
         )
         form_initial = {}
-        if not (roteiro.origem_estado_id or roteiro.origem_cidade_id):
+        if not (roteiro_vinculado.origem_estado_id or roteiro_vinculado.origem_cidade_id):
             se_id = roteiro_state.get("sede_estado_id")
             sc_id = roteiro_state.get("sede_cidade_id")
             if se_id:
@@ -772,11 +791,41 @@ def wizard_roteiro(request, pk):
             if sc_id:
                 form_initial["origem_cidade"] = sc_id
         form = RoteiroForm(
-            instance=roteiro,
+            instance=roteiro_vinculado,
             initial=form_initial if form_initial else None,
         )
         preparar_querysets_formulario_roteiro(
-            form, method=request.method, post=request.POST, instance=roteiro
+            form, method=request.method, post=request.POST, instance=roteiro_vinculado
+        )
+    else:
+        # Oficio ainda sem roteiro proprio: pre-seleciona o roteiro do evento (se houver
+        # um completo pronto pra reuso) ou parte de sede+destino do evento, sem datas e
+        # sem persistir nada ainda.
+        roteiro_padrao_evento = resolver_roteiro_padrao_evento(oficio.evento)
+        if roteiro_padrao_evento is not None:
+            destinos_atuais, trechos_list, roteiro_state = montar_estado_editor_roteiro_evento_selecionado(
+                roteiro_padrao_evento
+            )
+            form_instance = Roteiro(
+                tipo=Roteiro.TIPO_AVULSO,
+                status=Roteiro.STATUS_RASCUNHO,
+                origem_cidade=roteiro_padrao_evento.origem_cidade,
+                origem_estado=roteiro_padrao_evento.origem_estado,
+                observacoes=roteiro_padrao_evento.observacoes,
+            )
+        else:
+            initial = montar_initial_roteiro_evento_sem_datas(oficio.evento)
+            destinos_atuais, trechos_list, roteiro_state = preparar_estado_editor_roteiro_para_get(
+                initial=initial
+            )
+            form_instance = Roteiro(tipo=Roteiro.TIPO_AVULSO, status=Roteiro.STATUS_RASCUNHO)
+            if initial.get("origem_cidade"):
+                form_instance.origem_cidade_id = initial["origem_cidade"]
+            if initial.get("origem_estado"):
+                form_instance.origem_estado_id = initial["origem_estado"]
+        form = RoteiroForm(instance=form_instance)
+        preparar_querysets_formulario_roteiro(
+            form, method=request.method, post=request.POST, instance=form_instance
         )
 
     dados_av = avaliar_oficio_dados_viajantes(oficio=oficio)
@@ -784,7 +833,7 @@ def wizard_roteiro(request, pk):
     context = montar_contexto_editor_roteiro(
         evento=None,
         form=form,
-        obj=roteiro,
+        obj=roteiro_vinculado,
         destinos_atuais=destinos_atuais,
         trechos_list=trechos_list,
         is_avulso=True,

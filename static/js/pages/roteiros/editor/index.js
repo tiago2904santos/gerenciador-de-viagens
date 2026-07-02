@@ -1377,6 +1377,32 @@ export function initRoteirosEditor() {
         tempo_adicional_min: $('id_retorno_tempo_adicional_min').value||'0', duracao_estimada_min: $('id_retorno_duracao_estimada_min').value||'', rota_fonte: $('id_retorno_rota_fonte').value||'' }
     };
   }
+  function clearRouteTrechos() {
+    // Ao desmarcar um roteiro salvo, mantém a sede (padrão herdado do evento) mas limpa
+    // destinos/trechos/retorno — trechos são derivados dos destinos (ver shouldUseExactTrechos),
+    // então pra realmente sumir com o trecho da rota antiga é preciso zerar os dois juntos.
+    var cur = captureCurrentState();
+    cur.roteiro_modo = 'ROTEIRO_PROPRIO';
+    cur.roteiro_id = null;
+    cur.destinos_atuais = [];
+    cur.trechos = [];
+    cur.retorno = {
+      saida_cidade: '', chegada_cidade: '',
+      saida_data: '', saida_hora: '', chegada_data: '', chegada_hora: '',
+      distancia_km: '', duracao_estimada_min: '', tempo_cru_estimado_min: '',
+      tempo_adicional_min: 0, rota_fonte: ''
+    };
+    return applyState(cur).then(function() {
+      if ($('id_retorno_saida_cidade')) $('id_retorno_saida_cidade').value = '';
+      if ($('id_retorno_chegada_cidade')) $('id_retorno_chegada_cidade').value = '';
+      // applyState não zera os campos de exibição (hh:mm) do tempo de retorno, e recalcRetorno
+      // os usa como fallback pra re-derivar o tempo cru — sem isso o "Tempo de viagem" antigo volta.
+      if ($('id_retorno_tempo_viagem_hhmm')) $('id_retorno_tempo_viagem_hhmm').value = '';
+      if ($('id_retorno_tempo_adicional_hhmm')) $('id_retorno_tempo_adicional_hhmm').value = '';
+      if ($('id_retorno_tempo_cru_estimado_min')) $('id_retorno_tempo_cru_estimado_min').value = '';
+      recalcRetorno(false);
+    });
+  }
   function setDiariasStatus(state, text) {
     var status = $('diarias-status'); if (!status) return;
     status.dataset.state = state || 'pending';
@@ -1827,7 +1853,13 @@ export function initRoteirosEditor() {
     });
   }
   if ($('id_roteiro_modo_proprio')) {
-    $('id_roteiro_modo_proprio').addEventListener('change', function() { setModeUi(); scheduleRealtimeDiarias(); scheduleAutosave(); });
+    $('id_roteiro_modo_proprio').addEventListener('change', function() {
+      var hadSelection = !!getSelectedRouteId();
+      setModeUi();
+      if (hadSelection) { clearRouteTrechos(); }
+      else { scheduleRealtimeDiarias(); }
+      scheduleAutosave();
+    });
   }
   setModeUi();
   toggleBateVoltaPanel();

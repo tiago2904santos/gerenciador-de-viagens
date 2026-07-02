@@ -79,17 +79,19 @@ class WizardJustificativaTests(TestCase):
         return Oficio.objects.get(pk=oficio.pk)
 
     def _roteiro_com_saida(self, oficio, dias_apos_criacao=5):
-        self.client.get(reverse("oficios:wizard_roteiro", args=[oficio.pk]))
-        oficio.refresh_from_db()
-        roteiro = oficio.roteiro
         base = oficio.data_criacao
         d_saida = base + datetime.timedelta(days=dias_apos_criacao)
-        roteiro.saida_dt = timezone.make_aware(
-            datetime.datetime.combine(d_saida, datetime.time(8, 0)),
-            timezone.get_current_timezone(),
+        roteiro = Roteiro.objects.create(
+            tipo=Roteiro.TIPO_AVULSO,
+            status=Roteiro.STATUS_RASCUNHO,
+            saida_dt=timezone.make_aware(
+                datetime.datetime.combine(d_saida, datetime.time(8, 0)),
+                timezone.get_current_timezone(),
+            ),
         )
-        roteiro.origem_estado_id = None
-        roteiro.save(update_fields=["saida_dt"])
+        oficio.roteiro = roteiro
+        oficio.save(update_fields=["roteiro"])
+        oficio.refresh_from_db()
         return roteiro
 
     def test_get_etapa_justificativa_200(self):
