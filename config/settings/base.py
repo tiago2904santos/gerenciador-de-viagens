@@ -186,6 +186,11 @@ def _env_flag(name, default="false"):
 # Diagnóstico: python manage.py gdrive_check
 # Reprocessar pendentes: python manage.py gdrive_upload_pendentes
 # ---------------------------------------------------------------------------
+# O Google costuma devolver o token com escopos concedidos anteriormente somados
+# aos recém-pedidos (ex.: ao ampliar o escopo, o retorno inclui o antigo + o
+# novo). Sem isso, oauthlib trata a diferença como erro ("Scope has changed").
+os.environ.setdefault("OAUTHLIB_RELAX_TOKEN_SCOPE", "1")
+
 GOOGLE_DRIVE = {
     "MODO": (os.getenv("GOOGLE_DRIVE_MODO") or "mock").strip().lower(),
     # Credenciais OAuth 2.0 (geradas no Google Cloud Console)

@@ -234,6 +234,18 @@
   font-size: var(--font-size-xs);
 }
 
+/* Abas de origem: Meu Drive × Drives compartilhados */
+.gdrive-root-tabs {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.gdrive-root-tab.is-active {
+  background: var(--color-primary-soft);
+  border-color: var(--color-primary-bright);
+  color: var(--color-primary-bright);
+}
+
 .gdrive-browser-body { position: relative; }
 
 .gdrive-folder-list {

@@ -10,7 +10,12 @@ logger = logging.getLogger(__name__)
 
 _FOLDER_MIME = "application/vnd.google-apps.folder"
 _SHORTCUT_MIME = "application/vnd.google-apps.shortcut"
-_SCOPES = ["https://www.googleapis.com/auth/drive.file"]
+_SCOPES = [
+    "https://www.googleapis.com/auth/drive.file",
+    # Necessário para listar Drives Compartilhados (drives().list()) e navegar
+    # pastas pré-existentes; drive.file sozinho só enxerga itens criados pelo app.
+    "https://www.googleapis.com/auth/drive.readonly",
+]
 
 _MIMETYPES = {
     "pdf": "application/pdf",
@@ -106,6 +111,12 @@ class _MockClient:
     def nome_pasta(self, pasta_id: str) -> str:
         return pasta_id
 
+    def listar_drives_compartilhados(self) -> list[dict]:
+        return [
+            {"id": "mock-shared-drive-1", "name": "Drive Compartilhado Viagens (mock)"},
+            {"id": "mock-shared-drive-2", "name": "Drive Compartilhado Arquivo (mock)"},
+        ]
+
 
 class _RealClient:
     def __init__(self):
@@ -158,7 +169,7 @@ class _RealClient:
         media = MediaIoBaseUpload(io.BytesIO(conteudo), mimetype=mimetype, resumable=False)
         result = (
             self._svc.files()
-            .create(body=metadata, media_body=media, fields="id,webViewLink")
+            .create(body=metadata, media_body=media, fields="id,webViewLink", supportsAllDrives=True)
             .execute()
         )
         logger.info("[Drive] upload nome=%s → id=%s", nome, result["id"])
@@ -172,7 +183,10 @@ class _RealClient:
         q = f"name = '{nome}' and mimeType = '{_FOLDER_MIME}' and trashed = false"
         if pai_id:
             q += f" and '{pai_id}' in parents"
-        res = self._svc.files().list(q=q, fields="files(id)", pageSize=1).execute()
+        res = self._svc.files().list(
+            q=q, fields="files(id)", pageSize=1,
+            supportsAllDrives=True, includeItemsFromAllDrives=True,
+        ).execute()
         files = res.get("files", [])
 
         if files:
@@ -181,7 +195,9 @@ class _RealClient:
             meta: dict = {"name": nome, "mimeType": _FOLDER_MIME}
             if pai_id:
                 meta["parents"] = [pai_id]
-            folder_id = self._svc.files().create(body=meta, fields="id").execute()["id"]
+            folder_id = (
+                self._svc.files().create(body=meta, fields="id", supportsAllDrives=True).execute()["id"]
+            )
             logger.info("[Drive] pasta criada nome=%s pai_id=%s → id=%s", nome, pai_id, folder_id)
 
         self._cache[key] = folder_id
@@ -194,30 +210,45 @@ class _RealClient:
         else:
             q += " and 'root' in parents"
         res = self._svc.files().list(
-            q=q, fields="files(id,name)", orderBy="name", pageSize=100
+            q=q, fields="files(id,name)", orderBy="name", pageSize=100,
+            supportsAllDrives=True, includeItemsFromAllDrives=True,
         ).execute()
         return res.get("files", [])
+
+    def listar_drives_compartilhados(self) -> list[dict]:
+        res = self._svc.drives().list(pageSize=100, fields="drives(id,name)").execute()
+        drives = res.get("drives", [])
+        return sorted(drives, key=lambda d: (d.get("name") or "").lower())
 
     def criar_pasta(self, nome: str, pai_id: str | None = None) -> dict:
         meta: dict = {"name": nome, "mimeType": _FOLDER_MIME}
         if pai_id:
             meta["parents"] = [pai_id]
-        result = self._svc.files().create(body=meta, fields="id,name").execute()
+        result = self._svc.files().create(body=meta, fields="id,name", supportsAllDrives=True).execute()
         logger.info("[Drive] pasta criada nome=%s pai_id=%s → id=%s", nome, pai_id, result["id"])
         return result
 
     def nome_pasta(self, pasta_id: str) -> str:
         try:
-            result = self._svc.files().get(fileId=pasta_id, fields="name").execute()
+            result = self._svc.files().get(
+                fileId=pasta_id, fields="name", supportsAllDrives=True
+            ).execute()
             return result.get("name", pasta_id)
         except Exception:
             return pasta_id
 
     def mover_renomear(self, file_id: str, novo_nome: str, nova_pasta_id: str | None = None) -> str:
         """Renomeia e/ou move um arquivo já existente (criado pelo app)."""
-        kwargs: dict = {"fileId": file_id, "body": {"name": novo_nome}, "fields": "id"}
+        kwargs: dict = {
+            "fileId": file_id,
+            "body": {"name": novo_nome},
+            "fields": "id",
+            "supportsAllDrives": True,
+        }
         if nova_pasta_id:
-            atual = self._svc.files().get(fileId=file_id, fields="parents").execute()
+            atual = self._svc.files().get(
+                fileId=file_id, fields="parents", supportsAllDrives=True
+            ).execute()
             pais_atuais = atual.get("parents", []) or []
             if nova_pasta_id not in pais_atuais or len(pais_atuais) > 1:
                 kwargs["addParents"] = nova_pasta_id
@@ -248,7 +279,7 @@ class _RealClient:
             "parents": [pasta_id],
             "shortcutDetails": {"targetId": target_id},
         }
-        result = self._svc.files().create(body=meta, fields="id").execute()
+        result = self._svc.files().create(body=meta, fields="id", supportsAllDrives=True).execute()
         logger.info("[Drive] atalho criado nome=%s target=%s → id=%s", nome, target_id, result["id"])
         return result["id"]
 

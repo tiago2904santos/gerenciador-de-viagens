@@ -119,12 +119,20 @@
                  data-url-listar="{% url 'google_drive:api_listar_pastas' %}"
                  data-url-criar="{% url 'google_drive:api_criar_pasta' %}"
                  data-url-salvar="{% url 'google_drive:salvar_pasta_raiz' %}"
+                 data-url-drives="{% url 'google_drive:api_listar_drives_compartilhados' %}"
                  data-csrf="{{ csrf_token }}">
 
               <div class="gdrive-browser-toolbar">
-                <button type="button" class="cv-btn cv-btn--secondary cv-btn--sm" id="gdrive-btn-carregar">
-                  {% if pasta_raiz_id %}Navegar pastas{% else %}Carregar pastas do Drive{% endif %}
-                </button>
+                <div class="gdrive-root-tabs" role="tablist" aria-label="Origem das pastas">
+                  <button type="button" class="cv-btn cv-btn--secondary cv-btn--sm gdrive-root-tab"
+                          id="gdrive-btn-meu-drive" role="tab" aria-selected="false">
+                    📁 Meu Drive
+                  </button>
+                  <button type="button" class="cv-btn cv-btn--secondary cv-btn--sm gdrive-root-tab"
+                          id="gdrive-btn-drives-compartilhados" role="tab" aria-selected="false">
+                    🔗 Drives compartilhados
+                  </button>
+                </div>
                 <button type="button" class="cv-btn cv-btn--ghost cv-btn--sm" id="gdrive-btn-voltar" hidden>
                   ← Voltar
                 </button>
