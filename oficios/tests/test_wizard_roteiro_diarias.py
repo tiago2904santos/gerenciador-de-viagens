@@ -1,3 +1,4 @@
+import json
 from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
@@ -91,6 +92,51 @@ class OficioWizardRoteiroDiariasTests(TestCase):
         self.assertContains(response, "cv-card-footer-section")
         self.assertContains(response, "Avançar")
 
+        oficio.refresh_from_db()
+        self.assertIsNone(oficio.roteiro_id)
+
+    def test_autosave_criar_vincula_rascunho_ao_oficio_imediatamente(self):
+        """Sem isso, desmarcar um roteiro salvo e comecar o proprio nao sobrevive a um
+        reload: como oficio.roteiro_id continua None ate o save final, a proxima visita
+        volta a sugerir o roteiro do evento — parecendo que "desmarcar" nao funciona."""
+        oficio = self._oficio_ate_transporte([self.servidor_a.pk])
+        self.assertIsNone(oficio.roteiro_id)
+
+        response = self.client.post(
+            reverse("oficios:wizard_roteiro_autosave_criar", args=[oficio.pk]),
+            data=json.dumps({
+                "model": "roteiro",
+                "object_id": "",
+                "dirty_fields": ["observacoes"],
+                "fields": {"observacoes": "Rascunho proprio do oficio"},
+                "snapshots": {},
+            }),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertTrue(payload["ok"])
+        self.assertTrue(payload["created"])
+
+        oficio.refresh_from_db()
+        self.assertEqual(oficio.roteiro_id, payload["object_id"])
+        self.assertEqual(oficio.roteiro.observacoes, "RASCUNHO PROPRIO DO OFICIO")
+
+    def test_autosave_criar_sem_conteudo_minimo_nao_cria_nem_vincula(self):
+        oficio = self._oficio_ate_transporte([self.servidor_a.pk])
+        response = self.client.post(
+            reverse("oficios:wizard_roteiro_autosave_criar", args=[oficio.pk]),
+            data=json.dumps({
+                "model": "roteiro",
+                "object_id": "",
+                "dirty_fields": [],
+                "fields": {},
+                "snapshots": {},
+            }),
+            content_type="application/json",
+        )
+        payload = response.json()
+        self.assertFalse(payload["ok"])
         oficio.refresh_from_db()
         self.assertIsNone(oficio.roteiro_id)
 

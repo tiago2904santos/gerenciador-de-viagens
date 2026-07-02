@@ -30,6 +30,10 @@ from justificativas.services import oficio_exige_justificativa
 
 from roteiros.forms import RoteiroForm
 from roteiros.models import Roteiro
+from roteiros.services.autosave import ROTEIRO_AUTOSAVE_FIELDS
+from roteiros.services.autosave import apply_roteiro_autosave
+from roteiros.services.autosave import build_roteiro_draft
+from roteiros.services.autosave import has_minimum_roteiro_content
 from roteiros.services import (
     atualizar_roteiro,
     carregar_opcoes_rotas_avulsas_salvas,
@@ -718,6 +722,45 @@ def _resolver_roteiro_rascunho_autosave(post):
     except (TypeError, ValueError):
         return None
     return Roteiro.objects.filter(pk=pk).first()
+
+
+@require_POST
+def wizard_roteiro_autosave_criar(request, pk):
+    """Cria (via autosave) o rascunho de roteiro proprio do oficio e ja vincula ao oficio.
+
+    Sem isso, desmarcar o roteiro do evento (item "Roteiro novo") e comecar a preencher
+    um roteiro proprio nao sobrevive a uma nova visita a etapa: como `oficio.roteiro_id`
+    continua None ate o save final, a proxima GET volta a sugerir o roteiro do evento
+    (ver `resolver_roteiro_padrao_evento`), fazendo parecer que "desmarcar" nao funciona.
+    """
+    oficio = get_oficio_by_id(pk)
+    if oficio.roteiro_id:
+        return autosave_json_response(ok=True, object_id=oficio.roteiro_id, created=False)
+
+    try:
+        payload = parse_autosave_payload(request, expected_model="roteiro")
+    except AutosavePayloadError as exc:
+        return autosave_json_response(ok=False, message=str(exc))
+
+    clean_fields = filter_allowed_fields(payload.fields, payload.dirty_fields, ROTEIRO_AUTOSAVE_FIELDS)
+    if not has_minimum_roteiro_content(clean_fields, payload.snapshots):
+        return autosave_json_response(ok=False, message="Conteúdo insuficiente para criar rascunho.")
+
+    roteiro = build_roteiro_draft()
+    version = apply_roteiro_autosave(roteiro, clean_fields, payload.snapshots)
+    if not roteiro.origem_cidade_id and not roteiro.origem_estado_id:
+        # A sede exibida na tela (herdada do evento/config) nao chega "suja" no payload de
+        # autosave se o usuario nunca clicou nela — sem isso o rascunho nasceria sem sede.
+        from cadastros.services import resolver_sede_ids_desde_configuracao
+
+        estado_id, cidade_id, _aviso = resolver_sede_ids_desde_configuracao()
+        if estado_id and cidade_id:
+            roteiro.origem_estado_id = estado_id
+            roteiro.origem_cidade_id = cidade_id
+            roteiro.save(update_fields=["origem_estado", "origem_cidade", "updated_at"])
+    oficio.roteiro = roteiro
+    oficio.save(update_fields=["roteiro", "updated_at"])
+    return autosave_json_response(ok=True, object_id=roteiro.pk, created=True, version=version)
 
 
 def wizard_roteiro(request, pk):
