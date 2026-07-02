@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.http import urlencode
 
 from cadastros.models import Cargo
 from cadastros.models import Servidor
@@ -37,8 +38,10 @@ class OficioViewsTests(TestCase):
         response = self.client.get(reverse("oficios:index"))
         self.assertContains(response, "data-delete-confirm-modal")
         self.assertContains(response, "data-delete-modal-trigger")
-        self.assertContains(response, f'data-delete-url="{reverse("oficios:excluir", args=[oficio.pk])}"')
-        self.assertNotContains(response, f'href="{reverse("oficios:excluir", args=[oficio.pk])}"')
+        excluir_url = reverse("oficios:excluir", args=[oficio.pk])
+        next_qs = urlencode({"next": reverse("oficios:index")})
+        self.assertContains(response, f'data-delete-url="{excluir_url}?{next_qs}"')
+        self.assertNotContains(response, f'href="{excluir_url}"')
 
     def test_get_novo_cria_rascunho_e_redireciona(self):
         response = self.client.get(reverse("oficios:novo"))
@@ -486,6 +489,32 @@ class OficioViewsTests(TestCase):
         self.assertEqual(response.status_code, 302)
         detail_response = self.client.get(reverse("oficios:detalhe", args=[oficio.pk]))
         self.assertEqual(detail_response.status_code, 404)
+
+    def test_post_excluir_de_oficio_de_evento_sem_next_volta_para_evento(self):
+        from eventos.models import Evento
+
+        evento = Evento.objects.create(motivo="Evento de teste")
+        oficio = Oficio.objects.create(
+            numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC, evento=evento,
+        )
+        response = self.client.post(reverse("oficios:excluir", args=[oficio.pk]))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            response.url, reverse("eventos:guiado_etapa", kwargs={"pk": evento.pk, "etapa": 3}),
+        )
+
+    def test_post_excluir_de_oficio_de_evento_com_next_da_lista_volta_para_lista(self):
+        from eventos.models import Evento
+
+        evento = Evento.objects.create(motivo="Evento de teste")
+        oficio = Oficio.objects.create(
+            numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC, evento=evento,
+        )
+        excluir_url = reverse("oficios:excluir", args=[oficio.pk])
+        next_qs = urlencode({"next": reverse("oficios:index")})
+        response = self.client.post(f"{excluir_url}?{next_qs}")
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("oficios:index"))
 
     def test_get_excluir_redireciona_para_lista(self):
         oficio = Oficio.objects.create(numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)

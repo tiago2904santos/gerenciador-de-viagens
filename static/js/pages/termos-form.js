@@ -407,6 +407,156 @@
     });
   }
 
+  function draftStorageKey() {
+    return "termoFormDraft:" + window.location.pathname + window.location.search;
+  }
+
+  function serializeFormEntries(form) {
+    var data = new FormData(form);
+    var entries = [];
+    data.forEach(function (value, key) {
+      if (key === "csrfmiddlewaretoken") return;
+      entries.push([key, value]);
+    });
+    return entries;
+  }
+
+  function saveDraft(form) {
+    try {
+      window.sessionStorage.setItem(draftStorageKey(), JSON.stringify(serializeFormEntries(form)));
+    } catch (err) {
+      /* armazenamento indisponivel (modo privado, quota etc.) */
+    }
+  }
+
+  function takeDraft() {
+    var key = draftStorageKey();
+    var raw;
+    try {
+      raw = window.sessionStorage.getItem(key);
+    } catch (err) {
+      return null;
+    }
+    if (!raw) return null;
+    try {
+      window.sessionStorage.removeItem(key);
+    } catch (err) {
+      /* ignore */
+    }
+    var entries;
+    try {
+      entries = JSON.parse(raw);
+    } catch (err) {
+      return null;
+    }
+    if (!Array.isArray(entries)) return null;
+    var byName = {};
+    entries.forEach(function (pair) {
+      var name = pair[0];
+      var value = pair[1];
+      if (!byName[name]) byName[name] = [];
+      byName[name].push(value);
+    });
+    return byName;
+  }
+
+  function applyDraftSimpleFields(form, draft) {
+    if (draft.oficio && draft.oficio.length) {
+      var oficioSelect = form.querySelector("select[name='oficio']");
+      if (oficioSelect) oficioSelect.value = draft.oficio[0];
+    }
+
+    var startIso = draft.data_evento_inicio ? draft.data_evento_inicio[0] : "";
+    var endIso = draft.data_evento_fim ? draft.data_evento_fim[0] : "";
+    if (startIso) {
+      setDateFields(form, startIso, endIso || startIso);
+    }
+
+    if (draft.servidores && draft.servidores.length) {
+      var servidoresSelect = form.querySelector("select[name='servidores']");
+      setMultiSelectValues(servidoresSelect, draft.servidores, form);
+    }
+
+    if (draft.viatura && draft.viatura.length) {
+      var viaturaSelect = form.querySelector("select[name='viatura']");
+      if (viaturaSelect) {
+        viaturaSelect.value = draft.viatura[0];
+        resetSearchPicker(viaturaSelect);
+        initSearchPickers(form);
+      }
+    }
+  }
+
+  function collectDestinoEntries(draft) {
+    var entries = {};
+    Object.keys(draft).forEach(function (name) {
+      var stateMatch = name.match(/^destino_estado(?:_(\d+))?$/);
+      var cityMatch = name.match(/^destino_cidade(?:_(\d+))?$/);
+      if (stateMatch) {
+        var stateIdx = stateMatch[1] ? parseInt(stateMatch[1], 10) : 0;
+        entries[stateIdx] = entries[stateIdx] || {};
+        entries[stateIdx].estado = draft[name][0];
+      }
+      if (cityMatch) {
+        var cityIdx = cityMatch[1] ? parseInt(cityMatch[1], 10) : 0;
+        entries[cityIdx] = entries[cityIdx] || {};
+        entries[cityIdx].cidade = draft[name][0];
+      }
+    });
+    return entries;
+  }
+
+  function applyDraftDestinos(form, draft) {
+    var entries = collectDestinoEntries(draft);
+    var indexes = Object.keys(entries)
+      .map(Number)
+      .filter(function (idx) {
+        var entry = entries[idx];
+        return entry && (entry.estado || entry.cidade);
+      })
+      .sort(function (a, b) { return a - b; });
+    if (!indexes.length) return;
+
+    var addButton = form.querySelector("[data-termo-add-destino]");
+    var rowsNeeded = indexes[indexes.length - 1] + 1;
+
+    function rowsCount() {
+      return form.querySelectorAll("[data-termo-destino-row]").length;
+    }
+
+    var guard = 0;
+    while (rowsCount() < rowsNeeded && addButton && guard < 50) {
+      addButton.click();
+      guard += 1;
+    }
+
+    var rows = Array.prototype.slice.call(form.querySelectorAll("[data-termo-destino-row]"));
+    indexes.forEach(function (idx) {
+      var row = rows[idx];
+      var entry = entries[idx];
+      if (!row || !entry) return;
+      var stateSelect = row.querySelector("[data-termo-destino-state]");
+      var citySelect = row.querySelector("[data-termo-destino-city]");
+      if (!stateSelect) return;
+      stateSelect.value = entry.estado || "";
+      resetSearchPicker(stateSelect);
+      initSearchPickers(form);
+      if (entry.estado && citySelect) {
+        loadCitiesForState(form, citySelect, entry.estado, entry.cidade || "").then(function () {
+          initSearchPickers(form);
+        });
+      }
+    });
+  }
+
+  function bindDraftAutosaveLinks(form) {
+    form.addEventListener("click", function (event) {
+      var link = event.target.closest('[data-autosave-link="1"]');
+      if (!link || !form.contains(link)) return;
+      saveDraft(form);
+    });
+  }
+
   function syncEventDates(form) {
     var root = form.querySelector("#termo-evento-date-picker");
     var startHidden = form.querySelector("input[name='data_evento_inicio']");
@@ -496,9 +646,16 @@
     var form = document.querySelector("[data-termo-form]");
     if (!form) return;
 
+    var draft = takeDraft();
+    if (draft) applyDraftSimpleFields(form, draft);
+
     syncOficioSummary(form, readSummaries());
     syncDestinationCities(form);
     syncAddDestinationButton(form);
     syncEventDates(form);
+
+    if (draft) applyDraftDestinos(form, draft);
+
+    bindDraftAutosaveLinks(form);
   });
 })();

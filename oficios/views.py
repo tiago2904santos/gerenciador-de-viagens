@@ -507,7 +507,7 @@ def index(request):
     )
     cards = []
     for oficio in oficios:
-        card = apresentar_oficio_card(oficio)
+        card = apresentar_oficio_card(oficio, excluir_next_url=reverse("oficios:index"))
         card["actions"] = apresentar_acoes_oficio(
             editar_url=reverse("oficios:editar", args=[oficio.pk]),
             excluir_url=reverse("oficios:excluir", args=[oficio.pk]),
@@ -1283,7 +1283,14 @@ def baixar_ordem_servico_documento(request, pk, formato):
 def excluir(request, pk):
     oficio = get_oficio_by_id(pk)
     evento_id = oficio.evento_id
+
+    def _fallback_url():
+        if evento_id:
+            return redirect("eventos:guiado_etapa", pk=evento_id, etapa=3)
+        return redirect("oficios:index")
+
     if request.method == "POST":
+        next_url = _safe_next_url(request, "")
         try:
             excluir_oficio(oficio)
         except OficioVinculadoError:
@@ -1291,13 +1298,9 @@ def excluir(request, pk):
                 request,
                 "Não foi possível excluir o ofício porque ele está vinculado a outros registros.",
             )
-            if evento_id:
-                return redirect("eventos:guiado_etapa", pk=evento_id, etapa=3)
-            return redirect("oficios:index")
+            return redirect(next_url) if next_url else _fallback_url()
         messages.success(request, "Ofício excluído com sucesso.")
-        if evento_id:
-            return redirect("eventos:guiado_etapa", pk=evento_id, etapa=3)
-        return redirect("oficios:index")
+        return redirect(next_url) if next_url else _fallback_url()
     return redirect(_oficio_back_url(oficio))
 
 

@@ -3,7 +3,6 @@ from __future__ import annotations
 import hashlib
 import io
 import logging
-import zipfile
 
 logger = logging.getLogger(__name__)
 
@@ -382,11 +381,17 @@ def sha256_bytes(content: bytes) -> str:
     return hashlib.sha256(content).hexdigest()
 
 
-def empacotar_termos_zip(documentos: list[DocumentoGerado]) -> bytes:
+def fundir_termos_docx(documentos: list[DocumentoGerado]) -> bytes:
+    from docx import Document as DocxDocument
+    from docxcompose.composer import Composer
+
+    base = DocxDocument(io.BytesIO(documentos[0].conteudo))
+    composer = Composer(base)
+    for doc in documentos[1:]:
+        base.add_page_break()
+        composer.append(DocxDocument(io.BytesIO(doc.conteudo)))
     buf = io.BytesIO()
-    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
-        for doc in documentos:
-            zf.writestr(doc.nome_arquivo, doc.conteudo)
+    composer.save(buf)
     return buf.getvalue()
 
 

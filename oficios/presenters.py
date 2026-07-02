@@ -9,6 +9,7 @@ from decimal import Decimal
 
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.http import urlencode
 
 from .models import Oficio
 
@@ -124,7 +125,7 @@ def _temporal_badge_oficio(oficio):
     return f"há {dias} dias", "success"
 
 
-def apresentar_oficio_card(oficio):
+def apresentar_oficio_card(oficio, *, excluir_next_url=None):
     servidores = list(oficio.servidores.all())
     termos_pks = {s.pk for s in oficio.servidores_termo_autorizacao.all()}
     servidor_pks = {s.pk for s in servidores}
@@ -286,8 +287,15 @@ def apresentar_oficio_card(oficio):
         "pdf_url": reverse("oficios:baixar_documento", args=[oficio.pk, "pdf"]),
         "docx_url": reverse("oficios:baixar_documento", args=[oficio.pk, "docx"]),
         "editar_url": reverse("oficios:dados_viajantes", args=[oficio.pk]),
-        "excluir_url": reverse("oficios:excluir", args=[oficio.pk]),
+        "excluir_url": _excluir_url_oficio(oficio.pk, excluir_next_url),
     }
+
+
+def _excluir_url_oficio(pk, next_url=None):
+    url = reverse("oficios:excluir", args=[pk])
+    if next_url:
+        url = f"{url}?{urlencode({'next': next_url})}"
+    return url
 
 
 def _motorista_label_oficio(oficio):

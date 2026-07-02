@@ -525,11 +525,10 @@
         body.appendChild(title);
 
         const metaParts = [item.cargo, item.unidade].filter(Boolean);
-        body.appendChild(el(
-          "span",
-          "cv-search-picker__selected-meta",
-          metaParts.length ? metaParts.join(" • ") : "Dados complementares nao informados",
-        ));
+        const metaText = metaParts.length
+          ? metaParts.join(" • ")
+          : (item.meta || "Dados complementares nao informados");
+        body.appendChild(el("span", "cv-search-picker__selected-meta", metaText));
 
         const detailParts = [];
         if (item.cpf) detailParts.push("CPF: " + maskDocument(item.cpf, "cpf"));

@@ -34,7 +34,7 @@ from oficios.services import validar_oficio_para_documento
 from .forms import TermoAutorizacaoForm
 from .models import TermoAutorizacao
 from .presenters import apresentar_linha_lista_simples_termo
-from .services import empacotar_termos_zip
+from .services import fundir_termos_docx
 from .services import fundir_termos_pdf
 from .services import gerar_termo_cadastro_lote
 from .services import gerar_termo_cadastro_um
@@ -579,16 +579,15 @@ def baixar_termo_cadastro_docx(request, pk):
     docs = _termo_cadastro_docs_com_generico(termo, DocumentoFormato.DOCX)
     if len(docs) == 1:
         doc = docs[0]
-        response = HttpResponse(doc.conteudo, content_type=doc.content_type)
-        response["Content-Disposition"] = f'attachment; filename="{doc.nome_arquivo}"'
-        response["X-Content-Type-Options"] = "nosniff"
-        response["X-Document-SHA256"] = doc.hash_sha256
-        return response
-    zip_bytes = empacotar_termos_zip(docs)
-    response = HttpResponse(zip_bytes, content_type="application/zip")
-    response["Content-Disposition"] = f'attachment; filename="termo_{termo.pk}_docx.zip"'
+        content = doc.conteudo
+        content_hash = doc.hash_sha256
+    else:
+        content = fundir_termos_docx(docs)
+        content_hash = sha256_bytes(content)
+    response = HttpResponse(content, content_type=docs[0].content_type)
+    response["Content-Disposition"] = f'attachment; filename="termo_{termo.pk}.docx"'
     response["X-Content-Type-Options"] = "nosniff"
-    response["X-Document-SHA256"] = sha256_bytes(zip_bytes)
+    response["X-Document-SHA256"] = content_hash
     return response
 
 
@@ -708,8 +707,14 @@ def baixar_termo_lote_zip(request, pk, formato):
         return redirect("termos:index")
 
     docs = gerar_termo_lote(oficio, fmt)
-    zip_bytes = empacotar_termos_zip(docs)
-    nome = f"termos_oficio_{oficio.numero_formatado.replace('/', '-')}.zip"
-    response = HttpResponse(zip_bytes, content_type="application/zip")
+    if len(docs) == 1:
+        content = docs[0].conteudo
+    elif fmt == DocumentoFormato.PDF:
+        content = fundir_termos_pdf(docs)
+    else:
+        content = fundir_termos_docx(docs)
+    nome = f"termos_oficio_{oficio.numero_formatado.replace('/', '-')}.{fmt.value}"
+    response = HttpResponse(content, content_type=docs[0].content_type)
     response["Content-Disposition"] = f'attachment; filename="{nome}"'
+    response["X-Content-Type-Options"] = "nosniff"
     return response

@@ -164,7 +164,7 @@
               </div>
             </div>
           </div>
-        {% include "components/ui/layouts/card_footer_section.html" with secondary_label=back_label secondary_url=index_url primary_label="Salvar OS" primary_action="save" only %}
+        {% include "components/ui/layouts/card_footer_section.html" with secondary_label=back_label secondary_url=index_url primary_label=os_is_completa|yesno:"Finalizar Ordem de Serviço,Salvar como rascunho" primary_action="save" primary_extra_class="os-submit-btn" only %}
         </section>
         
       </main>
@@ -174,5 +174,5 @@
 
 {% block extra_js %}
   <script src="{% static 'js/pages/oficios-dados-viajantes.js' %}" defer></script>
-  <script src="{% static 'js/pages/ordens-servico-form.js' %}?v=20260625-managed-destinos" defer></script>
+  <script src="{% static 'js/pages/ordens-servico-form.js' %}?v=20260702-btn-label2" defer></script>
 {% endblock %}

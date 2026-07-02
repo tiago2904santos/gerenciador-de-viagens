@@ -355,7 +355,13 @@ def detalhe(request, pk, etapa=1):
             "page_title": evento.titulo,
             "evento": evento,
             "evento_form": form,
-            "oficio_cards": [apresentar_oficio_card(oficio) for oficio in evento.oficios.all()],
+            "oficio_cards": [
+                apresentar_oficio_card(
+                    oficio,
+                    excluir_next_url=_reverse("eventos:guiado_etapa", kwargs={"pk": evento.pk, "etapa": 3}),
+                )
+                for oficio in evento.oficios.all()
+            ],
             "roteiro_rows": _roteiro_rows_do_evento(evento),
             "plano_cards": [apresentar_plano_card(plano) for plano in evento.planos_trabalho.all()],
             "ordem_cards": [apresentar_ordem_servico_card(ordem) for ordem in evento.ordens_servico.all()],

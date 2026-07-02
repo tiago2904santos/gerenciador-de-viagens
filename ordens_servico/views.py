@@ -234,6 +234,26 @@ def _evento_display_values(form):
     }
 
 
+def _ordem_is_completa(form, evento_display):
+    if not evento_display.get("inicio") or not evento_display.get("fim"):
+        return False
+
+    if not form.initial.get("destino_cidade"):
+        return False
+
+    if form.is_bound:
+        servidores_ok = bool(form.data.getlist("servidores"))
+        motivo_ok = bool((form.data.get("motivo") or "").strip())
+    else:
+        if form.instance and form.instance.pk:
+            servidores_ok = form.instance.servidores.exists()
+        else:
+            servidores_ok = bool(form.initial.get("servidores"))
+        motivo_ok = bool((getattr(form.instance, "motivo", "") or "").strip())
+
+    return bool(servidores_ok and motivo_ok)
+
+
 def _form_context(*, request, form, ordem=None, evento=None):
     oficios_qs = form.fields["oficios"].queryset.select_related("roteiro").prefetch_related(
         "roteiro__destinos__cidade",
@@ -249,6 +269,8 @@ def _form_context(*, request, form, ordem=None, evento=None):
         f"?{urlencode({'next': request.get_full_path()})}"
     )
 
+    evento_display = _evento_display_values(form)
+
     return {
         "page_title": "Nova Ordem de Serviço" if ordem is None or not ordem.pk else f"Editar {ordem.numero_formatado}",
         "form": form,
@@ -260,8 +282,9 @@ def _form_context(*, request, form, ordem=None, evento=None):
         "tem_modelos_motivo": form.fields["modelo_motivo"].queryset.exists(),
         "api_cidades_por_estado_url": reverse("roteiros:api_cidades_por_estado", kwargs={"estado_id": 0}),
         "evento_selected_dates_json": _evento_selected_dates_json(form),
-        "evento_display": _evento_display_values(form),
+        "evento_display": evento_display,
         "os_oficios_summary": summaries,
+        "os_is_completa": _ordem_is_completa(form, evento_display),
     }
 
 

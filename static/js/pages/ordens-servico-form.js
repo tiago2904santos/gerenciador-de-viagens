@@ -147,7 +147,10 @@
         managedFlag: "osDestinosManaged",
         readyAttr: "osDestinoReady",
         loadCities: function (citySelect, stateId, selectedCityId) {
-          return loadCitiesForState(form, citySelect, stateId, selectedCityId);
+          return loadCitiesForState(form, citySelect, stateId, selectedCityId).then(function (cities) {
+            updateSubmitButtonLabel(form);
+            return cities;
+          });
         }
       });
       return;
@@ -166,7 +169,7 @@
         citySelect,
         stateSelect.value || initialStateId,
         citySelect.value || initialCityId,
-      );
+      ).then(function () { updateSubmitButtonLabel(form); });
     }
 
     stateSelect.addEventListener("change", onStateChange);
@@ -175,7 +178,7 @@
       citySelect,
       stateSelect.value || initialStateId,
       citySelect.value || initialCityId,
-    );
+    ).then(function () { updateSubmitButtonLabel(form); });
   }
 
   function focusDestinationPicker(form) {
@@ -392,9 +395,13 @@
       if (stateSelect && citySelect) {
         stateSelect.value = destinoStateId;
         stateSelect.dispatchEvent(new Event("change", { bubbles: true }));
-        loadCitiesForState(form, citySelect, destinoStateId, destinoCityId);
+        loadCitiesForState(form, citySelect, destinoStateId, destinoCityId).then(function () {
+          updateSubmitButtonLabel(form);
+        });
       }
     }
+
+    updateSubmitButtonLabel(form);
   }
 
   function initOficioAutoFill(form, summaries) {
@@ -402,6 +409,198 @@
     if (!select) return;
     select.addEventListener("change", function () { onOficiosChange(form, summaries); });
     select.addEventListener("input",  function () { onOficiosChange(form, summaries); });
+  }
+
+  /* ── Rótulo do botão principal: "Finalizar Ordem de Serviço" ou "Salvar como rascunho" ── */
+
+  function osIsCompleta(form) {
+    var startHidden = form.querySelector("input[name='data_evento_inicio']");
+    var endHidden = form.querySelector("input[name='data_evento_fim']");
+    var destinoCidade = form.querySelector("select[name='destino_cidade']");
+    var servidoresSelect = form.querySelector("select[name='servidores']");
+    var motivoField = form.querySelector("[data-motivo-textarea='true']");
+
+    var temDatas = !!(startHidden && startHidden.value) && !!(endHidden && endHidden.value);
+    var temDestino = !!(destinoCidade && destinoCidade.value);
+    var temServidores = !!servidoresSelect && Array.from(servidoresSelect.options).some(function (o) { return o.selected; });
+    var temMotivo = !!(motivoField && motivoField.value.trim());
+
+    return temDatas && temDestino && temServidores && temMotivo;
+  }
+
+  function updateSubmitButtonLabel(form) {
+    var button = form.querySelector(".os-submit-btn span:not(.cv-btn__icon)");
+    if (!button) return;
+    button.textContent = osIsCompleta(form) ? "Finalizar Ordem de Serviço" : "Salvar como rascunho";
+  }
+
+  function initSubmitButtonLabel(form) {
+    updateSubmitButtonLabel(form);
+
+    var debounceTimer = null;
+    function debouncedUpdate() {
+      window.clearTimeout(debounceTimer);
+      debounceTimer = window.setTimeout(function () { updateSubmitButtonLabel(form); }, 150);
+    }
+    form.addEventListener("input", debouncedUpdate);
+    form.addEventListener("change", debouncedUpdate);
+  }
+
+  /* ── Draft: preserva o formulário ao navegar para "Gerenciar modelos" / "Cadastrar servidor" ── */
+
+  function draftStorageKey() {
+    return "osFormDraft:" + window.location.pathname + window.location.search;
+  }
+
+  function serializeFormEntries(form) {
+    var data = new FormData(form);
+    var entries = [];
+    data.forEach(function (value, key) {
+      if (key === "csrfmiddlewaretoken") return;
+      entries.push([key, value]);
+    });
+    return entries;
+  }
+
+  function saveDraft(form) {
+    try {
+      window.sessionStorage.setItem(draftStorageKey(), JSON.stringify(serializeFormEntries(form)));
+    } catch (err) {
+      /* armazenamento indisponivel (modo privado, quota etc.) */
+    }
+  }
+
+  function takeDraft() {
+    var key = draftStorageKey();
+    var raw;
+    try {
+      raw = window.sessionStorage.getItem(key);
+    } catch (err) {
+      return null;
+    }
+    if (!raw) return null;
+    try {
+      window.sessionStorage.removeItem(key);
+    } catch (err) {
+      /* ignore */
+    }
+    var entries;
+    try {
+      entries = JSON.parse(raw);
+    } catch (err) {
+      return null;
+    }
+    if (!Array.isArray(entries)) return null;
+    var byName = {};
+    entries.forEach(function (pair) {
+      var name = pair[0];
+      var value = pair[1];
+      if (!byName[name]) byName[name] = [];
+      byName[name].push(value);
+    });
+    return byName;
+  }
+
+  function bindDraftAutosaveLinks(form) {
+    form.addEventListener("click", function (event) {
+      var link = event.target.closest('[data-autosave-link="1"]');
+      if (!link || !form.contains(link)) return;
+      saveDraft(form);
+    });
+  }
+
+  function applyDraftDestinos(form, draft) {
+    var entries = {};
+    Object.keys(draft).forEach(function (name) {
+      var stateMatch = name.match(/^destino_estado(?:_(\d+))?$/);
+      var cityMatch = name.match(/^destino_cidade(?:_(\d+))?$/);
+      if (stateMatch) {
+        var stateIdx = stateMatch[1] ? parseInt(stateMatch[1], 10) : 0;
+        entries[stateIdx] = entries[stateIdx] || {};
+        entries[stateIdx].estado = draft[name][0];
+      }
+      if (cityMatch) {
+        var cityIdx = cityMatch[1] ? parseInt(cityMatch[1], 10) : 0;
+        entries[cityIdx] = entries[cityIdx] || {};
+        entries[cityIdx].cidade = draft[name][0];
+      }
+    });
+
+    var indexes = Object.keys(entries)
+      .map(Number)
+      .filter(function (idx) {
+        var entry = entries[idx];
+        return entry && (entry.estado || entry.cidade);
+      })
+      .sort(function (a, b) { return a - b; });
+    if (!indexes.length) return;
+
+    var addButton = form.querySelector("[data-os-add-destino]");
+
+    function rowsCount() {
+      return form.querySelectorAll("[data-os-destino-row]").length;
+    }
+
+    var rowsNeeded = indexes[indexes.length - 1] + 1;
+    var guard = 0;
+    while (rowsCount() < rowsNeeded && addButton && guard < 50) {
+      addButton.click();
+      guard += 1;
+    }
+
+    var rows = Array.prototype.slice.call(form.querySelectorAll("[data-os-destino-row]"));
+    indexes.forEach(function (idx) {
+      var row = rows[idx];
+      var entry = entries[idx];
+      if (!row || !entry) return;
+      var stateSelect = row.querySelector("[data-os-destino-state]");
+      var citySelect = row.querySelector("[data-os-destino-city]");
+      if (!stateSelect) return;
+      stateSelect.value = entry.estado || "";
+      resetPicker(stateSelect);
+      initPickers(form);
+      if (entry.estado && citySelect) {
+        loadCitiesForState(form, citySelect, entry.estado, entry.cidade || "").then(function () {
+          initPickers(form);
+          updateSubmitButtonLabel(form);
+        });
+      }
+    });
+  }
+
+  function applyDraft(form, draft) {
+    if (draft.oficios && draft.oficios.length) {
+      var oficiosSelect = form.querySelector("select[name='oficios']");
+      setMultiSelectValues(oficiosSelect, draft.oficios, form);
+    }
+
+    var startIso = draft.data_evento_inicio ? draft.data_evento_inicio[0] : "";
+    var endIso = draft.data_evento_fim ? draft.data_evento_fim[0] : "";
+    if (startIso) {
+      setDateFields(form, startIso, endIso || startIso);
+    }
+
+    if (draft.servidores && draft.servidores.length) {
+      var servidoresSelect = form.querySelector("select[name='servidores']");
+      setMultiSelectValues(servidoresSelect, draft.servidores, form);
+    }
+
+    applyDraftDestinos(form, draft);
+
+    if (draft.modelo_motivo && draft.modelo_motivo.length) {
+      var modeloSelect = form.querySelector("[data-modelo-motivo-select='true']");
+      if (modeloSelect) modeloSelect.value = draft.modelo_motivo[0];
+    }
+
+    if (draft.motivo && draft.motivo.length) {
+      var motivoField = form.querySelector("[data-motivo-textarea='true']");
+      if (motivoField) {
+        motivoField.value = draft.motivo[0];
+        motivoField.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+    }
+
+    updateSubmitButtonLabel(form);
   }
 
   /* ── Bootstrap ──────────────────────────────────────────────── */
@@ -416,5 +615,12 @@
     syncDestinationCities(form);
     syncAddDestinationButton(form);
     syncEventDates(form);
+    bindDraftAutosaveLinks(form);
+    initSubmitButtonLabel(form);
+
+    var draft = takeDraft();
+    if (draft) {
+      applyDraft(form, draft);
+    }
   });
 })();

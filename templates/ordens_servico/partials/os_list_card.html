@@ -58,8 +58,8 @@
           <div class="oficio-lc__traveller-body">
             <div class="oficio-lc__traveller-name-row">
               <span class="oficio-lc__traveller-name">ASSINANTE</span>
+              <span class="oficio-lc__traveller-meta">{{ card.assinante.nome }}{% if card.assinante.cargo %} · {{ card.assinante.cargo }}{% endif %}</span>
             </div>
-            <span class="oficio-lc__traveller-meta">{{ card.assinante.nome }}{% if card.assinante.cargo %} · {{ card.assinante.cargo }}{% endif %}</span>
           </div>
         </div>
         {% endif %}
