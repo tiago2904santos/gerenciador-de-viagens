@@ -566,17 +566,20 @@ export function initRoteirosEditor() {
     var shEl = card.querySelector('[name="trecho_' + o + '_saida_hora"]');
     var chEl = card.querySelector('[name="trecho_' + o + '_chegada_hora"]');
     if (suggestArrival && sdEl && shEl) {
+      // silent: true — sem isso, o 'change' disparado no hidden de chegada reentra no
+      // listener do container (que chama recalcCard de novo) e estoura a pilha, já que o
+      // valor calculado não muda entre chamadas e nada interrompe o ciclo.
       if (!sdEl.value || !shEl.value) {
-        setTrechoDateValue(card, 'chegada', '');
+        setTrechoDateValue(card, 'chegada', '', { silent: true });
         if (chEl) chEl.value = '';
       } else if (total > 0) {
         var cheg = calcularChegada(sdEl.value, shEl.value, cru, add);
         if (cheg) {
-          setTrechoDateValue(card, 'chegada', cheg.data);
+          setTrechoDateValue(card, 'chegada', cheg.data, { silent: true });
           if (chEl) chEl.value = cheg.hora;
         }
       } else {
-        setTrechoDateValue(card, 'chegada', '');
+        setTrechoDateValue(card, 'chegada', '', { silent: true });
         if (chEl) chEl.value = '';
       }
     }
