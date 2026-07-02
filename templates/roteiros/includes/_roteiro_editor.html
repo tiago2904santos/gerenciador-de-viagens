@@ -1,5 +1,9 @@
 {% load static %}
-{% url 'roteiros:roteiro-autosave-create' as roteiro_autosave_create_url %}
+{% if roteiro_editor_oficio and oficio %}
+  {% url 'oficios:wizard_roteiro_autosave_criar' pk=oficio.pk as roteiro_autosave_create_url %}
+{% else %}
+  {% url 'roteiros:roteiro-autosave-create' as roteiro_autosave_create_url %}
+{% endif %}
 
 <div class="roteiro-wizard__editor {% if is_avulso %}roteiro-editor--avulso{% endif %}{% if roteiro_editor_oficio %} roteiro-editor--oficio{% endif %}" data-glance-state="closed">
     <form method="post" id="roteiro-editor-form" novalidate class="roteiro-wizard__form"

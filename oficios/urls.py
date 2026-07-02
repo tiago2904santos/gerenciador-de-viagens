@@ -24,6 +24,11 @@ urlpatterns = [
     path("<int:pk>/transporte/", views.transporte, name="transporte"),
     path("<int:pk>/transporte/autosave/", views.transporte_autosave, name="transporte_autosave"),
     path("<int:pk>/roteiro/", views.wizard_roteiro, name="wizard_roteiro"),
+    path(
+        "<int:pk>/roteiro/autosave/criar/",
+        views.wizard_roteiro_autosave_criar,
+        name="wizard_roteiro_autosave_criar",
+    ),
     path("<int:pk>/justificativa/", views.wizard_justificativa, name="wizard_justificativa"),
     path("<int:pk>/justificativa/autosave/", views.justificativa_autosave, name="justificativa_autosave"),
     path("<int:pk>/resumo/", views.wizard_resumo, name="wizard_resumo"),
