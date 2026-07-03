@@ -4,6 +4,8 @@ import re
 from urllib.parse import urlencode
 
 from django.contrib.auth import get_user_model
+from django.middleware.csrf import get_token
+from django.test import Client
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -274,6 +276,39 @@ class OficioWizardDadosViajantesTests(TestCase):
         oficio.refresh_from_db()
         self.assertEqual(oficio.motorista, self.servidor)
         self.assertEqual(oficio.motorista_modo, Oficio.MOTORISTA_MODO_SERVIDOR)
+
+    def test_autosave_via_sendbeacon_ao_sair_da_pagina_persiste_servidores(self):
+        """navigator.sendBeacon (disparado no beforeunload ao sair da etapa sem
+        clicar em 'Avançar') não permite setar headers, então o JS manda
+        FormData com csrfmiddlewaretoken + payload em vez de JSON puro. Um
+        client com enforce_csrf_checks=True reproduz fielmente esse caminho —
+        sem o suporte a FormData no parse do autosave, isso voltava 403 e a
+        seleção de servidores nunca era persistida."""
+        client = Client(enforce_csrf_checks=True)
+        client.force_login(self.user)
+        oficio = Oficio.objects.create(numero=1, ano=timezone.localdate().year, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+
+        get_response = client.get(reverse("oficios:dados_viajantes", args=[oficio.pk]))
+        token = get_token(get_response.wsgi_request)
+
+        payload = {
+            "object_id": str(oficio.pk),
+            "form_id": "oficio-form",
+            "model": "oficio",
+            "dirty_fields": ["servidores"],
+            "fields": {"servidores": [str(self.servidor.pk), str(self.outro_servidor.pk)]},
+            "snapshots": {},
+        }
+        response = client.post(
+            reverse("oficios:dados_viajantes_autosave", args=[oficio.pk]),
+            data={"csrfmiddlewaretoken": token, "payload": json.dumps(payload)},
+        )
+
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(
+            set(oficio.servidores.values_list("pk", flat=True)),
+            {self.servidor.pk, self.outro_servidor.pk},
+        )
 
     def test_get_dados_viajantes_renderiza_oficio_existente(self):
         oficio = Oficio.objects.create(

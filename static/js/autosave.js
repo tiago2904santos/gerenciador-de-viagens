@@ -256,8 +256,15 @@
       var payload = buildPayload();
       if (!payload.dirty_fields.length && !dirtySnapshots.size) return;
       if (!shouldCreate(payload)) return;
-      var blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
-      navigator.sendBeacon(url, blob);
+      /* sendBeacon não permite setar headers (logo, sem X-CSRFToken). Um Blob
+         JSON puro cai no CSRF do Django e o servidor rejeita com 403 sem
+         nenhum aviso no cliente — o autosave "parecia" ter disparado mas
+         nunca era persistido. Envia como FormData (multipart) com o token
+         csrf como campo normal, que o middleware valida do jeito de sempre. */
+      var formData = new FormData();
+      formData.append('csrfmiddlewaretoken', csrfFromForm(form));
+      formData.append('payload', JSON.stringify(payload));
+      navigator.sendBeacon(url, formData);
       debug('sendBeacon disparado');
     });
 

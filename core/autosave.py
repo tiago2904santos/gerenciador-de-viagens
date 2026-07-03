@@ -22,8 +22,19 @@ class AutosavePayload:
 def parse_autosave_payload(request, *, expected_model=None):
     if request.method != "POST":
         raise AutosavePayloadError("Método inválido para autosave.")
+
+    content_type = (request.content_type or "").split(";")[0].strip()
+    if content_type == "application/json":
+        raw_source = request.body or b"{}"
+    else:
+        # navigator.sendBeacon (flush ao sair da página) não permite setar o
+        # header X-CSRFToken; por isso o autosave-on-unload envia FormData
+        # (multipart) com csrfmiddlewaretoken + payload em vez de JSON puro,
+        # deixando o CSRF ser validado normalmente pelo middleware.
+        raw_source = request.POST.get("payload") or "{}"
+
     try:
-        raw = json.loads(request.body or "{}")
+        raw = json.loads(raw_source)
     except (TypeError, ValueError, json.JSONDecodeError) as exc:
         raise AutosavePayloadError("Payload JSON inválido.") from exc
 
