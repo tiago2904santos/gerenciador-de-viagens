@@ -39,6 +39,7 @@
     var inFlight = null;
     var abortController = null;
     var queueAfterFlight = false;
+    var readyToSubmit = false;
 
     function emit(name, detail) {
       form.dispatchEvent(new CustomEvent(name, { detail: detail || {} }));
@@ -213,11 +214,38 @@
       schedule(350);
     }, true);
 
-    form.addEventListener('submit', function () {
-      submitting = true;
+    form.addEventListener('submit', function (event) {
+      if (readyToSubmit || !inFlight) {
+        submitting = true;
+        window.clearTimeout(inputTimer);
+        paused = true;
+        return;
+      }
+
+      /* Um autosave anterior (com dados mais antigos, ex.: antes do usuário
+         adicionar o último servidor) ainda está em voo. Abortar o fetch no
+         cliente não impede o servidor de terminar de processá-lo — se essa
+         resposta chegar e salvar depois do POST real do "Avançar", ela
+         sobrescreve o M2M de servidores com o snapshot antigo, apagando quem
+         foi adicionado por último. Em vez de abortar, espera o autosave
+         pendente terminar (garantindo que o POST real seja sempre o último a
+         gravar) e só então reenvia o formulário. */
+      event.preventDefault();
+      event.stopImmediatePropagation();
       window.clearTimeout(inputTimer);
-      if (abortController) abortController.abort();
       paused = true;
+      var submitter = event.submitter;
+      inFlight.finally(function () {
+        readyToSubmit = true;
+        window.clearTimeout(inputTimer);
+        if (submitter && typeof submitter.click === 'function') {
+          submitter.click();
+        } else if (typeof form.requestSubmit === 'function') {
+          form.requestSubmit();
+        } else {
+          form.submit();
+        }
+      });
     }, true);
 
     window.addEventListener('beforeunload', function () {
