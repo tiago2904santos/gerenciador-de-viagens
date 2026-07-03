@@ -13,8 +13,8 @@
     </div>
 
     <div class="evento-lc__sections">
-      <p class="evento-lc__section-label">Ofícios</p>
-      <div class="oficio-lc__trechos-list evento-lc__docs-list evento-lc__oficios-list">
+      <p class="evento-lc__section-label">Ofícios e documentos</p>
+      <div class="oficio-lc__trechos-list evento-lc__docs-list evento-lc__oficios-list evento-lc__documentos-list">
         {% for oficio in card.oficios %}
           <div class="oficio-lc__trecho oficio-lc__trecho--documento evento-lc__oficio-row">
             <div class="evento-lc__oficio-row-header">
@@ -32,15 +32,7 @@
               </div>
             </div>
           </div>
-        {% empty %}
-          <p class="oficio-lc__empty-hint">Nenhum ofício vinculado a este evento.</p>
         {% endfor %}
-      </div>
-
-      {% if card.documentos %}
-      <p class="evento-lc__section-label">Documentos</p>
-      {% endif %}
-      <div class="oficio-lc__trechos-list evento-lc__docs-list evento-lc__documentos-list">
         {% for doc in card.documentos %}
           <div class="oficio-lc__trecho oficio-lc__trecho--documento">
             <div class="oficio-lc__trecho-body">
@@ -59,53 +51,51 @@
               {% if doc.editar_url %}{% include "components/ui/buttons/icon_button.html" with href=doc.editar_url action="edit" aria_label="Editar documento" tooltip="Editar" only %}{% endif %}
             </div>
           </div>
-        {% empty %}
-          <p class="oficio-lc__empty-hint">Nenhum plano, convite ou OS vinculado a este evento.</p>
         {% endfor %}
+        {% if not card.oficios and not card.documentos %}
+          <p class="oficio-lc__empty-hint">Nenhum ofício, plano, convite ou OS vinculado a este evento.</p>
+        {% endif %}
       </div>
 
       {% if card.servidores_flat %}
       <p class="evento-lc__section-label">Servidores</p>
-      {% for oficio in card.oficios %}
-        {% if oficio.servidores %}
-        <div class="evento-lc__servidores-grupo">
-          <p class="evento-lc__servidores-oficio-label">Ofício {{ oficio.numero }}</p>
-          <div class="oficio-lc__travellers oficio-lc__travellers--n3">
-            {% for s in oficio.servidores %}
-            <div class="oficio-lc__traveller oficio-lc__traveller--motorista">
-              <div class="oficio-lc__traveller-body">
-                <div class="oficio-lc__traveller-name-row">
-                  <span class="oficio-lc__traveller-name">{{ s.name }}</span>
-                  {% if s.cargo or s.unidade or s.telefone %}
-                  <span class="oficio-lc__traveller-meta">{% if s.cargo %}{{ s.cargo }}{% endif %}{% if s.cargo and s.unidade %} · {% endif %}{% if s.unidade %}{{ s.unidade }}{% endif %}{% if s.telefone %} · {{ s.telefone }}{% endif %}</span>
-                  {% endif %}
-                </div>
+      <div class="oficio-lc__travellers oficio-lc__travellers--n3">
+        {% for oficio in card.oficios %}
+          {% for s in oficio.servidores %}
+          <div class="oficio-lc__traveller oficio-lc__traveller--motorista">
+            <div class="oficio-lc__traveller-body">
+              <div class="oficio-lc__traveller-name-row">
+                <span class="oficio-lc__traveller-name">{{ s.name }}</span>
+                {% if s.unidade %}<span class="oficio-lc__traveller-unidade">{{ s.unidade }}</span>{% endif %}
+                <span class="oficio-lc__traveller-badge oficio-lc__traveller-badge--muted">Ofício {{ oficio.numero }}</span>
               </div>
-              {% if s.has_termo %}
-              <div class="oficio-lc__traveller-termo cv-icon-btn-group">
-                {% if s.termo_open_url %}
-                <a class="cv-icon-btn cv-icon-btn--preview" href="{{ s.termo_open_url }}" target="_blank" rel="noopener noreferrer" aria-label="Visualizar termo de autorização de {{ s.name }}" data-tooltip="Visualizar termo">
-                  {% include "dev/ui_lab/partials/_cv_icon.html" with icon="eye" only %}
-                </a>
-                {% endif %}
-                {% if s.termo_pdf_url %}
-                <a class="cv-icon-btn cv-icon-btn--pdf" href="{{ s.termo_pdf_url }}" aria-label="Baixar termo de autorização em PDF de {{ s.name }}" data-tooltip="PDF" data-direct-download="true">
-                  {% include "dev/ui_lab/partials/_cv_icon.html" with icon="pdf" only %}
-                </a>
-                {% endif %}
-                {% if s.termo_docx_url %}
-                <a class="cv-icon-btn cv-icon-btn--docx" href="{{ s.termo_docx_url }}" aria-label="Baixar termo de autorização em DOCX de {{ s.name }}" data-tooltip="DOCX" data-direct-download="true">
-                  {% include "dev/ui_lab/partials/_cv_icon.html" with icon="docx" only %}
-                </a>
-                {% endif %}
-              </div>
+              {% if s.cargo or s.telefone %}
+              <span class="oficio-lc__traveller-meta">{% if s.cargo %}{{ s.cargo }}{% endif %}{% if s.cargo and s.telefone %} · {% endif %}{% if s.telefone %}{{ s.telefone }}{% endif %}</span>
               {% endif %}
             </div>
-            {% endfor %}
+            {% if s.has_termo %}
+            <div class="oficio-lc__traveller-termo cv-icon-btn-group">
+              {% if s.termo_open_url %}
+              <a class="cv-icon-btn cv-icon-btn--preview" href="{{ s.termo_open_url }}" target="_blank" rel="noopener noreferrer" aria-label="Visualizar termo de autorização de {{ s.name }}" data-tooltip="Visualizar termo">
+                {% include "dev/ui_lab/partials/_cv_icon.html" with icon="eye" only %}
+              </a>
+              {% endif %}
+              {% if s.termo_pdf_url %}
+              <a class="cv-icon-btn cv-icon-btn--pdf" href="{{ s.termo_pdf_url }}" aria-label="Baixar termo de autorização em PDF de {{ s.name }}" data-tooltip="PDF" data-direct-download="true">
+                {% include "dev/ui_lab/partials/_cv_icon.html" with icon="pdf" only %}
+              </a>
+              {% endif %}
+              {% if s.termo_docx_url %}
+              <a class="cv-icon-btn cv-icon-btn--docx" href="{{ s.termo_docx_url }}" aria-label="Baixar termo de autorização em DOCX de {{ s.name }}" data-tooltip="DOCX" data-direct-download="true">
+                {% include "dev/ui_lab/partials/_cv_icon.html" with icon="docx" only %}
+              </a>
+              {% endif %}
+            </div>
+            {% endif %}
           </div>
-        </div>
-        {% endif %}
-      {% endfor %}
+          {% endfor %}
+        {% endfor %}
+      </div>
       {% endif %}
     </div>
 
