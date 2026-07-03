@@ -248,6 +248,37 @@
       });
     }, true);
 
+    form.addEventListener('click', function (event) {
+      var link = event.target.closest('[data-autosave-link="1"]');
+      if (!link || !form.contains(link) || !link.href) return;
+      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      if (link.target && link.target !== '_self') return;
+      if (paused || submitting) return;
+      if (!inFlight && !inputTimer) return;
+
+      /* Mesma corrida do submit acima, só que aqui a navegação nem é um POST
+         do próprio form — é um link comum (stepper, "Voltar", "Cadastrar novo
+         viajante"...). Sem interceptar o clique, a navegação sai imediatamente
+         e a única rede de proteção é o beforeunload/sendBeacon abaixo, que não
+         espera nenhum autosave em voo terminar antes de mandar o snapshot
+         atual: se o autosave mais antigo (ainda em voo) responder depois do
+         sendBeacon, ele sobrescreve o M2M de servidores com o estado anterior.
+         Aqui a gente cancela o debounce pendente, garante que o snapshot atual
+         seja enviado e só troca de página depois que a gravação terminar. */
+      event.preventDefault();
+      window.clearTimeout(inputTimer);
+      var href = link.href;
+      /* `send()` desiste na hora se `paused` já estiver true, então só
+         marcamos `paused` depois que o(s) envio(s) de fato saírem — nada mais
+         dispara `schedule()` nesse meio-tempo, já que a navegação está prestes
+         a acontecer e nenhum evento novo do form roda antes disso. */
+      var pending = inFlight ? inFlight.then(function () { return send(); }) : send();
+      pending.finally(function () {
+        paused = true;
+        window.location.href = href;
+      });
+    }, true);
+
     window.addEventListener('beforeunload', function () {
       if (!navigator.sendBeacon) return;
       if (paused || submitting) return;
