@@ -68,6 +68,61 @@ def clonar_roteiro(origem):
     return novo
 
 
+CAMPOS_COMPARACAO_ROTEIRO = [
+    "origem_estado_id",
+    "origem_cidade_id",
+    "saida_dt",
+    "duracao_min",
+    "chegada_dt",
+    "retorno_saida_dt",
+    "retorno_duracao_min",
+    "retorno_chegada_dt",
+    "quantidade_diarias",
+    "valor_diarias",
+    "observacoes",
+    "rota_distancia_manual_km",
+    "rota_duracao_manual_min",
+    "rota_ajuste_justificativa",
+]
+
+CAMPOS_COMPARACAO_TRECHO = [
+    "tipo",
+    "ordem",
+    "origem_estado_id",
+    "origem_cidade_id",
+    "destino_estado_id",
+    "destino_cidade_id",
+    "saida_dt",
+    "chegada_dt",
+    "distancia_km",
+    "duracao_estimada_min",
+    "tempo_cru_estimado_min",
+    "tempo_adicional_min",
+]
+
+
+def snapshot_comparavel_roteiro(roteiro):
+    """Dict com os campos relevantes do roteiro (+ destinos/trechos), para comparar
+    uma cópia (`roteiro_ajustado`) com o original sem considerar pk/timestamps."""
+    dados = {campo: getattr(roteiro, campo) for campo in CAMPOS_COMPARACAO_ROTEIRO}
+    dados["destinos"] = [
+        (d.cidade_id, d.estado_id, d.ordem) for d in roteiro.destinos.all().order_by("ordem", "id")
+    ]
+    dados["trechos"] = [
+        tuple(getattr(t, campo) for campo in CAMPOS_COMPARACAO_TRECHO)
+        for t in roteiro.trechos.all().order_by("ordem", "id")
+    ]
+    return dados
+
+
+def diferencas_entre_roteiros(original, copia):
+    """Lista as chaves (campo/destinos/trechos) que diferem entre dois roteiros.
+    Lista vazia = cópia idêntica ao original (nunca foi de fato ajustada)."""
+    a = snapshot_comparavel_roteiro(original)
+    b = snapshot_comparavel_roteiro(copia)
+    return [chave for chave in a if a[chave] != b[chave]]
+
+
 def garantir_roteiro_ajustado(prestacao):
     """Garante a cópia editável do roteiro na prestação (clona do ofício na 1ª vez)."""
     if prestacao.roteiro_ajustado_id:

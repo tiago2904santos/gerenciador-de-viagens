@@ -11,57 +11,8 @@ Uso:
 
 from django.core.management.base import BaseCommand
 
+from prestacoes_contas.diario_services import diferencas_entre_roteiros
 from prestacoes_contas.models import PrestacaoContas
-
-CAMPOS_ROTEIRO = [
-    "origem_estado_id",
-    "origem_cidade_id",
-    "saida_dt",
-    "duracao_min",
-    "chegada_dt",
-    "retorno_saida_dt",
-    "retorno_duracao_min",
-    "retorno_chegada_dt",
-    "quantidade_diarias",
-    "valor_diarias",
-    "observacoes",
-    "rota_distancia_manual_km",
-    "rota_duracao_manual_min",
-    "rota_ajuste_justificativa",
-]
-
-CAMPOS_TRECHO = [
-    "tipo",
-    "ordem",
-    "origem_estado_id",
-    "origem_cidade_id",
-    "destino_estado_id",
-    "destino_cidade_id",
-    "saida_dt",
-    "chegada_dt",
-    "distancia_km",
-    "duracao_estimada_min",
-    "tempo_cru_estimado_min",
-    "tempo_adicional_min",
-]
-
-
-def _snapshot(roteiro):
-    dados = {campo: getattr(roteiro, campo) for campo in CAMPOS_ROTEIRO}
-    dados["destinos"] = [
-        (d.cidade_id, d.estado_id, d.ordem) for d in roteiro.destinos.all().order_by("ordem", "id")
-    ]
-    dados["trechos"] = [
-        tuple(getattr(t, campo) for campo in CAMPOS_TRECHO)
-        for t in roteiro.trechos.all().order_by("ordem", "id")
-    ]
-    return dados
-
-
-def _diferencas(original, copia):
-    a = _snapshot(original)
-    b = _snapshot(copia)
-    return [chave for chave in a if a[chave] != b[chave]]
 
 
 class Command(BaseCommand):
@@ -105,7 +56,7 @@ class Command(BaseCommand):
                 )
                 continue
 
-            diffs = _diferencas(original, copia)
+            diffs = diferencas_entre_roteiros(original, copia)
             if diffs:
                 divergentes += 1
                 self.stdout.write(
