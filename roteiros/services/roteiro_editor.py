@@ -475,6 +475,46 @@ def atualizar_roteiro(instance, form, roteiro_state, validated, diarias_resultad
 
 
 @transaction.atomic
+def sobrescrever_roteiro_duplicado(
+    duplicado,
+    request_post,
+    *,
+    method,
+    roteiro_state,
+    validated,
+    diarias_resultado,
+    instance_obsoleta=None,
+):
+    """Atualiza o roteiro já existente e idêntico ("duplicado") com os dados recém
+    submetidos, em vez de manter dois registros iguais no banco. Se havia uma
+    instância obsoleta (rascunho de autosave ou o roteiro que estava sendo criado/
+    editado e passou a coincidir com o duplicado), migra Ofícios e Prestações de
+    Contas que apontavam para ela e a remove, para que os documentos que já usavam
+    o roteiro existente continuem funcionando normalmente.
+    """
+    from roteiros.forms import RoteiroForm
+
+    form = RoteiroForm(request_post, instance=duplicado)
+    preparar_querysets_formulario_roteiro(form, method=method, post=request_post, instance=duplicado)
+    if not form.is_valid():
+        return None
+
+    roteiro = atualizar_roteiro(duplicado, form, roteiro_state, validated, diarias_resultado)
+
+    if instance_obsoleta is not None and instance_obsoleta.pk and instance_obsoleta.pk != roteiro.pk:
+        from oficios.models import Oficio
+        from prestacoes_contas.models import PrestacaoContas
+
+        Oficio.objects.filter(roteiro_id=instance_obsoleta.pk).update(roteiro_id=roteiro.pk)
+        PrestacaoContas.objects.filter(roteiro_ajustado_id=instance_obsoleta.pk).update(
+            roteiro_ajustado_id=roteiro.pk
+        )
+        instance_obsoleta.delete()
+
+    return roteiro
+
+
+@transaction.atomic
 def excluir_roteiro(instance):
     try:
         instance.delete()

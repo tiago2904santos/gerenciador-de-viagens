@@ -15,6 +15,7 @@ from .roteiro_editor import (
     preparar_estado_editor_roteiro_para_get,
     preparar_querysets_formulario_roteiro,
     roteiro_state_equivalente_ao_roteiro,
+    sobrescrever_roteiro_duplicado,
     validar_submissao_editor_roteiro,
 )
 
@@ -33,5 +34,6 @@ __all__ = [
     "preparar_estado_editor_roteiro_para_get",
     "preparar_querysets_formulario_roteiro",
     "roteiro_state_equivalente_ao_roteiro",
+    "sobrescrever_roteiro_duplicado",
     "validar_submissao_editor_roteiro",
 ]

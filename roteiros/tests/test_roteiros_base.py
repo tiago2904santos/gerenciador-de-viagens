@@ -44,6 +44,30 @@ class RoteirosBaseTests(TestCase):
         response = self.client.get(reverse("roteiros:novo"))
         self.assertEqual(response.status_code, 200)
 
+    def test_salvar_roteiro_identico_sobrescreve_o_existente_em_vez_de_travar(self):
+        from oficios.models import Oficio
+
+        payload1 = self._loop_diario_post_data()
+        payload1["observacoes"] = "primeira versao"
+        resp1 = self.client.post(reverse("roteiros:novo"), data=payload1)
+        self.assertEqual(resp1.status_code, 302)
+        self.assertEqual(Roteiro.objects.count(), 1)
+        existente = Roteiro.objects.first()
+        self.assertEqual(existente.observacoes, "PRIMEIRA VERSAO")
+
+        oficio = Oficio.objects.create(roteiro=existente)
+
+        payload2 = self._loop_diario_post_data()
+        payload2["observacoes"] = "segunda versao"
+        resp2 = self.client.post(reverse("roteiros:novo"), data=payload2)
+
+        self.assertEqual(resp2.status_code, 302, "deveria sobrescrever e redirecionar, não travar com erro de duplicado")
+        self.assertEqual(Roteiro.objects.count(), 1, "não deveria criar um segundo roteiro idêntico")
+        existente.refresh_from_db()
+        self.assertEqual(existente.observacoes, "SEGUNDA VERSAO")
+        oficio.refresh_from_db()
+        self.assertEqual(oficio.roteiro_id, existente.pk)
+
     def test_criar_roteiro_minimo_e_destino(self):
         r = Roteiro.objects.create(
             tipo=Roteiro.TIPO_AVULSO,

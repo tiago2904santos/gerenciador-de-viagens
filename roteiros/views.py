@@ -57,6 +57,7 @@ from .services import (
     obter_initial_roteiro,
     preparar_estado_editor_roteiro_para_get,
     preparar_querysets_formulario_roteiro,
+    sobrescrever_roteiro_duplicado,
     validar_submissao_editor_roteiro,
 )
 from .services.autosave import (
@@ -198,19 +199,35 @@ def novo(request):
                 validated, roteiro_state, evento=evento, excluir_pk=getattr(rascunho, "pk", None)
             )
             if duplicado is not None:
-                form.add_error(
-                    None,
-                    f"Já existe um roteiro idêntico salvo (#{duplicado.pk}). Edite o existente ou ajuste os dados.",
+                roteiro = sobrescrever_roteiro_duplicado(
+                    duplicado,
+                    request.POST,
+                    method=request.method,
+                    roteiro_state=roteiro_state,
+                    validated=validated,
+                    diarias_resultado=diarias_resultado,
+                    instance_obsoleta=rascunho,
                 )
+            elif rascunho is not None:
+                roteiro = atualizar_roteiro(rascunho, form, roteiro_state, validated, diarias_resultado)
             else:
-                if rascunho is not None:
-                    roteiro = atualizar_roteiro(rascunho, form, roteiro_state, validated, diarias_resultado)
+                roteiro = criar_roteiro(form, roteiro_state, validated, diarias_resultado, evento=evento)
+
+            if roteiro is not None:
+                if duplicado is not None:
+                    messages.success(
+                        request,
+                        f"Já existia um roteiro idêntico (#{duplicado.pk}); os dados foram atualizados nele.",
+                    )
                 else:
-                    roteiro = criar_roteiro(form, roteiro_state, validated, diarias_resultado, evento=evento)
-                messages.success(request, "Roteiro cadastrado com sucesso.")
+                    messages.success(request, "Roteiro cadastrado com sucesso.")
                 if evento is not None:
                     return redirect("eventos:guiado_etapa", pk=evento.pk, etapa=2)
                 return redirect("roteiros:index")
+            form.add_error(
+                None,
+                f"Já existe um roteiro idêntico salvo (#{duplicado.pk}). Edite o existente ou ajuste os dados.",
+            )
         for error in validated.get("errors", []):
             form.add_error(None, error)
         destinos_atuais, trechos_list = normalizar_destinos_e_trechos_apos_erro_post(roteiro_state)
@@ -283,18 +300,35 @@ def editar(request, pk):
                 validated, roteiro_state, evento=evento, excluir_pk=roteiro.pk
             )
             if duplicado is not None:
-                form.add_error(
-                    None,
-                    f"Já existe um roteiro idêntico salvo (#{duplicado.pk}). Edite o existente ou ajuste os dados.",
+                atualizado = sobrescrever_roteiro_duplicado(
+                    duplicado,
+                    request.POST,
+                    method=request.method,
+                    roteiro_state=roteiro_state,
+                    validated=validated,
+                    diarias_resultado=diarias_resultado,
+                    instance_obsoleta=roteiro,
                 )
             else:
-                atualizar_roteiro(roteiro, form, roteiro_state, validated, diarias_resultado)
-                messages.success(request, "Roteiro atualizado com sucesso.")
+                atualizado = atualizar_roteiro(roteiro, form, roteiro_state, validated, diarias_resultado)
+
+            if atualizado is not None:
+                if duplicado is not None:
+                    messages.success(
+                        request,
+                        f"Já existia um roteiro idêntico (#{duplicado.pk}); os dados foram atualizados nele e este registro foi descartado.",
+                    )
+                else:
+                    messages.success(request, "Roteiro atualizado com sucesso.")
                 if next_url:
                     return redirect(next_url)
-                if roteiro.evento_id:
-                    return redirect("eventos:guiado_etapa", pk=roteiro.evento_id, etapa=2)
+                if evento is not None:
+                    return redirect("eventos:guiado_etapa", pk=evento.pk, etapa=2)
                 return redirect("roteiros:index")
+            form.add_error(
+                None,
+                f"Já existe um roteiro idêntico salvo (#{duplicado.pk}). Edite o existente ou ajuste os dados.",
+            )
         for error in validated.get("errors", []):
             form.add_error(None, error)
         destinos_atuais, trechos_list = normalizar_destinos_e_trechos_apos_erro_post(roteiro_state)
