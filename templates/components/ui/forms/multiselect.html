@@ -1,7 +1,14 @@
 {% comment %}
 cv-custom-select em modo multiplo — mesmo componente JS do select simples.
 O <select multiple> nativo preserva name/id/value/selected para submit Django.
+Campos que já usam cv-search-picker (data-cv-search-picker no widget, ex.:
+equipe do ofício) não devem ganhar este wrapper — o próprio search-picker
+já cuida da UI e do <select> nativo.
 {% endcomment %}
+{% if "cv-search-picker__native" in field.field.widget.attrs.class|default:"" %}
+  {{ field.as_widget }}
+{% else %}
 <div class="cv-custom-select{% if field.errors %} cv-custom-select--error{% endif %}{% if field.field.disabled %} cv-custom-select--disabled{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}" data-cv-select>
   {{ field.as_widget }}
 </div>
+{% endif %}
