@@ -1,5 +1,7 @@
 {% comment %}
-cv-search-picker global — clonagem 1:1 do modelo aprovado no UI Lab.
+cv-custom-select em modo multiplo — mesmo componente JS do select simples.
 O <select multiple> nativo preserva name/id/value/selected para submit Django.
 {% endcomment %}
-{{ field.as_widget }}
+<div class="cv-custom-select{% if field.errors %} cv-custom-select--error{% endif %}{% if field.field.disabled %} cv-custom-select--disabled{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}" data-cv-select>
+  {{ field.as_widget }}
+</div>

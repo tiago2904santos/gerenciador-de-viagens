@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+  <div class="page-shell page-shell--standard-simple">
+    {% include "components/ui/headers/header_stack_simple.html" with eyebrow="EVENTOS" title=page_title description=page_description icon_label="EV" module_label="Tipos de Evento" only %}
+
+    <form class="main-form-panel" method="post" novalidate>
+      {% csrf_token %}
+      {% include "components/ui/layouts/form_section.html" with title="Dados do tipo" description="Informe o nome exibido na seleção de tipo do evento." section_id="tipos-evento-form-section" only %}
+      <div class="field-grid">
+        {% include "components/forms/form_field.html" with field=form.nome size_class="field-size-4" only %}
+        {% include "components/forms/form_field.html" with field=form.ativo size_class="field-size-4" only %}
+      </div>
+      {% include "components/ui/layouts/card_footer_actions.html" with secondary_label="Voltar" secondary_url=back_url primary_label=submit_label|default:"Salvar" only %}
+    </form>
+  </div>
+{% endblock %}

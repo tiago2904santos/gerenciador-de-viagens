@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from urllib.parse import urlencode
 
 from django.contrib import messages
 from django.db.models import Q
@@ -10,6 +11,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.dateparse import parse_date
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.http import require_POST
 
@@ -28,11 +30,25 @@ from prestacoes_contas.forms import PrestacaoMultipleFileInput
 
 from .forms import EventoForm
 from .forms import EventoNovoCadastroForm
+from .forms import TipoEventoForm
 from .models import Evento
 from .models import EventoDocumentoSolicitacao
 from .models import EVENTO_SOLICITACAO_EXTENSOES
+from .models import TipoEvento
 from .presenters import apresentar_evento_list_card
+from .presenters import apresentar_linha_lista_simples_tipo_evento
 from .services import build_evento_guided_context
+
+
+def _safe_next_url(request, fallback_url):
+    next_url = request.POST.get("next") or request.GET.get("next")
+    if next_url and url_has_allowed_host_and_scheme(
+        next_url,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        return next_url
+    return fallback_url
 
 
 def api_cidades_por_uf(request, uf):
@@ -43,6 +59,103 @@ def api_cidades_por_uf(request, uf):
         return JsonResponse([], safe=False)
     cidades = listar_cidades_para_select(estado_id=estado.pk)
     return JsonResponse([{"id": c.nome, "nome": c.nome} for c in cidades], safe=False)
+
+
+def tipos_index(request):
+    q = request.GET.get("q", "").strip()
+    back_url = _safe_next_url(request, reverse("eventos:index"))
+    form = TipoEventoForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Tipo de evento criado com sucesso.")
+        redirect_url = reverse("eventos:tipos_index")
+        if back_url:
+            redirect_url = f"{redirect_url}?{urlencode({'next': back_url})}"
+        return redirect(redirect_url)
+    tipos = TipoEvento.objects.all()
+    if q:
+        query = remove_accents(q)
+        tipos = tipos.filter(nome__unaccent__icontains=query)
+    rows = [
+        apresentar_linha_lista_simples_tipo_evento(
+            tipo,
+            edit_url=reverse("eventos:tipo_editar", args=[tipo.pk]),
+            delete_url=reverse("eventos:tipo_excluir", args=[tipo.pk]),
+            delete_modal=True,
+        )
+        for tipo in tipos
+    ]
+    return render(
+        request,
+        "eventos/tipos/index.html",
+        {
+            "page_title": "Tipos de evento",
+            "page_description": "Cadastre os tipos que podem ser selecionados (mais de um por evento).",
+            "q": q,
+            "rows": rows,
+            "quick_add_form": form,
+            "quick_add_next_url": back_url,
+            "back_url": back_url,
+            "new_url": reverse("eventos:tipo_novo"),
+        },
+    )
+
+
+def tipo_novo(request):
+    form = TipoEventoForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Tipo de evento criado com sucesso.")
+        return redirect("eventos:tipos_index")
+    return render(
+        request,
+        "eventos/tipos/form.html",
+        {
+            "page_title": "Novo tipo de evento",
+            "page_description": "Cadastre um tipo que poderá ser selecionado (mais de um por evento).",
+            "form": form,
+            "back_url": reverse("eventos:tipos_index"),
+            "submit_label": "Salvar tipo",
+        },
+    )
+
+
+def tipo_editar(request, pk):
+    tipo = get_object_or_404(TipoEvento, pk=pk)
+    form = TipoEventoForm(request.POST or None, instance=tipo)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Tipo de evento atualizado com sucesso.")
+        return redirect("eventos:tipos_index")
+    return render(
+        request,
+        "eventos/tipos/form.html",
+        {
+            "page_title": "Editar tipo de evento",
+            "page_description": "Cadastre um tipo que poderá ser selecionado (mais de um por evento).",
+            "form": form,
+            "back_url": reverse("eventos:tipos_index"),
+            "submit_label": "Salvar alterações",
+        },
+    )
+
+
+def tipo_excluir(request, pk):
+    tipo = get_object_or_404(TipoEvento, pk=pk)
+    if request.method == "POST":
+        tipo.delete()
+        messages.success(request, "Tipo de evento excluído com sucesso.")
+        return redirect("eventos:tipos_index")
+    return render(
+        request,
+        "eventos/tipos/confirm_delete.html",
+        {
+            "page_title": "Excluir tipo de evento",
+            "page_description": "Confirme a remoção deste tipo de evento.",
+            "object": tipo,
+            "back_url": reverse("eventos:tipos_index"),
+        },
+    )
 
 
 def index(request):
@@ -283,22 +396,11 @@ def detalhe(request, pk, etapa=1):
         if form.is_valid():
             evento = form.save(commit=False)
             if not evento.titulo:
-                parts = []
-                if evento.tipo:
-                    label = evento.get_tipo_display()
-                    if evento.tipo == "outros" and evento.tipo_outro:
-                        label = evento.tipo_outro
-                    parts.append(label)
-                if evento.destino_cidade:
-                    destino = evento.destino_cidade
-                    if evento.destino_uf:
-                        destino += f"/{evento.destino_uf}"
-                    parts.append(destino)
-                elif evento.destino_uf:
-                    parts.append(evento.destino_uf)
-                evento.titulo = " - ".join(parts) if parts else "Novo Evento"
+                nomes = [tipo.nome for tipo in form.cleaned_data.get("tipos") or []]
+                evento.titulo = " / ".join(nomes) if nomes else "Novo Evento"
             _save_destinos_extras(evento, request)
             evento.save()
+            form.save_m2m()
             _garantir_termo_automatico(evento)
             messages.success(request, "Dados do evento atualizados.")
             return redirect("eventos:guiado_etapa", pk=evento.pk, etapa=2)
@@ -368,6 +470,7 @@ def detalhe(request, pk, etapa=1):
             "termos": _termos_do_evento(evento),
             "sede_uf": config.uf if config else "",
             "modelos_motivo_url": _reverse("oficios:modelos_motivo_index"),
+            "tipos_evento_url": f"{_reverse('eventos:tipos_index')}?{urlencode({'next': request.path})}",
             "solicitacao_anexos": solicitacao_anexos,
             **guided_context,
         },

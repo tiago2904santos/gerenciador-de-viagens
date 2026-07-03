@@ -2,6 +2,7 @@ from django.contrib import admin
 
 from .models import Evento
 from .models import EventoAnexo
+from .models import TipoEvento
 
 
 class EventoAnexoInline(admin.TabularInline):
@@ -20,6 +21,13 @@ class EventoAdmin(admin.ModelAdmin):
     @admin.display(description="Destino")
     def destino_display(self, obj):
         return obj.destino_display
+
+
+@admin.register(TipoEvento)
+class TipoEventoAdmin(admin.ModelAdmin):
+    list_display = ("nome", "ativo", "ordem")
+    list_filter = ("ativo",)
+    search_fields = ("nome",)
 
 
 @admin.register(EventoAnexo)

@@ -9,6 +9,7 @@ from django.urls import reverse
 from cadastros.models import Cargo, Servidor
 from documentos.models import DocumentoArtefato
 from eventos.models import Evento
+from eventos.models import TipoEvento
 from oficios.models import Oficio
 from integracoes.google_drive import services
 from integracoes.google_drive.models import (
@@ -32,9 +33,10 @@ class ReorganizarTudoViewTests(TestCase):
         cargo = Cargo.objects.create(nome="Investigador")
         ana = Servidor.objects.create(nome="Ana", cargo=cargo, cpf="12345678901")
         self.evento = Evento.objects.create(
-            tipo=Evento.TIPO_PCPR_COMUNIDADE, destino_cidade="Maringá", destino_uf="PR",
+            destino_cidade="Maringá", destino_uf="PR",
             data_inicio=date(2026, 7, 22), data_fim=date(2026, 7, 23),
         )
+        self.evento.tipos.add(TipoEvento.objects.get_or_create(nome="PCPR na Comunidade")[0])
         self.oficio = Oficio.objects.create(
             numero=1, ano=2026, protocolo="123456789", motivo="m", evento=self.evento,
         )

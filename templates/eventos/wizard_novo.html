@@ -36,18 +36,7 @@
             </header>
             <div class="cv-wizard-section-body">
               <div class="field-grid">
-                {% include "components/forms/form_field.html" with field=form.tipo size_class="field-size-4" only %}
-              </div>
-
-              {# Campo "Descreva o tipo" — aparece apenas quando "Outros" é selecionado #}
-              <div class="field-grid" id="tipo-outro-wrapper" hidden>
-                <div class="field field-size-4 app-form-field cv-field">
-                  <label class="cv-field__label" for="{{ form.tipo_outro.id_for_label }}">{{ form.tipo_outro.label }}</label>
-                  {{ form.tipo_outro }}
-                  {% if form.tipo_outro.errors %}
-                    {% include "components/ui/feedback/field_error.html" with errors=form.tipo_outro.errors only %}
-                  {% endif %}
-                </div>
+                {% include "components/forms/form_field.html" with field=form.tipos action_url=tipos_evento_url action_label="Gerenciar tipos" size_class="field-size-4" only %}
               </div>
 
               <hr style="border: none; border-top: 1px solid var(--cv-border-default, rgba(255,255,255,0.08)); margin: 0.5rem 0 0;">
@@ -340,21 +329,6 @@
         cidadeSel.disabled = false;
       }
 
-      function syncTipoOutro() {
-        var select = document.querySelector('[data-tipo-evento-select="true"]');
-        var wrapper = document.getElementById('tipo-outro-wrapper');
-        if (!select || !wrapper) return;
-        wrapper.hidden = select.value !== 'outros';
-      }
-
-      function initTipoOutro() {
-        var select = document.querySelector('[data-tipo-evento-select="true"]');
-        if (!select) return;
-        select.addEventListener('change', syncTipoOutro);
-        select.addEventListener('input', syncTipoOutro);
-        syncTipoOutro();
-      }
-
       function initCidadePicker(form) {
         var ufSel = form.querySelector('select[name="destino_uf"]');
         var cidadeSel = form.querySelector('[data-destino-cidade-picker]');
@@ -465,7 +439,6 @@
 
       function init() {
         var form = document.querySelector('.oficio-wizard__form');
-        initTipoOutro();
         if (form) initCidadePicker(form);
         initAddDestinoEvento();
       }

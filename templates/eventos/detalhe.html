@@ -39,17 +39,7 @@
               </header>
               <div class="cv-wizard-section-body">
                 <div class="field-grid">
-                  {% include "components/forms/form_field.html" with field=form.tipo size_class="field-size-4" only %}
-                </div>
-
-                <div class="field-grid" id="tipo-outro-wrapper-d" hidden>
-                  <div class="field field-size-4 app-form-field cv-field">
-                    <label class="cv-field__label" for="{{ form.tipo_outro.id_for_label }}">{{ form.tipo_outro.label }}</label>
-                    {{ form.tipo_outro }}
-                    {% if form.tipo_outro.errors %}
-                      {% include "components/ui/feedback/field_error.html" with errors=form.tipo_outro.errors only %}
-                    {% endif %}
-                  </div>
+                  {% include "components/forms/form_field.html" with field=form.tipos action_url=tipos_evento_url action_label="Gerenciar tipos" size_class="field-size-4" only %}
                 </div>
 
                 <hr style="border: none; border-top: 1px solid var(--cv-border-default, rgba(255,255,255,0.08)); margin: 0.5rem 0 0;">
@@ -300,21 +290,6 @@
                   });
               }
 
-              function syncTipoOutroD() {
-                var select = document.querySelector('#evento-card-dados-d').closest('form').querySelector('[data-tipo-evento-select="true"]');
-                if (!select) select = document.querySelector('[name="tipo"]');
-                var wrapper = document.getElementById('tipo-outro-wrapper-d');
-                if (!select || !wrapper) return;
-                wrapper.hidden = select.value !== 'outros';
-              }
-              function initTipoOutroD() {
-                var select = document.querySelector('[name="tipo"]');
-                if (!select) return;
-                select.addEventListener('change', syncTipoOutroD);
-                select.addEventListener('input', syncTipoOutroD);
-                syncTipoOutroD();
-              }
-
               function initCidadePickerD(form) {
                 var ufSel = form.querySelector('select[name="destino_uf"]');
                 var cidadeSel = form.querySelector('[data-destino-cidade-picker]');
@@ -457,7 +432,6 @@
 
               function initD() {
                 var form = document.querySelector('.oficio-wizard__form');
-                initTipoOutroD();
                 if (form) initCidadePickerD(form);
                 initAddDestinoD();
               }

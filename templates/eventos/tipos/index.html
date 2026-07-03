@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+  {% include "components/lists/list_page_quick_add.html" with title=page_title description=page_description eyebrow="Eventos" brand_mark="EV" search_placeholder="Buscar tipos de evento" empty_message="Nenhum tipo de evento cadastrado." rows=rows q=q quick_add_form=quick_add_form quick_add_next_url=quick_add_next_url quick_add_panel_id="quick-add-tipo-evento" quick_add_label="Novo tipo" quick_add_submit_label="Salvar tipo" quick_add_body_template="eventos/tipos/partials/_quick_add_fields.html" quick_add_compact=True disable_realtime_filter=True hide_realtime_count=True delete_modal_enabled=True delete_modal_title="Excluir tipo?" delete_modal_entity="este tipo" %}
+  {% if back_url %}
+    {% include "components/ui/buttons/floating_action.html" with href=back_url label="Voltar" variant="secondary" icon="arrow-left" aria_label="Voltar" only %}
+  {% endif %}
+{% endblock %}

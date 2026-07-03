@@ -5,6 +5,7 @@ from oficios.forms import ModeloMotivoSelect
 from oficios.models import ModeloMotivoOficio
 
 from .models import Evento
+from .models import TipoEvento
 
 _ESTADOS_CHOICES = [
     ("", "Selecione o estado"),
@@ -46,10 +47,11 @@ class EventoNovoCadastroForm(forms.ModelForm):
         empty_label="Selecione um modelo (opcional)",
         widget=ModeloMotivoSelect(attrs={"class": "form-select", "data-modelo-motivo-select": "true"}),
     )
-    tipo_outro = forms.CharField(
-        label="Descreva o tipo",
+    tipos = forms.ModelMultipleChoiceField(
+        label="Tipo do evento",
+        queryset=TipoEvento.objects.filter(ativo=True).order_by("ordem", "nome"),
         required=False,
-        widget=forms.TextInput(attrs={"class": "cv-field__control", "placeholder": "Ex: Reunião interinstitucional"}),
+        widget=forms.SelectMultiple(attrs={"data-placeholder": "Selecione o(s) tipo(s)"}),
     )
     destino_uf = forms.ChoiceField(
         label="Estado",
@@ -70,8 +72,7 @@ class EventoNovoCadastroForm(forms.ModelForm):
     class Meta:
         model = Evento
         fields = [
-            "tipo",
-            "tipo_outro",
+            "tipos",
             "motivo",
             "data_inicio",
             "data_fim",
@@ -79,10 +80,6 @@ class EventoNovoCadastroForm(forms.ModelForm):
             "destino_cidade",
         ]
         widgets = {
-            "tipo": forms.Select(
-                attrs={"class": "form-select", "data-tipo-evento-select": "true"},
-                choices=[("", "Selecione o tipo")] + Evento.TIPO_CHOICES,
-            ),
             "motivo": forms.Textarea(
                 attrs={
                     "class": "cv-field__control cv-field__control--textarea",
@@ -108,15 +105,11 @@ class EventoNovoCadastroForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["tipo"].required = False
         self.fields["data_inicio"].required = False
         self.fields["data_fim"].required = False
         self.fields["modelo_motivo"].queryset = ModeloMotivoOficio.objects.filter(ativo=True).order_by(
             "ordem", "nome"
         )
-        # Populate tipo_outro from instance if available
-        if self.instance and self.instance.pk:
-            self.fields["tipo_outro"].initial = self.instance.tipo_outro
         # Pré-preenche a UF de destino com o estado padrão das configurações (eventos sem destino definido)
         if not self.is_bound and not (self.instance and self.instance.destino_uf):
             uf_padrao = ConfiguracaoSistema.get_singleton().uf
@@ -180,3 +173,22 @@ class EventoForm(forms.ModelForm):
             self.add_error("destino_uf", "Informe a UF com 2 caracteres.")
         cleaned["destino_uf"] = destino_uf
         return cleaned
+
+
+class TipoEventoForm(forms.ModelForm):
+    nome = forms.CharField(
+        label="Nome",
+        help_text="Ex.: PCPR na Comunidade, Justiça no Bairro.",
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+    )
+    ativo = forms.BooleanField(
+        label="Ativo",
+        required=False,
+        initial=True,
+        help_text="Desmarque para ocultar este tipo da seleção sem apagar eventos já vinculados.",
+        widget=forms.CheckboxInput(attrs={"class": "app-card-toggle__input"}),
+    )
+
+    class Meta:
+        model = TipoEvento
+        fields = ["nome", "ativo"]

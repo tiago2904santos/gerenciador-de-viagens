@@ -10,12 +10,21 @@ class _Servidor:
         self.nome = nome
 
 
+class _TiposManager:
+    def __init__(self, nomes):
+        self._nomes = nomes
+
+    def values_list(self, field, flat=False):
+        return list(self._nomes)
+
+
 class _Evento:
     def __init__(self, **kw):
+        self.pk = 1
+        tipos_nomes = kw.pop("tipos_nomes", None)
         self.__dict__.update(kw)
-
-    def get_tipo_display(self):
-        return self._display
+        if tipos_nomes is not None:
+            self.tipos = _TiposManager(tipos_nomes)
 
 
 class _Oficio:
@@ -57,15 +66,26 @@ class NamingTests(SimpleTestCase):
 
     def test_pasta_evento(self):
         ev = _Evento(
-            tipo="pcpr_comunidade",
-            _display="PCPR na Comunidade",
-            tipo_outro="",
+            tipos_nomes=["PCPR na Comunidade"],
             titulo="",
             destino_cidade="Maringá",
             data_inicio=date(2026, 7, 22),
             data_fim=date(2026, 7, 23),
         )
         self.assertEqual(naming.pasta_evento(ev), "PCPR na Comunidade - Maringá - 22 a 23 jul 2026")
+
+    def test_pasta_evento_com_multiplos_tipos(self):
+        ev = _Evento(
+            tipos_nomes=["PCPR na Comunidade", "Justiça no Bairro"],
+            titulo="",
+            destino_cidade="Maringá",
+            data_inicio=date(2026, 7, 22),
+            data_fim=date(2026, 7, 23),
+        )
+        self.assertEqual(
+            naming.pasta_evento(ev),
+            "PCPR na Comunidade, Justiça no Bairro - Maringá - 22 a 23 jul 2026",
+        )
 
     def test_pasta_oficio(self):
         of = _Oficio(numero=1, ano=2026, protocolo="123456789")

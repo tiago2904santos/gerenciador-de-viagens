@@ -7,6 +7,7 @@ from django.test import TestCase, override_settings
 from cadastros.models import Cargo, Servidor
 from documentos.models import DocumentoArtefato
 from eventos.models import Evento
+from eventos.models import TipoEvento
 from oficios.models import Oficio
 from integracoes.google_drive import organizer, services
 from integracoes.google_drive.models import DriveArquivo
@@ -25,12 +26,12 @@ class OrganizerTests(TestCase):
         self.ana = Servidor.objects.create(nome="Ana", cargo=self.cargo, cpf="12345678901")
         self.bruno = Servidor.objects.create(nome="Bruno", cargo=self.cargo, cpf="98765432100")
         self.evento = Evento.objects.create(
-            tipo=Evento.TIPO_PCPR_COMUNIDADE,
             destino_cidade="Maringá",
             destino_uf="PR",
             data_inicio=date(2026, 7, 22),
             data_fim=date(2026, 7, 23),
         )
+        self.evento.tipos.add(TipoEvento.objects.get_or_create(nome="PCPR na Comunidade")[0])
         self.oficio = Oficio.objects.create(
             numero=1, ano=2026, protocolo="123456789", motivo="m", evento=self.evento,
         )

@@ -13,6 +13,10 @@
 
    Modificadores CSS:
      .cv-custom-select--sm / --lg / --disabled / --error
+
+   Multi-select: adicione o atributo `multiple` no <select> nativo e, se quiser,
+   `data-placeholder="Texto"` na div wrapper para o texto exibido quando nada
+   estiver selecionado. Cliques em opções alternam a seleção sem fechar o menu.
    ========================================================================== */
 
 (function () {
@@ -104,6 +108,7 @@
     menu.id        = this._id + '-menu';
     menu.className = 'cv-custom-select__menu';
     menu.setAttribute('role', 'listbox');
+    if (native.multiple) menu.setAttribute('aria-multiselectable', 'true');
     menu.hidden = true;
 
     var opts = Array.prototype.slice.call(native.options);
@@ -166,13 +171,34 @@
   // ─────────────────────────────────────────────────────────────────────────
   CustomSelect.prototype._syncFromNative = function () {
     var native   = this.native;
-    var sel      = native.options[native.selectedIndex];
     var valSpan  = this.trigger.querySelector('.cv-custom-select__value');
 
     this._items.forEach(function (item) {
       item.el.classList.remove('cv-custom-select__option--selected');
       item.el.setAttribute('aria-selected', 'false');
     });
+
+    if (native.multiple) {
+      var selected = Array.prototype.filter.call(native.options, function (o) { return o.selected; });
+      if (selected.length) {
+        valSpan.textContent = selected.map(function (o) { return o.text; }).join(', ');
+        valSpan.classList.remove('cv-custom-select__value--placeholder');
+      } else {
+        valSpan.textContent = native.getAttribute('data-placeholder') || this.root.getAttribute('data-placeholder') || '';
+        valSpan.classList.add('cv-custom-select__value--placeholder');
+      }
+      for (var s = 0; s < selected.length; s++) {
+        for (var i = 0; i < this._items.length; i++) {
+          if (this._items[i].value === selected[s].value) {
+            this._items[i].el.classList.add('cv-custom-select__option--selected');
+            this._items[i].el.setAttribute('aria-selected', 'true');
+          }
+        }
+      }
+      return;
+    }
+
+    var sel = native.options[native.selectedIndex];
 
     if (sel) {
       valSpan.textContent = sel.text;
@@ -249,7 +275,11 @@
     var item = this._items[index];
     if (!item || item.disabled) return;
 
-    this.native.value = item.value;
+    if (this.native.multiple) {
+      this.native.options[index].selected = !this.native.options[index].selected;
+    } else {
+      this.native.value = item.value;
+    }
 
     // Disparar change no select nativo (compatível com frameworks)
     if (typeof Event !== 'undefined') {
@@ -263,8 +293,11 @@
     }
 
     this._syncFromNative();
-    this._close();
-    this.trigger.focus();
+
+    if (!this.native.multiple) {
+      this._close();
+      this.trigger.focus();
+    }
   };
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -400,9 +433,10 @@
       }
     });
 
-    // Clique fora → fechar
+    // Clique fora → fechar (o menu pode estar "flutuando" no body via
+    // CvFloatingDropdown, entao um clique nele nao conta como "fora").
     document.addEventListener('click', function (e) {
-      if (self._isOpen && !self.root.contains(e.target)) {
+      if (self._isOpen && !self.root.contains(e.target) && !self.menu.contains(e.target)) {
         self._close();
       }
     });

@@ -2,7 +2,19 @@
   {% include "components/forms/card_toggle.html" with field=field title=label|default:field.label description=help_text size_class=size_class only %}
 {% elif field.field.widget.input_type == 'select' and field.field.widget.allow_multiple_selected %}
 <div class="field app-form-field cv-field{% if size_class %} {{ size_class }}{% endif %}">
-  {% include "components/ui/forms/multiselect.html" with field=field only %}
+  <label class="app-form-label cv-field__label" for="{{ field.id_for_label }}">{{ label|default:field.label }}</label>
+  {% if action_url or action_label %}
+    <div class="cv-field-with-action cv-field-with-action--manage-reveal">
+      {% include "components/ui/forms/multiselect.html" with field=field only %}
+      {% if action_url %}
+        {% include "components/ui/buttons/field_manage_button.html" with href=action_url action_label=action_label data_autosave_link=True only %}
+      {% elif action_label %}
+        {% include "components/ui/buttons/field_manage_button.html" with action_label=action_label type=action_type|default:"button" only %}
+      {% endif %}
+    </div>
+  {% else %}
+    {% include "components/ui/forms/multiselect.html" with field=field only %}
+  {% endif %}
   {% if help_text %}<p class="field-help app-form-help">{{ help_text }}</p>{% endif %}
   {% if field.errors %}{% include "components/ui/feedback/field_error.html" with errors=field.errors only %}{% endif %}
 </div>

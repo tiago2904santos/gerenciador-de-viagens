@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from django.urls import reverse
 
+from core.presenters.badges import build_badge
 from oficios.presenters import apresentar_oficio_card
 
 from .models import EventoAnexo
@@ -170,4 +171,15 @@ def apresentar_evento_list_card(evento):
         "detail_url": reverse("eventos:guiado_etapa", args=[evento.pk, 3]),
         "editar_url": reverse("eventos:guiado_etapa", args=[evento.pk, 1]),
         "excluir_url": reverse("eventos:excluir", args=[evento.pk]),
+    }
+
+
+def apresentar_linha_lista_simples_tipo_evento(tipo, edit_url="#", delete_url="#", delete_modal=False):
+    badges = [] if tipo.ativo else [build_badge("Inativo", "muted")]
+    return {
+        "title": tipo.nome,
+        "badges": badges,
+        "edit_url": edit_url,
+        "delete_url": delete_url,
+        "delete_modal": delete_modal,
     }

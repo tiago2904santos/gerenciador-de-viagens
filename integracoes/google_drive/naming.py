@@ -155,14 +155,13 @@ def periodo_pasta(evento) -> str:
 
 
 def tipo_evento_label(evento) -> str:
-    tipo = getattr(evento, "tipo", "") or ""
-    if tipo == "outros":
-        return (getattr(evento, "tipo_outro", "") or "").strip() or "Evento"
-    if tipo:
-        try:
-            return evento.get_tipo_display()
-        except Exception:
-            return tipo
+    # Usa ", " (nao "/") porque sanitize_drive_name troca barra por hifen, o
+    # que confundiria o separador com o hifen que junta tipo/cidade/periodo.
+    tipos = getattr(evento, "tipos", None)
+    if tipos is not None and getattr(evento, "pk", None):
+        nomes = list(tipos.values_list("nome", flat=True))
+        if nomes:
+            return ", ".join(nomes)
     return (getattr(evento, "titulo", "") or "").strip() or "Evento"
 
 

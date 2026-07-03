@@ -1,0 +1,6 @@
+<div class="field-grid">
+  <div class="field-size-4">
+    {% include "components/forms/form_field.html" with field=form.nome only %}
+  </div>
+</div>
+<input type="hidden" name="{{ form.ativo.html_name }}" value="on">

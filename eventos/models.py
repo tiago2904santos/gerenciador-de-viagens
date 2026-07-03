@@ -31,21 +31,6 @@ class Evento(models.Model):
         (STATUS_CANCELADO, "Cancelado"),
     ]
 
-    TIPO_PCPR_COMUNIDADE = "pcpr_comunidade"
-    TIPO_OPERACAO_POLICIAL = "operacao_policial"
-    TIPO_PARANA_EM_ACAO = "parana_em_acao"
-    TIPO_EXPO = "expo"
-    TIPO_JUSTICA_BAIRRO = "justica_bairro"
-    TIPO_OUTROS = "outros"
-    TIPO_CHOICES = [
-        (TIPO_PCPR_COMUNIDADE, "PCPR na Comunidade"),
-        (TIPO_OPERACAO_POLICIAL, "Operação Policial"),
-        (TIPO_PARANA_EM_ACAO, "Paraná em Ação"),
-        (TIPO_EXPO, "Expo"),
-        (TIPO_JUSTICA_BAIRRO, "Justiça no Bairro"),
-        (TIPO_OUTROS, "Outros"),
-    ]
-
     titulo = models.CharField("Titulo", max_length=255, blank=True, default="")
     descricao = models.TextField("Descricao/objetivo", blank=True, default="")
     destino_uf = models.CharField("UF do destino", max_length=2, blank=True, default="")
@@ -70,8 +55,12 @@ class Evento(models.Model):
         related_name="eventos_responsavel",
         verbose_name="Responsavel",
     )
-    tipo = models.CharField("Tipo do evento", max_length=30, choices=TIPO_CHOICES, blank=True, default="")
-    tipo_outro = models.CharField("Tipo personalizado (quando Outros)", max_length=120, blank=True, default="")
+    tipos = models.ManyToManyField(
+        "eventos.TipoEvento",
+        blank=True,
+        related_name="eventos",
+        verbose_name="Tipos do evento",
+    )
     destinos_extras = models.JSONField("Destinos adicionais", default=list, blank=True)
     motivo = models.TextField("Motivo", blank=True, default="")
     status = models.CharField(max_length=30, choices=STATUS_CHOICES, default=STATUS_RASCUNHO)
@@ -103,6 +92,37 @@ class Evento(models.Model):
         if cidade and uf:
             return f"{cidade}/{uf}"
         return cidade or uf or "Destino nao informado"
+
+    @property
+    def tipos_display(self) -> str:
+        if not self.pk:
+            return ""
+        return " / ".join(self.tipos.values_list("nome", flat=True))
+
+
+class TipoEvento(TimeStampedModel):
+    """Tipo gerenciavel do evento (ex.: "PCPR na Comunidade", "Expo").
+
+    Um evento pode ter mais de um tipo (ex.: acao conjunta "PCPR na Comunidade"
+    + "Justica no Bairro"). A lista e mantida pelo usuario na tela de gerenciar
+    tipos, sem valores fixos no codigo.
+    """
+
+    nome = models.CharField(max_length=120, unique=True)
+    ativo = models.BooleanField(default=True)
+    ordem = models.PositiveIntegerField(default=100)
+
+    class Meta:
+        ordering = ["ordem", "nome"]
+        verbose_name = "Tipo de evento"
+        verbose_name_plural = "Tipos de evento"
+
+    def __str__(self) -> str:
+        return self.nome
+
+    def save(self, *args, **kwargs):
+        self.nome = normalize_spaces(self.nome)
+        super().save(*args, **kwargs)
 
 
 EVENTO_SOLICITACAO_EXTENSOES = ["pdf", "png", "jpg", "jpeg"]
