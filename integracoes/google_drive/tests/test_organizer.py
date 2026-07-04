@@ -72,10 +72,27 @@ class OrganizerTests(TestCase):
         linhas = organizer.planejar_oficio(self.oficio)
         self.assertIn(
             "Eventos/PCPR na Comunidade - Maringá - 22 a 23 jul 2026/"
-            "Ofício 01 protocolo 12.345.678-9 Ana e Bruno/"
+            "Ofício 01 protocolo 12.345.678-9 Ana e Bruno (Maringá)/"
             "Ofício 01-2026 protocolo 12.345.678-9 Ana e Bruno (Maringá).pdf",
             linhas,
         )
+
+    def test_os_e_plano_ficam_no_nivel_do_evento(self):
+        self._artefato("ordem_servico", name="os.pdf")
+        self._artefato("plano_trabalho", name="plano.pdf")
+        linhas = organizer.planejar_oficio(self.oficio)
+        evento_dir = "Eventos/PCPR na Comunidade - Maringá - 22 a 23 jul 2026"
+        oficio_dir = f"{evento_dir}/Ofício 01 protocolo 12.345.678-9 Ana e Bruno (Maringá)"
+        # OS e plano ficam direto na pasta do evento, não dentro da pasta do ofício.
+        self.assertTrue(any(
+            l.startswith(f"{evento_dir}/Ordem de serviço") for l in linhas
+        ), linhas)
+        self.assertTrue(any(
+            l.startswith(f"{evento_dir}/Plano de trabalho") for l in linhas
+        ), linhas)
+        self.assertFalse(any(
+            l.startswith(f"{oficio_dir}/Ordem de serviço") for l in linhas
+        ), linhas)
 
     def test_oficio_sem_evento_vai_para_pasta_de_tipo(self):
         self.oficio.evento = None

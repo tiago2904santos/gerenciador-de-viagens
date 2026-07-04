@@ -121,15 +121,26 @@ def protocolo_fmt(oficio) -> str:
     return format_protocolo(getattr(oficio, "protocolo", "") or "")
 
 
+def capitalizar_cidade(cidade: str | None) -> str:
+    """Nome de cidade em capitalização legível PT-BR (``MARINGÁ`` → ``Maringá``).
+
+    Usa o formatador de documentos para tratar partículas ("dos", "de") e
+    siglas, evitando o ``str.title()`` cego.
+    """
+    from documentos.services.formatters import format_document_display
+
+    return format_document_display((cidade or "").strip())
+
+
 def cidade_evento(evento=None, oficio=None) -> str:
     if evento is not None:
         cidade = (getattr(evento, "destino_cidade", "") or "").strip()
         if cidade:
-            return cidade
+            return capitalizar_cidade(cidade)
     if oficio is not None and getattr(oficio, "evento", None) is not None:
         cidade = (getattr(oficio.evento, "destino_cidade", "") or "").strip()
         if cidade:
-            return cidade
+            return capitalizar_cidade(cidade)
     return ""
 
 
@@ -177,7 +188,7 @@ def pasta_evento(evento) -> str:
     return sanitize_drive_name(base)
 
 
-def pasta_oficio(oficio, servidores) -> str:
+def pasta_oficio(oficio, servidores, cidade="") -> str:
     num = f"{oficio.numero:02d}" if getattr(oficio, "numero", None) else f"#{oficio.pk}"
     proto = protocolo_fmt(oficio)
     nomes = nomes_servidores(servidores)
@@ -186,7 +197,7 @@ def pasta_oficio(oficio, servidores) -> str:
         partes.append(f"protocolo {proto}")
     if nomes:
         partes.append(nomes)
-    return sanitize_drive_name(" ".join(partes))
+    return sanitize_drive_name(" ".join(partes) + _suf_cidade(cidade))
 
 
 def pasta_prestacao_servidor(servidor) -> str:
