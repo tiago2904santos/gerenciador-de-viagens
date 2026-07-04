@@ -5,6 +5,7 @@ from integracoes.google_drive.models import (
     DriveArquivoExterno,
     DriveCredenciais,
     DriveReorganizacaoJob,
+    DriveSyncStatus,
 )
 
 
@@ -59,6 +60,16 @@ class DriveArquivoExternoAdmin(admin.ModelAdmin):
         "enviado_em",
         "atualizado_em",
     )
+
+    def has_add_permission(self, request):
+        return False
+
+
+@admin.register(DriveSyncStatus)
+class DriveSyncStatusAdmin(admin.ModelAdmin):
+    list_display = ("__str__", "content_type", "object_id", "tentativas", "atualizado_em")
+    list_filter = ("content_type",)
+    readonly_fields = ("content_type", "object_id", "tentativas", "ultimo_erro", "criado_em", "atualizado_em")
 
     def has_add_permission(self, request):
         return False

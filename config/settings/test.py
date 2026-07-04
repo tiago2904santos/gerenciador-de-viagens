@@ -29,3 +29,7 @@ PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
 # A exceção de piso de numeração é específica de produção; a suíte valida o
 # algoritmo genérico (sequência a partir de 1, reaproveitamento de lacunas).
 OFICIO_NUMERO_INICIAL = {}
+
+# Sem broker na suíte: tarefas do Celery (ex.: retry de upload ao Drive)
+# rodam na hora, no mesmo processo, em vez de tentar conectar a um Redis.
+CELERY_TASK_ALWAYS_EAGER = True

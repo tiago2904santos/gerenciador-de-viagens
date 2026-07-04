@@ -55,6 +55,7 @@ rsync --archive --chown=viagens:viagens ~/.ssh /home/viagens
 apt install -y \
     python3.12 python3.12-venv python3.12-dev python3-pip \
     postgresql postgresql-contrib \
+    redis-server \
     nginx \
     git \
     build-essential libpq-dev \
@@ -62,6 +63,8 @@ apt install -y \
     libffi-dev libcairo2 libgdk-pixbuf2.0-0 \
     shared-mime-info fonts-liberation fonts-dejavu-core
 ```
+
+> `redis-server` é o broker do Celery — usado apenas para reenviar automaticamente ao Google Drive os documentos cujo upload falhou na hora (ver seção 5.3). Sem ele, o sistema funciona normalmente; só o retry automático fica indisponível.
 
 > **Por que essas libs?** `libpango`, `libcairo` e `libharfbuzz` são exigidas pelo WeasyPrint para renderizar HTML em PDF. Sem elas, a geração de documentos falha silenciosamente.
 
@@ -244,6 +247,53 @@ sudo systemctl start gerenciador-viagens
 sudo systemctl status gerenciador-viagens
 ```
 
+### 5.3 Worker Celery (retry automático de uploads ao Drive)
+
+Opcional, mas recomendado: sem ele, o envio ao Drive continua funcionando
+normalmente (síncrono, como sempre foi) — só o reenvio automático de uploads
+que falharem fica indisponível, ficando visível como pendência na tela
+`/integracoes/google-drive/` até um reenvio manual.
+
+```bash
+# Garanta que o Redis (instalado no passo 2.3) está ativo
+sudo systemctl enable --now redis-server
+```
+
+Crie o serviço systemd do worker:
+
+```bash
+sudo nano /etc/systemd/system/gerenciador-viagens-celery.service
+```
+
+```ini
+[Unit]
+Description=Gerenciador de Viagens — Celery worker
+After=network.target redis-server.service
+
+[Service]
+User=viagens
+Group=viagens
+WorkingDirectory=/var/www/gerenciador-viagens/app
+EnvironmentFile=/var/www/gerenciador-viagens/app/.env
+Environment="DJANGO_SETTINGS_MODULE=config.settings.prod"
+ExecStart=/var/www/gerenciador-viagens/venv/bin/celery \
+          -A config worker \
+          --loglevel=info \
+          --logfile=/var/www/gerenciador-viagens/logs/celery.log
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable gerenciador-viagens-celery
+sudo systemctl start gerenciador-viagens-celery
+sudo systemctl status gerenciador-viagens-celery
+```
+
 ---
 
 ## 6. Nginx (proxy reverso)
@@ -324,6 +374,7 @@ python manage.py migrate --noinput
 python manage.py collectstatic --noinput --clear
 
 sudo systemctl restart gerenciador-viagens
+sudo systemctl restart gerenciador-viagens-celery  # se o worker estiver configurado (seção 5.3)
 ```
 
 Ou use o script pronto:
@@ -366,6 +417,7 @@ Acesse `http://SEU_IP_VPS/admin` e faça login com o superusuário criado.
 - [ ] `python manage.py importar_base_geografica` executado (dados de cidades)
 - [ ] Superusuário criado (`createsuperuser`)
 - [ ] Serviço systemd ativo e respondendo
+- [ ] (Opcional) Redis + worker Celery configurados (retry automático de uploads ao Drive — seção 5.3)
 - [ ] Nginx configurado e recarregado
 - [ ] (Opcional) HTTPS configurado com Certbot
 - [ ] Login funcional no navegador
