@@ -3,17 +3,17 @@
 Estrutura-alvo (a partir da pasta raiz escolhida pelo usuário):
 
     Eventos/
-      <Tipo - Cidade - Período>/
-        <Ofício NN protocolo ... Servidores>/
+      <Tipo - Cidade - Período>/                    (Cidade em Title Case)
+        <Ofício NN protocolo ... Servidores (Cidade)>/
           Ofício NN-AAAA ... (Cidade).pdf            (canônico)
-          Plano de trabalho PP-AAAA ... (Cidade).pdf (canônico; PP = nº do plano)
-          Ordem de serviço ...                       (canônico)
           Justificativa ...                          (canônico)
-          Convite (Cidade).<ext>                     (EventoAnexo)
           Termos/ Termo de autorização ... Servidor (Cidade).pdf
           Prestação de contas/
             Anexo solicitação ... (Cidade).<ext>
             Prestação <Servidor>/ ... (RT, diário, despacho, comprovante)
+        Ordem de serviço ...                         (canônico; nível do evento)
+        Plano de trabalho PP-AAAA ... (Cidade).pdf   (canônico; nível do evento)
+        Convite (Cidade).<ext>                       (EventoAnexo; nível do evento)
     Ofícios/ Planos de trabalho/ Ordens de serviço/ Termos/ Justificativas/
         <- agregadoras globais por tipo (ATALHOS p/ os canônicos com evento)
     Prestações de contas/  <- atalhos de pasta p/ cada "Prestação <Servidor>"
@@ -94,14 +94,16 @@ def _oficio_folder_no_evento(client, tipo: str, oficio, servidores) -> str:
     """Pasta de tipo global + subpasta do ofício (caso sem evento)."""
     tipo_folder = _pasta_tipo_global(client, tipo)
     if oficio is not None:
-        return client.get_or_create_pasta(naming.pasta_oficio(oficio, servidores), tipo_folder)
+        cidade = naming.cidade_evento(getattr(oficio, "evento", None), oficio)
+        return client.get_or_create_pasta(naming.pasta_oficio(oficio, servidores, cidade), tipo_folder)
     return tipo_folder
 
 
 def _oficio_folder_com_evento(client, evento, oficio, servidores) -> str:
     ev = _pasta_evento_folder(client, evento)
     if oficio is not None:
-        return client.get_or_create_pasta(naming.pasta_oficio(oficio, servidores), ev)
+        cidade = naming.cidade_evento(evento, oficio)
+        return client.get_or_create_pasta(naming.pasta_oficio(oficio, servidores, cidade), ev)
     return ev
 
 
@@ -203,6 +205,9 @@ def organizar_artefato(artefato) -> tuple[str, str] | None:
         oficio_folder = _oficio_folder_com_evento(client, evento, oficio, servidores)
         if tipo == "termo_autorizacao":
             canonica = _pasta_termos(client, oficio_folder)
+        elif tipo in ("ordem_servico", "plano_trabalho"):
+            # OS e plano ficam diretamente na pasta do evento (não dentro do ofício).
+            canonica = _pasta_evento_folder(client, evento)
         else:
             canonica = oficio_folder
         atalho_pasta = _pasta_tipo_global(client, tipo)
@@ -309,7 +314,8 @@ def organizar_evento_anexo(anexo) -> None:
         return
     client = get_client()
     oficio = evento.oficios.first()
-    pasta_id = _oficio_folder_com_evento(client, evento, oficio, list(oficio.servidores.all()) if oficio else [])
+    # Convite/ofício solicitante ficam diretamente na pasta do evento.
+    pasta_id = _pasta_evento_folder(client, evento)
 
     cidade = naming.cidade_evento(evento, oficio)
     ext = naming.extensao(anexo.arquivo.name)
@@ -518,9 +524,10 @@ def organizar_evento(evento) -> None:
 
 def _caminho_base_oficio(oficio, servidores) -> str:
     evento = getattr(oficio, "evento", None)
+    cidade = naming.cidade_evento(evento, oficio)
     if evento is not None:
-        return f"{naming.PASTA_EVENTOS}/{naming.pasta_evento(evento)}/{naming.pasta_oficio(oficio, servidores)}"
-    return f"{naming.pasta_tipo('oficio')}/{naming.pasta_oficio(oficio, servidores)}"
+        return f"{naming.PASTA_EVENTOS}/{naming.pasta_evento(evento)}/{naming.pasta_oficio(oficio, servidores, cidade)}"
+    return f"{naming.pasta_tipo('oficio')}/{naming.pasta_oficio(oficio, servidores, cidade)}"
 
 
 def _caminho_artefato(artefato, oficio, servidores, cidade) -> str:
@@ -531,13 +538,17 @@ def _caminho_artefato(artefato, oficio, servidores, cidade) -> str:
     )
     evento = getattr(artefato, "evento", None) or getattr(oficio, "evento", None)
     if evento is not None:
-        base = f"{naming.PASTA_EVENTOS}/{naming.pasta_evento(evento)}/{naming.pasta_oficio(oficio, servidores)}"
+        evento_base = f"{naming.PASTA_EVENTOS}/{naming.pasta_evento(evento)}"
+        oficio_base = f"{evento_base}/{naming.pasta_oficio(oficio, servidores, cidade)}"
         if tipo == "termo_autorizacao":
-            return f"{base}/{naming.PASTA_TERMOS}/{nome}"
-        return f"{base}/{nome}"
+            return f"{oficio_base}/{naming.PASTA_TERMOS}/{nome}"
+        if tipo in ("ordem_servico", "plano_trabalho"):
+            # OS e plano ficam diretamente na pasta do evento.
+            return f"{evento_base}/{nome}"
+        return f"{oficio_base}/{nome}"
     base = naming.pasta_tipo(tipo)
     if oficio is not None:
-        return f"{base}/{naming.pasta_oficio(oficio, servidores)}/{nome}"
+        return f"{base}/{naming.pasta_oficio(oficio, servidores, cidade)}/{nome}"
     return f"{base}/{nome}"
 
 

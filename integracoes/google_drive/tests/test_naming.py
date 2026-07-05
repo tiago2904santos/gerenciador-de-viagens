@@ -92,6 +92,16 @@ class NamingTests(SimpleTestCase):
         nome = naming.pasta_oficio(of, [_Servidor("ANA"), _Servidor("BRUNO")])
         self.assertEqual(nome, "Ofício 01 protocolo 12.345.678-9 Ana e Bruno")
 
+    def test_pasta_oficio_com_destino(self):
+        of = _Oficio(numero=1, ano=2026, protocolo="123456789")
+        nome = naming.pasta_oficio(of, [_Servidor("ANA"), _Servidor("BRUNO")], "Maringá")
+        self.assertEqual(nome, "Ofício 01 protocolo 12.345.678-9 Ana e Bruno (Maringá)")
+
+    def test_capitalizar_cidade(self):
+        self.assertEqual(naming.capitalizar_cidade("MARINGÁ"), "Maringá")
+        self.assertEqual(naming.capitalizar_cidade("SÃO JOSÉ DOS PINHAIS"), "São José dos Pinhais")
+        self.assertEqual(naming.capitalizar_cidade(""), "")
+
     def test_nome_oficio(self):
         of = _Oficio(numero=1, ano=2026, protocolo="123456789")
         nome = naming.nome_oficio(of, [_Servidor("ANA"), _Servidor("BRUNO")], "Maringá")
