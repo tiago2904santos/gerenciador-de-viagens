@@ -51,6 +51,7 @@ INSTALLED_APPS = [
 ]
 
 _MIDDLEWARE_CORE = [
+    "core.middleware.CurrentRequestMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -202,6 +203,20 @@ GOOGLE_DRIVE = {
     # Em modo mock, faz o upload simulado mas ainda persiste DriveArquivo no banco
     "UPLOAD_EM_MOCK": _env_flag("GOOGLE_DRIVE_UPLOAD_EM_MOCK", "false"),
 }
+
+# ---------------------------------------------------------------------------
+# Celery (fila de retry em segundo plano — ex.: reenvio automático ao Drive
+# quando o upload falha na hora). Sem CELERY_BROKER_URL configurado, aponta
+# para um Redis local; se não houver worker/broker disponível, o código que
+# despacha tarefas (integracoes/google_drive/signals.py) cai de volta para o
+# caminho síncrono e não quebra a aplicação.
+# ---------------------------------------------------------------------------
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", CELERY_BROKER_URL)
+CELERY_TASK_ALWAYS_EAGER = _env_flag("CELERY_TASK_ALWAYS_EAGER", "false")
+CELERY_TASK_EAGER_PROPAGATES = True
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_TASK_TRACK_STARTED = True
 
 EPROTOCOLO = {
     "AMBIENTE": (os.getenv("EPROTOCOLO_AMBIENTE") or "mock").strip().lower(),

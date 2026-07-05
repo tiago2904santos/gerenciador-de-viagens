@@ -132,3 +132,40 @@ class DriveArquivoExterno(models.Model):
 
     def __str__(self) -> str:
         return f"Drive externo: {self.nome or self.file_id}"
+
+
+class DriveSyncStatus(models.Model):
+    """Registra falhas de sincronização com o Drive (existe só enquanto há erro).
+
+    Um registro por (content_type, object_id) de origem (``DocumentoArtefato``,
+    ``PrestacaoContas``, ``EventoAnexo``, ``EventoDocumentoSolicitacao``).
+    Criado na primeira falha, incrementado a cada nova tentativa malsucedida e
+    apagado assim que a sincronização for bem-sucedida. Alimenta o retry em
+    segundo plano (Celery) e o painel de pendências da tela de configuração.
+
+    ``object_id`` é ``CharField`` (não ``PositiveIntegerField``) porque
+    ``DocumentoArtefato`` usa chave primária UUID, diferente dos demais
+    modelos rastreados aqui (pk inteiro).
+    """
+
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.CharField(max_length=64)
+    origem = GenericForeignKey("content_type", "object_id")
+
+    tentativas = models.PositiveIntegerField(default=1)
+    ultimo_erro = models.TextField(blank=True, default="")
+    criado_em = models.DateTimeField(auto_now_add=True)
+    atualizado_em = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Pendência de sincronização com o Drive"
+        verbose_name_plural = "Pendências de sincronização com o Drive"
+        ordering = ["-atualizado_em"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["content_type", "object_id"], name="drive_sync_status_unico"
+            )
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.content_type.name} #{self.object_id} ({self.tentativas}x)"

@@ -1,3 +1,4 @@
+import threading
 from urllib.parse import urlsplit
 
 from django.contrib.auth import REDIRECT_FIELD_NAME
@@ -5,6 +6,32 @@ from django.contrib.auth.middleware import LoginRequiredMiddleware
 from django.contrib.auth.views import redirect_to_login
 from django.http import JsonResponse
 from django.shortcuts import resolve_url
+
+_local = threading.local()
+
+
+def get_current_request():
+    """Retorna a request da thread atual, ou ``None`` fora de um request (shell, comando, task)."""
+    return getattr(_local, "request", None)
+
+
+class CurrentRequestMiddleware:
+    """Guarda a request da thread atual para código sem acesso direto a ela.
+
+    Usado por integracoes.google_drive.signals para exibir uma mensagem
+    (django.contrib.messages) quando um upload ao Drive falha durante um
+    post_save — o signal não recebe a request como argumento.
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        _local.request = request
+        try:
+            return self.get_response(request)
+        finally:
+            _local.request = None
 
 
 class AjaxAwareLoginRequiredMiddleware(LoginRequiredMiddleware):

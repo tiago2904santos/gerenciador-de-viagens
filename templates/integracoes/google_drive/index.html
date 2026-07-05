@@ -188,6 +188,50 @@
         </div>
       </section>
 
+      {# ── CARD 2.5 — Pendências (falhas de envio) ── #}
+      {% if total_pendencias %}
+      <section class="cv-wizard-section-card" aria-labelledby="gdrive-pendencias-title">
+        <header class="cv-wizard-section-header">
+          <div class="cv-wizard-section-header__copy">
+            <h3 class="cv-wizard-section-title" id="gdrive-pendencias-title">Pendências</h3>
+            <p class="cv-wizard-section-subtitle">
+              Documentos que falharam ao enviar para o Drive. O sistema já tenta
+              reenviar automaticamente em segundo plano; use o botão abaixo para
+              forçar uma nova tentativa agora.
+            </p>
+          </div>
+          <div class="cv-wizard-section-header__meta">
+            {% include "components/ui/badges/chip.html" with tone="danger" label="Pendente" count=total_pendencias only %}
+          </div>
+        </header>
+
+        <div class="cv-wizard-section-body">
+          <ul class="gdrive-previa-lista">
+            {% for pendencia in pendencias %}
+              <li>
+                <strong>{{ pendencia.content_type.name|capfirst }} #{{ pendencia.object_id }}</strong>
+                — {{ pendencia.tentativas }} tentativa{{ pendencia.tentativas|pluralize }},
+                última em {{ pendencia.atualizado_em|date:"d/m/Y H:i" }}.
+                {% if pendencia.ultimo_erro %}
+                  <span class="field-help-text">{{ pendencia.ultimo_erro|truncatechars:160 }}</span>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <section class="cv-card-footer-section">
+          <div class="cv-card-footer-section__divider" aria-hidden="true"></div>
+          <footer class="cv-card-footer cv-card-footer--end">
+            <form method="post" action="{% url 'google_drive:reprocessar_pendencias' %}">
+              {% csrf_token %}
+              <button type="submit" class="cv-btn cv-btn--primary">Tentar novamente agora</button>
+            </form>
+          </footer>
+        </section>
+      </section>
+      {% endif %}
+
       {# ── CARD 3 — Organização em massa ── #}
       {% if pode_reorganizar %}
       <section class="cv-wizard-section-card" aria-labelledby="gdrive-massa-title">

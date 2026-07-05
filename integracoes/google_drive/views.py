@@ -32,6 +32,8 @@ from integracoes.google_drive.services import (
 def index(request):
     from eventos.models import Evento
 
+    from integracoes.google_drive import status
+
     cfg = getattr(settings, "GOOGLE_DRIVE", {})
     creds = DriveCredenciais.objects.first()
     pasta_raiz_id = get_pasta_raiz_id()
@@ -54,6 +56,8 @@ def index(request):
             "pode_reorganizar": bool(pasta_raiz_id) and (autorizado or modo == "mock"),
             "total_eventos": Evento.objects.count(),
             "job_reorg": DriveReorganizacaoJob.objects.order_by("-iniciado_em").first(),
+            "total_pendencias": status.contagem_pendencias(),
+            "pendencias": status.listar_pendencias(limite=20),
         },
     )
 
@@ -349,3 +353,52 @@ def previa_reorganizacao(request):
         return JsonResponse({"erro": str(exc)}, status=500)
 
     return JsonResponse({"linhas": linhas[:limite], "truncado": truncado, "total": len(linhas)})
+
+
+# ---------------------------------------------------------------------------
+# Pendências (retry manual)
+# ---------------------------------------------------------------------------
+
+_TASK_POR_MODELO = None  # populado sob demanda (evita import de tasks/Celery no boot)
+
+
+def _task_por_modelo() -> dict:
+    global _TASK_POR_MODELO
+    if _TASK_POR_MODELO is None:
+        from integracoes.google_drive import tasks
+
+        _TASK_POR_MODELO = {
+            "documentoartefato": tasks.processar_artefato,
+            "prestacaocontas": tasks.processar_prestacao,
+            "eventoanexo": tasks.processar_evento_anexo,
+            "eventodocumentosolicitacao": tasks.processar_solicitacao_evento,
+        }
+    return _TASK_POR_MODELO
+
+
+@login_required
+@require_POST
+def reprocessar_pendencias(request):
+    """Reagenda (via Celery) o reenvio de tudo que está marcado como pendência."""
+    from integracoes.google_drive import status
+
+    mapa = _task_por_modelo()
+    agendadas = 0
+    for pendencia in status.listar_pendencias(limite=500):
+        task = mapa.get(pendencia.content_type.model)
+        if task is None:
+            continue
+        try:
+            task.delay(pendencia.object_id)
+            agendadas += 1
+        except Exception as exc:
+            logger.warning("[Drive] falha ao reagendar pendência %s: %s", pendencia.pk, exc)
+
+    if agendadas:
+        messages.success(request, f"{agendadas} pendência(s) reagendada(s) para reenvio.")
+    else:
+        messages.info(
+            request,
+            "Não foi possível reagendar agora — verifique se a fila (Celery/Redis) está no ar.",
+        )
+    return redirect("cadastros:configuracao")
