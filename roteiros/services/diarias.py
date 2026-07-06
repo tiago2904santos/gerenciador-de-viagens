@@ -260,6 +260,16 @@ def build_periods(
     total_pernoites = _count_period_pernoites(periodos)
     total_full = sum(int(p.get('n_diarias', 0) or 0) for p in periodos)
     if total_pernoites > 0 and total_full < total_pernoites:
+        # A fração final (dia de retorno) não pode ser descartada: o tempo que
+        # sobra além das noites inteiras ainda gera um percentual complementar
+        # (15%/30%), na mesma regra usada por período em `_segment_breakdown`.
+        trip_start = periodos[0]['_period_start']
+        trip_end = periodos[-1]['_period_end']
+        leftover_seconds = (trip_end - trip_start).total_seconds() - (total_pernoites * 24 * 3600)
+        leftover_percentual = 0
+        if leftover_seconds > 6 * 3600:
+            leftover_percentual = 15 if leftover_seconds <= 8 * 3600 else 30
+
         for p in periodos:
             n_in_period = int(p.get('_pernoites_periodo', 0) or 0)
             p['n_diarias'] = n_in_period
@@ -270,6 +280,19 @@ def build_periods(
             subtotal_novo = valor_1_servidor * servidores
             p['subtotal'] = formatar_valor_diarias(subtotal_novo)
             p['subtotal_decimal'] = subtotal_novo
+
+        if leftover_percentual:
+            # Atribui a fração ao último período com pernoite real (o trecho
+            # puramente de retorno à sede, sem pernoite, não deve "herdar" a
+            # tarifa da sede para o dia da volta).
+            alvo = next((p for p in reversed(periodos) if p['n_diarias'] > 0), periodos[-1])
+            tabela = TABELA_DIARIAS.get(alvo['tipo'], TABELA_DIARIAS['INTERIOR'])
+            valor_parcial = tabela['15'] if leftover_percentual == 15 else tabela['30']
+            alvo['percentual_adicional'] = leftover_percentual
+            valor_1_servidor = (tabela['24h'] * alvo['n_diarias']) + valor_parcial
+            subtotal_novo = valor_1_servidor * servidores
+            alvo['subtotal'] = formatar_valor_diarias(subtotal_novo)
+            alvo['subtotal_decimal'] = subtotal_novo
 
     for p in periodos:
         p.pop('_period_start', None)
