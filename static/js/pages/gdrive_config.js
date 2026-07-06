@@ -16,10 +16,12 @@
     const urlListar = container.dataset.urlListar;
     const urlCriar = container.dataset.urlCriar;
     const urlDrives = container.dataset.urlDrives;
+    const urlCompartilhadosComigo = container.dataset.urlCompartilhadosComigo;
     const csrf = container.dataset.csrf;
 
     const btnMeuDrive = container.querySelector("#gdrive-btn-meu-drive");
     const btnDrivesCompartilhados = container.querySelector("#gdrive-btn-drives-compartilhados");
+    const btnCompartilhadosComigo = container.querySelector("#gdrive-btn-compartilhados-comigo");
     const btnVoltar = container.querySelector("#gdrive-btn-voltar");
     const browserBody = container.querySelector("#gdrive-browser-body");
     const folderList = container.querySelector("#gdrive-folder-list");
@@ -39,7 +41,7 @@
     // Navegação: pilha de { id, nome }
     const navStack = [];
     let selectedFolder = null; // { id, name }
-    let rootMode = "meu_drive"; // "meu_drive" | "compartilhados"
+    let rootMode = "meu_drive"; // "meu_drive" | "compartilhados" | "compartilhados_comigo"
 
     function currentPaiId() {
       return navStack.length > 0 ? navStack[navStack.length - 1].id : null;
@@ -50,11 +52,19 @@
       if (btnMeuDrive) btnMeuDrive.setAttribute("aria-selected", String(rootMode === "meu_drive"));
       if (btnDrivesCompartilhados) btnDrivesCompartilhados.classList.toggle("is-active", rootMode === "compartilhados");
       if (btnDrivesCompartilhados) btnDrivesCompartilhados.setAttribute("aria-selected", String(rootMode === "compartilhados"));
+      if (btnCompartilhadosComigo) btnCompartilhadosComigo.classList.toggle("is-active", rootMode === "compartilhados_comigo");
+      if (btnCompartilhadosComigo) btnCompartilhadosComigo.setAttribute("aria-selected", String(rootMode === "compartilhados_comigo"));
+    }
+
+    function baseLabel() {
+      if (rootMode === "compartilhados") return "Drives compartilhados";
+      if (rootMode === "compartilhados_comigo") return "Compartilhados comigo";
+      return "Meu Drive";
     }
 
     function updateBreadcrumb() {
       if (!breadcrumbEl) return;
-      const base = rootMode === "compartilhados" ? "Drives compartilhados" : "Meu Drive";
+      const base = baseLabel();
       if (navStack.length === 0) {
         breadcrumbEl.textContent = base;
         return;
@@ -134,8 +144,11 @@
 
     function updateCriarVisibilidade() {
       // Não faz sentido "criar pasta" enquanto só se está listando os Drives
-      // compartilhados disponíveis (ainda não se entrou em nenhum deles).
-      const podeCriar = !(rootMode === "compartilhados" && navStack.length === 0);
+      // compartilhados disponíveis, ou os itens de nível superior compartilhados
+      // comigo (ainda não se entrou em nenhum deles).
+      const listandoRaizSemContexto =
+        (rootMode === "compartilhados" || rootMode === "compartilhados_comigo") && navStack.length === 0;
+      const podeCriar = !listandoRaizSemContexto;
       btnToggleCriar.hidden = !podeCriar;
       if (!podeCriar) {
         newFolderPanel.hidden = true;
@@ -194,12 +207,39 @@
       }
     }
 
+    async function loadCompartilhadosComigo() {
+      setLoading(true);
+      browserBody.hidden = false;
+      browserActions.hidden = false;
+      btnVoltar.hidden = true;
+      updateCriarVisibilidade();
+      updateBreadcrumb();
+
+      try {
+        const resp = await fetch(urlCompartilhadosComigo, {
+          credentials: "same-origin",
+          headers: { "X-Requested-With": "XMLHttpRequest" },
+        });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.erro || "Erro ao carregar pastas compartilhadas comigo");
+        renderFolders(data.pastas || []);
+      } catch (err) {
+        folderList.innerHTML = `<p class="gdrive-error">Erro: ${escapeHtml(String(err.message))}</p>`;
+        folderList.hidden = false;
+        folderEmpty.hidden = true;
+      } finally {
+        setLoading(false);
+      }
+    }
+
     function loadRoot(mode) {
       rootMode = mode;
       navStack.length = 0;
       updateTabs();
       if (mode === "compartilhados") {
         loadDrives();
+      } else if (mode === "compartilhados_comigo") {
+        loadCompartilhadosComigo();
       } else {
         loadPastas(null);
       }
@@ -207,11 +247,16 @@
 
     btnMeuDrive.addEventListener("click", () => loadRoot("meu_drive"));
     btnDrivesCompartilhados.addEventListener("click", () => loadRoot("compartilhados"));
+    if (btnCompartilhadosComigo) {
+      btnCompartilhadosComigo.addEventListener("click", () => loadRoot("compartilhados_comigo"));
+    }
 
     btnVoltar.addEventListener("click", () => {
       navStack.pop();
       if (navStack.length === 0 && rootMode === "compartilhados") {
         loadDrives();
+      } else if (navStack.length === 0 && rootMode === "compartilhados_comigo") {
+        loadCompartilhadosComigo();
       } else {
         loadPastas(currentPaiId());
       }

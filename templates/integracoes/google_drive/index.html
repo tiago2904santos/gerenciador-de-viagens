@@ -133,6 +133,7 @@
                  data-url-criar="{% url 'google_drive:api_criar_pasta' %}"
                  data-url-salvar="{% url 'google_drive:salvar_pasta_raiz' %}"
                  data-url-drives="{% url 'google_drive:api_listar_drives_compartilhados' %}"
+                 data-url-compartilhados-comigo="{% url 'google_drive:api_listar_compartilhados_comigo' %}"
                  data-csrf="{{ csrf_token }}">
 
               <div class="gdrive-browser-toolbar">
@@ -140,6 +141,10 @@
                   <button type="button" class="cv-btn cv-btn--secondary cv-btn--sm gdrive-root-tab"
                           id="gdrive-btn-meu-drive" role="tab" aria-selected="false">
                     📁 Meu Drive
+                  </button>
+                  <button type="button" class="cv-btn cv-btn--secondary cv-btn--sm gdrive-root-tab"
+                          id="gdrive-btn-compartilhados-comigo" role="tab" aria-selected="false">
+                    👥 Compartilhados comigo
                   </button>
                   <button type="button" class="cv-btn cv-btn--secondary cv-btn--sm gdrive-root-tab"
                           id="gdrive-btn-drives-compartilhados" role="tab" aria-selected="false">
@@ -306,5 +311,5 @@
 {% endblock %}
 
 {% block extra_js %}
-  <script src="{% static 'js/pages/gdrive_config.js' %}" defer></script>
+  <script src="{% static 'js/pages/gdrive_config.js' %}?v=20260706-compartilhados-comigo" defer></script>
 {% endblock %}

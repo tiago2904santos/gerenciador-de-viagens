@@ -17,6 +17,11 @@ urlpatterns = [
         views.api_listar_drives_compartilhados,
         name="api_listar_drives_compartilhados",
     ),
+    path(
+        "api/compartilhados-comigo/",
+        views.api_listar_compartilhados_comigo,
+        name="api_listar_compartilhados_comigo",
+    ),
     path("api/pastas/criar/", views.api_criar_pasta, name="api_criar_pasta"),
     path("api/pasta-raiz/salvar/", views.salvar_pasta_raiz, name="salvar_pasta_raiz"),
     # Organização em massa

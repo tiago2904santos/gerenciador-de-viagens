@@ -180,6 +180,16 @@ def api_listar_drives_compartilhados(request):
 
 
 @login_required
+def api_listar_compartilhados_comigo(request):
+    try:
+        client = get_client()
+        pastas = client.listar_compartilhados_comigo()
+        return JsonResponse({"pastas": pastas})
+    except Exception as exc:
+        return JsonResponse({"erro": str(exc)}, status=500)
+
+
+@login_required
 @require_POST
 def api_criar_pasta(request):
     try:

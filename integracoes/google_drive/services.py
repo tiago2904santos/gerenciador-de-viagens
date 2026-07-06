@@ -145,6 +145,11 @@ class _MockClient:
             {"id": "mock-shared-drive-2", "name": "Drive Compartilhado Arquivo (mock)"},
         ]
 
+    def listar_compartilhados_comigo(self) -> list[dict]:
+        return [
+            {"id": "mock-compartilhada-1", "name": "Pasta Compartilhada Exemplo (mock)"},
+        ]
+
 
 class _RealClient:
     def __init__(self):
@@ -247,6 +252,15 @@ class _RealClient:
         res = self._svc.drives().list(pageSize=100, fields="drives(id,name)").execute()
         drives = res.get("drives", [])
         return sorted(drives, key=lambda d: (d.get("name") or "").lower())
+
+    def listar_compartilhados_comigo(self) -> list[dict]:
+        """Pastas de nível superior compartilhadas diretamente com a conta (não em ``root``)."""
+        q = f"sharedWithMe = true and mimeType = '{_FOLDER_MIME}' and trashed = false"
+        res = self._svc.files().list(
+            q=q, fields="files(id,name)", orderBy="name", pageSize=100,
+            supportsAllDrives=True, includeItemsFromAllDrives=True,
+        ).execute()
+        return res.get("files", [])
 
     def criar_pasta(self, nome: str, pai_id: str | None = None) -> dict:
         meta: dict = {"name": nome, "mimeType": _FOLDER_MIME}
