@@ -2,7 +2,9 @@
   {% include "components/forms/card_toggle.html" with field=field title=label|default:field.label description=help_text size_class=size_class only %}
 {% elif field.field.widget.input_type == 'select' and field.field.widget.allow_multiple_selected %}
 <div class="field app-form-field cv-field{% if size_class %} {{ size_class }}{% endif %}">
+  {% if "cv-search-picker__native" not in field.field.widget.attrs.class|default:"" %}
   <label class="app-form-label cv-field__label" for="{{ field.id_for_label }}">{{ label|default:field.label }}</label>
+  {% endif %}
   {% if action_url or action_label %}
     <div class="cv-field-with-action cv-field-with-action--manage-reveal">
       {% include "components/ui/forms/multiselect.html" with field=field only %}

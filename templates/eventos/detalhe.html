@@ -222,21 +222,58 @@
                 </div>
               </header>
               <div class="cv-wizard-section-body">
-                <div class="field-grid">
-                  {% include "components/forms/form_field.html" with field=form.oficios_vinculados only %}
-                </div>
-                <div class="field-grid">
-                  {% include "components/forms/form_field.html" with field=form.ordens_servico_vinculadas only %}
-                </div>
-                <div class="field-grid">
-                  {% include "components/forms/form_field.html" with field=form.planos_trabalho_vinculados only %}
-                </div>
-                <div class="field-grid">
-                  {% include "components/forms/form_field.html" with field=form.termos_vinculados only %}
-                </div>
-                <div class="field-grid">
-                  {% include "components/forms/form_field.html" with field=form.roteiros_vinculados only %}
-                </div>
+                <section class="wizard-inner-section" aria-labelledby="evento-wizard-doc-oficios-d">
+                  <header class="wizard-inner-section__header">
+                    <h4 class="wizard-inner-section__title" id="evento-wizard-doc-oficios-d">Ofícios</h4>
+                  </header>
+                  <div class="field-grid">
+                    {% include "components/forms/form_field.html" with field=form.oficios_vinculados only %}
+                  </div>
+                </section>
+
+                <hr style="border: none; border-top: 1px solid var(--cv-border-default, rgba(255,255,255,0.08)); margin: 0.5rem 0 0;">
+
+                <section class="wizard-inner-section" aria-labelledby="evento-wizard-doc-os-d">
+                  <header class="wizard-inner-section__header">
+                    <h4 class="wizard-inner-section__title" id="evento-wizard-doc-os-d">Ordens de serviço</h4>
+                  </header>
+                  <div class="field-grid">
+                    {% include "components/forms/form_field.html" with field=form.ordens_servico_vinculadas only %}
+                  </div>
+                </section>
+
+                <hr style="border: none; border-top: 1px solid var(--cv-border-default, rgba(255,255,255,0.08)); margin: 0.5rem 0 0;">
+
+                <section class="wizard-inner-section" aria-labelledby="evento-wizard-doc-pt-d">
+                  <header class="wizard-inner-section__header">
+                    <h4 class="wizard-inner-section__title" id="evento-wizard-doc-pt-d">Planos de trabalho</h4>
+                  </header>
+                  <div class="field-grid">
+                    {% include "components/forms/form_field.html" with field=form.planos_trabalho_vinculados only %}
+                  </div>
+                </section>
+
+                <hr style="border: none; border-top: 1px solid var(--cv-border-default, rgba(255,255,255,0.08)); margin: 0.5rem 0 0;">
+
+                <section class="wizard-inner-section" aria-labelledby="evento-wizard-doc-termos-d">
+                  <header class="wizard-inner-section__header">
+                    <h4 class="wizard-inner-section__title" id="evento-wizard-doc-termos-d">Termos de autorização</h4>
+                  </header>
+                  <div class="field-grid">
+                    {% include "components/forms/form_field.html" with field=form.termos_vinculados only %}
+                  </div>
+                </section>
+
+                <hr style="border: none; border-top: 1px solid var(--cv-border-default, rgba(255,255,255,0.08)); margin: 0.5rem 0 0;">
+
+                <section class="wizard-inner-section" aria-labelledby="evento-wizard-doc-roteiros-d">
+                  <header class="wizard-inner-section__header">
+                    <h4 class="wizard-inner-section__title" id="evento-wizard-doc-roteiros-d">Roteiros</h4>
+                  </header>
+                  <div class="field-grid">
+                    {% include "components/forms/form_field.html" with field=form.roteiros_vinculados only %}
+                  </div>
+                </section>
               </div>
               {% url 'eventos:index' as back_url_eventos %}
               {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar à lista" secondary_url=back_url_eventos primary_label="Salvar e avançar" primary_action="wizard_next" only %}
