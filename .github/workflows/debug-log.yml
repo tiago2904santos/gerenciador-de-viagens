@@ -21,21 +21,26 @@ jobs:
             echo "===== tail -200 django.log ====="
             tail -200 /var/www/gerenciador-viagens/logs/django.log || true
             echo ""
-            echo "===== estado do drive (pasta raiz, credenciais, pendencias, job de reorganizacao) ====="
+            echo "===== estado do drive ====="
             cd /var/www/gerenciador-viagens/app
             source /var/www/gerenciador-viagens/venv/bin/activate
-            DJANGO_SETTINGS_MODULE=config.settings.prod python manage.py shell -c "
-from integracoes.google_drive.models import DriveCredenciais, DriveReorganizacaoJob, DriveSyncStatus
-from documentos.models import DocumentoArtefato
-c = DriveCredenciais.objects.first()
-print('pasta_raiz_id:', repr(c.pasta_raiz_id) if c else None)
-print('pasta_raiz_nome:', repr(c.pasta_raiz_nome) if c else None)
-job = DriveReorganizacaoJob.objects.order_by('-iniciado_em').first()
-if job:
-    print('ultimo job reorganizacao:', job.status, job.iniciado_em, job.finalizado_em, 'eventos=', job.total_eventos, job.eventos_processados, 'avulsos=', job.avulsos, 'erros=', job.erros, 'msg=', job.mensagem)
-else:
-    print('nenhum job de reorganizacao encontrado')
-print('pendencias:', DriveSyncStatus.objects.count())
-print('artefatos totais:', DocumentoArtefato.objects.count())
-print('artefatos sem DriveArquivo:', DocumentoArtefato.objects.filter(drive_arquivo__isnull=True, formato__iexact='pdf').count())
-"
+            cat > /tmp/gdrive_debug.py << 'PYEOF'
+            from integracoes.google_drive.models import DriveCredenciais, DriveReorganizacaoJob, DriveSyncStatus
+            from documentos.models import DocumentoArtefato
+            c = DriveCredenciais.objects.first()
+            print('pasta_raiz_id:', repr(c.pasta_raiz_id) if c else None)
+            print('pasta_raiz_nome:', repr(c.pasta_raiz_nome) if c else None)
+            job = DriveReorganizacaoJob.objects.order_by('-iniciado_em').first()
+            if job:
+                print('ultimo job:', job.status, job.iniciado_em, job.finalizado_em, 'eventos=', job.total_eventos, job.eventos_processados, 'avulsos=', job.avulsos, 'erros=', job.erros, 'msg=', job.mensagem)
+            else:
+                print('nenhum job de reorganizacao encontrado')
+            print('pendencias:', DriveSyncStatus.objects.count())
+            pend = list(DriveSyncStatus.objects.order_by('-atualizado_em')[:10])
+            for p in pend:
+                print('  -', p.content_type.model, p.object_id, p.tentativas, 'x |', p.ultimo_erro[:300])
+            print('artefatos totais:', DocumentoArtefato.objects.count())
+            print('artefatos pdf sem DriveArquivo:', DocumentoArtefato.objects.filter(drive_arquivo__isnull=True, formato__iexact='pdf').count())
+            PYEOF
+            DJANGO_SETTINGS_MODULE=config.settings.prod python manage.py shell < /tmp/gdrive_debug.py
+            rm -f /tmp/gdrive_debug.py
