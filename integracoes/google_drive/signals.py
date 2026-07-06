@@ -9,7 +9,8 @@ def conectar() -> None:
     from django.db.models.signals import post_save
 
     from documentos.models import DocumentoArtefato
-    from eventos.models import EventoAnexo, EventoDocumentoSolicitacao
+    from eventos.models import Evento, EventoAnexo, EventoDocumentoSolicitacao
+    from oficios.models import Oficio
     from prestacoes_contas.models import (
         AssinaturaDocumento,
         PrestacaoContas,
@@ -39,6 +40,12 @@ def conectar() -> None:
         _organizar_solicitacao,
         sender=EventoDocumentoSolicitacao,
         dispatch_uid="gdrive_evento_solicitacao",
+    )
+    post_save.connect(
+        _organizar_oficio_ao_salvar, sender=Oficio, dispatch_uid="gdrive_oficio_salvo"
+    )
+    post_save.connect(
+        _organizar_evento_ao_salvar, sender=Evento, dispatch_uid="gdrive_evento_salvo"
     )
 
 
@@ -153,3 +160,88 @@ def _organizar_solicitacao(sender, instance, **kwargs) -> None:
     _processar_com_retry(
         organizer.organizar_solicitacao_evento, instance, tasks.processar_solicitacao_evento
     )
+
+
+def _organizar_oficio_ao_salvar(sender, instance, **kwargs) -> None:
+    """Assim que o ofício deixa de ser rascunho, gera e sobe ao Drive tudo que
+    ainda faltar (ofício, justificativa, termos, ordem de serviço) — sem
+    depender de alguém abrir/baixar o documento manualmente.
+
+    Roda em segundo plano (thread) porque envolve GERAR PDFs de verdade (não é
+    só subir um arquivo já pronto) — fazer isso de forma síncrona deixaria o
+    salvamento do ofício lento. As funções de backfill (``_garantir_*``) só
+    geram o que ainda não existe, então salvar o ofício várias vezes não
+    duplica nem reprocessa à toa.
+    """
+    if _drive_desligado():
+        return
+    if instance.status == instance.STATUS_RASCUNHO:
+        return
+    import threading
+
+    threading.Thread(
+        target=_organizar_oficio_em_thread, args=(instance.pk,), daemon=True
+    ).start()
+
+
+def _organizar_oficio_em_thread(oficio_id: int) -> None:
+    from django.db import connection
+
+    from . import organizer
+
+    try:
+        from oficios.models import Oficio
+
+        oficio = Oficio.objects.filter(pk=oficio_id).first()
+        if oficio is None:
+            return
+        try:
+            from . import status
+
+            status.executar_e_rastrear(organizer.organizar_oficio, oficio)
+        except Exception:
+            logger.error(
+                "[Drive] falha ao gerar/organizar ofício #%s em segundo plano",
+                oficio_id, exc_info=True,
+            )
+    finally:
+        connection.close()
+
+
+def _organizar_evento_ao_salvar(sender, instance, **kwargs) -> None:
+    """Mesma ideia de ``_organizar_oficio_ao_salvar``, para o que depende do
+    evento (plano de trabalho) — dispara assim que o evento sai do rascunho.
+    Também roda em segundo plano pelo mesmo motivo (geração real de PDF)."""
+    if _drive_desligado():
+        return
+    if instance.status in (instance.STATUS_RASCUNHO, instance.STATUS_CANCELADO):
+        return
+    import threading
+
+    threading.Thread(
+        target=_organizar_evento_em_thread, args=(instance.pk,), daemon=True
+    ).start()
+
+
+def _organizar_evento_em_thread(evento_id: int) -> None:
+    from django.db import connection
+
+    from . import organizer
+
+    try:
+        from eventos.models import Evento
+
+        evento = Evento.objects.filter(pk=evento_id).first()
+        if evento is None:
+            return
+        try:
+            from . import status
+
+            status.executar_e_rastrear(organizer.organizar_evento, evento)
+        except Exception:
+            logger.error(
+                "[Drive] falha ao gerar/organizar evento #%s em segundo plano",
+                evento_id, exc_info=True,
+            )
+    finally:
+        connection.close()

@@ -201,7 +201,14 @@ def _persistir_artefato(artefato, pasta_id: str, nome: str, *, atalho_pasta_id: 
             reg_anterior.save()
             return file_id, url
 
-    file_id, url = client.upload(nome, conteudo, mime, pasta_id=pasta_id)
+    # Rede de segurança: antes de criar um arquivo novo, confere se já não existe
+    # um com esse nome na pasta canônica (registro local perdido/dessincronizado,
+    # execuções concorrentes de "Reorganizar" etc.) — evita duplicar.
+    existente_id = client.buscar_arquivo_por_nome(nome, pasta_id)
+    if existente_id:
+        file_id, url = client.atualizar_conteudo(existente_id, nome, conteudo, mime, pasta_id=pasta_id)
+    else:
+        file_id, url = client.upload(nome, conteudo, mime, pasta_id=pasta_id)
 
     if not reg:
         reg = DriveArquivo(artefato=artefato)
@@ -254,10 +261,10 @@ def organizar_artefato(artefato) -> tuple[str, str] | None:
         tipo, formato, oficio, getattr(artefato, "servidor", None), servidores, cidade
     )
 
-    # Canônico: SEMPRE na pasta global do tipo (Ofícios/Termos/Planos de trabalho/
-    # Ordens de serviço/Justificativas), com subpasta por ofício quando aplicável —
-    # independente de o documento pertencer a um evento ou ser avulso.
-    canonica = _oficio_folder_no_evento(client, tipo, oficio, servidores)
+    # Canônico: SEMPRE direto na pasta global do tipo (Ofícios/Termos/Planos de
+    # trabalho/Ordens de serviço/Justificativas), sem subpasta — cada arquivo já
+    # tem nome único o bastante (número, protocolo, servidores, cidade).
+    canonica = _pasta_tipo_global(client, tipo)
 
     atalho_pasta = None
     if evento is not None:
@@ -624,12 +631,34 @@ def _garantir_planos(evento) -> None:
 # Orquestração
 # ---------------------------------------------------------------------------
 
+def _artefatos_mais_recentes(qs):
+    """Deduplica ``DocumentoArtefato`` por (tipo, formato, servidor), mantendo só
+    o mais recente de cada posição lógica.
+
+    ``DocumentoArtefato`` é um histórico imutável (cada edição gera uma linha
+    nova) e alguns registros antigos — de antes da deduplicação existir —
+    ainda têm seu PRÓPRIO ``DriveArquivo`` (arquivo real independente). Sem
+    este filtro, ``organizar_artefato`` reprocessaria TODOS eles e cada um
+    renomearia seu próprio arquivo para o mesmo nome/pasta canônica,
+    resultando em várias cópias do "mesmo" documento no Drive.
+    """
+    vistos = set()
+    mais_recentes = []
+    for artefato in qs:  # Meta.ordering = ["-criado_em"]: já vem do mais novo pro mais velho.
+        chave = (artefato.tipo, artefato.formato, artefato.servidor_id)
+        if chave in vistos:
+            continue
+        vistos.add(chave)
+        mais_recentes.append(artefato)
+    return mais_recentes
+
+
 def organizar_oficio(oficio) -> None:
     """Organiza todos os artefatos e prestações de um ofício (+ backfill)."""
     _garantir_documento_oficio(oficio)
     _garantir_termos(oficio)
     _garantir_ordens_servico(oficio)
-    for artefato in oficio.documentos_gerados.all():
+    for artefato in _artefatos_mais_recentes(oficio.documentos_gerados.all()):
         try:
             organizar_artefato(artefato)
         except Exception as exc:
@@ -647,7 +676,7 @@ def organizar_evento(evento) -> None:
     for oficio in evento.oficios.all():
         organizar_oficio(oficio)
     # Planos do evento sem ofício (não cobertos por organizar_oficio).
-    for artefato in evento.documentos_gerados.filter(oficio__isnull=True):
+    for artefato in _artefatos_mais_recentes(evento.documentos_gerados.filter(oficio__isnull=True)):
         try:
             organizar_artefato(artefato)
         except Exception as exc:
@@ -677,17 +706,14 @@ def _caminho_base_oficio(oficio, servidores) -> str:
 
 
 def _caminho_artefato(artefato, oficio, servidores, cidade) -> str:
-    """Caminho do CANÔNICO (arquivo real) — sempre na pasta global do tipo,
-    tenha o documento evento ou não (dentro de Eventos/ existe só um atalho)."""
+    """Caminho do CANÔNICO (arquivo real) — sempre direto na pasta global do
+    tipo, sem subpasta (dentro de Eventos/ existe só um atalho)."""
     tipo = artefato.tipo or "oficio"
     formato = artefato.formato or "pdf"
     nome = (artefato.nome_drive or "").strip() or _derivar_nome_artefato(
         tipo, formato, oficio, getattr(artefato, "servidor", None), servidores, cidade
     )
-    base = naming.pasta_tipo(tipo)
-    if oficio is not None:
-        return f"{base}/{naming.pasta_oficio(oficio, servidores, cidade)}/{nome}"
-    return f"{base}/{nome}"
+    return f"{naming.pasta_tipo(tipo)}/{nome}"
 
 
 def planejar_oficio(oficio) -> list[str]:
@@ -697,7 +723,7 @@ def planejar_oficio(oficio) -> list[str]:
     base = _caminho_base_oficio(oficio, servidores)
     linhas: list[str] = []
 
-    for art in oficio.documentos_gerados.all():
+    for art in _artefatos_mais_recentes(oficio.documentos_gerados.all()):
         linhas.append(_caminho_artefato(art, oficio, servidores, cidade))
 
     for p in oficio.prestacoes_contas.all():

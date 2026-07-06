@@ -68,13 +68,13 @@ class OrganizerTests(TestCase):
         self.assertEqual(DriveArquivo.objects.filter(artefato=art).count(), 1)
 
     def test_planejar_oficio_monta_arvore(self):
-        """O CANÔNICO (arquivo real) fica sempre na pasta global do tipo, tenha
-        evento ou não — dentro de Eventos/ existe apenas um atalho."""
+        """O CANÔNICO (arquivo real) fica sempre direto na pasta global do tipo
+        (sem subpasta), tenha evento ou não — dentro de Eventos/ existe
+        apenas um atalho."""
         self._artefato("oficio")
         linhas = organizer.planejar_oficio(self.oficio)
         self.assertIn(
-            "Ofícios/Ofício 01 protocolo 12.345.678-9 Ana e Bruno (Maringá)/"
-            "Ofício 01-2026 protocolo 12.345.678-9 Ana e Bruno (Maringá).pdf",
+            "Ofícios/Ofício 01-2026 protocolo 12.345.678-9 Ana e Bruno (Maringá).pdf",
             linhas,
         )
 

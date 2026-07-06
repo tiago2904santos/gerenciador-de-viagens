@@ -138,6 +138,12 @@ class _MockClient:
     def excluir_arquivo(self, file_id: str) -> None:
         logger.info("[Drive MOCK] excluir_arquivo file_id=%s", file_id)
 
+    def buscar_arquivo_por_nome(self, nome: str, pasta_id: str) -> str | None:
+        return None
+
+    def listar_arquivos(self, pasta_id: str) -> list[dict]:
+        return []
+
     def listar_pastas(self, pai_id: str | None = None) -> list[dict]:
         return [
             {"id": "mock-pasta-documentos", "name": "Documentos (mock)"},
@@ -368,6 +374,34 @@ class _RealClient:
             logger.info("[Drive] arquivo excluído file_id=%s", file_id)
         except Exception as exc:
             logger.warning("[Drive] falha ao excluir file_id=%s: %s", file_id, exc)
+
+    def buscar_arquivo_por_nome(self, nome: str, pasta_id: str) -> str | None:
+        """Procura um arquivo (não-pasta) com esse nome exato dentro de ``pasta_id``.
+
+        Rede de segurança contra duplicar: usada antes de criar um arquivo novo,
+        caso o registro local (``DriveArquivo``) tenha se perdido/dessincronizado
+        mas o arquivo já exista de verdade no Drive.
+        """
+        nome_escapado = nome.replace("'", "\\'")
+        q = (
+            f"name = '{nome_escapado}' and mimeType != '{_FOLDER_MIME}' and trashed = false"
+            f" and '{pasta_id}' in parents"
+        )
+        res = self._svc.files().list(
+            q=q, fields="files(id)", pageSize=1,
+            supportsAllDrives=True, includeItemsFromAllDrives=True,
+        ).execute()
+        files = res.get("files", [])
+        return files[0]["id"] if files else None
+
+    def listar_arquivos(self, pasta_id: str) -> list[dict]:
+        """Lista arquivos (não-pastas) diretamente dentro de ``pasta_id``."""
+        q = f"mimeType != '{_FOLDER_MIME}' and trashed = false and '{pasta_id}' in parents"
+        res = self._svc.files().list(
+            q=q, fields="files(id,name,modifiedTime)", pageSize=1000, orderBy="name",
+            supportsAllDrives=True, includeItemsFromAllDrives=True,
+        ).execute()
+        return res.get("files", [])
 
 
 # ---------------------------------------------------------------------------
