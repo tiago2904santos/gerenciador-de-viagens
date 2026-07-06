@@ -1,0 +1,25 @@
+name: Debug - ler log de producao (temporario)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  ler-log:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Ler django.log e status do servico via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            echo "===== systemctl status gerenciador-viagens ====="
+            systemctl status gerenciador-viagens --no-pager -l || true
+            echo ""
+            echo "===== journalctl -u gerenciador-viagens (ultimas 150 linhas) ====="
+            journalctl -u gerenciador-viagens -n 150 --no-pager || true
+            echo ""
+            echo "===== tail -150 django.log ====="
+            tail -150 /var/www/gerenciador-viagens/logs/django.log || true
