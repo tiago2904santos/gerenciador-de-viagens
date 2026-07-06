@@ -11,7 +11,24 @@ vezes — depois disso, o objeto continua marcado como pendência (ver
 
 from __future__ import annotations
 
-from celery import shared_task
+try:
+    from celery import shared_task
+except ModuleNotFoundError:
+    # Celery não instalado (ex.: dev local sem broker). Fornecemos um decorator
+    # equivalente cujo ``.delay()`` levanta erro — capturado em ``signals.py``,
+    # que então registra o objeto como pendência para reenvio manual.
+    def shared_task(*dargs, **dkwargs):
+        def decorator(func):
+            def _sem_celery(*args, **kwargs):
+                raise RuntimeError("Celery não está instalado; retry indisponível")
+
+            func.delay = _sem_celery
+            func.apply_async = _sem_celery
+            return func
+
+        if len(dargs) == 1 and callable(dargs[0]) and not dkwargs:
+            return decorator(dargs[0])
+        return decorator
 
 from . import organizer, status
 

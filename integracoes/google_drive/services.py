@@ -27,12 +27,40 @@ _AUTH_URI = "https://accounts.google.com/o/oauth2/auth"
 _TOKEN_URI = "https://oauth2.googleapis.com/token"
 
 
+class DriveScopeError(RuntimeError):
+    """A autorização OAuth salva não cobre os escopos que o app precisa.
+
+    Acontece quando o app passou a pedir mais escopos (ex.: ``drive.readonly``)
+    do que a credencial guardada concedeu: a renovação do token falha com
+    ``invalid_scope`` e a solução é reconectar a conta.
+    """
+
+
 def _cfg() -> dict:
     return getattr(settings, "GOOGLE_DRIVE", {})
 
 
 def mimetype_para_formato(formato: str) -> str:
     return _MIMETYPES.get((formato or "").lower(), "application/octet-stream")
+
+
+def escopo_faltante() -> list[str]:
+    """Escopos requeridos (``_SCOPES``) que NÃO constam na credencial salva.
+
+    Retorna lista vazia quando não há credencial (nada a comparar) ou quando o
+    escopo salvo cobre tudo. Usado para avisar o usuário a reconectar a conta
+    antes que a renovação do token quebre com ``invalid_scope``.
+    """
+    try:
+        from integracoes.google_drive.models import DriveCredenciais
+
+        creds = DriveCredenciais.objects.first()
+    except Exception:
+        return []
+    if not creds or not (creds.scope or "").strip():
+        return []
+    salvos = set((creds.scope or "").split())
+    return [s for s in _SCOPES if s not in salvos]
 
 
 def client_config_dict() -> dict:
@@ -302,14 +330,21 @@ def get_client() -> _MockClient | _RealClient:
         cfg = _cfg()
         modo = cfg.get("MODO", "mock").lower()
 
-        if modo != "mock":
-            try:
-                _client = _RealClient()
-            except Exception as exc:
-                logger.error("[Drive] falha ao criar client real (%s) — usando mock", exc)
-                _client = _MockClient()
-        else:
+        if modo == "mock":
             _client = _MockClient()
+        else:
+            # Modo ativo: NUNCA cair para o mock em silêncio — isso mascarava
+            # falhas de token/escopo (uploads "sumiam" no mock enquanto o sistema
+            # se dizia ativo). Propagamos o erro para que o signal registre a
+            # pendência e avise o usuário, em vez de fingir sucesso.
+            faltando = escopo_faltante()
+            if faltando:
+                raise DriveScopeError(
+                    "A conexão com o Google Drive precisa ser refeita: a "
+                    "autorização salva não inclui " + ", ".join(faltando) + ". "
+                    "Reconecte a conta em Configurações > Google Drive."
+                )
+            _client = _RealClient()
     return _client
 
 

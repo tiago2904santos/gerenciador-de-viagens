@@ -32,6 +32,19 @@
         </header>
 
         <div class="cv-wizard-section-body">
+          {% if escopo_faltante %}
+            <div class="gdrive-scope-alert" role="alert"
+                 style="margin-bottom:0.75rem;padding:0.75rem 1rem;border:1px solid var(--color-danger,#c0392b);border-radius:8px;background:rgba(192,57,43,.06);">
+              <p class="field-label" style="color:var(--color-danger,#c0392b);margin:0 0 .25rem;">⚠ Reconexão necessária</p>
+              <p class="field-help-text" style="margin:0;">
+                A autorização salva não inclui todas as permissões que o sistema precisa
+                (falta: <strong>{{ escopo_faltante|join:", " }}</strong>). Enquanto isso, a
+                renovação do token falha com <code>invalid_scope</code> e os documentos
+                <strong>não chegam ao Drive</strong>. Clique em
+                <strong>Trocar conta</strong> abaixo para reautorizar.
+              </p>
+            </div>
+          {% endif %}
           {% if autorizado and creds %}
             <div class="gdrive-conta-info">
               <dl class="field-meta-list">

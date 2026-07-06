@@ -27,6 +27,20 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS(f"OAuth autorizado. Token atualizado em: {creds.atualizado_em:%d/%m/%Y %H:%M}"))
             self.stdout.write(f"Expiry: {creds.token_expiry}")
             self.stdout.write(f"Scope : {creds.scope}")
+
+            from integracoes.google_drive.services import escopo_faltante
+
+            faltando = escopo_faltante()
+            if faltando:
+                self.stdout.write("")
+                self.stdout.write(self.style.ERROR(
+                    "ESCOPO INSUFICIENTE: a autorização salva não inclui "
+                    + ", ".join(faltando) + "."
+                ))
+                self.stdout.write(self.style.ERROR(
+                    "A renovação do token vai falhar com 'invalid_scope' e o upload "
+                    "não chega ao Drive. Reconecte a conta em Configurações > Google Drive."
+                ))
         else:
             self.stdout.write(self.style.WARNING("OAuth não autorizado. Nenhuma credencial no banco."))
             self.stdout.write("Para autorizar: acesse /integracoes/google-drive/oauth/iniciar/ no navegador.")
