@@ -352,11 +352,35 @@ def organizar_solicitacao_evento(doc) -> None:
     colocar_arquivo_externo(doc, doc.arquivo, campo="arquivo", pasta_id=prestacao_folder, nome=nome)
 
 
+def _prestacao_tem_conteudo(prestacao) -> bool:
+    """True se há algo de fato para organizar no Drive.
+
+    A ``PrestacaoContas`` é criada automaticamente (vazia, status pendente)
+    assim que o ofício é salvo ou ganha servidores — antes de qualquer
+    documento de prestação existir. Sem este filtro, todo save do ofício
+    dispara chamadas ao Drive (criar pastas) só para não ter nada a enviar,
+    e uma falha nessas chamadas aparece como erro de "prestação de contas"
+    no meio do wizard do ofício, o que não faz sentido para quem só está
+    editando o ofício.
+    """
+    if getattr(prestacao, "despacho_assinado", None):
+        return True
+    if getattr(prestacao, "comprovante_saque_transferencia", None):
+        return True
+    if prestacao.documentos_anexos.exists():
+        return True
+    if prestacao.assinaturas.exists():
+        return True
+    return False
+
+
 def organizar_prestacao(prestacao) -> None:
     """Arquivos da ``PrestacaoContas`` na pasta do servidor + atalho global."""
     oficio = getattr(prestacao, "oficio", None)
     servidor = getattr(prestacao, "servidor", None)
     if oficio is None:
+        return
+    if not _prestacao_tem_conteudo(prestacao):
         return
     client = get_client()
     servidores = list(oficio.servidores.all())

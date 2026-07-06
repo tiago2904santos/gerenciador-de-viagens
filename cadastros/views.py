@@ -854,7 +854,8 @@ def configuracao_sistema(request):
         DriveCredenciais,
         DriveReorganizacaoJob,
     )
-    from integracoes.google_drive.services import esta_autorizado, get_pasta_raiz_id
+    from integracoes.google_drive import status as drive_status
+    from integracoes.google_drive.services import escopo_faltante, esta_autorizado, get_pasta_raiz_id
 
     from .models import ConfiguracaoSistema
 
@@ -896,6 +897,7 @@ def configuracao_sistema(request):
             # Google Drive
             "drive_autorizado": drive_autorizado,
             "drive_creds": drive_creds,
+            "drive_escopo_faltante": escopo_faltante(),
             "drive_pasta_raiz_id": drive_pasta_raiz_id,
             "drive_pasta_raiz_nome": drive_creds.pasta_raiz_nome if drive_creds else "",
             "drive_total_arquivos": DriveArquivo.objects.count(),
@@ -905,6 +907,9 @@ def configuracao_sistema(request):
             and (drive_autorizado or drive_modo == "mock"),
             "drive_total_eventos": Evento.objects.count(),
             "drive_job_reorg": DriveReorganizacaoJob.objects.order_by("-iniciado_em").first(),
+            # Pendências (falhas de envio ao Drive)
+            "drive_total_pendencias": drive_status.contagem_pendencias(),
+            "drive_pendencias": drive_status.listar_pendencias(limite=20),
         },
     )
 
