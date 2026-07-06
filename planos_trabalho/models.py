@@ -7,6 +7,7 @@ from django.utils import timezone
 from django.utils.text import slugify
 
 from cadastros.models import Cargo
+from cadastros.models import CancelavelModel
 from cadastros.models import Cidade
 from cadastros.models import ConfiguracaoSistema
 from cadastros.models import Estado
@@ -89,7 +90,7 @@ class AtividadePlanoTrabalho(TimeStampedModel):
         super().save(*args, **kwargs)
 
 
-class PlanoTrabalho(TimeStampedModel):
+class PlanoTrabalho(TimeStampedModel, CancelavelModel):
     STATUS_RASCUNHO = "RASCUNHO"
     STATUS_GERADO = "GERADO"
     STATUS_CHOICES = [

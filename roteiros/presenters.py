@@ -261,7 +261,7 @@ def apresentar_linha_lista_simples_roteiro(roteiro, *, edit_url="#", delete_url=
     return {
         "avatar": "RT",
         "title": card["rota_display"],
-        "badges": [],
+        "badges": [{"text": "Cancelado", "variant": "danger"}] if roteiro.cancelado else [],
         "meta": [
             build_meta("Período", periodo),
             build_meta("Trechos", trechos_label),

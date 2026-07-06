@@ -353,8 +353,10 @@ def apresentar_plano_card(plano):
     return {
         "id": plano.pk,
         "numero_label": plano.numero_formatado,
-        "status_label": plano.get_status_display(),
-        "status_state": str(plano.status or "").lower(),
+        "status_label": "Cancelado" if plano.cancelado else plano.get_status_display(),
+        "status_state": "danger" if plano.cancelado else str(plano.status or "").lower(),
+        "cancelado": plano.cancelado,
+        "motivo_cancelamento": plano.motivo_cancelamento,
         "destino": destino_label,
         "periodo": periodo_label,
         "programa": programa_label,

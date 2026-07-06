@@ -473,6 +473,8 @@ def detalhe(request, pk, etapa=1):
             "modelos_motivo_url": _reverse("oficios:modelos_motivo_index"),
             "tipos_evento_url": f"{_reverse('eventos:tipos_index')}?{urlencode({'next': request.path})}",
             "solicitacao_anexos": solicitacao_anexos,
+            "evento_status_variant": "danger" if evento.status == Evento.STATUS_CANCELADO else "active",
+            "cancelar_evento_url": _reverse("eventos:cancelar", kwargs={"pk": evento.pk}),
             **guided_context,
         },
     )
@@ -502,3 +504,21 @@ def excluir(request, pk):
     evento.delete()
     messages.success(request, f'Evento "{titulo}" excluído.')
     return redirect("eventos:index")
+
+
+@require_POST
+def cancelar(request, pk):
+    evento = get_object_or_404(Evento, pk=pk)
+
+    if evento.status == Evento.STATUS_CANCELADO:
+        messages.error(request, "Este evento já está cancelado.")
+        return redirect("eventos:detalhe", pk=pk)
+
+    motivo = (request.POST.get("motivo") or "").strip()
+    if not motivo:
+        messages.error(request, "Informe o motivo do cancelamento.")
+        return redirect("eventos:detalhe", pk=pk)
+
+    evento.cancelar(motivo)
+    messages.success(request, "Evento cancelado. Todos os documentos vinculados também foram cancelados.")
+    return redirect("eventos:detalhe", pk=pk)

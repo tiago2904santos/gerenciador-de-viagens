@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from django.db import models
 
+from cadastros.models import CancelavelModel
 from cadastros.models import Cidade
 from cadastros.models import Estado
 from cadastros.models import Servidor
@@ -10,7 +11,7 @@ from cadastros.models import Viatura
 from oficios.models import Oficio
 
 
-class TermoAutorizacao(TimeStampedModel):
+class TermoAutorizacao(TimeStampedModel, CancelavelModel):
     evento = models.ForeignKey(
         "eventos.Evento",
         null=True,

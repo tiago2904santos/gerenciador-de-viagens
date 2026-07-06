@@ -19,6 +19,29 @@ class TimeStampedModel(models.Model):
         abstract = True
 
 
+class CancelavelModel(models.Model):
+    """Mixin para documentos que podem ser cancelados (com motivo obrigatório).
+
+    Usado por Oficio, OrdemServico, PlanoTrabalho, TermoAutorizacao e Roteiro para
+    suportar tanto o cancelamento individual quanto o cascade disparado pelo
+    cancelamento do Evento ao qual estão vinculados.
+    """
+
+    cancelado = models.BooleanField("Cancelado", default=False)
+    motivo_cancelamento = models.TextField("Motivo do cancelamento", blank=True, default="")
+    cancelado_em = models.DateTimeField("Cancelado em", null=True, blank=True)
+
+    class Meta:
+        abstract = True
+
+    def cancelar(self, motivo: str) -> None:
+        motivo = (motivo or "").strip()
+        self.cancelado = True
+        self.motivo_cancelamento = motivo
+        self.cancelado_em = timezone.now()
+        self.save(update_fields=["cancelado", "motivo_cancelamento", "cancelado_em"])
+
+
 class Unidade(TimeStampedModel):
     nome = models.CharField(max_length=255)
     sigla = models.CharField(max_length=50, blank=True)

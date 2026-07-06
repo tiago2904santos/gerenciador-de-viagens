@@ -137,6 +137,32 @@ def _sync_atalho(client, reg, nome: str, target_id: str, atalho_pasta_id: str | 
     reg.atalho_pasta_id = atalho_pasta_id
 
 
+def _localizar_artefato_anterior(artefato):
+    """``DocumentoArtefato`` anterior mais recente na MESMA posição lógica (mesmo
+    ofício/evento/servidor + tipo + formato) que já tem arquivo no Drive.
+
+    ``DocumentoArtefato`` é um registro histórico imutável: cada edição do
+    documento gera uma linha NOVA (hash diferente). Sem isso, cada edição
+    criaria um segundo arquivo no Drive em vez de sobrescrever o já existente.
+    """
+    from documentos.models import DocumentoArtefato
+
+    qs = (
+        DocumentoArtefato.objects.filter(tipo=artefato.tipo, formato=artefato.formato)
+        .exclude(pk=artefato.pk)
+        .exclude(drive_arquivo__isnull=True)
+    )
+    if artefato.oficio_id:
+        qs = qs.filter(oficio_id=artefato.oficio_id)
+    else:
+        qs = qs.filter(oficio__isnull=True, evento_id=artefato.evento_id)
+    if artefato.servidor_id:
+        qs = qs.filter(servidor_id=artefato.servidor_id)
+    else:
+        qs = qs.filter(servidor__isnull=True)
+    return qs.order_by("-criado_em").first()
+
+
 def _persistir_artefato(artefato, pasta_id: str, nome: str, *, atalho_pasta_id: str | None = None) -> tuple[str, str] | None:
     from .models import DriveArquivo
 
@@ -154,6 +180,22 @@ def _persistir_artefato(artefato, pasta_id: str, nome: str, *, atalho_pasta_id: 
     conteudo = _ler_filefield(getattr(artefato, "arquivo", None))
     if conteudo is None:
         return None
+
+    anterior = _localizar_artefato_anterior(artefato)
+    if anterior is not None:
+        reg_anterior = anterior.drive_arquivo
+        if reg_anterior.file_id and not reg_anterior.mock:
+            # Documento editado e regerado: sobrescreve o arquivo já existente no
+            # Drive (mesmo file_id) em vez de duplicar.
+            file_id, url = client.atualizar_conteudo(
+                reg_anterior.file_id, nome, conteudo, mime, pasta_id=pasta_id
+            )
+            reg_anterior.artefato = artefato
+            reg_anterior.nome, reg_anterior.mock = nome, is_mock()
+            _sync_atalho(client, reg_anterior, nome, file_id, atalho_pasta_id)
+            reg_anterior.save()
+            return file_id, url
+
     file_id, url = client.upload(nome, conteudo, mime, pasta_id=pasta_id)
 
     if not reg:
@@ -188,7 +230,13 @@ def _derivar_nome_artefato(tipo, formato, oficio, servidor, servidores, cidade) 
 
 
 def organizar_artefato(artefato) -> tuple[str, str] | None:
-    """Coloca um ``DocumentoArtefato`` na pasta certa (canônico + atalho global)."""
+    """Coloca um ``DocumentoArtefato`` na pasta certa (canônico + atalho global).
+
+    Só o PDF sobe ao Drive — DOCX/XLSX gerados a partir do mesmo documento ficam
+    só no sistema local (evita duplicidade de formato nas pastas do Drive).
+    """
+    if (artefato.formato or "pdf").lower() != "pdf":
+        return None
     client = get_client()
     tipo = artefato.tipo or "oficio"
     formato = artefato.formato or "pdf"
@@ -228,9 +276,11 @@ def organizar_artefato(artefato) -> tuple[str, str] | None:
 # ---------------------------------------------------------------------------
 
 def colocar_arquivo_externo(obj, ff, *, campo: str, pasta_id: str, nome: str) -> tuple[str, str] | None:
-    """Envia/move um ``FileField`` que não é ``DocumentoArtefato``.
+    """Envia um ``FileField`` que não é ``DocumentoArtefato``, sempre com o conteúdo atual.
 
-    Idempotente via ``DriveArquivoExterno`` (content_type + object_id + campo).
+    Idempotente via ``DriveArquivoExterno`` (content_type + object_id + campo): um
+    registro já existente tem seu CONTEÚDO sobrescrito (o arquivo local pode ter
+    sido substituído), nunca um segundo arquivo criado para o mesmo campo.
     """
     if not ff:
         return None
@@ -245,17 +295,17 @@ def colocar_arquivo_externo(obj, ff, *, campo: str, pasta_id: str, nome: str) ->
         content_type=ct, object_id=obj.pk, campo=campo
     ).first()
     mime = _mime_por_nome(nome)
-
-    if reg and reg.file_id and not reg.mock:
-        client.mover_renomear(reg.file_id, nome, pasta_id)
-        if reg.nome != nome or reg.pasta_id != pasta_id:
-            reg.nome, reg.pasta_id = nome, pasta_id
-            reg.save(update_fields=["nome", "pasta_id", "atualizado_em"])
-        return reg.file_id, reg.url
-
     conteudo = _ler_filefield(ff)
     if conteudo is None:
         return None
+
+    if reg and reg.file_id and not reg.mock:
+        file_id, url = client.atualizar_conteudo(reg.file_id, nome, conteudo, mime, pasta_id=pasta_id)
+        reg.url, reg.nome, reg.pasta_id = url, nome, pasta_id
+        reg.mime_type, reg.mock = mime, is_mock()
+        reg.save()
+        return file_id, url
+
     file_id, url = client.upload(nome, conteudo, mime, pasta_id=pasta_id)
 
     if reg:
@@ -468,6 +518,34 @@ def _garantir_termos(oficio) -> None:
             logger.warning("[Drive] backfill termo (oficio %s, serv %s) falhou: %s", oficio.pk, servidor.pk, exc)
 
 
+def _garantir_ordens_servico(oficio) -> None:
+    """Regenera (e persiste) a Ordem de Serviço do ofício, se ainda não houver artefato.
+
+    Geração é sempre a partir do ofício (não de uma ``OrdemServico`` específica);
+    a persistência acontece dentro de ``gerar_resposta_ordem_servico_documento``
+    (cache/dedupe por conteúdo).
+    """
+    from documentos.services.types import DocumentoFormato
+
+    try:
+        from ordens_servico.services import gerar_resposta_ordem_servico_documento
+    except Exception:
+        return
+
+    try:
+        tem_os = oficio.ordens_servico.exists()
+    except Exception:
+        return
+    if not tem_os:
+        return
+    if oficio.documentos_gerados.filter(tipo="ordem_servico").exists():
+        return
+    try:
+        gerar_resposta_ordem_servico_documento(oficio, DocumentoFormato.PDF)
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("[Drive] backfill ordem de serviço (oficio %s) falhou: %s", oficio.pk, exc)
+
+
 def _garantir_planos(evento) -> None:
     """Regenera (e persiste) planos do evento que ainda não têm artefato.
 
@@ -505,8 +583,9 @@ def _garantir_planos(evento) -> None:
 # ---------------------------------------------------------------------------
 
 def organizar_oficio(oficio) -> None:
-    """Organiza todos os artefatos e prestações de um ofício (+ backfill de termos)."""
+    """Organiza todos os artefatos e prestações de um ofício (+ backfill de termos/OS)."""
     _garantir_termos(oficio)
+    _garantir_ordens_servico(oficio)
     for artefato in oficio.documentos_gerados.all():
         try:
             organizar_artefato(artefato)

@@ -57,4 +57,5 @@ urlpatterns = [
     ),
     path("<int:pk>/documentos/<str:formato>/", views.baixar_documento, name="baixar_documento"),
     path("<int:pk>/excluir/", views.excluir, name="excluir"),
+    path("<int:pk>/cancelar/", views.cancelar, name="cancelar"),
 ]

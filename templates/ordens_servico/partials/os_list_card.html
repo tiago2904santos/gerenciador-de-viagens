@@ -14,7 +14,16 @@
       {% if card.temporal_label %}
       {% include "components/ui/badges/chip.html" with tone=card.temporal_tone label=card.temporal_label extra_class="oficio-lc__temporal-chip" only %}
       {% endif %}
+      {% if card.cancelado %}
+      {% include "components/ui/badges/chip.html" with tone="danger" label="Cancelada" extra_class="oficio-lc__temporal-chip" only %}
+      {% endif %}
     </div>
+
+    {% if card.cancelado and card.motivo_cancelamento %}
+    <div class="oficio-lc__section">
+      <p class="oficio-lc__empty-hint"><strong>Motivo do cancelamento:</strong> {{ card.motivo_cancelamento }}</p>
+    </div>
+    {% endif %}
 
     {# ── SERVIDORES ── #}
     <div class="oficio-lc__section">

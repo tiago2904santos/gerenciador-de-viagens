@@ -1723,6 +1723,73 @@ body.has-delete-modal-open {
   }
 }
 
+.cancel-reason-modal__form {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.cancel-reason-modal__field {
+  margin: 0;
+}
+
+.cancel-reason-modal__textarea {
+  min-height: 96px;
+  resize: vertical;
+  width: 100%;
+}
+
+/* Menu de ações (⋮) — junta Cancelar/Excluir num único botão */
+.cv-action-menu {
+  background: var(--surface-list-panel);
+  border: 1px solid var(--border-list-panel);
+  border-radius: var(--radius-md);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 180px;
+  padding: var(--space-2);
+  z-index: var(--z-modal, 1000);
+}
+
+.cv-action-menu--open {
+  display: flex;
+}
+
+.cv-action-menu__item {
+  align-items: center;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--theme-text-heading);
+  cursor: pointer;
+  display: flex;
+  font-size: var(--font-size-sm);
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+  width: 100%;
+}
+
+.cv-action-menu__item:hover,
+.cv-action-menu__item:focus-visible {
+  background: var(--color-surface-muted);
+}
+
+.cv-action-menu__item .cv-icon {
+  flex: 0 0 auto;
+  height: 16px;
+  width: 16px;
+}
+
+.cv-action-menu__item--cancel {
+  color: var(--color-warning);
+}
+
+.cv-action-menu__item--delete {
+  color: var(--color-danger);
+}
+
 
 /* =========================================================
    17. Quick Create Inline
@@ -2120,6 +2187,25 @@ body.has-delete-modal-open {
   background: var(--route-status-muted-bg);
   border:     1px solid var(--route-status-muted-border);
   color:      var(--route-status-muted-text);
+}
+
+.page-header-status-chip--danger {
+  background: var(--color-danger-soft);
+  border:     1px solid var(--color-danger-border-soft);
+  color:      var(--color-danger);
+}
+
+/* Alerta inline simples (ex.: aviso de cancelamento) */
+.cv-alert {
+  border-radius: var(--radius-md, 8px);
+  padding:       var(--space-3) var(--space-4);
+  font-size:     var(--font-size-sm);
+}
+
+.cv-alert--danger {
+  background: var(--color-danger-soft);
+  border:     1px solid var(--color-danger-border-soft);
+  color:      var(--color-danger);
 }
 
 

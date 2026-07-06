@@ -697,6 +697,13 @@ def excluir_oficio(instance):
         raise OficioVinculadoError from exc
 
 
+def cancelar_oficio(instance: Oficio, motivo: str) -> Oficio:
+    """Cancela o ofício. A partir daí ele não gera novas prestações de contas
+    e não pode mais ser selecionado para compor uma nova Ordem de Serviço."""
+    instance.cancelar(motivo)
+    return instance
+
+
 def build_oficio_document_payload(oficio):
     viatura_label = ""
     if oficio.viatura_id:

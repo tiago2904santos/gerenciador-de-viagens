@@ -168,7 +168,7 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None):
 
     destino = _destino_display_oficio(oficio)
     data_evento = _data_evento_display_oficio(oficio)
-    temporal_label, temporal_tone = _temporal_badge_oficio(oficio)
+    temporal_label, temporal_tone = ("", "") if oficio.cancelado else _temporal_badge_oficio(oficio)
 
     # Trechos e diárias do roteiro
     trechos_display = []
@@ -243,10 +243,17 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None):
     except Exception:
         pass
 
-    status_chip_tone = (
-        "success" if oficio.status in {Oficio.STATUS_GERADO, Oficio.STATUS_FINALIZADO}
-        else ("muted" if oficio.status == Oficio.STATUS_ARQUIVADO else "warning")
-    )
+    if oficio.cancelado:
+        status_chip_label = "Cancelado"
+        status_chip_tone = "danger"
+        status_variant = "cancelado"
+    else:
+        status_chip_label = oficio.get_status_display()
+        status_chip_tone = (
+            "success" if oficio.status in {Oficio.STATUS_GERADO, Oficio.STATUS_FINALIZADO}
+            else ("muted" if oficio.status == Oficio.STATUS_ARQUIVADO else "warning")
+        )
+        status_variant = oficio.status.lower() if oficio.status else "outro"
 
     data_criacao_display = ""
     if oficio.data_criacao:
@@ -262,9 +269,12 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None):
         "data_criacao_display": data_criacao_display,
         "destino_display": destino,
         "data_evento_display": data_evento,
-        "status_chip_label": oficio.get_status_display(),
+        "status_chip_label": status_chip_label,
         "status_chip_tone": status_chip_tone,
-        "status_variant": oficio.status.lower() if oficio.status else "outro",
+        "status_variant": status_variant,
+        "cancelado": oficio.cancelado,
+        "motivo_cancelamento": oficio.motivo_cancelamento,
+        "cancelar_url": reverse("oficios:cancelar", args=[oficio.pk]),
         "temporal_label": temporal_label,
         "temporal_tone": temporal_tone,
         "servidores": servidores_display,

@@ -15,6 +15,12 @@
       {% include "components/ui/badges/chip.html" with tone=card.status_state label=card.status_label extra_class="oficio-lc__temporal-chip" only %}
     </div>
 
+    {% if card.cancelado and card.motivo_cancelamento %}
+    <div class="oficio-lc__section">
+      <p class="oficio-lc__empty-hint"><strong>Motivo do cancelamento:</strong> {{ card.motivo_cancelamento }}</p>
+    </div>
+    {% endif %}
+
     {# ── SOLICITANTE E COORDENADORES (mesmo visual dos servidores do ofício) ── #}
     {% if card.participantes %}
     <div class="oficio-lc__section">

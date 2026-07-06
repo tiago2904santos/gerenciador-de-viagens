@@ -1,5 +1,6 @@
 # Eventos serao agrupadores OPCIONAIS de documentos, nao fluxo obrigatorio.
 from django.db import models
+from django.utils import timezone
 
 from core.normalizers import normalize_spaces
 from core.normalizers import normalize_upper
@@ -64,6 +65,8 @@ class Evento(models.Model):
     destinos_extras = models.JSONField("Destinos adicionais", default=list, blank=True)
     motivo = models.TextField("Motivo", blank=True, default="")
     status = models.CharField(max_length=30, choices=STATUS_CHOICES, default=STATUS_RASCUNHO)
+    motivo_cancelamento = models.TextField("Motivo do cancelamento", blank=True, default="")
+    cancelado_em = models.DateTimeField("Cancelado em", null=True, blank=True)
     drive_folder_id = models.CharField("ID da pasta no Drive", max_length=255, blank=True, default="")
     drive_folder_url = models.URLField("URL da pasta no Drive", blank=True, default="")
     criado_em = models.DateTimeField(auto_now_add=True)
@@ -98,6 +101,20 @@ class Evento(models.Model):
         if not self.pk:
             return ""
         return " / ".join(self.tipos.values_list("nome", flat=True))
+
+    def cancelar(self, motivo: str) -> None:
+        """Cancela o evento e cascateia o cancelamento para todos os documentos vinculados."""
+        motivo = (motivo or "").strip()
+        self.status = self.STATUS_CANCELADO
+        self.motivo_cancelamento = motivo
+        self.cancelado_em = timezone.now()
+        self.save(update_fields=["status", "motivo_cancelamento", "cancelado_em"])
+
+        motivo_cascade = f"Evento cancelado: {motivo}" if motivo else "Evento cancelado."
+        for related_name in ("oficios", "ordens_servico", "planos_trabalho", "termos_autorizacao", "roteiros"):
+            manager = getattr(self, related_name)
+            for documento in manager.filter(cancelado=False):
+                documento.cancelar(motivo_cascade)
 
 
 class TipoEvento(TimeStampedModel):

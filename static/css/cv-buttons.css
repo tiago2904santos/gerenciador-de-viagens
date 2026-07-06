@@ -669,6 +669,19 @@ html[data-theme="light"] {
   border-color: #7a1a14;
 }
 
+/* Cancelar — amber de alerta (distinto do vermelho de exclusão) */
+.cv-icon-btn--cancel {
+  background: linear-gradient(135deg, #b8860b 0%, var(--color-warning) 100%);
+  border-color: #8a660a;
+  color: var(--color-white);
+}
+
+.cv-icon-btn--cancel:hover,
+.cv-icon-btn--cancel:focus {
+  background: linear-gradient(135deg, #9c7209 0%, #b8860b 100%);
+  border-color: #75570a;
+}
+
 /* Preview — teal informativo (olho) */
 .cv-icon-btn--preview {
   background: var(--cv-btn-preview-bg);

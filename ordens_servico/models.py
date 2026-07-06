@@ -3,13 +3,14 @@ from __future__ import annotations
 from django.db import models
 from django.utils import timezone
 
+from cadastros.models import CancelavelModel
 from cadastros.models import Cidade
 from cadastros.models import Servidor
 from cadastros.models import TimeStampedModel
 from oficios.models import Oficio
 
 
-class OrdemServico(TimeStampedModel):
+class OrdemServico(TimeStampedModel, CancelavelModel):
     numero = models.PositiveIntegerField(null=True, blank=True, db_index=True)
     ano = models.PositiveIntegerField(null=True, blank=True, db_index=True)
     evento = models.ForeignKey(

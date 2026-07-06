@@ -3,12 +3,13 @@ from decimal import Decimal, InvalidOperation
 from django.db import models
 from django.utils import timezone
 
+from cadastros.models import CancelavelModel
 from cadastros.models import Cidade
 from cadastros.models import Estado
 from cadastros.models import TimeStampedModel
 
 
-class Roteiro(models.Model):
+class Roteiro(CancelavelModel):
     """
     Roteiro avulso (e futuramente vinculado a evento), alinhado ao legacy `RoteiroEvento`.
     """

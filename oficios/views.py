@@ -81,6 +81,7 @@ from .selectors import listar_servidores_para_oficio
 from .selectors import listar_viaturas_para_oficio
 from .services import atualizar_modelo_motivo
 from .services import OficioVinculadoError
+from .services import cancelar_oficio
 from .services import atualizar_oficio_dados_viajantes
 from .services import atualizar_oficio_transporte
 from .services import avaliar_oficio_dados_viajantes
@@ -1302,6 +1303,30 @@ def excluir(request, pk):
         messages.success(request, "Ofício excluído com sucesso.")
         return redirect(next_url) if next_url else _fallback_url()
     return redirect(_oficio_back_url(oficio))
+
+
+@require_POST
+def cancelar(request, pk):
+    oficio = get_oficio_by_id(pk)
+    next_url = _safe_next_url(request, "")
+
+    def _fallback_url():
+        if oficio.evento_id:
+            return redirect("eventos:guiado_etapa", pk=oficio.evento_id, etapa=3)
+        return redirect("oficios:index")
+
+    if oficio.cancelado:
+        messages.error(request, "Este ofício já está cancelado.")
+        return redirect(next_url) if next_url else _fallback_url()
+
+    motivo = (request.POST.get("motivo") or "").strip()
+    if not motivo:
+        messages.error(request, "Informe o motivo do cancelamento.")
+        return redirect(next_url) if next_url else _fallback_url()
+
+    cancelar_oficio(oficio, motivo)
+    messages.success(request, "Ofício cancelado. Ele não gera mais prestação de contas nem pode ser usado em novas Ordens de Serviço.")
+    return redirect(next_url) if next_url else _fallback_url()
 
 
 def modelos_motivo_index(request):

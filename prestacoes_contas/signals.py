@@ -6,6 +6,9 @@ from django.dispatch import receiver
 def _criar_prestacoes(oficio, servidor_ids=None):
     from .models import PrestacaoContas
 
+    if oficio.cancelado:
+        return
+
     servidores = oficio.servidores.all()
     if servidor_ids is not None:
         servidores = servidores.filter(pk__in=servidor_ids)

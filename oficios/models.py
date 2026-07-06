@@ -2,6 +2,7 @@ from django.db import models
 from django.db.models import Q
 from django.utils import timezone
 
+from cadastros.models import CancelavelModel
 from cadastros.models import Combustivel
 from cadastros.models import Servidor
 from cadastros.models import TimeStampedModel
@@ -13,7 +14,7 @@ from core.utils.masks import normalize_protocolo
 from roteiros.models import Roteiro
 
 
-class Oficio(TimeStampedModel):
+class Oficio(TimeStampedModel, CancelavelModel):
     STATUS_RASCUNHO = "RASCUNHO"
     STATUS_GERADO = "GERADO"
     STATUS_FINALIZADO = "FINALIZADO"

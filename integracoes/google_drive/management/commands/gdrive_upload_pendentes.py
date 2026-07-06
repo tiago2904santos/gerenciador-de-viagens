@@ -22,9 +22,13 @@ class Command(BaseCommand):
         from integracoes.google_drive.models import DriveArquivo
         from integracoes.google_drive.services import upload_artefato
 
+        # Só PDF sobe ao Drive (DOCX/XLSX ficam só no sistema local) — sem esse
+        # filtro, artefatos não-PDF nunca ganhariam DriveArquivo e apareceriam
+        # sempre como "pendentes", mesmo sem nada de errado.
         enviados_ids = DriveArquivo.objects.values_list("artefato_id", flat=True)
         pendentes = (
-            DocumentoArtefato.objects.exclude(pk__in=enviados_ids)
+            DocumentoArtefato.objects.filter(formato__iexact="pdf")
+            .exclude(pk__in=enviados_ids)
             .order_by("criado_em")[: options["limite"]]
         )
 

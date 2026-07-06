@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from django import forms
+from django.db.models import Q
 
 from cadastros.form_widgets import ServidorEquipeSelectMultiple
 from cadastros.models import Cidade
@@ -118,10 +119,12 @@ class OrdemServicoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        ja_vinculados = list(self.instance.oficios.values_list("pk", flat=True)) if self.instance.pk else []
         self.fields["oficios"].required = False
         self.fields["oficios"].queryset = (
             Oficio.objects
             .select_related("roteiro", "viatura")
+            .filter(Q(cancelado=False) | Q(pk__in=ja_vinculados))
             .order_by("-data_criacao", "-created_at")
         )
 

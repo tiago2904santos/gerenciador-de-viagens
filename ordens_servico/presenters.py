@@ -150,6 +150,8 @@ def apresentar_ordem_servico_card(ordem):
         "servidores": _servidores_display_os(ordem),
         "servidores_count": ordem.servidores.count(),
         "oficios_vinculados": _oficios_vinculados_os(ordem),
+        "cancelado": ordem.cancelado,
+        "motivo_cancelamento": ordem.motivo_cancelamento,
         "motivo": motivo,
         "motivo_resumido": motivo_resumido,
         "assinante": _get_assinante_os(),

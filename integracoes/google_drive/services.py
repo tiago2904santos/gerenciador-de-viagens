@@ -126,6 +126,15 @@ class _MockClient:
         )
         return fake_id
 
+    def atualizar_conteudo(
+        self, file_id: str, novo_nome: str, conteudo: bytes, mimetype: str, pasta_id: str | None = None
+    ) -> tuple[str, str]:
+        logger.info(
+            "[Drive MOCK] atualizar_conteudo (sobrescrever) file_id=%s nome=%s pasta_id=%s",
+            file_id, novo_nome, pasta_id,
+        )
+        return file_id, f"https://drive.google.com/mock/{file_id}"
+
     def listar_pastas(self, pai_id: str | None = None) -> list[dict]:
         return [
             {"id": "mock-pasta-documentos", "name": "Documentos (mock)"},
@@ -324,6 +333,30 @@ class _RealClient:
         result = self._svc.files().create(body=meta, fields="id", supportsAllDrives=True).execute()
         logger.info("[Drive] atalho criado nome=%s target=%s → id=%s", nome, target_id, result["id"])
         return result["id"]
+
+    def atualizar_conteudo(
+        self, file_id: str, novo_nome: str, conteudo: bytes, mimetype: str, pasta_id: str | None = None
+    ) -> tuple[str, str]:
+        """Sobrescreve o conteúdo de um arquivo já existente (mesmo ``file_id``).
+
+        Usado quando o usuário edita e regera um documento: em vez de criar um
+        segundo arquivo no Drive, substitui o conteúdo do arquivo já enviado.
+        """
+        from googleapiclient.http import MediaIoBaseUpload
+
+        media = MediaIoBaseUpload(io.BytesIO(conteudo), mimetype=mimetype, resumable=False)
+        result = (
+            self._svc.files()
+            .update(
+                fileId=file_id, body={"name": novo_nome}, media_body=media,
+                fields="id,webViewLink", supportsAllDrives=True,
+            )
+            .execute()
+        )
+        if pasta_id:
+            self.mover_renomear(file_id, novo_nome, pasta_id)
+        logger.info("[Drive] conteúdo sobrescrito file_id=%s nome=%s", file_id, novo_nome)
+        return result["id"], result.get("webViewLink", "")
 
 
 # ---------------------------------------------------------------------------

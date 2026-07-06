@@ -260,7 +260,9 @@ class EventoNovoCadastroForm(forms.ModelForm):
                 self.initial["destino_uf"] = uf_padrao
 
         evento_pk = self.instance.pk if self.instance else None
-        nao_vinculado_ou_deste_evento = Q(evento__isnull=True) | Q(evento_id=evento_pk)
+        # Documentos cancelados não entram como opção para NOVA vinculação, mas
+        # continuam visíveis se já estiverem vinculados a este evento.
+        nao_vinculado_ou_deste_evento = Q(evento_id=evento_pk) | Q(evento__isnull=True, cancelado=False)
 
         self.fields["oficios_vinculados"].queryset = (
             Oficio.objects.select_related("roteiro", "viatura")
