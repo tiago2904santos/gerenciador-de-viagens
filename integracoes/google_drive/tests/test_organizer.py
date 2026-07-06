@@ -68,31 +68,32 @@ class OrganizerTests(TestCase):
         self.assertEqual(DriveArquivo.objects.filter(artefato=art).count(), 1)
 
     def test_planejar_oficio_monta_arvore(self):
+        """O CANÔNICO (arquivo real) fica sempre na pasta global do tipo, tenha
+        evento ou não — dentro de Eventos/ existe apenas um atalho."""
         self._artefato("oficio")
         linhas = organizer.planejar_oficio(self.oficio)
         self.assertIn(
-            "Eventos/PCPR na Comunidade - Maringá - 22 a 23 jul 2026/"
-            "Ofício 01 protocolo 12.345.678-9 Ana e Bruno (Maringá)/"
+            "Ofícios/Ofício 01 protocolo 12.345.678-9 Ana e Bruno (Maringá)/"
             "Ofício 01-2026 protocolo 12.345.678-9 Ana e Bruno (Maringá).pdf",
             linhas,
         )
 
-    def test_os_e_plano_ficam_no_nivel_do_evento(self):
-        self._artefato("ordem_servico", name="os.pdf")
-        self._artefato("plano_trabalho", name="plano.pdf")
+    def test_os_e_plano_canonicos_ficam_na_pasta_global_do_tipo(self):
+        """OS e plano: o CANÔNICO vive em Ordens de serviço/Planos de trabalho
+        (pasta global) — dentro do evento existe só um atalho, no nível do
+        evento (não dentro da pasta do ofício)."""
+        art_os = self._artefato("ordem_servico", name="os.pdf")
+        art_plano = self._artefato("plano_trabalho", name="plano.pdf")
         linhas = organizer.planejar_oficio(self.oficio)
-        evento_dir = "Eventos/PCPR na Comunidade - Maringá - 22 a 23 jul 2026"
-        oficio_dir = f"{evento_dir}/Ofício 01 protocolo 12.345.678-9 Ana e Bruno (Maringá)"
-        # OS e plano ficam direto na pasta do evento, não dentro da pasta do ofício.
-        self.assertTrue(any(
-            l.startswith(f"{evento_dir}/Ordem de serviço") for l in linhas
-        ), linhas)
-        self.assertTrue(any(
-            l.startswith(f"{evento_dir}/Plano de trabalho") for l in linhas
-        ), linhas)
-        self.assertFalse(any(
-            l.startswith(f"{oficio_dir}/Ordem de serviço") for l in linhas
-        ), linhas)
+        self.assertTrue(any(l.startswith("Ordens de serviço/") for l in linhas), linhas)
+        self.assertTrue(any(l.startswith("Planos de trabalho/") for l in linhas), linhas)
+
+        organizer.organizar_artefato(art_os)
+        reg_os = DriveArquivo.objects.get(artefato=art_os)
+        self.assertTrue(reg_os.atalho_id)
+        client = services.get_client()
+        pasta_evento_id = organizer._pasta_evento_folder(client, self.evento)
+        self.assertEqual(reg_os.atalho_pasta_id, pasta_evento_id)
 
     def test_oficio_sem_evento_vai_para_pasta_de_tipo(self):
         self.oficio.evento = None

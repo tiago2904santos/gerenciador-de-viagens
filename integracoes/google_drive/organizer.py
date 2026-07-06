@@ -2,24 +2,29 @@
 
 Estrutura-alvo (a partir da pasta raiz escolhida pelo usuário):
 
+    Ofícios/ Planos de trabalho/ Ordens de serviço/ Termos/ Justificativas/
+        <ofício ou item>/arquivo.pdf                 <- CANÔNICO (arquivo real),
+        sempre aqui, tenha o documento evento ou não.
+    Prestação de contas dos ofícios sem evento seguem dentro da própria
+    pasta do ofício (``Ofícios/<pasta_oficio>/Prestação de contas/...``).
+
     Eventos/
       <Tipo - Cidade - Período>/                    (Cidade em Title Case)
         <Ofício NN protocolo ... Servidores (Cidade)>/
-          Ofício NN-AAAA ... (Cidade).pdf            (canônico)
-          Justificativa ...                          (canônico)
-          Termos/ Termo de autorização ... Servidor (Cidade).pdf
+          Ofício NN-AAAA ... (Cidade).pdf            (ATALHO -> Ofícios/...)
+          Justificativa ...                          (ATALHO -> Justificativas/...)
+          Termos/ Termo de autorização ... Servidor (Cidade).pdf  (ATALHO -> Termos/...)
           Prestação de contas/
             Anexo solicitação ... (Cidade).<ext>
             Prestação <Servidor>/ ... (RT, diário, despacho, comprovante)
-        Ordem de serviço ...                         (canônico; nível do evento)
-        Plano de trabalho PP-AAAA ... (Cidade).pdf   (canônico; nível do evento)
+        Ordem de serviço ...                    (ATALHO -> Ordens de serviço/...; nível do evento)
+        Plano de trabalho PP-AAAA ... (Cidade).pdf  (ATALHO -> Planos de trabalho/...; nível do evento)
         Convite (Cidade).<ext>                       (EventoAnexo; nível do evento)
-    Ofícios/ Planos de trabalho/ Ordens de serviço/ Termos/ Justificativas/
-        <- agregadoras globais por tipo (ATALHOS p/ os canônicos com evento)
     Prestações de contas/  <- atalhos de pasta p/ cada "Prestação <Servidor>"
 
-Documentos SEM evento têm o canônico direto na pasta de tipo global
-(``Planos de trabalho/<ofício>/arquivo``) — não existe mais "Avulsos".
+O canônico (arquivo real) vive SEMPRE na pasta global do tipo — dentro de
+Eventos/ só existem ATALHOS, para facilitar a navegação por evento sem
+duplicar conteúdo.
 
 Tudo é idempotente: reexecutar move/renomeia (e reusa atalhos) em vez de
 duplicar (reusa ``get_or_create_pasta`` e os registros ``DriveArquivo`` /
@@ -249,24 +254,22 @@ def organizar_artefato(artefato) -> tuple[str, str] | None:
         tipo, formato, oficio, getattr(artefato, "servidor", None), servidores, cidade
     )
 
+    # Canônico: SEMPRE na pasta global do tipo (Ofícios/Termos/Planos de trabalho/
+    # Ordens de serviço/Justificativas), com subpasta por ofício quando aplicável —
+    # independente de o documento pertencer a um evento ou ser avulso.
+    canonica = _oficio_folder_no_evento(client, tipo, oficio, servidores)
+
+    atalho_pasta = None
     if evento is not None:
-        oficio_folder = _oficio_folder_com_evento(client, evento, oficio, servidores)
+        # Dentro de Eventos/, tudo é ATALHO apontando para o canônico acima.
+        oficio_folder_evento = _oficio_folder_com_evento(client, evento, oficio, servidores)
         if tipo == "termo_autorizacao":
-            canonica = _pasta_termos(client, oficio_folder)
+            atalho_pasta = _pasta_termos(client, oficio_folder_evento)
         elif tipo in ("ordem_servico", "plano_trabalho"):
             # OS e plano ficam diretamente na pasta do evento (não dentro do ofício).
-            canonica = _pasta_evento_folder(client, evento)
+            atalho_pasta = _pasta_evento_folder(client, evento)
         else:
-            canonica = oficio_folder
-        atalho_pasta = _pasta_tipo_global(client, tipo)
-    else:
-        # Sem evento: canônico já vive na pasta de tipo global (sem atalho).
-        if tipo == "termo_autorizacao":
-            base = _oficio_folder_no_evento(client, tipo, oficio, servidores)
-            canonica = base
-        else:
-            canonica = _oficio_folder_no_evento(client, tipo, oficio, servidores)
-        atalho_pasta = None
+            atalho_pasta = oficio_folder_evento
 
     return _persistir_artefato(artefato, canonica, nome, atalho_pasta_id=atalho_pasta)
 
@@ -519,31 +522,70 @@ def _garantir_termos(oficio) -> None:
 
 
 def _garantir_ordens_servico(oficio) -> None:
-    """Regenera (e persiste) a Ordem de Serviço do ofício, se ainda não houver artefato.
+    """Regenera (e persiste) a Ordem de Serviço vinculada ao ofício, se faltar.
 
-    Geração é sempre a partir do ofício (não de uma ``OrdemServico`` específica);
-    a persistência acontece dentro de ``gerar_resposta_ordem_servico_documento``
-    (cache/dedupe por conteúdo).
+    Usa ``gerar_os_pdf_response`` (contexto real da ``OrdemServico``, com os
+    servidores efetivamente designados) — NUNCA ``gerar_resposta_ordem_servico_documento``,
+    que gera uma versão RASCUNHO em branco (``em_elaboracao=True``, sem saber
+    qual servidor foi designado) e não deve ir para o Drive.
+
+    Só o "ofício âncora" (primeiro vinculado à OS) dispara a geração, evitando
+    persistir a mesma OS várias vezes quando ela cobre vários ofícios.
+    """
+    try:
+        from ordens_servico.services import gerar_os_pdf_response
+    except Exception:
+        return
+
+    try:
+        ordens = list(oficio.ordens_servico.all())
+    except Exception:
+        return
+    for ordem in ordens:
+        oficio_ancora = ordem.oficios.first()
+        if oficio_ancora is None or oficio_ancora.pk != oficio.pk:
+            continue
+        if oficio.documentos_gerados.filter(tipo="ordem_servico").exists():
+            continue
+        try:
+            gerar_os_pdf_response(ordem)
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("[Drive] backfill ordem de serviço (OS %s) falhou: %s", ordem.pk, exc)
+
+
+def _garantir_documento_oficio(oficio) -> None:
+    """Regenera (e persiste) o ofício canônico e, se aplicável, a justificativa.
+
+    A justificativa só é gerada quando é EXIGIDA e já está FINALIZADA — caso
+    contrário o documento sairia com o texto em branco.
     """
     from documentos.services.types import DocumentoFormato
 
-    try:
-        from ordens_servico.services import gerar_resposta_ordem_servico_documento
-    except Exception:
-        return
+    if not oficio.documentos_gerados.filter(tipo="oficio").exists():
+        try:
+            from oficios.services import gerar_resposta_documento_oficio
 
-    try:
-        tem_os = oficio.ordens_servico.exists()
-    except Exception:
-        return
-    if not tem_os:
-        return
-    if oficio.documentos_gerados.filter(tipo="ordem_servico").exists():
-        return
-    try:
-        gerar_resposta_ordem_servico_documento(oficio, DocumentoFormato.PDF)
-    except Exception as exc:  # noqa: BLE001
-        logger.warning("[Drive] backfill ordem de serviço (oficio %s) falhou: %s", oficio.pk, exc)
+            gerar_resposta_documento_oficio(oficio, DocumentoFormato.PDF)
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("[Drive] backfill ofício (oficio %s) falhou: %s", oficio.pk, exc)
+
+    if not oficio.documentos_gerados.filter(tipo="justificativa").exists():
+        try:
+            from justificativas.models import Justificativa
+            from justificativas.services import oficio_exige_justificativa
+
+            justificativa = getattr(oficio, "justificativa", None)
+            pronta = (
+                justificativa is not None
+                and justificativa.status == Justificativa.STATUS_FINALIZADA
+                and (justificativa.texto or "").strip()
+            )
+            if oficio_exige_justificativa(oficio) and pronta:
+                from oficios.services import gerar_resposta_justificativa_documento
+
+                gerar_resposta_justificativa_documento(oficio, DocumentoFormato.PDF)
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("[Drive] backfill justificativa (oficio %s) falhou: %s", oficio.pk, exc)
 
 
 def _garantir_planos(evento) -> None:
@@ -583,7 +625,8 @@ def _garantir_planos(evento) -> None:
 # ---------------------------------------------------------------------------
 
 def organizar_oficio(oficio) -> None:
-    """Organiza todos os artefatos e prestações de um ofício (+ backfill de termos/OS)."""
+    """Organiza todos os artefatos e prestações de um ofício (+ backfill)."""
+    _garantir_documento_oficio(oficio)
     _garantir_termos(oficio)
     _garantir_ordens_servico(oficio)
     for artefato in oficio.documentos_gerados.all():
@@ -634,21 +677,13 @@ def _caminho_base_oficio(oficio, servidores) -> str:
 
 
 def _caminho_artefato(artefato, oficio, servidores, cidade) -> str:
+    """Caminho do CANÔNICO (arquivo real) — sempre na pasta global do tipo,
+    tenha o documento evento ou não (dentro de Eventos/ existe só um atalho)."""
     tipo = artefato.tipo or "oficio"
     formato = artefato.formato or "pdf"
     nome = (artefato.nome_drive or "").strip() or _derivar_nome_artefato(
         tipo, formato, oficio, getattr(artefato, "servidor", None), servidores, cidade
     )
-    evento = getattr(artefato, "evento", None) or getattr(oficio, "evento", None)
-    if evento is not None:
-        evento_base = f"{naming.PASTA_EVENTOS}/{naming.pasta_evento(evento)}"
-        oficio_base = f"{evento_base}/{naming.pasta_oficio(oficio, servidores, cidade)}"
-        if tipo == "termo_autorizacao":
-            return f"{oficio_base}/{naming.PASTA_TERMOS}/{nome}"
-        if tipo in ("ordem_servico", "plano_trabalho"):
-            # OS e plano ficam diretamente na pasta do evento.
-            return f"{evento_base}/{nome}"
-        return f"{oficio_base}/{nome}"
     base = naming.pasta_tipo(tipo)
     if oficio is not None:
         return f"{base}/{naming.pasta_oficio(oficio, servidores, cidade)}/{nome}"

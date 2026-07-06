@@ -135,6 +135,9 @@ class _MockClient:
         )
         return file_id, f"https://drive.google.com/mock/{file_id}"
 
+    def excluir_arquivo(self, file_id: str) -> None:
+        logger.info("[Drive MOCK] excluir_arquivo file_id=%s", file_id)
+
     def listar_pastas(self, pai_id: str | None = None) -> list[dict]:
         return [
             {"id": "mock-pasta-documentos", "name": "Documentos (mock)"},
@@ -357,6 +360,14 @@ class _RealClient:
             self.mover_renomear(file_id, novo_nome, pasta_id)
         logger.info("[Drive] conteúdo sobrescrito file_id=%s nome=%s", file_id, novo_nome)
         return result["id"], result.get("webViewLink", "")
+
+    def excluir_arquivo(self, file_id: str) -> None:
+        """Exclui (definitivamente) um arquivo/atalho do Drive pelo ID."""
+        try:
+            self._svc.files().delete(fileId=file_id, supportsAllDrives=True).execute()
+            logger.info("[Drive] arquivo excluído file_id=%s", file_id)
+        except Exception as exc:
+            logger.warning("[Drive] falha ao excluir file_id=%s: %s", file_id, exc)
 
 
 # ---------------------------------------------------------------------------

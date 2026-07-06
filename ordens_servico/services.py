@@ -123,6 +123,36 @@ def gerar_os_docx_response(ordem: OrdemServico):
     )
 
 
+def _persistir_ordem_servico_artefato(ordem: OrdemServico, doc) -> None:
+    """Persiste a OS gerada (conteúdo real, com os servidores designados) como
+    ``DocumentoArtefato`` — para auto-organização/upload no Drive.
+
+    Idempotente por conteúdo (hash). Nunca quebra a geração/download em caso de falha.
+    """
+    try:
+        from documentos.models import DocumentoArtefato
+        from documentos.services.persistence import persist_geracao
+        from integracoes.google_drive import naming
+
+        if DocumentoArtefato.objects.filter(
+            tipo=DocumentoTipo.ORDEM_SERVICO.value, hash_sha256=doc.hash_sha256
+        ).exists():
+            return
+        oficio = ordem.oficios.first()
+        if oficio is None:
+            return
+        servidores = list(oficio.servidores.all())
+        cidade = naming.cidade_evento(getattr(oficio, "evento", None), oficio)
+        persist_geracao(
+            doc,
+            oficio_id=oficio.pk,
+            evento_id=getattr(oficio, "evento_id", None),
+            nome_drive=naming.nome_os(oficio, servidores, cidade),
+        )
+    except Exception:
+        logger.warning("Não foi possível persistir artefato da ordem de serviço.", exc_info=True)
+
+
 def gerar_os_pdf_response(ordem: OrdemServico):
     """Gera e retorna HttpResponse com o PDF da Ordem de Serviço."""
     ctx = build_os_docxtpl_context(ordem)
@@ -140,6 +170,7 @@ def gerar_os_pdf_response(ordem: OrdemServico):
         docx_template_path="ordem_servico.docx",
         reference=reference,
     )
+    _persistir_ordem_servico_artefato(ordem, doc)
     return build_download_response(
         content=doc.conteudo,
         tipo=DocumentoTipo.ORDEM_SERVICO,
