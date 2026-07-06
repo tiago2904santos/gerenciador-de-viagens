@@ -401,6 +401,7 @@ def detalhe(request, pk, etapa=1):
             _save_destinos_extras(evento, request)
             evento.save()
             form.save_m2m()
+            form.sincronizar_documentos_vinculados(evento)
             _garantir_termo_automatico(evento)
             messages.success(request, "Dados do evento atualizados.")
             return redirect("eventos:guiado_etapa", pk=evento.pk, etapa=2)

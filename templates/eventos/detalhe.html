@@ -211,12 +211,38 @@
                   </div>
                 </div>
               </div>
+            </section>
+
+            {# CARD 3 — Documentos já existentes #}
+            <section class="cv-wizard-section-card termo-card" id="evento-card-documentos-d">
+              <header class="cv-wizard-section-header">
+                <div class="cv-wizard-section-header__copy">
+                  <h2 class="cv-wizard-section-title">3. Documentos já existentes</h2>
+                  <p class="cv-wizard-section-subtitle">Vincule ofícios, ordens de serviço, planos de trabalho, termos e roteiros já criados a este evento. Desmarque para desvincular.</p>
+                </div>
+              </header>
+              <div class="cv-wizard-section-body">
+                <div class="field-grid">
+                  {% include "components/forms/form_field.html" with field=form.oficios_vinculados only %}
+                </div>
+                <div class="field-grid">
+                  {% include "components/forms/form_field.html" with field=form.ordens_servico_vinculadas only %}
+                </div>
+                <div class="field-grid">
+                  {% include "components/forms/form_field.html" with field=form.planos_trabalho_vinculados only %}
+                </div>
+                <div class="field-grid">
+                  {% include "components/forms/form_field.html" with field=form.termos_vinculados only %}
+                </div>
+                <div class="field-grid">
+                  {% include "components/forms/form_field.html" with field=form.roteiros_vinculados only %}
+                </div>
+              </div>
               {% url 'eventos:index' as back_url_eventos %}
               {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar à lista" secondary_url=back_url_eventos primary_label="Salvar e avançar" primary_action="wizard_next" only %}
               {% endwith %}
             </section>
 
-            
           </form>
 
           <script src="{% static 'js/pages/oficios-dados-viajantes.js' %}?v=20260618-eventos-det" defer></script>

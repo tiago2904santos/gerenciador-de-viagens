@@ -1,11 +1,84 @@
 from django import forms
+from django.db.models import Q
+from django.utils import timezone
 
 from cadastros.models import ConfiguracaoSistema
 from oficios.forms import ModeloMotivoSelect
 from oficios.models import ModeloMotivoOficio
+from oficios.models import Oficio
+from ordens_servico.forms import OficioMultiSelectWidget
+from ordens_servico.models import OrdemServico
+from planos_trabalho.models import PlanoTrabalho
+from roteiros.models import Roteiro
+from termos.models import TermoAutorizacao
 
 from .models import Evento
 from .models import TipoEvento
+
+_DOCUMENTOS_VINCULAVEIS = [
+    ("oficios_vinculados", "oficios"),
+    ("ordens_servico_vinculadas", "ordens_servico"),
+    ("planos_trabalho_vinculados", "planos_trabalho"),
+    ("termos_vinculados", "termos_autorizacao"),
+    ("roteiros_vinculados", "roteiros"),
+]
+
+
+def _periodo_roteiro(roteiro) -> str:
+    inicio = roteiro.saida_dt
+    fim = roteiro.retorno_chegada_dt or roteiro.chegada_dt or roteiro.retorno_saida_dt
+    if not inicio:
+        return ""
+
+    def _fmt(dt):
+        if timezone.is_aware(dt):
+            dt = timezone.localtime(dt)
+        return dt.strftime("%d/%m/%Y")
+
+    if not fim or fim == inicio:
+        return _fmt(inicio)
+    return f"{_fmt(inicio)} a {_fmt(fim)}"
+
+
+class _VinculoMultiSelectWidget(forms.SelectMultiple):
+    """Base dos pickers de documentos já existentes vinculáveis a um evento."""
+
+    def option_display(self, instance):
+        raise NotImplementedError
+
+    def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+        option = super().create_option(name, value, label, selected, index, subindex=subindex, attrs=attrs)
+        instance = getattr(value, "instance", None)
+        if instance is None:
+            return option
+        main, meta = self.option_display(instance)
+        option["label"] = main
+        option["attrs"].update({
+            "data-main": main,
+            "data-meta": meta,
+            "data-search": " ".join(p for p in [main, meta, str(instance.pk)] if p),
+        })
+        return option
+
+
+class OrdemServicoMultiSelectWidget(_VinculoMultiSelectWidget):
+    def option_display(self, ordem):
+        return ordem.numero_formatado, f"{ordem.periodo_display} - {ordem.destinos_display}"
+
+
+class PlanoTrabalhoMultiSelectWidget(_VinculoMultiSelectWidget):
+    def option_display(self, plano):
+        return f"PT {plano.numero_formatado}", f"{plano.programa_display} - {plano.periodo_display}"
+
+
+class TermoAutorizacaoMultiSelectWidget(_VinculoMultiSelectWidget):
+    def option_display(self, termo):
+        return f"Termo #{termo.pk}", f"{termo.destino_display} - {termo.periodo_display}"
+
+
+class RoteiroMultiSelectWidget(_VinculoMultiSelectWidget):
+    def option_display(self, roteiro):
+        return str(roteiro), _periodo_roteiro(roteiro)
 
 _ESTADOS_CHOICES = [
     ("", "Selecione o estado"),
@@ -68,6 +141,81 @@ class EventoNovoCadastroForm(forms.ModelForm):
             }
         ),
     )
+    oficios_vinculados = forms.ModelMultipleChoiceField(
+        label="Ofícios já existentes",
+        queryset=Oficio.objects.none(),
+        required=False,
+        widget=OficioMultiSelectWidget(attrs={
+            "class": "cv-search-picker__native",
+            "data-cv-search-picker": "true",
+            "data-picker-mode": "multi",
+            "data-picker-variant": "compact",
+            "data-picker-label": "Ofícios já existentes",
+            "data-placeholder": "Buscar por número, protocolo ou assunto",
+            "data-empty-message": "Nenhum ofício encontrado.",
+            "data-empty-selected": "Nenhum ofício vinculado.",
+        }),
+    )
+    ordens_servico_vinculadas = forms.ModelMultipleChoiceField(
+        label="Ordens de serviço já existentes",
+        queryset=OrdemServico.objects.none(),
+        required=False,
+        widget=OrdemServicoMultiSelectWidget(attrs={
+            "class": "cv-search-picker__native",
+            "data-cv-search-picker": "true",
+            "data-picker-mode": "multi",
+            "data-picker-variant": "compact",
+            "data-picker-label": "Ordens de serviço já existentes",
+            "data-placeholder": "Buscar por número",
+            "data-empty-message": "Nenhuma ordem de serviço encontrada.",
+            "data-empty-selected": "Nenhuma OS vinculada.",
+        }),
+    )
+    planos_trabalho_vinculados = forms.ModelMultipleChoiceField(
+        label="Planos de trabalho já existentes",
+        queryset=PlanoTrabalho.objects.none(),
+        required=False,
+        widget=PlanoTrabalhoMultiSelectWidget(attrs={
+            "class": "cv-search-picker__native",
+            "data-cv-search-picker": "true",
+            "data-picker-mode": "multi",
+            "data-picker-variant": "compact",
+            "data-picker-label": "Planos de trabalho já existentes",
+            "data-placeholder": "Buscar por número",
+            "data-empty-message": "Nenhum plano de trabalho encontrado.",
+            "data-empty-selected": "Nenhum plano vinculado.",
+        }),
+    )
+    termos_vinculados = forms.ModelMultipleChoiceField(
+        label="Termos de autorização já existentes",
+        queryset=TermoAutorizacao.objects.none(),
+        required=False,
+        widget=TermoAutorizacaoMultiSelectWidget(attrs={
+            "class": "cv-search-picker__native",
+            "data-cv-search-picker": "true",
+            "data-picker-mode": "multi",
+            "data-picker-variant": "compact",
+            "data-picker-label": "Termos de autorização já existentes",
+            "data-placeholder": "Buscar por destino",
+            "data-empty-message": "Nenhum termo encontrado.",
+            "data-empty-selected": "Nenhum termo vinculado.",
+        }),
+    )
+    roteiros_vinculados = forms.ModelMultipleChoiceField(
+        label="Roteiros já existentes",
+        queryset=Roteiro.objects.none(),
+        required=False,
+        widget=RoteiroMultiSelectWidget(attrs={
+            "class": "cv-search-picker__native",
+            "data-cv-search-picker": "true",
+            "data-picker-mode": "multi",
+            "data-picker-variant": "compact",
+            "data-picker-label": "Roteiros já existentes",
+            "data-placeholder": "Buscar por origem",
+            "data-empty-message": "Nenhum roteiro encontrado.",
+            "data-empty-selected": "Nenhum roteiro vinculado.",
+        }),
+    )
 
     class Meta:
         model = Evento
@@ -116,6 +264,44 @@ class EventoNovoCadastroForm(forms.ModelForm):
             if uf_padrao:
                 self.initial["destino_uf"] = uf_padrao
 
+        evento_pk = self.instance.pk if self.instance else None
+        nao_vinculado_ou_deste_evento = Q(evento__isnull=True) | Q(evento_id=evento_pk)
+
+        self.fields["oficios_vinculados"].queryset = (
+            Oficio.objects.select_related("roteiro", "viatura")
+            .filter(nao_vinculado_ou_deste_evento)
+            .order_by("-data_criacao", "-created_at")
+        )
+        self.fields["ordens_servico_vinculadas"].queryset = (
+            OrdemServico.objects.filter(nao_vinculado_ou_deste_evento).order_by("-ano", "-numero")
+        )
+        self.fields["planos_trabalho_vinculados"].queryset = (
+            PlanoTrabalho.objects.filter(nao_vinculado_ou_deste_evento).order_by("-ano", "-numero")
+        )
+        self.fields["termos_vinculados"].queryset = (
+            TermoAutorizacao.objects.select_related("destino_cidade", "destino_estado")
+            .filter(nao_vinculado_ou_deste_evento)
+            .order_by("-created_at")
+        )
+        self.fields["roteiros_vinculados"].queryset = (
+            Roteiro.objects.select_related("origem_cidade", "origem_estado")
+            .filter(nao_vinculado_ou_deste_evento)
+            .order_by("-created_at")
+        )
+
+        if evento_pk and not self.is_bound:
+            self.initial["oficios_vinculados"] = list(self.instance.oficios.values_list("pk", flat=True))
+            self.initial["ordens_servico_vinculadas"] = list(
+                self.instance.ordens_servico.values_list("pk", flat=True)
+            )
+            self.initial["planos_trabalho_vinculados"] = list(
+                self.instance.planos_trabalho.values_list("pk", flat=True)
+            )
+            self.initial["termos_vinculados"] = list(
+                self.instance.termos_autorizacao.values_list("pk", flat=True)
+            )
+            self.initial["roteiros_vinculados"] = list(self.instance.roteiros.values_list("pk", flat=True))
+
     def clean(self):
         cleaned = super().clean()
         data_inicio = cleaned.get("data_inicio")
@@ -123,6 +309,21 @@ class EventoNovoCadastroForm(forms.ModelForm):
         if data_inicio and data_fim and data_fim < data_inicio:
             self.add_error("data_fim", "A data final não pode ser anterior à data inicial.")
         return cleaned
+
+    def sincronizar_documentos_vinculados(self, evento):
+        """Vincula/desvincula ofícios, OS, planos, termos e roteiros conforme a seleção do form."""
+        for field_name, related_name in _DOCUMENTOS_VINCULAVEIS:
+            if field_name not in self.cleaned_data:
+                continue
+            manager = getattr(evento, related_name)
+            selecionados_ids = {obj.pk for obj in self.cleaned_data[field_name]}
+            atuais_ids = set(manager.values_list("pk", flat=True))
+            para_adicionar = selecionados_ids - atuais_ids
+            para_remover = atuais_ids - selecionados_ids
+            if para_adicionar:
+                manager.model.objects.filter(pk__in=para_adicionar).update(evento=evento)
+            if para_remover:
+                manager.model.objects.filter(pk__in=para_remover).update(evento=None)
 
 
 class EventoForm(forms.ModelForm):
