@@ -1,8 +1,10 @@
 import hashlib
 from datetime import date
+from unittest.mock import patch
 
 from django.core.files.base import ContentFile
 from django.test import TestCase, override_settings
+from googleapiclient.errors import HttpError
 
 from cadastros.models import Cargo, Servidor
 from documentos.models import DocumentoArtefato
@@ -11,6 +13,13 @@ from eventos.models import TipoEvento
 from oficios.models import Oficio
 from integracoes.google_drive import organizer, services
 from integracoes.google_drive.models import DriveArquivo
+
+
+def _http_404():
+    import httplib2
+
+    resp = httplib2.Response({"status": 404})
+    return HttpError(resp, b'{"error": {"message": "File not found"}}')
 
 
 def _pdf(name):
@@ -66,6 +75,41 @@ class OrganizerTests(TestCase):
         organizer.organizar_artefato(art)
         organizer.organizar_artefato(art)
         self.assertEqual(DriveArquivo.objects.filter(artefato=art).count(), 1)
+
+    def test_recria_quando_arquivo_proprio_foi_apagado_no_drive(self):
+        """Se o file_id salvo não existe mais no Drive (404), reenviar em vez
+        de travar a sincronização inteira (bug real: 46 pendências e
+        "Reorganizar" não enviando nada)."""
+        art = self._artefato("oficio")
+        organizer.organizar_artefato(art)
+        reg = DriveArquivo.objects.get(artefato=art)
+        reg.mock = False
+        reg.save()
+
+        client = services.get_client()
+        with patch.object(client, "mover_renomear", side_effect=_http_404()):
+            resultado = organizer.organizar_artefato(art)
+
+        self.assertIsNotNone(resultado)
+        reg.refresh_from_db()
+        self.assertTrue(reg.file_id)
+
+    def test_recria_quando_arquivo_anterior_foi_apagado_no_drive(self):
+        """Editar/regerar um documento cujo arquivo anterior sumiu do Drive
+        (404 ao sobrescrever) deve criar um novo em vez de falhar."""
+        anterior = self._artefato("oficio", name="oficio_v1.pdf")
+        organizer.organizar_artefato(anterior)
+        reg_anterior = DriveArquivo.objects.get(artefato=anterior)
+        reg_anterior.mock = False
+        reg_anterior.save()
+
+        novo = self._artefato("oficio", name="oficio_v2.pdf")
+        client = services.get_client()
+        with patch.object(client, "atualizar_conteudo", side_effect=_http_404()):
+            resultado = organizer.organizar_artefato(novo)
+
+        self.assertIsNotNone(resultado)
+        self.assertTrue(DriveArquivo.objects.filter(artefato=novo).exists())
 
     def test_planejar_oficio_monta_arvore(self):
         """O CANÔNICO (arquivo real) fica sempre direto na pasta global do tipo

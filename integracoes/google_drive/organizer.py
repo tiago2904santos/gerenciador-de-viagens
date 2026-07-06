@@ -169,6 +169,8 @@ def _localizar_artefato_anterior(artefato):
 
 
 def _persistir_artefato(artefato, pasta_id: str, nome: str, *, atalho_pasta_id: str | None = None) -> tuple[str, str] | None:
+    from googleapiclient.errors import HttpError
+
     from .models import DriveArquivo
 
     client = get_client()
@@ -176,11 +178,23 @@ def _persistir_artefato(artefato, pasta_id: str, nome: str, *, atalho_pasta_id: 
     reg = DriveArquivo.objects.filter(artefato=artefato).first()
 
     if reg and reg.file_id and not reg.mock:
-        client.mover_renomear(reg.file_id, nome, pasta_id)
-        reg.nome = nome
-        _sync_atalho(client, reg, nome, reg.file_id, atalho_pasta_id)
-        reg.save()
-        return reg.file_id, reg.url
+        try:
+            client.mover_renomear(reg.file_id, nome, pasta_id)
+            reg.nome = nome
+            _sync_atalho(client, reg, nome, reg.file_id, atalho_pasta_id)
+            reg.save()
+            return reg.file_id, reg.url
+        except HttpError as exc:
+            if exc.resp.status != 404:
+                raise
+            # O arquivo foi apagado do Drive (fora do app, ou por uma limpeza
+            # anterior) mas o registro local ainda aponta pra ele: trata como
+            # se não existisse e recria abaixo em vez de travar a sincronização.
+            logger.warning(
+                "[Drive] file_id %s do artefato %s não existe mais no Drive; recriando",
+                reg.file_id, artefato.pk,
+            )
+            reg.file_id = ""
 
     conteudo = _ler_filefield(getattr(artefato, "arquivo", None))
     if conteudo is None:
@@ -192,14 +206,23 @@ def _persistir_artefato(artefato, pasta_id: str, nome: str, *, atalho_pasta_id: 
         if reg_anterior.file_id and not reg_anterior.mock:
             # Documento editado e regerado: sobrescreve o arquivo já existente no
             # Drive (mesmo file_id) em vez de duplicar.
-            file_id, url = client.atualizar_conteudo(
-                reg_anterior.file_id, nome, conteudo, mime, pasta_id=pasta_id
-            )
-            reg_anterior.artefato = artefato
-            reg_anterior.nome, reg_anterior.mock = nome, is_mock()
-            _sync_atalho(client, reg_anterior, nome, file_id, atalho_pasta_id)
-            reg_anterior.save()
-            return file_id, url
+            try:
+                file_id, url = client.atualizar_conteudo(
+                    reg_anterior.file_id, nome, conteudo, mime, pasta_id=pasta_id
+                )
+                reg_anterior.artefato = artefato
+                reg_anterior.nome, reg_anterior.mock = nome, is_mock()
+                _sync_atalho(client, reg_anterior, nome, file_id, atalho_pasta_id)
+                reg_anterior.save()
+                return file_id, url
+            except HttpError as exc:
+                if exc.resp.status != 404:
+                    raise
+                logger.warning(
+                    "[Drive] file_id %s do artefato anterior %s não existe mais no Drive; "
+                    "criando arquivo novo para %s",
+                    reg_anterior.file_id, anterior.pk, artefato.pk,
+                )
 
     # Rede de segurança: antes de criar um arquivo novo, confere se já não existe
     # um com esse nome na pasta canônica (registro local perdido/dessincronizado,
