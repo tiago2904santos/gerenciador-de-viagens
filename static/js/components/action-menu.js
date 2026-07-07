@@ -11,13 +11,15 @@
   }
 
   function position(trigger, menu) {
+    menu.style.position = "fixed";
+    menu.style.top = "0px";
+    menu.style.left = "0px";
     var rect = trigger.getBoundingClientRect();
     var menuRect = menu.getBoundingClientRect();
     var top = rect.top - menuRect.height - 6;
     if (top < 8) top = rect.bottom + 6;
     var left = rect.right - menuRect.width;
     if (left < 8) left = rect.left;
-    menu.style.position = "fixed";
     menu.style.top = top + "px";
     menu.style.left = left + "px";
   }

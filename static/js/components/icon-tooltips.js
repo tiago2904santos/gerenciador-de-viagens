@@ -41,7 +41,8 @@
   }
 
   function showTooltip(target) {
-    var text = target && target.getAttribute("data-tooltip");
+    if (!target || target.getAttribute("aria-expanded") === "true") return;
+    var text = target.getAttribute("data-tooltip");
     if (!text) return;
 
     currentTarget = target;
@@ -81,6 +82,11 @@
   });
 
   document.addEventListener("focusout", function (event) {
+    var target = getTarget(event.target);
+    if (target) hideTooltip(target);
+  });
+
+  document.addEventListener("click", function (event) {
     var target = getTarget(event.target);
     if (target) hideTooltip(target);
   });

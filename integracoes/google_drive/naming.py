@@ -36,6 +36,7 @@ PASTA_TIPO_PLURAL = {
     "ordem_servico": "Ordens de serviço",
     "termo_autorizacao": "Termos",
     "justificativa": "Justificativas",
+    "solicitacao_viagem": "Solicitações de Viagem",
 }
 
 
@@ -372,19 +373,16 @@ def nome_convite(cidade, ext="pdf", titulo="") -> str:
     return _arquivo(base + _suf_cidade(cidade), ext)
 
 
-def nome_anexo_solicitacao(oficio, servidor, numero_solicitacao, cidade, ext="pdf") -> str:
-    nd = num_doc(oficio.numero, oficio.ano)
-    proto = protocolo_fmt(oficio)
-    nome = primeiro_nome(servidor)
-    partes = ["Anexo solicitação"]
-    if numero_solicitacao:
-        partes.append(str(numero_solicitacao).strip())
-    partes.append(f"Ofício {nd}".strip())
-    if proto:
-        partes.append(f"protocolo {proto}")
-    if nome:
-        partes.append(nome)
-    return _arquivo(" ".join(partes) + _suf_cidade(cidade), ext)
+def nome_solicitacao_viagem(evento, cidade, ext="pdf") -> str:
+    """Nome do documento de solicitação de viagem (ofício solicitante anexado
+    pelo usuário) — vive na pasta global "Solicitações de Viagem", no mesmo
+    nível de Ordem de Serviço/Plano de Trabalho, não em Prestação de contas.
+
+    Formato: ``Solicitação de Viagem - {destino} - {período do evento}``.
+    """
+    periodo = periodo_extenso(getattr(evento, "data_inicio", None), getattr(evento, "data_fim", None))
+    partes = [p for p in ("Solicitação de Viagem", cidade, periodo) if p]
+    return _arquivo(" - ".join(partes), ext)
 
 
 def nome_relatorio_tecnico(oficio, servidor, cidade, ext="pdf") -> str:

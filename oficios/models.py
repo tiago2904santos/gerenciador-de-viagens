@@ -46,7 +46,7 @@ class Oficio(TimeStampedModel, CancelavelModel):
         "eventos.Evento",
         null=True,
         blank=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         related_name="oficios",
     )
     roteiro = models.ForeignKey(

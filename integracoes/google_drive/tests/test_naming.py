@@ -124,12 +124,12 @@ class NamingTests(SimpleTestCase):
         nome = naming.nome_termo(of, _Servidor("ANA"), "Maringá")
         self.assertEqual(nome, "Termo de autorização 01-2026 protocolo 12.345.678-9 Ana (Maringá).pdf")
 
-    def test_nome_anexo_solicitacao(self):
-        of = _Oficio(numero=1, ano=2026, protocolo="123456789")
-        nome = naming.nome_anexo_solicitacao(of, _Servidor("ANA"), "123456", "Maringá", "pdf")
+    def test_nome_solicitacao_viagem(self):
+        evento = _Evento(data_inicio=date(2026, 7, 21), data_fim=date(2026, 7, 27))
+        nome = naming.nome_solicitacao_viagem(evento, "Ivaiporã", "pdf")
         self.assertEqual(
             nome,
-            "Anexo solicitação 123456 Ofício 01-2026 protocolo 12.345.678-9 Ana (Maringá).pdf",
+            "Solicitação de Viagem - Ivaiporã - 21 a 27 de julho de 2026.pdf",
         )
 
     def test_pasta_prestacao_servidor(self):

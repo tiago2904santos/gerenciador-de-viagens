@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 
 
 def conectar() -> None:
-    from django.db.models.signals import post_save
+    from django.db.models.signals import post_save, pre_delete
 
     from documentos.models import DocumentoArtefato
     from eventos.models import Evento, EventoAnexo, EventoDocumentoSolicitacao
@@ -47,6 +47,19 @@ def conectar() -> None:
     post_save.connect(
         _organizar_evento_ao_salvar, sender=Evento, dispatch_uid="gdrive_evento_salvo"
     )
+
+    pre_delete.connect(
+        _limpar_drive_artefato, sender=DocumentoArtefato, dispatch_uid="gdrive_excluir_artefato"
+    )
+    for model, dispatch_uid in (
+        (PrestacaoContas, "gdrive_excluir_prestacao"),
+        (PrestacaoDocumentoAnexo, "gdrive_excluir_prestacao_anexo"),
+        (AssinaturaDocumento, "gdrive_excluir_prestacao_assinatura"),
+        (EventoAnexo, "gdrive_excluir_evento_anexo"),
+        (EventoDocumentoSolicitacao, "gdrive_excluir_evento_solicitacao"),
+        (Evento, "gdrive_excluir_evento_nota"),
+    ):
+        pre_delete.connect(_limpar_drive_externo, sender=model, dispatch_uid=dispatch_uid)
 
 
 def _drive_desligado() -> bool:
@@ -226,6 +239,73 @@ def _organizar_evento_ao_salvar(sender, instance, **kwargs) -> None:
     threading.Thread(
         target=_organizar_evento_em_thread, args=(instance.pk,), daemon=True
     ).start()
+
+
+def _excluir_no_drive(client, reg) -> None:
+    """Move para a lixeira o arquivo canônico e o atalho (se houver) de um registro."""
+    if reg.file_id:
+        try:
+            client.mover_para_lixeira(reg.file_id)
+        except Exception:
+            logger.error("[Drive] falha ao mover file_id=%s para a lixeira", reg.file_id, exc_info=True)
+    if getattr(reg, "atalho_id", ""):
+        try:
+            client.mover_para_lixeira(reg.atalho_id)
+        except Exception:
+            logger.error("[Drive] falha ao mover atalho_id=%s para a lixeira", reg.atalho_id, exc_info=True)
+
+
+def _limpar_drive_artefato(sender, instance, **kwargs) -> None:
+    """Ao excluir um ``DocumentoArtefato``, move seu arquivo (e atalho) no Drive
+    para a lixeira antes que o ``DriveArquivo`` seja cascateado do banco."""
+    if _drive_desligado():
+        return
+    reg = getattr(instance, "drive_arquivo", None)
+    if reg is None:
+        return
+    from .services import get_client
+
+    try:
+        client = get_client()
+    except Exception:
+        logger.error(
+            "[Drive] falha ao obter client para excluir artefato %s", instance.pk, exc_info=True
+        )
+        return
+    _excluir_no_drive(client, reg)
+
+
+def _limpar_drive_externo(sender, instance, **kwargs) -> None:
+    """Ao excluir qualquer origem rastreada em ``DriveArquivoExterno`` (prestação,
+    anexo de prestação, assinatura, anexo de evento, solicitação, nota de
+    cancelamento), move os arquivos correspondentes no Drive para a lixeira.
+
+    Roda em ``pre_delete`` porque ``DriveArquivoExterno`` usa ``GenericForeignKey``
+    (sem FK de verdade) — não cascateia sozinho e ficaria órfão no banco.
+    """
+    if _drive_desligado():
+        return
+    from django.contrib.contenttypes.models import ContentType
+
+    from .models import DriveArquivoExterno
+
+    ct = ContentType.objects.get_for_model(instance.__class__)
+    regs = list(DriveArquivoExterno.objects.filter(content_type=ct, object_id=instance.pk))
+    if not regs:
+        return
+    from .services import get_client
+
+    try:
+        client = get_client()
+    except Exception:
+        logger.error(
+            "[Drive] falha ao obter client para excluir arquivos de %s #%s",
+            instance.__class__.__name__, instance.pk, exc_info=True,
+        )
+        return
+    for reg in regs:
+        _excluir_no_drive(client, reg)
+    DriveArquivoExterno.objects.filter(pk__in=[reg.pk for reg in regs]).delete()
 
 
 def _organizar_evento_em_thread(evento_id: int) -> None:

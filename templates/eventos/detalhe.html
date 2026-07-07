@@ -21,19 +21,6 @@
         <strong>Evento cancelado.</strong>
         {% if evento.motivo_cancelamento %} Motivo: {{ evento.motivo_cancelamento }}{% endif %}
       </div>
-    {% else %}
-      <div style="display:flex; justify-content:flex-end; margin: 0 0 var(--space-3);">
-        <button
-          type="button"
-          class="cv-btn cv-btn--danger"
-          data-cancel-modal-trigger
-          data-cancel-url="{{ cancelar_evento_url }}"
-          data-cancel-label="{{ evento.titulo|default:'este evento' }}"
-        >
-          <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="ban" only %}</span>
-          <span>Cancelar evento</span>
-        </button>
-      </div>
     {% endif %}
 
     {% include "components/ui/navigation/page_stepper.html" with steps=evento_page_steps aria_label="Etapas do evento" only %}

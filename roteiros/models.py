@@ -128,7 +128,7 @@ class Roteiro(CancelavelModel):
         "eventos.Evento",
         null=True,
         blank=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         related_name="roteiros",
     )
     created_at = models.DateTimeField(auto_now_add=True)

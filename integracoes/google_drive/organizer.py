@@ -3,6 +3,7 @@
 Estrutura-alvo (a partir da pasta raiz escolhida pelo usuário):
 
     Ofícios/ Planos de trabalho/ Ordens de serviço/ Termos/ Justificativas/
+        Solicitações de Viagem/
         <ofício ou item>/arquivo.pdf                 <- CANÔNICO (arquivo real),
         sempre aqui, tenha o documento evento ou não.
     Prestação de contas dos ofícios sem evento seguem dentro da própria
@@ -15,10 +16,10 @@ Estrutura-alvo (a partir da pasta raiz escolhida pelo usuário):
           Justificativa ...                          (ATALHO -> Justificativas/...)
           Termos/ Termo de autorização ... Servidor (Cidade).pdf  (ATALHO -> Termos/...)
           Prestação de contas/
-            Anexo solicitação ... (Cidade).<ext>
             Prestação <Servidor>/ ... (RT, diário, despacho, comprovante)
         Ordem de serviço ...                    (ATALHO -> Ordens de serviço/...; nível do evento)
         Plano de trabalho PP-AAAA ... (Cidade).pdf  (ATALHO -> Planos de trabalho/...; nível do evento)
+        Solicitação de Viagem - ... (ATALHO -> Solicitações de Viagem/...; nível do evento)
         Convite (Cidade).<ext>                       (EventoAnexo; nível do evento)
     Prestações de contas/  <- atalhos de pasta p/ cada "Prestação <Servidor>"
 
@@ -542,30 +543,32 @@ def organizar_evento_anexo(anexo) -> None:
 
 
 def organizar_solicitacao_evento(doc) -> None:
-    """``EventoDocumentoSolicitacao`` → ``Prestação de contas`` do (primeiro) ofício."""
+    """``EventoDocumentoSolicitacao`` (ofício/documento solicitando a viagem) →
+    pasta global "Solicitações de Viagem" (canônico) + atalho na pasta do
+    evento, no mesmo nível de Ordem de Serviço/Plano de Trabalho — não é um
+    anexo de prestação de contas.
+    """
     evento = getattr(doc, "evento", None)
     if evento is None or not getattr(doc, "arquivo", None):
         return
     client = get_client()
     oficio = evento.oficios.first()
-    if oficio is None:
-        return
-    servidores = list(oficio.servidores.all())
-    oficio_folder = _oficio_base_folder(client, oficio, servidores)
-    prestacao_folder = _pasta_prestacao(client, oficio_folder)
     cidade = naming.cidade_evento(evento, oficio)
     ext = naming.extensao(doc.arquivo.name)
-
-    prestacoes = list(oficio.prestacoes_contas.all())
-    if len(prestacoes) == 1:
-        p = prestacoes[0]
-        nome = naming.nome_anexo_solicitacao(oficio, p.servidor, p.numero_solicitacao, cidade, ext)
-    else:
-        base = f"Anexo solicitação Ofício {naming.num_doc(oficio.numero, oficio.ano)}".strip()
-        nome = naming._arquivo(f"{base}{naming._suf_cidade(cidade)}", ext)
-    if _cancelado(oficio=oficio, evento=evento):
+    nome = naming.nome_solicitacao_viagem(evento, cidade, ext)
+    if _cancelado(evento=evento):
         nome = naming.com_sufixo_cancelado(nome)
-    colocar_arquivo_externo(doc, doc.arquivo, campo="arquivo", pasta_id=prestacao_folder, nome=nome)
+
+    canonica = _pasta_tipo_global(client, "solicitacao_viagem")
+    resultado = colocar_arquivo_externo(doc, doc.arquivo, campo="arquivo", pasta_id=canonica, nome=nome)
+    if resultado is None:
+        return
+    file_id, _url = resultado
+
+    evento_folder = _pasta_evento_folder(client, evento)
+    _atalho_pasta_externo(
+        doc, campo="atalho_evento", nome=nome, target_id=file_id, pasta_id=evento_folder,
+    )
 
 
 def _prestacao_tem_conteudo(prestacao) -> bool:

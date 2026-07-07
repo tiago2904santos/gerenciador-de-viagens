@@ -171,6 +171,8 @@ def apresentar_evento_list_card(evento):
         "detail_url": reverse("eventos:guiado_etapa", args=[evento.pk, 3]),
         "editar_url": reverse("eventos:guiado_etapa", args=[evento.pk, 1]),
         "excluir_url": reverse("eventos:excluir", args=[evento.pk]),
+        "cancelar_url": reverse("eventos:cancelar", args=[evento.pk]),
+        "cancelado": evento.status == evento.STATUS_CANCELADO,
     }
 
 

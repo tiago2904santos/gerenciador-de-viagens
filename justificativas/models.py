@@ -40,7 +40,7 @@ class Justificativa(TimeStampedModel):
         "eventos.Evento",
         null=True,
         blank=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         related_name="justificativas",
     )
     oficio = models.OneToOneField(

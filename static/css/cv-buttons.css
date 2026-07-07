@@ -803,6 +803,11 @@ html[data-theme="light"] {
   z-index: calc(var(--z-dropdown) + 1);
 }
 
+.cv-icon-btn[data-tooltip][aria-expanded="true"]::after {
+  content: none;
+  display: none;
+}
+
 /* Grupo de icon buttons (para listas e cards) */
 .cv-icon-btn-group {
   align-items: center;

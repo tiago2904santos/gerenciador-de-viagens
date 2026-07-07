@@ -107,16 +107,43 @@
         </div>
         <div class="oficio-lc__footer-actions-danger cv-icon-btn-group">
           <button
-            class="cv-icon-btn cv-icon-btn--delete"
+            class="cv-icon-btn cv-icon-btn--edit"
             type="button"
-            aria-label="Excluir evento"
-            data-tooltip="Excluir"
-            data-delete-modal-trigger
-            data-delete-url="{{ card.excluir_url }}"
-            data-delete-label="{{ card.titulo }}"
+            aria-label="Mais ações do evento"
+            aria-haspopup="true"
+            aria-expanded="false"
+            data-tooltip="Mais ações"
+            data-action-menu-trigger
+            data-action-menu-target="evento-action-menu-{{ card.pk }}"
           >
-            {% include "dev/ui_lab/partials/_cv_icon.html" with icon="delete" only %}
+            {% include "dev/ui_lab/partials/_cv_icon.html" with icon="more" only %}
           </button>
+          <div class="cv-action-menu" id="evento-action-menu-{{ card.pk }}" role="menu" hidden>
+            {% if not card.cancelado %}
+            <button
+              type="button"
+              class="cv-action-menu__item cv-action-menu__item--cancel"
+              role="menuitem"
+              data-cancel-modal-trigger
+              data-cancel-url="{{ card.cancelar_url }}"
+              data-cancel-label="{{ card.titulo }}"
+            >
+              {% include "dev/ui_lab/partials/_cv_icon.html" with icon="ban" only %}
+              <span>Cancelar evento</span>
+            </button>
+            {% endif %}
+            <button
+              type="button"
+              class="cv-action-menu__item cv-action-menu__item--delete"
+              role="menuitem"
+              data-delete-modal-trigger
+              data-delete-url="{{ card.excluir_url }}"
+              data-delete-label="{{ card.titulo }}"
+            >
+              {% include "dev/ui_lab/partials/_cv_icon.html" with icon="delete" only %}
+              <span>Excluir evento</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>

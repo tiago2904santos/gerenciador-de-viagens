@@ -138,6 +138,9 @@ class _MockClient:
     def excluir_arquivo(self, file_id: str) -> None:
         logger.info("[Drive MOCK] excluir_arquivo file_id=%s", file_id)
 
+    def mover_para_lixeira(self, file_id: str) -> None:
+        logger.info("[Drive MOCK] mover_para_lixeira file_id=%s", file_id)
+
     def buscar_arquivo_por_nome(self, nome: str, pasta_id: str) -> str | None:
         return None
 
@@ -396,6 +399,16 @@ class _RealClient:
             logger.info("[Drive] arquivo excluído file_id=%s", file_id)
         except Exception as exc:
             logger.warning("[Drive] falha ao excluir file_id=%s: %s", file_id, exc)
+
+    def mover_para_lixeira(self, file_id: str) -> None:
+        """Move um arquivo/atalho para a lixeira do Drive (reversível, ~30 dias)."""
+        try:
+            self._svc.files().update(
+                fileId=file_id, body={"trashed": True}, supportsAllDrives=True,
+            ).execute()
+            logger.info("[Drive] arquivo movido para a lixeira file_id=%s", file_id)
+        except Exception as exc:
+            logger.warning("[Drive] falha ao mover para a lixeira file_id=%s: %s", file_id, exc)
 
     def buscar_arquivo_por_nome(self, nome: str, pasta_id: str) -> str | None:
         """Procura um arquivo (não-pasta) com esse nome exato dentro de ``pasta_id``.

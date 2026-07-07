@@ -120,7 +120,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 OFICIO_NUMERO_INICIAL = {2026: 75}
 
 # Armazenamento de artefatos documentais gerados (assinatura, auditoria).
-MEDIA_URL = "media/"
+MEDIA_URL = "/media/"
 MEDIA_ROOT = env_path("MEDIA_ROOT", "media")
 
 # Núcleo documental (DOCX/PDF, conversão opcional, assinatura).
