@@ -59,6 +59,12 @@ _MESES_ABREV = [
     "dez",
 ]
 
+_MESES_EXTENSO = {
+    1: "janeiro", 2: "fevereiro", 3: "março", 4: "abril",
+    5: "maio", 6: "junho", 7: "julho", 8: "agosto",
+    9: "setembro", 10: "outubro", 11: "novembro", 12: "dezembro",
+}
+
 # Barra (vira hífen) e caracteres realmente problemáticos no Drive/sincronização.
 _BARRA_RE = re.compile(r"[\\/]+")
 _INVALIDOS_RE = re.compile(r'[<>:"|?*\x00-\x1f]')
@@ -186,6 +192,26 @@ def periodo_pasta(evento) -> str:
     return periodo_curto(getattr(evento, "data_inicio", None), getattr(evento, "data_fim", None))
 
 
+def periodo_extenso(di, df) -> str:
+    """``21 a 27 de julho de 2026``; ``21 de julho de 2026`` se só uma data."""
+    if not di and not df:
+        return ""
+    if di and df and di != df:
+        if di.month == df.month and di.year == df.year:
+            return f"{di.day} a {df.day} de {_MESES_EXTENSO[di.month]} de {di.year}"
+        if di.year == df.year:
+            return (
+                f"{di.day} de {_MESES_EXTENSO[di.month]} a "
+                f"{df.day} de {_MESES_EXTENSO[df.month]} de {di.year}"
+            )
+        return (
+            f"{di.day} de {_MESES_EXTENSO[di.month]} de {di.year} a "
+            f"{df.day} de {_MESES_EXTENSO[df.month]} de {df.year}"
+        )
+    d = di or df
+    return f"{d.day} de {_MESES_EXTENSO[d.month]} de {d.year}"
+
+
 def tipo_evento_label(evento) -> str:
     # Usa ", " (nao "/") porque sanitize_drive_name troca barra por hifen, o
     # que confundiria o separador com o hifen que junta tipo/cidade/periodo.
@@ -255,13 +281,16 @@ def nome_termo(oficio, servidor, cidade, formato="pdf") -> str:
 
 
 def destinos_os(ordem) -> str:
+    """Destinos da OS em MAIÚSCULAS (ex.: ``IVAIPORÃ/PR``) — combinação com
+    formato de nome de arquivo acordada com o usuário para a Ordem de Serviço,
+    diferente do Title Case usado no resto do sistema."""
     if not getattr(ordem, "pk", None):
         return ""
     cidades = list(ordem.destinos.select_related("estado").order_by("nome"))
     if not cidades:
         return ""
     return ", ".join(
-        f"{capitalizar_cidade(c.nome)}/{c.estado.sigla}" if c.estado_id else capitalizar_cidade(c.nome)
+        f"{c.nome.upper()}/{c.estado.sigla}" if c.estado_id else c.nome.upper()
         for c in cidades
     )
 
@@ -272,15 +301,17 @@ def nome_os(ordem, formato="pdf") -> str:
     pode cobrir vários ofícios com participantes/período/destino diferentes
     do dela (ex.: OS única pra 2 ofícios de cidades/datas distintas).
 
-    Separador " - " (não "*"): asterisco é caractere inválido em nomes de
-    arquivo no Windows e seria removido pelo sanitizador — quebraria a
-    sincronização local do Drive Desktop.
+    Formato acordado com o usuário: ``ORDEM DE SERVIÇO 007-2026 - IVAIPORÃ/PR
+    - 21 a 27 de julho de 2026 - Nome1, Nome2 e Nome3``. Separador " - " (não
+    "*"): asterisco é caractere inválido em nomes de arquivo no Windows e
+    seria removido pelo sanitizador — quebraria a sincronização local do
+    Drive Desktop.
     """
     nd = num_doc(ordem.numero, ordem.ano, width=3)
     destino = destinos_os(ordem)
-    periodo = periodo_curto(ordem.data_evento_inicio, ordem.data_evento_fim)
+    periodo = periodo_extenso(ordem.data_evento_inicio, ordem.data_evento_fim)
     nomes = nomes_servidores(list(ordem.servidores.all()) if ordem.pk else [])
-    partes = [p for p in (f"Ordem de Serviço {nd}".strip(), destino, periodo, nomes) if p]
+    partes = [p for p in (f"ORDEM DE SERVIÇO {nd}".strip(), destino, periodo, nomes) if p]
     return _arquivo(" - ".join(partes), formato)
 
 

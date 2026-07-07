@@ -298,7 +298,7 @@ def _derivar_nome_artefato(tipo, formato, oficio, servidor, servidores, cidade) 
         suf = naming._suf_cidade(cidade)
         rotulo = {
             "plano_trabalho": "Plano de trabalho",
-            "ordem_servico": "Ordem de Serviço",
+            "ordem_servico": "ORDEM DE SERVIÇO",
             "termo_autorizacao": "Termo de autorização",
             "justificativa": "Justificativa",
         }.get(tipo, "Ofício")
@@ -312,7 +312,7 @@ def _derivar_nome_artefato(tipo, formato, oficio, servidor, servidores, cidade) 
         ordem = oficio.ordens_servico.first()
         if ordem is not None:
             return naming.nome_os(ordem, formato)
-        return naming._arquivo(f"Ordem de Serviço{naming._suf_cidade(cidade)}", formato)
+        return naming._arquivo(f"ORDEM DE SERVIÇO{naming._suf_cidade(cidade)}", formato)
     if tipo == "justificativa":
         return naming.nome_justificativa(oficio, cidade, formato)
     if tipo == "plano_trabalho":
