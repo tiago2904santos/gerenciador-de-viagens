@@ -9,7 +9,7 @@
     <div class="oficio-lc__id-row">
       <div class="oficio-lc__info-item">
         <span class="oficio-lc__info-label">Ordem de Serviço</span>
-        <span class="oficio-lc__info-value">{{ card.numero_display }}{% if card.destinos_display %} · {{ card.destinos_display }}{% endif %}{% if card.periodo_display %} · {{ card.periodo_display }}{% endif %}</span>
+        <span class="oficio-lc__info-value oficio-lc__info-value--wrap">{{ card.numero_display }}{% if card.destinos_display %} · {{ card.destinos_display }}{% endif %}{% if card.periodo_display %} · {{ card.periodo_display }}{% endif %}</span>
       </div>
       {% if card.temporal_label %}
       {% include "components/ui/badges/chip.html" with tone=card.temporal_tone label=card.temporal_label extra_class="oficio-lc__temporal-chip" only %}
