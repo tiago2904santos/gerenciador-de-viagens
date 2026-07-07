@@ -19,56 +19,41 @@ jobs:
             source /var/www/gerenciador-viagens/venv/bin/activate
             export DJANGO_SETTINGS_MODULE=config.settings.prod
             export $(grep -v '^#' .env | xargs)
+            echo "=== Servicos ==="
+            systemctl show gerenciador-viagens --property=ActiveEnterTimestamp,MainPID
+            systemctl show gerenciador-viagens-celery --property=ActiveEnterTimestamp,MainPID,ActiveState 2>&1 || echo "servico celery nao encontrado"
+            date
+
             cat > /tmp/diag.py << 'PYEOF'
-            from integracoes.google_drive.services import get_client
-            from documentos.models import DocumentoArtefato
-            from oficios.models import Oficio
+            from integracoes.google_drive.services import get_client, get_pasta_raiz_id
+            from integracoes.google_drive.models import DriveCredenciais
 
             client = get_client()
             svc = client._svc
 
-            print('=== Pastas suspeitas (403 insufficientFilePermissions no addParents) ===')
-            for fid in ['1HrPMhwwtZ0R_GQ40sDYR_ZiVy9rzUCBO', '14uUlmUn9WZ-RtKC5Xi0fA7TxPqSav0C1']:
+            raiz = get_pasta_raiz_id()
+            print('pasta_raiz_id configurada:', raiz)
+            if raiz:
                 try:
                     meta = svc.files().get(
-                        fileId=fid,
-                        fields='id,name,trashed,driveId,parents,capabilities,owners,shared',
+                        fileId=raiz,
+                        fields='id,name,trashed,driveId,parents,capabilities,owners',
                         supportsAllDrives=True,
                     ).execute()
-                    print(fid, '->', meta)
+                    print('raiz ->', meta)
                 except Exception as exc:
-                    print(fid, '-> ERRO:', exc)
+                    print('raiz -> ERRO:', exc)
 
-            print()
-            print('=== Artefatos/atalhos do oficio 86/2026 (shortcutTargetInvalid) ===')
-            oficio = Oficio.objects.filter(numero=86, ano=2026).first()
-            print('oficio encontrado:', oficio)
-            if oficio:
-                for a in DocumentoArtefato.objects.filter(oficio=oficio):
-                    reg = getattr(a, 'drive_arquivo', None)
-                    file_id = reg.file_id if reg else None
-                    atalho_id = reg.atalho_id if reg else None
-                    print('artefato', a.pk, 'tipo=' + str(a.tipo), 'file_id=' + str(file_id), 'atalho_id=' + str(atalho_id))
-                    if reg and reg.file_id:
-                        try:
-                            meta = svc.files().get(
-                                fileId=reg.file_id,
-                                fields='id,name,mimeType,trashed,shortcutDetails',
-                                supportsAllDrives=True,
-                            ).execute()
-                            print('  canonico:', meta)
-                        except Exception as exc:
-                            print('  canonico ERRO:', exc)
-                    if reg and reg.atalho_id:
-                        try:
-                            meta = svc.files().get(
-                                fileId=reg.atalho_id,
-                                fields='id,name,mimeType,trashed,shortcutDetails',
-                                supportsAllDrives=True,
-                            ).execute()
-                            print('  atalho:', meta)
-                        except Exception as exc:
-                            print('  atalho ERRO:', exc)
+                print()
+                print('busca fresca por pasta "Oficios" dentro da raiz:')
+                q = "name = '" + "Ofícios" + "' and mimeType = 'application/vnd.google-apps.folder' and trashed = false and '" + raiz + "' in parents"
+                res = svc.files().list(q=q, fields='files(id,name)', pageSize=5, supportsAllDrives=True, includeItemsFromAllDrives=True).execute()
+                print('resultado:', res.get('files'))
+
+            creds = DriveCredenciais.objects.first()
+            if creds:
+                print()
+                print('credencial: scope=' + str(creds.scope) + ' atualizado_em=' + str(creds.atualizado_em))
             PYEOF
             python manage.py shell < /tmp/diag.py
             rm -f /tmp/diag.py
