@@ -57,13 +57,55 @@ class DualOrganizationTests(TestCase):
         reg = DriveArquivo.objects.get(artefato=art)
         self.assertEqual(reg.atalho_id, "")
 
-    def test_plano_usa_nome_drive(self):
+    def test_plano_usa_nome_drive_quando_evento_sem_plano_cadastrado(self):
+        """Sem PlanoTrabalho real vinculado ao evento (caso legado/artefato
+        órfão), não tem como recalcular — mantém o nome_drive salvo."""
         nome = "Plano de trabalho 05-2026 (Maringá).pdf"
         art = self._art("plano_trabalho", evento=self.evento, oficio=self.oficio, nome_drive=nome, name="plano.pdf")
         organizer.organizar_artefato(art)
         reg = DriveArquivo.objects.get(artefato=art)
         self.assertEqual(reg.nome, nome)
         self.assertTrue(reg.atalho_id)
+
+    def test_plano_unico_sempre_recalcula_mesmo_com_nome_drive_antigo(self):
+        """Mesmo bug/fix da OS: evento com um único plano recalcula o nome do
+        arquivo sempre a partir do PlanoTrabalho atual, nunca confia no
+        nome_drive salvo na criação (que fica desatualizado pra sempre)."""
+        from datetime import date
+
+        from planos_trabalho.models import PlanoTrabalho
+        from integracoes.google_drive import naming
+
+        plano = PlanoTrabalho.objects.create(
+            evento=self.evento, numero=7, ano=2026,
+            data_evento_inicio=date(2026, 7, 21), data_evento_fim=date(2026, 7, 27),
+        )
+        art = self._art(
+            "plano_trabalho", evento=self.evento, oficio=self.oficio,
+            nome_drive="Plano de trabalho 05-2026 protocolo velho (Maringá).pdf",
+            name="plano.pdf",
+        )
+        organizer.organizar_artefato(art)
+        reg = DriveArquivo.objects.get(artefato=art)
+        self.assertEqual(reg.nome, naming.nome_plano(plano))
+        self.assertNotIn("protocolo", reg.nome)
+
+    def test_plano_multiplo_mantem_nome_drive_por_ambiguidade(self):
+        """Evento com MAIS de um plano: sem FK direta artefato->plano, não dá
+        pra saber qual plano corresponde a este artefato — mantém o
+        nome_drive salvo em vez de arriscar atribuir o nome errado."""
+        from datetime import date
+
+        from planos_trabalho.models import PlanoTrabalho
+
+        PlanoTrabalho.objects.create(evento=self.evento, numero=7, ano=2026, data_evento_inicio=date(2026, 7, 21))
+        PlanoTrabalho.objects.create(evento=self.evento, numero=8, ano=2026, data_evento_inicio=date(2026, 8, 1))
+
+        nome = "Plano de trabalho 05-2026 (Maringá).pdf"
+        art = self._art("plano_trabalho", evento=self.evento, oficio=self.oficio, nome_drive=nome, name="plano.pdf")
+        organizer.organizar_artefato(art)
+        reg = DriveArquivo.objects.get(artefato=art)
+        self.assertEqual(reg.nome, nome)
 
     def test_idempotente_atalho_e_arquivo(self):
         art = self._art("oficio", oficio=self.oficio)

@@ -312,15 +312,39 @@ def nome_os(ordem, formato="pdf") -> str:
     return _arquivo(" - ".join(partes), formato)
 
 
-def nome_plano(plano, cidade, *, oficio=None, formato="pdf") -> str:
-    """Nome do plano usando a numeração do PRÓPRIO plano (não do ofício)."""
+def destinos_plano(plano) -> str:
+    if not getattr(plano, "pk", None):
+        return ""
+    destinos = list(
+        plano.destinos.filter(evento__isnull=True)
+        .select_related("cidade", "estado")
+        .order_by("ordem", "pk")
+    )
+    cidades = [d.cidade for d in destinos if d.cidade_id]
+    if cidades:
+        return ", ".join(f"{capitalizar_cidade(c.nome)}/{c.uf}" for c in cidades)
+    if plano.destino_cidade_id:
+        c = plano.destino_cidade
+        return f"{capitalizar_cidade(c.nome)}/{c.uf}"
+    return ""
+
+
+def nome_plano(plano, formato="pdf") -> str:
+    """Nome do arquivo do Plano de Trabalho — usa os dados do PRÓPRIO plano
+    (número, destino, período do evento). Sem ofício/protocolo: um plano
+    pertence ao evento, não a um ofício específico (um evento pode ter vários
+    ofícios, e a associação com "o primeiro" seria arbitrária).
+
+    Formato acordado com o usuário: ``Plano de Trabalho 07-2026 - Ivaiporã/PR
+    - 21 a 27 de julho de 2026``.
+    """
     nd = num_doc(getattr(plano, "numero", None), getattr(plano, "ano", None))
-    proto = protocolo_fmt(oficio) if oficio is not None else ""
-    base = "Plano de trabalho"
-    partes = [f"{base} {nd}".strip()]
-    if proto:
-        partes.append(f"protocolo {proto}")
-    return _arquivo(" ".join(partes) + _suf_cidade(cidade), formato)
+    destino = destinos_plano(plano)
+    periodo = periodo_extenso(
+        getattr(plano, "data_evento_inicio", None), getattr(plano, "data_evento_fim", None)
+    )
+    partes = [p for p in (f"Plano de Trabalho {nd}".strip(), destino, periodo) if p]
+    return _arquivo(" - ".join(partes), formato)
 
 
 def nome_atalho_prestacao(oficio, servidor, cidade) -> str:

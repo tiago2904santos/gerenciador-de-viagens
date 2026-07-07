@@ -322,7 +322,7 @@ def _derivar_nome_artefato(tipo, formato, oficio, servidor, servidores, cidade) 
     if oficio is None:
         suf = naming._suf_cidade(cidade)
         rotulo = {
-            "plano_trabalho": "Plano de trabalho",
+            "plano_trabalho": "Plano de Trabalho",
             "ordem_servico": "Ordem de Serviço",
             "termo_autorizacao": "Termo de autorização",
             "justificativa": "Justificativa",
@@ -341,8 +341,8 @@ def _derivar_nome_artefato(tipo, formato, oficio, servidor, servidores, cidade) 
     if tipo == "justificativa":
         return naming.nome_justificativa(oficio, cidade, formato)
     if tipo == "plano_trabalho":
-        # planos sempre têm nome_drive; fallback genérico caso falte.
-        return naming._arquivo(f"Plano de trabalho{naming._suf_cidade(cidade)}", formato)
+        # Fallback raríssimo (nome_drive ausente e evento não localizável).
+        return naming._arquivo(f"Plano de Trabalho{naming._suf_cidade(cidade)}", formato)
     return naming.nome_oficio(oficio, servidores, cidade, formato)
 
 
@@ -373,6 +373,14 @@ def organizar_artefato(artefato) -> tuple[str, str] | None:
         # recalcula sempre, a partir do estado ATUAL da própria OrdemServico.
         ordem = oficio.ordens_servico.first()
         nome = naming.nome_os(ordem, formato)
+    elif tipo == "plano_trabalho" and evento is not None and evento.planos_trabalho.count() == 1:
+        # Mesmo raciocínio da OS acima: nome_drive do plano é gravado uma vez
+        # na criação (planos_trabalho.services._persistir_plano_artefato,
+        # deduplicado por hash) e nunca recalculado ao reorganizar. Só dá pra
+        # fazer isso com segurança quando o evento tem EXATAMENTE 1 plano —
+        # com mais de um não tem como saber, só pelo artefato (sem FK direta
+        # pra PlanoTrabalho), qual plano corresponde a qual artefato.
+        nome = naming.nome_plano(evento.planos_trabalho.first(), formato)
     else:
         nome = (artefato.nome_drive or "").strip() or _derivar_nome_artefato(
             tipo, formato, oficio, getattr(artefato, "servidor", None), servidores, cidade
@@ -789,10 +797,8 @@ def _garantir_planos(evento) -> None:
     except Exception:
         return
 
-    oficio = evento.oficios.first()
-    cidade = naming.cidade_evento(evento, oficio)
     for plano in planos:
-        nome = naming.nome_plano(plano, cidade, oficio=oficio)
+        nome = naming.nome_plano(plano)
         if DocumentoArtefato.objects.filter(
             evento=evento, tipo="plano_trabalho", nome_drive=nome
         ).exists():

@@ -1169,12 +1169,11 @@ def _persistir_plano_artefato(plano: PlanoTrabalho, doc) -> None:
         ).exists():
             return
         oficio = plano.evento.oficios.first() if plano.evento_id else None
-        cidade = naming.cidade_evento(getattr(plano, "evento", None), oficio)
         persist_geracao(
             doc,
             evento_id=plano.evento_id,
             oficio_id=(oficio.pk if oficio else None),
-            nome_drive=naming.nome_plano(plano, cidade, oficio=oficio),
+            nome_drive=naming.nome_plano(plano),
         )
     except Exception:
         logger.warning("Não foi possível persistir artefato do plano de trabalho.", exc_info=True)
