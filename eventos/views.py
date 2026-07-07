@@ -395,9 +395,8 @@ def detalhe(request, pk, etapa=1):
         form = EventoNovoCadastroForm(request.POST, instance=evento)
         if form.is_valid():
             evento = form.save(commit=False)
-            if not evento.titulo:
-                nomes = [tipo.nome for tipo in form.cleaned_data.get("tipos") or []]
-                evento.titulo = " / ".join(nomes) if nomes else "Novo Evento"
+            nomes = [tipo.nome for tipo in form.cleaned_data.get("tipos") or []]
+            evento.titulo = " / ".join(nomes) if nomes else "Novo Evento"
             _save_destinos_extras(evento, request)
             evento.save()
             form.save_m2m()
