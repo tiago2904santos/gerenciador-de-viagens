@@ -55,6 +55,46 @@ def _format_datetime(value) -> str:
     return value.astimezone(timezone.get_current_timezone()).strftime("%d/%m/%Y %H:%M")
 
 
+_MESES = {
+    1: "janeiro", 2: "fevereiro", 3: "março", 4: "abril",
+    5: "maio", 6: "junho", 7: "julho", 8: "agosto",
+    9: "setembro", 10: "outubro", 11: "novembro", 12: "dezembro",
+}
+
+
+def _to_local_date(value):
+    if not value:
+        return None
+    from django.utils import timezone
+
+    if timezone.is_naive(value):
+        value = timezone.make_aware(value, timezone.get_current_timezone())
+    return value.astimezone(timezone.get_current_timezone()).date()
+
+
+def _fmt_data_extenso(d) -> str:
+    return f"{d.day} de {_MESES[d.month]} de {d.year}"
+
+
+def _periodo_extenso(saida, retorno) -> str:
+    inicio = _to_local_date(saida)
+    fim = _to_local_date(retorno)
+    if not inicio and not fim:
+        return "—"
+    if not inicio:
+        inicio = fim
+    if not fim or fim == inicio:
+        return f"no dia {_fmt_data_extenso(inicio)}"
+    if inicio.month == fim.month and inicio.year == fim.year:
+        return f"nos dias {inicio.day} até {fim.day} de {_MESES[inicio.month]} de {inicio.year}"
+    if inicio.year == fim.year:
+        return (
+            f"nos dias {inicio.day} de {_MESES[inicio.month]} até "
+            f"{fim.day} de {_MESES[fim.month]} de {fim.year}"
+        )
+    return f"nos dias {_fmt_data_extenso(inicio)} até {_fmt_data_extenso(fim)}"
+
+
 def _format_brl(value) -> str:
     if value in (None, ""):
         return "—"
@@ -230,9 +270,7 @@ def _viagem_payload(oficio: Oficio) -> dict[str, Any]:
     retorno = getattr(roteiro, "retorno_chegada_dt", None) or getattr(roteiro, "retorno_saida_dt", None)
     saida_txt = _format_datetime(saida)
     retorno_txt = _format_datetime(retorno)
-    periodo = "—"
-    if saida_txt != "—" or retorno_txt != "—":
-        periodo = f"{saida_txt} a {retorno_txt}"
+    periodo = _periodo_extenso(saida, retorno)
     destino_principal = "—"
     if roteiro:
         destino = roteiro.destinos.select_related("cidade", "estado").order_by("ordem", "pk").first()

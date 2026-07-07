@@ -253,8 +253,13 @@ def _periodo_texto(termo: TermoAutorizacao) -> str:
     if not fim or fim == inicio:
         return f"no dia {_fmt_extenso(inicio)}"
     if inicio.month == fim.month and inicio.year == fim.year:
-        return f"nos dias {inicio.day} a {fim.day} de {_MESES[inicio.month]} de {inicio.year}"
-    return f"nos dias {_fmt_extenso(inicio)} a {_fmt_extenso(fim)}"
+        return f"nos dias {inicio.day} até {fim.day} de {_MESES[inicio.month]} de {inicio.year}"
+    if inicio.year == fim.year:
+        return (
+            f"nos dias {inicio.day} de {_MESES[inicio.month]} até "
+            f"{fim.day} de {_MESES[fim.month]} de {fim.year}"
+        )
+    return f"nos dias {_fmt_extenso(inicio)} até {_fmt_extenso(fim)}"
 
 
 def _viagem_payload_termo(termo: TermoAutorizacao) -> dict:
