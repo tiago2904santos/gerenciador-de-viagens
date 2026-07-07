@@ -1,0 +1,28 @@
+name: Diagnostico manual (leitura)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  diagnostico:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Rodar comando de leitura via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /var/www/gerenciador-viagens/app
+            source /var/www/gerenciador-viagens/venv/bin/activate
+            export DJANGO_SETTINGS_MODULE=config.settings.prod
+            export $(grep -v '^#' .env | xargs)
+            python manage.py shell -c "
+            from integracoes.google_drive.models import DriveSyncStatus
+            qs = DriveSyncStatus.objects.select_related('content_type').order_by('-atualizado_em')
+            print('total pendencias:', qs.count())
+            for p in qs[:50]:
+                print(f'{p.content_type.name} #{p.object_id} | {p.tentativas}x | atualizado_em={p.atualizado_em} | erro={p.ultimo_erro[:200]!r}')
+            "
