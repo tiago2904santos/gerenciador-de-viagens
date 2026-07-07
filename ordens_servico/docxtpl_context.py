@@ -40,7 +40,9 @@ def _destinos_display(ordem: OrdemServico) -> str:
     if not destinos:
         return ""
     parts = [
-        f"{d.nome}/{d.estado.sigla}" if d.estado_id else d.nome
+        f"{format_document_display(d.nome)}/{d.estado.sigla}"
+        if d.estado_id
+        else format_document_display(d.nome)
         for d in destinos
     ]
     if len(parts) == 1:
