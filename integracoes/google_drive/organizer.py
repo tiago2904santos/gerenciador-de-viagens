@@ -247,7 +247,7 @@ def _derivar_nome_artefato(tipo, formato, oficio, servidor, servidores, cidade) 
         suf = naming._suf_cidade(cidade)
         rotulo = {
             "plano_trabalho": "Plano de trabalho",
-            "ordem_servico": "Ordem de serviço",
+            "ordem_servico": "Ordem de Serviço",
             "termo_autorizacao": "Termo de autorização",
             "justificativa": "Justificativa",
         }.get(tipo, "Ofício")
@@ -255,7 +255,13 @@ def _derivar_nome_artefato(tipo, formato, oficio, servidor, servidores, cidade) 
     if tipo == "termo_autorizacao":
         return naming.nome_termo(oficio, servidor, cidade, formato)
     if tipo == "ordem_servico":
-        return naming.nome_os(oficio, servidores, cidade, formato)
+        # Fallback raríssimo: só ocorre pra um DocumentoArtefato antigo sem
+        # nome_drive salvo (o caminho normal já grava nome_drive na criação,
+        # ver ordens_servico.services._persistir_ordem_servico_artefato).
+        ordem = oficio.ordens_servico.first()
+        if ordem is not None:
+            return naming.nome_os(ordem, formato)
+        return naming._arquivo(f"Ordem de Serviço{naming._suf_cidade(cidade)}", formato)
     if tipo == "justificativa":
         return naming.nome_justificativa(oficio, cidade, formato)
     if tipo == "plano_trabalho":

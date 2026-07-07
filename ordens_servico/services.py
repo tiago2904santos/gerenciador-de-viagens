@@ -148,13 +148,11 @@ def _persistir_ordem_servico_artefato(ordem: OrdemServico, doc) -> None:
         oficio = ordem.oficios.first()
         if oficio is None:
             return
-        servidores = list(oficio.servidores.all())
-        cidade = naming.cidade_evento(getattr(oficio, "evento", None), oficio)
         persist_geracao(
             doc,
             oficio_id=oficio.pk,
             evento_id=getattr(oficio, "evento_id", None),
-            nome_drive=naming.nome_os(oficio, servidores, cidade),
+            nome_drive=naming.nome_os(ordem),
         )
     except Exception:
         logger.warning("Não foi possível persistir artefato da ordem de serviço.", exc_info=True)

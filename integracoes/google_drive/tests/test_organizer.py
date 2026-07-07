@@ -142,6 +142,29 @@ class OrganizerTests(TestCase):
         reg.refresh_from_db()
         self.assertTrue(reg.file_id)
 
+    def test_nome_os_usa_dados_da_propria_os(self):
+        """O nome do arquivo da OS vem da própria OrdemServico (número, destino,
+        período, servidores) — não do ofício "âncora": uma OS pode cobrir
+        vários ofícios com destino/período/participantes diferentes dela."""
+        from cadastros.models import Cidade, Estado
+        from integracoes.google_drive import naming
+        from ordens_servico.models import OrdemServico
+
+        estado = Estado.objects.create(nome="Paraná", sigla="PR")
+        cidade = Cidade.objects.create(nome="Rio Branco do Sul", uf="PR", estado=estado)
+        ordem = OrdemServico.objects.create(
+            numero=4, ano=2026,
+            data_evento_inicio=date(2026, 7, 17), data_evento_fim=date(2026, 7, 17),
+        )
+        ordem.destinos.add(cidade)
+        ordem.servidores.add(self.ana, self.bruno)
+
+        nome = naming.nome_os(ordem)
+        self.assertEqual(
+            nome,
+            "Ordem de Serviço 004-2026 - Rio Branco do Sul-PR - 17 jul 2026 - Ana e Bruno.pdf",
+        )
+
     def test_organizar_oficio_limpa_pendencia_apos_sucesso(self):
         """organizar_oficio (usado por "Reorganizar tudo") passava batido pelo
         DriveSyncStatus: um artefato que tinha falhado antes (pendência

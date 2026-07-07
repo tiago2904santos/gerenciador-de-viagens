@@ -114,11 +114,6 @@ class NamingTests(SimpleTestCase):
         nome = naming.nome_termo(of, _Servidor("ANA"), "Maringá")
         self.assertEqual(nome, "Termo de autorização 01-2026 protocolo 12.345.678-9 Ana (Maringá).pdf")
 
-    def test_nome_os_usa_tres_digitos(self):
-        of = _Oficio(numero=1, ano=2026, protocolo="123456789")
-        nome = naming.nome_os(of, [_Servidor("ANA")], "Maringá")
-        self.assertTrue(nome.startswith("Ordem de serviço 001-2026"))
-
     def test_nome_anexo_solicitacao(self):
         of = _Oficio(numero=1, ano=2026, protocolo="123456789")
         nome = naming.nome_anexo_solicitacao(of, _Servidor("ANA"), "123456", "Maringá", "pdf")

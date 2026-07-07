@@ -144,9 +144,8 @@ def cidade_evento(evento=None, oficio=None) -> str:
     return ""
 
 
-def periodo_pasta(evento) -> str:
-    di = getattr(evento, "data_inicio", None)
-    df = getattr(evento, "data_fim", None)
+def periodo_curto(di, df) -> str:
+    """``22 a 23 jul 2026``; ``22 jul 2026`` se só uma data."""
     if not di and not df:
         return ""
     if di and df and di != df:
@@ -163,6 +162,10 @@ def periodo_pasta(evento) -> str:
         )
     d = di or df
     return f"{d.day} {_MESES_ABREV[d.month]} {d.year}"
+
+
+def periodo_pasta(evento) -> str:
+    return periodo_curto(getattr(evento, "data_inicio", None), getattr(evento, "data_fim", None))
 
 
 def tipo_evento_label(evento) -> str:
@@ -233,16 +236,34 @@ def nome_termo(oficio, servidor, cidade, formato="pdf") -> str:
     return _arquivo(" ".join(partes) + _suf_cidade(cidade), formato)
 
 
-def nome_os(oficio, servidores, cidade, formato="pdf") -> str:
-    nd = num_doc(oficio.numero, oficio.ano, width=3)
-    proto = protocolo_fmt(oficio)
-    nomes = nomes_servidores(servidores)
-    partes = [f"Ordem de serviço {nd}".strip()]
-    if proto:
-        partes.append(f"protocolo {proto}")
-    if nomes:
-        partes.append(nomes)
-    return _arquivo(" ".join(partes) + _suf_cidade(cidade), formato)
+def destinos_os(ordem) -> str:
+    if not getattr(ordem, "pk", None):
+        return ""
+    cidades = list(ordem.destinos.select_related("estado").order_by("nome"))
+    if not cidades:
+        return ""
+    return ", ".join(
+        f"{capitalizar_cidade(c.nome)}/{c.estado.sigla}" if c.estado_id else capitalizar_cidade(c.nome)
+        for c in cidades
+    )
+
+
+def nome_os(ordem, formato="pdf") -> str:
+    """Nome do arquivo da Ordem de Serviço — usa os dados da PRÓPRIA OS
+    (número, destinos, período, servidores), nunca do ofício "âncora": uma OS
+    pode cobrir vários ofícios com participantes/período/destino diferentes
+    do dela (ex.: OS única pra 2 ofícios de cidades/datas distintas).
+
+    Separador " - " (não "*"): asterisco é caractere inválido em nomes de
+    arquivo no Windows e seria removido pelo sanitizador — quebraria a
+    sincronização local do Drive Desktop.
+    """
+    nd = num_doc(ordem.numero, ordem.ano, width=3)
+    destino = destinos_os(ordem)
+    periodo = periodo_curto(ordem.data_evento_inicio, ordem.data_evento_fim)
+    nomes = nomes_servidores(list(ordem.servidores.all()) if ordem.pk else [])
+    partes = [p for p in (f"Ordem de Serviço {nd}".strip(), destino, periodo, nomes) if p]
+    return _arquivo(" - ".join(partes), formato)
 
 
 def nome_plano(plano, cidade, *, oficio=None, formato="pdf") -> str:
