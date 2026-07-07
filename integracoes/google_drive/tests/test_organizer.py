@@ -22,6 +22,17 @@ def _http_404():
     return HttpError(resp, b'{"error": {"message": "File not found"}}')
 
 
+def _http_403_sem_permissao():
+    import httplib2
+
+    resp = httplib2.Response({"status": 403})
+    return HttpError(
+        resp,
+        b'{"error": {"errors": [{"reason": "insufficientFilePermissions", '
+        b'"message": "The user does not have sufficient permissions for this file."}]}}',
+    )
+
+
 def _pdf(name):
     raw = b"%PDF-1.4\n%%EOF\n" + name.encode()
     return ContentFile(raw, name=name), hashlib.sha256(raw).hexdigest()
@@ -93,6 +104,46 @@ class OrganizerTests(TestCase):
         self.assertIsNotNone(resultado)
         reg.refresh_from_db()
         self.assertTrue(reg.file_id)
+
+    def test_recria_quando_sem_permissao_no_arquivo_proprio(self):
+        """403 insufficientFilePermissions (arquivo existe, mas a conta
+        conectada não pode mais mexer nele — visto em produção ao mover
+        arquivos entre pastas após reconexão/mudança de permissão) deve
+        recriar, igual ao 404."""
+        art = self._artefato("oficio")
+        organizer.organizar_artefato(art)
+        reg = DriveArquivo.objects.get(artefato=art)
+        reg.mock = False
+        reg.save()
+
+        client = services.get_client()
+        with patch.object(client, "mover_renomear", side_effect=_http_403_sem_permissao()):
+            resultado = organizer.organizar_artefato(art)
+
+        self.assertIsNotNone(resultado)
+        reg.refresh_from_db()
+        self.assertTrue(reg.file_id)
+
+    def test_outros_403_continuam_propagando(self):
+        """Só insufficientFilePermissions vira "recriar" — outro motivo de 403
+        (ex.: limite de taxa) não deve ser mascarado como se fosse um problema
+        de arquivo perdido."""
+        import httplib2
+
+        art = self._artefato("oficio")
+        organizer.organizar_artefato(art)
+        reg = DriveArquivo.objects.get(artefato=art)
+        reg.mock = False
+        reg.save()
+
+        resp = httplib2.Response({"status": 403})
+        erro_limite = HttpError(
+            resp, b'{"error": {"errors": [{"reason": "rateLimitExceeded"}]}}'
+        )
+        client = services.get_client()
+        with patch.object(client, "mover_renomear", side_effect=erro_limite):
+            with self.assertRaises(HttpError):
+                organizer.organizar_artefato(art)
 
     def test_recria_quando_arquivo_anterior_foi_apagado_no_drive(self):
         """Editar/regerar um documento cujo arquivo anterior sumiu do Drive

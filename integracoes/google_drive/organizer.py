@@ -192,6 +192,28 @@ def _localizar_artefato_anterior(artefato):
     return qs.order_by("-criado_em").first()
 
 
+def _arquivo_inacessivel(exc) -> bool:
+    """True quando o erro indica que não dá pra mexer no file_id atual — 404
+    (apagado) ou 403 ``insufficientFilePermissions`` (o arquivo existe mas a
+    conta conectada não tem permissão pra movê-lo/editá-lo — ex.: dono
+    diferente, ou tentativa de mover entre Drives Compartilhados sem acesso
+    de gerente num dos dois lados). Nos dois casos o tratamento é o mesmo:
+    considerar o file_id perdido e criar um arquivo novo, que a conta
+    conectada vai possuir de verdade — em vez de travar a sincronização.
+    """
+    status = getattr(exc.resp, "status", None)
+    if status == 404:
+        return True
+    if status == 403:
+        # HttpError.__str__ não inclui o corpo da resposta — o motivo
+        # ("insufficientFilePermissions") só está em .content (bytes/JSON).
+        conteudo = getattr(exc, "content", b"") or b""
+        if isinstance(conteudo, bytes):
+            conteudo = conteudo.decode("utf-8", errors="ignore")
+        return "insufficientFilePermissions" in conteudo
+    return False
+
+
 def _persistir_artefato(artefato, pasta_id: str, nome: str, *, atalho_pasta_id: str | None = None) -> tuple[str, str] | None:
     from googleapiclient.errors import HttpError
 
@@ -209,13 +231,15 @@ def _persistir_artefato(artefato, pasta_id: str, nome: str, *, atalho_pasta_id: 
             reg.save()
             return reg.file_id, reg.url
         except HttpError as exc:
-            if exc.resp.status != 404:
+            if not _arquivo_inacessivel(exc):
                 raise
             # O arquivo foi apagado do Drive (fora do app, ou por uma limpeza
-            # anterior) mas o registro local ainda aponta pra ele: trata como
-            # se não existisse e recria abaixo em vez de travar a sincronização.
+            # anterior) OU a conta conectada perdeu permissão sobre ele (dono
+            # diferente, movido pra fora do alcance) — nos dois casos o
+            # registro local não serve mais: trata como inexistente e recria
+            # abaixo em vez de travar a sincronização.
             logger.warning(
-                "[Drive] file_id %s do artefato %s não existe mais no Drive; recriando",
+                "[Drive] file_id %s do artefato %s inacessível (apagado ou sem permissão); recriando",
                 reg.file_id, artefato.pk,
             )
             reg.file_id = ""
@@ -240,11 +264,11 @@ def _persistir_artefato(artefato, pasta_id: str, nome: str, *, atalho_pasta_id: 
                 reg_anterior.save()
                 return file_id, url
             except HttpError as exc:
-                if exc.resp.status != 404:
+                if not _arquivo_inacessivel(exc):
                     raise
                 logger.warning(
-                    "[Drive] file_id %s do artefato anterior %s não existe mais no Drive; "
-                    "criando arquivo novo para %s",
+                    "[Drive] file_id %s do artefato anterior %s inacessível (apagado ou "
+                    "sem permissão); criando arquivo novo para %s",
                     reg_anterior.file_id, anterior.pk, artefato.pk,
                 )
 
@@ -256,12 +280,13 @@ def _persistir_artefato(artefato, pasta_id: str, nome: str, *, atalho_pasta_id: 
         try:
             file_id, url = client.atualizar_conteudo(existente_id, nome, conteudo, mime, pasta_id=pasta_id)
         except HttpError as exc:
-            if exc.resp.status != 404:
+            if not _arquivo_inacessivel(exc):
                 raise
             # Mesmo caso das outras recriações: o arquivo achado por nome não
-            # existe mais de verdade (apagado entre a busca e a atualização).
+            # está mais acessível de verdade (apagado ou sem permissão entre a
+            # busca e a atualização).
             logger.warning(
-                "[Drive] arquivo %s achado por nome não existe mais no Drive; criando novo para artefato %s",
+                "[Drive] arquivo %s achado por nome ficou inacessível; criando novo para artefato %s",
                 existente_id, artefato.pk,
             )
             file_id, url = client.upload(nome, conteudo, mime, pasta_id=pasta_id)
@@ -395,13 +420,14 @@ def _persistir_conteudo_externo(
             reg.save()
             return file_id, url
         except HttpError as exc:
-            if exc.resp.status != 404:
+            if not _arquivo_inacessivel(exc):
                 raise
-            # Mesmo caso de _persistir_artefato: o arquivo foi apagado do Drive
-            # fora do app, mas o registro local ainda aponta pra ele — recria
-            # abaixo em vez de travar a sincronização deste campo.
+            # Mesmo caso de _persistir_artefato: o arquivo foi apagado do Drive,
+            # ou a conta conectada perdeu permissão sobre ele — recria abaixo em
+            # vez de travar a sincronização deste campo.
             logger.warning(
-                "[Drive] file_id %s do arquivo externo %s#%s (%s) não existe mais no Drive; recriando",
+                "[Drive] file_id %s do arquivo externo %s#%s (%s) inacessível (apagado ou sem "
+                "permissão); recriando",
                 reg.file_id, obj.__class__.__name__, obj.pk, campo,
             )
             reg.file_id = ""
