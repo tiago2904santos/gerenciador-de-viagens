@@ -692,40 +692,44 @@ def _artefatos_mais_recentes(qs):
 
 def organizar_oficio(oficio) -> None:
     """Organiza todos os artefatos e prestações de um ofício (+ backfill)."""
+    from . import status
+
     _garantir_documento_oficio(oficio)
     _garantir_termos(oficio)
     _garantir_ordens_servico(oficio)
     for artefato in _artefatos_mais_recentes(oficio.documentos_gerados.all()):
         try:
-            organizar_artefato(artefato)
+            status.executar_e_rastrear(organizar_artefato, artefato)
         except Exception as exc:
             logger.error("[Drive] erro ao organizar artefato %s: %s", artefato.pk, exc, exc_info=True)
     for prestacao in oficio.prestacoes_contas.all():
         try:
-            organizar_prestacao(prestacao)
+            status.executar_e_rastrear(organizar_prestacao, prestacao)
         except Exception as exc:
             logger.error("[Drive] erro ao organizar prestação %s: %s", prestacao.pk, exc, exc_info=True)
 
 
 def organizar_evento(evento) -> None:
     """Organiza ofícios, planos, anexos e solicitações de um evento."""
+    from . import status
+
     _garantir_planos(evento)
     for oficio in evento.oficios.all():
         organizar_oficio(oficio)
     # Planos do evento sem ofício (não cobertos por organizar_oficio).
     for artefato in _artefatos_mais_recentes(evento.documentos_gerados.filter(oficio__isnull=True)):
         try:
-            organizar_artefato(artefato)
+            status.executar_e_rastrear(organizar_artefato, artefato)
         except Exception as exc:
             logger.error("[Drive] erro ao organizar artefato %s: %s", artefato.pk, exc, exc_info=True)
     for anexo in evento.anexos.all():
         try:
-            organizar_evento_anexo(anexo)
+            status.executar_e_rastrear(organizar_evento_anexo, anexo)
         except Exception as exc:
             logger.error("[Drive] erro ao organizar anexo %s: %s", anexo.pk, exc, exc_info=True)
     for doc in evento.documentos_solicitacao.all():
         try:
-            organizar_solicitacao_evento(doc)
+            status.executar_e_rastrear(organizar_solicitacao_evento, doc)
         except Exception as exc:
             logger.error("[Drive] erro ao organizar solicitação %s: %s", doc.pk, exc, exc_info=True)
 

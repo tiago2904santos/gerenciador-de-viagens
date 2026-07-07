@@ -142,6 +142,23 @@ class OrganizerTests(TestCase):
         reg.refresh_from_db()
         self.assertTrue(reg.file_id)
 
+    def test_organizar_oficio_limpa_pendencia_apos_sucesso(self):
+        """organizar_oficio (usado por "Reorganizar tudo") passava batido pelo
+        DriveSyncStatus: um artefato que tinha falhado antes (pendência
+        registrada pelo caminho do signal) e agora sobe com sucesso via
+        Reorganizar continuava aparecendo pra sempre no painel de pendências,
+        porque só o caminho signal/Celery chamava status.registrar_sucesso."""
+        from integracoes.google_drive import status
+        from integracoes.google_drive.models import DriveSyncStatus
+
+        art = self._artefato("oficio")
+        status.registrar_falha(art, RuntimeError("Drive fora do ar (simulado)"))
+        self.assertEqual(DriveSyncStatus.objects.count(), 1)
+
+        organizer.organizar_oficio(self.oficio)
+
+        self.assertEqual(DriveSyncStatus.objects.count(), 0)
+
     def test_planejar_oficio_monta_arvore(self):
         """O CANÔNICO (arquivo real) fica sempre direto na pasta global do tipo
         (sem subpasta), tenha evento ou não — dentro de Eventos/ existe
