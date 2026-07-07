@@ -202,6 +202,12 @@ GOOGLE_DRIVE = {
     "PASTA_RAIZ_ID": (os.getenv("GOOGLE_DRIVE_PASTA_RAIZ_ID") or "").strip(),
     # Em modo mock, faz o upload simulado mas ainda persiste DriveArquivo no banco
     "UPLOAD_EM_MOCK": _env_flag("GOOGLE_DRIVE_UPLOAD_EM_MOCK", "false"),
+    # Timeout (segundos) de cada chamada HTTP à API do Drive. Sem isso, uma
+    # conexão travada (ex.: falha de TLS no meio do handshake) trava pra
+    # sempre a chamada, e junto com ela a reorganização em massa inteira
+    # (roda sequencial numa única thread) — sem nunca lançar exceção pro
+    # try/except que já existe em cada artefato.
+    "HTTP_TIMEOUT_SECONDS": float(os.getenv("GOOGLE_DRIVE_HTTP_TIMEOUT_SECONDS") or 30),
 }
 
 # ---------------------------------------------------------------------------

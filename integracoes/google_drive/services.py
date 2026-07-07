@@ -171,8 +171,10 @@ class _MockClient:
 
 class _RealClient:
     def __init__(self):
+        import httplib2
         from google.auth.transport.requests import Request
         from google.oauth2.credentials import Credentials
+        from google_auth_httplib2 import AuthorizedHttp
         from googleapiclient.discovery import build
 
         from integracoes.google_drive.models import DriveCredenciais
@@ -207,7 +209,9 @@ class _RealClient:
                 creds_obj.token_expiry = creds.expiry.replace(tzinfo=timezone.utc)
             creds_obj.save(update_fields=["access_token", "token_expiry", "atualizado_em"])
 
-        self._svc = build("drive", "v3", credentials=creds, cache_discovery=False)
+        timeout = float(cfg.get("HTTP_TIMEOUT_SECONDS") or 30)
+        authed_http = AuthorizedHttp(creds, http=httplib2.Http(timeout=timeout))
+        self._svc = build("drive", "v3", http=authed_http, cache_discovery=False)
         self._cache: dict[tuple[str | None, str], str] = {}
 
     def upload(self, nome: str, conteudo: bytes, mimetype: str, pasta_id: str | None = None) -> tuple[str, str]:
