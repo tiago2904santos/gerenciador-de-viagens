@@ -362,9 +362,21 @@ def organizar_artefato(artefato) -> tuple[str, str] | None:
     servidores = list(oficio.servidores.all()) if oficio is not None else []
     cidade = naming.cidade_evento(evento, oficio)
 
-    nome = (artefato.nome_drive or "").strip() or _derivar_nome_artefato(
-        tipo, formato, oficio, getattr(artefato, "servidor", None), servidores, cidade
-    )
+    if tipo == "ordem_servico" and oficio is not None and oficio.ordens_servico.exists():
+        # NUNCA confia no nome_drive salvo pra OS: ele é gravado uma vez, na
+        # criação do artefato, e artefatos de OS são deduplicados por hash de
+        # conteúdo (_persistir_ordem_servico_artefato) — então uma OS gerada
+        # há semanas, antes de qualquer ajuste no formato do nome (ou antes de
+        # um novo ofício ser vinculado à mesma OS, mudando destino/período/
+        # servidores), fica com o nome ERRADO pra sempre, porque reorganizar
+        # de novo nunca recalcula, só reusa o que já está no banco. A OS
+        # recalcula sempre, a partir do estado ATUAL da própria OrdemServico.
+        ordem = oficio.ordens_servico.first()
+        nome = naming.nome_os(ordem, formato)
+    else:
+        nome = (artefato.nome_drive or "").strip() or _derivar_nome_artefato(
+            tipo, formato, oficio, getattr(artefato, "servidor", None), servidores, cidade
+        )
     if _cancelado(oficio=oficio, evento=evento):
         nome = naming.com_sufixo_cancelado(nome)
 

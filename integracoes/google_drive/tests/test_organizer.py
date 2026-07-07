@@ -261,6 +261,30 @@ class OrganizerTests(TestCase):
         pasta_evento_id = organizer._pasta_evento_folder(client, self.evento)
         self.assertEqual(reg_os.atalho_pasta_id, pasta_evento_id)
 
+    def test_nome_da_os_sempre_recalcula_mesmo_com_nome_drive_antigo_salvo(self):
+        """Bug real visto em produção: OS geradas antes do novo formato de nome
+        ficavam com o nome antigo (derivado do ofício, com "protocolo X") pra
+        sempre — organizar_artefato reusava o nome_drive já salvo em vez de
+        recalcular, e "Reorganizar" nunca corrigia."""
+        from ordens_servico.models import OrdemServico
+
+        ordem = OrdemServico.objects.create(
+            numero=7, ano=2026,
+            data_evento_inicio=date(2026, 7, 21), data_evento_fim=date(2026, 7, 27),
+        )
+        ordem.oficios.add(self.oficio)
+        ordem.servidores.add(self.ana, self.bruno)
+
+        art = self._artefato("ordem_servico", name="os.pdf")
+        art.nome_drive = "Ordem de serviço 086-2026 protocolo 26.174.695-6 Ana e Bruno (Ivaiporã).pdf"
+        art.save(update_fields=["nome_drive"])
+
+        organizer.organizar_artefato(art)
+
+        reg = DriveArquivo.objects.get(artefato=art)
+        self.assertEqual(reg.nome, naming.nome_os(ordem))
+        self.assertNotIn("protocolo", reg.nome)
+
     def test_oficio_sem_evento_vai_para_pasta_de_tipo(self):
         self.oficio.evento = None
         self.oficio.save()
