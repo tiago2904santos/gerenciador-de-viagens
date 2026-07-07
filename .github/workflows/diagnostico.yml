@@ -21,8 +21,19 @@ jobs:
             export $(grep -v '^#' .env | xargs)
             python manage.py shell -c "
             from integracoes.google_drive.models import DriveSyncStatus
+            from documentos.models import DocumentoArtefato
             qs = DriveSyncStatus.objects.select_related('content_type').order_by('-atualizado_em')
             print('total pendencias:', qs.count())
             for p in qs[:50]:
-                print(f'{p.content_type.name} #{p.object_id} | {p.tentativas}x | atualizado_em={p.atualizado_em} | erro={p.ultimo_erro[:200]!r}')
+                print('----')
+                print(f'{p.content_type.name} #{p.object_id} | {p.tentativas}x | atualizado_em={p.atualizado_em}')
+                if p.content_type.model == 'documentoartefato':
+                    try:
+                        a = DocumentoArtefato.objects.select_related('oficio', 'servidor').get(pk=p.object_id)
+                        oficio = a.oficio.numero_formatado if a.oficio_id else '-'
+                        servidor = a.servidor.nome if a.servidor_id else '-'
+                        print(f'  artefato: tipo={a.tipo} formato={a.formato} nome_drive={a.nome_drive!r} oficio={oficio} servidor={servidor}')
+                    except DocumentoArtefato.DoesNotExist:
+                        print('  artefato: NAO ENCONTRADO (registro apagado)')
+                print(f'  erro: {p.ultimo_erro}')
             "
