@@ -19,21 +19,56 @@ jobs:
             source /var/www/gerenciador-viagens/venv/bin/activate
             export DJANGO_SETTINGS_MODULE=config.settings.prod
             export $(grep -v '^#' .env | xargs)
-            python manage.py shell -c "
-            from integracoes.google_drive.models import DriveSyncStatus
+            cat > /tmp/diag.py << 'PYEOF'
+            from integracoes.google_drive.services import get_client
             from documentos.models import DocumentoArtefato
-            qs = DriveSyncStatus.objects.select_related('content_type').order_by('-atualizado_em')
-            print('total pendencias:', qs.count())
-            for p in qs[:50]:
-                print('----')
-                print(f'{p.content_type.name} #{p.object_id} | {p.tentativas}x | atualizado_em={p.atualizado_em}')
-                if p.content_type.model == 'documentoartefato':
-                    try:
-                        a = DocumentoArtefato.objects.select_related('oficio', 'servidor').get(pk=p.object_id)
-                        oficio = a.oficio.numero_formatado if a.oficio_id else '-'
-                        servidor = a.servidor.nome if a.servidor_id else '-'
-                        print(f'  artefato: tipo={a.tipo} formato={a.formato} nome_drive={a.nome_drive!r} oficio={oficio} servidor={servidor}')
-                    except DocumentoArtefato.DoesNotExist:
-                        print('  artefato: NAO ENCONTRADO (registro apagado)')
-                print(f'  erro: {p.ultimo_erro}')
-            "
+            from oficios.models import Oficio
+
+            client = get_client()
+            svc = client._svc
+
+            print('=== Pastas suspeitas (403 insufficientFilePermissions no addParents) ===')
+            for fid in ['1HrPMhwwtZ0R_GQ40sDYR_ZiVy9rzUCBO', '14uUlmUn9WZ-RtKC5Xi0fA7TxPqSav0C1']:
+                try:
+                    meta = svc.files().get(
+                        fileId=fid,
+                        fields='id,name,trashed,driveId,parents,capabilities,owners,shared',
+                        supportsAllDrives=True,
+                    ).execute()
+                    print(fid, '->', meta)
+                except Exception as exc:
+                    print(fid, '-> ERRO:', exc)
+
+            print()
+            print('=== Artefatos/atalhos do oficio 86/2026 (shortcutTargetInvalid) ===')
+            oficio = Oficio.objects.filter(numero=86, ano=2026).first()
+            print('oficio encontrado:', oficio)
+            if oficio:
+                for a in DocumentoArtefato.objects.filter(oficio=oficio):
+                    reg = getattr(a, 'drive_arquivo', None)
+                    file_id = reg.file_id if reg else None
+                    atalho_id = reg.atalho_id if reg else None
+                    print('artefato', a.pk, 'tipo=' + str(a.tipo), 'file_id=' + str(file_id), 'atalho_id=' + str(atalho_id))
+                    if reg and reg.file_id:
+                        try:
+                            meta = svc.files().get(
+                                fileId=reg.file_id,
+                                fields='id,name,mimeType,trashed,shortcutDetails',
+                                supportsAllDrives=True,
+                            ).execute()
+                            print('  canonico:', meta)
+                        except Exception as exc:
+                            print('  canonico ERRO:', exc)
+                    if reg and reg.atalho_id:
+                        try:
+                            meta = svc.files().get(
+                                fileId=reg.atalho_id,
+                                fields='id,name,mimeType,trashed,shortcutDetails',
+                                supportsAllDrives=True,
+                            ).execute()
+                            print('  atalho:', meta)
+                        except Exception as exc:
+                            print('  atalho ERRO:', exc)
+            PYEOF
+            python manage.py shell < /tmp/diag.py
+            rm -f /tmp/diag.py
