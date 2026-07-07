@@ -162,7 +162,7 @@ class OrganizerTests(TestCase):
         nome = naming.nome_os(ordem)
         self.assertEqual(
             nome,
-            "ORDEM DE SERVIÇO 004-2026 - RIO BRANCO DO SUL-PR - 17 de julho de 2026 - Ana e Bruno.pdf",
+            "Ordem de Serviço 004-2026 - Rio Branco do Sul-PR - 17 de julho de 2026 - Ana e Bruno.pdf",
         )
 
     def test_organizar_oficio_limpa_pendencia_apos_sucesso(self):

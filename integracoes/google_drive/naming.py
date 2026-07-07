@@ -281,16 +281,13 @@ def nome_termo(oficio, servidor, cidade, formato="pdf") -> str:
 
 
 def destinos_os(ordem) -> str:
-    """Destinos da OS em MAIÚSCULAS (ex.: ``IVAIPORÃ/PR``) — combinação com
-    formato de nome de arquivo acordada com o usuário para a Ordem de Serviço,
-    diferente do Title Case usado no resto do sistema."""
     if not getattr(ordem, "pk", None):
         return ""
     cidades = list(ordem.destinos.select_related("estado").order_by("nome"))
     if not cidades:
         return ""
     return ", ".join(
-        f"{c.nome.upper()}/{c.estado.sigla}" if c.estado_id else c.nome.upper()
+        f"{capitalizar_cidade(c.nome)}/{c.estado.sigla}" if c.estado_id else capitalizar_cidade(c.nome)
         for c in cidades
     )
 
@@ -301,7 +298,7 @@ def nome_os(ordem, formato="pdf") -> str:
     pode cobrir vários ofícios com participantes/período/destino diferentes
     do dela (ex.: OS única pra 2 ofícios de cidades/datas distintas).
 
-    Formato acordado com o usuário: ``ORDEM DE SERVIÇO 007-2026 - IVAIPORÃ/PR
+    Formato acordado com o usuário: ``Ordem de Serviço 007-2026 - Ivaiporã/PR
     - 21 a 27 de julho de 2026 - Nome1, Nome2 e Nome3``. Separador " - " (não
     "*"): asterisco é caractere inválido em nomes de arquivo no Windows e
     seria removido pelo sanitizador — quebraria a sincronização local do
@@ -311,7 +308,7 @@ def nome_os(ordem, formato="pdf") -> str:
     destino = destinos_os(ordem)
     periodo = periodo_extenso(ordem.data_evento_inicio, ordem.data_evento_fim)
     nomes = nomes_servidores(list(ordem.servidores.all()) if ordem.pk else [])
-    partes = [p for p in (f"ORDEM DE SERVIÇO {nd}".strip(), destino, periodo, nomes) if p]
+    partes = [p for p in (f"Ordem de Serviço {nd}".strip(), destino, periodo, nomes) if p]
     return _arquivo(" - ".join(partes), formato)
 
 
