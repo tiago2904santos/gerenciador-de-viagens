@@ -318,6 +318,8 @@ def colocar_arquivo_externo(obj, ff, *, campo: str, pasta_id: str, nome: str) ->
     if not ff:
         return None
 
+    from googleapiclient.errors import HttpError
+
     from django.contrib.contenttypes.models import ContentType
 
     from .models import DriveArquivoExterno
@@ -333,11 +335,23 @@ def colocar_arquivo_externo(obj, ff, *, campo: str, pasta_id: str, nome: str) ->
         return None
 
     if reg and reg.file_id and not reg.mock:
-        file_id, url = client.atualizar_conteudo(reg.file_id, nome, conteudo, mime, pasta_id=pasta_id)
-        reg.url, reg.nome, reg.pasta_id = url, nome, pasta_id
-        reg.mime_type, reg.mock = mime, is_mock()
-        reg.save()
-        return file_id, url
+        try:
+            file_id, url = client.atualizar_conteudo(reg.file_id, nome, conteudo, mime, pasta_id=pasta_id)
+            reg.url, reg.nome, reg.pasta_id = url, nome, pasta_id
+            reg.mime_type, reg.mock = mime, is_mock()
+            reg.save()
+            return file_id, url
+        except HttpError as exc:
+            if exc.resp.status != 404:
+                raise
+            # Mesmo caso de _persistir_artefato: o arquivo foi apagado do Drive
+            # fora do app, mas o registro local ainda aponta pra ele — recria
+            # abaixo em vez de travar a sincronização deste campo.
+            logger.warning(
+                "[Drive] file_id %s do arquivo externo %s#%s (%s) não existe mais no Drive; recriando",
+                reg.file_id, obj.__class__.__name__, obj.pk, campo,
+            )
+            reg.file_id = ""
 
     file_id, url = client.upload(nome, conteudo, mime, pasta_id=pasta_id)
 

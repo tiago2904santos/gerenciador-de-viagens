@@ -111,6 +111,37 @@ class OrganizerTests(TestCase):
         self.assertIsNotNone(resultado)
         self.assertTrue(DriveArquivo.objects.filter(artefato=novo).exists())
 
+    def test_colocar_arquivo_externo_recria_quando_apagado_no_drive(self):
+        """Mesmo bug de test_recria_quando_arquivo_proprio_foi_apagado_no_drive,
+        mas na rota de arquivos externos (EventoAnexo, PrestacaoContas, etc.):
+        um 404 ao sobrescrever o file_id salvo travava a organização do evento
+        inteiro em vez de reenviar."""
+        from eventos.models import EventoAnexo
+        from integracoes.google_drive.models import DriveArquivoExterno
+
+        arquivo, _digest = _pdf("convite.pdf")
+        anexo = EventoAnexo.objects.create(
+            evento=self.evento, tipo=EventoAnexo.TIPO_CONVITE, arquivo=arquivo,
+        )
+
+        resultado = organizer.colocar_arquivo_externo(
+            anexo, anexo.arquivo, campo="arquivo", pasta_id="pasta-1", nome="convite.pdf",
+        )
+        self.assertIsNotNone(resultado)
+        reg = DriveArquivoExterno.objects.get(content_type__model="eventoanexo", object_id=anexo.pk, campo="arquivo")
+        reg.mock = False
+        reg.save()
+
+        client = services.get_client()
+        with patch.object(client, "atualizar_conteudo", side_effect=_http_404()):
+            resultado = organizer.colocar_arquivo_externo(
+                anexo, anexo.arquivo, campo="arquivo", pasta_id="pasta-1", nome="convite.pdf",
+            )
+
+        self.assertIsNotNone(resultado)
+        reg.refresh_from_db()
+        self.assertTrue(reg.file_id)
+
     def test_planejar_oficio_monta_arvore(self):
         """O CANÔNICO (arquivo real) fica sempre direto na pasta global do tipo
         (sem subpasta), tenha evento ou não — dentro de Eventos/ existe
