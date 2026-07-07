@@ -51,6 +51,16 @@ class NamingTests(SimpleTestCase):
         self.assertEqual(naming.nomes_servidores([a, b]), "Ana e Bruno")
         self.assertEqual(naming.nomes_servidores([a, b, c]), "Ana, Bruno e Carla")
 
+    def test_com_sufixo_cancelado(self):
+        self.assertEqual(
+            naming.com_sufixo_cancelado("Ofício 01-2026.pdf"), "Ofício 01-2026 (cancelado).pdf"
+        )
+        self.assertEqual(
+            naming.com_sufixo_cancelado("Ofício 01-2026 (cancelado).pdf"),
+            "Ofício 01-2026 (cancelado).pdf",
+        )
+        self.assertEqual(naming.com_sufixo_cancelado(""), "")
+
     def test_sanitize_troca_barra_por_hifen(self):
         self.assertEqual(naming.sanitize_drive_name("Ofício 01/2026"), "Ofício 01-2026")
         self.assertEqual(naming.sanitize_drive_name('a:b"c|d?e*f'), "abcdef")

@@ -11,7 +11,7 @@ from documentos.models import DocumentoArtefato
 from eventos.models import Evento
 from eventos.models import TipoEvento
 from oficios.models import Oficio
-from integracoes.google_drive import organizer, services
+from integracoes.google_drive import naming, organizer, services
 from integracoes.google_drive.models import DriveArquivo
 
 
@@ -218,3 +218,106 @@ class OrganizerTests(TestCase):
         linhas = organizer.planejar_oficio(self.oficio)
         self.assertTrue(any(linha.startswith("Ofícios/") for linha in linhas))
         self.assertFalse(any("Avulsos" in linha for linha in linhas))
+
+
+@override_settings(GOOGLE_DRIVE={"MODO": "mock", "UPLOAD_EM_MOCK": True})
+class CancelamentoTests(TestCase):
+    """Evento/documento cancelado: pasta do evento vai pra "Eventos cancelados/",
+    nota com o motivo, e "(cancelado)" no nome de cada documento."""
+
+    def setUp(self):
+        services._reset_client()
+        self.cargo = Cargo.objects.create(nome="Investigador")
+        self.ana = Servidor.objects.create(nome="Ana", cargo=self.cargo, cpf="12345678901")
+        self.evento = Evento.objects.create(
+            destino_cidade="Maringá", destino_uf="PR",
+            data_inicio=date(2026, 7, 22), data_fim=date(2026, 7, 23),
+        )
+        self.evento.tipos.add(TipoEvento.objects.get_or_create(nome="PCPR na Comunidade")[0])
+        self.oficio = Oficio.objects.create(
+            numero=1, ano=2026, protocolo="123456789", motivo="m", evento=self.evento,
+        )
+        self.oficio.servidores.add(self.ana)
+
+    def _artefato(self, tipo, name="doc.pdf"):
+        arquivo, digest = _pdf(name)
+        return DocumentoArtefato.objects.create(
+            tipo=tipo, formato="pdf", oficio=self.oficio, hash_sha256=digest, arquivo=arquivo,
+        )
+
+    def _cancelar_evento(self, motivo="Chuva forte"):
+        """Seta os campos de cancelamento via queryset.update() — evita passar
+        por Evento.save(), que agora dispara o signal (organização em thread
+        de verdade) e causa "database is locked" contra a transação do teste."""
+        from django.utils import timezone
+
+        Evento.objects.filter(pk=self.evento.pk).update(
+            status=Evento.STATUS_CANCELADO, motivo_cancelamento=motivo, cancelado_em=timezone.now()
+        )
+        self.evento.refresh_from_db()
+
+    def test_pasta_evento_ativo_fica_em_eventos(self):
+        client = services.get_client()
+        resultado = organizer._pasta_evento_folder(client, self.evento)
+        pai = client.get_or_create_pasta(naming.PASTA_EVENTOS, None)
+        esperado = client.get_or_create_pasta(naming.pasta_evento(self.evento), pai)
+        self.assertEqual(resultado, esperado)
+
+    def test_pasta_evento_cancelado_vai_para_eventos_cancelados(self):
+        self._cancelar_evento()
+        client = services.get_client()
+        resultado = organizer._pasta_evento_folder(client, self.evento)
+        pai = client.get_or_create_pasta(naming.PASTA_EVENTOS_CANCELADOS, None)
+        esperado = client.get_or_create_pasta(naming.pasta_evento(self.evento), pai)
+        self.assertEqual(resultado, esperado)
+
+    def test_pasta_evento_cancelado_ja_existente_em_eventos_e_movida(self):
+        """Evento cancelado depois de já ter sido organizado antes: a pasta que
+        já existe em "Eventos/" é MOVIDA pra "Eventos cancelados/", não
+        duplicada."""
+        client = services.get_client()
+        self._cancelar_evento()
+        with patch.object(client, "buscar_pasta_por_nome", return_value="pasta-antiga-id") as m_buscar, \
+                patch.object(client, "mover_renomear") as m_mover:
+            resultado = organizer._pasta_evento_folder(client, self.evento)
+
+        m_buscar.assert_called_once()
+        pai_cancelados = client.get_or_create_pasta(naming.PASTA_EVENTOS_CANCELADOS, None)
+        m_mover.assert_called_once_with("pasta-antiga-id", naming.pasta_evento(self.evento), pai_cancelados)
+        self.assertEqual(resultado, "pasta-antiga-id")
+
+    def test_organizar_artefato_com_oficio_cancelado_ganha_sufixo(self):
+        art = self._artefato("oficio")
+        self.oficio.cancelado = True
+        self.oficio.save(update_fields=["cancelado"])
+
+        organizer.organizar_artefato(art)
+
+        reg = DriveArquivo.objects.get(artefato=art)
+        self.assertTrue(reg.nome.endswith(" (cancelado).pdf"), reg.nome)
+
+    def test_organizar_artefato_sem_cancelamento_nao_ganha_sufixo(self):
+        art = self._artefato("oficio")
+        organizer.organizar_artefato(art)
+        reg = DriveArquivo.objects.get(artefato=art)
+        self.assertNotIn("cancelado", reg.nome)
+
+    def test_organizar_motivo_cancelamento_grava_nota(self):
+        from django.contrib.contenttypes.models import ContentType
+
+        from integracoes.google_drive.models import DriveArquivoExterno
+
+        self._cancelar_evento("Chuva forte demais")
+        organizer.organizar_motivo_cancelamento(self.evento)
+
+        ct = ContentType.objects.get_for_model(Evento)
+        reg = DriveArquivoExterno.objects.get(
+            content_type=ct, object_id=self.evento.pk, campo="motivo_cancelamento"
+        )
+        self.assertEqual(reg.nome, naming.NOME_MOTIVO_CANCELAMENTO)
+
+    def test_organizar_motivo_cancelamento_noop_se_nao_cancelado(self):
+        from integracoes.google_drive.models import DriveArquivoExterno
+
+        organizer.organizar_motivo_cancelamento(self.evento)
+        self.assertEqual(DriveArquivoExterno.objects.count(), 0)

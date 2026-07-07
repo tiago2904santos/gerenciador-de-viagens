@@ -18,10 +18,14 @@ from core.utils.masks import format_protocolo
 
 # Nomes fixos de pastas da árvore.
 PASTA_EVENTOS = "Eventos"
+PASTA_EVENTOS_CANCELADOS = "Eventos cancelados"
 PASTA_TERMOS = "Termos"
 PASTA_PRESTACAO = "Prestação de contas"
 # Pasta global (no topo) que agrega TODAS as prestações de contas.
 PASTA_PRESTACOES_GLOBAL = "Prestações de contas"
+
+# Nome fixo do arquivo com o motivo do cancelamento, dentro da pasta do evento.
+NOME_MOTIVO_CANCELAMENTO = "Motivo do cancelamento.txt"
 
 # Pastas globais por tipo de documento (no topo, fora de "Eventos"). Usadas como
 # destino canônico quando o documento não tem evento e como agregadoras (atalhos)
@@ -87,6 +91,20 @@ def _arquivo(base: str, ext: str | None) -> str:
 def _suf_cidade(cidade: str | None) -> str:
     cidade = (cidade or "").strip()
     return f" ({cidade})" if cidade else ""
+
+
+def com_sufixo_cancelado(nome: str) -> str:
+    """Insere ``" (cancelado)"`` antes da extensão. Idempotente: reorganizar de
+    novo um documento que já tem o sufixo (ou reverter um cancelamento, o que
+    faz o próximo reorganize recalcular sem o sufixo) nunca duplica."""
+    if not nome:
+        return nome
+    if nome.endswith(" (cancelado)") or " (cancelado)." in nome:
+        return nome
+    if "." in nome:
+        base, ext = nome.rsplit(".", 1)
+        return f"{base} (cancelado).{ext}"
+    return f"{nome} (cancelado)"
 
 
 def num_doc(numero, ano, *, width: int = 2) -> str:

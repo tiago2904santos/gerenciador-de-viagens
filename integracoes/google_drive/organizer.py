@@ -84,10 +84,34 @@ def _raiz() -> str | None:
 # Pastas
 # ---------------------------------------------------------------------------
 
+def _evento_cancelado(evento) -> bool:
+    from eventos.models import Evento
+
+    return getattr(evento, "status", None) == Evento.STATUS_CANCELADO
+
+
 def _pasta_evento_folder(client, evento) -> str:
+    """Pasta do evento — em ``Eventos/`` normalmente, ou em ``Eventos cancelados/``
+    quando ``evento.status == CANCELADO``.
+
+    Se a pasta já existir do lado ERRADO (evento acabou de ser cancelado e já
+    tinha sido organizado antes, ou — mais raro — o cancelamento foi revertido
+    manualmente editando o campo ``status``), move em vez de duplicar.
+    """
     raiz = _raiz()
-    eventos = client.get_or_create_pasta(naming.PASTA_EVENTOS, raiz)
-    return client.get_or_create_pasta(naming.pasta_evento(evento), eventos)
+    nome_pasta = naming.pasta_evento(evento)
+    cancelado = _evento_cancelado(evento)
+    nome_pai_certo = naming.PASTA_EVENTOS_CANCELADOS if cancelado else naming.PASTA_EVENTOS
+    nome_pai_errado = naming.PASTA_EVENTOS if cancelado else naming.PASTA_EVENTOS_CANCELADOS
+
+    pai_errado = client.get_or_create_pasta(nome_pai_errado, raiz)
+    existente_errado = client.buscar_pasta_por_nome(nome_pasta, pai_errado)
+    pai_certo = client.get_or_create_pasta(nome_pai_certo, raiz)
+    if existente_errado:
+        client.mover_renomear(existente_errado, nome_pasta, pai_certo)
+        return existente_errado
+
+    return client.get_or_create_pasta(nome_pasta, pai_certo)
 
 
 def _pasta_tipo_global(client, tipo: str) -> str:
@@ -242,6 +266,22 @@ def _persistir_artefato(artefato, pasta_id: str, nome: str, *, atalho_pasta_id: 
     return file_id, url
 
 
+def _cancelado(*, oficio=None, evento=None) -> bool:
+    """``True`` quando o dono do documento está cancelado.
+
+    ``DocumentoArtefato`` não tem FK direta pra ``OrdemServico``/``PlanoTrabalho``/
+    ``TermoAutorizacao`` — mas ``oficio.cancelado`` já cobre ofício, termo e OS
+    (os 3 são sempre cancelados juntos, seja via cancelamento direto do ofício,
+    seja via cascata de ``Evento.cancelar()``). ``evento.status`` cobre plano de
+    trabalho e anexos/solicitações do evento (que não têm ofício).
+    """
+    if oficio is not None and getattr(oficio, "cancelado", False):
+        return True
+    if evento is not None and _evento_cancelado(evento):
+        return True
+    return False
+
+
 def _derivar_nome_artefato(tipo, formato, oficio, servidor, servidores, cidade) -> str:
     if oficio is None:
         suf = naming._suf_cidade(cidade)
@@ -289,6 +329,8 @@ def organizar_artefato(artefato) -> tuple[str, str] | None:
     nome = (artefato.nome_drive or "").strip() or _derivar_nome_artefato(
         tipo, formato, oficio, getattr(artefato, "servidor", None), servidores, cidade
     )
+    if _cancelado(oficio=oficio, evento=evento):
+        nome = naming.com_sufixo_cancelado(nome)
 
     # Canônico: SEMPRE direto na pasta global do tipo (Ofícios/Termos/Planos de
     # trabalho/Ordens de serviço/Justificativas), sem subpasta — cada arquivo já
@@ -314,16 +356,14 @@ def organizar_artefato(artefato) -> tuple[str, str] | None:
 # Persistência: arquivos externos (DriveArquivoExterno)
 # ---------------------------------------------------------------------------
 
-def colocar_arquivo_externo(obj, ff, *, campo: str, pasta_id: str, nome: str) -> tuple[str, str] | None:
-    """Envia um ``FileField`` que não é ``DocumentoArtefato``, sempre com o conteúdo atual.
+def _persistir_conteudo_externo(
+    obj, conteudo: bytes, *, campo: str, pasta_id: str, nome: str, mime: str
+) -> tuple[str, str] | None:
+    """Miolo de ``colocar_arquivo_externo``, sem depender de um ``FileField``.
 
-    Idempotente via ``DriveArquivoExterno`` (content_type + object_id + campo): um
-    registro já existente tem seu CONTEÚDO sobrescrito (o arquivo local pode ter
-    sido substituído), nunca um segundo arquivo criado para o mesmo campo.
+    Usada tanto pra arquivos locais (``colocar_arquivo_externo``) quanto pra
+    conteúdo gerado na hora (ex.: a nota de motivo do cancelamento).
     """
-    if not ff:
-        return None
-
     from googleapiclient.errors import HttpError
 
     from django.contrib.contenttypes.models import ContentType
@@ -335,10 +375,6 @@ def colocar_arquivo_externo(obj, ff, *, campo: str, pasta_id: str, nome: str) ->
     reg = DriveArquivoExterno.objects.filter(
         content_type=ct, object_id=obj.pk, campo=campo
     ).first()
-    mime = _mime_por_nome(nome)
-    conteudo = _ler_filefield(ff)
-    if conteudo is None:
-        return None
 
     if reg and reg.file_id and not reg.mock:
         try:
@@ -378,6 +414,22 @@ def colocar_arquivo_externo(obj, ff, *, campo: str, pasta_id: str, nome: str) ->
             mock=is_mock(),
         )
     return file_id, url
+
+
+def colocar_arquivo_externo(obj, ff, *, campo: str, pasta_id: str, nome: str) -> tuple[str, str] | None:
+    """Envia um ``FileField`` que não é ``DocumentoArtefato``, sempre com o conteúdo atual.
+
+    Idempotente via ``DriveArquivoExterno`` (content_type + object_id + campo): um
+    registro já existente tem seu CONTEÚDO sobrescrito (o arquivo local pode ter
+    sido substituído), nunca um segundo arquivo criado para o mesmo campo.
+    """
+    if not ff:
+        return None
+    conteudo = _ler_filefield(ff)
+    if conteudo is None:
+        return None
+    mime = _mime_por_nome(nome)
+    return _persistir_conteudo_externo(obj, conteudo, campo=campo, pasta_id=pasta_id, nome=nome, mime=mime)
 
 
 def _atalho_pasta_externo(obj, *, campo: str, nome: str, target_id: str, pasta_id: str) -> str | None:
@@ -427,6 +479,8 @@ def organizar_evento_anexo(anexo) -> None:
     else:
         titulo = (anexo.titulo or anexo.get_tipo_display()).strip()
         nome = naming._arquivo(f"{titulo}{naming._suf_cidade(cidade)}", ext)
+    if _cancelado(evento=evento):
+        nome = naming.com_sufixo_cancelado(nome)
     colocar_arquivo_externo(anexo, anexo.arquivo, campo="arquivo", pasta_id=pasta_id, nome=nome)
 
 
@@ -452,6 +506,8 @@ def organizar_solicitacao_evento(doc) -> None:
     else:
         base = f"Anexo solicitação Ofício {naming.num_doc(oficio.numero, oficio.ano)}".strip()
         nome = naming._arquivo(f"{base}{naming._suf_cidade(cidade)}", ext)
+    if _cancelado(oficio=oficio, evento=evento):
+        nome = naming.com_sufixo_cancelado(nome)
     colocar_arquivo_externo(doc, doc.arquivo, campo="arquivo", pasta_id=prestacao_folder, nome=nome)
 
 
@@ -493,19 +549,24 @@ def organizar_prestacao(prestacao) -> None:
     serv_folder = client.get_or_create_pasta(
         naming.pasta_prestacao_servidor(servidor), prestacao_folder
     )
+    cancelado = _cancelado(oficio=oficio, evento=getattr(oficio, "evento", None))
+
+    def _nome(builder, *args):
+        nome = builder(*args)
+        return naming.com_sufixo_cancelado(nome) if cancelado else nome
 
     if getattr(prestacao, "despacho_assinado", None):
         ext = naming.extensao(prestacao.despacho_assinado.name)
         colocar_arquivo_externo(
             prestacao, prestacao.despacho_assinado, campo="despacho_assinado",
-            pasta_id=serv_folder, nome=naming.nome_despacho(oficio, servidor, cidade, ext),
+            pasta_id=serv_folder, nome=_nome(naming.nome_despacho, oficio, servidor, cidade, ext),
         )
     if getattr(prestacao, "comprovante_saque_transferencia", None):
         ext = naming.extensao(prestacao.comprovante_saque_transferencia.name)
         colocar_arquivo_externo(
             prestacao, prestacao.comprovante_saque_transferencia,
             campo="comprovante_saque_transferencia",
-            pasta_id=serv_folder, nome=naming.nome_comprovante(oficio, servidor, cidade, ext),
+            pasta_id=serv_folder, nome=_nome(naming.nome_comprovante, oficio, servidor, cidade, ext),
         )
 
     for anexo in prestacao.documentos_anexos.all():
@@ -513,9 +574,9 @@ def organizar_prestacao(prestacao) -> None:
             continue
         ext = naming.extensao(anexo.arquivo.name)
         if anexo.tipo == "comprovante":
-            nome = naming.nome_comprovante(oficio, servidor, cidade, ext)
+            nome = _nome(naming.nome_comprovante, oficio, servidor, cidade, ext)
         else:
-            nome = naming.nome_despacho(oficio, servidor, cidade, ext)
+            nome = _nome(naming.nome_despacho, oficio, servidor, cidade, ext)
         colocar_arquivo_externo(anexo, anexo.arquivo, campo="arquivo", pasta_id=serv_folder, nome=nome)
 
     for assinatura in prestacao.assinaturas.all():
@@ -523,9 +584,9 @@ def organizar_prestacao(prestacao) -> None:
             continue
         ext = naming.extensao(assinatura.arquivo_assinado.name) or "pdf"
         if assinatura.tipo == "rt":
-            nome = naming.nome_relatorio_tecnico(oficio, servidor, cidade, ext)
+            nome = _nome(naming.nome_relatorio_tecnico, oficio, servidor, cidade, ext)
         elif assinatura.tipo == "db":
-            nome = naming.nome_diario_bordo(oficio, servidor, cidade, ext)
+            nome = _nome(naming.nome_diario_bordo, oficio, servidor, cidade, ext)
         else:
             continue
         colocar_arquivo_externo(
@@ -540,6 +601,29 @@ def organizar_prestacao(prestacao) -> None:
         prestacao, campo="atalho_prestacao",
         nome=naming.nome_atalho_prestacao(oficio, servidor, cidade),
         target_id=serv_folder, pasta_id=global_folder,
+    )
+
+
+def organizar_motivo_cancelamento(evento) -> None:
+    """Nota com o motivo do cancelamento, dentro da pasta do evento (já movida
+    pra "Eventos cancelados/" por ``_pasta_evento_folder``). Não faz nada se o
+    evento não estiver cancelado."""
+    if not _evento_cancelado(evento):
+        return
+    client = get_client()
+    pasta_id = _pasta_evento_folder(client, evento)
+    quando = evento.cancelado_em.strftime("%d/%m/%Y %H:%M") if evento.cancelado_em else ""
+    motivo = (evento.motivo_cancelamento or "").strip() or "(não informado)"
+    linhas = [
+        f"Evento cancelado em {quando}." if quando else "Evento cancelado.",
+        "",
+        "Motivo:",
+        motivo,
+    ]
+    conteudo = "\n".join(linhas).encode("utf-8")
+    _persistir_conteudo_externo(
+        evento, conteudo, campo="motivo_cancelamento",
+        pasta_id=pasta_id, nome=naming.NOME_MOTIVO_CANCELAMENTO, mime="text/plain",
     )
 
 
@@ -720,6 +804,10 @@ def organizar_evento(evento) -> None:
     from . import status
 
     _garantir_planos(evento)
+    try:
+        organizar_motivo_cancelamento(evento)
+    except Exception as exc:
+        logger.error("[Drive] erro ao gravar motivo de cancelamento do evento %s: %s", evento.pk, exc, exc_info=True)
     for oficio in evento.oficios.all():
         organizar_oficio(oficio)
     # Planos do evento sem ofício (não cobertos por organizar_oficio).

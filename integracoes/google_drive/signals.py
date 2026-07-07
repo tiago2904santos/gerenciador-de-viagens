@@ -211,10 +211,15 @@ def _organizar_oficio_em_thread(oficio_id: int) -> None:
 def _organizar_evento_ao_salvar(sender, instance, **kwargs) -> None:
     """Mesma ideia de ``_organizar_oficio_ao_salvar``, para o que depende do
     evento (plano de trabalho) — dispara assim que o evento sai do rascunho.
-    Também roda em segundo plano pelo mesmo motivo (geração real de PDF)."""
+    Também roda em segundo plano pelo mesmo motivo (geração real de PDF).
+
+    NÃO pula mais eventos cancelados: é o cancelamento que dispara mover a
+    pasta pra "Eventos cancelados/", gravar o motivo e re-sincronizar os
+    documentos com o sufixo "(cancelado)" (ver organizer.organizar_evento).
+    """
     if _drive_desligado():
         return
-    if instance.status in (instance.STATUS_RASCUNHO, instance.STATUS_CANCELADO):
+    if instance.status == instance.STATUS_RASCUNHO:
         return
     import threading
 

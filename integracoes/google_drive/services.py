@@ -141,6 +141,9 @@ class _MockClient:
     def buscar_arquivo_por_nome(self, nome: str, pasta_id: str) -> str | None:
         return None
 
+    def buscar_pasta_por_nome(self, nome: str, pasta_id: str) -> str | None:
+        return None
+
     def listar_arquivos(self, pasta_id: str) -> list[dict]:
         return []
 
@@ -389,6 +392,25 @@ class _RealClient:
         nome_escapado = nome.replace("'", "\\'")
         q = (
             f"name = '{nome_escapado}' and mimeType != '{_FOLDER_MIME}' and trashed = false"
+            f" and '{pasta_id}' in parents"
+        )
+        res = self._svc.files().list(
+            q=q, fields="files(id)", pageSize=1,
+            supportsAllDrives=True, includeItemsFromAllDrives=True,
+        ).execute()
+        files = res.get("files", [])
+        return files[0]["id"] if files else None
+
+    def buscar_pasta_por_nome(self, nome: str, pasta_id: str) -> str | None:
+        """Procura uma PASTA com esse nome exato dentro de ``pasta_id``.
+
+        Usada pra detectar quando uma pasta (ex.: de um evento) já existe do
+        lado "errado" da árvore (ex.: em "Eventos/" quando o evento acabou de
+        ser cancelado) — permite mover em vez de duplicar.
+        """
+        nome_escapado = nome.replace("'", "\\'")
+        q = (
+            f"name = '{nome_escapado}' and mimeType = '{_FOLDER_MIME}' and trashed = false"
             f" and '{pasta_id}' in parents"
         )
         res = self._svc.files().list(
