@@ -20,6 +20,7 @@ from oficios.forms import OficioDadosViajantesForm
 from oficios.forms import ModeloMotivoOficioForm
 from oficios.models import ModeloMotivoOficio
 from oficios.models import Oficio
+from oficios.models import OficioNumeroLacuna
 from oficios.services import atualizar_oficio_dados_viajantes
 from oficios.services import atualizar_modelo_motivo
 from oficios.services import avaliar_oficio_dados_viajantes
@@ -28,6 +29,7 @@ from oficios.document_generation import get_document_generation_status
 from oficios.services import criar_modelo_motivo
 from oficios.services import criar_oficio_dados_viajantes
 from oficios.services import excluir_modelo_motivo
+from oficios.services import excluir_oficio
 from oficios.services import get_next_available_numero_oficio
 from oficios.services import criar_oficio_rascunho
 from oficios.services import _preencher_roteiro_oficio_com_evento
@@ -63,12 +65,68 @@ class OficioServicesTests(TestCase):
         self.assertEqual(oficio.status, Oficio.STATUS_RASCUNHO)
         self.assertEqual(list(oficio.servidores.all()), [self.servidor])
 
-    def test_get_next_available_numero_reaproveita_menor_lacuna(self):
+    def test_get_next_available_numero_reaproveita_lacuna_apos_exclusao(self):
         ano = timezone.localdate().year
         primeiro = Oficio.objects.create(numero=1, ano=ano, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
         Oficio.objects.create(numero=2, ano=ano, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
-        primeiro.delete()
+        excluir_oficio(primeiro)
         self.assertEqual(get_next_available_numero_oficio(ano), 1)
+
+    def test_get_next_available_numero_ignora_numeros_apenas_pulados_manualmente(self):
+        # Cria 1..10 e depois "pula" para o 15 manualmente: 11-14 não devem ser
+        # sugeridos automaticamente, só o 16 (maior + 1).
+        ano = timezone.localdate().year
+        for numero in range(1, 11):
+            Oficio.objects.create(numero=numero, ano=ano, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        Oficio.objects.create(numero=15, ano=ano, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        self.assertEqual(get_next_available_numero_oficio(ano), 16)
+
+    def test_excluir_oficio_libera_numero_para_reaproveitamento(self):
+        ano = timezone.localdate().year
+        oficios = [
+            Oficio.objects.create(numero=numero, ano=ano, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+            for numero in range(1, 11)
+        ]
+        excluir_oficio(oficios[6])  # exclui o ofício número 7
+        self.assertTrue(OficioNumeroLacuna.objects.filter(ano=ano, numero=7).exists())
+        self.assertEqual(get_next_available_numero_oficio(ano), 7)
+
+    def test_editar_numero_libera_numero_antigo_e_consome_lacuna_do_novo(self):
+        ano = timezone.localdate().year
+        oficio = Oficio.objects.create(numero=5, ano=ano, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        outro = Oficio.objects.create(numero=8, ano=ano, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        excluir_oficio(outro)  # libera o número 8 como lacuna
+
+        form = OficioDadosViajantesForm(
+            data={
+                "numero": "8",
+                "custeio": Oficio.CUSTEIO_UNIDADE_DPC,
+                "custeio_observacao": "",
+            },
+            instance=oficio,
+        )
+        self.assertTrue(form.is_valid(), form.errors)
+        atualizado = atualizar_oficio_dados_viajantes(oficio, form, action="save_draft")
+
+        self.assertEqual(atualizado.numero, 8)
+        self.assertTrue(OficioNumeroLacuna.objects.filter(ano=ano, numero=5).exists())
+        self.assertFalse(OficioNumeroLacuna.objects.filter(ano=ano, numero=8).exists())
+
+    def test_clean_numero_rejeita_numero_ja_usado_no_ano(self):
+        ano = timezone.localdate().year
+        Oficio.objects.create(numero=3, ano=ano, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        oficio = Oficio.objects.create(numero=9, ano=ano, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+
+        form = OficioDadosViajantesForm(
+            data={
+                "numero": "3",
+                "custeio": Oficio.CUSTEIO_UNIDADE_DPC,
+                "custeio_observacao": "",
+            },
+            instance=oficio,
+        )
+        self.assertFalse(form.is_valid())
+        self.assertIn("numero", form.errors)
 
     def test_preencher_roteiro_oficio_com_evento_so_preenche_sede_e_destino(self):
         estado = Estado.objects.create(nome="Parana", sigla="PR")

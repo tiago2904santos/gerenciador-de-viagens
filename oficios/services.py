@@ -102,6 +102,7 @@ def _try_cached_download(
 
 from .models import ModeloMotivoOficio
 from .models import Oficio
+from .models import OficioNumeroLacuna
 from roteiros.models import Roteiro
 from roteiros.models import RoteiroDestino
 
@@ -273,7 +274,8 @@ def atualizar_oficio_dados_viajantes(oficio, form, action="save_draft"):
         "motorista_protocolo_ref": original.motorista_protocolo_ref,
     }
     atualizado = form.save(commit=False)
-    atualizado.numero = oficio.numero
+    if atualizado.numero is None:
+        atualizado.numero = original.numero
     atualizado.ano = oficio.ano
     atualizado.data_criacao = timezone.localdate()
     for field_name, value in transporte_original.items():
@@ -284,6 +286,9 @@ def atualizar_oficio_dados_viajantes(oficio, form, action="save_draft"):
     atualizar_status_automatico_oficio(atualizado, action=action, form=form)
     atualizado.save()
     form.save_m2m()
+    numero_antigo = original.numero
+    if numero_antigo and original.ano and numero_antigo != atualizado.numero:
+        OficioNumeroLacuna.objects.get_or_create(ano=original.ano, numero=numero_antigo)
     return atualizado
 
 
@@ -691,10 +696,13 @@ def _dados_viajantes_from_oficio(oficio):
 
 @transaction.atomic
 def excluir_oficio(instance):
+    numero, ano = instance.numero, instance.ano
     try:
         instance.delete()
     except ProtectedError as exc:
         raise OficioVinculadoError from exc
+    if numero and ano:
+        OficioNumeroLacuna.objects.get_or_create(ano=ano, numero=numero)
 
 
 def cancelar_oficio(instance: Oficio, motivo: str) -> Oficio:

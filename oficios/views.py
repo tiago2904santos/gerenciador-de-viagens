@@ -301,6 +301,7 @@ def _wizard_dados_viajantes_context(
         "show_motorista_card": show_motorista_card,
         "motorista_extras_visivel": motorista_extras_visivel,
         "motorista_oficio_ano": oficio.ano or timezone.localdate().year,
+        "oficio_numero_ano_hint": f"Ano {oficio.ano}" if oficio.ano else "",
         "motorista_oficio_numero_inicial": _motorista_oficio_numero_display(ref_raw),
         "motorista_compact_widget": mark_safe(
             transporte_form["motorista"].as_widget(attrs={"data-picker-variant": "compact"})
@@ -428,6 +429,7 @@ def _merge_payload_fields(data, clean_fields):
 def _oficio_dados_viajantes_autosave_data(oficio):
     return _querydict_from_pairs(
         {
+            "numero": oficio.numero or "",
             "protocolo": oficio.protocolo or "",
             "modelo_motivo": "",
             "motivo": oficio.motivo or "",
