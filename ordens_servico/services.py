@@ -92,16 +92,23 @@ def gerar_resposta_ordem_servico_documento(oficio: Oficio, formato: DocumentoFor
             cache_hit=False,
         )
         response["X-Document-SHA256"] = doc.hash_sha256
-        try:
-            persist_geracao(
-                doc,
-                oficio_id=oficio.pk,
-                payload_snapshot=payload,
-                cache_key=cache_key,
-                engine=doc.pdf_engine_used or "",
-            )
-        except Exception:
-            logger.exception("Não foi possível persistir artefato de ordem de serviço.")
+        if not payload.get("em_elaboracao"):
+            # Nunca persiste a versão RASCUNHO (em_elaboracao=True): ela não sabe
+            # quais servidores foram efetivamente designados na OS e, se virasse
+            # um DocumentoArtefato, bloquearia para sempre o backfill da versão
+            # real (gerar_os_pdf_response) feito por
+            # integracoes.google_drive.organizer._garantir_ordens_servico, que só
+            # gera quando o ofício ainda não tem nenhum artefato tipo=ordem_servico.
+            try:
+                persist_geracao(
+                    doc,
+                    oficio_id=oficio.pk,
+                    payload_snapshot=payload,
+                    cache_key=cache_key,
+                    engine=doc.pdf_engine_used or "",
+                )
+            except Exception:
+                logger.exception("Não foi possível persistir artefato de ordem de serviço.")
         return response
 
 
