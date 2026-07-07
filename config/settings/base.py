@@ -223,6 +223,15 @@ CELERY_TASK_ALWAYS_EAGER = _env_flag("CELERY_TASK_ALWAYS_EAGER", "false")
 CELERY_TASK_EAGER_PROPAGATES = True
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_TASK_TRACK_STARTED = True
+# Sem isso, ".delay()" pode ficar preso indefinidamente tentando conectar num
+# broker inalcançável (rede instável, host errado) — o mesmo tipo de trava sem
+# timeout que já mordeu a integração com o Google Drive. Falha rápido em vez
+# de travar quem chamou (ex.: a view "Tentar novamente agora").
+CELERY_BROKER_CONNECTION_TIMEOUT = float(os.getenv("CELERY_BROKER_CONNECTION_TIMEOUT") or 5)
+CELERY_BROKER_TRANSPORT_OPTIONS = {
+    "socket_connect_timeout": float(os.getenv("CELERY_BROKER_CONNECTION_TIMEOUT") or 5),
+    "socket_timeout": float(os.getenv("CELERY_BROKER_CONNECTION_TIMEOUT") or 5),
+}
 
 EPROTOCOLO = {
     "AMBIENTE": (os.getenv("EPROTOCOLO_AMBIENTE") or "mock").strip().lower(),

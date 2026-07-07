@@ -388,29 +388,48 @@ def _task_por_modelo() -> dict:
     return _TASK_POR_MODELO
 
 
+def _reprocessar_pendencias_em_thread() -> None:
+    """Roda o reenvio de pendências fora do request (ver ``reprocessar_pendencias``)."""
+    from django.db import connection
+
+    from integracoes.google_drive import status
+
+    try:
+        mapa = _task_por_modelo()
+        for pendencia in status.listar_pendencias(limite=500):
+            task = mapa.get(pendencia.content_type.model)
+            if task is None:
+                continue
+            try:
+                task.delay(pendencia.object_id)
+            except Exception as exc:
+                logger.warning("[Drive] falha ao reagendar pendência %s: %s", pendencia.pk, exc)
+    finally:
+        connection.close()
+
+
 @login_required
 @require_POST
 def reprocessar_pendencias(request):
-    """Reagenda (via Celery) o reenvio de tudo que está marcado como pendência."""
-    from integracoes.google_drive import status
+    """Reagenda (via Celery) o reenvio de tudo que está marcado como pendência.
 
-    mapa = _task_por_modelo()
-    agendadas = 0
-    for pendencia in status.listar_pendencias(limite=500):
-        task = mapa.get(pendencia.content_type.model)
-        if task is None:
-            continue
-        try:
-            task.delay(pendencia.object_id)
-            agendadas += 1
-        except Exception as exc:
-            logger.warning("[Drive] falha ao reagendar pendência %s: %s", pendencia.pk, exc)
-
-    if agendadas:
-        messages.success(request, f"{agendadas} pendência(s) reagendada(s) para reenvio.")
+    Roda em segundo plano (thread) em vez de bloquear o request: ``task.delay()``
+    depende de conseguir falar com o broker (Redis) e, se o worker Celery não
+    estiver configurado ou a rede estiver instável (ou ``CELERY_TASK_ALWAYS_EAGER``
+    estiver ligado, o que roda cada reenvio na hora, sequencialmente, dentro do
+    próprio ``.delay()``), o botão "Tentar novamente agora" ficava com a página
+    carregando até todas as pendências (até 500) serem tentadas uma a uma.
+    """
+    # Em testes (mesma flag usada por reorganizar_tudo), roda de forma síncrona
+    # para ser determinístico.
+    sincrono = getattr(settings, "GOOGLE_DRIVE", {}).get("REORG_SINCRONO", False)
+    if sincrono:
+        _reprocessar_pendencias_em_thread()
     else:
-        messages.info(
-            request,
-            "Não foi possível reagendar agora — verifique se a fila (Celery/Redis) está no ar.",
-        )
+        threading.Thread(target=_reprocessar_pendencias_em_thread, daemon=True).start()
+    messages.success(
+        request,
+        "Reenvio das pendências iniciado em segundo plano. "
+        "Atualize a página em instantes para ver a lista diminuir.",
+    )
     return redirect("cadastros:configuracao")

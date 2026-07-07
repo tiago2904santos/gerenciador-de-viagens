@@ -148,7 +148,7 @@ class SignalRetryTests(TestCase):
         self.assertEqual(DriveSyncStatus.objects.count(), 1)
 
 
-@override_settings(GOOGLE_DRIVE={"MODO": "mock", "UPLOAD_EM_MOCK": True})
+@override_settings(GOOGLE_DRIVE={"MODO": "mock", "UPLOAD_EM_MOCK": True, "REORG_SINCRONO": True})
 class PainelPendenciasViewTests(TestCase):
     def setUp(self):
         from django.contrib.auth import get_user_model
