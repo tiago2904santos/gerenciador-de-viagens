@@ -253,7 +253,18 @@ def _persistir_artefato(artefato, pasta_id: str, nome: str, *, atalho_pasta_id: 
     # execuções concorrentes de "Reorganizar" etc.) — evita duplicar.
     existente_id = client.buscar_arquivo_por_nome(nome, pasta_id)
     if existente_id:
-        file_id, url = client.atualizar_conteudo(existente_id, nome, conteudo, mime, pasta_id=pasta_id)
+        try:
+            file_id, url = client.atualizar_conteudo(existente_id, nome, conteudo, mime, pasta_id=pasta_id)
+        except HttpError as exc:
+            if exc.resp.status != 404:
+                raise
+            # Mesmo caso das outras recriações: o arquivo achado por nome não
+            # existe mais de verdade (apagado entre a busca e a atualização).
+            logger.warning(
+                "[Drive] arquivo %s achado por nome não existe mais no Drive; criando novo para artefato %s",
+                existente_id, artefato.pk,
+            )
+            file_id, url = client.upload(nome, conteudo, mime, pasta_id=pasta_id)
     else:
         file_id, url = client.upload(nome, conteudo, mime, pasta_id=pasta_id)
 

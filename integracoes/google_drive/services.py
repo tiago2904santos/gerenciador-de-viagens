@@ -306,6 +306,8 @@ class _RealClient:
 
     def mover_renomear(self, file_id: str, novo_nome: str, nova_pasta_id: str | None = None) -> str:
         """Renomeia e/ou move um arquivo já existente (criado pelo app)."""
+        from googleapiclient.errors import HttpError
+
         kwargs: dict = {
             "fileId": file_id,
             "body": {"name": novo_nome},
@@ -321,7 +323,20 @@ class _RealClient:
                 kwargs["addParents"] = nova_pasta_id
                 if pais_atuais:
                     kwargs["removeParents"] = ",".join(pais_atuais)
-        self._svc.files().update(**kwargs).execute()
+        try:
+            self._svc.files().update(**kwargs).execute()
+        except HttpError as exc:
+            if exc.resp.status != 403 or "cannotMoveTrashedItemOutOfTeamDrive" not in str(exc):
+                raise
+            # Item foi movido pra lixeira (fora do app) mas o Drive não deixa
+            # mover item lixado pra fora de um Drive Compartilhado: restaura antes.
+            logger.warning(
+                "[Drive] file_id %s estava na lixeira; restaurando antes de mover", file_id,
+            )
+            self._svc.files().update(
+                fileId=file_id, body={"trashed": False}, supportsAllDrives=True,
+            ).execute()
+            self._svc.files().update(**kwargs).execute()
         logger.info(
             "[Drive] mover_renomear file_id=%s nome=%s pasta_id=%s",
             file_id,
