@@ -29,4 +29,5 @@ jobs:
             python manage.py migrate --noinput
             python manage.py collectstatic --noinput --clear
             systemctl restart gerenciador-viagens
+            systemctl restart gerenciador-viagens-celery
             echo "Deploy concluído!"
