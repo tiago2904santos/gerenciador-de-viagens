@@ -1,0 +1,94 @@
+from django.contrib.auth import get_user_model
+from django.test import TestCase
+from django.urls import reverse
+
+from cadastros.models import Servidor
+from eventos.models import Evento
+from eventos.services import excluir_evento
+from oficios.models import Oficio
+from prestacoes_contas.models import PrestacaoContas
+from roteiros.models import Roteiro
+
+
+class ExcluirEventoTests(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(
+            username="tester_eventos",
+            password="123456",
+        )
+        self.client.force_login(self.user)
+        self.evento = Evento.objects.create(titulo="Evento de teste")
+
+    def test_excluir_evento_exclui_roteiro_pertencente_apenas_a_ele(self):
+        roteiro = Roteiro.objects.create(evento=self.evento)
+        Oficio.objects.create(evento=self.evento, roteiro=roteiro)
+
+        excluir_evento(self.evento)
+
+        self.assertFalse(Evento.objects.filter(pk=self.evento.pk).exists())
+        self.assertFalse(Roteiro.objects.filter(pk=roteiro.pk).exists())
+
+    def test_excluir_evento_preserva_roteiro_usado_por_oficio_de_outro_evento(self):
+        outro_evento = Evento.objects.create(titulo="Outro evento")
+        roteiro = Roteiro.objects.create(evento=self.evento)
+        Oficio.objects.create(evento=self.evento, roteiro=roteiro)
+        oficio_outro_evento = Oficio.objects.create(evento=outro_evento, roteiro=roteiro)
+
+        excluir_evento(self.evento)
+
+        self.assertFalse(Evento.objects.filter(pk=self.evento.pk).exists())
+        roteiro.refresh_from_db()
+        self.assertIsNone(roteiro.evento_id)
+        oficio_outro_evento.refresh_from_db()
+        self.assertEqual(oficio_outro_evento.roteiro_id, roteiro.pk)
+
+    def test_excluir_evento_preserva_roteiro_usado_por_oficio_avulso(self):
+        roteiro = Roteiro.objects.create(evento=self.evento)
+        Oficio.objects.create(evento=self.evento, roteiro=roteiro)
+        oficio_avulso = Oficio.objects.create(evento=None, roteiro=roteiro)
+
+        excluir_evento(self.evento)
+
+        roteiro.refresh_from_db()
+        self.assertIsNone(roteiro.evento_id)
+        oficio_avulso.refresh_from_db()
+        self.assertEqual(oficio_avulso.roteiro_id, roteiro.pk)
+
+    def test_excluir_evento_preserva_roteiro_usado_em_prestacao_de_contas_de_outro_evento(self):
+        outro_evento = Evento.objects.create(titulo="Outro evento")
+        servidor = Servidor.objects.create(nome="Servidor Um", cpf="12345678901")
+        roteiro = Roteiro.objects.create(evento=self.evento)
+        Oficio.objects.create(evento=self.evento, roteiro=roteiro)
+        oficio_outro_evento = Oficio.objects.create(evento=outro_evento)
+        prestacao = PrestacaoContas.objects.create(
+            oficio=oficio_outro_evento, servidor=servidor, roteiro_ajustado=roteiro,
+        )
+
+        excluir_evento(self.evento)
+
+        roteiro.refresh_from_db()
+        self.assertIsNone(roteiro.evento_id)
+        prestacao.refresh_from_db()
+        self.assertEqual(prestacao.roteiro_ajustado_id, roteiro.pk)
+
+    def test_excluir_evento_exclui_oficio_proprio(self):
+        oficio = Oficio.objects.create(evento=self.evento)
+
+        excluir_evento(self.evento)
+
+        self.assertFalse(Oficio.objects.filter(pk=oficio.pk).exists())
+
+    def test_view_excluir_preserva_roteiro_de_outro_evento(self):
+        outro_evento = Evento.objects.create(titulo="Outro evento")
+        roteiro = Roteiro.objects.create(evento=self.evento)
+        Oficio.objects.create(evento=self.evento, roteiro=roteiro)
+        oficio_outro_evento = Oficio.objects.create(evento=outro_evento, roteiro=roteiro)
+
+        response = self.client.post(reverse("eventos:excluir", args=[self.evento.pk]))
+
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(Evento.objects.filter(pk=self.evento.pk).exists())
+        roteiro.refresh_from_db()
+        self.assertIsNone(roteiro.evento_id)
+        oficio_outro_evento.refresh_from_db()
+        self.assertEqual(oficio_outro_evento.roteiro_id, roteiro.pk)

@@ -206,8 +206,9 @@ class EventoAnexo(models.Model):
     ]
 
     # CASCADE e correto aqui: o anexo pertence ao evento (nao e um documento
-    # independente). A regra de SET_NULL vale para os documentos reais, que
-    # precisam sobreviver a exclusao do evento.
+    # independente). Excluir o evento exclui os documentos reais tambem (ver
+    # eventos.services.excluir_evento); a excecao e um roteiro ainda em uso por
+    # outro evento/oficio avulso, que e desvinculado em vez de excluido.
     evento = models.ForeignKey(
         Evento,
         on_delete=models.CASCADE,

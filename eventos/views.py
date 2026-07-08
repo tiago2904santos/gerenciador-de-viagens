@@ -38,6 +38,7 @@ from .models import TipoEvento
 from .presenters import apresentar_evento_list_card
 from .presenters import apresentar_linha_lista_simples_tipo_evento
 from .services import build_evento_guided_context
+from .services import excluir_evento
 
 
 def _safe_next_url(request, fallback_url):
@@ -500,7 +501,7 @@ def guiado_termos(request, pk):
 def excluir(request, pk):
     evento = get_object_or_404(Evento, pk=pk)
     titulo = evento.titulo or f"Evento #{pk}"
-    evento.delete()
+    excluir_evento(evento)
     messages.success(request, f'Evento "{titulo}" excluído.')
     return redirect("eventos:index")
 
