@@ -169,50 +169,6 @@
   margin-top: var(--space-4);
 }
 
-.termos-list {
-  display: grid;
-  gap: var(--space-3);
-}
-
-.termo-list-card {
-  align-items: center;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  display: flex;
-  gap: var(--space-4);
-  justify-content: space-between;
-  padding: var(--space-4);
-}
-
-.termo-list-card__title {
-  font-size: var(--font-size-lg);
-  margin: 0 0 var(--space-1);
-}
-
-.termo-list-card__meta {
-  color: var(--color-muted);
-  margin: 0;
-}
-
-.termo-list-card__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  justify-content: flex-end;
-}
-
-.termos-empty {
-  border: 1px dashed var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-6);
-  text-align: center;
-}
-
-.termos-empty h3,
-.termos-empty p {
-  margin-top: 0;
-}
-
 .termo-preview-title {
   margin: var(--space-5) 0 var(--space-2);
 }
@@ -245,10 +201,6 @@
     grid-template-columns: 1fr !important;
   }
 
-  .termo-list-card {
-    align-items: flex-start;
-    flex-direction: column;
-  }
 }
 
 /* ── Etapa 3 — seleção de atividades, metas e recursos ──────────────────── */

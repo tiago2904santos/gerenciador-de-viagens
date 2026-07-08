@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from django.urls import reverse
+from django.utils import timezone
 
 from core.presenters.badges import build_badge
 from oficios.presenters import apresentar_oficio_card
@@ -109,6 +110,87 @@ def _solicitacao_item(doc):
     }
 
 
+def _evento_pronto(evento) -> bool:
+    """Evento "pronto" = documentos vinculados finalizados, sem nenhum pendente.
+
+    Regra:
+      - Ofícios: nenhum ofício pode estar em rascunho (cancelados são ignorados).
+        Não é obrigatório ter ofício — um evento pode se apoiar só em convite/OS.
+      - Etapa 4: precisa existir pelo menos um documento (Ordem de Serviço, Plano
+        de Trabalho, convite ou ofício/documento de solicitação) e nenhum deles
+        pode estar pendente (um Plano de Trabalho em rascunho bloqueia).
+    """
+    from oficios.models import Oficio
+    from planos_trabalho.models import PlanoTrabalho
+
+    oficios = [o for o in evento.oficios.all() if not o.cancelado]
+    if any(o.status == Oficio.STATUS_RASCUNHO for o in oficios):
+        return False
+
+    planos = [p for p in evento.planos_trabalho.all() if not p.cancelado]
+    if any(p.status == PlanoTrabalho.STATUS_RASCUNHO for p in planos):
+        return False
+
+    tem_os = any(not o.cancelado for o in evento.ordens_servico.all())
+    tem_plano = bool(planos)  # todos os restantes já não são rascunho
+    tem_convite = any(a.tipo == EventoAnexo.TIPO_CONVITE for a in evento.anexos.all())
+    tem_solicitacao = bool(list(evento.documentos_solicitacao.all()))
+    return tem_os or tem_plano or tem_convite or tem_solicitacao
+
+
+def _evento_roteiro_saida(evento):
+    """Roteiro do evento com a saída mais próxima → (saida_date, end_date, origem_nome).
+
+    Considera roteiros ligados direto ao evento e os ligados via ofícios. Ignora
+    cancelados e sem data de saída. Devolve (None, None, "") se não houver.
+    """
+    candidatos = list(evento.roteiros.all())
+    for o in evento.oficios.all():
+        if o.roteiro_id and o.roteiro:
+            candidatos.append(o.roteiro)
+
+    validos = {}
+    for r in candidatos:
+        if getattr(r, "cancelado", False) or not r.saida_dt:
+            continue
+        validos[r.pk] = r
+    if not validos:
+        return None, None, ""
+
+    r = min(validos.values(), key=lambda x: x.saida_dt)
+    tz = timezone.get_current_timezone()
+    saida_date = r.saida_dt.astimezone(tz).date() if timezone.is_aware(r.saida_dt) else r.saida_dt.date()
+    chegada_dt = r.retorno_chegada_dt or r.chegada_dt
+    end_date = saida_date
+    if chegada_dt:
+        end_date = chegada_dt.astimezone(tz).date() if timezone.is_aware(chegada_dt) else chegada_dt.date()
+    origem = r.origem_cidade.nome if r.origem_cidade_id and r.origem_cidade else ""
+    return saida_date, end_date, origem
+
+
+def _evento_temporal_chip(evento):
+    """Rótulo/tonalidade do chip de um evento pronto: contagem regressiva até a saída."""
+    saida_date, end_date, origem = _evento_roteiro_saida(evento)
+    if not saida_date:
+        return "Pronto", "success"
+
+    today = timezone.localdate()
+    sufixo = f" p/ sair de {origem}" if origem else ""
+    if today < saida_date:
+        dias = (saida_date - today).days
+        if dias == 1:
+            return f"falta 1 dia{sufixo}", "warning"
+        return f"faltam {dias} dias{sufixo}", "warning"
+    if saida_date <= today <= end_date:
+        return "em andamento", "info"
+    dias = (today - end_date).days
+    if dias == 0:
+        return "concluído hoje", "success"
+    if dias == 1:
+        return "concluído ontem", "success"
+    return f"concluído há {dias} dias", "success"
+
+
 def _titulo_sem_data(evento) -> str:
     titulo = evento.titulo or f"Evento #{evento.pk}"
     if evento.data_inicio:
@@ -152,11 +234,18 @@ def apresentar_evento_list_card(evento):
     documentos.extend(_ordem_item(ordem) for ordem in evento.ordens_servico.all())
     documentos.extend(_solicitacao_item(doc) for doc in evento.documentos_solicitacao.all())
 
+    if evento.status == evento.STATUS_CANCELADO:
+        status_label, status_state = "Cancelado", "danger"
+    elif _evento_pronto(evento):
+        status_label, status_state = _evento_temporal_chip(evento)
+    else:
+        status_label, status_state = "Rascunho", "warning"
+
     return {
         "pk": evento.pk,
         "titulo": _titulo_sem_data(evento),
-        "status_label": evento.get_status_display(),
-        "status_state": "success" if evento.status == evento.STATUS_FINALIZADO else "warning",
+        "status_label": status_label,
+        "status_state": status_state,
         "destino": _clean_evento_display(evento.destino_display),
         "periodo": _clean_evento_display(evento.periodo_display),
         "periodo_curto": _periodo_curto(evento),

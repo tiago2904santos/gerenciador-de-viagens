@@ -1,10 +1,37 @@
 # Servicos de agrupamento OPCIONAL de documentos ficam neste modulo.
 from __future__ import annotations
 
+from pathlib import Path
 from urllib.parse import urlencode
 
+from django.core.files.base import ContentFile
 from django.db import transaction
 from django.urls import reverse
+
+
+def converter_para_pdf_se_necessario(arquivo):
+    """Converte um upload de imagem (PNG/JPG/JPEG) para PDF; um PDF passa direto.
+
+    Documentos de solicitação aceitam foto/print como conveniência de upload,
+    mas o arquivo guardado (e depois enviado ao Drive) precisa ser sempre PDF,
+    para manter o mesmo formato dos demais documentos do evento.
+    """
+    ext = Path(arquivo.name).suffix.lower().lstrip(".")
+    if ext == "pdf":
+        return arquivo
+
+    from io import BytesIO
+
+    from PIL import Image
+
+    imagem = Image.open(arquivo)
+    if imagem.mode != "RGB":
+        imagem = imagem.convert("RGB")
+    buffer = BytesIO()
+    imagem.save(buffer, format="PDF")
+    buffer.seek(0)
+    nome_pdf = f"{Path(arquivo.name).stem}.pdf"
+    return ContentFile(buffer.read(), name=nome_pdf)
 
 
 @transaction.atomic

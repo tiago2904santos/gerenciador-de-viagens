@@ -305,7 +305,7 @@ class CancelamentoTests(TestCase):
         self.cargo = Cargo.objects.create(nome="Investigador")
         self.ana = Servidor.objects.create(nome="Ana", cargo=self.cargo, cpf="12345678901")
         self.evento = Evento.objects.create(
-            destino_cidade="Maringá", destino_uf="PR",
+            titulo="Evento de teste", destino_cidade="Maringá", destino_uf="PR",
             data_inicio=date(2026, 7, 22), data_fim=date(2026, 7, 23),
         )
         self.evento.tipos.add(TipoEvento.objects.get_or_create(nome="PCPR na Comunidade")[0])

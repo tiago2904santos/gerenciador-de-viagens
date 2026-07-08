@@ -609,49 +609,11 @@
         {% endif %}
 
         {% if etapa_atual == 5 %}
-          <div class="termos-list">
-            {% for termo in termos %}
-              <article class="termo-list-card">
-                <div>
-                  <h3 class="termo-list-card__title">
-                    {{ termo.destino_display }}
-                    {% if termo.cancelado %}
-                      {% include "components/ui/badges/chip.html" with tone="danger" label="Cancelado" only %}
-                    {% endif %}
-                  </h3>
-                  <p class="termo-list-card__meta">
-                    {{ termo.periodo_display }}
-                    {% if termo.oficio_id %} - Oficio {{ termo.oficio.numero_formatado }}{% endif %}
-                  </p>
-                  <p class="termo-list-card__meta">
-                    Servidores:
-                    {% if termo.servidores.exists %}
-                      {{ termo.servidores.count }}
-                    {% elif termo.oficio_id %}
-                      fallback do oficio
-                    {% else %}
-                      sem servidor
-                    {% endif %}
-                    {% if termo.viatura_id %} - Viatura {{ termo.viatura }}{% endif %}
-                  </p>
-                  {% if termo.cancelado and termo.motivo_cancelamento %}
-                  <p class="termo-list-card__meta"><strong>Motivo do cancelamento:</strong> {{ termo.motivo_cancelamento }}</p>
-                  {% endif %}
-                </div>
-                <div class="termo-list-card__actions">
-                  <a class="cv-btn cv-btn--secondary" href="{% url 'termos:editar' termo.pk %}"><span>Abrir</span></a>
-                  <a class="cv-btn cv-btn--secondary" href="{% url 'termos:termo_cadastro_pdf_inline' termo.pk %}"><span>Preview</span></a>
-                </div>
-              </article>
-            {% empty %}
-              <div class="termos-empty">
-                <h3>Nenhum termo vinculado</h3>
-                <p>Use o cadastro oficial de termos para criar o documento deste evento.</p>
-                {% include "components/ui/buttons/button.html" with href=create_urls.termo label="Novo termo" variant="primary" only %}
-              </div>
-            {% endfor %}
-          </div>
+          <h4 class="wizard-inner-section__title">Termo do evento</h4>
+          {% include "components/lists/simple_list.html" with rows=termo_generico_rows empty_message="Nenhum termo vinculado." empty_action_label="Novo termo" empty_action_url=create_urls.termo hide_realtime_count=True only %}
 
+          <h4 class="wizard-inner-section__title">Termos dos ofícios</h4>
+          {% include "components/lists/simple_list.html" with rows=termos_oficio_rows empty_message="Nenhum termo gerado a partir de ofícios deste evento." hide_realtime_count=True only %}
 
           <div class="cv-fab-container">
             {% include "components/ui/buttons/button.html" with href=create_urls.termo label="Novo termo" variant="primary" icon="plus" extra_class="cv-fab" only %}

@@ -59,15 +59,14 @@
 
       {% if card.servidores_flat %}
       <p class="evento-lc__section-label">Servidores</p>
-      <div class="oficio-lc__travellers oficio-lc__travellers--n3">
+      <div class="oficio-lc__travellers oficio-lc__travellers--n{% if card.servidores_flat_count == 1 %}1{% else %}2{% endif %}">
         {% for oficio in card.oficios %}
           {% for s in oficio.servidores %}
           <div class="oficio-lc__traveller oficio-lc__traveller--motorista">
             <div class="oficio-lc__traveller-body">
               <div class="oficio-lc__traveller-name-row">
-                <span class="oficio-lc__traveller-name">{{ s.name }}</span>
-                {% if s.unidade %}<span class="oficio-lc__traveller-unidade">{{ s.unidade }}</span>{% endif %}
-                <span class="oficio-lc__traveller-badge oficio-lc__traveller-badge--muted">Ofício {{ oficio.numero }}</span>
+                <span class="oficio-lc__traveller-name">{{ s.name }}{% if s.unidade %} <span class="oficio-lc__traveller-unidade-sep" aria-hidden="true">*</span> <span class="oficio-lc__traveller-unidade">{{ s.unidade }}</span>{% endif %}</span>
+                <span class="oficio-lc__traveller-badge">Ofício {{ oficio.numero }}</span>
               </div>
               {% if s.cargo or s.telefone %}
               <span class="oficio-lc__traveller-meta">{% if s.cargo %}{{ s.cargo }}{% endif %}{% if s.cargo and s.telefone %} · {% endif %}{% if s.telefone %}{{ s.telefone }}{% endif %}</span>

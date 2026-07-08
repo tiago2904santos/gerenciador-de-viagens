@@ -24,6 +24,7 @@ from oficios.presenters import apresentar_oficio_card
 from ordens_servico.presenters import apresentar_ordem_servico_card
 from planos_trabalho.presenters import apresentar_plano_card
 from roteiros.presenters import apresentar_linha_lista_simples_roteiro
+from termos.presenters import apresentar_linha_lista_simples_termo
 
 from prestacoes_contas.forms import PrestacaoMultipleFileField
 from prestacoes_contas.forms import PrestacaoMultipleFileInput
@@ -176,13 +177,17 @@ def index(request):
         "oficios__viatura",
         "oficios__motorista",
         "oficios__roteiro",
+        "oficios__roteiro__origem_cidade",
         "oficios__roteiro__destinos__cidade__estado",
         "oficios__roteiro__trechos",
+        "roteiros",
+        "roteiros__origem_cidade",
         "planos_trabalho",
         "planos_trabalho__programa",
         "planos_trabalho__destino_cidade__estado",
         "ordens_servico",
         "ordens_servico__destinos__estado",
+        "documentos_solicitacao",
     )
     if q:
         q_unaccent = remove_accents(q)
@@ -335,17 +340,44 @@ def _roteiro_rows_do_evento(evento):
     ]
 
 
-def _termos_do_evento(evento):
-    """Retorna termos do evento: diretos (termo.evento) + via oficios vinculados ao evento."""
+def _apresentar_termos_rows(termos_qs):
+    return [
+        apresentar_linha_lista_simples_termo(
+            termo,
+            edit_url=reverse("termos:editar", args=[termo.pk]),
+            delete_url=reverse("termos:excluir", args=[termo.pk]),
+            delete_modal=True,
+            pdf_url=reverse("termos:baixar_termo_cadastro_pdf", args=[termo.pk]),
+            docx_url=reverse("termos:baixar_termo_cadastro_docx", args=[termo.pk]),
+        )
+        for termo in termos_qs
+    ]
+
+
+def _termo_generico_rows_do_evento(evento):
+    """Termo(s) genérico(s) do evento (evento.termo direto, sem ofício) — sempre no topo da lista."""
     from termos.models import TermoAutorizacao
 
-    return (
-        TermoAutorizacao.objects.filter(Q(evento=evento) | Q(oficio__evento=evento))
-        .distinct()
+    termos = (
+        TermoAutorizacao.objects.filter(evento=evento, oficio__isnull=True)
+        .select_related("destino_cidade__estado", "destino_estado", "viatura")
+        .prefetch_related("servidores")
+        .order_by("-created_at")
+    )
+    return _apresentar_termos_rows(termos)
+
+
+def _termos_oficio_rows_do_evento(evento):
+    """Termos gerados a partir de ofícios vinculados ao evento."""
+    from termos.models import TermoAutorizacao
+
+    termos = (
+        TermoAutorizacao.objects.filter(oficio__evento=evento)
         .select_related("destino_cidade__estado", "destino_estado", "viatura", "oficio")
         .prefetch_related("servidores")
         .order_by("-created_at")
     )
+    return _apresentar_termos_rows(termos)
 
 
 def _garantir_termo_automatico(evento):
@@ -413,14 +445,19 @@ def detalhe(request, pk, etapa=1):
     if request.method == "POST" and request.POST.get("action") == "upload_solicitacao":
         from django.core.validators import FileExtensionValidator
         from django.core.exceptions import ValidationError
+        from PIL import UnidentifiedImageError
+
+        from .services import converter_para_pdf_se_necessario
 
         arquivos = request.FILES.getlist("solicitacao_arquivos")
         validator = FileExtensionValidator(EVENTO_SOLICITACAO_EXTENSOES)
         erros = False
+        convertidos = []
         for arquivo in arquivos:
             try:
                 validator(arquivo)
-            except ValidationError:
+                convertidos.append(converter_para_pdf_se_necessario(arquivo))
+            except (ValidationError, UnidentifiedImageError):
                 erros = True
                 break
         if erros or not arquivos:
@@ -429,11 +466,11 @@ def detalhe(request, pk, etapa=1):
             else:
                 messages.error(request, "Formato inválido. Aceita apenas PDF, PNG, JPG ou JPEG.")
         else:
-            for arquivo in arquivos:
+            for arquivo_pdf in convertidos:
                 EventoDocumentoSolicitacao.objects.create(
                     evento=evento,
-                    arquivo=arquivo,
-                    nome_original=Path(arquivo.name).name,
+                    arquivo=arquivo_pdf,
+                    nome_original=Path(arquivo_pdf.name).name,
                 )
             messages.success(request, "Documentos de solicitação anexados com sucesso.")
         return redirect("eventos:guiado_etapa", pk=evento.pk, etapa=4)
@@ -468,7 +505,8 @@ def detalhe(request, pk, etapa=1):
             "roteiro_rows": _roteiro_rows_do_evento(evento),
             "plano_cards": [apresentar_plano_card(plano) for plano in evento.planos_trabalho.all()],
             "ordem_cards": [apresentar_ordem_servico_card(ordem) for ordem in evento.ordens_servico.all()],
-            "termos": _termos_do_evento(evento),
+            "termo_generico_rows": _termo_generico_rows_do_evento(evento),
+            "termos_oficio_rows": _termos_oficio_rows_do_evento(evento),
             "sede_uf": config.uf if config else "",
             "modelos_motivo_url": _reverse("oficios:modelos_motivo_index"),
             "tipos_evento_url": f"{_reverse('eventos:tipos_index')}?{urlencode({'next': request.path})}",
