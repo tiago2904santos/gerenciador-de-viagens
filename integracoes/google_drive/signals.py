@@ -47,6 +47,9 @@ def conectar() -> None:
     post_save.connect(
         _organizar_evento_ao_salvar, sender=Evento, dispatch_uid="gdrive_evento_salvo"
     )
+    post_save.connect(
+        _criar_pasta_evento_ao_criar, sender=Evento, dispatch_uid="gdrive_evento_criar_pasta"
+    )
 
     pre_delete.connect(
         _limpar_drive_artefato, sender=DocumentoArtefato, dispatch_uid="gdrive_excluir_artefato"
@@ -243,6 +246,24 @@ def _organizar_evento_ao_salvar(sender, instance, **kwargs) -> None:
     threading.Thread(
         target=_organizar_evento_em_thread, args=(instance.pk,), daemon=True
     ).start()
+
+
+def _criar_pasta_evento_ao_criar(sender, instance, created, **kwargs) -> None:
+    """Cria a pasta do evento no Drive assim que ele é criado — mesmo em rascunho.
+
+    Diferente de ``_organizar_evento_ao_salvar`` (que só roda quando o evento sai
+    do rascunho, pois organiza documentos e gera PDFs reais em segundo plano),
+    aqui só criamos a pasta vazia: uma chamada leve, síncrona (mesmo padrão de
+    ``_organizar_evento_anexo``/``_organizar_solicitacao``), sem esperar o
+    primeiro documento do evento.
+    """
+    if not created or _drive_desligado():
+        return
+    from . import organizer, tasks
+
+    _processar_com_retry(
+        organizer.criar_pasta_evento, instance, tasks.processar_criar_pasta_evento
+    )
 
 
 def _excluir_no_drive(client, reg) -> None:

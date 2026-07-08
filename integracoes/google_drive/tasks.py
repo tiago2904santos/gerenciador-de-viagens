@@ -83,3 +83,13 @@ def processar_solicitacao_evento(self, solicitacao_id: int) -> None:
     if doc is None:
         return
     status.executar_e_rastrear(organizer.organizar_solicitacao_evento, doc)
+
+
+@shared_task(**_TASK_KWARGS)
+def processar_criar_pasta_evento(self, evento_id: int) -> None:
+    from eventos.models import Evento
+
+    evento = Evento.objects.filter(pk=evento_id).first()
+    if evento is None:
+        return
+    status.executar_e_rastrear(organizer.criar_pasta_evento, evento)
