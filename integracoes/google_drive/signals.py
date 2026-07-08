@@ -367,6 +367,16 @@ def _limpar_pasta_evento(sender, instance, **kwargs) -> None:
         logger.error(
             "[Drive] falha ao mover pasta do evento #%s para a lixeira", instance.pk, exc_info=True
         )
+        return
+
+    from django.contrib.contenttypes.models import ContentType
+
+    from .models import DriveArquivoExterno
+
+    ct = ContentType.objects.get_for_model(instance.__class__)
+    DriveArquivoExterno.objects.filter(
+        content_type=ct, object_id=instance.pk, campo="pasta_evento"
+    ).delete()
 
 
 def _organizar_evento_em_thread(evento_id: int) -> None:

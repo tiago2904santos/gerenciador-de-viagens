@@ -332,25 +332,44 @@ class CancelamentoTests(TestCase):
         self.evento.refresh_from_db()
 
     def test_pasta_evento_ativo_fica_em_eventos(self):
+        """``setUp`` já criou o evento (post_save resolve e persiste a pasta na
+        hora) — aqui a chamada deve REUSAR esse registro (renomeando a mesma
+        pasta, já que os tipos foram adicionados via M2M depois), não recalcular
+        um ID novo por busca de nome."""
         client = services.get_client()
-        resultado = organizer._pasta_evento_folder(client, self.evento)
         pai = client.get_or_create_pasta(naming.PASTA_EVENTOS, None)
-        esperado = client.get_or_create_pasta(naming.pasta_evento(self.evento), pai)
-        self.assertEqual(resultado, esperado)
+        reg_antes = organizer._registro_pasta_evento(self.evento)
+        with patch.object(client, "mover_renomear") as m_mover:
+            resultado = organizer._pasta_evento_folder(client, self.evento)
+        m_mover.assert_called_once_with(reg_antes.file_id, naming.pasta_evento(self.evento), pai)
+        self.assertEqual(resultado, reg_antes.file_id)
 
     def test_pasta_evento_cancelado_vai_para_eventos_cancelados(self):
         self._cancelar_evento()
         client = services.get_client()
-        resultado = organizer._pasta_evento_folder(client, self.evento)
         pai = client.get_or_create_pasta(naming.PASTA_EVENTOS_CANCELADOS, None)
-        esperado = client.get_or_create_pasta(naming.pasta_evento(self.evento), pai)
-        self.assertEqual(resultado, esperado)
+        reg_antes = organizer._registro_pasta_evento(self.evento)
+        with patch.object(client, "mover_renomear") as m_mover:
+            resultado = organizer._pasta_evento_folder(client, self.evento)
+        m_mover.assert_called_once_with(reg_antes.file_id, naming.pasta_evento(self.evento), pai)
+        self.assertEqual(resultado, reg_antes.file_id)
+        reg_depois = organizer._registro_pasta_evento(self.evento)
+        self.assertEqual(reg_depois.pasta_id, pai)
 
     def test_pasta_evento_cancelado_ja_existente_em_eventos_e_movida(self):
-        """Evento cancelado depois de já ter sido organizado antes: a pasta que
-        já existe em "Eventos/" é MOVIDA pra "Eventos cancelados/", não
-        duplicada."""
+        """Evento organizado por código ANTIGO, sem registro de pasta persistido
+        (simulado apagando o registro criado no ``setUp``), cancelado depois: a
+        pasta que já existe em "Eventos/" é MOVIDA pra "Eventos cancelados/",
+        não duplicada."""
+        from django.contrib.contenttypes.models import ContentType
+
+        from integracoes.google_drive.models import DriveArquivoExterno
+
         client = services.get_client()
+        ct = ContentType.objects.get_for_model(Evento)
+        DriveArquivoExterno.objects.filter(
+            content_type=ct, object_id=self.evento.pk, campo="pasta_evento"
+        ).delete()
         self._cancelar_evento()
         with patch.object(client, "buscar_pasta_por_nome", return_value="pasta-antiga-id") as m_buscar, \
                 patch.object(client, "mover_renomear") as m_mover:
@@ -392,10 +411,17 @@ class CancelamentoTests(TestCase):
         self.assertEqual(reg.nome, naming.NOME_MOTIVO_CANCELAMENTO)
 
     def test_organizar_motivo_cancelamento_noop_se_nao_cancelado(self):
+        from django.contrib.contenttypes.models import ContentType
+
         from integracoes.google_drive.models import DriveArquivoExterno
 
         organizer.organizar_motivo_cancelamento(self.evento)
-        self.assertEqual(DriveArquivoExterno.objects.count(), 0)
+        ct = ContentType.objects.get_for_model(Evento)
+        self.assertFalse(
+            DriveArquivoExterno.objects.filter(
+                content_type=ct, object_id=self.evento.pk, campo="motivo_cancelamento"
+            ).exists()
+        )
 
 
 @override_settings(GOOGLE_DRIVE={"MODO": "mock", "UPLOAD_EM_MOCK": True})
@@ -410,6 +436,18 @@ class CriarPastaEventoTests(TestCase):
         evento = Evento.objects.create(destino_cidade="Maringá", destino_uf="PR")
         self.assertEqual(evento.status, Evento.STATUS_RASCUNHO)
         nome_pasta = naming.pasta_evento(evento)
+
+        # A criação acima (post_save) já resolveu e persistiu a pasta; limpa o
+        # registro para isolar o comportamento de ``criar_pasta_evento`` chamado
+        # diretamente, como se fosse a primeira resolução.
+        from django.contrib.contenttypes.models import ContentType
+
+        from integracoes.google_drive.models import DriveArquivoExterno
+
+        ct = ContentType.objects.get_for_model(Evento)
+        DriveArquivoExterno.objects.filter(
+            content_type=ct, object_id=evento.pk, campo="pasta_evento"
+        ).delete()
 
         with patch(
             "integracoes.google_drive.services._MockClient.get_or_create_pasta"
@@ -438,3 +476,39 @@ class CriarPastaEventoTests(TestCase):
             ) as mock_create:
                 Evento.objects.create(destino_cidade="Maringá", destino_uf="PR")
             mock_create.assert_not_called()
+
+    def test_reusa_mesma_pasta_apos_evento_ganhar_cidade_e_data(self):
+        """Evento criado em branco (rascunho, sem cidade/data) ganha uma pasta
+        no Drive na hora ("Evento {pk}"). Ao preencher cidade/data depois (fluxo
+        normal do wizard), a MESMA pasta deve ser renomeada — não pode sobrar
+        uma pasta órfã com o nome antigo."""
+        client = services.get_client()
+        evento = Evento.objects.create()
+        pasta_inicial = organizer._pasta_evento_folder(client, evento)
+
+        evento.destino_cidade = "Maringá"
+        evento.data_inicio = date(2026, 7, 22)
+        evento.data_fim = date(2026, 7, 23)
+        evento.save()
+
+        pasta_depois = organizer._pasta_evento_folder(client, evento)
+        self.assertEqual(pasta_inicial, pasta_depois)
+
+    def test_excluir_evento_apos_mudar_nome_move_a_pasta_certa_para_lixeira(self):
+        """Regressão: a pasta resolvida na exclusão deve ser a MESMA usada em
+        vida (via registro persistido), não uma recém-criada por busca de nome
+        desatualizada — senão a pasta de verdade fica órfã no Drive."""
+        client = services.get_client()
+        evento = Evento.objects.create()
+        pasta_id = organizer._pasta_evento_folder(client, evento)
+
+        evento.destino_cidade = "Maringá"
+        evento.data_inicio = date(2026, 7, 22)
+        evento.data_fim = date(2026, 7, 23)
+        evento.save()
+
+        with patch(
+            "integracoes.google_drive.services._MockClient.mover_para_lixeira"
+        ) as mock_lixeira:
+            evento.delete()
+        mock_lixeira.assert_any_call(pasta_id)

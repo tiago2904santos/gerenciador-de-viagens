@@ -43,6 +43,8 @@ from .services import get_client, is_mock, mimetype_para_formato
 logger = logging.getLogger(__name__)
 
 _SHORTCUT_MIME = "application/vnd.google-apps.shortcut"
+_FOLDER_MIME = "application/vnd.google-apps.folder"
+_CAMPO_PASTA_EVENTO = "pasta_evento"
 
 
 # ---------------------------------------------------------------------------
@@ -91,28 +93,93 @@ def _evento_cancelado(evento) -> bool:
     return getattr(evento, "status", None) == Evento.STATUS_CANCELADO
 
 
+def _registro_pasta_evento(evento):
+    from django.contrib.contenttypes.models import ContentType
+    from eventos.models import Evento
+
+    from .models import DriveArquivoExterno
+
+    ct = ContentType.objects.get_for_model(Evento)
+    return DriveArquivoExterno.objects.filter(
+        content_type=ct, object_id=evento.pk, campo=_CAMPO_PASTA_EVENTO
+    ).first()
+
+
+def _salvar_registro_pasta_evento(evento, reg, pasta_id: str, nome_pasta: str, pai_certo: str) -> None:
+    from django.contrib.contenttypes.models import ContentType
+    from eventos.models import Evento
+
+    from .models import DriveArquivoExterno
+
+    if reg:
+        reg.file_id, reg.nome, reg.pasta_id = pasta_id, nome_pasta, pai_certo
+        reg.mime_type, reg.mock = _FOLDER_MIME, is_mock()
+        reg.save()
+        return
+    ct = ContentType.objects.get_for_model(Evento)
+    DriveArquivoExterno.objects.create(
+        content_type=ct, object_id=evento.pk, campo=_CAMPO_PASTA_EVENTO,
+        file_id=pasta_id, nome=nome_pasta, pasta_id=pai_certo,
+        mime_type=_FOLDER_MIME, mock=is_mock(),
+    )
+
+
 def _pasta_evento_folder(client, evento) -> str:
     """Pasta do evento — em ``Eventos/`` normalmente, ou em ``Eventos cancelados/``
     quando ``evento.status == CANCELADO``.
 
-    Se a pasta já existir do lado ERRADO (evento acabou de ser cancelado e já
-    tinha sido organizado antes, ou — mais raro — o cancelamento foi revertido
-    manualmente editando o campo ``status``), move em vez de duplicar.
+    O ID da pasta é persistido em ``DriveArquivoExterno`` (campo ``pasta_evento``)
+    assim que resolvido pela primeira vez. Chamadas seguintes REUSAM esse ID
+    (renomeando/movendo a mesma pasta via ``mover_renomear``) em vez de buscar de
+    novo por nome — o nome muda toda vez que cidade/data/tipo do evento mudam
+    (comum: o evento é criado em branco pelo wizard e só ganha esses dados
+    depois), e uma busca por nome não acha a pasta já criada com o nome antigo,
+    criando uma pasta NOVA e deixando a antiga órfã no Drive para sempre.
     """
+    from googleapiclient.errors import HttpError
+
     raiz = _raiz()
     nome_pasta = naming.pasta_evento(evento)
     cancelado = _evento_cancelado(evento)
     nome_pai_certo = naming.PASTA_EVENTOS_CANCELADOS if cancelado else naming.PASTA_EVENTOS
-    nome_pai_errado = naming.PASTA_EVENTOS if cancelado else naming.PASTA_EVENTOS_CANCELADOS
+    pai_certo = client.get_or_create_pasta(nome_pai_certo, raiz)
 
+    reg = _registro_pasta_evento(evento)
+    # Só descarta o registro quando ele veio do mock e agora estamos "de
+    # verdade" (transição mock → ativo, onde o ID fake não existe no Drive
+    # real). Mock reusando mock (testes) e real reusando real são válidos.
+    reutilizavel = reg and reg.file_id and (not reg.mock or is_mock())
+    if reutilizavel:
+        try:
+            client.mover_renomear(reg.file_id, nome_pasta, pai_certo)
+            _salvar_registro_pasta_evento(evento, reg, reg.file_id, nome_pasta, pai_certo)
+            return reg.file_id
+        except HttpError as exc:
+            if not _arquivo_inacessivel(exc):
+                raise
+            # Pasta apagada/inacessível fora do app (ou perda de permissão): o
+            # registro local não serve mais — resolve de novo abaixo e recria.
+            logger.warning(
+                "[Drive] pasta do evento #%s (file_id=%s) inacessível; recriando",
+                evento.pk, reg.file_id,
+            )
+
+    # Sem registro ainda (evento organizado antes deste mecanismo existir) ou
+    # registro invalidado: busca também do lado ERRADO (evento acabou de ser
+    # cancelado e já tinha sido organizado antes, ou o cancelamento foi
+    # revertido editando o campo ``status`` manualmente) antes de criar/achar
+    # do lado certo — evita duplicar quando a pasta já existe com o nome ATUAL.
+    nome_pai_errado = naming.PASTA_EVENTOS if cancelado else naming.PASTA_EVENTOS_CANCELADOS
     pai_errado = client.get_or_create_pasta(nome_pai_errado, raiz)
     existente_errado = client.buscar_pasta_por_nome(nome_pasta, pai_errado)
-    pai_certo = client.get_or_create_pasta(nome_pai_certo, raiz)
     if existente_errado:
         client.mover_renomear(existente_errado, nome_pasta, pai_certo)
-        return existente_errado
+        pasta_id = existente_errado
+    else:
+        pasta_id = client.get_or_create_pasta(nome_pasta, pai_certo)
 
-    return client.get_or_create_pasta(nome_pasta, pai_certo)
+    _salvar_registro_pasta_evento(evento, reg, pasta_id, nome_pasta, pai_certo)
+    return pasta_id
 
 
 def _pasta_tipo_global(client, tipo: str) -> str:
