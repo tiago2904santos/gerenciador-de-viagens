@@ -48,7 +48,7 @@ def conectar() -> None:
         _organizar_evento_ao_salvar, sender=Evento, dispatch_uid="gdrive_evento_salvo"
     )
     post_save.connect(
-        _criar_pasta_evento_ao_criar, sender=Evento, dispatch_uid="gdrive_evento_criar_pasta"
+        _sincronizar_pasta_evento_ao_salvar, sender=Evento, dispatch_uid="gdrive_evento_pasta_sync"
     )
 
     pre_delete.connect(
@@ -248,21 +248,24 @@ def _organizar_evento_ao_salvar(sender, instance, **kwargs) -> None:
     ).start()
 
 
-def _criar_pasta_evento_ao_criar(sender, instance, created, **kwargs) -> None:
-    """Cria a pasta do evento no Drive assim que ele é criado — mesmo em rascunho.
+def _sincronizar_pasta_evento_ao_salvar(sender, instance, **kwargs) -> None:
+    """Cria (na primeira vez com dados suficientes) ou renomeia a pasta do
+    evento no Drive sempre que ele é salvo — inclusive antes de sair do
+    rascunho — para refletir qualquer alteração de tipo/cidade/data.
 
-    Diferente de ``_organizar_evento_ao_salvar`` (que só roda quando o evento sai
-    do rascunho, pois organiza documentos e gera PDFs reais em segundo plano),
-    aqui só criamos a pasta vazia: uma chamada leve, síncrona (mesmo padrão de
-    ``_organizar_evento_anexo``/``_organizar_solicitacao``), sem esperar o
-    primeiro documento do evento.
+    Diferente de ``_organizar_evento_ao_salvar`` (que só roda quando o evento
+    sai do rascunho, pois organiza documentos e gera PDFs reais em segundo
+    plano), aqui só sincronizamos a pasta em si: uma chamada leve, síncrona
+    (mesmo padrão de ``_organizar_evento_anexo``/``_organizar_solicitacao``).
+    A função chamada (``organizer.sincronizar_pasta_evento``) não faz nada
+    enquanto a Etapa 1 ainda não tiver dados suficientes.
     """
-    if not created or _drive_desligado():
+    if _drive_desligado():
         return
     from . import organizer, tasks
 
     _processar_com_retry(
-        organizer.criar_pasta_evento, instance, tasks.processar_criar_pasta_evento
+        organizer.sincronizar_pasta_evento, instance, tasks.processar_sincronizar_pasta_evento
     )
 
 
@@ -347,6 +350,14 @@ def _limpar_pasta_evento(sender, instance, **kwargs) -> None:
     from . import organizer
     from .services import get_client
 
+    pasta_id = instance.drive_folder_id or None
+    if not pasta_id:
+        from eventos.services import _evento_dados_completos
+
+        if not _evento_dados_completos(instance):
+            # Nunca teve dados suficientes (Etapa 1) para ganhar uma pasta própria.
+            return
+
     try:
         client = get_client()
     except Exception:
@@ -354,13 +365,14 @@ def _limpar_pasta_evento(sender, instance, **kwargs) -> None:
             "[Drive] falha ao obter client para excluir pasta do evento #%s", instance.pk, exc_info=True
         )
         return
-    try:
-        pasta_id = organizer._pasta_evento_folder(client, instance)
-    except Exception:
-        logger.error(
-            "[Drive] falha ao localizar pasta do evento #%s", instance.pk, exc_info=True
-        )
-        return
+    if pasta_id is None:
+        try:
+            pasta_id = organizer._pasta_evento_folder(client, instance)
+        except Exception:
+            logger.error(
+                "[Drive] falha ao localizar pasta do evento #%s", instance.pk, exc_info=True
+            )
+            return
     try:
         client.mover_para_lixeira(pasta_id)
     except Exception:
