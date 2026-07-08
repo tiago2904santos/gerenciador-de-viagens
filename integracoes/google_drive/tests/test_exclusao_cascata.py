@@ -45,6 +45,15 @@ class ExclusaoEventoCascataTests(TestCase):
             self.evento.delete()
         mock_lixeira.assert_any_call(file_id)
 
+    def test_excluir_evento_move_pasta_do_evento_para_lixeira_no_drive(self):
+        from integracoes.google_drive import organizer
+
+        client = services.get_client()
+        pasta_id = organizer._pasta_evento_folder(client, self.evento)
+        with patch("integracoes.google_drive.services._MockClient.mover_para_lixeira") as mock_lixeira:
+            self.evento.delete()
+        mock_lixeira.assert_any_call(pasta_id)
+
 
 @override_settings(GOOGLE_DRIVE={"MODO": "mock", "UPLOAD_EM_MOCK": True})
 class ExclusaoDocumentoLimpaDriveTests(TestCase):
