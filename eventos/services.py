@@ -3,7 +3,33 @@ from __future__ import annotations
 
 from urllib.parse import urlencode
 
+from django.db import transaction
 from django.urls import reverse
+
+
+@transaction.atomic
+def excluir_evento(evento) -> None:
+    """Exclui o evento e cascateia a exclusão dos documentos vinculados.
+
+    Todo documento (ofício, roteiro, ordem de serviço, plano de trabalho, termo de
+    autorização, justificativa, artefato gerado) que pertence apenas a este evento é
+    excluído junto. Exceção: um roteiro deste evento que ainda está em uso por outro
+    ofício ou prestação de contas que NÃO pertence a este evento (outro evento, ou
+    avulso) não é excluído — apenas desvinculado do evento, preservando o documento
+    do outro dono.
+    """
+    from prestacoes_contas.models import PrestacaoContas
+
+    for roteiro in evento.roteiros.all():
+        ainda_em_uso_fora_do_evento = (
+            roteiro.oficios.exclude(evento=evento).exists()
+            or PrestacaoContas.objects.filter(roteiro_ajustado=roteiro).exclude(oficio__evento=evento).exists()
+        )
+        if ainda_em_uso_fora_do_evento:
+            roteiro.evento = None
+            roteiro.save(update_fields=["evento"])
+
+    evento.delete()
 
 
 def build_evento_document_context(evento) -> dict:

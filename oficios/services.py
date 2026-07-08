@@ -286,9 +286,6 @@ def atualizar_oficio_dados_viajantes(oficio, form, action="save_draft"):
     atualizar_status_automatico_oficio(atualizado, action=action, form=form)
     atualizado.save()
     form.save_m2m()
-    numero_antigo = original.numero
-    if numero_antigo and original.ano and numero_antigo != atualizado.numero:
-        OficioNumeroLacuna.objects.get_or_create(ano=original.ano, numero=numero_antigo)
     return atualizado
 
 

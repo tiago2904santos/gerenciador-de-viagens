@@ -1,14 +1,14 @@
 # Regras de negócio de Ofícios
 
 ## REG-OF-001 — Numeração anual editável, com sugestão automática por lacuna liberada
-- Descrição: ao criar um ofício, o sistema reserva automaticamente um número (sugestão), mas o campo N° do Ofício é editável na Etapa 1 (Dados dos viajantes) — alguns setores preenchem o número manualmente (numeração não sequencial). A sugestão automática usa a menor lacuna liberada por **exclusão** de um ofício já numerado (`OficioNumeroLacuna`); números apenas pulados manualmente (ex.: ir de 10 direto para 15) não são oferecidos como sugestão — só o maior número usado + 1. Editar o número de um ofício existente libera o número antigo (via `OficioNumeroLacuna`) para reaproveitamento; cancelar um ofício (sem excluir) não libera o número.
+- Descrição: ao criar um ofício, o sistema reserva automaticamente um número (sugestão), mas o campo N° do Ofício é editável na Etapa 1 (Dados dos viajantes) — alguns setores preenchem o número manualmente (numeração não sequencial). A sugestão automática usa a menor lacuna liberada por **exclusão** de um ofício já numerado (`OficioNumeroLacuna`); números apenas pulados manualmente (ex.: ir de 10 direto para 15) não são oferecidos como sugestão — só o maior número usado + 1. **Editar** o número de um ofício existente (ex.: corrigir 88 para 98) **não** libera o número antigo — só a **exclusão** de um ofício numerado libera um número para reaproveitamento; cancelar um ofício (sem excluir) também não libera o número.
 - Origem no legacy: `eventos/models.py` (`Oficio.get_next_available_numero`, `Oficio.save`).
 - Arquivos/funções: model `Oficio`, `OficioNumeroLacuna`; services `get_next_available_numero_oficio`, `reservar_numero_oficio`, `excluir_oficio`, `atualizar_oficio_dados_viajantes`; form `OficioDadosViajantesForm.clean_numero`.
-- Estado no 3.0: implementado na Fase 12.2 para criação pelo wizard de Dados e viajantes; edição manual e lacunas por exclusão adicionadas depois.
+- Estado no 3.0: implementado na Fase 12.2 para criação pelo wizard de Dados e viajantes; edição manual do número adicionada depois (sem liberar o número antigo — testado em produção e revertido após reportar comportamento indesejado).
 - Adaptação correta: manter service transacional e constraint `(ano, numero)`; validar unicidade amigável no form antes do `IntegrityError`.
 - Prioridade: Alta.
 - Riscos: colisão de número em concorrência.
-- Testes necessários: criação sequencial, reaproveitamento de lacuna após exclusão, números pulados manualmente não sugeridos, edição de número liberando o antigo, concorrência.
+- Testes necessários: criação sequencial, reaproveitamento de lacuna após exclusão, números pulados manualmente não sugeridos, edição de número não libera o antigo, concorrência.
 
 ## REG-OF-002 — Protocolo canônico e visual
 - Descrição: protocolo é persistido em dígitos e exibido em máscara `XX.XXX.XXX-X`.

@@ -91,7 +91,9 @@ class OficioServicesTests(TestCase):
         self.assertTrue(OficioNumeroLacuna.objects.filter(ano=ano, numero=7).exists())
         self.assertEqual(get_next_available_numero_oficio(ano), 7)
 
-    def test_editar_numero_libera_numero_antigo_e_consome_lacuna_do_novo(self):
+    def test_editar_numero_nao_libera_numero_antigo_mas_consome_lacuna_do_novo(self):
+        # Editar (corrigir) o número de um ofício existente não deve reintroduzir
+        # o número antigo como sugestão automática — só a exclusão faz isso.
         ano = timezone.localdate().year
         oficio = Oficio.objects.create(numero=5, ano=ano, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
         outro = Oficio.objects.create(numero=8, ano=ano, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
@@ -109,8 +111,10 @@ class OficioServicesTests(TestCase):
         atualizado = atualizar_oficio_dados_viajantes(oficio, form, action="save_draft")
 
         self.assertEqual(atualizado.numero, 8)
-        self.assertTrue(OficioNumeroLacuna.objects.filter(ano=ano, numero=5).exists())
+        self.assertFalse(OficioNumeroLacuna.objects.filter(ano=ano, numero=5).exists())
         self.assertFalse(OficioNumeroLacuna.objects.filter(ano=ano, numero=8).exists())
+        # próxima sugestão vai direto para o maior usado + 1, não reaproveita o 5
+        self.assertEqual(get_next_available_numero_oficio(ano), 9)
 
     def test_clean_numero_rejeita_numero_ja_usado_no_ano(self):
         ano = timezone.localdate().year
