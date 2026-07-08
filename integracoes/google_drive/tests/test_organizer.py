@@ -1,6 +1,6 @@
 import hashlib
 from datetime import date
-from unittest.mock import patch
+from unittest.mock import ANY, patch
 
 from django.core.files.base import ContentFile
 from django.test import TestCase, override_settings
@@ -425,16 +425,45 @@ class CancelamentoTests(TestCase):
 
 
 @override_settings(GOOGLE_DRIVE={"MODO": "mock", "UPLOAD_EM_MOCK": True})
-class CriarPastaEventoTests(TestCase):
-    """A pasta do evento deve existir no Drive assim que o evento é criado,
-    mesmo sem nenhum documento ainda (evento em rascunho)."""
+class SincronizarPastaEventoTests(TestCase):
+    """A pasta do evento só deve existir no Drive depois que a Etapa 1 tiver
+    dados suficientes (evita criar uma pasta genérica "Evento" antes disso);
+    e alterações posteriores (ex.: mudar a data) devem renomear a pasta já
+    existente em vez de criar uma duplicata."""
 
     def setUp(self):
         services._reset_client()
 
-    def test_criar_pasta_evento_cria_pasta_mesmo_sem_documentos(self):
-        evento = Evento.objects.create(destino_cidade="Maringá", destino_uf="PR")
+    def _evento_completo(self, **overrides):
+        dados = dict(
+            titulo="PCPR na Comunidade",
+            destino_cidade="Londrina",
+            destino_uf="PR",
+            data_inicio=date(2026, 7, 3),
+            data_fim=date(2026, 7, 3),
+        )
+        dados.update(overrides)
+        return Evento.objects.create(**dados)
+
+    def test_sincronizar_pasta_evento_nao_cria_pasta_sem_dados_essenciais(self):
+        evento = Evento.objects.create()
         self.assertEqual(evento.status, Evento.STATUS_RASCUNHO)
+
+        with patch(
+            "integracoes.google_drive.services._MockClient.get_or_create_pasta"
+        ) as mock_create:
+            organizer.sincronizar_pasta_evento(evento)
+
+        mock_create.assert_not_called()
+        evento.refresh_from_db()
+        self.assertEqual(evento.drive_folder_id, "")
+
+    def test_sincronizar_pasta_evento_cria_pasta_com_dados_completos(self):
+        # ``_evento_completo`` já dispara o signal (post_save) de verdade; zera
+        # ``drive_folder_id`` pra testar isoladamente o caminho "ainda sem pasta".
+        evento = self._evento_completo()
+        Evento.objects.filter(pk=evento.pk).update(drive_folder_id="")
+        evento.refresh_from_db()
         nome_pasta = naming.pasta_evento(evento)
 
         # A criação acima (post_save) já resolveu e persistiu a pasta; limpa o
@@ -453,28 +482,65 @@ class CriarPastaEventoTests(TestCase):
             "integracoes.google_drive.services._MockClient.get_or_create_pasta"
         ) as mock_create:
             mock_create.return_value = "mock-pasta-id"
-            organizer.criar_pasta_evento(evento)
+            organizer.sincronizar_pasta_evento(evento)
 
         mock_create.assert_any_call(nome_pasta, "mock-pasta-id")
+        evento.refresh_from_db()
+        self.assertEqual(evento.drive_folder_id, "mock-pasta-id")
 
-    def test_evento_ao_salvar_cria_pasta_automaticamente(self):
-        """Ponta a ponta: criar o Evento (post_save) já cria a pasta, sem
-        precisar de nenhum ofício/documento."""
+    def test_sincronizar_pasta_evento_renomeia_pasta_existente_ao_mudar_dados(self):
+        evento = self._evento_completo()
+        evento.refresh_from_db()
+        pasta_id_original = evento.drive_folder_id
+        self.assertTrue(pasta_id_original)
+
+        evento.data_inicio = date(2026, 7, 4)
+        evento.data_fim = date(2026, 7, 4)
+        evento.save()
+        novo_nome = naming.pasta_evento(evento)
+
+        with patch(
+            "integracoes.google_drive.services._MockClient.mover_renomear"
+        ) as mock_renomear, patch(
+            "integracoes.google_drive.services._MockClient.get_or_create_pasta"
+        ) as mock_create:
+            mock_renomear.return_value = pasta_id_original
+            mock_create.return_value = "mock-pasta-eventos-pai"
+            organizer.sincronizar_pasta_evento(evento)
+
+        # Renomeia a pasta já existente (mesmo id) — nunca cria uma pasta nova
+        # com o nome do evento (só o "Eventos/" pai, se ainda não resolvido).
+        mock_renomear.assert_any_call(pasta_id_original, novo_nome, "mock-pasta-eventos-pai")
+        for chamada in mock_create.call_args_list:
+            self.assertNotEqual(chamada.args[0], novo_nome)
+        evento.refresh_from_db()
+        self.assertEqual(evento.drive_folder_id, pasta_id_original)
+
+    def test_evento_ao_salvar_sincroniza_pasta_automaticamente(self):
+        """Ponta a ponta: criar o Evento (post_save) já com dados da Etapa 1
+        cria a pasta, sem precisar de nenhum ofício/documento."""
         with patch(
             "integracoes.google_drive.services._MockClient.get_or_create_pasta"
         ) as mock_create:
             mock_create.return_value = "mock-pasta-id"
-            evento = Evento.objects.create(destino_cidade="Maringá", destino_uf="PR")
+            evento = self._evento_completo()
 
         nome_pasta = naming.pasta_evento(evento)
         mock_create.assert_any_call(nome_pasta, "mock-pasta-id")
+
+    def test_evento_ao_salvar_nao_cria_pasta_sem_dados_da_etapa_1(self):
+        with patch(
+            "integracoes.google_drive.services._MockClient.get_or_create_pasta"
+        ) as mock_create:
+            Evento.objects.create()
+        mock_create.assert_not_called()
 
     def test_evento_ao_salvar_nao_cria_pasta_com_drive_desligado(self):
         with override_settings(GOOGLE_DRIVE={"MODO": "mock", "UPLOAD_EM_MOCK": False}):
             with patch(
                 "integracoes.google_drive.services._MockClient.get_or_create_pasta"
             ) as mock_create:
-                Evento.objects.create(destino_cidade="Maringá", destino_uf="PR")
+                self._evento_completo()
             mock_create.assert_not_called()
 
     def test_reusa_mesma_pasta_apos_evento_ganhar_cidade_e_data(self):

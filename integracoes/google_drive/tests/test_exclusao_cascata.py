@@ -1,4 +1,5 @@
 import hashlib
+from datetime import date
 from unittest.mock import patch
 
 from django.contrib.contenttypes.models import ContentType
@@ -23,7 +24,9 @@ class ExclusaoEventoCascataTests(TestCase):
 
     def setUp(self):
         services._reset_client()
-        self.evento = Evento.objects.create(titulo="Evento de teste")
+        self.evento = Evento.objects.create(
+            titulo="Evento de teste", destino_cidade="Curitiba", data_inicio=date(2026, 7, 3),
+        )
         self.oficio = Oficio.objects.create(evento=self.evento, assunto="Assunto teste")
         arquivo, hash_ = _pdf("oficio.pdf")
         self.artefato = DocumentoArtefato.objects.create(
@@ -46,13 +49,24 @@ class ExclusaoEventoCascataTests(TestCase):
         mock_lixeira.assert_any_call(file_id)
 
     def test_excluir_evento_move_pasta_do_evento_para_lixeira_no_drive(self):
-        from integracoes.google_drive import organizer
-
-        client = services.get_client()
-        pasta_id = organizer._pasta_evento_folder(client, self.evento)
+        self.evento.refresh_from_db()
+        pasta_id = self.evento.drive_folder_id
+        self.assertTrue(pasta_id)
         with patch("integracoes.google_drive.services._MockClient.mover_para_lixeira") as mock_lixeira:
             self.evento.delete()
         mock_lixeira.assert_any_call(pasta_id)
+
+    def test_excluir_evento_sem_dados_completos_nao_mexe_no_drive(self):
+        """Evento que nunca teve dados suficientes (Etapa 1) nunca ganhou pasta
+        própria — excluir não deve criar nem tentar trashear nada por ele."""
+        evento_vazio = Evento.objects.create()
+        self.assertEqual(evento_vazio.drive_folder_id, "")
+        with patch("integracoes.google_drive.services._MockClient.mover_para_lixeira") as mock_lixeira, patch(
+            "integracoes.google_drive.services._MockClient.get_or_create_pasta"
+        ) as mock_create:
+            evento_vazio.delete()
+        mock_lixeira.assert_not_called()
+        mock_create.assert_not_called()
 
 
 @override_settings(GOOGLE_DRIVE={"MODO": "mock", "UPLOAD_EM_MOCK": True})

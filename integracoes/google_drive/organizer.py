@@ -924,17 +924,39 @@ def organizar_oficio(oficio) -> None:
             logger.error("[Drive] erro ao organizar prestação %s: %s", prestacao.pk, exc, exc_info=True)
 
 
-def criar_pasta_evento(evento) -> None:
-    """Garante que a pasta do evento já exista no Drive, mesmo sem nenhum
-    documento ainda (ex.: logo na criação do evento, ainda em rascunho).
+def sincronizar_pasta_evento(evento) -> None:
+    """Cria (na primeira vez) ou renomeia/move a pasta do evento no Drive para
+    refletir os dados atuais (tipo, cidade, período) — mesmo com o evento
+    ainda em rascunho, mas só depois que a Etapa 1 tiver informação
+    suficiente (``eventos.services._evento_dados_completos``); antes disso,
+    não cria a pasta genérica "Evento" que só o placeholder produziria.
 
-    Só cria a pasta (leve, uma chamada de API) — não organiza documentos nem
-    gera PDFs, por isso pode rodar mesmo com o evento em rascunho.
+    Usa ``evento.drive_folder_id`` (persistido aqui na primeira criação) para
+    renomear a pasta já existente em vez de criar uma duplicata quando os
+    dados do evento mudam depois (ex.: data alterada).
     """
+    from eventos.models import Evento
+    from eventos.services import _evento_dados_completos
+
+    if not _evento_dados_completos(evento):
+        return
+
     from .services import get_client
 
     client = get_client()
-    _pasta_evento_folder(client, evento)
+    nome_pasta = naming.pasta_evento(evento)
+
+    if evento.drive_folder_id:
+        raiz = _raiz()
+        nome_pai = naming.PASTA_EVENTOS_CANCELADOS if _evento_cancelado(evento) else naming.PASTA_EVENTOS
+        pai_id = client.get_or_create_pasta(nome_pai, raiz)
+        pasta_id = client.mover_renomear(evento.drive_folder_id, nome_pasta, pai_id)
+    else:
+        pasta_id = _pasta_evento_folder(client, evento)
+
+    if pasta_id and pasta_id != evento.drive_folder_id:
+        Evento.objects.filter(pk=evento.pk).update(drive_folder_id=pasta_id)
+        evento.drive_folder_id = pasta_id
 
 
 def organizar_evento(evento) -> None:
