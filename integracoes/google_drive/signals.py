@@ -47,6 +47,9 @@ def conectar() -> None:
     post_save.connect(
         _organizar_evento_ao_salvar, sender=Evento, dispatch_uid="gdrive_evento_salvo"
     )
+    post_save.connect(
+        _criar_pasta_evento_ao_criar, sender=Evento, dispatch_uid="gdrive_evento_criar_pasta"
+    )
 
     pre_delete.connect(
         _limpar_drive_artefato, sender=DocumentoArtefato, dispatch_uid="gdrive_excluir_artefato"
@@ -60,6 +63,10 @@ def conectar() -> None:
         (Evento, "gdrive_excluir_evento_nota"),
     ):
         pre_delete.connect(_limpar_drive_externo, sender=model, dispatch_uid=dispatch_uid)
+
+    pre_delete.connect(
+        _limpar_pasta_evento, sender=Evento, dispatch_uid="gdrive_excluir_evento_pasta"
+    )
 
 
 def _drive_desligado() -> bool:
@@ -241,6 +248,24 @@ def _organizar_evento_ao_salvar(sender, instance, **kwargs) -> None:
     ).start()
 
 
+def _criar_pasta_evento_ao_criar(sender, instance, created, **kwargs) -> None:
+    """Cria a pasta do evento no Drive assim que ele é criado — mesmo em rascunho.
+
+    Diferente de ``_organizar_evento_ao_salvar`` (que só roda quando o evento sai
+    do rascunho, pois organiza documentos e gera PDFs reais em segundo plano),
+    aqui só criamos a pasta vazia: uma chamada leve, síncrona (mesmo padrão de
+    ``_organizar_evento_anexo``/``_organizar_solicitacao``), sem esperar o
+    primeiro documento do evento.
+    """
+    if not created or _drive_desligado():
+        return
+    from . import organizer, tasks
+
+    _processar_com_retry(
+        organizer.criar_pasta_evento, instance, tasks.processar_criar_pasta_evento
+    )
+
+
 def _excluir_no_drive(client, reg) -> None:
     """Move para a lixeira o arquivo canônico e o atalho (se houver) de um registro."""
     if reg.file_id:
@@ -306,6 +331,42 @@ def _limpar_drive_externo(sender, instance, **kwargs) -> None:
     for reg in regs:
         _excluir_no_drive(client, reg)
     DriveArquivoExterno.objects.filter(pk__in=[reg.pk for reg in regs]).delete()
+
+
+def _limpar_pasta_evento(sender, instance, **kwargs) -> None:
+    """Ao excluir um Evento, move a pasta inteira do evento no Drive para a lixeira.
+
+    Roda em ``pre_delete`` depois que os documentos do evento já foram excluídos
+    (Django deleta dependentes antes do próprio evento), quando seus arquivos
+    canônicos e atalhos já foram movidos para a lixeira individualmente por
+    ``_limpar_drive_artefato``/``_limpar_drive_externo``. Esta função cuida do que
+    sobra: a pasta do evento em si (que ficaria vazia, mas visível, no Drive).
+    """
+    if _drive_desligado():
+        return
+    from . import organizer
+    from .services import get_client
+
+    try:
+        client = get_client()
+    except Exception:
+        logger.error(
+            "[Drive] falha ao obter client para excluir pasta do evento #%s", instance.pk, exc_info=True
+        )
+        return
+    try:
+        pasta_id = organizer._pasta_evento_folder(client, instance)
+    except Exception:
+        logger.error(
+            "[Drive] falha ao localizar pasta do evento #%s", instance.pk, exc_info=True
+        )
+        return
+    try:
+        client.mover_para_lixeira(pasta_id)
+    except Exception:
+        logger.error(
+            "[Drive] falha ao mover pasta do evento #%s para a lixeira", instance.pk, exc_info=True
+        )
 
 
 def _organizar_evento_em_thread(evento_id: int) -> None:

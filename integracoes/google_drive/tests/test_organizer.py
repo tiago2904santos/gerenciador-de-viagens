@@ -396,3 +396,45 @@ class CancelamentoTests(TestCase):
 
         organizer.organizar_motivo_cancelamento(self.evento)
         self.assertEqual(DriveArquivoExterno.objects.count(), 0)
+
+
+@override_settings(GOOGLE_DRIVE={"MODO": "mock", "UPLOAD_EM_MOCK": True})
+class CriarPastaEventoTests(TestCase):
+    """A pasta do evento deve existir no Drive assim que o evento é criado,
+    mesmo sem nenhum documento ainda (evento em rascunho)."""
+
+    def setUp(self):
+        services._reset_client()
+
+    def test_criar_pasta_evento_cria_pasta_mesmo_sem_documentos(self):
+        evento = Evento.objects.create(destino_cidade="Maringá", destino_uf="PR")
+        self.assertEqual(evento.status, Evento.STATUS_RASCUNHO)
+        nome_pasta = naming.pasta_evento(evento)
+
+        with patch(
+            "integracoes.google_drive.services._MockClient.get_or_create_pasta"
+        ) as mock_create:
+            mock_create.return_value = "mock-pasta-id"
+            organizer.criar_pasta_evento(evento)
+
+        mock_create.assert_any_call(nome_pasta, "mock-pasta-id")
+
+    def test_evento_ao_salvar_cria_pasta_automaticamente(self):
+        """Ponta a ponta: criar o Evento (post_save) já cria a pasta, sem
+        precisar de nenhum ofício/documento."""
+        with patch(
+            "integracoes.google_drive.services._MockClient.get_or_create_pasta"
+        ) as mock_create:
+            mock_create.return_value = "mock-pasta-id"
+            evento = Evento.objects.create(destino_cidade="Maringá", destino_uf="PR")
+
+        nome_pasta = naming.pasta_evento(evento)
+        mock_create.assert_any_call(nome_pasta, "mock-pasta-id")
+
+    def test_evento_ao_salvar_nao_cria_pasta_com_drive_desligado(self):
+        with override_settings(GOOGLE_DRIVE={"MODO": "mock", "UPLOAD_EM_MOCK": False}):
+            with patch(
+                "integracoes.google_drive.services._MockClient.get_or_create_pasta"
+            ) as mock_create:
+                Evento.objects.create(destino_cidade="Maringá", destino_uf="PR")
+            mock_create.assert_not_called()

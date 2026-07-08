@@ -857,6 +857,19 @@ def organizar_oficio(oficio) -> None:
             logger.error("[Drive] erro ao organizar prestação %s: %s", prestacao.pk, exc, exc_info=True)
 
 
+def criar_pasta_evento(evento) -> None:
+    """Garante que a pasta do evento já exista no Drive, mesmo sem nenhum
+    documento ainda (ex.: logo na criação do evento, ainda em rascunho).
+
+    Só cria a pasta (leve, uma chamada de API) — não organiza documentos nem
+    gera PDFs, por isso pode rodar mesmo com o evento em rascunho.
+    """
+    from .services import get_client
+
+    client = get_client()
+    _pasta_evento_folder(client, evento)
+
+
 def organizar_evento(evento) -> None:
     """Organiza ofícios, planos, anexos e solicitações de um evento."""
     from . import status
