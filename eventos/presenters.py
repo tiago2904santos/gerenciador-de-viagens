@@ -19,6 +19,11 @@ def _clean_evento_display(value: str) -> str:
 
 def _oficio_item(oficio):
     card = apresentar_oficio_card(oficio)
+    justificativa_card = card.get("justificativa")
+    tem_justificativa = bool(
+        justificativa_card and justificativa_card.get("status_label") == "Preenchida"
+    )
+    justificativa_pdf_url = card.get("justificativa_pdf_url", "") if tem_justificativa else ""
     viatura_placa = card.get("veiculo_placa") or ""
     viatura_modelo = card.get("veiculo_modelo") or ""
     viatura_display = " · ".join(filter(None, [viatura_placa, viatura_modelo])) or "Não informado"
@@ -52,6 +57,7 @@ def _oficio_item(oficio):
         "visualizar_url": card["visualizar_url"],
         "pdf_url": card["pdf_url"],
         "docx_url": card["docx_url"],
+        "justificativa_pdf_url": justificativa_pdf_url,
     }
 
 

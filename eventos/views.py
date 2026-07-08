@@ -224,7 +224,7 @@ def index(request):
         "viagem_asc": ("data_inicio", "-criado_em"),
         "viagem_desc": ("-data_inicio", "-criado_em"),
     }
-    eventos = eventos.order_by(*sort_map.get(sort or "numero_desc", sort_map["numero_desc"]))
+    eventos = eventos.order_by(*sort_map.get(sort or "criacao_desc", sort_map["criacao_desc"]))
     has_filters = any([q, temporal, viagem_de, viagem_ate, sort])
     cards = [apresentar_evento_list_card(evento) for evento in eventos]
 
@@ -251,10 +251,10 @@ def index(request):
                 {"value": "passado", "label": "Passadas"},
             ],
             "sort_options": [
-                {"value": "numero_desc", "label": "Número: maior"},
-                {"value": "numero_asc", "label": "Número: menor"},
                 {"value": "criacao_desc", "label": "Criação: mais recente"},
                 {"value": "criacao_asc", "label": "Criação: mais antiga"},
+                {"value": "numero_desc", "label": "Número: maior"},
+                {"value": "numero_asc", "label": "Número: menor"},
                 {"value": "viagem_asc", "label": "Viagem: mais próxima"},
                 {"value": "viagem_desc", "label": "Viagem: mais distante"},
             ],

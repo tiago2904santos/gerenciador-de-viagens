@@ -25,7 +25,7 @@
                 </div>
               </div>
               <div class="oficio-lc__trecho-actions cv-icon-btn-group">
-                {% include "components/ui/buttons/icon_button.html" with href=oficio.pdf_url action="pdf" aria_label="Baixar ofício em PDF" tooltip="PDF" only %}
+                <a class="cv-icon-btn cv-icon-btn--pdf" href="{{ oficio.pdf_url }}" aria-label="Baixar ofício em PDF{% if oficio.justificativa_pdf_url %} (baixa também a justificativa){% endif %}" data-tooltip="PDF"{% if oficio.justificativa_pdf_url %} data-extra-download-url="{{ oficio.justificativa_pdf_url }}"{% endif %}>{% include "dev/ui_lab/partials/_cv_icon.html" with icon="pdf" only %}</a>
                 {% include "components/ui/buttons/icon_button.html" with href=oficio.docx_url action="docx" aria_label="Baixar ofício em DOCX" tooltip="DOCX" only %}
                 {% include "components/ui/buttons/icon_button.html" with href=oficio.visualizar_url action="preview" aria_label="Visualizar ofício" tooltip="Visualizar" only %}
                 {% include "components/ui/buttons/icon_button.html" with href=oficio.editar_url action="edit" aria_label="Editar ofício" tooltip="Editar" only %}
