@@ -86,10 +86,10 @@ def processar_solicitacao_evento(self, solicitacao_id: int) -> None:
 
 
 @shared_task(**_TASK_KWARGS)
-def processar_criar_pasta_evento(self, evento_id: int) -> None:
+def processar_sincronizar_pasta_evento(self, evento_id: int) -> None:
     from eventos.models import Evento
 
     evento = Evento.objects.filter(pk=evento_id).first()
     if evento is None:
         return
-    status.executar_e_rastrear(organizer.criar_pasta_evento, evento)
+    status.executar_e_rastrear(organizer.sincronizar_pasta_evento, evento)
