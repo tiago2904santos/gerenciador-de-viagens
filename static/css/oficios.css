@@ -3260,6 +3260,18 @@ html[data-theme="dark"] [data-oficio-wizard-step1] .cv-search-picker {
   white-space: nowrap;
 }
 
+/* Título · destino · período pode ser um texto longo (evento, OS, plano de
+   trabalho): em vez de truncar com reticências (que exige que o item flexível
+   encolha corretamente em todo layout/viewport), deixa quebrar em várias
+   linhas para nunca forçar overflow horizontal do card e esconder os botões
+   de ação. Mesmo raciocínio já aplicado em .oficio-lc__info-value--rota. */
+.oficio-lc__info-value--wrap {
+  overflow: visible;
+  overflow-wrap: anywhere;
+  text-overflow: clip;
+  white-space: normal;
+}
+
 /* ── BADGES DE STATUS ── */
 .oficio-lc__status-badge {
   border-radius: var(--radius-pill);
