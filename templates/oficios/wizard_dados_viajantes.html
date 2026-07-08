@@ -31,19 +31,9 @@
           <header class="wizard-inner-section__header">
             <h4 class="wizard-inner-section__title" id="oficio-wizard-dados-oficio">Dados do ofício</h4>
           </header>
-          {# Linha 1: N° do Ofício (readonly) | Protocolo | Custeio #}
+          {# Linha 1: N° do Ofício (editável, sugestão automática) | Protocolo | Custeio #}
           <div class="field-grid field-grid--cols-3">
-            <div class="cv-field cv-field--readonly">
-              <label class="cv-field__label" for="oficio-wizard-numero-readonly">N° do Ofício</label>
-              <input
-                type="text"
-                class="cv-field__control"
-                id="oficio-wizard-numero-readonly"
-                value="{{ wizard_summary.numero_label }}"
-                readonly
-                tabindex="-1"
-              >
-            </div>
+            {% include "components/forms/form_field.html" with field=form.numero label="N° do Ofício" help_text=oficio_numero_ano_hint only %}
             {% include "components/forms/form_field.html" with field=form.protocolo label="Protocolo" only %}
             {% include "components/forms/form_field.html" with field=form.custeio label="Custeio" only %}
             {# Linha 2: Nome da Instituição — somente quando custeio = Outra instituição #}

@@ -170,19 +170,31 @@ class Oficio(TimeStampedModel, CancelavelModel):
 
     @classmethod
     def get_next_available_numero(cls, ano: int | None = None) -> int:
+        """Sugere o próximo número: reaproveita a menor lacuna liberada por exclusão
+        (ver ``OficioNumeroLacuna``); caso não haja lacuna, segue para o maior número
+        usado + 1. Números apenas pulados manualmente (nunca ocupados) não são
+        oferecidos como sugestão — só voltam a ficar disponíveis se o ofício que os
+        usou for excluído.
+        """
         from django.conf import settings
 
         resolved_year = ano or timezone.localdate().year
-        piso = getattr(settings, "OFICIO_NUMERO_INICIAL", {}).get(resolved_year, 0)
+        piso = max(getattr(settings, "OFICIO_NUMERO_INICIAL", {}).get(resolved_year, 0), 1)
         numeros_usados = set(
             cls.objects.filter(ano=resolved_year)
             .exclude(numero__isnull=True)
             .values_list("numero", flat=True)
         )
-        candidato = max(piso, 1)
-        while candidato in numeros_usados:
-            candidato += 1
-        return candidato
+        lacuna = (
+            OficioNumeroLacuna.objects.filter(ano=resolved_year, numero__gte=piso)
+            .exclude(numero__in=numeros_usados)
+            .order_by("numero")
+            .first()
+        )
+        if lacuna is not None:
+            return lacuna.numero
+        maior_usado = max(numeros_usados, default=piso - 1)
+        return max(maior_usado + 1, piso)
 
     def save(self, *args, **kwargs):
         self.protocolo = normalize_protocolo(self.protocolo)
@@ -190,6 +202,8 @@ class Oficio(TimeStampedModel, CancelavelModel):
         self.motivo = normalize_spaces(self.motivo)
         self.custeio_observacao = normalize_spaces(self.custeio_observacao)
         super().save(*args, **kwargs)
+        if self.numero and self.ano:
+            OficioNumeroLacuna.objects.filter(ano=self.ano, numero=self.numero).delete()
 
     def diarias_para_servidores(self):
         """Diárias deste ofício = valor por servidor (persistido no roteiro) × nº de servidores.
@@ -229,6 +243,29 @@ class Oficio(TimeStampedModel, CancelavelModel):
             "valor_extenso": valor_por_extenso_ptbr(total),
             "quantidade_servidores": qtd_servidores,
         }
+
+
+class OficioNumeroLacuna(models.Model):
+    """Número de ofício liberado para reaproveitamento (exclusão de um ofício numerado).
+
+    Números pulados manualmente (ex.: ir direto de 10 para 15) nunca entram aqui —
+    só a exclusão de um ofício já numerado registra a lacuna, via ``excluir_oficio``.
+    """
+
+    ano = models.PositiveIntegerField(db_index=True)
+    numero = models.PositiveIntegerField()
+    liberado_em = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["ano", "numero"]
+        verbose_name = "Número de ofício liberado"
+        verbose_name_plural = "Números de ofício liberados"
+        constraints = [
+            models.UniqueConstraint(fields=["ano", "numero"], name="oficios_lacuna_ano_numero_unique"),
+        ]
+
+    def __str__(self):
+        return f"{self.numero:02d}/{self.ano}"
 
 
 class ModeloMotivoOficio(TimeStampedModel):

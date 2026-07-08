@@ -1,6 +1,7 @@
 import re
 
 from django import forms
+from django.utils import timezone
 
 from core.normalizers import normalize_plate
 from core.normalizers import normalize_spaces
@@ -214,6 +215,7 @@ class OficioDadosViajantesForm(OficioForm):
 
     class Meta(OficioForm.Meta):
         fields = [
+            "numero",
             "protocolo",
             "motivo",
             "custeio",
@@ -223,6 +225,7 @@ class OficioDadosViajantesForm(OficioForm):
             "servidores_termo_autorizacao",
         ]
         widgets = {
+            "numero": forms.NumberInput(attrs={"class": "form-control", "min": "1", "data-oficio-numero-field": "true"}),
             "protocolo": forms.TextInput(attrs={"class": "form-control", "data-mask": "protocolo"}),
             "motivo": forms.Textarea(
                 attrs={
@@ -275,6 +278,7 @@ class OficioDadosViajantesForm(OficioForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["modelo_motivo"].queryset = ModeloMotivoOficio.objects.order_by("ordem", "nome")
+        self.fields["numero"].widget.attrs["min"] = "1"
         self.fields["protocolo"].required = False
         self.fields["motivo"].required = False
         self.fields["custeio"].required = False
@@ -293,6 +297,21 @@ class OficioDadosViajantesForm(OficioForm):
             self.initial["servidores_termo_autorizacao"] = list(
                 self.instance.servidores.values_list("pk", flat=True),
             )
+
+    def clean_numero(self):
+        """Campo opcional: em branco, mantém o número já reservado (automático)."""
+        numero = self.cleaned_data.get("numero")
+        if numero is None:
+            return None
+        if numero < 1:
+            raise forms.ValidationError("Informe um número de ofício válido (maior que zero).")
+        ano = self.instance.ano or timezone.localdate().year
+        conflito = Oficio.objects.filter(ano=ano, numero=numero)
+        if self.instance.pk:
+            conflito = conflito.exclude(pk=self.instance.pk)
+        if conflito.exists():
+            raise forms.ValidationError(f"Já existe um ofício com o número {numero} em {ano}.")
+        return numero
 
     def clean_protocolo(self):
         protocolo = normalize_protocolo(self.cleaned_data.get("protocolo", ""))

@@ -1,14 +1,14 @@
 # Regras de negócio de Ofícios
 
-## REG-OF-001 — Numeração anual incremental por menor lacuna
-- Descrição: ao criar ofício sem número, o sistema reserva o menor número disponível no ano e exibe em dois dígitos (`01/2026`).
+## REG-OF-001 — Numeração anual editável, com sugestão automática por lacuna liberada
+- Descrição: ao criar um ofício, o sistema reserva automaticamente um número (sugestão), mas o campo N° do Ofício é editável na Etapa 1 (Dados dos viajantes) — alguns setores preenchem o número manualmente (numeração não sequencial). A sugestão automática usa a menor lacuna liberada por **exclusão** de um ofício já numerado (`OficioNumeroLacuna`); números apenas pulados manualmente (ex.: ir de 10 direto para 15) não são oferecidos como sugestão — só o maior número usado + 1. Editar o número de um ofício existente libera o número antigo (via `OficioNumeroLacuna`) para reaproveitamento; cancelar um ofício (sem excluir) não libera o número.
 - Origem no legacy: `eventos/models.py` (`Oficio.get_next_available_numero`, `Oficio.save`).
-- Arquivos/funções: model `Oficio`, services `get_next_available_numero_oficio` e `reservar_numero_oficio`.
-- Estado no 3.0: implementado na Fase 12.2 para criação pelo wizard de Dados e viajantes.
-- Adaptação correta: manter service transacional e constraint `(ano, numero)`.
+- Arquivos/funções: model `Oficio`, `OficioNumeroLacuna`; services `get_next_available_numero_oficio`, `reservar_numero_oficio`, `excluir_oficio`, `atualizar_oficio_dados_viajantes`; form `OficioDadosViajantesForm.clean_numero`.
+- Estado no 3.0: implementado na Fase 12.2 para criação pelo wizard de Dados e viajantes; edição manual e lacunas por exclusão adicionadas depois.
+- Adaptação correta: manter service transacional e constraint `(ano, numero)`; validar unicidade amigável no form antes do `IntegrityError`.
 - Prioridade: Alta.
 - Riscos: colisão de número em concorrência.
-- Testes necessários: criação sequencial, reaproveitamento de lacuna e concorrência.
+- Testes necessários: criação sequencial, reaproveitamento de lacuna após exclusão, números pulados manualmente não sugeridos, edição de número liberando o antigo, concorrência.
 
 ## REG-OF-002 — Protocolo canônico e visual
 - Descrição: protocolo é persistido em dígitos e exibido em máscara `XX.XXX.XXX-X`.
@@ -181,8 +181,8 @@
 - Estado no 3.0: implementado com backend obrigatório e JS progressivo opcional.
 
 ## REG-OF-021 — Resumo informativo no GET inicial
-- Descrição: no GET de `/oficios/novo/`, a Etapa 1 deve sempre exibir N° do Ofício, Data criação e Status em modo informativo antes de qualquer salvamento.
-- Estado no 3.0: implementado.
+- Descrição: no GET de `/oficios/novo/`, a Etapa 1 deve sempre exibir Data criação e Status em modo informativo antes de qualquer salvamento. N° do Ofício também aparece pré-preenchido com a sugestão automática, mas é editável (ver REG-OF-001).
+- Estado no 3.0: implementado; campo N° do Ofício passou de somente leitura para editável.
 
 ## REG-OF-022 — Custeio observação condicional
 - Descrição: `custeio_observacao` só é exibido quando `custeio=Outra instituição`; validação backend continua obrigatória nesse cenário.

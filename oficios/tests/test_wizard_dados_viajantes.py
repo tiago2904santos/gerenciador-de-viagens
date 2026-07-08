@@ -87,9 +87,8 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertContains(response, "Justificativa")
         self.assertContains(response, "Documentos")
         self.assertContains(response, "N° do Ofício")
-        self.assertContains(response, oficio.numero_formatado)
-        self.assertContains(response, "oficio-wizard-numero-readonly")
-        self.assertContains(response, "readonly")
+        self.assertContains(response, f'name="numero" value="{oficio.numero}"')
+        self.assertContains(response, f"Ano {oficio.ano}")
         self.assertNotContains(response, "Data criação:")
         self.assertContains(response, "cv-wizard-section-card")
         self.assertContains(response, "field-grid")
@@ -148,7 +147,7 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertNotContains(response, "Assunto e motivo")
         self.assertNotContains(response, "Contexto operacional")
         self.assertNotContains(response, "Is padrão")
-        self.assertNotContains(response, 'name="numero"')
+        self.assertContains(response, 'name="numero"')
         self.assertNotContains(response, 'name="ano"')
         self.assertNotContains(response, 'name="data_criacao"')
         self.assertNotContains(response, 'name="status"')
@@ -249,6 +248,29 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertEqual(response.status_code, 200)
         oficio.refresh_from_db()
         self.assertEqual(oficio.motivo, "Texto salvo automaticamente")
+        self.assertEqual(oficio.numero, 1)
+
+    def test_dados_viajantes_autosave_numero_manual(self):
+        oficio = Oficio.objects.create(numero=1, ano=timezone.localdate().year, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        payload = {
+            "object_id": str(oficio.pk),
+            "form_id": "oficio-form",
+            "model": "oficio",
+            "dirty_fields": ["numero"],
+            "fields": {"numero": "50"},
+            "snapshots": {},
+        }
+
+        response = self.client.post(
+            reverse("oficios:dados_viajantes_autosave", args=[oficio.pk]),
+            data=json.dumps(payload),
+            content_type="application/json",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        oficio.refresh_from_db()
+        self.assertEqual(oficio.numero, 50)
 
     def test_dados_viajantes_autosave_salva_motorista_da_equipe(self):
         oficio = Oficio.objects.create(numero=1, ano=timezone.localdate().year, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
@@ -326,7 +348,8 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertContains(response, "Motivo existente")
         self.assertContains(response, "page-stepper")
         self.assertContains(response, "page-shell--wizard")
-        self.assertContains(response, "01/2026")
+        self.assertContains(response, 'name="numero" value="1"')
+        self.assertContains(response, "Ano 2026")
         self.assertNotContains(response, "Data criação:")
         self.assertContains(response, "page-header-status-chip")
         self.assertContains(response, oficio.get_status_display())
@@ -525,7 +548,7 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.client.post(self._novo_rascunho_url(), data=self._payload(action="save_draft"))
         self.client.post(self._novo_rascunho_url(), data=self._payload(protocolo="12.345.678-8", action="save_draft"))
         primeiro = Oficio.objects.get(numero=1, ano=ano)
-        primeiro.delete()
+        self.client.post(reverse("oficios:excluir", args=[primeiro.pk]))
 
         self.client.post(self._novo_rascunho_url(), data=self._payload(protocolo="12.345.678-7", action="save_draft"))
 
