@@ -6,46 +6,62 @@
 >
   <div class="oficio-lc__layout">
 
-    {# ── IDENTIFICAÇÃO: Número · Protocolo · Data de Criação · Status ── #}
+    {# ── IDENTIFICAÇÃO: Ofício · Protocolo · Destino · Data do Evento · Status ── #}
     <div class="oficio-lc__id-row">
-      <div class="oficio-lc__info-item">
-        <span class="oficio-lc__info-label">Número do Ofício</span>
-        <span class="oficio-lc__info-value">{{ card.numero_display }}</span>
+      <div class="oficio-lc__info-item oficio-lc__info-item--wide">
+        <span class="oficio-lc__info-label">Ofício</span>
+        <span class="oficio-lc__info-value oficio-lc__info-value--wrap">{{ card.numero_display }}{% if card.protocolo_display %} · {{ card.protocolo_display }}{% endif %}{% if card.destino_display %} · {{ card.destino_display }}{% endif %}{% if card.data_evento_display %} · {{ card.data_evento_display }}{% endif %}</span>
       </div>
-      {% if card.protocolo_display %}
-      <div class="oficio-lc__info-item">
-        <span class="oficio-lc__info-label">Protocolo</span>
-        <span class="oficio-lc__info-value">{{ card.protocolo_display }}</span>
-      </div>
-      {% endif %}
-      {% if card.data_criacao_display %}
-      <div class="oficio-lc__info-item">
-        <span class="oficio-lc__info-label">Data de Criação</span>
-        <span class="oficio-lc__info-value">{{ card.data_criacao_display }}</span>
-      </div>
-      {% endif %}
       {% include "components/ui/badges/chip.html" with tone=card.status_tone label=card.status_label extra_class="oficio-lc__temporal-chip" only %}
       {% if card.temporal_label %}
       {% include "components/ui/badges/chip.html" with tone=card.temporal_tone label=card.temporal_label extra_class="oficio-lc__temporal-chip" only %}
       {% endif %}
     </div>
 
-    {# ── SERVIDOR DA PRESTAÇÃO ── #}
+    {# ── SERVIDORES DA PRESTAÇÃO — cada um com nº de solicitação inline (autosave) ── #}
     <div class="oficio-lc__section">
-      <div class="oficio-lc__travellers oficio-lc__travellers--n1">
-        <div class="oficio-lc__traveller{% if card.servidor.is_motorista %} oficio-lc__traveller--motorista{% endif %}">
+      <div class="oficio-lc__travellers">
+        {% for servidor in card.servidores %}
+        <div class="oficio-lc__traveller oficio-lc__traveller--prestacao{% if servidor.is_motorista %} oficio-lc__traveller--motorista{% endif %}">
+          <form method="post"
+                action="{% url 'prestacoes_contas:index' %}"
+                class="oficio-lc__solicitacao-form oficio-lc__solicitacao-form--inline"
+                novalidate
+                data-autosave="true"
+                data-autosave-model="prestacao_servidor"
+                data-autosave-step="lista"
+                data-autosave-url="{{ servidor.solicitacao_autosave_url }}"
+                data-autosave-object-id="{{ servidor.ps_pk }}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="save_solicitacoes">
+            <input type="text"
+                   name="ps-{{ servidor.ps_pk }}-numero_solicitacao"
+                   class="form-control cv-field__control oficio-lc__solicitacao-input"
+                   placeholder="Nº da solicitação"
+                   aria-label="Número da solicitação de {{ servidor.name }}"
+                   autocomplete="off"
+                   maxlength="60"
+                   value="{{ servidor.numero_solicitacao }}">
+          </form>
+
           <div class="oficio-lc__traveller-body">
             <div class="oficio-lc__traveller-name-row">
-              <span class="oficio-lc__traveller-name">{{ card.servidor.name }}</span>
-              {% if card.servidor.is_motorista %}
+              <span class="oficio-lc__traveller-name">{{ servidor.name }}</span>
+              {% if servidor.is_motorista %}
               <span class="oficio-lc__traveller-badge">Motorista</span>
               {% endif %}
+              {% if servidor.comprovante_ok %}
+              <span class="oficio-lc__traveller-badge oficio-lc__traveller-badge--ok" title="Comprovante de saque anexado">✓ Comprovante</span>
+              {% endif %}
             </div>
-            {% if card.servidor.cargo or card.servidor.unidade %}
-            <span class="oficio-lc__traveller-meta">{% if card.servidor.cargo %}{{ card.servidor.cargo }}{% endif %}{% if card.servidor.cargo and card.servidor.unidade %} · {% endif %}{% if card.servidor.unidade %}{{ card.servidor.unidade }}{% endif %}</span>
+            {% if servidor.cargo or servidor.unidade %}
+            <span class="oficio-lc__traveller-meta">{% if servidor.cargo %}{{ servidor.cargo }}{% endif %}{% if servidor.cargo and servidor.unidade %} · {% endif %}{% if servidor.unidade %}{{ servidor.unidade }}{% endif %}</span>
             {% endif %}
           </div>
+
+          {% include "components/ui/buttons/icon_button.html" with href=servidor.pacote_url action="pdf" aria_label="Baixar pacote do servidor" tooltip="Baixar pacote (PDF final)" only %}
         </div>
+        {% endfor %}
       </div>
     </div>
 
@@ -103,34 +119,12 @@
       </div>
     </div>
 
-    {# ── NÚMERO DA SOLICITAÇÃO ── #}
-    <div class="oficio-lc__section">
-      <form method="post"
-            action="{% url 'prestacoes_contas:index' %}"
-            class="oficio-lc__solicitacao-form"
-            novalidate
-            data-autosave="true"
-            data-autosave-model="prestacao_contas"
-            data-autosave-step="lista"
-            data-autosave-url="{{ card.autosave_url }}"
-            data-autosave-object-id="{{ card.prestacao_pk }}">
-        {% csrf_token %}
-        <input type="hidden" name="action" value="save_solicitacao">
-        <input type="hidden" name="prestacao_id" value="{{ card.prestacao_pk }}">
-        {% include "components/forms/form_field.html" with field=card.solicitacao_form.numero_solicitacao only %}
-        {% include "components/ui/buttons/button.html" with label="Salvar solicitação" variant="secondary" size="sm" type="submit" only %}
-      </form>
-    </div>
-
     {# ── FOOTER ── #}
     <div class="oficio-lc__footer">
       <div class="oficio-lc__footer-actions">
         <div class="oficio-lc__footer-actions-main cv-icon-btn-group">
           {% include "components/ui/buttons/icon_button.html" with href=card.documentos_url action="edit" aria_label="Abrir prestação" tooltip="Abrir prestação" only %}
           {% include "components/ui/buttons/icon_button.html" with href=card.rt_url action="document" aria_label="Relatório técnico" tooltip="Relatório técnico" only %}
-          {% if card.tem_rt %}
-          {% include "components/ui/buttons/icon_button.html" with href=card.rt_download_url action="download" aria_label="Baixar relatório técnico" tooltip="Baixar RT" only %}
-          {% endif %}
           {% include "components/ui/buttons/icon_button.html" with href=card.diario_url action="route" aria_label="Diário de bordo" tooltip="Diário de bordo" only %}
           {% include "components/ui/buttons/icon_button.html" with href=card.consolidado_url action="pdf" aria_label="PDF final da prestação" tooltip="PDF final" only %}
         </div>

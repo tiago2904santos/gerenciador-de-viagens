@@ -81,27 +81,29 @@
 
                 <div class="rt-summary-card__section-ribbon" aria-hidden="true"></div>
 
-                <article class="oficio-documentos-card oficio-documentos-card--travellers rt-summary-card__traveller-card" aria-label="Servidor da prestação">
+                <article class="oficio-documentos-card oficio-documentos-card--travellers rt-summary-card__traveller-card" aria-label="Servidores da prestação">
                   <header class="oficio-documentos-card__header oficio-documentos-travellers__header">
                     <div class="oficio-documentos-travellers__titles">
                       <span class="oficio-documentos-card__eyebrow">Equipe</span>
-                      <h4 class="oficio-documentos-card__title">Servidor</h4>
-                      <p class="oficio-documentos-card__subtitle">Servidor vinculado à prestação de contas</p>
+                      <h4 class="oficio-documentos-card__title">Servidores ({{ identificacao.servidores_count }})</h4>
+                      <p class="oficio-documentos-card__subtitle">Mesmo texto para todos; o RT é gerado por servidor com os dados pessoais.</p>
                     </div>
                   </header>
                   <div class="oficio-documentos-card__body">
-                    <div class="oficio-documentos-travellers-lines oficio-documentos-travellers-lines--n1">
-                      <article class="oficio-documentos-traveller-line{% if identificacao.is_motorista %} oficio-documentos-traveller-line--motorista{% endif %}">
+                    <div class="oficio-documentos-travellers-lines">
+                      {% for s in identificacao.servidores %}
+                      <article class="oficio-documentos-traveller-line{% if s.is_motorista %} oficio-documentos-traveller-line--motorista{% endif %}">
                         <div class="oficio-documentos-traveller-line__name-row">
-                          <strong class="oficio-documentos-traveller-line__name">{{ identificacao.nome_servidor }}</strong>
-                          {% if identificacao.is_motorista %}
+                          <strong class="oficio-documentos-traveller-line__name">{{ s.nome_servidor }}</strong>
+                          {% if s.is_motorista %}
                             {% include "components/ui/badges/chip.html" with label="Motorista" tone="warning" size="compact" only %}
                           {% endif %}
                         </div>
                         <span class="oficio-documentos-traveller-line__cargo">
-                          {{ identificacao.cargo }}{% if identificacao.unidade %} · {{ identificacao.unidade }}{% endif %}{% if identificacao.cpf_servidor and identificacao.cpf_servidor != "—" %} · CPF {{ identificacao.cpf_servidor }}{% endif %}
+                          {{ s.cargo }}{% if s.unidade %} · {{ s.unidade }}{% endif %}{% if s.cpf_servidor and s.cpf_servidor != "—" %} · CPF {{ s.cpf_servidor }}{% endif %}
                         </span>
                       </article>
+                      {% endfor %}
                     </div>
                   </div>
                 </article>
@@ -144,8 +146,8 @@
                       {% include "components/ui/buttons/button.html" with href=documentos_url label="Voltar aos documentos" variant="secondary" icon="arrow-left" only %}
                     </div>
                     <div class="cv-card-footer__primary">
-                      {% include "components/ui/buttons/button.html" with label="Gerar DOCX" variant="secondary" icon="download" icon_after=True type="submit" name="action" value="download_docx" only %}
-                      {% include "components/ui/buttons/button.html" with label="Gerar PDF" variant="primary" icon="download" icon_after=True type="submit" name="action" value="download_pdf" only %}
+                      {% include "components/ui/buttons/button.html" with label="Salvar texto" variant="secondary" type="submit" name="action" value="save" only %}
+                      {% include "components/ui/buttons/button.html" with href=diario_url label="Ir para Diário de Bordo" variant="primary" icon="arrow-right" icon_after=True only %}
                     </div>
                   </footer>
                 </section>
@@ -154,9 +156,28 @@
           {% endfor %}
         </form>
 
-        {% include "prestacoes_contas/partials/assinatura_card.html" with assinatura=assinatura next_url=assinatura_next_url csrf_token=csrf_token only %}
-
-        {% include "prestacoes_contas/partials/documento_preview.html" with preview_anchor="rt-preview" preview_title="Pré-visualização do relatório" preview_subtitle="O PDF é gerado com os dados salvos do relatório. Reabra o card após editar para atualizar." preview_doc_title="Relatório Técnico" preview_inline_url=preview_inline_url preview_pdf_url=preview_pdf_url preview_docx_url=preview_docx_url only %}
+        {# Download do RT por servidor (mesmo texto, dados pessoais de cada um) #}
+        <section class="cv-wizard-section-card" aria-labelledby="rt-downloads-title">
+          <header class="cv-wizard-section-header">
+            <div class="cv-wizard-section-header__copy">
+              <h2 class="cv-wizard-section-title" id="rt-downloads-title">Baixar Relatório Técnico por servidor</h2>
+              <p class="cv-wizard-section-subtitle">O texto acima é salvo automaticamente; cada arquivo sai com o nome e CPF do servidor. A assinatura é feita na etapa <strong>PDF Final</strong>.</p>
+            </div>
+          </header>
+          <div class="cv-wizard-section-body">
+            <ul class="prestacao-servidor-downloads">
+              {% for s in servidores %}
+              <li class="prestacao-servidor-downloads__item">
+                <span class="prestacao-servidor-downloads__name">{{ s.nome }}{% if s.is_motorista %} <span class="oficio-lc__traveller-badge">Motorista</span>{% endif %}</span>
+                <span class="prestacao-servidor-downloads__actions">
+                  {% include "components/ui/buttons/button.html" with href=s.download_pdf_url label="PDF" variant="primary" size="sm" icon="download" only %}
+                  {% include "components/ui/buttons/button.html" with href=s.download_docx_url label="DOCX" variant="secondary" size="sm" icon="download" only %}
+                </span>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </section>
       </div>
     </main>
   </div>

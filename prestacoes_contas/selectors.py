@@ -2,11 +2,11 @@ from django.db.models import Prefetch
 from django.db.models import Q
 from django.utils import timezone
 
-from cadastros.models import Servidor
 from core.normalizers import remove_accents
 from roteiros.models import RoteiroTrecho
 
 from .models import PrestacaoContas
+from .models import PrestacaoServidor
 
 
 # Espelha a ordenação da lista de ofícios, adaptando os campos para a
@@ -16,8 +16,8 @@ _SORT_MAP = {
     "criacao_asc":  ["criado_em"],
     "viagem_asc":   ["oficio__roteiro__saida_dt",  "-criado_em"],
     "viagem_desc":  ["-oficio__roteiro__saida_dt", "-criado_em"],
-    "servidor_asc":  ["servidor__nome"],
-    "servidor_desc": ["-servidor__nome"],
+    "oficio_asc":   ["oficio__ano", "oficio__numero"],
+    "oficio_desc":  ["-oficio__ano", "-oficio__numero"],
 }
 
 
@@ -37,9 +37,6 @@ def listar_prestacoes(
             "oficio__roteiro__origem_cidade",
             "oficio__roteiro__origem_estado",
             "oficio__viatura",
-            "servidor",
-            "servidor__cargo",
-            "servidor__unidade",
         )
         .prefetch_related(
             Prefetch(
@@ -47,6 +44,12 @@ def listar_prestacoes(
                 queryset=RoteiroTrecho.objects.select_related(
                     "origem_cidade", "origem_estado", "destino_cidade", "destino_estado"
                 ).order_by("ordem"),
+            ),
+            Prefetch(
+                "servidores_prestacao",
+                queryset=PrestacaoServidor.objects.select_related(
+                    "servidor", "servidor__cargo", "servidor__unidade"
+                ).prefetch_related("documentos_anexos").order_by("pk"),
             ),
             "relatorio_tecnico",
             "diario_bordo",
@@ -61,10 +64,10 @@ def listar_prestacoes(
         query = q.strip()
         query_unaccent = remove_accents(query)
         filters = (
-            Q(servidor__nome__unaccent__icontains=query_unaccent)
+            Q(servidores_prestacao__servidor__nome__unaccent__icontains=query_unaccent)
             | Q(oficio__protocolo__unaccent__icontains=query_unaccent)
-            | Q(numero_solicitacao__unaccent__icontains=query_unaccent)
-            | Q(servidor__cargo__nome__unaccent__icontains=query_unaccent)
+            | Q(servidores_prestacao__numero_solicitacao__unaccent__icontains=query_unaccent)
+            | Q(servidores_prestacao__servidor__cargo__nome__unaccent__icontains=query_unaccent)
         )
         if query.isdigit():
             filters |= Q(oficio__numero=int(query)) | Q(oficio__ano=int(query))

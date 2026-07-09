@@ -13,6 +13,7 @@ from .models import ModeloTextoRelatorioTecnico
 from .models import PRESTACAO_DOCUMENTO_EXTENSOES
 from .models import PrestacaoContas
 from .models import PrestacaoDocumentoAnexo
+from .models import PrestacaoServidor
 from .models import RelatorioTecnico
 
 
@@ -181,21 +182,9 @@ class PrestacaoMultipleFileField(forms.FileField):
         return [single_file_clean(data, initial)]
 
 
-class PrestacaoDocumentosForm(forms.ModelForm):
-    despacho_arquivos = PrestacaoMultipleFileField(
-        label="Despacho assinado do ofício",
-        required=False,
-        validators=[FileExtensionValidator(PRESTACAO_DOCUMENTO_EXTENSOES)],
-        help_text="Anexe PDF, PNG, JPG ou JPEG.",
-        widget=PrestacaoMultipleFileInput(
-            attrs={
-                "class": "form-control cv-field__control prestacao-file-input",
-                "accept": "application/pdf,image/png,image/jpeg,image/*",
-            },
-        ),
-    )
-    comprovante_arquivos = PrestacaoMultipleFileField(
-        label="Comprovante de saque/transferência",
+def _anexo_multiple_file_field(label):
+    return PrestacaoMultipleFileField(
+        label=label,
         required=False,
         validators=[FileExtensionValidator(PRESTACAO_DOCUMENTO_EXTENSOES)],
         help_text="Anexe PDF, PNG, JPG ou JPEG.",
@@ -207,25 +196,42 @@ class PrestacaoDocumentosForm(forms.ModelForm):
         ),
     )
 
-    DOCUMENTO_TIPOS = {
-        "despacho_arquivos": PrestacaoDocumentoAnexo.TIPO_DESPACHO,
-        "comprovante_arquivos": PrestacaoDocumentoAnexo.TIPO_COMPROVANTE,
-    }
+
+class PrestacaoDespachoForm(forms.ModelForm):
+    """Despacho assinado do ofício — compartilhado por todos os servidores."""
+
+    despacho_arquivos = _anexo_multiple_file_field("Despacho assinado do ofício")
 
     class Meta:
         model = PrestacaoContas
-        fields = [
-            "numero_solicitacao",
-        ]
-        labels = {
-            "numero_solicitacao": "Número da solicitação",
-            "despacho_assinado": "Despacho assinado do ofício",
-            "comprovante_saque_transferencia": "Comprovante de saque/transferência",
-        }
-        help_texts = {
-            "despacho_assinado": "Anexe PDF, PNG, JPG ou JPEG.",
-            "comprovante_saque_transferencia": "Anexe PDF, PNG, JPG ou JPEG.",
-        }
+        fields = []
+
+    def save(self, commit=True):
+        prestacao = super().save(commit=commit)
+        if commit:
+            self.save_anexos(prestacao)
+        return prestacao
+
+    def save_anexos(self, prestacao):
+        for arquivo in self.cleaned_data.get("despacho_arquivos") or []:
+            PrestacaoDocumentoAnexo.objects.create(
+                prestacao=prestacao,
+                servidor_prestacao=None,
+                tipo=PrestacaoDocumentoAnexo.TIPO_DESPACHO,
+                arquivo=arquivo,
+                nome_original=Path(getattr(arquivo, "name", "") or "").name,
+            )
+
+
+class PrestacaoServidorDocumentosForm(forms.ModelForm):
+    """Dados individuais do servidor: número da solicitação + comprovante de saque."""
+
+    comprovante_arquivos = _anexo_multiple_file_field("Comprovante de saque/transferência")
+
+    class Meta:
+        model = PrestacaoServidor
+        fields = ["numero_solicitacao"]
+        labels = {"numero_solicitacao": "Número da solicitação"}
         widgets = {
             "numero_solicitacao": forms.TextInput(
                 attrs={
@@ -237,25 +243,25 @@ class PrestacaoDocumentosForm(forms.ModelForm):
         }
 
     def save(self, commit=True):
-        prestacao = super().save(commit=commit)
+        servidor_prestacao = super().save(commit=commit)
         if commit:
-            self.save_anexos(prestacao)
-        return prestacao
+            self.save_anexos(servidor_prestacao)
+        return servidor_prestacao
 
-    def save_anexos(self, prestacao):
-        for field_name, tipo in self.DOCUMENTO_TIPOS.items():
-            for arquivo in self.cleaned_data.get(field_name) or []:
-                PrestacaoDocumentoAnexo.objects.create(
-                    prestacao=prestacao,
-                    tipo=tipo,
-                    arquivo=arquivo,
-                    nome_original=Path(getattr(arquivo, "name", "") or "").name,
-                )
+    def save_anexos(self, servidor_prestacao):
+        for arquivo in self.cleaned_data.get("comprovante_arquivos") or []:
+            PrestacaoDocumentoAnexo.objects.create(
+                prestacao=servidor_prestacao.prestacao,
+                servidor_prestacao=servidor_prestacao,
+                tipo=PrestacaoDocumentoAnexo.TIPO_COMPROVANTE,
+                arquivo=arquivo,
+                nome_original=Path(getattr(arquivo, "name", "") or "").name,
+            )
 
 
 class PrestacaoSolicitacaoForm(forms.ModelForm):
     class Meta:
-        model = PrestacaoContas
+        model = PrestacaoServidor
         fields = ["numero_solicitacao"]
         labels = {"numero_solicitacao": "Número da solicitação"}
         widgets = {

@@ -172,10 +172,9 @@ def _assunto_relatorio_tecnico(oficio) -> str:
     return format_document_display(assunto)
 
 
-def build_relatorio_tecnico_context(relatorio: RelatorioTecnico) -> dict:
+def build_relatorio_tecnico_context(relatorio: RelatorioTecnico, servidor) -> dict:
     pc = relatorio.prestacao
     oficio = pc.oficio
-    servidor = pc.servidor
     data_rt = _data_relatorio_tecnico(oficio)
     inst = build_configuracao_context()
     defaults = relatorio_tecnico_default_values(pc)
@@ -213,15 +212,15 @@ def build_relatorio_tecnico_context(relatorio: RelatorioTecnico) -> dict:
     }
 
 
-def gerar_relatorio_tecnico_docx(relatorio: RelatorioTecnico) -> bytes:
+def gerar_relatorio_tecnico_docx(relatorio: RelatorioTecnico, servidor) -> bytes:
     garantir_campos_padrao_relatorio_tecnico(relatorio)
-    context = build_relatorio_tecnico_context(relatorio)
+    context = build_relatorio_tecnico_context(relatorio, servidor)
     template_path = Path(settings.BASE_DIR) / "documentos" / "resources" / "relatorio-tecnico.docx"
     return render_docx_bytes(template_path=template_path, context=context)
 
 
-def gerar_relatorio_tecnico_pdf(relatorio: RelatorioTecnico) -> bytes:
-    docx_bytes = gerar_relatorio_tecnico_docx(relatorio)
+def gerar_relatorio_tecnico_pdf(relatorio: RelatorioTecnico, servidor) -> bytes:
+    docx_bytes = gerar_relatorio_tecnico_docx(relatorio, servidor)
     explicit = (getattr(settings, "DOCUMENTOS_DEFAULT_PDF_ENGINE", "auto") or "auto").strip().lower()
     resolution = resolve_pdf_engine(explicit_setting=explicit, prefer_docx_pipeline=True)
     if not resolution.attempt_chain:
@@ -255,10 +254,9 @@ def gerar_relatorio_tecnico_pdf(relatorio: RelatorioTecnico) -> bytes:
     raise DocumentValidationError(msg)
 
 
-def nome_arquivo_rt(relatorio: RelatorioTecnico, formato: str = "docx") -> str:
-    pc = relatorio.prestacao
-    nome = pc.servidor.nome.replace(" ", "_").upper()
-    oficio = pc.oficio.numero_formatado.replace("/", "-")
+def nome_arquivo_rt(relatorio: RelatorioTecnico, servidor, formato: str = "docx") -> str:
+    nome = servidor.nome.replace(" ", "_").upper()
+    oficio = relatorio.prestacao.oficio.numero_formatado.replace("/", "-")
     ext = "pdf" if formato == "pdf" else "docx"
     return f"RT_{nome}_OFICIO_{oficio}.{ext}"
 
@@ -277,21 +275,19 @@ def _pdf_bytes_from_file_field(field, label: str) -> bytes:
     raise DocumentValidationError(f"Formato inválido em {label}. Use PDF, PNG, JPG ou JPEG.")
 
 
-def _pdf_parts_from_anexos(prestacao, tipo: str, label: str, legacy_field_name: str) -> list[tuple[str, bytes]]:
+def _pdf_parts_from_anexos(anexos_qs, label: str, legacy_field=None) -> list[tuple[str, bytes]]:
     parts = []
     seen = set()
-    anexos = prestacao.documentos_anexos.filter(tipo=tipo).order_by("criado_em", "pk")
-    for index, anexo in enumerate(anexos, start=1):
+    for index, anexo in enumerate(anexos_qs.order_by("criado_em", "pk"), start=1):
         name = str(getattr(anexo.arquivo, "name", "") or "")
         if not name or name in seen:
             continue
         seen.add(name)
         parts.append((f"{label} {index}", _pdf_bytes_from_file_field(anexo.arquivo, label)))
 
-    legacy = getattr(prestacao, legacy_field_name, None)
-    legacy_name = str(getattr(legacy, "name", "") or "")
+    legacy_name = str(getattr(legacy_field, "name", "") or "") if legacy_field is not None else ""
     if legacy_name and legacy_name not in seen:
-        parts.append((label, _pdf_bytes_from_file_field(legacy, label)))
+        parts.append((label, _pdf_bytes_from_file_field(legacy_field, label)))
 
     if not parts:
         raise DocumentValidationError(f"Anexe o arquivo: {label}.")
@@ -355,16 +351,12 @@ def _merge_pdf_parts(parts: list[tuple[str, bytes]]) -> bytes:
 def _solicitacoes_do_oficio(prestacao) -> dict[int, str]:
     solicitacoes = {}
     try:
-        qs = prestacao.oficio.prestacoes_contas.all()
-        for item in qs:
-            numero = str(item.numero_solicitacao or "").strip()
+        for ps in prestacao.servidores_prestacao.all():
+            numero = str(ps.numero_solicitacao or "").strip()
             if numero:
-                solicitacoes[item.servidor_id] = numero
+                solicitacoes[ps.servidor_id] = numero
     except Exception:
         pass
-    numero_atual = str(prestacao.numero_solicitacao or "").strip()
-    if numero_atual:
-        solicitacoes[prestacao.servidor_id] = numero_atual
     return solicitacoes
 
 
@@ -386,25 +378,25 @@ def gerar_oficio_prestacao_pdf(prestacao) -> bytes:
     return doc.conteudo
 
 
-def gerar_prestacao_consolidado_pdf(prestacao) -> bytes:
-    if not str(prestacao.numero_solicitacao or "").strip():
+def gerar_prestacao_consolidado_pdf(servidor_prestacao) -> bytes:
+    """Pacote final de um servidor: ofício + despacho (compartilhados) + RT do
+    servidor + diário (compartilhado) + comprovante do servidor."""
+    prestacao = servidor_prestacao.prestacao
+
+    if not str(servidor_prestacao.numero_solicitacao or "").strip():
         raise DocumentValidationError("Informe o número da solicitação antes de gerar o PDF final.")
 
-    relatorio, _ = RelatorioTecnico.objects.get_or_create(prestacao=prestacao)
     diario, _ = DiarioBordo.objects.get_or_create(prestacao=prestacao)
     sincronizar_trechos(diario)
 
     despacho_parts = _pdf_parts_from_anexos(
-        prestacao,
-        PrestacaoDocumentoAnexo.TIPO_DESPACHO,
+        prestacao.documentos_anexos.filter(tipo=PrestacaoDocumentoAnexo.TIPO_DESPACHO),
         "despacho assinado do ofício",
-        "despacho_assinado",
+        legacy_field=prestacao.despacho_assinado,
     )
     comprovante_parts = _pdf_parts_from_anexos(
-        prestacao,
-        PrestacaoDocumentoAnexo.TIPO_COMPROVANTE,
+        servidor_prestacao.documentos_anexos.filter(tipo=PrestacaoDocumentoAnexo.TIPO_COMPROVANTE),
         "comprovante de saque/transferência",
-        "comprovante_saque_transferencia",
     )
 
     from .assinatura_services import pdf_db_assinado_ou_gerado
@@ -414,32 +406,14 @@ def gerar_prestacao_consolidado_pdf(prestacao) -> bytes:
         [
             ("ofício", gerar_oficio_prestacao_pdf(prestacao)),
             *despacho_parts,
-            ("relatório técnico", pdf_rt_assinado_ou_gerado(prestacao)),
+            ("relatório técnico", pdf_rt_assinado_ou_gerado(servidor_prestacao)),
             ("diário de bordo", pdf_db_assinado_ou_gerado(prestacao)),
             *comprovante_parts,
         ]
     )
 
-    parts = [
-        ("ofício", gerar_oficio_prestacao_pdf(prestacao)),
-        (
-            "despacho assinado do ofício",
-            _pdf_bytes_from_file_field(prestacao.despacho_assinado, "despacho assinado do ofício"),
-        ),
-        ("relatório técnico", gerar_relatorio_tecnico_pdf(relatorio)),
-        ("diário de bordo", gerar_diario_bordo_pdf(diario)),
-        (
-            "comprovante de saque/transferência",
-            _pdf_bytes_from_file_field(
-                prestacao.comprovante_saque_transferencia,
-                "comprovante de saque/transferência",
-            ),
-        ),
-    ]
-    return _merge_pdf_parts(parts)
 
-
-def nome_arquivo_prestacao_consolidado(prestacao) -> str:
-    nome = prestacao.servidor.nome.replace(" ", "_").upper()
-    oficio = prestacao.oficio.numero_formatado.replace("/", "-")
+def nome_arquivo_prestacao_consolidado(servidor_prestacao) -> str:
+    nome = servidor_prestacao.servidor.nome.replace(" ", "_").upper()
+    oficio = servidor_prestacao.prestacao.oficio.numero_formatado.replace("/", "-")
     return f"PRESTACAO_{nome}_OFICIO_{oficio}.pdf"

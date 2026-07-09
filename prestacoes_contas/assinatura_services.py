@@ -32,17 +32,14 @@ class AssinaturaError(Exception):
 # Resolução do signatário
 # ─────────────────────────────────────────────────────────────────
 
-def signer_do_documento(prestacao, tipo: str):
-    """Servidor que deve assinar o documento, ou ``None`` se indefinido.
+def signer_rt(servidor_prestacao):
+    """Servidor que assina o Relatório Técnico (é o próprio servidor da linha)."""
+    return getattr(servidor_prestacao, "servidor", None) if servidor_prestacao else None
 
-    RT → servidor da prestação. DB → motorista do ofício (quando é um Servidor
-    cadastrado; motorista manual não tem CPF e não pode assinar).
-    """
-    if tipo == AssinaturaDocumento.TIPO_RT:
-        return prestacao.servidor
-    if tipo == AssinaturaDocumento.TIPO_DB:
-        return getattr(prestacao.oficio, "motorista", None)
-    return None
+
+def signer_db(prestacao):
+    """Motorista do ofício que assina o Diário de Bordo (quando é Servidor cadastrado)."""
+    return getattr(prestacao.oficio, "motorista", None)
 
 
 def _cpf_valido(servidor) -> bool:
@@ -50,25 +47,18 @@ def _cpf_valido(servidor) -> bool:
     return len(cpf) == 11 and cpf.isdigit()
 
 
-def _label_documento(tipo: str) -> str:
-    return dict(AssinaturaDocumento.TIPO_CHOICES).get(tipo, tipo)
-
-
-def _label_signatario(tipo: str) -> str:
-    return "servidor" if tipo == AssinaturaDocumento.TIPO_RT else "motorista"
-
-
 # ─────────────────────────────────────────────────────────────────
 # Geração do snapshot (PDF não assinado)
 # ─────────────────────────────────────────────────────────────────
 
-def _gerar_origem_bytes(prestacao, tipo: str) -> bytes:
-    if tipo == AssinaturaDocumento.TIPO_RT:
-        from .services import gerar_relatorio_tecnico_pdf
+def _origem_rt_bytes(prestacao, servidor) -> bytes:
+    from .services import gerar_relatorio_tecnico_pdf
 
-        relatorio, _ = RelatorioTecnico.objects.get_or_create(prestacao=prestacao)
-        return gerar_relatorio_tecnico_pdf(relatorio)
+    relatorio, _ = RelatorioTecnico.objects.get_or_create(prestacao=prestacao)
+    return gerar_relatorio_tecnico_pdf(relatorio, servidor)
 
+
+def _origem_db_bytes(prestacao) -> bytes:
     from .diario_services import gerar_diario_bordo_pdf
 
     diario, _ = DiarioBordo.objects.get_or_create(prestacao=prestacao)
@@ -79,61 +69,79 @@ def _gerar_origem_bytes(prestacao, tipo: str) -> bytes:
 # Emissão / consulta de link
 # ─────────────────────────────────────────────────────────────────
 
-def emitir_link(prestacao, tipos, dias: int = 7, forcar: bool = False):
-    """Cria/atualiza o link de assinatura para os ``tipos`` pendentes.
+def _preparar_doc(doc, signer, origem_bytes, token, agora, expira, forcar):
+    if doc.status == AssinaturaDocumento.STATUS_ASSINADA and not forcar:
+        return None
+    if forcar:
+        _limpar_assinatura(doc)
+    doc.signer = signer
+    doc.nome_esperado = signer.nome
+    doc.status = AssinaturaDocumento.STATUS_PENDENTE
+    doc.identidade_confirmada_em = None
+    doc.link_token = token
+    doc.link_criado_em = agora
+    doc.link_expira_em = expira
+    doc.arquivo_origem.save(f"{doc.tipo}_origem.pdf", ContentFile(origem_bytes), save=False)
+    doc.save()
+    return doc
 
-    Documentos já assinados são ignorados (a menos de ``forcar``). Levanta
-    ``AssinaturaError`` se nenhum documento puder ser incluído ou se algum
-    signatário não tiver CPF cadastrado. Retorna ``(token, [docs])``.
-    """
-    tipos = [t for t in dict.fromkeys(tipos) if t in dict(AssinaturaDocumento.TIPO_CHOICES)]
-    if not tipos:
-        raise AssinaturaError("Selecione ao menos um documento para assinar.")
 
-    resolvidos = []
-    for tipo in tipos:
-        signer = signer_do_documento(prestacao, tipo)
-        if signer is None:
-            raise AssinaturaError(
-                f"O {_label_documento(tipo)} não tem {_label_signatario(tipo)} definido para assinar."
-            )
-        if not _cpf_valido(signer):
-            raise AssinaturaError(
-                f"O {_label_signatario(tipo)} \"{signer}\" não tem CPF cadastrado; "
-                "cadastre o CPF para poder gerar o link de assinatura."
-            )
-        resolvidos.append((tipo, signer))
+def emitir_link_rt(servidor_prestacao, dias: int = 7, forcar: bool = False):
+    """Link de assinatura do RT de um servidor. Retorna ``(token, [doc])``."""
+    signer = signer_rt(servidor_prestacao)
+    if signer is None:
+        raise AssinaturaError("O Relatório Técnico não tem servidor definido para assinar.")
+    if not _cpf_valido(signer):
+        raise AssinaturaError(
+            f"O servidor \"{signer}\" não tem CPF cadastrado; "
+            "cadastre o CPF para poder gerar o link de assinatura."
+        )
+
+    prestacao = servidor_prestacao.prestacao
+    doc, _ = AssinaturaDocumento.objects.get_or_create(
+        servidor_prestacao=servidor_prestacao,
+        tipo=AssinaturaDocumento.TIPO_RT,
+        defaults={"prestacao": prestacao, "signer": signer},
+    )
+    if doc.prestacao_id != prestacao.pk:
+        doc.prestacao = prestacao
 
     token = secrets.token_urlsafe(32)
     agora = timezone.now()
     expira = agora + timedelta(days=max(1, int(dias)))
+    origem = _origem_rt_bytes(prestacao, signer)
+    preparado = _preparar_doc(doc, signer, origem, token, agora, expira, forcar)
+    if preparado is None:
+        raise AssinaturaError("O Relatório Técnico deste servidor já está assinado.")
+    return token, [preparado]
 
-    incluidos = []
-    for tipo, signer in resolvidos:
-        doc, _ = AssinaturaDocumento.objects.get_or_create(
-            prestacao=prestacao,
-            tipo=tipo,
-            defaults={"signer": signer},
+
+def emitir_link_db(prestacao, dias: int = 7, forcar: bool = False):
+    """Link de assinatura do Diário de Bordo (motorista). Retorna ``(token, [doc])``."""
+    signer = signer_db(prestacao)
+    if signer is None:
+        raise AssinaturaError("O Diário de Bordo não tem motorista definido para assinar.")
+    if not _cpf_valido(signer):
+        raise AssinaturaError(
+            f"O motorista \"{signer}\" não tem CPF cadastrado; "
+            "cadastre o CPF para poder gerar o link de assinatura."
         )
-        if doc.status == AssinaturaDocumento.STATUS_ASSINADA and not forcar:
-            continue
-        if forcar:
-            _limpar_assinatura(doc)
-        doc.signer = signer
-        doc.nome_esperado = signer.nome
-        doc.status = AssinaturaDocumento.STATUS_PENDENTE
-        doc.identidade_confirmada_em = None
-        doc.link_token = token
-        doc.link_criado_em = agora
-        doc.link_expira_em = expira
-        origem = _gerar_origem_bytes(prestacao, tipo)
-        doc.arquivo_origem.save(f"{tipo}_origem.pdf", ContentFile(origem), save=False)
-        doc.save()
-        incluidos.append(doc)
 
-    if not incluidos:
-        raise AssinaturaError("Os documentos selecionados já estão assinados.")
-    return token, incluidos
+    doc, _ = AssinaturaDocumento.objects.get_or_create(
+        prestacao=prestacao,
+        tipo=AssinaturaDocumento.TIPO_DB,
+        servidor_prestacao=None,
+        defaults={"signer": signer},
+    )
+
+    token = secrets.token_urlsafe(32)
+    agora = timezone.now()
+    expira = agora + timedelta(days=max(1, int(dias)))
+    origem = _origem_db_bytes(prestacao)
+    preparado = _preparar_doc(doc, signer, origem, token, agora, expira, forcar)
+    if preparado is None:
+        raise AssinaturaError("O Diário de Bordo já está assinado.")
+    return token, [preparado]
 
 
 def documentos_do_link(token: str):
@@ -142,7 +150,7 @@ def documentos_do_link(token: str):
         return []
     docs = list(
         AssinaturaDocumento.objects.select_related(
-            "prestacao__oficio", "signer"
+            "prestacao__oficio", "servidor_prestacao__servidor", "signer"
         ).filter(link_token=token)
     )
     validos = [d for d in docs if not d.link_expirado]
@@ -304,8 +312,7 @@ def aplicar_assinatura(doc, *, png_bytes, modo, fonte, pagina, x, y, w, h, ip=""
     doc.save()
 
 
-def cancelar_assinatura(prestacao, tipo: str) -> None:
-    doc = AssinaturaDocumento.objects.filter(prestacao=prestacao, tipo=tipo).first()
+def _cancelar_doc(doc) -> None:
     if not doc:
         return
     _limpar_assinatura(doc)
@@ -317,49 +324,64 @@ def cancelar_assinatura(prestacao, tipo: str) -> None:
     doc.save()
 
 
+def cancelar_assinatura_rt(servidor_prestacao) -> None:
+    _cancelar_doc(assinatura_rt(servidor_prestacao))
+
+
+def cancelar_assinatura_db(prestacao) -> None:
+    _cancelar_doc(assinatura_db(prestacao))
+
+
 # ─────────────────────────────────────────────────────────────────
 # Integração: usar o arquivo assinado quando existir
 # ─────────────────────────────────────────────────────────────────
 
-def assinatura_assinada(prestacao, tipo: str):
+def assinatura_rt(servidor_prestacao):
+    """Assinatura do RT de um servidor (qualquer status), ou ``None``."""
+    if not servidor_prestacao:
+        return None
     return (
         AssinaturaDocumento.objects.select_related("signer")
-        .filter(prestacao=prestacao, tipo=tipo, status=AssinaturaDocumento.STATUS_ASSINADA)
+        .filter(servidor_prestacao=servidor_prestacao, tipo=AssinaturaDocumento.TIPO_RT)
+        .first()
+    )
+
+
+def assinatura_db(prestacao):
+    """Assinatura do Diário de Bordo (qualquer status), ou ``None``."""
+    return (
+        AssinaturaDocumento.objects.select_related("signer")
+        .filter(
+            prestacao=prestacao,
+            tipo=AssinaturaDocumento.TIPO_DB,
+            servidor_prestacao__isnull=True,
+        )
         .first()
     )
 
 
 def _bytes_assinado(doc) -> bytes | None:
-    if doc and doc.arquivo_assinado:
+    if doc and doc.status == AssinaturaDocumento.STATUS_ASSINADA and doc.arquivo_assinado:
         with doc.arquivo_assinado.open("rb") as f:
             return f.read()
     return None
 
 
-def pdf_rt_assinado_ou_gerado(prestacao) -> bytes:
-    conteudo = _bytes_assinado(assinatura_assinada(prestacao, AssinaturaDocumento.TIPO_RT))
+def pdf_rt_assinado_ou_gerado(servidor_prestacao) -> bytes:
+    conteudo = _bytes_assinado(assinatura_rt(servidor_prestacao))
     if conteudo is not None:
         return conteudo
     from .services import gerar_relatorio_tecnico_pdf
 
-    relatorio, _ = RelatorioTecnico.objects.get_or_create(prestacao=prestacao)
-    return gerar_relatorio_tecnico_pdf(relatorio)
+    relatorio, _ = RelatorioTecnico.objects.get_or_create(prestacao=servidor_prestacao.prestacao)
+    return gerar_relatorio_tecnico_pdf(relatorio, servidor_prestacao.servidor)
 
 
 def pdf_db_assinado_ou_gerado(prestacao) -> bytes:
-    conteudo = _bytes_assinado(assinatura_assinada(prestacao, AssinaturaDocumento.TIPO_DB))
+    conteudo = _bytes_assinado(assinatura_db(prestacao))
     if conteudo is not None:
         return conteudo
     from .diario_services import gerar_diario_bordo_pdf
 
     diario, _ = DiarioBordo.objects.get_or_create(prestacao=prestacao)
     return gerar_diario_bordo_pdf(diario)
-
-
-def assinaturas_status(prestacao) -> dict:
-    """Mapa ``{tipo: AssinaturaDocumento|None}`` para uso nos templates."""
-    docs = {d.tipo: d for d in AssinaturaDocumento.objects.select_related("signer").filter(prestacao=prestacao)}
-    return {
-        AssinaturaDocumento.TIPO_RT: docs.get(AssinaturaDocumento.TIPO_RT),
-        AssinaturaDocumento.TIPO_DB: docs.get(AssinaturaDocumento.TIPO_DB),
-    }

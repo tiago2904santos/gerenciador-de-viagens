@@ -5,19 +5,24 @@ from django.dispatch import receiver
 
 def _criar_prestacoes(oficio, servidor_ids=None):
     from .models import PrestacaoContas
+    from .models import PrestacaoServidor
 
     if oficio.cancelado:
         return
+
+    prestacao, _ = PrestacaoContas.objects.get_or_create(
+        oficio=oficio,
+        defaults={"status": PrestacaoContas.STATUS_PENDENTE},
+    )
 
     servidores = oficio.servidores.all()
     if servidor_ids is not None:
         servidores = servidores.filter(pk__in=servidor_ids)
 
     for servidor in servidores:
-        PrestacaoContas.objects.get_or_create(
-            oficio=oficio,
+        PrestacaoServidor.objects.get_or_create(
+            prestacao=prestacao,
             servidor=servidor,
-            defaults={"status": PrestacaoContas.STATUS_PENDENTE},
         )
 
 

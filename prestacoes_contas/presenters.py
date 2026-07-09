@@ -5,27 +5,69 @@ from core.utils.masks import format_protocolo
 # Reaproveita a formatação já consolidada na lista de ofícios para manter
 # o visual do card idêntico (trechos, valor, datas e badge temporal).
 from oficios.presenters import (
+    _data_evento_display_oficio,
+    _destino_display_oficio,
     _format_brl_diarias,
     _format_dt_trecho,
     _label_cidade_uf_trecho,
     _temporal_badge_oficio,
 )
 
+from .forms import PrestacaoSolicitacaoForm
+from .models import PrestacaoDocumentoAnexo
 
-def apresentar_prestacao_card(prestacao, solicitacao_form=None):
-    """Monta o contexto de um card de prestação no layout da lista de ofícios.
 
-    Cada prestação é de um único servidor; por isso o card mostra apenas o
-    servidor da prestação, mas reaproveita os dados de roteiro/diárias do
-    ofício associado.
-    """
-    oficio = prestacao.oficio
-    servidor = prestacao.servidor
-
-    # ── Servidor (único viajante do card) ──
+def _servidor_row(ps, solicitacao_form=None):
+    """Dados de um servidor no card: identificação + solicitação inline + status."""
+    servidor = ps.servidor
     cargo_nome = servidor.cargo.nome if servidor.cargo_id and servidor.cargo else ""
     unidade_nome = str(servidor.unidade) if servidor.unidade_id else ""
-    is_motorista = bool(oficio.motorista_id and servidor.pk == oficio.motorista_id)
+
+    # Comprovante de saque (individual): usa os anexos já pré-carregados.
+    comprovante_ok = any(
+        anexo.tipo == PrestacaoDocumentoAnexo.TIPO_COMPROVANTE
+        for anexo in ps.documentos_anexos.all()
+    )
+
+    if solicitacao_form is None:
+        solicitacao_form = PrestacaoSolicitacaoForm(instance=ps, prefix=f"ps-{ps.pk}")
+
+    return {
+        "ps_pk": ps.pk,
+        "name": servidor.nome,
+        "cargo": cargo_nome,
+        "unidade": unidade_nome,
+        "is_motorista": ps.is_motorista,
+        "numero_solicitacao": ps.numero_solicitacao,
+        "solicitacao_form": solicitacao_form,
+        "solicitacao_autosave_url": reverse(
+            "prestacoes_contas:prestacao_servidor_solicitacao_autosave", args=[ps.pk]
+        ),
+        "comprovante_ok": comprovante_ok,
+        "pacote_url": reverse("prestacoes_contas:consolidado_download", args=[ps.pk]),
+        "rt_download_url": reverse("prestacoes_contas:rt_download_servidor", args=[ps.pk]),
+    }
+
+
+def apresentar_prestacao_card(prestacao, solicitacao_forms=None):
+    """Monta o contexto de um card de prestação (um por ofício) no layout da lista de ofícios.
+
+    Reúne todos os servidores do ofício: o trabalho compartilhado (roteiro,
+    diárias, despacho, texto do RT e diário de bordo) aparece uma vez; o número
+    da solicitação e o comprovante de saque são exibidos por servidor.
+
+    ``solicitacao_forms`` é um dict ``{ps_pk: PrestacaoSolicitacaoForm}`` opcional
+    (usado para reexibir erros de validação); quando ausente, cada linha cria o
+    seu próprio form não-vinculado.
+    """
+    oficio = prestacao.oficio
+    solicitacao_forms = solicitacao_forms or {}
+
+    # ── Servidores da prestação ──
+    servidores = [
+        _servidor_row(ps, solicitacao_forms.get(ps.pk))
+        for ps in prestacao.servidores_prestacao.all()
+    ]
 
     # ── Identificação ──
     data_criacao_display = ""
@@ -35,6 +77,8 @@ def apresentar_prestacao_card(prestacao, solicitacao_form=None):
         except Exception:
             pass
 
+    destino_display = _destino_display_oficio(oficio)
+    data_evento_display = _data_evento_display_oficio(oficio)
     temporal_label, temporal_tone = _temporal_badge_oficio(oficio)
 
     # ── Roteiro: placa/modelo, trechos e diárias (espelha o card de ofício) ──
@@ -67,21 +111,23 @@ def apresentar_prestacao_card(prestacao, solicitacao_form=None):
             valor_diarias_display = _format_brl_diarias(roteiro.valor_diarias)
             valor_diarias_extenso = (roteiro.valor_diarias_extenso or "").strip()
 
-    # ── Relatório técnico (download condicional) ──
+    # ── Relatório técnico compartilhado (download é por servidor) ──
     rt = None
     try:
         rt = prestacao.relatorio_tecnico
     except Exception:
         rt = None
-    rt_download_url = (
-        reverse("prestacoes_contas:rt_download", args=[rt.pk]) if rt else ""
-    )
+
+    search_parts = [oficio.numero_formatado, format_protocolo(oficio.protocolo) or ""]
+    search_parts += [s["name"] for s in servidores]
 
     return {
         "prestacao_pk": prestacao.pk,
         # identificação
         "numero_display": oficio.numero_formatado,
         "protocolo_display": format_protocolo(oficio.protocolo) or "",
+        "destino_display": destino_display,
+        "data_evento_display": data_evento_display,
         "data_criacao_display": data_criacao_display,
         "temporal_label": temporal_label,
         "temporal_tone": temporal_tone,
@@ -89,30 +135,21 @@ def apresentar_prestacao_card(prestacao, solicitacao_form=None):
         "status_label": prestacao.status_display,
         "status_tone": prestacao.status_variant,
         "status_value": prestacao.status,
-        # servidor único
-        "servidor": {
-            "name": servidor.nome,
-            "cargo": cargo_nome,
-            "unidade": unidade_nome,
-            "is_motorista": is_motorista,
-        },
+        # servidores (lista)
+        "servidores": servidores,
+        "servidores_count": len(servidores),
         # roteiro / transporte
         "veiculo_placa": veiculo_placa,
         "veiculo_modelo": veiculo_modelo,
         "trechos": trechos_display,
         "valor_diarias_display": valor_diarias_display,
         "valor_diarias_extenso": valor_diarias_extenso,
-        # solicitação
-        "numero_solicitacao": prestacao.numero_solicitacao,
-        "solicitacao_form": solicitacao_form,
-        # ações / urls
+        # ações / urls (nível ofício)
         "documentos_url": reverse("prestacoes_contas:documentos", args=[prestacao.pk]),
         "rt_url": reverse("prestacoes_contas:rt_criar", args=[prestacao.pk]),
         "tem_rt": rt is not None,
-        "rt_download_url": rt_download_url,
         "diario_url": reverse("prestacoes_contas:diario_criar", args=[prestacao.pk]),
         "consolidado_url": reverse("prestacoes_contas:consolidado", args=[prestacao.pk]),
-        "autosave_url": reverse("prestacoes_contas:prestacao_autosave", args=[prestacao.pk]),
         # filtro / busca
-        "search_text": f"{oficio.numero_formatado} {format_protocolo(oficio.protocolo) or ''} {servidor.nome}",
+        "search_text": " ".join(p for p in search_parts if p),
     }

@@ -124,8 +124,38 @@ class TermoAutorizacao(TimeStampedModel, CancelavelModel):
         if selecionados.exists():
             return selecionados
         if self.oficio_id:
-            return self.oficio.servidores_termo_autorizacao.select_related("cargo", "unidade").order_by("nome")
+            do_oficio = self.oficio.servidores_termo_autorizacao.select_related("cargo", "unidade").order_by("nome")
+            if do_oficio.exists():
+                return do_oficio
+        if self.evento_id:
+            do_evento = self._servidores_do_evento()
+            if do_evento is not None:
+                return do_evento
         return Servidor.objects.none()
+
+    def _servidores_do_evento(self):
+        """Servidores dos ofícios do evento (termo de autorização, com fallback nos participantes).
+
+        Usado quando o termo genérico do evento não tem servidores próprios nem
+        ofício vinculado — assim o download do termo genérico também gera um termo
+        individual para cada servidor do evento.
+        """
+        ids: list[int] = []
+        oficios = self.evento.oficios.prefetch_related(
+            "servidores_termo_autorizacao",
+            "servidores",
+        )
+        for oficio in oficios:
+            do_termo = list(oficio.servidores_termo_autorizacao.all()) or list(oficio.servidores.all())
+            ids.extend(servidor.pk for servidor in do_termo)
+        ids = list(dict.fromkeys(ids))
+        if not ids:
+            return None
+        return (
+            Servidor.objects.filter(pk__in=ids)
+            .select_related("cargo", "unidade")
+            .order_by("nome")
+        )
 
     def viatura_efetiva(self):
         if self.viatura_id:

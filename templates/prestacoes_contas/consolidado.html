@@ -21,46 +21,27 @@
 
     <main class="main-form-panel main-form-panel--stack oficio-wizard__main">
       <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
-        <section class="cv-wizard-section-card rt-summary-card oficio-documentos-summary-section" aria-labelledby="prestacao-final-resumo-title">
+        <section class="cv-wizard-section-card oficio-documentos-summary-section" aria-labelledby="prestacao-final-resumo-title">
           <header class="cv-wizard-section-header">
             <div class="cv-wizard-section-header__copy">
-              <h2 class="cv-wizard-section-title" id="prestacao-final-resumo-title">Resumo do ofício</h2>
-              <p class="cv-wizard-section-subtitle">O PDF final será montado na ordem: ofício, despacho, RT, diário e comprovante.</p>
+              <h2 class="cv-wizard-section-title" id="prestacao-final-resumo-title">Ofício {{ identificacao.numero }}</h2>
+              <p class="cv-wizard-section-subtitle">Cada servidor tem seu pacote final na ordem: ofício, despacho, RT, diário e comprovante.</p>
             </div>
           </header>
           <div class="cv-wizard-section-body">
-            <div class="oficio-documentos-grid">
-              <section class="oficio-documentos-admin-facts" aria-label="Dados administrativos">
-                <div class="oficio-documentos-card__body">
-                  <dl class="oficio-documentos-facts oficio-documentos-facts--admin rt-summary-card__facts">
-                    <div class="oficio-documentos-fact">
-                      <dt>Número do ofício</dt>
-                      <dd>{{ identificacao.numero }}</dd>
-                    </div>
-                    <div class="oficio-documentos-fact">
-                      <dt>Protocolo</dt>
-                      <dd>{{ identificacao.protocolo }}</dd>
-                    </div>
-                    <div class="oficio-documentos-fact">
-                      <dt>Servidor</dt>
-                      <dd>{{ identificacao.nome_servidor }}</dd>
-                    </div>
-                    <div class="oficio-documentos-fact">
-                      <dt>Número da solicitação</dt>
-                      <dd>{{ prestacao.numero_solicitacao|default:"—" }}</dd>
-                    </div>
-                  </dl>
-                </div>
-              </section>
-            </div>
+            <dl class="oficio-documentos-facts oficio-documentos-facts--admin">
+              <div class="oficio-documentos-fact"><dt>Protocolo</dt><dd>{{ identificacao.protocolo }}</dd></div>
+              <div class="oficio-documentos-fact"><dt>Servidores</dt><dd>{{ identificacao.servidores_count }}</dd></div>
+            </dl>
           </div>
         </section>
 
+        {# ── Itens compartilhados do ofício ── #}
         <section class="cv-wizard-section-card" aria-labelledby="prestacao-final-itens-title">
           <header class="cv-wizard-section-header">
             <div class="cv-wizard-section-header__copy">
-              <h2 class="cv-wizard-section-title" id="prestacao-final-itens-title">Itens do PDF</h2>
-              <p class="cv-wizard-section-subtitle">Pendências impedem a geração apenas quando o arquivo final é solicitado.</p>
+              <h2 class="cv-wizard-section-title" id="prestacao-final-itens-title">Itens compartilhados</h2>
+              <p class="cv-wizard-section-subtitle">Valem para todos os servidores do ofício.</p>
             </div>
           </header>
           <div class="cv-wizard-section-body">
@@ -82,45 +63,68 @@
               {% endfor %}
             </div>
           </div>
+        </section>
+
+        {# ── Assinatura do Diário de Bordo (motorista, uma vez) ── #}
+        {% include "prestacoes_contas/partials/assinatura_card.html" with assinatura=assinatura_db next_url=assinatura_next_url csrf_token=csrf_token only %}
+
+        {# ── Um pacote por servidor: solicitação, comprovante, assinatura do RT ── #}
+        {% for s in servidores %}
+        <section class="cv-wizard-section-card" aria-label="Pacote de {{ s.nome }}">
+          <header class="cv-wizard-section-header">
+            <div class="cv-wizard-section-header__copy">
+              <h2 class="cv-wizard-section-title">
+                {{ s.nome }}
+                {% if s.is_motorista %}{% include "components/ui/badges/chip.html" with label="Motorista" tone="warning" size="compact" only %}{% endif %}
+              </h2>
+              <p class="cv-wizard-section-subtitle">Nº solicitação: {{ s.numero_solicitacao|default:"—" }} · Comprovante: {{ s.comprovante_resumo.value }}</p>
+            </div>
+          </header>
+          <div class="cv-wizard-section-body">
+            <div class="os-list">
+              <article class="os-list-card">
+                <div class="os-list-card__info">
+                  <h3 class="os-list-card__title">Número da solicitação</h3>
+                  <p class="os-list-card__meta">{{ s.numero_solicitacao|default:"Pendente" }}</p>
+                </div>
+                <div class="os-list-card__actions">
+                  {% if s.numero_ok %}{% include "components/ui/lists/status_pill.html" with label="OK" variant="success" only %}{% else %}{% include "components/ui/lists/status_pill.html" with label="Pendente" variant="warning" only %}{% endif %}
+                </div>
+              </article>
+              <article class="os-list-card">
+                <div class="os-list-card__info">
+                  <h3 class="os-list-card__title">Comprovante de saque/transferência</h3>
+                  <p class="os-list-card__meta">{{ s.comprovante_resumo.value }}</p>
+                </div>
+                <div class="os-list-card__actions">
+                  {% if s.comprovante_resumo.status %}{% include "components/ui/lists/status_pill.html" with label="OK" variant="success" only %}{% else %}{% include "components/ui/lists/status_pill.html" with label="Pendente" variant="warning" only %}{% endif %}
+                </div>
+              </article>
+            </div>
+
+            {% include "prestacoes_contas/partials/assinatura_card.html" with assinatura=s.assinatura_rt next_url=assinatura_next_url csrf_token=csrf_token only %}
+          </div>
           <section class="cv-card-footer-section">
             <div class="cv-card-footer-section__divider" aria-hidden="true"></div>
             <footer class="cv-card-footer">
               <div class="cv-card-footer__secondary">
-                {% include "components/ui/buttons/button.html" with href=diario_url label="Voltar ao Diário de Bordo" variant="secondary" icon="arrow-left" only %}
+                {% include "components/ui/buttons/button.html" with href=s.preview_inline_url label="Pré-visualizar" variant="secondary" icon="eye" target="_blank" only %}
               </div>
               <div class="cv-card-footer__primary">
-                {% include "components/ui/buttons/button.html" with href=download_url label="Gerar PDF final" variant="primary" icon="download" icon_after=True only %}
+                {% include "components/ui/buttons/button.html" with href=s.download_url label="Baixar pacote (PDF final)" variant="primary" icon="download" icon_after=True only %}
               </div>
             </footer>
           </section>
         </section>
-
-        <section class="cv-wizard-section-card" aria-labelledby="prestacao-assinaturas-title">
-          <header class="cv-wizard-section-header">
-            <div class="cv-wizard-section-header__copy">
-              <h2 class="cv-wizard-section-title" id="prestacao-assinaturas-title">Assinaturas</h2>
-              <p class="cv-wizard-section-subtitle">Colete a assinatura do RT (servidor) e do Diário (motorista). O PDF Final usa os arquivos assinados quando existem.</p>
-            </div>
-          </header>
-          {% if assinatura_combinado_possivel %}
-          <div class="cv-wizard-section-body">
-            <form method="post" action="{{ assinatura_gerar_url }}" class="assinatura-card__combo">
-              {% csrf_token %}
-              <input type="hidden" name="tipos" value="rt">
-              <input type="hidden" name="tipos" value="db">
-              <input type="hidden" name="next" value="{{ assinatura_next_url }}">
-              {% include "components/ui/buttons/button.html" with type="submit" label="Gerar link único (RT + Diário)" variant="primary" icon="link" only %}
-              <span class="assinatura-card__expira">Um só link onde o signatário assina os dois documentos em sequência.</span>
-            </form>
-          </div>
-          {% endif %}
-        </section>
-
-        {% for a in assinaturas %}
-          {% include "prestacoes_contas/partials/assinatura_card.html" with assinatura=a next_url=assinatura_next_url csrf_token=csrf_token only %}
         {% endfor %}
 
-        {% include "prestacoes_contas/partials/documento_preview.html" with preview_anchor="consolidado-preview" preview_title="Pré-visualização do PDF final" preview_subtitle="Documento consolidado na ordem: ofício, despacho, RT, diário e comprovante." preview_doc_title="PDF Final" preview_inline_url=preview_inline_url preview_pdf_url=download_url only %}
+        <section class="cv-card-footer-section">
+          <footer class="cv-card-footer">
+            <div class="cv-card-footer__secondary">
+              {% include "components/ui/buttons/button.html" with href=diario_url label="Voltar ao Diário de Bordo" variant="secondary" icon="arrow-left" only %}
+            </div>
+          </footer>
+        </section>
       </div>
     </main>
   </div>

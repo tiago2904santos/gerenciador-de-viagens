@@ -48,7 +48,7 @@ def _destino_display_oficio(oficio) -> str:
     destinos = list(oficio.roteiro.destinos.all())
     if not destinos:
         return ""
-    parts = [f"{d.cidade} ({d.estado.sigla})" for d in destinos[:2]]
+    parts = [_label_cidade_uf_trecho(d.cidade, d.estado) for d in destinos[:2]]
     result = ", ".join(parts)
     if len(destinos) > 2:
         result += f" +{len(destinos) - 2}"

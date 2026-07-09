@@ -184,6 +184,27 @@ class TermoAutorizacaoCadastroTests(TestCase):
 
         self.assertEqual(list(termo.servidores_efetivos()), [self.servidor_2])
 
+    def test_termo_generico_do_evento_usa_servidores_dos_oficios(self):
+        from eventos.models import Evento
+
+        evento = Evento.objects.create(titulo="Acao", data_inicio=date(2026, 6, 10))
+        self.oficio.evento = evento
+        self.oficio.save(update_fields=["evento"])
+        self.oficio.servidores_termo_autorizacao.add(self.servidor_2)
+
+        termo_generico = TermoAutorizacao.objects.create(
+            evento=evento,
+            destino_estado=self.estado,
+            destino_cidade=self.cidade_destino,
+            data_evento_inicio=date(2026, 6, 10),
+            data_evento_fim=date(2026, 6, 10),
+        )
+
+        self.assertEqual(
+            list(termo_generico.servidores_efetivos()),
+            [self.servidor_2, self.servidor_1],
+        )
+
     def test_payload_sem_servidor_e_semipreenchido(self):
         termo = TermoAutorizacao.objects.create(
             destino_estado=self.estado,
@@ -265,36 +286,34 @@ class TermoAutorizacaoCadastroTests(TestCase):
         doc.save(buf)
         return buf.getvalue()
 
+    def _fake_gerar_docx(self, content_type):
+        def _fake(termo, servidor, formato):
+            if servidor is None:
+                texto = "GENERICO"
+            elif servidor.pk == self.servidor_1.pk:
+                texto = "SERVIDOR A"
+            else:
+                texto = "SERVIDOR B"
+            return SimpleNamespace(
+                conteudo=self._docx_bytes(texto),
+                nome_arquivo="x.docx",
+                content_type=content_type,
+                hash_sha256=str(getattr(servidor, "pk", 0)),
+            )
+
+        return _fake
+
     @mock.patch("termos.views.gerar_termo_cadastro_um")
-    @mock.patch("termos.views.gerar_termo_cadastro_lote")
-    def test_download_docx_multiplo_retorna_arquivo_unico(self, m_lote, m_um):
+    def test_download_docx_multiplo_retorna_arquivo_unico(self, m_um):
         termo = TermoAutorizacao.objects.create(
             destino_estado=self.estado,
             destino_cidade=self.cidade_destino,
             data_evento_inicio=date(2026, 6, 10),
             data_evento_fim=date(2026, 6, 10),
         )
+        termo.servidores.set([self.servidor_1, self.servidor_2])
         content_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        m_um.return_value = SimpleNamespace(
-            conteudo=self._docx_bytes("GENERICO"),
-            nome_arquivo="generico.docx",
-            content_type=content_type,
-            hash_sha256="0",
-        )
-        m_lote.return_value = [
-            SimpleNamespace(
-                conteudo=self._docx_bytes("SERVIDOR A"),
-                nome_arquivo="a.docx",
-                content_type=content_type,
-                hash_sha256="1",
-            ),
-            SimpleNamespace(
-                conteudo=self._docx_bytes("SERVIDOR B"),
-                nome_arquivo="b.docx",
-                content_type=content_type,
-                hash_sha256="2",
-            ),
-        ]
+        m_um.side_effect = self._fake_gerar_docx(content_type)
 
         response = self.client.get(reverse("termos:baixar_termo_cadastro_docx", args=[termo.pk]))
 
@@ -307,3 +326,22 @@ class TermoAutorizacaoCadastroTests(TestCase):
         self.assertIn("GENERICO", textos)
         self.assertIn("SERVIDOR A", textos)
         self.assertIn("SERVIDOR B", textos)
+
+    @mock.patch("termos.views.gerar_termo_cadastro_um")
+    def test_download_sem_servidor_nao_duplica_termo_generico(self, m_um):
+        """Termo sem servidores efetivos gera UM genérico apenas (sem página repetida)."""
+        termo = TermoAutorizacao.objects.create(
+            destino_estado=self.estado,
+            destino_cidade=self.cidade_destino,
+            data_evento_inicio=date(2026, 6, 10),
+            data_evento_fim=date(2026, 6, 10),
+        )
+        m_um.side_effect = self._fake_gerar_docx(
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        )
+
+        self.client.get(reverse("termos:baixar_termo_cadastro_docx", args=[termo.pk]))
+
+        self.assertEqual(m_um.call_count, 1)
+        (_, servidor_arg, _), _ = m_um.call_args
+        self.assertIsNone(servidor_arg)

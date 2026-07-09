@@ -555,9 +555,15 @@ def termo_cadastro_servidor_pdf_inline(request, pk, servidor_pk):
 
 
 def _termo_cadastro_docs_com_generico(termo, formato):
-    """Termo genérico + termos individuais de cada servidor selecionado."""
+    """Termo genérico + termos individuais de cada servidor efetivo.
+
+    Não usa ``gerar_termo_cadastro_lote`` porque este faz fallback para ``[None]``
+    quando não há servidores — o que duplicaria o termo genérico. Aqui o genérico
+    é gerado exatamente uma vez e os individuais só quando há servidores.
+    """
     docs = [gerar_termo_cadastro_um(termo, None, formato)]
-    docs.extend(gerar_termo_cadastro_lote(termo, formato))
+    for servidor in termo.servidores_efetivos():
+        docs.append(gerar_termo_cadastro_um(termo, servidor, formato))
     return docs
 
 

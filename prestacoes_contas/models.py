@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 from django.core.validators import FileExtensionValidator
 
 from cadastros.models import Servidor
@@ -44,15 +45,13 @@ class PrestacaoContas(models.Model):
         (STATUS_REPROVADA, "Reprovada"),
     ]
 
-    oficio = models.ForeignKey(
+    # Uma prestação por ofício. Os dados compartilhados por todos os servidores
+    # (texto do RT, diário de bordo do motorista, despacho, número do ofício)
+    # ficam aqui; o que é individual de cada servidor fica em ``PrestacaoServidor``.
+    oficio = models.OneToOneField(
         Oficio,
         on_delete=models.CASCADE,
-        related_name="prestacoes_contas",
-    )
-    servidor = models.ForeignKey(
-        Servidor,
-        on_delete=models.CASCADE,
-        related_name="prestacoes_contas",
+        related_name="prestacao_contas",
     )
     # Cópia editável do roteiro (o que realmente ocorreu na viagem). Quando
     # preenchida, substitui o roteiro do ofício no diário sem alterar o ofício.
@@ -63,20 +62,8 @@ class PrestacaoContas(models.Model):
         blank=True,
         related_name="+",
     )
-    numero_solicitacao = models.CharField(
-        "Número da solicitação",
-        max_length=60,
-        blank=True,
-        default="",
-    )
     despacho_assinado = models.FileField(
         "Despacho assinado do ofício",
-        upload_to=prestacao_documento_upload_to,
-        blank=True,
-        validators=[FileExtensionValidator(PRESTACAO_DOCUMENTO_EXTENSOES)],
-    )
-    comprovante_saque_transferencia = models.FileField(
-        "Comprovante de saque/transferência",
         upload_to=prestacao_documento_upload_to,
         blank=True,
         validators=[FileExtensionValidator(PRESTACAO_DOCUMENTO_EXTENSOES)],
@@ -90,15 +77,9 @@ class PrestacaoContas(models.Model):
         ordering = ["-criado_em"]
         verbose_name = "Prestação de Contas"
         verbose_name_plural = "Prestações de Contas"
-        constraints = [
-            models.UniqueConstraint(
-                fields=["oficio", "servidor"],
-                name="unique_prestacao_por_servidor_oficio",
-            )
-        ]
 
     def __str__(self):
-        return f"Prestação — {self.servidor} / Ofício {self.oficio.numero_formatado}"
+        return f"Prestação — Ofício {self.oficio.numero_formatado}"
 
     @property
     def status_display(self):
@@ -115,6 +96,60 @@ class PrestacaoContas(models.Model):
         }.get(self.status, "muted")
 
 
+class PrestacaoServidor(models.Model):
+    """Parte individual da prestação de um servidor dentro do ofício.
+
+    Guarda o que muda de servidor para servidor: número da solicitação,
+    comprovante de saque/transferência (via ``PrestacaoDocumentoAnexo``) e a
+    assinatura do relatório técnico (via ``AssinaturaDocumento``). O texto do RT
+    e o diário de bordo são compartilhados e ficam em ``PrestacaoContas``.
+    """
+
+    prestacao = models.ForeignKey(
+        PrestacaoContas,
+        on_delete=models.CASCADE,
+        related_name="servidores_prestacao",
+    )
+    servidor = models.ForeignKey(
+        Servidor,
+        on_delete=models.CASCADE,
+        related_name="prestacoes_servidor",
+    )
+    numero_solicitacao = models.CharField(
+        "Número da solicitação",
+        max_length=60,
+        blank=True,
+        default="",
+    )
+    criado_em = models.DateTimeField(auto_now_add=True)
+    atualizado_em = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["prestacao", "pk"]
+        verbose_name = "Servidor da prestação"
+        verbose_name_plural = "Servidores da prestação"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["prestacao", "servidor"],
+                name="unique_servidor_por_prestacao",
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.servidor} — Ofício {self.prestacao.oficio.numero_formatado}"
+
+    @property
+    def oficio(self):
+        return self.prestacao.oficio
+
+    @property
+    def is_motorista(self) -> bool:
+        return bool(
+            self.prestacao.oficio.motorista_id
+            and self.servidor_id == self.prestacao.oficio.motorista_id
+        )
+
+
 class PrestacaoDocumentoAnexo(models.Model):
     TIPO_DESPACHO = "despacho"
     TIPO_COMPROVANTE = "comprovante"
@@ -127,6 +162,15 @@ class PrestacaoDocumentoAnexo(models.Model):
     prestacao = models.ForeignKey(
         PrestacaoContas,
         on_delete=models.CASCADE,
+        related_name="documentos_anexos",
+    )
+    # Comprovante é individual → aponta para o servidor; despacho é compartilhado
+    # → fica nulo (referencia apenas a prestação do ofício).
+    servidor_prestacao = models.ForeignKey(
+        PrestacaoServidor,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
         related_name="documentos_anexos",
     )
     tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, db_index=True)
@@ -264,6 +308,15 @@ class AssinaturaDocumento(models.Model):
         on_delete=models.CASCADE,
         related_name="assinaturas",
     )
+    # RT é assinado por servidor → aponta para o ``PrestacaoServidor``; o Diário
+    # é assinado uma vez pelo motorista → fica nulo (nível ofício/prestação).
+    servidor_prestacao = models.ForeignKey(
+        PrestacaoServidor,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="assinaturas",
+    )
     tipo = models.CharField(max_length=4, choices=TIPO_CHOICES, db_index=True)
     signer = models.ForeignKey(
         Servidor,
@@ -307,10 +360,18 @@ class AssinaturaDocumento(models.Model):
         verbose_name = "Assinatura de documento"
         verbose_name_plural = "Assinaturas de documentos"
         constraints = [
+            # Documentos de nível ofício (ex.: Diário de Bordo): um por prestação/tipo.
             models.UniqueConstraint(
                 fields=["prestacao", "tipo"],
+                condition=Q(servidor_prestacao__isnull=True),
                 name="uniq_assinatura_prestacao_tipo",
-            )
+            ),
+            # Documentos individuais (ex.: Relatório Técnico): um por servidor/tipo.
+            models.UniqueConstraint(
+                fields=["servidor_prestacao", "tipo"],
+                condition=Q(servidor_prestacao__isnull=False),
+                name="uniq_assinatura_servidor_tipo",
+            ),
         ]
 
     def __str__(self):

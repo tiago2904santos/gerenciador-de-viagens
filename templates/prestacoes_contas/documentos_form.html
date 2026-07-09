@@ -4,8 +4,8 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260620-prestacao-docs">
-  <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}?v=20260629f">
+  <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260709-prestacao-docs">
+  <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}?v=20260709">
 {% endblock %}
 
 {% block content %}
@@ -16,131 +16,111 @@
 
     <main class="main-form-panel main-form-panel--stack oficio-wizard__main">
       <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
+
+        {# ── Identificação do ofício (compartilhada) ── #}
+        <section class="cv-wizard-section-card">
+          <header class="cv-wizard-section-header">
+            <div class="cv-wizard-section-header__copy">
+              <h2 class="cv-wizard-section-title">Ofício {{ identificacao.numero }}</h2>
+              <p class="cv-wizard-section-subtitle">Dados compartilhados por todos os servidores desta prestação.</p>
+            </div>
+          </header>
+          <div class="cv-wizard-section-body">
+            <dl class="oficio-documentos-facts oficio-documentos-facts--admin">
+              <div class="oficio-documentos-fact"><dt>Protocolo</dt><dd>{{ identificacao.protocolo }}</dd></div>
+              <div class="oficio-documentos-fact"><dt>Destino</dt><dd>{{ identificacao.destino }}</dd></div>
+              <div class="oficio-documentos-fact"><dt>Período da viagem</dt><dd>{{ identificacao.periodo }}</dd></div>
+              <div class="oficio-documentos-fact"><dt>Servidores</dt><dd>{{ identificacao.servidores_count }}</dd></div>
+            </dl>
+          </div>
+        </section>
+
+        {# ── Despacho assinado do ofício (compartilhado) ── #}
+        <form method="post"
+              enctype="multipart/form-data"
+              class="oficio-wizard__form"
+              novalidate
+              data-file-autosave-url="{{ despacho_autosave_url }}">
+          {% csrf_token %}
+          <section class="cv-wizard-section-card" aria-labelledby="prestacao-despacho-title">
+            <header class="cv-wizard-section-header">
+              <div class="cv-wizard-section-header__copy">
+                <h2 class="cv-wizard-section-title" id="prestacao-despacho-title">Despacho assinado do ofício</h2>
+                <p class="cv-wizard-section-subtitle">Um único despacho para o ofício — vale para todos os servidores.</p>
+              </div>
+            </header>
+            <div class="cv-wizard-section-body">
+              <div class="field app-form-field">
+                <label class="app-form-label" for="{{ despacho_form.despacho_arquivos.id_for_label }}">{{ despacho_form.despacho_arquivos.label }}</label>
+                {{ despacho_form.despacho_arquivos }}
+                {% include "prestacoes_contas/partials/documento_anexos.html" with anexos=despacho_anexos only %}
+                {% if despacho_form.despacho_arquivos.help_text %}<p class="field-help app-form-help">{{ despacho_form.despacho_arquivos.help_text }}</p>{% endif %}
+              </div>
+            </div>
+          </section>
+        </form>
+
+        {# ── Um bloco por servidor: nº de solicitação + comprovante de saque ── #}
+        {% for servidor in servidores %}
         <form method="post"
               enctype="multipart/form-data"
               class="oficio-wizard__form"
               novalidate
               data-autosave="true"
-              data-autosave-model="prestacao_contas"
+              data-autosave-model="prestacao_servidor"
               data-autosave-step="documentos"
-              data-autosave-url="{{ autosave_url }}"
-              data-autosave-object-id="{{ prestacao.pk }}"
-              data-file-autosave-url="{{ arquivo_autosave_url }}">
+              data-autosave-url="{{ servidor.solicitacao_autosave_url }}"
+              data-autosave-object-id="{{ servidor.ps.pk }}"
+              data-file-autosave-url="{{ servidor.arquivo_autosave_url }}">
           {% csrf_token %}
-          {{ form.numero_solicitacao.as_hidden }}
-
-          {% if form.non_field_errors %}
-            {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
-          {% endif %}
-
-          <section class="cv-wizard-section-card rt-summary-card oficio-documentos-summary-section" aria-labelledby="prestacao-docs-resumo-title">
+          <section class="cv-wizard-section-card" aria-label="Documentos de {{ servidor.identificacao.nome_servidor }}">
             <header class="cv-wizard-section-header">
               <div class="cv-wizard-section-header__copy">
-                <h2 class="cv-wizard-section-title"
-                    id="prestacao-docs-resumo-title"
-                    data-solicitacao-title>
-                  Solicitação {{ prestacao.numero_solicitacao|default:"" }}
+                <h2 class="cv-wizard-section-title">
+                  {{ servidor.identificacao.nome_servidor }}
+                  {% if servidor.identificacao.is_motorista %}{% include "components/ui/badges/chip.html" with label="Motorista" tone="warning" size="compact" only %}{% endif %}
                 </h2>
-                <p class="cv-wizard-section-subtitle">Dados usados para vincular os documentos desta prestação.</p>
-              </div>
-            </header>
-            <div class="cv-wizard-section-body">
-              <div class="oficio-documentos-grid">
-                <section class="oficio-documentos-admin-facts" aria-label="Dados administrativos">
-                  <div class="oficio-documentos-card__body">
-                    <dl class="oficio-documentos-facts oficio-documentos-facts--admin rt-summary-card__facts">
-                      <div class="oficio-documentos-fact">
-                        <dt>Número do ofício</dt>
-                        <dd>{{ identificacao.numero }}</dd>
-                      </div>
-                      <div class="oficio-documentos-fact">
-                        <dt>Protocolo</dt>
-                        <dd>{{ identificacao.protocolo }}</dd>
-                      </div>
-                      <div class="oficio-documentos-fact">
-                        <dt>Destino</dt>
-                        <dd>{{ identificacao.destino }}</dd>
-                      </div>
-                      <div class="oficio-documentos-fact">
-                        <dt>Período da viagem</dt>
-                        <dd>{{ identificacao.periodo }}</dd>
-                      </div>
-                    </dl>
-                  </div>
-                </section>
-
-                <article class="oficio-documentos-card oficio-documentos-card--travellers rt-summary-card__traveller-card" aria-label="Servidor da prestação">
-                  <header class="oficio-documentos-card__header oficio-documentos-travellers__header">
-                    <div class="oficio-documentos-travellers__titles">
-                      <span class="oficio-documentos-card__eyebrow">Equipe</span>
-                      <h4 class="oficio-documentos-card__title">Servidor</h4>
-                      <p class="oficio-documentos-card__subtitle">Servidor vinculado à prestação de contas</p>
-                    </div>
-                  </header>
-                  <div class="oficio-documentos-card__body">
-                    <div class="oficio-documentos-travellers-lines oficio-documentos-travellers-lines--n1">
-                      <article class="oficio-documentos-traveller-line{% if identificacao.is_motorista %} oficio-documentos-traveller-line--motorista{% endif %}">
-                        <div class="oficio-documentos-traveller-line__name-row">
-                          <strong class="oficio-documentos-traveller-line__name">{{ identificacao.nome_servidor }}</strong>
-                          {% if identificacao.is_motorista %}
-                            {% include "components/ui/badges/chip.html" with label="Motorista" tone="warning" size="compact" only %}
-                          {% endif %}
-                        </div>
-                        <span class="oficio-documentos-traveller-line__cargo">
-                          {{ identificacao.cargo }}{% if identificacao.unidade %} · {{ identificacao.unidade }}{% endif %}{% if identificacao.cpf_servidor and identificacao.cpf_servidor != "—" %} · CPF {{ identificacao.cpf_servidor }}{% endif %}
-                        </span>
-                      </article>
-                    </div>
-                  </div>
-                </article>
-              </div>
-            </div>
-          </section>
-
-          <section class="cv-wizard-section-card" aria-labelledby="prestacao-docs-title">
-            <header class="cv-wizard-section-header">
-              <div class="cv-wizard-section-header__copy">
-                <h2 class="cv-wizard-section-title" id="prestacao-docs-title">Arquivos e solicitação</h2>
-                <p class="cv-wizard-section-subtitle">O número da solicitação será levado para a coluna de solicitação do ofício.</p>
+                <p class="cv-wizard-section-subtitle">
+                  {{ servidor.identificacao.cargo }}{% if servidor.identificacao.unidade %} · {{ servidor.identificacao.unidade }}{% endif %}{% if servidor.identificacao.cpf_servidor and servidor.identificacao.cpf_servidor != "—" %} · CPF {{ servidor.identificacao.cpf_servidor }}{% endif %}
+                </p>
               </div>
             </header>
             <div class="cv-wizard-section-body">
               <div class="field-grid">
                 <div class="field app-form-field">
-                  <label class="app-form-label" for="{{ form.despacho_arquivos.id_for_label }}">{{ form.despacho_arquivos.label }}</label>
-                  {{ form.despacho_arquivos }}
-                  {% include "prestacoes_contas/partials/documento_anexos.html" with anexos=despacho_anexos only %}
-                  {% if form.despacho_arquivos.help_text %}<p class="field-help app-form-help">{{ form.despacho_arquivos.help_text }}</p>{% endif %}
-                  {% if form.despacho_arquivos.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.despacho_arquivos.errors only %}{% endif %}
+                  <label class="app-form-label" for="{{ servidor.form.numero_solicitacao.id_for_label }}">Número da solicitação</label>
+                  {{ servidor.form.numero_solicitacao }}
+                  <p class="field-help app-form-help">Vai para a coluna de solicitação deste servidor no ofício.</p>
                 </div>
                 <div class="field app-form-field">
-                  <label class="app-form-label" for="{{ form.comprovante_arquivos.id_for_label }}">{{ form.comprovante_arquivos.label }}</label>
-                  {{ form.comprovante_arquivos }}
-                  {% include "prestacoes_contas/partials/documento_anexos.html" with anexos=comprovante_anexos only %}
-                  {% if form.comprovante_arquivos.help_text %}<p class="field-help app-form-help">{{ form.comprovante_arquivos.help_text }}</p>{% endif %}
-                  {% if form.comprovante_arquivos.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.comprovante_arquivos.errors only %}{% endif %}
+                  <label class="app-form-label" for="{{ servidor.form.comprovante_arquivos.id_for_label }}">Comprovante de saque/transferência</label>
+                  {{ servidor.form.comprovante_arquivos }}
+                  {% include "prestacoes_contas/partials/documento_anexos.html" with anexos=servidor.comprovante_anexos only %}
+                  {% if servidor.form.comprovante_arquivos.help_text %}<p class="field-help app-form-help">{{ servidor.form.comprovante_arquivos.help_text }}</p>{% endif %}
                 </div>
               </div>
             </div>
-            <section class="cv-card-footer-section">
-              <div class="cv-card-footer-section__divider" aria-hidden="true"></div>
-              <footer class="cv-card-footer">
-                <div class="cv-card-footer__secondary">
-                  {% include "components/ui/buttons/button.html" with href="/prestacoes-contas/" label="Voltar à lista" variant="secondary" icon="arrow-left" only %}
-                </div>
-                <div class="cv-card-footer__primary">
-                  {% include "components/ui/buttons/button.html" with label="Salvar" variant="secondary" type="submit" name="action" value="save" only %}
-                  {% include "components/ui/buttons/button.html" with label="Salvar e ir para RT" variant="primary" icon="arrow-right" icon_after=True type="submit" name="action" value="save_continue" only %}
-                </div>
-              </footer>
-            </section>
           </section>
         </form>
+        {% endfor %}
+
+        {# ── Navegação ── #}
+        <section class="cv-card-footer-section">
+          <footer class="cv-card-footer">
+            <div class="cv-card-footer__secondary">
+              {% include "components/ui/buttons/button.html" with href="/prestacoes-contas/" label="Voltar à lista" variant="secondary" icon="arrow-left" only %}
+            </div>
+            <div class="cv-card-footer__primary">
+              {% include "components/ui/buttons/button.html" with href=rt_url label="Ir para Relatório Técnico" variant="primary" icon="arrow-right" icon_after=True only %}
+            </div>
+          </footer>
+        </section>
+
       </div>
     </main>
   </div>
 {% endblock %}
 
 {% block extra_js %}
-  <script src="{% static 'js/pages/prestacoes-contas-documentos.js' %}?v=20260629e" defer></script>
+  <script src="{% static 'js/pages/prestacoes-contas-documentos.js' %}?v=20260709" defer></script>
 {% endblock %}
