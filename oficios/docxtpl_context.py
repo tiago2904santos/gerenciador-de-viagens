@@ -450,10 +450,12 @@ def _diarias(oficio: Oficio) -> tuple[str, str]:
 def _solicitacoes_por_servidor(oficio: Oficio) -> dict[int, str]:
     solicitacoes: dict[int, str] = {}
     try:
-        for prestacao in oficio.prestacoes_contas.all():
-            numero = _txt(getattr(prestacao, "numero_solicitacao", ""))
-            if numero:
-                solicitacoes[prestacao.servidor_id] = numero
+        prestacao = getattr(oficio, "prestacao_contas", None)
+        if prestacao is not None:
+            for ps in prestacao.servidores_prestacao.all():
+                numero = _txt(getattr(ps, "numero_solicitacao", ""))
+                if numero:
+                    solicitacoes[ps.servidor_id] = numero
     except Exception:
         pass
     return solicitacoes
