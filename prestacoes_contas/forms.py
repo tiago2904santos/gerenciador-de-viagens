@@ -6,8 +6,11 @@ from django.core.validators import FileExtensionValidator
 from django.forms import modelformset_factory
 from django.forms.renderers import TemplatesSetting
 
+from cadastros.models import Servidor
 from core.normalizers import normalize_spaces
+from core.utils.masks import normalize_protocolo
 
+from .models import DiarioBordo
 from .models import DiarioBordoTrecho
 from .models import ModeloTextoRelatorioTecnico
 from .models import PRESTACAO_DOCUMENTO_EXTENSOES
@@ -88,6 +91,136 @@ DiarioBordoTrechoFormSet = modelformset_factory(
     extra=0,
     can_delete=False,
 )
+
+
+class DiarioMotoristaForm(forms.ModelForm):
+    """Troca o motorista apenas deste diário — o ofício original não é alterado.
+
+    Três modos: manter o do ofício, escolher outro servidor do mesmo ofício ou
+    informar um motorista de outro ofício (nome/CPF + nº do ofício e protocolo).
+    """
+
+    # CPF e protocolo aceitam a entrada mascarada (pontos/traços) — a normalização
+    # para dígitos é feita no clean, então o max_length do modelo não vale para o
+    # texto digitado. Declarados aqui para não herdar o max_length curto do campo.
+    motorista_manual_cpf = forms.CharField(
+        required=False,
+        max_length=14,
+        widget=forms.TextInput(
+            attrs={
+                "class": "cv-field__control",
+                "placeholder": "000.000.000-00",
+                "autocomplete": "off",
+                "inputmode": "numeric",
+                "data-mask": "cpf",
+            },
+        ),
+    )
+    motorista_protocolo_ref = forms.CharField(
+        required=False,
+        max_length=30,
+        widget=forms.TextInput(
+            attrs={
+                "class": "cv-field__control",
+                "placeholder": "00.000.000-0",
+                "autocomplete": "off",
+                "inputmode": "numeric",
+                "data-mask": "protocolo",
+            },
+        ),
+    )
+
+    class Meta:
+        model = DiarioBordo
+        fields = [
+            "motorista_modo",
+            "motorista_servidor",
+            "motorista_manual_nome",
+            "motorista_manual_cpf",
+            "motorista_oficio_referencia",
+            "motorista_protocolo_ref",
+        ]
+        widgets = {
+            "motorista_modo": forms.RadioSelect(),
+            "motorista_manual_nome": forms.TextInput(
+                attrs={
+                    "class": "cv-field__control",
+                    "placeholder": "Nome do motorista",
+                    "autocomplete": "off",
+                },
+            ),
+            "motorista_oficio_referencia": forms.TextInput(
+                attrs={
+                    "class": "cv-field__control",
+                    "placeholder": "15/2026",
+                    "autocomplete": "off",
+                },
+            ),
+        }
+
+    def __init__(self, *args, oficio=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._oficio = oficio
+        if oficio is not None:
+            servidores = oficio.servidores.select_related("cargo", "unidade").order_by("nome")
+        else:
+            servidores = Servidor.objects.none()
+        servidor_field = self.fields["motorista_servidor"]
+        servidor_field.queryset = servidores
+        servidor_field.required = False
+        servidor_field.empty_label = "Selecione um servidor"
+        servidor_field.widget.attrs["class"] = "form-select"
+        self.fields["motorista_modo"].required = False
+
+    def clean_motorista_manual_cpf(self):
+        return re.sub(r"\D", "", self.cleaned_data.get("motorista_manual_cpf") or "")[:11]
+
+    def clean_motorista_protocolo_ref(self):
+        return normalize_protocolo(self.cleaned_data.get("motorista_protocolo_ref") or "")
+
+    def clean_motorista_oficio_referencia(self):
+        return (self.cleaned_data.get("motorista_oficio_referencia") or "").strip()[:16]
+
+    def clean_motorista_manual_nome(self):
+        return normalize_spaces(self.cleaned_data.get("motorista_manual_nome") or "")
+
+    def clean(self):
+        cleaned = super().clean()
+        modo = cleaned.get("motorista_modo") or DiarioBordo.MOTORISTA_MODO_OFICIO
+        cleaned["motorista_modo"] = modo
+
+        if modo == DiarioBordo.MOTORISTA_MODO_SERVIDOR:
+            if not cleaned.get("motorista_servidor"):
+                self.add_error("motorista_servidor", "Selecione um servidor do ofício.")
+        elif modo == DiarioBordo.MOTORISTA_MODO_OUTRO:
+            if not cleaned.get("motorista_manual_nome"):
+                self.add_error("motorista_manual_nome", "Informe o nome do motorista.")
+        return cleaned
+
+    def save(self, commit=True):
+        # A limpeza dos campos não usados é feita aqui (e não via cleaned_data):
+        # campos com default="" omitidos do POST são ignorados por construct_instance.
+        diario = super().save(commit=False)
+        modo = self.cleaned_data.get("motorista_modo") or DiarioBordo.MOTORISTA_MODO_OFICIO
+        diario.motorista_modo = modo
+
+        if modo == DiarioBordo.MOTORISTA_MODO_SERVIDOR:
+            diario.motorista_manual_nome = ""
+            diario.motorista_manual_cpf = ""
+            diario.motorista_oficio_referencia = ""
+            diario.motorista_protocolo_ref = ""
+        elif modo == DiarioBordo.MOTORISTA_MODO_OUTRO:
+            diario.motorista_servidor = None
+        else:  # MOTORISTA_MODO_OFICIO — herda do ofício, sem overrides
+            diario.motorista_servidor = None
+            diario.motorista_manual_nome = ""
+            diario.motorista_manual_cpf = ""
+            diario.motorista_oficio_referencia = ""
+            diario.motorista_protocolo_ref = ""
+
+        if commit:
+            diario.save()
+        return diario
 
 
 # Campos de texto longo que recebem select de modelos + textarea (estilo "motivo" do ofício).

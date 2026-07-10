@@ -6,7 +6,7 @@
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260620-diario">
   <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260620-diario">
-  <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}?v=20260620-diario3">
+  <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}?v=20260710-motorista">
   <link rel="stylesheet" href="{% static 'css/prestacoes-documento-preview.css' %}?v=20260621-preview">
 {% endblock %}
 
@@ -44,6 +44,9 @@
                 <h2 class="cv-wizard-section-title" id="diario-identificacao-title">Resumo do ofício</h2>
                 <p class="cv-wizard-section-subtitle">O cabeçalho do diário (motorista, viatura e protocolo) é montado a partir do ofício.</p>
               </div>
+              <div class="cv-wizard-section-header__actions">
+                {% include "components/ui/buttons/button.html" with href=editar_motorista_url label="Trocar motorista" variant="secondary" icon="sync" only %}
+              </div>
             </header>
             <div class="cv-wizard-section-body">
               <div class="oficio-documentos-grid">
@@ -66,6 +69,22 @@
                         <dt>Período da viagem</dt>
                         <dd>{{ identificacao.periodo }}</dd>
                       </div>
+                      <div class="oficio-documentos-fact diario-motorista-fact">
+                        <dt>Motorista</dt>
+                        <dd>
+                          <span>{{ motorista_resumo.nome }}</span>
+                          {% if motorista_resumo.cpf %}<span class="diario-motorista-fact__cpf">CPF {{ motorista_resumo.cpf }}</span>{% endif %}
+                        </dd>
+                      </div>
+                      <div class="oficio-documentos-fact diario-motorista-fact">
+                        <dt>Origem do motorista</dt>
+                        <dd>
+                          <span>{{ motorista_resumo.origem }}</span>
+                          {% if motorista_resumo.alterado %}
+                            {% include "components/ui/badges/chip.html" with label="Alterado" tone="warning" size="compact" only %}
+                          {% endif %}
+                        </dd>
+                      </div>
                     </dl>
                   </div>
                 </section>
@@ -79,25 +98,25 @@
               <div class="cv-wizard-section-header__copy">
                 <h2 class="cv-wizard-section-title" id="diario-viagem-title">Dados da viagem</h2>
                 <p class="cv-wizard-section-subtitle">
-                  Datas, horários e trechos vêm do roteiro do ofício. Se a viagem ocorreu diferente do previsto, edite o roteiro desta prestação — o ofício original não é alterado.
+                  Os trechos vêm do roteiro do ofício. Se a viagem ocorreu diferente do previsto, edite os trechos desta prestação — o ofício original não é alterado.
                 </p>
               </div>
-              {% if diaria_info.ajustado %}
-                {% include "components/ui/badges/chip.html" with label="Roteiro ajustado" tone="warning" size="compact" only %}
-              {% endif %}
+              <div class="cv-wizard-section-header__actions">
+                {% if diaria_info.ajustado %}
+                  {% include "components/ui/badges/chip.html" with label="Roteiro ajustado" tone="warning" size="compact" only %}
+                {% endif %}
+                {% include "components/ui/buttons/button.html" with href=editar_roteiro_url label="Editar trechos" variant="secondary" icon="route" only %}
+              </div>
             </header>
-            <div class="cv-wizard-section-body">
-              {% if diaria_info.alterada %}
+            {% if diaria_info.alterada %}
+              <div class="cv-wizard-section-body">
                 <div class="diario-diaria-alert" role="alert">
                   <strong>Atenção:</strong> a alteração do roteiro mudou o valor da diária —
                   <span class="diario-diaria-alert__values">{{ diaria_info.valor_oficio_label }} (ofício) → {{ diaria_info.valor_ajustado_label }} (ajustado)</span>.
                   Justifique a diferença em <a href="{{ rt_url }}">Informações complementares</a> do Relatório Técnico.
                 </div>
-              {% endif %}
-              <div class="cv-card-footer__primary">
-                {% include "components/ui/buttons/button.html" with href=editar_roteiro_url label="Editar dados da viagem" variant="secondary" icon="edit" only %}
               </div>
-            </div>
+            {% endif %}
           </section>
 
           {# Um card solto por trecho (estilo retorno final, sem tempos) #}
@@ -200,7 +219,10 @@
           {% endfor %}
         </form>
 
+        {# Assinatura eletrônica temporariamente oculta (fluxo indisponível). #}
+        {% comment %}
         {% include "prestacoes_contas/partials/assinatura_card.html" with assinatura=assinatura next_url=assinatura_next_url csrf_token=csrf_token only %}
+        {% endcomment %}
 
         {% if trechos %}
           {% include "prestacoes_contas/partials/documento_preview.html" with preview_anchor="diario-preview" preview_title="Pré-visualização do diário" preview_subtitle="O PDF é gerado com os dados salvos do diário. Reabra o card após editar para atualizar." preview_doc_title="Diário de Bordo" preview_inline_url=preview_inline_url preview_pdf_url=preview_pdf_url preview_xlsx_url=preview_xlsx_url only %}

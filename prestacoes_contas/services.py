@@ -190,7 +190,7 @@ def build_relatorio_tecnico_context(relatorio: RelatorioTecnico, servidor) -> di
     return {
         "oficio": oficio.numero_formatado,
         "assunto_oficio": _assunto_relatorio_tecnico(oficio),
-        "sede": inst.get("cidade_endereco") or _sede(),
+        "sede": format_document_display(inst.get("cidade_endereco") or _sede()),
         "data_atual_extenso": _data_extenso(data_rt),
         "divisao": divisao_cabecalho,
         "unidade_cabecalho": unidade_cabecalho,

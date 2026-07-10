@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260710-motorista">
+  <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}?v=20260710-motorista">
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'js/pages/diario-motorista.js' %}?v=20260710" defer></script>
+{% endblock %}
+
+{% block content %}
+  <div class="page-shell page-shell--wizard oficio-wizard app-wizard">
+    {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="PRESTAÇÕES" title=page_title icon_label="PC" module_label="Prestações de Contas" back_label="Voltar ao diário" back_url=diario_url status_label="Diário de Bordo" status_variant="draft" only %}
+
+    {% include "components/ui/navigation/page_stepper.html" with steps=wizard_page_steps only %}
+
+    <main class="main-form-panel main-form-panel--stack oficio-wizard__main">
+      <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
+        <form method="post" class="oficio-wizard__form" novalidate data-diario-motorista-form>
+          {% csrf_token %}
+
+          {% if form.non_field_errors %}
+            {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
+          {% endif %}
+
+          <section class="cv-wizard-section-card" aria-labelledby="diario-motorista-title">
+            <header class="cv-wizard-section-header">
+              <div class="cv-wizard-section-header__copy">
+                <h2 class="cv-wizard-section-title" id="diario-motorista-title">Motorista do diário de bordo</h2>
+                <p class="cv-wizard-section-subtitle">
+                  Ofício {{ identificacao.numero }}. A troca vale apenas para este diário — o ofício original não é alterado.
+                </p>
+              </div>
+            </header>
+
+            <div class="cv-wizard-section-body">
+              <fieldset class="diario-motorista-modo">
+                <legend class="cv-field__label">Quem foi o motorista nesta viagem?</legend>
+                {% for radio in form.motorista_modo %}
+                  <label class="diario-motorista-modo__option">
+                    {{ radio.tag }}
+                    <span class="diario-motorista-modo__text">
+                      {{ radio.choice_label }}
+                      {% if radio.data.value == "OFICIO" %}
+                        <small class="diario-motorista-modo__hint">{{ motorista_oficio_nome }}{% if motorista_oficio_cpf %} — CPF {{ motorista_oficio_cpf }}{% endif %}</small>
+                      {% endif %}
+                    </span>
+                  </label>
+                {% endfor %}
+                {% if form.motorista_modo.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.motorista_modo.errors only %}{% endif %}
+              </fieldset>
+
+              {# Outro servidor do mesmo ofício #}
+              <div class="diario-motorista-group" data-motorista-group="SERVIDOR" hidden>
+                <div class="field cv-field">
+                  <label class="cv-field__label" for="{{ form.motorista_servidor.id_for_label }}">Servidor deste ofício</label>
+                  {% include "components/ui/forms/select.html" with field=form.motorista_servidor only %}
+                  {% if form.motorista_servidor.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.motorista_servidor.errors only %}{% endif %}
+                </div>
+              </div>
+
+              {# Motorista de outro ofício #}
+              <div class="diario-motorista-group" data-motorista-group="OUTRO_OFICIO" hidden>
+                <div class="field-grid field-grid--cols-2">
+                  <div class="field cv-field">
+                    <label class="cv-field__label" for="{{ form.motorista_manual_nome.id_for_label }}">Nome do motorista</label>
+                    {{ form.motorista_manual_nome }}
+                    {% if form.motorista_manual_nome.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.motorista_manual_nome.errors only %}{% endif %}
+                  </div>
+                  <div class="field cv-field">
+                    <label class="cv-field__label" for="{{ form.motorista_manual_cpf.id_for_label }}">CPF</label>
+                    {{ form.motorista_manual_cpf }}
+                    {% if form.motorista_manual_cpf.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.motorista_manual_cpf.errors only %}{% endif %}
+                  </div>
+                  <div class="field cv-field">
+                    <label class="cv-field__label" for="{{ form.motorista_oficio_referencia.id_for_label }}">Ofício do motorista</label>
+                    {{ form.motorista_oficio_referencia }}
+                    <p class="cv-field__hint">Formato número/ano (ex.: 15/2026).</p>
+                    {% if form.motorista_oficio_referencia.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.motorista_oficio_referencia.errors only %}{% endif %}
+                  </div>
+                  <div class="field cv-field">
+                    <label class="cv-field__label" for="{{ form.motorista_protocolo_ref.id_for_label }}">Protocolo do motorista</label>
+                    {{ form.motorista_protocolo_ref }}
+                    {% if form.motorista_protocolo_ref.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.motorista_protocolo_ref.errors only %}{% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <section class="cv-card-footer-section">
+              <div class="cv-card-footer-section__divider" aria-hidden="true"></div>
+              <footer class="cv-card-footer">
+                <div class="cv-card-footer__secondary">
+                  {% include "components/ui/buttons/button.html" with href=diario_url label="Cancelar" variant="secondary" icon="arrow-left" only %}
+                </div>
+                <div class="cv-card-footer__primary">
+                  {% include "components/ui/buttons/button.html" with label="Salvar motorista" variant="primary" icon="check" icon_after=True type="submit" only %}
+                </div>
+              </footer>
+            </section>
+          </section>
+        </form>
+      </div>
+    </main>
+  </div>
+{% endblock %}

@@ -13,9 +13,11 @@ from django.conf import settings
 from django.utils import timezone
 
 from cadastros.selectors import build_configuracao_context
+from core.utils.masks import format_cpf
 from core.utils.masks import format_placa
 from core.utils.masks import format_protocolo
 from documentos.services.adapters.xlsx_render import fill_diario_bordo_xlsx
+from documentos.services.formatters import format_document_display
 from documentos.services.exceptions import DocumentValidationError
 from documentos.services.libreoffice_resolve import resolve_libreoffice_binary
 from documentos.services.pdf_engine import build_pdf_unavailable_message
@@ -251,17 +253,53 @@ def _motorista_nome_cpf(oficio: Oficio) -> tuple[str, str]:
     return "", ""
 
 
+def motorista_do_oficio(oficio: Oficio) -> tuple[str, str]:
+    """(nome, cpf) do motorista definido no ofício (referência para a Etapa 3)."""
+    return _motorista_nome_cpf(oficio)
+
+
+def _split_oficio_ref(ref: object) -> tuple[str, str]:
+    """Divide 'número/ano' em (número, ano); sem '/', devolve (ref, '')."""
+    raw = str(ref or "").strip()
+    if "/" in raw:
+        numero, ano = raw.split("/", 1)
+        return numero.strip(), ano.strip()
+    return raw, ""
+
+
+def motorista_diario(diario: DiarioBordo) -> tuple[str, str]:
+    """(nome, cpf) do motorista do diário considerando o override; senão vem do ofício."""
+    modo = diario.motorista_modo
+    if modo == DiarioBordo.MOTORISTA_MODO_SERVIDOR and diario.motorista_servidor_id:
+        servidor = diario.motorista_servidor
+        return servidor.nome, (servidor.cpf_formatado or "")
+    if modo == DiarioBordo.MOTORISTA_MODO_OUTRO:
+        nome = (diario.motorista_manual_nome or "").strip()
+        cpf = (diario.motorista_manual_cpf or "").strip()
+        return nome, (format_cpf(cpf) or cpf)
+    return _motorista_nome_cpf(diario.prestacao.oficio)
+
+
+def _viatura_label(modelo: object, tipo_display: object) -> str:
+    """`Onix (Descaracterizada)` — modelo + tipo entre parênteses, em capitalize."""
+    modelo_fmt = format_document_display(modelo)
+    tipo_fmt = format_document_display(tipo_display)
+    if modelo_fmt and tipo_fmt:
+        return f"{modelo_fmt} ({tipo_fmt})"
+    return modelo_fmt or tipo_fmt
+
+
 def _viatura_dados(oficio: Oficio) -> dict:
     if oficio.viatura_id:
         v = oficio.viatura
         return {
-            "viatura": _upper(v.get_tipo_display()) if (v.tipo or "").strip() else "",
+            "viatura": _viatura_label(v.modelo, v.get_tipo_display() if (v.tipo or "").strip() else ""),
             "combustivel": _upper(v.combustivel) if v.combustivel_id else "",
             "placa": format_placa(v.placa) if v.placa else "",
         }
     tm = (oficio.transporte_tipo_manual or "").strip()
     return {
-        "viatura": _upper(oficio.get_transporte_tipo_manual_display()) if tm else "",
+        "viatura": _viatura_label("", oficio.get_transporte_tipo_manual_display() if tm else ""),
         "combustivel": (
             _upper(oficio.transporte_combustivel_manual)
             if oficio.transporte_combustivel_manual_id
@@ -280,15 +318,25 @@ def _abastecimento_label(valor) -> str:
 def build_diario_bordo_context(diario: DiarioBordo) -> tuple[dict, list[dict]]:
     oficio = diario.prestacao.oficio
     inst = build_configuracao_context()
-    motorista_nome, motorista_cpf = _motorista_nome_cpf(oficio)
+    motorista_nome, motorista_cpf = motorista_diario(diario)
     viatura = _viatura_dados(oficio)
+
+    # Ofício/protocolo do motorista: por padrão são os do próprio ofício; quando o
+    # motorista é de outro ofício, usam a referência informada no override.
+    if diario.motorista_modo == DiarioBordo.MOTORISTA_MODO_OUTRO:
+        numero_motorista, ano_motorista = _split_oficio_ref(diario.motorista_oficio_referencia)
+        protocolo_motorista = format_protocolo(diario.motorista_protocolo_ref) or ""
+    else:
+        numero_motorista = str(oficio.numero or "").strip()
+        ano_motorista = str(oficio.ano or "").strip()
+        protocolo_motorista = format_protocolo(oficio.protocolo) or ""
 
     header = {
         "divisao": _upper(inst.get("divisao")),
         "unidade_cabecalho": _upper(inst.get("unidade")),
-        "oficio_motorista": str(oficio.numero or "").strip(),
-        "ano": str(oficio.ano or "").strip(),
-        "protocolo_motorista": format_protocolo(oficio.protocolo) or "",
+        "oficio_motorista": numero_motorista,
+        "ano": ano_motorista,
+        "protocolo_motorista": protocolo_motorista,
         "viatura": viatura["viatura"],
         "combustivel": viatura["combustivel"],
         "placa": viatura["placa"],

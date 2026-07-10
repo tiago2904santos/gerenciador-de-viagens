@@ -19,6 +19,7 @@ urlpatterns = [
     path("rt/servidor/<int:ps_pk>/download/<str:formato>/", views.rt_download_servidor, name="rt_download_servidor_formato"),
     path("prestacao/<int:pc_pk>/diario/", views.diario_criar, name="diario_criar"),
     path("prestacao/<int:pc_pk>/diario/editar-roteiro/", views.diario_editar_roteiro, name="diario_editar_roteiro"),
+    path("prestacao/<int:pc_pk>/diario/motorista/", views.diario_motorista, name="diario_motorista"),
     path("diario/<int:pk>/autosave/", views.diario_autosave, name="diario_autosave"),
     path("diario/<int:pk>/download/", views.diario_download, name="diario_download"),
     path("diario/<int:pk>/download/<str:formato>/", views.diario_download, name="diario_download_formato"),

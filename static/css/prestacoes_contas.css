@@ -61,6 +61,27 @@
   white-space: nowrap;
 }
 
+/* Motorista/origem do diário: mais largos e com quebra, para caber nome + CPF + chip. */
+.rt-summary-card .oficio-documentos-fact.diario-motorista-fact {
+  grid-column: span 2;
+}
+
+.rt-summary-card .oficio-documentos-fact.diario-motorista-fact dd {
+  align-items: center;
+  column-gap: var(--space-2);
+  display: flex;
+  flex-wrap: wrap;
+  overflow: visible;
+  row-gap: var(--space-1);
+  text-overflow: clip;
+  white-space: normal;
+}
+
+.diario-motorista-fact__cpf {
+  color: var(--color-muted);
+  font-weight: 600;
+}
+
 .rt-summary-card .rt-summary-card__traveller-card {
   background: transparent;
   border: 0;
@@ -582,8 +603,7 @@
 .assinatura-card__actions form { margin: 0; }
 .assinatura-card__expira { margin: 0; font-size: 0.82rem; color: var(--color-text-muted, #52657a); }
 
-/* Lista de downloads do RT por servidor (etapa RT) */
-.prestacao-servidor-downloads { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
-.prestacao-servidor-downloads__item { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap; padding: 0.6rem 0.75rem; border: 1px solid var(--color-border-soft, #e2e8f0); border-radius: var(--radius-control, 8px); background: var(--color-card-muted, #f8fafd); }
-.prestacao-servidor-downloads__name { font-weight: 600; }
-.prestacao-servidor-downloads__actions { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+/* PDF Final: prontidão dos itens compartilhados + rótulo do card por servidor */
+.prestacao-final-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.85rem; }
+.prestacao-final-servidor__name { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; font-weight: 600; }
+.prestacao-final-servidor__meta { display: block; margin-top: 0.2rem; font-weight: 400; font-size: 0.8125rem; color: var(--color-text-muted, #52657a); }

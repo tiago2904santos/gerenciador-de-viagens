@@ -35,11 +35,14 @@ from .models import AssinaturaDocumento
 from .diario_services import diaria_info
 from .diario_services import garantir_roteiro_ajustado
 from .diario_services import gerar_diario_bordo_xlsx
+from .diario_services import motorista_diario
+from .diario_services import motorista_do_oficio
 from .diario_services import nome_arquivo_diario
 from .diario_services import sincronizar_trechos
 from .forms import CAMPOS_COM_MODELO
 from .forms import CAMPOS_CUSTEIO_COM_OUTRO
 from .forms import DiarioBordoTrechoFormSet
+from .forms import DiarioMotoristaForm
 from .forms import ModeloTextoRelatorioTecnicoForm
 from .forms import OUTRO_VALUE
 from .forms import PrestacaoDespachoForm
@@ -932,6 +935,8 @@ def diario_criar(request, pc_pk):
             "assinatura": _assinatura_db_card(request, prestacao),
             "assinatura_next_url": reverse("prestacoes_contas:diario_criar", args=[prestacao.pk]),
             "editar_roteiro_url": reverse("prestacoes_contas:diario_editar_roteiro", args=[prestacao.pk]),
+            "editar_motorista_url": reverse("prestacoes_contas:diario_motorista", args=[prestacao.pk]),
+            "motorista_resumo": _motorista_resumo(diario),
             "rt_url": reverse("prestacoes_contas:rt_criar", args=[prestacao.pk]),
             "autosave_url": reverse("prestacoes_contas:diario_autosave", args=[diario.pk]),
             "preview_inline_url": reverse("prestacoes_contas:diario_download_formato", args=[diario.pk, "pdf"]) + "?inline=1",
@@ -976,6 +981,64 @@ def diario_editar_roteiro(request, pc_pk):
         return redirect(diario_url)
     editar_url = reverse("roteiros:editar", args=[copia.pk])
     return redirect(f"{editar_url}?{urlencode({'next': diario_url})}")
+
+
+_MOTORISTA_ORIGEM_LABEL = {
+    DiarioBordo.MOTORISTA_MODO_OFICIO: "Motorista do ofício",
+    DiarioBordo.MOTORISTA_MODO_SERVIDOR: "Outro servidor deste ofício",
+    DiarioBordo.MOTORISTA_MODO_OUTRO: "Motorista de outro ofício",
+}
+
+
+def _motorista_resumo(diario) -> dict:
+    """Motorista efetivo do diário (considerando a troca) para exibir na Etapa 3."""
+    nome, cpf = motorista_diario(diario)
+    return {
+        "nome": nome or "—",
+        "cpf": cpf or "",
+        "origem": _MOTORISTA_ORIGEM_LABEL.get(diario.motorista_modo, "Motorista do ofício"),
+        "alterado": diario.motorista_alterado,
+    }
+
+
+def diario_motorista(request, pc_pk):
+    """Etapa 3 — troca o motorista apenas deste diário, sem alterar o ofício."""
+    prestacao = get_object_or_404(
+        PrestacaoContas.objects.select_related("oficio").prefetch_related(
+            "oficio__servidores__cargo",
+            "oficio__servidores__unidade",
+        ),
+        pk=pc_pk,
+    )
+    diario, _ = DiarioBordo.objects.get_or_create(prestacao=prestacao)
+    diario_url = reverse("prestacoes_contas:diario_criar", args=[prestacao.pk])
+
+    if request.method == "POST":
+        form = DiarioMotoristaForm(request.POST, instance=diario, oficio=prestacao.oficio)
+        if form.is_valid():
+            form.save()
+            _marcar_prestacao_em_preenchimento(prestacao)
+            messages.success(request, "Motorista do diário de bordo atualizado.")
+            return redirect(diario_url)
+    else:
+        form = DiarioMotoristaForm(instance=diario, oficio=prestacao.oficio)
+
+    oficio_nome, oficio_cpf = motorista_do_oficio(prestacao.oficio)
+    return render(
+        request,
+        "prestacoes_contas/diario_motorista_form.html",
+        {
+            "page_title": "Trocar motorista do diário",
+            "prestacao": prestacao,
+            "diario": diario,
+            "form": form,
+            "identificacao": _build_identificacao(prestacao),
+            "wizard_page_steps": _build_prestacao_steps(prestacao, "diario"),
+            "motorista_oficio_nome": oficio_nome or "—",
+            "motorista_oficio_cpf": oficio_cpf,
+            "diario_url": diario_url,
+        },
+    )
 
 
 def diario_download(request, pk, formato="xlsx"):

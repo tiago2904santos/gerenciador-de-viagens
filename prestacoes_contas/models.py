@@ -224,10 +224,50 @@ class DiarioBordo(models.Model):
     necessidade de abastecimento de cada trecho (ver ``DiarioBordoTrecho``).
     """
 
+    # Motorista do diário. Por padrão vem do ofício (modo OFICIO); pode ser
+    # trocado só para esta prestação (outro servidor do mesmo ofício ou um
+    # motorista de outro ofício) sem alterar o ofício original.
+    MOTORISTA_MODO_OFICIO = "OFICIO"
+    MOTORISTA_MODO_SERVIDOR = "SERVIDOR"
+    MOTORISTA_MODO_OUTRO = "OUTRO_OFICIO"
+    MOTORISTA_MODO_CHOICES = [
+        (MOTORISTA_MODO_OFICIO, "Manter motorista do ofício"),
+        (MOTORISTA_MODO_SERVIDOR, "Outro servidor deste ofício"),
+        (MOTORISTA_MODO_OUTRO, "Motorista de outro ofício"),
+    ]
+
     prestacao = models.OneToOneField(
         PrestacaoContas,
         on_delete=models.CASCADE,
         related_name="diario_bordo",
+    )
+    motorista_modo = models.CharField(
+        max_length=16,
+        choices=MOTORISTA_MODO_CHOICES,
+        default=MOTORISTA_MODO_OFICIO,
+    )
+    motorista_servidor = models.ForeignKey(
+        Servidor,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+        verbose_name="Motorista (servidor do ofício)",
+    )
+    motorista_manual_nome = models.CharField(max_length=255, blank=True, default="")
+    motorista_manual_cpf = models.CharField(max_length=11, blank=True, default="")
+    motorista_oficio_referencia = models.CharField(
+        max_length=16,
+        blank=True,
+        default="",
+        verbose_name="Ofício do motorista",
+        help_text="Referência no formato número/ano (ex.: 15/2026).",
+    )
+    motorista_protocolo_ref = models.CharField(
+        max_length=30,
+        blank=True,
+        default="",
+        verbose_name="Protocolo do motorista",
     )
     criado_em = models.DateTimeField(auto_now_add=True)
     atualizado_em = models.DateTimeField(auto_now=True)
@@ -238,6 +278,11 @@ class DiarioBordo(models.Model):
 
     def __str__(self):
         return f"Diário de bordo — {self.prestacao}"
+
+    @property
+    def motorista_alterado(self) -> bool:
+        """True quando o motorista foi trocado em relação ao do ofício."""
+        return self.motorista_modo != self.MOTORISTA_MODO_OFICIO
 
 
 class DiarioBordoTrecho(models.Model):

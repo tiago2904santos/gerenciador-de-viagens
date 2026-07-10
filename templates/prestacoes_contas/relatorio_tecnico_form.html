@@ -160,22 +160,35 @@
         <section class="cv-wizard-section-card" aria-labelledby="rt-downloads-title">
           <header class="cv-wizard-section-header">
             <div class="cv-wizard-section-header__copy">
-              <h2 class="cv-wizard-section-title" id="rt-downloads-title">Baixar Relatório Técnico por servidor</h2>
-              <p class="cv-wizard-section-subtitle">O texto acima é salvo automaticamente; cada arquivo sai com o nome e CPF do servidor. A assinatura é feita na etapa <strong>PDF Final</strong>.</p>
+              <h2 class="cv-wizard-section-title" id="rt-downloads-title">Relatório Técnico por servidor</h2>
+              <p class="cv-wizard-section-subtitle">O texto acima é salvo automaticamente. Abra cada card para pré-visualizar o relatório já preenchido; cada arquivo sai com o nome e CPF do servidor.</p>
             </div>
           </header>
-          <div class="cv-wizard-section-body">
-            <ul class="prestacao-servidor-downloads">
-              {% for s in servidores %}
-              <li class="prestacao-servidor-downloads__item">
-                <span class="prestacao-servidor-downloads__name">{{ s.nome }}{% if s.is_motorista %} <span class="oficio-lc__traveller-badge">Motorista</span>{% endif %}</span>
-                <span class="prestacao-servidor-downloads__actions">
-                  {% include "components/ui/buttons/button.html" with href=s.download_pdf_url label="PDF" variant="primary" size="sm" icon="download" only %}
-                  {% include "components/ui/buttons/button.html" with href=s.download_docx_url label="DOCX" variant="secondary" size="sm" icon="download" only %}
-                </span>
-              </li>
-              {% endfor %}
-            </ul>
+          <div class="cv-wizard-section-body document-inline-stack">
+            {% for s in servidores %}
+              <details class="document-inline-card document-inline-card--lazy" data-lazy-inline>
+                <summary class="document-inline-card__header">
+                  <span class="document-inline-card__title">{{ s.nome }}{% if s.is_motorista %} <span class="oficio-lc__traveller-badge">Motorista</span>{% endif %}</span>
+                  <span class="document-inline-card__header-end">
+                    <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do documento">
+                      {% include "components/ui/buttons/icon_button.html" with href=s.preview_inline_url action="preview" aria_label="Abrir em nova aba" tooltip="Abrir em nova aba" only %}
+                      {% include "components/ui/buttons/icon_button.html" with href=s.download_pdf_url action="pdf" aria_label="Baixar PDF" tooltip="Baixar PDF" only %}
+                      {% include "components/ui/buttons/icon_button.html" with href=s.download_docx_url action="docx" aria_label="Baixar DOCX" tooltip="Baixar DOCX" only %}
+                    </span>
+                  </span>
+                </summary>
+                <div class="document-inline-card__body">
+                  <div class="document-inline-viewer">
+                    <iframe
+                      class="document-inline-viewer__frame"
+                      data-src="{{ s.preview_inline_url }}"
+                      title="Relatório técnico — {{ s.nome }}"
+                      loading="lazy"
+                    ></iframe>
+                  </div>
+                </div>
+              </details>
+            {% endfor %}
           </div>
         </section>
       </div>
