@@ -357,9 +357,16 @@ class PrestacaoDespachoForm(forms.ModelForm):
 
 
 class PrestacaoServidorDocumentosForm(forms.ModelForm):
-    """Dados individuais do servidor: número da solicitação + comprovante de saque."""
+    """Dados individuais do servidor: número da solicitação + arquivos assinados.
+
+    Cada servidor anexa o comprovante de saque/transferência e o relatório técnico
+    assinado; quando o servidor é o motorista do ofício, anexa também o diário de
+    bordo assinado.
+    """
 
     comprovante_arquivos = _anexo_multiple_file_field("Comprovante de saque/transferência")
+    rt_assinado_arquivos = _anexo_multiple_file_field("Relatório técnico assinado")
+    diario_assinado_arquivos = _anexo_multiple_file_field("Diário de bordo assinado")
 
     class Meta:
         model = PrestacaoServidor
@@ -381,14 +388,27 @@ class PrestacaoServidorDocumentosForm(forms.ModelForm):
             self.save_anexos(servidor_prestacao)
         return servidor_prestacao
 
-    def save_anexos(self, servidor_prestacao):
-        for arquivo in self.cleaned_data.get("comprovante_arquivos") or []:
+    def _criar_anexos(self, servidor_prestacao, campo, tipo):
+        for arquivo in self.cleaned_data.get(campo) or []:
             PrestacaoDocumentoAnexo.objects.create(
                 prestacao=servidor_prestacao.prestacao,
                 servidor_prestacao=servidor_prestacao,
-                tipo=PrestacaoDocumentoAnexo.TIPO_COMPROVANTE,
+                tipo=tipo,
                 arquivo=arquivo,
                 nome_original=Path(getattr(arquivo, "name", "") or "").name,
+            )
+
+    def save_anexos(self, servidor_prestacao):
+        self._criar_anexos(
+            servidor_prestacao, "comprovante_arquivos", PrestacaoDocumentoAnexo.TIPO_COMPROVANTE
+        )
+        self._criar_anexos(
+            servidor_prestacao, "rt_assinado_arquivos", PrestacaoDocumentoAnexo.TIPO_RT_ASSINADO
+        )
+        # O diário de bordo assinado só existe para o motorista do ofício.
+        if servidor_prestacao.is_motorista:
+            self._criar_anexos(
+                servidor_prestacao, "diario_assinado_arquivos", PrestacaoDocumentoAnexo.TIPO_DB_ASSINADO
             )
 
 

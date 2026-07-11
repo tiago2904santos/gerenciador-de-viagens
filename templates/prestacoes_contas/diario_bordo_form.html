@@ -195,7 +195,8 @@
                       </div>
                       <div class="cv-card-footer__primary">
                         {% include "components/ui/buttons/button.html" with label="Gerar XLSX" variant="secondary" icon="download" icon_after=True type="submit" name="action" value="download_xlsx" only %}
-                        {% include "components/ui/buttons/button.html" with label="Gerar PDF" variant="primary" icon="download" icon_after=True type="submit" name="action" value="download_pdf" only %}
+                        {% include "components/ui/buttons/button.html" with label="Gerar PDF" variant="secondary" icon="download" icon_after=True type="submit" name="action" value="download_pdf" only %}
+                        {% include "components/ui/buttons/button.html" with href=documentos_url label="Ir para Documentos" variant="primary" icon="arrow-right" icon_after=True only %}
                       </div>
                     </footer>
                   </section>
@@ -212,6 +213,9 @@
                 <footer class="cv-card-footer">
                   <div class="cv-card-footer__secondary">
                     {% include "components/ui/buttons/button.html" with href=rt_url label="Voltar ao Relatório Técnico" variant="secondary" icon="arrow-left" only %}
+                  </div>
+                  <div class="cv-card-footer__primary">
+                    {% include "components/ui/buttons/button.html" with href=documentos_url label="Ir para Documentos" variant="primary" icon="arrow-right" icon_after=True only %}
                   </div>
                 </footer>
               </section>

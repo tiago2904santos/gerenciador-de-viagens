@@ -98,6 +98,20 @@
                   {% include "prestacoes_contas/partials/documento_anexos.html" with anexos=servidor.comprovante_anexos only %}
                   {% if servidor.form.comprovante_arquivos.help_text %}<p class="field-help app-form-help">{{ servidor.form.comprovante_arquivos.help_text }}</p>{% endif %}
                 </div>
+                <div class="field app-form-field">
+                  <label class="app-form-label" for="{{ servidor.form.rt_assinado_arquivos.id_for_label }}">Relatório técnico assinado</label>
+                  {{ servidor.form.rt_assinado_arquivos }}
+                  {% include "prestacoes_contas/partials/documento_anexos.html" with anexos=servidor.rt_assinado_anexos only %}
+                  {% if servidor.form.rt_assinado_arquivos.help_text %}<p class="field-help app-form-help">{{ servidor.form.rt_assinado_arquivos.help_text }}</p>{% endif %}
+                </div>
+                {% if servidor.identificacao.is_motorista %}
+                <div class="field app-form-field">
+                  <label class="app-form-label" for="{{ servidor.form.diario_assinado_arquivos.id_for_label }}">Diário de bordo assinado</label>
+                  {{ servidor.form.diario_assinado_arquivos }}
+                  {% include "prestacoes_contas/partials/documento_anexos.html" with anexos=servidor.diario_assinado_anexos only %}
+                  {% if servidor.form.diario_assinado_arquivos.help_text %}<p class="field-help app-form-help">{{ servidor.form.diario_assinado_arquivos.help_text }}</p>{% endif %}
+                </div>
+                {% endif %}
               </div>
             </div>
           </section>
@@ -108,10 +122,10 @@
         <section class="cv-card-footer-section">
           <footer class="cv-card-footer">
             <div class="cv-card-footer__secondary">
-              {% include "components/ui/buttons/button.html" with href="/prestacoes-contas/" label="Voltar à lista" variant="secondary" icon="arrow-left" only %}
+              {% include "components/ui/buttons/button.html" with href=diario_url label="Voltar ao Diário de Bordo" variant="secondary" icon="arrow-left" only %}
             </div>
             <div class="cv-card-footer__primary">
-              {% include "components/ui/buttons/button.html" with href=rt_url label="Ir para Relatório Técnico" variant="primary" icon="arrow-right" icon_after=True only %}
+              {% include "components/ui/buttons/button.html" with href=consolidado_url label="Ir para PDF Final" variant="primary" icon="arrow-right" icon_after=True only %}
             </div>
           </footer>
         </section>

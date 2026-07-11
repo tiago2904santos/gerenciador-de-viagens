@@ -294,6 +294,19 @@ def _pdf_parts_from_anexos(anexos_qs, label: str, legacy_field=None) -> list[tup
     return parts
 
 
+def _pdf_parts_from_anexos_opcional(anexos_qs, label: str) -> list[tuple[str, bytes]]:
+    """Como ``_pdf_parts_from_anexos``, mas retorna ``[]`` quando não há anexos."""
+    parts = []
+    seen = set()
+    for index, anexo in enumerate(anexos_qs.order_by("criado_em", "pk"), start=1):
+        name = str(getattr(anexo.arquivo, "name", "") or "")
+        if not name or name in seen:
+            continue
+        seen.add(name)
+        parts.append((f"{label} {index}", _pdf_bytes_from_file_field(anexo.arquivo, label)))
+    return parts
+
+
 def _image_bytes_to_pdf(content: bytes) -> bytes:
     from PIL import Image
     from PIL import ImageSequence
@@ -380,7 +393,11 @@ def gerar_oficio_prestacao_pdf(prestacao) -> bytes:
 
 def gerar_prestacao_consolidado_pdf(servidor_prestacao) -> bytes:
     """Pacote final de um servidor: ofício + despacho (compartilhados) + RT do
-    servidor + diário (compartilhado) + comprovante do servidor."""
+    servidor + diário (compartilhado) + comprovante do servidor.
+
+    Quando os documentos assinados foram anexados na Etapa 3 (RT assinado do
+    servidor e diário de bordo assinado do motorista), eles têm prioridade sobre
+    a versão gerada/assinada eletronicamente pelo sistema."""
     prestacao = servidor_prestacao.prestacao
 
     if not str(servidor_prestacao.numero_solicitacao or "").strip():
@@ -402,12 +419,26 @@ def gerar_prestacao_consolidado_pdf(servidor_prestacao) -> bytes:
     from .assinatura_services import pdf_db_assinado_ou_gerado
     from .assinatura_services import pdf_rt_assinado_ou_gerado
 
+    # RT assinado anexado pelo servidor tem prioridade sobre a versão gerada.
+    rt_upload_parts = _pdf_parts_from_anexos_opcional(
+        servidor_prestacao.documentos_anexos.filter(tipo=PrestacaoDocumentoAnexo.TIPO_RT_ASSINADO),
+        "relatório técnico assinado",
+    )
+    rt_parts = rt_upload_parts or [("relatório técnico", pdf_rt_assinado_ou_gerado(servidor_prestacao))]
+
+    # Diário de bordo assinado é anexado no card do motorista (nível ofício).
+    db_upload_parts = _pdf_parts_from_anexos_opcional(
+        prestacao.documentos_anexos.filter(tipo=PrestacaoDocumentoAnexo.TIPO_DB_ASSINADO),
+        "diário de bordo assinado",
+    )
+    db_parts = db_upload_parts or [("diário de bordo", pdf_db_assinado_ou_gerado(prestacao))]
+
     return _merge_pdf_parts(
         [
             ("ofício", gerar_oficio_prestacao_pdf(prestacao)),
             *despacho_parts,
-            ("relatório técnico", pdf_rt_assinado_ou_gerado(servidor_prestacao)),
-            ("diário de bordo", pdf_db_assinado_ou_gerado(prestacao)),
+            *rt_parts,
+            *db_parts,
             *comprovante_parts,
         ]
     )
