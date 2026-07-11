@@ -210,9 +210,9 @@ def _build_prestacao_steps(prestacao, atual: str) -> list:
     diario_url = reverse("prestacoes_contas:diario_criar", args=[prestacao.pk])
     consolidado_url = reverse("prestacoes_contas:consolidado", args=[prestacao.pk])
     etapas = [
-        ("documentos", "Etapa 1", "Documentos", documentos_url),
-        ("rt", "Etapa 2", "Relatório Técnico", rt_url),
-        ("diario", "Etapa 3", "Diário de Bordo", diario_url),
+        ("rt", "Etapa 1", "Relatório Técnico", rt_url),
+        ("diario", "Etapa 2", "Diário de Bordo", diario_url),
+        ("documentos", "Etapa 3", "Documentos", documentos_url),
         ("consolidado", "Etapa 4", "PDF Final", consolidado_url),
     ]
     steps = []
@@ -489,11 +489,13 @@ def _prestacao_full(pc_pk):
 
 
 def documentos(request, pc_pk):
-    """Etapa 1: despacho (compartilhado) + solicitação/comprovante por servidor.
+    """Etapa 3: despacho (compartilhado) + arquivos assinados por servidor.
 
-    Cada seção autosalva de forma independente (número via autosave.js, arquivos
-    via prestacoes-contas-documentos.js), por isso a página é apenas de leitura/
-    edição contínua — a navegação para o RT é um link.
+    Cada servidor anexa o comprovante de saque/transferência e o relatório técnico
+    assinado; o motorista anexa também o diário de bordo assinado. Cada seção
+    autosalva de forma independente (número via autosave.js, arquivos via
+    prestacoes-contas-documentos.js), por isso a página é apenas de leitura/edição
+    contínua — a navegação entre etapas é por links.
     """
     prestacao = _prestacao_full(pc_pk)
     servidores = list(prestacao.servidores_prestacao.all())
@@ -504,12 +506,16 @@ def documentos(request, pc_pk):
     for ps in servidores:
         form = PrestacaoServidorDocumentosForm(instance=ps, prefix=f"ps-{ps.pk}")
         comprovantes = ps.documentos_anexos.filter(tipo=PrestacaoDocumentoAnexo.TIPO_COMPROVANTE)
+        rt_assinados = ps.documentos_anexos.filter(tipo=PrestacaoDocumentoAnexo.TIPO_RT_ASSINADO)
+        diario_assinados = ps.documentos_anexos.filter(tipo=PrestacaoDocumentoAnexo.TIPO_DB_ASSINADO)
         servidores_ctx.append(
             {
                 "ps": ps,
                 "identificacao": _servidor_identificacao(ps),
                 "form": form,
                 "comprovante_anexos": _anexos_rows(prestacao, comprovantes),
+                "rt_assinado_anexos": _anexos_rows(prestacao, rt_assinados),
+                "diario_assinado_anexos": _anexos_rows(prestacao, diario_assinados),
                 "arquivo_autosave_url": reverse(
                     "prestacoes_contas:prestacao_servidor_arquivo_autosave", args=[ps.pk]
                 ),
@@ -531,7 +537,8 @@ def documentos(request, pc_pk):
             "servidores": servidores_ctx,
             "identificacao": _build_identificacao(prestacao),
             "wizard_page_steps": _build_prestacao_steps(prestacao, "documentos"),
-            "rt_url": reverse("prestacoes_contas:rt_criar", args=[prestacao.pk]),
+            "diario_url": reverse("prestacoes_contas:diario_criar", args=[prestacao.pk]),
+            "consolidado_url": reverse("prestacoes_contas:consolidado", args=[prestacao.pk]),
             "despacho_autosave_url": reverse(
                 "prestacoes_contas:prestacao_arquivo_autosave", args=[prestacao.pk]
             ),
@@ -882,7 +889,7 @@ def rt_download_servidor(request, ps_pk, formato="docx"):
 
 
 def diario_criar(request, pc_pk):
-    """Etapa 3 do wizard: diário de bordo do veículo a partir do roteiro do ofício."""
+    """Etapa 2 do wizard: diário de bordo do veículo a partir do roteiro do ofício."""
     prestacao = get_object_or_404(
         PrestacaoContas.objects.select_related(
             "oficio__roteiro",
@@ -938,6 +945,7 @@ def diario_criar(request, pc_pk):
             "editar_motorista_url": reverse("prestacoes_contas:diario_motorista", args=[prestacao.pk]),
             "motorista_resumo": _motorista_resumo(diario),
             "rt_url": reverse("prestacoes_contas:rt_criar", args=[prestacao.pk]),
+            "documentos_url": reverse("prestacoes_contas:documentos", args=[prestacao.pk]),
             "autosave_url": reverse("prestacoes_contas:diario_autosave", args=[diario.pk]),
             "preview_inline_url": reverse("prestacoes_contas:diario_download_formato", args=[diario.pk, "pdf"]) + "?inline=1",
             "preview_pdf_url": reverse("prestacoes_contas:diario_download_formato", args=[diario.pk, "pdf"]),
@@ -1002,7 +1010,7 @@ def _motorista_resumo(diario) -> dict:
 
 
 def diario_motorista(request, pc_pk):
-    """Etapa 3 — troca o motorista apenas deste diário, sem alterar o ofício."""
+    """Etapa 2 — troca o motorista apenas deste diário, sem alterar o ofício."""
     prestacao = get_object_or_404(
         PrestacaoContas.objects.select_related("oficio").prefetch_related(
             "oficio__servidores__cargo",
@@ -1113,6 +1121,12 @@ def consolidado(request, pc_pk):
         comprovante_resumo = _anexos_resumo(
             ps.documentos_anexos.filter(tipo=PrestacaoDocumentoAnexo.TIPO_COMPROVANTE)
         )
+        rt_assinado_resumo = _anexos_resumo(
+            ps.documentos_anexos.filter(tipo=PrestacaoDocumentoAnexo.TIPO_RT_ASSINADO)
+        )
+        diario_assinado_resumo = _anexos_resumo(
+            ps.documentos_anexos.filter(tipo=PrestacaoDocumentoAnexo.TIPO_DB_ASSINADO)
+        )
         servidores_ctx.append(
             {
                 "ps_pk": ps.pk,
@@ -1121,6 +1135,8 @@ def consolidado(request, pc_pk):
                 "numero_solicitacao": ps.numero_solicitacao,
                 "numero_ok": bool((ps.numero_solicitacao or "").strip()),
                 "comprovante_resumo": comprovante_resumo,
+                "rt_assinado_resumo": rt_assinado_resumo,
+                "diario_assinado_resumo": diario_assinado_resumo,
                 "assinatura_rt": _assinatura_rt_card(request, ps),
                 "download_url": reverse("prestacoes_contas:consolidado_download", args=[ps.pk]),
                 "preview_inline_url": reverse("prestacoes_contas:consolidado_download", args=[ps.pk]) + "?inline=1",
@@ -1139,7 +1155,7 @@ def consolidado(request, pc_pk):
             "servidores": servidores_ctx,
             "assinatura_db": _assinatura_db_card(request, prestacao),
             "assinatura_next_url": reverse("prestacoes_contas:consolidado", args=[prestacao.pk]),
-            "diario_url": reverse("prestacoes_contas:diario_criar", args=[prestacao.pk]),
+            "documentos_url": reverse("prestacoes_contas:documentos", args=[prestacao.pk]),
         },
     )
 

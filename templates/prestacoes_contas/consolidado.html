@@ -100,7 +100,7 @@
                 <summary class="document-inline-card__header">
                   <span class="document-inline-card__title">
                     <span class="prestacao-final-servidor__name">{{ s.nome }}{% if s.is_motorista %} {% include "components/ui/badges/chip.html" with label="Motorista" tone="warning" size="compact" only %}{% endif %}</span>
-                    <span class="prestacao-final-servidor__meta">Nº solicitação {{ s.numero_solicitacao|default:"—" }} · Comprovante: {{ s.comprovante_resumo.value }}</span>
+                    <span class="prestacao-final-servidor__meta">Nº solicitação {{ s.numero_solicitacao|default:"—" }} · Comprovante: {{ s.comprovante_resumo.value }} · RT assinado: {{ s.rt_assinado_resumo.value }}{% if s.is_motorista %} · Diário assinado: {{ s.diario_assinado_resumo.value }}{% endif %}
                   </span>
                   <span class="document-inline-card__header-end">
                     <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do pacote">
@@ -127,7 +127,7 @@
         <section class="cv-card-footer-section">
           <footer class="cv-card-footer">
             <div class="cv-card-footer__secondary">
-              {% include "components/ui/buttons/button.html" with href=diario_url label="Voltar ao Diário de Bordo" variant="secondary" icon="arrow-left" only %}
+              {% include "components/ui/buttons/button.html" with href=documentos_url label="Voltar aos Documentos" variant="secondary" icon="arrow-left" only %}
             </div>
           </footer>
         </section>

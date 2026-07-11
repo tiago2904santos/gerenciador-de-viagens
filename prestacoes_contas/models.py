@@ -153,10 +153,14 @@ class PrestacaoServidor(models.Model):
 class PrestacaoDocumentoAnexo(models.Model):
     TIPO_DESPACHO = "despacho"
     TIPO_COMPROVANTE = "comprovante"
+    TIPO_RT_ASSINADO = "rt_assinado"
+    TIPO_DB_ASSINADO = "db_assinado"
 
     TIPO_CHOICES = [
         (TIPO_DESPACHO, "Despacho assinado do ofício"),
         (TIPO_COMPROVANTE, "Comprovante de saque/transferência"),
+        (TIPO_RT_ASSINADO, "Relatório técnico assinado"),
+        (TIPO_DB_ASSINADO, "Diário de bordo assinado"),
     ]
 
     prestacao = models.ForeignKey(
@@ -164,8 +168,9 @@ class PrestacaoDocumentoAnexo(models.Model):
         on_delete=models.CASCADE,
         related_name="documentos_anexos",
     )
-    # Comprovante é individual → aponta para o servidor; despacho é compartilhado
-    # → fica nulo (referencia apenas a prestação do ofício).
+    # Comprovante, RT assinado (individual) e diário assinado (do motorista)
+    # apontam para o servidor; despacho é compartilhado → fica nulo (referencia
+    # apenas a prestação do ofício).
     servidor_prestacao = models.ForeignKey(
         PrestacaoServidor,
         on_delete=models.CASCADE,
