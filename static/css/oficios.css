@@ -3894,11 +3894,11 @@ html[data-theme="light"] .oficio-lc__trecho--atividade .oficio-lc__trecho-rota {
   align-items: center;
   flex: 0 0 200px;
   margin: 0;
-  max-width: 200px;
+  max-width: 101px;
 }
 
 .oficio-lc__solicitacao-input {
-  width: 55%;
+  width: 100%;
   min-width: 0;
 }
 
