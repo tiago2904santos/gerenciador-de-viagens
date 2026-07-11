@@ -109,9 +109,8 @@
   margin: 0;
 }
 
-.rt-summary-card .rt-summary-card__traveller-card .oficio-documentos-traveller-line {
-  flex-basis: 100%;
-}
+/* Servidores do RT: colunas dinâmicas por quantidade (até 3 por linha), como
+   nos Viajantes do ofício — o modificador --nX no container define o flex-basis. */
 
 .rt-summary-card__cost-grid {
   display: grid;
@@ -548,17 +547,23 @@
 
 /* Aviso de alteração no valor da diária (diário e RT) */
 .diario-diaria-alert {
-  background: color-mix(in srgb, var(--color-warning, #d9a40f) 12%, transparent);
-  border: 1px solid color-mix(in srgb, var(--color-warning, #d9a40f) 45%, transparent);
-  border-radius: var(--radius-control, 8px);
-  color: var(--color-text);
+  background: color-mix(in srgb, var(--color-warning, #d9a40f) 7%, transparent);
+  border: 0;
+  border-left: 3px solid var(--color-warning, #d9a40f);
+  border-radius: var(--radius-sm, 6px);
+  color: var(--color-text-muted, #52657a);
   font-size: var(--font-size-sm);
   line-height: 1.5;
   margin-bottom: var(--space-4);
   padding: var(--space-3) var(--space-4);
 }
 
+.diario-diaria-alert strong {
+  color: var(--color-text);
+}
+
 .diario-diaria-alert__values {
+  color: var(--color-text);
   font-weight: 700;
   white-space: nowrap;
 }

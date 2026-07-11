@@ -17,48 +17,86 @@
     <main class="main-form-panel main-form-panel--stack oficio-wizard__main">
       <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
 
-        {# ── Identificação do ofício (compartilhada) ── #}
-        <section class="cv-wizard-section-card">
+        {# ── Resumo do ofício (mesmo layout das outras etapas) + despacho compartilhado ── #}
+        <section class="cv-wizard-section-card rt-summary-card oficio-documentos-summary-section" aria-labelledby="prestacao-docs-resumo-title">
           <header class="cv-wizard-section-header">
             <div class="cv-wizard-section-header__copy">
-              <h2 class="cv-wizard-section-title">Ofício {{ identificacao.numero }}</h2>
-              <p class="cv-wizard-section-subtitle">Dados compartilhados por todos os servidores desta prestação.</p>
+              <h2 class="cv-wizard-section-title" id="prestacao-docs-resumo-title">Resumo do ofício</h2>
+              <p class="cv-wizard-section-subtitle">Dados e despacho compartilhados por todos os servidores desta prestação.</p>
             </div>
           </header>
           <div class="cv-wizard-section-body">
-            <dl class="oficio-documentos-facts oficio-documentos-facts--admin">
-              <div class="oficio-documentos-fact"><dt>Protocolo</dt><dd>{{ identificacao.protocolo }}</dd></div>
-              <div class="oficio-documentos-fact"><dt>Destino</dt><dd>{{ identificacao.destino }}</dd></div>
-              <div class="oficio-documentos-fact"><dt>Período da viagem</dt><dd>{{ identificacao.periodo }}</dd></div>
-              <div class="oficio-documentos-fact"><dt>Servidores</dt><dd>{{ identificacao.servidores_count }}</dd></div>
-            </dl>
-          </div>
-        </section>
+            <div class="oficio-documentos-grid">
+              <section class="oficio-documentos-admin-facts" aria-label="Dados administrativos">
+                <div class="oficio-documentos-card__body">
+                  <dl class="oficio-documentos-facts oficio-documentos-facts--admin rt-summary-card__facts">
+                    <div class="oficio-documentos-fact">
+                      <dt>Número do ofício</dt>
+                      <dd>{{ identificacao.numero }}</dd>
+                    </div>
+                    <div class="oficio-documentos-fact">
+                      <dt>Protocolo</dt>
+                      <dd>{{ identificacao.protocolo }}</dd>
+                    </div>
+                    <div class="oficio-documentos-fact">
+                      <dt>Destino</dt>
+                      <dd>{{ identificacao.destino }}</dd>
+                    </div>
+                    <div class="oficio-documentos-fact">
+                      <dt>Período da viagem</dt>
+                      <dd>{{ identificacao.periodo }}</dd>
+                    </div>
+                  </dl>
+                </div>
+              </section>
 
-        {# ── Despacho assinado do ofício (compartilhado) ── #}
-        <form method="post"
-              enctype="multipart/form-data"
-              class="oficio-wizard__form"
-              novalidate
-              data-file-autosave-url="{{ despacho_autosave_url }}">
-          {% csrf_token %}
-          <section class="cv-wizard-section-card" aria-labelledby="prestacao-despacho-title">
-            <header class="cv-wizard-section-header">
-              <div class="cv-wizard-section-header__copy">
-                <h2 class="cv-wizard-section-title" id="prestacao-despacho-title">Despacho assinado do ofício</h2>
-                <p class="cv-wizard-section-subtitle">Um único despacho para o ofício — vale para todos os servidores.</p>
-              </div>
-            </header>
-            <div class="cv-wizard-section-body">
+              <div class="rt-summary-card__section-ribbon" aria-hidden="true"></div>
+
+              <article class="oficio-documentos-card oficio-documentos-card--travellers rt-summary-card__traveller-card" aria-label="Servidores da prestação">
+                <header class="oficio-documentos-card__header oficio-documentos-travellers__header">
+                  <div class="oficio-documentos-travellers__titles">
+                    <span class="oficio-documentos-card__eyebrow">Equipe</span>
+                    <h4 class="oficio-documentos-card__title">Servidores ({{ identificacao.servidores_count }})</h4>
+                  </div>
+                </header>
+                <div class="oficio-documentos-card__body">
+                  <div class="oficio-documentos-travellers-lines">
+                    {% for s in identificacao.servidores %}
+                    <article class="oficio-documentos-traveller-line{% if s.is_motorista %} oficio-documentos-traveller-line--motorista{% endif %}">
+                      <div class="oficio-documentos-traveller-line__name-row">
+                        <strong class="oficio-documentos-traveller-line__name">{{ s.nome_servidor }}</strong>
+                        {% if s.is_motorista %}
+                          {% include "components/ui/badges/chip.html" with label="Motorista" tone="warning" size="compact" only %}
+                        {% endif %}
+                      </div>
+                      <span class="oficio-documentos-traveller-line__cargo">
+                        {{ s.cargo }}{% if s.unidade %} · {{ s.unidade }}{% endif %}{% if s.cpf_servidor and s.cpf_servidor != "—" %} · CPF {{ s.cpf_servidor }}{% endif %}
+                      </span>
+                    </article>
+                    {% endfor %}
+                  </div>
+                </div>
+              </article>
+            </div>
+
+            <div class="rt-summary-card__section-ribbon" aria-hidden="true"></div>
+
+            {# Despacho assinado do ofício — documento único, vale para todos os servidores #}
+            <form method="post"
+                  enctype="multipart/form-data"
+                  class="oficio-wizard__form"
+                  novalidate
+                  data-file-autosave-url="{{ despacho_autosave_url }}">
+              {% csrf_token %}
               <div class="field app-form-field">
                 <label class="app-form-label" for="{{ despacho_form.despacho_arquivos.id_for_label }}">{{ despacho_form.despacho_arquivos.label }}</label>
                 {{ despacho_form.despacho_arquivos }}
                 {% include "prestacoes_contas/partials/documento_anexos.html" with anexos=despacho_anexos only %}
                 {% if despacho_form.despacho_arquivos.help_text %}<p class="field-help app-form-help">{{ despacho_form.despacho_arquivos.help_text }}</p>{% endif %}
               </div>
-            </div>
-          </section>
-        </form>
+            </form>
+          </div>
+        </section>
 
         {# ── Um bloco por servidor: nº de solicitação + comprovante de saque ── #}
         {% for servidor in servidores %}

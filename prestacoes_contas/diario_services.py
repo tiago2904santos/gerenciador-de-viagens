@@ -213,6 +213,50 @@ def trechos_ordenados(roteiro) -> list[RoteiroTrecho]:
     return sorted(qs, key=chave)
 
 
+def _fmt_dt_legivel(dt) -> str | None:
+    local = _local(dt)
+    if local is None:
+        return None
+    return local.strftime("%d/%m/%Y às %H:%M")
+
+
+def alteracoes_datas_horarios_roteiro(prestacao) -> list[str]:
+    """Frases descrevendo as mudanças de saída/chegada entre os trechos do roteiro do
+    ofício e o roteiro ajustado desta prestação. Pareia pela posição dentro de cada
+    tipo (IDA/RETORNO) — o número de ``ordem`` não é confiável entre as duas cópias
+    (a copia editável pode ser reindexada a partir de 0)."""
+    copia = prestacao.roteiro_ajustado
+    original = getattr(prestacao.oficio, "roteiro", None)
+    if copia is None or original is None:
+        return []
+
+    def agrupar_por_tipo(roteiro):
+        grupos: dict[str, list] = {}
+        for t in trechos_ordenados(roteiro):
+            grupos.setdefault(t.tipo, []).append(t)
+        return grupos
+
+    originais_por_tipo = agrupar_por_tipo(original)
+    itens = []
+    for tipo, trechos_novos in agrupar_por_tipo(copia).items():
+        trechos_velhos = originais_por_tipo.get(tipo, [])
+        for t_novo, t_velho in zip(trechos_novos, trechos_velhos):
+            rota = (
+                f"{format_document_display(_cidade_label(t_novo.origem_cidade, t_novo.origem_estado))}"
+                f" → {format_document_display(_cidade_label(t_novo.destino_cidade, t_novo.destino_estado))}"
+            )
+            de_saida = _fmt_dt_legivel(t_velho.saida_dt) or "não informada"
+            para_saida = _fmt_dt_legivel(t_novo.saida_dt) or "não informada"
+            if de_saida != para_saida:
+                itens.append(f"saída ({rota}) de {de_saida} para {para_saida}")
+
+            de_chegada = _fmt_dt_legivel(t_velho.chegada_dt) or "não informada"
+            para_chegada = _fmt_dt_legivel(t_novo.chegada_dt) or "não informada"
+            if de_chegada != para_chegada:
+                itens.append(f"chegada ({rota}) de {de_chegada} para {para_chegada}")
+    return itens
+
+
 def sincronizar_trechos(diario: DiarioBordo) -> list[DiarioBordoTrecho]:
     """Garante uma linha de diário por trecho do roteiro, preservando o que já foi digitado."""
     roteiro = roteiro_efetivo(diario.prestacao)

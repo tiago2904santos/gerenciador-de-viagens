@@ -40,9 +40,8 @@
 
           {% if diaria_info.alterada %}
             <div class="diario-diaria-alert" role="alert">
-              <strong>Diária alterada no roteiro desta prestação.</strong>
-              Valor: {{ diaria_info.valor_oficio_label }} (ofício) → {{ diaria_info.valor_ajustado_label }} (ajustado).
-              Descreva o motivo da alteração no campo <strong>Informações complementares</strong> abaixo.
+              <strong>Roteiro ajustado nesta prestação.</strong>
+              Preenchemos automaticamente em <strong>Informações complementares</strong> o que mudou (datas, horários e diária) — revise e complete a justificativa.
             </div>
           {% endif %}
 
@@ -90,7 +89,7 @@
                     </div>
                   </header>
                   <div class="oficio-documentos-card__body">
-                    <div class="oficio-documentos-travellers-lines">
+                    <div class="oficio-documentos-travellers-lines oficio-documentos-travellers-lines--n{{ identificacao.servidores_count }}">
                       {% for s in identificacao.servidores %}
                       <article class="oficio-documentos-traveller-line{% if s.is_motorista %} oficio-documentos-traveller-line--motorista{% endif %}">
                         <div class="oficio-documentos-traveller-line__name-row">
@@ -138,26 +137,11 @@
                   {% include "prestacoes_contas/_campo_com_modelo.html" with c=c only %}
                 </div>
               </div>
-              {% if forloop.last %}
-                <section class="cv-card-footer-section">
-                  <div class="cv-card-footer-section__divider" aria-hidden="true"></div>
-                  <footer class="cv-card-footer">
-                    <div class="cv-card-footer__secondary">
-                      {% include "components/ui/buttons/button.html" with href="/prestacoes-contas/" label="Voltar à lista" variant="secondary" icon="arrow-left" only %}
-                    </div>
-                    <div class="cv-card-footer__primary">
-                      {% include "components/ui/buttons/button.html" with label="Salvar texto" variant="secondary" type="submit" name="action" value="save" only %}
-                      {% include "components/ui/buttons/button.html" with href=diario_url label="Ir para Diário de Bordo" variant="primary" icon="arrow-right" icon_after=True only %}
-                    </div>
-                  </footer>
-                </section>
-              {% endif %}
             </section>
           {% endfor %}
-        </form>
 
-        {# Download do RT por servidor (mesmo texto, dados pessoais de cada um) #}
-        <section class="cv-wizard-section-card" aria-labelledby="rt-downloads-title">
+          {# Download do RT por servidor (mesmo texto, dados pessoais de cada um) #}
+          <section class="cv-wizard-section-card" aria-labelledby="rt-downloads-title">
           <header class="cv-wizard-section-header">
             <div class="cv-wizard-section-header__copy">
               <h2 class="cv-wizard-section-title" id="rt-downloads-title">Relatório Técnico por servidor</h2>
@@ -190,7 +174,20 @@
               </details>
             {% endfor %}
           </div>
+          <section class="cv-card-footer-section">
+            <div class="cv-card-footer-section__divider" aria-hidden="true"></div>
+            <footer class="cv-card-footer">
+              <div class="cv-card-footer__secondary">
+                {% include "components/ui/buttons/button.html" with href="/prestacoes-contas/" label="Voltar à lista" variant="secondary" icon="arrow-left" only %}
+              </div>
+              <div class="cv-card-footer__primary">
+                {% include "components/ui/buttons/button.html" with label="Salvar texto" variant="secondary" type="submit" name="action" value="save" only %}
+                {% include "components/ui/buttons/button.html" with href=diario_url label="Ir para Diário de Bordo" variant="primary" icon="arrow-right" icon_after=True only %}
+              </div>
+            </footer>
+          </section>
         </section>
+        </form>
       </div>
     </main>
   </div>

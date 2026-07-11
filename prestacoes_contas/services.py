@@ -28,7 +28,10 @@ from oficios.assunto_oficio import resolver_assunto_oficio
 from oficios.documents import build_canonical_document_payload
 from oficios.docxtpl_context import build_oficio_docxtpl_context
 
+from .diario_services import alteracoes_datas_horarios_roteiro
+from .diario_services import diferencas_entre_roteiros
 from .diario_services import gerar_diario_bordo_pdf
+from .diario_services import roteiro_efetivo
 from .diario_services import sincronizar_trechos
 from .forms import DEFAULT_CUSTEIO_VALUES
 from .models import DiarioBordo
@@ -104,17 +107,58 @@ def _sede() -> str:
         return ""
 
 
-def diaria_inicial_da_prestacao(prestacao) -> str:
+def _diaria_por_servidor(roteiro, total_servidores: int) -> Decimal | None:
+    if roteiro and roteiro.valor_diarias:
+        return Decimal(roteiro.valor_diarias) / Decimal(total_servidores or 1)
+    return None
+
+
+def diaria_inicial_do_oficio(prestacao) -> str:
+    """Diária por servidor conforme o roteiro original do ofício (sem ajustes)."""
     try:
         oficio = prestacao.oficio
-        roteiro = oficio.roteiro
-        if roteiro and roteiro.valor_diarias:
-            total_servidores = oficio.servidores.count() or 1
-            valor_por_servidor = Decimal(roteiro.valor_diarias) / Decimal(total_servidores)
-            return format_currency_br(valor_por_servidor)
+        total_servidores = oficio.servidores.count() or 1
+        valor = _diaria_por_servidor(getattr(oficio, "roteiro", None), total_servidores)
+        if valor is not None:
+            return format_currency_br(valor)
     except Exception:
         pass
     return ""
+
+
+def diaria_inicial_da_prestacao(prestacao) -> str:
+    """Diária por servidor calculada a partir do roteiro efetivo (ajustado, se houver)."""
+    try:
+        oficio = prestacao.oficio
+        total_servidores = oficio.servidores.count() or 1
+        valor = _diaria_por_servidor(roteiro_efetivo(prestacao), total_servidores)
+        if valor is not None:
+            return format_currency_br(valor)
+    except Exception:
+        pass
+    return ""
+
+
+def descricao_ajustes_roteiro(prestacao) -> str:
+    """Texto pronto (com espaço para justificativa) para 'Informações complementares'
+    do RT, listando o que mudou no roteiro desta prestação: datas/horários dos
+    trechos e diária por servidor. Vazio se o roteiro não foi de fato ajustado."""
+    copia = prestacao.roteiro_ajustado
+    original = getattr(prestacao.oficio, "roteiro", None)
+    if copia is None or original is None or not diferencas_entre_roteiros(original, copia):
+        return ""
+
+    itens = list(alteracoes_datas_horarios_roteiro(prestacao))
+
+    diaria_oficio = diaria_inicial_do_oficio(prestacao)
+    diaria_ajustada = diaria_inicial_da_prestacao(prestacao)
+    if diaria_oficio and diaria_ajustada and diaria_oficio != diaria_ajustada:
+        itens.append(f"diária (por servidor) de {diaria_oficio} para {diaria_ajustada}")
+
+    if not itens:
+        return ""
+
+    return "Alterações em relação ao roteiro do ofício: " + "; ".join(itens) + ". Justificativa: "
 
 
 def relatorio_tecnico_default_values(prestacao) -> dict:
@@ -122,18 +166,34 @@ def relatorio_tecnico_default_values(prestacao) -> dict:
     diaria = diaria_inicial_da_prestacao(prestacao)
     if diaria:
         values["diaria"] = diaria
+    info = descricao_ajustes_roteiro(prestacao)
+    if info:
+        values["info_complementares"] = info
     return values
 
 
 def garantir_campos_padrao_relatorio_tecnico(relatorio: RelatorioTecnico) -> list[str]:
-    defaults = relatorio_tecnico_default_values(relatorio.prestacao)
+    prestacao = relatorio.prestacao
+    defaults = relatorio_tecnico_default_values(prestacao)
+    valor_default_oficio = normalize_spaces(diaria_inicial_do_oficio(prestacao))
+
     update_fields = []
-    for campo in ("diaria", "translado", "combustivel", "passagem"):
+    for campo in ("diaria", "translado", "combustivel", "passagem", "info_complementares"):
+        valor_padrao = (defaults.get(campo) or "").strip()
+        if not valor_padrao:
+            continue
         valor_atual = normalize_spaces(getattr(relatorio, campo, "") or "")
-        valor_padrao = normalize_spaces(defaults.get(campo) or "")
-        if not valor_atual and valor_padrao:
+
+        deve_atualizar = not valor_atual
+        if campo == "diaria" and valor_atual and valor_atual == valor_default_oficio:
+            # Ainda é o valor automático anterior (não editado manualmente):
+            # sincroniza com o novo valor ajustado do roteiro.
+            deve_atualizar = valor_atual != normalize_spaces(valor_padrao)
+
+        if deve_atualizar:
             setattr(relatorio, campo, valor_padrao)
             update_fields.append(campo)
+
     if update_fields:
         relatorio.save(update_fields=[*update_fields, "atualizado_em"])
     return update_fields
@@ -445,6 +505,35 @@ def gerar_prestacao_consolidado_pdf(servidor_prestacao) -> bytes:
 
 
 def nome_arquivo_prestacao_consolidado(servidor_prestacao) -> str:
-    nome = servidor_prestacao.servidor.nome.replace(" ", "_").upper()
-    oficio = servidor_prestacao.prestacao.oficio.numero_formatado.replace("/", "-")
-    return f"PRESTACAO_{nome}_OFICIO_{oficio}.pdf"
+    """Nome do PDF consolidado da prestação, no formato acordado com o usuário:
+
+    ``Prestação solicitação {nº solicitação} Ofício {nº-ano} {primeiro nome}
+    {destino} {data do evento}.pdf``.
+
+    Destino e data do evento vêm dos mesmos helpers de exibição do ofício
+    (derivados do roteiro), garantindo consistência com o que aparece na tela.
+    Partes vazias (ex.: sem roteiro) são omitidas; ``sanitize_drive_name`` troca
+    as barras de destino/data por hífen para servir como nome de arquivo válido.
+    """
+    from integracoes.google_drive import naming
+    from oficios.presenters import _data_evento_display_oficio
+    from oficios.presenters import _destino_display_oficio
+
+    oficio = servidor_prestacao.prestacao.oficio
+    numero_solicitacao = str(servidor_prestacao.numero_solicitacao or "").strip()
+    oficio_num = oficio.numero_formatado.replace("/", "-")
+    nome = naming.primeiro_nome(servidor_prestacao.servidor)
+    destino = _destino_display_oficio(oficio)
+    data_evento = _data_evento_display_oficio(oficio)
+
+    partes = ["Prestação"]
+    if numero_solicitacao:
+        partes.append(f"solicitação {numero_solicitacao}")
+    partes.append(f"Ofício {oficio_num}")
+    if nome:
+        partes.append(nome)
+    if destino:
+        partes.append(destino)
+    if data_evento:
+        partes.append(data_evento)
+    return naming._arquivo(" ".join(partes), "pdf")

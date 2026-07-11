@@ -169,22 +169,6 @@
                     </div>
                   </div>
                 </div>
-
-                {% if forloop.last %}
-                  <section class="cv-card-footer-section">
-                    <div class="cv-card-footer-section__divider" aria-hidden="true"></div>
-                    <footer class="cv-card-footer">
-                      <div class="cv-card-footer__secondary">
-                        {% include "components/ui/buttons/button.html" with href=rt_url label="Voltar ao Relatório Técnico" variant="secondary" icon="arrow-left" only %}
-                      </div>
-                      <div class="cv-card-footer__primary">
-                        {% include "components/ui/buttons/button.html" with label="Gerar XLSX" variant="secondary" icon="download" icon_after=True type="submit" name="action" value="download_xlsx" only %}
-                        {% include "components/ui/buttons/button.html" with label="Gerar PDF" variant="secondary" icon="download" icon_after=True type="submit" name="action" value="download_pdf" only %}
-                        {% include "components/ui/buttons/button.html" with href=documentos_url label="Ir para Documentos" variant="primary" icon="arrow-right" icon_after=True only %}
-                      </div>
-                    </footer>
-                  </section>
-                {% endif %}
               </section>
             {% endwith %}
           {% empty %}
@@ -192,29 +176,34 @@
               <div class="cv-wizard-section-body">
                 {% include "components/ui/feedback/empty_state.html" with message="Nenhum trecho no roteiro deste ofício. Defina o roteiro do ofício para gerar o diário de bordo." only %}
               </div>
-              <section class="cv-card-footer-section">
-                <div class="cv-card-footer-section__divider" aria-hidden="true"></div>
-                <footer class="cv-card-footer">
-                  <div class="cv-card-footer__secondary">
-                    {% include "components/ui/buttons/button.html" with href=rt_url label="Voltar ao Relatório Técnico" variant="secondary" icon="arrow-left" only %}
-                  </div>
-                  <div class="cv-card-footer__primary">
-                    {% include "components/ui/buttons/button.html" with href=documentos_url label="Ir para Documentos" variant="primary" icon="arrow-right" icon_after=True only %}
-                  </div>
-                </footer>
-              </section>
             </section>
           {% endfor %}
+
+          {# Assinatura eletrônica temporariamente oculta (fluxo indisponível). #}
+          {% comment %}
+          {% include "prestacoes_contas/partials/assinatura_card.html" with assinatura=assinatura next_url=assinatura_next_url csrf_token=csrf_token only %}
+          {% endcomment %}
+
+          {% if trechos %}
+            {% include "prestacoes_contas/partials/documento_preview.html" with preview_anchor="diario-preview" preview_title="Pré-visualização do diário" preview_subtitle="O PDF é gerado com os dados salvos do diário. Reabra o card após editar para atualizar." preview_doc_title="Diário de Bordo" preview_inline_url=preview_inline_url preview_pdf_url=preview_pdf_url preview_xlsx_url=preview_xlsx_url only %}
+          {% endif %}
+
+          <section class="cv-card-footer-section">
+            <div class="cv-card-footer-section__divider" aria-hidden="true"></div>
+            <footer class="cv-card-footer">
+              <div class="cv-card-footer__secondary">
+                {% include "components/ui/buttons/button.html" with href=rt_url label="Voltar ao Relatório Técnico" variant="secondary" icon="arrow-left" only %}
+              </div>
+              <div class="cv-card-footer__primary">
+                {% if trechos %}
+                  {% include "components/ui/buttons/button.html" with label="Gerar XLSX" variant="secondary" icon="download" icon_after=True type="submit" name="action" value="download_xlsx" only %}
+                  {% include "components/ui/buttons/button.html" with label="Gerar PDF" variant="secondary" icon="download" icon_after=True type="submit" name="action" value="download_pdf" only %}
+                {% endif %}
+                {% include "components/ui/buttons/button.html" with href=documentos_url label="Ir para Documentos" variant="primary" icon="arrow-right" icon_after=True only %}
+              </div>
+            </footer>
+          </section>
         </form>
-
-        {# Assinatura eletrônica temporariamente oculta (fluxo indisponível). #}
-        {% comment %}
-        {% include "prestacoes_contas/partials/assinatura_card.html" with assinatura=assinatura next_url=assinatura_next_url csrf_token=csrf_token only %}
-        {% endcomment %}
-
-        {% if trechos %}
-          {% include "prestacoes_contas/partials/documento_preview.html" with preview_anchor="diario-preview" preview_title="Pré-visualização do diário" preview_subtitle="O PDF é gerado com os dados salvos do diário. Reabra o card após editar para atualizar." preview_doc_title="Diário de Bordo" preview_inline_url=preview_inline_url preview_pdf_url=preview_pdf_url preview_xlsx_url=preview_xlsx_url only %}
-        {% endif %}
       </div>
     </main>
   </div>
