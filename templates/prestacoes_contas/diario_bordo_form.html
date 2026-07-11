@@ -45,10 +45,21 @@
                 <p class="cv-wizard-section-subtitle">O cabeçalho do diário (motorista, viatura e protocolo) é montado a partir do ofício.</p>
               </div>
               <div class="cv-wizard-section-header__actions">
+                {% if diaria_info.ajustado %}
+                  {% include "components/ui/badges/chip.html" with label="Roteiro ajustado" tone="warning" size="compact" only %}
+                {% endif %}
                 {% include "components/ui/buttons/button.html" with href=editar_motorista_url label="Trocar motorista" variant="secondary" icon="sync" only %}
+                {% include "components/ui/buttons/button.html" with href=editar_roteiro_url label="Editar trechos" variant="secondary" icon="route" only %}
               </div>
             </header>
             <div class="cv-wizard-section-body">
+              {% if diaria_info.alterada %}
+                <div class="diario-diaria-alert" role="alert">
+                  <strong>Atenção:</strong> a alteração do roteiro mudou o valor da diária —
+                  <span class="diario-diaria-alert__values">{{ diaria_info.valor_oficio_label }} (ofício) → {{ diaria_info.valor_ajustado_label }} (ajustado)</span>.
+                  Justifique a diferença em <a href="{{ rt_url }}">Informações complementares</a> do Relatório Técnico.
+                </div>
+              {% endif %}
               <div class="oficio-documentos-grid">
                 <section class="oficio-documentos-admin-facts" aria-label="Dados administrativos">
                   <div class="oficio-documentos-card__body">
@@ -90,33 +101,6 @@
                 </section>
               </div>
             </div>
-          </section>
-
-          {# CARD — Dados da viagem (editar via roteiro / cópia da prestação) #}
-          <section class="cv-wizard-section-card" aria-labelledby="diario-viagem-title">
-            <header class="cv-wizard-section-header">
-              <div class="cv-wizard-section-header__copy">
-                <h2 class="cv-wizard-section-title" id="diario-viagem-title">Dados da viagem</h2>
-                <p class="cv-wizard-section-subtitle">
-                  Os trechos vêm do roteiro do ofício. Se a viagem ocorreu diferente do previsto, edite os trechos desta prestação — o ofício original não é alterado.
-                </p>
-              </div>
-              <div class="cv-wizard-section-header__actions">
-                {% if diaria_info.ajustado %}
-                  {% include "components/ui/badges/chip.html" with label="Roteiro ajustado" tone="warning" size="compact" only %}
-                {% endif %}
-                {% include "components/ui/buttons/button.html" with href=editar_roteiro_url label="Editar trechos" variant="secondary" icon="route" only %}
-              </div>
-            </header>
-            {% if diaria_info.alterada %}
-              <div class="cv-wizard-section-body">
-                <div class="diario-diaria-alert" role="alert">
-                  <strong>Atenção:</strong> a alteração do roteiro mudou o valor da diária —
-                  <span class="diario-diaria-alert__values">{{ diaria_info.valor_oficio_label }} (ofício) → {{ diaria_info.valor_ajustado_label }} (ajustado)</span>.
-                  Justifique a diferença em <a href="{{ rt_url }}">Informações complementares</a> do Relatório Técnico.
-                </div>
-              </div>
-            {% endif %}
           </section>
 
           {# Um card solto por trecho (estilo retorno final, sem tempos) #}
