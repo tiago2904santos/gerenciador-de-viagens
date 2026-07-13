@@ -738,6 +738,33 @@ html[data-theme="light"] {
   color: var(--cv-btn-secondary-hover-color);
 }
 
+/* Concluir — verde de sucesso, preenchido (finalizar prestação) */
+.cv-icon-btn--complete {
+  background: linear-gradient(135deg, #1f8f4e 0%, var(--color-success, #24a25b) 100%);
+  border-color: #167039;
+  color: var(--color-white, #fff);
+}
+
+.cv-icon-btn--complete:hover,
+.cv-icon-btn--complete:focus {
+  background: linear-gradient(135deg, #1a7a43 0%, #1f8f4e 100%);
+  border-color: #125d30;
+}
+
+/* Arquivar — âmbar sóbrio; desarquivar/reabrir usam o neutro (--edit) */
+.cv-icon-btn--archive {
+  background: var(--cv-btn-neutral-bg);
+  border-color: var(--cv-btn-neutral-border);
+  color: var(--cv-btn-neutral-color);
+}
+
+.cv-icon-btn--archive:hover,
+.cv-icon-btn--archive:focus {
+  background: var(--cv-btn-secondary-hover-bg);
+  border-color: var(--cv-btn-secondary-hover-border);
+  color: var(--cv-btn-secondary-hover-color);
+}
+
 /* PDF — vermelho documental, preenchido */
 .cv-icon-btn--pdf {
   background: var(--cv-btn-pdf-bg);

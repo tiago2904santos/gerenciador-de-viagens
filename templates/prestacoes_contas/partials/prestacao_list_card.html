@@ -128,6 +128,28 @@
           {% include "components/ui/buttons/icon_button.html" with href=card.diario_url action="route" aria_label="Diário de bordo" tooltip="Diário de bordo" only %}
           {% include "components/ui/buttons/icon_button.html" with href=card.consolidado_url action="pdf" aria_label="PDF final da prestação" tooltip="PDF final" only %}
         </div>
+
+        <div class="oficio-lc__footer-actions-manage cv-icon-btn-group">
+          <form method="post" action="{{ card.finalizar_url }}" class="oficio-lc__inline-action">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ current_url }}">
+            {% if card.finalizada %}
+            <button type="submit" class="cv-icon-btn cv-icon-btn--edit" aria-label="Reabrir prestação" data-tooltip="Reabrir prestação">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="arrow-left" only %}</button>
+            {% else %}
+            <button type="submit" class="cv-icon-btn cv-icon-btn--complete" aria-label="Finalizar prestação" data-tooltip="Finalizar prestação">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="check" only %}</button>
+            {% endif %}
+          </form>
+
+          <form method="post" action="{{ card.arquivar_url }}" class="oficio-lc__inline-action">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ current_url }}">
+            {% if card.arquivada %}
+            <button type="submit" class="cv-icon-btn cv-icon-btn--edit" aria-label="Desarquivar prestação" data-tooltip="Desarquivar prestação">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="unarchive" only %}</button>
+            {% else %}
+            <button type="submit" class="cv-icon-btn cv-icon-btn--archive" aria-label="Arquivar prestação" data-tooltip="Arquivar prestação">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="archive" only %}</button>
+            {% endif %}
+          </form>
+        </div>
       </div>
     </div>
 

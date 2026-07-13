@@ -507,6 +507,36 @@ def _salvar_solicitacoes_em_lote(request):
             ps.save(update_fields=["numero_solicitacao", "atualizado_em"])
 
 
+def _redirect_lista(request, prestacao):
+    """Volta para a lista preservando a aba/filtros de onde a ação foi disparada."""
+    destino = request.POST.get("next") or reverse("prestacoes_contas:index")
+    return redirect(destino)
+
+
+@require_POST
+def prestacao_arquivar(request, pc_pk):
+    """Arquiva ou desarquiva a prestação (alterna conforme o estado atual)."""
+    prestacao = get_object_or_404(PrestacaoContas, pk=pc_pk)
+    prestacao.definir_arquivada(not prestacao.arquivada)
+    if prestacao.arquivada:
+        messages.success(request, "Prestação arquivada.")
+    else:
+        messages.success(request, "Prestação desarquivada.")
+    return _redirect_lista(request, prestacao)
+
+
+@require_POST
+def prestacao_finalizar(request, pc_pk):
+    """Conclui ou reabre a prestação (alterna conforme o estado atual)."""
+    prestacao = get_object_or_404(PrestacaoContas, pk=pc_pk)
+    prestacao.definir_finalizada(not prestacao.finalizada)
+    if prestacao.finalizada:
+        messages.success(request, "Prestação finalizada.")
+    else:
+        messages.success(request, "Prestação reaberta.")
+    return _redirect_lista(request, prestacao)
+
+
 @require_POST
 def prestacao_servidor_solicitacao_autosave(request, ps_pk):
     ps = get_object_or_404(PrestacaoServidor, pk=ps_pk)

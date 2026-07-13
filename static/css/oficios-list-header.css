@@ -232,10 +232,81 @@
   border-color: var(--border-active, rgba(99, 165, 255, 0.45));
 }
 
+/* ── Abas das prestações (Pendentes / Que vão acontecer / Arquivados / Finalizados) ── */
+.prestacoes-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2, 8px);
+  margin: 0 0 var(--space-4, 16px);
+}
+
+.prestacoes-tab {
+  align-items: center;
+  background: var(--color-surface-soft, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.12));
+  border-radius: var(--radius-pill, 999px);
+  color: var(--color-text-secondary, rgba(255, 255, 255, 0.7));
+  display: inline-flex;
+  font-size: var(--font-size-sm, 0.875rem);
+  font-weight: 600;
+  gap: var(--space-2, 8px);
+  line-height: 1;
+  padding: 8px 14px;
+  text-decoration: none;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.prestacoes-tab:hover,
+.prestacoes-tab:focus-visible {
+  background: var(--color-surface-strong, rgba(255, 255, 255, 0.08));
+  border-color: var(--color-border-strong, rgba(255, 255, 255, 0.2));
+  color: var(--color-text, #fff);
+  outline: none;
+}
+
+.prestacoes-tab--active {
+  background: var(--color-primary-soft, rgba(99, 165, 255, 0.16));
+  border-color: var(--color-primary-bright, rgba(99, 165, 255, 0.6));
+  color: var(--color-primary-bright, #63a5ff);
+}
+
+.prestacoes-tab__count {
+  background: var(--color-surface-strong, rgba(255, 255, 255, 0.1));
+  border-radius: var(--radius-pill, 999px);
+  color: inherit;
+  font-size: var(--font-size-2xs, 0.72rem);
+  font-variant-numeric: tabular-nums;
+  min-width: 1.5em;
+  padding: 2px 7px;
+  text-align: center;
+}
+
+.prestacoes-tab--active .prestacoes-tab__count {
+  background: var(--color-primary-bright, #63a5ff);
+  color: var(--color-on-primary, #071019);
+}
+
+/* Ações de gerenciamento do card de prestação (finalizar / arquivar) */
+.oficio-lc__footer-actions-manage {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2, 8px);
+  margin-left: auto;
+}
+
+.oficio-lc__inline-action {
+  display: inline-flex;
+  margin: 0;
+}
+
 /* ── Responsivo ─────────────────────────────────────────────────────────── */
 @media (max-width: 720px) {
   .oficios-filter-bar__search-row {
     flex-wrap: wrap;
+  }
+
+  .oficio-lc__footer-actions-manage {
+    margin-left: 0;
   }
 
   .oficios-filter-clear {

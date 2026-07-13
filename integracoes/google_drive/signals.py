@@ -144,8 +144,19 @@ def _upload_artefato(sender, instance, created: bool, **kwargs) -> None:
     _processar_com_retry(organizer.organizar_artefato, instance, tasks.processar_artefato)
 
 
-def _organizar_prestacao(sender, instance, **kwargs) -> None:
+# Campos que não afetam os documentos da prestação no Drive: arquivar/finalizar
+# são apenas estado de listagem, não devem disparar reorganização de arquivos.
+_PRESTACAO_CAMPOS_SEM_DRIVE = {
+    "arquivada", "arquivada_em", "finalizada", "finalizada_em", "atualizado_em",
+}
+
+
+def _organizar_prestacao(sender, instance, update_fields=None, **kwargs) -> None:
     if _drive_desligado():
+        return
+    # Save que mexeu só em flags de listagem (arquivar/finalizar) não muda nada
+    # no Drive — evita reorganização desnecessária.
+    if update_fields is not None and set(update_fields) <= _PRESTACAO_CAMPOS_SEM_DRIVE:
         return
     from . import organizer, tasks
 

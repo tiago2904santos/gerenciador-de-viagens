@@ -39,6 +39,9 @@
         </div>
         {% endif %}
 
+        {% if current_aba %}<input type="hidden" name="aba" value="{{ current_aba }}">{% endif %}
+
+        {% if temporal_options %}
         <div class="cv-custom-select oficios-filter-cs" data-cv-select>
           <select name="temporal" aria-label="Período da viagem" data-cv-filter="select">
             {% for opt in temporal_options %}
@@ -46,6 +49,7 @@
             {% endfor %}
           </select>
         </div>
+        {% endif %}
 
         <div class="cv-custom-select oficios-filter-cs" data-cv-select>
           <select name="sort" aria-label="Ordenar por" data-cv-filter="select">

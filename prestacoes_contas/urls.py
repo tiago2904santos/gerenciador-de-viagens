@@ -8,6 +8,8 @@ app_name = "prestacoes_contas"
 
 urlpatterns = [
     path("", views.index, name="index"),
+    path("prestacao/<int:pc_pk>/arquivar/", views.prestacao_arquivar, name="prestacao_arquivar"),
+    path("prestacao/<int:pc_pk>/finalizar/", views.prestacao_finalizar, name="prestacao_finalizar"),
     path("prestacao/<int:pc_pk>/documentos/", views.documentos, name="documentos"),
     path("prestacao/<int:pc_pk>/despacho/autosave/", views.prestacao_arquivo_autosave, name="prestacao_arquivo_autosave"),
     path("prestacao/<int:pc_pk>/anexo/<int:anexo_pk>/excluir/", views.prestacao_documento_excluir, name="prestacao_documento_excluir"),

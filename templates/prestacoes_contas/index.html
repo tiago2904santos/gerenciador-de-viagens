@@ -6,18 +6,29 @@
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/roteiros-list.css' %}?v=20260622-mobile">
   <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260610-oficios-datepicker">
-  <link rel="stylesheet" href="{% static 'css/oficios-list-header.css' %}?v=20260627-filter-style">
+  <link rel="stylesheet" href="{% static 'css/oficios-list-header.css' %}?v=20260713-abas-prestacao">
 {% endblock %}
 
 {% block content %}
 <div class="app-page--main-card-list page-shell page-shell--list oficios-list-page" data-cv-realtime-filter-scope>
 
-  {% include "components/lists/oficios_cloned_list_header.html" with eyebrow="PRESTAÇÕES" search_placeholder="Buscar por servidor, ofício, protocolo ou solicitação…" search_aria_label="Buscar prestações" %}
+  {% include "components/lists/oficios_cloned_list_header.html" with eyebrow="PRESTAÇÕES" search_placeholder="Buscar por servidor, ofício, protocolo ou solicitação…" search_aria_label="Buscar prestações" current_aba=aba %}
+
+  <nav class="prestacoes-tabs" aria-label="Abas de prestações">
+    {% for tab in abas %}
+    <a class="prestacoes-tab{% if tab.is_active %} prestacoes-tab--active{% endif %}"
+       href="{{ tab.url }}"
+       {% if tab.is_active %}aria-current="page"{% endif %}>
+      <span class="prestacoes-tab__label">{{ tab.label }}</span>
+      <span class="prestacoes-tab__count">{{ tab.count }}</span>
+    </a>
+    {% endfor %}
+  </nav>
 
   <div class="list-panel">
     <div class="list-content list-grid list-grid--roteiros app-list-grid" data-cv-list-container>
       {% for card in cards %}
-        {% include "prestacoes_contas/partials/prestacao_list_card.html" with card=card only %}
+        {% include "prestacoes_contas/partials/prestacao_list_card.html" with card=card current_url=request.get_full_path only %}
       {% empty %}
         {% include "components/lists/list_empty.html" with message=empty_message only %}
       {% endfor %}

@@ -137,6 +137,11 @@ def apresentar_prestacao_card(prestacao, solicitacao_forms=None):
         "status_label": prestacao.status_display,
         "status_tone": prestacao.status_variant,
         "status_value": prestacao.status,
+        # arquivamento / conclusão
+        "arquivada": prestacao.arquivada,
+        "finalizada": prestacao.finalizada,
+        "arquivar_url": reverse("prestacoes_contas:prestacao_arquivar", args=[prestacao.pk]),
+        "finalizar_url": reverse("prestacoes_contas:prestacao_finalizar", args=[prestacao.pk]),
         # servidores (lista)
         "servidores": servidores,
         "servidores_count": len(servidores),
