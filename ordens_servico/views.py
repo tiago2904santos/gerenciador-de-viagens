@@ -30,8 +30,12 @@ from .services import gerar_os_pdf_response
 
 
 def index(request):
+    from django.db.models import OuterRef
+    from core import documento_abas as tabs
+    from prestacoes_contas.models import PrestacaoContas
+
     q = request.GET.get("q", "").strip()
-    temporal = request.GET.get("temporal", "").strip()
+    aba = tabs.normalizar_aba(request.GET.get("aba", ""))
     viagem_de = request.GET.get("viagem_de", "").strip()
     viagem_ate = request.GET.get("viagem_ate", "").strip()
     sort = request.GET.get("sort", "").strip()
@@ -53,14 +57,6 @@ def index(request):
             filters |= Q(numero=int(q)) | Q(ano=int(q)) | Q(oficios__numero=int(q))
         ordens = ordens.filter(filters).distinct()
 
-    hoje = timezone.localdate()
-    if temporal == "futuro":
-        ordens = ordens.filter(data_evento_inicio__gt=hoje)
-    elif temporal == "andamento":
-        ordens = ordens.filter(data_evento_inicio__lte=hoje, data_evento_fim__gte=hoje)
-    elif temporal == "passado":
-        ordens = ordens.filter(data_evento_fim__lt=hoje)
-
     viagem_de_date = parse_date(viagem_de) if viagem_de else None
     viagem_ate_date = parse_date(viagem_ate) if viagem_ate else None
     if viagem_de_date:
@@ -78,8 +74,21 @@ def index(request):
     }
     ordens = ordens.order_by(*sort_map.get(sort or "numero_desc", sort_map["numero_desc"]))
 
-    cards = [apresentar_ordem_servico_card(ordem) for ordem in ordens]
-    has_filters = any([q, temporal, viagem_de, viagem_ate, sort])
+    # Abas: Finalizado = todas as prestações dos ofícios (não cancelados)
+    # vinculados à OS já finalizadas.
+    sub = PrestacaoContas.objects.filter(oficio__ordens_servico=OuterRef("pk"), oficio__cancelado=False)
+    ordens = tabs.anotar_finalizacao(ordens, sub, sub.filter(finalizada=False))
+    cancelado_q = Q(cancelado=True)
+    date_field = "data_evento_inicio"
+    lista = ordens.filter(tabs.q_da_aba(aba, date_field=date_field, cancelado_q=cancelado_q))
+    contagem = tabs.contar_por_aba(ordens, date_field=date_field, cancelado_q=cancelado_q)
+    abas = tabs.build_abas(
+        reverse("ordens_servico:index"), aba, contagem,
+        preserved={"q": q, "sort": sort, "viagem_de": viagem_de, "viagem_ate": viagem_ate},
+    )
+
+    cards = [apresentar_ordem_servico_card(ordem) for ordem in lista]
+    has_filters = any([q, viagem_de, viagem_ate, sort])
 
     return render(
         request,
@@ -88,20 +97,15 @@ def index(request):
             "page_title": "Ordens de Serviço",
             "page_description": "Cadastre e gerencie ordens de serviço.",
             "q": q,
-            "temporal": temporal,
+            "aba": aba,
+            "abas": abas,
             "viagem_de": viagem_de,
             "viagem_ate": viagem_ate,
             "sort": sort,
             "has_filters": has_filters,
             "cards": cards,
             "nova_url": reverse("ordens_servico:nova"),
-            "search_clear_url": reverse("ordens_servico:index"),
-            "temporal_options": [
-                {"value": "", "label": "Qualquer período"},
-                {"value": "futuro", "label": "Futuras"},
-                {"value": "andamento", "label": "Em andamento"},
-                {"value": "passado", "label": "Passadas"},
-            ],
+            "search_clear_url": f"{reverse('ordens_servico:index')}?aba={aba}",
             "sort_options": [
                 {"value": "numero_desc", "label": "Número: maior"},
                 {"value": "numero_asc", "label": "Número: menor"},

@@ -489,24 +489,41 @@ def _justificativa_autosave_data(inst):
 
 
 def index(request):
+    from django.db.models import OuterRef, Q
+    from core import documento_abas as tabs
+    from prestacoes_contas.models import PrestacaoContas
+
     q           = request.GET.get("q",          "").strip()
     status      = request.GET.get("status",     "").strip()
-    temporal    = request.GET.get("temporal",   "").strip()
+    aba         = tabs.normalizar_aba(request.GET.get("aba", ""))
     criacao_de  = request.GET.get("criacao_de", "").strip()
     criacao_ate = request.GET.get("criacao_ate","").strip()
     viagem_de   = request.GET.get("viagem_de",  "").strip()
     viagem_ate  = request.GET.get("viagem_ate", "").strip()
     sort        = request.GET.get("sort",       "").strip()
 
-    oficios = listar_oficios(
+    base = listar_oficios(
         q=q or None,
         status=status or None,
-        temporal=temporal or None,
         criacao_de=criacao_de or None,
         criacao_ate=criacao_ate or None,
         viagem_de=viagem_de or None,
         viagem_ate=viagem_ate or None,
         sort=sort or None,
+    )
+    # Finalizado = a prestação de contas deste ofício foi finalizada.
+    sub = PrestacaoContas.objects.filter(oficio=OuterRef("pk"))
+    base = tabs.anotar_finalizacao(base, sub, sub.filter(finalizada=False))
+    cancelado_q = Q(cancelado=True)
+    date_field = "roteiro__saida_dt__date"
+
+    oficios = base.filter(tabs.q_da_aba(aba, date_field=date_field, cancelado_q=cancelado_q))
+    contagem = tabs.contar_por_aba(base, date_field=date_field, cancelado_q=cancelado_q)
+    abas = tabs.build_abas(
+        reverse("oficios:index"), aba, contagem,
+        preserved={"q": q, "status": status, "sort": sort,
+                   "criacao_de": criacao_de, "criacao_ate": criacao_ate,
+                   "viagem_de": viagem_de, "viagem_ate": viagem_ate},
     )
     cards = []
     for oficio in oficios:
@@ -518,7 +535,7 @@ def index(request):
         )
         cards.append(card)
 
-    has_filters = any([q, status, temporal, criacao_de, criacao_ate, viagem_de, viagem_ate, sort])
+    has_filters = any([q, status, criacao_de, criacao_ate, viagem_de, viagem_ate, sort])
 
     return render(
         request,
@@ -527,7 +544,8 @@ def index(request):
             "page_title": "Ofícios",
             "q":           q,
             "status":      status,
-            "temporal":    temporal,
+            "aba":         aba,
+            "abas":        abas,
             "criacao_de":  criacao_de,
             "criacao_ate": criacao_ate,
             "viagem_de":   viagem_de,
@@ -536,15 +554,9 @@ def index(request):
             "has_filters": has_filters,
             "cards":       cards,
             "create_url":  reverse("oficios:novo"),
-            "search_clear_url": reverse("oficios:index"),
+            "search_clear_url": f"{reverse('oficios:index')}?aba={aba}",
             "status_options": [{"value": "", "label": "Todos os status"}]
             + [{"value": v, "label": l} for v, l in Oficio.STATUS_CHOICES],
-            "temporal_options": [
-                {"value": "",          "label": "Qualquer período"},
-                {"value": "futuro",    "label": "Futuras"},
-                {"value": "andamento", "label": "Em andamento"},
-                {"value": "passado",   "label": "Passadas"},
-            ],
             "sort_options": [
                 {"value": "numero_desc",  "label": "Número: maior"},
                 {"value": "numero_asc",   "label": "Número: menor"},

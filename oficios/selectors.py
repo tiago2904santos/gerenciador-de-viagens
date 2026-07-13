@@ -30,7 +30,6 @@ _SORT_MAP = {
 def listar_oficios(
     q: str | None = None,
     status: str | None = None,
-    temporal: str | None = None,
     criacao_de: str | None = None,
     criacao_ate: str | None = None,
     viagem_de: str | None = None,
@@ -94,24 +93,6 @@ def listar_oficios(
             except (ValueError, IndexError):
                 pass
         queryset = queryset.filter(filters).distinct()
-    if temporal:
-        today = timezone.localdate()
-        if temporal == "futuro":
-            queryset = queryset.filter(roteiro__isnull=False, roteiro__saida_dt__date__gt=today)
-        elif temporal == "andamento":
-            queryset = queryset.filter(
-                roteiro__isnull=False,
-                roteiro__saida_dt__date__lte=today,
-            ).filter(
-                Q(roteiro__retorno_chegada_dt__date__gte=today)
-                | Q(roteiro__retorno_chegada_dt__isnull=True, roteiro__chegada_dt__date__gte=today)
-                | Q(roteiro__retorno_chegada_dt__isnull=True, roteiro__chegada_dt__isnull=True)
-            )
-        elif temporal == "passado":
-            queryset = queryset.filter(roteiro__isnull=False).filter(
-                Q(roteiro__retorno_chegada_dt__date__lt=today)
-                | Q(roteiro__retorno_chegada_dt__isnull=True, roteiro__chegada_dt__date__lt=today)
-            )
     if criacao_de:
         try:
             queryset = queryset.filter(data_criacao__date__gte=criacao_de)

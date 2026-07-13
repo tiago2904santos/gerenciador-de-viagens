@@ -35,7 +35,8 @@ class OficioViewsTests(TestCase):
 
     def test_index_usa_modal_para_excluir_oficio(self):
         oficio = Oficio.objects.create(numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
-        response = self.client.get(reverse("oficios:index"))
+        # Ofício sem data de viagem cai na aba "Em andamento e realizados" (atuais).
+        response = self.client.get(reverse("oficios:index") + "?aba=atuais")
         self.assertContains(response, "data-delete-confirm-modal")
         self.assertContains(response, "data-delete-modal-trigger")
         excluir_url = reverse("oficios:excluir", args=[oficio.pk])

@@ -232,15 +232,15 @@
   border-color: var(--border-active, rgba(99, 165, 255, 0.45));
 }
 
-/* ── Abas das prestações (Pendentes / Que vão acontecer / Arquivados / Finalizados) ── */
-.prestacoes-tabs {
+/* ── Abas de listagem (temporais / de estado) — compartilhado entre as listas ── */
+.cv-list-tabs {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2, 8px);
   margin: 0 0 var(--space-4, 16px);
 }
 
-.prestacoes-tab {
+.cv-list-tab {
   align-items: center;
   background: var(--color-surface-soft, rgba(255, 255, 255, 0.04));
   border: 1px solid var(--color-border, rgba(255, 255, 255, 0.12));
@@ -256,21 +256,21 @@
   transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
-.prestacoes-tab:hover,
-.prestacoes-tab:focus-visible {
+.cv-list-tab:hover,
+.cv-list-tab:focus-visible {
   background: var(--color-surface-strong, rgba(255, 255, 255, 0.08));
   border-color: var(--color-border-strong, rgba(255, 255, 255, 0.2));
   color: var(--color-text, #fff);
   outline: none;
 }
 
-.prestacoes-tab--active {
+.cv-list-tab--active {
   background: var(--color-primary-soft, rgba(99, 165, 255, 0.16));
   border-color: var(--color-primary-bright, rgba(99, 165, 255, 0.6));
   color: var(--color-primary-bright, #63a5ff);
 }
 
-.prestacoes-tab__count {
+.cv-list-tab__count {
   background: var(--color-surface-strong, rgba(255, 255, 255, 0.1));
   border-radius: var(--radius-pill, 999px);
   color: inherit;
@@ -281,7 +281,7 @@
   text-align: center;
 }
 
-.prestacoes-tab--active .prestacoes-tab__count {
+.cv-list-tab--active .cv-list-tab__count {
   background: var(--color-primary-bright, #63a5ff);
   color: var(--color-white, #fff);
 }

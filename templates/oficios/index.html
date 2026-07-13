@@ -6,7 +6,7 @@
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/roteiros-list.css' %}?v=20260622-mobile">
   <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260610-oficios-datepicker">
-  <link rel="stylesheet" href="{% static 'css/oficios-list-header.css' %}?v=20260627-filter-style">
+  <link rel="stylesheet" href="{% static 'css/oficios-list-header.css' %}?v=20260713-abas-docs">
 {% endblock %}
 
 {% block content %}
@@ -48,14 +48,7 @@
             >
           </div>
 
-          {# Período temporal #}
-          <div class="cv-custom-select oficios-filter-cs" data-cv-select>
-            <select name="temporal" aria-label="Período da viagem" data-cv-filter="select">
-              {% for opt in temporal_options %}
-                <option value="{{ opt.value }}"{% if opt.value == temporal %} selected{% endif %}>{{ opt.label }}</option>
-              {% endfor %}
-            </select>
-          </div>
+          <input type="hidden" name="aba" value="{{ aba }}">
 
           {# Ordenação #}
           <div class="cv-custom-select oficios-filter-cs" data-cv-select>
@@ -108,6 +101,8 @@
       </div>
     </div>
   </form>
+
+  {% include "components/lists/list_tabs.html" with abas=abas tabs_aria_label="Abas de ofícios" only %}
 
   <div class="list-panel">
     <div class="list-content list-grid list-grid--roteiros app-list-grid" data-cv-list-container>

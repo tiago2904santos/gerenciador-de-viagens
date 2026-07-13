@@ -161,8 +161,12 @@ def tipo_excluir(request, pk):
 
 
 def index(request):
+    from django.db.models import OuterRef
+    from core import documento_abas as tabs
+    from prestacoes_contas.models import PrestacaoContas
+
     q = request.GET.get("q", "").strip()
-    temporal = request.GET.get("temporal", "").strip()
+    aba = tabs.normalizar_aba(request.GET.get("aba", ""))
     viagem_de = request.GET.get("viagem_de", "").strip()
     viagem_ate = request.GET.get("viagem_ate", "").strip()
     sort = request.GET.get("sort", "").strip()
@@ -201,14 +205,6 @@ def index(request):
             | Q(unidade_responsavel__nome__unaccent__icontains=q_unaccent)
         )
 
-    hoje = timezone.localdate()
-    if temporal == "futuro":
-        eventos = eventos.filter(data_inicio__gt=hoje)
-    elif temporal == "andamento":
-        eventos = eventos.filter(data_inicio__lte=hoje, data_fim__gte=hoje)
-    elif temporal == "passado":
-        eventos = eventos.filter(data_fim__lt=hoje)
-
     viagem_de_date = parse_date(viagem_de) if viagem_de else None
     viagem_ate_date = parse_date(viagem_ate) if viagem_ate else None
     if viagem_de_date:
@@ -225,8 +221,21 @@ def index(request):
         "viagem_desc": ("-data_inicio", "-criado_em"),
     }
     eventos = eventos.order_by(*sort_map.get(sort or "criacao_desc", sort_map["criacao_desc"]))
-    has_filters = any([q, temporal, viagem_de, viagem_ate, sort])
-    cards = [apresentar_evento_list_card(evento) for evento in eventos]
+
+    # Abas: Finalizado = todas as prestações dos ofícios (não cancelados) do
+    # evento já finalizadas.
+    sub = PrestacaoContas.objects.filter(oficio__evento=OuterRef("pk"), oficio__cancelado=False)
+    eventos = tabs.anotar_finalizacao(eventos, sub, sub.filter(finalizada=False))
+    cancelado_q = Q(status=Evento.STATUS_CANCELADO)
+    date_field = "data_inicio"
+    lista = eventos.filter(tabs.q_da_aba(aba, date_field=date_field, cancelado_q=cancelado_q))
+    contagem = tabs.contar_por_aba(eventos, date_field=date_field, cancelado_q=cancelado_q)
+    abas = tabs.build_abas(
+        reverse("eventos:index"), aba, contagem,
+        preserved={"q": q, "sort": sort, "viagem_de": viagem_de, "viagem_ate": viagem_ate},
+    )
+    has_filters = any([q, viagem_de, viagem_ate, sort])
+    cards = [apresentar_evento_list_card(evento) for evento in lista]
 
     return render(
         request,
@@ -235,21 +244,16 @@ def index(request):
             "page_title": "Eventos",
             "page_description": "Agrupadores opcionais para organizar documentos relacionados.",
             "q": q,
-            "temporal": temporal,
+            "aba": aba,
+            "abas": abas,
             "viagem_de": viagem_de,
             "viagem_ate": viagem_ate,
             "sort": sort,
             "has_filters": has_filters,
-            "eventos": eventos,
+            "eventos": lista,
             "cards": cards,
             "novo_url": reverse("eventos:novo"),
-            "search_clear_url": reverse("eventos:index"),
-            "temporal_options": [
-                {"value": "", "label": "Qualquer período"},
-                {"value": "futuro", "label": "Futuras"},
-                {"value": "andamento", "label": "Em andamento"},
-                {"value": "passado", "label": "Passadas"},
-            ],
+            "search_clear_url": f"{reverse('eventos:index')}?aba={aba}",
             "sort_options": [
                 {"value": "criacao_desc", "label": "Criação: mais recente"},
                 {"value": "criacao_asc", "label": "Criação: mais antiga"},

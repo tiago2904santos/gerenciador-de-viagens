@@ -29,7 +29,8 @@ class PlanoWizardViewsTests(TestCase):
 
     def test_index_renderiza(self):
         criar_plano_maringa(self.maringa)
-        response = self.client.get(reverse("planos_trabalho:index"))
+        # O plano de teste tem data de evento passada → aba "atuais".
+        response = self.client.get(reverse("planos_trabalho:index") + "?aba=atuais")
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "20/2026/ASCOM")
 

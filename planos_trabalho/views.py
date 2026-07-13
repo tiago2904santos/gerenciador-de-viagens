@@ -270,9 +270,13 @@ def _autosave_form_errors(*forms):
 
 
 def index(request):
+    from django.db.models import OuterRef, Q
+    from core import documento_abas as tabs
+    from prestacoes_contas.models import PrestacaoContas
+
     q = request.GET.get("q", "").strip()
     status = request.GET.get("status", "").strip()
-    temporal = request.GET.get("temporal", "").strip()
+    aba = tabs.normalizar_aba(request.GET.get("aba", ""))
     viagem_de = request.GET.get("viagem_de", "").strip()
     viagem_ate = request.GET.get("viagem_ate", "").strip()
     sort = request.GET.get("sort", "").strip()
@@ -300,14 +304,6 @@ def index(request):
             filtro = filtro | Q(numero=int(q)) | Q(ano=int(q))
         planos = planos.filter(filtro)
 
-    hoje = timezone.localdate()
-    if temporal == "futuro":
-        planos = planos.filter(data_evento_inicio__gt=hoje)
-    elif temporal == "andamento":
-        planos = planos.filter(data_evento_inicio__lte=hoje, data_evento_fim__gte=hoje)
-    elif temporal == "passado":
-        planos = planos.filter(data_evento_fim__lt=hoje)
-
     viagem_de_date = parse_date(viagem_de) if viagem_de else None
     viagem_ate_date = parse_date(viagem_ate) if viagem_ate else None
     if viagem_de_date:
@@ -325,8 +321,22 @@ def index(request):
     }
     planos = planos.order_by(*sort_map.get(sort or "numero_desc", sort_map["numero_desc"]))
 
-    cards = [apresentar_plano_card(plano) for plano in planos]
-    has_filters = any([q, status, temporal, viagem_de, viagem_ate, sort])
+    # Abas: Finalizado = todas as prestações dos ofícios (não cancelados) do
+    # evento vinculado ao plano já finalizadas.
+    sub = PrestacaoContas.objects.filter(oficio__evento=OuterRef("evento_id"), oficio__cancelado=False)
+    planos = tabs.anotar_finalizacao(planos, sub, sub.filter(finalizada=False))
+    cancelado_q = Q(cancelado=True)
+    date_field = "data_evento_inicio"
+    lista = planos.filter(tabs.q_da_aba(aba, date_field=date_field, cancelado_q=cancelado_q))
+    contagem = tabs.contar_por_aba(planos, date_field=date_field, cancelado_q=cancelado_q)
+    abas = tabs.build_abas(
+        reverse("planos_trabalho:index"), aba, contagem,
+        preserved={"q": q, "status": status, "sort": sort,
+                   "viagem_de": viagem_de, "viagem_ate": viagem_ate},
+    )
+
+    cards = [apresentar_plano_card(plano) for plano in lista]
+    has_filters = any([q, status, viagem_de, viagem_ate, sort])
     return render(
         request,
         "planos_trabalho/index.html",
@@ -335,24 +345,19 @@ def index(request):
             "page_description": "Cadastre e gerencie planos de trabalho com numeração própria.",
             "q": q,
             "status": status,
-            "temporal": temporal,
+            "aba": aba,
+            "abas": abas,
             "viagem_de": viagem_de,
             "viagem_ate": viagem_ate,
             "sort": sort,
             "has_filters": has_filters,
             "cards": cards,
             "create_url": reverse("planos_trabalho:novo"),
-            "search_clear_url": reverse("planos_trabalho:index"),
+            "search_clear_url": f"{reverse('planos_trabalho:index')}?aba={aba}",
             "programas_url": reverse("planos_trabalho:programas_index"),
             "horarios_url": reverse("planos_trabalho:horarios_index"),
             "status_options": [{"value": "", "label": "Todos os status"}]
             + [{"value": v, "label": l} for v, l in PlanoTrabalho.STATUS_CHOICES],
-            "temporal_options": [
-                {"value": "", "label": "Qualquer período"},
-                {"value": "futuro", "label": "Futuras"},
-                {"value": "andamento", "label": "Em andamento"},
-                {"value": "passado", "label": "Passadas"},
-            ],
             "sort_options": [
                 {"value": "numero_desc", "label": "Número: maior"},
                 {"value": "numero_asc", "label": "Número: menor"},
