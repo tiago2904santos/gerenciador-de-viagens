@@ -146,6 +146,11 @@ class Oficio(TimeStampedModel, CancelavelModel):
         verbose_name="Emitir como retificado",
         help_text="Quando verdadeiro e o ofício seria Autorização por datas, o documento usa o rótulo Retificado.",
     )
+    complementar_documento = models.BooleanField(
+        default=False,
+        verbose_name="Emitir como complementar",
+        help_text="Quando verdadeiro, o documento usa o rótulo Complementar ao lado do número do ofício.",
+    )
 
     class Meta:
         ordering = ["-data_criacao", "-created_at"]
