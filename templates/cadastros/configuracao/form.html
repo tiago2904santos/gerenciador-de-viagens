@@ -80,6 +80,28 @@
 
             {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar" secondary_url=back_url primary_label="Salvar" only %}
           </section>
+
+          {# CARD 2b — Destinatário do Ofício por gabinete de destino #}
+          <section class="cv-wizard-section-card" aria-labelledby="config-card-destinatarios-title">
+            <header class="cv-wizard-section-header">
+              <div class="cv-wizard-section-header__copy">
+                <h3 class="cv-wizard-section-title" id="config-card-destinatarios-title">Destinatário do Ofício por gabinete de destino</h3>
+                <p class="cv-wizard-section-subtitle">
+                  Autoridade endereçada (Exmo. Sr.) ao final do ofício, conforme o gabinete de destino escolhido no ofício.
+                  Basta cadastrar o servidor com nome completo, cargo e unidade — RG/CPF não são exigidos.
+                </p>
+              </div>
+            </header>
+
+            <div class="cv-wizard-section-body">
+              <div class="field-grid field-grid--cols-2">
+                {% include "components/forms/form_field.html" with field=assinaturas_form.destinatario_oficio_adjunto size_class="field-size-1" only %}
+                {% include "components/forms/form_field.html" with field=assinaturas_form.destinatario_oficio_geral size_class="field-size-1" only %}
+              </div>
+            </div>
+
+            {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar" secondary_url=back_url primary_label="Salvar" only %}
+          </section>
         </form>
 
         {# CARD 3 — Google Drive #}

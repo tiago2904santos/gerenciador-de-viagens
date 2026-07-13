@@ -31,11 +31,12 @@
           <header class="wizard-inner-section__header">
             <h4 class="wizard-inner-section__title" id="oficio-wizard-dados-oficio">Dados do ofício</h4>
           </header>
-          {# Linha 1: N° do Ofício (editável, sugestão automática) | Protocolo | Custeio #}
-          <div class="field-grid field-grid--cols-3">
+          {# Linha 1: N° do Ofício (editável, sugestão automática) | Protocolo | Custeio | Gabinete de destino #}
+          <div class="field-grid field-grid--cols-4">
             {% include "components/forms/form_field.html" with field=form.numero label="N° do Ofício" help_text=oficio_numero_ano_hint only %}
             {% include "components/forms/form_field.html" with field=form.protocolo label="Protocolo" only %}
             {% include "components/forms/form_field.html" with field=form.custeio label="Custeio" only %}
+            {% include "components/forms/form_field.html" with field=form.destino_gabinete label="Gabinete de destino" help_text="Autoridade que assina a autorização (endereçamento do ofício)." only %}
             {# Linha 2: Nome da Instituição — somente quando custeio = Outra instituição #}
             <div
               class="field field-size-4{% if not mostrar_custeio_observacao %} form-field--hidden{% else %} is-open{% endif %}"

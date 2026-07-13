@@ -441,12 +441,16 @@ class AssinaturaConfiguracao(TimeStampedModel):
     JUSTIFICATIVA = "JUSTIFICATIVA"
     PLANO_TRABALHO = "PLANO_TRABALHO"
     ORDEM_SERVICO = "ORDEM_SERVICO"
+    DESTINATARIO_OFICIO_ADJUNTO = "DESTINATARIO_OFICIO_ADJUNTO"
+    DESTINATARIO_OFICIO_GERAL = "DESTINATARIO_OFICIO_GERAL"
 
     TIPO_CHOICES = [
         (OFICIO, "Ofício"),
         (JUSTIFICATIVA, "Justificativa"),
         (PLANO_TRABALHO, "Plano de Trabalho"),
         (ORDEM_SERVICO, "Ordem de Serviço"),
+        (DESTINATARIO_OFICIO_ADJUNTO, "Destinatário do Ofício – Gabinete do Delegado-Geral Adjunto"),
+        (DESTINATARIO_OFICIO_GERAL, "Destinatário do Ofício – Gabinete do Delegado-Geral"),
     ]
 
     configuracao = models.ForeignKey(
