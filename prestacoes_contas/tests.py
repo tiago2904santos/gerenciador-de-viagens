@@ -44,9 +44,52 @@ class PrestacaoContasSignalsTests(TestCase):
 
         oficio.servidores.add(self.servidor_a, self.servidor_b)
 
+        prestacao = PrestacaoContas.objects.get(oficio=oficio)
         self.assertEqual(
-            set(PrestacaoContas.objects.filter(oficio=oficio).values_list("servidor_id", flat=True)),
+            set(prestacao.servidores_prestacao.values_list("servidor_id", flat=True)),
             {self.servidor_a.pk, self.servidor_b.pk},
+        )
+
+    def test_remover_servidor_do_oficio_remove_da_prestacao(self):
+        """Servidor retirado do ofício não deve continuar na prestação.
+
+        Regressão: o wizard semeia a equipe do ofício anterior do evento; se o
+        usuário troca os servidores, os semeados não podem sobrar na prestação
+        (era o que misturava equipes entre ofícios do mesmo evento).
+        """
+        oficio = Oficio.objects.create(
+            numero=3,
+            ano=2026,
+            protocolo="111222333",
+            status=Oficio.STATUS_RASCUNHO,
+        )
+        oficio.servidores.add(self.servidor_a, self.servidor_b)
+
+        oficio.servidores.remove(self.servidor_a)
+
+        prestacao = PrestacaoContas.objects.get(oficio=oficio)
+        self.assertEqual(
+            set(prestacao.servidores_prestacao.values_list("servidor_id", flat=True)),
+            {self.servidor_b.pk},
+        )
+
+    def test_set_servidores_reconcilia_equipe_da_prestacao(self):
+        """``.set()`` (usado pelo ModelForm) deve deixar a prestação idêntica à equipe."""
+        oficio = Oficio.objects.create(
+            numero=4,
+            ano=2026,
+            protocolo="444555666",
+            status=Oficio.STATUS_RASCUNHO,
+        )
+        oficio.servidores.add(self.servidor_a, self.servidor_b)
+
+        # Substitui a equipe inteira, como faz o form ao salvar o ofício.
+        oficio.servidores.set([self.servidor_b])
+
+        prestacao = PrestacaoContas.objects.get(oficio=oficio)
+        self.assertEqual(
+            set(prestacao.servidores_prestacao.values_list("servidor_id", flat=True)),
+            {self.servidor_b.pk},
         )
 
 
@@ -67,7 +110,7 @@ class RelatorioTecnicoDiariaTests(TestCase):
             roteiro=roteiro,
         )
         oficio.servidores.add(self.servidor_a, self.servidor_b)
-        prestacao = PrestacaoContas.objects.get(oficio=oficio, servidor=self.servidor_a)
+        prestacao = PrestacaoContas.objects.get(oficio=oficio)
 
         response = self.client.get(reverse("prestacoes_contas:rt_criar", args=[prestacao.pk]))
 
@@ -92,8 +135,9 @@ class RelatorioTecnicoDiariaTests(TestCase):
         oficio.assunto = "Atualizacao"
         oficio.save(update_fields=["assunto", "updated_at"])
 
+        prestacao = PrestacaoContas.objects.get(oficio=oficio)
         self.assertEqual(
-            set(PrestacaoContas.objects.filter(oficio=oficio).values_list("servidor_id", flat=True)),
+            set(prestacao.servidores_prestacao.values_list("servidor_id", flat=True)),
             {self.servidor_a.pk, self.servidor_b.pk},
         )
 
@@ -106,7 +150,7 @@ class RelatorioTecnicoDocumentoTests(TestCase):
         self.servidor = Servidor.objects.create(nome="Servidor RT", cargo=self.cargo, cpf="11122233344")
         self.oficio = Oficio.objects.create(numero=7, ano=2026, protocolo="123456789")
         self.oficio.servidores.add(self.servidor)
-        self.prestacao = PrestacaoContas.objects.get(oficio=self.oficio, servidor=self.servidor)
+        self.prestacao = PrestacaoContas.objects.get(oficio=self.oficio)
         self.relatorio = RelatorioTecnico.objects.create(
             prestacao=self.prestacao,
             diaria="R$100,00",

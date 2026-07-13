@@ -54,6 +54,7 @@ def listar_prestacoes(
             "relatorio_tecnico",
             "diario_bordo",
         )
+        .filter(oficio__cancelado=False)
         .order_by(*order_fields)
     )
 
