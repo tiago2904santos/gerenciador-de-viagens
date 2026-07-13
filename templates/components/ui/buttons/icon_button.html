@@ -4,7 +4,7 @@
      href="{{ href }}"
      aria-label="{{ aria_label }}"
      data-tooltip="{{ tooltip|default:aria_label }}"
-     {% if action == "preview" %}target="_blank" rel="noopener noreferrer"{% endif %}
+     {% if action == "preview" %}target="_blank" rel="noopener noreferrer"{% elif action == "pdf" or action == "docx" %}download{% endif %}
      {% if data_autosave_link %}data-autosave-link="1"{% endif %}
   >{% if action == "preview" %}{% include "dev/ui_lab/partials/_cv_icon.html" with icon="eye" only %}{% else %}{% include "dev/ui_lab/partials/_cv_icon.html" with icon=action only %}{% endif %}</a>
 {% else %}

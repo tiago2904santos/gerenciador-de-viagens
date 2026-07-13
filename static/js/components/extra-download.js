@@ -16,6 +16,7 @@
     window.setTimeout(function () {
       var link = document.createElement("a");
       link.href = extraUrl;
+      link.download = "";
       link.rel = "noopener";
       link.style.display = "none";
       document.body.appendChild(link);
