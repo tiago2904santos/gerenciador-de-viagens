@@ -216,10 +216,13 @@ def apresentar_linha_lista_simples_servidor(servidor, edit_url="#", delete_url="
     if servidor.unidade:
         unidade_label = servidor.unidade.sigla or servidor.unidade.nome
     cargo_label = servidor.cargo.nome if servidor.cargo else "—"
+    badges = []
+    if servidor.status == servidor.STATUS_RASCUNHO:
+        badges.append(build_badge("Rascunho", "draft"))
     return {
         "avatar": "SV",
         "title": servidor.nome,
-        "badges": [],
+        "badges": badges,
         "meta": [
             build_meta("Cargo", cargo_label),
             build_meta("CPF", _format_cpf(servidor.cpf)),
@@ -237,10 +240,13 @@ def apresentar_linha_lista_simples_viatura(viatura, edit_url="#", delete_url="#"
     placa_fmt = _format_placa(viatura.placa)
     modelo = (viatura.modelo or "").strip()
     title = f"{modelo} — {placa_fmt}" if modelo else placa_fmt
+    badges = []
+    if viatura.status == viatura.STATUS_RASCUNHO:
+        badges.append(build_badge("Rascunho", "draft"))
     return {
         "avatar": "VT",
         "title": title,
-        "badges": [],
+        "badges": badges,
         "meta": [
             build_meta("Placa", placa_fmt),
             build_meta("Unidade", _viatura_unidade_label(viatura)),

@@ -119,14 +119,35 @@ def _initial_roteiro_evento(evento):
 
 
 def index(request):
+    from django.db.models import OuterRef, Q
+    from core import documento_abas as tabs
+    from prestacoes_contas.models import PrestacaoContas
+
     q = request.GET.get("q", "").strip()
+    aba = tabs.normalizar_aba(request.GET.get("aba", ""))
     roteiros = listar_roteiros(q=q)
-    paginator = Paginator(roteiros, ROTEIROS_PER_PAGE)
+
+    # Finalizado = todas as prestações dos ofícios (não cancelados) vinculados
+    # a este roteiro já foram finalizadas.
+    sub = PrestacaoContas.objects.filter(oficio__roteiro=OuterRef("pk"), oficio__cancelado=False)
+    roteiros = tabs.anotar_finalizacao(roteiros, sub, sub.filter(finalizada=False))
+    cancelado_q = Q(cancelado=True)
+    date_field = "saida_dt__date"
+
+    lista = roteiros.filter(tabs.q_da_aba(aba, date_field=date_field, cancelado_q=cancelado_q))
+    contagem = tabs.contar_por_aba(roteiros, date_field=date_field, cancelado_q=cancelado_q)
+    abas = tabs.build_abas(
+        reverse("roteiros:index"), aba, contagem,
+        preserved={"q": q},
+    )
+
+    paginator = Paginator(lista, ROTEIROS_PER_PAGE)
     page_obj = paginator.get_page(request.GET.get("page"))
+    next_url = request.get_full_path()
     rows = [
         apresentar_linha_lista_simples_roteiro(
             roteiro,
-            edit_url=reverse("roteiros:editar", args=[roteiro.pk]),
+            edit_url=f"{reverse('roteiros:editar', args=[roteiro.pk])}?{urlencode({'next': next_url})}",
             delete_url=reverse("roteiros:excluir", args=[roteiro.pk]),
             delete_modal=True,
         )
@@ -139,13 +160,15 @@ def index(request):
             "page_title": "Roteiros",
             "page_description": "Sede, destinos, período, trechos e diárias prontos para reutilizar em documentos.",
             "create_url": reverse("roteiros:novo"),
-            "search_clear_url": reverse("roteiros:index"),
+            "search_clear_url": f"{reverse('roteiros:index')}?aba={aba}",
             "empty_message": "Nenhum roteiro cadastrado ainda.",
             "rows": rows,
             "q": q,
+            "aba": aba,
+            "abas": abas,
             "page_obj": page_obj,
             "pagination_pages": _pagination_pages(page_obj),
-            "page_querystring": urlencode({"q": q}) if q else "",
+            "page_querystring": urlencode({k: v for k, v in {"q": q, "aba": aba}.items() if v}),
         },
     )
 

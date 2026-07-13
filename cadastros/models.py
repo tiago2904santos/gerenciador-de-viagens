@@ -159,7 +159,15 @@ class Combustivel(TimeStampedModel):
 
 
 class Servidor(TimeStampedModel):
+    STATUS_RASCUNHO = "RASCUNHO"
+    STATUS_COMPLETO = "COMPLETO"
+    STATUS_CHOICES = [
+        (STATUS_RASCUNHO, "Rascunho"),
+        (STATUS_COMPLETO, "Completo"),
+    ]
+
     nome = models.CharField(max_length=255)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_RASCUNHO)
     cargo = models.ForeignKey(
         Cargo,
         on_delete=models.PROTECT,
@@ -242,10 +250,18 @@ class Servidor(TimeStampedModel):
         else:
             self.rg = "".join(c for c in (self.rg or "").upper() if c.isalnum())
         self.telefone = normalize_digits(self.telefone)
+        self.status = self.STATUS_COMPLETO if self.esta_completo() else self.STATUS_RASCUNHO
         super().save(*args, **kwargs)
 
 
 class Viatura(TimeStampedModel):
+    STATUS_RASCUNHO = "RASCUNHO"
+    STATUS_COMPLETO = "COMPLETO"
+    STATUS_CHOICES = [
+        (STATUS_RASCUNHO, "Rascunho"),
+        (STATUS_COMPLETO, "Completo"),
+    ]
+
     TIPO_CARACTERIZADA = "CARACTERIZADA"
     TIPO_DESCARACTERIZADA = "DESCARACTERIZADA"
     TIPO_CHOICES = [
@@ -254,6 +270,7 @@ class Viatura(TimeStampedModel):
     ]
 
     placa = models.CharField(max_length=7, unique=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_RASCUNHO)
     modelo = models.CharField(max_length=120, blank=True)
     combustivel = models.ForeignKey(
         Combustivel,
@@ -311,6 +328,7 @@ class Viatura(TimeStampedModel):
         self.placa = normalize_plate(self.placa)
         self.modelo = normalize_upper(self.modelo)
         self.tipo = (self.tipo or "").strip().upper()
+        self.status = self.STATUS_COMPLETO if self.esta_completo() else self.STATUS_RASCUNHO
         super().save(*args, **kwargs)
 
 

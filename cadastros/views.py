@@ -11,6 +11,8 @@ from django.urls import reverse
 from django.utils.http import url_has_allowed_host_and_scheme
 
 from core.utils.masks import only_digits
+from .models import Servidor
+from .models import Viatura
 from .forms import CargoForm
 from .forms import CidadeForm
 from .forms import CombustivelForm
@@ -713,15 +715,18 @@ def servidor_create(request):
     next_url = _safe_next_url(request, index_url)
     form = ServidorForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
-        criar_servidor(form)
-        messages.success(request, "Servidor criado com sucesso.")
+        servidor = criar_servidor(form)
+        if servidor.status == Servidor.STATUS_RASCUNHO:
+            messages.success(request, "Servidor salvo como rascunho. Complete cargo e CPF quando possível.")
+        else:
+            messages.success(request, "Servidor criado com sucesso.")
         return redirect(next_url)
     return render(
         request,
         "cadastros/servidores/form.html",
         {
             "page_title": "Novo servidor",
-            "page_description": "Nome, cargo e CPF são obrigatórios. RG e vínculo com unidade são opcionais.",
+            "page_description": "Apenas o nome é obrigatório — cargo, CPF, RG e unidade podem ser completados depois; o cadastro fica como rascunho até então.",
             "form": form,
             "submit_label": "Criar servidor",
             "submit_icon": "plus",
@@ -737,15 +742,18 @@ def servidor_update(request, pk):
     servidor = get_servidor_by_id(pk)
     form = ServidorForm(request.POST or None, instance=servidor)
     if request.method == "POST" and form.is_valid():
-        atualizar_servidor(servidor, form)
-        messages.success(request, "Servidor atualizado com sucesso.")
+        servidor = atualizar_servidor(servidor, form)
+        if servidor.status == Servidor.STATUS_RASCUNHO:
+            messages.success(request, "Servidor salvo como rascunho. Complete cargo e CPF quando possível.")
+        else:
+            messages.success(request, "Servidor atualizado com sucesso.")
         return redirect("cadastros:servidores_index")
     return render(
         request,
         "cadastros/servidores/form.html",
         {
             "page_title": "Editar servidor",
-            "page_description": "Atualize os dados do servidor. RG e vínculo com unidade são opcionais.",
+            "page_description": "Atualize os dados do servidor. Cargo, CPF, RG e unidade podem ser completados depois; o cadastro fica como rascunho até então.",
             "form": form,
             "submit_label": "Salvar servidor",
             "submit_icon": "check",
@@ -804,15 +812,18 @@ def viatura_create(request):
     next_url = _safe_next_url(request, index_url)
     form = ViaturaForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
-        criar_viatura(form)
-        messages.success(request, "Viatura criada com sucesso.")
+        viatura = criar_viatura(form)
+        if viatura.status == Viatura.STATUS_RASCUNHO:
+            messages.success(request, "Viatura salva como rascunho. Complete modelo, combustível e tipo quando possível.")
+        else:
+            messages.success(request, "Viatura criada com sucesso.")
         return redirect(next_url)
     return render(
         request,
         "cadastros/viaturas/form.html",
         {
             "page_title": "Nova viatura",
-            "page_description": "Cadastre placa, modelo, combustível e tipo.",
+            "page_description": "Apenas a placa é obrigatória — modelo, combustível e tipo podem ser completados depois; o cadastro fica como rascunho até então.",
             "form": form,
             "submit_label": "Criar viatura",
             "submit_icon": "plus",
@@ -827,15 +838,18 @@ def viatura_update(request, pk):
     viatura = get_viatura_by_id(pk)
     form = ViaturaForm(request.POST or None, instance=viatura)
     if request.method == "POST" and form.is_valid():
-        atualizar_viatura(viatura, form)
-        messages.success(request, "Viatura atualizada com sucesso.")
+        viatura = atualizar_viatura(viatura, form)
+        if viatura.status == Viatura.STATUS_RASCUNHO:
+            messages.success(request, "Viatura salva como rascunho. Complete modelo, combustível e tipo quando possível.")
+        else:
+            messages.success(request, "Viatura atualizada com sucesso.")
         return redirect("cadastros:viaturas_index")
     return render(
         request,
         "cadastros/viaturas/form.html",
         {
             "page_title": "Editar viatura",
-            "page_description": "Atualize os dados da viatura.",
+            "page_description": "Atualize os dados da viatura. Modelo, combustível e tipo podem ser completados depois; o cadastro fica como rascunho até então.",
             "form": form,
             "submit_label": "Salvar viatura",
             "submit_icon": "check",

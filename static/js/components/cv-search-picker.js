@@ -42,6 +42,7 @@
       main:      option.dataset.main     || (option.textContent || "").trim(),
       memberIds,
       meta:      option.dataset.meta     || option.dataset.unidade || "",
+      rascunho:  option.dataset.rascunho === "true",
       rg:        option.dataset.rg       || "",
       search:    option.dataset.search   || option.textContent    || "",
       selected:  option.selected,
@@ -417,6 +418,9 @@
       }
 
       body.appendChild(main);
+      if (item.rascunho) {
+        main.appendChild(el("span", "cv-chip cv-chip--warning cv-chip--compact", "Rascunho"));
+      }
       if (item.meta) {
         body.appendChild(el("span", "cv-search-picker__option-meta", item.meta));
       }
@@ -507,6 +511,7 @@
         const name = el("span", "cv-search-picker__selected-name", nameParts.join("  •  "));
         title.appendChild(name);
         if (showDriverCtrl) title.appendChild(el("span", "cv-search-picker__driver-chip", "Motorista"));
+        if (item.rascunho) title.appendChild(el("span", "cv-chip cv-chip--warning cv-chip--compact", "Rascunho"));
         body.appendChild(title);
 
         const metaParts = [item.cargo, item.cpf, item.rg].filter(Boolean);
@@ -522,6 +527,7 @@
         const name = el("span", "cv-search-picker__selected-name", item.label);
         title.appendChild(name);
         if (showDriverCtrl) title.appendChild(el("span", "cv-search-picker__driver-chip", "Motorista"));
+        if (item.rascunho) title.appendChild(el("span", "cv-chip cv-chip--warning cv-chip--compact", "Rascunho"));
         body.appendChild(title);
 
         const metaParts = [item.cargo, item.unidade].filter(Boolean);

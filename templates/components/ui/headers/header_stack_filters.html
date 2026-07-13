@@ -32,6 +32,7 @@
           {% if search_value %}value="{{ search_value }}"{% endif %}
         >
       </div>
+      {% if current_aba %}<input type="hidden" name="aba" value="{{ current_aba }}">{% endif %}
       {% if status_options %}
         <div class="header-filter-bar__row">
           <div class="header-filter-bar__fields">

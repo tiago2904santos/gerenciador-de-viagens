@@ -227,6 +227,38 @@ class ServidorCrudTests(TestCase):
 
         self.assertRedirects(response, reverse("cadastros:servidores_index"))
 
+    def test_servidor_create_apenas_com_nome_fica_rascunho(self):
+        response = self.client.post(
+            reverse("cadastros:servidor_create"),
+            {
+                "nome": "servidor incompleto",
+                "cargo": "",
+                "cpf": "",
+                "rg": "",
+                "unidade": "",
+            },
+        )
+        self.assertRedirects(response, reverse("cadastros:servidores_index"))
+        servidor = Servidor.objects.get(nome="SERVIDOR INCOMPLETO")
+        self.assertEqual(servidor.status, Servidor.STATUS_RASCUNHO)
+
+        response = self.client.get(reverse("cadastros:servidores_index"))
+        self.assertContains(response, "Rascunho")
+
+        response = self.client.post(
+            reverse("cadastros:servidor_update", args=[servidor.pk]),
+            {
+                "nome": "servidor incompleto",
+                "cargo": str(self.cargo.pk),
+                "cpf": "111.444.777-35",
+                "rg": "",
+                "unidade": "",
+            },
+        )
+        self.assertRedirects(response, reverse("cadastros:servidores_index"))
+        servidor.refresh_from_db()
+        self.assertEqual(servidor.status, Servidor.STATUS_COMPLETO)
+
 
 @override_settings(ALLOWED_HOSTS=["testserver", "localhost"])
 class ViaturaCrudTests(TestCase):
@@ -325,6 +357,36 @@ class ViaturaCrudTests(TestCase):
         )
 
         self.assertRedirects(response, next_url)
+
+    def test_viatura_create_apenas_com_placa_fica_rascunho(self):
+        response = self.client.post(
+            reverse("cadastros:viatura_create"),
+            {
+                "placa": "ccc1234",
+                "modelo": "",
+                "combustivel": "",
+                "tipo": "",
+            },
+        )
+        self.assertRedirects(response, reverse("cadastros:viaturas_index"))
+        viatura = Viatura.objects.get(placa="CCC1234")
+        self.assertEqual(viatura.status, Viatura.STATUS_RASCUNHO)
+
+        response = self.client.get(reverse("cadastros:viaturas_index"))
+        self.assertContains(response, "Rascunho")
+
+        response = self.client.post(
+            reverse("cadastros:viatura_update", args=[viatura.pk]),
+            {
+                "placa": "ccc1234",
+                "modelo": "Onix",
+                "combustivel": str(self.combustivel.pk),
+                "tipo": Viatura.TIPO_CARACTERIZADA,
+            },
+        )
+        self.assertRedirects(response, reverse("cadastros:viaturas_index"))
+        viatura.refresh_from_db()
+        self.assertEqual(viatura.status, Viatura.STATUS_COMPLETO)
 
 
 @override_settings(ALLOWED_HOSTS=["testserver", "localhost"])

@@ -333,10 +333,11 @@ def _roteiro_rows_do_evento(evento):
         .order_by("-created_at")
         .prefetch_related("destinos__cidade__estado", "trechos")
     )
+    next_url = reverse("eventos:guiado_etapa", kwargs={"pk": evento.pk, "etapa": 2})
     return [
         apresentar_linha_lista_simples_roteiro(
             r,
-            edit_url=reverse("roteiros:editar", args=[r.pk]),
+            edit_url=f"{reverse('roteiros:editar', args=[r.pk])}?{urlencode({'next': next_url})}",
             delete_url=reverse("roteiros:excluir", args=[r.pk]),
             delete_modal=True,
         )

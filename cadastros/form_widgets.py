@@ -1,5 +1,6 @@
 from django import forms
 
+from .models import Servidor
 from .models import Viatura
 
 
@@ -33,6 +34,7 @@ class ServidorEquipeSelectMultiple(forms.SelectMultiple):
                 "data-search": search,
                 "data-unidade": unidade,
                 "data-unidade-id": unidade_id,
+                "data-rascunho": "true" if servidor.status == Servidor.STATUS_RASCUNHO else "false",
             },
         )
         return option
@@ -66,6 +68,7 @@ class ViaturaSelectSingle(forms.Select):
                 "data-motorista-ids": motorista_ids,
                 "data-unidade-id": unidade_id,
                 "data-search": search,
+                "data-rascunho": "true" if viatura.status == Viatura.STATUS_RASCUNHO else "false",
             },
         )
         return option
@@ -122,6 +125,7 @@ class ServidorMotoristaSelect(forms.Select):
                 "data-search": search,
                 "data-unidade": unidade,
                 "data-unidade-id": unidade_id,
+                "data-rascunho": "true" if servidor.status == Servidor.STATUS_RASCUNHO else "false",
             },
         )
         return option

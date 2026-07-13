@@ -79,6 +79,7 @@ def _servidor_option_attrs(servidor):
         "data-search": search,
         "data-unidade": unidade,
         "data-unidade-id": str(servidor.unidade_id or ""),
+        "data-rascunho": "true" if servidor.status == Servidor.STATUS_RASCUNHO else "false",
     }
 
 
@@ -273,6 +274,7 @@ class ServidorForm(BaseCadastroForm):
     cpf = forms.CharField(
         label="CPF",
         max_length=14,
+        required=False,
         widget=forms.TextInput(
             attrs={
                 "placeholder": "000.000.000-00",
@@ -317,8 +319,8 @@ class ServidorForm(BaseCadastroForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["cargo"].required = True
-        self.fields["cargo"].empty_label = "Selecione"
+        self.fields["cargo"].required = False
+        self.fields["cargo"].empty_label = "Selecione (opcional)"
         self.fields["cargo"].widget.attrs["class"] = "form-select"
         self.fields["cargo"].queryset = Cargo.objects.order_by("nome")
         self.fields["unidade"].required = False
@@ -362,7 +364,7 @@ class ServidorForm(BaseCadastroForm):
     def clean_cpf(self):
         digits = only_digits(self.cleaned_data.get("cpf", ""))
         if not digits:
-            raise forms.ValidationError("Informe o CPF.")
+            return ""
         if len(digits) != 11:
             raise forms.ValidationError("CPF deve conter 11 dígitos.")
         if not validar_cpf_digitos(digits):
@@ -438,11 +440,11 @@ class ViaturaForm(BaseCadastroForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["combustivel"].required = True
-        self.fields["combustivel"].empty_label = "Selecione"
+        self.fields["combustivel"].required = False
+        self.fields["combustivel"].empty_label = "Selecione (opcional)"
         self.fields["combustivel"].widget.attrs["class"] = "form-select"
         self.fields["combustivel"].queryset = Combustivel.objects.order_by("nome")
-        self.fields["tipo"].required = True
+        self.fields["tipo"].required = False
         self.fields["unidade"].required = False
         self.fields["unidade"].empty_label = "Selecione (opcional)"
         self.fields["unidade"].label = "Unidade (opcional)"
@@ -479,10 +481,7 @@ class ViaturaForm(BaseCadastroForm):
         return raw
 
     def clean_modelo(self):
-        modelo = normalize_upper(self.cleaned_data.get("modelo", ""))
-        if not modelo:
-            raise forms.ValidationError("Informe o modelo.")
-        return modelo
+        return normalize_upper(self.cleaned_data.get("modelo", ""))
 
 
 class ConfiguracaoSistemaForm(forms.ModelForm):
