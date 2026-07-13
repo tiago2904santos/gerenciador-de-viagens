@@ -1,5 +1,6 @@
 from datetime import date
 from datetime import datetime
+from datetime import timedelta
 from decimal import Decimal
 import json
 import tempfile
@@ -624,3 +625,98 @@ class RelatorioTecnicoDocumentoTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "application/pdf")
         self.assertIn(".pdf", response["Content-Disposition"])
+
+
+class PrestacaoAbasTests(TestCase):
+    """Abas (pendentes/futuras/arquivados/finalizados) + ações arquivar/finalizar."""
+
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(username="tester_abas", password="123456")
+        self.client.force_login(self.user)
+        self.cargo = Cargo.objects.create(nome="Agente")
+        self.servidor = Servidor.objects.create(nome="Servidor Abas", cargo=self.cargo, cpf="11122233344")
+
+    def _criar_prestacao(self, *, saida_offset_dias=0, numero=1):
+        """Cria um ofício (e, via signal, a prestação) com saída em ``hoje + offset``."""
+        saida = timezone.now() + timedelta(days=saida_offset_dias)
+        roteiro = Roteiro.objects.create(saida_dt=saida)
+        oficio = Oficio.objects.create(numero=numero, ano=2026, protocolo=f"1000000{numero}", roteiro=roteiro)
+        oficio.servidores.add(self.servidor)
+        return PrestacaoContas.objects.get(oficio=oficio)
+
+    def _pks(self, aba):
+        from prestacoes_contas import selectors
+
+        return set(selectors.listar_prestacoes(aba=aba).values_list("pk", flat=True))
+
+    def test_viagem_futura_alem_de_um_dia_nao_aparece_em_pendentes(self):
+        pendente = self._criar_prestacao(saida_offset_dias=0, numero=1)   # começa hoje
+        amanha = self._criar_prestacao(saida_offset_dias=1, numero=2)     # falta 1 dia (visível)
+        futura = self._criar_prestacao(saida_offset_dias=5, numero=3)     # falta mais de 1 dia
+
+        from prestacoes_contas import selectors
+
+        pendentes = self._pks(selectors.ABA_PENDENTES)
+        futuras = self._pks(selectors.ABA_FUTURAS)
+
+        self.assertIn(pendente.pk, pendentes)
+        self.assertIn(amanha.pk, pendentes)
+        self.assertNotIn(futura.pk, pendentes)
+        self.assertEqual(futuras, {futura.pk})
+
+    def test_arquivar_move_para_aba_arquivados(self):
+        from prestacoes_contas import selectors
+
+        prestacao = self._criar_prestacao(saida_offset_dias=0)
+
+        response = self.client.post(
+            reverse("prestacoes_contas:prestacao_arquivar", args=[prestacao.pk]),
+            data={"next": "/prestacoes-contas/?aba=pendentes"},
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, "/prestacoes-contas/?aba=pendentes")
+        prestacao.refresh_from_db()
+        self.assertTrue(prestacao.arquivada)
+        self.assertIsNotNone(prestacao.arquivada_em)
+        self.assertNotIn(prestacao.pk, self._pks(selectors.ABA_PENDENTES))
+        self.assertIn(prestacao.pk, self._pks(selectors.ABA_ARQUIVADOS))
+
+        # Segundo POST desarquiva (toggle).
+        self.client.post(reverse("prestacoes_contas:prestacao_arquivar", args=[prestacao.pk]))
+        prestacao.refresh_from_db()
+        self.assertFalse(prestacao.arquivada)
+        self.assertIsNone(prestacao.arquivada_em)
+        self.assertIn(prestacao.pk, self._pks(selectors.ABA_PENDENTES))
+
+    def test_finalizar_tem_precedencia_sobre_arquivada(self):
+        from prestacoes_contas import selectors
+
+        prestacao = self._criar_prestacao(saida_offset_dias=0)
+        prestacao.definir_arquivada(True)
+
+        self.client.post(reverse("prestacoes_contas:prestacao_finalizar", args=[prestacao.pk]))
+
+        prestacao.refresh_from_db()
+        self.assertTrue(prestacao.finalizada)
+        # Finalizada aparece só em "Finalizados", mesmo estando arquivada.
+        self.assertIn(prestacao.pk, self._pks(selectors.ABA_FINALIZADOS))
+        self.assertNotIn(prestacao.pk, self._pks(selectors.ABA_ARQUIVADOS))
+        self.assertNotIn(prestacao.pk, self._pks(selectors.ABA_PENDENTES))
+
+    def test_contagem_por_aba(self):
+        from prestacoes_contas import selectors
+
+        p_pend = self._criar_prestacao(saida_offset_dias=0, numero=1)
+        self._criar_prestacao(saida_offset_dias=5, numero=2)
+        p_arq = self._criar_prestacao(saida_offset_dias=0, numero=3)
+        p_arq.definir_arquivada(True)
+        p_fin = self._criar_prestacao(saida_offset_dias=0, numero=4)
+        p_fin.definir_finalizada(True)
+
+        contagem = selectors.contar_por_aba()
+        self.assertEqual(contagem[selectors.ABA_PENDENTES], 1)
+        self.assertEqual(contagem[selectors.ABA_FUTURAS], 1)
+        self.assertEqual(contagem[selectors.ABA_ARQUIVADOS], 1)
+        self.assertEqual(contagem[selectors.ABA_FINALIZADOS], 1)
+        self.assertIn(p_pend.pk, self._pks(selectors.ABA_PENDENTES))

@@ -283,7 +283,7 @@
 
 .prestacoes-tab--active .prestacoes-tab__count {
   background: var(--color-primary-bright, #63a5ff);
-  color: var(--color-on-primary, #071019);
+  color: var(--color-white, #fff);
 }
 
 /* Ações de gerenciamento do card de prestação (finalizar / arquivar) */
