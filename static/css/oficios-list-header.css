@@ -241,11 +241,26 @@
 }
 
 .cv-list-tab {
+  --cv-list-tab-bg: var(--color-surface-soft, rgba(255, 255, 255, 0.04));
+  --cv-list-tab-border: var(--color-border, rgba(255, 255, 255, 0.12));
+  --cv-list-tab-color: var(--color-text-secondary, rgba(255, 255, 255, 0.7));
+  --cv-list-tab-hover-bg: var(--color-surface-strong, rgba(255, 255, 255, 0.08));
+  --cv-list-tab-hover-border: var(--color-border-strong, rgba(255, 255, 255, 0.2));
+  --cv-list-tab-hover-color: var(--color-text, #fff);
+  --cv-list-tab-count-bg: var(--color-surface-strong, rgba(255, 255, 255, 0.1));
+  --cv-list-tab-active-bg: var(--color-primary-soft, rgba(99, 165, 255, 0.16));
+  --cv-list-tab-active-border: var(--color-primary-bright, rgba(99, 165, 255, 0.6));
+  --cv-list-tab-active-color: var(--color-primary-bright, #63a5ff);
+  --cv-list-tab-active-count-bg: var(--color-primary-bright, #63a5ff);
+  --cv-list-tab-active-count-color: var(--color-white, #fff);
+}
+
+.cv-list-tab {
   align-items: center;
-  background: var(--color-surface-soft, rgba(255, 255, 255, 0.04));
-  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.12));
+  background: var(--cv-list-tab-bg);
+  border: 1px solid var(--cv-list-tab-border);
   border-radius: var(--radius-pill, 999px);
-  color: var(--color-text-secondary, rgba(255, 255, 255, 0.7));
+  color: var(--cv-list-tab-color);
   display: inline-flex;
   font-size: var(--font-size-sm, 0.875rem);
   font-weight: 600;
@@ -258,20 +273,20 @@
 
 .cv-list-tab:hover,
 .cv-list-tab:focus-visible {
-  background: var(--color-surface-strong, rgba(255, 255, 255, 0.08));
-  border-color: var(--color-border-strong, rgba(255, 255, 255, 0.2));
-  color: var(--color-text, #fff);
+  background: var(--cv-list-tab-hover-bg);
+  border-color: var(--cv-list-tab-hover-border);
+  color: var(--cv-list-tab-hover-color);
   outline: none;
 }
 
 .cv-list-tab--active {
-  background: var(--color-primary-soft, rgba(99, 165, 255, 0.16));
-  border-color: var(--color-primary-bright, rgba(99, 165, 255, 0.6));
-  color: var(--color-primary-bright, #63a5ff);
+  background: var(--cv-list-tab-active-bg);
+  border-color: var(--cv-list-tab-active-border);
+  color: var(--cv-list-tab-active-color);
 }
 
 .cv-list-tab__count {
-  background: var(--color-surface-strong, rgba(255, 255, 255, 0.1));
+  background: var(--cv-list-tab-count-bg);
   border-radius: var(--radius-pill, 999px);
   color: inherit;
   font-size: var(--font-size-2xs, 0.72rem);
@@ -282,8 +297,27 @@
 }
 
 .cv-list-tab--active .cv-list-tab__count {
-  background: var(--color-primary-bright, #63a5ff);
-  color: var(--color-white, #fff);
+  background: var(--cv-list-tab-active-count-bg);
+  color: var(--cv-list-tab-active-count-color);
+}
+
+/* Tema escuro: --color-text-secondary/--color-border não têm variante escura própria
+   (ficam com tons pensados pro claro), por isso a aba inativa some no fundo escuro.
+   Aqui usamos tokens já calibrados pro escuro (--theme-text-muted etc.) e o dourado
+   no lugar do azul soft na aba ativa. */
+html[data-theme="dark"] .cv-list-tab {
+  --cv-list-tab-bg: var(--color-surface-strong, #111e2f);
+  --cv-list-tab-border: var(--color-border-strong, rgba(214, 227, 244, 0.38));
+  --cv-list-tab-color: var(--theme-text-muted, #b8c8dc);
+  --cv-list-tab-hover-bg: var(--color-card-soft, #24384e);
+  --cv-list-tab-hover-border: rgba(237, 244, 255, 0.55);
+  --cv-list-tab-hover-color: var(--color-heading, #f7fbff);
+  --cv-list-tab-count-bg: rgba(255, 255, 255, 0.12);
+  --cv-list-tab-active-bg: #4d3d1e;
+  --cv-list-tab-active-border: #d8a21b;
+  --cv-list-tab-active-color: #ffe9a8;
+  --cv-list-tab-active-count-bg: #d8a21b;
+  --cv-list-tab-active-count-color: #2a1d05;
 }
 
 /* Ações de gerenciamento do card de prestação (finalizar / arquivar) */
