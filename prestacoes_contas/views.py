@@ -1,4 +1,5 @@
 from pathlib import Path
+import json
 import re
 
 from django.contrib import messages
@@ -19,8 +20,11 @@ from core.autosave import parse_autosave_payload
 from core.normalizers import normalize_spaces
 from core.normalizers import remove_accents
 from core.presenters.meta import build_meta
+from core.utils.masks import format_cpf
+from core.utils.masks import format_placa
 from core.utils.masks import format_protocolo
 from documentos.services.exceptions import DocumentValidationError
+from oficios.models import Oficio
 
 from .assinatura_services import AssinaturaError
 from .assinatura_services import assinatura_db
@@ -39,6 +43,8 @@ from .diario_services import motorista_diario
 from .diario_services import motorista_do_oficio
 from .diario_services import nome_arquivo_diario
 from .diario_services import sincronizar_trechos
+from .diario_services import viatura_resumo_diario
+from .diario_services import viatura_resumo_oficio
 from .forms import CAMPOS_COM_MODELO
 from .forms import CAMPOS_CUSTEIO_COM_OUTRO
 from .forms import DiarioBordoTrechoFormSet
@@ -1009,10 +1015,68 @@ def _motorista_resumo(diario) -> dict:
     }
 
 
+def _sincronizar_info_complementares_rt(prestacao):
+    """Após trocar motorista/viatura, gera a prévia em Informações complementares do
+    RT — apenas quando o campo ainda está vazio (não sobrescreve texto do usuário)."""
+    from .services import descricao_ajustes_prestacao
+
+    relatorio = RelatorioTecnico.objects.filter(prestacao=prestacao).first()
+    if relatorio is None or normalize_spaces(relatorio.info_complementares or ""):
+        return
+    texto = descricao_ajustes_prestacao(prestacao)
+    if texto:
+        relatorio.info_complementares = texto
+        relatorio.save(update_fields=["info_complementares", "atualizado_em"])
+
+
+def _oficio_prefill_dados(oficio) -> dict:
+    """Dados de um ofício para auto-preencher o formulário de troca (motorista + viatura)."""
+    from .diario_services import _viatura_dados  # uso interno no mesmo app
+
+    nome, cpf = motorista_do_oficio(oficio)
+    numero = str(oficio.numero or "").strip()
+    ano = str(oficio.ano or "").strip()
+    numero_ano = f"{numero}/{ano}" if numero and ano else numero
+
+    viatura = {"modo": "", "id": "", "modelo": "", "placa": "", "tipo": "", "combustivel": ""}
+    if oficio.viatura_id:
+        v = oficio.viatura
+        viatura = {
+            "modo": DiarioBordo.VIATURA_MODO_BANCO,
+            "id": str(oficio.viatura_id),
+            "modelo": v.modelo or "",
+            "placa": v.placa or "",
+            "tipo": v.tipo or "",
+            "combustivel": str(v.combustivel) if v.combustivel_id else "",
+        }
+    elif (oficio.transporte_modelo_manual or oficio.transporte_placa_manual or oficio.transporte_tipo_manual):
+        viatura = {
+            "modo": DiarioBordo.VIATURA_MODO_MANUAL,
+            "id": "",
+            "modelo": oficio.transporte_modelo_manual or "",
+            "placa": oficio.transporte_placa_manual or "",
+            "tipo": oficio.transporte_tipo_manual or "",
+            "combustivel": str(oficio.transporte_combustivel_manual) if oficio.transporte_combustivel_manual_id else "",
+        }
+
+    label = numero_ano or f"Ofício {oficio.pk}"
+    if nome:
+        label = f"{label} — {nome}"
+    return {
+        "id": oficio.pk,
+        "label": label,
+        "numero_ano": numero_ano,
+        "protocolo": format_protocolo(oficio.protocolo) or "",
+        "motorista_nome": nome or "",
+        "motorista_cpf": format_cpf(cpf) or cpf or "",
+        "viatura": viatura,
+    }
+
+
 def diario_motorista(request, pc_pk):
-    """Etapa 2 — troca o motorista apenas deste diário, sem alterar o ofício."""
+    """Etapa 2 — troca o motorista/viatura apenas deste diário, sem alterar o ofício."""
     prestacao = get_object_or_404(
-        PrestacaoContas.objects.select_related("oficio").prefetch_related(
+        PrestacaoContas.objects.select_related("oficio", "oficio__viatura").prefetch_related(
             "oficio__servidores__cargo",
             "oficio__servidores__unidade",
         ),
@@ -1025,18 +1089,29 @@ def diario_motorista(request, pc_pk):
         form = DiarioMotoristaForm(request.POST, instance=diario, oficio=prestacao.oficio)
         if form.is_valid():
             form.save()
+            _sincronizar_info_complementares_rt(prestacao)
             _marcar_prestacao_em_preenchimento(prestacao)
-            messages.success(request, "Motorista do diário de bordo atualizado.")
+            messages.success(request, "Diário de bordo atualizado (motorista/viatura).")
             return redirect(diario_url)
     else:
         form = DiarioMotoristaForm(instance=diario, oficio=prestacao.oficio)
 
     oficio_nome, oficio_cpf = motorista_do_oficio(prestacao.oficio)
+
+    # Ofícios existentes (com número) para o select de "motorista de outro ofício".
+    oficios = (
+        Oficio.objects.select_related("viatura", "viatura__combustivel", "motorista", "transporte_combustivel_manual")
+        .exclude(pk=prestacao.oficio_id)
+        .filter(numero__isnull=False)
+        .order_by("-ano", "-numero")[:200]
+    )
+    oficios_prefill = [_oficio_prefill_dados(o) for o in oficios]
+
     return render(
         request,
         "prestacoes_contas/diario_motorista_form.html",
         {
-            "page_title": "Trocar motorista do diário",
+            "page_title": "Trocar motorista / viatura",
             "prestacao": prestacao,
             "diario": diario,
             "form": form,
@@ -1044,6 +1119,9 @@ def diario_motorista(request, pc_pk):
             "wizard_page_steps": _build_prestacao_steps(prestacao, "diario"),
             "motorista_oficio_nome": oficio_nome or "—",
             "motorista_oficio_cpf": oficio_cpf,
+            "viatura_oficio": viatura_resumo_oficio(prestacao.oficio),
+            "oficios_prefill": oficios_prefill,
+            "oficios_prefill_json": json.dumps(oficios_prefill),
             "diario_url": diario_url,
         },
     )

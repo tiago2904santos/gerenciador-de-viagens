@@ -29,6 +29,16 @@
           >
         </div>
 
+        {% if status_options %}
+        <div class="cv-custom-select oficios-filter-cs" data-cv-select>
+          <select name="status" aria-label="Status" data-cv-filter="select">
+            {% for opt in status_options %}
+              <option value="{{ opt.value }}"{% if opt.value == status %} selected{% endif %}>{{ opt.label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        {% endif %}
+
         <div class="cv-custom-select oficios-filter-cs" data-cv-select>
           <select name="temporal" aria-label="Período da viagem" data-cv-filter="select">
             {% for opt in temporal_options %}

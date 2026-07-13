@@ -4,12 +4,14 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260710-motorista">
-  <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}?v=20260710-motorista">
+  <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260711-motorista">
+  <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}?v=20260711-motorista">
+  <link rel="stylesheet" href="{% static 'css/diario-troca.css' %}?v=20260711">
 {% endblock %}
 
 {% block extra_js %}
-  <script src="{% static 'js/pages/diario-motorista.js' %}?v=20260710" defer></script>
+  <script src="{% static 'js/components/masks.js' %}?v=20260711" defer></script>
+  <script src="{% static 'js/pages/diario-motorista.js' %}?v=20260711" defer></script>
 {% endblock %}
 
 {% block content %}
@@ -20,53 +22,86 @@
 
     <main class="main-form-panel main-form-panel--stack oficio-wizard__main">
       <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
-        <form method="post" class="oficio-wizard__form" novalidate data-diario-motorista-form>
+        <form method="post" class="oficio-wizard__form dmv-form"
+              novalidate
+              data-diario-motorista-form
+              data-oficios='{{ oficios_prefill_json }}'>
           {% csrf_token %}
 
           {% if form.non_field_errors %}
             {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
           {% endif %}
 
-          <section class="cv-wizard-section-card" aria-labelledby="diario-motorista-title">
+          <p class="dmv-lede">
+            Ajuste o <strong>motorista</strong> e a <strong>viatura</strong> apenas deste diário — o
+            ofício {{ identificacao.numero }} original não é alterado. Se houver troca, geramos uma prévia
+            da justificativa em <strong>Informações complementares</strong> do Relatório Técnico.
+          </p>
+
+          {# ═══════════════ MOTORISTA ═══════════════ #}
+          <section class="cv-wizard-section-card" aria-labelledby="dmv-motorista-title">
             <header class="cv-wizard-section-header">
               <div class="cv-wizard-section-header__copy">
-                <h2 class="cv-wizard-section-title" id="diario-motorista-title">Motorista do diário de bordo</h2>
-                <p class="cv-wizard-section-subtitle">
-                  Ofício {{ identificacao.numero }}. A troca vale apenas para este diário — o ofício original não é alterado.
-                </p>
+                <h2 class="cv-wizard-section-title" id="dmv-motorista-title">Motorista</h2>
+                <p class="cv-wizard-section-subtitle">Quem dirigiu o veículo nesta viagem?</p>
               </div>
             </header>
 
             <div class="cv-wizard-section-body">
-              <fieldset class="diario-motorista-modo">
-                <legend class="cv-field__label">Quem foi o motorista nesta viagem?</legend>
-                {% for radio in form.motorista_modo %}
-                  <label class="diario-motorista-modo__option">
-                    {{ radio.tag }}
-                    <span class="diario-motorista-modo__text">
-                      {{ radio.choice_label }}
-                      {% if radio.data.value == "OFICIO" %}
-                        <small class="diario-motorista-modo__hint">{{ motorista_oficio_nome }}{% if motorista_oficio_cpf %} — CPF {{ motorista_oficio_cpf }}{% endif %}</small>
-                      {% endif %}
-                    </span>
-                  </label>
-                {% endfor %}
+              <fieldset class="dmv-picker" data-dmv-picker="motorista">
+                <legend class="sr-only">Motorista do diário</legend>
+                <div class="dmv-picker__grid">
+                  {% for radio in form.motorista_modo %}
+                    <label class="dmv-option">
+                      {{ radio.tag }}
+                      <span class="dmv-option__mark" aria-hidden="true"></span>
+                      <span class="dmv-option__content">
+                        <span class="dmv-option__title">{{ radio.choice_label }}</span>
+                        {% if radio.data.value == "OFICIO" %}
+                          <span class="dmv-option__hint">{{ motorista_oficio_nome }}{% if motorista_oficio_cpf %} · CPF {{ motorista_oficio_cpf }}{% endif %}</span>
+                        {% elif radio.data.value == "SERVIDOR" %}
+                          <span class="dmv-option__hint">Um dos servidores deste ofício assumiu a direção.</span>
+                        {% else %}
+                          <span class="dmv-option__hint">Motorista vindo de outro ofício ou preenchido manualmente.</span>
+                        {% endif %}
+                      </span>
+                    </label>
+                  {% endfor %}
+                </div>
                 {% if form.motorista_modo.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.motorista_modo.errors only %}{% endif %}
               </fieldset>
 
               {# Outro servidor do mesmo ofício #}
-              <div class="diario-motorista-group" data-motorista-group="SERVIDOR" hidden>
+              <div class="dmv-group" data-motorista-group="SERVIDOR" hidden>
                 <div class="field cv-field">
                   <label class="cv-field__label" for="{{ form.motorista_servidor.id_for_label }}">Servidor deste ofício</label>
-                  {% include "components/ui/forms/select.html" with field=form.motorista_servidor only %}
+                  {{ form.motorista_servidor }}
                   {% if form.motorista_servidor.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.motorista_servidor.errors only %}{% endif %}
                 </div>
               </div>
 
-              {# Motorista de outro ofício #}
-              <div class="diario-motorista-group" data-motorista-group="OUTRO_OFICIO" hidden>
-                <div class="field-grid field-grid--cols-2">
-                  <div class="field cv-field">
+              {# Motorista de outro ofício / manual #}
+              <div class="dmv-group" data-motorista-group="OUTRO_OFICIO" hidden>
+                {% if oficios_prefill %}
+                  <div class="dmv-prefill">
+                    <div class="dmv-prefill__icon" aria-hidden="true">
+                      {% include "dev/ui_lab/partials/_cv_icon.html" with icon="download" only %}
+                    </div>
+                    <div class="dmv-prefill__body">
+                      <label class="cv-field__label" for="dmv-oficio-prefill">Puxar dados de um ofício existente <span class="dmv-muted">(opcional)</span></label>
+                      <select id="dmv-oficio-prefill" class="form-select" data-oficio-prefill>
+                        <option value="">Selecione um ofício…</option>
+                        {% for o in oficios_prefill %}
+                          <option value="{{ o.id }}">{{ o.label }}</option>
+                        {% endfor %}
+                      </select>
+                      <p class="cv-field__hint">Preenche automaticamente motorista, ofício, protocolo e viatura — tudo continua editável.</p>
+                    </div>
+                  </div>
+                {% endif %}
+
+                <div class="dmv-fields">
+                  <div class="field cv-field dmv-fields__wide">
                     <label class="cv-field__label" for="{{ form.motorista_manual_nome.id_for_label }}">Nome do motorista</label>
                     {{ form.motorista_manual_nome }}
                     {% if form.motorista_manual_nome.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.motorista_manual_nome.errors only %}{% endif %}
@@ -90,6 +125,76 @@
                 </div>
               </div>
             </div>
+          </section>
+
+          {# ═══════════════ VIATURA ═══════════════ #}
+          <section class="cv-wizard-section-card" aria-labelledby="dmv-viatura-title">
+            <header class="cv-wizard-section-header">
+              <div class="cv-wizard-section-header__copy">
+                <h2 class="cv-wizard-section-title" id="dmv-viatura-title">Viatura</h2>
+                <p class="cv-wizard-section-subtitle">Qual veículo foi usado nesta viagem?</p>
+              </div>
+            </header>
+
+            <div class="cv-wizard-section-body">
+              <fieldset class="dmv-picker" data-dmv-picker="viatura">
+                <legend class="sr-only">Viatura do diário</legend>
+                <div class="dmv-picker__grid">
+                  {% for radio in form.viatura_modo %}
+                    <label class="dmv-option">
+                      {{ radio.tag }}
+                      <span class="dmv-option__mark" aria-hidden="true"></span>
+                      <span class="dmv-option__content">
+                        <span class="dmv-option__title">{{ radio.choice_label }}</span>
+                        {% if radio.data.value == "OFICIO" %}
+                          <span class="dmv-option__hint">{{ viatura_oficio.viatura }}{% if viatura_oficio.placa %} · {{ viatura_oficio.placa }}{% endif %}</span>
+                        {% elif radio.data.value == "BANCO" %}
+                          <span class="dmv-option__hint">Escolher uma viatura já cadastrada no sistema.</span>
+                        {% else %}
+                          <span class="dmv-option__hint">Digitar os dados do veículo à mão.</span>
+                        {% endif %}
+                      </span>
+                    </label>
+                  {% endfor %}
+                </div>
+                {% if form.viatura_modo.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.viatura_modo.errors only %}{% endif %}
+              </fieldset>
+
+              {# Viatura do cadastro #}
+              <div class="dmv-group" data-viatura-group="BANCO" hidden>
+                <div class="field cv-field">
+                  <label class="cv-field__label" for="{{ form.viatura.id_for_label }}">Viatura do cadastro</label>
+                  {{ form.viatura }}
+                  {% if form.viatura.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.viatura.errors only %}{% endif %}
+                </div>
+              </div>
+
+              {# Viatura manual #}
+              <div class="dmv-group" data-viatura-group="MANUAL" hidden>
+                <div class="dmv-fields">
+                  <div class="field cv-field dmv-fields__wide">
+                    <label class="cv-field__label" for="{{ form.viatura_manual_modelo.id_for_label }}">Modelo</label>
+                    {{ form.viatura_manual_modelo }}
+                    {% if form.viatura_manual_modelo.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.viatura_manual_modelo.errors only %}{% endif %}
+                  </div>
+                  <div class="field cv-field">
+                    <label class="cv-field__label" for="{{ form.viatura_manual_placa.id_for_label }}">Placa</label>
+                    {{ form.viatura_manual_placa }}
+                    {% if form.viatura_manual_placa.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.viatura_manual_placa.errors only %}{% endif %}
+                  </div>
+                  <div class="field cv-field">
+                    <label class="cv-field__label" for="{{ form.viatura_manual_tipo.id_for_label }}">Tipo</label>
+                    {{ form.viatura_manual_tipo }}
+                    {% if form.viatura_manual_tipo.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.viatura_manual_tipo.errors only %}{% endif %}
+                  </div>
+                  <div class="field cv-field">
+                    <label class="cv-field__label" for="{{ form.viatura_manual_combustivel.id_for_label }}">Combustível</label>
+                    {{ form.viatura_manual_combustivel }}
+                    {% if form.viatura_manual_combustivel.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.viatura_manual_combustivel.errors only %}{% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
 
             <section class="cv-card-footer-section">
               <div class="cv-card-footer-section__divider" aria-hidden="true"></div>
@@ -98,7 +203,7 @@
                   {% include "components/ui/buttons/button.html" with href=diario_url label="Cancelar" variant="secondary" icon="arrow-left" only %}
                 </div>
                 <div class="cv-card-footer__primary">
-                  {% include "components/ui/buttons/button.html" with label="Salvar motorista" variant="primary" icon="check" icon_after=True type="submit" only %}
+                  {% include "components/ui/buttons/button.html" with label="Salvar alterações" variant="primary" icon="check" icon_after=True type="submit" only %}
                 </div>
               </footer>
             </section>

@@ -1,0 +1,193 @@
+/* Troca de motorista / viatura do diário de bordo (Etapa 3).
+   Cards de opção (radio-cards) + grupos condicionais, no tema do sistema. */
+
+.dmv-lede {
+  margin: 0 0 var(--space-2, 0.5rem);
+  color: var(--color-text-muted, #52657a);
+  font-size: var(--font-size-sm, 0.875rem);
+  line-height: 1.55;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Picker: cards de opção ───────────────────────────────── */
+.dmv-picker {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.dmv-picker__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: var(--space-3, 0.75rem);
+}
+
+.dmv-option {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3, 0.75rem);
+  padding: var(--space-4, 1rem);
+  border: 1px solid var(--color-border-soft, #e3eaf2);
+  border-radius: var(--radius-control, 12px);
+  background: var(--color-surface, #101d2c);
+  cursor: pointer;
+  transition: border-color var(--transition-fast, 0.15s ease),
+    background var(--transition-fast, 0.15s ease),
+    box-shadow var(--transition-fast, 0.15s ease);
+}
+
+.dmv-option:hover {
+  border-color: color-mix(in srgb, var(--color-primary, #2f8bd8) 55%, var(--color-border-soft, #e3eaf2));
+  background: color-mix(in srgb, var(--color-primary, #2f8bd8) 6%, var(--color-surface, #101d2c));
+}
+
+/* Radio nativo escondido — o card inteiro é o alvo. */
+.dmv-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  pointer-events: none;
+}
+
+.dmv-option__mark {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+  border: 2px solid var(--color-border, #9fb2c8);
+  border-radius: 50%;
+  background: transparent;
+  transition: border-color var(--transition-fast, 0.15s ease);
+}
+
+.dmv-option__content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.dmv-option__title {
+  font-weight: var(--font-weight-bold, 600);
+  color: var(--color-heading, var(--color-text, #eef4fb));
+  line-height: 1.3;
+}
+
+.dmv-option__hint {
+  font-size: var(--font-size-xs, 0.78rem);
+  color: var(--color-text-muted, #52657a);
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+/* Selecionado (via :has moderno + fallback .is-selected do JS). */
+.dmv-option:has(input:checked),
+.dmv-option.is-selected {
+  border-color: var(--color-primary, #2f8bd8);
+  background: color-mix(in srgb, var(--color-primary, #2f8bd8) 12%, var(--color-surface, #101d2c));
+  box-shadow: inset 0 0 0 1px var(--color-primary, #2f8bd8);
+}
+
+.dmv-option:has(input:checked) .dmv-option__mark,
+.dmv-option.is-selected .dmv-option__mark {
+  border-color: var(--color-primary, #2f8bd8);
+  background:
+    radial-gradient(circle at center, var(--color-primary, #2f8bd8) 0 5px, transparent 6px);
+}
+
+/* Acessibilidade: foco pelo teclado destaca o card. */
+.dmv-option:has(input:focus-visible) {
+  outline: 2px solid var(--color-primary, #2f8bd8);
+  outline-offset: 2px;
+}
+
+/* ── Grupo condicional (aparece conforme a opção) ─────────── */
+.dmv-group {
+  margin-top: var(--space-4, 1rem);
+  padding: var(--space-4, 1rem);
+  border: 1px solid var(--color-border-soft, #e3eaf2);
+  border-radius: var(--radius-control, 12px);
+  background: var(--color-surface-muted, #0d1826);
+  animation: dmv-reveal 0.18s ease;
+}
+
+.dmv-group[hidden] {
+  display: none;
+}
+
+@keyframes dmv-reveal {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.dmv-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3, 0.75rem) var(--space-4, 1rem);
+}
+
+.dmv-fields__wide {
+  grid-column: 1 / -1;
+}
+
+/* ── Prefill: puxar dados de um ofício ────────────────────── */
+.dmv-prefill {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3, 0.75rem);
+  margin-bottom: var(--space-4, 1rem);
+  padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+  border: 1px dashed color-mix(in srgb, var(--color-primary, #2f8bd8) 45%, transparent);
+  border-radius: var(--radius-control, 12px);
+  background: color-mix(in srgb, var(--color-primary, #2f8bd8) 7%, transparent);
+}
+
+.dmv-prefill__icon {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  color: var(--color-primary, #2f8bd8);
+  background: color-mix(in srgb, var(--color-primary, #2f8bd8) 16%, transparent);
+}
+
+.dmv-prefill__icon .cv-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.dmv-prefill__body {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1, 0.25rem);
+}
+
+.dmv-muted {
+  color: var(--color-text-muted, #52657a);
+  font-weight: 400;
+}
+
+@media (max-width: 640px) {
+  .dmv-fields {
+    grid-template-columns: 1fr;
+  }
+}

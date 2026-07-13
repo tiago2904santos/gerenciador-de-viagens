@@ -3,6 +3,7 @@ from django.db.models import Q
 from django.core.validators import FileExtensionValidator
 
 from cadastros.models import Servidor
+from cadastros.models import Viatura
 from oficios.models import Oficio
 from roteiros.models import RoteiroTrecho
 
@@ -241,6 +242,18 @@ class DiarioBordo(models.Model):
         (MOTORISTA_MODO_OUTRO, "Motorista de outro ofício"),
     ]
 
+    # Viatura do diário. Por padrão vem do ofício (modo OFICIO); pode ser trocada
+    # só para este diário — escolhendo uma viatura do cadastro (BANCO) ou
+    # preenchendo os dados manualmente (MANUAL) — sem alterar o ofício original.
+    VIATURA_MODO_OFICIO = "OFICIO"
+    VIATURA_MODO_BANCO = "BANCO"
+    VIATURA_MODO_MANUAL = "MANUAL"
+    VIATURA_MODO_CHOICES = [
+        (VIATURA_MODO_OFICIO, "Manter a viatura do ofício"),
+        (VIATURA_MODO_BANCO, "Selecionar do cadastro"),
+        (VIATURA_MODO_MANUAL, "Preencher manualmente"),
+    ]
+
     prestacao = models.OneToOneField(
         PrestacaoContas,
         on_delete=models.CASCADE,
@@ -274,6 +287,31 @@ class DiarioBordo(models.Model):
         default="",
         verbose_name="Protocolo do motorista",
     )
+
+    # ── Override da viatura (independente do motorista) ──
+    viatura_modo = models.CharField(
+        max_length=10,
+        choices=VIATURA_MODO_CHOICES,
+        default=VIATURA_MODO_OFICIO,
+    )
+    viatura = models.ForeignKey(
+        "cadastros.Viatura",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+        verbose_name="Viatura (cadastro)",
+    )
+    viatura_manual_modelo = models.CharField(max_length=120, blank=True, default="")
+    viatura_manual_placa = models.CharField(max_length=8, blank=True, default="")
+    viatura_manual_tipo = models.CharField(
+        max_length=20,
+        choices=Viatura.TIPO_CHOICES,
+        blank=True,
+        default="",
+    )
+    viatura_manual_combustivel = models.CharField(max_length=60, blank=True, default="")
+
     criado_em = models.DateTimeField(auto_now_add=True)
     atualizado_em = models.DateTimeField(auto_now=True)
 
@@ -288,6 +326,11 @@ class DiarioBordo(models.Model):
     def motorista_alterado(self) -> bool:
         """True quando o motorista foi trocado em relação ao do ofício."""
         return self.motorista_modo != self.MOTORISTA_MODO_OFICIO
+
+    @property
+    def viatura_alterada(self) -> bool:
+        """True quando a viatura foi trocada em relação à do ofício."""
+        return self.viatura_modo != self.VIATURA_MODO_OFICIO
 
 
 class DiarioBordoTrecho(models.Model):

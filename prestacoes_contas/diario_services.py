@@ -22,6 +22,7 @@ from documentos.services.exceptions import DocumentValidationError
 from documentos.services.libreoffice_resolve import resolve_libreoffice_binary
 from documentos.services.pdf_engine import build_pdf_unavailable_message
 from documentos.services.pdf_engine import resolve_pdf_engine
+from cadastros.models import Viatura
 from oficios.models import Oficio
 from roteiros.models import RoteiroTrecho
 
@@ -353,6 +354,83 @@ def _viatura_dados(oficio: Oficio) -> dict:
     }
 
 
+def _viatura_dados_diario(diario: DiarioBordo) -> dict:
+    """Dados da viatura efetiva do diário, considerando o override; senão vem do ofício."""
+    modo = diario.viatura_modo
+    if modo == DiarioBordo.VIATURA_MODO_BANCO and diario.viatura_id:
+        v = diario.viatura
+        return {
+            "viatura": _viatura_label(v.modelo, v.get_tipo_display() if (v.tipo or "").strip() else ""),
+            "combustivel": _upper(v.combustivel) if v.combustivel_id else "",
+            "placa": format_placa(v.placa) if v.placa else "",
+        }
+    if modo == DiarioBordo.VIATURA_MODO_MANUAL:
+        tipo_display = dict(Viatura.TIPO_CHOICES).get((diario.viatura_manual_tipo or "").strip(), "")
+        return {
+            "viatura": _viatura_label(diario.viatura_manual_modelo, tipo_display),
+            "combustivel": _upper(diario.viatura_manual_combustivel),
+            "placa": format_placa(diario.viatura_manual_placa) if diario.viatura_manual_placa else "",
+        }
+    return _viatura_dados(diario.prestacao.oficio)
+
+
+def viatura_resumo_diario(diario: DiarioBordo) -> dict:
+    """Resumo da viatura efetiva do diário para exibição (nome/placa/combustível)."""
+    dados = _viatura_dados_diario(diario)
+    return {
+        "viatura": dados.get("viatura") or "—",
+        "placa": dados.get("placa") or "",
+        "combustivel": dados.get("combustivel") or "",
+        "alterada": diario.viatura_alterada,
+    }
+
+
+def viatura_resumo_oficio(oficio: Oficio) -> dict:
+    """Resumo da viatura definida no ofício (referência para a Etapa 3)."""
+    dados = _viatura_dados(oficio)
+    return {
+        "viatura": dados.get("viatura") or "—",
+        "placa": dados.get("placa") or "",
+        "combustivel": dados.get("combustivel") or "",
+    }
+
+
+def _viatura_texto(dados: dict) -> str:
+    partes = [dados.get("viatura") or "", dados.get("placa") or ""]
+    txt = " — ".join(p for p in partes if p)
+    return txt or "não informada"
+
+
+def alteracoes_motorista_viatura(prestacao) -> list[str]:
+    """Frases descrevendo a troca de motorista e/ou viatura no diário desta prestação,
+    em relação ao ofício. Vazio quando nada foi trocado (ou não há diário)."""
+    diario = (
+        DiarioBordo.objects.filter(prestacao=prestacao)
+        .select_related("viatura", "viatura__combustivel", "motorista_servidor")
+        .first()
+    )
+    if diario is None:
+        return []
+    oficio = prestacao.oficio
+    itens = []
+
+    if diario.motorista_alterado:
+        nome_of, _ = motorista_do_oficio(oficio)
+        nome_novo, _ = motorista_diario(diario)
+        de = format_document_display(nome_of) or "não informado"
+        para = format_document_display(nome_novo) or "não informado"
+        if de != para:
+            itens.append(f"houve a troca do motorista {de} para {para}")
+
+    if diario.viatura_alterada:
+        de = _viatura_texto(_viatura_dados(oficio))
+        para = _viatura_texto(_viatura_dados_diario(diario))
+        if de != para:
+            itens.append(f"houve a troca da viatura {de} para {para}")
+
+    return itens
+
+
 def _abastecimento_label(valor) -> str:
     sim = "X" if valor is True else " "
     nao = "X" if valor is False else " "
@@ -363,7 +441,7 @@ def build_diario_bordo_context(diario: DiarioBordo) -> tuple[dict, list[dict]]:
     oficio = diario.prestacao.oficio
     inst = build_configuracao_context()
     motorista_nome, motorista_cpf = motorista_diario(diario)
-    viatura = _viatura_dados(oficio)
+    viatura = _viatura_dados_diario(diario)
 
     # Ofício/protocolo do motorista: por padrão são os do próprio ofício; quando o
     # motorista é de outro ofício, usam a referência informada no override.

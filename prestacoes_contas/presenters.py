@@ -68,6 +68,8 @@ def apresentar_prestacao_card(prestacao, solicitacao_forms=None):
         _servidor_row(ps, solicitacao_forms.get(ps.pk))
         for ps in prestacao.servidores_prestacao.all()
     ]
+    # O motorista aparece sempre como primeiro nome da lista (ordem estável entre os demais).
+    servidores.sort(key=lambda s: not s["is_motorista"])
 
     # ── Identificação ──
     data_criacao_display = ""

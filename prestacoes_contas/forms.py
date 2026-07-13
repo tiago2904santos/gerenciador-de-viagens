@@ -7,6 +7,7 @@ from django.forms import modelformset_factory
 from django.forms.renderers import TemplatesSetting
 
 from cadastros.models import Servidor
+from cadastros.models import Viatura
 from core.normalizers import normalize_spaces
 from core.utils.masks import normalize_protocolo
 
@@ -129,6 +130,18 @@ class DiarioMotoristaForm(forms.ModelForm):
             },
         ),
     )
+    viatura_manual_placa = forms.CharField(
+        required=False,
+        max_length=8,
+        widget=forms.TextInput(
+            attrs={
+                "class": "cv-field__control",
+                "placeholder": "ABC-1D23",
+                "autocomplete": "off",
+                "data-mask": "placa",
+            },
+        ),
+    )
 
     class Meta:
         model = DiarioBordo
@@ -139,6 +152,12 @@ class DiarioMotoristaForm(forms.ModelForm):
             "motorista_manual_cpf",
             "motorista_oficio_referencia",
             "motorista_protocolo_ref",
+            "viatura_modo",
+            "viatura",
+            "viatura_manual_modelo",
+            "viatura_manual_placa",
+            "viatura_manual_tipo",
+            "viatura_manual_combustivel",
         ]
         widgets = {
             "motorista_modo": forms.RadioSelect(),
@@ -153,6 +172,21 @@ class DiarioMotoristaForm(forms.ModelForm):
                 attrs={
                     "class": "cv-field__control",
                     "placeholder": "15/2026",
+                    "autocomplete": "off",
+                },
+            ),
+            "viatura_modo": forms.RadioSelect(),
+            "viatura_manual_modelo": forms.TextInput(
+                attrs={
+                    "class": "cv-field__control",
+                    "placeholder": "Ex.: Onix",
+                    "autocomplete": "off",
+                },
+            ),
+            "viatura_manual_combustivel": forms.TextInput(
+                attrs={
+                    "class": "cv-field__control",
+                    "placeholder": "Ex.: Gasolina",
                     "autocomplete": "off",
                 },
             ),
@@ -172,6 +206,22 @@ class DiarioMotoristaForm(forms.ModelForm):
         servidor_field.widget.attrs["class"] = "form-select"
         self.fields["motorista_modo"].required = False
 
+        # Viatura do cadastro (modo BANCO).
+        viatura_field = self.fields["viatura"]
+        viatura_field.queryset = Viatura.objects.select_related("combustivel").order_by("modelo", "placa")
+        viatura_field.required = False
+        viatura_field.empty_label = "Selecione uma viatura"
+        viatura_field.widget.attrs["class"] = "form-select"
+
+        # Tipo (caracterizada/descaracterizada) da viatura manual.
+        tipo_field = self.fields["viatura_manual_tipo"]
+        tipo_field.required = False
+        tipo_field.widget = forms.Select(
+            choices=[("", "Selecione")] + list(Viatura.TIPO_CHOICES),
+            attrs={"class": "form-select"},
+        )
+        self.fields["viatura_modo"].required = False
+
     def clean_motorista_manual_cpf(self):
         return re.sub(r"\D", "", self.cleaned_data.get("motorista_manual_cpf") or "")[:11]
 
@@ -184,6 +234,15 @@ class DiarioMotoristaForm(forms.ModelForm):
     def clean_motorista_manual_nome(self):
         return normalize_spaces(self.cleaned_data.get("motorista_manual_nome") or "")
 
+    def clean_viatura_manual_placa(self):
+        return re.sub(r"[^A-Za-z0-9]", "", self.cleaned_data.get("viatura_manual_placa") or "").upper()[:8]
+
+    def clean_viatura_manual_modelo(self):
+        return normalize_spaces(self.cleaned_data.get("viatura_manual_modelo") or "")
+
+    def clean_viatura_manual_combustivel(self):
+        return normalize_spaces(self.cleaned_data.get("viatura_manual_combustivel") or "")
+
     def clean(self):
         cleaned = super().clean()
         modo = cleaned.get("motorista_modo") or DiarioBordo.MOTORISTA_MODO_OFICIO
@@ -195,6 +254,15 @@ class DiarioMotoristaForm(forms.ModelForm):
         elif modo == DiarioBordo.MOTORISTA_MODO_OUTRO:
             if not cleaned.get("motorista_manual_nome"):
                 self.add_error("motorista_manual_nome", "Informe o nome do motorista.")
+
+        viatura_modo = cleaned.get("viatura_modo") or DiarioBordo.VIATURA_MODO_OFICIO
+        cleaned["viatura_modo"] = viatura_modo
+        if viatura_modo == DiarioBordo.VIATURA_MODO_BANCO:
+            if not cleaned.get("viatura"):
+                self.add_error("viatura", "Selecione uma viatura do cadastro.")
+        elif viatura_modo == DiarioBordo.VIATURA_MODO_MANUAL:
+            if not cleaned.get("viatura_manual_modelo"):
+                self.add_error("viatura_manual_modelo", "Informe o modelo da viatura.")
         return cleaned
 
     def save(self, commit=True):
@@ -217,6 +285,22 @@ class DiarioMotoristaForm(forms.ModelForm):
             diario.motorista_manual_cpf = ""
             diario.motorista_oficio_referencia = ""
             diario.motorista_protocolo_ref = ""
+
+        viatura_modo = self.cleaned_data.get("viatura_modo") or DiarioBordo.VIATURA_MODO_OFICIO
+        diario.viatura_modo = viatura_modo
+        if viatura_modo == DiarioBordo.VIATURA_MODO_BANCO:
+            diario.viatura_manual_modelo = ""
+            diario.viatura_manual_placa = ""
+            diario.viatura_manual_tipo = ""
+            diario.viatura_manual_combustivel = ""
+        elif viatura_modo == DiarioBordo.VIATURA_MODO_MANUAL:
+            diario.viatura = None
+        else:  # VIATURA_MODO_OFICIO — herda do ofício, sem overrides
+            diario.viatura = None
+            diario.viatura_manual_modelo = ""
+            diario.viatura_manual_placa = ""
+            diario.viatura_manual_tipo = ""
+            diario.viatura_manual_combustivel = ""
 
         if commit:
             diario.save()

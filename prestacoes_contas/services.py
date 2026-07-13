@@ -29,6 +29,7 @@ from oficios.documents import build_canonical_document_payload
 from oficios.docxtpl_context import build_oficio_docxtpl_context
 
 from .diario_services import alteracoes_datas_horarios_roteiro
+from .diario_services import alteracoes_motorista_viatura
 from .diario_services import diferencas_entre_roteiros
 from .diario_services import gerar_diario_bordo_pdf
 from .diario_services import roteiro_efetivo
@@ -139,26 +140,34 @@ def diaria_inicial_da_prestacao(prestacao) -> str:
     return ""
 
 
-def descricao_ajustes_roteiro(prestacao) -> str:
-    """Texto pronto (com espaço para justificativa) para 'Informações complementares'
-    do RT, listando o que mudou no roteiro desta prestação: datas/horários dos
-    trechos e diária por servidor. Vazio se o roteiro não foi de fato ajustado."""
+def _ajustes_roteiro_itens(prestacao) -> list[str]:
+    """Itens de alteração do roteiro (datas/horários + diária) desta prestação."""
     copia = prestacao.roteiro_ajustado
     original = getattr(prestacao.oficio, "roteiro", None)
     if copia is None or original is None or not diferencas_entre_roteiros(original, copia):
-        return ""
+        return []
 
     itens = list(alteracoes_datas_horarios_roteiro(prestacao))
 
     diaria_oficio = diaria_inicial_do_oficio(prestacao)
     diaria_ajustada = diaria_inicial_da_prestacao(prestacao)
     if diaria_oficio and diaria_ajustada and diaria_oficio != diaria_ajustada:
-        itens.append(f"diária (por servidor) de {diaria_oficio} para {diaria_ajustada}")
+        itens.append(f"a diária (por servidor) passou de {diaria_oficio} para {diaria_ajustada}")
+    return itens
 
+
+def descricao_ajustes_prestacao(prestacao) -> str:
+    """Texto-prévia (com espaço para justificativa) para 'Informações complementares'
+    do RT, listando o que mudou nesta prestação em relação ao ofício: troca de
+    motorista, troca de viatura e ajustes de roteiro (datas/horários e diária).
+    Vazio quando nada mudou."""
+    itens = list(alteracoes_motorista_viatura(prestacao))
+    itens += _ajustes_roteiro_itens(prestacao)
     if not itens:
         return ""
-
-    return "Alterações em relação ao roteiro do ofício: " + "; ".join(itens) + ". Justificativa: "
+    corpo = "; ".join(itens)
+    corpo = corpo[:1].upper() + corpo[1:]
+    return f"{corpo}. Justificativa: "
 
 
 def relatorio_tecnico_default_values(prestacao) -> dict:
@@ -166,7 +175,7 @@ def relatorio_tecnico_default_values(prestacao) -> dict:
     diaria = diaria_inicial_da_prestacao(prestacao)
     if diaria:
         values["diaria"] = diaria
-    info = descricao_ajustes_roteiro(prestacao)
+    info = descricao_ajustes_prestacao(prestacao)
     if info:
         values["info_complementares"] = info
     return values
