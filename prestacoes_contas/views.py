@@ -62,7 +62,13 @@ from .models import PrestacaoDocumentoAnexo
 from .models import PrestacaoServidor
 from .models import RelatorioTecnico
 from .presenters import apresentar_prestacao_card
+from .selectors import ABA_ARQUIVADOS
+from .selectors import ABA_FINALIZADOS
+from .selectors import ABA_FUTURAS
+from .selectors import ABA_PENDENTES
+from .selectors import contar_por_aba
 from .selectors import listar_prestacoes
+from .selectors import normalizar_aba
 from .services import gerar_relatorio_tecnico_docx
 from .services import gerar_prestacao_consolidado_pdf
 from .services import diaria_inicial_da_prestacao
@@ -383,6 +389,42 @@ def _trecho_display(linha) -> dict:
     }
 
 
+_ABA_LABELS = [
+    (ABA_PENDENTES, "Pendentes"),
+    (ABA_FUTURAS, "Que vão acontecer"),
+    (ABA_ARQUIVADOS, "Arquivados"),
+    (ABA_FINALIZADOS, "Finalizados"),
+]
+
+_ABA_EMPTY_MESSAGE = {
+    ABA_PENDENTES: "Nenhuma prestação pendente. Viagens que ainda vão acontecer estão na aba “Que vão acontecer”.",
+    ABA_FUTURAS: "Nenhuma viagem agendada para os próximos dias.",
+    ABA_ARQUIVADOS: "Nenhuma prestação arquivada.",
+    ABA_FINALIZADOS: "Nenhuma prestação finalizada ainda.",
+}
+
+
+def _build_abas(request, aba_atual, contagem, *, q="", status="", sort=""):
+    """Abas da lista, cada uma como link que preserva a busca/ordenação atuais."""
+    from urllib.parse import urlencode
+
+    base_params = [(k, v) for k, v in (("q", q), ("status", status), ("sort", sort)) if v]
+    base_url = reverse("prestacoes_contas:index")
+    abas = []
+    for chave, label in _ABA_LABELS:
+        query = urlencode([("aba", chave), *base_params])
+        abas.append(
+            {
+                "key": chave,
+                "label": label,
+                "count": contagem.get(chave, 0),
+                "url": f"{base_url}?{query}",
+                "is_active": chave == aba_atual,
+            }
+        )
+    return abas
+
+
 def index(request):
     if request.method == "POST" and request.POST.get("action") == "save_solicitacoes":
         _salvar_solicitacoes_em_lote(request)
@@ -391,7 +433,7 @@ def index(request):
 
     q         = request.GET.get("q",         "").strip()
     status    = request.GET.get("status",    "").strip()
-    temporal  = request.GET.get("temporal",  "").strip()
+    aba       = normalizar_aba(request.GET.get("aba", ""))
     viagem_de = request.GET.get("viagem_de", "").strip()
     viagem_ate = request.GET.get("viagem_ate", "").strip()
     sort      = request.GET.get("sort",      "").strip()
@@ -399,7 +441,7 @@ def index(request):
     prestacoes = listar_prestacoes(
         q=q or None,
         status=status or None,
-        temporal=temporal or None,
+        aba=aba,
         viagem_de=viagem_de or None,
         viagem_ate=viagem_ate or None,
         sort=sort or None,
@@ -407,7 +449,15 @@ def index(request):
 
     cards = [apresentar_prestacao_card(prestacao) for prestacao in prestacoes]
 
-    has_filters = any([q, status, temporal, viagem_de, viagem_ate, sort])
+    has_filters = any([q, status, viagem_de, viagem_ate, sort])
+
+    contagem = contar_por_aba(
+        q=q or None,
+        status=status or None,
+        viagem_de=viagem_de or None,
+        viagem_ate=viagem_ate or None,
+    )
+    abas = _build_abas(request, aba, contagem, q=q, status=status, sort=sort)
 
     return render(
         request,
@@ -418,20 +468,16 @@ def index(request):
             "cards": cards,
             "q":          q,
             "status":     status,
-            "temporal":   temporal,
+            "aba":        aba,
+            "abas":       abas,
             "viagem_de":  viagem_de,
             "viagem_ate": viagem_ate,
             "sort":       sort,
             "has_filters": has_filters,
-            "search_clear_url": reverse("prestacoes_contas:index"),
+            "search_clear_url": f"{reverse('prestacoes_contas:index')}?aba={aba}",
             "status_options": [{"value": "", "label": "Todos os status"}]
             + [{"value": v, "label": l} for v, l in PrestacaoContas.STATUS_CHOICES],
-            "temporal_options": [
-                {"value": "",          "label": "Qualquer período"},
-                {"value": "futuro",    "label": "Futuras"},
-                {"value": "andamento", "label": "Em andamento"},
-                {"value": "passado",   "label": "Passadas"},
-            ],
+            "empty_message": _ABA_EMPTY_MESSAGE.get(aba, "Nenhuma prestação de contas encontrada."),
             "sort_options": [
                 {"value": "criacao_desc",  "label": "Criação: mais recente"},
                 {"value": "criacao_asc",   "label": "Criação: mais antiga"},
@@ -440,7 +486,6 @@ def index(request):
                 {"value": "oficio_asc",    "label": "Ofício: crescente"},
                 {"value": "oficio_desc",   "label": "Ofício: decrescente"},
             ],
-            "empty_message": "Nenhuma prestação de contas encontrada com os filtros aplicados.",
         },
     )
 
