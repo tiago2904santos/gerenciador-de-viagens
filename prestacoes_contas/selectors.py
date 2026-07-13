@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.db.models import Prefetch
 from django.db.models import Q
 from django.utils import timezone
@@ -21,14 +23,54 @@ _SORT_MAP = {
 }
 
 
-def listar_prestacoes(
+# ── Abas da lista de prestações ──
+# A viagem só aparece em "Pendentes" quando já está acontecendo/aconteceu ou
+# começa em até 1 dia; se ainda faltar mais de um dia, vai para "Que vai
+# acontecer". "Arquivados" e "Finalizados" independem do tempo da viagem.
+ABA_PENDENTES = "pendentes"
+ABA_FUTURAS = "futuras"
+ABA_ARQUIVADOS = "arquivados"
+ABA_FINALIZADOS = "finalizados"
+ABA_PADRAO = ABA_PENDENTES
+ABAS_VALIDAS = {ABA_PENDENTES, ABA_FUTURAS, ABA_ARQUIVADOS, ABA_FINALIZADOS}
+
+
+def normalizar_aba(aba: str | None) -> str:
+    aba = (aba or "").strip()
+    return aba if aba in ABAS_VALIDAS else ABA_PADRAO
+
+
+def _q_da_aba(aba: str) -> Q:
+    """Filtro que define quais prestações pertencem a cada aba (mutuamente exclusivas)."""
+    if aba == ABA_FINALIZADOS:
+        return Q(finalizada=True)
+    if aba == ABA_ARQUIVADOS:
+        return Q(arquivada=True, finalizada=False)
+
+    # Pendentes e Futuras são "ativas" (nem arquivadas, nem finalizadas).
+    ativa = Q(arquivada=False, finalizada=False)
+    # Visível a partir de 1 dia antes da saída: saída <= amanhã.
+    limite_visivel = timezone.localdate() + timedelta(days=1)
+    if aba == ABA_FUTURAS:
+        return ativa & Q(oficio__roteiro__saida_dt__date__gt=limite_visivel)
+    # Pendentes: já acontecendo/aconteceu, começa em até 1 dia, ou sem data de
+    # viagem definida (precisa de atenção mesmo sem roteiro).
+    visivel = (
+        Q(oficio__roteiro__saida_dt__date__lte=limite_visivel)
+        | Q(oficio__roteiro__isnull=True)
+        | Q(oficio__roteiro__saida_dt__isnull=True)
+    )
+    return ativa & visivel
+
+
+def _base_prestacoes(
     q: str | None = None,
     status: str | None = None,
-    temporal: str | None = None,
     viagem_de: str | None = None,
     viagem_ate: str | None = None,
     sort: str | None = None,
 ):
+    """Queryset com os filtros de busca/ordenação, mas sem o recorte por aba."""
     order_fields = _SORT_MAP.get(sort or "criacao_desc", ["-criado_em"])
     queryset = (
         PrestacaoContas.objects.select_related(
@@ -74,28 +116,6 @@ def listar_prestacoes(
             filters |= Q(oficio__numero=int(query)) | Q(oficio__ano=int(query))
         queryset = queryset.filter(filters).distinct()
 
-    if temporal:
-        today = timezone.localdate()
-        if temporal == "futuro":
-            queryset = queryset.filter(
-                oficio__roteiro__isnull=False,
-                oficio__roteiro__saida_dt__date__gt=today,
-            )
-        elif temporal == "andamento":
-            queryset = queryset.filter(
-                oficio__roteiro__isnull=False,
-                oficio__roteiro__saida_dt__date__lte=today,
-            ).filter(
-                Q(oficio__roteiro__retorno_chegada_dt__date__gte=today)
-                | Q(oficio__roteiro__retorno_chegada_dt__isnull=True, oficio__roteiro__chegada_dt__date__gte=today)
-                | Q(oficio__roteiro__retorno_chegada_dt__isnull=True, oficio__roteiro__chegada_dt__isnull=True)
-            )
-        elif temporal == "passado":
-            queryset = queryset.filter(oficio__roteiro__isnull=False).filter(
-                Q(oficio__roteiro__retorno_chegada_dt__date__lt=today)
-                | Q(oficio__roteiro__retorno_chegada_dt__isnull=True, oficio__roteiro__chegada_dt__date__lt=today)
-            )
-
     if viagem_de:
         try:
             queryset = queryset.filter(
@@ -114,3 +134,32 @@ def listar_prestacoes(
             pass
 
     return queryset
+
+
+def listar_prestacoes(
+    q: str | None = None,
+    status: str | None = None,
+    aba: str | None = None,
+    viagem_de: str | None = None,
+    viagem_ate: str | None = None,
+    sort: str | None = None,
+):
+    """Prestações da aba pedida já com os filtros de busca/ordenação aplicados."""
+    base = _base_prestacoes(
+        q=q, status=status, viagem_de=viagem_de, viagem_ate=viagem_ate, sort=sort
+    )
+    return base.filter(_q_da_aba(normalizar_aba(aba)))
+
+
+def contar_por_aba(
+    q: str | None = None,
+    status: str | None = None,
+    viagem_de: str | None = None,
+    viagem_ate: str | None = None,
+) -> dict:
+    """Total de prestações em cada aba, respeitando os filtros de busca ativos."""
+    base = _base_prestacoes(q=q, status=status, viagem_de=viagem_de, viagem_ate=viagem_ate)
+    return {
+        aba: base.filter(_q_da_aba(aba)).values("pk").distinct().count()
+        for aba in (ABA_PENDENTES, ABA_FUTURAS, ABA_ARQUIVADOS, ABA_FINALIZADOS)
+    }

@@ -70,6 +70,13 @@ class PrestacaoContas(models.Model):
         validators=[FileExtensionValidator(PRESTACAO_DOCUMENTO_EXTENSOES)],
     )
     status = models.CharField(max_length=30, choices=STATUS_CHOICES, default=STATUS_PENDENTE)
+    # Arquivar tira a prestação da lista de pendentes sem concluí-la (fica na aba
+    # "Arquivados"); finalizar marca a prestação como concluída (aba "Finalizados").
+    # São flags independentes do fluxo de aprovação em ``status``.
+    arquivada = models.BooleanField(default=False)
+    arquivada_em = models.DateTimeField(null=True, blank=True)
+    finalizada = models.BooleanField(default=False)
+    finalizada_em = models.DateTimeField(null=True, blank=True)
     observacoes = models.TextField(blank=True, default="")
     criado_em = models.DateTimeField(auto_now_add=True)
     atualizado_em = models.DateTimeField(auto_now=True)
@@ -95,6 +102,22 @@ class PrestacaoContas(models.Model):
             self.STATUS_APROVADA: "success",
             self.STATUS_REPROVADA: "danger",
         }.get(self.status, "muted")
+
+    def definir_arquivada(self, arquivada: bool):
+        """Arquiva/desarquiva a prestação, registrando o momento do arquivamento."""
+        from django.utils import timezone as _tz
+
+        self.arquivada = arquivada
+        self.arquivada_em = _tz.now() if arquivada else None
+        self.save(update_fields=["arquivada", "arquivada_em", "atualizado_em"])
+
+    def definir_finalizada(self, finalizada: bool):
+        """Conclui/reabre a prestação, registrando o momento da conclusão."""
+        from django.utils import timezone as _tz
+
+        self.finalizada = finalizada
+        self.finalizada_em = _tz.now() if finalizada else None
+        self.save(update_fields=["finalizada", "finalizada_em", "atualizado_em"])
 
 
 class PrestacaoServidor(models.Model):
