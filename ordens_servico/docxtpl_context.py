@@ -51,10 +51,20 @@ def _destinos_display(ordem: OrdemServico) -> str:
     return f"{', '.join(primeiros)} e {ultimo}"
 
 
+_CARGO_STOPWORDS = {"de", "da", "do", "das", "dos", "e"}
+
+
 def _is_acronym(word: str) -> bool:
-    """ADM, DPC, PC etc. — all-uppercase ASCII short word."""
+    """ADM, DPC, PC etc. — all-uppercase ASCII short word.
+
+    Exclui preposições/conjunções comuns (DE, DA, DO...): como os nomes de
+    cargo vêm em caixa alta do banco (ex.: "AGENTE DE POLICIA"), sem essa
+    exclusão elas pareciam siglas e ficavam maiúsculas no documento gerado.
+    """
     clean = "".join(c for c in word if c.isalpha())
-    return bool(clean) and clean.isascii() and clean.isupper() and len(clean) <= 5
+    if not clean or clean.lower() in _CARGO_STOPWORDS:
+        return False
+    return clean.isascii() and clean.isupper() and len(clean) <= 5
 
 
 def _pluralize_pt(word: str) -> str:

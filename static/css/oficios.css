@@ -8,6 +8,24 @@
 /* --------------------------------------------------------------------------
    4. Oficios
    -------------------------------------------------------------------------- */
+.oficio-numero-field__row {
+  align-items: center;
+  display: flex;
+  gap: var(--space-2);
+}
+
+.oficio-numero-field__row .form-control {
+  flex: 1 1 auto;
+}
+
+.oficio-numero-field__hint {
+  color: var(--color-help);
+  flex: 0 0 auto;
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 .oficio-card {
   background: var(--color-card);
   border: 1px solid var(--color-border);

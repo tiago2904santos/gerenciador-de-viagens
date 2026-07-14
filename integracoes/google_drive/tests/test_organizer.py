@@ -285,6 +285,48 @@ class OrganizerTests(TestCase):
         self.assertEqual(reg.nome, naming.nome_os(ordem))
         self.assertNotIn("protocolo", reg.nome)
 
+    def test_ofico_com_duas_os_nao_mistura_nome_entre_elas(self):
+        """Bug real visto em produção: um mesmo ofício pode ter DUAS Ordens de
+        Serviço vinculadas (``oficios`` é M2M dos dois lados). Antes da
+        correção, ``organizar_artefato`` chamava ``oficio.ordens_servico.first()``
+        sem checar ambiguidade — pegava uma OS arbitrária e aplicava o nome
+        dela ao artefato da OUTRA OS do mesmo ofício, fazendo duas OSs com
+        números/servidores diferentes irem pro Drive com o MESMO nome (uma
+        delas com conteúdo certo e nome errado, sobrescrevendo a pasta
+        canônica)."""
+        from ordens_servico.models import OrdemServico
+
+        ordem_12 = OrdemServico.objects.create(
+            numero=12, ano=2026,
+            data_evento_inicio=date(2026, 7, 23), data_evento_fim=date(2026, 7, 26),
+        )
+        ordem_12.oficios.add(self.oficio)
+        ordem_12.servidores.add(self.ana)
+
+        ordem_15 = OrdemServico.objects.create(
+            numero=15, ano=2026,
+            data_evento_inicio=date(2026, 7, 23), data_evento_fim=date(2026, 7, 26),
+        )
+        ordem_15.oficios.add(self.oficio)
+        ordem_15.servidores.add(self.bruno)
+
+        art_12 = self._artefato("ordem_servico", name="os12.pdf")
+        art_12.nome_drive = naming.nome_os(ordem_12)
+        art_12.save(update_fields=["nome_drive"])
+
+        art_15 = self._artefato("ordem_servico", name="os15.pdf")
+        art_15.nome_drive = naming.nome_os(ordem_15)
+        art_15.save(update_fields=["nome_drive"])
+
+        organizer.organizar_artefato(art_12)
+        organizer.organizar_artefato(art_15)
+
+        reg_12 = DriveArquivo.objects.get(artefato=art_12)
+        reg_15 = DriveArquivo.objects.get(artefato=art_15)
+        self.assertEqual(reg_12.nome, naming.nome_os(ordem_12))
+        self.assertEqual(reg_15.nome, naming.nome_os(ordem_15))
+        self.assertNotEqual(reg_12.nome, reg_15.nome)
+
     def test_oficio_sem_evento_vai_para_pasta_de_tipo(self):
         self.oficio.evento = None
         self.oficio.save()

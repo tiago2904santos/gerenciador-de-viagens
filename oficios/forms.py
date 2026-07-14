@@ -286,13 +286,19 @@ class OficioDadosViajantesForm(OficioForm):
         self.fields["servidores"].required = False
         self.fields["servidores_termo_autorizacao"].queryset = self.fields["servidores"].queryset
         self.fields["servidores_termo_autorizacao"].required = False
-        if not self.is_bound and not (self.instance.motivo or "").strip():
-            modelo_padrao = self.fields["modelo_motivo"].queryset.filter(is_padrao=True).first()
-            if modelo_padrao:
-                if not self.initial.get("modelo_motivo"):
-                    self.initial["modelo_motivo"] = modelo_padrao.pk
-                if not (self.initial.get("motivo") or "").strip():
-                    self.initial["motivo"] = modelo_padrao.texto
+        if not self.is_bound:
+            motivo_atual = (self.instance.motivo or "").strip()
+            if not motivo_atual:
+                modelo_padrao = self.fields["modelo_motivo"].queryset.filter(is_padrao=True).first()
+                if modelo_padrao:
+                    if not self.initial.get("modelo_motivo"):
+                        self.initial["modelo_motivo"] = modelo_padrao.pk
+                    if not (self.initial.get("motivo") or "").strip():
+                        self.initial["motivo"] = modelo_padrao.texto
+            elif not self.initial.get("modelo_motivo"):
+                modelo_correspondente = self.fields["modelo_motivo"].queryset.filter(texto=motivo_atual).first()
+                if modelo_correspondente:
+                    self.initial["modelo_motivo"] = modelo_correspondente.pk
         if not self.is_bound and self.instance.pk and not self.instance.servidores_termo_autorizacao.exists():
             self.initial["servidores_termo_autorizacao"] = list(
                 self.instance.servidores.values_list("pk", flat=True),

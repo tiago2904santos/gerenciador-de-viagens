@@ -401,6 +401,8 @@ def avaliar_oficio_dados_viajantes(oficio=None, form=None):
         values = {}
 
     pendencias = []
+    if not values.get("protocolo"):
+        pendencias.append("Informe o protocolo.")
     if not values.get("motivo"):
         pendencias.append("Informe o motivo.")
     if not values.get("custeio"):
@@ -668,6 +670,7 @@ def _dados_viajantes_from_form(form):
         return {
             "data_criacao": get_value("data_criacao"),
             "motivo": str(get_value("motivo", "") or "").strip(),
+            "protocolo": str(get_value("protocolo", "") or "").strip(),
             "custeio": get_value("custeio"),
             "custeio_observacao": str(get_value("custeio_observacao", "") or "").strip(),
             "servidores_count": len(servidores),
@@ -685,6 +688,7 @@ def _dados_viajantes_from_oficio(oficio):
     return {
         "data_criacao": oficio.data_criacao,
         "motivo": oficio.motivo.strip(),
+        "protocolo": oficio.protocolo.strip(),
         "custeio": oficio.custeio,
         "custeio_observacao": oficio.custeio_observacao.strip(),
         "servidores_count": servidores_count,

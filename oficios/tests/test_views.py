@@ -58,7 +58,7 @@ class OficioViewsTests(TestCase):
         self.assertContains(response, "cv-wizard-section-card")
         self.assertContains(response, "field-grid")
         self.assertContains(response, f'name="numero" value="{oficio.numero}"')
-        self.assertContains(response, f"Ano {oficio.ano}")
+        self.assertContains(response, f"/ {oficio.ano}")
         self.assertNotContains(response, "Data criaÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o:")
         self.assertNotContains(response, "Gerado automaticamente ao salvar.")
         self.assertNotContains(response, "serÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡ definida automaticamente ao salvar")

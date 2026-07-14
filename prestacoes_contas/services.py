@@ -324,10 +324,13 @@ def gerar_relatorio_tecnico_pdf(relatorio: RelatorioTecnico, servidor) -> bytes:
 
 
 def nome_arquivo_rt(relatorio: RelatorioTecnico, servidor, formato: str = "docx") -> str:
+    from integracoes.google_drive import naming
+
     nome = servidor.nome.replace(" ", "_").upper()
     oficio = relatorio.prestacao.oficio.numero_formatado.replace("/", "-")
     ext = "pdf" if formato == "pdf" else "docx"
-    return f"RT_{nome}_OFICIO_{oficio}.{ext}"
+    # Nome baixado pelo usuário p/ anexar em outros sistemas: sem acentos.
+    return f"{naming.nome_arquivo_ascii(f'RT_{nome}_OFICIO_{oficio}')}.{ext}"
 
 
 def _pdf_bytes_from_file_field(field, label: str) -> bytes:
@@ -521,8 +524,10 @@ def nome_arquivo_prestacao_consolidado(servidor_prestacao) -> str:
 
     Destino e data do evento vêm dos mesmos helpers de exibição do ofício
     (derivados do roteiro), garantindo consistência com o que aparece na tela.
-    Partes vazias (ex.: sem roteiro) são omitidas; ``sanitize_drive_name`` troca
-    as barras de destino/data por hífen para servir como nome de arquivo válido.
+    Partes vazias (ex.: sem roteiro) são omitidas. Diferente da nomeação usada
+    no Drive, este nome é o do arquivo baixado pelo usuário (para anexar em
+    outros sistemas) — por isso vai sem acentos nem caracteres especiais,
+    já que alguns desses sistemas externos rejeitam nomes acentuados.
     """
     from integracoes.google_drive import naming
     from oficios.presenters import _data_evento_display_oficio
@@ -545,4 +550,5 @@ def nome_arquivo_prestacao_consolidado(servidor_prestacao) -> str:
         partes.append(destino)
     if data_evento:
         partes.append(data_evento)
-    return naming._arquivo(" ".join(partes), "pdf")
+    ext = "pdf"
+    return f"{naming.nome_arquivo_ascii(' '.join(partes))}.{ext}"

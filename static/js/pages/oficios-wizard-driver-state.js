@@ -21,6 +21,8 @@
   var PANEL_MANUAL   = '[data-oficio-motorista-manual]';
   var MODO_BTN       = '[data-oficio-motorista-modo-btn]';
   var DRIVER_TOGGLE  = '.cv-search-picker__driver-toggle';
+  var VIATURA_FOOTER    = '[data-oficio-viatura-footer]';
+  var MOTORISTA_FOOTER  = '[data-oficio-motorista-footer]';
 
   /* ── Helpers ─────────────────────────────────────────────────── */
 
@@ -179,6 +181,13 @@
     }
   }
 
+  function syncFooters(root, showMotorista) {
+    var viaturaFooter   = root.querySelector(VIATURA_FOOTER);
+    var motoristaFooter = root.querySelector(MOTORISTA_FOOTER);
+    if (viaturaFooter)   viaturaFooter.hidden = !!showMotorista;
+    if (motoristaFooter) motoristaFooter.hidden = !showMotorista;
+  }
+
   function switchToManual(root) {
     /* Limpa o motorista selecionado no picker antes de mudar */
     var motSel = root.querySelector(MOTORISTA_SEL);
@@ -223,6 +232,7 @@
     var card  = root.querySelector(EXTERNAL_CARD);
     syncTrailingCard(root, show);
     setCardVisible(card, show);
+    syncFooters(root, show);
 
     if (driverValue) {
       clearManualMotorista(card);

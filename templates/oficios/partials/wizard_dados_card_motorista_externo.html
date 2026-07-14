@@ -50,7 +50,7 @@
       </div>
     </div>
   </div>
-  {% if show_motorista_card %}
+  <div data-oficio-motorista-footer{% if not show_motorista_card %} hidden{% endif %}>
     {% include "components/ui/layouts/card_footer_section.html" with primary_label="Avançar" primary_action="wizard_next" only %}
-  {% endif %}
+  </div>
 </section>

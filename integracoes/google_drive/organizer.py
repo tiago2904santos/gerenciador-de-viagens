@@ -402,9 +402,14 @@ def _derivar_nome_artefato(tipo, formato, oficio, servidor, servidores, cidade) 
         # Fallback raríssimo: só ocorre pra um DocumentoArtefato antigo sem
         # nome_drive salvo (o caminho normal já grava nome_drive na criação,
         # ver ordens_servico.services._persistir_ordem_servico_artefato).
-        ordem = oficio.ordens_servico.first()
-        if ordem is not None:
-            return naming.nome_os(ordem, formato)
+        # Com mais de uma OS no mesmo ofício não dá pra saber a qual das duas
+        # este artefato pertence (mesmo motivo do count()==1 em
+        # organizar_artefato) — usa o nome genérico em vez de arriscar pegar
+        # a OS errada.
+        if oficio.ordens_servico.count() == 1:
+            ordem = oficio.ordens_servico.first()
+            if ordem is not None:
+                return naming.nome_os(ordem, formato)
         return naming._arquivo(f"Ordem de Serviço{naming._suf_cidade(cidade)}", formato)
     if tipo == "justificativa":
         return naming.nome_justificativa(oficio, cidade, formato)
@@ -430,7 +435,7 @@ def organizar_artefato(artefato) -> tuple[str, str] | None:
     servidores = list(oficio.servidores.all()) if oficio is not None else []
     cidade = naming.cidade_evento(evento, oficio)
 
-    if tipo == "ordem_servico" and oficio is not None and oficio.ordens_servico.exists():
+    if tipo == "ordem_servico" and oficio is not None and oficio.ordens_servico.count() == 1:
         # NUNCA confia no nome_drive salvo pra OS: ele é gravado uma vez, na
         # criação do artefato, e artefatos de OS são deduplicados por hash de
         # conteúdo (_persistir_ordem_servico_artefato) — então uma OS gerada
@@ -439,6 +444,16 @@ def organizar_artefato(artefato) -> tuple[str, str] | None:
         # servidores), fica com o nome ERRADO pra sempre, porque reorganizar
         # de novo nunca recalcula, só reusa o que já está no banco. A OS
         # recalcula sempre, a partir do estado ATUAL da própria OrdemServico.
+        #
+        # Só é seguro fazer isso quando o ofício tem EXATAMENTE 1 OS vinculada
+        # (``oficios`` é M2M dos dois lados: um ofício pode ter várias OS
+        # diferentes). Com mais de uma, ``.first()`` pegaria uma OS
+        # arbitrária e aplicaria o nome dela a artefatos de OUTRA OS do mesmo
+        # ofício — foi o que causou duas Ordens de Serviço distintas
+        # (números/servidores diferentes) irem pro Drive com o MESMO nome,
+        # cada uma sobrescrevendo/renomeando o arquivo errado. Nesse caso
+        # ambíguo cai no ``else`` abaixo, que confia no nome_drive gravado na
+        # criação do artefato — específico daquela OS, nunca ambíguo.
         ordem = oficio.ordens_servico.first()
         nome = naming.nome_os(ordem, formato)
     elif tipo == "plano_trabalho" and evento is not None and evento.planos_trabalho.count() == 1:

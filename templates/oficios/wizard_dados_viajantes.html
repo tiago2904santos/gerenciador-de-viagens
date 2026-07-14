@@ -33,7 +33,14 @@
           </header>
           {# Linha 1: N° do Ofício (editável, sugestão automática) | Protocolo | Custeio #}
           <div class="field-grid field-grid--cols-3">
-            {% include "components/forms/form_field.html" with field=form.numero label="N° do Ofício" help_text=oficio_numero_ano_hint only %}
+            <div class="field app-form-field cv-field oficio-numero-field">
+              <label class="app-form-label cv-field__label" for="{{ form.numero.id_for_label }}">N° do Ofício</label>
+              <div class="oficio-numero-field__row">
+                {{ form.numero }}
+                {% if oficio_numero_ano_hint %}<span class="oficio-numero-field__hint">{{ oficio_numero_ano_hint }}</span>{% endif %}
+              </div>
+              {% if form.numero.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.numero.errors only %}{% endif %}
+            </div>
             {% include "components/forms/form_field.html" with field=form.protocolo label="Protocolo" only %}
             {% include "components/forms/form_field.html" with field=form.custeio label="Custeio" only %}
             {# Linha 2: Nome da Instituição — somente quando custeio = Outra instituição #}
