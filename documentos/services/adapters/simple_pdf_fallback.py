@@ -36,6 +36,7 @@ def _as_lines(payload: Mapping[str, object]) -> list[str]:
             "numero_formatado",
             "protocolo",
             "assunto",
+            "assunto_oficio",
             "motivo",
             "roteiro",
             "data_criacao",
