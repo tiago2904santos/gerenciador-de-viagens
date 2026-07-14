@@ -18,6 +18,11 @@ Regras:
   sobre Autorização/Convalidação/Retificado (marcador explícito do usuário,
   independente da data de emissão). Os dois marcadores são mutuamente
   exclusivos — ver `oficios/services.py`.
+- **`assunto_termo_diarias`**: usado na frase fixa do corpo do ofício
+  ("solicito {{assunto_termo_diarias}} e medidas para a concessão de
+  diárias..."). Essa frase reflete somente Autorização/Convalidação — não
+  muda com Retificado/Complementar, que só afetam o rótulo curto ao lado do
+  número do ofício (`assunto_oficio`/`assunto_rotulo`).
 """
 
 from __future__ import annotations
@@ -45,7 +50,8 @@ def _data_criacao(oficio: Oficio) -> date:
 def resolver_assunto_oficio(oficio: Oficio) -> dict[str, str]:
     """
     Devolve chaves estáveis para templates: `assunto_linha`, `assunto_oficio`,
-    `assunto_termo` e `assunto_rotulo` (igual a `assunto_oficio`).
+    `assunto_termo`, `assunto_termo_diarias` e `assunto_rotulo` (igual a
+    `assunto_oficio`).
     """
     primeira = get_primeira_saida_oficio(oficio)
     d0_date = _data_criacao(oficio)
@@ -56,12 +62,16 @@ def resolver_assunto_oficio(oficio: Oficio) -> dict[str, str]:
         s_local = primeira.astimezone(timezone.get_current_timezone()).date()
         base_autorizacao = d0_date < s_local
 
+    assunto_linha_base = ASSUNTO_AUTORIZACAO if base_autorizacao else ASSUNTO_CONVALIDACAO
+    assunto_termo_diarias = "autorização" if base_autorizacao else "convalidação"
+
     complementar = bool(getattr(oficio, "complementar_documento", False))
     if complementar:
         return {
-            "assunto_linha": ASSUNTO_AUTORIZACAO if base_autorizacao else ASSUNTO_CONVALIDACAO,
+            "assunto_linha": assunto_linha_base,
             "assunto_oficio": "(Complementar)",
             "assunto_termo": "complementação",
+            "assunto_termo_diarias": assunto_termo_diarias,
             "assunto_rotulo": "(Complementar)",
         }
 
@@ -71,6 +81,7 @@ def resolver_assunto_oficio(oficio: Oficio) -> dict[str, str]:
             "assunto_linha": ASSUNTO_AUTORIZACAO,
             "assunto_oficio": "(Retificado)",
             "assunto_termo": "retificação",
+            "assunto_termo_diarias": assunto_termo_diarias,
             "assunto_rotulo": "(Retificado)",
         }
 
@@ -79,6 +90,7 @@ def resolver_assunto_oficio(oficio: Oficio) -> dict[str, str]:
             "assunto_linha": ASSUNTO_AUTORIZACAO,
             "assunto_oficio": "(Autorização)",
             "assunto_termo": "autorização",
+            "assunto_termo_diarias": assunto_termo_diarias,
             "assunto_rotulo": "(Autorização)",
         }
 
@@ -86,5 +98,6 @@ def resolver_assunto_oficio(oficio: Oficio) -> dict[str, str]:
         "assunto_linha": ASSUNTO_CONVALIDACAO,
         "assunto_oficio": "(Convalidação)",
         "assunto_termo": "convalidação",
+        "assunto_termo_diarias": assunto_termo_diarias,
         "assunto_rotulo": "(Convalidação)",
     }

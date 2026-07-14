@@ -35,6 +35,11 @@ def apply_pdf_response_headers(response: HttpResponse, *, filename: str) -> None
     response["X-Content-Type-Options"] = "nosniff"
     response["X-Frame-Options"] = "SAMEORIGIN"
     response["Cross-Origin-Resource-Policy"] = "same-origin"
+    # A URL de visualização inline (iframe) é fixa por ofício; sem isso o navegador
+    # pode reaproveitar um PDF já visto para a mesma URL mesmo após o conteúdo mudar
+    # (ex.: ofício marcado como retificado/complementar).
+    response["Cache-Control"] = "no-store, must-revalidate"
+    response["Pragma"] = "no-cache"
 
 
 def _parse_first_byte_range(range_header: str | None, file_size: int) -> tuple[int, int] | str | None:

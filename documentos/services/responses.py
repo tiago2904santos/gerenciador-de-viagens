@@ -38,6 +38,8 @@ def build_download_response(
         filename = build_document_filename(tipo, formato, reference=reference, now=now)
         response = HttpResponse(content, content_type=get_content_type_for_format(formato))
         response["Content-Disposition"] = f'attachment; filename="{filename}"'
+        response["Cache-Control"] = "no-store, must-revalidate"
+        response["Pragma"] = "no-cache"
         if cache_hit is True:
             response["X-Document-Cache"] = "HIT"
         elif cache_hit is False:
