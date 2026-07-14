@@ -1360,10 +1360,11 @@ def retificar(request, pk):
     if oficio.retificado_documento:
         desfazer_retificacao_oficio(oficio)
         messages.success(request, "Retificação removida. O ofício voltou ao rótulo padrão do documento.")
-    else:
-        retificar_oficio(oficio)
-        messages.success(request, "Ofício marcado como retificado. O documento passará a exibir \"Retificado\" ao lado do número. Edite o que for necessário.")
-    return redirect(next_url) if next_url else _fallback_url()
+        return redirect(next_url) if next_url else _fallback_url()
+
+    retificar_oficio(oficio)
+    messages.success(request, "Ofício marcado como retificado. Edite o que for necessário — o documento passará a exibir \"Retificado\" ao lado do número.")
+    return redirect("oficios:dados_viajantes", pk=oficio.pk)
 
 
 @require_POST
@@ -1379,10 +1380,11 @@ def marcar_complementar(request, pk):
     if oficio.complementar_documento:
         desfazer_complementar_oficio(oficio)
         messages.success(request, "Marcação de complementar removida do ofício.")
-    else:
-        marcar_oficio_complementar(oficio)
-        messages.success(request, "Ofício marcado como complementar. O documento passará a exibir \"Complementar\" ao lado do número. Edite o que for necessário.")
-    return redirect(next_url) if next_url else _fallback_url()
+        return redirect(next_url) if next_url else _fallback_url()
+
+    marcar_oficio_complementar(oficio)
+    messages.success(request, "Ofício marcado como complementar. Edite o que for necessário — o documento passará a exibir \"Complementar\" ao lado do número.")
+    return redirect("oficios:dados_viajantes", pk=oficio.pk)
 
 
 def modelos_motivo_index(request):

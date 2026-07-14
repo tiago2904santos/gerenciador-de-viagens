@@ -12,11 +12,6 @@
         <span class="oficio-lc__info-label">Número do Ofício</span>
         <span class="oficio-lc__info-value">{{ card.numero_display }}</span>
       </div>
-      {% if card.retificado %}
-      {% include "components/ui/badges/chip.html" with tone="warning" label="Retificado" extra_class="oficio-lc__temporal-chip" only %}
-      {% elif card.complementar %}
-      {% include "components/ui/badges/chip.html" with tone="info" label="Complementar" extra_class="oficio-lc__temporal-chip" only %}
-      {% endif %}
       {% if card.protocolo_display %}
       <div class="oficio-lc__info-item">
         <span class="oficio-lc__info-label">Protocolo</span>
@@ -181,6 +176,15 @@
 
     {# ── FOOTER ── #}
     <div class="oficio-lc__footer">
+      {% if card.retificado %}
+      <div class="oficio-lc__footer-badge">
+        {% include "components/ui/badges/chip.html" with tone="warning" label="Retificado" only %}
+      </div>
+      {% elif card.complementar %}
+      <div class="oficio-lc__footer-badge">
+        {% include "components/ui/badges/chip.html" with tone="info" label="Complementar" only %}
+      </div>
+      {% endif %}
       <div class="oficio-lc__footer-actions">
         <div class="oficio-lc__footer-actions-main cv-icon-btn-group">
           {% include "components/ui/buttons/icon_button.html" with href=card.editar_url action="edit" aria_label="Editar ofício" tooltip="Editar" only %}
@@ -202,32 +206,20 @@
             {% include "dev/ui_lab/partials/_cv_icon.html" with icon="more" only %}
           </button>
           <div class="cv-action-menu" id="oficio-action-menu-{{ card.oficio_pk }}" role="menu" hidden>
-            <button
-              type="button"
-              class="cv-action-menu__item cv-action-menu__item--retificar"
-              role="menuitem"
-              data-toggle-modal-trigger
-              data-toggle-url="{{ card.retificar_url }}"
-              data-toggle-title="{% if card.retificado %}Desfazer retificação do ofício?{% else %}Marcar ofício como retificado?{% endif %}"
-              data-toggle-message="{% if card.retificado %}O ofício deixará de ser marcado como retificado e o documento voltará a exibir o rótulo padrão ao lado do número.{% else %}O documento passará a exibir “Retificado” ao lado do número, no lugar de “Autorização”. Você poderá editar livremente qualquer dado do ofício.{% endif %}"
-              data-toggle-confirm-label="{% if card.retificado %}Desfazer retificação{% else %}Retificar ofício{% endif %}"
-            >
-              {% include "dev/ui_lab/partials/_cv_icon.html" with icon="sync" only %}
-              <span>{% if card.retificado %}Desfazer retificação{% else %}Retificar ofício{% endif %}</span>
-            </button>
-            <button
-              type="button"
-              class="cv-action-menu__item cv-action-menu__item--complementar"
-              role="menuitem"
-              data-toggle-modal-trigger
-              data-toggle-url="{{ card.marcar_complementar_url }}"
-              data-toggle-title="{% if card.complementar %}Desfazer marcação de complementar?{% else %}Marcar ofício como complementar?{% endif %}"
-              data-toggle-message="{% if card.complementar %}O ofício deixará de ser marcado como complementar e o documento voltará a exibir o rótulo padrão ao lado do número.{% else %}O documento passará a exibir “Complementar” ao lado do número. Você poderá editar livremente qualquer dado do ofício.{% endif %}"
-              data-toggle-confirm-label="{% if card.complementar %}Desfazer complementar{% else %}Ofício complementar{% endif %}"
-            >
-              {% include "dev/ui_lab/partials/_cv_icon.html" with icon="plus" only %}
-              <span>{% if card.complementar %}Desfazer complementar{% else %}Ofício complementar{% endif %}</span>
-            </button>
+            <form method="post" action="{{ card.retificar_url }}" class="cv-action-menu__form">
+              {% csrf_token %}
+              <button type="submit" class="cv-action-menu__item cv-action-menu__item--retificar" role="menuitem">
+                {% include "dev/ui_lab/partials/_cv_icon.html" with icon="sync" only %}
+                <span>{% if card.retificado %}Desfazer retificação{% else %}Retificar ofício{% endif %}</span>
+              </button>
+            </form>
+            <form method="post" action="{{ card.marcar_complementar_url }}" class="cv-action-menu__form">
+              {% csrf_token %}
+              <button type="submit" class="cv-action-menu__item cv-action-menu__item--complementar" role="menuitem">
+                {% include "dev/ui_lab/partials/_cv_icon.html" with icon="plus" only %}
+                <span>{% if card.complementar %}Desfazer complementar{% else %}Ofício complementar{% endif %}</span>
+              </button>
+            </form>
             {% if not card.cancelado %}
             <button
               type="button"
