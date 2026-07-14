@@ -102,8 +102,38 @@
     initSearchPickers(form);
   }
 
+  function clearOficioFields(form) {
+    setDateFields(form, "", "");
+
+    var stateSelect = form.querySelector("select[name='destino_estado']");
+    var citySelect = form.querySelector("select[name='destino_cidade']");
+    if (stateSelect) {
+      stateSelect.value = "";
+      resetSearchPicker(stateSelect);
+      initSearchPickers(form);
+    }
+    if (citySelect) {
+      clearCitySelect(form, citySelect);
+    }
+
+    var servidoresSelect = form.querySelector("select[name='servidores']");
+    if (servidoresSelect) {
+      setMultiSelectValues(servidoresSelect, [], form);
+    }
+
+    var viaturaSelect = form.querySelector("select[name='viatura']");
+    if (viaturaSelect) {
+      viaturaSelect.value = "";
+      resetSearchPicker(viaturaSelect);
+      initSearchPickers(form);
+    }
+  }
+
   function autoFillFromOficio(form, summary) {
-    if (!summary) return;
+    if (!summary) {
+      clearOficioFields(form);
+      return;
+    }
 
     if (summary.data_inicio) {
       setDateFields(form, summary.data_inicio, summary.data_fim || summary.data_inicio);
@@ -153,6 +183,9 @@
 
     var items = Object.keys(summaries).map(function (key) {
       return summaries[key];
+    });
+    items.sort(function (a, b) {
+      return (a.order || 0) - (b.order || 0);
     });
 
     function selectedSummary() {
