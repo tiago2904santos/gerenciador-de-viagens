@@ -61,10 +61,11 @@ class BaseCadastroForm(forms.ModelForm):
 def _servidor_option_attrs(servidor):
     cargo = servidor.cargo.nome if servidor.cargo_id and servidor.cargo else ""
     unidade = str(servidor.unidade) if servidor.unidade_id and servidor.unidade else ""
+    unidade_nome = servidor.unidade.nome if servidor.unidade_id and servidor.unidade else ""
     cpf = servidor.cpf_formatado or ""
     rg = servidor.rg_formatado or ""
     main = " • ".join(part for part in [servidor.nome, cargo, f"CPF {cpf}" if cpf else ""] if part)
-    search = " ".join(part for part in [servidor.nome, cargo, cpf, rg, unidade] if part)
+    search = " ".join(part for part in [servidor.nome, cargo, cpf, rg, unidade, unidade_nome] if part)
     return {
         "data-option-kind": "servidor",
         "data-cargo": cargo,
@@ -74,6 +75,7 @@ def _servidor_option_attrs(servidor):
         "data-rg": rg,
         "data-search": search,
         "data-unidade": unidade,
+        "data-unidade-nome": unidade_nome,
         "data-unidade-id": str(servidor.unidade_id or ""),
         "data-rascunho": "true" if servidor.status == Servidor.STATUS_RASCUNHO else "false",
     }
@@ -731,32 +733,65 @@ class ConfiguracaoAssinaturasForm(forms.Form):
 
 
 class ConfiguracaoDestinatarioForm(forms.ModelForm):
-    """Destinatário padrão do Ofício: busca por nome do servidor.
+    """Destinatário padrão do Ofício: nome, cargo e unidade lotada.
 
-    A unidade lotada do servidor selecionado vira o DESTINO do cabeçalho do
-    Ofício (mesmo mecanismo da ORIGEM, que usa a unidade da configuração).
+    O nome busca um servidor cadastrado (autocompletando cargo e unidade), mas
+    também aceita texto livre quando o servidor não está no banco de dados —
+    nesse caso cargo e unidade são preenchidos manualmente.
     """
 
     class Meta:
         model = ConfiguracaoSistema
-        fields = ["destinatario_oficio"]
+        fields = [
+            "destinatario_oficio",
+            "destinatario_oficio_nome",
+            "destinatario_oficio_cargo",
+            "destinatario_oficio_unidade",
+        ]
+        widgets = {
+            "destinatario_oficio_nome": forms.HiddenInput(),
+            "destinatario_oficio_cargo": forms.TextInput(
+                attrs={"class": "form-control", "data-mask": "upper", "placeholder": "Cargo do destinatário"}
+            ),
+            "destinatario_oficio_unidade": forms.TextInput(
+                attrs={"class": "form-control", "data-mask": "upper", "placeholder": "Unidade lotada do destinatário"}
+            ),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["destinatario_oficio"].required = False
         self.fields["destinatario_oficio"].empty_label = ""
-        self.fields["destinatario_oficio"].label = "Destinatário do Ofício"
+        self.fields["destinatario_oficio"].label = "Nome"
         self.fields["destinatario_oficio"].widget = _AssinanteServidorSelect(
             attrs={
                 "class": "cv-search-picker__native",
                 "data-cv-search-picker": "true",
                 "data-picker-mode": "single",
                 "data-picker-variant": "compact",
-                "data-picker-label": "Destinatário do Ofício",
-                "data-picker-hint": "Busque por nome, cargo ou CPF.",
-                "data-placeholder": "Buscar servidor",
+                "data-picker-label": "Nome",
+                "data-placeholder": "Buscar ou digitar nome",
                 "data-empty-message": "Nenhum servidor encontrado.",
+                "data-picker-allow-free-text": "true",
+                "data-picker-free-text-message": "Servidor não cadastrado — pressione Enter e preencha cargo/unidade manualmente.",
             }
         )
         self.fields["destinatario_oficio"].queryset = _servidores_assinantes_queryset()
+        self.fields["destinatario_oficio_nome"].required = False
+        self.fields["destinatario_oficio_cargo"].required = False
+        self.fields["destinatario_oficio_cargo"].label = "Cargo"
+        self.fields["destinatario_oficio_unidade"].required = False
+        self.fields["destinatario_oficio_unidade"].label = "Unidade lotada"
+
+    def clean(self):
+        cleaned = super().clean()
+        servidor = cleaned.get("destinatario_oficio")
+        if servidor:
+            if not cleaned.get("destinatario_oficio_nome"):
+                cleaned["destinatario_oficio_nome"] = servidor.nome
+            if not cleaned.get("destinatario_oficio_cargo") and servidor.cargo_id:
+                cleaned["destinatario_oficio_cargo"] = servidor.cargo.nome
+            if not cleaned.get("destinatario_oficio_unidade") and servidor.unidade_id:
+                cleaned["destinatario_oficio_unidade"] = servidor.unidade.nome
+        return cleaned
 

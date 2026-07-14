@@ -229,11 +229,7 @@ def _orgao_destino(oficio: Oficio, inst: Mapping[str, Any]) -> str:
 
 
 def _destinatario_nome_cargo(inst: Mapping[str, Any]) -> tuple[str, str]:
-    servidor = inst.get("destinatario_oficio")
-    if not servidor:
-        return "", ""
-    cargo = servidor.cargo.nome if getattr(servidor, "cargo_id", None) else ""
-    return _txt(servidor.nome), _txt(cargo)
+    return _txt(inst.get("destinatario_oficio_nome")), _txt(inst.get("destinatario_oficio_cargo"))
 
 
 def _build_column_lines(items: list[str], blank_lines: int = 1) -> str:

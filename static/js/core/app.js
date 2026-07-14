@@ -139,51 +139,53 @@ document.documentElement.dataset.appReady = "true";
   }
 
   function initQuickEditButtons() {
-    var buttons = Array.prototype.slice.call(document.querySelectorAll("[data-quick-edit]"));
+    // Delegado no document: os botões costumam ser trocados via AJAX (filtro
+    // de listas com live-search-submit.js), então um bind direto nos nós
+    // encontrados no load perde os botões recriados depois do swap do painel.
+    document.addEventListener("click", function (event) {
+      var button = event.target.closest("[data-quick-edit]");
+      if (!button) { return; }
 
-    buttons.forEach(function (button) {
-      button.addEventListener("click", function () {
-        var editUrl = button.getAttribute("data-edit-url");
-        var fieldsJson = button.getAttribute("data-edit-fields") || "{}";
-        var fields = {};
-        try { fields = JSON.parse(fieldsJson); } catch (e) {}
+      var editUrl = button.getAttribute("data-edit-url");
+      var fieldsJson = button.getAttribute("data-edit-fields") || "{}";
+      var fields = {};
+      try { fields = JSON.parse(fieldsJson); } catch (e) {}
 
-        var toggle = document.querySelector("[data-quick-add-toggle]");
-        if (!toggle) { return; }
+      var toggle = document.querySelector("[data-quick-add-toggle]");
+      if (!toggle) { return; }
 
-        var panelId = getPanelId(toggle);
-        var panel = panelId ? document.getElementById(panelId) : null;
-        if (!panel) { return; }
+      var panelId = getPanelId(toggle);
+      var panel = panelId ? document.getElementById(panelId) : null;
+      if (!panel) { return; }
 
-        // Aponta o form para a URL de edição
-        if (editUrl) {
-          panel.action = editUrl;
-          panel.dataset.editMode = "true";
-        }
+      // Aponta o form para a URL de edição
+      if (editUrl) {
+        panel.action = editUrl;
+        panel.dataset.editMode = "true";
+      }
 
-        // Preenche os campos pelo name
-        Object.keys(fields).forEach(function (name) {
-          var input = panel.querySelector('[name="' + name + '"]');
-          if (input) { input.value = fields[name]; }
-        });
-
-        // Abre o painel
-        if (toggle.getAttribute("aria-expanded") !== "true") {
-          toggle.click();
-        } else {
-          initPanelFields(panel);
-        }
-
-        // Foca o primeiro campo editável
-        var firstInput = panel.querySelector("input:not([type=hidden]), select, textarea");
-        if (firstInput) {
-          window.setTimeout(function () {
-            initPanelFields(panel);
-            firstInput.focus();
-            firstInput.select();
-          }, 60);
-        }
+      // Preenche os campos pelo name
+      Object.keys(fields).forEach(function (name) {
+        var input = panel.querySelector('[name="' + name + '"]');
+        if (input) { input.value = fields[name]; }
       });
+
+      // Abre o painel
+      if (toggle.getAttribute("aria-expanded") !== "true") {
+        toggle.click();
+      } else {
+        initPanelFields(panel);
+      }
+
+      // Foca o primeiro campo editável
+      var firstInput = panel.querySelector("input:not([type=hidden]), select, textarea");
+      if (firstInput) {
+        window.setTimeout(function () {
+          initPanelFields(panel);
+          firstInput.focus();
+          firstInput.select();
+        }, 60);
+      }
     });
   }
 

@@ -146,11 +146,9 @@ def build_configuracao_context():
         "divisao": configuracao.divisao.nome if configuracao.divisao_id else "",
         "unidade": configuracao.unidade.nome if configuracao.unidade_id else "",
         "destinatario_oficio": configuracao.destinatario_oficio,
-        "destinatario_oficio_unidade": (
-            configuracao.destinatario_oficio.unidade.nome
-            if configuracao.destinatario_oficio_id and configuracao.destinatario_oficio.unidade_id
-            else ""
-        ),
+        "destinatario_oficio_nome": configuracao.destinatario_oficio_nome,
+        "destinatario_oficio_cargo": configuracao.destinatario_oficio_cargo,
+        "destinatario_oficio_unidade": configuracao.destinatario_oficio_unidade,
         # Compatibilidade: placeholders antigos "sede" passam a refletir cidade_endereco.
         "sede": cidade_doc,
         "nome_chefia": configuracao.nome_chefia,

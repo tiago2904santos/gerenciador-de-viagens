@@ -340,8 +340,10 @@
     const previaAviso = document.getElementById("gdrive-previa-aviso");
     if (!btnPrevia || !urlPrevia) return;
 
-    btnPrevia.addEventListener("click", async () => {
-      const original = btnPrevia.textContent;
+    const TEXTO_VER = "Ver prévia";
+    const TEXTO_OCULTAR = "Ocultar prévia";
+
+    async function abrirPrevia() {
       btnPrevia.disabled = true;
       btnPrevia.textContent = "Carregando…";
       try {
@@ -364,19 +366,42 @@
               previaLista.appendChild(li);
             });
           }
-          previaAviso.hidden = !data.truncado;
+          const avisos = [];
           if (data.truncado) {
-            previaAviso.textContent = "Mostrando as primeiras " + linhas.length + " linhas (há mais).";
+            avisos.push("Mostrando as primeiras " + linhas.length + " linhas (há mais).");
           }
+          if (data.itens_com_erro) {
+            avisos.push(
+              data.itens_com_erro +
+                " evento(s)/ofício(s) não puderam ser incluídos na prévia (erro ao planejar). " +
+                "Os demais itens continuam listados normalmente."
+            );
+          }
+          previaAviso.hidden = avisos.length === 0;
+          previaAviso.textContent = avisos.join(" ");
         }
         previaBox.hidden = false;
+        btnPrevia.textContent = TEXTO_OCULTAR;
       } catch (e) {
         previaAviso.hidden = false;
         previaAviso.textContent = "Falha ao carregar a prévia.";
         previaBox.hidden = false;
+        btnPrevia.textContent = TEXTO_OCULTAR;
       } finally {
         btnPrevia.disabled = false;
-        btnPrevia.textContent = original;
+      }
+    }
+
+    function fecharPrevia() {
+      previaBox.hidden = true;
+      btnPrevia.textContent = TEXTO_VER;
+    }
+
+    btnPrevia.addEventListener("click", () => {
+      if (!previaBox.hidden) {
+        fecharPrevia();
+      } else {
+        abrirPrevia();
       }
     });
   }

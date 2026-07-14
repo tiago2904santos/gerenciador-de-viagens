@@ -340,7 +340,12 @@ def status_reorganizacao(request):
 
 @login_required
 def previa_reorganizacao(request):
-    """Lista os caminhos planejados (dry-run) sem tocar no Drive."""
+    """Lista os caminhos planejados (dry-run) sem tocar no Drive.
+
+    Cada evento/ofício é planejado isoladamente: um erro num único item (ex.:
+    dados incompletos) só pula aquele item — não derruba a prévia inteira,
+    como acontecia antes com o try/except único ao redor de todo o loop.
+    """
     from eventos.models import Evento
     from oficios.models import Oficio
     from integracoes.google_drive import organizer
@@ -348,23 +353,38 @@ def previa_reorganizacao(request):
     limite = 500
     linhas: list[str] = []
     truncado = False
+    itens_com_erro = 0
 
-    try:
-        for evento in Evento.objects.all().iterator():
+    for evento in Evento.objects.all().iterator():
+        try:
             linhas.extend(organizer.planejar_evento(evento))
+        except Exception:
+            itens_com_erro += 1
+            logger.warning("[Drive] falha ao planejar prévia do evento %s", evento.pk, exc_info=True)
+            continue
+        if len(linhas) >= limite:
+            truncado = True
+            break
+    if not truncado:
+        for oficio in Oficio.objects.filter(evento__isnull=True).iterator():
+            try:
+                linhas.extend(organizer.planejar_oficio(oficio))
+            except Exception:
+                itens_com_erro += 1
+                logger.warning("[Drive] falha ao planejar prévia do ofício %s", oficio.pk, exc_info=True)
+                continue
             if len(linhas) >= limite:
                 truncado = True
                 break
-        if not truncado:
-            for oficio in Oficio.objects.filter(evento__isnull=True).iterator():
-                linhas.extend(organizer.planejar_oficio(oficio))
-                if len(linhas) >= limite:
-                    truncado = True
-                    break
-    except Exception as exc:
-        return JsonResponse({"erro": str(exc)}, status=500)
 
-    return JsonResponse({"linhas": linhas[:limite], "truncado": truncado, "total": len(linhas)})
+    return JsonResponse(
+        {
+            "linhas": linhas[:limite],
+            "truncado": truncado,
+            "total": len(linhas),
+            "itens_com_erro": itens_com_erro,
+        }
+    )
 
 
 # ---------------------------------------------------------------------------

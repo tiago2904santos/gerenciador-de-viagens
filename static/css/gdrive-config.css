@@ -9,6 +9,8 @@
   display: flex;
   flex-direction: column;
   gap: 0;
+  /* Vermelho nítido do botão Desconectar (variante escura no bloco de tema). */
+  --gd-unlink: #d23a2c;
 }
 
 /* ── Blocos internos, separados por divisória sutil ───────────────────────── */
@@ -31,11 +33,12 @@
   filter: saturate(0.55);
 }
 
-/* Cabeçalho do bloco: logo/ícone + título/sub + chip à direita */
+/* Cabeçalho do bloco: logo/ícone + título/sub + chip/ações à direita */
 .gdrive-block__head {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-2) var(--space-3);
 }
 
 .gdrive-block__headtext {
@@ -88,7 +91,7 @@
 /* ── Meta da conta — grade de pílulas label/valor ─────────────────────────── */
 .gdrive-meta {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   gap: var(--space-2);
   margin: 0;
 }
@@ -96,11 +99,12 @@
 .gdrive-meta__item {
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  padding: var(--space-3);
-  border-radius: var(--radius-sm);
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
   background: var(--color-surface-muted);
   border: 1px solid var(--color-border-soft);
+  box-shadow: var(--shadow-xs);
 }
 
 .gdrive-meta__label {
@@ -114,9 +118,34 @@
 .gdrive-meta__value {
   margin: 0;
   color: var(--color-heading);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-md);
   font-weight: var(--font-weight-semibold);
   font-variant-numeric: tabular-nums;
+}
+
+/* ── Alerta de reconexão (escopo faltante) ────────────────────────────────── */
+.gdrive-scope-alert {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-danger-soft);
+  border: 1px solid var(--color-danger-border-soft);
+}
+
+.gdrive-scope-alert__title {
+  margin: 0;
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+}
+
+.gdrive-scope-alert__text {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  line-height: 1.5;
 }
 
 /* ── Linha de ações (botões) ──────────────────────────────────────────────── */
@@ -134,14 +163,24 @@
 
 .gdrive-actions--massa { justify-content: flex-end; }
 
-/* Desconectar — discreto; tom de perigo só no hover */
-.gdrive-btn-unlink { color: var(--color-danger); }
+/* Ações no cabeçalho do bloco (Trocar conta / Desconectar na linha do título) */
+.gdrive-actions--head {
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+}
+
+/* Desconectar — contorno vermelho nítido; preenche no hover (nada de pastel) */
+.gdrive-btn-unlink {
+  background: transparent;
+  border-color: var(--gd-unlink);
+  color: var(--gd-unlink);
+}
 
 .gdrive-btn-unlink:hover,
 .gdrive-btn-unlink:focus-visible {
-  background: var(--color-danger-soft);
-  border-color: var(--color-danger-border-soft);
-  color: var(--color-danger);
+  background: var(--gd-unlink);
+  border-color: var(--gd-unlink);
+  color: #ffffff;
 }
 
 /* Texto de ajuda */
@@ -170,8 +209,11 @@
 .gdrive-pasta-selecionada {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
+  gap: var(--space-2);
+  /* padding vertical +3px vs. --space-3: compensa o line-height menor do nome
+     da pasta (24px) frente ao valor numérico do stat ao lado (30px), para
+     as duas caixas terminarem com a mesma altura total. */
+  padding: calc(var(--space-3) + 3px) var(--space-4);
   border-radius: var(--radius-md);
   background: var(--color-success-soft);
   border: 1px solid var(--color-success-border-soft);
@@ -223,27 +265,70 @@
 
 .gdrive-browser-toolbar {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+  flex-direction: column;
   gap: var(--space-2);
 }
 
+/* Linha de navegação (Voltar + trilha de pastas). Fica ~invisível no root
+   (Voltar oculto e breadcrumb vazio) e ganha conteúdo ao entrar em subpastas. */
+.gdrive-navrow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 0;
+}
+
 .gdrive-breadcrumb {
-  margin-left: var(--space-1);
   color: var(--color-text-soft);
   font-size: var(--font-size-xs);
 }
 
-/* Abas de origem: Meu Drive × Drives compartilhados */
+/* Abas de origem — segmented control de colunas iguais.
+   A trilha usa o fundo da página (mais recuado que o painel muted) para não
+   se confundir com ele; a aba ativa é uma "pílula" elevada. */
 .gdrive-root-tabs {
-  display: flex;
-  gap: var(--space-1);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  padding: 3px;
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-soft);
+  box-shadow: inset 0 1px 2px rgba(7, 26, 51, 0.05);
 }
 
+.gdrive-root-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2) var(--space-2);
+  border: 1px solid transparent;
+  border-radius: calc(var(--radius-md) - 3px);
+  background: transparent;
+  color: var(--color-text-soft);
+  font: inherit;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.25;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.gdrive-root-tab:hover { color: var(--color-heading); }
+
 .gdrive-root-tab.is-active {
-  background: var(--color-primary-soft);
-  border-color: var(--color-primary-bright);
+  background: var(--color-surface);
+  border-color: var(--color-border-soft);
   color: var(--color-primary-bright);
+  box-shadow: var(--shadow-xs);
+}
+
+@media (max-width: 520px) {
+  .gdrive-root-tabs { grid-template-columns: 1fr; }
 }
 
 .gdrive-browser-body { position: relative; }
@@ -426,12 +511,53 @@
 }
 
 .gdrive-mock-note {
-  flex-basis: 100%;
+  margin: 0;
   color: var(--color-warning);
   font-size: var(--font-size-2xs);
 }
 
-/* ── Organização em massa ─────────────────────────────────────────────────── */
+/* Números do diretório lado a lado (arquivos enviados + eventos) */
+.gdrive-stats-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.gdrive-stats-row .gdrive-stat {
+  flex: 1 1 200px;
+}
+
+/* ── Organização em massa (subseção fundida ao diretório) ─────────────────── */
+.gdrive-subsection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: 1px dashed var(--color-border-soft);
+}
+
+.gdrive-subsection__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+
+.gdrive-subsection__headtext {
+  display: flex;
+  flex: 1 1 260px;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.gdrive-subsection__title {
+  margin: 0;
+  color: var(--color-heading);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
 .gdrive-massa {
   display: flex;
   flex-direction: column;
@@ -552,6 +678,7 @@
   gap: 2px;
   margin: 0;
   padding: 0;
+  max-height: 240px;
   overflow-y: auto;
   list-style: none;
   color: var(--color-text-muted);
@@ -566,6 +693,196 @@
   background: var(--color-surface);
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* ── Lista de pendências — cartões legíveis, altura limitada ───────────────── */
+.gdrive-pend-lista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  max-height: 340px;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.gdrive-pend {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border-soft);
+  border-left: 3px solid var(--color-danger-border-soft);
+}
+
+/* Linha única: tag + título (com contexto embutido) + quando */
+.gdrive-pend__top {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.gdrive-pend__tipo {
+  flex: 0 0 auto;
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-soft);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  align-self: center;
+}
+
+.gdrive-pend__titulo {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  margin: 0;
+  color: var(--color-heading);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gdrive-pend__contexto {
+  color: var(--color-text-soft);
+  font-size: var(--font-size-xs);
+  font-weight: normal;
+}
+
+.gdrive-pend__quando {
+  flex: 0 0 auto;
+  color: var(--color-text-soft);
+  font-size: var(--font-size-2xs);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Linha única: motivo (destacado) + ação (neutra) */
+.gdrive-pend__causa {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  line-height: 1.4;
+}
+
+.gdrive-pend__motivo {
+  color: var(--color-danger);
+  font-weight: var(--font-weight-medium);
+}
+
+.gdrive-pend__acao {
+  color: var(--color-text-muted);
+}
+
+.gdrive-pend__acao::before {
+  content: "— ";
+}
+
+.gdrive-pend__det {
+  font-size: var(--font-size-2xs);
+}
+
+.gdrive-pend__det summary {
+  width: fit-content;
+  color: var(--color-text-soft);
+  cursor: pointer;
+  user-select: none;
+}
+
+.gdrive-pend__det summary:hover { color: var(--color-heading); }
+
+.gdrive-pend__erro {
+  display: block;
+  margin-top: var(--space-1);
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-soft);
+  color: var(--color-text-muted);
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  font-size: var(--font-size-2xs);
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ── Barras de rolagem temáticas (o scrollbar claro nativo fica feio no escuro) */
+.gdrive-pend-lista,
+.gdrive-previa-lista,
+.gdrive-folder-list {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-strong) transparent;
+}
+
+.gdrive-pend-lista::-webkit-scrollbar,
+.gdrive-previa-lista::-webkit-scrollbar,
+.gdrive-folder-list::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.gdrive-pend-lista::-webkit-scrollbar-track,
+.gdrive-previa-lista::-webkit-scrollbar-track,
+.gdrive-folder-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.gdrive-pend-lista::-webkit-scrollbar-thumb,
+.gdrive-previa-lista::-webkit-scrollbar-thumb,
+.gdrive-folder-list::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-border-strong);
+  background-clip: padding-box;
+}
+
+.gdrive-pend-lista::-webkit-scrollbar-thumb:hover,
+.gdrive-previa-lista::-webkit-scrollbar-thumb:hover,
+.gdrive-folder-list::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-text-soft);
+}
+
+/* ── Tema escuro ──────────────────────────────────────────────────────────────
+   Os tokens "*-soft" (success/danger/primary) só têm variante clara em
+   tokens.css; sem override viravam caixas claras sobre o fundo escuro. Aqui os
+   redefinimos ESCOPADOS ao card do Drive, de modo que todas as regras acima
+   passem a usar tons translúcidos que combinam com o navy do tema escuro.
+   ------------------------------------------------------------------------------ */
+html[data-theme="dark"] .gdrive-body,
+html[data-theme="dark-dark"] .gdrive-body,
+html[data-theme="light-dark"] .gdrive-body {
+  /* Verde (pasta selecionada, status concluído) */
+  --color-success: #5bd6a4;
+  --color-success-soft: rgba(34, 170, 120, 0.14);
+  --color-success-border-soft: rgba(66, 200, 148, 0.40);
+
+  /* Vermelho (status com erro, desconectar) */
+  --color-danger: #ff9a90;
+  --color-danger-soft: rgba(210, 70, 60, 0.16);
+  --color-danger-border-soft: rgba(235, 110, 100, 0.42);
+
+  /* Azul (aba ativa, pasta destacada, links, barra de progresso) */
+  --color-primary-bright: #5aa6e6;
+  --color-primary-soft: rgba(60, 130, 205, 0.22);
+
+  /* Vermelho do Desconectar mais vivo no escuro (não o dark-red apagado) */
+  --gd-unlink: #ff6a5e;
+}
+
+/* Trilha do segmented control no escuro: navy recuado (não o quase-preto do
+   --color-bg), com a aba ativa numa superfície mais clara por cima. */
+html[data-theme="dark"] .gdrive-root-tabs,
+html[data-theme="dark-dark"] .gdrive-root-tabs,
+html[data-theme="light-dark"] .gdrive-root-tabs {
+  background: #101c2b;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 
 /* ── Responsivo ───────────────────────────────────────────────────────────── */

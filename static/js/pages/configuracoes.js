@@ -137,8 +137,39 @@
     }
   }
 
+  function initDestinatarioForm(form) {
+    const select = form.querySelector("#id_destinatario_oficio");
+    const nomeHidden = form.querySelector("#id_destinatario_oficio_nome");
+    const cargoInput = form.querySelector("#id_destinatario_oficio_cargo");
+    const unidadeInput = form.querySelector("#id_destinatario_oficio_unidade");
+    if (!select || !nomeHidden) return;
+
+    const picker = select.nextElementSibling;
+    const textInput =
+      picker && picker.classList.contains("cv-search-picker")
+        ? picker.querySelector(".cv-search-picker__input")
+        : null;
+
+    if (textInput) {
+      textInput.addEventListener("input", () => {
+        nomeHidden.value = textInput.value.trim();
+      });
+    }
+
+    select.addEventListener("change", () => {
+      const option = select.selectedOptions[0];
+      if (!option || !option.value) return;
+      const nome = (option.textContent || "").trim();
+      nomeHidden.value = nome;
+      if (textInput) textInput.value = nome;
+      if (cargoInput) cargoInput.value = option.dataset.cargo || "";
+      if (unidadeInput) unidadeInput.value = option.dataset.unidadeNome || option.dataset.unidade || "";
+    });
+  }
+
   function init() {
     document.querySelectorAll("[data-configuracoes-form]").forEach(initConfiguracoesForm);
+    document.querySelectorAll("[data-destinatario-form]").forEach(initDestinatarioForm);
   }
 
   if (document.readyState === "loading") {

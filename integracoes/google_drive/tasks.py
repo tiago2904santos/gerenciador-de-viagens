@@ -51,6 +51,7 @@ def processar_artefato(self, artefato_id: int) -> None:
 
     art = DocumentoArtefato.objects.filter(pk=artefato_id).first()
     if art is None:
+        status.limpar_pendencia_orfa(DocumentoArtefato, artefato_id)
         return
     status.executar_e_rastrear(organizer.organizar_artefato, art)
 
@@ -61,6 +62,7 @@ def processar_prestacao(self, prestacao_id: int) -> None:
 
     prestacao = PrestacaoContas.objects.filter(pk=prestacao_id).first()
     if prestacao is None:
+        status.limpar_pendencia_orfa(PrestacaoContas, prestacao_id)
         return
     status.executar_e_rastrear(organizer.organizar_prestacao, prestacao)
 
@@ -71,6 +73,7 @@ def processar_evento_anexo(self, anexo_id: int) -> None:
 
     anexo = EventoAnexo.objects.filter(pk=anexo_id).first()
     if anexo is None:
+        status.limpar_pendencia_orfa(EventoAnexo, anexo_id)
         return
     status.executar_e_rastrear(organizer.organizar_evento_anexo, anexo)
 
@@ -81,6 +84,7 @@ def processar_solicitacao_evento(self, solicitacao_id: int) -> None:
 
     doc = EventoDocumentoSolicitacao.objects.filter(pk=solicitacao_id).first()
     if doc is None:
+        status.limpar_pendencia_orfa(EventoDocumentoSolicitacao, solicitacao_id)
         return
     status.executar_e_rastrear(organizer.organizar_solicitacao_evento, doc)
 

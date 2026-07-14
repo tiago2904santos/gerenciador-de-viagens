@@ -391,6 +391,9 @@ class ConfiguracaoSistema(TimeStampedModel):
         verbose_name="Destinatário padrão do Ofício",
         help_text="A unidade lotada deste servidor vira o DESTINO do cabeçalho do Ofício.",
     )
+    destinatario_oficio_nome = models.CharField(max_length=255, blank=True, default="")
+    destinatario_oficio_cargo = models.CharField(max_length=120, blank=True, default="")
+    destinatario_oficio_unidade = models.CharField(max_length=255, blank=True, default="")
     pt_ultimo_numero = models.PositiveIntegerField(default=0)
     pt_ano = models.PositiveIntegerField(default=0)
     pt_sufixo_numero = models.CharField(
@@ -440,6 +443,19 @@ class ConfiguracaoSistema(TimeStampedModel):
         self.telefone = normalize_digits(self.telefone)
         # Mantém compatível com código que ainda lê `sede`: mesmo valor que cidade_endereco.
         self.sede = self.cidade_endereco
+        # Destinatário do Ofício: se um servidor cadastrado foi selecionado e os
+        # campos de texto não foram preenchidos manualmente, herda nome/cargo/unidade dele.
+        if self.destinatario_oficio_id:
+            servidor = self.destinatario_oficio
+            if not self.destinatario_oficio_nome:
+                self.destinatario_oficio_nome = servidor.nome
+            if not self.destinatario_oficio_cargo and servidor.cargo_id:
+                self.destinatario_oficio_cargo = servidor.cargo.nome
+            if not self.destinatario_oficio_unidade and servidor.unidade_id:
+                self.destinatario_oficio_unidade = servidor.unidade.nome
+        self.destinatario_oficio_nome = norm_upper_words(self.destinatario_oficio_nome)
+        self.destinatario_oficio_cargo = norm_upper_words(self.destinatario_oficio_cargo)
+        self.destinatario_oficio_unidade = norm_upper_words(self.destinatario_oficio_unidade)
         super().save(*args, **kwargs)
 
 

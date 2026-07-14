@@ -937,7 +937,7 @@ def configuracao_sistema(request):
             "drive_job_reorg": DriveReorganizacaoJob.objects.order_by("-iniciado_em").first(),
             # Pendências (falhas de envio ao Drive)
             "drive_total_pendencias": drive_status.contagem_pendencias(),
-            "drive_pendencias": drive_status.listar_pendencias(limite=20),
+            "drive_pendencias": drive_status.listar_pendencias_detalhadas(limite=20),
         },
     )
 

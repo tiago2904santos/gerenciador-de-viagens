@@ -917,7 +917,11 @@ def organizar_oficio(oficio) -> None:
             status.executar_e_rastrear(organizar_artefato, artefato)
         except Exception as exc:
             logger.error("[Drive] erro ao organizar artefato %s: %s", artefato.pk, exc, exc_info=True)
-    for prestacao in oficio.prestacoes_contas.all():
+    # ``prestacao_contas`` é OneToOne (uma prestação por ofício, não vários) —
+    # ``getattr`` com default retorna ``None`` quando ainda não existe, em vez
+    # de levantar ``PrestacaoContas.DoesNotExist``.
+    prestacao = getattr(oficio, "prestacao_contas", None)
+    if prestacao is not None:
         try:
             status.executar_e_rastrear(organizar_prestacao, prestacao)
         except Exception as exc:
@@ -1021,26 +1025,31 @@ def planejar_oficio(oficio) -> list[str]:
     for art in _artefatos_mais_recentes(oficio.documentos_gerados.all()):
         linhas.append(_caminho_artefato(art, oficio, servidores, cidade))
 
-    for p in oficio.prestacoes_contas.all():
-        servf = f"{base}/{naming.PASTA_PRESTACAO}/{naming.pasta_prestacao_servidor(p.servidor)}"
+    # ``prestacao_contas`` é OneToOne (uma por ofício); espelha o mesmo padrão
+    # de ``organizar_prestacao`` (que efetivamente sobe os arquivos) para a
+    # prévia bater com o que a reorganização real faz.
+    p = getattr(oficio, "prestacao_contas", None)
+    if p is not None:
+        servidor_p = getattr(p, "servidor", None)
+        servf = f"{base}/{naming.PASTA_PRESTACAO}/{naming.pasta_prestacao_servidor(servidor_p)}"
         if getattr(p, "despacho_assinado", None):
-            linhas.append(f"{servf}/{naming.nome_despacho(oficio, p.servidor, cidade, naming.extensao(p.despacho_assinado.name))}")
+            linhas.append(f"{servf}/{naming.nome_despacho(oficio, servidor_p, cidade, naming.extensao(p.despacho_assinado.name))}")
         if getattr(p, "comprovante_saque_transferencia", None):
-            linhas.append(f"{servf}/{naming.nome_comprovante(oficio, p.servidor, cidade, naming.extensao(p.comprovante_saque_transferencia.name))}")
+            linhas.append(f"{servf}/{naming.nome_comprovante(oficio, servidor_p, cidade, naming.extensao(p.comprovante_saque_transferencia.name))}")
         for a in p.documentos_anexos.all():
             if not getattr(a, "arquivo", None):
                 continue
             ext = naming.extensao(a.arquivo.name)
-            nome = naming.nome_comprovante(oficio, p.servidor, cidade, ext) if a.tipo == "comprovante" else naming.nome_despacho(oficio, p.servidor, cidade, ext)
+            nome = naming.nome_comprovante(oficio, servidor_p, cidade, ext) if a.tipo == "comprovante" else naming.nome_despacho(oficio, servidor_p, cidade, ext)
             linhas.append(f"{servf}/{nome}")
         for s in p.assinaturas.all():
             if not getattr(s, "arquivo_assinado", None):
                 continue
             ext = naming.extensao(s.arquivo_assinado.name) or "pdf"
             if s.tipo == "rt":
-                linhas.append(f"{servf}/{naming.nome_relatorio_tecnico(oficio, p.servidor, cidade, ext)}")
+                linhas.append(f"{servf}/{naming.nome_relatorio_tecnico(oficio, servidor_p, cidade, ext)}")
             elif s.tipo == "db":
-                linhas.append(f"{servf}/{naming.nome_diario_bordo(oficio, p.servidor, cidade, ext)}")
+                linhas.append(f"{servf}/{naming.nome_diario_bordo(oficio, servidor_p, cidade, ext)}")
 
     return linhas
 

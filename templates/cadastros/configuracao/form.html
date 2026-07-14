@@ -4,7 +4,7 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/gdrive-config.css' %}?v=20260701-progress">
+  <link rel="stylesheet" href="{% static 'css/gdrive-config.css' %}?v=20260714-pend-compact">
 {% endblock %}
 
 {% block content %}
@@ -83,20 +83,23 @@
         </form>
 
         {# CARD 2B — Destinatário padrão do Ofício #}
-        <form method="post" action="{% url 'cadastros:configuracao' %}">
+        <form method="post" action="{% url 'cadastros:configuracao' %}" data-destinatario-form>
           {% csrf_token %}
           <input type="hidden" name="form_id" value="destinatarios">
+          {{ destinatario_form.destinatario_oficio_nome }}
           <section class="cv-wizard-section-card" aria-labelledby="config-card-destinatario-title">
             <header class="cv-wizard-section-header">
               <div class="cv-wizard-section-header__copy">
                 <h3 class="cv-wizard-section-title" id="config-card-destinatario-title">Destinatário padrão do Ofício</h3>
-                <p class="cv-wizard-section-subtitle">A unidade lotada do servidor selecionado define o DESTINO do cabeçalho do Ofício.</p>
+                <p class="cv-wizard-section-subtitle">Busque um servidor cadastrado (cargo e unidade são preenchidos automaticamente) ou digite os dados manualmente.</p>
               </div>
             </header>
 
             <div class="cv-wizard-section-body">
-              <div class="field-grid field-grid--cols-2">
+              <div class="field-grid field-grid--cols-3">
                 {% include "components/forms/form_field.html" with field=destinatario_form.destinatario_oficio size_class="field-size-1" only %}
+                {% include "components/forms/form_field.html" with field=destinatario_form.destinatario_oficio_cargo size_class="field-size-1" only %}
+                {% include "components/forms/form_field.html" with field=destinatario_form.destinatario_oficio_unidade size_class="field-size-1" only %}
               </div>
             </div>
 
@@ -141,18 +144,31 @@
                   </svg>
                 </span>
                 <div class="gdrive-block__headtext">
-                <h4 class="gdrive-block__title" id="gdrive-conta-section">Conta Google</h4>
+                  <h4 class="gdrive-block__title" id="gdrive-conta-section">Conta Google</h4>
                   <p class="gdrive-block__sub">
                     {% if drive_autorizado and drive_creds %}Tokens armazenados e renovados automaticamente.{% else %}Nenhuma conta conectada ainda.{% endif %}
                   </p>
                 </div>
+                {% if drive_autorizado and drive_creds %}
+                  <div class="gdrive-actions gdrive-actions--head">
+                    <a href="{% url 'google_drive:oauth_iniciar' %}" class="cv-btn cv-btn--secondary cv-btn--sm">Trocar conta</a>
+                    <form method="post" action="{% url 'google_drive:oauth_revogar' %}"
+                          onsubmit="return confirm('Desconectar a conta Google vai remover os tokens salvos. Continuar?')">
+                      {% csrf_token %}
+                      <button type="submit" class="cv-btn cv-btn--sm gdrive-btn-unlink">Desconectar</button>
+                    </form>
+                  </div>
+                {% else %}
+                  <div class="gdrive-actions gdrive-actions--head">
+                    <a href="{% url 'google_drive:oauth_iniciar' %}" class="cv-btn cv-btn--primary cv-btn--sm">Conectar conta Google</a>
+                  </div>
+                {% endif %}
               </div>
 
               {% if drive_escopo_faltante %}
-                <div class="gdrive-scope-alert" role="alert"
-                     style="margin-bottom:0.75rem;padding:0.75rem 1rem;border:1px solid var(--color-danger,#c0392b);border-radius:8px;background:rgba(192,57,43,.06);">
-                  <p class="gdrive-block__title" style="color:var(--color-danger,#c0392b);margin:0 0 .25rem;font-size:0.95rem;">⚠ Reconexão necessária</p>
-                  <p class="gdrive-hint" style="margin:0;">
+                <div class="gdrive-scope-alert" role="alert">
+                  <p class="gdrive-scope-alert__title">⚠ Reconexão necessária</p>
+                  <p class="gdrive-scope-alert__text">
                     A autorização salva não inclui todas as permissões necessárias
                     (falta: <strong>{{ drive_escopo_faltante|join:", " }}</strong>). A renovação
                     do token vai falhar e os documentos <strong>não chegam ao Drive</strong>.
@@ -177,57 +193,38 @@
                     </div>
                   {% endif %}
                 </dl>
-                <div class="gdrive-actions">
-                  <a href="{% url 'google_drive:oauth_iniciar' %}" class="cv-btn cv-btn--secondary cv-btn--sm">Trocar conta</a>
-                  <form method="post" action="{% url 'google_drive:oauth_revogar' %}"
-                        onsubmit="return confirm('Desconectar a conta Google vai remover os tokens salvos. Continuar?')">
-                    {% csrf_token %}
-                    <button type="submit" class="cv-btn cv-btn--ghost cv-btn--sm gdrive-btn-unlink">Desconectar</button>
-                  </form>
-                </div>
               {% else %}
                 <p class="gdrive-hint">
                   Clique em <strong>Conectar</strong> para autorizar o acesso ao Drive. Você será
                   redirecionado ao Google e voltará automaticamente após confirmar.
                 </p>
-                <div class="gdrive-actions">
-                  <a href="{% url 'google_drive:oauth_iniciar' %}" class="cv-btn cv-btn--primary">Conectar conta Google</a>
-                </div>
               {% endif %}
             </section>
 
             {# ── Bloco: Diretório de destino ── #}
             <section class="gdrive-block{% if not drive_autorizado %} is-disabled{% endif %}"
-                     aria-labelledby="gdrive-pasta-section"
+                     aria-label="Diretório de destino"
                      {% if not drive_autorizado %}aria-disabled="true"{% endif %}>
-              <div class="gdrive-block__head">
-                <span class="gdrive-block__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="folder" only %}</span>
-                <div class="gdrive-block__headtext">
-                  <h4 class="gdrive-block__title" id="gdrive-pasta-section">Diretório de destino</h4>
-                  <p class="gdrive-block__sub">Pasta no Drive onde os documentos serão salvos, organizados por evento e categoria.</p>
-                </div>
-                {% if drive_pasta_raiz_id %}
-                  {% include "components/ui/badges/chip.html" with tone="success" label="Configurada" size="compact" only %}
-                {% endif %}
-              </div>
-
               {% if not drive_autorizado %}
                 <p class="gdrive-hint gdrive-disabled-hint">
                   Conecte uma conta Google primeiro para poder navegar e selecionar pastas.
                 </p>
               {% else %}
-                {% if drive_pasta_raiz_id %}
-                  <div class="gdrive-pasta-atual">
-                    <span class="gdrive-pasta-atual__label">Pasta atual</span>
-                    <div class="gdrive-pasta-selecionada">
-                      <span class="gdrive-pasta-selecionada__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="folder" only %}</span>
-                      <span class="gdrive-pasta-selecionada__nome">{{ drive_pasta_raiz_nome|default:drive_pasta_raiz_id }}</span>
-                      <a href="https://drive.google.com/drive/folders/{{ drive_pasta_raiz_id }}"
-                         target="_blank" rel="noopener"
-                         class="gdrive-pasta-selecionada__link">Ver no Drive ↗</a>
-                    </div>
+                <div class="gdrive-stats-row">
+                  <div class="gdrive-stat">
+                    <span class="gdrive-stat__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="cloud" only %}</span>
+                    <span class="gdrive-stat__text">Arquivos enviados ao Drive</span>
+                    <span class="gdrive-stat__value">{{ drive_total_arquivos }}</span>
                   </div>
-                {% endif %}
+                  {% if drive_pode_reorganizar %}
+                    <div class="gdrive-stat">
+                      <span class="gdrive-stat__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="calendar" only %}</span>
+                      <span class="gdrive-stat__text">Eventos cadastrados</span>
+                      <span class="gdrive-stat__value">{{ drive_total_eventos }}</span>
+                    </div>
+                  {% endif %}
+                </div>
+                {% if not drive_modo_ativo %}<p class="gdrive-mock-note">Modo mock — sem chamadas reais ao Drive.</p>{% endif %}
 
                 <div class="gdrive-folder-browser" id="gdrive-folder-browser"
                      data-url-listar="{% url 'google_drive:api_listar_pastas' %}"
@@ -237,25 +234,40 @@
                      data-url-compartilhados-comigo="{% url 'google_drive:api_listar_compartilhados_comigo' %}"
                      data-csrf="{{ csrf_token }}">
 
+                  {% if drive_pasta_raiz_id %}
+                    <div class="gdrive-pasta-atual">
+                      <span class="gdrive-pasta-atual__label">Pasta atual</span>
+                      <div class="gdrive-pasta-selecionada">
+                        <span class="gdrive-pasta-selecionada__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="folder" only %}</span>
+                        <span class="gdrive-pasta-selecionada__nome">{{ drive_pasta_raiz_nome|default:drive_pasta_raiz_id }}</span>
+                        <a href="https://drive.google.com/drive/folders/{{ drive_pasta_raiz_id }}"
+                           target="_blank" rel="noopener"
+                           class="gdrive-pasta-selecionada__link">Ver no Drive ↗</a>
+                      </div>
+                    </div>
+                  {% endif %}
+
                   <div class="gdrive-browser-toolbar">
                     <div class="gdrive-root-tabs" role="tablist" aria-label="Origem das pastas">
-                      <button type="button" class="cv-btn cv-btn--secondary cv-btn--sm gdrive-root-tab"
+                      <button type="button" class="gdrive-root-tab"
                               id="gdrive-btn-meu-drive" role="tab" aria-selected="false">
-                        📁 Meu Drive
+                        Meu Drive
                       </button>
-                      <button type="button" class="cv-btn cv-btn--secondary cv-btn--sm gdrive-root-tab"
+                      <button type="button" class="gdrive-root-tab"
                               id="gdrive-btn-compartilhados-comigo" role="tab" aria-selected="false">
-                        👥 Compartilhados comigo
+                        Compartilhados comigo
                       </button>
-                      <button type="button" class="cv-btn cv-btn--secondary cv-btn--sm gdrive-root-tab"
+                      <button type="button" class="gdrive-root-tab"
                               id="gdrive-btn-drives-compartilhados" role="tab" aria-selected="false">
-                        🔗 Drives compartilhados
+                        Drives compartilhados
                       </button>
                     </div>
-                    <button type="button" class="cv-btn cv-btn--ghost cv-btn--sm" id="gdrive-btn-voltar" hidden>
-                      ← Voltar
-                    </button>
-                    <span class="gdrive-breadcrumb" id="gdrive-breadcrumb"></span>
+                    <div class="gdrive-navrow">
+                      <button type="button" class="cv-btn cv-btn--ghost cv-btn--sm" id="gdrive-btn-voltar" hidden>
+                        ← Voltar
+                      </button>
+                      <span class="gdrive-breadcrumb" id="gdrive-breadcrumb"></span>
+                    </div>
                   </div>
 
                   <div class="gdrive-browser-body" id="gdrive-browser-body" hidden>
@@ -298,11 +310,55 @@
                   </div>
                 </div>
 
-                <div class="gdrive-stat">
-                  <span class="gdrive-stat__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="cloud" only %}</span>
-                  <span class="gdrive-stat__text">Arquivos já enviados ao Drive</span>
-                  <span class="gdrive-stat__value">{{ drive_total_arquivos }}</span>
-                </div>
+                {# Organização em massa — fundida ao diretório de destino #}
+                {% if drive_pode_reorganizar %}
+                  <div class="gdrive-subsection">
+                    <div class="gdrive-subsection__head">
+                      <div class="gdrive-subsection__headtext">
+                        <h5 class="gdrive-subsection__title">Organização em massa</h5>
+                        <p class="gdrive-block__sub">
+                          Reorganiza no Drive todos os eventos e ofícios avulsos: move/renomeia o
+                          que já foi enviado e sobe o que falta. Documentos novos já são
+                          organizados sozinhos.
+                        </p>
+                      </div>
+                      <div class="gdrive-actions gdrive-actions--massa">
+                        <button type="button" class="cv-btn cv-btn--secondary cv-btn--sm" id="gdrive-btn-previa">
+                          Ver prévia
+                        </button>
+                        <form method="post" action="{% url 'google_drive:reorganizar_tudo' %}"
+                              onsubmit="return confirm('Reorganizar TODOS os eventos e ofícios avulsos no Drive? Isso move/renomeia arquivos já enviados e sobe os que faltam.')">
+                          {% csrf_token %}
+                          <button type="submit" class="cv-btn cv-btn--primary cv-btn--sm">Reorganizar tudo no Drive</button>
+                        </form>
+                      </div>
+                    </div>
+
+                    <div class="gdrive-massa" id="gdrive-massa"
+                         data-url-previa="{% url 'google_drive:previa_reorganizacao' %}"
+                         data-url-status="{% url 'google_drive:status_reorganizacao' %}">
+                      <div class="gdrive-status" id="gdrive-status"{% if not drive_job_reorg %} hidden{% endif %}>
+                        <div class="gdrive-status__row">
+                          <span class="gdrive-status__spinner" aria-hidden="true"></span>
+                          <div class="gdrive-status__body">
+                            <span class="gdrive-status__label">Status da reorganização</span>
+                            <span class="gdrive-status__text" id="gdrive-status-texto">{% if drive_job_reorg %}{{ drive_job_reorg.get_status_display }}{% endif %}</span>
+                          </div>
+                          <span class="gdrive-status__percent" id="gdrive-status-percent"></span>
+                        </div>
+                        <div class="gdrive-progress" id="gdrive-progress" role="progressbar" aria-labelledby="gdrive-status-texto" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                          <div class="gdrive-progress__fill" id="gdrive-progress-fill"></div>
+                        </div>
+                      </div>
+
+                      <div class="gdrive-previa" id="gdrive-previa" hidden>
+                        <span class="gdrive-previa__label">Prévia (o que será criado/movido)</span>
+                        <ul class="gdrive-previa-lista" id="gdrive-previa-lista"></ul>
+                        <p class="gdrive-hint" id="gdrive-previa-aviso" hidden></p>
+                      </div>
+                    </div>
+                  </div>
+                {% endif %}
               {% endif %}
             </section>
 
@@ -314,21 +370,31 @@
                   <div class="gdrive-block__headtext">
                     <h4 class="gdrive-block__title" id="gdrive-pendencias-section">Pendências</h4>
                     <p class="gdrive-block__sub">
-                      Documentos que falharam ao enviar para o Drive. Use o botão abaixo para
-                      forçar uma nova tentativa agora.
+                      Estes documentos não chegaram ao Drive. O sistema tenta reenviar
+                      sozinho em segundo plano — cada item mostra o motivo e o que fazer.
                     </p>
                   </div>
                   {% include "components/ui/badges/chip.html" with tone="danger" label="Pendente" count=drive_total_pendencias only %}
                 </div>
 
-                <ul class="gdrive-previa-lista">
-                  {% for pendencia in drive_pendencias %}
-                    <li>
-                      <strong>{{ pendencia.content_type.name|capfirst }} #{{ pendencia.object_id }}</strong>
-                      — {{ pendencia.tentativas }} tentativa{{ pendencia.tentativas|pluralize }},
-                      última em {{ pendencia.atualizado_em|date:"d/m/Y H:i" }}.
-                      {% if pendencia.ultimo_erro %}
-                        <span class="gdrive-hint">{{ pendencia.ultimo_erro|truncatechars:160 }}</span>
+                <ul class="gdrive-pend-lista">
+                  {% for p in drive_pendencias %}
+                    <li class="gdrive-pend">
+                      <div class="gdrive-pend__top">
+                        <span class="gdrive-pend__tipo">{{ p.tipo_label }}</span>
+                        <p class="gdrive-pend__titulo">
+                          {{ p.titulo }}{% if p.contexto %}<span class="gdrive-pend__contexto"> · {{ p.contexto }}</span>{% endif %}
+                        </p>
+                        <span class="gdrive-pend__quando">{{ p.tentativas }} tentativa{{ p.tentativas|pluralize }} · {{ p.atualizado_em|date:"d/m H:i" }}</span>
+                      </div>
+                      <p class="gdrive-pend__causa">
+                        <span class="gdrive-pend__motivo">{{ p.motivo }}</span>{% if p.acao %} <span class="gdrive-pend__acao">{{ p.acao }}</span>{% endif %}
+                      </p>
+                      {% if p.detalhe %}
+                        <details class="gdrive-pend__det">
+                          <summary>Detalhes técnicos</summary>
+                          <code class="gdrive-pend__erro">{{ p.detalhe }}</code>
+                        </details>
                       {% endif %}
                     </li>
                   {% endfor %}
@@ -338,64 +404,6 @@
                   <form method="post" action="{% url 'google_drive:reprocessar_pendencias' %}">
                     {% csrf_token %}
                     <button type="submit" class="cv-btn cv-btn--primary cv-btn--sm">Tentar novamente agora</button>
-                  </form>
-                </div>
-              </section>
-            {% endif %}
-
-            {# ── Bloco: Organização em massa ── #}
-            {% if drive_pode_reorganizar %}
-              <section class="gdrive-block" aria-labelledby="gdrive-massa-section">
-                <div class="gdrive-block__head">
-                  <span class="gdrive-block__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="sync" only %}</span>
-                  <div class="gdrive-block__headtext">
-                    <h4 class="gdrive-block__title" id="gdrive-massa-section">Organização em massa</h4>
-                    <p class="gdrive-block__sub">
-                      Reorganiza no Drive todos os eventos e ofícios avulsos: move/renomeia o que já
-                      foi enviado e sobe o que falta. Documentos novos já são organizados sozinhos.
-                    </p>
-                  </div>
-                </div>
-
-                <div class="gdrive-massa" id="gdrive-massa"
-                     data-url-previa="{% url 'google_drive:previa_reorganizacao' %}"
-                     data-url-status="{% url 'google_drive:status_reorganizacao' %}">
-                  <div class="gdrive-stat gdrive-stat--inline">
-                    <span class="gdrive-stat__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="calendar" only %}</span>
-                    <span class="gdrive-stat__text">Eventos cadastrados</span>
-                    <span class="gdrive-stat__value">{{ drive_total_eventos }}</span>
-                    {% if not drive_modo_ativo %}<span class="gdrive-mock-note">Modo mock — sem chamadas reais ao Drive.</span>{% endif %}
-                  </div>
-
-                  <div class="gdrive-status" id="gdrive-status"{% if not drive_job_reorg %} hidden{% endif %}>
-                    <div class="gdrive-status__row">
-                      <span class="gdrive-status__spinner" aria-hidden="true"></span>
-                      <div class="gdrive-status__body">
-                        <span class="gdrive-status__label">Status da reorganização</span>
-                        <span class="gdrive-status__text" id="gdrive-status-texto">{% if drive_job_reorg %}{{ drive_job_reorg.get_status_display }}{% endif %}</span>
-                      </div>
-                      <span class="gdrive-status__percent" id="gdrive-status-percent"></span>
-                    </div>
-                    <div class="gdrive-progress" id="gdrive-progress" role="progressbar" aria-labelledby="gdrive-status-texto" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-                      <div class="gdrive-progress__fill" id="gdrive-progress-fill"></div>
-                    </div>
-                  </div>
-
-                  <div class="gdrive-previa" id="gdrive-previa" hidden>
-                    <span class="gdrive-previa__label">Prévia (o que será criado/movido)</span>
-                    <ul class="gdrive-previa-lista" id="gdrive-previa-lista"></ul>
-                    <p class="gdrive-hint" id="gdrive-previa-aviso" hidden></p>
-                  </div>
-                </div>
-
-                <div class="gdrive-actions gdrive-actions--massa">
-                  <button type="button" class="cv-btn cv-btn--secondary cv-btn--sm" id="gdrive-btn-previa">
-                    Ver prévia
-                  </button>
-                  <form method="post" action="{% url 'google_drive:reorganizar_tudo' %}"
-                        onsubmit="return confirm('Reorganizar TODOS os eventos e ofícios avulsos no Drive? Isso move/renomeia arquivos já enviados e sobe os que faltam.')">
-                    {% csrf_token %}
-                    <button type="submit" class="cv-btn cv-btn--primary cv-btn--sm">Reorganizar tudo no Drive</button>
                   </form>
                 </div>
               </section>
@@ -411,5 +419,5 @@
 
 {% block extra_js %}
   <script src="{% static 'js/pages/configuracoes.js' %}" defer></script>
-  <script src="{% static 'js/pages/gdrive_config.js' %}?v=20260706-compartilhados-comigo" defer></script>
+  <script src="{% static 'js/pages/gdrive_config.js' %}?v=20260714-previa-toggle" defer></script>
 {% endblock %}

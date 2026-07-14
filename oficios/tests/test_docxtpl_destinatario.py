@@ -28,10 +28,22 @@ class DestinatarioOficioDocxtplTests(TestCase):
             unidade=self.unidade,
         )
         self.cfg.destinatario_oficio = destinatario
-        self.cfg.save(update_fields=["destinatario_oficio"])
+        self.cfg.save()
 
         oficio = Oficio.objects.create()
         ctx = build_oficio_docxtpl_context(oficio)
         self.assertEqual(ctx["orgao_destino"], "Gabinete do Delegado Geral Adjunto")
         self.assertEqual(ctx["nome_destinatario"], "Riad Braga Farhat")
         self.assertEqual(ctx["cargo_destinatario"], "Delegado-Geral Adjunto Operacional")
+
+    def test_destinatario_manual_sem_servidor_cadastrado(self):
+        self.cfg.destinatario_oficio_nome = "Maria Souza"
+        self.cfg.destinatario_oficio_cargo = "Diretora"
+        self.cfg.destinatario_oficio_unidade = "Secretaria Executiva"
+        self.cfg.save()
+
+        oficio = Oficio.objects.create()
+        ctx = build_oficio_docxtpl_context(oficio)
+        self.assertEqual(ctx["orgao_destino"], "Secretaria Executiva")
+        self.assertEqual(ctx["nome_destinatario"], "Maria Souza")
+        self.assertEqual(ctx["cargo_destinatario"], "Diretora")
