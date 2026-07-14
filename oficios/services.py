@@ -709,6 +709,37 @@ def cancelar_oficio(instance: Oficio, motivo: str) -> Oficio:
     return instance
 
 
+def retificar_oficio(instance: Oficio) -> Oficio:
+    """Marca o ofício como retificado: o documento passa a exibir "Retificado"
+    ao lado do número no lugar de "Autorização". Mutuamente exclusivo com a
+    marcação de complementar."""
+    instance.retificado_documento = True
+    instance.complementar_documento = False
+    instance.save(update_fields=["retificado_documento", "complementar_documento"])
+    return instance
+
+
+def desfazer_retificacao_oficio(instance: Oficio) -> Oficio:
+    instance.retificado_documento = False
+    instance.save(update_fields=["retificado_documento"])
+    return instance
+
+
+def marcar_oficio_complementar(instance: Oficio) -> Oficio:
+    """Marca o ofício como complementar: o documento passa a exibir "Complementar"
+    ao lado do número. Mutuamente exclusivo com a retificação."""
+    instance.complementar_documento = True
+    instance.retificado_documento = False
+    instance.save(update_fields=["retificado_documento", "complementar_documento"])
+    return instance
+
+
+def desfazer_complementar_oficio(instance: Oficio) -> Oficio:
+    instance.complementar_documento = False
+    instance.save(update_fields=["complementar_documento"])
+    return instance
+
+
 def build_oficio_document_payload(oficio):
     viatura_label = ""
     if oficio.viatura_id:

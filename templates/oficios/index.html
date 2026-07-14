@@ -121,6 +121,7 @@
 
   {% include "components/ui/modals/delete_confirm_modal.html" with delete_modal_title="Excluir ofício?" delete_modal_entity="este ofício" %}
   {% include "components/ui/modals/cancel_reason_modal.html" with cancel_modal_title="Cancelar ofício?" cancel_modal_entity="este ofício" cancel_modal_hint="Ele deixa de gerar prestação de contas e não poderá mais ser usado em novas Ordens de Serviço." %}
+  {% include "components/ui/modals/toggle_confirm_modal.html" %}
 
   {% include "components/ui/buttons/floating_action.html" with href=create_url label="Novo ofício" variant="primary" icon="plus" aria_label="Novo ofício" only %}
 
