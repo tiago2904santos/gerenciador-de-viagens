@@ -24,11 +24,23 @@ from justificativas.models import Justificativa
 
 from roteiros.models import RoteiroTrecho
 
+from cadastros.models import AssinaturaConfiguracao
+
 from .assunto_oficio import resolver_assunto_oficio
 from .models import Oficio
 
 DESTINO_FORA_PARANA = "SESP"
 DESTINO_DENTRO_PARANA = "Gabinete do Delegado Geral Adjunto"
+
+DESTINO_GABINETE_LABELS = {
+    Oficio.DESTINO_GABINETE_ADJUNTO: "Gabinete do Delegado Geral Adjunto",
+    Oficio.DESTINO_GABINETE_GERAL: "Gabinete do Delegado Geral",
+}
+
+DESTINATARIO_TIPO_POR_GABINETE = {
+    Oficio.DESTINO_GABINETE_ADJUNTO: AssinaturaConfiguracao.DESTINATARIO_OFICIO_ADJUNTO,
+    Oficio.DESTINO_GABINETE_GERAL: AssinaturaConfiguracao.DESTINATARIO_OFICIO_GERAL,
+}
 
 _MESES_PTBR = {
     1: "janeiro",
@@ -53,6 +65,8 @@ OFICIO_DOCXTPL_KEYS = frozenset(
         "protocolo",
         "nome_chefia",
         "cargo_chefia",
+        "nome_destinatario",
+        "cargo_destinatario",
         "unidade",
         "unidade_cabecalho",
         "orgao_destino",
@@ -171,12 +185,17 @@ def _build_sede(inst: dict[str, Any]) -> str:
     return format_document_display(_txt(inst.get("sede"))) if _txt(inst.get("sede")) else ""
 
 
-def _assinatura_nome_cargo(inst: dict[str, Any], tipo: str | None = None) -> tuple[str, str]:
+def _assinatura_nome_cargo(
+    inst: dict[str, Any],
+    tipo: str | None = None,
+    *,
+    fallback_geral: bool = True,
+) -> tuple[str, str]:
     ass = inst.get("assinaturas") or {}
     rows: list[dict[str, Any]] = []
     if isinstance(ass, dict):
-        if tipo and tipo in ass:
-            lst = ass[tipo]
+        if tipo is not None:
+            lst = ass.get(tipo) or []
             if isinstance(lst, list):
                 for row in lst:
                     if isinstance(row, dict) and (_txt(row.get("nome")) or row.get("servidor")):
@@ -190,7 +209,9 @@ def _assinatura_nome_cargo(inst: dict[str, Any], tipo: str | None = None) -> tup
                         rows.append(row)
     rows.sort(key=lambda r: int(r.get("ordem") or 0))
     if not rows:
-        return _txt(inst.get("nome_chefia")), _txt(inst.get("cargo_chefia"))
+        if fallback_geral:
+            return _txt(inst.get("nome_chefia")), _txt(inst.get("cargo_chefia"))
+        return "", ""
     row = rows[0]
     srv = row.get("servidor")
     nome = _txt(row.get("nome") or (getattr(srv, "nome", "") if srv else ""))
@@ -200,6 +221,7 @@ def _assinatura_nome_cargo(inst: dict[str, Any], tipo: str | None = None) -> tup
     return nome, cargo
 
 
+<<<<<<< HEAD
 def _orgao_destino(oficio: Oficio, inst: Mapping[str, Any]) -> str:
     destino_padrao = _txt(inst.get("destinatario_oficio_unidade")) or DESTINO_DENTRO_PARANA
     r = getattr(oficio, "roteiro", None)
@@ -216,7 +238,34 @@ def _orgao_destino(oficio: Oficio, inst: Mapping[str, Any]) -> str:
                 if t.destino_estado_id and t.destino_estado.sigla != "PR":
                     raw = DESTINO_FORA_PARANA
                     break
+=======
+def _viagem_fora_parana(oficio: Oficio) -> bool:
+    r = getattr(oficio, "roteiro", None)
+    if not r:
+        return False
+    for d in r.destinos.select_related("estado"):
+        if d.estado_id and d.estado.sigla != "PR":
+            return True
+    for t in r.trechos.select_related("destino_estado"):
+        if t.destino_estado_id and t.destino_estado.sigla != "PR":
+            return True
+    return False
+
+
+def _orgao_destino(oficio: Oficio) -> str:
+    if _viagem_fora_parana(oficio):
+        raw = DESTINO_FORA_PARANA
+    else:
+        raw = DESTINO_GABINETE_LABELS.get(oficio.destino_gabinete, DESTINO_DENTRO_PARANA)
+>>>>>>> 39f91824b21b787daa133f02be5ba387535f3f36
     return format_document_display(raw)
+
+
+def _destinatario_nome_cargo(inst: dict[str, Any], oficio: Oficio) -> tuple[str, str]:
+    tipo = DESTINATARIO_TIPO_POR_GABINETE.get(oficio.destino_gabinete)
+    if not tipo:
+        return "", ""
+    return _assinatura_nome_cargo(inst, tipo, fallback_geral=False)
 
 
 def _build_column_lines(items: list[str], blank_lines: int = 1) -> str:
@@ -482,6 +531,7 @@ def _build_oficio_docxtpl_context_impl(
 ) -> dict[str, Any]:
     inst = build_configuracao_context()
     nome_chefia, cargo_chefia = _assinatura_nome_cargo(inst, "OFICIO")
+    nome_destinatario, cargo_destinatario = _destinatario_nome_cargo(inst, oficio)
     nome_orgao_raw = _txt(inst.get("nome_orgao"))
     unidade_campo_raw = _txt(inst.get("unidade"))
     sigla_raw = _txt(inst.get("sigla_orgao"))
@@ -508,6 +558,8 @@ def _build_oficio_docxtpl_context_impl(
         "protocolo": protocolo,
         "nome_chefia": format_document_display(nome_chefia) if nome_chefia else "",
         "cargo_chefia": format_document_display(cargo_chefia) if cargo_chefia else "",
+        "nome_destinatario": format_document_display(nome_destinatario) if nome_destinatario else "",
+        "cargo_destinatario": format_document_display(cargo_destinatario) if cargo_destinatario else "",
         "nome_orgao": format_document_display(nome_orgao_raw) if nome_orgao_raw else "",
         "nome_orgao_cabecalho": _hdr(nome_orgao_raw),
         "unidade": unidade,

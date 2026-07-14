@@ -525,7 +525,7 @@
         {% if etapa_atual == 3 %}
           <div class="list-content app-list-grid">
             {% for card in oficio_cards %}
-              {% include "oficios/partials/oficio_list_card.html" with card=card only %}
+              {% include "oficios/partials/oficio_list_card.html" with card=card csrf_token=csrf_token only %}
             {% empty %}
               {% include "components/lists/list_empty.html" with message="Nenhum oficio vinculado a este evento." action_label="Novo oficio" action_url=create_urls.oficio only %}
             {% endfor %}

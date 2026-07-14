@@ -1790,6 +1790,16 @@ body.has-delete-modal-open {
   color: var(--color-danger);
 }
 
+.cv-action-menu__item--retificar,
+.cv-action-menu__item--complementar {
+  color: var(--color-info);
+}
+
+.cv-action-menu__form {
+  display: block;
+  width: 100%;
+}
+
 
 /* =========================================================
    17. Quick Create Inline

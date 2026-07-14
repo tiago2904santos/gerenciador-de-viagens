@@ -1,7 +1,6 @@
 ﻿import re
 
 from django import forms
-from django.db.models import Q
 
 from core.normalizers import normalize_plate
 from core.normalizers import normalize_upper
@@ -30,13 +29,10 @@ from .models import Viatura
 PLACA_RE = re.compile(r"^[A-Z]{3}(?:\d{4}|\d[A-Z]\d{2})$")
 
 
-def _servidores_assinantes_queryset(extra_ids=None):
-    servidores = list(Servidor.objects.select_related("cargo", "unidade").order_by("nome"))
-    completos_ids = [servidor.pk for servidor in servidores if servidor.esta_completo()]
-    extra_ids = [pk for pk in (extra_ids or []) if pk]
-    if completos_ids:
-        return Servidor.objects.filter(Q(pk__in=completos_ids) | Q(pk__in=extra_ids)).order_by("nome")
-    return Servidor.objects.order_by("nome")
+def _servidores_assinantes_queryset():
+    # Assinantes/destinatários exibem apenas nome e cargo no documento (sem RG/CPF),
+    # então servidores incompletos (ex.: chefias sem CPF cadastrado) também são elegíveis.
+    return Servidor.objects.select_related("cargo", "unidade").order_by("nome")
 
 
 def _normalize_nome_obrigatorio(value):
@@ -662,6 +658,16 @@ _TIPO_FIELD_MAP = [
     (AssinaturaConfiguracao.JUSTIFICATIVA, "assinante_justificativa", "Assinante padrão – Justificativa"),
     (AssinaturaConfiguracao.PLANO_TRABALHO, "assinante_plano_trabalho", "Assinante padrão – Plano de Trabalho"),
     (AssinaturaConfiguracao.ORDEM_SERVICO, "assinante_ordem_servico", "Assinante padrão – Ordem de Serviço"),
+    (
+        AssinaturaConfiguracao.DESTINATARIO_OFICIO_ADJUNTO,
+        "destinatario_oficio_adjunto",
+        "Destinatário do Ofício – Gabinete do Delegado-Geral Adjunto",
+    ),
+    (
+        AssinaturaConfiguracao.DESTINATARIO_OFICIO_GERAL,
+        "destinatario_oficio_geral",
+        "Destinatário do Ofício – Gabinete do Delegado-Geral",
+    ),
 ]
 
 
@@ -682,6 +688,8 @@ _ASSINANTE_PICKER_LABELS = {
     "assinante_justificativa": "Assinante da Justificativa",
     "assinante_plano_trabalho": "Assinante do Plano de Trabalho",
     "assinante_ordem_servico": "Assinante da Ordem de Serviço",
+    "destinatario_oficio_adjunto": "Destinatário do Ofício – Gabinete do Delegado-Geral Adjunto",
+    "destinatario_oficio_geral": "Destinatário do Ofício – Gabinete do Delegado-Geral",
 }
 
 

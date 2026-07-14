@@ -107,7 +107,7 @@
   <div class="list-panel">
     <div class="list-content list-grid list-grid--roteiros app-list-grid" data-cv-list-container>
       {% for card in cards %}
-        {% include "oficios/partials/oficio_list_card.html" with card=card only %}
+        {% include "oficios/partials/oficio_list_card.html" with card=card csrf_token=csrf_token only %}
       {% empty %}
         {% include "components/lists/list_empty.html" with message=empty_message action_label="Novo ofício" action_url=create_url only %}
       {% endfor %}

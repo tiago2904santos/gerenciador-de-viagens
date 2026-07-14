@@ -82,6 +82,10 @@ from .selectors import listar_viaturas_para_oficio
 from .services import atualizar_modelo_motivo
 from .services import OficioVinculadoError
 from .services import cancelar_oficio
+from .services import retificar_oficio
+from .services import desfazer_retificacao_oficio
+from .services import marcar_oficio_complementar
+from .services import desfazer_complementar_oficio
 from .services import atualizar_oficio_dados_viajantes
 from .services import atualizar_oficio_transporte
 from .services import avaliar_oficio_dados_viajantes
@@ -1341,6 +1345,46 @@ def cancelar(request, pk):
     cancelar_oficio(oficio, motivo)
     messages.success(request, "Ofício cancelado. Ele não gera mais prestação de contas nem pode ser usado em novas Ordens de Serviço.")
     return redirect(next_url) if next_url else _fallback_url()
+
+
+@require_POST
+def retificar(request, pk):
+    oficio = get_oficio_by_id(pk)
+    next_url = _safe_next_url(request, "")
+
+    def _fallback_url():
+        if oficio.evento_id:
+            return redirect("eventos:guiado_etapa", pk=oficio.evento_id, etapa=3)
+        return redirect("oficios:index")
+
+    if oficio.retificado_documento:
+        desfazer_retificacao_oficio(oficio)
+        messages.success(request, "Retificação removida. O ofício voltou ao rótulo padrão do documento.")
+        return redirect(next_url) if next_url else _fallback_url()
+
+    retificar_oficio(oficio)
+    messages.success(request, "Ofício marcado como retificado. Edite o que for necessário — o documento passará a exibir \"Retificado\" ao lado do número.")
+    return redirect("oficios:dados_viajantes", pk=oficio.pk)
+
+
+@require_POST
+def marcar_complementar(request, pk):
+    oficio = get_oficio_by_id(pk)
+    next_url = _safe_next_url(request, "")
+
+    def _fallback_url():
+        if oficio.evento_id:
+            return redirect("eventos:guiado_etapa", pk=oficio.evento_id, etapa=3)
+        return redirect("oficios:index")
+
+    if oficio.complementar_documento:
+        desfazer_complementar_oficio(oficio)
+        messages.success(request, "Marcação de complementar removida do ofício.")
+        return redirect(next_url) if next_url else _fallback_url()
+
+    marcar_oficio_complementar(oficio)
+    messages.success(request, "Ofício marcado como complementar. Edite o que for necessário — o documento passará a exibir \"Complementar\" ao lado do número.")
+    return redirect("oficios:dados_viajantes", pk=oficio.pk)
 
 
 def modelos_motivo_index(request):

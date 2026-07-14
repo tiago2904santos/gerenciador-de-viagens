@@ -11,6 +11,7 @@ from core.normalizers import normalize_upper
 from core.utils.masks import format_placa
 from core.utils.masks import format_protocolo
 from core.utils.masks import normalize_protocolo
+from .assunto_oficio import resolver_assunto_oficio
 import logging
 
 from django.conf import settings as django_settings
@@ -709,6 +710,37 @@ def cancelar_oficio(instance: Oficio, motivo: str) -> Oficio:
     return instance
 
 
+def retificar_oficio(instance: Oficio) -> Oficio:
+    """Marca o ofício como retificado: o documento passa a exibir "Retificado"
+    ao lado do número no lugar de "Autorização". Mutuamente exclusivo com a
+    marcação de complementar."""
+    instance.retificado_documento = True
+    instance.complementar_documento = False
+    instance.save(update_fields=["retificado_documento", "complementar_documento"])
+    return instance
+
+
+def desfazer_retificacao_oficio(instance: Oficio) -> Oficio:
+    instance.retificado_documento = False
+    instance.save(update_fields=["retificado_documento"])
+    return instance
+
+
+def marcar_oficio_complementar(instance: Oficio) -> Oficio:
+    """Marca o ofício como complementar: o documento passa a exibir "Complementar"
+    ao lado do número. Mutuamente exclusivo com a retificação."""
+    instance.complementar_documento = True
+    instance.retificado_documento = False
+    instance.save(update_fields=["retificado_documento", "complementar_documento"])
+    return instance
+
+
+def desfazer_complementar_oficio(instance: Oficio) -> Oficio:
+    instance.complementar_documento = False
+    instance.save(update_fields=["complementar_documento"])
+    return instance
+
+
 def build_oficio_document_payload(oficio):
     viatura_label = ""
     if oficio.viatura_id:
@@ -720,12 +752,15 @@ def build_oficio_document_payload(oficio):
         motorista_label = oficio.motorista.nome
     elif oficio.motorista_modo == Oficio.MOTORISTA_MODO_MANUAL:
         motorista_label = (oficio.motorista_manual_nome or "").strip()
+    assunto_doc = resolver_assunto_oficio(oficio)
     return {
         "numero": oficio.numero,
         "ano": oficio.ano,
         "numero_formatado": oficio.numero_formatado,
         "protocolo": format_protocolo(oficio.protocolo),
         "assunto": oficio.assunto,
+        "assunto_oficio": assunto_doc["assunto_oficio"],
+        "assunto_linha": assunto_doc["assunto_linha"],
         "motivo": oficio.motivo,
         "data_criacao": oficio.data_criacao,
         "status": oficio.status,

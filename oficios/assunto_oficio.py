@@ -14,6 +14,10 @@ Regras:
 - **Retificado**: quando `retificado_documento` é verdadeiro **e** a regra por
   datas seria Autorização (documento emitido antes da viagem). Se a regra já
   for Convalidação, o marcador de retificação é ignorado.
+- **Complementar**: quando `complementar_documento` é verdadeiro, prevalece
+  sobre Autorização/Convalidação/Retificado (marcador explícito do usuário,
+  independente da data de emissão). Os dois marcadores são mutuamente
+  exclusivos — ver `oficios/services.py`.
 """
 
 from __future__ import annotations
@@ -51,6 +55,15 @@ def resolver_assunto_oficio(oficio: Oficio) -> dict[str, str]:
     else:
         s_local = primeira.astimezone(timezone.get_current_timezone()).date()
         base_autorizacao = d0_date < s_local
+
+    complementar = bool(getattr(oficio, "complementar_documento", False))
+    if complementar:
+        return {
+            "assunto_linha": ASSUNTO_AUTORIZACAO if base_autorizacao else ASSUNTO_CONVALIDACAO,
+            "assunto_oficio": "(Complementar)",
+            "assunto_termo": "complementação",
+            "assunto_rotulo": "(Complementar)",
+        }
 
     retificado = bool(getattr(oficio, "retificado_documento", False))
     if retificado and base_autorizacao:

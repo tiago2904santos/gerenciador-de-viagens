@@ -176,6 +176,15 @@
 
     {# ── FOOTER ── #}
     <div class="oficio-lc__footer">
+      {% if card.retificado %}
+      <div class="oficio-lc__footer-badge">
+        {% include "components/ui/badges/chip.html" with tone="warning" label="Retificado" only %}
+      </div>
+      {% elif card.complementar %}
+      <div class="oficio-lc__footer-badge">
+        {% include "components/ui/badges/chip.html" with tone="info" label="Complementar" only %}
+      </div>
+      {% endif %}
       <div class="oficio-lc__footer-actions">
         <div class="oficio-lc__footer-actions-main cv-icon-btn-group">
           {% include "components/ui/buttons/icon_button.html" with href=card.editar_url action="edit" aria_label="Editar ofício" tooltip="Editar" only %}
@@ -197,6 +206,20 @@
             {% include "dev/ui_lab/partials/_cv_icon.html" with icon="more" only %}
           </button>
           <div class="cv-action-menu" id="oficio-action-menu-{{ card.oficio_pk }}" role="menu" hidden>
+            <form method="post" action="{{ card.retificar_url }}" class="cv-action-menu__form">
+              {% csrf_token %}
+              <button type="submit" class="cv-action-menu__item cv-action-menu__item--retificar" role="menuitem">
+                {% include "dev/ui_lab/partials/_cv_icon.html" with icon="sync" only %}
+                <span>{% if card.retificado %}Desfazer retificação{% else %}Retificar ofício{% endif %}</span>
+              </button>
+            </form>
+            <form method="post" action="{{ card.marcar_complementar_url }}" class="cv-action-menu__form">
+              {% csrf_token %}
+              <button type="submit" class="cv-action-menu__item cv-action-menu__item--complementar" role="menuitem">
+                {% include "dev/ui_lab/partials/_cv_icon.html" with icon="plus" only %}
+                <span>{% if card.complementar %}Desfazer complementar{% else %}Ofício complementar{% endif %}</span>
+              </button>
+            </form>
             {% if not card.cancelado %}
             <button
               type="button"
