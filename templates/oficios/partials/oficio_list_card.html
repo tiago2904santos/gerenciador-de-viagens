@@ -24,6 +24,11 @@
         <span class="oficio-lc__info-value">{{ card.data_criacao_display }}</span>
       </div>
       {% endif %}
+      {% if card.retificado %}
+      {% include "components/ui/badges/chip.html" with tone="warning" label="Retificado" extra_class="oficio-lc__temporal-chip" only %}
+      {% elif card.complementar %}
+      {% include "components/ui/badges/chip.html" with tone="info" label="Complementar" extra_class="oficio-lc__temporal-chip" only %}
+      {% endif %}
       {% if card.temporal_label %}
       {% include "components/ui/badges/chip.html" with tone=card.temporal_tone label=card.temporal_label extra_class="oficio-lc__temporal-chip" only %}
       {% endif %}
@@ -176,15 +181,6 @@
 
     {# ── FOOTER ── #}
     <div class="oficio-lc__footer">
-      {% if card.retificado %}
-      <div class="oficio-lc__footer-badge">
-        {% include "components/ui/badges/chip.html" with tone="warning" label="Retificado" only %}
-      </div>
-      {% elif card.complementar %}
-      <div class="oficio-lc__footer-badge">
-        {% include "components/ui/badges/chip.html" with tone="info" label="Complementar" only %}
-      </div>
-      {% endif %}
       <div class="oficio-lc__footer-actions">
         <div class="oficio-lc__footer-actions-main cv-icon-btn-group">
           {% include "components/ui/buttons/icon_button.html" with href=card.editar_url action="edit" aria_label="Editar ofício" tooltip="Editar" only %}
