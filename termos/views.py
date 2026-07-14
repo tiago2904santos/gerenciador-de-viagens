@@ -21,6 +21,7 @@ from django.views.decorators.http import require_http_methods
 from cadastros.models import Servidor
 from core.normalizers import remove_accents
 
+from documentos.services.exceptions import DocumentValidationError
 from documentos.services.responses import build_inline_pdf_response
 from documentos.services.types import DocumentoFormato
 from documentos.services.types import DocumentoTipo
@@ -505,10 +506,18 @@ def _termo_cadastro_docs_or_none(termo, formato):
     return docs or None
 
 
+def _termo_pdf_error_redirect(request, termo, exc: DocumentValidationError):
+    messages.error(request, str(exc))
+    return redirect("termos:editar", pk=termo.pk)
+
+
 @require_GET
 def termo_cadastro_pdf_inline(request, pk):
     termo = get_object_or_404(_termo_queryset(), pk=pk)
-    docs = _termo_cadastro_docs_or_none(termo, DocumentoFormato.PDF)
+    try:
+        docs = _termo_cadastro_docs_or_none(termo, DocumentoFormato.PDF)
+    except DocumentValidationError as exc:
+        return _termo_pdf_error_redirect(request, termo, exc)
     if docs is None:
         messages.error(request, "Nenhum termo gerado.")
         return redirect("termos:editar", pk=termo.pk)
@@ -526,7 +535,10 @@ def termo_cadastro_pdf_inline(request, pk):
 @require_GET
 def termo_cadastro_generico_pdf_inline(request, pk):
     termo = get_object_or_404(_termo_queryset(), pk=pk)
-    doc = gerar_termo_cadastro_um(termo, None, DocumentoFormato.PDF)
+    try:
+        doc = gerar_termo_cadastro_um(termo, None, DocumentoFormato.PDF)
+    except DocumentValidationError as exc:
+        return _termo_pdf_error_redirect(request, termo, exc)
     return build_inline_pdf_response(
         request,
         content=doc.conteudo,
@@ -543,7 +555,10 @@ def termo_cadastro_servidor_pdf_inline(request, pk, servidor_pk):
     servidor = get_object_or_404(Servidor, pk=servidor_pk)
     if not termo.servidores_efetivos().filter(pk=servidor.pk).exists():
         raise Http404("Servidor nao selecionado para este termo.")
-    doc = gerar_termo_cadastro_um(termo, servidor, DocumentoFormato.PDF)
+    try:
+        doc = gerar_termo_cadastro_um(termo, servidor, DocumentoFormato.PDF)
+    except DocumentValidationError as exc:
+        return _termo_pdf_error_redirect(request, termo, exc)
     return build_inline_pdf_response(
         request,
         content=doc.conteudo,
@@ -567,10 +582,18 @@ def _termo_cadastro_docs_com_generico(termo, formato):
     return docs
 
 
+def _termo_oficio_pdf_error_redirect(request, oficio, exc: DocumentValidationError):
+    messages.error(request, str(exc))
+    return redirect(f"{redirect_para_corrigir_documento_oficio(oficio)}?documento_incompleto=1")
+
+
 @require_GET
 def baixar_termo_cadastro_pdf(request, pk):
     termo = get_object_or_404(_termo_queryset(), pk=pk)
-    docs = _termo_cadastro_docs_com_generico(termo, DocumentoFormato.PDF)
+    try:
+        docs = _termo_cadastro_docs_com_generico(termo, DocumentoFormato.PDF)
+    except DocumentValidationError as exc:
+        return _termo_pdf_error_redirect(request, termo, exc)
     content = docs[0].conteudo if len(docs) == 1 else fundir_termos_pdf(docs)
     response = HttpResponse(content, content_type="application/pdf")
     response["Content-Disposition"] = f'attachment; filename="termo_{termo.pk}.pdf"'
@@ -638,7 +661,10 @@ def termo_servidor_pdf_inline(request, pk, servidor_pk):
     if not listar_servidores_com_termo(oficio).filter(pk=servidor.pk).exists():
         raise Http404("Servidor nao selecionado para Termo de Autorizacao neste oficio.")
 
-    doc = gerar_termo_um(oficio, servidor, DocumentoFormato.PDF)
+    try:
+        doc = gerar_termo_um(oficio, servidor, DocumentoFormato.PDF)
+    except DocumentValidationError as exc:
+        return _termo_oficio_pdf_error_redirect(request, oficio, exc)
     ref = f"{oficio.numero_formatado.replace('/', '-')}-termo-{servidor.pk}"
     return build_inline_pdf_response(
         request,
@@ -668,7 +694,10 @@ def baixar_termo_servidor(request, pk, servidor_pk, formato):
     if not listar_servidores_com_termo(oficio).filter(pk=servidor.pk).exists():
         raise Http404("Servidor nao selecionado para Termo de Autorizacao neste oficio.")
 
-    doc = gerar_termo_um(oficio, servidor, fmt)
+    try:
+        doc = gerar_termo_um(oficio, servidor, fmt)
+    except DocumentValidationError as exc:
+        return _termo_oficio_pdf_error_redirect(request, oficio, exc)
     response = HttpResponse(doc.conteudo, content_type=doc.content_type)
     response["Content-Disposition"] = f'attachment; filename="{doc.nome_arquivo}"'
     response["X-Content-Type-Options"] = "nosniff"
@@ -687,7 +716,10 @@ def baixar_termos_todos_pdf(request, pk):
         messages.error(request, "Nenhum servidor selecionado para Termo de Autorizacao.")
         return redirect("termos:index")
 
-    docs = gerar_termo_lote(oficio, DocumentoFormato.PDF)
+    try:
+        docs = gerar_termo_lote(oficio, DocumentoFormato.PDF)
+    except DocumentValidationError as exc:
+        return _termo_oficio_pdf_error_redirect(request, oficio, exc)
     pdf_bytes = fundir_termos_pdf(docs)
     nome = f"termos_oficio_{oficio.numero_formatado.replace('/', '-')}.pdf"
     response = HttpResponse(pdf_bytes, content_type="application/pdf")
@@ -712,7 +744,10 @@ def baixar_termo_lote_zip(request, pk, formato):
         messages.error(request, "Nenhum servidor selecionado para Termo de Autorizacao.")
         return redirect("termos:index")
 
-    docs = gerar_termo_lote(oficio, fmt)
+    try:
+        docs = gerar_termo_lote(oficio, fmt)
+    except DocumentValidationError as exc:
+        return _termo_oficio_pdf_error_redirect(request, oficio, exc)
     if len(docs) == 1:
         content = docs[0].conteudo
     elif fmt == DocumentoFormato.PDF:

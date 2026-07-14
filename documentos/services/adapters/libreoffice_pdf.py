@@ -8,59 +8,64 @@ from urllib.parse import urlparse
 
 import requests
 
+# Invocações concorrentes de `soffice` sem perfil isolado disputam o lock do
+# perfil de utilizador padrão (~/.config/libreoffice/.../.lock): uma delas
+# falha ou bloqueia indefinidamente. `-env:UserInstallation` isola cada
+# chamada no seu próprio diretório temporário, eliminando essa disputa.
+_LIBREOFFICE_TIMEOUT_SECONDS = 90
+
+
+def _convert_via_libreoffice(*, input_bytes: bytes, filename: str, libreoffice_binary: str) -> bytes:
+    with tempfile.TemporaryDirectory() as tmp:
+        tdir = Path(tmp)
+        input_path = tdir / filename
+        input_path.write_bytes(input_bytes)
+        profile_dir = tdir / "profile"
+        try:
+            subprocess.run(
+                [
+                    libreoffice_binary,
+                    f"-env:UserInstallation=file://{profile_dir}",
+                    "--headless",
+                    "--convert-to",
+                    "pdf",
+                    "--outdir",
+                    str(tdir),
+                    str(input_path),
+                ],
+                check=True,
+                capture_output=True,
+                text=True,
+                timeout=_LIBREOFFICE_TIMEOUT_SECONDS,
+            )
+        except subprocess.TimeoutExpired as exc:
+            raise RuntimeError(
+                f"LibreOffice não respondeu em {_LIBREOFFICE_TIMEOUT_SECONDS}s (possível disputa de conversões concorrentes)."
+            ) from exc
+        pdf_path = tdir / f"{input_path.stem}.pdf"
+        if not pdf_path.exists():
+            raise RuntimeError("LibreOffice não gerou o arquivo PDF esperado.")
+        return pdf_path.read_bytes()
+
 
 def convert_docx_to_pdf_libreoffice(*, docx_bytes: bytes, libreoffice_binary: str) -> bytes:
     """
     Converte DOCX em PDF via LibreOffice em modo headless (sem unoserver).
     """
-    with tempfile.TemporaryDirectory() as tmp:
-        tdir = Path(tmp)
-        docx_path = tdir / "entrada.docx"
-        docx_path.write_bytes(docx_bytes)
-        subprocess.run(
-            [
-                libreoffice_binary,
-                "--headless",
-                "--convert-to",
-                "pdf",
-                "--outdir",
-                str(tdir),
-                str(docx_path),
-            ],
-            check=True,
-            capture_output=True,
-            text=True,
-        )
-        pdf_path = tdir / "entrada.pdf"
-        if not pdf_path.exists():
-            raise RuntimeError("LibreOffice não gerou o arquivo PDF esperado.")
-        return pdf_path.read_bytes()
+    return _convert_via_libreoffice(
+        input_bytes=docx_bytes,
+        filename="entrada.docx",
+        libreoffice_binary=libreoffice_binary,
+    )
 
 
 def convert_xlsx_to_pdf_libreoffice(*, xlsx_bytes: bytes, libreoffice_binary: str) -> bytes:
     """Converte XLSX em PDF via LibreOffice em modo headless (sem unoserver)."""
-    with tempfile.TemporaryDirectory() as tmp:
-        tdir = Path(tmp)
-        xlsx_path = tdir / "entrada.xlsx"
-        xlsx_path.write_bytes(xlsx_bytes)
-        subprocess.run(
-            [
-                libreoffice_binary,
-                "--headless",
-                "--convert-to",
-                "pdf",
-                "--outdir",
-                str(tdir),
-                str(xlsx_path),
-            ],
-            check=True,
-            capture_output=True,
-            text=True,
-        )
-        pdf_path = tdir / "entrada.pdf"
-        if not pdf_path.exists():
-            raise RuntimeError("LibreOffice não gerou o arquivo PDF esperado.")
-        return pdf_path.read_bytes()
+    return _convert_via_libreoffice(
+        input_bytes=xlsx_bytes,
+        filename="entrada.xlsx",
+        libreoffice_binary=libreoffice_binary,
+    )
 
 
 def unoserver_healthcheck(base_url: str, *, timeout: float = 3) -> bool:
