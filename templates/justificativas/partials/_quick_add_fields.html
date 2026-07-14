@@ -7,7 +7,8 @@
   <div class="field-grid">
     <div class="field-size-4">
       {% url 'justificativas:modelos_index' as modelos_url %}
-      {% include "components/forms/input_with_action.html" with field=form.modelo action_url=modelos_url action_label="Gerenciar modelos" only %}
+      {% url 'justificativas:index' as justificativas_index_url %}
+      {% include "components/forms/input_with_action.html" with field=form.modelo action_url=modelos_url|add:"?next="|add:justificativas_index_url action_label="Gerenciar modelos" only %}
     </div>
   </div>
   <div class="field-grid">
