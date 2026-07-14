@@ -658,16 +658,6 @@ _TIPO_FIELD_MAP = [
     (AssinaturaConfiguracao.JUSTIFICATIVA, "assinante_justificativa", "Assinante padrão – Justificativa"),
     (AssinaturaConfiguracao.PLANO_TRABALHO, "assinante_plano_trabalho", "Assinante padrão – Plano de Trabalho"),
     (AssinaturaConfiguracao.ORDEM_SERVICO, "assinante_ordem_servico", "Assinante padrão – Ordem de Serviço"),
-    (
-        AssinaturaConfiguracao.DESTINATARIO_OFICIO_ADJUNTO,
-        "destinatario_oficio_adjunto",
-        "Destinatário do Ofício – Gabinete do Delegado-Geral Adjunto",
-    ),
-    (
-        AssinaturaConfiguracao.DESTINATARIO_OFICIO_GERAL,
-        "destinatario_oficio_geral",
-        "Destinatário do Ofício – Gabinete do Delegado-Geral",
-    ),
 ]
 
 
@@ -688,8 +678,6 @@ _ASSINANTE_PICKER_LABELS = {
     "assinante_justificativa": "Assinante da Justificativa",
     "assinante_plano_trabalho": "Assinante do Plano de Trabalho",
     "assinante_ordem_servico": "Assinante da Ordem de Serviço",
-    "destinatario_oficio_adjunto": "Destinatário do Ofício – Gabinete do Delegado-Geral Adjunto",
-    "destinatario_oficio_geral": "Destinatário do Ofício – Gabinete do Delegado-Geral",
 }
 
 

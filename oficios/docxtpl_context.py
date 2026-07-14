@@ -24,23 +24,11 @@ from justificativas.models import Justificativa
 
 from roteiros.models import RoteiroTrecho
 
-from cadastros.models import AssinaturaConfiguracao
-
 from .assunto_oficio import resolver_assunto_oficio
 from .models import Oficio
 
 DESTINO_FORA_PARANA = "SESP"
 DESTINO_DENTRO_PARANA = "Gabinete do Delegado Geral Adjunto"
-
-DESTINO_GABINETE_LABELS = {
-    Oficio.DESTINO_GABINETE_ADJUNTO: "Gabinete do Delegado Geral Adjunto",
-    Oficio.DESTINO_GABINETE_GERAL: "Gabinete do Delegado Geral",
-}
-
-DESTINATARIO_TIPO_POR_GABINETE = {
-    Oficio.DESTINO_GABINETE_ADJUNTO: AssinaturaConfiguracao.DESTINATARIO_OFICIO_ADJUNTO,
-    Oficio.DESTINO_GABINETE_GERAL: AssinaturaConfiguracao.DESTINATARIO_OFICIO_GERAL,
-}
 
 _MESES_PTBR = {
     1: "janeiro",
@@ -221,7 +209,6 @@ def _assinatura_nome_cargo(
     return nome, cargo
 
 
-<<<<<<< HEAD
 def _orgao_destino(oficio: Oficio, inst: Mapping[str, Any]) -> str:
     destino_padrao = _txt(inst.get("destinatario_oficio_unidade")) or DESTINO_DENTRO_PARANA
     r = getattr(oficio, "roteiro", None)
@@ -238,34 +225,15 @@ def _orgao_destino(oficio: Oficio, inst: Mapping[str, Any]) -> str:
                 if t.destino_estado_id and t.destino_estado.sigla != "PR":
                     raw = DESTINO_FORA_PARANA
                     break
-=======
-def _viagem_fora_parana(oficio: Oficio) -> bool:
-    r = getattr(oficio, "roteiro", None)
-    if not r:
-        return False
-    for d in r.destinos.select_related("estado"):
-        if d.estado_id and d.estado.sigla != "PR":
-            return True
-    for t in r.trechos.select_related("destino_estado"):
-        if t.destino_estado_id and t.destino_estado.sigla != "PR":
-            return True
-    return False
-
-
-def _orgao_destino(oficio: Oficio) -> str:
-    if _viagem_fora_parana(oficio):
-        raw = DESTINO_FORA_PARANA
-    else:
-        raw = DESTINO_GABINETE_LABELS.get(oficio.destino_gabinete, DESTINO_DENTRO_PARANA)
->>>>>>> 39f91824b21b787daa133f02be5ba387535f3f36
     return format_document_display(raw)
 
 
-def _destinatario_nome_cargo(inst: dict[str, Any], oficio: Oficio) -> tuple[str, str]:
-    tipo = DESTINATARIO_TIPO_POR_GABINETE.get(oficio.destino_gabinete)
-    if not tipo:
+def _destinatario_nome_cargo(inst: Mapping[str, Any]) -> tuple[str, str]:
+    servidor = inst.get("destinatario_oficio")
+    if not servidor:
         return "", ""
-    return _assinatura_nome_cargo(inst, tipo, fallback_geral=False)
+    cargo = servidor.cargo.nome if getattr(servidor, "cargo_id", None) else ""
+    return _txt(servidor.nome), _txt(cargo)
 
 
 def _build_column_lines(items: list[str], blank_lines: int = 1) -> str:
@@ -531,7 +499,7 @@ def _build_oficio_docxtpl_context_impl(
 ) -> dict[str, Any]:
     inst = build_configuracao_context()
     nome_chefia, cargo_chefia = _assinatura_nome_cargo(inst, "OFICIO")
-    nome_destinatario, cargo_destinatario = _destinatario_nome_cargo(inst, oficio)
+    nome_destinatario, cargo_destinatario = _destinatario_nome_cargo(inst)
     nome_orgao_raw = _txt(inst.get("nome_orgao"))
     unidade_campo_raw = _txt(inst.get("unidade"))
     sigla_raw = _txt(inst.get("sigla_orgao"))

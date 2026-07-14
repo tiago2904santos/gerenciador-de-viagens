@@ -35,13 +35,6 @@ class Oficio(TimeStampedModel, CancelavelModel):
         (CUSTEIO_ONUS_LIMITADO, "Ônus limitado"),
     ]
 
-    DESTINO_GABINETE_ADJUNTO = "ADJUNTO"
-    DESTINO_GABINETE_GERAL = "GERAL"
-    DESTINO_GABINETE_CHOICES = [
-        (DESTINO_GABINETE_ADJUNTO, "Gabinete do Delegado-Geral Adjunto"),
-        (DESTINO_GABINETE_GERAL, "Gabinete do Delegado-Geral"),
-    ]
-
     numero = models.PositiveIntegerField(null=True, blank=True, db_index=True)
     ano = models.PositiveIntegerField(null=True, blank=True, db_index=True)
     data_criacao = models.DateField(default=timezone.localdate, db_index=True)
@@ -76,13 +69,6 @@ class Oficio(TimeStampedModel, CancelavelModel):
         default=CUSTEIO_UNIDADE_DPC,
     )
     custeio_observacao = models.CharField(max_length=255, blank=True, default="")
-    destino_gabinete = models.CharField(
-        max_length=10,
-        choices=DESTINO_GABINETE_CHOICES,
-        default=DESTINO_GABINETE_ADJUNTO,
-        verbose_name="Gabinete de destino",
-        help_text="Autoridade a quem o ofício é endereçado quando o destino é dentro do Paraná.",
-    )
     servidores = models.ManyToManyField(Servidor, blank=True, related_name="oficios")
     servidores_termo_autorizacao = models.ManyToManyField(
         Servidor,

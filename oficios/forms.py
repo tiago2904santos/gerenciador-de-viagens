@@ -156,7 +156,6 @@ class OficioForm(forms.ModelForm):
             "motorista",
             "custeio",
             "custeio_observacao",
-            "destino_gabinete",
         ]
         widgets = {
             "data_criacao": forms.DateInput(attrs={"class": "form-control", "type": "date"}),
@@ -169,7 +168,6 @@ class OficioForm(forms.ModelForm):
             "viatura": forms.Select(attrs={"class": "form-select"}),
             "motorista": forms.Select(attrs={"class": "form-select"}),
             "custeio": forms.Select(attrs={"class": "form-select"}),
-            "destino_gabinete": forms.Select(attrs={"class": "form-select"}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -222,7 +220,6 @@ class OficioDadosViajantesForm(OficioForm):
             "motivo",
             "custeio",
             "custeio_observacao",
-            "destino_gabinete",
             "viatura",
             "servidores",
             "servidores_termo_autorizacao",
@@ -241,9 +238,6 @@ class OficioDadosViajantesForm(OficioForm):
                 attrs={"class": "form-select", "data-oficio-custeio-field": "true"},
             ),
             "custeio_observacao": forms.TextInput(attrs={"class": "form-control"}),
-            "destino_gabinete": forms.Select(
-                attrs={"class": "form-select", "data-oficio-destino-gabinete-field": "true"},
-            ),
             "viatura": ViaturaSelectSingle(
                 attrs={
                     "class": "form-select cv-search-picker__native",
@@ -288,7 +282,6 @@ class OficioDadosViajantesForm(OficioForm):
         self.fields["protocolo"].required = False
         self.fields["motivo"].required = False
         self.fields["custeio"].required = False
-        self.fields["destino_gabinete"].required = False
         self.fields["viatura"].empty_label = ""
         self.fields["servidores"].required = False
         self.fields["servidores_termo_autorizacao"].queryset = self.fields["servidores"].queryset
