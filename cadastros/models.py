@@ -382,6 +382,15 @@ class ConfiguracaoSistema(TimeStampedModel):
         related_name="+",
         verbose_name="Coordenador administrativo padrão (Plano de Trabalho)",
     )
+    destinatario_oficio = models.ForeignKey(
+        Servidor,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+        verbose_name="Destinatário padrão do Ofício",
+        help_text="A unidade lotada deste servidor vira o DESTINO do cabeçalho do Ofício.",
+    )
     pt_ultimo_numero = models.PositiveIntegerField(default=0)
     pt_ano = models.PositiveIntegerField(default=0)
     pt_sufixo_numero = models.CharField(

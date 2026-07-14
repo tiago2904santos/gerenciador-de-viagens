@@ -145,6 +145,12 @@ def build_configuracao_context():
         "sigla_orgao": configuracao.sigla_orgao,
         "divisao": configuracao.divisao.nome if configuracao.divisao_id else "",
         "unidade": configuracao.unidade.nome if configuracao.unidade_id else "",
+        "destinatario_oficio": configuracao.destinatario_oficio,
+        "destinatario_oficio_unidade": (
+            configuracao.destinatario_oficio.unidade.nome
+            if configuracao.destinatario_oficio_id and configuracao.destinatario_oficio.unidade_id
+            else ""
+        ),
         # Compatibilidade: placeholders antigos "sede" passam a refletir cidade_endereco.
         "sede": cidade_doc,
         "nome_chefia": configuracao.nome_chefia,

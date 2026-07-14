@@ -200,12 +200,13 @@ def _assinatura_nome_cargo(inst: dict[str, Any], tipo: str | None = None) -> tup
     return nome, cargo
 
 
-def _orgao_destino(oficio: Oficio) -> str:
+def _orgao_destino(oficio: Oficio, inst: Mapping[str, Any]) -> str:
+    destino_padrao = _txt(inst.get("destinatario_oficio_unidade")) or DESTINO_DENTRO_PARANA
     r = getattr(oficio, "roteiro", None)
     if not r:
-        raw = DESTINO_DENTRO_PARANA
+        raw = destino_padrao
     else:
-        raw = DESTINO_DENTRO_PARANA
+        raw = destino_padrao
         for d in r.destinos.select_related("estado"):
             if d.estado_id and d.estado.sigla != "PR":
                 raw = DESTINO_FORA_PARANA
@@ -511,7 +512,7 @@ def _build_oficio_docxtpl_context_impl(
         "nome_orgao_cabecalho": _hdr(nome_orgao_raw),
         "unidade": unidade,
         "unidade_cabecalho": _hdr(unidade_campo_raw),
-        "orgao_destino": _orgao_destino(oficio),
+        "orgao_destino": _orgao_destino(oficio, inst),
         "placa": v["placa"],
         "viatura": v["viatura"],
         "combustivel": v["combustivel"],

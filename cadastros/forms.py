@@ -733,3 +733,34 @@ class ConfiguracaoAssinaturasForm(forms.Form):
             else:
                 AssinaturaConfiguracao.objects.filter(configuracao=configuracao, tipo=tipo, ordem=1).delete()
 
+
+class ConfiguracaoDestinatarioForm(forms.ModelForm):
+    """Destinatário padrão do Ofício: busca por nome do servidor.
+
+    A unidade lotada do servidor selecionado vira o DESTINO do cabeçalho do
+    Ofício (mesmo mecanismo da ORIGEM, que usa a unidade da configuração).
+    """
+
+    class Meta:
+        model = ConfiguracaoSistema
+        fields = ["destinatario_oficio"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["destinatario_oficio"].required = False
+        self.fields["destinatario_oficio"].empty_label = ""
+        self.fields["destinatario_oficio"].label = "Destinatário do Ofício"
+        self.fields["destinatario_oficio"].widget = _AssinanteServidorSelect(
+            attrs={
+                "class": "cv-search-picker__native",
+                "data-cv-search-picker": "true",
+                "data-picker-mode": "single",
+                "data-picker-variant": "compact",
+                "data-picker-label": "Destinatário do Ofício",
+                "data-picker-hint": "Busque por nome, cargo ou CPF.",
+                "data-placeholder": "Buscar servidor",
+                "data-empty-message": "Nenhum servidor encontrado.",
+            }
+        )
+        self.fields["destinatario_oficio"].queryset = _servidores_assinantes_queryset()
+

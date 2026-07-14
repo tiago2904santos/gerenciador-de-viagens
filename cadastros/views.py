@@ -17,6 +17,7 @@ from .forms import CargoForm
 from .forms import CidadeForm
 from .forms import CombustivelForm
 from .forms import ConfiguracaoAssinaturasForm
+from .forms import ConfiguracaoDestinatarioForm
 from .forms import ConfiguracaoSistemaForm
 from .forms import EstadoForm
 from .forms import ServidorForm
@@ -874,10 +875,17 @@ def configuracao_sistema(request):
     from .models import ConfiguracaoSistema
 
     obj = ConfiguracaoSistema.get_singleton()
-    post_data = request.POST or None
+    is_post_dados = request.method == "POST" and request.POST.get("form_id") != "destinatarios"
+    is_post_destinatarios = request.method == "POST" and request.POST.get("form_id") == "destinatarios"
+
+    post_data = request.POST if is_post_dados else None
     form = ConfiguracaoSistemaForm(post_data, instance=obj)
     assinaturas_form = ConfiguracaoAssinaturasForm(post_data, configuracao=obj)
-    if request.method == "POST" and form.is_valid() and assinaturas_form.is_valid():
+    destinatario_form = ConfiguracaoDestinatarioForm(
+        request.POST if is_post_destinatarios else None, instance=obj,
+    )
+
+    if is_post_dados and form.is_valid() and assinaturas_form.is_valid():
         _, cidade_resolvida = salvar_configuracao_sistema(form)
         assinaturas_form.save(obj)
         if (
@@ -890,6 +898,11 @@ def configuracao_sistema(request):
                 "Base geográfica não importada ou cidade não encontrada; cidade sede padrão não foi definida.",
             )
         messages.success(request, "Configurações salvas com sucesso.")
+        return redirect("cadastros:configuracao")
+
+    if is_post_destinatarios and destinatario_form.is_valid():
+        destinatario_form.save()
+        messages.success(request, "Destinatário salvo com sucesso.")
         return redirect("cadastros:configuracao")
 
     cfg_drive = getattr(settings, "GOOGLE_DRIVE", {})
@@ -905,6 +918,7 @@ def configuracao_sistema(request):
             "page_description": "Unidade, cidade em documentos e assinantes padrão por tipo.",
             "form": form,
             "assinaturas_form": assinaturas_form,
+            "destinatario_form": destinatario_form,
             "submit_label": "Salvar configuração",
             "submit_icon": "check",
             "back_url": reverse("core:dashboard"),
