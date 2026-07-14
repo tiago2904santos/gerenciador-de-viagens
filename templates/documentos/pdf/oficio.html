@@ -9,7 +9,7 @@
   {% if institucional.sigla_orgao %}<div class="doc-meta doc-muted" style="text-align:center;">{{ institucional.sigla_orgao|upper }}</div>{% endif %}
   <div class="doc-unidade">{{ institucional.unidade }}</div>
 
-  <div class="doc-title">Solicitação de autorização — Ofício nº {{ oficio.numero_formatado }}</div>
+  <div class="doc-title">Solicitação de autorização — Ofício nº {{ oficio.numero_formatado }} {{ oficio.assunto_oficio }}</div>
 
   <div class="doc-meta">
     <strong>Protocolo:</strong> {{ oficio.protocolo }} &nbsp;·&nbsp;
