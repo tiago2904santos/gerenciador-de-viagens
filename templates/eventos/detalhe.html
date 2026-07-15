@@ -229,56 +229,51 @@
                 </div>
               </header>
               <div class="cv-wizard-section-body">
-                <section class="wizard-inner-section" aria-labelledby="evento-wizard-doc-oficios-d">
-                  <header class="wizard-inner-section__header">
-                    <h4 class="wizard-inner-section__title" id="evento-wizard-doc-oficios-d">Ofícios</h4>
-                  </header>
+                <div class="evento-doc-tabs" id="evento-doc-tabs" role="tablist" aria-label="Tipo de documento">
+                  <button type="button" class="evento-doc-tab is-active" data-doc-tab-target="oficios" role="tab" aria-selected="true" aria-controls="evento-wizard-doc-oficios-d">
+                    Ofícios
+                  </button>
+                  <button type="button" class="evento-doc-tab" data-doc-tab-target="roteiros" role="tab" aria-selected="false" aria-controls="evento-wizard-doc-roteiros-d">
+                    Roteiros
+                  </button>
+                  <button type="button" class="evento-doc-tab" data-doc-tab-target="pt" role="tab" aria-selected="false" aria-controls="evento-wizard-doc-pt-d">
+                    PT
+                  </button>
+                  <button type="button" class="evento-doc-tab" data-doc-tab-target="os" role="tab" aria-selected="false" aria-controls="evento-wizard-doc-os-d">
+                    OS
+                  </button>
+                  <button type="button" class="evento-doc-tab" data-doc-tab-target="termos" role="tab" aria-selected="false" aria-controls="evento-wizard-doc-termos-d">
+                    Termos
+                  </button>
+                </div>
+
+                <section class="wizard-inner-section" id="evento-wizard-doc-oficios-d" data-doc-tab-panel="oficios" role="tabpanel">
                   <div class="field-grid">
                     {% include "components/forms/form_field.html" with field=form.oficios_vinculados only %}
                   </div>
                 </section>
 
-                <hr style="border: none; border-top: 1px solid var(--cv-border-default, rgba(255,255,255,0.08)); margin: 0.5rem 0 0;">
-
-                <section class="wizard-inner-section" aria-labelledby="evento-wizard-doc-os-d">
-                  <header class="wizard-inner-section__header">
-                    <h4 class="wizard-inner-section__title" id="evento-wizard-doc-os-d">Ordens de serviço</h4>
-                  </header>
+                <section class="wizard-inner-section" id="evento-wizard-doc-roteiros-d" data-doc-tab-panel="roteiros" role="tabpanel" hidden>
                   <div class="field-grid">
-                    {% include "components/forms/form_field.html" with field=form.ordens_servico_vinculadas only %}
+                    {% include "components/forms/form_field.html" with field=form.roteiros_vinculados only %}
                   </div>
                 </section>
 
-                <hr style="border: none; border-top: 1px solid var(--cv-border-default, rgba(255,255,255,0.08)); margin: 0.5rem 0 0;">
-
-                <section class="wizard-inner-section" aria-labelledby="evento-wizard-doc-pt-d">
-                  <header class="wizard-inner-section__header">
-                    <h4 class="wizard-inner-section__title" id="evento-wizard-doc-pt-d">Planos de trabalho</h4>
-                  </header>
+                <section class="wizard-inner-section" id="evento-wizard-doc-pt-d" data-doc-tab-panel="pt" role="tabpanel" hidden>
                   <div class="field-grid">
                     {% include "components/forms/form_field.html" with field=form.planos_trabalho_vinculados only %}
                   </div>
                 </section>
 
-                <hr style="border: none; border-top: 1px solid var(--cv-border-default, rgba(255,255,255,0.08)); margin: 0.5rem 0 0;">
-
-                <section class="wizard-inner-section" aria-labelledby="evento-wizard-doc-termos-d">
-                  <header class="wizard-inner-section__header">
-                    <h4 class="wizard-inner-section__title" id="evento-wizard-doc-termos-d">Termos de autorização</h4>
-                  </header>
+                <section class="wizard-inner-section" id="evento-wizard-doc-os-d" data-doc-tab-panel="os" role="tabpanel" hidden>
                   <div class="field-grid">
-                    {% include "components/forms/form_field.html" with field=form.termos_vinculados only %}
+                    {% include "components/forms/form_field.html" with field=form.ordens_servico_vinculadas only %}
                   </div>
                 </section>
 
-                <hr style="border: none; border-top: 1px solid var(--cv-border-default, rgba(255,255,255,0.08)); margin: 0.5rem 0 0;">
-
-                <section class="wizard-inner-section" aria-labelledby="evento-wizard-doc-roteiros-d">
-                  <header class="wizard-inner-section__header">
-                    <h4 class="wizard-inner-section__title" id="evento-wizard-doc-roteiros-d">Roteiros</h4>
-                  </header>
+                <section class="wizard-inner-section" id="evento-wizard-doc-termos-d" data-doc-tab-panel="termos" role="tabpanel" hidden>
                   <div class="field-grid">
-                    {% include "components/forms/form_field.html" with field=form.roteiros_vinculados only %}
+                    {% include "components/forms/form_field.html" with field=form.termos_vinculados only %}
                   </div>
                 </section>
               </div>
@@ -511,6 +506,39 @@
               } else {
                 initD();
               }
+            })();
+          </script>
+
+          <script>
+            (function () {
+              var tabs = document.getElementById('evento-doc-tabs');
+              if (!tabs) return;
+
+              var buttons = tabs.querySelectorAll('[data-doc-tab-target]');
+              var panels = document.querySelectorAll('[data-doc-tab-panel]');
+
+              function activate(target) {
+                buttons.forEach(function (btn) {
+                  var active = btn.dataset.docTabTarget === target;
+                  btn.classList.toggle('is-active', active);
+                  btn.setAttribute('aria-selected', String(active));
+                });
+                panels.forEach(function (panel) {
+                  panel.hidden = panel.dataset.docTabPanel !== target;
+                });
+              }
+
+              buttons.forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                  activate(btn.dataset.docTabTarget);
+                });
+              });
+
+              // Abre direto na aba que já tem documentos vinculados, se houver.
+              var comVinculo = Array.prototype.find.call(panels, function (panel) {
+                return panel.querySelector('select option:checked');
+              });
+              if (comVinculo) activate(comVinculo.dataset.docTabPanel);
             })();
           </script>
         {% endif %}
