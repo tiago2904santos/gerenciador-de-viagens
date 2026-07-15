@@ -1,3 +1,5 @@
+from urllib.parse import urlencode
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
@@ -17,6 +19,37 @@ class ModelosJustificativaCrudTests(TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertContains(r, "Modelos de justificativa")
         self.assertContains(r, "Buscar modelos de justificativa")
+
+    def test_listagem_exibe_quick_add_e_botao_voltar(self):
+        r = self.client.get(reverse("justificativas:modelos_index"))
+        self.assertEqual(r.status_code, 200)
+        self.assertContains(r, 'id="quick-add-modelo-justificativa"')
+        self.assertContains(r, "Novo modelo")
+        self.assertContains(r, 'name="nome"')
+        self.assertContains(r, 'name="texto"')
+        self.assertContains(r, "cv-floating-action")
+        self.assertContains(r, "Voltar para as justificativas")
+        self.assertContains(r, reverse("justificativas:index"))
+
+    def test_quick_add_cria_modelo_e_redireciona_para_lista(self):
+        r = self.client.post(
+            reverse("justificativas:modelos_index"),
+            data={"nome": "MODELO QUICK ADD", "texto": "Texto base", "is_padrao": "on"},
+        )
+        self.assertEqual(r.status_code, 302)
+        self.assertTrue(ModeloJustificativa.objects.filter(nome="MODELO QUICK ADD").exists())
+        r2 = self.client.get(reverse("justificativas:modelos_index"))
+        self.assertContains(r2, "MODELO QUICK ADD")
+
+    def test_quick_add_preserva_next_no_redirecionamento(self):
+        wizard_url = reverse("oficios:index")
+        r = self.client.post(
+            f"{reverse('justificativas:modelos_index')}?next={wizard_url}",
+            data={"nome": "MODELO COM NEXT", "texto": "Texto base", "is_padrao": ""},
+        )
+        self.assertEqual(r.status_code, 302)
+        expected = f"{reverse('justificativas:modelos_index')}?{urlencode({'next': wizard_url})}"
+        self.assertEqual(r.url, expected)
 
     def test_criar_e_lista(self):
         r = self.client.post(

@@ -6,6 +6,7 @@ from django.db.models import Q
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
 from core.normalizers import remove_accents
@@ -26,6 +27,21 @@ from .services import excluir_modelo_justificativa
 
 
 JUSTIFICATIVAS_PER_PAGE = 15
+
+
+def _url_with_next(url_name, next_url):
+    return f"{reverse(url_name)}?{urlencode({'next': next_url})}"
+
+
+def _safe_next_url(request, fallback_url):
+    next_url = request.POST.get("next") or request.GET.get("next")
+    if next_url and url_has_allowed_host_and_scheme(
+        next_url,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        return next_url
+    return fallback_url
 
 
 def _pagination_pages(page_obj, *, on_each_side=1, on_ends=1):
@@ -95,12 +111,26 @@ def justificativa_excluir(request, pk):
 
 def modelos_index(request):
     q = request.GET.get("q", "").strip()
+    back_url = _safe_next_url(request, reverse("justificativas:index"))
+    _oficios_prefix = reverse("oficios:index")
+    if back_url.startswith(_oficios_prefix):
+        back_label = "Voltar para o ofício"
+        back_aria_label = "Voltar para o cadastro de ofício"
+    else:
+        back_label = "Voltar para as justificativas"
+        back_aria_label = "Voltar para a lista de justificativas"
+    form = ModeloJustificativaForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        criar_modelo_justificativa(form)
+        messages.success(request, "Modelo de justificativa criado com sucesso.")
+        return redirect(_url_with_next("justificativas:modelos_index", back_url))
     modelos = listar_modelos_justificativa_busca(q=q or None)
     rows = [
         apresentar_linha_lista_simples_modelo_justificativa(
             modelo,
             edit_url=reverse("justificativas:modelo_editar", args=[modelo.pk]),
             delete_url=reverse("justificativas:modelo_excluir", args=[modelo.pk]),
+            delete_modal=True,
         )
         for modelo in modelos
     ]
@@ -112,6 +142,11 @@ def modelos_index(request):
             "page_description": "Cadastre textos reutilizaveis para preencher rapidamente a justificativa dos oficios.",
             "q": q,
             "rows": rows,
+            "quick_add_form": form,
+            "quick_add_next_url": back_url,
+            "back_to_url": back_url,
+            "back_label": back_label,
+            "back_aria_label": back_aria_label,
             "new_url": reverse("justificativas:modelo_novo"),
         },
     )

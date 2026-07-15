@@ -13,6 +13,7 @@ def apresentar_linha_lista_simples_modelo_justificativa(
     modelo: ModeloJustificativa,
     edit_url: str = "#",
     delete_url: str = "#",
+    delete_modal: bool = False,
 ):
     """Mesmo contrato de `apresentar_linha_lista_simples_modelo_motivo` (lista simples)."""
     badges = []
@@ -29,6 +30,7 @@ def apresentar_linha_lista_simples_modelo_justificativa(
         ],
         "edit_url": edit_url,
         "delete_url": delete_url,
+        "delete_modal": delete_modal,
         "set_default_url": (
             reverse("justificativas:modelo_definir_padrao", args=[modelo.pk])
             if not modelo.is_padrao
