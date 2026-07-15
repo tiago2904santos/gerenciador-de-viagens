@@ -612,3 +612,6 @@
 .prestacao-final-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.85rem; }
 .prestacao-final-servidor__name { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; font-weight: 600; }
 .prestacao-final-servidor__meta { display: block; margin-top: 0.2rem; font-weight: 400; font-size: 0.8125rem; color: var(--color-text-muted, #52657a); }
+
+/* RT por servidor: campo opcional para sobrescrever a diária de um único servidor */
+.rt-diaria-override-field { max-width: 22rem; margin-bottom: var(--space-4, 1rem); }

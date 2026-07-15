@@ -52,6 +52,7 @@ from .forms import DiarioMotoristaForm
 from .forms import ModeloTextoRelatorioTecnicoForm
 from .forms import OUTRO_VALUE
 from .forms import PrestacaoDespachoForm
+from .forms import PrestacaoServidorDiariaForm
 from .forms import PrestacaoServidorDocumentosForm
 from .forms import RelatorioTecnicoForm
 from .forms import get_custeio_valores_fixos
@@ -278,6 +279,27 @@ def _solicitacao_autosave_value(payload):
         if clean_name == "numero_solicitacao" or clean_name.endswith("-numero_solicitacao"):
             return normalize_spaces(value or "")
     return None
+
+
+def _salvar_diaria_overrides(prestacao, fields):
+    """Salva os campos ``ps-<pk>-diaria_valor_override`` presentes em ``fields``.
+
+    Usado tanto pelo autosave do RT (um campo por servidor no mesmo formulário)
+    quanto pelo fallback sem JS do POST de ``rt_criar``.
+    """
+    atualizacoes = {}
+    for name, value in fields.items():
+        match = re.match(r"^ps-(\d+)-diaria_valor_override$", str(name or ""))
+        if match:
+            atualizacoes[int(match.group(1))] = normalize_spaces(value or "")
+    if not atualizacoes:
+        return
+    servidores = PrestacaoServidor.objects.filter(pk__in=atualizacoes.keys(), prestacao=prestacao)
+    for ps in servidores:
+        novo = atualizacoes.get(ps.pk, "")
+        if ps.diaria_valor_override != novo:
+            ps.diaria_valor_override = novo
+            ps.save(update_fields=["diaria_valor_override", "atualizado_em"])
 
 
 def _salvar_rt_autosave(relatorio, clean_fields):
@@ -848,6 +870,7 @@ def rt_criar(request, pc_pk):
         form = RelatorioTecnicoForm(request.POST, instance=relatorio, relatorio=relatorio)
         if form.is_valid():
             form.save()
+            _salvar_diaria_overrides(prestacao, request.POST)
             _marcar_prestacao_em_preenchimento(prestacao)
             messages.success(request, "Texto do relatório técnico salvo.")
             return redirect("prestacoes_contas:rt_criar", pc_pk=prestacao.pk)
@@ -864,6 +887,8 @@ def rt_criar(request, pc_pk):
             "ps_pk": ps.pk,
             "nome": ps.servidor.nome,
             "is_motorista": ps.is_motorista,
+            "diaria_ajustada": bool(ps.diaria_valor_override),
+            "diaria_form": PrestacaoServidorDiariaForm(instance=ps, prefix=f"ps-{ps.pk}"),
             "download_pdf_url": reverse(
                 "prestacoes_contas:rt_download_servidor_formato", args=[ps.pk, "pdf"]
             ),
@@ -923,7 +948,11 @@ def rt_autosave(request, pk):
     }
     clean_fields = filter_allowed_fields(payload.fields, payload.dirty_fields, allowed_fields)
     _salvar_rt_autosave(relatorio, clean_fields)
-    if clean_fields and relatorio.prestacao.status == PrestacaoContas.STATUS_PENDENTE:
+    _salvar_diaria_overrides(
+        relatorio.prestacao,
+        {name: payload.fields.get(name) for name in payload.dirty_fields},
+    )
+    if payload.dirty_fields and relatorio.prestacao.status == PrestacaoContas.STATUS_PENDENTE:
         relatorio.prestacao.status = PrestacaoContas.STATUS_EM_PREENCHIMENTO
         relatorio.prestacao.save(update_fields=["status", "atualizado_em"])
     return autosave_json_response(
@@ -956,7 +985,7 @@ def rt_download_servidor(request, ps_pk, formato="docx"):
             return redirect("prestacoes_contas:rt_criar", pc_pk=ps.prestacao_id)
         content_type = "application/pdf"
     else:
-        conteudo = gerar_relatorio_tecnico_docx(relatorio, ps.servidor)
+        conteudo = gerar_relatorio_tecnico_docx(relatorio, ps)
         formato = "docx"
         content_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 

@@ -241,9 +241,11 @@ def _assunto_relatorio_tecnico(oficio) -> str:
     return format_document_display(assunto)
 
 
-def build_relatorio_tecnico_context(relatorio: RelatorioTecnico, servidor) -> dict:
+def build_relatorio_tecnico_context(relatorio: RelatorioTecnico, servidor_prestacao) -> dict:
     pc = relatorio.prestacao
     oficio = pc.oficio
+    servidor = servidor_prestacao.servidor
+    diaria_override = normalize_spaces(getattr(servidor_prestacao, "diaria_valor_override", "") or "")
     data_rt = _data_relatorio_tecnico(oficio)
     inst = build_configuracao_context()
     defaults = relatorio_tecnico_default_values(pc)
@@ -269,7 +271,7 @@ def build_relatorio_tecnico_context(relatorio: RelatorioTecnico, servidor) -> di
         "email": str(inst.get("email") or "").strip().lower(),
         "nome_servidor": servidor.nome,
         "cpf_servidor": servidor.cpf_formatado,
-        "diaria": normalize_spaces(relatorio.diaria or "") or defaults.get("diaria", ""),
+        "diaria": diaria_override or normalize_spaces(relatorio.diaria or "") or defaults.get("diaria", ""),
         "translado": normalize_spaces(relatorio.translado or "") or defaults.get("translado", ""),
         "combustivel": normalize_spaces(relatorio.combustivel or "") or defaults.get("combustivel", ""),
         "passagem": normalize_spaces(relatorio.passagem or "") or defaults.get("passagem", ""),
@@ -281,15 +283,15 @@ def build_relatorio_tecnico_context(relatorio: RelatorioTecnico, servidor) -> di
     }
 
 
-def gerar_relatorio_tecnico_docx(relatorio: RelatorioTecnico, servidor) -> bytes:
+def gerar_relatorio_tecnico_docx(relatorio: RelatorioTecnico, servidor_prestacao) -> bytes:
     garantir_campos_padrao_relatorio_tecnico(relatorio)
-    context = build_relatorio_tecnico_context(relatorio, servidor)
+    context = build_relatorio_tecnico_context(relatorio, servidor_prestacao)
     template_path = Path(settings.BASE_DIR) / "documentos" / "resources" / "relatorio-tecnico.docx"
     return render_docx_bytes(template_path=template_path, context=context)
 
 
-def gerar_relatorio_tecnico_pdf(relatorio: RelatorioTecnico, servidor) -> bytes:
-    docx_bytes = gerar_relatorio_tecnico_docx(relatorio, servidor)
+def gerar_relatorio_tecnico_pdf(relatorio: RelatorioTecnico, servidor_prestacao) -> bytes:
+    docx_bytes = gerar_relatorio_tecnico_docx(relatorio, servidor_prestacao)
     explicit = (getattr(settings, "DOCUMENTOS_DEFAULT_PDF_ENGINE", "auto") or "auto").strip().lower()
     resolution = resolve_pdf_engine(explicit_setting=explicit, prefer_docx_pipeline=True)
     if not resolution.attempt_chain:

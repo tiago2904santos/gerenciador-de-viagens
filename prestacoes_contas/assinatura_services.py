@@ -51,11 +51,11 @@ def _cpf_valido(servidor) -> bool:
 # Geração do snapshot (PDF não assinado)
 # ─────────────────────────────────────────────────────────────────
 
-def _origem_rt_bytes(prestacao, servidor) -> bytes:
+def _origem_rt_bytes(prestacao, servidor_prestacao) -> bytes:
     from .services import gerar_relatorio_tecnico_pdf
 
     relatorio, _ = RelatorioTecnico.objects.get_or_create(prestacao=prestacao)
-    return gerar_relatorio_tecnico_pdf(relatorio, servidor)
+    return gerar_relatorio_tecnico_pdf(relatorio, servidor_prestacao)
 
 
 def _origem_db_bytes(prestacao) -> bytes:
@@ -109,7 +109,7 @@ def emitir_link_rt(servidor_prestacao, dias: int = 7, forcar: bool = False):
     token = secrets.token_urlsafe(32)
     agora = timezone.now()
     expira = agora + timedelta(days=max(1, int(dias)))
-    origem = _origem_rt_bytes(prestacao, signer)
+    origem = _origem_rt_bytes(prestacao, servidor_prestacao)
     preparado = _preparar_doc(doc, signer, origem, token, agora, expira, forcar)
     if preparado is None:
         raise AssinaturaError("O Relatório Técnico deste servidor já está assinado.")
@@ -374,7 +374,7 @@ def pdf_rt_assinado_ou_gerado(servidor_prestacao) -> bytes:
     from .services import gerar_relatorio_tecnico_pdf
 
     relatorio, _ = RelatorioTecnico.objects.get_or_create(prestacao=servidor_prestacao.prestacao)
-    return gerar_relatorio_tecnico_pdf(relatorio, servidor_prestacao.servidor)
+    return gerar_relatorio_tecnico_pdf(relatorio, servidor_prestacao)
 
 
 def pdf_db_assinado_ou_gerado(prestacao) -> bytes:

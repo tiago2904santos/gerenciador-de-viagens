@@ -5,7 +5,7 @@
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260619-rt-form">
-  <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}?v=20260620-ribbon-simple">
+  <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}?v=20260715-diaria-override">
   <link rel="stylesheet" href="{% static 'css/prestacoes-documento-preview.css' %}?v=20260621-preview">
 {% endblock %}
 
@@ -152,7 +152,11 @@
             {% for s in servidores %}
               <details class="document-inline-card document-inline-card--lazy" data-lazy-inline>
                 <summary class="document-inline-card__header">
-                  <span class="document-inline-card__title">{{ s.nome }}{% if s.is_motorista %} <span class="oficio-lc__traveller-badge">Motorista</span>{% endif %}</span>
+                  <span class="document-inline-card__title">
+                    {{ s.nome }}
+                    {% if s.is_motorista %} <span class="oficio-lc__traveller-badge">Motorista</span>{% endif %}
+                    {% if s.diaria_ajustada %} {% include "components/ui/badges/chip.html" with label="Diária ajustada" tone="info" size="compact" only %}{% endif %}
+                  </span>
                   <span class="document-inline-card__header-end">
                     <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do documento">
                       {% include "components/ui/buttons/icon_button.html" with href=s.preview_inline_url action="preview" aria_label="Abrir em nova aba" tooltip="Abrir em nova aba" only %}
@@ -162,6 +166,11 @@
                   </span>
                 </summary>
                 <div class="document-inline-card__body">
+                  <div class="field app-form-field rt-diaria-override-field">
+                    <label class="app-form-label" for="{{ s.diaria_form.diaria_valor_override.id_for_label }}">{{ s.diaria_form.diaria_valor_override.label }}</label>
+                    {{ s.diaria_form.diaria_valor_override }}
+                    <p class="field-help app-form-help">{{ s.diaria_form.diaria_valor_override.help_text }}</p>
+                  </div>
                   <div class="document-inline-viewer">
                     <iframe
                       class="document-inline-viewer__frame"
