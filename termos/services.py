@@ -185,6 +185,21 @@ def gerar_termo_lote(oficio: Oficio, formato: DocumentoFormato) -> list[Document
     return out
 
 
+def resolver_artefato_termo_oficio(oficio: Oficio, servidor: Servidor):
+    """Garante que exista um `DocumentoArtefato` PDF do termo embutido no ofício.
+
+    Reaproveita o mais recente se já existir; senão gera e persiste agora. Usado
+    para oferecer "anexar assinado" mesmo que ninguém tenha aberto o preview antes.
+    """
+    from documentos.selectors import get_latest_artefato_pdf_termo
+
+    artefato = get_latest_artefato_pdf_termo(oficio.pk, servidor.pk)
+    if artefato is not None:
+        return artefato
+    gerar_termo_um(oficio, servidor, DocumentoFormato.PDF)
+    return get_latest_artefato_pdf_termo(oficio.pk, servidor.pk)
+
+
 def _participante_payload(servidor: Servidor | None) -> dict:
     if servidor is None:
         return {
@@ -369,17 +384,78 @@ def gerar_termo_cadastro_um(
     facade = _facade_termo_com_template(template_docx)
     ref_servidor = servidor.pk if servidor is not None else "sem-servidor"
     ref = f"termo-{termo.pk}-cadastro-{ref_servidor}"
-    return facade.gerar(
+    doc = facade.gerar(
         tipo=DocumentoTipo.TERMO_AUTORIZACAO,
         formato=formato,
         payload=payload,
         reference=ref,
         docxtpl_context=_legacy_docx_context(payload),
     )
+    if termo.pk:
+        _persistir_termo_cadastro_artefato(termo, servidor, doc)
+    return doc
+
+
+def _persistir_termo_cadastro_artefato(
+    termo: TermoAutorizacao, servidor: Servidor | None, doc: DocumentoGerado
+) -> None:
+    """Persiste o termo avulso/cadastro como ``DocumentoArtefato`` (Drive + anexar assinado).
+
+    Análogo a ``_persistir_termo_artefato``, mas para o cadastro independente
+    (``TermoAutorizacao``), que pode não ter ofício vinculado — por isso usa
+    ``termo_id`` (em vez de só ``oficio_id``) para desambiguar termos avulsos
+    que compartilhem o mesmo servidor (ou sejam ambos genéricos, sem servidor).
+    """
+    try:
+        from documentos.models import DocumentoArtefato
+        from documentos.services.persistence import persist_geracao
+        from integracoes.google_drive import naming
+
+        servidor_id = servidor.pk if servidor is not None else None
+        if DocumentoArtefato.objects.filter(
+            tipo=DocumentoTipo.TERMO_AUTORIZACAO.value,
+            termo_id=termo.pk,
+            servidor_id=servidor_id,
+            hash_sha256=doc.hash_sha256,
+        ).exists():
+            return
+        oficio = termo.oficio
+        nome_drive = ""
+        if oficio is not None:
+            try:
+                cidade = naming.cidade_evento(getattr(oficio, "evento", None), oficio)
+                nome_drive = naming.nome_termo(oficio, servidor, cidade)
+            except Exception:
+                nome_drive = ""
+        persist_geracao(
+            doc,
+            oficio_id=oficio.pk if oficio is not None else None,
+            servidor_id=servidor_id,
+            evento_id=termo.evento_id,
+            termo_id=termo.pk,
+            nome_drive=nome_drive,
+        )
+    except Exception:
+        logger.warning("Não foi possível persistir artefato do termo (cadastro).", exc_info=True)
 
 
 def gerar_termo_cadastro_lote(termo: TermoAutorizacao, formato: DocumentoFormato) -> list[DocumentoGerado]:
     return [gerar_termo_cadastro_um(termo, servidor, formato) for servidor in servidores_para_termo_cadastro(termo)]
+
+
+def resolver_artefato_termo_cadastro(termo: TermoAutorizacao, servidor: Servidor | None):
+    """Garante que exista um `DocumentoArtefato` PDF do termo avulso (genérico ou por servidor).
+
+    Reaproveita o mais recente se já existir; senão gera e persiste agora.
+    """
+    from documentos.selectors import get_latest_artefato_pdf_termo_cadastro
+
+    servidor_id = servidor.pk if servidor is not None else None
+    artefato = get_latest_artefato_pdf_termo_cadastro(termo.pk, servidor_id)
+    if artefato is not None:
+        return artefato
+    gerar_termo_cadastro_um(termo, servidor, DocumentoFormato.PDF)
+    return get_latest_artefato_pdf_termo_cadastro(termo.pk, servidor_id)
 
 
 def sha256_bytes(content: bytes) -> str:

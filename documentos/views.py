@@ -1,13 +1,16 @@
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.decorators import login_not_required
 from django.core.signing import BadSignature
 from django.core.signing import SignatureExpired
 from django.http import Http404
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from django.shortcuts import redirect
 from django.shortcuts import render
 from django.templatetags.static import static
 from django.urls import reverse
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_GET
 from django.views.decorators.http import require_POST
 
@@ -17,6 +20,9 @@ from .services.access import artefato_pdf_download_filename
 from .services.access import build_pdf_http_response_for_artefato
 from .services.access import ensure_request_may_view_artefato_pdf
 from .services.access import select_artefato_pdf_fieldfile
+from .services.exceptions import ArquivoAssinadoInvalido
+from .services.persistence import anexar_arquivo_assinado
+from .services.persistence import remover_arquivo_assinado
 from .services.temporary_links import build_artefato_pdf_public_conteudo_url
 from .services.temporary_links import create_artefato_pdf_temp_token
 from .services.temporary_links import parse_artefato_pdf_temp_token
@@ -89,5 +95,59 @@ def artefato_pdf_visualizar(request, pk):
             "share_temporario_url": share_url,
         },
     )
+
+
+def _safe_next_url(request, fallback_url):
+    next_url = request.POST.get("next") or request.GET.get("next")
+    if next_url and url_has_allowed_host_and_scheme(
+        next_url,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        return next_url
+    return fallback_url
+
+
+def _artefato_fallback_url(artefato: DocumentoArtefato) -> str:
+    """Para onde voltar quando não há ``next``: a tela "dona" do documento."""
+    if artefato.oficio_id:
+        return reverse("oficios:wizard_documentos", args=[artefato.oficio_id])
+    if artefato.termo_id:
+        return reverse("termos:editar", args=[artefato.termo_id])
+    return reverse("documentos:index")
+
+
+@require_POST
+def artefato_assinado_anexar(request, pk):
+    artefato = get_object_or_404(DocumentoArtefato, pk=pk)
+    ensure_request_may_view_artefato_pdf(request, artefato)
+    fallback = _artefato_fallback_url(artefato)
+    upload = request.FILES.get("arquivo")
+    if not upload:
+        messages.error(request, "Selecione um arquivo PDF para anexar.")
+        return redirect(_safe_next_url(request, fallback))
+    try:
+        anexar_arquivo_assinado(artefato, upload)
+    except ArquivoAssinadoInvalido as exc:
+        messages.error(request, str(exc))
+        return redirect(_safe_next_url(request, fallback))
+    from integracoes.google_drive.services import sincronizar_assinatura_manual
+
+    sincronizar_assinatura_manual(artefato)
+    messages.success(request, "Documento assinado anexado.")
+    return redirect(_safe_next_url(request, fallback))
+
+
+@require_POST
+def artefato_assinado_remover(request, pk):
+    artefato = get_object_or_404(DocumentoArtefato, pk=pk)
+    ensure_request_may_view_artefato_pdf(request, artefato)
+    fallback = _artefato_fallback_url(artefato)
+    remover_arquivo_assinado(artefato)
+    from integracoes.google_drive.services import sincronizar_assinatura_manual
+
+    sincronizar_assinatura_manual(artefato)
+    messages.success(request, "Documento assinado removido.")
+    return redirect(_safe_next_url(request, fallback))
 
 

@@ -24,3 +24,7 @@ class DocumentRendererUnavailable(DocumentError):
 
 class UnresolvedPlaceholderError(DocumentError):
     """Placeholders não resolvidos após renderização/substituição."""
+
+
+class ArquivoAssinadoInvalido(DocumentError):
+    """Upload de documento assinado rejeitado (formato ou tamanho inválido)."""

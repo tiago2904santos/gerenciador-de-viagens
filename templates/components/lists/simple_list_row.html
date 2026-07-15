@@ -40,6 +40,28 @@
       {% if row.docx_url %}
         {% include "components/ui/buttons/icon_button.html" with href=row.docx_url action="docx" aria_label="Baixar em DOCX" tooltip="DOCX" only %}
       {% endif %}
+      {% if row.anexar_assinado_url %}
+        <button
+          type="button"
+          class="cv-icon-btn cv-icon-btn--sign"
+          data-attach-signed-trigger
+          data-attach-signed-url="{{ row.anexar_assinado_url }}"
+          data-attach-signed-doc-label="{{ row.title }}"
+          aria-label="Anexar assinado"
+          data-tooltip="Anexar assinado"
+        >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="sign" only %}</button>
+      {% endif %}
+      {% if row.remover_assinado_url %}
+        <button
+          type="button"
+          class="cv-icon-btn cv-icon-btn--delete"
+          data-delete-modal-trigger
+          data-delete-url="{{ row.remover_assinado_url }}"
+          data-delete-label="o assinado de {{ row.title }}"
+          aria-label="Remover assinado"
+          data-tooltip="Remover assinado"
+        >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="delete" only %}</button>
+      {% endif %}
       {% if row.edit_url %}
         {% if row.edit_fields_json %}
           <button

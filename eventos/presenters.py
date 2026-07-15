@@ -183,12 +183,11 @@ def _evento_temporal_chip(evento):
         return "Pronto", "success"
 
     today = timezone.localdate()
-    sufixo = f" p/ sair de {origem}" if origem else ""
     if today < saida_date:
         dias = (saida_date - today).days
         if dias == 1:
-            return f"falta 1 dia{sufixo}", "warning"
-        return f"faltam {dias} dias{sufixo}", "warning"
+            return "falta 1 dia", "warning"
+        return f"faltam {dias} dias", "warning"
     if saida_date <= today <= end_date:
         return "em andamento", "info"
     dias = (today - end_date).days
@@ -269,6 +268,7 @@ def apresentar_evento_list_card(evento):
         "editar_url": reverse("eventos:guiado_etapa", args=[evento.pk, 1]),
         "excluir_url": reverse("eventos:excluir", args=[evento.pk]),
         "cancelar_url": reverse("eventos:cancelar", args=[evento.pk]),
+        "reativar_url": reverse("eventos:reativar", args=[evento.pk]),
         "cancelado": evento.status == evento.STATUS_CANCELADO,
     }
 

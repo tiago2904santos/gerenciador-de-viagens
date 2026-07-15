@@ -1,9 +1,17 @@
 (function () {
   "use strict";
 
-  /** Evita que cliques nos links do cabeçalho alternem o estado do <details>. */
+  /** Evita que cliques nos links do cabeçalho alternem o estado do <details>.
+   *
+   * Exceto os gatilhos de modal (anexar/remover assinado): esses dependem de
+   * delegação no `document` (ver attach-signed-modal.js/delete-confirm-modal.js)
+   * e precisam que o clique continue borbulhando até lá.
+   */
   document.querySelectorAll(".document-inline-actions--header").forEach(function (el) {
     el.addEventListener("click", function (e) {
+      if (e.target.closest("[data-attach-signed-trigger], [data-delete-modal-trigger]")) {
+        return;
+      }
       e.stopPropagation();
     });
   });

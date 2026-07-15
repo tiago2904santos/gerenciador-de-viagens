@@ -71,7 +71,7 @@
             <div class="oficio-lc__traveller-body">
               <div class="oficio-lc__traveller-name-row">
                 <span class="oficio-lc__traveller-name">{{ s.name }}{% if s.unidade %} <span class="oficio-lc__traveller-unidade-sep" aria-hidden="true">*</span> <span class="oficio-lc__traveller-unidade">{{ s.unidade }}</span>{% endif %}</span>
-                <span class="oficio-lc__traveller-badge">Ofício {{ oficio.numero }}</span>
+                <span class="oficio-lc__traveller-badge">{{ oficio.numero }}</span>
               </div>
               {% if s.cargo or s.telefone %}
               <span class="oficio-lc__traveller-meta">{% if s.cargo %}{{ s.cargo }}{% endif %}{% if s.cargo and s.telefone %} · {% endif %}{% if s.telefone %}{{ s.telefone }}{% endif %}</span>
@@ -87,11 +87,6 @@
               {% if s.termo_pdf_url %}
               <a class="cv-icon-btn cv-icon-btn--pdf" href="{{ s.termo_pdf_url }}" aria-label="Baixar termo de autorização em PDF de {{ s.name }}" data-tooltip="PDF" download>
                 {% include "dev/ui_lab/partials/_cv_icon.html" with icon="pdf" only %}
-              </a>
-              {% endif %}
-              {% if s.termo_docx_url %}
-              <a class="cv-icon-btn cv-icon-btn--docx" href="{{ s.termo_docx_url }}" aria-label="Baixar termo de autorização em DOCX de {{ s.name }}" data-tooltip="DOCX" download>
-                {% include "dev/ui_lab/partials/_cv_icon.html" with icon="docx" only %}
               </a>
               {% endif %}
             </div>
@@ -123,7 +118,19 @@
             {% include "dev/ui_lab/partials/_cv_icon.html" with icon="more" only %}
           </button>
           <div class="cv-action-menu" id="evento-action-menu-{{ card.pk }}" role="menu" hidden>
-            {% if not card.cancelado %}
+            {% if card.cancelado %}
+            <button
+              type="button"
+              class="cv-action-menu__item"
+              role="menuitem"
+              data-confirm-action-trigger
+              data-confirm-action-url="{{ card.reativar_url }}"
+              data-confirm-action-label-text="{{ card.titulo }}"
+            >
+              {% include "dev/ui_lab/partials/_cv_icon.html" with icon="unarchive" only %}
+              <span>Reativar evento</span>
+            </button>
+            {% else %}
             <button
               type="button"
               class="cv-action-menu__item cv-action-menu__item--cancel"

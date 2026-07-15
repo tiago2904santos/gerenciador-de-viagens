@@ -1,0 +1,30 @@
+<div class="delete-confirm-modal" data-confirm-action-modal hidden>
+  <div class="delete-confirm-modal__backdrop" data-confirm-action-cancel></div>
+  <section
+    class="delete-confirm-modal__dialog"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="confirm-action-title"
+    aria-describedby="confirm-action-description"
+    tabindex="-1"
+  >
+    <header class="delete-confirm-modal__header">
+      <span class="delete-confirm-modal__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon=confirm_action_icon|default:"unarchive" only %}</span>
+      <div class="delete-confirm-modal__copy">
+        <span class="delete-confirm-modal__eyebrow">{{ confirm_action_eyebrow|default:"Confirmar ação" }}</span>
+        <h2 class="delete-confirm-modal__title" id="confirm-action-title">{{ confirm_action_title|default:"Confirmar?" }}</h2>
+      </div>
+    </header>
+
+    <p class="delete-confirm-modal__message" id="confirm-action-description">
+      Você está prestes a reativar <strong data-confirm-action-label>{{ confirm_action_entity|default:"este registro" }}</strong>.
+      {{ confirm_action_hint }}
+    </p>
+
+    <form method="post" class="delete-confirm-modal__actions" data-confirm-action-form>
+      {% csrf_token %}
+      {% include "components/ui/buttons/button.html" with label="Voltar" variant="secondary" type="button" data_confirm_action_cancel=True only %}
+      {% include "components/ui/buttons/button.html" with label=confirm_action_button_label|default:"Confirmar" variant="secondary" type="submit" icon=confirm_action_icon|default:"unarchive" only %}
+    </form>
+  </section>
+</div>

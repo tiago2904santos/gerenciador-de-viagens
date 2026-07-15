@@ -9,14 +9,18 @@ from typing import Any, Mapping
 
 from django.conf import settings
 from django.core.files.base import ContentFile
+from django.core.files.uploadedfile import UploadedFile
 from django.db.models import Model
 from django.db.models.query import QuerySet
+from django.utils import timezone
 
 from documentos.models import DocumentoArtefato
+from documentos.services.exceptions import ArquivoAssinadoInvalido
 from documentos.services.facade import DocumentoGerado
 from documentos.services.timing import measure_step
 
 _MAX_SNAPSHOT_DEPTH = 48
+_ARQUIVO_ASSINADO_MAX_BYTES = 15 * 1024 * 1024
 
 
 def _sanear_objeto_para_json(val: Any, *, _depth: int = 0) -> Any:
@@ -69,6 +73,7 @@ def persist_geracao(
     oficio_id: int | None = None,
     servidor_id: int | None = None,
     evento_id: int | None = None,
+    termo_id: int | None = None,
     nome_drive: str = "",
     payload_snapshot: Mapping[str, Any] | None = None,
     cache_key: str = "",
@@ -89,6 +94,7 @@ def persist_geracao(
             "oficio_id": oficio_id,
             "servidor_id": servidor_id,
             "evento_id": evento_id,
+            "termo_id": termo_id,
         },
     ):
         return DocumentoArtefato.objects.create(
@@ -97,6 +103,7 @@ def persist_geracao(
             oficio_id=oficio_id,
             servidor_id=servidor_id,
             evento_id=evento_id,
+            termo_id=termo_id,
             nome_drive=nome_drive or "",
             payload_snapshot=payload_snapshot,
             hash_sha256=doc.hash_sha256,
@@ -105,5 +112,43 @@ def persist_geracao(
             engine=engine or "",
             generator_version=gen_ver,
         )
+
+
+def _validar_upload_assinado(upload: UploadedFile) -> None:
+    nome = (upload.name or "").lower()
+    if not nome.endswith(".pdf"):
+        raise ArquivoAssinadoInvalido("Envie um arquivo PDF.")
+    if upload.size > _ARQUIVO_ASSINADO_MAX_BYTES:
+        raise ArquivoAssinadoInvalido("Arquivo maior que 15MB.")
+    inicio = upload.read(5)
+    upload.seek(0)
+    if inicio != b"%PDF-":
+        raise ArquivoAssinadoInvalido("O arquivo não parece ser um PDF válido.")
+
+
+def anexar_arquivo_assinado(artefato: DocumentoArtefato, upload: UploadedFile) -> DocumentoArtefato:
+    """Anexa manualmente a versão assinada (ex.: escaneada) de um artefato gerado.
+
+    A partir daqui ela passa a ser a versão "oficial": preferida na exibição/
+    download (``access.select_artefato_pdf_fieldfile``) e no Drive.
+    """
+    _validar_upload_assinado(upload)
+    if artefato.arquivo_assinado:
+        artefato.arquivo_assinado.delete(save=False)
+    artefato.arquivo_assinado.save(f"assinado_{artefato.pk}.pdf", ContentFile(upload.read()), save=False)
+    artefato.assinado_em = timezone.now()
+    artefato.assinado_nome_original = upload.name or ""
+    artefato.save(update_fields=["arquivo_assinado", "assinado_em", "assinado_nome_original"])
+    return artefato
+
+
+def remover_arquivo_assinado(artefato: DocumentoArtefato) -> DocumentoArtefato:
+    """Remove o anexo assinado, voltando a servir a versão gerada pelo sistema."""
+    if artefato.arquivo_assinado:
+        artefato.arquivo_assinado.delete(save=False)
+    artefato.assinado_em = None
+    artefato.assinado_nome_original = ""
+    artefato.save(update_fields=["arquivo_assinado", "assinado_em", "assinado_nome_original"])
+    return artefato
 
 

@@ -25,3 +25,17 @@ def get_latest_artefato_pdf_termo(oficio_id: int, servidor_id: int) -> Documento
         .order_by("-criado_em")
         .first()
     )
+
+
+def get_latest_artefato_pdf_termo_cadastro(termo_id: int, servidor_id: int | None) -> DocumentoArtefato | None:
+    """Último PDF persistido de um termo de autorização avulso (app `termos`), genérico ou por servidor."""
+    return (
+        DocumentoArtefato.objects.filter(
+            termo_id=termo_id,
+            servidor_id=servidor_id,
+            tipo=DocumentoTipo.TERMO_AUTORIZACAO.value,
+            formato="pdf",
+        )
+        .order_by("-criado_em")
+        .first()
+    )

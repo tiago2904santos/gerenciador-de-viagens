@@ -33,6 +33,14 @@ class DocumentoArtefato(models.Model):
         related_name="documentos_gerados",
         help_text="Evento de origem (usado por documentos que se ligam ao evento, ex.: plano de trabalho).",
     )
+    termo = models.ForeignKey(
+        "termos.TermoAutorizacao",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="documentos_gerados",
+        help_text="Termo de autorização avulso de origem (cadastro em `termos`, pode não ter ofício).",
+    )
     nome_drive = models.CharField(
         max_length=255,
         blank=True,
@@ -45,6 +53,18 @@ class DocumentoArtefato(models.Model):
     generator_version = models.CharField(max_length=32, blank=True, default="")
     engine = models.CharField(max_length=32, blank=True, default="")
     arquivo = models.FileField(upload_to="documentos/gerados/%Y/%m/")
+    arquivo_assinado = models.FileField(
+        upload_to="documentos/assinados/%Y/%m/",
+        blank=True,
+        help_text="Versão assinada anexada manualmente (substitui a gerada na exibição/download/Drive).",
+    )
+    assinado_em = models.DateTimeField(null=True, blank=True)
+    assinado_nome_original = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        help_text="Nome do arquivo enviado pelo usuário, para exibição.",
+    )
     criado_em = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -54,3 +74,18 @@ class DocumentoArtefato(models.Model):
 
     def __str__(self) -> str:
         return f"{self.tipo} ({self.formato}) {self.hash_sha256[:8]}"
+
+    @property
+    def esta_assinado(self) -> bool:
+        arq = self.arquivo_assinado
+        if not arq or not getattr(arq, "name", ""):
+            return False
+        try:
+            return arq.storage.exists(arq.name)
+        except OSError:
+            return False
+
+    @property
+    def arquivo_efetivo(self):
+        """Arquivo a considerar "oficial": assinado se existir no storage, senão o gerado."""
+        return self.arquivo_assinado if self.esta_assinado else self.arquivo

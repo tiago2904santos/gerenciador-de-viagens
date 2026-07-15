@@ -21,6 +21,7 @@ urlpatterns = [
     path("<int:pk>/editar/", views.editar, name="editar"),
     path("<int:pk>/excluir/", views.excluir, name="excluir"),
     path("<int:pk>/cancelar/", views.cancelar, name="cancelar"),
+    path("<int:pk>/reativar/", views.reativar, name="reativar"),
     path(
         "<int:pk>/solicitacao-anexo/<int:anexo_pk>/excluir/",
         views.excluir_solicitacao_anexo,

@@ -312,7 +312,7 @@ def _persistir_artefato(artefato, pasta_id: str, nome: str, *, atalho_pasta_id: 
             )
             reg.file_id = ""
 
-    conteudo = _ler_filefield(getattr(artefato, "arquivo", None))
+    conteudo = _ler_filefield(getattr(artefato, "arquivo_efetivo", None) or getattr(artefato, "arquivo", None))
     if conteudo is None:
         return None
 
@@ -489,6 +489,34 @@ def organizar_artefato(artefato) -> tuple[str, str] | None:
             atalho_pasta = oficio_folder_evento
 
     return _persistir_artefato(artefato, canonica, nome, atalho_pasta_id=atalho_pasta)
+
+
+def sincronizar_conteudo_assinado(artefato) -> tuple[str, str] | None:
+    """Empurra pro Drive o conteúdo efetivo (assinado se houver) de um artefato já organizado.
+
+    ``organizar_artefato``/``_persistir_artefato`` pulam a atualização de conteúdo
+    quando o artefato já tem um ``DriveArquivo`` (assumem que o conteúdo de um
+    artefato não muda, só nome/pasta) — por isso anexar ou remover um arquivo
+    assinado manualmente precisa forçar a reescrita aqui, em vez de reusar
+    ``organizar_artefato`` puro.
+    """
+    from .models import DriveArquivo
+
+    reg = DriveArquivo.objects.filter(artefato=artefato).first()
+    if reg is None or not reg.file_id or reg.mock:
+        # Nunca subiu (ou só existe em modo mock): o caminho normal já resolve.
+        return organizar_artefato(artefato)
+
+    conteudo = _ler_filefield(getattr(artefato, "arquivo_efetivo", None) or getattr(artefato, "arquivo", None))
+    if conteudo is None:
+        return None
+
+    client = get_client()
+    mime = mimetype_para_formato(artefato.formato)
+    file_id, url = client.atualizar_conteudo(reg.file_id, reg.nome, conteudo, mime)
+    reg.url = url
+    reg.save(update_fields=["url"])
+    return file_id, url
 
 
 # ---------------------------------------------------------------------------

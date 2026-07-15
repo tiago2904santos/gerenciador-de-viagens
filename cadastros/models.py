@@ -41,6 +41,12 @@ class CancelavelModel(models.Model):
         self.cancelado_em = timezone.now()
         self.save(update_fields=["cancelado", "motivo_cancelamento", "cancelado_em"])
 
+    def reativar(self) -> None:
+        self.cancelado = False
+        self.motivo_cancelamento = ""
+        self.cancelado_em = None
+        self.save(update_fields=["cancelado", "motivo_cancelamento", "cancelado_em"])
+
 
 class Unidade(TimeStampedModel):
     nome = models.CharField(max_length=255)

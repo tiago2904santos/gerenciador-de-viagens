@@ -15,8 +15,10 @@ from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_GET
 from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_POST
 
 from cadastros.models import Servidor
 from core.normalizers import remove_accents
@@ -43,6 +45,8 @@ from .services import gerar_termo_lote
 from .services import gerar_termo_um
 from .services import listar_servidores_com_termo
 from .services import preview_termo_context
+from .services import resolver_artefato_termo_cadastro
+from .services import resolver_artefato_termo_oficio
 from .services import sha256_bytes
 
 
@@ -92,6 +96,7 @@ def index(request):
             delete_modal=True,
             pdf_url=reverse("termos:baixar_termo_cadastro_pdf", args=[termo.pk]),
             docx_url=reverse("termos:baixar_termo_cadastro_docx", args=[termo.pk]),
+            **_termo_assinado_info(termo, None),
         )
         for termo in page_obj.object_list
     ]
@@ -378,6 +383,26 @@ def _termo_page_steps(form, termo=None):
     ]
 
 
+def _termo_assinado_info(termo, servidor_id):
+    from documentos.selectors import get_latest_artefato_pdf_termo_cadastro
+
+    artefato = get_latest_artefato_pdf_termo_cadastro(termo.pk, servidor_id)
+    if artefato is not None:
+        assinado = artefato.esta_assinado
+        return {
+            "assinado": assinado,
+            "anexar_assinado_url": reverse("documentos:artefato_assinado_anexar", args=[artefato.pk]),
+            "remover_assinado_url": (
+                reverse("documentos:artefato_assinado_remover", args=[artefato.pk]) if assinado else None
+            ),
+        }
+    if servidor_id is None:
+        anexar_url = reverse("termos:termo_cadastro_generico_assinado_anexar", args=[termo.pk])
+    else:
+        anexar_url = reverse("termos:termo_cadastro_servidor_assinado_anexar", args=[termo.pk, servidor_id])
+    return {"assinado": False, "anexar_assinado_url": anexar_url, "remover_assinado_url": None}
+
+
 def _termo_preview_documents(termo):
     if not termo or not termo.pk:
         return {}
@@ -386,6 +411,7 @@ def _termo_preview_documents(termo):
         "generico": {
             "titulo": "Termo generico",
             "inline_url": reverse("termos:termo_cadastro_generico_pdf_inline", args=[termo.pk]),
+            **_termo_assinado_info(termo, None),
         },
         "servidores": [
             {
@@ -393,6 +419,7 @@ def _termo_preview_documents(termo):
                 "titulo": f"Termo - {servidor.nome}",
                 "servidor_nome": servidor.nome,
                 "inline_url": reverse("termos:termo_cadastro_servidor_pdf_inline", args=[termo.pk, servidor.pk]),
+                **_termo_assinado_info(termo, servidor.pk),
             }
             for servidor in servidores
         ],
@@ -760,3 +787,73 @@ def baixar_termo_lote_zip(request, pk, formato):
     response["Content-Disposition"] = f'attachment; filename="{nome}"'
     response["X-Content-Type-Options"] = "nosniff"
     return response
+
+
+def _safe_next_url(request, fallback_url):
+    next_url = request.POST.get("next") or request.GET.get("next")
+    if next_url and url_has_allowed_host_and_scheme(
+        next_url,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        return next_url
+    return fallback_url
+
+
+def _anexar_assinado_resolver(request, fallback_url, resolver):
+    """Miolo comum: resolve (gera se preciso) o artefato e anexa o PDF enviado.
+
+    ``resolver`` é uma função sem argumentos que devolve o ``DocumentoArtefato``
+    (ou ``None`` se não conseguiu gerar). Usado pelos dois wrappers finos
+    (termo embutido no ofício e termo avulso/cadastro) para não duplicar a
+    validação/anexação/sincronização com o Drive, que já vivem em `documentos`.
+    """
+    from documentos.services.exceptions import ArquivoAssinadoInvalido
+    from documentos.services.persistence import anexar_arquivo_assinado
+    from integracoes.google_drive.services import sincronizar_assinatura_manual
+
+    upload = request.FILES.get("arquivo")
+    if not upload:
+        messages.error(request, "Selecione um arquivo PDF para anexar.")
+        return redirect(_safe_next_url(request, fallback_url))
+    artefato = resolver()
+    if artefato is None:
+        messages.error(request, "Não foi possível gerar o termo para anexar o assinado.")
+        return redirect(_safe_next_url(request, fallback_url))
+    try:
+        anexar_arquivo_assinado(artefato, upload)
+    except ArquivoAssinadoInvalido as exc:
+        messages.error(request, str(exc))
+        return redirect(_safe_next_url(request, fallback_url))
+    sincronizar_assinatura_manual(artefato)
+    messages.success(request, "Documento assinado anexado.")
+    return redirect(_safe_next_url(request, fallback_url))
+
+
+@require_POST
+def termo_oficio_assinado_anexar(request, pk, servidor_pk):
+    oficio = get_oficio_by_id(pk)
+    servidor = get_object_or_404(Servidor, pk=servidor_pk)
+    fallback = reverse("oficios:wizard_documentos", args=[oficio.pk])
+    return _anexar_assinado_resolver(
+        request, fallback, lambda: resolver_artefato_termo_oficio(oficio, servidor)
+    )
+
+
+@require_POST
+def termo_cadastro_generico_assinado_anexar(request, pk):
+    termo = get_object_or_404(_termo_queryset(), pk=pk)
+    fallback = reverse("termos:editar", args=[termo.pk])
+    return _anexar_assinado_resolver(
+        request, fallback, lambda: resolver_artefato_termo_cadastro(termo, None)
+    )
+
+
+@require_POST
+def termo_cadastro_servidor_assinado_anexar(request, pk, servidor_pk):
+    termo = get_object_or_404(_termo_queryset(), pk=pk)
+    servidor = get_object_or_404(Servidor, pk=servidor_pk)
+    fallback = reverse("termos:editar", args=[termo.pk])
+    return _anexar_assinado_resolver(
+        request, fallback, lambda: resolver_artefato_termo_cadastro(termo, servidor)
+    )

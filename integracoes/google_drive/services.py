@@ -523,3 +523,23 @@ def upload_artefato(artefato) -> tuple[str, str] | None:
     except Exception as exc:
         logger.error("[Drive] falha ao enviar artefato %s: %s", getattr(artefato, "pk", "?"), exc, exc_info=True)
         return None
+
+
+def sincronizar_assinatura_manual(artefato) -> tuple[str, str] | None:
+    """Reenvia ao Drive o conteúdo efetivo de um artefato após anexar/remover um assinado manual.
+
+    Best-effort: nunca derruba a request que anexou/removeu o arquivo por causa
+    de uma falha no Drive.
+    """
+    if _cfg().get("MODO", "mock").lower() == "mock" and not _cfg().get("UPLOAD_EM_MOCK", False):
+        return None
+    try:
+        from . import organizer
+
+        return organizer.sincronizar_conteudo_assinado(artefato)
+    except Exception as exc:
+        logger.error(
+            "[Drive] falha ao sincronizar assinatura manual do artefato %s: %s",
+            getattr(artefato, "pk", "?"), exc, exc_info=True,
+        )
+        return None

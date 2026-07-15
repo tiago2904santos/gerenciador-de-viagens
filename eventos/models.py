@@ -116,6 +116,22 @@ class Evento(models.Model):
             for documento in manager.filter(cancelado=False):
                 documento.cancelar(motivo_cascade)
 
+    def reativar(self) -> None:
+        """Reverte o cancelamento do evento e dos documentos cancelados em cascata por ele.
+
+        Documentos que ja estavam cancelados por conta propria antes do cancelamento
+        do evento (motivo diferente do cascade) permanecem cancelados.
+        """
+        self.status = self.STATUS_RASCUNHO
+        self.motivo_cancelamento = ""
+        self.cancelado_em = None
+        self.save(update_fields=["status", "motivo_cancelamento", "cancelado_em"])
+
+        for related_name in ("oficios", "ordens_servico", "planos_trabalho", "termos_autorizacao", "roteiros"):
+            manager = getattr(self, related_name)
+            for documento in manager.filter(cancelado=True, motivo_cancelamento__startswith="Evento cancelado"):
+                documento.reativar()
+
 
 class TipoEvento(TimeStampedModel):
     """Tipo gerenciavel do evento (ex.: "PCPR na Comunidade", "Expo").

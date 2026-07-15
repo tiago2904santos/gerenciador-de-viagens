@@ -386,7 +386,7 @@ def _termos_servidor_rows_do_evento(evento):
     rows = []
     vistos = set()
     for termo in termos:
-        for servidor in termo.servidores_efetivos():
+        for servidor, oficio_origem in termo.servidores_efetivos_com_oficio():
             chave = (termo.pk, servidor.pk)
             if chave in vistos:
                 continue
@@ -395,6 +395,7 @@ def _termos_servidor_rows_do_evento(evento):
                 apresentar_linha_lista_simples_termo_servidor(
                     termo,
                     servidor,
+                    oficio=oficio_origem,
                     edit_url=reverse("termos:editar", args=[termo.pk]),
                     pdf_url=reverse("termos:termo_cadastro_servidor_pdf_inline", args=[termo.pk, servidor.pk]),
                 )
@@ -535,6 +536,7 @@ def detalhe(request, pk, etapa=1):
             "solicitacao_anexos": solicitacao_anexos,
             "evento_status_variant": "danger" if evento.status == Evento.STATUS_CANCELADO else "active",
             "cancelar_evento_url": _reverse("eventos:cancelar", kwargs={"pk": evento.pk}),
+            "reativar_evento_url": _reverse("eventos:reativar", kwargs={"pk": evento.pk}),
             **guided_context,
         },
     )
@@ -581,4 +583,17 @@ def cancelar(request, pk):
 
     evento.cancelar(motivo)
     messages.success(request, "Evento cancelado. Todos os documentos vinculados também foram cancelados.")
+    return redirect("eventos:detalhe", pk=pk)
+
+
+@require_POST
+def reativar(request, pk):
+    evento = get_object_or_404(Evento, pk=pk)
+
+    if evento.status != Evento.STATUS_CANCELADO:
+        messages.error(request, "Este evento não está cancelado.")
+        return redirect("eventos:detalhe", pk=pk)
+
+    evento.reativar()
+    messages.success(request, "Evento reativado. Os documentos cancelados junto com ele também foram reativados.")
     return redirect("eventos:detalhe", pk=pk)

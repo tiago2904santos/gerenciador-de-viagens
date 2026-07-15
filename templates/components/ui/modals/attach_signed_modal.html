@@ -1,0 +1,49 @@
+<div class="delete-confirm-modal" data-attach-signed-modal hidden>
+  <div class="delete-confirm-modal__backdrop" data-attach-signed-cancel></div>
+  <section
+    class="delete-confirm-modal__dialog"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="attach-signed-title"
+    aria-describedby="attach-signed-description"
+    tabindex="-1"
+  >
+    <header class="delete-confirm-modal__header">
+      <span class="delete-confirm-modal__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="sign" only %}</span>
+      <div class="delete-confirm-modal__copy">
+        <span class="delete-confirm-modal__eyebrow">Documento assinado</span>
+        <h2 class="delete-confirm-modal__title" id="attach-signed-title">Anexar assinado</h2>
+      </div>
+    </header>
+
+    <p class="delete-confirm-modal__message" id="attach-signed-description">
+      Envie o PDF já assinado de <strong data-attach-signed-label>este documento</strong>.
+      Ele passa a ser usado no lugar do gerado, na tela e no Google Drive.
+    </p>
+
+    <form method="post" enctype="multipart/form-data" class="attach-signed-modal__form" data-attach-signed-form>
+      {% csrf_token %}
+      <input type="hidden" name="next" data-attach-signed-next value="">
+      <div class="field app-form-field cv-field attach-signed-modal__field">
+        <label class="app-form-label cv-field__label" for="id-attach-signed-arquivo">Arquivo PDF assinado</label>
+        <input
+          id="id-attach-signed-arquivo"
+          type="file"
+          name="arquivo"
+          accept="application/pdf,.pdf"
+          class="cv-field__control"
+          required
+        >
+      </div>
+      <div class="delete-confirm-modal__actions">
+        <button type="button" class="cv-btn cv-btn--secondary" data-attach-signed-cancel>
+          <span>Cancelar</span>
+        </button>
+        <button type="submit" class="cv-btn cv-btn--primary">
+          <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="sign" only %}</span>
+          <span>Anexar</span>
+        </button>
+      </div>
+    </form>
+  </section>
+</div>

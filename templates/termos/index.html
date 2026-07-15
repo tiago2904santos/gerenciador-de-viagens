@@ -1,5 +1,5 @@
 {% extends "base.html" %}
 {% block title %}{{ page_title }}{% endblock %}
 {% block content %}
-  {% include "components/lists/list_page_standard.html" with title=page_title description=page_description eyebrow="Termos" search_placeholder="Buscar por destino, ofício, protocolo, viatura ou servidor" action_label="Novo termo" action_url=novo_url action_aria_label="Cadastrar termo" empty_message="Nenhum termo cadastrado ainda." rows=rows q=q disable_realtime_filter=True hide_realtime_count=True delete_modal_enabled=True delete_modal_title="Excluir termo?" delete_modal_entity="este termo" %}
+  {% include "components/lists/list_page_standard.html" with title=page_title description=page_description eyebrow="Termos" search_placeholder="Buscar por destino, ofício, protocolo, viatura ou servidor" action_label="Novo termo" action_url=novo_url action_aria_label="Cadastrar termo" empty_message="Nenhum termo cadastrado ainda." rows=rows q=q disable_realtime_filter=True hide_realtime_count=True delete_modal_enabled=True delete_modal_title="Excluir termo?" delete_modal_entity="este termo" attach_signed_modal_enabled=True %}
 {% endblock %}

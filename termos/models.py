@@ -164,6 +164,42 @@ class TermoAutorizacao(TimeStampedModel, CancelavelModel):
             return self.oficio.viatura
         return None
 
+    def servidores_efetivos_com_oficio(self):
+        """Servidores efetivos, junto com o oficio de origem de cada um.
+
+        Quando o termo e generico do evento (sem oficio proprio) e os servidores
+        vem por fallback dos oficios do evento, cada servidor carrega o oficio
+        que realmente o originou — necessario para exibir numero e viatura
+        corretos por servidor, já que o termo genérico em si não tem nenhum.
+        """
+        if not self.pk:
+            return []
+        selecionados = list(self.servidores.select_related("cargo", "unidade").order_by("nome"))
+        if selecionados:
+            oficio = self.oficio if self.oficio_id else None
+            return [(servidor, oficio) for servidor in selecionados]
+        if self.oficio_id:
+            do_oficio = list(
+                self.oficio.servidores_termo_autorizacao.select_related("cargo", "unidade").order_by("nome")
+            )
+            if do_oficio:
+                return [(servidor, self.oficio) for servidor in do_oficio]
+        if self.evento_id:
+            pares = []
+            vistos: set[int] = set()
+            oficios = self.evento.oficios.select_related("viatura").prefetch_related(
+                "servidores_termo_autorizacao", "servidores",
+            )
+            for oficio in oficios:
+                do_termo = list(oficio.servidores_termo_autorizacao.all()) or list(oficio.servidores.all())
+                for servidor in do_termo:
+                    if servidor.pk in vistos:
+                        continue
+                    vistos.add(servidor.pk)
+                    pares.append((servidor, oficio))
+            return pares
+        return []
+
     def _primeiro_destino_oficio(self):
         roteiro = getattr(self.oficio, "roteiro", None)
         if not roteiro:

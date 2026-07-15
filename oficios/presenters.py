@@ -846,9 +846,22 @@ def apresentar_oficio_wizard_documentos_context(oficio):
     else:
         doc_msg = ""
 
+    from documentos.selectors import get_latest_artefato_pdf_termo
+
     termos_items = []
     servidores_termo = oficio.servidores_termo_autorizacao.select_related("cargo", "unidade").order_by("nome")
     for servidor in servidores_termo:
+        artefato_termo = get_latest_artefato_pdf_termo(oficio.pk, servidor.pk)
+        if artefato_termo is not None:
+            assinado = artefato_termo.esta_assinado
+            anexar_assinado_url = reverse("documentos:artefato_assinado_anexar", args=[artefato_termo.pk])
+            remover_assinado_url = (
+                reverse("documentos:artefato_assinado_remover", args=[artefato_termo.pk]) if assinado else None
+            )
+        else:
+            assinado = False
+            anexar_assinado_url = reverse("termos:termo_oficio_assinado_anexar", args=[oficio.pk, servidor.pk])
+            remover_assinado_url = None
         termos_items.append(
             {
                 "titulo": f"Termo de Autorização — {servidor.nome}",
@@ -865,6 +878,9 @@ def apresentar_oficio_wizard_documentos_context(oficio):
                     args=[oficio.pk, servidor.pk, "docx"],
                 ),
                 "disponivel": disponivel,
+                "assinado": assinado,
+                "anexar_assinado_url": anexar_assinado_url,
+                "remover_assinado_url": remover_assinado_url,
             },
         )
 

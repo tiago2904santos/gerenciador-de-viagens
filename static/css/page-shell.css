@@ -1738,6 +1738,15 @@ body.has-delete-modal-open {
   width: 100%;
 }
 
+.attach-signed-modal__form {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.attach-signed-modal__field {
+  margin: 0;
+}
+
 /* Menu de ações (⋮) — junta Cancelar/Excluir num único botão */
 .cv-action-menu {
   background: var(--surface-list-panel);
