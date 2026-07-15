@@ -143,6 +143,101 @@ class RelatorioTecnicoDiariaTests(TestCase):
         )
 
 
+class PrestacaoServidorDiariaOverrideTests(TestCase):
+    """Sobrescrita da diária de um único servidor (ex.: saque em vez de transferência)."""
+
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(username="tester_diaria_override", password="123456")
+        self.client.force_login(self.user)
+        self.cargo = Cargo.objects.create(nome="Agente")
+        self.servidor_a = Servidor.objects.create(nome="Servidor A", cargo=self.cargo, cpf="11122233344")
+        self.servidor_b = Servidor.objects.create(nome="Servidor B", cargo=self.cargo, cpf="55566677788")
+        self.oficio = Oficio.objects.create(numero=9, ano=2026, protocolo="123456789")
+        self.oficio.servidores.add(self.servidor_a, self.servidor_b)
+        self.prestacao = PrestacaoContas.objects.get(oficio=self.oficio)
+        self.relatorio = RelatorioTecnico.objects.create(
+            prestacao=self.prestacao,
+            diaria="R$100,00",
+            translado="Não houve",
+            combustivel="Cartão Prime",
+            passagem="Não houve",
+        )
+        self.ps_a = self.prestacao.servidores_prestacao.get(servidor=self.servidor_a)
+        self.ps_b = self.prestacao.servidores_prestacao.get(servidor=self.servidor_b)
+
+    def test_contexto_usa_valor_padrao_quando_nao_ha_override(self):
+        contexto = build_relatorio_tecnico_context(self.relatorio, self.ps_a)
+        self.assertEqual(contexto["diaria"], "R$100,00")
+
+    def test_contexto_usa_override_apenas_do_servidor_ajustado(self):
+        self.ps_b.diaria_valor_override = "R$80,00"
+        self.ps_b.save(update_fields=["diaria_valor_override"])
+
+        self.assertEqual(build_relatorio_tecnico_context(self.relatorio, self.ps_a)["diaria"], "R$100,00")
+        self.assertEqual(build_relatorio_tecnico_context(self.relatorio, self.ps_b)["diaria"], "R$80,00")
+
+    def test_rt_criar_get_mostra_selo_so_no_servidor_com_override(self):
+        self.ps_b.diaria_valor_override = "R$80,00"
+        self.ps_b.save(update_fields=["diaria_valor_override"])
+
+        response = self.client.get(reverse("prestacoes_contas:rt_criar", args=[self.prestacao.pk]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Diária ajustada")
+        self.assertContains(response, f'id_ps-{self.ps_b.pk}-diaria_valor_override')
+        self.assertContains(response, 'value="R$80,00"')
+
+    def test_rt_autosave_salva_override_de_um_servidor_sem_afetar_o_outro(self):
+        field_name = f"ps-{self.ps_b.pk}-diaria_valor_override"
+        payload = {
+            "object_id": str(self.relatorio.pk),
+            "form_id": "",
+            "model": "relatorio_tecnico",
+            "dirty_fields": [field_name],
+            "fields": {field_name: "R$80,00 (saque)"},
+            "snapshots": {},
+        }
+
+        response = self.client.post(
+            reverse("prestacoes_contas:rt_autosave", args=[self.relatorio.pk]),
+            data=json.dumps(payload),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.ps_a.refresh_from_db()
+        self.ps_b.refresh_from_db()
+        self.relatorio.refresh_from_db()
+        self.assertEqual(self.ps_b.diaria_valor_override, "R$80,00 (saque)")
+        self.assertEqual(self.ps_a.diaria_valor_override, "")
+        self.assertEqual(self.relatorio.diaria, "R$100,00")
+
+    def test_rt_criar_post_salva_override_sem_js(self):
+        data = {
+            "diaria": "R$100,00",
+            "translado": "Não houve",
+            "combustivel": "Cartão Prime",
+            "passagem": "Não houve",
+            "motivo": "",
+            "atividade": "",
+            "conclusao": "",
+            "medidas": "",
+            "info_complementares": "",
+            f"ps-{self.ps_b.pk}-diaria_valor_override": "R$80,00",
+        }
+
+        response = self.client.post(
+            reverse("prestacoes_contas:rt_criar", args=[self.prestacao.pk]),
+            data=data,
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.ps_a.refresh_from_db()
+        self.ps_b.refresh_from_db()
+        self.assertEqual(self.ps_b.diaria_valor_override, "R$80,00")
+        self.assertEqual(self.ps_a.diaria_valor_override, "")
+
+
 class RelatorioTecnicoDocumentoTests(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="tester_rt_doc", password="123456")

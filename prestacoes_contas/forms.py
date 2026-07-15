@@ -512,6 +512,30 @@ class PrestacaoSolicitacaoForm(forms.ModelForm):
         }
 
 
+class PrestacaoServidorDiariaForm(forms.ModelForm):
+    """Valor de diária específico de um servidor, usado só no RT dele."""
+
+    class Meta:
+        model = PrestacaoServidor
+        fields = ["diaria_valor_override"]
+        labels = {"diaria_valor_override": "Diária deste servidor (se for diferente)"}
+        widgets = {
+            "diaria_valor_override": forms.TextInput(
+                attrs={
+                    "class": "form-control cv-field__control",
+                    "placeholder": 'Deixe em branco para usar o valor padrão acima',
+                    "autocomplete": "off",
+                },
+            ),
+        }
+        help_texts = {
+            "diaria_valor_override": (
+                'Ex.: "R$ 80,00". Preencha só quando este servidor recebeu um valor '
+                "diferente do padrão (ex.: houve saque em vez de transferência)."
+            ),
+        }
+
+
 class RelatorioTecnicoForm(forms.ModelForm):
     translado_outro = forms.CharField(
         label="Translado - outro",

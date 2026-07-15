@@ -145,6 +145,16 @@ class PrestacaoServidor(models.Model):
         blank=True,
         default="",
     )
+    # Sobrescreve, só para este servidor, o valor de diária exibido no RT dele
+    # (ex.: quando ele recebeu por saque em vez de transferência e o valor
+    # ficou diferente do padrão calculado para o ofício). Em branco usa o
+    # valor compartilhado (``RelatorioTecnico.diaria``).
+    diaria_valor_override = models.CharField(
+        "Diária deste servidor (se for diferente)",
+        max_length=255,
+        blank=True,
+        default="",
+    )
     criado_em = models.DateTimeField(auto_now_add=True)
     atualizado_em = models.DateTimeField(auto_now=True)
 
