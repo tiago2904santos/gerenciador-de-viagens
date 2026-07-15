@@ -3866,10 +3866,6 @@ html[data-theme="light"] .oficio-lc__trecho--atividade .oficio-lc__trecho-rota {
   padding: var(--space-3) var(--space-6);
 }
 
-.oficio-lc__footer-badge {
-  margin-bottom: var(--space-3);
-}
-
 .oficio-lc__footer-actions {
   align-items: center;
   display: flex;
