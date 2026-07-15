@@ -5,6 +5,7 @@ from django.utils import timezone
 
 from core.normalizers import normalize_plate
 from core.normalizers import remove_accents
+from core.tenancy import filter_queryset_by_area
 
 from cadastros.models import Servidor
 from cadastros.models import Unidade
@@ -38,7 +39,7 @@ def listar_oficios(
 ):
     order_fields = _SORT_MAP.get(sort or "numero_desc", ["-numero", "-ano"])
     queryset = (
-        Oficio.objects.select_related(
+        filter_queryset_by_area(Oficio.objects).select_related(
             "roteiro",
             "roteiro__origem_cidade",
             "roteiro__origem_estado",
@@ -123,7 +124,7 @@ def listar_oficios(
 
 
 def get_oficio_by_id(pk: int):
-    queryset = Oficio.objects.select_related(
+    queryset = filter_queryset_by_area(Oficio.objects).select_related(
         "roteiro",
         "viatura",
         "viatura__combustivel",

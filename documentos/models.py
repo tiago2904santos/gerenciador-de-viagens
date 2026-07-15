@@ -9,6 +9,14 @@ class DocumentoArtefato(models.Model):
     """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    area = models.ForeignKey(
+        "usuarios.AreaTrabalho",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="documentos_artefatos",
+        verbose_name="Area de trabalho",
+    )
     tipo = models.CharField(max_length=64, db_index=True)
     formato = models.CharField(max_length=16, db_index=True)
     oficio = models.ForeignKey(
@@ -74,6 +82,14 @@ class DocumentoArtefato(models.Model):
 
     def __str__(self) -> str:
         return f"{self.tipo} ({self.formato}) {self.hash_sha256[:8]}"
+
+    def save(self, *args, **kwargs):
+        if self.area_id is None:
+            if self.oficio_id and self.oficio and self.oficio.area_id:
+                self.area = self.oficio.area
+            elif self.evento_id and self.evento and self.evento.area_id:
+                self.area = self.evento.area
+        super().save(*args, **kwargs)
 
     @property
     def esta_assinado(self) -> bool:

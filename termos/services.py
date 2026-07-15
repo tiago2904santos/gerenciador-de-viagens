@@ -458,6 +458,119 @@ def resolver_artefato_termo_cadastro(termo: TermoAutorizacao, servidor: Servidor
     return get_latest_artefato_pdf_termo_cadastro(termo.pk, servidor_id)
 
 
+def termo_oficio_tem_assinado(oficio: Oficio, servidor: Servidor) -> bool:
+    """``True`` se já existe uma versão assinada anexada para este termo embutido no ofício."""
+    from documentos.selectors import get_latest_artefato_pdf_termo
+
+    artefato = get_latest_artefato_pdf_termo(oficio.pk, servidor.pk)
+    return artefato is not None and artefato.esta_assinado
+
+
+def pdf_termo_oficio_assinado_ou_gerado(oficio: Oficio, servidor: Servidor) -> bytes:
+    """Bytes do termo embutido no ofício: prefere o assinado anexado, senão gera."""
+    from documentos.selectors import get_latest_artefato_pdf_termo
+
+    artefato = get_latest_artefato_pdf_termo(oficio.pk, servidor.pk)
+    if artefato is not None and artefato.esta_assinado:
+        with artefato.arquivo_assinado.open("rb") as f:
+            return f.read()
+    return gerar_termo_um(oficio, servidor, DocumentoFormato.PDF).conteudo
+
+
+def termo_oficio_assinado_info(oficio: Oficio, servidor: Servidor) -> dict:
+    """Dados de assinatura de um termo embutido no ofício, para presenters de card/wizard.
+
+    Retorna ``assinado``, ``anexar_assinado_url``, ``assinado_nome_original``,
+    ``assinado_view_url`` e ``remover_assinado_url``. Se ainda não existe artefato
+    persistido, ``anexar_assinado_url`` aponta para o wrapper que resolve-ou-gera
+    sob demanda (``termos:termo_oficio_assinado_anexar``).
+    """
+    from django.urls import reverse
+
+    from documentos.selectors import get_latest_artefato_pdf_termo
+
+    artefato = get_latest_artefato_pdf_termo(oficio.pk, servidor.pk)
+    if artefato is not None:
+        assinado = artefato.esta_assinado
+        return {
+            "assinado": assinado,
+            "anexar_assinado_url": reverse("documentos:artefato_assinado_anexar", args=[artefato.pk]),
+            "assinado_nome_original": artefato.assinado_nome_original if assinado else "",
+            "assinado_view_url": (
+                reverse("documentos:artefato_pdf_conteudo", args=[artefato.pk]) if assinado else ""
+            ),
+            "remover_assinado_url": (
+                reverse("documentos:artefato_assinado_remover", args=[artefato.pk]) if assinado else ""
+            ),
+        }
+    return {
+        "assinado": False,
+        "anexar_assinado_url": reverse("termos:termo_oficio_assinado_anexar", args=[oficio.pk, servidor.pk]),
+        "assinado_nome_original": "",
+        "assinado_view_url": "",
+        "remover_assinado_url": "",
+    }
+
+
+def termo_cadastro_tem_assinado(termo: TermoAutorizacao, servidor: Servidor | None) -> bool:
+    """``True`` se já existe uma versão assinada anexada para este termo avulso (genérico ou por servidor)."""
+    from documentos.selectors import get_latest_artefato_pdf_termo_cadastro
+
+    servidor_id = servidor.pk if servidor is not None else None
+    artefato = get_latest_artefato_pdf_termo_cadastro(termo.pk, servidor_id)
+    return artefato is not None and artefato.esta_assinado
+
+
+def pdf_termo_cadastro_assinado_ou_gerado(termo: TermoAutorizacao, servidor: Servidor | None) -> bytes:
+    """Bytes do termo avulso/cadastro: prefere o assinado anexado, senão gera."""
+    from documentos.selectors import get_latest_artefato_pdf_termo_cadastro
+
+    servidor_id = servidor.pk if servidor is not None else None
+    artefato = get_latest_artefato_pdf_termo_cadastro(termo.pk, servidor_id)
+    if artefato is not None and artefato.esta_assinado:
+        with artefato.arquivo_assinado.open("rb") as f:
+            return f.read()
+    return gerar_termo_cadastro_um(termo, servidor, DocumentoFormato.PDF).conteudo
+
+
+def termo_cadastro_assinado_info(termo: TermoAutorizacao, servidor_id: int | None) -> dict:
+    """Dados de assinatura de um termo avulso (genérico ou por servidor) para presenters de lista.
+
+    Retorna ``assinado``, ``anexar_assinado_url``, ``assinado_nome_original`` e
+    ``assinado_view_url`` prontos para uso em cards/linhas de lista e no modal
+    "anexar assinado" (termos/views.py e eventos/views.py).
+    """
+    from django.urls import reverse
+
+    from documentos.selectors import get_latest_artefato_pdf_termo_cadastro
+
+    artefato = get_latest_artefato_pdf_termo_cadastro(termo.pk, servidor_id)
+    if artefato is not None:
+        assinado = artefato.esta_assinado
+        return {
+            "assinado": assinado,
+            "anexar_assinado_url": reverse("documentos:artefato_assinado_anexar", args=[artefato.pk]),
+            "assinado_nome_original": artefato.assinado_nome_original if assinado else "",
+            "assinado_view_url": (
+                reverse("documentos:artefato_pdf_conteudo", args=[artefato.pk]) if assinado else ""
+            ),
+            "remover_assinado_url": (
+                reverse("documentos:artefato_assinado_remover", args=[artefato.pk]) if assinado else ""
+            ),
+        }
+    if servidor_id is None:
+        anexar_url = reverse("termos:termo_cadastro_generico_assinado_anexar", args=[termo.pk])
+    else:
+        anexar_url = reverse("termos:termo_cadastro_servidor_assinado_anexar", args=[termo.pk, servidor_id])
+    return {
+        "assinado": False,
+        "anexar_assinado_url": anexar_url,
+        "assinado_nome_original": "",
+        "assinado_view_url": "",
+        "remover_assinado_url": "",
+    }
+
+
 def sha256_bytes(content: bytes) -> str:
     return hashlib.sha256(content).hexdigest()
 
@@ -477,11 +590,16 @@ def fundir_termos_docx(documentos: list[DocumentoGerado]) -> bytes:
 
 
 def fundir_termos_pdf(documentos: list[DocumentoGerado]) -> bytes:
+    return fundir_termos_pdf_bytes([doc.conteudo for doc in documentos])
+
+
+def fundir_termos_pdf_bytes(conteudos: list[bytes]) -> bytes:
+    """Como ``fundir_termos_pdf``, mas a partir de bytes já resolvidos (assinado ou gerado)."""
     from pypdf import PdfReader, PdfWriter
 
     writer = PdfWriter()
-    for doc in documentos:
-        reader = PdfReader(io.BytesIO(doc.conteudo))
+    for conteudo in conteudos:
+        reader = PdfReader(io.BytesIO(conteudo))
         for page in reader.pages:
             writer.add_page(page)
     buf = io.BytesIO()

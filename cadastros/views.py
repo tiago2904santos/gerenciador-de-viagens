@@ -870,11 +870,16 @@ def configuracao_sistema(request):
         DriveReorganizacaoJob,
     )
     from integracoes.google_drive import status as drive_status
-    from integracoes.google_drive.services import escopo_faltante, esta_autorizado, get_pasta_raiz_id
+    from integracoes.google_drive.services import (
+        escopo_faltante,
+        esta_autorizado,
+        get_credenciais,
+        get_pasta_raiz_id,
+    )
 
     from .models import ConfiguracaoSistema
 
-    obj = ConfiguracaoSistema.get_singleton()
+    obj = ConfiguracaoSistema.get_for_area(getattr(request, "area", None))
     is_post_dados = request.method == "POST" and request.POST.get("form_id") != "destinatarios"
     is_post_destinatarios = request.method == "POST" and request.POST.get("form_id") == "destinatarios"
 
@@ -906,10 +911,11 @@ def configuracao_sistema(request):
         return redirect("cadastros:configuracao")
 
     cfg_drive = getattr(settings, "GOOGLE_DRIVE", {})
-    drive_creds = DriveCredenciais.objects.first()
+    area = getattr(request, "area", None)
+    drive_creds = get_credenciais(area)
     drive_modo = cfg_drive.get("MODO", "mock").lower()
-    drive_autorizado = esta_autorizado()
-    drive_pasta_raiz_id = get_pasta_raiz_id()
+    drive_autorizado = esta_autorizado(area)
+    drive_pasta_raiz_id = get_pasta_raiz_id(area)
     return render(
         request,
         "cadastros/configuracao/form.html",
@@ -925,7 +931,7 @@ def configuracao_sistema(request):
             # Google Drive
             "drive_autorizado": drive_autorizado,
             "drive_creds": drive_creds,
-            "drive_escopo_faltante": escopo_faltante(),
+            "drive_escopo_faltante": escopo_faltante(area),
             "drive_pasta_raiz_id": drive_pasta_raiz_id,
             "drive_pasta_raiz_nome": drive_creds.pasta_raiz_nome if drive_creds else "",
             "drive_total_arquivos": DriveArquivo.objects.count(),

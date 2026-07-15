@@ -38,6 +38,7 @@ def _oficio_item(oficio):
         viatura_unidade = str(v.unidade) if v.unidade_id else ""
 
     return {
+        "oficio_pk": card["oficio_pk"],
         "numero": card["numero_display"],
         "protocolo": card.get("protocolo_display") or "",
         "data_evento_display": card.get("data_evento_display") or "",

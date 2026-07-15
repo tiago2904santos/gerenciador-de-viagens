@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="{% static 'css/roteiros-list.css' %}?v=20260622-mobile">
   <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260610-oficios-datepicker">
   <link rel="stylesheet" href="{% static 'css/oficios-list-header.css' %}?v=20260713-abas-docs">
+  <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}?v=20260715-assinado">
 {% endblock %}
 
 {% block content %}
@@ -121,6 +122,7 @@
 
   {% include "components/ui/modals/delete_confirm_modal.html" with delete_modal_title="Excluir ofício?" delete_modal_entity="este ofício" %}
   {% include "components/ui/modals/cancel_reason_modal.html" with cancel_modal_title="Cancelar ofício?" cancel_modal_entity="este ofício" cancel_modal_hint="Ele deixa de gerar prestação de contas e não poderá mais ser usado em novas Ordens de Serviço." %}
+  {% include "components/ui/modals/attach_signed_modal.html" %}
 
   {% include "components/ui/buttons/floating_action.html" with href=create_url label="Novo ofício" variant="primary" icon="plus" aria_label="Novo ofício" only %}
 

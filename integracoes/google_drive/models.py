@@ -6,6 +6,14 @@ from django.db import models
 class DriveCredenciais(models.Model):
     """Tokens OAuth 2.0 da conta Google autorizada. Registro único (singleton)."""
 
+    area = models.OneToOneField(
+        "usuarios.AreaTrabalho",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="drive_credenciais",
+        verbose_name="Area de trabalho",
+    )
     access_token = models.TextField()
     refresh_token = models.TextField()
     token_expiry = models.DateTimeField(null=True, blank=True)

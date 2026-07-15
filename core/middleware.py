@@ -7,6 +7,8 @@ from django.contrib.auth.views import redirect_to_login
 from django.http import JsonResponse
 from django.shortcuts import resolve_url
 
+from core.tenancy import resolve_area_for_request
+
 _local = threading.local()
 
 
@@ -78,3 +80,14 @@ def _expects_json(request):
     if "application/json" in accept:
         return True
     return request.path.startswith("/roteiros/api/") or request.path.startswith("/roteiros/trechos/")
+
+
+class CurrentAreaMiddleware:
+    """Anexa a area de trabalho ativa em ``request.area``."""
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        resolve_area_for_request(request)
+        return self.get_response(request)

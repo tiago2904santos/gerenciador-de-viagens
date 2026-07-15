@@ -339,8 +339,16 @@ class Viatura(TimeStampedModel):
 
 
 class ConfiguracaoSistema(TimeStampedModel):
-    """Singleton (pk=1): dados institucionais para documentos e regras globais."""
+    """Dados institucionais para documentos e regras da area atual."""
 
+    area = models.OneToOneField(
+        "usuarios.AreaTrabalho",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="configuracao_sistema",
+        verbose_name="Area de trabalho",
+    )
     cidade_sede_padrao = models.ForeignKey(
         Cidade,
         on_delete=models.SET_NULL,
@@ -427,7 +435,17 @@ class ConfiguracaoSistema(TimeStampedModel):
 
     @classmethod
     def get_singleton(cls):
-        obj, _ = cls.objects.get_or_create(pk=1, defaults={"prazo_justificativa_dias": 10})
+        obj = cls.objects.filter(area__isnull=True).order_by("pk").first()
+        if obj is not None:
+            return obj
+        obj = cls.objects.create(prazo_justificativa_dias=10)
+        return obj
+
+    @classmethod
+    def get_for_area(cls, area):
+        if area is None:
+            return cls.get_singleton()
+        obj, _ = cls.objects.get_or_create(area=area, defaults={"prazo_justificativa_dias": 10})
         return obj
 
     def save(self, *args, **kwargs):

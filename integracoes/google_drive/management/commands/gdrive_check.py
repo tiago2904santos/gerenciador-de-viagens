@@ -20,9 +20,9 @@ class Command(BaseCommand):
         self.stdout.write(f"GOOGLE_DRIVE_UPLOAD_EM_MOCK: {upload_em_mock}")
         self.stdout.write("")
 
-        from integracoes.google_drive.models import DriveCredenciais
+        from integracoes.google_drive.services import get_credenciais
 
-        creds = DriveCredenciais.objects.first()
+        creds = get_credenciais()
         if creds:
             self.stdout.write(self.style.SUCCESS(f"OAuth autorizado. Token atualizado em: {creds.atualizado_em:%d/%m/%Y %H:%M}"))
             self.stdout.write(f"Expiry: {creds.token_expiry}")

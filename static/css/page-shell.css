@@ -1804,6 +1804,54 @@ body.has-delete-modal-open {
   color: var(--color-info);
 }
 
+/* Ações de documento (termo, ofício etc.) — cor do ícone acompanha o botão
+   sólido equivalente (preview/pdf/docx), com leve tingimento no hover. */
+.cv-action-menu__item--preview {
+  color: var(--cv-btn-preview-color, var(--color-info));
+}
+
+.cv-action-menu__item--pdf {
+  color: var(--cv-btn-pdf-bg, var(--color-danger));
+}
+
+.cv-action-menu__item--pdf:hover,
+.cv-action-menu__item--pdf:focus-visible {
+  background: color-mix(in srgb, var(--cv-btn-pdf-bg, var(--color-danger)) 14%, transparent);
+}
+
+.cv-action-menu__item--docx {
+  color: var(--cv-btn-docx-bg, var(--color-primary));
+}
+
+.cv-action-menu__item--docx:hover,
+.cv-action-menu__item--docx:focus-visible {
+  background: color-mix(in srgb, var(--cv-btn-docx-bg, var(--color-primary)) 14%, transparent);
+}
+
+.cv-action-menu__item--sign {
+  color: var(--cv-btn-primary-bg, var(--color-primary));
+}
+
+.cv-action-menu__item--sign:hover,
+.cv-action-menu__item--sign:focus-visible {
+  background: color-mix(in srgb, var(--cv-btn-primary-bg, var(--color-primary)) 14%, transparent);
+}
+
+.cv-action-menu__item--sign.is-assinado {
+  color: var(--color-success, #24a25b);
+}
+
+.cv-action-menu__item--sign.is-assinado:hover,
+.cv-action-menu__item--sign.is-assinado:focus-visible {
+  background: color-mix(in srgb, var(--color-success, #24a25b) 16%, transparent);
+}
+
+.cv-action-menu__divider {
+  border: none;
+  border-top: 1px solid var(--color-border-soft, rgba(255, 255, 255, 0.08));
+  margin: var(--space-1) var(--space-1);
+}
+
 .cv-action-menu__form {
   display: block;
   width: 100%;

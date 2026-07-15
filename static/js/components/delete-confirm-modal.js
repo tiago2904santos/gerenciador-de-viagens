@@ -10,6 +10,8 @@
     var dialog = modal.querySelector(".delete-confirm-modal__dialog");
     var form = modal.querySelector("[data-delete-confirm-form]");
     var label = modal.querySelector("[data-delete-confirm-label]");
+    var titleEl = modal.querySelector(".delete-confirm-modal__title");
+    var defaultTitle = titleEl ? titleEl.textContent : "";
 
     function closeModal() {
       modal.hidden = true;
@@ -28,6 +30,9 @@
       form.setAttribute("action", deleteUrl);
       if (label) {
         label.textContent = trigger.getAttribute("data-delete-label") || "este registro";
+      }
+      if (titleEl) {
+        titleEl.textContent = trigger.getAttribute("data-delete-title") || defaultTitle;
       }
       modal.hidden = false;
       document.body.classList.add("has-delete-modal-open");

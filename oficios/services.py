@@ -8,6 +8,7 @@ from django.utils import timezone
 
 from core.normalizers import normalize_spaces
 from core.normalizers import normalize_upper
+from core.tenancy import get_current_area
 from core.utils.masks import format_placa
 from core.utils.masks import format_protocolo
 from core.utils.masks import normalize_protocolo
@@ -242,6 +243,8 @@ def atualizar_status_automatico_oficio(oficio, action="save_draft", form=None):
 @transaction.atomic
 def criar_oficio_dados_viajantes(form, action="save_draft"):
     oficio = form.save(commit=False)
+    if oficio.area_id is None:
+        oficio.area = get_current_area()
     oficio.data_criacao = oficio.data_criacao or timezone.localdate()
     oficio.custeio = oficio.custeio or Oficio.CUSTEIO_UNIDADE_DPC
     modelo_motivo = form.cleaned_data.get("modelo_motivo")
@@ -363,6 +366,7 @@ def criar_oficio_rascunho(evento=None):
 
         seed = build_evento_document_seed(evento)
     oficio = Oficio.objects.create(
+        area=getattr(evento, "area", None) if evento is not None else get_current_area(),
         evento=evento,
         data_criacao=timezone.localdate(),
         status=Oficio.STATUS_RASCUNHO,
@@ -385,7 +389,12 @@ def reservar_numero_oficio(oficio, ano=None):
         return oficio
 
     resolved_year = ano or timezone.localdate().year
-    list(Oficio.objects.select_for_update().filter(ano=resolved_year).exclude(numero__isnull=True))
+    qs = Oficio.objects.select_for_update().filter(ano=resolved_year).exclude(numero__isnull=True)
+    if oficio.area_id:
+        qs = qs.filter(area=oficio.area)
+    else:
+        qs = qs.filter(area__isnull=True)
+    list(qs)
     oficio.ano = resolved_year
     oficio.numero = get_next_available_numero_oficio(resolved_year)
     oficio.save()

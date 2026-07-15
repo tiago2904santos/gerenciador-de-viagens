@@ -10,6 +10,7 @@ from cadastros.models import ConfiguracaoSistema
 from cadastros.models import Estado
 from cadastros.models import Unidade
 from cadastros.services import resolver_sede_ids_desde_configuracao
+from usuarios.models import AreaTrabalho
 
 
 class ConfiguracaoSistemaFormTests(TestCase):
@@ -77,6 +78,29 @@ class ConfiguracaoSistemaFormTests(TestCase):
         form = ConfiguracaoSistemaForm(data=data, instance=self.instance)
         self.assertFalse(form.is_valid())
         self.assertIn("email", form.errors)
+
+
+class ConfiguracaoSistemaAreaTests(TestCase):
+    def test_get_for_area_mantem_configuracoes_independentes(self):
+        ascom = AreaTrabalho.objects.create(nome="Assessoria de Comunicacao Social", sigla="ASCOM")
+        dpcap = AreaTrabalho.objects.create(nome="DPCAP", sigla="DPCAP")
+
+        cfg_ascom = ConfiguracaoSistema.get_for_area(ascom)
+        cfg_dpcap = ConfiguracaoSistema.get_for_area(dpcap)
+        cfg_global = ConfiguracaoSistema.get_singleton()
+
+        cfg_ascom.sigla_orgao = "ASCOM"
+        cfg_ascom.pt_sufixo_numero = "ASCOM"
+        cfg_ascom.save()
+        cfg_dpcap.sigla_orgao = "DPCAP"
+        cfg_dpcap.pt_sufixo_numero = "DPCAP"
+        cfg_dpcap.save()
+
+        self.assertNotEqual(cfg_ascom.pk, cfg_dpcap.pk)
+        self.assertNotEqual(cfg_global.pk, cfg_ascom.pk)
+        self.assertEqual(ConfiguracaoSistema.get_for_area(ascom).pt_sufixo_numero, "ASCOM")
+        self.assertEqual(ConfiguracaoSistema.get_for_area(dpcap).pt_sufixo_numero, "DPCAP")
+        self.assertIsNone(cfg_global.area_id)
 
 
 class ApiConsultaCepTests(TestCase):

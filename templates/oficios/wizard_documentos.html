@@ -5,6 +5,7 @@
   {{ block.super }}
   <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260603">
   <link rel="stylesheet" href="{% static 'css/oficios-documentos-inline.css' %}?v=20260622-mobile">
+  <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}?v=20260715-assinado">
 {% endblock %}
 
 {% block wizard_content %}
@@ -144,32 +145,21 @@
                 <summary class="document-inline-card__header">
                   <span class="document-inline-card__title">
                     {{ t.titulo }}
-                    {% if t.assinado %}
-                      {% include "components/ui/badges/status_badge.html" with label="Assinado" variant="success" only %}
-                    {% endif %}
                   </span>
                   <span class="document-inline-card__header-end">
                     <span class="document-inline-actions document-inline-actions--header" aria-label="Anexar assinado — {{ t.servidor_nome }}">
                       <button
                         type="button"
-                        class="cv-icon-btn cv-icon-btn--sign"
+                        class="cv-icon-btn cv-icon-btn--sign{% if t.assinado %} is-assinado{% endif %}"
                         data-attach-signed-trigger
                         data-attach-signed-url="{{ t.anexar_assinado_url }}"
                         data-attach-signed-doc-label="Termo de {{ t.servidor_nome }}"
-                        aria-label="Anexar assinado"
-                        data-tooltip="Anexar assinado"
+                        data-attach-signed-current-name="{{ t.assinado_nome_original }}"
+                        data-attach-signed-current-view-url="{{ t.assinado_view_url }}"
+                        data-attach-signed-current-remove-url="{{ t.remover_assinado_url }}"
+                        aria-label="{% if t.assinado %}Termo assinado — gerenciar{% else %}Anexar assinado{% endif %}"
+                        data-tooltip="{% if t.assinado %}Assinado — clique para gerenciar{% else %}Anexar assinado{% endif %}"
                       >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="sign" only %}</button>
-                      {% if t.remover_assinado_url %}
-                        <button
-                          type="button"
-                          class="cv-icon-btn cv-icon-btn--delete"
-                          data-delete-modal-trigger
-                          data-delete-url="{{ t.remover_assinado_url }}"
-                          data-delete-label="o assinado de {{ t.servidor_nome }}"
-                          aria-label="Remover assinado"
-                          data-tooltip="Remover assinado"
-                        >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="delete" only %}</button>
-                      {% endif %}
                     </span>
                   </span>
                 </summary>
@@ -486,8 +476,7 @@
 {% endblock %}
 
 {% block wizard_modals %}
-  {% include "components/ui/modals/attach_signed_modal.html" only %}
-  {% include "components/ui/modals/delete_confirm_modal.html" with delete_modal_title="Remover documento assinado?" only %}
+  {% include "components/ui/modals/attach_signed_modal.html" %}
 {% endblock %}
 
 {% block extra_js %}

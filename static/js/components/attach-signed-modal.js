@@ -2,6 +2,7 @@
   "use strict";
 
   var activeTrigger = null;
+  var currentRemoveUrl = "";
 
   function init() {
     var modal = document.querySelector("[data-attach-signed-modal]");
@@ -11,6 +12,9 @@
     var form = modal.querySelector("[data-attach-signed-form]");
     var label = modal.querySelector("[data-attach-signed-label]");
     var nextInput = modal.querySelector("[data-attach-signed-next]");
+    var currentBlock = modal.querySelector("[data-attach-signed-current]");
+    var currentName = modal.querySelector("[data-attach-signed-current-name]");
+    var currentOpen = modal.querySelector("[data-attach-signed-current-open]");
 
     function closeModal() {
       modal.hidden = true;
@@ -19,6 +23,7 @@
         activeTrigger.focus();
       }
       activeTrigger = null;
+      currentRemoveUrl = "";
     }
 
     function openModal(trigger) {
@@ -33,11 +38,38 @@
       if (nextInput) {
         nextInput.value = window.location.pathname + window.location.search + window.location.hash;
       }
+
+      var currentName_ = trigger.getAttribute("data-attach-signed-current-name") || "";
+      var currentViewUrl = trigger.getAttribute("data-attach-signed-current-view-url") || "";
+      currentRemoveUrl = trigger.getAttribute("data-attach-signed-current-remove-url") || "";
+      if (currentBlock) {
+        currentBlock.hidden = !currentName_;
+      }
+      if (currentName) {
+        currentName.textContent = currentName_;
+      }
+      if (currentOpen) {
+        currentOpen.setAttribute("href", currentViewUrl || "#");
+      }
+
       modal.hidden = false;
       document.body.classList.add("has-delete-modal-open");
       if (dialog && typeof dialog.focus === "function") {
         dialog.focus();
       }
+    }
+
+    function removeCurrentSigned() {
+      if (!currentRemoveUrl || !form) return;
+      var csrfInput = form.querySelector('input[name="csrfmiddlewaretoken"]');
+      var token = csrfInput ? csrfInput.value : "";
+      fetch(currentRemoveUrl, {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "X-CSRFToken": token },
+      }).then(function () {
+        window.location.reload();
+      });
     }
 
     document.addEventListener("click", function (event) {
@@ -51,6 +83,12 @@
       if (!modal.hidden && event.target.closest("[data-attach-signed-cancel]")) {
         event.preventDefault();
         closeModal();
+        return;
+      }
+
+      if (!modal.hidden && event.target.closest("[data-attach-signed-remove]")) {
+        event.preventDefault();
+        removeCurrentSigned();
       }
     });
 

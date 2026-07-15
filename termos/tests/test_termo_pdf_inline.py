@@ -28,6 +28,7 @@ from roteiros.models import RoteiroDestino
 from roteiros.models import RoteiroTrecho
 from termos.services import gerar_termo_um
 from termos.services import gerar_termo_lote
+from termos.services import sha256_bytes
 
 
 class TermoServidorPdfInlineTests(TestCase):
@@ -129,48 +130,34 @@ class TermoServidorPdfInlineTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     @mock.patch("termos.views.validar_oficio_para_documento", return_value={"pendencias": []})
-    @mock.patch("termos.views.gerar_termo_um")
+    @mock.patch("termos.views.pdf_termo_oficio_assinado_ou_gerado")
     def test_inline_com_sha256(self, m_gerar, _m_val):
-        m_gerar.return_value = SimpleNamespace(
-            conteudo=b"%PDF-1.4\n",
-            hash_sha256="deadbeef",
-            content_type="application/pdf",
-            nome_arquivo="t.pdf",
-        )
+        m_gerar.return_value = b"%PDF-1.4\n"
         url = reverse("termos:termo_servidor_pdf_inline", args=[self.oficio.pk, self.servidor_ok.pk])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertIn("inline", response["Content-Disposition"])
-        self.assertEqual(response["X-Document-SHA256"], "deadbeef")
+        self.assertEqual(response["X-Document-SHA256"], sha256_bytes(b"%PDF-1.4\n"))
         _ = b"".join(response.streaming_content)
 
     @mock.patch("termos.views.validar_oficio_para_documento", return_value={"pendencias": []})
-    @mock.patch("termos.views.gerar_termo_um")
+    @mock.patch("termos.views.pdf_termo_oficio_assinado_ou_gerado")
     def test_download_pdf_anexo_com_sha256(self, m_gerar, _m_val):
-        m_gerar.return_value = SimpleNamespace(
-            conteudo=b"%PDF-1.4\n",
-            hash_sha256="deadbeef",
-            content_type="application/pdf",
-            nome_arquivo="t.pdf",
-        )
+        m_gerar.return_value = b"%PDF-1.4\n"
         url = reverse("termos:baixar_termo_servidor", args=[self.oficio.pk, self.servidor_ok.pk, "pdf"])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "application/pdf")
         self.assertIn("attachment", response["Content-Disposition"])
-        self.assertEqual(response["X-Document-SHA256"], "deadbeef")
-        m_gerar.assert_called_once_with(self.oficio, self.servidor_ok, DocumentoFormato.PDF)
+        self.assertEqual(response["X-Document-SHA256"], sha256_bytes(b"%PDF-1.4\n"))
+        m_gerar.assert_called_once_with(self.oficio, self.servidor_ok)
 
     @mock.patch("termos.views.validar_oficio_para_documento", return_value={"pendencias": []})
-    @mock.patch("termos.views.fundir_termos_pdf")
-    @mock.patch("termos.views.gerar_termo_lote")
-    def test_download_todos_pdf_usa_arquivo_consolidado(self, m_lote, m_fundir, _m_val):
+    @mock.patch("termos.views.fundir_termos_pdf_bytes")
+    @mock.patch("termos.views.pdf_termo_oficio_assinado_ou_gerado")
+    def test_download_todos_pdf_usa_arquivo_consolidado(self, m_gerar, m_fundir, _m_val):
         self.oficio.servidores_termo_autorizacao.add(self.servidor_ok)
-        docs = [
-            SimpleNamespace(conteudo=b"%PDF-1.4\n1", nome_arquivo="termo-1.pdf"),
-            SimpleNamespace(conteudo=b"%PDF-1.4\n2", nome_arquivo="termo-2.pdf"),
-        ]
-        m_lote.return_value = docs
+        m_gerar.return_value = b"%PDF-1.4\n1"
         m_fundir.return_value = b"%PDF-1.4\nmerged"
 
         url = reverse("termos:baixar_termos_todos_pdf", args=[self.oficio.pk])
@@ -181,8 +168,7 @@ class TermoServidorPdfInlineTests(TestCase):
         self.assertIn("attachment", response["Content-Disposition"])
         self.assertIn("termos_oficio_", response["Content-Disposition"])
         self.assertEqual(response.content, b"%PDF-1.4\nmerged")
-        m_lote.assert_called_once_with(self.oficio, DocumentoFormato.PDF)
-        m_fundir.assert_called_once_with(docs)
+        m_fundir.assert_called_once_with([b"%PDF-1.4\n1"])
 
     def test_template_html_oficial_renderiza_dados_reais(self):
         payload = build_termo_payload(self.oficio, self.servidor_ok)

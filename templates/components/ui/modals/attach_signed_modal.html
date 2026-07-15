@@ -21,27 +21,39 @@
       Ele passa a ser usado no lugar do gerado, na tela e no Google Drive.
     </p>
 
+    <ul class="prestacao-file-list" data-attach-signed-current hidden>
+      <li class="prestacao-file-list__item">
+        <div class="prestacao-file-widget__meta">
+          <strong class="prestacao-file-widget__name" data-attach-signed-current-name></strong>
+          <span class="prestacao-file-widget__subtitle">Arquivo anexado</span>
+        </div>
+        <div class="prestacao-file-widget__actions">
+          <a
+            class="cv-icon-btn cv-icon-btn--preview prestacao-file-widget__action"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Visualizar arquivo assinado"
+            data-tooltip="Visualizar"
+            data-attach-signed-current-open
+          >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="eye" only %}</a>
+          <button
+            type="button"
+            class="cv-icon-btn cv-icon-btn--delete prestacao-file-widget__action"
+            aria-label="Remover arquivo assinado"
+            data-tooltip="Remover"
+            data-attach-signed-remove
+          >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="delete" only %}</button>
+        </div>
+      </li>
+    </ul>
+
     <form method="post" enctype="multipart/form-data" class="attach-signed-modal__form" data-attach-signed-form>
       {% csrf_token %}
       <input type="hidden" name="next" data-attach-signed-next value="">
-      <div class="field app-form-field cv-field attach-signed-modal__field">
-        <label class="app-form-label cv-field__label" for="id-attach-signed-arquivo">Arquivo PDF assinado</label>
-        <input
-          id="id-attach-signed-arquivo"
-          type="file"
-          name="arquivo"
-          accept="application/pdf,.pdf"
-          class="cv-field__control"
-          required
-        >
-      </div>
+      {% include "components/ui/forms/file_picker.html" with field_id="id-attach-signed-arquivo" field_name="arquivo" accept="application/pdf,.pdf" multiple=False only %}
       <div class="delete-confirm-modal__actions">
         <button type="button" class="cv-btn cv-btn--secondary" data-attach-signed-cancel>
           <span>Cancelar</span>
-        </button>
-        <button type="submit" class="cv-btn cv-btn--primary">
-          <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="sign" only %}</span>
-          <span>Anexar</span>
         </button>
       </div>
     </form>

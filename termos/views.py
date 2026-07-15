@@ -38,16 +38,21 @@ from .forms import TermoAutorizacaoForm
 from .models import TermoAutorizacao
 from .presenters import apresentar_linha_lista_simples_termo
 from .services import fundir_termos_docx
-from .services import fundir_termos_pdf
-from .services import gerar_termo_cadastro_lote
+from .services import fundir_termos_pdf_bytes
 from .services import gerar_termo_cadastro_um
 from .services import gerar_termo_lote
 from .services import gerar_termo_um
 from .services import listar_servidores_com_termo
+from .services import pdf_termo_cadastro_assinado_ou_gerado
+from .services import pdf_termo_oficio_assinado_ou_gerado
 from .services import preview_termo_context
 from .services import resolver_artefato_termo_cadastro
 from .services import resolver_artefato_termo_oficio
+from .services import servidores_para_termo_cadastro
 from .services import sha256_bytes
+from .services import termo_cadastro_assinado_info
+from .services import termo_cadastro_tem_assinado
+from .services import termo_oficio_tem_assinado
 
 
 TERMOS_PER_PAGE = 15
@@ -96,7 +101,7 @@ def index(request):
             delete_modal=True,
             pdf_url=reverse("termos:baixar_termo_cadastro_pdf", args=[termo.pk]),
             docx_url=reverse("termos:baixar_termo_cadastro_docx", args=[termo.pk]),
-            **_termo_assinado_info(termo, None),
+            **termo_cadastro_assinado_info(termo, None),
         )
         for termo in page_obj.object_list
     ]
@@ -383,26 +388,6 @@ def _termo_page_steps(form, termo=None):
     ]
 
 
-def _termo_assinado_info(termo, servidor_id):
-    from documentos.selectors import get_latest_artefato_pdf_termo_cadastro
-
-    artefato = get_latest_artefato_pdf_termo_cadastro(termo.pk, servidor_id)
-    if artefato is not None:
-        assinado = artefato.esta_assinado
-        return {
-            "assinado": assinado,
-            "anexar_assinado_url": reverse("documentos:artefato_assinado_anexar", args=[artefato.pk]),
-            "remover_assinado_url": (
-                reverse("documentos:artefato_assinado_remover", args=[artefato.pk]) if assinado else None
-            ),
-        }
-    if servidor_id is None:
-        anexar_url = reverse("termos:termo_cadastro_generico_assinado_anexar", args=[termo.pk])
-    else:
-        anexar_url = reverse("termos:termo_cadastro_servidor_assinado_anexar", args=[termo.pk, servidor_id])
-    return {"assinado": False, "anexar_assinado_url": anexar_url, "remover_assinado_url": None}
-
-
 def _termo_preview_documents(termo):
     if not termo or not termo.pk:
         return {}
@@ -411,7 +396,7 @@ def _termo_preview_documents(termo):
         "generico": {
             "titulo": "Termo generico",
             "inline_url": reverse("termos:termo_cadastro_generico_pdf_inline", args=[termo.pk]),
-            **_termo_assinado_info(termo, None),
+            **termo_cadastro_assinado_info(termo, None),
         },
         "servidores": [
             {
@@ -419,7 +404,7 @@ def _termo_preview_documents(termo):
                 "titulo": f"Termo - {servidor.nome}",
                 "servidor_nome": servidor.nome,
                 "inline_url": reverse("termos:termo_cadastro_servidor_pdf_inline", args=[termo.pk, servidor.pk]),
-                **_termo_assinado_info(termo, servidor.pk),
+                **termo_cadastro_assinado_info(termo, servidor.pk),
             }
             for servidor in servidores
         ],
@@ -529,11 +514,6 @@ def excluir(request, pk):
     return redirect("termos:index")
 
 
-def _termo_cadastro_docs_or_none(termo, formato):
-    docs = gerar_termo_cadastro_lote(termo, formato)
-    return docs or None
-
-
 def _termo_pdf_error_redirect(request, termo, exc: DocumentValidationError):
     messages.error(request, str(exc))
     return redirect("termos:editar", pk=termo.pk)
@@ -542,14 +522,12 @@ def _termo_pdf_error_redirect(request, termo, exc: DocumentValidationError):
 @require_GET
 def termo_cadastro_pdf_inline(request, pk):
     termo = get_object_or_404(_termo_queryset(), pk=pk)
+    servidores = servidores_para_termo_cadastro(termo)
     try:
-        docs = _termo_cadastro_docs_or_none(termo, DocumentoFormato.PDF)
+        conteudos = [pdf_termo_cadastro_assinado_ou_gerado(termo, servidor) for servidor in servidores]
     except DocumentValidationError as exc:
         return _termo_pdf_error_redirect(request, termo, exc)
-    if docs is None:
-        messages.error(request, "Nenhum termo gerado.")
-        return redirect("termos:editar", pk=termo.pk)
-    content = docs[0].conteudo if len(docs) == 1 else fundir_termos_pdf(docs)
+    content = conteudos[0] if len(conteudos) == 1 else fundir_termos_pdf_bytes(conteudos)
     return build_inline_pdf_response(
         request,
         content=content,
@@ -564,16 +542,16 @@ def termo_cadastro_pdf_inline(request, pk):
 def termo_cadastro_generico_pdf_inline(request, pk):
     termo = get_object_or_404(_termo_queryset(), pk=pk)
     try:
-        doc = gerar_termo_cadastro_um(termo, None, DocumentoFormato.PDF)
+        content = pdf_termo_cadastro_assinado_ou_gerado(termo, None)
     except DocumentValidationError as exc:
         return _termo_pdf_error_redirect(request, termo, exc)
     return build_inline_pdf_response(
         request,
-        content=doc.conteudo,
+        content=content,
         tipo=DocumentoTipo.TERMO_AUTORIZACAO,
         reference=f"termo-{termo.pk}-generico",
         now=timezone.now(),
-        x_document_sha256=doc.hash_sha256,
+        x_document_sha256=sha256_bytes(content),
     )
 
 
@@ -584,23 +562,24 @@ def termo_cadastro_servidor_pdf_inline(request, pk, servidor_pk):
     if not termo.servidores_efetivos().filter(pk=servidor.pk).exists():
         raise Http404("Servidor nao selecionado para este termo.")
     try:
-        doc = gerar_termo_cadastro_um(termo, servidor, DocumentoFormato.PDF)
+        content = pdf_termo_cadastro_assinado_ou_gerado(termo, servidor)
     except DocumentValidationError as exc:
         return _termo_pdf_error_redirect(request, termo, exc)
     return build_inline_pdf_response(
         request,
-        content=doc.conteudo,
+        content=content,
         tipo=DocumentoTipo.TERMO_AUTORIZACAO,
         reference=f"termo-{termo.pk}-servidor-{servidor.pk}",
         now=timezone.now(),
-        x_document_sha256=doc.hash_sha256,
+        x_document_sha256=sha256_bytes(content),
     )
 
 
 def _termo_cadastro_docs_com_generico(termo, formato):
-    """Termo genérico + termos individuais de cada servidor efetivo.
+    """Termo genérico + termos individuais de cada servidor efetivo (sempre gerados).
 
-    Não usa ``gerar_termo_cadastro_lote`` porque este faz fallback para ``[None]``
+    Usado só pelo DOCX (não tem versão assinada equivalente). Não usa
+    ``gerar_termo_cadastro_lote`` porque este faz fallback para ``[None]``
     quando não há servidores — o que duplicaria o termo genérico. Aqui o genérico
     é gerado exatamente uma vez e os individuais só quando há servidores.
     """
@@ -608,6 +587,14 @@ def _termo_cadastro_docs_com_generico(termo, formato):
     for servidor in termo.servidores_efetivos():
         docs.append(gerar_termo_cadastro_um(termo, servidor, formato))
     return docs
+
+
+def _termo_cadastro_pdf_bytes_com_generico(termo):
+    """Como ``_termo_cadastro_docs_com_generico``, mas em PDF preferindo o assinado de cada parte."""
+    conteudos = [pdf_termo_cadastro_assinado_ou_gerado(termo, None)]
+    for servidor in termo.servidores_efetivos():
+        conteudos.append(pdf_termo_cadastro_assinado_ou_gerado(termo, servidor))
+    return conteudos
 
 
 def _termo_oficio_pdf_error_redirect(request, oficio, exc: DocumentValidationError):
@@ -619,10 +606,10 @@ def _termo_oficio_pdf_error_redirect(request, oficio, exc: DocumentValidationErr
 def baixar_termo_cadastro_pdf(request, pk):
     termo = get_object_or_404(_termo_queryset(), pk=pk)
     try:
-        docs = _termo_cadastro_docs_com_generico(termo, DocumentoFormato.PDF)
+        conteudos = _termo_cadastro_pdf_bytes_com_generico(termo)
     except DocumentValidationError as exc:
         return _termo_pdf_error_redirect(request, termo, exc)
-    content = docs[0].conteudo if len(docs) == 1 else fundir_termos_pdf(docs)
+    content = conteudos[0] if len(conteudos) == 1 else fundir_termos_pdf_bytes(conteudos)
     response = HttpResponse(content, content_type="application/pdf")
     response["Content-Disposition"] = f'attachment; filename="termo_{termo.pk}.pdf"'
     response["X-Content-Type-Options"] = "nosniff"
@@ -678,29 +665,30 @@ def preview_termo_oficio(request, pk):
 @require_GET
 def termo_servidor_pdf_inline(request, pk, servidor_pk):
     oficio = get_oficio_by_id(pk)
-    aval = validar_oficio_para_documento(oficio)
-    if aval["pendencias"]:
-        messages.error(request, "Termo nao gerado: oficio incompleto.")
-        return redirect(f"{redirect_para_corrigir_documento_oficio(oficio)}?documento_incompleto=1")
-
     servidor = get_object_or_404(Servidor, pk=servidor_pk)
     if not oficio.servidores.filter(pk=servidor.pk).exists():
         raise Http404("Servidor nao participa deste oficio.")
     if not listar_servidores_com_termo(oficio).filter(pk=servidor.pk).exists():
         raise Http404("Servidor nao selecionado para Termo de Autorizacao neste oficio.")
 
+    if not termo_oficio_tem_assinado(oficio, servidor):
+        aval = validar_oficio_para_documento(oficio)
+        if aval["pendencias"]:
+            messages.error(request, "Termo nao gerado: oficio incompleto.")
+            return redirect(f"{redirect_para_corrigir_documento_oficio(oficio)}?documento_incompleto=1")
+
     try:
-        doc = gerar_termo_um(oficio, servidor, DocumentoFormato.PDF)
+        content = pdf_termo_oficio_assinado_ou_gerado(oficio, servidor)
     except DocumentValidationError as exc:
         return _termo_oficio_pdf_error_redirect(request, oficio, exc)
     ref = f"{oficio.numero_formatado.replace('/', '-')}-termo-{servidor.pk}"
     return build_inline_pdf_response(
         request,
-        content=doc.conteudo,
+        content=content,
         tipo=DocumentoTipo.TERMO_AUTORIZACAO,
         reference=ref,
         now=timezone.now(),
-        x_document_sha256=doc.hash_sha256,
+        x_document_sha256=sha256_bytes(content),
     )
 
 
@@ -711,44 +699,56 @@ def baixar_termo_servidor(request, pk, servidor_pk, formato):
     except ValueError as exc:
         raise Http404("Formato nao suportado.") from exc
 
-    aval = validar_oficio_para_documento(oficio)
-    if aval["pendencias"]:
-        messages.error(request, "Termo nao gerado: oficio incompleto.")
-        return redirect(f"{redirect_para_corrigir_documento_oficio(oficio)}?documento_incompleto=1")
-
     servidor = get_object_or_404(Servidor, pk=servidor_pk)
     if not oficio.servidores.filter(pk=servidor.pk).exists():
         raise Http404("Servidor nao participa deste oficio.")
     if not listar_servidores_com_termo(oficio).filter(pk=servidor.pk).exists():
         raise Http404("Servidor nao selecionado para Termo de Autorizacao neste oficio.")
 
+    tem_assinado = fmt == DocumentoFormato.PDF and termo_oficio_tem_assinado(oficio, servidor)
+    if not tem_assinado:
+        aval = validar_oficio_para_documento(oficio)
+        if aval["pendencias"]:
+            messages.error(request, "Termo nao gerado: oficio incompleto.")
+            return redirect(f"{redirect_para_corrigir_documento_oficio(oficio)}?documento_incompleto=1")
+
     try:
-        doc = gerar_termo_um(oficio, servidor, fmt)
+        if fmt == DocumentoFormato.PDF:
+            content = pdf_termo_oficio_assinado_ou_gerado(oficio, servidor)
+            content_type = "application/pdf"
+            nome_arquivo = f"termo_{oficio.numero_formatado.replace('/', '-')}_{servidor.pk}.pdf"
+        else:
+            doc = gerar_termo_um(oficio, servidor, fmt)
+            content = doc.conteudo
+            content_type = doc.content_type
+            nome_arquivo = doc.nome_arquivo
     except DocumentValidationError as exc:
         return _termo_oficio_pdf_error_redirect(request, oficio, exc)
-    response = HttpResponse(doc.conteudo, content_type=doc.content_type)
-    response["Content-Disposition"] = f'attachment; filename="{doc.nome_arquivo}"'
+    response = HttpResponse(content, content_type=content_type)
+    response["Content-Disposition"] = f'attachment; filename="{nome_arquivo}"'
     response["X-Content-Type-Options"] = "nosniff"
-    response["X-Document-SHA256"] = doc.hash_sha256
+    response["X-Document-SHA256"] = sha256_bytes(content)
     return response
 
 
 def baixar_termos_todos_pdf(request, pk):
     oficio = get_oficio_by_id(pk)
-    aval = validar_oficio_para_documento(oficio)
-    if aval["pendencias"]:
-        messages.error(request, "Termos nao gerados: oficio incompleto.")
-        return redirect(f"{redirect_para_corrigir_documento_oficio(oficio)}?documento_incompleto=1")
-
-    if not listar_servidores_com_termo(oficio).exists():
+    servidores = list(listar_servidores_com_termo(oficio))
+    if not servidores:
         messages.error(request, "Nenhum servidor selecionado para Termo de Autorizacao.")
         return redirect("termos:index")
 
+    if not all(termo_oficio_tem_assinado(oficio, s) for s in servidores):
+        aval = validar_oficio_para_documento(oficio)
+        if aval["pendencias"]:
+            messages.error(request, "Termos nao gerados: oficio incompleto.")
+            return redirect(f"{redirect_para_corrigir_documento_oficio(oficio)}?documento_incompleto=1")
+
     try:
-        docs = gerar_termo_lote(oficio, DocumentoFormato.PDF)
+        conteudos = [pdf_termo_oficio_assinado_ou_gerado(oficio, s) for s in servidores]
     except DocumentValidationError as exc:
         return _termo_oficio_pdf_error_redirect(request, oficio, exc)
-    pdf_bytes = fundir_termos_pdf(docs)
+    pdf_bytes = fundir_termos_pdf_bytes(conteudos)
     nome = f"termos_oficio_{oficio.numero_formatado.replace('/', '-')}.pdf"
     response = HttpResponse(pdf_bytes, content_type="application/pdf")
     response["Content-Disposition"] = f'attachment; filename="{nome}"'
@@ -763,27 +763,31 @@ def baixar_termo_lote_zip(request, pk, formato):
     except ValueError as exc:
         raise Http404("Formato nao suportado.") from exc
 
-    aval = validar_oficio_para_documento(oficio)
-    if aval["pendencias"]:
-        messages.error(request, "Lote nao gerado: oficio incompleto.")
-        return redirect(f"{redirect_para_corrigir_documento_oficio(oficio)}?documento_incompleto=1")
-
-    if not listar_servidores_com_termo(oficio).exists():
+    servidores = list(listar_servidores_com_termo(oficio))
+    if not servidores:
         messages.error(request, "Nenhum servidor selecionado para Termo de Autorizacao.")
         return redirect("termos:index")
 
+    tem_assinado = fmt == DocumentoFormato.PDF and all(termo_oficio_tem_assinado(oficio, s) for s in servidores)
+    if not tem_assinado:
+        aval = validar_oficio_para_documento(oficio)
+        if aval["pendencias"]:
+            messages.error(request, "Lote nao gerado: oficio incompleto.")
+            return redirect(f"{redirect_para_corrigir_documento_oficio(oficio)}?documento_incompleto=1")
+
     try:
-        docs = gerar_termo_lote(oficio, fmt)
+        if fmt == DocumentoFormato.PDF:
+            conteudos = [pdf_termo_oficio_assinado_ou_gerado(oficio, s) for s in servidores]
+            content = conteudos[0] if len(conteudos) == 1 else fundir_termos_pdf_bytes(conteudos)
+            content_type = "application/pdf"
+        else:
+            docs = gerar_termo_lote(oficio, fmt)
+            content = docs[0].conteudo if len(docs) == 1 else fundir_termos_docx(docs)
+            content_type = docs[0].content_type
     except DocumentValidationError as exc:
         return _termo_oficio_pdf_error_redirect(request, oficio, exc)
-    if len(docs) == 1:
-        content = docs[0].conteudo
-    elif fmt == DocumentoFormato.PDF:
-        content = fundir_termos_pdf(docs)
-    else:
-        content = fundir_termos_docx(docs)
     nome = f"termos_oficio_{oficio.numero_formatado.replace('/', '-')}.{fmt.value}"
-    response = HttpResponse(content, content_type=docs[0].content_type)
+    response = HttpResponse(content, content_type=content_type)
     response["Content-Disposition"] = f'attachment; filename="{nome}"'
     response["X-Content-Type-Options"] = "nosniff"
     return response

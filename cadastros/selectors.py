@@ -2,6 +2,7 @@
 from django.shortcuts import get_object_or_404
 
 from core.normalizers import remove_accents
+from core.tenancy import get_current_area
 
 from .models import AssinaturaConfiguracao
 from .models import Cargo
@@ -127,7 +128,7 @@ def get_viatura_by_id(pk):
 
 
 def get_configuracao_sistema():
-    return ConfiguracaoSistema.get_singleton()
+    return ConfiguracaoSistema.get_for_area(get_current_area())
 
 
 def build_configuracao_context():

@@ -398,7 +398,7 @@ class PlanoTrabalho(TimeStampedModel, CancelavelModel):
         ano_atual = timezone.localdate().year
         with transaction.atomic():
             config = (
-                ConfiguracaoSistema.objects.select_for_update().filter(pk=1).first()
+                ConfiguracaoSistema.objects.select_for_update().filter(area__isnull=True).order_by("pk").first()
                 or ConfiguracaoSistema.get_singleton()
             )
             if config.pt_ano != ano_atual:

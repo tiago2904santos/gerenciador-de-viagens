@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260701-meta-linha">
   <link rel="stylesheet" href="{% static 'css/oficios-list-header.css' %}?v=20260713-abas-docs">
   <link rel="stylesheet" href="{% static 'css/eventos-list.css' %}?v=20260708-servidores-2col">
+  <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}?v=20260715-assinado">
 {% endblock %}
 
 {% block content %}
@@ -41,5 +42,6 @@
     {% include "components/ui/modals/delete_confirm_modal.html" with delete_modal_title="Excluir Evento?" delete_modal_entity="este evento" %}
     {% include "components/ui/modals/cancel_reason_modal.html" with cancel_modal_title="Cancelar evento?" cancel_modal_entity="este evento" cancel_modal_hint="Um evento cancelado deixa de gerar prestação de contas e não pode mais ser usado em novas Ordens de Serviço. Ao cancelar o evento, todos os documentos vinculados a ele também serão cancelados." %}
     {% include "components/ui/modals/confirm_action_modal.html" with confirm_action_eyebrow="Confirmar reativação" confirm_action_title="Reativar evento?" confirm_action_entity="este evento" confirm_action_hint="Os documentos cancelados junto com ele também serão reativados." confirm_action_button_label="Reativar evento" %}
+    {% include "components/ui/modals/attach_signed_modal.html" %}
   </div>
 {% endblock %}

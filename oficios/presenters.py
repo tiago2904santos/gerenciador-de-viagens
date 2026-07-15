@@ -126,6 +126,8 @@ def _temporal_badge_oficio(oficio):
 
 
 def apresentar_oficio_card(oficio, *, excluir_next_url=None):
+    from termos.services import termo_oficio_assinado_info
+
     servidores = list(oficio.servidores.all())
     termos_pks = {s.pk for s in oficio.servidores_termo_autorizacao.all()}
     servidor_pks = {s.pk for s in servidores}
@@ -146,14 +148,23 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None):
         unidade_nome = str(s.unidade) if s.unidade_id else ""
         has_termo = s.pk in termos_pks
         termo_open_url = termo_pdf_url = termo_docx_url = ""
+        assinado_info = {
+            "assinado": False,
+            "anexar_assinado_url": "",
+            "assinado_nome_original": "",
+            "assinado_view_url": "",
+            "remover_assinado_url": "",
+        }
         if has_termo:
             try:
                 termo_open_url = reverse("termos:termo_servidor_pdf_inline", args=[oficio.pk, s.pk])
                 termo_pdf_url = reverse("termos:baixar_termo_servidor", args=[oficio.pk, s.pk, "pdf"])
                 termo_docx_url = reverse("termos:baixar_termo_servidor", args=[oficio.pk, s.pk, "docx"])
+                assinado_info = termo_oficio_assinado_info(oficio, s)
             except Exception:
                 pass
         servidores_display.append({
+            "servidor_pk": s.pk,
             "initials": _iniciais_nome_servidor(s.nome),
             "name": s.nome,
             "cargo": cargo_nome,
@@ -164,6 +175,11 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None):
             "termo_open_url": termo_open_url,
             "termo_pdf_url": termo_pdf_url,
             "termo_docx_url": termo_docx_url,
+            "termo_assinado": assinado_info["assinado"],
+            "termo_anexar_assinado_url": assinado_info["anexar_assinado_url"],
+            "termo_remover_assinado_url": assinado_info["remover_assinado_url"],
+            "termo_assinado_nome_original": assinado_info["assinado_nome_original"],
+            "termo_assinado_view_url": assinado_info["assinado_view_url"],
         })
 
     destino = _destino_display_oficio(oficio)
@@ -846,22 +862,12 @@ def apresentar_oficio_wizard_documentos_context(oficio):
     else:
         doc_msg = ""
 
-    from documentos.selectors import get_latest_artefato_pdf_termo
+    from termos.services import termo_oficio_assinado_info
 
     termos_items = []
     servidores_termo = oficio.servidores_termo_autorizacao.select_related("cargo", "unidade").order_by("nome")
     for servidor in servidores_termo:
-        artefato_termo = get_latest_artefato_pdf_termo(oficio.pk, servidor.pk)
-        if artefato_termo is not None:
-            assinado = artefato_termo.esta_assinado
-            anexar_assinado_url = reverse("documentos:artefato_assinado_anexar", args=[artefato_termo.pk])
-            remover_assinado_url = (
-                reverse("documentos:artefato_assinado_remover", args=[artefato_termo.pk]) if assinado else None
-            )
-        else:
-            assinado = False
-            anexar_assinado_url = reverse("termos:termo_oficio_assinado_anexar", args=[oficio.pk, servidor.pk])
-            remover_assinado_url = None
+        assinado_info = termo_oficio_assinado_info(oficio, servidor)
         termos_items.append(
             {
                 "titulo": f"Termo de Autorização — {servidor.nome}",
@@ -869,6 +875,7 @@ def apresentar_oficio_wizard_documentos_context(oficio):
                 "servidor_id": servidor.pk,
                 "servidor_pk": servidor.pk,
                 "inline_url": reverse("termos:termo_servidor_pdf_inline", args=[oficio.pk, servidor.pk]),
+                **assinado_info,
                 "download_pdf_url": reverse(
                     "termos:baixar_termo_servidor",
                     args=[oficio.pk, servidor.pk, "pdf"],
@@ -878,9 +885,6 @@ def apresentar_oficio_wizard_documentos_context(oficio):
                     args=[oficio.pk, servidor.pk, "docx"],
                 ),
                 "disponivel": disponivel,
-                "assinado": assinado,
-                "anexar_assinado_url": anexar_assinado_url,
-                "remover_assinado_url": remover_assinado_url,
             },
         )
 

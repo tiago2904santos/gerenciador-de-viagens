@@ -3,6 +3,8 @@ from django.db.models import Q
 from django.utils import timezone
 
 from cadastros.models import ConfiguracaoSistema
+from core.tenancy import filter_queryset_by_area
+from core.tenancy import get_current_area
 from oficios.forms import ModeloMotivoSelect
 from oficios.models import ModeloMotivoOficio
 from oficios.models import Oficio
@@ -255,7 +257,7 @@ class EventoNovoCadastroForm(forms.ModelForm):
         )
         # Pré-preenche a UF de destino com o estado padrão das configurações (eventos sem destino definido)
         if not self.is_bound and not (self.instance and self.instance.destino_uf):
-            uf_padrao = ConfiguracaoSistema.get_singleton().uf
+            uf_padrao = ConfiguracaoSistema.get_for_area(get_current_area()).uf
             if uf_padrao:
                 self.initial["destino_uf"] = uf_padrao
 
@@ -265,7 +267,7 @@ class EventoNovoCadastroForm(forms.ModelForm):
         nao_vinculado_ou_deste_evento = Q(evento_id=evento_pk) | Q(evento__isnull=True, cancelado=False)
 
         self.fields["oficios_vinculados"].queryset = (
-            Oficio.objects.select_related("roteiro", "viatura")
+            filter_queryset_by_area(Oficio.objects).select_related("roteiro", "viatura")
             .filter(nao_vinculado_ou_deste_evento)
             .order_by("-data_criacao", "-created_at")
         )

@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260609-termos">
   <link rel="stylesheet" href="{% static 'css/oficios-documentos-inline.css' %}?v=20260624-termos">
   <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260624-oficios-preview">
+  <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}?v=20260715-assinado">
 {% endblock %}
 
 {% block content %}
@@ -236,9 +237,6 @@
               <summary class="document-inline-card__header">
                 <span class="document-inline-card__title">
                   {{ docs.generico.titulo }} - {{ termo.destino_display }} - {{ termo.periodo_display }}
-                  {% if docs.generico.assinado %}
-                    {% include "components/ui/badges/status_badge.html" with label="Assinado" variant="success" only %}
-                  {% endif %}
                 </span>
                 <span class="document-inline-card__header-end">
                   <span class="document-inline-actions document-inline-actions--header" aria-label="Acoes do termo generico">
@@ -246,24 +244,16 @@
                     {% include "components/ui/buttons/icon_button.html" with href=docs.generico.inline_url action="pdf" aria_label="Visualizar PDF do termo generico" tooltip="PDF" only %}
                     <button
                       type="button"
-                      class="cv-icon-btn cv-icon-btn--sign"
+                      class="cv-icon-btn cv-icon-btn--sign{% if docs.generico.assinado %} is-assinado{% endif %}"
                       data-attach-signed-trigger
                       data-attach-signed-url="{{ docs.generico.anexar_assinado_url }}"
                       data-attach-signed-doc-label="o termo genérico"
-                      aria-label="Anexar assinado"
-                      data-tooltip="Anexar assinado"
+                      data-attach-signed-current-name="{{ docs.generico.assinado_nome_original }}"
+                      data-attach-signed-current-view-url="{{ docs.generico.assinado_view_url }}"
+                      data-attach-signed-current-remove-url="{{ docs.generico.remover_assinado_url }}"
+                      aria-label="{% if docs.generico.assinado %}Termo assinado — gerenciar{% else %}Anexar assinado{% endif %}"
+                      data-tooltip="{% if docs.generico.assinado %}Assinado — clique para gerenciar{% else %}Anexar assinado{% endif %}"
                     >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="sign" only %}</button>
-                    {% if docs.generico.remover_assinado_url %}
-                      <button
-                        type="button"
-                        class="cv-icon-btn cv-icon-btn--delete"
-                        data-delete-modal-trigger
-                        data-delete-url="{{ docs.generico.remover_assinado_url }}"
-                        data-delete-label="o assinado do termo genérico"
-                        aria-label="Remover assinado"
-                        data-tooltip="Remover assinado"
-                      >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="delete" only %}</button>
-                    {% endif %}
                   </span>
                 </span>
               </summary>
@@ -290,9 +280,6 @@
                       <summary class="document-inline-card__header">
                         <span class="document-inline-card__title">
                           {{ doc.titulo }}
-                          {% if doc.assinado %}
-                            {% include "components/ui/badges/status_badge.html" with label="Assinado" variant="success" only %}
-                          {% endif %}
                         </span>
                         <span class="document-inline-card__header-end">
                           <span class="document-inline-actions document-inline-actions--header" aria-label="Acoes do termo de {{ doc.servidor_nome }}">
@@ -300,24 +287,16 @@
                             {% include "components/ui/buttons/icon_button.html" with href=doc.inline_url action="pdf" aria_label="Visualizar PDF do termo de servidor" tooltip="PDF" only %}
                             <button
                               type="button"
-                              class="cv-icon-btn cv-icon-btn--sign"
+                              class="cv-icon-btn cv-icon-btn--sign{% if doc.assinado %} is-assinado{% endif %}"
                               data-attach-signed-trigger
                               data-attach-signed-url="{{ doc.anexar_assinado_url }}"
                               data-attach-signed-doc-label="o termo de {{ doc.servidor_nome }}"
-                              aria-label="Anexar assinado"
-                              data-tooltip="Anexar assinado"
+                              data-attach-signed-current-name="{{ doc.assinado_nome_original }}"
+                              data-attach-signed-current-view-url="{{ doc.assinado_view_url }}"
+                              data-attach-signed-current-remove-url="{{ doc.remover_assinado_url }}"
+                              aria-label="{% if doc.assinado %}Termo assinado — gerenciar{% else %}Anexar assinado{% endif %}"
+                              data-tooltip="{% if doc.assinado %}Assinado — clique para gerenciar{% else %}Anexar assinado{% endif %}"
                             >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="sign" only %}</button>
-                            {% if doc.remover_assinado_url %}
-                              <button
-                                type="button"
-                                class="cv-icon-btn cv-icon-btn--delete"
-                                data-delete-modal-trigger
-                                data-delete-url="{{ doc.remover_assinado_url }}"
-                                data-delete-label="o assinado de {{ doc.servidor_nome }}"
-                                aria-label="Remover assinado"
-                                data-tooltip="Remover assinado"
-                              >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="delete" only %}</button>
-                            {% endif %}
                           </span>
                         </span>
                       </summary>
@@ -341,8 +320,7 @@
           {% endwith %}
         </div>
       </section>
-      {% include "components/ui/modals/attach_signed_modal.html" only %}
-      {% include "components/ui/modals/delete_confirm_modal.html" with delete_modal_title="Remover documento assinado?" only %}
+      {% include "components/ui/modals/attach_signed_modal.html" %}
     {% endif %}
   </div>
 {% endblock %}

@@ -2,6 +2,7 @@ from django.db import models
 from django.db.models import Q
 from django.utils import timezone
 
+from core.tenancy import get_current_area
 from cadastros.models import CancelavelModel
 from cadastros.models import Combustivel
 from cadastros.models import Servidor
@@ -35,6 +36,14 @@ class Oficio(TimeStampedModel, CancelavelModel):
         (CUSTEIO_ONUS_LIMITADO, "Ônus limitado"),
     ]
 
+    area = models.ForeignKey(
+        "usuarios.AreaTrabalho",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="oficios",
+        verbose_name="Area de trabalho",
+    )
     numero = models.PositiveIntegerField(null=True, blank=True, db_index=True)
     ano = models.PositiveIntegerField(null=True, blank=True, db_index=True)
     data_criacao = models.DateField(default=timezone.localdate, db_index=True)
@@ -158,9 +167,9 @@ class Oficio(TimeStampedModel, CancelavelModel):
         verbose_name_plural = "Ofícios"
         constraints = [
             models.UniqueConstraint(
-                fields=["ano", "numero"],
+                fields=["area", "ano", "numero"],
                 condition=Q(ano__isnull=False, numero__isnull=False),
-                name="oficios_oficio_ano_numero_unique",
+                name="oficios_oficio_area_ano_numero_unique",
             )
         ]
 
@@ -185,14 +194,22 @@ class Oficio(TimeStampedModel, CancelavelModel):
 
         resolved_year = ano or timezone.localdate().year
         piso = max(getattr(settings, "OFICIO_NUMERO_INICIAL", {}).get(resolved_year, 0), 1)
+        area = get_current_area()
+        qs = cls.objects.filter(ano=resolved_year)
+        lacunas_qs = OficioNumeroLacuna.objects.filter(ano=resolved_year, numero__gte=piso)
+        if area is not None:
+            qs = qs.filter(area=area)
+            lacunas_qs = lacunas_qs.filter(area=area)
+        else:
+            qs = qs.filter(area__isnull=True)
+            lacunas_qs = lacunas_qs.filter(area__isnull=True)
         numeros_usados = set(
-            cls.objects.filter(ano=resolved_year)
+            qs
             .exclude(numero__isnull=True)
             .values_list("numero", flat=True)
         )
         lacuna = (
-            OficioNumeroLacuna.objects.filter(ano=resolved_year, numero__gte=piso)
-            .exclude(numero__in=numeros_usados)
+            lacunas_qs.exclude(numero__in=numeros_usados)
             .order_by("numero")
             .first()
         )
@@ -202,13 +219,15 @@ class Oficio(TimeStampedModel, CancelavelModel):
         return max(maior_usado + 1, piso)
 
     def save(self, *args, **kwargs):
+        if self.area_id is None and self.evento_id and self.evento and self.evento.area_id:
+            self.area = self.evento.area
         self.protocolo = normalize_protocolo(self.protocolo)
         self.assunto = normalize_spaces(self.assunto)
         self.motivo = normalize_spaces(self.motivo)
         self.custeio_observacao = normalize_spaces(self.custeio_observacao)
         super().save(*args, **kwargs)
         if self.numero and self.ano:
-            OficioNumeroLacuna.objects.filter(ano=self.ano, numero=self.numero).delete()
+            OficioNumeroLacuna.objects.filter(area=self.area, ano=self.ano, numero=self.numero).delete()
 
     def diarias_para_servidores(self):
         """Diárias deste ofício = valor por servidor (persistido no roteiro) × nº de servidores.
@@ -257,6 +276,14 @@ class OficioNumeroLacuna(models.Model):
     só a exclusão de um ofício já numerado registra a lacuna, via ``excluir_oficio``.
     """
 
+    area = models.ForeignKey(
+        "usuarios.AreaTrabalho",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="oficio_lacunas",
+        verbose_name="Area de trabalho",
+    )
     ano = models.PositiveIntegerField(db_index=True)
     numero = models.PositiveIntegerField()
     liberado_em = models.DateTimeField(auto_now_add=True)
@@ -266,7 +293,7 @@ class OficioNumeroLacuna(models.Model):
         verbose_name = "Número de ofício liberado"
         verbose_name_plural = "Números de ofício liberados"
         constraints = [
-            models.UniqueConstraint(fields=["ano", "numero"], name="oficios_lacuna_ano_numero_unique"),
+            models.UniqueConstraint(fields=["area", "ano", "numero"], name="oficios_lacuna_area_ano_numero_unique"),
         ]
 
     def __str__(self):

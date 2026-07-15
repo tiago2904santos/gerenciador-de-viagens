@@ -109,11 +109,16 @@ def _safe_next_url(request, fallback_url):
 
 
 def _artefato_fallback_url(artefato: DocumentoArtefato) -> str:
-    """Para onde voltar quando não há ``next``: a tela "dona" do documento."""
-    if artefato.oficio_id:
-        return reverse("oficios:wizard_documentos", args=[artefato.oficio_id])
+    """Para onde voltar quando não há ``next``: a tela "dona" do documento.
+
+    ``termo_id`` primeiro: um termo avulso pode ter ``oficio_id`` preenchido
+    (vinculado só para fins de nome no Drive), mas a tela relevante pra quem
+    anexou/removeu o assinado é a do cadastro do termo, não o wizard do ofício.
+    """
     if artefato.termo_id:
         return reverse("termos:editar", args=[artefato.termo_id])
+    if artefato.oficio_id:
+        return reverse("oficios:wizard_documentos", args=[artefato.oficio_id])
     return reverse("documentos:index")
 
 

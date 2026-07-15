@@ -5,6 +5,7 @@ from django.utils import timezone
 
 from core.normalizers import normalize_plate
 from core.normalizers import normalize_spaces
+from core.tenancy import get_current_area
 from core.utils.masks import format_placa
 from core.utils.masks import normalize_protocolo
 
@@ -312,7 +313,12 @@ class OficioDadosViajantesForm(OficioForm):
         if numero < 1:
             raise forms.ValidationError("Informe um número de ofício válido (maior que zero).")
         ano = self.instance.ano or timezone.localdate().year
+        area = self.instance.area if self.instance and self.instance.area_id else get_current_area()
         conflito = Oficio.objects.filter(ano=ano, numero=numero)
+        if area is not None:
+            conflito = conflito.filter(area=area)
+        else:
+            conflito = conflito.filter(area__isnull=True)
         if self.instance.pk:
             conflito = conflito.exclude(pk=self.instance.pk)
         if conflito.exists():

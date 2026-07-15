@@ -18,6 +18,7 @@ from django.views.decorators.http import require_POST
 from cadastros.models import ConfiguracaoSistema
 from cadastros.models import Estado
 from core.normalizers import remove_accents
+from core.tenancy import filter_queryset_by_area
 from roteiros.selectors import listar_cidades_para_select
 
 from oficios.presenters import apresentar_oficio_card
@@ -171,7 +172,7 @@ def index(request):
     viagem_ate = request.GET.get("viagem_ate", "").strip()
     sort = request.GET.get("sort", "").strip()
 
-    eventos = Evento.objects.select_related("unidade_responsavel", "responsavel").prefetch_related(
+    eventos = filter_queryset_by_area(Evento.objects).select_related("unidade_responsavel", "responsavel").prefetch_related(
         "anexos",
         "oficios",
         "oficios__servidores",
@@ -266,7 +267,7 @@ def index(request):
     )
 
 def _evento_queryset():
-    return Evento.objects.select_related("unidade_responsavel", "responsavel").prefetch_related(
+    return filter_queryset_by_area(Evento.objects).select_related("unidade_responsavel", "responsavel").prefetch_related(
         "oficios",
         "oficios__servidores",
         "oficios__servidores_termo_autorizacao",
@@ -346,6 +347,8 @@ def _roteiro_rows_do_evento(evento):
 
 
 def _apresentar_termos_rows(termos_qs):
+    from termos.services import termo_cadastro_assinado_info
+
     return [
         apresentar_linha_lista_simples_termo(
             termo,
@@ -354,6 +357,7 @@ def _apresentar_termos_rows(termos_qs):
             delete_modal=True,
             pdf_url=reverse("termos:baixar_termo_cadastro_pdf", args=[termo.pk]),
             docx_url=reverse("termos:baixar_termo_cadastro_docx", args=[termo.pk]),
+            **termo_cadastro_assinado_info(termo, None),
         )
         for termo in termos_qs
     ]
@@ -376,6 +380,7 @@ def _termos_servidor_rows_do_evento(evento):
     """Termos individuais por servidor: um card por servidor efetivo de cada termo do evento."""
     from termos.models import TermoAutorizacao
     from termos.presenters import apresentar_linha_lista_simples_termo_servidor
+    from termos.services import termo_cadastro_assinado_info
 
     termos = (
         TermoAutorizacao.objects.filter(Q(evento=evento) | Q(oficio__evento=evento))
@@ -398,6 +403,7 @@ def _termos_servidor_rows_do_evento(evento):
                     oficio=oficio_origem,
                     edit_url=reverse("termos:editar", args=[termo.pk]),
                     pdf_url=reverse("termos:termo_cadastro_servidor_pdf_inline", args=[termo.pk, servidor.pk]),
+                    **termo_cadastro_assinado_info(termo, servidor.pk),
                 )
             )
     return rows
@@ -423,7 +429,7 @@ def _garantir_termo_automatico(evento):
 
 @require_http_methods(["GET"])
 def novo(request):
-    evento = Evento()
+    evento = Evento(area=getattr(request, "area", None))
     evento.save()
     return redirect("eventos:guiado_etapa", pk=evento.pk, etapa=1)
 
@@ -451,6 +457,8 @@ def detalhe(request, pk, etapa=1):
         form = EventoNovoCadastroForm(request.POST, instance=evento)
         if form.is_valid():
             evento = form.save(commit=False)
+            if evento.area_id is None:
+                evento.area = getattr(request, "area", None)
             nomes = [tipo.nome for tipo in form.cleaned_data.get("tipos") or []]
             evento.titulo = " / ".join(nomes) if nomes else "Novo Evento"
             _save_destinos_extras(evento, request)
@@ -544,7 +552,7 @@ def detalhe(request, pk, etapa=1):
 
 @require_POST
 def excluir_solicitacao_anexo(request, pk, anexo_pk):
-    evento = get_object_or_404(Evento, pk=pk)
+    evento = get_object_or_404(_evento_queryset(), pk=pk)
     try:
         anexo = EventoDocumentoSolicitacao.objects.get(pk=anexo_pk, evento=evento)
         anexo.arquivo.delete(save=False)
@@ -561,7 +569,7 @@ def guiado_termos(request, pk):
 
 @require_http_methods(["POST"])
 def excluir(request, pk):
-    evento = get_object_or_404(Evento, pk=pk)
+    evento = get_object_or_404(_evento_queryset(), pk=pk)
     titulo = evento.titulo or f"Evento #{pk}"
     excluir_evento(evento)
     messages.success(request, f'Evento "{titulo}" excluído.')
@@ -570,7 +578,7 @@ def excluir(request, pk):
 
 @require_POST
 def cancelar(request, pk):
-    evento = get_object_or_404(Evento, pk=pk)
+    evento = get_object_or_404(_evento_queryset(), pk=pk)
 
     if evento.status == Evento.STATUS_CANCELADO:
         messages.error(request, "Este evento já está cancelado.")
@@ -588,7 +596,7 @@ def cancelar(request, pk):
 
 @require_POST
 def reativar(request, pk):
-    evento = get_object_or_404(Evento, pk=pk)
+    evento = get_object_or_404(_evento_queryset(), pk=pk)
 
     if evento.status != Evento.STATUS_CANCELADO:
         messages.error(request, "Este evento não está cancelado.")

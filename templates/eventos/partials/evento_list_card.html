@@ -78,17 +78,54 @@
               {% endif %}
             </div>
             {% if s.has_termo %}
-            <div class="oficio-lc__traveller-termo cv-icon-btn-group">
-              {% if s.termo_open_url %}
-              <a class="cv-icon-btn cv-icon-btn--preview" href="{{ s.termo_open_url }}" target="_blank" rel="noopener noreferrer" aria-label="Visualizar termo de autorização de {{ s.name }}" data-tooltip="Visualizar termo">
-                {% include "dev/ui_lab/partials/_cv_icon.html" with icon="eye" only %}
-              </a>
-              {% endif %}
-              {% if s.termo_pdf_url %}
-              <a class="cv-icon-btn cv-icon-btn--pdf" href="{{ s.termo_pdf_url }}" aria-label="Baixar termo de autorização em PDF de {{ s.name }}" data-tooltip="PDF" download>
-                {% include "dev/ui_lab/partials/_cv_icon.html" with icon="pdf" only %}
-              </a>
-              {% endif %}
+            <div class="oficio-lc__traveller-termo">
+              <button
+                type="button"
+                class="cv-icon-btn cv-icon-btn--edit{% if s.termo_assinado %} is-assinado{% endif %}"
+                aria-label="Ações do termo de {{ s.name }}"
+                aria-haspopup="true"
+                aria-expanded="false"
+                data-tooltip="{% if s.termo_assinado %}Termo assinado — ações{% else %}Ações do termo{% endif %}"
+                data-action-menu-trigger
+                data-action-menu-target="evento-termo-action-menu-{{ oficio.oficio_pk }}-{{ s.servidor_pk }}"
+              >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="more" only %}</button>
+              <div class="cv-action-menu" id="evento-termo-action-menu-{{ oficio.oficio_pk }}-{{ s.servidor_pk }}" role="menu" hidden>
+                {% if s.termo_open_url %}
+                <a class="cv-action-menu__item cv-action-menu__item--preview" href="{{ s.termo_open_url }}" target="_blank" rel="noopener noreferrer" role="menuitem">
+                  {% include "dev/ui_lab/partials/_cv_icon.html" with icon="eye" only %}
+                  <span>Visualizar termo</span>
+                </a>
+                {% endif %}
+                {% if s.termo_pdf_url %}
+                <a class="cv-action-menu__item cv-action-menu__item--pdf" href="{{ s.termo_pdf_url }}" download role="menuitem">
+                  {% include "dev/ui_lab/partials/_cv_icon.html" with icon="pdf" only %}
+                  <span>Baixar PDF</span>
+                </a>
+                {% endif %}
+                {% if s.termo_docx_url %}
+                <a class="cv-action-menu__item cv-action-menu__item--docx" href="{{ s.termo_docx_url }}" download role="menuitem">
+                  {% include "dev/ui_lab/partials/_cv_icon.html" with icon="docx" only %}
+                  <span>Baixar DOCX</span>
+                </a>
+                {% endif %}
+                {% if s.termo_anexar_assinado_url %}
+                <hr class="cv-action-menu__divider">
+                <button
+                  type="button"
+                  class="cv-action-menu__item cv-action-menu__item--sign{% if s.termo_assinado %} is-assinado{% endif %}"
+                  role="menuitem"
+                  data-attach-signed-trigger
+                  data-attach-signed-url="{{ s.termo_anexar_assinado_url }}"
+                  data-attach-signed-doc-label="o termo de {{ s.name }}"
+                  data-attach-signed-current-name="{{ s.termo_assinado_nome_original }}"
+                  data-attach-signed-current-view-url="{{ s.termo_assinado_view_url }}"
+                  data-attach-signed-current-remove-url="{{ s.termo_remover_assinado_url }}"
+                >
+                  {% include "dev/ui_lab/partials/_cv_icon.html" with icon="sign" only %}
+                  <span>{% if s.termo_assinado %}Gerenciar assinado{% else %}Anexar termo assinado{% endif %}</span>
+                </button>
+                {% endif %}
+              </div>
             </div>
             {% endif %}
           </div>
@@ -101,7 +138,6 @@
     <div class="oficio-lc__footer">
       <div class="oficio-lc__footer-actions">
         <div class="oficio-lc__footer-actions-main cv-icon-btn-group">
-          {% include "components/ui/buttons/icon_button.html" with href=card.detail_url action="preview" aria_label="Abrir detalhe do evento" tooltip="Abrir detalhe" only %}
           {% include "components/ui/buttons/icon_button.html" with href=card.editar_url action="edit" aria_label="Editar evento" tooltip="Editar evento" only %}
         </div>
         <div class="oficio-lc__footer-actions-danger cv-icon-btn-group">

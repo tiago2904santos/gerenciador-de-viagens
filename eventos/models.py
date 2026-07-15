@@ -32,6 +32,14 @@ class Evento(models.Model):
         (STATUS_CANCELADO, "Cancelado"),
     ]
 
+    area = models.ForeignKey(
+        "usuarios.AreaTrabalho",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="eventos",
+        verbose_name="Area de trabalho",
+    )
     titulo = models.CharField("Titulo", max_length=255, blank=True, default="")
     descricao = models.TextField("Descricao/objetivo", blank=True, default="")
     destino_uf = models.CharField("UF do destino", max_length=2, blank=True, default="")
@@ -76,6 +84,9 @@ class Evento(models.Model):
         ordering = ["-data_inicio", "-criado_em"]
         verbose_name = "Evento"
         verbose_name_plural = "Eventos"
+        indexes = [
+            models.Index(fields=["area", "-criado_em"], name="eventos_evento_area_criado_idx"),
+        ]
 
     def __str__(self) -> str:
         return self.titulo or f"Evento #{self.pk or 'novo'}"

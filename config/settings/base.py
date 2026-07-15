@@ -57,6 +57,7 @@ _MIDDLEWARE_CORE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "core.middleware.CurrentAreaMiddleware",
 ]
 _MIDDLEWARE_TAIL = [
     "django.contrib.messages.middleware.MessageMiddleware",

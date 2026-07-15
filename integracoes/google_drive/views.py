@@ -23,10 +23,21 @@ from integracoes.google_drive.services import (
     client_config_dict,
     escopo_faltante,
     esta_autorizado,
+    get_credenciais,
     get_client,
     get_pasta_raiz_id,
     is_mock,
 )
+
+
+def _area_atual(request):
+    return getattr(request, "area", None)
+
+
+def _credenciais_queryset(area):
+    if area is None:
+        return DriveCredenciais.objects.filter(area__isnull=True)
+    return DriveCredenciais.objects.filter(area=area)
 
 
 @login_required
@@ -36,10 +47,11 @@ def index(request):
     from integracoes.google_drive import status
 
     cfg = getattr(settings, "GOOGLE_DRIVE", {})
-    creds = DriveCredenciais.objects.first()
-    pasta_raiz_id = get_pasta_raiz_id()
+    area = _area_atual(request)
+    creds = get_credenciais(area)
+    pasta_raiz_id = get_pasta_raiz_id(area)
     modo = cfg.get("MODO", "mock").lower()
-    autorizado = esta_autorizado()
+    autorizado = esta_autorizado(area)
 
     return render(
         request,
@@ -49,7 +61,7 @@ def index(request):
             "page_description": "Configuração da integração com o Google Drive.",
             "modo": modo,
             "autorizado": autorizado,
-            "escopo_faltante": escopo_faltante(),
+            "escopo_faltante": escopo_faltante(area),
             "creds": creds,
             "pasta_raiz_id": pasta_raiz_id,
             "pasta_raiz_nome": creds.pasta_raiz_nome if creds else "",
@@ -98,6 +110,8 @@ def oauth_iniciar(request):
     )
     request.session["gdrive_oauth_state"] = state
     request.session["gdrive_code_verifier"] = getattr(flow, "code_verifier", None)
+    area = _area_atual(request)
+    request.session["gdrive_oauth_area_id"] = area.pk if area else None
     return redirect(auth_url)
 
 
@@ -111,7 +125,7 @@ def oauth_callback(request):
 
     if "error" in request.GET:
         messages.error(request, f"Autorização recusada: {request.GET['error']}")
-        return redirect("cadastros:configuracao")
+        return redirect("google_drive:index")
 
     try:
         flow = Flow.from_client_config(
@@ -126,12 +140,14 @@ def oauth_callback(request):
         flow.fetch_token(authorization_response=request.build_absolute_uri())
         creds = flow.credentials
 
-        DriveCredenciais.objects.all().delete()
+        area = _area_atual(request)
+        _credenciais_queryset(area).delete()
         expiry = creds.expiry
         if expiry and expiry.tzinfo is None:
             expiry = expiry.replace(tzinfo=dt_tz.utc)
 
         DriveCredenciais.objects.create(
+            area=area,
             access_token=creds.token,
             refresh_token=creds.refresh_token or "",
             token_expiry=expiry,
@@ -148,7 +164,7 @@ def oauth_callback(request):
 @login_required
 @require_POST
 def oauth_revogar(request):
-    DriveCredenciais.objects.all().delete()
+    _credenciais_queryset(_area_atual(request)).delete()
     _reset_client()
     messages.success(request, "Conta Google desconectada.")
     return redirect("cadastros:configuracao")
@@ -162,7 +178,7 @@ def oauth_revogar(request):
 def api_listar_pastas(request):
     pai_id = request.GET.get("pai_id") or None
     try:
-        client = get_client()
+        client = get_client(_area_atual(request))
         pastas = client.listar_pastas(pai_id=pai_id)
         return JsonResponse({"pastas": pastas})
     except Exception as exc:
@@ -172,7 +188,7 @@ def api_listar_pastas(request):
 @login_required
 def api_listar_drives_compartilhados(request):
     try:
-        client = get_client()
+        client = get_client(_area_atual(request))
         drives = client.listar_drives_compartilhados()
         return JsonResponse({"pastas": drives})
     except Exception as exc:
@@ -182,7 +198,7 @@ def api_listar_drives_compartilhados(request):
 @login_required
 def api_listar_compartilhados_comigo(request):
     try:
-        client = get_client()
+        client = get_client(_area_atual(request))
         pastas = client.listar_compartilhados_comigo()
         return JsonResponse({"pastas": pastas})
     except Exception as exc:
@@ -203,7 +219,7 @@ def api_criar_pasta(request):
         return JsonResponse({"erro": "Nome é obrigatório"}, status=400)
 
     try:
-        client = get_client()
+        client = get_client(_area_atual(request))
         pasta = client.criar_pasta(nome, pai_id=pai_id)
         return JsonResponse({"pasta": pasta})
     except Exception as exc:
@@ -218,16 +234,17 @@ def salvar_pasta_raiz(request):
 
     if not pasta_id:
         messages.error(request, "Nenhuma pasta selecionada.")
-        return redirect("cadastros:configuracao")
+        return redirect("google_drive:index")
 
-    creds = DriveCredenciais.objects.first()
+    area = _area_atual(request)
+    creds = get_credenciais(area)
     if not creds:
         messages.error(request, "Conta Google não conectada.")
         return redirect("cadastros:configuracao")
 
     if not pasta_nome:
         try:
-            pasta_nome = get_client().nome_pasta(pasta_id)
+            pasta_nome = get_client(area).nome_pasta(pasta_id)
         except Exception:
             pasta_nome = pasta_id
 
@@ -236,17 +253,17 @@ def salvar_pasta_raiz(request):
     creds.save(update_fields=["pasta_raiz_id", "pasta_raiz_nome", "atualizado_em"])
     _reset_client()
     messages.success(request, f"Pasta \"{pasta_nome}\" definida como diretório de destino.")
-    return redirect("cadastros:configuracao")
+    return redirect("google_drive:index")
 
 
 # ---------------------------------------------------------------------------
 # Organização em massa
 # ---------------------------------------------------------------------------
 
-def _pode_reorganizar() -> bool:
+def _pode_reorganizar(area=None) -> bool:
     cfg = getattr(settings, "GOOGLE_DRIVE", {})
     modo = cfg.get("MODO", "mock").lower()
-    return bool(get_pasta_raiz_id()) and (esta_autorizado() or modo == "mock")
+    return bool(get_pasta_raiz_id(area)) and (esta_autorizado(area) or modo == "mock")
 
 
 def _executar_reorganizacao(job_id: int) -> None:
@@ -285,16 +302,16 @@ def _executar_reorganizacao(job_id: int) -> None:
 @login_required
 @require_POST
 def reorganizar_tudo(request):
-    if not _pode_reorganizar():
+    if not _pode_reorganizar(_area_atual(request)):
         messages.error(
             request,
             "Conecte a conta Google e defina a pasta de destino antes de reorganizar.",
         )
-        return redirect("cadastros:configuracao")
+        return redirect("google_drive:index")
 
     if DriveReorganizacaoJob.objects.filter(status=DriveReorganizacaoJob.STATUS_EM_ANDAMENTO).exists():
         messages.info(request, "Já existe uma reorganização em andamento. Aguarde concluir.")
-        return redirect("cadastros:configuracao")
+        return redirect("google_drive:index")
 
     job = DriveReorganizacaoJob.objects.create(status=DriveReorganizacaoJob.STATUS_EM_ANDAMENTO)
 
@@ -310,7 +327,7 @@ def reorganizar_tudo(request):
         "Reorganização iniciada em segundo plano. O andamento aparece neste card — "
         "pode sair desta página; a tarefa continua rodando.",
     )
-    return redirect("cadastros:configuracao")
+    return redirect("google_drive:index")
 
 
 def _job_para_json(job: DriveReorganizacaoJob | None) -> dict:
