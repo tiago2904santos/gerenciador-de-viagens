@@ -23,6 +23,11 @@
                   <span>Ofício: {{ oficio.numero }}</span>
                   {% if oficio.protocolo %}<span>Protocolo: {{ oficio.protocolo }}</span>{% endif %}
                 </div>
+                {% if oficio.data_evento_display or oficio.destino_display %}
+                  <div class="oficio-lc__trecho-times">
+                    {% if oficio.data_evento_display %}{{ oficio.data_evento_display }}{% endif %}{% if oficio.data_evento_display and oficio.destino_display %} · {% endif %}{% if oficio.destino_display %}{{ oficio.destino_display }}{% endif %}
+                  </div>
+                {% endif %}
               </div>
               <div class="oficio-lc__trecho-actions cv-icon-btn-group">
                 <a class="cv-icon-btn cv-icon-btn--pdf" href="{{ oficio.pdf_url }}" aria-label="Baixar ofício em PDF{% if oficio.justificativa_pdf_url %} (baixa também a justificativa){% endif %}" data-tooltip="PDF" download{% if oficio.justificativa_pdf_url %} data-extra-download-url="{{ oficio.justificativa_pdf_url }}"{% endif %}>{% include "dev/ui_lab/partials/_cv_icon.html" with icon="pdf" only %}</a>

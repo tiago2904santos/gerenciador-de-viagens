@@ -88,7 +88,7 @@
 .evento-lc .oficio-lc__trechos-list {
   flex: 0 0 auto;
   height: auto;
-  max-height: 320px;
+  max-height: 264px;
   overflow-x: visible;
   overflow-y: auto;
   scrollbar-color: var(--color-border-strong) transparent;

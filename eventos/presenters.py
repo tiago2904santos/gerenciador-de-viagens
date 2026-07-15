@@ -40,6 +40,8 @@ def _oficio_item(oficio):
     return {
         "numero": card["numero_display"],
         "protocolo": card.get("protocolo_display") or "",
+        "data_evento_display": card.get("data_evento_display") or "",
+        "destino_display": card.get("destino_display") or "",
         "status_label": card["status_chip_label"].replace(" (legado)", ""),
         "status_state": card["status_chip_tone"],
         "data": card["data_criacao_display"],
