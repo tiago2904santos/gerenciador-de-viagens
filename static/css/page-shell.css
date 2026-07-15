@@ -2388,7 +2388,7 @@ body.has-delete-modal-open {
 }
 
 .quick-add-panel.is-open {
-  max-height: 520px;
+  max-height: 580px;
   opacity:    1;
   transform:  translateY(0);
 }

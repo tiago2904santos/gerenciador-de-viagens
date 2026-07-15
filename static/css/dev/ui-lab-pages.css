@@ -640,7 +640,7 @@ html[data-theme="dark"] .ui-lab-structure-quick-add .quick-add-footer-button[ari
 }
 
 .quick-add-panel.is-open {
-  max-height: 520px;
+  max-height: 580px;
   opacity: 1;
   transform: translateY(0);
 }
