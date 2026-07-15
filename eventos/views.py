@@ -372,17 +372,34 @@ def _termo_generico_rows_do_evento(evento):
     return _apresentar_termos_rows(termos)
 
 
-def _termos_oficio_rows_do_evento(evento):
-    """Termos gerados a partir de ofícios vinculados ao evento."""
+def _termos_servidor_rows_do_evento(evento):
+    """Termos individuais por servidor: um card por servidor efetivo de cada termo do evento."""
     from termos.models import TermoAutorizacao
+    from termos.presenters import apresentar_linha_lista_simples_termo_servidor
 
     termos = (
-        TermoAutorizacao.objects.filter(oficio__evento=evento)
+        TermoAutorizacao.objects.filter(Q(evento=evento) | Q(oficio__evento=evento))
         .select_related("destino_cidade__estado", "destino_estado", "viatura", "oficio")
         .prefetch_related("servidores")
         .order_by("-created_at")
     )
-    return _apresentar_termos_rows(termos)
+    rows = []
+    vistos = set()
+    for termo in termos:
+        for servidor in termo.servidores_efetivos():
+            chave = (termo.pk, servidor.pk)
+            if chave in vistos:
+                continue
+            vistos.add(chave)
+            rows.append(
+                apresentar_linha_lista_simples_termo_servidor(
+                    termo,
+                    servidor,
+                    edit_url=reverse("termos:editar", args=[termo.pk]),
+                    pdf_url=reverse("termos:termo_cadastro_servidor_pdf_inline", args=[termo.pk, servidor.pk]),
+                )
+            )
+    return rows
 
 
 def _garantir_termo_automatico(evento):
@@ -511,7 +528,7 @@ def detalhe(request, pk, etapa=1):
             "plano_cards": [apresentar_plano_card(plano) for plano in evento.planos_trabalho.all()],
             "ordem_cards": [apresentar_ordem_servico_card(ordem) for ordem in evento.ordens_servico.all()],
             "termo_generico_rows": _termo_generico_rows_do_evento(evento),
-            "termos_oficio_rows": _termos_oficio_rows_do_evento(evento),
+            "termos_servidor_rows": _termos_servidor_rows_do_evento(evento),
             "sede_uf": config.uf if config else "",
             "modelos_motivo_url": _reverse("oficios:modelos_motivo_index"),
             "tipos_evento_url": f"{_reverse('eventos:tipos_index')}?{urlencode({'next': request.path})}",

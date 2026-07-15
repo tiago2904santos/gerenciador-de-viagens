@@ -612,8 +612,8 @@
           <h4 class="wizard-inner-section__title">Termo do evento</h4>
           {% include "components/lists/simple_list.html" with rows=termo_generico_rows empty_message="Nenhum termo vinculado." empty_action_label="Novo termo" empty_action_url=create_urls.termo hide_realtime_count=True only %}
 
-          <h4 class="wizard-inner-section__title">Termos dos ofícios</h4>
-          {% include "components/lists/simple_list.html" with rows=termos_oficio_rows empty_message="Nenhum termo gerado a partir de ofícios deste evento." hide_realtime_count=True only %}
+          <h4 class="wizard-inner-section__title">Termos por servidor</h4>
+          {% include "components/lists/simple_list.html" with rows=termos_servidor_rows empty_message="Nenhum servidor vinculado a termos deste evento." hide_realtime_count=True only %}
 
           <div class="cv-fab-container">
             {% include "components/ui/buttons/button.html" with href=create_urls.termo label="Novo termo" variant="primary" icon="plus" extra_class="cv-fab" only %}
