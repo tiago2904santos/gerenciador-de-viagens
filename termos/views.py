@@ -422,8 +422,9 @@ def _form_context(*, request, form, termo=None, evento=None):
         )
     )
     summaries = {}
-    for oficio in oficios:
+    for index, oficio in enumerate(oficios):
         summary = _oficio_summary(oficio)
+        summary["order"] = index
         summaries[str(summary["id"])] = summary
     return {
         "page_title": "Cadastro de termo",
