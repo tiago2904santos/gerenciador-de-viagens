@@ -105,7 +105,7 @@ class SignalRetryTests(TestCase):
         mensagens = [str(m) for m in storage]
         self.assertTrue(any("Não foi possível enviar" in m for m in mensagens))
 
-        delay_mock.assert_called_once_with(art.pk)
+        delay_mock.assert_called_once_with(art.pk, usuario_id=None)
 
     def test_sucesso_nao_cria_pendencia_nem_mensagem(self):
         arquivo, digest = _pdf("doc.pdf")
@@ -172,7 +172,7 @@ class PainelPendenciasViewTests(TestCase):
             tipo="oficio", formato="pdf", oficio=self.oficio,
             hash_sha256=digest, arquivo=arquivo,
         )
-        status.registrar_falha(self.art, RuntimeError("Drive fora do ar"))
+        status.registrar_falha(self.art, RuntimeError("Drive fora do ar"), usuario=self.user)
 
     def test_card_de_pendencias_aparece_na_tela(self):
         resp = self.client.get(reverse("google_drive:index"))
@@ -186,4 +186,4 @@ class PainelPendenciasViewTests(TestCase):
             resp = self.client.post(reverse("google_drive:reprocessar_pendencias"))
         self.assertRedirects(resp, reverse("cadastros:configuracao"))
         # object_id fica salvo como string em DriveSyncStatus (pk pode ser UUID ou int).
-        delay_mock.assert_called_once_with(str(self.art.pk))
+        delay_mock.assert_called_once_with(str(self.art.pk), usuario_id=self.user.pk)

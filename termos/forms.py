@@ -9,6 +9,7 @@ from cadastros.models import Estado
 from cadastros.models import Servidor
 from cadastros.models import Viatura
 from cadastros.services import resolver_sede_ids_desde_configuracao
+from core.tenancy import filter_queryset_by_area
 from oficios.models import Oficio
 
 from .models import TermoAutorizacao
@@ -114,7 +115,11 @@ class TermoAutorizacaoForm(forms.ModelForm):
 
         self.fields["oficio"].required = False
         self.fields["oficio"].empty_label = ""
-        self.fields["oficio"].queryset = Oficio.objects.select_related("roteiro", "viatura").order_by("-data_criacao", "-created_at")
+        self.fields["oficio"].queryset = (
+            filter_queryset_by_area(Oficio.objects)
+            .select_related("roteiro", "viatura")
+            .order_by("-data_criacao", "-created_at")
+        )
 
         self.fields["destino_estado"].required = False
         self.fields["destino_estado"].empty_label = ""
@@ -142,11 +147,14 @@ class TermoAutorizacaoForm(forms.ModelForm):
         self.fields["data_evento_inicio"].required = False
         self.fields["data_evento_fim"].required = False
         self.fields["servidores"].required = False
-        self.fields["servidores"].queryset = Servidor.objects.select_related("cargo", "unidade").order_by("nome")
+        self.fields["servidores"].queryset = (
+            filter_queryset_by_area(Servidor.objects).select_related("cargo", "unidade").order_by("nome")
+        )
         self.fields["viatura"].required = False
         self.fields["viatura"].empty_label = ""
         self.fields["viatura"].queryset = (
-            Viatura.objects.select_related("combustivel", "unidade")
+            filter_queryset_by_area(Viatura.objects)
+            .select_related("combustivel", "unidade")
             .prefetch_related("motoristas")
             .order_by("placa")
         )
@@ -182,7 +190,13 @@ class TermoAutorizacaoForm(forms.ModelForm):
     def _build_destination_rows(self, estado_id, cidade_id):
         rows = []
         if self.is_bound:
-            rows.append(self._destination_row_from_values(0, self.data.get("destino_estado"), self.data.get("destino_cidade")))
+            rows.append(
+                self._destination_row_from_values(
+                    0,
+                    self.data.get("destino_estado"),
+                    self.data.get("destino_cidade"),
+                )
+            )
             for idx in self._extra_destination_indexes():
                 rows.append(
                     self._destination_row_from_values(
@@ -192,7 +206,13 @@ class TermoAutorizacaoForm(forms.ModelForm):
                     )
                 )
         elif self.instance and self.instance.pk:
-            rows.append(self._destination_row_from_values(0, self.instance.destino_estado_id, self.instance.destino_cidade_id))
+            rows.append(
+                self._destination_row_from_values(
+                    0,
+                    self.instance.destino_estado_id,
+                    self.instance.destino_cidade_id,
+                )
+            )
             for idx, destino in enumerate(self.instance.destinos_extras or [], 1):
                 if not isinstance(destino, dict):
                     continue

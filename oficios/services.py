@@ -378,9 +378,9 @@ def criar_oficio_rascunho(evento=None):
     return oficio
 
 
-def get_next_available_numero_oficio(ano):
+def get_next_available_numero_oficio(ano, area=None):
     # Fonte única da lógica de numeração (inclui o piso por ano via settings).
-    return Oficio.get_next_available_numero(ano)
+    return Oficio.get_next_available_numero(ano, area=area)
 
 
 @transaction.atomic
@@ -396,7 +396,7 @@ def reservar_numero_oficio(oficio, ano=None):
         qs = qs.filter(area__isnull=True)
     list(qs)
     oficio.ano = resolved_year
-    oficio.numero = get_next_available_numero_oficio(resolved_year)
+    oficio.numero = get_next_available_numero_oficio(resolved_year, area=oficio.area)
     oficio.save()
     return oficio
 
@@ -788,8 +788,12 @@ def build_oficio_document_payload(oficio):
 @transaction.atomic
 def criar_modelo_motivo(form):
     modelo = form.save(commit=False)
+    if not modelo.area_id:
+        from core.tenancy import get_current_area
+
+        modelo.area = get_current_area()
     if modelo.is_padrao:
-        ModeloMotivoOficio.objects.exclude(pk=modelo.pk).update(is_padrao=False)
+        ModeloMotivoOficio.objects.exclude(pk=modelo.pk).filter(area=modelo.area).update(is_padrao=False)
     modelo.save()
     return modelo
 
@@ -798,8 +802,12 @@ def criar_modelo_motivo(form):
 def atualizar_modelo_motivo(instance, form):
     _ = instance
     modelo = form.save(commit=False)
+    if not modelo.area_id:
+        from core.tenancy import get_current_area
+
+        modelo.area = get_current_area()
     if modelo.is_padrao:
-        ModeloMotivoOficio.objects.exclude(pk=modelo.pk).update(is_padrao=False)
+        ModeloMotivoOficio.objects.exclude(pk=modelo.pk).filter(area=modelo.area).update(is_padrao=False)
     modelo.save()
     return modelo
 

@@ -1,14 +1,16 @@
-# Multi-login, dados separados e Google Drive por area
+# Multi-login, dados separados por area e Google Drive por usuario
 
 ## Objetivo
 
 Permitir que o sistema tenha varios logins usando a mesma aplicacao, mas com dados
 separados por area/setor. Exemplo:
 
-- ASCOM: dois usuarios acessam os mesmos eventos, oficios, documentos, cadastros,
-  configuracoes e a mesma conta/pasta do Google Drive da ASCOM.
+- ASCOM: dois usuarios acessam os mesmos eventos, oficios, documentos, cadastros
+  e configuracoes da ASCOM.
 - DPCAP: outros usuarios acessam outro conjunto de eventos, oficios, documentos,
-  cadastros, configuracoes e outra conta/pasta do Google Drive.
+  cadastros e configuracoes.
+- Google Drive: cada usuario institucional conecta a propria conta Google, por
+  exemplo `adm.tsantos@pc.pr.gov.br`.
 
 O conceito central deve ser uma entidade de area, tambem chamada de tenant.
 
@@ -17,8 +19,8 @@ O conceito central deve ser uma entidade de area, tambem chamada de tenant.
 Hoje a base ainda esta desenhada como instalacao unica:
 
 - `cadastros.ConfiguracaoSistema` e singleton via `get_singleton()` com `pk=1`.
-- `integracoes.google_drive.DriveCredenciais` usa `objects.first()` e funciona
-  como singleton.
+- `integracoes.google_drive.DriveCredenciais` precisa ser resolvido por usuario,
+  nao por unidade.
 - Listagens como eventos, oficios, roteiros, servidores e viaturas consultam as
   tabelas inteiras.
 - Numeracoes como oficio `ano + numero` sao globais.
@@ -91,14 +93,17 @@ Dados separados por area:
 - `TermoAutorizacao`
 - `Justificativa`
 - `PlanoTrabalho`
+- `ProgramaSolicitante`
+- `HorarioAtendimento`
+- `AtividadePlanoTrabalho`
 - `OrdemServico`
 - `PrestacaoContas`
+- `ModeloTextoRelatorioTecnico`
 - `DocumentoArtefato`
-- `DriveCredenciais`
-- `DriveReorganizacaoJob`
-- `DriveArquivo`
-- `DriveArquivoExterno`
-- `DriveSyncStatus`
+- `DriveReorganizacaoJob` (por usuario e area)
+- `DriveArquivo`, isolado pela area do `DocumentoArtefato`
+- `DriveArquivoExterno`, isolado pela area do objeto de origem
+- `DriveSyncStatus`, isolado pelo usuario e pela area do objeto de origem
 - modelos de protocolo/eProtocolo, se tambem forem especificos da area.
 
 Dados que podem continuar globais:
@@ -106,6 +111,7 @@ Dados que podem continuar globais:
 - `Estado`
 - `Cidade`
 - bases geograficas/IBGE.
+- `DriveCredenciais`, porque a credencial e por usuario/login, nao por area.
 
 ## Configuracao por area
 
@@ -139,12 +145,12 @@ Isso permite:
 - DPCAP com cabecalho, chefia, unidade, sufixo e assinaturas proprias;
 - numeracao de Plano de Trabalho separada.
 
-## Google Drive por area
+## Google Drive por usuario
 
 `DriveCredenciais` deve ganhar:
 
 ```python
-area = models.OneToOneField("usuarios.AreaTrabalho", on_delete=models.CASCADE)
+usuario = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 ```
 
 E todos os pontos que hoje fazem:
@@ -156,18 +162,25 @@ DriveCredenciais.objects.first()
 devem passar a usar:
 
 ```python
-DriveCredenciais.objects.filter(area=request.area).first()
+DriveCredenciais.objects.filter(usuario=request.user).first()
 ```
 
 ou, em services/tasks sem request:
 
 ```python
-DriveCredenciais.objects.filter(area=area).first()
+DriveCredenciais.objects.filter(usuario=usuario).first()
 ```
 
-Cada area pode autorizar uma conta Google diferente e escolher uma pasta raiz
-diferente. Os arquivos enviados ao Drive devem ser rastreados com a mesma area
-do documento de origem.
+Cada usuario autoriza a propria conta institucional uma vez. Ao entrar no
+sistema, o usuario usa:
+
+```text
+usuario -> area atual para dados/configuracoes
+usuario -> credencial Google Drive do proprio usuario
+```
+
+A area continua separando os dados. A credencial Google separa a conta de Drive
+de cada login.
 
 ## Filtros obrigatorios nas views
 
@@ -234,13 +247,13 @@ e passar `area` explicitamente para services e selectors.
 1. Criar `AreaTrabalho` e `VinculoUsuarioArea`.
 2. Criar middleware/seletor de area atual.
 3. Migrar `ConfiguracaoSistema` de singleton global para configuracao por area.
-4. Migrar `DriveCredenciais` para credenciais por area.
+4. Migrar `DriveCredenciais` para credenciais por usuario.
 5. Adicionar `area` aos modelos principais: eventos, oficios, roteiros,
-   documentos e cadastros.
+   documentos, cadastros, planos de trabalho, ordens de servico e prestacoes.
 6. Atualizar selectors/views/forms para filtrar sempre por `request.area`.
 7. Atualizar numeracoes e constraints para incluir `area`.
 8. Atualizar Google Drive services, signals e Celery tasks para carregar
-   credenciais pela area do objeto.
+   credenciais pelo usuario autenticado/responsavel pela acao.
 9. Migrar dados existentes para uma area inicial, por exemplo ASCOM.
 10. Criar testes de isolamento: usuario ASCOM nao ve nem acessa dados DPCAP.
 
@@ -262,8 +275,8 @@ Depois preencher todos os registros existentes com essa area. So entao tornar
 - Usuario DPCAP nao ve eventos, oficios, servidores, viaturas ou documentos da
   ASCOM.
 - Configuracoes da ASCOM nao alteram configuracoes da DPCAP.
-- Cada area conecta uma conta/pasta propria do Google Drive.
-- Uploads e reorganizacao do Drive usam a credencial da area correta.
+- Cada usuario conecta sua conta/pasta propria do Google Drive.
+- Uploads e reorganizacao do Drive usam a credencial Google do usuario correto.
 - Numeracao de oficios e planos e independente por area.
 - URLs diretas de outra area retornam 404 ou permissao negada.
-- Testes cobrem listagem, detalhe, criacao, edicao, exclusao e Drive por area.
+- Testes cobrem listagem, detalhe, criacao, edicao, exclusao por area e Drive por usuario.

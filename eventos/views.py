@@ -69,13 +69,15 @@ def tipos_index(request):
     back_url = _safe_next_url(request, reverse("eventos:index"))
     form = TipoEventoForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
-        form.save()
+        tipo = form.save(commit=False)
+        tipo.area = getattr(request, "area", None)
+        tipo.save()
         messages.success(request, "Tipo de evento criado com sucesso.")
         redirect_url = reverse("eventos:tipos_index")
         if back_url:
             redirect_url = f"{redirect_url}?{urlencode({'next': back_url})}"
         return redirect(redirect_url)
-    tipos = TipoEvento.objects.all()
+    tipos = filter_queryset_by_area(TipoEvento.objects).all()
     if q:
         query = remove_accents(q)
         tipos = tipos.filter(nome__unaccent__icontains=query)
@@ -107,7 +109,9 @@ def tipos_index(request):
 def tipo_novo(request):
     form = TipoEventoForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
-        form.save()
+        tipo = form.save(commit=False)
+        tipo.area = getattr(request, "area", None)
+        tipo.save()
         messages.success(request, "Tipo de evento criado com sucesso.")
         return redirect("eventos:tipos_index")
     return render(
@@ -124,7 +128,7 @@ def tipo_novo(request):
 
 
 def tipo_editar(request, pk):
-    tipo = get_object_or_404(TipoEvento, pk=pk)
+    tipo = get_object_or_404(filter_queryset_by_area(TipoEvento.objects), pk=pk)
     form = TipoEventoForm(request.POST or None, instance=tipo)
     if request.method == "POST" and form.is_valid():
         form.save()
@@ -144,7 +148,7 @@ def tipo_editar(request, pk):
 
 
 def tipo_excluir(request, pk):
-    tipo = get_object_or_404(TipoEvento, pk=pk)
+    tipo = get_object_or_404(filter_queryset_by_area(TipoEvento.objects), pk=pk)
     if request.method == "POST":
         tipo.delete()
         messages.success(request, "Tipo de evento excluído com sucesso.")

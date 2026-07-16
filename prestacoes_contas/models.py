@@ -49,6 +49,14 @@ class PrestacaoContas(models.Model):
     # Uma prestação por ofício. Os dados compartilhados por todos os servidores
     # (texto do RT, diário de bordo do motorista, despacho, número do ofício)
     # ficam aqui; o que é individual de cada servidor fica em ``PrestacaoServidor``.
+    area = models.ForeignKey(
+        "usuarios.AreaTrabalho",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="prestacoes_contas",
+        verbose_name="Area de trabalho",
+    )
     oficio = models.OneToOneField(
         Oficio,
         on_delete=models.CASCADE,
@@ -83,11 +91,24 @@ class PrestacaoContas(models.Model):
 
     class Meta:
         ordering = ["-criado_em"]
+        indexes = [
+            models.Index(fields=["area", "-criado_em"], name="prestacoes_area_criado_idx"),
+        ]
         verbose_name = "Prestação de Contas"
         verbose_name_plural = "Prestações de Contas"
 
     def __str__(self):
         return f"Prestação — Ofício {self.oficio.numero_formatado}"
+
+    def save(self, *args, **kwargs):
+        if self.area_id is None:
+            if self.oficio_id and self.oficio and self.oficio.area_id:
+                self.area = self.oficio.area
+            else:
+                from core.tenancy import get_current_area
+
+                self.area = get_current_area()
+        super().save(*args, **kwargs)
 
     @property
     def status_display(self):
@@ -540,6 +561,14 @@ class ModeloTextoRelatorioTecnico(models.Model):
         (CAMPO_INFO, "Informações complementares"),
     ]
 
+    area = models.ForeignKey(
+        "usuarios.AreaTrabalho",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="modelos_texto_relatorio_tecnico",
+        verbose_name="Area de trabalho",
+    )
     campo = models.CharField(max_length=30, choices=CAMPO_CHOICES, db_index=True)
     nome = models.CharField(max_length=120)
     texto = models.TextField()
@@ -549,11 +578,20 @@ class ModeloTextoRelatorioTecnico(models.Model):
         ordering = ["campo", "ordem", "nome"]
         verbose_name = "Modelo de texto do RT"
         verbose_name_plural = "Modelos de texto do RT"
+        indexes = [
+            models.Index(fields=["area", "campo", "ordem", "nome"], name="prest_rt_txt_area_campo_idx"),
+        ]
         constraints = [
             models.UniqueConstraint(
                 fields=["campo", "nome"],
+                condition=Q(area__isnull=True),
                 name="unique_modelo_texto_rt_campo_nome",
-            )
+            ),
+            models.UniqueConstraint(
+                fields=["area", "campo", "nome"],
+                condition=Q(area__isnull=False),
+                name="prest_rt_texto_area_campo_nome_unique",
+            ),
         ]
 
     def __str__(self):

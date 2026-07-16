@@ -2,6 +2,235 @@
 
 {% block title %}{{ page_title }}{% endblock %}
 
+{% block extra_css %}
+  <style>
+    .admin-workspaces {
+      display: grid;
+      gap: 24px;
+    }
+
+    .admin-workspaces__forms {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      align-items: start;
+    }
+
+    .admin-workspaces__panel {
+      background: var(--surface-card, #fff);
+      border: 1px solid var(--border-subtle, rgba(15, 23, 42, .12));
+      border-radius: 8px;
+      padding: 18px;
+      box-shadow: var(--shadow-card, 0 10px 24px rgba(15, 23, 42, .08));
+    }
+
+    .admin-workspaces__panel h2,
+    .admin-workspaces__panel h3 {
+      margin: 0 0 6px;
+      font-size: 1rem;
+    }
+
+    .admin-workspaces__panel p {
+      margin: 0 0 14px;
+      color: var(--text-muted, #64748b);
+      font-size: .9rem;
+    }
+
+    .admin-workspaces__form {
+      display: grid;
+      gap: 12px;
+    }
+
+    .admin-workspaces__submit {
+      justify-self: start;
+      border: 0;
+      border-radius: 6px;
+      padding: 10px 14px;
+      background: var(--color-primary, #1d4ed8);
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .admin-workspaces__lists {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+      gap: 16px;
+    }
+
+    .admin-workspaces__table-wrap {
+      overflow-x: auto;
+    }
+
+    .admin-workspaces__table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .92rem;
+    }
+
+    .admin-workspaces__table th,
+    .admin-workspaces__table td {
+      padding: 10px 8px;
+      border-bottom: 1px solid var(--border-subtle, rgba(15, 23, 42, .12));
+      text-align: left;
+      vertical-align: top;
+      white-space: nowrap;
+    }
+
+    .admin-workspaces__table th {
+      color: var(--text-muted, #64748b);
+      font-size: .78rem;
+      text-transform: uppercase;
+    }
+
+    .admin-workspaces__badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(37, 99, 235, .12);
+      color: var(--color-primary, #1d4ed8);
+      font-weight: 700;
+      font-size: .78rem;
+    }
+
+    .admin-workspaces__badge--muted {
+      background: rgba(100, 116, 139, .14);
+      color: var(--text-muted, #64748b);
+    }
+
+    .admin-workspaces__error {
+      margin: 0;
+      color: var(--danger, #b91c1c);
+      font-size: .86rem;
+    }
+
+    @media (max-width: 1120px) {
+      .admin-workspaces__forms,
+      .admin-workspaces__lists {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+{% endblock %}
+
 {% block content %}
-  {% include "components/lists/list_page.html" with title=page_title description=page_description eyebrow="Acesso" search_placeholder="Buscar usuarios" empty_message="Usuarios, perfis e permissoes serao implementados em etapa futura." only %}
+  <div class="page-shell page-shell--standard-simple admin-workspaces">
+    {% include "components/ui/headers/header_stack_simple.html" with eyebrow="ADMINISTRAÇÃO" title=page_title description=page_description icon_label="US" module_label="Usuários" only %}
+
+    <section class="admin-workspaces__forms" aria-label="Cadastros administrativos">
+      <form class="admin-workspaces__panel admin-workspaces__form" method="post" novalidate>
+        {% csrf_token %}
+        <input type="hidden" name="action" value="criar_area">
+        <h2>Criar área</h2>
+        <p>Use para cadastrar ASCOM, DPCAP ou qualquer nova área de trabalho.</p>
+        {% if area_form.non_field_errors %}<p class="admin-workspaces__error">{{ area_form.non_field_errors|join:", " }}</p>{% endif %}
+        {% for field in area_form %}
+          {% include "components/forms/form_field.html" with field=field only %}
+        {% endfor %}
+        <button class="admin-workspaces__submit" type="submit">Criar área</button>
+      </form>
+
+      <form class="admin-workspaces__panel admin-workspaces__form" method="post" novalidate>
+        {% csrf_token %}
+        <input type="hidden" name="action" value="criar_usuario">
+        <h2>Criar usuário</h2>
+        <p>Cria o login e já vincula o usuário à área escolhida.</p>
+        {% if usuario_form.non_field_errors %}<p class="admin-workspaces__error">{{ usuario_form.non_field_errors|join:", " }}</p>{% endif %}
+        {% for field in usuario_form %}
+          {% include "components/forms/form_field.html" with field=field only %}
+        {% endfor %}
+        <button class="admin-workspaces__submit" type="submit">Criar usuário</button>
+      </form>
+
+      <form class="admin-workspaces__panel admin-workspaces__form" method="post" novalidate>
+        {% csrf_token %}
+        <input type="hidden" name="action" value="vincular_usuario">
+        <h2>Vincular existente</h2>
+        <p>Use quando o usuário já existe e precisa acessar outra área.</p>
+        {% if vinculo_form.non_field_errors %}<p class="admin-workspaces__error">{{ vinculo_form.non_field_errors|join:", " }}</p>{% endif %}
+        {% for field in vinculo_form %}
+          {% include "components/forms/form_field.html" with field=field only %}
+        {% endfor %}
+        <button class="admin-workspaces__submit" type="submit">Salvar vínculo</button>
+      </form>
+    </section>
+
+    <section class="admin-workspaces__lists" aria-label="Áreas e vínculos cadastrados">
+      <div class="admin-workspaces__panel">
+        <h3>Áreas cadastradas</h3>
+        <p>Quantidade de usuários vinculados por área.</p>
+        <div class="admin-workspaces__table-wrap">
+          <table class="admin-workspaces__table">
+            <thead>
+              <tr>
+                <th>Sigla</th>
+                <th>Nome</th>
+                <th>Status</th>
+                <th>Usuários</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for area in areas %}
+                <tr>
+                  <td><strong>{{ area.sigla }}</strong></td>
+                  <td>{{ area.nome }}</td>
+                  <td>
+                    {% if area.ativa %}
+                      <span class="admin-workspaces__badge">Ativa</span>
+                    {% else %}
+                      <span class="admin-workspaces__badge admin-workspaces__badge--muted">Inativa</span>
+                    {% endif %}
+                  </td>
+                  <td>{{ area.vinculos_usuario.count }}</td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="4">Nenhuma área cadastrada.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="admin-workspaces__panel">
+        <h3>Usuários e acessos</h3>
+        <p>Conferência dos vínculos ativos e áreas padrão.</p>
+        <div class="admin-workspaces__table-wrap">
+          <table class="admin-workspaces__table">
+            <thead>
+              <tr>
+                <th>Usuário</th>
+                <th>E-mail</th>
+                <th>Área</th>
+                <th>Perfil</th>
+                <th>Padrão</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for vinculo in vinculos %}
+                <tr>
+                  <td><strong>{{ vinculo.usuario.get_username }}</strong></td>
+                  <td>{{ vinculo.usuario.email|default:"-" }}</td>
+                  <td>{{ vinculo.area.sigla }}</td>
+                  <td>{{ vinculo.get_papel_display }}</td>
+                  <td>{% if vinculo.area_padrao %}Sim{% else %}Não{% endif %}</td>
+                  <td>
+                    {% if vinculo.ativo %}
+                      <span class="admin-workspaces__badge">Ativo</span>
+                    {% else %}
+                      <span class="admin-workspaces__badge admin-workspaces__badge--muted">Inativo</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="6">Nenhum vínculo cadastrado.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </div>
 {% endblock %}

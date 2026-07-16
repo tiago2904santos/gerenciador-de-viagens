@@ -12,6 +12,7 @@ from cadastros.models import Servidor
 from cadastros.models import Unidade
 from cadastros.services import resolver_sede_ids_desde_configuracao
 from core.normalizers import normalize_upper
+from core.tenancy import filter_queryset_by_area
 
 from .models import AtividadePlanoTrabalho
 from .models import EfetivoEvento
@@ -181,7 +182,7 @@ class PlanoIdentificacaoForm(forms.ModelForm):
         programa_choices.extend(
             [
                 (str(programa.pk), programa.nome)
-                for programa in ProgramaSolicitante.objects.filter(ativo=True).order_by("ordem", "nome")
+                for programa in filter_queryset_by_area(ProgramaSolicitante.objects).filter(ativo=True).order_by("ordem", "nome")
             ]
         )
 
@@ -200,7 +201,7 @@ class PlanoIdentificacaoForm(forms.ModelForm):
         self.initial["programa"] = programa_inicial
         self.programa_outros_selected = programa_inicial == self.PROGRAMA_OUTRO_VALUE
 
-        horarios_ativos = list(HorarioAtendimento.objects.filter(ativo=True).order_by("ordem", "faixa"))
+        horarios_ativos = list(filter_queryset_by_area(HorarioAtendimento.objects).filter(ativo=True).order_by("ordem", "faixa"))
         horario_choices = [("", "Selecione um horário (opcional)")]
         horario_choices.extend([(horario.faixa, horario.faixa) for horario in horarios_ativos])
         horario_inicial = ""
@@ -234,7 +235,7 @@ class PlanoIdentificacaoForm(forms.ModelForm):
         self.destination_rows = self._build_destination_rows(estado_id, cidade_id)
 
         cargo_choices = [("", "Selecione um cargo")]
-        cargo_choices.extend([(cargo.nome, cargo.nome) for cargo in Cargo.objects.order_by("nome")])
+        cargo_choices.extend([(cargo.nome, cargo.nome) for cargo in filter_queryset_by_area(Cargo.objects).order_by("nome")])
         for campo in ("coordenador_adm_cargo_manual", "coordenador_op_cargo_manual"):
             valor_atual = ""
             if self.is_bound:
@@ -245,7 +246,7 @@ class PlanoIdentificacaoForm(forms.ModelForm):
                 cargo_choices.append((valor_atual, valor_atual))
             self.fields[campo].widget.choices = cargo_choices
 
-        servidores_qs = Servidor.objects.select_related("cargo", "unidade").order_by("nome")
+        servidores_qs = filter_queryset_by_area(Servidor.objects).select_related("cargo", "unidade").order_by("nome")
         for campo, titulo, papel, rotulo in (
             ("coordenador_adm", "COORDENADOR ADMINISTRATIVO", "adm", "Coordenador administrativo"),
             ("coordenador_op", "COORDENADOR OPERACIONAL", "op", "Coordenador operacional (opcional)"),
@@ -275,7 +276,7 @@ class PlanoIdentificacaoForm(forms.ModelForm):
         if not valor or self.programa_outros_selected:
             return None
         try:
-            return ProgramaSolicitante.objects.get(pk=valor, ativo=True)
+            return filter_queryset_by_area(ProgramaSolicitante.objects).get(pk=valor, ativo=True)
         except (ProgramaSolicitante.DoesNotExist, TypeError, ValueError):
             raise forms.ValidationError("Selecione um programa válido.")
 
@@ -529,10 +530,10 @@ class EfetivoPlanoForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["unidade"].queryset = Unidade.objects.order_by("nome")
+        self.fields["unidade"].queryset = filter_queryset_by_area(Unidade.objects).order_by("nome")
         self.fields["unidade"].empty_label = ""
         self.fields["unidade"].required = False
-        self.fields["cargo"].queryset = Cargo.objects.order_by("nome")
+        self.fields["cargo"].queryset = filter_queryset_by_area(Cargo.objects).order_by("nome")
         self.fields["cargo"].empty_label = "Selecione o cargo"
 
     def clean(self):
@@ -591,7 +592,7 @@ class EventoPlanoForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["programa"].queryset = ProgramaSolicitante.objects.filter(ativo=True).order_by("ordem", "nome")
+        self.fields["programa"].queryset = filter_queryset_by_area(ProgramaSolicitante.objects).filter(ativo=True).order_by("ordem", "nome")
         self.fields["programa"].required = False
         self.fields["programa_outros"].required = False
         self.fields["horario_atendimento"].required = False
@@ -636,10 +637,10 @@ class EfetivoEventoForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["unidade"].queryset = Unidade.objects.order_by("nome")
+        self.fields["unidade"].queryset = filter_queryset_by_area(Unidade.objects).order_by("nome")
         self.fields["unidade"].empty_label = ""
         self.fields["unidade"].required = False
-        self.fields["cargo"].queryset = Cargo.objects.order_by("nome")
+        self.fields["cargo"].queryset = filter_queryset_by_area(Cargo.objects).order_by("nome")
         self.fields["cargo"].empty_label = "Selecione o cargo"
 
     def clean(self):
@@ -713,7 +714,7 @@ class AtividadePlanoTrabalhoForm(forms.ModelForm):
         normalizado = slugify(codigo).replace("-", "_").upper()
         if not normalizado:
             raise forms.ValidationError("Código inválido.")
-        qs = AtividadePlanoTrabalho.objects.filter(codigo=normalizado)
+        qs = filter_queryset_by_area(AtividadePlanoTrabalho.objects).filter(codigo=normalizado)
         if self.instance.pk:
             qs = qs.exclude(pk=self.instance.pk)
         if qs.exists():
@@ -767,7 +768,7 @@ class AtividadePlanoTrabalhoQuickAddForm(forms.ModelForm):
         base = slugify(nome).replace("-", "_").upper() or "ATIVIDADE"
         codigo = base
         sufixo = 2
-        while AtividadePlanoTrabalho.objects.filter(codigo=codigo).exists():
+        while filter_queryset_by_area(AtividadePlanoTrabalho.objects).filter(codigo=codigo).exists():
             codigo = f"{base}_{sufixo}"
             sufixo += 1
         return codigo

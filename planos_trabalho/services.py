@@ -11,6 +11,8 @@ from django.db.models import Max
 from django.utils import timezone
 
 from cadastros.models import ConfiguracaoSistema
+from core.tenancy import filter_queryset_by_area
+from core.tenancy import get_current_area
 from documentos.services.facade import build_default_facade
 from documentos.services.formatters import format_city_uf
 from documentos.services.formatters import format_document_display
@@ -349,8 +351,8 @@ def montar_efetivo_evento_texto(evento: EventoPlano) -> str:
 # ── Diárias ──────────────────────────────────────────────────────────────────
 
 
-def _sede_cidade_uf() -> tuple[str, str]:
-    config = ConfiguracaoSistema.get_singleton()
+def _sede_cidade_uf(area=None) -> tuple[str, str]:
+    config = ConfiguracaoSistema.get_for_area(area)
     cidade = config.cidade_sede_padrao
     if cidade is not None:
         return cidade.nome or "", cidade.uf or ""
@@ -383,7 +385,7 @@ def calcular_diarias_plano(plano: PlanoTrabalho, total_efetivo: int | None = Non
     if chegada <= saida:
         return {"ok": False, "erros": ["A chegada na sede deve ser depois da saída."]}
 
-    sede_cidade, sede_uf = _sede_cidade_uf()
+    sede_cidade, sede_uf = _sede_cidade_uf(plano.area if plano.area_id else None)
     marker = PeriodMarker(
         saida=saida,
         destino_cidade=plano.destino_cidade.nome,
@@ -550,7 +552,7 @@ def _calcular_diaria(
     quantidade_servidores: int,
 ) -> dict:
     """Wrapper sobre ``calculate_periodized_diarias`` com formatação consistente."""
-    sede_cidade, sede_uf = _sede_cidade_uf()
+    sede_cidade, sede_uf = _sede_cidade_uf(plano.area if plano.area_id else None)
     resultado = calculate_periodized_diarias(
         markers,
         chegada,
@@ -741,7 +743,7 @@ TEXTO_UNIDADE_MOVEL = (
 
 def atividades_catalogo_ativas() -> list[AtividadePlanoTrabalho]:
     """Catálogo de atividades ativas, na ordem oficial (ordem, nome)."""
-    return list(AtividadePlanoTrabalho.objects.filter(ativo=True).order_by("ordem", "nome"))
+    return list(filter_queryset_by_area(AtividadePlanoTrabalho.objects).filter(ativo=True).order_by("ordem", "nome"))
 
 
 def _atividades_selecionadas_ordenadas(plano: PlanoTrabalho) -> list[AtividadePlanoTrabalho]:
@@ -832,7 +834,7 @@ def _atividades_combinadas_multi(plano: PlanoTrabalho) -> list[AtividadePlanoTra
     if not codigos:
         return []
     return list(
-        AtividadePlanoTrabalho.objects.filter(codigo__in=codigos).order_by("ordem", "nome")
+        filter_queryset_by_area(AtividadePlanoTrabalho.objects).filter(codigo__in=codigos).order_by("ordem", "nome")
     )
 
 
@@ -1208,10 +1210,11 @@ def criar_plano_rascunho(evento=None) -> PlanoTrabalho:
 
         seed = build_evento_document_seed(evento)
 
-    plano = PlanoTrabalho(data_criacao=timezone.localdate())
+    area = getattr(evento, "area", None) or get_current_area()
+    plano = PlanoTrabalho(data_criacao=timezone.localdate(), area=area)
     plano.evento = evento
     plano.atribuir_numero()
-    config = ConfiguracaoSistema.get_singleton()
+    config = ConfiguracaoSistema.get_for_area(area)
     if config.coordenador_adm_plano_trabalho_id:
         plano.coordenador_adm = config.coordenador_adm_plano_trabalho
     elif getattr(evento, "responsavel_id", None):

@@ -34,6 +34,8 @@ duplicar (reusa ``get_or_create_pasta`` e os registros ``DriveArquivo`` /
 
 from __future__ import annotations
 
+from contextlib import contextmanager
+import contextvars
 import logging
 import mimetypes
 
@@ -45,6 +47,24 @@ logger = logging.getLogger(__name__)
 _SHORTCUT_MIME = "application/vnd.google-apps.shortcut"
 _FOLDER_MIME = "application/vnd.google-apps.folder"
 _CAMPO_PASTA_EVENTO = "pasta_evento"
+_USUARIO_CONTEXTO = contextvars.ContextVar("google_drive_usuario", default=None)
+
+
+def get_usuario_contexto():
+    return _USUARIO_CONTEXTO.get()
+
+
+@contextmanager
+def usar_usuario(usuario):
+    token = _USUARIO_CONTEXTO.set(usuario)
+    try:
+        yield
+    finally:
+        _USUARIO_CONTEXTO.reset(token)
+
+
+def _get_client():
+    return get_client(get_usuario_contexto())
 
 
 # ---------------------------------------------------------------------------
@@ -80,7 +100,7 @@ def _mime_por_nome(nome: str) -> str:
 def _raiz() -> str | None:
     from .services import get_pasta_raiz_id
 
-    return get_pasta_raiz_id() or None
+    return get_pasta_raiz_id(get_usuario_contexto()) or None
 
 
 # ---------------------------------------------------------------------------
@@ -287,7 +307,7 @@ def _persistir_artefato(artefato, pasta_id: str, nome: str, *, atalho_pasta_id: 
 
     from .models import DriveArquivo
 
-    client = get_client()
+    client = _get_client()
     mime = mimetype_para_formato(artefato.formato)
     reg = DriveArquivo.objects.filter(artefato=artefato).first()
 
@@ -427,7 +447,7 @@ def organizar_artefato(artefato) -> tuple[str, str] | None:
     """
     if (artefato.formato or "pdf").lower() != "pdf":
         return None
-    client = get_client()
+    client = _get_client()
     tipo = artefato.tipo or "oficio"
     formato = artefato.formato or "pdf"
     oficio = getattr(artefato, "oficio", None)
@@ -511,7 +531,7 @@ def sincronizar_conteudo_assinado(artefato) -> tuple[str, str] | None:
     if conteudo is None:
         return None
 
-    client = get_client()
+    client = _get_client()
     mime = mimetype_para_formato(artefato.formato)
     file_id, url = client.atualizar_conteudo(reg.file_id, reg.nome, conteudo, mime)
     reg.url = url
@@ -537,7 +557,7 @@ def _persistir_conteudo_externo(
 
     from .models import DriveArquivoExterno
 
-    client = get_client()
+    client = _get_client()
     ct = ContentType.objects.get_for_model(obj.__class__)
     reg = DriveArquivoExterno.objects.filter(
         content_type=ct, object_id=obj.pk, campo=campo
@@ -606,7 +626,7 @@ def _atalho_pasta_externo(obj, *, campo: str, nome: str, target_id: str, pasta_i
 
     from .models import DriveArquivoExterno
 
-    client = get_client()
+    client = _get_client()
     ct = ContentType.objects.get_for_model(obj.__class__)
     reg = DriveArquivoExterno.objects.filter(
         content_type=ct, object_id=obj.pk, campo=campo
@@ -635,7 +655,7 @@ def organizar_evento_anexo(anexo) -> None:
     evento = getattr(anexo, "evento", None)
     if evento is None or not getattr(anexo, "arquivo", None):
         return
-    client = get_client()
+    client = _get_client()
     oficio = evento.oficios.first()
     # Convite/ofício solicitante ficam diretamente na pasta do evento.
     pasta_id = _pasta_evento_folder(client, evento)
@@ -661,7 +681,7 @@ def organizar_solicitacao_evento(doc) -> None:
     evento = getattr(doc, "evento", None)
     if evento is None or not getattr(doc, "arquivo", None):
         return
-    client = get_client()
+    client = _get_client()
     oficio = evento.oficios.first()
     cidade = naming.cidade_evento(evento, oficio)
     ext = naming.extensao(doc.arquivo.name)
@@ -711,7 +731,7 @@ def organizar_prestacao(prestacao) -> None:
         return
     if not _prestacao_tem_conteudo(prestacao):
         return
-    client = get_client()
+    client = _get_client()
     servidores = list(oficio.servidores.all())
     cidade = naming.cidade_evento(getattr(oficio, "evento", None), oficio)
     oficio_folder = _oficio_base_folder(client, oficio, servidores)
@@ -780,7 +800,7 @@ def organizar_motivo_cancelamento(evento) -> None:
     evento não estiver cancelado."""
     if not _evento_cancelado(evento):
         return
-    client = get_client()
+    client = _get_client()
     pasta_id = _pasta_evento_folder(client, evento)
     quando = evento.cancelado_em.strftime("%d/%m/%Y %H:%M") if evento.cancelado_em else ""
     motivo = (evento.motivo_cancelamento or "").strip() or "(não informado)"
@@ -990,7 +1010,7 @@ def sincronizar_pasta_evento(evento) -> None:
 
     from .services import get_client
 
-    client = get_client()
+    client = _get_client()
     nome_pasta = naming.pasta_evento(evento)
 
     if evento.drive_folder_id:
@@ -1108,7 +1128,7 @@ def planejar_evento(evento) -> list[str]:
 # Reorganização em massa (usada pelo comando e pelo botão da UI)
 # ---------------------------------------------------------------------------
 
-def reorganizar_tudo(evento_id: int | None = None, progress=None) -> dict:
+def reorganizar_tudo(evento_id: int | None = None, progress=None, usuario=None, area=None) -> dict:
     """Reorganiza todos os eventos (+ ofícios sem evento) no Drive.
 
     ``progress`` (opcional) é chamado como ``progress(eventos_processados, total)``
@@ -1122,30 +1142,40 @@ def reorganizar_tudo(evento_id: int | None = None, progress=None) -> dict:
     resumo = {"eventos": 0, "avulsos": 0, "erros": 0}
 
     eventos = Evento.objects.all()
+    if area is None:
+        eventos = eventos.filter(area__isnull=True)
+    else:
+        eventos = eventos.filter(area=area)
     if evento_id is not None:
         eventos = eventos.filter(pk=evento_id)
     total = eventos.count()
     processados = 0
     if progress:
         progress(0, total)
-    for evento in eventos.iterator():
-        try:
-            organizar_evento(evento)
-            resumo["eventos"] += 1
-        except Exception as exc:  # noqa: BLE001
-            resumo["erros"] += 1
-            logger.error("[Drive] erro ao reorganizar evento %s: %s", evento.pk, exc, exc_info=True)
-        processados += 1
-        if progress:
-            progress(processados, total)
-
-    if evento_id is None:
-        for oficio in Oficio.objects.filter(evento__isnull=True).iterator():
+    with usar_usuario(usuario):
+        for evento in eventos.iterator():
             try:
-                organizar_oficio(oficio)
-                resumo["avulsos"] += 1
+                organizar_evento(evento)
+                resumo["eventos"] += 1
             except Exception as exc:  # noqa: BLE001
                 resumo["erros"] += 1
-                logger.error("[Drive] erro ao reorganizar ofício avulso %s: %s", oficio.pk, exc, exc_info=True)
+                logger.error("[Drive] erro ao reorganizar evento %s: %s", evento.pk, exc, exc_info=True)
+            processados += 1
+            if progress:
+                progress(processados, total)
+
+        if evento_id is None:
+            oficios = Oficio.objects.filter(evento__isnull=True)
+            if area is None:
+                oficios = oficios.filter(area__isnull=True)
+            else:
+                oficios = oficios.filter(area=area)
+            for oficio in oficios.iterator():
+                try:
+                    organizar_oficio(oficio)
+                    resumo["avulsos"] += 1
+                except Exception as exc:  # noqa: BLE001
+                    resumo["erros"] += 1
+                    logger.error("[Drive] erro ao reorganizar ofício avulso %s: %s", oficio.pk, exc, exc_info=True)
 
     return resumo

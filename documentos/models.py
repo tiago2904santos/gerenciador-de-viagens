@@ -89,6 +89,8 @@ class DocumentoArtefato(models.Model):
                 self.area = self.oficio.area
             elif self.evento_id and self.evento and self.evento.area_id:
                 self.area = self.evento.area
+            elif self.termo_id and self.termo and self.termo.area_id:
+                self.area = self.termo.area
         super().save(*args, **kwargs)
 
     @property

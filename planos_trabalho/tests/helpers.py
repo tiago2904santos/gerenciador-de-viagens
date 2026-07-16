@@ -16,6 +16,10 @@ from planos_trabalho.models import EfetivoPlano
 from planos_trabalho.models import PlanoTrabalho
 
 
+UNIDADE_ASCOM_NOME = "ASSESSORIA DE COMUNICAÇÃO SOCIAL"
+UNIDADE_ASCOM_SIGLA = "ASCOM"
+
+
 def criar_base_geografica():
     parana = Estado.objects.create(nome="Paraná", sigla="PR")
     curitiba = Cidade.objects.create(estado=parana, nome="Curitiba", capital=True)
@@ -27,7 +31,7 @@ def criar_base_geografica():
 def configurar_sistema(curitiba):
     config = ConfiguracaoSistema.get_singleton()
     config.cidade_sede_padrao = curitiba
-    config.unidade = Unidade.objects.create(nome="Assessoria de Comunicação Social")
+    config.unidade = Unidade.objects.create(nome=UNIDADE_ASCOM_NOME, sigla=UNIDADE_ASCOM_SIGLA)
     config.cidade_endereco = "Curitiba"
     config.uf = "PR"
     config.nome_chefia = "João Mário Nunes de Góes"
@@ -54,7 +58,10 @@ def criar_plano_maringa(maringa, *, efetivo=6):
         chegada_sede_hora=time(14, 0),
     )
     cargo = Cargo.objects.get_or_create(nome="Policial Civil")[0]
-    unidade = Unidade.objects.get_or_create(nome="Assessoria de Comunicação Social", sigla="ASCOM")[0]
+    unidade = Unidade.objects.get_or_create(
+        nome=UNIDADE_ASCOM_NOME,
+        defaults={"sigla": UNIDADE_ASCOM_SIGLA},
+    )[0]
     EfetivoPlano.objects.create(plano=plano, unidade=unidade, cargo=cargo, quantidade=efetivo)
     return plano
 

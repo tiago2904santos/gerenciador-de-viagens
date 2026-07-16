@@ -11,7 +11,7 @@ from integracoes.google_drive.models import (
 
 @admin.register(DriveCredenciais)
 class DriveCredenciaisAdmin(admin.ModelAdmin):
-    list_display = ("__str__", "scope", "token_expiry", "atualizado_em")
+    list_display = ("__str__", "usuario", "scope", "token_expiry", "atualizado_em")
     readonly_fields = ("access_token", "refresh_token", "token_expiry", "scope", "criado_em", "atualizado_em")
 
     def has_add_permission(self, request):
@@ -31,10 +31,10 @@ class DriveArquivoAdmin(admin.ModelAdmin):
 
 @admin.register(DriveReorganizacaoJob)
 class DriveReorganizacaoJobAdmin(admin.ModelAdmin):
-    list_display = ("__str__", "status", "eventos_processados", "total_eventos", "avulsos", "erros", "iniciado_em", "finalizado_em")
-    list_filter = ("status",)
+    list_display = ("__str__", "usuario", "area", "status", "eventos_processados", "total_eventos", "avulsos", "erros", "iniciado_em", "finalizado_em")
+    list_filter = ("status", "area")
     readonly_fields = (
-        "status", "total_eventos", "eventos_processados", "avulsos", "erros",
+        "usuario", "area", "status", "total_eventos", "eventos_processados", "avulsos", "erros",
         "mensagem", "iniciado_em", "finalizado_em",
     )
 
@@ -67,9 +67,9 @@ class DriveArquivoExternoAdmin(admin.ModelAdmin):
 
 @admin.register(DriveSyncStatus)
 class DriveSyncStatusAdmin(admin.ModelAdmin):
-    list_display = ("__str__", "content_type", "object_id", "tentativas", "atualizado_em")
+    list_display = ("__str__", "usuario", "content_type", "object_id", "tentativas", "atualizado_em")
     list_filter = ("content_type",)
-    readonly_fields = ("content_type", "object_id", "tentativas", "ultimo_erro", "criado_em", "atualizado_em")
+    readonly_fields = ("usuario", "content_type", "object_id", "tentativas", "ultimo_erro", "criado_em", "atualizado_em")
 
     def has_add_permission(self, request):
         return False

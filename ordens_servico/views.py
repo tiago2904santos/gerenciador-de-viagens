@@ -17,6 +17,7 @@ from django.views.decorators.http import require_GET
 from django.views.decorators.http import require_http_methods
 
 from core.normalizers import remove_accents
+from core.tenancy import filter_queryset_by_area
 from documentos.services.responses import build_inline_pdf_response_from_download_response
 from documentos.services.types import DocumentoTipo
 from eventos.services import build_evento_document_seed
@@ -40,7 +41,7 @@ def index(request):
     viagem_ate = request.GET.get("viagem_ate", "").strip()
     sort = request.GET.get("sort", "").strip()
 
-    ordens = OrdemServico.objects.prefetch_related(
+    ordens = filter_queryset_by_area(OrdemServico.objects).prefetch_related(
         "destinos__estado",
         "servidores__cargo",
         "servidores__unidade",
@@ -119,7 +120,7 @@ def index(request):
     )
 
 def _os_queryset():
-    return OrdemServico.objects.prefetch_related("destinos__estado", "servidores", "oficios")
+    return filter_queryset_by_area(OrdemServico.objects).prefetch_related("destinos__estado", "servidores", "oficios")
 
 
 def _evento_etapa_url(evento_id):
@@ -367,7 +368,7 @@ def pdf_inline(request, pk):
 
 @require_http_methods(["POST"])
 def excluir(request, pk):
-    ordem = get_object_or_404(OrdemServico, pk=pk)
+    ordem = get_object_or_404(_os_queryset(), pk=pk)
     numero = ordem.numero_formatado
     ordem.delete()
     messages.success(request, f"Ordem de Serviço {numero} excluída.")

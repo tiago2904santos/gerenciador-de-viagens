@@ -124,7 +124,7 @@ class EventoNovoCadastroForm(forms.ModelForm):
     )
     tipos = forms.ModelMultipleChoiceField(
         label="Tipo do evento",
-        queryset=TipoEvento.objects.filter(ativo=True).order_by("ordem", "nome"),
+        queryset=TipoEvento.objects.none(),
         required=False,
         widget=forms.SelectMultiple(attrs={"data-placeholder": "Selecione o(s) tipo(s)"}),
     )
@@ -252,7 +252,10 @@ class EventoNovoCadastroForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields["data_inicio"].required = False
         self.fields["data_fim"].required = False
-        self.fields["modelo_motivo"].queryset = ModeloMotivoOficio.objects.filter(ativo=True).order_by(
+        self.fields["tipos"].queryset = filter_queryset_by_area(TipoEvento.objects).filter(ativo=True).order_by(
+            "ordem", "nome"
+        )
+        self.fields["modelo_motivo"].queryset = filter_queryset_by_area(ModeloMotivoOficio.objects).filter(ativo=True).order_by(
             "ordem", "nome"
         )
         # Pré-preenche a UF de destino com o estado padrão das configurações (eventos sem destino definido)
@@ -361,6 +364,12 @@ class EventoForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields["unidade_responsavel"].required = False
         self.fields["responsavel"].required = False
+        self.fields["unidade_responsavel"].queryset = filter_queryset_by_area(
+            self.fields["unidade_responsavel"].queryset.model.objects
+        ).order_by("nome")
+        self.fields["responsavel"].queryset = filter_queryset_by_area(
+            self.fields["responsavel"].queryset.model.objects
+        ).order_by("nome")
 
     def clean(self):
         cleaned = super().clean()

@@ -48,8 +48,14 @@ def listar_oficios(
             "solicitante",
         )
         .prefetch_related(
-            Prefetch("servidores", queryset=Servidor.objects.select_related("cargo", "unidade").order_by("nome")),
-            Prefetch("servidores_termo_autorizacao", queryset=Servidor.objects.order_by("nome")),
+            Prefetch(
+                "servidores",
+                queryset=filter_queryset_by_area(Servidor.objects).select_related("cargo", "unidade").order_by("nome"),
+            ),
+            Prefetch(
+                "servidores_termo_autorizacao",
+                queryset=filter_queryset_by_area(Servidor.objects).order_by("nome"),
+            ),
             Prefetch(
                 "roteiro__destinos",
                 queryset=RoteiroDestino.objects.select_related("cidade", "estado").order_by("ordem"),
@@ -142,12 +148,13 @@ def listar_roteiros_para_oficio():
 
 
 def listar_servidores_para_oficio():
-    return Servidor.objects.select_related("cargo", "unidade").order_by("nome")
+    return filter_queryset_by_area(Servidor.objects).select_related("cargo", "unidade").order_by("nome")
 
 
 def listar_viaturas_para_oficio():
     return (
-        Viatura.objects.select_related("combustivel", "unidade")
+        filter_queryset_by_area(Viatura.objects)
+        .select_related("combustivel", "unidade")
         .prefetch_related("motoristas")
         .order_by("placa")
     )
@@ -158,7 +165,7 @@ def get_viatura_por_placa_normalizada(placa_bruta: str):
     if len(placa) != 7:
         return None
     try:
-        return Viatura.objects.select_related("combustivel", "unidade").get(placa=placa)
+        return filter_queryset_by_area(Viatura.objects).select_related("combustivel", "unidade").get(placa=placa)
     except Viatura.DoesNotExist:
         return None
 
@@ -167,7 +174,7 @@ def _filtro_viaturas_equipe_oficio(equipe_servidor_ids: list[int] | None):
     if not equipe_servidor_ids:
         return Q()
     unidade_ids = list(
-        Servidor.objects.filter(pk__in=equipe_servidor_ids, unidade_id__isnull=False)
+        filter_queryset_by_area(Servidor.objects).filter(pk__in=equipe_servidor_ids, unidade_id__isnull=False)
         .values_list("unidade_id", flat=True)
         .distinct()
     )
@@ -182,7 +189,7 @@ def _unidade_ids_dos_servidores(servidor_ids: list[int] | None) -> list[int]:
     if not servidor_ids:
         return []
     return list(
-        Servidor.objects.filter(pk__in=servidor_ids, unidade_id__isnull=False)
+        filter_queryset_by_area(Servidor.objects).filter(pk__in=servidor_ids, unidade_id__isnull=False)
         .values_list("unidade_id", flat=True)
         .distinct()
     )
@@ -211,13 +218,16 @@ def buscar_viaturas_para_oficio(
         if motorista_id:
             combined = combined | Q(motoristas=motorista_id) if combined else Q(motoristas=motorista_id)
         return (
-            Viatura.objects.filter(combined)
+            filter_queryset_by_area(Viatura.objects)
+            .filter(combined)
             .distinct()
             .select_related("combustivel", "unidade")
             .prefetch_related(
                 Prefetch(
                     "motoristas",
-                    queryset=Servidor.objects.select_related("unidade", "cargo").order_by("nome"),
+                    queryset=filter_queryset_by_area(Servidor.objects)
+                    .select_related("unidade", "cargo")
+                    .order_by("nome"),
                 ),
             )
             .order_by("placa")[:limit]
@@ -237,12 +247,15 @@ def buscar_viaturas_para_oficio(
         filters |= Q(placa__icontains=plate_key)
 
     return (
-        Viatura.objects.filter(filters)
+        filter_queryset_by_area(Viatura.objects)
+        .filter(filters)
         .select_related("combustivel", "unidade")
         .prefetch_related(
             Prefetch(
                 "motoristas",
-                queryset=Servidor.objects.select_related("unidade", "cargo").order_by("nome"),
+                queryset=filter_queryset_by_area(Servidor.objects)
+                .select_related("unidade", "cargo")
+                .order_by("nome"),
             ),
         )
         .distinct()
@@ -310,12 +323,12 @@ def viatura_para_resultado_busca(
 
 
 def listar_unidades_para_oficio():
-    return Unidade.objects.order_by("nome")
+    return filter_queryset_by_area(Unidade.objects).order_by("nome")
 
 
 def listar_modelos_motivo(q: str | None = None, incluir_inativos: bool = True):
     _ = incluir_inativos
-    queryset = ModeloMotivoOficio.objects.order_by("nome")
+    queryset = filter_queryset_by_area(ModeloMotivoOficio.objects).order_by("nome")
     if q:
         query = remove_accents(q.strip())
         queryset = queryset.filter(Q(nome__unaccent__icontains=query) | Q(texto__unaccent__icontains=query))
@@ -323,8 +336,8 @@ def listar_modelos_motivo(q: str | None = None, incluir_inativos: bool = True):
 
 
 def listar_modelos_motivo_ativos():
-    return ModeloMotivoOficio.objects.order_by("nome")
+    return filter_queryset_by_area(ModeloMotivoOficio.objects).order_by("nome")
 
 
 def get_modelo_motivo_by_id(pk: int):
-    return get_object_or_404(ModeloMotivoOficio, pk=pk)
+    return get_object_or_404(filter_queryset_by_area(ModeloMotivoOficio.objects), pk=pk)

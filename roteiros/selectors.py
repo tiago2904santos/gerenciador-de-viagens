@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404
 
 from cadastros.models import Cidade, Estado
 from core.normalizers import remove_accents
+from core.tenancy import filter_queryset_by_area
 
 from .models import Roteiro
 from .models import RoteiroTrecho
@@ -27,7 +28,8 @@ def listar_roteiros(q=None, status=None):
         .order_by("ordem", "pk")
     )
     queryset = (
-        Roteiro.objects.select_related("origem_estado", "origem_cidade", "origem_cidade__estado")
+        filter_queryset_by_area(Roteiro.objects)
+        .select_related("origem_estado", "origem_cidade", "origem_cidade__estado")
         .prefetch_related(
             "destinos__cidade",
             "destinos__estado",
@@ -63,7 +65,7 @@ def listar_roteiros(q=None, status=None):
 
 def get_roteiro_by_id(pk):
     return get_object_or_404(
-        Roteiro.objects.select_related(
+        filter_queryset_by_area(Roteiro.objects).select_related(
             "origem_estado",
             "origem_cidade",
             "origem_cidade__estado",
@@ -145,7 +147,9 @@ def _anotar_e_filtrar_roteiros_completos(qs):
 def queryset_roteiros_avulsos_para_mapa_rotas(limit=50):
     """Roteiros avulsos totalmente preenchidos (esconde rascunhos incompletos criados pelo wizard)."""
     return (
-        _anotar_e_filtrar_roteiros_completos(Roteiro.objects.filter(tipo=Roteiro.TIPO_AVULSO))
+        _anotar_e_filtrar_roteiros_completos(
+            filter_queryset_by_area(Roteiro.objects).filter(tipo=Roteiro.TIPO_AVULSO)
+        )
         .select_related("origem_cidade", "origem_estado")
         .prefetch_related(
             "destinos",
@@ -174,7 +178,7 @@ def queryset_roteiros_reutilizaveis_para_evento(evento=None, limit=50, excluir_p
         condicao |= Q(evento=evento) | Q(oficios__evento=evento)
 
     qs = (
-        _anotar_e_filtrar_roteiros_completos(Roteiro.objects.filter(condicao))
+        _anotar_e_filtrar_roteiros_completos(filter_queryset_by_area(Roteiro.objects).filter(condicao))
         .distinct()
         .select_related("origem_cidade", "origem_estado")
         .prefetch_related(

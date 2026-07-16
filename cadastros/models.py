@@ -49,6 +49,14 @@ class CancelavelModel(models.Model):
 
 
 class Unidade(TimeStampedModel):
+    area = models.ForeignKey(
+        "usuarios.AreaTrabalho",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="unidades",
+        verbose_name="Area de trabalho",
+    )
     nome = models.CharField(max_length=255)
     sigla = models.CharField(max_length=50, blank=True)
 
@@ -56,6 +64,21 @@ class Unidade(TimeStampedModel):
         ordering = ["nome"]
         verbose_name = "Unidade"
         verbose_name_plural = "Unidades"
+        indexes = [
+            models.Index(fields=["area", "nome"], name="cadastros_unid_area_nome_idx"),
+        ]
+        constraints = [
+            UniqueConstraint(
+                fields=["nome"],
+                condition=Q(area__isnull=True),
+                name="cadastros_unidade_nome_global_unique",
+            ),
+            UniqueConstraint(
+                fields=["area", "nome"],
+                condition=Q(area__isnull=False),
+                name="cadastros_unidade_area_nome_unique",
+            ),
+        ]
 
     def __str__(self):
         return self.sigla or self.nome
@@ -123,42 +146,114 @@ class Cidade(TimeStampedModel):
 
 
 class Cargo(TimeStampedModel):
-    nome = models.CharField(max_length=120, unique=True)
+    area = models.ForeignKey(
+        "usuarios.AreaTrabalho",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="cargos",
+        verbose_name="Area de trabalho",
+    )
+    nome = models.CharField(max_length=120)
     is_padrao = models.BooleanField(default=False)
 
     class Meta:
         ordering = ["nome"]
         verbose_name = "Cargo"
         verbose_name_plural = "Cargos"
+        indexes = [
+            models.Index(fields=["area", "nome"], name="cadastros_cargo_area_nome_idx"),
+        ]
+        constraints = [
+            UniqueConstraint(
+                fields=["nome"],
+                condition=Q(area__isnull=True),
+                name="cadastros_cargo_nome_global_unique",
+            ),
+            UniqueConstraint(
+                fields=["area", "nome"],
+                condition=Q(area__isnull=False),
+                name="cadastros_cargo_area_nome_unique",
+            ),
+            UniqueConstraint(
+                fields=["area"],
+                condition=Q(area__isnull=False) & Q(is_padrao=True),
+                name="cadastros_cargo_area_padrao_unique",
+            ),
+            UniqueConstraint(
+                fields=["is_padrao"],
+                condition=Q(area__isnull=True) & Q(is_padrao=True),
+                name="cadastros_cargo_global_padrao_unique",
+            ),
+        ]
 
     @transaction.atomic
     def save(self, *args, **kwargs):
         if self.nome:
             self.nome = normalize_upper(self.nome)
-        super().save(*args, **kwargs)
         if self.is_padrao:
-            Cargo.objects.select_for_update().exclude(pk=self.pk).filter(is_padrao=True).update(is_padrao=False)
+            Cargo.objects.select_for_update().exclude(pk=self.pk).filter(
+                area=self.area,
+                is_padrao=True,
+            ).update(is_padrao=False)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.nome
 
 
 class Combustivel(TimeStampedModel):
-    nome = models.CharField(max_length=120, unique=True)
+    area = models.ForeignKey(
+        "usuarios.AreaTrabalho",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="combustiveis",
+        verbose_name="Area de trabalho",
+    )
+    nome = models.CharField(max_length=120)
     is_padrao = models.BooleanField(default=False)
 
     class Meta:
         ordering = ["nome"]
         verbose_name = "Combustível"
         verbose_name_plural = "Combustíveis"
+        indexes = [
+            models.Index(fields=["area", "nome"], name="cadastros_comb_area_nome_idx"),
+        ]
+        constraints = [
+            UniqueConstraint(
+                fields=["nome"],
+                condition=Q(area__isnull=True),
+                name="cadastros_combustivel_nome_global_unique",
+            ),
+            UniqueConstraint(
+                fields=["area", "nome"],
+                condition=Q(area__isnull=False),
+                name="cadastros_combustivel_area_nome_unique",
+            ),
+            UniqueConstraint(
+                fields=["area"],
+                condition=Q(area__isnull=False) & Q(is_padrao=True),
+                name="cadastros_combustivel_area_padrao_unique",
+            ),
+            UniqueConstraint(
+                fields=["is_padrao"],
+                condition=Q(area__isnull=True) & Q(is_padrao=True),
+                name="cadastros_combustivel_global_padrao_unique",
+            ),
+        ]
 
     @transaction.atomic
     def save(self, *args, **kwargs):
         if self.nome:
             self.nome = normalize_upper(self.nome)
-        super().save(*args, **kwargs)
         if self.is_padrao:
-            Combustivel.objects.select_for_update().exclude(pk=self.pk).filter(is_padrao=True).update(is_padrao=False)
+            Combustivel.objects.select_for_update().exclude(pk=self.pk).filter(
+                area=self.area,
+                is_padrao=True,
+            ).update(is_padrao=False)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.nome
@@ -172,6 +267,14 @@ class Servidor(TimeStampedModel):
         (STATUS_COMPLETO, "Completo"),
     ]
 
+    area = models.ForeignKey(
+        "usuarios.AreaTrabalho",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="servidores",
+        verbose_name="Area de trabalho",
+    )
     nome = models.CharField(max_length=255)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_RASCUNHO)
     cargo = models.ForeignKey(
@@ -197,22 +300,49 @@ class Servidor(TimeStampedModel):
         ordering = ["nome"]
         verbose_name = "Servidor"
         verbose_name_plural = "Servidores"
+        indexes = [
+            models.Index(fields=["area", "nome"], name="cadastros_srv_area_nome_idx"),
+        ]
         constraints = [
-            UniqueConstraint(fields=["nome"], name="cadastros_servidor_nome_unique"),
+            UniqueConstraint(
+                fields=["nome"],
+                condition=Q(area__isnull=True),
+                name="cadastros_servidor_nome_global_unique",
+            ),
+            UniqueConstraint(
+                fields=["area", "nome"],
+                condition=Q(area__isnull=False),
+                name="cadastros_servidor_area_nome_unique",
+            ),
             UniqueConstraint(
                 fields=["cpf"],
-                condition=Q(cpf__gt=""),
-                name="cadastros_servidor_cpf_unique_nn",
+                condition=Q(area__isnull=True) & Q(cpf__gt=""),
+                name="cadastros_servidor_cpf_global_unique",
+            ),
+            UniqueConstraint(
+                fields=["area", "cpf"],
+                condition=Q(area__isnull=False) & Q(cpf__gt=""),
+                name="cadastros_servidor_area_cpf_unique",
             ),
             UniqueConstraint(
                 fields=["rg"],
-                condition=Q(rg__gt="") & ~Q(rg=RG_NAO_POSSUI_CANONICAL),
-                name="cadastros_servidor_rg_unique_nn",
+                condition=Q(area__isnull=True) & Q(rg__gt="") & ~Q(rg=RG_NAO_POSSUI_CANONICAL),
+                name="cadastros_servidor_rg_global_unique",
+            ),
+            UniqueConstraint(
+                fields=["area", "rg"],
+                condition=Q(area__isnull=False) & Q(rg__gt="") & ~Q(rg=RG_NAO_POSSUI_CANONICAL),
+                name="cadastros_servidor_area_rg_unique",
             ),
             UniqueConstraint(
                 fields=["telefone"],
-                condition=Q(telefone__gt=""),
-                name="cadastros_servidor_telefone_unique_nn",
+                condition=Q(area__isnull=True) & Q(telefone__gt=""),
+                name="cadastros_servidor_telefone_global_unique",
+            ),
+            UniqueConstraint(
+                fields=["area", "telefone"],
+                condition=Q(area__isnull=False) & Q(telefone__gt=""),
+                name="cadastros_servidor_area_telefone_unique",
             ),
         ]
 
@@ -275,6 +405,14 @@ class Viatura(TimeStampedModel):
         (TIPO_DESCARACTERIZADA, "Descaracterizada"),
     ]
 
+    area = models.ForeignKey(
+        "usuarios.AreaTrabalho",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="viaturas",
+        verbose_name="Area de trabalho",
+    )
     placa = models.CharField(max_length=7, unique=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_RASCUNHO)
     modelo = models.CharField(max_length=120, blank=True)
@@ -305,6 +443,9 @@ class Viatura(TimeStampedModel):
         ordering = ["placa"]
         verbose_name = "Viatura"
         verbose_name_plural = "Viaturas"
+        indexes = [
+            models.Index(fields=["area", "placa"], name="cadastros_viat_area_placa_idx"),
+        ]
 
     def __str__(self):
         return self.placa

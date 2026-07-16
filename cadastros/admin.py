@@ -55,15 +55,35 @@ class CidadeAdmin(admin.ModelAdmin):
 
 @admin.register(Servidor)
 class ServidorAdmin(admin.ModelAdmin):
-    list_display = ("nome", "cargo", "cpf", "sem_rg", "telefone", "unidade")
-    search_fields = ("nome", "cpf", "rg", "telefone", "cargo__nome", "unidade__nome")
-    list_filter = ("cargo", "unidade")
+    list_display = ("nome", "area", "cargo", "cpf", "sem_rg", "telefone", "unidade")
+    search_fields = (
+        "nome",
+        "cpf",
+        "rg",
+        "telefone",
+        "cargo__nome",
+        "unidade__nome",
+        "area__nome",
+        "area__sigla",
+    )
+    list_filter = ("area", "cargo", "unidade")
+    autocomplete_fields = ("area", "cargo", "unidade")
     ordering = ("nome",)
 
 
 @admin.register(Viatura)
 class ViaturaAdmin(admin.ModelAdmin):
-    list_display = ("placa", "modelo", "unidade", "combustivel", "tipo")
-    search_fields = ("placa", "modelo", "unidade__nome", "unidade__sigla", "combustivel__nome", "tipo")
-    list_filter = ("unidade", "combustivel", "tipo")
+    list_display = ("placa", "area", "modelo", "unidade", "combustivel", "tipo")
+    search_fields = (
+        "placa",
+        "modelo",
+        "unidade__nome",
+        "unidade__sigla",
+        "combustivel__nome",
+        "tipo",
+        "area__nome",
+        "area__sigla",
+    )
+    list_filter = ("area", "unidade", "combustivel", "tipo")
+    autocomplete_fields = ("area", "unidade", "combustivel", "motoristas")
     ordering = ("placa",)

@@ -16,12 +16,21 @@ from cadastros.models import TimeStampedModel
 from cadastros.models import Unidade
 from core.normalizers import normalize_spaces
 from core.normalizers import normalize_upper
+from core.tenancy import get_current_area
 
 
 class ProgramaSolicitante(TimeStampedModel):
     """Programa/iniciativa que solicita a ação (ex.: Justiça no Bairro)."""
 
-    nome = models.CharField(max_length=200, unique=True)
+    area = models.ForeignKey(
+        "usuarios.AreaTrabalho",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="programas_solicitantes",
+        verbose_name="Area de trabalho",
+    )
+    nome = models.CharField(max_length=200)
     ativo = models.BooleanField(default=True)
     ordem = models.PositiveIntegerField(default=100)
 
@@ -29,6 +38,13 @@ class ProgramaSolicitante(TimeStampedModel):
         ordering = ["ordem", "nome"]
         verbose_name = "Programa solicitante"
         verbose_name_plural = "Programas solicitantes"
+        indexes = [
+            models.Index(fields=["area", "ordem", "nome"], name="planos_prog_area_ordem_idx"),
+        ]
+        constraints = [
+            models.UniqueConstraint(fields=["nome"], condition=Q(area__isnull=True), name="planos_programa_nome_global_unique"),
+            models.UniqueConstraint(fields=["area", "nome"], condition=Q(area__isnull=False), name="planos_programa_area_nome_unique"),
+        ]
 
     def __str__(self):
         return self.nome
@@ -41,12 +57,27 @@ class ProgramaSolicitante(TimeStampedModel):
 class HorarioAtendimento(TimeStampedModel):
     """Faixa de horário disponível para seleção nos planos de trabalho."""
 
-    faixa = models.CharField(max_length=60, unique=True)
+    area = models.ForeignKey(
+        "usuarios.AreaTrabalho",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="horarios_atendimento",
+        verbose_name="Area de trabalho",
+    )
+    faixa = models.CharField(max_length=60)
     ativo = models.BooleanField(default=True)
     ordem = models.PositiveIntegerField(default=100)
 
     class Meta:
         ordering = ["ordem", "faixa"]
+        indexes = [
+            models.Index(fields=["area", "ordem", "faixa"], name="planos_horario_area_ordem_idx"),
+        ]
+        constraints = [
+            models.UniqueConstraint(fields=["faixa"], condition=Q(area__isnull=True), name="planos_horario_faixa_global_unique"),
+            models.UniqueConstraint(fields=["area", "faixa"], condition=Q(area__isnull=False), name="planos_horario_area_faixa_unique"),
+        ]
         verbose_name = "Horário de atendimento"
         verbose_name_plural = "Horários de atendimento"
 
@@ -66,7 +97,15 @@ class AtividadePlanoTrabalho(TimeStampedModel):
     do wizard, sua meta e seu recurso entram automaticamente no plano.
     """
 
-    codigo = models.CharField("Código", max_length=40, unique=True)
+    area = models.ForeignKey(
+        "usuarios.AreaTrabalho",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="atividades_plano_trabalho",
+        verbose_name="Area de trabalho",
+    )
+    codigo = models.CharField("Código", max_length=40)
     nome = models.CharField("Nome", max_length=255)
     meta = models.TextField("Meta")
     recurso_necessario = models.TextField("Recurso necessário", blank=True, default="")
@@ -75,6 +114,13 @@ class AtividadePlanoTrabalho(TimeStampedModel):
 
     class Meta:
         ordering = ["ordem", "nome"]
+        indexes = [
+            models.Index(fields=["area", "ordem", "nome"], name="planos_ativ_area_ordem_idx"),
+        ]
+        constraints = [
+            models.UniqueConstraint(fields=["codigo"], condition=Q(area__isnull=True), name="planos_atividade_codigo_global_unique"),
+            models.UniqueConstraint(fields=["area", "codigo"], condition=Q(area__isnull=False), name="planos_atividade_area_codigo_unique"),
+        ]
         verbose_name = "Atividade (Plano de Trabalho)"
         verbose_name_plural = "Atividades (Plano de Trabalho)"
 
@@ -111,6 +157,14 @@ class PlanoTrabalho(TimeStampedModel, CancelavelModel):
         (COORDENADOR_GENERO_FEMININO, "Feminino"),
     ]
 
+    area = models.ForeignKey(
+        "usuarios.AreaTrabalho",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="planos_trabalho",
+        verbose_name="Area de trabalho",
+    )
     numero = models.PositiveIntegerField(null=True, blank=True, db_index=True)
     ano = models.PositiveIntegerField(null=True, blank=True, db_index=True)
     sufixo_numero = models.CharField(max_length=20, blank=True, default="")
@@ -282,11 +336,19 @@ class PlanoTrabalho(TimeStampedModel, CancelavelModel):
         ordering = ["-ano", "-numero", "-created_at"]
         verbose_name = "Plano de Trabalho"
         verbose_name_plural = "Planos de Trabalho"
+        indexes = [
+            models.Index(fields=["area", "-ano", "-numero"], name="planos_area_numero_idx"),
+        ]
         constraints = [
             models.UniqueConstraint(
                 fields=["ano", "numero"],
-                condition=Q(ano__isnull=False, numero__isnull=False),
-                name="planos_trabalho_ano_numero_unique",
+                condition=Q(area__isnull=True, ano__isnull=False, numero__isnull=False),
+                name="planos_trabalho_ano_numero_global_unique",
+            ),
+            models.UniqueConstraint(
+                fields=["area", "ano", "numero"],
+                condition=Q(area__isnull=False, ano__isnull=False, numero__isnull=False),
+                name="planos_trabalho_area_ano_numero_unique",
             )
         ]
 
@@ -389,27 +451,31 @@ class PlanoTrabalho(TimeStampedModel, CancelavelModel):
         return bool(nome)
 
     @classmethod
-    def proximo_numero(cls) -> tuple[int, int, str]:
+    def proximo_numero(cls, area=None) -> tuple[int, int, str]:
         """Reserva o próximo número sequencial via contador na configuração.
 
         Retorna (numero, ano, sufixo). Usa lock pessimista no singleton para
         evitar números duplicados em requisições concorrentes.
         """
         ano_atual = timezone.localdate().year
+        area = get_current_area() if area is None else area
         with transaction.atomic():
             config = (
-                ConfiguracaoSistema.objects.select_for_update().filter(area__isnull=True).order_by("pk").first()
-                or ConfiguracaoSistema.get_singleton()
+                ConfiguracaoSistema.objects.select_for_update().filter(area=area).order_by("pk").first()
+                if area is not None
+                else ConfiguracaoSistema.objects.select_for_update().filter(area__isnull=True).order_by("pk").first()
             )
+            if config is None:
+                config = ConfiguracaoSistema.get_for_area(area)
             if config.pt_ano != ano_atual:
                 config.pt_ano = ano_atual
                 config.pt_ultimo_numero = 0
-            ultimo_numero_banco = (
-                cls.objects.filter(ano=ano_atual)
-                .aggregate(ultimo=models.Max("numero"))
-                .get("ultimo")
-                or 0
-            )
+            planos = cls.objects.filter(ano=ano_atual)
+            if area is None:
+                planos = planos.filter(area__isnull=True)
+            else:
+                planos = planos.filter(area=area)
+            ultimo_numero_banco = planos.aggregate(ultimo=models.Max("numero")).get("ultimo") or 0
             config.pt_ultimo_numero = max(config.pt_ultimo_numero, ultimo_numero_banco) + 1
             config.save(update_fields=["pt_ano", "pt_ultimo_numero", "updated_at"])
             sufixo = (getattr(config, "pt_sufixo_numero", "") or "").strip()
@@ -418,12 +484,17 @@ class PlanoTrabalho(TimeStampedModel, CancelavelModel):
     def atribuir_numero(self) -> None:
         if self.numero and self.ano:
             return
-        numero, ano, sufixo = type(self).proximo_numero()
+        numero, ano, sufixo = type(self).proximo_numero(self.area)
         self.numero = numero
         self.ano = ano
         self.sufixo_numero = sufixo
 
     def save(self, *args, **kwargs):
+        if self.area_id is None:
+            if self.evento_id and self.evento and self.evento.area_id:
+                self.area = self.evento.area
+            else:
+                self.area = get_current_area()
         self.programa_outros = normalize_spaces(self.programa_outros)
         self.horario_atendimento = normalize_spaces(self.horario_atendimento)
         self.coordenador_adm_nome_manual = normalize_spaces(self.coordenador_adm_nome_manual)

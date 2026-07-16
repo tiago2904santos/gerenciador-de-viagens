@@ -5,6 +5,7 @@ from django.utils import timezone
 
 from core.normalizers import normalize_plate
 from core.normalizers import normalize_spaces
+from core.tenancy import filter_queryset_by_area
 from core.tenancy import get_current_area
 from core.utils.masks import format_placa
 from core.utils.masks import normalize_protocolo
@@ -278,7 +279,7 @@ class OficioDadosViajantesForm(OficioForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["modelo_motivo"].queryset = ModeloMotivoOficio.objects.order_by("ordem", "nome")
+        self.fields["modelo_motivo"].queryset = filter_queryset_by_area(ModeloMotivoOficio.objects).order_by("ordem", "nome")
         self.fields["numero"].widget.attrs["min"] = "1"
         self.fields["protocolo"].required = False
         self.fields["motivo"].required = False

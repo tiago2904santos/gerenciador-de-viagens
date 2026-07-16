@@ -45,6 +45,14 @@ class Roteiro(CancelavelModel):
         (TIPO_AVULSO, "Avulso"),
     ]
 
+    area = models.ForeignKey(
+        "usuarios.AreaTrabalho",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="roteiros",
+        verbose_name="Area de trabalho",
+    )
     origem_estado = models.ForeignKey(
         Estado,
         null=True,
@@ -142,6 +150,16 @@ class Roteiro(CancelavelModel):
     def __str__(self):
         orig = self.origem_cidade or self.origem_estado
         return str(orig) if orig else f"Roteiro #{self.pk or ''}"
+
+    def save(self, *args, **kwargs):
+        if self.area_id is None:
+            if self.evento_id and self.evento and self.evento.area_id:
+                self.area = self.evento.area
+            else:
+                from core.tenancy import get_current_area
+
+                self.area = get_current_area()
+        super().save(*args, **kwargs)
 
     def aplicar_diarias_calculadas(self, resultado):
         totais = (resultado or {}).get("totais") or {}

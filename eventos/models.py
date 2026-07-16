@@ -1,5 +1,6 @@
 # Eventos serao agrupadores OPCIONAIS de documentos, nao fluxo obrigatorio.
 from django.db import models
+from django.db.models import Q
 from django.utils import timezone
 
 from core.normalizers import normalize_spaces
@@ -152,7 +153,15 @@ class TipoEvento(TimeStampedModel):
     tipos, sem valores fixos no codigo.
     """
 
-    nome = models.CharField(max_length=120, unique=True)
+    area = models.ForeignKey(
+        "usuarios.AreaTrabalho",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="tipos_evento",
+        verbose_name="Area de trabalho",
+    )
+    nome = models.CharField(max_length=120)
     ativo = models.BooleanField(default=True)
     ordem = models.PositiveIntegerField(default=100)
 
@@ -160,6 +169,21 @@ class TipoEvento(TimeStampedModel):
         ordering = ["ordem", "nome"]
         verbose_name = "Tipo de evento"
         verbose_name_plural = "Tipos de evento"
+        indexes = [
+            models.Index(fields=["area", "ordem", "nome"], name="eventos_tipo_area_ordem_idx"),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["nome"],
+                condition=Q(area__isnull=True),
+                name="eventos_tipo_nome_global_unique",
+            ),
+            models.UniqueConstraint(
+                fields=["area", "nome"],
+                condition=Q(area__isnull=False),
+                name="eventos_tipo_area_nome_unique",
+            ),
+        ]
 
     def __str__(self) -> str:
         return self.nome
@@ -196,7 +220,15 @@ class EventoDocumentoSolicitacao(models.Model):
 
 
 class ModeloMotivoEvento(TimeStampedModel):
-    nome = models.CharField(max_length=120, unique=True)
+    area = models.ForeignKey(
+        "usuarios.AreaTrabalho",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="modelos_motivo_evento",
+        verbose_name="Area de trabalho",
+    )
+    nome = models.CharField(max_length=120)
     texto = models.TextField()
     ativo = models.BooleanField(default=True)
     ordem = models.PositiveIntegerField(default=100)
@@ -206,6 +238,31 @@ class ModeloMotivoEvento(TimeStampedModel):
         ordering = ["ordem", "nome"]
         verbose_name = "Modelo de motivo de evento"
         verbose_name_plural = "Modelos de motivo de evento"
+        indexes = [
+            models.Index(fields=["area", "ordem", "nome"], name="eventos_motivo_area_ordem_idx"),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["nome"],
+                condition=Q(area__isnull=True),
+                name="eventos_motivo_nome_global_unique",
+            ),
+            models.UniqueConstraint(
+                fields=["area", "nome"],
+                condition=Q(area__isnull=False),
+                name="eventos_motivo_area_nome_unique",
+            ),
+            models.UniqueConstraint(
+                fields=["area"],
+                condition=Q(area__isnull=False) & Q(is_padrao=True),
+                name="eventos_motivo_area_padrao_unique",
+            ),
+            models.UniqueConstraint(
+                fields=["is_padrao"],
+                condition=Q(area__isnull=True) & Q(is_padrao=True),
+                name="eventos_motivo_global_padrao_unique",
+            ),
+        ]
 
     def __str__(self):
         return self.nome
@@ -214,7 +271,7 @@ class ModeloMotivoEvento(TimeStampedModel):
         self.nome = normalize_upper(self.nome)
         self.texto = normalize_spaces(self.texto)
         if self.is_padrao:
-            ModeloMotivoEvento.objects.exclude(pk=self.pk).update(is_padrao=False)
+            ModeloMotivoEvento.objects.exclude(pk=self.pk).filter(area=self.area).update(is_padrao=False)
         super().save(*args, **kwargs)
 
 

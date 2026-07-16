@@ -101,6 +101,22 @@ def _avisar_usuario(mensagem: str) -> None:
         pass
 
 
+def _usuario_atual():
+    from core.middleware import get_current_request
+
+    request = get_current_request()
+    user = getattr(request, "user", None) if request is not None else None
+    return user if user is not None and getattr(user, "is_authenticated", False) else None
+
+
+def _usuario_por_id(usuario_id):
+    if not usuario_id:
+        return None
+    from django.contrib.auth import get_user_model
+
+    return get_user_model().objects.filter(pk=usuario_id).first()
+
+
 def _processar_com_retry(fn, obj, task) -> None:
     """Tenta ``fn(obj)`` na hora (como sempre foi); se falhar, avisa o usuário
     e agenda um retry em segundo plano (Celery) com backoff.
@@ -111,8 +127,9 @@ def _processar_com_retry(fn, obj, task) -> None:
     """
     from . import status
 
+    usuario = _usuario_atual()
     try:
-        status.executar_e_rastrear(fn, obj)
+        status.executar_e_rastrear(fn, obj, usuario=usuario)
     except Exception as exc:
         logger.error(
             "[Drive] falha ao sincronizar %s #%s: %s",
@@ -126,7 +143,7 @@ def _processar_com_retry(fn, obj, task) -> None:
             "O sistema vai tentar novamente automaticamente em segundo plano."
         )
         try:
-            task.delay(obj.pk)
+            task.delay(obj.pk, usuario_id=getattr(usuario, "pk", None))
         except Exception as exc2:
             logger.warning(
                 "[Drive] fila de retry indisponível (%s); %s #%s fica pendente até reenvio manual",
@@ -211,11 +228,13 @@ def _organizar_oficio_ao_salvar(sender, instance, **kwargs) -> None:
     import threading
 
     threading.Thread(
-        target=_organizar_oficio_em_thread, args=(instance.pk,), daemon=True
+        target=_organizar_oficio_em_thread,
+        args=(instance.pk, getattr(_usuario_atual(), "pk", None)),
+        daemon=True,
     ).start()
 
 
-def _organizar_oficio_em_thread(oficio_id: int) -> None:
+def _organizar_oficio_em_thread(oficio_id: int, usuario_id=None) -> None:
     from django.db import connection
 
     from . import organizer
@@ -229,7 +248,9 @@ def _organizar_oficio_em_thread(oficio_id: int) -> None:
         try:
             from . import status
 
-            status.executar_e_rastrear(organizer.organizar_oficio, oficio)
+            usuario = _usuario_por_id(usuario_id)
+            with organizer.usar_usuario(usuario):
+                status.executar_e_rastrear(organizer.organizar_oficio, oficio, usuario=usuario)
         except Exception:
             logger.error(
                 "[Drive] falha ao gerar/organizar ofício #%s em segundo plano",
@@ -255,7 +276,9 @@ def _organizar_evento_ao_salvar(sender, instance, **kwargs) -> None:
     import threading
 
     threading.Thread(
-        target=_organizar_evento_em_thread, args=(instance.pk,), daemon=True
+        target=_organizar_evento_em_thread,
+        args=(instance.pk, getattr(_usuario_atual(), "pk", None)),
+        daemon=True,
     ).start()
 
 
@@ -402,7 +425,7 @@ def _limpar_pasta_evento(sender, instance, **kwargs) -> None:
     ).delete()
 
 
-def _organizar_evento_em_thread(evento_id: int) -> None:
+def _organizar_evento_em_thread(evento_id: int, usuario_id=None) -> None:
     from django.db import connection
 
     from . import organizer
@@ -416,7 +439,9 @@ def _organizar_evento_em_thread(evento_id: int) -> None:
         try:
             from . import status
 
-            status.executar_e_rastrear(organizer.organizar_evento, evento)
+            usuario = _usuario_por_id(usuario_id)
+            with organizer.usar_usuario(usuario):
+                status.executar_e_rastrear(organizer.organizar_evento, evento, usuario=usuario)
         except Exception:
             logger.error(
                 "[Drive] falha ao gerar/organizar evento #%s em segundo plano",

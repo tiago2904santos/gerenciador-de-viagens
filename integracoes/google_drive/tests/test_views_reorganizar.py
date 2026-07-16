@@ -28,6 +28,7 @@ class ReorganizarTudoViewTests(TestCase):
         self.client.force_login(self.user)
         # Pasta raiz configurada (mock) — habilita o card e a ação.
         DriveCredenciais.objects.create(
+            usuario=self.user,
             access_token="t", refresh_token="r", pasta_raiz_id="mock-raiz", pasta_raiz_nome="Raiz",
         )
         cargo = Cargo.objects.create(nome="Investigador")
@@ -66,6 +67,7 @@ class ReorganizarTudoViewTests(TestCase):
         self.client.post(reverse("google_drive:reorganizar_tudo"))
         job = DriveReorganizacaoJob.objects.order_by("-iniciado_em").first()
         self.assertIsNotNone(job)
+        self.assertEqual(job.usuario, self.user)
         self.assertEqual(job.status, DriveReorganizacaoJob.STATUS_CONCLUIDA)
         self.assertIsNotNone(job.finalizado_em)
 
@@ -79,7 +81,10 @@ class ReorganizarTudoViewTests(TestCase):
         self.assertFalse(data["em_andamento"])
 
     def test_nao_inicia_se_ja_em_andamento(self):
-        DriveReorganizacaoJob.objects.create(status=DriveReorganizacaoJob.STATUS_EM_ANDAMENTO)
+        DriveReorganizacaoJob.objects.create(
+            usuario=self.user,
+            status=DriveReorganizacaoJob.STATUS_EM_ANDAMENTO,
+        )
         resp = self.client.post(reverse("google_drive:reorganizar_tudo"))
         self.assertRedirects(resp, reverse("google_drive:index"))
         # Não cria um segundo job em andamento.

@@ -8,6 +8,7 @@ from cadastros.models import Cidade
 from cadastros.models import Estado
 from cadastros.models import Servidor
 from cadastros.services import resolver_sede_ids_desde_configuracao
+from core.tenancy import filter_queryset_by_area
 from oficios.forms import ModeloMotivoSelect
 from oficios.models import ModeloMotivoOficio
 from oficios.models import Oficio
@@ -122,7 +123,7 @@ class OrdemServicoForm(forms.ModelForm):
         ja_vinculados = list(self.instance.oficios.values_list("pk", flat=True)) if self.instance.pk else []
         self.fields["oficios"].required = False
         self.fields["oficios"].queryset = (
-            Oficio.objects
+            filter_queryset_by_area(Oficio.objects)
             .select_related("roteiro", "viatura")
             .filter(Q(cancelado=False) | Q(pk__in=ja_vinculados))
             .order_by("-data_criacao", "-created_at")
@@ -153,7 +154,7 @@ class OrdemServicoForm(forms.ModelForm):
 
         self.fields["servidores"].required = False
         self.fields["servidores"].queryset = (
-            Servidor.objects.select_related("cargo", "unidade").order_by("nome")
+            filter_queryset_by_area(Servidor.objects).select_related("cargo", "unidade").order_by("nome")
         )
 
         self.fields["motivo"].required = False
@@ -199,7 +200,13 @@ class OrdemServicoForm(forms.ModelForm):
     def _build_destination_rows(self, estado_id, cidade_id):
         rows = []
         if self.is_bound:
-            rows.append(self._destination_row_from_values(0, self.data.get("destino_estado"), self.data.get("destino_cidade")))
+            rows.append(
+                self._destination_row_from_values(
+                    0,
+                    self.data.get("destino_estado"),
+                    self.data.get("destino_cidade"),
+                )
+            )
             for idx in self._extra_destination_indexes():
                 rows.append(
                     self._destination_row_from_values(

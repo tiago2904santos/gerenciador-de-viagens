@@ -1,18 +1,19 @@
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.conf import settings
 from django.db import models
 
 
 class DriveCredenciais(models.Model):
     """Tokens OAuth 2.0 da conta Google autorizada. Registro único (singleton)."""
 
-    area = models.OneToOneField(
-        "usuarios.AreaTrabalho",
+    usuario = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         null=True,
         blank=True,
-        related_name="drive_credenciais",
-        verbose_name="Area de trabalho",
+        related_name="google_drive_credenciais",
+        verbose_name="Usuario",
     )
     access_token = models.TextField()
     refresh_token = models.TextField()
@@ -47,6 +48,22 @@ class DriveReorganizacaoJob(models.Model):
         (STATUS_ERRO, "Erro"),
     ]
 
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="drive_jobs_reorganizacao",
+        verbose_name="Usuario",
+    )
+    area = models.ForeignKey(
+        "usuarios.AreaTrabalho",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="drive_jobs_reorganizacao",
+        verbose_name="Area de trabalho",
+    )
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_EM_ANDAMENTO, db_index=True)
     total_eventos = models.PositiveIntegerField(default=0)
     eventos_processados = models.PositiveIntegerField(default=0)
@@ -60,6 +77,9 @@ class DriveReorganizacaoJob(models.Model):
         verbose_name = "Job de reorganização do Drive"
         verbose_name_plural = "Jobs de reorganização do Drive"
         ordering = ["-iniciado_em"]
+        indexes = [
+            models.Index(fields=["usuario", "area", "status"], name="drive_job_usuario_area_idx"),
+        ]
 
     def __str__(self) -> str:
         return f"Reorganização {self.get_status_display()} ({self.iniciado_em:%d/%m %H:%M})"
@@ -156,6 +176,14 @@ class DriveSyncStatus(models.Model):
     modelos rastreados aqui (pk inteiro).
     """
 
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="drive_pendencias_sync",
+        verbose_name="Usuario",
+    )
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.CharField(max_length=64)
     origem = GenericForeignKey("content_type", "object_id")

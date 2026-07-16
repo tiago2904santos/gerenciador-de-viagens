@@ -8,6 +8,14 @@ from django.urls import reverse
 NAVIGATION_ITEMS = [
     {"id": "dashboard", "label": "Dashboard", "url_name": "core:dashboard", "icon": "DG"},
     {
+        "id": "usuarios",
+        "label": "Admin",
+        "url_name": "usuarios:index",
+        "icon": "US",
+        "active_when": ["usuarios:"],
+        "staff_only": True,
+    },
+    {
         "id": "cadastros",
         "label": "Cadastros",
         "url_name": "cadastros:servidores_index",
@@ -100,7 +108,11 @@ def build_navigation(request):
     if request.resolver_match:
         current_view_name = request.resolver_match.view_name or ""
 
-    return [_build_item(item, current_view_name) for item in NAVIGATION_ITEMS]
+    return [
+        _build_item(item, current_view_name)
+        for item in NAVIGATION_ITEMS
+        if _is_visible_for_request(item, request)
+    ]
 
 
 def _build_item(item, current_view_name):
@@ -137,3 +149,10 @@ def _matches_current_view(item, current_view_name):
         return True
 
     return any(current_view_name.startswith(prefix) for prefix in item.get("active_when", []))
+
+
+def _is_visible_for_request(item, request):
+    if not item.get("staff_only"):
+        return True
+    user = getattr(request, "user", None)
+    return bool(user and user.is_authenticated and (user.is_staff or user.is_superuser))

@@ -12,6 +12,14 @@ from oficios.models import Oficio
 
 
 class TermoAutorizacao(TimeStampedModel, CancelavelModel):
+    area = models.ForeignKey(
+        "usuarios.AreaTrabalho",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="termos_autorizacao",
+        verbose_name="Area de trabalho",
+    )
     evento = models.ForeignKey(
         "eventos.Evento",
         null=True,
@@ -68,6 +76,18 @@ class TermoAutorizacao(TimeStampedModel, CancelavelModel):
 
     def __str__(self) -> str:
         return f"Termo #{self.pk or 'novo'} - {self.destino_display}"
+
+    def save(self, *args, **kwargs):
+        if self.area_id is None:
+            if self.evento_id and self.evento and self.evento.area_id:
+                self.area = self.evento.area
+            elif self.oficio_id and self.oficio and self.oficio.area_id:
+                self.area = self.oficio.area
+            else:
+                from core.tenancy import get_current_area
+
+                self.area = get_current_area()
+        super().save(*args, **kwargs)
 
     @property
     def destino_display(self) -> str:

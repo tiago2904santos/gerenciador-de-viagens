@@ -20,6 +20,8 @@ from core.autosave import parse_autosave_payload
 from core.normalizers import normalize_spaces
 from core.normalizers import remove_accents
 from core.presenters.meta import build_meta
+from core.tenancy import filter_queryset_by_area
+from core.tenancy import get_current_area
 from core.utils.masks import format_cpf
 from core.utils.masks import format_placa
 from core.utils.masks import format_protocolo
@@ -76,6 +78,29 @@ from .services import diaria_inicial_da_prestacao
 from .services import garantir_campos_padrao_relatorio_tecnico
 from .services import nome_arquivo_prestacao_consolidado
 from .services import nome_arquivo_rt
+
+
+def _area_related_queryset(queryset, area_field="prestacao__area"):
+    area = get_current_area()
+    if area is None:
+        return queryset.filter(**{f"{area_field}__isnull": True})
+    return queryset.filter(**{area_field: area})
+
+
+def _prestacao_queryset():
+    return filter_queryset_by_area(PrestacaoContas.objects)
+
+
+def _prestacao_servidor_queryset():
+    return _area_related_queryset(PrestacaoServidor.objects)
+
+
+def _relatorio_queryset():
+    return _area_related_queryset(RelatorioTecnico.objects)
+
+
+def _diario_queryset():
+    return _area_related_queryset(DiarioBordo.objects)
 
 
 def _destino_display(oficio) -> str:
@@ -521,7 +546,7 @@ def _salvar_solicitacoes_em_lote(request):
             atualizacoes[int(match.group(1))] = normalize_spaces(value or "")
     if not atualizacoes:
         return
-    servidores = PrestacaoServidor.objects.filter(pk__in=atualizacoes.keys())
+    servidores = _prestacao_servidor_queryset().filter(pk__in=atualizacoes.keys())
     for ps in servidores:
         novo = atualizacoes.get(ps.pk, "")
         if ps.numero_solicitacao != novo:
@@ -538,7 +563,7 @@ def _redirect_lista(request, prestacao):
 @require_POST
 def prestacao_arquivar(request, pc_pk):
     """Arquiva ou desarquiva a prestação (alterna conforme o estado atual)."""
-    prestacao = get_object_or_404(PrestacaoContas, pk=pc_pk)
+    prestacao = get_object_or_404(_prestacao_queryset(), pk=pc_pk)
     prestacao.definir_arquivada(not prestacao.arquivada)
     if prestacao.arquivada:
         messages.success(request, "Prestação arquivada.")
@@ -550,7 +575,7 @@ def prestacao_arquivar(request, pc_pk):
 @require_POST
 def prestacao_finalizar(request, pc_pk):
     """Conclui ou reabre a prestação (alterna conforme o estado atual)."""
-    prestacao = get_object_or_404(PrestacaoContas, pk=pc_pk)
+    prestacao = get_object_or_404(_prestacao_queryset(), pk=pc_pk)
     prestacao.definir_finalizada(not prestacao.finalizada)
     if prestacao.finalizada:
         messages.success(request, "Prestação finalizada.")
@@ -561,7 +586,7 @@ def prestacao_finalizar(request, pc_pk):
 
 @require_POST
 def prestacao_servidor_solicitacao_autosave(request, ps_pk):
-    ps = get_object_or_404(PrestacaoServidor, pk=ps_pk)
+    ps = get_object_or_404(_prestacao_servidor_queryset(), pk=ps_pk)
     try:
         payload = parse_autosave_payload(request, expected_model="prestacao_servidor")
     except AutosavePayloadError as exc:
@@ -581,7 +606,7 @@ def prestacao_servidor_solicitacao_autosave(request, ps_pk):
 
 def _prestacao_full(pc_pk):
     return get_object_or_404(
-        PrestacaoContas.objects.select_related("oficio__roteiro").prefetch_related(
+        _prestacao_queryset().select_related("oficio__roteiro").prefetch_related(
             "servidores_prestacao__servidor__cargo",
             "servidores_prestacao__servidor__unidade",
             "servidores_prestacao__documentos_anexos",
@@ -653,7 +678,7 @@ def documentos(request, pc_pk):
 @require_POST
 def prestacao_arquivo_autosave(request, pc_pk):
     """Autosave do despacho (compartilhado)."""
-    prestacao = get_object_or_404(PrestacaoContas, pk=pc_pk)
+    prestacao = get_object_or_404(_prestacao_queryset(), pk=pc_pk)
     form = PrestacaoDespachoForm(request.POST, request.FILES, instance=prestacao)
     if not form.is_valid():
         return autosave_json_response(
@@ -677,7 +702,7 @@ def prestacao_servidor_arquivo_autosave(request, ps_pk):
     Salva apenas os anexos — não reescreve o ``numero_solicitacao`` (que tem seu
     próprio autosave), evitando apagá-lo quando o POST traz só o arquivo.
     """
-    ps = get_object_or_404(PrestacaoServidor.objects.select_related("prestacao"), pk=ps_pk)
+    ps = get_object_or_404(_prestacao_servidor_queryset().select_related("prestacao"), pk=ps_pk)
     form = PrestacaoServidorDocumentosForm(request.POST, request.FILES, instance=ps, prefix=f"ps-{ps.pk}")
     if not form.is_valid():
         return autosave_json_response(
@@ -696,7 +721,7 @@ def prestacao_servidor_arquivo_autosave(request, ps_pk):
 
 @require_POST
 def prestacao_documento_excluir(request, pc_pk, anexo_pk):
-    prestacao = get_object_or_404(PrestacaoContas, pk=pc_pk)
+    prestacao = get_object_or_404(_prestacao_queryset(), pk=pc_pk)
     anexo = get_object_or_404(
         PrestacaoDocumentoAnexo,
         pk=anexo_pk,
@@ -796,7 +821,7 @@ def _assinatura_db_card(request, prestacao) -> dict:
 @require_POST
 def assinatura_rt_gerar(request, ps_pk):
     ps = get_object_or_404(
-        PrestacaoServidor.objects.select_related("prestacao__oficio", "servidor"), pk=ps_pk
+        _prestacao_servidor_queryset().select_related("prestacao__oficio", "servidor"), pk=ps_pk
     )
     forcar = request.POST.get("forcar") == "1"
     next_url = request.POST.get("next") or reverse(
@@ -817,7 +842,7 @@ def assinatura_rt_gerar(request, ps_pk):
 @require_POST
 def assinatura_db_gerar(request, pc_pk):
     prestacao = get_object_or_404(
-        PrestacaoContas.objects.select_related("oficio__motorista"), pk=pc_pk
+        _prestacao_queryset().select_related("oficio__motorista"), pk=pc_pk
     )
     forcar = request.POST.get("forcar") == "1"
     next_url = request.POST.get("next") or reverse(
@@ -837,7 +862,7 @@ def assinatura_db_gerar(request, pc_pk):
 
 @require_POST
 def assinatura_rt_cancelar(request, ps_pk):
-    ps = get_object_or_404(PrestacaoServidor, pk=ps_pk)
+    ps = get_object_or_404(_prestacao_servidor_queryset(), pk=ps_pk)
     next_url = request.POST.get("next") or reverse(
         "prestacoes_contas:consolidado", args=[ps.prestacao_id]
     )
@@ -848,7 +873,7 @@ def assinatura_rt_cancelar(request, ps_pk):
 
 @require_POST
 def assinatura_db_cancelar(request, pc_pk):
-    prestacao = get_object_or_404(PrestacaoContas, pk=pc_pk)
+    prestacao = get_object_or_404(_prestacao_queryset(), pk=pc_pk)
     next_url = request.POST.get("next") or reverse(
         "prestacoes_contas:consolidado", args=[prestacao.pk]
     )
@@ -926,7 +951,7 @@ def rt_criar(request, pc_pk):
 
 @require_POST
 def rt_autosave(request, pk):
-    relatorio = get_object_or_404(RelatorioTecnico, pk=pk)
+    relatorio = get_object_or_404(_relatorio_queryset(), pk=pk)
     try:
         payload = parse_autosave_payload(request, expected_model="relatorio_tecnico")
     except AutosavePayloadError as exc:
@@ -964,7 +989,7 @@ def rt_autosave(request, pk):
 
 def rt_download_servidor(request, ps_pk, formato="docx"):
     ps = get_object_or_404(
-        PrestacaoServidor.objects.select_related(
+        _prestacao_servidor_queryset().select_related(
             "prestacao__oficio__roteiro", "servidor"
         ),
         pk=ps_pk,
@@ -1001,7 +1026,7 @@ def rt_download_servidor(request, ps_pk, formato="docx"):
 def diario_criar(request, pc_pk):
     """Etapa 2 do wizard: diário de bordo do veículo a partir do roteiro do ofício."""
     prestacao = get_object_or_404(
-        PrestacaoContas.objects.select_related(
+        _prestacao_queryset().select_related(
             "oficio__roteiro",
             "oficio__viatura",
             "oficio__motorista",
@@ -1066,7 +1091,7 @@ def diario_criar(request, pc_pk):
 
 @require_POST
 def diario_autosave(request, pk):
-    diario = get_object_or_404(DiarioBordo.objects.select_related("prestacao"), pk=pk)
+    diario = get_object_or_404(_diario_queryset().select_related("prestacao"), pk=pk)
     sincronizar_trechos(diario)
     try:
         payload = parse_autosave_payload(request, expected_model="diario_bordo")
@@ -1089,7 +1114,7 @@ def diario_editar_roteiro(request, pc_pk):
     from urllib.parse import urlencode
 
     prestacao = get_object_or_404(
-        PrestacaoContas.objects.select_related("oficio__roteiro"),
+        _prestacao_queryset().select_related("oficio__roteiro"),
         pk=pc_pk,
     )
     copia = garantir_roteiro_ajustado(prestacao)
@@ -1180,7 +1205,7 @@ def _oficio_prefill_dados(oficio) -> dict:
 def diario_motorista(request, pc_pk):
     """Etapa 2 — troca o motorista/viatura apenas deste diário, sem alterar o ofício."""
     prestacao = get_object_or_404(
-        PrestacaoContas.objects.select_related("oficio", "oficio__viatura").prefetch_related(
+        _prestacao_queryset().select_related("oficio", "oficio__viatura").prefetch_related(
             "oficio__servidores__cargo",
             "oficio__servidores__unidade",
         ),
@@ -1204,7 +1229,8 @@ def diario_motorista(request, pc_pk):
 
     # Ofícios existentes (com número) para o select de "motorista de outro ofício".
     oficios = (
-        Oficio.objects.select_related("viatura", "viatura__combustivel", "motorista", "transporte_combustivel_manual")
+        filter_queryset_by_area(Oficio.objects)
+        .select_related("viatura", "viatura__combustivel", "motorista", "transporte_combustivel_manual")
         .exclude(pk=prestacao.oficio_id)
         .filter(numero__isnull=False)
         .order_by("-ano", "-numero")[:200]
@@ -1233,7 +1259,7 @@ def diario_motorista(request, pc_pk):
 
 def diario_download(request, pk, formato="xlsx"):
     diario = get_object_or_404(
-        DiarioBordo.objects.select_related(
+        _diario_queryset().select_related(
             "prestacao__oficio__roteiro",
             "prestacao__oficio__viatura",
             "prestacao__oficio__motorista",
@@ -1344,7 +1370,7 @@ def consolidado(request, pc_pk):
 
 def consolidado_download(request, ps_pk):
     ps = get_object_or_404(
-        PrestacaoServidor.objects.select_related(
+        _prestacao_servidor_queryset().select_related(
             "prestacao__oficio__roteiro", "servidor"
         ).prefetch_related("prestacao__servidores_prestacao"),
         pk=ps_pk,
@@ -1380,7 +1406,7 @@ def modelos_index(request):
 
     grupos = []
     for campo, label in ModeloTextoRelatorioTecnico.CAMPO_CHOICES:
-        modelos = ModeloTextoRelatorioTecnico.objects.filter(campo=campo)
+        modelos = filter_queryset_by_area(ModeloTextoRelatorioTecnico.objects).filter(campo=campo)
         if q:
             q_unaccent = remove_accents(q)
             modelos = modelos.filter(Q(nome__unaccent__icontains=q_unaccent) | Q(texto__unaccent__icontains=q_unaccent))
@@ -1429,7 +1455,9 @@ def modelo_novo(request):
 
     form = ModeloTextoRelatorioTecnicoForm(request.POST or None, initial=initial)
     if request.method == "POST" and form.is_valid():
-        form.save()
+        modelo = form.save(commit=False)
+        modelo.area = getattr(request, "area", None)
+        modelo.save()
         messages.success(request, "Modelo criado com sucesso.")
         return redirect(_voltar_modelos_url(form.cleaned_data["campo"]))
 
@@ -1447,10 +1475,13 @@ def modelo_novo(request):
 
 
 def modelo_editar(request, pk):
-    modelo = get_object_or_404(ModeloTextoRelatorioTecnico, pk=pk)
+    modelo = get_object_or_404(filter_queryset_by_area(ModeloTextoRelatorioTecnico.objects), pk=pk)
     form = ModeloTextoRelatorioTecnicoForm(request.POST or None, instance=modelo)
     if request.method == "POST" and form.is_valid():
-        form.save()
+        modelo = form.save(commit=False)
+        if not modelo.area_id:
+            modelo.area = getattr(request, "area", None)
+        modelo.save()
         messages.success(request, "Modelo atualizado com sucesso.")
         return redirect(_voltar_modelos_url(form.cleaned_data["campo"]))
 
@@ -1468,7 +1499,7 @@ def modelo_editar(request, pk):
 
 
 def modelo_excluir(request, pk):
-    modelo = get_object_or_404(ModeloTextoRelatorioTecnico, pk=pk)
+    modelo = get_object_or_404(filter_queryset_by_area(ModeloTextoRelatorioTecnico.objects), pk=pk)
     if request.method == "POST":
         campo = modelo.campo
         modelo.delete()

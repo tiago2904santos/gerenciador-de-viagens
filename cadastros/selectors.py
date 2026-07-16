@@ -2,6 +2,7 @@
 from django.shortcuts import get_object_or_404
 
 from core.normalizers import remove_accents
+from core.tenancy import filter_queryset_by_area
 from core.tenancy import get_current_area
 
 from .models import AssinaturaConfiguracao
@@ -16,7 +17,7 @@ from .models import Viatura
 
 
 def listar_unidades(q=None):
-    queryset = Unidade.objects.order_by("nome")
+    queryset = filter_queryset_by_area(Unidade.objects).order_by("nome")
     if q:
         q = remove_accents(q)
         queryset = queryset.filter(Q(nome__unaccent__icontains=q) | Q(sigla__unaccent__icontains=q))
@@ -45,7 +46,7 @@ def listar_estados(q=None):
 
 
 def get_unidade_by_id(pk):
-    return get_object_or_404(Unidade, pk=pk)
+    return get_object_or_404(filter_queryset_by_area(Unidade.objects), pk=pk)
 
 
 def get_cidade_by_id(pk):
@@ -57,29 +58,29 @@ def get_estado_by_id(pk):
 
 
 def listar_cargos(q=None):
-    queryset = Cargo.objects.order_by("nome")
+    queryset = filter_queryset_by_area(Cargo.objects).order_by("nome")
     if q:
         queryset = queryset.filter(Q(nome__unaccent__icontains=remove_accents(q)))
     return queryset
 
 
 def get_cargo_by_id(pk):
-    return get_object_or_404(Cargo, pk=pk)
+    return get_object_or_404(filter_queryset_by_area(Cargo.objects), pk=pk)
 
 
 def listar_combustiveis(q=None):
-    queryset = Combustivel.objects.order_by("nome")
+    queryset = filter_queryset_by_area(Combustivel.objects).order_by("nome")
     if q:
         queryset = queryset.filter(Q(nome__unaccent__icontains=remove_accents(q)))
     return queryset
 
 
 def get_combustivel_by_id(pk):
-    return get_object_or_404(Combustivel, pk=pk)
+    return get_object_or_404(filter_queryset_by_area(Combustivel.objects), pk=pk)
 
 
 def listar_servidores(q=None):
-    queryset = Servidor.objects.select_related("cargo", "unidade").order_by("nome")
+    queryset = filter_queryset_by_area(Servidor.objects).select_related("cargo", "unidade").order_by("nome")
     if q:
         q_unaccent = remove_accents(q)
         queryset = queryset.filter(
@@ -94,12 +95,13 @@ def listar_servidores(q=None):
 
 
 def get_servidor_by_id(pk):
-    return get_object_or_404(Servidor.objects.select_related("cargo", "unidade"), pk=pk)
+    return get_object_or_404(filter_queryset_by_area(Servidor.objects).select_related("cargo", "unidade"), pk=pk)
 
 
 def listar_viaturas(q=None):
     queryset = (
-        Viatura.objects.select_related("combustivel", "unidade")
+        filter_queryset_by_area(Viatura.objects)
+        .select_related("combustivel", "unidade")
         .prefetch_related("motoristas")
         .order_by("placa")
     )
@@ -122,7 +124,9 @@ def listar_viaturas(q=None):
 
 def get_viatura_by_id(pk):
     return get_object_or_404(
-        Viatura.objects.select_related("combustivel", "unidade").prefetch_related("motoristas"),
+        filter_queryset_by_area(Viatura.objects)
+        .select_related("combustivel", "unidade")
+        .prefetch_related("motoristas"),
         pk=pk,
     )
 

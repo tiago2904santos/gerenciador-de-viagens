@@ -21,6 +21,7 @@ from django.views.decorators.http import require_http_methods
 from django.views.decorators.http import require_POST
 
 from cadastros.models import Servidor
+from core.tenancy import filter_queryset_by_area
 from core.normalizers import remove_accents
 
 from documentos.services.exceptions import DocumentValidationError
@@ -62,7 +63,8 @@ def index(request):
     q = request.GET.get("q", "").strip()
     q_digits = _digits(q)
     termos = (
-        TermoAutorizacao.objects.select_related(
+        filter_queryset_by_area(TermoAutorizacao.objects)
+        .select_related(
             "oficio",
             "destino_estado",
             "destino_cidade",
@@ -134,7 +136,7 @@ def _pagination_pages(page_obj, *, on_each_side=1, on_ends=1):
 
 
 def _termo_queryset():
-    return TermoAutorizacao.objects.select_related(
+    return filter_queryset_by_area(TermoAutorizacao.objects).select_related(
         "oficio",
         "oficio__roteiro",
         "destino_estado",
@@ -558,7 +560,7 @@ def termo_cadastro_generico_pdf_inline(request, pk):
 @require_GET
 def termo_cadastro_servidor_pdf_inline(request, pk, servidor_pk):
     termo = get_object_or_404(_termo_queryset(), pk=pk)
-    servidor = get_object_or_404(Servidor, pk=servidor_pk)
+    servidor = get_object_or_404(filter_queryset_by_area(Servidor.objects), pk=servidor_pk)
     if not termo.servidores_efetivos().filter(pk=servidor.pk).exists():
         raise Http404("Servidor nao selecionado para este termo.")
     try:
@@ -642,7 +644,7 @@ def preview_termo_oficio(request, pk):
     servidor_pk = request.GET.get("servidor")
     servidor = None
     if servidor_pk:
-        servidor = get_object_or_404(Servidor, pk=int(servidor_pk))
+        servidor = get_object_or_404(filter_queryset_by_area(Servidor.objects), pk=int(servidor_pk))
     ctx = preview_termo_context(oficio, servidor, modo_semipreenchido=modo)
     if request.GET.get("format") == "json":
         return HttpResponse(
@@ -665,7 +667,7 @@ def preview_termo_oficio(request, pk):
 @require_GET
 def termo_servidor_pdf_inline(request, pk, servidor_pk):
     oficio = get_oficio_by_id(pk)
-    servidor = get_object_or_404(Servidor, pk=servidor_pk)
+    servidor = get_object_or_404(filter_queryset_by_area(Servidor.objects), pk=servidor_pk)
     if not oficio.servidores.filter(pk=servidor.pk).exists():
         raise Http404("Servidor nao participa deste oficio.")
     if not listar_servidores_com_termo(oficio).filter(pk=servidor.pk).exists():
@@ -699,7 +701,7 @@ def baixar_termo_servidor(request, pk, servidor_pk, formato):
     except ValueError as exc:
         raise Http404("Formato nao suportado.") from exc
 
-    servidor = get_object_or_404(Servidor, pk=servidor_pk)
+    servidor = get_object_or_404(filter_queryset_by_area(Servidor.objects), pk=servidor_pk)
     if not oficio.servidores.filter(pk=servidor.pk).exists():
         raise Http404("Servidor nao participa deste oficio.")
     if not listar_servidores_com_termo(oficio).filter(pk=servidor.pk).exists():
@@ -837,7 +839,7 @@ def _anexar_assinado_resolver(request, fallback_url, resolver):
 @require_POST
 def termo_oficio_assinado_anexar(request, pk, servidor_pk):
     oficio = get_oficio_by_id(pk)
-    servidor = get_object_or_404(Servidor, pk=servidor_pk)
+    servidor = get_object_or_404(filter_queryset_by_area(Servidor.objects), pk=servidor_pk)
     fallback = reverse("oficios:wizard_documentos", args=[oficio.pk])
     return _anexar_assinado_resolver(
         request, fallback, lambda: resolver_artefato_termo_oficio(oficio, servidor)
@@ -856,7 +858,7 @@ def termo_cadastro_generico_assinado_anexar(request, pk):
 @require_POST
 def termo_cadastro_servidor_assinado_anexar(request, pk, servidor_pk):
     termo = get_object_or_404(_termo_queryset(), pk=pk)
-    servidor = get_object_or_404(Servidor, pk=servidor_pk)
+    servidor = get_object_or_404(filter_queryset_by_area(Servidor.objects), pk=servidor_pk)
     fallback = reverse("termos:editar", args=[termo.pk])
     return _anexar_assinado_resolver(
         request, fallback, lambda: resolver_artefato_termo_cadastro(termo, servidor)

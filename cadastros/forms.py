@@ -4,6 +4,7 @@ from django import forms
 
 from core.normalizers import normalize_plate
 from core.normalizers import normalize_upper
+from core.tenancy import filter_queryset_by_area
 from core.utils.masks import (
     RG_NAO_POSSUI_CANONICAL,
     RG_NAO_POSSUI_DISPLAY,
@@ -32,7 +33,11 @@ PLACA_RE = re.compile(r"^[A-Z]{3}(?:\d{4}|\d[A-Z]\d{2})$")
 def _servidores_assinantes_queryset():
     # Assinantes/destinatários exibem apenas nome e cargo no documento (sem RG/CPF),
     # então servidores incompletos (ex.: chefias sem CPF cadastrado) também são elegíveis.
-    return Servidor.objects.select_related("cargo", "unidade").order_by("nome")
+    return _servidores_queryset()
+
+
+def _servidores_queryset():
+    return filter_queryset_by_area(Servidor.objects).select_related("cargo", "unidade").order_by("nome")
 
 
 def _normalize_nome_obrigatorio(value):
@@ -155,9 +160,11 @@ class UnidadeForm(BaseCadastroForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["servidores"].queryset = Servidor.objects.select_related("cargo", "unidade").order_by("nome")
+        self.fields["servidores"].queryset = _servidores_queryset()
         if self.instance.pk and not self.is_bound:
-            self.initial["servidores"] = list(self.instance.servidores.values_list("pk", flat=True))
+            self.initial["servidores"] = list(
+                _servidores_queryset().filter(unidade=self.instance).values_list("pk", flat=True)
+            )
 
     def save(self, commit=True):
         unidade = super().save(commit=commit)
@@ -166,12 +173,19 @@ class UnidadeForm(BaseCadastroForm):
             servidores = self.cleaned_data.get("servidores")
             if servidores is not None:
                 selected_ids = {servidor.pk for servidor in servidores}
-                Servidor.objects.filter(pk__in=selected_ids).update(unidade=unidade)
-                Servidor.objects.filter(unidade=unidade).exclude(pk__in=selected_ids).update(unidade=None)
+                servidores_area = filter_queryset_by_area(Servidor.objects)
+                servidores_area.filter(pk__in=selected_ids).update(unidade=unidade)
+                servidores_area.filter(unidade=unidade).exclude(pk__in=selected_ids).update(unidade=None)
         return unidade
 
     def clean_nome(self):
-        return self.cleaned_data["nome"].strip()
+        nome = (self.cleaned_data["nome"] or "").strip()
+        qs = filter_queryset_by_area(Unidade.objects).filter(nome=normalize_upper(nome))
+        if self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise forms.ValidationError("Já existe uma unidade com este nome.")
+        return nome
 
     def clean_sigla(self):
         return self.cleaned_data.get("sigla", "").strip().upper()
@@ -236,7 +250,7 @@ class CargoForm(BaseCadastroForm):
 
     def clean_nome(self):
         nome = _normalize_nome_obrigatorio(self.cleaned_data.get("nome", ""))
-        qs = Cargo.objects.filter(nome=nome)
+        qs = filter_queryset_by_area(Cargo.objects).filter(nome=nome)
         if self.instance.pk:
             qs = qs.exclude(pk=self.instance.pk)
         if qs.exists():
@@ -260,7 +274,7 @@ class CombustivelForm(BaseCadastroForm):
 
     def clean_nome(self):
         nome = _normalize_nome_obrigatorio(self.cleaned_data.get("nome", ""))
-        qs = Combustivel.objects.filter(nome=nome)
+        qs = filter_queryset_by_area(Combustivel.objects).filter(nome=nome)
         if self.instance.pk:
             qs = qs.exclude(pk=self.instance.pk)
         if qs.exists():
@@ -320,7 +334,7 @@ class ServidorForm(BaseCadastroForm):
         self.fields["cargo"].required = False
         self.fields["cargo"].empty_label = "Selecione (opcional)"
         self.fields["cargo"].widget.attrs["class"] = "form-select"
-        self.fields["cargo"].queryset = Cargo.objects.order_by("nome")
+        self.fields["cargo"].queryset = filter_queryset_by_area(Cargo.objects).order_by("nome")
         self.fields["unidade"].required = False
         self.fields["unidade"].empty_label = "Selecione (opcional)"
         self.fields["unidade"].widget = UnidadeSearchSelect(
@@ -335,10 +349,10 @@ class ServidorForm(BaseCadastroForm):
                 "data-empty-message": "Nenhuma unidade encontrada.",
             }
         )
-        self.fields["unidade"].queryset = Unidade.objects.order_by("nome")
+        self.fields["unidade"].queryset = filter_queryset_by_area(Unidade.objects).order_by("nome")
 
         if not self.instance.pk and not self.data:
-            padrao = Cargo.objects.filter(is_padrao=True).first()
+            padrao = filter_queryset_by_area(Cargo.objects).filter(is_padrao=True).first()
             if padrao:
                 self.initial.setdefault("cargo", padrao.pk)
 
@@ -352,7 +366,7 @@ class ServidorForm(BaseCadastroForm):
 
     def clean_nome(self):
         nome = _normalize_nome_obrigatorio(self.cleaned_data.get("nome", ""))
-        qs = Servidor.objects.filter(nome=nome)
+        qs = filter_queryset_by_area(Servidor.objects).filter(nome=nome)
         if self.instance.pk:
             qs = qs.exclude(pk=self.instance.pk)
         if qs.exists():
@@ -367,7 +381,7 @@ class ServidorForm(BaseCadastroForm):
             raise forms.ValidationError("CPF deve conter 11 dígitos.")
         if not validar_cpf_digitos(digits):
             raise forms.ValidationError("CPF inválido.")
-        qs = Servidor.objects.filter(cpf=digits)
+        qs = filter_queryset_by_area(Servidor.objects).filter(cpf=digits)
         if self.instance.pk:
             qs = qs.exclude(pk=self.instance.pk)
         if qs.exists():
@@ -381,7 +395,7 @@ class ServidorForm(BaseCadastroForm):
         if not raw:
             return RG_NAO_POSSUI_CANONICAL
         if raw:
-            qs = Servidor.objects.filter(rg=raw)
+            qs = filter_queryset_by_area(Servidor.objects).filter(rg=raw)
             if self.instance.pk:
                 qs = qs.exclude(pk=self.instance.pk)
             if qs.exists():
@@ -399,7 +413,7 @@ class ServidorForm(BaseCadastroForm):
             return ""
         if len(digits) not in (10, 11):
             raise forms.ValidationError("Telefone deve ter 10 ou 11 dígitos.")
-        qs = Servidor.objects.filter(telefone=digits)
+        qs = filter_queryset_by_area(Servidor.objects).filter(telefone=digits)
         if self.instance.pk:
             qs = qs.exclude(pk=self.instance.pk)
         if qs.exists():
@@ -441,7 +455,7 @@ class ViaturaForm(BaseCadastroForm):
         self.fields["combustivel"].required = False
         self.fields["combustivel"].empty_label = "Selecione (opcional)"
         self.fields["combustivel"].widget.attrs["class"] = "form-select"
-        self.fields["combustivel"].queryset = Combustivel.objects.order_by("nome")
+        self.fields["combustivel"].queryset = filter_queryset_by_area(Combustivel.objects).order_by("nome")
         self.fields["tipo"].required = False
         self.fields["unidade"].required = False
         self.fields["unidade"].empty_label = "Selecione (opcional)"
@@ -456,11 +470,11 @@ class ViaturaForm(BaseCadastroForm):
                 "data-empty-message": "Nenhuma unidade encontrada.",
             }
         )
-        self.fields["unidade"].queryset = Unidade.objects.order_by("nome")
+        self.fields["unidade"].queryset = filter_queryset_by_area(Unidade.objects).order_by("nome")
         self.fields["motoristas"].required = False
-        self.fields["motoristas"].queryset = Servidor.objects.select_related("cargo", "unidade").order_by("nome")
+        self.fields["motoristas"].queryset = _servidores_queryset()
         if not self.instance.pk and not self.data:
-            padrao = Combustivel.objects.filter(is_padrao=True).first()
+            padrao = filter_queryset_by_area(Combustivel.objects).filter(is_padrao=True).first()
             if padrao:
                 self.initial.setdefault("combustivel", padrao.pk)
             self.initial.setdefault("tipo", Viatura.TIPO_DESCARACTERIZADA)
@@ -558,7 +572,7 @@ class ConfiguracaoSistemaForm(forms.ModelForm):
                 "data-empty-message": "Nenhuma unidade encontrada.",
             }
         )
-        self.fields["divisao"].queryset = Unidade.objects.order_by("nome")
+        self.fields["divisao"].queryset = filter_queryset_by_area(Unidade.objects).order_by("nome")
 
         self.fields["unidade"].required = False
         self.fields["unidade"].empty_label = ""
@@ -575,7 +589,7 @@ class ConfiguracaoSistemaForm(forms.ModelForm):
                 "data-empty-message": "Nenhuma unidade encontrada.",
             }
         )
-        self.fields["unidade"].queryset = Unidade.objects.order_by("nome")
+        self.fields["unidade"].queryset = filter_queryset_by_area(Unidade.objects).order_by("nome")
 
         self.fields["cidade_endereco"].label = "Cidade"
         self.fields["cep"].label = "CEP"

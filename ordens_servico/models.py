@@ -11,6 +11,14 @@ from oficios.models import Oficio
 
 
 class OrdemServico(TimeStampedModel, CancelavelModel):
+    area = models.ForeignKey(
+        "usuarios.AreaTrabalho",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="ordens_servico",
+        verbose_name="Area de trabalho",
+    )
     numero = models.PositiveIntegerField(null=True, blank=True, db_index=True)
     ano = models.PositiveIntegerField(null=True, blank=True, db_index=True)
     evento = models.ForeignKey(
@@ -77,17 +85,24 @@ class OrdemServico(TimeStampedModel, CancelavelModel):
         return ", ".join(parts)
 
     def save(self, *args, **kwargs):
+        if self.area_id is None:
+            if self.evento_id and self.evento and self.evento.area_id:
+                self.area = self.evento.area
+            else:
+                from core.tenancy import get_current_area
+
+                self.area = get_current_area()
         if not self.numero:
             self._assign_numero()
         super().save(*args, **kwargs)
 
     def _assign_numero(self):
         ano = timezone.localdate().year
-        last = (
-            OrdemServico.objects.filter(ano=ano)
-            .order_by("-numero")
-            .values_list("numero", flat=True)
-            .first()
-        )
+        queryset = OrdemServico.objects.filter(ano=ano)
+        if self.area_id:
+            queryset = queryset.filter(area=self.area)
+        else:
+            queryset = queryset.filter(area__isnull=True)
+        last = queryset.order_by("-numero").values_list("numero", flat=True).first()
         self.numero = (last or 0) + 1
         self.ano = ano

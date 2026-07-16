@@ -14,6 +14,8 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_GET
 from django.views.decorators.http import require_POST
 
+from core.tenancy import filter_queryset_by_area
+
 from .models import DocumentoArtefato
 from .services import default_document_registry
 from .services.access import artefato_pdf_download_filename
@@ -49,7 +51,7 @@ def index(request):
 
 @require_GET
 def artefato_pdf_conteudo(request, pk):
-    artefato = get_object_or_404(DocumentoArtefato, pk=pk)
+    artefato = get_object_or_404(filter_queryset_by_area(DocumentoArtefato.objects), pk=pk)
     ensure_request_may_view_artefato_pdf(request, artefato)
     return build_pdf_http_response_for_artefato(request, artefato)
 
@@ -73,7 +75,7 @@ def artefato_pdf_conteudo_publico(request):
 
 @require_GET
 def artefato_pdf_visualizar(request, pk):
-    artefato = get_object_or_404(DocumentoArtefato, pk=pk)
+    artefato = get_object_or_404(filter_queryset_by_area(DocumentoArtefato.objects), pk=pk)
     ensure_request_may_view_artefato_pdf(request, artefato)
     if select_artefato_pdf_fieldfile(artefato) is None:
         raise Http404("Ficheiro PDF não disponível.")
@@ -124,7 +126,7 @@ def _artefato_fallback_url(artefato: DocumentoArtefato) -> str:
 
 @require_POST
 def artefato_assinado_anexar(request, pk):
-    artefato = get_object_or_404(DocumentoArtefato, pk=pk)
+    artefato = get_object_or_404(filter_queryset_by_area(DocumentoArtefato.objects), pk=pk)
     ensure_request_may_view_artefato_pdf(request, artefato)
     fallback = _artefato_fallback_url(artefato)
     upload = request.FILES.get("arquivo")
@@ -145,7 +147,7 @@ def artefato_assinado_anexar(request, pk):
 
 @require_POST
 def artefato_assinado_remover(request, pk):
-    artefato = get_object_or_404(DocumentoArtefato, pk=pk)
+    artefato = get_object_or_404(filter_queryset_by_area(DocumentoArtefato.objects), pk=pk)
     ensure_request_may_view_artefato_pdf(request, artefato)
     fallback = _artefato_fallback_url(artefato)
     remover_arquivo_assinado(artefato)
@@ -154,5 +156,4 @@ def artefato_assinado_remover(request, pk):
     sincronizar_assinatura_manual(artefato)
     messages.success(request, "Documento assinado removido.")
     return redirect(_safe_next_url(request, fallback))
-
 

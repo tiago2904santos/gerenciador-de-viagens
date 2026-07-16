@@ -11,15 +11,16 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
-from .forms import RoteiroForm
 from core.autosave import (
     AutosavePayloadError,
     autosave_json_response,
     filter_allowed_fields,
     parse_autosave_payload,
 )
+from core.tenancy import filter_queryset_by_area
 from eventos.services import build_evento_document_seed
 from eventos.services import resolve_evento_from_request
+from .forms import RoteiroForm
 from .services.routing.route_exceptions import (
     RouteAuthenticationError,
     RouteConfigurationError,
@@ -192,7 +193,7 @@ def _resolver_rascunho_autosave(request):
         pk = int(raw)
     except (TypeError, ValueError):
         return None
-    return Roteiro.objects.filter(pk=pk).first()
+    return filter_queryset_by_area(Roteiro.objects).filter(pk=pk).first()
 
 
 def novo(request):

@@ -10,6 +10,7 @@ from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
+from core.tenancy import filter_queryset_by_area
 from integracoes.google_drive.models import (
     DriveArquivo,
     DriveCredenciais,
@@ -30,14 +31,19 @@ from integracoes.google_drive.services import (
 )
 
 
-def _area_atual(request):
-    return getattr(request, "area", None)
+def _usuario_atual(request):
+    user = getattr(request, "user", None)
+    return user if user is not None and user.is_authenticated else None
 
 
-def _credenciais_queryset(area):
-    if area is None:
-        return DriveCredenciais.objects.filter(area__isnull=True)
-    return DriveCredenciais.objects.filter(area=area)
+def _credenciais_queryset(usuario):
+    if usuario is None:
+        return DriveCredenciais.objects.filter(usuario__isnull=True)
+    return DriveCredenciais.objects.filter(usuario=usuario)
+
+
+def _jobs_queryset(usuario, area):
+    return DriveReorganizacaoJob.objects.filter(usuario=usuario, area=area)
 
 
 @login_required
@@ -47,11 +53,12 @@ def index(request):
     from integracoes.google_drive import status
 
     cfg = getattr(settings, "GOOGLE_DRIVE", {})
-    area = _area_atual(request)
-    creds = get_credenciais(area)
-    pasta_raiz_id = get_pasta_raiz_id(area)
+    usuario = _usuario_atual(request)
+    creds = get_credenciais(usuario)
+    pasta_raiz_id = get_pasta_raiz_id(usuario)
     modo = cfg.get("MODO", "mock").lower()
-    autorizado = esta_autorizado(area)
+    autorizado = esta_autorizado(usuario)
+    area = getattr(request, "area", None)
 
     return render(
         request,
@@ -61,17 +68,17 @@ def index(request):
             "page_description": "Configuração da integração com o Google Drive.",
             "modo": modo,
             "autorizado": autorizado,
-            "escopo_faltante": escopo_faltante(area),
+            "escopo_faltante": escopo_faltante(usuario),
             "creds": creds,
             "pasta_raiz_id": pasta_raiz_id,
             "pasta_raiz_nome": creds.pasta_raiz_nome if creds else "",
-            "total_arquivos": DriveArquivo.objects.count(),
+            "total_arquivos": DriveArquivo.objects.filter(artefato__area=area).count(),
             "modo_ativo": modo != "mock",
             "pode_reorganizar": bool(pasta_raiz_id) and (autorizado or modo == "mock"),
-            "total_eventos": Evento.objects.count(),
-            "job_reorg": DriveReorganizacaoJob.objects.order_by("-iniciado_em").first(),
-            "total_pendencias": status.contagem_pendencias(),
-            "pendencias": status.listar_pendencias(limite=20),
+            "total_eventos": filter_queryset_by_area(Evento.objects, area=area).count(),
+            "job_reorg": _jobs_queryset(usuario, area).order_by("-iniciado_em").first(),
+            "total_pendencias": status.contagem_pendencias(usuario=usuario, area=area),
+            "pendencias": status.listar_pendencias(limite=20, usuario=usuario, area=area),
         },
     )
 
@@ -110,8 +117,8 @@ def oauth_iniciar(request):
     )
     request.session["gdrive_oauth_state"] = state
     request.session["gdrive_code_verifier"] = getattr(flow, "code_verifier", None)
-    area = _area_atual(request)
-    request.session["gdrive_oauth_area_id"] = area.pk if area else None
+    usuario = _usuario_atual(request)
+    request.session["gdrive_oauth_usuario_id"] = usuario.pk if usuario else None
     return redirect(auth_url)
 
 
@@ -140,14 +147,14 @@ def oauth_callback(request):
         flow.fetch_token(authorization_response=request.build_absolute_uri())
         creds = flow.credentials
 
-        area = _area_atual(request)
-        _credenciais_queryset(area).delete()
+        usuario = _usuario_atual(request)
+        _credenciais_queryset(usuario).delete()
         expiry = creds.expiry
         if expiry and expiry.tzinfo is None:
             expiry = expiry.replace(tzinfo=dt_tz.utc)
 
         DriveCredenciais.objects.create(
-            area=area,
+            usuario=usuario,
             access_token=creds.token,
             refresh_token=creds.refresh_token or "",
             token_expiry=expiry,
@@ -164,7 +171,7 @@ def oauth_callback(request):
 @login_required
 @require_POST
 def oauth_revogar(request):
-    _credenciais_queryset(_area_atual(request)).delete()
+    _credenciais_queryset(_usuario_atual(request)).delete()
     _reset_client()
     messages.success(request, "Conta Google desconectada.")
     return redirect("cadastros:configuracao")
@@ -178,7 +185,7 @@ def oauth_revogar(request):
 def api_listar_pastas(request):
     pai_id = request.GET.get("pai_id") or None
     try:
-        client = get_client(_area_atual(request))
+        client = get_client(_usuario_atual(request))
         pastas = client.listar_pastas(pai_id=pai_id)
         return JsonResponse({"pastas": pastas})
     except Exception as exc:
@@ -188,7 +195,7 @@ def api_listar_pastas(request):
 @login_required
 def api_listar_drives_compartilhados(request):
     try:
-        client = get_client(_area_atual(request))
+        client = get_client(_usuario_atual(request))
         drives = client.listar_drives_compartilhados()
         return JsonResponse({"pastas": drives})
     except Exception as exc:
@@ -198,7 +205,7 @@ def api_listar_drives_compartilhados(request):
 @login_required
 def api_listar_compartilhados_comigo(request):
     try:
-        client = get_client(_area_atual(request))
+        client = get_client(_usuario_atual(request))
         pastas = client.listar_compartilhados_comigo()
         return JsonResponse({"pastas": pastas})
     except Exception as exc:
@@ -219,7 +226,7 @@ def api_criar_pasta(request):
         return JsonResponse({"erro": "Nome é obrigatório"}, status=400)
 
     try:
-        client = get_client(_area_atual(request))
+        client = get_client(_usuario_atual(request))
         pasta = client.criar_pasta(nome, pai_id=pai_id)
         return JsonResponse({"pasta": pasta})
     except Exception as exc:
@@ -236,15 +243,15 @@ def salvar_pasta_raiz(request):
         messages.error(request, "Nenhuma pasta selecionada.")
         return redirect("google_drive:index")
 
-    area = _area_atual(request)
-    creds = get_credenciais(area)
+    usuario = _usuario_atual(request)
+    creds = get_credenciais(usuario)
     if not creds:
         messages.error(request, "Conta Google não conectada.")
         return redirect("cadastros:configuracao")
 
     if not pasta_nome:
         try:
-            pasta_nome = get_client(area).nome_pasta(pasta_id)
+            pasta_nome = get_client(usuario).nome_pasta(pasta_id)
         except Exception:
             pasta_nome = pasta_id
 
@@ -260,13 +267,13 @@ def salvar_pasta_raiz(request):
 # Organização em massa
 # ---------------------------------------------------------------------------
 
-def _pode_reorganizar(area=None) -> bool:
+def _pode_reorganizar(usuario=None) -> bool:
     cfg = getattr(settings, "GOOGLE_DRIVE", {})
     modo = cfg.get("MODO", "mock").lower()
-    return bool(get_pasta_raiz_id(area)) and (esta_autorizado(area) or modo == "mock")
+    return bool(get_pasta_raiz_id(usuario)) and (esta_autorizado(usuario) or modo == "mock")
 
 
-def _executar_reorganizacao(job_id: int) -> None:
+def _executar_reorganizacao(job_id: int, usuario, area) -> None:
     """Roda a reorganização e atualiza o job. Pensado para rodar numa thread."""
     from django.db import connection
 
@@ -278,7 +285,7 @@ def _executar_reorganizacao(job_id: int) -> None:
         )
 
     try:
-        resumo = organizer.reorganizar_tudo(progress=progress)
+        resumo = organizer.reorganizar_tudo(progress=progress, usuario=usuario, area=area)
         DriveReorganizacaoJob.objects.filter(pk=job_id).update(
             status=DriveReorganizacaoJob.STATUS_CONCLUIDA,
             total_eventos=resumo["eventos"],
@@ -302,25 +309,31 @@ def _executar_reorganizacao(job_id: int) -> None:
 @login_required
 @require_POST
 def reorganizar_tudo(request):
-    if not _pode_reorganizar(_area_atual(request)):
+    usuario = _usuario_atual(request)
+    area = getattr(request, "area", None)
+    if not _pode_reorganizar(usuario):
         messages.error(
             request,
             "Conecte a conta Google e defina a pasta de destino antes de reorganizar.",
         )
         return redirect("google_drive:index")
 
-    if DriveReorganizacaoJob.objects.filter(status=DriveReorganizacaoJob.STATUS_EM_ANDAMENTO).exists():
+    if _jobs_queryset(usuario, area).filter(status=DriveReorganizacaoJob.STATUS_EM_ANDAMENTO).exists():
         messages.info(request, "Já existe uma reorganização em andamento. Aguarde concluir.")
         return redirect("google_drive:index")
 
-    job = DriveReorganizacaoJob.objects.create(status=DriveReorganizacaoJob.STATUS_EM_ANDAMENTO)
+    job = DriveReorganizacaoJob.objects.create(
+        usuario=usuario,
+        area=area,
+        status=DriveReorganizacaoJob.STATUS_EM_ANDAMENTO,
+    )
 
     # Em testes (ou se configurado), roda de forma síncrona para ser determinístico.
     sincrono = getattr(settings, "GOOGLE_DRIVE", {}).get("REORG_SINCRONO", False)
     if sincrono:
-        _executar_reorganizacao(job.pk)
+        _executar_reorganizacao(job.pk, usuario, area)
     else:
-        threading.Thread(target=_executar_reorganizacao, args=(job.pk,), daemon=True).start()
+        threading.Thread(target=_executar_reorganizacao, args=(job.pk, usuario, area), daemon=True).start()
 
     messages.success(
         request,
@@ -351,7 +364,7 @@ def _job_para_json(job: DriveReorganizacaoJob | None) -> dict:
 @login_required
 def status_reorganizacao(request):
     """JSON do job de reorganização mais recente (para polling na página)."""
-    job = DriveReorganizacaoJob.objects.order_by("-iniciado_em").first()
+    job = _jobs_queryset(_usuario_atual(request), getattr(request, "area", None)).order_by("-iniciado_em").first()
     return JsonResponse(_job_para_json(job))
 
 
@@ -371,8 +384,9 @@ def previa_reorganizacao(request):
     linhas: list[str] = []
     truncado = False
     itens_com_erro = 0
+    area = getattr(request, "area", None)
 
-    for evento in Evento.objects.all().iterator():
+    for evento in filter_queryset_by_area(Evento.objects, area=area).iterator():
         try:
             linhas.extend(organizer.planejar_evento(evento))
         except Exception:
@@ -383,7 +397,7 @@ def previa_reorganizacao(request):
             truncado = True
             break
     if not truncado:
-        for oficio in Oficio.objects.filter(evento__isnull=True).iterator():
+        for oficio in filter_queryset_by_area(Oficio.objects, area=area).filter(evento__isnull=True).iterator():
             try:
                 linhas.extend(organizer.planejar_oficio(oficio))
             except Exception:
@@ -425,7 +439,7 @@ def _task_por_modelo() -> dict:
     return _TASK_POR_MODELO
 
 
-def _reprocessar_pendencias_em_thread() -> None:
+def _reprocessar_pendencias_em_thread(usuario, area) -> None:
     """Roda o reenvio de pendências fora do request (ver ``reprocessar_pendencias``)."""
     from django.db import connection
 
@@ -433,12 +447,12 @@ def _reprocessar_pendencias_em_thread() -> None:
 
     try:
         mapa = _task_por_modelo()
-        for pendencia in status.listar_pendencias(limite=500):
+        for pendencia in status.listar_pendencias(limite=500, usuario=usuario, area=area):
             task = mapa.get(pendencia.content_type.model)
             if task is None:
                 continue
             try:
-                task.delay(pendencia.object_id)
+                task.delay(pendencia.object_id, usuario_id=getattr(usuario, "pk", None))
             except Exception as exc:
                 logger.warning("[Drive] falha ao reagendar pendência %s: %s", pendencia.pk, exc)
     finally:
@@ -459,11 +473,13 @@ def reprocessar_pendencias(request):
     """
     # Em testes (mesma flag usada por reorganizar_tudo), roda de forma síncrona
     # para ser determinístico.
+    usuario = _usuario_atual(request)
+    area = getattr(request, "area", None)
     sincrono = getattr(settings, "GOOGLE_DRIVE", {}).get("REORG_SINCRONO", False)
     if sincrono:
-        _reprocessar_pendencias_em_thread()
+        _reprocessar_pendencias_em_thread(usuario, area)
     else:
-        threading.Thread(target=_reprocessar_pendencias_em_thread, daemon=True).start()
+        threading.Thread(target=_reprocessar_pendencias_em_thread, args=(usuario, area), daemon=True).start()
     messages.success(
         request,
         "Reenvio das pendências iniciado em segundo plano. "

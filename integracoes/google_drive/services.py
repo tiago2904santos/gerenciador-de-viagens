@@ -5,7 +5,7 @@ import logging
 from datetime import datetime, timezone
 
 from django.conf import settings
-from core.tenancy import get_current_area
+from core.middleware import get_current_request
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +45,7 @@ def mimetype_para_formato(formato: str) -> str:
     return _MIMETYPES.get((formato or "").lower(), "application/octet-stream")
 
 
-def escopo_faltante(area=None) -> list[str]:
+def escopo_faltante(usuario=None) -> list[str]:
     """Escopos requeridos (``_SCOPES``) que NÃO constam na credencial salva.
 
     Retorna lista vazia quando não há credencial (nada a comparar) ou quando o
@@ -53,7 +53,7 @@ def escopo_faltante(area=None) -> list[str]:
     antes que a renovação do token quebre com ``invalid_scope``.
     """
     try:
-        creds = get_credenciais(area)
+        creds = get_credenciais(usuario)
     except Exception:
         return []
     if not creds or not (creds.scope or "").strip():
@@ -75,19 +75,29 @@ def client_config_dict() -> dict:
     }
 
 
-def get_credenciais(area=None):
+def _resolve_usuario(usuario=None):
+    if usuario is not None:
+        return usuario
+    request = get_current_request()
+    user = getattr(request, "user", None) if request is not None else None
+    if user is not None and getattr(user, "is_authenticated", False):
+        return user
+    return None
+
+
+def get_credenciais(usuario=None):
     from integracoes.google_drive.models import DriveCredenciais
 
-    area = get_current_area() if area is None else area
-    if area is not None:
-        return DriveCredenciais.objects.filter(area=area).first()
-    return DriveCredenciais.objects.filter(area__isnull=True).order_by("pk").first()
+    usuario = _resolve_usuario(usuario)
+    if usuario is not None:
+        return DriveCredenciais.objects.filter(usuario=usuario).first()
+    return DriveCredenciais.objects.filter(usuario__isnull=True).order_by("pk").first()
 
 
-def get_pasta_raiz_id(area=None) -> str:
+def get_pasta_raiz_id(usuario=None) -> str:
     """Retorna o ID da pasta raiz: prioriza DB sobre .env."""
     try:
-        creds = get_credenciais(area)
+        creds = get_credenciais(usuario)
         if creds and creds.pasta_raiz_id:
             return creds.pasta_raiz_id
     except Exception:
@@ -183,14 +193,14 @@ class _MockClient:
 
 
 class _RealClient:
-    def __init__(self, area=None):
+    def __init__(self, usuario=None):
         import httplib2
         from google.auth.transport.requests import Request
         from google.oauth2.credentials import Credentials
         from google_auth_httplib2 import AuthorizedHttp
         from googleapiclient.discovery import build
 
-        creds_obj = get_credenciais(area)
+        creds_obj = get_credenciais(usuario)
         if not creds_obj:
             raise RuntimeError(
                 "Google Drive: nenhuma credencial OAuth armazenada. "
@@ -474,9 +484,9 @@ def _reset_client() -> None:
     _clients.clear()
 
 
-def get_client(area=None) -> _MockClient | _RealClient:
-    area = get_current_area() if area is None else area
-    key = area.pk if area is not None else None
+def get_client(usuario=None) -> _MockClient | _RealClient:
+    usuario = _resolve_usuario(usuario)
+    key = usuario.pk if usuario is not None else None
     if key not in _clients:
         cfg = _cfg()
         modo = cfg.get("MODO", "mock").lower()
@@ -488,24 +498,24 @@ def get_client(area=None) -> _MockClient | _RealClient:
             # falhas de token/escopo (uploads "sumiam" no mock enquanto o sistema
             # se dizia ativo). Propagamos o erro para que o signal registre a
             # pendência e avise o usuário, em vez de fingir sucesso.
-            faltando = escopo_faltante(area)
+            faltando = escopo_faltante(usuario)
             if faltando:
                 raise DriveScopeError(
                     "A conexão com o Google Drive precisa ser refeita: a "
                     "autorização salva não inclui " + ", ".join(faltando) + ". "
                     "Reconecte a conta em Configurações > Google Drive."
                 )
-            _clients[key] = _RealClient(area)
+            _clients[key] = _RealClient(usuario)
     return _clients[key]
 
 
-def is_mock(area=None) -> bool:
-    return isinstance(get_client(area), _MockClient)
+def is_mock(usuario=None) -> bool:
+    return isinstance(get_client(usuario), _MockClient)
 
 
-def esta_autorizado(area=None) -> bool:
+def esta_autorizado(usuario=None) -> bool:
     try:
-        return get_credenciais(area) is not None
+        return get_credenciais(usuario) is not None
     except Exception:
         return False
 

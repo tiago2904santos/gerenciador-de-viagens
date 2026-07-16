@@ -183,7 +183,7 @@ class Oficio(TimeStampedModel, CancelavelModel):
         return "—"
 
     @classmethod
-    def get_next_available_numero(cls, ano: int | None = None) -> int:
+    def get_next_available_numero(cls, ano: int | None = None, area=None) -> int:
         """Sugere o próximo número: reaproveita a menor lacuna liberada por exclusão
         (ver ``OficioNumeroLacuna``); caso não haja lacuna, segue para o maior número
         usado + 1. Números apenas pulados manualmente (nunca ocupados) não são
@@ -194,7 +194,7 @@ class Oficio(TimeStampedModel, CancelavelModel):
 
         resolved_year = ano or timezone.localdate().year
         piso = max(getattr(settings, "OFICIO_NUMERO_INICIAL", {}).get(resolved_year, 0), 1)
-        area = get_current_area()
+        area = get_current_area() if area is None else area
         qs = cls.objects.filter(ano=resolved_year)
         lacunas_qs = OficioNumeroLacuna.objects.filter(ano=resolved_year, numero__gte=piso)
         if area is not None:
@@ -301,7 +301,15 @@ class OficioNumeroLacuna(models.Model):
 
 
 class ModeloMotivoOficio(TimeStampedModel):
-    nome = models.CharField(max_length=120, unique=True)
+    area = models.ForeignKey(
+        "usuarios.AreaTrabalho",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="modelos_motivo_oficio",
+        verbose_name="Area de trabalho",
+    )
+    nome = models.CharField(max_length=120)
     texto = models.TextField()
     ativo = models.BooleanField(default=True)
     ordem = models.PositiveIntegerField(default=100)
@@ -311,6 +319,15 @@ class ModeloMotivoOficio(TimeStampedModel):
         ordering = ["ordem", "nome"]
         verbose_name = "Modelo de motivo de ofício"
         verbose_name_plural = "Modelos de motivo de ofício"
+        indexes = [
+            models.Index(fields=["area", "ordem", "nome"], name="oficios_motivo_area_ordem_idx"),
+        ]
+        constraints = [
+            models.UniqueConstraint(fields=["nome"], condition=Q(area__isnull=True), name="oficios_motivo_nome_global_unique"),
+            models.UniqueConstraint(fields=["area", "nome"], condition=Q(area__isnull=False), name="oficios_motivo_area_nome_unique"),
+            models.UniqueConstraint(fields=["area"], condition=Q(area__isnull=False) & Q(is_padrao=True), name="oficios_motivo_area_padrao_unique"),
+            models.UniqueConstraint(fields=["is_padrao"], condition=Q(area__isnull=True) & Q(is_padrao=True), name="oficios_motivo_global_padrao_unique"),
+        ]
 
     def __str__(self):
         return self.nome
@@ -319,5 +336,5 @@ class ModeloMotivoOficio(TimeStampedModel):
         self.nome = normalize_upper(self.nome)
         self.texto = normalize_spaces(self.texto)
         if self.is_padrao:
-            ModeloMotivoOficio.objects.exclude(pk=self.pk).update(is_padrao=False)
+            ModeloMotivoOficio.objects.exclude(pk=self.pk).filter(area=self.area).update(is_padrao=False)
         super().save(*args, **kwargs)

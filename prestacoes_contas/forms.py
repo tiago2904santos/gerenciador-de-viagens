@@ -8,6 +8,7 @@ from django.forms.renderers import TemplatesSetting
 
 from cadastros.models import Servidor
 from cadastros.models import Viatura
+from core.tenancy import filter_queryset_by_area
 from core.normalizers import normalize_spaces
 from core.utils.masks import normalize_protocolo
 
@@ -208,7 +209,9 @@ class DiarioMotoristaForm(forms.ModelForm):
 
         # Viatura do cadastro (modo BANCO).
         viatura_field = self.fields["viatura"]
-        viatura_field.queryset = Viatura.objects.select_related("combustivel").order_by("modelo", "placa")
+        viatura_field.queryset = (
+            filter_queryset_by_area(Viatura.objects).select_related("combustivel").order_by("modelo", "placa")
+        )
         viatura_field.required = False
         viatura_field.empty_label = "Selecione uma viatura"
         viatura_field.widget.attrs["class"] = "form-select"
@@ -625,7 +628,7 @@ class RelatorioTecnicoForm(forms.ModelForm):
             field_name = f"modelo_{campo}"
             field = forms.ModelChoiceField(
                 label=f"Modelo de {label.lower()}",
-                queryset=ModeloTextoRelatorioTecnico.objects.filter(campo=campo).order_by("ordem", "nome"),
+                queryset=filter_queryset_by_area(ModeloTextoRelatorioTecnico.objects).filter(campo=campo).order_by("ordem", "nome"),
                 required=False,
                 empty_label="Selecione um modelo (opcional)",
                 widget=ModeloTextoSelect(

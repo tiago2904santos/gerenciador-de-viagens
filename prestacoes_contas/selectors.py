@@ -5,6 +5,7 @@ from django.db.models import Q
 from django.utils import timezone
 
 from core.normalizers import remove_accents
+from core.tenancy import filter_queryset_by_area
 from roteiros.models import RoteiroTrecho
 
 from .models import PrestacaoContas
@@ -73,7 +74,8 @@ def _base_prestacoes(
     """Queryset com os filtros de busca/ordenação, mas sem o recorte por aba."""
     order_fields = _SORT_MAP.get(sort or "criacao_desc", ["-criado_em"])
     queryset = (
-        PrestacaoContas.objects.select_related(
+        filter_queryset_by_area(PrestacaoContas.objects)
+        .select_related(
             "oficio",
             "oficio__roteiro",
             "oficio__roteiro__origem_cidade",

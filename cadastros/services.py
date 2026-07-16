@@ -5,6 +5,8 @@ from core.deletion import excluir_com_protecao
 from core.normalizers import normalize_digits
 from core.normalizers import normalize_spaces
 from core.normalizers import remove_accents
+from core.tenancy import get_current_area
+
 from .models import Cargo
 from .models import Cidade
 from .models import Combustivel
@@ -152,11 +154,21 @@ def excluir_estado(instance):
 
 
 def criar_unidade(form):
-    return form.save()
+    unidade = form.save(commit=False)
+    if not unidade.area_id:
+        unidade.area = get_current_area()
+    unidade.save()
+    form.save_m2m()
+    return unidade
 
 
 def atualizar_unidade(instance, form):
-    return form.save()
+    unidade = form.save(commit=False)
+    if not unidade.area_id:
+        unidade.area = get_current_area()
+    unidade.save()
+    form.save_m2m()
+    return unidade
 
 
 def excluir_unidade(instance):
@@ -176,11 +188,21 @@ def excluir_cidade(instance):
 
 
 def criar_cargo(form):
-    return form.save()
+    cargo = form.save(commit=False)
+    if not cargo.area_id:
+        cargo.area = get_current_area()
+    cargo.save()
+    form.save_m2m()
+    return cargo
 
 
 def atualizar_cargo(instance, form):
-    return form.save()
+    cargo = form.save(commit=False)
+    if not cargo.area_id:
+        cargo.area = get_current_area()
+    cargo.save()
+    form.save_m2m()
+    return cargo
 
 
 def excluir_cargo(instance):
@@ -188,11 +210,21 @@ def excluir_cargo(instance):
 
 
 def criar_combustivel(form):
-    return form.save()
+    combustivel = form.save(commit=False)
+    if not combustivel.area_id:
+        combustivel.area = get_current_area()
+    combustivel.save()
+    form.save_m2m()
+    return combustivel
 
 
 def atualizar_combustivel(instance, form):
-    return form.save()
+    combustivel = form.save(commit=False)
+    if not combustivel.area_id:
+        combustivel.area = get_current_area()
+    combustivel.save()
+    form.save_m2m()
+    return combustivel
 
 
 def excluir_combustivel(instance):
@@ -200,11 +232,21 @@ def excluir_combustivel(instance):
 
 
 def criar_servidor(form):
-    return form.save()
+    servidor = form.save(commit=False)
+    if not servidor.area_id:
+        servidor.area = get_current_area()
+    servidor.save()
+    form.save_m2m()
+    return servidor
 
 
 def atualizar_servidor(instance, form):
-    return form.save()
+    servidor = form.save(commit=False)
+    if not servidor.area_id:
+        servidor.area = get_current_area()
+    servidor.save()
+    form.save_m2m()
+    return servidor
 
 
 def excluir_servidor(instance):
@@ -212,11 +254,21 @@ def excluir_servidor(instance):
 
 
 def criar_viatura(form):
-    return form.save()
+    viatura = form.save(commit=False)
+    if not viatura.area_id:
+        viatura.area = get_current_area()
+    viatura.save()
+    form.save_m2m()
+    return viatura
 
 
 def atualizar_viatura(instance, form):
-    return form.save()
+    viatura = form.save(commit=False)
+    if not viatura.area_id:
+        viatura.area = get_current_area()
+    viatura.save()
+    form.save_m2m()
+    return viatura
 
 
 def excluir_viatura(instance):

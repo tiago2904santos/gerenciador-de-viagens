@@ -21,6 +21,7 @@ from core.autosave import AutosavePayloadError
 from core.autosave import autosave_json_response
 from core.autosave import filter_allowed_fields
 from core.autosave import parse_autosave_payload
+from core.tenancy import filter_queryset_by_area
 
 from justificativas.forms import JustificativaOficioForm
 from justificativas.presenters import apresentar_justificativa_wizard_context
@@ -213,7 +214,7 @@ def _prepare_dados_viajantes_form(form):
 def _prepare_transporte_form(form):
     form.fields["viatura"].queryset = listar_viaturas_para_oficio()
     form.fields["motorista"].queryset = listar_servidores_para_oficio()
-    form.fields["transporte_combustivel_manual"].queryset = Combustivel.objects.order_by("nome")
+    form.fields["transporte_combustivel_manual"].queryset = filter_queryset_by_area(Combustivel.objects).order_by("nome")
 
 
 def _wizard_dados_viajantes_context(

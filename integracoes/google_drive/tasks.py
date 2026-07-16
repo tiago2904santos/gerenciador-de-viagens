@@ -45,55 +45,73 @@ _TASK_KWARGS = dict(
 )
 
 
+def _usuario_por_id(usuario_id):
+    if not usuario_id:
+        return None
+    from django.contrib.auth import get_user_model
+
+    return get_user_model().objects.filter(pk=usuario_id).first()
+
+
 @shared_task(**_TASK_KWARGS)
-def processar_artefato(self, artefato_id: int) -> None:
+def processar_artefato(self, artefato_id: int, usuario_id=None) -> None:
     from documentos.models import DocumentoArtefato
 
     art = DocumentoArtefato.objects.filter(pk=artefato_id).first()
     if art is None:
         status.limpar_pendencia_orfa(DocumentoArtefato, artefato_id)
         return
-    status.executar_e_rastrear(organizer.organizar_artefato, art)
+    usuario = _usuario_por_id(usuario_id)
+    with organizer.usar_usuario(usuario):
+        status.executar_e_rastrear(organizer.organizar_artefato, art, usuario=usuario)
 
 
 @shared_task(**_TASK_KWARGS)
-def processar_prestacao(self, prestacao_id: int) -> None:
+def processar_prestacao(self, prestacao_id: int, usuario_id=None) -> None:
     from prestacoes_contas.models import PrestacaoContas
 
     prestacao = PrestacaoContas.objects.filter(pk=prestacao_id).first()
     if prestacao is None:
         status.limpar_pendencia_orfa(PrestacaoContas, prestacao_id)
         return
-    status.executar_e_rastrear(organizer.organizar_prestacao, prestacao)
+    usuario = _usuario_por_id(usuario_id)
+    with organizer.usar_usuario(usuario):
+        status.executar_e_rastrear(organizer.organizar_prestacao, prestacao, usuario=usuario)
 
 
 @shared_task(**_TASK_KWARGS)
-def processar_evento_anexo(self, anexo_id: int) -> None:
+def processar_evento_anexo(self, anexo_id: int, usuario_id=None) -> None:
     from eventos.models import EventoAnexo
 
     anexo = EventoAnexo.objects.filter(pk=anexo_id).first()
     if anexo is None:
         status.limpar_pendencia_orfa(EventoAnexo, anexo_id)
         return
-    status.executar_e_rastrear(organizer.organizar_evento_anexo, anexo)
+    usuario = _usuario_por_id(usuario_id)
+    with organizer.usar_usuario(usuario):
+        status.executar_e_rastrear(organizer.organizar_evento_anexo, anexo, usuario=usuario)
 
 
 @shared_task(**_TASK_KWARGS)
-def processar_solicitacao_evento(self, solicitacao_id: int) -> None:
+def processar_solicitacao_evento(self, solicitacao_id: int, usuario_id=None) -> None:
     from eventos.models import EventoDocumentoSolicitacao
 
     doc = EventoDocumentoSolicitacao.objects.filter(pk=solicitacao_id).first()
     if doc is None:
         status.limpar_pendencia_orfa(EventoDocumentoSolicitacao, solicitacao_id)
         return
-    status.executar_e_rastrear(organizer.organizar_solicitacao_evento, doc)
+    usuario = _usuario_por_id(usuario_id)
+    with organizer.usar_usuario(usuario):
+        status.executar_e_rastrear(organizer.organizar_solicitacao_evento, doc, usuario=usuario)
 
 
 @shared_task(**_TASK_KWARGS)
-def processar_sincronizar_pasta_evento(self, evento_id: int) -> None:
+def processar_sincronizar_pasta_evento(self, evento_id: int, usuario_id=None) -> None:
     from eventos.models import Evento
 
     evento = Evento.objects.filter(pk=evento_id).first()
     if evento is None:
         return
-    status.executar_e_rastrear(organizer.sincronizar_pasta_evento, evento)
+    usuario = _usuario_por_id(usuario_id)
+    with organizer.usar_usuario(usuario):
+        status.executar_e_rastrear(organizer.sincronizar_pasta_evento, evento, usuario=usuario)

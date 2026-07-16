@@ -119,8 +119,8 @@ class DualOrganizationTests(TestCase):
     def test_prestacao_cria_atalho_de_pasta_global(self):
         arquivo, _ = _pdf("despacho.pdf")
         prest = (
-            PrestacaoContas.objects.filter(oficio=self.oficio, servidor=self.ana).first()
-            or PrestacaoContas(oficio=self.oficio, servidor=self.ana)
+            PrestacaoContas.objects.filter(oficio=self.oficio).first()
+            or PrestacaoContas(oficio=self.oficio)
         )
         prest.despacho_assinado = arquivo
         prest.save()

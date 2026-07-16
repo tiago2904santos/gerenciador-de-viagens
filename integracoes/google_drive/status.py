@@ -12,19 +12,86 @@ from __future__ import annotations
 _LIMITE_ERRO = 2000  # trunca mensagens de exceção muito longas antes de persistir.
 
 
-def registrar_falha(obj, exc: Exception) -> None:
+_UNSET = object()
+
+
+def _resolve_usuario(usuario=None):
+    if usuario is not None:
+        return usuario
+    try:
+        from core.middleware import get_current_request
+
+        request = get_current_request()
+        user = getattr(request, "user", None) if request is not None else None
+        if user is not None and getattr(user, "is_authenticated", False):
+            return user
+    except Exception:
+        pass
+    try:
+        from .organizer import get_usuario_contexto
+
+        return get_usuario_contexto()
+    except Exception:
+        return None
+
+
+def _resolve_area(area=_UNSET):
+    if area is not _UNSET:
+        return area
+    try:
+        from core.tenancy import get_current_area
+
+        return get_current_area()
+    except Exception:
+        return None
+
+
+def _area_origem(origem):
+    if origem is None:
+        return None
+    area = getattr(origem, "area", None)
+    if area is not None:
+        return area
+    oficio = getattr(origem, "oficio", None)
+    if oficio is not None:
+        return getattr(oficio, "area", None)
+    evento = getattr(origem, "evento", None)
+    if evento is not None:
+        return getattr(evento, "area", None)
+    prestacao = getattr(origem, "prestacao", None)
+    if prestacao is not None:
+        return getattr(prestacao, "area", None)
+    return None
+
+
+def _mesma_area(origem, area) -> bool:
+    origem_area = _area_origem(origem)
+    origem_area_id = getattr(origem_area, "pk", origem_area)
+    area_id = getattr(area, "pk", area)
+    return origem_area_id == area_id
+
+
+def registrar_falha(obj, exc: Exception, usuario=None) -> None:
     from django.contrib.contenttypes.models import ContentType
 
     from .models import DriveSyncStatus
 
     ct = ContentType.objects.get_for_model(obj.__class__)
     pendencia, criada = DriveSyncStatus.objects.get_or_create(
-        content_type=ct, object_id=str(obj.pk), defaults={"ultimo_erro": str(exc)[:_LIMITE_ERRO]}
+        content_type=ct,
+        object_id=str(obj.pk),
+        defaults={
+            "usuario": _resolve_usuario(usuario),
+            "ultimo_erro": str(exc)[:_LIMITE_ERRO],
+        },
     )
     if not criada:
+        usuario = _resolve_usuario(usuario)
+        if usuario is not None:
+            pendencia.usuario = usuario
         pendencia.tentativas += 1
         pendencia.ultimo_erro = str(exc)[:_LIMITE_ERRO]
-        pendencia.save(update_fields=["tentativas", "ultimo_erro", "atualizado_em"])
+        pendencia.save(update_fields=["usuario", "tentativas", "ultimo_erro", "atualizado_em"])
 
 
 def registrar_sucesso(obj) -> None:
@@ -51,7 +118,7 @@ def limpar_pendencia_orfa(model_cls, object_id) -> None:
     DriveSyncStatus.objects.filter(content_type=ct, object_id=str(object_id)).delete()
 
 
-def executar_e_rastrear(fn, obj) -> None:
+def executar_e_rastrear(fn, obj, usuario=None) -> None:
     """Roda ``fn(obj)``; registra sucesso/falha em ``DriveSyncStatus``.
 
     Repropaga a exceção em caso de falha para permitir que quem chamou decida
@@ -60,24 +127,38 @@ def executar_e_rastrear(fn, obj) -> None:
     try:
         fn(obj)
     except Exception as exc:
-        registrar_falha(obj, exc)
+        registrar_falha(obj, exc, usuario=usuario)
         raise
     else:
         registrar_sucesso(obj)
 
 
-def contagem_pendencias() -> int:
+def _pendencias_queryset(usuario=_UNSET):
     from .models import DriveSyncStatus
 
-    return DriveSyncStatus.objects.count()
+    qs = DriveSyncStatus.objects.select_related("content_type", "usuario").order_by("-atualizado_em")
+    if usuario is not _UNSET:
+        qs = qs.filter(usuario=usuario)
+    return qs
 
 
-def listar_pendencias(limite: int = 20):
-    from .models import DriveSyncStatus
+def _filtrar_pendencias(qs, area=_UNSET, limite: int | None = None):
+    area = _resolve_area(area)
+    itens = []
+    for pendencia in qs:
+        if _mesma_area(pendencia.origem, area):
+            itens.append(pendencia)
+            if limite is not None and len(itens) >= limite:
+                break
+    return itens
 
-    return list(
-        DriveSyncStatus.objects.select_related("content_type").order_by("-atualizado_em")[:limite]
-    )
+
+def contagem_pendencias(usuario=_UNSET, area=_UNSET) -> int:
+    return len(_filtrar_pendencias(_pendencias_queryset(usuario=usuario), area=area, limite=None))
+
+
+def listar_pendencias(limite: int = 20, usuario=_UNSET, area=_UNSET):
+    return _filtrar_pendencias(_pendencias_queryset(usuario=usuario), area=area, limite=limite)
 
 
 # Rótulo amigável por modelo de origem (fallback: verbose_name do ContentType).
@@ -173,7 +254,7 @@ def _motivo_amigavel(erro: str):
     )
 
 
-def listar_pendencias_detalhadas(limite: int = 20):
+def listar_pendencias_detalhadas(limite: int = 20, usuario=_UNSET, area=_UNSET):
     """Pendências prontas para exibição: nome legível + motivo em linguagem simples.
 
     Cada item é um dict com: ``titulo`` (nome do documento), ``tipo_label``
@@ -182,7 +263,7 @@ def listar_pendencias_detalhadas(limite: int = 20):
     (erro técnico cru, para o expansível).
     """
     itens = []
-    for pendencia in listar_pendencias(limite=limite):
+    for pendencia in listar_pendencias(limite=limite, usuario=usuario, area=area):
         origem = pendencia.origem  # resolve o GenericForeignKey (1 query por item)
         motivo, acao = _motivo_amigavel(pendencia.ultimo_erro)
         itens.append(

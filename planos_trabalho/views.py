@@ -31,6 +31,7 @@ from documentos.services.timing import measure_step
 from documentos.services.types import DocumentoFormato
 from documentos.services.types import DocumentoTipo
 from eventos.services import resolve_evento_from_request
+from core.tenancy import filter_queryset_by_area
 
 from .forms import AtividadePlanoTrabalhoForm
 from .forms import AtividadePlanoTrabalhoQuickAddForm
@@ -85,7 +86,7 @@ from .services import textos_padrao_templates
 
 def _get_plano(pk) -> PlanoTrabalho:
     return get_object_or_404(
-        PlanoTrabalho.objects.select_related(
+        filter_queryset_by_area(PlanoTrabalho.objects).select_related(
             "evento",
             "programa",
             "destino_estado",
@@ -281,7 +282,7 @@ def index(request):
     viagem_ate = request.GET.get("viagem_ate", "").strip()
     sort = request.GET.get("sort", "").strip()
 
-    planos = PlanoTrabalho.objects.select_related(
+    planos = filter_queryset_by_area(PlanoTrabalho.objects).select_related(
         "programa",
         "destino_cidade__estado",
         "coordenador_adm__cargo",
@@ -323,7 +324,10 @@ def index(request):
 
     # Abas: Finalizado = todas as prestações dos ofícios (não cancelados) do
     # evento vinculado ao plano já finalizadas.
-    sub = PrestacaoContas.objects.filter(oficio__evento=OuterRef("evento_id"), oficio__cancelado=False)
+    sub = filter_queryset_by_area(PrestacaoContas.objects).filter(
+        oficio__evento=OuterRef("evento_id"),
+        oficio__cancelado=False,
+    )
     planos = tabs.anotar_finalizacao(planos, sub, sub.filter(finalizada=False))
     cancelado_q = Q(cancelado=True)
     date_field = "data_evento_inicio"
@@ -609,9 +613,9 @@ def _apply_efetivo_snapshot(plano: PlanoTrabalho, rows):
             client_idx = index
         if not cargo_id or not quantidade or quantidade <= 0:
             continue
-        if not Cargo.objects.filter(pk=cargo_id).exists():
+        if not filter_queryset_by_area(Cargo.objects).filter(pk=cargo_id).exists():
             continue
-        if unidade_id and not Unidade.objects.filter(pk=unidade_id).exists():
+        if unidade_id and not filter_queryset_by_area(Unidade.objects).filter(pk=unidade_id).exists():
             unidade_id = None
         chave = (unidade_id, cargo_id)
         if chave in vistos:
@@ -1026,11 +1030,13 @@ def atividades_index(request):
     back_url = _atividades_back_url(request)
     form = AtividadePlanoTrabalhoQuickAddForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
-        form.save()
+        atividade = form.save(commit=False)
+        atividade.area = getattr(request, "area", None)
+        atividade.save()
         messages.success(request, "Atividade cadastrada.")
         return redirect(_atividades_index_url(back_url))
 
-    atividades = AtividadePlanoTrabalho.objects.order_by("ordem", "nome")
+    atividades = filter_queryset_by_area(AtividadePlanoTrabalho.objects).order_by("ordem", "nome")
     if q:
         from core.normalizers import remove_accents
 
@@ -1083,7 +1089,9 @@ def _atividades_index_url(back_url, base=None):
 def atividade_novo(request):
     form = AtividadePlanoTrabalhoForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
-        form.save()
+        atividade = form.save(commit=False)
+        atividade.area = getattr(request, "area", None)
+        atividade.save()
         messages.success(request, "Atividade cadastrada.")
         return redirect("planos_trabalho:atividades_index")
     return render(
@@ -1100,12 +1108,15 @@ def atividade_novo(request):
 
 def atividade_editar(request, pk):
     """Edição inline via quick add: processa o POST do painel e volta ao gerenciador."""
-    atividade = get_object_or_404(AtividadePlanoTrabalho, pk=pk)
+    atividade = get_object_or_404(filter_queryset_by_area(AtividadePlanoTrabalho.objects), pk=pk)
     back_url = _atividades_back_url(request)
     if request.method == "POST":
         form = AtividadePlanoTrabalhoQuickAddForm(request.POST, instance=atividade)
         if form.is_valid():
-            form.save()
+            atividade = form.save(commit=False)
+            if not atividade.area_id:
+                atividade.area = getattr(request, "area", None)
+            atividade.save()
             messages.success(request, "Atividade atualizada.")
         else:
             for erros in form.errors.values():
@@ -1115,7 +1126,7 @@ def atividade_editar(request, pk):
 
 
 def atividade_excluir(request, pk):
-    atividade = get_object_or_404(AtividadePlanoTrabalho, pk=pk)
+    atividade = get_object_or_404(filter_queryset_by_area(AtividadePlanoTrabalho.objects), pk=pk)
     if request.method == "POST":
         nome = atividade.nome
         atividade.delete()
@@ -1257,7 +1268,7 @@ def excluir(request, pk):
 
 
 def programas_index(request):
-    programas = ProgramaSolicitante.objects.order_by("ordem", "nome")
+    programas = filter_queryset_by_area(ProgramaSolicitante.objects).order_by("ordem", "nome")
     linhas = [
         {
             "title": programa.nome,
@@ -1287,7 +1298,9 @@ def programas_index(request):
 def programa_novo(request):
     form = ProgramaSolicitanteForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
-        form.save()
+        programa = form.save(commit=False)
+        programa.area = getattr(request, "area", None)
+        programa.save()
         messages.success(request, "Programa cadastrado.")
         return redirect("planos_trabalho:programas_index")
     return render(
@@ -1302,10 +1315,13 @@ def programa_novo(request):
 
 
 def programa_editar(request, pk):
-    programa = get_object_or_404(ProgramaSolicitante, pk=pk)
+    programa = get_object_or_404(filter_queryset_by_area(ProgramaSolicitante.objects), pk=pk)
     form = ProgramaSolicitanteForm(request.POST or None, instance=programa)
     if request.method == "POST" and form.is_valid():
-        form.save()
+        programa = form.save(commit=False)
+        if not programa.area_id:
+            programa.area = getattr(request, "area", None)
+        programa.save()
         messages.success(request, "Programa atualizado.")
         return redirect("planos_trabalho:programas_index")
     return render(
@@ -1321,7 +1337,7 @@ def programa_editar(request, pk):
 
 
 def programa_excluir(request, pk):
-    programa = get_object_or_404(ProgramaSolicitante, pk=pk)
+    programa = get_object_or_404(filter_queryset_by_area(ProgramaSolicitante.objects), pk=pk)
     if request.method == "POST":
         nome = programa.nome
         programa.delete()
@@ -1339,7 +1355,7 @@ def programa_excluir(request, pk):
 
 
 def horarios_index(request):
-    horarios = HorarioAtendimento.objects.order_by("ordem", "faixa")
+    horarios = filter_queryset_by_area(HorarioAtendimento.objects).order_by("ordem", "faixa")
     linhas = [
         {
             "title": horario.faixa,
@@ -1368,7 +1384,9 @@ def horarios_index(request):
 def horario_novo(request):
     form = HorarioAtendimentoForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
-        form.save()
+        horario = form.save(commit=False)
+        horario.area = getattr(request, "area", None)
+        horario.save()
         messages.success(request, "Horário cadastrado.")
         return redirect("planos_trabalho:horarios_index")
     return render(
@@ -1384,10 +1402,13 @@ def horario_novo(request):
 
 
 def horario_editar(request, pk):
-    horario = get_object_or_404(HorarioAtendimento, pk=pk)
+    horario = get_object_or_404(filter_queryset_by_area(HorarioAtendimento.objects), pk=pk)
     form = HorarioAtendimentoForm(request.POST or None, instance=horario)
     if request.method == "POST" and form.is_valid():
-        form.save()
+        horario = form.save(commit=False)
+        if not horario.area_id:
+            horario.area = getattr(request, "area", None)
+        horario.save()
         messages.success(request, "Horário atualizado.")
         return redirect("planos_trabalho:horarios_index")
     return render(
@@ -1404,7 +1425,7 @@ def horario_editar(request, pk):
 
 
 def horario_excluir(request, pk):
-    horario = get_object_or_404(HorarioAtendimento, pk=pk)
+    horario = get_object_or_404(filter_queryset_by_area(HorarioAtendimento.objects), pk=pk)
     if request.method == "POST":
         faixa = horario.faixa
         horario.delete()
