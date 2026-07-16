@@ -14,6 +14,7 @@ Modo single:
   single_field         BoundField do form (opcional) — usado para rotulo/id/name/value/erros do hidden
   single_label          rotulo (se omitido, usa single_field.label; se nenhum, nao exibe rotulo)
   single_input_id       id do input de exibicao (se omitido, usa single_field.id_for_label + "_display")
+  single_hidden_id      id do hidden quando NAO houver single_field
   single_hidden_name    name do hidden quando NAO houver single_field
   single_hidden_value   value do hidden quando NAO houver single_field
   trecho_date           data-trecho-date na raiz (uso: roteiro retorno)
@@ -21,7 +22,8 @@ Modo single:
 Modo range:
   start_field / end_field                 BoundField do form (opcional)
   start_label / end_label                 default "Data inicial" / "Data final"
-  start_input_id / end_input_id           default *_field.id_for_label + "_display"
+  start_input_id / end_input_id           ids dos inputs de exibicao; default *_field.id_for_label + "_display"
+  start_hidden_id / end_hidden_id         ids dos hiddens quando NAO houver *_field
   start_hidden_name / end_hidden_name     usados quando NAO houver *_field
   start_hidden_value / end_hidden_value
   show_summary   exibe o resumo textual abaixo dos campos (default: true)
@@ -47,7 +49,7 @@ Modo multi:
   {% endif %}
 >
   {% if mode == "range" %}
-    {% if start_field %}{% with start_id=start_field.id_for_label|add:"_display" start_lbl=start_label|default:start_field.label %}
+    {% if start_field %}{% with start_default_id=start_field.id_for_label|add:"_display" %}{% with start_id=start_input_id|default:start_default_id start_lbl=start_label|default:start_field.label %}
       <div class="field-grid field-grid--cols-2">
         <div class="cv-field">
           <label class="cv-field__label" for="{{ start_id }}">{{ start_lbl }}</label>
@@ -58,7 +60,7 @@ Modo multi:
             </button>
           </div>
         </div>
-    {% endwith %}{% else %}{% with start_id=start_input_id start_lbl=start_label|default:"Data inicial" %}
+    {% endwith %}{% endwith %}{% else %}{% with start_id=start_input_id start_lbl=start_label|default:"Data inicial" %}
       <div class="field-grid field-grid--cols-2">
         <div class="cv-field">
           <label class="cv-field__label" for="{{ start_id }}">{{ start_lbl }}</label>
@@ -71,7 +73,7 @@ Modo multi:
         </div>
     {% endwith %}{% endif %}
 
-    {% if end_field %}{% with end_id=end_field.id_for_label|add:"_display" end_lbl=end_label|default:end_field.label %}
+    {% if end_field %}{% with end_default_id=end_field.id_for_label|add:"_display" %}{% with end_id=end_input_id|default:end_default_id end_lbl=end_label|default:end_field.label %}
         <div class="cv-field">
           <label class="cv-field__label" for="{{ end_id }}">{{ end_lbl }}</label>
           <div class="cv-date-picker__control">
@@ -82,7 +84,7 @@ Modo multi:
           </div>
         </div>
       </div>
-    {% endwith %}{% else %}{% with end_id=end_input_id end_lbl=end_label|default:"Data final" %}
+    {% endwith %}{% endwith %}{% else %}{% with end_id=end_input_id end_lbl=end_label|default:"Data final" %}
         <div class="cv-field">
           <label class="cv-field__label" for="{{ end_id }}">{{ end_lbl }}</label>
           <div class="cv-date-picker__control">
@@ -96,10 +98,16 @@ Modo multi:
     {% endwith %}{% endif %}
 
     {% if start_field %}{{ start_field }}{% else %}
-      <input type="hidden" name="{{ start_hidden_name }}" id="{{ start_input_id }}" value="{{ start_hidden_value|default:'' }}" data-cv-date-picker-start-value>
+      <input type="hidden" name="{{ start_hidden_name }}"{% if start_hidden_id %} id="{{ start_hidden_id }}"{% endif %} value="{{ start_hidden_value|default:'' }}" data-cv-date-picker-start-value{% if filter_date %} data-cv-filter="date"{% endif %}>
     {% endif %}
     {% if end_field %}{{ end_field }}{% else %}
-      <input type="hidden" name="{{ end_hidden_name }}" id="{{ end_input_id }}" value="{{ end_hidden_value|default:'' }}" data-cv-date-picker-end-value>
+      <input type="hidden" name="{{ end_hidden_name }}"{% if end_hidden_id %} id="{{ end_hidden_id }}"{% endif %} value="{{ end_hidden_value|default:'' }}" data-cv-date-picker-end-value{% if filter_date %} data-cv-filter="date"{% endif %}>
+    {% endif %}
+    {% if start_field.errors %}
+      {% include "components/ui/feedback/field_error.html" with errors=start_field.errors only %}
+    {% endif %}
+    {% if end_field.errors %}
+      {% include "components/ui/feedback/field_error.html" with errors=end_field.errors only %}
     {% endif %}
     {% if show_summary|default_if_none:True %}
       <p class="cv-date-picker__summary" data-cv-date-picker-summary></p>
@@ -121,7 +129,7 @@ Modo multi:
     </div>
     <p class="cv-date-picker__summary" data-cv-date-picker-summary></p>
   {% else %}
-    {% if single_field %}{% with single_id=single_field.id_for_label|add:"_display" single_lbl=single_label|default:single_field.label %}
+    {% if single_field %}{% with single_default_id=single_field.id_for_label|add:"_display" %}{% with single_id=single_input_id|default:single_default_id single_lbl=single_label|default:single_field.label %}
       <div class="cv-field">
         {% if single_lbl %}<label class="cv-field__label" for="{{ single_id }}">{{ single_lbl }}</label>{% endif %}
         <div class="cv-date-picker__control">
@@ -131,7 +139,7 @@ Modo multi:
           </button>
         </div>
       </div>
-    {% endwith %}{% else %}{% with single_id=single_input_id single_lbl=single_label %}
+    {% endwith %}{% endwith %}{% else %}{% with single_id=single_input_id single_lbl=single_label %}
       <div class="cv-field">
         {% if single_lbl %}<label class="cv-field__label" for="{{ single_id }}">{{ single_lbl }}</label>{% endif %}
         <div class="cv-date-picker__control">
@@ -143,7 +151,10 @@ Modo multi:
       </div>
     {% endwith %}{% endif %}
     {% if single_field %}{{ single_field }}{% else %}
-      <input type="hidden" name="{{ single_hidden_name }}" id="{{ single_input_id }}" value="{{ single_hidden_value|default:'' }}" data-cv-date-picker-value>
+      <input type="hidden" name="{{ single_hidden_name }}"{% if single_hidden_id %} id="{{ single_hidden_id }}"{% endif %} value="{{ single_hidden_value|default:'' }}" data-cv-date-picker-value>
+    {% endif %}
+    {% if single_field.errors %}
+      {% include "components/ui/feedback/field_error.html" with errors=single_field.errors only %}
     {% endif %}
   {% endif %}
 

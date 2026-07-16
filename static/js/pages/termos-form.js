@@ -20,27 +20,6 @@
       .replace(/[\u0300-\u036f]/g, "");
   }
 
-  function parseIsoDate(value) {
-    if (!value) return "";
-    var text = String(value).trim();
-    if (/^\d{4}-\d{2}-\d{2}$/.test(text)) return text;
-    var match = text.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-    if (!match) return "";
-    return [match[3], match[2], match[1]].join("-");
-  }
-
-  function formatDisplayDate(value) {
-    var iso = parseIsoDate(value);
-    if (!iso) return "";
-    var parts = iso.split("-");
-    return [parts[2], parts[1], parts[0]].join("/");
-  }
-
-  function setInputValue(input, value) {
-    if (!input) return;
-    input.value = value || "";
-  }
-
   function resetSearchPicker(select) {
     if (window.CV && window.CV.destinos && typeof window.CV.destinos.resetSearchPicker === "function") {
       window.CV.destinos.resetSearchPicker(select);
@@ -76,19 +55,16 @@
   function setDateFields(form, startIso, endIso) {
     var startHidden  = form.querySelector("input[name='data_evento_inicio']");
     var endHidden    = form.querySelector("input[name='data_evento_fim']");
-    var startDisplay = form.querySelector("[data-termo-evento-start-display]");
-    var endDisplay   = form.querySelector("[data-termo-evento-end-display]");
+    var startDisplay = form.querySelector("#termo-evento-date-picker [data-cv-date-picker-start-display]");
+    var endDisplay   = form.querySelector("#termo-evento-date-picker [data-cv-date-picker-end-display]");
     var picker       = form.querySelector("#termo-evento-date-picker");
     var safeEnd = endIso || startIso;
     if (startHidden)  startHidden.value  = startIso || "";
     if (endHidden)    endHidden.value    = safeEnd  || "";
     if (startDisplay) startDisplay.value = isoToDisplay(startIso);
     if (endDisplay)   endDisplay.value   = isoToDisplay(safeEnd);
-    if (picker) {
-      var dates = [];
-      if (startIso) dates.push(startIso);
-      if (safeEnd && safeEnd !== startIso) dates.push(safeEnd);
-      picker.dataset.selectedDates = JSON.stringify(dates);
+    if (picker && picker._cvDatePicker && typeof picker._cvDatePicker.setRange === "function") {
+      picker._cvDatePicker.setRange(startIso || "", safeEnd || "");
     }
   }
 
@@ -590,91 +566,6 @@
     });
   }
 
-  function syncEventDates(form) {
-    var root = form.querySelector("#termo-evento-date-picker");
-    var startHidden = form.querySelector("input[name='data_evento_inicio']");
-    var endHidden = form.querySelector("input[name='data_evento_fim']");
-    var startDisplay = form.querySelector("[data-termo-evento-start-display]");
-    var endDisplay = form.querySelector("[data-termo-evento-end-display]");
-    var openButtons = Array.prototype.slice.call(form.querySelectorAll("[data-termo-evento-open-picker]"));
-
-    if (!root || !startHidden || !endHidden || !startDisplay || !endDisplay) return;
-
-    function parseSelectedDates() {
-      var raw = root.dataset.selectedDates || "[]";
-      var values = [];
-      try {
-        values = JSON.parse(raw) || [];
-      } catch (err) {
-        values = [];
-      }
-
-      values = values
-        .map(function (value) {
-          return parseIsoDate(value);
-        })
-        .filter(function (value) {
-          return !!value;
-        });
-
-      if (!values.length) {
-        var start = parseIsoDate(startHidden.value);
-        var end = parseIsoDate(endHidden.value);
-        if (start) values.push(start);
-        if (end && end !== start) values.push(end);
-      }
-
-      values.sort(function (a, b) {
-        return a < b ? -1 : a > b ? 1 : 0;
-      });
-
-      return values;
-    }
-
-    function renderFromDates() {
-      var dates = parseSelectedDates();
-      var start = dates[0] || "";
-      var end = dates[dates.length - 1] || "";
-      if (start && !end) {
-        end = start;
-      }
-      if (!start) {
-        setInputValue(startHidden, "");
-        setInputValue(endHidden, "");
-        setInputValue(startDisplay, "");
-        setInputValue(endDisplay, "");
-        return;
-      }
-      setInputValue(startHidden, start);
-      setInputValue(endHidden, end || start);
-      setInputValue(startDisplay, formatDisplayDate(start));
-      setInputValue(endDisplay, formatDisplayDate(end || start));
-    }
-
-    var observer = new MutationObserver(function (mutations) {
-      var changed = mutations.some(function (mutation) {
-        return mutation.attributeName === "data-selected-dates";
-      });
-      if (changed) {
-        renderFromDates();
-      }
-    });
-
-    observer.observe(root, { attributes: true, attributeFilter: ["data-selected-dates"] });
-    root.addEventListener("cv:multi-confirm", renderFromDates);
-
-    openButtons.forEach(function (button) {
-      button.addEventListener("click", function () {
-        if (root._cvDatePicker && root._cvDatePicker.open) {
-          root._cvDatePicker.open();
-        }
-      });
-    });
-
-    form.addEventListener("submit", renderFromDates);
-    renderFromDates();
-  }
-
   document.addEventListener("DOMContentLoaded", function () {
     var form = document.querySelector("[data-termo-form]");
     if (!form) return;
@@ -685,8 +576,6 @@
     syncOficioSummary(form, readSummaries());
     syncDestinationCities(form);
     syncAddDestinationButton(form);
-    syncEventDates(form);
-
     if (draft) applyDraftDestinos(form, draft);
 
     bindDraftAutosaveLinks(form);

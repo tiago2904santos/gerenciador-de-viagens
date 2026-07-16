@@ -18,12 +18,6 @@
     return [p[2], p[1], p[0]].join("/");
   }
 
-  function parseIso(val) {
-    if (!val) return "";
-    val = String(val).trim();
-    return /^\d{4}-\d{2}-\d{2}$/.test(val) ? val : "";
-  }
-
   /* ── cv-search-picker: reset + reinit ──────────────────────── */
 
   function resetPicker(select) {
@@ -241,8 +235,8 @@
   function setDateFields(form, startIso, endIso) {
     var startHidden = form.querySelector("input[name='data_evento_inicio']");
     var endHidden   = form.querySelector("input[name='data_evento_fim']");
-    var startDisplay = form.querySelector("[data-termo-evento-start-display]");
-    var endDisplay   = form.querySelector("[data-termo-evento-end-display]");
+    var startDisplay = form.querySelector("#os-evento-date-picker [data-cv-date-picker-start-display]");
+    var endDisplay   = form.querySelector("#os-evento-date-picker [data-cv-date-picker-end-display]");
     var picker       = form.querySelector("#os-evento-date-picker");
 
     var safeEnd = endIso || startIso;
@@ -250,66 +244,9 @@
     if (endHidden)    endHidden.value    = safeEnd  || "";
     if (startDisplay) startDisplay.value = isoToDisplay(startIso);
     if (endDisplay)   endDisplay.value   = isoToDisplay(safeEnd);
-    if (picker) {
-      var dates = [];
-      if (startIso) dates.push(startIso);
-      if (safeEnd && safeEnd !== startIso) dates.push(safeEnd);
-      picker.dataset.selectedDates = JSON.stringify(dates);
+    if (picker && picker._cvDatePicker && typeof picker._cvDatePicker.setRange === "function") {
+      picker._cvDatePicker.setRange(startIso || "", safeEnd || "");
     }
-  }
-
-  function syncEventDates(form) {
-    var root         = form.querySelector("#os-evento-date-picker");
-    var startHidden  = form.querySelector("input[name='data_evento_inicio']");
-    var endHidden    = form.querySelector("input[name='data_evento_fim']");
-    var startDisplay = form.querySelector("[data-termo-evento-start-display]");
-    var endDisplay   = form.querySelector("[data-termo-evento-end-display]");
-    var openButtons  = Array.prototype.slice.call(form.querySelectorAll("[data-termo-evento-open-picker]"));
-    if (!root || !startHidden || !endHidden) return;
-
-    function parseSelectedDates() {
-      var raw = root.dataset.selectedDates || "[]";
-      var vals = [];
-      try { vals = JSON.parse(raw) || []; } catch (e) {}
-      vals = vals.map(parseIso).filter(Boolean);
-      if (!vals.length) {
-        var s = parseIso(startHidden.value);
-        var e = parseIso(endHidden.value);
-        if (s) vals.push(s);
-        if (e && e !== s) vals.push(e);
-      }
-      vals.sort();
-      return vals;
-    }
-
-    function renderFromDates() {
-      var dates = parseSelectedDates();
-      var start = dates[0] || "";
-      var end   = dates[dates.length - 1] || start;
-      startHidden.value = start;
-      endHidden.value   = end;
-      if (startDisplay) startDisplay.value = isoToDisplay(start);
-      if (endDisplay)   endDisplay.value   = isoToDisplay(end);
-    }
-
-    var observer = new MutationObserver(function (mutations) {
-      if (mutations.some(function (m) { return m.attributeName === "data-selected-dates"; })) {
-        renderFromDates();
-      }
-    });
-    observer.observe(root, { attributes: true, attributeFilter: ["data-selected-dates"] });
-    root.addEventListener("cv:multi-confirm", renderFromDates);
-
-    openButtons.forEach(function (button) {
-      button.addEventListener("click", function () {
-        if (root._cvDatePicker && root._cvDatePicker.open) {
-          root._cvDatePicker.open();
-        }
-      });
-    });
-
-    form.addEventListener("submit", renderFromDates);
-    renderFromDates();
   }
 
   /* ── Modelo de motivo → textarea ───────────────────────────── */
@@ -614,7 +551,6 @@
     initOficioAutoFill(form, summaries);
     syncDestinationCities(form);
     syncAddDestinationButton(form);
-    syncEventDates(form);
     bindDraftAutosaveLinks(form);
     initSubmitButtonLabel(form);
 

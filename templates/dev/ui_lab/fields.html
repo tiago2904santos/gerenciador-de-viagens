@@ -406,47 +406,7 @@
                 </p>
               </div>
 
-              <div class="cv-date-picker" data-cv-date-picker data-mode="single" data-initial-date="18/05/2026">
-                <div class="cv-field">
-                  <label class="cv-field__label" for="lab-date-single-display">Data do evento</label>
-                  <div class="cv-date-picker__control">
-                    <input
-                      class="cv-field__control cv-date-picker__display"
-                      id="lab-date-single-display"
-                      type="text"
-                      readonly
-                      placeholder="Selecionar data"
-                      value="18/05/2026"
-                      data-cv-date-picker-display
-                    >
-                    <button
-                      class="cv-date-picker__trigger"
-                      type="button"
-                      data-cv-date-picker-trigger
-                      aria-expanded="false"
-                      aria-label="Abrir calendario"
-                    >
-                      Calendario
-                    </button>
-                  </div>
-                  <input type="hidden" name="data_evento_unica" value="2026-05-18" data-cv-date-picker-value>
-                  <p class="cv-date-picker__summary" data-cv-date-picker-summary>18 de maio de 2026</p>
-                </div>
-
-                <div class="cv-date-picker__panel" hidden data-cv-date-picker-panel>
-                  <div class="cv-date-picker__panel-header">
-                    <button class="cv-date-picker__nav" type="button" data-cv-date-picker-prev aria-label="Mes anterior">Anterior</button>
-                    <div class="cv-date-picker__month" data-cv-date-picker-month></div>
-                    <button class="cv-date-picker__nav" type="button" data-cv-date-picker-next aria-label="Proximo mes">Proximo</button>
-                  </div>
-                  <div class="cv-date-picker__weekdays" data-cv-date-picker-weekdays></div>
-                  <div class="cv-date-picker__days" data-cv-date-picker-days></div>
-                  <div class="cv-date-picker__footer">
-                    <button type="button" class="cv-date-picker__footer-action" data-cv-date-picker-today>Hoje</button>
-                    <button type="button" class="cv-date-picker__footer-action" data-cv-date-picker-clear>Limpar</button>
-                  </div>
-                </div>
-              </div>
+              {% include "components/forms/cv_date_picker.html" with mode="single" picker_id="lab-date-single-picker" single_label="Data do evento" single_input_id="lab-date-single-display" single_hidden_id="lab-date-single" single_hidden_name="data_evento_unica" single_hidden_value="2026-05-18" initial_date="18/05/2026" only %}
             </div>
 
             <div class="cv-date-picker-demo">
@@ -457,52 +417,7 @@
                 </p>
               </div>
 
-              <div class="cv-date-picker" data-cv-date-picker data-mode="range" data-initial-date="18/05/2026">
-                <div class="cv-field">
-                  <label class="cv-field__label" for="lab-date-range-display">Periodo do evento</label>
-                  <div class="cv-date-picker__control cv-date-picker__control--range">
-                    <input
-                      class="cv-field__control cv-date-picker__display"
-                      id="lab-date-range-display"
-                      type="text"
-                      readonly
-                      placeholder="Selecionar ida e volta"
-                      value="18/05/2026 a 20/05/2026"
-                      data-cv-date-picker-display
-                    >
-                    <button
-                      class="cv-date-picker__trigger"
-                      type="button"
-                      data-cv-date-picker-trigger
-                      aria-expanded="false"
-                      aria-label="Abrir calendario"
-                    >
-                      Calendario
-                    </button>
-                  </div>
-                  <div class="cv-date-picker__meta">
-                    <span class="cv-date-picker__pill">Ida: <strong data-cv-date-picker-start-label>18/05/2026</strong></span>
-                    <span class="cv-date-picker__pill">Volta: <strong data-cv-date-picker-end-label>20/05/2026</strong></span>
-                  </div>
-                  <input type="hidden" name="data_evento_inicio" value="2026-05-18" data-cv-date-picker-start-value>
-                  <input type="hidden" name="data_evento_fim" value="2026-05-20" data-cv-date-picker-end-value>
-                  <p class="cv-date-picker__summary" data-cv-date-picker-summary>18 de maio de 2026 a 20 de maio de 2026</p>
-                </div>
-
-                <div class="cv-date-picker__panel" hidden data-cv-date-picker-panel>
-                  <div class="cv-date-picker__panel-header">
-                    <button class="cv-date-picker__nav" type="button" data-cv-date-picker-prev aria-label="Mes anterior">Anterior</button>
-                    <div class="cv-date-picker__month" data-cv-date-picker-month></div>
-                    <button class="cv-date-picker__nav" type="button" data-cv-date-picker-next aria-label="Proximo mes">Proximo</button>
-                  </div>
-                  <div class="cv-date-picker__weekdays" data-cv-date-picker-weekdays></div>
-                  <div class="cv-date-picker__days" data-cv-date-picker-days></div>
-                  <div class="cv-date-picker__footer">
-                    <button type="button" class="cv-date-picker__footer-action" data-cv-date-picker-today>Hoje</button>
-                    <button type="button" class="cv-date-picker__footer-action" data-cv-date-picker-clear>Limpar</button>
-                  </div>
-                </div>
-              </div>
+              {% include "components/forms/cv_date_picker.html" with mode="range" picker_id="lab-date-range-picker" start_label="Data inicial" end_label="Data final" start_input_id="lab-date-range-start-display" end_input_id="lab-date-range-end-display" start_hidden_id="lab-date-range-start" end_hidden_id="lab-date-range-end" start_hidden_name="data_evento_inicio" end_hidden_name="data_evento_fim" start_hidden_value="2026-05-18" end_hidden_value="2026-05-20" initial_date="18/05/2026" only %}
             </div>
           </div>
         </div>

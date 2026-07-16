@@ -21,3 +21,7 @@ C:\Users\tiago\OneDrive\Documentos\Gerenciador de Viagens\core\urls.py changed, 
 C:\Users\tiago\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\django\db\backends\utils.py:98: RuntimeWarning: Accessing the database during app initialization is discouraged. To fix this warning, avoid executing queries in AppConfig.ready() or when your app modules are imported.
   warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
 Watching for file changes with StatReloader
+C:\Users\tiago\OneDrive\Documentos\Gerenciador de Viagens\oficios\forms.py changed, reloading.
+C:\Users\tiago\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\django\db\backends\utils.py:98: RuntimeWarning: Accessing the database during app initialization is discouraged. To fix this warning, avoid executing queries in AppConfig.ready() or when your app modules are imported.
+  warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+Watching for file changes with StatReloader

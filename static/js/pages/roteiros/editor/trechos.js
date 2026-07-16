@@ -10,30 +10,6 @@ export const TRECHOS_EMPTY_HTML =
 
 export const TRECHO_CARD_SELECTOR = '.roteiro-trecho-card[data-key]';
 
-var CALENDAR_ICON_SVG =
-  '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' +
-  '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>' +
-  '<line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>' +
-  '</svg>';
-
-var DATE_PICKER_PANEL_HTML =
-  '<div class="cv-date-picker__panel" hidden data-cv-date-picker-panel>' +
-  '<div class="cv-date-picker__context" data-cv-date-picker-context hidden>' +
-  '<span class="cv-date-picker__context-step" data-cv-date-picker-context-step></span>' +
-  '<strong class="cv-date-picker__context-route" data-cv-date-picker-context-route></strong>' +
-  '</div>' +
-  '<div class="cv-date-picker__panel-header">' +
-  '<button class="cv-date-picker__nav" type="button" data-cv-date-picker-prev aria-label="Mês anterior">Anterior</button>' +
-  '<div class="cv-date-picker__month" data-cv-date-picker-month></div>' +
-  '<button class="cv-date-picker__nav" type="button" data-cv-date-picker-next aria-label="Próximo mês">Próximo</button>' +
-  '</div>' +
-  '<div class="cv-date-picker__weekdays" data-cv-date-picker-weekdays></div>' +
-  '<div class="cv-date-picker__days" data-cv-date-picker-days></div>' +
-  '<div class="cv-date-picker__footer">' +
-  '<button type="button" class="cv-date-picker__footer-action" data-cv-date-picker-today>Hoje</button>' +
-  '<button type="button" class="cv-date-picker__footer-action" data-cv-date-picker-clear>Limpar</button>' +
-  '</div></div>';
-
 function isoToDisplayDate(iso) {
   var raw = String(iso || '').trim();
   if (!raw) return '';
@@ -45,40 +21,16 @@ function isoToDisplayDate(iso) {
 function buildDatePickerField(ordem, role, label, isoValue, esc) {
   var idBase = 'trecho_' + ordem + '_' + role;
   var display = isoToDisplayDate(isoValue);
-  var initialAttr = display ? ' data-initial-date="' + esc(display) + '"' : '';
-  return (
-    '<div class="field cv-field field-size-1">' +
-    '<label class="cv-field__label" for="' +
-    idBase +
-    '_data_display">' +
-    esc(label) +
-    '</label>' +
-    '<div class="cv-date-picker" data-cv-date-picker data-mode="single" data-trecho-date="' +
-    esc(role) +
-    '"' +
-    initialAttr +
-    '>' +
-    '<div class="cv-date-picker__control">' +
-    '<input type="text" class="cv-field__control" id="' +
-    idBase +
-    '_data_display" placeholder="dd/mm/aaaa" autocomplete="off" inputmode="numeric" maxlength="10" value="' +
-    esc(display) +
-    '" data-cv-date-picker-display>' +
-    '<button type="button" class="cv-date-picker__trigger cv-date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-label="Abrir calendário">' +
-    CALENDAR_ICON_SVG +
-    '</button></div>' +
-    '<input type="hidden" name="trecho_' +
-    ordem +
-    '_' +
-    role +
-    '_data" id="' +
-    idBase +
-    '_data" value="' +
-    esc(isoValue || '') +
-    '" data-cv-date-picker-value>' +
-    DATE_PICKER_PANEL_HTML +
-    '</div></div>'
-  );
+  var template = document.getElementById('trecho-single-date-picker-template');
+  if (!template) return '';
+  return template.innerHTML
+    .replace(/__LABEL__/g, esc(label))
+    .replace(/__DISPLAY_ID__/g, esc(idBase + '_data_display'))
+    .replace(/__HIDDEN_ID__/g, esc(idBase + '_data'))
+    .replace(/__HIDDEN_NAME__/g, esc('trecho_' + ordem + '_' + role + '_data'))
+    .replace(/__ISO_VALUE__/g, esc(isoValue || ''))
+    .replace(/__INITIAL_DATE__/g, esc(display))
+    .replace(/__ROLE__/g, esc(role));
 }
 
 function buildTimeField(ordem, role, label, value, esc) {
@@ -290,9 +242,13 @@ export function setTrechoDateValue(card, role, isoDate, options) {
   }
   var picker = card.querySelector('[data-trecho-date="' + role + '"]');
   if (picker) {
-    var display = picker.querySelector('[data-cv-date-picker-display]');
-    if (display) {
-      display.value = isoToDisplayDate(isoDate);
+    if (picker._cvDatePicker && typeof picker._cvDatePicker.setSingle === 'function') {
+      picker._cvDatePicker.setSingle(isoDate || '');
+    } else {
+      var display = picker.querySelector('[data-cv-date-picker-display]');
+      if (display) {
+        display.value = isoToDisplayDate(isoDate);
+      }
     }
   }
 }

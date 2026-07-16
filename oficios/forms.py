@@ -160,7 +160,8 @@ class OficioForm(forms.ModelForm):
             "custeio_observacao",
         ]
         widgets = {
-            "data_criacao": forms.DateInput(attrs={"class": "form-control", "type": "date"}),
+            # Datas editaveis sao apresentadas pelos modelos globais cv_date_picker.
+            "data_criacao": forms.HiddenInput(),
             "motivo": forms.Textarea(attrs={"class": "form-control", "rows": 4}),
             "roteiro": forms.Select(attrs={"class": "form-select"}),
             "solicitante": forms.Select(attrs={"class": "form-select"}),
