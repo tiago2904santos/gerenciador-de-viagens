@@ -44,7 +44,7 @@
                    value="{{ servidor.numero_solicitacao }}">
             {% with ps_id=servidor.ps_pk|stringformat:"s" %}
               {% with prazo_name="ps-"|add:ps_id|add:"-prazo_limite_saque" prazo_display_id="id_ps_"|add:ps_id|add:"_prazo_limite_saque_display" prazo_hidden_id="id_ps_"|add:ps_id|add:"_prazo_limite_saque" prazo_aria="Prazo limite para saque de "|add:servidor.name %}
-                {% include "components/forms/cv_date_picker.html" with mode="single" control_variant="input-only" extra_class="oficio-lc__prazo-picker" single_input_id=prazo_display_id single_hidden_id=prazo_hidden_id single_hidden_name=prazo_name single_hidden_value=servidor.prazo_limite_saque input_class="form-control cv-field__control oficio-lc__prazo-input" single_aria_label=prazo_aria only %}
+                {% include "components/forms/cv_date_picker.html" with mode="single" extra_class="oficio-lc__prazo-picker" single_input_id=prazo_display_id single_hidden_id=prazo_hidden_id single_hidden_name=prazo_name single_hidden_value=servidor.prazo_limite_saque single_placeholder="Sacar até" input_class="form-control oficio-lc__prazo-input" single_aria_label=prazo_aria only %}
               {% endwith %}
             {% endwith %}
           </form>
@@ -69,7 +69,10 @@
                   class="cv-icon-btn cv-icon-btn--whatsapp"
                   aria-label="Enviar aviso de liberação de diárias por WhatsApp"
                   data-tooltip="Enviar aviso de liberação (WhatsApp)"
-                  data-diaria-wa-send
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                  data-action-menu-trigger
+                  data-action-menu-target="diaria-wa-menu-{{ servidor.ps_pk }}"
                   data-wa-phone="{{ servidor.whatsapp_phone }}"
                   data-wa-oficio="{{ servidor.whatsapp_oficio }}"
                   data-wa-unidade="{{ servidor.whatsapp_unidade }}"
@@ -77,6 +80,20 @@
                   data-wa-servidor="{{ servidor.name }}"
                   data-wa-diaria="{{ servidor.whatsapp_diaria }}"
           >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="whatsapp" only %}</button>
+          <div class="cv-action-menu" id="diaria-wa-menu-{{ servidor.ps_pk }}" role="menu" hidden>
+            <button type="button" class="cv-action-menu__item cv-action-menu__item--whatsapp" role="menuitem" data-diaria-wa-send data-wa-app="normal">
+              {% include "dev/ui_lab/partials/_cv_icon.html" with icon="whatsapp" only %}
+              <span>Enviar (WhatsApp)</span>
+            </button>
+            <button type="button" class="cv-action-menu__item cv-action-menu__item--whatsapp" role="menuitem" data-diaria-wa-send data-wa-app="business">
+              {% include "dev/ui_lab/partials/_cv_icon.html" with icon="whatsapp" only %}
+              <span>Enviar (Business)</span>
+            </button>
+            <button type="button" class="cv-action-menu__item cv-action-menu__item--copy" role="menuitem" data-diaria-wa-copy>
+              {% include "dev/ui_lab/partials/_cv_icon.html" with icon="copy" only %}
+              <span>Copiar mensagem</span>
+            </button>
+          </div>
         </div>
         {% endfor %}
       </div>
@@ -176,22 +193,34 @@
 <script>
   if (!window.__prestDiariaWaBound) {
     window.__prestDiariaWaBound = true;
-    document.addEventListener("click", function (e) {
-      var btn = e.target.closest("[data-diaria-wa-send]");
-      if (!btn) return;
-      e.preventDefault();
 
-      var row = btn.closest(".oficio-lc__traveller");
+    // Os itens do menu (Enviar WhatsApp/Business/Copiar) ficam dentro de
+    // .cv-action-menu, que o action-menu.js move para <body> ao abrir — por
+    // isso não dá pra usar closest() a partir do item para achar a linha do
+    // servidor; volta-se ao botão-gatilho original (que continua no lugar)
+    // pelo id do menu.
+    function diariaWaTrigger(el) {
+      var menu = el.closest(".cv-action-menu");
+      if (!menu) return null;
+      return document.querySelector('[data-action-menu-target="' + menu.id + '"]');
+    }
+
+    // Valida solicitação/prazo e monta a mensagem; retorna null (já focando o
+    // campo pendente) se faltar algo — usado tanto pelo envio quanto pela cópia.
+    function diariaWaContext(el) {
+      var trigger = diariaWaTrigger(el);
+      if (!trigger) return null;
+      var row = trigger.closest(".oficio-lc__traveller");
       var numInput = row ? row.querySelector('input[name$="-numero_solicitacao"]') : null;
       var prazoInput = row ? row.querySelector('input[name$="-prazo_limite_saque"]') : null;
-      var prazoDisplay = row ? row.querySelector("[data-cv-date-picker-input-only]") : null;
+      var prazoDisplay = row ? row.querySelector(".oficio-lc__prazo-picker [data-cv-date-picker-display]") : null;
 
       if (numInput && !numInput.value.trim()) {
         numInput.focus();
         numInput.setCustomValidity("Preencha o número da solicitação antes de enviar o aviso.");
         numInput.reportValidity();
         numInput.setCustomValidity("");
-        return;
+        return null;
       }
       if (prazoInput && !prazoInput.value) {
         if (prazoDisplay) {
@@ -200,33 +229,82 @@
           prazoDisplay.reportValidity();
           prazoDisplay.setCustomValidity("");
         }
-        return;
-      }
-      var phone = (btn.dataset.waPhone || "").replace(/\D/g, "");
-      if (!phone) {
-        window.alert("Este servidor não tem um celular válido cadastrado (DDD + 9 dígitos) para enviar o aviso por WhatsApp.");
-        return;
+        return null;
       }
 
       var prazoParts = (prazoInput.value || "").split("-");
-      var prazoDisplay = prazoParts.length === 3 ? (prazoParts[2] + "/" + prazoParts[1] + "/" + prazoParts[0]) : "";
+      var prazoTexto = prazoParts.length === 3 ? (prazoParts[2] + "/" + prazoParts[1] + "/" + prazoParts[0]) : "";
 
-      var msg = "📢 LIBERAÇÃO DE DIÁRIAS\n" +
-        "Comunicamos que, referente ao Ofício nº " + (btn.dataset.waOficio || "") +
-        " (" + (btn.dataset.waUnidade || "") + "), as diárias relativas ao evento " +
-        (btn.dataset.waEvento || "") + " estão liberadas para Transferência ou Saque.\n\n" +
-        "* Servidor beneficiado: " + (btn.dataset.waServidor || "") + "\n" +
-        "* Valor (por diária): " + (btn.dataset.waDiaria || "") + "\n" +
-        "⏳ Prazo limite para saque: " + prazoDisplay + " (PRAZO IMPRORROGÁVEL)\n" +
-        "⚠️ Aviso importante: O saque das diárias não fica disponível no mesmo dia do desbloqueio do cartão. Programe-se com antecedência!";
+      // Emojis/marcadores via código de caractere (não como literal no
+      // arquivo) — evita depender da codificação com que este template acaba
+      // sendo salvo/lido.
+      var EMOJI_LIBERACAO = String.fromCharCode(0xD83D, 0xDCE2); // megafone
+      var EMOJI_PRAZO = String.fromCharCode(0x23F3); // ampulheta
+      var EMOJI_AVISO = String.fromCharCode(0x26A0, 0xFE0F); // alerta
+      var BULLET = String.fromCharCode(0x2022); // marcador de lista (evita colidir com o *negrito* do WhatsApp)
 
-      var enc = encodeURIComponent(msg);
-      var waMe = "https://wa.me/" + phone + "?text=" + enc;
+      var oficioNum = trigger.dataset.waOficio || "";
+      var unidade = (trigger.dataset.waUnidade || "").trim();
+      var evento = trigger.dataset.waEvento || "";
+      var servidorNome = trigger.dataset.waServidor || "";
+      var diariaValor = trigger.dataset.waDiaria || "";
+      var oficioRef = "Ofício nº *" + oficioNum + "*" + (unidade ? " (" + unidade + ")" : "");
+
+      var msg = EMOJI_LIBERACAO + " *LIBERAÇÃO DE DIÁRIAS*\n" +
+        "Comunicamos que, referente ao " + oficioRef +
+        ", as diárias relativas ao evento *" + evento + "* estão liberadas para Transferência ou Saque.\n\n" +
+        BULLET + " Servidor beneficiado: *" + servidorNome + "*\n" +
+        BULLET + " Valor (por diária): *" + diariaValor + "*\n" +
+        EMOJI_PRAZO + " Prazo limite para saque: *" + prazoTexto + "* (PRAZO IMPRORROGÁVEL)\n" +
+        EMOJI_AVISO + " Aviso importante: O saque das diárias não fica disponível no mesmo dia do desbloqueio do cartão. Programe-se com antecedência!";
+
+      return { msg: msg, phone: (trigger.dataset.waPhone || "").replace(/\D/g, "") };
+    }
+
+    document.addEventListener("click", function (e) {
+      var sendBtn = e.target.closest("[data-diaria-wa-send]");
+      var copyBtn = e.target.closest("[data-diaria-wa-copy]");
+      var el = sendBtn || copyBtn;
+      if (!el) return;
+      e.preventDefault();
+
+      var ctx = diariaWaContext(el);
+      if (!ctx) return;
+
+      if (copyBtn) {
+        var label = copyBtn.querySelector("span");
+        var restore = label ? label.textContent : "";
+        var marcarCopiado = function () {
+          if (!label) return;
+          label.textContent = "Copiado!";
+          setTimeout(function () { label.textContent = restore; }, 1500);
+        };
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(ctx.msg).then(marcarCopiado, function () {
+            window.alert("Não foi possível copiar automaticamente. Copie a mensagem manualmente.");
+          });
+        } else {
+          window.alert("Não foi possível copiar automaticamente. Copie a mensagem manualmente.");
+        }
+        return;
+      }
+
+      if (!ctx.phone) {
+        window.alert("Este servidor não tem um celular válido cadastrado (DDD + 9 dígitos) para enviar o aviso por WhatsApp.");
+        return;
+      }
+      var enc = encodeURIComponent(ctx.msg);
+      // api.whatsapp.com direto (em vez de wa.me) — o redirecionamento do
+      // wa.me tem relatos de corromper emojis no parâmetro "text" em alguns
+      // clientes; indo direto ao endpoint final evita esse salto a mais.
+      var waMe = "https://api.whatsapp.com/send?phone=" + ctx.phone + "&text=" + enc;
+      var app = sendBtn.dataset.waApp === "business" ? "business" : "normal";
       if (/Android/i.test(navigator.userAgent || "")) {
-        var q = "phone=" + phone + "&text=" + enc;
+        var pkg = app === "business" ? "com.whatsapp.w4b" : "com.whatsapp";
+        var q = (ctx.phone ? "phone=" + ctx.phone + "&" : "") + "text=" + enc;
         window.location.href =
           "intent://send?" + q +
-          "#Intent;scheme=whatsapp;package=com.whatsapp;S.browser_fallback_url=" + encodeURIComponent(waMe) + ";end";
+          "#Intent;scheme=whatsapp;package=" + pkg + ";S.browser_fallback_url=" + encodeURIComponent(waMe) + ";end";
         return;
       }
       window.open(waMe, "_blank", "noopener");

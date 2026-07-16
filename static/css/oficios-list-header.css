@@ -142,8 +142,54 @@
   color: rgba(99, 165, 255, 0.95);
 }
 
+html[data-theme="light"] .oficios-filter-range--active .oficios-filter-range__btn,
+html[data-theme="dark-light"] .oficios-filter-range--active .oficios-filter-range__btn,
+html[data-theme="light-light"] .oficios-filter-range--active .oficios-filter-range__btn {
+  background: rgba(18, 111, 184, 0.12);
+  border-color: rgba(11, 88, 150, 0.55);
+  color: #0b3a66;
+}
+
+html[data-theme="light"] .oficios-filter-range--active .oficios-filter-range__btn .cv-btn__icon,
+html[data-theme="dark-light"] .oficios-filter-range--active .oficios-filter-range__btn .cv-btn__icon,
+html[data-theme="light-light"] .oficios-filter-range--active .oficios-filter-range__btn .cv-btn__icon {
+  color: #126fb8;
+}
+
+html[data-theme="light"] .oficios-filter-range--active .oficios-filter-range__btn:hover:not(:disabled),
+html[data-theme="dark-light"] .oficios-filter-range--active .oficios-filter-range__btn:hover:not(:disabled),
+html[data-theme="light-light"] .oficios-filter-range--active .oficios-filter-range__btn:hover:not(:disabled) {
+  background: rgba(18, 111, 184, 0.2);
+  border-color: #126fb8;
+  color: #072f54;
+}
+
 .oficio-lc__prazo-picker {
-  display: contents;
+  display: block;
+  flex: 0 0 140px;
+  min-width: 0;
+  width: 140px;
+}
+
+.oficio-lc__prazo-picker .cv-field,
+.oficio-lc__prazo-picker .cv-date-picker__control {
+  margin: 0;
+  min-width: 0;
+  width: 100%;
+}
+
+.oficio-lc__prazo-picker .oficio-lc__prazo-input {
+  min-width: 0;
+  width: 100%;
+}
+
+.oficio-lc__prazo-picker .cv-date-picker__trigger--icon {
+  background: var(--cv-btn-secondary-bg);
+  border-color: var(--cv-btn-secondary-border);
+  box-shadow: var(--shadow-xs);
+  color: var(--cv-btn-secondary-color);
+  opacity: 1;
+  pointer-events: auto;
 }
 
 /* ── Abas de listagem (temporais / de estado) — compartilhado entre as listas ── */

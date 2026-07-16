@@ -1804,6 +1804,15 @@ body.has-delete-modal-open {
   color: var(--color-info);
 }
 
+.cv-action-menu__item--whatsapp {
+  color: #1fa855;
+}
+
+.cv-action-menu__item--whatsapp:hover,
+.cv-action-menu__item--whatsapp:focus-visible {
+  background: color-mix(in srgb, #1fa855 14%, transparent);
+}
+
 /* Ações de documento (termo, ofício etc.) — cor do ícone acompanha o botão
    sólido equivalente (preview/pdf/docx), com leve tingimento no hover. */
 .cv-action-menu__item--preview {

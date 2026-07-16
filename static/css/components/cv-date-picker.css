@@ -326,9 +326,18 @@ html[data-theme="light-light"] {
 }
 
 .cv-date-picker__day:hover {
-  background-color: rgba(127, 127, 127, 0.1);
   filter: brightness(1.08);
   z-index: 2;
+}
+
+.cv-date-picker__day:hover:not(.cv-date-picker__day--selected):not(.cv-date-picker__day--range):not(.cv-date-picker__day--multi-selected) {
+  background-color: rgba(127, 127, 127, 0.1);
+}
+
+.cv-date-picker__day--selected:hover,
+.cv-date-picker__day--range:hover,
+.cv-date-picker__day--multi-selected:hover {
+  background-color: transparent;
 }
 
 .cv-date-picker__day--multi-selected {

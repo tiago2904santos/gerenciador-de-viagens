@@ -189,7 +189,7 @@ Modo multi:
       <div class="cv-field">
         {% if single_lbl %}<label class="cv-field__label" for="{{ single_id }}">{{ single_lbl }}</label>{% endif %}
         <div class="cv-date-picker__control">
-          <input type="text" class="cv-field__control" id="{{ single_id }}" placeholder="dd/mm/aaaa" autocomplete="off" inputmode="numeric" maxlength="10" data-cv-date-picker-display readonly>
+          <input type="text" class="cv-field__control{% if input_class %} {{ input_class }}{% endif %}" id="{{ single_id }}" placeholder="{{ single_placeholder|default:'dd/mm/aaaa' }}" autocomplete="off" inputmode="numeric" maxlength="10"{% if single_aria_label %} aria-label="{{ single_aria_label }}"{% endif %} data-cv-date-picker-display readonly>
           <button type="button" class="cv-date-picker__trigger cv-date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-label="Abrir calendario">
             {% include "components/forms/_cv_date_picker_icon.html" %}
           </button>
@@ -199,7 +199,7 @@ Modo multi:
       <div class="cv-field">
         {% if single_lbl %}<label class="cv-field__label" for="{{ single_id }}">{{ single_lbl }}</label>{% endif %}
         <div class="cv-date-picker__control">
-          <input type="text" class="cv-field__control" id="{{ single_id }}" placeholder="dd/mm/aaaa" autocomplete="off" inputmode="numeric" maxlength="10" data-cv-date-picker-display readonly>
+          <input type="text" class="cv-field__control{% if input_class %} {{ input_class }}{% endif %}" id="{{ single_id }}" placeholder="{{ single_placeholder|default:'dd/mm/aaaa' }}" autocomplete="off" inputmode="numeric" maxlength="10"{% if single_aria_label %} aria-label="{{ single_aria_label }}"{% endif %} data-cv-date-picker-display readonly>
           <button type="button" class="cv-date-picker__trigger cv-date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-label="Abrir calendario">
             {% include "components/forms/_cv_date_picker_icon.html" %}
           </button>

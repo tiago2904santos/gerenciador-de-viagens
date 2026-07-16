@@ -1,5 +1,6 @@
 from django.urls import reverse
 
+from cadastros.selectors import get_configuracao_sistema
 from core.utils.masks import format_protocolo
 
 # Reaproveita a formatação já consolidada na lista de ofícios para manter
@@ -124,7 +125,11 @@ def apresentar_prestacao_card(prestacao, solicitacao_forms=None):
             valor_diarias_extenso = (roteiro.valor_diarias_extenso or "").strip()
 
     # ── Aviso de liberação de diárias (WhatsApp): partes comuns a todo servidor ──
-    unidade_sede_display = str(oficio.solicitante) if oficio.solicitante_id else ""
+    # "Unidade sede" = a unidade configurada em Configurações > "Dados da
+    # unidade e Endereço dos documentos" (a mesma usada como ORIGEM no
+    # cabeçalho do ofício gerado), não o solicitante do ofício.
+    configuracao = get_configuracao_sistema()
+    unidade_sede_display = configuracao.unidade.nome if configuracao.unidade_id else ""
     if destino_display and data_evento_display:
         evento_wa_display = f"{destino_display}, de {data_evento_display}"
     else:
