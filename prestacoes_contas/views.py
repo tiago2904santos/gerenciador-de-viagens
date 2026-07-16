@@ -68,8 +68,8 @@ from .models import RelatorioTecnico
 from .presenters import apresentar_prestacao_card
 from .selectors import ABA_ARQUIVADOS
 from .selectors import ABA_FINALIZADOS
-from .selectors import ABA_FUTURAS
-from .selectors import ABA_PENDENTES
+from .selectors import ABA_LIBERADAS
+from .selectors import ABA_NAO_LIBERADAS
 from .selectors import contar_por_aba
 from .selectors import listar_prestacoes
 from .selectors import normalizar_aba
@@ -307,17 +307,17 @@ def _solicitacao_autosave_value(payload):
     return None
 
 
-def _prazo_autosave_value(payload):
-    """Valor bruto (``'AAAA-MM-DD'`` ou vazio) do campo ``prazo_limite_saque``, se presente."""
+def _date_autosave_value(payload, field_name):
+    """Valor ISO bruto (ou vazio) de um campo de data individual, se presente."""
     for name, value in payload.fields.items():
         clean_name = str(name or "").strip()
-        if clean_name == "prazo_limite_saque" or clean_name.endswith("-prazo_limite_saque"):
+        if clean_name == field_name or clean_name.endswith(f"-{field_name}"):
             return (value or "").strip()
     return None
 
 
-def _parse_prazo_limite_saque(texto):
-    """Converte ``'AAAA-MM-DD'`` (input type=date) em ``date``; ``''`` vira ``None``."""
+def _parse_iso_date(texto):
+    """Converte ``'AAAA-MM-DD'`` em ``date``; ``''`` vira ``None``."""
     if not texto:
         return None
     return datetime.date.fromisoformat(texto)
@@ -454,15 +454,15 @@ def _trecho_display(linha) -> dict:
 
 
 _ABA_LABELS = [
-    (ABA_PENDENTES, "Pendentes"),
-    (ABA_FUTURAS, "Que vão acontecer"),
+    (ABA_NAO_LIBERADAS, "Não liberadas"),
+    (ABA_LIBERADAS, "Liberadas"),
     (ABA_ARQUIVADOS, "Arquivados"),
     (ABA_FINALIZADOS, "Finalizados"),
 ]
 
 _ABA_EMPTY_MESSAGE = {
-    ABA_PENDENTES: "Nenhuma prestação pendente. Viagens que ainda vão acontecer estão na aba “Que vão acontecer”.",
-    ABA_FUTURAS: "Nenhuma viagem agendada para os próximos dias.",
+    ABA_NAO_LIBERADAS: "Nenhuma prestação com diárias pendentes de liberação.",
+    ABA_LIBERADAS: "Nenhuma prestação com diárias já liberadas.",
     ABA_ARQUIVADOS: "Nenhuma prestação arquivada.",
     ABA_FINALIZADOS: "Nenhuma prestação finalizada ainda.",
 }
@@ -555,20 +555,27 @@ def index(request):
 
 
 def _salvar_solicitacoes_em_lote(request):
-    """Fallback sem JS: salva os campos ``ps-<pk>-numero_solicitacao``/``-prazo_limite_saque`` do card."""
+    """Fallback sem JS para solicitação e período de liberação de cada servidor."""
     atualizacoes = {}
+    liberacoes = {}
     prazos = {}
     for name, value in request.POST.items():
         match = re.match(r"^ps-(\d+)-numero_solicitacao$", name)
         if match:
             atualizacoes[int(match.group(1))] = normalize_spaces(value or "")
             continue
+        match_liberacao = re.match(r"^ps-(\d+)-data_liberacao_diarias$", name)
+        if match_liberacao:
+            liberacoes[int(match_liberacao.group(1))] = (value or "").strip()
+            continue
         match_prazo = re.match(r"^ps-(\d+)-prazo_limite_saque$", name)
         if match_prazo:
             prazos[int(match_prazo.group(1))] = (value or "").strip()
-    if not atualizacoes and not prazos:
+    if not atualizacoes and not liberacoes and not prazos:
         return
-    servidores = _prestacao_servidor_queryset().filter(pk__in=set(atualizacoes) | set(prazos))
+    servidores = _prestacao_servidor_queryset().filter(
+        pk__in=set(atualizacoes) | set(liberacoes) | set(prazos)
+    )
     for ps in servidores:
         update_fields = []
         if ps.pk in atualizacoes:
@@ -576,9 +583,17 @@ def _salvar_solicitacoes_em_lote(request):
             if ps.numero_solicitacao != novo:
                 ps.numero_solicitacao = novo
                 update_fields.append("numero_solicitacao")
+        if ps.pk in liberacoes:
+            try:
+                nova_liberacao = _parse_iso_date(liberacoes[ps.pk])
+            except ValueError:
+                nova_liberacao = ps.data_liberacao_diarias
+            if ps.data_liberacao_diarias != nova_liberacao:
+                ps.data_liberacao_diarias = nova_liberacao
+                update_fields.append("data_liberacao_diarias")
         if ps.pk in prazos:
             try:
-                novo_prazo = _parse_prazo_limite_saque(prazos[ps.pk])
+                novo_prazo = _parse_iso_date(prazos[ps.pk])
             except ValueError:
                 novo_prazo = ps.prazo_limite_saque
             if ps.prazo_limite_saque != novo_prazo:
@@ -632,10 +647,22 @@ def prestacao_servidor_solicitacao_autosave(request, ps_pk):
         ps.save(update_fields=["numero_solicitacao", "atualizado_em"])
         _marcar_prestacao_em_preenchimento(ps.prestacao)
 
-    prazo_raw = _prazo_autosave_value(payload)
+    liberacao_raw = _date_autosave_value(payload, "data_liberacao_diarias")
+    prazo_raw = _date_autosave_value(payload, "prazo_limite_saque")
+
+    if liberacao_raw is not None:
+        try:
+            nova_liberacao = _parse_iso_date(liberacao_raw)
+        except ValueError:
+            return autosave_json_response(ok=False, message="Data de liberação inválida.")
+        if ps.data_liberacao_diarias != nova_liberacao:
+            ps.data_liberacao_diarias = nova_liberacao
+            ps.save(update_fields=["data_liberacao_diarias", "atualizado_em"])
+            _marcar_prestacao_em_preenchimento(ps.prestacao)
+
     if prazo_raw is not None:
         try:
-            novo_prazo = _parse_prazo_limite_saque(prazo_raw)
+            novo_prazo = _parse_iso_date(prazo_raw)
         except ValueError:
             return autosave_json_response(ok=False, message="Data de prazo limite inválida.")
         if ps.prazo_limite_saque != novo_prazo:

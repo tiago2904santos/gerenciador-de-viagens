@@ -30,6 +30,7 @@ Modo single:
   start_hidden_value / end_hidden_value
   show_summary   exibe o resumo textual abaixo dos campos (default: true)
   control_variant  "filter-pill" preserva o botao compacto dos filtros de lista
+  compact_range_display  exibe dia/mes no inicio e mantem o ano na data final
 
 Modo multi:
   max_dates             numero maximo de datas (ex.: 1 por trecho do roteiro)
@@ -47,6 +48,7 @@ Modo multi:
   {% if mode %}data-mode="{{ mode }}"{% endif %}
   {% if picker_id %}id="{{ picker_id }}"{% endif %}
   {% if initial_date %}data-initial-date="{{ initial_date }}"{% endif %}
+  {% if compact_range_display %}data-compact-range-display="true"{% endif %}
   {% if trecho_date %}data-trecho-date="{{ trecho_date }}"{% endif %}
   {% if mode == "multi" %}
     {% if max_dates %}data-max-dates="{{ max_dates }}"{% endif %}

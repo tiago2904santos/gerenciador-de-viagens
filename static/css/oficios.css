@@ -3922,23 +3922,25 @@ html[data-theme="light"] .oficio-lc__trecho--atividade .oficio-lc__trecho-rota {
   min-width: 0;
 }
 
-.oficio-lc__prazo-input {
-  width: 100%;
+.oficio-lc__saque-range-picker {
+  display: inline-flex;
+  flex: 0 0 180px;
   min-width: 0;
+  width: 180px;
 }
 
-.oficio-lc__prazo-picker {
-  display: block;
-  flex: 0 0 140px;
+.oficio-lc__saque-range-picker .oficios-filter-range__btn {
+  gap: 5px;
   min-width: 0;
-  width: 140px;
+  padding-inline: 10px;
+  width: 100%;
 }
 
-.oficio-lc__prazo-picker .cv-field,
-.oficio-lc__prazo-picker .cv-date-picker__control {
-  margin: 0;
+.oficio-lc__saque-range-picker .oficios-filter-range__label {
+  font-size: 0.72rem;
   min-width: 0;
-  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .oficio-lc__traveller--prestacao .oficio-lc__traveller-body {

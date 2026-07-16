@@ -164,32 +164,25 @@ html[data-theme="light-light"] .oficios-filter-range--active .oficios-filter-ran
   color: #072f54;
 }
 
-.oficio-lc__prazo-picker {
-  display: block;
-  flex: 0 0 140px;
+.oficio-lc__saque-range-picker {
+  display: inline-flex;
+  flex: 0 0 155px;
   min-width: 0;
-  width: 140px;
+  width: 180px;
 }
 
-.oficio-lc__prazo-picker .cv-field,
-.oficio-lc__prazo-picker .cv-date-picker__control {
-  margin: 0;
+.oficio-lc__saque-range-picker .oficios-filter-range__btn {
+  gap: 5px;
   min-width: 0;
+  padding-inline: 10px;
   width: 100%;
 }
 
-.oficio-lc__prazo-picker .oficio-lc__prazo-input {
+.oficio-lc__saque-range-picker .oficios-filter-range__label {
+  font-size: 0.72rem;
   min-width: 0;
-  width: 100%;
-}
-
-.oficio-lc__prazo-picker .cv-date-picker__trigger--icon {
-  background: var(--cv-btn-secondary-bg);
-  border-color: var(--cv-btn-secondary-border);
-  box-shadow: var(--shadow-xs);
-  color: var(--cv-btn-secondary-color);
-  opacity: 1;
-  pointer-events: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ── Abas de listagem (temporais / de estado) — compartilhado entre as listas ── */

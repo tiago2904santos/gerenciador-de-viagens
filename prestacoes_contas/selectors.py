@@ -1,8 +1,7 @@
-from datetime import timedelta
-
+from django.db.models import Exists
+from django.db.models import OuterRef
 from django.db.models import Prefetch
 from django.db.models import Q
-from django.utils import timezone
 
 from core.normalizers import remove_accents
 from core.tenancy import filter_queryset_by_area
@@ -25,15 +24,17 @@ _SORT_MAP = {
 
 
 # ── Abas da lista de prestações ──
-# A viagem só aparece em "Pendentes" quando já está acontecendo/aconteceu ou
-# começa em até 1 dia; se ainda faltar mais de um dia, vai para "Que vai
-# acontecer". "Arquivados" e "Finalizados" independem do tempo da viagem.
-ABA_PENDENTES = "pendentes"
-ABA_FUTURAS = "futuras"
+# "Liberadas" = todo servidor do ofício já tem a Data de liberação das
+# diárias preenchida (o aviso de liberação já pode ser enviado a todos);
+# basta um servidor sem essa data para a prestação ficar em "Não liberadas".
+# "Arquivados" e "Finalizados" independem disso e têm precedência (uma
+# prestação finalizada some das outras abas mesmo se ainda não liberada).
+ABA_NAO_LIBERADAS = "nao_liberadas"
+ABA_LIBERADAS = "liberadas"
 ABA_ARQUIVADOS = "arquivados"
 ABA_FINALIZADOS = "finalizados"
-ABA_PADRAO = ABA_PENDENTES
-ABAS_VALIDAS = {ABA_PENDENTES, ABA_FUTURAS, ABA_ARQUIVADOS, ABA_FINALIZADOS}
+ABA_PADRAO = ABA_NAO_LIBERADAS
+ABAS_VALIDAS = {ABA_NAO_LIBERADAS, ABA_LIBERADAS, ABA_ARQUIVADOS, ABA_FINALIZADOS}
 
 
 def normalizar_aba(aba: str | None) -> str:
@@ -48,20 +49,19 @@ def _q_da_aba(aba: str) -> Q:
     if aba == ABA_ARQUIVADOS:
         return Q(arquivada=True, finalizada=False)
 
-    # Pendentes e Futuras são "ativas" (nem arquivadas, nem finalizadas).
+    # Liberadas e Não liberadas são "ativas" (nem arquivadas, nem finalizadas).
     ativa = Q(arquivada=False, finalizada=False)
-    # Visível a partir de 1 dia antes da saída: saída <= amanhã.
-    limite_visivel = timezone.localdate() + timedelta(days=1)
-    if aba == ABA_FUTURAS:
-        return ativa & Q(oficio__roteiro__saida_dt__date__gt=limite_visivel)
-    # Pendentes: já acontecendo/aconteceu, começa em até 1 dia, ou sem data de
-    # viagem definida (precisa de atenção mesmo sem roteiro).
-    visivel = (
-        Q(oficio__roteiro__saida_dt__date__lte=limite_visivel)
-        | Q(oficio__roteiro__isnull=True)
-        | Q(oficio__roteiro__saida_dt__isnull=True)
-    )
-    return ativa & visivel
+    tem_servidor = Q(Exists(PrestacaoServidor.objects.filter(prestacao=OuterRef("pk"))))
+    tem_pendente = Q(Exists(
+        PrestacaoServidor.objects.filter(
+            prestacao=OuterRef("pk"), data_liberacao_diarias__isnull=True
+        )
+    ))
+    if aba == ABA_LIBERADAS:
+        return ativa & tem_servidor & ~tem_pendente
+    # Não liberadas: ainda sem nenhum servidor cadastrado, ou algum servidor
+    # sem a data de liberação preenchida.
+    return ativa & (~tem_servidor | tem_pendente)
 
 
 def _base_prestacoes(
@@ -163,5 +163,5 @@ def contar_por_aba(
     base = _base_prestacoes(q=q, status=status, viagem_de=viagem_de, viagem_ate=viagem_ate)
     return {
         aba: base.filter(_q_da_aba(aba)).values("pk").distinct().count()
-        for aba in (ABA_PENDENTES, ABA_FUTURAS, ABA_ARQUIVADOS, ABA_FINALIZADOS)
+        for aba in (ABA_NAO_LIBERADAS, ABA_LIBERADAS, ABA_ARQUIVADOS, ABA_FINALIZADOS)
     }

@@ -1,6 +1,5 @@
 from datetime import date
 from datetime import datetime
-from datetime import timedelta
 from decimal import Decimal
 import json
 import tempfile
@@ -236,6 +235,50 @@ class PrestacaoServidorDiariaOverrideTests(TestCase):
         self.ps_b.refresh_from_db()
         self.assertEqual(self.ps_b.diaria_valor_override, "R$80,00")
         self.assertEqual(self.ps_a.diaria_valor_override, "")
+
+    def test_autosave_salva_periodo_de_liberacao_e_saque(self):
+        liberacao_name = f"ps-{self.ps_a.pk}-data_liberacao_diarias"
+        prazo_name = f"ps-{self.ps_a.pk}-prazo_limite_saque"
+        payload = {
+            "object_id": str(self.ps_a.pk),
+            "form_id": "",
+            "model": "prestacao_servidor",
+            "dirty_fields": [liberacao_name, prazo_name],
+            "fields": {
+                liberacao_name: "2026-07-16",
+                prazo_name: "2026-07-23",
+            },
+            "snapshots": {},
+        }
+
+        response = self.client.post(
+            reverse(
+                "prestacoes_contas:prestacao_servidor_solicitacao_autosave",
+                args=[self.ps_a.pk],
+            ),
+            data=json.dumps(payload),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.ps_a.refresh_from_db()
+        self.assertEqual(self.ps_a.data_liberacao_diarias, date(2026, 7, 16))
+        self.assertEqual(self.ps_a.prazo_limite_saque, date(2026, 7, 23))
+
+    def test_post_sem_js_salva_periodo_de_liberacao_e_saque(self):
+        response = self.client.post(
+            reverse("prestacoes_contas:index"),
+            data={
+                "action": "save_solicitacoes",
+                f"ps-{self.ps_a.pk}-data_liberacao_diarias": "2026-07-16",
+                f"ps-{self.ps_a.pk}-prazo_limite_saque": "2026-07-23",
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.ps_a.refresh_from_db()
+        self.assertEqual(self.ps_a.data_liberacao_diarias, date(2026, 7, 16))
+        self.assertEqual(self.ps_a.prazo_limite_saque, date(2026, 7, 23))
 
 
 class RelatorioTecnicoDocumentoTests(TestCase):
@@ -723,7 +766,7 @@ class RelatorioTecnicoDocumentoTests(TestCase):
 
 
 class PrestacaoAbasTests(TestCase):
-    """Abas (pendentes/futuras/arquivados/finalizados) + ações arquivar/finalizar."""
+    """Abas (não liberadas/liberadas/arquivados/finalizados) + ações arquivar/finalizar."""
 
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="tester_abas", password="123456")
@@ -731,10 +774,9 @@ class PrestacaoAbasTests(TestCase):
         self.cargo = Cargo.objects.create(nome="Agente")
         self.servidor = Servidor.objects.create(nome="Servidor Abas", cargo=self.cargo, cpf="11122233344")
 
-    def _criar_prestacao(self, *, saida_offset_dias=0, numero=1):
-        """Cria um ofício (e, via signal, a prestação) com saída em ``hoje + offset``."""
-        saida = timezone.now() + timedelta(days=saida_offset_dias)
-        roteiro = Roteiro.objects.create(saida_dt=saida)
+    def _criar_prestacao(self, *, numero=1):
+        """Cria um ofício (e, via signal, a prestação) com um servidor vinculado."""
+        roteiro = Roteiro.objects.create(saida_dt=timezone.now())
         oficio = Oficio.objects.create(numero=numero, ano=2026, protocolo=f"1000000{numero}", roteiro=roteiro)
         oficio.servidores.add(self.servidor)
         return PrestacaoContas.objects.get(oficio=oficio)
@@ -744,37 +786,45 @@ class PrestacaoAbasTests(TestCase):
 
         return set(selectors.listar_prestacoes(aba=aba).values_list("pk", flat=True))
 
-    def test_viagem_futura_alem_de_um_dia_nao_aparece_em_pendentes(self):
-        pendente = self._criar_prestacao(saida_offset_dias=0, numero=1)   # começa hoje
-        amanha = self._criar_prestacao(saida_offset_dias=1, numero=2)     # falta 1 dia (visível)
-        futura = self._criar_prestacao(saida_offset_dias=5, numero=3)     # falta mais de 1 dia
+    def _liberar(self, prestacao):
+        """Marca a data de liberação das diárias do (único) servidor da prestação."""
+        ps = prestacao.servidores_prestacao.get()
+        ps.data_liberacao_diarias = timezone.localdate()
+        ps.save(update_fields=["data_liberacao_diarias"])
 
+    def test_prestacao_sem_data_liberacao_fica_em_nao_liberadas(self):
         from prestacoes_contas import selectors
 
-        pendentes = self._pks(selectors.ABA_PENDENTES)
-        futuras = self._pks(selectors.ABA_FUTURAS)
+        prestacao = self._criar_prestacao(numero=1)
 
-        self.assertIn(pendente.pk, pendentes)
-        self.assertIn(amanha.pk, pendentes)
-        self.assertNotIn(futura.pk, pendentes)
-        self.assertEqual(futuras, {futura.pk})
+        self.assertIn(prestacao.pk, self._pks(selectors.ABA_NAO_LIBERADAS))
+        self.assertNotIn(prestacao.pk, self._pks(selectors.ABA_LIBERADAS))
+
+    def test_prestacao_com_servidor_liberado_move_para_liberadas(self):
+        from prestacoes_contas import selectors
+
+        prestacao = self._criar_prestacao(numero=1)
+        self._liberar(prestacao)
+
+        self.assertIn(prestacao.pk, self._pks(selectors.ABA_LIBERADAS))
+        self.assertNotIn(prestacao.pk, self._pks(selectors.ABA_NAO_LIBERADAS))
 
     def test_arquivar_move_para_aba_arquivados(self):
         from prestacoes_contas import selectors
 
-        prestacao = self._criar_prestacao(saida_offset_dias=0)
+        prestacao = self._criar_prestacao()
 
         response = self.client.post(
             reverse("prestacoes_contas:prestacao_arquivar", args=[prestacao.pk]),
-            data={"next": "/prestacoes-contas/?aba=pendentes"},
+            data={"next": "/prestacoes-contas/?aba=nao_liberadas"},
         )
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, "/prestacoes-contas/?aba=pendentes")
+        self.assertEqual(response.url, "/prestacoes-contas/?aba=nao_liberadas")
         prestacao.refresh_from_db()
         self.assertTrue(prestacao.arquivada)
         self.assertIsNotNone(prestacao.arquivada_em)
-        self.assertNotIn(prestacao.pk, self._pks(selectors.ABA_PENDENTES))
+        self.assertNotIn(prestacao.pk, self._pks(selectors.ABA_NAO_LIBERADAS))
         self.assertIn(prestacao.pk, self._pks(selectors.ABA_ARQUIVADOS))
 
         # Segundo POST desarquiva (toggle).
@@ -782,12 +832,12 @@ class PrestacaoAbasTests(TestCase):
         prestacao.refresh_from_db()
         self.assertFalse(prestacao.arquivada)
         self.assertIsNone(prestacao.arquivada_em)
-        self.assertIn(prestacao.pk, self._pks(selectors.ABA_PENDENTES))
+        self.assertIn(prestacao.pk, self._pks(selectors.ABA_NAO_LIBERADAS))
 
     def test_finalizar_tem_precedencia_sobre_arquivada(self):
         from prestacoes_contas import selectors
 
-        prestacao = self._criar_prestacao(saida_offset_dias=0)
+        prestacao = self._criar_prestacao()
         prestacao.definir_arquivada(True)
 
         self.client.post(reverse("prestacoes_contas:prestacao_finalizar", args=[prestacao.pk]))
@@ -797,21 +847,22 @@ class PrestacaoAbasTests(TestCase):
         # Finalizada aparece só em "Finalizados", mesmo estando arquivada.
         self.assertIn(prestacao.pk, self._pks(selectors.ABA_FINALIZADOS))
         self.assertNotIn(prestacao.pk, self._pks(selectors.ABA_ARQUIVADOS))
-        self.assertNotIn(prestacao.pk, self._pks(selectors.ABA_PENDENTES))
+        self.assertNotIn(prestacao.pk, self._pks(selectors.ABA_NAO_LIBERADAS))
 
     def test_contagem_por_aba(self):
         from prestacoes_contas import selectors
 
-        p_pend = self._criar_prestacao(saida_offset_dias=0, numero=1)
-        self._criar_prestacao(saida_offset_dias=5, numero=2)
-        p_arq = self._criar_prestacao(saida_offset_dias=0, numero=3)
+        p_nao_lib = self._criar_prestacao(numero=1)
+        p_lib = self._criar_prestacao(numero=2)
+        self._liberar(p_lib)
+        p_arq = self._criar_prestacao(numero=3)
         p_arq.definir_arquivada(True)
-        p_fin = self._criar_prestacao(saida_offset_dias=0, numero=4)
+        p_fin = self._criar_prestacao(numero=4)
         p_fin.definir_finalizada(True)
 
         contagem = selectors.contar_por_aba()
-        self.assertEqual(contagem[selectors.ABA_PENDENTES], 1)
-        self.assertEqual(contagem[selectors.ABA_FUTURAS], 1)
+        self.assertEqual(contagem[selectors.ABA_NAO_LIBERADAS], 1)
+        self.assertEqual(contagem[selectors.ABA_LIBERADAS], 1)
         self.assertEqual(contagem[selectors.ABA_ARQUIVADOS], 1)
         self.assertEqual(contagem[selectors.ABA_FINALIZADOS], 1)
-        self.assertIn(p_pend.pk, self._pks(selectors.ABA_PENDENTES))
+        self.assertIn(p_nao_lib.pk, self._pks(selectors.ABA_NAO_LIBERADAS))

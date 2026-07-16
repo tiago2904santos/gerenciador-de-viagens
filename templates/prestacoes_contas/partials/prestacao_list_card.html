@@ -43,8 +43,8 @@
                    maxlength="60"
                    value="{{ servidor.numero_solicitacao }}">
             {% with ps_id=servidor.ps_pk|stringformat:"s" %}
-              {% with prazo_name="ps-"|add:ps_id|add:"-prazo_limite_saque" prazo_display_id="id_ps_"|add:ps_id|add:"_prazo_limite_saque_display" prazo_hidden_id="id_ps_"|add:ps_id|add:"_prazo_limite_saque" prazo_aria="Prazo limite para saque de "|add:servidor.name %}
-                {% include "components/forms/cv_date_picker.html" with mode="single" extra_class="oficio-lc__prazo-picker" single_input_id=prazo_display_id single_hidden_id=prazo_hidden_id single_hidden_name=prazo_name single_hidden_value=servidor.prazo_limite_saque single_placeholder="Sacar até" input_class="form-control oficio-lc__prazo-input" single_aria_label=prazo_aria only %}
+              {% with liberacao_name="ps-"|add:ps_id|add:"-data_liberacao_diarias" liberacao_hidden_id="id_ps_"|add:ps_id|add:"_data_liberacao_diarias" prazo_name="ps-"|add:ps_id|add:"-prazo_limite_saque" prazo_hidden_id="id_ps_"|add:ps_id|add:"_prazo_limite_saque" range_picker_id="id_ps_"|add:ps_id|add:"_periodo_saque" %}
+                {% include "components/forms/cv_date_picker.html" with mode="range" control_variant="filter-pill" compact_range_display=True picker_id=range_picker_id extra_class="oficios-filter-range oficio-lc__saque-range-picker" trigger_label="Liberação → saque" trigger_aria_label="Selecionar data de liberação e prazo para saque de "|add:servidor.name start_hidden_id=liberacao_hidden_id end_hidden_id=prazo_hidden_id start_hidden_name=liberacao_name end_hidden_name=prazo_name start_hidden_value=servidor.data_liberacao_diarias end_hidden_value=servidor.prazo_limite_saque initial_date=servidor.data_liberacao_diarias show_summary=False only %}
               {% endwith %}
             {% endwith %}
           </form>
@@ -205,15 +205,28 @@
       return document.querySelector('[data-action-menu-target="' + menu.id + '"]');
     }
 
-    // Valida solicitação/prazo e monta a mensagem; retorna null (já focando o
+    function diariaDateText(value) {
+      var parts = String(value || "").split("-");
+      return parts.length === 3 ? (parts[2] + "/" + parts[1] + "/" + parts[0]) : "";
+    }
+
+    function diariaTodayIso() {
+      var today = new Date();
+      var month = String(today.getMonth() + 1).padStart(2, "0");
+      var day = String(today.getDate()).padStart(2, "0");
+      return today.getFullYear() + "-" + month + "-" + day;
+    }
+
+    // Valida solicitação/período e monta a mensagem; retorna null (já focando o
     // campo pendente) se faltar algo — usado tanto pelo envio quanto pela cópia.
     function diariaWaContext(el) {
       var trigger = diariaWaTrigger(el);
       if (!trigger) return null;
       var row = trigger.closest(".oficio-lc__traveller");
       var numInput = row ? row.querySelector('input[name$="-numero_solicitacao"]') : null;
+      var liberacaoInput = row ? row.querySelector('input[name$="-data_liberacao_diarias"]') : null;
       var prazoInput = row ? row.querySelector('input[name$="-prazo_limite_saque"]') : null;
-      var prazoDisplay = row ? row.querySelector(".oficio-lc__prazo-picker [data-cv-date-picker-display]") : null;
+      var rangeTrigger = row ? row.querySelector(".oficio-lc__saque-range-picker [data-cv-date-picker-trigger]") : null;
 
       if (numInput && !numInput.value.trim()) {
         numInput.focus();
@@ -222,18 +235,28 @@
         numInput.setCustomValidity("");
         return null;
       }
+      if (!liberacaoInput || !liberacaoInput.value) {
+        if (rangeTrigger) rangeTrigger.focus();
+        window.alert("Informe a data de liberação antes de enviar o aviso.");
+        return null;
+      }
       if (prazoInput && !prazoInput.value) {
-        if (prazoDisplay) {
-          prazoDisplay.focus();
-          prazoDisplay.setCustomValidity("Informe o prazo limite para saque antes de enviar o aviso.");
-          prazoDisplay.reportValidity();
-          prazoDisplay.setCustomValidity("");
-        }
+        if (rangeTrigger) rangeTrigger.focus();
+        window.alert("Informe o prazo limite para saque antes de enviar o aviso.");
+        return null;
+      }
+      if (liberacaoInput.value > diariaTodayIso()) {
+        if (rangeTrigger) rangeTrigger.focus();
+        window.alert(
+          "O aviso só poderá ser enviado a partir de " +
+          diariaDateText(liberacaoInput.value) +
+          ", data de liberação das diárias."
+        );
         return null;
       }
 
-      var prazoParts = (prazoInput.value || "").split("-");
-      var prazoTexto = prazoParts.length === 3 ? (prazoParts[2] + "/" + prazoParts[1] + "/" + prazoParts[0]) : "";
+      var liberacaoTexto = diariaDateText(liberacaoInput.value);
+      var prazoTexto = diariaDateText(prazoInput.value);
 
       // Emojis/marcadores via código de caractere (não como literal no
       // arquivo) — evita depender da codificação com que este template acaba
@@ -252,9 +275,10 @@
 
       var msg = EMOJI_LIBERACAO + " *LIBERAÇÃO DE DIÁRIAS*\n" +
         "Comunicamos que, referente ao " + oficioRef +
-        ", as diárias relativas ao evento *" + evento + "* estão liberadas para Transferência ou Saque.\n\n" +
-        BULLET + " Servidor beneficiado: *" + servidorNome + "*\n" +
-        BULLET + " Valor (por diária): *" + diariaValor + "*\n" +
+        ", as diárias relativas ao evento de *" + evento + "* estão liberadas para Transferência ou Saque.\n\n" +
+        BULLET + " Nome: *" + servidorNome + "*\n" +
+        BULLET + " Valor: *" + diariaValor + "*\n" +
+        BULLET + " Data de liberação: *" + liberacaoTexto + "*\n" +
         EMOJI_PRAZO + " Prazo limite para saque: *" + prazoTexto + "* (PRAZO IMPRORROGÁVEL)\n" +
         EMOJI_AVISO + " Aviso importante: O saque das diárias não fica disponível no mesmo dia do desbloqueio do cartão. Programe-se com antecedência!";
 

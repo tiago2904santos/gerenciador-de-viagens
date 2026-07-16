@@ -46,6 +46,9 @@ def _servidor_row(ps, solicitacao_form=None):
         "unidade": unidade_nome,
         "is_motorista": ps.is_motorista,
         "numero_solicitacao": ps.numero_solicitacao,
+        "data_liberacao_diarias": (
+            ps.data_liberacao_diarias.isoformat() if ps.data_liberacao_diarias else ""
+        ),
         "prazo_limite_saque": ps.prazo_limite_saque.isoformat() if ps.prazo_limite_saque else "",
         "solicitacao_form": solicitacao_form,
         "solicitacao_autosave_url": reverse(

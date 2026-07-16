@@ -70,6 +70,10 @@
     return [pad2(date.getDate()), pad2(date.getMonth() + 1), date.getFullYear()].join('/');
   }
 
+  function formatCompactDisplayDate(date) {
+    return [pad2(date.getDate()), pad2(date.getMonth() + 1)].join('/');
+  }
+
   function formatIsoDate(date) {
     return [
       date.getFullYear(),
@@ -526,11 +530,13 @@
       }
       if (displayText) {
         var displayPlaceholder = displayText.dataset.placeholder || 'Período da viagem';
+        var compactRangeDisplay = root.dataset.compactRangeDisplay === 'true';
+        var startRangeFormatter = compactRangeDisplay ? formatCompactDisplayDate : formatDisplayDate;
         if (selectedStart && selectedEnd) {
-          displayText.textContent = formatDisplayDate(selectedStart) + '  →  ' + formatDisplayDate(selectedEnd);
+          displayText.textContent = startRangeFormatter(selectedStart) + '  →  ' + formatDisplayDate(selectedEnd);
           root.classList.add('oficios-filter-range--active');
         } else if (selectedStart) {
-          displayText.textContent = formatDisplayDate(selectedStart) + '  →  …';
+          displayText.textContent = startRangeFormatter(selectedStart) + '  →  …';
           root.classList.add('oficios-filter-range--active');
         } else {
           displayText.textContent = displayPlaceholder;
