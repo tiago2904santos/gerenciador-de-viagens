@@ -173,6 +173,7 @@ html[data-theme="light-light"] {
   --cv-date-picker-day-gap: 1.6px;
   --cv-date-picker-day-size: 40px;
   --cv-date-picker-grid-width: calc((7 * var(--cv-date-picker-day-size)) + (6 * var(--cv-date-picker-day-gap)));
+  /* Quebra de semana: suaviza apenas as quinas da borda; inicio/fim seguem pill. */
   --cv-date-picker-week-edge-radius: 4px;
   background: var(--route-card-inner-bg, var(--theme-surface-card));
   border: 1px solid var(--route-card-inner-border, var(--theme-border-card));
