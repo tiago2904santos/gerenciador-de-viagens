@@ -798,6 +798,22 @@ def dashboard(request):
 
 @login_required(login_url="core:login")
 def perfil(request):
+    from django.conf import settings
+
+    from core.tenancy import filter_queryset_by_area
+    from integracoes.google_drive import status as drive_status
+    from integracoes.google_drive.models import (
+        DriveArquivo,
+        DriveCredenciais,
+        DriveReorganizacaoJob,
+    )
+    from integracoes.google_drive.services import (
+        escopo_faltante,
+        esta_autorizado,
+        get_credenciais,
+        get_pasta_raiz_id,
+    )
+
     perfil_form = PerfilUsuarioForm(instance=request.user, prefix="perfil")
     senha_form = AlterarSenhaForm(user=request.user, prefix="senha")
 
@@ -825,6 +841,14 @@ def perfil(request):
         .order_by("-area_padrao", "area__sigla")
     )
 
+    cfg_drive = getattr(settings, "GOOGLE_DRIVE", {})
+    usuario_drive = request.user if request.user.is_authenticated else None
+    area_drive = getattr(request, "area", None)
+    drive_creds = get_credenciais(usuario_drive)
+    drive_modo = cfg_drive.get("MODO", "mock").lower()
+    drive_autorizado = esta_autorizado(usuario_drive)
+    drive_pasta_raiz_id = get_pasta_raiz_id(usuario_drive)
+
     return render(
         request,
         "core/perfil.html",
@@ -835,6 +859,32 @@ def perfil(request):
             "perfil_form": perfil_form,
             "senha_form": senha_form,
             "vinculos_area": vinculos_area,
+            # Google Drive
+            "drive_autorizado": drive_autorizado,
+            "drive_creds": drive_creds,
+            "drive_escopo_faltante": escopo_faltante(usuario_drive),
+            "drive_pasta_raiz_id": drive_pasta_raiz_id,
+            "drive_pasta_raiz_nome": drive_creds.pasta_raiz_nome if drive_creds else "",
+            "drive_total_arquivos": DriveArquivo.objects.filter(artefato__area=area_drive).count(),
+            "drive_modo_ativo": drive_modo != "mock",
+            # Reorganização em massa
+            "drive_pode_reorganizar": bool(drive_pasta_raiz_id)
+            and (drive_autorizado or drive_modo == "mock"),
+            "drive_total_eventos": filter_queryset_by_area(Evento.objects, area=area_drive).count(),
+            "drive_job_reorg": DriveReorganizacaoJob.objects.filter(
+                usuario=usuario_drive,
+                area=area_drive,
+            ).order_by("-iniciado_em").first(),
+            # Pendências (falhas de envio ao Drive)
+            "drive_total_pendencias": drive_status.contagem_pendencias(
+                usuario=usuario_drive,
+                area=area_drive,
+            ),
+            "drive_pendencias": drive_status.listar_pendencias_detalhadas(
+                limite=20,
+                usuario=usuario_drive,
+                area=area_drive,
+            ),
         },
     )
 

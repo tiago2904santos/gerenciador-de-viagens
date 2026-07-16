@@ -175,7 +175,7 @@ class PainelPendenciasViewTests(TestCase):
         status.registrar_falha(self.art, RuntimeError("Drive fora do ar"), usuario=self.user)
 
     def test_card_de_pendencias_aparece_na_tela(self):
-        resp = self.client.get(reverse("google_drive:index"))
+        resp = self.client.get(reverse("core:perfil"))
         self.assertContains(resp, "Pendências")
         self.assertContains(resp, "Tentar novamente agora")
 
@@ -184,6 +184,6 @@ class PainelPendenciasViewTests(TestCase):
             "integracoes.google_drive.tasks.processar_artefato.delay"
         ) as delay_mock:
             resp = self.client.post(reverse("google_drive:reprocessar_pendencias"))
-        self.assertRedirects(resp, reverse("cadastros:configuracao"))
+        self.assertRedirects(resp, reverse("core:perfil"))
         # object_id fica salvo como string em DriveSyncStatus (pk pode ser UUID ou int).
         delay_mock.assert_called_once_with(str(self.art.pk), usuario_id=self.user.pk)

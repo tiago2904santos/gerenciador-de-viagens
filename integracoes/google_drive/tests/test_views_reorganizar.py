@@ -50,14 +50,14 @@ class ReorganizarTudoViewTests(TestCase):
         )
 
     def test_card_aparece_quando_pode_reorganizar(self):
-        resp = self.client.get(reverse("google_drive:index"))
+        resp = self.client.get(reverse("core:perfil"))
         self.assertEqual(resp.status_code, 200)
         self.assertContains(resp, "Organização em massa")
         self.assertContains(resp, "Reorganizar tudo no Drive")
 
     def test_post_reorganiza_e_cria_drive_arquivo(self):
         resp = self.client.post(reverse("google_drive:reorganizar_tudo"))
-        self.assertRedirects(resp, reverse("google_drive:index"))
+        self.assertRedirects(resp, reverse("core:perfil"))
         reg = DriveArquivo.objects.get(artefato__oficio=self.oficio)
         self.assertEqual(
             reg.nome, "Ofício 01-2026 protocolo 12.345.678-9 Ana (Maringá).pdf"
@@ -86,7 +86,7 @@ class ReorganizarTudoViewTests(TestCase):
             status=DriveReorganizacaoJob.STATUS_EM_ANDAMENTO,
         )
         resp = self.client.post(reverse("google_drive:reorganizar_tudo"))
-        self.assertRedirects(resp, reverse("google_drive:index"))
+        self.assertRedirects(resp, reverse("core:perfil"))
         # Não cria um segundo job em andamento.
         self.assertEqual(
             DriveReorganizacaoJob.objects.filter(
@@ -107,5 +107,5 @@ class ReorganizarTudoViewTests(TestCase):
     def test_get_index_sem_pasta_nao_mostra_card(self):
         DriveCredenciais.objects.update(pasta_raiz_id="")
         services._reset_client()
-        resp = self.client.get(reverse("google_drive:index"))
+        resp = self.client.get(reverse("core:perfil"))
         self.assertNotContains(resp, "Organização em massa")

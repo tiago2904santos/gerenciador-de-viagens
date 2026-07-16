@@ -16,6 +16,63 @@
   }
 }
 
+/* Formulários dentro do card único (dados / senha) */
+.perfil-form {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: var(--space-4);
+}
+
+/* Empurra o botão para a base do card, alinhando os dois entre si */
+.perfil-form__actions {
+  display: flex;
+  margin-top: auto;
+}
+
+.perfil-form__actions .cv-btn {
+  justify-content: center;
+  width: 100%;
+}
+
+/* Dados do perfil + Alterar senha lado a lado */
+.perfil-columns {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 900px) {
+  .perfil-columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Cada seção vira um card discreto */
+.perfil-columns > .wizard-inner-section {
+  background: var(--theme-surface-card-soft, var(--color-surface-soft));
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-card);
+  padding: var(--space-5);
+}
+
+/* Neutraliza a divisória herdada entre .wizard-inner-section adjacentes:
+   cada card já tem sua própria borda e padding. */
+.perfil-columns > .wizard-inner-section + .wizard-inner-section {
+  border-top: 1px solid var(--color-border-soft);
+  padding-top: var(--space-5);
+}
+
+/* Separador entre o bloco de colunas e a seção Áreas de trabalho */
+.cv-wizard-section-body--sections > .perfil-columns {
+  padding-bottom: var(--space-5);
+}
+
+.cv-wizard-section-body--sections > .perfil-columns + .wizard-inner-section {
+  border-top: 1px solid var(--border-form-section);
+  padding-top: var(--space-5);
+}
+
 /* Lista de áreas vinculadas */
 .perfil-areas {
   display: grid;
@@ -58,36 +115,15 @@
   font-size: var(--font-size-sm);
 }
 
-/* Sessão e integrações */
-.perfil-sessao {
-  display: grid;
+/* Cabeçalho do card: chips de identidade + botão de sair alinhados */
+.perfil-header-meta {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--space-2);
 }
 
-.perfil-sessao__row {
-  align-items: center;
-  background: var(--theme-surface-card-soft, var(--color-surface-soft));
-  border: 1px solid var(--color-border-soft);
-  border-radius: var(--radius-control);
+.perfil-logout {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-  justify-content: space-between;
-  padding: var(--space-3) var(--space-4);
-}
-
-.perfil-sessao__text {
-  display: grid;
-  gap: 2px;
-  min-width: 0;
-}
-
-.perfil-sessao__title {
-  color: var(--theme-text-heading, var(--color-heading));
-  font-weight: 800;
-}
-
-.perfil-sessao__hint {
-  color: var(--theme-text-muted, var(--color-muted));
-  font-size: var(--font-size-sm);
+  margin: 0;
 }

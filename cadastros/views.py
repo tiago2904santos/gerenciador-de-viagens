@@ -10,7 +10,6 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils.http import url_has_allowed_host_and_scheme
 
-from core.tenancy import filter_queryset_by_area
 from core.utils.masks import only_digits
 from .models import Servidor
 from .models import Viatura
@@ -862,22 +861,6 @@ def viatura_update(request, pk):
 
 
 def configuracao_sistema(request):
-    from django.conf import settings
-
-    from eventos.models import Evento
-    from integracoes.google_drive.models import (
-        DriveArquivo,
-        DriveCredenciais,
-        DriveReorganizacaoJob,
-    )
-    from integracoes.google_drive import status as drive_status
-    from integracoes.google_drive.services import (
-        escopo_faltante,
-        esta_autorizado,
-        get_credenciais,
-        get_pasta_raiz_id,
-    )
-
     from .models import ConfiguracaoSistema
 
     obj = ConfiguracaoSistema.get_for_area(getattr(request, "area", None))
@@ -911,13 +894,6 @@ def configuracao_sistema(request):
         messages.success(request, "Destinatário salvo com sucesso.")
         return redirect("cadastros:configuracao")
 
-    cfg_drive = getattr(settings, "GOOGLE_DRIVE", {})
-    usuario_drive = request.user if request.user.is_authenticated else None
-    area_drive = getattr(request, "area", None)
-    drive_creds = get_credenciais(usuario_drive)
-    drive_modo = cfg_drive.get("MODO", "mock").lower()
-    drive_autorizado = esta_autorizado(usuario_drive)
-    drive_pasta_raiz_id = get_pasta_raiz_id(usuario_drive)
     return render(
         request,
         "cadastros/configuracao/form.html",
@@ -930,32 +906,6 @@ def configuracao_sistema(request):
             "submit_label": "Salvar configuração",
             "submit_icon": "check",
             "back_url": reverse("core:dashboard"),
-            # Google Drive
-            "drive_autorizado": drive_autorizado,
-            "drive_creds": drive_creds,
-            "drive_escopo_faltante": escopo_faltante(usuario_drive),
-            "drive_pasta_raiz_id": drive_pasta_raiz_id,
-            "drive_pasta_raiz_nome": drive_creds.pasta_raiz_nome if drive_creds else "",
-            "drive_total_arquivos": DriveArquivo.objects.filter(artefato__area=area_drive).count(),
-            "drive_modo_ativo": drive_modo != "mock",
-            # Reorganização em massa
-            "drive_pode_reorganizar": bool(drive_pasta_raiz_id)
-            and (drive_autorizado or drive_modo == "mock"),
-            "drive_total_eventos": filter_queryset_by_area(Evento.objects, area=area_drive).count(),
-            "drive_job_reorg": DriveReorganizacaoJob.objects.filter(
-                usuario=usuario_drive,
-                area=area_drive,
-            ).order_by("-iniciado_em").first(),
-            # Pendências (falhas de envio ao Drive)
-            "drive_total_pendencias": drive_status.contagem_pendencias(
-                usuario=usuario_drive,
-                area=area_drive,
-            ),
-            "drive_pendencias": drive_status.listar_pendencias_detalhadas(
-                limite=20,
-                usuario=usuario_drive,
-                area=area_drive,
-            ),
         },
     )
 

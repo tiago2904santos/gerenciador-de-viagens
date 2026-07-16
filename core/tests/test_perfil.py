@@ -43,17 +43,35 @@ class PerfilUsuarioTests(TestCase):
             reverse("core:perfil"),
             {
                 "action": "atualizar_perfil",
-                "perfil-first_name": "Tiago",
-                "perfil-last_name": "Santos",
+                "perfil-username": "usuario_perfil",
+                "perfil-nome_completo": "Tiago Dos Santos",
                 "perfil-email": "adm.tsantos@pc.pr.gov.br",
             },
         )
 
         self.assertRedirects(response, reverse("core:perfil"))
         self.user.refresh_from_db()
+        self.assertEqual(self.user.get_full_name(), "Tiago Dos Santos")
         self.assertEqual(self.user.first_name, "Tiago")
-        self.assertEqual(self.user.last_name, "Santos")
+        self.assertEqual(self.user.last_name, "Dos Santos")
         self.assertEqual(self.user.email, "adm.tsantos@pc.pr.gov.br")
+
+    def test_atualiza_nome_de_usuario(self):
+        self.client.force_login(self.user)
+
+        response = self.client.post(
+            reverse("core:perfil"),
+            {
+                "action": "atualizar_perfil",
+                "perfil-username": "novo_login",
+                "perfil-nome_completo": "Tiago Dos Santos",
+                "perfil-email": "adm.tsantos@pc.pr.gov.br",
+            },
+        )
+
+        self.assertRedirects(response, reverse("core:perfil"))
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.username, "novo_login")
 
     def test_altera_senha_e_mantem_sessao(self):
         self.client.force_login(self.user)

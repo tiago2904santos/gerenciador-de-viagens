@@ -6,13 +6,12 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from core.tenancy import filter_queryset_by_area
 from integracoes.google_drive.models import (
-    DriveArquivo,
     DriveCredenciais,
     DriveReorganizacaoJob,
 )
@@ -22,12 +21,10 @@ from integracoes.google_drive.services import (
     _SCOPES,
     _reset_client,
     client_config_dict,
-    escopo_faltante,
     esta_autorizado,
     get_credenciais,
     get_client,
     get_pasta_raiz_id,
-    is_mock,
 )
 
 
@@ -44,43 +41,6 @@ def _credenciais_queryset(usuario):
 
 def _jobs_queryset(usuario, area):
     return DriveReorganizacaoJob.objects.filter(usuario=usuario, area=area)
-
-
-@login_required
-def index(request):
-    from eventos.models import Evento
-
-    from integracoes.google_drive import status
-
-    cfg = getattr(settings, "GOOGLE_DRIVE", {})
-    usuario = _usuario_atual(request)
-    creds = get_credenciais(usuario)
-    pasta_raiz_id = get_pasta_raiz_id(usuario)
-    modo = cfg.get("MODO", "mock").lower()
-    autorizado = esta_autorizado(usuario)
-    area = getattr(request, "area", None)
-
-    return render(
-        request,
-        "integracoes/google_drive/index.html",
-        {
-            "page_title": "Google Drive",
-            "page_description": "Configuração da integração com o Google Drive.",
-            "modo": modo,
-            "autorizado": autorizado,
-            "escopo_faltante": escopo_faltante(usuario),
-            "creds": creds,
-            "pasta_raiz_id": pasta_raiz_id,
-            "pasta_raiz_nome": creds.pasta_raiz_nome if creds else "",
-            "total_arquivos": DriveArquivo.objects.filter(artefato__area=area).count(),
-            "modo_ativo": modo != "mock",
-            "pode_reorganizar": bool(pasta_raiz_id) and (autorizado or modo == "mock"),
-            "total_eventos": filter_queryset_by_area(Evento.objects, area=area).count(),
-            "job_reorg": _jobs_queryset(usuario, area).order_by("-iniciado_em").first(),
-            "total_pendencias": status.contagem_pendencias(usuario=usuario, area=area),
-            "pendencias": status.listar_pendencias(limite=20, usuario=usuario, area=area),
-        },
-    )
 
 
 # ---------------------------------------------------------------------------
@@ -132,7 +92,7 @@ def oauth_callback(request):
 
     if "error" in request.GET:
         messages.error(request, f"Autorização recusada: {request.GET['error']}")
-        return redirect("google_drive:index")
+        return redirect("core:perfil")
 
     try:
         flow = Flow.from_client_config(
@@ -165,7 +125,7 @@ def oauth_callback(request):
     except Exception as exc:
         messages.error(request, f"Erro ao completar autorização: {exc}")
 
-    return redirect("cadastros:configuracao")
+    return redirect("core:perfil")
 
 
 @login_required
@@ -174,7 +134,7 @@ def oauth_revogar(request):
     _credenciais_queryset(_usuario_atual(request)).delete()
     _reset_client()
     messages.success(request, "Conta Google desconectada.")
-    return redirect("cadastros:configuracao")
+    return redirect("core:perfil")
 
 
 # ---------------------------------------------------------------------------
@@ -241,13 +201,13 @@ def salvar_pasta_raiz(request):
 
     if not pasta_id:
         messages.error(request, "Nenhuma pasta selecionada.")
-        return redirect("google_drive:index")
+        return redirect("core:perfil")
 
     usuario = _usuario_atual(request)
     creds = get_credenciais(usuario)
     if not creds:
         messages.error(request, "Conta Google não conectada.")
-        return redirect("cadastros:configuracao")
+        return redirect("core:perfil")
 
     if not pasta_nome:
         try:
@@ -260,7 +220,7 @@ def salvar_pasta_raiz(request):
     creds.save(update_fields=["pasta_raiz_id", "pasta_raiz_nome", "atualizado_em"])
     _reset_client()
     messages.success(request, f"Pasta \"{pasta_nome}\" definida como diretório de destino.")
-    return redirect("google_drive:index")
+    return redirect("core:perfil")
 
 
 # ---------------------------------------------------------------------------
@@ -316,11 +276,11 @@ def reorganizar_tudo(request):
             request,
             "Conecte a conta Google e defina a pasta de destino antes de reorganizar.",
         )
-        return redirect("google_drive:index")
+        return redirect("core:perfil")
 
     if _jobs_queryset(usuario, area).filter(status=DriveReorganizacaoJob.STATUS_EM_ANDAMENTO).exists():
         messages.info(request, "Já existe uma reorganização em andamento. Aguarde concluir.")
-        return redirect("google_drive:index")
+        return redirect("core:perfil")
 
     job = DriveReorganizacaoJob.objects.create(
         usuario=usuario,
@@ -340,7 +300,7 @@ def reorganizar_tudo(request):
         "Reorganização iniciada em segundo plano. O andamento aparece neste card — "
         "pode sair desta página; a tarefa continua rodando.",
     )
-    return redirect("google_drive:index")
+    return redirect("core:perfil")
 
 
 def _job_para_json(job: DriveReorganizacaoJob | None) -> dict:
@@ -485,4 +445,4 @@ def reprocessar_pendencias(request):
         "Reenvio das pendências iniciado em segundo plano. "
         "Atualize a página em instantes para ver a lista diminuir.",
     )
-    return redirect("cadastros:configuracao")
+    return redirect("core:perfil")

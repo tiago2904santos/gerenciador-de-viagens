@@ -5,7 +5,6 @@ from . import views
 app_name = "google_drive"
 
 urlpatterns = [
-    path("", views.index, name="index"),
     # OAuth
     path("oauth/iniciar/", views.oauth_iniciar, name="oauth_iniciar"),
     path("oauth/callback/", views.oauth_callback, name="oauth_callback"),

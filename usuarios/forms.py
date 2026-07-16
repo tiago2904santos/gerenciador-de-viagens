@@ -48,16 +48,6 @@ class UsuarioAreaCreationForm(EstiloCamposMixin, UserCreationForm):
         initial=VinculoUsuarioArea.PAPEL_EDITOR,
         label="Perfil na área",
     )
-    area_padrao = forms.BooleanField(
-        required=False,
-        initial=True,
-        label="Definir como área padrão",
-    )
-    is_staff = forms.BooleanField(
-        required=False,
-        label="Administrador do sistema",
-        help_text="Permite acessar esta página administrativa.",
-    )
 
     class Meta(UserCreationForm.Meta):
         model = get_user_model()
@@ -70,8 +60,6 @@ class UsuarioAreaCreationForm(EstiloCamposMixin, UserCreationForm):
             "password2",
             "area",
             "papel",
-            "area_padrao",
-            "is_staff",
         ]
         labels = {
             "username": "Login",
@@ -92,14 +80,16 @@ class UsuarioAreaCreationForm(EstiloCamposMixin, UserCreationForm):
         user.email = self.cleaned_data["email"]
         user.first_name = self.cleaned_data.get("first_name", "")
         user.last_name = self.cleaned_data.get("last_name", "")
-        user.is_staff = self.cleaned_data.get("is_staff", False)
+        user.is_staff = False
         if commit:
             user.save()
+            # Primeira (e única) área do usuário → vira a padrão, garantindo
+            # que ele tenha uma área carregada ao entrar no sistema.
             VinculoUsuarioArea.objects.create(
                 usuario=user,
                 area=self.cleaned_data["area"],
                 papel=self.cleaned_data["papel"],
-                area_padrao=self.cleaned_data.get("area_padrao", False),
+                area_padrao=True,
                 ativo=True,
             )
         return user
@@ -108,26 +98,14 @@ class UsuarioAreaCreationForm(EstiloCamposMixin, UserCreationForm):
 class VinculoUsuarioAreaForm(EstiloCamposMixin, forms.ModelForm):
     class Meta:
         model = VinculoUsuarioArea
-        fields = ["usuario", "area", "papel", "area_padrao"]
+        fields = ["usuario", "area", "papel"]
         labels = {
             "usuario": "Usuário existente",
             "area": "Área de trabalho",
             "papel": "Perfil na área",
-            "area_padrao": "Definir como área padrão",
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["usuario"].queryset = get_user_model().objects.order_by("username")
         self.fields["area"].queryset = AreaTrabalho.objects.filter(ativa=True).order_by("sigla")
-
-    @transaction.atomic
-    def save(self, commit=True):
-        vinculo = super().save(commit=False)
-        if commit:
-            if vinculo.area_padrao and vinculo.ativo:
-                VinculoUsuarioArea.objects.filter(usuario=vinculo.usuario, area_padrao=True).exclude(
-                    pk=vinculo.pk
-                ).update(area_padrao=False)
-            vinculo.save()
-        return vinculo
