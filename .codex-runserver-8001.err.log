@@ -3,27 +3,21 @@ C:\Users\tiago\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\django\
 C:\Users\tiago\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\django\db\backends\utils.py:98: RuntimeWarning: Accessing the database during app initialization is discouraged. To fix this warning, avoid executing queries in AppConfig.ready() or when your app modules are imported.
   warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
 Watching for file changes with StatReloader
-Forbidden (Permission denied): /usuarios/
-Traceback (most recent call last):
-  File "C:\Users\tiago\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
-    response = get_response(request)
-  File "C:\Users\tiago\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
-    response = wrapped_callback(request, *callback_args, **callback_kwargs)
-  File "C:\Users\tiago\OneDrive\Documentos\Gerenciador de Viagens\usuarios\views.py", line 16, in index
-    raise PermissionDenied("Apenas administradores podem gerenciar áreas e usuários.")
-django.core.exceptions.PermissionDenied: Apenas administradores podem gerenciar áreas e usuários.
-[15/Jul/2026 17:57:19] "GET /usuarios/ HTTP/1.1" 403 135
-[15/Jul/2026 17:57:19,688] - Broken pipe from ('127.0.0.1', 49176)
-C:\Users\tiago\OneDrive\Documentos\Gerenciador de Viagens\usuarios\views.py changed, reloading.
+[15/Jul/2026 21:54:01] "HEAD /login/ HTTP/1.1" 200 0
+[15/Jul/2026 21:54:27] "HEAD /usuarios/ HTTP/1.1" 302 0
+C:\Users\tiago\OneDrive\Documentos\Gerenciador de Viagens\core\forms.py changed, reloading.
 C:\Users\tiago\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\django\db\backends\utils.py:98: RuntimeWarning: Accessing the database during app initialization is discouraged. To fix this warning, avoid executing queries in AppConfig.ready() or when your app modules are imported.
   warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
 Watching for file changes with StatReloader
-[15/Jul/2026 17:58:22] "GET /usuarios/ HTTP/1.1" 302 0
-[15/Jul/2026 17:58:22,649] - Broken pipe from ('127.0.0.1', 65311)
-[15/Jul/2026 17:58:28] "HEAD /usuarios/ HTTP/1.1" 302 0
-[15/Jul/2026 18:00:41] "GET /usuarios/ HTTP/1.1" 302 0
-[15/Jul/2026 18:00:41] "GET /login/?next=/usuarios/ HTTP/1.1" 200 1919
-[15/Jul/2026 18:00:41] "GET /static/css/tokens.css HTTP/1.1" 200 8340
-[15/Jul/2026 18:00:41] "GET /static/css/auth.css HTTP/1.1" 200 4868
-Not Found: /favicon.ico
-[15/Jul/2026 18:00:42] "GET /favicon.ico HTTP/1.1" 404 9903
+C:\Users\tiago\OneDrive\Documentos\Gerenciador de Viagens\core\views.py changed, reloading.
+C:\Users\tiago\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\django\db\backends\utils.py:98: RuntimeWarning: Accessing the database during app initialization is discouraged. To fix this warning, avoid executing queries in AppConfig.ready() or when your app modules are imported.
+  warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+Watching for file changes with StatReloader
+C:\Users\tiago\OneDrive\Documentos\Gerenciador de Viagens\core\views.py changed, reloading.
+C:\Users\tiago\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\django\db\backends\utils.py:98: RuntimeWarning: Accessing the database during app initialization is discouraged. To fix this warning, avoid executing queries in AppConfig.ready() or when your app modules are imported.
+  warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+Watching for file changes with StatReloader
+C:\Users\tiago\OneDrive\Documentos\Gerenciador de Viagens\core\urls.py changed, reloading.
+C:\Users\tiago\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\django\db\backends\utils.py:98: RuntimeWarning: Accessing the database during app initialization is discouraged. To fix this warning, avoid executing queries in AppConfig.ready() or when your app modules are imported.
+  warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+Watching for file changes with StatReloader

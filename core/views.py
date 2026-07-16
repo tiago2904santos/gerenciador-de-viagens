@@ -1,5 +1,10 @@
+from django.contrib import messages
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.http import Http404
+from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
 
@@ -7,6 +12,7 @@ from eventos.forms import EventoForm
 from eventos.models import Evento
 
 from .forms import LoginForm
+from .forms import PerfilUsuarioForm
 
 
 UI_LAB_PAGE_DEFINITIONS = [
@@ -786,6 +792,49 @@ def dashboard(request):
             "page_title": "Central de Viagens 3",
             "page_section": "Dashboard",
             "page_description": "Fundacao visual para os fluxos documentais do sistema.",
+        },
+    )
+
+
+@login_required(login_url="core:login")
+def perfil(request):
+    perfil_form = PerfilUsuarioForm(instance=request.user, prefix="perfil")
+    senha_form = PasswordChangeForm(user=request.user, prefix="senha")
+
+    if request.method == "POST":
+        action = request.POST.get("action")
+        if action == "atualizar_perfil":
+            perfil_form = PerfilUsuarioForm(request.POST, instance=request.user, prefix="perfil")
+            if perfil_form.is_valid():
+                perfil_form.save()
+                messages.success(request, "Perfil atualizado com sucesso.")
+                return redirect("core:perfil")
+        elif action == "alterar_senha":
+            senha_form = PasswordChangeForm(user=request.user, data=request.POST, prefix="senha")
+            if senha_form.is_valid():
+                user = senha_form.save()
+                update_session_auth_hash(request, user)
+                messages.success(request, "Senha alterada com sucesso.")
+                return redirect("core:perfil")
+        else:
+            messages.error(request, "Ação de perfil inválida.")
+
+    vinculos_area = (
+        request.user.vinculos_area.select_related("area")
+        .filter(ativo=True)
+        .order_by("-area_padrao", "area__sigla")
+    )
+
+    return render(
+        request,
+        "core/perfil.html",
+        {
+            "page_title": "Meu perfil",
+            "page_section": "Conta",
+            "page_description": "Gerencie seus dados de acesso, senha e sessão.",
+            "perfil_form": perfil_form,
+            "senha_form": senha_form,
+            "vinculos_area": vinculos_area,
         },
     )
 

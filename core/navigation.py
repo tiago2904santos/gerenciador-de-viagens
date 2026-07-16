@@ -8,6 +8,14 @@ from django.urls import reverse
 NAVIGATION_ITEMS = [
     {"id": "dashboard", "label": "Dashboard", "url_name": "core:dashboard", "icon": "DG"},
     {
+        "id": "perfil",
+        "label": "Perfil",
+        "url_name": "core:perfil",
+        "icon": "PF",
+        "active_when": ["core:perfil"],
+        "auth_only": True,
+    },
+    {
         "id": "usuarios",
         "label": "Admin",
         "url_name": "usuarios:index",
@@ -152,7 +160,9 @@ def _matches_current_view(item, current_view_name):
 
 
 def _is_visible_for_request(item, request):
+    user = getattr(request, "user", None)
+    if item.get("auth_only") and not (user and user.is_authenticated):
+        return False
     if not item.get("staff_only"):
         return True
-    user = getattr(request, "user", None)
     return bool(user and user.is_authenticated and (user.is_staff or user.is_superuser))
