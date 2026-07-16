@@ -172,13 +172,15 @@
 
 .perfil-form__actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: stretch;
   margin-top: auto;
   padding-top: var(--space-1);
+  width: 100%;
 }
 
 .perfil-form__actions .cv-btn {
-  min-width: 180px;
+  justify-content: center;
+  width: 100%;
 }
 
 .perfil-access {
