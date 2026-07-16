@@ -4,111 +4,256 @@
 
 {% block extra_css %}
   <style>
-    .admin-workspaces {
+    .workspace-admin {
+      --admin-bg: #f6f8fb;
+      --admin-panel: #ffffff;
+      --admin-border: #d9e2ef;
+      --admin-text: #172033;
+      --admin-muted: #64748b;
+      --admin-primary: #0f4c81;
+      --admin-primary-strong: #08345d;
+      --admin-success-bg: #e7f7ee;
+      --admin-success-text: #17633b;
       display: grid;
-      gap: 24px;
+      gap: 18px;
+      color: var(--admin-text);
     }
 
-    .admin-workspaces__forms {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+    .workspace-admin__header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
       gap: 16px;
+      padding: 20px;
+      border: 1px solid var(--admin-border);
+      border-radius: 8px;
+      background: var(--admin-panel);
+    }
+
+    .workspace-admin__eyebrow {
+      margin: 0 0 6px;
+      color: var(--admin-primary);
+      font-size: .76rem;
+      font-weight: 800;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    .workspace-admin__title {
+      margin: 0;
+      font-size: clamp(1.35rem, 2vw, 1.8rem);
+      line-height: 1.15;
+    }
+
+    .workspace-admin__description {
+      max-width: 760px;
+      margin: 8px 0 0;
+      color: var(--admin-muted);
+      line-height: 1.5;
+    }
+
+    .workspace-admin__lock {
+      flex: 0 0 auto;
+      border-radius: 6px;
+      background: #eef4fb;
+      color: var(--admin-primary);
+      padding: 8px 10px;
+      font-size: .82rem;
+      font-weight: 800;
+    }
+
+    .workspace-admin__forms {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(250px, 1fr));
+      gap: 14px;
       align-items: start;
     }
 
-    .admin-workspaces__panel {
-      background: var(--surface-card, #fff);
-      border: 1px solid var(--border-subtle, rgba(15, 23, 42, .12));
+    .workspace-admin__panel {
+      min-width: 0;
+      border: 1px solid var(--admin-border);
       border-radius: 8px;
-      padding: 18px;
-      box-shadow: var(--shadow-card, 0 10px 24px rgba(15, 23, 42, .08));
+      background: var(--admin-panel);
+      padding: 16px;
     }
 
-    .admin-workspaces__panel h2,
-    .admin-workspaces__panel h3 {
-      margin: 0 0 6px;
+    .workspace-admin__panel-title {
+      margin: 0;
       font-size: 1rem;
+      line-height: 1.2;
     }
 
-    .admin-workspaces__panel p {
-      margin: 0 0 14px;
-      color: var(--text-muted, #64748b);
+    .workspace-admin__panel-text {
+      margin: 6px 0 14px;
+      color: var(--admin-muted);
       font-size: .9rem;
+      line-height: 1.45;
     }
 
-    .admin-workspaces__form {
+    .workspace-admin__form {
       display: grid;
       gap: 12px;
     }
 
-    .admin-workspaces__submit {
+    .workspace-admin__fields {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .workspace-admin__field {
+      min-width: 0;
+      display: grid;
+      gap: 5px;
+    }
+
+    .workspace-admin__field--wide,
+    .workspace-admin__field--check {
+      grid-column: 1 / -1;
+    }
+
+    .workspace-admin__label {
+      color: var(--admin-text);
+      font-size: .82rem;
+      font-weight: 800;
+    }
+
+    .workspace-admin__field input:not([type="checkbox"]),
+    .workspace-admin__field select {
+      width: 100%;
+      min-height: 42px;
+      box-sizing: border-box;
+      border: 1px solid #bfccdc;
+      border-radius: 6px;
+      background: #ffffff;
+      color: var(--admin-text);
+      padding: 9px 10px;
+      font: inherit;
+    }
+
+    .workspace-admin__field input:focus,
+    .workspace-admin__field select:focus {
+      outline: 3px solid rgba(15, 76, 129, .16);
+      border-color: var(--admin-primary);
+    }
+
+    .workspace-admin__check {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 42px;
+      padding: 9px 10px;
+      border: 1px solid #bfccdc;
+      border-radius: 6px;
+      background: #f8fafc;
+      color: var(--admin-text);
+      font-weight: 700;
+    }
+
+    .workspace-admin__check input {
+      width: 18px;
+      height: 18px;
+      margin: 0;
+      accent-color: var(--admin-primary);
+    }
+
+    .workspace-admin__help {
+      margin: 0;
+      color: var(--admin-muted);
+      font-size: .78rem;
+      line-height: 1.35;
+    }
+
+    .workspace-admin__error {
+      margin: 0;
+      color: #b42318;
+      font-size: .82rem;
+      line-height: 1.35;
+    }
+
+    .workspace-admin__submit {
       justify-self: start;
+      min-height: 40px;
       border: 0;
       border-radius: 6px;
-      padding: 10px 14px;
-      background: var(--color-primary, #1d4ed8);
-      color: #fff;
-      font-weight: 700;
+      padding: 9px 14px;
+      background: var(--admin-primary);
+      color: #ffffff;
+      font-weight: 800;
       cursor: pointer;
     }
 
-    .admin-workspaces__lists {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
-      gap: 16px;
+    .workspace-admin__submit:hover {
+      background: var(--admin-primary-strong);
     }
 
-    .admin-workspaces__table-wrap {
+    .workspace-admin__lists {
+      display: grid;
+      grid-template-columns: minmax(0, .9fr) minmax(0, 1.4fr);
+      gap: 14px;
+    }
+
+    .workspace-admin__table-wrap {
       overflow-x: auto;
     }
 
-    .admin-workspaces__table {
+    .workspace-admin__table {
       width: 100%;
       border-collapse: collapse;
-      font-size: .92rem;
+      font-size: .9rem;
     }
 
-    .admin-workspaces__table th,
-    .admin-workspaces__table td {
-      padding: 10px 8px;
-      border-bottom: 1px solid var(--border-subtle, rgba(15, 23, 42, .12));
+    .workspace-admin__table th,
+    .workspace-admin__table td {
+      padding: 9px 8px;
+      border-bottom: 1px solid var(--admin-border);
       text-align: left;
-      vertical-align: top;
+      vertical-align: middle;
+    }
+
+    .workspace-admin__table th {
+      color: var(--admin-muted);
+      font-size: .74rem;
+      font-weight: 800;
+      text-transform: uppercase;
       white-space: nowrap;
     }
 
-    .admin-workspaces__table th {
-      color: var(--text-muted, #64748b);
-      font-size: .78rem;
-      text-transform: uppercase;
+    .workspace-admin__table td {
+      color: var(--admin-text);
     }
 
-    .admin-workspaces__badge {
+    .workspace-admin__badge {
       display: inline-flex;
       align-items: center;
-      min-height: 24px;
+      min-height: 22px;
       padding: 2px 8px;
       border-radius: 999px;
-      background: rgba(37, 99, 235, .12);
-      color: var(--color-primary, #1d4ed8);
-      font-weight: 700;
-      font-size: .78rem;
+      background: var(--admin-success-bg);
+      color: var(--admin-success-text);
+      font-size: .74rem;
+      font-weight: 800;
+      white-space: nowrap;
     }
 
-    .admin-workspaces__badge--muted {
-      background: rgba(100, 116, 139, .14);
-      color: var(--text-muted, #64748b);
+    .workspace-admin__badge--muted {
+      background: #eef2f7;
+      color: #526070;
     }
 
-    .admin-workspaces__error {
-      margin: 0;
-      color: var(--danger, #b91c1c);
-      font-size: .86rem;
+    @media (max-width: 1180px) {
+      .workspace-admin__forms,
+      .workspace-admin__lists {
+        grid-template-columns: 1fr;
+      }
     }
 
-    @media (max-width: 1120px) {
-      .admin-workspaces__forms,
-      .admin-workspaces__lists {
+    @media (max-width: 720px) {
+      .workspace-admin__header {
+        display: grid;
+      }
+
+      .workspace-admin__fields {
         grid-template-columns: 1fr;
       }
     }
@@ -116,53 +261,99 @@
 {% endblock %}
 
 {% block content %}
-  <div class="page-shell page-shell--standard-simple admin-workspaces">
-    {% include "components/ui/headers/header_stack_simple.html" with eyebrow="ADMINISTRAÇÃO" title=page_title description=page_description icon_label="US" module_label="Usuários" only %}
+  <div class="page-shell page-shell--standard-simple workspace-admin">
+    <header class="workspace-admin__header">
+      <div>
+        <p class="workspace-admin__eyebrow">Administração</p>
+        <h1 class="workspace-admin__title">{{ page_title }}</h1>
+        <p class="workspace-admin__description">{{ page_description }}</p>
+      </div>
+      <span class="workspace-admin__lock">Acesso administrativo</span>
+    </header>
 
-    <section class="admin-workspaces__forms" aria-label="Cadastros administrativos">
-      <form class="admin-workspaces__panel admin-workspaces__form" method="post" novalidate>
+    <section class="workspace-admin__forms" aria-label="Cadastros administrativos">
+      <form class="workspace-admin__panel workspace-admin__form" method="post" novalidate>
         {% csrf_token %}
         <input type="hidden" name="action" value="criar_area">
-        <h2>Criar área</h2>
-        <p>Use para cadastrar ASCOM, DPCAP ou qualquer nova área de trabalho.</p>
-        {% if area_form.non_field_errors %}<p class="admin-workspaces__error">{{ area_form.non_field_errors|join:", " }}</p>{% endif %}
-        {% for field in area_form %}
-          {% include "components/forms/form_field.html" with field=field only %}
-        {% endfor %}
-        <button class="admin-workspaces__submit" type="submit">Criar área</button>
+        <div>
+          <h2 class="workspace-admin__panel-title">Criar área</h2>
+          <p class="workspace-admin__panel-text">Cadastre ASCOM, DPCAP ou qualquer outra área de trabalho.</p>
+        </div>
+        {% if area_form.non_field_errors %}<p class="workspace-admin__error">{{ area_form.non_field_errors|join:", " }}</p>{% endif %}
+        <div class="workspace-admin__fields">
+          {% for field in area_form %}
+            <div class="workspace-admin__field{% if field.field.widget.input_type == 'checkbox' %} workspace-admin__field--check{% endif %}{% if field.name == 'nome' %} workspace-admin__field--wide{% endif %}">
+              {% if field.field.widget.input_type == 'checkbox' %}
+                <label class="workspace-admin__check" for="{{ field.id_for_label }}">{{ field }} <span>{{ field.label }}</span></label>
+              {% else %}
+                <label class="workspace-admin__label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+              {% endif %}
+              {% if field.help_text %}<p class="workspace-admin__help">{{ field.help_text }}</p>{% endif %}
+              {% if field.errors %}<p class="workspace-admin__error">{{ field.errors|join:", " }}</p>{% endif %}
+            </div>
+          {% endfor %}
+        </div>
+        <button class="workspace-admin__submit" type="submit">Criar área</button>
       </form>
 
-      <form class="admin-workspaces__panel admin-workspaces__form" method="post" novalidate>
+      <form class="workspace-admin__panel workspace-admin__form" method="post" novalidate>
         {% csrf_token %}
         <input type="hidden" name="action" value="criar_usuario">
-        <h2>Criar usuário</h2>
-        <p>Cria o login e já vincula o usuário à área escolhida.</p>
-        {% if usuario_form.non_field_errors %}<p class="admin-workspaces__error">{{ usuario_form.non_field_errors|join:", " }}</p>{% endif %}
-        {% for field in usuario_form %}
-          {% include "components/forms/form_field.html" with field=field only %}
-        {% endfor %}
-        <button class="admin-workspaces__submit" type="submit">Criar usuário</button>
+        <div>
+          <h2 class="workspace-admin__panel-title">Criar usuário</h2>
+          <p class="workspace-admin__panel-text">Cria o login e já vincula o usuário à área escolhida.</p>
+        </div>
+        {% if usuario_form.non_field_errors %}<p class="workspace-admin__error">{{ usuario_form.non_field_errors|join:", " }}</p>{% endif %}
+        <div class="workspace-admin__fields">
+          {% for field in usuario_form %}
+            <div class="workspace-admin__field{% if field.field.widget.input_type == 'checkbox' %} workspace-admin__field--check{% endif %}{% if field.name == 'email' or field.name == 'area' %} workspace-admin__field--wide{% endif %}">
+              {% if field.field.widget.input_type == 'checkbox' %}
+                <label class="workspace-admin__check" for="{{ field.id_for_label }}">{{ field }} <span>{{ field.label }}</span></label>
+              {% else %}
+                <label class="workspace-admin__label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+              {% endif %}
+              {% if field.help_text %}<p class="workspace-admin__help">{{ field.help_text }}</p>{% endif %}
+              {% if field.errors %}<p class="workspace-admin__error">{{ field.errors|join:", " }}</p>{% endif %}
+            </div>
+          {% endfor %}
+        </div>
+        <button class="workspace-admin__submit" type="submit">Criar usuário</button>
       </form>
 
-      <form class="admin-workspaces__panel admin-workspaces__form" method="post" novalidate>
+      <form class="workspace-admin__panel workspace-admin__form" method="post" novalidate>
         {% csrf_token %}
         <input type="hidden" name="action" value="vincular_usuario">
-        <h2>Vincular existente</h2>
-        <p>Use quando o usuário já existe e precisa acessar outra área.</p>
-        {% if vinculo_form.non_field_errors %}<p class="admin-workspaces__error">{{ vinculo_form.non_field_errors|join:", " }}</p>{% endif %}
-        {% for field in vinculo_form %}
-          {% include "components/forms/form_field.html" with field=field only %}
-        {% endfor %}
-        <button class="admin-workspaces__submit" type="submit">Salvar vínculo</button>
+        <div>
+          <h2 class="workspace-admin__panel-title">Vincular existente</h2>
+          <p class="workspace-admin__panel-text">Use quando o usuário já existe e precisa acessar outra área.</p>
+        </div>
+        {% if vinculo_form.non_field_errors %}<p class="workspace-admin__error">{{ vinculo_form.non_field_errors|join:", " }}</p>{% endif %}
+        <div class="workspace-admin__fields">
+          {% for field in vinculo_form %}
+            <div class="workspace-admin__field{% if field.field.widget.input_type == 'checkbox' %} workspace-admin__field--check{% endif %}{% if field.name == 'usuario' or field.name == 'area' %} workspace-admin__field--wide{% endif %}">
+              {% if field.field.widget.input_type == 'checkbox' %}
+                <label class="workspace-admin__check" for="{{ field.id_for_label }}">{{ field }} <span>{{ field.label }}</span></label>
+              {% else %}
+                <label class="workspace-admin__label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+              {% endif %}
+              {% if field.help_text %}<p class="workspace-admin__help">{{ field.help_text }}</p>{% endif %}
+              {% if field.errors %}<p class="workspace-admin__error">{{ field.errors|join:", " }}</p>{% endif %}
+            </div>
+          {% endfor %}
+        </div>
+        <button class="workspace-admin__submit" type="submit">Salvar vínculo</button>
       </form>
     </section>
 
-    <section class="admin-workspaces__lists" aria-label="Áreas e vínculos cadastrados">
-      <div class="admin-workspaces__panel">
-        <h3>Áreas cadastradas</h3>
-        <p>Quantidade de usuários vinculados por área.</p>
-        <div class="admin-workspaces__table-wrap">
-          <table class="admin-workspaces__table">
+    <section class="workspace-admin__lists" aria-label="Áreas e vínculos cadastrados">
+      <div class="workspace-admin__panel">
+        <h3 class="workspace-admin__panel-title">Áreas cadastradas</h3>
+        <p class="workspace-admin__panel-text">Quantidade de usuários vinculados por área.</p>
+        <div class="workspace-admin__table-wrap">
+          <table class="workspace-admin__table">
             <thead>
               <tr>
                 <th>Sigla</th>
@@ -178,9 +369,9 @@
                   <td>{{ area.nome }}</td>
                   <td>
                     {% if area.ativa %}
-                      <span class="admin-workspaces__badge">Ativa</span>
+                      <span class="workspace-admin__badge">Ativa</span>
                     {% else %}
-                      <span class="admin-workspaces__badge admin-workspaces__badge--muted">Inativa</span>
+                      <span class="workspace-admin__badge workspace-admin__badge--muted">Inativa</span>
                     {% endif %}
                   </td>
                   <td>{{ area.vinculos_usuario.count }}</td>
@@ -193,11 +384,11 @@
         </div>
       </div>
 
-      <div class="admin-workspaces__panel">
-        <h3>Usuários e acessos</h3>
-        <p>Conferência dos vínculos ativos e áreas padrão.</p>
-        <div class="admin-workspaces__table-wrap">
-          <table class="admin-workspaces__table">
+      <div class="workspace-admin__panel">
+        <h3 class="workspace-admin__panel-title">Usuários e acessos</h3>
+        <p class="workspace-admin__panel-text">Conferência dos vínculos ativos e áreas padrão.</p>
+        <div class="workspace-admin__table-wrap">
+          <table class="workspace-admin__table">
             <thead>
               <tr>
                 <th>Usuário</th>
@@ -218,9 +409,9 @@
                   <td>{% if vinculo.area_padrao %}Sim{% else %}Não{% endif %}</td>
                   <td>
                     {% if vinculo.ativo %}
-                      <span class="admin-workspaces__badge">Ativo</span>
+                      <span class="workspace-admin__badge">Ativo</span>
                     {% else %}
-                      <span class="admin-workspaces__badge admin-workspaces__badge--muted">Inativo</span>
+                      <span class="workspace-admin__badge workspace-admin__badge--muted">Inativo</span>
                     {% endif %}
                   </td>
                 </tr>

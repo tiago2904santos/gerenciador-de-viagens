@@ -12,7 +12,7 @@ from .models import AreaTrabalho
 from .models import VinculoUsuarioArea
 
 
-@login_required
+@login_required(login_url="core:login")
 def index(request):
     if not request.user.is_staff and not request.user.is_superuser:
         raise PermissionDenied("Apenas administradores podem gerenciar áreas e usuários.")
