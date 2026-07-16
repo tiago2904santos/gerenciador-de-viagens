@@ -24,22 +24,48 @@ def _whatsapp_phone(servidor):
     return f"55{telefone}" if len(telefone) == 11 and telefone.isdigit() else ""
 
 
-def _servidor_row(ps, solicitacao_form=None):
+def _anexo_assinado_info(anexos, *, tipo, anexar_url, prestacao_pk):
+    atual = next(
+        (anexo for anexo in reversed(list(anexos)) if anexo.tipo == tipo),
+        None,
+    )
+    if atual is None:
+        return {
+            "assinado": False,
+            "anexar_url": anexar_url,
+            "nome_original": "",
+            "view_url": "",
+            "remover_url": "",
+        }
+    return {
+        "assinado": True,
+        "anexar_url": anexar_url,
+        "nome_original": atual.nome_original or atual.arquivo.name.rsplit("/", 1)[-1],
+        "view_url": atual.arquivo.url,
+        "remover_url": reverse(
+            "prestacoes_contas:prestacao_documento_excluir",
+            args=[prestacao_pk, atual.pk],
+        ),
+    }
+
+
+def _servidor_row(ps, solicitacao_form=None, prestacao_anexos=None):
     """Dados de um servidor no card: identificação + solicitação inline + status."""
     servidor = ps.servidor
     cargo_nome = servidor.cargo.nome if servidor.cargo_id and servidor.cargo else ""
     unidade_nome = str(servidor.unidade) if servidor.unidade_id else ""
 
     # Comprovante de saque (individual): usa os anexos já pré-carregados.
+    anexos = list(ps.documentos_anexos.all())
     comprovante_ok = any(
         anexo.tipo == PrestacaoDocumentoAnexo.TIPO_COMPROVANTE
-        for anexo in ps.documentos_anexos.all()
+        for anexo in anexos
     )
 
     if solicitacao_form is None:
         solicitacao_form = PrestacaoSolicitacaoForm(instance=ps, prefix=f"ps-{ps.pk}")
 
-    return {
+    row = {
         "ps_pk": ps.pk,
         "name": servidor.nome,
         "cargo": cargo_nome,
@@ -63,6 +89,34 @@ def _servidor_row(ps, solicitacao_form=None):
         "whatsapp_phone": _whatsapp_phone(servidor),
         "whatsapp_diaria_override": (ps.diaria_valor_override or "").strip(),
     }
+    row["rt_assinado"] = _anexo_assinado_info(
+        anexos,
+        tipo=PrestacaoDocumentoAnexo.TIPO_RT_ASSINADO,
+        anexar_url=reverse(
+            "prestacoes_contas:prestacao_servidor_assinado_anexar",
+            args=[ps.pk, PrestacaoDocumentoAnexo.TIPO_RT_ASSINADO],
+        ),
+        prestacao_pk=ps.prestacao_id,
+    )
+    row["comprovante_anexo"] = _anexo_assinado_info(
+        anexos,
+        tipo=PrestacaoDocumentoAnexo.TIPO_COMPROVANTE,
+        anexar_url=reverse(
+            "prestacoes_contas:prestacao_servidor_assinado_anexar",
+            args=[ps.pk, PrestacaoDocumentoAnexo.TIPO_COMPROVANTE],
+        ),
+        prestacao_pk=ps.prestacao_id,
+    )
+    row["diario_assinado"] = _anexo_assinado_info(
+        prestacao_anexos or [],
+        tipo=PrestacaoDocumentoAnexo.TIPO_DB_ASSINADO,
+        anexar_url=reverse(
+            "prestacoes_contas:prestacao_servidor_assinado_anexar",
+            args=[ps.pk, PrestacaoDocumentoAnexo.TIPO_DB_ASSINADO],
+        ),
+        prestacao_pk=ps.prestacao_id,
+    )
+    return row
 
 
 def apresentar_prestacao_card(prestacao, solicitacao_forms=None):
@@ -80,8 +134,9 @@ def apresentar_prestacao_card(prestacao, solicitacao_forms=None):
     solicitacao_forms = solicitacao_forms or {}
 
     # ── Servidores da prestação ──
+    prestacao_anexos = list(prestacao.documentos_anexos.all())
     servidores = [
-        _servidor_row(ps, solicitacao_forms.get(ps.pk))
+        _servidor_row(ps, solicitacao_forms.get(ps.pk), prestacao_anexos)
         for ps in prestacao.servidores_prestacao.all()
     ]
     # O motorista aparece sempre como primeiro nome da lista (ordem estável entre os demais).
@@ -166,6 +221,16 @@ def apresentar_prestacao_card(prestacao, solicitacao_forms=None):
     for row in servidores:
         row["diario_pdf_url"] = diario_pdf_url
 
+    despacho_assinado = _anexo_assinado_info(
+        prestacao_anexos,
+        tipo=PrestacaoDocumentoAnexo.TIPO_DESPACHO,
+        anexar_url=reverse(
+            "prestacoes_contas:prestacao_despacho_assinado_anexar",
+            args=[prestacao.pk],
+        ),
+        prestacao_pk=prestacao.pk,
+    )
+
     search_parts = [oficio.numero_formatado, format_protocolo(oficio.protocolo) or ""]
     search_parts += [s["name"] for s in servidores]
 
@@ -203,6 +268,7 @@ def apresentar_prestacao_card(prestacao, solicitacao_forms=None):
         "tem_rt": rt is not None,
         "diario_url": reverse("prestacoes_contas:diario_criar", args=[prestacao.pk]),
         "consolidado_url": reverse("prestacoes_contas:consolidado", args=[prestacao.pk]),
+        "despacho_assinado": despacho_assinado,
         # filtro / busca
         "search_text": " ".join(p for p in search_parts if p),
     }

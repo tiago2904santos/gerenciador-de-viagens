@@ -131,7 +131,6 @@
                     <tr>
                       <th>Sigla</th>
                       <th>Nome</th>
-                      <th>Status</th>
                       <th>Usuários</th>
                     </tr>
                   </thead>
@@ -140,17 +139,10 @@
                       <tr>
                         <td><strong>{{ area.sigla }}</strong></td>
                         <td>{{ area.nome }}</td>
-                        <td>
-                          {% if area.ativa %}
-                            {% include "components/ui/badges/chip.html" with tone="success" label="Ativa" size="compact" only %}
-                          {% else %}
-                            {% include "components/ui/badges/chip.html" with tone="muted" label="Inativa" size="compact" only %}
-                          {% endif %}
-                        </td>
                         <td>{{ area.vinculos_usuario.count }}</td>
                       </tr>
                     {% empty %}
-                      <tr><td colspan="4" class="admin-table__empty">Nenhuma área cadastrada.</td></tr>
+                      <tr><td colspan="3" class="admin-table__empty">Nenhuma área cadastrada.</td></tr>
                     {% endfor %}
                   </tbody>
                 </table>
@@ -162,7 +154,7 @@
             <header class="cv-wizard-section-header">
               <div class="cv-wizard-section-header__copy">
                 <h3 class="cv-wizard-section-title" id="admin-card-vinculos-lista-title">Usuários e acessos</h3>
-                <p class="cv-wizard-section-subtitle">Conferência dos vínculos ativos e áreas padrão.</p>
+                <p class="cv-wizard-section-subtitle">Conferência dos vínculos e áreas padrão.</p>
               </div>
               <div class="cv-wizard-section-header__meta">
                 {% include "components/ui/badges/chip.html" with tone="info" label="Vínculos" count=vinculos|length size="compact" only %}
@@ -179,7 +171,6 @@
                       <th>Área</th>
                       <th>Perfil</th>
                       <th>Padrão</th>
-                      <th>Status</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -196,16 +187,9 @@
                             <span class="admin-table__empty">—</span>
                           {% endif %}
                         </td>
-                        <td>
-                          {% if vinculo.ativo %}
-                            {% include "components/ui/badges/chip.html" with tone="success" label="Ativo" size="compact" only %}
-                          {% else %}
-                            {% include "components/ui/badges/chip.html" with tone="muted" label="Inativo" size="compact" only %}
-                          {% endif %}
-                        </td>
                       </tr>
                     {% empty %}
-                      <tr><td colspan="6" class="admin-table__empty">Nenhum vínculo cadastrado.</td></tr>
+                      <tr><td colspan="5" class="admin-table__empty">Nenhum vínculo cadastrado.</td></tr>
                     {% endfor %}
                   </tbody>
                 </table>

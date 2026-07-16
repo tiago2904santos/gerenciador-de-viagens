@@ -97,6 +97,7 @@ def _base_prestacoes(
             ),
             "relatorio_tecnico",
             "diario_bordo",
+            "documentos_anexos",
         )
         .filter(oficio__cancelado=False)
         .order_by(*order_fields)

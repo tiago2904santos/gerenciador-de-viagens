@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="{% static 'css/roteiros-list.css' %}?v=20260622-mobile">
   <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260610-oficios-datepicker">
   <link rel="stylesheet" href="{% static 'css/oficios-list-header.css' %}?v=20260716-prestacao-actions">
+  <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}?v=20260716-assinado-modal">
 {% endblock %}
 
 {% block content %}
@@ -31,5 +32,6 @@
     {% endif %}
   </div>
 
+  {% include "components/ui/modals/attach_signed_modal.html" %}
 </div>
 {% endblock %}

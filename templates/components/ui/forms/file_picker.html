@@ -9,7 +9,7 @@
              id="{{ field_id }}"
              class="form-control cv-field__control prestacao-file-input"
              accept="{{ accept|default:'application/pdf,image/png,image/jpeg,image/*' }}"
-             {% if multiple|default:True %}multiple{% endif %}
+             {% if not single %}multiple{% endif %}
              data-file-native="true">
       <label class="prestacao-file-picker__action" for="{{ field_id }}">{{ action_label|default:"Selecionar arquivos" }}</label>
       <span class="prestacao-file-picker__value" data-file-picker-name data-default-label="{{ empty_label|default:'Nenhum arquivo selecionado' }}">{{ empty_label|default:"Nenhum arquivo selecionado" }}</span>

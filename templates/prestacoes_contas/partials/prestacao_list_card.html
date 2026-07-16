@@ -115,6 +115,44 @@
               <span><strong>Diário de bordo</strong><small>Ainda não foi criado</small></span>
             </span>
             {% endif %}
+            <button
+              type="button"
+              class="cv-action-menu__item oficio-lc__action-menu-item{% if servidor.rt_assinado.assinado or servidor.diario_assinado.assinado or servidor.comprovante_anexo.assinado %} is-assinado{% endif %}"
+              role="menuitem"
+              data-attach-signed-trigger
+              data-attach-signed-reopen-key="prestacao-servidor-{{ servidor.ps_pk }}"
+              data-attach-signed-accept="application/pdf,image/png,image/jpeg,.pdf,.png,.jpg,.jpeg"
+              data-attach-signed-file-description="um arquivo em PDF, PNG ou JPEG"
+              data-attach-signed-file-help="Selecione um único arquivo em PDF, PNG, JPG ou JPEG."
+              data-attach-signed-choose-label="Escolher arquivo"
+              data-attach-signed-upload-label="Anexar arquivo"
+              data-attach-signed-url="{{ servidor.rt_assinado.anexar_url }}"
+              data-attach-signed-doc-label="o relatório técnico de {{ servidor.name }}"
+              data-attach-signed-current-name="{{ servidor.rt_assinado.nome_original }}"
+              data-attach-signed-current-view-url="{{ servidor.rt_assinado.view_url }}"
+              data-attach-signed-current-remove-url="{{ servidor.rt_assinado.remover_url }}"
+              data-attach-signed-primary-option-label="Relatório técnico"
+              data-attach-signed-secondary-url="{{ servidor.diario_assinado.anexar_url }}"
+              data-attach-signed-secondary-doc-label="o diário de bordo do ofício {{ card.numero_display }}"
+              data-attach-signed-secondary-current-name="{{ servidor.diario_assinado.nome_original }}"
+              data-attach-signed-secondary-current-view-url="{{ servidor.diario_assinado.view_url }}"
+              data-attach-signed-secondary-current-remove-url="{{ servidor.diario_assinado.remover_url }}"
+              data-attach-signed-secondary-option-label="Diário de bordo"
+              data-attach-signed-tertiary-url="{{ servidor.comprovante_anexo.anexar_url }}"
+              data-attach-signed-tertiary-doc-label="o comprovante de saque ou transferência de {{ servidor.name }}"
+              data-attach-signed-tertiary-current-name="{{ servidor.comprovante_anexo.nome_original }}"
+              data-attach-signed-tertiary-current-view-url="{{ servidor.comprovante_anexo.view_url }}"
+              data-attach-signed-tertiary-current-remove-url="{{ servidor.comprovante_anexo.remover_url }}"
+              data-attach-signed-tertiary-option-label="Comprovante"
+            >
+              <span class="oficio-lc__action-menu-item-icon cv-action-menu__item-icon--success" aria-hidden="true">
+                {% include "dev/ui_lab/partials/_cv_icon.html" with icon="sign" only %}
+              </span>
+              <span>
+                <strong>{% if servidor.rt_assinado.assinado or servidor.diario_assinado.assinado or servidor.comprovante_anexo.assinado %}Gerenciar documentos assinados{% else %}Anexar documentos assinados{% endif %}</strong>
+                <small>RT, diário ou comprovante</small>
+              </span>
+            </button>
             <a class="cv-action-menu__item oficio-lc__action-menu-item"
                href="{{ servidor.pacote_url }}"
                download
@@ -233,6 +271,24 @@
       <div class="oficio-lc__footer-actions">
         <div class="oficio-lc__footer-actions-main cv-icon-btn-group">
           {% include "components/ui/buttons/icon_button.html" with href=card.rt_url action="edit" aria_label="Abrir prestação na etapa 1" tooltip="Abrir prestação" only %}
+          <button
+            type="button"
+            class="cv-icon-btn cv-icon-btn--sign{% if card.despacho_assinado.assinado %} is-assinado{% endif %}"
+            aria-label="{% if card.despacho_assinado.assinado %}Gerenciar despacho assinado{% else %}Anexar despacho assinado{% endif %}"
+            data-tooltip="{% if card.despacho_assinado.assinado %}Despacho assinado — gerenciar{% else %}Anexar despacho assinado{% endif %}"
+            data-attach-signed-trigger
+            data-attach-signed-reopen-key="prestacao-despacho-{{ card.prestacao_pk }}"
+            data-attach-signed-accept="application/pdf,image/png,image/jpeg,.pdf,.png,.jpg,.jpeg"
+            data-attach-signed-file-description="um arquivo em PDF, PNG ou JPEG"
+            data-attach-signed-file-help="Selecione um único arquivo em PDF, PNG, JPG ou JPEG."
+            data-attach-signed-choose-label="Escolher arquivo"
+            data-attach-signed-upload-label="Anexar arquivo"
+            data-attach-signed-url="{{ card.despacho_assinado.anexar_url }}"
+            data-attach-signed-doc-label="o despacho do ofício {{ card.numero_display }}"
+            data-attach-signed-current-name="{{ card.despacho_assinado.nome_original }}"
+            data-attach-signed-current-view-url="{{ card.despacho_assinado.view_url }}"
+            data-attach-signed-current-remove-url="{{ card.despacho_assinado.remover_url }}"
+          >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="sign" only %}</button>
         </div>
 
         <div class="oficio-lc__footer-actions-manage cv-icon-btn-group">

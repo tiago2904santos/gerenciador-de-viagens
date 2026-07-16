@@ -48,6 +48,26 @@ class ResolverAssuntoOficioTests(TestCase):
         r = resolver_assunto_oficio(oficio)
         self.assertEqual(r["assunto_oficio"], "(Retificado)")
         self.assertEqual(r["assunto_linha"], ASSUNTO_AUTORIZACAO)
+        self.assertEqual(r["assunto_termo"], "autorização")
+
+    def test_complementar_nunca_muda_assunto_termo(self):
+        roteiro = self._roteiro_com_saida(datetime.datetime(2026, 6, 1, 8, 0, 0))
+        oficio_autorizacao = Oficio.objects.create(
+            data_criacao=datetime.date(2026, 5, 10),
+            roteiro=roteiro,
+            complementar_documento=True,
+        )
+        r = resolver_assunto_oficio(oficio_autorizacao)
+        self.assertEqual(r["assunto_termo"], "autorização")
+
+        roteiro2 = self._roteiro_com_saida(datetime.datetime(2026, 5, 1, 8, 0, 0))
+        oficio_convalidacao = Oficio.objects.create(
+            data_criacao=datetime.date(2026, 5, 10),
+            roteiro=roteiro2,
+            complementar_documento=True,
+        )
+        r2 = resolver_assunto_oficio(oficio_convalidacao)
+        self.assertEqual(r2["assunto_termo"], "convalidação")
 
     def test_retificado_ignorado_se_ja_convalidacao(self):
         roteiro = self._roteiro_com_saida(datetime.datetime(2026, 5, 1, 8, 0, 0))

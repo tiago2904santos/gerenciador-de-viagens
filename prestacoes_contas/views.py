@@ -12,6 +12,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import escape
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
 from core.autosave import AutosavePayloadError
@@ -789,6 +790,90 @@ def prestacao_servidor_arquivo_autosave(request, ps_pk):
         ok=True,
         object_id=ps.pk,
         version=_autosave_version(ps),
+    )
+
+
+def _prestacao_upload_next_url(request, fallback_url):
+    next_url = request.POST.get("next")
+    if next_url and url_has_allowed_host_and_scheme(
+        next_url,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        return next_url
+    return fallback_url
+
+
+def _prestacao_assinado_upload(
+    request,
+    *,
+    prestacao,
+    tipo,
+    servidor_prestacao=None,
+    substituir_todos_do_tipo=False,
+):
+    fallback_url = reverse("prestacoes_contas:index")
+    destino = _prestacao_upload_next_url(request, fallback_url)
+    arquivo = request.FILES.get("arquivo")
+    if not arquivo:
+        messages.error(request, "Selecione um arquivo PDF para anexar.")
+        return redirect(destino)
+
+    nome_original = Path(getattr(arquivo, "name", "") or "").name
+    if Path(nome_original).suffix.lower() not in {".pdf", ".png", ".jpg", ".jpeg"}:
+        messages.error(request, "O documento deve ser enviado em PDF, PNG, JPG ou JPEG.")
+        return redirect(destino)
+
+    anteriores = PrestacaoDocumentoAnexo.objects.filter(prestacao=prestacao, tipo=tipo)
+    if not substituir_todos_do_tipo:
+        anteriores = anteriores.filter(servidor_prestacao=servidor_prestacao)
+    for anexo in anteriores:
+        if anexo.arquivo:
+            anexo.arquivo.delete(save=False)
+    anteriores.delete()
+
+    PrestacaoDocumentoAnexo.objects.create(
+        prestacao=prestacao,
+        servidor_prestacao=servidor_prestacao,
+        tipo=tipo,
+        arquivo=arquivo,
+        nome_original=nome_original,
+    )
+    _marcar_prestacao_em_preenchimento(prestacao)
+    messages.success(request, "Documento assinado anexado.")
+    return redirect(destino)
+
+
+@require_POST
+def prestacao_despacho_assinado_anexar(request, pc_pk):
+    prestacao = get_object_or_404(_prestacao_queryset(), pk=pc_pk)
+    return _prestacao_assinado_upload(
+        request,
+        prestacao=prestacao,
+        tipo=PrestacaoDocumentoAnexo.TIPO_DESPACHO,
+    )
+
+
+@require_POST
+def prestacao_servidor_assinado_anexar(request, ps_pk, tipo):
+    servidor_prestacao = get_object_or_404(
+        _prestacao_servidor_queryset().select_related("prestacao__oficio"),
+        pk=ps_pk,
+    )
+    tipos_permitidos = {
+        PrestacaoDocumentoAnexo.TIPO_RT_ASSINADO,
+        PrestacaoDocumentoAnexo.TIPO_COMPROVANTE,
+        PrestacaoDocumentoAnexo.TIPO_DB_ASSINADO,
+    }
+    if tipo not in tipos_permitidos:
+        return HttpResponse(status=404)
+    diario_compartilhado = tipo == PrestacaoDocumentoAnexo.TIPO_DB_ASSINADO
+    return _prestacao_assinado_upload(
+        request,
+        prestacao=servidor_prestacao.prestacao,
+        servidor_prestacao=None if diario_compartilhado else servidor_prestacao,
+        tipo=tipo,
+        substituir_todos_do_tipo=diario_compartilhado,
     )
 
 

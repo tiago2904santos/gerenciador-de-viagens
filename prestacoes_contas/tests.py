@@ -307,6 +307,222 @@ class PrestacaoServidorDiariaOverrideTests(TestCase):
         )
 
 
+class PrestacaoAssinadoUploadTests(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(
+            username="tester_assinado_upload",
+            password="123456",
+        )
+        self.client.force_login(self.user)
+        cargo = Cargo.objects.create(nome="Agente")
+        self.motorista = Servidor.objects.create(
+            nome="Motorista",
+            cargo=cargo,
+            cpf="11122233344",
+        )
+        self.servidor = Servidor.objects.create(
+            nome="Servidor",
+            cargo=cargo,
+            cpf="55566677788",
+        )
+        self.oficio = Oficio.objects.create(
+            numero=18,
+            ano=2026,
+            protocolo="123456789",
+            motorista=self.motorista,
+        )
+        self.oficio.servidores.add(self.motorista, self.servidor)
+        self.prestacao = PrestacaoContas.objects.get(oficio=self.oficio)
+        self.ps_motorista = self.prestacao.servidores_prestacao.get(servidor=self.motorista)
+        self.ps_servidor = self.prestacao.servidores_prestacao.get(servidor=self.servidor)
+
+    def test_anexa_e_substitui_despacho_assinado(self):
+        url = reverse(
+            "prestacoes_contas:prestacao_despacho_assinado_anexar",
+            args=[self.prestacao.pk],
+        )
+        with tempfile.TemporaryDirectory() as tmpdir, override_settings(MEDIA_ROOT=tmpdir):
+            for nome in ("despacho-1.pdf", "despacho-2.pdf"):
+                response = self.client.post(
+                    url,
+                    data={
+                        "arquivo": SimpleUploadedFile(
+                            nome,
+                            b"%PDF-1.4\n%%EOF\n",
+                            content_type="application/pdf",
+                        ),
+                        "next": reverse("prestacoes_contas:index"),
+                    },
+                )
+                self.assertEqual(response.status_code, 302)
+
+            anexos = PrestacaoDocumentoAnexo.objects.filter(
+                prestacao=self.prestacao,
+                servidor_prestacao=None,
+                tipo=PrestacaoDocumentoAnexo.TIPO_DESPACHO,
+            )
+            self.assertEqual(anexos.count(), 1)
+            self.assertEqual(anexos.get().nome_original, "despacho-2.pdf")
+
+    def test_diario_assinado_pode_ser_anexado_por_qualquer_servidor_e_e_compartilhado(self):
+        tipo = PrestacaoDocumentoAnexo.TIPO_DB_ASSINADO
+        with tempfile.TemporaryDirectory() as tmpdir, override_settings(MEDIA_ROOT=tmpdir):
+            response = self.client.post(
+                reverse(
+                    "prestacoes_contas:prestacao_servidor_assinado_anexar",
+                    args=[self.ps_servidor.pk, tipo],
+                ),
+                data={
+                    "arquivo": SimpleUploadedFile(
+                        "diario-servidor.pdf",
+                        b"%PDF-1.4\n%%EOF\n",
+                        content_type="application/pdf",
+                    )
+                },
+            )
+            self.assertEqual(response.status_code, 302)
+
+            response = self.client.post(
+                reverse(
+                    "prestacoes_contas:prestacao_servidor_assinado_anexar",
+                    args=[self.ps_motorista.pk, tipo],
+                ),
+                data={
+                    "arquivo": SimpleUploadedFile(
+                        "diario-motorista.pdf",
+                        b"%PDF-1.4\n%%EOF\n",
+                        content_type="application/pdf",
+                    )
+                },
+            )
+            self.assertEqual(response.status_code, 302)
+            anexos = PrestacaoDocumentoAnexo.objects.filter(
+                prestacao=self.prestacao,
+                servidor_prestacao=None,
+                tipo=tipo,
+            )
+            self.assertEqual(anexos.count(), 1)
+            self.assertEqual(anexos.get().nome_original, "diario-motorista.pdf")
+
+            lista = self.client.get(reverse("prestacoes_contas:index"))
+            self.assertContains(
+                lista,
+                'data-attach-signed-secondary-current-name="diario-motorista.pdf"',
+                count=2,
+            )
+
+    def test_rejeita_formato_de_documento_nao_suportado(self):
+        response = self.client.post(
+            reverse(
+                "prestacoes_contas:prestacao_servidor_assinado_anexar",
+                args=[self.ps_servidor.pk, PrestacaoDocumentoAnexo.TIPO_RT_ASSINADO],
+            ),
+            data={
+                "arquivo": SimpleUploadedFile(
+                    "relatorio.txt",
+                    b"arquivo invalido",
+                    content_type="text/plain",
+                ),
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(
+            PrestacaoDocumentoAnexo.objects.filter(
+                prestacao=self.prestacao,
+                servidor_prestacao=self.ps_servidor,
+                tipo=PrestacaoDocumentoAnexo.TIPO_RT_ASSINADO,
+            ).exists()
+        )
+
+    def test_aceita_png_jpg_e_jpeg(self):
+        url = reverse(
+            "prestacoes_contas:prestacao_servidor_assinado_anexar",
+            args=[self.ps_servidor.pk, PrestacaoDocumentoAnexo.TIPO_RT_ASSINADO],
+        )
+        formatos = (
+            ("relatorio.png", b"\x89PNG\r\n\x1a\n", "image/png"),
+            ("relatorio.jpg", b"\xff\xd8\xff\xe0", "image/jpeg"),
+            ("relatorio.jpeg", b"\xff\xd8\xff\xe0", "image/jpeg"),
+        )
+        with tempfile.TemporaryDirectory() as tmpdir, override_settings(MEDIA_ROOT=tmpdir):
+            for nome, conteudo, content_type in formatos:
+                with self.subTest(nome=nome):
+                    response = self.client.post(
+                        url,
+                        data={
+                            "arquivo": SimpleUploadedFile(
+                                nome,
+                                conteudo,
+                                content_type=content_type,
+                            )
+                        },
+                    )
+                    self.assertEqual(response.status_code, 302)
+                    self.assertTrue(
+                        PrestacaoDocumentoAnexo.objects.filter(
+                            prestacao=self.prestacao,
+                            servidor_prestacao=self.ps_servidor,
+                            tipo=PrestacaoDocumentoAnexo.TIPO_RT_ASSINADO,
+                            nome_original=nome,
+                        ).exists()
+                    )
+
+    def test_anexa_comprovante_e_preserva_reabertura_do_modal(self):
+        tipo = PrestacaoDocumentoAnexo.TIPO_COMPROVANTE
+        next_url = (
+            reverse("prestacoes_contas:index")
+            + f"#attach-signed=prestacao-servidor-{self.ps_servidor.pk}&kind=tertiary"
+        )
+        with tempfile.TemporaryDirectory() as tmpdir, override_settings(MEDIA_ROOT=tmpdir):
+            response = self.client.post(
+                reverse(
+                    "prestacoes_contas:prestacao_servidor_assinado_anexar",
+                    args=[self.ps_servidor.pk, tipo],
+                ),
+                data={
+                    "arquivo": SimpleUploadedFile(
+                        "comprovante.pdf",
+                        b"%PDF-1.4\n%%EOF\n",
+                        content_type="application/pdf",
+                    ),
+                    "next": next_url,
+                },
+            )
+
+        self.assertRedirects(response, next_url, fetch_redirect_response=False)
+        self.assertTrue(
+            PrestacaoDocumentoAnexo.objects.filter(
+                prestacao=self.prestacao,
+                servidor_prestacao=self.ps_servidor,
+                tipo=tipo,
+                nome_original="comprovante.pdf",
+            ).exists()
+        )
+
+    def test_lista_exibe_uploads_assinados_conforme_o_papel(self):
+        response = self.client.get(reverse("prestacoes_contas:index"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Anexar documentos assinados", count=2)
+        self.assertNotContains(response, "Anexar RT assinado")
+        self.assertNotContains(response, "Anexar diário assinado")
+        self.assertContains(response, "data-attach-signed-secondary-url", count=2)
+        self.assertContains(response, "data-attach-signed-tertiary-url", count=2)
+        self.assertContains(
+            response,
+            'data-attach-signed-secondary-option-label="Diário de bordo"',
+            count=2,
+        )
+        self.assertContains(
+            response,
+            'data-attach-signed-tertiary-option-label="Comprovante"',
+            count=2,
+        )
+        self.assertContains(response, "data-attach-signed-kind-selector", count=1)
+        self.assertContains(response, "Anexar despacho assinado", count=2)
+        self.assertContains(response, "data-attach-signed-modal", count=1)
+
+
 class RelatorioTecnicoDocumentoTests(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="tester_rt_doc", password="123456")

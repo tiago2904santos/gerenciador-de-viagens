@@ -12,6 +12,16 @@ urlpatterns = [
     path("prestacao/<int:pc_pk>/finalizar/", views.prestacao_finalizar, name="prestacao_finalizar"),
     path("prestacao/<int:pc_pk>/documentos/", views.documentos, name="documentos"),
     path("prestacao/<int:pc_pk>/despacho/autosave/", views.prestacao_arquivo_autosave, name="prestacao_arquivo_autosave"),
+    path(
+        "prestacao/<int:pc_pk>/despacho-assinado/anexar/",
+        views.prestacao_despacho_assinado_anexar,
+        name="prestacao_despacho_assinado_anexar",
+    ),
+    path(
+        "servidor-prestacao/<int:ps_pk>/assinado/<str:tipo>/anexar/",
+        views.prestacao_servidor_assinado_anexar,
+        name="prestacao_servidor_assinado_anexar",
+    ),
     path("prestacao/<int:pc_pk>/anexo/<int:anexo_pk>/excluir/", views.prestacao_documento_excluir, name="prestacao_documento_excluir"),
     path("servidor-prestacao/<int:ps_pk>/solicitacao/autosave/", views.prestacao_servidor_solicitacao_autosave, name="prestacao_servidor_solicitacao_autosave"),
     path("servidor-prestacao/<int:ps_pk>/comprovante/autosave/", views.prestacao_servidor_arquivo_autosave, name="prestacao_servidor_arquivo_autosave"),

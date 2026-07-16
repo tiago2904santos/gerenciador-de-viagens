@@ -14,10 +14,15 @@ Regras:
 - **Retificado**: quando `retificado_documento` é verdadeiro **e** a regra por
   datas seria Autorização (documento emitido antes da viagem). Se a regra já
   for Convalidação, o marcador de retificação é ignorado.
-- **Complementar**: quando `complementar_documento` é verdadeiro, prevalece
-  sobre Autorização/Convalidação/Retificado (marcador explícito do usuário,
-  independente da data de emissão). Os dois marcadores são mutuamente
-  exclusivos — ver `oficios/services.py`.
+- **Complementar**: quando `complementar_documento` é verdadeiro (marcador
+  explícito do usuário, independente da data de emissão). Os dois marcadores
+  são mutuamente exclusivos — ver `oficios/services.py`.
+
+`assunto_termo` (usado na frase fixa do ofício "solicito {assunto_termo} e
+medidas para a concessão de diárias...") **nunca** pode ser outra coisa além
+de "autorização" ou "convalidação" — os marcadores de Retificado/Complementar
+só afetam `assunto_oficio`/`assunto_rotulo` (o rótulo entre parênteses),
+nunca o termo da frase.
 """
 
 from __future__ import annotations
@@ -58,10 +63,11 @@ def resolver_assunto_oficio(oficio: Oficio) -> dict[str, str]:
 
     complementar = bool(getattr(oficio, "complementar_documento", False))
     if complementar:
+        termo = "autorização" if base_autorizacao else "convalidação"
         return {
             "assunto_linha": ASSUNTO_AUTORIZACAO if base_autorizacao else ASSUNTO_CONVALIDACAO,
             "assunto_oficio": "(Complementar)",
-            "assunto_termo": "complementação",
+            "assunto_termo": termo,
             "assunto_rotulo": "(Complementar)",
         }
 
@@ -70,7 +76,7 @@ def resolver_assunto_oficio(oficio: Oficio) -> dict[str, str]:
         return {
             "assunto_linha": ASSUNTO_AUTORIZACAO,
             "assunto_oficio": "(Retificado)",
-            "assunto_termo": "retificação",
+            "assunto_termo": "autorização",
             "assunto_rotulo": "(Retificado)",
         }
 

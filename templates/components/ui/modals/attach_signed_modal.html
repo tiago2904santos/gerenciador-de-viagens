@@ -26,36 +26,25 @@
     <p class="attach-signed-modal__intro" id="attach-signed-description">
       {% include "dev/ui_lab/partials/_cv_icon.html" with icon="document" only %}
       <span>
-        Envie o PDF já assinado de <strong data-attach-signed-label>este documento</strong>.
+        Envie <span data-attach-signed-file-description>o PDF já assinado</span> de <strong data-attach-signed-label>este documento</strong>.
         Ele substituirá o arquivo gerado na tela e no Google Drive.
       </span>
     </p>
 
-    <ul class="prestacao-file-list" data-attach-signed-current hidden>
-      <li class="prestacao-file-list__item">
-        <div class="prestacao-file-widget__meta">
-          <strong class="prestacao-file-widget__name" data-attach-signed-current-name></strong>
-          <span class="prestacao-file-widget__subtitle">Arquivo anexado</span>
-        </div>
-        <div class="prestacao-file-widget__actions">
-          <a
-            class="cv-icon-btn cv-icon-btn--preview prestacao-file-widget__action"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Visualizar arquivo assinado"
-            data-tooltip="Visualizar"
-            data-attach-signed-current-open
-          >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="eye" only %}</a>
-          <button
-            type="button"
-            class="cv-icon-btn cv-icon-btn--delete prestacao-file-widget__action"
-            aria-label="Remover arquivo assinado"
-            data-tooltip="Remover"
-            data-attach-signed-remove
-          >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="delete" only %}</button>
-        </div>
-      </li>
-    </ul>
+    <div class="attach-signed-modal__kind" data-attach-signed-kind-selector hidden>
+      <span class="attach-signed-modal__kind-label">Documento</span>
+      <div class="attach-signed-modal__kind-options" role="group" aria-label="Selecionar documento assinado">
+        <button type="button" class="attach-signed-modal__kind-option is-active" aria-pressed="true" data-attach-signed-kind="primary">
+          <span data-attach-signed-primary-option-label>Relatório técnico</span>
+        </button>
+        <button type="button" class="attach-signed-modal__kind-option" aria-pressed="false" data-attach-signed-kind="secondary">
+          <span data-attach-signed-secondary-option-label>Diário de bordo</span>
+        </button>
+        <button type="button" class="attach-signed-modal__kind-option" aria-pressed="false" data-attach-signed-kind="tertiary" hidden>
+          <span data-attach-signed-tertiary-option-label>Comprovante</span>
+        </button>
+      </div>
+    </div>
 
     <form method="post" enctype="multipart/form-data" class="attach-signed-modal__form" data-attach-signed-form>
       {% csrf_token %}
@@ -63,10 +52,35 @@
       <div class="attach-signed-modal__upload">
         <div class="attach-signed-modal__upload-heading">
           <strong>Arquivo assinado</strong>
-          <span>Selecione um único arquivo em formato PDF.</span>
+          <span data-attach-signed-file-help>Selecione um único arquivo em formato PDF.</span>
         </div>
-        {% include "components/ui/forms/file_picker.html" with field_id="id-attach-signed-arquivo" field_name="arquivo" accept="application/pdf,.pdf" multiple=False action_label="Escolher PDF" empty_label="Arraste ou escolha o documento assinado" upload_label="Anexar PDF" only %}
+        {% include "components/ui/forms/file_picker.html" with field_id="id-attach-signed-arquivo" field_name="arquivo" accept="application/pdf,.pdf" single=True action_label="Escolher PDF" empty_label="Arraste ou escolha o documento assinado" upload_label="Anexar PDF" only %}
       </div>
+      <ul class="prestacao-file-list" data-attach-signed-current hidden>
+        <li class="prestacao-file-list__item">
+          <div class="prestacao-file-widget__meta">
+            <strong class="prestacao-file-widget__name" data-attach-signed-current-name></strong>
+            <span class="prestacao-file-widget__subtitle">Arquivo anexado</span>
+          </div>
+          <div class="prestacao-file-widget__actions">
+            <a
+              class="cv-icon-btn cv-icon-btn--preview prestacao-file-widget__action"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Visualizar arquivo assinado"
+              data-tooltip="Visualizar"
+              data-attach-signed-current-open
+            >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="eye" only %}</a>
+            <button
+              type="button"
+              class="cv-icon-btn cv-icon-btn--delete prestacao-file-widget__action"
+              aria-label="Remover arquivo assinado"
+              data-tooltip="Remover"
+              data-attach-signed-remove
+            >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="delete" only %}</button>
+          </div>
+        </li>
+      </ul>
       <div class="delete-confirm-modal__actions">
         {% include "components/ui/buttons/button.html" with label="Cancelar" variant="secondary" type="button" data_attach_signed_cancel=True extra_class="attach-signed-modal__cancel" only %}
       </div>
