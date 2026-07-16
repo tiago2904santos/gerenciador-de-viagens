@@ -248,9 +248,9 @@
       });
     }, true);
 
-    form.addEventListener('click', function (event) {
+    document.addEventListener('click', function (event) {
       var link = event.target.closest('[data-autosave-link="1"]');
-      if (!link || !form.contains(link) || !link.href) return;
+      if (!link || !link.href) return;
       if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       if (link.target && link.target !== '_self') return;
       if (paused || submitting) return;
@@ -264,7 +264,10 @@
          atual: se o autosave mais antigo (ainda em voo) responder depois do
          sendBeacon, ele sobrescreve o M2M de servidores com o estado anterior.
          Aqui a gente cancela o debounce pendente, garante que o snapshot atual
-         seja enviado e só troca de página depois que a gravação terminar. */
+         seja enviado e só troca de página depois que a gravação terminar.
+         Escuta no `document` (não no `form`) porque o header com o link
+         "Voltar" (header_stack_back_action.html) fica fora da tag <form> em
+         todos os wizards — um listener preso ao form nunca veria esse clique. */
       event.preventDefault();
       window.clearTimeout(inputTimer);
       var href = link.href;

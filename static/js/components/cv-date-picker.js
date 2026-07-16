@@ -549,6 +549,7 @@
       var button = document.createElement('button');
       var isCurrentMonth = isSameMonth(date, activeDate);
       var isToday = isSameDay(date, new Date());
+      var dayAriaLabel = formatLongDate(date) + (isToday ? ' (hoje)' : '');
 
       // multi mode: verifica se este dia está na lista de selecionados
       var isMultiSel = false;
@@ -581,7 +582,7 @@
       button.type = 'button';
       button.className = 'cv-date-picker__day';
       button.textContent = String(date.getDate());
-      button.setAttribute('aria-label', formatLongDate(date));
+      button.setAttribute('aria-label', dayAriaLabel);
       button.setAttribute('aria-pressed', (isStart || isEnd || isSameDay(date, selectedSingle) || isMultiRange) ? 'true' : 'false');
       button.dataset.date = formatIsoDate(date);
       button.classList.toggle('cv-date-picker__day--muted', !isCurrentMonth);
@@ -614,7 +615,7 @@
             button.title = routeSteps[multiStepIndex].label;
             button.setAttribute(
               'aria-label',
-              formatLongDate(date) + ' - ' + routeSteps[multiStepIndex].label
+              dayAriaLabel + ' - ' + routeSteps[multiStepIndex].label
             );
           }
         }

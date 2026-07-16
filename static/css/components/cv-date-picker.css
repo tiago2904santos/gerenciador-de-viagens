@@ -170,8 +170,8 @@ html[data-theme="light-light"] {
 }
 
 .cv-date-picker__panel {
-  --cv-date-picker-day-gap: 0px;
-  --cv-date-picker-day-size: 42px;
+  --cv-date-picker-day-gap: 1.6px;
+  --cv-date-picker-day-size: 40px;
   --cv-date-picker-grid-width: calc((7 * var(--cv-date-picker-day-size)) + (6 * var(--cv-date-picker-day-gap)));
   --cv-date-picker-week-edge-radius: 4px;
   background: var(--route-card-inner-bg, var(--theme-surface-card));
@@ -270,7 +270,7 @@ html[data-theme="light-light"] {
   display: grid;
   grid-template-columns: repeat(7, var(--cv-date-picker-day-size));
   justify-content: center;
-  row-gap: 2px;
+  row-gap: var(--cv-date-picker-day-gap);
 }
 
 .cv-date-picker__weekday {
@@ -295,7 +295,8 @@ html[data-theme="light-light"] {
   font-size: var(--font-size-sm);
   font-variant-numeric: tabular-nums;
   font-weight: var(--font-weight-semibold);
-  height: 40px;
+  box-sizing: border-box;
+  height: var(--cv-date-picker-day-size);
   isolation: isolate;
   justify-content: center;
   min-width: 0;
@@ -314,13 +315,13 @@ html[data-theme="light-light"] {
 .cv-date-picker__day::before {
   border-radius: 50%;
   content: "";
-  height: 40px;
+  height: var(--cv-date-picker-day-size);
   left: 50%;
   pointer-events: none;
   position: absolute;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: 40px;
+  width: var(--cv-date-picker-day-size);
   z-index: -1;
 }
 
@@ -379,6 +380,28 @@ html[data-theme="light-light"] .cv-date-picker__day-badge {
   border-color: transparent;
 }
 
+.cv-date-picker__day--today::after {
+  background: var(--cv-date-picker-selected-bg-start);
+  border-radius: 50%;
+  bottom: 4px;
+  box-shadow: 0 0 0 1px var(--route-card-inner-bg, var(--theme-surface-card));
+  content: "";
+  height: 5px;
+  left: 50%;
+  pointer-events: none;
+  position: absolute;
+  transform: translateX(-50%);
+  width: 5px;
+  z-index: 3;
+}
+
+.cv-date-picker__day--today.cv-date-picker__day--selected::after,
+.cv-date-picker__day--today.cv-date-picker__day--range::after,
+.cv-date-picker__day--today.cv-date-picker__day--multi-selected::after {
+  background: var(--cv-date-picker-selected-color);
+  box-shadow: 0 0 0 1px var(--cv-date-picker-selected-halo);
+}
+
 .cv-date-picker__day--selected,
 .cv-date-picker__day--range-start,
 .cv-date-picker__day--range-end,
@@ -402,8 +425,8 @@ html[data-theme="light-light"] .cv-date-picker__day-badge {
     linear-gradient(180deg, var(--cv-date-picker-selected-bg-start) 0%, var(--cv-date-picker-selected-bg-end) 100%);
   border-radius: 0;
   box-shadow: none;
-  height: 40px;
-  width: calc(100% + var(--cv-date-picker-day-gap));
+  height: var(--cv-date-picker-day-size);
+  width: var(--cv-date-picker-day-size);
 }
 
 .cv-date-picker__day--multi-start {
@@ -463,11 +486,21 @@ html[data-theme="light-light"] .cv-date-picker__day-badge {
 }
 
 .cv-date-picker__day--range {
+  background: transparent;
+  border-color: transparent;
+  border-radius: 0;
+  color: var(--cv-date-picker-selected-color);
+  z-index: 2;
+}
+
+.cv-date-picker__day--range::before {
   background:
     linear-gradient(180deg, var(--cv-date-picker-selected-bg-start) 0%, var(--cv-date-picker-selected-bg-end) 100%);
-  border-color: var(--cv-date-picker-selected-border);
-  border-radius: 999px;
-  color: var(--cv-date-picker-selected-color);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  height: var(--cv-date-picker-day-size);
+  width: var(--cv-date-picker-day-size);
 }
 
 html[data-theme="dark"] .cv-date-picker .cv-date-picker__day--multi-selected,
@@ -552,14 +585,28 @@ html[data-theme="light-light"] .cv-date-picker .cv-date-picker__day--multi-singl
   z-index: 3;
 }
 
-.cv-date-picker__day--range-start {
+.cv-date-picker__day--range:nth-child(7n + 1)::before {
+  border-bottom-left-radius: var(--cv-date-picker-week-edge-radius);
+  border-top-left-radius: var(--cv-date-picker-week-edge-radius);
+}
+
+.cv-date-picker__day--range:nth-child(7n)::before {
+  border-bottom-right-radius: var(--cv-date-picker-week-edge-radius);
+  border-top-right-radius: var(--cv-date-picker-week-edge-radius);
+}
+
+.cv-date-picker__day--range.cv-date-picker__day--range-start::before {
   border-bottom-left-radius: var(--radius-pill);
   border-top-left-radius: var(--radius-pill);
 }
 
-.cv-date-picker__day--range-end {
+.cv-date-picker__day--range.cv-date-picker__day--range-end::before {
   border-bottom-right-radius: var(--radius-pill);
   border-top-right-radius: var(--radius-pill);
+}
+
+.cv-date-picker__day--range.cv-date-picker__day--range-start.cv-date-picker__day--range-end::before {
+  border-radius: var(--radius-pill);
 }
 
 .cv-date-picker__day:focus-visible {
