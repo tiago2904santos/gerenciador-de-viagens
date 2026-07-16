@@ -1,0 +1,907 @@
+/* ==========================================================================
+   ACTION SYSTEM 2.0
+   Camada visual unificada para .cv-btn, botoes legados, icones, grupos,
+   menus de acao e modais. Carregada por ultimo para permitir migracao gradual.
+   ========================================================================== */
+
+:root {
+  --action-height: 42px;
+  --action-radius: 12px;
+  --action-radius-sm: 10px;
+  --action-group-radius: 16px;
+  --action-gap: 7px;
+  --action-padding-x: 15px;
+  --action-font-size: 0.84rem;
+  --action-font-weight: 720;
+
+  --action-bg: #ffffff;
+  --action-bg-soft: #f3f7fb;
+  --action-bg-hover: #eaf2f9;
+  --action-border: #c8d6e5;
+  --action-border-strong: #9fb5cb;
+  --action-text: #24445f;
+  --action-text-strong: #102f4b;
+  --action-muted: #627b92;
+
+  --action-primary-bg: linear-gradient(145deg, #1769aa, #0f568f);
+  --action-primary-hover-bg: linear-gradient(145deg, #1d75bb, #125f9d);
+  --action-primary-border: #0d4c80;
+  --action-primary-text: #ffffff;
+  --action-primary-shadow: 0 7px 18px rgba(15, 86, 143, 0.2);
+
+  --action-danger-bg: #fff2f0;
+  --action-danger-hover-bg: #ffe7e3;
+  --action-danger-border: #e3a49d;
+  --action-danger-text: #a23b31;
+
+  --action-success-bg: #edf8f2;
+  --action-success-hover-bg: #e0f2e8;
+  --action-success-border: #98c8ae;
+  --action-success-text: #236b4a;
+
+  --action-warning-bg: #fff8e9;
+  --action-warning-hover-bg: #fff0cd;
+  --action-warning-border: #dfc07a;
+  --action-warning-text: #876317;
+
+  --action-info-bg: #edf5fb;
+  --action-info-hover-bg: #e0eef8;
+  --action-info-border: #a8c4db;
+  --action-info-text: #315f84;
+
+  --action-pdf-bg: #fff0ed;
+  --action-pdf-border: #e68a7f;
+  --action-pdf-text: #b72f27;
+  --action-docx-bg: #eaf2ff;
+  --action-docx-border: #78a9e3;
+  --action-docx-text: #125da8;
+  --action-preview-bg: #e4faf7;
+  --action-preview-border: #69c9bd;
+  --action-preview-text: #08776e;
+  --action-edit-bg: #f1f4f7;
+  --action-edit-border: #b8c5d0;
+  --action-edit-text: #4b6275;
+
+  --action-focus: 0 0 0 3px rgba(28, 113, 178, 0.22);
+  --action-shadow: 0 3px 10px rgba(21, 55, 86, 0.08);
+  --action-shadow-hover: 0 7px 17px rgba(21, 55, 86, 0.13);
+
+  --action-group-bg: rgba(244, 248, 252, 0.9);
+  --action-group-border: rgba(151, 174, 197, 0.38);
+  --action-group-shadow: 0 5px 16px rgba(21, 55, 86, 0.07);
+
+  --action-modal-bg: rgba(255, 255, 255, 0.985);
+  --action-modal-border: rgba(151, 174, 197, 0.5);
+  --action-modal-shadow: 0 28px 80px rgba(8, 28, 47, 0.3);
+  --action-modal-backdrop: rgba(7, 18, 31, 0.68);
+}
+
+html[data-theme="dark"] {
+  --action-bg: #172638;
+  --action-bg-soft: #132131;
+  --action-bg-hover: #20354a;
+  --action-border: #385068;
+  --action-border-strong: #55728e;
+  --action-text: #d4e2ef;
+  --action-text-strong: #f3f8fc;
+  --action-muted: #9eb1c4;
+
+  --action-primary-bg: linear-gradient(145deg, #205f8f, #16486f);
+  --action-primary-hover-bg: linear-gradient(145deg, #286fa4, #1b557f);
+  --action-primary-border: #3f7096;
+  --action-primary-text: #ffffff;
+  --action-primary-shadow: 0 7px 18px rgba(0, 0, 0, 0.22);
+
+  --action-danger-bg: #382322;
+  --action-danger-hover-bg: #472927;
+  --action-danger-border: #7e4b47;
+  --action-danger-text: #f1b5ae;
+
+  --action-success-bg: #19352e;
+  --action-success-hover-bg: #20433a;
+  --action-success-border: #426f60;
+  --action-success-text: #a9dec7;
+
+  --action-warning-bg: #362f20;
+  --action-warning-hover-bg: #443a25;
+  --action-warning-border: #72613a;
+  --action-warning-text: #e5cb89;
+
+  --action-info-bg: #192d40;
+  --action-info-hover-bg: #20394f;
+  --action-info-border: #426581;
+  --action-info-text: #b1d1e9;
+
+  --action-pdf-bg: #442326;
+  --action-pdf-border: #a84f55;
+  --action-pdf-text: #ffaaa4;
+  --action-docx-bg: #173559;
+  --action-docx-border: #397dc0;
+  --action-docx-text: #9ed0ff;
+  --action-preview-bg: #103b3b;
+  --action-preview-border: #2d8f87;
+  --action-preview-text: #91e5dc;
+  --action-edit-bg: #202d39;
+  --action-edit-border: #50677a;
+  --action-edit-text: #bfd0de;
+
+  --action-focus: 0 0 0 3px rgba(100, 177, 232, 0.25);
+  --action-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+  --action-shadow-hover: 0 8px 20px rgba(0, 0, 0, 0.26);
+
+  --action-group-bg: rgba(15, 29, 43, 0.84);
+  --action-group-border: rgba(91, 120, 147, 0.34);
+  --action-group-shadow: 0 7px 20px rgba(0, 0, 0, 0.18);
+
+  --action-modal-bg: rgba(15, 29, 43, 0.985);
+  --action-modal-border: rgba(102, 135, 164, 0.36);
+  --action-modal-shadow: 0 30px 86px rgba(0, 0, 0, 0.58);
+  --action-modal-backdrop: rgba(2, 8, 15, 0.78);
+}
+
+/* Text buttons: novo e legado compartilham a mesma geometria. */
+.cv-btn,
+.btn,
+.app-btn {
+  align-items: center;
+  border: 1px solid var(--action-border);
+  border-radius: var(--action-radius);
+  box-shadow: var(--action-shadow);
+  box-sizing: border-box;
+  cursor: pointer;
+  display: inline-flex;
+  font-family: var(--font-sans);
+  font-size: var(--action-font-size);
+  font-weight: var(--action-font-weight);
+  gap: var(--action-gap);
+  justify-content: center;
+  line-height: 1;
+  min-height: var(--action-height);
+  padding: 0 var(--action-padding-x);
+  text-decoration: none;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    color 150ms ease,
+    transform 150ms ease;
+  white-space: nowrap;
+}
+
+.cv-btn:hover,
+.btn:hover,
+.app-btn:hover {
+  box-shadow: var(--action-shadow-hover);
+  transform: translateY(-1px);
+}
+
+.cv-btn:active,
+.btn:active,
+.app-btn:active {
+  box-shadow: var(--action-shadow);
+  transform: translateY(0);
+}
+
+.cv-btn:focus-visible,
+.btn:focus-visible,
+.app-btn:focus-visible {
+  box-shadow: var(--action-focus), var(--action-shadow);
+  outline: none;
+}
+
+.cv-btn:disabled,
+.cv-btn[aria-disabled="true"],
+.btn:disabled,
+.btn[aria-disabled="true"],
+.app-btn:disabled,
+.app-btn[aria-disabled="true"] {
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 0.48;
+  pointer-events: none;
+  transform: none;
+}
+
+.cv-btn--primary,
+.cv-btn--primary-action,
+.cv-btn--next,
+.btn-primary,
+.app-btn--primary {
+  background: var(--action-primary-bg);
+  border-color: var(--action-primary-border);
+  box-shadow: var(--action-primary-shadow);
+  color: var(--action-primary-text);
+}
+
+.cv-btn--primary:hover,
+.cv-btn--primary:focus,
+.cv-btn--primary-action:hover,
+.cv-btn--primary-action:focus,
+.cv-btn--next:hover,
+.cv-btn--next:focus,
+.btn-primary:hover,
+.btn-primary:focus,
+.app-btn--primary:hover,
+.app-btn--primary:focus {
+  background: var(--action-primary-hover-bg);
+  border-color: var(--action-primary-border);
+  color: var(--action-primary-text);
+}
+
+.cv-btn--secondary,
+.cv-btn--neutral,
+.cv-btn--back,
+.cv-btn--back-list,
+.cv-btn--cancel,
+.cv-btn--signature,
+.cv-btn--document,
+.cv-btn--copy-link,
+.btn-secondary,
+.btn-muted,
+.app-btn--secondary,
+.app-btn--muted {
+  background: var(--action-bg);
+  border-color: var(--action-border);
+  box-shadow: var(--action-shadow);
+  color: var(--action-text);
+}
+
+.cv-btn--secondary:hover,
+.cv-btn--neutral:hover,
+.cv-btn--back:hover,
+.cv-btn--back-list:hover,
+.cv-btn--cancel:hover,
+.cv-btn--signature:hover,
+.cv-btn--document:hover,
+.cv-btn--copy-link:hover,
+.btn-secondary:hover,
+.btn-muted:hover,
+.app-btn--secondary:hover,
+.app-btn--muted:hover {
+  background: var(--action-bg-hover);
+  border-color: var(--action-border-strong);
+  color: var(--action-text-strong);
+}
+
+.cv-btn--ghost,
+.btn--ghost {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  color: var(--action-text);
+}
+
+.cv-btn--ghost:hover,
+.btn--ghost:hover {
+  background: var(--action-bg-soft);
+  border-color: transparent;
+  box-shadow: none;
+  color: var(--action-text-strong);
+  transform: none;
+}
+
+.cv-btn--danger,
+.cv-btn--soft-danger,
+.btn-danger,
+.app-btn--danger {
+  background: var(--action-danger-bg);
+  border-color: var(--action-danger-border);
+  box-shadow: none;
+  color: var(--action-danger-text);
+}
+
+.cv-btn--danger:hover,
+.cv-btn--soft-danger:hover,
+.btn-danger:hover,
+.app-btn--danger:hover {
+  background: var(--action-danger-hover-bg);
+  border-color: var(--action-danger-border);
+  color: var(--action-danger-text);
+}
+
+.cv-btn--primary-success {
+  background: var(--action-success-bg);
+  border-color: var(--action-success-border);
+  box-shadow: none;
+  color: var(--action-success-text);
+}
+
+.cv-btn--primary-success:hover {
+  background: var(--action-success-hover-bg);
+  border-color: var(--action-success-border);
+  color: var(--action-success-text);
+}
+
+.cv-btn--preview,
+.cv-btn--tool {
+  background: var(--action-info-bg);
+  border-color: var(--action-info-border);
+  box-shadow: none;
+  color: var(--action-info-text);
+}
+
+.cv-btn--preview:hover,
+.cv-btn--tool:hover {
+  background: var(--action-info-hover-bg);
+  border-color: var(--action-info-border);
+  color: var(--action-info-text);
+}
+
+.cv-btn--pdf,
+.cv-btn--docx {
+  background: var(--action-bg);
+  border-color: var(--action-border);
+  box-shadow: var(--action-shadow);
+  color: var(--action-text);
+}
+
+.cv-btn--pdf .cv-btn__icon {
+  color: var(--action-danger-text);
+}
+
+.cv-btn--docx .cv-btn__icon {
+  color: var(--action-info-text);
+}
+
+.cv-btn--xs,
+.btn--compact {
+  border-radius: 9px;
+  min-height: 30px;
+  padding-inline: 9px;
+}
+
+.cv-btn--sm,
+.btn-sm,
+.btn--sm,
+.app-btn--sm {
+  border-radius: var(--action-radius-sm);
+  min-height: 34px;
+  padding-inline: 11px;
+}
+
+.cv-btn--lg,
+.btn--lg {
+  min-height: 48px;
+  padding-inline: 20px;
+}
+
+/* Icon buttons: cores semanticas suaves, legiveis nos dois temas. */
+.cv-icon-btn {
+  background: var(--action-bg);
+  border-color: var(--action-border);
+  box-shadow: var(--action-shadow);
+  color: var(--action-text);
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    color 150ms ease,
+    transform 150ms ease;
+}
+
+.cv-icon-btn:hover,
+.cv-icon-btn:focus {
+  background: var(--action-bg-hover);
+  border-color: var(--action-border-strong);
+  box-shadow: var(--action-shadow-hover);
+  color: var(--action-text-strong);
+  transform: translateY(-1px);
+}
+
+.cv-icon-btn:active {
+  box-shadow: var(--action-shadow);
+  transform: translateY(0);
+}
+
+.cv-icon-btn--delete {
+  background: var(--action-danger-bg);
+  border-color: var(--action-danger-border);
+  color: var(--action-danger-text);
+}
+
+.cv-icon-btn--cancel {
+  background: var(--action-warning-bg);
+  border-color: var(--action-warning-border);
+  color: var(--action-warning-text);
+}
+
+.cv-icon-btn--complete,
+.cv-icon-btn--sign.is-assinado,
+.cv-icon-btn--whatsapp {
+  background: var(--action-success-bg);
+  border-color: var(--action-success-border);
+  box-shadow: var(--action-shadow);
+  color: var(--action-success-text);
+}
+
+.cv-icon-btn--preview {
+  background: var(--action-preview-bg);
+  border-color: var(--action-preview-border);
+  box-shadow: var(--action-shadow);
+  color: var(--action-preview-text);
+}
+
+.cv-icon-btn--docx {
+  background: var(--action-docx-bg);
+  border-color: var(--action-docx-border);
+  box-shadow: var(--action-shadow);
+  color: var(--action-docx-text);
+}
+
+.cv-icon-btn--settings,
+.cv-icon-btn--signature {
+  background: var(--action-info-bg);
+  border-color: var(--action-info-border);
+  box-shadow: var(--action-shadow);
+  color: var(--action-info-text);
+}
+
+.cv-icon-btn--pdf {
+  background: var(--action-pdf-bg);
+  border-color: var(--action-pdf-border);
+  box-shadow: var(--action-shadow);
+  color: var(--action-pdf-text);
+}
+
+.cv-icon-btn--edit {
+  background: var(--action-edit-bg);
+  border-color: var(--action-edit-border);
+  color: var(--action-edit-text);
+}
+
+.cv-icon-btn--archive {
+  background: var(--action-bg);
+  border-color: var(--action-border);
+  color: var(--action-text);
+}
+
+.cv-icon-btn--pdf:hover,
+.cv-icon-btn--pdf:focus {
+  background: color-mix(in srgb, var(--action-pdf-bg) 82%, var(--action-pdf-text) 18%);
+  border-color: var(--action-pdf-text);
+  color: var(--action-pdf-text);
+}
+
+.cv-icon-btn--docx:hover,
+.cv-icon-btn--docx:focus {
+  background: color-mix(in srgb, var(--action-docx-bg) 82%, var(--action-docx-text) 18%);
+  border-color: var(--action-docx-text);
+  color: var(--action-docx-text);
+}
+
+.cv-icon-btn--preview:hover,
+.cv-icon-btn--preview:focus {
+  background: color-mix(in srgb, var(--action-preview-bg) 82%, var(--action-preview-text) 18%);
+  border-color: var(--action-preview-text);
+  color: var(--action-preview-text);
+}
+
+.cv-icon-btn--edit:hover,
+.cv-icon-btn--edit:focus {
+  background: color-mix(in srgb, var(--action-edit-bg) 82%, var(--action-edit-text) 18%);
+  border-color: var(--action-edit-text);
+  color: var(--action-edit-text);
+}
+
+/* Agrupamentos: uma unica superficie reduz ruido e organiza a hierarquia. */
+.cv-btn-group,
+.btn-group {
+  align-items: center;
+  background: var(--action-group-bg);
+  border: 1px solid var(--action-group-border);
+  border-radius: var(--action-group-radius);
+  box-shadow: var(--action-group-shadow);
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px;
+}
+
+.cv-icon-btn-group {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0;
+}
+
+.cv-btn-group .cv-btn,
+.btn-group .btn,
+.btn-group .app-btn,
+.cv-icon-btn-group .cv-icon-btn {
+  box-shadow: none;
+}
+
+/* Menus globais com a mesma linguagem dos grupos. */
+.cv-action-menu {
+  background: var(--action-modal-bg);
+  border: 1px solid var(--action-modal-border);
+  border-radius: 16px;
+  box-shadow: 0 20px 52px rgba(5, 22, 38, 0.28);
+  gap: 4px;
+  padding: 8px;
+}
+
+html[data-theme="dark"] .cv-action-menu {
+  box-shadow: 0 22px 58px rgba(0, 0, 0, 0.5);
+}
+
+.cv-action-menu__item {
+  border: 1px solid transparent;
+  border-radius: 10px;
+  color: var(--action-text);
+  min-height: 38px;
+  padding: 8px 10px;
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+}
+
+.cv-action-menu__item:hover,
+.cv-action-menu__item:focus-visible {
+  background: var(--action-bg-hover);
+  border-color: var(--action-border);
+  color: var(--action-text-strong);
+  outline: none;
+}
+
+/* Menu contextual rico: cabeçalho, contexto e itens com descrição. */
+.cv-action-menu--rich {
+  gap: 5px;
+  min-width: 276px;
+  padding: 10px;
+}
+
+.cv-action-menu__heading {
+  align-items: center;
+  border-bottom: 1px solid var(--action-group-border);
+  display: flex;
+  gap: 10px;
+  margin: 0 2px 5px;
+  padding: 4px 5px 10px;
+}
+
+.cv-action-menu__heading-icon,
+.cv-action-menu__item-icon {
+  align-items: center;
+  background: var(--action-info-bg);
+  border: 1px solid var(--action-info-border);
+  border-radius: 10px;
+  color: var(--action-info-text);
+  display: inline-flex;
+  flex: 0 0 34px;
+  height: 34px;
+  justify-content: center;
+}
+
+.cv-action-menu__heading-icon .cv-icon,
+.cv-action-menu__item-icon .cv-icon {
+  height: 17px;
+  width: 17px;
+}
+
+.cv-action-menu__heading-copy,
+.cv-action-menu__item-copy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.cv-action-menu__heading-copy strong,
+.cv-action-menu__item-copy strong {
+  color: var(--action-text-strong);
+  font-size: 0.84rem;
+  font-weight: 760;
+  line-height: 1.2;
+}
+
+.cv-action-menu__heading-copy small,
+.cv-action-menu__item-copy small {
+  color: var(--action-muted);
+  font-size: 0.68rem;
+  line-height: 1.35;
+  margin-top: 2px;
+}
+
+.cv-action-menu__item--rich {
+  border: 1px solid transparent;
+  border-radius: 11px;
+  gap: 10px;
+  min-height: 52px;
+  padding: 7px;
+  text-decoration: none;
+}
+
+.cv-action-menu__item--rich:hover,
+.cv-action-menu__item--rich:focus-visible {
+  background: var(--action-bg-hover);
+  border-color: var(--action-border);
+}
+
+.cv-action-menu__item-icon--pdf {
+  background: var(--action-pdf-bg);
+  border-color: var(--action-pdf-border);
+  color: var(--action-pdf-text);
+}
+
+.cv-action-menu__item-icon--docx {
+  background: var(--action-docx-bg);
+  border-color: var(--action-docx-border);
+  color: var(--action-docx-text);
+}
+
+.cv-action-menu__item-icon--preview {
+  background: var(--action-preview-bg);
+  border-color: var(--action-preview-border);
+  color: var(--action-preview-text);
+}
+
+.cv-action-menu__item-icon--edit {
+  background: var(--action-edit-bg);
+  border-color: var(--action-edit-border);
+  color: var(--action-edit-text);
+}
+
+.cv-action-menu__item-icon--danger {
+  background: var(--action-danger-bg);
+  border-color: var(--action-danger-border);
+  color: var(--action-danger-text);
+}
+
+.cv-action-menu__item-icon--warning {
+  background: var(--action-warning-bg);
+  border-color: var(--action-warning-border);
+  color: var(--action-warning-text);
+}
+
+.cv-action-menu__item-icon--success {
+  background: var(--action-success-bg);
+  border-color: var(--action-success-border);
+  color: var(--action-success-text);
+}
+
+.cv-action-menu__item--rich.is-disabled,
+.cv-action-menu__item--rich[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.48;
+  pointer-events: none;
+}
+
+/* Modal shell global. */
+.delete-confirm-modal__backdrop {
+  background: var(--action-modal-backdrop);
+  backdrop-filter: blur(10px) saturate(0.85);
+}
+
+.delete-confirm-modal__dialog {
+  background: var(--action-modal-bg);
+  border: 1px solid var(--action-modal-border);
+  border-radius: 24px;
+  box-shadow: var(--action-modal-shadow);
+  gap: 18px;
+  max-width: min(100%, 560px);
+  overflow: hidden;
+  padding: 24px;
+}
+
+.delete-confirm-modal__header {
+  gap: 13px;
+  padding-right: 38px;
+}
+
+.delete-confirm-modal__icon {
+  background: var(--action-danger-bg);
+  border-color: var(--action-danger-border);
+  border-radius: 13px;
+  color: var(--action-danger-text);
+  flex-basis: 46px;
+  height: 46px;
+  width: 46px;
+}
+
+.delete-confirm-modal__eyebrow {
+  color: var(--action-muted);
+  font-size: 0.68rem;
+  letter-spacing: 0.13em;
+}
+
+.delete-confirm-modal__title {
+  color: var(--action-text-strong);
+  font-size: 1.32rem;
+  letter-spacing: -0.015em;
+}
+
+.delete-confirm-modal__message {
+  color: var(--action-muted);
+  font-size: 0.88rem;
+  line-height: 1.65;
+}
+
+.delete-confirm-modal__message strong {
+  color: var(--action-text-strong);
+}
+
+.delete-confirm-modal__actions {
+  border-top: 1px solid var(--action-group-border);
+  gap: 7px;
+  padding-top: 16px;
+}
+
+/* Modal de documento assinado. */
+.attach-signed-modal__dialog {
+  max-width: min(100%, 610px);
+}
+
+.attach-signed-modal__icon {
+  background: var(--action-info-bg);
+  border-color: var(--action-info-border);
+  color: var(--action-info-text);
+}
+
+.attach-signed-modal__close {
+  position: absolute;
+  right: 18px;
+  top: 18px;
+}
+
+.attach-signed-modal__intro {
+  align-items: flex-start;
+  background: var(--action-bg-soft);
+  border: 1px solid var(--action-border);
+  border-radius: 14px;
+  color: var(--action-muted);
+  display: flex;
+  font-size: 0.84rem;
+  gap: 10px;
+  line-height: 1.55;
+  margin: 0;
+  padding: 12px 14px;
+}
+
+.attach-signed-modal__intro .cv-icon {
+  color: var(--action-info-text);
+  flex: 0 0 18px;
+  height: 18px;
+  margin-top: 2px;
+  width: 18px;
+}
+
+.attach-signed-modal__upload {
+  display: grid;
+  gap: 10px;
+}
+
+.attach-signed-modal__upload-heading {
+  display: grid;
+  gap: 3px;
+}
+
+.attach-signed-modal__upload-heading strong {
+  color: var(--action-text-strong);
+  font-size: 0.85rem;
+}
+
+.attach-signed-modal__upload-heading span {
+  color: var(--action-muted);
+  font-size: 0.72rem;
+}
+
+.attach-signed-modal__form > .app-form-field {
+  margin: 0;
+}
+
+.attach-signed-modal__form .prestacao-file-picker {
+  background: var(--action-bg-soft);
+  border: 1px dashed var(--action-border-strong);
+  border-radius: 15px;
+  box-shadow: none;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  min-height: 104px;
+  padding: 13px;
+}
+
+.attach-signed-modal__form .prestacao-file-picker:hover,
+.attach-signed-modal__form .prestacao-file-picker:focus-within {
+  background: var(--action-bg-hover);
+  border-color: var(--action-info-border);
+}
+
+.attach-signed-modal__form .prestacao-file-picker__action {
+  align-items: center;
+  align-self: end;
+  background: var(--action-bg);
+  border: 1px solid var(--action-border);
+  border-radius: 11px;
+  color: var(--action-text);
+  display: inline-flex;
+  font-size: 0.8rem;
+  font-weight: 720;
+  grid-column: 1;
+  justify-content: center;
+  min-height: 38px;
+  padding: 0 13px;
+  width: fit-content;
+}
+
+.attach-signed-modal__form .prestacao-file-picker__value {
+  align-self: center;
+  color: var(--action-muted);
+  font-size: 0.78rem;
+  grid-column: 1 / -1;
+  grid-row: 1;
+  padding: 0;
+}
+
+.attach-signed-modal__form .prestacao-file-picker__upload {
+  align-self: end;
+  background: var(--action-primary-bg);
+  border: 1px solid var(--action-primary-border);
+  border-radius: 11px;
+  color: var(--action-primary-text);
+  font-size: 0.8rem;
+  font-weight: 720;
+  grid-column: 2;
+  min-height: 38px;
+  padding: 0 14px;
+}
+
+.attach-signed-modal__form .prestacao-file-picker__upload:disabled {
+  background: var(--action-bg);
+  border-color: var(--action-border);
+  color: var(--action-muted);
+  opacity: 0.52;
+}
+
+.attach-signed-modal__form .prestacao-file-selection__menu,
+.attach-signed-modal [data-attach-signed-current] {
+  background: var(--action-bg-soft);
+  border: 1px solid var(--action-border);
+  border-radius: 14px;
+}
+
+@media (max-width: 640px) {
+  .cv-btn-group,
+  .btn-group {
+    max-width: 100%;
+  }
+
+  .cv-icon-btn-group {
+    max-width: 100%;
+  }
+
+  .delete-confirm-modal__dialog {
+    border-radius: 20px;
+    padding: 19px;
+  }
+
+  .attach-signed-modal__form .prestacao-file-picker {
+    grid-template-columns: 1fr;
+  }
+
+  .attach-signed-modal__form .prestacao-file-picker__upload {
+    grid-column: 1;
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cv-btn,
+  .btn,
+  .app-btn,
+  .cv-icon-btn,
+  .cv-action-menu__item {
+    scroll-behavior: auto;
+    transition-duration: 0.01ms;
+  }
+
+  .cv-btn:hover,
+  .btn:hover,
+  .app-btn:hover,
+  .cv-icon-btn:hover,
+  .cv-icon-btn:focus {
+    transform: none;
+  }
+}

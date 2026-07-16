@@ -7,14 +7,29 @@ from .models import AreaTrabalho
 from .models import VinculoUsuarioArea
 
 
-class AreaTrabalhoForm(forms.ModelForm):
+class EstiloCamposMixin:
+    """Aplica as classes de widget do design system (form-control / card toggle)."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            attrs = getattr(field.widget, "attrs", None)
+            if attrs is None:
+                continue
+            if isinstance(field.widget, forms.CheckboxInput):
+                attrs.setdefault("class", "app-card-toggle__input sr-only")
+                attrs.setdefault("role", "switch")
+            else:
+                attrs.setdefault("class", "form-control")
+
+
+class AreaTrabalhoForm(EstiloCamposMixin, forms.ModelForm):
     class Meta:
         model = AreaTrabalho
-        fields = ["nome", "sigla", "ativa"]
+        fields = ["nome", "sigla"]
         labels = {
             "nome": "Nome da área",
             "sigla": "Sigla",
-            "ativa": "Área ativa",
         }
         widgets = {
             "nome": forms.TextInput(attrs={"placeholder": "Assessoria de Comunicação Social"}),
@@ -22,7 +37,7 @@ class AreaTrabalhoForm(forms.ModelForm):
         }
 
 
-class UsuarioAreaCreationForm(UserCreationForm):
+class UsuarioAreaCreationForm(EstiloCamposMixin, UserCreationForm):
     area = forms.ModelChoiceField(
         queryset=AreaTrabalho.objects.none(),
         label="Área de trabalho",
@@ -90,16 +105,15 @@ class UsuarioAreaCreationForm(UserCreationForm):
         return user
 
 
-class VinculoUsuarioAreaForm(forms.ModelForm):
+class VinculoUsuarioAreaForm(EstiloCamposMixin, forms.ModelForm):
     class Meta:
         model = VinculoUsuarioArea
-        fields = ["usuario", "area", "papel", "area_padrao", "ativo"]
+        fields = ["usuario", "area", "papel", "area_padrao"]
         labels = {
             "usuario": "Usuário existente",
             "area": "Área de trabalho",
             "papel": "Perfil na área",
             "area_padrao": "Definir como área padrão",
-            "ativo": "Vínculo ativo",
         }
 
     def __init__(self, *args, **kwargs):

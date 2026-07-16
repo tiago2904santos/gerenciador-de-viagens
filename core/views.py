@@ -1,7 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.http import Http404
 from django.shortcuts import redirect
@@ -11,6 +10,7 @@ from django.urls import reverse
 from eventos.forms import EventoForm
 from eventos.models import Evento
 
+from .forms import AlterarSenhaForm
 from .forms import LoginForm
 from .forms import PerfilUsuarioForm
 
@@ -799,7 +799,7 @@ def dashboard(request):
 @login_required(login_url="core:login")
 def perfil(request):
     perfil_form = PerfilUsuarioForm(instance=request.user, prefix="perfil")
-    senha_form = PasswordChangeForm(user=request.user, prefix="senha")
+    senha_form = AlterarSenhaForm(user=request.user, prefix="senha")
 
     if request.method == "POST":
         action = request.POST.get("action")
@@ -810,7 +810,7 @@ def perfil(request):
                 messages.success(request, "Perfil atualizado com sucesso.")
                 return redirect("core:perfil")
         elif action == "alterar_senha":
-            senha_form = PasswordChangeForm(user=request.user, data=request.POST, prefix="senha")
+            senha_form = AlterarSenhaForm(user=request.user, data=request.POST, prefix="senha")
             if senha_form.is_valid():
                 user = senha_form.save()
                 update_session_auth_hash(request, user)

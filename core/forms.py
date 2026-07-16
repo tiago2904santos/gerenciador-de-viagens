@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import PasswordChangeForm
 
 
 class LoginForm(AuthenticationForm):
@@ -33,7 +34,16 @@ class PerfilUsuarioForm(forms.ModelForm):
             "email": "E-mail institucional",
         }
         widgets = {
-            "first_name": forms.TextInput(attrs={"autocomplete": "given-name"}),
-            "last_name": forms.TextInput(attrs={"autocomplete": "family-name"}),
-            "email": forms.EmailInput(attrs={"autocomplete": "email"}),
+            "first_name": forms.TextInput(attrs={"autocomplete": "given-name", "class": "form-control"}),
+            "last_name": forms.TextInput(attrs={"autocomplete": "family-name", "class": "form-control"}),
+            "email": forms.EmailInput(attrs={"autocomplete": "email", "class": "form-control"}),
         }
+
+
+class AlterarSenhaForm(PasswordChangeForm):
+    """PasswordChangeForm com as classes de widget do design system."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs.setdefault("class", "form-control")

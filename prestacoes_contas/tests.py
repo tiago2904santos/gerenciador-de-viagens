@@ -23,6 +23,7 @@ from prestacoes_contas.models import DiarioBordo
 from prestacoes_contas.models import PrestacaoContas
 from prestacoes_contas.models import PrestacaoDocumentoAnexo
 from prestacoes_contas.models import RelatorioTecnico
+from prestacoes_contas.presenters import apresentar_prestacao_card
 from prestacoes_contas.services import build_relatorio_tecnico_context
 from roteiros.models import Roteiro
 from roteiros.models import RoteiroTrecho
@@ -279,6 +280,31 @@ class PrestacaoServidorDiariaOverrideTests(TestCase):
         self.ps_a.refresh_from_db()
         self.assertEqual(self.ps_a.data_liberacao_diarias, date(2026, 7, 16))
         self.assertEqual(self.ps_a.prazo_limite_saque, date(2026, 7, 23))
+
+    def test_card_oferece_pdfs_individuais_e_consolidado_no_menu(self):
+        diario = DiarioBordo.objects.create(prestacao=self.prestacao)
+
+        card = apresentar_prestacao_card(self.prestacao)
+        servidor = next(row for row in card["servidores"] if row["ps_pk"] == self.ps_a.pk)
+
+        self.assertEqual(
+            servidor["rt_download_url"],
+            reverse(
+                "prestacoes_contas:rt_download_servidor_formato",
+                args=[self.ps_a.pk, "pdf"],
+            ),
+        )
+        self.assertEqual(
+            servidor["diario_pdf_url"],
+            reverse(
+                "prestacoes_contas:diario_download_formato",
+                args=[diario.pk, "pdf"],
+            ),
+        )
+        self.assertEqual(
+            servidor["pacote_url"],
+            reverse("prestacoes_contas:consolidado_download", args=[self.ps_a.pk]),
+        )
 
 
 class RelatorioTecnicoDocumentoTests(TestCase):

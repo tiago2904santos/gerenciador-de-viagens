@@ -280,15 +280,31 @@
                 {% include "components/ui/badges/chip.html" with tone="pending" size="compact" label="Pendente" only %}
               {% endif %}
             </div>
-            <div class="protocolo-detail-doc__actions cv-icon-btn-group">
-              {% if doc.arquivo_pdf %}
-                {% include "components/ui/buttons/icon_button.html" with href=doc.arquivo_pdf.url action="preview" aria_label="Abrir documento" tooltip="Abrir documento" only %}
-                {% include "components/ui/buttons/icon_button.html" with href=doc.arquivo_pdf.url action="pdf" aria_label="Baixar PDF" tooltip="PDF" only %}
-              {% else %}
-                {% include "components/ui/buttons/icon_button.html" with href=protocolo.get_detail_url|add:"#documentos" action="preview" aria_label="Abrir documento" tooltip="Abrir documento" only %}
-                {% include "components/ui/buttons/icon_button.html" with href=protocolo.get_detail_url|add:"#documentos" action="pdf" aria_label="Ver PDF no protocolo" tooltip="PDF" only %}
-              {% endif %}
-              {% include "components/ui/buttons/icon_button.html" with href=protocolo.get_solicitar_assinatura_url action="docx" aria_label="Solicitar assinatura" tooltip="Solicitar assinatura" only %}
+            <div class="protocolo-detail-doc__actions">
+              <button class="cv-icon-btn cv-icon-btn--settings"
+                      type="button"
+                      aria-label="Abrir ações de {{ doc.nome_arquivo|default:'documento' }}"
+                      aria-haspopup="true"
+                      aria-expanded="false"
+                      data-tooltip="Ações do documento"
+                      data-action-menu-trigger
+                      data-action-menu-target="protocolo-documento-menu-{{ forloop.counter }}">
+                {% include "dev/ui_lab/partials/_cv_icon.html" with icon="folder" only %}
+              </button>
+              <div class="cv-action-menu cv-action-menu--rich"
+                   id="protocolo-documento-menu-{{ forloop.counter }}"
+                   role="menu"
+                   hidden>
+                {% include "components/ui/menus/rich_menu_header.html" with title=doc.nome_arquivo|default:"Documento" subtitle=doc.get_tipo_documento_display icon="folder" only %}
+                {% if doc.arquivo_pdf %}
+                  {% include "components/ui/menus/rich_menu_link.html" with href=doc.arquivo_pdf.url title="Visualizar documento" description="Abrir o arquivo no navegador" icon="eye" tone="preview" target_blank=True only %}
+                  {% include "components/ui/menus/rich_menu_link.html" with href=doc.arquivo_pdf.url title="Baixar PDF" description="Salvar uma cópia do documento" icon="pdf" tone="pdf" download=True only %}
+                {% else %}
+                  {% include "components/ui/menus/rich_menu_link.html" with href=protocolo.get_detail_url|add:"#documentos" title="Visualizar documento" description="Consultar o arquivo no protocolo" icon="eye" tone="preview" only %}
+                  {% include "components/ui/menus/rich_menu_link.html" with href=protocolo.get_detail_url|add:"#documentos" title="Ver PDF no protocolo" description="O arquivo ainda não está disponível localmente" icon="pdf" tone="pdf" only %}
+                {% endif %}
+                {% include "components/ui/menus/rich_menu_link.html" with href=protocolo.get_solicitar_assinatura_url title="Solicitar assinatura" description="Encaminhar documento para assinatura" icon="sign" tone="docx" only %}
+              </div>
             </div>
           </article>
         {% empty %}

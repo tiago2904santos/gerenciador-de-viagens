@@ -34,25 +34,58 @@
       </form>
     {% endif %}
     <div class="cv-icon-btn-group">
-      {% if row.pdf_url %}
-        {% include "components/ui/buttons/icon_button.html" with href=row.pdf_url action="pdf" aria_label="Baixar em PDF" tooltip="PDF" only %}
-      {% endif %}
-      {% if row.docx_url %}
-        {% include "components/ui/buttons/icon_button.html" with href=row.docx_url action="docx" aria_label="Baixar em DOCX" tooltip="DOCX" only %}
-      {% endif %}
-      {% if row.anexar_assinado_url %}
-        <button
-          type="button"
-          class="cv-icon-btn cv-icon-btn--sign{% if row.remover_assinado_url %} is-assinado{% endif %}"
-          data-attach-signed-trigger
-          data-attach-signed-url="{{ row.anexar_assinado_url }}"
-          data-attach-signed-doc-label="{{ row.title }}"
-          data-attach-signed-current-name="{{ row.assinado_nome_original }}"
-          data-attach-signed-current-view-url="{{ row.assinado_view_url }}"
-          data-attach-signed-current-remove-url="{{ row.remover_assinado_url }}"
-          aria-label="{% if row.remover_assinado_url %}Assinado — gerenciar{% else %}Anexar assinado{% endif %}"
-          data-tooltip="{% if row.remover_assinado_url %}Assinado — clique para gerenciar{% else %}Anexar assinado{% endif %}"
-        >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="sign" only %}</button>
+      {% if row.pdf_url or row.docx_url or row.anexar_assinado_url %}
+        {% with menu_suffix=row_index|default:"item" %}
+          <button
+            type="button"
+            class="cv-icon-btn {% if row.remover_assinado_url %}cv-icon-btn--complete{% else %}cv-icon-btn--settings{% endif %}"
+            aria-label="Abrir documentos de {{ row.title }}"
+            aria-haspopup="true"
+            aria-expanded="false"
+            data-tooltip="{% if row.remover_assinado_url %}Documentos e assinado{% else %}Documentos{% endif %}"
+            data-action-menu-trigger
+            data-action-menu-target="simple-row-document-menu-{{ row.title|slugify }}-{{ menu_suffix }}"
+          >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="folder" only %}</button>
+          <div
+            class="cv-action-menu cv-action-menu--rich"
+            id="simple-row-document-menu-{{ row.title|slugify }}-{{ menu_suffix }}"
+            role="menu"
+            hidden
+          >
+            {% if row.remover_assinado_url %}
+              {% include "components/ui/menus/rich_menu_header.html" with title="Documento assinado" subtitle=row.title icon="sign" only %}
+            {% else %}
+              {% include "components/ui/menus/rich_menu_header.html" with title="Documentos" subtitle=row.title icon="folder" only %}
+            {% endif %}
+            {% if row.pdf_url %}
+              {% include "components/ui/menus/rich_menu_link.html" with href=row.pdf_url title="Baixar PDF" description="Documento pronto para impressão" icon="pdf" tone="pdf" download=True only %}
+            {% endif %}
+            {% if row.docx_url %}
+              {% include "components/ui/menus/rich_menu_link.html" with href=row.docx_url title="Baixar DOCX" description="Arquivo editável" icon="docx" tone="docx" download=True only %}
+            {% endif %}
+            {% if row.anexar_assinado_url %}
+              <button
+                type="button"
+                class="cv-action-menu__item cv-action-menu__item--rich"
+                role="menuitem"
+                data-attach-signed-trigger
+                data-attach-signed-url="{{ row.anexar_assinado_url }}"
+                data-attach-signed-doc-label="{{ row.title }}"
+                data-attach-signed-current-name="{{ row.assinado_nome_original }}"
+                data-attach-signed-current-view-url="{{ row.assinado_view_url }}"
+                data-attach-signed-current-remove-url="{{ row.remover_assinado_url }}"
+              >
+                <span class="cv-action-menu__item-icon cv-action-menu__item-icon--success" aria-hidden="true">
+                  {% include "dev/ui_lab/partials/_cv_icon.html" with icon="sign" only %}
+                </span>
+                <span class="cv-action-menu__item-copy">
+                  <strong>{% if row.remover_assinado_url %}Gerenciar assinado{% else %}Anexar assinado{% endif %}</strong>
+                  <small>{% if row.remover_assinado_url %}Visualizar, substituir ou remover{% else %}Enviar o PDF depois da assinatura{% endif %}</small>
+                </span>
+              </button>
+            {% endif %}
+          </div>
+        {% endwith %}
       {% endif %}
       {% if row.edit_url %}
         {% if row.edit_fields_json %}

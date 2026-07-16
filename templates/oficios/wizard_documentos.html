@@ -45,9 +45,21 @@
           {% if di.oficio.disponivel %}
             <span class="document-inline-card__header-end">
               <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do documento">
-                {% include "components/ui/buttons/icon_button.html" with href=di.oficio.url action="preview" aria_label="Visualizar documento" tooltip="Visualizar documento" only %}
-                {% include "components/ui/buttons/icon_button.html" with href=di.oficio.download_pdf_url action="pdf" aria_label="Baixar PDF" tooltip="Baixar PDF" only %}
-                {% include "components/ui/buttons/icon_button.html" with href=di.oficio.download_docx_url action="docx" aria_label="Baixar DOCX" tooltip="Baixar DOCX" only %}
+                <button class="cv-icon-btn cv-icon-btn--settings" type="button"
+                        aria-label="Abrir ações do ofício"
+                        aria-haspopup="true"
+                        aria-expanded="false"
+                        data-tooltip="Visualizar e baixar"
+                        data-action-menu-trigger
+                        data-action-menu-target="wizard-oficio-document-menu">
+                  {% include "dev/ui_lab/partials/_cv_icon.html" with icon="folder" only %}
+                </button>
+                <div class="cv-action-menu cv-action-menu--rich" id="wizard-oficio-document-menu" role="menu" hidden>
+                  {% include "components/ui/menus/rich_menu_header.html" with title=di.oficio.titulo subtitle="Documento do ofício" icon="folder" only %}
+                  {% include "components/ui/menus/rich_menu_link.html" with href=di.oficio.url title="Visualizar documento" description="Abrir o PDF no navegador" icon="eye" tone="preview" target_blank=True only %}
+                  {% include "components/ui/menus/rich_menu_link.html" with href=di.oficio.download_pdf_url title="Baixar PDF" description="Documento pronto para impressão" icon="pdf" tone="pdf" download=True only %}
+                  {% include "components/ui/menus/rich_menu_link.html" with href=di.oficio.download_docx_url title="Baixar DOCX" description="Arquivo editável do ofício" icon="docx" tone="docx" download=True only %}
+                </div>
               </span>
             </span>
           {% endif %}
@@ -74,9 +86,21 @@
           {% if di.justificativa.disponivel %}
             <span class="document-inline-card__header-end">
               <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do documento">
-                {% include "components/ui/buttons/icon_button.html" with href=di.justificativa.url action="preview" aria_label="Visualizar documento" tooltip="Visualizar documento" only %}
-                {% include "components/ui/buttons/icon_button.html" with href=di.justificativa.download_pdf_url action="pdf" aria_label="Baixar PDF" tooltip="Baixar PDF" only %}
-                {% include "components/ui/buttons/icon_button.html" with href=di.justificativa.download_docx_url action="docx" aria_label="Baixar DOCX" tooltip="Baixar DOCX" only %}
+                <button class="cv-icon-btn cv-icon-btn--settings" type="button"
+                        aria-label="Abrir ações da justificativa"
+                        aria-haspopup="true"
+                        aria-expanded="false"
+                        data-tooltip="Visualizar e baixar"
+                        data-action-menu-trigger
+                        data-action-menu-target="wizard-justificativa-document-menu">
+                  {% include "dev/ui_lab/partials/_cv_icon.html" with icon="folder" only %}
+                </button>
+                <div class="cv-action-menu cv-action-menu--rich" id="wizard-justificativa-document-menu" role="menu" hidden>
+                  {% include "components/ui/menus/rich_menu_header.html" with title=di.justificativa.titulo subtitle="Documento de justificativa" icon="folder" only %}
+                  {% include "components/ui/menus/rich_menu_link.html" with href=di.justificativa.url title="Visualizar documento" description="Abrir o PDF no navegador" icon="eye" tone="preview" target_blank=True only %}
+                  {% include "components/ui/menus/rich_menu_link.html" with href=di.justificativa.download_pdf_url title="Baixar PDF" description="Documento pronto para impressão" icon="pdf" tone="pdf" download=True only %}
+                  {% include "components/ui/menus/rich_menu_link.html" with href=di.justificativa.download_docx_url title="Baixar DOCX" description="Arquivo editável da justificativa" icon="docx" tone="docx" download=True only %}
+                </div>
               </span>
             </span>
           {% endif %}
@@ -106,31 +130,44 @@
                 {% if di.termos|length == 1 %}
                   {% for t in di.termos %}
                     {% if t.disponivel %}
-                      <span class="cv-icon-btn-group">
-                        <a class="cv-icon-btn cv-icon-btn--preview" href="{{ t.inline_url }}" target="_blank" rel="noopener noreferrer" aria-label="Visualizar termo" data-tooltip="Visualizar termo">
-                          {% include "dev/ui_lab/partials/_cv_icon.html" with icon="eye" only %}
-                        </a>
-                        <a class="cv-icon-btn cv-icon-btn--pdf" href="{{ t.download_pdf_url }}" aria-label="Baixar termo em PDF" data-tooltip="Baixar termo em PDF" download>
-                          {% include "dev/ui_lab/partials/_cv_icon.html" with icon="pdf" only %}
-                        </a>
-                        <a class="cv-icon-btn cv-icon-btn--docx" href="{{ t.download_docx_url }}" aria-label="Baixar termo em DOCX" data-tooltip="Baixar termo em DOCX" download>
-                          {% include "dev/ui_lab/partials/_cv_icon.html" with icon="docx" only %}
-                        </a>
-                      </span>
+                      <button class="cv-icon-btn cv-icon-btn--settings" type="button"
+                              aria-label="Abrir ações do termo"
+                              aria-haspopup="true"
+                              aria-expanded="false"
+                              data-tooltip="Visualizar e baixar"
+                              data-action-menu-trigger
+                              data-action-menu-target="wizard-termos-document-menu">
+                        {% include "dev/ui_lab/partials/_cv_icon.html" with icon="folder" only %}
+                      </button>
+                      <div class="cv-action-menu cv-action-menu--rich" id="wizard-termos-document-menu" role="menu" hidden>
+                        {% include "components/ui/menus/rich_menu_header.html" with title="Termo de autorização" subtitle=t.titulo icon="folder" only %}
+                        {% include "components/ui/menus/rich_menu_link.html" with href=t.inline_url title="Visualizar termo" description="Abrir o documento no navegador" icon="eye" tone="preview" target_blank=True only %}
+                        {% include "components/ui/menus/rich_menu_link.html" with href=t.download_pdf_url title="Baixar PDF" description="Documento pronto para assinatura" icon="pdf" tone="pdf" download=True only %}
+                        {% include "components/ui/menus/rich_menu_link.html" with href=t.download_docx_url title="Baixar DOCX" description="Arquivo editável do termo" icon="docx" tone="docx" download=True only %}
+                      </div>
                     {% endif %}
                   {% endfor %}
                 {% else %}
-                  <span class="cv-icon-btn-group">
-                    <button class="cv-icon-btn cv-icon-btn--preview" type="button" data-open-all-termos aria-label="Visualizar termos" data-tooltip="Visualizar termos">
-                      {% include "dev/ui_lab/partials/_cv_icon.html" with icon="eye" only %}
+                  <button class="cv-icon-btn cv-icon-btn--settings" type="button"
+                          aria-label="Abrir ações dos termos"
+                          aria-haspopup="true"
+                          aria-expanded="false"
+                          data-tooltip="Visualizar e baixar"
+                          data-action-menu-trigger
+                          data-action-menu-target="wizard-termos-document-menu">
+                    {% include "dev/ui_lab/partials/_cv_icon.html" with icon="folder" only %}
+                  </button>
+                  <div class="cv-action-menu cv-action-menu--rich" id="wizard-termos-document-menu" role="menu" hidden>
+                    {% include "components/ui/menus/rich_menu_header.html" with title="Termos de autorização" subtitle="Todos os servidores" icon="folder" only %}
+                    <button class="cv-action-menu__item cv-action-menu__item--rich" type="button" data-open-all-termos role="menuitem">
+                      <span class="cv-action-menu__item-icon cv-action-menu__item-icon--preview" aria-hidden="true">
+                        {% include "dev/ui_lab/partials/_cv_icon.html" with icon="eye" only %}
+                      </span>
+                      <span class="cv-action-menu__item-copy"><strong>Visualizar termos</strong><small>Abrir todos os documentos disponíveis</small></span>
                     </button>
-                    <a class="cv-icon-btn cv-icon-btn--pdf" href="{{ di.termos_download_todos_pdf_url }}" data-download-all-termos aria-label="Baixar termos em PDF" data-tooltip="Baixar termos em PDF" download>
-                      {% include "dev/ui_lab/partials/_cv_icon.html" with icon="pdf" only %}
-                    </a>
-                    <a class="cv-icon-btn cv-icon-btn--docx" href="{{ di.termos_download_todos_docx_url }}" aria-label="Baixar termos em DOCX" data-tooltip="Baixar termos em DOCX" download>
-                      {% include "dev/ui_lab/partials/_cv_icon.html" with icon="docx" only %}
-                    </a>
-                  </span>
+                    {% include "components/ui/menus/rich_menu_link.html" with href=di.termos_download_todos_pdf_url title="Baixar PDFs" description="Salvar todos os termos em PDF" icon="pdf" tone="pdf" download=True data_download_all_termos=True only %}
+                    {% include "components/ui/menus/rich_menu_link.html" with href=di.termos_download_todos_docx_url title="Baixar DOCXs" description="Salvar todos os arquivos editáveis" icon="docx" tone="docx" download=True only %}
+                  </div>
                 {% endif %}
               </span>
             </span>

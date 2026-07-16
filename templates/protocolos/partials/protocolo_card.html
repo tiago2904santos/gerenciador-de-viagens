@@ -115,15 +115,30 @@ Parametros: protocolo
                 {% if doc.tamanho_bytes %} - {{ doc.tamanho_bytes|filesizeformat }}{% endif %}
               </div>
             </div>
-            <div class="oficio-lc__trecho-actions cv-icon-btn-group">
-              {% if doc.arquivo_pdf %}
-                {% include "components/ui/buttons/icon_button.html" with href=doc.arquivo_pdf.url action="preview" size="sm" aria_label="Abrir documento" tooltip="Abrir documento" only %}
-                {% include "components/ui/buttons/icon_button.html" with href=doc.arquivo_pdf.url action="pdf" size="sm" aria_label="Baixar PDF" tooltip="PDF" only %}
-              {% else %}
-                {% include "components/ui/buttons/icon_button.html" with href=protocolo.get_detail_url|add:"#documentos" action="preview" size="sm" aria_label="Abrir documento" tooltip="Abrir documento" only %}
-                {% include "components/ui/buttons/icon_button.html" with href=protocolo.get_detail_url|add:"#documentos" action="pdf" size="sm" aria_label="Ver PDF no protocolo" tooltip="PDF" only %}
-              {% endif %}
-              {% include "components/ui/buttons/icon_button.html" with href=protocolo.get_solicitar_assinatura_url action="docx" size="sm" aria_label="Solicitar assinatura" tooltip="Solicitar assinatura" only %}
+            <div class="oficio-lc__trecho-actions">
+              <button
+                class="cv-icon-btn cv-icon-btn--settings cv-icon-btn--sm"
+                type="button"
+                aria-label="Abrir ações de {{ doc.nome_arquivo|default:'documento' }}"
+                aria-haspopup="true"
+                aria-expanded="false"
+                data-tooltip="Ações do documento"
+                data-action-menu-trigger
+                data-action-menu-target="protocolo-document-menu-{{ protocolo.pk }}-{{ doc.pk }}"
+              >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="folder" only %}</button>
+              <div class="cv-action-menu cv-action-menu--rich" id="protocolo-document-menu-{{ protocolo.pk }}-{{ doc.pk }}" role="menu" hidden>
+                {% include "components/ui/menus/rich_menu_header.html" with title=doc.nome_arquivo|default:"Documento" subtitle=doc.get_tipo_documento_display icon="document" only %}
+                {% if doc.arquivo_pdf %}
+                  {% include "components/ui/menus/rich_menu_link.html" with href=doc.arquivo_pdf.url title="Abrir documento" description="Visualizar o arquivo no navegador" icon="eye" tone="preview" target_blank=True only %}
+                  {% include "components/ui/menus/rich_menu_link.html" with href=doc.arquivo_pdf.url title="Baixar PDF" description="Salvar uma cópia do documento" icon="pdf" tone="pdf" download=True only %}
+                {% else %}
+                  {% with documentos_url=protocolo.get_detail_url|add:"#documentos" %}
+                    {% include "components/ui/menus/rich_menu_link.html" with href=documentos_url title="Abrir documento" description="Consultar na página do protocolo" icon="eye" tone="preview" only %}
+                    {% include "components/ui/menus/rich_menu_link.html" with href=documentos_url title="Consultar PDF" description="O arquivo está vinculado ao protocolo" icon="pdf" tone="pdf" only %}
+                  {% endwith %}
+                {% endif %}
+                {% include "components/ui/menus/rich_menu_link.html" with href=protocolo.get_solicitar_assinatura_url title="Solicitar assinatura" description="Iniciar o fluxo de assinatura" icon="sign" tone="success" only %}
+              </div>
             </div>
           </div>
         {% empty %}
@@ -148,13 +163,30 @@ Parametros: protocolo
       <div class="oficio-lc__footer-actions">
         <div class="oficio-lc__footer-actions-main cv-icon-btn-group">
           {% include "components/ui/buttons/icon_button.html" with href=protocolo.get_detail_url action="preview" aria_label="Visualizar protocolo" tooltip="Visualizar" only %}
-          {% include "components/ui/buttons/icon_button.html" with href=protocolo.get_atualizar_url action="edit" aria_label="Atualizar situacao" tooltip="Atualizar situacao" only %}
-          {% include "components/ui/buttons/icon_button.html" with href=protocolo.get_detail_url|add:"#documentos" action="pdf" aria_label="Documentos do protocolo" tooltip="Documentos" only %}
-          {% include "components/ui/buttons/icon_button.html" with href=protocolo.get_detail_url|add:"#assinaturas" action="docx" aria_label="Assinaturas do protocolo" tooltip="Assinaturas" only %}
-          {% include "components/ui/buttons/icon_button.html" with href=protocolo.get_detail_url|add:"#tramitacoes" action="preview" aria_label="Tramitacoes do protocolo" tooltip="Tramitacoes" only %}
-        </div>
-        <div class="oficio-lc__footer-actions-danger cv-icon-btn-group">
-          {% include "components/ui/buttons/icon_button.html" with href=protocolo.get_logs_url action="delete" aria_label="Logs do protocolo" tooltip="Logs" only %}
+          <button
+            class="cv-icon-btn cv-icon-btn--settings"
+            type="button"
+            aria-label="Abrir ações do protocolo {{ protocolo.numero_display }}"
+            aria-haspopup="true"
+            aria-expanded="false"
+            data-tooltip="Mais ações"
+            data-action-menu-trigger
+            data-action-menu-target="protocolo-action-menu-{{ protocolo.pk }}"
+          >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="more" only %}</button>
+          <div class="cv-action-menu cv-action-menu--rich" id="protocolo-action-menu-{{ protocolo.pk }}" role="menu" hidden>
+            {% include "components/ui/menus/rich_menu_header.html" with title="Gerenciar protocolo" subtitle=protocolo.numero_display icon="settings" only %}
+            {% include "components/ui/menus/rich_menu_link.html" with href=protocolo.get_atualizar_url title="Atualizar situação" description="Registrar o estado atual do protocolo" icon="edit" tone="edit" only %}
+            {% with documentos_url=protocolo.get_detail_url|add:"#documentos" %}
+              {% include "components/ui/menus/rich_menu_link.html" with href=documentos_url title="Documentos" description="Consultar os arquivos do protocolo" icon="pdf" tone="pdf" only %}
+            {% endwith %}
+            {% with assinaturas_url=protocolo.get_detail_url|add:"#assinaturas" %}
+              {% include "components/ui/menus/rich_menu_link.html" with href=assinaturas_url title="Assinaturas" description="Acompanhar assinaturas vinculadas" icon="sign" tone="success" only %}
+            {% endwith %}
+            {% with tramitacoes_url=protocolo.get_detail_url|add:"#tramitacoes" %}
+              {% include "components/ui/menus/rich_menu_link.html" with href=tramitacoes_url title="Tramitações" description="Ver o histórico de movimentações" icon="route" tone="preview" only %}
+            {% endwith %}
+            {% include "components/ui/menus/rich_menu_link.html" with href=protocolo.get_logs_url title="Logs do protocolo" description="Consultar o histórico técnico" icon="document" tone="warning" only %}
+          </div>
         </div>
       </div>
     </div>

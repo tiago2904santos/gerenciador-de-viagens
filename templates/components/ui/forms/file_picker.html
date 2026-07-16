@@ -11,10 +11,10 @@
              accept="{{ accept|default:'application/pdf,image/png,image/jpeg,image/*' }}"
              {% if multiple|default:True %}multiple{% endif %}
              data-file-native="true">
-      <label class="prestacao-file-picker__action" for="{{ field_id }}">Selecionar arquivos</label>
-      <span class="prestacao-file-picker__value" data-file-picker-name data-default-label="Nenhum arquivo selecionado">Nenhum arquivo selecionado</span>
+      <label class="prestacao-file-picker__action" for="{{ field_id }}">{{ action_label|default:"Selecionar arquivos" }}</label>
+      <span class="prestacao-file-picker__value" data-file-picker-name data-default-label="{{ empty_label|default:'Nenhum arquivo selecionado' }}">{{ empty_label|default:"Nenhum arquivo selecionado" }}</span>
       <div class="prestacao-file-picker__inline-actions" data-file-inline-actions hidden></div>
-      <button class="prestacao-file-picker__upload" type="submit" data-file-upload-button disabled>Anexar</button>
+      <button class="prestacao-file-picker__upload" type="submit" data-file-upload-button disabled>{{ upload_label|default:"Anexar" }}</button>
     </div>
     <div class="prestacao-file-selection" data-file-selection-dropdown hidden>
       <button class="prestacao-file-selection__toggle" type="button" aria-expanded="false" data-file-selection-toggle>

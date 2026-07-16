@@ -1,349 +1,142 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block extra_css %}
-  <style>
-    .profile-page {
-      --profile-panel: #ffffff;
-      --profile-border: #d9e2ef;
-      --profile-text: #172033;
-      --profile-muted: #64748b;
-      --profile-primary: #0f4c81;
-      --profile-primary-strong: #08345d;
-      --profile-danger: #b42318;
-      display: grid;
-      gap: 16px;
-      color: var(--profile-text);
-    }
-
-    .profile-page__header,
-    .profile-page__panel {
-      border: 1px solid var(--profile-border);
-      border-radius: 8px;
-      background: var(--profile-panel);
-      padding: 18px;
-    }
-
-    .profile-page__header {
-      display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      align-items: flex-start;
-    }
-
-    .profile-page__eyebrow {
-      margin: 0 0 6px;
-      color: var(--profile-primary);
-      font-size: .76rem;
-      font-weight: 800;
-      letter-spacing: 0;
-      text-transform: uppercase;
-    }
-
-    .profile-page__title {
-      margin: 0;
-      font-size: clamp(1.35rem, 2vw, 1.8rem);
-      line-height: 1.15;
-    }
-
-    .profile-page__description,
-    .profile-page__text {
-      margin: 8px 0 0;
-      color: var(--profile-muted);
-      line-height: 1.5;
-    }
-
-    .profile-page__identity {
-      text-align: right;
-      min-width: 180px;
-    }
-
-    .profile-page__username {
-      display: block;
-      font-weight: 800;
-    }
-
-    .profile-page__email {
-      display: block;
-      color: var(--profile-muted);
-      font-size: .88rem;
-      margin-top: 4px;
-      overflow-wrap: anywhere;
-    }
-
-    .profile-page__grid {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(300px, .75fr);
-      gap: 14px;
-      align-items: start;
-    }
-
-    .profile-page__stack {
-      display: grid;
-      gap: 14px;
-    }
-
-    .profile-page__panel-title {
-      margin: 0;
-      font-size: 1rem;
-      line-height: 1.2;
-    }
-
-    .profile-page__form {
-      display: grid;
-      gap: 12px;
-      margin-top: 14px;
-    }
-
-    .profile-page__fields {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .profile-page__field {
-      display: grid;
-      gap: 5px;
-      min-width: 0;
-    }
-
-    .profile-page__field--wide {
-      grid-column: 1 / -1;
-    }
-
-    .profile-page__label {
-      font-size: .82rem;
-      font-weight: 800;
-    }
-
-    .profile-page__field input {
-      width: 100%;
-      min-height: 42px;
-      box-sizing: border-box;
-      border: 1px solid #bfccdc;
-      border-radius: 6px;
-      background: #ffffff;
-      color: var(--profile-text);
-      padding: 9px 10px;
-      font: inherit;
-    }
-
-    .profile-page__field input:focus {
-      outline: 3px solid rgba(15, 76, 129, .16);
-      border-color: var(--profile-primary);
-    }
-
-    .profile-page__help {
-      margin: 0;
-      color: var(--profile-muted);
-      font-size: .78rem;
-      line-height: 1.35;
-    }
-
-    .profile-page__error {
-      margin: 0;
-      color: var(--profile-danger);
-      font-size: .82rem;
-      line-height: 1.35;
-    }
-
-    .profile-page__actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .profile-page__button {
-      min-height: 40px;
-      border: 0;
-      border-radius: 6px;
-      padding: 9px 14px;
-      background: var(--profile-primary);
-      color: #ffffff;
-      font-weight: 800;
-      cursor: pointer;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .profile-page__button:hover {
-      background: var(--profile-primary-strong);
-    }
-
-    .profile-page__button--ghost {
-      border: 1px solid var(--profile-border);
-      background: #ffffff;
-      color: var(--profile-primary);
-    }
-
-    .profile-page__button--ghost:hover {
-      background: #eef4fb;
-    }
-
-    .profile-page__button--danger {
-      background: var(--profile-danger);
-    }
-
-    .profile-page__button--danger:hover {
-      background: #8f1b13;
-    }
-
-    .profile-page__list {
-      display: grid;
-      gap: 8px;
-      margin: 14px 0 0;
-      padding: 0;
-      list-style: none;
-    }
-
-    .profile-page__item {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      border: 1px solid var(--profile-border);
-      border-radius: 6px;
-      padding: 10px;
-      background: #f8fafc;
-    }
-
-    .profile-page__badge {
-      flex: 0 0 auto;
-      align-self: center;
-      border-radius: 999px;
-      padding: 2px 8px;
-      background: #e7f7ee;
-      color: #17633b;
-      font-size: .74rem;
-      font-weight: 800;
-    }
-
-    @media (max-width: 980px) {
-      .profile-page__grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 680px) {
-      .profile-page__header {
-        display: grid;
-      }
-
-      .profile-page__identity {
-        text-align: left;
-      }
-
-      .profile-page__fields {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="{% static 'css/perfil.css' %}?v=20260716-redesign">
 {% endblock %}
 
 {% block content %}
-  <div class="page-shell page-shell--standard-simple profile-page">
-    <header class="profile-page__header">
-      <div>
-        <p class="profile-page__eyebrow">Conta</p>
-        <h1 class="profile-page__title">{{ page_title }}</h1>
-        <p class="profile-page__description">{{ page_description }}</p>
+  <div class="page-shell page-shell--wizard">
+    {% include "components/ui/headers/header_stack_simple.html" with eyebrow="Conta" title=page_title description=page_description icon_label="PF" module_label="Meu perfil" only %}
+
+    <main class="main-form-panel main-form-panel--stack">
+      <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
+
+        {# ── Dados do perfil ── #}
+        <form method="post" novalidate>
+          {% csrf_token %}
+          <section class="cv-wizard-section-card" aria-labelledby="perfil-card-dados-title">
+            <header class="cv-wizard-section-header">
+              <div class="cv-wizard-section-header__copy">
+                <h3 class="cv-wizard-section-title" id="perfil-card-dados-title">Dados do perfil</h3>
+                <p class="cv-wizard-section-subtitle">Atualize seu nome e e-mail institucional usado no sistema.</p>
+              </div>
+              <div class="cv-wizard-section-header__meta">
+                {% include "components/ui/badges/chip.html" with tone="info" label=request.user.get_username size="compact" only %}
+                {% if request.user.email %}
+                  {% include "components/ui/badges/chip.html" with tone="muted" label=request.user.email size="compact" only %}
+                {% else %}
+                  {% include "components/ui/badges/chip.html" with tone="warning" label="E-mail não informado" size="compact" only %}
+                {% endif %}
+              </div>
+            </header>
+
+            <div class="cv-wizard-section-body">
+              {% if perfil_form.non_field_errors %}
+                {% include "components/ui/feedback/field_error.html" with errors=perfil_form.non_field_errors only %}
+              {% endif %}
+              <div class="field-grid field-grid--cols-2">
+                {% include "components/forms/form_field.html" with field=perfil_form.first_name size_class="field-size-1" only %}
+                {% include "components/forms/form_field.html" with field=perfil_form.last_name size_class="field-size-1" only %}
+                {% include "components/forms/form_field.html" with field=perfil_form.email size_class="field-size-2" only %}
+              </div>
+            </div>
+
+            {% include "components/ui/layouts/card_footer_section.html" with primary_label="Salvar perfil" primary_action="atualizar_perfil" only %}
+          </section>
+        </form>
+
+        {# ── Alterar senha ── #}
+        <form method="post" novalidate>
+          {% csrf_token %}
+          <section class="cv-wizard-section-card" aria-labelledby="perfil-card-senha-title">
+            <header class="cv-wizard-section-header">
+              <div class="cv-wizard-section-header__copy">
+                <h3 class="cv-wizard-section-title" id="perfil-card-senha-title">Alterar senha</h3>
+                <p class="cv-wizard-section-subtitle">Informe a senha atual e defina uma nova senha de acesso.</p>
+              </div>
+            </header>
+
+            <div class="cv-wizard-section-body">
+              {% if senha_form.non_field_errors %}
+                {% include "components/ui/feedback/field_error.html" with errors=senha_form.non_field_errors only %}
+              {% endif %}
+              <div class="field-grid field-grid--cols-2">
+                {% include "components/forms/form_field.html" with field=senha_form.old_password size_class="field-size-2" only %}
+                {% include "components/forms/form_field.html" with field=senha_form.new_password1 size_class="field-size-1" help_text="Mínimo de 8 caracteres; evite senhas comuns ou só números." only %}
+                {% include "components/forms/form_field.html" with field=senha_form.new_password2 size_class="field-size-1" only %}
+              </div>
+            </div>
+
+            {% include "components/ui/layouts/card_footer_section.html" with primary_label="Alterar senha" primary_action="alterar_senha" only %}
+          </section>
+        </form>
+
+        {# ── Áreas, sessão e integrações ── #}
+        <div class="perfil-duo">
+          <section class="cv-wizard-section-card" aria-labelledby="perfil-card-areas-title">
+            <header class="cv-wizard-section-header">
+              <div class="cv-wizard-section-header__copy">
+                <h3 class="cv-wizard-section-title" id="perfil-card-areas-title">Áreas de trabalho</h3>
+                <p class="cv-wizard-section-subtitle">Áreas em que seu usuário está vinculado.</p>
+              </div>
+            </header>
+
+            <div class="cv-wizard-section-body">
+              <ul class="perfil-areas">
+                {% for vinculo in vinculos_area %}
+                  <li class="perfil-areas__item">
+                    <div class="perfil-areas__text">
+                      <span class="perfil-areas__sigla">{{ vinculo.area.sigla }}</span>
+                      <span class="perfil-areas__nome">{{ vinculo.area.nome }}</span>
+                    </div>
+                    {% if vinculo.area_padrao %}
+                      {% include "components/ui/badges/chip.html" with tone="info" label="Padrão" size="compact" only %}
+                    {% endif %}
+                  </li>
+                {% empty %}
+                  <li class="perfil-areas__item perfil-areas__item--empty">Nenhuma área vinculada.</li>
+                {% endfor %}
+              </ul>
+            </div>
+          </section>
+
+          <section class="cv-wizard-section-card" aria-labelledby="perfil-card-sessao-title">
+            <header class="cv-wizard-section-header">
+              <div class="cv-wizard-section-header__copy">
+                <h3 class="cv-wizard-section-title" id="perfil-card-sessao-title">Sessão e integrações</h3>
+                <p class="cv-wizard-section-subtitle">Conexão com o Google Drive e saída do sistema.</p>
+              </div>
+            </header>
+
+            <div class="cv-wizard-section-body">
+              <div class="perfil-sessao">
+                <div class="perfil-sessao__row">
+                  <div class="perfil-sessao__text">
+                    <span class="perfil-sessao__title">Google Drive</span>
+                    <span class="perfil-sessao__hint">A conexão do Drive é individual por usuário institucional.</span>
+                  </div>
+                  <a class="cv-btn cv-btn--secondary cv-btn--sm" href="{% url 'google_drive:index' %}">Abrir integração</a>
+                </div>
+
+                <div class="perfil-sessao__row">
+                  <div class="perfil-sessao__text">
+                    <span class="perfil-sessao__title">Sessão atual</span>
+                    <span class="perfil-sessao__hint">Sai do sistema neste navegador.</span>
+                  </div>
+                  <form method="post" action="{% url 'core:logout' %}">
+                    {% csrf_token %}
+                    <button class="cv-btn cv-btn--danger cv-btn--sm" type="submit">Sair do sistema</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
       </div>
-      <div class="profile-page__identity" aria-label="Usuário conectado">
-        <span class="profile-page__username">{{ request.user.get_username }}</span>
-        <span class="profile-page__email">{{ request.user.email|default:"E-mail não informado" }}</span>
-      </div>
-    </header>
-
-    <div class="profile-page__grid">
-      <section class="profile-page__stack" aria-label="Dados e senha">
-        <div class="profile-page__panel">
-          <h2 class="profile-page__panel-title">Dados do perfil</h2>
-          <p class="profile-page__text">Atualize seu nome e e-mail institucional usado no sistema.</p>
-          <form class="profile-page__form" method="post" novalidate>
-            {% csrf_token %}
-            <input type="hidden" name="action" value="atualizar_perfil">
-            {% if perfil_form.non_field_errors %}<p class="profile-page__error">{{ perfil_form.non_field_errors|join:", " }}</p>{% endif %}
-            <div class="profile-page__fields">
-              {% for field in perfil_form %}
-                <div class="profile-page__field{% if field.name == 'email' %} profile-page__field--wide{% endif %}">
-                  <label class="profile-page__label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-                  {{ field }}
-                  {% if field.help_text %}<p class="profile-page__help">{{ field.help_text }}</p>{% endif %}
-                  {% if field.errors %}<p class="profile-page__error">{{ field.errors|join:", " }}</p>{% endif %}
-                </div>
-              {% endfor %}
-            </div>
-            <div class="profile-page__actions">
-              <button class="profile-page__button" type="submit">Salvar perfil</button>
-            </div>
-          </form>
-        </div>
-
-        <div class="profile-page__panel">
-          <h2 class="profile-page__panel-title">Alterar senha</h2>
-          <p class="profile-page__text">Informe a senha atual e defina uma nova senha de acesso.</p>
-          <form class="profile-page__form" method="post" novalidate>
-            {% csrf_token %}
-            <input type="hidden" name="action" value="alterar_senha">
-            {% if senha_form.non_field_errors %}<p class="profile-page__error">{{ senha_form.non_field_errors|join:", " }}</p>{% endif %}
-            <div class="profile-page__fields">
-              {% for field in senha_form %}
-                <div class="profile-page__field{% if field.name == 'old_password' %} profile-page__field--wide{% endif %}">
-                  <label class="profile-page__label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-                  {{ field }}
-                  {% if field.help_text %}<p class="profile-page__help">{{ field.help_text }}</p>{% endif %}
-                  {% if field.errors %}<p class="profile-page__error">{{ field.errors|join:", " }}</p>{% endif %}
-                </div>
-              {% endfor %}
-            </div>
-            <div class="profile-page__actions">
-              <button class="profile-page__button" type="submit">Alterar senha</button>
-            </div>
-          </form>
-        </div>
-      </section>
-
-      <aside class="profile-page__stack" aria-label="Sessão e acessos">
-        <div class="profile-page__panel">
-          <h2 class="profile-page__panel-title">Sessão</h2>
-          <p class="profile-page__text">Use esta ação para sair do sistema neste navegador.</p>
-          <form class="profile-page__form" method="post" action="{% url 'core:logout' %}">
-            {% csrf_token %}
-            <div class="profile-page__actions">
-              <button class="profile-page__button profile-page__button--danger" type="submit">Sair do sistema</button>
-            </div>
-          </form>
-        </div>
-
-        <div class="profile-page__panel">
-          <h2 class="profile-page__panel-title">Áreas de trabalho</h2>
-          <p class="profile-page__text">Áreas em que seu usuário está vinculado.</p>
-          <ul class="profile-page__list">
-            {% for vinculo in vinculos_area %}
-              <li class="profile-page__item">
-                <div>
-                  <strong>{{ vinculo.area.sigla }}</strong>
-                  <div>{{ vinculo.area.nome }}</div>
-                </div>
-                {% if vinculo.area_padrao %}<span class="profile-page__badge">Padrão</span>{% endif %}
-              </li>
-            {% empty %}
-              <li class="profile-page__item">Nenhuma área vinculada.</li>
-            {% endfor %}
-          </ul>
-        </div>
-
-        <div class="profile-page__panel">
-          <h2 class="profile-page__panel-title">Google Drive</h2>
-          <p class="profile-page__text">A conexão do Drive é individual por usuário institucional.</p>
-          <div class="profile-page__actions" style="margin-top: 14px;">
-            <a class="profile-page__button profile-page__button--ghost" href="{% url 'google_drive:index' %}">Abrir integração</a>
-          </div>
-        </div>
-      </aside>
-    </div>
+    </main>
   </div>
 {% endblock %}

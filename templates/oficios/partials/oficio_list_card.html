@@ -74,30 +74,25 @@
               data-action-menu-trigger
               data-action-menu-target="termo-action-menu-{{ card.oficio_pk }}-{{ s.servidor_pk }}"
             >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="more" only %}</button>
-            <div class="cv-action-menu" id="termo-action-menu-{{ card.oficio_pk }}-{{ s.servidor_pk }}" role="menu" hidden>
+            <div class="cv-action-menu cv-action-menu--rich" id="termo-action-menu-{{ card.oficio_pk }}-{{ s.servidor_pk }}" role="menu" hidden>
+              {% if s.termo_assinado %}
+                {% include "components/ui/menus/rich_menu_header.html" with title="Termo assinado" subtitle=s.name icon="sign" only %}
+              {% else %}
+                {% include "components/ui/menus/rich_menu_header.html" with title="Termo do servidor" subtitle=s.name icon="document" only %}
+              {% endif %}
               {% if s.termo_open_url %}
-              <a class="cv-action-menu__item cv-action-menu__item--preview" href="{{ s.termo_open_url }}" target="_blank" rel="noopener noreferrer" role="menuitem">
-                {% include "dev/ui_lab/partials/_cv_icon.html" with icon="eye" only %}
-                <span>Visualizar termo</span>
-              </a>
+                {% include "components/ui/menus/rich_menu_link.html" with href=s.termo_open_url title="Visualizar termo" description="Abrir o documento no navegador" icon="eye" tone="preview" target_blank=True only %}
               {% endif %}
               {% if s.termo_pdf_url %}
-              <a class="cv-action-menu__item cv-action-menu__item--pdf" href="{{ s.termo_pdf_url }}" download role="menuitem">
-                {% include "dev/ui_lab/partials/_cv_icon.html" with icon="pdf" only %}
-                <span>Baixar PDF</span>
-              </a>
+                {% include "components/ui/menus/rich_menu_link.html" with href=s.termo_pdf_url title="Baixar PDF" description="Documento pronto para assinatura" icon="pdf" tone="pdf" download=True only %}
               {% endif %}
               {% if s.termo_docx_url %}
-              <a class="cv-action-menu__item cv-action-menu__item--docx" href="{{ s.termo_docx_url }}" download role="menuitem">
-                {% include "dev/ui_lab/partials/_cv_icon.html" with icon="docx" only %}
-                <span>Baixar DOCX</span>
-              </a>
+                {% include "components/ui/menus/rich_menu_link.html" with href=s.termo_docx_url title="Baixar DOCX" description="Arquivo editável do termo" icon="docx" tone="docx" download=True only %}
               {% endif %}
               {% if s.termo_anexar_assinado_url %}
-              <hr class="cv-action-menu__divider">
               <button
                 type="button"
-                class="cv-action-menu__item cv-action-menu__item--sign{% if s.termo_assinado %} is-assinado{% endif %}"
+                class="cv-action-menu__item cv-action-menu__item--rich{% if s.termo_assinado %} is-assinado{% endif %}"
                 role="menuitem"
                 data-attach-signed-trigger
                 data-attach-signed-url="{{ s.termo_anexar_assinado_url }}"
@@ -106,8 +101,13 @@
                 data-attach-signed-current-view-url="{{ s.termo_assinado_view_url }}"
                 data-attach-signed-current-remove-url="{{ s.termo_remover_assinado_url }}"
               >
-                {% include "dev/ui_lab/partials/_cv_icon.html" with icon="sign" only %}
-                <span>{% if s.termo_assinado %}Gerenciar assinado{% else %}Anexar termo assinado{% endif %}</span>
+                <span class="cv-action-menu__item-icon cv-action-menu__item-icon--success" aria-hidden="true">
+                  {% include "dev/ui_lab/partials/_cv_icon.html" with icon="sign" only %}
+                </span>
+                <span class="cv-action-menu__item-copy">
+                  <strong>{% if s.termo_assinado %}Gerenciar assinado{% else %}Anexar termo assinado{% endif %}</strong>
+                  <small>{% if s.termo_assinado %}Visualizar, substituir ou remover{% else %}Enviar o PDF depois da assinatura{% endif %}</small>
+                </span>
               </button>
               {% endif %}
             </div>
@@ -203,9 +203,22 @@
           </div>
           <div class="oficio-lc__traveller-termo cv-icon-btn-group">
             {% include "components/ui/buttons/icon_button.html" with href=card.justificativa_url action="edit" aria_label="Editar justificativa" tooltip="Editar justificativa" only %}
-            {% include "components/ui/buttons/icon_button.html" with href=card.justificativa_visualizar_url action="preview" aria_label="Visualizar justificativa" tooltip="Visualizar justificativa" only %}
-            {% include "components/ui/buttons/icon_button.html" with href=card.justificativa_pdf_url action="pdf" aria_label="Baixar justificativa em PDF" tooltip="PDF" only %}
-            {% include "components/ui/buttons/icon_button.html" with href=card.justificativa_docx_url action="docx" aria_label="Baixar justificativa em DOCX" tooltip="DOCX" only %}
+            <button
+              class="cv-icon-btn cv-icon-btn--settings"
+              type="button"
+              aria-label="Abrir documentos da justificativa"
+              aria-haspopup="true"
+              aria-expanded="false"
+              data-tooltip="Visualizar e baixar"
+              data-action-menu-trigger
+              data-action-menu-target="justificativa-document-menu-{{ card.oficio_pk }}"
+            >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="folder" only %}</button>
+            <div class="cv-action-menu cv-action-menu--rich" id="justificativa-document-menu-{{ card.oficio_pk }}" role="menu" hidden>
+              {% include "components/ui/menus/rich_menu_header.html" with title="Justificativa" subtitle=card.numero_display icon="folder" only %}
+              {% include "components/ui/menus/rich_menu_link.html" with href=card.justificativa_visualizar_url title="Visualizar justificativa" description="Abrir o documento no navegador" icon="eye" tone="preview" target_blank=True only %}
+              {% include "components/ui/menus/rich_menu_link.html" with href=card.justificativa_pdf_url title="Baixar PDF" description="Documento pronto para impressão" icon="pdf" tone="pdf" download=True only %}
+              {% include "components/ui/menus/rich_menu_link.html" with href=card.justificativa_docx_url title="Baixar DOCX" description="Arquivo editável da justificativa" icon="docx" tone="docx" download=True only %}
+            </div>
           </div>
         </div>
       </div>
@@ -216,9 +229,22 @@
       <div class="oficio-lc__footer-actions">
         <div class="oficio-lc__footer-actions-main cv-icon-btn-group">
           {% include "components/ui/buttons/icon_button.html" with href=card.editar_url action="edit" aria_label="Editar ofício" tooltip="Editar" only %}
-          {% include "components/ui/buttons/icon_button.html" with href=card.visualizar_url action="preview" aria_label="Visualizar ofício" tooltip="Visualizar" only %}
-          {% include "components/ui/buttons/icon_button.html" with href=card.pdf_url action="pdf" aria_label="Baixar PDF do ofício" tooltip="PDF" only %}
-          {% include "components/ui/buttons/icon_button.html" with href=card.docx_url action="docx" aria_label="Baixar DOCX do ofício" tooltip="DOCX" only %}
+          <button
+            class="cv-icon-btn cv-icon-btn--settings"
+            type="button"
+            aria-label="Abrir documentos do ofício {{ card.numero_display }}"
+            aria-haspopup="true"
+            aria-expanded="false"
+            data-tooltip="Visualizar e baixar"
+            data-action-menu-trigger
+            data-action-menu-target="oficio-document-menu-{{ card.oficio_pk }}"
+          >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="folder" only %}</button>
+          <div class="cv-action-menu cv-action-menu--rich" id="oficio-document-menu-{{ card.oficio_pk }}" role="menu" hidden>
+            {% include "components/ui/menus/rich_menu_header.html" with title="Documentos do ofício" subtitle=card.numero_display icon="folder" only %}
+            {% include "components/ui/menus/rich_menu_link.html" with href=card.visualizar_url title="Visualizar ofício" description="Abrir o documento no navegador" icon="eye" tone="preview" target_blank=True only %}
+            {% include "components/ui/menus/rich_menu_link.html" with href=card.pdf_url title="Baixar PDF" description="Documento pronto para impressão" icon="pdf" tone="pdf" download=True only %}
+            {% include "components/ui/menus/rich_menu_link.html" with href=card.docx_url title="Baixar DOCX" description="Arquivo editável do ofício" icon="docx" tone="docx" download=True only %}
+          </div>
         </div>
         <div class="oficio-lc__footer-actions-danger cv-icon-btn-group">
           <button
@@ -233,44 +259,59 @@
           >
             {% include "dev/ui_lab/partials/_cv_icon.html" with icon="more" only %}
           </button>
-          <div class="cv-action-menu" id="oficio-action-menu-{{ card.oficio_pk }}" role="menu" hidden>
+          <div class="cv-action-menu cv-action-menu--rich" id="oficio-action-menu-{{ card.oficio_pk }}" role="menu" hidden>
+            {% include "components/ui/menus/rich_menu_header.html" with title="Gerenciar ofício" subtitle=card.numero_display icon="settings" only %}
             <form method="post" action="{{ card.retificar_url }}" class="cv-action-menu__form">
               {% csrf_token %}
-              <button type="submit" class="cv-action-menu__item cv-action-menu__item--retificar" role="menuitem">
-                {% include "dev/ui_lab/partials/_cv_icon.html" with icon="sync" only %}
-                <span>{% if card.retificado %}Desfazer retificação{% else %}Retificar ofício{% endif %}</span>
+              <button type="submit" class="cv-action-menu__item cv-action-menu__item--rich" role="menuitem">
+                <span class="cv-action-menu__item-icon cv-action-menu__item-icon--preview" aria-hidden="true">
+                  {% include "dev/ui_lab/partials/_cv_icon.html" with icon="sync" only %}
+                </span>
+                <span class="cv-action-menu__item-copy">
+                  <strong>{% if card.retificado %}Desfazer retificação{% else %}Retificar ofício{% endif %}</strong>
+                  <small>Atualizar o estado de retificação</small>
+                </span>
               </button>
             </form>
             <form method="post" action="{{ card.marcar_complementar_url }}" class="cv-action-menu__form">
               {% csrf_token %}
-              <button type="submit" class="cv-action-menu__item cv-action-menu__item--complementar" role="menuitem">
-                {% include "dev/ui_lab/partials/_cv_icon.html" with icon="plus" only %}
-                <span>{% if card.complementar %}Desfazer complementar{% else %}Ofício complementar{% endif %}</span>
+              <button type="submit" class="cv-action-menu__item cv-action-menu__item--rich" role="menuitem">
+                <span class="cv-action-menu__item-icon cv-action-menu__item-icon--edit" aria-hidden="true">
+                  {% include "dev/ui_lab/partials/_cv_icon.html" with icon="plus" only %}
+                </span>
+                <span class="cv-action-menu__item-copy">
+                  <strong>{% if card.complementar %}Desfazer complementar{% else %}Ofício complementar{% endif %}</strong>
+                  <small>Identificar o documento como complementar</small>
+                </span>
               </button>
             </form>
             {% if not card.cancelado %}
             <button
               type="button"
-              class="cv-action-menu__item cv-action-menu__item--cancel"
+              class="cv-action-menu__item cv-action-menu__item--rich"
               role="menuitem"
               data-cancel-modal-trigger
               data-cancel-url="{{ card.cancelar_url }}"
               data-cancel-label="{{ card.numero_display }}"
             >
-              {% include "dev/ui_lab/partials/_cv_icon.html" with icon="ban" only %}
-              <span>Cancelar ofício</span>
+              <span class="cv-action-menu__item-icon cv-action-menu__item-icon--warning" aria-hidden="true">
+                {% include "dev/ui_lab/partials/_cv_icon.html" with icon="ban" only %}
+              </span>
+              <span class="cv-action-menu__item-copy"><strong>Cancelar ofício</strong><small>Interromper o fluxo mantendo o histórico</small></span>
             </button>
             {% endif %}
             <button
               type="button"
-              class="cv-action-menu__item cv-action-menu__item--delete"
+              class="cv-action-menu__item cv-action-menu__item--rich"
               role="menuitem"
               data-delete-modal-trigger
               data-delete-url="{{ card.excluir_url }}"
               data-delete-label="{{ card.numero_display }}"
             >
-              {% include "dev/ui_lab/partials/_cv_icon.html" with icon="delete" only %}
-              <span>Excluir ofício</span>
+              <span class="cv-action-menu__item-icon cv-action-menu__item-icon--danger" aria-hidden="true">
+                {% include "dev/ui_lab/partials/_cv_icon.html" with icon="delete" only %}
+              </span>
+              <span class="cv-action-menu__item-copy"><strong>Excluir ofício</strong><small>Remover permanentemente quando permitido</small></span>
             </button>
           </div>
         </div>

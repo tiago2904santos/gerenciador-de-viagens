@@ -4,7 +4,7 @@
   {% endif %}
   <div class="simple-list" role="list" data-cv-list-container>
     {% for row in rows %}
-      {% include "components/lists/simple_list_row.html" with row=row %}
+      {% include "components/lists/simple_list_row.html" with row=row row_index=forloop.counter %}
     {% endfor %}
   </div>
   <div data-cv-empty-state hidden>

@@ -86,13 +86,28 @@
 }
 
 .evento-lc .oficio-lc__trechos-list {
+  box-sizing: border-box;
   flex: 0 0 auto;
   height: auto;
   max-height: 264px;
-  overflow-x: visible;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
   overflow-y: auto;
   scrollbar-color: var(--color-border-strong) transparent;
   scrollbar-width: thin;
+  width: 100%;
+}
+
+.evento-lc .oficio-lc__trechos-list > .oficio-lc__trecho {
+  box-sizing: border-box;
+  max-width: 100%;
+  min-width: 0;
+  width: 100%;
+}
+
+.evento-lc .oficio-lc__trechos-list .oficio-lc__trecho-body {
+  min-width: 0;
 }
 
 .evento-lc .oficio-lc__trechos-list::-webkit-scrollbar {
@@ -148,7 +163,7 @@
 
 .evento-lc__sections > .oficio-lc__oficios-list {
   max-height: 165px;
-  overflow-x: visible;
+  overflow-x: hidden;
   overflow-y: auto;
   scrollbar-color: var(--color-border-strong) transparent;
   scrollbar-width: thin;

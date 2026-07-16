@@ -1,427 +1,220 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block extra_css %}
-  <style>
-    .workspace-admin {
-      --admin-bg: #f6f8fb;
-      --admin-panel: #ffffff;
-      --admin-border: #d9e2ef;
-      --admin-text: #172033;
-      --admin-muted: #64748b;
-      --admin-primary: #0f4c81;
-      --admin-primary-strong: #08345d;
-      --admin-success-bg: #e7f7ee;
-      --admin-success-text: #17633b;
-      display: grid;
-      gap: 18px;
-      color: var(--admin-text);
-    }
-
-    .workspace-admin__header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 20px;
-      border: 1px solid var(--admin-border);
-      border-radius: 8px;
-      background: var(--admin-panel);
-    }
-
-    .workspace-admin__eyebrow {
-      margin: 0 0 6px;
-      color: var(--admin-primary);
-      font-size: .76rem;
-      font-weight: 800;
-      letter-spacing: 0;
-      text-transform: uppercase;
-    }
-
-    .workspace-admin__title {
-      margin: 0;
-      font-size: clamp(1.35rem, 2vw, 1.8rem);
-      line-height: 1.15;
-    }
-
-    .workspace-admin__description {
-      max-width: 760px;
-      margin: 8px 0 0;
-      color: var(--admin-muted);
-      line-height: 1.5;
-    }
-
-    .workspace-admin__lock {
-      flex: 0 0 auto;
-      border-radius: 6px;
-      background: #eef4fb;
-      color: var(--admin-primary);
-      padding: 8px 10px;
-      font-size: .82rem;
-      font-weight: 800;
-    }
-
-    .workspace-admin__forms {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(250px, 1fr));
-      gap: 14px;
-      align-items: start;
-    }
-
-    .workspace-admin__panel {
-      min-width: 0;
-      border: 1px solid var(--admin-border);
-      border-radius: 8px;
-      background: var(--admin-panel);
-      padding: 16px;
-    }
-
-    .workspace-admin__panel-title {
-      margin: 0;
-      font-size: 1rem;
-      line-height: 1.2;
-    }
-
-    .workspace-admin__panel-text {
-      margin: 6px 0 14px;
-      color: var(--admin-muted);
-      font-size: .9rem;
-      line-height: 1.45;
-    }
-
-    .workspace-admin__form {
-      display: grid;
-      gap: 12px;
-    }
-
-    .workspace-admin__fields {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .workspace-admin__field {
-      min-width: 0;
-      display: grid;
-      gap: 5px;
-    }
-
-    .workspace-admin__field--wide,
-    .workspace-admin__field--check {
-      grid-column: 1 / -1;
-    }
-
-    .workspace-admin__label {
-      color: var(--admin-text);
-      font-size: .82rem;
-      font-weight: 800;
-    }
-
-    .workspace-admin__field input:not([type="checkbox"]),
-    .workspace-admin__field select {
-      width: 100%;
-      min-height: 42px;
-      box-sizing: border-box;
-      border: 1px solid #bfccdc;
-      border-radius: 6px;
-      background: #ffffff;
-      color: var(--admin-text);
-      padding: 9px 10px;
-      font: inherit;
-    }
-
-    .workspace-admin__field input:focus,
-    .workspace-admin__field select:focus {
-      outline: 3px solid rgba(15, 76, 129, .16);
-      border-color: var(--admin-primary);
-    }
-
-    .workspace-admin__check {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-height: 42px;
-      padding: 9px 10px;
-      border: 1px solid #bfccdc;
-      border-radius: 6px;
-      background: #f8fafc;
-      color: var(--admin-text);
-      font-weight: 700;
-    }
-
-    .workspace-admin__check input {
-      width: 18px;
-      height: 18px;
-      margin: 0;
-      accent-color: var(--admin-primary);
-    }
-
-    .workspace-admin__help {
-      margin: 0;
-      color: var(--admin-muted);
-      font-size: .78rem;
-      line-height: 1.35;
-    }
-
-    .workspace-admin__error {
-      margin: 0;
-      color: #b42318;
-      font-size: .82rem;
-      line-height: 1.35;
-    }
-
-    .workspace-admin__submit {
-      justify-self: start;
-      min-height: 40px;
-      border: 0;
-      border-radius: 6px;
-      padding: 9px 14px;
-      background: var(--admin-primary);
-      color: #ffffff;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    .workspace-admin__submit:hover {
-      background: var(--admin-primary-strong);
-    }
-
-    .workspace-admin__lists {
-      display: grid;
-      grid-template-columns: minmax(0, .9fr) minmax(0, 1.4fr);
-      gap: 14px;
-    }
-
-    .workspace-admin__table-wrap {
-      overflow-x: auto;
-    }
-
-    .workspace-admin__table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: .9rem;
-    }
-
-    .workspace-admin__table th,
-    .workspace-admin__table td {
-      padding: 9px 8px;
-      border-bottom: 1px solid var(--admin-border);
-      text-align: left;
-      vertical-align: middle;
-    }
-
-    .workspace-admin__table th {
-      color: var(--admin-muted);
-      font-size: .74rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      white-space: nowrap;
-    }
-
-    .workspace-admin__table td {
-      color: var(--admin-text);
-    }
-
-    .workspace-admin__badge {
-      display: inline-flex;
-      align-items: center;
-      min-height: 22px;
-      padding: 2px 8px;
-      border-radius: 999px;
-      background: var(--admin-success-bg);
-      color: var(--admin-success-text);
-      font-size: .74rem;
-      font-weight: 800;
-      white-space: nowrap;
-    }
-
-    .workspace-admin__badge--muted {
-      background: #eef2f7;
-      color: #526070;
-    }
-
-    @media (max-width: 1180px) {
-      .workspace-admin__forms,
-      .workspace-admin__lists {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 720px) {
-      .workspace-admin__header {
-        display: grid;
-      }
-
-      .workspace-admin__fields {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="{% static 'css/workspace-admin.css' %}?v=20260716-redesign">
 {% endblock %}
 
 {% block content %}
-  <div class="page-shell page-shell--standard-simple workspace-admin">
-    <header class="workspace-admin__header">
-      <div>
-        <p class="workspace-admin__eyebrow">Administração</p>
-        <h1 class="workspace-admin__title">{{ page_title }}</h1>
-        <p class="workspace-admin__description">{{ page_description }}</p>
-      </div>
-      <span class="workspace-admin__lock">Acesso administrativo</span>
-    </header>
+  <div class="page-shell page-shell--wizard">
+    {% include "components/ui/headers/header_stack_simple.html" with eyebrow="Administração" title=page_title description=page_description icon_label="AD" module_label="Administração" status_label="Acesso administrativo" status_variant="pending" only %}
 
-    <section class="workspace-admin__forms" aria-label="Cadastros administrativos">
-      <form class="workspace-admin__panel workspace-admin__form" method="post" novalidate>
-        {% csrf_token %}
-        <input type="hidden" name="action" value="criar_area">
-        <div>
-          <h2 class="workspace-admin__panel-title">Criar área</h2>
-          <p class="workspace-admin__panel-text">Cadastre ASCOM, DPCAP ou qualquer outra área de trabalho.</p>
-        </div>
-        {% if area_form.non_field_errors %}<p class="workspace-admin__error">{{ area_form.non_field_errors|join:", " }}</p>{% endif %}
-        <div class="workspace-admin__fields">
-          {% for field in area_form %}
-            <div class="workspace-admin__field{% if field.field.widget.input_type == 'checkbox' %} workspace-admin__field--check{% endif %}{% if field.name == 'nome' %} workspace-admin__field--wide{% endif %}">
-              {% if field.field.widget.input_type == 'checkbox' %}
-                <label class="workspace-admin__check" for="{{ field.id_for_label }}">{{ field }} <span>{{ field.label }}</span></label>
-              {% else %}
-                <label class="workspace-admin__label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-                {{ field }}
+    <main class="main-form-panel main-form-panel--stack">
+      <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
+
+        {# ── Criar área ── #}
+        <form method="post" novalidate>
+          {% csrf_token %}
+          <section class="cv-wizard-section-card" aria-labelledby="admin-card-area-title">
+            <header class="cv-wizard-section-header">
+              <div class="cv-wizard-section-header__copy">
+                <h3 class="cv-wizard-section-title" id="admin-card-area-title">Criar área</h3>
+                <p class="cv-wizard-section-subtitle">Cadastre ASCOM, DPCAP ou qualquer outra área de trabalho.</p>
+              </div>
+            </header>
+
+            <div class="cv-wizard-section-body">
+              {% if area_form.non_field_errors %}
+                {% include "components/ui/feedback/field_error.html" with errors=area_form.non_field_errors only %}
               {% endif %}
-              {% if field.help_text %}<p class="workspace-admin__help">{{ field.help_text }}</p>{% endif %}
-              {% if field.errors %}<p class="workspace-admin__error">{{ field.errors|join:", " }}</p>{% endif %}
+              <div class="field-grid field-grid--cols-3">
+                {% include "components/forms/form_field.html" with field=area_form.nome size_class="field-size-2" only %}
+                {% include "components/forms/form_field.html" with field=area_form.sigla size_class="field-size-1" only %}
+              </div>
             </div>
-          {% endfor %}
-        </div>
-        <button class="workspace-admin__submit" type="submit">Criar área</button>
-      </form>
 
-      <form class="workspace-admin__panel workspace-admin__form" method="post" novalidate>
-        {% csrf_token %}
-        <input type="hidden" name="action" value="criar_usuario">
-        <div>
-          <h2 class="workspace-admin__panel-title">Criar usuário</h2>
-          <p class="workspace-admin__panel-text">Cria o login e já vincula o usuário à área escolhida.</p>
-        </div>
-        {% if usuario_form.non_field_errors %}<p class="workspace-admin__error">{{ usuario_form.non_field_errors|join:", " }}</p>{% endif %}
-        <div class="workspace-admin__fields">
-          {% for field in usuario_form %}
-            <div class="workspace-admin__field{% if field.field.widget.input_type == 'checkbox' %} workspace-admin__field--check{% endif %}{% if field.name == 'email' or field.name == 'area' %} workspace-admin__field--wide{% endif %}">
-              {% if field.field.widget.input_type == 'checkbox' %}
-                <label class="workspace-admin__check" for="{{ field.id_for_label }}">{{ field }} <span>{{ field.label }}</span></label>
-              {% else %}
-                <label class="workspace-admin__label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-                {{ field }}
+            {% include "components/ui/layouts/card_footer_section.html" with primary_label="Criar área" primary_action="criar_area" only %}
+          </section>
+        </form>
+
+        {# ── Criar usuário ── #}
+        <form method="post" novalidate>
+          {% csrf_token %}
+          <section class="cv-wizard-section-card" aria-labelledby="admin-card-usuario-title">
+            <header class="cv-wizard-section-header">
+              <div class="cv-wizard-section-header__copy">
+                <h3 class="cv-wizard-section-title" id="admin-card-usuario-title">Criar usuário</h3>
+                <p class="cv-wizard-section-subtitle">Cria o login e já vincula o usuário à área escolhida.</p>
+              </div>
+            </header>
+
+            <div class="cv-wizard-section-body">
+              {% if usuario_form.non_field_errors %}
+                {% include "components/ui/feedback/field_error.html" with errors=usuario_form.non_field_errors only %}
               {% endif %}
-              {% if field.help_text %}<p class="workspace-admin__help">{{ field.help_text }}</p>{% endif %}
-              {% if field.errors %}<p class="workspace-admin__error">{{ field.errors|join:", " }}</p>{% endif %}
-            </div>
-          {% endfor %}
-        </div>
-        <button class="workspace-admin__submit" type="submit">Criar usuário</button>
-      </form>
+              <div class="field-grid field-grid--cols-2">
+                {% include "components/forms/form_field.html" with field=usuario_form.username size_class="field-size-1" only %}
+                {% include "components/forms/form_field.html" with field=usuario_form.email size_class="field-size-1" only %}
+                {% include "components/forms/form_field.html" with field=usuario_form.first_name size_class="field-size-1" only %}
+                {% include "components/forms/form_field.html" with field=usuario_form.last_name size_class="field-size-1" only %}
+                {% include "components/forms/form_field.html" with field=usuario_form.password1 size_class="field-size-1" only %}
+                {% include "components/forms/form_field.html" with field=usuario_form.password2 size_class="field-size-1" only %}
+              </div>
 
-      <form class="workspace-admin__panel workspace-admin__form" method="post" novalidate>
-        {% csrf_token %}
-        <input type="hidden" name="action" value="vincular_usuario">
-        <div>
-          <h2 class="workspace-admin__panel-title">Vincular existente</h2>
-          <p class="workspace-admin__panel-text">Use quando o usuário já existe e precisa acessar outra área.</p>
-        </div>
-        {% if vinculo_form.non_field_errors %}<p class="workspace-admin__error">{{ vinculo_form.non_field_errors|join:", " }}</p>{% endif %}
-        <div class="workspace-admin__fields">
-          {% for field in vinculo_form %}
-            <div class="workspace-admin__field{% if field.field.widget.input_type == 'checkbox' %} workspace-admin__field--check{% endif %}{% if field.name == 'usuario' or field.name == 'area' %} workspace-admin__field--wide{% endif %}">
-              {% if field.field.widget.input_type == 'checkbox' %}
-                <label class="workspace-admin__check" for="{{ field.id_for_label }}">{{ field }} <span>{{ field.label }}</span></label>
-              {% else %}
-                <label class="workspace-admin__label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-                {{ field }}
+              <section class="wizard-inner-section" aria-labelledby="admin-usuario-acesso-section">
+                <header class="wizard-inner-section__header">
+                  <h4 class="wizard-inner-section__title" id="admin-usuario-acesso-section">Acesso à área</h4>
+                </header>
+                <div class="field-grid field-grid--cols-2">
+                  {% include "components/forms/form_field.html" with field=usuario_form.area size_class="field-size-1" help_text=usuario_form.area.help_text only %}
+                  {% include "components/forms/form_field.html" with field=usuario_form.papel size_class="field-size-1" only %}
+                </div>
+                <div class="field-grid field-grid--cols-2">
+                  {% include "components/forms/card_toggle.html" with field=usuario_form.area_padrao title="Área padrão" on_label="SIM" off_label="NÃO" only %}
+                  {% include "components/forms/card_toggle.html" with field=usuario_form.is_staff title="Admin" on_label="SIM" off_label="NÃO" only %}
+                </div>
+              </section>
+            </div>
+
+            {% include "components/ui/layouts/card_footer_section.html" with primary_label="Criar usuário" primary_action="criar_usuario" only %}
+          </section>
+        </form>
+
+        {# ── Vincular usuário existente ── #}
+        <form method="post" novalidate>
+          {% csrf_token %}
+          <section class="cv-wizard-section-card" aria-labelledby="admin-card-vinculo-title">
+            <header class="cv-wizard-section-header">
+              <div class="cv-wizard-section-header__copy">
+                <h3 class="cv-wizard-section-title" id="admin-card-vinculo-title">Vincular usuário existente</h3>
+                <p class="cv-wizard-section-subtitle">Use quando o usuário já existe e precisa acessar outra área.</p>
+              </div>
+            </header>
+
+            <div class="cv-wizard-section-body">
+              {% if vinculo_form.non_field_errors %}
+                {% include "components/ui/feedback/field_error.html" with errors=vinculo_form.non_field_errors only %}
               {% endif %}
-              {% if field.help_text %}<p class="workspace-admin__help">{{ field.help_text }}</p>{% endif %}
-              {% if field.errors %}<p class="workspace-admin__error">{{ field.errors|join:", " }}</p>{% endif %}
+              <div class="field-grid field-grid--cols-3">
+                {% include "components/forms/form_field.html" with field=vinculo_form.usuario size_class="field-size-1" only %}
+                {% include "components/forms/form_field.html" with field=vinculo_form.area size_class="field-size-1" only %}
+                {% include "components/forms/form_field.html" with field=vinculo_form.papel size_class="field-size-1" only %}
+              </div>
+              <div class="field-grid field-grid--cols-2">
+                {% include "components/forms/card_toggle.html" with field=vinculo_form.area_padrao title="Área padrão" on_label="SIM" off_label="NÃO" only %}
+              </div>
             </div>
-          {% endfor %}
-        </div>
-        <button class="workspace-admin__submit" type="submit">Salvar vínculo</button>
-      </form>
-    </section>
 
-    <section class="workspace-admin__lists" aria-label="Áreas e vínculos cadastrados">
-      <div class="workspace-admin__panel">
-        <h3 class="workspace-admin__panel-title">Áreas cadastradas</h3>
-        <p class="workspace-admin__panel-text">Quantidade de usuários vinculados por área.</p>
-        <div class="workspace-admin__table-wrap">
-          <table class="workspace-admin__table">
-            <thead>
-              <tr>
-                <th>Sigla</th>
-                <th>Nome</th>
-                <th>Status</th>
-                <th>Usuários</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for area in areas %}
-                <tr>
-                  <td><strong>{{ area.sigla }}</strong></td>
-                  <td>{{ area.nome }}</td>
-                  <td>
-                    {% if area.ativa %}
-                      <span class="workspace-admin__badge">Ativa</span>
-                    {% else %}
-                      <span class="workspace-admin__badge workspace-admin__badge--muted">Inativa</span>
-                    {% endif %}
-                  </td>
-                  <td>{{ area.vinculos_usuario.count }}</td>
-                </tr>
-              {% empty %}
-                <tr><td colspan="4">Nenhuma área cadastrada.</td></tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>
+            {% include "components/ui/layouts/card_footer_section.html" with primary_label="Salvar vínculo" primary_action="vincular_usuario" only %}
+          </section>
+        </form>
 
-      <div class="workspace-admin__panel">
-        <h3 class="workspace-admin__panel-title">Usuários e acessos</h3>
-        <p class="workspace-admin__panel-text">Conferência dos vínculos ativos e áreas padrão.</p>
-        <div class="workspace-admin__table-wrap">
-          <table class="workspace-admin__table">
-            <thead>
-              <tr>
-                <th>Usuário</th>
-                <th>E-mail</th>
-                <th>Área</th>
-                <th>Perfil</th>
-                <th>Padrão</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for vinculo in vinculos %}
-                <tr>
-                  <td><strong>{{ vinculo.usuario.get_username }}</strong></td>
-                  <td>{{ vinculo.usuario.email|default:"-" }}</td>
-                  <td>{{ vinculo.area.sigla }}</td>
-                  <td>{{ vinculo.get_papel_display }}</td>
-                  <td>{% if vinculo.area_padrao %}Sim{% else %}Não{% endif %}</td>
-                  <td>
-                    {% if vinculo.ativo %}
-                      <span class="workspace-admin__badge">Ativo</span>
-                    {% else %}
-                      <span class="workspace-admin__badge workspace-admin__badge--muted">Inativo</span>
-                    {% endif %}
-                  </td>
-                </tr>
-              {% empty %}
-                <tr><td colspan="6">Nenhum vínculo cadastrado.</td></tr>
-              {% endfor %}
-            </tbody>
-          </table>
+        {# ── Conferência: áreas e vínculos ── #}
+        <div class="workspace-admin-tables">
+          <section class="cv-wizard-section-card" aria-labelledby="admin-card-areas-lista-title">
+            <header class="cv-wizard-section-header">
+              <div class="cv-wizard-section-header__copy">
+                <h3 class="cv-wizard-section-title" id="admin-card-areas-lista-title">Áreas cadastradas</h3>
+                <p class="cv-wizard-section-subtitle">Quantidade de usuários vinculados por área.</p>
+              </div>
+              <div class="cv-wizard-section-header__meta">
+                {% include "components/ui/badges/chip.html" with tone="info" label="Áreas" count=areas|length size="compact" only %}
+              </div>
+            </header>
+
+            <div class="cv-wizard-section-body">
+              <div class="admin-table-wrap">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Sigla</th>
+                      <th>Nome</th>
+                      <th>Status</th>
+                      <th>Usuários</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for area in areas %}
+                      <tr>
+                        <td><strong>{{ area.sigla }}</strong></td>
+                        <td>{{ area.nome }}</td>
+                        <td>
+                          {% if area.ativa %}
+                            {% include "components/ui/badges/chip.html" with tone="success" label="Ativa" size="compact" only %}
+                          {% else %}
+                            {% include "components/ui/badges/chip.html" with tone="muted" label="Inativa" size="compact" only %}
+                          {% endif %}
+                        </td>
+                        <td>{{ area.vinculos_usuario.count }}</td>
+                      </tr>
+                    {% empty %}
+                      <tr><td colspan="4" class="admin-table__empty">Nenhuma área cadastrada.</td></tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <section class="cv-wizard-section-card" aria-labelledby="admin-card-vinculos-lista-title">
+            <header class="cv-wizard-section-header">
+              <div class="cv-wizard-section-header__copy">
+                <h3 class="cv-wizard-section-title" id="admin-card-vinculos-lista-title">Usuários e acessos</h3>
+                <p class="cv-wizard-section-subtitle">Conferência dos vínculos ativos e áreas padrão.</p>
+              </div>
+              <div class="cv-wizard-section-header__meta">
+                {% include "components/ui/badges/chip.html" with tone="info" label="Vínculos" count=vinculos|length size="compact" only %}
+              </div>
+            </header>
+
+            <div class="cv-wizard-section-body">
+              <div class="admin-table-wrap">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Usuário</th>
+                      <th>E-mail</th>
+                      <th>Área</th>
+                      <th>Perfil</th>
+                      <th>Padrão</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for vinculo in vinculos %}
+                      <tr>
+                        <td><strong>{{ vinculo.usuario.get_username }}</strong></td>
+                        <td>{{ vinculo.usuario.email|default:"-" }}</td>
+                        <td>{{ vinculo.area.sigla }}</td>
+                        <td>{{ vinculo.get_papel_display }}</td>
+                        <td>
+                          {% if vinculo.area_padrao %}
+                            {% include "components/ui/badges/chip.html" with tone="info" label="Padrão" size="compact" only %}
+                          {% else %}
+                            <span class="admin-table__empty">—</span>
+                          {% endif %}
+                        </td>
+                        <td>
+                          {% if vinculo.ativo %}
+                            {% include "components/ui/badges/chip.html" with tone="success" label="Ativo" size="compact" only %}
+                          {% else %}
+                            {% include "components/ui/badges/chip.html" with tone="muted" label="Inativo" size="compact" only %}
+                          {% endif %}
+                        </td>
+                      </tr>
+                    {% empty %}
+                      <tr><td colspan="6" class="admin-table__empty">Nenhum vínculo cadastrado.</td></tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
         </div>
+
       </div>
-    </section>
+    </main>
   </div>
 {% endblock %}

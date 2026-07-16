@@ -1,0 +1,17 @@
+<a
+  class="cv-action-menu__item cv-action-menu__item--rich{% if extra_class %} {{ extra_class }}{% endif %}"
+  href="{{ href }}"
+  role="menuitem"
+  {% if download %}download{% endif %}
+  {% if target_blank %}target="_blank" rel="noopener noreferrer"{% endif %}
+  {% if extra_download_url %}data-extra-download-url="{{ extra_download_url }}"{% endif %}
+  {% if data_download_all_termos %}data-download-all-termos{% endif %}
+>
+  <span class="cv-action-menu__item-icon{% if tone %} cv-action-menu__item-icon--{{ tone }}{% endif %}" aria-hidden="true">
+    {% include "dev/ui_lab/partials/_cv_icon.html" with icon=icon only %}
+  </span>
+  <span class="cv-action-menu__item-copy">
+    <strong>{{ title }}</strong>
+    {% if description %}<small>{{ description }}</small>{% endif %}
+  </span>
+</a>

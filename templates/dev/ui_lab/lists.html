@@ -49,7 +49,7 @@
           <div class="list-panel">
             <div class="simple-list" role="list" aria-label="Lista de itens (demonstração)">
               {% for row in ui_lab_simple_rows %}
-                {% include "components/lists/simple_list_row.html" with row=row only %}
+                {% include "components/lists/simple_list_row.html" with row=row row_index=forloop.counter only %}
               {% endfor %}
             </div>
             <div data-cv-empty-state hidden>
@@ -117,7 +117,7 @@
           <div class="list-panel">
             <div class="simple-list" role="list" aria-label="Lista com quick add (demonstração)">
               {% for row in ui_lab_simple_rows %}
-                {% include "components/lists/simple_list_row.html" with row=row only %}
+                {% include "components/lists/simple_list_row.html" with row=row row_index=forloop.counter only %}
               {% endfor %}
             </div>
             <div data-cv-empty-state hidden>

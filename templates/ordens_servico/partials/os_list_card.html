@@ -80,9 +80,22 @@
       <div class="oficio-lc__footer-actions">
         <div class="oficio-lc__footer-actions-main cv-icon-btn-group">
           {% include "components/ui/buttons/icon_button.html" with href=card.editar_url action="edit" aria_label="Editar Ordem de Serviço" tooltip="Editar" only %}
-          {% include "components/ui/buttons/icon_button.html" with href=card.visualizar_url action="preview" aria_label="Visualizar Ordem de Serviço" tooltip="Visualizar" only %}
-          {% include "components/ui/buttons/icon_button.html" with href=card.pdf_url action="pdf" aria_label="Baixar PDF da Ordem de Serviço" tooltip="PDF" only %}
-          {% include "components/ui/buttons/icon_button.html" with href=card.docx_url action="docx" aria_label="Baixar DOCX da Ordem de Serviço" tooltip="DOCX" only %}
+          <button
+            class="cv-icon-btn cv-icon-btn--settings"
+            type="button"
+            aria-label="Abrir documentos da Ordem de Serviço {{ card.numero_display }}"
+            aria-haspopup="true"
+            aria-expanded="false"
+            data-tooltip="Visualizar e baixar"
+            data-action-menu-trigger
+            data-action-menu-target="os-document-menu-{{ card.pk }}"
+          >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="folder" only %}</button>
+          <div class="cv-action-menu cv-action-menu--rich" id="os-document-menu-{{ card.pk }}" role="menu" hidden>
+            {% include "components/ui/menus/rich_menu_header.html" with title="Ordem de Serviço" subtitle=card.numero_display icon="folder" only %}
+            {% include "components/ui/menus/rich_menu_link.html" with href=card.visualizar_url title="Visualizar documento" description="Abrir a Ordem de Serviço" icon="eye" tone="preview" target_blank=True only %}
+            {% include "components/ui/menus/rich_menu_link.html" with href=card.pdf_url title="Baixar PDF" description="Documento pronto para impressão" icon="pdf" tone="pdf" download=True only %}
+            {% include "components/ui/menus/rich_menu_link.html" with href=card.docx_url title="Baixar DOCX" description="Arquivo editável da Ordem de Serviço" icon="docx" tone="docx" download=True only %}
+          </div>
         </div>
         <div class="oficio-lc__footer-actions-danger cv-icon-btn-group">
           <button

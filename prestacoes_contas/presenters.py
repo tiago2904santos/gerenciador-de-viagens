@@ -56,7 +56,9 @@ def _servidor_row(ps, solicitacao_form=None):
         ),
         "comprovante_ok": comprovante_ok,
         "pacote_url": reverse("prestacoes_contas:consolidado_download", args=[ps.pk]),
-        "rt_download_url": reverse("prestacoes_contas:rt_download_servidor", args=[ps.pk]),
+        "rt_download_url": reverse(
+            "prestacoes_contas:rt_download_servidor_formato", args=[ps.pk, "pdf"]
+        ),
         # aviso de liberação de diárias (WhatsApp) — partes fixas do texto
         "whatsapp_phone": _whatsapp_phone(servidor),
         "whatsapp_diaria_override": (ps.diaria_valor_override or "").strip(),
@@ -149,6 +151,20 @@ def apresentar_prestacao_card(prestacao, solicitacao_forms=None):
         rt = prestacao.relatorio_tecnico
     except Exception:
         rt = None
+
+    diario = None
+    try:
+        diario = prestacao.diario_bordo
+    except Exception:
+        diario = None
+
+    diario_pdf_url = (
+        reverse("prestacoes_contas:diario_download_formato", args=[diario.pk, "pdf"])
+        if diario is not None
+        else ""
+    )
+    for row in servidores:
+        row["diario_pdf_url"] = diario_pdf_url
 
     search_parts = [oficio.numero_formatado, format_protocolo(oficio.protocolo) or ""]
     search_parts += [s["name"] for s in servidores]

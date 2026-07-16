@@ -594,6 +594,26 @@
   white-space: nowrap;
 }
 
+/* O fundo do toggle é claro em todos os temas (verde/vermelho pastel);
+   nos temas escuros os tokens de texto viram claros e somem sobre ele. */
+html[data-theme="dark"] .app-card-toggle__title,
+html[data-theme="dark-dark"] .app-card-toggle__title,
+html[data-theme="light-dark"] .app-card-toggle__title,
+html[data-theme="dark"] .app-page__form-card .app-card-toggle__title,
+html[data-theme="dark-dark"] .app-page__form-card .app-card-toggle__title,
+html[data-theme="light-dark"] .app-page__form-card .app-card-toggle__title {
+  color: #071a33;
+}
+
+html[data-theme="dark"] .app-card-toggle__description,
+html[data-theme="dark-dark"] .app-card-toggle__description,
+html[data-theme="light-dark"] .app-card-toggle__description,
+html[data-theme="dark"] .app-page__form-card .app-card-toggle__description,
+html[data-theme="dark-dark"] .app-page__form-card .app-card-toggle__description,
+html[data-theme="light-dark"] .app-page__form-card .app-card-toggle__description {
+  color: #52657a;
+}
+
 .app-card-toggle__state {
   align-items: center;
   background: #f7c8c8;

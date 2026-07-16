@@ -92,9 +92,22 @@
       <div class="oficio-lc__footer-actions">
         <div class="oficio-lc__footer-actions-main cv-icon-btn-group">
           {% include "components/ui/buttons/icon_button.html" with href=card.editar_url action="edit" aria_label="Editar plano" tooltip="Editar" only %}
-          {% include "components/ui/buttons/icon_button.html" with href=card.pdf_inline_url action="preview" aria_label="Visualizar plano" tooltip="Visualizar" only %}
-          {% include "components/ui/buttons/icon_button.html" with href=card.baixar_pdf_url action="pdf" aria_label="Baixar PDF do plano" tooltip="PDF" only %}
-          {% include "components/ui/buttons/icon_button.html" with href=card.baixar_docx_url action="docx" aria_label="Baixar DOCX do plano" tooltip="DOCX" only %}
+          <button
+            class="cv-icon-btn cv-icon-btn--settings"
+            type="button"
+            aria-label="Abrir documentos do plano {{ card.numero_label }}"
+            aria-haspopup="true"
+            aria-expanded="false"
+            data-tooltip="Visualizar e baixar"
+            data-action-menu-trigger
+            data-action-menu-target="plano-document-menu-{{ card.id }}"
+          >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="folder" only %}</button>
+          <div class="cv-action-menu cv-action-menu--rich" id="plano-document-menu-{{ card.id }}" role="menu" hidden>
+            {% include "components/ui/menus/rich_menu_header.html" with title="Documentos do plano" subtitle=card.numero_label icon="folder" only %}
+            {% include "components/ui/menus/rich_menu_link.html" with href=card.pdf_inline_url title="Visualizar plano" description="Abrir o documento no navegador" icon="eye" tone="preview" target_blank=True only %}
+            {% include "components/ui/menus/rich_menu_link.html" with href=card.baixar_pdf_url title="Baixar PDF" description="Documento pronto para impressão" icon="pdf" tone="pdf" download=True only %}
+            {% include "components/ui/menus/rich_menu_link.html" with href=card.baixar_docx_url title="Baixar DOCX" description="Arquivo editável do plano" icon="docx" tone="docx" download=True only %}
+          </div>
         </div>
         <div class="oficio-lc__footer-actions-danger cv-icon-btn-group">
           <button

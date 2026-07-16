@@ -185,6 +185,207 @@ html[data-theme="light-light"] .oficios-filter-range--active .oficios-filter-ran
   text-overflow: ellipsis;
 }
 
+/* Ações individuais da prestação: documentos e aviso de liberação. */
+.oficio-lc__document-menu-trigger,
+.oficio-lc__wa-trigger {
+  background: linear-gradient(145deg, #f8fbff, #edf3f9);
+  border-color: #b9cbe0;
+  box-shadow: 0 5px 14px rgba(24, 61, 102, 0.1);
+  color: #315a82;
+}
+
+.oficio-lc__document-menu-trigger:hover,
+.oficio-lc__document-menu-trigger:focus {
+  background: linear-gradient(145deg, #edf5fc, #e2edf8);
+  border-color: #86a9ca;
+  color: #174c7a;
+}
+
+.oficio-lc__wa-trigger {
+  background: linear-gradient(145deg, #f2faf6, #e4f3eb);
+  border-color: #9bc9b2;
+  box-shadow: 0 5px 14px rgba(28, 112, 75, 0.12);
+  color: #23734f;
+}
+
+.oficio-lc__wa-trigger:hover,
+.oficio-lc__wa-trigger:focus {
+  background: linear-gradient(145deg, #e7f6ee, #d8ecdf);
+  border-color: #72af90;
+  color: #155f3e;
+}
+
+html[data-theme="dark"] .oficio-lc__document-menu-trigger {
+  background: linear-gradient(145deg, #172b3d, #132535);
+  border-color: #385873;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22);
+  color: #a9c9e7;
+}
+
+html[data-theme="dark"] .oficio-lc__document-menu-trigger:hover,
+html[data-theme="dark"] .oficio-lc__document-menu-trigger:focus {
+  background: linear-gradient(145deg, #1c354b, #182e41);
+  border-color: #527899;
+  color: #d0e6f8;
+}
+
+html[data-theme="dark"] .oficio-lc__wa-trigger {
+  background: linear-gradient(145deg, #18342e, #142b27);
+  border-color: #3f6a5c;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22);
+  color: #9bd8bd;
+}
+
+html[data-theme="dark"] .oficio-lc__wa-trigger:hover,
+html[data-theme="dark"] .oficio-lc__wa-trigger:focus {
+  background: linear-gradient(145deg, #1e4037, #19372f);
+  border-color: #568777;
+  color: #c2ecd9;
+}
+
+/* Os menus são movidos para o body pelo action-menu.js, por isso o escopo
+   precisa estar na própria classe do widget. */
+.oficio-lc__action-menu {
+  background: color-mix(in srgb, var(--surface-list-panel) 96%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border-list-panel) 78%, #7c9ab8);
+  border-radius: 16px;
+  box-shadow: 0 20px 48px rgba(13, 35, 58, 0.24);
+  gap: 5px;
+  min-width: 270px;
+  padding: 10px;
+}
+
+.oficio-lc__action-menu-heading {
+  align-items: center;
+  border-bottom: 1px solid var(--color-border-soft, rgba(110, 140, 170, 0.2));
+  display: flex;
+  gap: 10px;
+  margin: 0 2px 5px;
+  padding: 4px 5px 10px;
+}
+
+.oficio-lc__action-menu-heading > span:last-child,
+.oficio-lc__action-menu-item > span:last-child {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.oficio-lc__action-menu-heading strong,
+.oficio-lc__action-menu-item strong {
+  color: var(--theme-text-heading);
+  font-size: 0.84rem;
+  font-weight: 750;
+  line-height: 1.2;
+}
+
+.oficio-lc__action-menu-heading small,
+.oficio-lc__action-menu-item small {
+  color: var(--theme-text-muted);
+  font-size: 0.68rem;
+  line-height: 1.35;
+  margin-top: 2px;
+}
+
+.oficio-lc__action-menu-heading-icon,
+.oficio-lc__action-menu-item-icon {
+  align-items: center;
+  background: rgba(69, 105, 143, 0.1);
+  border: 1px solid rgba(69, 105, 143, 0.16);
+  border-radius: 10px;
+  color: #426b91;
+  display: inline-flex;
+  flex: 0 0 34px;
+  height: 34px;
+  justify-content: center;
+}
+
+.oficio-lc__action-menu-heading-icon .cv-icon,
+.oficio-lc__action-menu-item-icon .cv-icon {
+  height: 17px;
+  width: 17px;
+}
+
+.oficio-lc__action-menu-item {
+  border: 1px solid transparent;
+  border-radius: 11px;
+  gap: 10px;
+  min-height: 52px;
+  padding: 7px;
+  text-decoration: none;
+}
+
+.oficio-lc__action-menu-item:hover,
+.oficio-lc__action-menu-item:focus-visible {
+  background: color-mix(in srgb, var(--color-surface-muted) 78%, transparent);
+  border-color: var(--color-border-soft, rgba(110, 140, 170, 0.2));
+  outline: none;
+}
+
+.oficio-lc__action-menu-item.is-disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
+.oficio-lc__action-menu-heading-icon--wa,
+.oficio-lc__action-menu-item-icon--wa {
+  background: rgba(38, 139, 91, 0.1);
+  border-color: rgba(38, 139, 91, 0.18);
+  color: #23734f;
+}
+
+.oficio-lc__action-menu-item-icon--business {
+  background: rgba(26, 112, 109, 0.1);
+  border-color: rgba(26, 112, 109, 0.18);
+  color: #1d6f6c;
+}
+
+.oficio-lc__action-menu-item-icon--pdf {
+  background: rgba(171, 64, 54, 0.09);
+  border-color: rgba(171, 64, 54, 0.16);
+  color: #a0443b;
+}
+
+.oficio-lc__action-menu-item-icon--route {
+  background: rgba(49, 99, 151, 0.09);
+  border-color: rgba(49, 99, 151, 0.16);
+  color: #315f8c;
+}
+
+.oficio-lc__action-menu-item-icon--package,
+.oficio-lc__action-menu-item-icon--copy {
+  background: rgba(104, 82, 149, 0.09);
+  border-color: rgba(104, 82, 149, 0.16);
+  color: #65528b;
+}
+
+html[data-theme="dark"] .oficio-lc__action-menu {
+  background: rgba(14, 30, 45, 0.98);
+  border-color: rgba(120, 153, 181, 0.28);
+  box-shadow: 0 22px 54px rgba(0, 0, 0, 0.48);
+}
+
+html[data-theme="dark"] .oficio-lc__action-menu-item:hover,
+html[data-theme="dark"] .oficio-lc__action-menu-item:focus-visible {
+  background: rgba(88, 122, 151, 0.13);
+  border-color: rgba(120, 153, 181, 0.22);
+}
+
+/* Finalizar: sucesso sóbrio no tema escuro, sem o verde fluorescente. */
+html[data-theme="dark"] .oficio-lc .cv-icon-btn--complete {
+  background: linear-gradient(145deg, #1d4439, #17372f);
+  border-color: #3e6f5e;
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.2);
+  color: #b7e8d3;
+}
+
+html[data-theme="dark"] .oficio-lc .cv-icon-btn--complete:hover,
+html[data-theme="dark"] .oficio-lc .cv-icon-btn--complete:focus {
+  background: linear-gradient(145deg, #245143, #1c4036);
+  border-color: #568776;
+  color: #d2f3e4;
+}
+
 /* ── Abas de listagem (temporais / de estado) — compartilhado entre as listas ── */
 .cv-list-tabs {
   display: flex;
