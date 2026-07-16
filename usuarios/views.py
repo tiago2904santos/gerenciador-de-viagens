@@ -2,6 +2,8 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.db.models import Count
+from django.db.models import Q
 from django.shortcuts import redirect
 from django.shortcuts import render
 
@@ -44,10 +46,33 @@ def index(request):
         else:
             messages.error(request, "Ação administrativa inválida.")
 
-    users = get_user_model().objects.prefetch_related("vinculos_area__area").order_by("username")
-    areas = AreaTrabalho.objects.prefetch_related("vinculos_usuario").order_by("sigla")
+    users_base = get_user_model().objects.prefetch_related("vinculos_area__area")
+    areas_base = AreaTrabalho.objects.annotate(total_vinculos=Count("vinculos_usuario"))
+    vinculos_base = VinculoUsuarioArea.objects.select_related("usuario", "area")
+
+    total_usuarios = users_base.count()
+    total_areas = areas_base.count()
+    total_vinculos = vinculos_base.count()
+
+    busca = request.GET.get("q", "").strip()
+    areas = areas_base
+    vinculos = vinculos_base
+    if busca:
+        areas = areas.filter(Q(sigla__icontains=busca) | Q(nome__icontains=busca))
+        vinculos = vinculos.filter(
+            Q(usuario__username__icontains=busca)
+            | Q(usuario__first_name__icontains=busca)
+            | Q(usuario__last_name__icontains=busca)
+            | Q(usuario__email__icontains=busca)
+            | Q(area__sigla__icontains=busca)
+            | Q(area__nome__icontains=busca)
+            | Q(papel__icontains=busca)
+        )
+
+    users = users_base.order_by("username")
+    areas = areas.order_by("sigla")
     vinculos = (
-        VinculoUsuarioArea.objects.select_related("usuario", "area")
+        vinculos
         .order_by("area__sigla", "usuario__username")
     )
 
@@ -63,5 +88,9 @@ def index(request):
             "areas": areas,
             "users": users,
             "vinculos": vinculos,
+            "busca": busca,
+            "total_areas": total_areas,
+            "total_usuarios": total_usuarios,
+            "total_vinculos": total_vinculos,
         },
     )

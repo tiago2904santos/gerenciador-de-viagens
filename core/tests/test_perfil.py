@@ -25,6 +25,8 @@ class PerfilUsuarioTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "core/perfil.html")
         self.assertContains(response, "Meu perfil")
+        self.assertContains(response, "Conta e segurança")
+        self.assertContains(response, "Dados pessoais")
         self.assertContains(response, "Sair do sistema")
 
     def test_sidebar_exibe_acesso_ao_perfil_e_logout(self):

@@ -7,6 +7,19 @@ from .models import AreaTrabalho
 from .models import VinculoUsuarioArea
 
 
+def _cv_picker_single_attrs(*, label, placeholder, empty_message):
+    return {
+        "class": "cv-search-picker__native",
+        "data-cv-search-picker": "true",
+        "data-picker-mode": "single",
+        "data-picker-variant": "compact",
+        "data-picker-label": label,
+        "data-picker-open-all": "true",
+        "data-placeholder": placeholder,
+        "data-empty-message": empty_message,
+    }
+
+
 class EstiloCamposMixin:
     """Aplica as classes de widget do design system (form-control / card toggle)."""
 
@@ -38,10 +51,26 @@ class AreaTrabalhoForm(EstiloCamposMixin, forms.ModelForm):
 
 
 class UsuarioAreaCreationForm(EstiloCamposMixin, UserCreationForm):
+    nome_completo = forms.CharField(
+        label="Nome completo",
+        widget=forms.TextInput(
+            attrs={
+                "autocomplete": "name",
+                "placeholder": "Nome e sobrenome",
+            }
+        ),
+    )
     area = forms.ModelChoiceField(
         queryset=AreaTrabalho.objects.none(),
         label="Área de trabalho",
         help_text="Área que o usuário acessará ao entrar no sistema.",
+        widget=forms.Select(
+            attrs=_cv_picker_single_attrs(
+                label="Área de trabalho",
+                placeholder="Buscar área...",
+                empty_message="Nenhuma área encontrada.",
+            )
+        ),
     )
     papel = forms.ChoiceField(
         choices=VinculoUsuarioArea.PAPEL_CHOICES,
@@ -54,32 +83,44 @@ class UsuarioAreaCreationForm(EstiloCamposMixin, UserCreationForm):
         fields = [
             "username",
             "email",
-            "first_name",
-            "last_name",
+            "nome_completo",
             "password1",
             "password2",
             "area",
             "papel",
         ]
         labels = {
-            "username": "Login",
+            "username": "Nome de usuário",
             "email": "E-mail institucional",
-            "first_name": "Nome",
-            "last_name": "Sobrenome",
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["area"].queryset = AreaTrabalho.objects.filter(ativa=True).order_by("sigla")
         self.fields["email"].required = True
-        self.fields["email"].widget.attrs.update({"placeholder": "adm.tsantos@pc.pr.gov.br"})
+        self.fields["username"].widget.attrs.update(
+            {
+                "autocomplete": "username",
+                "placeholder": "ex.: adm.tsantos",
+            }
+        )
+        self.fields["email"].widget.attrs.update(
+            {
+                "autocomplete": "email",
+                "placeholder": "adm.tsantos@pc.pr.gov.br",
+            }
+        )
+        self.fields["password1"].widget.attrs["autocomplete"] = "new-password"
+        self.fields["password2"].widget.attrs["autocomplete"] = "new-password"
 
     @transaction.atomic
     def save(self, commit=True):
         user = super().save(commit=False)
+        nome_completo = self.cleaned_data["nome_completo"].strip()
+        partes_nome = nome_completo.split(" ", 1)
         user.email = self.cleaned_data["email"]
-        user.first_name = self.cleaned_data.get("first_name", "")
-        user.last_name = self.cleaned_data.get("last_name", "")
+        user.first_name = partes_nome[0]
+        user.last_name = partes_nome[1].strip() if len(partes_nome) > 1 else ""
         user.is_staff = False
         if commit:
             user.save()
@@ -103,6 +144,22 @@ class VinculoUsuarioAreaForm(EstiloCamposMixin, forms.ModelForm):
             "usuario": "Usuário existente",
             "area": "Área de trabalho",
             "papel": "Perfil na área",
+        }
+        widgets = {
+            "usuario": forms.Select(
+                attrs=_cv_picker_single_attrs(
+                    label="Usuário existente",
+                    placeholder="Buscar usuário...",
+                    empty_message="Nenhum usuário encontrado.",
+                )
+            ),
+            "area": forms.Select(
+                attrs=_cv_picker_single_attrs(
+                    label="Área de trabalho",
+                    placeholder="Buscar área...",
+                    empty_message="Nenhuma área encontrada.",
+                )
+            ),
         }
 
     def __init__(self, *args, **kwargs):

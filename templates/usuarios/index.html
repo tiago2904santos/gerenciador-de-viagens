@@ -4,7 +4,7 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/workspace-admin.css' %}?v=20260716-subcards">
+  <link rel="stylesheet" href="{% static 'css/workspace-admin.css' %}?v=20260716-admin-action-baseline">
 {% endblock %}
 
 {% block content %}
@@ -14,26 +14,83 @@
     <main class="main-form-panel main-form-panel--stack">
       <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
 
-        {# ══ Card 1: Cadastros ══ #}
+        <section class="admin-overview" aria-label="Resumo administrativo">
+          <div class="admin-overview__intro">
+            <span class="admin-overview__eyebrow">Visão geral</span>
+            <strong>Gerencie a estrutura de acesso</strong>
+            <p>Cadastre usuários e áreas, depois confira os vínculos existentes.</p>
+          </div>
+          <dl class="admin-overview__stats">
+            <div>
+              <dt>Áreas</dt>
+              <dd>{{ total_areas }}</dd>
+            </div>
+            <div>
+              <dt>Usuários</dt>
+              <dd>{{ total_usuarios }}</dd>
+            </div>
+            <div>
+              <dt>Vínculos</dt>
+              <dd>{{ total_vinculos }}</dd>
+            </div>
+          </dl>
+        </section>
+
         <section class="cv-wizard-section-card" aria-labelledby="admin-card-cadastros-title">
           <header class="cv-wizard-section-header">
             <div class="cv-wizard-section-header__copy">
-              <h3 class="cv-wizard-section-title" id="admin-card-cadastros-title">Cadastros</h3>
-              <p class="cv-wizard-section-subtitle">Crie áreas de trabalho, novos usuários e vínculos de acesso.</p>
+              <h3 class="cv-wizard-section-title" id="admin-card-cadastros-title">Cadastros e acessos</h3>
+              <p class="cv-wizard-section-subtitle">Crie usuários, áreas de trabalho e vínculos de acesso.</p>
             </div>
           </header>
 
           <div class="cv-wizard-section-body">
             <div class="admin-cadastros">
+              <section class="admin-subcard admin-subcard--primary" aria-labelledby="admin-sub-usuario-title">
+                <header class="admin-subcard__header">
+                  <span class="admin-subcard__step" aria-hidden="true">01</span>
+                  <div>
+                    <h4 class="admin-subcard__title" id="admin-sub-usuario-title">Criar usuário</h4>
+                    <p class="admin-subcard__description">Crie a conta e defina o primeiro acesso à área de trabalho.</p>
+                  </div>
+                </header>
+                <form class="admin-form" method="post" novalidate>
+                  {% csrf_token %}
+                  {% if usuario_form.non_field_errors %}
+                    {% include "components/ui/feedback/field_error.html" with errors=usuario_form.non_field_errors only %}
+                  {% endif %}
+                  <div class="field-grid admin-identity-grid">
+                    {% include "components/forms/form_field.html" with field=usuario_form.username size_class="field-size-1" only %}
+                    {% include "components/forms/form_field.html" with field=usuario_form.email size_class="field-size-1" only %}
+                    {% include "components/forms/form_field.html" with field=usuario_form.nome_completo size_class="field-size-1" only %}
+                  </div>
+                  <div class="field-grid field-grid--cols-2 admin-password-grid">
+                    {% include "components/forms/form_field.html" with field=usuario_form.password1 size_class="field-size-1" only %}
+                    {% include "components/forms/form_field.html" with field=usuario_form.password2 size_class="field-size-1" only %}
+                  </div>
 
-              {# Coluna esquerda: Criar área + Vincular existente #}
-              <div class="admin-cadastros__col">
+                  <div class="admin-subgroup">
+                    <h5 class="admin-subgroup__title">Permissão inicial</h5>
+                    <div class="field-grid field-grid--cols-2">
+                      {% include "components/forms/form_field.html" with field=usuario_form.area size_class="field-size-1" help_text=usuario_form.area.help_text only %}
+                      {% include "components/forms/form_field.html" with field=usuario_form.papel size_class="field-size-1" only %}
+                    </div>
+                  </div>
 
-                {# Criar área #}
+                  <div class="admin-form__actions">
+                    {% include "components/ui/buttons/button.html" with label="Criar usuário" variant="primary" icon="arrow-right" icon_after=True type="submit" name="action" value="criar_usuario" only %}
+                  </div>
+                </form>
+              </section>
+
+              <div class="admin-cadastros__secondary">
                 <section class="admin-subcard" aria-labelledby="admin-sub-area-title">
-                  <header class="wizard-inner-section__header">
-                    <h4 class="wizard-inner-section__title" id="admin-sub-area-title">Criar área</h4>
-                    <p class="wizard-inner-section__description">Cadastre ASCOM, DPCAP ou qualquer outra área de trabalho.</p>
+                  <header class="admin-subcard__header">
+                    <span class="admin-subcard__step" aria-hidden="true">02</span>
+                    <div>
+                      <h4 class="admin-subcard__title" id="admin-sub-area-title">Criar área</h4>
+                      <p class="admin-subcard__description">Cadastre uma nova unidade ou equipe de trabalho.</p>
+                    </div>
                   </header>
                   <form class="admin-form" method="post" novalidate>
                     {% csrf_token %}
@@ -50,11 +107,13 @@
                   </form>
                 </section>
 
-                {# Vincular usuário existente #}
-                <section class="admin-subcard" aria-labelledby="admin-sub-vinculo-title">
-                  <header class="wizard-inner-section__header">
-                    <h4 class="wizard-inner-section__title" id="admin-sub-vinculo-title">Vincular usuário existente</h4>
-                    <p class="wizard-inner-section__description">Use quando o usuário já existe e precisa acessar outra área.</p>
+                <section class="admin-subcard admin-subcard--link" aria-labelledby="admin-sub-vinculo-title">
+                  <header class="admin-subcard__header">
+                    <span class="admin-subcard__step" aria-hidden="true">03</span>
+                    <div>
+                      <h4 class="admin-subcard__title" id="admin-sub-vinculo-title">Vincular usuário existente</h4>
+                      <p class="admin-subcard__description">Adicione outra área a uma conta existente.</p>
+                    </div>
                   </header>
                   <form class="admin-form" method="post" novalidate>
                     {% csrf_token %}
@@ -71,67 +130,52 @@
                     </div>
                   </form>
                 </section>
-
               </div>
-
-              {# Coluna direita: Criar usuário #}
-              <div class="admin-cadastros__col">
-                <section class="admin-subcard admin-subcard--fill" aria-labelledby="admin-sub-usuario-title">
-                  <header class="wizard-inner-section__header">
-                    <h4 class="wizard-inner-section__title" id="admin-sub-usuario-title">Criar usuário</h4>
-                    <p class="wizard-inner-section__description">Cria o login e já vincula o usuário à área escolhida.</p>
-                  </header>
-                  <form class="admin-form" method="post" novalidate>
-                    {% csrf_token %}
-                    {% if usuario_form.non_field_errors %}
-                      {% include "components/ui/feedback/field_error.html" with errors=usuario_form.non_field_errors only %}
-                    {% endif %}
-                    <div class="field-grid field-grid--cols-2">
-                      {% include "components/forms/form_field.html" with field=usuario_form.username size_class="field-size-1" only %}
-                      {% include "components/forms/form_field.html" with field=usuario_form.email size_class="field-size-1" only %}
-                      {% include "components/forms/form_field.html" with field=usuario_form.first_name size_class="field-size-1" only %}
-                      {% include "components/forms/form_field.html" with field=usuario_form.last_name size_class="field-size-1" only %}
-                      {% include "components/forms/form_field.html" with field=usuario_form.password1 size_class="field-size-1" only %}
-                      {% include "components/forms/form_field.html" with field=usuario_form.password2 size_class="field-size-1" only %}
-                    </div>
-
-                    <div class="admin-subgroup">
-                      <h5 class="admin-subgroup__title">Acesso à área</h5>
-                      <div class="field-grid field-grid--cols-2">
-                        {% include "components/forms/form_field.html" with field=usuario_form.area size_class="field-size-1" help_text=usuario_form.area.help_text only %}
-                        {% include "components/forms/form_field.html" with field=usuario_form.papel size_class="field-size-1" only %}
-                      </div>
-                    </div>
-
-                    <div class="admin-form__actions">
-                      {% include "components/ui/buttons/button.html" with label="Criar usuário" variant="primary" icon="arrow-right" icon_after=True type="submit" name="action" value="criar_usuario" only %}
-                    </div>
-                  </form>
-                </section>
-              </div>
-
             </div>
           </div>
         </section>
 
-        {# ══ Card 2: Conferência ══ #}
         <section class="cv-wizard-section-card" aria-labelledby="admin-card-conferencia-title">
           <header class="cv-wizard-section-header">
             <div class="cv-wizard-section-header__copy">
-              <h3 class="cv-wizard-section-title" id="admin-card-conferencia-title">Conferência</h3>
-              <p class="cv-wizard-section-subtitle">Áreas cadastradas e vínculos de acesso já existentes.</p>
+              <h3 class="cv-wizard-section-title" id="admin-card-conferencia-title">Conferência de acessos</h3>
+              <p class="cv-wizard-section-subtitle">Consulte áreas cadastradas e permissões existentes.</p>
             </div>
           </header>
 
           <div class="cv-wizard-section-body">
-            <div class="admin-conferencia">
+            <form class="admin-search" method="get" role="search">
+              <div class="admin-search__copy">
+                <label for="admin-search-input">Buscar na administração</label>
+                <span>Pesquise por usuário, e-mail, área, sigla ou perfil.</span>
+              </div>
+              <div class="admin-search__control">
+                <input
+                  class="form-control"
+                  id="admin-search-input"
+                  name="q"
+                  type="search"
+                  value="{{ busca }}"
+                  placeholder="Digite para filtrar..."
+                  autocomplete="off"
+                >
+                <button class="cv-btn cv-btn--primary cv-btn--sm" type="submit">Buscar</button>
+                {% if busca %}
+                  <a class="cv-btn cv-btn--secondary cv-btn--sm" href="{% url 'usuarios:index' %}">Limpar</a>
+                {% endif %}
+              </div>
+            </form>
 
-              {# Áreas cadastradas #}
-              <section class="admin-subcard" aria-labelledby="admin-sub-areas-lista-title">
-                <header class="wizard-inner-section__header wizard-inner-section__header--actions">
-                  <div class="wizard-inner-section__header-copy">
-                    <h4 class="wizard-inner-section__title" id="admin-sub-areas-lista-title">Áreas cadastradas</h4>
-                    <p class="wizard-inner-section__description">Quantidade de usuários vinculados por área.</p>
+            {% if busca %}
+              <p class="admin-search-result">Resultados para <strong>“{{ busca }}”</strong>.</p>
+            {% endif %}
+
+            <div class="admin-conferencia">
+              <section class="admin-list-card" aria-labelledby="admin-sub-areas-lista-title">
+                <header class="admin-list-card__header">
+                  <div>
+                    <h4 class="admin-list-card__title" id="admin-sub-areas-lista-title">Áreas cadastradas</h4>
+                    <p class="admin-list-card__description">Quantidade de usuários vinculados em cada área.</p>
                   </div>
                   {% include "components/ui/badges/chip.html" with tone="info" label="Áreas" count=areas|length size="compact" only %}
                 </header>
@@ -147,24 +191,23 @@
                     <tbody>
                       {% for area in areas %}
                         <tr>
-                          <td><strong>{{ area.sigla }}</strong></td>
-                          <td>{{ area.nome }}</td>
-                          <td>{{ area.vinculos_usuario.count }}</td>
+                          <td><span class="admin-entity-mark">{{ area.sigla }}</span></td>
+                          <td><strong>{{ area.nome }}</strong></td>
+                          <td>{{ area.total_vinculos }}</td>
                         </tr>
                       {% empty %}
-                        <tr><td colspan="3" class="admin-table__empty">Nenhuma área cadastrada.</td></tr>
+                        <tr><td colspan="3" class="admin-table__empty">Nenhuma área encontrada.</td></tr>
                       {% endfor %}
                     </tbody>
                   </table>
                 </div>
               </section>
 
-              {# Usuários e acessos #}
-              <section class="admin-subcard" aria-labelledby="admin-sub-vinculos-lista-title">
-                <header class="wizard-inner-section__header wizard-inner-section__header--actions">
-                  <div class="wizard-inner-section__header-copy">
-                    <h4 class="wizard-inner-section__title" id="admin-sub-vinculos-lista-title">Usuários e acessos</h4>
-                    <p class="wizard-inner-section__description">Conferência dos vínculos e áreas padrão.</p>
+              <section class="admin-list-card" aria-labelledby="admin-sub-vinculos-lista-title">
+                <header class="admin-list-card__header">
+                  <div>
+                    <h4 class="admin-list-card__title" id="admin-sub-vinculos-lista-title">Usuários e acessos</h4>
+                    <p class="admin-list-card__description">Perfis concedidos e área padrão de cada conta.</p>
                   </div>
                   {% include "components/ui/badges/chip.html" with tone="info" label="Vínculos" count=vinculos|length size="compact" only %}
                 </header>
@@ -182,30 +225,36 @@
                     <tbody>
                       {% for vinculo in vinculos %}
                         <tr>
-                          <td><strong>{{ vinculo.usuario.get_username }}</strong></td>
-                          <td>{{ vinculo.usuario.email|default:"-" }}</td>
-                          <td>{{ vinculo.area.sigla }}</td>
+                          <td>
+                            <div class="admin-user">
+                              <span class="admin-user__avatar" aria-hidden="true">{{ vinculo.usuario.get_username|slice:":2"|upper }}</span>
+                              <span>
+                                <strong>{{ vinculo.usuario.get_full_name|default:vinculo.usuario.get_username }}</strong>
+                                <small>@{{ vinculo.usuario.get_username }}</small>
+                              </span>
+                            </div>
+                          </td>
+                          <td>{{ vinculo.usuario.email|default:"—" }}</td>
+                          <td><span class="admin-entity-mark">{{ vinculo.area.sigla }}</span></td>
                           <td>{{ vinculo.get_papel_display }}</td>
                           <td>
                             {% if vinculo.area_padrao %}
                               {% include "components/ui/badges/chip.html" with tone="info" label="Padrão" size="compact" only %}
                             {% else %}
-                              <span class="admin-table__empty">—</span>
+                              <span class="admin-table__muted">—</span>
                             {% endif %}
                           </td>
                         </tr>
                       {% empty %}
-                        <tr><td colspan="5" class="admin-table__empty">Nenhum vínculo cadastrado.</td></tr>
+                        <tr><td colspan="5" class="admin-table__empty">Nenhum vínculo encontrado.</td></tr>
                       {% endfor %}
                     </tbody>
                   </table>
                 </div>
               </section>
-
             </div>
           </div>
         </section>
-
       </div>
     </main>
   </div>
