@@ -777,6 +777,19 @@ html[data-theme="light"] {
   border-color: #125d30;
 }
 
+/* WhatsApp — verde característico, preenchido (aviso de liberação de diárias) */
+.cv-icon-btn--whatsapp {
+  background: linear-gradient(135deg, #1fa855 0%, #25d366 100%);
+  border-color: #178a45;
+  color: #fff;
+}
+
+.cv-icon-btn--whatsapp:hover,
+.cv-icon-btn--whatsapp:focus {
+  background: linear-gradient(135deg, #178a45 0%, #1fa855 100%);
+  border-color: #12703a;
+}
+
 /* Arquivar — âmbar sóbrio; desarquivar/reabrir usam o neutro (--edit) */
 .cv-icon-btn--archive {
   background: var(--cv-btn-neutral-bg);

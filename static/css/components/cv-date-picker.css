@@ -170,7 +170,7 @@ html[data-theme="light-light"] {
 }
 
 .cv-date-picker__panel {
-  --cv-date-picker-day-gap: 1.6px;
+  --cv-date-picker-day-gap: 2px;
   --cv-date-picker-day-size: 40px;
   --cv-date-picker-grid-width: calc((7 * var(--cv-date-picker-day-size)) + (6 * var(--cv-date-picker-day-gap)));
   /* Quebra de semana: suaviza apenas as quinas da borda; inicio/fim seguem pill. */
@@ -304,13 +304,12 @@ html[data-theme="light-light"] {
   padding: 0;
   position: relative;
   transition:
-    transform var(--transition-fast),
     background-color var(--transition-fast),
     border-color var(--transition-fast),
     color var(--transition-fast),
+    filter var(--transition-fast),
     box-shadow var(--transition-fast);
   width: 100%;
-  will-change: transform;
 }
 
 .cv-date-picker__day::before {
@@ -327,8 +326,9 @@ html[data-theme="light-light"] {
 }
 
 .cv-date-picker__day:hover {
-  transform: translateY(-1px) scale(1.03);
-  z-index: 3;
+  background-color: rgba(127, 127, 127, 0.1);
+  filter: brightness(1.08);
+  z-index: 2;
 }
 
 .cv-date-picker__day--multi-selected {
@@ -582,8 +582,8 @@ html[data-theme="light-light"] .cv-date-picker .cv-date-picker__day--multi-end:h
 html[data-theme="light"] .cv-date-picker .cv-date-picker__day--multi-single:hover,
 html[data-theme="dark-light"] .cv-date-picker .cv-date-picker__day--multi-single:hover,
 html[data-theme="light-light"] .cv-date-picker .cv-date-picker__day--multi-single:hover {
-  transform: translateY(-1px) scale(1.03);
-  z-index: 3;
+  filter: brightness(1.08);
+  z-index: 2;
 }
 
 .cv-date-picker__day--range:nth-child(7n + 1)::before {

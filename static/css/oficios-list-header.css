@@ -76,11 +76,74 @@
   width: auto !important;
 }
 
-/* O filtro usa o mesmo range global; aqui existe apenas ajuste de layout. */
+/* O filtro mantém o gatilho compacto; o painel continua sendo o global. */
 .oficios-filter-range {
-  flex: 1 1 420px;
-  min-width: min(100%, 360px);
+  display: inline-flex;
+  flex: 0 1 auto;
+  min-width: 0;
   position: relative;
+}
+
+.oficios-filter-range__btn {
+  align-items: center;
+  background:
+    linear-gradient(var(--cv-select-bg), var(--cv-select-bg)) padding-box,
+    linear-gradient(var(--cv-select-border), var(--cv-select-border)) border-box;
+  border: 1px solid transparent;
+  border-radius: var(--cv-field-radius, 10px);
+  box-shadow: var(--cv-cs-trigger-shadow, none);
+  color: var(--cv-field-color, #f2f7ff);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: inherit;
+  font-size: var(--cv-field-font-size, 0.92rem);
+  font-weight: var(--cv-cs-value-weight, 500);
+  gap: 10px;
+  height: var(--cv-field-height, 44px);
+  min-height: var(--cv-field-height, 44px);
+  padding: 0 var(--cv-field-padding-x, 16px);
+  transition: background 150ms ease, box-shadow 150ms ease;
+  white-space: nowrap;
+}
+
+.oficios-filter-range__btn:hover:not(:disabled) {
+  background:
+    linear-gradient(var(--cv-select-bg-hover), var(--cv-select-bg-hover)) padding-box,
+    linear-gradient(var(--cv-select-border-hover), var(--cv-select-border-hover)) border-box;
+}
+
+.oficios-filter-range__btn:focus-visible {
+  background:
+    linear-gradient(var(--cv-select-bg-hover), var(--cv-select-bg-hover)) padding-box,
+    linear-gradient(var(--cv-select-border-focus), var(--cv-select-border-focus)) border-box;
+  box-shadow: var(--cv-select-focus-shadow);
+  outline: none;
+}
+
+.oficios-filter-range__btn .cv-btn__icon {
+  align-items: center;
+  color: var(--color-filter-placeholder, rgba(255, 255, 255, 0.6));
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+.oficios-filter-range__label {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+}
+
+.oficios-filter-range--active .oficios-filter-range__btn {
+  background: rgba(99, 165, 255, 0.12);
+  border-color: rgba(99, 165, 255, 0.55);
+  color: #fff;
+}
+
+.oficios-filter-range--active .oficios-filter-range__btn .cv-btn__icon {
+  color: rgba(99, 165, 255, 0.95);
+}
+
+.oficio-lc__prazo-picker {
+  display: contents;
 }
 
 /* ── Abas de listagem (temporais / de estado) — compartilhado entre as listas ── */
@@ -206,6 +269,11 @@ html[data-theme="dark"] .cv-list-tab {
     flex: 1 1 100% !important;
     max-width: none;
     min-width: 0;
+  }
+
+  .oficios-filter-range__btn {
+    justify-content: center;
+    width: 100%;
   }
 
 }

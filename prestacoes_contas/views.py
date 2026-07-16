@@ -1,4 +1,5 @@
 from pathlib import Path
+import datetime
 import json
 import re
 
@@ -306,6 +307,22 @@ def _solicitacao_autosave_value(payload):
     return None
 
 
+def _prazo_autosave_value(payload):
+    """Valor bruto (``'AAAA-MM-DD'`` ou vazio) do campo ``prazo_limite_saque``, se presente."""
+    for name, value in payload.fields.items():
+        clean_name = str(name or "").strip()
+        if clean_name == "prazo_limite_saque" or clean_name.endswith("-prazo_limite_saque"):
+            return (value or "").strip()
+    return None
+
+
+def _parse_prazo_limite_saque(texto):
+    """Converte ``'AAAA-MM-DD'`` (input type=date) em ``date``; ``''`` vira ``None``."""
+    if not texto:
+        return None
+    return datetime.date.fromisoformat(texto)
+
+
 def _salvar_diaria_overrides(prestacao, fields):
     """Salva os campos ``ps-<pk>-diaria_valor_override`` presentes em ``fields``.
 
@@ -538,20 +555,37 @@ def index(request):
 
 
 def _salvar_solicitacoes_em_lote(request):
-    """Fallback sem JS: salva os campos ``ps-<pk>-numero_solicitacao`` do card."""
+    """Fallback sem JS: salva os campos ``ps-<pk>-numero_solicitacao``/``-prazo_limite_saque`` do card."""
     atualizacoes = {}
+    prazos = {}
     for name, value in request.POST.items():
         match = re.match(r"^ps-(\d+)-numero_solicitacao$", name)
         if match:
             atualizacoes[int(match.group(1))] = normalize_spaces(value or "")
-    if not atualizacoes:
+            continue
+        match_prazo = re.match(r"^ps-(\d+)-prazo_limite_saque$", name)
+        if match_prazo:
+            prazos[int(match_prazo.group(1))] = (value or "").strip()
+    if not atualizacoes and not prazos:
         return
-    servidores = _prestacao_servidor_queryset().filter(pk__in=atualizacoes.keys())
+    servidores = _prestacao_servidor_queryset().filter(pk__in=set(atualizacoes) | set(prazos))
     for ps in servidores:
-        novo = atualizacoes.get(ps.pk, "")
-        if ps.numero_solicitacao != novo:
-            ps.numero_solicitacao = novo
-            ps.save(update_fields=["numero_solicitacao", "atualizado_em"])
+        update_fields = []
+        if ps.pk in atualizacoes:
+            novo = atualizacoes[ps.pk]
+            if ps.numero_solicitacao != novo:
+                ps.numero_solicitacao = novo
+                update_fields.append("numero_solicitacao")
+        if ps.pk in prazos:
+            try:
+                novo_prazo = _parse_prazo_limite_saque(prazos[ps.pk])
+            except ValueError:
+                novo_prazo = ps.prazo_limite_saque
+            if ps.prazo_limite_saque != novo_prazo:
+                ps.prazo_limite_saque = novo_prazo
+                update_fields.append("prazo_limite_saque")
+        if update_fields:
+            ps.save(update_fields=[*update_fields, "atualizado_em"])
 
 
 def _redirect_lista(request, prestacao):
@@ -597,6 +631,18 @@ def prestacao_servidor_solicitacao_autosave(request, ps_pk):
         ps.numero_solicitacao = valor
         ps.save(update_fields=["numero_solicitacao", "atualizado_em"])
         _marcar_prestacao_em_preenchimento(ps.prestacao)
+
+    prazo_raw = _prazo_autosave_value(payload)
+    if prazo_raw is not None:
+        try:
+            novo_prazo = _parse_prazo_limite_saque(prazo_raw)
+        except ValueError:
+            return autosave_json_response(ok=False, message="Data de prazo limite inválida.")
+        if ps.prazo_limite_saque != novo_prazo:
+            ps.prazo_limite_saque = novo_prazo
+            ps.save(update_fields=["prazo_limite_saque", "atualizado_em"])
+            _marcar_prestacao_em_preenchimento(ps.prestacao)
+
     return autosave_json_response(
         ok=True,
         object_id=ps.pk,

@@ -6,7 +6,7 @@
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/roteiros-list.css' %}?v=20260622-mobile">
   <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260610-oficios-datepicker">
-  <link rel="stylesheet" href="{% static 'css/oficios-list-header.css' %}?v=20260713-abas-docs">
+  <link rel="stylesheet" href="{% static 'css/oficios-list-header.css' %}?v=20260716-filter-pill">
   <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}?v=20260715-assinado">
 {% endblock %}
 
@@ -60,7 +60,7 @@
             </select>
           </div>
 
-          {% include "components/forms/cv_date_picker.html" with mode="range" picker_id="oficios-filter-date-picker" extra_class="oficios-filter-range" start_label="Viagem de" end_label="Viagem até" start_input_id="id_oficios_viagem_de_display" end_input_id="id_oficios_viagem_ate_display" start_hidden_id="id_oficios_viagem_de" end_hidden_id="id_oficios_viagem_ate" start_hidden_name="viagem_de" end_hidden_name="viagem_ate" start_hidden_value=viagem_de end_hidden_value=viagem_ate initial_date=viagem_de filter_date=True show_summary=False only %}
+          {% include "components/forms/cv_date_picker.html" with mode="range" control_variant="filter-pill" picker_id="oficios-filter-date-picker" extra_class="oficios-filter-range" trigger_label="Período da viagem" trigger_aria_label="Filtrar por período da viagem" start_hidden_id="id_oficios_viagem_de" end_hidden_id="id_oficios_viagem_ate" start_hidden_name="viagem_de" end_hidden_name="viagem_ate" start_hidden_value=viagem_de end_hidden_value=viagem_ate initial_date=viagem_de filter_date=True show_summary=False only %}
 
           {# Limpar filtros — último item da linha #}
           {% include "components/ui/buttons/button.html" with href=search_clear_url label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control oficios-filter-clear" only %}

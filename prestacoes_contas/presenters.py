@@ -17,6 +17,12 @@ from .forms import PrestacaoSolicitacaoForm
 from .models import PrestacaoDocumentoAnexo
 
 
+def _whatsapp_phone(servidor):
+    """Telefone com DDI 55, só quando tem os 11 dígitos (DDD + celular); senão vazio."""
+    telefone = (getattr(servidor, "telefone", "") or "").strip()
+    return f"55{telefone}" if len(telefone) == 11 and telefone.isdigit() else ""
+
+
 def _servidor_row(ps, solicitacao_form=None):
     """Dados de um servidor no card: identificação + solicitação inline + status."""
     servidor = ps.servidor
@@ -39,6 +45,7 @@ def _servidor_row(ps, solicitacao_form=None):
         "unidade": unidade_nome,
         "is_motorista": ps.is_motorista,
         "numero_solicitacao": ps.numero_solicitacao,
+        "prazo_limite_saque": ps.prazo_limite_saque.isoformat() if ps.prazo_limite_saque else "",
         "solicitacao_form": solicitacao_form,
         "solicitacao_autosave_url": reverse(
             "prestacoes_contas:prestacao_servidor_solicitacao_autosave", args=[ps.pk]
@@ -46,6 +53,9 @@ def _servidor_row(ps, solicitacao_form=None):
         "comprovante_ok": comprovante_ok,
         "pacote_url": reverse("prestacoes_contas:consolidado_download", args=[ps.pk]),
         "rt_download_url": reverse("prestacoes_contas:rt_download_servidor", args=[ps.pk]),
+        # aviso de liberação de diárias (WhatsApp) — partes fixas do texto
+        "whatsapp_phone": _whatsapp_phone(servidor),
+        "whatsapp_diaria_override": (ps.diaria_valor_override or "").strip(),
     }
 
 
@@ -112,6 +122,18 @@ def apresentar_prestacao_card(prestacao, solicitacao_forms=None):
         if roteiro.valor_diarias:
             valor_diarias_display = _format_brl_diarias(roteiro.valor_diarias)
             valor_diarias_extenso = (roteiro.valor_diarias_extenso or "").strip()
+
+    # ── Aviso de liberação de diárias (WhatsApp): partes comuns a todo servidor ──
+    unidade_sede_display = str(oficio.solicitante) if oficio.solicitante_id else ""
+    if destino_display and data_evento_display:
+        evento_wa_display = f"{destino_display}, de {data_evento_display}"
+    else:
+        evento_wa_display = destino_display or data_evento_display
+    for row in servidores:
+        row["whatsapp_oficio"] = oficio.numero_formatado
+        row["whatsapp_unidade"] = unidade_sede_display
+        row["whatsapp_evento"] = evento_wa_display
+        row["whatsapp_diaria"] = row.pop("whatsapp_diaria_override") or valor_diarias_display
 
     # ── Relatório técnico compartilhado (download é por servidor) ──
     rt = None

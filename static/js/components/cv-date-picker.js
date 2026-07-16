@@ -179,6 +179,7 @@
     var singleHidden = root.querySelector('[data-cv-date-picker-value]');
     var startLabel = root.querySelector('[data-cv-date-picker-start-label]');
     var endLabel = root.querySelector('[data-cv-date-picker-end-label]');
+    var displayText = root.querySelector('[data-cv-date-picker-display-text]');
     var summary = root.querySelector('[data-cv-date-picker-summary]');
     var startDisplay = root.querySelector('[data-cv-date-picker-start-display]');
     var endDisplay = root.querySelector('[data-cv-date-picker-end-display]');
@@ -522,6 +523,19 @@
       }
       if (endLabel) {
         endLabel.textContent = selectedEnd ? formatDisplayDate(selectedEnd) : 'Escolher';
+      }
+      if (displayText) {
+        var displayPlaceholder = displayText.dataset.placeholder || 'Período da viagem';
+        if (selectedStart && selectedEnd) {
+          displayText.textContent = formatDisplayDate(selectedStart) + '  →  ' + formatDisplayDate(selectedEnd);
+          root.classList.add('oficios-filter-range--active');
+        } else if (selectedStart) {
+          displayText.textContent = formatDisplayDate(selectedStart) + '  →  …';
+          root.classList.add('oficios-filter-range--active');
+        } else {
+          displayText.textContent = displayPlaceholder;
+          root.classList.remove('oficios-filter-range--active');
+        }
       }
       if (summary) {
         if (selectedStart && selectedEnd) {

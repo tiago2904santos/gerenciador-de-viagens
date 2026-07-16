@@ -42,6 +42,11 @@
                    autocomplete="off"
                    maxlength="60"
                    value="{{ servidor.numero_solicitacao }}">
+            {% with ps_id=servidor.ps_pk|stringformat:"s" %}
+              {% with prazo_name="ps-"|add:ps_id|add:"-prazo_limite_saque" prazo_display_id="id_ps_"|add:ps_id|add:"_prazo_limite_saque_display" prazo_hidden_id="id_ps_"|add:ps_id|add:"_prazo_limite_saque" prazo_aria="Prazo limite para saque de "|add:servidor.name %}
+                {% include "components/forms/cv_date_picker.html" with mode="single" control_variant="input-only" extra_class="oficio-lc__prazo-picker" single_input_id=prazo_display_id single_hidden_id=prazo_hidden_id single_hidden_name=prazo_name single_hidden_value=servidor.prazo_limite_saque input_class="form-control cv-field__control oficio-lc__prazo-input" single_aria_label=prazo_aria only %}
+              {% endwith %}
+            {% endwith %}
           </form>
 
           <div class="oficio-lc__traveller-body">
@@ -60,6 +65,18 @@
           </div>
 
           {% include "components/ui/buttons/icon_button.html" with href=servidor.pacote_url action="pdf" aria_label="Baixar pacote do servidor" tooltip="Baixar pacote (PDF final)" only %}
+          <button type="button"
+                  class="cv-icon-btn cv-icon-btn--whatsapp"
+                  aria-label="Enviar aviso de liberação de diárias por WhatsApp"
+                  data-tooltip="Enviar aviso de liberação (WhatsApp)"
+                  data-diaria-wa-send
+                  data-wa-phone="{{ servidor.whatsapp_phone }}"
+                  data-wa-oficio="{{ servidor.whatsapp_oficio }}"
+                  data-wa-unidade="{{ servidor.whatsapp_unidade }}"
+                  data-wa-evento="{{ servidor.whatsapp_evento }}"
+                  data-wa-servidor="{{ servidor.name }}"
+                  data-wa-diaria="{{ servidor.whatsapp_diaria }}"
+          >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="whatsapp" only %}</button>
         </div>
         {% endfor %}
       </div>
@@ -155,3 +172,64 @@
 
   </div>
 </article>
+
+<script>
+  if (!window.__prestDiariaWaBound) {
+    window.__prestDiariaWaBound = true;
+    document.addEventListener("click", function (e) {
+      var btn = e.target.closest("[data-diaria-wa-send]");
+      if (!btn) return;
+      e.preventDefault();
+
+      var row = btn.closest(".oficio-lc__traveller");
+      var numInput = row ? row.querySelector('input[name$="-numero_solicitacao"]') : null;
+      var prazoInput = row ? row.querySelector('input[name$="-prazo_limite_saque"]') : null;
+      var prazoDisplay = row ? row.querySelector("[data-cv-date-picker-input-only]") : null;
+
+      if (numInput && !numInput.value.trim()) {
+        numInput.focus();
+        numInput.setCustomValidity("Preencha o número da solicitação antes de enviar o aviso.");
+        numInput.reportValidity();
+        numInput.setCustomValidity("");
+        return;
+      }
+      if (prazoInput && !prazoInput.value) {
+        if (prazoDisplay) {
+          prazoDisplay.focus();
+          prazoDisplay.setCustomValidity("Informe o prazo limite para saque antes de enviar o aviso.");
+          prazoDisplay.reportValidity();
+          prazoDisplay.setCustomValidity("");
+        }
+        return;
+      }
+      var phone = (btn.dataset.waPhone || "").replace(/\D/g, "");
+      if (!phone) {
+        window.alert("Este servidor não tem um celular válido cadastrado (DDD + 9 dígitos) para enviar o aviso por WhatsApp.");
+        return;
+      }
+
+      var prazoParts = (prazoInput.value || "").split("-");
+      var prazoDisplay = prazoParts.length === 3 ? (prazoParts[2] + "/" + prazoParts[1] + "/" + prazoParts[0]) : "";
+
+      var msg = "📢 LIBERAÇÃO DE DIÁRIAS\n" +
+        "Comunicamos que, referente ao Ofício nº " + (btn.dataset.waOficio || "") +
+        " (" + (btn.dataset.waUnidade || "") + "), as diárias relativas ao evento " +
+        (btn.dataset.waEvento || "") + " estão liberadas para Transferência ou Saque.\n\n" +
+        "* Servidor beneficiado: " + (btn.dataset.waServidor || "") + "\n" +
+        "* Valor (por diária): " + (btn.dataset.waDiaria || "") + "\n" +
+        "⏳ Prazo limite para saque: " + prazoDisplay + " (PRAZO IMPRORROGÁVEL)\n" +
+        "⚠️ Aviso importante: O saque das diárias não fica disponível no mesmo dia do desbloqueio do cartão. Programe-se com antecedência!";
+
+      var enc = encodeURIComponent(msg);
+      var waMe = "https://wa.me/" + phone + "?text=" + enc;
+      if (/Android/i.test(navigator.userAgent || "")) {
+        var q = "phone=" + phone + "&text=" + enc;
+        window.location.href =
+          "intent://send?" + q +
+          "#Intent;scheme=whatsapp;package=com.whatsapp;S.browser_fallback_url=" + encodeURIComponent(waMe) + ";end";
+        return;
+      }
+      window.open(waMe, "_blank", "noopener");
+    });
+  }
+</script>

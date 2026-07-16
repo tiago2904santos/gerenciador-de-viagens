@@ -59,7 +59,7 @@
           </select>
         </div>
 
-        {% include "components/forms/cv_date_picker.html" with mode="range" picker_id="oficios-cloned-filter-date-picker" extra_class="oficios-filter-range" start_label="Viagem de" end_label="Viagem até" start_input_id="id_cloned_viagem_de_display" end_input_id="id_cloned_viagem_ate_display" start_hidden_id="id_cloned_viagem_de" end_hidden_id="id_cloned_viagem_ate" start_hidden_name="viagem_de" end_hidden_name="viagem_ate" start_hidden_value=viagem_de end_hidden_value=viagem_ate initial_date=viagem_de filter_date=True show_summary=False only %}
+        {% include "components/forms/cv_date_picker.html" with mode="range" control_variant="filter-pill" picker_id="oficios-cloned-filter-date-picker" extra_class="oficios-filter-range" trigger_label="Período da viagem" trigger_aria_label="Filtrar por período da viagem" start_hidden_id="id_cloned_viagem_de" end_hidden_id="id_cloned_viagem_ate" start_hidden_name="viagem_de" end_hidden_name="viagem_ate" start_hidden_value=viagem_de end_hidden_value=viagem_ate initial_date=viagem_de filter_date=True show_summary=False only %}
 
         {% include "components/ui/buttons/button.html" with href=search_clear_url label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control oficios-filter-clear" only %}
       </div>

@@ -41,6 +41,50 @@ class GlobalDatePickerTests(SimpleTestCase):
                 self.assertEqual(html.count("data-cv-date-picker-panel"), 1)
                 self.assertIn(f'data-mode="{mode}"', html)
 
+    def test_compact_variants_preserve_existing_triggers(self):
+        filter_html = render_to_string(
+            "components/forms/cv_date_picker.html",
+            {
+                "mode": "range",
+                "control_variant": "filter-pill",
+                "trigger_label": "Período da viagem",
+                "start_hidden_name": "viagem_de",
+                "end_hidden_name": "viagem_ate",
+                "show_summary": False,
+            },
+        )
+        self.assertIn('class="oficios-filter-range__btn"', filter_html)
+        self.assertIn("Período da viagem", filter_html)
+        self.assertNotIn("data-cv-date-picker-start-display", filter_html)
+        self.assertNotIn("data-cv-date-picker-end-display", filter_html)
+
+        action_html = render_to_string(
+            "components/forms/cv_date_picker.html",
+            {
+                "mode": "multi",
+                "control_variant": "action-button",
+                "trigger_label": "Preencher datas",
+                "show_summary": False,
+            },
+        )
+        self.assertIn("Preencher datas", action_html)
+        self.assertNotIn("data-cv-date-picker-display", action_html)
+        self.assertEqual(action_html.count("data-cv-date-picker-panel"), 1)
+
+    def test_calendar_grid_uses_an_integer_uniform_gap(self):
+        css_path = (
+            Path(settings.BASE_DIR)
+            / "static"
+            / "css"
+            / "components"
+            / "cv-date-picker.css"
+        )
+        css = css_path.read_text(encoding="utf-8")
+        self.assertIn("--cv-date-picker-day-gap: 2px;", css)
+        self.assertNotIn("scale(1.03)", css)
+        self.assertIn("column-gap: var(--cv-date-picker-day-gap);", css)
+        self.assertIn("row-gap: var(--cv-date-picker-day-gap);", css)
+
     def test_calendar_markup_exists_only_in_the_global_partial(self):
         templates_root = Path(settings.BASE_DIR) / "templates"
         global_partial = templates_root / "components" / "forms" / "cv_date_picker.html"

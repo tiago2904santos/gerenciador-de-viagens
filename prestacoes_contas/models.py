@@ -176,6 +176,14 @@ class PrestacaoServidor(models.Model):
         blank=True,
         default="",
     )
+    # Prazo limite para saque informado no aviso de liberação de diárias
+    # (WhatsApp) enviado a este servidor. Cada servidor tem o seu, já que a
+    # liberação do cartão pode ocorrer em datas diferentes por pessoa.
+    prazo_limite_saque = models.DateField(
+        "Prazo limite para saque",
+        null=True,
+        blank=True,
+    )
     criado_em = models.DateTimeField(auto_now_add=True)
     atualizado_em = models.DateTimeField(auto_now=True)
 
