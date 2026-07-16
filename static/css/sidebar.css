@@ -237,6 +237,72 @@
   padding: 14px 20px 16px;
 }
 
+.sidebar-account {
+  display: grid;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid var(--sidebar-link-border);
+  border-radius: var(--radius-control);
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.sidebar-account__identity {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.sidebar-account__label {
+  color: var(--sidebar-footer-fg);
+  font-size: 0.68rem;
+  font-weight: 700;
+  opacity: 0.72;
+  text-transform: uppercase;
+}
+
+.sidebar-account__name {
+  color: #ffffff;
+  font-size: 0.9rem;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar-account__area {
+  color: var(--sidebar-footer-fg);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.sidebar-account__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.sidebar-account__link {
+  align-items: center;
+  background: var(--sidebar-link-surface);
+  border: 1px solid var(--sidebar-link-border);
+  border-radius: var(--radius-sm);
+  color: var(--sidebar-link-fg);
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 700;
+  justify-content: center;
+  min-height: 34px;
+  padding: 7px 10px;
+  text-decoration: none;
+  transition: background-color var(--transition-base), border-color var(--transition-base);
+}
+
+.sidebar-account__link:hover,
+.sidebar-account__link:focus-visible {
+  background: var(--sidebar-link-hover-bg);
+  border-color: rgba(255, 243, 207, 0.35);
+}
+
 .sidebar-logout-form {
   margin: 0;
 }
@@ -248,8 +314,9 @@
   color: var(--sidebar-logout-fg);
   cursor: pointer;
   font-size: 12px;
-  font-weight: 600;
-  padding: 8px 12px;
+  font-weight: 700;
+  min-height: 34px;
+  padding: 7px 10px;
   transition: background-color var(--transition-base), border-color var(--transition-base);
   width: 100%;
 }

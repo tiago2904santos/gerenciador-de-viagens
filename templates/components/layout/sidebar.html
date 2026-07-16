@@ -74,6 +74,24 @@
     {% endfor %}
   </nav>
   <div class="sidebar-footer">
+    {% if request.user.is_authenticated %}
+      <section class="sidebar-account" aria-label="Conta do usuario">
+        <div class="sidebar-account__identity">
+          <span class="sidebar-account__label">Conectado como</span>
+          <strong class="sidebar-account__name">{{ request.user.get_username }}</strong>
+          {% if request.area %}
+            <span class="sidebar-account__area">{{ request.area.sigla }}</span>
+          {% endif %}
+        </div>
+        <div class="sidebar-account__actions">
+          <a class="sidebar-account__link" href="{% url 'core:perfil' %}">Perfil</a>
+          <form class="sidebar-logout-form" method="post" action="{% url 'core:logout' %}">
+            {% csrf_token %}
+            <button class="sidebar-logout-btn" type="submit">Sair</button>
+          </form>
+        </div>
+      </section>
+    {% endif %}
     <div class="sidebar-theme" role="group" aria-label="Tema visual da area principal">
       <span class="sidebar-theme__label" id="sidebar-theme-label">Tema</span>
       <div class="app-theme-grid" role="radiogroup" aria-labelledby="sidebar-theme-label">

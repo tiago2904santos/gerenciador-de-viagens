@@ -27,6 +27,15 @@ class PerfilUsuarioTests(TestCase):
         self.assertContains(response, "Meu perfil")
         self.assertContains(response, "Sair do sistema")
 
+    def test_sidebar_exibe_acesso_ao_perfil_e_logout(self):
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("core:dashboard"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'href="/perfil/"')
+        self.assertContains(response, 'action="/logout/"')
+
     def test_atualiza_dados_do_perfil(self):
         self.client.force_login(self.user)
 
