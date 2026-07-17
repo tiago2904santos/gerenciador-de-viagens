@@ -1,27 +1,24 @@
-<div class="delete-confirm-modal" data-delete-confirm-modal hidden>
-  <div class="delete-confirm-modal__backdrop" data-delete-modal-cancel></div>
+<div class="cv-dialog cv-dialog--danger delete-confirm-modal" data-delete-confirm-modal hidden>
+  <div class="cv-dialog__backdrop delete-confirm-modal__backdrop" data-delete-modal-cancel></div>
   <section
-    class="delete-confirm-modal__dialog"
+    class="cv-dialog__panel cv-dialog__panel--sm delete-confirm-modal__dialog"
     role="dialog"
     aria-modal="true"
     aria-labelledby="delete-confirm-title"
     aria-describedby="delete-confirm-description"
     tabindex="-1"
   >
-    <header class="delete-confirm-modal__header">
-      <span class="delete-confirm-modal__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="delete" only %}</span>
-      <div class="delete-confirm-modal__copy">
-        <span class="delete-confirm-modal__eyebrow">Confirmar exclusão</span>
-        <h2 class="delete-confirm-modal__title" id="delete-confirm-title">{{ delete_modal_title|default:"Excluir registro?" }}</h2>
-      </div>
-    </header>
+    {% include "components/ui/modals/dialog_header.html" with icon="delete" tone="danger" eyebrow="Confirmar exclusão" title=delete_modal_title|default:"Excluir registro?" title_id="delete-confirm-title" data_delete_modal_cancel=True only %}
 
-    <p class="delete-confirm-modal__message" id="delete-confirm-description">
-      Você está prestes a excluir <strong data-delete-confirm-label>{{ delete_modal_entity|default:"este registro" }}</strong>.
-      Se houver vínculos com outros registros, a exclusão será bloqueada.
-    </p>
+    <div class="cv-dialog__body delete-confirm-modal__body">
+      <p class="cv-dialog__message delete-confirm-modal__message" id="delete-confirm-description">
+        Você está prestes a excluir <strong data-delete-confirm-label>{{ delete_modal_entity|default:"este registro" }}</strong>.
+        Se houver vínculos com outros registros, a exclusão será bloqueada.
+      </p>
+      <p class="cv-dialog__notice cv-dialog__notice--danger">Esta ação é permanente e não poderá ser desfeita.</p>
+    </div>
 
-    <form method="post" class="delete-confirm-modal__actions" data-delete-confirm-form>
+    <form method="post" class="cv-dialog__footer delete-confirm-modal__actions" data-delete-confirm-form>
       {% csrf_token %}
       {% include "components/ui/buttons/button.html" with label="Cancelar" variant="secondary" type="button" data_delete_modal_cancel=True only %}
       {% include "components/ui/buttons/button.html" with label="Excluir" variant="danger" type="submit" icon="delete" only %}

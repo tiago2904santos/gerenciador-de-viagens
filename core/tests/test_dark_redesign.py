@@ -1,0 +1,536 @@
+from pathlib import Path
+
+from django.conf import settings
+from django.test import SimpleTestCase
+
+
+class DarkRedesignContractTests(SimpleTestCase):
+    def setUp(self):
+        self.base_path = Path(settings.BASE_DIR) / "templates" / "base.html"
+        self.css_path = Path(settings.BASE_DIR) / "static" / "css" / "dark-redesign.css"
+        self.base = self.base_path.read_text(encoding="utf-8")
+        self.css = self.css_path.read_text(encoding="utf-8")
+
+    def test_dark_redesign_is_the_final_global_css_layer(self):
+        extra_css_index = self.base.index("{% block extra_css %}")
+        file_picker_index = self.base.index("css/components/file-picker.css")
+        action_system_index = self.base.index("css/components/action-system.css")
+        record_list_index = self.base.index("css/components/record-list.css")
+        filter_header_index = self.base.index("css/components/filter-header.css")
+        form_panel_index = self.base.index("css/components/form-panel.css")
+        app_shell_index = self.base.index("css/components/app-shell.css")
+        content_cards_index = self.base.index("css/components/content-cards.css")
+        document_viewer_index = self.base.index("css/components/document-viewer.css")
+        dialog_index = self.base.index("css/components/dialog.css")
+        dark_redesign_index = self.base.index("css/dark-redesign.css")
+
+        self.assertLess(extra_css_index, file_picker_index)
+        self.assertLess(file_picker_index, action_system_index)
+        self.assertLess(extra_css_index, action_system_index)
+        self.assertLess(action_system_index, dialog_index)
+        self.assertLess(action_system_index, record_list_index)
+        self.assertLess(record_list_index, filter_header_index)
+        self.assertLess(filter_header_index, form_panel_index)
+        self.assertLess(form_panel_index, app_shell_index)
+        self.assertLess(app_shell_index, content_cards_index)
+        self.assertLess(content_cards_index, document_viewer_index)
+        self.assertLess(document_viewer_index, dialog_index)
+        self.assertLess(content_cards_index, dialog_index)
+        self.assertLess(dialog_index, dark_redesign_index)
+        self.assertLess(action_system_index, dark_redesign_index)
+
+    def test_theme_layer_does_not_target_official_light_theme(self):
+        self.assertNotIn('html[data-theme="light"]', self.css)
+        self.assertNotIn('html[data-theme="light-light"]', self.css)
+        self.assertNotIn('html[data-theme="dark-light"]', self.css)
+
+    def test_semantic_dark_contract_covers_core_component_needs(self):
+        required_tokens = (
+            "--color-bg:",
+            "--color-surface:",
+            "--color-surface-elevated:",
+            "--color-text:",
+            "--color-text-muted:",
+            "--color-border:",
+            "--color-focus:",
+            "--color-success:",
+            "--color-info:",
+            "--color-warning:",
+            "--color-danger:",
+            "--color-input-bg:",
+            "--sidebar-width:",
+        )
+
+        for token in required_tokens:
+            with self.subTest(token=token):
+                self.assertIn(token, self.css)
+
+    def test_reduced_motion_and_mobile_shell_are_explicit(self):
+        self.assertIn("@media (prefers-reduced-motion: reduce)", self.css)
+        self.assertIn("@media (max-width: 600px)", self.css)
+        self.assertIn("height: 100dvh;", self.css)
+        self.assertIn("max-height: none;", self.css)
+
+    def test_templates_do_not_reintroduce_inline_visual_or_event_contracts(self):
+        templates = Path(settings.BASE_DIR) / "templates"
+        forbidden = (" style=", " onclick=", " onchange=", " oninput=", " onsubmit=")
+
+        for template in templates.rglob("*.html"):
+            source = template.read_text(encoding="utf-8")
+            for contract in forbidden:
+                with self.subTest(template=template, contract=contract):
+                    self.assertNotIn(contract, source)
+
+    def test_global_app_owns_confirmation_behavior(self):
+        app_js = (
+            Path(settings.BASE_DIR) / "static" / "js" / "core" / "app.js"
+        ).read_text(encoding="utf-8")
+        self.assertIn("initConfirmSubmitContracts", app_js)
+        self.assertIn("[data-confirm-submit]", app_js)
+        self.assertIn("form[data-confirm-submit]", app_js)
+
+    def test_global_app_owns_dynamic_component_initialization(self):
+        app_js = (
+            Path(settings.BASE_DIR) / "static" / "js" / "core" / "app.js"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn("window.CV.registerEnhancer", app_js)
+        self.assertIn("window.CV.enhance", app_js)
+        self.assertIn("new MutationObserver", app_js)
+
+        component_files = (
+            "cv-custom-select.js",
+            "cv-search-picker.js",
+            "cv-date-picker.js",
+            "realtime-filters.js",
+            "live-search-submit.js",
+            "delete-confirm-modal.js",
+            "confirm-action-modal.js",
+            "cancel-reason-modal.js",
+        )
+        components = Path(settings.BASE_DIR) / "static" / "js" / "components"
+        for filename in component_files:
+            with self.subTest(component=filename):
+                source = (components / filename).read_text(encoding="utf-8")
+                self.assertIn("registerEnhancer", source)
+
+    def test_page_header_wrappers_share_one_canonical_markup(self):
+        headers = Path(settings.BASE_DIR) / "templates" / "components" / "ui" / "headers"
+        canonical = (headers / "page_header.html").read_text(encoding="utf-8")
+
+        self.assertIn('<header class="page-header-stack', canonical)
+        self.assertIn("components/ui/buttons/button.html", canonical)
+        self.assertIn("components/ui/badges/status_badge.html", canonical)
+
+        for wrapper_name in (
+            "header_stack_simple.html",
+            "header_stack_back_action.html",
+            "header_stack_stepper.html",
+        ):
+            with self.subTest(wrapper=wrapper_name):
+                wrapper = (headers / wrapper_name).read_text(encoding="utf-8")
+                self.assertIn('components/ui/headers/page_header.html', wrapper)
+                self.assertNotIn('class="page-header-band"', wrapper)
+
+    def test_canonical_header_uses_a_valid_multiline_template_comment(self):
+        canonical = (
+            Path(settings.BASE_DIR)
+            / "templates"
+            / "components"
+            / "ui"
+            / "headers"
+            / "page_header.html"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn("{% comment %}", canonical)
+        self.assertIn("{% endcomment %}", canonical)
+        self.assertNotIn("{#\n", canonical)
+
+    def test_canonical_button_exposes_loading_and_disabled_contracts(self):
+        button = (
+            Path(settings.BASE_DIR)
+            / "templates"
+            / "components"
+            / "ui"
+            / "buttons"
+            / "button.html"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn("is-loading", button)
+        self.assertIn('aria-busy="true"', button)
+        self.assertIn("disabled or loading", button)
+
+    def test_legacy_field_entrypoint_delegates_to_canonical_field(self):
+        wrapper = (
+            Path(settings.BASE_DIR)
+            / "templates"
+            / "components"
+            / "forms"
+            / "form_field.html"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn('components/ui/forms/field.html', wrapper)
+        self.assertNotIn("field.as_widget", wrapper)
+
+    def test_selection_lab_uses_real_field_and_filter_components(self):
+        lab = (
+            Path(settings.BASE_DIR)
+            / "templates"
+            / "dev"
+            / "ui_lab"
+            / "selects_filters.html"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn('components/forms/form_field.html', lab)
+        self.assertIn('components/ui/headers/header_stack_filters.html', lab)
+        self.assertIn("data-cv-realtime-filter-scope", lab)
+        self.assertNotIn('<select name="lab-', lab)
+
+    def test_feedback_lab_uses_canonical_feedback_components(self):
+        lab = (
+            Path(settings.BASE_DIR)
+            / "templates"
+            / "dev"
+            / "ui_lab"
+            / "feedback.html"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn('components/ui/feedback/alert.html', lab)
+        self.assertIn('components/ui/feedback/form_errors.html', lab)
+        self.assertIn('components/ui/feedback/empty_state.html', lab)
+        self.assertNotIn("ui-lab-feedback-card", lab)
+
+    def test_canonical_feedback_supports_existing_contracts(self):
+        feedback = (
+            Path(settings.BASE_DIR) / "templates" / "components" / "ui" / "feedback"
+        )
+        alert = (feedback / "alert.html").read_text(encoding="utf-8")
+        empty_state = (feedback / "empty_state.html").read_text(encoding="utf-8")
+        form_errors = (feedback / "form_errors.html").read_text(encoding="utf-8")
+
+        self.assertIn("alert-{{ alert_variant }}", alert)
+        self.assertIn("alert--{{ alert_variant }}", alert)
+        self.assertIn("action_label and action_url", empty_state)
+        self.assertIn('components/ui/buttons/button.html', empty_state)
+        self.assertIn("form.errors or errors", form_errors)
+
+    def test_overlay_lab_uses_the_real_confirmation_modal(self):
+        lab = (
+            Path(settings.BASE_DIR)
+            / "templates"
+            / "dev"
+            / "ui_lab"
+            / "overlays.html"
+        ).read_text(encoding="utf-8")
+        app_js = (
+            Path(settings.BASE_DIR) / "static" / "js" / "core" / "app.js"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn('components/ui/modals/delete_confirm_modal.html', lab)
+        self.assertIn("data_delete_url", lab)
+        self.assertNotIn("ui-lab-overlay-frame", lab)
+        self.assertIn("window.CV.dialogs", app_js)
+        self.assertIn('event.key !== "Tab"', app_js)
+        self.assertIn('event.key === "Escape"', app_js)
+        self.assertIn("data-action-menu-trigger", lab)
+        self.assertIn("data-tooltip", lab)
+        self.assertIn("data-sidebar-drawer-toggle", lab)
+        self.assertIn('components/ui/menus/rich_menu_link.html', lab)
+
+    def test_table_lab_uses_canonical_table_and_pagination(self):
+        lab = (
+            Path(settings.BASE_DIR)
+            / "templates"
+            / "dev"
+            / "ui_lab"
+            / "tables.html"
+        ).read_text(encoding="utf-8")
+        table = (
+            Path(settings.BASE_DIR)
+            / "templates"
+            / "components"
+            / "ui"
+            / "tables"
+            / "data_table.html"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn('components/ui/tables/data_table.html', lab)
+        self.assertIn('components/ui/lists/pagination.html', lab)
+        self.assertNotIn('class="ui-lab-table"', lab)
+        self.assertIn('scope="col"', table)
+        self.assertIn('components/ui/badges/status_badge.html', table)
+
+    def test_file_picker_is_a_global_accessible_component(self):
+        component = (
+            Path(settings.BASE_DIR)
+            / "templates"
+            / "components"
+            / "ui"
+            / "forms"
+            / "file_picker.html"
+        ).read_text(encoding="utf-8")
+        component_css = (
+            Path(settings.BASE_DIR)
+            / "static"
+            / "css"
+            / "components"
+            / "file-picker.css"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn("cv-file-picker", component)
+        self.assertIn("cv-file-selection", component)
+        self.assertIn('aria-describedby="{{ field_id }}-help"', component)
+        self.assertIn(".cv-file-picker", component_css)
+        self.assertIn("@media (max-width: 620px)", component_css)
+
+    def test_confirmation_flows_share_the_canonical_dialog_structure(self):
+        modals = (
+            Path(settings.BASE_DIR) / "templates" / "components" / "ui" / "modals"
+        )
+        header = (modals / "dialog_header.html").read_text(encoding="utf-8")
+
+        self.assertIn("cv-dialog__header", header)
+        self.assertIn("cv-dialog__close", header)
+        for filename, hook in (
+            ("delete_confirm_modal.html", "data-delete-confirm-modal"),
+            ("cancel_reason_modal.html", "data-cancel-reason-modal"),
+            ("confirm_action_modal.html", "data-confirm-action-modal"),
+        ):
+            with self.subTest(modal=filename):
+                source = (modals / filename).read_text(encoding="utf-8")
+                self.assertIn("cv-dialog__panel", source)
+                self.assertIn("components/ui/modals/dialog_header.html", source)
+                self.assertIn("cv-dialog__body", source)
+                self.assertIn("cv-dialog__footer", source)
+                self.assertIn(hook, source)
+
+    def test_compact_form_sections_are_explicitly_closed(self):
+        templates = Path(settings.BASE_DIR) / "templates"
+        include_contract = 'components/ui/layouts/form_section.html'
+
+        for template in templates.rglob("*.html"):
+            source = template.read_text(encoding="utf-8")
+            if include_contract not in source or template.as_posix().endswith("components/ui/forms/form_section.html"):
+                continue
+            with self.subTest(template=template):
+                self.assertGreaterEqual(source.count("</section>"), source.count(include_contract))
+
+    def test_protocolos_product_module_was_removed(self):
+        settings_source = (
+            Path(settings.BASE_DIR) / "config" / "settings" / "base.py"
+        ).read_text(encoding="utf-8")
+        urls_source = (Path(settings.BASE_DIR) / "config" / "urls.py").read_text(encoding="utf-8")
+        navigation_source = (
+            Path(settings.BASE_DIR) / "core" / "navigation.py"
+        ).read_text(encoding="utf-8")
+
+        self.assertNotIn('"protocolos",', settings_source)
+        self.assertNotIn('include("protocolos.urls")', urls_source)
+        self.assertNotIn('"url_name": "protocolos:index"', navigation_source)
+        self.assertFalse(list((Path(settings.BASE_DIR) / "protocolos").rglob("*.py")))
+        self.assertFalse(list((Path(settings.BASE_DIR) / "integracoes" / "eprotocolo").rglob("*.py")))
+        self.assertFalse(list((Path(settings.BASE_DIR) / "templates" / "protocolos").rglob("*.html")))
+
+    def test_global_shell_has_accessible_mobile_navigation_contract(self):
+        sidebar_template = (
+            Path(settings.BASE_DIR) / "templates" / "components" / "layout" / "sidebar.html"
+        ).read_text(encoding="utf-8")
+        sidebar_js = (
+            Path(settings.BASE_DIR) / "static" / "js" / "components" / "sidebar.js"
+        ).read_text(encoding="utf-8")
+        shell_css = (
+            Path(settings.BASE_DIR) / "static" / "css" / "components" / "app-shell.css"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn('href="#main-content"', self.base)
+        self.assertIn('id="main-content"', self.base)
+        self.assertIn("data-sidebar-drawer-toggle", self.base)
+        self.assertIn('id="app-sidebar"', sidebar_template)
+        self.assertIn('aria-label="MÃ³dulos da Central de Viagens"', sidebar_template)
+        self.assertIn("accordion.hidden = !isOpen", sidebar_js)
+        self.assertIn("sidebar.inert = !shouldOpen", sidebar_js)
+        self.assertIn('event.key === "Escape"', sidebar_js)
+        self.assertIn("body.has-sidebar-open", shell_css)
+        self.assertIn("@media (max-width: 840px)", shell_css)
+
+    def test_delete_confirmation_page_keeps_cancel_and_submit_actions(self):
+        component = (
+            Path(settings.BASE_DIR)
+            / "templates"
+            / "components"
+            / "ui"
+            / "modals"
+            / "confirm_delete.html"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn("cv-confirm-page", component)
+        self.assertIn("href=back_url", component)
+        self.assertIn('variant="danger"', component)
+        self.assertIn('type="submit"', component)
+
+    def test_summary_and_document_cards_share_global_contracts(self):
+        cards = Path(settings.BASE_DIR) / "templates" / "components" / "cards"
+        summary = (cards / "summary_card.html").read_text(encoding="utf-8")
+        document = (cards / "document_card.html").read_text(encoding="utf-8")
+        plan_summary = (
+            Path(settings.BASE_DIR)
+            / "templates"
+            / "planos_trabalho"
+            / "partials"
+            / "resumo_evento_card.html"
+        ).read_text(encoding="utf-8")
+        component_css = (
+            Path(settings.BASE_DIR)
+            / "static"
+            / "css"
+            / "components"
+            / "content-cards.css"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn("cv-summary-tile", summary)
+        self.assertIn("cv-document-card", document)
+        self.assertIn("cv-summary-card", plan_summary)
+        self.assertIn("cv-summary-grid--4", plan_summary)
+        self.assertIn("@media (max-width: 620px)", component_css)
+
+        for relative in (
+            "relatorio_tecnico_form.html",
+            "consolidado.html",
+            "documentos_form.html",
+            "diario_bordo_form.html",
+        ):
+            with self.subTest(template=relative):
+                source = (
+                    Path(settings.BASE_DIR) / "templates" / "prestacoes_contas" / relative
+                ).read_text(encoding="utf-8")
+                self.assertIn("cv-summary-card", source)
+
+    def test_cards_lab_renders_canonical_product_components(self):
+        lab = (
+            Path(settings.BASE_DIR)
+            / "templates"
+            / "dev"
+            / "ui_lab"
+            / "cards.html"
+        ).read_text(encoding="utf-8")
+        views = (Path(settings.BASE_DIR) / "core" / "views.py").read_text(encoding="utf-8")
+
+        self.assertIn('components/cards/summary_card.html', lab)
+        self.assertIn('components/lists/list_grid.html', lab)
+        self.assertIn('components/lists/simple_list.html', lab)
+        self.assertNotIn('dev/ui_lab/partials/_list_card.html', lab)
+        self.assertNotIn('dev/ui_lab/partials/_simple_list_item.html', lab)
+        self.assertIn('"dev/ui_lab/cards.html", "cards"', views)
+        self.assertFalse(
+            (Path(settings.BASE_DIR) / "templates" / "dev" / "ui_lab" / "partials" / "_list_card.html").exists()
+        )
+
+    def test_rich_list_cards_share_the_entity_card_contract(self):
+        templates = Path(settings.BASE_DIR) / "templates"
+        for relative in (
+            "oficios/partials/oficio_list_card.html",
+            "eventos/partials/evento_list_card.html",
+            "planos_trabalho/partials/plano_list_card.html",
+            "ordens_servico/partials/os_list_card.html",
+            "prestacoes_contas/partials/prestacao_list_card.html",
+            "roteiros/partials/roteiro_list_card.html",
+            "components/lists/main_list_card.html",
+        ):
+            with self.subTest(template=relative):
+                source = (templates / relative).read_text(encoding="utf-8")
+                self.assertIn("cv-entity-card", source)
+                self.assertIn("cv-entity-card__header", source)
+                self.assertIn("cv-entity-card__body", source)
+                self.assertIn("cv-entity-card__footer", source)
+
+    def test_document_viewer_and_signature_use_canonical_components(self):
+        templates = Path(settings.BASE_DIR) / "templates"
+        viewer = (templates / "components" / "documents" / "pdf_viewer.html").read_text(encoding="utf-8")
+        signature = (templates / "components" / "documents" / "signature_card.html").read_text(encoding="utf-8")
+        viewer_page = (templates / "documentos" / "pdf_viewer.html").read_text(encoding="utf-8")
+        documents_lab = (templates / "dev" / "ui_lab" / "documents.html").read_text(encoding="utf-8")
+        signature_lab = (templates / "dev" / "ui_lab" / "signature.html").read_text(encoding="utf-8")
+        signature_js = (
+            Path(settings.BASE_DIR) / "static" / "js" / "components" / "signature-actions.js"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn("cv-document-viewer", viewer)
+        self.assertIn("doc-pdf-canvas-wrap", viewer)
+        self.assertIn('components/documents/pdf_viewer.html', viewer_page)
+        self.assertIn('components/documents/pdf_viewer.html', documents_lab)
+        self.assertIn("cv-signature-card", signature)
+        self.assertIn("data-cv-signature-copy", signature)
+        self.assertIn('components/documents/signature_card.html', signature_lab)
+        self.assertIn('components/documents/signature_card.html', (
+            templates / "prestacoes_contas" / "diario_bordo_form.html"
+        ).read_text(encoding="utf-8"))
+        self.assertIn("[data-cv-signature-copy]", signature_js)
+        self.assertNotIn("<script>", signature)
+        self.assertFalse((templates / "prestacoes_contas" / "partials" / "assinatura_card.html").exists())
+        self.assertFalse((Path(settings.BASE_DIR) / "static" / "css" / "documentos-viewer.css").exists())
+
+    def test_wizard_transport_uses_canonical_section_and_action_contracts(self):
+        source = (
+            Path(settings.BASE_DIR) / "templates" / "oficios" / "wizard_transporte.html"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn("cv-wizard-section-card", source)
+        self.assertIn("cv-wizard-section-header", source)
+        self.assertIn("cv-wizard-section-body", source)
+        self.assertIn("cv-btn cv-btn--secondary", source)
+        self.assertNotIn("form-section app-form-section", source)
+        self.assertNotIn("btn btn-secondary", source)
+
+    def test_event_labs_render_the_real_form_sections_and_list_card(self):
+        lab_root = Path(settings.BASE_DIR) / "templates" / "dev" / "ui_lab"
+        form_lab = (lab_root / "eventos_cadastro.html").read_text(encoding="utf-8")
+        list_lab = (lab_root / "eventos_lista.html").read_text(encoding="utf-8")
+
+        self.assertIn('eventos/includes/_evento_form_sections.html', form_lab)
+        self.assertIn('eventos/partials/evento_list_card.html', list_lab)
+        self.assertIn('css/eventos-list.css', list_lab)
+        self.assertNotIn('components/lists/main_list_card.html', list_lab)
+        self.assertNotIn("ui-lab-status-pill--review", form_lab)
+        self.assertNotIn("ui-lab-status-pill--review", list_lab)
+
+    def test_dashboard_uses_global_header_summary_and_module_cards(self):
+        templates = Path(settings.BASE_DIR) / "templates"
+        dashboard = (templates / "core" / "dashboard.html").read_text(encoding="utf-8")
+        module_card = (templates / "components" / "cards" / "module_card.html").read_text(encoding="utf-8")
+
+        self.assertIn("page-shell dashboard-page", dashboard)
+        self.assertIn('components/ui/headers/header_stack_simple.html', dashboard)
+        self.assertIn('components/cards/summary_card.html', dashboard)
+        self.assertIn('components/cards/module_card.html', dashboard)
+        self.assertNotIn("dashboard-login-inspired", dashboard)
+        self.assertIn("cv-module-card", module_card)
+        self.assertIn('components/buttons/action_button.html', module_card)
+
+        cadastros = (templates / "cadastros" / "index.html").read_text(encoding="utf-8")
+        self.assertIn("page-shell cadastros-hub", cadastros)
+        self.assertIn('components/ui/headers/header_stack_simple.html', cadastros)
+        self.assertIn('components/cards/module_card.html', cadastros)
+        self.assertNotIn("app-page-hero", cadastros)
+
+    def test_login_is_a_solid_responsive_dark_surface_without_flow_changes(self):
+        login = (
+            Path(settings.BASE_DIR) / "templates" / "core" / "login.html"
+        ).read_text(encoding="utf-8")
+        auth_css = (
+            Path(settings.BASE_DIR) / "static" / "css" / "auth.css"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn('method="post"', login)
+        self.assertIn("{{ form.username }}", login)
+        self.assertIn("{{ form.password }}", login)
+        self.assertIn("{% csrf_token %}", login)
+        self.assertIn("auth-intro", login)
+        self.assertIn("auth-panel", login)
+        self.assertNotIn("gradient(", auth_css)
+        self.assertIn("@media (max-width: 820px)", auth_css)
+        self.assertIn("@media (prefers-reduced-motion: reduce)", auth_css)
+
+    def test_dark_action_tokens_use_solid_primary_fills(self):
+        self.assertIn("--action-primary-bg: var(--color-primary);", self.css)
+        self.assertIn("--cv-btn-primary-bg: var(--color-primary);", self.css)
+        self.assertIn("--route-button-primary-bg: var(--color-primary);", self.css)

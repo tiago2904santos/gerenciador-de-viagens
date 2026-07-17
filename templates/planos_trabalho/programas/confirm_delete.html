@@ -10,10 +10,11 @@
       {% include "components/ui/layouts/form_section.html" with title="Confirmação de exclusão" description="Confirma a exclusão do programa solicitante." section_id="pt-programa-delete-section" only %}
       <div class="field-grid">
         <div class="field-size-4">
-          <p style="margin: 0 0 var(--space-3)">Confirma a exclusão do programa <strong>{{ programa.nome }}</strong>?</p>
+          <p class="delete-confirm-copy">Confirma a exclusão do programa <strong>{{ programa.nome }}</strong>?</p>
           {% include "components/ui/feedback/alert.html" with variant="warning" message="Planos já criados que usam este programa não são alterados." only %}
         </div>
       </div>
+      </section>
       {% include "components/ui/layouts/card_footer_actions.html" with secondary_label="Cancelar" secondary_url=cancel_url primary_label="Excluir" primary_variant="danger" only %}
     </form>
   </div>

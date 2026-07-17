@@ -1,10 +1,10 @@
 <article
-  class="oficio-lc evento-lc"
+  class="cv-entity-card oficio-lc evento-lc"
   data-cv-filter-item
   data-search-text="{{ card.titulo }} {{ card.destino }} {{ card.periodo }} {{ card.responsavel }}{% for oficio in card.oficios %} {{ oficio.numero }}{% for servidor in oficio.servidores %} {{ servidor.name }}{% endfor %}{% endfor %}{% for doc in card.documentos %} {{ doc.kind }} {{ doc.title }} {{ doc.detail }}{% endfor %}"
 >
-  <div class="oficio-lc__layout">
-    <div class="oficio-lc__id-row">
+  <div class="cv-entity-card__body oficio-lc__layout">
+    <div class="cv-entity-card__header oficio-lc__id-row">
       <div class="oficio-lc__info-item oficio-lc__info-item--wide">
         <span class="oficio-lc__info-label">Evento</span>
         <span class="oficio-lc__info-value oficio-lc__info-value--wrap">{{ card.titulo }}{% if card.destino %} · {{ card.destino }}{% endif %}{% if card.periodo %} · {{ card.periodo }}{% endif %}</span>
@@ -187,7 +187,7 @@
       {% endif %}
     </div>
 
-    <div class="oficio-lc__footer">
+    <div class="cv-entity-card__footer oficio-lc__footer">
       <div class="oficio-lc__footer-actions">
         <div class="oficio-lc__footer-actions-main cv-icon-btn-group">
           {% include "components/ui/buttons/icon_button.html" with href=card.editar_url action="edit" aria_label="Editar evento" tooltip="Editar evento" only %}

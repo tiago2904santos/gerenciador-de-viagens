@@ -15,6 +15,10 @@ body {
   margin-bottom: 12px;
 }
 
+.doc-meta--center {
+  text-align: center;
+}
+
 .doc-orgao {
   font-weight: 700;
   text-transform: uppercase;

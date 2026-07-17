@@ -1,0 +1,60 @@
+/* Shared structural layout for data-list headers with filters. */
+
+.cv-filter-header {
+  overflow: visible;
+}
+
+.cv-filter-header__heading .page-header-band__content {
+  align-items: end;
+}
+
+.cv-filter-header__controls {
+  display: block;
+}
+
+.cv-filter-bar,
+.cv-filter-bar > .header-filter-bar__search {
+  min-width: 0;
+  width: 100%;
+}
+
+.cv-filter-bar > .header-filter-bar__search {
+  align-items: center;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(240px, 1fr) repeat(4, auto) auto;
+}
+
+.cv-filter-bar__search {
+  min-width: 220px;
+  position: relative;
+}
+
+.cv-filter-bar__search-input {
+  width: 100%;
+}
+
+.cv-filter-bar__select {
+  min-width: 150px;
+}
+
+@media (max-width: 1180px) {
+  .cv-filter-bar > .header-filter-bar__search {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .cv-filter-bar__search {
+    flex: 1 1 340px;
+  }
+}
+
+@media (max-width: 620px) {
+  .cv-filter-bar__search,
+  .cv-filter-bar__select,
+  .cv-filter-bar .cv-date-picker,
+  .cv-filter-bar .cv-btn {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+}

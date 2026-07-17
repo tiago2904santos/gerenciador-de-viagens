@@ -1,38 +1,42 @@
-<div class="field app-form-field">
+<div class="field app-form-field cv-file-field">
   {% if label %}
     <label class="app-form-label" for="{{ field_id }}">{{ label }}</label>
   {% endif %}
-  <div class="prestacao-file-widget" data-file-picker>
-    <div class="prestacao-file-picker">
+  <div class="cv-file-widget prestacao-file-widget" data-file-picker>
+    <div class="cv-file-picker prestacao-file-picker">
       <input type="file"
              name="{{ field_name }}"
              id="{{ field_id }}"
-             class="form-control cv-field__control prestacao-file-input"
+             class="form-control cv-field__control cv-file-input prestacao-file-input"
              accept="{{ accept|default:'application/pdf,image/png,image/jpeg,image/*' }}"
              {% if not single %}multiple{% endif %}
+             {% if help_text %}aria-describedby="{{ field_id }}-help"{% endif %}
              data-file-native="true">
-      <label class="prestacao-file-picker__action" for="{{ field_id }}">{{ action_label|default:"Selecionar arquivos" }}</label>
-      <span class="prestacao-file-picker__value" data-file-picker-name data-default-label="{{ empty_label|default:'Nenhum arquivo selecionado' }}">{{ empty_label|default:"Nenhum arquivo selecionado" }}</span>
-      <div class="prestacao-file-picker__inline-actions" data-file-inline-actions hidden></div>
-      <button class="prestacao-file-picker__upload" type="submit" data-file-upload-button disabled>{{ upload_label|default:"Anexar" }}</button>
+      <label class="cv-file-picker__action prestacao-file-picker__action" for="{{ field_id }}">
+        <span class="cv-file-picker__action-icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="document" only %}</span>
+        <span>{{ action_label|default:"Selecionar arquivos" }}</span>
+      </label>
+      <span class="cv-file-picker__value prestacao-file-picker__value" data-file-picker-name data-default-label="{{ empty_label|default:'Nenhum arquivo selecionado' }}">{{ empty_label|default:"Nenhum arquivo selecionado" }}</span>
+      <div class="cv-file-picker__inline-actions prestacao-file-picker__inline-actions" data-file-inline-actions hidden></div>
+      <button class="cv-file-picker__upload prestacao-file-picker__upload" type="submit" data-file-upload-button disabled>{{ upload_label|default:"Anexar" }}</button>
     </div>
-    <div class="prestacao-file-selection" data-file-selection-dropdown hidden>
-      <button class="prestacao-file-selection__toggle" type="button" aria-expanded="false" data-file-selection-toggle>
+    <div class="cv-file-selection prestacao-file-selection" data-file-selection-dropdown hidden>
+      <button class="cv-file-selection__toggle prestacao-file-selection__toggle" type="button" aria-expanded="false" data-file-selection-toggle>
         <span data-file-selection-summary>Arquivos selecionados</span>
-        <span class="prestacao-file-selection__chevron" aria-hidden="true"></span>
+        <span class="cv-file-selection__chevron prestacao-file-selection__chevron" aria-hidden="true"></span>
       </button>
-      <div class="prestacao-file-selection__menu" data-file-selection-menu hidden>
-        <ul class="prestacao-file-selection__list" data-file-selection-list></ul>
+      <div class="cv-file-selection__menu prestacao-file-selection__menu" data-file-selection-menu hidden>
+        <ul class="cv-file-selection__list prestacao-file-selection__list" data-file-selection-list></ul>
       </div>
     </div>
     <template data-file-selection-template>
-      <li class="prestacao-file-selection__item" data-file-selection-row>
-        <div class="prestacao-file-widget__meta">
-          <strong class="prestacao-file-widget__name" data-file-selection-name></strong>
-          <span class="prestacao-file-widget__subtitle" data-file-selection-size></span>
+      <li class="cv-file-selection__item prestacao-file-selection__item" data-file-selection-row>
+        <div class="cv-file-widget__meta prestacao-file-widget__meta">
+          <strong class="cv-file-widget__name prestacao-file-widget__name" data-file-selection-name></strong>
+          <span class="cv-file-widget__subtitle prestacao-file-widget__subtitle" data-file-selection-size></span>
         </div>
-        <div class="prestacao-file-widget__actions">
-          <a class="cv-icon-btn cv-icon-btn--preview prestacao-file-widget__action"
+        <div class="cv-file-widget__actions prestacao-file-widget__actions">
+          <a class="cv-icon-btn cv-icon-btn--preview cv-file-widget__action prestacao-file-widget__action"
              href=""
              target="_blank"
              rel="noopener noreferrer"
@@ -42,7 +46,7 @@
              data-file-preview-selection>
             {% include "dev/ui_lab/partials/_cv_icon.html" with icon="eye" only %}
           </a>
-          <button class="cv-icon-btn cv-icon-btn--delete prestacao-file-widget__action"
+          <button class="cv-icon-btn cv-icon-btn--delete cv-file-widget__action prestacao-file-widget__action"
                   type="button"
                   aria-label="Remover arquivo da seleção"
                   data-tooltip="Remover"
@@ -55,6 +59,6 @@
     </template>
   </div>
   {% if help_text %}
-    <p class="field-help app-form-help">{{ help_text }}</p>
+    <p class="field-help app-form-help" id="{{ field_id }}-help">{{ help_text }}</p>
   {% endif %}
 </div>

@@ -1,7 +1,7 @@
 {# Lista simples com header Quick Add. Usa os mesmos tokens/estruturas do UI Lab. #}
 <div class="page-shell page-shell--list"{% if not disable_realtime_filter %} data-cv-realtime-filter-scope{% endif %}>
-  <div class="page-header-stack header-stack--quick-add{% if quick_add_compact %} header-stack--quick-add-compact{% endif %}">
-    <div class="page-header-band">
+  <div class="cv-filter-header page-header-stack header-stack--quick-add{% if quick_add_compact %} header-stack--quick-add-compact{% endif %}">
+    <div class="cv-filter-header__heading page-header-band">
       <div class="page-header-band__content">
         <div class="page-header-band__text">
           {% if eyebrow %}<span class="page-header-band__eyebrow">{{ eyebrow }}</span>{% endif %}
@@ -10,15 +10,15 @@
       </div>
     </div>
 
-    <div class="page-header-rail page-header-rail--filters page-header-rail--filters-quick-add">
+    <div class="cv-filter-header__controls page-header-rail page-header-rail--filters page-header-rail--filters-quick-add">
       {% if brand_mark %}
         <div class="page-header-rail__marker" aria-hidden="true">{{ brand_mark }}</div>
       {% endif %}
 
-      <form class="header-filter-bar" method="get" action="{{ request.path }}" data-cv-live-submit-form>
-        <div class="header-filter-bar__search">
+      <form class="cv-filter-bar header-filter-bar" method="get" action="{{ request.path }}" data-cv-live-submit-form>
+        <div class="cv-filter-bar__search header-filter-bar__search">
           <input
-            class="header-filter-input"
+            class="cv-filter-bar__search-input header-filter-input"
             type="search"
             name="q"
             placeholder="{{ search_placeholder|default:'Buscar itens' }}"

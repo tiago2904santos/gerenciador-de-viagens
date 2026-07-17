@@ -1,5 +1,3 @@
-{% if form.errors %}
-<div class="alert alert--danger" role="alert">
-  Revise os campos destacados antes de continuar.
-</div>
+{% if form.errors or errors %}
+  {% include "components/ui/feedback/alert.html" with variant="danger" title="Não foi possível continuar" message="Revise os campos destacados antes de continuar." only %}
 {% endif %}

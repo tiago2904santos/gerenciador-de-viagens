@@ -8,19 +8,20 @@
     data-oficio-motorista-mod-inicial="{{ form.motorista_modo.value|default:'SERVIDOR' }}"
     data-equipe-servidor-ids="{{ equipe_servidor_ids_csv }}"
   >
-    <section class="form-section app-form-section oficio-transporte-card oficio-motorista-card">
-      <div class="oficio-equipe-section__header">
-        <div class="oficio-equipe-section__copy">
-          <h3>Motorista</h3>
+    <section class="cv-wizard-section-card oficio-transporte-card oficio-motorista-card" aria-labelledby="oficio-motorista-title">
+      <header class="cv-wizard-section-header oficio-equipe-section__header">
+        <div class="cv-wizard-section-header__copy oficio-equipe-section__copy">
+          <h3 class="cv-wizard-section-title" id="oficio-motorista-title">Motorista</h3>
           <p>Escolha um servidor cadastrado ou use o modo manual quando o motorista for externo à equipe.</p>
         </div>
-        <div class="oficio-transporte-card__header-actions oficio-transporte-card__header-actions--split">
+        <div class="cv-wizard-section-header__actions oficio-transporte-card__header-actions oficio-transporte-card__header-actions--split">
           {% include "components/buttons/action_button.html" with href=servidor_create_url label="Adicionar servidor" variant="secondary" data_autosave_link=True only %}
-          <button type="button" class="btn btn-secondary" data-oficio-motorista-toggle>
+          <button type="button" class="cv-btn cv-btn--secondary" data-oficio-motorista-toggle>
             {% if form.motorista_modo.value == "MANUAL" %}Usar motorista cadastrado{% else %}Usar motorista manual{% endif %}
           </button>
         </div>
-      </div>
+      </header>
+      <div class="cv-wizard-section-body">
       {{ form.motorista_modo }}
       <div class="oficio-motorista-servidor" data-oficio-motorista-servidor>
         <div class="form-grid app-form-grid">
@@ -60,6 +61,7 @@
             {% include "components/forms/form_field.html" with field=form.motorista_protocolo_ref label="PROTOCOLO DO MOTORISTA" only %}
           </div>
         </div>
+      </div>
       </div>
     </section>
   </div>

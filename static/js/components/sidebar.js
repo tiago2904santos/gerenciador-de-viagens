@@ -20,9 +20,13 @@
 
   function setOpenState(item, isOpen) {
     const toggle = item.querySelector("[data-sidebar-toggle]");
+    const accordion = item.querySelector(".sidebar-accordion");
     item.classList.toggle("is-open", isOpen);
     if (toggle) {
       toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    }
+    if (accordion) {
+      accordion.hidden = !isOpen;
     }
   }
 
@@ -43,6 +47,68 @@
   document.addEventListener("DOMContentLoaded", function () {
     let openItems = readOpenItems();
     const onCadastros = isCadastrosPath();
+    const mobileQuery = window.matchMedia("(max-width: 840px)");
+    const sidebar = document.querySelector("[data-sidebar]");
+    const drawerToggles = document.querySelectorAll("[data-sidebar-drawer-toggle]");
+    const drawerCloseButtons = document.querySelectorAll("[data-sidebar-drawer-close]");
+    let drawerOpener = null;
+
+    function drawerIsOpen() {
+      return document.body.classList.contains("has-sidebar-open");
+    }
+
+    function setDrawerOpen(isOpen, restoreFocus) {
+      if (!sidebar || !drawerToggles.length) return;
+
+      const shouldOpen = mobileQuery.matches && isOpen;
+      document.body.classList.toggle("has-sidebar-open", shouldOpen);
+      drawerToggles.forEach(function (toggle) {
+        toggle.setAttribute("aria-expanded", shouldOpen ? "true" : "false");
+        toggle.setAttribute("aria-label", shouldOpen ? "Fechar menu principal" : "Abrir menu principal");
+      });
+
+      if (mobileQuery.matches) {
+        sidebar.inert = !shouldOpen;
+        sidebar.setAttribute("aria-hidden", shouldOpen ? "false" : "true");
+      } else {
+        sidebar.inert = false;
+        sidebar.removeAttribute("aria-hidden");
+      }
+
+      if (shouldOpen) {
+        drawerOpener = document.activeElement;
+        const closeButton = sidebar.querySelector(".sidebar-drawer-close");
+        window.requestAnimationFrame(function () {
+          if (closeButton) closeButton.focus();
+        });
+      } else if (restoreFocus && drawerOpener && typeof drawerOpener.focus === "function") {
+        drawerOpener.focus();
+        drawerOpener = null;
+      }
+    }
+
+    function syncDrawerMode() {
+      setDrawerOpen(false, false);
+    }
+
+    drawerToggles.forEach(function (toggle) {
+      toggle.addEventListener("click", function () {
+        setDrawerOpen(!drawerIsOpen(), false);
+      });
+    });
+
+    drawerCloseButtons.forEach(function (button) {
+      button.addEventListener("click", function () {
+        setDrawerOpen(false, true);
+      });
+    });
+
+    if (typeof mobileQuery.addEventListener === "function") {
+      mobileQuery.addEventListener("change", syncDrawerMode);
+    } else if (typeof mobileQuery.addListener === "function") {
+      mobileQuery.addListener(syncDrawerMode);
+    }
+    syncDrawerMode();
 
     if (!onCadastros) {
       closeAllCollapsible(openItems);
@@ -88,7 +154,41 @@
         openItems = readOpenItems();
         closeAllCollapsible(openItems);
         writeOpenItems(openItems);
+        if (mobileQuery.matches) setDrawerOpen(false, false);
       });
+    });
+
+    document.querySelectorAll("[data-sidebar-panel-link]").forEach(function (link) {
+      link.addEventListener("click", function () {
+        if (mobileQuery.matches) setDrawerOpen(false, false);
+      });
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (!mobileQuery.matches || !drawerIsOpen() || !sidebar) return;
+
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setDrawerOpen(false, true);
+        return;
+      }
+
+      if (event.key !== "Tab") return;
+      const focusable = Array.from(sidebar.querySelectorAll(
+        'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )).filter(function (element) {
+        return !element.hidden && element.getAttribute("aria-hidden") !== "true";
+      });
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     });
   });
 })();

@@ -44,6 +44,10 @@ CSS_EXCEPTIONS: dict[str, dict] = {
         "reason": "Arquivo de tema — cores hex são a definição original, permitidas aqui.",
         "rules": {"hex_color_outside_tokens"},
     },
+    "static/css/dark-redesign.css": {
+        "reason": "Official dark-theme layer; literal values define its tokens and theme-only finishes.",
+        "rules": {"hex_color_outside_tokens"},
+    },
     "static/css/auth.css": {
         "reason": "CSS de autenticação — isolado, pode ter cores específicas.",
         "rules": {"hex_color_outside_tokens"},
@@ -62,6 +66,7 @@ CSS_EXCEPTIONS: dict[str, dict] = {
 # Regras de templates
 # ---------------------------------------------------------------------------
 TEMPLATE_RULES_ERRO = [
+    ("onsubmit_inline", re.compile(r'\bonsubmit='),           'Inline onsubmit event - use addEventListener'),
     ("css_inline",      re.compile(r'\bstyle="'),             'Atributo style="" inline — usar classe CSS'),
     ("onclick_inline",  re.compile(r'\bonclick='),            'Evento onclick inline — usar addEventListener'),
     ("onchange_inline", re.compile(r'\bonchange='),           'Evento onchange inline — usar addEventListener'),

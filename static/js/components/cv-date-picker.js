@@ -829,6 +829,7 @@
 
   function init(root) {
     var scope = root && root.querySelectorAll ? root : document;
+    if (scope.matches && scope.matches(SELECTOR)) initPicker(scope);
     Array.prototype.slice.call(scope.querySelectorAll(SELECTOR)).forEach(initPicker);
   }
 
@@ -843,7 +844,9 @@
   window.CV = window.CV || {};
   window.CV.datePicker = window.CvDatePicker;
 
-  if (document.readyState === 'loading') {
+  if (typeof window.CV.registerEnhancer === 'function') {
+    window.CV.registerEnhancer('datePicker', init);
+  } else if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', boot);
   } else {
     boot();

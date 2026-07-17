@@ -447,7 +447,9 @@
   // ─────────────────────────────────────────────────────────────────────────
   function initAll(root) {
     var scope = root && root.querySelectorAll ? root : document;
-    var els = scope.querySelectorAll('[data-cv-select]');
+    var els = [];
+    if (scope.matches && scope.matches('[data-cv-select]')) els.push(scope);
+    els = els.concat(Array.prototype.slice.call(scope.querySelectorAll('[data-cv-select]')));
     for (var i = 0; i < els.length; i++) {
       if (!els[i]._cvSelect) {
         els[i].setAttribute('data-cv-select-bound', 'true');
@@ -457,13 +459,14 @@
     }
   }
 
-  if (document.readyState === 'loading') {
+  window.CvCustomSelect = { init: initAll, CustomSelect: CustomSelect };
+  window.CV = window.CV || {};
+  window.CV.customSelect = window.CvCustomSelect;
+  if (typeof window.CV.registerEnhancer === 'function') {
+    window.CV.registerEnhancer('customSelect', initAll);
+  } else if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function () { initAll(document); });
   } else {
     initAll(document);
   }
-
-  window.CvCustomSelect = { init: initAll, CustomSelect: CustomSelect };
-  window.CV = window.CV || {};
-  window.CV.customSelect = window.CvCustomSelect;
 }());

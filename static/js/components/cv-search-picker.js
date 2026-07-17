@@ -694,6 +694,7 @@
 
   function init(root) {
     const scope = root && root.querySelectorAll ? root : document;
+    if (scope.matches && scope.matches(SELECTOR)) initPicker(scope);
     scope.querySelectorAll(SELECTOR).forEach(initPicker);
   }
 
@@ -705,7 +706,9 @@
   window.CV = window.CV || {};
   window.CV.searchPicker = window.CvSearchPicker;
 
-  if (document.readyState === "loading") {
+  if (typeof window.CV.registerEnhancer === "function") {
+    window.CV.registerEnhancer("searchPicker", init);
+  } else if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", boot);
   } else {
     boot();

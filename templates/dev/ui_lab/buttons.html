@@ -6,511 +6,105 @@
 
   <section class="ui-lab-section">
     <div class="ui-lab-section__header">
-      <p class="ui-lab-section__eyebrow">Button Grammar</p>
-      <h2 class="ui-lab-section__title">Gramática visual de botões</h2>
+      <p class="ui-lab-section__eyebrow">Button System</p>
+      <h2 class="ui-lab-section__title">Ações canônicas</h2>
       <p class="ui-lab-section__description">
-        A vitrine abaixo mostra apenas os formatos reutilizáveis definidos para
-        o sistema: pill, circular, acoplado a campo e footer action. As telas
-        reais seguem esta base fase por fase.
-      </p>
-    </div>
-
-    <article class="ui-lab-preview-card">
-      <div class="ui-lab-preview-card__header">
-        <span class="ui-lab-preview-card__label">Visão geral</span>
-        <span class="ui-lab-status-pill ui-lab-status-pill--done">4 formatos</span>
-      </div>
-      <div class="cv-demo-surface">
-        <p class="cv-demo-surface__title">Pill, circular, field action e footer</p>
-        <p class="cv-demo-surface__text">
-          Pills concentram as ações principais e secundárias. Botões circulares
-          ficam para listas e documentos. Field actions sempre acompanham o
-          campo. Footer actions fazem parte estrutural do card.
-        </p>
-      </div>
-    </article>
-  </section>
-
-  <section class="ui-lab-section">
-    <div class="ui-lab-section__header">
-      <p class="ui-lab-section__eyebrow">Pill Buttons</p>
-      <h2 class="ui-lab-section__title">Botões pill</h2>
-      <p class="ui-lab-section__description">
-        Formato padrão para salvar, cadastrar, finalizar, avançar, voltar e
-        cancelar. A régua visual é a mesma em todos os exemplos.
+        Hierarquia funcional, tamanhos e estados renderizados pelos mesmos includes usados nas páginas reais.
       </p>
     </div>
 
     <div class="ui-lab-stack">
       <article class="ui-lab-preview-card">
         <div class="ui-lab-preview-card__header">
-          <span class="ui-lab-preview-card__label">Ações principais</span>
-          <span class="ui-lab-status-pill ui-lab-status-pill--done">Primary</span>
+          <span class="ui-lab-preview-card__label">Principais e navegação</span>
+          <span class="ui-lab-status-pill ui-lab-status-pill--done">Canônico</span>
         </div>
         <div class="ui-lab-button-row">
-          <button class="cv-btn cv-btn--primary" type="button">
-            <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="check" only %}</span>
-            <span>Salvar</span>
-          </button>
-          <button class="cv-btn cv-btn--primary-action" type="button">
-            <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="plus" only %}</span>
-            <span>Cadastrar</span>
-          </button>
-          <button class="cv-btn cv-btn--primary-success" type="button">
-            <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="check" only %}</span>
-            <span>Finalizar</span>
-          </button>
-          <button class="cv-btn cv-btn--next" type="button">
-            <span>Avançar</span>
-            <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="arrow-right" only %}</span>
-          </button>
+          {% include "components/ui/buttons/button.html" with label="Salvar" variant="primary" icon="check" only %}
+          {% include "components/ui/buttons/button.html" with label="Cadastrar" variant="primary-action" icon="plus" only %}
+          {% include "components/ui/buttons/button.html" with label="Finalizar" variant="primary-success" icon="check" only %}
+          {% include "components/ui/buttons/button.html" with label="Avançar" variant="next" icon="arrow-right" icon_after=True only %}
+          {% include "components/ui/buttons/button.html" with label="Voltar" variant="back" icon="arrow-left" only %}
+          {% include "components/ui/buttons/button.html" with label="Voltar para lista" variant="back-list" icon="list" only %}
+          {% include "components/ui/buttons/button.html" with label="Cancelar" variant="cancel" icon="x" only %}
         </div>
       </article>
 
       <article class="ui-lab-preview-card">
         <div class="ui-lab-preview-card__header">
-          <span class="ui-lab-preview-card__label">Secundárias e navegação</span>
-          <span class="ui-lab-status-pill ui-lab-status-pill--done">Secondary</span>
+          <span class="ui-lab-preview-card__label">Documentos e ferramentas</span>
+          <span class="ui-lab-status-pill ui-lab-status-pill--done">Canônico</span>
         </div>
         <div class="ui-lab-button-row">
-          <button class="cv-btn cv-btn--back" type="button">
-            <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="arrow-left" only %}</span>
-            <span>Voltar</span>
-          </button>
-          <button class="cv-btn cv-btn--back-list" type="button">
-            <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="list" only %}</span>
-            <span>Voltar para lista</span>
-          </button>
-          <button class="cv-btn cv-btn--cancel" type="button">
-            <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="x" only %}</span>
-            <span>Cancelar</span>
-          </button>
-        </div>
-        <p class="ui-lab-preview-card__description">
-          Voltar e voltar para lista continuam distintos. No claro, o texto de
-          voltar para lista ganhou mais contraste. No escuro, a combinação foi
-          refeita para não parecer desabilitada.
-        </p>
-      </article>
-    </div>
-  </section>
-
-  <section class="ui-lab-section">
-    <div class="ui-lab-section__header">
-      <p class="ui-lab-section__eyebrow">Documental Buttons</p>
-      <h2 class="ui-lab-section__title">Ações documentais</h2>
-      <p class="ui-lab-section__description">
-        Ações compactas para fluxo documental. Visualizar ficou mais elegante,
-        assinar virou primário, gerar assinatura e copiar link ficaram
-        secundários, e PDF/DOCX mantêm identidade própria sem exagero.
-      </p>
-    </div>
-
-    <div class="ui-lab-stack">
-      <article class="ui-lab-preview-card">
-        <div class="ui-lab-preview-card__header">
-          <span class="ui-lab-preview-card__label">Fluxo documental</span>
-          <span class="ui-lab-status-pill ui-lab-status-pill--done">Docs</span>
-        </div>
-        <div class="ui-lab-button-row">
-          <button class="cv-btn cv-btn--preview" type="button">
-            <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="eye" only %}</span>
-            <span>Visualizar</span>
-          </button>
-          <button class="cv-btn cv-btn--sign" type="button">
-            <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="sign" only %}</span>
-            <span>Assinar</span>
-          </button>
-          <button class="cv-btn cv-btn--signature" type="button">
-            <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="signature" only %}</span>
-            <span>Gerar assinatura</span>
-          </button>
-          <button class="cv-btn cv-btn--copy-link" type="button">
-            <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="clipboard-copy" only %}</span>
-            <span>Copiar link</span>
-          </button>
+          {% include "components/ui/buttons/button.html" with label="Visualizar" variant="preview" icon="eye" only %}
+          {% include "components/ui/buttons/button.html" with label="Assinar" variant="sign" icon="sign" only %}
+          {% include "components/ui/buttons/button.html" with label="Gerar assinatura" variant="signature" icon="signature" only %}
+          {% include "components/ui/buttons/button.html" with label="Copiar link" variant="copy-link" icon="clipboard-copy" only %}
+          {% include "components/ui/buttons/button.html" with label="Calcular rota" variant="secondary" icon="route" only %}
+          {% include "components/ui/buttons/button.html" with label="Calcular diária" variant="secondary" icon="calculator" only %}
         </div>
       </article>
 
       <article class="ui-lab-preview-card">
         <div class="ui-lab-preview-card__header">
-          <span class="ui-lab-preview-card__label">Exportação documental</span>
-          <span class="ui-lab-status-pill ui-lab-status-pill--done">PDF / DOCX</span>
+          <span class="ui-lab-preview-card__label">Destrutivas</span>
+          <span class="ui-lab-status-pill ui-lab-status-pill--issue">Uso controlado</span>
+        </div>
+        <div class="ui-lab-button-row">
+          {% include "components/ui/buttons/button.html" with label="Excluir" variant="danger" icon="trash" only %}
+          {% include "components/ui/buttons/button.html" with label="Remover" variant="soft-danger" icon="x" only %}
+        </div>
+      </article>
+
+      <article class="ui-lab-preview-card">
+        <div class="ui-lab-preview-card__header">
+          <span class="ui-lab-preview-card__label">Ações compactas</span>
+          <span class="ui-lab-status-pill ui-lab-status-pill--done">Ícone + tooltip</span>
         </div>
         <div class="cv-icon-btn-group">
-          <button class="cv-icon-btn cv-icon-btn--pdf" type="button" aria-label="Baixar PDF" data-tooltip="Baixar PDF">
-            {% include "dev/ui_lab/partials/_cv_icon.html" with icon="pdf" only %}
-          </button>
-          <button class="cv-icon-btn cv-icon-btn--docx" type="button" aria-label="Baixar DOCX" data-tooltip="Baixar DOCX">
-            {% include "dev/ui_lab/partials/_cv_icon.html" with icon="docx" only %}
-          </button>
-        </div>
-        <p class="ui-lab-preview-card__description">
-          PDF e DOCX continuam reconhecíveis, mas agora com presença visual mais
-          contida e proporcional ao restante do sistema.
-        </p>
-      </article>
-    </div>
-  </section>
-
-  <section class="ui-lab-section">
-    <div class="ui-lab-section__header">
-      <p class="ui-lab-section__eyebrow">Circular Buttons</p>
-      <h2 class="ui-lab-section__title">Botões circulares</h2>
-      <p class="ui-lab-section__description">
-        Exclusivos para ações compactas em lista, card ou documento. Cada
-        botão recebe apenas ícone, com aria-label e tooltip obrigatórios.
-      </p>
-    </div>
-
-    <div class="ui-lab-stack">
-      <article class="ui-lab-preview-card">
-        <div class="ui-lab-preview-card__header">
-          <span class="ui-lab-preview-card__label">Lista compacta</span>
-          <span class="ui-lab-status-pill ui-lab-status-pill--done">Row actions</span>
-        </div>
-        <div class="cv-demo-list-row">
-          <div class="cv-demo-list-row__meta">
-            <p class="cv-demo-list-row__title">Ofício 018/2026</p>
-            <p class="cv-demo-list-row__subtitle">Pronto para revisão final</p>
-          </div>
-          <div class="cv-icon-btn-group">
-            <button class="cv-icon-btn cv-icon-btn--edit" type="button" aria-label="Editar ofício" data-tooltip="Editar ofício">
-              {% include "dev/ui_lab/partials/_cv_icon.html" with icon="edit" only %}
-            </button>
-            <button class="cv-icon-btn cv-icon-btn--preview" type="button" aria-label="Visualizar ofício" data-tooltip="Visualizar ofício">
-              {% include "dev/ui_lab/partials/_cv_icon.html" with icon="eye" only %}
-            </button>
-            <button class="cv-icon-btn cv-icon-btn--sign" type="button" aria-label="Assinar ofício" data-tooltip="Assinar ofício">
-              {% include "dev/ui_lab/partials/_cv_icon.html" with icon="sign" only %}
-            </button>
-            <button class="cv-icon-btn cv-icon-btn--delete" type="button" aria-label="Excluir ofício" data-tooltip="Excluir ofício">
-              {% include "dev/ui_lab/partials/_cv_icon.html" with icon="trash" only %}
-            </button>
-          </div>
+          {% include "components/ui/buttons/icon_button.html" with action="edit" aria_label="Editar ofício" only %}
+          {% include "components/ui/buttons/icon_button.html" with action="preview" aria_label="Visualizar ofício" only %}
+          {% include "components/ui/buttons/icon_button.html" with action="sign" aria_label="Assinar ofício" only %}
+          {% include "components/ui/buttons/icon_button.html" with action="pdf" aria_label="Baixar PDF" only %}
+          {% include "components/ui/buttons/icon_button.html" with action="docx" aria_label="Baixar DOCX" only %}
+          {% include "components/ui/buttons/icon_button.html" with action="delete" aria_label="Excluir ofício" only %}
         </div>
       </article>
 
       <article class="ui-lab-preview-card">
         <div class="ui-lab-preview-card__header">
-          <span class="ui-lab-preview-card__label">Documentos compactos</span>
-          <span class="ui-lab-status-pill ui-lab-status-pill--done">Docs</span>
+          <span class="ui-lab-preview-card__label">Tamanhos e estados</span>
+          <span class="ui-lab-status-pill ui-lab-status-pill--done">Acessível</span>
         </div>
         <div class="ui-lab-button-row">
-          <button class="cv-icon-btn cv-icon-btn--pdf" type="button" aria-label="Baixar PDF" data-tooltip="Baixar PDF">
-            {% include "dev/ui_lab/partials/_cv_icon.html" with icon="pdf" only %}
-          </button>
-          <button class="cv-icon-btn cv-icon-btn--docx" type="button" aria-label="Baixar DOCX" data-tooltip="Baixar DOCX">
-            {% include "dev/ui_lab/partials/_cv_icon.html" with icon="docx" only %}
-          </button>
-        </div>
-      </article>
-    </div>
-  </section>
-
-  <section class="ui-lab-section">
-    <div class="ui-lab-section__header">
-      <p class="ui-lab-section__eyebrow">Operacional Buttons</p>
-      <h2 class="ui-lab-section__title">Botões operacionais</h2>
-      <p class="ui-lab-section__description">
-        Ações de ferramenta reutilizáveis para operações como calcular rota e
-        diária. Os ícones já existem no sistema e seguem a mesma régua visual
-        dos demais botões pill compactos.
-      </p>
-    </div>
-
-    <article class="ui-lab-preview-card">
-      <div class="ui-lab-preview-card__header">
-        <span class="ui-lab-preview-card__label">Ferramentas</span>
-        <span class="ui-lab-status-pill ui-lab-status-pill--done">Tools</span>
-      </div>
-      <div class="ui-lab-button-row">
-        <button class="cv-btn cv-btn--secondary" type="button">
-          <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="route" only %}</span>
-          <span>Calcular rota</span>
-        </button>
-        <button class="cv-btn cv-btn--secondary" type="button">
-          <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="calculator" only %}</span>
-          <span>Calcular diária</span>
-        </button>
-      </div>
-    </article>
-  </section>
-
-  <section class="ui-lab-section">
-    <div class="ui-lab-section__header">
-      <p class="ui-lab-section__eyebrow">Destructive Buttons</p>
-      <h2 class="ui-lab-section__title">Ações destrutivas</h2>
-      <p class="ui-lab-section__description">
-        Excluir e remover compartilham a mesma linguagem visual destrutiva.
-        A diferença fica só no rótulo e no ícone.
-      </p>
-    </div>
-
-    <article class="ui-lab-preview-card">
-      <div class="ui-lab-preview-card__header">
-        <span class="ui-lab-preview-card__label">Destrutivas</span>
-        <span class="ui-lab-status-pill ui-lab-status-pill--issue">Danger</span>
-      </div>
-      <div class="ui-lab-button-row">
-        <button class="cv-btn cv-btn--danger" type="button">
-          <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="trash" only %}</span>
-          <span>Excluir</span>
-        </button>
-        <button class="cv-btn cv-btn--soft-danger" type="button">
-          <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="x" only %}</span>
-          <span>Remover</span>
-        </button>
-      </div>
-    </article>
-  </section>
-
-  <section class="ui-lab-section">
-    <div class="ui-lab-section__header">
-      <p class="ui-lab-section__eyebrow">Field Attached</p>
-      <h2 class="ui-lab-section__title">Botões acoplados a input e select</h2>
-      <p class="ui-lab-section__description">
-        O botão lateral é uma ação simples ao lado do campo. Ele alinha só com
-        a linha do input ou select e mantém a mesma altura visual.
-      </p>
-    </div>
-
-    <div class="ui-lab-stack">
-      <article class="ui-lab-preview-card">
-        <div class="ui-lab-preview-card__header">
-          <span class="ui-lab-preview-card__label">Cargo</span>
-          <span class="ui-lab-status-pill ui-lab-status-pill--pending">Attached</span>
-        </div>
-        <div class="cv-field-row">
-          <label class="cv-field-control cv-field-control--grow">
-            <span class="cv-field-control__label">Cargo</span>
-            <select class="cv-field-control__select" aria-label="Selecionar cargo">
-              <option>Coordenador</option>
-              <option>Analista</option>
-              <option>Motorista</option>
-            </select>
-          </label>
-          <button class="cv-field-side-action cv-field-side-action--secondary" type="button">
-            <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="settings" only %}</span>
-            <span>Gerenciar cargo</span>
-          </button>
+          {% include "components/ui/buttons/button.html" with label="Pequeno" variant="secondary" size="sm" only %}
+          {% include "components/ui/buttons/button.html" with label="Padrão" variant="secondary" only %}
+          {% include "components/ui/buttons/button.html" with label="Grande" variant="secondary" size="lg" only %}
+          {% include "components/ui/buttons/button.html" with label="Desabilitado" variant="secondary" disabled=True only %}
+          {% include "components/ui/buttons/button.html" with label="Salvando" variant="primary" loading=True only %}
         </div>
       </article>
 
       <article class="ui-lab-preview-card">
         <div class="ui-lab-preview-card__header">
-          <span class="ui-lab-preview-card__label">Unidade</span>
-          <span class="ui-lab-status-pill ui-lab-status-pill--pending">Primary attached</span>
+          <span class="ui-lab-preview-card__label">Ação acoplada a campo</span>
+          <span class="ui-lab-status-pill ui-lab-status-pill--done">Canônico</span>
         </div>
-        <div class="cv-field-row">
-          <label class="cv-field-control cv-field-control--grow">
-            <span class="cv-field-control__label">Unidade</span>
-            <select class="cv-field-control__select" aria-label="Selecionar unidade">
-              <option>Sede</option>
-              <option>Regional Norte</option>
-              <option>Regional Sul</option>
-            </select>
+        <div class="cv-demo-field-row">
+          <label class="cv-demo-field cv-demo-field--grow">
+            <span class="cv-demo-field__label">Cargo</span>
+            <select class="cv-demo-select" aria-label="Selecionar cargo"><option>Coordenador</option></select>
           </label>
-          <button class="cv-field-side-action cv-field-side-action--secondary" type="button">
-            <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="settings" only %}</span>
-            <span>Gerenciar unidade</span>
-          </button>
+          {% include "components/ui/buttons/field_action_button.html" with label="Gerenciar cargos" icon="settings" variant="secondary" only %}
         </div>
-      </article>
-
-      <article class="ui-lab-preview-card">
-        <div class="ui-lab-preview-card__header">
-          <span class="ui-lab-preview-card__label">Combustível</span>
-          <span class="ui-lab-status-pill ui-lab-status-pill--pending">Secondary attached</span>
-        </div>
-        <div class="cv-field-row">
-          <label class="cv-field-control cv-field-control--grow">
-            <span class="cv-field-control__label">Combustível</span>
-            <select class="cv-field-control__select" aria-label="Selecionar combustível">
-              <option>Gasolina</option>
-              <option>Diesel</option>
-              <option>Etanol</option>
-            </select>
-          </label>
-          <button class="cv-field-side-action cv-field-side-action--secondary" type="button">
-            <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="settings" only %}</span>
-            <span>Gerenciar combustíveis</span>
-          </button>
-        </div>
-      </article>
-
-      <article class="ui-lab-preview-card">
-        <div class="ui-lab-preview-card__header">
-          <span class="ui-lab-preview-card__label">Campo auxiliar</span>
-          <span class="ui-lab-status-pill ui-lab-status-pill--pending">Neutral attached</span>
-        </div>
-        <div class="cv-field-row">
-          <label class="cv-field-control cv-field-control--grow">
-            <span class="cv-field-control__label">Campo auxiliar</span>
-            <input class="cv-field-control__input" type="text" value="Brasília" aria-label="Campo auxiliar">
-          </label>
-          <button class="cv-field-side-action cv-field-side-action--neutral" type="button">
-            <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="x" only %}</span>
-            <span>Limpar</span>
-          </button>
-        </div>
-      </article>
-    </div>
-  </section>
-
-  <section class="ui-lab-section">
-    <div class="ui-lab-section__header">
-      <p class="ui-lab-section__eyebrow">Footer Action</p>
-      <h2 class="ui-lab-section__title">Botão de rodapé integrado ao card</h2>
-      <p class="ui-lab-section__description">
-        O rodapé inteiro é a ação. A área inferior do card funciona como footer
-        clicável, com borda superior, fundo próprio e hover em toda a faixa.
-      </p>
-    </div>
-
-    <div class="ui-lab-stack">
-      <article class="cv-demo-footer-card">
-        <div class="cv-demo-footer-card__body">
-          <p class="cv-demo-footer-card__title">Adicionar destino</p>
-          <p class="cv-demo-footer-card__text">
-            O footer toma o lugar do botão solto e faz a área inteira parecer
-            parte do card.
-          </p>
-        </div>
-        <button class="cv-footer-action cv-footer-action--add" type="button">
-          <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="plus" only %}</span>
-          <span>Adicionar destino</span>
-        </button>
       </article>
 
       <article class="cv-demo-footer-card">
         <div class="cv-demo-footer-card__body">
-          <p class="cv-demo-footer-card__title">Cadastrar item</p>
-          <p class="cv-demo-footer-card__text">
-            Serve para adicionar trecho, viajante, diária ou anexo dentro de
-            blocos repetíveis.
-          </p>
+          <p class="cv-demo-footer-card__title">Lista repetível</p>
+          <p class="cv-demo-footer-card__text">O rodapé inteiro comunica a ação de acrescentar um novo item.</p>
         </div>
-        <button class="cv-footer-action cv-footer-action--primary" type="button">
-          <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="plus" only %}</span>
-          <span>Cadastrar item</span>
-        </button>
-      </article>
-
-      <article class="cv-demo-footer-card">
-        <div class="cv-demo-footer-card__body">
-          <p class="cv-demo-footer-card__title">Adicionar anexo</p>
-          <p class="cv-demo-footer-card__text">
-            Versão neutra do rodapé, integrada ao bloco sem parecer um botão
-            solto no final do card.
-          </p>
-        </div>
-        <button class="cv-footer-action cv-footer-action--neutral" type="button">
-          <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="plus" only %}</span>
-          <span>Adicionar anexo</span>
-        </button>
-      </article>
-    </div>
-  </section>
-
-  <section class="ui-lab-section">
-    <div class="ui-lab-section__header">
-      <p class="ui-lab-section__eyebrow">States</p>
-      <h2 class="ui-lab-section__title">Estados do botão</h2>
-      <p class="ui-lab-section__description">
-        A mesma régua compacta aparece em normal, hover, active, focus,
-        disabled e loading.
-      </p>
-    </div>
-
-    <div class="cv-demo-state-grid">
-      <div class="cv-demo-state-tile">
-        <p class="cv-demo-state-tile__label">Normal</p>
-        <button class="cv-btn cv-btn--primary" type="button">
-          <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="check" only %}</span>
-          <span>Salvar</span>
-        </button>
-        <p class="cv-demo-state-tile__description">Estado base do sistema.</p>
-      </div>
-
-      <div class="cv-demo-state-tile cv-demo-state-tile--hover">
-        <p class="cv-demo-state-tile__label">Hover</p>
-        <button class="cv-btn cv-btn--secondary" type="button">
-          <span>Hover</span>
-        </button>
-        <p class="cv-demo-state-tile__description">Hover mais leve e clicável.</p>
-      </div>
-
-      <div class="cv-demo-state-tile cv-demo-state-tile--active">
-        <p class="cv-demo-state-tile__label">Active</p>
-        <button class="cv-btn cv-btn--secondary" type="button" aria-pressed="true">
-          <span>Active</span>
-        </button>
-        <p class="cv-demo-state-tile__description">Pressão sutil e sem peso excessivo.</p>
-      </div>
-
-      <div class="cv-demo-state-tile cv-demo-state-tile--focus">
-        <p class="cv-demo-state-tile__label">Focus</p>
-        <button class="cv-btn cv-btn--secondary" type="button">
-          <span>Focus</span>
-        </button>
-        <p class="cv-demo-state-tile__description">Mostra o focus ring do sistema.</p>
-      </div>
-
-      <div class="cv-demo-state-tile cv-demo-state-tile--disabled">
-        <p class="cv-demo-state-tile__label">Disabled</p>
-        <button class="cv-btn cv-btn--primary" type="button" disabled>
-          <span>Disabled</span>
-        </button>
-        <p class="cv-demo-state-tile__description">Estado sem interação.</p>
-      </div>
-
-      <div class="cv-demo-state-tile cv-demo-state-tile--loading">
-        <p class="cv-demo-state-tile__label">Loading</p>
-        <button class="cv-btn cv-btn--primary is-loading" type="button" aria-busy="true">
-          <span>Salvando</span>
-        </button>
-        <p class="cv-demo-state-tile__description">Spinner via classe is-loading.</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="ui-lab-section">
-    <div class="ui-lab-section__header">
-      <p class="ui-lab-section__eyebrow">State Buttons</p>
-      <h2 class="ui-lab-section__title">Botoes de estado</h2>
-      <p class="ui-lab-section__description">
-        Familia premium para success, warning, danger e neutral.
-        Padrao global reutilizavel para estados, toggles e controles segmentados. A linguagem
-        visual segue o botao lateral de campo: fundo translucido, borda semantica, glow suave,
-        dot de estado e foco acessivel.
-      </p>
-    </div>
-
-    <div class="cv-field-lab">
-      <article class="cv-field-panel" id="fields-state-buttons">
-        <div class="cv-field-panel__body">
-          <div class="cv-field-state-grid">
-            <div class="cv-field-state-card">
-              <h4 class="cv-field-state-card__title">Estados simples</h4>
-              <p class="cv-field-state-card__description">Success, warning, danger e neutral compartilham a mesma gramatica.</p>
-              <div class="cv-state-button-demo-row">
-                <button class="cv-state-button cv-state-button--success" type="button">Success</button>
-                <button class="cv-state-button cv-state-button--warning" type="button">Warning</button>
-                <button class="cv-state-button cv-state-button--danger" type="button">Danger</button>
-                <button class="cv-state-button cv-state-button--neutral" type="button">Neutral</button>
-              </div>
-            </div>
-            <div class="cv-field-state-card">
-              <h4 class="cv-field-state-card__title">Toggle binario</h4>
-              <p class="cv-field-state-card__description">Mesmo padrao usado pelos estados de RG.</p>
-              <div class="cv-state-button-demo-row">
-                <button class="cv-field-side-action cv-field-side-action--success cv-field-side-action--toggle cv-field-side-action--state is-active" type="button" aria-pressed="true">Possui RG</button>
-                <button class="cv-field-side-action cv-field-side-action--danger cv-field-side-action--toggle cv-field-side-action--state is-inactive" type="button" aria-pressed="false">Nao possui RG</button>
-              </div>
-            </div>
-          </div>
-        </div>
+        {% include "components/ui/buttons/footer_action.html" with label="Adicionar destino" icon="plus" variant="primary" only %}
       </article>
     </div>
   </section>

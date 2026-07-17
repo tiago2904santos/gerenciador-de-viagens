@@ -152,10 +152,16 @@
   function init(root) {
     var scope = root && root.querySelectorAll ? root : document;
     if (!hasListPanel()) return;
+    if (scope.matches && scope.matches(FORM_SELECTOR)) bindForm(scope);
     scope.querySelectorAll(FORM_SELECTOR).forEach(bindForm);
   }
 
-  if (document.readyState === 'loading') {
+  window.CV = window.CV || {};
+  window.CV.liveSearch = { init: init };
+
+  if (typeof window.CV.registerEnhancer === 'function') {
+    window.CV.registerEnhancer('liveSearch', init);
+  } else if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function () {
       init(document);
     });

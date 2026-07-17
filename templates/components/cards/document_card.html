@@ -1,43 +1,43 @@
-<article class="document-card app-card{% if card and card.status_class %} {{ card.status_class }}{% endif %}">
-  <header class="document-card-header">
-    <div>
+<article class="cv-document-card document-card app-card{% if card and card.status_class %} {{ card.status_class }}{% endif %}">
+  <header class="cv-document-card__header document-card-header">
+    <div class="cv-document-card__heading">
       {% if card %}
         {% if card.status %}
           {% with sc_tone=card.status_class|cut:"status-chip--"|default:"muted" %}
             {% include "components/ui/lists/status_pill.html" with label=card.status variant=sc_tone only %}
           {% endwith %}
         {% endif %}
-        <h3>{{ card.title|default:"Documento" }}</h3>
+        <h3 class="cv-document-card__title">{{ card.title|default:"Documento" }}</h3>
       {% else %}
         {% with sc_tone=status_class|cut:"status-chip--"|default:"draft" %}
           {% include "components/ui/lists/status_pill.html" with label=status|default:"Rascunho" variant=sc_tone only %}
         {% endwith %}
-        <h3>{{ title|default:"Documento" }}</h3>
+        <h3 class="cv-document-card__title">{{ title|default:"Documento" }}</h3>
       {% endif %}
       {% if card.subtitle %}
-        <p>{{ card.subtitle }}</p>
+        <p class="cv-document-card__subtitle">{{ card.subtitle }}</p>
       {% endif %}
     </div>
   </header>
   {% if card.meta %}
-    <dl class="document-meta">
+    <dl class="cv-document-card__meta document-meta">
       {% for item in card.meta %}
         <div class="document-meta-item"><dt>{{ item.label }}</dt><dd>{{ item.value }}</dd></div>
       {% endfor %}
     </dl>
   {% else %}
-    <dl class="document-meta">
+    <dl class="cv-document-card__meta document-meta">
       <div class="document-meta-item"><dt>Tipo</dt><dd>{{ document_type|default:"Documento" }}</dd></div>
     </dl>
   {% endif %}
-  <div class="document-card-body">
+  <div class="cv-document-card__body document-card-body">
     {% if card.body %}
       {{ card.body }}
     {% else %}
       {{ content|default:"" }}
     {% endif %}
   </div>
-  <footer class="document-actions">
+  <footer class="cv-document-card__actions document-actions">
     {% if card.actions %}
       {% for action in card.actions %}
         {% include "components/buttons/action_button.html" with href=action.href label=action.label variant=action.variant size="sm" only %}

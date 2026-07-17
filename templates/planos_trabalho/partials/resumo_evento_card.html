@@ -11,7 +11,7 @@ Espera:
   total_eventos          : total de eventos (subtítulo em multi)
   mostrar_acoes          : bool — exibe editar/remover (usa ev.editar_url / ev.excluir_url)
 {% endcomment %}
-<section class="cv-wizard-section-card" aria-label="{% if is_multi %}Resumo do evento {{ ev.ordem }}{% else %}Resumo do plano{% endif %}">
+<section class="cv-summary-card cv-wizard-section-card" aria-label="{% if is_multi %}Resumo do evento {{ ev.ordem }}{% else %}Resumo do plano{% endif %}">
   <header class="cv-wizard-section-header pt-resumo-card-header">
     <div class="cv-wizard-section-header__copy">
       <h3 class="cv-wizard-section-title">
@@ -29,7 +29,7 @@ Espera:
           {% include "dev/ui_lab/partials/_cv_icon.html" with icon="edit" only %}
         </button>
         <button type="submit" formmethod="post" formaction="{{ ev.excluir_url }}" formnovalidate
-                onclick="return confirm('Remover este evento do plano?');"
+                data-confirm-submit data-confirm-message="Remover este evento do plano?"
                 class="cv-icon-btn cv-icon-btn--delete" aria-label="Remover evento" data-tooltip="Remover evento">
           {% include "dev/ui_lab/partials/_cv_icon.html" with icon="delete" only %}
         </button>
@@ -38,10 +38,10 @@ Espera:
   </header>
 
   <div class="cv-wizard-section-body">
-    <div class="pt-resumo-evento">
+    <div class="cv-summary-card__body pt-resumo-evento">
 
       {# ── Linha 1: identificação (4 colunas) ───────────────────── #}
-      <div class="pt-resumo-grid pt-resumo-grid--4">
+      <div class="cv-summary-grid cv-summary-grid--4 pt-resumo-grid pt-resumo-grid--4">
         <div class="pt-resumo-box">
           <span class="pt-resumo-box__label">Número do plano</span>
           <span class="pt-resumo-box__value">{{ numero }}</span>
@@ -61,7 +61,7 @@ Espera:
       </div>
 
       {# ── Linha 2: solicitante + coordenação ───────────────────── #}
-      <div class="pt-resumo-grid {% if ev.coordenador_op_presente %}pt-resumo-grid--3{% else %}pt-resumo-grid--2{% endif %}">
+      <div class="cv-summary-grid {% if ev.coordenador_op_presente %}cv-summary-grid--3 pt-resumo-grid--3{% else %}cv-summary-grid--2 pt-resumo-grid--2{% endif %} pt-resumo-grid">
         <div class="pt-resumo-box">
           <span class="pt-resumo-box__label">Solicitante</span>
           <span class="pt-resumo-box__value">{{ ev.programa }}</span>
@@ -79,7 +79,7 @@ Espera:
       </div>
 
       {# ── Linha 3: efetivo · valor/diárias · atividades (3 colunas) #}
-      <div class="pt-resumo-grid3">
+      <div class="cv-summary-grid cv-summary-grid--3 pt-resumo-grid3">
         <div class="pt-resumo-box pt-resumo-efetivo">
           <span class="pt-resumo-box__label">Efetivo{% if ev.efetivo_total %} ({{ ev.efetivo_total }} servidor{{ ev.efetivo_total|pluralize:"es" }}){% endif %}</span>
           <div class="pt-resumo-list">

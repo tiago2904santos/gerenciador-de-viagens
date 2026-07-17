@@ -1,13 +1,13 @@
 <article
-  class="oficio-lc oficio-lc--roteiro oficio-lc--{{ card.status_variant|default:'outro' }}"
+  class="cv-entity-card oficio-lc oficio-lc--roteiro oficio-lc--{{ card.status_variant|default:'outro' }}"
   data-cv-filter-item
   data-search-text="{{ card.rota_display }}{% if card.trechos %}{% for t in card.trechos %} {{ t.rota }}{% endfor %}{% endif %}"
   {% if card.status_variant %}data-status-value="{{ card.status_variant }}"{% endif %}
 >
-  <div class="oficio-lc__layout">
+  <div class="cv-entity-card__body oficio-lc__layout">
 
     {# ── CABEÇALHO: Rota · Início · Fim · Chip temporal ── #}
-    <div class="oficio-lc__id-row">
+    <div class="cv-entity-card__header oficio-lc__id-row">
       <div class="oficio-lc__info-item oficio-lc__info-item--wide">
         <span class="oficio-lc__info-label">Roteiro</span>
         <span class="oficio-lc__info-value oficio-lc__info-value--rota">{{ card.rota_display }}</span>
@@ -74,7 +74,7 @@
     </div>
 
     {# ── FOOTER: Editar · Excluir ── #}
-    <div class="oficio-lc__footer">
+    <div class="cv-entity-card__footer oficio-lc__footer">
       <div class="oficio-lc__footer-actions">
         <div class="oficio-lc__footer-actions-main cv-icon-btn-group">
           {% include "components/ui/buttons/icon_button.html" with href=card.editar_url action="edit" aria_label="Editar roteiro" tooltip="Editar" only %}

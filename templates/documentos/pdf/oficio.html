@@ -6,7 +6,7 @@
 </head>
 <body>
   <div class="doc-orgao">{{ institucional.nome_orgao }}</div>
-  {% if institucional.sigla_orgao %}<div class="doc-meta doc-muted" style="text-align:center;">{{ institucional.sigla_orgao|upper }}</div>{% endif %}
+  {% if institucional.sigla_orgao %}<div class="doc-meta doc-muted doc-meta--center">{{ institucional.sigla_orgao|upper }}</div>{% endif %}
   <div class="doc-unidade">{{ institucional.unidade }}</div>
 
   <div class="doc-title">Solicitação de autorização — Ofício nº {{ oficio.numero_formatado }} {{ oficio.assunto_oficio }}</div>

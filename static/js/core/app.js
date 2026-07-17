@@ -1,5 +1,185 @@
 document.documentElement.dataset.appReady = "true";
 
+/* Registro único de componentes progressivos.
+ * Cada módulo publica um inicializador idempotente; este coordenador aplica os
+ * contratos no DOM inicial e em conteúdo inserido por AJAX, templates ou
+ * listas dinâmicas, sem acoplar páginas à ordem dos scripts. */
+(function () {
+  "use strict";
+
+  window.CV = window.CV || {};
+
+  var enhancers = new Map();
+  var pendingRoots = new Set();
+  var flushScheduled = false;
+  var observer = null;
+
+  function safelyEnhance(name, initializer, root) {
+    try {
+      initializer(root || document);
+    } catch (error) {
+      document.dispatchEvent(new CustomEvent("cv:enhancer-error", {
+        detail: { name: name, message: error.message },
+      }));
+    }
+  }
+
+  function enhance(root) {
+    enhancers.forEach(function (initializer, name) {
+      safelyEnhance(name, initializer, root || document);
+    });
+  }
+
+  function flush() {
+    flushScheduled = false;
+    var roots = Array.from(pendingRoots);
+    pendingRoots.clear();
+    roots.forEach(enhance);
+  }
+
+  function schedule(root) {
+    if (!root || root.nodeType !== 1) return;
+    pendingRoots.add(root);
+    if (flushScheduled) return;
+    flushScheduled = true;
+    if (typeof window.queueMicrotask === "function") window.queueMicrotask(flush);
+    else window.setTimeout(flush, 0);
+  }
+
+  function register(name, initializer) {
+    if (!name || typeof initializer !== "function") return;
+    enhancers.set(name, initializer);
+    if (document.readyState !== "loading") safelyEnhance(name, initializer, document);
+  }
+
+  function start() {
+    if (observer || !document.documentElement) return;
+    enhance(document);
+    if (typeof MutationObserver !== "function") return;
+    observer = new MutationObserver(function (mutations) {
+      mutations.forEach(function (mutation) {
+        Array.prototype.forEach.call(mutation.addedNodes, schedule);
+      });
+    });
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+  }
+
+  window.CV.registerEnhancer = register;
+  window.CV.enhance = enhance;
+  window.CV.componentRegistry = {
+    enhance: enhance,
+    register: register,
+    registered: function () { return Array.from(enhancers.keys()); },
+  };
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start, { once: true });
+  else start();
+}());
+
+/* Dialog accessibility shared by confirmation, upload and cancellation flows. */
+(function () {
+  "use strict";
+
+  window.CV = window.CV || {};
+
+  var dialogStates = typeof WeakMap !== "undefined" ? new WeakMap() : new Map();
+  var openDialogs = [];
+  var focusableSelector = [
+    "a[href]",
+    "button:not([disabled])",
+    "input:not([disabled]):not([type='hidden'])",
+    "select:not([disabled])",
+    "textarea:not([disabled])",
+    "[tabindex]:not([tabindex='-1'])",
+  ].join(",");
+
+  function focusableElements(container) {
+    return Array.prototype.filter.call(container.querySelectorAll(focusableSelector), function (element) {
+      return !element.hidden && element.getAttribute("aria-hidden") !== "true";
+    });
+  }
+
+  function currentDialog() {
+    return openDialogs.length ? openDialogs[openDialogs.length - 1] : null;
+  }
+
+  function open(container, options) {
+    if (!container) return false;
+    var config = options || {};
+    var opener = config.opener || document.activeElement;
+    dialogStates.set(container, { opener: opener, onRequestClose: config.onRequestClose });
+    openDialogs = openDialogs.filter(function (item) { return item !== container; });
+    openDialogs.push(container);
+    container.hidden = false;
+    document.body.classList.add("has-dialog-open", "has-delete-modal-open");
+
+    var initialFocus = config.initialFocus;
+    if (!initialFocus) {
+      initialFocus = focusableElements(container)[0] || container.querySelector('[role="dialog"]');
+    }
+    window.requestAnimationFrame(function () {
+      if (initialFocus && typeof initialFocus.focus === "function") initialFocus.focus();
+    });
+    container.dispatchEvent(new CustomEvent("cv:dialog:opened", { bubbles: true }));
+    return true;
+  }
+
+  function close(container, options) {
+    if (!container) return false;
+    var config = options || {};
+    var state = dialogStates.get(container) || {};
+    container.hidden = true;
+    openDialogs = openDialogs.filter(function (item) { return item !== container; });
+    if (!openDialogs.length) {
+      document.body.classList.remove("has-dialog-open", "has-delete-modal-open");
+    }
+    dialogStates.delete(container);
+    if (config.restoreFocus !== false && state.opener && typeof state.opener.focus === "function") {
+      state.opener.focus();
+    }
+    container.dispatchEvent(new CustomEvent("cv:dialog:closed", { bubbles: true }));
+    return true;
+  }
+
+  document.addEventListener("keydown", function (event) {
+    var container = currentDialog();
+    if (!container) return;
+    var state = dialogStates.get(container) || {};
+
+    if (event.key === "Escape") {
+      event.preventDefault();
+      if (typeof state.onRequestClose === "function") state.onRequestClose();
+      else close(container);
+      return;
+    }
+
+    if (event.key !== "Tab") return;
+    var focusable = focusableElements(container);
+    if (!focusable.length) {
+      event.preventDefault();
+      var dialog = container.querySelector('[role="dialog"]');
+      if (dialog) dialog.focus();
+      return;
+    }
+    var first = focusable[0];
+    var last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
+
+  window.CV.dialogs = {
+    close: close,
+    current: currentDialog,
+    focusableElements: focusableElements,
+    open: open,
+  };
+}());
+
 (function () {
   function getPanelId(toggle) {
     return toggle.getAttribute("aria-controls") || toggle.getAttribute("data-quick-add-toggle");
@@ -189,13 +369,35 @@ document.documentElement.dataset.appReady = "true";
     });
   }
 
+  function initConfirmSubmitContracts() {
+    document.addEventListener("click", function (event) {
+      var trigger = event.target.closest("[data-confirm-submit]");
+      if (!trigger) return;
+      var message = trigger.getAttribute("data-confirm-message") || "Confirmar esta ação?";
+      if (!window.confirm(message)) {
+        event.preventDefault();
+      }
+    });
+
+    document.addEventListener("submit", function (event) {
+      var form = event.target.closest("form[data-confirm-submit]");
+      if (!form) return;
+      var message = form.getAttribute("data-confirm-message") || "Confirmar esta ação?";
+      if (!window.confirm(message)) {
+        event.preventDefault();
+      }
+    });
+  }
+
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", function () {
       initQuickAddToggles();
       initQuickEditButtons();
+      initConfirmSubmitContracts();
     });
   } else {
     initQuickAddToggles();
     initQuickEditButtons();
+    initConfirmSubmitContracts();
   }
 }());

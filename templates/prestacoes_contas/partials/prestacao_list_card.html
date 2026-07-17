@@ -1,13 +1,13 @@
 <article
-  class="oficio-lc oficio-lc--{{ card.status_value|default:'outro' }}"
+  class="cv-entity-card oficio-lc oficio-lc--{{ card.status_value|default:'outro' }}"
   data-cv-filter-item
   data-search-text="{{ card.search_text }}"
   data-status-value="{{ card.status_value }}"
 >
-  <div class="oficio-lc__layout">
+  <div class="cv-entity-card__body oficio-lc__layout">
 
     {# ── IDENTIFICAÇÃO: Ofício · Protocolo · Destino · Data do Evento · Status ── #}
-    <div class="oficio-lc__id-row">
+    <div class="cv-entity-card__header oficio-lc__id-row">
       <div class="oficio-lc__info-item oficio-lc__info-item--wide">
         <span class="oficio-lc__info-label">Ofício</span>
         <span class="oficio-lc__info-value oficio-lc__info-value--wrap">{{ card.numero_display }}{% if card.protocolo_display %} · {{ card.protocolo_display }}{% endif %}{% if card.destino_display %} · {{ card.destino_display }}{% endif %}{% if card.data_evento_display %} · {{ card.data_evento_display }}{% endif %}</span>
@@ -267,7 +267,7 @@
     </div>
 
     {# ── FOOTER ── #}
-    <div class="oficio-lc__footer">
+    <div class="cv-entity-card__footer oficio-lc__footer">
       <div class="oficio-lc__footer-actions">
         <div class="oficio-lc__footer-actions-main cv-icon-btn-group">
           {% include "components/ui/buttons/icon_button.html" with href=card.rt_url action="edit" aria_label="Abrir prestação na etapa 1" tooltip="Abrir prestação" only %}

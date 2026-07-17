@@ -721,3 +721,8 @@ html[data-theme="dark"] .ui-lab-structure-quick-add .quick-add-footer-button[ari
     width: 100%;
   }
 }
+@media (min-width: 841px) {
+  .ui-lab-mobile-only-action {
+    display: none;
+  }
+}

@@ -1,13 +1,13 @@
 <article
-  class="oficio-lc oficio-lc--{{ card.status_variant|default:'outro' }}"
+  class="cv-entity-card oficio-lc oficio-lc--{{ card.status_variant|default:'outro' }}"
   data-cv-filter-item
   data-search-text="{{ card.numero_display }} {{ card.protocolo_display }} {{ card.destino_display }}{% for s in card.servidores %} {{ s.name }}{% endfor %}"
   {% if card.status_variant %}data-status-value="{{ card.status_variant }}"{% endif %}
 >
-  <div class="oficio-lc__layout">
+  <div class="cv-entity-card__body oficio-lc__layout">
 
     {# ── IDENTIFICAÇÃO: Número · Protocolo · Data de Criação ── #}
-    <div class="oficio-lc__id-row">
+    <div class="cv-entity-card__header oficio-lc__id-row">
       <div class="oficio-lc__info-item">
         <span class="oficio-lc__info-label">Número do Ofício</span>
         <span class="oficio-lc__info-value">{{ card.numero_display }}</span>
@@ -225,7 +225,7 @@
     </div>
 
     {# ── FOOTER ── #}
-    <div class="oficio-lc__footer">
+    <div class="cv-entity-card__footer oficio-lc__footer">
       <div class="oficio-lc__footer-actions">
         <div class="oficio-lc__footer-actions-main cv-icon-btn-group">
           {% include "components/ui/buttons/icon_button.html" with href=card.editar_url action="edit" aria_label="Editar ofício" tooltip="Editar" only %}

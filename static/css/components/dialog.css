@@ -1,0 +1,97 @@
+/* Structural contract for global dialogs. Dark-theme appearance lives in dark-redesign.css. */
+
+.cv-dialog[hidden] {
+  display: none;
+}
+
+.cv-dialog {
+  inset: 0;
+  position: fixed;
+  z-index: var(--z-modal, 1000);
+}
+
+.cv-dialog__backdrop {
+  inset: 0;
+  position: absolute;
+}
+
+.cv-dialog__panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  left: 50%;
+  max-height: min(88vh, 760px);
+  max-width: min(calc(100vw - 32px), 620px);
+  overflow: hidden;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+}
+
+.cv-dialog__panel--sm {
+  max-width: min(calc(100vw - 32px), 520px);
+}
+
+.cv-dialog__panel--lg {
+  max-width: min(calc(100vw - 32px), 760px);
+}
+
+.cv-dialog__header {
+  align-items: center;
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  min-width: 0;
+}
+
+.cv-dialog__icon,
+.cv-dialog__close {
+  align-items: center;
+  display: inline-flex;
+  justify-content: center;
+}
+
+.cv-dialog__heading {
+  min-width: 0;
+}
+
+.cv-dialog__eyebrow,
+.cv-dialog__title,
+.cv-dialog__message {
+  margin: 0;
+}
+
+.cv-dialog__body {
+  min-height: 0;
+  overflow: auto;
+}
+
+.cv-dialog__footer {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  justify-content: flex-end;
+}
+
+.cv-dialog__panel.attach-signed-modal__dialog {
+  grid-template-rows: auto auto auto minmax(0, 1fr);
+}
+
+@media (max-width: 560px) {
+  .cv-dialog__panel {
+    bottom: 0;
+    left: 0;
+    max-height: calc(100vh - 24px);
+    max-width: none;
+    top: auto;
+    transform: none;
+  }
+
+  .cv-dialog__footer > .cv-btn,
+  .cv-dialog__footer > .app-btn,
+  .cv-dialog__footer > .btn {
+    flex: 1 1 100%;
+    justify-content: center;
+  }
+}

@@ -1,3 +1,10 @@
 <div class="empty-state app-empty-state">
+  <span class="empty-state__mark" aria-hidden="true">CV</span>
+  {% if title %}<h3 class="empty-state__title">{{ title }}</h3>{% endif %}
   <p class="empty-state__message">{{ message|default:title|default:"Nada encontrado." }}</p>
+  {% if action_label and action_url %}
+    <div class="empty-state__actions">
+      {% include "components/ui/buttons/button.html" with label=action_label href=action_url variant="secondary" size="sm" only %}
+    </div>
+  {% endif %}
 </div>
