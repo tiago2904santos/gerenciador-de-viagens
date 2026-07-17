@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}{{ page_title }}{% endblock %}
 {% block content %}
   <div class="page-shell page-shell--wizard">
@@ -6,7 +7,7 @@
 
     <main class="main-form-panel main-form-panel--stack">
       <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
-        <form method="post" novalidate>
+        <form method="post" novalidate data-servidor-form>
           {% csrf_token %}
           {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
           <section class="cv-wizard-section-card" aria-labelledby="servidores-form-card-title">
@@ -36,7 +37,7 @@
                 </div>
 
                 <div class="field-grid">
-                  {% include "components/forms/form_field.html" with field=form.unidade size_class="field-size-4" only %}
+                  {% include "components/forms/form_field.html" with field=form.unidade action_url=unidades_manage_url action_label="Gerenciar unidades" size_class="field-size-4" only %}
                 </div>
               </section>
             </div>
@@ -47,4 +48,8 @@
       </div>
     </main>
   </div>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'js/pages/servidores-form.js' %}?v=20260717-draft-cargos" defer></script>
 {% endblock %}

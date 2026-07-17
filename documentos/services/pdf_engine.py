@@ -41,7 +41,8 @@ def _os_label() -> str:
 
 
 def _libreoffice_ok() -> bool:
-    return bool(resolve_libreoffice_binary())
+    # Um executável existente pode pertencer a uma instalação incompleta.
+    return bool(resolve_libreoffice_binary(verify_version=True))
 
 
 def _unoserver_ok() -> bool:

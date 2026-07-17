@@ -28,8 +28,15 @@
             {% if q %}value="{{ q }}"{% endif %}
           >
         </div>
+        {% if extra_hidden_field_name and extra_hidden_field_value %}
+          <input type="hidden" name="{{ extra_hidden_field_name }}" value="{{ extra_hidden_field_value }}">
+        {% endif %}
         <div class="header-filter-bar__actions">
-          {% include "components/ui/buttons/button.html" with href=request.path label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" data_cv_filter_clear=True only %}
+          {% if extra_hidden_field_name and extra_hidden_field_value %}
+            {% include "components/ui/buttons/button.html" with href=request.path|add:"?"|add:extra_hidden_field_name|add:"="|add:extra_hidden_field_value label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" data_cv_filter_clear=True only %}
+          {% else %}
+            {% include "components/ui/buttons/button.html" with href=request.path label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" data_cv_filter_clear=True only %}
+          {% endif %}
         </div>
       </form>
 
@@ -62,5 +69,9 @@
 
   {% if delete_modal_enabled %}
     {% include "components/ui/modals/delete_confirm_modal.html" %}
+  {% endif %}
+
+  {% if back_url %}
+    {% include "components/ui/buttons/floating_action.html" with href=back_url label=back_label|default:"Voltar" icon="arrow-left" variant="secondary" aria_label=back_label|default:"Voltar" extra_class="cv-floating-action--back" only %}
   {% endif %}
 </div>

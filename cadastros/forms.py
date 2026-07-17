@@ -466,6 +466,7 @@ class ViaturaForm(BaseCadastroForm):
                 "data-cv-search-picker": "true",
                 "data-picker-mode": "single",
                 "data-picker-variant": "compact",
+                "data-picker-label": "Unidade (opcional)",
                 "data-placeholder": "Buscar unidade",
                 "data-empty-message": "Nenhuma unidade encontrada.",
             }

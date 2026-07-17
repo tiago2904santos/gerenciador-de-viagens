@@ -33,6 +33,12 @@ def _url_with_next(url_name, next_url):
     return f"{reverse(url_name)}?{urlencode({'next': next_url})}"
 
 
+def _append_next(url, next_url):
+    if not next_url:
+        return url
+    return f"{url}?{urlencode({'next': next_url})}"
+
+
 def _safe_next_url(request, fallback_url):
     next_url = request.POST.get("next") or request.GET.get("next")
     if next_url and url_has_allowed_host_and_scheme(
@@ -128,9 +134,14 @@ def modelos_index(request):
     rows = [
         apresentar_linha_lista_simples_modelo_justificativa(
             modelo,
-            edit_url=reverse("justificativas:modelo_editar", args=[modelo.pk]),
-            delete_url=reverse("justificativas:modelo_excluir", args=[modelo.pk]),
+            edit_url=_append_next(
+                reverse("justificativas:modelo_editar", args=[modelo.pk]), back_url
+            ),
+            delete_url=_append_next(
+                reverse("justificativas:modelo_excluir", args=[modelo.pk]), back_url
+            ),
             delete_modal=True,
+            next_url=back_url,
         )
         for modelo in modelos
     ]
@@ -177,16 +188,18 @@ def modelo_definir_padrao(request, pk):
     modelo.is_padrao = True
     modelo.save()
     messages.success(request, "Modelo definido como padrao.")
-    return redirect("justificativas:modelos_index")
+    next_url = _safe_next_url(request, reverse("justificativas:index"))
+    return redirect(_append_next(reverse("justificativas:modelos_index"), next_url))
 
 
 def modelo_editar(request, pk):
     modelo = get_modelo_justificativa_by_id(pk)
+    next_url = _safe_next_url(request, reverse("justificativas:index"))
     form = ModeloJustificativaForm(request.POST or None, instance=modelo)
     if request.method == "POST" and form.is_valid():
         atualizar_modelo_justificativa(modelo, form)
         messages.success(request, "Modelo de justificativa atualizado com sucesso.")
-        return redirect("justificativas:modelos_index")
+        return redirect(_append_next(reverse("justificativas:modelos_index"), next_url))
     return render(
         request,
         "justificativas/modelos/form.html",
@@ -194,7 +207,7 @@ def modelo_editar(request, pk):
             "page_title": "Editar modelo de justificativa",
             "page_description": "Crie textos reutilizaveis para agilizar o preenchimento da justificativa nos oficios.",
             "form": form,
-            "back_url": reverse("justificativas:modelos_index"),
+            "back_url": _append_next(reverse("justificativas:modelos_index"), next_url),
             "submit_label": "Salvar alteracoes",
         },
     )
@@ -202,10 +215,11 @@ def modelo_editar(request, pk):
 
 def modelo_excluir(request, pk):
     modelo = get_modelo_justificativa_by_id(pk)
+    next_url = _safe_next_url(request, reverse("justificativas:index"))
     if request.method == "POST":
         excluir_modelo_justificativa(modelo)
         messages.success(request, "Modelo de justificativa excluido com sucesso.")
-        return redirect("justificativas:modelos_index")
+        return redirect(_append_next(reverse("justificativas:modelos_index"), next_url))
     return render(
         request,
         "justificativas/modelos/confirm_delete.html",
@@ -213,7 +227,7 @@ def modelo_excluir(request, pk):
             "page_title": "Excluir modelo de justificativa",
             "page_description": "Confirme a remocao deste modelo de justificativa.",
             "object": modelo,
-            "back_url": reverse("justificativas:modelos_index"),
+            "back_url": _append_next(reverse("justificativas:modelos_index"), next_url),
         },
     )
 

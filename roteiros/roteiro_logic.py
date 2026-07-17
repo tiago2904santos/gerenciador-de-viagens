@@ -564,6 +564,7 @@ def _serialize_roteiro_state(state):
         },
         'bate_volta_diario': _build_roteiro_bate_volta_diario_state(state.get('bate_volta_diario')),
         'seed_source_label': state.get('seed_source_label') or '',
+        'mapa_rota': state.get('mapa_rota'),
     }
 
 
@@ -691,6 +692,13 @@ def _build_roteiro_state_from_roteiro_evento(roteiro, seed_source_label='PrÃ©-
         state['retorno']['chegada_data'], state['retorno']['chegada_hora'] = _split_route_datetime(roteiro.retorno_chegada_dt)
     state['bate_volta_diario'] = _infer_roteiro_bate_volta_diario_from_state(state)
     _maybe_apply_sede_padrao_configuracao(roteiro, state)
+
+    from roteiros.services.routing.route_service import serialize_existing_route
+
+    try:
+        state['mapa_rota'] = serialize_existing_route(roteiro)
+    except Exception:
+        state['mapa_rota'] = None
     return state
 
 

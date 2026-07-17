@@ -30,6 +30,11 @@ class WeasyImportProbeTests(SimpleTestCase):
 
 
 class ResolvePdfEngineTests(SimpleTestCase):
+    @mock.patch.object(pe, "resolve_libreoffice_binary", return_value="/x/soffice")
+    def test_libreoffice_disponivel_exige_verificacao_do_executavel(self, m_resolve):
+        self.assertTrue(pe._libreoffice_ok())
+        m_resolve.assert_called_once_with(verify_version=True)
+
     @mock.patch.object(pe, "_word_ok", return_value=True)
     @mock.patch.object(pe, "_libreoffice_ok", return_value=False)
     @mock.patch.object(pe, "_weasy_import_ok", return_value=True)

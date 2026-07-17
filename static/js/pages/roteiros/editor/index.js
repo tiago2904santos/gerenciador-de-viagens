@@ -1377,12 +1377,13 @@ export function initRoteirosEditor() {
         tempo_adicional_min: $('id_retorno_tempo_adicional_min').value||'0', duracao_estimada_min: $('id_retorno_duracao_estimada_min').value||'', rota_fonte: $('id_retorno_rota_fonte').value||'' }
     };
   }
-  function clearRouteTrechos() {
+  function clearRouteTrechos(options) {
     // Ao desmarcar um roteiro salvo, mantém a sede (padrão herdado do evento) mas limpa
     // destinos/trechos/retorno — trechos são derivados dos destinos (ver shouldUseExactTrechos),
     // então pra realmente sumir com o trecho da rota antiga é preciso zerar os dois juntos.
+    var keepEventoMode = !!(options && options.keepEventoMode);
     var cur = captureCurrentState();
-    cur.roteiro_modo = 'ROTEIRO_PROPRIO';
+    cur.roteiro_modo = keepEventoMode ? 'EVENTO_EXISTENTE' : 'ROTEIRO_PROPRIO';
     cur.roteiro_id = null;
     cur.destinos_atuais = [];
     cur.trechos = [];
@@ -1401,6 +1402,16 @@ export function initRoteirosEditor() {
       if ($('id_retorno_tempo_adicional_hhmm')) $('id_retorno_tempo_adicional_hhmm').value = '';
       if ($('id_retorno_tempo_cru_estimado_min')) $('id_retorno_tempo_cru_estimado_min').value = '';
       recalcRetorno(false);
+      if (window.RoteirosMap && typeof window.RoteirosMap.applyExternalRoute === 'function') {
+        window.RoteirosMap.applyExternalRoute(null);
+      }
+    });
+  }
+  function applyRouteSelection(r) {
+    return applyState(r.state).then(function() {
+      if (window.RoteirosMap && typeof window.RoteirosMap.applyExternalRoute === 'function') {
+        window.RoteirosMap.applyExternalRoute(r.state.mapa_rota || null);
+      }
     });
   }
   function setDiariasStatus(state, text) {
@@ -1530,7 +1541,7 @@ export function initRoteirosEditor() {
   function applyState(state) {
     var cur = Object.assign({}, state || {}); applyingState = true;
     var curRouteId = cur.roteiro_id || '';
-    if (cur.roteiro_modo === 'EVENTO_EXISTENTE' && curRouteId) { $('id_roteiro_modo_evento').checked=true; $('id_roteiro_modo_proprio').checked=false; setSelectedRouteId(curRouteId); }
+    if (cur.roteiro_modo === 'EVENTO_EXISTENTE') { $('id_roteiro_modo_evento').checked=true; $('id_roteiro_modo_proprio').checked=false; setSelectedRouteId(curRouteId); }
     else { $('id_roteiro_modo_evento').checked=false; $('id_roteiro_modo_proprio').checked=true; setSelectedRouteId(''); }
     setModeUi();
     $('id_origem_estado').value = cur.sede_estado_id || '';
@@ -1836,10 +1847,17 @@ export function initRoteirosEditor() {
     $('roteiro-lista').addEventListener('click', function(e) {
       var btn = e.target.closest('[data-route-id]'); if (!btn) return;
       var rid = btn.getAttribute('data-route-id')||''; if (!rid) return;
+      if (getSelectedRouteId() === rid) {
+        clearRouteTrechos({ keepEventoMode: true }).then(function() {
+          scheduleRealtimeDiarias();
+        });
+        scheduleAutosave();
+        return;
+      }
       setSelectedRouteId(rid);
       routeResumo();
       var r = routeMap[String(rid)];
-      if (r && r.state && $('id_roteiro_modo_evento').checked) applyState(r.state);
+      if (r && r.state && $('id_roteiro_modo_evento').checked) applyRouteSelection(r);
       else scheduleRealtimeDiarias();
       scheduleAutosave();
     });
@@ -1847,7 +1865,10 @@ export function initRoteirosEditor() {
   if ($('id_roteiro_modo_evento')) {
     $('id_roteiro_modo_evento').addEventListener('change', function() {
       setModeUi();
-      if ($('id_roteiro_modo_evento').checked && getSelectedRouteId()) { var r = routeMap[String(getSelectedRouteId())]; if (r && r.state) applyState(r.state); }
+      if ($('id_roteiro_modo_evento').checked && getSelectedRouteId()) {
+        var r = routeMap[String(getSelectedRouteId())];
+        if (r && r.state) applyRouteSelection(r);
+      }
       else { scheduleRealtimeDiarias(); }
       scheduleAutosave();
     });

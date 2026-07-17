@@ -743,6 +743,48 @@
     showElement($('roteiro-mapa-stale-hint'));
   }
 
+  /**
+   * Aplica no mapa uma rota já calculada (ex.: reaproveitada de um roteiro salvo),
+   * sem chamar a API de cálculo. `payload` segue o mesmo formato de `initial`
+   * (roteiro-mapa-inicial): { route, points }. Passe null/undefined para limpar.
+   */
+  function applyExternalRoute(payload) {
+    ensureMap();
+    var route = payload && payload.route ? payload.route : null;
+    var points = payload && Array.isArray(payload.points) ? payload.points : [];
+    initial.route = route;
+    initial.legs = [];
+    initial.points = points;
+    persistRouteInForm(route, points);
+    showError('');
+
+    if (!route) {
+      clearMapLayers();
+      updateSummary(null, null, null);
+      setFramePlaceholder(true);
+      toggleRecalc(false);
+      toggleFit(false);
+      hideElement($('roteiro-mapa-stale-hint'));
+      refreshRouteReadyState();
+      return;
+    }
+
+    initial.status = route.status || 'calculada';
+    hadGeometry = !!(route.geometry && route.geometry.type === 'LineString');
+    updateSummary(route, [], points);
+    var gw = route.geometry_warning;
+    var drew = drawRoute(route.geometry, gw, [], points);
+    if (!drew && route.distance_km != null && !gw) {
+      showError(MSG_GEOM_DESENHO);
+    } else if (!drew && gw) {
+      showError(gw);
+    }
+    toggleRecalc(true);
+    toggleFit(!!lastRouteBounds);
+    hideElement($('roteiro-mapa-stale-hint'));
+    refreshRouteReadyState();
+  }
+
   var mapBooted = false;
   function bootMap() {
     if (mapBooted) {
@@ -767,6 +809,6 @@
     scheduleMapBoot();
   }
 
-  window.RoteirosMap = { onDestinosReordered: onDestinosReordered };
+  window.RoteirosMap = { onDestinosReordered: onDestinosReordered, applyExternalRoute: applyExternalRoute };
   window.RoteirosMapBoot = bootMap;
 })();

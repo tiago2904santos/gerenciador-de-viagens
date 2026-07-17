@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import socket
 import subprocess
 import tempfile
@@ -15,17 +16,24 @@ import requests
 _LIBREOFFICE_TIMEOUT_SECONDS = 90
 
 
+def _headless_subprocess_kwargs() -> dict[str, int]:
+    if os.name != "nt":
+        return {}
+    return {"creationflags": int(getattr(subprocess, "CREATE_NO_WINDOW", 0))}
+
+
 def _convert_via_libreoffice(*, input_bytes: bytes, filename: str, libreoffice_binary: str) -> bytes:
     with tempfile.TemporaryDirectory() as tmp:
         tdir = Path(tmp)
         input_path = tdir / filename
         input_path.write_bytes(input_bytes)
         profile_dir = tdir / "profile"
+        profile_dir.mkdir()
         try:
             subprocess.run(
                 [
                     libreoffice_binary,
-                    f"-env:UserInstallation=file://{profile_dir}",
+                    f"-env:UserInstallation={profile_dir.as_uri()}",
                     "--headless",
                     "--convert-to",
                     "pdf",
@@ -37,6 +45,7 @@ def _convert_via_libreoffice(*, input_bytes: bytes, filename: str, libreoffice_b
                 capture_output=True,
                 text=True,
                 timeout=_LIBREOFFICE_TIMEOUT_SECONDS,
+                **_headless_subprocess_kwargs(),
             )
         except subprocess.TimeoutExpired as exc:
             raise RuntimeError(

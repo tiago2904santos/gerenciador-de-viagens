@@ -228,7 +228,7 @@ class Command(BaseCommand):
             if i == 0:
                 cfg = ConfiguracaoSistema.get_singleton()
             else:
-                cfg = ConfiguracaoSistema(pk=i + 1)
+                cfg = ConfiguracaoSistema()
             cfg.cidade_sede_padrao = cidades[0]
             cfg.nome_orgao = "POLICIA CIVIL DO PARANA"
             cfg.sigla_orgao = "PCPR"

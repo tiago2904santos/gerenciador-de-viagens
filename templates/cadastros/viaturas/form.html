@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}{{ page_title }}{% endblock %}
 {% block content %}
   <div class="page-shell page-shell--wizard">
@@ -6,7 +7,7 @@
 
     <main class="main-form-panel main-form-panel--stack">
       <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
-        <form method="post" novalidate>
+        <form method="post" novalidate data-viatura-form>
           {% csrf_token %}
           {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
           <section class="cv-wizard-section-card" aria-labelledby="viaturas-form-card-title">
@@ -28,17 +29,13 @@
 
               <section class="wizard-inner-section">
                 <div class="field-grid">
-                  <div class="field app-form-field cv-field field-size-4">
-                    <label class="app-form-label cv-field__label" for="{{ form.unidade.id_for_label }}">{{ form.unidade.label }}</label>
-                    {{ form.unidade.as_widget }}
-                    {% if form.unidade.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.unidade.errors only %}{% endif %}
-                  </div>
+                  {% include "components/forms/form_field.html" with field=form.unidade action_url=unidades_manage_url action_label="Gerenciar unidades" size_class="field-size-4" only %}
                 </div>
               </section>
 
               <section class="wizard-inner-section">
                 <div class="field-grid">
-                  {% include "components/forms/form_field.html" with field=form.motoristas size_class="field-size-4" only %}
+                  {% include "components/forms/form_field.html" with field=form.motoristas action_url=servidores_manage_url action_label="Gerenciar servidores" size_class="field-size-4" only %}
                 </div>
               </section>
             </div>
@@ -49,4 +46,8 @@
       </div>
     </main>
   </div>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'js/pages/viaturas-form.js' %}?v=20260717-draft-combustiveis" defer></script>
 {% endblock %}

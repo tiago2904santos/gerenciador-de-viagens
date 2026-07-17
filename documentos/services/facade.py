@@ -289,7 +289,7 @@ class DocumentoFacade:
                 docxtpl_context=docxtpl_context,
                 payload=payload,
             )
-        binary = (libreoffice_binary or "").strip() or resolve_libreoffice_binary()
+        binary = (libreoffice_binary or "").strip() or resolve_libreoffice_binary(verify_version=True)
         if not binary:
             raise DocumentValidationError(
                 "Motor PDF = libreoffice, mas nenhum executável foi encontrado. "

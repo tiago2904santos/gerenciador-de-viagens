@@ -6,7 +6,7 @@
   <label class="app-form-label cv-field__label" for="{{ field.id_for_label }}">{{ label|default:field.label }}</label>
   {% endif %}
   {% if action_url or action_label %}
-    <div class="cv-field-with-action cv-field-with-action--manage-reveal">
+    <div class="cv-field-with-action cv-field-with-action--manage-reveal{% if "cv-search-picker__native" in field.field.widget.attrs.class|default:"" %} cv-field-with-action--search-picker{% endif %}">
       {% include "components/ui/forms/multiselect.html" with field=field only %}
       {% if action_url %}
         {% include "components/ui/buttons/field_manage_button.html" with href=action_url action_label=action_label data_autosave_link=True only %}
@@ -26,7 +26,18 @@
   <label class="app-form-label cv-field__label" for="{{ field.id_for_label }}">{{ label|default:field.label }}</label>
   {% endif %}
   {% if "cv-search-picker__native" in field.field.widget.attrs.class %}
-    {{ field.as_widget }}
+    {% if action_url or action_label %}
+      <div class="cv-field-with-action cv-field-with-action--manage-reveal cv-field-with-action--search-picker">
+        {{ field.as_widget }}
+        {% if action_url %}
+          {% include "components/ui/buttons/field_manage_button.html" with href=action_url action_label=action_label data_autosave_link=True only %}
+        {% elif action_label %}
+          {% include "components/ui/buttons/field_manage_button.html" with action_label=action_label type=action_type|default:"button" only %}
+        {% endif %}
+      </div>
+    {% else %}
+      {{ field.as_widget }}
+    {% endif %}
   {% elif action_url or action_label %}
     <div class="cv-field-with-action cv-field-with-action--manage-reveal">
       {% include "components/ui/forms/select.html" with field=field only %}

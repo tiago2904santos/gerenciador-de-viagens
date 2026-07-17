@@ -1,6 +1,6 @@
 {# Lista Standard oficial, promovida do modelo aprovado no UI Lab. #}
 <div class="page-shell page-shell--list"{% if not disable_realtime_filter %} data-cv-realtime-filter-scope{% endif %}>
-  {% include "components/ui/headers/header_stack_filters.html" with eyebrow=eyebrow title=title icon_label=brand_mark form_action=request.path search_name="q" search_value=q search_placeholder=search_placeholder search_clear_url=search_clear_url|default:request.path status_options=status_options status_value=status_value current_aba=current_aba %}
+  {% include "components/ui/headers/header_stack_filters.html" with eyebrow=eyebrow title=title icon_label=brand_mark form_action=request.path search_name="q" search_value=q search_placeholder=search_placeholder search_clear_url=search_clear_url|default:request.path status_options=status_options status_value=status_value current_aba=current_aba next_url=next_url %}
 
   {% if abas %}
     {% include "components/lists/list_tabs.html" with abas=abas tabs_aria_label=tabs_aria_label only %}
@@ -21,5 +21,9 @@
 
   {% if action_label and action_url %}
     {% include "components/ui/buttons/floating_action.html" with href=action_url label=action_label icon="plus" variant="primary" aria_label=action_aria_label|default:action_label only %}
+  {% endif %}
+
+  {% if back_url %}
+    {% include "components/ui/buttons/floating_action.html" with href=back_url label=back_label|default:"Voltar" icon="arrow-left" variant="secondary" aria_label=back_label|default:"Voltar" extra_class="cv-floating-action--stacked" only %}
   {% endif %}
 </div>

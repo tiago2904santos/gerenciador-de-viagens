@@ -1425,6 +1425,18 @@ html[data-theme="light-dark"] input[type="checkbox"] {
   z-index: 5;
 }
 
+/* Search picker + botão de gerenciar: cv-search-picker.js move o botão para
+   dentro do controle de busca (ao lado de "Limpar busca") em vez de
+   sobrepor o rótulo/dica do campo. Fica sempre visível (o controle já não
+   é tão compacto quanto um select simples, então esconder no hover
+   prejudicaria a descoberta do botão). */
+.main-form-panel .cv-field-with-action--search-picker .cv-search-picker__control > .cv-icon-btn--field-manage {
+  flex: 0 0 auto;
+  height: calc(var(--cv-search-picker-height) - 8px);
+  width: calc(var(--cv-search-picker-height) - 8px);
+  position: static;
+}
+
 /* Search picker single: só label interna + controle (sem painel de selecionados) */
 .main-form-panel .cv-search-picker:not(:has(.cv-search-picker__selected-panel)) {
   gap: var(--space-2);

@@ -191,6 +191,15 @@
 
     select.insertAdjacentElement("afterend", root);
 
+    /* Campo com botão de gerenciar (field.html): o botão nasce como irmão
+       do <select> dentro do wrapper .cv-field-with-action--search-picker.
+       Move para dentro do controle de busca para alinhar com "Limpar
+       busca" em vez de sobrepor o rótulo/dica renderizados acima. */
+    const manageBtn = select.parentElement
+      ? select.parentElement.querySelector(":scope > .cv-icon-btn--field-manage")
+      : null;
+    if (manageBtn) control.appendChild(manageBtn);
+
     const floatingMenu =
       window.CvFloatingDropdown && window.CvFloatingDropdown.attach
         ? window.CvFloatingDropdown.attach(dropdown, control)

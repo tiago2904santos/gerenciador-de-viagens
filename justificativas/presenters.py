@@ -1,3 +1,5 @@
+from urllib.parse import urlencode
+
 from core.presenters.badges import build_badge
 from core.presenters.meta import build_meta
 from django.urls import reverse
@@ -14,6 +16,7 @@ def apresentar_linha_lista_simples_modelo_justificativa(
     edit_url: str = "#",
     delete_url: str = "#",
     delete_modal: bool = False,
+    next_url: str = "",
 ):
     """Mesmo contrato de `apresentar_linha_lista_simples_modelo_motivo` (lista simples)."""
     badges = []
@@ -22,6 +25,13 @@ def apresentar_linha_lista_simples_modelo_justificativa(
     texto = (modelo.texto or "").strip()
     if len(texto) > 90:
         texto = f"{texto[:90]}..."
+    set_default_url = (
+        reverse("justificativas:modelo_definir_padrao", args=[modelo.pk])
+        if not modelo.is_padrao
+        else ""
+    )
+    if set_default_url and next_url:
+        set_default_url = f"{set_default_url}?{urlencode({'next': next_url})}"
     return {
         "title": modelo.nome,
         "badges": badges,
@@ -31,11 +41,7 @@ def apresentar_linha_lista_simples_modelo_justificativa(
         "edit_url": edit_url,
         "delete_url": delete_url,
         "delete_modal": delete_modal,
-        "set_default_url": (
-            reverse("justificativas:modelo_definir_padrao", args=[modelo.pk])
-            if not modelo.is_padrao
-            else ""
-        ),
+        "set_default_url": set_default_url,
     }
 
 

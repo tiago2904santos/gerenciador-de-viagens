@@ -1,4 +1,4 @@
-import { initRoteirosEditor } from './pages/roteiros/editor/index.js?v=20260701-destinos-autosave-fix';
+import { initRoteirosEditor } from './pages/roteiros/editor/index.js?v=20260717-load-saved-route-map';
 
 function bootRoteirosEditor() {
   const form = document.getElementById('roteiro-editor-form');

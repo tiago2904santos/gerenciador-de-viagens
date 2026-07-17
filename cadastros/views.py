@@ -111,6 +111,19 @@ def _safe_next_url(request, fallback_url):
     return fallback_url
 
 
+def _validated_next(request):
+    next_url = request.GET.get("next") or request.POST.get("next") or ""
+    if next_url and not url_has_allowed_host_and_scheme(
+        next_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()
+    ):
+        next_url = ""
+    return next_url
+
+
+def _url_with_next(url, next_url):
+    return url + ("?" + urlencode({"next": next_url}) if next_url else "")
+
+
 def index(request):
     return render(
         request,
@@ -269,11 +282,13 @@ def estado_delete(request, pk):
 
 def unidades_index(request):
     q = request.GET.get("q", "").strip()
+    next_url = _validated_next(request)
+    self_url_with_next = _url_with_next(reverse("cadastros:unidades_index"), next_url)
     form = UnidadeForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
         criar_unidade(form)
         messages.success(request, "Unidade criada com sucesso.")
-        return redirect("cadastros:unidades_index")
+        return redirect(self_url_with_next)
     unidades = listar_unidades(q=q)
     paginator = Paginator(unidades, CADASTROS_PER_PAGE)
     page_obj = paginator.get_page(request.GET.get("page"))
@@ -281,11 +296,16 @@ def unidades_index(request):
         apresentar_linha_lista_simples_unidade(
             unidade,
             edit_url=reverse("cadastros:unidade_update", args=[unidade.pk]),
-            delete_url=reverse("cadastros:unidade_delete", args=[unidade.pk]),
+            delete_url=_url_with_next(reverse("cadastros:unidade_delete", args=[unidade.pk]), next_url),
             delete_modal=True,
         )
         for unidade in page_obj.object_list
     ]
+    page_params = {}
+    if q:
+        page_params["q"] = q
+    if next_url:
+        page_params["next"] = next_url
     return _render_listagem(
         request,
         "cadastros/unidades/index.html",
@@ -297,7 +317,10 @@ def unidades_index(request):
             "quick_add_form": form,
             "page_obj": page_obj,
             "pagination_pages": _pagination_pages(page_obj),
-            "page_querystring": urlencode({"q": q}) if q else "",
+            "page_querystring": urlencode(page_params) if page_params else "",
+            "back_url": next_url or None,
+            "back_label": "Voltar ao servidor",
+            "next_url": next_url,
         },
     )
 
@@ -345,15 +368,16 @@ def unidade_update(request, pk):
 
 def unidade_delete(request, pk):
     unidade = get_unidade_by_id(pk)
+    redirect_url = _url_with_next(reverse("cadastros:unidades_index"), _validated_next(request))
     if request.method == "POST":
         try:
             excluir_unidade(unidade)
         except CadastroVinculadoError:
             _vinculo_error(request)
-            return redirect("cadastros:unidades_index")
+            return redirect(redirect_url)
         messages.success(request, "Unidade excluída com sucesso.")
-        return redirect("cadastros:unidades_index")
-    return redirect("cadastros:unidades_index")
+        return redirect(redirect_url)
+    return redirect(redirect_url)
 
 
 def cidades_index(request):
@@ -480,11 +504,14 @@ def cidade_delete(request, pk):
 
 def cargos_index(request):
     q = request.GET.get("q", "").strip()
+    next_url = _validated_next(request)
+    self_url = reverse("cadastros:cargos_index")
+    self_url_with_next = _url_with_next(self_url, next_url)
     form = CargoForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
         criar_cargo(form)
         messages.success(request, "Cargo criado com sucesso.")
-        return redirect("cadastros:cargos_index")
+        return redirect(self_url_with_next)
     cargos = listar_cargos(q=q)
     paginator = Paginator(cargos, CADASTROS_PER_PAGE)
     page_obj = paginator.get_page(request.GET.get("page"))
@@ -492,14 +519,21 @@ def cargos_index(request):
         apresentar_linha_lista_simples_cargo(
             cargo,
             edit_url=reverse("cadastros:cargo_update", args=[cargo.pk]),
-            delete_url=reverse("cadastros:cargo_delete", args=[cargo.pk]),
+            delete_url=_url_with_next(reverse("cadastros:cargo_delete", args=[cargo.pk]), next_url),
             delete_modal=True,
             set_default_url=(
-                reverse("cadastros:cargo_set_default", args=[cargo.pk]) if not cargo.is_padrao else None
+                _url_with_next(reverse("cadastros:cargo_set_default", args=[cargo.pk]), next_url)
+                if not cargo.is_padrao
+                else None
             ),
         )
         for cargo in page_obj.object_list
     ]
+    page_params = {}
+    if q:
+        page_params["q"] = q
+    if next_url:
+        page_params["next"] = next_url
     return _render_listagem(
         request,
         "cadastros/cargos/index.html",
@@ -511,7 +545,10 @@ def cargos_index(request):
             "quick_add_form": form,
             "page_obj": page_obj,
             "pagination_pages": _pagination_pages(page_obj),
-            "page_querystring": urlencode({"q": q}) if q else "",
+            "page_querystring": urlencode(page_params) if page_params else "",
+            "back_url": next_url or None,
+            "back_label": "Voltar ao servidor",
+            "next_url": next_url,
         },
     )
 
@@ -558,34 +595,38 @@ def cargo_update(request, pk):
 
 
 def cargo_set_default(request, pk):
+    redirect_url = _url_with_next(reverse("cadastros:cargos_index"), _validated_next(request))
     if request.method != "POST":
-        return redirect("cadastros:cargos_index")
+        return redirect(redirect_url)
     cargo = get_cargo_by_id(pk)
     definir_cargo_padrao(cargo)
     messages.success(request, "Cargo definido como padrão com sucesso.")
-    return redirect("cadastros:cargos_index")
+    return redirect(redirect_url)
 
 
 def cargo_delete(request, pk):
     cargo = get_cargo_by_id(pk)
+    redirect_url = _url_with_next(reverse("cadastros:cargos_index"), _validated_next(request))
     if request.method != "POST":
-        return redirect("cadastros:cargos_index")
+        return redirect(redirect_url)
     try:
         excluir_cargo(cargo)
     except CadastroVinculadoError:
         _vinculo_error(request)
-        return redirect("cadastros:cargos_index")
+        return redirect(redirect_url)
     messages.success(request, "Cargo excluído com sucesso.")
-    return redirect("cadastros:cargos_index")
+    return redirect(redirect_url)
 
 
 def combustiveis_index(request):
     q = request.GET.get("q", "").strip()
+    next_url = _validated_next(request)
+    self_url_with_next = _url_with_next(reverse("cadastros:combustiveis_index"), next_url)
     form = CombustivelForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
         criar_combustivel(form)
         messages.success(request, "Combustível criado com sucesso.")
-        return redirect("cadastros:combustiveis_index")
+        return redirect(self_url_with_next)
     combustiveis = listar_combustiveis(q=q)
     paginator = Paginator(combustiveis, CADASTROS_PER_PAGE)
     page_obj = paginator.get_page(request.GET.get("page"))
@@ -593,9 +634,9 @@ def combustiveis_index(request):
         apresentar_linha_lista_simples_combustivel(
             combustivel,
             edit_url=reverse("cadastros:combustivel_update", args=[combustivel.pk]),
-            delete_url=reverse("cadastros:combustivel_delete", args=[combustivel.pk]),
+            delete_url=_url_with_next(reverse("cadastros:combustivel_delete", args=[combustivel.pk]), next_url),
             set_default_url=(
-                reverse("cadastros:combustivel_set_default", args=[combustivel.pk])
+                _url_with_next(reverse("cadastros:combustivel_set_default", args=[combustivel.pk]), next_url)
                 if not combustivel.is_padrao
                 else None
             ),
@@ -603,6 +644,11 @@ def combustiveis_index(request):
         )
         for combustivel in page_obj.object_list
     ]
+    page_params = {}
+    if q:
+        page_params["q"] = q
+    if next_url:
+        page_params["next"] = next_url
     return _render_listagem(
         request,
         "cadastros/combustiveis/index.html",
@@ -614,7 +660,10 @@ def combustiveis_index(request):
             "quick_add_form": form,
             "page_obj": page_obj,
             "pagination_pages": _pagination_pages(page_obj),
-            "page_querystring": urlencode({"q": q}) if q else "",
+            "page_querystring": urlencode(page_params) if page_params else "",
+            "back_url": next_url or None,
+            "back_label": "Voltar à viatura",
+            "next_url": next_url,
         },
     )
 
@@ -661,29 +710,32 @@ def combustivel_update(request, pk):
 
 
 def combustivel_set_default(request, pk):
+    redirect_url = _url_with_next(reverse("cadastros:combustiveis_index"), _validated_next(request))
     if request.method != "POST":
-        return redirect("cadastros:combustiveis_index")
+        return redirect(redirect_url)
     combustivel = get_combustivel_by_id(pk)
     definir_combustivel_padrao(combustivel)
     messages.success(request, "Combustível definido como padrão com sucesso.")
-    return redirect("cadastros:combustiveis_index")
+    return redirect(redirect_url)
 
 
 def combustivel_delete(request, pk):
     combustivel = get_combustivel_by_id(pk)
+    redirect_url = _url_with_next(reverse("cadastros:combustiveis_index"), _validated_next(request))
     if request.method == "POST":
         try:
             excluir_combustivel(combustivel)
         except CadastroVinculadoError:
             _vinculo_error(request)
-            return redirect("cadastros:combustiveis_index")
+            return redirect(redirect_url)
         messages.success(request, "Combustível excluído com sucesso.")
-        return redirect("cadastros:combustiveis_index")
-    return redirect("cadastros:combustiveis_index")
+        return redirect(redirect_url)
+    return redirect(redirect_url)
 
 
 def servidores_index(request):
     q = request.GET.get("q", "").strip()
+    next_url = _validated_next(request)
     servidores = listar_servidores(q=q)
     paginator = Paginator(servidores, SERVIDORES_PER_PAGE)
     page_obj = paginator.get_page(request.GET.get("page"))
@@ -691,11 +743,16 @@ def servidores_index(request):
         apresentar_linha_lista_simples_servidor(
             servidor,
             edit_url=reverse("cadastros:servidor_update", args=[servidor.pk]),
-            delete_url=reverse("cadastros:servidor_delete", args=[servidor.pk]),
+            delete_url=_url_with_next(reverse("cadastros:servidor_delete", args=[servidor.pk]), next_url),
             delete_modal=True,
         )
         for servidor in page_obj.object_list
     ]
+    page_params = {}
+    if q:
+        page_params["q"] = q
+    if next_url:
+        page_params["next"] = next_url
     return _render_listagem(
         request,
         "cadastros/servidores/index.html",
@@ -706,7 +763,10 @@ def servidores_index(request):
             "q": q,
             "page_obj": page_obj,
             "pagination_pages": _pagination_pages(page_obj),
-            "page_querystring": urlencode({"q": q}) if q else "",
+            "page_querystring": urlencode(page_params) if page_params else "",
+            "back_url": next_url or None,
+            "back_label": "Voltar à viatura",
+            "next_url": next_url,
         },
     )
 
@@ -722,6 +782,7 @@ def servidor_create(request):
         else:
             messages.success(request, "Servidor criado com sucesso.")
         return redirect(next_url)
+    own_url = reverse("cadastros:servidor_create")
     return render(
         request,
         "cadastros/servidores/form.html",
@@ -733,8 +794,8 @@ def servidor_create(request):
             "submit_icon": "plus",
             "next_url": next_url,
             "back_url": next_url,
-            "cargos_manage_url": reverse("cadastros:cargos_index"),
-            "unidades_manage_url": reverse("cadastros:unidades_index"),
+            "cargos_manage_url": _url_with_next(reverse("cadastros:cargos_index"), own_url),
+            "unidades_manage_url": _url_with_next(reverse("cadastros:unidades_index"), own_url),
         },
     )
 
@@ -749,6 +810,7 @@ def servidor_update(request, pk):
         else:
             messages.success(request, "Servidor atualizado com sucesso.")
         return redirect("cadastros:servidores_index")
+    own_url = reverse("cadastros:servidor_update", args=[pk])
     return render(
         request,
         "cadastros/servidores/form.html",
@@ -759,24 +821,25 @@ def servidor_update(request, pk):
             "submit_label": "Salvar servidor",
             "submit_icon": "check",
             "back_url": reverse("cadastros:servidores_index"),
-            "cargos_manage_url": reverse("cadastros:cargos_index"),
-            "unidades_manage_url": reverse("cadastros:unidades_index"),
+            "cargos_manage_url": _url_with_next(reverse("cadastros:cargos_index"), own_url),
+            "unidades_manage_url": _url_with_next(reverse("cadastros:unidades_index"), own_url),
         },
     )
 
 
 def servidor_delete(request, pk):
     servidor = get_servidor_by_id(pk)
+    redirect_url = _url_with_next(reverse("cadastros:servidores_index"), _validated_next(request))
     if request.method != "POST":
-        return redirect("cadastros:servidores_index")
+        return redirect(redirect_url)
     if request.method == "POST":
         try:
             excluir_servidor(servidor)
         except CadastroVinculadoError:
             _vinculo_error(request)
-            return redirect("cadastros:servidores_index")
+            return redirect(redirect_url)
         messages.success(request, "Servidor excluído com sucesso.")
-        return redirect("cadastros:servidores_index")
+        return redirect(redirect_url)
 
 
 def viaturas_index(request):
@@ -819,6 +882,7 @@ def viatura_create(request):
         else:
             messages.success(request, "Viatura criada com sucesso.")
         return redirect(next_url)
+    own_url = reverse("cadastros:viatura_create")
     return render(
         request,
         "cadastros/viaturas/form.html",
@@ -830,7 +894,9 @@ def viatura_create(request):
             "submit_icon": "plus",
             "next_url": next_url,
             "back_url": next_url,
-            "combustiveis_manage_url": reverse("cadastros:combustiveis_index"),
+            "combustiveis_manage_url": _url_with_next(reverse("cadastros:combustiveis_index"), own_url),
+            "unidades_manage_url": _url_with_next(reverse("cadastros:unidades_index"), own_url),
+            "servidores_manage_url": _url_with_next(reverse("cadastros:servidores_index"), own_url),
         },
     )
 
@@ -845,6 +911,7 @@ def viatura_update(request, pk):
         else:
             messages.success(request, "Viatura atualizada com sucesso.")
         return redirect("cadastros:viaturas_index")
+    own_url = reverse("cadastros:viatura_update", args=[pk])
     return render(
         request,
         "cadastros/viaturas/form.html",
@@ -855,7 +922,9 @@ def viatura_update(request, pk):
             "submit_label": "Salvar viatura",
             "submit_icon": "check",
             "back_url": reverse("cadastros:viaturas_index"),
-            "combustiveis_manage_url": reverse("cadastros:combustiveis_index"),
+            "combustiveis_manage_url": _url_with_next(reverse("cadastros:combustiveis_index"), own_url),
+            "unidades_manage_url": _url_with_next(reverse("cadastros:unidades_index"), own_url),
+            "servidores_manage_url": _url_with_next(reverse("cadastros:servidores_index"), own_url),
         },
     )
 

@@ -33,6 +33,7 @@
         >
       </div>
       {% if current_aba %}<input type="hidden" name="aba" value="{{ current_aba }}">{% endif %}
+      {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
       {% if status_options %}
         <div class="header-filter-bar__row">
           <div class="header-filter-bar__fields">
@@ -48,7 +49,9 @@
       {% endif %}
     </div>
     <div class="page-header-rail__actions">
-      {% if search_clear_url %}
+      {% if search_clear_url and next_url %}
+        {% include "components/ui/buttons/button.html" with href=search_clear_url|add:"?next="|add:next_url label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" data_cv_filter_clear=True only %}
+      {% elif search_clear_url %}
         {% include "components/ui/buttons/button.html" with href=search_clear_url label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" data_cv_filter_clear=True only %}
       {% endif %}
       {% if primary_action_label and primary_action_url %}

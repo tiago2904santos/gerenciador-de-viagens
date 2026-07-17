@@ -1357,6 +1357,12 @@ html[data-theme="light"] {
   z-index: calc(var(--z-footer-actions-fixed) + 20);
 }
 
+/* Segunda ação flutuante na mesma página (ex.: "Voltar" ao lado do "+"
+   principal) — empilha acima em vez de sobrepor. */
+.cv-floating-action--stacked {
+  bottom: calc(clamp(var(--space-4), 2vw, var(--space-5)) + var(--control-height-md) + var(--space-3));
+}
+
 .cv-floating-action__button {
   box-shadow: 0 18px 32px rgba(11, 58, 102, 0.18);
 }

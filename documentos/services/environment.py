@@ -171,7 +171,7 @@ def build_document_environment_report() -> DocumentEnvironmentReport:
     pyver = sys.version.split()[0]
     docx_ok, docx_missing = _check_docx()
 
-    lo_bin = resolve_libreoffice_binary()
+    lo_bin = resolve_libreoffice_binary(verify_version=True)
     lo_ok = bool(lo_bin)
 
     word_ok, word_detail = _word_com_available()

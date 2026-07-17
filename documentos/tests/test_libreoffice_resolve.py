@@ -11,6 +11,17 @@ from documentos.services.libreoffice_resolve import resolve_libreoffice_binary
 
 
 class LibreOfficeResolveTests(SimpleTestCase):
+    @mock.patch.object(lo_mod.os, "name", "nt")
+    def test_windows_prefere_soffice_com_quando_exe_tem_irmao_console(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            exe = Path(tmp) / "soffice.exe"
+            console = Path(tmp) / "soffice.com"
+            exe.touch()
+            console.touch()
+
+            with override_settings(DOCUMENTOS_LIBREOFFICE_BINARY=str(exe)):
+                self.assertEqual(resolve_libreoffice_binary(), str(console))
+
     @override_settings(DOCUMENTOS_LIBREOFFICE_BINARY="")
     def test_explicit_setting_empty_uses_discovery(self):
         _ = resolve_libreoffice_binary()
@@ -56,6 +67,25 @@ class LibreOfficeResolveTests(SimpleTestCase):
                     self.assertIsNone(resolve_libreoffice_binary(verify_version=True))
         finally:
             Path(path).unlink(missing_ok=True)
+
+    @mock.patch.object(lo_mod.os, "name", "nt")
+    @mock.patch.object(lo_mod.subprocess, "run", return_value=mock.Mock(returncode=0))
+    def test_verify_version_windows_nao_abre_janela(self, m_run):
+        with tempfile.NamedTemporaryFile(suffix=".com") as tmp:
+            self.assertTrue(lo_mod.verify_libreoffice_binary(tmp.name))
+
+        self.assertEqual(
+            m_run.call_args.kwargs["creationflags"],
+            getattr(lo_mod.subprocess, "CREATE_NO_WINDOW", 0),
+        )
+
+    @mock.patch.object(lo_mod.os, "name", "nt")
+    @mock.patch.object(lo_mod.subprocess, "run")
+    def test_verify_version_recusa_exe_grafico_sem_irmao_console(self, m_run):
+        with tempfile.NamedTemporaryFile(suffix=".exe") as tmp:
+            self.assertFalse(lo_mod.verify_libreoffice_binary(tmp.name))
+
+        m_run.assert_not_called()
 
     def test_shutil_which_used_when_no_explicit(self):
         with tempfile.NamedTemporaryFile(suffix=".exe", delete=False) as tmp:
