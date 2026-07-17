@@ -12,64 +12,64 @@ html[data-theme="dark-dark"],
 html[data-theme="light-dark"] {
   color-scheme: dark;
 
-  /* Deep, near-black navy foundation with clearer separation from elevated surfaces. */
-  --color-bg: #060f1a;
-  --color-shell: #0a1622;
-  --color-bg-strong: #03080d;
+  /* Original deep navy palette — near-black base with blue-graphite surfaces. */
+  --color-bg: #07111d;
+  --color-shell: #081827;
+  --color-bg-strong: #050d16;
   --color-bg-subtle: #0e1e2f;
-  --color-bg-glow: #1c3348;
-  --color-surface: #14273c;
-  --color-surface-soft: #1c3650;
-  --color-surface-muted: #0f2033;
-  --color-surface-strong: #1c3245;
-  --color-surface-elevated: #24445e;
-  --color-card: #14273c;
-  --color-card-soft: #1c3650;
-  --color-card-muted: #0f2033;
-  --color-panel: #14273c;
-  --color-panel-strong: #1c3245;
+  --color-bg-glow: #17476f;
+  --color-surface: #1a2638;
+  --color-surface-soft: #223348;
+  --color-surface-muted: #131f2e;
+  --color-surface-strong: #111e2f;
+  --color-surface-elevated: #24384e;
+  --color-card: #1a2638;
+  --color-card-soft: #223348;
+  --color-card-muted: #131f2e;
+  --color-panel: #162435;
+  --color-panel-strong: #111e2f;
 
-  /* Readable text hierarchy — wider gap between heading, body and muted tones */
-  --color-text: #e9eef3;
-  --color-heading: #ffffff;
-  --color-heading-soft: #dbe4ea;
-  --color-section-title: #f4f6f7;
-  --color-card-title: #f4f6f7;
-  --color-muted: #93a5b4;
-  --color-muted-strong: #c3d0da;
-  --color-subtle: #6f8494;
-  --color-text-muted: #93a5b4;
-  --color-text-soft: #6f8494;
-  --color-label: #becbd6;
-  --color-label-strong: #edf1f4;
-  --color-help: #8ea0ac;
-  --color-description: #a3b1bc;
-  --color-icon: #b7c4cd;
-  --color-icon-muted: #7f93a1;
-  --color-icon-strong: #f3f5f6;
+  /* Original bluish text hierarchy — cool whites over deep navy. */
+  --color-text: #edf4ff;
+  --color-heading: #f7fbff;
+  --color-heading-soft: #deebfb;
+  --color-section-title: #f6fbff;
+  --color-card-title: #ecf5ff;
+  --color-muted: #aebfd4;
+  --color-muted-strong: #d3dfef;
+  --color-subtle: #8598af;
+  --color-text-muted: #aebfd4;
+  --color-text-soft: #8598af;
+  --color-label: #cdd9ea;
+  --color-label-strong: #e8f1ff;
+  --color-help: #9fb0c6;
+  --color-description: #b4c3d8;
+  --color-icon: #cddcf0;
+  --color-icon-muted: #9fb2ce;
+  --color-icon-strong: #f0f7ff;
 
-  /* Richer blue actions and a visible glow on gold accents, closer to the previous theme. */
-  --color-border: #4a6883;
-  --color-border-soft: #2e4a63;
-  --color-border-strong: #7396b3;
-  --color-primary: #1c5f8c;
-  --color-primary-strong: #154a6c;
-  --color-primary-dark: #0a2c44;
-  --color-primary-hover: #2c7fac;
-  --color-primary-bright: #78b0d6;
-  --color-primary-soft: #1a3c54;
-  --color-secondary: #465968;
-  --color-secondary-hover: #596d7d;
-  --color-secondary-soft: #303e49;
-  --color-accent: #d9aa18;
-  --color-accent-hover: #e7bd3b;
-  --color-accent-soft: #3b392b;
-  --color-accent-text: #f2cf5d;
-  --color-accent-border-soft: #766326;
-  --color-accent-border-strong: #a18422;
-  --glow-accent: 0 0 24px rgba(217, 170, 24, 0.22);
-  --color-focus: #86a9c2;
-  --color-selection: rgba(217, 170, 24, 0.34);
+  /* Original vivid-blue actions and gold accent, with a visible gold glow. */
+  --color-border: rgba(191, 211, 234, 0.28);
+  --color-border-soft: rgba(191, 211, 234, 0.2);
+  --color-border-strong: rgba(214, 227, 244, 0.4);
+  --color-primary: #12507f;
+  --color-primary-strong: #0b3a66;
+  --color-primary-dark: #062847;
+  --color-primary-hover: #1a659d;
+  --color-primary-bright: #2f88c7;
+  --color-primary-soft: #16324b;
+  --color-secondary: #155b9a;
+  --color-secondary-hover: #1a70bb;
+  --color-secondary-soft: #16324b;
+  --color-accent: #d8a21b;
+  --color-accent-hover: #e0ab3c;
+  --color-accent-soft: #3b3320;
+  --color-accent-text: #e0ab3c;
+  --color-accent-border-soft: #7a641f;
+  --color-accent-border-strong: #a5851f;
+  --glow-accent: 0 14px 34px rgba(216, 162, 27, 0.22);
+  --color-focus: #74aae0;
+  --color-selection: rgba(216, 162, 27, 0.34);
 
   /* Functional states */
   --color-success: #58c694;
@@ -89,15 +89,15 @@ html[data-theme="light-dark"] {
   --color-danger-border-soft: rgba(239, 125, 119, 0.32);
   --color-danger-border-strong: rgba(239, 125, 119, 0.5);
 
-  /* Elevation and motion */
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.24);
-  --shadow-sm: 0 5px 16px rgba(0, 0, 0, 0.22);
-  --shadow-md: 0 14px 36px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.4);
-  --shadow-card: 0 12px 32px rgba(0, 0, 0, 0.25);
-  --shadow-soft: 0 6px 20px rgba(0, 0, 0, 0.2);
-  --shadow-panel: 0 18px 44px rgba(0, 0, 0, 0.32);
-  --shadow-elevated: 0 26px 70px rgba(0, 0, 0, 0.45);
+  /* Elevation and motion — deeper shadows with an inset highlight, like the old theme. */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 6px 18px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 14px 34px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.5);
+  --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 14px 34px rgba(0, 0, 0, 0.42);
+  --shadow-soft: 0 10px 24px rgba(0, 0, 0, 0.3);
+  --shadow-panel: 0 18px 44px rgba(0, 0, 0, 0.42);
+  --shadow-elevated: 0 26px 70px rgba(0, 0, 0, 0.55);
   --focus-ring: 0 0 0 2px rgba(134, 169, 194, 0.24);
   --transition-fast: 120ms cubic-bezier(.2, .8, .2, 1);
   --transition-base: 170ms cubic-bezier(.2, .8, .2, 1);
@@ -232,12 +232,15 @@ html[data-theme="light-dark"] {
   --sidebar-focus-ring: rgba(131, 188, 232, 0.52);
   --sidebar-theme-active-bg: rgba(75, 143, 197, 0.23);
 
-  --app-body-bg: var(--color-bg);
-  --app-main-bg: var(--color-bg);
+  --app-body-bg:
+    radial-gradient(ellipse 70% 50% at 50% 0%, rgba(21, 91, 154, 0.16), transparent 55%),
+    radial-gradient(ellipse 60% 40% at 100% 100%, rgba(216, 162, 27, 0.06), transparent 60%),
+    linear-gradient(180deg, #0e1928 0%, #060d16 100%);
+  --app-main-bg: transparent;
   --app-featured-bg: var(--color-surface);
-  --app-hero-stage-start: #2b3c48;
-  --app-hero-stage-end: #2b3c48;
-  --app-hero-stage-bg: #2b3c48;
+  --app-hero-stage-start: #0d1725;
+  --app-hero-stage-end: #17476f;
+  --app-hero-stage-bg: linear-gradient(225deg, #17476f 0%, #0d1725 72%);
   --app-hero-body-bg: var(--color-surface);
   --app-hero-ribbon: var(--color-primary);
   --theme-accent-line: var(--color-primary);
@@ -712,59 +715,60 @@ html[data-theme="light-dark"] :is(.badge, .chip, .status-badge, .cv-status-pill)
 html[data-theme="dark"],
 html[data-theme="dark-dark"],
 html[data-theme="light-dark"] {
-  --cv-chip-bg: #26394a;
-  --cv-chip-border: #57748c;
-  --cv-chip-color: #f0f5f8;
-  --cv-chip-glow: none;
-  --cv-chip-success-bg: #0b5a45;
-  --cv-chip-success-border: #27a77d;
-  --cv-chip-success-color: #e2fff5;
-  --cv-chip-success-glow: none;
-  --cv-chip-warning-bg: #674514;
-  --cv-chip-warning-border: #c98d32;
-  --cv-chip-warning-color: #fff2cc;
-  --cv-chip-warning-glow: none;
-  --cv-chip-danger-bg: #68272f;
-  --cv-chip-danger-border: #d05c65;
-  --cv-chip-danger-color: #ffe7e9;
-  --cv-chip-danger-glow: none;
-  --cv-chip-info-bg: #164f78;
-  --cv-chip-info-border: #4b98c8;
-  --cv-chip-info-color: #e4f5ff;
-  --cv-chip-info-glow: none;
-  --cv-chip-pending-bg: #2d2568;
-  --cv-chip-pending-border: #7568d9;
-  --cv-chip-pending-color: #e9e5ff;
-  --cv-chip-pending-glow: none;
-  --cv-chip-muted-bg: #26394a;
-  --cv-chip-muted-border: #57748c;
-  --cv-chip-muted-color: #e7eef3;
-  --cv-chip-muted-glow: none;
-  --cv-chip-neutral-bg: #26394a;
-  --cv-chip-neutral-border: #57748c;
-  --cv-chip-neutral-color: #f0f5f8;
-  --cv-chip-neutral-glow: none;
-  --cv-chip-entity-bg: #0f4a48;
-  --cv-chip-entity-border: #3fa89e;
-  --cv-chip-entity-color: #d7fff5;
-  --cv-chip-entity-glow: none;
-  --cv-chip-filter-bg: #174968;
-  --cv-chip-filter-border: #4a91ba;
-  --cv-chip-filter-color: #e4f5ff;
-  --cv-chip-filter-glow: none;
+  /* Chips: saturated jewel-tone fills with bright text and a soft state glow. */
+  --cv-chip-bg: #234763;
+  --cv-chip-border: #4f83ad;
+  --cv-chip-color: #e7f2fb;
+  --cv-chip-glow: 0 0 0 1px rgba(79, 131, 173, 0.35), 0 0 12px rgba(79, 131, 173, 0.3);
+  --cv-chip-success-bg: #0e6b50;
+  --cv-chip-success-border: #2fbf94;
+  --cv-chip-success-color: #d8ffef;
+  --cv-chip-success-glow: 0 0 0 1px rgba(47, 191, 148, 0.4), 0 0 12px rgba(47, 191, 148, 0.32);
+  --cv-chip-warning-bg: #7a4f12;
+  --cv-chip-warning-border: #e0ab3c;
+  --cv-chip-warning-color: #ffe7ac;
+  --cv-chip-warning-glow: 0 0 0 1px rgba(224, 171, 60, 0.42), 0 0 12px rgba(224, 171, 60, 0.34);
+  --cv-chip-danger-bg: #7c2933;
+  --cv-chip-danger-border: #e26a72;
+  --cv-chip-danger-color: #ffdcde;
+  --cv-chip-danger-glow: 0 0 0 1px rgba(226, 106, 114, 0.4), 0 0 12px rgba(226, 106, 114, 0.32);
+  --cv-chip-info-bg: #175988;
+  --cv-chip-info-border: #55a1d6;
+  --cv-chip-info-color: #dcefff;
+  --cv-chip-info-glow: 0 0 0 1px rgba(85, 161, 214, 0.4), 0 0 12px rgba(85, 161, 214, 0.32);
+  --cv-chip-pending-bg: #362e7a;
+  --cv-chip-pending-border: #8074ef;
+  --cv-chip-pending-color: #e2ddff;
+  --cv-chip-pending-glow: 0 0 0 1px rgba(128, 116, 239, 0.4), 0 0 12px rgba(128, 116, 239, 0.32);
+  --cv-chip-muted-bg: #2b3f52;
+  --cv-chip-muted-border: #5f7d97;
+  --cv-chip-muted-color: #dce7f1;
+  --cv-chip-muted-glow: 0 0 0 1px rgba(95, 125, 151, 0.3), 0 0 9px rgba(95, 125, 151, 0.22);
+  --cv-chip-neutral-bg: #2b3f52;
+  --cv-chip-neutral-border: #5f7d97;
+  --cv-chip-neutral-color: #e6eff7;
+  --cv-chip-neutral-glow: var(--cv-chip-muted-glow);
+  --cv-chip-entity-bg: #0d5f58;
+  --cv-chip-entity-border: #36c4b1;
+  --cv-chip-entity-color: #ccfff5;
+  --cv-chip-entity-glow: 0 0 0 1px rgba(54, 196, 177, 0.4), 0 0 12px rgba(54, 196, 177, 0.32);
+  --cv-chip-filter-bg: #175988;
+  --cv-chip-filter-border: #55a1d6;
+  --cv-chip-filter-color: #dcefff;
+  --cv-chip-filter-glow: var(--cv-chip-info-glow);
 }
 
 html[data-theme="dark"] :is(.cv-chip, .status-chip),
 html[data-theme="dark-dark"] :is(.cv-chip, .status-chip),
 html[data-theme="light-dark"] :is(.cv-chip, .status-chip) {
-  box-shadow: none;
+  box-shadow: var(--_cv-chip-glow, none), var(--shadow-xs);
 }
 
 html[data-theme="dark"] :is(.cv-chip, .status-chip):hover,
 html[data-theme="dark-dark"] :is(.cv-chip, .status-chip):hover,
 html[data-theme="light-dark"] :is(.cv-chip, .status-chip):hover {
-  box-shadow: none;
-  filter: brightness(1.12);
+  box-shadow: var(--_cv-chip-glow, none), var(--shadow-sm);
+  filter: brightness(1.08);
 }
 
 html[data-theme="dark"] .alert,
@@ -1221,8 +1225,6 @@ html[data-theme="light-dark"] :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-lay
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .cv-entity-card:hover {
-  background: var(--color-surface-strong);
-  border-color: var(--color-primary-bright);
   box-shadow: var(--shadow-panel);
   transform: translateY(-1px);
 }
@@ -1250,7 +1252,6 @@ html[data-theme="light-dark"] :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-lay
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .cv-summary-tile:hover {
   background: var(--color-surface-soft);
-  border-color: var(--color-primary-bright);
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
@@ -1363,7 +1364,6 @@ html[data-theme="light-dark"] :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-lay
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .cv-document-card:hover {
-  border-color: var(--color-primary-bright);
   box-shadow: var(--shadow-panel);
 }
 
@@ -1523,8 +1523,6 @@ html[data-theme="light-dark"] :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-lay
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .cv-module-card:hover {
-  background: var(--color-surface-strong);
-  border-color: var(--color-primary-bright);
   box-shadow: var(--shadow-panel);
   transform: translateY(-1px);
 }
@@ -1665,7 +1663,6 @@ html[data-theme="light-dark"] :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-lay
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   :is(.card, .app-card, .module-card, .document-card, .summary-card):hover {
-  border-color: var(--color-primary-bright);
   box-shadow: var(--shadow-sm);
 }
 
@@ -1680,7 +1677,6 @@ html[data-theme="light-dark"] :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-lay
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .oficio-lc:hover {
-  border-color: var(--color-primary-bright);
   box-shadow: var(--shadow-panel);
   transform: translateY(-1px);
 }
@@ -1688,15 +1684,18 @@ html[data-theme="light-dark"] :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-lay
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .oficio-lc__id-row {
   background: var(--color-surface-muted);
-  background-image: none;
+  background-image: linear-gradient(to right, color-mix(in srgb, var(--color-accent) 12%, transparent) 0px, transparent 88px);
   border-bottom-color: var(--color-border-strong);
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .oficio-lc__id-row::before {
-  background: var(--color-accent);
-  box-shadow: none;
-  width: 4px;
+  background: linear-gradient(180deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 50%, transparent) 100%);
+  box-shadow:
+    0 0 6px 1px color-mix(in srgb, var(--color-accent) 45%, transparent),
+    0 0 14px 2px color-mix(in srgb, var(--color-accent) 24%, transparent),
+    0 0 26px 5px color-mix(in srgb, var(--color-accent) 10%, transparent);
+  width: 8px;
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
@@ -1737,6 +1736,11 @@ html[data-theme="light-dark"] :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-lay
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .oficio-lc__traveller--motorista .oficio-lc__traveller-name {
+  color: var(--color-accent-text);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .oficio-lc__trecho {
   background: var(--color-input-bg);
   border-color: var(--color-border-soft);
@@ -1750,10 +1754,10 @@ html[data-theme="light-dark"] :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-lay
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .oficio-lc__traveller-badge {
-  background: var(--color-primary-soft);
-  border: 1px solid var(--color-border);
-  color: var(--color-heading);
-  box-shadow: none;
+  background: color-mix(in srgb, var(--color-accent) 20%, var(--color-surface));
+  border: 1px solid color-mix(in srgb, var(--color-accent) 55%, var(--color-border-strong));
+  color: var(--color-accent-text);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-accent) 20%, transparent), 0 0 10px color-mix(in srgb, var(--color-accent) 18%, transparent);
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
@@ -1819,7 +1823,7 @@ html[data-theme="light-dark"] :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-lay
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .cv-filter-bar__search:hover {
-  border-color: var(--color-primary-bright);
+  border-color: var(--color-border-strong);
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])

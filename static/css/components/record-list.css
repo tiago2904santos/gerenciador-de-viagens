@@ -12,18 +12,18 @@
   border-radius: var(--radius-lg, 14px);
   display: grid;
   gap: 16px;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   min-width: 0;
-  padding: 16px 18px;
+  padding: 16px 18px 16px 30px;
   position: relative;
 }
 
 .cv-record-row::before {
-  border-radius: inherit;
+  border-radius: 999px;
   content: "";
-  inset: 0 auto 0 0;
+  inset: 14px auto 14px 16px;
   position: absolute;
-  width: 3px;
+  width: 6px;
 }
 
 .cv-record-row__identity {
@@ -62,11 +62,21 @@
   padding-left: 14px;
 }
 
+/* When this canonical list sits inside a standard list panel, the panel's own
+   slab (background/border/shadow) doubles up behind the cards and they stop
+   reading as floating. Drop the slab so the cards float on the page surface. */
+.list-panel:has(> .cv-record-list) {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
 @media (max-width: 720px) {
   .cv-record-row {
     align-items: start;
-    grid-template-columns: auto minmax(0, 1fr);
-    padding: 14px;
+    grid-template-columns: minmax(0, 1fr);
+    padding: 14px 14px 14px 26px;
   }
 
   .cv-record-row__actions {

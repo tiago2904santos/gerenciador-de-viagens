@@ -1,7 +1,4 @@
 <div class="cv-record-row simple-list-item" role="listitem" data-cv-filter-item data-search-text="{{ row.title }}{% if row.search_extra %} {{ row.search_extra }}{% endif %}{% if row.meta %}{% if row.meta.0.label %}{% for item in row.meta %} {{ item.value }}{% endfor %}{% else %} {{ row.meta }}{% endif %}{% endif %}"{% if row.status_value %} data-status-value="{{ row.status_value }}"{% endif %}>
-  <div class="cv-record-row__identity simple-list-item__avatar" aria-hidden="true">
-    <span>{{ row.avatar|default:"CV" }}</span>
-  </div>
   <div class="cv-record-row__content simple-list-item__body">
     <div class="cv-record-row__heading simple-list-item__title">
       <span class="cv-record-row__title simple-list-item__title-text">{{ row.title }}</span>
