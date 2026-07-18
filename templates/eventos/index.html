@@ -19,7 +19,7 @@
 
 {% block content %}
   <div class="app-page--main-card-list page-shell page-shell--list oficios-list-page eventos-list-page" data-cv-realtime-filter-scope>
-    {% include "components/lists/oficios_cloned_list_header.html" with eyebrow="EVENTOS" search_placeholder="Buscar por título, destino ou responsável..." search_aria_label="Buscar eventos" current_aba=aba %}
+    {% include "components/ui/headers/header_stack_filters.html" with advanced=True form_action=request.path title=page_title eyebrow="EVENTOS" search_placeholder="Buscar por título, destino ou responsável..." search_aria_label="Buscar eventos" current_aba=aba date_picker_id="ev-filter-date-picker" date_start_id="id_ev_viagem_de" date_end_id="id_ev_viagem_ate" %}
 
     {% include "components/lists/list_tabs.html" with abas=abas tabs_aria_label="Abas de eventos" only %}
 

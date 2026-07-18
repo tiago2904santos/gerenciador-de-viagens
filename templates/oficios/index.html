@@ -13,62 +13,7 @@
 {% block content %}
 <div class="app-page--main-card-list page-shell page-shell--list oficios-list-page" data-cv-realtime-filter-scope>
 
-  <form class="cv-filter-header page-header-stack" method="get" action="{{ request.path }}" data-cv-live-submit-form>
-
-    {# ── BAND ── #}
-    <div class="cv-filter-header__heading page-header-band">
-      <div class="page-header-band__content">
-        <div class="page-header-band__text">
-          <span class="page-header-band__eyebrow">OFÍCIOS</span>
-          <h1 class="page-header-band__title">{{ page_title }}</h1>
-        </div>
-      </div>
-    </div>
-
-    {# ── RAIL ── #}
-    <div class="cv-filter-header__controls page-header-rail page-header-rail--filters oficios-rail">
-      <div class="cv-filter-bar header-filter-bar header-filter-bar--advanced oficios-filter-bar">
-
-        {# Linha única — busca + filtros + limpar (último) #}
-        <div class="header-filter-bar__search oficios-filter-bar__search-row oficios-filter-bar__single-row">
-          <div class="cv-filter-bar__search oficios-filter-bar__search-wrap">
-            <span class="oficios-filter-bar__search-icon" aria-hidden="true">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
-                <circle cx="11" cy="11" r="7"/>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-              </svg>
-            </span>
-            <input
-              class="cv-filter-bar__search-input header-filter-input oficios-filter-bar__search-input"
-              type="search"
-              name="q"
-              placeholder="Buscar por número, protocolo, motivo ou destino…"
-              aria-label="Buscar ofícios"
-              data-cv-filter="search"
-              {% if q %}value="{{ q }}"{% endif %}
-            >
-          </div>
-
-          <input type="hidden" name="aba" value="{{ aba }}">
-
-          {# Ordenação #}
-          <div class="cv-filter-bar__select cv-custom-select oficios-filter-cs" data-cv-select>
-            <select name="sort" aria-label="Ordenar por" data-cv-filter="select">
-              {% for opt in sort_options %}
-                <option value="{{ opt.value }}"{% if opt.value == sort or not sort and forloop.first %} selected{% endif %}>{{ opt.label }}</option>
-              {% endfor %}
-            </select>
-          </div>
-
-          {% include "components/forms/cv_date_picker.html" with mode="range" control_variant="filter-pill" picker_id="oficios-filter-date-picker" extra_class="oficios-filter-range" trigger_label="Período da viagem" trigger_aria_label="Filtrar por período da viagem" start_hidden_id="id_oficios_viagem_de" end_hidden_id="id_oficios_viagem_ate" start_hidden_name="viagem_de" end_hidden_name="viagem_ate" start_hidden_value=viagem_de end_hidden_value=viagem_ate initial_date=viagem_de filter_date=True show_summary=False only %}
-
-          {# Limpar filtros — último item da linha #}
-          {% include "components/ui/buttons/button.html" with href=search_clear_url label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control oficios-filter-clear" only %}
-        </div>
-
-      </div>
-    </div>
-  </form>
+  {% include "components/ui/headers/header_stack_filters.html" with advanced=True form_action=request.path title=page_title eyebrow="OFÍCIOS" status_options=None search_placeholder="Buscar por número, protocolo, motivo ou destino…" search_aria_label="Buscar ofícios" current_aba=aba date_picker_id="oficios-filter-date-picker" date_start_id="id_oficios_viagem_de" date_end_id="id_oficios_viagem_ate" %}
 
   {% include "components/lists/list_tabs.html" with abas=abas tabs_aria_label="Abas de ofícios" only %}
 

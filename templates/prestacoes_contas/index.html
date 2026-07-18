@@ -13,7 +13,7 @@
 {% block content %}
 <div class="app-page--main-card-list page-shell page-shell--list oficios-list-page" data-cv-realtime-filter-scope>
 
-  {% include "components/lists/oficios_cloned_list_header.html" with eyebrow="PRESTAÇÕES" search_placeholder="Buscar por servidor, ofício, protocolo ou solicitação…" search_aria_label="Buscar prestações" current_aba=aba %}
+  {% include "components/ui/headers/header_stack_filters.html" with advanced=True form_action=request.path title=page_title eyebrow="PRESTAÇÕES" search_placeholder="Buscar por servidor, ofício, protocolo ou solicitação…" search_aria_label="Buscar prestações" current_aba=aba date_picker_id="pc-filter-date-picker" date_start_id="id_pc_viagem_de" date_end_id="id_pc_viagem_ate" %}
 
   {% include "components/lists/list_tabs.html" with abas=abas tabs_aria_label="Abas de prestações" only %}
 
