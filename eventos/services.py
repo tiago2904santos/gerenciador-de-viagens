@@ -268,7 +268,7 @@ def build_evento_guided_context(evento, *, etapa_atual: int = 1) -> dict:
     steps_def = [
         (1, "Dados do evento", "eventos:guiado_etapa", _evento_dados_completos(evento)),
         (2, "Roteiros", "eventos:guiado_etapa", evento.roteiros.exists()),
-        (3, "Oficios / Justificativas", "eventos:guiado_etapa", evento.oficios.exists()),
+        (3, "Ofícios / Justificativas", "eventos:guiado_etapa", evento.oficios.exists()),
         (
             4,
             "PT / OS",
@@ -286,7 +286,7 @@ def build_evento_guided_context(evento, *, etapa_atual: int = 1) -> dict:
                 "state_class": "is-current" if is_current else ("is-complete" if complete else "is-pending"),
                 "step_label": f"Etapa {number}",
                 "title": title,
-                "status": "Atual" if is_current else ("Concluida" if complete else "Vazia"),
+                "status": "Atual" if is_current else ("Concluída" if complete else "Pendente"),
                 "marker": str(number),
                 "marker_aria_hidden": False,
                 "aria_current": "step" if is_current else "",
@@ -315,7 +315,7 @@ def _evento_chips(evento) -> list[dict]:
     chips = []
     if evento.data_inicio:
         chips.append({"label": evento.periodo_display, "variant": "entity"})
-    if evento.destino_display != "Destino nao informado":
+    if evento.destino_display != "Destino não informado":
         chips.append({"label": evento.destino_display, "variant": "entity"})
     counts = [
         (evento.roteiros.count(), "Roteiro", "Roteiros"),

@@ -76,3 +76,51 @@ Consolidações concluídas nesta rodada:
 Órfãos removidos: regras de `app-page--main-card-list`/`oficios-list-page`/`list-grid--roteiros`
 em `roteiros-list.css` e `eventos-list.css`. As classes `oficio-lc__*` seguem em uso pelos
 miolos dos cards (remoção só depois de um redesign de miolo).
+
+## Rodada v2 — anexos canônicos (2026-07-18)
+
+- **File picker global**: `components/ui/forms/file_picker.html`, `components/file-picker.css` e
+  `components/file-picker.js` agora formam um contrato único para vazio, seleção simples,
+  seleção múltipla, revisão, remoção, preview, drag-and-drop e estado ocupado.
+- **Conteúdo dinâmico**: o componente foi registrado no enhancer global e possui guarda
+  idempotente, alcançando formulários inseridos depois do carregamento inicial.
+- **Acessibilidade**: seleção anunciada por `role=status`, ajuda/erro ligados por
+  `aria-describedby`, fechamento da lista por `Escape` e ações com nomes acessíveis.
+- **Prestação de contas**: a cópia de renderização e manipulação de arquivos foi removida
+  de `prestacoes-contas-documentos.js`; esse módulo conserva somente autosave, CSRF, payloads,
+  exclusão remota e atualização do título.
+- **Documento assinado**: o modal passou a usar `CV.dialogs` e o enhancer global, compartilhando
+  trap de foco, fechamento por `Escape`, restauração do foco e suporte a DOM dinâmico.
+- **UI Lab**: o seletor real está demonstrado em `dev/ui_lab/fields.html`.
+- **Validação visual**: conferidos vazio, dois arquivos, expansão, remoção individual,
+  desktop, 810 px, 600 px e tema claro. O modal real foi conferido em Prestações de Contas,
+  inclusive abertura por gatilho, foco inicial, `Escape` e restauração do foco.
+
+## Rodada v2 — wizard guiado de eventos (2026-07-18)
+
+- **Identidade corrigida**: o fluxo real não usa mais o rótulo incorreto “Cadastro de ofício”;
+  o cabeçalho passa a apresentar Eventos, título de fallback, etapa atual e período.
+- **Hierarquia por tarefa**: os blocos internos da etapa 1 agora são “Identificação do evento”,
+  “Quando e onde” e “Documentos vinculados”, sem numeração concorrente com o stepper global.
+- **Seções mais leves**: os modificadores globais `--compact` e `--described` reduzem a altura
+  do cabeçalho e permitem instruções curtas; ambos estão demonstrados no UI Lab Structures.
+- **Direção azul**: o filete dos cards de wizard no tema escuro usa o azul primário, deixando
+  o dourado fora da estrutura dominante dos formulários.
+- **Abas acessíveis**: documentos vinculados usam relação tab/tabpanel completa, roving
+  `tabindex`, setas esquerda/direita, `Home`, `End` e registro no enhancer global.
+- **Contratos preservados**: o formulário continua enviando os mesmos campos de tipos, motivo,
+  datas, destinos e cinco `ModelMultipleChoiceField`; URLs e transições do wizard não mudaram.
+## Família visual de cards — formulários e listas
+
+- Cards de formulário e cards de lista passam a consumir os mesmos tokens escuros de superfície, cabeçalho, borda, sombra e acento.
+- A família cobre tanto seções de wizard (`cv-wizard-section-card`) quanto formulários CRUD compactos (`main-form-panel`).
+- O cabeçalho canônico de formulário usa a mesma superfície azul-marinho profunda e o mesmo banho dourado lateral dos cards de lista.
+- O filete dourado compartilha cor, espessura e acabamento; sua geometria continua acompanhando o conteúdo do formulário.
+- A diferença de comportamento é intencional: cards de lista podem elevar no hover; cards com campos permanecem estáveis durante o preenchimento.
+
+## Coleções em fluxos guiados
+
+- Cabeçalhos autônomos de coleção reutilizam o cabeçalho canônico dos cards sem criar uma superfície externa em torno de cards de lista.
+- Os cabeçalhos organizam e explicam cada coleção; as ações de criação permanecem em FABs, conforme preferência visual aprovada pelo usuário.
+- As etapas 2 a 5 de Eventos foram organizadas em coleções nomeadas para roteiros, ofícios, planejamento e termos.
+- `templates/eventos/wizard_novo.html` foi removido após comprovação de que nenhuma URL, view ou include o consumia; o fluxo ativo permanece em `templates/eventos/detalhe.html`.

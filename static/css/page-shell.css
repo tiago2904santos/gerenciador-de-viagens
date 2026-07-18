@@ -1146,6 +1146,9 @@ html[data-theme="light"] {
 }
 
 .cv-wizard-section-header {
+  --_wizard-filete-inset-block: var(--space-4);
+  --_wizard-filete-left:        var(--space-6);
+  --_wizard-filete-width:       6px;
   align-items:      center;
   background:       var(--cv-wizard-section-header-bg);
   background-image: linear-gradient(to right, color-mix(in srgb, var(--color-accent) 7%, transparent) 0px, transparent 76px);
@@ -1167,13 +1170,14 @@ html[data-theme="light"] {
     0 0 12px 2px color-mix(in srgb, var(--color-accent) 15%, transparent),
     0 0 22px 4px color-mix(in srgb, var(--color-accent) 6%, transparent);
   content:       "";
-  /* Ribbon acompanha a altura do título, não do card inteiro */
-  height:        1.8em;
-  left:          var(--space-6);
+  /* O filete acompanha todo o bloco de conteúdo, inclusive subtítulos e ações. */
+  bottom:        var(--_wizard-filete-inset-block);
+  height:        auto;
+  left:          var(--_wizard-filete-left);
   position:      absolute;
-  top:           50%;
-  transform:     translateY(-50%);
-  width:         6px;
+  top:           var(--_wizard-filete-inset-block);
+  transform:     none;
+  width:         var(--_wizard-filete-width);
 }
 
 .cv-wizard-section-header__copy {
@@ -1214,6 +1218,57 @@ html[data-theme="light"] {
 
 .cv-wizard-section-subtitle {
   display:     none;
+}
+
+/* Modificadores canônicos para formulários que precisam explicar a tarefa
+   sem transformar cada seção em um cabeçalho pesado. */
+.cv-wizard-section-card--described .cv-wizard-section-subtitle {
+  display: block;
+  line-height: 1.45;
+  max-width: 72ch;
+}
+
+.cv-wizard-section-header--described .cv-wizard-section-subtitle {
+  display: block;
+  line-height: 1.45;
+  max-width: 72ch;
+}
+
+/* Cabeçalho autônomo para coleções: compartilha a linguagem do card sem
+   envolver cards de lista em outra superfície. */
+.cv-wizard-collection {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+  width: 100%;
+}
+
+.cv-wizard-collection__body {
+  min-width: 0;
+}
+
+.cv-wizard-section-header--standalone {
+  border: 1px solid var(--cv-wizard-section-border);
+  border-radius: var(--cv-wizard-section-radius);
+  box-shadow: var(--cv-wizard-section-shadow);
+  min-height: 0;
+  overflow: hidden;
+  padding-block: var(--space-4);
+}
+
+.cv-wizard-section-card--compact .cv-wizard-section-header {
+  --_wizard-filete-width: 4px;
+  min-height: 0;
+  padding-block: var(--space-4);
+}
+
+.cv-wizard-section-card--compact .cv-wizard-section-header::before {
+  width: var(--_wizard-filete-width);
+}
+
+.cv-wizard-section-card--compact .cv-wizard-section-title {
+  font-size: var(--font-size-base);
+  letter-spacing: 0.045em;
 }
 
 .cv-wizard-section-body {
@@ -1428,6 +1483,13 @@ html[data-theme="light"] {
   flex-direction: column;
   overflow:       visible;
   width:          100%;
+}
+
+/* Estado vazio já possui sua própria superfície; não o envolve em outro card. */
+.list-panel--empty {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
 }
 
 /* Filter Bar: controles de busca/filtro à esquerda, ações à direita */
@@ -1999,7 +2061,13 @@ body.has-delete-modal-open {
   }
 
   .cv-wizard-section-header {
-    padding: var(--space-3) var(--space-4);
+    --_wizard-filete-inset-block: var(--space-3);
+    --_wizard-filete-left:        var(--space-4);
+    padding: var(--space-3) var(--space-4) var(--space-3) var(--space-8);
+  }
+
+  .cv-wizard-section-card--compact .cv-wizard-section-header {
+    padding-block: var(--space-3);
   }
 
   .cv-wizard-section-body {
@@ -3480,12 +3548,14 @@ html[data-theme="dark"] .quick-add-footer-button.is-filled:hover {
   }
 
   .cv-wizard-section-header {
+    --_wizard-filete-inset-block: var(--space-4);
+    --_wizard-filete-left:        var(--space-4);
     min-height: 0;
     padding: var(--space-4) var(--space-4) var(--space-4) var(--space-8);
   }
 
-  .cv-wizard-section-header::before {
-    left: var(--space-4);
+  .cv-wizard-section-card--compact .cv-wizard-section-header {
+    padding-block: var(--space-4);
   }
 
   .cv-wizard-section-header__actions,

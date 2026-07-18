@@ -13,8 +13,8 @@
 {% endblock %}
 
 {% block content %}
-  <div class="page-shell page-shell--wizard oficio-wizard app-wizard">
-    {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="CADASTRO DE OFICIO" title=evento.titulo description=evento.periodo_display icon_label="EV" module_label="Eventos" back_label="Voltar para lista" back_url="/eventos/" status_label=evento.get_status_display status_variant=evento_status_variant only %}
+  <div class="page-shell page-shell--wizard oficio-wizard app-wizard evento-guided-page">
+    {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="EVENTOS" title=evento_header_title description=evento_header_description icon_label="EV" module_label="Eventos" back_label="Voltar para lista" back_url="/eventos/" status_label=evento.get_status_display status_variant=evento_status_variant only %}
 
     {% if evento.status == "cancelado" %}
       <div class="cv-alert cv-alert--danger cv-alert--action">
@@ -34,7 +34,7 @@
     <main class="main-form-panel main-form-panel--stack oficio-wizard__main">
       <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
         {% if etapa_atual == 1 %}
-          <form method="post" class="oficio-wizard__form" novalidate data-api-cidades-url="{% url 'eventos:api_cidades_por_uf' uf='0' %}" data-sede-uf="{{ sede_uf }}">
+          <form method="post" class="oficio-wizard__form" novalidate data-evento-guided-form data-api-cidades-url="{% url 'eventos:api_cidades_por_uf' uf='0' %}" data-sede-uf="{{ sede_uf }}">
             {% csrf_token %}
             {% with form=evento_form %}
 
@@ -43,10 +43,11 @@
             {% endif %}
 
             {# CARD 1 — O que é o evento #}
-            <section class="cv-wizard-section-card" aria-labelledby="evento-wizard-tipo-title-d">
+            <section class="cv-wizard-section-card cv-wizard-section-card--compact cv-wizard-section-card--described" aria-labelledby="evento-wizard-tipo-title-d">
               <header class="cv-wizard-section-header">
                 <div class="cv-wizard-section-header__copy">
-                  <h2 class="cv-wizard-section-title" id="evento-wizard-tipo-title-d">O que é o evento</h2>
+                  <h2 class="cv-wizard-section-title" id="evento-wizard-tipo-title-d">Identificação do evento</h2>
+                  <p class="cv-wizard-section-subtitle">Escolha o tipo e registre o motivo que contextualiza esta atividade.</p>
                 </div>
               </header>
               <div class="cv-wizard-section-body">
@@ -71,16 +72,16 @@
             </section>
 
             {# CARD 2 — Datas e destinos #}
-            <section class="cv-wizard-section-card termo-card termo-card--evento" id="evento-card-dados-d">
+            <section class="cv-wizard-section-card cv-wizard-section-card--compact cv-wizard-section-card--described termo-card termo-card--evento" id="evento-card-dados-d" aria-labelledby="evento-card-dados-title-d">
               <header class="cv-wizard-section-header">
                 <div class="cv-wizard-section-header__copy">
-                  <h2 class="cv-wizard-section-title">2. Evento</h2>
-                  <p class="cv-wizard-section-subtitle">Destino e periodo sao obrigatorios para avançar.</p>
+                  <h2 class="cv-wizard-section-title" id="evento-card-dados-title-d">Quando e onde</h2>
+                  <p class="cv-wizard-section-subtitle">Informe o período e ao menos um destino para continuar.</p>
                 </div>
               </header>
 
               <div class="cv-wizard-section-body termo-evento-body">
-                  <section class="wizard-inner-section termo-evento-periodo" aria-label="Periodo do evento">
+                  <section class="wizard-inner-section termo-evento-periodo" aria-label="Período do evento">
                     {% include "components/forms/cv_date_picker.html" with mode="range" picker_id="evento-date-picker-d" extra_class="termo-date-picker" start_field=form.data_inicio end_field=form.data_fim start_label="Data inicial" end_label="Data final" start_input_id="id_data_inicio_display_d" end_input_id="id_data_fim_display_d" only %}
                   </section>
 
@@ -92,57 +93,57 @@
             </section>
 
             {# CARD 3 — Documentos já existentes #}
-            <section class="cv-wizard-section-card termo-card" id="evento-card-documentos-d">
+            <section class="cv-wizard-section-card cv-wizard-section-card--compact cv-wizard-section-card--described termo-card" id="evento-card-documentos-d" aria-labelledby="evento-card-documentos-title-d">
               <header class="cv-wizard-section-header">
                 <div class="cv-wizard-section-header__copy">
-                  <h2 class="cv-wizard-section-title">3. Documentos já existentes</h2>
-                  <p class="cv-wizard-section-subtitle">Vincule ofícios, ordens de serviço, planos de trabalho, termos e roteiros já criados a este evento. Desmarque para desvincular.</p>
+                  <h2 class="cv-wizard-section-title" id="evento-card-documentos-title-d">Documentos vinculados</h2>
+                  <p class="cv-wizard-section-subtitle">Reaproveite documentos existentes. Marque para vincular e desmarque para remover o vínculo.</p>
                 </div>
               </header>
               <div class="cv-wizard-section-body">
-                <div class="evento-doc-tabs" id="evento-doc-tabs" role="tablist" aria-label="Tipo de documento">
-                  <button type="button" class="evento-doc-tab is-active" data-doc-tab-target="oficios" role="tab" aria-selected="true" aria-controls="evento-wizard-doc-oficios-d">
+                <div class="evento-doc-tabs" id="evento-doc-tabs" role="tablist" aria-label="Tipo de documento" data-evento-doc-tabs>
+                  <button type="button" class="evento-doc-tab is-active" id="evento-doc-tab-oficios-d" data-doc-tab-target="oficios" role="tab" aria-selected="true" aria-controls="evento-wizard-doc-oficios-d" tabindex="0">
                     Ofícios
                   </button>
-                  <button type="button" class="evento-doc-tab" data-doc-tab-target="roteiros" role="tab" aria-selected="false" aria-controls="evento-wizard-doc-roteiros-d">
+                  <button type="button" class="evento-doc-tab" id="evento-doc-tab-roteiros-d" data-doc-tab-target="roteiros" role="tab" aria-selected="false" aria-controls="evento-wizard-doc-roteiros-d" tabindex="-1">
                     Roteiros
                   </button>
-                  <button type="button" class="evento-doc-tab" data-doc-tab-target="pt" role="tab" aria-selected="false" aria-controls="evento-wizard-doc-pt-d">
+                  <button type="button" class="evento-doc-tab" id="evento-doc-tab-pt-d" data-doc-tab-target="pt" role="tab" aria-selected="false" aria-controls="evento-wizard-doc-pt-d" tabindex="-1">
                     Plano de Trabalho
                   </button>
-                  <button type="button" class="evento-doc-tab" data-doc-tab-target="os" role="tab" aria-selected="false" aria-controls="evento-wizard-doc-os-d">
+                  <button type="button" class="evento-doc-tab" id="evento-doc-tab-os-d" data-doc-tab-target="os" role="tab" aria-selected="false" aria-controls="evento-wizard-doc-os-d" tabindex="-1">
                     Ordem de Serviço
                   </button>
-                  <button type="button" class="evento-doc-tab" data-doc-tab-target="termos" role="tab" aria-selected="false" aria-controls="evento-wizard-doc-termos-d">
+                  <button type="button" class="evento-doc-tab" id="evento-doc-tab-termos-d" data-doc-tab-target="termos" role="tab" aria-selected="false" aria-controls="evento-wizard-doc-termos-d" tabindex="-1">
                     Termos
                   </button>
                 </div>
 
-                <section class="wizard-inner-section" id="evento-wizard-doc-oficios-d" data-doc-tab-panel="oficios" role="tabpanel">
+                <section class="wizard-inner-section" id="evento-wizard-doc-oficios-d" data-doc-tab-panel="oficios" role="tabpanel" aria-labelledby="evento-doc-tab-oficios-d" tabindex="0">
                   <div class="field-grid">
                     {% include "components/forms/form_field.html" with field=form.oficios_vinculados only %}
                   </div>
                 </section>
 
-                <section class="wizard-inner-section" id="evento-wizard-doc-roteiros-d" data-doc-tab-panel="roteiros" role="tabpanel" hidden>
+                <section class="wizard-inner-section" id="evento-wizard-doc-roteiros-d" data-doc-tab-panel="roteiros" role="tabpanel" aria-labelledby="evento-doc-tab-roteiros-d" tabindex="0" hidden>
                   <div class="field-grid">
                     {% include "components/forms/form_field.html" with field=form.roteiros_vinculados only %}
                   </div>
                 </section>
 
-                <section class="wizard-inner-section" id="evento-wizard-doc-pt-d" data-doc-tab-panel="pt" role="tabpanel" hidden>
+                <section class="wizard-inner-section" id="evento-wizard-doc-pt-d" data-doc-tab-panel="pt" role="tabpanel" aria-labelledby="evento-doc-tab-pt-d" tabindex="0" hidden>
                   <div class="field-grid">
                     {% include "components/forms/form_field.html" with field=form.planos_trabalho_vinculados only %}
                   </div>
                 </section>
 
-                <section class="wizard-inner-section" id="evento-wizard-doc-os-d" data-doc-tab-panel="os" role="tabpanel" hidden>
+                <section class="wizard-inner-section" id="evento-wizard-doc-os-d" data-doc-tab-panel="os" role="tabpanel" aria-labelledby="evento-doc-tab-os-d" tabindex="0" hidden>
                   <div class="field-grid">
                     {% include "components/forms/form_field.html" with field=form.ordens_servico_vinculadas only %}
                   </div>
                 </section>
 
-                <section class="wizard-inner-section" id="evento-wizard-doc-termos-d" data-doc-tab-panel="termos" role="tabpanel" hidden>
+                <section class="wizard-inner-section" id="evento-wizard-doc-termos-d" data-doc-tab-panel="termos" role="tabpanel" aria-labelledby="evento-doc-tab-termos-d" tabindex="0" hidden>
                   <div class="field-grid">
                     {% include "components/forms/form_field.html" with field=form.termos_vinculados only %}
                   </div>
@@ -156,31 +157,39 @@
           </form>
 
           <script src="{% static 'js/pages/oficios-dados-viajantes.js' %}?v=20260618-eventos-det" defer></script>
-          <script src="{% static 'js/pages/eventos-detalhe.js' %}?v=20260718-extraido" defer></script>
+          <script src="{% static 'js/pages/eventos-detalhe.js' %}?v=20260718-tabs-registry" defer></script>
         {% endif %}
 
         {% if etapa_atual == 2 %}
-          {% include "components/lists/simple_list.html" with rows=roteiro_rows empty_message="Nenhum roteiro vinculado a este evento." empty_action_label="Novo roteiro" empty_action_url=create_urls.roteiro hide_realtime_count=True only %}
+          <section class="cv-wizard-collection" aria-labelledby="evento-roteiros-title">
+            {% include "components/ui/layouts/collection_header.html" with title="Roteiros do evento" title_id="evento-roteiros-title" description="Organize os deslocamentos, horários e trechos previstos para esta viagem." only %}
+            <div class="cv-wizard-collection__body">
+              {% include "components/lists/simple_list.html" with rows=roteiro_rows empty_message="Nenhum roteiro vinculado a este evento." hide_realtime_count=True only %}
+            </div>
+          </section>
           <div class="cv-fab-container">
             {% include "components/ui/buttons/button.html" with href=create_urls.roteiro label="Novo roteiro" variant="primary" icon="plus" extra_class="cv-fab" only %}
           </div>
         {% endif %}
 
         {% if etapa_atual == 3 %}
-          <div class="list-content app-list-grid">
-            {% for card in oficio_cards %}
-              {% include "oficios/partials/oficio_list_card.html" with card=card csrf_token=csrf_token only %}
-            {% empty %}
-              {% include "components/lists/list_empty.html" with message="Nenhum oficio vinculado a este evento." action_label="Novo oficio" action_url=create_urls.oficio only %}
-            {% endfor %}
-          </div>
+          <section class="cv-wizard-collection" aria-labelledby="evento-oficios-title">
+            {% include "components/ui/layouts/collection_header.html" with title="Ofícios e justificativas" title_id="evento-oficios-title" description="Registre as autorizações e justificativas que formalizam a participação no evento." only %}
+            <div class="cv-wizard-collection__body list-content app-list-grid">
+              {% for card in oficio_cards %}
+                {% include "oficios/partials/oficio_list_card.html" with card=card csrf_token=csrf_token only %}
+              {% empty %}
+                {% include "components/lists/list_empty.html" with message="Nenhum ofício vinculado a este evento." only %}
+              {% endfor %}
+            </div>
+          </section>
           <div class="cv-fab-container">
-            {% include "components/ui/buttons/button.html" with href=create_urls.oficio label="Novo oficio" variant="primary" icon="plus" extra_class="cv-fab" only %}
+            {% include "components/ui/buttons/button.html" with href=create_urls.oficio label="Novo ofício" variant="primary" icon="plus" extra_class="cv-fab" only %}
           </div>
         {% endif %}
 
         {% if etapa_atual == 4 %}
-          <section class="cv-wizard-section-card" aria-labelledby="evento-solicitacao-title">
+          <section class="cv-wizard-section-card cv-wizard-section-card--compact cv-wizard-section-card--described" aria-labelledby="evento-solicitacao-title">
             <header class="cv-wizard-section-header">
               <div class="cv-wizard-section-header__copy">
                 <h3 class="cv-wizard-section-title" id="evento-solicitacao-title">Documentos de solicitação</h3>
@@ -201,18 +210,20 @@
             </div>
           </section>
 
-          <div class="list-content app-list-grid">
-            {% for card in plano_cards %}
-              {% include "planos_trabalho/partials/plano_list_card.html" with card=card only %}
-            {% endfor %}
-            {% for card in ordem_cards %}
-              {% include "ordens_servico/partials/os_list_card.html" with card=card only %}
-            {% endfor %}
-            {% if not plano_cards and not ordem_cards %}
-              {% include "components/lists/list_empty.html" with message="Nenhum plano ou OS vinculado a este evento." action_label="Novo plano" action_url=create_urls.plano only %}
-            {% endif %}
-          </div>
-
+          <section class="cv-wizard-collection" aria-labelledby="evento-planejamento-title">
+            {% include "components/ui/layouts/collection_header.html" with title="Planejamento e autorização" title_id="evento-planejamento-title" description="Vincule o Plano de Trabalho e a Ordem de Serviço que orientam a execução da viagem." only %}
+            <div class="cv-wizard-collection__body list-content app-list-grid">
+              {% for card in plano_cards %}
+                {% include "planos_trabalho/partials/plano_list_card.html" with card=card only %}
+              {% endfor %}
+              {% for card in ordem_cards %}
+                {% include "ordens_servico/partials/os_list_card.html" with card=card only %}
+              {% endfor %}
+              {% if not plano_cards and not ordem_cards %}
+                {% include "components/lists/list_empty.html" with message="Nenhum plano ou OS vinculado a este evento." only %}
+              {% endif %}
+            </div>
+          </section>
           <div class="cv-fab-container">
             {% include "components/ui/buttons/button.html" with href=create_urls.plano label="Novo plano" variant="primary" icon="plus" extra_class="cv-fab" only %}
             {% include "components/ui/buttons/button.html" with href=create_urls.ordem label="Nova OS" variant="secondary" icon="plus" extra_class="cv-fab" only %}
@@ -220,11 +231,19 @@
         {% endif %}
 
         {% if etapa_atual == 5 %}
-          <h4 class="wizard-inner-section__title">Termo do evento</h4>
-          {% include "components/lists/simple_list.html" with rows=termo_generico_rows empty_message="Nenhum termo vinculado." empty_action_label="Novo termo" empty_action_url=create_urls.termo hide_realtime_count=True only %}
+          <section class="cv-wizard-collection" aria-labelledby="evento-termo-geral-title">
+            {% include "components/ui/layouts/collection_header.html" with title="Termo do evento" title_id="evento-termo-geral-title" description="Crie o termo geral com as condições e responsabilidades desta viagem." only %}
+            <div class="cv-wizard-collection__body">
+              {% include "components/lists/simple_list.html" with rows=termo_generico_rows empty_message="Nenhum termo vinculado." hide_realtime_count=True only %}
+            </div>
+          </section>
 
-          <h4 class="wizard-inner-section__title">Termos por servidor</h4>
-          {% include "components/lists/simple_list.html" with rows=termos_servidor_rows empty_message="Nenhum servidor vinculado a termos deste evento." hide_realtime_count=True only %}
+          <section class="cv-wizard-collection" aria-labelledby="evento-termos-servidor-title">
+            {% include "components/ui/layouts/collection_header.html" with title="Termos por servidor" title_id="evento-termos-servidor-title" description="Acompanhe os termos individuais gerados para cada participante vinculado." only %}
+            <div class="cv-wizard-collection__body">
+              {% include "components/lists/simple_list.html" with rows=termos_servidor_rows empty_message="Nenhum servidor vinculado a termos deste evento." hide_realtime_count=True only %}
+            </div>
+          </section>
 
           <div class="cv-fab-container">
             {% include "components/ui/buttons/button.html" with href=create_urls.termo label="Novo termo" variant="primary" icon="plus" extra_class="cv-fab" only %}

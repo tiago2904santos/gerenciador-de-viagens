@@ -212,7 +212,7 @@ def _titulo_sem_data(evento) -> str:
 def _evento_meta(evento) -> str:
     parts = []
     raw = evento.destino_display
-    if raw and raw != "Destino nao informado":
+    if raw and raw not in {"Destino nao informado", "Destino não informado"}:
         parts.append(raw)
     pc = _periodo_curto(evento)
     if pc:

@@ -46,6 +46,8 @@
             </div>
           </div>
 
+          {% include "components/lists/list_tabs.html" with abas=ui_lab_list_tabs tabs_aria_label="Estados da lista de demonstração" only %}
+
           <div class="list-panel">
             <div class="simple-list" role="list" aria-label="Lista de itens (demonstração)">
               {% for row in ui_lab_simple_rows %}

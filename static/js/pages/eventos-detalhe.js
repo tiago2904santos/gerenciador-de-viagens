@@ -76,7 +76,8 @@
   function initCidadePickerD(form) {
     var ufSel = form.querySelector('select[name="destino_uf"]');
     var cidadeSel = form.querySelector('[data-destino-cidade-picker]');
-    if (!ufSel || !cidadeSel) return;
+    if (!ufSel || !cidadeSel || ufSel.dataset.eventoCityBound === 'true') return;
+    ufSel.dataset.eventoCityBound = 'true';
     var initialValue = cidadeSel.dataset.initialValue || '';
     ufSel.addEventListener('change', function () {
       loadCidadesForUfD(form, cidadeSel, ufSel.value, '');
@@ -124,7 +125,8 @@
     var tmpl = document.getElementById('tmpl-destino-extra-d');
     var cardEl = document.getElementById('evento-card-dados-d');
     var form = cardEl ? cardEl.closest('form') : null;
-    if (!btn || !lista || !tmpl) return;
+    if (!btn || !lista || !tmpl || btn.dataset.eventoDestinosBound === 'true') return;
+    btn.dataset.eventoDestinosBound = 'true';
 
     var sedeUf = (form && form.dataset.sedeUf) || '';
     var extraCount = 0;
@@ -210,47 +212,79 @@
     }
   }
 
-  function initDocTabsD() {
-    var tabs = document.getElementById('evento-doc-tabs');
-    if (!tabs) return;
+  function initDocTabsD(root) {
+    var scope = root && root.querySelectorAll ? root : document;
+    var tabLists = Array.prototype.slice.call(scope.querySelectorAll('[data-evento-doc-tabs]'));
+    if (scope.matches && scope.matches('[data-evento-doc-tabs]')) tabLists.unshift(scope);
 
-    var buttons = tabs.querySelectorAll('[data-doc-tab-target]');
-    var panels = document.querySelectorAll('[data-doc-tab-panel]');
+    tabLists.forEach(function (tabs) {
+      if (tabs.dataset.eventoTabsBound === 'true') return;
+      tabs.dataset.eventoTabsBound = 'true';
+      var card = tabs.closest('.cv-wizard-section-card') || document;
+      var buttons = Array.prototype.slice.call(tabs.querySelectorAll('[data-doc-tab-target]'));
+      var panels = Array.prototype.slice.call(card.querySelectorAll('[data-doc-tab-panel]'));
+      if (!buttons.length || !panels.length) return;
 
-    function activate(target) {
-      buttons.forEach(function (btn) {
-        var active = btn.dataset.docTabTarget === target;
-        btn.classList.toggle('is-active', active);
-        btn.setAttribute('aria-selected', String(active));
-      });
-      panels.forEach(function (panel) {
-        panel.hidden = panel.dataset.docTabPanel !== target;
-      });
-    }
+      function activate(target, moveFocus) {
+        buttons.forEach(function (button) {
+          var active = button.dataset.docTabTarget === target;
+          button.classList.toggle('is-active', active);
+          button.setAttribute('aria-selected', String(active));
+          button.tabIndex = active ? 0 : -1;
+          if (active && moveFocus) button.focus();
+        });
+        panels.forEach(function (panel) {
+          panel.hidden = panel.dataset.docTabPanel !== target;
+        });
+      }
 
-    buttons.forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        activate(btn.dataset.docTabTarget);
+      buttons.forEach(function (button, index) {
+        button.addEventListener('click', function () {
+          activate(button.dataset.docTabTarget, false);
+        });
+        button.addEventListener('keydown', function (event) {
+          var nextIndex = index;
+          if (event.key === 'ArrowRight') nextIndex = (index + 1) % buttons.length;
+          else if (event.key === 'ArrowLeft') nextIndex = (index - 1 + buttons.length) % buttons.length;
+          else if (event.key === 'Home') nextIndex = 0;
+          else if (event.key === 'End') nextIndex = buttons.length - 1;
+          else return;
+          event.preventDefault();
+          activate(buttons[nextIndex].dataset.docTabTarget, true);
+        });
       });
+
+      var linkedPanel = panels.find(function (panel) {
+        return Array.prototype.some.call(panel.querySelectorAll('select option:checked'), function (option) {
+          return Boolean(String(option.value || '').trim());
+        });
+      });
+      var initialButton = buttons.find(function (button) {
+        return button.getAttribute('aria-selected') === 'true';
+      }) || buttons[0];
+      activate(linkedPanel ? linkedPanel.dataset.docTabPanel : initialButton.dataset.docTabTarget, false);
     });
-
-    // Abre direto na aba que já tem documentos vinculados, se houver.
-    var comVinculo = Array.prototype.find.call(panels, function (panel) {
-      return panel.querySelector('select option:checked');
-    });
-    if (comVinculo) activate(comVinculo.dataset.docTabPanel);
   }
 
-  function initD() {
-    var form = document.querySelector('.oficio-wizard__form');
-    if (form) initCidadePickerD(form);
-    initAddDestinoD();
-    initDocTabsD();
+  function initD(root) {
+    var scope = root && root.querySelectorAll ? root : document;
+    var forms = Array.prototype.slice.call(scope.querySelectorAll('[data-evento-guided-form]'));
+    if (scope.matches && scope.matches('[data-evento-guided-form]')) forms.unshift(scope);
+    forms.forEach(function (form) {
+      if (form.dataset.eventoGuidedBound === 'true') return;
+      form.dataset.eventoGuidedBound = 'true';
+      initCidadePickerD(form);
+      initAddDestinoD();
+    });
+    initDocTabsD(scope);
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initD);
+  window.CV = window.CV || {};
+  if (typeof window.CV.registerEnhancer === 'function') {
+    window.CV.registerEnhancer('eventoGuided', initD);
+  } else if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () { initD(document); });
   } else {
-    initD();
+    initD(document);
   }
 })();

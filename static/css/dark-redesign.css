@@ -68,7 +68,7 @@ html[data-theme="light-dark"] {
   --color-accent-border-soft: #7a641f;
   --color-accent-border-strong: #a5851f;
   --glow-accent: 0 14px 34px rgba(216, 162, 27, 0.22);
-  --color-focus: #74aae0;
+  --color-focus: #e0ab3c;
   --color-selection: rgba(216, 162, 27, 0.34);
 
   /* Functional states */
@@ -98,7 +98,7 @@ html[data-theme="light-dark"] {
   --shadow-soft: 0 10px 24px rgba(0, 0, 0, 0.3);
   --shadow-panel: 0 18px 44px rgba(0, 0, 0, 0.42);
   --shadow-elevated: 0 26px 70px rgba(0, 0, 0, 0.55);
-  --focus-ring: 0 0 0 2px rgba(134, 169, 194, 0.24);
+  --focus-ring: 0 0 0 3px rgba(216, 162, 27, 0.22);
   --transition-fast: 120ms cubic-bezier(.2, .8, .2, 1);
   --transition-base: 170ms cubic-bezier(.2, .8, .2, 1);
   --transition-slow: 240ms cubic-bezier(.2, .8, .2, 1);
@@ -118,8 +118,20 @@ html[data-theme="light-dark"] {
   --cv-card-bg: var(--color-surface);
   --cv-card-border: 1px solid var(--color-border);
   --cv-card-shadow: var(--shadow-card);
-  --cv-list-card-bg: var(--color-surface);
-  --cv-list-card-border: 1px solid var(--color-border);
+  /* Uma única família visual sustenta cards de lista e de formulário. */
+  --cv-card-family-bg: var(--color-surface);
+  --cv-card-family-header-bg: var(--color-surface-muted);
+  --cv-card-family-header-image: linear-gradient(to right, color-mix(in srgb, var(--color-accent) 12%, transparent) 0, transparent 88px);
+  --cv-card-family-border: var(--color-border);
+  --cv-card-family-border-strong: var(--color-border-strong);
+  --cv-card-family-shadow: var(--shadow-card);
+  --cv-card-family-accent-bg: linear-gradient(180deg, var(--color-accent-hover) 0%, var(--color-accent) 100%);
+  --cv-card-family-accent-shadow:
+    0 0 0 1px color-mix(in srgb, var(--color-accent) 18%, transparent),
+    0 0 10px color-mix(in srgb, var(--color-accent) 16%, transparent);
+  --cv-card-family-accent-width: 8px;
+  --cv-list-card-bg: var(--cv-card-family-bg);
+  --cv-list-card-border: 1px solid var(--cv-card-family-border);
   --theme-surface-card: var(--color-surface);
   --theme-surface-card-soft: var(--color-surface-soft);
   --theme-border-card: var(--color-border);
@@ -183,10 +195,10 @@ html[data-theme="light-dark"] {
   --stepper-label-active: var(--color-heading);
   --stepper-label-done: var(--color-muted-strong);
   --stepper-status-current-color: var(--color-accent);
-  --cv-wizard-section-bg: var(--color-surface);
-  --cv-wizard-section-header-bg: var(--color-surface-muted);
-  --cv-wizard-section-border: var(--color-border);
-  --cv-wizard-section-shadow: var(--shadow-card);
+  --cv-wizard-section-bg: var(--cv-card-family-bg);
+  --cv-wizard-section-header-bg: var(--cv-card-family-header-bg);
+  --cv-wizard-section-border: var(--cv-card-family-border);
+  --cv-wizard-section-shadow: var(--cv-card-family-shadow);
   --cv-icon-btn-tooltip-bg: var(--color-bg-strong);
   --cv-icon-btn-tooltip-color: var(--color-text);
   --cv-icon-btn-tooltip-border: var(--color-border-strong);
@@ -444,10 +456,7 @@ html[data-theme="light-dark"] .page-header-stack {
 html[data-theme="dark"] .page-header-band,
 html[data-theme="dark-dark"] .page-header-band,
 html[data-theme="light-dark"] .page-header-band {
-  background:
-    radial-gradient(ellipse 95% 140% at 0% 0%, rgba(217, 170, 24, 0.20), transparent 58%),
-    radial-gradient(ellipse 80% 130% at 100% 0%, rgba(44, 127, 172, 0.34), transparent 58%),
-    linear-gradient(180deg, #071320 0%, var(--color-bg-strong) 100%);
+  background: #0d1d30;
   box-shadow: none;
   padding: clamp(22px, 2.6vw, 34px) clamp(22px, 3vw, 38px) 10px;
 }
@@ -468,7 +477,7 @@ html[data-theme="light-dark"] .page-header-band__title {
 html[data-theme="dark"] .page-header-rail,
 html[data-theme="dark-dark"] .page-header-rail,
 html[data-theme="light-dark"] .page-header-rail {
-  background: var(--color-bg-strong);
+  background: #122238;
   border-top: 1px solid var(--color-border);
   padding: 16px clamp(22px, 3vw, 38px) clamp(22px, 2.6vw, 32px);
 }
@@ -492,6 +501,78 @@ html[data-theme="dark"] .page-header-rail__subtitle,
 html[data-theme="dark-dark"] .page-header-rail__subtitle,
 html[data-theme="light-dark"] .page-header-rail__subtitle {
   color: var(--color-muted-strong);
+}
+
+/* Listas usam um cabeçalho mais leve e inteiramente azul, sem perder hierarquia. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .page-shell--list .page-header-stack {
+  background: #0d1d30;
+  border-color: color-mix(in srgb, var(--color-border) 84%, #31577c);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.32);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .page-shell--list .page-header-band {
+  background: #0d1d30;
+  padding: 20px clamp(20px, 2.4vw, 30px) 16px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .page-shell--list .page-header-rail {
+  background: #14263b;
+  border-top-color: rgba(152, 184, 218, 0.22);
+  padding: 14px clamp(20px, 2.4vw, 30px) 18px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .page-shell--list .header-filter-input {
+  background: #0b1d2e;
+  border-color: #526f89;
+  min-height: 44px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .page-shell--list .list-panel--empty .empty-state {
+  align-items: center;
+  background: #142338;
+  border: 1px solid rgba(152, 184, 218, 0.32);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+  display: grid;
+  gap: 3px 14px;
+  grid-template-columns: auto minmax(0, 1fr);
+  justify-items: start;
+  padding: clamp(24px, 3vw, 32px);
+  text-align: left;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .page-shell--list .list-panel--empty .empty-state__mark {
+  background: #0d4d7f;
+  border: 1px solid #397aa8;
+  grid-row: 1 / span 2;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .page-shell--list .list-panel--empty :is(.empty-state__title, .empty-state__message) {
+  margin-inline: 0;
+}
+
+/* O seletor de ofício já vive dentro do card da etapa: apenas os resultados
+   individuais precisam de superfície própria. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .termo-oficio-summary-panel {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .termo-oficio-summary-panel .cv-search-picker__selected-header {
+  background: transparent;
+  border: 0;
+  padding: 0 0 var(--space-2);
 }
 
 /* Fields, custom selects and pickers */
@@ -1018,23 +1099,24 @@ html[data-theme="light-dark"] :is(.ui-lab-feedback-grid, .ui-lab-feedback-exampl
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .cv-wizard-section-card {
-  background: var(--cv-wizard-section-bg);
-  border-color: var(--cv-wizard-section-border);
-  box-shadow: var(--cv-wizard-section-shadow);
+  background: var(--cv-card-family-bg);
+  border-color: var(--cv-card-family-border);
+  box-shadow: var(--cv-card-family-shadow);
   overflow: hidden;
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .cv-wizard-section-header {
-  background: var(--color-surface-soft);
-  background-image: none;
-  border-color: var(--color-border);
+  --_wizard-filete-width: var(--cv-card-family-accent-width);
+  background: var(--cv-card-family-header-bg);
+  background-image: var(--cv-card-family-header-image);
+  border-color: var(--cv-card-family-border-strong);
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .cv-wizard-section-header::before {
-  background: var(--color-accent);
-  box-shadow: none;
+  background: var(--cv-card-family-accent-bg);
+  box-shadow: var(--cv-card-family-accent-shadow);
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
@@ -1594,33 +1676,45 @@ html[data-theme="light-dark"] :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-lay
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--quick-add) {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border-strong);
+  background: var(--cv-card-family-bg);
+  border: 1px solid var(--cv-card-family-border);
   border-radius: 16px;
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--cv-card-family-shadow);
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .main-form-panel > .form-section {
-  background: var(--color-surface);
+  background: var(--cv-card-family-bg);
   box-shadow: none;
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .main-form-panel > .form-section > .section-header {
-  background: var(--color-surface-strong);
-  border-bottom: 1px solid var(--color-border);
+  background: var(--cv-card-family-header-bg);
+  background-image: var(--cv-card-family-header-image);
+  border-bottom: 1px solid var(--cv-card-family-border-strong);
+  padding: var(--space-4) var(--space-6) var(--space-4) var(--space-10);
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .main-form-panel > .form-section > .section-header::before {
-  background: var(--color-accent);
+  background: var(--cv-card-family-accent-bg);
+  bottom: var(--space-4);
+  box-shadow: var(--cv-card-family-accent-shadow);
+  height: auto;
+  left: var(--space-6);
+  top: var(--space-4);
+  transform: none;
+  width: var(--cv-card-family-accent-width);
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .main-form-panel .section-header__title {
   color: var(--color-heading);
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-extrabold);
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
@@ -1630,8 +1724,20 @@ html[data-theme="light-dark"] :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-lay
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .main-form-panel > .cv-card-footer {
-  background: var(--color-surface-muted);
-  border-top-color: var(--color-border-strong);
+  background: var(--cv-card-family-bg);
+  border-top-color: var(--cv-card-family-border);
+}
+
+@media (max-width: 640px) {
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    .main-form-panel > .form-section > .section-header {
+    padding: var(--space-4) var(--space-4) var(--space-4) var(--space-8);
+  }
+
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    .main-form-panel > .form-section > .section-header::before {
+    left: var(--space-4);
+  }
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
@@ -1681,10 +1787,10 @@ html[data-theme="light-dark"] :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-lay
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .oficio-lc {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  background: var(--cv-card-family-bg);
+  border: 1px solid var(--cv-card-family-border);
   border-radius: 16px;
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--cv-card-family-shadow);
   transform: none;
 }
 
@@ -1696,19 +1802,16 @@ html[data-theme="light-dark"] :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-lay
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .oficio-lc__id-row {
-  background: var(--color-surface-muted);
-  background-image: linear-gradient(to right, color-mix(in srgb, var(--color-accent) 12%, transparent) 0px, transparent 88px);
-  border-bottom-color: var(--color-border-strong);
+  background: var(--cv-card-family-header-bg);
+  background-image: var(--cv-card-family-header-image);
+  border-bottom-color: var(--cv-card-family-border-strong);
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .oficio-lc__id-row::before {
-  background: linear-gradient(180deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 50%, transparent) 100%);
-  box-shadow:
-    0 0 6px 1px color-mix(in srgb, var(--color-accent) 45%, transparent),
-    0 0 14px 2px color-mix(in srgb, var(--color-accent) 24%, transparent),
-    0 0 26px 5px color-mix(in srgb, var(--color-accent) 10%, transparent);
-  width: 8px;
+  background: var(--cv-card-family-accent-bg);
+  box-shadow: var(--cv-card-family-accent-shadow);
+  width: var(--cv-card-family-accent-width);
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
@@ -1746,7 +1849,7 @@ html[data-theme="light-dark"] :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-lay
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .oficio-lc__section {
-  background: var(--color-surface);
+  background: var(--cv-card-family-bg);
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
@@ -1793,8 +1896,8 @@ html[data-theme="light-dark"] :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-lay
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .oficio-lc__footer {
-  background: var(--color-surface);
-  border-top-color: var(--color-border);
+  background: var(--cv-card-family-bg);
+  border-top-color: var(--cv-card-family-border);
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
@@ -1896,7 +1999,7 @@ html[data-theme="light-dark"] :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-lay
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .cv-record-row::before {
-  background: var(--color-primary-hover);
+  background: var(--color-accent);
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
@@ -1908,7 +2011,7 @@ html[data-theme="light-dark"] :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-lay
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .cv-record-row:hover::before {
-  background: var(--color-accent);
+  background: var(--color-accent-hover);
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
@@ -1957,7 +2060,7 @@ html[data-theme="light-dark"] :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-lay
    Paleta intocada — apenas estados e profundidade.
    ========================================================= */
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"]) {
-  --cv-btn-focus-ring: 0 0 0 3px rgba(116, 170, 224, 0.35);
+  --cv-btn-focus-ring: 0 0 0 3px rgba(216, 162, 27, 0.3);
 }
 
 /* Primário: relevo interno discreto + sombra curta; pressionado afunda. */
@@ -2061,23 +2164,6 @@ html[data-theme="light-dark"] :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-lay
   box-shadow: none;
 }
 
-/* Rodapé do card: separador sutil em vez de bloco cheio. */
-:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  .oficio-lc__footer {
-  background: transparent;
-  border-top-color: var(--color-border-soft);
-}
-
-/* Filete dourado do cabeçalho: mais fino e com metade do brilho do glow
-   anterior (percentuais e raios de desfoque reduzidos pela metade). */
-:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  .oficio-lc__id-row::before {
-  width: 6px;
-  box-shadow:
-    0 0 3px 1px color-mix(in srgb, var(--color-accent) 18%, transparent),
-    0 0 7px 2px color-mix(in srgb, var(--color-accent) 7%, transparent);
-}
-
 /* Linhas de trecho: fundo mais raso, borda só no hover. */
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .oficio-lc__trecho {
@@ -2098,7 +2184,7 @@ html[data-theme="light-dark"] :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-lay
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .oficios-filter-bar .header-filter-input:focus-visible {
   border-color: var(--color-focus);
-  box-shadow: 0 0 0 3px rgba(116, 170, 224, 0.25);
+  box-shadow: 0 0 0 3px rgba(216, 162, 27, 0.22);
   outline: none;
 }
 
@@ -2106,4 +2192,24 @@ html[data-theme="light-dark"] :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-lay
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .page-shell--cards .cv-card-grid {
   gap: var(--space-6);
+}
+
+/* Exceção de composição: no formulário de Termos, o painel selecionado não
+   cria um segundo card ao redor dos cartões de resultado. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .termos-page .termo-oficio-summary-panel.cv-search-picker__selected-panel {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .termos-page .termo-evento-destinos .roteiro-destinos-panel.cv-search-picker__selected-panel {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
 }

@@ -95,7 +95,7 @@ class Evento(models.Model):
     @property
     def periodo_display(self) -> str:
         if not self.data_inicio:
-            return "Periodo nao informado"
+            return "Período não informado"
         if not self.data_fim or self.data_fim == self.data_inicio:
             return self.data_inicio.strftime("%d/%m/%Y")
         return f"{self.data_inicio.strftime('%d/%m/%Y')} a {self.data_fim.strftime('%d/%m/%Y')}"
@@ -106,7 +106,7 @@ class Evento(models.Model):
         uf = (self.destino_uf or "").strip()
         if cidade and uf:
             return f"{cidade}/{uf}"
-        return cidade or uf or "Destino nao informado"
+        return cidade or uf or "Destino não informado"
 
     @property
     def tipos_display(self) -> str:

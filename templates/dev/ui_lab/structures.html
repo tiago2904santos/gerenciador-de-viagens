@@ -188,9 +188,12 @@
           <main class="main-form-panel main-form-panel--stack">
             <div class="cv-wizard-section-stack">
 
-              <section class="cv-wizard-section-card" aria-labelledby="structure-wizard-primary">
+              <section class="cv-wizard-section-card cv-wizard-section-card--compact cv-wizard-section-card--described" aria-labelledby="structure-wizard-primary">
                 <header class="cv-wizard-section-header">
-                  <h3 class="cv-wizard-section-title" id="structure-wizard-primary">Seção exemplo 1</h3>
+                  <div class="cv-wizard-section-header__copy">
+                    <h3 class="cv-wizard-section-title" id="structure-wizard-primary">Identificação</h3>
+                    <p class="cv-wizard-section-subtitle">Descrição curta da tarefa e dos dados esperados nesta seção.</p>
+                  </div>
                 </header>
                 <div class="cv-wizard-section-body">
                   <div class="field-grid">
@@ -201,9 +204,12 @@
                 </div>
               </section>
 
-              <section class="cv-wizard-section-card" aria-labelledby="structure-wizard-secondary">
+              <section class="cv-wizard-section-card cv-wizard-section-card--compact cv-wizard-section-card--described" aria-labelledby="structure-wizard-secondary">
                 <header class="cv-wizard-section-header">
-                  <h3 class="cv-wizard-section-title" id="structure-wizard-secondary">Seção exemplo 2</h3>
+                  <div class="cv-wizard-section-header__copy">
+                    <h3 class="cv-wizard-section-title" id="structure-wizard-secondary">Detalhes complementares</h3>
+                    <p class="cv-wizard-section-subtitle">Campos relacionados permanecem próximos, com menor peso visual.</p>
+                  </div>
                 </header>
                 <div class="cv-wizard-section-body">
                   <div class="field-grid">
@@ -211,6 +217,13 @@
                       {% include "dev/ui_lab/partials/_demo_field.html" with field=field only %}
                     {% endfor %}
                   </div>
+                </div>
+              </section>
+
+              <section class="cv-wizard-collection" aria-labelledby="structure-wizard-collection">
+                {% include "components/ui/layouts/collection_header.html" with title="Documentos vinculados" title_id="structure-wizard-collection" description="Cabeçalho autônomo organiza uma coleção sem envolver os cards da lista em outra superfície." only %}
+                <div class="cv-wizard-collection__body">
+                  {% include "components/feedback/empty_state.html" with title="Nenhum documento vinculado" message="A coleção preserva a mesma linguagem visual dos demais cards." only %}
                 </div>
               </section>
 

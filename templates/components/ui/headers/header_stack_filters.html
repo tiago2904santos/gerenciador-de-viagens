@@ -111,16 +111,20 @@
         </div>
       {% endif %}
     </div>
-    <div class="page-header-rail__actions">
-      {% if search_clear_url and next_url %}
-        {% include "components/ui/buttons/button.html" with href=search_clear_url|add:"?next="|add:next_url label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" data_cv_filter_clear=True only %}
-      {% elif search_clear_url %}
-        {% include "components/ui/buttons/button.html" with href=search_clear_url label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" data_cv_filter_clear=True only %}
-      {% endif %}
-      {% if primary_action_label and primary_action_url %}
-        {% include "components/ui/buttons/button.html" with href=primary_action_url label=primary_action_label variant="primary" icon="plus" extra_class="cv-btn--control" only %}
-      {% endif %}
-    </div>
+    {% if search_value or status_value or primary_action_label and primary_action_url %}
+      <div class="page-header-rail__actions">
+        {% if search_value or status_value %}
+          {% if search_clear_url and next_url %}
+            {% include "components/ui/buttons/button.html" with href=search_clear_url|add:"?next="|add:next_url label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" data_cv_filter_clear=True only %}
+          {% elif search_clear_url %}
+            {% include "components/ui/buttons/button.html" with href=search_clear_url label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" data_cv_filter_clear=True only %}
+          {% endif %}
+        {% endif %}
+        {% if primary_action_label and primary_action_url %}
+          {% include "components/ui/buttons/button.html" with href=primary_action_url label=primary_action_label variant="primary" icon="plus" extra_class="cv-btn--control" only %}
+        {% endif %}
+      </div>
+    {% endif %}
   </div>
   {% endif %}
 {% if form_action %}

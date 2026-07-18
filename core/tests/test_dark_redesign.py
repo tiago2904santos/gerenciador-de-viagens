@@ -279,9 +279,19 @@ class DarkRedesignContractTests(SimpleTestCase):
 
         self.assertIn("cv-file-picker", component)
         self.assertIn("cv-file-selection", component)
-        self.assertIn('aria-describedby="{{ field_id }}-help"', component)
+        self.assertIn('{{ field_id }}-status', component)
+        self.assertIn('role="status"', component)
+        self.assertIn('data-file-picker-status', component)
         self.assertIn(".cv-file-picker", component_css)
+        self.assertIn(".is-dragover", component_css)
         self.assertIn("@media (max-width: 620px)", component_css)
+
+        script = (
+            Path(settings.BASE_DIR) / "static" / "js" / "components" / "file-picker.js"
+        ).read_text(encoding="utf-8")
+        self.assertIn('registerEnhancer("filePicker", init)', script)
+        self.assertIn('data-file-picker-bound', script)
+        self.assertIn('addEventListener("drop"', script)
 
     def test_confirmation_flows_share_the_canonical_dialog_structure(self):
         modals = (
@@ -304,6 +314,17 @@ class DarkRedesignContractTests(SimpleTestCase):
                 self.assertIn("cv-dialog__footer", source)
                 self.assertIn(hook, source)
 
+        attach_script = (
+            Path(settings.BASE_DIR)
+            / "static"
+            / "js"
+            / "components"
+            / "attach-signed-modal.js"
+        ).read_text(encoding="utf-8")
+        self.assertIn('registerEnhancer("attachSignedModal", init)', attach_script)
+        self.assertIn("window.CV.dialogs.open", attach_script)
+        self.assertIn("window.CV.dialogs.close", attach_script)
+
     def test_compact_form_sections_are_explicitly_closed(self):
         templates = Path(settings.BASE_DIR) / "templates"
         include_contract = 'components/ui/layouts/form_section.html'
@@ -314,6 +335,54 @@ class DarkRedesignContractTests(SimpleTestCase):
                 continue
             with self.subTest(template=template):
                 self.assertGreaterEqual(source.count("</section>"), source.count(include_contract))
+
+    def test_event_guided_flow_uses_task_sections_and_accessible_tabs(self):
+        template = (
+            Path(settings.BASE_DIR) / "templates" / "eventos" / "detalhe.html"
+        ).read_text(encoding="utf-8")
+        script = (
+            Path(settings.BASE_DIR) / "static" / "js" / "pages" / "eventos-detalhe.js"
+        ).read_text(encoding="utf-8")
+        page_shell = (
+            Path(settings.BASE_DIR) / "static" / "css" / "page-shell.css"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn('eyebrow="EVENTOS"', template)
+        self.assertNotIn("CADASTRO DE OFICIO", template)
+        self.assertIn("Identificação do evento", template)
+        self.assertIn("Quando e onde", template)
+        self.assertIn("Documentos vinculados", template)
+        self.assertIn("data-evento-doc-tabs", template)
+        self.assertIn('aria-labelledby="evento-doc-tab-oficios-d"', template)
+        self.assertIn("cv-wizard-section-card--compact", page_shell)
+        self.assertIn("cv-wizard-section-card--described", page_shell)
+        self.assertIn("event.key === 'ArrowRight'", script)
+        self.assertIn("event.key === 'Home'", script)
+        self.assertIn("registerEnhancer('eventoGuided', initD)", script)
+        self.assertIn("components/ui/layouts/collection_header.html", template)
+        self.assertIn("Roteiros do evento", template)
+        self.assertIn("Ofícios e justificativas", template)
+        self.assertIn("Planejamento e autorização", template)
+        self.assertIn("Termos por servidor", template)
+        self.assertEqual(template.count('class="cv-fab-container"'), 4)
+        self.assertIn('extra_class="cv-fab"', template)
+
+        collection_header = (
+            Path(settings.BASE_DIR)
+            / "templates"
+            / "components"
+            / "ui"
+            / "layouts"
+            / "collection_header.html"
+        ).read_text(encoding="utf-8")
+        self.assertIn("cv-wizard-section-header--standalone", collection_header)
+        self.assertIn("cv-wizard-section-header--described", collection_header)
+        self.assertIn("cv-wizard-section-header__actions", collection_header)
+
+        obsolete_wizard = (
+            Path(settings.BASE_DIR) / "templates" / "eventos" / "wizard_novo.html"
+        )
+        self.assertFalse(obsolete_wizard.exists())
 
     def test_protocolos_product_module_was_removed(self):
         settings_source = (
@@ -557,3 +626,63 @@ class DarkRedesignContractTests(SimpleTestCase):
                 )
                 self.assertIn("var(--color-primary", declaration)
                 self.assertNotIn("var(--color-accent", declaration)
+
+    def test_dark_wizard_filete_stays_gold_and_tracks_header_content(self):
+        page_shell = (
+            Path(settings.BASE_DIR) / "static" / "css" / "page-shell.css"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn("--_wizard-filete-inset-block", page_shell)
+        self.assertIn("bottom:        var(--_wizard-filete-inset-block);", page_shell)
+        self.assertIn("top:           var(--_wizard-filete-inset-block);", page_shell)
+        self.assertIn("height:        auto;", page_shell)
+        self.assertIn(
+            "padding: var(--space-3) var(--space-4) var(--space-3) var(--space-8);",
+            page_shell,
+        )
+
+        dark_filete_rule = self.css.split(".cv-wizard-section-header::before", 1)[1]
+        dark_filete_rule = dark_filete_rule.split("}", 1)[0]
+        self.assertIn("var(--cv-card-family-accent-bg)", dark_filete_rule)
+        self.assertNotIn("var(--color-primary-bright)", dark_filete_rule)
+
+    def test_list_and_form_cards_share_the_dark_card_family(self):
+        for token in (
+            "--cv-card-family-bg:",
+            "--cv-card-family-header-bg:",
+            "--cv-card-family-header-image:",
+            "--cv-card-family-border:",
+            "--cv-card-family-shadow:",
+            "--cv-card-family-accent-bg:",
+            "--cv-card-family-accent-width:",
+        ):
+            with self.subTest(token=token):
+                self.assertIn(token, self.css)
+
+        wizard_header = self.css.split(".cv-wizard-section-header {", 1)[1]
+        wizard_header = wizard_header.split("}", 1)[0]
+        list_header = self.css.split(".oficio-lc__id-row {", 1)[1]
+        list_header = list_header.split("}", 1)[0]
+
+        for shared_token in (
+            "var(--cv-card-family-header-bg)",
+            "var(--cv-card-family-header-image)",
+            "var(--cv-card-family-border-strong)",
+        ):
+            with self.subTest(shared_token=shared_token):
+                self.assertIn(shared_token, wizard_header)
+                self.assertIn(shared_token, list_header)
+
+        self.assertEqual(self.css.count(".oficio-lc__id-row::before"), 1)
+
+        simple_form_header = self.css.split(
+            ".main-form-panel > .form-section > .section-header {", 1
+        )[1].split("}", 1)[0]
+        simple_form_filete = self.css.split(
+            ".main-form-panel > .form-section > .section-header::before {", 1
+        )[1].split("}", 1)[0]
+
+        self.assertIn("var(--cv-card-family-header-bg)", simple_form_header)
+        self.assertIn("var(--cv-card-family-header-image)", simple_form_header)
+        self.assertIn("var(--cv-card-family-accent-bg)", simple_form_filete)
+        self.assertIn("var(--cv-card-family-accent-width)", simple_form_filete)

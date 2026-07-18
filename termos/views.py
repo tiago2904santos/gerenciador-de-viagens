@@ -111,8 +111,8 @@ def index(request):
         request,
         "termos/index.html",
         {
-            "page_title": "Termos de Autorizacao",
-            "page_description": "Cadastre termos avulsos ou vinculados a oficios existentes.",
+            "page_title": "Termos de Autorização",
+            "page_description": "Cadastre termos avulsos ou vinculados a ofícios existentes.",
             "rows": rows,
             "q": q,
             "page_obj": page_obj,

@@ -3,10 +3,15 @@
 
   var activeTrigger = null;
   var currentRemoveUrl = "";
+  var BOUND = "data-attach-signed-bound";
 
-  function init() {
-    var modal = document.querySelector("[data-attach-signed-modal]");
-    if (!modal) return;
+  function init(root) {
+    var scope = root && root.querySelector ? root : document;
+    var modal = scope.matches && scope.matches("[data-attach-signed-modal]")
+      ? scope
+      : scope.querySelector("[data-attach-signed-modal]");
+    if (!modal || modal.getAttribute(BOUND) === "true") return false;
+    modal.setAttribute(BOUND, "true");
 
     var dialog = modal.querySelector(".delete-confirm-modal__dialog");
     var form = modal.querySelector("[data-attach-signed-form]");
@@ -24,7 +29,7 @@
     var fileDescription = modal.querySelector("[data-attach-signed-file-description]");
     var fileHelp = modal.querySelector("[data-attach-signed-file-help]");
     var fileInput = modal.querySelector('input[type="file"]');
-    var chooseLabel = modal.querySelector(".prestacao-file-picker__action");
+    var chooseLabel = modal.querySelector("[data-file-picker-action-label]");
     var uploadButton = modal.querySelector("[data-file-upload-button]");
     var fileDefaults = {
       accept: fileInput ? fileInput.getAttribute("accept") || "" : "",
@@ -88,10 +93,12 @@
     }
 
     function closeModal() {
-      modal.hidden = true;
-      document.body.classList.remove("has-delete-modal-open");
-      if (activeTrigger && typeof activeTrigger.focus === "function") {
-        activeTrigger.focus();
+      if (window.CV && window.CV.dialogs) {
+        window.CV.dialogs.close(modal);
+      } else {
+        modal.hidden = true;
+        document.body.classList.remove("has-delete-modal-open");
+        if (activeTrigger && typeof activeTrigger.focus === "function") activeTrigger.focus();
       }
       activeTrigger = null;
       currentRemoveUrl = "";
@@ -157,10 +164,16 @@
       if (!documentData(selectedKind) || !documentData(selectedKind).url) selectedKind = "primary";
       selectDocument(selectedKind, false);
 
-      modal.hidden = false;
-      document.body.classList.add("has-delete-modal-open");
-      if (dialog && typeof dialog.focus === "function") {
-        dialog.focus();
+      if (window.CV && window.CV.dialogs) {
+        window.CV.dialogs.open(modal, {
+          opener: trigger,
+          initialFocus: fileInput || dialog,
+          onRequestClose: closeModal,
+        });
+      } else {
+        modal.hidden = false;
+        document.body.classList.add("has-delete-modal-open");
+        if (dialog && typeof dialog.focus === "function") dialog.focus();
       }
     }
 
@@ -205,7 +218,7 @@
     });
 
     document.addEventListener("keydown", function (event) {
-      if (!modal.hidden && event.key === "Escape") {
+      if ((!window.CV || !window.CV.dialogs) && !modal.hidden && event.key === "Escape") {
         closeModal();
       }
     });
@@ -221,11 +234,15 @@
       );
       if (reopenTrigger) openModal(reopenTrigger, reopenParams.get("kind") || "primary");
     }
+    return true;
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
+  window.CV = window.CV || {};
+  if (typeof window.CV.registerEnhancer === "function") {
+    window.CV.registerEnhancer("attachSignedModal", init);
+  } else if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", function () { init(document); });
   } else {
-    init();
+    init(document);
   }
 })();

@@ -16,17 +16,22 @@
 }
 
 .termo-oficio-selector-wrapper {
+  display: grid;
+  gap: var(--space-4);
   margin-top: 0;
 }
 
 .termo-oficio-summary-panel {
-  background: var(--cv-sp-selected-panel-bg);
-  border: 1px solid var(--cv-sp-selected-panel-border);
-  border-radius: var(--cv-sp-card-radius);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
 }
 
 .termo-oficio-summary-panel .cv-search-picker__selected-header {
-  padding-right: var(--space-4);
+  border: 0;
+  padding: 0 0 var(--space-2);
 }
 
 .termo-oficio-summary-panel .termo-oficio-summary {

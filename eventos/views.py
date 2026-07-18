@@ -521,14 +521,26 @@ def detalhe(request, pk, etapa=1):
     ]
 
     guided_context = build_evento_guided_context(evento, etapa_atual=etapa)
+    current_step = next(
+        (step for step in guided_context["evento_page_steps"] if step.get("aria_current") == "step"),
+        None,
+    )
+    evento_header_title = (evento.titulo or "").strip() or "Novo evento"
+    evento_header_description = f"Etapa {guided_context['etapa_atual']} de 5"
+    if current_step:
+        evento_header_description += f" · {current_step['title']}"
+    if evento.periodo_display:
+        evento_header_description += f" · {evento.periodo_display}"
     config = ConfiguracaoSistema.get_singleton()
     from django.urls import reverse as _reverse
     return render(
         request,
         "eventos/detalhe.html",
         {
-            "page_title": evento.titulo,
+            "page_title": evento_header_title,
             "evento": evento,
+            "evento_header_title": evento_header_title,
+            "evento_header_description": evento_header_description,
             "evento_form": form,
             "oficio_cards": [
                 apresentar_oficio_card(

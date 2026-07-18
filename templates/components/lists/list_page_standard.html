@@ -6,9 +6,9 @@
     {% include "components/lists/list_tabs.html" with abas=abas tabs_aria_label=tabs_aria_label only %}
   {% endif %}
 
-  <div class="list-panel">
+  <div class="list-panel{% if not rows %} list-panel--empty{% endif %}">
     {% include "components/lists/pagination.html" %}
-    {% include "components/lists/simple_list.html" with rows=rows empty_message=empty_message empty_action_label=action_label empty_action_url=action_url hide_realtime_count=hide_realtime_count %}
+    {% include "components/lists/simple_list.html" with rows=rows empty_message=empty_message empty_action_label=empty_action_label empty_action_url=empty_action_url hide_realtime_count=hide_realtime_count %}
   </div>
 
   {% if delete_modal_enabled %}

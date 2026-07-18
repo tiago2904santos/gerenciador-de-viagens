@@ -27,6 +27,16 @@
         </div>
       </article>
 
+      <article class="ui-lab-preview-card" id="fields-file-picker">
+        <div class="ui-lab-preview-card__header">
+          <span class="ui-lab-preview-card__label">Anexos e seleção múltipla</span>
+          <span class="ui-lab-status-pill ui-lab-status-pill--done">Canônico</span>
+        </div>
+        <div class="app-form">
+          {% include "components/ui/forms/file_picker.html" with field_id="lab-documentos-viagem" field_name="documentos_viagem" label="Documentos da viagem" help_text="Arraste ou selecione PDFs e imagens. A seleção pode ser revisada antes do envio." upload_label="Anexar documentos" upload_button_type="button" only %}
+        </div>
+      </article>
+
       <article class="ui-lab-preview-card">
         <div class="ui-lab-preview-card__header">
           <span class="ui-lab-preview-card__label">Data, textarea e seleções</span>

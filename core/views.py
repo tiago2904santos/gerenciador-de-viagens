@@ -456,10 +456,16 @@ UI_LAB_FIELDS = {
 UI_LAB_SIMPLE_ROWS = [
     {
         "avatar": "A1",
-        "title": "Item exemplo 1",
+        "title": "Servidor com metadados ricos",
         "edit_url": "#",
         "delete_url": "#",
-        "meta": "Descricao exemplo · Metadado exemplo",
+        "meta": [
+            {"label": "Cargo", "value": "Assessoria técnica"},
+            {"label": "CPF", "value": "101.035.329-27"},
+            {"label": "RG", "value": "12.345.678-9"},
+            {"label": "Telefone", "value": "(41) 99999-0000"},
+            {"label": "Unidade", "value": "DPC"},
+        ],
         "status_label": "Status exemplo",
         "status_modifier": "done",
         "status_value": "done",
@@ -498,6 +504,13 @@ UI_LAB_SIMPLE_ROWS = [
         "status_value": "done",
         "action_label": "Acao",
     },
+]
+
+UI_LAB_LIST_TABS = [
+    {"label": "Ativos", "count": 12, "url": "#", "is_active": True},
+    {"label": "Em andamento", "count": 4, "url": "#", "is_active": False},
+    {"label": "Finalizados", "count": 8, "url": "#", "is_active": False},
+    {"label": "Cancelados", "count": 1, "url": "#", "is_active": False},
 ]
 
 UI_LAB_TABLE_ROWS = [
@@ -884,6 +897,7 @@ def _build_ui_lab_context(active_slug):
             {"value": "draft", "label": "Rascunhos"},
         ),
         "ui_lab_simple_rows": UI_LAB_SIMPLE_ROWS,
+        "ui_lab_list_tabs": UI_LAB_LIST_TABS,
         "ui_lab_table_page": ui_lab_table_page,
         "ui_lab_table_pagination_pages": (1, 2, 3),
         "ui_lab_cards": UI_LAB_CARDS,

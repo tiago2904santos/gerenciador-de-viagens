@@ -1,28 +1,32 @@
-<div class="prestacao-file-widget" data-file-picker>
-  <div class="prestacao-file-picker">
+<div class="cv-file-widget prestacao-file-widget" data-file-picker>
+  <div class="cv-file-picker prestacao-file-picker">
     <input type="{{ widget.type }}" name="{{ widget.name }}"{% for name, value in widget.attrs.items %}{% if value is not False %} {{ name }}{% if value is not True %}="{{ value|stringformat:'s' }}"{% endif %}{% endif %}{% endfor %} data-file-native="true">
-    <label class="prestacao-file-picker__action" for="{{ widget.attrs.id }}">Selecionar arquivos</label>
-    <span class="prestacao-file-picker__value" data-file-picker-name data-default-label="Nenhum arquivo selecionado">Nenhum arquivo selecionado</span>
-    <div class="prestacao-file-picker__inline-actions" data-file-inline-actions hidden></div>
-    <button class="prestacao-file-picker__upload" type="button" data-file-upload-button disabled>Anexar</button>
+    <label class="cv-file-picker__action prestacao-file-picker__action" for="{{ widget.attrs.id }}">
+      <span class="cv-file-picker__action-icon" aria-hidden="true">{% include "components/ui/icons/icon.html" with icon="document" only %}</span>
+      <span data-file-picker-action-label>Selecionar arquivos</span>
+    </label>
+    <span class="cv-file-picker__value prestacao-file-picker__value" data-file-picker-name data-default-label="Nenhum arquivo selecionado">Nenhum arquivo selecionado</span>
+    <div class="cv-file-picker__inline-actions prestacao-file-picker__inline-actions" data-file-inline-actions hidden></div>
+    <button class="cv-file-picker__upload prestacao-file-picker__upload" type="button" data-file-upload-button disabled>Anexar</button>
   </div>
-  <div class="prestacao-file-selection" data-file-selection-dropdown hidden>
-    <button class="prestacao-file-selection__toggle"
+  <span class="sr-only" id="{{ widget.attrs.id }}-status" role="status" aria-live="polite" data-file-picker-status>Nenhum arquivo selecionado</span>
+  <div class="cv-file-selection prestacao-file-selection" data-file-selection-dropdown hidden>
+    <button class="cv-file-selection__toggle prestacao-file-selection__toggle"
             type="button"
             aria-expanded="false"
             data-file-selection-toggle>
       <span data-file-selection-summary>Arquivos selecionados</span>
-      <span class="prestacao-file-selection__chevron" aria-hidden="true"></span>
+      <span class="cv-file-selection__chevron prestacao-file-selection__chevron" aria-hidden="true"></span>
     </button>
-    <div class="prestacao-file-selection__menu" data-file-selection-menu hidden>
-      <ul class="prestacao-file-selection__list" data-file-selection-list></ul>
+    <div class="cv-file-selection__menu prestacao-file-selection__menu" data-file-selection-menu hidden>
+      <ul class="cv-file-selection__list prestacao-file-selection__list" data-file-selection-list></ul>
     </div>
   </div>
   <template data-file-selection-template>
-    <li class="prestacao-file-selection__item" data-file-selection-row>
-      <div class="prestacao-file-widget__meta">
-        <strong class="prestacao-file-widget__name" data-file-selection-name></strong>
-        <span class="prestacao-file-widget__subtitle" data-file-selection-size></span>
+    <li class="cv-file-selection__item prestacao-file-selection__item" data-file-selection-row>
+      <div class="cv-file-widget__meta prestacao-file-widget__meta">
+        <strong class="cv-file-widget__name prestacao-file-widget__name" data-file-selection-name></strong>
+        <span class="cv-file-widget__subtitle prestacao-file-widget__subtitle" data-file-selection-size></span>
       </div>
       <div class="prestacao-file-widget__actions">
         <a class="cv-icon-btn cv-icon-btn--preview prestacao-file-widget__action"
@@ -33,7 +37,7 @@
            data-tooltip="Abrir"
            title="Abrir"
            data-file-preview-selection>
-          {% include "dev/ui_lab/partials/_cv_icon.html" with icon="eye" only %}
+          {% include "components/ui/icons/icon.html" with icon="eye" only %}
         </a>
         <button class="cv-icon-btn cv-icon-btn--delete prestacao-file-widget__action"
                 type="button"
@@ -41,7 +45,7 @@
                 data-tooltip="Remover"
                 title="Remover"
                 data-file-remove-selection>
-          {% include "dev/ui_lab/partials/_cv_icon.html" with icon="delete" only %}
+          {% include "components/ui/icons/icon.html" with icon="delete" only %}
         </button>
       </div>
     </li>
