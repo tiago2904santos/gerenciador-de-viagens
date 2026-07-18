@@ -18,30 +18,5 @@
 {% endblock %}
 
 {% block content %}
-  <div class="app-page--main-card-list page-shell page-shell--list oficios-list-page eventos-list-page" data-cv-realtime-filter-scope>
-    {% include "components/ui/headers/header_stack_filters.html" with advanced=True form_action=request.path title=page_title eyebrow="EVENTOS" search_placeholder="Buscar por título, destino ou responsável..." search_aria_label="Buscar eventos" current_aba=aba date_picker_id="ev-filter-date-picker" date_start_id="id_ev_viagem_de" date_end_id="id_ev_viagem_ate" %}
-
-    {% include "components/lists/list_tabs.html" with abas=abas tabs_aria_label="Abas de eventos" only %}
-
-    <div class="list-panel">
-      <div class="list-content app-list-grid" data-cv-list-container>
-        {% for card in cards %}
-          {% include "eventos/partials/evento_list_card.html" with card=card only %}
-        {% empty %}
-          {% include "components/lists/list_empty.html" with message="Nenhum evento encontrado." action_label="Novo evento" action_url=novo_url only %}
-        {% endfor %}
-      </div>
-      {% if cards %}
-        <div data-cv-empty-state hidden>
-          {% include "components/lists/list_empty.html" with message="Nenhum evento encontrado com os filtros aplicados." only %}
-        </div>
-      {% endif %}
-    </div>
-
-    {% include "components/ui/buttons/floating_action.html" with href=novo_url label="Novo evento" variant="primary" icon="plus" aria_label="Novo evento" only %}
-    {% include "components/ui/modals/delete_confirm_modal.html" with delete_modal_title="Excluir Evento?" delete_modal_entity="este evento" %}
-    {% include "components/ui/modals/cancel_reason_modal.html" with cancel_modal_title="Cancelar evento?" cancel_modal_entity="este evento" cancel_modal_hint="Um evento cancelado deixa de gerar prestação de contas e não pode mais ser usado em novas Ordens de Serviço. Ao cancelar o evento, todos os documentos vinculados a ele também serão cancelados." %}
-    {% include "components/ui/modals/confirm_action_modal.html" with confirm_action_eyebrow="Confirmar reativação" confirm_action_title="Reativar evento?" confirm_action_entity="este evento" confirm_action_hint="Os documentos cancelados junto com ele também serão reativados." confirm_action_button_label="Reativar evento" %}
-    {% include "components/ui/modals/attach_signed_modal.html" %}
-  </div>
+  {% include "components/lists/list_page_cards.html" with title=page_title eyebrow="EVENTOS" search_placeholder="Buscar por título, destino ou responsável..." search_aria_label="Buscar eventos" date_picker_id="ev-filter-date-picker" date_start_id="id_ev_viagem_de" date_end_id="id_ev_viagem_ate" tabs_aria_label="Abas de eventos" page_extra_class="eventos-list-page" card_template="eventos/partials/evento_list_card.html" empty_message="Nenhum evento encontrado." empty_action_label="Novo evento" empty_action_url=novo_url filter_empty_message="Nenhum evento encontrado com os filtros aplicados." action_label="Novo evento" action_url=novo_url delete_modal_title="Excluir Evento?" delete_modal_entity="este evento" cancel_modal_title="Cancelar evento?" cancel_modal_entity="este evento" cancel_modal_hint="Um evento cancelado deixa de gerar prestação de contas e não pode mais ser usado em novas Ordens de Serviço. Ao cancelar o evento, todos os documentos vinculados a ele também serão cancelados." confirm_action_eyebrow="Confirmar reativação" confirm_action_title="Reativar evento?" confirm_action_entity="este evento" confirm_action_hint="Os documentos cancelados junto com ele também serão reativados." confirm_action_button_label="Reativar evento" attach_signed_modal=True %}
 {% endblock %}

@@ -11,27 +11,5 @@
 {% endblock %}
 
 {% block content %}
-<div class="app-page--main-card-list page-shell page-shell--list oficios-list-page" data-cv-realtime-filter-scope>
-
-  {% include "components/ui/headers/header_stack_filters.html" with advanced=True form_action=request.path title=page_title eyebrow="PRESTAÇÕES" search_placeholder="Buscar por servidor, ofício, protocolo ou solicitação…" search_aria_label="Buscar prestações" current_aba=aba date_picker_id="pc-filter-date-picker" date_start_id="id_pc_viagem_de" date_end_id="id_pc_viagem_ate" %}
-
-  {% include "components/lists/list_tabs.html" with abas=abas tabs_aria_label="Abas de prestações" only %}
-
-  <div class="list-panel">
-    <div class="list-content list-grid list-grid--roteiros app-list-grid" data-cv-list-container>
-      {% for card in cards %}
-        {% include "prestacoes_contas/partials/prestacao_list_card.html" with card=card current_url=request.get_full_path csrf_token=csrf_token only %}
-      {% empty %}
-        {% include "components/lists/list_empty.html" with message=empty_message only %}
-      {% endfor %}
-    </div>
-    {% if cards %}
-      <div data-cv-empty-state hidden>
-        {% include "components/lists/list_empty.html" with message=empty_message only %}
-      </div>
-    {% endif %}
-  </div>
-
-  {% include "components/ui/modals/attach_signed_modal.html" %}
-</div>
+  {% include "components/lists/list_page_cards.html" with title=page_title eyebrow="PRESTAÇÕES" search_placeholder="Buscar por servidor, ofício, protocolo ou solicitação…" search_aria_label="Buscar prestações" date_picker_id="pc-filter-date-picker" date_start_id="id_pc_viagem_de" date_end_id="id_pc_viagem_ate" tabs_aria_label="Abas de prestações" card_template="prestacoes_contas/partials/prestacao_list_card.html" empty_message=empty_message attach_signed_modal=True %}
 {% endblock %}

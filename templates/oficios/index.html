@@ -11,33 +11,5 @@
 {% endblock %}
 
 {% block content %}
-<div class="app-page--main-card-list page-shell page-shell--list oficios-list-page" data-cv-realtime-filter-scope>
-
-  {% include "components/ui/headers/header_stack_filters.html" with advanced=True form_action=request.path title=page_title eyebrow="OFÍCIOS" status_options=None search_placeholder="Buscar por número, protocolo, motivo ou destino…" search_aria_label="Buscar ofícios" current_aba=aba date_picker_id="oficios-filter-date-picker" date_start_id="id_oficios_viagem_de" date_end_id="id_oficios_viagem_ate" %}
-
-  {% include "components/lists/list_tabs.html" with abas=abas tabs_aria_label="Abas de ofícios" only %}
-
-  <div class="list-panel">
-    <div class="list-content list-grid list-grid--roteiros app-list-grid" data-cv-list-container>
-      {% for card in cards %}
-        {% include "oficios/partials/oficio_list_card.html" with card=card csrf_token=csrf_token only %}
-      {% empty %}
-        {% include "components/lists/list_empty.html" with message=empty_message action_label="Novo ofício" action_url=create_url only %}
-      {% endfor %}
-    </div>
-    {% if cards %}
-      <div data-cv-empty-state hidden>
-        {% include "components/lists/list_empty.html" with message=empty_message only %}
-      </div>
-    {% endif %}
-  </div>
-
-  {% include "components/ui/modals/delete_confirm_modal.html" with delete_modal_title="Excluir ofício?" delete_modal_entity="este ofício" %}
-  {% include "components/ui/modals/cancel_reason_modal.html" with cancel_modal_title="Cancelar ofício?" cancel_modal_entity="este ofício" cancel_modal_hint="Ele deixa de gerar prestação de contas e não poderá mais ser usado em novas Ordens de Serviço." %}
-  {% include "components/ui/modals/attach_signed_modal.html" %}
-
-  {% include "components/ui/buttons/floating_action.html" with href=create_url label="Novo ofício" variant="primary" icon="plus" aria_label="Novo ofício" only %}
-
-</div>
-
+  {% include "components/lists/list_page_cards.html" with title=page_title eyebrow="OFÍCIOS" status_options=None search_placeholder="Buscar por número, protocolo, motivo ou destino…" search_aria_label="Buscar ofícios" date_picker_id="oficios-filter-date-picker" date_start_id="id_oficios_viagem_de" date_end_id="id_oficios_viagem_ate" tabs_aria_label="Abas de ofícios" card_template="oficios/partials/oficio_list_card.html" empty_message=empty_message empty_action_label="Novo ofício" empty_action_url=create_url action_label="Novo ofício" action_url=create_url delete_modal_title="Excluir ofício?" delete_modal_entity="este ofício" cancel_modal_title="Cancelar ofício?" cancel_modal_entity="este ofício" cancel_modal_hint="Ele deixa de gerar prestação de contas e não poderá mais ser usado em novas Ordens de Serviço." attach_signed_modal=True %}
 {% endblock %}
