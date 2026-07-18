@@ -977,9 +977,22 @@ html[data-theme="light-dark"] :is(.ui-lab-feedback-grid, .ui-lab-feedback-exampl
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .cv-dialog__footer {
-  background: var(--color-surface-muted);
+  background: transparent;
   border-top: 1px solid var(--color-border);
   padding: 16px 22px;
+}
+
+/* attach_signed_modal.html não envolve o conteúdo em .cv-dialog__body (que
+   ganharia os 22px de padding do contrato canônico) — sem isso, mensagem,
+   seletor de tipo e uploader ficam colados nas bordas do painel. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  :is(.attach-signed-modal__intro, .attach-signed-modal__kind, .attach-signed-modal__upload, .attach-signed-modal__form [data-attach-signed-current]) {
+  margin-inline: 22px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .attach-signed-modal__intro {
+  margin-top: 18px;
 }
 
 .cv-dialog__form {

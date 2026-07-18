@@ -36,6 +36,16 @@
   max-width: min(calc(100vw - 32px), 760px);
 }
 
+/* A sidebar fixa ocupa a faixa esquerda da viewport; centralizar o diálogo em
+   100% da tela o empurra visualmente contra a sidebar, com folga desigual
+   nas laterais. Acima do breakpoint em que a sidebar fica visível, centraliza
+   no espaço útil (viewport menos a sidebar) em vez da viewport inteira. */
+@media (min-width: 841px) {
+  .cv-dialog__panel {
+    left: calc(50% + var(--sidebar-width, 0px) / 2);
+  }
+}
+
 .cv-dialog__header {
   align-items: center;
   display: grid;

@@ -427,6 +427,17 @@ class DarkRedesignContractTests(SimpleTestCase):
 
     def test_rich_list_cards_share_the_entity_card_contract(self):
         templates = Path(settings.BASE_DIR) / "templates"
+        canonical = (
+            templates / "components" / "ui" / "lists" / "entity_card.html"
+        ).read_text(encoding="utf-8")
+        for contract in (
+            "cv-entity-card",
+            "cv-entity-card__body",
+            "components/ui/lists/entity_card_header.html",
+            "components/ui/lists/entity_card_footer.html",
+        ):
+            self.assertIn(contract, canonical)
+
         for relative in (
             "oficios/partials/oficio_list_card.html",
             "eventos/partials/evento_list_card.html",
@@ -434,14 +445,18 @@ class DarkRedesignContractTests(SimpleTestCase):
             "ordens_servico/partials/os_list_card.html",
             "prestacoes_contas/partials/prestacao_list_card.html",
             "roteiros/partials/roteiro_list_card.html",
-            "components/lists/main_list_card.html",
         ):
             with self.subTest(template=relative):
                 source = (templates / relative).read_text(encoding="utf-8")
-                self.assertIn("cv-entity-card", source)
-                self.assertIn("cv-entity-card__header", source)
-                self.assertIn("cv-entity-card__body", source)
-                self.assertIn("cv-entity-card__footer", source)
+                self.assertIn('components/ui/lists/entity_card.html', source)
+
+        generic = (
+            templates / "components" / "lists" / "main_list_card.html"
+        ).read_text(encoding="utf-8")
+        self.assertIn("cv-entity-card", generic)
+        self.assertIn("cv-entity-card__header", generic)
+        self.assertIn("cv-entity-card__body", generic)
+        self.assertIn("cv-entity-card__footer", generic)
 
     def test_document_viewer_and_signature_use_canonical_components(self):
         templates = Path(settings.BASE_DIR) / "templates"
@@ -530,7 +545,15 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertIn("@media (max-width: 820px)", auth_css)
         self.assertIn("@media (prefers-reduced-motion: reduce)", auth_css)
 
-    def test_dark_action_tokens_use_solid_primary_fills(self):
-        self.assertIn("--action-primary-bg: var(--color-primary);", self.css)
-        self.assertIn("--cv-btn-primary-bg: var(--color-primary);", self.css)
-        self.assertIn("--route-button-primary-bg: var(--color-primary);", self.css)
+    def test_dark_primary_actions_stay_in_the_primary_blue_family(self):
+        for token in (
+            "--action-primary-bg:",
+            "--cv-btn-primary-bg:",
+            "--route-button-primary-bg:",
+        ):
+            with self.subTest(token=token):
+                declaration = next(
+                    line.strip() for line in self.css.splitlines() if line.strip().startswith(token)
+                )
+                self.assertIn("var(--color-primary", declaration)
+                self.assertNotIn("var(--color-accent", declaration)
