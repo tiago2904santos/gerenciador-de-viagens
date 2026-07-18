@@ -25,6 +25,20 @@
           <span class="cv-action-menu__item-copy"><strong>{{ item.title }}</strong><small>{{ item.description }}</small></span>
         </button>
       </form>
+    {% elif item.type == "confirm" %}
+      <button
+        type="button"
+        class="cv-action-menu__item cv-action-menu__item--rich"
+        role="menuitem"
+        data-confirm-action-trigger
+        data-confirm-action-url="{{ item.url }}"
+        data-confirm-action-label-text="{{ item.label }}"
+      >
+        <span class="cv-action-menu__item-icon cv-action-menu__item-icon--{{ item.icon_tone|default:'success' }}" aria-hidden="true">
+          {% include "components/ui/icons/icon.html" with icon=item.icon|default:"check" only %}
+        </span>
+        <span class="cv-action-menu__item-copy"><strong>{{ item.title }}</strong><small>{{ item.description }}</small></span>
+      </button>
     {% elif item.type == "cancel" %}
       <button
         type="button"

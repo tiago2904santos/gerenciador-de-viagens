@@ -51,6 +51,19 @@ def menu_cancel(url, label, *, title="Cancelar", description="Interromper o flux
     return {"type": "cancel", "url": url, "label": label, "title": title, "description": description}
 
 
+def menu_confirm(url, label, title, description, *, icon="check", icon_tone="success"):
+    """Item que abre o modal global de confirmação (data-confirm-action-trigger)."""
+    return {
+        "type": "confirm",
+        "url": url,
+        "label": label,
+        "title": title,
+        "description": description,
+        "icon": icon,
+        "icon_tone": icon_tone,
+    }
+
+
 def menu_attach_signed(url, doc_label, *, assinado=False, current_name="", current_view_url="", current_remove_url=""):
     return {
         "type": "attach_signed",

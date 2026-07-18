@@ -3,6 +3,7 @@ from __future__ import annotations
 from django.urls import reverse
 from django.utils import timezone
 
+from core import entity_cards
 from core.presenters.badges import build_badge
 from oficios.presenters import apresentar_oficio_card
 
@@ -249,16 +250,74 @@ def apresentar_evento_list_card(evento):
     else:
         status_label, status_state = "Rascunho", "warning"
 
+    titulo = _titulo_sem_data(evento)
+    destino = _clean_evento_display(evento.destino_display)
+    periodo = _clean_evento_display(evento.periodo_display)
+    responsavel = evento.responsavel.nome if evento.responsavel_id and evento.responsavel else "Não informado"
+    cancelado = evento.status == evento.STATUS_CANCELADO
+    excluir_url = reverse("eventos:excluir", args=[evento.pk])
+    cancelar_url = reverse("eventos:cancelar", args=[evento.pk])
+    reativar_url = reverse("eventos:reativar", args=[evento.pk])
+
+    search_parts = [titulo, destino, periodo, responsavel]
+    for oficio_data in oficios:
+        search_parts.append(oficio_data["numero"])
+        search_parts.extend(s["name"] for s in oficio_data["servidores"])
+    for doc in documentos:
+        search_parts.extend([doc.get("kind", ""), doc.get("title", ""), doc.get("detail", "")])
+
+    header_value = " · ".join(p for p in [titulo, destino, periodo] if p)
+
+    if cancelado:
+        acao_situacao = entity_cards.menu_confirm(
+            reativar_url, titulo, "Reativar evento", "Retornar o evento ao fluxo de trabalho",
+            icon="unarchive", icon_tone="success",
+        )
+    else:
+        acao_situacao = entity_cards.menu_cancel(
+            cancelar_url, titulo,
+            title="Cancelar evento", description="Interromper o fluxo mantendo o histórico",
+        )
+
     return {
         "pk": evento.pk,
-        "titulo": _titulo_sem_data(evento),
+        "search_text": " ".join(p for p in search_parts if p).strip(),
+        "header": entity_cards.header(
+            [entity_cards.header_item("Evento", header_value, wide=True, wrap=True)],
+            [entity_cards.chip(status_state, status_label)],
+        ),
+        "footer": entity_cards.footer(
+            edit_url=reverse("eventos:guiado_etapa", args=[evento.pk, 1]),
+            edit_aria="Editar evento",
+            edit_tooltip="Editar evento",
+            danger_menus=[
+                entity_cards.menu(
+                    f"evento-action-menu-{evento.pk}",
+                    "Gerenciar evento",
+                    titulo,
+                    [
+                        acao_situacao,
+                        entity_cards.menu_delete(
+                            excluir_url, titulo,
+                            title="Excluir evento",
+                        ),
+                    ],
+                    icon="settings",
+                    trigger_icon="more",
+                    trigger_variant="edit",
+                    trigger_aria="Mais ações do evento",
+                    trigger_tooltip="Mais ações",
+                )
+            ],
+        ),
+        "titulo": titulo,
         "status_label": status_label,
         "status_state": status_state,
-        "destino": _clean_evento_display(evento.destino_display),
-        "periodo": _clean_evento_display(evento.periodo_display),
+        "destino": destino,
+        "periodo": periodo,
         "periodo_curto": _periodo_curto(evento),
         "evento_meta": _evento_meta(evento),
-        "responsavel": evento.responsavel.nome if evento.responsavel_id and evento.responsavel else "Não informado",
+        "responsavel": responsavel,
         "oficios": oficios,
         "oficios_count": len(oficios),
         "servidores_flat": servidores_flat,
@@ -267,10 +326,10 @@ def apresentar_evento_list_card(evento):
         "documentos_count": len(documentos),
         "detail_url": reverse("eventos:guiado_etapa", args=[evento.pk, 3]),
         "editar_url": reverse("eventos:guiado_etapa", args=[evento.pk, 1]),
-        "excluir_url": reverse("eventos:excluir", args=[evento.pk]),
-        "cancelar_url": reverse("eventos:cancelar", args=[evento.pk]),
-        "reativar_url": reverse("eventos:reativar", args=[evento.pk]),
-        "cancelado": evento.status == evento.STATUS_CANCELADO,
+        "excluir_url": excluir_url,
+        "cancelar_url": cancelar_url,
+        "reativar_url": reativar_url,
+        "cancelado": cancelado,
     }
 
 
