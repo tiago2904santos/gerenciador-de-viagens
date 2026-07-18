@@ -54,3 +54,25 @@
 ## Critério de migração por grupo
 
 Inventariar consumidores → aplicar contrato canônico → demonstrar no UI Lab → validar tema escuro → validar funcionamento no tema claro → executar testes → só então remover legado.
+
+## Rodada v2 — componentização global (2026-07-18, branch redesign/dark-components-v2)
+
+Consolidações concluídas nesta rodada:
+
+- **Ícones**: sistema único em `templates/components/ui/icons/icon.html` (grid 24, stroke 1.75,
+  pdf/docx com glifos desenhados). `dev/ui_lab/partials/_cv_icon.html` apenas delega.
+- **Destinos**: partials unificados em `templates/components/domain/destinos/` (prefix os|pt|termo).
+- **Cabeçalho de filtros**: modo `advanced` no `components/ui/headers/header_stack_filters.html`;
+  o clone `oficios_cloned_list_header.html` e o form inline de ofícios foram removidos.
+- **Listas em cards**: `components/lists/list_page_cards.html` + casca `page-shell--cards`/`cv-card-grid`
+  (CSS em `components/record-list.css`). As 5 index (ofícios, eventos, prestações, OS, PT) viraram 1 include.
+- **Entity card**: `components/ui/lists/entity_card{,_header,_footer,_menu}.html` + builders em
+  `core/entity_cards.py`; os 6 cards de lista agora são casca fina + `_<app>_card_body.html`.
+- **JS extraído de templates**: `js/pages/eventos-detalhe.js` e `js/pages/prestacoes-diaria-wa.js`.
+- **file_list**: lista de anexos global em `components/ui/lists/file_list.html`.
+- **Botões**: refinamento dark (relevo/estados/foco) no fim de `dark-redesign.css`; fusão de
+  `buttons.css`/`buttons-functional.css`/`cv-buttons.css` continua PENDENTE (baixo ganho, risco médio).
+
+Órfãos removidos: regras de `app-page--main-card-list`/`oficios-list-page`/`list-grid--roteiros`
+em `roteiros-list.css` e `eventos-list.css`. As classes `oficio-lc__*` seguem em uso pelos
+miolos dos cards (remoção só depois de um redesign de miolo).

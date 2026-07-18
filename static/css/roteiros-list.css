@@ -22,12 +22,6 @@
   margin: 0 0 var(--space-1);
 }
 
-.app-page--main-card-list .list-grid.list-grid--roteiros.app-list-grid {
-  display: grid;
-  gap: var(--space-6);
-  grid-template-columns: minmax(0, 1fr);
-}
-
 /* ── Reuso do card de ofício (oficio-lc) na lista de roteiros ── */
 
 /* Rota pode ocupar várias linhas em vez de truncar com reticências */
@@ -38,21 +32,6 @@
 /* Trechos: 2 colunas de 3 · Valor Total: 1 coluna de 3 */
 .oficio-lc--roteiro .oficio-lc__transport-card--span2 {
   grid-column: span 2;
-}
-
-.oficios-list-page > .list-panel {
-  background: transparent;
-  border: 0;
-  border-radius: 0;
-  box-shadow: none;
-}
-
-.oficios-list-page > .list-panel > .list-content {
-  padding-block: 0;
-}
-
-.app-page--main-card-list .list-grid--roteiros .roteiro-list-card {
-  width: 100%;
 }
 
 .roteiro-list-card {
