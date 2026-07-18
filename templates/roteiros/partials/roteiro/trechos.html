@@ -1,12 +1,13 @@
 {# SEÇÃO 5: TRECHOS #}
-<section class="cv-wizard-section-card roteiro-editor__section--trechos"
+<section class="{% if roteiro_editor_oficio %}cv-form-block cv-form-block--resource{% else %}cv-wizard-section-card{% endif %} roteiro-editor__section--trechos"
          aria-labelledby="sec-trechos"
          data-trechos-component>
-  <header class="cv-wizard-section-header">
-    <div class="cv-wizard-section-header__copy">
-      <h3 class="cv-wizard-section-title" id="sec-trechos">5. Trechos</h3>
+  <header class="{% if roteiro_editor_oficio %}cv-form-block__header{% else %}cv-wizard-section-header{% endif %}">
+    <div class="{% if roteiro_editor_oficio %}cv-form-block__copy{% else %}cv-wizard-section-header__copy{% endif %}">
+      <h3 class="{% if roteiro_editor_oficio %}cv-form-block__title{% else %}cv-wizard-section-title{% endif %}" id="sec-trechos">Trechos</h3>
+      {% if roteiro_editor_oficio %}<p class="cv-form-block__description">Saídas e chegadas geradas a partir dos destinos.</p>{% endif %}
     </div>
-    <div class="cv-wizard-section-header__actions">
+    <div class="{% if roteiro_editor_oficio %}cv-form-block__actions{% else %}cv-wizard-section-header__actions{% endif %}">
       {# Calendário para preencher as datas dos trechos em sequência #}
       {% include "components/forms/cv_date_picker.html" with mode="multi" control_variant="action-button" picker_id="trechos-date-picker" trigger_label="Preencher datas" trigger_aria_label="Preencher datas dos trechos" trigger_class="cv-field-side-action cv-field-side-action--secondary" show_summary=False show_context=True show_confirm=True only %}
       <template id="trecho-single-date-picker-template">
@@ -14,7 +15,7 @@
       </template>
     </div>
   </header>
-  <div id="trechos-gerados-container" class="cv-wizard-section-body roteiro-trechos-stack">
+  <div id="trechos-gerados-container" class="{% if roteiro_editor_oficio %}cv-form-block__body{% else %}cv-wizard-section-body{% endif %} roteiro-trechos-stack">
     <div class="roteiro-editor__empty">
       <p class="roteiro-editor__empty-title">Trechos ainda não disponíveis</p>
       <p class="roteiro-editor__empty-text">Os trechos aparecem aqui após definir os destinos.</p>

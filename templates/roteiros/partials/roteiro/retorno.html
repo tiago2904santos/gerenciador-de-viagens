@@ -1,11 +1,12 @@
 {# SEÇÃO 6: RETORNO #}
-<section class="cv-wizard-section-card roteiro-editor__section--retorno" aria-labelledby="sec-retorno">
-  <header class="cv-wizard-section-header">
-    <div class="cv-wizard-section-header__copy">
-      <h3 class="cv-wizard-section-title" id="sec-retorno">6. Retorno final</h3>
+<section class="{% if roteiro_editor_oficio %}cv-form-block{% else %}cv-wizard-section-card{% endif %} roteiro-editor__section--retorno" aria-labelledby="sec-retorno">
+  <header class="{% if roteiro_editor_oficio %}cv-form-block__header{% else %}cv-wizard-section-header{% endif %}">
+    <div class="{% if roteiro_editor_oficio %}cv-form-block__copy{% else %}cv-wizard-section-header__copy{% endif %}">
+      <h3 class="{% if roteiro_editor_oficio %}cv-form-block__title{% else %}cv-wizard-section-title{% endif %}" id="sec-retorno">Retorno final</h3>
+      {% if roteiro_editor_oficio %}<p class="cv-form-block__description">Último deslocamento até a sede.</p>{% endif %}
     </div>
   </header>
-  <div class="cv-wizard-section-body roteiro-editor__retorno-body" id="retorno-card">
+  <div class="{% if roteiro_editor_oficio %}cv-form-block__body{% else %}cv-wizard-section-body{% endif %} roteiro-editor__retorno-body" id="retorno-card">
 
     <div class="roteiro-trecho-card__route-row field-grid field-grid--cols-2">
       <div class="roteiro-trecho-card__leg">

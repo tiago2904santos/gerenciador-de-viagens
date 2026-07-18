@@ -1,14 +1,15 @@
 {# SEÇÃO 4: MAPA DA ROTA #}
-<section class="cv-wizard-section-card roteiro-editor__section--mapa"
+<section class="{% if roteiro_editor_oficio %}cv-form-block{% else %}cv-wizard-section-card{% endif %} roteiro-editor__section--mapa"
          id="sec-mapa-rota"
          aria-labelledby="sec-mapa-rota-title">
-  <header class="cv-wizard-section-header">
-    <div class="cv-wizard-section-header__copy">
-      <h3 class="cv-wizard-section-title" id="sec-mapa-rota-title">4. Mapa da rota</h3>
+  <header class="{% if roteiro_editor_oficio %}cv-form-block__header{% else %}cv-wizard-section-header{% endif %}">
+    <div class="{% if roteiro_editor_oficio %}cv-form-block__copy{% else %}cv-wizard-section-header__copy{% endif %}">
+      <h3 class="{% if roteiro_editor_oficio %}cv-form-block__title{% else %}cv-wizard-section-title{% endif %}" id="sec-mapa-rota-title">Mapa da rota</h3>
+      {% if roteiro_editor_oficio %}<p class="cv-form-block__description">Distância, duração e visualização do percurso.</p>{% endif %}
     </div>
   </header>
 
-  <div class="cv-wizard-section-body">
+  <div class="{% if roteiro_editor_oficio %}cv-form-block__body{% else %}cv-wizard-section-body{% endif %}">
     <p class="roteiro-mapa__stale-hint text-warning-emphasis small"
        id="roteiro-mapa-stale-hint"
        hidden

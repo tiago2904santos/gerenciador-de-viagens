@@ -1,13 +1,13 @@
 ﻿{# SEÇÃO 1: FONTE DO ROTEIRO #}
-<section class="cv-wizard-section-card roteiro-editor__section--fonte"
+<section class="{% if roteiro_editor_oficio %}cv-form-block cv-form-block--resource{% else %}cv-wizard-section-card{% endif %} roteiro-editor__section--fonte"
          aria-labelledby="sec-fonte">
-  <header class="cv-wizard-section-header">
-    <div class="cv-wizard-section-header__copy">
-      <h3 class="cv-wizard-section-title" id="sec-fonte">1. Fonte</h3>
-      <p class="cv-wizard-section-subtitle">Escolha um roteiro salvo ou monte um roteiro novo definindo a sede.</p>
+  <header class="{% if roteiro_editor_oficio %}cv-form-block__header{% else %}cv-wizard-section-header{% endif %}">
+    <div class="{% if roteiro_editor_oficio %}cv-form-block__copy{% else %}cv-wizard-section-header__copy{% endif %}">
+      <h3 class="{% if roteiro_editor_oficio %}cv-form-block__title{% else %}cv-wizard-section-title{% endif %}" id="sec-fonte">Origem e destinos</h3>
+      <p class="{% if roteiro_editor_oficio %}cv-form-block__description{% else %}cv-wizard-section-subtitle{% endif %}">Use um roteiro salvo ou defina a sede e os destinos.</p>
     </div>
     {% if has_event_routes %}
-    <div class="cv-wizard-section-header__actions">
+    <div class="{% if roteiro_editor_oficio %}cv-form-block__actions{% else %}cv-wizard-section-header__actions{% endif %}">
       <div class="cv-segment-toggle" role="group" aria-label="Modo do roteiro" id="roteiro-modo-toggle">
         <button type="button"
                 class="cv-segment-toggle__btn"
@@ -28,7 +28,7 @@
     {% endif %}
   </header>
 
-  <div class="cv-wizard-section-body">
+  <div class="{% if roteiro_editor_oficio %}cv-form-block__body{% else %}cv-wizard-section-body{% endif %}">
     {# Radios ocultos â€” lidos pelo JS para detectar e submeter o modo #}
     <input type="radio" name="roteiro_modo" id="id_roteiro_modo_evento" value="EVENTO_EXISTENTE"
            {% if roteiro_modo == 'EVENTO_EXISTENTE' %}checked{% endif %}
@@ -42,10 +42,12 @@
     <div id="roteiro-selector-wrapper"
          class="roteiro-editor__routes-panel">
 
-      <section class="wizard-inner-section" aria-labelledby="sec-roteiro-salvo-title">
-        <header class="wizard-inner-section__header">
-          <h4 class="wizard-inner-section__title" id="sec-roteiro-salvo-title">Roteiros salvos</h4>
-          <p class="wizard-inner-section__description">Reaproveite um roteiro já validado para acelerar o preenchimento.</p>
+      <section class="{% if roteiro_editor_oficio %}cv-form-subsection{% else %}wizard-inner-section{% endif %}" aria-labelledby="sec-roteiro-salvo-title">
+        <header class="{% if roteiro_editor_oficio %}cv-form-subsection__header{% else %}wizard-inner-section__header{% endif %}">
+          <div class="{% if roteiro_editor_oficio %}cv-form-subsection__copy{% endif %}">
+            <h4 class="{% if roteiro_editor_oficio %}cv-form-subsection__title{% else %}wizard-inner-section__title{% endif %}" id="sec-roteiro-salvo-title">Roteiros salvos</h4>
+            <p class="{% if roteiro_editor_oficio %}cv-form-subsection__description{% else %}wizard-inner-section__description{% endif %}">Reaproveite um roteiro já validado.</p>
+          </div>
         </header>
         <div class="field-grid roteiro-sede-grid">
           <div class="field app-form-field field-size-2">
@@ -77,10 +79,12 @@
          {% if roteiro_modo == 'EVENTO_EXISTENTE' %}hidden{% endif %}>
 
       {# Sede #}
-      <section class="wizard-inner-section" aria-labelledby="sec-sede-title" id="sec-sede">
-        <header class="wizard-inner-section__header">
-          <h4 class="wizard-inner-section__title" id="sec-sede-title">Sede</h4>
-          <p class="wizard-inner-section__description">Defina a unidade de origem da viagem (UF e cidade).</p>
+      <section class="{% if roteiro_editor_oficio %}cv-form-subsection{% else %}wizard-inner-section{% endif %}" aria-labelledby="sec-sede-title" id="sec-sede">
+        <header class="{% if roteiro_editor_oficio %}cv-form-subsection__header{% else %}wizard-inner-section__header{% endif %}">
+          <div class="{% if roteiro_editor_oficio %}cv-form-subsection__copy{% endif %}">
+            <h4 class="{% if roteiro_editor_oficio %}cv-form-subsection__title{% else %}wizard-inner-section__title{% endif %}" id="sec-sede-title">Sede</h4>
+            <p class="{% if roteiro_editor_oficio %}cv-form-subsection__description{% else %}wizard-inner-section__description{% endif %}">Unidade de origem da viagem.</p>
+          </div>
         </header>
         <div class="field-grid roteiro-sede-grid">
           <div class="field app-form-field">
@@ -173,5 +177,4 @@
   }).observe(panelSalvo, { attributes: true, attributeFilter: ['hidden'] });
 })();
 </script>
-
 

@@ -44,12 +44,30 @@
       </div>
       {% endif %}
 
+      {% if roteiro_editor_oficio %}
+      <section class="cv-wizard-section-card cv-form-card roteiro-editor__oficio-card" aria-labelledby="roteiro-oficio-card-title">
+        <header class="cv-wizard-section-header">
+          <div class="cv-wizard-section-header__copy">
+            <h2 class="cv-wizard-section-title" id="roteiro-oficio-card-title">Roteiro e diárias</h2>
+          </div>
+        </header>
+        <div class="cv-wizard-section-body">
+      {% endif %}
+
       {% include "roteiros/partials/roteiro/source.html" %}
       {% include "roteiros/partials/roteiro/bate_volta.html" %}
       {% include "roteiros/includes/mapa_rota.html" %}
       {% include "components/domain/trechos.html" %}
       {% include "components/domain/retorno.html" %}
       {% include "components/domain/calculadora_rota.html" %}
+
+      {% if roteiro_editor_oficio %}
+        </div>
+        <div class="cv-form-card__footer">
+          {% include "roteiros/partials/roteiro/actions.html" %}
+        </div>
+      </section>
+      {% endif %}
     </form>
 </div>
 

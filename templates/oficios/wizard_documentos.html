@@ -28,15 +28,23 @@
     </section>
   {% endif %}
 
-  <section class="cv-wizard-section-card oficio-documentos-preview-section document-inline-stack" aria-labelledby="documentos-conferencia-title">
+  <section class="cv-wizard-section-card cv-form-card oficio-documentos-unified-card" aria-labelledby="oficio-documentos-unified-title">
     <header class="cv-wizard-section-header">
       <div class="cv-wizard-section-header__copy">
-        <h3 class="cv-wizard-section-title" id="documentos-conferencia-title">Documentos para conferência</h3>
-        <p class="cv-wizard-section-subtitle">Confira e baixe os documentos gerados para o ofício.</p>
+        <h2 class="cv-wizard-section-title" id="oficio-documentos-unified-title">Documentos e conferência</h2>
       </div>
     </header>
 
-    <div class="cv-wizard-section-body oficio-documentos-preview-section__body">
+    <div class="cv-wizard-section-body">
+  <section class="cv-form-block oficio-documentos-preview-section document-inline-stack" aria-labelledby="documentos-conferencia-title">
+    <header class="cv-form-block__header">
+      <div class="cv-form-block__copy">
+        <h3 class="cv-form-block__title" id="documentos-conferencia-title">Documentos para conferência</h3>
+        <p class="cv-form-block__description">Visualize e baixe os arquivos gerados.</p>
+      </div>
+    </header>
+
+    <div class="cv-form-block__body oficio-documentos-preview-section__body">
 
     {% with di=documentos_ctx.documentos_inline %}
       <details class="document-inline-card document-inline-card--lazy" data-lazy-inline>
@@ -221,22 +229,17 @@
       </details>
     {% endwith %}
     </div>
-    {% if mostrar_pendencias %}
-      {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar à lista" secondary_action="save_draft_list" secondary_icon="list" primary_label="Salvar rascunho" primary_action="save_draft_list" primary_icon="document" only %}
-    {% else %}
-      {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar à lista" secondary_action="save_draft_list" secondary_icon="list" primary_label="Finalizar Ofício" primary_action="finalizar" primary_icon="check" only %}
-    {% endif %}
   </section>
 
-  <section class="cv-wizard-section-card oficio-documentos-summary-section" aria-labelledby="oficio-documentos-summary-title">
-    <header class="cv-wizard-section-header">
-      <div class="cv-wizard-section-header__copy">
-        <h3 class="cv-wizard-section-title" id="oficio-documentos-summary-title">Resumo do ofício</h3>
-        <p class="cv-wizard-section-subtitle">Dados utilizados para montar os documentos desta etapa.</p>
+  <section class="cv-form-block oficio-documentos-summary-section" aria-labelledby="oficio-documentos-summary-title">
+    <header class="cv-form-block__header">
+      <div class="cv-form-block__copy">
+        <h3 class="cv-form-block__title" id="oficio-documentos-summary-title">Resumo do ofício</h3>
+        <p class="cv-form-block__description">Dados administrativos, equipe e transporte.</p>
       </div>
     </header>
 
-    <div class="cv-wizard-section-body">
+    <div class="cv-form-block__body">
       <div class="oficio-documentos-grid">
     <section class="oficio-documentos-admin-facts" aria-label="Dados administrativos">
       <header class="oficio-documentos-card__header">
@@ -361,19 +364,22 @@
     </div>
   </section>
 
-  <section class="cv-wizard-section-card oficio-documentos-route-section" aria-labelledby="oficio-documentos-route-title">
-    <header class="cv-wizard-section-header">
-      <div class="cv-wizard-section-header__copy">
-        <h3 class="cv-wizard-section-title" id="oficio-documentos-route-title">Roteiro e diárias</h3>
+  <section class="cv-form-block cv-form-block--resource oficio-documentos-route-section" aria-labelledby="oficio-documentos-route-title">
+    <header class="cv-form-block__header">
+      <div class="cv-form-block__copy">
+        <h3 class="cv-form-block__title" id="oficio-documentos-route-title">Roteiro e diárias</h3>
+        <p class="cv-form-block__description">Trechos e resumo financeiro.</p>
       </div>
+      <div class="cv-form-block__actions">
       {% if documentos_ctx.roteiro_card.status_chip_label %}
         {% with sc_tone=documentos_ctx.roteiro_card.status_chip_class|cut:"status-chip--"|default:"muted" %}
           {% include "components/ui/lists/status_pill.html" with label=documentos_ctx.roteiro_card.status_chip_label variant=sc_tone extra_class="oficio-documentos-route-section__status-chip" only %}
         {% endwith %}
       {% endif %}
+      </div>
     </header>
 
-    <div class="cv-wizard-section-body">
+    <div class="cv-form-block__body">
     {% if documentos_ctx.roteiro_card %}
       {% with card=documentos_ctx.roteiro_card %}
         <article class="oficio-documentos-route-card oficio-documentos-route-card--trechos-{{ card.trechos_count|default:0 }}{% if card.trechos_count > 3 %} oficio-documentos-route-card--trechos-many{% endif %}">
@@ -508,6 +514,16 @@
       </article>
     {% endif %}
 
+    </div>
+  </section>
+    </div>
+
+    <div class="cv-form-card__footer">
+      {% if mostrar_pendencias %}
+        {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar à lista" secondary_action="save_draft_list" secondary_icon="list" primary_label="Salvar rascunho" primary_action="save_draft_list" primary_icon="document" only %}
+      {% else %}
+        {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar à lista" secondary_action="save_draft_list" secondary_icon="list" primary_label="Finalizar Ofício" primary_action="finalizar" primary_icon="check" only %}
+      {% endif %}
     </div>
   </section>
 {% endblock %}

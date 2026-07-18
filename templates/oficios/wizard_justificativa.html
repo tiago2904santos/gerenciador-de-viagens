@@ -2,29 +2,20 @@
 {% load static %}
 
 {% block wizard_content %}
-  <section class="cv-wizard-section-card oficio-justificativa-card" aria-labelledby="justificativa-panel-title">
+  <section class="cv-wizard-section-card cv-form-card oficio-justificativa-card" aria-labelledby="justificativa-panel-title">
     <header class="cv-wizard-section-header">
       <div class="cv-wizard-section-header__copy">
         <h3 class="cv-wizard-section-title" id="justificativa-panel-title">Justificativa</h3>
       </div>
-      <div class="cv-wizard-section-header__actions">
-        {% include "components/buttons/action_button.html" with href=modelos_justificativa_url label="Gerenciar modelos" variant="secondary" data_autosave_link=True only %}
-      </div>
     </header>
 
     <div class="cv-wizard-section-body oficio-justificativa-card__body">
-      <section class="wizard-inner-section">
-        {% include "components/forms/form_field.html" with field=form.modelo label="Modelo" only %}
-      </section>
-
-      <section class="wizard-inner-section">
-        <div class="oficio-justificativa-card__wide-field cv-field--full-width">
-          {% include "components/forms/form_field.html" with field=form.texto label="Justificativa" only %}
-        </div>
-      </section>
+      {% include "components/ui/forms/form_block.html" with title="Conteúdo" description="Use um modelo ou escreva a justificativa completa" section_id="oficio-justificativa-conteudo" variant="resource" action_label="Gerenciar modelos" action_url=modelos_justificativa_url action_autosave=True body_extra_class="cv-form-stack" body_template="oficios/partials/justificativa/_fields.html" %}
     </div>
 
-    {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar" secondary_action="wizard_back" primary_label="Avançar" primary_action="wizard_next" only %}
+    <div class="cv-form-card__footer">
+      {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar" secondary_action="wizard_back" primary_label="Avançar" primary_action="wizard_next" only %}
+    </div>
   </section>
 {% endblock %}
 
