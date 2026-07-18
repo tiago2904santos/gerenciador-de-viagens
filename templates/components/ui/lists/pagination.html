@@ -12,11 +12,11 @@
   <div class="pagination-shell__controls">
     {% if page_obj.has_previous %}
       <a class="pagination-shell__nav pagination-shell__nav--prev" href="?{% if page_querystring %}{{ page_querystring }}&{% endif %}page={{ page_obj.previous_page_number }}" aria-label="Página anterior">
-        <span class="pagination-shell__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="arrow-left" only %}</span>
+        <span class="pagination-shell__icon" aria-hidden="true">{% include "components/ui/icons/icon.html" with icon="arrow-left" only %}</span>
       </a>
     {% else %}
       <span class="pagination-shell__nav pagination-shell__nav--prev is-disabled" aria-disabled="true">
-        <span class="pagination-shell__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="arrow-left" only %}</span>
+        <span class="pagination-shell__icon" aria-hidden="true">{% include "components/ui/icons/icon.html" with icon="arrow-left" only %}</span>
       </span>
     {% endif %}
 
@@ -34,11 +34,11 @@
 
     {% if page_obj.has_next %}
       <a class="pagination-shell__nav pagination-shell__nav--next pagination-shell__nav--primary" href="?{% if page_querystring %}{{ page_querystring }}&{% endif %}page={{ page_obj.next_page_number }}" aria-label="Próxima página">
-        <span class="pagination-shell__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="arrow-right" only %}</span>
+        <span class="pagination-shell__icon" aria-hidden="true">{% include "components/ui/icons/icon.html" with icon="arrow-right" only %}</span>
       </a>
     {% else %}
       <span class="pagination-shell__nav pagination-shell__nav--next is-disabled" aria-disabled="true">
-        <span class="pagination-shell__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="arrow-right" only %}</span>
+        <span class="pagination-shell__icon" aria-hidden="true">{% include "components/ui/icons/icon.html" with icon="arrow-right" only %}</span>
       </span>
     {% endif %}
   </div>

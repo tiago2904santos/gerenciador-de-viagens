@@ -101,7 +101,7 @@
             data-tooltip="Visualizar e baixar"
             data-action-menu-trigger
             data-action-menu-target="plano-document-menu-{{ card.id }}"
-          >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="folder" only %}</button>
+          >{% include "components/ui/icons/icon.html" with icon="folder" only %}</button>
           <div class="cv-action-menu cv-action-menu--rich" id="plano-document-menu-{{ card.id }}" role="menu" hidden>
             {% include "components/ui/menus/rich_menu_header.html" with title="Documentos do plano" subtitle=card.numero_label icon="folder" only %}
             {% include "components/ui/menus/rich_menu_link.html" with href=card.pdf_inline_url title="Visualizar plano" description="Abrir o documento no navegador" icon="eye" tone="preview" target_blank=True only %}
@@ -119,7 +119,7 @@
             data-delete-url="{{ card.excluir_url }}"
             data-delete-label="{{ card.numero_label }}"
           >
-            {% include "dev/ui_lab/partials/_cv_icon.html" with icon="delete" only %}
+            {% include "components/ui/icons/icon.html" with icon="delete" only %}
           </button>
         </div>
       </div>

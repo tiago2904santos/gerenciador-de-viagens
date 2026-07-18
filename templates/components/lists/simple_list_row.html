@@ -44,7 +44,7 @@
             data-tooltip="{% if row.remover_assinado_url %}Documentos e assinado{% else %}Documentos{% endif %}"
             data-action-menu-trigger
             data-action-menu-target="simple-row-document-menu-{{ row.title|slugify }}-{{ menu_suffix }}"
-          >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="folder" only %}</button>
+          >{% include "components/ui/icons/icon.html" with icon="folder" only %}</button>
           <div
             class="cv-action-menu cv-action-menu--rich"
             id="simple-row-document-menu-{{ row.title|slugify }}-{{ menu_suffix }}"
@@ -75,7 +75,7 @@
                 data-attach-signed-current-remove-url="{{ row.remover_assinado_url }}"
               >
                 <span class="cv-action-menu__item-icon cv-action-menu__item-icon--success" aria-hidden="true">
-                  {% include "dev/ui_lab/partials/_cv_icon.html" with icon="sign" only %}
+                  {% include "components/ui/icons/icon.html" with icon="sign" only %}
                 </span>
                 <span class="cv-action-menu__item-copy">
                   <strong>{% if row.remover_assinado_url %}Gerenciar assinado{% else %}Anexar assinado{% endif %}</strong>
@@ -96,7 +96,7 @@
             data-edit-fields="{{ row.edit_fields_json }}"
             aria-label="Editar"
             data-tooltip="Editar"
-          >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="edit" only %}</button>
+          >{% include "components/ui/icons/icon.html" with icon="edit" only %}</button>
         {% else %}
           {% include "components/ui/buttons/icon_button.html" with href=row.edit_url action="edit" aria_label="Editar" tooltip="Editar" only %}
         {% endif %}
@@ -111,7 +111,7 @@
             data-delete-label="{{ row.title }}"
             aria-label="Excluir"
             data-tooltip="Excluir"
-          >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="delete" only %}</button>
+          >{% include "components/ui/icons/icon.html" with icon="delete" only %}</button>
         {% else %}
           {% include "components/ui/buttons/icon_button.html" with href=row.delete_url action="delete" aria_label="Excluir" tooltip="Excluir" only %}
         {% endif %}

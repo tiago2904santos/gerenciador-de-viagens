@@ -11,7 +11,7 @@
     {% include "components/ui/modals/dialog_header.html" with icon="sign" tone="document" eyebrow="Documento assinado" title="Anexar assinado" title_id="attach-signed-title" icon_extra_class="attach-signed-modal__icon" data_attach_signed_cancel=True only %}
 
     <p class="cv-dialog__message attach-signed-modal__intro" id="attach-signed-description">
-      {% include "dev/ui_lab/partials/_cv_icon.html" with icon="document" only %}
+      {% include "components/ui/icons/icon.html" with icon="document" only %}
       <span>
         Envie <span data-attach-signed-file-description>o PDF já assinado</span> de <strong data-attach-signed-label>este documento</strong>.
         Ele substituirá o arquivo gerado na tela e no Google Drive.
@@ -57,14 +57,14 @@
               aria-label="Visualizar arquivo assinado"
               data-tooltip="Visualizar"
               data-attach-signed-current-open
-            >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="eye" only %}</a>
+            >{% include "components/ui/icons/icon.html" with icon="eye" only %}</a>
             <button
               type="button"
               class="cv-icon-btn cv-icon-btn--delete prestacao-file-widget__action"
               aria-label="Remover arquivo assinado"
               data-tooltip="Remover"
               data-attach-signed-remove
-            >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="delete" only %}</button>
+            >{% include "components/ui/icons/icon.html" with icon="delete" only %}</button>
           </div>
         </li>
       </ul>

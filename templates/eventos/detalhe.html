@@ -555,7 +555,7 @@
                            rel="noopener noreferrer"
                            aria-label="Visualizar arquivo"
                            data-tooltip="Visualizar">
-                          {% include "dev/ui_lab/partials/_cv_icon.html" with icon="eye" only %}
+                          {% include "components/ui/icons/icon.html" with icon="eye" only %}
                         </a>
                         <form class="cv-inline-form" method="post" action="{{ anexo.delete_url }}">
                           {% csrf_token %}
@@ -564,7 +564,7 @@
                                   aria-label="Excluir documento"
                                   data-tooltip="Excluir"
                                   data-confirm-submit data-confirm-message="Remover este documento?">
-                            {% include "dev/ui_lab/partials/_cv_icon.html" with icon="delete" only %}
+                            {% include "components/ui/icons/icon.html" with icon="delete" only %}
                           </button>
                         </form>
                       </div>

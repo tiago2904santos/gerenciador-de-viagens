@@ -39,7 +39,7 @@
                   data-tooltip="Ações e documentos"
                   data-action-menu-trigger
                   data-action-menu-target="evento-oficio-menu-{{ card.pk }}-{{ oficio.oficio_pk }}"
-                >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="folder" only %}</button>
+                >{% include "components/ui/icons/icon.html" with icon="folder" only %}</button>
                 <div
                   class="cv-action-menu cv-action-menu--rich oficio-lc__document-menu"
                   id="evento-oficio-menu-{{ card.pk }}-{{ oficio.oficio_pk }}"
@@ -85,7 +85,7 @@
                 data-tooltip="Ações e documentos"
                 data-action-menu-trigger
                 data-action-menu-target="evento-documento-menu-{{ card.pk }}-{{ forloop.counter }}"
-              >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="folder" only %}</button>
+              >{% include "components/ui/icons/icon.html" with icon="folder" only %}</button>
               <div
                 class="cv-action-menu cv-action-menu--rich oficio-lc__document-menu"
                 id="evento-documento-menu-{{ card.pk }}-{{ forloop.counter }}"
@@ -140,7 +140,7 @@
                 data-tooltip="{% if s.termo_assinado %}Termo assinado — ações{% else %}Ações do termo{% endif %}"
                 data-action-menu-trigger
                 data-action-menu-target="evento-termo-action-menu-{{ oficio.oficio_pk }}-{{ s.servidor_pk }}"
-              >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="more" only %}</button>
+              >{% include "components/ui/icons/icon.html" with icon="more" only %}</button>
               <div class="cv-action-menu cv-action-menu--rich" id="evento-termo-action-menu-{{ oficio.oficio_pk }}-{{ s.servidor_pk }}" role="menu" hidden>
                 {% if s.termo_assinado %}
                   {% include "components/ui/menus/rich_menu_header.html" with title="Termo assinado" subtitle=s.name icon="sign" only %}
@@ -169,7 +169,7 @@
                   data-attach-signed-current-remove-url="{{ s.termo_remover_assinado_url }}"
                 >
                   <span class="cv-action-menu__item-icon cv-action-menu__item-icon--success" aria-hidden="true">
-                    {% include "dev/ui_lab/partials/_cv_icon.html" with icon="sign" only %}
+                    {% include "components/ui/icons/icon.html" with icon="sign" only %}
                   </span>
                   <span class="cv-action-menu__item-copy">
                     <strong>{% if s.termo_assinado %}Gerenciar assinado{% else %}Anexar termo assinado{% endif %}</strong>
@@ -203,7 +203,7 @@
             data-action-menu-trigger
             data-action-menu-target="evento-action-menu-{{ card.pk }}"
           >
-            {% include "dev/ui_lab/partials/_cv_icon.html" with icon="more" only %}
+            {% include "components/ui/icons/icon.html" with icon="more" only %}
           </button>
           <div class="cv-action-menu cv-action-menu--rich" id="evento-action-menu-{{ card.pk }}" role="menu" hidden>
             {% include "components/ui/menus/rich_menu_header.html" with title="Gerenciar evento" subtitle=card.titulo icon="settings" only %}
@@ -217,7 +217,7 @@
               data-confirm-action-label-text="{{ card.titulo }}"
             >
               <span class="cv-action-menu__item-icon cv-action-menu__item-icon--success" aria-hidden="true">
-                {% include "dev/ui_lab/partials/_cv_icon.html" with icon="unarchive" only %}
+                {% include "components/ui/icons/icon.html" with icon="unarchive" only %}
               </span>
               <span class="cv-action-menu__item-copy"><strong>Reativar evento</strong><small>Retornar o evento ao fluxo de trabalho</small></span>
             </button>
@@ -231,7 +231,7 @@
               data-cancel-label="{{ card.titulo }}"
             >
               <span class="cv-action-menu__item-icon cv-action-menu__item-icon--warning" aria-hidden="true">
-                {% include "dev/ui_lab/partials/_cv_icon.html" with icon="ban" only %}
+                {% include "components/ui/icons/icon.html" with icon="ban" only %}
               </span>
               <span class="cv-action-menu__item-copy"><strong>Cancelar evento</strong><small>Interromper o fluxo mantendo o histórico</small></span>
             </button>
@@ -245,7 +245,7 @@
               data-delete-label="{{ card.titulo }}"
             >
               <span class="cv-action-menu__item-icon cv-action-menu__item-icon--danger" aria-hidden="true">
-                {% include "dev/ui_lab/partials/_cv_icon.html" with icon="delete" only %}
+                {% include "components/ui/icons/icon.html" with icon="delete" only %}
               </span>
               <span class="cv-action-menu__item-copy"><strong>Excluir evento</strong><small>Remover permanentemente quando permitido</small></span>
             </button>

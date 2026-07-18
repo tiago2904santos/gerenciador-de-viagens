@@ -52,7 +52,7 @@
                         data-tooltip="Visualizar e baixar"
                         data-action-menu-trigger
                         data-action-menu-target="wizard-oficio-document-menu">
-                  {% include "dev/ui_lab/partials/_cv_icon.html" with icon="folder" only %}
+                  {% include "components/ui/icons/icon.html" with icon="folder" only %}
                 </button>
                 <div class="cv-action-menu cv-action-menu--rich" id="wizard-oficio-document-menu" role="menu" hidden>
                   {% include "components/ui/menus/rich_menu_header.html" with title=di.oficio.titulo subtitle="Documento do ofício" icon="folder" only %}
@@ -93,7 +93,7 @@
                         data-tooltip="Visualizar e baixar"
                         data-action-menu-trigger
                         data-action-menu-target="wizard-justificativa-document-menu">
-                  {% include "dev/ui_lab/partials/_cv_icon.html" with icon="folder" only %}
+                  {% include "components/ui/icons/icon.html" with icon="folder" only %}
                 </button>
                 <div class="cv-action-menu cv-action-menu--rich" id="wizard-justificativa-document-menu" role="menu" hidden>
                   {% include "components/ui/menus/rich_menu_header.html" with title=di.justificativa.titulo subtitle="Documento de justificativa" icon="folder" only %}
@@ -137,7 +137,7 @@
                               data-tooltip="Visualizar e baixar"
                               data-action-menu-trigger
                               data-action-menu-target="wizard-termos-document-menu">
-                        {% include "dev/ui_lab/partials/_cv_icon.html" with icon="folder" only %}
+                        {% include "components/ui/icons/icon.html" with icon="folder" only %}
                       </button>
                       <div class="cv-action-menu cv-action-menu--rich" id="wizard-termos-document-menu" role="menu" hidden>
                         {% include "components/ui/menus/rich_menu_header.html" with title="Termo de autorização" subtitle=t.titulo icon="folder" only %}
@@ -155,13 +155,13 @@
                           data-tooltip="Visualizar e baixar"
                           data-action-menu-trigger
                           data-action-menu-target="wizard-termos-document-menu">
-                    {% include "dev/ui_lab/partials/_cv_icon.html" with icon="folder" only %}
+                    {% include "components/ui/icons/icon.html" with icon="folder" only %}
                   </button>
                   <div class="cv-action-menu cv-action-menu--rich" id="wizard-termos-document-menu" role="menu" hidden>
                     {% include "components/ui/menus/rich_menu_header.html" with title="Termos de autorização" subtitle="Todos os servidores" icon="folder" only %}
                     <button class="cv-action-menu__item cv-action-menu__item--rich" type="button" data-open-all-termos role="menuitem">
                       <span class="cv-action-menu__item-icon cv-action-menu__item-icon--preview" aria-hidden="true">
-                        {% include "dev/ui_lab/partials/_cv_icon.html" with icon="eye" only %}
+                        {% include "components/ui/icons/icon.html" with icon="eye" only %}
                       </span>
                       <span class="cv-action-menu__item-copy"><strong>Visualizar termos</strong><small>Abrir todos os documentos disponíveis</small></span>
                     </button>
@@ -196,7 +196,7 @@
                         data-attach-signed-current-remove-url="{{ t.remover_assinado_url }}"
                         aria-label="{% if t.assinado %}Termo assinado — gerenciar{% else %}Anexar assinado{% endif %}"
                         data-tooltip="{% if t.assinado %}Assinado — clique para gerenciar{% else %}Anexar assinado{% endif %}"
-                      >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="sign" only %}</button>
+                      >{% include "components/ui/icons/icon.html" with icon="sign" only %}</button>
                     </span>
                   </span>
                 </summary>

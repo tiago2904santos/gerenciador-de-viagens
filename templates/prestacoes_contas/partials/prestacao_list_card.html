@@ -72,14 +72,14 @@
                   aria-expanded="false"
                   data-action-menu-trigger
                   data-action-menu-target="prestacao-docs-menu-{{ servidor.ps_pk }}"
-          >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="folder" only %}</button>
+          >{% include "components/ui/icons/icon.html" with icon="folder" only %}</button>
           <div class="cv-action-menu oficio-lc__action-menu oficio-lc__document-menu"
                id="prestacao-docs-menu-{{ servidor.ps_pk }}"
                role="menu"
                hidden>
             <div class="oficio-lc__action-menu-heading">
               <span class="oficio-lc__action-menu-heading-icon">
-                {% include "dev/ui_lab/partials/_cv_icon.html" with icon="download" only %}
+                {% include "components/ui/icons/icon.html" with icon="download" only %}
               </span>
               <span>
                 <strong>Baixar documentos</strong>
@@ -91,7 +91,7 @@
                download
                role="menuitem">
               <span class="oficio-lc__action-menu-item-icon oficio-lc__action-menu-item-icon--pdf">
-                {% include "dev/ui_lab/partials/_cv_icon.html" with icon="pdf" only %}
+                {% include "components/ui/icons/icon.html" with icon="pdf" only %}
               </span>
               <span><strong>Relatório técnico</strong><small>Salvar PDF individual</small></span>
             </a>
@@ -101,7 +101,7 @@
                download
                role="menuitem">
               <span class="oficio-lc__action-menu-item-icon oficio-lc__action-menu-item-icon--route">
-                {% include "dev/ui_lab/partials/_cv_icon.html" with icon="route" only %}
+                {% include "components/ui/icons/icon.html" with icon="route" only %}
               </span>
               <span><strong>Diário de bordo</strong><small>Salvar PDF do diário</small></span>
             </a>
@@ -110,7 +110,7 @@
                   role="menuitem"
                   aria-disabled="true">
               <span class="oficio-lc__action-menu-item-icon oficio-lc__action-menu-item-icon--route">
-                {% include "dev/ui_lab/partials/_cv_icon.html" with icon="route" only %}
+                {% include "components/ui/icons/icon.html" with icon="route" only %}
               </span>
               <span><strong>Diário de bordo</strong><small>Ainda não foi criado</small></span>
             </span>
@@ -146,7 +146,7 @@
               data-attach-signed-tertiary-option-label="Comprovante"
             >
               <span class="oficio-lc__action-menu-item-icon cv-action-menu__item-icon--success" aria-hidden="true">
-                {% include "dev/ui_lab/partials/_cv_icon.html" with icon="sign" only %}
+                {% include "components/ui/icons/icon.html" with icon="sign" only %}
               </span>
               <span>
                 <strong>{% if servidor.rt_assinado.assinado or servidor.diario_assinado.assinado or servidor.comprovante_anexo.assinado %}Gerenciar documentos assinados{% else %}Anexar documentos assinados{% endif %}</strong>
@@ -158,7 +158,7 @@
                download
                role="menuitem">
               <span class="oficio-lc__action-menu-item-icon oficio-lc__action-menu-item-icon--package">
-                {% include "dev/ui_lab/partials/_cv_icon.html" with icon="folder" only %}
+                {% include "components/ui/icons/icon.html" with icon="folder" only %}
               </span>
               <span><strong>Anexo completo</strong><small>Salvar PDF consolidado</small></span>
             </a>
@@ -177,11 +177,11 @@
                   data-wa-evento="{{ servidor.whatsapp_evento }}"
                   data-wa-servidor="{{ servidor.name }}"
                   data-wa-diaria="{{ servidor.whatsapp_diaria }}"
-          >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="whatsapp-modern" only %}</button>
+          >{% include "components/ui/icons/icon.html" with icon="whatsapp-modern" only %}</button>
           <div class="cv-action-menu oficio-lc__action-menu oficio-lc__wa-menu" id="diaria-wa-menu-{{ servidor.ps_pk }}" role="menu" hidden>
             <div class="oficio-lc__action-menu-heading">
               <span class="oficio-lc__action-menu-heading-icon oficio-lc__action-menu-heading-icon--wa">
-                {% include "dev/ui_lab/partials/_cv_icon.html" with icon="whatsapp-modern" only %}
+                {% include "components/ui/icons/icon.html" with icon="whatsapp-modern" only %}
               </span>
               <span>
                 <strong>Aviso de liberação</strong>
@@ -190,19 +190,19 @@
             </div>
             <button type="button" class="cv-action-menu__item oficio-lc__action-menu-item oficio-lc__action-menu-item--wa" role="menuitem" data-diaria-wa-send data-wa-app="normal">
               <span class="oficio-lc__action-menu-item-icon oficio-lc__action-menu-item-icon--wa">
-                {% include "dev/ui_lab/partials/_cv_icon.html" with icon="whatsapp-modern" only %}
+                {% include "components/ui/icons/icon.html" with icon="whatsapp-modern" only %}
               </span>
               <span><strong>WhatsApp</strong><small>Abrir no aplicativo pessoal</small></span>
             </button>
             <button type="button" class="cv-action-menu__item oficio-lc__action-menu-item oficio-lc__action-menu-item--wa" role="menuitem" data-diaria-wa-send data-wa-app="business">
               <span class="oficio-lc__action-menu-item-icon oficio-lc__action-menu-item-icon--business">
-                {% include "dev/ui_lab/partials/_cv_icon.html" with icon="whatsapp-business" only %}
+                {% include "components/ui/icons/icon.html" with icon="whatsapp-business" only %}
               </span>
               <span><strong>WhatsApp Business</strong><small>Abrir no aplicativo profissional</small></span>
             </button>
             <button type="button" class="cv-action-menu__item oficio-lc__action-menu-item" role="menuitem" data-diaria-wa-copy>
               <span class="oficio-lc__action-menu-item-icon oficio-lc__action-menu-item-icon--copy">
-                {% include "dev/ui_lab/partials/_cv_icon.html" with icon="copy-modern" only %}
+                {% include "components/ui/icons/icon.html" with icon="copy-modern" only %}
               </span>
               <span><strong>Copiar mensagem</strong><small>Copiar o texto para a área de transferência</small></span>
             </button>
@@ -288,7 +288,7 @@
             data-attach-signed-current-name="{{ card.despacho_assinado.nome_original }}"
             data-attach-signed-current-view-url="{{ card.despacho_assinado.view_url }}"
             data-attach-signed-current-remove-url="{{ card.despacho_assinado.remover_url }}"
-          >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="sign" only %}</button>
+          >{% include "components/ui/icons/icon.html" with icon="sign" only %}</button>
         </div>
 
         <div class="oficio-lc__footer-actions-manage cv-icon-btn-group">
@@ -296,9 +296,9 @@
             {% csrf_token %}
             <input type="hidden" name="next" value="{{ current_url }}">
             {% if card.finalizada %}
-            <button type="submit" class="cv-icon-btn cv-icon-btn--edit" aria-label="Reabrir prestação" data-tooltip="Reabrir prestação">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="arrow-left" only %}</button>
+            <button type="submit" class="cv-icon-btn cv-icon-btn--edit" aria-label="Reabrir prestação" data-tooltip="Reabrir prestação">{% include "components/ui/icons/icon.html" with icon="arrow-left" only %}</button>
             {% else %}
-            <button type="submit" class="cv-icon-btn cv-icon-btn--complete" aria-label="Finalizar prestação" data-tooltip="Finalizar prestação">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="check" only %}</button>
+            <button type="submit" class="cv-icon-btn cv-icon-btn--complete" aria-label="Finalizar prestação" data-tooltip="Finalizar prestação">{% include "components/ui/icons/icon.html" with icon="check" only %}</button>
             {% endif %}
           </form>
 
@@ -306,9 +306,9 @@
             {% csrf_token %}
             <input type="hidden" name="next" value="{{ current_url }}">
             {% if card.arquivada %}
-            <button type="submit" class="cv-icon-btn cv-icon-btn--edit" aria-label="Desarquivar prestação" data-tooltip="Desarquivar prestação">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="unarchive" only %}</button>
+            <button type="submit" class="cv-icon-btn cv-icon-btn--edit" aria-label="Desarquivar prestação" data-tooltip="Desarquivar prestação">{% include "components/ui/icons/icon.html" with icon="unarchive" only %}</button>
             {% else %}
-            <button type="submit" class="cv-icon-btn cv-icon-btn--archive" aria-label="Arquivar prestação" data-tooltip="Arquivar prestação">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="archive" only %}</button>
+            <button type="submit" class="cv-icon-btn cv-icon-btn--archive" aria-label="Arquivar prestação" data-tooltip="Arquivar prestação">{% include "components/ui/icons/icon.html" with icon="archive" only %}</button>
             {% endif %}
           </form>
         </div>

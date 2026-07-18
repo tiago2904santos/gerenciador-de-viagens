@@ -19,11 +19,11 @@
      {% if data_confirm_action_url %}data-confirm-action-trigger data-confirm-action-url="{{ data_confirm_action_url }}"{% if data_confirm_action_label_text %} data-confirm-action-label-text="{{ data_confirm_action_label_text }}"{% endif %}{% endif %}
   >
     {% if icon and not icon_after %}
-      <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon=icon only %}</span>
+      <span class="cv-btn__icon" aria-hidden="true">{% include "components/ui/icons/icon.html" with icon=icon only %}</span>
     {% endif %}
     <span>{{ label }}</span>
     {% if icon and icon_after %}
-      <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon=icon only %}</span>
+      <span class="cv-btn__icon" aria-hidden="true">{% include "components/ui/icons/icon.html" with icon=icon only %}</span>
     {% endif %}
   </a>
 {% else %}
@@ -46,11 +46,11 @@
      {% if data_confirm_action_url %}data-confirm-action-trigger data-confirm-action-url="{{ data_confirm_action_url }}"{% if data_confirm_action_label_text %} data-confirm-action-label-text="{{ data_confirm_action_label_text }}"{% endif %}{% endif %}
   >
     {% if icon and not icon_after %}
-      <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon=icon only %}</span>
+      <span class="cv-btn__icon" aria-hidden="true">{% include "components/ui/icons/icon.html" with icon=icon only %}</span>
     {% endif %}
     <span>{{ label }}</span>
     {% if icon and icon_after %}
-      <span class="cv-btn__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon=icon only %}</span>
+      <span class="cv-btn__icon" aria-hidden="true">{% include "components/ui/icons/icon.html" with icon=icon only %}</span>
     {% endif %}
   </button>
 {% endif %}

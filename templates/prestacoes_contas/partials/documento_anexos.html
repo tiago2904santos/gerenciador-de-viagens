@@ -13,14 +13,14 @@
              rel="noopener noreferrer"
              aria-label="Visualizar arquivo"
              data-tooltip="Visualizar">
-            {% include "dev/ui_lab/partials/_cv_icon.html" with icon="eye" only %}
+            {% include "components/ui/icons/icon.html" with icon="eye" only %}
           </a>
           <button class="cv-icon-btn cv-icon-btn--delete prestacao-file-widget__action"
                   type="button"
                   aria-label="Excluir arquivo"
                   data-tooltip="Excluir"
                   data-file-delete-url="{{ anexo.delete_url }}">
-            {% include "dev/ui_lab/partials/_cv_icon.html" with icon="delete" only %}
+            {% include "components/ui/icons/icon.html" with icon="delete" only %}
           </button>
         </div>
       </li>
