@@ -1,8 +1,8 @@
 {# form_section.html — ver docs/ui-components.md #}
-<section class="form-section{% if extra_class %} {{ extra_class }}{% endif %}"{% if section_id %} aria-labelledby="{{ section_id }}"{% endif %}>
-  <header class="section-header">
-    <div class="section-header__copy">
-      <h2 class="section-header__title"{% if section_id %} id="{{ section_id }}"{% endif %}>{{ title }}</h2>
-      {% if description %}<p class="section-header__description">{{ description }}</p>{% endif %}
+<section class="form-section cv-form-block{% if extra_class %} {{ extra_class }}{% endif %}"{% if section_id %} aria-labelledby="{{ section_id }}"{% endif %}>
+  <header class="section-header cv-form-block__header">
+    <div class="section-header__copy cv-form-block__copy">
+      <h2 class="section-header__title cv-form-block__title"{% if section_id %} id="{{ section_id }}"{% endif %}>{{ title }}</h2>
+      {% if description %}<p class="section-header__description cv-form-block__description">{{ description }}</p>{% endif %}
     </div>
   </header>

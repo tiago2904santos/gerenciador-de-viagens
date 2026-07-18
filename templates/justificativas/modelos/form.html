@@ -6,7 +6,7 @@
   <div class="page-shell page-shell--standard-simple">
     {% include "components/ui/headers/header_stack_simple.html" with eyebrow="OFÍCIOS" title=page_title description=page_description icon_label="JT" module_label="Justificativas" only %}
 
-    <form class="main-form-panel" method="post" novalidate>
+    <form class="main-form-panel cv-form-card" method="post" novalidate>
       {% csrf_token %}
       {% if form.is_padrao.value %}
         <input type="hidden" name="{{ form.is_padrao.html_name }}" value="on">

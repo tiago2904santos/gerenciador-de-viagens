@@ -1,38 +1,31 @@
-{# Card 4 — Motorista (aparece quando viatura selecionada + sem driver na equipe) #}
+{# Seção de motorista externo: irmã de Equipe e Transporte. #}
 <section
-  class="cv-wizard-section-card oficio-reveal-panel{% if show_motorista_card %} is-open{% endif %}{% if not show_motorista_card %} form-field--hidden{% endif %}"
+  class="cv-form-block cv-form-block--resource oficio-external-driver{% if show_motorista_card %} is-open{% else %} form-field--hidden{% endif %}"
   aria-labelledby="oficio-wizard-motorista-title"
   data-oficio-driver-external-card
   {% if not show_motorista_card %}hidden{% endif %}
 >
-  <header class="cv-wizard-section-header">
-    <div class="cv-wizard-section-header__copy">
-      <h3 class="cv-wizard-section-title" id="oficio-wizard-motorista-title">Motorista</h3>
+  <header class="cv-form-block__header">
+    <div class="cv-form-block__copy">
+      <h4 class="cv-form-block__title" id="oficio-wizard-motorista-title">Motorista</h4>
+      <p class="cv-form-block__description">Condutor da viatura</p>
     </div>
-    <div class="cv-wizard-section-header__actions">
+    <div class="cv-form-block__actions">
       {% include "oficios/partials/_motorista_modo_toggle.html" with modo_atual=transporte_form.motorista_modo.value only %}
     </div>
   </header>
 
-  <div class="cv-wizard-section-body">
+  <div class="cv-form-block__body oficio-external-driver__body">
     {{ transporte_form.motorista_modo }}
 
-    {# ── Modo SERVIDOR: busca no sistema ────────────────────────── #}
-    <div data-oficio-motorista-servidor>
-      <div class="field app-form-field cv-field">
-        <label class="app-form-label cv-field__label" for="{{ transporte_form.motorista.id_for_label }}">
-          Nome do motorista
-        </label>
-        {{ motorista_compact_widget }}
-      </div>
+    <div class="oficio-external-driver__identity" data-oficio-motorista-servidor>
+      <label class="sr-only" for="{{ transporte_form.motorista.id_for_label }}">Buscar motorista no sistema</label>
+      {{ motorista_compact_widget }}
     </div>
 
-    {# ── Modo MANUAL: input livre ─────────────────────────────── #}
-    <div data-oficio-motorista-manual>
-      <div class="field app-form-field">
-        <label class="app-form-label" for="{{ transporte_form.motorista_manual_nome.id_for_label }}">
-          Nome do motorista
-        </label>
+    <div class="oficio-external-driver__identity" data-oficio-motorista-manual>
+      <div class="field app-form-field cv-field">
+        <label class="sr-only" for="{{ transporte_form.motorista_manual_nome.id_for_label }}">Nome completo</label>
         {{ transporte_form.motorista_manual_nome }}
         {% if transporte_form.motorista_manual_nome.errors %}
           {% include "components/ui/feedback/field_error.html" with errors=transporte_form.motorista_manual_nome.errors only %}
@@ -40,17 +33,15 @@
       </div>
     </div>
 
-    {# ── Ofício de referência do motorista ────────────────────── #}
-    <div class="field-grid" data-oficio-motorista-extras>
-      <div class="field field-size-2">
-        {% include "components/forms/oficio_motorista_split_field.html" with field=transporte_form.motorista_oficio_referencia label="Nº do ofício do motorista" ano=motorista_oficio_ano numero_inicial=motorista_oficio_numero_inicial only %}
+    <div class="oficio-external-driver__reference" data-oficio-motorista-extras>
+      <div class="oficio-external-driver__reference-copy">
+        <strong>Ofício de origem</strong>
+        <span>Identifique o documento que autorizou este motorista.</span>
       </div>
-      <div class="field field-size-2">
-        {% include "components/forms/form_field.html" with field=transporte_form.motorista_protocolo_ref label="Protocolo do ofício do motorista" only %}
+      <div class="oficio-external-driver__reference-fields">
+        {% include "components/forms/oficio_motorista_split_field.html" with field=transporte_form.motorista_oficio_referencia label="N° do Ofício" ano=motorista_oficio_ano numero_inicial=motorista_oficio_numero_inicial only %}
+        {% include "components/forms/form_field.html" with field=transporte_form.motorista_protocolo_ref label="Protocolo" only %}
       </div>
     </div>
-  </div>
-  <div data-oficio-motorista-footer{% if not show_motorista_card %} hidden{% endif %}>
-    {% include "components/ui/layouts/card_footer_section.html" with primary_label="Avançar" primary_action="wizard_next" only %}
   </div>
 </section>

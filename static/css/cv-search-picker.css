@@ -498,6 +498,13 @@
   white-space: nowrap;
 }
 
+/* Estrutura enriquecida usada pelo tema escuro. Mantida oculta na base para
+   não iniciar o redesign do tema claro nesta etapa. */
+.cv-search-picker__option-visual,
+.cv-search-picker__option-status {
+  display: none;
+}
+
 .cv-search-picker__empty,
 .cv-search-picker__selected-empty {
   background: var(--field-bg-soft);
@@ -726,6 +733,39 @@
   transform: translateY(0);
 }
 
+/* Estrutura compartilhada do roster: o card seleciona o motorista, enquanto
+   termo e remoção continuam como ações independentes acima da área clicável. */
+.cv-search-picker--roster .cv-search-picker__selected-card {
+  position: relative;
+}
+
+.cv-search-picker--roster .cv-search-picker__driver-surface {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  inset: 0;
+  padding: 0;
+  position: absolute;
+  width: 100%;
+  z-index: 1;
+}
+
+.cv-search-picker--roster :is(.cv-search-picker__selected-avatar, .cv-search-picker__selected-main) {
+  pointer-events: none;
+  position: relative;
+  z-index: 2;
+}
+
+.cv-search-picker--roster .cv-search-picker__selected-actions {
+  position: relative;
+  z-index: 3;
+}
+
+.cv-search-picker--roster .cv-search-picker__driver-control {
+  display: none;
+}
+
 .cv-search-picker__driver-toggle {
   align-items: center;
   appearance: none;
@@ -851,12 +891,15 @@
 }
 
 @media (max-width: 720px) {
-  .cv-search-picker--compact .cv-search-picker__selected-list {
+  .cv-search-picker--compact .cv-search-picker__selected-list,
+  .cv-search-picker--detailed .cv-search-picker__selected-list {
     grid-template-columns: 1fr;
   }
 
   .cv-search-picker--compact .cv-search-picker__selected-card:only-child,
-  .cv-search-picker--compact .cv-search-picker__selected-card:last-child:nth-child(odd) {
+  .cv-search-picker--compact .cv-search-picker__selected-card:last-child:nth-child(odd),
+  .cv-search-picker--detailed .cv-search-picker__selected-card:only-child,
+  .cv-search-picker--detailed .cv-search-picker__selected-card:last-child:nth-child(odd) {
     grid-column: auto;
   }
 

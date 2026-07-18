@@ -1,0 +1,13 @@
+{% include "components/forms/input_with_action.html" with field=form.modelo_motivo label="Modelo de motivo" action_url=modelos_motivo_url action_label="Gerenciar modelos" only %}
+{% if not tem_modelos_motivo %}
+  <div class="field">
+    <p class="field-help">Nenhum modelo cadastrado. <a href="{{ modelos_motivo_url }}">Abrir gerenciamento de modelos</a></p>
+  </div>
+{% endif %}
+<div class="field app-form-field cv-field oficio-motivo-field oficio-reveal-panel is-open" data-oficio-custeio-observacao-panel>
+  <label class="sr-only" for="{{ form.motivo.id_for_label }}">Descrição</label>
+  {{ form.motivo }}
+  {% if form.motivo.errors %}
+    {% include "components/ui/feedback/field_error.html" with errors=form.motivo.errors only %}
+  {% endif %}
+</div>

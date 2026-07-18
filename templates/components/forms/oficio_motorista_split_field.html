@@ -2,27 +2,28 @@
 Campo enviado ao servidor: hidden name=motorista_oficio_referencia (NUMERO/ANO).
 Input visível: apenas dígitos do número (até 3).
 {% endcomment %}
-<div class="field app-form-field">
-  <label class="app-form-label" for="{{ field.id_for_label }}_numero">{{ label }}</label>
+<div class="field app-form-field cv-field cv-composite-field oficio-motorista-numero-field">
+  <label class="app-form-label cv-field__label" for="{{ field.id_for_label }}_numero">{{ label }}</label>
   <div
-    class="app-input-addon"
+    class="cv-composite-field__control"
     data-oficio-motorista-addon
     data-oficio-ano="{{ ano }}"
     data-mask-year="{{ ano }}"
   >
     {{ field.as_widget }}
     <input
-      type="text"
+      type="number"
       id="{{ field.id_for_label }}_numero"
-      class="form-control app-input-addon__control"
-      maxlength="3"
+      class="form-control"
+      min="1"
+      max="999"
       inputmode="numeric"
       autocomplete="off"
       value="{{ numero_inicial }}"
       data-oficio-motorista-number
       aria-label="{{ label }} — só o número"
     />
-    <span class="app-input-addon__suffix">/{{ ano }}</span>
+    <span class="cv-composite-field__suffix">/ {{ ano }}</span>
   </div>
   {% if field.errors %}<p class="field-error">{{ field.errors|striptags }}</p>{% endif %}
 </div>

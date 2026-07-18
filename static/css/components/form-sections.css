@@ -1,0 +1,133 @@
+/* ========================================================================
+   Canonical form composition
+
+   These classes describe reusable layout contracts. Page modules may add
+   data-* hooks for business behaviour, but should not duplicate this visual
+   structure with module-prefixed selectors.
+   ======================================================================== */
+
+.cv-form-card > .cv-wizard-section-body,
+.cv-form-card__body {
+  display: grid;
+  gap: 10px;
+}
+
+.cv-form-block {
+  align-items: start;
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+}
+
+.cv-form-block__header {
+  align-items: baseline;
+  display: flex;
+  gap: var(--space-3);
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.cv-form-block__copy {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.cv-form-block:not(.cv-form-block--split):not(.cv-form-block--resource) >
+  .cv-form-block__header .cv-form-block__copy {
+  align-items: baseline;
+  display: flex;
+  gap: var(--space-3);
+  justify-content: space-between;
+  width: 100%;
+}
+
+.cv-form-block__title,
+.cv-form-block__description {
+  margin: 0;
+}
+
+.cv-form-block__body {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.cv-form-block__actions {
+  align-items: center;
+  display: flex;
+  flex-shrink: 0;
+  gap: var(--space-2);
+}
+
+.cv-form-block--split {
+  align-items: end;
+  grid-template-columns: minmax(160px, 0.7fr) minmax(0, 2fr);
+}
+
+.cv-form-block--split > .cv-form-block__header {
+  align-self: center;
+  display: grid;
+  gap: 3px;
+  justify-content: start;
+}
+
+.cv-form-block--split > .cv-form-block__body {
+  align-self: end;
+}
+
+.cv-form-stack {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.cv-composite-field__control {
+  align-items: stretch;
+  display: grid;
+  gap: 0;
+  grid-template-columns: minmax(0, 1fr) auto;
+  overflow: hidden;
+}
+
+.cv-composite-field__control > .form-control {
+  min-width: 0;
+}
+
+.cv-composite-field__suffix {
+  align-items: center;
+  display: inline-flex;
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .cv-form-block--split {
+    align-items: stretch;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cv-form-block--split > .cv-form-block__header {
+    align-items: baseline;
+    display: flex;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 620px) {
+  .cv-form-block:not(.cv-form-block--split):not(.cv-form-block--resource) >
+    .cv-form-block__header .cv-form-block__copy {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .cv-form-block__header,
+  .cv-form-block--split > .cv-form-block__header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .cv-form-block__actions {
+    width: 100%;
+  }
+}

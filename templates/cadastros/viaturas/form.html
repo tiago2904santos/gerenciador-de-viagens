@@ -10,37 +10,22 @@
         <form method="post" novalidate data-viatura-form>
           {% csrf_token %}
           {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
-          <section class="cv-wizard-section-card" aria-labelledby="viaturas-form-card-title">
+          <section class="cv-wizard-section-card cv-form-card" aria-labelledby="viaturas-form-card-title">
             <header class="cv-wizard-section-header">
               <div class="cv-wizard-section-header__copy">
                 <h3 class="cv-wizard-section-title" id="viaturas-form-card-title">Dados da viatura</h3>
               </div>
             </header>
 
-            <div class="cv-wizard-section-body cv-wizard-section-body--sections">
-              <section class="wizard-inner-section">
-                <div class="field-grid field-grid--cols-4">
-                  {% include "components/forms/form_field.html" with field=form.placa size_class="field-size-1" only %}
-                  {% include "components/forms/form_field.html" with field=form.modelo size_class="field-size-1" only %}
-                  {% include "components/forms/form_field.html" with field=form.tipo size_class="field-size-1" only %}
-                  {% include "components/forms/input_with_action.html" with field=form.combustivel action_url=combustiveis_manage_url action_label="Gerenciar combustíveis" size_class="field-size-1" only %}
-                </div>
-              </section>
-
-              <section class="wizard-inner-section">
-                <div class="field-grid">
-                  {% include "components/forms/form_field.html" with field=form.unidade action_url=unidades_manage_url action_label="Gerenciar unidades" size_class="field-size-4" only %}
-                </div>
-              </section>
-
-              <section class="wizard-inner-section">
-                <div class="field-grid">
-                  {% include "components/forms/form_field.html" with field=form.motoristas action_url=servidores_manage_url action_label="Gerenciar servidores" size_class="field-size-4" only %}
-                </div>
-              </section>
+            <div class="cv-wizard-section-body">
+              {% include "components/ui/forms/form_block.html" with title="Identificação" description="Placa, modelo, tipo e combustível" section_id="viaturas-identificacao-title" body_template="cadastros/viaturas/partials/_identity_fields.html" %}
+              {% include "components/ui/forms/form_block.html" with title="Lotação" description="Unidade responsável pela viatura" section_id="viaturas-lotacao-title" body_template="cadastros/viaturas/partials/_assignment_fields.html" %}
+              {% include "components/ui/forms/form_block.html" with title="Motoristas" description="Servidores autorizados a conduzir" section_id="viaturas-motoristas-title" variant="resource" body_template="cadastros/viaturas/partials/_drivers_fields.html" %}
             </div>
 
-            {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar" secondary_url=back_url primary_label="Salvar" only %}
+            <div class="cv-form-card__footer">
+              {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar" secondary_url=back_url primary_label="Salvar" only %}
+            </div>
           </section>
         </form>
       </div>

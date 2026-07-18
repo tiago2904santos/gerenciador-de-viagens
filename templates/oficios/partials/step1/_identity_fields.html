@@ -1,0 +1,21 @@
+<div class="field-grid field-grid--cols-3 oficio-step1-identification-grid">
+  <div class="field app-form-field cv-field cv-composite-field">
+    <label class="app-form-label cv-field__label" for="{{ form.numero.id_for_label }}">N° do Ofício</label>
+    <div class="cv-composite-field__control">
+      {{ form.numero }}
+      {% if oficio_numero_ano_hint %}<span class="cv-composite-field__suffix">{{ oficio_numero_ano_hint }}</span>{% endif %}
+    </div>
+    {% if form.numero.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.numero.errors only %}{% endif %}
+  </div>
+  {% include "components/forms/form_field.html" with field=form.protocolo label="Protocolo" only %}
+  {% include "components/forms/form_field.html" with field=form.custeio label="Custeio" only %}
+  <div
+    class="field field-size-4{% if not mostrar_custeio_observacao %} form-field--hidden{% else %} is-open{% endif %}"
+    data-custeio-observacao-wrapper
+    data-oficio-instituicao-field
+    data-oficio-custeio-outra-value="{{ outra_instituicao_custeio_value|default:'OUTRA_INSTITUICAO' }}"
+    {% if not mostrar_custeio_observacao %}hidden{% endif %}
+  >
+    {% include "components/forms/form_field.html" with field=form.custeio_observacao label="Nome da Instituição" only %}
+  </div>
+</div>

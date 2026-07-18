@@ -6,7 +6,7 @@
   <div class="page-shell page-shell--standard-simple">
     {% include "components/ui/headers/header_stack_simple.html" with eyebrow="PLANOS DE TRABALHO" title=page_title description=page_description icon_label="PT" module_label="Atividades" only %}
 
-    <form class="main-form-panel" method="post" novalidate>
+    <form class="main-form-panel cv-form-card" method="post" novalidate>
       {% csrf_token %}
       {% include "components/ui/layouts/form_section.html" with title="Dados da atividade" description="Código e nome identificam a atividade; a meta é obrigatória e o recurso é opcional." section_id="pt-atividade-form-section" only %}
       <div class="field-grid">

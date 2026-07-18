@@ -4,7 +4,7 @@
   <div class="page-shell page-shell--standard-simple">
     {% include "components/ui/headers/header_stack_simple.html" with eyebrow="CADASTROS" title=page_title description=page_description icon_label="CB" module_label="Cadastros" only %}
 
-    <form class="main-form-panel main-form-panel--quick-add" method="post" novalidate>
+    <form class="main-form-panel main-form-panel--quick-add cv-form-card" method="post" novalidate>
       {% csrf_token %}
       {% include "components/forms/quick_add_shell.html" with eyebrow="CADASTROS" title="Dados do combustível" description="Nome único. Opcionalmente marque o padrão para novas viaturas." section_id="combustiveis-form-section" body_template="cadastros/combustiveis/partials/_quick_add_fields.html" form=form only %}
       {% include "components/ui/buttons/floating_primary_action.html" with label=submit_label icon=submit_icon|default:"plus" type="submit" only %}

@@ -60,6 +60,8 @@
     var self   = this;
     var native = this.native;
 
+    this.root.classList.add('cv-custom-select--v2');
+
     // 1. Ocultar native select (mantido no DOM para form submit)
     native.classList.add('cv-custom-select__native');
     native.setAttribute('aria-hidden', 'true');
@@ -80,7 +82,7 @@
     var trigger = document.createElement('button');
     trigger.type = 'button';
     trigger.id   = triggerId;
-    trigger.className = 'cv-custom-select__trigger';
+    trigger.className = 'cv-custom-select__trigger cv-custom-select__trigger--v2';
     trigger.setAttribute('role', 'combobox');
     trigger.setAttribute('aria-haspopup', 'listbox');
     trigger.setAttribute('aria-expanded', 'false');
@@ -106,7 +108,7 @@
     // 4. Construir menu
     var menu = document.createElement('ul');
     menu.id        = this._id + '-menu';
-    menu.className = 'cv-custom-select__menu';
+    menu.className = 'cv-custom-select__menu cv-custom-select__menu--v2';
     menu.setAttribute('role', 'listbox');
     if (native.multiple) menu.setAttribute('aria-multiselectable', 'true');
     menu.hidden = true;
@@ -321,6 +323,7 @@
       this._items[this._focused].el.classList.remove('cv-custom-select__option--focused');
     }
     this._focused = -1;
+    this.trigger.removeAttribute('aria-activedescendant');
   };
 
   CustomSelect.prototype._firstFocusable = function () {
@@ -417,20 +420,11 @@
       self._syncFromNative();
     });
 
-    // Menu — hover (sync foco visual)
-    this.menu.addEventListener('mousemove', function (e) {
-      var optEl = e.target;
-      while (optEl && optEl !== self.menu) {
-        if (optEl.getAttribute('role') === 'option') break;
-        optEl = optEl.parentElement;
-      }
-      if (!optEl || optEl === self.menu) return;
-      for (var i = 0; i < self._items.length; i++) {
-        if (self._items[i].el === optEl && !self._items[i].disabled) {
-          self._setFocus(i);
-          break;
-        }
-      }
+    // O hover pertence ao ponteiro e dura somente enquanto ele estiver sobre a
+    // opção. Ao entrar no menu, removemos o foco visual criado pelo teclado;
+    // o CSS :hover assume o destaque sem deixar estado preso no JavaScript.
+    this.menu.addEventListener('mouseenter', function () {
+      self._clearFocus();
     });
 
     // Clique fora → fechar (o menu pode estar "flutuando" no body via

@@ -71,6 +71,28 @@
     return value || "";
   }
 
+  function initialsFromLabel(label) {
+    const parts = (label || "").trim().split(/\s+/).filter(Boolean);
+    return [parts[0], parts.length > 1 ? parts[parts.length - 1] : ""]
+      .filter(Boolean)
+      .map((part) => part.charAt(0))
+      .join("")
+      .slice(0, 2)
+      .toUpperCase() || "•";
+  }
+
+  function uniqueTextParts(values) {
+    const seen = new Set();
+    return values
+      .map((value) => (value || "").trim())
+      .filter((value) => {
+        const key = normalize(value);
+        if (!key || seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+  }
+
   /* ── Inicialização do picker ──────────────────────────────────── */
 
   function initPicker(select) {
@@ -80,6 +102,7 @@
     /* Configuração via data-* */
     const mode         = select.dataset.pickerMode        || "multi";   /* single | multi */
     const variant      = select.dataset.pickerVariant     || "compact"; /* compact | detailed */
+    const presentation = select.dataset.pickerPresentation || "default";
     const placeholder  = select.dataset.placeholder       || "Digite para buscar";
     const emptyMsg     = select.dataset.emptyMessage      || "Nenhum resultado encontrado.";
     const emptyPanelMsg = select.dataset.emptySelected    || "Nenhum item selecionado.";
@@ -123,6 +146,8 @@
     /* ── Construção do DOM ──────────────────────────────────────── */
 
     const root = el("div", `cv-search-picker cv-search-picker--${mode} cv-search-picker--${variant}`);
+    if (presentation !== "default") root.classList.add(`cv-search-picker--${presentation}`);
+    if (presentation === "people") root.classList.add("cv-search-picker--roster");
     if (select.disabled)   root.classList.add("cv-search-picker--disabled");
     if (isError)           root.classList.add("cv-search-picker--error");
 
@@ -131,6 +156,8 @@
 
     /* Área de busca */
     const field      = el("div",    "cv-search-picker__field");
+    const labelEl    = fieldLabel ? el("div", "cv-search-picker__label", fieldLabel) : null;
+    const hintEl     = fieldHint ? el("div", "cv-search-picker__hint", fieldHint) : null;
     const control    = el("div",    "cv-search-picker__control");
     const icon       = el("span",   "cv-search-picker__icon", "");
     const input      = el("input",  "cv-search-picker__input");
@@ -157,8 +184,8 @@
     list.setAttribute("aria-multiselectable", mode === "multi" ? "true" : "false");
     dropdown.hidden = true;
 
-    if (fieldLabel) field.appendChild(el("div", "cv-search-picker__label", fieldLabel));
-    if (fieldHint) field.appendChild(el("div", "cv-search-picker__hint", fieldHint));
+    if (labelEl) field.appendChild(labelEl);
+    if (hintEl && presentation !== "people" && presentation !== "vehicle") field.appendChild(hintEl);
     dropdown.appendChild(list);
     dropdown.appendChild(emptyEl);
     control.appendChild(icon);
@@ -170,25 +197,26 @@
 
     /* Painel de selecionados — multi sempre; single só quando detailed */
     const showPanel = mode === "multi" || variant === "detailed";
-    let panel = null, grid = null, counter = null, panelEmpty = null;
+    let panel = null, grid = null, counter = null, panelEmpty = null, panelTitleEl = null;
     if (showPanel) {
       panel      = el("section", "cv-search-picker__selected-panel");
-      const panelHeader = el("div",  "cv-search-picker__selected-header");
-      const titleEl     = el("h4",   "cv-search-picker__selected-title", panelTitle);
       grid       = el("div",  "cv-search-picker__selected-list");
       panelEmpty = el("p",    "cv-search-picker__selected-empty", emptyPanelMsg);
 
-      panelHeader.appendChild(titleEl);
-      if (mode === "multi") {
-        counter = el("span", "cv-search-picker__selected-count", "0");
-        panelHeader.appendChild(counter);
+      if (presentation !== "people" && presentation !== "vehicle") {
+        const panelHeader = el("div", "cv-search-picker__selected-header");
+        panelTitleEl = el("h4", "cv-search-picker__selected-title", panelTitle);
+        panelHeader.appendChild(panelTitleEl);
+        if (mode === "multi") {
+          counter = el("span", "cv-search-picker__selected-count", "0");
+          panelHeader.appendChild(counter);
+        }
+        panel.appendChild(panelHeader);
       }
-      panel.appendChild(panelHeader);
       panel.appendChild(grid);
       panel.appendChild(panelEmpty);
       root.appendChild(panel);
     }
-
     select.insertAdjacentElement("afterend", root);
 
     /* Campo com botão de gerenciar (field.html): o botão nasce como irmão
@@ -360,7 +388,7 @@
       if (!item || item.disabled || !item.selected) return;
       item.selected = false;
       selectedForTerm.delete(value);
-      if (driverValue === value) driverValue = "";
+      if (driverValue === value) setDriverValue("");
       syncSelect(true);
       syncTermSelect();
       render();
@@ -384,7 +412,10 @@
       const toggle = card.querySelector(".cv-search-picker__term-control .cv-field-side-action");
       if (toggle) {
         toggle.setAttribute("aria-pressed", enabled ? "true" : "false");
-        toggle.textContent = enabled ? "Gerar termo" : "Nao gerar";
+        toggle.textContent = presentation === "people"
+          ? (enabled ? "Termo: sim" : "Termo: não")
+          : (enabled ? "Gerar termo" : "Nao gerar");
+        toggle.setAttribute("aria-label", enabled ? "Não gerar termo de autorização" : "Gerar termo de autorização");
         toggle.classList.toggle("cv-field-side-action--success", enabled);
         toggle.classList.toggle("cv-field-side-action--danger", !enabled);
         toggle.classList.toggle("is-active",   enabled);
@@ -397,15 +428,36 @@
       grid.querySelectorAll(".cv-search-picker__driver-toggle").forEach((button) => {
         const active = button.dataset.value === driverValue;
         const card = button.closest(".cv-search-picker__selected-card");
+        const text = button.querySelector(".cv-search-picker__driver-text");
         button.setAttribute("aria-pressed", active ? "true" : "false");
         button.classList.toggle("cv-search-picker__driver-toggle--active", active);
-        if (card) card.classList.toggle("cv-search-picker__selected-card--driver", active);
+        if (card) {
+          card.classList.toggle("cv-search-picker__selected-card--driver", active);
+          const surface = card.querySelector(".cv-search-picker__driver-surface");
+          if (surface) {
+            surface.setAttribute("aria-pressed", active ? "true" : "false");
+            surface.setAttribute(
+              "aria-label",
+              active
+                ? `${surface.dataset.label} é o motorista`
+                : `Definir ${surface.dataset.label} como motorista`,
+            );
+          }
+        }
+        if (text && presentation === "people") {
+          text.textContent = active ? "Motorista" : "Definir motorista";
+        }
       });
     }
 
     function setDriverValue(value) {
-      driverValue = driverValue === value ? "" : value;
+      driverValue = value;
+      select.dataset.pickerDriverValue = value;
       updateDriverControls();
+      select.dispatchEvent(new CustomEvent("cv:search-picker-driver-change", {
+        bubbles: true,
+        detail: { value: value },
+      }));
     }
 
     /* ── Render: Resultados do dropdown ─────────────────────────── */
@@ -413,8 +465,28 @@
     function renderOptionItem(item, index) {
       const btn    = el("button", "cv-search-picker__option");
       const marker = el("span",   "cv-search-picker__option-marker", "");
+      const visual = el("span",   "cv-search-picker__option-visual", "");
       const body   = el("div",    "cv-search-picker__option-content");
-      const main   = el("span",   "cv-search-picker__option-main", item.main || item.label);
+      const status = el("span",   "cv-search-picker__option-status", "");
+      const isVehicle = presentation === "vehicle";
+      const isPerson = !isVehicle && (presentation === "people" || !!item.cargo || !!item.cpf || !!item.rg);
+      const primaryText = (isPerson || isVehicle) ? item.label : (item.main || item.label);
+      const main   = el("span",   "cv-search-picker__option-main", primaryText);
+      let metaText = item.meta;
+
+      if (isPerson) {
+        btn.classList.add("cv-search-picker__option--person");
+        visual.textContent = initialsFromLabel(item.label);
+        metaText = uniqueTextParts([item.cargo, item.unidade]).join(" • ") || "Servidor cadastrado";
+      } else if (isVehicle) {
+        btn.classList.add("cv-search-picker__option--vehicle");
+        visual.textContent = "V";
+        metaText = item.cargo || item.meta;
+      } else if (item.kind === "unidade") {
+        visual.textContent = "U";
+      } else {
+        visual.textContent = "•";
+      }
 
       btn.type = "button";
       btn.dataset.value = item.value;
@@ -426,16 +498,24 @@
         btn.classList.add("cv-search-picker__option--unidade");
       }
 
+      visual.setAttribute("aria-hidden", "true");
+      status.setAttribute("aria-hidden", "true");
+      status.textContent = item.selected
+        ? "Selecionado"
+        : (mode === "multi" ? "Adicionar" : "Escolher");
+
       body.appendChild(main);
       if (item.rascunho) {
         main.appendChild(el("span", "cv-chip cv-chip--warning cv-chip--compact", "Rascunho"));
       }
-      if (item.meta) {
-        body.appendChild(el("span", "cv-search-picker__option-meta", item.meta));
+      if (metaText) {
+        body.appendChild(el("span", "cv-search-picker__option-meta", metaText));
       }
 
       btn.appendChild(marker);
+      btn.appendChild(visual);
       btn.appendChild(body);
+      btn.appendChild(status);
       btn.addEventListener("mousedown", (e) => e.preventDefault());
       btn.addEventListener("click", () => selectItem(item.value));
       return btn;
@@ -466,11 +546,14 @@
       const toggle = el(
         "button",
         "cv-field-side-action cv-field-side-action--toggle cv-field-side-action--state " + stateClass,
-        enabled ? "Gerar termo" : "Nao gerar",
+        presentation === "people"
+          ? (enabled ? "Termo: sim" : "Termo: não")
+          : (enabled ? "Gerar termo" : "Nao gerar"),
       );
 
       toggle.type = "button";
       toggle.setAttribute("aria-pressed", enabled ? "true" : "false");
+      toggle.setAttribute("aria-label", enabled ? "Não gerar termo de autorização" : "Gerar termo de autorização");
 
       toggle.addEventListener("click", () => {
         const current = toggle.getAttribute("aria-pressed") === "true";
@@ -487,19 +570,38 @@
       const row = el("div", "cv-search-picker__driver-control");
       const button = el("button", "cv-search-picker__driver-toggle");
       const marker = el("span", "cv-search-picker__driver-marker", "");
-      const text = el("span", "cv-search-picker__driver-text", "Este servidor e o motorista");
+      const text = el(
+        "span",
+        "cv-search-picker__driver-text",
+        presentation === "people" ? (active ? "Motorista" : "Definir motorista") : "Este servidor e o motorista",
+      );
 
       button.type = "button";
       button.dataset.value = item.value;
       button.setAttribute("aria-pressed", active ? "true" : "false");
       button.setAttribute("aria-label", (active ? "Desmarcar " : "Marcar ") + item.label + " como motorista");
       button.classList.toggle("cv-search-picker__driver-toggle--active", active);
-      button.addEventListener("click", () => setDriverValue(item.value));
+      button.addEventListener("click", () => setDriverValue(driverValue === item.value ? "" : item.value));
 
       button.appendChild(marker);
       button.appendChild(text);
       row.appendChild(button);
       return row;
+    }
+
+    function buildDriverSurface(item) {
+      const active = driverValue === item.value;
+      const button = el("button", "cv-search-picker__driver-surface");
+      button.type = "button";
+      button.dataset.value = item.value;
+      button.dataset.label = item.label;
+      button.setAttribute("aria-pressed", active ? "true" : "false");
+      button.setAttribute(
+        "aria-label",
+        active ? `${item.label} é o motorista` : `Definir ${item.label} como motorista`,
+      );
+      button.addEventListener("click", () => setDriverValue(driverValue === item.value ? "" : item.value));
+      return button;
     }
 
     /* ── Render: Cards selecionados ─────────────────────────────── */
@@ -508,10 +610,29 @@
       const card = el("div", "cv-search-picker__selected-card");
       card.dataset.value = item.value;
 
+      if (presentation === "people" || item.cpf || item.rg) {
+        card.classList.add("cv-search-picker__selected-card--person");
+      } else if (presentation === "vehicle") {
+        card.classList.add("cv-search-picker__selected-card--vehicle");
+      }
+
       const body  = el("div", "cv-search-picker__selected-main");
       const title = el("div", "cv-search-picker__selected-title-row");
 
-      if (variant === "detailed") {
+      if (presentation === "people") {
+        const name = el("span", "cv-search-picker__selected-name", item.label);
+        title.appendChild(name);
+        if (showDriverCtrl) title.appendChild(el("span", "cv-search-picker__driver-chip", "Motorista"));
+        if (item.rascunho) title.appendChild(el("span", "cv-chip cv-chip--warning cv-chip--compact", "Rascunho"));
+        body.appendChild(title);
+
+        const infoParts = [];
+        if (item.cargo) infoParts.push(item.cargo);
+        if (item.unidade) infoParts.push(item.unidade);
+        if (infoParts.length) {
+          body.appendChild(el("span", "cv-search-picker__selected-meta", infoParts.join("  •  ")));
+        }
+      } else if (variant === "detailed") {
         /* ── Layout detalhado ──────────────────────────────────────
            Linha 1: Nome • Unidade lotada
            Linha 2: Cargo • CPF • RG (sem máscara)
@@ -553,14 +674,46 @@
         }
       }
 
-      const removeBtn = el("button", "cv-search-picker__remove", "x");
+      const removeBtn = el("button", "cv-search-picker__remove", presentation !== "default" ? "×" : "x");
       removeBtn.type = "button";
       removeBtn.setAttribute("aria-label", "Remover " + item.label);
       removeBtn.addEventListener("click", () => removeItem(item.value));
 
+      card.classList.toggle("cv-search-picker__selected-card--driver", driverValue === item.value);
+
+      if (presentation === "people") {
+        const nameParts = item.label.trim().split(/\s+/).filter(Boolean);
+        const initials = [nameParts[0], nameParts.length > 1 ? nameParts[nameParts.length - 1] : ""]
+          .filter(Boolean)
+          .map((part) => part.charAt(0))
+          .join("")
+          .slice(0, 2)
+          .toUpperCase();
+        const avatar = el("span", "cv-search-picker__selected-avatar", initials || "•");
+        const actions = el("div", "cv-search-picker__selected-actions");
+        avatar.setAttribute("aria-hidden", "true");
+        actions.setAttribute("role", "group");
+        actions.setAttribute("aria-label", "Ações de " + item.label);
+
+        if (showDriverCtrl) card.appendChild(buildDriverSurface(item));
+        card.appendChild(avatar);
+        card.appendChild(body);
+        if (showDriverCtrl) {
+          card.classList.add("cv-search-picker__selected-card--with-driver");
+          actions.appendChild(buildDriverControl(item));
+        }
+        if (showTermCtrl) {
+          card.classList.add("cv-search-picker__selected-card--with-term");
+          actions.appendChild(buildTermControl(item.value));
+          card.classList.toggle("cv-search-picker__selected-card--has-term", selectedForTerm.has(item.value));
+        }
+        actions.appendChild(removeBtn);
+        card.appendChild(actions);
+        return card;
+      }
+
       card.appendChild(body);
       card.appendChild(removeBtn);
-      card.classList.toggle("cv-search-picker__selected-card--driver", driverValue === item.value);
 
       /* Controle de Termo */
       if (showTermCtrl) {
@@ -585,6 +738,9 @@
       sel.forEach((item) => grid.appendChild(buildCard(item)));
       if (panelEmpty) panelEmpty.hidden = sel.length > 0;
       if (counter)    counter.textContent = String(sel.length);
+      if (panelTitleEl && presentation === "people") {
+        panelTitleEl.textContent = sel.length === 1 ? "1 pessoa na equipe" : `${sel.length} pessoas na equipe`;
+      }
     }
 
     /* ── Render principal ───────────────────────────────────────── */

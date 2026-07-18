@@ -10,7 +10,7 @@
         <form method="post" novalidate data-servidor-form>
           {% csrf_token %}
           {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
-          <section class="cv-wizard-section-card" aria-labelledby="servidores-form-card-title">
+          <section class="cv-wizard-section-card cv-form-card" aria-labelledby="servidores-form-card-title">
             <header class="cv-wizard-section-header">
               <div class="cv-wizard-section-header__copy">
                 <h3 class="cv-wizard-section-title" id="servidores-form-card-title">Dados do servidor</h3>
@@ -18,31 +18,12 @@
             </header>
 
             <div class="cv-wizard-section-body">
-              <section class="wizard-inner-section" aria-labelledby="servidores-form-id">
-                <div class="field-grid field-grid--cols-2">
-                  {% include "components/forms/form_field.html" with field=form.nome size_class="field-size-1" only %}
-                  {% include "components/forms/input_with_action.html" with field=form.cargo action_url=cargos_manage_url action_label="Gerenciar cargos" size_class="field-size-1" only %}
-                </div>
-
-                <div class="field-grid field-grid--cols-3">
-                  {% include "components/forms/form_field.html" with field=form.cpf size_class="field-size-1" only %}
-                  {% include "components/forms/form_field.html" with field=form.telefone size_class="field-size-1" only %}
-                  <div class="field app-form-field field-size-1 field-rg-wrap" data-rg-field-wrap>
-                    <label class="app-form-label" for="{{ form.rg.id_for_label }}">{{ form.rg.label }}</label>
-                    <div class="cv-field-row">
-                      {{ form.rg }}
-                    </div>
-                    {% if form.rg.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.rg.errors only %}{% endif %}
-                  </div>
-                </div>
-
-                <div class="field-grid">
-                  {% include "components/forms/form_field.html" with field=form.unidade action_url=unidades_manage_url action_label="Gerenciar unidades" size_class="field-size-4" only %}
-                </div>
-              </section>
+              {% include "components/ui/forms/form_block.html" with title="Identificação funcional" description="Dados pessoais, cargo e unidade de lotação" section_id="servidores-form-id" body_extra_class="cv-form-stack" body_template="cadastros/servidores/partials/_form_fields.html" %}
             </div>
 
-            {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar" secondary_url=back_url primary_label="Salvar" only %}
+            <div class="cv-form-card__footer">
+              {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar" secondary_url=back_url primary_label="Salvar" only %}
+            </div>
           </section>
         </form>
       </div>

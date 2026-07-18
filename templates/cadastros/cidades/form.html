@@ -6,7 +6,7 @@
   <div class="page-shell page-shell--standard-simple">
     {% include "components/ui/headers/header_stack_simple.html" with eyebrow="CADASTROS" title=page_title description=page_description icon_label="CI" module_label="Cadastros" only %}
 
-    <form class="main-form-panel" method="post" novalidate>
+    <form class="main-form-panel cv-form-card" method="post" novalidate>
       {% csrf_token %}
       {% include "components/ui/layouts/form_section.html" with title="Dados da cidade" description="Informe nome, estado e dados geográficos da cidade." section_id="cidades-form-section" only %}
       <div class="field-grid">

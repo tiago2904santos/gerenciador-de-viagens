@@ -10,19 +10,34 @@
       {% csrf_token %}
       <main class="main-form-panel main-form-panel--stack">
         <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
-          {% include "eventos/includes/_evento_form_sections.html" with form=form section_prefix="evento-real" only %}
+          <section class="cv-wizard-section-card cv-form-card" aria-labelledby="evento-form-title">
+            <header class="cv-wizard-section-header">
+              <div class="cv-wizard-section-header__copy">
+                <h2 class="cv-wizard-section-title" id="evento-form-title">Informações do evento</h2>
+              </div>
+            </header>
 
-          <div class="footer-actions">
-            <div class="footer-actions__secondary">
-              {% include "components/ui/buttons/button.html" with href=index_url label="Cancelar" variant="secondary" only %}
-              {% if panel_url %}
-                {% include "components/ui/buttons/button.html" with href=panel_url label="Abrir painel do evento" variant="secondary" only %}
-              {% endif %}
+            <div class="cv-wizard-section-body">
+              {% include "eventos/includes/_evento_form_sections.html" with form=form section_prefix="evento-real" only %}
             </div>
-            <div class="footer-actions__primary">
-              {% include "components/ui/buttons/button.html" with type="submit" label="Salvar evento" variant="primary" only %}
+
+            <div class="cv-form-card__footer">
+              <div class="cv-card-footer-section">
+                <div class="cv-card-footer-section__divider" aria-hidden="true"></div>
+                <footer class="cv-card-footer">
+                  <div class="cv-card-footer__secondary">
+                    {% include "components/ui/buttons/button.html" with href=index_url label="Cancelar" variant="secondary" icon="arrow-left" only %}
+                    {% if panel_url %}
+                      {% include "components/ui/buttons/button.html" with href=panel_url label="Abrir painel do evento" variant="secondary" only %}
+                    {% endif %}
+                  </div>
+                  <div class="cv-card-footer__primary">
+                    {% include "components/ui/buttons/button.html" with type="submit" label="Salvar evento" variant="primary" icon="arrow-right" icon_after=True only %}
+                  </div>
+                </footer>
+              </div>
             </div>
-          </div>
+          </section>
         </div>
       </main>
     </form>

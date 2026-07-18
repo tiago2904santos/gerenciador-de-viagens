@@ -19,10 +19,12 @@
 
   <div class="page-header-rail{% if stepper_template %} page-header-rail--stepper{% endif %}">
     {% if icon_label %}<div class="page-header-rail__marker" aria-hidden="true">{{ icon_label }}</div>{% endif %}
-    <div class="page-header-rail__content">
-      {% if module_label %}<span class="page-header-rail__eyebrow">{{ module_label }}</span>{% endif %}
-      {% if description %}<p class="page-header-rail__subtitle">{{ description }}</p>{% endif %}
-    </div>
+    {% if module_label or description %}
+      <div class="page-header-rail__content">
+        {% if module_label %}<span class="page-header-rail__eyebrow">{{ module_label }}</span>{% endif %}
+        {% if description %}<p class="page-header-rail__subtitle">{{ description }}</p>{% endif %}
+      </div>
+    {% endif %}
 
     {% if stepper_template %}
       <div class="page-header-rail__stepper">{% include stepper_template %}</div>

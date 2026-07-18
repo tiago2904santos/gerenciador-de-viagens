@@ -19,87 +19,29 @@
 
   <input type="hidden" name="transporte_embed" value="1">
   <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable" data-oficio-wizard-step1 data-oficio-driver-source>
-    {# CARD 1 — Dados principais #}
-    <section class="cv-wizard-section-card" aria-labelledby="oficio-wizard-dados-principais">
+    <section class="cv-wizard-section-card cv-form-card" aria-labelledby="oficio-wizard-dados-principais">
       <header class="cv-wizard-section-header">
         <div class="cv-wizard-section-header__copy">
-          <h3 class="cv-wizard-section-title" id="oficio-wizard-dados-principais">Dados principais</h3>
+          <h3 class="cv-wizard-section-title" id="oficio-wizard-dados-principais">Informações da viagem</h3>
         </div>
       </header>
-      <div class="cv-wizard-section-body">
-        <section class="wizard-inner-section" aria-labelledby="oficio-wizard-dados-oficio">
-          <header class="wizard-inner-section__header">
-            <h4 class="wizard-inner-section__title" id="oficio-wizard-dados-oficio">Dados do ofício</h4>
-          </header>
-          {# Linha 1: N° do Ofício (editável, sugestão automática) | Protocolo | Custeio #}
-          <div class="field-grid field-grid--cols-3">
-            <div class="field app-form-field cv-field oficio-numero-field">
-              <label class="app-form-label cv-field__label" for="{{ form.numero.id_for_label }}">N° do Ofício</label>
-              <div class="oficio-numero-field__row">
-                {{ form.numero }}
-                {% if oficio_numero_ano_hint %}<span class="oficio-numero-field__hint">{{ oficio_numero_ano_hint }}</span>{% endif %}
-              </div>
-              {% if form.numero.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.numero.errors only %}{% endif %}
-            </div>
-            {% include "components/forms/form_field.html" with field=form.protocolo label="Protocolo" only %}
-            {% include "components/forms/form_field.html" with field=form.custeio label="Custeio" only %}
-            {# Linha 2: Nome da Instituição — somente quando custeio = Outra instituição #}
-            <div
-              class="field field-size-4{% if not mostrar_custeio_observacao %} form-field--hidden{% else %} is-open{% endif %}"
-              data-custeio-observacao-wrapper
-              data-oficio-instituicao-field
-              data-oficio-custeio-outra-value="{{ outra_instituicao_custeio_value|default:'OUTRA_INSTITUICAO' }}"
-              {% if not mostrar_custeio_observacao %}hidden{% endif %}
-            >
-              {% include "components/forms/form_field.html" with field=form.custeio_observacao label="Nome da Instituição" only %}
-            </div>
-          </div>
-        </section>
 
-        <section class="wizard-inner-section" aria-labelledby="oficio-wizard-motivo">
-          <header class="wizard-inner-section__header">
-            <h4 class="wizard-inner-section__title" id="oficio-wizard-motivo">Motivo</h4>
-          </header>
-          <div class="field-grid">
-            {% include "components/forms/input_with_action.html" with field=form.modelo_motivo action_url=modelos_motivo_url action_label="Gerenciar modelos" size_class="field-size-4" only %}
-            {% if not tem_modelos_motivo %}
-              <div class="field field-size-4">
-                <p class="field-help">Nenhum modelo cadastrado. <a href="{{ modelos_motivo_url }}">Abrir gerenciamento de modelos</a></p>
-              </div>
-            {% endif %}
-            <div class="field field-size-4 app-form-field cv-field oficio-motivo-field oficio-reveal-panel is-open" data-oficio-custeio-observacao-panel>
-              <label class="cv-field__label" for="{{ form.motivo.id_for_label }}">Motivo</label>
-              {{ form.motivo }}
-              {% if form.motivo.errors %}
-                {% include "components/ui/feedback/field_error.html" with errors=form.motivo.errors only %}
-              {% endif %}
-            </div>
-          </div>
-        </section>
+      <div class="cv-wizard-section-body">
+        {% include "components/ui/forms/form_block.html" with title="Identificação" description="Número, protocolo e custeio" section_id="oficio-step1-identity-title" variant="split" body_template="oficios/partials/step1/_identity_fields.html" %}
+
+        {% include "components/ui/forms/form_block.html" with title="Finalidade" description="Motivo e descrição da viagem" section_id="oficio-step1-purpose-title" body_extra_class="cv-form-stack" body_template="oficios/partials/step1/_purpose_fields.html" %}
+
+        {% include "components/ui/forms/form_block.html" with title="Equipe" description="Viajantes e motorista" section_id="oficio-wizard-equipe-title" variant="resource" action_label="Novo viajante" action_url=servidor_create_url action_autosave=True body_template="oficios/partials/step1/_team_fields.html" %}
+
+        {% include "components/ui/forms/form_block.html" with title="Transporte" description="Viatura utilizada" section_id="oficio-wizard-viatura-title" variant="resource" action_label="Nova viatura" action_url=viatura_create_url action_autosave=True data_hook="oficio-viatura-card" body_template="oficios/partials/step1/_transport_fields.html" %}
+
+        {% include "oficios/partials/wizard_dados_card_motorista_externo.html" %}
+      </div>
+
+      <div class="cv-form-card__footer" data-oficio-viatura-footer>
+        {% include "components/ui/layouts/card_footer_section.html" with primary_label="Avançar" primary_action="wizard_next" only %}
       </div>
     </section>
-
-    {# CARD 2 — Equipe e motorista #}
-    <section class="cv-wizard-section-card" aria-labelledby="oficio-wizard-equipe-title">
-      <header class="cv-wizard-section-header">
-        <div class="cv-wizard-section-header__copy">
-          <h3 class="cv-wizard-section-title" id="oficio-wizard-equipe-title">Equipe do ofício e motorista</h3>
-        </div>
-        <div class="cv-wizard-section-header__actions">
-          {% include "components/buttons/action_button.html" with href=servidor_create_url label="Cadastrar novo viajante" variant="secondary" data_autosave_link=True only %}
-        </div>
-      </header>
-      <div class="cv-wizard-section-body">
-        <input type="hidden" name="servidores_termo_autorizacao_present" value="1">
-        {% include "components/forms/form_field.html" with field=form.servidores only %}
-        <div hidden aria-hidden="true">
-          {{ form.servidores_termo_autorizacao }}
-        </div>
-      </div>
-    </section>
-
-    {% include "oficios/partials/wizard_dados_card_viatura.html" %}
-    {% include "oficios/partials/wizard_dados_card_motorista_externo.html" %}
   </div>
 {% endblock %}
 
@@ -107,6 +49,6 @@
   {{ block.super }}
   <script src="{% static 'js/pages/oficios-dados-viajantes.js' %}?v=20260527d" defer></script>
   <script src="{% static 'js/pages/oficios-transporte.js' %}?v=20260512" defer></script>
-  <script src="{% static 'js/pages/oficios-wizard-driver-state.js' %}?v=20260608" defer></script>
+  <script src="{% static 'js/pages/oficios-wizard-driver-state.js' %}?v=20260718-driver-contract-v2" defer></script>
   <script src="{% static 'js/pages/oficios-viatura-sugestoes.js' %}?v=20260527c" defer></script>
 {% endblock %}

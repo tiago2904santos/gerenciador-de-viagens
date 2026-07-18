@@ -1,0 +1,37 @@
+{% comment %}
+  Canonical internal form block.
+
+  Variants:
+  - default: stacked header and body
+  - split: contextual copy beside the fields
+  - resource: entity/resource picker with an optional header action
+
+  Business behaviour belongs to data-* hooks supplied through extra_class or
+  to the included body template; this component owns only shared structure.
+{% endcomment %}
+<section
+  class="cv-form-block{% if variant %} cv-form-block--{{ variant }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
+  {% if section_id %}aria-labelledby="{{ section_id }}"{% endif %}
+  {% if data_hook %}data-{{ data_hook }}{% endif %}
+>
+  <header class="cv-form-block__header">
+    <div class="cv-form-block__copy">
+      <h4 class="cv-form-block__title"{% if section_id %} id="{{ section_id }}"{% endif %}>{{ title }}</h4>
+      {% if description %}<p class="cv-form-block__description">{{ description }}</p>{% endif %}
+    </div>
+
+    {% if action_label or actions_template %}
+      <div class="cv-form-block__actions">
+        {% if actions_template %}
+          {% include actions_template %}
+        {% else %}
+          {% include "components/buttons/action_button.html" with href=action_url label=action_label variant=action_variant|default:"secondary" data_autosave_link=action_autosave only %}
+        {% endif %}
+      </div>
+    {% endif %}
+  </header>
+
+  <div class="cv-form-block__body{% if body_extra_class %} {{ body_extra_class }}{% endif %}">
+    {% if body_template %}{% include body_template %}{% endif %}
+  </div>
+</section>

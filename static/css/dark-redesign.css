@@ -98,7 +98,8 @@ html[data-theme="light-dark"] {
   --shadow-soft: 0 10px 24px rgba(0, 0, 0, 0.3);
   --shadow-panel: 0 18px 44px rgba(0, 0, 0, 0.42);
   --shadow-elevated: 0 26px 70px rgba(0, 0, 0, 0.55);
-  --focus-ring: 0 0 0 3px rgba(216, 162, 27, 0.22);
+  /* O foco escuro orienta pela borda, sem halo luminoso ao redor do controle. */
+  --focus-ring: none;
   --transition-fast: 120ms cubic-bezier(.2, .8, .2, 1);
   --transition-base: 170ms cubic-bezier(.2, .8, .2, 1);
   --transition-slow: 240ms cubic-bezier(.2, .8, .2, 1);
@@ -115,6 +116,9 @@ html[data-theme="light-dark"] {
   --cv-field-color: var(--color-input-text);
   --cv-field-border: 1px solid var(--color-input-border);
   --cv-field-focus-ring: var(--focus-ring);
+  --cv-field-shadow-focus: none;
+  --cv-select-focus-ring: none;
+  --cv-select-focus-shadow: none;
   --cv-card-bg: var(--color-surface);
   --cv-card-border: 1px solid var(--color-border);
   --cv-card-shadow: var(--shadow-card);
@@ -184,9 +188,9 @@ html[data-theme="light-dark"] {
   --stepper-idle-bg: var(--color-surface-muted);
   --stepper-idle-border: var(--color-border-strong);
   --stepper-idle-color: var(--color-muted);
-  --stepper-active-bg: var(--color-primary-strong);
-  --stepper-active-border: var(--color-primary-bright);
-  --stepper-active-color: var(--color-white);
+  --stepper-active-bg: #6b531a;
+  --stepper-active-border: var(--color-accent);
+  --stepper-active-color: #fff2c8;
   --stepper-done-bg: var(--color-accent-soft);
   --stepper-done-border: var(--color-accent-border-soft);
   --stepper-done-color: var(--color-accent-text);
@@ -269,6 +273,13 @@ html[data-theme="light-dark"] {
   --app-primary: var(--color-primary);
   --app-primary-hover: var(--color-primary-hover);
   --app-primary-soft: var(--color-primary-soft);
+}
+
+/* O passo atual é identificado pela combinação sólida de fundo e borda, sem
+   anéis concêntricos que possam ser confundidos com um foco exagerado. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  :is(.page-stepper__item.is-current .page-stepper__marker, .page-stepper__item.is-active .page-stepper__number) {
+  box-shadow: none;
 }
 
 html[data-theme="dark"] body,
@@ -584,17 +595,27 @@ html[data-theme="light-dark"] :is(input, select, textarea) {
   color: var(--color-input-text);
 }
 
+/* Os formulários canônicos usavam um fundo composto por gradientes. No tema
+   escuro, os controles passam a ter uma caixa sólida e claramente delimitada. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .main-form-panel :is(.form-control, .form-select, select.form-select) {
+  background: var(--color-input-bg);
+  border: 1px solid var(--color-input-border);
+  box-shadow: none;
+}
+
 html[data-theme="dark"] :is(input, select, textarea):hover:not(:disabled):not([readonly]),
 html[data-theme="dark-dark"] :is(input, select, textarea):hover:not(:disabled):not([readonly]),
 html[data-theme="light-dark"] :is(input, select, textarea):hover:not(:disabled):not([readonly]) {
-  border-color: rgba(255, 255, 255, 0.25);
+  border-color: #7894a8;
 }
 
 html[data-theme="dark"] :is(input, select, textarea):focus,
 html[data-theme="dark-dark"] :is(input, select, textarea):focus,
 html[data-theme="light-dark"] :is(input, select, textarea):focus {
-  border-color: var(--color-focus);
+  border-color: var(--color-accent-border-strong);
   box-shadow: var(--focus-ring);
+  outline: none;
 }
 
 html[data-theme="dark"] :is(input, select, textarea)[readonly],
@@ -620,6 +641,1106 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
   background: var(--color-input-bg);
   border-color: var(--color-input-border);
   color: var(--color-input-text);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker {
+  --cv-search-picker-focus-shadow: none;
+  --field-border-focus: var(--color-accent-border-strong);
+}
+
+/* O picker é um único controle visual. O input de busca interno não desenha
+   uma segunda caixa nem recebe o outline global de campos. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker__input,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker__input:focus,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker__input:focus-visible {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  outline: none;
+}
+
+/* =========================================================
+   Canonical dark wizard and form composition
+   The approved Oficios step 1 is now the shared contract for wizard shells,
+   form cards, internal blocks and composed fields.
+   ========================================================= */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .page-shell--wizard {
+  --cv-wizard-section-header-padding: 12px 18px 12px 30px;
+  --cv-wizard-section-body-padding: 16px 18px;
+  --cv-wizard-shell-header-height: 91.2px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .page-shell--wizard .page-header-stack {
+  align-items: stretch;
+  background: #12243a;
+  border: 1px solid rgba(145, 177, 211, 0.34);
+  border-radius: 14px;
+  box-shadow: 0 8px 22px rgba(2, 10, 18, 0.2);
+  display: grid;
+  grid-template-columns: minmax(330px, 1fr) auto;
+  min-height: var(--cv-wizard-shell-header-height);
+  overflow: hidden;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .page-shell--wizard :is(.page-header-band, .page-header-rail) {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  min-height: calc(var(--cv-wizard-shell-header-height) - 2px);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .page-shell--wizard .page-header-band {
+  justify-content: center;
+  padding: 10px 14px 10px 18px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .page-shell--wizard .page-header-band__content {
+  gap: 14px;
+  justify-content: flex-start;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .page-shell--wizard .page-header-band__text {
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 4px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .page-shell--wizard .page-header-band__eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  line-height: 1;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .page-shell--wizard .page-header-band__title {
+  font-size: 25px;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .page-shell--wizard .page-header-status-chip {
+  box-shadow: none;
+  font-size: 10px;
+  min-height: 22px;
+  padding: 2px 9px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .page-shell--wizard .page-header-rail {
+  gap: 12px;
+  justify-content: flex-end;
+  padding: 10px 14px 10px 8px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .page-shell--wizard .page-header-rail__content {
+  flex: 0 1 auto;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .page-shell--wizard :is(.page-header-rail__marker, .page-header-rail__eyebrow) {
+  display: none;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .page-shell--wizard .page-header-rail__subtitle {
+  color: #c5d4e5;
+  font-size: 12px;
+  font-weight: var(--font-weight-bold);
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .page-shell--wizard .page-header-rail__actions .cv-btn {
+  min-height: 38px;
+  padding: 8px 13px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .page-shell--wizard > .page-stepper {
+  --stepper-marker-size: 32px;
+  padding: 10px 18px 11px;
+  top: 12px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .page-shell--wizard .page-stepper__list {
+  gap: 0;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .page-shell--wizard .page-stepper__item {
+  gap: 4px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .page-shell--wizard .page-stepper__track {
+  margin-inline: 0;
+  width: 100%;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .page-shell--wizard .page-stepper__eyebrow {
+  display: none;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .page-shell--wizard .page-stepper__content {
+  gap: 0;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-form-card .cv-search-picker__selected-panel {
+  gap: 8px;
+  padding: 12px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-form-card .cv-search-picker__selected-empty {
+  padding: 9px 12px;
+  text-align: left;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-form-card > .cv-wizard-section-header {
+  --_wizard-filete-left: 14px;
+  min-height: 58px;
+}
+
+/* Quick-adds ainda carregam padding legado mais específico. O componente
+   canônico reserva a mesma área livre entre o filete e o título da etapa 1. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-form-card > .quick-create-panel__header.cv-wizard-section-header {
+  padding-left: 34px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-form-card > .cv-wizard-section-body {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-form-block {
+  background: var(--color-surface-soft);
+  border: 0;
+  border-radius: 14px;
+  grid-template-columns: minmax(0, 1fr);
+  margin: 0;
+  padding: 14px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-form-block__header {
+  align-items: baseline;
+  display: flex;
+  gap: 14px;
+  justify-content: space-between;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-form-stack {
+  border: 0;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-form-block__title {
+  color: var(--color-heading);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-black);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  :is(.app-form-label, .cv-field__label, .cv-search-picker__label) {
+  color: var(--color-heading);
+  font-size: 0.78rem;
+  font-weight: var(--font-weight-black);
+  letter-spacing: 0;
+  line-height: 1.2;
+  text-transform: none;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-form-block__description {
+  color: var(--color-muted);
+  font-size: var(--font-size-xs);
+  line-height: 1.45;
+  text-align: right;
+}
+
+/* Identificação repete a composição compacta de "Ofício de origem": contexto
+   à esquerda e controles na mesma linha, sem uma faixa de cabeçalho vazia. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-form-block--split {
+  align-items: end;
+  grid-template-columns: minmax(160px, 0.7fr) minmax(0, 2fr);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-form-block--split > .cv-form-block__header {
+  align-self: center;
+  display: grid;
+  gap: 3px;
+  justify-content: start;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-form-block--split .cv-form-block__description {
+  text-align: left;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-form-block--split > .cv-form-block__body {
+  align-self: end;
+}
+
+@media (max-width: 900px) {
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    .cv-form-block--split {
+    align-items: stretch;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    .cv-form-block--split > .cv-form-block__header {
+    align-items: baseline;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    .cv-form-block--split .cv-form-block__description {
+    text-align: right;
+  }
+}
+
+@media (max-width: 620px) {
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    .cv-form-block--split > .cv-form-block__header {
+    align-items: start;
+    display: grid;
+  }
+
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    .cv-form-block--split .cv-form-block__description {
+    text-align: left;
+  }
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-form-block__actions .cv-btn {
+  margin: 0;
+  white-space: nowrap;
+}
+
+/* Controles da ficha: superfícies sólidas, raios menores e nenhuma luz de
+   foco. O número e o ano formam um único controle composto. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-form-card :is(.form-control, .cv-custom-select__trigger, textarea) {
+  background: var(--color-input-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  box-shadow: none;
+  color: var(--color-text);
+  min-height: 46px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-form-card :is(.form-control, .cv-custom-select__trigger, textarea):hover {
+  background: var(--color-input-bg);
+  border-color: color-mix(in srgb, var(--color-border) 78%, var(--color-text) 22%);
+  box-shadow: none;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-form-card :is(.form-control, .cv-custom-select__trigger, textarea):focus,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-form-card .cv-custom-select__trigger[aria-expanded="true"] {
+  border-color: var(--color-accent-border-soft);
+  box-shadow: none;
+  outline: 0;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-form-card .cv-custom-select__chevron {
+  color: var(--color-accent-text);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-form-card textarea.form-control {
+  min-height: 92px;
+  padding: 12px 14px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-composite-field__control {
+  align-items: stretch;
+  background: var(--color-input-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  display: grid;
+  gap: 0;
+  grid-template-columns: minmax(0, 1fr) auto;
+  min-height: 46px;
+  overflow: hidden;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-composite-field__control:hover {
+  border-color: color-mix(in srgb, var(--color-border) 78%, var(--color-text) 22%);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-composite-field__control:focus-within {
+  border-color: var(--color-accent-border-soft);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-composite-field__control .form-control {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  min-width: 0;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-composite-field__suffix {
+  align-items: center;
+  background: color-mix(in srgb, var(--color-accent) 7%, var(--color-surface-muted));
+  border-left: 1px solid var(--color-border);
+  color: var(--color-accent-text);
+  display: inline-flex;
+  font-size: var(--font-size-xs);
+  padding: 0 12px;
+}
+
+@media (max-width: 820px) {
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    .cv-form-stack {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 620px) {
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    .cv-form-block__header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    .cv-form-block__description {
+    text-align: left;
+  }
+}
+
+/* No hover, somente a borda clareia discretamente. Fundo e sombra permanecem
+   estáveis, inclusive contra os hovers globais de forms e do search picker. */
+html[data-theme="dark"] .cv-form-card :is(input, textarea):hover:not(:disabled):not([readonly]),
+html[data-theme="dark-dark"] .cv-form-card :is(input, textarea):hover:not(:disabled):not([readonly]),
+html[data-theme="light-dark"] .cv-form-card :is(input, textarea):hover:not(:disabled):not([readonly]) {
+  background: var(--color-input-bg) !important;
+  border-color: color-mix(in srgb, var(--color-border) 78%, var(--color-text) 22%) !important;
+  box-shadow: none !important;
+}
+
+html[data-theme="dark"] .cv-composite-field__control .form-control:hover,
+html[data-theme="dark-dark"] .cv-composite-field__control .form-control:hover,
+html[data-theme="light-dark"] .cv-composite-field__control .form-control:hover {
+  background: transparent !important;
+  border: 0 !important;
+}
+
+html[data-theme="dark"] .cv-form-card .cv-search-picker__control:hover,
+html[data-theme="dark-dark"] .cv-form-card .cv-search-picker__control:hover,
+html[data-theme="light-dark"] .cv-form-card .cv-search-picker__control:hover {
+  background: var(--color-input-bg) !important;
+  border-color: color-mix(in srgb, var(--color-input-border) 78%, var(--color-text) 22%) !important;
+  box-shadow: none !important;
+}
+
+/* Multipicker de pessoas: uma lista operacional, não uma grade de cards. Cada
+   pessoa usa toda a largura e mantém suas ações disponíveis no mouse, teclado
+   e touch. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--people {
+  gap: 12px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--people .cv-search-picker__selected-panel {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  gap: 10px;
+  padding: 0;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--people .cv-search-picker__selected-title {
+  color: var(--color-muted-strong);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--people .cv-search-picker__selected-list {
+  gap: 8px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--people .cv-search-picker__selected-card,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--people .cv-search-picker__selected-card:hover,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--people .cv-search-picker__selected-card--with-term:hover {
+  align-items: center;
+  background: var(--color-surface-soft);
+  border-color: var(--color-border);
+  box-shadow: none;
+  column-gap: 10px;
+  grid-template-columns: minmax(0, 1fr) auto auto auto;
+  min-height: 64px;
+  padding: 9px 10px 9px 12px;
+  row-gap: 0;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--people .cv-search-picker__selected-main {
+  gap: 2px;
+  grid-column: 1;
+  grid-row: 1;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--people .cv-search-picker__selected-name {
+  white-space: normal;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--people .cv-search-picker__driver-chip {
+  display: none;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--people .cv-search-picker__driver-control {
+  grid-column: 2;
+  grid-row: 1;
+  max-height: none;
+  opacity: 1;
+  overflow: visible;
+  transform: none;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--people .cv-search-picker__driver-toggle {
+  background: var(--color-surface-muted);
+  border-color: var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  box-shadow: none;
+  min-height: 34px;
+  padding: 0 11px;
+  width: auto;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--people .cv-search-picker__driver-toggle--active {
+  background: var(--color-accent-soft);
+  border-color: var(--color-accent-border-strong);
+  color: var(--color-accent-text);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--people .cv-search-picker__term-control {
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: auto;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--people .cv-search-picker__term-control .cv-field-side-action {
+  box-shadow: none;
+  min-height: 34px;
+  white-space: nowrap;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--people .cv-search-picker__selected-card > .cv-search-picker__remove,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--people .cv-search-picker__selected-card:hover > .cv-search-picker__remove {
+  align-self: center;
+  background: transparent;
+  border: 1px solid var(--color-danger-border-soft);
+  border-radius: var(--radius-pill);
+  color: var(--color-danger);
+  grid-column: 4;
+  grid-row: 1;
+  height: 34px;
+  margin: 0;
+  opacity: 1;
+  transform: none;
+  width: 34px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--people .cv-search-picker__selected-empty {
+  background: var(--color-surface-muted);
+  border-style: solid;
+}
+
+/* A seleção única de viatura compartilha a linguagem leve do picker de
+   pessoas, preservando placa, modelo e unidade em uma linha independente. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--vehicle {
+  background: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
+  border: 1px dashed var(--color-input-border);
+  border-radius: 16px;
+  gap: 13px;
+  padding: 14px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--vehicle .cv-search-picker__field {
+  gap: 7px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--vehicle .cv-search-picker__label {
+  color: var(--color-heading);
+  font-size: 0.78rem;
+  text-transform: none;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--vehicle .cv-search-picker__control {
+  background: var(--color-input-bg);
+  border-color: var(--color-input-border);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--vehicle .cv-search-picker__selected-panel {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  gap: 8px;
+  padding: 0;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--vehicle .cv-search-picker__selected-title {
+  color: var(--color-muted-strong);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--vehicle .cv-search-picker__selected-list {
+  gap: 8px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--vehicle .cv-search-picker__selected-card,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--vehicle .cv-search-picker__selected-card:hover {
+  align-items: center;
+  background: var(--color-input-bg);
+  border-color: var(--color-border-soft);
+  border-radius: 12px;
+  box-shadow: none;
+  column-gap: 10px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  min-height: 58px;
+  padding: 9px 10px 9px 12px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--vehicle .cv-search-picker__selected-main {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--vehicle .cv-search-picker__selected-card > .cv-search-picker__remove,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--vehicle .cv-search-picker__selected-card:hover > .cv-search-picker__remove {
+  align-self: center;
+  background: transparent;
+  border: 0;
+  border-left: 1px solid var(--color-border-soft);
+  border-radius: 0;
+  color: var(--color-muted);
+  grid-column: 2;
+  grid-row: 1;
+  height: 34px;
+  margin: 0;
+  opacity: 1;
+  transform: none;
+  width: 38px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--vehicle .cv-search-picker__selected-card > .cv-search-picker__remove:hover {
+  background: transparent;
+  color: var(--color-muted-strong);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--vehicle .cv-search-picker__selected-empty {
+  background: transparent;
+  border: 0;
+  padding: 9px 12px;
+  text-align: left;
+}
+
+/* Roster v2: o conjunto é um único componente e cada servidor é uma linha.
+   Identidade e ações deixam de competir dentro de um card colorido. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--people.cv-search-picker--roster {
+  background: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
+  border: 1px dashed var(--color-input-border);
+  border-radius: 16px;
+  gap: 13px;
+  padding: 14px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--people.cv-search-picker--roster .cv-search-picker__field {
+  gap: 7px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--people.cv-search-picker--roster .cv-search-picker__label {
+  color: var(--color-heading);
+  font-size: 0.78rem;
+  text-transform: none;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--people.cv-search-picker--roster .cv-search-picker__control {
+  background: var(--color-input-bg);
+  border-color: var(--color-input-border);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--people.cv-search-picker--roster .cv-search-picker__selected-panel {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  gap: 8px;
+  padding: 0;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--people.cv-search-picker--roster .cv-search-picker__selected-title {
+  color: var(--color-accent-text);
+  padding: 0 2px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--people.cv-search-picker--roster .cv-search-picker__selected-list {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  gap: 8px;
+  overflow: visible;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--people.cv-search-picker--roster .cv-search-picker__selected-card,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--people.cv-search-picker--roster .cv-search-picker__selected-card:hover {
+  align-items: center;
+  background: var(--color-input-bg);
+  border: 1px solid var(--color-border-soft);
+  border-radius: 12px;
+  box-shadow: none;
+  column-gap: 12px;
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  min-height: 78px;
+  padding: 11px 12px;
+  position: relative;
+  row-gap: 0;
+  transition: background-color 140ms ease, box-shadow 140ms ease;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--people.cv-search-picker--roster .cv-search-picker__selected-card:hover {
+  background: color-mix(in srgb, var(--color-accent) 5%, var(--color-input-bg));
+  border-color: var(--color-border);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--people.cv-search-picker--roster .cv-search-picker__selected-card--driver,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--people.cv-search-picker--roster .cv-search-picker__selected-card--driver:hover {
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface-muted));
+  border-color: var(--color-accent-border-soft);
+  box-shadow: inset 4px 0 0 var(--color-accent);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--people.cv-search-picker--roster .cv-search-picker__selected-card:last-child {
+  border-bottom: 1px solid var(--color-border-soft);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--roster .cv-search-picker__selected-avatar {
+  align-items: center;
+  background: var(--color-accent-soft);
+  border: 1px solid var(--color-accent-border-soft);
+  border-radius: 12px;
+  color: var(--color-accent-text);
+  display: inline-flex;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-black);
+  grid-column: 1;
+  height: 42px;
+  justify-content: center;
+  letter-spacing: 0.04em;
+  pointer-events: none;
+  position: relative;
+  width: 42px;
+  z-index: 2;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--roster .cv-search-picker__selected-card--driver .cv-search-picker__selected-avatar {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-on-accent, #081522);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--roster .cv-search-picker__selected-main {
+  gap: 3px;
+  grid-column: 2;
+  grid-row: 1;
+  pointer-events: none;
+  position: relative;
+  z-index: 2;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--roster .cv-search-picker__driver-chip {
+  align-items: center;
+  background: var(--color-accent);
+  border-radius: 999px;
+  color: var(--color-on-accent, #081522);
+  display: none;
+  font-size: 10px;
+  font-weight: var(--font-weight-black);
+  letter-spacing: 0.04em;
+  min-height: 21px;
+  padding: 2px 8px;
+  text-transform: uppercase;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--roster .cv-search-picker__selected-card--driver .cv-search-picker__driver-chip {
+  display: inline-flex;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--roster .cv-search-picker__driver-surface {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  cursor: pointer;
+  inset: 0;
+  padding: 0;
+  position: absolute;
+  width: 100%;
+  z-index: 1;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--roster .cv-search-picker__selected-actions {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  display: flex;
+  gap: 10px;
+  grid-column: 3;
+  grid-row: 1;
+  padding: 0;
+  position: relative;
+  z-index: 3;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--roster :is(.cv-search-picker__driver-control, .cv-search-picker__term-control) {
+  border: 0;
+  display: block;
+  grid-column: auto;
+  grid-row: auto;
+  justify-self: auto;
+  max-height: none;
+  opacity: 1;
+  overflow: visible;
+  padding: 0;
+  transform: none;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--roster .cv-search-picker__driver-control {
+  display: none;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--roster .cv-search-picker__selected-actions :is(.cv-search-picker__driver-toggle, .cv-field-side-action) {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  color: var(--color-muted-strong);
+  min-height: 30px;
+  min-width: 0;
+  padding: 0 3px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--roster .cv-search-picker__selected-actions :is(.cv-search-picker__driver-toggle, .cv-field-side-action)[aria-pressed="true"] {
+  background: transparent;
+  border-color: transparent;
+  color: var(--color-accent-text);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--roster .cv-search-picker__selected-actions .cv-field-side-action--state::before {
+  background: currentColor;
+  box-shadow: none;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--roster .cv-search-picker__selected-actions .cv-search-picker__remove {
+  align-self: center;
+  background: transparent;
+  border: 0;
+  border-left: 1px solid var(--color-border-soft);
+  border-radius: 0;
+  color: var(--color-muted);
+  height: 32px;
+  margin: 0;
+  opacity: 1;
+  position: static;
+  transform: none;
+  padding-left: 10px;
+  width: 38px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker--roster .cv-search-picker__selected-actions .cv-search-picker__remove:hover {
+  background: transparent;
+  color: var(--color-muted-strong);
+}
+
+@media (max-width: 720px) {
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    .cv-search-picker--people.cv-search-picker--roster .cv-search-picker__selected-card,
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    .cv-search-picker--people.cv-search-picker--roster .cv-search-picker__selected-card:hover {
+    grid-template-columns: 42px minmax(0, 1fr);
+    row-gap: 8px;
+  }
+
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    .cv-search-picker--roster .cv-search-picker__selected-actions {
+    background: transparent;
+    border: 0;
+    grid-column: 2;
+    grid-row: 2;
+    justify-content: flex-start;
+    padding: 0;
+  }
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-form-card__footer:not([hidden])
+  .cv-card-footer-section {
+  bottom: auto;
+  margin: 0;
+  position: static;
+  width: auto;
+  z-index: auto;
+}
+
+/* Linha sutil separando o footer do corpo do card — mesmo tom do rodapé do
+   card de lista (.oficio-lc__footer usa var(--color-border-soft)). */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-form-card__footer
+  .cv-card-footer-section__divider {
+  border-top: 1px solid var(--color-border-soft);
+  display: block;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-form-card__footer
+  .cv-card-footer {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: var(--space-4) var(--space-6);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-form-card__footer
+  .cv-card-footer__secondary:empty {
+  display: none;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-form-card__footer
+  .cv-card-footer__primary .cv-btn {
+  background: #123a5a;
+  background-image: none;
+  border: 1px solid rgba(214, 227, 244, 0.34);
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(2, 10, 18, 0.28);
+  color: var(--color-text);
+  min-height: 46px;
+  padding: 0 18px;
+  transform: none;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-form-card__footer
+  .cv-card-footer__primary .cv-btn .cv-btn__icon {
+  color: var(--color-accent-text);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-form-card__footer
+  .cv-card-footer__primary .cv-btn:hover {
+  background: #16486e;
+  background-image: none;
+  border-color: rgba(224, 171, 60, 0.55);
+  box-shadow: 0 6px 16px rgba(2, 10, 18, 0.28);
+  transform: none;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-form-card__footer
+  .cv-card-footer__primary .cv-btn:focus-visible {
+  border-color: var(--color-accent-border-soft);
+  box-shadow: 0 6px 16px rgba(2, 10, 18, 0.28);
+  outline: none;
+}
+
+@media (max-width: 980px) {
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    .page-shell--wizard .page-header-stack {
+    grid-template-columns: minmax(300px, 1fr) auto;
+  }
+
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    .page-shell--wizard .page-header-rail {
+    border-left: 0;
+    border-top: 0;
+    min-height: 90px;
+  }
+
+}
+
+@media (max-width: 760px) {
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    .page-shell--wizard .page-header-stack {
+    grid-template-columns: 1fr;
+  }
+
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    .page-shell--wizard .page-header-band {
+    min-height: 68px;
+    padding-right: 14px;
+  }
+
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    .page-shell--wizard .page-header-rail {
+    border-top: 1px solid rgba(145, 177, 211, 0.22);
+    min-height: 50px;
+    padding-block: 6px;
+  }
+}
+
+@media (max-width: 640px) {
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    .cv-search-picker--people .cv-search-picker__selected-card,
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    .cv-search-picker--people .cv-search-picker__selected-card:hover {
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: 8px;
+  }
+
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    .cv-search-picker--people .cv-search-picker__driver-control {
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: start;
+  }
+
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    .cv-search-picker--people .cv-search-picker__term-control {
+    border-top: 0;
+    grid-column: 2;
+    grid-row: 2;
+    padding-top: 0;
+  }
+
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    .cv-search-picker--people .cv-search-picker__selected-card > .cv-search-picker__remove {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    .cv-form-card__footer:not([hidden])
+    .cv-card-footer-section {
+    bottom: 8px;
+    margin: 0 8px 8px;
+    width: auto;
+  }
+
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    .cv-form-card__footer .cv-card-footer {
+    justify-content: stretch;
+  }
+
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    .cv-form-card__footer .cv-card-footer__primary,
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    .cv-form-card__footer .cv-card-footer__primary .cv-btn {
+    width: 100%;
+  }
 }
 
 html[data-theme="dark"] :is(.cv-custom-select__menu, .cv-search-picker__dropdown, .cv-date-picker__popover, .cv-action-menu__panel),
@@ -1285,6 +2406,302 @@ html[data-theme="light-dark"] :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-lay
   html[data-theme="light-dark"] .app-theme-grid__btn small {
     display: none;
   }
+}
+
+/* =========================================================
+   CV Search Picker v3 — resultados operacionais
+   A lista mostra identidade, contexto útil e estado como três áreas claras.
+   Documentos continuam pesquisáveis, mas não poluem a apresentação.
+   ========================================================= */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker__dropdown {
+  background: var(--color-surface-strong);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 14px;
+  box-shadow: 0 18px 40px rgba(2, 9, 16, 0.48);
+  padding: 6px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker__dropdown.cv-floating-dropdown--active {
+  background: var(--color-surface-strong);
+  border-color: var(--color-border-strong);
+  border-radius: 14px;
+  overflow: hidden;
+  padding: 6px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker__list {
+  display: grid;
+  gap: 4px;
+  padding: 0;
+  scrollbar-color: var(--color-border-strong) transparent;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker__option {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 10px;
+  box-shadow: none;
+  column-gap: 12px;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  min-height: 62px;
+  padding: 9px 11px;
+  text-align: left;
+  transform: none;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  :is(.cv-search-picker__option:first-child, .cv-search-picker__option:last-child) {
+  border-radius: 10px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker__option:hover,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker__option--active {
+  background: color-mix(in srgb, var(--color-surface-elevated) 72%, var(--color-input-bg) 28%);
+  border: 0;
+  box-shadow: none;
+  transform: none;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker__option--selected,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker__option--selected:hover,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker__option--selected.cv-search-picker__option--active {
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-input-bg));
+  border: 0;
+  box-shadow: inset 3px 0 0 var(--color-accent);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker__option-marker {
+  display: none;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker__option-visual {
+  align-items: center;
+  align-self: center;
+  background: var(--color-input-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  color: var(--color-accent-text);
+  display: inline-grid;
+  font-size: 0.7rem;
+  font-weight: var(--font-weight-black);
+  height: 40px;
+  justify-content: center;
+  letter-spacing: 0.02em;
+  width: 40px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker__option--vehicle .cv-search-picker__option-visual {
+  border-radius: 9px;
+  color: var(--color-muted-strong);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker__option--selected .cv-search-picker__option-visual {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-on-accent, #081522);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker__option-content {
+  align-content: center;
+  gap: 3px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker__option-main {
+  color: var(--color-heading);
+  font-size: 0.86rem;
+  font-weight: var(--font-weight-black);
+  line-height: 1.25;
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker__option-meta {
+  color: var(--color-muted-strong);
+  display: -webkit-box;
+  font-size: 0.74rem;
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker__option-status {
+  align-items: center;
+  color: var(--color-muted);
+  display: inline-flex;
+  font-size: 0.68rem;
+  font-weight: var(--font-weight-bold);
+  justify-content: flex-end;
+  min-width: 70px;
+  white-space: nowrap;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker__option--selected .cv-search-picker__option-status {
+  color: var(--color-accent-text);
+}
+
+/* Lista selecionada: linhas sólidas e estáveis; remoção simples e sem vermelho. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker__selected-list {
+  gap: 8px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker__selected-card,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker__selected-card:hover {
+  background: var(--color-input-bg);
+  border-color: var(--color-border);
+  box-shadow: none;
+  transform: none;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker__selected-card > .cv-search-picker__remove,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker__selected-card > .cv-search-picker__remove:hover,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-search-picker__selected-card > .cv-search-picker__remove:focus-visible {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  color: var(--color-muted-strong);
+  outline: none;
+}
+
+@media (max-width: 600px) {
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    .cv-search-picker__option {
+    grid-template-columns: 36px minmax(0, 1fr);
+    min-height: 56px;
+    padding: 8px;
+  }
+
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    .cv-search-picker__option-visual {
+    height: 36px;
+    width: 36px;
+  }
+
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    .cv-search-picker__option-status {
+    display: none;
+  }
+}
+
+/* Motorista externo: mesma seção estrutural de Equipe e Transporte. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .oficio-external-driver__reference-copy strong {
+  color: var(--color-heading);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .oficio-external-driver .cv-segment-toggle {
+  background: var(--color-input-bg);
+  border-color: var(--color-border);
+  border-radius: 10px;
+  box-shadow: none;
+  display: inline-grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding: 3px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .oficio-external-driver .cv-segment-toggle__btn {
+  border-radius: 7px;
+  color: var(--color-muted-strong);
+  justify-content: center;
+  min-height: 32px;
+  padding: 7px 13px;
+  text-align: center;
+  transform: none;
+  width: 100%;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .oficio-external-driver .cv-segment-toggle__btn[aria-pressed="true"] {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  box-shadow: none;
+  color: var(--color-on-accent, #081522);
+  transform: none;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .oficio-external-driver .cv-segment-toggle__btn:hover:not([aria-pressed="true"]) {
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .oficio-external-driver__identity > .cv-search-picker {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  margin: 0;
+  padding: 0;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .oficio-external-driver .cv-search-picker__control {
+  background: var(--color-input-bg) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 10px;
+  box-shadow: none !important;
+  min-height: 46px;
+  padding: 0 12px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .oficio-external-driver .cv-search-picker__control:hover {
+  background: var(--color-input-bg) !important;
+  border-color: color-mix(in srgb, var(--color-border) 78%, var(--color-text) 22%) !important;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .oficio-external-driver .cv-search-picker__field:focus-within .cv-search-picker__control {
+  background: var(--color-input-bg) !important;
+  border-color: var(--color-accent-border-soft) !important;
+  box-shadow: none !important;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .oficio-external-driver .cv-search-picker__input {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  min-height: 44px;
+  padding: 0;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .oficio-external-driver__reference {
+  border-top-color: var(--color-border-soft);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2060,7 +3477,7 @@ html[data-theme="light-dark"] :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-lay
    Paleta intocada — apenas estados e profundidade.
    ========================================================= */
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"]) {
-  --cv-btn-focus-ring: 0 0 0 3px rgba(216, 162, 27, 0.3);
+  --cv-btn-focus-ring: none;
 }
 
 /* Primário: relevo interno discreto + sombra curta; pressionado afunda. */
@@ -2184,7 +3601,7 @@ html[data-theme="light-dark"] :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-lay
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .oficios-filter-bar .header-filter-input:focus-visible {
   border-color: var(--color-focus);
-  box-shadow: 0 0 0 3px rgba(216, 162, 27, 0.22);
+  box-shadow: none;
   outline: none;
 }
 
@@ -2212,4 +3629,162 @@ html[data-theme="light-dark"] :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-lay
   border-radius: 0;
   box-shadow: none;
   padding: 0;
+}
+
+/* Custom Select v2 — controle dividido e menu de opções destacado. A classe
+   do menu viaja com o dropdown quando ele é portado para o body. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-custom-select__trigger--v2 {
+  align-items: stretch;
+  background: var(--color-input-bg);
+  border: 1px solid var(--color-input-border);
+  border-radius: 10px;
+  box-shadow: none;
+  color: var(--color-text);
+  gap: 0;
+  min-height: 46px;
+  overflow: hidden;
+  padding: 0;
+  transition: border-color 120ms ease;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-custom-select__trigger--v2:hover:not(:disabled) {
+  background: var(--color-input-bg);
+  border-color: color-mix(in srgb, var(--color-input-border) 78%, var(--color-text) 22%);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-custom-select__trigger--v2:focus-visible,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-custom-select--v2.cv-custom-select--open .cv-custom-select__trigger--v2 {
+  background: var(--color-input-bg);
+  border-color: var(--color-accent-border-soft);
+  border-radius: 10px;
+  box-shadow: none;
+  outline: 0;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-custom-select__trigger--v2 .cv-custom-select__value {
+  align-items: center;
+  display: flex;
+  min-width: 0;
+  padding: 0 14px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-custom-select__trigger--v2 .cv-custom-select__chevron {
+  align-items: center;
+  align-self: stretch;
+  background: var(--color-surface-muted);
+  border-left: 1px solid var(--color-border-soft);
+  color: var(--color-accent-text);
+  display: inline-flex;
+  justify-content: center;
+  width: 44px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-custom-select--v2.cv-custom-select--open .cv-custom-select__chevron {
+  background: color-mix(in srgb, var(--color-accent) 8%, var(--color-surface-muted));
+  color: var(--color-accent-text);
+  transform: rotate(180deg);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-custom-select__menu--v2 {
+  --cv-cs-menu-bg: var(--color-input-bg);
+  animation: none;
+  background: var(--color-input-bg);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 12px;
+  box-shadow: 0 12px 28px rgb(2 10 18 / 0.28);
+  max-height: 260px;
+  padding: 6px;
+  top: calc(100% + 6px);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-custom-select__menu--v2.cv-floating-dropdown--active {
+  background: var(--color-input-bg);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 12px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  translate: 0 6px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-custom-select__menu--v2 .cv-custom-select__option {
+  border-radius: 8px;
+  color: var(--color-muted-strong);
+  gap: 10px;
+  margin: 2px 0;
+  min-height: 40px;
+  padding: 0 10px 0 12px;
+  transition: background-color 100ms ease, color 100ms ease;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-custom-select__menu--v2 .cv-custom-select__option:hover:not(.cv-custom-select__option--disabled),
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-custom-select__menu--v2 .cv-custom-select__option--focused {
+  background: var(--color-surface-soft);
+  color: var(--color-heading);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-custom-select__menu--v2 .cv-custom-select__option--selected {
+  background: color-mix(in srgb, var(--color-accent) 10%, var(--color-surface-soft));
+  box-shadow: inset 3px 0 0 var(--color-accent);
+  color: var(--color-heading);
+  font-weight: var(--font-weight-bold);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-custom-select__menu--v2 .cv-custom-select__option--selected.cv-custom-select__option--focused {
+  filter: none;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-custom-select__menu--v2 .cv-custom-select__option-check {
+  align-items: center;
+  background: var(--color-accent);
+  border-radius: 7px;
+  color: var(--color-on-accent, #081522);
+  height: 26px;
+  justify-content: center;
+  margin-left: auto;
+  order: 2;
+  width: 26px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-custom-select__menu--v2 .cv-custom-select__option-label {
+  order: 1;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-custom-select--v2.cv-custom-select--disabled .cv-custom-select__trigger--v2,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-custom-select__trigger--v2:disabled {
+  background: var(--color-surface-muted);
+  border-color: var(--color-border-soft);
+  box-shadow: none;
+  opacity: 0.64;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-custom-select--v2.cv-custom-select--error .cv-custom-select__trigger--v2 {
+  background: var(--color-input-bg);
+  border-color: var(--color-danger);
+  box-shadow: none;
+}
+
+@media (max-width: 600px) {
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    .cv-custom-select__menu--v2 {
+    max-height: 220px;
+  }
 }
