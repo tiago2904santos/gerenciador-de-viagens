@@ -1,0 +1,48 @@
+{# Rodapé específico da prestação — abrir/assinar despacho + finalizar/arquivar (POST com next=current_url). #}
+<div class="cv-entity-card__footer oficio-lc__footer">
+  <div class="oficio-lc__footer-actions">
+    <div class="oficio-lc__footer-actions-main cv-icon-btn-group">
+      {% include "components/ui/buttons/icon_button.html" with href=card.rt_url action="edit" aria_label="Abrir prestação na etapa 1" tooltip="Abrir prestação" only %}
+      <button
+        type="button"
+        class="cv-icon-btn cv-icon-btn--sign{% if card.despacho_assinado.assinado %} is-assinado{% endif %}"
+        aria-label="{% if card.despacho_assinado.assinado %}Gerenciar despacho assinado{% else %}Anexar despacho assinado{% endif %}"
+        data-tooltip="{% if card.despacho_assinado.assinado %}Despacho assinado — gerenciar{% else %}Anexar despacho assinado{% endif %}"
+        data-attach-signed-trigger
+        data-attach-signed-reopen-key="prestacao-despacho-{{ card.prestacao_pk }}"
+        data-attach-signed-accept="application/pdf,image/png,image/jpeg,.pdf,.png,.jpg,.jpeg"
+        data-attach-signed-file-description="um arquivo em PDF, PNG ou JPEG"
+        data-attach-signed-file-help="Selecione um único arquivo em PDF, PNG, JPG ou JPEG."
+        data-attach-signed-choose-label="Escolher arquivo"
+        data-attach-signed-upload-label="Anexar arquivo"
+        data-attach-signed-url="{{ card.despacho_assinado.anexar_url }}"
+        data-attach-signed-doc-label="o despacho do ofício {{ card.numero_display }}"
+        data-attach-signed-current-name="{{ card.despacho_assinado.nome_original }}"
+        data-attach-signed-current-view-url="{{ card.despacho_assinado.view_url }}"
+        data-attach-signed-current-remove-url="{{ card.despacho_assinado.remover_url }}"
+      >{% include "components/ui/icons/icon.html" with icon="sign" only %}</button>
+    </div>
+
+    <div class="oficio-lc__footer-actions-manage cv-icon-btn-group">
+      <form method="post" action="{{ card.finalizar_url }}" class="oficio-lc__inline-action">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ current_url }}">
+        {% if card.finalizada %}
+        <button type="submit" class="cv-icon-btn cv-icon-btn--edit" aria-label="Reabrir prestação" data-tooltip="Reabrir prestação">{% include "components/ui/icons/icon.html" with icon="arrow-left" only %}</button>
+        {% else %}
+        <button type="submit" class="cv-icon-btn cv-icon-btn--complete" aria-label="Finalizar prestação" data-tooltip="Finalizar prestação">{% include "components/ui/icons/icon.html" with icon="check" only %}</button>
+        {% endif %}
+      </form>
+
+      <form method="post" action="{{ card.arquivar_url }}" class="oficio-lc__inline-action">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ current_url }}">
+        {% if card.arquivada %}
+        <button type="submit" class="cv-icon-btn cv-icon-btn--edit" aria-label="Desarquivar prestação" data-tooltip="Desarquivar prestação">{% include "components/ui/icons/icon.html" with icon="unarchive" only %}</button>
+        {% else %}
+        <button type="submit" class="cv-icon-btn cv-icon-btn--archive" aria-label="Arquivar prestação" data-tooltip="Arquivar prestação">{% include "components/ui/icons/icon.html" with icon="archive" only %}</button>
+        {% endif %}
+      </form>
+    </div>
+  </div>
+</div>

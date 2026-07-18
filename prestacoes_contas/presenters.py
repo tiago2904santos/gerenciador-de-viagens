@@ -1,6 +1,7 @@
 from django.urls import reverse
 
 from cadastros.selectors import get_configuracao_sistema
+from core import entity_cards
 from core.utils.masks import format_protocolo
 
 # Reaproveita a formatação já consolidada na lista de ofícios para manter
@@ -234,8 +235,23 @@ def apresentar_prestacao_card(prestacao, solicitacao_forms=None):
     search_parts = [oficio.numero_formatado, format_protocolo(oficio.protocolo) or ""]
     search_parts += [s["name"] for s in servidores]
 
+    protocolo_display = format_protocolo(oficio.protocolo) or ""
+    header_value = " · ".join(
+        p
+        for p in [oficio.numero_formatado, protocolo_display, destino_display, data_evento_display]
+        if p
+    )
+    header_chips = [entity_cards.chip(prestacao.status_variant, prestacao.status_display)]
+    if temporal_label:
+        header_chips.append(entity_cards.chip(temporal_tone, temporal_label))
+
     return {
         "prestacao_pk": prestacao.pk,
+        "status_variant": prestacao.status or "outro",
+        "header": entity_cards.header(
+            [entity_cards.header_item("Ofício", header_value, wide=True, wrap=True)],
+            header_chips,
+        ),
         # identificação
         "numero_display": oficio.numero_formatado,
         "protocolo_display": format_protocolo(oficio.protocolo) or "",

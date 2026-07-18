@@ -3,6 +3,10 @@
 
 {% block title %}{{ page_title }}{% endblock %}
 
+{% block extra_js %}
+  <script src="{% static 'js/pages/prestacoes-diaria-wa.js' %}?v=20260718-extraido" defer></script>
+{% endblock %}
+
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/roteiros-list.css' %}?v=20260622-mobile">
   <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260610-oficios-datepicker">

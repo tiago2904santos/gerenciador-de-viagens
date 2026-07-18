@@ -1,0 +1,243 @@
+{# Miolo do card de prestação — servidores (solicitação/saque/docs/WhatsApp) + transporte/roteiro. #}
+<div class="oficio-lc__section">
+  <div class="oficio-lc__travellers">
+    {% for servidor in card.servidores %}
+    <div class="oficio-lc__traveller oficio-lc__traveller--prestacao{% if servidor.is_motorista %} oficio-lc__traveller--motorista{% endif %}">
+      <form method="post"
+            action="{% url 'prestacoes_contas:index' %}"
+            class="oficio-lc__solicitacao-form oficio-lc__solicitacao-form--inline"
+            novalidate
+            data-autosave="true"
+            data-autosave-model="prestacao_servidor"
+            data-autosave-step="lista"
+            data-autosave-url="{{ servidor.solicitacao_autosave_url }}"
+            data-autosave-object-id="{{ servidor.ps_pk }}">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="save_solicitacoes">
+        <input type="text"
+               name="ps-{{ servidor.ps_pk }}-numero_solicitacao"
+               class="form-control cv-field__control oficio-lc__solicitacao-input"
+               placeholder="Solicitação"
+               aria-label="Número da solicitação de {{ servidor.name }}"
+               autocomplete="off"
+               maxlength="60"
+               value="{{ servidor.numero_solicitacao }}">
+        {% with ps_id=servidor.ps_pk|stringformat:"s" %}
+          {% with liberacao_name="ps-"|add:ps_id|add:"-data_liberacao_diarias" liberacao_hidden_id="id_ps_"|add:ps_id|add:"_data_liberacao_diarias" prazo_name="ps-"|add:ps_id|add:"-prazo_limite_saque" prazo_hidden_id="id_ps_"|add:ps_id|add:"_prazo_limite_saque" range_picker_id="id_ps_"|add:ps_id|add:"_periodo_saque" %}
+            {% include "components/forms/cv_date_picker.html" with mode="range" control_variant="filter-pill" compact_range_display=True picker_id=range_picker_id extra_class="oficios-filter-range oficio-lc__saque-range-picker" trigger_label="Liberação → saque" trigger_aria_label="Selecionar data de liberação e prazo para saque de "|add:servidor.name start_hidden_id=liberacao_hidden_id end_hidden_id=prazo_hidden_id start_hidden_name=liberacao_name end_hidden_name=prazo_name start_hidden_value=servidor.data_liberacao_diarias end_hidden_value=servidor.prazo_limite_saque initial_date=servidor.data_liberacao_diarias show_summary=False only %}
+          {% endwith %}
+        {% endwith %}
+      </form>
+
+      <div class="oficio-lc__traveller-body">
+        <div class="oficio-lc__traveller-name-row">
+          <span class="oficio-lc__traveller-name">{{ servidor.name }}</span>
+          {% if servidor.is_motorista %}
+          <span class="oficio-lc__traveller-badge">Motorista</span>
+          {% endif %}
+          {% if servidor.comprovante_ok %}
+          <span class="oficio-lc__traveller-badge oficio-lc__traveller-badge--ok" title="Comprovante de saque anexado">✓ Comprovante</span>
+          {% endif %}
+        </div>
+        {% if servidor.cargo or servidor.unidade %}
+        <span class="oficio-lc__traveller-meta">{% if servidor.cargo %}{{ servidor.cargo }}{% endif %}{% if servidor.cargo and servidor.unidade %} · {% endif %}{% if servidor.unidade %}{{ servidor.unidade }}{% endif %}</span>
+        {% endif %}
+      </div>
+
+      <button type="button"
+              class="cv-icon-btn oficio-lc__document-menu-trigger"
+              aria-label="Abrir opções de documentos de {{ servidor.name }}"
+              data-tooltip="Baixar documentos"
+              aria-haspopup="true"
+              aria-expanded="false"
+              data-action-menu-trigger
+              data-action-menu-target="prestacao-docs-menu-{{ servidor.ps_pk }}"
+      >{% include "components/ui/icons/icon.html" with icon="folder" only %}</button>
+      <div class="cv-action-menu oficio-lc__action-menu oficio-lc__document-menu"
+           id="prestacao-docs-menu-{{ servidor.ps_pk }}"
+           role="menu"
+           hidden>
+        <div class="oficio-lc__action-menu-heading">
+          <span class="oficio-lc__action-menu-heading-icon">
+            {% include "components/ui/icons/icon.html" with icon="download" only %}
+          </span>
+          <span>
+            <strong>Baixar documentos</strong>
+            <small>{{ servidor.name }}</small>
+          </span>
+        </div>
+        <a class="cv-action-menu__item oficio-lc__action-menu-item"
+           href="{{ servidor.rt_download_url }}"
+           download
+           role="menuitem">
+          <span class="oficio-lc__action-menu-item-icon oficio-lc__action-menu-item-icon--pdf">
+            {% include "components/ui/icons/icon.html" with icon="pdf" only %}
+          </span>
+          <span><strong>Relatório técnico</strong><small>Salvar PDF individual</small></span>
+        </a>
+        {% if servidor.diario_pdf_url %}
+        <a class="cv-action-menu__item oficio-lc__action-menu-item"
+           href="{{ servidor.diario_pdf_url }}"
+           download
+           role="menuitem">
+          <span class="oficio-lc__action-menu-item-icon oficio-lc__action-menu-item-icon--route">
+            {% include "components/ui/icons/icon.html" with icon="route" only %}
+          </span>
+          <span><strong>Diário de bordo</strong><small>Salvar PDF do diário</small></span>
+        </a>
+        {% else %}
+        <span class="cv-action-menu__item oficio-lc__action-menu-item is-disabled"
+              role="menuitem"
+              aria-disabled="true">
+          <span class="oficio-lc__action-menu-item-icon oficio-lc__action-menu-item-icon--route">
+            {% include "components/ui/icons/icon.html" with icon="route" only %}
+          </span>
+          <span><strong>Diário de bordo</strong><small>Ainda não foi criado</small></span>
+        </span>
+        {% endif %}
+        <button
+          type="button"
+          class="cv-action-menu__item oficio-lc__action-menu-item{% if servidor.rt_assinado.assinado or servidor.diario_assinado.assinado or servidor.comprovante_anexo.assinado %} is-assinado{% endif %}"
+          role="menuitem"
+          data-attach-signed-trigger
+          data-attach-signed-reopen-key="prestacao-servidor-{{ servidor.ps_pk }}"
+          data-attach-signed-accept="application/pdf,image/png,image/jpeg,.pdf,.png,.jpg,.jpeg"
+          data-attach-signed-file-description="um arquivo em PDF, PNG ou JPEG"
+          data-attach-signed-file-help="Selecione um único arquivo em PDF, PNG, JPG ou JPEG."
+          data-attach-signed-choose-label="Escolher arquivo"
+          data-attach-signed-upload-label="Anexar arquivo"
+          data-attach-signed-url="{{ servidor.rt_assinado.anexar_url }}"
+          data-attach-signed-doc-label="o relatório técnico de {{ servidor.name }}"
+          data-attach-signed-current-name="{{ servidor.rt_assinado.nome_original }}"
+          data-attach-signed-current-view-url="{{ servidor.rt_assinado.view_url }}"
+          data-attach-signed-current-remove-url="{{ servidor.rt_assinado.remover_url }}"
+          data-attach-signed-primary-option-label="Relatório técnico"
+          data-attach-signed-secondary-url="{{ servidor.diario_assinado.anexar_url }}"
+          data-attach-signed-secondary-doc-label="o diário de bordo do ofício {{ card.numero_display }}"
+          data-attach-signed-secondary-current-name="{{ servidor.diario_assinado.nome_original }}"
+          data-attach-signed-secondary-current-view-url="{{ servidor.diario_assinado.view_url }}"
+          data-attach-signed-secondary-current-remove-url="{{ servidor.diario_assinado.remover_url }}"
+          data-attach-signed-secondary-option-label="Diário de bordo"
+          data-attach-signed-tertiary-url="{{ servidor.comprovante_anexo.anexar_url }}"
+          data-attach-signed-tertiary-doc-label="o comprovante de saque ou transferência de {{ servidor.name }}"
+          data-attach-signed-tertiary-current-name="{{ servidor.comprovante_anexo.nome_original }}"
+          data-attach-signed-tertiary-current-view-url="{{ servidor.comprovante_anexo.view_url }}"
+          data-attach-signed-tertiary-current-remove-url="{{ servidor.comprovante_anexo.remover_url }}"
+          data-attach-signed-tertiary-option-label="Comprovante"
+        >
+          <span class="oficio-lc__action-menu-item-icon cv-action-menu__item-icon--success" aria-hidden="true">
+            {% include "components/ui/icons/icon.html" with icon="sign" only %}
+          </span>
+          <span>
+            <strong>{% if servidor.rt_assinado.assinado or servidor.diario_assinado.assinado or servidor.comprovante_anexo.assinado %}Gerenciar documentos assinados{% else %}Anexar documentos assinados{% endif %}</strong>
+            <small>RT, diário ou comprovante</small>
+          </span>
+        </button>
+        <a class="cv-action-menu__item oficio-lc__action-menu-item"
+           href="{{ servidor.pacote_url }}"
+           download
+           role="menuitem">
+          <span class="oficio-lc__action-menu-item-icon oficio-lc__action-menu-item-icon--package">
+            {% include "components/ui/icons/icon.html" with icon="folder" only %}
+          </span>
+          <span><strong>Anexo completo</strong><small>Salvar PDF consolidado</small></span>
+        </a>
+      </div>
+      <button type="button"
+              class="cv-icon-btn oficio-lc__wa-trigger"
+              aria-label="Enviar aviso de liberação de diárias por WhatsApp"
+              data-tooltip="Enviar aviso de liberação (WhatsApp)"
+              aria-haspopup="true"
+              aria-expanded="false"
+              data-action-menu-trigger
+              data-action-menu-target="diaria-wa-menu-{{ servidor.ps_pk }}"
+              data-wa-phone="{{ servidor.whatsapp_phone }}"
+              data-wa-oficio="{{ servidor.whatsapp_oficio }}"
+              data-wa-unidade="{{ servidor.whatsapp_unidade }}"
+              data-wa-evento="{{ servidor.whatsapp_evento }}"
+              data-wa-servidor="{{ servidor.name }}"
+              data-wa-diaria="{{ servidor.whatsapp_diaria }}"
+      >{% include "components/ui/icons/icon.html" with icon="whatsapp-modern" only %}</button>
+      <div class="cv-action-menu oficio-lc__action-menu oficio-lc__wa-menu" id="diaria-wa-menu-{{ servidor.ps_pk }}" role="menu" hidden>
+        <div class="oficio-lc__action-menu-heading">
+          <span class="oficio-lc__action-menu-heading-icon oficio-lc__action-menu-heading-icon--wa">
+            {% include "components/ui/icons/icon.html" with icon="whatsapp-modern" only %}
+          </span>
+          <span>
+            <strong>Aviso de liberação</strong>
+            <small>Escolha como enviar</small>
+          </span>
+        </div>
+        <button type="button" class="cv-action-menu__item oficio-lc__action-menu-item oficio-lc__action-menu-item--wa" role="menuitem" data-diaria-wa-send data-wa-app="normal">
+          <span class="oficio-lc__action-menu-item-icon oficio-lc__action-menu-item-icon--wa">
+            {% include "components/ui/icons/icon.html" with icon="whatsapp-modern" only %}
+          </span>
+          <span><strong>WhatsApp</strong><small>Abrir no aplicativo pessoal</small></span>
+        </button>
+        <button type="button" class="cv-action-menu__item oficio-lc__action-menu-item oficio-lc__action-menu-item--wa" role="menuitem" data-diaria-wa-send data-wa-app="business">
+          <span class="oficio-lc__action-menu-item-icon oficio-lc__action-menu-item-icon--business">
+            {% include "components/ui/icons/icon.html" with icon="whatsapp-business" only %}
+          </span>
+          <span><strong>WhatsApp Business</strong><small>Abrir no aplicativo profissional</small></span>
+        </button>
+        <button type="button" class="cv-action-menu__item oficio-lc__action-menu-item" role="menuitem" data-diaria-wa-copy>
+          <span class="oficio-lc__action-menu-item-icon oficio-lc__action-menu-item-icon--copy">
+            {% include "components/ui/icons/icon.html" with icon="copy-modern" only %}
+          </span>
+          <span><strong>Copiar mensagem</strong><small>Copiar o texto para a área de transferência</small></span>
+        </button>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="oficio-lc__section">
+  <div class="oficio-lc__transport-row">
+
+    <div class="oficio-lc__transport-card">
+      <span class="oficio-lc__transport-label">Placa</span>
+      {% if card.veiculo_placa %}
+        <div class="oficio-lc__transport-placa">{{ card.veiculo_placa }}</div>
+      {% else %}
+        <div class="oficio-lc__transport-placa oficio-lc__text--empty">Não informado</div>
+      {% endif %}
+      {% if card.veiculo_modelo %}
+        <span class="oficio-lc__transport-label">Modelo</span>
+        <div class="oficio-lc__transport-modelo">{{ card.veiculo_modelo }}</div>
+      {% endif %}
+    </div>
+
+    {% if card.trechos %}
+    <div class="oficio-lc__transport-card oficio-lc__transport-card--trechos">
+      <span class="oficio-lc__transport-label">Trechos encontrados</span>
+      <div class="oficio-lc__trechos-list">
+        {% for trecho in card.trechos %}
+        <div class="oficio-lc__trecho">
+          <div class="oficio-lc__trecho-rota">{{ trecho.rota }}</div>
+          {% if trecho.saida or trecho.chegada %}
+          <div class="oficio-lc__trecho-times">
+            {% if trecho.saida %}{{ trecho.saida }}{% endif %}
+            {% if trecho.saida and trecho.chegada %} → {% endif %}
+            {% if trecho.chegada %}{{ trecho.chegada }}{% endif %}
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if card.valor_diarias_display %}
+    <div class="oficio-lc__transport-card oficio-lc__transport-card--valor">
+      <span class="oficio-lc__transport-label">Valor Total</span>
+      <div class="oficio-lc__valor-total">{{ card.valor_diarias_display }}</div>
+      {% if card.valor_diarias_extenso %}
+      <span class="oficio-lc__transport-label">Valor por Extenso</span>
+      <div class="oficio-lc__valor-extenso">{{ card.valor_diarias_extenso }}</div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+  </div>
+</div>

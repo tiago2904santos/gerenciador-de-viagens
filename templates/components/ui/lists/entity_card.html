@@ -19,10 +19,12 @@
     </div>
     {% endif %}
 
-    {% include body_template with card=card csrf_token=csrf_token only %}
+    {% include body_template with card=card csrf_token=csrf_token current_url=current_url only %}
 
     {% if card.footer %}
       {% include "components/ui/lists/entity_card_footer.html" with footer=card.footer csrf_token=csrf_token only %}
+    {% elif footer_template %}
+      {% include footer_template with card=card csrf_token=csrf_token current_url=current_url only %}
     {% endif %}
 
   </div>
