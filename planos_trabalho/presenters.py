@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from django.urls import reverse
 
+from core import entity_cards
+
 from .models import PlanoTrabalho
 
 
@@ -350,11 +352,52 @@ def apresentar_plano_card(plano):
         else []
     )
 
+    numero_label = plano.numero_formatado
+    status_label = "Cancelado" if plano.cancelado else plano.get_status_display()
+    status_state = "danger" if plano.cancelado else str(plano.status or "").lower()
+    editar_url = reverse("planos_trabalho:wizard_identificacao", args=[plano.pk])
+    excluir_url = reverse("planos_trabalho:excluir", args=[plano.pk])
+    header_value = " · ".join(
+        parte
+        for parte in [numero_label, destino_label if destino_label != "—" else "", periodo_label if periodo_label != "—" else ""]
+        if parte
+    )
+
     return {
         "id": plano.pk,
-        "numero_label": plano.numero_formatado,
-        "status_label": "Cancelado" if plano.cancelado else plano.get_status_display(),
-        "status_state": "danger" if plano.cancelado else str(plano.status or "").lower(),
+        "search_text": " ".join(
+            p for p in [numero_label, destino_label, programa_label, coordenador_nome or ""] if p
+        ).strip(),
+        "status_variant": status_state or "outro",
+        "status_value": status_state,
+        "header": entity_cards.header(
+            [entity_cards.header_item("Plano de Trabalho", header_value, wrap=True)],
+            [entity_cards.chip(status_state, status_label)],
+        ),
+        "cancel_note": plano.motivo_cancelamento if plano.cancelado else "",
+        "footer": entity_cards.footer(
+            edit_url=editar_url,
+            edit_aria="Editar plano",
+            menus=[
+                entity_cards.documents_menu(
+                    f"plano-document-menu-{plano.pk}",
+                    numero_label,
+                    title="Documentos do plano",
+                    view_url=reverse("planos_trabalho:pdf_inline", args=[plano.pk]),
+                    pdf_url=reverse("planos_trabalho:baixar_documento", args=[plano.pk, "pdf"]),
+                    docx_url=reverse("planos_trabalho:baixar_documento", args=[plano.pk, "docx"]),
+                    view_title="Visualizar plano",
+                    docx_description="Arquivo editável do plano",
+                    trigger_aria=f"Abrir documentos do plano {numero_label}",
+                )
+            ],
+            delete_modal_url=excluir_url,
+            delete_modal_label=numero_label,
+            delete_aria="Excluir plano",
+        ),
+        "numero_label": numero_label,
+        "status_label": status_label,
+        "status_state": status_state,
         "cancelado": plano.cancelado,
         "motivo_cancelamento": plano.motivo_cancelamento,
         "destino": destino_label,
@@ -369,9 +412,9 @@ def apresentar_plano_card(plano):
         "valor_unitario_display": valor_unitario_display,
         "diarias_composicao": diarias_composicao,
         "data_criacao_label": plano.data_criacao.strftime("%d/%m/%Y"),
-        "editar_url": reverse("planos_trabalho:wizard_identificacao", args=[plano.pk]),
+        "editar_url": editar_url,
         "documentos_url": reverse("planos_trabalho:wizard_documentos", args=[plano.pk]),
-        "excluir_url": reverse("planos_trabalho:excluir", args=[plano.pk]),
+        "excluir_url": excluir_url,
         "baixar_docx_url": reverse("planos_trabalho:baixar_documento", args=[plano.pk, "docx"]),
         "baixar_pdf_url": reverse("planos_trabalho:baixar_documento", args=[plano.pk, "pdf"]),
         "pdf_inline_url": reverse("planos_trabalho:pdf_inline", args=[plano.pk]),
