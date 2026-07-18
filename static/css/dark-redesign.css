@@ -1712,6 +1712,25 @@ html[data-theme="light-dark"] :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-lay
   font-weight: 750;
 }
 
+/* Título do card de lista com a mesma linguagem tipográfica do título dos
+   cards de formulário (.cv-wizard-section-title): uppercase, extrabold,
+   letter-spacing e glow do acento. Só o item de título do id-row (o rótulo
+   pequeno acima permanece como está). */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .oficio-lc__id-row .oficio-lc__info-value {
+  color: var(--theme-text-heading, var(--color-heading));
+  font-size: clamp(0.92rem, 1.15vw, 1.05rem);
+  font-weight: var(--font-weight-extrabold);
+  letter-spacing: 0.05em;
+  text-shadow: 0 1px 6px color-mix(in srgb, var(--color-accent) 20%, transparent);
+  text-transform: uppercase;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .oficio-lc__id-row .oficio-lc__info-value--wrap {
+  letter-spacing: 0.03em;
+}
+
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .oficio-lc__section {
   background: var(--color-surface);
@@ -1748,7 +1767,6 @@ html[data-theme="light-dark"] :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-lay
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .oficio-lc__trecho:hover {
-  background: var(--color-primary-soft);
   border-color: var(--color-border-strong);
 }
 
@@ -2037,13 +2055,14 @@ html[data-theme="light-dark"] :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-lay
   border-top-color: var(--color-border-soft);
 }
 
-/* Filete dourado do cabeçalho: mais fino e com brilho contido. */
+/* Filete dourado do cabeçalho: mais fino e com metade do brilho do glow
+   anterior (percentuais e raios de desfoque reduzidos pela metade). */
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .oficio-lc__id-row::before {
   width: 6px;
   box-shadow:
-    0 0 6px 1px color-mix(in srgb, var(--color-accent) 35%, transparent),
-    0 0 14px 2px color-mix(in srgb, var(--color-accent) 14%, transparent);
+    0 0 3px 1px color-mix(in srgb, var(--color-accent) 18%, transparent),
+    0 0 7px 2px color-mix(in srgb, var(--color-accent) 7%, transparent);
 }
 
 /* Linhas de trecho: fundo mais raso, borda só no hover. */
