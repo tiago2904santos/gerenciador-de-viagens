@@ -11,8 +11,8 @@
           {% if preview.erro %}
             {% include "components/ui/feedback/alert.html" with variant="danger" message=preview.erro only %}
           {% else %}
-            <p class="section-header__description" style="margin: 0 0 var(--space-3)"><strong>Servidores com Termo de Autorização</strong></p>
-            <ul style="margin: 0 0 var(--space-4); padding-left: var(--space-5); color: var(--color-muted)">
+            <p class="section-header__description document-preview-heading"><strong>Servidores com Termo de Autorização</strong></p>
+            <ul class="document-preview-list">
               {% for servidor in preview.servidores %}
                 <li>{{ servidor.nome }}</li>
               {% empty %}

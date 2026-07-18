@@ -8,17 +8,37 @@
   <script src="{% static 'js/core/theme-init.js' %}?v=20260513"></script>
   <title>{% block title %}Central de Viagens 3{% endblock %}</title>
   <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20260717-search-picker-manage-btn2">
-  <link rel="stylesheet" href="{% static 'css/utilities.css' %}?v=20260526-viatura-picker">
+  <link rel="stylesheet" href="{% static 'css/utilities.css' %}?v=20260717-data-table">
   <link rel="stylesheet" href="{% static 'css/page-shell.css' %}?v=20260717-floating-stack">
   <link rel="stylesheet" href="{% static 'css/cv-buttons.css' %}?v=20260706-cancelamento">
   <link rel="stylesheet" href="{% static 'css/components/cv-date-picker.css' %}?v=20260716-hover-no-square">
   {% block extra_css %}{% endblock %}
+  <link rel="stylesheet" href="{% static 'css/components/file-picker.css' %}?v=20260717-canonical">
   <link rel="stylesheet" href="{% static 'css/components/action-system.css' %}?v=20260716-three-doc-options">
+  <link rel="stylesheet" href="{% static 'css/components/record-list.css' %}?v=20260717-no-avatar">
+  <link rel="stylesheet" href="{% static 'css/components/filter-header.css' %}?v=20260717-canonical">
+  <link rel="stylesheet" href="{% static 'css/components/form-panel.css' %}?v=20260717-canonical">
+  <link rel="stylesheet" href="{% static 'css/components/app-shell.css' %}?v=20260717-drawer">
+  <link rel="stylesheet" href="{% static 'css/components/content-cards.css' %}?v=20260717-canonical">
+  <link rel="stylesheet" href="{% static 'css/components/document-viewer.css' %}?v=20260717-canonical">
+  <link rel="stylesheet" href="{% static 'css/components/dialog.css' %}?v=20260717-canonical">
+  <link rel="stylesheet" href="{% static 'css/dark-redesign.css' %}?v=20260717-global-redesign">
 </head>
 <body>
-  <div class="app-shell {% block shell_class %}{% endblock %}">
+  <a class="cv-skip-link" href="#main-content">Pular para o conteÃºdo principal</a>
+  <div class="app-shell {% block shell_class %}{% endblock %}" data-app-shell>
+    <header class="app-mobile-bar">
+      <a class="app-mobile-bar__brand" href="{% url 'core:dashboard' %}">
+        <span class="sidebar-brand-badge" aria-hidden="true">CV</span>
+        <span>Central de Viagens</span>
+      </a>
+      <button class="app-mobile-bar__toggle" type="button" aria-controls="app-sidebar" aria-expanded="false" aria-label="Abrir menu principal" data-sidebar-drawer-toggle>
+        <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
+      </button>
+    </header>
     {% include "components/layout/sidebar.html" %}
-    <main class="app-main">
+    <button class="sidebar-scrim" type="button" aria-label="Fechar menu principal" tabindex="-1" data-sidebar-drawer-close></button>
+    <main class="app-main" id="main-content" tabindex="-1">
       <section class="content-wrap">
         {% include "components/feedback/alerts.html" %}
         {% block content %}{% endblock %}
@@ -28,25 +48,26 @@
   <script src="{% static 'js/theme-toggle.js' %}?v=20260513" defer></script>
   <script src="{% static 'js/core/http.js' %}?v=20260520" defer></script>
   <script src="{% static 'js/autosave.js' %}?v=20260715-link-flush-document" defer></script>
-  <script src="{% static 'js/core/app.js' %}?v=20260714-quickedit-delegated" defer></script>
-  <script src="{% static 'js/components/sidebar.js' %}" defer></script>
+  <script src="{% static 'js/core/app.js' %}?v=20260717-dialog-system" defer></script>
+  <script src="{% static 'js/components/sidebar.js' %}?v=20260717-accessible-drawer" defer></script>
   <script src="{% static 'js/components/masks.js' %}?v=20260620-milhar" defer></script>
   <script src="{% static 'js/components/state-toggle.js' %}?v=20260520-fase2" defer></script>
   <script src="{% static 'js/components/card-toggle.js' %}?v=20260520-fase2" defer></script>
-  <script src="{% static 'js/components/realtime-filters.js' %}?v=20260623-cede" defer></script>
-  <script src="{% static 'js/components/live-search-submit.js' %}?v=20260623-motor" defer></script>
+  <script src="{% static 'js/components/realtime-filters.js' %}?v=20260717-registry" defer></script>
+  <script src="{% static 'js/components/live-search-submit.js' %}?v=20260717-registry" defer></script>
   <script src="{% static 'js/components/icon-tooltips.js' %}?v=20260707-menu-hide" defer></script>
-  <script src="{% static 'js/components/delete-confirm-modal.js' %}?v=20260715-assinado" defer></script>
-  <script src="{% static 'js/components/cancel-reason-modal.js' %}?v=20260706" defer></script>
-  <script src="{% static 'js/components/confirm-action-modal.js' %}?v=20260715" defer></script>
+  <script src="{% static 'js/components/delete-confirm-modal.js' %}?v=20260717-dialog-registry" defer></script>
+  <script src="{% static 'js/components/cancel-reason-modal.js' %}?v=20260717-dialog-registry" defer></script>
+  <script src="{% static 'js/components/confirm-action-modal.js' %}?v=20260717-dialog-registry" defer></script>
   <script src="{% static 'js/components/attach-signed-modal.js' %}?v=20260716-image-formats" defer></script>
   <script src="{% static 'js/components/action-menu.js' %}?v=20260707-fixedpos" defer></script>
   <script src="{% static 'js/components/file-picker.js' %}?v=20260629f" defer></script>
+  <script src="{% static 'js/components/signature-actions.js' %}?v=20260717-canonical" defer></script>
   <script src="{% static 'js/components/cv-floating-dropdown.js' %}?v=20260520" defer></script>
-  <script src="{% static 'js/components/cv-custom-select.js' %}?v=20260703-multi2" defer></script>
-  <script src="{% static 'js/components/cv-search-picker.js' %}?v=20260717-manage-button" defer></script>
+  <script src="{% static 'js/components/cv-custom-select.js' %}?v=20260717-registry" defer></script>
+  <script src="{% static 'js/components/cv-search-picker.js' %}?v=20260717-registry" defer></script>
   <script src="{% static 'js/components/destinos-section.js' %}?v=20260625-managed-destinos" defer></script>
-  <script src="{% static 'js/components/cv-date-picker.js' %}?v=20260716-compact-range-end-year" defer></script>
+  <script src="{% static 'js/components/cv-date-picker.js' %}?v=20260717-registry" defer></script>
   <script src="{% static 'js/cv-select.js' %}?v=20260520" defer></script>
   <script src="{% static 'js/components/fields-init.js' %}?v=20260520-fase3" defer></script>
   {% block extra_js %}{% endblock %}

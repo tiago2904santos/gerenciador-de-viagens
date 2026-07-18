@@ -1,0 +1,20 @@
+{% comment %}Canonical dialog header shared by confirmation, cancellation and attachment flows.{% endcomment %}
+<header class="cv-dialog__header{% if tone %} cv-dialog__header--{{ tone }}{% endif %}">
+  <span class="cv-dialog__icon{% if tone %} cv-dialog__icon--{{ tone }}{% endif %} delete-confirm-modal__icon{% if icon_extra_class %} {{ icon_extra_class }}{% endif %}" aria-hidden="true">
+    {% include "dev/ui_lab/partials/_cv_icon.html" with icon=icon|default:"more" only %}
+  </span>
+  <div class="cv-dialog__heading delete-confirm-modal__copy">
+    {% if eyebrow %}<span class="cv-dialog__eyebrow delete-confirm-modal__eyebrow">{{ eyebrow }}</span>{% endif %}
+    <h2 class="cv-dialog__title delete-confirm-modal__title"{% if title_id %} id="{{ title_id }}"{% endif %}>{{ title }}</h2>
+  </div>
+  <button
+    type="button"
+    class="cv-dialog__close cv-icon-btn cv-icon-btn--sm"
+    aria-label="Fechar"
+    data-tooltip="Fechar"
+    {% if data_delete_modal_cancel %}data-delete-modal-cancel{% endif %}
+    {% if data_cancel_modal_cancel %}data-cancel-modal-cancel{% endif %}
+    {% if data_confirm_action_cancel %}data-confirm-action-cancel{% endif %}
+    {% if data_attach_signed_cancel %}data-attach-signed-cancel{% endif %}
+  >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="x" only %}</button>
+</header>

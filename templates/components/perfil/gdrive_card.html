@@ -46,7 +46,7 @@
           <div class="gdrive-actions gdrive-actions--head">
             <a href="{% url 'google_drive:oauth_iniciar' %}" class="cv-btn cv-btn--secondary cv-btn--sm">Trocar conta</a>
             <form method="post" action="{% url 'google_drive:oauth_revogar' %}"
-                  onsubmit="return confirm('Desconectar a conta Google vai remover os tokens salvos. Continuar?')">
+                  data-confirm-submit data-confirm-message="Desconectar a conta Google vai remover os tokens salvos. Continuar?">
               {% csrf_token %}
               <button type="submit" class="cv-btn cv-btn--sm gdrive-btn-unlink">Desconectar</button>
             </form>
@@ -220,7 +220,7 @@
                   Ver prévia
                 </button>
                 <form method="post" action="{% url 'google_drive:reorganizar_tudo' %}"
-                      onsubmit="return confirm('Reorganizar TODOS os eventos e ofícios avulsos no Drive? Isso move/renomeia arquivos já enviados e sobe os que faltam.')">
+                      data-confirm-submit data-confirm-message="Reorganizar TODOS os eventos e ofícios avulsos no Drive? Isso move/renomeia arquivos já enviados e sobe os que faltam.">
                   {% csrf_token %}
                   <button type="submit" class="cv-btn cv-btn--primary cv-btn--sm">Reorganizar tudo no Drive</button>
                 </form>

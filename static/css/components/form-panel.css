@@ -1,0 +1,73 @@
+/* Canonical structure for compact CRUD forms. Theme appearance is defined globally. */
+
+.main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--quick-add) {
+  display: grid;
+  gap: 0;
+  overflow: hidden;
+}
+
+.main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--quick-add) > .form-section {
+  border: 0;
+  display: grid;
+  gap: 0;
+  padding: 0;
+}
+
+.main-form-panel > .form-section > .section-header {
+  align-items: center;
+  padding: 18px clamp(20px, 3vw, 30px);
+  position: relative;
+}
+
+.main-form-panel > .form-section > .section-header::before {
+  border-radius: 999px;
+  content: "";
+  height: 28px;
+  left: 0;
+  position: absolute;
+  width: 3px;
+}
+
+.main-form-panel > .form-section > :not(.section-header) {
+  padding: clamp(20px, 3vw, 30px);
+}
+
+.main-form-panel > .cv-card-footer {
+  margin: 0;
+}
+
+.cv-confirm-page__header {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+.cv-confirm-page__icon {
+  align-items: center;
+  display: inline-flex;
+  height: 44px;
+  justify-content: center;
+  width: 44px;
+}
+
+.cv-confirm-page__eyebrow,
+.cv-confirm-page__message,
+.cv-confirm-page__notice {
+  margin: 0;
+}
+
+.cv-confirm-page__body {
+  display: grid;
+  gap: 14px;
+}
+
+.cv-confirm-page__footer {
+  justify-content: flex-end;
+}
+
+@media (max-width: 640px) {
+  .main-form-panel > .form-section > .section-header,
+  .main-form-panel > .form-section > :not(.section-header),
+  .main-form-panel > .cv-card-footer {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}

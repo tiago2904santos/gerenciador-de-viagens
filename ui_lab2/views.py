@@ -5,7 +5,8 @@ Cada categoria e uma pagina. Cada componente aparece com: nome, preview clonado
 e a lista "Usado em" com os arquivos onde ele aparece no sistema.
 
 Escopo do catalogo (decidido com o usuario): site inteiro EXCETO paginas de
-lista (`*/index.html`, `components/lists/**`) e EXCETO o app `protocolos`.
+lista (`*/index.html`, `components/lists/**`). O app Protocolos foi removido
+da aplicacao e, portanto, nao faz mais parte do inventario.
 As listas de "Usado em" sao apuradas por grep e datadas em USAGE_AUDIT_DATE.
 """
 
@@ -162,8 +163,8 @@ CATEGORY_BY_SLUG = {c["slug"]: c for c in UI_LAB2_CATEGORIES}
 
 
 # ── "Usado em" — apurado por grep (datado em USAGE_AUDIT_DATE) ──────────────
-# Exclui paginas de lista (*/index.html) e o app protocolos, por decisao do
-# usuario. Tambem exclui base.html (infra) e dev/ui_lab/** (UI Lab 1.0).
+# Exclui paginas de lista (*/index.html), base.html (infra) e dev/ui_lab/**
+# (UI Lab 1.0).
 COMPONENT_USAGE = {
     # Calendarios & Datas
     "cv_date_picker": [

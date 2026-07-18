@@ -574,40 +574,6 @@
 }
 
 /* ── Card de assinatura eletrônica ──────────────────────────────── */
-.assinatura-card { display: grid; gap: 0.85rem; }
-.assinatura-card__statusrow { display: flex; }
-.assinatura-card__motivo {
-  margin: 0;
-  color: var(--color-warning, #b8860b);
-  font-size: 0.92rem;
-}
-.assinatura-card__done { margin: 0; line-height: 1.5; }
-.assinatura-card__cod {
-  display: inline-block;
-  margin-left: 0.35rem;
-  padding: 0.05rem 0.4rem;
-  border-radius: 0.4rem;
-  background: var(--color-surface-muted, #eef2f7);
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-}
-.assinatura-card__linkrow { display: flex; gap: 0.5rem; align-items: stretch; }
-.assinatura-card__linkinput {
-  flex: 1;
-  min-width: 0;
-  border: 1px solid var(--color-border, #d9e1ea);
-  border-radius: 0.55rem;
-  padding: 0.55rem 0.7rem;
-  font-size: 0.86rem;
-  background: var(--color-surface-muted, #f5f8fc);
-  color: var(--color-text, #0b1f33);
-}
-.assinatura-card__copy { white-space: nowrap; }
-.assinatura-card__actions { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; }
-.assinatura-card__actions form { margin: 0; }
-.assinatura-card__expira { margin: 0; font-size: 0.82rem; color: var(--color-text-muted, #52657a); }
-
 /* PDF Final: prontidão dos itens compartilhados + rótulo do card por servidor */
 .prestacao-final-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.85rem; }
 .prestacao-final-servidor__name { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; font-weight: 600; }

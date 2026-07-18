@@ -265,7 +265,9 @@
     matchesFilter: matchesFilter,
   };
 
-  if (document.readyState === 'loading') {
+  if (typeof window.CV.registerEnhancer === 'function') {
+    window.CV.registerEnhancer('realtimeFilters', init);
+  } else if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function () {
       init(document);
     });

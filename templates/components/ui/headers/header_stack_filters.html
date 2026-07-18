@@ -1,28 +1,28 @@
 {# header_stack_filters.html — ver docs/ui-components.md #}
 {% if form_action %}
-  <form class="page-header-stack{% if extra_class %} {{ extra_class }}{% endif %}" method="get" action="{{ form_action }}" data-cv-live-submit-form>
+  <form class="cv-filter-header page-header-stack{% if extra_class %} {{ extra_class }}{% endif %}" method="get" action="{{ form_action }}" data-cv-live-submit-form>
 {% else %}
-  <div class="page-header-stack{% if extra_class %} {{ extra_class }}{% endif %}">
+  <div class="cv-filter-header page-header-stack{% if extra_class %} {{ extra_class }}{% endif %}">
 {% endif %}
-  <div class="page-header-band">
+  <div class="cv-filter-header__heading page-header-band">
     <div class="page-header-band__content">
       <div class="page-header-band__text">
         {% if eyebrow %}<span class="page-header-band__eyebrow">{{ eyebrow }}</span>{% endif %}
         <h1 class="page-header-band__title">{{ title }}</h1>
       </div>
       {% if status_label %}
-        <span class="page-header-status-chip page-header-status-chip--{{ status_variant|default:'draft' }}">{{ status_label }}</span>
+        {% include "components/ui/badges/status_badge.html" with label=status_label variant=status_variant|default:"draft" extra_class="page-header-status-chip" only %}
       {% endif %}
     </div>
   </div>
-  <div class="page-header-rail page-header-rail--filters">
+  <div class="cv-filter-header__controls page-header-rail page-header-rail--filters">
     {% if icon_label %}
       <div class="page-header-rail__marker" aria-hidden="true">{{ icon_label }}</div>
     {% endif %}
-    <div class="header-filter-bar{% if status_options %} header-filter-bar--advanced{% endif %}">
-      <div class="header-filter-bar__search">
+    <div class="cv-filter-bar header-filter-bar{% if status_options %} header-filter-bar--advanced{% endif %}">
+      <div class="cv-filter-bar__search header-filter-bar__search">
         <input
-          class="header-filter-input"
+          class="cv-filter-bar__search-input header-filter-input"
           type="search"
           name="{{ search_name|default:'q' }}"
           placeholder="{{ search_placeholder|default:'Buscar...' }}"
@@ -37,7 +37,7 @@
       {% if status_options %}
         <div class="header-filter-bar__row">
           <div class="header-filter-bar__fields">
-            <div class="header-filter-field">
+            <div class="cv-filter-bar__select header-filter-field">
               <select class="header-filter-select" name="{{ status_name|default:'status' }}" aria-label="{{ status_label|default:'Status' }}" data-cv-filter="status">
                 {% for option in status_options %}
                   <option value="{{ option.value }}"{% if option.value == status_value %} selected{% endif %}>{{ option.label }}</option>

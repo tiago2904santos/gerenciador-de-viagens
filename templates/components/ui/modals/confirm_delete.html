@@ -1,9 +1,20 @@
-<div class="form-section">
-  <header class="section-header">
+<section class="cv-confirm-page form-section" aria-labelledby="confirm-delete-page-title">
+  <header class="cv-confirm-page__header section-header">
+    <span class="cv-confirm-page__icon" aria-hidden="true">
+      {% include "dev/ui_lab/partials/_cv_icon.html" with icon="delete" only %}
+    </span>
     <div class="section-header__copy">
-      {% include "components/ui/badges/status_badge.html" with label="Atenção" variant="danger" only %}
-      <h2 class="section-header__title">{{ object_label }}</h2>
-      <p class="section-header__description">{{ message|default:"Esta ação excluirá o cadastro. Se houver vínculos com outros registros, a exclusão será bloqueada." }}</p>
+      <span class="cv-confirm-page__eyebrow">Confirmação permanente</span>
+      <h2 class="section-header__title" id="confirm-delete-page-title">Excluir {{ object_label }}?</h2>
+      <p class="section-header__description">Revise a consequência antes de continuar.</p>
     </div>
   </header>
-</div>
+  <div class="cv-confirm-page__body">
+    <p class="cv-confirm-page__message">{{ message|default:"Esta ação excluirá o cadastro. Se houver vínculos com outros registros, a exclusão será bloqueada." }}</p>
+    <p class="cv-confirm-page__notice">A exclusão não poderá ser desfeita.</p>
+  </div>
+  <footer class="cv-card-footer cv-confirm-page__footer">
+    {% include "components/ui/buttons/button.html" with href=back_url label="Cancelar" variant="secondary" icon="arrow-left" only %}
+    {% include "components/ui/buttons/button.html" with label=primary_label|default:"Excluir" variant="danger" icon="delete" type="submit" only %}
+  </footer>
+</section>

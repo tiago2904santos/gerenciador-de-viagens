@@ -310,6 +310,13 @@ body.asgn {
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+
+.asgn-fontchip--classica { font-family: "Great Vibes", cursive; }
+.asgn-fontchip--profissional { font-family: "Alex Brush", cursive; }
+.asgn-fontchip--moderna { font-family: "Parisienne", cursive; }
+.asgn-fontchip--simples { font-family: "Sacramento", cursive; }
+.asgn-fontchip--natural { font-family: "Allura", cursive; }
+.asgn-fontchip--luxuosa { font-family: "Herr Von Muellerhoff", cursive; }
 .asgn-fontchip.is-selected { border-color: var(--asgn-primary); box-shadow: 0 0 0 2px rgba(31, 111, 235, 0.2); }
 
 .asgn-drawwrap {

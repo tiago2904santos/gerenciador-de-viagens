@@ -13,7 +13,7 @@
         {% include "dev/ui_lab/partials/_cv_icon.html" with icon="edit" only %}
       </button>
       <button type="submit" formmethod="post" formaction="{{ card.excluir_url }}" formnovalidate
-              onclick="return confirm('Remover este evento do plano?');"
+              data-confirm-submit data-confirm-message="Remover este evento do plano?"
               class="cv-icon-btn cv-icon-btn--delete" aria-label="Remover evento" data-tooltip="Remover evento">
         {% include "dev/ui_lab/partials/_cv_icon.html" with icon="delete" only %}
       </button>

@@ -1,29 +1,16 @@
-<div class="delete-confirm-modal" data-attach-signed-modal hidden>
-  <div class="delete-confirm-modal__backdrop" data-attach-signed-cancel></div>
+<div class="cv-dialog cv-dialog--document delete-confirm-modal" data-attach-signed-modal hidden>
+  <div class="cv-dialog__backdrop delete-confirm-modal__backdrop" data-attach-signed-cancel></div>
   <section
-    class="delete-confirm-modal__dialog attach-signed-modal__dialog"
+    class="cv-dialog__panel cv-dialog__panel--lg delete-confirm-modal__dialog attach-signed-modal__dialog"
     role="dialog"
     aria-modal="true"
     aria-labelledby="attach-signed-title"
     aria-describedby="attach-signed-description"
     tabindex="-1"
   >
-    <button
-      type="button"
-      class="cv-icon-btn cv-icon-btn--sm attach-signed-modal__close"
-      aria-label="Fechar"
-      data-tooltip="Fechar"
-      data-attach-signed-cancel
-    >{% include "dev/ui_lab/partials/_cv_icon.html" with icon="x" only %}</button>
-    <header class="delete-confirm-modal__header">
-      <span class="delete-confirm-modal__icon attach-signed-modal__icon" aria-hidden="true">{% include "dev/ui_lab/partials/_cv_icon.html" with icon="sign" only %}</span>
-      <div class="delete-confirm-modal__copy">
-        <span class="delete-confirm-modal__eyebrow">Documento assinado</span>
-        <h2 class="delete-confirm-modal__title" id="attach-signed-title">Anexar assinado</h2>
-      </div>
-    </header>
+    {% include "components/ui/modals/dialog_header.html" with icon="sign" tone="document" eyebrow="Documento assinado" title="Anexar assinado" title_id="attach-signed-title" icon_extra_class="attach-signed-modal__icon" data_attach_signed_cancel=True only %}
 
-    <p class="attach-signed-modal__intro" id="attach-signed-description">
+    <p class="cv-dialog__message attach-signed-modal__intro" id="attach-signed-description">
       {% include "dev/ui_lab/partials/_cv_icon.html" with icon="document" only %}
       <span>
         Envie <span data-attach-signed-file-description>o PDF já assinado</span> de <strong data-attach-signed-label>este documento</strong>.
@@ -46,7 +33,7 @@
       </div>
     </div>
 
-    <form method="post" enctype="multipart/form-data" class="attach-signed-modal__form" data-attach-signed-form>
+    <form method="post" enctype="multipart/form-data" class="cv-dialog__form attach-signed-modal__form" data-attach-signed-form>
       {% csrf_token %}
       <input type="hidden" name="next" data-attach-signed-next value="">
       <div class="attach-signed-modal__upload">
@@ -81,7 +68,7 @@
           </div>
         </li>
       </ul>
-      <div class="delete-confirm-modal__actions">
+      <div class="cv-dialog__footer delete-confirm-modal__actions">
         {% include "components/ui/buttons/button.html" with label="Cancelar" variant="secondary" type="button" data_attach_signed_cancel=True extra_class="attach-signed-modal__cancel" only %}
       </div>
     </form>

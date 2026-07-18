@@ -75,8 +75,8 @@
       <input class="asgn-input" id="asgn-name-input" maxlength="60" value="{{ nome }}">
       <div class="asgn-fontlist" id="asgn-fontlist">
         {% for f in fontes %}
-        <button type="button" class="asgn-fontchip" data-key="{{ f.key }}"
-                data-family="{{ f.family }}" style="font-family: {{ f.family }};">{{ nome }}</button>
+        <button type="button" class="asgn-fontchip asgn-fontchip--{{ f.key }}" data-key="{{ f.key }}"
+                data-family="{{ f.family }}">{{ nome }}</button>
         {% endfor %}
       </div>
     </div>

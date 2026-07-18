@@ -1,0 +1,239 @@
+/* Canonical summary and document cards. Theme-specific appearance is separate. */
+
+.cv-summary-tile {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 16px;
+}
+
+.cv-summary-tile__label,
+.cv-summary-tile__value,
+.cv-summary-tile__description {
+  margin: 0;
+}
+
+.cv-summary-tile__value {
+  font-size: clamp(1.15rem, 2vw, 1.55rem);
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.cv-summary-grid {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.cv-summary-grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.cv-summary-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.cv-summary-grid--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+.cv-summary-card__body {
+  display: grid;
+  gap: 12px;
+}
+
+.cv-summary-card .pt-resumo-box {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  padding: 14px 16px;
+}
+
+.cv-document-card {
+  display: grid;
+  gap: 0;
+  padding: 0;
+  position: relative;
+}
+
+.cv-document-card__header,
+.cv-document-card__meta,
+.cv-document-card__body,
+.cv-document-card__actions {
+  margin: 0;
+  padding: 16px 18px;
+}
+
+.cv-document-card__header {
+  align-items: start;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.cv-document-card__heading {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+}
+
+.cv-document-card__title,
+.cv-document-card__subtitle {
+  margin: 0;
+}
+
+.cv-document-card__meta {
+  border-block: 1px solid transparent;
+}
+
+.cv-document-card__actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Shared structural contract for rich entity cards across product modules. */
+.cv-entity-card {
+  min-width: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.cv-entity-card__header,
+.cv-entity-card__body,
+.cv-entity-card__footer {
+  min-width: 0;
+}
+
+.cv-entity-card__footer {
+  position: relative;
+  z-index: 1;
+}
+
+.cv-signature-card {
+  overflow: hidden;
+}
+
+.cv-signature-card__header {
+  align-items: start;
+  display: flex;
+  gap: 18px;
+  justify-content: space-between;
+}
+
+.cv-signature-card__eyebrow,
+.cv-signature-card__link-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cv-signature-card__body {
+  display: grid;
+  gap: 16px;
+}
+
+.cv-signature-card__link-group {
+  display: grid;
+  gap: 7px;
+}
+
+.cv-signature-card__link-row {
+  align-items: stretch;
+  display: flex;
+  gap: 8px;
+}
+
+.cv-signature-card__link {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.cv-signature-card__actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cv-signature-card__form { margin: 0; }
+.cv-signature-card__result,
+.cv-signature-card__notice,
+.cv-signature-card__expiry { margin: 0; }
+.cv-signature-card__code { white-space: nowrap; }
+
+.cv-module-card {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-width: 0;
+  overflow: hidden;
+  padding: 0;
+}
+
+.cv-module-card__header,
+.cv-module-card__body,
+.cv-module-card__footer {
+  padding: 16px 18px;
+}
+
+.cv-module-card__header {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+}
+
+.cv-module-card__mark {
+  align-items: center;
+  border-radius: 10px;
+  display: flex;
+  flex: 0 0 auto;
+  font-size: 0.72rem;
+  font-weight: 900;
+  height: 34px;
+  justify-content: center;
+  width: 34px;
+}
+
+.cv-module-card__eyebrow,
+.cv-module-card__title,
+.cv-module-card__description {
+  margin: 0;
+}
+
+.cv-module-card__body {
+  display: grid;
+  gap: 7px;
+}
+
+.cv-module-card__footer {
+  align-items: center;
+  display: flex;
+}
+
+@media (max-width: 900px) {
+  .cv-summary-grid--4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  .cv-summary-grid--2,
+  .cv-summary-grid--3,
+  .cv-summary-grid--4 {
+    grid-template-columns: 1fr;
+  }
+
+  .cv-document-card__header,
+  .cv-document-card__meta,
+  .cv-document-card__body,
+  .cv-document-card__actions {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .cv-signature-card__header,
+  .cv-signature-card__link-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .cv-signature-card__actions > *,
+  .cv-signature-card__actions .cv-btn {
+    width: 100%;
+  }
+}

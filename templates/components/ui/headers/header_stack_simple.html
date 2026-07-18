@@ -1,23 +1,2 @@
-{# header_stack_simple.html — ver docs/ui-components.md #}
-<div class="page-header-stack{% if extra_class %} {{ extra_class }}{% endif %}">
-  <div class="page-header-band">
-    <div class="page-header-band__content">
-      <div class="page-header-band__text">
-        {% if eyebrow %}<span class="page-header-band__eyebrow">{{ eyebrow }}</span>{% endif %}
-        <h1 class="page-header-band__title">{{ title }}</h1>
-      </div>
-      {% if status_label %}
-        <span class="page-header-status-chip page-header-status-chip--{{ status_variant|default:'draft' }}">{{ status_label }}</span>
-      {% endif %}
-    </div>
-  </div>
-  <div class="page-header-rail">
-    {% if icon_label %}
-      <div class="page-header-rail__marker" aria-hidden="true">{{ icon_label }}</div>
-    {% endif %}
-    <div class="page-header-rail__content">
-      {% if module_label %}<span class="page-header-rail__eyebrow">{{ module_label }}</span>{% endif %}
-      {% if description %}<p class="page-header-rail__subtitle">{{ description }}</p>{% endif %}
-    </div>
-  </div>
-</div>
+{# Compatibilidade pública. O markup vive em page_header.html. #}
+{% include "components/ui/headers/page_header.html" %}

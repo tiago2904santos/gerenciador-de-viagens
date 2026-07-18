@@ -38,7 +38,7 @@
           {% endif %}
 
           {# CARD — Identificação (reaproveita o resumo do ofício) #}
-          <section class="cv-wizard-section-card rt-summary-card oficio-documentos-summary-section" aria-labelledby="diario-identificacao-title">
+          <section class="cv-summary-card cv-wizard-section-card rt-summary-card oficio-documentos-summary-section" aria-labelledby="diario-identificacao-title">
             <header class="cv-wizard-section-header">
               <div class="cv-wizard-section-header__copy">
                 <h2 class="cv-wizard-section-title" id="diario-identificacao-title">Resumo do ofício</h2>
@@ -181,7 +181,7 @@
 
           {# Assinatura eletrônica temporariamente oculta (fluxo indisponível). #}
           {% comment %}
-          {% include "prestacoes_contas/partials/assinatura_card.html" with assinatura=assinatura next_url=assinatura_next_url csrf_token=csrf_token only %}
+          {% include "components/documents/signature_card.html" with signature=assinatura next_url=assinatura_next_url only %}
           {% endcomment %}
 
           {% if trechos %}

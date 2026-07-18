@@ -1,8 +1,15 @@
-<article class="module-card app-card">
-  <span class="eyebrow">{{ eyebrow|default:"Modulo" }}</span>
-  <h3>{{ title }}</h3>
-  {% if description %}<p>{{ description }}</p>{% endif %}
+<article class="cv-module-card module-card app-card">
+  <header class="cv-module-card__header">
+    <span class="cv-module-card__mark" aria-hidden="true">{{ mark|default:title|slice:":2"|upper }}</span>
+    <span class="cv-module-card__eyebrow eyebrow">{{ eyebrow|default:"Módulo" }}</span>
+  </header>
+  <div class="cv-module-card__body">
+    <h3 class="cv-module-card__title">{{ title }}</h3>
+    {% if description %}<p class="cv-module-card__description">{{ description }}</p>{% endif %}
+  </div>
   {% if href %}
-    {% include "components/buttons/action_button.html" with href=href label=action_label|default:"Abrir" variant="secondary" size="sm" only %}
+    <footer class="cv-module-card__footer">
+      {% include "components/buttons/action_button.html" with href=href label=action_label|default:"Abrir" variant="secondary" size="sm" icon="arrow-right" icon_after=True only %}
+    </footer>
   {% endif %}
 </article>

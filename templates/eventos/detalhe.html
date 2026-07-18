@@ -17,12 +17,12 @@
     {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="CADASTRO DE OFICIO" title=evento.titulo description=evento.periodo_display icon_label="EV" module_label="Eventos" back_label="Voltar para lista" back_url="/eventos/" status_label=evento.get_status_display status_variant=evento_status_variant only %}
 
     {% if evento.status == "cancelado" %}
-      <div class="cv-alert cv-alert--danger" style="margin: 0 0 var(--space-4); display:flex; align-items:center; justify-content:space-between; gap: var(--space-3); flex-wrap: wrap;">
+      <div class="cv-alert cv-alert--danger cv-alert--action">
         <span>
           <strong>Evento cancelado.</strong>
           {% if evento.motivo_cancelamento %} Motivo: {{ evento.motivo_cancelamento }}{% endif %}
         </span>
-        <form method="post" action="{{ reativar_evento_url }}" onsubmit="return confirm('Reativar este evento? Os documentos cancelados junto com ele também serão reativados.')">
+        <form method="post" action="{{ reativar_evento_url }}" data-confirm-submit data-confirm-message="Reativar este evento? Os documentos cancelados junto com ele também serão reativados.">
           {% csrf_token %}
           {% include "components/ui/buttons/button.html" with label="Reativar evento" variant="secondary" type="submit" icon="unarchive" only %}
         </form>
@@ -55,7 +55,7 @@
                   {% include "components/forms/form_field.html" with field=form.tipos action_url=tipos_evento_url action_label="Gerenciar tipos" size_class="field-size-4" only %}
                 </div>
 
-                <hr style="border: none; border-top: 1px solid var(--cv-border-default, rgba(255,255,255,0.08)); margin: 0.5rem 0 0;">
+                <hr class="cv-divider">
 
                 <section class="wizard-inner-section" aria-labelledby="evento-wizard-motivo-d">
                   <header class="wizard-inner-section__header">
@@ -541,7 +541,7 @@
               </form>
 
               {% if solicitacao_anexos %}
-                <ul class="prestacao-file-list" style="margin-top:0.75rem">
+                <ul class="prestacao-file-list cv-content-spaced">
                   {% for anexo in solicitacao_anexos %}
                     <li class="prestacao-file-list__item">
                       <div class="prestacao-file-widget__meta">
@@ -557,13 +557,13 @@
                            data-tooltip="Visualizar">
                           {% include "dev/ui_lab/partials/_cv_icon.html" with icon="eye" only %}
                         </a>
-                        <form method="post" action="{{ anexo.delete_url }}" style="display:inline">
+                        <form class="cv-inline-form" method="post" action="{{ anexo.delete_url }}">
                           {% csrf_token %}
                           <button class="cv-icon-btn cv-icon-btn--delete prestacao-file-widget__action"
                                   type="submit"
                                   aria-label="Excluir documento"
                                   data-tooltip="Excluir"
-                                  onclick="return confirm('Remover este documento?')">
+                                  data-confirm-submit data-confirm-message="Remover este documento?">
                             {% include "dev/ui_lab/partials/_cv_icon.html" with icon="delete" only %}
                           </button>
                         </form>
@@ -572,7 +572,7 @@
                   {% endfor %}
                 </ul>
               {% else %}
-                <p class="document-inline-empty" style="margin-top:0.75rem">Nenhum documento de solicitação anexado ainda.</p>
+                <p class="document-inline-empty cv-content-spaced">Nenhum documento de solicitação anexado ainda.</p>
               {% endif %}
             </div>
           </section>

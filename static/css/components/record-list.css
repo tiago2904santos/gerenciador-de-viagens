@@ -1,0 +1,91 @@
+/* Canonical record list. Visual theme overrides live in dark-redesign.css. */
+
+.cv-record-list {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.cv-record-row {
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: var(--radius-lg, 14px);
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  min-width: 0;
+  padding: 16px 18px 16px 30px;
+  position: relative;
+}
+
+.cv-record-row::before {
+  border-radius: 999px;
+  content: "";
+  inset: 14px auto 14px 16px;
+  position: absolute;
+  width: 6px;
+}
+
+.cv-record-row__identity {
+  align-items: center;
+  display: inline-flex;
+  justify-content: center;
+}
+
+.cv-record-row__identity > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cv-record-row__content,
+.cv-record-row__heading {
+  min-width: 0;
+}
+
+.cv-record-row__title {
+  font-size: var(--font-size-sm, 0.875rem);
+  letter-spacing: 0.01em;
+}
+
+.cv-record-row__meta {
+  margin-top: 5px;
+}
+
+.cv-record-row__meta-item {
+  align-items: baseline;
+  display: inline-flex;
+}
+
+.cv-record-row__actions {
+  border-left: 1px solid transparent;
+  padding-left: 14px;
+}
+
+/* When this canonical list sits inside a standard list panel, the panel's own
+   slab (background/border/shadow) doubles up behind the cards and they stop
+   reading as floating. Drop the slab so the cards float on the page surface. */
+.list-panel:has(> .cv-record-list) {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+@media (max-width: 720px) {
+  .cv-record-row {
+    align-items: start;
+    grid-template-columns: minmax(0, 1fr);
+    padding: 14px 14px 14px 26px;
+  }
+
+  .cv-record-row__actions {
+    border-left: 0;
+    border-top: 1px solid transparent;
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+    padding-left: 0;
+    padding-top: 12px;
+    width: 100%;
+  }
+}

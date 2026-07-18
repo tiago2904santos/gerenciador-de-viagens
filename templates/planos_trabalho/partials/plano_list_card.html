@@ -1,13 +1,13 @@
 <article
-  class="oficio-lc oficio-lc--{{ card.status_state|default:'outro' }}"
+  class="cv-entity-card oficio-lc oficio-lc--{{ card.status_state|default:'outro' }}"
   data-cv-filter-item
   data-search-text="{{ card.numero_label }} {{ card.destino }} {{ card.programa }} {{ card.coordenador }}"
   data-status-value="{{ card.status_state }}"
 >
-  <div class="oficio-lc__layout">
+  <div class="cv-entity-card__body oficio-lc__layout">
 
     {# ── IDENTIFICAÇÃO ── #}
-    <div class="oficio-lc__id-row">
+    <div class="cv-entity-card__header oficio-lc__id-row">
       <div class="oficio-lc__info-item">
         <span class="oficio-lc__info-label">Plano de Trabalho</span>
         <span class="oficio-lc__info-value oficio-lc__info-value--wrap">{{ card.numero_label }}{% if card.destino %} · {{ card.destino }}{% endif %}{% if card.periodo %} · {{ card.periodo }}{% endif %}</span>
@@ -88,7 +88,7 @@
     </div>
 
     {# ── FOOTER ── #}
-    <div class="oficio-lc__footer">
+    <div class="cv-entity-card__footer oficio-lc__footer">
       <div class="oficio-lc__footer-actions">
         <div class="oficio-lc__footer-actions-main cv-icon-btn-group">
           {% include "components/ui/buttons/icon_button.html" with href=card.editar_url action="edit" aria_label="Editar plano" tooltip="Editar" only %}

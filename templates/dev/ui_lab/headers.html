@@ -7,328 +7,52 @@
   <section class="ui-lab-section ui-lab-section--headers">
     <div class="ui-lab-section__header">
       <p class="ui-lab-section__eyebrow">Header Lab</p>
-      <h2 class="ui-lab-section__title">Contexto acima, ações abaixo</h2>
+      <h2 class="ui-lab-section__title">Cabeçalhos canônicos</h2>
       <p class="ui-lab-section__description">
-        O header não carrega ação final. Filtros, stepper e quick add ficam no rail.
+        Um único markup sustenta contexto, descrição, status, retorno, ação primária e stepper.
+        As páginas devem consumir os includes oficiais, nunca copiar a estrutura abaixo.
       </p>
     </div>
 
     <div class="ui-lab-stack">
       <article class="ui-lab-preview-card">
         <div class="ui-lab-preview-card__header">
-          <span class="ui-lab-preview-card__label">Header Band — sem chip</span>
-          <span class="ui-lab-status-pill ui-lab-status-pill--done">Pronto</span>
+          <span class="ui-lab-preview-card__label">Simple</span>
+          <span class="ui-lab-status-pill ui-lab-status-pill--done">Canônico</span>
         </div>
-        <div class="page-header-stack">
-          <div class="page-header-band">
-            <div class="page-header-band__content">
-              <div class="page-header-band__text">
-                <span class="page-header-band__eyebrow">Contexto</span>
-                <h2 class="page-header-band__title">Título da página</h2>
-              </div>
-            </div>
-          </div>
-        </div>
+        {% include "components/ui/headers/header_stack_simple.html" with eyebrow="Cadastros" title="Servidores" description="Gerencie os servidores disponíveis para os documentos." icon_label="SV" module_label="Cadastros" only %}
       </article>
 
       <article class="ui-lab-preview-card">
         <div class="ui-lab-preview-card__header">
-          <span class="ui-lab-preview-card__label">Header Band — com status</span>
-          <span class="ui-lab-status-pill ui-lab-status-pill--done">Pronto</span>
+          <span class="ui-lab-preview-card__label">Status + retorno</span>
+          <span class="ui-lab-status-pill ui-lab-status-pill--done">Canônico</span>
         </div>
-        <div class="ui-lab-header-band-grid">
-          <div class="page-header-band ui-lab-header-band-demo">
-            <div class="page-header-band__content">
-              <div class="page-header-band__text">
-                <span class="page-header-band__eyebrow">Solicitações</span>
-                <h2 class="page-header-band__title">Pedido de viagem</h2>
-              </div>
-              <span class="page-header-status-chip page-header-status-chip--draft">Rascunho</span>
-            </div>
-          </div>
-
-          <div class="page-header-band ui-lab-header-band-demo">
-            <div class="page-header-band__content">
-              <div class="page-header-band__text">
-                <span class="page-header-band__eyebrow">Operação</span>
-                <h2 class="page-header-band__title">Cadastro ativo</h2>
-              </div>
-              <span class="page-header-status-chip page-header-status-chip--active">Ativo</span>
-            </div>
-          </div>
-        </div>
+        {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="Documentos" title="Revisão do ofício" description="Confira os dados antes de finalizar o documento." icon_label="OF" module_label="Ofícios" status_label="Rascunho" status_variant="draft" back_label="Voltar à lista" back_url="#" only %}
       </article>
 
       <article class="ui-lab-preview-card">
         <div class="ui-lab-preview-card__header">
-          <span class="ui-lab-preview-card__label">Header Stack — Rail Simple</span>
-          <span class="ui-lab-status-pill ui-lab-status-pill--done">Pronto</span>
+          <span class="ui-lab-preview-card__label">Ação primária</span>
+          <span class="ui-lab-status-pill ui-lab-status-pill--done">Canônico</span>
         </div>
-        <div class="page-header-stack">
-          <div class="page-header-band">
-            <div class="page-header-band__content">
-              <div class="page-header-band__text">
-                <span class="page-header-band__eyebrow">Contexto</span>
-                <h2 class="page-header-band__title">Título da página</h2>
-              </div>
-            </div>
-          </div>
-          <div class="page-header-rail">
-            <div class="page-header-rail__marker" aria-hidden="true">TP</div>
-            <div class="page-header-rail__content">
-              <span class="page-header-rail__eyebrow">Módulo</span>
-              <p class="page-header-rail__subtitle">Subtítulo genérico para explicar o objetivo desta tela.</p>
-            </div>
-          </div>
-        </div>
+        {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="Eventos" title="Editar evento" description="Atualize o agrupador sem alterar os documentos associados." icon_label="EV" module_label="Eventos" status_label="Em preparação" status_variant="pending" primary_action_label="Salvar evento" primary_action_url="#" only %}
       </article>
 
       <article class="ui-lab-preview-card">
         <div class="ui-lab-preview-card__header">
-          <span class="ui-lab-preview-card__label">Header Stack — Rail Back Action</span>
-          <span class="ui-lab-status-pill ui-lab-status-pill--done">Pronto</span>
+          <span class="ui-lab-preview-card__label">Filtros</span>
+          <span class="ui-lab-status-pill ui-lab-status-pill--done">Canônico</span>
         </div>
-        <div class="ui-lab-header-variant-grid">
-          <div class="ui-lab-header-variant-card">
-            <div class="page-header-stack">
-              <div class="page-header-band">
-                <div class="page-header-band__content">
-                  <div class="page-header-band__text">
-                    <span class="page-header-band__eyebrow">Documentos</span>
-                    <h2 class="page-header-band__title">Revisão em andamento</h2>
-                  </div>
-                  <span class="page-header-status-chip page-header-status-chip--draft">Rascunho</span>
-                </div>
-              </div>
-              <div class="page-header-rail">
-                <div class="page-header-rail__marker" aria-hidden="true">TP</div>
-                <div class="page-header-rail__content">
-                  <span class="page-header-rail__eyebrow">Conferência</span>
-                  <p class="page-header-rail__subtitle">Estado normal: o CTA principal ainda é voltar para a lista.</p>
-                </div>
-                <div class="page-header-rail__actions">
-                  <button class="btn btn-secondary" type="button">Voltar à lista</button>
-                </div>
-              </div>
-            </div>
-            <p class="ui-lab-header-variant-card__caption">Estado normal do rail com retorno.</p>
-          </div>
-
-          <div class="ui-lab-header-variant-card">
-            <div class="page-header-stack">
-              <div class="page-header-band">
-                <div class="page-header-band__content">
-                  <div class="page-header-band__text">
-                    <span class="page-header-band__eyebrow">Documentos</span>
-                    <h2 class="page-header-band__title">Revisão concluída</h2>
-                  </div>
-                  <span class="page-header-status-chip page-header-status-chip--pending">Pendente</span>
-                </div>
-              </div>
-              <div class="page-header-rail">
-                <div class="page-header-rail__marker" aria-hidden="true">TP</div>
-                <div class="page-header-rail__content">
-                  <span class="page-header-rail__eyebrow">Conferência</span>
-                  <p class="page-header-rail__subtitle">Quando tudo está preenchido, o CTA vira o próximo passo.</p>
-                </div>
-                <div class="page-header-rail__actions">
-                  <button class="btn btn-primary" type="button">Finalizar documento</button>
-                </div>
-              </div>
-            </div>
-            <p class="ui-lab-header-variant-card__caption">Estado final com CTA de conclusão.</p>
-          </div>
-        </div>
+        {% include "components/ui/headers/header_stack_filters.html" with eyebrow="Eventos" title="Eventos" icon_label="EV" search_name="q" search_placeholder="Buscar eventos" search_clear_url="#" primary_action_label="Novo evento" primary_action_url="#" only %}
       </article>
 
       <article class="ui-lab-preview-card">
         <div class="ui-lab-preview-card__header">
-          <span class="ui-lab-preview-card__label">Header Stack — Rail Filters</span>
-          <span class="ui-lab-status-pill ui-lab-status-pill--done">Pronto</span>
+          <span class="ui-lab-preview-card__label">Stepper</span>
+          <span class="ui-lab-status-pill ui-lab-status-pill--done">Canônico</span>
         </div>
-        <div class="page-header-stack">
-          <div class="page-header-band">
-            <div class="page-header-band__content">
-              <div class="page-header-band__text">
-                <span class="page-header-band__eyebrow">Contexto</span>
-                <h2 class="page-header-band__title">Título da página</h2>
-              </div>
-            </div>
-          </div>
-          <div class="page-header-rail page-header-rail--filters">
-            <div class="page-header-rail__marker" aria-hidden="true">TP</div>
-            <div class="header-filter-bar">
-              <div class="header-filter-bar__search">
-                <input class="header-filter-input" type="search" placeholder="Buscar itens..." aria-label="Buscar">
-              </div>
-            </div>
-            <div class="page-header-rail__actions">
-              <button class="header-filter-button" type="button">Limpar filtros</button>
-            </div>
-          </div>
-        </div>
-      </article>
-
-      <article class="ui-lab-preview-card">
-        <div class="ui-lab-preview-card__header">
-          <span class="ui-lab-preview-card__label">Header Stack — Rail Advanced Filters</span>
-          <span class="ui-lab-status-pill ui-lab-status-pill--done">Pronto</span>
-        </div>
-        <div class="page-header-stack">
-          <div class="page-header-band">
-            <div class="page-header-band__content">
-              <div class="page-header-band__text">
-                <span class="page-header-band__eyebrow">Contexto</span>
-                <h2 class="page-header-band__title">Título da página</h2>
-              </div>
-            </div>
-          </div>
-          <div class="page-header-rail page-header-rail--filters page-header-rail--advanced-filters">
-            <div class="page-header-rail__marker" aria-hidden="true">TP</div>
-            <div class="header-filter-bar header-filter-bar--advanced">
-              <div class="header-filter-bar__search">
-                <input class="header-filter-input" type="search" placeholder="Buscar item..." aria-label="Buscar">
-              </div>
-              <div class="header-filter-bar__row">
-                <div class="header-filter-bar__fields">
-                  <div class="header-filter-field header-filter-field--sort">
-                    <select class="header-filter-select" aria-label="Ordenar por">
-                      <option value="">Ordenar por</option>
-                      <option value="newest">Mais recentes</option>
-                      <option value="oldest">Mais antigos</option>
-                      <option value="name">Nome A-Z</option>
-                      <option value="status">Status</option>
-                    </select>
-                  </div>
-                  <div class="header-filter-field header-filter-field--period">
-                    <select class="header-filter-select" aria-label="Período">
-                      <option value="">Período</option>
-                      <option value="today">Hoje</option>
-                      <option value="7d">Últimos 7 dias</option>
-                      <option value="30d" selected>Últimos 30 dias</option>
-                      <option value="custom">Personalizado</option>
-                    </select>
-                  </div>
-                  <div class="header-filter-field header-filter-field--status">
-                    <select class="header-filter-select" aria-label="Status">
-                      <option value="">Status</option>
-                      <option value="all">Todos</option>
-                      <option value="active">Ativo</option>
-                      <option value="pending">Pendente</option>
-                      <option value="done">Finalizado</option>
-                      <option value="issues">Com pendência</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="header-filter-bar__actions">
-                  <button class="header-filter-button" type="button">Limpar filtros</button>
-                </div>
-              </div>
-              <div class="header-applied-filters" aria-label="Filtros ativos">
-                <span class="header-applied-chip">Status exemplo <span aria-hidden="true">×</span></span>
-                <span class="header-applied-chip">Últimos 30 dias <span aria-hidden="true">×</span></span>
-                <span class="header-applied-chip">Mais recentes <span aria-hidden="true">×</span></span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </article>
-
-      <article class="ui-lab-preview-card ui-lab-header-quick-add">
-        <div class="ui-lab-preview-card__header">
-          <span class="ui-lab-preview-card__label">Header Stack — Rail Filters + Quick Add</span>
-          <span class="ui-lab-status-pill ui-lab-status-pill--done">Pronto</span>
-        </div>
-        <div class="page-header-stack header-stack--quick-add">
-          <div class="page-header-band">
-            <div class="page-header-band__content">
-              <div class="page-header-band__text">
-                <span class="page-header-band__eyebrow">Contexto</span>
-                <h2 class="page-header-band__title">Título da página</h2>
-              </div>
-            </div>
-          </div>
-          <div class="page-header-rail page-header-rail--filters page-header-rail--filters-quick-add ui-lab-header-quick-add__rail">
-            <div class="page-header-rail__marker" aria-hidden="true">TP</div>
-            <div class="header-filter-bar">
-              <div class="header-filter-bar__search">
-                <input class="header-filter-input" type="search" placeholder="Buscar itens..." aria-label="Buscar">
-              </div>
-              <div class="header-filter-bar__actions">
-                <button class="header-filter-button" type="button">Limpar filtros</button>
-              </div>
-            </div>
-            <div class="quick-add-inline__panel quick-add-panel" id="ui-lab-headers-quick-add" hidden>
-              <div class="quick-add-inline__body">
-                <div class="quick-add-inline__fields">
-                  <div class="field-grid">
-                    {% for field in ui_lab_fields.quick_add_header %}
-                      {% include "dev/ui_lab/partials/_demo_field.html" with field=field only %}
-                    {% endfor %}
-                  </div>
-                </div>
-                <div class="quick-add-inline__actions">
-                  <button class="btn btn-secondary" type="button" data-quick-add-close aria-controls="ui-lab-headers-quick-add">Cancelar</button>
-                  <button class="btn btn-primary" type="button">Salvar</button>
-                </div>
-              </div>
-              
-            </div>
-            
-          </div>
-          <button class="quick-add-footer-button" type="button" data-quick-add-toggle="ui-lab-headers-quick-add" aria-controls="ui-lab-headers-quick-add" aria-expanded="false">
-            <span class="quick-add-footer-button__icon" aria-hidden="true">+</span>
-            <span class="quick-add-footer-button__label">Cadastrar item</span>
-          </button>
-        </div>
-      </article>
-
-      <article class="ui-lab-preview-card">
-        <div class="ui-lab-preview-card__header">
-          <span class="ui-lab-preview-card__label">Header Stack — Stepper</span>
-          <span class="ui-lab-status-pill ui-lab-status-pill--done">Pronto</span>
-        </div>
-        <div class="page-header-stack">
-          <div class="page-header-band">
-            <div class="page-header-band__content">
-              <div class="page-header-band__text">
-                <span class="page-header-band__eyebrow">Contexto</span>
-                <h2 class="page-header-band__title">Título da página</h2>
-              </div>
-              <span class="page-header-status-chip page-header-status-chip--draft">Rascunho</span>
-            </div>
-          </div>
-          <div class="page-header-rail page-header-rail--stepper">
-            <div class="page-header-rail__marker" aria-hidden="true">TP</div>
-            <div class="page-header-rail__content">
-              <span class="page-header-rail__eyebrow">Módulo</span>
-              <p class="page-header-rail__subtitle">Etapa 2 de 6 — Subtítulo genérico da etapa atual.</p>
-            </div>
-            <div class="page-header-rail__actions">
-              <button class="btn btn-secondary" type="button">Voltar à lista</button>
-            </div>
-          </div>
-        </div>
-        <nav class="page-stepper page-stepper--horizontal" aria-label="Etapas do formulário">
-          <ol class="page-stepper__list">
-            {% for step in ui_lab_steps %}
-              <li class="page-stepper__item {{ step.state_class }}"{% if step.aria_current %} aria-current="{{ step.aria_current }}"{% endif %}>
-                <div class="page-stepper__track">
-                  <div class="page-stepper__connector page-stepper__connector--before"></div>
-                  <div class="page-stepper__marker" aria-hidden="{{ step.marker_aria_hidden|yesno:'true,false' }}">
-                    <span class="page-stepper__marker-icon">{{ step.marker }}</span>
-                  </div>
-                  <div class="page-stepper__connector page-stepper__connector--after"></div>
-                </div>
-                <div class="page-stepper__content">
-                  <span class="page-stepper__eyebrow">{{ step.step_label }}</span>
-                  <span class="page-stepper__label">{{ step.title }}</span>
-                  <span class="page-stepper__status">{{ step.status }}</span>
-                </div>
-              </li>
-            {% endfor %}
-          </ol>
-        </nav>
+        {% include "components/ui/headers/header_stack_stepper.html" with eyebrow="Plano de trabalho" title="Novo plano" description="Preencha as etapas para concluir o documento." icon_label="PT" module_label="Planos de Trabalho" status_label="Rascunho" status_variant="draft" only %}
       </article>
     </div>
   </section>

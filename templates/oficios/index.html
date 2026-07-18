@@ -13,10 +13,10 @@
 {% block content %}
 <div class="app-page--main-card-list page-shell page-shell--list oficios-list-page" data-cv-realtime-filter-scope>
 
-  <form class="page-header-stack" method="get" action="{{ request.path }}" data-cv-live-submit-form>
+  <form class="cv-filter-header page-header-stack" method="get" action="{{ request.path }}" data-cv-live-submit-form>
 
     {# ── BAND ── #}
-    <div class="page-header-band">
+    <div class="cv-filter-header__heading page-header-band">
       <div class="page-header-band__content">
         <div class="page-header-band__text">
           <span class="page-header-band__eyebrow">OFÍCIOS</span>
@@ -26,12 +26,12 @@
     </div>
 
     {# ── RAIL ── #}
-    <div class="page-header-rail page-header-rail--filters oficios-rail">
-      <div class="header-filter-bar header-filter-bar--advanced oficios-filter-bar">
+    <div class="cv-filter-header__controls page-header-rail page-header-rail--filters oficios-rail">
+      <div class="cv-filter-bar header-filter-bar header-filter-bar--advanced oficios-filter-bar">
 
         {# Linha única — busca + filtros + limpar (último) #}
         <div class="header-filter-bar__search oficios-filter-bar__search-row oficios-filter-bar__single-row">
-          <div class="oficios-filter-bar__search-wrap">
+          <div class="cv-filter-bar__search oficios-filter-bar__search-wrap">
             <span class="oficios-filter-bar__search-icon" aria-hidden="true">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
                 <circle cx="11" cy="11" r="7"/>
@@ -39,7 +39,7 @@
               </svg>
             </span>
             <input
-              class="header-filter-input oficios-filter-bar__search-input"
+              class="cv-filter-bar__search-input header-filter-input oficios-filter-bar__search-input"
               type="search"
               name="q"
               placeholder="Buscar por número, protocolo, motivo ou destino…"
@@ -52,7 +52,7 @@
           <input type="hidden" name="aba" value="{{ aba }}">
 
           {# Ordenação #}
-          <div class="cv-custom-select oficios-filter-cs" data-cv-select>
+          <div class="cv-filter-bar__select cv-custom-select oficios-filter-cs" data-cv-select>
             <select name="sort" aria-label="Ordenar por" data-cv-filter="select">
               {% for opt in sort_options %}
                 <option value="{{ opt.value }}"{% if opt.value == sort or not sort and forloop.first %} selected{% endif %}>{{ opt.label }}</option>

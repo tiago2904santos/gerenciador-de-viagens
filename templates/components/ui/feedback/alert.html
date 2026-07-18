@@ -1,3 +1,6 @@
-<div class="alert alert--{{ variant|default:'info' }}{% if extra_class %} {{ extra_class }}{% endif %}" role="alert">
-  {{ message }}
+{% with alert_variant=variant|default:'info' %}
+<div class="alert alert-{{ alert_variant }} alert--{{ alert_variant }}{% if extra_class %} {{ extra_class }}{% endif %}" role="alert">
+  {% if title %}<strong class="alert__title">{{ title }}</strong>{% endif %}
+  <span class="alert__message">{{ message }}</span>
 </div>
+{% endwith %}

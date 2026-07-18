@@ -10,14 +10,15 @@
       {% include "components/ui/layouts/form_section.html" with title="Confirmação de exclusão" description="Confirma a exclusão do modelo de motivo." section_id="modelos-motivo-delete-section" only %}
       <div class="field-grid">
         <div class="field-size-4">
-          <p style="margin: 0 0 var(--space-3)">Confirma a exclusão do modelo <strong>{{ object.nome }}</strong>?</p>
+          <p class="delete-confirm-copy">Confirma a exclusão do modelo <strong>{{ object.nome }}</strong>?</p>
           {% if object.texto %}
-            <p style="margin: 0 0 var(--space-2)"><strong>Prévia do texto:</strong></p>
-            <p style="margin: 0 0 var(--space-4); color: var(--color-muted)">{{ object.texto }}</p>
+            <p class="delete-confirm-preview__label"><strong>Prévia do texto:</strong></p>
+            <p class="delete-confirm-preview__body">{{ object.texto }}</p>
           {% endif %}
           {% include "components/ui/feedback/alert.html" with variant="warning" message="Esta ação remove o modelo da lista de sugestões, mas não altera ofícios já criados." only %}
         </div>
       </div>
+      </section>
       {% include "components/ui/layouts/card_footer_actions.html" with secondary_label="Cancelar" secondary_url=back_url primary_label="Excluir" primary_variant="danger" only %}
     </form>
   </div>

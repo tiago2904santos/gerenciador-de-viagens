@@ -84,13 +84,6 @@ NAVIGATION_ITEMS = [
         "icon": "JS",
     },
     {
-        "id": "protocolos",
-        "label": "Protocolos",
-        "url_name": "protocolos:index",
-        "icon": "PR",
-        "active_when": ["protocolos:"],
-    },
-    {
         "id": "prestacoes_contas",
         "label": "Prestações de Contas",
         "url_name": "prestacoes_contas:index",

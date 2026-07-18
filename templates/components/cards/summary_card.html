@@ -1,5 +1,5 @@
-<article class="summary-card">
-  <span class="summary-label">{{ label }}</span>
-  <strong>{{ value }}</strong>
-  {% if description %}<p>{{ description }}</p>{% endif %}
+<article class="cv-summary-tile summary-card">
+  <span class="cv-summary-tile__label summary-label">{{ label }}</span>
+  <strong class="cv-summary-tile__value">{{ value }}</strong>
+  {% if description %}<p class="cv-summary-tile__description">{{ description }}</p>{% endif %}
 </article>

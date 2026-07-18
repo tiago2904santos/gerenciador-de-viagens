@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView as DjangoLoginView
+from django.core.paginator import Paginator
 from django.http import Http404
 from django.shortcuts import redirect
 from django.shortcuts import render
@@ -13,6 +14,7 @@ from eventos.models import Evento
 from .forms import AlterarSenhaForm
 from .forms import LoginForm
 from .forms import PerfilUsuarioForm
+from .forms import UiLabFieldDemoForm
 
 
 UI_LAB_PAGE_DEFINITIONS = [
@@ -48,8 +50,8 @@ UI_LAB_PAGE_DEFINITIONS = [
         "title": "Cadastro de Evento",
         "subtitle": "Laboratorio visual do formulario de Eventos usando padroes existentes.",
         "summary": "Header, cards, grid, campos, chips e rodape clonados dos cadastros maduros.",
-        "status_label": "Em revisao",
-        "status_modifier": "review",
+        "status_label": "Pronto",
+        "status_modifier": "done",
         "route_name": "core:ui_lab_eventos_cadastro",
     },
     {
@@ -59,8 +61,8 @@ UI_LAB_PAGE_DEFINITIONS = [
         "title": "Lista & Painel de Eventos",
         "subtitle": "Laboratorio da lista e do card de eventos clonando Roteiros e Oficios.",
         "summary": "Lista de eventos em cards, filtro em tempo real, chips de status e estado vazio.",
-        "status_label": "Em revisao",
-        "status_modifier": "review",
+        "status_label": "Pronto",
+        "status_modifier": "done",
         "route_name": "core:ui_lab_eventos_lista",
     },
     {
@@ -73,6 +75,17 @@ UI_LAB_PAGE_DEFINITIONS = [
         "status_label": "Pronto",
         "status_modifier": "done",
         "route_name": "core:ui_lab_lists",
+    },
+    {
+        "slug": "cards",
+        "label": "Cards / Summaries",
+        "mark": "CD",
+        "title": "Cards / Summaries",
+        "subtitle": "Cards documentais e blocos de resumo construidos com os contratos canonicos.",
+        "summary": "Resumo, metadados documentais, status e grupos de acoes responsivos.",
+        "status_label": "Pronto",
+        "status_modifier": "done",
+        "route_name": "core:ui_lab_cards",
     },
     {
         "slug": "headers",
@@ -92,8 +105,8 @@ UI_LAB_PAGE_DEFINITIONS = [
         "title": "Buttons",
         "subtitle": "Taxonomia funcional de botoes: form, navegacao, wizard, documento e destrutivos.",
         "summary": "Hierarquia, document actions com identidade propria, Excluir vs Remover, estados e icon buttons.",
-        "status_label": "Em construcao",
-        "status_modifier": "build",
+        "status_label": "Pronto",
+        "status_modifier": "done",
         "route_name": "core:ui_lab_buttons",
     },
     {
@@ -103,8 +116,8 @@ UI_LAB_PAGE_DEFINITIONS = [
         "title": "Fields / Inputs",
         "subtitle": "Campos base do design system, agrupamentos e variacoes de estado.",
         "summary": "Inputs, textareas, checkboxes, radios, switches e layouts de campo.",
-        "status_label": "Planejado",
-        "status_modifier": "planned",
+        "status_label": "Pronto",
+        "status_modifier": "done",
         "route_name": "core:ui_lab_fields",
     },
     {
@@ -114,8 +127,8 @@ UI_LAB_PAGE_DEFINITIONS = [
         "title": "Selects / Dropdowns / Filters",
         "subtitle": "Selecao, dropdowns, filtros e quick add em uma pagina dedicada.",
         "summary": "Selects, filtros simples, filtros avancados e quick add aberto.",
-        "status_label": "Em construcao",
-        "status_modifier": "build",
+        "status_label": "Pronto",
+        "status_modifier": "done",
         "route_name": "core:ui_lab_selects_filters",
     },
     {
@@ -125,8 +138,8 @@ UI_LAB_PAGE_DEFINITIONS = [
         "title": "Badges / Chips / Status",
         "subtitle": "Estados, chips e etiquetas para ciclos documentais e entidades.",
         "summary": "Status de ciclo, chips de pessoa, viajante, destino e filtros aplicados.",
-        "status_label": "Planejado",
-        "status_modifier": "planned",
+        "status_label": "Pronto",
+        "status_modifier": "done",
         "route_name": "core:ui_lab_status",
     },
     {
@@ -136,8 +149,8 @@ UI_LAB_PAGE_DEFINITIONS = [
         "title": "Feedback / Validation",
         "subtitle": "Mensagens, alertas, estados vazios e validacao de formulario.",
         "summary": "Erros, avisos, sucesso, loading, skeleton e estados discretos.",
-        "status_label": "Planejado",
-        "status_modifier": "planned",
+        "status_label": "Pronto",
+        "status_modifier": "done",
         "route_name": "core:ui_lab_feedback",
     },
     {
@@ -147,8 +160,8 @@ UI_LAB_PAGE_DEFINITIONS = [
         "title": "Modals / Drawers / Popovers",
         "subtitle": "Camadas de interface que aparecem acima do conteudo principal.",
         "summary": "Modal, drawer lateral, popover, tooltip e menus de acao.",
-        "status_label": "Planejado",
-        "status_modifier": "planned",
+        "status_label": "Pronto",
+        "status_modifier": "done",
         "route_name": "core:ui_lab_overlays",
     },
     {
@@ -158,8 +171,8 @@ UI_LAB_PAGE_DEFINITIONS = [
         "title": "Tables / Pagination",
         "subtitle": "Tabelas, selecao, paginacao e estados vazios em um so lugar.",
         "summary": "Tabela simples, densa, responsiva, com acoes e paginacao.",
-        "status_label": "Planejado",
-        "status_modifier": "planned",
+        "status_label": "Pronto",
+        "status_modifier": "done",
         "route_name": "core:ui_lab_tables",
     },
     {
@@ -169,8 +182,8 @@ UI_LAB_PAGE_DEFINITIONS = [
         "title": "Document Viewer / PDF Preview",
         "subtitle": "Superficie documental para pre-visualizacao, metadados e acoes.",
         "summary": "Preview de PDF, toolbar, info lateral e arquivos vinculados.",
-        "status_label": "Planejado",
-        "status_modifier": "planned",
+        "status_label": "Pronto",
+        "status_modifier": "done",
         "route_name": "core:ui_lab_documents",
     },
     {
@@ -180,8 +193,8 @@ UI_LAB_PAGE_DEFINITIONS = [
         "title": "Signature / Document Actions",
         "subtitle": "Acoes de assinatura e distribuicao documental em um shell separado.",
         "summary": "Solicitacao, download, copia de link e estados de assinatura.",
-        "status_label": "Planejado",
-        "status_modifier": "planned",
+        "status_label": "Pronto",
+        "status_modifier": "done",
         "route_name": "core:ui_lab_signature",
     },
 ]
@@ -296,6 +309,12 @@ UI_LAB_PLAN_ITEMS = {
         "Lista com cards, descricao e metadados",
         "Estado vazio com acao contextual",
         "Pagination shell com paginas anterior e proxima",
+    ],
+    "cards": [
+        "Summary tiles para informacoes de leitura rapida",
+        "Document cards com status e metadados estruturados",
+        "Acoes documentais com hierarquia funcional",
+        "Grid responsivo sem implementacoes paralelas",
     ],
     "status": [
         "Status de ciclo documental e estados operacionais",
@@ -443,6 +462,7 @@ UI_LAB_SIMPLE_ROWS = [
         "meta": "Descricao exemplo · Metadado exemplo",
         "status_label": "Status exemplo",
         "status_modifier": "done",
+        "status_value": "done",
         "action_label": "Acao",
     },
     {
@@ -453,6 +473,7 @@ UI_LAB_SIMPLE_ROWS = [
         "meta": "Descricao exemplo · Metadado exemplo",
         "status_label": "Status exemplo",
         "status_modifier": "draft",
+        "status_value": "draft",
         "action_label": "Acao",
     },
     {
@@ -463,6 +484,7 @@ UI_LAB_SIMPLE_ROWS = [
         "meta": "Descricao exemplo · Metadado exemplo",
         "status_label": "Status exemplo",
         "status_modifier": "review",
+        "status_value": "draft",
         "action_label": "Acao",
     },
     {
@@ -473,39 +495,74 @@ UI_LAB_SIMPLE_ROWS = [
         "meta": "Descricao exemplo · Metadado exemplo",
         "status_label": "Status exemplo",
         "status_modifier": "done",
+        "status_value": "done",
         "action_label": "Acao",
     },
 ]
 
+UI_LAB_TABLE_ROWS = [
+    {
+        "title": f"Documento {number:02d}",
+        "detail": "Ofício de demonstração",
+        "reference": f"CV-{2026000 + number}",
+        "status_label": "Concluído" if number % 3 == 0 else "Em revisão" if number % 2 == 0 else "Rascunho",
+        "status_variant": "success" if number % 3 == 0 else "info" if number % 2 == 0 else "warning",
+        "action_url": "#",
+    }
+    for number in range(1, 14)
+]
+
 UI_LAB_CARDS = [
     {
-        "title": "Card exemplo 1",
-        "status_label": "Status exemplo",
-        "status_modifier": "draft",
-        "meta_items": ["Metadado exemplo", "Metadado exemplo"],
-        "description": "Descricao generica do conteudo deste card. Texto de exemplo sem dados reais.",
-        "secondary_action": "Acao exemplo",
-        "primary_action": "Ver detalhes",
+        "title": "Oficio de solicitacao 621/2026",
+        "subtitle": "Documento principal da viagem",
+        "status": "Em revisao",
+        "status_class": "status-chip--info",
+        "meta": [
+            {"label": "Tipo", "value": "Oficio"},
+            {"label": "Atualizado", "value": "17/07/2026, 14:32"},
+        ],
+        "body": "Minuta pronta para conferencia antes da assinatura.",
+        "actions": [
+            {"href": "#", "label": "Abrir", "variant": "secondary"},
+            {"href": "#", "label": "Baixar PDF", "variant": "muted"},
+        ],
     },
     {
-        "title": "Card exemplo 2",
-        "status_label": "Status exemplo",
-        "status_modifier": "done",
-        "meta_items": ["Metadado exemplo", "Metadado exemplo"],
-        "description": "Descricao generica do conteudo deste card. Texto de exemplo sem dados reais.",
-        "secondary_action": "Acao exemplo",
-        "primary_action": "Ver detalhes",
-    },
-    {
-        "title": "Card exemplo 3",
-        "status_label": "Status exemplo",
-        "status_modifier": "review",
-        "meta_items": ["Metadado exemplo", "Metadado exemplo"],
-        "description": "Descricao generica do conteudo deste card. Texto de exemplo sem dados reais.",
-        "secondary_action": "Acao exemplo",
-        "primary_action": "Ver detalhes",
+        "title": "Relatorio tecnico da viagem",
+        "subtitle": "Prestacao de contas",
+        "status": "Concluido",
+        "status_class": "status-chip--success",
+        "meta": [
+            {"label": "Tipo", "value": "Relatorio tecnico"},
+            {"label": "Responsavel", "value": "Rafael Ferreira da Silva"},
+        ],
+        "body": "Documento final consolidado e disponivel para consulta.",
+        "actions": [
+            {"href": "#", "label": "Visualizar", "variant": "secondary"},
+            {"href": "#", "label": "Excluir", "variant": "danger"},
+        ],
     },
 ]
+
+UI_LAB_SUMMARY_ITEMS = [
+    {"label": "Destino", "value": "Londrina / PR", "description": "Viagem institucional"},
+    {"label": "Periodo", "value": "27 a 29 de maio", "description": "3 dias de afastamento"},
+    {"label": "Viajantes", "value": "4 servidores", "description": "1 motorista designado"},
+    {"label": "Situacao", "value": "Em preparacao", "description": "Documentos em revisao"},
+]
+
+UI_LAB_SIGNATURE = {
+    "tipo": "relatorio-tecnico",
+    "signatario": "Rafael Ferreira da Silva",
+    "assinada": False,
+    "link_ativo": True,
+    "pode_assinar": True,
+    "link_absoluto": "https://exemplo.local/assinar/7F4K-92MZ/",
+    "whatsapp_phone": "5541999999999",
+    "whatsapp_msg": "O documento esta disponivel para assinatura.",
+    "gerar_url": "#",
+}
 
 UI_LAB_ROTEIROS_CARDS = [
     {
@@ -626,6 +683,56 @@ def _ui_lab_evento_card(
     """
 
     return {
+        "pk": "lab-" + status_variant,
+        "titulo": titulo,
+        "destino": destino,
+        "periodo": periodo,
+        "responsavel": responsavel,
+        "status_state": status_tone,
+        "status_label": status_label,
+        "cancelado": status_variant == "cancelado",
+        "oficios": [
+            {
+                "oficio_pk": index + 1,
+                "numero": f"{index + 1:03d}/2026",
+                "protocolo": f"CV-{2026100 + index}",
+                "destino_display": destino,
+                "data_evento_display": periodo,
+                "servidores": [],
+                "visualizar_url": "#",
+                "pdf_url": "#",
+                "docx_url": "#",
+                "editar_url": "#",
+            }
+            for index in range(oficios)
+        ],
+        "documentos": [
+            {
+                "kind": "Documento",
+                "title": f"Arquivo vinculado {index + 1}",
+                "detail": "Disponivel no Drive" if drive == "Vinculado" else "Pendente de vinculacao",
+                "meta": f"{pendencias} pendencia(s)",
+                "visualizar_url": "#",
+                "pdf_url": "#",
+                "docx_url": "#",
+                "editar_url": "#",
+            }
+            for index in range(documentos)
+        ],
+        "servidores_flat": [
+            {
+                "name": responsavel,
+                "cargo": "Responsavel",
+                "unidade": unidade,
+                "telefone": "",
+                "has_termo": False,
+            }
+        ],
+        "servidores_flat_count": 1,
+        "editar_url": href,
+        "cancelar_url": "#",
+        "reativar_url": "#",
+        "excluir_url": "#",
         "title": titulo,
         "subtitle": f"{destino} · {periodo}",
         "status_variant": status_variant,
@@ -755,6 +862,11 @@ def _build_ui_lab_context(active_slug):
     if current_page is None:
         raise Http404
 
+    field_demo_form = UiLabFieldDemoForm()
+    field_demo_form_bound = UiLabFieldDemoForm(data={"nome": ""})
+    field_demo_form_bound.is_valid()
+    ui_lab_table_page = Paginator(UI_LAB_TABLE_ROWS, 5).page(2)
+
     return {
         "ui_lab_pages": pages,
         "ui_lab_nav_items": pages,
@@ -764,8 +876,19 @@ def _build_ui_lab_context(active_slug):
         "ui_lab_header_status_variants": UI_LAB_HEADER_STATUS_VARIANTS,
         "ui_lab_steps": UI_LAB_STEPS,
         "ui_lab_fields": UI_LAB_FIELDS,
+        "field_demo_form": field_demo_form,
+        "field_demo_form_bound": field_demo_form_bound,
+        "ui_lab_filter_options": (
+            {"value": "", "label": "Todos os status"},
+            {"value": "done", "label": "Concluídos"},
+            {"value": "draft", "label": "Rascunhos"},
+        ),
         "ui_lab_simple_rows": UI_LAB_SIMPLE_ROWS,
+        "ui_lab_table_page": ui_lab_table_page,
+        "ui_lab_table_pagination_pages": (1, 2, 3),
         "ui_lab_cards": UI_LAB_CARDS,
+        "ui_lab_summary_items": UI_LAB_SUMMARY_ITEMS,
+        "ui_lab_signature": UI_LAB_SIGNATURE,
         "ui_lab_roteiros_cards": UI_LAB_ROTEIROS_CARDS,
         "ui_lab_status_examples": UI_LAB_STATUS_EXAMPLES,
         "ui_lab_chip_groups": UI_LAB_CHIP_GROUPS,
@@ -981,7 +1104,7 @@ def ui_lab_lists(request):
 
 
 def ui_lab_cards(request):
-    return ui_lab_lists(request)
+    return _render_ui_lab(request, "dev/ui_lab/cards.html", "cards")
 
 
 def ui_lab_overlays(request):

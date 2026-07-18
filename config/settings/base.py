@@ -45,7 +45,6 @@ INSTALLED_APPS = [
     "ordens_servico",
     "diario_bordo",
     "integracoes.google_drive",
-    "protocolos",
     "prestacoes_contas",
     "ui_lab2",
 ]
@@ -163,20 +162,6 @@ def _env_flag(name, default="false"):
 
 
 # ---------------------------------------------------------------------------
-# Integração eProtocolo (Paraná)
-#
-# Credenciais sensíveis (CLIENT_SECRET, CONSUMER_ID, etc.) ficam apenas no .env
-# e nunca são versionadas. Códigos institucionais não sensíveis (órgão, locais,
-# assunto, espécie, palavra-chave) também são configuráveis aqui ou no admin.
-#
-# AMBIENTE controla o comportamento do client:
-#   - "mock"        → nunca chama a rede; respostas determinísticas (dev/testes).
-#   - "homologacao" → chama a API real de homologação se houver credenciais.
-#   - "producao"    → chama a API real de produção se houver credenciais.
-# Sem credenciais válidas, o client cai em modo mock automaticamente para que o
-# sistema nunca quebre por ausência de configuração.
-# ---------------------------------------------------------------------------
-# ---------------------------------------------------------------------------
 # Integração Google Drive
 #
 # Sem credenciais (MODO=mock), o sistema nunca chama a API — uploads são
@@ -232,28 +217,4 @@ CELERY_BROKER_CONNECTION_TIMEOUT = float(os.getenv("CELERY_BROKER_CONNECTION_TIM
 CELERY_BROKER_TRANSPORT_OPTIONS = {
     "socket_connect_timeout": float(os.getenv("CELERY_BROKER_CONNECTION_TIMEOUT") or 5),
     "socket_timeout": float(os.getenv("CELERY_BROKER_CONNECTION_TIMEOUT") or 5),
-}
-
-EPROTOCOLO = {
-    "AMBIENTE": (os.getenv("EPROTOCOLO_AMBIENTE") or "mock").strip().lower(),
-    "BASE_URL": (os.getenv("EPROTOCOLO_BASE_URL") or "").strip(),
-    "TOKEN_URL": (os.getenv("EPROTOCOLO_TOKEN_URL") or "").strip(),
-    "CLIENT_ID": (os.getenv("EPROTOCOLO_CLIENT_ID") or "").strip(),
-    "CLIENT_SECRET": (os.getenv("EPROTOCOLO_CLIENT_SECRET") or "").strip(),
-    "CONSUMER_ID": (os.getenv("EPROTOCOLO_CONSUMER_ID") or "").strip(),
-    "TIMEOUT": int(os.getenv("EPROTOCOLO_TIMEOUT", "30") or "30"),
-    "VERIFY_SSL": _env_flag("EPROTOCOLO_VERIFY_SSL", "true"),
-    "REAL_READONLY": _env_flag("EPROTOCOLO_REAL_READONLY", "true"),
-    "REAL_MUTATIONS_ENABLED": _env_flag("EPROTOCOLO_REAL_MUTATIONS_ENABLED", "false"),
-    # Códigos institucionais padrão (não sensíveis) — usados pelos mappers
-    # quando o documento não traz a informação. Podem ficar vazios.
-    "COD_ORGAO_PADRAO": (os.getenv("EPROTOCOLO_COD_ORGAO_PADRAO") or "").strip(),
-    "NOME_ORGAO_PADRAO": (os.getenv("EPROTOCOLO_NOME_ORGAO_PADRAO") or "").strip(),
-    "COD_LOCAL_ORIGEM_PADRAO": (os.getenv("EPROTOCOLO_COD_LOCAL_ORIGEM_PADRAO") or "").strip(),
-    "COD_LOCAL_DESTINO_PADRAO": (os.getenv("EPROTOCOLO_COD_LOCAL_DESTINO_PADRAO") or "").strip(),
-    "COD_ASSUNTO_VIAGEM": (os.getenv("EPROTOCOLO_COD_ASSUNTO_VIAGEM") or "").strip(),
-    "COD_ESPECIE_OFICIO": (os.getenv("EPROTOCOLO_COD_ESPECIE_OFICIO") or "").strip(),
-    "COD_PALAVRA_CHAVE_VIAGEM": (os.getenv("EPROTOCOLO_COD_PALAVRA_CHAVE_VIAGEM") or "").strip(),
-    "COD_TIPO_TRAMITACAO_PADRAO": (os.getenv("EPROTOCOLO_COD_TIPO_TRAMITACAO_PADRAO") or "").strip(),
-    "CPF_USUARIO_SISTEMA": (os.getenv("EPROTOCOLO_CPF_USUARIO_SISTEMA") or "").strip(),
 }
