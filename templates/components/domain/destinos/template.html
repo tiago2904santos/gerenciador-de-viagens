@@ -1,0 +1,4 @@
+{# <template> clonado pelo JS de quick-add de destinos. Parâmetros: prefix (os|pt|termo), picker_open_all (opcional). #}
+<template data-{{ prefix }}-destino-template>
+  {% include "components/domain/destino_row.html" with row_extra_class="termo-destino-row" prefix=prefix row_index="__index__" picker_open_all=picker_open_all state_select_template="components/domain/destinos/state_select.html" city_select_template="components/domain/destinos/city_select.html" %}
+</template>

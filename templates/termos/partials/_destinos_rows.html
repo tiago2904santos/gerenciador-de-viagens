@@ -1,3 +1,0 @@
-{% for row in form.destination_rows %}
-  {% include "components/domain/destino_row.html" with row_single=row.is_primary row_extra_class="termo-destino-row" termo_row=True has_termo_index=True termo_index=row.index remove_hidden=row.is_primary state_select_template="termos/partials/_destino_state_select.html" city_select_template="termos/partials/_destino_city_select.html" %}
-{% endfor %}

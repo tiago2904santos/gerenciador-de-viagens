@@ -1,13 +1,15 @@
+{# Select de estado do destino. Serve tanto às linhas reais (row presente) quanto ao <template> (row ausente, row_index="__index__"). #}
 <select
   class="cv-search-picker__native"
   data-cv-search-picker="true"
   data-picker-mode="single"
   data-picker-variant="compact"
+  {% if picker_open_all %}data-picker-open-all="true"{% endif %}
   data-placeholder="Buscar estado..."
   data-empty-message="Nenhum estado encontrado."
   data-picker-initial-value="{{ row.estado_id }}"
-  data-termo-destino-state
-  name="{% if row.is_primary %}destino_estado{% else %}destino_estado_{{ row.index }}{% endif %}"
+  data-{{ prefix }}-destino-state
+  name="{% if row.is_primary %}destino_estado{% else %}destino_estado_{{ row_index }}{% endif %}"
 >
   <option value=""></option>
   {% for estado in form.fields.destino_estado.queryset %}

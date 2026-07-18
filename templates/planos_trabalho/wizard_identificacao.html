@@ -89,8 +89,8 @@
               </div>
             </div>
           </section>
-          {% include "components/domain/destinos_section.html" with section_id="pt-evento-destinos" title_id="pt-evento-destinos-title" description="Cada destino usa o mesmo padrão visual da sede para manter o fluxo consistente." panel_aria_label="Destinos adicionados" add_button_pt=True rows_template="planos_trabalho/partials/_destinos_rows.html" errors_template="planos_trabalho/partials/_destinos_errors.html" %}
-          {% include "planos_trabalho/partials/_destinos_template.html" %}
+          {% include "components/domain/destinos_section.html" with section_id="pt-evento-destinos" title_id="pt-evento-destinos-title" description="Cada destino usa o mesmo padrão visual da sede para manter o fluxo consistente." panel_aria_label="Destinos adicionados" add_button_pt=True prefix="pt" rows_template="components/domain/destinos/rows.html" errors_template="components/domain/destinos/errors.html" %}
+          {% include "components/domain/destinos/template.html" with prefix="pt" %}
           {% comment %}
           <section class="wizard-inner-section termo-evento-destinos" aria-labelledby="pt-evento-destinos-title" id="pt-evento-destinos">
             <header class="wizard-inner-section__header">
