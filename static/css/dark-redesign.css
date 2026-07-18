@@ -1979,3 +1979,99 @@ html[data-theme="light-dark"] :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-lay
   height: var(--cv-btn-icon-size);
   display: block;
 }
+
+/* =========================================================
+   Refino visual v2 (2026-07-18) — hierarquia e menos peso
+   Cards de lista (entity card), chips e cabeçalho de filtros.
+   Paleta intocada; apenas contraste, bordas e espaçamento.
+   ========================================================= */
+
+/* Sub-cards internos: superfície suave SEM borda — a borda só acende no hover.
+   Menos linhas de grade dentro do card, visual mais leve. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  :is(.oficio-lc__transport-card, .oficio-lc__traveller, .oficio-lc__subcard) {
+  border-color: transparent;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  :is(.oficio-lc__transport-card, .oficio-lc__traveller, .oficio-lc__subcard):hover {
+  border-color: var(--color-border);
+}
+
+/* Labels internos mais discretos que os valores — hierarquia label < valor. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  :is(.oficio-lc__transport-label, .oficio-lc__traveller-meta, .oficio-lc__trecho-times) {
+  color: var(--color-subtle);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .oficio-lc__transport-label {
+  color: color-mix(in srgb, var(--color-accent-text) 72%, var(--color-muted));
+  font-size: 0.64rem;
+}
+
+/* Valores em destaque claro sobre os labels. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  :is(.oficio-lc__valor-total, .oficio-lc__transport-placa, .oficio-lc__traveller-name) {
+  color: var(--color-heading);
+}
+
+/* Chips do cabeçalho do card: sem glow, presença menor. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .oficio-lc__temporal-chip {
+  box-shadow: none;
+  font-size: 0.68rem;
+}
+
+/* Badge interna (Motorista, nº do ofício... ) mais contida. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .oficio-lc__traveller-badge {
+  box-shadow: none;
+}
+
+/* Rodapé do card: separador sutil em vez de bloco cheio. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .oficio-lc__footer {
+  background: transparent;
+  border-top-color: var(--color-border-soft);
+}
+
+/* Filete dourado do cabeçalho: mais fino e com brilho contido. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .oficio-lc__id-row::before {
+  width: 6px;
+  box-shadow:
+    0 0 6px 1px color-mix(in srgb, var(--color-accent) 35%, transparent),
+    0 0 14px 2px color-mix(in srgb, var(--color-accent) 14%, transparent);
+}
+
+/* Linhas de trecho: fundo mais raso, borda só no hover. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .oficio-lc__trecho {
+  border-color: transparent;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .oficio-lc__trecho:hover {
+  border-color: var(--color-border);
+}
+
+/* Cabeçalho de filtros: campos assentados na superfície suave, foco consistente. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  :is(.oficios-filter-bar .header-filter-input, .oficios-filter-bar .oficios-filter-cs select) {
+  background: var(--color-surface-soft);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .oficios-filter-bar .header-filter-input:focus-visible {
+  border-color: var(--color-focus);
+  box-shadow: 0 0 0 3px rgba(116, 170, 224, 0.25);
+  outline: none;
+}
+
+/* Grid de cards: respiro vertical consistente. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .page-shell--cards .cv-card-grid {
+  gap: var(--space-6);
+}
