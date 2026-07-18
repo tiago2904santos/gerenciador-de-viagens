@@ -3,6 +3,7 @@ from __future__ import annotations
 from django.urls import reverse
 from django.utils import timezone
 
+from core import entity_cards
 from oficios.presenters import _iniciais_nome_servidor
 
 
@@ -139,25 +140,74 @@ def apresentar_ordem_servico_card(ordem):
     if len(motivo) > 240:
         motivo_resumido = motivo[:240] + "…"
 
+    numero_display = ordem.numero_formatado
+    destinos_display = _destinos_display_os(ordem)
+    periodo_display = _periodo_display_curto(ordem)
+    servidores = _servidores_display_os(ordem)
+    oficios_vinculados = _oficios_vinculados_os(ordem)
+
+    header_value = " · ".join(
+        parte for parte in [numero_display, destinos_display, periodo_display] if parte
+    )
+    header_chips = []
+    if temporal_label:
+        header_chips.append(entity_cards.chip(temporal_tone, temporal_label))
+    if ordem.cancelado:
+        header_chips.append(entity_cards.chip("danger", "Cancelada"))
+
+    search_parts = [numero_display, destinos_display, motivo]
+    search_parts.extend(s["name"] for s in servidores)
+    search_parts.extend(o["numero"] for o in oficios_vinculados)
+
+    editar_url = reverse("ordens_servico:editar", args=[ordem.pk])
+    excluir_url = reverse("ordens_servico:excluir", args=[ordem.pk])
+
     return {
         "pk": ordem.pk,
-        "numero_display": ordem.numero_formatado,
+        "search_text": " ".join(p for p in search_parts if p).strip(),
+        "header": entity_cards.header(
+            [entity_cards.header_item("Ordem de Serviço", header_value, wrap=True)],
+            header_chips,
+        ),
+        "cancel_note": ordem.motivo_cancelamento if ordem.cancelado else "",
+        "footer": entity_cards.footer(
+            edit_url=editar_url,
+            edit_aria="Editar Ordem de Serviço",
+            menus=[
+                entity_cards.documents_menu(
+                    f"os-document-menu-{ordem.pk}",
+                    numero_display,
+                    title="Ordem de Serviço",
+                    view_url=reverse("ordens_servico:pdf_inline", args=[ordem.pk]),
+                    pdf_url=reverse("ordens_servico:baixar_pdf", args=[ordem.pk]),
+                    docx_url=reverse("ordens_servico:baixar_docx", args=[ordem.pk]),
+                    view_title="Visualizar documento",
+                    view_description="Abrir a Ordem de Serviço",
+                    docx_description="Arquivo editável da Ordem de Serviço",
+                    trigger_aria=f"Abrir documentos da Ordem de Serviço {numero_display}",
+                )
+            ],
+            delete_modal_url=excluir_url,
+            delete_modal_label=numero_display,
+            delete_aria="Excluir Ordem de Serviço",
+        ),
+        "numero_display": numero_display,
         "data_criacao_display": data_criacao_display,
-        "periodo_display": _periodo_display_curto(ordem),
-        "destinos_display": _destinos_display_os(ordem),
+        "periodo_display": periodo_display,
+        "destinos_display": destinos_display,
         "temporal_label": temporal_label,
         "temporal_tone": temporal_tone,
-        "servidores": _servidores_display_os(ordem),
+        "servidores": servidores,
         "servidores_count": ordem.servidores.count(),
-        "oficios_vinculados": _oficios_vinculados_os(ordem),
+        "oficios_vinculados": oficios_vinculados,
         "cancelado": ordem.cancelado,
         "motivo_cancelamento": ordem.motivo_cancelamento,
         "motivo": motivo,
         "motivo_resumido": motivo_resumido,
         "assinante": _get_assinante_os(),
-        "editar_url": reverse("ordens_servico:editar", args=[ordem.pk]),
+        "editar_url": editar_url,
         "docx_url": reverse("ordens_servico:baixar_docx", args=[ordem.pk]),
         "pdf_url": reverse("ordens_servico:baixar_pdf", args=[ordem.pk]),
         "visualizar_url": reverse("ordens_servico:pdf_inline", args=[ordem.pk]),
-        "excluir_url": reverse("ordens_servico:excluir", args=[ordem.pk]),
+        "excluir_url": excluir_url,
     }

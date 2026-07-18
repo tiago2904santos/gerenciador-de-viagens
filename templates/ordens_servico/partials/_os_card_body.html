@@ -1,0 +1,47 @@
+{# Miolo do card de Ordem de Serviço — servidores + motivo/assinante. #}
+<div class="oficio-lc__section">
+  <div class="oficio-lc__travellers oficio-lc__travellers--n{{ card.servidores_count|default:0 }}">
+    {% for s in card.servidores %}
+    <div class="oficio-lc__traveller{% if s.is_motorista %} oficio-lc__traveller--motorista{% endif %}">
+      <div class="oficio-lc__traveller-body">
+        <div class="oficio-lc__traveller-name-row">
+          <span class="oficio-lc__traveller-name">{{ s.name }}</span>
+          {% if s.is_motorista %}
+          <span class="oficio-lc__traveller-badge">Motorista</span>
+          {% endif %}
+          {% if s.cargo or s.unidade %}
+          <span class="oficio-lc__traveller-meta">{% if s.cargo %}{{ s.cargo }}{% endif %}{% if s.cargo and s.unidade %} · {% endif %}{% if s.unidade %}{{ s.unidade }}{% endif %}</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <p class="oficio-lc__empty-hint">Nenhum servidor informado</p>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="oficio-lc__section oficio-lc__section--justificativas">
+  <div class="oficio-lc__travellers oficio-lc__travellers--n{% if card.assinante %}2{% else %}1{% endif %}">
+    <div class="oficio-lc__traveller oficio-lc__traveller--justificativa">
+      <div class="oficio-lc__traveller-body">
+        <div class="oficio-lc__traveller-name-row">
+          <span class="oficio-lc__traveller-name">MOTIVO</span>
+        </div>
+        <span class="oficio-lc__traveller-meta">
+          {% if card.motivo_resumido %}{{ card.motivo_resumido }}{% else %}Nenhum motivo informado.{% endif %}
+        </span>
+      </div>
+    </div>
+    {% if card.assinante %}
+    <div class="oficio-lc__traveller oficio-lc__traveller--justificativa oficio-lc__traveller--assinante">
+      <div class="oficio-lc__traveller-body">
+        <div class="oficio-lc__traveller-name-row">
+          <span class="oficio-lc__traveller-name">ASSINANTE</span>
+          <span class="oficio-lc__traveller-meta">{{ card.assinante.nome }}{% if card.assinante.cargo %} · {{ card.assinante.cargo }}{% endif %}</span>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
