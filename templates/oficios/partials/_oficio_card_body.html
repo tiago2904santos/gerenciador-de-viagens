@@ -1,0 +1,174 @@
+{# Miolo do card de ofício — viajantes (com termos), transporte/roteiro e justificativa. #}
+<div class="oficio-lc__section">
+  <div class="oficio-lc__travellers oficio-lc__travellers--n{{ card.servidores_count|default:0 }}">
+    {% for s in card.servidores %}
+    <div class="oficio-lc__traveller{% if s.is_motorista %} oficio-lc__traveller--motorista{% endif %}">
+
+      <div class="oficio-lc__traveller-body">
+        <div class="oficio-lc__traveller-name-row">
+          <span class="oficio-lc__traveller-name">{{ s.name }}</span>
+          {% if s.is_motorista %}
+          <span class="oficio-lc__traveller-badge">Motorista</span>
+          {% endif %}
+        </div>
+        {% if s.cargo or s.unidade %}
+        <span class="oficio-lc__traveller-meta">{% if s.cargo %}{{ s.cargo }}{% endif %}{% if s.cargo and s.unidade %} · {% endif %}{% if s.unidade %}{{ s.unidade }}{% endif %}</span>
+        {% endif %}
+      </div>
+
+      {% if s.has_termo %}
+      <div class="oficio-lc__traveller-termo">
+        <button
+          type="button"
+          class="cv-icon-btn cv-icon-btn--edit{% if s.termo_assinado %} is-assinado{% endif %}"
+          aria-label="Ações do termo de {{ s.name }}"
+          aria-haspopup="true"
+          aria-expanded="false"
+          data-tooltip="{% if s.termo_assinado %}Termo assinado — ações{% else %}Ações do termo{% endif %}"
+          data-action-menu-trigger
+          data-action-menu-target="termo-action-menu-{{ card.oficio_pk }}-{{ s.servidor_pk }}"
+        >{% include "components/ui/icons/icon.html" with icon="more" only %}</button>
+        <div class="cv-action-menu cv-action-menu--rich" id="termo-action-menu-{{ card.oficio_pk }}-{{ s.servidor_pk }}" role="menu" hidden>
+          {% if s.termo_assinado %}
+            {% include "components/ui/menus/rich_menu_header.html" with title="Termo assinado" subtitle=s.name icon="sign" only %}
+          {% else %}
+            {% include "components/ui/menus/rich_menu_header.html" with title="Termo do servidor" subtitle=s.name icon="document" only %}
+          {% endif %}
+          {% if s.termo_open_url %}
+            {% include "components/ui/menus/rich_menu_link.html" with href=s.termo_open_url title="Visualizar termo" description="Abrir o documento no navegador" icon="eye" tone="preview" target_blank=True only %}
+          {% endif %}
+          {% if s.termo_pdf_url %}
+            {% include "components/ui/menus/rich_menu_link.html" with href=s.termo_pdf_url title="Baixar PDF" description="Documento pronto para assinatura" icon="pdf" tone="pdf" download=True only %}
+          {% endif %}
+          {% if s.termo_docx_url %}
+            {% include "components/ui/menus/rich_menu_link.html" with href=s.termo_docx_url title="Baixar DOCX" description="Arquivo editável do termo" icon="docx" tone="docx" download=True only %}
+          {% endif %}
+          {% if s.termo_anexar_assinado_url %}
+          <button
+            type="button"
+            class="cv-action-menu__item cv-action-menu__item--rich{% if s.termo_assinado %} is-assinado{% endif %}"
+            role="menuitem"
+            data-attach-signed-trigger
+            data-attach-signed-url="{{ s.termo_anexar_assinado_url }}"
+            data-attach-signed-doc-label="o termo de {{ s.name }}"
+            data-attach-signed-current-name="{{ s.termo_assinado_nome_original }}"
+            data-attach-signed-current-view-url="{{ s.termo_assinado_view_url }}"
+            data-attach-signed-current-remove-url="{{ s.termo_remover_assinado_url }}"
+          >
+            <span class="cv-action-menu__item-icon cv-action-menu__item-icon--success" aria-hidden="true">
+              {% include "components/ui/icons/icon.html" with icon="sign" only %}
+            </span>
+            <span class="cv-action-menu__item-copy">
+              <strong>{% if s.termo_assinado %}Gerenciar assinado{% else %}Anexar termo assinado{% endif %}</strong>
+              <small>{% if s.termo_assinado %}Visualizar, substituir ou remover{% else %}Enviar o PDF depois da assinatura{% endif %}</small>
+            </span>
+          </button>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+    {% empty %}
+    <p class="oficio-lc__empty-hint">Nenhum servidor informado</p>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="oficio-lc__section">
+  <div class="oficio-lc__transport-row">
+
+    <div class="oficio-lc__transport-card">
+      <span class="oficio-lc__transport-label">Placa</span>
+      {% if card.veiculo_placa %}
+        <div class="oficio-lc__transport-placa">{{ card.veiculo_placa }}</div>
+      {% else %}
+        <div class="oficio-lc__transport-placa oficio-lc__text--empty">Não informado</div>
+      {% endif %}
+      {% if card.veiculo_modelo %}
+        <span class="oficio-lc__transport-label">Modelo</span>
+        <div class="oficio-lc__transport-modelo">{{ card.veiculo_modelo }}</div>
+      {% endif %}
+      {% if card.motorista_is_carona and card.motorista_display %}
+        <span class="oficio-lc__transport-label">Motorista</span>
+        <div class="oficio-lc__transport-driver">{{ card.motorista_display }}</div>
+        <span class="oficio-lc__transport-hint">Externo ao ofício</span>
+      {% endif %}
+    </div>
+
+    {% if card.trechos %}
+    <div class="oficio-lc__transport-card oficio-lc__transport-card--trechos">
+      <span class="oficio-lc__transport-label">Trechos encontrados</span>
+      <div class="oficio-lc__trechos-list">
+        {% for trecho in card.trechos %}
+        <div class="oficio-lc__trecho">
+          <div class="oficio-lc__trecho-rota">{{ trecho.rota }}</div>
+          {% if trecho.saida or trecho.chegada %}
+          <div class="oficio-lc__trecho-times">
+            {% if trecho.saida %}{{ trecho.saida }}{% endif %}
+            {% if trecho.saida and trecho.chegada %} → {% endif %}
+            {% if trecho.chegada %}{{ trecho.chegada }}{% endif %}
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if card.valor_diarias_display %}
+    <div class="oficio-lc__transport-card oficio-lc__transport-card--valor">
+      <span class="oficio-lc__transport-label">Valor Total</span>
+      <div class="oficio-lc__valor-total">{{ card.valor_diarias_display }}</div>
+      {% if card.valor_diarias_extenso %}
+      <span class="oficio-lc__transport-label">Valor por Extenso</span>
+      <div class="oficio-lc__valor-extenso">{{ card.valor_diarias_extenso }}</div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+
+<div class="oficio-lc__section oficio-lc__section--justificativas">
+  <div class="oficio-lc__travellers oficio-lc__travellers--n1">
+    <div class="oficio-lc__traveller oficio-lc__traveller--justificativa">
+      <div class="oficio-lc__traveller-body">
+        <div class="oficio-lc__traveller-name-row">
+          <span class="oficio-lc__traveller-name">JUSTIFICATIVA</span>
+          {% if card.justificativa %}
+            <span class="oficio-lc__traveller-badge">{{ card.justificativa.status_label }}</span>
+          {% else %}
+            <span class="oficio-lc__traveller-badge">Pendente</span>
+          {% endif %}
+        </div>
+        <span class="oficio-lc__traveller-meta">
+          {% if card.justificativa %}
+            {{ card.justificativa.texto_resumido }}
+          {% else %}
+            Nenhuma justificativa informada.
+          {% endif %}
+        </span>
+      </div>
+      <div class="oficio-lc__traveller-termo cv-icon-btn-group">
+        {% include "components/ui/buttons/icon_button.html" with href=card.justificativa_url action="edit" aria_label="Editar justificativa" tooltip="Editar justificativa" only %}
+        <button
+          class="cv-icon-btn cv-icon-btn--settings"
+          type="button"
+          aria-label="Abrir documentos da justificativa"
+          aria-haspopup="true"
+          aria-expanded="false"
+          data-tooltip="Visualizar e baixar"
+          data-action-menu-trigger
+          data-action-menu-target="justificativa-document-menu-{{ card.oficio_pk }}"
+        >{% include "components/ui/icons/icon.html" with icon="folder" only %}</button>
+        <div class="cv-action-menu cv-action-menu--rich" id="justificativa-document-menu-{{ card.oficio_pk }}" role="menu" hidden>
+          {% include "components/ui/menus/rich_menu_header.html" with title="Justificativa" subtitle=card.numero_display icon="folder" only %}
+          {% include "components/ui/menus/rich_menu_link.html" with href=card.justificativa_visualizar_url title="Visualizar justificativa" description="Abrir o documento no navegador" icon="eye" tone="preview" target_blank=True only %}
+          {% include "components/ui/menus/rich_menu_link.html" with href=card.justificativa_pdf_url title="Baixar PDF" description="Documento pronto para impressão" icon="pdf" tone="pdf" download=True only %}
+          {% include "components/ui/menus/rich_menu_link.html" with href=card.justificativa_docx_url title="Baixar DOCX" description="Arquivo editável da justificativa" icon="docx" tone="docx" download=True only %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

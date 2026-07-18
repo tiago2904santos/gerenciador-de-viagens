@@ -1,3 +1,4 @@
+from core import entity_cards
 from core.presenters.actions import build_action
 from core.presenters.actions import build_delete_action
 from core.presenters.actions import build_edit_action
@@ -278,10 +279,99 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None):
         except Exception:
             pass
 
+    numero_display = oficio.numero_formatado
+    protocolo_display = format_protocolo(oficio.protocolo) or ""
+    editar_url = reverse("oficios:dados_viajantes", args=[oficio.pk])
+    excluir_url = _excluir_url_oficio(oficio.pk, excluir_next_url)
+    cancelar_url = reverse("oficios:cancelar", args=[oficio.pk])
+    retificar_url = reverse("oficios:retificar", args=[oficio.pk])
+    marcar_complementar_url = reverse("oficios:marcar_complementar", args=[oficio.pk])
+
+    header_parts = [f"Nº {numero_display}"]
+    if protocolo_display:
+        header_parts.append(f"Protocolo {protocolo_display}")
+    if destino:
+        header_parts.append(destino)
+    if data_evento:
+        header_parts.append(data_evento)
+    header_chips = []
+    if oficio.retificado_documento:
+        header_chips.append(entity_cards.chip("warning", "Retificado"))
+    elif oficio.complementar_documento:
+        header_chips.append(entity_cards.chip("info", "Complementar"))
+    if temporal_label:
+        header_chips.append(entity_cards.chip(temporal_tone, temporal_label))
+    if oficio.cancelado:
+        header_chips.append(entity_cards.chip("danger", "Cancelado"))
+
+    search_parts = [numero_display, protocolo_display, destino]
+    search_parts.extend(s["name"] for s in servidores_display)
+
+    acoes_gerenciar = [
+        entity_cards.menu_post(
+            retificar_url,
+            "Desfazer retificação" if oficio.retificado_documento else "Retificar ofício",
+            "Atualizar o estado de retificação",
+            "sync",
+            "preview",
+        ),
+        entity_cards.menu_post(
+            marcar_complementar_url,
+            "Desfazer complementar" if oficio.complementar_documento else "Ofício complementar",
+            "Identificar o documento como complementar",
+            "plus",
+            "edit",
+        ),
+    ]
+    if not oficio.cancelado:
+        acoes_gerenciar.append(
+            entity_cards.menu_cancel(cancelar_url, numero_display, title="Cancelar ofício")
+        )
+    acoes_gerenciar.append(
+        entity_cards.menu_delete(excluir_url, numero_display, title="Excluir ofício")
+    )
+
     return {
+        "search_text": " ".join(p for p in search_parts if p).strip(),
+        "header": entity_cards.header(
+            [entity_cards.header_item("Ofício", " · ".join(header_parts), wide=True, wrap=True)],
+            header_chips,
+        ),
+        "status_value": status_variant,
+        "cancel_note": oficio.motivo_cancelamento if oficio.cancelado else "",
+        "footer": entity_cards.footer(
+            edit_url=editar_url,
+            edit_aria="Editar ofício",
+            menus=[
+                entity_cards.documents_menu(
+                    f"oficio-document-menu-{oficio.pk}",
+                    numero_display,
+                    title="Documentos do ofício",
+                    view_url=reverse("oficios:oficio_pdf_inline", args=[oficio.pk]),
+                    pdf_url=reverse("oficios:baixar_documento", args=[oficio.pk, "pdf"]),
+                    docx_url=reverse("oficios:baixar_documento", args=[oficio.pk, "docx"]),
+                    view_title="Visualizar ofício",
+                    docx_description="Arquivo editável do ofício",
+                    trigger_aria=f"Abrir documentos do ofício {numero_display}",
+                )
+            ],
+            danger_menus=[
+                entity_cards.menu(
+                    f"oficio-action-menu-{oficio.pk}",
+                    "Gerenciar ofício",
+                    numero_display,
+                    acoes_gerenciar,
+                    icon="settings",
+                    trigger_icon="more",
+                    trigger_variant="edit",
+                    trigger_aria="Mais ações do ofício",
+                    trigger_tooltip="Mais ações",
+                )
+            ],
+        ),
         "oficio_pk": oficio.pk,
-        "numero_display": oficio.numero_formatado,
-        "protocolo_display": format_protocolo(oficio.protocolo) or "",
+        "numero_display": numero_display,
+        "protocolo_display": protocolo_display,
         "data_criacao_display": data_criacao_display,
         "destino_display": destino,
         "data_evento_display": data_evento,
@@ -290,11 +380,11 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None):
         "status_variant": status_variant,
         "cancelado": oficio.cancelado,
         "motivo_cancelamento": oficio.motivo_cancelamento,
-        "cancelar_url": reverse("oficios:cancelar", args=[oficio.pk]),
+        "cancelar_url": cancelar_url,
         "retificado": oficio.retificado_documento,
-        "retificar_url": reverse("oficios:retificar", args=[oficio.pk]),
+        "retificar_url": retificar_url,
         "complementar": oficio.complementar_documento,
-        "marcar_complementar_url": reverse("oficios:marcar_complementar", args=[oficio.pk]),
+        "marcar_complementar_url": marcar_complementar_url,
         "temporal_label": temporal_label,
         "temporal_tone": temporal_tone,
         "servidores": servidores_display,
@@ -316,8 +406,8 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None):
         "visualizar_url": reverse("oficios:oficio_pdf_inline", args=[oficio.pk]),
         "pdf_url": reverse("oficios:baixar_documento", args=[oficio.pk, "pdf"]),
         "docx_url": reverse("oficios:baixar_documento", args=[oficio.pk, "docx"]),
-        "editar_url": reverse("oficios:dados_viajantes", args=[oficio.pk]),
-        "excluir_url": _excluir_url_oficio(oficio.pk, excluir_next_url),
+        "editar_url": editar_url,
+        "excluir_url": excluir_url,
     }
 
 
