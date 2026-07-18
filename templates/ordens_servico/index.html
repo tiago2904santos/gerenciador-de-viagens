@@ -10,30 +10,5 @@
 {% endblock %}
 
 {% block content %}
-<div class="app-page--main-card-list page-shell page-shell--list oficios-list-page" data-cv-realtime-filter-scope>
-
-  {% include "components/ui/headers/header_stack_filters.html" with advanced=True form_action=request.path title=page_title eyebrow="DOCUMENTOS" search_placeholder="Buscar por número, motivo, destino ou servidor..." search_aria_label="Buscar ordens de serviço" current_aba=aba date_picker_id="os-filter-date-picker" date_start_id="id_os_viagem_de" date_end_id="id_os_viagem_ate" %}
-
-  {% include "components/lists/list_tabs.html" with abas=abas tabs_aria_label="Abas de ordens de serviço" only %}
-
-  <div class="list-panel">
-    <div class="list-content list-grid list-grid--roteiros app-list-grid" data-cv-list-container>
-      {% for card in cards %}
-        {% include "ordens_servico/partials/os_list_card.html" with card=card only %}
-      {% empty %}
-        {% include "components/lists/list_empty.html" with message=empty_message action_label="Nova OS" action_url=nova_url only %}
-      {% endfor %}
-    </div>
-    {% if cards %}
-      <div data-cv-empty-state hidden>
-        {% include "components/lists/list_empty.html" with message=empty_message only %}
-      </div>
-    {% endif %}
-  </div>
-
-  {% include "components/ui/modals/delete_confirm_modal.html" with delete_modal_title="Excluir Ordem de Serviço?" delete_modal_entity="esta Ordem de Serviço" %}
-
-  {% include "components/ui/buttons/floating_action.html" with href=nova_url label="Nova OS" variant="primary" icon="plus" aria_label="Nova Ordem de Serviço" only %}
-
-</div>
+  {% include "components/lists/list_page_cards.html" with title=page_title eyebrow="DOCUMENTOS" search_placeholder="Buscar por número, motivo, destino ou servidor..." search_aria_label="Buscar ordens de serviço" date_picker_id="os-filter-date-picker" date_start_id="id_os_viagem_de" date_end_id="id_os_viagem_ate" tabs_aria_label="Abas de ordens de serviço" card_template="ordens_servico/partials/os_list_card.html" empty_message=empty_message empty_action_label="Nova OS" empty_action_url=nova_url action_label="Nova OS" action_url=nova_url action_aria_label="Nova Ordem de Serviço" delete_modal_title="Excluir Ordem de Serviço?" delete_modal_entity="esta Ordem de Serviço" %}
 {% endblock %}

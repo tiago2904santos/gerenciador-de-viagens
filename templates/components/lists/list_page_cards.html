@@ -1,0 +1,47 @@
+{# Página de lista em CARDS — irmã do list_page_standard (rows). #}
+{# Incluir SEM only para o contexto da view fluir (cards, abas, request, sort_options...). #}
+{# Parâmetros: eyebrow, title, search_placeholder, search_aria_label, date_picker_id/date_start_id/date_end_id, #}
+{#   card_template (path do card), empty_message, empty_action_label/url, filter_empty_message, #}
+{#   action_label/action_url (FAB), tabs_aria_label, page_extra_class, #}
+{#   delete_modal_title/entity, cancel_modal_title/entity/hint, confirm_action_* , attach_signed_modal=True. #}
+<div class="page-shell page-shell--list page-shell--cards{% if page_extra_class %} {{ page_extra_class }}{% endif %}" data-cv-realtime-filter-scope>
+
+  {% include "components/ui/headers/header_stack_filters.html" with advanced=True form_action=request.path title=title|default:page_title eyebrow=eyebrow search_placeholder=search_placeholder search_aria_label=search_aria_label current_aba=aba date_picker_id=date_picker_id date_start_id=date_start_id date_end_id=date_end_id %}
+
+  {% if abas %}
+    {% include "components/lists/list_tabs.html" with abas=abas tabs_aria_label=tabs_aria_label only %}
+  {% endif %}
+
+  <div class="list-panel">
+    <div class="cv-card-grid" data-cv-list-container>
+      {% for card in cards %}
+        {% include card_template with card=card csrf_token=csrf_token current_url=request.get_full_path only %}
+      {% empty %}
+        {% include "components/lists/list_empty.html" with message=empty_message action_label=empty_action_label action_url=empty_action_url only %}
+      {% endfor %}
+    </div>
+    {% if cards %}
+      <div data-cv-empty-state hidden>
+        {% include "components/lists/list_empty.html" with message=filter_empty_message|default:empty_message only %}
+      </div>
+    {% endif %}
+  </div>
+
+  {% if delete_modal_title %}
+    {% include "components/ui/modals/delete_confirm_modal.html" with delete_modal_title=delete_modal_title delete_modal_entity=delete_modal_entity %}
+  {% endif %}
+  {% if cancel_modal_title %}
+    {% include "components/ui/modals/cancel_reason_modal.html" with cancel_modal_title=cancel_modal_title cancel_modal_entity=cancel_modal_entity cancel_modal_hint=cancel_modal_hint %}
+  {% endif %}
+  {% if confirm_action_title %}
+    {% include "components/ui/modals/confirm_action_modal.html" with confirm_action_eyebrow=confirm_action_eyebrow confirm_action_title=confirm_action_title confirm_action_entity=confirm_action_entity confirm_action_hint=confirm_action_hint confirm_action_button_label=confirm_action_button_label %}
+  {% endif %}
+  {% if attach_signed_modal %}
+    {% include "components/ui/modals/attach_signed_modal.html" %}
+  {% endif %}
+
+  {% if action_label and action_url %}
+    {% include "components/ui/buttons/floating_action.html" with href=action_url label=action_label variant="primary" icon="plus" aria_label=action_aria_label|default:action_label only %}
+  {% endif %}
+
+</div>
