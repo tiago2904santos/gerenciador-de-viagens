@@ -1,0 +1,29 @@
+{# Entity card global — casca de todos os cards de lista (ofício, roteiro, OS, PT, evento, prestação). #}
+{# Uso: include ... with card=card body_template="app/partials/_x_card_body.html" modifier="roteiro" csrf_token=csrf_token only #}
+{# card: search_text, status_variant?, status_value?, header (core.entity_cards.header), cancel_note?, footer (core.entity_cards.footer). #}
+<article
+  class="cv-entity-card oficio-lc oficio-lc--{{ card.status_variant|default:'outro' }}{% if modifier %} oficio-lc--{{ modifier }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
+  data-cv-filter-item
+  data-search-text="{{ card.search_text }}"
+  {% if card.status_value %}data-status-value="{{ card.status_value }}"{% endif %}
+>
+  <div class="cv-entity-card__body oficio-lc__layout">
+
+    {% if card.header %}
+      {% include "components/ui/lists/entity_card_header.html" with header=card.header only %}
+    {% endif %}
+
+    {% if card.cancel_note %}
+    <div class="oficio-lc__section">
+      <p class="oficio-lc__empty-hint"><strong>Motivo do cancelamento:</strong> {{ card.cancel_note }}</p>
+    </div>
+    {% endif %}
+
+    {% include body_template with card=card csrf_token=csrf_token only %}
+
+    {% if card.footer %}
+      {% include "components/ui/lists/entity_card_footer.html" with footer=card.footer csrf_token=csrf_token only %}
+    {% endif %}
+
+  </div>
+</article>

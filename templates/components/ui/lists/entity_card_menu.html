@@ -1,0 +1,78 @@
+{# Botão-gatilho + menu rico do entity card. menu = core.entity_cards.menu(...). #}
+{# Itens: link (rich_menu_link), post (form POST), delete/cancel (modais globais), attach_signed. #}
+<button
+  class="cv-icon-btn cv-icon-btn--{{ menu.trigger_variant|default:'settings' }}{% if menu.trigger_state_class %} {{ menu.trigger_state_class }}{% endif %}"
+  type="button"
+  aria-label="{{ menu.trigger_aria }}"
+  aria-haspopup="true"
+  aria-expanded="false"
+  data-tooltip="{{ menu.trigger_tooltip|default:'Visualizar e baixar' }}"
+  data-action-menu-trigger
+  data-action-menu-target="{{ menu.id }}"
+>{% include "components/ui/icons/icon.html" with icon=menu.trigger_icon|default:"folder" only %}</button>
+<div class="cv-action-menu cv-action-menu--rich" id="{{ menu.id }}" role="menu" hidden>
+  {% include "components/ui/menus/rich_menu_header.html" with title=menu.title subtitle=menu.subtitle icon=menu.icon|default:"folder" only %}
+  {% for item in menu.items %}
+    {% if item.type == "link" %}
+      {% include "components/ui/menus/rich_menu_link.html" with href=item.href title=item.title description=item.description icon=item.icon tone=item.tone target_blank=item.target_blank download=item.download only %}
+    {% elif item.type == "post" %}
+      <form method="post" action="{{ item.action_url }}" class="cv-action-menu__form">
+        {% csrf_token %}
+        <button type="submit" class="cv-action-menu__item cv-action-menu__item--rich" role="menuitem">
+          <span class="cv-action-menu__item-icon cv-action-menu__item-icon--{{ item.icon_tone }}" aria-hidden="true">
+            {% include "components/ui/icons/icon.html" with icon=item.icon only %}
+          </span>
+          <span class="cv-action-menu__item-copy"><strong>{{ item.title }}</strong><small>{{ item.description }}</small></span>
+        </button>
+      </form>
+    {% elif item.type == "cancel" %}
+      <button
+        type="button"
+        class="cv-action-menu__item cv-action-menu__item--rich"
+        role="menuitem"
+        data-cancel-modal-trigger
+        data-cancel-url="{{ item.url }}"
+        data-cancel-label="{{ item.label }}"
+      >
+        <span class="cv-action-menu__item-icon cv-action-menu__item-icon--warning" aria-hidden="true">
+          {% include "components/ui/icons/icon.html" with icon="ban" only %}
+        </span>
+        <span class="cv-action-menu__item-copy"><strong>{{ item.title }}</strong><small>{{ item.description }}</small></span>
+      </button>
+    {% elif item.type == "delete" %}
+      <button
+        type="button"
+        class="cv-action-menu__item cv-action-menu__item--rich"
+        role="menuitem"
+        data-delete-modal-trigger
+        data-delete-url="{{ item.url }}"
+        data-delete-label="{{ item.label }}"
+      >
+        <span class="cv-action-menu__item-icon cv-action-menu__item-icon--danger" aria-hidden="true">
+          {% include "components/ui/icons/icon.html" with icon="delete" only %}
+        </span>
+        <span class="cv-action-menu__item-copy"><strong>{{ item.title }}</strong><small>{{ item.description }}</small></span>
+      </button>
+    {% elif item.type == "attach_signed" %}
+      <button
+        type="button"
+        class="cv-action-menu__item cv-action-menu__item--rich{% if item.assinado %} is-assinado{% endif %}"
+        role="menuitem"
+        data-attach-signed-trigger
+        data-attach-signed-url="{{ item.url }}"
+        data-attach-signed-doc-label="{{ item.doc_label }}"
+        data-attach-signed-current-name="{{ item.current_name }}"
+        data-attach-signed-current-view-url="{{ item.current_view_url }}"
+        data-attach-signed-current-remove-url="{{ item.current_remove_url }}"
+      >
+        <span class="cv-action-menu__item-icon cv-action-menu__item-icon--success" aria-hidden="true">
+          {% include "components/ui/icons/icon.html" with icon="sign" only %}
+        </span>
+        <span class="cv-action-menu__item-copy">
+          <strong>{% if item.assinado %}Gerenciar assinado{% else %}Anexar assinado{% endif %}</strong>
+          <small>{% if item.assinado %}Visualizar, substituir ou remover{% else %}Enviar o PDF depois da assinatura{% endif %}</small>
+        </span>
+      </button>
+    {% endif %}
+  {% endfor %}
+</div>

@@ -3,6 +3,7 @@ from decimal import Decimal, InvalidOperation
 from django.urls import reverse
 from django.utils import timezone
 
+from core import entity_cards
 from core.presenters.actions import build_delete_action
 from core.presenters.actions import build_edit_action
 from core.presenters.actions import build_open_action
@@ -218,7 +219,30 @@ def apresentar_roteiro_card(roteiro):
     inicio_dt, fim_dt = _roteiro_inicio_fim(roteiro)
     temporal_label, temporal_tone = _temporal_badge_roteiro(roteiro)
 
+    inicio_display = _format_roteiro_dt(inicio_dt)
+    fim_display = _format_roteiro_dt(fim_dt)
+    header_items = [
+        entity_cards.header_item(
+            "Roteiro", titulo_rota, wide=True, value_class="oficio-lc__info-value--rota"
+        )
+    ]
+    if inicio_display:
+        header_items.append(entity_cards.header_item("Início", inicio_display))
+    if fim_display:
+        header_items.append(entity_cards.header_item("Fim", fim_display))
+    header_chips = [entity_cards.chip(temporal_tone, temporal_label)] if temporal_label else []
+
     return {
+        "search_text": " ".join(
+            [titulo_rota, *[t["rota"] for t in trechos_visiveis]]
+        ).strip(),
+        "header": entity_cards.header(header_items, header_chips),
+        "footer": entity_cards.footer(
+            edit_url=edit_url,
+            edit_aria="Editar roteiro",
+            delete_url=delete_url,
+            delete_aria="Excluir roteiro",
+        ),
         "title": titulo_rota,
         "rota_display": titulo_rota,
         "inicio_display": _format_roteiro_dt(inicio_dt),

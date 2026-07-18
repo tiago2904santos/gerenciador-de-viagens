@@ -1,0 +1,41 @@
+{# Miolo do card de roteiro — Trechos (2/3) · Valor Total (1/3). #}
+<div class="oficio-lc__section">
+  <div class="oficio-lc__transport-row oficio-lc__transport-row--roteiro">
+
+    <div class="oficio-lc__transport-card oficio-lc__transport-card--trechos oficio-lc__transport-card--span2">
+      <span class="oficio-lc__transport-label">Trechos encontrados</span>
+      {% if card.trechos %}
+      <div class="oficio-lc__trechos-list">
+        {% for trecho in card.trechos %}
+        <div class="oficio-lc__trecho">
+          <div class="oficio-lc__trecho-rota">{{ trecho.rota }}</div>
+          {% if trecho.saida or trecho.chegada %}
+          <div class="oficio-lc__trecho-times">
+            {% if trecho.saida %}{{ trecho.saida }}{% endif %}
+            {% if trecho.saida and trecho.chegada %} → {% endif %}
+            {% if trecho.chegada %}{{ trecho.chegada }}{% endif %}
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="oficio-lc__trecho-rota oficio-lc__text--empty">Nenhum trecho cadastrado</div>
+      {% endif %}
+    </div>
+
+    <div class="oficio-lc__transport-card oficio-lc__transport-card--valor">
+      <span class="oficio-lc__transport-label">Valor Total</span>
+      {% if card.valor_diarias_display %}
+      <div class="oficio-lc__valor-total">{{ card.valor_diarias_display }}</div>
+      {% if card.valor_diarias_extenso %}
+      <span class="oficio-lc__transport-label">Valor por Extenso</span>
+      <div class="oficio-lc__valor-extenso">{{ card.valor_diarias_extenso }}</div>
+      {% endif %}
+      {% else %}
+      <div class="oficio-lc__valor-total oficio-lc__text--empty">—</div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
