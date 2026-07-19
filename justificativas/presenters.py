@@ -1,3 +1,4 @@
+import json
 from urllib.parse import urlencode
 
 from core.presenters.badges import build_badge
@@ -39,6 +40,9 @@ def apresentar_linha_lista_simples_modelo_justificativa(
             build_meta("Prévia", texto or "—"),
         ],
         "edit_url": edit_url,
+        "edit_fields_json": json.dumps(
+            {"nome": modelo.nome, "texto": modelo.texto or ""}, ensure_ascii=False
+        ),
         "delete_url": delete_url,
         "delete_modal": delete_modal,
         "set_default_url": set_default_url,

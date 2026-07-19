@@ -101,50 +101,21 @@ def tipos_index(request):
             "quick_add_form": form,
             "quick_add_next_url": back_url,
             "back_url": back_url,
-            "new_url": reverse("eventos:tipo_novo"),
-        },
-    )
-
-
-def tipo_novo(request):
-    form = TipoEventoForm(request.POST or None)
-    if request.method == "POST" and form.is_valid():
-        tipo = form.save(commit=False)
-        tipo.area = getattr(request, "area", None)
-        tipo.save()
-        messages.success(request, "Tipo de evento criado com sucesso.")
-        return redirect("eventos:tipos_index")
-    return render(
-        request,
-        "eventos/tipos/form.html",
-        {
-            "page_title": "Novo tipo de evento",
-            "page_description": "Cadastre um tipo que poderá ser selecionado (mais de um por evento).",
-            "form": form,
-            "back_url": reverse("eventos:tipos_index"),
-            "submit_label": "Salvar tipo",
         },
     )
 
 
 def tipo_editar(request, pk):
+    """Edição inline via quick edit da lista; a página standalone foi removida."""
     tipo = get_object_or_404(filter_queryset_by_area(TipoEvento.objects), pk=pk)
     form = TipoEventoForm(request.POST or None, instance=tipo)
-    if request.method == "POST" and form.is_valid():
-        form.save()
-        messages.success(request, "Tipo de evento atualizado com sucesso.")
-        return redirect("eventos:tipos_index")
-    return render(
-        request,
-        "eventos/tipos/form.html",
-        {
-            "page_title": "Editar tipo de evento",
-            "page_description": "Cadastre um tipo que poderá ser selecionado (mais de um por evento).",
-            "form": form,
-            "back_url": reverse("eventos:tipos_index"),
-            "submit_label": "Salvar alterações",
-        },
-    )
+    if request.method == "POST":
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Tipo de evento atualizado com sucesso.")
+        else:
+            messages.error(request, "Não foi possível salvar o tipo. Verifique os dados informados.")
+    return redirect("eventos:tipos_index")
 
 
 def tipo_excluir(request, pk):

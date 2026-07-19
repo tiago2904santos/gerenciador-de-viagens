@@ -158,26 +158,6 @@ def modelos_index(request):
             "back_to_url": back_url,
             "back_label": back_label,
             "back_aria_label": back_aria_label,
-            "new_url": reverse("justificativas:modelo_novo"),
-        },
-    )
-
-
-def modelo_novo(request):
-    form = ModeloJustificativaForm(request.POST or None)
-    if request.method == "POST" and form.is_valid():
-        criar_modelo_justificativa(form)
-        messages.success(request, "Modelo de justificativa criado com sucesso.")
-        return redirect("justificativas:modelos_index")
-    return render(
-        request,
-        "justificativas/modelos/form.html",
-        {
-            "page_title": "Novo modelo de justificativa",
-            "page_description": "Crie textos reutilizaveis para agilizar o preenchimento da justificativa nos oficios.",
-            "form": form,
-            "back_url": reverse("justificativas:modelos_index"),
-            "submit_label": "Salvar modelo",
         },
     )
 
@@ -193,24 +173,17 @@ def modelo_definir_padrao(request, pk):
 
 
 def modelo_editar(request, pk):
+    """Edição inline via quick edit da lista; a página standalone foi removida."""
     modelo = get_modelo_justificativa_by_id(pk)
     next_url = _safe_next_url(request, reverse("justificativas:index"))
     form = ModeloJustificativaForm(request.POST or None, instance=modelo)
-    if request.method == "POST" and form.is_valid():
-        atualizar_modelo_justificativa(modelo, form)
-        messages.success(request, "Modelo de justificativa atualizado com sucesso.")
-        return redirect(_append_next(reverse("justificativas:modelos_index"), next_url))
-    return render(
-        request,
-        "justificativas/modelos/form.html",
-        {
-            "page_title": "Editar modelo de justificativa",
-            "page_description": "Crie textos reutilizaveis para agilizar o preenchimento da justificativa nos oficios.",
-            "form": form,
-            "back_url": _append_next(reverse("justificativas:modelos_index"), next_url),
-            "submit_label": "Salvar alteracoes",
-        },
-    )
+    if request.method == "POST":
+        if form.is_valid():
+            atualizar_modelo_justificativa(modelo, form)
+            messages.success(request, "Modelo de justificativa atualizado com sucesso.")
+        else:
+            messages.error(request, "Não foi possível salvar o modelo. Verifique os dados informados.")
+    return redirect(_append_next(reverse("justificativas:modelos_index"), next_url))
 
 
 def modelo_excluir(request, pk):

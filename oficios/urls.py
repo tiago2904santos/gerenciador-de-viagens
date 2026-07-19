@@ -9,7 +9,6 @@ urlpatterns = [
     path("", views.index, name="index"),
     path("novo/", views.novo, name="novo"),
     path("modelos-motivo/", views.modelos_motivo_index, name="modelos_motivo_index"),
-    path("modelos-motivo/novo/", views.modelo_motivo_novo, name="modelo_motivo_novo"),
     path("modelos-motivo/<int:pk>/editar/", views.modelo_motivo_editar, name="modelo_motivo_editar"),
     path(
         "modelos-motivo/<int:pk>/padrao/",

@@ -1,3 +1,5 @@
+import json
+
 from core import entity_cards
 from core.presenters.actions import build_action
 from core.presenters.actions import build_delete_action
@@ -838,6 +840,9 @@ def apresentar_linha_lista_simples_modelo_motivo(modelo, edit_url="#", delete_ur
             build_meta("Prévia", texto or "—"),
         ],
         "edit_url": edit_url,
+        "edit_fields_json": json.dumps(
+            {"nome": modelo.nome, "texto": modelo.texto or ""}, ensure_ascii=False
+        ),
         "delete_url": delete_url,
         "delete_modal": delete_modal,
         "set_default_url": (

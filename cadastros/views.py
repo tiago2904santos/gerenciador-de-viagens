@@ -14,7 +14,6 @@ from core.utils.masks import only_digits
 from .models import Servidor
 from .models import Viatura
 from .forms import CargoForm
-from .forms import CidadeForm
 from .forms import CombustivelForm
 from .forms import ConfiguracaoAssinaturasForm
 from .forms import ConfiguracaoDestinatarioForm
@@ -24,28 +23,24 @@ from .forms import ServidorForm
 from .forms import UnidadeForm
 from .forms import ViaturaForm
 from .presenters import apresentar_linha_lista_simples_cargo
-from .presenters import apresentar_linha_lista_simples_cidade
 from .presenters import apresentar_linha_lista_simples_estado
 from .presenters import apresentar_linha_lista_simples_combustivel
 from .presenters import apresentar_linha_lista_simples_servidor
 from .presenters import apresentar_linha_lista_simples_unidade
 from .presenters import apresentar_linha_lista_simples_viatura
 from .selectors import get_cargo_by_id
-from .selectors import get_cidade_by_id
 from .selectors import get_estado_by_id
 from .selectors import get_combustivel_by_id
 from .selectors import get_servidor_by_id
 from .selectors import get_unidade_by_id
 from .selectors import get_viatura_by_id
 from .selectors import listar_cargos
-from .selectors import listar_cidades
 from .selectors import listar_estados
 from .selectors import listar_combustiveis
 from .selectors import listar_servidores
 from .selectors import listar_unidades
 from .selectors import listar_viaturas
 from .services import atualizar_cargo
-from .services import atualizar_cidade
 from .services import atualizar_estado
 from .services import atualizar_combustivel
 from .services import atualizar_servidor
@@ -53,14 +48,12 @@ from .services import atualizar_unidade
 from .services import atualizar_viatura
 from .services import CadastroVinculadoError
 from .services import criar_cargo
-from .services import criar_cidade
 from .services import criar_estado
 from .services import criar_combustivel
 from .services import criar_servidor
 from .services import criar_unidade
 from .services import criar_viatura
 from .services import excluir_cargo
-from .services import excluir_cidade
 from .services import excluir_estado
 from .services import excluir_combustivel
 from .services import excluir_servidor
@@ -163,12 +156,6 @@ def index(request):
                     "eyebrow": "Cadastro",
                 },
                 {
-                    "title": "Cidades",
-                    "description": "Base geográfica de referência dos fluxos.",
-                    "href": reverse("cadastros:cidades_index"),
-                    "eyebrow": "Cadastro",
-                },
-                {
                     "title": "Configurações do sistema",
                     "description": "Dados institucionais e assinaturas por tipo de documento.",
                     "href": reverse("cadastros:configuracao"),
@@ -189,6 +176,11 @@ def index(request):
 
 def estados_index(request):
     q = request.GET.get("q", "").strip()
+    form = EstadoForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        criar_estado(form)
+        messages.success(request, "Estado criado com sucesso.")
+        return redirect("cadastros:estados_index")
     estados = listar_estados(q=q)
     paginator = Paginator(estados, CADASTROS_PER_PAGE)
     page_obj = paginator.get_page(request.GET.get("page"))
@@ -209,6 +201,7 @@ def estados_index(request):
             "page_description": "Base administrativa interna de unidades federativas (UF).",
             "rows": rows,
             "q": q,
+            "quick_add_form": form,
             "page_eyebrow": "Cadastros internos",
             "page_obj": page_obj,
             "pagination_pages": _pagination_pages(page_obj),
@@ -217,45 +210,17 @@ def estados_index(request):
     )
 
 
-def estado_create(request):
-    form = EstadoForm(request.POST or None)
-    if request.method == "POST" and form.is_valid():
-        criar_estado(form)
-        messages.success(request, "Estado criado com sucesso.")
-        return redirect("cadastros:estados_index")
-    return render(
-        request,
-        "cadastros/estados/form.html",
-        {
-            "page_title": "Novo estado",
-            "page_description": "Cadastre UF e nome oficial.",
-            "form": form,
-            "submit_label": "Criar estado",
-            "submit_icon": "plus",
-            "back_url": reverse("cadastros:estados_index"),
-        },
-    )
-
-
 def estado_update(request, pk):
+    # Edição acontece pelo quick add/quick edit da lista; a página standalone foi removida.
     estado = get_estado_by_id(pk)
     form = EstadoForm(request.POST or None, instance=estado)
-    if request.method == "POST" and form.is_valid():
-        atualizar_estado(estado, form)
-        messages.success(request, "Estado atualizado com sucesso.")
-        return redirect("cadastros:estados_index")
-    return render(
-        request,
-        "cadastros/estados/form.html",
-        {
-            "page_title": "Editar estado",
-            "page_description": "Atualize os dados da UF.",
-            "form": form,
-            "submit_label": "Salvar estado",
-            "submit_icon": "check",
-            "back_url": reverse("cadastros:estados_index"),
-        },
-    )
+    if request.method == "POST":
+        if form.is_valid():
+            atualizar_estado(estado, form)
+            messages.success(request, "Estado atualizado com sucesso.")
+        else:
+            messages.error(request, "Não foi possível salvar o estado. Verifique os dados informados.")
+    return redirect("cadastros:estados_index")
 
 
 def estado_delete(request, pk):
@@ -325,45 +290,17 @@ def unidades_index(request):
     )
 
 
-def unidade_create(request):
-    form = UnidadeForm(request.POST or None)
-    if request.method == "POST" and form.is_valid():
-        criar_unidade(form)
-        messages.success(request, "Unidade criada com sucesso.")
-        return redirect("cadastros:unidades_index")
-    return render(
-        request,
-        "cadastros/unidades/form.html",
-        {
-            "page_title": "Nova unidade",
-            "page_description": "Cadastre uma unidade administrativa reutilizável.",
-            "form": form,
-            "submit_label": "Criar unidade",
-            "submit_icon": "plus",
-            "back_url": reverse("cadastros:unidades_index"),
-        },
-    )
-
-
 def unidade_update(request, pk):
+    # Edição acontece pelo quick add/quick edit da lista; a página standalone foi removida.
     unidade = get_unidade_by_id(pk)
     form = UnidadeForm(request.POST or None, instance=unidade)
-    if request.method == "POST" and form.is_valid():
-        atualizar_unidade(unidade, form)
-        messages.success(request, "Unidade atualizada com sucesso.")
-        return redirect("cadastros:unidades_index")
-    return render(
-        request,
-        "cadastros/unidades/form.html",
-        {
-            "page_title": "Editar unidade",
-            "page_description": "Atualize os dados da unidade.",
-            "form": form,
-            "submit_label": "Salvar unidade",
-            "submit_icon": "check",
-            "back_url": reverse("cadastros:unidades_index"),
-        },
-    )
+    if request.method == "POST":
+        if form.is_valid():
+            atualizar_unidade(unidade, form)
+            messages.success(request, "Unidade atualizada com sucesso.")
+        else:
+            messages.error(request, "Não foi possível salvar a unidade. Verifique os dados informados.")
+    return redirect("cadastros:unidades_index")
 
 
 def unidade_delete(request, pk):
@@ -378,128 +315,6 @@ def unidade_delete(request, pk):
         messages.success(request, "Unidade excluída com sucesso.")
         return redirect(redirect_url)
     return redirect(redirect_url)
-
-
-def cidades_index(request):
-    q = request.GET.get("q", "").strip()
-    cidades = listar_cidades(q=q)
-    paginator = Paginator(cidades, CADASTROS_PER_PAGE)
-    page_obj = paginator.get_page(request.GET.get("page"))
-    rows = [
-        apresentar_linha_lista_simples_cidade(
-            cidade,
-            edit_url=reverse("cadastros:cidade_update", args=[cidade.pk]),
-            delete_url=reverse("cadastros:cidade_delete", args=[cidade.pk]),
-            delete_modal=True,
-        )
-        for cidade in page_obj.object_list
-    ]
-    export_base = reverse("cadastros:cidades_export_csv")
-    export_csv_url = f"{export_base}?{urlencode({'q': q})}" if q else export_base
-    return _render_listagem(
-        request,
-        "cadastros/cidades/index.html",
-        {
-            "page_title": "Cidades",
-            "page_description": "Cidades de referência para os fluxos.",
-            "rows": rows,
-            "q": q,
-            "export_csv_url": export_csv_url,
-            "page_eyebrow": "Cadastros",
-            "page_obj": page_obj,
-            "pagination_pages": _pagination_pages(page_obj),
-            "page_querystring": urlencode({"q": q}) if q else "",
-        },
-    )
-
-
-def cidades_export_csv(request):
-    q = request.GET.get("q", "").strip()
-    cidades = listar_cidades(q=q)
-    response = HttpResponse(content_type="text/csv; charset=utf-8")
-    response["Content-Disposition"] = 'attachment; filename="cidades.csv"'
-    response.write("\ufeff")
-    writer = csv.writer(response)
-    writer.writerow(
-        ["id", "nome", "uf", "estado_id", "capital", "codigo_ibge", "criado_em", "atualizado_em"],
-    )
-    for cidade in cidades:
-        writer.writerow(
-            [
-                cidade.pk,
-                cidade.nome,
-                cidade.uf,
-                cidade.estado_id,
-                cidade.capital,
-                cidade.codigo_ibge or "",
-                cidade.created_at.isoformat(),
-                cidade.updated_at.isoformat(),
-            ]
-        )
-    return response
-
-
-def cidade_create(request):
-    form = CidadeForm(request.POST or None)
-    if request.method == "POST" and form.is_valid():
-        criar_cidade(form)
-        messages.success(request, "Cidade criada com sucesso.")
-        return redirect("cadastros:cidades_index")
-    return render(
-        request,
-        "cadastros/cidades/form.html",
-        {
-            "page_title": "Nova cidade",
-            "page_description": "Cadastre uma cidade de referência.",
-            "form": form,
-            "submit_label": "Criar cidade",
-            "submit_icon": "plus",
-            "back_url": reverse("cadastros:cidades_index"),
-        },
-    )
-
-
-def cidade_update(request, pk):
-    cidade = get_cidade_by_id(pk)
-    form = CidadeForm(request.POST or None, instance=cidade)
-    if request.method == "POST" and form.is_valid():
-        atualizar_cidade(cidade, form)
-        messages.success(request, "Cidade atualizada com sucesso.")
-        return redirect("cadastros:cidades_index")
-    return render(
-        request,
-        "cadastros/cidades/form.html",
-        {
-            "page_title": "Editar cidade",
-            "page_description": "Atualize os dados da cidade.",
-            "form": form,
-            "submit_label": "Salvar cidade",
-            "submit_icon": "check",
-            "back_url": reverse("cadastros:cidades_index"),
-        },
-    )
-
-
-def cidade_delete(request, pk):
-    cidade = get_cidade_by_id(pk)
-    if request.method == "POST":
-        try:
-            excluir_cidade(cidade)
-        except CadastroVinculadoError:
-            _vinculo_error(request)
-            return redirect("cadastros:cidades_index")
-        messages.success(request, "Cidade excluída com sucesso.")
-        return redirect("cadastros:cidades_index")
-    return render(
-        request,
-        "cadastros/cidades/confirm_delete.html",
-        {
-            "page_title": "Excluir cidade",
-            "page_description": "Esta ação excluirá o cadastro. Se houver vínculos com outros registros, a exclusão será bloqueada.",
-            "object": cidade,
-            "back_url": reverse("cadastros:cidades_index"),
-        },
-    )
 
 
 def cargos_index(request):
@@ -553,45 +368,17 @@ def cargos_index(request):
     )
 
 
-def cargo_create(request):
-    form = CargoForm(request.POST or None)
-    if request.method == "POST" and form.is_valid():
-        criar_cargo(form)
-        messages.success(request, "Cargo criado com sucesso.")
-        return redirect("cadastros:cargos_index")
-    return render(
-        request,
-        "cadastros/cargos/form.html",
-        {
-            "page_title": "Novo cargo",
-            "page_description": "Cadastre um cargo para seleção em servidores.",
-            "form": form,
-            "submit_label": "Criar cargo",
-            "submit_icon": "plus",
-            "back_url": reverse("cadastros:cargos_index"),
-        },
-    )
-
-
 def cargo_update(request, pk):
+    # Edição acontece pelo quick add/quick edit da lista; a página standalone foi removida.
     cargo = get_cargo_by_id(pk)
     form = CargoForm(request.POST or None, instance=cargo)
-    if request.method == "POST" and form.is_valid():
-        atualizar_cargo(cargo, form)
-        messages.success(request, "Cargo atualizado com sucesso.")
-        return redirect("cadastros:cargos_index")
-    return render(
-        request,
-        "cadastros/cargos/form.html",
-        {
-            "page_title": "Editar cargo",
-            "page_description": "Atualize os dados do cargo.",
-            "form": form,
-            "submit_label": "Salvar cargo",
-            "submit_icon": "check",
-            "back_url": reverse("cadastros:cargos_index"),
-        },
-    )
+    if request.method == "POST":
+        if form.is_valid():
+            atualizar_cargo(cargo, form)
+            messages.success(request, "Cargo atualizado com sucesso.")
+        else:
+            messages.error(request, "Não foi possível salvar o cargo. Verifique os dados informados.")
+    return redirect("cadastros:cargos_index")
 
 
 def cargo_set_default(request, pk):
@@ -668,45 +455,17 @@ def combustiveis_index(request):
     )
 
 
-def combustivel_create(request):
-    form = CombustivelForm(request.POST or None)
-    if request.method == "POST" and form.is_valid():
-        criar_combustivel(form)
-        messages.success(request, "Combustível criado com sucesso.")
-        return redirect("cadastros:combustiveis_index")
-    return render(
-        request,
-        "cadastros/combustiveis/form.html",
-        {
-            "page_title": "Novo combustível",
-            "page_description": "Cadastre um combustível para seleção em viaturas.",
-            "form": form,
-            "submit_label": "Criar combustível",
-            "submit_icon": "plus",
-            "back_url": reverse("cadastros:combustiveis_index"),
-        },
-    )
-
-
 def combustivel_update(request, pk):
+    # Edição acontece pelo quick add/quick edit da lista; a página standalone foi removida.
     combustivel = get_combustivel_by_id(pk)
     form = CombustivelForm(request.POST or None, instance=combustivel)
-    if request.method == "POST" and form.is_valid():
-        atualizar_combustivel(combustivel, form)
-        messages.success(request, "Combustível atualizado com sucesso.")
-        return redirect("cadastros:combustiveis_index")
-    return render(
-        request,
-        "cadastros/combustiveis/form.html",
-        {
-            "page_title": "Editar combustível",
-            "page_description": "Atualize os dados do combustível.",
-            "form": form,
-            "submit_label": "Salvar combustível",
-            "submit_icon": "check",
-            "back_url": reverse("cadastros:combustiveis_index"),
-        },
-    )
+    if request.method == "POST":
+        if form.is_valid():
+            atualizar_combustivel(combustivel, form)
+            messages.success(request, "Combustível atualizado com sucesso.")
+        else:
+            messages.error(request, "Não foi possível salvar o combustível. Verifique os dados informados.")
+    return redirect("cadastros:combustiveis_index")
 
 
 def combustivel_set_default(request, pk):

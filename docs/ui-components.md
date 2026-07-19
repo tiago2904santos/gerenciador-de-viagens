@@ -41,7 +41,8 @@ Forms:
 {% include "components/ui/forms/field.html" with field=form.nome size_class="field-size-3" only %}
 {% include "components/ui/forms/field.html" with field=form.cargo action_url=cargos_url action_label="Gerenciar cargos" action_icon="settings" only %}
 {% include "components/ui/forms/field_grid.html" with fields=form.visible_fields only %}
-{% include "components/ui/forms/form_section.html" with title="Identificação" description="Dados principais." section_id="identificacao" only %}
+{% include "components/ui/forms/form_block.html" with title="Identificação" description="Dados principais." section_id="identificacao" body_template="app/partials/_identificacao_body.html" %}
+{% include "components/ui/forms/form_block.html" with shell="card" title="Dados do registro" description="Card de seção standalone." section_id="registro-title" body_template="app/partials/_registro_body.html" footer_template="app/partials/_registro_footer.html" %}
 {% include "components/ui/forms/footer_actions.html" with primary_label="Salvar" secondary_label="Voltar" secondary_url=back_url only %}
 {% include "components/ui/forms/file_picker.html" with field_id="id_anexos" field_name="anexos" label="Documentos" help_text="PDF ou imagem." only %}
 ```

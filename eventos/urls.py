@@ -10,7 +10,6 @@ urlpatterns = [
     path("novo/", views.novo, name="novo"),
     path("api/cidades/<str:uf>/", views.api_cidades_por_uf, name="api_cidades_por_uf"),
     path("tipos/", views.tipos_index, name="tipos_index"),
-    path("tipos/novo/", views.tipo_novo, name="tipo_novo"),
     path("tipos/<int:pk>/editar/", views.tipo_editar, name="tipo_editar"),
     path("tipos/<int:pk>/excluir/", views.tipo_excluir, name="tipo_excluir"),
     path("<int:pk>/", views.detalhe, name="detalhe"),

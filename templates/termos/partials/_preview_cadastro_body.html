@@ -1,0 +1,34 @@
+<dl class="termo-preview-grid">
+  <div>
+    <dt>Destino</dt>
+    <dd>{{ preview.destino }}</dd>
+  </div>
+  <div>
+    <dt>Periodo</dt>
+    <dd>{{ preview.periodo }}</dd>
+  </div>
+  <div>
+    <dt>Oficio vinculado</dt>
+    <dd>{% if preview.oficio %}{{ preview.oficio.numero_formatado }}{% else %}Nao vinculado{% endif %}</dd>
+  </div>
+  <div>
+    <dt>Viatura</dt>
+    <dd>{% if preview.viatura %}{{ preview.viatura }}{% else %}Nao informada{% endif %}</dd>
+  </div>
+</dl>
+
+<h3 class="termo-preview-title">Servidores</h3>
+<ul class="termo-preview-list">
+  {% for servidor in preview.servidores %}
+    <li>{{ servidor.nome }}</li>
+  {% empty %}
+    <li>Sem servidor selecionado. O documento sera semipreenchido.</li>
+  {% endfor %}
+</ul>
+
+<div class="termo-actions">
+  <a class="cv-btn cv-btn--primary" href="{% url 'termos:termo_cadastro_pdf_inline' termo.pk %}" target="_blank" rel="noopener"><span>Ver PDF</span></a>
+  <a class="cv-btn cv-btn--secondary" href="{% url 'termos:baixar_termo_cadastro_pdf' termo.pk %}"><span>Baixar PDF</span></a>
+  <a class="cv-btn cv-btn--secondary" href="{% url 'termos:baixar_termo_cadastro_docx' termo.pk %}"><span>Baixar DOCX</span></a>
+  <a class="cv-btn cv-btn--secondary" href="?format=json"><span>Ver JSON</span></a>
+</div>

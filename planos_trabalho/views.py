@@ -33,7 +33,6 @@ from documentos.services.types import DocumentoTipo
 from eventos.services import resolve_evento_from_request
 from core.tenancy import filter_queryset_by_area
 
-from .forms import AtividadePlanoTrabalhoForm
 from .forms import AtividadePlanoTrabalhoQuickAddForm
 from .forms import EfetivoPlanoFormSet
 from .forms import HorarioAtendimentoForm
@@ -1086,26 +1085,6 @@ def _atividades_index_url(back_url, base=None):
     return base
 
 
-def atividade_novo(request):
-    form = AtividadePlanoTrabalhoForm(request.POST or None)
-    if request.method == "POST" and form.is_valid():
-        atividade = form.save(commit=False)
-        atividade.area = getattr(request, "area", None)
-        atividade.save()
-        messages.success(request, "Atividade cadastrada.")
-        return redirect("planos_trabalho:atividades_index")
-    return render(
-        request,
-        "planos_trabalho/atividades/form.html",
-        {
-            "page_title": "Nova atividade",
-            "page_description": "Ao adicionar uma atividade, o preenchimento de meta é obrigatório.",
-            "form": form,
-            "back_url": reverse("planos_trabalho:atividades_index"),
-        },
-    )
-
-
 def atividade_editar(request, pk):
     """Edição inline via quick add: processa o POST do painel e volta ao gerenciador."""
     atividade = get_object_or_404(filter_queryset_by_area(AtividadePlanoTrabalho.objects), pk=pk)
@@ -1268,17 +1247,28 @@ def excluir(request, pk):
 
 
 def programas_index(request):
+    form = ProgramaSolicitanteForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        programa = form.save(commit=False)
+        programa.area = getattr(request, "area", None)
+        programa.save()
+        messages.success(request, "Programa cadastrado.")
+        return redirect("planos_trabalho:programas_index")
     programas = filter_queryset_by_area(ProgramaSolicitante.objects).order_by("ordem", "nome")
     linhas = [
         {
             "title": programa.nome,
-            "badges": [],
+            "badges": [] if programa.ativo else [build_badge("Inativo", "neutral")],
             "meta": [
-                {"label": "Status", "value": "Ativo" if programa.ativo else "Inativo"},
                 {"label": "Ordem", "value": str(programa.ordem)},
             ],
             "edit_url": reverse("planos_trabalho:programa_editar", args=[programa.pk]),
+            "edit_fields_json": json.dumps(
+                {"nome": programa.nome, "ativo": programa.ativo, "ordem": programa.ordem},
+                ensure_ascii=False,
+            ),
             "delete_url": reverse("planos_trabalho:programa_excluir", args=[programa.pk]),
+            "delete_modal": True,
         }
         for programa in programas
     ]
@@ -1288,52 +1278,28 @@ def programas_index(request):
         {
             "page_title": "Programas solicitantes",
             "page_description": "Programas exibidos na etapa de identificação do plano de trabalho.",
+            "q": "",
             "linhas": linhas,
-            "create_url": reverse("planos_trabalho:programa_novo"),
+            "quick_add_form": form,
             "back_url": reverse("planos_trabalho:index"),
         },
     )
 
 
-def programa_novo(request):
-    form = ProgramaSolicitanteForm(request.POST or None)
-    if request.method == "POST" and form.is_valid():
-        programa = form.save(commit=False)
-        programa.area = getattr(request, "area", None)
-        programa.save()
-        messages.success(request, "Programa cadastrado.")
-        return redirect("planos_trabalho:programas_index")
-    return render(
-        request,
-        "planos_trabalho/programas/form.html",
-        {
-            "page_title": "Novo programa solicitante",
-            "form": form,
-            "back_url": reverse("planos_trabalho:programas_index"),
-        },
-    )
-
-
 def programa_editar(request, pk):
+    """Edição inline via quick edit da lista; a página standalone foi removida."""
     programa = get_object_or_404(filter_queryset_by_area(ProgramaSolicitante.objects), pk=pk)
     form = ProgramaSolicitanteForm(request.POST or None, instance=programa)
-    if request.method == "POST" and form.is_valid():
-        programa = form.save(commit=False)
-        if not programa.area_id:
-            programa.area = getattr(request, "area", None)
-        programa.save()
-        messages.success(request, "Programa atualizado.")
-        return redirect("planos_trabalho:programas_index")
-    return render(
-        request,
-        "planos_trabalho/programas/form.html",
-        {
-            "page_title": f"Editar programa — {programa.nome}",
-            "form": form,
-            "programa": programa,
-            "back_url": reverse("planos_trabalho:programas_index"),
-        },
-    )
+    if request.method == "POST":
+        if form.is_valid():
+            programa = form.save(commit=False)
+            if not programa.area_id:
+                programa.area = getattr(request, "area", None)
+            programa.save()
+            messages.success(request, "Programa atualizado.")
+        else:
+            messages.error(request, "Não foi possível salvar o programa. Verifique os dados informados.")
+    return redirect("planos_trabalho:programas_index")
 
 
 def programa_excluir(request, pk):
@@ -1355,16 +1321,28 @@ def programa_excluir(request, pk):
 
 
 def horarios_index(request):
+    form = HorarioAtendimentoForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        horario = form.save(commit=False)
+        horario.area = getattr(request, "area", None)
+        horario.save()
+        messages.success(request, "Horário cadastrado.")
+        return redirect("planos_trabalho:horarios_index")
     horarios = filter_queryset_by_area(HorarioAtendimento.objects).order_by("ordem", "faixa")
     linhas = [
         {
             "title": horario.faixa,
+            "badges": [] if horario.ativo else [build_badge("Inativo", "neutral")],
             "meta": [
-                {"label": "Status", "value": "Ativo" if horario.ativo else "Inativo"},
                 {"label": "Ordem", "value": str(horario.ordem)},
             ],
             "edit_url": reverse("planos_trabalho:horario_editar", args=[horario.pk]),
+            "edit_fields_json": json.dumps(
+                {"faixa": horario.faixa, "ativo": horario.ativo, "ordem": horario.ordem},
+                ensure_ascii=False,
+            ),
             "delete_url": reverse("planos_trabalho:horario_excluir", args=[horario.pk]),
+            "delete_modal": True,
         }
         for horario in horarios
     ]
@@ -1376,52 +1354,25 @@ def horarios_index(request):
             "page_description": "Horários exibidos no select da etapa de identificação do plano de trabalho.",
             "linhas": linhas,
             "q": "",
-            "create_url": reverse("planos_trabalho:horario_novo"),
-        },
-    )
-
-
-def horario_novo(request):
-    form = HorarioAtendimentoForm(request.POST or None)
-    if request.method == "POST" and form.is_valid():
-        horario = form.save(commit=False)
-        horario.area = getattr(request, "area", None)
-        horario.save()
-        messages.success(request, "Horário cadastrado.")
-        return redirect("planos_trabalho:horarios_index")
-    return render(
-        request,
-        "planos_trabalho/horarios/form.html",
-        {
-            "page_title": "Novo horário de atendimento",
-            "page_description": "Faixa exibida no select da etapa de identificação do plano.",
-            "form": form,
-            "back_url": reverse("planos_trabalho:horarios_index"),
+            "quick_add_form": form,
         },
     )
 
 
 def horario_editar(request, pk):
+    """Edição inline via quick edit da lista; a página standalone foi removida."""
     horario = get_object_or_404(filter_queryset_by_area(HorarioAtendimento.objects), pk=pk)
     form = HorarioAtendimentoForm(request.POST or None, instance=horario)
-    if request.method == "POST" and form.is_valid():
-        horario = form.save(commit=False)
-        if not horario.area_id:
-            horario.area = getattr(request, "area", None)
-        horario.save()
-        messages.success(request, "Horário atualizado.")
-        return redirect("planos_trabalho:horarios_index")
-    return render(
-        request,
-        "planos_trabalho/horarios/form.html",
-        {
-            "page_title": f"Editar horário — {horario.faixa}",
-            "page_description": "Atualize a faixa exibida no select da etapa de identificação do plano.",
-            "form": form,
-            "horario": horario,
-            "back_url": reverse("planos_trabalho:horarios_index"),
-        },
-    )
+    if request.method == "POST":
+        if form.is_valid():
+            horario = form.save(commit=False)
+            if not horario.area_id:
+                horario.area = getattr(request, "area", None)
+            horario.save()
+            messages.success(request, "Horário atualizado.")
+        else:
+            messages.error(request, "Não foi possível salvar o horário. Verifique os dados informados.")
+    return redirect("planos_trabalho:horarios_index")
 
 
 def horario_excluir(request, pk):

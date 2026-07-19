@@ -175,26 +175,6 @@ def apresentar_linha_lista_simples_unidade(unidade, edit_url="#", delete_url="#"
     }
 
 
-def apresentar_linha_lista_simples_cidade(cidade, edit_url="#", delete_url="#", delete_modal=False):
-    sigla = cidade.estado.sigla if getattr(cidade, "estado", None) else cidade.uf
-    cap = "Sim" if getattr(cidade, "capital", False) else "Não"
-    badges = []
-    if getattr(cidade, "capital", False):
-        badges.append(build_badge("Capital", "accent"))
-    return {
-        "avatar": "CD",
-        "title": cidade.nome,
-        "badges": badges,
-        "meta": [
-            build_meta("UF", sigla),
-            build_meta("Capital", cap),
-        ],
-        "edit_url": edit_url,
-        "delete_url": delete_url,
-        "delete_modal": delete_modal,
-    }
-
-
 def apresentar_linha_lista_simples_estado(estado, edit_url="#", delete_url="#", delete_modal=False):
     cod = str(estado.codigo_ibge) if estado.codigo_ibge is not None else "—"
     return {
@@ -206,6 +186,14 @@ def apresentar_linha_lista_simples_estado(estado, edit_url="#", delete_url="#", 
             build_meta("IBGE", cod),
         ],
         "edit_url": edit_url,
+        "edit_fields_json": json.dumps(
+            {
+                "nome": estado.nome,
+                "sigla": estado.sigla,
+                "codigo_ibge": estado.codigo_ibge if estado.codigo_ibge is not None else "",
+            },
+            ensure_ascii=False,
+        ),
         "delete_url": delete_url,
         "delete_modal": delete_modal,
     }

@@ -1429,26 +1429,6 @@ def modelos_motivo_index(request):
             "back_to_oficio_url": back_url,
             "back_label": back_label,
             "back_aria_label": back_aria_label,
-            "new_url": reverse("oficios:modelo_motivo_novo"),
-        },
-    )
-
-
-def modelo_motivo_novo(request):
-    form = ModeloMotivoOficioForm(request.POST or None)
-    if request.method == "POST" and form.is_valid():
-        criar_modelo_motivo(form)
-        messages.success(request, "Modelo de motivo criado com sucesso.")
-        return redirect("oficios:modelos_motivo_index")
-    return render(
-        request,
-        "oficios/modelos_motivo/form.html",
-        {
-            "page_title": "Novo modelo de motivo",
-            "page_description": "Crie textos reutilizáveis para agilizar o preenchimento do motivo nos ofícios.",
-            "form": form,
-            "back_url": reverse("oficios:modelos_motivo_index"),
-            "submit_label": "Salvar modelo",
         },
     )
 
@@ -1463,23 +1443,16 @@ def modelo_motivo_definir_padrao(request, pk):
 
 
 def modelo_motivo_editar(request, pk):
+    """Edição inline via quick edit da lista; a página standalone foi removida."""
     modelo = get_modelo_motivo_by_id(pk)
     form = ModeloMotivoOficioForm(request.POST or None, instance=modelo)
-    if request.method == "POST" and form.is_valid():
-        atualizar_modelo_motivo(modelo, form)
-        messages.success(request, "Modelo de motivo atualizado com sucesso.")
-        return redirect("oficios:modelos_motivo_index")
-    return render(
-        request,
-        "oficios/modelos_motivo/form.html",
-        {
-            "page_title": "Editar modelo de motivo",
-            "page_description": "Crie textos reutilizáveis para agilizar o preenchimento do motivo nos ofícios.",
-            "form": form,
-            "back_url": reverse("oficios:modelos_motivo_index"),
-            "submit_label": "Salvar alterações",
-        },
-    )
+    if request.method == "POST":
+        if form.is_valid():
+            atualizar_modelo_motivo(modelo, form)
+            messages.success(request, "Modelo de motivo atualizado com sucesso.")
+        else:
+            messages.error(request, "Não foi possível salvar o modelo. Verifique os dados informados.")
+    return redirect("oficios:modelos_motivo_index")
 
 
 def modelo_motivo_excluir(request, pk):

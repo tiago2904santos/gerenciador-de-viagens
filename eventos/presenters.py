@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 from django.urls import reverse
 from django.utils import timezone
 
@@ -339,6 +341,7 @@ def apresentar_linha_lista_simples_tipo_evento(tipo, edit_url="#", delete_url="#
         "title": tipo.nome,
         "badges": badges,
         "edit_url": edit_url,
+        "edit_fields_json": json.dumps({"nome": tipo.nome, "ativo": tipo.ativo}, ensure_ascii=False),
         "delete_url": delete_url,
         "delete_modal": delete_modal,
     }

@@ -347,7 +347,13 @@ document.documentElement.dataset.appReady = "true";
       // Preenche os campos pelo name
       Object.keys(fields).forEach(function (name) {
         var input = panel.querySelector('[name="' + name + '"]');
-        if (input) { input.value = fields[name]; }
+        if (!input) { return; }
+        if (input.type === "checkbox" || input.type === "radio") {
+          input.checked = Boolean(fields[name]) && fields[name] !== "false" && fields[name] !== "0";
+        } else {
+          input.value = fields[name];
+        }
+        input.dispatchEvent(new Event("change", { bubbles: true }));
       });
 
       // Abre o painel
