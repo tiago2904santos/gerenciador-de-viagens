@@ -1,0 +1,7 @@
+<form method="post" enctype="multipart/form-data" action="{% url 'eventos:guiado_etapa' pk=evento.pk etapa=4 %}">
+  {% csrf_token %}
+  <input type="hidden" name="action" value="upload_solicitacao">
+  {% include "components/ui/forms/file_picker.html" with field_id="id_evt_solicitacao_arquivos" field_name="solicitacao_arquivos" label="Documentos de solicitação" help_text="Ofícios solicitantes, convites, despachos assinados ou imagens. Aceita PDF, PNG, JPG ou JPEG." only %}
+</form>
+
+{% include "components/ui/lists/file_list.html" with anexos=solicitacao_anexos subtitle="Documento de solicitação" extra_class="cv-content-spaced" delete_form=True empty_message="Nenhum documento de solicitação anexado ainda." csrf_token=csrf_token only %}

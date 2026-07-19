@@ -1,0 +1,86 @@
+{% with docs=termo_preview_documents %}
+  <details class="document-inline-card document-inline-card--lazy" data-lazy-inline>
+    <summary class="document-inline-card__header">
+      <span class="document-inline-card__title">
+        {{ docs.generico.titulo }} - {{ termo.destino_display }} - {{ termo.periodo_display }}
+      </span>
+      <span class="document-inline-card__header-end">
+        <span class="document-inline-actions document-inline-actions--header" aria-label="Acoes do termo generico">
+          {% include "components/ui/buttons/icon_button.html" with href=docs.generico.inline_url action="preview" aria_label="Abrir termo generico" tooltip="Abrir termo generico" only %}
+          {% include "components/ui/buttons/icon_button.html" with href=docs.generico.inline_url action="pdf" aria_label="Visualizar PDF do termo generico" tooltip="PDF" only %}
+          <button
+            type="button"
+            class="cv-icon-btn cv-icon-btn--sign{% if docs.generico.assinado %} is-assinado{% endif %}"
+            data-attach-signed-trigger
+            data-attach-signed-url="{{ docs.generico.anexar_assinado_url }}"
+            data-attach-signed-doc-label="o termo genérico"
+            data-attach-signed-current-name="{{ docs.generico.assinado_nome_original }}"
+            data-attach-signed-current-view-url="{{ docs.generico.assinado_view_url }}"
+            data-attach-signed-current-remove-url="{{ docs.generico.remover_assinado_url }}"
+            aria-label="{% if docs.generico.assinado %}Termo assinado — gerenciar{% else %}Anexar assinado{% endif %}"
+            data-tooltip="{% if docs.generico.assinado %}Assinado — clique para gerenciar{% else %}Anexar assinado{% endif %}"
+          >{% include "components/ui/icons/icon.html" with icon="sign" only %}</button>
+        </span>
+      </span>
+    </summary>
+    <div class="document-inline-card__body">
+      <div class="document-inline-viewer">
+        <iframe
+          class="document-inline-viewer__frame"
+          data-src="{{ docs.generico.inline_url }}"
+          title="Visualizacao do termo generico"
+          loading="lazy"
+        ></iframe>
+      </div>
+    </div>
+  </details>
+
+  <details class="document-inline-card document-inline-card--termos">
+    <summary class="document-inline-card__header">
+      <span class="document-inline-card__title">Termos por servidor</span>
+    </summary>
+    <div class="document-inline-card__body document-inline-card__body--termos">
+      {% if docs.servidores %}
+        {% for doc in docs.servidores %}
+          <details class="document-inline-card document-inline-card--nested document-inline-card--lazy" data-lazy-inline>
+            <summary class="document-inline-card__header">
+              <span class="document-inline-card__title">
+                {{ doc.titulo }}
+              </span>
+              <span class="document-inline-card__header-end">
+                <span class="document-inline-actions document-inline-actions--header" aria-label="Acoes do termo de {{ doc.servidor_nome }}">
+                  {% include "components/ui/buttons/icon_button.html" with href=doc.inline_url action="preview" aria_label="Abrir termo de servidor" tooltip="Abrir termo" only %}
+                  {% include "components/ui/buttons/icon_button.html" with href=doc.inline_url action="pdf" aria_label="Visualizar PDF do termo de servidor" tooltip="PDF" only %}
+                  <button
+                    type="button"
+                    class="cv-icon-btn cv-icon-btn--sign{% if doc.assinado %} is-assinado{% endif %}"
+                    data-attach-signed-trigger
+                    data-attach-signed-url="{{ doc.anexar_assinado_url }}"
+                    data-attach-signed-doc-label="o termo de {{ doc.servidor_nome }}"
+                    data-attach-signed-current-name="{{ doc.assinado_nome_original }}"
+                    data-attach-signed-current-view-url="{{ doc.assinado_view_url }}"
+                    data-attach-signed-current-remove-url="{{ doc.remover_assinado_url }}"
+                    aria-label="{% if doc.assinado %}Termo assinado — gerenciar{% else %}Anexar assinado{% endif %}"
+                    data-tooltip="{% if doc.assinado %}Assinado — clique para gerenciar{% else %}Anexar assinado{% endif %}"
+                  >{% include "components/ui/icons/icon.html" with icon="sign" only %}</button>
+                </span>
+              </span>
+            </summary>
+            <div class="document-inline-card__body">
+              <div class="document-inline-viewer">
+                <iframe
+                  class="document-inline-viewer__frame"
+                  data-src="{{ doc.inline_url }}"
+                  title="Visualizacao do termo de {{ doc.servidor_nome }}"
+                  loading="lazy"
+                ></iframe>
+              </div>
+            </div>
+          </details>
+        {% endfor %}
+      {% else %}
+        <p class="document-inline-empty">Nenhum servidor selecionado. Use o termo generico acima.</p>
+      {% endif %}
+    </div>
+  </details>
+{% endwith %}

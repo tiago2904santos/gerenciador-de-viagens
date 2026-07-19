@@ -1,0 +1,62 @@
+<div class="roteiro-trecho-card__route-row field-grid field-grid--cols-2">
+  <div class="roteiro-trecho-card__leg">
+    <div class="roteiro-trecho-card__leg-title">Saída</div>
+    <div class="field-grid field-grid--cols-2 roteiro-trecho-card__leg-grid">
+      <div class="field cv-field cv-field--readonly roteiro-trecho-card__leg-cidade">
+        <label class="cv-field__label" for="id_retorno_saida_cidade">Cidade de saída</label>
+        <input type="text" id="id_retorno_saida_cidade" class="cv-field__control" value="{{ retorno_state.saida_cidade|default:'' }}" readonly tabindex="-1" aria-readonly="true">
+      </div>
+      <div class="field cv-field field-size-1">
+        <label class="cv-field__label" for="id_retorno_saida_data_display">Data</label>
+        {% include "components/forms/cv_date_picker.html" with mode="single" picker_id="retorno-saida-date-picker" single_input_id="id_retorno_saida_data_display" single_hidden_id="id_retorno_saida_data" single_hidden_name="retorno_saida_data" single_hidden_value=retorno_state.saida_data initial_date=retorno_state.saida_data trecho_date="saida" only %}
+      </div>
+      <div class="field cv-field field-size-1">
+        <label class="cv-field__label" for="id_retorno_saida_hora">Hora</label>
+        <input type="text" class="cv-field__control" name="retorno_saida_hora" id="id_retorno_saida_hora" data-mask="time" value="{{ retorno_state.saida_hora|default:'' }}" placeholder="00:00" inputmode="numeric" maxlength="5" autocomplete="off">
+      </div>
+    </div>
+  </div>
+
+  <div class="roteiro-trecho-card__leg">
+    <div class="roteiro-trecho-card__leg-title">Chegada</div>
+    <div class="field-grid field-grid--cols-2 roteiro-trecho-card__leg-grid">
+      <div class="field cv-field cv-field--readonly roteiro-trecho-card__leg-cidade">
+        <label class="cv-field__label" for="id_retorno_chegada_cidade">Cidade de chegada</label>
+        <input type="text" id="id_retorno_chegada_cidade" class="cv-field__control" value="{{ retorno_state.chegada_cidade|default:'' }}" readonly tabindex="-1" aria-readonly="true">
+      </div>
+      <div class="field cv-field field-size-1">
+        <label class="cv-field__label" for="id_retorno_chegada_data_display">Data</label>
+        {% include "components/forms/cv_date_picker.html" with mode="single" picker_id="retorno-chegada-date-picker" single_input_id="id_retorno_chegada_data_display" single_hidden_id="id_retorno_chegada_data" single_hidden_name="retorno_chegada_data" single_hidden_value=retorno_state.chegada_data initial_date=retorno_state.chegada_data trecho_date="chegada" only %}
+      </div>
+      <div class="field cv-field field-size-1">
+        <label class="cv-field__label" for="id_retorno_chegada_hora">Hora</label>
+        <input type="text" class="cv-field__control" name="retorno_chegada_hora" id="id_retorno_chegada_hora" data-mask="time" value="{{ retorno_state.chegada_hora|default:'' }}" placeholder="00:00" inputmode="numeric" maxlength="5" autocomplete="off">
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="field-grid field-grid--cols-3 oficio-roteiro-time-calc-grid roteiro-time-calc-grid roteiro-trecho-card__time-grid">
+  <div class="field cv-field field-size-1">
+    <label class="cv-field__label" for="id_retorno_tempo_viagem_hhmm">Tempo de viagem</label>
+    <input type="text" class="cv-field__control" id="id_retorno_tempo_viagem_hhmm" value="" placeholder="00:00" data-mask="time" inputmode="numeric" maxlength="5" autocomplete="off">
+    <input type="hidden" name="retorno_tempo_cru_estimado_min" id="id_retorno_tempo_cru_estimado_min" value="{{ retorno_state.tempo_cru_estimado_min|default:'' }}">
+  </div>
+  <div class="field cv-field field-size-1">
+    <label class="cv-field__label" for="id_retorno_tempo_adicional_hhmm">Tempo adicional</label>
+    <div class="roteiro-time-calc-stepper roteiro-trecho-card__time-stepper">
+      <input type="text" class="cv-field__control trecho-tempo-adicional-hhmm" id="id_retorno_tempo_adicional_hhmm" value="" placeholder="00:00" data-mask="time" inputmode="numeric" maxlength="5" autocomplete="off">
+      <button type="button" class="cv-btn cv-btn--secondary cv-btn--control trecho-tempo-add-btn" id="retorno_tempo_add_menos" data-tempo-add-delta="-15" aria-label="Menos 15 minutos">−</button>
+      <button type="button" class="cv-btn cv-btn--secondary cv-btn--control trecho-tempo-add-btn" id="retorno_tempo_add_mais" data-tempo-add-delta="15" aria-label="Mais 15 minutos">+</button>
+    </div>
+    <input type="hidden" name="retorno_tempo_adicional_min" id="id_retorno_tempo_adicional_min" value="{{ retorno_state.tempo_adicional_min|default:0 }}">
+  </div>
+  <div class="field cv-field cv-field--readonly field-size-1">
+    <label class="cv-field__label" for="id_retorno_tempo_total">Tempo total</label>
+    <input type="text" class="cv-field__control trecho-tempo-total" id="id_retorno_tempo_total" value="" readonly tabindex="-1" aria-readonly="true">
+  </div>
+</div>
+<input type="hidden" name="retorno_distancia_km" id="id_retorno_distancia_km" value="{{ retorno_state.distancia_km|default:'' }}">
+<input type="hidden" name="retorno_duracao_estimada_min" id="id_retorno_duracao_estimada_min" value="{{ retorno_state.duracao_estimada_min|default:'' }}">
+<input type="hidden" name="retorno_rota_fonte" id="id_retorno_rota_fonte" value="{{ retorno_state.rota_fonte|default:'' }}">
+<div class="roteiro-editor__helper text-danger d-none" id="retorno-erro"></div>

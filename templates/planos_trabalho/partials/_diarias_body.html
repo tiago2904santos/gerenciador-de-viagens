@@ -1,0 +1,46 @@
+{% include "components/forms/cv_date_picker.html" with mode="range" picker_id="pt-diarias-date-picker" extra_class="termo-date-picker" start_field=diarias_form.saida_sede_data end_field=diarias_form.chegada_sede_data start_label="Data de saída da sede" end_label="Data de chegada na sede" start_input_id="id_pt_saida_sede_data_display" end_input_id="id_pt_chegada_sede_data_display" only %}
+<div class="field-grid pt-diarias-grid">
+    {% include "components/forms/form_field.html" with field=diarias_form.saida_sede_hora label="Hora de saída" size_class="field-size-1" only %}
+    {% include "components/forms/form_field.html" with field=diarias_form.chegada_sede_hora label="Hora de chegada" size_class="field-size-1" only %}
+</div>
+
+<section class="wizard-inner-section" aria-labelledby="pt-diarias-resultado-title">
+  <header class="wizard-inner-section__header">
+    <h4 class="wizard-inner-section__title" id="pt-diarias-resultado-title">Resultado do cálculo</h4>
+  </header>
+  <div class="oficio-lc__transport-row" data-pt-diarias-resultado>
+    <div class="oficio-lc__transport-card">
+      <span class="oficio-lc__transport-label">Composição por servidor</span>
+      <div class="oficio-lc__transport-placa" data-pt-resultado-composicao>
+        {% if diarias_resultado.ok %}{{ diarias_resultado.composicao }}{% else %}—{% endif %}
+      </div>
+      <span class="oficio-lc__transport-label">Efetivo total</span>
+      <div class="oficio-lc__transport-modelo" data-pt-resultado-efetivo>
+        {% if diarias_resultado.ok %}{{ diarias_resultado.quantidade_servidores }} servidor(es){% else %}—{% endif %}
+      </div>
+    </div>
+    <div class="oficio-lc__transport-card">
+      <span class="oficio-lc__transport-label">Valor por servidor</span>
+      <div class="oficio-lc__valor-total" data-pt-resultado-unitario>
+        {% if diarias_resultado.ok %}R${{ diarias_resultado.valor_unitario_display }}{% else %}—{% endif %}
+      </div>
+      <span class="oficio-lc__transport-label">Por extenso</span>
+      <div class="oficio-lc__valor-extenso" data-pt-resultado-unitario-extenso>
+        {% if diarias_resultado.ok %}{{ diarias_resultado.valor_unitario_extenso }}{% else %}—{% endif %}
+      </div>
+    </div>
+    <div class="oficio-lc__transport-card oficio-lc__transport-card--valor">
+      <span class="oficio-lc__transport-label">Valor total do plano</span>
+      <div class="oficio-lc__valor-total" data-pt-resultado-total>
+        {% if diarias_resultado.ok %}R${{ diarias_resultado.valor_total_display }}{% else %}—{% endif %}
+      </div>
+      <span class="oficio-lc__transport-label">Por extenso</span>
+      <div class="oficio-lc__valor-extenso" data-pt-resultado-total-extenso>
+        {% if diarias_resultado.ok %}{{ diarias_resultado.valor_total_extenso }}{% else %}—{% endif %}
+      </div>
+    </div>
+  </div>
+  <p class="field-help" data-pt-diarias-erros>
+    {% if not diarias_resultado.ok %}{{ diarias_resultado.erros|join:" " }}{% endif %}
+  </p>
+</section>

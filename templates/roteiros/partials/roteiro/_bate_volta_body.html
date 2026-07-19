@@ -1,0 +1,37 @@
+<div id="bate-volta-body" {% if not roteiro_editor_state_json.bate_volta_diario.ativo %}hidden{% endif %}>
+  <div id="bate-volta-panel" class="roteiro-editor__bate-volta-grid-v2">
+
+    {# O intervalo usa o modelo global; os horarios permanecem campos independentes. #}
+    {% include "components/forms/cv_date_picker.html" with mode="range" picker_id="bate-volta-date-picker" start_label="Data inicial" end_label="Data final" start_input_id="id_bate_volta_data_inicio_display" end_input_id="id_bate_volta_data_fim_display" start_hidden_id="id_bate_volta_data_inicio_native" end_hidden_id="id_bate_volta_data_fim_native" start_hidden_name="bate_volta_data_inicio" end_hidden_name="bate_volta_data_fim" start_hidden_value=roteiro_editor_state_json.bate_volta_diario.data_inicio end_hidden_value=roteiro_editor_state_json.bate_volta_diario.data_fim initial_date=roteiro_editor_state_json.bate_volta_diario.data_inicio only %}
+
+    <div class="field-grid field-grid--cols-2">
+        <div class="field cv-field field-size-1">
+          <label class="cv-field__label" for="id_bate_volta_ida_saida_hora">Saída da ida</label>
+          <input type="text" class="cv-field__control" id="id_bate_volta_ida_saida_hora" name="bate_volta_ida_saida_hora" data-mask="time"
+                 value="{{ roteiro_editor_state_json.bate_volta_diario.ida_saida_hora|default:'' }}"
+                 placeholder="00:00" inputmode="numeric" maxlength="5" autocomplete="off">
+        </div>
+        <div class="field cv-field field-size-1">
+          <label class="cv-field__label" for="id_bate_volta_ida_tempo_hhmm">Tempo da ida</label>
+          <input type="text" class="cv-field__control" id="id_bate_volta_ida_tempo_hhmm" data-mask="time"
+                 value="" placeholder="00:00" inputmode="numeric" maxlength="5" autocomplete="off">
+          <input type="hidden" id="id_bate_volta_ida_tempo_min" name="bate_volta_ida_tempo_min"
+                 value="{{ roteiro_editor_state_json.bate_volta_diario.ida_tempo_min|default:'' }}">
+        </div>
+        <div class="field cv-field field-size-1">
+          <label class="cv-field__label" for="id_bate_volta_volta_saida_hora">Saída da volta</label>
+          <input type="text" class="cv-field__control" id="id_bate_volta_volta_saida_hora" name="bate_volta_volta_saida_hora" data-mask="time"
+                 value="{{ roteiro_editor_state_json.bate_volta_diario.volta_saida_hora|default:'' }}"
+                 placeholder="00:00" inputmode="numeric" maxlength="5" autocomplete="off">
+        </div>
+        <div class="field cv-field field-size-1">
+          <label class="cv-field__label" for="id_bate_volta_volta_tempo_hhmm">Tempo da volta</label>
+          <input type="text" class="cv-field__control" id="id_bate_volta_volta_tempo_hhmm" data-mask="time"
+                 value="" placeholder="00:00" inputmode="numeric" maxlength="5" autocomplete="off">
+          <input type="hidden" id="id_bate_volta_volta_tempo_min" name="bate_volta_volta_tempo_min"
+                 value="{{ roteiro_editor_state_json.bate_volta_diario.volta_tempo_min|default:'' }}">
+        </div>
+    </div>
+
+  </div>
+</div>

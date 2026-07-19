@@ -43,116 +43,14 @@
             {% endif %}
 
             {# CARD 1 — O que é o evento #}
-            <section class="cv-wizard-section-card cv-wizard-section-card--compact cv-wizard-section-card--described" aria-labelledby="evento-wizard-tipo-title-d">
-              <header class="cv-wizard-section-header">
-                <div class="cv-wizard-section-header__copy">
-                  <h2 class="cv-wizard-section-title" id="evento-wizard-tipo-title-d">Identificação do evento</h2>
-                  <p class="cv-wizard-section-subtitle">Escolha o tipo e registre o motivo que contextualiza esta atividade.</p>
-                </div>
-              </header>
-              <div class="cv-wizard-section-body">
-                <div class="field-grid">
-                  {% include "components/forms/form_field.html" with field=form.tipos action_url=tipos_evento_url action_label="Gerenciar tipos" size_class="field-size-4" only %}
-                </div>
-
-                <hr class="cv-divider">
-
-                <section class="wizard-inner-section" aria-labelledby="evento-wizard-motivo-d">
-                  <header class="wizard-inner-section__header">
-                    <h4 class="wizard-inner-section__title" id="evento-wizard-motivo-d">Motivo</h4>
-                  </header>
-                  <div class="field-grid">
-                    {% include "components/forms/input_with_action.html" with field=form.modelo_motivo action_url=modelos_motivo_url action_label="Gerenciar modelos" size_class="field-size-4" only %}
-                  </div>
-                  <div class="field-grid">
-                    {% include "components/forms/form_field.html" with field=form.motivo size_class="field-size-4" only %}
-                  </div>
-                </section>
-              </div>
-            </section>
+            {% include "components/ui/forms/form_block.html" with shell="card" section_id="evento-wizard-tipo-title-d" extra_class="cv-wizard-section-card--compact cv-wizard-section-card--described" title="Identificação do evento" description="Escolha o tipo e registre o motivo que contextualiza esta atividade." body_template="eventos/partials/_detalhe_identificacao_body.html" %}
 
             {# CARD 2 — Datas e destinos #}
-            <section class="cv-wizard-section-card cv-wizard-section-card--compact cv-wizard-section-card--described termo-card termo-card--evento" id="evento-card-dados-d" aria-labelledby="evento-card-dados-title-d">
-              <header class="cv-wizard-section-header">
-                <div class="cv-wizard-section-header__copy">
-                  <h2 class="cv-wizard-section-title" id="evento-card-dados-title-d">Quando e onde</h2>
-                  <p class="cv-wizard-section-subtitle">Informe o período e ao menos um destino para continuar.</p>
-                </div>
-              </header>
-
-              <div class="cv-wizard-section-body termo-evento-body">
-                  <section class="wizard-inner-section termo-evento-periodo" aria-label="Período do evento">
-                    {% include "components/forms/cv_date_picker.html" with mode="range" picker_id="evento-date-picker-d" extra_class="termo-date-picker" start_field=form.data_inicio end_field=form.data_fim start_label="Data inicial" end_label="Data final" start_input_id="id_data_inicio_display_d" end_input_id="id_data_fim_display_d" only %}
-                  </section>
-
-                  {% include "components/domain/destinos_section.html" with section_id="evento-wizard-destinos-d" title_id="evento-destinos-title-d" add_button_id="btn-adicionar-destino-d" add_button_evento_d=True list_id="destinos-lista-d" rows_template="eventos/partials/_destinos_rows_detalhe.html" %}
-                  <template id="tmpl-destino-extra-d">
-                    {% include "eventos/partials/_destino_extra_template.html" %}
-                  </template>
-              </div>
-            </section>
+            {% include "components/ui/forms/form_block.html" with shell="card" element_id="evento-card-dados-d" section_id="evento-card-dados-title-d" extra_class="cv-wizard-section-card--compact cv-wizard-section-card--described termo-card termo-card--evento" title="Quando e onde" description="Informe o período e ao menos um destino para continuar." body_extra_class="termo-evento-body" body_template="eventos/partials/_detalhe_dados_body.html" %}
 
             {# CARD 3 — Documentos já existentes #}
-            <section class="cv-wizard-section-card cv-wizard-section-card--compact cv-wizard-section-card--described termo-card" id="evento-card-documentos-d" aria-labelledby="evento-card-documentos-title-d">
-              <header class="cv-wizard-section-header">
-                <div class="cv-wizard-section-header__copy">
-                  <h2 class="cv-wizard-section-title" id="evento-card-documentos-title-d">Documentos vinculados</h2>
-                  <p class="cv-wizard-section-subtitle">Reaproveite documentos existentes. Marque para vincular e desmarque para remover o vínculo.</p>
-                </div>
-              </header>
-              <div class="cv-wizard-section-body">
-                <div class="evento-doc-tabs" id="evento-doc-tabs" role="tablist" aria-label="Tipo de documento" data-evento-doc-tabs>
-                  <button type="button" class="evento-doc-tab is-active" id="evento-doc-tab-oficios-d" data-doc-tab-target="oficios" role="tab" aria-selected="true" aria-controls="evento-wizard-doc-oficios-d" tabindex="0">
-                    Ofícios
-                  </button>
-                  <button type="button" class="evento-doc-tab" id="evento-doc-tab-roteiros-d" data-doc-tab-target="roteiros" role="tab" aria-selected="false" aria-controls="evento-wizard-doc-roteiros-d" tabindex="-1">
-                    Roteiros
-                  </button>
-                  <button type="button" class="evento-doc-tab" id="evento-doc-tab-pt-d" data-doc-tab-target="pt" role="tab" aria-selected="false" aria-controls="evento-wizard-doc-pt-d" tabindex="-1">
-                    Plano de Trabalho
-                  </button>
-                  <button type="button" class="evento-doc-tab" id="evento-doc-tab-os-d" data-doc-tab-target="os" role="tab" aria-selected="false" aria-controls="evento-wizard-doc-os-d" tabindex="-1">
-                    Ordem de Serviço
-                  </button>
-                  <button type="button" class="evento-doc-tab" id="evento-doc-tab-termos-d" data-doc-tab-target="termos" role="tab" aria-selected="false" aria-controls="evento-wizard-doc-termos-d" tabindex="-1">
-                    Termos
-                  </button>
-                </div>
-
-                <section class="wizard-inner-section" id="evento-wizard-doc-oficios-d" data-doc-tab-panel="oficios" role="tabpanel" aria-labelledby="evento-doc-tab-oficios-d" tabindex="0">
-                  <div class="field-grid">
-                    {% include "components/forms/form_field.html" with field=form.oficios_vinculados only %}
-                  </div>
-                </section>
-
-                <section class="wizard-inner-section" id="evento-wizard-doc-roteiros-d" data-doc-tab-panel="roteiros" role="tabpanel" aria-labelledby="evento-doc-tab-roteiros-d" tabindex="0" hidden>
-                  <div class="field-grid">
-                    {% include "components/forms/form_field.html" with field=form.roteiros_vinculados only %}
-                  </div>
-                </section>
-
-                <section class="wizard-inner-section" id="evento-wizard-doc-pt-d" data-doc-tab-panel="pt" role="tabpanel" aria-labelledby="evento-doc-tab-pt-d" tabindex="0" hidden>
-                  <div class="field-grid">
-                    {% include "components/forms/form_field.html" with field=form.planos_trabalho_vinculados only %}
-                  </div>
-                </section>
-
-                <section class="wizard-inner-section" id="evento-wizard-doc-os-d" data-doc-tab-panel="os" role="tabpanel" aria-labelledby="evento-doc-tab-os-d" tabindex="0" hidden>
-                  <div class="field-grid">
-                    {% include "components/forms/form_field.html" with field=form.ordens_servico_vinculadas only %}
-                  </div>
-                </section>
-
-                <section class="wizard-inner-section" id="evento-wizard-doc-termos-d" data-doc-tab-panel="termos" role="tabpanel" aria-labelledby="evento-doc-tab-termos-d" tabindex="0" hidden>
-                  <div class="field-grid">
-                    {% include "components/forms/form_field.html" with field=form.termos_vinculados only %}
-                  </div>
-                </section>
-              </div>
-              {% url 'eventos:index' as back_url_eventos %}
-              {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar à lista" secondary_url=back_url_eventos primary_label="Salvar e avançar" primary_action="wizard_next" only %}
-              {% endwith %}
-            </section>
+            {% include "components/ui/forms/form_block.html" with shell="card" element_id="evento-card-documentos-d" section_id="evento-card-documentos-title-d" extra_class="cv-wizard-section-card--compact cv-wizard-section-card--described termo-card" title="Documentos vinculados" description="Reaproveite documentos existentes. Marque para vincular e desmarque para remover o vínculo." body_template="eventos/partials/_detalhe_documentos_body.html" footer_template="eventos/partials/_detalhe_documentos_footer.html" %}
+            {% endwith %}
 
           </form>
 
@@ -189,26 +87,7 @@
         {% endif %}
 
         {% if etapa_atual == 4 %}
-          <section class="cv-wizard-section-card cv-wizard-section-card--compact cv-wizard-section-card--described" aria-labelledby="evento-solicitacao-title">
-            <header class="cv-wizard-section-header">
-              <div class="cv-wizard-section-header__copy">
-                <h3 class="cv-wizard-section-title" id="evento-solicitacao-title">Documentos de solicitação</h3>
-                <p class="cv-wizard-section-subtitle">
-                  Anexe ofícios solicitantes, convites, despachos assinados ou imagens que fundamentam este evento.
-                  Esses documentos complementam ou substituem a Ordem de Serviço e o Plano de Trabalho.
-                </p>
-              </div>
-            </header>
-            <div class="cv-wizard-section-body">
-              <form method="post" enctype="multipart/form-data" action="{% url 'eventos:guiado_etapa' pk=evento.pk etapa=4 %}">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="upload_solicitacao">
-                {% include "components/ui/forms/file_picker.html" with field_id="id_evt_solicitacao_arquivos" field_name="solicitacao_arquivos" label="Documentos de solicitação" help_text="Ofícios solicitantes, convites, despachos assinados ou imagens. Aceita PDF, PNG, JPG ou JPEG." only %}
-              </form>
-
-              {% include "components/ui/lists/file_list.html" with anexos=solicitacao_anexos subtitle="Documento de solicitação" extra_class="cv-content-spaced" delete_form=True empty_message="Nenhum documento de solicitação anexado ainda." csrf_token=csrf_token only %}
-            </div>
-          </section>
+          {% include "components/ui/forms/form_block.html" with shell="card" section_id="evento-solicitacao-title" extra_class="cv-wizard-section-card--compact cv-wizard-section-card--described" title="Documentos de solicitação" description="Anexe ofícios solicitantes, convites, despachos assinados ou imagens que fundamentam este evento. Esses documentos complementam ou substituem a Ordem de Serviço e o Plano de Trabalho." body_template="eventos/partials/_detalhe_solicitacao_body.html" %}
 
           <section class="cv-wizard-collection" aria-labelledby="evento-planejamento-title">
             {% include "components/ui/layouts/collection_header.html" with title="Planejamento e autorização" title_id="evento-planejamento-title" description="Vincule o Plano de Trabalho e a Ordem de Serviço que orientam a execução da viagem." only %}

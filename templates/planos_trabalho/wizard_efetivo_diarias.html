@@ -3,148 +3,16 @@
 
 {% block extra_css %}
   {{ block.super }}
-  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260612-pt">
+  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260718-cv-summary">
   <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260614g-pt">
 {% endblock %}
 
 {% block wizard_content %}
   <div data-pt-efetivo-diarias data-api-calcular-url="{{ api_calcular_diarias_url }}">
 
-    <section class="cv-wizard-section-card termo-card" id="pt-card-efetivo">
-      <header class="cv-wizard-section-header">
-        <div class="cv-wizard-section-header__copy">
-          <h3 class="cv-wizard-section-title">Efetivo</h3>
-          <p class="cv-wizard-section-subtitle">Composição da equipe por unidade, cargo e quantidade. O total entra no cálculo das diárias.</p>
-        </div>
-      </header>
-      <div class="cv-wizard-section-body">
-        {{ formset.management_form }}
-        {% if formset.non_form_errors %}
-          {% include "components/ui/feedback/field_error.html" with errors=formset.non_form_errors only %}
-        {% endif %}
-        <div class="cv-search-picker">
-          <section class="cv-search-picker__selected-panel roteiro-destinos-panel" aria-label="Efetivos do plano">
-            <div class="cv-search-picker__selected-header roteiro-destinos-panel__header">
-              <h4 class="cv-search-picker__selected-title">Efetivos adicionados</h4>
-              <button type="button" class="cv-btn cv-btn--secondary cv-btn--sm" data-pt-efetivo-add>
-                <span>+ Adicionar efetivo</span>
-              </button>
-            </div>
-            <div class="cv-search-picker__selected-list roteiro-destinos-list pt-efetivo-rows" data-pt-efetivo-rows>
-              {% for efetivo_form in formset %}
-                <div class="cv-search-picker__selected-card destino-row{% if forloop.first and formset|length == 1 %} destino-row--single{% endif %} termo-destino-row pt-efetivo-card" data-pt-efetivo-row>
-                  {% for hidden in efetivo_form.hidden_fields %}{{ hidden }}{% endfor %}
-                  <div hidden>{{ efetivo_form.DELETE }}</div>
-                  <div class="cv-search-picker__selected-main">
-                    <div class="field-grid pt-efetivo-card__grid">
-                      <div class="field field-size-1 app-form-field">
-                        <label class="cv-field__label" for="{{ efetivo_form.unidade.id_for_label }}">Unidade (opcional)</label>
-                        {{ efetivo_form.unidade }}
-                        {% if efetivo_form.unidade.errors %}{% include "components/ui/feedback/field_error.html" with errors=efetivo_form.unidade.errors only %}{% endif %}
-                      </div>
-                      {% include "components/forms/input_with_action.html" with field=efetivo_form.cargo action_url=cargos_url action_label="Gerenciar cargos" size_class="field-size-1" only %}
-                      <div class="field field-size-1 app-form-field">
-                        <label class="cv-field__label" for="{{ efetivo_form.quantidade.id_for_label }}">Quantidade</label>
-                        <div class="roteiro-time-calc-stepper pt-quantidade-stepper">
-                          {{ efetivo_form.quantidade }}
-                          <button type="button" class="cv-btn cv-btn--secondary cv-btn--control" data-pt-quantidade-delta="-1" aria-label="Diminuir quantidade">−</button>
-                          <button type="button" class="cv-btn cv-btn--secondary cv-btn--control" data-pt-quantidade-delta="1" aria-label="Aumentar quantidade">+</button>
-                        </div>
-                        {% if efetivo_form.quantidade.errors %}{% include "components/ui/feedback/field_error.html" with errors=efetivo_form.quantidade.errors only %}{% endif %}
-                      </div>
-                    </div>
-                  </div>
-                  <button type="button" class="cv-search-picker__remove btn-remover-destino" title="Remover efetivo" aria-label="Remover efetivo" {% if forloop.first and formset|length == 1 %}hidden{% endif %} data-pt-efetivo-remove>x</button>
-                </div>
-              {% endfor %}
-            </div>
-          </section>
-        </div>
-        <template data-pt-efetivo-template>
-          <div class="cv-search-picker__selected-card destino-row termo-destino-row pt-efetivo-card" data-pt-efetivo-row>
-            {% for hidden in formset.empty_form.hidden_fields %}{{ hidden }}{% endfor %}
-            <div hidden>{{ formset.empty_form.DELETE }}</div>
-            <div class="cv-search-picker__selected-main">
-              <div class="field-grid pt-efetivo-card__grid">
-                <div class="field field-size-1 app-form-field">
-                  <label class="cv-field__label" for="{{ formset.empty_form.unidade.id_for_label }}">Unidade (opcional)</label>
-                  {{ formset.empty_form.unidade }}
-                </div>
-                {% include "components/forms/input_with_action.html" with field=formset.empty_form.cargo action_url=cargos_url action_label="Gerenciar cargos" size_class="field-size-1" only %}
-                <div class="field field-size-1 app-form-field">
-                  <label class="cv-field__label" for="{{ formset.empty_form.quantidade.id_for_label }}">Quantidade</label>
-                  <div class="roteiro-time-calc-stepper pt-quantidade-stepper">
-                    {{ formset.empty_form.quantidade }}
-                    <button type="button" class="cv-btn cv-btn--secondary cv-btn--control" data-pt-quantidade-delta="-1" aria-label="Diminuir quantidade">−</button>
-                    <button type="button" class="cv-btn cv-btn--secondary cv-btn--control" data-pt-quantidade-delta="1" aria-label="Aumentar quantidade">+</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <button type="button" class="cv-search-picker__remove btn-remover-destino" title="Remover efetivo" aria-label="Remover efetivo" data-pt-efetivo-remove>x</button>
-          </div>
-        </template>
-      </div>
-    </section>
+    {% include "components/ui/forms/form_block.html" with shell="card" element_id="pt-card-efetivo" section_id="pt-efetivo-title" extra_class="termo-card" title="Efetivo" description="Composição da equipe por unidade, cargo e quantidade. O total entra no cálculo das diárias." body_template="planos_trabalho/partials/_efetivo_body.html" %}
 
-    <section class="cv-wizard-section-card termo-card" id="pt-card-diarias">
-      <header class="cv-wizard-section-header">
-        <div class="cv-wizard-section-header__copy">
-          <h3 class="cv-wizard-section-title">Deslocamento e diárias</h3>
-          <p class="cv-wizard-section-subtitle">Informe a saída e a chegada na sede — o sistema calcula a composição das diárias automaticamente.</p>
-        </div>
-      </header>
-      <div class="cv-wizard-section-body">
-        {% include "components/forms/cv_date_picker.html" with mode="range" picker_id="pt-diarias-date-picker" extra_class="termo-date-picker" start_field=diarias_form.saida_sede_data end_field=diarias_form.chegada_sede_data start_label="Data de saída da sede" end_label="Data de chegada na sede" start_input_id="id_pt_saida_sede_data_display" end_input_id="id_pt_chegada_sede_data_display" only %}
-        <div class="field-grid pt-diarias-grid">
-            {% include "components/forms/form_field.html" with field=diarias_form.saida_sede_hora label="Hora de saída" size_class="field-size-1" only %}
-            {% include "components/forms/form_field.html" with field=diarias_form.chegada_sede_hora label="Hora de chegada" size_class="field-size-1" only %}
-        </div>
-
-        <section class="wizard-inner-section" aria-labelledby="pt-diarias-resultado-title">
-          <header class="wizard-inner-section__header">
-            <h4 class="wizard-inner-section__title" id="pt-diarias-resultado-title">Resultado do cálculo</h4>
-          </header>
-          <div class="oficio-lc__transport-row" data-pt-diarias-resultado>
-            <div class="oficio-lc__transport-card">
-              <span class="oficio-lc__transport-label">Composição por servidor</span>
-              <div class="oficio-lc__transport-placa" data-pt-resultado-composicao>
-                {% if diarias_resultado.ok %}{{ diarias_resultado.composicao }}{% else %}—{% endif %}
-              </div>
-              <span class="oficio-lc__transport-label">Efetivo total</span>
-              <div class="oficio-lc__transport-modelo" data-pt-resultado-efetivo>
-                {% if diarias_resultado.ok %}{{ diarias_resultado.quantidade_servidores }} servidor(es){% else %}—{% endif %}
-              </div>
-            </div>
-            <div class="oficio-lc__transport-card">
-              <span class="oficio-lc__transport-label">Valor por servidor</span>
-              <div class="oficio-lc__valor-total" data-pt-resultado-unitario>
-                {% if diarias_resultado.ok %}R${{ diarias_resultado.valor_unitario_display }}{% else %}—{% endif %}
-              </div>
-              <span class="oficio-lc__transport-label">Por extenso</span>
-              <div class="oficio-lc__valor-extenso" data-pt-resultado-unitario-extenso>
-                {% if diarias_resultado.ok %}{{ diarias_resultado.valor_unitario_extenso }}{% else %}—{% endif %}
-              </div>
-            </div>
-            <div class="oficio-lc__transport-card oficio-lc__transport-card--valor">
-              <span class="oficio-lc__transport-label">Valor total do plano</span>
-              <div class="oficio-lc__valor-total" data-pt-resultado-total>
-                {% if diarias_resultado.ok %}R${{ diarias_resultado.valor_total_display }}{% else %}—{% endif %}
-              </div>
-              <span class="oficio-lc__transport-label">Por extenso</span>
-              <div class="oficio-lc__valor-extenso" data-pt-resultado-total-extenso>
-                {% if diarias_resultado.ok %}{{ diarias_resultado.valor_total_extenso }}{% else %}—{% endif %}
-              </div>
-            </div>
-          </div>
-          <p class="field-help" data-pt-diarias-erros>
-            {% if not diarias_resultado.ok %}{{ diarias_resultado.erros|join:" " }}{% endif %}
-          </p>
-        </section>
-      </div>
-
-      {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar" secondary_action="wizard_back" primary_label="Salvar e avançar" primary_action="wizard_next" only %}
-    </section>
+    {% include "components/ui/forms/form_block.html" with shell="card" element_id="pt-card-diarias" section_id="pt-diarias-title" extra_class="termo-card" title="Deslocamento e diárias" description="Informe a saída e a chegada na sede — o sistema calcula a composição das diárias automaticamente." body_template="planos_trabalho/partials/_diarias_body.html" footer_template="planos_trabalho/partials/_wizard_footer_next.html" %}
   </div>
 {% endblock %}
 

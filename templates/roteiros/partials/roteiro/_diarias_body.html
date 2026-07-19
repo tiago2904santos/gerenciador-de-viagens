@@ -1,0 +1,28 @@
+<div id="diarias-error" class="alert alert-danger py-2 d-none" role="alert"></div>
+
+{% if roteiro_editor_oficio and diarias_quantidade_servidores == 0 %}
+<p class="field-help text-muted mb-2" id="diarias-aviso-sem-viajantes" role="status">
+  Selecione ao menos um viajante na Etapa 1 para calcular o valor total das diárias.
+</p>
+{% endif %}
+
+<div class="field-grid field-grid--cols-4 roteiro-editor__diarias-finance-grid">
+  <div class="field field-size-2 cv-summary-item cv-summary-item--principal">
+    <span class="cv-summary-label">Valor total</span>
+    <span class="cv-summary-value cv-summary-value--principal" id="diarias-valor">
+      {{ roteiro_diarias_resultado.totais.total_valor|default:"—" }}
+    </span>
+    <span class="cv-summary-label">Valor por extenso</span>
+    <span id="diarias-extenso">{{ roteiro_diarias_resultado.totais.valor_extenso|default:"Não informado" }}</span>
+  </div>
+  <div class="field field-size-2 roteiro-editor__diarias-secondary-stack">
+    <div class="cv-summary-item cv-summary-item--secondary">
+      <span class="cv-summary-label">Tipo destino</span>
+      <span class="cv-summary-value" id="diarias-tipo">{{ roteiro_diarias_resultado.tipo_destino|default:"—" }}</span>
+    </div>
+    <div class="cv-summary-item cv-summary-item--secondary">
+      <span class="cv-summary-label">Quantidade de diárias</span>
+      <span class="cv-summary-value" id="diarias-qtd">{{ roteiro_diarias_resultado.totais.total_diarias|default:"—" }}</span>
+    </div>
+  </div>
+</div>

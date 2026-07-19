@@ -18,64 +18,10 @@
           {% csrf_token %}
 
           {# CARD 1 — Dados da unidade e Endereço dos documentos #}
-          <section class="cv-wizard-section-card" aria-labelledby="config-card-unidade-endereco-title">
-            <header class="cv-wizard-section-header">
-              <div class="cv-wizard-section-header__copy">
-                <h3 class="cv-wizard-section-title" id="config-card-unidade-endereco-title">Dados da unidade e Endereço dos documentos</h3>
-              </div>
-            </header>
-
-            <div class="cv-wizard-section-body">
-              <section class="wizard-inner-section" aria-labelledby="config-unidade-section">
-                <div class="field-grid field-grid--cols-2">
-                  {% include "components/forms/form_field.html" with field=form.divisao size_class="field-size-1" only %}
-                  {% include "components/forms/form_field.html" with field=form.unidade size_class="field-size-1" only %}
-                </div>
-              </section>
-
-              <section class="wizard-inner-section" aria-labelledby="config-endereco-section">
-                <header class="wizard-inner-section__header">
-                  <h4 class="wizard-inner-section__title" id="config-endereco-section">Endereço dos documentos</h4>
-                </header>
-                <div class="field-grid field-grid--cols-4">
-                  {% include "components/forms/form_field.html" with field=form.cep size_class="field-size-1" only %}
-                  {% include "components/forms/form_field.html" with field=form.numero size_class="field-size-1" only %}
-                  {% include "components/forms/form_field.html" with field=form.logradouro size_class="field-size-2" only %}
-                </div>
-                <div class="field-grid field-grid--cols-3">
-                  {% include "components/forms/form_field.html" with field=form.bairro size_class="field-size-1" only %}
-                  {% include "components/forms/form_field.html" with field=form.cidade_endereco size_class="field-size-1" only %}
-                  {% include "components/forms/form_field.html" with field=form.uf_nome size_class="field-size-1" only %}
-                  {{ form.uf }}
-                </div>
-                <div class="field-grid field-grid--cols-4">
-                  {% include "components/forms/form_field.html" with field=form.email size_class="field-size-2" only %}
-                  {% include "components/forms/form_field.html" with field=form.telefone size_class="field-size-1" only %}
-                  {% include "components/forms/form_field.html" with field=form.ramal size_class="field-size-1" only %}
-                </div>
-              </section>
-            </div>
-          </section>
+          {% include "components/ui/forms/form_block.html" with shell="card" section_id="config-card-unidade-endereco-title" title="Dados da unidade e Endereço dos documentos" body_template="cadastros/configuracao/partials/_unidade_endereco_body.html" %}
 
           {# CARD 2 — Assinantes padrão por documento #}
-          <section class="cv-wizard-section-card" aria-labelledby="config-card-assinantes-title">
-            <header class="cv-wizard-section-header">
-              <div class="cv-wizard-section-header__copy">
-                <h3 class="cv-wizard-section-title" id="config-card-assinantes-title">Assinantes padrão por documento</h3>
-              </div>
-            </header>
-
-            <div class="cv-wizard-section-body">
-              <div class="field-grid field-grid--cols-2">
-                {% include "components/forms/form_field.html" with field=assinaturas_form.assinante_oficio size_class="field-size-1" only %}
-                {% include "components/forms/form_field.html" with field=assinaturas_form.assinante_justificativa size_class="field-size-1" only %}
-                {% include "components/forms/form_field.html" with field=assinaturas_form.assinante_plano_trabalho size_class="field-size-1" only %}
-                {% include "components/forms/form_field.html" with field=assinaturas_form.assinante_ordem_servico size_class="field-size-1" only %}
-              </div>
-            </div>
-
-            {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar" secondary_url=back_url primary_label="Salvar" only %}
-          </section>
+          {% include "components/ui/forms/form_block.html" with shell="card" section_id="config-card-assinantes-title" title="Assinantes padrão por documento" body_template="cadastros/configuracao/partials/_assinantes_body.html" footer_template="cadastros/configuracao/partials/_form_footer.html" %}
         </form>
 
         {# CARD 2B — Destinatário padrão do Ofício #}
@@ -83,24 +29,7 @@
           {% csrf_token %}
           <input type="hidden" name="form_id" value="destinatarios">
           {{ destinatario_form.destinatario_oficio_nome }}
-          <section class="cv-wizard-section-card" aria-labelledby="config-card-destinatario-title">
-            <header class="cv-wizard-section-header">
-              <div class="cv-wizard-section-header__copy">
-                <h3 class="cv-wizard-section-title" id="config-card-destinatario-title">Destinatário padrão do Ofício</h3>
-                <p class="cv-wizard-section-subtitle">Busque um servidor cadastrado (cargo e unidade são preenchidos automaticamente) ou digite os dados manualmente.</p>
-              </div>
-            </header>
-
-            <div class="cv-wizard-section-body">
-              <div class="field-grid field-grid--cols-3">
-                {% include "components/forms/form_field.html" with field=destinatario_form.destinatario_oficio size_class="field-size-1" only %}
-                {% include "components/forms/form_field.html" with field=destinatario_form.destinatario_oficio_cargo size_class="field-size-1" only %}
-                {% include "components/forms/form_field.html" with field=destinatario_form.destinatario_oficio_unidade size_class="field-size-1" only %}
-              </div>
-            </div>
-
-            {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar" secondary_url=back_url primary_label="Salvar" only %}
-          </section>
+          {% include "components/ui/forms/form_block.html" with shell="card" section_id="config-card-destinatario-title" title="Destinatário padrão do Ofício" description="Busque um servidor cadastrado (cargo e unidade são preenchidos automaticamente) ou digite os dados manualmente." body_template="cadastros/configuracao/partials/_destinatario_body.html" footer_template="cadastros/configuracao/partials/_form_footer.html" %}
         </form>
 
       </div>

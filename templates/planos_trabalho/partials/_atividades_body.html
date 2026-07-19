@@ -1,0 +1,52 @@
+<div class="pt-activity-tools">
+  <div class="pt-activity-tools-main">
+    <span class="pt-activity-counter" data-pt-activity-counter>
+      {% include "components/ui/badges/chip.html" with tone="warning" label=atividades_counter_label only %}
+    </span>
+    <button type="button" class="cv-btn cv-btn--secondary cv-btn--sm" data-pt-activity-select-all>Selecionar todos</button>
+    <button type="button" class="cv-btn cv-btn--secondary cv-btn--sm" data-pt-activity-clear>Limpar seleção</button>
+    <a href="{{ atividades_manager_url }}" class="cv-btn cv-btn--secondary cv-btn--sm" target="_blank" rel="noopener">Gerenciar atividades</a>
+  </div>
+  <div class="pt-activity-search-wrap">
+    <label class="cv-visually-hidden" for="pt-atividade-search">Buscar atividade</label>
+    <input
+      type="search"
+      id="pt-atividade-search"
+      class="cv-field__control pt-activity-search"
+      placeholder="Buscar atividade por nome"
+      autocomplete="off"
+      data-pt-activity-search
+    >
+  </div>
+</div>
+
+{% if atividades_catalogo %}
+  <div class="pt-activity-grid" data-pt-activity-grid>
+    {% for atividade in atividades_catalogo %}
+      <label class="pt-activity-item" for="pt-atividade-{{ atividade.codigo }}" data-pt-activity-item data-nome="{{ atividade.nome|lower }}" title="{{ atividade.nome }}">
+        <input
+          class="pt-activity-checkbox"
+          type="checkbox"
+          name="atividades_codigos"
+          value="{{ atividade.codigo }}"
+          id="pt-atividade-{{ atividade.codigo }}"
+          data-pt-activity-checkbox
+          {% if atividade.selected %}checked{% endif %}
+        >
+        <span class="pt-activity-item__label">{{ atividade.nome }}</span>
+        <span class="pt-activity-item__chip">
+          {% include "components/ui/badges/chip.html" with tone="warning" size="compact" label="Selecionada" only %}
+        </span>
+      </label>
+    {% endfor %}
+  </div>
+  <p class="pt-activity-filter-empty" hidden data-pt-activity-empty>Nenhuma atividade encontrada para a busca informada.</p>
+{% else %}
+  <div class="document-inline-card">
+    <div class="document-inline-card__body">
+      <p class="document-inline-empty">
+        Nenhuma atividade cadastrada. Use <a href="{{ atividades_manager_url }}" target="_blank" rel="noopener">Gerenciar atividades</a> para cadastrar a primeira.
+      </p>
+    </div>
+  </div>
+{% endif %}

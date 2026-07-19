@@ -1,0 +1,47 @@
+{% if diaria_info.alterada %}
+  <div class="diario-diaria-alert" role="alert">
+    <strong>Atenção:</strong> a alteração do roteiro mudou o valor da diária —
+    <span class="diario-diaria-alert__values">{{ diaria_info.valor_oficio_label }} (ofício) → {{ diaria_info.valor_ajustado_label }} (ajustado)</span>.
+    Justifique a diferença em <a href="{{ rt_url }}">Informações complementares</a> do Relatório Técnico.
+  </div>
+{% endif %}
+<div class="oficio-documentos-grid">
+  <section class="oficio-documentos-admin-facts" aria-label="Dados administrativos">
+    <div class="oficio-documentos-card__body">
+      <dl class="oficio-documentos-facts oficio-documentos-facts--admin rt-summary-card__facts">
+        <div class="oficio-documentos-fact">
+          <dt>Número do ofício</dt>
+          <dd>{{ identificacao.numero }}</dd>
+        </div>
+        <div class="oficio-documentos-fact">
+          <dt>Protocolo</dt>
+          <dd>{{ identificacao.protocolo }}</dd>
+        </div>
+        <div class="oficio-documentos-fact">
+          <dt>Destino</dt>
+          <dd>{{ identificacao.destino }}</dd>
+        </div>
+        <div class="oficio-documentos-fact">
+          <dt>Período da viagem</dt>
+          <dd>{{ identificacao.periodo }}</dd>
+        </div>
+        <div class="oficio-documentos-fact diario-motorista-fact">
+          <dt>Motorista</dt>
+          <dd>
+            <span>{{ motorista_resumo.nome }}</span>
+            {% if motorista_resumo.cpf %}<span class="diario-motorista-fact__cpf">CPF {{ motorista_resumo.cpf }}</span>{% endif %}
+          </dd>
+        </div>
+        <div class="oficio-documentos-fact diario-motorista-fact">
+          <dt>Origem do motorista</dt>
+          <dd>
+            <span>{{ motorista_resumo.origem }}</span>
+            {% if motorista_resumo.alterado %}
+              {% include "components/ui/badges/chip.html" with label="Alterado" tone="warning" size="compact" only %}
+            {% endif %}
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+</div>

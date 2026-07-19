@@ -1,0 +1,87 @@
+<div class="admin-cadastros">
+  <section class="admin-subcard admin-subcard--primary" aria-labelledby="admin-sub-usuario-title">
+    <header class="admin-subcard__header">
+      <span class="admin-subcard__step" aria-hidden="true">01</span>
+      <div>
+        <h4 class="admin-subcard__title" id="admin-sub-usuario-title">Criar usuário</h4>
+        <p class="admin-subcard__description">Crie a conta e defina o primeiro acesso à área de trabalho.</p>
+      </div>
+    </header>
+    <form class="admin-form" method="post" novalidate>
+      {% csrf_token %}
+      {% if usuario_form.non_field_errors %}
+        {% include "components/ui/feedback/field_error.html" with errors=usuario_form.non_field_errors only %}
+      {% endif %}
+      <div class="field-grid admin-identity-grid">
+        {% include "components/forms/form_field.html" with field=usuario_form.username size_class="field-size-1" only %}
+        {% include "components/forms/form_field.html" with field=usuario_form.email size_class="field-size-1" only %}
+        {% include "components/forms/form_field.html" with field=usuario_form.nome_completo size_class="field-size-1" only %}
+      </div>
+      <div class="field-grid field-grid--cols-2 admin-password-grid">
+        {% include "components/forms/form_field.html" with field=usuario_form.password1 size_class="field-size-1" only %}
+        {% include "components/forms/form_field.html" with field=usuario_form.password2 size_class="field-size-1" only %}
+      </div>
+
+      <div class="admin-subgroup">
+        <h5 class="admin-subgroup__title">Permissão inicial</h5>
+        <div class="field-grid field-grid--cols-2">
+          {% include "components/forms/form_field.html" with field=usuario_form.area size_class="field-size-1" help_text=usuario_form.area.help_text only %}
+          {% include "components/forms/form_field.html" with field=usuario_form.papel size_class="field-size-1" only %}
+        </div>
+      </div>
+
+      <div class="admin-form__actions">
+        {% include "components/ui/buttons/button.html" with label="Criar usuário" variant="primary" icon="arrow-right" icon_after=True type="submit" name="action" value="criar_usuario" only %}
+      </div>
+    </form>
+  </section>
+
+  <div class="admin-cadastros__secondary">
+    <section class="admin-subcard" aria-labelledby="admin-sub-area-title">
+      <header class="admin-subcard__header">
+        <span class="admin-subcard__step" aria-hidden="true">02</span>
+        <div>
+          <h4 class="admin-subcard__title" id="admin-sub-area-title">Criar área</h4>
+          <p class="admin-subcard__description">Cadastre uma nova unidade ou equipe de trabalho.</p>
+        </div>
+      </header>
+      <form class="admin-form" method="post" novalidate>
+        {% csrf_token %}
+        {% if area_form.non_field_errors %}
+          {% include "components/ui/feedback/field_error.html" with errors=area_form.non_field_errors only %}
+        {% endif %}
+        <div class="field-grid field-grid--cols-3">
+          {% include "components/forms/form_field.html" with field=area_form.nome size_class="field-size-2" only %}
+          {% include "components/forms/form_field.html" with field=area_form.sigla size_class="field-size-1" only %}
+        </div>
+        <div class="admin-form__actions">
+          {% include "components/ui/buttons/button.html" with label="Criar área" variant="primary" icon="arrow-right" icon_after=True type="submit" name="action" value="criar_area" only %}
+        </div>
+      </form>
+    </section>
+
+    <section class="admin-subcard admin-subcard--link" aria-labelledby="admin-sub-vinculo-title">
+      <header class="admin-subcard__header">
+        <span class="admin-subcard__step" aria-hidden="true">03</span>
+        <div>
+          <h4 class="admin-subcard__title" id="admin-sub-vinculo-title">Vincular usuário existente</h4>
+          <p class="admin-subcard__description">Adicione outra área a uma conta existente.</p>
+        </div>
+      </header>
+      <form class="admin-form" method="post" novalidate>
+        {% csrf_token %}
+        {% if vinculo_form.non_field_errors %}
+          {% include "components/ui/feedback/field_error.html" with errors=vinculo_form.non_field_errors only %}
+        {% endif %}
+        <div class="field-grid field-grid--cols-3">
+          {% include "components/forms/form_field.html" with field=vinculo_form.usuario size_class="field-size-1" only %}
+          {% include "components/forms/form_field.html" with field=vinculo_form.area size_class="field-size-1" only %}
+          {% include "components/forms/form_field.html" with field=vinculo_form.papel size_class="field-size-1" only %}
+        </div>
+        <div class="admin-form__actions">
+          {% include "components/ui/buttons/button.html" with label="Salvar vínculo" variant="primary" icon="arrow-right" icon_after=True type="submit" name="action" value="vincular_usuario" only %}
+        </div>
+      </form>
+    </section>
+  </div>
+</div>

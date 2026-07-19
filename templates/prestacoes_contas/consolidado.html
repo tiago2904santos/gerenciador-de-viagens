@@ -23,106 +23,10 @@
       <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
 
         {# ── Resumo do ofício (mesmo layout da Etapa 2) + prontidão dos itens ── #}
-        <section class="cv-summary-card cv-wizard-section-card rt-summary-card oficio-documentos-summary-section" aria-labelledby="prestacao-final-resumo-title">
-          <header class="cv-wizard-section-header">
-            <div class="cv-wizard-section-header__copy">
-              <h2 class="cv-wizard-section-title" id="prestacao-final-resumo-title">Resumo do ofício</h2>
-              <p class="cv-wizard-section-subtitle">Pré-visualize e baixe o pacote final de cada servidor — ofício, despacho, RT, diário e comprovante reunidos em um PDF.</p>
-            </div>
-          </header>
-          <div class="cv-wizard-section-body">
-            <div class="oficio-documentos-grid">
-              <section class="oficio-documentos-admin-facts" aria-label="Dados administrativos">
-                <div class="oficio-documentos-card__body">
-                  <dl class="oficio-documentos-facts oficio-documentos-facts--admin rt-summary-card__facts">
-                    <div class="oficio-documentos-fact">
-                      <dt>Número do ofício</dt>
-                      <dd>{{ identificacao.numero }}</dd>
-                    </div>
-                    <div class="oficio-documentos-fact">
-                      <dt>Protocolo</dt>
-                      <dd>{{ identificacao.protocolo }}</dd>
-                    </div>
-                    <div class="oficio-documentos-fact">
-                      <dt>Destino</dt>
-                      <dd>{{ identificacao.destino }}</dd>
-                    </div>
-                    <div class="oficio-documentos-fact">
-                      <dt>Período da viagem</dt>
-                      <dd>{{ identificacao.periodo }}</dd>
-                    </div>
-                  </dl>
-                </div>
-              </section>
-
-              <div class="rt-summary-card__section-ribbon" aria-hidden="true"></div>
-
-              <article class="oficio-documentos-card oficio-documentos-card--travellers rt-summary-card__traveller-card" aria-label="Servidores da prestação">
-                <header class="oficio-documentos-card__header oficio-documentos-travellers__header">
-                  <div class="oficio-documentos-travellers__titles">
-                    <span class="oficio-documentos-card__eyebrow">Equipe</span>
-                    <h4 class="oficio-documentos-card__title">Servidores ({{ identificacao.servidores_count }})</h4>
-                  </div>
-                </header>
-                <div class="oficio-documentos-card__body">
-                  <div class="oficio-documentos-travellers-lines">
-                    {% for s in identificacao.servidores %}
-                    <article class="oficio-documentos-traveller-line{% if s.is_motorista %} oficio-documentos-traveller-line--motorista{% endif %}">
-                      <div class="oficio-documentos-traveller-line__name-row">
-                        <strong class="oficio-documentos-traveller-line__name">{{ s.nome_servidor }}</strong>
-                        {% if s.is_motorista %}
-                          {% include "components/ui/badges/chip.html" with label="Motorista" tone="warning" size="compact" only %}
-                        {% endif %}
-                      </div>
-                      <span class="oficio-documentos-traveller-line__cargo">
-                        {{ s.cargo }}{% if s.unidade %} · {{ s.unidade }}{% endif %}{% if s.cpf_servidor and s.cpf_servidor != "—" %} · CPF {{ s.cpf_servidor }}{% endif %}
-                      </span>
-                    </article>
-                    {% endfor %}
-                  </div>
-                </div>
-              </article>
-            </div>
-          </div>
-        </section>
+        {% include "components/ui/forms/form_block.html" with shell="card" section_id="prestacao-final-resumo-title" extra_class="cv-summary-card rt-summary-card oficio-documentos-summary-section" title="Resumo do ofício" description="Pré-visualize e baixe o pacote final de cada servidor — ofício, despacho, RT, diário e comprovante reunidos em um PDF." body_template="prestacoes_contas/partials/_consolidado_resumo_body.html" %}
 
         {# ── Pacote final por servidor, com pré-visualização inline (fechado por padrão) ── #}
-        <section class="cv-wizard-section-card" aria-labelledby="prestacao-final-pacotes-title">
-          <header class="cv-wizard-section-header">
-            <div class="cv-wizard-section-header__copy">
-              <h2 class="cv-wizard-section-title" id="prestacao-final-pacotes-title">Pacote final por servidor</h2>
-              <p class="cv-wizard-section-subtitle">Abra um card para conferir o PDF já gerado antes de baixar.</p>
-            </div>
-          </header>
-          <div class="cv-wizard-section-body document-inline-stack">
-            {% for s in servidores %}
-              <details class="document-inline-card document-inline-card--lazy" data-lazy-inline>
-                <summary class="document-inline-card__header">
-                  <span class="document-inline-card__title">
-                    <span class="prestacao-final-servidor__name">{{ s.nome }}{% if s.is_motorista %} {% include "components/ui/badges/chip.html" with label="Motorista" tone="warning" size="compact" only %}{% endif %}</span>
-                    <span class="prestacao-final-servidor__meta">Nº solicitação {{ s.numero_solicitacao|default:"—" }} · Comprovante: {{ s.comprovante_resumo.value }} · RT assinado: {{ s.rt_assinado_resumo.value }}{% if s.is_motorista %} · Diário assinado: {{ s.diario_assinado_resumo.value }}{% endif %}</span>
-                  </span>
-                  <span class="document-inline-card__header-end">
-                    <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do pacote">
-                      {% include "components/ui/buttons/icon_button.html" with href=s.preview_inline_url action="preview" aria_label="Abrir em nova aba" tooltip="Abrir em nova aba" only %}
-                      {% include "components/ui/buttons/icon_button.html" with href=s.download_url action="pdf" aria_label="Baixar pacote (PDF final)" tooltip="Baixar pacote (PDF final)" only %}
-                    </span>
-                  </span>
-                </summary>
-                <div class="document-inline-card__body">
-                  <div class="document-inline-viewer">
-                    <iframe
-                      class="document-inline-viewer__frame"
-                      data-src="{{ s.preview_inline_url }}"
-                      title="Pacote final — {{ s.nome }}"
-                      loading="lazy"
-                    ></iframe>
-                  </div>
-                </div>
-              </details>
-            {% endfor %}
-          </div>
-        </section>
+        {% include "components/ui/forms/form_block.html" with shell="card" section_id="prestacao-final-pacotes-title" title="Pacote final por servidor" description="Abra um card para conferir o PDF já gerado antes de baixar." body_extra_class="document-inline-stack" body_template="prestacoes_contas/partials/_consolidado_pacotes_body.html" %}
 
         <section class="cv-card-footer-section">
           <footer class="cv-card-footer">

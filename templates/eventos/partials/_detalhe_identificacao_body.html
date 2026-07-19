@@ -1,0 +1,17 @@
+<div class="field-grid">
+  {% include "components/forms/form_field.html" with field=form.tipos action_url=tipos_evento_url action_label="Gerenciar tipos" size_class="field-size-4" only %}
+</div>
+
+<hr class="cv-divider">
+
+<section class="wizard-inner-section" aria-labelledby="evento-wizard-motivo-d">
+  <header class="wizard-inner-section__header">
+    <h4 class="wizard-inner-section__title" id="evento-wizard-motivo-d">Motivo</h4>
+  </header>
+  <div class="field-grid">
+    {% include "components/forms/input_with_action.html" with field=form.modelo_motivo action_url=modelos_motivo_url action_label="Gerenciar modelos" size_class="field-size-4" only %}
+  </div>
+  <div class="field-grid">
+    {% include "components/forms/form_field.html" with field=form.motivo size_class="field-size-4" only %}
+  </div>
+</section>

@@ -1,0 +1,26 @@
+{% for s in servidores %}
+  <details class="document-inline-card document-inline-card--lazy" data-lazy-inline>
+    <summary class="document-inline-card__header">
+      <span class="document-inline-card__title">
+        <span class="prestacao-final-servidor__name">{{ s.nome }}{% if s.is_motorista %} {% include "components/ui/badges/chip.html" with label="Motorista" tone="warning" size="compact" only %}{% endif %}</span>
+        <span class="prestacao-final-servidor__meta">Nº solicitação {{ s.numero_solicitacao|default:"—" }} · Comprovante: {{ s.comprovante_resumo.value }} · RT assinado: {{ s.rt_assinado_resumo.value }}{% if s.is_motorista %} · Diário assinado: {{ s.diario_assinado_resumo.value }}{% endif %}</span>
+      </span>
+      <span class="document-inline-card__header-end">
+        <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do pacote">
+          {% include "components/ui/buttons/icon_button.html" with href=s.preview_inline_url action="preview" aria_label="Abrir em nova aba" tooltip="Abrir em nova aba" only %}
+          {% include "components/ui/buttons/icon_button.html" with href=s.download_url action="pdf" aria_label="Baixar pacote (PDF final)" tooltip="Baixar pacote (PDF final)" only %}
+        </span>
+      </span>
+    </summary>
+    <div class="document-inline-card__body">
+      <div class="document-inline-viewer">
+        <iframe
+          class="document-inline-viewer__frame"
+          data-src="{{ s.preview_inline_url }}"
+          title="Pacote final — {{ s.nome }}"
+          loading="lazy"
+        ></iframe>
+      </div>
+    </div>
+  </details>
+{% endfor %}

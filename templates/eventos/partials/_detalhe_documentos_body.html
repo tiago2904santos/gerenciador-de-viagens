@@ -1,0 +1,47 @@
+<div class="evento-doc-tabs" id="evento-doc-tabs" role="tablist" aria-label="Tipo de documento" data-evento-doc-tabs>
+  <button type="button" class="evento-doc-tab is-active" id="evento-doc-tab-oficios-d" data-doc-tab-target="oficios" role="tab" aria-selected="true" aria-controls="evento-wizard-doc-oficios-d" tabindex="0">
+    Ofícios
+  </button>
+  <button type="button" class="evento-doc-tab" id="evento-doc-tab-roteiros-d" data-doc-tab-target="roteiros" role="tab" aria-selected="false" aria-controls="evento-wizard-doc-roteiros-d" tabindex="-1">
+    Roteiros
+  </button>
+  <button type="button" class="evento-doc-tab" id="evento-doc-tab-pt-d" data-doc-tab-target="pt" role="tab" aria-selected="false" aria-controls="evento-wizard-doc-pt-d" tabindex="-1">
+    Plano de Trabalho
+  </button>
+  <button type="button" class="evento-doc-tab" id="evento-doc-tab-os-d" data-doc-tab-target="os" role="tab" aria-selected="false" aria-controls="evento-wizard-doc-os-d" tabindex="-1">
+    Ordem de Serviço
+  </button>
+  <button type="button" class="evento-doc-tab" id="evento-doc-tab-termos-d" data-doc-tab-target="termos" role="tab" aria-selected="false" aria-controls="evento-wizard-doc-termos-d" tabindex="-1">
+    Termos
+  </button>
+</div>
+
+<section class="wizard-inner-section" id="evento-wizard-doc-oficios-d" data-doc-tab-panel="oficios" role="tabpanel" aria-labelledby="evento-doc-tab-oficios-d" tabindex="0">
+  <div class="field-grid">
+    {% include "components/forms/form_field.html" with field=form.oficios_vinculados only %}
+  </div>
+</section>
+
+<section class="wizard-inner-section" id="evento-wizard-doc-roteiros-d" data-doc-tab-panel="roteiros" role="tabpanel" aria-labelledby="evento-doc-tab-roteiros-d" tabindex="0" hidden>
+  <div class="field-grid">
+    {% include "components/forms/form_field.html" with field=form.roteiros_vinculados only %}
+  </div>
+</section>
+
+<section class="wizard-inner-section" id="evento-wizard-doc-pt-d" data-doc-tab-panel="pt" role="tabpanel" aria-labelledby="evento-doc-tab-pt-d" tabindex="0" hidden>
+  <div class="field-grid">
+    {% include "components/forms/form_field.html" with field=form.planos_trabalho_vinculados only %}
+  </div>
+</section>
+
+<section class="wizard-inner-section" id="evento-wizard-doc-os-d" data-doc-tab-panel="os" role="tabpanel" aria-labelledby="evento-doc-tab-os-d" tabindex="0" hidden>
+  <div class="field-grid">
+    {% include "components/forms/form_field.html" with field=form.ordens_servico_vinculadas only %}
+  </div>
+</section>
+
+<section class="wizard-inner-section" id="evento-wizard-doc-termos-d" data-doc-tab-panel="termos" role="tabpanel" aria-labelledby="evento-doc-tab-termos-d" tabindex="0" hidden>
+  <div class="field-grid">
+    {% include "components/forms/form_field.html" with field=form.termos_vinculados only %}
+  </div>
+</section>

@@ -5,7 +5,7 @@
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260611-os">
-  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260611-os-evento">
+  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260718-cv-summary">
   <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260611-os-evento-card">
 {% endblock %}
 
@@ -24,78 +24,16 @@
         {% endif %}
 
         {# ── 1. Ofícios vinculados ─────────────────────────────── #}
-        <section class="cv-wizard-section-card termo-card" id="os-card-oficios">
-          <header class="cv-wizard-section-header">
-            <div class="cv-wizard-section-header__copy">
-              <h2 class="cv-wizard-section-title">1. Ofícios vinculados</h2>
-              <p class="cv-wizard-section-subtitle">Opcional. Vincule um ou mais ofícios — destino, período, servidores e motivo serão preenchidos automaticamente.</p>
-            </div>
-          </header>
-          <div class="cv-wizard-section-body">
-            {% include "components/forms/form_field.html" with field=form.oficios only %}
-          </div>
-        </section>
+        {% include "components/ui/forms/form_block.html" with shell="card" element_id="os-card-oficios" section_id="os-oficios-title" extra_class="termo-card" title="1. Ofícios vinculados" description="Opcional. Vincule um ou mais ofícios — destino, período, servidores e motivo serão preenchidos automaticamente." body_template="ordens_servico/partials/_oficios_body.html" %}
 
-        {# ── 2. Período do evento ──────────────────────────────── #}
-        <section class="cv-wizard-section-card termo-card termo-card--evento" id="os-card-evento">
-          <header class="cv-wizard-section-header">
-            <div class="cv-wizard-section-header__copy">
-              <h2 class="cv-wizard-section-title">2. Evento</h2>
-              <p class="cv-wizard-section-subtitle">Periodo da atividade.</p>
-            </div>
-          </header>
-          <div class="cv-wizard-section-body termo-evento-body">
-            <section class="wizard-inner-section termo-evento-periodo" aria-label="Periodo do evento">
-              {% include "components/forms/cv_date_picker.html" with mode="range" picker_id="os-evento-date-picker" extra_class="termo-date-picker" start_field=form.data_evento_inicio end_field=form.data_evento_fim start_label="Data inicial" end_label="Data final" start_input_id="id_os_data_inicio_display" end_input_id="id_os_data_fim_display" only %}
-            </section>
-            {% include "components/domain/destinos_section.html" with section_id="os-evento-destinos" title_id="os-evento-destinos-title" add_button_id="btn-adicionar-destino" add_button_os=True list_id="os-destinos-list" prefix="os" picker_open_all=True rows_template="components/domain/destinos/rows.html" errors_template="components/domain/destinos/errors.html" %}
-            {% include "components/domain/destinos/template.html" with prefix="os" picker_open_all=True %}
-          </div>
-        </section>
+        {# ── 2. Evento ─────────────────────────────────────────── #}
+        {% include "components/ui/forms/form_block.html" with shell="card" element_id="os-card-evento" section_id="os-evento-title" extra_class="termo-card termo-card--evento" title="2. Evento" description="Periodo da atividade." body_extra_class="termo-evento-body" body_template="ordens_servico/partials/_evento_body.html" %}
 
-        {# ── 3. Destinos ───────────────────────────────────────── #}
-        {# ── 4. Servidores ─────────────────────────────────────── #}
-        <section class="cv-wizard-section-card termo-card" id="os-card-servidores">
-          <header class="cv-wizard-section-header">
-            <div class="cv-wizard-section-header__copy">
-              <h2 class="cv-wizard-section-title">3. Servidores</h2>
-              <p class="cv-wizard-section-subtitle">Opcional. Servidores que executarão esta OS.</p>
-            </div>
-            <div class="cv-wizard-section-header__actions">
-              {% include "components/buttons/action_button.html" with href=servidor_create_url label="Cadastrar servidor" variant="secondary" data_autosave_link=True only %}
-            </div>
-          </header>
-          <div class="cv-wizard-section-body">
-            {% include "components/forms/form_field.html" with field=form.servidores only %}
-          </div>
-        </section>
+        {# ── 3. Servidores ─────────────────────────────────────── #}
+        {% include "components/ui/forms/form_block.html" with shell="card" element_id="os-card-servidores" section_id="os-servidores-title" extra_class="termo-card" title="3. Servidores" description="Opcional. Servidores que executarão esta OS." action_label="Cadastrar servidor" action_url=servidor_create_url action_autosave=True body_template="ordens_servico/partials/_servidores_body.html" %}
 
-        {# ── 5. Motivo ─────────────────────────────────────────── #}
-        <section class="cv-wizard-section-card termo-card" id="os-card-motivo">
-          <header class="cv-wizard-section-header">
-            <div class="cv-wizard-section-header__copy">
-              <h2 class="cv-wizard-section-title">4. Motivo</h2>
-              <p class="cv-wizard-section-subtitle">Opcional. Use um modelo ou escreva o texto livremente.</p>
-            </div>
-          </header>
-          <div class="cv-wizard-section-body">
-            <div class="field-grid">
-              {% include "components/forms/input_with_action.html" with field=form.modelo_motivo action_url=modelos_motivo_url action_label="Gerenciar modelos" size_class="field-size-4" only %}
-              {% if not tem_modelos_motivo %}
-                <div class="field field-size-4">
-                  <p class="field-help">Nenhum modelo cadastrado. <a href="{{ modelos_motivo_url }}">Abrir gerenciamento de modelos</a></p>
-                </div>
-              {% endif %}
-              <div class="field field-size-4 app-form-field cv-field oficio-motivo-field oficio-reveal-panel is-open">
-                <label class="cv-field__label" for="{{ form.motivo.id_for_label }}">Motivo</label>
-                {{ form.motivo }}
-                {% if form.motivo.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.motivo.errors only %}{% endif %}
-              </div>
-            </div>
-          </div>
-        {% include "components/ui/layouts/card_footer_section.html" with secondary_label=back_label secondary_url=index_url primary_label=os_is_completa|yesno:"Finalizar Ordem de Serviço,Salvar como rascunho" primary_action="save" primary_extra_class="os-submit-btn" only %}
-        </section>
-        
+        {# ── 4. Motivo ─────────────────────────────────────────── #}
+        {% include "components/ui/forms/form_block.html" with shell="card" element_id="os-card-motivo" section_id="os-motivo-title" extra_class="termo-card" title="4. Motivo" description="Opcional. Use um modelo ou escreva o texto livremente." body_template="ordens_servico/partials/_motivo_body.html" footer_template="ordens_servico/partials/_motivo_footer.html" %}
       </main>
     </form>
   </div>

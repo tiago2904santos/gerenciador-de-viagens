@@ -3,18 +3,7 @@
 
 {% block wizard_content %}
   {% if mostrar_pendencias_documento and pendencias %}
-    <div class="oficio-wizard-pendencias cv-wizard-section-card" role="status">
-      <header class="cv-wizard-section-header">
-        <h3 class="cv-wizard-section-title">Pendências para concluir esta etapa</h3>
-      </header>
-      <div class="cv-wizard-section-body">
-        <ul>
-          {% for pendencia in pendencias %}
-            <li>{{ pendencia }}</li>
-          {% endfor %}
-        </ul>
-      </div>
-    </div>
+    {% include "components/ui/feedback/pendencias_card.html" with items=pendencias title="Pendências para concluir esta etapa" tone="warning" only %}
   {% endif %}
 
   <input type="hidden" name="transporte_embed" value="1">

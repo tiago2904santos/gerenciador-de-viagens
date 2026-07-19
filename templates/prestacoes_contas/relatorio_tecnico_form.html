@@ -46,156 +46,15 @@
           {% endif %}
 
           {# CARD 1 — Identificação #}
-          <section class="cv-summary-card cv-wizard-section-card rt-summary-card oficio-documentos-summary-section" aria-labelledby="rt-identificacao-title">
-            <header class="cv-wizard-section-header">
-              <div class="cv-wizard-section-header__copy">
-                <h2 class="cv-wizard-section-title" id="rt-identificacao-title">Resumo do ofício</h2>
-                <p class="cv-wizard-section-subtitle">Dados do ofício, viajante e custeios informados no relatório.</p>
-              </div>
-            </header>
-            <div class="cv-wizard-section-body">
-              <div class="oficio-documentos-grid">
-                <section class="oficio-documentos-admin-facts" aria-label="Dados administrativos">
-                  <div class="oficio-documentos-card__body">
-                    <dl class="oficio-documentos-facts oficio-documentos-facts--admin rt-summary-card__facts">
-                      <div class="oficio-documentos-fact">
-                        <dt>Número do ofício</dt>
-                        <dd>{{ identificacao.numero }}</dd>
-                      </div>
-                      <div class="oficio-documentos-fact">
-                        <dt>Protocolo</dt>
-                        <dd>{{ identificacao.protocolo }}</dd>
-                      </div>
-                      <div class="oficio-documentos-fact">
-                        <dt>Destino</dt>
-                        <dd>{{ identificacao.destino }}</dd>
-                      </div>
-                      <div class="oficio-documentos-fact">
-                        <dt>Período da viagem</dt>
-                        <dd>{{ identificacao.periodo }}</dd>
-                      </div>
-                    </dl>
-                  </div>
-                </section>
-
-                <div class="rt-summary-card__section-ribbon" aria-hidden="true"></div>
-
-                <article class="oficio-documentos-card oficio-documentos-card--travellers rt-summary-card__traveller-card" aria-label="Servidores da prestação">
-                  <header class="oficio-documentos-card__header oficio-documentos-travellers__header">
-                    <div class="oficio-documentos-travellers__titles">
-                      <span class="oficio-documentos-card__eyebrow">Equipe</span>
-                      <h4 class="oficio-documentos-card__title">Servidores ({{ identificacao.servidores_count }})</h4>
-                      <p class="oficio-documentos-card__subtitle">Mesmo texto para todos; o RT é gerado por servidor com os dados pessoais.</p>
-                    </div>
-                  </header>
-                  <div class="oficio-documentos-card__body">
-                    <div class="oficio-documentos-travellers-lines oficio-documentos-travellers-lines--n{{ identificacao.servidores_count }}">
-                      {% for s in identificacao.servidores %}
-                      <article class="oficio-documentos-traveller-line{% if s.is_motorista %} oficio-documentos-traveller-line--motorista{% endif %}">
-                        <div class="oficio-documentos-traveller-line__name-row">
-                          <strong class="oficio-documentos-traveller-line__name">{{ s.nome_servidor }}</strong>
-                          {% if s.is_motorista %}
-                            {% include "components/ui/badges/chip.html" with label="Motorista" tone="warning" size="compact" only %}
-                          {% endif %}
-                        </div>
-                        <span class="oficio-documentos-traveller-line__cargo">
-                          {{ s.cargo }}{% if s.unidade %} · {{ s.unidade }}{% endif %}{% if s.cpf_servidor and s.cpf_servidor != "—" %} · CPF {{ s.cpf_servidor }}{% endif %}
-                        </span>
-                      </article>
-                      {% endfor %}
-                    </div>
-                  </div>
-                </article>
-              </div>
-              <div class="rt-summary-card__section-ribbon" aria-hidden="true"></div>
-              <div class="rt-summary-card__cost-grid">
-                {% for item in campos_custeio %}
-                  <div class="rt-cost-field-group{% if item.uses_other %} rt-cost-field-group--select{% endif %}">
-                    {% include "components/forms/form_field.html" with field=item.field label=item.label only %}
-                    {% if item.uses_other %}
-                      <div class="rt-cost-field__other" data-rt-other-wrapper="{{ item.campo }}" hidden>
-                        {% include "components/forms/form_field.html" with field=item.other label="Informe "|add:item.label|lower only %}
-                      </div>
-                    {% endif %}
-                  </div>
-                {% endfor %}
-              </div>
-            </div>
-          </section>
+          {% include "components/ui/forms/form_block.html" with shell="card" section_id="rt-identificacao-title" extra_class="cv-summary-card rt-summary-card oficio-documentos-summary-section" title="Resumo do ofício" description="Dados do ofício, viajante e custeios informados no relatório." body_template="prestacoes_contas/partials/_rt_resumo_body.html" %}
 
           {# Cards de conteúdo do relatório #}
           {% for c in campos_modelo %}
-            <section class="cv-wizard-section-card rt-topic-card" aria-labelledby="rt-topic-{{ c.campo }}-title">
-              <header class="cv-wizard-section-header">
-                <div class="cv-wizard-section-header__copy">
-                  <h2 class="cv-wizard-section-title" id="rt-topic-{{ c.campo }}-title">{{ c.label }}</h2>
-                  <p class="cv-wizard-section-subtitle">Escolha um modelo para este tópico ou escreva livremente.</p>
-                </div>
-              </header>
-              <div class="cv-wizard-section-body">
-                <div class="field-grid">
-                  {% include "prestacoes_contas/_campo_com_modelo.html" with c=c only %}
-                </div>
-              </div>
-            </section>
+            {% include "components/ui/forms/form_block.html" with shell="card" section_id="rt-topic-"|add:c.campo|add:"-title" extra_class="rt-topic-card" title=c.label description="Escolha um modelo para este tópico ou escreva livremente." body_template="prestacoes_contas/partials/_rt_topico_body.html" %}
           {% endfor %}
 
           {# Download do RT por servidor (mesmo texto, dados pessoais de cada um) #}
-          <section class="cv-wizard-section-card" aria-labelledby="rt-downloads-title">
-          <header class="cv-wizard-section-header">
-            <div class="cv-wizard-section-header__copy">
-              <h2 class="cv-wizard-section-title" id="rt-downloads-title">Relatório Técnico por servidor</h2>
-              <p class="cv-wizard-section-subtitle">O texto acima é salvo automaticamente. Abra cada card para pré-visualizar o relatório já preenchido; cada arquivo sai com o nome e CPF do servidor.</p>
-            </div>
-          </header>
-          <div class="cv-wizard-section-body document-inline-stack">
-            {% for s in servidores %}
-              <details class="document-inline-card document-inline-card--lazy" data-lazy-inline>
-                <summary class="document-inline-card__header">
-                  <span class="document-inline-card__title">
-                    {{ s.nome }}
-                    {% if s.is_motorista %} <span class="oficio-lc__traveller-badge">Motorista</span>{% endif %}
-                    {% if s.diaria_ajustada %} {% include "components/ui/badges/chip.html" with label="Diária ajustada" tone="info" size="compact" only %}{% endif %}
-                  </span>
-                  <span class="document-inline-card__header-end">
-                    <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do documento">
-                      {% include "components/ui/buttons/icon_button.html" with href=s.preview_inline_url action="preview" aria_label="Abrir em nova aba" tooltip="Abrir em nova aba" only %}
-                      {% include "components/ui/buttons/icon_button.html" with href=s.download_pdf_url action="pdf" aria_label="Baixar PDF" tooltip="Baixar PDF" only %}
-                      {% include "components/ui/buttons/icon_button.html" with href=s.download_docx_url action="docx" aria_label="Baixar DOCX" tooltip="Baixar DOCX" only %}
-                    </span>
-                  </span>
-                </summary>
-                <div class="document-inline-card__body">
-                  <div class="field app-form-field rt-diaria-override-field">
-                    <label class="app-form-label" for="{{ s.diaria_form.diaria_valor_override.id_for_label }}">{{ s.diaria_form.diaria_valor_override.label }}</label>
-                    {{ s.diaria_form.diaria_valor_override }}
-                    <p class="field-help app-form-help">{{ s.diaria_form.diaria_valor_override.help_text }}</p>
-                  </div>
-                  <div class="document-inline-viewer">
-                    <iframe
-                      class="document-inline-viewer__frame"
-                      data-src="{{ s.preview_inline_url }}"
-                      title="Relatório técnico — {{ s.nome }}"
-                      loading="lazy"
-                    ></iframe>
-                  </div>
-                </div>
-              </details>
-            {% endfor %}
-          </div>
-          <section class="cv-card-footer-section">
-            <div class="cv-card-footer-section__divider" aria-hidden="true"></div>
-            <footer class="cv-card-footer">
-              <div class="cv-card-footer__secondary">
-                {% include "components/ui/buttons/button.html" with href="/prestacoes-contas/" label="Voltar à lista" variant="secondary" icon="arrow-left" only %}
-              </div>
-              <div class="cv-card-footer__primary">
-                {% include "components/ui/buttons/button.html" with label="Salvar texto" variant="secondary" type="submit" name="action" value="save" only %}
-                {% include "components/ui/buttons/button.html" with href=diario_url label="Ir para Diário de Bordo" variant="primary" icon="arrow-right" icon_after=True only %}
-              </div>
-            </footer>
-          </section>
-        </section>
+          {% include "components/ui/forms/form_block.html" with shell="card" section_id="rt-downloads-title" title="Relatório Técnico por servidor" description="O texto acima é salvo automaticamente. Abra cada card para pré-visualizar o relatório já preenchido; cada arquivo sai com o nome e CPF do servidor." body_extra_class="document-inline-stack" body_template="prestacoes_contas/partials/_rt_downloads_body.html" footer_template="prestacoes_contas/partials/_rt_downloads_footer.html" %}
         </form>
       </div>
     </main>

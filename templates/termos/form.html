@@ -5,8 +5,8 @@
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260609-termos">
-  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260609-termos">
-  <link rel="stylesheet" href="{% static 'css/oficios-documentos-inline.css' %}?v=20260624-termos">
+  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260718-cv-summary">
+  <link rel="stylesheet" href="{% static 'css/oficios-documentos-inline.css' %}?v=20260718-cv-summary">
   <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260624-oficios-preview">
   <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}?v=20260715-assinado">
 {% endblock %}
@@ -30,190 +30,18 @@
           {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
         {% endif %}
 
-        <section class="cv-wizard-section-card cv-wizard-section-card--described termo-card termo-card--oficio" id="termo-card-oficio" aria-labelledby="termo-oficio-title">
-          <header class="cv-wizard-section-header">
-            <div class="cv-wizard-section-header__copy">
-              <h2 class="cv-wizard-section-title" id="termo-oficio-title">1. Ofício vinculado</h2>
-              <p class="cv-wizard-section-subtitle">Busque um ofício já cadastrado para reaproveitar destino, período, servidores e viatura. Dados preenchidos manualmente continuam tendo prioridade.</p>
-            </div>
-          </header>
-          <div class="cv-wizard-section-body termo-card__body">
-            <div class="termo-oficio-selector-wrapper">
-              <div class="field-grid roteiro-sede-grid">
-                <div class="field app-form-field field-size-2">
-                  <label class="app-form-label" for="id_oficio_busca">Buscar ofício vinculado</label>
-                  <input
-                    type="search"
-                    id="id_oficio_busca"
-                    class="form-control"
-                    placeholder="Buscar por número, protocolo, destino, sede, viatura ou servidor"
-                    autocomplete="off"
-                  >
-                </div>
-              </div>
-              {{ form.oficio }}
-              {% if form.oficio.errors %}
-                {% include "components/ui/feedback/field_error.html" with errors=form.oficio.errors only %}
-              {% endif %}
-              <section class="cv-search-picker__selected-panel roteiro-routes-panel termo-oficio-summary-panel" aria-label="Ofícios encontrados">
-                <div class="cv-search-picker__selected-header roteiro-routes-panel__header">
-                  <h3 class="cv-search-picker__selected-title">Ofícios encontrados</h3>
-                </div>
-                <div id="termo-oficio-lista" class="roteiro-editor__route-list oficio-roteiro-route-list roteiro-routes-list"></div>
-              </section>
-            </div>
-          </div>
-        </section>
+        {% include "components/ui/forms/form_block.html" with shell="card" element_id="termo-card-oficio" section_id="termo-oficio-title" extra_class="cv-wizard-section-card--described termo-card termo-card--oficio" title="1. Ofício vinculado" description="Busque um ofício já cadastrado para reaproveitar destino, período, servidores e viatura. Dados preenchidos manualmente continuam tendo prioridade." body_extra_class="termo-card__body" body_template="termos/partials/_oficio_body.html" %}
 
-        <section class="cv-wizard-section-card cv-wizard-section-card--described termo-card termo-card--evento" id="termo-card-evento">
-          <header class="cv-wizard-section-header">
-            <div class="cv-wizard-section-header__copy">
-              <h2 class="cv-wizard-section-title">2. Evento</h2>
-              <p class="cv-wizard-section-subtitle">Destino e período são obrigatórios quando não vierem do ofício.</p>
-            </div>
-          </header>
-          <div class="cv-wizard-section-body termo-evento-body">
-            <section class="wizard-inner-section termo-evento-periodo" aria-label="Período do evento">
-              {% include "components/forms/cv_date_picker.html" with mode="range" picker_id="termo-evento-date-picker" extra_class="termo-date-picker" start_field=form.data_evento_inicio end_field=form.data_evento_fim start_label="Data inicial" end_label="Data final" start_input_id="id_data_evento_inicio_display" end_input_id="id_data_evento_fim_display" only %}
-            </section>
-            {% include "components/domain/destinos_section.html" with section_id="termo-evento-destinos" title_id="termo-evento-destinos-title" add_button_id="btn-adicionar-destino" add_button_termo=True list_id="termo-destinos-list" prefix="termo" rows_template="components/domain/destinos/rows.html" errors_template="components/domain/destinos/errors.html" %}
-            {% include "components/domain/destinos/template.html" with prefix="termo" %}
-          </div>
-        </section>
+        {% include "components/ui/forms/form_block.html" with shell="card" element_id="termo-card-evento" section_id="termo-evento-title" extra_class="cv-wizard-section-card--described termo-card termo-card--evento" title="2. Evento" description="Destino e período são obrigatórios quando não vierem do ofício." body_extra_class="termo-evento-body" body_template="termos/partials/_evento_body.html" %}
 
-        <section class="cv-wizard-section-card cv-wizard-section-card--described termo-card termo-card--servidores" id="termo-card-servidores">
-          <header class="cv-wizard-section-header">
-            <div class="cv-wizard-section-header__copy">
-              <h2 class="cv-wizard-section-title">3. Servidores</h2>
-              <p class="cv-wizard-section-subtitle">Opcional. Com vários servidores, será gerado um termo para cada um.</p>
-            </div>
-            <div class="cv-wizard-section-header__actions">
-              {% include "components/buttons/action_button.html" with href=servidor_create_url label="Cadastrar novo viajante" variant="secondary" data_autosave_link=True only %}
-            </div>
-          </header>
-          <div class="cv-wizard-section-body">
-            {% include "components/forms/form_field.html" with field=form.servidores only %}
-          </div>
-        </section>
+        {% include "components/ui/forms/form_block.html" with shell="card" element_id="termo-card-servidores" section_id="termo-servidores-title" extra_class="cv-wizard-section-card--described termo-card termo-card--servidores" title="3. Servidores" description="Opcional. Com vários servidores, será gerado um termo para cada um." action_label="Cadastrar novo viajante" action_url=servidor_create_url action_autosave=True body_template="termos/partials/_servidores_body.html" %}
 
-        <section class="cv-wizard-section-card cv-wizard-section-card--described termo-card termo-card--viatura" id="termo-card-viatura">
-          <header class="cv-wizard-section-header">
-            <div class="cv-wizard-section-header__copy">
-              <h2 class="cv-wizard-section-title">4. Viatura</h2>
-              <p class="cv-wizard-section-subtitle">Opcional. Se vazio, o termo pode usar a viatura do ofício vinculado.</p>
-            </div>
-            <div class="cv-wizard-section-header__actions">
-              {% include "components/buttons/action_button.html" with href=viatura_create_url label="Cadastrar nova viatura" variant="secondary" data_autosave_link=True only %}
-            </div>
-          </header>
-          <div class="cv-wizard-section-body">
-            {% include "components/forms/form_field.html" with field=form.viatura only %}
-          </div>
-          <div id="termo-form-footer">
-            {% include "components/ui/layouts/card_footer_section.html" with secondary_label=back_label secondary_url=index_url primary_label="Salvar termo" primary_action="save" only %}
-          </div>
-        </section>
+        {% include "components/ui/forms/form_block.html" with shell="card" element_id="termo-card-viatura" section_id="termo-viatura-title" extra_class="cv-wizard-section-card--described termo-card termo-card--viatura" title="4. Viatura" description="Opcional. Se vazio, o termo pode usar a viatura do ofício vinculado." action_label="Cadastrar nova viatura" action_url=viatura_create_url action_autosave=True body_template="termos/partials/_viatura_body.html" footer_template="termos/partials/_viatura_footer.html" %}
       </main>
     </form>
 
     {% if termo and termo.pk %}
-      <section class="cv-wizard-section-card document-inline-stack termo-pdf-preview-section" aria-labelledby="termo-pdf-preview-title">
-        <header class="cv-wizard-section-header">
-          <div class="cv-wizard-section-header__copy">
-            <h3 class="cv-wizard-section-title" id="termo-pdf-preview-title">Visualização dos termos</h3>
-            <p class="cv-wizard-section-subtitle">Confira o termo genérico e os termos individuais por servidor.</p>
-          </div>
-        </header>
-
-        <div class="cv-wizard-section-body oficio-documentos-preview-section__body">
-          {% with docs=termo_preview_documents %}
-            <details class="document-inline-card document-inline-card--lazy" data-lazy-inline>
-              <summary class="document-inline-card__header">
-                <span class="document-inline-card__title">
-                  {{ docs.generico.titulo }} - {{ termo.destino_display }} - {{ termo.periodo_display }}
-                </span>
-                <span class="document-inline-card__header-end">
-                  <span class="document-inline-actions document-inline-actions--header" aria-label="Acoes do termo generico">
-                    {% include "components/ui/buttons/icon_button.html" with href=docs.generico.inline_url action="preview" aria_label="Abrir termo generico" tooltip="Abrir termo generico" only %}
-                    {% include "components/ui/buttons/icon_button.html" with href=docs.generico.inline_url action="pdf" aria_label="Visualizar PDF do termo generico" tooltip="PDF" only %}
-                    <button
-                      type="button"
-                      class="cv-icon-btn cv-icon-btn--sign{% if docs.generico.assinado %} is-assinado{% endif %}"
-                      data-attach-signed-trigger
-                      data-attach-signed-url="{{ docs.generico.anexar_assinado_url }}"
-                      data-attach-signed-doc-label="o termo genérico"
-                      data-attach-signed-current-name="{{ docs.generico.assinado_nome_original }}"
-                      data-attach-signed-current-view-url="{{ docs.generico.assinado_view_url }}"
-                      data-attach-signed-current-remove-url="{{ docs.generico.remover_assinado_url }}"
-                      aria-label="{% if docs.generico.assinado %}Termo assinado — gerenciar{% else %}Anexar assinado{% endif %}"
-                      data-tooltip="{% if docs.generico.assinado %}Assinado — clique para gerenciar{% else %}Anexar assinado{% endif %}"
-                    >{% include "components/ui/icons/icon.html" with icon="sign" only %}</button>
-                  </span>
-                </span>
-              </summary>
-              <div class="document-inline-card__body">
-                <div class="document-inline-viewer">
-                  <iframe
-                    class="document-inline-viewer__frame"
-                    data-src="{{ docs.generico.inline_url }}"
-                    title="Visualizacao do termo generico"
-                    loading="lazy"
-                  ></iframe>
-                </div>
-              </div>
-            </details>
-
-            <details class="document-inline-card document-inline-card--termos">
-              <summary class="document-inline-card__header">
-                <span class="document-inline-card__title">Termos por servidor</span>
-              </summary>
-              <div class="document-inline-card__body document-inline-card__body--termos">
-                {% if docs.servidores %}
-                  {% for doc in docs.servidores %}
-                    <details class="document-inline-card document-inline-card--nested document-inline-card--lazy" data-lazy-inline>
-                      <summary class="document-inline-card__header">
-                        <span class="document-inline-card__title">
-                          {{ doc.titulo }}
-                        </span>
-                        <span class="document-inline-card__header-end">
-                          <span class="document-inline-actions document-inline-actions--header" aria-label="Acoes do termo de {{ doc.servidor_nome }}">
-                            {% include "components/ui/buttons/icon_button.html" with href=doc.inline_url action="preview" aria_label="Abrir termo de servidor" tooltip="Abrir termo" only %}
-                            {% include "components/ui/buttons/icon_button.html" with href=doc.inline_url action="pdf" aria_label="Visualizar PDF do termo de servidor" tooltip="PDF" only %}
-                            <button
-                              type="button"
-                              class="cv-icon-btn cv-icon-btn--sign{% if doc.assinado %} is-assinado{% endif %}"
-                              data-attach-signed-trigger
-                              data-attach-signed-url="{{ doc.anexar_assinado_url }}"
-                              data-attach-signed-doc-label="o termo de {{ doc.servidor_nome }}"
-                              data-attach-signed-current-name="{{ doc.assinado_nome_original }}"
-                              data-attach-signed-current-view-url="{{ doc.assinado_view_url }}"
-                              data-attach-signed-current-remove-url="{{ doc.remover_assinado_url }}"
-                              aria-label="{% if doc.assinado %}Termo assinado — gerenciar{% else %}Anexar assinado{% endif %}"
-                              data-tooltip="{% if doc.assinado %}Assinado — clique para gerenciar{% else %}Anexar assinado{% endif %}"
-                            >{% include "components/ui/icons/icon.html" with icon="sign" only %}</button>
-                          </span>
-                        </span>
-                      </summary>
-                      <div class="document-inline-card__body">
-                        <div class="document-inline-viewer">
-                          <iframe
-                            class="document-inline-viewer__frame"
-                            data-src="{{ doc.inline_url }}"
-                            title="Visualizacao do termo de {{ doc.servidor_nome }}"
-                            loading="lazy"
-                          ></iframe>
-                        </div>
-                      </div>
-                    </details>
-                  {% endfor %}
-                {% else %}
-                  <p class="document-inline-empty">Nenhum servidor selecionado. Use o termo generico acima.</p>
-                {% endif %}
-              </div>
-            </details>
-          {% endwith %}
-        </div>
-      </section>
+      {% include "components/ui/forms/form_block.html" with shell="card" section_id="termo-pdf-preview-title" extra_class="document-inline-stack termo-pdf-preview-section" title="Visualização dos termos" description="Confira o termo genérico e os termos individuais por servidor." body_extra_class="oficio-documentos-preview-section__body" body_template="termos/partials/_preview_body.html" %}
       {% include "components/ui/modals/attach_signed_modal.html" %}
     {% endif %}
   </div>

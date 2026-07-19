@@ -1,0 +1,109 @@
+<form class="admin-search" method="get" role="search">
+  <div class="admin-search__copy">
+    <label for="admin-search-input">Buscar na administração</label>
+    <span>Pesquise por usuário, e-mail, área, sigla ou perfil.</span>
+  </div>
+  <div class="admin-search__control">
+    <input
+      class="form-control"
+      id="admin-search-input"
+      name="q"
+      type="search"
+      value="{{ busca }}"
+      placeholder="Digite para filtrar..."
+      autocomplete="off"
+    >
+    <button class="cv-btn cv-btn--primary cv-btn--sm" type="submit">Buscar</button>
+    {% if busca %}
+      <a class="cv-btn cv-btn--secondary cv-btn--sm" href="{% url 'usuarios:index' %}">Limpar</a>
+    {% endif %}
+  </div>
+</form>
+
+{% if busca %}
+  <p class="admin-search-result">Resultados para <strong>“{{ busca }}”</strong>.</p>
+{% endif %}
+
+<div class="admin-conferencia">
+  <section class="admin-list-card" aria-labelledby="admin-sub-areas-lista-title">
+    <header class="admin-list-card__header">
+      <div>
+        <h4 class="admin-list-card__title" id="admin-sub-areas-lista-title">Áreas cadastradas</h4>
+        <p class="admin-list-card__description">Quantidade de usuários vinculados em cada área.</p>
+      </div>
+      {% include "components/ui/badges/chip.html" with tone="info" label="Áreas" count=areas|length size="compact" only %}
+    </header>
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Sigla</th>
+            <th>Nome</th>
+            <th>Usuários</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for area in areas %}
+            <tr>
+              <td><span class="admin-entity-mark">{{ area.sigla }}</span></td>
+              <td><strong>{{ area.nome }}</strong></td>
+              <td>{{ area.total_vinculos }}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="3" class="admin-table__empty">Nenhuma área encontrada.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="admin-list-card" aria-labelledby="admin-sub-vinculos-lista-title">
+    <header class="admin-list-card__header">
+      <div>
+        <h4 class="admin-list-card__title" id="admin-sub-vinculos-lista-title">Usuários e acessos</h4>
+        <p class="admin-list-card__description">Perfis concedidos e área padrão de cada conta.</p>
+      </div>
+      {% include "components/ui/badges/chip.html" with tone="info" label="Vínculos" count=vinculos|length size="compact" only %}
+    </header>
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Usuário</th>
+            <th>E-mail</th>
+            <th>Área</th>
+            <th>Perfil</th>
+            <th>Padrão</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for vinculo in vinculos %}
+            <tr>
+              <td>
+                <div class="admin-user">
+                  <span class="admin-user__avatar" aria-hidden="true">{{ vinculo.usuario.get_username|slice:":2"|upper }}</span>
+                  <span>
+                    <strong>{{ vinculo.usuario.get_full_name|default:vinculo.usuario.get_username }}</strong>
+                    <small>@{{ vinculo.usuario.get_username }}</small>
+                  </span>
+                </div>
+              </td>
+              <td>{{ vinculo.usuario.email|default:"—" }}</td>
+              <td><span class="admin-entity-mark">{{ vinculo.area.sigla }}</span></td>
+              <td>{{ vinculo.get_papel_display }}</td>
+              <td>
+                {% if vinculo.area_padrao %}
+                  {% include "components/ui/badges/chip.html" with tone="info" label="Padrão" size="compact" only %}
+                {% else %}
+                  <span class="admin-table__muted">—</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="5" class="admin-table__empty">Nenhum vínculo encontrado.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>

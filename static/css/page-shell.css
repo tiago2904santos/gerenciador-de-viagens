@@ -962,7 +962,6 @@ html[data-theme="light"] {
 
 /* Ponte: seções legadas do wizard dentro do stack (ofícios/roteiros) */
 .main-form-panel--stack .cv-wizard-section-stack > .form-section.app-form-section,
-.main-form-panel--stack .cv-wizard-section-stack > .oficio-wizard-pendencias,
 .main-form-panel--stack .roteiro-editor--avulso .roteiro-editor__section,
 .main-form-panel--stack .roteiro-editor--oficio .roteiro-editor__section {
   background:    var(--cv-wizard-section-bg);

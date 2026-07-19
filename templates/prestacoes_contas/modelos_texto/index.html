@@ -9,19 +9,7 @@
     <div class="list-panel">
     <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
       {% for grupo in grupos %}
-        <section class="cv-wizard-section-card modelos-grupo" id="grupo-{{ grupo.campo }}">
-          <header class="cv-wizard-section-header">
-            <div class="cv-wizard-section-header__copy">
-              <h2 class="cv-wizard-section-title">{{ grupo.label }}</h2>
-            </div>
-            <div class="cv-wizard-section-header__actions">
-              {% include "components/ui/buttons/button.html" with href=grupo.new_url label="Novo modelo" variant="secondary" icon="plus" extra_class="cv-btn--control" only %}
-            </div>
-          </header>
-          <div class="cv-wizard-section-body">
-            {% include "components/lists/simple_list.html" with rows=grupo.rows empty_message="Nenhum modelo cadastrado para este campo." empty_action_label="Novo modelo" empty_action_url=grupo.new_url only %}
-          </div>
-        </section>
+        {% include "components/ui/forms/form_block.html" with shell="card" element_id="grupo-"|add:grupo.campo extra_class="modelos-grupo" title=grupo.label actions_template="prestacoes_contas/partials/_modelos_grupo_actions.html" body_template="prestacoes_contas/partials/_modelos_grupo_body.html" %}
       {% endfor %}
     </div>
     </div>

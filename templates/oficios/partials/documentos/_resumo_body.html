@@ -1,0 +1,120 @@
+<div class="oficio-documentos-grid">
+  <section class="oficio-documentos-admin-facts" aria-label="Dados administrativos">
+    <header class="oficio-documentos-card__header">
+      <div>
+        <h4 class="oficio-documentos-card__title">Dados administrativos</h4>
+        <p class="oficio-documentos-card__subtitle">Identificação e custeio</p>
+      </div>
+      <div
+        class="oficio-documentos-summary__status {% if mostrar_pendencias %}oficio-documentos-summary__status--warning{% else %}oficio-documentos-summary__status--ok{% endif %}"
+        role="status"
+      >
+        {% if mostrar_pendencias %}
+          Pendências encontradas
+        {% else %}
+          Sem pendências
+        {% endif %}
+      </div>
+    </header>
+    <div class="oficio-documentos-card__body">
+      <dl class="oficio-documentos-facts oficio-documentos-facts--admin">
+        <div class="oficio-documentos-fact">
+          <dt>Número do ofício</dt>
+          <dd>{{ documentos_ctx.detalhe.numero_formatado }}</dd>
+        </div>
+        <div class="oficio-documentos-fact">
+          <dt>Protocolo</dt>
+          <dd>{{ documentos_ctx.detalhe.protocolo }}</dd>
+        </div>
+        <div class="oficio-documentos-fact">
+          <dt>Data de criação</dt>
+          <dd>{{ documentos_ctx.detalhe.data_criacao }}</dd>
+        </div>
+        <div class="oficio-documentos-fact">
+          <dt>Custeio</dt>
+          <dd>{{ documentos_ctx.detalhe.custeio }}</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <article class="oficio-documentos-card oficio-documentos-card--travellers" aria-label="Viajantes">
+    <header class="oficio-documentos-card__header oficio-documentos-travellers__header">
+      <div class="oficio-documentos-travellers__titles">
+        <span class="oficio-documentos-card__eyebrow">Equipe</span>
+        <h4 class="oficio-documentos-card__title">Viajantes</h4>
+        <p class="oficio-documentos-card__subtitle">Servidores vinculados ao ofício</p>
+      </div>
+    </header>
+    <div class="oficio-documentos-card__body">
+      {% with n=documentos_ctx.viajantes_cards|length %}
+      <div class="oficio-documentos-travellers-lines oficio-documentos-travellers-lines--n{{ n }}">
+        {% for viajante in documentos_ctx.viajantes_cards %}
+          <article class="oficio-documentos-traveller-line{% if viajante.is_motorista %} oficio-documentos-traveller-line--motorista{% endif %}">
+            <div class="oficio-documentos-traveller-line__name-row">
+              <strong class="oficio-documentos-traveller-line__name">{{ viajante.nome }}</strong>
+              {% if viajante.is_motorista %}
+                {% include "components/ui/badges/chip.html" with label="Motorista" tone="warning" size="compact" only %}
+              {% endif %}
+            </div>
+            {% if viajante.cargo or viajante.funcao or viajante.unidade %}
+              <span class="oficio-documentos-traveller-line__cargo">
+                {% if viajante.cargo %}{{ viajante.cargo }}{% elif viajante.funcao %}{{ viajante.funcao }}{% endif %}{% if viajante.unidade and viajante.cargo %} · {{ viajante.unidade }}{% elif viajante.unidade and viajante.funcao %} · {{ viajante.unidade }}{% elif viajante.unidade %}{{ viajante.unidade }}{% endif %}
+              </span>
+            {% endif %}
+          </article>
+        {% empty %}
+          <div class="oficio-documentos-travellers-empty">Nenhum viajante vinculado a este ofício.</div>
+        {% endfor %}
+      </div>
+      {% endwith %}
+    </div>
+  </article>
+
+  <article class="oficio-documentos-card oficio-documentos-card--vehicle" aria-label="Viatura e condução">
+    <header class="oficio-documentos-card__header oficio-documentos-vehicle__header">
+      <div class="oficio-documentos-vehicle__titles">
+        <span class="oficio-documentos-card__eyebrow">Transporte</span>
+        <h4 class="oficio-documentos-card__title">Viatura e condução</h4>
+        <p class="oficio-documentos-card__subtitle">Transporte utilizado no deslocamento</p>
+      </div>
+    </header>
+    <div class="oficio-documentos-card__body">
+      {% with t=documentos_ctx.transporte %}
+        <div class="oficio-documentos-vehicle-lines">
+          {# Col 1 — Placa + Modelo, span 2 linhas #}
+          <div class="cv-summary-item cv-summary-item--principal oficio-documentos-viatura-item--principal">
+            <span class="cv-summary-label">Placa</span>
+            <span class="cv-summary-value oficio-documentos-viatura-placa-value">{{ t.viatura|default:t.placa }}</span>
+            <span class="cv-summary-label">Modelo</span>
+            <span class="cv-summary-value oficio-documentos-viatura-modelo-value">{{ t.modelo }}</span>
+          </div>
+          {# Col 2 #}
+          <div class="cv-summary-item cv-summary-item--secondary">
+            <span class="cv-summary-label">Tipo</span>
+            <span class="cv-summary-value">{{ t.tipo_viatura|default:t.tipo }}</span>
+          </div>
+          <div class="cv-summary-item cv-summary-item--secondary">
+            <span class="cv-summary-label">Porte de arma</span>
+            <span class="cv-summary-value">{{ t.porte_armas }}</span>
+          </div>
+          {# Col 3 #}
+          <div class="cv-summary-item cv-summary-item--secondary">
+            <span class="cv-summary-label">Combustível</span>
+            <span class="cv-summary-value">{{ t.combustivel }}</span>
+          </div>
+          <div class="cv-summary-item cv-summary-item--secondary">
+            <span class="cv-summary-label">Unidade lotada</span>
+            <span class="cv-summary-value">{{ t.unidade }}</span>
+          </div>
+          {% if t.mostrar_motorista_externo %}
+            <section class="oficio-documentos-vehicle-executive__driver oficio-documentos-vehicle-executive__driver--external" aria-label="Motorista carona">
+              <strong class="oficio-documentos-vehicle-executive__driver-value">{{ t.motorista }}</strong>
+              <span class="oficio-documentos-motorista-carona-chip">Motorista carona</span>
+            </section>
+          {% endif %}
+        </div>
+      {% endwith %}
+    </div>
+  </article>
+</div>

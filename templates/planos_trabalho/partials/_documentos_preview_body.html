@@ -1,0 +1,29 @@
+<details class="document-inline-card document-inline-card--lazy" data-lazy-inline open>
+  <summary class="document-inline-card__header">
+    <span class="document-inline-card__title">Plano de Trabalho {{ plano.numero_formatado }}</span>
+    {% if documento_disponivel %}
+      <span class="document-inline-card__header-end">
+        <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do documento">
+          {% include "components/ui/buttons/icon_button.html" with href=pdf_inline_url action="preview" aria_label="Visualizar documento" tooltip="Visualizar documento" only %}
+          {% include "components/ui/buttons/icon_button.html" with href=baixar_pdf_url action="pdf" aria_label="Baixar PDF" tooltip="Baixar PDF" only %}
+          {% include "components/ui/buttons/icon_button.html" with href=baixar_docx_url action="docx" aria_label="Baixar DOCX" tooltip="Baixar DOCX" only %}
+        </span>
+      </span>
+    {% endif %}
+  </summary>
+  <div class="document-inline-card__body">
+    {% if documento_disponivel %}
+      <div class="document-inline-viewer">
+        <iframe
+          class="document-inline-viewer__frame"
+          data-src="{{ pdf_inline_url }}"
+          src="{{ pdf_inline_url }}"
+          title="Visualização do plano de trabalho em PDF"
+          loading="lazy"
+        ></iframe>
+      </div>
+    {% else %}
+      <p class="document-inline-empty">Complete as etapas anteriores para visualizar o documento.</p>
+    {% endif %}
+  </div>
+</details>

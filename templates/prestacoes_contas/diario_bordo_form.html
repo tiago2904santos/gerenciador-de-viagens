@@ -38,138 +38,14 @@
           {% endif %}
 
           {# CARD — Identificação (reaproveita o resumo do ofício) #}
-          <section class="cv-summary-card cv-wizard-section-card rt-summary-card oficio-documentos-summary-section" aria-labelledby="diario-identificacao-title">
-            <header class="cv-wizard-section-header">
-              <div class="cv-wizard-section-header__copy">
-                <h2 class="cv-wizard-section-title" id="diario-identificacao-title">Resumo do ofício</h2>
-                <p class="cv-wizard-section-subtitle">O cabeçalho do diário (motorista, viatura e protocolo) é montado a partir do ofício.</p>
-              </div>
-              <div class="cv-wizard-section-header__actions">
-                {% if diaria_info.ajustado %}
-                  {% include "components/ui/badges/chip.html" with label="Roteiro ajustado" tone="warning" size="compact" only %}
-                {% endif %}
-                {% include "components/ui/buttons/button.html" with href=editar_motorista_url label="Trocar motorista" variant="secondary" icon="sync" only %}
-                {% include "components/ui/buttons/button.html" with href=editar_roteiro_url label="Editar trechos" variant="secondary" icon="route" only %}
-              </div>
-            </header>
-            <div class="cv-wizard-section-body">
-              {% if diaria_info.alterada %}
-                <div class="diario-diaria-alert" role="alert">
-                  <strong>Atenção:</strong> a alteração do roteiro mudou o valor da diária —
-                  <span class="diario-diaria-alert__values">{{ diaria_info.valor_oficio_label }} (ofício) → {{ diaria_info.valor_ajustado_label }} (ajustado)</span>.
-                  Justifique a diferença em <a href="{{ rt_url }}">Informações complementares</a> do Relatório Técnico.
-                </div>
-              {% endif %}
-              <div class="oficio-documentos-grid">
-                <section class="oficio-documentos-admin-facts" aria-label="Dados administrativos">
-                  <div class="oficio-documentos-card__body">
-                    <dl class="oficio-documentos-facts oficio-documentos-facts--admin rt-summary-card__facts">
-                      <div class="oficio-documentos-fact">
-                        <dt>Número do ofício</dt>
-                        <dd>{{ identificacao.numero }}</dd>
-                      </div>
-                      <div class="oficio-documentos-fact">
-                        <dt>Protocolo</dt>
-                        <dd>{{ identificacao.protocolo }}</dd>
-                      </div>
-                      <div class="oficio-documentos-fact">
-                        <dt>Destino</dt>
-                        <dd>{{ identificacao.destino }}</dd>
-                      </div>
-                      <div class="oficio-documentos-fact">
-                        <dt>Período da viagem</dt>
-                        <dd>{{ identificacao.periodo }}</dd>
-                      </div>
-                      <div class="oficio-documentos-fact diario-motorista-fact">
-                        <dt>Motorista</dt>
-                        <dd>
-                          <span>{{ motorista_resumo.nome }}</span>
-                          {% if motorista_resumo.cpf %}<span class="diario-motorista-fact__cpf">CPF {{ motorista_resumo.cpf }}</span>{% endif %}
-                        </dd>
-                      </div>
-                      <div class="oficio-documentos-fact diario-motorista-fact">
-                        <dt>Origem do motorista</dt>
-                        <dd>
-                          <span>{{ motorista_resumo.origem }}</span>
-                          {% if motorista_resumo.alterado %}
-                            {% include "components/ui/badges/chip.html" with label="Alterado" tone="warning" size="compact" only %}
-                          {% endif %}
-                        </dd>
-                      </div>
-                    </dl>
-                  </div>
-                </section>
-              </div>
-            </div>
-          </section>
+          {% include "components/ui/forms/form_block.html" with shell="card" section_id="diario-identificacao-title" extra_class="cv-summary-card rt-summary-card oficio-documentos-summary-section" title="Resumo do ofício" description="O cabeçalho do diário (motorista, viatura e protocolo) é montado a partir do ofício." actions_template="prestacoes_contas/partials/_diario_resumo_actions.html" body_template="prestacoes_contas/partials/_diario_resumo_body.html" %}
 
           {# Um card solto por trecho (estilo retorno final, sem tempos) #}
           {% for item in trechos %}
             {% with form=item.form d=item.display %}
-              <section class="cv-wizard-section-card diario-trecho-card" aria-label="Trecho {{ d.ordem }}">
-                {{ form.id }}
-                <header class="cv-wizard-section-header">
-                  <div class="cv-wizard-section-header__copy">
-                    <h2 class="cv-wizard-section-title">Trecho {{ d.ordem }} — {{ d.rota }}</h2>
-                    <p class="cv-wizard-section-subtitle">Data, horário, origem e destino vêm do roteiro. Informe KM inicial/final e a necessidade de abastecimento.</p>
-                  </div>
-                </header>
-                <div class="cv-wizard-section-body">
-                  <div class="roteiro-trecho-card__route-row field-grid field-grid--cols-2">
-                    {# SAÍDA #}
-                    <div class="roteiro-trecho-card__leg">
-                      <div class="roteiro-trecho-card__leg-title">Saída</div>
-                      <div class="field-grid field-grid--cols-2 roteiro-trecho-card__leg-grid">
-                        <div class="field cv-field cv-field--readonly roteiro-trecho-card__leg-cidade">
-                          <label class="cv-field__label">Cidade de saída</label>
-                          <input type="text" class="cv-field__control" value="{{ d.origem }}" readonly tabindex="-1" aria-readonly="true">
-                        </div>
-                        <div class="field cv-field cv-field--readonly field-size-1">
-                          <label class="cv-field__label">Data</label>
-                          <input type="text" class="cv-field__control" value="{{ d.saida.data }}" readonly tabindex="-1" aria-readonly="true">
-                        </div>
-                        <div class="field cv-field cv-field--readonly field-size-1">
-                          <label class="cv-field__label">Hora</label>
-                          <input type="text" class="cv-field__control" value="{{ d.saida.hora }}" readonly tabindex="-1" aria-readonly="true">
-                        </div>
-                        <div class="field cv-field field-size-1 diario-trecho-card__field--full">
-                          <label class="cv-field__label" for="{{ form.km_inicial.id_for_label }}">KM inicial</label>
-                          {{ form.km_inicial }}
-                          {% if form.km_inicial.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.km_inicial.errors only %}{% endif %}
-                        </div>
-                      </div>
-                    </div>
-
-                    {# CHEGADA #}
-                    <div class="roteiro-trecho-card__leg">
-                      <div class="roteiro-trecho-card__leg-title">Chegada</div>
-                      <div class="field-grid field-grid--cols-2 roteiro-trecho-card__leg-grid">
-                        <div class="field cv-field cv-field--readonly roteiro-trecho-card__leg-cidade">
-                          <label class="cv-field__label">Cidade de chegada</label>
-                          <input type="text" class="cv-field__control" value="{{ d.destino }}" readonly tabindex="-1" aria-readonly="true">
-                        </div>
-                        <div class="field cv-field cv-field--readonly field-size-1">
-                          <label class="cv-field__label">Data</label>
-                          <input type="text" class="cv-field__control" value="{{ d.chegada.data }}" readonly tabindex="-1" aria-readonly="true">
-                        </div>
-                        <div class="field cv-field cv-field--readonly field-size-1">
-                          <label class="cv-field__label">Hora</label>
-                          <input type="text" class="cv-field__control" value="{{ d.chegada.hora }}" readonly tabindex="-1" aria-readonly="true">
-                        </div>
-                        <div class="field cv-field field-size-1">
-                          <label class="cv-field__label" for="{{ form.km_final.id_for_label }}">KM final</label>
-                          {{ form.km_final }}
-                          {% if form.km_final.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.km_final.errors only %}{% endif %}
-                        </div>
-                        <div class="field cv-field field-size-1">
-                          <label class="cv-field__label" for="{{ form.abastecimento.id_for_label }}">Necessidade de abastecimento</label>
-                          {% include "components/ui/forms/select.html" with field=form.abastecimento only %}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </section>
+              {% with ordem_str=d.ordem|stringformat:"s" %}
+                {% include "components/ui/forms/form_block.html" with shell="card" extra_class="diario-trecho-card" title="Trecho "|add:ordem_str|add:" — "|add:d.rota description="Data, horário, origem e destino vêm do roteiro. Informe KM inicial/final e a necessidade de abastecimento." body_template="prestacoes_contas/partials/_diario_trecho_body.html" %}
+              {% endwith %}
             {% endwith %}
           {% empty %}
             <section class="cv-wizard-section-card">

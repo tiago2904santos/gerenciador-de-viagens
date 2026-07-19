@@ -1,0 +1,17 @@
+<div class="roteiro-editor__switch-row"
+     data-cv-state-toggle
+     data-cv-state-binary
+     data-cv-state-input="#id_bate_volta_diario_ativo"
+     data-active-label="Com bate-volta diário"
+     data-inactive-label="Sem bate-volta diário">
+  <input type="hidden"
+         id="id_bate_volta_diario_ativo" name="bate_volta_diario_ativo"
+         value="{% if roteiro_editor_state_json.bate_volta_diario.ativo %}true{% else %}false{% endif %}">
+  <button type="button"
+          class="cv-field-side-action cv-field-side-action--toggle cv-field-side-action--state {% if roteiro_editor_state_json.bate_volta_diario.ativo %}is-active cv-field-side-action--success{% else %}is-inactive cv-field-side-action--danger{% endif %}"
+          data-cv-state-trigger
+          aria-label="Alternar bate-volta diário"
+          aria-pressed="{% if roteiro_editor_state_json.bate_volta_diario.ativo %}true{% else %}false{% endif %}">
+    <span>{% if roteiro_editor_state_json.bate_volta_diario.ativo %}Com bate-volta diário{% else %}Sem bate-volta diário{% endif %}</span>
+  </button>
+</div>

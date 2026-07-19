@@ -1,24 +1,2 @@
 {# SEÇÃO 5: TRECHOS #}
-<section class="{% if roteiro_editor_oficio %}cv-form-block cv-form-block--resource{% else %}cv-wizard-section-card{% endif %} roteiro-editor__section--trechos"
-         aria-labelledby="sec-trechos"
-         data-trechos-component>
-  <header class="{% if roteiro_editor_oficio %}cv-form-block__header{% else %}cv-wizard-section-header{% endif %}">
-    <div class="{% if roteiro_editor_oficio %}cv-form-block__copy{% else %}cv-wizard-section-header__copy{% endif %}">
-      <h3 class="{% if roteiro_editor_oficio %}cv-form-block__title{% else %}cv-wizard-section-title{% endif %}" id="sec-trechos">Trechos</h3>
-      {% if roteiro_editor_oficio %}<p class="cv-form-block__description">Saídas e chegadas geradas a partir dos destinos.</p>{% endif %}
-    </div>
-    <div class="{% if roteiro_editor_oficio %}cv-form-block__actions{% else %}cv-wizard-section-header__actions{% endif %}">
-      {# Calendário para preencher as datas dos trechos em sequência #}
-      {% include "components/forms/cv_date_picker.html" with mode="multi" control_variant="action-button" picker_id="trechos-date-picker" trigger_label="Preencher datas" trigger_aria_label="Preencher datas dos trechos" trigger_class="cv-field-side-action cv-field-side-action--secondary" show_summary=False show_context=True show_confirm=True only %}
-      <template id="trecho-single-date-picker-template">
-        {% include "components/forms/cv_date_picker.html" with mode="single" single_label="__LABEL__" single_input_id="__DISPLAY_ID__" single_hidden_id="__HIDDEN_ID__" single_hidden_name="__HIDDEN_NAME__" single_hidden_value="__ISO_VALUE__" initial_date="__INITIAL_DATE__" trecho_date="__ROLE__" only %}
-      </template>
-    </div>
-  </header>
-  <div id="trechos-gerados-container" class="{% if roteiro_editor_oficio %}cv-form-block__body{% else %}cv-wizard-section-body{% endif %} roteiro-trechos-stack">
-    <div class="roteiro-editor__empty">
-      <p class="roteiro-editor__empty-title">Trechos ainda não disponíveis</p>
-      <p class="roteiro-editor__empty-text">Os trechos aparecem aqui após definir os destinos.</p>
-    </div>
-  </div>
-</section>
+{% include "components/ui/forms/form_block.html" with shell=roteiro_editor_oficio|yesno:",card" variant="resource" extra_class="roteiro-editor__section--trechos" section_id="sec-trechos" data_hook="trechos-component" title="Trechos" description="Saídas e chegadas geradas a partir dos destinos." actions_template="roteiros/partials/roteiro/_trechos_actions.html" body_id="trechos-gerados-container" body_extra_class="roteiro-trechos-stack" body_template="roteiros/partials/roteiro/_trechos_body.html" %}
