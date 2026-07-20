@@ -193,7 +193,10 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None):
     trechos_display = []
     valor_diarias_display = ""
     valor_diarias_extenso = ""
+    roteiro_card = None
     if oficio.roteiro_id:
+        from roteiros.presenters import apresentar_roteiro_card
+
         roteiro = oficio.roteiro
         for t in roteiro.trechos.all():
             orig = _label_cidade_uf_trecho(t.origem_cidade, t.origem_estado)
@@ -207,6 +210,14 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None):
         if diarias_oficio:
             valor_diarias_display = _format_brl_diarias(diarias_oficio["valor_decimal"])
             valor_diarias_extenso = (diarias_oficio["valor_extenso"] or "").strip()
+        roteiro_card = apresentar_roteiro_card(roteiro, todos_trechos=True)
+        roteiro_card.pop("actions", None)
+        if diarias_oficio:
+            roteiro_card["diaria_moeda"] = valor_diarias_display
+            roteiro_card["valor_diarias_display"] = valor_diarias_display
+            roteiro_card["diaria_extenso"] = valor_diarias_extenso
+            roteiro_card["valor_diarias_extenso"] = valor_diarias_extenso
+            roteiro_card["diaria_vazio"] = False
 
     # Transporte
     veiculo_placa = ""
@@ -391,6 +402,9 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None):
         "temporal_tone": temporal_tone,
         "servidores": servidores_display,
         "servidores_count": len(servidores),
+        "custeio_display": oficio.get_custeio_display(),
+        "transporte": _montar_transporte_resumo_documentos(oficio),
+        "roteiro_card": roteiro_card,
         "veiculo_placa": veiculo_placa,
         "veiculo_modelo": veiculo_modelo,
         "veiculo_display": veiculo_display,
@@ -450,6 +464,7 @@ def _iniciais_nome_servidor(nome: str) -> str:
 def _montar_viajantes_cards_documentos(oficio):
     """Mini-fichas dos servidores vinculados (cadastro real; sem campos inventados)."""
     motorista_pk = oficio.motorista_id
+    termos_pks = set(oficio.servidores_termo_autorizacao.values_list("pk", flat=True))
     cards = []
     qs = oficio.servidores.select_related("cargo", "unidade").order_by("nome")
     for servidor in qs:
@@ -477,6 +492,7 @@ def _montar_viajantes_cards_documentos(oficio):
                 "telefone": tel_m,
                 "email": "",
                 "is_motorista": bool(motorista_pk and servidor.pk == motorista_pk),
+                "has_termo": servidor.pk in termos_pks,
             }
         )
     return cards
@@ -926,7 +942,7 @@ def apresentar_oficio_wizard_documentos_context(oficio):
     if roteiro:
         from roteiros.presenters import apresentar_roteiro_card
 
-        roteiro_card = apresentar_roteiro_card(roteiro)
+        roteiro_card = apresentar_roteiro_card(roteiro, todos_trechos=True)
         roteiro_card.pop("actions", None)
         roteiro_card["subtitle"] = "Roteiro utilizado para geração dos documentos"
         roteiro_card["title"] = " > ".join([sede_rota_label, *destinos_rota_labels])

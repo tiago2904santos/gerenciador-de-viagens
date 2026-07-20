@@ -55,7 +55,9 @@ html[data-theme="light-light"] {
   min-width: 0;
 }
 
-.cv-date-picker__trigger {
+/* Campo de input: chrome de field. Gatilhos action-button com .cv-btn
+   (ex.: "Preencher datas") ficam de fora — herdam o visual do botão. */
+.cv-date-picker__trigger:not(.cv-btn) {
   align-items: center;
   appearance: none;
   background:
@@ -81,16 +83,21 @@ html[data-theme="light-light"] {
     color var(--transition-fast);
 }
 
-.cv-date-picker__trigger:hover {
+.cv-date-picker__trigger:not(.cv-btn):hover {
   background:
     linear-gradient(var(--cv-field-bg-hover), var(--cv-field-bg-hover)) padding-box,
     linear-gradient(var(--cv-field-border-hover, var(--color-border-strong)), var(--cv-field-border-hover, var(--color-border-strong))) border-box;
 }
 
-.cv-date-picker__trigger:focus-visible {
+.cv-date-picker__trigger:not(.cv-btn):focus-visible {
   border-color: transparent;
   box-shadow: var(--cv-field-shadow-focus);
   outline: none;
+}
+
+/* Action-button: alinha ao cv-btn sem perder o gancho do date-picker. */
+.cv-date-picker__trigger.cv-btn {
+  flex: 0 0 auto;
 }
 
 .cv-date-picker__trigger--icon {

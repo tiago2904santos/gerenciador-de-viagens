@@ -1,5 +1,5 @@
 {# Calendário para preencher as datas dos trechos em sequência #}
-{% include "components/forms/cv_date_picker.html" with mode="multi" control_variant="action-button" picker_id="trechos-date-picker" trigger_label="Preencher datas" trigger_aria_label="Preencher datas dos trechos" trigger_class="cv-field-side-action cv-field-side-action--secondary" show_summary=False show_context=True show_confirm=True only %}
+{% include "components/forms/cv_date_picker.html" with mode="multi" control_variant="action-button" picker_id="trechos-date-picker" trigger_label="Preencher datas" trigger_aria_label="Preencher datas dos trechos" trigger_class="cv-btn cv-btn--secondary" show_summary=False show_context=True show_confirm=True only %}
 <template id="trecho-single-date-picker-template">
   {% include "components/forms/cv_date_picker.html" with mode="single" single_label="__LABEL__" single_input_id="__DISPLAY_ID__" single_hidden_id="__HIDDEN_ID__" single_hidden_name="__HIDDEN_NAME__" single_hidden_value="__ISO_VALUE__" initial_date="__INITIAL_DATE__" trecho_date="__ROLE__" only %}
 </template>

@@ -3,8 +3,8 @@
 
 {% block extra_css %}
   {{ block.super }}
-  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260718-cv-summary">
-  <link rel="stylesheet" href="{% static 'css/oficios-documentos-inline.css' %}?v=20260718-cv-summary">
+  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260720-route-shell">
+  <link rel="stylesheet" href="{% static 'css/oficios-documentos-inline.css' %}?v=20260720-doc-cards-termos-menu">
   <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}?v=20260715-assinado">
 {% endblock %}
 
@@ -13,29 +13,36 @@
     {% include "components/ui/feedback/pendencias_card.html" with items=pendencias_documentos lead="Corrija os itens abaixo antes de finalizar o ofício ou gerar DOCX/PDF." only %}
   {% endif %}
 
-  <section class="cv-wizard-section-card cv-form-card oficio-documentos-unified-card" aria-labelledby="oficio-documentos-unified-title">
-    <header class="cv-wizard-section-header">
-      <div class="cv-wizard-section-header__copy">
-        <h2 class="cv-wizard-section-title" id="oficio-documentos-unified-title">Documentos e conferência</h2>
+  <div data-oficio-wizard-documentos>
+    <section class="cv-wizard-section-card cv-form-card cv-wizard-section-card--described oficio-documentos-unified-card oficio-documentos-card" aria-labelledby="oficio-documentos-unified-title">
+      <header class="cv-wizard-section-header">
+        <div class="cv-wizard-section-header__copy">
+          <h2 class="cv-wizard-section-title" id="oficio-documentos-unified-title">Documentos e conferência</h2>
+          <p class="cv-wizard-section-subtitle">Arquivos gerados, resumo e roteiro para revisão final</p>
+        </div>
+      </header>
+
+      <div class="cv-wizard-section-body oficio-documentos-body">
+        {% include "components/ui/forms/form_block.html" with title="Documentos para conferência" description="Visualize e baixe os arquivos gerados." section_id="documentos-conferencia-title" extra_class="oficio-documentos-block oficio-documentos-preview-section document-inline-stack" body_extra_class="oficio-documentos-preview-section__body" body_template="oficios/partials/documentos/_conferencia_body.html" %}
+
+        {% include "components/ui/forms/form_block.html" with title="Resumo do ofício" description="Identificação e custeio." section_id="oficio-documentos-summary-title" extra_class="oficio-documentos-block oficio-documentos-info-section oficio-documentos-summary-section" body_template="oficios/partials/documentos/_resumo_body.html" %}
+
+        {% include "components/ui/forms/form_block.html" with title="Viajantes" description="Equipe vinculada a este ofício." section_id="oficio-documentos-viajantes-title" extra_class="oficio-documentos-block oficio-documentos-info-section oficio-documentos-viajantes-section" body_template="oficios/partials/documentos/_viajantes_body.html" %}
+
+        {% include "components/ui/forms/form_block.html" with title="Viatura e condução" description="Dados do veículo e motorista." section_id="oficio-documentos-viatura-title" extra_class="oficio-documentos-block oficio-documentos-info-section oficio-documentos-viatura-section" body_template="oficios/partials/documentos/_viatura_body.html" %}
+
+        {% include "components/ui/forms/form_block.html" with variant="resource" title=documentos_ctx.roteiro_card.title|default:"Roteiro e diárias" section_id="oficio-documentos-route-title" extra_class="oficio-documentos-block oficio-documentos-route-section" actions_template="oficios/partials/documentos/_roteiro_actions.html" body_template="oficios/partials/documentos/_roteiro_body.html" %}
       </div>
-    </header>
 
-    <div class="cv-wizard-section-body">
-      {% include "components/ui/forms/form_block.html" with title="Documentos para conferência" description="Visualize e baixe os arquivos gerados." section_id="documentos-conferencia-title" extra_class="oficio-documentos-preview-section document-inline-stack" body_extra_class="oficio-documentos-preview-section__body" body_template="oficios/partials/documentos/_conferencia_body.html" %}
-
-      {% include "components/ui/forms/form_block.html" with title="Resumo do ofício" description="Dados administrativos, equipe e transporte." section_id="oficio-documentos-summary-title" extra_class="oficio-documentos-summary-section" body_template="oficios/partials/documentos/_resumo_body.html" %}
-
-      {% include "components/ui/forms/form_block.html" with variant="resource" title="Roteiro e diárias" description="Trechos e resumo financeiro." section_id="oficio-documentos-route-title" extra_class="oficio-documentos-route-section" actions_template="oficios/partials/documentos/_roteiro_actions.html" body_template="oficios/partials/documentos/_roteiro_body.html" %}
-    </div>
-
-    <div class="cv-form-card__footer">
-      {% if mostrar_pendencias %}
-        {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar à lista" secondary_action="save_draft_list" secondary_icon="list" primary_label="Salvar rascunho" primary_action="save_draft_list" primary_icon="document" only %}
-      {% else %}
-        {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar à lista" secondary_action="save_draft_list" secondary_icon="list" primary_label="Finalizar Ofício" primary_action="finalizar" primary_icon="check" only %}
-      {% endif %}
-    </div>
-  </section>
+      <div class="cv-form-card__footer">
+        {% if mostrar_pendencias %}
+          {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar à lista" secondary_action="save_draft_list" secondary_icon="list" primary_label="Salvar rascunho" primary_action="save_draft_list" primary_icon="document" only %}
+        {% else %}
+          {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar à lista" secondary_action="save_draft_list" secondary_icon="list" primary_label="Finalizar Ofício" primary_action="finalizar" primary_icon="check" only %}
+        {% endif %}
+      </div>
+    </section>
+  </div>
 {% endblock %}
 
 {% block wizard_modals %}
@@ -44,5 +51,5 @@
 
 {% block extra_js %}
   {{ block.super }}
-  <script src="{% static 'js/pages/oficios-documentos-inline.js' %}?v=20260715-assinado" defer></script>
+  <script src="{% static 'js/pages/oficios-documentos-inline.js' %}?v=20260720-termos-unified-menu" defer></script>
 {% endblock %}

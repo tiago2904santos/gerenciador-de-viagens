@@ -5,13 +5,50 @@
   {{ block.super }}
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
   <link rel="stylesheet" href="{% static 'css/domain.css' %}?v=20260512">
-  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260720-mapa-loading">
+  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260720-leg-soft-fix">
+{% endblock %}
+
+{# Kill-switch após dark-redesign: só o fundo surface-soft dos inputs nos legs. #}
+{% block extra_css_after_theme %}
+  <style id="oficio-leg-surface-soft">
+    :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+      [data-oficio-wizard-roteiro]
+      .roteiro-trecho-card__leg
+      :is(
+        input.cv-field__control,
+        input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
+        .cv-date-picker__control > input.cv-field__control,
+        .cv-date-picker__control .cv-field__control,
+        .cv-field--readonly .cv-field__control,
+        .cv-field__control[readonly],
+        input[readonly]
+      ),
+    :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+      [data-oficio-wizard-roteiro]
+      #retorno-card
+      .roteiro-trecho-card__leg
+      :is(
+        input.cv-field__control,
+        input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
+        .cv-date-picker__control > input.cv-field__control,
+        .cv-date-picker__control .cv-field__control,
+        .cv-field--readonly .cv-field__control,
+        .cv-field__control[readonly],
+        input[readonly]
+      ) {
+      background: var(--color-surface-soft) !important;
+      border-color: transparent !important;
+      box-shadow: none !important;
+      color: var(--color-text);
+      opacity: 1;
+    }
+  </style>
 {% endblock %}
 
 {% block extra_js %}
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="{% static 'js/roteiros_wizard.js' %}?v=20260512"></script>
-  <script type="module" src="{% static 'js/roteiros.js' %}?v=20260720-sem-resumo-roteiro"></script>
+  <script type="module" src="{% static 'js/roteiros.js' %}?v=20260720-date-picker-header"></script>
   <script src="{% static 'js/roteiros-map.js' %}?v=20260717-load-saved-route-map"></script>
 {% endblock %}
 

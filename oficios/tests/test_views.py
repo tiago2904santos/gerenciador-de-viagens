@@ -233,9 +233,11 @@ class OficioViewsTests(TestCase):
         oficio = Oficio.objects.create(numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
         response = self.client.get(reverse("oficios:wizard_documentos", args=[oficio.pk]))
         html = response.content.decode("utf-8")
-        preview_start = html.index('<section class="cv-wizard-section-card oficio-documentos-preview-section document-inline-stack"')
-        summary_start = html.index('<section class="cv-wizard-section-card oficio-documentos-summary-section"', preview_start)
-        footer_start = html.index('<section class="cv-card-footer-section">', preview_start, summary_start)
+        preview_start = html.index('oficio-documentos-preview-section document-inline-stack')
+        self.assertIn("oficio-documentos-summary-section", html[preview_start:])
+        self.assertIn("oficio-documentos-viajantes-section", html[preview_start:])
+        self.assertIn("oficio-documentos-viatura-section", html[preview_start:])
+        footer_start = html.index('<section class="cv-card-footer-section">', preview_start)
         footer_end = html.index('</section>', footer_start) + len('</section>')
         footer = html[footer_start:footer_end]
 
@@ -261,9 +263,9 @@ class OficioViewsTests(TestCase):
         oficio = Oficio.objects.create(numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
         response = self.client.get(reverse("oficios:wizard_documentos", args=[oficio.pk]))
         html = response.content.decode("utf-8")
-        preview_start = html.index('<section class="cv-wizard-section-card oficio-documentos-preview-section document-inline-stack"')
-        summary_start = html.index('<section class="cv-wizard-section-card oficio-documentos-summary-section"', preview_start)
-        footer_start = html.index('<section class="cv-card-footer-section">', preview_start, summary_start)
+        preview_start = html.index('oficio-documentos-preview-section document-inline-stack')
+        self.assertIn("oficio-documentos-summary-section", html[preview_start:])
+        footer_start = html.index('<section class="cv-card-footer-section">', preview_start)
         footer_end = html.index('</section>', footer_start) + len('</section>')
         footer = html[footer_start:footer_end]
 
@@ -394,8 +396,9 @@ class OficioViewsTests(TestCase):
         )
         oficio.servidores.add(self.servidor)
         response = self.client.get(reverse("oficios:wizard_documentos", args=[oficio.pk]))
-        self.assertContains(response, "oficio-documentos-traveller-line--motorista")
+        self.assertContains(response, "oficio-documentos-traveller-tile--motorista")
         self.assertNotContains(response, "Motorista carona")
+        self.assertNotContains(response, "oficio-documentos-fact--driver-external")
         self.assertNotContains(response, "oficio-documentos-vehicle-executive__driver--external")
 
     @mock.patch("documentos.services.warm_cache.ensure_document_artifact_cached")
@@ -410,9 +413,10 @@ class OficioViewsTests(TestCase):
         )
         oficio.servidores.add(self.servidor)
         response = self.client.get(reverse("oficios:wizard_documentos", args=[oficio.pk]))
-        self.assertContains(response, "oficio-documentos-vehicle-executive__driver--external")
+        self.assertContains(response, "oficio-documentos-fact--driver-external")
         self.assertContains(response, "Motorista carona")
         self.assertContains(response, "MOTORISTA CARONA")
+        self.assertNotContains(response, "oficio-documentos-vehicle-executive__driver--external")
 
     @mock.patch("documentos.services.warm_cache.ensure_document_artifact_cached")
     @mock.patch("oficios.services.validar_oficio_para_documento", return_value={"status": "complete", "pendencias": []})

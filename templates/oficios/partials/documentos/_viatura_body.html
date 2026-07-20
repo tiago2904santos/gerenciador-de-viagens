@@ -1,0 +1,34 @@
+<article class="oficio-documentos-card oficio-documentos-card--vehicle" aria-label="Viatura e condução">
+  <div class="oficio-documentos-card__body">
+    {% with t=documentos_ctx.transporte %}
+      <dl class="oficio-documentos-facts oficio-documentos-facts--admin oficio-documentos-facts--vehicle">
+        <div class="oficio-documentos-fact">
+          <dt>Placa</dt>
+          <dd class="oficio-documentos-viatura-placa-value">{{ t.viatura|default:t.placa }}</dd>
+        </div>
+        <div class="oficio-documentos-fact">
+          <dt>Modelo</dt>
+          <dd class="oficio-documentos-viatura-modelo-value">{{ t.modelo }}</dd>
+        </div>
+        <div class="oficio-documentos-fact">
+          <dt>Tipo</dt>
+          <dd>{{ t.tipo_viatura|default:t.tipo }}</dd>
+        </div>
+        <div class="oficio-documentos-fact">
+          <dt>Combustível</dt>
+          <dd>{{ t.combustivel }}</dd>
+        </div>
+        <div class="oficio-documentos-fact">
+          <dt>Unidade lotada</dt>
+          <dd>{{ t.unidade }}</dd>
+        </div>
+        {% if t.mostrar_motorista_externo %}
+          <div class="oficio-documentos-fact oficio-documentos-fact--driver-external">
+            <dt>Motorista carona</dt>
+            <dd>{{ t.motorista }}</dd>
+          </div>
+        {% endif %}
+      </dl>
+    {% endwith %}
+  </div>
+</article>

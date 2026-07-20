@@ -36,6 +36,12 @@
       if (anchor.closest("[data-oficio-wizard-roteiro]")) {
         menu.setAttribute("data-oficio-wizard-roteiro", "");
       }
+      if (anchor.closest("[data-oficio-wizard-justificativa]")) {
+        menu.setAttribute("data-oficio-wizard-justificativa", "");
+      }
+      if (anchor.closest("[data-oficio-wizard-documentos]")) {
+        menu.setAttribute("data-oficio-wizard-documentos", "");
+      }
       document.body.appendChild(menu);
       menu.dataset.cvFloatingActive = "true";
       position();
@@ -57,6 +63,8 @@
       delete menu.dataset.cvFloatingActive;
       menu.removeAttribute("data-oficio-wizard-step1");
       menu.removeAttribute("data-oficio-wizard-roteiro");
+      menu.removeAttribute("data-oficio-wizard-justificativa");
+      menu.removeAttribute("data-oficio-wizard-documentos");
       if (placeholder && placeholder.parentNode) {
         placeholder.parentNode.insertBefore(menu, placeholder);
         placeholder.remove();

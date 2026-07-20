@@ -407,6 +407,7 @@ html[data-theme="dark"] {
 
 .cv-icon-btn--complete,
 .cv-icon-btn--sign.is-assinado,
+.cv-icon-btn--settings.is-assinado,
 .cv-icon-btn--whatsapp {
   background: var(--action-success-bg);
   border-color: var(--action-success-border);

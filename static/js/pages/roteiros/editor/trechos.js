@@ -10,6 +10,26 @@ export const TRECHOS_EMPTY_HTML =
 
 export const TRECHO_CARD_SELECTOR = '.roteiro-trecho-card[data-key]';
 
+function isRoteiroOficio() {
+  return !!document.querySelector('.roteiro-editor--oficio');
+}
+
+/** Empty state: no ofício vira um bloco irmão (mesmo padrão visual dos trechos). */
+export function getTrechosEmptyHtml() {
+  if (!isRoteiroOficio()) return TRECHOS_EMPTY_HTML;
+  return (
+    '<section class="cv-form-block cv-form-block--resource roteiro-editor__section--trechos-empty oficio-roteiro-block" aria-labelledby="sec-trechos-empty">' +
+    '<header class="cv-form-block__header">' +
+    '<div class="cv-form-block__copy">' +
+    '<h4 class="cv-form-block__title" id="sec-trechos-empty">Trechos</h4>' +
+    '<p class="cv-form-block__description">Saídas e chegadas entre sede e destinos.</p>' +
+    '</div></header>' +
+    '<div class="cv-form-block__body">' +
+    TRECHOS_EMPTY_HTML +
+    '</div></section>'
+  );
+}
+
 function isoToDisplayDate(iso) {
   var raw = String(iso || '').trim();
   if (!raw) return '';
@@ -82,6 +102,7 @@ function buildLegPanel(ordem, role, title, cityName, dateValue, timeValue, esc) 
  */
 export function buildTrechoCard(trecho, value, esc, formatDurationInput) {
   var o = trecho.ordem;
+  var num = o + 1;
   var dist = value.distancia_km || '';
   var cru = value.tempo_cru_estimado_min || '';
   var add =
@@ -93,8 +114,11 @@ export function buildTrechoCard(trecho, value, esc, formatDurationInput) {
   var fmt = typeof formatDurationInput === 'function' ? formatDurationInput : function (v) {
     return v || '';
   };
+  var oficio = isRoteiroOficio();
+  var routeText = esc(trecho.origem_nome) + ' \u2192 ' + esc(trecho.destino_nome);
+  var titleId = 'sec-trecho-' + num;
 
-  return (
+  var article =
     '<article class="roteiro-trecho-card roteiro-deslocamento" data-key="' +
     esc(trecho.key) +
     '" data-trecho-id="' +
@@ -114,15 +138,15 @@ export function buildTrechoCard(trecho, value, esc, formatDurationInput) {
     '" data-destino-cidade-id="' +
     esc(trecho.destino_cidade_id) +
     '">' +
-    '<div class="roteiro-leg-label">' +
-    '<span class="roteiro-leg-label__num">Trecho ' +
-    (o + 1) +
-    '</span>' +
-    '<span class="roteiro-leg-label__route">' +
-    esc(trecho.origem_nome) +
-    ' \u2192 ' +
-    esc(trecho.destino_nome) +
-    '</span></div>' +
+    (oficio
+      ? ''
+      : '<div class="roteiro-leg-label">' +
+        '<span class="roteiro-leg-label__num">Trecho ' +
+        num +
+        '</span>' +
+        '<span class="roteiro-leg-label__route">' +
+        routeText +
+        '</span></div>') +
     '<div class="roteiro-deslocamento__body">' +
     '<input type="hidden" name="trecho_' +
     o +
@@ -217,9 +241,35 @@ export function buildTrechoCard(trecho, value, esc, formatDurationInput) {
     '_rota_fonte" value="' +
     esc(fonte) +
     '">' +
-    '</div></article>'
+    '</div></article>';
+
+  if (!oficio) return article;
+
+  return (
+    '<section class="cv-form-block cv-form-block--resource roteiro-editor__section--trecho oficio-roteiro-block" aria-labelledby="' +
+    titleId +
+    '">' +
+    '<header class="cv-form-block__header">' +
+    '<div class="cv-form-block__copy">' +
+    '<h4 class="cv-form-block__title" id="' +
+    titleId +
+    '">Trecho ' +
+    num +
+    '</h4>' +
+    '<p class="cv-form-block__description">' +
+    routeText +
+    '</p>' +
+    '</div>' +
+    (num === 1
+      ? '<div class="cv-form-block__actions" data-trechos-date-picker-slot></div>'
+      : '') +
+    '</header>' +
+    '<div class="cv-form-block__body">' +
+    article +
+    '</div></section>'
   );
 }
+
 
 export function initTrechosFields(container) {
   var root = container || document.getElementById('trechos-gerados-container');
@@ -266,6 +316,7 @@ export function createTrechosModule() {
     initTrechosFields: initTrechosFields,
     setTrechoDateValue: setTrechoDateValue,
     queryTrechoCards: queryTrechoCards,
+    getTrechosEmptyHtml: getTrechosEmptyHtml,
     TRECHOS_EMPTY_HTML: TRECHOS_EMPTY_HTML,
     TRECHO_CARD_SELECTOR: TRECHO_CARD_SELECTOR,
   };

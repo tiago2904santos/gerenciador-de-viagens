@@ -1,13 +1,13 @@
 import { createEditorState } from './state.js';
 import {
   createTrechosModule,
-  TRECHOS_EMPTY_HTML,
+  getTrechosEmptyHtml,
   TRECHO_CARD_SELECTOR,
   buildTrechoCard,
   initTrechosFields,
   setTrechoDateValue,
   queryTrechoCards,
-} from './trechos.js?v=20260719b-deslocamentos-flat';
+} from './trechos.js?v=20260720-date-picker-header';
 import { createRetornoModule } from './retorno.js';
 import { createDiariasModule } from './diarias.js';
 import { createMapaModule } from './mapa.js';
@@ -109,11 +109,33 @@ export function initRoteirosEditor() {
   function getTrechoCards() {
     return queryTrechoCards($('trechos-gerados-container'));
   }
+  function parkTrechosDatePicker() {
+    var picker = getTrechosDatePicker();
+    var park = $('trechos-date-picker-park');
+    if (!picker || !park) return;
+    if (picker.parentNode !== park) park.appendChild(picker);
+  }
+  function placeTrechosDatePickerInFirstHeader() {
+    var picker = getTrechosDatePicker();
+    var park = $('trechos-date-picker-park');
+    if (!picker || !park) return;
+    var slot = document.querySelector(
+      '#trechos-gerados-container [data-trechos-date-picker-slot]'
+    );
+    if (slot) {
+      slot.appendChild(picker);
+      return;
+    }
+    if (picker.parentNode !== park) park.appendChild(picker);
+  }
   function mountTrechosHtml(html) {
     var container = $('trechos-gerados-container');
     if (!container) return;
+    // Preserva #trechos-date-picker fora do container antes do innerHTML.
+    parkTrechosDatePicker();
     container.innerHTML = html;
     initTrechosFields(container);
+    placeTrechosDatePickerInFirstHeader();
   }
   function refreshSelectPickers(root) {
     if (window.OficioWizard && typeof window.OficioWizard.refreshSelectPickers === 'function') {
@@ -430,7 +452,7 @@ export function initRoteirosEditor() {
   function clearLoopGeneratedTrechos() {
     // Ao sair do bate-volta, remove os trechos/retorno gerados pelo loop
     // e remonta a partir de sede+destinos (modo normal).
-    mountTrechosHtml(TRECHOS_EMPTY_HTML);
+    mountTrechosHtml(getTrechosEmptyHtml());
     [
       'id_retorno_saida_data',
       'id_retorno_saida_hora',
@@ -1260,7 +1282,7 @@ export function initRoteirosEditor() {
         });
       }
       if (!explicitTrechos.length) {
-        mountTrechosHtml(TRECHOS_EMPTY_HTML);
+        mountTrechosHtml(getTrechosEmptyHtml());
         updateRetornoCities();
         recalcRetorno(false);
         updateResumo();
@@ -1323,7 +1345,7 @@ export function initRoteirosEditor() {
     var sedeNome = selectedText($('id_origem_cidade'));
     var destinos = getDestinos().filter(function(d) { return d.estado_id && d.cidade_id; });
     if (!sedeEid || !sedeCid || !destinos.length) {
-      mountTrechosHtml(TRECHOS_EMPTY_HTML);
+      mountTrechosHtml(getTrechosEmptyHtml());
       updateRetornoCities();
       recalcRetorno(false);
       updateResumo();

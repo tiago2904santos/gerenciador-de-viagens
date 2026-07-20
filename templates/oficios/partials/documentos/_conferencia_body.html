@@ -84,51 +84,29 @@
   <details class="document-inline-card document-inline-card--termos">
     <summary class="document-inline-card__header">
       <span class="document-inline-card__title">Termos de Autorização</span>
-      {% if not di.termos_vazio %}
+      {% if not di.termos_vazio and di.termos|length > 1 %}
         <span class="document-inline-card__header-end">
           <span class="document-inline-actions document-inline-actions--header" aria-label="Ações dos termos">
-            {% if di.termos|length == 1 %}
-              {% for t in di.termos %}
-                {% if t.disponivel %}
-                  <button class="cv-icon-btn cv-icon-btn--settings" type="button"
-                          aria-label="Abrir ações do termo"
-                          aria-haspopup="true"
-                          aria-expanded="false"
-                          data-tooltip="Visualizar e baixar"
-                          data-action-menu-trigger
-                          data-action-menu-target="wizard-termos-document-menu">
-                    {% include "components/ui/icons/icon.html" with icon="folder" only %}
-                  </button>
-                  <div class="cv-action-menu cv-action-menu--rich" id="wizard-termos-document-menu" role="menu" hidden>
-                    {% include "components/ui/menus/rich_menu_header.html" with title="Termo de autorização" subtitle=t.titulo icon="folder" only %}
-                    {% include "components/ui/menus/rich_menu_link.html" with href=t.inline_url title="Visualizar termo" description="Abrir o documento no navegador" icon="eye" tone="preview" target_blank=True only %}
-                    {% include "components/ui/menus/rich_menu_link.html" with href=t.download_pdf_url title="Baixar PDF" description="Documento pronto para assinatura" icon="pdf" tone="pdf" download=True only %}
-                    {% include "components/ui/menus/rich_menu_link.html" with href=t.download_docx_url title="Baixar DOCX" description="Arquivo editável do termo" icon="docx" tone="docx" download=True only %}
-                  </div>
-                {% endif %}
-              {% endfor %}
-            {% else %}
-              <button class="cv-icon-btn cv-icon-btn--settings" type="button"
-                      aria-label="Abrir ações dos termos"
-                      aria-haspopup="true"
-                      aria-expanded="false"
-                      data-tooltip="Visualizar e baixar"
-                      data-action-menu-trigger
-                      data-action-menu-target="wizard-termos-document-menu">
-                {% include "components/ui/icons/icon.html" with icon="folder" only %}
+            <button class="cv-icon-btn cv-icon-btn--settings" type="button"
+                    aria-label="Abrir ações dos termos"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                    data-tooltip="Visualizar e baixar"
+                    data-action-menu-trigger
+                    data-action-menu-target="wizard-termos-document-menu">
+              {% include "components/ui/icons/icon.html" with icon="folder" only %}
+            </button>
+            <div class="cv-action-menu cv-action-menu--rich" id="wizard-termos-document-menu" role="menu" hidden>
+              {% include "components/ui/menus/rich_menu_header.html" with title="Termos de autorização" subtitle="Todos os servidores" icon="folder" only %}
+              <button class="cv-action-menu__item cv-action-menu__item--rich" type="button" data-open-all-termos role="menuitem">
+                <span class="cv-action-menu__item-icon cv-action-menu__item-icon--preview" aria-hidden="true">
+                  {% include "components/ui/icons/icon.html" with icon="eye" only %}
+                </span>
+                <span class="cv-action-menu__item-copy"><strong>Visualizar termos</strong><small>Abrir todos os documentos disponíveis</small></span>
               </button>
-              <div class="cv-action-menu cv-action-menu--rich" id="wizard-termos-document-menu" role="menu" hidden>
-                {% include "components/ui/menus/rich_menu_header.html" with title="Termos de autorização" subtitle="Todos os servidores" icon="folder" only %}
-                <button class="cv-action-menu__item cv-action-menu__item--rich" type="button" data-open-all-termos role="menuitem">
-                  <span class="cv-action-menu__item-icon cv-action-menu__item-icon--preview" aria-hidden="true">
-                    {% include "components/ui/icons/icon.html" with icon="eye" only %}
-                  </span>
-                  <span class="cv-action-menu__item-copy"><strong>Visualizar termos</strong><small>Abrir todos os documentos disponíveis</small></span>
-                </button>
-                {% include "components/ui/menus/rich_menu_link.html" with href=di.termos_download_todos_pdf_url title="Baixar PDFs" description="Salvar todos os termos em PDF" icon="pdf" tone="pdf" download=True data_download_all_termos=True only %}
-                {% include "components/ui/menus/rich_menu_link.html" with href=di.termos_download_todos_docx_url title="Baixar DOCXs" description="Salvar todos os arquivos editáveis" icon="docx" tone="docx" download=True only %}
-              </div>
-            {% endif %}
+              {% include "components/ui/menus/rich_menu_link.html" with href=di.termos_download_todos_pdf_url title="Baixar PDFs" description="Salvar todos os termos em PDF" icon="pdf" tone="pdf" download=True data_download_all_termos=True only %}
+              {% include "components/ui/menus/rich_menu_link.html" with href=di.termos_download_todos_docx_url title="Baixar DOCXs" description="Salvar todos os arquivos editáveis" icon="docx" tone="docx" download=True only %}
+            </div>
           </span>
         </span>
       {% endif %}
@@ -144,19 +122,50 @@
                 {{ t.titulo }}
               </span>
               <span class="document-inline-card__header-end">
-                <span class="document-inline-actions document-inline-actions--header" aria-label="Anexar assinado — {{ t.servidor_nome }}">
+                <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do termo — {{ t.servidor_nome }}">
                   <button
+                    class="cv-icon-btn cv-icon-btn--settings{% if t.assinado %} is-assinado{% endif %}"
                     type="button"
-                    class="cv-icon-btn cv-icon-btn--sign{% if t.assinado %} is-assinado{% endif %}"
-                    data-attach-signed-trigger
-                    data-attach-signed-url="{{ t.anexar_assinado_url }}"
-                    data-attach-signed-doc-label="Termo de {{ t.servidor_nome }}"
-                    data-attach-signed-current-name="{{ t.assinado_nome_original }}"
-                    data-attach-signed-current-view-url="{{ t.assinado_view_url }}"
-                    data-attach-signed-current-remove-url="{{ t.remover_assinado_url }}"
-                    aria-label="{% if t.assinado %}Termo assinado — gerenciar{% else %}Anexar assinado{% endif %}"
-                    data-tooltip="{% if t.assinado %}Assinado — clique para gerenciar{% else %}Anexar assinado{% endif %}"
-                  >{% include "components/ui/icons/icon.html" with icon="sign" only %}</button>
+                    aria-label="Abrir ações do termo de {{ t.servidor_nome }}"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                    data-tooltip="{% if t.assinado %}Termo assinado — ações{% else %}Visualizar, baixar e anexar{% endif %}"
+                    data-action-menu-trigger
+                    data-action-menu-target="wizard-termo-document-menu-{{ forloop.counter }}"
+                  >{% include "components/ui/icons/icon.html" with icon="folder" only %}</button>
+                  <div class="cv-action-menu cv-action-menu--rich" id="wizard-termo-document-menu-{{ forloop.counter }}" role="menu" hidden>
+                    {% if t.assinado %}
+                      {% include "components/ui/menus/rich_menu_header.html" with title="Termo assinado" subtitle=t.titulo icon="sign" only %}
+                    {% else %}
+                      {% include "components/ui/menus/rich_menu_header.html" with title="Termo de autorização" subtitle=t.titulo icon="folder" only %}
+                    {% endif %}
+                    {% if t.disponivel %}
+                      {% include "components/ui/menus/rich_menu_link.html" with href=t.inline_url title="Visualizar termo" description="Abrir o documento no navegador" icon="eye" tone="preview" target_blank=True only %}
+                      {% include "components/ui/menus/rich_menu_link.html" with href=t.download_pdf_url title="Baixar PDF" description="Documento pronto para assinatura" icon="pdf" tone="pdf" download=True only %}
+                      {% include "components/ui/menus/rich_menu_link.html" with href=t.download_docx_url title="Baixar DOCX" description="Arquivo editável do termo" icon="docx" tone="docx" download=True only %}
+                    {% endif %}
+                    {% if t.anexar_assinado_url %}
+                      <button
+                        type="button"
+                        class="cv-action-menu__item cv-action-menu__item--rich{% if t.assinado %} is-assinado{% endif %}"
+                        role="menuitem"
+                        data-attach-signed-trigger
+                        data-attach-signed-url="{{ t.anexar_assinado_url }}"
+                        data-attach-signed-doc-label="Termo de {{ t.servidor_nome }}"
+                        data-attach-signed-current-name="{{ t.assinado_nome_original }}"
+                        data-attach-signed-current-view-url="{{ t.assinado_view_url }}"
+                        data-attach-signed-current-remove-url="{{ t.remover_assinado_url }}"
+                      >
+                        <span class="cv-action-menu__item-icon cv-action-menu__item-icon--success" aria-hidden="true">
+                          {% include "components/ui/icons/icon.html" with icon="sign" only %}
+                        </span>
+                        <span class="cv-action-menu__item-copy">
+                          <strong>{% if t.assinado %}Gerenciar assinado{% else %}Anexar termo assinado{% endif %}</strong>
+                          <small>{% if t.assinado %}Visualizar, substituir ou remover{% else %}Enviar o PDF depois da assinatura{% endif %}</small>
+                        </span>
+                      </button>
+                    {% endif %}
+                  </div>
                 </span>
               </span>
             </summary>

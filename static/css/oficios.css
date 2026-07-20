@@ -1702,23 +1702,23 @@
 .oficio-documentos-summary__status {
   border-radius: var(--radius-pill);
   flex-shrink: 0;
-  font-size: var(--font-size-xs);
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  padding: var(--space-2) var(--space-4);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 4px 10px;
   text-transform: uppercase;
 }
 
 .oficio-documentos-summary__status--ok {
-  background: var(--color-success-soft);
-  border: 1px solid var(--color-success);
-  color: var(--color-success);
+  background: color-mix(in srgb, var(--color-success) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-success) 32%, transparent);
+  color: color-mix(in srgb, var(--color-success) 82%, var(--color-heading));
 }
 
 .oficio-documentos-summary__status--warning {
-  background: var(--color-danger-soft);
-  border: 1px solid var(--color-danger);
-  color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-danger) 28%, transparent);
+  color: color-mix(in srgb, var(--color-danger) 78%, var(--color-heading));
 }
 
 .oficio-documentos-grid {
@@ -1771,55 +1771,174 @@
   min-width: 0;
 }
 
-/* ── Viajantes — flex dinâmico por quantidade ──────────────────────── */
+/* ── Viajantes (Documentos) — tiles iguais aos facts do Resumo ──────── */
+.oficio-documentos-travellers-grid {
+  display: grid;
+  gap: var(--space-2);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  min-width: 0;
+}
+
+.oficio-documentos-travellers-grid--single {
+  grid-template-columns: 1fr;
+}
+
+.oficio-documentos-travellers-grid:not(.oficio-documentos-travellers-grid--single)
+  > .oficio-documentos-traveller-tile:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+.oficio-documentos-traveller-tile {
+  align-items: center;
+  background: var(--color-card-muted);
+  border: 1px solid var(--color-border-soft);
+  border-radius: 10px;
+  column-gap: 12px;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  min-width: 0;
+  padding: 10px 12px;
+}
+
+/* Motorista: mesmos tokens do roster Equipe (tint + borda + filete) */
+.oficio-documentos-traveller-tile--motorista {
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface-muted, var(--color-card-muted)));
+  border-color: var(--color-accent-border-soft, color-mix(in srgb, var(--color-accent) 40%, var(--color-border-soft)));
+  box-shadow: inset 4px 0 0 var(--color-accent);
+}
+
+.oficio-documentos-traveller-tile__avatar {
+  align-items: center;
+  background: color-mix(in srgb, var(--color-heading) 8%, transparent);
+  border: 1px solid var(--color-border-soft);
+  border-radius: 10px;
+  color: var(--color-heading);
+  display: inline-flex;
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+  height: 40px;
+  justify-content: center;
+  letter-spacing: 0.04em;
+  width: 40px;
+}
+
+.oficio-documentos-traveller-tile--motorista .oficio-documentos-traveller-tile__avatar {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-on-accent, #081522);
+}
+
+.oficio-documentos-traveller-tile__main {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.oficio-documentos-traveller-tile__title-row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+}
+
+.oficio-documentos-traveller-tile__name {
+  color: var(--color-heading);
+  font-size: var(--font-size-sm);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.oficio-documentos-traveller-tile__badge {
+  align-items: center;
+  background: var(--color-accent);
+  border-radius: 999px;
+  color: var(--color-on-accent, #081522);
+  display: inline-flex;
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  min-height: 21px;
+  padding: 2px 8px;
+  text-transform: uppercase;
+}
+
+.oficio-documentos-traveller-tile__meta {
+  color: var(--color-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  line-height: 1.3;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.oficio-documentos-traveller-tile__termo {
+  align-items: center;
+  align-self: center;
+  border-left: 1px solid var(--color-border-soft);
+  color: var(--color-muted-strong, var(--color-muted));
+  display: inline-flex;
+  flex-shrink: 0;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  gap: 6px;
+  grid-column: 3;
+  line-height: 1.3;
+  margin-left: auto;
+  min-height: 32px;
+  padding-left: 10px;
+  white-space: nowrap;
+}
+
+.oficio-documentos-traveller-tile__termo-dot {
+  background: currentColor;
+  border-radius: 50%;
+  flex-shrink: 0;
+  height: 7px;
+  width: 7px;
+}
+
+.oficio-documentos-traveller-tile__termo--sim {
+  color: var(--color-success);
+}
+
+.oficio-documentos-traveller-tile__termo--nao {
+  color: var(--color-danger);
+}
+
+/* Legado (prestações / cards antigos) — mantém layout de linhas */
 .oficio-documentos-travellers-lines {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
 }
 
-/* ── Viajantes — card compacto ─────────────────────────────────────── */
 .oficio-documentos-traveller-line {
   background: var(--color-card-muted);
   border: 1px solid var(--color-border-soft);
-  border-radius: var(--radius-control);
+  border-radius: 10px;
   display: flex;
-  flex-basis: 30%;   /* padrão: 3 por linha, n5+ */
+  flex-basis: 45%;
   flex-direction: column;
   flex-grow: 1;
   flex-shrink: 0;
-  gap: 3px;
+  gap: 2px;
   min-width: 0;
-  padding: var(--space-3) var(--space-4);
+  padding: 10px 12px;
 }
 
-/* ── Card do motorista: tom dourado no tema escuro ─────────────── */
+/* Motorista (legado lines): só filete — mesmo fundo do line base */
 .oficio-documentos-traveller-line--motorista {
-  background:   color-mix(in srgb, var(--color-accent) 9%, var(--color-card-muted));
-  border-color: color-mix(in srgb, var(--color-accent) 40%, var(--color-border-soft));
+  box-shadow: inset 2px 0 0 var(--color-accent);
 }
-
-.oficio-documentos-traveller-line--motorista .oficio-documentos-traveller-line__name {
-  color: var(--color-accent);
-}
-
-/* tema claro: volta ao neutro */
-html[data-theme="light"] .oficio-documentos-traveller-line--motorista {
-  background:   var(--color-card-muted);
-  border-color: var(--color-border-soft);
-}
-html[data-theme="light"] .oficio-documentos-traveller-line--motorista .oficio-documentos-traveller-line__name {
-  color: var(--color-heading);
-}
-
-/* flex-basis de 30% → cabe exatamente 3 por linha (3×30%=90%<100%, 4×30%=120%>100%) */
-/* flex-basis de 45% → cabe exatamente 2 por linha (2×45%=90%<100%, 3×45%=135%>100%) */
-/* flex-grow: 1 → última linha preenche a largura restante automaticamente         */
-
-.oficio-documentos-travellers-lines--n1 .oficio-documentos-traveller-line { flex-basis: 100%; }
-.oficio-documentos-travellers-lines--n2 .oficio-documentos-traveller-line { flex-basis: 45%; }
-.oficio-documentos-travellers-lines--n3 .oficio-documentos-traveller-line { flex-basis: 30%; }
-.oficio-documentos-travellers-lines--n4 .oficio-documentos-traveller-line { flex-basis: 45%; }
 
 .oficio-documentos-traveller-line__name-row {
   align-items: center;
@@ -1844,20 +1963,6 @@ html[data-theme="light"] .oficio-documentos-traveller-line--motorista .oficio-do
   font-weight: 500;
   line-height: 1.3;
   min-width: 0;
-}
-
-.oficio-documentos-traveller-line__badge {
-  background: var(--color-success-soft);
-  border: 1px solid var(--color-success);
-  border-radius: var(--radius-pill);
-  color: var(--color-success);
-  flex-shrink: 0;
-  font-size: var(--font-size-xs);
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  padding: var(--space-1) var(--space-2);
-  text-transform: uppercase;
-  white-space: nowrap;
 }
 
 .oficio-documentos-travellers-empty {
@@ -1972,13 +2077,17 @@ html[data-theme="light"] .oficio-documentos-traveller-line--motorista .oficio-do
 }
 
 /* ── Responsividade — viajantes ────────────────────────────────────── */
-@media (max-width: 599px) {
+@media (max-width: 720px) {
+  .oficio-documentos-travellers-grid {
+    grid-template-columns: 1fr;
+  }
+
   .oficio-documentos-traveller-line {
     flex-basis: 100%;
   }
 }
 
-@media (min-width: 600px) and (max-width: 799px) {
+@media (min-width: 721px) and (max-width: 799px) {
   .oficio-documentos-traveller-line {
     flex-basis: 45%;
   }
@@ -2017,8 +2126,8 @@ html[data-theme="light"] .oficio-documentos-traveller-line--motorista .oficio-do
 
 .oficio-documentos-card__title {
   color: var(--color-heading);
-  font-size: var(--font-size-md);
-  font-weight: 800;
+  font-size: 0.95rem;
+  font-weight: 700;
   letter-spacing: -0.01em;
   margin: 0 0 var(--space-1);
 }
@@ -2026,10 +2135,10 @@ html[data-theme="light"] .oficio-documentos-traveller-line--motorista .oficio-do
 .oficio-documentos-card__subtitle {
   color: var(--color-muted);
   font-size: var(--font-size-xs);
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  font-weight: 500;
+  letter-spacing: 0;
   margin: 0;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .oficio-documentos-card__body {
@@ -2061,8 +2170,8 @@ html[data-theme="light"] .oficio-documentos-traveller-line--motorista .oficio-do
 .oficio-documentos-fact {
   background: var(--color-card-muted);
   border: 1px solid var(--color-border-soft);
-  border-radius: var(--radius-control);
-  padding: var(--space-3);
+  border-radius: 10px;
+  padding: 10px 12px;
 }
 
 .oficio-documentos-fact dt {
@@ -2091,18 +2200,18 @@ html[data-theme="light"] .oficio-documentos-traveller-line--motorista .oficio-do
   text-transform: uppercase;
 }
 
-/* Resumo de roteiro (etapa documentos) — alinhado aos cartões da etapa documentos */
+/* Resumo de roteiro (etapa documentos) — shell transparente; poço só nos tiles internos */
 .oficio-documentos-route-card {
-  background: var(--color-card);
-  border: 1px solid var(--color-border-soft);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
   box-sizing: border-box;
   display: grid;
   gap: var(--space-2);
   margin: 0;
-  overflow: hidden;
-  padding: var(--space-4);
+  overflow: visible;
+  padding: 0;
 }
 
 .oficio-documentos-route-card__head {
@@ -3058,22 +3167,80 @@ html[data-theme="dark"] [data-oficio-wizard-step1] .cv-search-picker {
   --driver-text:   var(--color-accent);
 }
 
+/* Equipe (step1): cards selecionados em até 2 colunas quando houver espaço.
+   Escopo restrito ao roster do step1 — outros pickers (ex.: roteiro) seguem 1 coluna. */
+[data-oficio-wizard-step1] .oficio-step1-body
+  .cv-search-picker--people.cv-search-picker--roster
+  .cv-search-picker__selected-list {
+  display: grid;
+  gap: var(--space-2, 8px);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  min-width: 0;
+}
+
+[data-oficio-wizard-step1] .oficio-step1-body
+  .cv-search-picker--people.cv-search-picker--roster
+  .cv-search-picker__selected-card {
+  min-width: 0;
+}
+
+[data-oficio-wizard-step1] .oficio-step1-body
+  .cv-search-picker--people.cv-search-picker--roster
+  .cv-search-picker__selected-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+[data-oficio-wizard-step1] .oficio-step1-body
+  .cv-search-picker--people.cv-search-picker--roster
+  .cv-search-picker__selected-card:only-child,
+[data-oficio-wizard-step1] .oficio-step1-body
+  .cv-search-picker--people.cv-search-picker--roster
+  .cv-search-picker__selected-card:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 720px) {
+  [data-oficio-wizard-step1] .oficio-step1-body
+    .cv-search-picker--people.cv-search-picker--roster
+    .cv-search-picker__selected-list {
+    grid-template-columns: 1fr;
+  }
+
+  [data-oficio-wizard-step1] .oficio-step1-body
+    .cv-search-picker--people.cv-search-picker--roster
+    .cv-search-picker__selected-card:only-child,
+  [data-oficio-wizard-step1] .oficio-step1-body
+    .cv-search-picker--people.cv-search-picker--roster
+    .cv-search-picker__selected-card:last-child:nth-child(odd) {
+    grid-column: auto;
+  }
+}
+
 /* ── Etapa 1 / Roteiro: painéis por seção (layout estrutural) ─ */
-:is([data-oficio-wizard-step1], [data-oficio-wizard-roteiro]) :is(.oficio-step1-body, .oficio-roteiro-body) {
+.page-shell--wizard.oficio-wizard {
+  --stepper-missing-bg: color-mix(in srgb, var(--color-danger) 10%, transparent);
+  --stepper-missing-border: color-mix(in srgb, var(--color-danger) 28%, transparent);
+  --stepper-missing-color: color-mix(in srgb, var(--color-danger) 78%, var(--color-heading));
+  --stepper-status-missing-color: color-mix(in srgb, var(--color-danger) 68%, var(--color-muted));
+}
+
+:is([data-oficio-wizard-step1], [data-oficio-wizard-roteiro], [data-oficio-wizard-justificativa], [data-oficio-wizard-documentos]) :is(.oficio-step1-body, .oficio-roteiro-body, .oficio-justificativa-body, .oficio-documentos-body) {
   display: grid;
   gap: 10px;
 }
 
-:is([data-oficio-wizard-step1] .oficio-step1-block, [data-oficio-wizard-roteiro] .oficio-roteiro-block) {
+:is([data-oficio-wizard-step1] .oficio-step1-block, [data-oficio-wizard-roteiro] .oficio-roteiro-block, [data-oficio-wizard-justificativa] .oficio-justificativa-block, [data-oficio-wizard-documentos] .oficio-documentos-block) {
   margin: 0;
 }
 
-:is([data-oficio-wizard-step1] .oficio-step1-block, [data-oficio-wizard-roteiro] .oficio-roteiro-block) > .cv-form-block__header .cv-form-block__copy {
+:is([data-oficio-wizard-step1] .oficio-step1-block, [data-oficio-wizard-roteiro] .oficio-roteiro-block, [data-oficio-wizard-justificativa] .oficio-justificativa-block, [data-oficio-wizard-documentos] .oficio-documentos-block) > .cv-form-block__header .cv-form-block__copy {
   display: grid;
   gap: 3px;
 }
 
-:is([data-oficio-wizard-step1] .oficio-step1-block, [data-oficio-wizard-roteiro] .oficio-roteiro-block) .cv-form-block__description {
+:is([data-oficio-wizard-step1] .oficio-step1-block, [data-oficio-wizard-roteiro] .oficio-roteiro-block, [data-oficio-wizard-justificativa] .oficio-justificativa-block, [data-oficio-wizard-documentos] .oficio-documentos-block) .cv-form-block__description {
   text-align: left;
 }
 

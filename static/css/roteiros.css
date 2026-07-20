@@ -186,15 +186,16 @@
   gap: var(--space-3);
 }
 
-.roteiro-editor--avulso .roteiro-editor__section {
+/* Ordem flex só no avulso puro — no ofício o markup (e display:contents dos trechos) deve prevalecer. */
+.roteiro-editor--avulso:not(.roteiro-editor--oficio) .roteiro-editor__section {
   order: 4;
 }
 
-.roteiro-editor--avulso .roteiro-editor__reference-block--source {
+.roteiro-editor--avulso:not(.roteiro-editor--oficio) .roteiro-editor__reference-block--source {
   order: 1;
 }
 
-.roteiro-editor--avulso .roteiro-editor__reference-block--sede-destinos {
+.roteiro-editor--avulso:not(.roteiro-editor--oficio) .roteiro-editor__reference-block--sede-destinos {
   order: 2;
 }
 
@@ -1877,42 +1878,42 @@
   padding: 0;
 }
 
-.roteiro-editor--avulso .roteiro-editor__section--source,
-.roteiro-editor--avulso .roteiro-editor__reference-block--source {
+.roteiro-editor--avulso:not(.roteiro-editor--oficio) .roteiro-editor__section--source,
+.roteiro-editor--avulso:not(.roteiro-editor--oficio) .roteiro-editor__reference-block--source {
   order: 1;
 }
 
-.roteiro-editor--avulso .roteiro-editor__section--sede-destinos,
-.roteiro-editor--avulso .roteiro-editor__reference-block--sede-destinos {
+.roteiro-editor--avulso:not(.roteiro-editor--oficio) .roteiro-editor__section--sede-destinos,
+.roteiro-editor--avulso:not(.roteiro-editor--oficio) .roteiro-editor__reference-block--sede-destinos {
   order: 2;
 }
 
-.roteiro-editor--avulso .roteiro-editor__section--bate-volta {
+.roteiro-editor--avulso:not(.roteiro-editor--oficio) .roteiro-editor__section--bate-volta {
   order: 3;
 }
 
-.roteiro-editor--avulso .roteiro-editor__section--trechos {
+.roteiro-editor--avulso:not(.roteiro-editor--oficio) .roteiro-editor__section--trechos {
   order: 5;
 }
 
-.roteiro-editor--avulso .roteiro-editor__section--retorno,
-.roteiro-editor--avulso .roteiro-editor__reference-block--retorno {
+.roteiro-editor--avulso:not(.roteiro-editor--oficio) .roteiro-editor__section--retorno,
+.roteiro-editor--avulso:not(.roteiro-editor--oficio) .roteiro-editor__reference-block--retorno {
   order: 6;
 }
 
-.roteiro-editor--avulso .roteiro-editor__section--diarias {
+.roteiro-editor--avulso:not(.roteiro-editor--oficio) .roteiro-editor__section--diarias {
   order: 6;
 }
 
-.roteiro-editor--avulso .roteiro-editor__section--mapa {
+.roteiro-editor--avulso:not(.roteiro-editor--oficio) .roteiro-editor__section--mapa {
   order: 4;
 }
 
-.roteiro-editor--avulso .roteiro-editor__section--diarias {
+.roteiro-editor--avulso:not(.roteiro-editor--oficio) .roteiro-editor__section--diarias {
   order: 7;
 }
 
-.roteiro-editor--avulso .roteiro-editor__actions {
+.roteiro-editor--avulso:not(.roteiro-editor--oficio) .roteiro-editor__actions {
   order: 8;
 }
 
@@ -3079,3 +3080,137 @@ html[data-theme="dark-light"] .roteiro-editor--avulso .roteiro-editor__reference
 }
 
 
+
+/* ── Ofício wizard roteiro: zero visual de foco (pedido explícito) ─ */
+[data-oficio-wizard-roteiro] .oficio-roteiro-body,
+.roteiro-editor--oficio .oficio-roteiro-body {
+  /* Anéis / shadows de foco */
+  --cv-btn-focus-ring: none;
+  --cv-field-focus-ring: none;
+  --cv-field-shadow-focus: none;
+  --cv-search-picker-focus-shadow: none;
+  --cv-select-focus-ring: none;
+  --cv-select-focus-shadow: none;
+  --cv-sp-field-focus-ring: none;
+  --field-focus-ring: none;
+  --focus-ring: none;
+  --route-focus-ring: none;
+  --sidebar-focus-ring: transparent;
+  /* Bordas de foco = borda em repouso (sem destaque colorido) */
+  --border-focus: var(--color-border, transparent);
+  --color-focus: var(--color-border, transparent);
+  --cv-field-border-focus: var(--cv-field-border, var(--color-border, transparent));
+  --cv-field-focus-border: var(--cv-field-border, var(--color-border, transparent));
+  --cv-select-border-focus: var(--cv-select-border, var(--color-border, transparent));
+  --cv-sp-field-border-focus: var(--cv-sp-field-border, var(--color-border, transparent));
+  --field-border-focus: var(--field-border, var(--color-border, transparent));
+}
+
+[data-oficio-wizard-roteiro] .oficio-roteiro-body :is(:focus, :focus-visible),
+.roteiro-editor--oficio .oficio-roteiro-body :is(:focus, :focus-visible),
+[data-oficio-wizard-roteiro] .oficio-roteiro-body :is(:focus, :focus-visible)::before,
+.roteiro-editor--oficio .oficio-roteiro-body :is(:focus, :focus-visible)::before,
+[data-oficio-wizard-roteiro] .oficio-roteiro-body :is(:focus, :focus-visible)::after,
+.roteiro-editor--oficio .oficio-roteiro-body :is(:focus, :focus-visible)::after {
+  outline: none !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Contêineres que pintam anel via :focus-within (picker, select, date, choice) */
+[data-oficio-wizard-roteiro] .oficio-roteiro-body :is(
+  .app-multiselect__control,
+  .cv-composite-field,
+  .cv-composite-field__control,
+  .cv-custom-select,
+  .cv-custom-select__trigger,
+  .cv-date-picker,
+  .cv-date-picker__control,
+  .cv-field__control,
+  .cv-file-picker,
+  .cv-filter-bar__search,
+  .cv-multiselect__control,
+  .cv-search-picker__control,
+  .cv-search-picker__field,
+  .cv-select-wrapper,
+  .form-control,
+  .roteiro-editor__choice-card
+):focus-within,
+.roteiro-editor--oficio .oficio-roteiro-body :is(
+  .app-multiselect__control,
+  .cv-composite-field,
+  .cv-composite-field__control,
+  .cv-custom-select,
+  .cv-custom-select__trigger,
+  .cv-date-picker,
+  .cv-date-picker__control,
+  .cv-field__control,
+  .cv-file-picker,
+  .cv-filter-bar__search,
+  .cv-multiselect__control,
+  .cv-search-picker__control,
+  .cv-search-picker__field,
+  .cv-select-wrapper,
+  .form-control,
+  .roteiro-editor__choice-card
+):focus-within,
+[data-oficio-wizard-roteiro] .oficio-roteiro-body .cv-search-picker__field:focus-within .cv-search-picker__control,
+.roteiro-editor--oficio .oficio-roteiro-body .cv-search-picker__field:focus-within .cv-search-picker__control,
+[data-oficio-wizard-roteiro] .oficio-roteiro-body .cv-select-wrapper:focus-within::after,
+.roteiro-editor--oficio .oficio-roteiro-body .cv-select-wrapper:focus-within::after {
+  outline: none !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+}
+
+[data-oficio-wizard-roteiro] .oficio-roteiro-body .roteiro-editor__choice-card:focus-within,
+.roteiro-editor--oficio .oficio-roteiro-body .roteiro-editor__choice-card:focus-within {
+  border-color: var(--route-card-inner-border, var(--color-border)) !important;
+}
+
+/* Sobrescreve o focus canônico do dark-redesign neste escopo */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-body :is(button, a, input, select, textarea, [tabindex]):focus-visible,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .roteiro-editor--oficio .oficio-roteiro-body :is(button, a, input, select, textarea, [tabindex]):focus-visible {
+  outline: none !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+}
+
+/* ========================================================================
+   Ofício — legs Saída/Chegada: inputs em surface-soft
+   Também reforçado pós-tema no wizard_roteiro (extra_css_after_theme).
+   --color-surface-soft (#223348) ≠ --step1-field do leg (≈ #132538).
+   ======================================================================== */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro]
+  .roteiro-trecho-card__leg
+  :is(
+    input.cv-field__control,
+    input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
+    .cv-date-picker__control > input.cv-field__control,
+    .cv-date-picker__control .cv-field__control,
+    .cv-field--readonly .cv-field__control,
+    .cv-field__control[readonly],
+    input[readonly]
+  ),
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro]
+  #retorno-card
+  .roteiro-trecho-card__leg
+  :is(
+    input.cv-field__control,
+    input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
+    .cv-date-picker__control > input.cv-field__control,
+    .cv-date-picker__control .cv-field__control,
+    .cv-field--readonly .cv-field__control,
+    .cv-field__control[readonly],
+    input[readonly]
+  ) {
+  background: var(--color-surface-soft) !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  color: var(--color-text);
+  opacity: 1;
+}

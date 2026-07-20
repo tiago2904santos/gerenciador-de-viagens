@@ -1,0 +1,37 @@
+<article class="oficio-documentos-card oficio-documentos-card--travellers" aria-label="Viajantes">
+  <div class="oficio-documentos-card__body">
+    {% with n=documentos_ctx.viajantes_cards|length %}
+    <div class="oficio-documentos-travellers-grid{% if n == 1 %} oficio-documentos-travellers-grid--single{% endif %}" role="list">
+      {% for viajante in documentos_ctx.viajantes_cards %}
+        <article
+          class="oficio-documentos-traveller-tile{% if viajante.is_motorista %} oficio-documentos-traveller-tile--motorista{% endif %}"
+          role="listitem"
+        >
+          <span class="oficio-documentos-traveller-tile__avatar" aria-hidden="true">{{ viajante.iniciais }}</span>
+          <div class="oficio-documentos-traveller-tile__main">
+            <div class="oficio-documentos-traveller-tile__title-row">
+              <strong class="oficio-documentos-traveller-tile__name">{{ viajante.nome }}</strong>
+              {% if viajante.is_motorista %}
+                <span class="oficio-documentos-traveller-tile__badge">Motorista</span>
+              {% endif %}
+            </div>
+            {% if viajante.cargo or viajante.funcao or viajante.unidade %}
+              <span class="oficio-documentos-traveller-tile__meta">
+                {% if viajante.cargo %}{{ viajante.cargo }}{% elif viajante.funcao %}{{ viajante.funcao }}{% endif %}{% if viajante.unidade and viajante.cargo %} · {{ viajante.unidade }}{% elif viajante.unidade and viajante.funcao %} · {{ viajante.unidade }}{% elif viajante.unidade %}{{ viajante.unidade }}{% endif %}
+              </span>
+            {% endif %}
+          </div>
+          <span
+            class="oficio-documentos-traveller-tile__termo{% if viajante.has_termo %} oficio-documentos-traveller-tile__termo--sim{% else %} oficio-documentos-traveller-tile__termo--nao{% endif %}"
+          >
+            <span class="oficio-documentos-traveller-tile__termo-dot" aria-hidden="true"></span>
+            Termo: {% if viajante.has_termo %}sim{% else %}não{% endif %}
+          </span>
+        </article>
+      {% empty %}
+        <div class="oficio-documentos-travellers-empty">Nenhum viajante vinculado a este ofício.</div>
+      {% endfor %}
+    </div>
+    {% endwith %}
+  </div>
+</article>

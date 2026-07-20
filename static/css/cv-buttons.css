@@ -750,6 +750,19 @@ html[data-theme="light"] {
   border-color: #125d30;
 }
 
+/* Settings (pasta / ações) — já assinado: mesmo indicador verde compacto do --sign */
+.cv-icon-btn--settings.is-assinado {
+  background: linear-gradient(135deg, #1f8f4e 0%, var(--color-success, #24a25b) 100%);
+  border-color: #167039;
+  color: var(--color-white, #fff);
+}
+
+.cv-icon-btn--settings.is-assinado:hover,
+.cv-icon-btn--settings.is-assinado:focus {
+  background: linear-gradient(135deg, #1a7a43 0%, #1f8f4e 100%);
+  border-color: #125d30;
+}
+
 /* Signature — gerar assinatura (primary soft preenchido) */
 .cv-icon-btn--signature {
   background: var(--cv-btn-secondary-bg);

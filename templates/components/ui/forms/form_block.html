@@ -54,12 +54,13 @@
 <section
   class="cv-form-block{% if variant %} cv-form-block--{{ variant }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
   {% if element_id %}id="{{ element_id }}"{% endif %}
-  {% if section_id %}aria-labelledby="{{ section_id }}"{% endif %}
+  {% if section_id %}aria-labelledby="{{ section_id }}"{% elif aria_label %}aria-label="{{ aria_label }}"{% endif %}
   {% if data_hook %}data-{{ data_hook }}{% endif %}
 >
+  {% if title or description or action_label or actions_template %}
   <header class="cv-form-block__header">
     <div class="cv-form-block__copy">
-      <h4 class="cv-form-block__title"{% if section_id %} id="{{ section_id }}"{% endif %}>{{ title }}</h4>
+      {% if title %}<h4 class="cv-form-block__title"{% if section_id %} id="{{ section_id }}"{% endif %}>{{ title }}</h4>{% endif %}
       {% if description %}<p class="cv-form-block__description">{{ description }}</p>{% endif %}
     </div>
 
@@ -73,6 +74,7 @@
       </div>
     {% endif %}
   </header>
+  {% endif %}
 
   <div class="cv-form-block__body{% if body_extra_class %} {{ body_extra_class }}{% endif %}"{% if body_id %} id="{{ body_id }}"{% endif %}>
     {% if body_template %}{% include body_template %}{% endif %}

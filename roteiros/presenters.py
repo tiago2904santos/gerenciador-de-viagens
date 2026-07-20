@@ -164,7 +164,7 @@ def _roteiro_faixa_lateral_class(roteiro):
     return "roteiro-list-card--faixa-neutro"
 
 
-def apresentar_roteiro_card(roteiro):
+def apresentar_roteiro_card(roteiro, *, todos_trechos=False):
     origem_txt = _label_cidade_uf(roteiro.origem_cidade, roteiro.origem_estado)
     destinos_todos = list(roteiro.destinos.all()) if roteiro.pk else []
     destinos_txt_list = [
@@ -210,7 +210,11 @@ def apresentar_roteiro_card(roteiro):
     diaria_composicao_linhas = _composicao_diarias_linhas(diaria_resumo)
     diaria_vazio = not diaria_moeda and not diaria_composicao_linhas
     trechos_count = len(trechos_payload)
-    trechos_visiveis, trechos_resumo = _trechos_visiveis(trechos_payload)
+    # Lista de roteiros resume (>4 → 3 + resumo). Documentos precisa da lista completa no scroll.
+    if todos_trechos:
+        trechos_visiveis, trechos_resumo = trechos_payload, None
+    else:
+        trechos_visiveis, trechos_resumo = _trechos_visiveis(trechos_payload)
     roteiro_card_layout = _roteiro_card_layout(trechos_count)
     diaria_extenso = (roteiro.valor_diarias_extenso or "").strip()
     if (not diaria_extenso or diaria_extenso == "(preencher manualmente)") and diaria_moeda:

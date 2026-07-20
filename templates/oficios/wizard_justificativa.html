@@ -2,21 +2,24 @@
 {% load static %}
 
 {% block wizard_content %}
-  <section class="cv-wizard-section-card cv-form-card oficio-justificativa-card" aria-labelledby="justificativa-panel-title">
-    <header class="cv-wizard-section-header">
-      <div class="cv-wizard-section-header__copy">
-        <h3 class="cv-wizard-section-title" id="justificativa-panel-title">Justificativa</h3>
+  <div data-oficio-wizard-justificativa>
+    <section class="cv-wizard-section-card cv-form-card cv-wizard-section-card--described oficio-justificativa-card" aria-labelledby="justificativa-panel-title">
+      <header class="cv-wizard-section-header">
+        <div class="cv-wizard-section-header__copy">
+          <h3 class="cv-wizard-section-title" id="justificativa-panel-title">Justificativa</h3>
+          <p class="cv-wizard-section-subtitle">Texto que fundamenta a necessidade da viagem</p>
+        </div>
+      </header>
+
+      <div class="cv-wizard-section-body oficio-justificativa-body">
+        {% include "components/ui/forms/form_block.html" with title="Conteúdo" description="Use um modelo ou escreva a justificativa completa" section_id="oficio-justificativa-conteudo" variant="resource" extra_class="oficio-justificativa-block" action_label="Gerenciar modelos" action_url=modelos_justificativa_url action_autosave=True body_extra_class="cv-form-stack" body_template="oficios/partials/justificativa/_fields.html" %}
       </div>
-    </header>
 
-    <div class="cv-wizard-section-body oficio-justificativa-card__body">
-      {% include "components/ui/forms/form_block.html" with title="Conteúdo" description="Use um modelo ou escreva a justificativa completa" section_id="oficio-justificativa-conteudo" variant="resource" action_label="Gerenciar modelos" action_url=modelos_justificativa_url action_autosave=True body_extra_class="cv-form-stack" body_template="oficios/partials/justificativa/_fields.html" %}
-    </div>
-
-    <div class="cv-form-card__footer">
-      {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar" secondary_action="wizard_back" primary_label="Avançar" primary_action="wizard_next" only %}
-    </div>
-  </section>
+      <div class="cv-form-card__footer">
+        {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar" secondary_action="wizard_back" primary_label="Avançar" primary_action="wizard_next" only %}
+      </div>
+    </section>
+  </div>
 {% endblock %}
 
 {% block extra_js %}

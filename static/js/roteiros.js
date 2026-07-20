@@ -1,4 +1,4 @@
-import { initRoteirosEditor } from './pages/roteiros/editor/index.js?v=20260720-sem-resumo-roteiro';
+import { initRoteirosEditor } from './pages/roteiros/editor/index.js?v=20260720-date-picker-header';
 
 function bootRoteirosEditor() {
   const form = document.getElementById('roteiro-editor-form');

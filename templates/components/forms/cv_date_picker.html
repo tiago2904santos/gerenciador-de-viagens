@@ -142,7 +142,7 @@ Modo multi:
     {% if control_variant == "action-button" %}
       <button
         type="button"
-        class="{{ trigger_class|default:'cv-field-side-action cv-field-side-action--secondary' }} cv-date-picker__trigger"
+        class="{{ trigger_class|default:'cv-btn cv-btn--secondary' }} cv-date-picker__trigger"
         data-cv-date-picker-trigger
         aria-expanded="false"
         aria-label="{{ trigger_aria_label|default:trigger_label|default:'Abrir calendario' }}"

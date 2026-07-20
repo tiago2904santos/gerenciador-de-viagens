@@ -3,13 +3,19 @@
 
   /** Evita que cliques nos links do cabeçalho alternem o estado do <details>.
    *
-   * Exceto os gatilhos de modal (anexar/remover assinado): esses dependem de
-   * delegação no `document` (ver attach-signed-modal.js/delete-confirm-modal.js)
-   * e precisam que o clique continue borbulhando até lá.
+   * Exceto gatilhos que dependem de delegação no `document`
+   * (action-menu.js, attach-signed-modal.js, delete-confirm-modal.js):
+   * esses precisam que o clique continue borbulhando até lá.
+   * action-menu.js já chama preventDefault no trigger, então o <details>
+   * não alterna.
    */
   document.querySelectorAll(".document-inline-actions--header").forEach(function (el) {
     el.addEventListener("click", function (e) {
-      if (e.target.closest("[data-attach-signed-trigger], [data-delete-modal-trigger]")) {
+      if (
+        e.target.closest(
+          "[data-action-menu-trigger], [data-attach-signed-trigger], [data-delete-modal-trigger]",
+        )
+      ) {
         return;
       }
       e.stopPropagation();
@@ -112,4 +118,39 @@
   document.querySelectorAll("[data-verify-oficio-pdf-url]").forEach(function (btn) {
     bindVerifyPdfButton(btn, "data-verify-oficio-pdf-url");
   });
+
+  /** Encaixa R$ + valor na largura do tile (só reduz se o CSS cqi ainda extrapolar). */
+  function fitRouteValor(el) {
+    if (!el) return;
+    el.style.fontSize = "";
+    var maxPx = parseFloat(window.getComputedStyle(el).fontSize);
+    if (!isFinite(maxPx) || maxPx <= 0) return;
+    var minPx = Math.min(14, maxPx);
+    if (el.scrollWidth <= el.clientWidth + 0.5) return;
+    var lo = minPx;
+    var hi = maxPx;
+    for (var i = 0; i < 12; i++) {
+      var mid = (lo + hi) / 2;
+      el.style.fontSize = mid + "px";
+      if (el.scrollWidth <= el.clientWidth + 0.5) lo = mid;
+      else hi = mid;
+    }
+    el.style.fontSize = lo + "px";
+  }
+
+  function fitAllRouteValores() {
+    document
+      .querySelectorAll(".oficio-documentos-route-section .oficio-documentos-route-diarias-valor")
+      .forEach(fitRouteValor);
+  }
+
+  fitAllRouteValores();
+  if (typeof ResizeObserver !== "undefined") {
+    document.querySelectorAll(".oficio-documentos-route-valor-card").forEach(function (card) {
+      var ro = new ResizeObserver(function () {
+        fitRouteValor(card.querySelector(".oficio-documentos-route-diarias-valor"));
+      });
+      ro.observe(card);
+    });
+  }
 })();

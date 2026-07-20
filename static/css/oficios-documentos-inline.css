@@ -16,6 +16,14 @@
   order: 10;
 }
 
+.oficio-documentos-viajantes-section {
+  order: 12;
+}
+
+.oficio-documentos-viatura-section {
+  order: 14;
+}
+
 .oficio-documentos-route-section {
   order: 20;
 }
@@ -37,27 +45,8 @@
   gap: var(--space-4, 1rem);
 }
 
-.oficio-documentos-summary-section .cv-wizard-section-body {
+.oficio-documentos-info-section .cv-form-block__body {
   padding-top: 0;
-}
-
-.oficio-documentos-summary-section .oficio-documentos-grid {
-  gap: var(--space-6, 1.5rem);
-  margin: 0;
-}
-
-.oficio-documentos-summary-section .oficio-documentos-grid > * + * {
-  position: relative;
-}
-
-.oficio-documentos-summary-section .oficio-documentos-grid > * + *::before {
-  background: var(--cv-wizard-section-border, var(--color-border-soft, #e3eaf2));
-  content: "";
-  height: 1px;
-  left: 0;
-  position: absolute;
-  right: 0;
-  top: 0;
 }
 
 .oficio-documentos-route-section .cv-wizard-section-body,
@@ -69,56 +58,74 @@
   padding: 0;
 }
 
-.oficio-documentos-summary-section .oficio-documentos-admin-facts {
+.oficio-documentos-info-section .oficio-documentos-admin-facts {
   background: transparent;
   border: 0;
   box-shadow: none;
   overflow: visible;
 }
 
-.oficio-documentos-summary-section .oficio-documentos-admin-facts > .oficio-documentos-card__header {
-  display: none;
+.oficio-documentos-info-section .oficio-documentos-admin-facts > .oficio-documentos-card__body {
+  display: grid;
+  gap: 10px;
+  padding: 2px 0 0;
 }
 
-.oficio-documentos-summary-section .oficio-documentos-admin-facts > .oficio-documentos-card__body {
-  padding: var(--space-5) 0 0;
+.oficio-documentos-info-section .oficio-documentos-summary__status {
+  justify-self: start;
 }
 
-.oficio-documentos-summary-section .oficio-documentos-card,
+.oficio-documentos-info-section .oficio-documentos-card,
+.oficio-documentos-info-section .oficio-documentos-card--travellers,
+.oficio-documentos-info-section .oficio-documentos-card--vehicle,
 .oficio-documentos-route-section .oficio-documentos-route-card,
 .oficio-documentos-justification-section .oficio-documentos-card--justification {
-  background: transparent;
-  border: 0;
+  background: transparent !important;
+  border: 0 !important;
   border-radius: 0;
-  box-shadow: none;
+  box-shadow: none !important;
   overflow: visible;
+}
+
+.oficio-documentos-route-section .oficio-documentos-route-card__diarias-box,
+.oficio-documentos-route-section .oficio-documentos-route-card__body {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.oficio-documentos-route-section .oficio-documentos-route-card__diarias-box {
+  padding: 0;
 }
 
 .oficio-documentos-route-section .oficio-documentos-route-card {
   display: flex;
   flex-direction: column;
-  gap: var(--form-section-inner-gap);
-  padding: var(--cv-wizard-section-body-padding);
-  padding-top: 0;
+  gap: 8px;
+  padding: 0;
 }
 
-.oficio-documentos-summary-section .oficio-documentos-card__header,
+.oficio-documentos-info-section .oficio-documentos-card__header,
 .oficio-documentos-route-section .oficio-documentos-route-card__head,
 .oficio-documentos-justification-section .oficio-documentos-card__header {
   border-bottom: 0;
-  padding: var(--space-5, 0.75rem) 0 var(--space-1, 0.75rem);
+  padding: 12px 0 8px;
 }
 
 .oficio-documentos-route-section .oficio-documentos-route-card__head {
   margin-bottom: 0;
-  padding: 0;
+  padding: 12px 0 8px;
 }
 
 .oficio-documentos-route-section .oficio-documentos-route-card__title {
-  padding-top: var(--space-5);
+  color: var(--color-heading);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  padding-top: 0;
 }
 
-.oficio-documentos-summary-section .oficio-documentos-card__body,
+.oficio-documentos-info-section .oficio-documentos-card__body,
 .oficio-documentos-route-section .oficio-documentos-route-card__body,
 .oficio-documentos-justification-section .oficio-documentos-card__body {
   padding: 0;
@@ -137,9 +144,25 @@
   grid-column: 1;
 }
 
-/* Col 2: Valor total */
+/* Col 2: Valor total — container query para escalar a moeda com a largura do tile */
 .oficio-documentos-route-valor-card {
+  container-type: inline-size;
+  container-name: oficio-route-valor;
   grid-column: 2;
+}
+
+/* Moeda: R$ + número numa linha; tamanho base proporcional à largura do card */
+.oficio-documentos-route-section .oficio-documentos-route-diarias-valor {
+  display: block;
+  font-size: clamp(1.2rem, 18cqi, 3.5rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  max-width: 100%;
+  overflow: hidden;
+  overflow-wrap: normal;
+  white-space: nowrap;
+  word-break: normal;
 }
 
 /* Col 3: container flex que estica para preencher as linhas */
@@ -165,10 +188,7 @@
 }
 
 .oficio-documentos-route-section .oficio-documentos-route-card--trechos-2 .oficio-documentos-route-diarias-valor {
-  font-size: clamp(1.6rem, 2.8vw, 2rem);
-  font-weight: 900;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
+  font-size: clamp(1.2rem, 16cqi, 2rem);
   margin-bottom: var(--space-3);
 }
 
@@ -192,10 +212,6 @@
 }
 
 .oficio-documentos-route-section .oficio-documentos-route-card--trechos-3 .oficio-documentos-route-diarias-valor {
-  font-size: clamp(3rem, 6vw, 4.5rem);
-  font-weight: 900;
-  letter-spacing: -0.02em;
-  line-height: 1;
   margin-bottom: var(--space-5);
 }
 
@@ -225,10 +241,6 @@
 }
 
 .oficio-documentos-route-section .oficio-documentos-route-card--trechos-many .oficio-documentos-route-diarias-valor {
-  font-size: clamp(3rem, 6vw, 4.5rem);
-  font-weight: 900;
-  letter-spacing: -0.02em;
-  line-height: 1;
   margin-bottom: var(--space-5);
 }
 
@@ -246,34 +258,59 @@
   line-height: 1.15;
 }
 
-/* Scroll list (4+ trechos) */
+/* Scroll list (4+ trechos): wrapper = poço do valor-card; itens = painel da seção */
 .oficio-documentos-route-trechos-scroll-card {
+  background: var(--color-card-muted);
+  border: 1px solid var(--color-border-soft);
+  border-radius: 10px;
+  box-shadow: none;
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: 8px;
   height: 100%;
-  max-height: 250px;
-  padding-right: 0;
+  max-height: 180px;
+  min-width: 0;
+  padding: 10px 12px;
 }
 
-.oficio-documentos-route-trechos-scroll-card .roteiro-routes-panel__header {
+.oficio-documentos-route-trechos-scroll-card > .cv-summary-label {
   flex-shrink: 0;
-  padding: 0 var(--space-4) var(--space-1);
+  margin: 0;
+  padding: 0 2px;
 }
 
 .oficio-documentos-route-trechos-scroll-list {
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: 8px;
   max-height: 220px;
+  min-height: 0;
   overflow-y: auto;
-  padding-right: var(--space-1);
+  padding: 0 2px 2px 0;
   scrollbar-color: rgba(191, 211, 234, 0.6) transparent;
   scrollbar-width: thin;
 }
 
-.oficio-documentos-route-trecho-scroll-item {
+/* Mesmo fundo visual da seção (vence .cv-summary-item com color-card-muted) */
+.oficio-documentos-route-section .oficio-documentos-route-trecho-scroll-item {
+  background: var(--step1-panel, var(--color-card, #fff)) !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
   flex-shrink: 0;
+}
+
+.oficio-documentos-route-trecho-scroll-item .cv-summary-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.oficio-documentos-route-trecho-scroll-item .cv-summary-value {
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.3;
 }
 
 /* Compartilhados */
@@ -316,9 +353,9 @@
   }
 }
 
-.oficio-documentos-summary-section .oficio-documentos-card__eyebrow,
-.oficio-documentos-summary-section .oficio-documentos-card__subtitle,
-.oficio-documentos-summary-section .oficio-documentos-vehicle-executive__label,
+.oficio-documentos-info-section .oficio-documentos-card__eyebrow,
+.oficio-documentos-info-section .oficio-documentos-card__subtitle,
+.oficio-documentos-info-section .oficio-documentos-vehicle-executive__label,
 .oficio-documentos-route-section .oficio-documentos-route-card__eyebrow,
 .oficio-documentos-route-section .oficio-documentos-route-card__subtitle,
 .oficio-documentos-route-section .oficio-documentos-route-card__tagline,
@@ -330,121 +367,111 @@
   display: none;
 }
 
-.oficio-documentos-route-section .oficio-documentos-route-card__title,
 .oficio-documentos-justification-section .oficio-documentos-card__title {
   font-size: var(--font-size-md, 1rem);
 }
 
-.oficio-documentos-summary-section .oficio-documentos-vehicle-lines {
-  display: grid;
-  gap: var(--space-3, 0.75rem);
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-template-rows: auto auto;
+.oficio-documentos-info-section .oficio-documentos-facts {
+  gap: 8px;
 }
 
-.oficio-documentos-summary-section .oficio-documentos-viatura-item--principal {
-  grid-row: span 2;
+.oficio-documentos-info-section .oficio-documentos-fact {
+  border-radius: 10px;
+  padding: 10px 12px;
 }
 
-/* Cards de resumo — summary e route sections */
-.oficio-documentos-summary-section .cv-summary-item,
+.oficio-documentos-info-section .oficio-documentos-fact dt {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  margin-bottom: 3px;
+}
+
+.oficio-documentos-info-section .oficio-documentos-fact dd {
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.oficio-documentos-info-section .oficio-documentos-travellers-grid {
+  gap: 8px;
+}
+
+.oficio-documentos-info-section .oficio-documentos-traveller-tile {
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.oficio-documentos-info-section .oficio-documentos-traveller-tile__name {
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.oficio-documentos-info-section .oficio-documentos-facts--vehicle {
+  gap: 8px;
+}
+
+/* Tiles de resumo — info e route (mesmo poço / mesma densidade) */
+.oficio-documentos-info-section .cv-summary-item,
 .oficio-documentos-route-section .cv-summary-item {
   background: var(--color-card-muted);
   border: 1px solid var(--color-border-soft);
-  border-radius: var(--radius-control);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2, 0.5rem);
-  padding: var(--space-3) var(--space-4);
-}
-
-.oficio-documentos-summary-section .cv-summary-item--principal,
-.oficio-documentos-route-section .cv-summary-item--principal {
-  height: 100%;
-}
-
-.oficio-documentos-summary-section .cv-summary-label,
-.oficio-documentos-route-section .cv-summary-label {
-  color: var(--color-muted);
-  font-size: 10px;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.oficio-documentos-summary-section .cv-summary-value,
-.oficio-documentos-route-section .cv-summary-value {
-  color: var(--color-heading);
-  font-size: var(--font-size-md, 1rem);
-  font-weight: 800;
-  line-height: 1.25;
-  overflow-wrap: anywhere;
-}
-
-.oficio-documentos-summary-section .oficio-documentos-viatura-placa-value {
-  font-size: clamp(2.2rem, 5vw, 3rem);
-  font-weight: 900;
-  letter-spacing: 0.02em;
-  line-height: 1;
-  margin-bottom: var(--space-3);
-}
-
-.oficio-documentos-summary-section .oficio-documentos-viatura-modelo-value {
-  font-size: clamp(1rem, 2vw, 1.3rem);
-  font-weight: 800;
-  line-height: 1.2;
-}
-
-/* Coluna direita: dois cards empilhados */
-.oficio-documentos-viatura-secondary-stack {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3, 0.75rem);
-}
-
-.oficio-documentos-viatura-secondary-stack .cv-summary-item {
-  flex: 1;
-}
-
-/* Driver externo mantém visual de destaque */
-.oficio-documentos-summary-section .oficio-documentos-vehicle-lines > .oficio-documentos-vehicle-executive__driver {
-  background: var(--color-card-muted);
-  border: 1px solid var(--color-border-soft);
-  border-radius: var(--radius-control);
+  border-radius: 10px;
   display: flex;
   flex-direction: column;
   gap: 3px;
-  padding: var(--space-3) var(--space-4);
+  min-height: 0;
+  padding: 10px 12px;
 }
 
-.oficio-documentos-summary-section .oficio-documentos-vehicle-executive__driver-value {
+.oficio-documentos-info-section .cv-summary-label,
+.oficio-documentos-route-section .cv-summary-label {
+  color: var(--color-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.oficio-documentos-info-section .cv-summary-value,
+.oficio-documentos-route-section .cv-summary-value {
   color: var(--color-heading);
-  font-size: clamp(2.2rem, 5vw, 3.4rem);
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+/* Valor total: reafirma após .cv-summary-value (evita 0.92rem + wrap) */
+.oficio-documentos-route-section .oficio-documentos-route-diarias-valor {
+  color: var(--color-heading);
+  font-size: clamp(1.2rem, 18cqi, 3.5rem);
   font-weight: 900;
-  letter-spacing: 0.02em;
-  line-height: 0.95;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  max-width: 100%;
+  overflow: hidden;
+  overflow-wrap: normal;
+  white-space: nowrap;
+  word-break: normal;
 }
 
-.oficio-documentos-summary-section .oficio-documentos-vehicle-executive__driver {
-  background: color-mix(in srgb, var(--color-accent, #d9a40f) 9%, var(--color-card-muted));
-  border-color: color-mix(in srgb, var(--color-accent, #d9a40f) 40%, var(--color-border-soft));
-  grid-column: 1 / -1;
+.oficio-documentos-route-section .oficio-documentos-route-card--trechos-2 .oficio-documentos-route-diarias-valor {
+  font-size: clamp(1.2rem, 16cqi, 2rem);
 }
 
-.oficio-documentos-summary-section .oficio-documentos-vehicle-executive__driver-label {
-  display: none;
-}
-
-.oficio-documentos-motorista-carona-chip {
-  align-self: flex-start;
-  border: 1px solid color-mix(in srgb, var(--color-accent, #d9a40f) 60%, transparent);
-  border-radius: var(--radius-pill, 999px);
-  color: var(--color-accent, #d9a40f);
-  font-size: var(--font-size-xs, 0.75rem);
+.oficio-documentos-info-section .oficio-documentos-viatura-placa-value {
+  font-size: 0.95rem;
   font-weight: 800;
   letter-spacing: 0.04em;
-  padding: 0.2rem 0.55rem;
-  text-transform: uppercase;
+  line-height: 1.25;
+  margin: 0;
+}
+
+.oficio-documentos-info-section .oficio-documentos-viatura-modelo-value {
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.3;
 }
 
 .document-inline-card {
@@ -458,6 +485,20 @@
 
 .document-inline-card--nested {
   margin-top: var(--space-3, 0.75rem);
+}
+
+/* Termos aninhados: mesmo fundo da seção de preview (não o poço de campo). */
+.oficio-documentos-preview-section.document-inline-stack
+  .document-inline-card--termos
+  .document-inline-card--nested,
+.oficio-documentos-preview-section.document-inline-stack
+  .document-inline-card--termos
+  .document-inline-card--nested
+  > .document-inline-card__header {
+  background: var(
+    --step1-panel,
+    var(--cv-wizard-section-bg, var(--surface-form-section, var(--color-surface, #fff)))
+  ) !important;
 }
 
 .document-inline-card__header {
@@ -546,24 +587,6 @@
 }
 
 @media (max-width: 480px) {
-  .oficio-documentos-summary-section .oficio-documentos-vehicle-lines {
-    grid-template-columns: 1fr;
-  }
-
-  .oficio-documentos-summary-section .oficio-documentos-viatura-item--principal {
-    grid-row: span 1;
-  }
-
-  .oficio-documentos-summary-section .oficio-documentos-vehicle-executive__driver {
-    grid-column: auto;
-  }
-
-  .oficio-documentos-summary-section .oficio-documentos-vehicle-executive__facts > div:nth-child(1)::after,
-  .oficio-documentos-summary-section .oficio-documentos-vehicle-executive__facts > div:nth-child(4)::before {
-    content: "";
-    margin: 0;
-  }
-
   .document-inline-actions--header {
     width: 100%;
     justify-content: stretch;
