@@ -1411,38 +1411,69 @@
   gap: var(--cv-wizard-section-stack-gap, var(--space-4));
 }
 
-.roteiro-trecho-card {
-  background: var(--cv-wizard-section-bg, var(--route-card-inner-bg));
-  border: 1px solid var(--cv-wizard-section-border, var(--route-section-border));
-  border-radius: var(--cv-wizard-section-radius, var(--radius-md));
-  box-shadow: var(--cv-wizard-section-shadow, none);
+/* ── Deslocamentos (trechos + retorno): blocos planos, sem card interno ── */
+.roteiro-deslocamentos-stack,
+.roteiro-trechos-stack {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* Cada trecho/retorno é um bloco plano dentro da seção; sem fundo/borda/sombra. */
+.roteiro-trecho-card,
+.roteiro-deslocamento {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
   overflow: visible;
+  padding: var(--space-4) 0;
 }
 
-.roteiro-trecho-card__header {
-  background: var(--cv-wizard-section-header-bg, var(--route-card-inner-bg));
-  background-image: linear-gradient(
-    to right,
-    color-mix(in srgb, var(--color-accent) 6%, transparent) 0,
-    transparent 72px
-  );
-  border-bottom: 1px solid var(--cv-wizard-section-border, var(--route-card-inner-border));
-  padding: var(--space-3) var(--space-5);
+/* Divisor sutil entre trechos consecutivos e antes do retorno. */
+.roteiro-trechos-stack .roteiro-deslocamento + .roteiro-deslocamento,
+.roteiro-deslocamento--retorno {
+  border-top: 1px solid var(--color-border-soft, var(--route-card-inner-border));
 }
 
-.roteiro-trecho-card__title {
-  color: var(--theme-text-heading);
-  font-size: 15px;
-  font-weight: 800;
-  letter-spacing: 0;
-  margin: 0;
+/* Primeiro bloco não precisa de respiro superior. */
+.roteiro-trechos-stack > .roteiro-deslocamento:first-child {
+  padding-top: 0;
 }
 
-.roteiro-trecho-card__body {
+.roteiro-deslocamento__body {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-  padding: var(--space-4) var(--space-5);
+  min-width: 0;
+}
+
+/* Rótulo leve (eyebrow) do trecho/retorno. */
+.roteiro-leg-label {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  min-width: 0;
+}
+
+.roteiro-leg-label__num {
+  color: var(--theme-text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.roteiro-leg-label__route {
+  color: var(--theme-text-heading);
+  font-size: 13px;
+  font-weight: 700;
+  min-width: 0;
+  word-break: break-word;
 }
 
 #retorno-card {

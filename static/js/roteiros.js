@@ -1,4 +1,4 @@
-import { initRoteirosEditor } from './pages/roteiros/editor/index.js?v=20260717-load-saved-route-map';
+import { initRoteirosEditor } from './pages/roteiros/editor/index.js?v=20260719b-deslocamentos-flat';
 
 function bootRoteirosEditor() {
   const form = document.getElementById('roteiro-editor-form');

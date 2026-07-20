@@ -95,7 +95,7 @@ export function buildTrechoCard(trecho, value, esc, formatDurationInput) {
   };
 
   return (
-    '<article class="roteiro-trecho-card oficio-roteiro-trecho-card" data-key="' +
+    '<article class="roteiro-trecho-card roteiro-deslocamento" data-key="' +
     esc(trecho.key) +
     '" data-trecho-id="' +
     esc(trechoId) +
@@ -114,15 +114,16 @@ export function buildTrechoCard(trecho, value, esc, formatDurationInput) {
     '" data-destino-cidade-id="' +
     esc(trecho.destino_cidade_id) +
     '">' +
-    '<header class="roteiro-trecho-card__header">' +
-    '<h4 class="roteiro-trecho-card__title">Trecho ' +
+    '<div class="roteiro-leg-label">' +
+    '<span class="roteiro-leg-label__num">Trecho ' +
     (o + 1) +
-    ' \u2014 ' +
+    '</span>' +
+    '<span class="roteiro-leg-label__route">' +
     esc(trecho.origem_nome) +
     ' \u2192 ' +
     esc(trecho.destino_nome) +
-    '</h4></header>' +
-    '<div class="roteiro-trecho-card__body">' +
+    '</span></div>' +
+    '<div class="roteiro-deslocamento__body">' +
     '<input type="hidden" name="trecho_' +
     o +
     '_origem_nome" value="' +

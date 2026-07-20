@@ -1,0 +1,17 @@
+<div class="roteiro-deslocamentos-stack">
+  {# Trechos gerados dinamicamente pelo JS a partir dos destinos. #}
+  <div id="trechos-gerados-container" class="roteiro-trechos-stack">
+    {% include "roteiros/partials/roteiro/_trechos_body.html" %}
+  </div>
+
+  {# Retorno final — mesmo layout plano de um trecho. #}
+  <div class="roteiro-trecho-card roteiro-deslocamento roteiro-deslocamento--retorno" id="retorno-card">
+    <div class="roteiro-leg-label">
+      <span class="roteiro-leg-label__num">Retorno</span>
+      <span class="roteiro-leg-label__route">Último deslocamento até a sede</span>
+    </div>
+    <div class="roteiro-deslocamento__body">
+      {% include "roteiros/partials/roteiro/_retorno_body.html" %}
+    </div>
+  </div>
+</div>

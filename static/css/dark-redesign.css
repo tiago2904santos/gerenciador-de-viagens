@@ -853,6 +853,11 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .roteiro-editor--oficio .roteiro-editor__oficio-card {
+  background-color: var(--color-input-bg);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .roteiro-editor--oficio :is(
     .roteiro-mapa__frame,
     .roteiro-mapa__frame #map,
