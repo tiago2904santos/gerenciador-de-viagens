@@ -363,7 +363,6 @@
 }
 
 .cv-search-picker__list {
-  background: var(--dropdown-bg);
   display: grid;
   gap: var(--space-1);
   max-height: calc(var(--control-height-lg) * 5);

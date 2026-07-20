@@ -852,9 +852,248 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
   margin-top: 0;
 }
 
+/* ========================================================================
+   Etapa 1 do ofício — card + camada intermediária por seção
+   Card externo escuro; blocos em surface-soft; campos no tom do card
+   (poço inset dentro de cada seção).
+   ======================================================================== */
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  .roteiro-editor--oficio .roteiro-editor__oficio-card {
-  background-color: var(--color-input-bg);
+  [data-oficio-wizard-step1] .oficio-step1-card {
+  --step1-surface: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
+  --step1-panel: var(--color-surface-soft);
+  --step1-field: var(--step1-surface);
+  --step1-empty: var(--step1-field);
+  --color-input-bg: var(--step1-field);
+  --cv-field-bg: var(--step1-field);
+  background: var(--step1-surface);
+  border-color: color-mix(in srgb, var(--color-border) 40%, transparent);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 10px 28px rgba(0, 0, 0, 0.28);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-step1] .oficio-step1-card > .cv-wizard-section-header {
+  background: transparent;
+  min-height: 64px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-step1] .oficio-step1-card > .cv-wizard-section-header .cv-wizard-section-title {
+  font-size: 1.05rem;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-step1] .oficio-step1-card > .cv-wizard-section-header .cv-wizard-section-subtitle {
+  color: var(--color-muted);
+  display: block;
+  font-size: var(--font-size-xs);
+  margin: 4px 0 0;
+  max-width: 56ch;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-step1] .oficio-step1-body {
+  display: grid;
+  gap: 10px;
+  padding: 14px 18px 18px;
+}
+
+/* Camada intermediária: cada seção é um painel suave. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-step1] .oficio-step1-block {
+  background: var(--step1-panel);
+  border: 0;
+  border-radius: 14px;
+  gap: 12px;
+  margin: 0;
+  padding: 14px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-step1] .oficio-step1-block > .cv-form-block__header {
+  align-items: flex-start;
+  gap: 12px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-step1] .oficio-step1-block > .cv-form-block__header .cv-form-block__copy {
+  align-items: start;
+  display: grid;
+  gap: 3px;
+  justify-content: start;
+  width: auto;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-step1] .oficio-step1-block .cv-form-block__description {
+  text-align: left;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-step1] .oficio-step1-block.cv-form-block--split {
+  align-items: center;
+  gap: 16px;
+  grid-template-columns: minmax(148px, 0.62fr) minmax(0, 2.1fr);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-step1] .oficio-step1-block.cv-form-block--split > .cv-form-block__body {
+  align-self: center;
+}
+
+/* Campos no tom do card: poço inset dentro do painel intermediário. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-step1] :is(
+    input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
+    textarea,
+    select,
+    .form-control,
+    .form-select,
+    .cv-composite-field__control,
+    .cv-custom-select__trigger,
+    .cv-field__control,
+    .cv-search-picker__input,
+    .cv-search-picker__control
+  ) {
+  background: var(--step1-field) !important;
+  border-color: transparent !important;
+  border-radius: 10px;
+  box-shadow: none !important;
+}
+
+/* Não pintar .cv-custom-select no hover: o wrapper tem radius 0 e o fundo
+   quadrado vaza pelos cantos do trigger arredondado. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-step1] :is(
+    input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
+    textarea,
+    select,
+    .form-control,
+    .form-select,
+    .cv-composite-field__control,
+    .cv-custom-select__trigger,
+    .cv-field__control,
+    .cv-search-picker__input,
+    .cv-search-picker__control
+  ):is(:hover, :focus, :focus-within, :focus-visible),
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-step1] .cv-custom-select--open .cv-custom-select__trigger {
+  background: var(--step1-field) !important;
+  border-color: transparent !important;
+  border-radius: 10px;
+  box-shadow: none !important;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-step1] .cv-composite-field__suffix {
+  background: color-mix(in srgb, var(--color-accent) 8%, var(--step1-field));
+  border-left-color: color-mix(in srgb, var(--color-border) 45%, transparent);
+  color: var(--color-muted-strong);
+}
+
+/* Pickers sem casca extra — o painel da seção já é a camada intermediária. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-step1] :is(
+    .cv-search-picker,
+    .cv-search-picker--people,
+    .cv-search-picker--people.cv-search-picker--roster,
+    .cv-search-picker--vehicle
+  ) {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0;
+  box-shadow: none !important;
+  gap: 10px;
+  padding: 0 !important;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-step1] .cv-search-picker__selected-panel {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  gap: 8px;
+  padding: 0 !important;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-step1] .cv-search-picker__selected-empty {
+  background: var(--step1-empty) !important;
+  border: 0 !important;
+  border-radius: 10px;
+  color: var(--color-muted);
+  padding: 12px 14px !important;
+  text-align: left;
+}
+
+/* Sugestões de viatura: mesmo poço dos campos (não o card-muted frio). */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-step1] .viatura-sugestao-chip {
+  background: var(--step1-field);
+  border-color: transparent;
+  box-shadow: none;
+  color: var(--color-text);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-step1] .viatura-sugestao-chip:hover,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-step1] .viatura-sugestao-chip:focus-visible,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-step1] .viatura-sugestao-chip--active {
+  background: color-mix(in srgb, var(--color-accent) 8%, var(--step1-field));
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-step1] .viatura-sugestao-badge {
+  background: color-mix(in srgb, #fff 6%, var(--step1-panel));
+  border-color: color-mix(in srgb, var(--color-border) 55%, transparent);
+  color: var(--color-muted-strong);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-step1] .viatura-sugestao-badge--motorista,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-step1] .viatura-sugestao-badge--unidade,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-step1] .viatura-sugestao-badge--ativa {
+  background: color-mix(in srgb, #fff 6%, var(--step1-panel));
+  border-color: color-mix(in srgb, var(--color-border) 55%, transparent);
+  color: var(--color-muted-strong);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-step1] .cv-form-block__actions .cv-btn {
+  background: transparent;
+  border-color: color-mix(in srgb, var(--color-border) 70%, transparent);
+  box-shadow: none;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-step1] .cv-form-block__actions .cv-btn:hover {
+  background: color-mix(in srgb, #fff 4%, transparent);
+  border-color: color-mix(in srgb, var(--color-border) 90%, var(--color-text) 10%);
+}
+
+/* Menu do select reanexado ao <body> (cv-floating-dropdown.js). */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-custom-select__menu--v2.cv-floating-dropdown--active[data-oficio-wizard-step1] {
+  --cv-cs-menu-bg: var(--step1-surface, color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%));
+  background: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
+  border-color: color-mix(in srgb, var(--color-border) 55%, transparent);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+}
+
+@media (max-width: 900px) {
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    [data-oficio-wizard-step1] .oficio-step1-block.cv-form-block--split {
+    align-items: stretch;
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
@@ -3775,6 +4014,7 @@ html[data-theme="light-dark"] :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-lay
   .cv-custom-select__trigger--v2:hover:not(:disabled) {
   background: var(--color-input-bg);
   border-color: color-mix(in srgb, var(--color-input-border) 78%, var(--color-text) 22%);
+  border-radius: 10px;
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])

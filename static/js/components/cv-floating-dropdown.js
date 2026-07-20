@@ -27,6 +27,12 @@
       }
       placeholder = document.createComment("cv-floating-dropdown");
       menu.parentNode.insertBefore(placeholder, menu);
+      // O menu sai da árvore do anchor ao ir para o body, então tokens de tema
+      // escopados por atributo (ex.: [data-oficio-wizard-step1]) deixam de
+      // cascatear. Copiamos o marcador para o menu preservar o tema do anchor.
+      if (anchor.closest("[data-oficio-wizard-step1]")) {
+        menu.setAttribute("data-oficio-wizard-step1", "");
+      }
       document.body.appendChild(menu);
       menu.dataset.cvFloatingActive = "true";
       position();
@@ -46,6 +52,7 @@
       menu.style.right = "";
       menu.style.minWidth = "";
       delete menu.dataset.cvFloatingActive;
+      menu.removeAttribute("data-oficio-wizard-step1");
       if (placeholder && placeholder.parentNode) {
         placeholder.parentNode.insertBefore(menu, placeholder);
         placeholder.remove();

@@ -8,21 +8,22 @@
 
   <input type="hidden" name="transporte_embed" value="1">
   <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable" data-oficio-wizard-step1 data-oficio-driver-source>
-    <section class="cv-wizard-section-card cv-form-card" aria-labelledby="oficio-wizard-dados-principais">
+    <section class="cv-wizard-section-card cv-form-card cv-wizard-section-card--described oficio-step1-card" aria-labelledby="oficio-wizard-dados-principais">
       <header class="cv-wizard-section-header">
         <div class="cv-wizard-section-header__copy">
           <h3 class="cv-wizard-section-title" id="oficio-wizard-dados-principais">Informações da viagem</h3>
+          <p class="cv-wizard-section-subtitle">Identificação, finalidade, equipe e transporte</p>
         </div>
       </header>
 
-      <div class="cv-wizard-section-body">
-        {% include "components/ui/forms/form_block.html" with title="Identificação" description="Número, protocolo e custeio" section_id="oficio-step1-identity-title" variant="split" body_template="oficios/partials/step1/_identity_fields.html" %}
+      <div class="cv-wizard-section-body oficio-step1-body">
+        {% include "components/ui/forms/form_block.html" with title="Identificação" description="Número, protocolo e custeio" section_id="oficio-step1-identity-title" variant="split" extra_class="oficio-step1-block" body_template="oficios/partials/step1/_identity_fields.html" %}
 
-        {% include "components/ui/forms/form_block.html" with title="Finalidade" description="Motivo e descrição da viagem" section_id="oficio-step1-purpose-title" body_extra_class="cv-form-stack" body_template="oficios/partials/step1/_purpose_fields.html" %}
+        {% include "components/ui/forms/form_block.html" with title="Finalidade" description="Motivo e descrição da viagem" section_id="oficio-step1-purpose-title" extra_class="oficio-step1-block" body_extra_class="cv-form-stack" body_template="oficios/partials/step1/_purpose_fields.html" %}
 
-        {% include "components/ui/forms/form_block.html" with title="Equipe" description="Viajantes e motorista" section_id="oficio-wizard-equipe-title" variant="resource" action_label="Novo viajante" action_url=servidor_create_url action_autosave=True body_template="oficios/partials/step1/_team_fields.html" %}
+        {% include "components/ui/forms/form_block.html" with title="Equipe" description="Viajantes e motorista" section_id="oficio-wizard-equipe-title" variant="resource" extra_class="oficio-step1-block" action_label="Novo viajante" action_url=servidor_create_url action_autosave=True body_template="oficios/partials/step1/_team_fields.html" %}
 
-        {% include "components/ui/forms/form_block.html" with title="Transporte" description="Viatura utilizada" section_id="oficio-wizard-viatura-title" variant="resource" action_label="Nova viatura" action_url=viatura_create_url action_autosave=True data_hook="oficio-viatura-card" body_template="oficios/partials/step1/_transport_fields.html" %}
+        {% include "components/ui/forms/form_block.html" with title="Transporte" description="Viatura utilizada" section_id="oficio-wizard-viatura-title" variant="resource" extra_class="oficio-step1-block" action_label="Nova viatura" action_url=viatura_create_url action_autosave=True data_hook="oficio-viatura-card" body_template="oficios/partials/step1/_transport_fields.html" %}
 
         {% include "oficios/partials/wizard_dados_card_motorista_externo.html" %}
       </div>
