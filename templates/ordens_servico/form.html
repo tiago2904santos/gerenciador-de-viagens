@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260611-os">
   <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260718-cv-summary">
   <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260611-os-evento-card">
+  <link rel="stylesheet" href="{% static 'css/ordens-servico.css' %}?v=20260720-modelos-os">
 {% endblock %}
 
 {% block content %}
@@ -32,8 +33,8 @@
         {# ── 3. Servidores ─────────────────────────────────────── #}
         {% include "components/ui/forms/form_block.html" with shell="card" element_id="os-card-servidores" section_id="os-servidores-title" extra_class="termo-card" title="3. Servidores" description="Opcional. Servidores que executarão esta OS." action_label="Cadastrar servidor" action_url=servidor_create_url action_autosave=True body_template="ordens_servico/partials/_servidores_body.html" %}
 
-        {# ── 4. Motivo ─────────────────────────────────────────── #}
-        {% include "components/ui/forms/form_block.html" with shell="card" element_id="os-card-motivo" section_id="os-motivo-title" extra_class="termo-card" title="4. Motivo" description="Opcional. Use um modelo ou escreva o texto livremente." body_template="ordens_servico/partials/_motivo_body.html" footer_template="ordens_servico/partials/_motivo_footer.html" %}
+        {# ── 4. Necessidade e motivo ────────────────────────────── #}
+        {% include "components/ui/forms/form_block.html" with shell="card" element_id="os-card-motivo" section_id="os-motivo-title" extra_class="termo-card" title="4. Necessidade e motivo" description="Escolha o tipo de OS e complemente com o motivo ou finalidade específica." body_template="ordens_servico/partials/_motivo_body.html" footer_template="ordens_servico/partials/_motivo_footer.html" %}
       </main>
     </form>
   </div>
@@ -41,5 +42,5 @@
 
 {% block extra_js %}
   <script src="{% static 'js/pages/oficios-dados-viajantes.js' %}" defer></script>
-  <script src="{% static 'js/pages/ordens-servico-form.js' %}?v=20260716-global-picker-migration" defer></script>
+  <script src="{% static 'js/pages/ordens-servico-form.js' %}?v=20260720-modelos-os" defer></script>
 {% endblock %}

@@ -4,6 +4,7 @@ from django import forms
 from django.db.models import Q
 
 from cadastros.form_widgets import ServidorEquipeSelectMultiple
+from cadastros.form_widgets import ServidorMotoristaSelect
 from cadastros.models import Cidade
 from cadastros.models import Estado
 from cadastros.models import Servidor
@@ -83,6 +84,14 @@ class OrdemServicoForm(forms.ModelForm):
             "data_evento_inicio",
             "data_evento_fim",
             "servidores",
+            "tipo_necessidade",
+            "motorista_equipe",
+            "tecnico_equipe",
+            "apoio_montagem",
+            "apoio_escolta",
+            "coordenador_cerimonial",
+            "apoio_cerimonial",
+            "apoio_preparacao",
             "motivo",
         ]
         widgets = {
@@ -108,6 +117,65 @@ class OrdemServicoForm(forms.ModelForm):
                 "data-placeholder": "Buscar por nome, CPF ou RG",
                 "data-empty-message": "Nenhum servidor encontrado.",
                 "data-empty-selected": "Nenhum servidor selecionado.",
+            }),
+            "tipo_necessidade": forms.RadioSelect(attrs={
+                "data-os-model-option": "true",
+            }),
+            "motorista_equipe": ServidorMotoristaSelect(attrs={
+                "class": "form-select cv-search-picker__native",
+                "data-cv-search-picker": "true",
+                "data-picker-mode": "single",
+                "data-picker-variant": "detailed",
+                "data-placeholder": "Selecionar motorista...",
+                "data-empty-message": "Nenhum servidor encontrado.",
+            }),
+            "tecnico_equipe": ServidorMotoristaSelect(attrs={
+                "class": "form-select cv-search-picker__native",
+                "data-cv-search-picker": "true",
+                "data-picker-mode": "single",
+                "data-picker-variant": "detailed",
+                "data-placeholder": "Selecionar técnico...",
+                "data-empty-message": "Nenhum servidor encontrado.",
+            }),
+            "apoio_montagem": ServidorMotoristaSelect(attrs={
+                "class": "form-select cv-search-picker__native",
+                "data-cv-search-picker": "true",
+                "data-picker-mode": "single",
+                "data-picker-variant": "detailed",
+                "data-placeholder": "Selecionar apoio de montagem...",
+                "data-empty-message": "Nenhum servidor encontrado.",
+            }),
+            "apoio_escolta": ServidorMotoristaSelect(attrs={
+                "class": "form-select cv-search-picker__native",
+                "data-cv-search-picker": "true",
+                "data-picker-mode": "single",
+                "data-picker-variant": "detailed",
+                "data-placeholder": "Selecionar apoio de escolta...",
+                "data-empty-message": "Nenhum servidor encontrado.",
+            }),
+            "coordenador_cerimonial": ServidorMotoristaSelect(attrs={
+                "class": "form-select cv-search-picker__native",
+                "data-cv-search-picker": "true",
+                "data-picker-mode": "single",
+                "data-picker-variant": "detailed",
+                "data-placeholder": "Selecionar coordenação...",
+                "data-empty-message": "Nenhum servidor encontrado.",
+            }),
+            "apoio_cerimonial": ServidorMotoristaSelect(attrs={
+                "class": "form-select cv-search-picker__native",
+                "data-cv-search-picker": "true",
+                "data-picker-mode": "single",
+                "data-picker-variant": "detailed",
+                "data-placeholder": "Selecionar apoio de cerimonial...",
+                "data-empty-message": "Nenhum servidor encontrado.",
+            }),
+            "apoio_preparacao": ServidorMotoristaSelect(attrs={
+                "class": "form-select cv-search-picker__native",
+                "data-cv-search-picker": "true",
+                "data-picker-mode": "single",
+                "data-picker-variant": "detailed",
+                "data-placeholder": "Selecionar apoio de preparação...",
+                "data-empty-message": "Nenhum servidor encontrado.",
             }),
             "motivo": forms.Textarea(attrs={
                 "rows": 5,
@@ -157,6 +225,21 @@ class OrdemServicoForm(forms.ModelForm):
             filter_queryset_by_area(Servidor.objects).select_related("cargo", "unidade").order_by("nome")
         )
 
+        role_queryset = filter_queryset_by_area(Servidor.objects).select_related("cargo", "unidade").order_by("nome")
+        role_fields = (
+            "motorista_equipe",
+            "tecnico_equipe",
+            "apoio_montagem",
+            "apoio_escolta",
+            "coordenador_cerimonial",
+            "apoio_cerimonial",
+            "apoio_preparacao",
+        )
+        for field_name in role_fields:
+            self.fields[field_name].required = False
+            self.fields[field_name].queryset = role_queryset
+
+        self.fields["tipo_necessidade"].required = True
         self.fields["motivo"].required = False
         self.fields["modelo_motivo"].queryset = (
             ModeloMotivoOficio.objects.filter(ativo=True).order_by("ordem", "nome")

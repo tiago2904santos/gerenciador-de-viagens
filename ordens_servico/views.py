@@ -120,7 +120,19 @@ def index(request):
     )
 
 def _os_queryset():
-    return filter_queryset_by_area(OrdemServico.objects).prefetch_related("destinos__estado", "servidores", "oficios")
+    return (
+        filter_queryset_by_area(OrdemServico.objects)
+        .select_related(
+            "motorista_equipe",
+            "tecnico_equipe",
+            "apoio_montagem",
+            "apoio_escolta",
+            "coordenador_cerimonial",
+            "apoio_cerimonial",
+            "apoio_preparacao",
+        )
+        .prefetch_related("destinos__estado", "servidores", "oficios")
+    )
 
 
 def _evento_etapa_url(evento_id):
@@ -248,15 +260,43 @@ def _ordem_is_completa(form, evento_display):
 
     if form.is_bound:
         servidores_ok = bool(form.data.getlist("servidores"))
+        tipo = (form.data.get("tipo_necessidade") or "").strip()
+        tipo_ok = bool(tipo)
         motivo_ok = bool((form.data.get("motivo") or "").strip())
+        if tipo in {OrdemServico.TIPO_CAMINHAO, OrdemServico.TIPO_MICROONIBUS}:
+            equipe_ok = all(
+                bool((form.data.get(field_name) or "").strip())
+                for field_name in ("motorista_equipe", "tecnico_equipe", "apoio_montagem", "apoio_escolta")
+            )
+        elif tipo == OrdemServico.TIPO_CERIMONIAL_ANTECIPADO:
+            equipe_ok = all(
+                bool((form.data.get(field_name) or "").strip())
+                for field_name in ("coordenador_cerimonial", "apoio_cerimonial", "apoio_preparacao")
+            )
+        else:
+            equipe_ok = servidores_ok
     else:
         if form.instance and form.instance.pk:
             servidores_ok = form.instance.servidores.exists()
         else:
             servidores_ok = bool(form.initial.get("servidores"))
+        tipo = (getattr(form.instance, "tipo_necessidade", "") or "").strip()
+        tipo_ok = bool(tipo)
         motivo_ok = bool((getattr(form.instance, "motivo", "") or "").strip())
+        if tipo in {OrdemServico.TIPO_CAMINHAO, OrdemServico.TIPO_MICROONIBUS}:
+            equipe_ok = all(
+                bool(getattr(form.instance, field_name + "_id", None))
+                for field_name in ("motorista_equipe", "tecnico_equipe", "apoio_montagem", "apoio_escolta")
+            )
+        elif tipo == OrdemServico.TIPO_CERIMONIAL_ANTECIPADO:
+            equipe_ok = all(
+                bool(getattr(form.instance, field_name + "_id", None))
+                for field_name in ("coordenador_cerimonial", "apoio_cerimonial", "apoio_preparacao")
+            )
+        else:
+            equipe_ok = servidores_ok
 
-    return bool(servidores_ok and motivo_ok)
+    return bool(equipe_ok and tipo_ok and motivo_ok)
 
 
 def _form_context(*, request, form, ordem=None, evento=None):
