@@ -1236,11 +1236,19 @@ html[data-theme="dark"] .ui-lab-page {
   color: var(--cv-cs-chevron-color);
   display: flex;
   flex-shrink: 0;
-  transition: transform 200ms ease, color 150ms ease;
+  transition: color 150ms ease;
+}
+
+.cv-custom-select__chevron svg {
+  display: block;
+  transition: transform 200ms ease;
 }
 
 .cv-custom-select--open .cv-custom-select__chevron {
   color: var(--cv-select-border-focus);
+}
+
+.cv-custom-select--open .cv-custom-select__chevron svg {
   transform: rotate(180deg);
 }
 

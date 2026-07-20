@@ -2136,6 +2136,14 @@ html[data-theme="light-dark"] :is(.cv-custom-select__option--selected, .cv-searc
   color: var(--color-white);
 }
 
+html[data-theme="dark"] :is(.cv-custom-select__option--selected:hover, .cv-custom-select__option--selected.cv-custom-select__option--focused, .cv-search-picker__option--selected:hover),
+html[data-theme="dark-dark"] :is(.cv-custom-select__option--selected:hover, .cv-custom-select__option--selected.cv-custom-select__option--focused, .cv-search-picker__option--selected:hover),
+html[data-theme="light-dark"] :is(.cv-custom-select__option--selected:hover, .cv-custom-select__option--selected.cv-custom-select__option--focused, .cv-search-picker__option--selected:hover) {
+  background: color-mix(in srgb, var(--color-primary-hover) 35%, var(--color-primary-dark));
+  border-color: var(--color-primary-hover);
+  color: var(--color-white);
+}
+
 html[data-theme="dark"] :is(.cv-search-picker__selected-panel, .cv-search-picker__selected-card),
 html[data-theme="dark-dark"] :is(.cv-search-picker__selected-panel, .cv-search-picker__selected-card),
 html[data-theme="light-dark"] :is(.cv-search-picker__selected-panel, .cv-search-picker__selected-card) {
@@ -4052,6 +4060,11 @@ html[data-theme="light-dark"] :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-lay
   .cv-custom-select--v2.cv-custom-select--open .cv-custom-select__chevron {
   background: color-mix(in srgb, var(--color-accent) 8%, var(--color-surface-muted));
   color: var(--color-accent-text);
+  transform: none;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-custom-select--v2.cv-custom-select--open .cv-custom-select__chevron svg {
   transform: rotate(180deg);
 }
 
@@ -4106,7 +4119,12 @@ html[data-theme="light-dark"] :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-lay
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .cv-custom-select__menu--v2 .cv-custom-select__option--selected:hover:not(.cv-custom-select__option--disabled),
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .cv-custom-select__menu--v2 .cv-custom-select__option--selected.cv-custom-select__option--focused {
+  background: color-mix(in srgb, var(--color-accent) 16%, var(--color-surface-soft));
+  box-shadow: inset 3px 0 0 var(--color-accent);
+  color: var(--color-heading);
   filter: none;
 }
 

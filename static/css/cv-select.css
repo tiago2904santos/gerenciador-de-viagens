@@ -785,11 +785,19 @@ html[data-theme="dark"] {
   color: var(--cv-cs-chevron-color);
   display: flex;
   flex-shrink: 0;
-  transition: transform 200ms ease, color 150ms ease;
+  transition: color 150ms ease;
+}
+
+.cv-custom-select__chevron svg {
+  display: block;
+  transition: transform 200ms ease;
 }
 
 .cv-custom-select--open .cv-custom-select__chevron {
   color: var(--cv-select-border-focus);
+}
+
+.cv-custom-select--open .cv-custom-select__chevron svg {
   transform: rotate(180deg);
 }
 
@@ -877,7 +885,9 @@ html[data-theme="dark"] {
   font-weight: var(--cv-cs-option-selected-weight);
 }
 
+.cv-custom-select__option--selected:hover:not(.cv-custom-select__option--disabled),
 .cv-custom-select__option--selected.cv-custom-select__option--focused {
+  background: var(--cv-cs-option-selected-bg);
   filter: brightness(0.97);
 }
 
