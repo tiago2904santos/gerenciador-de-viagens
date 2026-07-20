@@ -11,6 +11,22 @@ from oficios.models import Oficio
 
 
 class OrdemServico(TimeStampedModel, CancelavelModel):
+    TIPO_PADRAO = "PADRAO"
+    TIPO_OPERACAO_ANTECIPADA = "OPERACAO_ANTECIPADA"
+    TIPO_OPERACAO_RETORNO_POSTERIOR = "OPERACAO_RETORNO_POSTERIOR"
+    TIPO_CAMINHAO = "CAMINHAO"
+    TIPO_MICROONIBUS = "MICROONIBUS"
+    TIPO_CERIMONIAL_ANTECIPADO = "CERIMONIAL_ANTECIPADO"
+
+    TIPO_NECESSIDADE_CHOICES = [
+        (TIPO_PADRAO, "Padrão / texto livre"),
+        (TIPO_OPERACAO_ANTECIPADA, "Operação policial - ida antecipada"),
+        (TIPO_OPERACAO_RETORNO_POSTERIOR, "Operação policial - retorno posterior"),
+        (TIPO_CAMINHAO, "Caminhão - dois dias antes e depois"),
+        (TIPO_MICROONIBUS, "Micro-ônibus"),
+        (TIPO_CERIMONIAL_ANTECIPADO, "Cerimonial - ida antecipada"),
+    ]
+
     area = models.ForeignKey(
         "usuarios.AreaTrabalho",
         null=True,
@@ -47,6 +63,68 @@ class OrdemServico(TimeStampedModel, CancelavelModel):
         blank=True,
         related_name="ordens_servico",
         verbose_name="Servidores",
+    )
+    tipo_necessidade = models.CharField(
+        "Tipo de necessidade",
+        max_length=40,
+        choices=TIPO_NECESSIDADE_CHOICES,
+        default=TIPO_PADRAO,
+    )
+    motorista_equipe = models.ForeignKey(
+        Servidor,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        verbose_name="Motorista",
+    )
+    tecnico_equipe = models.ForeignKey(
+        Servidor,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        verbose_name="Técnico",
+    )
+    apoio_montagem = models.ForeignKey(
+        Servidor,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        verbose_name="Apoio de montagem",
+    )
+    apoio_escolta = models.ForeignKey(
+        Servidor,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        verbose_name="Apoio de escolta",
+    )
+    coordenador_cerimonial = models.ForeignKey(
+        Servidor,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        verbose_name="Coordenação de cerimonial",
+    )
+    apoio_cerimonial = models.ForeignKey(
+        Servidor,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        verbose_name="Apoio de cerimonial",
+    )
+    apoio_preparacao = models.ForeignKey(
+        Servidor,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        verbose_name="Apoio de preparação",
     )
     motivo = models.TextField("Motivo", blank=True, default="")
 
