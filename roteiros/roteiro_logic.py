@@ -495,7 +495,7 @@ def _roteiro_resolve_travel_minutes(raw_minutes, total_minutes, additional_minut
 
 
 def _build_roteiro_roteiro_label(roteiro):
-    origem = _roteiro_local_label(roteiro.origem_cidade, roteiro.origem_estado) or 'Sede nÃ£o informada'
+    origem = _roteiro_local_label(roteiro.origem_cidade, roteiro.origem_estado) or 'Sede não informada'
     destinos = [
         _roteiro_local_label(destino.cidade, destino.estado)
         for destino in roteiro.destinos.select_related('cidade', 'estado').order_by('ordem', 'id')
@@ -503,7 +503,7 @@ def _build_roteiro_roteiro_label(roteiro):
     resumo = ' -> '.join(destinos[:3]) if destinos else 'Sem destinos'
     if len(destinos) > 3:
         resumo += ' -> ...'
-    return f'Roteiro #{roteiro.pk} - {origem} -> {resumo}'
+    return f'{origem} -> {resumo}'
 
 
 def _serialize_roteiro_state(state):
@@ -1380,7 +1380,7 @@ def _build_roteiro_avulso_route_options(evento=None, excluir_pk=None):
         state_map[roteiro.pk] = state
         options.append({
             'id': roteiro.pk,
-            'label': state.get('roteiro_evento_label') or f'Roteiro #{roteiro.pk}',
+            'label': state.get('roteiro_evento_label') or state.get('resumo') or 'Roteiro salvo',
             'resumo': resumo,
             'status': roteiro.status,
             'tipo_label': 'Vinculado a evento' if roteiro.tipo == Roteiro.TIPO_EVENTO else 'Avulso',

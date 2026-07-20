@@ -1,4 +1,8 @@
 {# SEÇÃO 4: MAPA DA ROTA #}
-{% include "components/ui/forms/form_block.html" with shell=roteiro_editor_oficio|yesno:",card" extra_class="roteiro-editor__section--mapa" element_id="sec-mapa-rota" section_id="sec-mapa-rota-title" title="Mapa da rota" description="Distância, duração e visualização do percurso." body_template="roteiros/partials/roteiro/_mapa_body.html" %}
+{% if roteiro_editor_oficio %}
+  {% include "components/ui/forms/form_block.html" with shell="" extra_class="roteiro-editor__section--mapa oficio-roteiro-block" element_id="sec-mapa-rota" section_id="sec-mapa-rota-title" title="Mapa da rota" description="Distância, duração e visualização do percurso." body_template="roteiros/partials/roteiro/_mapa_body.html" %}
+{% else %}
+  {% include "components/ui/forms/form_block.html" with shell="card" extra_class="roteiro-editor__section--mapa" element_id="sec-mapa-rota" section_id="sec-mapa-rota-title" title="Mapa da rota" description="Distância, duração e visualização do percurso." body_template="roteiros/partials/roteiro/_mapa_body.html" %}
+{% endif %}
 
 {{ roteiro_mapa_inicial|json_script:"roteiro-mapa-inicial" }}

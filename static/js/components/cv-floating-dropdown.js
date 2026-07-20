@@ -33,6 +33,9 @@
       if (anchor.closest("[data-oficio-wizard-step1]")) {
         menu.setAttribute("data-oficio-wizard-step1", "");
       }
+      if (anchor.closest("[data-oficio-wizard-roteiro]")) {
+        menu.setAttribute("data-oficio-wizard-roteiro", "");
+      }
       document.body.appendChild(menu);
       menu.dataset.cvFloatingActive = "true";
       position();
@@ -53,6 +56,7 @@
       menu.style.minWidth = "";
       delete menu.dataset.cvFloatingActive;
       menu.removeAttribute("data-oficio-wizard-step1");
+      menu.removeAttribute("data-oficio-wizard-roteiro");
       if (placeholder && placeholder.parentNode) {
         placeholder.parentNode.insertBefore(menu, placeholder);
         placeholder.remove();

@@ -5,7 +5,7 @@
   {% url 'roteiros:roteiro-autosave-create' as roteiro_autosave_create_url %}
 {% endif %}
 
-<div class="roteiro-wizard__editor {% if is_avulso %}roteiro-editor--avulso{% endif %}{% if roteiro_editor_oficio %} roteiro-editor--oficio{% endif %}" data-glance-state="closed">
+<div class="roteiro-wizard__editor {% if is_avulso %}roteiro-editor--avulso{% endif %}{% if roteiro_editor_oficio %} roteiro-editor--oficio{% endif %}"{% if roteiro_editor_oficio %} data-oficio-wizard-roteiro{% endif %} data-glance-state="closed">
     <form method="post" id="roteiro-editor-form" novalidate class="roteiro-wizard__form"
           {% if roteiro_form_action %}action="{{ roteiro_form_action }}"{% endif %}
           data-autosave="true"
@@ -45,13 +45,14 @@
       {% endif %}
 
       {% if roteiro_editor_oficio %}
-      <section class="cv-wizard-section-card cv-form-card roteiro-editor__oficio-card" aria-labelledby="roteiro-oficio-card-title">
+      <section class="cv-wizard-section-card cv-form-card cv-wizard-section-card--described roteiro-editor__oficio-card oficio-roteiro-card" aria-labelledby="roteiro-oficio-card-title">
         <header class="cv-wizard-section-header">
           <div class="cv-wizard-section-header__copy">
             <h2 class="cv-wizard-section-title" id="roteiro-oficio-card-title">Roteiro e diárias</h2>
+            <p class="cv-wizard-section-subtitle">Origem, percurso, deslocamentos e cálculo financeiro</p>
           </div>
         </header>
-        <div class="cv-wizard-section-body">
+        <div class="cv-wizard-section-body oficio-roteiro-body">
       {% endif %}
 
       {% include "roteiros/partials/roteiro/source.html" %}

@@ -3058,22 +3058,22 @@ html[data-theme="dark"] [data-oficio-wizard-step1] .cv-search-picker {
   --driver-text:   var(--color-accent);
 }
 
-/* ── Etapa 1: painéis por seção (layout estrutural, ambos os temas) ─ */
-[data-oficio-wizard-step1] .oficio-step1-body {
+/* ── Etapa 1 / Roteiro: painéis por seção (layout estrutural) ─ */
+:is([data-oficio-wizard-step1], [data-oficio-wizard-roteiro]) :is(.oficio-step1-body, .oficio-roteiro-body) {
   display: grid;
   gap: 10px;
 }
 
-[data-oficio-wizard-step1] .oficio-step1-block {
+:is([data-oficio-wizard-step1] .oficio-step1-block, [data-oficio-wizard-roteiro] .oficio-roteiro-block) {
   margin: 0;
 }
 
-[data-oficio-wizard-step1] .oficio-step1-block > .cv-form-block__header .cv-form-block__copy {
+:is([data-oficio-wizard-step1] .oficio-step1-block, [data-oficio-wizard-roteiro] .oficio-roteiro-block) > .cv-form-block__header .cv-form-block__copy {
   display: grid;
   gap: 3px;
 }
 
-[data-oficio-wizard-step1] .oficio-step1-block .cv-form-block__description {
+:is([data-oficio-wizard-step1] .oficio-step1-block, [data-oficio-wizard-roteiro] .oficio-roteiro-block) .cv-form-block__description {
   text-align: left;
 }
 

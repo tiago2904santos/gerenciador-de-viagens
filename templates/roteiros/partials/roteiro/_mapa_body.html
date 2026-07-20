@@ -80,14 +80,18 @@
   <div class="roteiro-mapa__frame roteiro-mapa__frame--placeholder"
        id="roteiro-mapa-container"
        data-testid="roteiro-mapa-container"></div>
+
+  <div class="roteiro-mapa__loading"
+       id="roteiro-mapa-loading"
+       hidden
+       role="status"
+       aria-live="polite">
+    <span class="roteiro-mapa__loading-spinner" aria-hidden="true"></span>
+    <span class="roteiro-mapa__loading-text">Calculando rota…</span>
+  </div>
 </div>
 
 <div class="roteiro-mapa__error alert alert-warning py-2 small"
      id="roteiro-mapa-error"
      hidden
      role="alert"></div>
-<div class="roteiro-mapa__loading small text-muted"
-     id="roteiro-mapa-loading"
-     hidden>
-  Calculando rota…
-</div>

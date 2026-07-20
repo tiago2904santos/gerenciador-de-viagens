@@ -427,6 +427,30 @@ export function initRoteirosEditor() {
       scheduleRealtimeDiarias();
     }, 160);
   }
+  function clearLoopGeneratedTrechos() {
+    // Ao sair do bate-volta, remove os trechos/retorno gerados pelo loop
+    // e remonta a partir de sede+destinos (modo normal).
+    mountTrechosHtml(TRECHOS_EMPTY_HTML);
+    [
+      'id_retorno_saida_data',
+      'id_retorno_saida_hora',
+      'id_retorno_chegada_data',
+      'id_retorno_chegada_hora',
+      'id_retorno_distancia_km',
+      'id_retorno_tempo_cru_estimado_min',
+      'id_retorno_duracao_estimada_min',
+      'id_retorno_tempo_viagem_hhmm',
+      'id_retorno_tempo_adicional_hhmm'
+    ].forEach(function(id) {
+      if ($(id)) $(id).value = '';
+    });
+    if ($('id_retorno_tempo_adicional_min')) $('id_retorno_tempo_adicional_min').value = '0';
+    if ($('id_retorno_rota_fonte')) $('id_retorno_rota_fonte').value = '';
+    lastTrechosSignature = '';
+    renderTrechos(captureCurrentState(), { preferSeed: false, force: true });
+    scheduleRealtimeDiarias();
+    notifyRouteStateChanged();
+  }
   function selectedText(el) { return el && el.selectedIndex >= 0 && el.options[el.selectedIndex] ? String(el.options[el.selectedIndex].text || '').trim() : ''; }
   function esc(value) { return String(value || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
   function makeStableKey(prefix) {
@@ -835,26 +859,41 @@ export function initRoteirosEditor() {
     var container = $('destinos-container');
     return container ? Array.from(container.querySelectorAll('.destino-row')) : [];
   }
+  function syncDestinoRowChrome(row, idx) {
+    if (!row) return;
+    var ord = row.querySelector('[data-destino-ord]');
+    if (ord) ord.textContent = String(idx + 1);
+    var es = row.querySelector('.destino-estado');
+    var ci = row.querySelector('.destino-cidade');
+    var esId = 'destino_estado_' + idx;
+    var ciId = 'destino_cidade_' + idx;
+    if (es) {
+      es.name = esId;
+      es.id = esId;
+    }
+    if (ci) {
+      ci.name = ciId;
+      ci.id = ciId;
+    }
+    var esLabel = row.querySelector('label[for^="destino_estado_"]');
+    var ciLabel = row.querySelector('label[for^="destino_cidade_"]');
+    if (esLabel) esLabel.setAttribute('for', esId);
+    if (ciLabel) ciLabel.setAttribute('for', ciId);
+  }
   function reindexDestinoRows() {
     if (window.CV && window.CV.destinos && typeof window.CV.destinos.reindexRows === 'function') {
       window.CV.destinos.reindexRows($('destinos-container'), {
         rowSelector: '.destino-row',
         indexAttr: 'index',
         onRow: function(row, idx) {
-          var es = row.querySelector('.destino-estado');
-          var ci = row.querySelector('.destino-cidade');
-          if (es) es.name = 'destino_estado_' + idx;
-          if (ci) ci.name = 'destino_cidade_' + idx;
+          syncDestinoRowChrome(row, idx);
         }
       });
       return;
     }
     getDestinoRows().forEach(function(row, idx) {
       row.dataset.index = String(idx);
-      var es = row.querySelector('.destino-estado');
-      var ci = row.querySelector('.destino-cidade');
-      if (es) es.name = 'destino_estado_' + idx;
-      if (ci) ci.name = 'destino_cidade_' + idx;
+      syncDestinoRowChrome(row, idx);
     });
   }
   function refreshDestinoButtons() {
@@ -977,6 +1016,26 @@ export function initRoteirosEditor() {
       return String(template.innerHTML || '').replace(/__index__/g, esc(String(idx)));
     }
     var selE = destino && destino.estado_id ? destino.estado_id : (destinoEstadoDefaultId || '');
+    var isOficio = !!(form && form.closest && form.closest('[data-oficio-wizard-roteiro]'));
+    if (isOficio) {
+      return '' +
+        '<div class="destino-row oficio-roteiro-destino-row" data-index="' + esc(String(idx)) + '">' +
+          '<span class="oficio-roteiro-destino-row__badge" data-destino-ord aria-hidden="true">' + esc(String(idx + 1)) + '</span>' +
+          '<div class="oficio-roteiro-destino-row__body">' +
+            '<div class="field-grid roteiro-sede-grid roteiro-destino-grid oficio-roteiro-destino-row__fields">' +
+              '<div class="field app-form-field">' +
+                '<select name="destino_estado_' + idx + '" id="destino_estado_' + idx + '" class="destino-estado cv-search-picker__native" data-cv-search-picker="true" data-picker-mode="single" data-picker-variant="compact" data-placeholder="Buscar estado..." data-empty-message="Nenhum estado encontrado." aria-label="UF">' + estadoOptionsMarkup(selE) + '</select>' +
+              '</div>' +
+              '<div class="field app-form-field">' +
+                '<select name="destino_cidade_' + idx + '" id="destino_cidade_' + idx + '" class="destino-cidade cv-search-picker__native" data-cv-search-picker="true" data-picker-mode="single" data-picker-variant="compact" data-placeholder="Buscar cidade..." data-empty-message="Nenhuma cidade encontrada." aria-label="Cidade" disabled>' +
+                  '<option value="">---------</option>' +
+                '</select>' +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+          '<button type="button" class="btn-remover-destino oficio-roteiro-destino-row__remove" title="Remover destino" aria-label="Remover destino">×</button>' +
+        '</div>';
+    }
     return '' +
       '<div class="cv-search-picker__selected-card destino-row" data-index="' + esc(String(idx)) + '">' +
         '<div class="cv-search-picker__selected-main">' +
@@ -1347,7 +1406,12 @@ export function initRoteirosEditor() {
       sede_estado_id: $('id_origem_estado').value||null, sede_cidade_id: $('id_origem_cidade').value||null,
       destinos_atuais: getDestinos(),
       bate_volta_diario: {
-        ativo: !!($('id_bate_volta_diario_ativo') && $('id_bate_volta_diario_ativo').checked),
+        ativo: (function() {
+          var input = $('id_bate_volta_diario_ativo');
+          if (!input) return false;
+          if (input.type === 'checkbox') return !!input.checked;
+          return String(input.value || '').toLowerCase() === 'true';
+        })(),
         data_inicio: ($('id_bate_volta_data_inicio_native') || {}).value || '',
         data_fim: ($('id_bate_volta_data_fim_native') || {}).value || '',
         ida_saida_hora: ($('id_bate_volta_ida_saida_hora') || {}).value || '',
@@ -1614,21 +1678,54 @@ export function initRoteirosEditor() {
       routePeriodSummary(route)
     ].join(' ');
   }
+  function routeDisplayTitle(route) {
+    var label = String((route && route.label) || '').trim();
+    label = label.replace(/^Roteiro\s*#\d+\s*[-–—:]\s*/i, '').trim();
+    if (label) return label;
+    var resumo = String((route && route.resumo) || '').trim();
+    if (resumo) return resumo;
+    return 'Roteiro salvo';
+  }
+  var ROUTE_AVATAR_ICON =
+    '<svg class="cv-icon oficio-roteiro-route-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false" fill="none">' +
+      '<circle cx="6" cy="19" r="2.5" fill="currentColor"></circle>' +
+      '<circle cx="18" cy="5" r="2.5" fill="currentColor"></circle>' +
+      '<path d="M8.2 18.2h6.1a3.3 3.3 0 0 0 0-6.6H9.7a3.3 3.3 0 0 1 0-6.6h6.1" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>' +
+    '</svg>';
   function renderRouteList(filterText) {
     var target = $('roteiro-lista'); if (!target) return;
+    var emptyEl = $('roteiro-lista-empty');
     var selId = getSelectedRouteId(); var term = normalizeRouteSearch(filterText);
     var filtered = routes.filter(function(r) { if (!term) return true; return normalizeRouteSearch(routeSearchText(r)).indexOf(term)!==-1; });
-    if (!filtered.length) { target.innerHTML = '<div class="oficio-roteiro-route-empty">Nenhum roteiro encontrado para a busca.</div>'; return; }
+    var isOficioPicker = !!target.closest('.oficio-roteiro-salvo-picker');
+    if (!filtered.length) {
+      target.innerHTML = isOficioPicker ? '' : '<div class="oficio-roteiro-route-empty">Nenhum roteiro encontrado para a busca.</div>';
+      if (emptyEl) emptyEl.hidden = !isOficioPicker;
+      return;
+    }
+    if (emptyEl) emptyEl.hidden = true;
     target.innerHTML = filtered.map(function(r) {
       var rid=String(r.id); var ac=rid===selId?' is-active':'';
+      var title = routeDisplayTitle(r);
+      if (isOficioPicker) {
+        return '<button type="button" class="cv-search-picker__selected-card oficio-roteiro-route-item'+ac+'" data-route-id="'+esc(rid)+'" aria-pressed="'+(rid===selId?'true':'false')+'">' +
+          '<span class="cv-search-picker__selected-avatar" aria-hidden="true">'+ROUTE_AVATAR_ICON+'</span>' +
+          '<div class="cv-search-picker__selected-main">' +
+            '<span class="cv-search-picker__selected-name">'+esc(title)+'</span>' +
+            '<span class="cv-search-picker__selected-meta route-periodo">'+esc(routePeriodSummary(r))+'</span>' +
+          '</div></button>';
+      }
       return '<button type="button" class="oficio-roteiro-route-item'+ac+'" data-route-id="'+esc(rid)+'">' +
-        '<span class="route-title">'+esc(r.label||'Roteiro #'+rid)+'</span>' +
+        '<span class="route-title">'+esc(title)+'</span>' +
         '<span class="route-periodo">'+esc(routePeriodSummary(r))+'</span></button>';
     }).join('');
   }
   function routeResumo() {
-    var r = routeMap[String(getSelectedRouteId() || '')];
-    $('roteiro-selector-resumo').textContent = r ? ((r.tipo_label ? r.tipo_label+' â€” ' : '')+r.resumo) : '';
+    var resumoEl = $('roteiro-selector-resumo');
+    if (resumoEl) {
+      var r = routeMap[String(getSelectedRouteId() || '')];
+      resumoEl.textContent = r ? ((r.tipo_label ? r.tipo_label + ' — ' : '') + r.resumo) : '';
+    }
     renderRouteList($('id_roteiro_busca') ? $('id_roteiro_busca').value : '');
   }
   function setModeUi() {
@@ -1793,7 +1890,11 @@ export function initRoteirosEditor() {
     field.addEventListener('change', function() {
       if (applyingState) return;
       toggleBateVoltaPanel();
-      scheduleLoopTrechosRender({ preferSeed: false, force: true });
+      if (id === 'id_bate_volta_diario_ativo' && !isLoopModeActive()) {
+        clearLoopGeneratedTrechos();
+      } else {
+        scheduleLoopTrechosRender({ preferSeed: false, force: true });
+      }
       scheduleAutosave();
       notifyRouteStateChanged();
     });

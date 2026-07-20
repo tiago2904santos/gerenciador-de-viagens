@@ -250,6 +250,22 @@
   width: var(--space-6);
 }
 
+/* Limpar busca: só o "x", sem cápsula/fundo. */
+.cv-search-picker__clear {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  color: var(--color-muted-strong, var(--theme-text-muted, var(--color-muted)));
+  font-size: 0.95rem;
+  font-weight: var(--font-weight-semibold);
+  height: auto;
+  min-height: 1.25rem;
+  min-width: 1.25rem;
+  text-transform: none;
+  width: auto;
+}
+
 .cv-search-picker__selected-card > .cv-search-picker__remove {
   background: var(--danger-bg);
   align-self: stretch;
@@ -303,7 +319,14 @@
 }
 
 .cv-search-picker__clear:hover,
-.cv-search-picker__clear:focus-visible,
+.cv-search-picker__clear:focus-visible {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  color: var(--color-text, var(--theme-text-heading));
+  outline: none;
+}
+
 .cv-search-picker__remove:hover,
 .cv-search-picker__remove:focus-visible {
   background: var(--danger-bg);

@@ -839,7 +839,7 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .roteiro-editor--oficio .roteiro-editor__oficio-card > .cv-wizard-section-body {
-  line-height: 0;
+  line-height: normal;
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
@@ -853,12 +853,12 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
 }
 
 /* ========================================================================
-   Etapa 1 do ofício — card + camada intermediária por seção
+   Etapas Ofício (Dados / Roteiro) — card + camada intermediária por seção
    Card externo escuro; blocos em surface-soft; campos no tom do card
    (poço inset dentro de cada seção).
    ======================================================================== */
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  [data-oficio-wizard-step1] .oficio-step1-card {
+  :is([data-oficio-wizard-step1] .oficio-step1-card, [data-oficio-wizard-roteiro] .oficio-roteiro-card) {
   --step1-surface: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
   --step1-panel: var(--color-surface-soft);
   --step1-field: var(--step1-surface);
@@ -873,20 +873,20 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  [data-oficio-wizard-step1] .oficio-step1-card > .cv-wizard-section-header {
+  :is([data-oficio-wizard-step1] .oficio-step1-card, [data-oficio-wizard-roteiro] .oficio-roteiro-card) > .cv-wizard-section-header {
   background: transparent;
   min-height: 64px;
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  [data-oficio-wizard-step1] .oficio-step1-card > .cv-wizard-section-header .cv-wizard-section-title {
+  :is([data-oficio-wizard-step1] .oficio-step1-card, [data-oficio-wizard-roteiro] .oficio-roteiro-card) > .cv-wizard-section-header .cv-wizard-section-title {
   font-size: 1.05rem;
   letter-spacing: 0.02em;
   text-transform: none;
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  [data-oficio-wizard-step1] .oficio-step1-card > .cv-wizard-section-header .cv-wizard-section-subtitle {
+  :is([data-oficio-wizard-step1] .oficio-step1-card, [data-oficio-wizard-roteiro] .oficio-roteiro-card) > .cv-wizard-section-header .cv-wizard-section-subtitle {
   color: var(--color-muted);
   display: block;
   font-size: var(--font-size-xs);
@@ -895,7 +895,7 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  [data-oficio-wizard-step1] .oficio-step1-body {
+  :is([data-oficio-wizard-step1] .oficio-step1-body, [data-oficio-wizard-roteiro] .oficio-roteiro-body) {
   display: grid;
   gap: 10px;
   padding: 14px 18px 18px;
@@ -903,7 +903,7 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
 
 /* Camada intermediária: cada seção é um painel suave. */
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  [data-oficio-wizard-step1] .oficio-step1-block {
+  :is([data-oficio-wizard-step1] .oficio-step1-block, [data-oficio-wizard-roteiro] .oficio-roteiro-block) {
   background: var(--step1-panel);
   border: 0;
   border-radius: 14px;
@@ -913,13 +913,13 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  [data-oficio-wizard-step1] .oficio-step1-block > .cv-form-block__header {
+  :is([data-oficio-wizard-step1] .oficio-step1-block, [data-oficio-wizard-roteiro] .oficio-roteiro-block) > .cv-form-block__header {
   align-items: flex-start;
   gap: 12px;
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  [data-oficio-wizard-step1] .oficio-step1-block > .cv-form-block__header .cv-form-block__copy {
+  :is([data-oficio-wizard-step1] .oficio-step1-block, [data-oficio-wizard-roteiro] .oficio-roteiro-block) > .cv-form-block__header .cv-form-block__copy {
   align-items: start;
   display: grid;
   gap: 3px;
@@ -928,25 +928,25 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  [data-oficio-wizard-step1] .oficio-step1-block .cv-form-block__description {
+  :is([data-oficio-wizard-step1] .oficio-step1-block, [data-oficio-wizard-roteiro] .oficio-roteiro-block) .cv-form-block__description {
   text-align: left;
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  [data-oficio-wizard-step1] .oficio-step1-block.cv-form-block--split {
+  :is([data-oficio-wizard-step1] .oficio-step1-block, [data-oficio-wizard-roteiro] .oficio-roteiro-block).cv-form-block--split {
   align-items: center;
   gap: 16px;
   grid-template-columns: minmax(148px, 0.62fr) minmax(0, 2.1fr);
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  [data-oficio-wizard-step1] .oficio-step1-block.cv-form-block--split > .cv-form-block__body {
+  :is([data-oficio-wizard-step1] .oficio-step1-block, [data-oficio-wizard-roteiro] .oficio-roteiro-block).cv-form-block--split > .cv-form-block__body {
   align-self: center;
 }
 
 /* Campos no tom do card: poço inset dentro do painel intermediário. */
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  [data-oficio-wizard-step1] :is(
+  :is([data-oficio-wizard-step1], [data-oficio-wizard-roteiro]) :is(
     input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
     textarea,
     select,
@@ -967,7 +967,7 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
 /* Não pintar .cv-custom-select no hover: o wrapper tem radius 0 e o fundo
    quadrado vaza pelos cantos do trigger arredondado. */
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  [data-oficio-wizard-step1] :is(
+  :is([data-oficio-wizard-step1], [data-oficio-wizard-roteiro]) :is(
     input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
     textarea,
     select,
@@ -980,7 +980,7 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
     .cv-search-picker__control
   ):is(:hover, :focus, :focus-within, :focus-visible),
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  [data-oficio-wizard-step1] .cv-custom-select--open .cv-custom-select__trigger {
+  :is([data-oficio-wizard-step1], [data-oficio-wizard-roteiro]) .cv-custom-select--open .cv-custom-select__trigger {
   background: var(--step1-field) !important;
   border-color: transparent !important;
   border-radius: 10px;
@@ -988,7 +988,7 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  [data-oficio-wizard-step1] .cv-composite-field__suffix {
+  :is([data-oficio-wizard-step1], [data-oficio-wizard-roteiro]) .cv-composite-field__suffix {
   background: color-mix(in srgb, var(--color-accent) 8%, var(--step1-field));
   border-left-color: color-mix(in srgb, var(--color-border) 45%, transparent);
   color: var(--color-muted-strong);
@@ -996,7 +996,7 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
 
 /* Pickers sem casca extra — o painel da seção já é a camada intermediária. */
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  [data-oficio-wizard-step1] :is(
+  :is([data-oficio-wizard-step1], [data-oficio-wizard-roteiro]) :is(
     .cv-search-picker,
     .cv-search-picker--people,
     .cv-search-picker--people.cv-search-picker--roster,
@@ -1011,7 +1011,7 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  [data-oficio-wizard-step1] .cv-search-picker__selected-panel {
+  :is([data-oficio-wizard-step1], [data-oficio-wizard-roteiro]) .cv-search-picker__selected-panel {
   background: transparent !important;
   border: 0 !important;
   box-shadow: none !important;
@@ -1020,7 +1020,7 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  [data-oficio-wizard-step1] .cv-search-picker__selected-empty {
+  :is([data-oficio-wizard-step1], [data-oficio-wizard-roteiro]) .cv-search-picker__selected-empty {
   background: var(--step1-empty) !important;
   border: 0 !important;
   border-radius: 10px;
@@ -1031,7 +1031,7 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
 
 /* Sugestões de viatura: mesmo poço dos campos (não o card-muted frio). */
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  [data-oficio-wizard-step1] .viatura-sugestao-chip {
+  :is([data-oficio-wizard-step1], [data-oficio-wizard-roteiro]) .viatura-sugestao-chip {
   background: var(--step1-field);
   border-color: transparent;
   box-shadow: none;
@@ -1039,49 +1039,49 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  [data-oficio-wizard-step1] .viatura-sugestao-chip:hover,
+  :is([data-oficio-wizard-step1], [data-oficio-wizard-roteiro]) .viatura-sugestao-chip:hover,
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  [data-oficio-wizard-step1] .viatura-sugestao-chip:focus-visible,
+  :is([data-oficio-wizard-step1], [data-oficio-wizard-roteiro]) .viatura-sugestao-chip:focus-visible,
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  [data-oficio-wizard-step1] .viatura-sugestao-chip--active {
+  :is([data-oficio-wizard-step1], [data-oficio-wizard-roteiro]) .viatura-sugestao-chip--active {
   background: color-mix(in srgb, var(--color-accent) 8%, var(--step1-field));
   border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  [data-oficio-wizard-step1] .viatura-sugestao-badge {
+  :is([data-oficio-wizard-step1], [data-oficio-wizard-roteiro]) .viatura-sugestao-badge {
   background: color-mix(in srgb, #fff 6%, var(--step1-panel));
   border-color: color-mix(in srgb, var(--color-border) 55%, transparent);
   color: var(--color-muted-strong);
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  [data-oficio-wizard-step1] .viatura-sugestao-badge--motorista,
+  :is([data-oficio-wizard-step1], [data-oficio-wizard-roteiro]) .viatura-sugestao-badge--motorista,
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  [data-oficio-wizard-step1] .viatura-sugestao-badge--unidade,
+  :is([data-oficio-wizard-step1], [data-oficio-wizard-roteiro]) .viatura-sugestao-badge--unidade,
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  [data-oficio-wizard-step1] .viatura-sugestao-badge--ativa {
+  :is([data-oficio-wizard-step1], [data-oficio-wizard-roteiro]) .viatura-sugestao-badge--ativa {
   background: color-mix(in srgb, #fff 6%, var(--step1-panel));
   border-color: color-mix(in srgb, var(--color-border) 55%, transparent);
   color: var(--color-muted-strong);
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  [data-oficio-wizard-step1] .cv-form-block__actions .cv-btn {
+  :is([data-oficio-wizard-step1], [data-oficio-wizard-roteiro]) .cv-form-block__actions .cv-btn {
   background: transparent;
   border-color: color-mix(in srgb, var(--color-border) 70%, transparent);
   box-shadow: none;
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  [data-oficio-wizard-step1] .cv-form-block__actions .cv-btn:hover {
+  :is([data-oficio-wizard-step1], [data-oficio-wizard-roteiro]) .cv-form-block__actions .cv-btn:hover {
   background: color-mix(in srgb, #fff 4%, transparent);
   border-color: color-mix(in srgb, var(--color-border) 90%, var(--color-text) 10%);
 }
 
 /* Menu do select reanexado ao <body> (cv-floating-dropdown.js). */
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  .cv-custom-select__menu--v2.cv-floating-dropdown--active[data-oficio-wizard-step1] {
+  .cv-custom-select__menu--v2.cv-floating-dropdown--active:is([data-oficio-wizard-step1], [data-oficio-wizard-roteiro]) {
   --cv-cs-menu-bg: var(--step1-surface, color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%));
   background: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
   border-color: color-mix(in srgb, var(--color-border) 55%, transparent);
@@ -1090,9 +1090,347 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
 
 @media (max-width: 900px) {
   :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-    [data-oficio-wizard-step1] .oficio-step1-block.cv-form-block--split {
+    :is([data-oficio-wizard-step1] .oficio-step1-block, [data-oficio-wizard-roteiro] .oficio-roteiro-block).cv-form-block--split {
     align-items: stretch;
     grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .field-grid.roteiro-sede-grid {
+  gap: 10px 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+@media (max-width: 600px) {
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    [data-oficio-wizard-roteiro] .field-grid.roteiro-sede-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Roteiro ofício: empty states e resumos no mesmo poço dos campos. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] :is(.roteiro-editor__empty, .cv-summary-item) {
+  background: var(--step1-field, color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%));
+  border-color: transparent;
+  box-shadow: none;
+}
+
+/* Roteiros salvos: lista rolável no mesmo poço do roster de Equipe. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-salvo-picker .cv-search-picker__selected-list {
+  display: grid;
+  gap: 8px;
+  max-height: 280px;
+  overflow: auto;
+}
+
+/* Busca de roteiro salvo: mesma altura do picker de Equipe. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-salvo-picker {
+  --form-control-height: var(--control-height-md, 44px);
+  --cv-search-picker-height: var(--control-height-md, 44px);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-salvo-picker .cv-search-picker__field {
+  gap: 7px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-salvo-picker .cv-search-picker__label {
+  color: var(--color-heading);
+  font-size: 0.78rem;
+  font-weight: var(--font-weight-black);
+  text-transform: none;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-salvo-picker .cv-search-picker__control {
+  align-items: center;
+  background: var(--step1-field, var(--color-input-bg)) !important;
+  border-color: transparent !important;
+  border-radius: 10px;
+  box-shadow: none !important;
+  box-sizing: border-box;
+  display: flex;
+  gap: 8px;
+  height: var(--form-control-height);
+  max-height: var(--form-control-height);
+  min-height: var(--form-control-height);
+  padding: 0 12px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-salvo-picker .cv-search-picker__input {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  flex: 1 1 auto;
+  line-height: 1.25;
+  min-height: 0;
+  min-width: 0;
+  outline: none;
+  padding: 0 5px;
+  width: 100%;
+}
+
+/* Destinos (ofício): subsection limpa + linhas no tom do roster/Equipe. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-destinos {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  display: grid;
+  gap: 12px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-destinos__header {
+  align-items: flex-start;
+  gap: 12px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-destinos__actions {
+  flex: 0 0 auto;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-destinos__actions .cv-btn {
+  background: transparent;
+  border-color: color-mix(in srgb, var(--color-border) 70%, transparent);
+  box-shadow: none;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-destinos__actions .cv-btn:hover {
+  background: color-mix(in srgb, #fff 4%, transparent);
+  border-color: color-mix(in srgb, var(--color-border) 90%, var(--color-text) 10%);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-destinos__list {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-destino-row.destino-row,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-destino-row.destino-row:hover {
+  align-items: center;
+  background: color-mix(in srgb, #fff 3.5%, var(--step1-panel, var(--color-surface-soft)));
+  border: 1px solid color-mix(in srgb, var(--color-border) 40%, transparent);
+  border-radius: 12px;
+  box-shadow: none;
+  column-gap: 12px;
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 40px;
+  min-height: 78px;
+  padding: 11px 10px 11px 12px;
+  row-gap: 0;
+  transition: background-color 140ms ease, border-color 140ms ease;
+  user-select: none;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-destino-row.destino-row:hover {
+  background: color-mix(in srgb, var(--color-accent) 6%, var(--step1-panel, var(--color-surface-soft)));
+  border-color: color-mix(in srgb, var(--color-border) 70%, transparent);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-destino-row.destino-row--single,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-destino-row.destino-row--single:hover {
+  grid-template-columns: 42px minmax(0, 1fr);
+}
+
+/* Sede: mesma linha visual dos destinos (badge + campos). */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-sede-row,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-sede-row:hover {
+  align-items: center;
+  background: color-mix(in srgb, #fff 3.5%, var(--step1-panel, var(--color-surface-soft)));
+  border: 1px solid color-mix(in srgb, var(--color-border) 40%, transparent);
+  border-radius: 12px;
+  box-shadow: none;
+  column-gap: 12px;
+  display: grid;
+  grid-template-columns: minmax(42px, max-content) minmax(0, 1fr);
+  min-height: 78px;
+  padding: 11px 12px;
+  row-gap: 0;
+  transition: background-color 140ms ease, border-color 140ms ease;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-sede-row:hover {
+  background: color-mix(in srgb, var(--color-accent) 6%, var(--step1-panel, var(--color-surface-soft)));
+  border-color: color-mix(in srgb, var(--color-border) 70%, transparent);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-destino-row__badge {
+  align-items: center;
+  background: var(--color-accent-soft);
+  border: 1px solid var(--color-accent-border-soft);
+  border-radius: 12px;
+  color: var(--color-accent-text);
+  display: inline-flex;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-black);
+  grid-column: 1;
+  height: 42px;
+  justify-content: center;
+  letter-spacing: 0.04em;
+  width: 42px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-destino-row__body {
+  grid-column: 2;
+  min-width: 0;
+  width: 100%;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-destino-row__fields {
+  gap: 10px 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+  width: 100%;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-destino-row__fields > .field {
+  gap: 6px;
+  margin: 0;
+  min-width: 0;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-destino-row__fields .app-form-label {
+  color: var(--color-muted-strong);
+  font-size: 0.72rem;
+  font-weight: var(--font-weight-bold);
+  margin: 0;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-destino-row__remove {
+  align-items: center;
+  align-self: stretch;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-left: 1px solid color-mix(in srgb, var(--color-border) 55%, transparent);
+  border-radius: 0 10px 10px 0;
+  box-shadow: none;
+  color: transparent;
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 0;
+  font-weight: var(--font-weight-semibold);
+  grid-column: 3;
+  justify-content: center;
+  justify-self: stretch;
+  line-height: 0;
+  margin: -11px -10px -11px 0;
+  min-width: 40px;
+  opacity: 1;
+  overflow: visible;
+  padding: 0;
+  text-transform: none;
+  transform: none;
+  transition: none;
+  width: 40px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-destino-row__remove::before {
+  color: var(--color-muted);
+  content: "×";
+  display: block;
+  font-size: 1.25rem;
+  font-weight: inherit;
+  line-height: 1;
+  /* Compensa o baseline óptico do glyph × */
+  transform: translateY(-0.06em);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-destino-row__remove:hover,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-destino-row__remove:focus-visible,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .destino-row > .oficio-roteiro-destino-row__remove:hover,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .destino-row > .oficio-roteiro-destino-row__remove:focus-visible {
+  background: transparent;
+  border-color: color-mix(in srgb, var(--color-border) 55%, transparent);
+  border-left-color: color-mix(in srgb, var(--color-border) 55%, transparent);
+  box-shadow: none;
+  color: transparent;
+  outline: 0;
+  transform: none;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-destino-row__remove:hover::before,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-destino-row__remove:focus-visible::before {
+  color: var(--color-muted);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-destino-row.destino-row--single .oficio-roteiro-destino-row__remove {
+  display: none;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-destino-row.is-dragging {
+  opacity: 0.72;
+  transform: scale(0.985);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-destino-row.is-drop-target {
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--color-accent) 55%, transparent);
+}
+
+@media (max-width: 720px) {
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    [data-oficio-wizard-roteiro] .oficio-roteiro-destino-row.destino-row,
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    [data-oficio-wizard-roteiro] .oficio-roteiro-destino-row.destino-row:hover,
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    [data-oficio-wizard-roteiro] .oficio-roteiro-destino-row.destino-row--single,
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    [data-oficio-wizard-roteiro] .oficio-roteiro-destino-row.destino-row--single:hover {
+    grid-template-columns: 42px minmax(0, 1fr);
+    row-gap: 8px;
+  }
+
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    [data-oficio-wizard-roteiro] .oficio-roteiro-destino-row__remove {
+    border-left: 0;
+    border-top: 1px solid color-mix(in srgb, var(--color-border) 55%, transparent);
+    border-radius: 0 0 10px 10px;
+    grid-column: 1 / -1;
+    margin: 0 -10px -11px -12px;
+    min-height: 40px;
+    width: auto;
+  }
+
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    [data-oficio-wizard-roteiro] .oficio-roteiro-destino-row.destino-row--single .oficio-roteiro-destino-row__remove {
+    display: none;
   }
 }
 
@@ -1102,8 +1440,8 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
     .roteiro-mapa__frame #map,
     .roteiro-mapa__frame .leaflet-container
   ) {
-  height: 380px;
-  min-height: 380px;
+  height: 600px;
+  min-height: 600px;
 }
 
 @media (max-width: 760px) {
@@ -1113,8 +1451,8 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
       .roteiro-mapa__frame #map,
       .roteiro-mapa__frame .leaflet-container
     ) {
-    height: 300px;
-    min-height: 300px;
+    height: 420px;
+    min-height: 420px;
   }
 }
 
@@ -1131,6 +1469,165 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
   background: var(--color-input-bg);
   border-color: color-mix(in srgb, var(--color-border) 78%, var(--color-text) 22%);
   box-shadow: none;
+}
+
+/* Bate-volta (ofício): duas linhas estilo Sede (I / V) com 3 campos cada. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-bate-volta {
+  display: block;
+  min-width: 0;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-bate-volta__picker {
+  display: block;
+  min-width: 0;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-bate-volta__rows {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-bate-volta__row,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-bate-volta__row:hover {
+  align-items: center;
+  background: color-mix(in srgb, #fff 3.5%, var(--step1-panel, var(--color-surface-soft)));
+  border: 1px solid color-mix(in srgb, var(--color-border) 40%, transparent);
+  border-radius: 12px;
+  box-shadow: none;
+  column-gap: 12px;
+  display: grid;
+  grid-template-columns: minmax(42px, max-content) minmax(0, 1fr);
+  min-height: 78px;
+  padding: 11px 12px;
+  row-gap: 0;
+  transition: background-color 140ms ease, border-color 140ms ease;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-bate-volta__row:hover {
+  background: color-mix(in srgb, var(--color-accent) 6%, var(--step1-panel, var(--color-surface-soft)));
+  border-color: color-mix(in srgb, var(--color-border) 70%, transparent);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-row-badge,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-bate-volta__badge {
+  font-size: 0.58rem;
+  letter-spacing: 0.03em;
+  line-height: 1;
+  min-width: 42px;
+  padding: 0 5px;
+  text-transform: uppercase;
+  width: auto;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-bate-volta__fields {
+  display: grid;
+  gap: 10px 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  min-width: 0;
+  width: 100%;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-bate-volta__fields > .field {
+  gap: 6px;
+  margin: 0;
+  min-width: 0;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-bate-volta__fields .cv-field__label {
+  color: var(--color-muted-strong);
+  font-size: 0.72rem;
+  font-weight: var(--font-weight-bold);
+  margin: 0;
+}
+
+@media (max-width: 720px) {
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    [data-oficio-wizard-roteiro] .oficio-roteiro-bate-volta__fields {
+    grid-template-columns: 1fr;
+  }
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-bate-volta-toggle .cv-field-side-action--success,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-bate-volta-toggle .cv-field-side-action--success:hover {
+  background: color-mix(in srgb, var(--color-accent) 14%, var(--color-input-bg));
+  border-color: var(--color-accent-border-soft);
+  box-shadow: none;
+  color: var(--color-accent-text);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-bate-volta-toggle .cv-field-side-action--danger,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-bate-volta-toggle .cv-field-side-action--danger:hover {
+  background: var(--color-input-bg);
+  border-color: var(--color-border);
+  box-shadow: none;
+  color: var(--color-muted-strong);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro]
+  .oficio-roteiro-bate-volta-toggle
+  .cv-field-side-action--state.cv-field-side-action--success::before {
+  background: var(--color-accent);
+  box-shadow: none;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro]
+  .oficio-roteiro-bate-volta-toggle
+  .cv-field-side-action--state.cv-field-side-action--danger::before {
+  background: var(--color-muted);
+  box-shadow: none;
+}
+
+/* Bate-volta fechado: so alinhamento vertical no header (titulo a esquerda, toggle a direita). */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro]
+  .roteiro-editor__section--bate-volta.oficio-roteiro-block:has(#bate-volta-body[hidden])
+  > .cv-form-block__header {
+  align-items: center;
+  justify-content: space-between;
+  text-align: left;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro]
+  .roteiro-editor__section--bate-volta.oficio-roteiro-block:has(#bate-volta-body[hidden])
+  > .cv-form-block__header .cv-form-block__copy {
+  align-items: start;
+  justify-content: start;
+  text-align: left;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro]
+  .roteiro-editor__section--bate-volta.oficio-roteiro-block:has(#bate-volta-body[hidden])
+  > .cv-form-block__header .cv-form-block__description {
+  text-align: left;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro]
+  .roteiro-editor__section--bate-volta.oficio-roteiro-block:has(#bate-volta-body[hidden])
+  > .cv-form-block__header .cv-form-block__actions {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
@@ -1944,6 +2441,108 @@ html[data-theme="light-dark"] .cv-form-card .cv-search-picker__control:hover {
     justify-content: flex-start;
     padding: 0;
   }
+}
+
+/* Roteiros salvos (ofício): mesma linha do roster de Equipe, sem apagar/termo. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-salvo-picker.cv-search-picker--people.cv-search-picker--roster
+  .cv-search-picker__selected-card.oficio-roteiro-route-item,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-salvo-picker.cv-search-picker--people.cv-search-picker--roster
+  .cv-search-picker__selected-card.oficio-roteiro-route-item:hover {
+  appearance: none;
+  -webkit-appearance: none;
+  color: inherit;
+  cursor: pointer;
+  display: grid;
+  font: inherit;
+  grid-template-columns: 42px minmax(0, 1fr);
+  text-align: left;
+  width: 100%;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-salvo-picker.cv-search-picker--people.cv-search-picker--roster
+  .cv-search-picker__selected-card.oficio-roteiro-route-item:hover {
+  background: color-mix(in srgb, var(--color-accent) 5%, var(--color-input-bg));
+  border-color: var(--color-border);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-salvo-picker.cv-search-picker--people.cv-search-picker--roster
+  .cv-search-picker__selected-card.oficio-roteiro-route-item.is-active,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-salvo-picker.cv-search-picker--people.cv-search-picker--roster
+  .cv-search-picker__selected-card.oficio-roteiro-route-item.is-active:hover {
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface-muted));
+  border-color: var(--color-accent-border-soft);
+  box-shadow: inset 4px 0 0 var(--color-accent);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-salvo-picker .cv-search-picker__selected-avatar {
+  font-size: 0;
+  letter-spacing: 0;
+  line-height: 0;
+  overflow: hidden;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-salvo-picker .cv-search-picker__selected-avatar .oficio-roteiro-route-icon,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-salvo-picker .cv-search-picker__selected-avatar .cv-icon {
+  color: inherit;
+  display: block;
+  flex: 0 0 20px;
+  height: 20px !important;
+  max-height: 20px;
+  max-width: 20px;
+  min-height: 20px;
+  min-width: 20px;
+  overflow: visible;
+  width: 20px !important;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-salvo-picker .cv-search-picker__selected-avatar .oficio-roteiro-route-icon circle {
+  fill: currentColor;
+  stroke: none;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-salvo-picker .cv-search-picker__selected-avatar .oficio-roteiro-route-icon path {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.2;
+}
+
+/* Selecionado: mesmo preenchimento dourado do motorista (--driver). */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-salvo-picker
+  .cv-search-picker__selected-card.oficio-roteiro-route-item.is-active
+  .cv-search-picker__selected-avatar,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-salvo-picker
+  .cv-search-picker__selected-card.oficio-roteiro-route-item[aria-pressed="true"]
+  .cv-search-picker__selected-avatar {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-on-accent, #081522);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-roteiro] .oficio-roteiro-salvo-picker.cv-search-picker--people.cv-search-picker--roster
+  .cv-search-picker__selected-list#roteiro-lista {
+  display: grid;
+  gap: 8px;
+  max-height: 280px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 2px;
+  scrollbar-gutter: stable;
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
@@ -2990,9 +3589,9 @@ html[data-theme="light-dark"] :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-lay
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  .oficio-external-driver .cv-segment-toggle {
-  background: var(--color-input-bg);
-  border-color: var(--color-border);
+  :is(.oficio-external-driver, [data-oficio-wizard-roteiro]) .cv-segment-toggle {
+  background: var(--step1-field, var(--color-input-bg));
+  border-color: transparent;
   border-radius: 10px;
   box-shadow: none;
   display: inline-grid;
@@ -3001,7 +3600,7 @@ html[data-theme="light-dark"] :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-lay
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  .oficio-external-driver .cv-segment-toggle__btn {
+  :is(.oficio-external-driver, [data-oficio-wizard-roteiro]) .cv-segment-toggle__btn {
   border-radius: 7px;
   color: var(--color-muted-strong);
   justify-content: center;
@@ -3014,7 +3613,7 @@ html[data-theme="light-dark"] :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-lay
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  .oficio-external-driver .cv-segment-toggle__btn[aria-pressed="true"] {
+  :is(.oficio-external-driver, [data-oficio-wizard-roteiro]) .cv-segment-toggle__btn[aria-pressed="true"] {
   background: var(--color-accent);
   border-color: var(--color-accent);
   box-shadow: none;
@@ -3023,8 +3622,8 @@ html[data-theme="light-dark"] :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-lay
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  .oficio-external-driver .cv-segment-toggle__btn:hover:not([aria-pressed="true"]) {
-  background: var(--color-surface-muted);
+  :is(.oficio-external-driver, [data-oficio-wizard-roteiro]) .cv-segment-toggle__btn:hover:not([aria-pressed="true"]) {
+  background: color-mix(in srgb, #fff 5%, transparent);
   color: var(--color-text);
 }
 

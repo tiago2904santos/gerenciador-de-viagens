@@ -495,8 +495,6 @@ class RoteirosBaseTests(TestCase):
             "roteiro_modo": roteiro_logic.ROTEIRO_MODO_PROPRIO,
             "origem_estado": str(self.estado.pk),
             "origem_cidade": str(self.cidade_sede.pk),
-            "destino_estado_0": str(self.estado_destino.pk),
-            "destino_cidade_0": str(self.cidade_dest.pk),
             "bate_volta_diario_ativo": "on",
             "bate_volta_data_inicio": "2026-05-05",
             "bate_volta_data_fim": "2026-05-07",

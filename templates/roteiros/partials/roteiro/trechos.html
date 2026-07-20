@@ -1,2 +1,6 @@
 {# SEÇÃO 5: TRECHOS + RETORNO (deslocamentos) #}
-{% include "components/ui/forms/form_block.html" with shell=roteiro_editor_oficio|yesno:",card" variant="resource" extra_class="roteiro-editor__section--trechos" section_id="sec-trechos" data_hook="trechos-component" title="Trechos e retorno" description="Saídas, chegadas e o retorno final à sede." actions_template="roteiros/partials/roteiro/_trechos_actions.html" body_template="roteiros/partials/roteiro/_trechos_retorno_body.html" %}
+{% if roteiro_editor_oficio %}
+  {% include "components/ui/forms/form_block.html" with shell="" variant="resource" extra_class="roteiro-editor__section--trechos oficio-roteiro-block" section_id="sec-trechos" data_hook="trechos-component" title="Trechos e retorno" description="Saídas, chegadas e o retorno final à sede." actions_template="roteiros/partials/roteiro/_trechos_actions.html" body_template="roteiros/partials/roteiro/_trechos_retorno_body.html" %}
+{% else %}
+  {% include "components/ui/forms/form_block.html" with shell="card" variant="resource" extra_class="roteiro-editor__section--trechos" section_id="sec-trechos" data_hook="trechos-component" title="Trechos e retorno" description="Saídas, chegadas e o retorno final à sede." actions_template="roteiros/partials/roteiro/_trechos_actions.html" body_template="roteiros/partials/roteiro/_trechos_retorno_body.html" %}
+{% endif %}

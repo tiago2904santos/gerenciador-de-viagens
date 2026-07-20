@@ -1,4 +1,95 @@
 <div id="bate-volta-body" {% if not roteiro_editor_state_json.bate_volta_diario.ativo %}hidden{% endif %}>
+  {% if roteiro_editor_oficio %}
+  <div id="bate-volta-panel" class="roteiro-editor__bate-volta-grid-v2 oficio-roteiro-bate-volta">
+    {# Um unico date-picker range; duas linhas estilo Sede (3 campos cada). #}
+    <div
+      class="cv-date-picker oficio-roteiro-bate-volta__picker"
+      data-cv-date-picker
+      data-mode="range"
+      id="bate-volta-date-picker"
+      {% if roteiro_editor_state_json.bate_volta_diario.data_inicio %}data-initial-date="{{ roteiro_editor_state_json.bate_volta_diario.data_inicio }}"{% endif %}
+    >
+      <div class="oficio-roteiro-bate-volta__rows">
+        <div class="oficio-roteiro-bate-volta__row" aria-labelledby="bate-volta-ida-title">
+          <span class="oficio-roteiro-destino-row__badge oficio-roteiro-row-badge" id="bate-volta-ida-title">Ida</span>
+          <div class="oficio-roteiro-destino-row__body">
+            <div class="field-grid oficio-roteiro-bate-volta__fields">
+              <div class="field cv-field">
+                <label class="cv-field__label" for="id_bate_volta_data_inicio_display">Data de ida</label>
+                <div class="cv-date-picker__control">
+                  <input type="text" class="cv-field__control" id="id_bate_volta_data_inicio_display" placeholder="dd/mm/aaaa" autocomplete="off" inputmode="numeric" maxlength="10" data-cv-date-picker-start-display readonly>
+                  <button type="button" class="cv-date-picker__trigger cv-date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-label="Abrir calendario">
+                    {% include "components/forms/_cv_date_picker_icon.html" %}
+                  </button>
+                </div>
+              </div>
+              <div class="field cv-field">
+                <label class="cv-field__label" for="id_bate_volta_ida_saida_hora">Horário de saída</label>
+                <input type="text" class="cv-field__control" id="id_bate_volta_ida_saida_hora" name="bate_volta_ida_saida_hora" data-mask="time"
+                       value="{{ roteiro_editor_state_json.bate_volta_diario.ida_saida_hora|default:'' }}"
+                       placeholder="00:00" inputmode="numeric" maxlength="5" autocomplete="off">
+              </div>
+              <div class="field cv-field">
+                <label class="cv-field__label" for="id_bate_volta_ida_tempo_hhmm">Tempo de ida</label>
+                <input type="text" class="cv-field__control" id="id_bate_volta_ida_tempo_hhmm" data-mask="time"
+                       value="" placeholder="00:00" inputmode="numeric" maxlength="5" autocomplete="off">
+                <input type="hidden" id="id_bate_volta_ida_tempo_min" name="bate_volta_ida_tempo_min"
+                       value="{{ roteiro_editor_state_json.bate_volta_diario.ida_tempo_min|default:'' }}">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="oficio-roteiro-bate-volta__row" aria-labelledby="bate-volta-volta-title">
+          <span class="oficio-roteiro-destino-row__badge oficio-roteiro-row-badge" id="bate-volta-volta-title">Volta</span>
+          <div class="oficio-roteiro-destino-row__body">
+            <div class="field-grid oficio-roteiro-bate-volta__fields">
+              <div class="field cv-field">
+                <label class="cv-field__label" for="id_bate_volta_data_fim_display">Data de volta</label>
+                <div class="cv-date-picker__control">
+                  <input type="text" class="cv-field__control" id="id_bate_volta_data_fim_display" placeholder="dd/mm/aaaa" autocomplete="off" inputmode="numeric" maxlength="10" data-cv-date-picker-end-display readonly>
+                  <button type="button" class="cv-date-picker__trigger cv-date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-label="Abrir calendario">
+                    {% include "components/forms/_cv_date_picker_icon.html" %}
+                  </button>
+                </div>
+              </div>
+              <div class="field cv-field">
+                <label class="cv-field__label" for="id_bate_volta_volta_saida_hora">Horário de volta</label>
+                <input type="text" class="cv-field__control" id="id_bate_volta_volta_saida_hora" name="bate_volta_volta_saida_hora" data-mask="time"
+                       value="{{ roteiro_editor_state_json.bate_volta_diario.volta_saida_hora|default:'' }}"
+                       placeholder="00:00" inputmode="numeric" maxlength="5" autocomplete="off">
+              </div>
+              <div class="field cv-field">
+                <label class="cv-field__label" for="id_bate_volta_volta_tempo_hhmm">Tempo de retorno</label>
+                <input type="text" class="cv-field__control" id="id_bate_volta_volta_tempo_hhmm" data-mask="time"
+                       value="" placeholder="00:00" inputmode="numeric" maxlength="5" autocomplete="off">
+                <input type="hidden" id="id_bate_volta_volta_tempo_min" name="bate_volta_volta_tempo_min"
+                       value="{{ roteiro_editor_state_json.bate_volta_diario.volta_tempo_min|default:'' }}">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <input type="hidden" name="bate_volta_data_inicio" id="id_bate_volta_data_inicio_native" value="{{ roteiro_editor_state_json.bate_volta_diario.data_inicio|default:'' }}" data-cv-date-picker-start-value>
+      <input type="hidden" name="bate_volta_data_fim" id="id_bate_volta_data_fim_native" value="{{ roteiro_editor_state_json.bate_volta_diario.data_fim|default:'' }}" data-cv-date-picker-end-value>
+
+      <div class="cv-date-picker__panel" hidden data-cv-date-picker-panel>
+        <div class="cv-date-picker__panel-header">
+          <button class="cv-date-picker__nav" type="button" data-cv-date-picker-prev aria-label="Mes anterior">Anterior</button>
+          <div class="cv-date-picker__month" data-cv-date-picker-month></div>
+          <button class="cv-date-picker__nav" type="button" data-cv-date-picker-next aria-label="Proximo mes">Proximo</button>
+        </div>
+        <div class="cv-date-picker__weekdays" data-cv-date-picker-weekdays></div>
+        <div class="cv-date-picker__days" data-cv-date-picker-days></div>
+        <div class="cv-date-picker__footer">
+          <button type="button" class="cv-date-picker__footer-action" data-cv-date-picker-today>Hoje</button>
+          <button type="button" class="cv-date-picker__footer-action" data-cv-date-picker-clear>Limpar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% else %}
   <div id="bate-volta-panel" class="roteiro-editor__bate-volta-grid-v2">
 
     {# O intervalo usa o modelo global; os horarios permanecem campos independentes. #}
@@ -34,4 +125,5 @@
     </div>
 
   </div>
+  {% endif %}
 </div>

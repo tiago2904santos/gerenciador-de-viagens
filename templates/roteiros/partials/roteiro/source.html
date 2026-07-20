@@ -1,5 +1,9 @@
 {# SEÇÃO 1: FONTE DO ROTEIRO #}
-{% include "components/ui/forms/form_block.html" with shell=roteiro_editor_oficio|yesno:",card" variant="resource" extra_class="roteiro-editor__section--fonte" section_id="sec-fonte" title="Origem e destinos" description="Use um roteiro salvo ou defina a sede e os destinos." actions_template="roteiros/partials/roteiro/_fonte_actions.html" body_template="roteiros/partials/roteiro/_fonte_body.html" %}
+{% if roteiro_editor_oficio %}
+  {% include "components/ui/forms/form_block.html" with shell="" variant="resource" extra_class="roteiro-editor__section--fonte oficio-roteiro-block" section_id="sec-fonte" title="Origem e destinos" description="Use um roteiro salvo ou defina a sede e os destinos." actions_template="roteiros/partials/roteiro/_fonte_actions.html" body_template="roteiros/partials/roteiro/_fonte_body.html" %}
+{% else %}
+  {% include "components/ui/forms/form_block.html" with shell="card" variant="resource" extra_class="roteiro-editor__section--fonte" section_id="sec-fonte" title="Origem e destinos" description="Use um roteiro salvo ou defina a sede e os destinos." actions_template="roteiros/partials/roteiro/_fonte_actions.html" body_template="roteiros/partials/roteiro/_fonte_body.html" %}
+{% endif %}
 
 <script>
 (function () {
@@ -13,8 +17,19 @@
   if (!panelSalvo || !panelNovo) return;
 
   function syncButtons(isSalvo) {
-    if (btnSalvo) btnSalvo.setAttribute('aria-pressed', isSalvo ? 'true' : 'false');
-    if (btnNovo)  btnNovo.setAttribute('aria-pressed', isSalvo ? 'false' : 'true');
+    function applyPressed(btn, active) {
+      if (!btn) return;
+      var wasActive = btn.getAttribute('aria-pressed') === 'true';
+      btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+      /* Mesma animação do toggle da etapa 1 (motorista). */
+      if (active && !wasActive) {
+        btn.classList.remove('cv-segment-toggle__btn--pop');
+        void btn.offsetWidth;
+        btn.classList.add('cv-segment-toggle__btn--pop');
+      }
+    }
+    applyPressed(btnSalvo, isSalvo);
+    applyPressed(btnNovo, !isSalvo);
     panelNovo.hidden = isSalvo;
   }
 
