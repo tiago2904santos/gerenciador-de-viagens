@@ -1,5 +1,5 @@
-<section class="wizard-inner-section termo-evento-periodo" aria-label="Período do evento">
-  {% include "components/forms/cv_date_picker.html" with mode="range" picker_id="termo-evento-date-picker" extra_class="termo-date-picker" start_field=form.data_evento_inicio end_field=form.data_evento_fim start_label="Data inicial" end_label="Data final" start_input_id="id_data_evento_inicio_display" end_input_id="id_data_evento_fim_display" only %}
+<section class="cv-form-subsection termo-evento-periodo" aria-label="Período do evento">
+  {% include "components/forms/cv_date_picker.html" with mode="range" picker_id="termo-evento-date-picker" extra_class="termo-date-picker" start_field=form.data_evento_inicio end_field=form.data_evento_fim start_label="Data inicial" end_label="Data final" start_input_id="id_data_evento_inicio_display" end_input_id="id_data_evento_fim_display" show_summary=False only %}
 </section>
-{% include "components/domain/destinos_section.html" with section_id="termo-evento-destinos" title_id="termo-evento-destinos-title" add_button_id="btn-adicionar-destino" add_button_termo=True list_id="termo-destinos-list" prefix="termo" rows_template="components/domain/destinos/rows.html" errors_template="components/domain/destinos/errors.html" title="Destinos" description="Adicione os locais na ordem em que serão visitados." %}
-{% include "components/domain/destinos/template.html" with prefix="termo" %}
+
+{% include "termos/partials/_evento_destinos_section.html" %}

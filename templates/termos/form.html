@@ -4,50 +4,75 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260609-termos">
-  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260718-cv-summary">
-  <link rel="stylesheet" href="{% static 'css/oficios-documentos-inline.css' %}?v=20260718-cv-summary">
-  <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260624-oficios-preview">
+  <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260720-termos-wizard">
+  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260720-termos-wizard">
+  <link rel="stylesheet" href="{% static 'css/oficios-documentos-inline.css' %}?v=20260720-termos-wizard">
+  <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260720-termos-oficio-cards">
   <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}?v=20260715-assinado">
 {% endblock %}
 
 {% block content %}
   {{ oficios_summary|json_script:"termos-oficios-summary" }}
-  <div class="page-shell termos-page">
+  <div class="page-shell page-shell--wizard oficio-wizard app-wizard termos-wizard" data-termo-wizard-shell>
     {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="TERMOS" title=page_title description="Cadastro independente de termo de autorização" icon_label="TM" module_label="Termos" back_label=back_label back_url=index_url only %}
 
-    <form
-      method="post"
-      class="termo-form"
-      data-termo-form
-      data-api-cidades-url="{{ api_cidades_por_estado_url }}"
-      data-termo-evento-selected-dates='{{ termo_evento_selected_dates_json|escape }}'
-    >
-      {% csrf_token %}
+    <main class="main-form-panel main-form-panel--stack oficio-wizard__main">
+      <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
+        <form
+          method="post"
+          class="termo-form oficio-wizard__form"
+          data-termo-form
+          data-api-cidades-url="{{ api_cidades_por_estado_url }}"
+          data-termo-evento-selected-dates='{{ termo_evento_selected_dates_json|escape }}'
+        >
+          {% csrf_token %}
 
-      <main class="main-form-panel main-form-panel--stack oficio-wizard__main">
-        {% if form.non_field_errors %}
-          {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
+          {% if form.non_field_errors %}
+            {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
+          {% endif %}
+
+          <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable" data-termo-wizard-form data-oficio-wizard-step1>
+            <section
+              class="cv-wizard-section-card cv-form-card cv-wizard-section-card--described oficio-step1-card termo-form-card"
+              aria-labelledby="termo-form-main-title"
+            >
+              <header class="cv-wizard-section-header">
+                <div class="cv-wizard-section-header__copy">
+                  <h3 class="cv-wizard-section-title" id="termo-form-main-title">Dados do termo</h3>
+                  <p class="cv-wizard-section-subtitle">Ofício, evento, equipe, transporte e documentos</p>
+                </div>
+              </header>
+
+              <div class="cv-wizard-section-body oficio-step1-body termo-form-body">
+                {% include "components/ui/forms/form_block.html" with element_id="termo-block-oficio" section_id="termo-oficio-title" extra_class="oficio-step1-block termo-block" title="Ofício vinculado" description="Opcional. Reaproveite destino, período, servidores e viatura de um ofício." body_extra_class="termo-block__body" body_template="termos/partials/_oficio_body.html" %}
+
+                {% include "components/ui/forms/form_block.html" with element_id="termo-block-evento" section_id="termo-evento-title" extra_class="oficio-step1-block termo-block" title="Evento" description="Destino e período — obrigatórios quando não vierem do ofício." body_extra_class="cv-form-stack termo-evento-body" body_template="termos/partials/_evento_body.html" %}
+
+                {% include "components/ui/forms/form_block.html" with element_id="termo-block-servidores" section_id="termo-servidores-title" variant="resource" extra_class="oficio-step1-block termo-block" title="Equipe" description="Viajantes do termo. Com vários servidores, gera um termo para cada um." action_label="Novo viajante" action_url=servidor_create_url action_autosave=True body_template="termos/partials/_servidores_body.html" %}
+
+                {% include "components/ui/forms/form_block.html" with element_id="termo-block-viatura" section_id="termo-viatura-title" variant="resource" extra_class="oficio-step1-block termo-block" title="Transporte" description="Opcional. Se vazio, pode usar a viatura do ofício vinculado." action_label="Nova viatura" action_url=viatura_create_url action_autosave=True body_template="termos/partials/_viatura_body.html" %}
+
+                {% if termo and termo.pk %}
+                  {% include "components/ui/forms/form_block.html" with element_id="termo-block-documentos" section_id="termo-documentos-title" data_hook="oficio-wizard-documentos" extra_class="oficio-step1-block oficio-documentos-block termo-block termo-documentos-preview oficio-documentos-preview-section document-inline-stack" title="Documentos para conferência" description="Visualize, baixe e anexe os termos assinados." body_extra_class="oficio-documentos-preview-section__body" body_template="termos/partials/_preview_body.html" %}
+                {% endif %}
+              </div>
+
+              <div class="cv-form-card__footer" id="termo-form-footer">
+                {% include "termos/partials/_viatura_footer.html" %}
+              </div>
+            </section>
+          </div>
+        </form>
+
+        {% if termo and termo.pk %}
+          {% include "components/ui/modals/attach_signed_modal.html" %}
         {% endif %}
-
-        {% include "components/ui/forms/form_block.html" with shell="card" element_id="termo-card-oficio" section_id="termo-oficio-title" extra_class="cv-wizard-section-card--described termo-card termo-card--oficio" title="1. Ofício vinculado" description="Busque um ofício já cadastrado para reaproveitar destino, período, servidores e viatura. Dados preenchidos manualmente continuam tendo prioridade." body_extra_class="termo-card__body" body_template="termos/partials/_oficio_body.html" %}
-
-        {% include "components/ui/forms/form_block.html" with shell="card" element_id="termo-card-evento" section_id="termo-evento-title" extra_class="cv-wizard-section-card--described termo-card termo-card--evento" title="2. Evento" description="Destino e período são obrigatórios quando não vierem do ofício." body_extra_class="termo-evento-body" body_template="termos/partials/_evento_body.html" %}
-
-        {% include "components/ui/forms/form_block.html" with shell="card" element_id="termo-card-servidores" section_id="termo-servidores-title" extra_class="cv-wizard-section-card--described termo-card termo-card--servidores" title="3. Servidores" description="Opcional. Com vários servidores, será gerado um termo para cada um." action_label="Cadastrar novo viajante" action_url=servidor_create_url action_autosave=True body_template="termos/partials/_servidores_body.html" %}
-
-        {% include "components/ui/forms/form_block.html" with shell="card" element_id="termo-card-viatura" section_id="termo-viatura-title" extra_class="cv-wizard-section-card--described termo-card termo-card--viatura" title="4. Viatura" description="Opcional. Se vazio, o termo pode usar a viatura do ofício vinculado." action_label="Cadastrar nova viatura" action_url=viatura_create_url action_autosave=True body_template="termos/partials/_viatura_body.html" footer_template="termos/partials/_viatura_footer.html" %}
-      </main>
-    </form>
-
-    {% if termo and termo.pk %}
-      {% include "components/ui/forms/form_block.html" with shell="card" section_id="termo-pdf-preview-title" extra_class="document-inline-stack termo-pdf-preview-section" title="Visualização dos termos" description="Confira o termo genérico e os termos individuais por servidor." body_extra_class="oficio-documentos-preview-section__body" body_template="termos/partials/_preview_body.html" %}
-      {% include "components/ui/modals/attach_signed_modal.html" %}
-    {% endif %}
+      </div>
+    </main>
   </div>
 {% endblock %}
 
 {% block extra_js %}
-  <script src="{% static 'js/pages/termos-form.js' %}?v=20260716-global-picker-migration" defer></script>
-  <script src="{% static 'js/pages/oficios-documentos-inline.js' %}?v=20260720-action-menu" defer></script>
+  <script src="{% static 'js/pages/termos-form.js' %}?v=20260720-termos-oficio-cards" defer></script>
+  <script src="{% static 'js/pages/oficios-documentos-inline.js' %}?v=20260720-termos-wizard" defer></script>
 {% endblock %}

@@ -487,6 +487,11 @@
   margin-top: var(--space-3, 0.75rem);
 }
 
+/* Item estático da pilha (ex.: rótulo + ações agregadas), sem <details>/<summary>. */
+.document-inline-card--static .document-inline-card__header {
+  cursor: default;
+}
+
 /* Termos aninhados: mesmo fundo da seção de preview (não o poço de campo). */
 .oficio-documentos-preview-section.document-inline-stack
   .document-inline-card--termos

@@ -3,6 +3,48 @@
 
   var CITIES_CACHE = {};
 
+  var ROUTE_AVATAR_ICON =
+    '<svg class="cv-icon oficio-roteiro-route-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false" fill="none">' +
+      '<circle cx="6" cy="19" r="2.5" fill="currentColor"></circle>' +
+      '<circle cx="18" cy="5" r="2.5" fill="currentColor"></circle>' +
+      '<path d="M8.2 18.2h6.1a3.3 3.3 0 0 0 0-6.6H9.7a3.3 3.3 0 0 1 0-6.6h6.1" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>' +
+    '</svg>';
+
+  function routeCardTitle(summary) {
+    var label = String(summary.label || "").trim();
+    var destino = String(summary.roteiro || summary.destino || "")
+      .trim()
+      .replace(/\s*->\s*/g, " \u2192 ");
+    return [label, destino].filter(Boolean).join(" ");
+  }
+
+  function firstNames(summary) {
+    var nomes = summary.servidores_nomes;
+    if (!nomes || !nomes.length) {
+      nomes = String(summary.servidores_label || "")
+        .split(",")
+        .map(function (nome) { return nome.trim(); })
+        .filter(Boolean);
+    }
+    return nomes
+      .map(function (nome) { return String(nome || "").trim().split(/\s+/)[0] || ""; })
+      .filter(Boolean);
+  }
+
+  function viaturaLabel(summary) {
+    var placa = String(summary.viatura || "").trim();
+    var modelo = String(summary.viatura_modelo || "").trim();
+    return [placa, modelo].filter(Boolean).join(" ");
+  }
+
+  function routeCardMeta(summary) {
+    var periodo = String(summary.periodo || "").trim();
+    var servidores = firstNames(summary).join(", ");
+    var viatura = viaturaLabel(summary);
+    var parts = [periodo, servidores, viatura].filter(Boolean);
+    return parts.length ? parts.join(" \u00b7 ") : "Sem informa\u00e7\u00f5es dispon\u00edveis";
+  }
+
   function readSummaries() {
     var script = document.getElementById("termos-oficios-summary");
     if (!script) return {};
@@ -187,6 +229,7 @@
     }
 
     function renderList(filterText) {
+      var emptyEl = form.querySelector("#termo-oficio-lista-empty");
       var term = normalize(filterText);
       var tokens = term.split(/\s+/).filter(Boolean);
       var filtered = items.filter(function (summary) {
@@ -198,48 +241,39 @@
 
       list.innerHTML = "";
       if (!filtered.length) {
-        var emptyState = document.createElement("div");
-        emptyState.className = "oficio-roteiro-route-empty";
-        emptyState.textContent = "Nenhum oficio encontrado para a busca.";
-        list.appendChild(emptyState);
+        if (emptyEl) emptyEl.hidden = false;
         return;
       }
+      if (emptyEl) emptyEl.hidden = true;
 
       filtered.forEach(function (summary) {
         var active = String(summary.id) === String(select.value || "");
         var button = document.createElement("button");
         button.type = "button";
-        button.className = "oficio-roteiro-route-item" + (active ? " is-active" : "");
+        button.className = "cv-search-picker__selected-card oficio-roteiro-route-item" + (active ? " is-active" : "");
         button.dataset.routeId = String(summary.id);
+        button.setAttribute("aria-pressed", active ? "true" : "false");
 
-        var firstLine = document.createElement("span");
-        firstLine.className = "route-title termo-oficio-route-line termo-oficio-route-line--primary";
+        var avatar = document.createElement("span");
+        avatar.className = "cv-search-picker__selected-avatar";
+        avatar.setAttribute("aria-hidden", "true");
+        avatar.innerHTML = ROUTE_AVATAR_ICON;
 
-        var oficio = document.createElement("strong");
-        oficio.className = "termo-oficio-route__oficio";
-        oficio.textContent = summary.label || ("Oficio " + String(summary.id));
+        var main = document.createElement("div");
+        main.className = "cv-search-picker__selected-main";
 
-        var protocolo = document.createElement("span");
-        protocolo.className = "termo-oficio-route__protocolo";
-        protocolo.textContent = "Protocolo " + (summary.protocolo || "-");
+        var name = document.createElement("span");
+        name.className = "cv-search-picker__selected-name";
+        name.textContent = routeCardTitle(summary);
 
-        firstLine.appendChild(oficio);
-        firstLine.appendChild(protocolo);
+        var meta = document.createElement("span");
+        meta.className = "cv-search-picker__selected-meta route-periodo";
+        meta.textContent = routeCardMeta(summary);
 
-        var secondLine = document.createElement("span");
-        secondLine.className = "route-destinos termo-oficio-route-line";
-        secondLine.textContent = [
-          summary.roteiro || summary.destino || "Roteiro nao informado",
-          summary.periodo ? "Periodo: " + summary.periodo : "",
-        ].filter(Boolean).join(" | ");
-
-        var thirdLine = document.createElement("span");
-        thirdLine.className = "route-periodo termo-oficio-route-line termo-oficio-route-line--servers";
-        thirdLine.textContent = summary.servidores_label ? summary.servidores_label : "Sem servidores vinculados";
-
-        button.appendChild(firstLine);
-        button.appendChild(secondLine);
-        button.appendChild(thirdLine);
+        main.appendChild(name);
+        main.appendChild(meta);
+        button.appendChild(avatar);
+        button.appendChild(main);
         button.addEventListener("click", function () {
           var alreadySelected = String(select.value || "") === String(summary.id);
           select.value = alreadySelected ? "" : String(summary.id);
@@ -349,7 +383,7 @@
       window.CV.destinos.initManagedRows({
         form: form,
         sectionSelector: "#termo-evento-destinos",
-        addSelector: "[data-termo-add-destino]",
+        addSelector: "#termo-btn-adicionar-destino",
         templateSelector: "template[data-termo-destino-template]",
         rowSelector: "[data-termo-destino-row]",
         stateSelector: "[data-termo-destino-state]",
@@ -362,6 +396,10 @@
         extraCityPrefix: "destino_cidade_",
         managedFlag: "termoDestinosManaged",
         readyAttr: "termoDestinoReady",
+        onRow: function (row, index) {
+          var badge = row.querySelector("[data-destino-ord]");
+          if (badge) badge.textContent = String(index + 1);
+        },
         loadCities: function (citySelect, stateId, selectedCityId) {
           return loadCitiesForState(form, citySelect, stateId, selectedCityId);
         }
@@ -395,7 +433,7 @@
 
   function syncAddDestinationButton(form) {
     if (form.dataset.termoDestinosManaged === "true") return;
-    var button = form.querySelector("[data-termo-add-destino]");
+    var button = form.querySelector("#termo-btn-adicionar-destino");
     var destinationSection = form.querySelector("#termo-evento-destinos");
     if (!button || !destinationSection) return;
 
@@ -526,7 +564,7 @@
       .sort(function (a, b) { return a - b; });
     if (!indexes.length) return;
 
-    var addButton = form.querySelector("[data-termo-add-destino]");
+    var addButton = form.querySelector("#termo-btn-adicionar-destino");
     var rowsNeeded = indexes[indexes.length - 1] + 1;
 
     function rowsCount() {

@@ -1,8 +1,9 @@
-{# Miolo do card de ofício — viajantes (com termos), transporte/roteiro e justificativa. #}
+{# Miolo do card de ofício — viajantes (modelo roster), transporte/roteiro e justificativa. #}
 <div class="oficio-lc__section">
   <div class="oficio-lc__travellers oficio-lc__travellers--n{{ card.servidores_count|default:0 }}">
     {% for s in card.servidores %}
     <div class="oficio-lc__traveller{% if s.is_motorista %} oficio-lc__traveller--motorista{% endif %}">
+      <span class="oficio-lc__traveller-avatar" aria-hidden="true">{{ s.initials }}</span>
 
       <div class="oficio-lc__traveller-body">
         <div class="oficio-lc__traveller-name-row">
@@ -17,7 +18,7 @@
       </div>
 
       {% if s.has_termo %}
-      <div class="oficio-lc__traveller-termo">
+      <div class="oficio-lc__traveller-actions">
         <button
           type="button"
           class="cv-icon-btn cv-icon-btn--edit{% if s.termo_assinado %} is-assinado{% endif %}"

@@ -182,6 +182,16 @@ def _digits(value):
     return re.sub(r"\D", "", str(value or ""))
 
 
+def _roteiro_destino_label(item):
+    if not item:
+        return ""
+    if item.cidade_id:
+        return str(item.cidade)
+    if item.estado_id:
+        return str(item.estado)
+    return str(item)
+
+
 def _oficio_summary(oficio):
     roteiro = oficio.roteiro
     destino = ""
@@ -197,8 +207,8 @@ def _oficio_summary(oficio):
         sede = str(sede_obj) if sede_obj else ""
         destinos = list(roteiro.destinos.select_related("cidade", "estado").order_by("ordem", "pk"))
         destino_obj = destinos[0] if destinos else None
-        destino = str(destino_obj) if destino_obj else ""
-        destinos_label = ", ".join(str(item) for item in destinos if item)
+        destino = _roteiro_destino_label(destino_obj)
+        destinos_label = ", ".join(_roteiro_destino_label(item) for item in destinos if item)
         roteiro_label = " -> ".join(part for part in [sede, destinos_label or destino] if part)
         if destino_obj:
             estado_id = destino_obj.estado_id or ""
@@ -333,79 +343,28 @@ def _termo_evento_display_values(form):
     }
 
 
-def _termo_page_steps(form, termo=None):
-    oficio_val = None
-    servidores_val = []
-    viatura_val = None
-    if form.is_bound:
-        oficio_val = form.data.get("oficio") or None
-        servidores_val = form.data.getlist("servidores") if hasattr(form.data, "getlist") else []
-        viatura_val = form.data.get("viatura") or None
-    elif termo and termo.pk:
-        oficio_val = termo.oficio_id
-        servidores_val = list(termo.servidores.values_list("pk", flat=True))
-        viatura_val = termo.viatura_id
-
-    return [
-        {
-            "marker": "1",
-            "step_label": "OFÍCIO",
-            "title": "Oficio vinculado",
-            "status": "Opcional",
-            "url": "#termo-card-oficio",
-            "state_class": "is-complete" if oficio_val else "",
-        },
-        {
-            "marker": "2",
-            "step_label": "EVENTO",
-            "title": "Evento",
-            "status": "Obrigatório",
-            "url": "#termo-card-evento",
-            "state_class": "is-current",
-            "aria_current": "step",
-        },
-        {
-            "marker": "3",
-            "step_label": "SERVIDORES",
-            "title": "Servidores",
-            "status": "Opcional",
-            "url": "#termo-card-servidores",
-            "state_class": "is-complete" if servidores_val else "",
-        },
-        {
-            "marker": "4",
-            "step_label": "VIATURA",
-            "title": "Viatura",
-            "status": "Opcional",
-            "url": "#termo-card-viatura",
-            "state_class": "is-complete" if viatura_val else "",
-        },
-        {
-            "marker": "5",
-            "step_label": "REVISÃO",
-            "title": "Salvar termo",
-            "status": "Acoes finais",
-            "url": "#termo-form-footer",
-        },
-    ]
-
-
 def _termo_preview_documents(termo):
     if not termo or not termo.pk:
         return {}
     servidores = list(termo.servidores_efetivos())
     return {
         "generico": {
-            "titulo": "Termo generico",
+            "titulo": "Termo genérico",
             "inline_url": reverse("termos:termo_cadastro_generico_pdf_inline", args=[termo.pk]),
+            "download_pdf_url": reverse("termos:baixar_termo_cadastro_pdf", args=[termo.pk]),
+            "download_docx_url": reverse("termos:baixar_termo_cadastro_docx", args=[termo.pk]),
             **termo_cadastro_assinado_info(termo, None),
         },
+        "download_todos_pdf_url": reverse("termos:baixar_termo_cadastro_pdf", args=[termo.pk]),
+        "download_todos_docx_url": reverse("termos:baixar_termo_cadastro_docx", args=[termo.pk]),
         "servidores": [
             {
                 "id": servidor.pk,
-                "titulo": f"Termo - {servidor.nome}",
+                "titulo": f"Termo de Autorização — {servidor.nome}",
                 "servidor_nome": servidor.nome,
-                "inline_url": reverse("termos:termo_cadastro_servidor_pdf_inline", args=[termo.pk, servidor.pk]),
+                "inline_url": reverse(
+                    "termos:termo_cadastro_servidor_pdf_inline", args=[termo.pk, servidor.pk]
+                ),
                 **termo_cadastro_assinado_info(termo, servidor.pk),
             }
             for servidor in servidores
@@ -452,7 +411,6 @@ def _form_context(*, request, form, termo=None, evento=None):
         "api_cidades_por_estado_url": reverse("roteiros:api_cidades_por_estado", kwargs={"estado_id": 0}),
         "oficios_summary": summaries,
         "termo_preview_documents": _termo_preview_documents(termo),
-        "termo_page_steps": _termo_page_steps(form, termo=termo),
         "termo_evento_selected_dates_json": _termo_evento_selected_dates_json(form),
         "termo_evento_display": _termo_evento_display_values(form),
     }

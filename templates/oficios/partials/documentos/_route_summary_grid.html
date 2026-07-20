@@ -42,22 +42,33 @@
       </span>
     </div>
 
-    {# Col 4: Tipo destino + Quantidade de diárias #}
+    {# Col 4: Placa + Modelo (card da lista) ou Tipo destino + Quantidade de diárias (wizard) #}
     <div class="oficio-documentos-route-col4">
-      <div class="cv-summary-item">
-        <span class="cv-summary-label">Tipo destino</span>
-        <span class="cv-summary-value">{{ card.diaria_tipo_destino|default:"—" }}</span>
-      </div>
-      <div class="cv-summary-item">
-        <span class="cv-summary-label">Quantidade de diárias</span>
-        {% if card.diaria_composicao_linhas %}
-          <ul class="oficio-documentos-route-composicao-list">
-            {% for linha in card.diaria_composicao_linhas %}<li class="cv-summary-value">{{ linha }}</li>{% endfor %}
-          </ul>
-        {% else %}
-          <span class="cv-summary-value">—</span>
-        {% endif %}
-      </div>
+      {% if col4_viatura %}
+        <div class="cv-summary-item">
+          <span class="cv-summary-label">Placa</span>
+          <span class="cv-summary-value">{{ viatura_placa|default:"—" }}</span>
+        </div>
+        <div class="cv-summary-item">
+          <span class="cv-summary-label">Modelo</span>
+          <span class="cv-summary-value">{{ viatura_modelo|default:"—" }}</span>
+        </div>
+      {% else %}
+        <div class="cv-summary-item">
+          <span class="cv-summary-label">Tipo destino</span>
+          <span class="cv-summary-value">{{ card.diaria_tipo_destino|default:"—" }}</span>
+        </div>
+        <div class="cv-summary-item">
+          <span class="cv-summary-label">Quantidade de diárias</span>
+          {% if card.diaria_composicao_linhas %}
+            <ul class="oficio-documentos-route-composicao-list">
+              {% for linha in card.diaria_composicao_linhas %}<li class="cv-summary-value">{{ linha }}</li>{% endfor %}
+            </ul>
+          {% else %}
+            <span class="cv-summary-value">—</span>
+          {% endif %}
+        </div>
+      {% endif %}
     </div>
 
   </div>

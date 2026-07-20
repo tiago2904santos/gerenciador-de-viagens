@@ -1914,6 +1914,11 @@
   color: var(--color-danger);
 }
 
+/* Card da lista de ofícios: campos sem borda (mesma linguagem do cadastro) */
+.oficio-lc :is(.oficio-lc__transport-card, .oficio-lc__traveller, .oficio-lc__trecho) {
+  border-color: transparent;
+}
+
 /* Legado (prestações / cards antigos) — mantém layout de linhas */
 .oficio-documentos-travellers-lines {
   display: flex;
@@ -3260,8 +3265,8 @@ html[data-theme="dark"] [data-oficio-wizard-step1] .cv-search-picker {
 }
 
 .oficio-lc:hover {
-  box-shadow: var(--shadow-panel);
-  transform: translateY(-2px);
+  box-shadow: var(--cv-wizard-section-shadow, var(--shadow-card));
+  transform: none;
 }
 
 .oficio-lc__layout {
@@ -3413,69 +3418,101 @@ html[data-theme="dark"] [data-oficio-wizard-step1] .cv-search-picker {
   text-transform: uppercase;
 }
 
-/* ── VIAJANTES: cards horizontais por quantidade ── */
+/* ── VIAJANTES: roster (avatar + corpo + ações do termo) ── */
 .oficio-lc__travellers {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
   gap: var(--space-2);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-/* base: 3 por linha (5+ servidores) */
+.oficio-lc__travellers--n0,
+.oficio-lc__travellers--n1 {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.oficio-lc__travellers--n3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.oficio-lc__travellers--n5,
+.oficio-lc__travellers--n6,
+.oficio-lc__travellers--n7,
+.oficio-lc__travellers--n8,
+.oficio-lc__travellers--n9 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* base card — alinhado ao tile de Documentos / Equipe */
 .oficio-lc__traveller {
   align-items: center;
   background: var(--color-card-muted);
   border: 1px solid var(--color-border-soft);
-  border-radius: var(--radius-control);
-  display: flex;
-  flex-basis: 30%;
-  flex-direction: row;
-  flex-grow: 1;
-  flex-shrink: 0;
-  gap: var(--space-3);
+  border-radius: 10px;
+  column-gap: 12px;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
   min-width: 0;
-  padding: var(--space-3) var(--space-4);
+  padding: 10px 12px;
 }
 
-/* coluna de texto: nome + meta */
+.oficio-lc__traveller:not(:has(.oficio-lc__traveller-avatar)) {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.oficio-lc__traveller-avatar {
+  align-items: center;
+  background: color-mix(in srgb, var(--color-heading) 8%, transparent);
+  border: 1px solid var(--color-border-soft);
+  border-radius: 10px;
+  color: var(--color-heading);
+  display: inline-flex;
+  flex-shrink: 0;
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+  height: 40px;
+  justify-content: center;
+  letter-spacing: 0.04em;
+  width: 40px;
+}
+
 .oficio-lc__traveller-body {
-  display: flex;
-  flex: 1 1 0;
-  flex-direction: column;
-  gap: 3px;
+  display: grid;
+  gap: 2px;
   min-width: 0;
+}
+
+.oficio-lc__traveller-actions {
+  align-items: center;
+  display: inline-flex;
+  flex-shrink: 0;
+  justify-content: center;
 }
 
 .oficio-lc__travellers--n0 .oficio-lc__traveller,
 .oficio-lc__travellers--n1 .oficio-lc__traveller {
-  flex-basis: 100%;
+  grid-column: 1 / -1;
 }
 
-.oficio-lc__travellers--n2 .oficio-lc__traveller {
-  flex-basis: 45%;
-}
-
-.oficio-lc__travellers--n3 .oficio-lc__traveller {
-  flex-basis: 30%;
-}
-
-.oficio-lc__travellers--n4 .oficio-lc__traveller {
-  flex-basis: 45%;
-}
-
-/* Motorista — tinte dourado (tema escuro por padrão) — idêntico ao oficio-documentos-traveller-line--motorista */
+/* Motorista — mesmos tokens da Equipe / Documentos */
 .oficio-lc__traveller--motorista {
-  background: color-mix(in srgb, var(--color-accent) 9%, var(--color-card-muted));
-  border-color: color-mix(in srgb, var(--color-accent) 40%, var(--color-border-soft));
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface-muted, var(--color-card-muted)));
+  border-color: var(--color-accent-border-soft, color-mix(in srgb, var(--color-accent) 40%, var(--color-border-soft)));
+  box-shadow: inset 4px 0 0 var(--color-accent);
 }
 
 .oficio-lc__traveller--motorista .oficio-lc__traveller-name {
-  color: var(--color-accent);
+  color: var(--color-heading);
 }
 
-/* tema claro: volta ao neutro */
+.oficio-lc__traveller--motorista .oficio-lc__traveller-avatar {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-on-accent, #081522);
+}
+
 html[data-theme="light"] .oficio-lc__traveller--motorista {
-  background: var(--color-card-muted);
-  border-color: var(--color-border-soft);
+  background: color-mix(in srgb, var(--color-accent) 8%, var(--color-card-muted));
+  border-color: var(--color-accent-border-soft, var(--color-border-soft));
 }
 
 html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-name {
@@ -3526,26 +3563,34 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
 }
 
 .oficio-lc__traveller-badge {
+  align-items: center;
   background: color-mix(in srgb, var(--color-accent) 18%, transparent);
   border: 1px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
-  border-radius: var(--radius-pill);
+  border-radius: 999px;
   color: var(--color-accent);
+  display: inline-flex;
   flex-shrink: 0;
   font-size: 10px;
   font-weight: 800;
-  letter-spacing: 0.06em;
-  padding: 1px var(--space-2);
+  letter-spacing: 0.04em;
+  min-height: 21px;
+  padding: 2px 8px;
   text-transform: uppercase;
   white-space: nowrap;
 }
 
+.oficio-lc__traveller--motorista .oficio-lc__traveller-badge {
+  background: var(--color-accent);
+  border: 0;
+  color: var(--color-on-accent, #081522);
+}
+
+.oficio-lc__traveller-actions,
 .oficio-lc__traveller-termo {
   align-items: center;
-  display: flex;
+  display: inline-flex;
   flex-shrink: 0;
-  flex-wrap: wrap;
-  gap: var(--space-1);
-  margin-left: auto;
+  justify-content: center;
 }
 
 /* ── VIATURA E CONDUÇÃO ── */
@@ -3563,9 +3608,11 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
   background: var(--color-card-muted);
   border: 1px solid var(--color-border-soft);
   border-radius: var(--radius-control);
+  container-type: inline-size;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
+  justify-content: center;
   min-width: 160px;
   overflow: hidden;
   padding: var(--space-3) var(--space-4);
@@ -3573,7 +3620,7 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
 }
 
 .oficio-lc__transport-label {
-  color: var(--color-muted);
+  color: var(--color-accent);
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.08em;
@@ -3587,10 +3634,10 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
 
 .oficio-lc__transport-placa {
   color: var(--color-heading);
-  font-size: clamp(14px, 2.2vw, 32px);
+  font-size: clamp(1.55rem, 14cqi, 2.85rem);
   font-weight: 900;
   letter-spacing: 0.02em;
-  line-height: 1;
+  line-height: 1.05;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -3598,9 +3645,13 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
 
 .oficio-lc__transport-modelo {
   color: var(--color-heading);
-  font-size: var(--font-size-md);
-  font-weight: 800;
-  line-height: 1.35;
+  font-size: clamp(1.25rem, 11cqi, 2.35rem);
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .oficio-lc__transport-driver {
@@ -3652,8 +3703,8 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
 }
 
 .oficio-lc__trecho {
-  background: var(--color-card-muted);
-  border: 1px solid var(--color-border-soft);
+  background: transparent;
+  border: 1px solid transparent;
   border-radius: var(--radius-sm);
   padding: var(--space-2) var(--space-3);
 }
@@ -4134,8 +4185,12 @@ html[data-theme="light"] .oficio-lc__trecho--atividade .oficio-lc__trecho-rota {
     width: 100%;
   }
 
+  .oficio-lc__travellers {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .oficio-lc__traveller {
-    flex-basis: 100%;
+    grid-column: 1 / -1;
   }
 
   .oficio-lc__transport-row {
@@ -4163,8 +4218,7 @@ html[data-theme="light"] .oficio-lc__trecho--atividade .oficio-lc__trecho-rota {
 
 @media (max-width: 599px) {
   .oficio-lc__traveller {
-    align-items: stretch;
-    flex-direction: column;
+    align-items: center;
   }
 
   .oficio-lc__traveller-name,

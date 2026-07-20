@@ -1,0 +1,22 @@
+{# Clone visual/interação da linha de destino do ofício (roteiros/partials/roteiro/_destino_row_oficio.html). #}
+<div class="destino-row oficio-roteiro-destino-row{% if row_single %} destino-row--single{% endif %}"
+     data-termo-destino-row
+     data-termo-destino-index="{{ row_index }}">
+  <span class="oficio-roteiro-destino-row__badge" data-destino-ord aria-hidden="true">{{ row_ordinal }}</span>
+  <div class="oficio-roteiro-destino-row__body">
+    <div class="field-grid roteiro-sede-grid roteiro-destino-grid oficio-roteiro-destino-row__fields">
+      <div class="field app-form-field">
+        {% include "components/domain/destinos/state_select.html" with prefix="termo" %}
+      </div>
+      <div class="field app-form-field">
+        {% include "components/domain/destinos/city_select.html" with prefix="termo" %}
+      </div>
+    </div>
+  </div>
+  <button type="button"
+          class="btn-remover-destino oficio-roteiro-destino-row__remove"
+          title="Remover destino"
+          aria-label="Remover destino"
+          data-termo-remove-destino
+          {% if row_single or remove_hidden %}hidden{% endif %}>×</button>
+</div>

@@ -4,16 +4,28 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260609-termos">
-  <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260609">
+  <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260720-termos-wizard">
+  <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260720-termos-wizard">
 {% endblock %}
 
 {% block content %}
-  <div class="page-shell page-shell--standard-simple termos-page">
+  <div class="page-shell page-shell--wizard oficio-wizard app-wizard termos-wizard">
     {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="TERMOS" title=page_title icon_label="TM" module_label="Termos" back_label="Editar termo" back_url=editar_url only %}
 
-    <main class="main-form-panel">
-      {% include "components/ui/forms/form_block.html" with shell="card" section_id="termo-preview-cadastro-title" title="Resumo do termo" description="Dados efetivos usados na geracao do documento." body_template="termos/partials/_preview_cadastro_body.html" %}
+    <main class="main-form-panel main-form-panel--stack oficio-wizard__main">
+      <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
+        <section class="cv-wizard-section-card cv-form-card cv-wizard-section-card--described" aria-labelledby="termo-preview-cadastro-title">
+          <header class="cv-wizard-section-header">
+            <div class="cv-wizard-section-header__copy">
+              <h3 class="cv-wizard-section-title" id="termo-preview-cadastro-title">Resumo do termo</h3>
+              <p class="cv-wizard-section-subtitle">Dados efetivos usados na geração do documento</p>
+            </div>
+          </header>
+          <div class="cv-wizard-section-body">
+            {% include "termos/partials/_preview_cadastro_body.html" %}
+          </div>
+        </section>
+      </div>
     </main>
   </div>
 {% endblock %}
