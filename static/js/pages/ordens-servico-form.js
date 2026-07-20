@@ -268,6 +268,36 @@
     });
   }
 
+  /* ── Modelo de OS → campos condicionais ───────────────────── */
+
+  function selectedOsModel(form) {
+    var checked = form.querySelector("input[name='tipo_necessidade']:checked");
+    return checked ? checked.value : "";
+  }
+
+  function syncOsModelFields(form) {
+    var model = selectedOsModel(form);
+    form.querySelectorAll("[data-os-model-fields]").forEach(function (group) {
+      var models = String(group.dataset.osModelFields || "").split(/\s+/).filter(Boolean);
+      group.hidden = models.indexOf(model) === -1;
+    });
+    form.querySelectorAll(".os-model-card").forEach(function (card) {
+      var input = card.querySelector("input[name='tipo_necessidade']");
+      card.classList.toggle("is-selected", !!input && input.checked);
+    });
+    updateSubmitButtonLabel(form);
+  }
+
+  function initOsModelPicker(form) {
+    if (!form.querySelector("[data-os-model-picker]")) return;
+    form.addEventListener("change", function (event) {
+      if (event.target && event.target.name === "tipo_necessidade") {
+        syncOsModelFields(form);
+      }
+    });
+    syncOsModelFields(form);
+  }
+
   /* ── Auto-fill a partir dos ofícios selecionados ───────────── */
 
   function onOficiosChange(form, summaries) {
@@ -356,13 +386,28 @@
     var destinoCidade = form.querySelector("select[name='destino_cidade']");
     var servidoresSelect = form.querySelector("select[name='servidores']");
     var motivoField = form.querySelector("[data-motivo-textarea='true']");
+    var model = selectedOsModel(form);
 
     var temDatas = !!(startHidden && startHidden.value) && !!(endHidden && endHidden.value);
     var temDestino = !!(destinoCidade && destinoCidade.value);
     var temServidores = !!servidoresSelect && Array.from(servidoresSelect.options).some(function (o) { return o.selected; });
+    var temTipoNecessidade = !!model;
     var temMotivo = !!(motivoField && motivoField.value.trim());
+    var temEquipe = temServidores;
 
-    return temDatas && temDestino && temServidores && temMotivo;
+    if (model === "CAMINHAO" || model === "MICROONIBUS") {
+      temEquipe = ["motorista_equipe", "tecnico_equipe", "apoio_montagem", "apoio_escolta"].every(function (name) {
+        var field = form.querySelector("select[name='" + name + "']");
+        return !!(field && field.value);
+      });
+    } else if (model === "CERIMONIAL_ANTECIPADO") {
+      temEquipe = ["coordenador_cerimonial", "apoio_cerimonial", "apoio_preparacao"].every(function (name) {
+        var field = form.querySelector("select[name='" + name + "']");
+        return !!(field && field.value);
+      });
+    }
+
+    return temDatas && temDestino && temEquipe && temTipoNecessidade && temMotivo;
   }
 
   function updateSubmitButtonLabel(form) {
@@ -529,6 +574,21 @@
       if (modeloSelect) modeloSelect.value = draft.modelo_motivo[0];
     }
 
+    if (draft.tipo_necessidade && draft.tipo_necessidade.length) {
+      var tipoInput = form.querySelector("input[name='tipo_necessidade'][value='" + draft.tipo_necessidade[0] + "']");
+      if (tipoInput) tipoInput.checked = true;
+    }
+
+    ["motorista_equipe", "tecnico_equipe", "apoio_montagem", "apoio_escolta", "coordenador_cerimonial", "apoio_cerimonial", "apoio_preparacao"].forEach(function (name) {
+      if (!draft[name] || !draft[name].length) return;
+      var field = form.querySelector("select[name='" + name + "']");
+      if (field) {
+        field.value = draft[name][0];
+        resetPicker(field);
+        initPickers(form);
+      }
+    });
+
     if (draft.motivo && draft.motivo.length) {
       var motivoField = form.querySelector("[data-motivo-textarea='true']");
       if (motivoField) {
@@ -537,6 +597,7 @@
       }
     }
 
+    syncOsModelFields(form);
     updateSubmitButtonLabel(form);
   }
 
@@ -548,6 +609,7 @@
 
     var summaries = readSummaries();
     initModeloMotivo(form);
+    initOsModelPicker(form);
     initOficioAutoFill(form, summaries);
     syncDestinationCities(form);
     syncAddDestinationButton(form);

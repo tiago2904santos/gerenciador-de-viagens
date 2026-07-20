@@ -12,15 +12,24 @@ enviada em branco pro Drive.
 
 from __future__ import annotations
 
+import re
+from datetime import date
+from io import BytesIO
 from unittest import mock
+from zipfile import ZipFile
 
 from django.test import TestCase, override_settings
 
+from cadastros.models import Cidade
+from cadastros.models import Estado
+from cadastros.models import Servidor
 from documentos.models import DocumentoArtefato
 from documentos.services.facade import DocumentoGerado
 from documentos.services.types import DocumentoFormato, DocumentoTipo
 from oficios.models import Oficio
 
+from ..models import OrdemServico
+from ..services import gerar_os_docx_response
 from ..services import gerar_resposta_ordem_servico_documento
 
 
@@ -68,3 +77,34 @@ class GerarRespostaOrdemServicoDocumentoTests(TestCase):
         self.assertTrue(
             DocumentoArtefato.objects.filter(tipo="ordem_servico", oficio=self.oficio).exists()
         )
+
+
+class GerarOrdemServicoDocxTests(TestCase):
+    def test_caminhao_usa_template_de_modelos(self):
+        estado = Estado.objects.create(nome="PARANA", sigla="PR")
+        cidade = Cidade.objects.create(nome="CURITIBA", estado=estado, uf="PR")
+        motorista = Servidor.objects.create(nome="MOTORISTA TESTE")
+        tecnico = Servidor.objects.create(nome="TECNICO TESTE")
+        montagem = Servidor.objects.create(nome="APOIO MONTAGEM")
+        escolta = Servidor.objects.create(nome="APOIO ESCOLTA")
+        ordem = OrdemServico.objects.create(
+            tipo_necessidade=OrdemServico.TIPO_CAMINHAO,
+            data_evento_inicio=date(2026, 8, 10),
+            data_evento_fim=date(2026, 8, 12),
+            motivo="evento institucional",
+            motorista_equipe=motorista,
+            tecnico_equipe=tecnico,
+            apoio_montagem=montagem,
+            apoio_escolta=escolta,
+        )
+        ordem.destinos.set([cidade])
+
+        response = gerar_os_docx_response(ordem)
+
+        self.assertEqual(response.status_code, 200)
+        with ZipFile(BytesIO(response.content)) as docx:
+            xml = docx.read("word/document.xml").decode("utf-8")
+        text = re.sub(r"<[^>]+>", "", xml)
+        self.assertIn("Deslocamento - Caminhão de apoio", text)
+        self.assertIn("dois dias de antecedência", text)
+        self.assertIn("Motorista Teste", text)

@@ -27,6 +27,28 @@ class DocxtplNestedTemplatesSmokeTests(SimpleTestCase):
         )
         self.assertTrue(out.startswith(b"PK"))
 
+    def test_ordem_servico_modelos_docx_renders(self):
+        path = resolve_resource_docx("ordem_servico_modelos.docx")
+        self.assertTrue(path.is_file())
+        out = render_docx_bytes(
+            template_path=path,
+            context={
+                "ordem_de_servico": "1/2026",
+                "unidade_abreviado": "ASCOM",
+                "referencia": "Deslocamento - Caminhão de apoio",
+                "nome_chefia": "Chefia Teste",
+                "cargo_chefia": "Delegado",
+                "divisao_capitalize": "Assessoria",
+                "determinacao": "O deslocamento da equipe foi determinado.",
+                "competencias_equipe": ["Motorista - conduzir o veículo"],
+                "justificativas": ["Justificativa do deslocamento."],
+                "finalidade": "Finalidade do documento.",
+                "sede": "Curitiba/PR",
+                "data_atual_extenso": "20 de julho de 2026",
+            },
+        )
+        self.assertTrue(out.startswith(b"PK"))
+
     def test_termo_autorizacao_docx_renders(self):
         path = resolve_resource_docx("termo_autorizacao.docx")
         self.assertTrue(path.is_file())

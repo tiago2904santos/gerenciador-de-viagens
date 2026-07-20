@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260611-os">
   <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260611-os-evento">
   <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260611-os-evento-card">
+  <link rel="stylesheet" href="{% static 'css/ordens-servico.css' %}?v=20260720-modelos-os">
 {% endblock %}
 
 {% block content %}
@@ -74,12 +75,66 @@
         <section class="cv-wizard-section-card termo-card" id="os-card-motivo">
           <header class="cv-wizard-section-header">
             <div class="cv-wizard-section-header__copy">
-              <h2 class="cv-wizard-section-title">4. Motivo</h2>
-              <p class="cv-wizard-section-subtitle">Opcional. Use um modelo ou escreva o texto livremente.</p>
+              <h2 class="cv-wizard-section-title">4. Necessidade e motivo</h2>
+              <p class="cv-wizard-section-subtitle">Escolha o tipo de OS e complemente com o motivo ou finalidade específica.</p>
             </div>
           </header>
           <div class="cv-wizard-section-body">
             <div class="field-grid">
+              <fieldset class="os-model-picker field-size-4" data-os-model-picker>
+                <legend class="cv-field__label">Modelo de OS</legend>
+                <div class="os-model-picker__grid">
+                  {% for radio in form.tipo_necessidade %}
+                    <label class="os-model-card">
+                      {{ radio.tag }}
+                      <span class="os-model-card__mark" aria-hidden="true"></span>
+                      <span class="os-model-card__body">
+                        <span class="os-model-card__title">{{ radio.choice_label }}</span>
+                        {% if radio.data.value == "OPERACAO_ANTECIPADA" %}
+                          <span class="os-model-card__hint">Justifica ida antecipada para preparar ou alinhar a operação policial.</span>
+                        {% elif radio.data.value == "OPERACAO_RETORNO_POSTERIOR" %}
+                          <span class="os-model-card__hint">Justifica retorno um dia após a operação policial.</span>
+                        {% elif radio.data.value == "CAMINHAO" %}
+                          <span class="os-model-card__hint">Inclui motorista, técnico e apoios de montagem/escolta, com dois dias antes e depois.</span>
+                        {% elif radio.data.value == "MICROONIBUS" %}
+                          <span class="os-model-card__hint">Inclui motorista, técnico e apoios de montagem/escolta, sem regra de dois dias.</span>
+                        {% elif radio.data.value == "CERIMONIAL_ANTECIPADO" %}
+                          <span class="os-model-card__hint">Justifica ida antecipada da equipe de cerimonial para organizar a solenidade.</span>
+                        {% else %}
+                          <span class="os-model-card__hint">Mantém o texto livre usado nas OS atuais.</span>
+                        {% endif %}
+                      </span>
+                    </label>
+                  {% endfor %}
+                </div>
+                {% if form.tipo_necessidade.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.tipo_necessidade.errors only %}{% endif %}
+              </fieldset>
+
+              <section class="os-model-fields field-size-4" data-os-model-fields="CAMINHAO MICROONIBUS" hidden>
+                <header class="os-model-fields__header">
+                  <h3 class="os-model-fields__title">Competências da equipe operacional</h3>
+                  <p class="os-model-fields__hint">Campos usados no documento para descrever motorista, técnico e apoios.</p>
+                </header>
+                <div class="field-grid">
+                  {% include "components/forms/form_field.html" with field=form.motorista_equipe size_class="field-size-2" only %}
+                  {% include "components/forms/form_field.html" with field=form.tecnico_equipe size_class="field-size-2" only %}
+                  {% include "components/forms/form_field.html" with field=form.apoio_montagem size_class="field-size-2" only %}
+                  {% include "components/forms/form_field.html" with field=form.apoio_escolta size_class="field-size-2" only %}
+                </div>
+              </section>
+
+              <section class="os-model-fields field-size-4" data-os-model-fields="CERIMONIAL_ANTECIPADO" hidden>
+                <header class="os-model-fields__header">
+                  <h3 class="os-model-fields__title">Competências da equipe de cerimonial</h3>
+                  <p class="os-model-fields__hint">Campos usados no documento para detalhar coordenação, apoio e preparação da solenidade.</p>
+                </header>
+                <div class="field-grid">
+                  {% include "components/forms/form_field.html" with field=form.coordenador_cerimonial size_class="field-size-2" only %}
+                  {% include "components/forms/form_field.html" with field=form.apoio_cerimonial size_class="field-size-2" only %}
+                  {% include "components/forms/form_field.html" with field=form.apoio_preparacao size_class="field-size-2" only %}
+                </div>
+              </section>
+
               {% include "components/forms/input_with_action.html" with field=form.modelo_motivo action_url=modelos_motivo_url action_label="Gerenciar modelos" size_class="field-size-4" only %}
               {% if not tem_modelos_motivo %}
                 <div class="field field-size-4">

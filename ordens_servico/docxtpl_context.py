@@ -145,6 +145,150 @@ def _equipe_deslocamento(ordem: OrdemServico) -> str:
     return ", ".join(partes[:-1]) + f" e {partes[-1]}"
 
 
+def _nome_servidor(servidor) -> str:
+    if not servidor:
+        return ""
+    return format_document_display(servidor.nome) or str(servidor.nome)
+
+
+def _competencia(servidor, texto: str) -> str:
+    nome = _nome_servidor(servidor)
+    if not nome:
+        return ""
+    return f"{nome} - {texto}"
+
+
+def _competencias_transporte(ordem: OrdemServico) -> list[str]:
+    return [
+        item
+        for item in [
+            _competencia(
+                ordem.motorista_equipe,
+                "conduzir o veículo oficial durante os deslocamentos de ida e retorno, zelando pela segurança da equipe e apoiando a movimentação necessária à execução da atividade",
+            ),
+            _competencia(
+                ordem.tecnico_equipe,
+                "prestar suporte técnico à operação dos equipamentos, acompanhando montagem, funcionamento, conferência e recolhimento dos materiais utilizados",
+            ),
+            _competencia(
+                ordem.apoio_montagem,
+                "auxiliar na carga, descarga, montagem, organização dos materiais e adequação do local para a realização da atividade",
+            ),
+            _competencia(
+                ordem.apoio_escolta,
+                "prestar apoio à escolta e à segurança do deslocamento, orientando acessos, estacionamento e movimentação do veículo e da equipe",
+            ),
+        ]
+        if item
+    ]
+
+
+def _competencias_cerimonial(ordem: OrdemServico) -> list[str]:
+    return [
+        item
+        for item in [
+            _competencia(
+                ordem.coordenador_cerimonial,
+                "conduzir o veículo oficial durante o deslocamento de ida e retorno, bem como coordenar as atividades de Cerimonial, supervisionando os procedimentos protocolares, a recepção das autoridades, a composição do dispositivo de honra e a execução do roteiro oficial",
+            ),
+            _competencia(
+                ordem.apoio_cerimonial,
+                "prestar apoio às atividades de Cerimonial, auxiliando na organização do ambiente, recepção das autoridades e execução dos procedimentos protocolares",
+            ),
+            _competencia(
+                ordem.apoio_preparacao,
+                "auxiliar na preparação da solenidade, conferência dos materiais, organização dos espaços e demais atividades necessárias à realização do evento",
+            ),
+        ]
+        if item
+    ]
+
+
+def _texto_modelo(ordem: OrdemServico, motivo: str) -> dict[str, object]:
+    tipo = ordem.tipo_necessidade or OrdemServico.TIPO_PADRAO
+    destino = _destinos_display(ordem) or "destino informado"
+    motivo_doc = motivo or "atuação na atividade institucional designada"
+
+    textos = {
+        "referencia": "Diligências",
+        "determinacao": (
+            f"O deslocamento {_equipe_deslocamento(ordem)} para o município de {destino}, "
+            f"{_periodo_extenso(ordem.data_evento_inicio, ordem.data_evento_fim)}, para realizar {motivo_doc}."
+        ),
+        "justificativas": [],
+        "competencias_equipe": [],
+        "finalidade": "A presente Ordem de Serviço tem por finalidade garantir a execução da atividade designada, com observância às normas administrativas aplicáveis.",
+    }
+
+    if tipo == OrdemServico.TIPO_OPERACAO_ANTECIPADA:
+        textos.update({
+            "referencia": "Deslocamento - Operação policial com ida antecipada",
+            "determinacao": (
+                f"O deslocamento {_equipe_deslocamento(ordem)} para o município de {destino}, "
+                f"{_periodo_extenso(ordem.data_evento_inicio, ordem.data_evento_fim)}, para atuação em operação policial relacionada a {motivo_doc}."
+            ),
+            "justificativas": [
+                "A ida antecipada faz-se necessária para alinhamento prévio com as equipes envolvidas, reconhecimento do local de atuação, organização logística e preparação das providências indispensáveis à execução da operação policial.",
+            ],
+            "finalidade": "A presente Ordem de Serviço tem por finalidade assegurar que a equipe esteja previamente posicionada e preparada para o adequado cumprimento das atividades de polícia judiciária.",
+        })
+    elif tipo == OrdemServico.TIPO_OPERACAO_RETORNO_POSTERIOR:
+        textos.update({
+            "referencia": "Deslocamento - Operação policial com retorno posterior",
+            "determinacao": (
+                f"O deslocamento {_equipe_deslocamento(ordem)} para o município de {destino}, "
+                f"{_periodo_extenso(ordem.data_evento_inicio, ordem.data_evento_fim)}, para atuação em operação policial relacionada a {motivo_doc}."
+            ),
+            "justificativas": [
+                "O retorno um dia posterior à operação faz-se necessário em razão do encerramento das atividades, consolidação das providências administrativas e operacionais, recolhimento de materiais e deslocamento seguro da equipe após a finalização dos trabalhos.",
+            ],
+            "finalidade": "A presente Ordem de Serviço tem por finalidade assegurar a conclusão regular da operação policial e o retorno da equipe após o encerramento das providências necessárias.",
+        })
+    elif tipo == OrdemServico.TIPO_CAMINHAO:
+        textos.update({
+            "referencia": "Deslocamento - Caminhão de apoio",
+            "determinacao": (
+                f"O deslocamento da equipe abaixo relacionada para o município de {destino}, "
+                f"{_periodo_extenso(ordem.data_evento_inicio, ordem.data_evento_fim)}, para apoio logístico com caminhão em {motivo_doc}, observadas as atribuições a seguir:"
+            ),
+            "competencias_equipe": _competencias_transporte(ordem),
+            "justificativas": [
+                "O deslocamento do caminhão com dois dias de antecedência faz-se necessário para viabilizar o traslado, descarga, montagem, conferência técnica e adequação dos materiais e equipamentos no local do evento.",
+                "A permanência por dois dias posteriores ao evento justifica-se pela necessidade de desmontagem, conferência, acondicionamento, carregamento dos materiais e retorno do veículo com segurança, preservando os bens públicos utilizados.",
+            ],
+            "finalidade": "A presente Ordem de Serviço tem por finalidade garantir o planejamento, a execução e a desmobilização do apoio logístico prestado com caminhão.",
+        })
+    elif tipo == OrdemServico.TIPO_MICROONIBUS:
+        textos.update({
+            "referencia": "Deslocamento - Micro-ônibus",
+            "determinacao": (
+                f"O deslocamento da equipe abaixo relacionada para o município de {destino}, "
+                f"{_periodo_extenso(ordem.data_evento_inicio, ordem.data_evento_fim)}, para apoio logístico com micro-ônibus em {motivo_doc}, observadas as atribuições a seguir:"
+            ),
+            "competencias_equipe": _competencias_transporte(ordem),
+            "justificativas": [
+                "O micro-ônibus será utilizado para transporte e apoio logístico da equipe, observando-se o cronograma da atividade, sem necessidade de deslocamento com dois dias de antecedência ou permanência por dois dias posteriores ao evento.",
+            ],
+            "finalidade": "A presente Ordem de Serviço tem por finalidade garantir o transporte, a organização e o apoio logístico necessários à realização da atividade.",
+        })
+    elif tipo == OrdemServico.TIPO_CERIMONIAL_ANTECIPADO:
+        textos.update({
+            "referencia": "Deslocamento - Equipe de Cerimonial",
+            "determinacao": (
+                f"O deslocamento da equipe abaixo relacionada para o município de {destino}, "
+                f"{_periodo_extenso(ordem.data_evento_inicio, ordem.data_evento_fim)}, para atuação na organização e realização de {motivo_doc}, observadas as atribuições a seguir:"
+            ),
+            "competencias_equipe": _competencias_cerimonial(ordem),
+            "justificativas": [
+                "O deslocamento da equipe de Cerimonial com antecedência faz-se necessário para organização dos trabalhos, especialmente quando não houver visita técnica prévia ao local da solenidade.",
+                "A permanência da equipe permitirá verificar estrutura do local, sistema de sonorização, disposição do palco, púlpito, bandeiras, autoridades e convidados, decoração, acessos e demais aspectos logísticos, possibilitando os ajustes necessários para assegurar a adequada realização da solenidade.",
+            ],
+            "finalidade": "A presente Ordem de Serviço tem por finalidade garantir o planejamento, a organização e a execução das atividades de Cerimonial, assegurando o cumprimento das normas de protocolo e a realização do evento institucional com eficiência.",
+        })
+
+    return textos
+
+
 def build_os_docxtpl_context(ordem: OrdemServico) -> dict[str, Any]:
     inst = build_configuracao_context()
 
@@ -165,6 +309,9 @@ def build_os_docxtpl_context(ordem: OrdemServico) -> dict[str, Any]:
         else str(ordem.pk or "—")
     )
 
+    motivo = format_document_display(_txt(ordem.motivo)) if _txt(ordem.motivo) else ""
+    textos_modelo = _texto_modelo(ordem, motivo)
+
     return {
         "ordem_de_servico": numero_str,
         "unidade_abreviado": sigla or unidade,
@@ -177,8 +324,15 @@ def build_os_docxtpl_context(ordem: OrdemServico) -> dict[str, Any]:
         "unidade_rodape": unidade,
         "destino": _destinos_display(ordem),
         "data_extenso": _periodo_extenso(ordem.data_evento_inicio, ordem.data_evento_fim),
-        "motivo": format_document_display(_txt(ordem.motivo)) if _txt(ordem.motivo) else "",
+        "motivo": motivo,
         "equipe_deslocamento": _equipe_deslocamento(ordem),
+        "tipo_necessidade": ordem.tipo_necessidade or OrdemServico.TIPO_PADRAO,
+        "tipo_necessidade_label": ordem.get_tipo_necessidade_display(),
+        "referencia": textos_modelo["referencia"],
+        "determinacao": textos_modelo["determinacao"],
+        "justificativas": textos_modelo["justificativas"],
+        "competencias_equipe": textos_modelo["competencias_equipe"],
+        "finalidade": textos_modelo["finalidade"],
         "sede": _build_sede(inst),
         "data_atual_extenso": _fmt_extenso(timezone.localdate()),
         "endereco": _build_endereco(inst),

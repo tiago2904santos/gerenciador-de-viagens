@@ -29,6 +29,12 @@ from .models import OrdemServico
 logger = logging.getLogger(__name__)
 
 
+def _template_ordem_servico(ordem: OrdemServico) -> str:
+    if ordem.tipo_necessidade == OrdemServico.TIPO_PADRAO:
+        return "ordem_servico.docx"
+    return "ordem_servico_modelos.docx"
+
+
 def _ordem_chain() -> tuple[str, ...]:
     explicit = (getattr(django_settings, "DOCUMENTOS_DEFAULT_PDF_ENGINE", "auto") or "auto").strip().lower()
     return resolve_pdf_engine(explicit_setting=explicit, prefer_docx_pipeline=False).attempt_chain
@@ -115,7 +121,7 @@ def gerar_resposta_ordem_servico_documento(oficio: Oficio, formato: DocumentoFor
 def gerar_os_docx_response(ordem: OrdemServico):
     """Gera e retorna HttpResponse com o DOCX da Ordem de Serviço."""
     ctx = build_os_docxtpl_context(ordem)
-    template_path = resolve_resource_docx("ordem_servico.docx")
+    template_path = resolve_resource_docx(_template_ordem_servico(ordem))
     conteudo = render_docx_bytes(template_path=template_path, context=ctx)
     reference = (
         f"os-{ordem.numero:03d}-{ordem.ano}"
@@ -172,7 +178,7 @@ def gerar_os_pdf_response(ordem: OrdemServico):
         formato=DocumentoFormato.PDF,
         payload={"institucional": {}, "oficio": {}},
         docxtpl_context=ctx,
-        docx_template_path="ordem_servico.docx",
+        docx_template_path=_template_ordem_servico(ordem),
         reference=reference,
     )
     _persistir_ordem_servico_artefato(ordem, doc)
