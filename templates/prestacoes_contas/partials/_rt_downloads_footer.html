@@ -2,7 +2,7 @@
   <div class="cv-card-footer-section__divider" aria-hidden="true"></div>
   <footer class="cv-card-footer">
     <div class="cv-card-footer__secondary">
-      {% include "components/ui/buttons/button.html" with href="/prestacoes-contas/" label="Voltar à lista" variant="secondary" icon="arrow-left" only %}
+      {% include "components/ui/buttons/button.html" with href=back_url|default:"/prestacoes-contas/" label="Voltar à lista" variant="secondary" icon="arrow-left" only %}
     </div>
     <div class="cv-card-footer__primary">
       {% include "components/ui/buttons/button.html" with label="Salvar texto" variant="secondary" type="submit" name="action" value="save" only %}

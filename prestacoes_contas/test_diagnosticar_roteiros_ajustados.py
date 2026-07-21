@@ -35,7 +35,10 @@ class DiagnosticarRoteirosAjustadosTests(TestCase):
         original = self._roteiro_com_destino()
         oficio = Oficio.objects.create(numero=1, ano=2026, roteiro=original)
         copia = clonar_roteiro(original)
-        PrestacaoContas.objects.create(oficio=oficio, servidor=self.servidor, roteiro_ajustado=copia)
+        oficio.servidores.add(self.servidor)
+        prestacao = PrestacaoContas.objects.get(oficio=oficio)
+        prestacao.roteiro_ajustado = copia
+        prestacao.save(update_fields=["roteiro_ajustado"])
 
         saida = self._run()
         self.assertIn("IDENTICA", saida)
@@ -48,7 +51,10 @@ class DiagnosticarRoteirosAjustadosTests(TestCase):
         copia = clonar_roteiro(original)
         copia.observacoes = "AJUSTADO"
         copia.save(update_fields=["observacoes"])
-        PrestacaoContas.objects.create(oficio=oficio, servidor=self.servidor, roteiro_ajustado=copia)
+        oficio.servidores.add(self.servidor)
+        prestacao = PrestacaoContas.objects.get(oficio=oficio)
+        prestacao.roteiro_ajustado = copia
+        prestacao.save(update_fields=["roteiro_ajustado"])
 
         saida = self._run()
         self.assertIn("DIVERGENTE", saida)

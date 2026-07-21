@@ -122,7 +122,7 @@ def _initial_roteiro_evento(evento):
 def index(request):
     from django.db.models import OuterRef, Q
     from core import documento_abas as tabs
-    from prestacoes_contas.models import PrestacaoContas
+    from prestacoes_contas.models import PrestacaoServidor
 
     q = request.GET.get("q", "").strip()
     aba = tabs.normalizar_aba(request.GET.get("aba", ""))
@@ -130,7 +130,10 @@ def index(request):
 
     # Finalizado = todas as prestações dos ofícios (não cancelados) vinculados
     # a este roteiro já foram finalizadas.
-    sub = PrestacaoContas.objects.filter(oficio__roteiro=OuterRef("pk"), oficio__cancelado=False)
+    sub = PrestacaoServidor.objects.filter(
+        prestacao__oficio__roteiro=OuterRef("pk"),
+        prestacao__oficio__cancelado=False,
+    )
     roteiros = tabs.anotar_finalizacao(roteiros, sub, sub.filter(finalizada=False))
     cancelado_q = Q(cancelado=True)
     date_field = "saida_dt__date"

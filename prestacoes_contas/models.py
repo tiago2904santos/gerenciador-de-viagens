@@ -77,14 +77,6 @@ class PrestacaoContas(models.Model):
         blank=True,
         validators=[FileExtensionValidator(PRESTACAO_DOCUMENTO_EXTENSOES)],
     )
-    status = models.CharField(max_length=30, choices=STATUS_CHOICES, default=STATUS_PENDENTE)
-    # Arquivar tira a prestação da lista de pendentes sem concluí-la (fica na aba
-    # "Arquivados"); finalizar marca a prestação como concluída (aba "Finalizados").
-    # São flags independentes do fluxo de aprovação em ``status``.
-    arquivada = models.BooleanField(default=False)
-    arquivada_em = models.DateTimeField(null=True, blank=True)
-    finalizada = models.BooleanField(default=False)
-    finalizada_em = models.DateTimeField(null=True, blank=True)
     observacoes = models.TextField(blank=True, default="")
     criado_em = models.DateTimeField(auto_now_add=True)
     atualizado_em = models.DateTimeField(auto_now=True)
@@ -110,45 +102,23 @@ class PrestacaoContas(models.Model):
                 self.area = get_current_area()
         super().save(*args, **kwargs)
 
-    @property
-    def status_display(self):
-        return dict(self.STATUS_CHOICES).get(self.status, self.status)
-
-    @property
-    def status_variant(self):
-        return {
-            self.STATUS_PENDENTE: "pending",
-            self.STATUS_EM_PREENCHIMENTO: "warning",
-            self.STATUS_ENVIADA: "info",
-            self.STATUS_APROVADA: "success",
-            self.STATUS_REPROVADA: "danger",
-        }.get(self.status, "muted")
-
-    def definir_arquivada(self, arquivada: bool):
-        """Arquiva/desarquiva a prestação, registrando o momento do arquivamento."""
-        from django.utils import timezone as _tz
-
-        self.arquivada = arquivada
-        self.arquivada_em = _tz.now() if arquivada else None
-        self.save(update_fields=["arquivada", "arquivada_em", "atualizado_em"])
-
-    def definir_finalizada(self, finalizada: bool):
-        """Conclui/reabre a prestação, registrando o momento da conclusão."""
-        from django.utils import timezone as _tz
-
-        self.finalizada = finalizada
-        self.finalizada_em = _tz.now() if finalizada else None
-        self.save(update_fields=["finalizada", "finalizada_em", "atualizado_em"])
-
 
 class PrestacaoServidor(models.Model):
     """Parte individual da prestação de um servidor dentro do ofício.
 
-    Guarda o que muda de servidor para servidor: número da solicitação,
-    comprovante de saque/transferência (via ``PrestacaoDocumentoAnexo``) e a
-    assinatura do relatório técnico (via ``AssinaturaDocumento``). O texto do RT
-    e o diário de bordo são compartilhados e ficam em ``PrestacaoContas``.
+    Guarda o acompanhamento e o que muda de servidor para servidor: status,
+    arquivamento/finalização, número da solicitação, comprovante de saque/
+    transferência (via ``PrestacaoDocumentoAnexo``) e a assinatura do relatório
+    técnico (via ``AssinaturaDocumento``). O texto do RT e o diário de bordo são
+    compartilhados e ficam em ``PrestacaoContas``.
     """
+
+    STATUS_PENDENTE = PrestacaoContas.STATUS_PENDENTE
+    STATUS_EM_PREENCHIMENTO = PrestacaoContas.STATUS_EM_PREENCHIMENTO
+    STATUS_ENVIADA = PrestacaoContas.STATUS_ENVIADA
+    STATUS_APROVADA = PrestacaoContas.STATUS_APROVADA
+    STATUS_REPROVADA = PrestacaoContas.STATUS_REPROVADA
+    STATUS_CHOICES = PrestacaoContas.STATUS_CHOICES
 
     prestacao = models.ForeignKey(
         PrestacaoContas,
@@ -188,6 +158,14 @@ class PrestacaoServidor(models.Model):
         null=True,
         blank=True,
     )
+    status = models.CharField(max_length=30, choices=STATUS_CHOICES, default=STATUS_PENDENTE)
+    # Arquivar tira este servidor da lista de pendentes sem concluí-lo (aba
+    # "Arquivados"); finalizar marca a prestação deste servidor como concluída
+    # (aba "Finalizados"). São flags independentes do fluxo em ``status``.
+    arquivada = models.BooleanField(default=False)
+    arquivada_em = models.DateTimeField(null=True, blank=True)
+    finalizada = models.BooleanField(default=False)
+    finalizada_em = models.DateTimeField(null=True, blank=True)
     criado_em = models.DateTimeField(auto_now_add=True)
     atualizado_em = models.DateTimeField(auto_now=True)
 
@@ -195,6 +173,10 @@ class PrestacaoServidor(models.Model):
         ordering = ["prestacao", "pk"]
         verbose_name = "Servidor da prestação"
         verbose_name_plural = "Servidores da prestação"
+        indexes = [
+            models.Index(fields=["arquivada", "finalizada", "data_liberacao_diarias"], name="prest_serv_aba_idx"),
+            models.Index(fields=["status"], name="prest_serv_status_idx"),
+        ]
         constraints = [
             models.UniqueConstraint(
                 fields=["prestacao", "servidor"],
@@ -215,6 +197,41 @@ class PrestacaoServidor(models.Model):
             self.prestacao.oficio.motorista_id
             and self.servidor_id == self.prestacao.oficio.motorista_id
         )
+
+    @property
+    def status_display(self):
+        return dict(self.STATUS_CHOICES).get(self.status, self.status)
+
+    @property
+    def status_variant(self):
+        return {
+            self.STATUS_PENDENTE: "pending",
+            self.STATUS_EM_PREENCHIMENTO: "warning",
+            self.STATUS_ENVIADA: "info",
+            self.STATUS_APROVADA: "success",
+            self.STATUS_REPROVADA: "danger",
+        }.get(self.status, "muted")
+
+    def definir_arquivada(self, arquivada: bool):
+        """Arquiva/desarquiva este servidor, registrando o momento do arquivamento."""
+        from django.utils import timezone as _tz
+
+        self.arquivada = arquivada
+        self.arquivada_em = _tz.now() if arquivada else None
+        self.save(update_fields=["arquivada", "arquivada_em", "atualizado_em"])
+
+    def definir_finalizada(self, finalizada: bool):
+        """Conclui/reabre a prestação deste servidor, registrando o momento."""
+        from django.utils import timezone as _tz
+
+        self.finalizada = finalizada
+        self.finalizada_em = _tz.now() if finalizada else None
+        self.save(update_fields=["finalizada", "finalizada_em", "atualizado_em"])
+
+    def marcar_em_preenchimento(self):
+        if self.status == self.STATUS_PENDENTE:
+            self.status = self.STATUS_EM_PREENCHIMENTO
+            self.save(update_fields=["status", "atualizado_em"])
 
 
 class PrestacaoDocumentoAnexo(models.Model):

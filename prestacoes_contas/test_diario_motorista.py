@@ -42,10 +42,11 @@ class DiarioMotoristaBaseTest(TestCase):
         # O ofício cria a PrestacaoContas via signal; a equipe entra depois.
         self.oficio.servidores.add(self.servidor_equipe)
         self.prestacao = self.oficio.prestacao_contas
+        self.ps = self.prestacao.servidores_prestacao.get(servidor=self.servidor_equipe)
         self.diario = DiarioBordo.objects.create(prestacao=self.prestacao)
 
     def url(self):
-        return reverse("prestacoes_contas:diario_motorista", args=[self.prestacao.pk])
+        return reverse("prestacoes_contas:diario_servidor_motorista", args=[self.ps.pk])
 
 
 class MotoristaDiarioServiceTest(DiarioMotoristaBaseTest):
@@ -137,7 +138,7 @@ class MotoristaViewTest(DiarioMotoristaBaseTest):
     def test_get_renderiza_pagina(self):
         response = self.client.get(self.url())
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Motorista do diário de bordo")
+        self.assertContains(response, "Trocar motorista / viatura")
 
     def test_post_servidor_persiste_e_redireciona(self):
         response = self.client.post(
@@ -148,7 +149,7 @@ class MotoristaViewTest(DiarioMotoristaBaseTest):
             },
         )
         self.assertRedirects(
-            response, reverse("prestacoes_contas:diario_criar", args=[self.prestacao.pk]),
+            response, reverse("prestacoes_contas:diario_servidor", args=[self.ps.pk]),
         )
         self.diario.refresh_from_db()
         self.assertEqual(self.diario.motorista_modo, DiarioBordo.MOTORISTA_MODO_SERVIDOR)

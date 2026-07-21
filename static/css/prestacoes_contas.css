@@ -581,3 +581,47 @@
 
 /* RT por servidor: campo opcional para sobrescrever a diária de um único servidor */
 .rt-diaria-override-field { max-width: 22rem; margin-bottom: var(--space-4, 1rem); }
+
+/* Cards individuais agrupados visualmente pelo mesmo ofício */
+.cv-card-grid > .prestacao-card-group--start,
+.cv-card-grid > .prestacao-card-group--middle,
+.cv-card-grid > .prestacao-card-group--end {
+  position: relative;
+}
+
+.cv-card-grid > .prestacao-card-group--start {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  margin-bottom: 0;
+}
+
+.cv-card-grid > .prestacao-card-group--middle {
+  border-radius: 0;
+  margin-bottom: 0;
+  margin-top: 0;
+}
+
+.cv-card-grid > .prestacao-card-group--end {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  margin-top: 0;
+}
+
+.cv-card-grid > .prestacao-card-group--middle,
+.cv-card-grid > .prestacao-card-group--end {
+  border-top: 1px dashed var(--color-border-soft, #d7e0ea);
+}
+
+.cv-card-grid > .prestacao-card-group--start::before,
+.cv-card-grid > .prestacao-card-group--middle::before,
+.cv-card-grid > .prestacao-card-group--end::before {
+  background: var(--color-primary, #1f6feb);
+  border-radius: 999px;
+  content: "";
+  position: absolute;
+  left: 0.35rem;
+  top: 0.75rem;
+  bottom: 0.75rem;
+  width: 3px;
+}
+

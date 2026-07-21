@@ -66,7 +66,8 @@ from .models import PrestacaoContas
 from .models import PrestacaoDocumentoAnexo
 from .models import PrestacaoServidor
 from .models import RelatorioTecnico
-from .presenters import apresentar_prestacao_card
+from .presenters import apresentar_prestacao_servidor_card
+from .presenters import marcar_agrupamento_cards
 from .selectors import ABA_ARQUIVADOS
 from .selectors import ABA_FINALIZADOS
 from .selectors import ABA_LIBERADAS
@@ -210,10 +211,29 @@ def _build_identificacao(prestacao) -> dict:
     }
 
 
-def _marcar_prestacao_em_preenchimento(prestacao):
-    if prestacao.status == PrestacaoContas.STATUS_PENDENTE:
-        prestacao.status = PrestacaoContas.STATUS_EM_PREENCHIMENTO
-        prestacao.save(update_fields=["status", "atualizado_em"])
+def _marcar_servidor_em_preenchimento(ps):
+    if ps is not None:
+        ps.marcar_em_preenchimento()
+
+
+def _marcar_servidores_pendentes(prestacao):
+    """Marca em preenchimento todos os servidores ainda pendentes do ofício."""
+    if prestacao is None:
+        return
+    for ps in prestacao.servidores_prestacao.filter(status=PrestacaoServidor.STATUS_PENDENTE):
+        ps.marcar_em_preenchimento()
+
+
+def _primeiro_servidor(prestacao):
+    return prestacao.servidores_prestacao.order_by("pk").first()
+
+
+def _redirect_primeiro_servidor(request, prestacao, viewname):
+    ps = _primeiro_servidor(prestacao)
+    if ps is None:
+        messages.error(request, "Esta prestação ainda não possui servidores.")
+        return redirect("prestacoes_contas:index")
+    return redirect(viewname, ps_pk=ps.pk)
 
 
 def _anexos_rows(prestacao, anexos_qs):
@@ -243,12 +263,12 @@ def _anexos_resumo(anexos_qs):
     return {"status": True, "value": f"{len(anexos)} arquivos anexados"}
 
 
-def _build_prestacao_steps(prestacao, atual: str) -> list:
-    """Etapas do wizard da prestação de contas."""
-    documentos_url = reverse("prestacoes_contas:documentos", args=[prestacao.pk])
-    rt_url = reverse("prestacoes_contas:rt_criar", args=[prestacao.pk])
-    diario_url = reverse("prestacoes_contas:diario_criar", args=[prestacao.pk])
-    consolidado_url = reverse("prestacoes_contas:consolidado", args=[prestacao.pk])
+def _build_prestacao_steps(ps, atual: str) -> list:
+    """Etapas do wizard da prestação de contas (navegação por servidor)."""
+    documentos_url = reverse("prestacoes_contas:documentos_servidor", args=[ps.pk])
+    rt_url = reverse("prestacoes_contas:rt_servidor", args=[ps.pk])
+    diario_url = reverse("prestacoes_contas:diario_servidor", args=[ps.pk])
+    consolidado_url = reverse("prestacoes_contas:consolidado_servidor", args=[ps.pk])
     etapas = [
         ("rt", "Etapa 1", "Relatório Técnico", rt_url),
         ("diario", "Etapa 2", "Diário de Bordo", diario_url),
@@ -462,10 +482,10 @@ _ABA_LABELS = [
 ]
 
 _ABA_EMPTY_MESSAGE = {
-    ABA_NAO_LIBERADAS: "Nenhuma prestação com diárias pendentes de liberação.",
-    ABA_LIBERADAS: "Nenhuma prestação com diárias já liberadas.",
-    ABA_ARQUIVADOS: "Nenhuma prestação arquivada.",
-    ABA_FINALIZADOS: "Nenhuma prestação finalizada ainda.",
+    ABA_NAO_LIBERADAS: "Nenhum servidor com diárias pendentes de liberação.",
+    ABA_LIBERADAS: "Nenhum servidor com diárias já liberadas.",
+    ABA_ARQUIVADOS: "Nenhuma prestação de servidor arquivada.",
+    ABA_FINALIZADOS: "Nenhuma prestação de servidor finalizada ainda.",
 }
 
 
@@ -512,7 +532,9 @@ def index(request):
         sort=sort or None,
     )
 
-    cards = [apresentar_prestacao_card(prestacao) for prestacao in prestacoes]
+    cards = marcar_agrupamento_cards(
+        [apresentar_prestacao_servidor_card(ps) for ps in prestacoes]
+    )
 
     has_filters = any([q, status, viagem_de, viagem_ate, sort])
 
@@ -529,7 +551,7 @@ def index(request):
         "prestacoes_contas/index.html",
         {
             "page_title": "Prestações de Contas",
-            "page_description": "Acompanhamento das prestações de contas por ofício.",
+            "page_description": "Acompanhamento das prestações de contas por servidor, agrupadas por ofício.",
             "cards": cards,
             "q":          q,
             "status":     status,
@@ -541,7 +563,7 @@ def index(request):
             "has_filters": has_filters,
             "search_clear_url": f"{reverse('prestacoes_contas:index')}?aba={aba}",
             "status_options": [{"value": "", "label": "Todos os status"}]
-            + [{"value": v, "label": l} for v, l in PrestacaoContas.STATUS_CHOICES],
+            + [{"value": v, "label": l} for v, l in PrestacaoServidor.STATUS_CHOICES],
             "empty_message": _ABA_EMPTY_MESSAGE.get(aba, "Nenhuma prestação de contas encontrada."),
             "sort_options": [
                 {"value": "criacao_desc",  "label": "Criação: mais recente"},
@@ -604,34 +626,56 @@ def _salvar_solicitacoes_em_lote(request):
             ps.save(update_fields=[*update_fields, "atualizado_em"])
 
 
-def _redirect_lista(request, prestacao):
+def _redirect_lista(request, _obj=None):
     """Volta para a lista preservando a aba/filtros de onde a ação foi disparada."""
     destino = request.POST.get("next") or reverse("prestacoes_contas:index")
     return redirect(destino)
 
 
 @require_POST
-def prestacao_arquivar(request, pc_pk):
-    """Arquiva ou desarquiva a prestação (alterna conforme o estado atual)."""
-    prestacao = get_object_or_404(_prestacao_queryset(), pk=pc_pk)
-    prestacao.definir_arquivada(not prestacao.arquivada)
-    if prestacao.arquivada:
-        messages.success(request, "Prestação arquivada.")
+def prestacao_servidor_arquivar(request, ps_pk):
+    """Arquiva ou desarquiva a prestação deste servidor."""
+    ps = get_object_or_404(_prestacao_servidor_queryset(), pk=ps_pk)
+    ps.definir_arquivada(not ps.arquivada)
+    if ps.arquivada:
+        messages.success(request, f"Prestação de {ps.servidor.nome} arquivada.")
     else:
-        messages.success(request, "Prestação desarquivada.")
-    return _redirect_lista(request, prestacao)
+        messages.success(request, f"Prestação de {ps.servidor.nome} desarquivada.")
+    return _redirect_lista(request)
+
+
+@require_POST
+def prestacao_servidor_finalizar(request, ps_pk):
+    """Conclui ou reabre a prestação deste servidor."""
+    ps = get_object_or_404(_prestacao_servidor_queryset(), pk=ps_pk)
+    ps.definir_finalizada(not ps.finalizada)
+    if ps.finalizada:
+        messages.success(request, f"Prestação de {ps.servidor.nome} finalizada.")
+    else:
+        messages.success(request, f"Prestação de {ps.servidor.nome} reaberta.")
+    return _redirect_lista(request)
+
+
+@require_POST
+def prestacao_arquivar(request, pc_pk):
+    """Compatibilidade: arquiva o primeiro servidor da prestação do ofício."""
+    prestacao = get_object_or_404(_prestacao_queryset(), pk=pc_pk)
+    ps = _primeiro_servidor(prestacao)
+    if ps is None:
+        messages.error(request, "Esta prestação ainda não possui servidores.")
+        return _redirect_lista(request)
+    return prestacao_servidor_arquivar(request, ps.pk)
 
 
 @require_POST
 def prestacao_finalizar(request, pc_pk):
-    """Conclui ou reabre a prestação (alterna conforme o estado atual)."""
+    """Compatibilidade: finaliza o primeiro servidor da prestação do ofício."""
     prestacao = get_object_or_404(_prestacao_queryset(), pk=pc_pk)
-    prestacao.definir_finalizada(not prestacao.finalizada)
-    if prestacao.finalizada:
-        messages.success(request, "Prestação finalizada.")
-    else:
-        messages.success(request, "Prestação reaberta.")
-    return _redirect_lista(request, prestacao)
+    ps = _primeiro_servidor(prestacao)
+    if ps is None:
+        messages.error(request, "Esta prestação ainda não possui servidores.")
+        return _redirect_lista(request)
+    return prestacao_servidor_finalizar(request, ps.pk)
 
 
 @require_POST
@@ -646,7 +690,7 @@ def prestacao_servidor_solicitacao_autosave(request, ps_pk):
     if valor is not None and ps.numero_solicitacao != valor:
         ps.numero_solicitacao = valor
         ps.save(update_fields=["numero_solicitacao", "atualizado_em"])
-        _marcar_prestacao_em_preenchimento(ps.prestacao)
+        _marcar_servidor_em_preenchimento(ps)
 
     liberacao_raw = _date_autosave_value(payload, "data_liberacao_diarias")
     prazo_raw = _date_autosave_value(payload, "prazo_limite_saque")
@@ -659,7 +703,7 @@ def prestacao_servidor_solicitacao_autosave(request, ps_pk):
         if ps.data_liberacao_diarias != nova_liberacao:
             ps.data_liberacao_diarias = nova_liberacao
             ps.save(update_fields=["data_liberacao_diarias", "atualizado_em"])
-            _marcar_prestacao_em_preenchimento(ps.prestacao)
+            _marcar_servidor_em_preenchimento(ps)
 
     if prazo_raw is not None:
         try:
@@ -669,7 +713,7 @@ def prestacao_servidor_solicitacao_autosave(request, ps_pk):
         if ps.prazo_limite_saque != novo_prazo:
             ps.prazo_limite_saque = novo_prazo
             ps.save(update_fields=["prazo_limite_saque", "atualizado_em"])
-            _marcar_prestacao_em_preenchimento(ps.prestacao)
+            _marcar_servidor_em_preenchimento(ps)
 
     return autosave_json_response(
         ok=True,
@@ -690,57 +734,117 @@ def _prestacao_full(pc_pk):
     )
 
 
-def documentos(request, pc_pk):
-    """Etapa 3: despacho (compartilhado) + arquivos assinados por servidor.
-
-    Cada servidor anexa o comprovante de saque/transferência e o relatório técnico
-    assinado; o motorista anexa também o diário de bordo assinado. Cada seção
-    autosalva de forma independente (número via autosave.js, arquivos via
-    prestacoes-contas-documentos.js), por isso a página é apenas de leitura/edição
-    contínua — a navegação entre etapas é por links.
-    """
-    prestacao = _prestacao_full(pc_pk)
-    servidores = list(prestacao.servidores_prestacao.all())
-
-    despacho_form = PrestacaoDespachoForm(instance=prestacao)
-
-    servidores_ctx = []
-    for ps in servidores:
-        form = PrestacaoServidorDocumentosForm(instance=ps, prefix=f"ps-{ps.pk}")
-        comprovantes = ps.documentos_anexos.filter(tipo=PrestacaoDocumentoAnexo.TIPO_COMPROVANTE)
-        rt_assinados = ps.documentos_anexos.filter(tipo=PrestacaoDocumentoAnexo.TIPO_RT_ASSINADO)
-        diario_assinados = ps.documentos_anexos.filter(tipo=PrestacaoDocumentoAnexo.TIPO_DB_ASSINADO)
-        servidores_ctx.append(
-            {
-                "ps": ps,
-                "identificacao": _servidor_identificacao(ps),
-                "form": form,
-                "comprovante_anexos": _anexos_rows(prestacao, comprovantes),
-                "rt_assinado_anexos": _anexos_rows(prestacao, rt_assinados),
-                "diario_assinado_anexos": _anexos_rows(prestacao, diario_assinados),
-                "arquivo_autosave_url": reverse(
-                    "prestacoes_contas:prestacao_servidor_arquivo_autosave", args=[ps.pk]
-                ),
-                "solicitacao_autosave_url": reverse(
-                    "prestacoes_contas:prestacao_servidor_solicitacao_autosave", args=[ps.pk]
-                ),
-            }
+def _prestacao_servidor_full(ps_pk):
+    return get_object_or_404(
+        _prestacao_servidor_queryset()
+        .select_related(
+            "prestacao__oficio__roteiro",
+            "servidor__cargo",
+            "servidor__unidade",
         )
+        .prefetch_related(
+            "prestacao__servidores_prestacao__servidor__cargo",
+            "prestacao__servidores_prestacao__servidor__unidade",
+            "prestacao__servidores_prestacao__documentos_anexos",
+            "prestacao__documentos_anexos",
+            "documentos_anexos",
+        ),
+        pk=ps_pk,
+    )
 
+
+def _servidor_documentos_ctx(prestacao, ps):
+    form = PrestacaoServidorDocumentosForm(instance=ps, prefix=f"ps-{ps.pk}")
+    comprovantes = ps.documentos_anexos.filter(tipo=PrestacaoDocumentoAnexo.TIPO_COMPROVANTE)
+    rt_assinados = ps.documentos_anexos.filter(tipo=PrestacaoDocumentoAnexo.TIPO_RT_ASSINADO)
+    diario_assinados = ps.documentos_anexos.filter(tipo=PrestacaoDocumentoAnexo.TIPO_DB_ASSINADO)
+    return {
+        "ps": ps,
+        "identificacao": _servidor_identificacao(ps),
+        "form": form,
+        "comprovante_anexos": _anexos_rows(prestacao, comprovantes),
+        "rt_assinado_anexos": _anexos_rows(prestacao, rt_assinados),
+        "diario_assinado_anexos": _anexos_rows(prestacao, diario_assinados),
+        "arquivo_autosave_url": reverse(
+            "prestacoes_contas:prestacao_servidor_arquivo_autosave", args=[ps.pk]
+        ),
+        "solicitacao_autosave_url": reverse(
+            "prestacoes_contas:prestacao_servidor_solicitacao_autosave", args=[ps.pk]
+        ),
+    }
+
+
+def _servidor_rt_ctx(ps):
+    return {
+        "ps_pk": ps.pk,
+        "nome": ps.servidor.nome,
+        "is_motorista": ps.is_motorista,
+        "diaria_ajustada": bool(ps.diaria_valor_override),
+        "diaria_form": PrestacaoServidorDiariaForm(instance=ps, prefix=f"ps-{ps.pk}"),
+        "download_pdf_url": reverse(
+            "prestacoes_contas:rt_download_servidor_formato", args=[ps.pk, "pdf"]
+        ),
+        "download_docx_url": reverse(
+            "prestacoes_contas:rt_download_servidor_formato", args=[ps.pk, "docx"]
+        ),
+        "preview_inline_url": reverse(
+            "prestacoes_contas:rt_download_servidor_formato", args=[ps.pk, "pdf"]
+        ) + "?inline=1",
+    }
+
+
+def _servidor_consolidado_ctx(request, ps):
+    comprovante_resumo = _anexos_resumo(
+        ps.documentos_anexos.filter(tipo=PrestacaoDocumentoAnexo.TIPO_COMPROVANTE)
+    )
+    rt_assinado_resumo = _anexos_resumo(
+        ps.documentos_anexos.filter(tipo=PrestacaoDocumentoAnexo.TIPO_RT_ASSINADO)
+    )
+    diario_assinado_resumo = _anexos_resumo(
+        ps.documentos_anexos.filter(tipo=PrestacaoDocumentoAnexo.TIPO_DB_ASSINADO)
+    )
+    return {
+        "ps_pk": ps.pk,
+        "nome": ps.servidor.nome,
+        "is_motorista": ps.is_motorista,
+        "numero_solicitacao": ps.numero_solicitacao,
+        "numero_ok": bool((ps.numero_solicitacao or "").strip()),
+        "comprovante_resumo": comprovante_resumo,
+        "rt_assinado_resumo": rt_assinado_resumo,
+        "diario_assinado_resumo": diario_assinado_resumo,
+        "assinatura_rt": _assinatura_rt_card(request, ps),
+        "download_url": reverse("prestacoes_contas:consolidado_download", args=[ps.pk]),
+        "preview_inline_url": reverse("prestacoes_contas:consolidado_download", args=[ps.pk]) + "?inline=1",
+    }
+
+
+def documentos(request, pc_pk):
+    """Compatibilidade: redireciona para o primeiro servidor."""
+    prestacao = get_object_or_404(_prestacao_queryset(), pk=pc_pk)
+    return _redirect_primeiro_servidor(request, prestacao, "prestacoes_contas:documentos_servidor")
+
+
+def documentos_servidor(request, ps_pk):
+    """Etapa 3: despacho compartilhado + documentos do servidor atual."""
+    ps = _prestacao_servidor_full(ps_pk)
+    prestacao = ps.prestacao
+    despacho_form = PrestacaoDespachoForm(instance=prestacao)
     despacho_anexos = prestacao.documentos_anexos.filter(tipo=PrestacaoDocumentoAnexo.TIPO_DESPACHO)
 
     return render(
         request,
         "prestacoes_contas/documentos_form.html",
         {
-            "page_title": "Documentos da Prestação",
+            "page_title": f"Documentos — {ps.servidor.nome}",
             "despacho_form": despacho_form,
             "prestacao": prestacao,
-            "servidores": servidores_ctx,
+            "ps": ps,
+            "servidores": [_servidor_documentos_ctx(prestacao, ps)],
             "identificacao": _build_identificacao(prestacao),
-            "wizard_page_steps": _build_prestacao_steps(prestacao, "documentos"),
-            "diario_url": reverse("prestacoes_contas:diario_criar", args=[prestacao.pk]),
-            "consolidado_url": reverse("prestacoes_contas:consolidado", args=[prestacao.pk]),
+            "wizard_page_steps": _build_prestacao_steps(ps, "documentos"),
+            "back_url": reverse("prestacoes_contas:index"),
+            "diario_url": reverse("prestacoes_contas:diario_servidor", args=[ps.pk]),
+            "consolidado_url": reverse("prestacoes_contas:consolidado_servidor", args=[ps.pk]),
             "despacho_autosave_url": reverse(
                 "prestacoes_contas:prestacao_arquivo_autosave", args=[prestacao.pk]
             ),
@@ -761,7 +865,7 @@ def prestacao_arquivo_autosave(request, pc_pk):
             errors=_autosave_form_errors(form),
         )
     form.save()
-    _marcar_prestacao_em_preenchimento(prestacao)
+    _marcar_servidores_pendentes(prestacao)
     return autosave_json_response(
         ok=True,
         object_id=prestacao.pk,
@@ -785,7 +889,7 @@ def prestacao_servidor_arquivo_autosave(request, ps_pk):
             errors=_autosave_form_errors(form),
         )
     form.save_anexos(ps)
-    _marcar_prestacao_em_preenchimento(ps.prestacao)
+    _marcar_servidor_em_preenchimento(ps)
     return autosave_json_response(
         ok=True,
         object_id=ps.pk,
@@ -839,7 +943,10 @@ def _prestacao_assinado_upload(
         arquivo=arquivo,
         nome_original=nome_original,
     )
-    _marcar_prestacao_em_preenchimento(prestacao)
+    if servidor_prestacao is not None:
+        _marcar_servidor_em_preenchimento(servidor_prestacao)
+    else:
+        _marcar_servidores_pendentes(prestacao)
     messages.success(request, "Documento assinado anexado.")
     return redirect(destino)
 
@@ -885,10 +992,14 @@ def prestacao_documento_excluir(request, pc_pk, anexo_pk):
         pk=anexo_pk,
         prestacao=prestacao,
     )
+    ps_marcar = anexo.servidor_prestacao
     if anexo.arquivo:
         anexo.arquivo.delete(save=False)
     anexo.delete()
-    _marcar_prestacao_em_preenchimento(prestacao)
+    if ps_marcar is not None:
+        _marcar_servidor_em_preenchimento(ps_marcar)
+    else:
+        _marcar_servidores_pendentes(prestacao)
     return autosave_json_response(
         ok=True,
         object_id=prestacao.pk,
@@ -983,7 +1094,7 @@ def assinatura_rt_gerar(request, ps_pk):
     )
     forcar = request.POST.get("forcar") == "1"
     next_url = request.POST.get("next") or reverse(
-        "prestacoes_contas:consolidado", args=[ps.prestacao_id]
+        "prestacoes_contas:consolidado_servidor", args=[ps.pk]
     )
     try:
         token, _docs = emitir_link_rt(ps, forcar=forcar)
@@ -1003,9 +1114,14 @@ def assinatura_db_gerar(request, pc_pk):
         _prestacao_queryset().select_related("oficio__motorista"), pk=pc_pk
     )
     forcar = request.POST.get("forcar") == "1"
-    next_url = request.POST.get("next") or reverse(
-        "prestacoes_contas:consolidado", args=[prestacao.pk]
-    )
+    next_url = request.POST.get("next")
+    if not next_url:
+        ps = _primeiro_servidor(prestacao)
+        next_url = (
+            reverse("prestacoes_contas:consolidado_servidor", args=[ps.pk])
+            if ps is not None
+            else reverse("prestacoes_contas:index")
+        )
     try:
         token, _docs = emitir_link_db(prestacao, forcar=forcar)
     except (AssinaturaError, DocumentValidationError) as exc:
@@ -1022,7 +1138,7 @@ def assinatura_db_gerar(request, pc_pk):
 def assinatura_rt_cancelar(request, ps_pk):
     ps = get_object_or_404(_prestacao_servidor_queryset(), pk=ps_pk)
     next_url = request.POST.get("next") or reverse(
-        "prestacoes_contas:consolidado", args=[ps.prestacao_id]
+        "prestacoes_contas:consolidado_servidor", args=[ps.pk]
     )
     cancelar_assinatura_rt(ps)
     messages.success(request, "Link/assinatura removidos. Você pode gerar um novo link.")
@@ -1032,31 +1148,42 @@ def assinatura_rt_cancelar(request, ps_pk):
 @require_POST
 def assinatura_db_cancelar(request, pc_pk):
     prestacao = get_object_or_404(_prestacao_queryset(), pk=pc_pk)
-    next_url = request.POST.get("next") or reverse(
-        "prestacoes_contas:consolidado", args=[prestacao.pk]
-    )
+    next_url = request.POST.get("next")
+    if not next_url:
+        ps = _primeiro_servidor(prestacao)
+        next_url = (
+            reverse("prestacoes_contas:consolidado_servidor", args=[ps.pk])
+            if ps is not None
+            else reverse("prestacoes_contas:index")
+        )
     cancelar_assinatura_db(prestacao)
     messages.success(request, "Link/assinatura removidos. Você pode gerar um novo link.")
     return redirect(next_url)
 
 
 def rt_criar(request, pc_pk):
-    """Edição do texto compartilhado do RT; a geração/preview é por servidor."""
-    prestacao = _prestacao_full(pc_pk)
+    """Compatibilidade: redireciona para o primeiro servidor."""
+    prestacao = get_object_or_404(_prestacao_queryset(), pk=pc_pk)
+    return _redirect_primeiro_servidor(request, prestacao, "prestacoes_contas:rt_servidor")
+
+
+def rt_servidor(request, ps_pk):
+    """Edição do texto compartilhado do RT; preview/download só do servidor atual."""
+    ps = _prestacao_servidor_full(ps_pk)
+    prestacao = ps.prestacao
 
     relatorio, _ = RelatorioTecnico.objects.get_or_create(prestacao=prestacao)
     garantir_campos_padrao_relatorio_tecnico(relatorio)
     identificacao = _build_identificacao(prestacao)
-    servidores = list(prestacao.servidores_prestacao.all())
 
     if request.method == "POST":
         form = RelatorioTecnicoForm(request.POST, instance=relatorio, relatorio=relatorio)
         if form.is_valid():
             form.save()
             _salvar_diaria_overrides(prestacao, request.POST)
-            _marcar_prestacao_em_preenchimento(prestacao)
+            _marcar_servidor_em_preenchimento(ps)
             messages.success(request, "Texto do relatório técnico salvo.")
-            return redirect("prestacoes_contas:rt_criar", pc_pk=prestacao.pk)
+            return redirect("prestacoes_contas:rt_servidor", ps_pk=ps.pk)
     else:
         initial = {}
         if not relatorio.diaria:
@@ -1065,45 +1192,67 @@ def rt_criar(request, pc_pk):
             initial["motivo"] = prestacao.oficio.motivo or ""
         form = RelatorioTecnicoForm(instance=relatorio, relatorio=relatorio, initial=initial)
 
-    servidores_ctx = [
-        {
-            "ps_pk": ps.pk,
-            "nome": ps.servidor.nome,
-            "is_motorista": ps.is_motorista,
-            "diaria_ajustada": bool(ps.diaria_valor_override),
-            "diaria_form": PrestacaoServidorDiariaForm(instance=ps, prefix=f"ps-{ps.pk}"),
-            "download_pdf_url": reverse(
-                "prestacoes_contas:rt_download_servidor_formato", args=[ps.pk, "pdf"]
-            ),
-            "download_docx_url": reverse(
-                "prestacoes_contas:rt_download_servidor_formato", args=[ps.pk, "docx"]
-            ),
-            "preview_inline_url": reverse(
-                "prestacoes_contas:rt_download_servidor_formato", args=[ps.pk, "pdf"]
-            ) + "?inline=1",
-        }
-        for ps in servidores
-    ]
+    servidores_ctx = [_servidor_rt_ctx(ps)]
 
     return render(
         request,
         "prestacoes_contas/relatorio_tecnico_form.html",
         {
-            "page_title": "Relatório Técnico",
+            "page_title": f"Relatório Técnico — {ps.servidor.nome}",
             "form": form,
             "campos_modelo": _build_campos_modelo(form),
             "campos_custeio": _build_campos_custeio(form),
             "relatorio": relatorio,
             "prestacao": prestacao,
+            "ps": ps,
             "identificacao": identificacao,
             "servidores": servidores_ctx,
-            "wizard_page_steps": _build_prestacao_steps(prestacao, "rt"),
+            "wizard_page_steps": _build_prestacao_steps(ps, "rt"),
             "diaria_info": diaria_info(prestacao),
-            "documentos_url": reverse("prestacoes_contas:documentos", args=[prestacao.pk]),
-            "diario_url": reverse("prestacoes_contas:diario_criar", args=[prestacao.pk]),
-            "autosave_url": reverse("prestacoes_contas:rt_autosave", args=[relatorio.pk]),
-            "preview_inline_url": servidores_ctx[0]["preview_inline_url"] if servidores_ctx else "",
+            "back_url": reverse("prestacoes_contas:index"),
+            "documentos_url": reverse("prestacoes_contas:documentos_servidor", args=[ps.pk]),
+            "diario_url": reverse("prestacoes_contas:diario_servidor", args=[ps.pk]),
+            "autosave_url": reverse("prestacoes_contas:rt_servidor_autosave", args=[ps.pk]),
+            "preview_inline_url": servidores_ctx[0]["preview_inline_url"],
         },
+    )
+
+
+@require_POST
+def rt_servidor_autosave(request, ps_pk):
+    ps = get_object_or_404(_prestacao_servidor_queryset().select_related("prestacao"), pk=ps_pk)
+    relatorio = get_object_or_404(_relatorio_queryset(), prestacao=ps.prestacao)
+    try:
+        payload = parse_autosave_payload(request, expected_model="relatorio_tecnico")
+    except AutosavePayloadError as exc:
+        return autosave_json_response(ok=False, message=str(exc))
+
+    allowed_fields = {
+        "diaria",
+        "translado",
+        "combustivel",
+        "passagem",
+        "translado_outro",
+        "combustivel_outro",
+        "passagem_outro",
+        "motivo",
+        "atividade",
+        "conclusao",
+        "medidas",
+        "info_complementares",
+    }
+    clean_fields = filter_allowed_fields(payload.fields, payload.dirty_fields, allowed_fields)
+    _salvar_rt_autosave(relatorio, clean_fields)
+    _salvar_diaria_overrides(
+        ps.prestacao,
+        {name: payload.fields.get(name) for name in payload.dirty_fields},
+    )
+    if payload.dirty_fields:
+        _marcar_servidor_em_preenchimento(ps)
+    return autosave_json_response(
+        ok=True,
+        object_id=relatorio.pk,
+        version=_autosave_version(relatorio),
     )
 
 
@@ -1135,9 +1284,8 @@ def rt_autosave(request, pk):
         relatorio.prestacao,
         {name: payload.fields.get(name) for name in payload.dirty_fields},
     )
-    if payload.dirty_fields and relatorio.prestacao.status == PrestacaoContas.STATUS_PENDENTE:
-        relatorio.prestacao.status = PrestacaoContas.STATUS_EM_PREENCHIMENTO
-        relatorio.prestacao.save(update_fields=["status", "atualizado_em"])
+    if payload.dirty_fields:
+        _marcar_servidores_pendentes(relatorio.prestacao)
     return autosave_json_response(
         ok=True,
         object_id=relatorio.pk,
@@ -1165,7 +1313,7 @@ def rt_download_servidor(request, ps_pk, formato="docx"):
             if inline:
                 return _preview_error_response(exc)
             messages.error(request, str(exc))
-            return redirect("prestacoes_contas:rt_criar", pc_pk=ps.prestacao_id)
+            return redirect("prestacoes_contas:rt_servidor", ps_pk=ps.pk)
         content_type = "application/pdf"
     else:
         conteudo = gerar_relatorio_tecnico_docx(relatorio, ps)
@@ -1182,18 +1330,15 @@ def rt_download_servidor(request, ps_pk, formato="docx"):
 
 
 def diario_criar(request, pc_pk):
-    """Etapa 2 do wizard: diário de bordo do veículo a partir do roteiro do ofício."""
-    prestacao = get_object_or_404(
-        _prestacao_queryset().select_related(
-            "oficio__roteiro",
-            "oficio__viatura",
-            "oficio__motorista",
-        ).prefetch_related(
-            "servidores_prestacao__servidor__cargo",
-            "servidores_prestacao__servidor__unidade",
-        ),
-        pk=pc_pk,
-    )
+    """Compatibilidade: redireciona para o primeiro servidor."""
+    prestacao = get_object_or_404(_prestacao_queryset(), pk=pc_pk)
+    return _redirect_primeiro_servidor(request, prestacao, "prestacoes_contas:diario_servidor")
+
+
+def diario_servidor(request, ps_pk):
+    """Etapa 2 do wizard: diário compartilhado; navegação por servidor."""
+    ps = _prestacao_servidor_full(ps_pk)
+    prestacao = ps.prestacao
 
     diario, _ = DiarioBordo.objects.get_or_create(prestacao=prestacao)
     sincronizar_trechos(diario)
@@ -1208,7 +1353,7 @@ def diario_criar(request, pc_pk):
         formset = DiarioBordoTrechoFormSet(request.POST, queryset=queryset)
         if formset.is_valid():
             formset.save()
-            _marcar_prestacao_em_preenchimento(prestacao)
+            _marcar_servidor_em_preenchimento(ps)
             formato = "pdf" if request.POST.get("action") == "download_pdf" else "xlsx"
             return redirect("prestacoes_contas:diario_download_formato", pk=diario.pk, formato=formato)
     else:
@@ -1224,26 +1369,48 @@ def diario_criar(request, pc_pk):
         request,
         "prestacoes_contas/diario_bordo_form.html",
         {
-            "page_title": "Diário de Bordo",
+            "page_title": f"Diário de Bordo — {ps.servidor.nome}",
             "prestacao": prestacao,
+            "ps": ps,
             "diario": diario,
             "formset": formset,
             "trechos": trechos,
             "identificacao": _build_identificacao(prestacao),
-            "wizard_page_steps": _build_prestacao_steps(prestacao, "diario"),
+            "wizard_page_steps": _build_prestacao_steps(ps, "diario"),
             "diaria_info": diaria_info(prestacao),
+            "back_url": reverse("prestacoes_contas:index"),
             "assinatura": _assinatura_db_card(request, prestacao),
-            "assinatura_next_url": reverse("prestacoes_contas:diario_criar", args=[prestacao.pk]),
-            "editar_roteiro_url": reverse("prestacoes_contas:diario_editar_roteiro", args=[prestacao.pk]),
-            "editar_motorista_url": reverse("prestacoes_contas:diario_motorista", args=[prestacao.pk]),
+            "assinatura_next_url": reverse("prestacoes_contas:diario_servidor", args=[ps.pk]),
+            "editar_roteiro_url": reverse("prestacoes_contas:diario_servidor_editar_roteiro", args=[ps.pk]),
+            "editar_motorista_url": reverse("prestacoes_contas:diario_servidor_motorista", args=[ps.pk]),
             "motorista_resumo": _motorista_resumo(diario),
-            "rt_url": reverse("prestacoes_contas:rt_criar", args=[prestacao.pk]),
-            "documentos_url": reverse("prestacoes_contas:documentos", args=[prestacao.pk]),
-            "autosave_url": reverse("prestacoes_contas:diario_autosave", args=[diario.pk]),
+            "rt_url": reverse("prestacoes_contas:rt_servidor", args=[ps.pk]),
+            "documentos_url": reverse("prestacoes_contas:documentos_servidor", args=[ps.pk]),
+            "autosave_url": reverse("prestacoes_contas:diario_servidor_autosave", args=[ps.pk]),
             "preview_inline_url": reverse("prestacoes_contas:diario_download_formato", args=[diario.pk, "pdf"]) + "?inline=1",
             "preview_pdf_url": reverse("prestacoes_contas:diario_download_formato", args=[diario.pk, "pdf"]),
             "preview_xlsx_url": reverse("prestacoes_contas:diario_download_formato", args=[diario.pk, "xlsx"]),
         },
+    )
+
+
+@require_POST
+def diario_servidor_autosave(request, ps_pk):
+    ps = get_object_or_404(_prestacao_servidor_queryset().select_related("prestacao"), pk=ps_pk)
+    diario = get_object_or_404(_diario_queryset(), prestacao=ps.prestacao)
+    sincronizar_trechos(diario)
+    try:
+        payload = parse_autosave_payload(request, expected_model="diario_bordo")
+    except AutosavePayloadError as exc:
+        return autosave_json_response(ok=False, message=str(exc))
+
+    _salvar_diario_autosave(diario, payload)
+    if payload.dirty_fields:
+        _marcar_servidor_em_preenchimento(ps)
+    return autosave_json_response(
+        ok=True,
+        object_id=diario.pk,
+        version=_autosave_version(diario),
     )
 
 
@@ -1257,9 +1424,8 @@ def diario_autosave(request, pk):
         return autosave_json_response(ok=False, message=str(exc))
 
     _salvar_diario_autosave(diario, payload)
-    if payload.dirty_fields and diario.prestacao.status == PrestacaoContas.STATUS_PENDENTE:
-        diario.prestacao.status = PrestacaoContas.STATUS_EM_PREENCHIMENTO
-        diario.prestacao.save(update_fields=["status", "atualizado_em"])
+    if payload.dirty_fields:
+        _marcar_servidores_pendentes(diario.prestacao)
     return autosave_json_response(
         ok=True,
         object_id=diario.pk,
@@ -1268,15 +1434,22 @@ def diario_autosave(request, pk):
 
 
 def diario_editar_roteiro(request, pc_pk):
+    """Compatibilidade: redireciona para o primeiro servidor."""
+    prestacao = get_object_or_404(_prestacao_queryset(), pk=pc_pk)
+    return _redirect_primeiro_servidor(request, prestacao, "prestacoes_contas:diario_servidor_editar_roteiro")
+
+
+def diario_servidor_editar_roteiro(request, ps_pk):
     """Abre o editor de roteiro sobre a cópia da prestação (clona do ofício na 1ª vez)."""
     from urllib.parse import urlencode
 
-    prestacao = get_object_or_404(
-        _prestacao_queryset().select_related("oficio__roteiro"),
-        pk=pc_pk,
+    ps = get_object_or_404(
+        _prestacao_servidor_queryset().select_related("prestacao__oficio__roteiro"),
+        pk=ps_pk,
     )
+    prestacao = ps.prestacao
     copia = garantir_roteiro_ajustado(prestacao)
-    diario_url = reverse("prestacoes_contas:diario_criar", args=[prestacao.pk])
+    diario_url = reverse("prestacoes_contas:diario_servidor", args=[ps.pk])
     if copia is None:
         messages.error(request, "Este ofício não possui roteiro para editar.")
         return redirect(diario_url)
@@ -1361,23 +1534,32 @@ def _oficio_prefill_dados(oficio) -> dict:
 
 
 def diario_motorista(request, pc_pk):
+    """Compatibilidade: redireciona para o primeiro servidor."""
+    prestacao = get_object_or_404(_prestacao_queryset(), pk=pc_pk)
+    return _redirect_primeiro_servidor(request, prestacao, "prestacoes_contas:diario_servidor_motorista")
+
+
+def diario_servidor_motorista(request, ps_pk):
     """Etapa 2 — troca o motorista/viatura apenas deste diário, sem alterar o ofício."""
-    prestacao = get_object_or_404(
-        _prestacao_queryset().select_related("oficio", "oficio__viatura").prefetch_related(
-            "oficio__servidores__cargo",
-            "oficio__servidores__unidade",
+    ps = get_object_or_404(
+        _prestacao_servidor_queryset()
+        .select_related("prestacao__oficio", "prestacao__oficio__viatura")
+        .prefetch_related(
+            "prestacao__oficio__servidores__cargo",
+            "prestacao__oficio__servidores__unidade",
         ),
-        pk=pc_pk,
+        pk=ps_pk,
     )
+    prestacao = ps.prestacao
     diario, _ = DiarioBordo.objects.get_or_create(prestacao=prestacao)
-    diario_url = reverse("prestacoes_contas:diario_criar", args=[prestacao.pk])
+    diario_url = reverse("prestacoes_contas:diario_servidor", args=[ps.pk])
 
     if request.method == "POST":
         form = DiarioMotoristaForm(request.POST, instance=diario, oficio=prestacao.oficio)
         if form.is_valid():
             form.save()
             _sincronizar_info_complementares_rt(prestacao)
-            _marcar_prestacao_em_preenchimento(prestacao)
+            _marcar_servidor_em_preenchimento(ps)
             messages.success(request, "Diário de bordo atualizado (motorista/viatura).")
             return redirect(diario_url)
     else:
@@ -1385,7 +1567,6 @@ def diario_motorista(request, pc_pk):
 
     oficio_nome, oficio_cpf = motorista_do_oficio(prestacao.oficio)
 
-    # Ofícios existentes (com número) para o select de "motorista de outro ofício".
     oficios = (
         filter_queryset_by_area(Oficio.objects)
         .select_related("viatura", "viatura__combustivel", "motorista", "transporte_combustivel_manual")
@@ -1401,10 +1582,12 @@ def diario_motorista(request, pc_pk):
         {
             "page_title": "Trocar motorista / viatura",
             "prestacao": prestacao,
+            "ps": ps,
             "diario": diario,
             "form": form,
             "identificacao": _build_identificacao(prestacao),
-            "wizard_page_steps": _build_prestacao_steps(prestacao, "diario"),
+            "wizard_page_steps": _build_prestacao_steps(ps, "diario"),
+            "back_url": reverse("prestacoes_contas:index"),
             "motorista_oficio_nome": oficio_nome or "—",
             "motorista_oficio_cpf": oficio_cpf,
             "viatura_oficio": viatura_resumo_oficio(prestacao.oficio),
@@ -1435,7 +1618,10 @@ def diario_download(request, pk, formato="xlsx"):
             if inline:
                 return _preview_error_response(exc)
             messages.error(request, str(exc))
-            return redirect("prestacoes_contas:diario_criar", pc_pk=diario.prestacao_id)
+            ps = _primeiro_servidor(diario.prestacao)
+            if ps is not None:
+                return redirect("prestacoes_contas:diario_servidor", ps_pk=ps.pk)
+            return redirect("prestacoes_contas:index")
         content_type = "application/pdf"
     else:
         conteudo = gerar_diario_bordo_xlsx(diario)
@@ -1452,7 +1638,14 @@ def diario_download(request, pk, formato="xlsx"):
 
 
 def consolidado(request, pc_pk):
-    prestacao = _prestacao_full(pc_pk)
+    """Compatibilidade: redireciona para o primeiro servidor."""
+    prestacao = get_object_or_404(_prestacao_queryset(), pk=pc_pk)
+    return _redirect_primeiro_servidor(request, prestacao, "prestacoes_contas:consolidado_servidor")
+
+
+def consolidado_servidor(request, ps_pk):
+    ps = _prestacao_servidor_full(ps_pk)
+    prestacao = ps.prestacao
 
     try:
         prestacao.relatorio_tecnico
@@ -1482,46 +1675,21 @@ def consolidado(request, pc_pk):
         },
     ]
 
-    servidores_ctx = []
-    for ps in prestacao.servidores_prestacao.all():
-        comprovante_resumo = _anexos_resumo(
-            ps.documentos_anexos.filter(tipo=PrestacaoDocumentoAnexo.TIPO_COMPROVANTE)
-        )
-        rt_assinado_resumo = _anexos_resumo(
-            ps.documentos_anexos.filter(tipo=PrestacaoDocumentoAnexo.TIPO_RT_ASSINADO)
-        )
-        diario_assinado_resumo = _anexos_resumo(
-            ps.documentos_anexos.filter(tipo=PrestacaoDocumentoAnexo.TIPO_DB_ASSINADO)
-        )
-        servidores_ctx.append(
-            {
-                "ps_pk": ps.pk,
-                "nome": ps.servidor.nome,
-                "is_motorista": ps.is_motorista,
-                "numero_solicitacao": ps.numero_solicitacao,
-                "numero_ok": bool((ps.numero_solicitacao or "").strip()),
-                "comprovante_resumo": comprovante_resumo,
-                "rt_assinado_resumo": rt_assinado_resumo,
-                "diario_assinado_resumo": diario_assinado_resumo,
-                "assinatura_rt": _assinatura_rt_card(request, ps),
-                "download_url": reverse("prestacoes_contas:consolidado_download", args=[ps.pk]),
-                "preview_inline_url": reverse("prestacoes_contas:consolidado_download", args=[ps.pk]) + "?inline=1",
-            }
-        )
-
     return render(
         request,
         "prestacoes_contas/consolidado.html",
         {
-            "page_title": "PDF Final",
+            "page_title": f"PDF Final — {ps.servidor.nome}",
             "prestacao": prestacao,
+            "ps": ps,
             "identificacao": _build_identificacao(prestacao),
-            "wizard_page_steps": _build_prestacao_steps(prestacao, "consolidado"),
+            "wizard_page_steps": _build_prestacao_steps(ps, "consolidado"),
             "itens_consolidado": itens,
-            "servidores": servidores_ctx,
+            "servidores": [_servidor_consolidado_ctx(request, ps)],
+            "back_url": reverse("prestacoes_contas:index"),
             "assinatura_db": _assinatura_db_card(request, prestacao),
-            "assinatura_next_url": reverse("prestacoes_contas:consolidado", args=[prestacao.pk]),
-            "documentos_url": reverse("prestacoes_contas:documentos", args=[prestacao.pk]),
+            "assinatura_next_url": reverse("prestacoes_contas:consolidado_servidor", args=[ps.pk]),
+            "documentos_url": reverse("prestacoes_contas:documentos_servidor", args=[ps.pk]),
         },
     )
 
@@ -1540,7 +1708,7 @@ def consolidado_download(request, ps_pk):
         if inline:
             return _preview_error_response(exc)
         messages.error(request, str(exc))
-        return redirect("prestacoes_contas:consolidado", pc_pk=ps.prestacao_id)
+        return redirect("prestacoes_contas:consolidado_servidor", ps_pk=ps.pk)
 
     nome = nome_arquivo_prestacao_consolidado(ps)
     disposition = "inline" if inline else "attachment"

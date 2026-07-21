@@ -48,7 +48,7 @@ def _roteiro_destino_label(item):
 def index(request):
     from django.db.models import OuterRef
     from core import documento_abas as tabs
-    from prestacoes_contas.models import PrestacaoContas
+    from prestacoes_contas.models import PrestacaoServidor
 
     q = request.GET.get("q", "").strip()
     aba = tabs.normalizar_aba(request.GET.get("aba", ""))
@@ -92,7 +92,10 @@ def index(request):
 
     # Abas: Finalizado = todas as prestações dos ofícios (não cancelados)
     # vinculados à OS já finalizadas.
-    sub = PrestacaoContas.objects.filter(oficio__ordens_servico=OuterRef("pk"), oficio__cancelado=False)
+    sub = PrestacaoServidor.objects.filter(
+        prestacao__oficio__ordens_servico=OuterRef("pk"),
+        prestacao__oficio__cancelado=False,
+    )
     ordens = tabs.anotar_finalizacao(ordens, sub, sub.filter(finalizada=False))
     cancelado_q = Q(cancelado=True)
     date_field = "data_evento_inicio"

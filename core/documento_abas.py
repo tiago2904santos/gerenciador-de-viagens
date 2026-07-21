@@ -48,9 +48,10 @@ def anotar_finalizacao(queryset, prestacoes_todas, prestacoes_pendentes):
     """Anota ``_tem_prestacao`` e ``_tem_prestacao_pendente`` (booleanos via EXISTS).
 
     ``prestacoes_todas`` e ``prestacoes_pendentes`` são subconsultas de
-    ``PrestacaoContas`` já ligadas ao documento por ``OuterRef`` — a segunda
-    restrita a ``finalizada=False``. Mantê-las como EXISTS (em vez de contagens)
-    evita GROUP BY e torna a negação (~) trivial e correta.
+    ``PrestacaoServidor`` (ou equivalente) já ligadas ao documento por
+    ``OuterRef`` — a segunda restrita a ``finalizada=False``. Mantê-las como
+    EXISTS (em vez de contagens) evita GROUP BY e torna a negação (~) trivial
+    e correta.
     """
     return queryset.annotate(
         _tem_prestacao=Exists(prestacoes_todas),

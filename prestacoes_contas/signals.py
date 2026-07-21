@@ -21,7 +21,7 @@ def _sincronizar_prestacao_servidores(oficio):
 
     prestacao, _ = PrestacaoContas.objects.get_or_create(
         oficio=oficio,
-        defaults={"area": oficio.area, "status": PrestacaoContas.STATUS_PENDENTE},
+        defaults={"area": oficio.area},
     )
     if prestacao.area_id is None and oficio.area_id:
         prestacao.area = oficio.area

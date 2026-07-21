@@ -16,7 +16,7 @@
 
 {% block content %}
   <div class="page-shell page-shell--wizard oficio-wizard app-wizard">
-    {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="PRESTAÇÕES" title=page_title icon_label="PC" module_label="Prestações de Contas" back_label="Voltar à lista" back_url="/prestacoes-contas/" status_label="Relatório Técnico" status_variant="draft" only %}
+    {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="PRESTAÇÕES" title=page_title icon_label="PC" module_label="Prestações de Contas" back_label="Voltar à lista" back_url=back_url|default:"/prestacoes-contas/" status_label="Relatório Técnico" status_variant="draft" only %}
 
     {% if wizard_page_steps %}
       {% include "components/ui/navigation/page_stepper.html" with steps=wizard_page_steps only %}
@@ -54,7 +54,7 @@
           {% endfor %}
 
           {# Download do RT por servidor (mesmo texto, dados pessoais de cada um) #}
-          {% include "components/ui/forms/form_block.html" with shell="card" section_id="rt-downloads-title" title="Relatório Técnico por servidor" description="O texto acima é salvo automaticamente. Abra cada card para pré-visualizar o relatório já preenchido; cada arquivo sai com o nome e CPF do servidor." body_extra_class="document-inline-stack" body_template="prestacoes_contas/partials/_rt_downloads_body.html" footer_template="prestacoes_contas/partials/_rt_downloads_footer.html" %}
+          {% include "components/ui/forms/form_block.html" with shell="card" section_id="rt-downloads-title" title="Relatório Técnico deste servidor" description="O texto acima é compartilhado com os demais servidores do ofício e salvo automaticamente. A pré-visualização e o download abaixo são só deste servidor." body_extra_class="document-inline-stack" body_template="prestacoes_contas/partials/_rt_downloads_body.html" footer_template="prestacoes_contas/partials/_rt_downloads_footer.html" %}
         </form>
       </div>
     </main>

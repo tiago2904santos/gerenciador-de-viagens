@@ -23,7 +23,7 @@ from prestacoes_contas.models import DiarioBordo
 from prestacoes_contas.models import PrestacaoContas
 from prestacoes_contas.models import PrestacaoDocumentoAnexo
 from prestacoes_contas.models import RelatorioTecnico
-from prestacoes_contas.presenters import apresentar_prestacao_card
+from prestacoes_contas.presenters import apresentar_prestacao_servidor_card
 from prestacoes_contas.services import build_relatorio_tecnico_context
 from roteiros.models import Roteiro
 from roteiros.models import RoteiroTrecho
@@ -112,8 +112,9 @@ class RelatorioTecnicoDiariaTests(TestCase):
         )
         oficio.servidores.add(self.servidor_a, self.servidor_b)
         prestacao = PrestacaoContas.objects.get(oficio=oficio)
+        ps = prestacao.servidores_prestacao.get(servidor=self.servidor_a)
 
-        response = self.client.get(reverse("prestacoes_contas:rt_criar", args=[prestacao.pk]))
+        response = self.client.get(reverse("prestacoes_contas:rt_servidor", args=[ps.pk]))
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'value="R$100,00"')
@@ -180,7 +181,7 @@ class PrestacaoServidorDiariaOverrideTests(TestCase):
         self.ps_b.diaria_valor_override = "R$80,00"
         self.ps_b.save(update_fields=["diaria_valor_override"])
 
-        response = self.client.get(reverse("prestacoes_contas:rt_criar", args=[self.prestacao.pk]))
+        response = self.client.get(reverse("prestacoes_contas:rt_servidor", args=[self.ps_b.pk]))
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Diária ajustada")
@@ -227,7 +228,7 @@ class PrestacaoServidorDiariaOverrideTests(TestCase):
         }
 
         response = self.client.post(
-            reverse("prestacoes_contas:rt_criar", args=[self.prestacao.pk]),
+            reverse("prestacoes_contas:rt_servidor", args=[self.ps_b.pk]),
             data=data,
         )
 
@@ -284,8 +285,8 @@ class PrestacaoServidorDiariaOverrideTests(TestCase):
     def test_card_oferece_pdfs_individuais_e_consolidado_no_menu(self):
         diario = DiarioBordo.objects.create(prestacao=self.prestacao)
 
-        card = apresentar_prestacao_card(self.prestacao)
-        servidor = next(row for row in card["servidores"] if row["ps_pk"] == self.ps_a.pk)
+        card = apresentar_prestacao_servidor_card(self.ps_a)
+        servidor = card["servidores"][0]
 
         self.assertEqual(
             servidor["rt_download_url"],
@@ -305,6 +306,27 @@ class PrestacaoServidorDiariaOverrideTests(TestCase):
             servidor["pacote_url"],
             reverse("prestacoes_contas:consolidado_download", args=[self.ps_a.pk]),
         )
+
+    def test_lista_cria_um_card_por_servidor_do_mesmo_oficio(self):
+        response = self.client.get(reverse("prestacoes_contas:index"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context["cards"]), 2)
+        self.assertEqual(
+            {card["ps_pk"] for card in response.context["cards"]},
+            {self.ps_a.pk, self.ps_b.pk},
+        )
+
+    def test_arquivar_um_servidor_nao_arquiva_o_outro(self):
+        response = self.client.post(
+            reverse("prestacoes_contas:prestacao_servidor_arquivar", args=[self.ps_a.pk])
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.ps_a.refresh_from_db()
+        self.ps_b.refresh_from_db()
+        self.assertTrue(self.ps_a.arquivada)
+        self.assertFalse(self.ps_b.arquivada)
 
 
 class PrestacaoAssinadoUploadTests(TestCase):
@@ -519,7 +541,7 @@ class PrestacaoAssinadoUploadTests(TestCase):
             count=2,
         )
         self.assertContains(response, "data-attach-signed-kind-selector", count=1)
-        self.assertContains(response, "Anexar despacho assinado", count=2)
+        self.assertContains(response, "Anexar despacho assinado", count=4)
         self.assertContains(response, "data-attach-signed-modal", count=1)
 
 
@@ -532,6 +554,7 @@ class RelatorioTecnicoDocumentoTests(TestCase):
         self.oficio = Oficio.objects.create(numero=7, ano=2026, protocolo="123456789")
         self.oficio.servidores.add(self.servidor)
         self.prestacao = PrestacaoContas.objects.get(oficio=self.oficio)
+        self.ps = self.prestacao.servidores_prestacao.get(servidor=self.servidor)
         self.relatorio = RelatorioTecnico.objects.create(
             prestacao=self.prestacao,
             diaria="R$100,00",
@@ -555,7 +578,7 @@ class RelatorioTecnicoDocumentoTests(TestCase):
         cfg.email = "TESTE@PC.PR.GOV.BR"
         cfg.save()
 
-        contexto = build_relatorio_tecnico_context(self.relatorio)
+        contexto = build_relatorio_tecnico_context(self.relatorio, self.ps)
 
         self.assertEqual(contexto["divisao"], "DIVISAO POLICIAL")
         self.assertEqual(contexto["unidade_cabecalho"], "UNIDADE TESTE")
@@ -573,7 +596,7 @@ class RelatorioTecnicoDocumentoTests(TestCase):
         self.oficio.save(update_fields=["roteiro", "updated_at"])
 
         with mock.patch("prestacoes_contas.services.timezone.localdate", return_value=date(2026, 6, 18)):
-            contexto = build_relatorio_tecnico_context(self.relatorio)
+            contexto = build_relatorio_tecnico_context(self.relatorio, self.ps)
 
         self.assertEqual(contexto["data_atual_extenso"], "19 de junho de 2026")
 
@@ -585,7 +608,7 @@ class RelatorioTecnicoDocumentoTests(TestCase):
         self.oficio.save(update_fields=["roteiro", "updated_at"])
 
         with mock.patch("prestacoes_contas.services.timezone.localdate", return_value=date(2026, 6, 23)):
-            contexto = build_relatorio_tecnico_context(self.relatorio)
+            contexto = build_relatorio_tecnico_context(self.relatorio, self.ps)
 
         self.assertEqual(contexto["data_atual_extenso"], "23 de junho de 2026")
 
@@ -597,7 +620,7 @@ class RelatorioTecnicoDocumentoTests(TestCase):
         self.oficio.save(update_fields=["roteiro", "updated_at"])
 
         with mock.patch("prestacoes_contas.services.timezone.localdate", return_value=date(2026, 6, 30)):
-            contexto = build_relatorio_tecnico_context(self.relatorio)
+            contexto = build_relatorio_tecnico_context(self.relatorio, self.ps)
 
         self.assertEqual(contexto["data_atual_extenso"], "24 de junho de 2026")
 
@@ -613,7 +636,7 @@ class RelatorioTecnicoDocumentoTests(TestCase):
         )
         self.relatorio.refresh_from_db()
 
-        contexto = build_relatorio_tecnico_context(self.relatorio)
+        contexto = build_relatorio_tecnico_context(self.relatorio, self.ps)
 
         self.assertEqual(contexto["diaria"], "R$210,00")
         self.assertEqual(contexto["translado"], "Não houve")
@@ -623,7 +646,7 @@ class RelatorioTecnicoDocumentoTests(TestCase):
     @mock.patch("prestacoes_contas.services.gerar_relatorio_tecnico_pdf", return_value=b"%PDF-1.4\n%%EOF\n")
     def test_download_pdf_do_rt(self, _mock_pdf):
         response = self.client.get(
-            reverse("prestacoes_contas:rt_download_formato", args=[self.relatorio.pk, "pdf"]),
+            reverse("prestacoes_contas:rt_download_servidor_formato", args=[self.ps.pk, "pdf"]),
         )
 
         self.assertEqual(response.status_code, 200)
@@ -643,7 +666,7 @@ class RelatorioTecnicoDocumentoTests(TestCase):
         )
 
         response = self.client.get(
-            reverse("prestacoes_contas:rt_download_formato", args=[self.relatorio.pk, "docx"]),
+            reverse("prestacoes_contas:rt_download_servidor_formato", args=[self.ps.pk, "docx"]),
         )
 
         self.assertEqual(response.status_code, 200)
@@ -667,12 +690,12 @@ class RelatorioTecnicoDocumentoTests(TestCase):
             "action": "download_pdf",
         }
 
-        response = self.client.post(reverse("prestacoes_contas:rt_criar", args=[self.prestacao.pk]), data=data)
+        response = self.client.post(reverse("prestacoes_contas:rt_servidor", args=[self.ps.pk]), data=data)
 
         self.assertEqual(response.status_code, 302)
         self.assertEqual(
             response.url,
-            reverse("prestacoes_contas:rt_download_formato", args=[self.relatorio.pk, "pdf"]),
+            reverse("prestacoes_contas:rt_servidor", args=[self.ps.pk]),
         )
 
     def test_formulario_rt_exibe_opcoes_especificas_para_campos_de_custeio(self):
@@ -691,49 +714,47 @@ class RelatorioTecnicoDocumentoTests(TestCase):
             [("Não houve", "Não houve"), ("__outro__", "Outro")],
         )
 
-    def test_index_salva_numero_solicitacao_da_prestacao(self):
-        prefix = f"prestacao-{self.prestacao.pk}"
+    def test_index_salva_numero_solicitacao_do_servidor(self):
+        prefix = f"ps-{self.ps.pk}"
         response = self.client.post(
             reverse("prestacoes_contas:index"),
             data={
-                "action": "save_solicitacao",
-                "prestacao_id": str(self.prestacao.pk),
+                "action": "save_solicitacoes",
                 f"{prefix}-numero_solicitacao": "SOL-123",
             },
         )
 
         self.assertEqual(response.status_code, 302)
-        self.prestacao.refresh_from_db()
-        self.assertEqual(self.prestacao.numero_solicitacao, "SOL-123")
+        self.ps.refresh_from_db()
+        self.assertEqual(self.ps.numero_solicitacao, "SOL-123")
 
     def test_autosave_salva_numero_solicitacao_prefixado_da_lista(self):
-        prefix = f"prestacao-{self.prestacao.pk}"
+        prefix = f"ps-{self.ps.pk}"
         field_name = f"{prefix}-numero_solicitacao"
         payload = {
-            "object_id": str(self.prestacao.pk),
+            "object_id": str(self.ps.pk),
             "form_id": "",
-            "model": "prestacao_contas",
+            "model": "prestacao_servidor",
             "dirty_fields": [field_name],
             "fields": {field_name: "SOL-AUTO"},
             "snapshots": {},
         }
 
         response = self.client.post(
-            reverse("prestacoes_contas:prestacao_autosave", args=[self.prestacao.pk]),
+            reverse("prestacoes_contas:prestacao_servidor_solicitacao_autosave", args=[self.ps.pk]),
             data=json.dumps(payload),
             content_type="application/json",
         )
 
         self.assertEqual(response.status_code, 200)
-        self.prestacao.refresh_from_db()
-        self.assertEqual(self.prestacao.numero_solicitacao, "SOL-AUTO")
+        self.ps.refresh_from_db()
+        self.assertEqual(self.ps.numero_solicitacao, "SOL-AUTO")
 
     def test_documentos_salva_numero_e_anexos(self):
         with tempfile.TemporaryDirectory() as tmpdir, override_settings(MEDIA_ROOT=tmpdir):
-            response = self.client.post(
-                reverse("prestacoes_contas:documentos", args=[self.prestacao.pk]),
+            despacho_response = self.client.post(
+                reverse("prestacoes_contas:prestacao_arquivo_autosave", args=[self.prestacao.pk]),
                 data={
-                    "numero_solicitacao": "SOL-456",
                     "despacho_arquivos": [
                         SimpleUploadedFile(
                             "despacho.pdf",
@@ -746,7 +767,13 @@ class RelatorioTecnicoDocumentoTests(TestCase):
                             content_type="application/pdf",
                         ),
                     ],
-                    "comprovante_arquivos": [
+                },
+            )
+            comprovante_response = self.client.post(
+                reverse("prestacoes_contas:prestacao_servidor_arquivo_autosave", args=[self.ps.pk]),
+                data={
+                    f"ps-{self.ps.pk}-numero_solicitacao": "SOL-456",
+                    f"ps-{self.ps.pk}-comprovante_arquivos": [
                         SimpleUploadedFile(
                             "comprovante.png",
                             (
@@ -759,14 +786,11 @@ class RelatorioTecnicoDocumentoTests(TestCase):
                             content_type="image/png",
                         ),
                     ],
-                    "action": "save_continue",
                 },
             )
 
-            self.assertEqual(response.status_code, 302)
-            self.assertEqual(response.url, reverse("prestacoes_contas:rt_criar", args=[self.prestacao.pk]))
-            self.prestacao.refresh_from_db()
-            self.assertEqual(self.prestacao.numero_solicitacao, "SOL-456")
+            self.assertEqual(despacho_response.status_code, 200)
+            self.assertEqual(comprovante_response.status_code, 200)
             self.assertEqual(
                 PrestacaoDocumentoAnexo.objects.filter(
                     prestacao=self.prestacao,
@@ -777,37 +801,38 @@ class RelatorioTecnicoDocumentoTests(TestCase):
             self.assertEqual(
                 PrestacaoDocumentoAnexo.objects.filter(
                     prestacao=self.prestacao,
+                    servidor_prestacao=self.ps,
                     tipo=PrestacaoDocumentoAnexo.TIPO_COMPROVANTE,
                 ).count(),
                 1,
             )
 
     def test_autosave_documentos_salva_numero_solicitacao(self):
+        field_name = f"ps-{self.ps.pk}-numero_solicitacao"
         payload = {
-            "object_id": str(self.prestacao.pk),
+            "object_id": str(self.ps.pk),
             "form_id": "",
-            "model": "prestacao_contas",
-            "dirty_fields": ["numero_solicitacao"],
-            "fields": {"numero_solicitacao": "SOL-DOCS"},
+            "model": "prestacao_servidor",
+            "dirty_fields": [field_name],
+            "fields": {field_name: "SOL-DOCS"},
             "snapshots": {},
         }
 
         response = self.client.post(
-            reverse("prestacoes_contas:prestacao_autosave", args=[self.prestacao.pk]),
+            reverse("prestacoes_contas:prestacao_servidor_solicitacao_autosave", args=[self.ps.pk]),
             data=json.dumps(payload),
             content_type="application/json",
         )
 
         self.assertEqual(response.status_code, 200)
-        self.prestacao.refresh_from_db()
-        self.assertEqual(self.prestacao.numero_solicitacao, "SOL-DOCS")
+        self.ps.refresh_from_db()
+        self.assertEqual(self.ps.numero_solicitacao, "SOL-DOCS")
 
     def test_autosave_arquivo_documentos_salva_anexo(self):
         with tempfile.TemporaryDirectory() as tmpdir, override_settings(MEDIA_ROOT=tmpdir):
             response = self.client.post(
                 reverse("prestacoes_contas:prestacao_arquivo_autosave", args=[self.prestacao.pk]),
                 data={
-                    "numero_solicitacao": "SOL-FILE",
                     "despacho_arquivos": [
                         SimpleUploadedFile(
                             "despacho.pdf",
@@ -824,8 +849,6 @@ class RelatorioTecnicoDocumentoTests(TestCase):
             )
 
             self.assertEqual(response.status_code, 200)
-            self.prestacao.refresh_from_db()
-            self.assertEqual(self.prestacao.numero_solicitacao, "SOL-FILE")
             self.assertEqual(
                 PrestacaoDocumentoAnexo.objects.filter(
                     prestacao=self.prestacao,
@@ -939,8 +962,8 @@ class RelatorioTecnicoDocumentoTests(TestCase):
         self.assertFalse(linha.abastecimento)
 
     def test_numero_solicitacao_preenche_coluna_do_oficio(self):
-        self.prestacao.numero_solicitacao = "SOL-789"
-        self.prestacao.save(update_fields=["numero_solicitacao", "atualizado_em"])
+        self.ps.numero_solicitacao = "SOL-789"
+        self.ps.save(update_fields=["numero_solicitacao", "atualizado_em"])
 
         contexto = build_oficio_docxtpl_context(self.oficio)
 
@@ -949,8 +972,8 @@ class RelatorioTecnicoDocumentoTests(TestCase):
     def test_coluna_solicitacao_preserva_linha_vazia_para_outro_servidor(self):
         servidor_b = Servidor.objects.create(nome="Servidor ZZ", cargo=self.cargo, cpf="22233344455")
         self.oficio.servidores.add(servidor_b)
-        self.prestacao.numero_solicitacao = "SOL-789"
-        self.prestacao.save(update_fields=["numero_solicitacao", "atualizado_em"])
+        self.ps.numero_solicitacao = "SOL-789"
+        self.ps.save(update_fields=["numero_solicitacao", "atualizado_em"])
 
         contexto = build_oficio_docxtpl_context(self.oficio)
 
@@ -970,6 +993,7 @@ class RelatorioTecnicoDocumentoTests(TestCase):
             )
             PrestacaoDocumentoAnexo.objects.create(
                 prestacao=self.prestacao,
+                servidor_prestacao=self.ps,
                 tipo=PrestacaoDocumentoAnexo.TIPO_COMPROVANTE,
                 arquivo=SimpleUploadedFile(
                     "comprovante-a.pdf",
@@ -980,6 +1004,7 @@ class RelatorioTecnicoDocumentoTests(TestCase):
             )
             PrestacaoDocumentoAnexo.objects.create(
                 prestacao=self.prestacao,
+                servidor_prestacao=self.ps,
                 tipo=PrestacaoDocumentoAnexo.TIPO_COMPROVANTE,
                 arquivo=SimpleUploadedFile(
                     "comprovante-b.pdf",
@@ -989,18 +1014,19 @@ class RelatorioTecnicoDocumentoTests(TestCase):
                 nome_original="comprovante-b.pdf",
             )
 
-            response = self.client.get(reverse("prestacoes_contas:consolidado", args=[self.prestacao.pk]))
+            response = self.client.get(reverse("prestacoes_contas:consolidado_servidor", args=[self.ps.pk]))
 
         self.assertEqual(response.status_code, 200)
         itens = response.context["itens_consolidado"]
-        self.assertTrue(itens[1]["status"])
-        self.assertEqual(itens[1]["value"], "despacho.pdf")
-        self.assertTrue(itens[4]["status"])
-        self.assertEqual(itens[4]["value"], "2 arquivos anexados")
+        self.assertTrue(itens[0]["status"])
+        self.assertEqual(itens[0]["value"], "despacho.pdf")
+        servidor_ctx = response.context["servidores"][0]
+        self.assertTrue(servidor_ctx["comprovante_resumo"]["status"])
+        self.assertEqual(servidor_ctx["comprovante_resumo"]["value"], "2 arquivos anexados")
 
     @mock.patch("prestacoes_contas.views.gerar_prestacao_consolidado_pdf", return_value=b"%PDF-1.4\n%%EOF\n")
     def test_download_pdf_consolidado(self, _mock_pdf):
-        response = self.client.get(reverse("prestacoes_contas:consolidado_download", args=[self.prestacao.pk]))
+        response = self.client.get(reverse("prestacoes_contas:consolidado_download", args=[self.ps.pk]))
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "application/pdf")
@@ -1021,75 +1047,74 @@ class PrestacaoAbasTests(TestCase):
         roteiro = Roteiro.objects.create(saida_dt=timezone.now())
         oficio = Oficio.objects.create(numero=numero, ano=2026, protocolo=f"1000000{numero}", roteiro=roteiro)
         oficio.servidores.add(self.servidor)
-        return PrestacaoContas.objects.get(oficio=oficio)
+        return PrestacaoContas.objects.get(oficio=oficio).servidores_prestacao.get()
 
     def _pks(self, aba):
         from prestacoes_contas import selectors
 
         return set(selectors.listar_prestacoes(aba=aba).values_list("pk", flat=True))
 
-    def _liberar(self, prestacao):
+    def _liberar(self, ps):
         """Marca a data de liberação das diárias do (único) servidor da prestação."""
-        ps = prestacao.servidores_prestacao.get()
         ps.data_liberacao_diarias = timezone.localdate()
         ps.save(update_fields=["data_liberacao_diarias"])
 
     def test_prestacao_sem_data_liberacao_fica_em_nao_liberadas(self):
         from prestacoes_contas import selectors
 
-        prestacao = self._criar_prestacao(numero=1)
+        ps = self._criar_prestacao(numero=1)
 
-        self.assertIn(prestacao.pk, self._pks(selectors.ABA_NAO_LIBERADAS))
-        self.assertNotIn(prestacao.pk, self._pks(selectors.ABA_LIBERADAS))
+        self.assertIn(ps.pk, self._pks(selectors.ABA_NAO_LIBERADAS))
+        self.assertNotIn(ps.pk, self._pks(selectors.ABA_LIBERADAS))
 
     def test_prestacao_com_servidor_liberado_move_para_liberadas(self):
         from prestacoes_contas import selectors
 
-        prestacao = self._criar_prestacao(numero=1)
-        self._liberar(prestacao)
+        ps = self._criar_prestacao(numero=1)
+        self._liberar(ps)
 
-        self.assertIn(prestacao.pk, self._pks(selectors.ABA_LIBERADAS))
-        self.assertNotIn(prestacao.pk, self._pks(selectors.ABA_NAO_LIBERADAS))
+        self.assertIn(ps.pk, self._pks(selectors.ABA_LIBERADAS))
+        self.assertNotIn(ps.pk, self._pks(selectors.ABA_NAO_LIBERADAS))
 
     def test_arquivar_move_para_aba_arquivados(self):
         from prestacoes_contas import selectors
 
-        prestacao = self._criar_prestacao()
+        ps = self._criar_prestacao()
 
         response = self.client.post(
-            reverse("prestacoes_contas:prestacao_arquivar", args=[prestacao.pk]),
+            reverse("prestacoes_contas:prestacao_servidor_arquivar", args=[ps.pk]),
             data={"next": "/prestacoes-contas/?aba=nao_liberadas"},
         )
 
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, "/prestacoes-contas/?aba=nao_liberadas")
-        prestacao.refresh_from_db()
-        self.assertTrue(prestacao.arquivada)
-        self.assertIsNotNone(prestacao.arquivada_em)
-        self.assertNotIn(prestacao.pk, self._pks(selectors.ABA_NAO_LIBERADAS))
-        self.assertIn(prestacao.pk, self._pks(selectors.ABA_ARQUIVADOS))
+        ps.refresh_from_db()
+        self.assertTrue(ps.arquivada)
+        self.assertIsNotNone(ps.arquivada_em)
+        self.assertNotIn(ps.pk, self._pks(selectors.ABA_NAO_LIBERADAS))
+        self.assertIn(ps.pk, self._pks(selectors.ABA_ARQUIVADOS))
 
         # Segundo POST desarquiva (toggle).
-        self.client.post(reverse("prestacoes_contas:prestacao_arquivar", args=[prestacao.pk]))
-        prestacao.refresh_from_db()
-        self.assertFalse(prestacao.arquivada)
-        self.assertIsNone(prestacao.arquivada_em)
-        self.assertIn(prestacao.pk, self._pks(selectors.ABA_NAO_LIBERADAS))
+        self.client.post(reverse("prestacoes_contas:prestacao_servidor_arquivar", args=[ps.pk]))
+        ps.refresh_from_db()
+        self.assertFalse(ps.arquivada)
+        self.assertIsNone(ps.arquivada_em)
+        self.assertIn(ps.pk, self._pks(selectors.ABA_NAO_LIBERADAS))
 
     def test_finalizar_tem_precedencia_sobre_arquivada(self):
         from prestacoes_contas import selectors
 
-        prestacao = self._criar_prestacao()
-        prestacao.definir_arquivada(True)
+        ps = self._criar_prestacao()
+        ps.definir_arquivada(True)
 
-        self.client.post(reverse("prestacoes_contas:prestacao_finalizar", args=[prestacao.pk]))
+        self.client.post(reverse("prestacoes_contas:prestacao_servidor_finalizar", args=[ps.pk]))
 
-        prestacao.refresh_from_db()
-        self.assertTrue(prestacao.finalizada)
+        ps.refresh_from_db()
+        self.assertTrue(ps.finalizada)
         # Finalizada aparece só em "Finalizados", mesmo estando arquivada.
-        self.assertIn(prestacao.pk, self._pks(selectors.ABA_FINALIZADOS))
-        self.assertNotIn(prestacao.pk, self._pks(selectors.ABA_ARQUIVADOS))
-        self.assertNotIn(prestacao.pk, self._pks(selectors.ABA_NAO_LIBERADAS))
+        self.assertIn(ps.pk, self._pks(selectors.ABA_FINALIZADOS))
+        self.assertNotIn(ps.pk, self._pks(selectors.ABA_ARQUIVADOS))
+        self.assertNotIn(ps.pk, self._pks(selectors.ABA_NAO_LIBERADAS))
 
     def test_contagem_por_aba(self):
         from prestacoes_contas import selectors
@@ -1108,3 +1133,74 @@ class PrestacaoAbasTests(TestCase):
         self.assertEqual(contagem[selectors.ABA_ARQUIVADOS], 1)
         self.assertEqual(contagem[selectors.ABA_FINALIZADOS], 1)
         self.assertIn(p_nao_lib.pk, self._pks(selectors.ABA_NAO_LIBERADAS))
+
+
+class PrestacaoPorServidorFluxoTests(TestCase):
+    """Cards e páginas individuais com dados compartilhados por ofício."""
+
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(username="tester_fluxo_ps", password="123456")
+        self.client.force_login(self.user)
+        self.cargo = Cargo.objects.create(nome="Agente")
+        self.servidor_a = Servidor.objects.create(nome="Servidor Um", cargo=self.cargo, cpf="11122233344")
+        self.servidor_b = Servidor.objects.create(nome="Servidor Dois", cargo=self.cargo, cpf="55566677788")
+        self.oficio = Oficio.objects.create(numero=21, ano=2026, protocolo="212121212")
+        self.oficio.servidores.add(self.servidor_a, self.servidor_b)
+        self.prestacao = PrestacaoContas.objects.get(oficio=self.oficio)
+        self.ps_a = self.prestacao.servidores_prestacao.get(servidor=self.servidor_a)
+        self.ps_b = self.prestacao.servidores_prestacao.get(servidor=self.servidor_b)
+
+    def test_lista_gera_card_separado_por_servidor_agrupado_pelo_oficio(self):
+        response = self.client.get(reverse("prestacoes_contas:index"))
+        self.assertEqual(response.status_code, 200)
+        cards = response.context["cards"]
+        self.assertEqual(len(cards), 2)
+        self.assertEqual({c["ps_pk"] for c in cards}, {self.ps_a.pk, self.ps_b.pk})
+        self.assertEqual({c["prestacao_pk"] for c in cards}, {self.prestacao.pk})
+        self.assertEqual({c["group_position"] for c in cards}, {"start", "end"})
+
+    def test_arquivar_apenas_um_servidor_nao_afeta_o_outro(self):
+        from prestacoes_contas import selectors
+
+        self.client.post(reverse("prestacoes_contas:prestacao_servidor_arquivar", args=[self.ps_a.pk]))
+        self.ps_a.refresh_from_db()
+        self.ps_b.refresh_from_db()
+        self.assertTrue(self.ps_a.arquivada)
+        self.assertFalse(self.ps_b.arquivada)
+        self.assertIn(
+            self.ps_a.pk,
+            set(selectors.listar_prestacoes(aba=selectors.ABA_ARQUIVADOS).values_list("pk", flat=True)),
+        )
+        self.assertIn(
+            self.ps_b.pk,
+            set(selectors.listar_prestacoes(aba=selectors.ABA_NAO_LIBERADAS).values_list("pk", flat=True)),
+        )
+
+    def test_texto_rt_salvo_em_um_servidor_aparece_na_pagina_do_outro(self):
+        RelatorioTecnico.objects.create(
+            prestacao=self.prestacao,
+            diaria="R$100,00",
+            translado="Não houve",
+            combustivel="Cartão Prime",
+            passagem="Não houve",
+            motivo="Texto compartilhado do ofício",
+        )
+        data = {
+            "diaria": "R$100,00",
+            "translado": "Não houve",
+            "combustivel": "Cartão Prime",
+            "passagem": "Não houve",
+            "motivo": "Texto compartilhado do ofício",
+            "atividade": "Atividade única do ofício",
+            "conclusao": "",
+            "medidas": "",
+            "info_complementares": "",
+        }
+        response = self.client.post(reverse("prestacoes_contas:rt_servidor", args=[self.ps_a.pk]), data=data)
+        self.assertEqual(response.status_code, 302)
+
+        pagina_b = self.client.get(reverse("prestacoes_contas:rt_servidor", args=[self.ps_b.pk]))
+        self.assertEqual(pagina_b.status_code, 200)
+        self.assertContains(pagina_b, "Atividade única do ofício")
+        self.assertEqual(pagina_b.context["servidores"][0]["ps_pk"], self.ps_b.pk)
+        self.assertNotEqual(pagina_b.context["servidores"][0]["ps_pk"], self.ps_a.pk)

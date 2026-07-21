@@ -15,6 +15,7 @@ from django.utils import timezone
 from core import documento_abas as tabs
 from oficios.models import Oficio
 from prestacoes_contas.models import PrestacaoContas
+from prestacoes_contas.models import PrestacaoServidor
 from roteiros.models import Roteiro
 
 
@@ -32,12 +33,12 @@ class DocumentoAbasOficioTests(TestCase):
         return oficio
 
     def _base_anotada(self, queryset):
-        sub = PrestacaoContas.objects.filter(oficio=OuterRef("pk"))
+        sub = PrestacaoServidor.objects.filter(prestacao__oficio=OuterRef("pk"))
         return tabs.anotar_finalizacao(queryset, sub, sub.filter(finalizada=False))
 
     def _abas_do(self, pk):
         """Conjunto de abas em que o ofício ``pk`` aparece (deve ser exatamente uma)."""
-        sub = PrestacaoContas.objects.filter(oficio=OuterRef("pk"))
+        sub = PrestacaoServidor.objects.filter(prestacao__oficio=OuterRef("pk"))
         base = tabs.anotar_finalizacao(Oficio.objects.filter(pk=pk), sub, sub.filter(finalizada=False))
         presentes = set()
         for aba in tabs.ABAS_VALIDAS:
@@ -56,10 +57,15 @@ class DocumentoAbasOficioTests(TestCase):
         self.assertEqual(self._abas_do(sem_data.pk), {tabs.ABA_ATUAIS})
 
     def test_finalizado_quando_prestacao_finalizada(self):
+        from cadastros.models import Servidor
+
         oficio = self._oficio(1, saida_offset=-5)
-        prestacao = PrestacaoContas.objects.get(oficio=oficio)  # criada pelo signal
+        servidor = Servidor.objects.create(nome="Servidor A", cpf="12345678901")
+        oficio.servidores.add(servidor)
+        prestacao = PrestacaoContas.objects.get(oficio=oficio)
+        ps = prestacao.servidores_prestacao.get()
         self.assertEqual(self._abas_do(oficio.pk), {tabs.ABA_ATUAIS})
-        prestacao.definir_finalizada(True)
+        ps.definir_finalizada(True)
         self.assertEqual(self._abas_do(oficio.pk), {tabs.ABA_FINALIZADOS})
 
     def test_cancelado_tem_precedencia(self):

@@ -356,10 +356,10 @@ def _texto_modelo(ordem: OrdemServico, motivo: str) -> dict[str, object]:
             ),
             "competencias_equipe": _competencias_cerimonial(ordem),
             "justificativas": [
-                "O deslocamento da equipe de Cerimonial com antecedência faz-se necessário para organização dos trabalhos, especialmente quando não houver visita técnica prévia ao local da solenidade.",
-                "A permanência da equipe permitirá verificar estrutura do local, sistema de sonorização, disposição do palco, púlpito, bandeiras, autoridades e convidados, decoração, acessos e demais aspectos logísticos, possibilitando os ajustes necessários para assegurar a adequada realização da solenidade.",
+                "O deslocamento da equipe com dois dias de antecedência faz-se necessário, sendo o primeiro destinado ao deslocamento até o município do evento e o segundo à organização dos trabalhos, em razão da inexistência de visita técnica prévia.",
+                "A permanência da equipe permitirá verificar a estrutura do local, sistema de sonorização, disposição do palco, púlpito, bandeiras, autoridades e convidados, decoração, acessos e demais aspectos logísticos, possibilitando os ajustes necessários para assegurar a adequada realização da solenidade.",
             ],
-            "finalidade": "A presente Ordem de Serviço tem por finalidade garantir o planejamento, a organização e a execução das atividades de Cerimonial, assegurando o cumprimento das normas de protocolo e a realização do evento institucional com eficiência.",
+            "finalidade": "A presente Ordem de Serviço tem por finalidade garantir o planejamento, a organização e a execução das atividades de Cerimonial, assegurando o cumprimento das normas de protocolo e a realização do evento institucional com eficiência e observância aos padrões da Polícia Civil do Paraná.",
         })
 
     return textos

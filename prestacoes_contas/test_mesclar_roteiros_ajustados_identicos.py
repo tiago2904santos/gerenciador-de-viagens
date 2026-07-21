@@ -35,7 +35,10 @@ class MesclarRoteirosAjustadosIdenticosTests(TestCase):
         original = self._roteiro_com_destino()
         oficio = Oficio.objects.create(numero=1, ano=2026, roteiro=original)
         copia = clonar_roteiro(original)
-        pc = PrestacaoContas.objects.create(oficio=oficio, servidor=self.servidor, roteiro_ajustado=copia)
+        oficio.servidores.add(self.servidor)
+        pc = PrestacaoContas.objects.get(oficio=oficio)
+        pc.roteiro_ajustado = copia
+        pc.save(update_fields=["roteiro_ajustado"])
 
         saida = self._run()
         self.assertIn("seriam descartadas", saida)
@@ -47,7 +50,10 @@ class MesclarRoteirosAjustadosIdenticosTests(TestCase):
         original = self._roteiro_com_destino()
         oficio = Oficio.objects.create(numero=2, ano=2026, roteiro=original)
         copia = clonar_roteiro(original)
-        pc = PrestacaoContas.objects.create(oficio=oficio, servidor=self.servidor, roteiro_ajustado=copia)
+        oficio.servidores.add(self.servidor)
+        pc = PrestacaoContas.objects.get(oficio=oficio)
+        pc.roteiro_ajustado = copia
+        pc.save(update_fields=["roteiro_ajustado"])
 
         saida = self._run("--confirmar")
 
@@ -63,7 +69,10 @@ class MesclarRoteirosAjustadosIdenticosTests(TestCase):
         copia = clonar_roteiro(original)
         copia.observacoes = "AJUSTADO"
         copia.save(update_fields=["observacoes"])
-        pc = PrestacaoContas.objects.create(oficio=oficio, servidor=self.servidor, roteiro_ajustado=copia)
+        oficio.servidores.add(self.servidor)
+        pc = PrestacaoContas.objects.get(oficio=oficio)
+        pc.roteiro_ajustado = copia
+        pc.save(update_fields=["roteiro_ajustado"])
 
         saida = self._run("--confirmar")
 
@@ -77,9 +86,15 @@ class MesclarRoteirosAjustadosIdenticosTests(TestCase):
         oficio1 = Oficio.objects.create(numero=4, ano=2026, roteiro=original)
         oficio2 = Oficio.objects.create(numero=5, ano=2026)
         copia = clonar_roteiro(original)
-        pc1 = PrestacaoContas.objects.create(oficio=oficio1, servidor=self.servidor, roteiro_ajustado=copia)
+        oficio1.servidores.add(self.servidor)
+        pc1 = PrestacaoContas.objects.get(oficio=oficio1)
+        pc1.roteiro_ajustado = copia
+        pc1.save(update_fields=["roteiro_ajustado"])
         servidor2 = Servidor.objects.create(nome="Servidor 2")
-        PrestacaoContas.objects.create(oficio=oficio2, servidor=servidor2, roteiro_ajustado=copia)
+        oficio2.servidores.add(servidor2)
+        pc2 = PrestacaoContas.objects.get(oficio=oficio2)
+        pc2.roteiro_ajustado = copia
+        pc2.save(update_fields=["roteiro_ajustado"])
 
         self._run("--confirmar")
 

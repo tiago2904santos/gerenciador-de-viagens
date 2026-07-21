@@ -121,7 +121,17 @@ class OrdemServicoDocxtplContextTests(TestCase):
         self.assertEqual(ctx["referencia"], "Deslocamento - Equipe de Cerimonial")
         self.assertEqual(len(ctx["competencias_equipe"]), 3)
         self.assertIn("Coordenador Cerimonial", ctx["competencias_equipe"][0])
-        self.assertIn("visita técnica prévia", " ".join(ctx["justificativas"]))
+        self.assertEqual(
+            ctx["justificativas"],
+            [
+                "O deslocamento da equipe com dois dias de antecedência faz-se necessário, sendo o primeiro destinado ao deslocamento até o município do evento e o segundo à organização dos trabalhos, em razão da inexistência de visita técnica prévia.",
+                "A permanência da equipe permitirá verificar a estrutura do local, sistema de sonorização, disposição do palco, púlpito, bandeiras, autoridades e convidados, decoração, acessos e demais aspectos logísticos, possibilitando os ajustes necessários para assegurar a adequada realização da solenidade.",
+            ],
+        )
+        self.assertEqual(
+            ctx["finalidade"],
+            "A presente Ordem de Serviço tem por finalidade garantir o planejamento, a organização e a execução das atividades de Cerimonial, assegurando o cumprimento das normas de protocolo e a realização do evento institucional com eficiência e observância aos padrões da Polícia Civil do Paraná.",
+        )
 
     def test_cerimonial_descreve_competencias_por_funcao(self):
         ordem = self._ordem(OrdemServico.TIPO_CERIMONIAL_ANTECIPADO)

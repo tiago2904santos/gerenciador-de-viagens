@@ -496,7 +496,7 @@ def _justificativa_autosave_data(inst):
 def index(request):
     from django.db.models import OuterRef, Q
     from core import documento_abas as tabs
-    from prestacoes_contas.models import PrestacaoContas
+    from prestacoes_contas.models import PrestacaoServidor
 
     q           = request.GET.get("q",          "").strip()
     status      = request.GET.get("status",     "").strip()
@@ -516,8 +516,8 @@ def index(request):
         viagem_ate=viagem_ate or None,
         sort=sort or None,
     )
-    # Finalizado = a prestação de contas deste ofício foi finalizada.
-    sub = PrestacaoContas.objects.filter(oficio=OuterRef("pk"))
+    # Finalizado = todos os servidores da prestação deste ofício foram finalizados.
+    sub = PrestacaoServidor.objects.filter(prestacao__oficio=OuterRef("pk"))
     base = tabs.anotar_finalizacao(base, sub, sub.filter(finalizada=False))
     cancelado_q = Q(cancelado=True)
     date_field = "roteiro__saida_dt__date"

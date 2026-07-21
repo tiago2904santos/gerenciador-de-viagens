@@ -15,7 +15,7 @@
 
 {% block content %}
   <div class="page-shell page-shell--wizard oficio-wizard app-wizard">
-    {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="PRESTAÇÕES" title=page_title icon_label="PC" module_label="Prestações de Contas" back_label="Voltar à lista" back_url="/prestacoes-contas/" status_label="PDF Final" status_variant="draft" only %}
+    {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="PRESTAÇÕES" title=page_title icon_label="PC" module_label="Prestações de Contas" back_label="Voltar à lista" back_url=back_url|default:"/prestacoes-contas/" status_label="PDF Final" status_variant="draft" only %}
 
     {% include "components/ui/navigation/page_stepper.html" with steps=wizard_page_steps only %}
 
@@ -26,7 +26,7 @@
         {% include "components/ui/forms/form_block.html" with shell="card" section_id="prestacao-final-resumo-title" extra_class="cv-summary-card rt-summary-card oficio-documentos-summary-section" title="Resumo do ofício" description="Pré-visualize e baixe o pacote final de cada servidor — ofício, despacho, RT, diário e comprovante reunidos em um PDF." body_template="prestacoes_contas/partials/_consolidado_resumo_body.html" %}
 
         {# ── Pacote final por servidor, com pré-visualização inline (fechado por padrão) ── #}
-        {% include "components/ui/forms/form_block.html" with shell="card" section_id="prestacao-final-pacotes-title" title="Pacote final por servidor" description="Abra um card para conferir o PDF já gerado antes de baixar." body_extra_class="document-inline-stack" body_template="prestacoes_contas/partials/_consolidado_pacotes_body.html" %}
+        {% include "components/ui/forms/form_block.html" with shell="card" section_id="prestacao-final-pacotes-title" title="Pacote final deste servidor" description="Abra o card para conferir o PDF já gerado antes de baixar. O ofício, o despacho e o diário são compartilhados; o RT e o comprovante são deste servidor." body_extra_class="document-inline-stack" body_template="prestacoes_contas/partials/_consolidado_pacotes_body.html" %}
 
         <section class="cv-card-footer-section">
           <footer class="cv-card-footer">

@@ -272,7 +272,7 @@ def _autosave_form_errors(*forms):
 def index(request):
     from django.db.models import OuterRef, Q
     from core import documento_abas as tabs
-    from prestacoes_contas.models import PrestacaoContas
+    from prestacoes_contas.models import PrestacaoServidor
 
     q = request.GET.get("q", "").strip()
     status = request.GET.get("status", "").strip()
@@ -323,10 +323,17 @@ def index(request):
 
     # Abas: Finalizado = todas as prestações dos ofícios (não cancelados) do
     # evento vinculado ao plano já finalizadas.
-    sub = filter_queryset_by_area(PrestacaoContas.objects).filter(
-        oficio__evento=OuterRef("evento_id"),
-        oficio__cancelado=False,
+    from core.tenancy import get_current_area
+
+    area = get_current_area()
+    sub = PrestacaoServidor.objects.filter(
+        prestacao__oficio__evento=OuterRef("evento_id"),
+        prestacao__oficio__cancelado=False,
     )
+    if area is None:
+        sub = sub.filter(prestacao__area__isnull=True)
+    else:
+        sub = sub.filter(prestacao__area=area)
     planos = tabs.anotar_finalizacao(planos, sub, sub.filter(finalizada=False))
     cancelado_q = Q(cancelado=True)
     date_field = "data_evento_inicio"

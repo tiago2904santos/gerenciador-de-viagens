@@ -1,6 +1,6 @@
 {# Miolo do card de prestação — servidores (solicitação/saque/docs/WhatsApp) + transporte/roteiro. #}
 <div class="oficio-lc__section">
-  <div class="oficio-lc__travellers">
+  <div class="oficio-lc__travellers oficio-lc__travellers--n1">
     {% for servidor in card.servidores %}
     <div class="oficio-lc__traveller oficio-lc__traveller--prestacao{% if servidor.is_motorista %} oficio-lc__traveller--motorista{% endif %}">
       <form method="post"

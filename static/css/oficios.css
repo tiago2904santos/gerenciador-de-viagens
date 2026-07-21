@@ -4016,11 +4016,12 @@ html[data-theme="light"] .oficio-lc__trecho--atividade .oficio-lc__trecho-rota {
 }
 
 /* ── Linha de servidor da prestação: solicitação à esquerda, nome/meta à direita ── */
-.oficio-lc__traveller--prestacao {
+.oficio-lc__traveller.oficio-lc__traveller--prestacao {
   align-items: center;
   flex-basis: 100%;
   flex-wrap: nowrap;
   gap: var(--space-3);
+  grid-template-columns: max-content minmax(0, 1fr) auto auto;
 }
 
 .oficio-lc__solicitacao-form--inline {
@@ -4060,6 +4061,7 @@ html[data-theme="light"] .oficio-lc__trecho--atividade .oficio-lc__trecho-rota {
 
 .oficio-lc__traveller--prestacao .oficio-lc__traveller-body {
   flex: 1 1 auto;
+  min-width: 0;
 }
 
 .oficio-lc__traveller-badge--ok {
@@ -4069,11 +4071,13 @@ html[data-theme="light"] .oficio-lc__trecho--atividade .oficio-lc__trecho-rota {
 }
 
 @media (max-width: 599px) {
-  .oficio-lc__traveller--prestacao {
+  .oficio-lc__traveller.oficio-lc__traveller--prestacao {
     flex-wrap: wrap;
+    grid-template-columns: minmax(0, 1fr) auto auto;
   }
   .oficio-lc__solicitacao-form--inline {
     flex-basis: 100%;
+    grid-column: 1 / -1;
     max-width: none;
     order: 2;
   }

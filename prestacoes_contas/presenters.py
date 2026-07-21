@@ -50,13 +50,12 @@ def _anexo_assinado_info(anexos, *, tipo, anexar_url, prestacao_pk):
     }
 
 
-def _servidor_row(ps, solicitacao_form=None, prestacao_anexos=None):
+def _servidor_row(ps, solicitacao_form=None, prestacao_anexos=None, diario_pdf_url=""):
     """Dados de um servidor no card: identificação + solicitação inline + status."""
     servidor = ps.servidor
     cargo_nome = servidor.cargo.nome if servidor.cargo_id and servidor.cargo else ""
     unidade_nome = str(servidor.unidade) if servidor.unidade_id else ""
 
-    # Comprovante de saque (individual): usa os anexos já pré-carregados.
     anexos = list(ps.documentos_anexos.all())
     comprovante_ok = any(
         anexo.tipo == PrestacaoDocumentoAnexo.TIPO_COMPROVANTE
@@ -86,7 +85,7 @@ def _servidor_row(ps, solicitacao_form=None, prestacao_anexos=None):
         "rt_download_url": reverse(
             "prestacoes_contas:rt_download_servidor_formato", args=[ps.pk, "pdf"]
         ),
-        # aviso de liberação de diárias (WhatsApp) — partes fixas do texto
+        "diario_pdf_url": diario_pdf_url,
         "whatsapp_phone": _whatsapp_phone(servidor),
         "whatsapp_diaria_override": (ps.diaria_valor_override or "").strip(),
     }
@@ -120,30 +119,34 @@ def _servidor_row(ps, solicitacao_form=None, prestacao_anexos=None):
     return row
 
 
-def apresentar_prestacao_card(prestacao, solicitacao_forms=None):
-    """Monta o contexto de um card de prestação (um por ofício) no layout da lista de ofícios.
+def apresentar_prestacao_servidor_card(ps, *, group_position="alone", solicitacao_form=None):
+    """Monta o card de um único servidor, com cabeçalho do ofício compartilhado.
 
-    Reúne todos os servidores do ofício: o trabalho compartilhado (roteiro,
-    diárias, despacho, texto do RT e diário de bordo) aparece uma vez; o número
-    da solicitação e o comprovante de saque são exibidos por servidor.
-
-    ``solicitacao_forms`` é um dict ``{ps_pk: PrestacaoSolicitacaoForm}`` opcional
-    (usado para reexibir erros de validação); quando ausente, cada linha cria o
-    seu próprio form não-vinculado.
+    ``group_position``: ``alone`` | ``start`` | ``middle`` | ``end`` — usado para
+    agrupar visualmente cards consecutivos do mesmo ofício.
     """
+    prestacao = ps.prestacao
     oficio = prestacao.oficio
-    solicitacao_forms = solicitacao_forms or {}
-
-    # ── Servidores da prestação ──
     prestacao_anexos = list(prestacao.documentos_anexos.all())
-    servidores = [
-        _servidor_row(ps, solicitacao_forms.get(ps.pk), prestacao_anexos)
-        for ps in prestacao.servidores_prestacao.all()
-    ]
-    # O motorista aparece sempre como primeiro nome da lista (ordem estável entre os demais).
-    servidores.sort(key=lambda s: not s["is_motorista"])
 
-    # ── Identificação ──
+    diario = None
+    try:
+        diario = prestacao.diario_bordo
+    except Exception:
+        diario = None
+    diario_pdf_url = (
+        reverse("prestacoes_contas:diario_download_formato", args=[diario.pk, "pdf"])
+        if diario is not None
+        else ""
+    )
+
+    servidor = _servidor_row(
+        ps,
+        solicitacao_form,
+        prestacao_anexos,
+        diario_pdf_url=diario_pdf_url,
+    )
+
     data_criacao_display = ""
     if oficio.data_criacao:
         try:
@@ -155,7 +158,6 @@ def apresentar_prestacao_card(prestacao, solicitacao_forms=None):
     data_evento_display = _data_evento_display_oficio(oficio)
     temporal_label, temporal_tone = _temporal_badge_oficio(oficio)
 
-    # ── Roteiro: placa/modelo, trechos e diárias (espelha o card de ofício) ──
     veiculo_placa = ""
     veiculo_modelo = ""
     if oficio.viatura_id:
@@ -185,42 +187,23 @@ def apresentar_prestacao_card(prestacao, solicitacao_forms=None):
             valor_diarias_display = _format_brl_diarias(roteiro.valor_diarias)
             valor_diarias_extenso = (roteiro.valor_diarias_extenso or "").strip()
 
-    # ── Aviso de liberação de diárias (WhatsApp): partes comuns a todo servidor ──
-    # "Unidade sede" = a unidade configurada em Configurações > "Dados da
-    # unidade e Endereço dos documentos" (a mesma usada como ORIGEM no
-    # cabeçalho do ofício gerado), não o solicitante do ofício.
     configuracao = get_configuracao_sistema()
     unidade_sede_display = configuracao.unidade.nome if configuracao.unidade_id else ""
     if destino_display and data_evento_display:
         evento_wa_display = f"{destino_display}, de {data_evento_display}"
     else:
         evento_wa_display = destino_display or data_evento_display
-    for row in servidores:
-        row["whatsapp_oficio"] = oficio.numero_formatado
-        row["whatsapp_unidade"] = unidade_sede_display
-        row["whatsapp_evento"] = evento_wa_display
-        row["whatsapp_diaria"] = row.pop("whatsapp_diaria_override") or valor_diarias_display
 
-    # ── Relatório técnico compartilhado (download é por servidor) ──
+    servidor["whatsapp_oficio"] = oficio.numero_formatado
+    servidor["whatsapp_unidade"] = unidade_sede_display
+    servidor["whatsapp_evento"] = evento_wa_display
+    servidor["whatsapp_diaria"] = servidor.pop("whatsapp_diaria_override") or valor_diarias_display
+
     rt = None
     try:
         rt = prestacao.relatorio_tecnico
     except Exception:
         rt = None
-
-    diario = None
-    try:
-        diario = prestacao.diario_bordo
-    except Exception:
-        diario = None
-
-    diario_pdf_url = (
-        reverse("prestacoes_contas:diario_download_formato", args=[diario.pk, "pdf"])
-        if diario is not None
-        else ""
-    )
-    for row in servidores:
-        row["diario_pdf_url"] = diario_pdf_url
 
     despacho_assinado = _anexo_assinado_info(
         prestacao_anexos,
@@ -232,59 +215,104 @@ def apresentar_prestacao_card(prestacao, solicitacao_forms=None):
         prestacao_pk=prestacao.pk,
     )
 
-    search_parts = [oficio.numero_formatado, format_protocolo(oficio.protocolo) or ""]
-    search_parts += [s["name"] for s in servidores]
-
     protocolo_display = format_protocolo(oficio.protocolo) or ""
     header_value = " · ".join(
         p
         for p in [oficio.numero_formatado, protocolo_display, destino_display, data_evento_display]
         if p
     )
-    header_chips = [entity_cards.chip(prestacao.status_variant, prestacao.status_display)]
+    header_chips = [entity_cards.chip(ps.status_variant, ps.status_display)]
     if temporal_label:
         header_chips.append(entity_cards.chip(temporal_tone, temporal_label))
 
+    equipe_count = len(list(prestacao.servidores_prestacao.all()))
+
     return {
+        "ps_pk": ps.pk,
         "prestacao_pk": prestacao.pk,
-        "status_variant": prestacao.status or "outro",
+        "group_position": group_position,
+        "group_class": f"prestacao-card-group--{group_position}" if group_position != "alone" else "",
+        "status_variant": ps.status or "outro",
         "header": entity_cards.header(
             [entity_cards.header_item("Ofício", header_value, wide=True, wrap=True)],
             header_chips,
         ),
-        # identificação
         "numero_display": oficio.numero_formatado,
-        "protocolo_display": format_protocolo(oficio.protocolo) or "",
+        "protocolo_display": protocolo_display,
         "destino_display": destino_display,
         "data_evento_display": data_evento_display,
         "data_criacao_display": data_criacao_display,
         "temporal_label": temporal_label,
         "temporal_tone": temporal_tone,
-        # status da prestação
-        "status_label": prestacao.status_display,
-        "status_tone": prestacao.status_variant,
-        "status_value": prestacao.status,
-        # arquivamento / conclusão
-        "arquivada": prestacao.arquivada,
-        "finalizada": prestacao.finalizada,
-        "arquivar_url": reverse("prestacoes_contas:prestacao_arquivar", args=[prestacao.pk]),
-        "finalizar_url": reverse("prestacoes_contas:prestacao_finalizar", args=[prestacao.pk]),
-        # servidores (lista)
-        "servidores": servidores,
-        "servidores_count": len(servidores),
-        # roteiro / transporte
+        "status_label": ps.status_display,
+        "status_tone": ps.status_variant,
+        "status_value": ps.status,
+        "arquivada": ps.arquivada,
+        "finalizada": ps.finalizada,
+        "arquivar_url": reverse("prestacoes_contas:prestacao_servidor_arquivar", args=[ps.pk]),
+        "finalizar_url": reverse("prestacoes_contas:prestacao_servidor_finalizar", args=[ps.pk]),
+        "servidores": [servidor],
+        "servidores_count": 1,
+        "equipe_count": equipe_count,
         "veiculo_placa": veiculo_placa,
         "veiculo_modelo": veiculo_modelo,
         "trechos": trechos_display,
         "valor_diarias_display": valor_diarias_display,
         "valor_diarias_extenso": valor_diarias_extenso,
-        # ações / urls (nível ofício)
-        "documentos_url": reverse("prestacoes_contas:documentos", args=[prestacao.pk]),
-        "rt_url": reverse("prestacoes_contas:rt_criar", args=[prestacao.pk]),
+        "documentos_url": reverse("prestacoes_contas:documentos_servidor", args=[ps.pk]),
+        "rt_url": reverse("prestacoes_contas:rt_servidor", args=[ps.pk]),
         "tem_rt": rt is not None,
-        "diario_url": reverse("prestacoes_contas:diario_criar", args=[prestacao.pk]),
-        "consolidado_url": reverse("prestacoes_contas:consolidado", args=[prestacao.pk]),
+        "diario_url": reverse("prestacoes_contas:diario_servidor", args=[ps.pk]),
+        "consolidado_url": reverse("prestacoes_contas:consolidado_servidor", args=[ps.pk]),
         "despacho_assinado": despacho_assinado,
-        # filtro / busca
-        "search_text": " ".join(p for p in search_parts if p),
+        "search_text": " ".join(
+            p for p in [oficio.numero_formatado, protocolo_display, servidor["name"], ps.numero_solicitacao] if p
+        ),
     }
+
+
+def apresentar_prestacao_card(prestacao, solicitacao_forms=None):
+    """Compatibilidade: gera cards individuais para todos os servidores do ofício."""
+    servidores = list(prestacao.servidores_prestacao.all())
+    total = len(servidores)
+    cards = []
+    for index, ps in enumerate(servidores):
+        if total <= 1:
+            position = "alone"
+        elif index == 0:
+            position = "start"
+        elif index == total - 1:
+            position = "end"
+        else:
+            position = "middle"
+        form = (solicitacao_forms or {}).get(ps.pk)
+        cards.append(apresentar_prestacao_servidor_card(ps, group_position=position, solicitacao_form=form))
+    return cards
+
+
+def marcar_agrupamento_cards(cards):
+    """Ajusta ``group_position`` em uma lista já ordenada de cards por servidor."""
+    if not cards:
+        return cards
+
+    i = 0
+    while i < len(cards):
+        j = i + 1
+        while j < len(cards) and cards[j]["prestacao_pk"] == cards[i]["prestacao_pk"]:
+            j += 1
+        tamanho = j - i
+        for offset in range(tamanho):
+            if tamanho == 1:
+                position = "alone"
+            elif offset == 0:
+                position = "start"
+            elif offset == tamanho - 1:
+                position = "end"
+            else:
+                position = "middle"
+            cards[i + offset]["group_position"] = position
+            cards[i + offset]["group_class"] = (
+                f"prestacao-card-group--{position}" if position != "alone" else ""
+            )
+        i = j
+    return cards
