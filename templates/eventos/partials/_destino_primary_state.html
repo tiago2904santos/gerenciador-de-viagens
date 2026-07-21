@@ -1,1 +1,14 @@
-{% include "components/forms/form_field.html" with field=form.destino_uf only %}
+<select
+  name="destino_uf"
+  class="cv-search-picker__native"
+  data-cv-search-picker="true"
+  data-picker-mode="single"
+  data-picker-variant="compact"
+  data-placeholder="Buscar estado..."
+  data-empty-message="Nenhum estado encontrado."
+  aria-label="Estado"
+  id="{{ form.destino_uf.id_for_label }}"
+>
+  <option value="">Selecione o estado</option>
+  {% for value, label in form.destino_uf.field.choices %}{% if value %}<option value="{{ value }}"{% if value == form.destino_uf.value %} selected{% endif %}>{{ label }}</option>{% endif %}{% endfor %}
+</select>

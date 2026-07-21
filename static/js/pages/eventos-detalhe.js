@@ -104,12 +104,24 @@
     jsonInput.value = JSON.stringify(result);
   }
 
+  function renumberBadgesD(lista) {
+    var rows = lista.querySelectorAll('[data-destino-index]');
+    var ordinal = 0;
+    rows.forEach(function (row) {
+      if (row.hidden) return;
+      ordinal += 1;
+      var badge = row.querySelector('[data-destino-ord]');
+      if (badge) badge.textContent = String(ordinal);
+    });
+  }
+
   function refreshRemoveButtonsD(lista) {
     if (window.CV && window.CV.destinos && typeof window.CV.destinos.updateSingleRowState === 'function') {
       window.CV.destinos.updateSingleRowState(lista, {
         rowSelector: '[data-destino-index]',
         removeSelector: '[data-remover-destino]'
       });
+      renumberBadgesD(lista);
       return;
     }
     var rows = lista.querySelectorAll('[data-destino-index]');
@@ -118,6 +130,7 @@
       var btn = row.querySelector('[data-remover-destino]');
       if (btn) btn.hidden = count <= 1;
     });
+    renumberBadgesD(lista);
   }
 
   function initAddDestinoD() {

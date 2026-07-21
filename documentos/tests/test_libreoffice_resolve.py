@@ -1,7 +1,9 @@
 import os
+import sys
 import tempfile
 from pathlib import Path
 from unittest import mock
+from unittest import skipUnless
 
 from django.test import SimpleTestCase
 from django.test import override_settings
@@ -11,6 +13,7 @@ from documentos.services.libreoffice_resolve import resolve_libreoffice_binary
 
 
 class LibreOfficeResolveTests(SimpleTestCase):
+    @skipUnless(sys.platform == "win32", "Mockar os.name='nt' quebra pathlib/tempfile fora do Windows")
     @mock.patch.object(lo_mod.os, "name", "nt")
     def test_windows_prefere_soffice_com_quando_exe_tem_irmao_console(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -68,6 +71,7 @@ class LibreOfficeResolveTests(SimpleTestCase):
         finally:
             Path(path).unlink(missing_ok=True)
 
+    @skipUnless(sys.platform == "win32", "Mockar os.name='nt' quebra tempfile fora do Windows")
     @mock.patch.object(lo_mod.os, "name", "nt")
     @mock.patch.object(lo_mod.subprocess, "run", return_value=mock.Mock(returncode=0))
     def test_verify_version_windows_nao_abre_janela(self, m_run):
@@ -79,6 +83,7 @@ class LibreOfficeResolveTests(SimpleTestCase):
             getattr(lo_mod.subprocess, "CREATE_NO_WINDOW", 0),
         )
 
+    @skipUnless(sys.platform == "win32", "Mockar os.name='nt' quebra tempfile fora do Windows")
     @mock.patch.object(lo_mod.os, "name", "nt")
     @mock.patch.object(lo_mod.subprocess, "run")
     def test_verify_version_recusa_exe_grafico_sem_irmao_console(self, m_run):
