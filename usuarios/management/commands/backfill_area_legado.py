@@ -11,6 +11,8 @@ from __future__ import annotations
 from django.apps import apps
 from django.core.management.base import BaseCommand
 from django.core.management.base import CommandError
+from django.db import IntegrityError
+from django.db import transaction
 
 
 # (app_label, model_name) com campo ``area`` nullable herdado do legado.
@@ -60,6 +62,9 @@ class Command(BaseCommand):
 
         dry_run = options["dry_run"]
         total = 0
+        atualizados = 0
+        conflitos = 0
+
         for app_label, model_name in _MODELOS:
             model = apps.get_model(app_label, model_name)
             if not hasattr(model, "area"):
@@ -70,10 +75,57 @@ class Command(BaseCommand):
                 continue
             total += count
             self.stdout.write(f"{app_label}.{model_name}: {count}")
-            if not dry_run:
-                qs.update(area=area)
+            if dry_run:
+                continue
+
+            ok, skipped = self._atualizar_modelo(model, qs, area)
+            atualizados += ok
+            conflitos += skipped
+            if skipped:
+                self.stdout.write(
+                    self.style.WARNING(
+                        f"  {skipped} registro(s) ignorados por conflito de unicidade."
+                    )
+                )
 
         if dry_run:
-            self.stdout.write(self.style.WARNING(f"Dry-run: {total} registro(s) seriam atualizados."))
-        else:
-            self.stdout.write(self.style.SUCCESS(f"Atualizados {total} registro(s) para area {area.sigla}."))
+            self.stdout.write(
+                self.style.WARNING(f"Dry-run: {total} registro(s) seriam atualizados.")
+            )
+            return
+
+        self.stdout.write(
+            self.style.SUCCESS(
+                f"Atualizados {atualizados} registro(s) para area {area.sigla}."
+            )
+        )
+        if conflitos:
+            self.stdout.write(
+                self.style.WARNING(
+                    f"{conflitos} registro(s) permaneceram sem area "
+                    "(ja existia equivalente na area destino)."
+                )
+            )
+
+    def _atualizar_modelo(self, model, qs, area) -> tuple[int, int]:
+        """Atualiza em lote; se houver unicidade, cai para registro a registro."""
+        try:
+            with transaction.atomic():
+                updated = qs.update(area=area)
+            return updated, 0
+        except IntegrityError:
+            pass
+
+        ok = 0
+        skipped = 0
+        for pk in list(qs.values_list("pk", flat=True)):
+            try:
+                with transaction.atomic():
+                    updated = model.objects.filter(pk=pk, area__isnull=True).update(area=area)
+                if updated:
+                    ok += 1
+                else:
+                    skipped += 1
+            except IntegrityError:
+                skipped += 1
+        return ok, skipped
