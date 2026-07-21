@@ -422,6 +422,10 @@
   function renderServidorRoleCard(card, role, active) {
     card.classList.toggle("os-servidor-role-card", active);
     card.classList.toggle("os-servidor-role-card--assigned", !!role && active);
+    card.classList.toggle(
+      "cv-search-picker__selected-card--driver",
+      !!role && active,
+    );
     card.dataset.osServidorRole = role || "";
 
     var badge = card.querySelector("[data-os-role-badge]");
@@ -441,6 +445,7 @@
       }
     }
     var label = role ? OS_ROLE_LABELS[role] : "Sem função - texto padrão";
+    badge.classList.toggle("cv-search-picker__driver-chip", !!role);
     badge.textContent = label;
   }
 
