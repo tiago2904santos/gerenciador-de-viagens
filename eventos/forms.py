@@ -143,18 +143,18 @@ class EventoNovoCadastroForm(forms.ModelForm):
             }
         ),
     )
+    # Os documentos vinculáveis usam um picker de busca próprio (mesmo cartão dos
+    # ofícios da OS), montado pelo JS a partir dos resumos servidos no template.
+    # Aqui o campo é apenas o <select multiple> oculto que carrega a seleção no
+    # submit — sem o enhancer genérico de cv-search-picker.
     oficios_vinculados = forms.ModelMultipleChoiceField(
         label="Ofícios já existentes",
         queryset=Oficio.objects.none(),
         required=False,
         widget=OficioMultiSelectWidget(attrs={
-            "class": "cv-search-picker__native",
-            "data-cv-search-picker": "true",
-            "data-picker-mode": "multi",
-            "data-picker-variant": "compact",
-            "data-placeholder": "Buscar por número, protocolo ou assunto",
-            "data-empty-message": "Nenhum ofício encontrado.",
-            "data-empty-selected": "Nenhum ofício vinculado.",
+            "class": "evento-doc-source-select",
+            "hidden": True,
+            "data-evento-doc-field": "oficios",
         }),
     )
     ordens_servico_vinculadas = forms.ModelMultipleChoiceField(
@@ -162,13 +162,9 @@ class EventoNovoCadastroForm(forms.ModelForm):
         queryset=OrdemServico.objects.none(),
         required=False,
         widget=OrdemServicoMultiSelectWidget(attrs={
-            "class": "cv-search-picker__native",
-            "data-cv-search-picker": "true",
-            "data-picker-mode": "multi",
-            "data-picker-variant": "compact",
-            "data-placeholder": "Buscar por número",
-            "data-empty-message": "Nenhuma ordem de serviço encontrada.",
-            "data-empty-selected": "Nenhuma OS vinculada.",
+            "class": "evento-doc-source-select",
+            "hidden": True,
+            "data-evento-doc-field": "os",
         }),
     )
     planos_trabalho_vinculados = forms.ModelMultipleChoiceField(
@@ -176,13 +172,9 @@ class EventoNovoCadastroForm(forms.ModelForm):
         queryset=PlanoTrabalho.objects.none(),
         required=False,
         widget=PlanoTrabalhoMultiSelectWidget(attrs={
-            "class": "cv-search-picker__native",
-            "data-cv-search-picker": "true",
-            "data-picker-mode": "multi",
-            "data-picker-variant": "compact",
-            "data-placeholder": "Buscar por número",
-            "data-empty-message": "Nenhum plano de trabalho encontrado.",
-            "data-empty-selected": "Nenhum plano vinculado.",
+            "class": "evento-doc-source-select",
+            "hidden": True,
+            "data-evento-doc-field": "pt",
         }),
     )
     termos_vinculados = forms.ModelMultipleChoiceField(
@@ -190,13 +182,9 @@ class EventoNovoCadastroForm(forms.ModelForm):
         queryset=TermoAutorizacao.objects.none(),
         required=False,
         widget=TermoAutorizacaoMultiSelectWidget(attrs={
-            "class": "cv-search-picker__native",
-            "data-cv-search-picker": "true",
-            "data-picker-mode": "multi",
-            "data-picker-variant": "compact",
-            "data-placeholder": "Buscar por destino",
-            "data-empty-message": "Nenhum termo encontrado.",
-            "data-empty-selected": "Nenhum termo vinculado.",
+            "class": "evento-doc-source-select",
+            "hidden": True,
+            "data-evento-doc-field": "termos",
         }),
     )
     roteiros_vinculados = forms.ModelMultipleChoiceField(
@@ -204,13 +192,9 @@ class EventoNovoCadastroForm(forms.ModelForm):
         queryset=Roteiro.objects.none(),
         required=False,
         widget=RoteiroMultiSelectWidget(attrs={
-            "class": "cv-search-picker__native",
-            "data-cv-search-picker": "true",
-            "data-picker-mode": "multi",
-            "data-picker-variant": "compact",
-            "data-placeholder": "Buscar por origem",
-            "data-empty-message": "Nenhum roteiro encontrado.",
-            "data-empty-selected": "Nenhum roteiro vinculado.",
+            "class": "evento-doc-source-select",
+            "hidden": True,
+            "data-evento-doc-field": "roteiros",
         }),
     )
 

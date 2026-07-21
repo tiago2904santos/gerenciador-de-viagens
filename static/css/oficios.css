@@ -3099,6 +3099,62 @@ html[data-theme="light"] .cv-segment-toggle {
   to   { opacity: 1; } /* só usa transition; este keyframe reservado */
 }
 
+/* ── Documentos vinculados (evento) ──────────────────────────────────────
+ * Toggle quadrado de 5 tipos, com o mesmo visual do segmented control de
+ * função dos servidores (Condução / Técnico / Apoio) da Ordem de Serviço.
+ */
+.evento-doc-toggle.cv-segment-toggle {
+  background: var(--color-surface-soft);
+  border-color: transparent;
+  border-radius: 10px;
+  box-shadow: none;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 2px;
+  padding: 3px;
+  width: 100%;
+}
+
+.evento-doc-toggle .cv-segment-toggle__btn {
+  border-radius: 7px;
+  color: var(--color-muted-strong);
+  justify-content: center;
+  min-height: 34px;
+  padding: 7px 10px;
+  text-align: center;
+  transform: none;
+  width: 100%;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.evento-doc-toggle .cv-segment-toggle__btn[aria-pressed="true"] {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  box-shadow: none;
+  color: var(--color-on-accent, #081522);
+  transform: none;
+}
+
+.evento-doc-toggle .cv-segment-toggle__btn:hover:not([aria-pressed="true"]) {
+  background: color-mix(in srgb, #fff 5%, transparent);
+  color: var(--color-text);
+}
+
+/* Telas estreitas: quebra o toggle em duas colunas para não espremer os rótulos. */
+@media (max-width: 680px) {
+  .evento-doc-toggle.cv-segment-toggle {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.evento-doc-panel {
+  margin-top: var(--space-4);
+}
+
+.evento-doc-summary-panel {
+  margin-top: var(--space-3);
+}
+
 [data-oficio-motorista-servidor],
 [data-oficio-motorista-manual] {
   display: grid;
@@ -4311,69 +4367,6 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
 
 .cv-fab-container .cv-fab {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
-}
-
-/* --------------------------------------------------------------------------
-   Documentos já existentes — abas para alternar entre Ofícios, Roteiros,
-   PT, OS e Termos, mostrando só um picker por vez (mesmo padrão visual das
-   abas "Meu Drive / Compartilhados comigo / Drives compartilhados" da
-   página de configurações do Google Drive).
-   -------------------------------------------------------------------------- */
-.evento-doc-tabs {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 2px;
-  padding: 3px;
-  margin-bottom: var(--space-4);
-  border-radius: var(--radius-md);
-  background: var(--color-bg);
-  border: 1px solid var(--color-border-soft);
-  box-shadow: inset 0 1px 2px rgba(7, 26, 51, 0.05);
-}
-
-.evento-doc-tab {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-2) var(--space-2);
-  border: 1px solid transparent;
-  border-radius: calc(var(--radius-md) - 3px);
-  background: transparent;
-  color: var(--color-text-soft);
-  font: inherit;
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  line-height: 1.25;
-  text-align: center;
-  cursor: pointer;
-  transition:
-    background var(--transition-fast),
-    color var(--transition-fast),
-    box-shadow var(--transition-fast);
-}
-
-.evento-doc-tab:hover { color: var(--color-heading); }
-
-.evento-doc-tab.is-active {
-  background: var(--color-surface);
-  border-color: var(--color-border-soft);
-  color: var(--color-primary-bright);
-  box-shadow: var(--shadow-xs);
-}
-
-@media (max-width: 640px) {
-  .evento-doc-tabs { grid-template-columns: repeat(3, 1fr); }
-}
-
-@media (max-width: 420px) {
-  .evento-doc-tabs { grid-template-columns: repeat(2, 1fr); }
-}
-
-/* Só um painel fica visível por vez, então nenhum deles deve herdar a borda
-   divisória que .wizard-inner-section aplica entre seções irmãs. */
-[data-doc-tab-panel] + [data-doc-tab-panel] {
-  border-top: none;
-  padding-top: 0;
 }
 
 /* Motorista externo — painel contextual dentro da seção de transporte. */

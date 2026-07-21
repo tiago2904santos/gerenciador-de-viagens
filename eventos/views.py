@@ -39,6 +39,7 @@ from .models import EVENTO_SOLICITACAO_EXTENSOES
 from .models import TipoEvento
 from .presenters import apresentar_evento_list_card
 from .presenters import apresentar_linha_lista_simples_tipo_evento
+from .presenters import build_evento_documentos_context
 from .services import build_evento_guided_context
 from .services import excluir_evento
 
@@ -533,6 +534,7 @@ def detalhe(request, pk, etapa=1):
             "cancelar_evento_url": _reverse("eventos:cancelar", kwargs={"pk": evento.pk}),
             "reativar_evento_url": _reverse("eventos:reativar", kwargs={"pk": evento.pk}),
             **guided_context,
+            **build_evento_documentos_context(form),
         },
     )
 

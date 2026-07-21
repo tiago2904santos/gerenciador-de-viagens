@@ -1,47 +1,23 @@
-<div class="evento-doc-tabs" id="evento-doc-tabs" role="tablist" aria-label="Tipo de documento" data-evento-doc-tabs>
-  <button type="button" class="evento-doc-tab is-active" id="evento-doc-tab-oficios-d" data-doc-tab-target="oficios" role="tab" aria-selected="true" aria-controls="evento-wizard-doc-oficios-d" tabindex="0">
-    Ofícios
-  </button>
-  <button type="button" class="evento-doc-tab" id="evento-doc-tab-roteiros-d" data-doc-tab-target="roteiros" role="tab" aria-selected="false" aria-controls="evento-wizard-doc-roteiros-d" tabindex="-1">
-    Roteiros
-  </button>
-  <button type="button" class="evento-doc-tab" id="evento-doc-tab-pt-d" data-doc-tab-target="pt" role="tab" aria-selected="false" aria-controls="evento-wizard-doc-pt-d" tabindex="-1">
-    Plano de Trabalho
-  </button>
-  <button type="button" class="evento-doc-tab" id="evento-doc-tab-os-d" data-doc-tab-target="os" role="tab" aria-selected="false" aria-controls="evento-wizard-doc-os-d" tabindex="-1">
-    Ordem de Serviço
-  </button>
-  <button type="button" class="evento-doc-tab" id="evento-doc-tab-termos-d" data-doc-tab-target="termos" role="tab" aria-selected="false" aria-controls="evento-wizard-doc-termos-d" tabindex="-1">
-    Termos
-  </button>
+{{ evento_doc_summaries|json_script:"evento-doc-summaries" }}
+
+<div
+  class="evento-doc-picker"
+  data-evento-doc-picker
+  data-evento-periodo-inicio="{{ evento_doc_periodo.inicio }}"
+  data-evento-periodo-fim="{{ evento_doc_periodo.fim }}"
+  data-evento-doc-tolerancia="{{ evento_doc_tolerancia_dias }}"
+>
+  <div class="cv-segment-toggle evento-doc-toggle" role="group" aria-label="Tipo de documento" data-evento-doc-toggle>
+    <button type="button" class="cv-segment-toggle__btn" data-doc-tab-target="oficios" aria-pressed="true">Ofícios</button>
+    <button type="button" class="cv-segment-toggle__btn" data-doc-tab-target="roteiros" aria-pressed="false">Roteiros</button>
+    <button type="button" class="cv-segment-toggle__btn" data-doc-tab-target="pt" aria-pressed="false">Plano de Trabalho</button>
+    <button type="button" class="cv-segment-toggle__btn" data-doc-tab-target="os" aria-pressed="false">Ordem de Serviço</button>
+    <button type="button" class="cv-segment-toggle__btn" data-doc-tab-target="termos" aria-pressed="false">Termos</button>
+  </div>
+
+  {% include "eventos/partials/_documento_panel.html" with panel_key="oficios" field=form.oficios_vinculados label="Adicionar ofício" placeholder="Buscar por número, protocolo, destino ou servidor" empty="Nenhum ofício disponível para o período." hidden=False %}
+  {% include "eventos/partials/_documento_panel.html" with panel_key="roteiros" field=form.roteiros_vinculados label="Adicionar roteiro" placeholder="Buscar por origem, destino ou período" empty="Nenhum roteiro disponível para o período." hidden=True %}
+  {% include "eventos/partials/_documento_panel.html" with panel_key="pt" field=form.planos_trabalho_vinculados label="Adicionar plano de trabalho" placeholder="Buscar por número, programa ou período" empty="Nenhum plano de trabalho disponível para o período." hidden=True %}
+  {% include "eventos/partials/_documento_panel.html" with panel_key="os" field=form.ordens_servico_vinculadas label="Adicionar ordem de serviço" placeholder="Buscar por número, destino ou período" empty="Nenhuma ordem de serviço disponível para o período." hidden=True %}
+  {% include "eventos/partials/_documento_panel.html" with panel_key="termos" field=form.termos_vinculados label="Adicionar termo" placeholder="Buscar por destino ou período" empty="Nenhum termo disponível para o período." hidden=True %}
 </div>
-
-<section class="wizard-inner-section" id="evento-wizard-doc-oficios-d" data-doc-tab-panel="oficios" role="tabpanel" aria-labelledby="evento-doc-tab-oficios-d" tabindex="0">
-  <div class="field-grid">
-    {% include "components/forms/form_field.html" with field=form.oficios_vinculados only %}
-  </div>
-</section>
-
-<section class="wizard-inner-section" id="evento-wizard-doc-roteiros-d" data-doc-tab-panel="roteiros" role="tabpanel" aria-labelledby="evento-doc-tab-roteiros-d" tabindex="0" hidden>
-  <div class="field-grid">
-    {% include "components/forms/form_field.html" with field=form.roteiros_vinculados only %}
-  </div>
-</section>
-
-<section class="wizard-inner-section" id="evento-wizard-doc-pt-d" data-doc-tab-panel="pt" role="tabpanel" aria-labelledby="evento-doc-tab-pt-d" tabindex="0" hidden>
-  <div class="field-grid">
-    {% include "components/forms/form_field.html" with field=form.planos_trabalho_vinculados only %}
-  </div>
-</section>
-
-<section class="wizard-inner-section" id="evento-wizard-doc-os-d" data-doc-tab-panel="os" role="tabpanel" aria-labelledby="evento-doc-tab-os-d" tabindex="0" hidden>
-  <div class="field-grid">
-    {% include "components/forms/form_field.html" with field=form.ordens_servico_vinculadas only %}
-  </div>
-</section>
-
-<section class="wizard-inner-section" id="evento-wizard-doc-termos-d" data-doc-tab-panel="termos" role="tabpanel" aria-labelledby="evento-doc-tab-termos-d" tabindex="0" hidden>
-  <div class="field-grid">
-    {% include "components/forms/form_field.html" with field=form.termos_vinculados only %}
-  </div>
-</section>

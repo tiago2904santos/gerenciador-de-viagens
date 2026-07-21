@@ -335,6 +335,280 @@ def apresentar_evento_list_card(evento):
     }
 
 
+# ── Documentos vinculáveis: resumos para o picker do evento ────────────────
+#
+# A lista de documentos vinculados reaproveita o mesmo cartão de busca dos
+# ofícios da Ordem de Serviço (título + meta em duas linhas) e recebe uma
+# pré-filtragem por datas no cliente. O servidor entrega apenas os dados de
+# cada documento (título, meta, período em ISO); o JS decide o que exibir
+# comparando o período do documento com o período do evento.
+
+# Documentos cujo período estiver a até N dias do período do evento aparecem
+# na lista. Ajuste único aqui caso a tolerância precise mudar.
+DOCUMENTO_FILTRO_DIAS_TOLERANCIA = 5
+
+_PLACEHOLDERS_META = (
+    "nao informado",
+    "nao informada",
+    "periodo nao informado",
+    "destino nao informado",
+)
+
+
+def _sem_acento(texto: str) -> str:
+    import unicodedata
+
+    return "".join(
+        c for c in unicodedata.normalize("NFD", texto or "") if unicodedata.category(c) != "Mn"
+    )
+
+
+def _meta_limpa(texto) -> str:
+    texto = (texto or "").strip()
+    if not texto:
+        return ""
+    base = _sem_acento(texto).lower()
+    if any(base == p or base.endswith(p) for p in _PLACEHOLDERS_META):
+        return ""
+    return texto
+
+
+def _como_data(valor):
+    # Normaliza datetime -> date; date passa direto.
+    if valor and hasattr(valor, "hour"):
+        return valor.date()
+    return valor
+
+
+def _iso_data(valor) -> str:
+    data = _como_data(valor)
+    if not data:
+        return ""
+    try:
+        return data.isoformat()
+    except Exception:
+        return ""
+
+
+def _data_br(valor) -> str:
+    data = _como_data(valor)
+    if not data:
+        return ""
+    try:
+        return data.strftime("%d/%m/%Y")
+    except Exception:
+        return ""
+
+
+def _periodo_texto(inicio, fim) -> str:
+    if not inicio:
+        return ""
+    if not fim or fim == inicio:
+        return _data_br(inicio)
+    return f"{_data_br(inicio)} a {_data_br(fim)}"
+
+
+def _primeiros_nomes(nomes) -> str:
+    partes = []
+    for nome in nomes:
+        nome = (nome or "").strip()
+        if nome:
+            partes.append(nome.split()[0])
+    return ", ".join(partes)
+
+
+def _selecionados(form, field_name) -> set[str]:
+    valor = form[field_name].value() or []
+    if isinstance(valor, (str, int)):
+        valor = [valor]
+    return {str(v) for v in valor}
+
+
+def _datas_roteiro(roteiro):
+    inicio = roteiro.saida_dt.date() if roteiro.saida_dt else None
+    retorno = (
+        getattr(roteiro, "retorno_chegada_dt", None)
+        or getattr(roteiro, "retorno_saida_dt", None)
+        or getattr(roteiro, "chegada_dt", None)
+    )
+    fim = retorno.date() if retorno else inicio
+    return inicio, fim
+
+
+def _resumo_oficio(oficio, selecionados: set[str]) -> dict:
+    roteiro = oficio.roteiro
+    destino_label = ""
+    inicio = fim = None
+    if roteiro:
+        sede_obj = roteiro.origem_cidade or roteiro.origem_estado
+        sede = str(sede_obj) if sede_obj else ""
+        destinos = list(roteiro.destinos.select_related("cidade", "estado").order_by("ordem", "pk"))
+        destinos_label = ", ".join(
+            str(d.cidade or d.estado) for d in destinos if (d.cidade_id or d.estado_id)
+        )
+        destino_label = " → ".join(p for p in [sede, destinos_label] if p)
+        inicio, fim = _datas_roteiro(roteiro)
+
+    servidores = list(oficio.servidores.all())
+    viatura = ""
+    if oficio.viatura_id:
+        placa = str(oficio.viatura)
+        modelo = (getattr(oficio.viatura, "modelo", "") or "").strip()
+        viatura = f"{placa} {modelo}".strip()
+
+    title = " ".join(p for p in [f"Ofício {oficio.numero_formatado}", destino_label] if p)
+    meta = " · ".join(
+        p for p in [_periodo_texto(inicio, fim), _primeiros_nomes(s.nome for s in servidores), viatura] if p
+    )
+    search = " ".join(
+        p
+        for p in [
+            oficio.numero_formatado,
+            oficio.protocolo or "",
+            destino_label,
+            " ".join(s.nome for s in servidores),
+            viatura,
+        ]
+        if p
+    )
+    return {
+        "id": oficio.pk,
+        "title": title,
+        "meta": meta or "Sem informações disponíveis",
+        "search_text": search,
+        "data_inicio": _iso_data(inicio),
+        "data_fim": _iso_data(fim),
+        "selected": str(oficio.pk) in selecionados,
+    }
+
+
+def _resumo_roteiro(roteiro, selecionados: set[str]) -> dict:
+    inicio, fim = _datas_roteiro(roteiro)
+    title = str(roteiro)
+    meta = _periodo_texto(inicio, fim)
+    return {
+        "id": roteiro.pk,
+        "title": title,
+        "meta": meta or "Sem período definido",
+        "search_text": f"{title} {meta}",
+        "data_inicio": _iso_data(inicio),
+        "data_fim": _iso_data(fim),
+        "selected": str(roteiro.pk) in selecionados,
+    }
+
+
+def _resumo_ordem(ordem, selecionados: set[str]) -> dict:
+    inicio = ordem.data_evento_inicio
+    fim = ordem.data_evento_fim or inicio
+    title = ordem.numero_formatado
+    meta = " · ".join(
+        p for p in [_meta_limpa(ordem.periodo_display), _meta_limpa(ordem.destinos_display)] if p
+    )
+    return {
+        "id": ordem.pk,
+        "title": title,
+        "meta": meta or "Sem período definido",
+        "search_text": f"{title} {meta}",
+        "data_inicio": _iso_data(inicio),
+        "data_fim": _iso_data(fim),
+        "selected": str(ordem.pk) in selecionados,
+    }
+
+
+def _resumo_plano(plano, selecionados: set[str]) -> dict:
+    inicio = plano.data_evento_inicio
+    fim = plano.data_evento_fim or inicio
+    title = f"PT {plano.numero_formatado}"
+    meta = " · ".join(
+        p for p in [_meta_limpa(plano.programa_display), _meta_limpa(plano.periodo_display)] if p
+    )
+    return {
+        "id": plano.pk,
+        "title": title,
+        "meta": meta or "Sem período definido",
+        "search_text": f"{title} {meta}",
+        "data_inicio": _iso_data(inicio),
+        "data_fim": _iso_data(fim),
+        "selected": str(plano.pk) in selecionados,
+    }
+
+
+def _resumo_termo(termo, selecionados: set[str]) -> dict:
+    inicio, fim = termo.periodo_efetivo()
+    title = f"Termo #{termo.pk}"
+    meta = " · ".join(
+        p for p in [_meta_limpa(termo.destino_display), _meta_limpa(termo.periodo_display)] if p
+    )
+    return {
+        "id": termo.pk,
+        "title": title,
+        "meta": meta or "Sem período definido",
+        "search_text": f"{title} {meta}",
+        "data_inicio": _iso_data(inicio),
+        "data_fim": _iso_data(fim),
+        "selected": str(termo.pk) in selecionados,
+    }
+
+
+def _periodo_referencia_evento(form) -> dict:
+    def norm(valor):
+        if not valor:
+            return ""
+        if hasattr(valor, "isoformat"):
+            return valor.isoformat()
+        valor = str(valor).strip()
+        if len(valor) == 10 and valor[4:5] == "-" and valor[7:8] == "-":
+            return valor
+        return ""
+
+    if form.is_bound:
+        return {"inicio": norm(form.data.get("data_inicio")), "fim": norm(form.data.get("data_fim"))}
+    instance = getattr(form, "instance", None)
+    return {
+        "inicio": norm(getattr(instance, "data_inicio", None)),
+        "fim": norm(getattr(instance, "data_fim", None)),
+    }
+
+
+def build_evento_documentos_context(form) -> dict:
+    """Resumos dos documentos vinculáveis para o picker de "Documentos vinculados".
+
+    Cada tipo de documento vira uma lista de cartões (título + meta + período em
+    ISO) consumida pelo JS, que aplica a pré-filtragem por proximidade de datas
+    contra o período do evento (``DOCUMENTO_FILTRO_DIAS_TOLERANCIA`` dias).
+    """
+    if form is None:
+        return {}
+
+    resumos = {
+        "oficios": [
+            _resumo_oficio(o, _selecionados(form, "oficios_vinculados"))
+            for o in form.fields["oficios_vinculados"].queryset
+        ],
+        "roteiros": [
+            _resumo_roteiro(r, _selecionados(form, "roteiros_vinculados"))
+            for r in form.fields["roteiros_vinculados"].queryset
+        ],
+        "pt": [
+            _resumo_plano(p, _selecionados(form, "planos_trabalho_vinculados"))
+            for p in form.fields["planos_trabalho_vinculados"].queryset
+        ],
+        "os": [
+            _resumo_ordem(o, _selecionados(form, "ordens_servico_vinculadas"))
+            for o in form.fields["ordens_servico_vinculadas"].queryset
+        ],
+        "termos": [
+            _resumo_termo(t, _selecionados(form, "termos_vinculados"))
+            for t in form.fields["termos_vinculados"].queryset
+        ],
+    }
+    return {
+        "evento_doc_summaries": resumos,
+        "evento_doc_periodo": _periodo_referencia_evento(form),
+        "evento_doc_tolerancia_dias": DOCUMENTO_FILTRO_DIAS_TOLERANCIA,
+    }
+
+
 def apresentar_linha_lista_simples_tipo_evento(tipo, edit_url="#", delete_url="#", delete_modal=False):
     badges = [] if tipo.ativo else [build_badge("Inativo", "muted")]
     return {
