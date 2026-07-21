@@ -99,6 +99,22 @@ class OrdemServicoDocxtplContextTests(TestCase):
         self.assertEqual(len(ctx["competencias_equipe"]), 4)
         self.assertIn("sem necessidade de deslocamento com dois dias de antecedência", " ".join(ctx["justificativas"]))
 
+    def test_microonibus_descreve_competencias_por_funcao(self):
+        ordem = self._ordem(OrdemServico.TIPO_MICROONIBUS)
+        ordem.funcoes_servidores = {
+            str(self.motorista.pk): OrdemServico.FUNCAO_CONDUCAO,
+            str(self.tecnico.pk): OrdemServico.FUNCAO_TECNICO,
+            str(self.montagem.pk): OrdemServico.FUNCAO_APOIO,
+        }
+        ordem.save(update_fields=["funcoes_servidores"])
+
+        ctx = build_os_docxtpl_context(ordem)
+
+        self.assertEqual(len(ctx["competencias_equipe"]), 3)
+        self.assertIn("conduzir o micro-ônibus oficial", ctx["competencias_equipe"][0])
+        self.assertIn("prestar suporte técnico", ctx["competencias_equipe"][1])
+        self.assertIn("prestar apoio operacional", ctx["competencias_equipe"][2])
+
     def test_cerimonial_descreve_ida_antecipada_e_competencias(self):
         ctx = build_os_docxtpl_context(self._ordem(OrdemServico.TIPO_CERIMONIAL_ANTECIPADO))
 
@@ -106,6 +122,23 @@ class OrdemServicoDocxtplContextTests(TestCase):
         self.assertEqual(len(ctx["competencias_equipe"]), 3)
         self.assertIn("Coordenador Cerimonial", ctx["competencias_equipe"][0])
         self.assertIn("visita técnica prévia", " ".join(ctx["justificativas"]))
+
+    def test_cerimonial_descreve_competencias_por_funcao(self):
+        ordem = self._ordem(OrdemServico.TIPO_CERIMONIAL_ANTECIPADO)
+        ordem.funcoes_servidores = {
+            str(self.coordenador.pk): OrdemServico.FUNCAO_COORDENACAO,
+            str(self.apoio.pk): OrdemServico.FUNCAO_APOIO,
+            str(self.preparacao.pk): OrdemServico.FUNCAO_PREPARACAO,
+        }
+        ordem.servidores.set([self.coordenador, self.apoio, self.preparacao])
+        ordem.save(update_fields=["funcoes_servidores"])
+
+        ctx = build_os_docxtpl_context(ordem)
+
+        self.assertEqual(len(ctx["competencias_equipe"]), 3)
+        self.assertIn("coordenar as atividades de Cerimonial", ctx["competencias_equipe"][0])
+        self.assertIn("prestar apoio às atividades de Cerimonial", ctx["competencias_equipe"][1])
+        self.assertIn("auxiliar na preparação da solenidade", ctx["competencias_equipe"][2])
 
     def test_operacao_policial_justifica_apenas_um_dia_posterior(self):
         ctx = build_os_docxtpl_context(self._ordem(OrdemServico.TIPO_OPERACAO_RETORNO_POSTERIOR))
@@ -144,5 +177,59 @@ class OrdemServicoDocxtplContextTests(TestCase):
                 str(self.motorista.pk): OrdemServico.FUNCAO_CONDUCAO,
                 str(self.montagem.pk): OrdemServico.FUNCAO_APOIO,
                 str(self.escolta.pk): OrdemServico.FUNCAO_APOIO,
+            },
+        )
+
+    def test_form_salva_funcoes_dinamicas_do_microonibus(self):
+        form = OrdemServicoForm(
+            data={
+                "data_evento_inicio": "2026-08-10",
+                "data_evento_fim": "2026-08-12",
+                "destino_estado": str(self.estado.pk),
+                "destino_cidade": str(self.cidade.pk),
+                "servidores": [str(self.motorista.pk), str(self.tecnico.pk)],
+                "tipo_necessidade": OrdemServico.TIPO_MICROONIBUS,
+                "funcao_servidor_%s" % self.motorista.pk: OrdemServico.FUNCAO_CONDUCAO,
+                "funcao_servidor_%s" % self.tecnico.pk: OrdemServico.FUNCAO_TECNICO,
+                "motivo": "evento institucional",
+            }
+        )
+
+        self.assertTrue(form.is_valid(), form.errors.as_data())
+        ordem = form.save()
+
+        self.assertEqual(
+            ordem.funcoes_servidores,
+            {
+                str(self.motorista.pk): OrdemServico.FUNCAO_CONDUCAO,
+                str(self.tecnico.pk): OrdemServico.FUNCAO_TECNICO,
+            },
+        )
+
+    def test_form_salva_funcoes_dinamicas_do_cerimonial(self):
+        form = OrdemServicoForm(
+            data={
+                "data_evento_inicio": "2026-08-10",
+                "data_evento_fim": "2026-08-12",
+                "destino_estado": str(self.estado.pk),
+                "destino_cidade": str(self.cidade.pk),
+                "servidores": [str(self.coordenador.pk), str(self.apoio.pk), str(self.preparacao.pk)],
+                "tipo_necessidade": OrdemServico.TIPO_CERIMONIAL_ANTECIPADO,
+                "funcao_servidor_%s" % self.coordenador.pk: OrdemServico.FUNCAO_COORDENACAO,
+                "funcao_servidor_%s" % self.apoio.pk: OrdemServico.FUNCAO_APOIO,
+                "funcao_servidor_%s" % self.preparacao.pk: OrdemServico.FUNCAO_PREPARACAO,
+                "motivo": "evento institucional",
+            }
+        )
+
+        self.assertTrue(form.is_valid(), form.errors.as_data())
+        ordem = form.save()
+
+        self.assertEqual(
+            ordem.funcoes_servidores,
+            {
+                str(self.coordenador.pk): OrdemServico.FUNCAO_COORDENACAO,
+                str(self.apoio.pk): OrdemServico.FUNCAO_APOIO,
+                str(self.preparacao.pk): OrdemServico.FUNCAO_PREPARACAO,
             },
         )

@@ -25,41 +25,4 @@
     </div>
     {% if form.tipo_necessidade.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.tipo_necessidade.errors only %}{% endif %}
   </fieldset>
-
-  <section class="os-model-fields field-size-4" data-os-model-fields="MICROONIBUS" hidden>
-    <header class="os-model-fields__header">
-      <h3 class="os-model-fields__title">Competências da equipe operacional</h3>
-      <p class="os-model-fields__hint">Campos usados no documento para descrever motorista, técnico e apoios.</p>
-    </header>
-    <div class="field-grid">
-      {% include "components/forms/form_field.html" with field=form.motorista_equipe size_class="field-size-2" only %}
-      {% include "components/forms/form_field.html" with field=form.tecnico_equipe size_class="field-size-2" only %}
-      {% include "components/forms/form_field.html" with field=form.apoio_montagem size_class="field-size-2" only %}
-      {% include "components/forms/form_field.html" with field=form.apoio_escolta size_class="field-size-2" only %}
-    </div>
-  </section>
-
-  <section class="os-model-fields field-size-4" data-os-model-fields="CERIMONIAL_ANTECIPADO" hidden>
-    <header class="os-model-fields__header">
-      <h3 class="os-model-fields__title">Competências da equipe de cerimonial</h3>
-      <p class="os-model-fields__hint">Campos usados no documento para detalhar coordenação, apoio e preparação da solenidade.</p>
-    </header>
-    <div class="field-grid">
-      {% include "components/forms/form_field.html" with field=form.coordenador_cerimonial size_class="field-size-2" only %}
-      {% include "components/forms/form_field.html" with field=form.apoio_cerimonial size_class="field-size-2" only %}
-      {% include "components/forms/form_field.html" with field=form.apoio_preparacao size_class="field-size-2" only %}
-    </div>
-  </section>
-
-  {% include "components/forms/input_with_action.html" with field=form.modelo_motivo action_url=modelos_motivo_url action_label="Gerenciar modelos" size_class="field-size-4" only %}
-  {% if not tem_modelos_motivo %}
-    <div class="field field-size-4">
-      <p class="field-help">Nenhum modelo cadastrado. <a href="{{ modelos_motivo_url }}">Abrir gerenciamento de modelos</a></p>
-    </div>
-  {% endif %}
-  <div class="field field-size-4 app-form-field cv-field oficio-motivo-field oficio-reveal-panel is-open">
-    <label class="cv-field__label" for="{{ form.motivo.id_for_label }}">Motivo</label>
-    {{ form.motivo }}
-    {% if form.motivo.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.motivo.errors only %}{% endif %}
-  </div>
 </div>

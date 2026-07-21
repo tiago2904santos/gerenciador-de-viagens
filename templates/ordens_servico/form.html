@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260611-os">
   <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260718-cv-summary">
   <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260720-os-oficio-cards">
-  <link rel="stylesheet" href="{% static 'css/ordens-servico.css' %}?v=20260721-os-role-toggle-gray">
+  <link rel="stylesheet" href="{% static 'css/ordens-servico.css' %}?v=20260721-os-header-oficio">
 {% endblock %}
 
 {% block content %}
@@ -41,7 +41,9 @@
               <div class="cv-wizard-section-body oficio-step1-body termo-form-body os-form-body">
                 {% include "components/ui/forms/form_block.html" with element_id="os-card-oficios" section_id="os-oficios-title" data_hook="oficio-wizard-step1" extra_class="oficio-step1-block termo-block os-block" title="Ofícios vinculados" description="Opcional. Reaproveite destino, período, servidores e motivo de um ou mais ofícios." body_extra_class="termo-block__body" body_template="ordens_servico/partials/_oficios_body.html" %}
 
-                {% include "components/ui/forms/form_block.html" with element_id="os-card-motivo" section_id="os-motivo-title" extra_class="oficio-step1-block termo-block os-block" title="Necessidade e motivo" description="Escolha o tipo de OS e complemente com o motivo ou finalidade específica." body_extra_class="termo-block__body" body_template="ordens_servico/partials/_motivo_body.html" %}
+                {% include "components/ui/forms/form_block.html" with element_id="os-card-motivo" section_id="os-motivo-title" extra_class="oficio-step1-block termo-block os-block" title="Necessidade" description="Escolha o tipo de OS." body_extra_class="termo-block__body" body_template="ordens_servico/partials/_motivo_body.html" %}
+
+                {% include "components/ui/forms/form_block.html" with element_id="os-card-motivo-texto" section_id="os-motivo-texto-title" extra_class="oficio-step1-block termo-block os-block" title="Motivo" description="Complemente com o motivo ou finalidade específica." body_extra_class="termo-block__body" body_template="ordens_servico/partials/_motivo_texto_body.html" %}
 
                 {% include "components/ui/forms/form_block.html" with element_id="os-card-evento" section_id="os-evento-title" data_hook="oficio-wizard-step1" extra_class="oficio-step1-block termo-block os-block" title="Evento" description="Período e destinos da atividade." body_extra_class="cv-form-stack termo-evento-body" body_template="ordens_servico/partials/_evento_body.html" %}
 
@@ -60,5 +62,5 @@
 {% endblock %}
 
 {% block extra_js %}
-  <script src="{% static 'js/pages/ordens-servico-form.js' %}?v=20260721-os-picker-focus-keep" defer></script>
+  <script src="{% static 'js/pages/ordens-servico-form.js' %}?v=20260721-os-cerimonial-roles" defer></script>
 {% endblock %}

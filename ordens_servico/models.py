@@ -20,11 +20,15 @@ class OrdemServico(TimeStampedModel, CancelavelModel):
     FUNCAO_CONDUCAO = "CONDUCAO"
     FUNCAO_TECNICO = "TECNICO"
     FUNCAO_APOIO = "APOIO"
+    FUNCAO_COORDENACAO = "COORDENACAO"
+    FUNCAO_PREPARACAO = "PREPARACAO"
 
     FUNCAO_SERVIDOR_CHOICES = [
         (FUNCAO_CONDUCAO, "Condução"),
         (FUNCAO_TECNICO, "Técnico"),
         (FUNCAO_APOIO, "Apoio"),
+        (FUNCAO_COORDENACAO, "Coordenação"),
+        (FUNCAO_PREPARACAO, "Preparação"),
     ]
 
     TIPO_NECESSIDADE_CHOICES = [

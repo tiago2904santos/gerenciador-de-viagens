@@ -45,8 +45,8 @@
 }
 
 .os-model-card:hover {
-  border-color: color-mix(in srgb, var(--color-primary) 55%, var(--color-border-soft));
-  background: color-mix(in srgb, var(--color-primary) 6%, var(--color-surface));
+  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--color-border-soft));
+  background: color-mix(in srgb, var(--color-accent) 6%, var(--color-surface));
 }
 
 .os-model-card input[type="radio"] {
@@ -89,19 +89,19 @@
 
 .os-model-card:has(input:checked),
 .os-model-card.is-selected {
-  border-color: var(--color-primary);
-  background: color-mix(in srgb, var(--color-primary) 12%, var(--color-surface));
-  box-shadow: inset 0 0 0 1px var(--color-primary);
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface));
+  box-shadow: inset 0 0 0 1px var(--color-accent);
 }
 
 .os-model-card:has(input:checked) .os-model-card__mark,
 .os-model-card.is-selected .os-model-card__mark {
-  border-color: var(--color-primary);
-  background: radial-gradient(circle at center, var(--color-primary) 0 5px, transparent 6px);
+  border-color: var(--color-accent);
+  background: radial-gradient(circle at center, var(--color-accent) 0 5px, transparent 6px);
 }
 
 .os-model-card:has(input:focus-visible) {
-  outline: 2px solid var(--color-primary);
+  outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
 
@@ -225,6 +225,172 @@
   color: var(--color-heading);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-bold);
+}
+
+/* Cabeçalho do card igual ao dos cards do cadastro de ofício. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .os-page .os-form-card > .cv-wizard-section-header {
+  background: transparent;
+  background-image: none;
+  min-height: 64px;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .os-page .os-form-card > .cv-wizard-section-header .cv-wizard-section-title {
+  font-size: 1.05rem;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .os-page .os-form-card > .cv-wizard-section-header .cv-wizard-section-subtitle {
+  color: var(--color-muted);
+  display: block;
+  font-size: var(--font-size-xs);
+  margin: 4px 0 0;
+  max-width: 56ch;
+}
+
+/* Poço dos campos (--step1-field) no card da OS, como no wizard de ofícios. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .os-page .os-form-card {
+  --step1-surface: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
+  --step1-panel: var(--color-surface-soft);
+  --step1-field: var(--step1-surface);
+  --step1-empty: var(--step1-field);
+  background: var(--step1-surface);
+  border-color: color-mix(in srgb, var(--color-border) 40%, transparent);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 10px 28px rgba(0, 0, 0, 0.28);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .os-page .os-form-card .cv-form-card__footer .cv-card-footer-section__divider {
+  border-top: 1px solid var(--color-border-soft);
+  display: block;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .os-page .os-form-card .cv-form-card__footer .cv-card-footer {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .os-page .os-form-card :is(
+    input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
+    textarea,
+    select,
+    .form-control,
+    .form-select,
+    .cv-composite-field__control,
+    .cv-custom-select__trigger,
+    .cv-field__control,
+    .cv-search-picker__input,
+    .cv-search-picker__control
+  ) {
+  background: var(--step1-field) !important;
+  border-color: transparent !important;
+  border-radius: 10px;
+  box-shadow: none !important;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .os-page .os-form-card :is(
+    input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
+    textarea,
+    select,
+    .form-control,
+    .form-select,
+    .cv-composite-field__control,
+    .cv-custom-select__trigger,
+    .cv-field__control,
+    .cv-search-picker__input,
+    .cv-search-picker__control
+  ):is(:hover, :focus, :focus-within, :focus-visible),
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .os-page .os-form-card .cv-custom-select--open .cv-custom-select__trigger {
+  background: var(--step1-field) !important;
+  border-color: transparent !important;
+  border-radius: 10px;
+  box-shadow: none !important;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .os-page .os-form-card .os-servidor-role-panel {
+  background: var(--step1-field);
+  border: 0;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .os-page .os-form-card .os-servidor-role-panel :is(
+    .cv-search-picker__control,
+    .cv-search-picker__input
+  ),
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .os-page .os-form-card .os-servidor-role-panel :is(
+    .cv-search-picker__control,
+    .cv-search-picker__input
+  ):is(:hover, :focus, :focus-within, :focus-visible) {
+  background: var(--color-surface-soft) !important;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .os-page .os-form-card .os-model-card {
+  background: var(--step1-field);
+  border-color: transparent;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .os-page .os-form-card .os-model-card:hover {
+  background: color-mix(in srgb, var(--color-accent) 6%, var(--step1-field));
+  border-color: color-mix(in srgb, var(--color-accent) 55%, transparent);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .os-page .os-form-card .os-model-card:has(input:checked),
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .os-page .os-form-card .os-model-card.is-selected {
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--step1-field));
+  border-color: var(--color-accent-border-soft, var(--color-accent));
+  box-shadow: inset 4px 0 0 var(--color-accent);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .os-page .os-form-card .os-model-card:has(input:checked) .os-model-card__mark,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .os-page .os-form-card .os-model-card.is-selected .os-model-card__mark {
+  border-color: var(--color-accent);
+  background: radial-gradient(circle at center, var(--color-accent) 0 5px, transparent 6px);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .os-page .os-form-card #os-oficio-lista
+  .cv-search-picker__selected-card:not(.is-active):not([aria-pressed="true"]) {
+  background: var(--step1-field) !important;
+  border-color: transparent !important;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .os-page .os-form-card #os-oficio-lista
+  .cv-search-picker__selected-card:not(.is-active):not([aria-pressed="true"]):hover {
+  background: color-mix(in srgb, var(--color-accent) 5%, var(--step1-field)) !important;
+}
+
+/* Cards de servidores no poço dos campos; destaque dourado só na função ativa. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .os-page #os-card-servidores
+  .cv-search-picker__selected-card:not(.cv-search-picker__selected-card--driver) {
+  background: var(--step1-field) !important;
+  border-color: transparent !important;
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .os-page #os-card-servidores
+  .cv-search-picker__selected-card:not(.cv-search-picker__selected-card--driver):hover {
+  background: color-mix(in srgb, var(--color-accent) 5%, var(--step1-field)) !important;
 }
 
 /* Equipe da OS: replica o roster padrão do cadastro de ofício. */

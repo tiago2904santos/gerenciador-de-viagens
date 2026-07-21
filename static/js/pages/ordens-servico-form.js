@@ -6,7 +6,28 @@
   var OS_ROLE_LABELS = {
     CONDUCAO: "Condução",
     TECNICO: "Técnico",
-    APOIO: "Apoio"
+    APOIO: "Apoio",
+    COORDENACAO: "Coordenação",
+    PREPARACAO: "Preparação"
+  };
+  var OS_ROLE_SETS = {
+    CAMINHAO: ["CONDUCAO", "TECNICO", "APOIO"],
+    MICROONIBUS: ["CONDUCAO", "TECNICO", "APOIO"],
+    CERIMONIAL_ANTECIPADO: ["COORDENACAO", "APOIO", "PREPARACAO"]
+  };
+  var OS_ROLE_PANEL_COPY = {
+    CAMINHAO: {
+      title: "Função no caminhão",
+      aria: "Função dos servidores no caminhão"
+    },
+    MICROONIBUS: {
+      title: "Função no micro-ônibus",
+      aria: "Função dos servidores no micro-ônibus"
+    },
+    CERIMONIAL_ANTECIPADO: {
+      title: "Função no cerimonial",
+      aria: "Função dos servidores no cerimonial"
+    }
   };
 
   var ROUTE_AVATAR_ICON =
@@ -359,6 +380,27 @@
     return checked ? checked.value : "";
   }
 
+  function supportsServidorRoles(form) {
+    return Object.prototype.hasOwnProperty.call(OS_ROLE_SETS, selectedOsModel(form));
+  }
+
+  function roleModesForModel(form) {
+    return OS_ROLE_SETS[selectedOsModel(form)] || [];
+  }
+
+  function defaultServidorRole(form) {
+    return roleModesForModel(form)[0] || "CONDUCAO";
+  }
+
+  function pruneInvalidServidorRoles(form) {
+    var allowed = new Set(roleModesForModel(form));
+    Object.keys(OS_ROLE_ASSIGNMENTS).forEach(function (id) {
+      if (!allowed.has(OS_ROLE_ASSIGNMENTS[id])) {
+        delete OS_ROLE_ASSIGNMENTS[id];
+      }
+    });
+  }
+
   function syncOsModelFields(form) {
     var model = selectedOsModel(form);
     form.querySelectorAll("[data-os-model-fields]").forEach(function (group) {
@@ -395,13 +437,46 @@
   }
 
   function activeServidorRole(form) {
+    var modes = roleModesForModel(form);
     var active = form.querySelector("[data-os-role-mode][aria-pressed='true']");
-    return active ? active.dataset.osRoleMode : "CONDUCAO";
+    if (active && modes.indexOf(active.dataset.osRoleMode) !== -1) {
+      return active.dataset.osRoleMode;
+    }
+    return defaultServidorRole(form);
   }
 
   function syncServidorRoleButtons(form) {
+    var toggle = form.querySelector(".os-servidor-role-panel__toggle");
+    if (!toggle) return;
+    var modes = roleModesForModel(form);
+    var activeRole = activeServidorRole(form);
+
+    if (!modes.length) {
+      toggle.replaceChildren();
+      return;
+    }
+
+    var currentModes = Array.from(toggle.querySelectorAll("[data-os-role-mode]")).map(function (button) {
+      return button.dataset.osRoleMode;
+    });
+    var needsRebuild = currentModes.length !== modes.length
+      || modes.some(function (mode, index) { return currentModes[index] !== mode; });
+
+    if (needsRebuild) {
+      toggle.replaceChildren();
+      modes.forEach(function (mode, index) {
+        var button = document.createElement("button");
+        button.type = "button";
+        button.className = "cv-segment-toggle__btn";
+        button.dataset.osRoleMode = mode;
+        button.setAttribute("aria-pressed", mode === activeRole ? "true" : "false");
+        button.textContent = OS_ROLE_LABELS[mode] || mode;
+        toggle.appendChild(button);
+      });
+    }
+
     form.querySelectorAll("[data-os-role-mode]").forEach(function (button) {
-      var active = button.dataset.osRoleMode === activeServidorRole(form);
+      var active = button.dataset.osRoleMode === activeRole;
       var wasActive = button.getAttribute("aria-pressed") === "true";
       button.setAttribute("aria-pressed", active ? "true" : "false");
 
@@ -427,7 +502,7 @@
     form.querySelectorAll("[data-os-servidor-role-input]").forEach(function (input) {
       input.remove();
     });
-    if (selectedOsModel(form) !== "CAMINHAO") return;
+    if (!supportsServidorRoles(form)) return;
 
     selectedServidorIds(form).forEach(function (id) {
       var role = OS_ROLE_ASSIGNMENTS[id];
@@ -478,10 +553,20 @@
     return next && next.classList && next.classList.contains("cv-search-picker") ? next : null;
   }
 
-  function mountServidorRolePanel(form, isTruck) {
+  function mountServidorRolePanel(form, rolesEnabled) {
     var panel = form.querySelector("[data-os-servidor-role-panel]");
     var picker = servidoresPicker(form);
     if (!panel || !picker) return;
+    var model = selectedOsModel(form);
+    var copy = OS_ROLE_PANEL_COPY[model] || OS_ROLE_PANEL_COPY.CAMINHAO;
+    var title = panel.querySelector(".os-servidor-role-panel__title");
+    var toggle = panel.querySelector(".os-servidor-role-panel__toggle");
+    if (title) {
+      title.textContent = copy.title;
+    }
+    if (toggle) {
+      toggle.setAttribute("aria-label", copy.aria);
+    }
     var field = picker.querySelector(".cv-search-picker__field")
       || panel.querySelector(".cv-search-picker__field");
     var selected = picker.querySelector(".cv-search-picker__selected-panel");
@@ -494,7 +579,7 @@
       || activeEl.closest(".cv-search-picker__control")
     ));
 
-    if (isTruck) {
+    if (rolesEnabled) {
       var alreadyMounted = panel.parentElement === picker
         && panel.nextElementSibling === selected
         && field.parentElement === fieldHost
@@ -532,9 +617,10 @@
 
   function syncServidorRoleUi(form) {
     var picker = servidoresPicker(form);
-    var isTruck = selectedOsModel(form) === "CAMINHAO";
-    mountServidorRolePanel(form, isTruck);
+    var rolesEnabled = supportsServidorRoles(form);
+    mountServidorRolePanel(form, rolesEnabled);
     pruneServidorRoles(form);
+    pruneInvalidServidorRoles(form);
     syncServidorRoleButtons(form);
     syncServidorRoleInputs(form);
 
@@ -543,15 +629,15 @@
     picker.querySelectorAll(".cv-search-picker__selected-card[data-value]").forEach(function (card) {
       var servidorId = String(card.dataset.value || "");
       var role = OS_ROLE_ASSIGNMENTS[servidorId];
-      renderServidorRoleCard(card, role, isTruck, isTruck && role === activeRole);
+      renderServidorRoleCard(card, role, rolesEnabled, rolesEnabled && role === activeRole);
     });
   }
 
   function initServidorRolePicker(form) {
     OS_ROLE_ASSIGNMENTS = readRoleAssignments();
-    mountServidorRolePanel(form, selectedOsModel(form) === "CAMINHAO");
+    mountServidorRolePanel(form, supportsServidorRoles(form));
     form.addEventListener("click", function (event) {
-      if (selectedOsModel(form) !== "CAMINHAO") return;
+      if (!supportsServidorRoles(form)) return;
       if (event.target.closest("[data-os-role-mode]")) return;
       if (event.target.closest(".cv-search-picker__remove")) return;
 
@@ -789,20 +875,8 @@
     var temMotivo = !!(motivoField && motivoField.value.trim());
     var temEquipe = temServidores;
 
-    if (model === "CAMINHAO" || model === "MICROONIBUS") {
-      if (model === "CAMINHAO") {
-        temEquipe = temServidores;
-      } else {
-        temEquipe = ["motorista_equipe", "tecnico_equipe", "apoio_montagem", "apoio_escolta"].every(function (name) {
-        var field = form.querySelector("select[name='" + name + "']");
-        return !!(field && field.value);
-      });
-      }
-    } else if (model === "CERIMONIAL_ANTECIPADO") {
-      temEquipe = ["coordenador_cerimonial", "apoio_cerimonial", "apoio_preparacao"].every(function (name) {
-        var field = form.querySelector("select[name='" + name + "']");
-        return !!(field && field.value);
-      });
+    if (model === "CAMINHAO" || model === "MICROONIBUS" || model === "CERIMONIAL_ANTECIPADO") {
+      temEquipe = temServidores;
     }
 
     return temDatas && temDestino && temEquipe && temTipoNecessidade && temMotivo;

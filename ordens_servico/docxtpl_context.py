@@ -232,7 +232,42 @@ def _competencias_caminhao(ordem: OrdemServico) -> list[str]:
     return [texto for texto in textos if texto]
 
 
+def _competencias_microonibus(ordem: OrdemServico) -> list[str]:
+    textos = [
+        _competencia_grupo(
+            _servidores_por_funcao(ordem, OrdemServico.FUNCAO_CONDUCAO),
+            "conduzir o micro-ônibus oficial durante os deslocamentos de ida e retorno, zelando pela segurança da equipe e dos passageiros",
+        ),
+        _competencia_grupo(
+            _servidores_por_funcao(ordem, OrdemServico.FUNCAO_TECNICO),
+            "prestar suporte técnico à operação dos equipamentos e acompanhar a organização dos materiais utilizados na atividade",
+        ),
+        _competencia_grupo(
+            _servidores_por_funcao(ordem, OrdemServico.FUNCAO_APOIO),
+            "prestar apoio operacional à equipe, auxiliando na organização, montagem, escolta e movimentação necessárias à realização da atividade",
+        ),
+    ]
+    return [texto for texto in textos if texto]
+
+
 def _competencias_cerimonial(ordem: OrdemServico) -> list[str]:
+    textos = [
+        _competencia_grupo(
+            _servidores_por_funcao(ordem, OrdemServico.FUNCAO_COORDENACAO),
+            "conduzir o veículo oficial durante o deslocamento de ida e retorno, bem como coordenar as atividades de Cerimonial, supervisionando os procedimentos protocolares, a recepção das autoridades, a composição do dispositivo de honra e a execução do roteiro oficial",
+        ),
+        _competencia_grupo(
+            _servidores_por_funcao(ordem, OrdemServico.FUNCAO_APOIO),
+            "prestar apoio às atividades de Cerimonial, auxiliando na organização do ambiente, recepção das autoridades e execução dos procedimentos protocolares",
+        ),
+        _competencia_grupo(
+            _servidores_por_funcao(ordem, OrdemServico.FUNCAO_PREPARACAO),
+            "auxiliar na preparação da solenidade, conferência dos materiais, organização dos espaços e demais atividades necessárias à realização do evento",
+        ),
+    ]
+    dinamicas = [texto for texto in textos if texto]
+    if dinamicas:
+        return dinamicas
     return [
         item
         for item in [
@@ -299,13 +334,14 @@ def _texto_modelo(ordem: OrdemServico, motivo: str) -> dict[str, object]:
             "finalidade": "A presente Ordem de Serviço tem por finalidade garantir o planejamento, a execução e a desmobilização do apoio logístico prestado com caminhão.",
         })
     elif tipo == OrdemServico.TIPO_MICROONIBUS:
+        competencias_microonibus = _competencias_microonibus(ordem) or _competencias_transporte(ordem)
         textos.update({
             "referencia": "Deslocamento - Micro-ônibus",
             "determinacao": (
                 f"O deslocamento da equipe abaixo relacionada para o município de {destino}, "
                 f"{_periodo_extenso(ordem.data_evento_inicio, ordem.data_evento_fim)}, para apoio logístico com micro-ônibus em {motivo_doc}, observadas as atribuições a seguir:"
             ),
-            "competencias_equipe": _competencias_transporte(ordem),
+            "competencias_equipe": competencias_microonibus,
             "justificativas": [
                 "O micro-ônibus será utilizado para transporte e apoio logístico da equipe, observando-se o cronograma da atividade, sem necessidade de deslocamento com dois dias de antecedência ou permanência por dois dias posteriores ao evento.",
             ],

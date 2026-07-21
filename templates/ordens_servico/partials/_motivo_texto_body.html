@@ -1,0 +1,13 @@
+<div class="field-grid">
+  {% include "components/forms/input_with_action.html" with field=form.modelo_motivo action_url=modelos_motivo_url action_label="Gerenciar modelos" size_class="field-size-4" only %}
+  {% if not tem_modelos_motivo %}
+    <div class="field field-size-4">
+      <p class="field-help">Nenhum modelo cadastrado. <a href="{{ modelos_motivo_url }}">Abrir gerenciamento de modelos</a></p>
+    </div>
+  {% endif %}
+  <div class="field field-size-4 app-form-field cv-field oficio-motivo-field oficio-reveal-panel is-open">
+    <label class="cv-field__label" for="{{ form.motivo.id_for_label }}">Motivo</label>
+    {{ form.motivo }}
+    {% if form.motivo.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.motivo.errors only %}{% endif %}
+  </div>
+</div>

@@ -20,6 +20,8 @@ FUNCOES_SERVIDOR_VALIDAS = {
     OrdemServico.FUNCAO_CONDUCAO,
     OrdemServico.FUNCAO_TECNICO,
     OrdemServico.FUNCAO_APOIO,
+    OrdemServico.FUNCAO_COORDENACAO,
+    OrdemServico.FUNCAO_PREPARACAO,
 }
 
 
@@ -365,7 +367,11 @@ class OrdemServicoForm(forms.ModelForm):
         return cleaned
 
     def _clean_funcoes_servidores(self, cleaned):
-        if cleaned.get("tipo_necessidade") != OrdemServico.TIPO_CAMINHAO:
+        if cleaned.get("tipo_necessidade") not in {
+            OrdemServico.TIPO_CAMINHAO,
+            OrdemServico.TIPO_MICROONIBUS,
+            OrdemServico.TIPO_CERIMONIAL_ANTECIPADO,
+        }:
             return {}
         servidores = cleaned.get("servidores")
         servidor_ids = {str(servidor.pk) for servidor in servidores} if servidores is not None else set()
