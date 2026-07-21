@@ -1,15 +1,14 @@
+{% include "components/forms/form_field.html" with field=form.servidores only %}
 <section class="os-servidor-role-panel" data-os-model-fields="CAMINHAO" data-os-servidor-role-panel hidden>
   <header class="os-servidor-role-panel__header">
-    <div>
-      <h3 class="os-servidor-role-panel__title">Função no caminhão</h3>
-      <p class="os-servidor-role-panel__hint">Escolha uma função e clique nos cards dos servidores selecionados para atribuir. Servidores sem função geram texto padrão.</p>
-    </div>
-    <div class="cv-segment-toggle os-servidor-role-panel__toggle" role="group" aria-label="Função dos servidores no caminhão">
-      <button type="button" class="cv-segment-toggle__btn" data-os-role-mode="CONDUCAO" aria-pressed="true">Condução</button>
-      <button type="button" class="cv-segment-toggle__btn" data-os-role-mode="TECNICO" aria-pressed="false">Técnico</button>
-      <button type="button" class="cv-segment-toggle__btn" data-os-role-mode="APOIO" aria-pressed="false">Apoio</button>
-    </div>
+    <h3 class="os-servidor-role-panel__title">Função no caminhão</h3>
+    <p class="os-servidor-role-panel__hint">Escolha uma função e pesquise os servidores que serão adicionados à equipe.</p>
   </header>
-  <p class="os-servidor-role-panel__hint">Clique novamente em um card já marcado para remover a função.</p>
+  <div class="cv-segment-toggle os-servidor-role-panel__toggle" role="group" aria-label="Função dos servidores no caminhão">
+    <button type="button" class="cv-segment-toggle__btn" data-os-role-mode="CONDUCAO" aria-pressed="true">Condução</button>
+    <button type="button" class="cv-segment-toggle__btn" data-os-role-mode="TECNICO" aria-pressed="false">Técnico</button>
+    <button type="button" class="cv-segment-toggle__btn" data-os-role-mode="APOIO" aria-pressed="false">Apoio</button>
+  </div>
+  <p class="os-servidor-role-panel__hint">Escolha a função e clique nos cards abaixo para atribuir. Clique de novo para remover.</p>
+  <div class="os-servidor-role-panel__picker" data-os-servidor-picker-field-host></div>
 </section>
-{% include "components/forms/form_field.html" with field=form.servidores only %}

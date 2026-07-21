@@ -86,7 +86,18 @@
 
   /* ── cv-search-picker: reset + reinit ──────────────────────── */
 
+  function salvageServidorRolePanel(form) {
+    var panel = form.querySelector("[data-os-servidor-role-panel]");
+    if (!panel || !panel.closest(".cv-search-picker")) return;
+    var host = form.querySelector("#os-card-servidores .cv-form-block__body") || form;
+    host.appendChild(panel);
+  }
+
   function resetPicker(select) {
+    if (select && select.name === "servidores") {
+      var form = select.closest("[data-os-form]");
+      if (form) salvageServidorRolePanel(form);
+    }
     if (window.CV && window.CV.destinos && typeof window.CV.destinos.resetSearchPicker === "function") {
       window.CV.destinos.resetSearchPicker(select);
       return;
@@ -298,6 +309,9 @@
     });
     resetPicker(select);
     initPickers(form);
+    if (select.name === "servidores") {
+      syncServidorRoleUi(form);
+    }
   }
 
   /* ── Date picker sync ──────────────────────────────────────── */
@@ -388,7 +402,15 @@
   function syncServidorRoleButtons(form) {
     form.querySelectorAll("[data-os-role-mode]").forEach(function (button) {
       var active = button.dataset.osRoleMode === activeServidorRole(form);
+      var wasActive = button.getAttribute("aria-pressed") === "true";
       button.setAttribute("aria-pressed", active ? "true" : "false");
+
+      /* Dispara a animação de entrada apenas na troca (não no carregamento) */
+      if (active && !wasActive) {
+        button.classList.remove("cv-segment-toggle__btn--pop");
+        void button.offsetWidth;
+        button.classList.add("cv-segment-toggle__btn--pop");
+      }
     });
   }
 
@@ -419,12 +441,12 @@
     });
   }
 
-  function renderServidorRoleCard(card, role, active) {
+  function renderServidorRoleCard(card, role, active, highlighted) {
     card.classList.toggle("os-servidor-role-card", active);
     card.classList.toggle("os-servidor-role-card--assigned", !!role && active);
     card.classList.toggle(
       "cv-search-picker__selected-card--driver",
-      !!role && active,
+      highlighted,
     );
     card.dataset.osServidorRole = role || "";
 
@@ -445,30 +467,89 @@
       }
     }
     var label = role ? OS_ROLE_LABELS[role] : "Sem função - texto padrão";
-    badge.classList.toggle("cv-search-picker__driver-chip", !!role);
+    badge.classList.toggle("cv-search-picker__driver-chip", highlighted);
     badge.textContent = label;
   }
 
-  function syncServidorRoleUi(form) {
+  function servidoresPicker(form) {
     var select = form.querySelector("select[name='servidores']");
-    if (!select) return;
-    var picker = select.nextElementSibling && select.nextElementSibling.classList.contains("cv-search-picker")
-      ? select.nextElementSibling
-      : null;
+    if (!select) return null;
+    var next = select.nextElementSibling;
+    return next && next.classList && next.classList.contains("cv-search-picker") ? next : null;
+  }
+
+  function mountServidorRolePanel(form, isTruck) {
+    var panel = form.querySelector("[data-os-servidor-role-panel]");
+    var picker = servidoresPicker(form);
+    if (!panel || !picker) return;
+    var field = picker.querySelector(".cv-search-picker__field")
+      || panel.querySelector(".cv-search-picker__field");
+    var selected = picker.querySelector(".cv-search-picker__selected-panel");
+    var fieldHost = panel.querySelector("[data-os-servidor-picker-field-host]");
+    if (!field || !selected || !fieldHost) return;
+
+    var activeEl = document.activeElement;
+    var keepPickerFocus = !!(activeEl && (
+      activeEl.classList.contains("cv-search-picker__input")
+      || activeEl.closest(".cv-search-picker__control")
+    ));
+
+    if (isTruck) {
+      var alreadyMounted = panel.parentElement === picker
+        && panel.nextElementSibling === selected
+        && field.parentElement === fieldHost
+        && !panel.hidden;
+      if (alreadyMounted) return;
+
+      if (field.parentElement !== fieldHost) {
+        fieldHost.replaceChildren(field);
+      }
+      if (panel.parentElement !== picker || panel.nextElementSibling !== selected) {
+        picker.insertBefore(panel, selected);
+      }
+      panel.hidden = false;
+    } else {
+      if (field.parentElement !== picker || field.nextElementSibling !== selected) {
+        picker.insertBefore(field, selected);
+      }
+      if (panel.parentElement === picker) {
+        var panelHost = form.querySelector("#os-card-servidores .cv-form-block__body") || form;
+        panelHost.appendChild(panel);
+      }
+      panel.hidden = true;
+    }
+
+    if (keepPickerFocus) {
+      var input = picker.querySelector(".cv-search-picker__input")
+        || panel.querySelector(".cv-search-picker__input");
+      if (input) {
+        window.setTimeout(function () {
+          input.focus({ preventScroll: true });
+        }, 0);
+      }
+    }
+  }
+
+  function syncServidorRoleUi(form) {
+    var picker = servidoresPicker(form);
     var isTruck = selectedOsModel(form) === "CAMINHAO";
+    mountServidorRolePanel(form, isTruck);
     pruneServidorRoles(form);
     syncServidorRoleButtons(form);
     syncServidorRoleInputs(form);
 
     if (!picker) return;
+    var activeRole = activeServidorRole(form);
     picker.querySelectorAll(".cv-search-picker__selected-card[data-value]").forEach(function (card) {
       var servidorId = String(card.dataset.value || "");
-      renderServidorRoleCard(card, OS_ROLE_ASSIGNMENTS[servidorId], isTruck);
+      var role = OS_ROLE_ASSIGNMENTS[servidorId];
+      renderServidorRoleCard(card, role, isTruck, isTruck && role === activeRole);
     });
   }
 
   function initServidorRolePicker(form) {
     OS_ROLE_ASSIGNMENTS = readRoleAssignments();
+    mountServidorRolePanel(form, selectedOsModel(form) === "CAMINHAO");
     form.addEventListener("click", function (event) {
       if (selectedOsModel(form) !== "CAMINHAO") return;
       if (event.target.closest("[data-os-role-mode]")) return;
@@ -476,10 +557,7 @@
 
       var card = event.target.closest(".cv-search-picker__selected-card[data-value]");
       if (!card || !form.contains(card)) return;
-      var servidoresSelect = form.querySelector("select[name='servidores']");
-      var picker = servidoresSelect && servidoresSelect.nextElementSibling && servidoresSelect.nextElementSibling.classList.contains("cv-search-picker")
-        ? servidoresSelect.nextElementSibling
-        : null;
+      var picker = servidoresPicker(form);
       if (!picker || !picker.contains(card)) return;
 
       var servidorId = String(card.dataset.value || "");
@@ -497,9 +575,15 @@
     form.addEventListener("click", function (event) {
       var button = event.target.closest("[data-os-role-mode]");
       if (!button || !form.contains(button)) return;
+      var wasActive = button.getAttribute("aria-pressed") === "true";
       form.querySelectorAll("[data-os-role-mode]").forEach(function (candidate) {
         candidate.setAttribute("aria-pressed", candidate === button ? "true" : "false");
       });
+      if (!wasActive) {
+        button.classList.remove("cv-segment-toggle__btn--pop");
+        void button.offsetWidth;
+        button.classList.add("cv-segment-toggle__btn--pop");
+      }
       syncServidorRoleUi(form);
     });
     form.addEventListener("change", function (event) {
