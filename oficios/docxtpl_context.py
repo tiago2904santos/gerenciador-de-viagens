@@ -334,11 +334,50 @@ def _retorno_from_roteiro_header(r, ida: list[RoteiroTrecho]) -> RoteiroTrecho:
     return trecho
 
 
+def _bate_volta_ida_volta(
+    r, qs: list[RoteiroTrecho]
+) -> tuple[list[RoteiroTrecho], list[RoteiroTrecho]] | None:
+    """Reagrupa os trechos por direção no modo bate-volta diário.
+
+    Nesse modo os trechos são gravados como pares alternados
+    ``sede → destino`` (ordem par) e ``destino → sede`` (ordem ímpar), e apenas
+    o último recebe ``tipo=RETORNO``. Dividir por ``tipo`` jogaria as voltas
+    intermediárias no ROTEIRO DE IDA. Aqui todas as idas vão para o bloco de
+    ida e todas as voltas para o de retorno.
+
+    Retorna ``(ida, volta)`` quando o padrão bate-volta é reconhecido; caso
+    contrário ``None`` (roteiro comum, split por ``tipo``).
+    """
+    sede = (r.origem_estado_id, r.origem_cidade_id)
+    if not sede[1] or len(qs) < 2 or len(qs) % 2 != 0:
+        return None
+    away = None
+    for idx, t in enumerate(qs):
+        origem = (t.origem_estado_id, t.origem_cidade_id)
+        destino = (t.destino_estado_id, t.destino_cidade_id)
+        if idx % 2 == 0:  # perna de ida: sede → destino
+            if origem != sede:
+                return None
+            if away is None:
+                away = destino
+            if destino != away:
+                return None
+        else:  # perna de volta: destino → sede
+            if away is None or origem != away or destino != sede:
+                return None
+    if not away or away == sede:
+        return None
+    return qs[0::2], qs[1::2]
+
+
 def _roteiro_trechos(oficio: Oficio) -> tuple[list[RoteiroTrecho], list[RoteiroTrecho]]:
     r = oficio.roteiro
     if not r:
         return [], []
     qs = list(r.trechos.select_related("origem_cidade", "origem_estado", "destino_cidade", "destino_estado").order_by("ordem", "pk"))
+    bate_volta = _bate_volta_ida_volta(r, qs)
+    if bate_volta is not None:
+        return bate_volta
     ida = [t for t in qs if t.tipo == RoteiroTrecho.TIPO_IDA]
     volta = [t for t in qs if t.tipo == RoteiroTrecho.TIPO_RETORNO]
     if not volta and (r.retorno_saida_dt or r.retorno_chegada_dt):

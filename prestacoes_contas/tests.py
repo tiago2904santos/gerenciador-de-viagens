@@ -566,7 +566,6 @@ class RelatorioTecnicoDocumentoTests(TestCase):
 
     def test_contexto_preenche_cabecalho_e_rodape_do_template(self):
         cfg = ConfiguracaoSistema.get_singleton()
-        cfg.divisao = Unidade.objects.create(nome="DIVISAO POLICIAL")
         cfg.unidade = Unidade.objects.create(nome="UNIDADE TESTE")
         cfg.logradouro = "RUA CENTRAL"
         cfg.numero = "123"
@@ -580,10 +579,9 @@ class RelatorioTecnicoDocumentoTests(TestCase):
 
         contexto = build_relatorio_tecnico_context(self.relatorio, self.ps)
 
-        self.assertEqual(contexto["divisao"], "DIVISAO POLICIAL")
         self.assertEqual(contexto["unidade_cabecalho"], "UNIDADE TESTE")
         self.assertEqual(contexto["assunto_oficio"], "Autorização")
-        self.assertEqual(contexto["unidade_rodape"], "Divisao Policial")
+        self.assertEqual(contexto["unidade_rodape"], "Unidade Teste")
         self.assertIn("Rua Central", contexto["endereco"])
         self.assertIn("Curitiba/PR", contexto["endereco"])
         self.assertEqual(contexto["email"], "teste@pc.pr.gov.br")

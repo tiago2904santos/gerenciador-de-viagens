@@ -148,7 +148,9 @@ def build_configuracao_context():
     return {
         "nome_orgao": configuracao.nome_orgao,
         "sigla_orgao": configuracao.sigla_orgao,
-        "divisao": configuracao.divisao.nome if configuracao.divisao_id else "",
+        # Campo "divisão" removido do cabeçalho: mantido vazio apenas por
+        # compatibilidade com placeholders/consumidores antigos.
+        "divisao": "",
         "unidade": configuracao.unidade.nome if configuracao.unidade_id else "",
         "destinatario_oficio": configuracao.destinatario_oficio,
         "destinatario_oficio_nome": configuracao.destinatario_oficio_nome,

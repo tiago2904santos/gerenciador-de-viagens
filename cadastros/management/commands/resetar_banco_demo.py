@@ -232,7 +232,6 @@ class Command(BaseCommand):
             cfg.cidade_sede_padrao = cidades[0]
             cfg.nome_orgao = "POLICIA CIVIL DO PARANA"
             cfg.sigla_orgao = "PCPR"
-            cfg.divisao = unidades[i] if unidades else None
             cfg.unidade = unidades[i] if unidades else None
             cfg.cep = f"8001000{i}"
             cfg.logradouro = "RUA JOSE LOUREIRO"

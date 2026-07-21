@@ -12,9 +12,9 @@ from .models import Viatura
 
 @admin.register(ConfiguracaoSistema)
 class ConfiguracaoSistemaAdmin(admin.ModelAdmin):
-    list_display = ("id", "area", "divisao", "unidade", "cidade_endereco", "updated_at")
+    list_display = ("id", "area", "unidade", "cidade_endereco", "updated_at")
     list_filter = ("area",)
-    autocomplete_fields = ("area", "divisao", "unidade", "cidade_sede_padrao")
+    autocomplete_fields = ("area", "unidade", "cidade_sede_padrao")
 
 
 @admin.register(Cargo)

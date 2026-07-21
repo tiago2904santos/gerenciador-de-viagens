@@ -591,6 +591,27 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertContains(response, "Motivo card")
         self.assertContains(response, "12.345.678-9")
 
+    def test_index_exibe_referencias_e_layout_compacto_para_motorista_fora_do_oficio(self):
+        ano = timezone.localdate().year
+        oficio = Oficio.objects.create(
+            numero=1,
+            ano=ano,
+            motivo="Viagem com motorista externo",
+            protocolo="123456789",
+            custeio=Oficio.CUSTEIO_UNIDADE_DPC,
+            motorista=self.outro_servidor,
+            motorista_oficio_referencia="79/2026",
+            motorista_protocolo_ref="150000039",
+            viatura=self.viatura,
+        )
+        oficio.servidores.add(self.servidor)
+
+        response = self.client.get(reverse("oficios:index") + "?aba=atuais")
+
+        self.assertContains(response, "oficio-lc__transport-card--motorista-externo")
+        self.assertContains(response, "Ofício 79/2026 · Protocolo 15.000.003-9")
+        self.assertNotContains(response, "Externo ao ofício")
+
     def test_templates_do_wizard_nao_usam_href_falso_css_ou_script_inline(self):
         template_paths = [
             Path("templates/oficios/wizard_base.html"),

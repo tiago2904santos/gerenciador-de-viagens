@@ -16,12 +16,10 @@ from usuarios.models import AreaTrabalho
 class ConfiguracaoSistemaFormTests(TestCase):
     def setUp(self):
         self.instance = ConfiguracaoSistema.get_singleton()
-        self.divisao = Unidade.objects.create(nome="DIVISAO", sigla="DIV")
         self.unidade = Unidade.objects.create(nome="UNIDADE", sigla="UNI")
 
     def _build_valid_data(self):
         return {
-            "divisao": self.divisao.pk,
             "unidade": self.unidade.pk,
             "cep": "80000-000",
             "logradouro": "RUA TESTE",

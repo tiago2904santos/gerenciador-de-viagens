@@ -86,7 +86,7 @@
   }
 
   function initConfiguracoesForm(form) {
-    ["#id_divisao", "#id_unidade", "#id_logradouro", "#id_bairro", "#id_cidade_endereco"].forEach(
+    ["#id_unidade", "#id_logradouro", "#id_bairro", "#id_cidade_endereco"].forEach(
       (selector) => {
         const input = form.querySelector(selector);
         if (!input) return;

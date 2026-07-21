@@ -48,8 +48,7 @@ class BuildOficioCapitalizacaoTests(TestCase):
 
     def test_justificativa_rodape_nao_todo_maiusculo(self):
         cfg = ConfiguracaoSistema.get_singleton()
-        cfg.divisao = Unidade.objects.create(nome="ASSESSORIA DE COMUNICAÇÃO SOCIAL")
-        cfg.unidade = Unidade.objects.create(nome="UNIDADE TESTE")
+        cfg.unidade = Unidade.objects.create(nome="ASSESSORIA DE COMUNICAÇÃO SOCIAL")
         cfg.logradouro = "RUA EXEMPLO"
         cfg.numero = "1"
         cfg.bairro = "BAIRRO"

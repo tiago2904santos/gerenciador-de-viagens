@@ -17,7 +17,6 @@ class DocumentosContextTests(TestCase):
             "cep": "80000000",
             "telefone": "41999999999",
             "email": "exemplo@pc.pr.gov.br",
-            "divisao": Unidade.objects.create(nome="DIVISAO", sigla="DIV"),
             "unidade": Unidade.objects.create(nome="UNIDADE", sigla="UNI"),
         }
         defaults.update(kwargs)

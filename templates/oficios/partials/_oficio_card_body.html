@@ -79,7 +79,7 @@
 <div class="oficio-lc__section">
   <div class="oficio-lc__transport-row">
 
-    <div class="oficio-lc__transport-card">
+    <div class="oficio-lc__transport-card{% if card.motorista_is_carona %} oficio-lc__transport-card--motorista-externo{% endif %}">
       <span class="oficio-lc__transport-label">Placa</span>
       {% if card.veiculo_placa %}
         <div class="oficio-lc__transport-placa">{{ card.veiculo_placa }}</div>
@@ -93,7 +93,9 @@
       {% if card.motorista_is_carona and card.motorista_display %}
         <span class="oficio-lc__transport-label">Motorista</span>
         <div class="oficio-lc__transport-driver">{{ card.motorista_display }}</div>
-        <span class="oficio-lc__transport-hint">Externo ao ofício</span>
+        {% if card.motorista_referencia_display %}
+          <span class="oficio-lc__transport-hint">{{ card.motorista_referencia_display }}</span>
+        {% endif %}
       {% endif %}
     </div>
 

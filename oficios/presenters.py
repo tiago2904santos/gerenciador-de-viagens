@@ -225,6 +225,16 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None):
     motorista_display = _motorista_label_oficio(oficio)
     if motorista_display == "—":
         motorista_display = ""
+    motorista_referencia_display = ""
+    if motorista_is_carona:
+        referencias = []
+        oficio_motorista = (oficio.motorista_oficio_referencia or "").strip()
+        protocolo_motorista = format_protocolo(oficio.motorista_protocolo_ref)
+        if oficio_motorista:
+            referencias.append(f"Ofício {oficio_motorista}")
+        if protocolo_motorista:
+            referencias.append(f"Protocolo {protocolo_motorista}")
+        motorista_referencia_display = " · ".join(referencias)
 
     # Justificativa
     justificativa = None
@@ -396,6 +406,7 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None):
         "veiculo_display": veiculo_display,
         "motorista_is_carona": motorista_is_carona,
         "motorista_display": motorista_display,
+        "motorista_referencia_display": motorista_referencia_display,
         "trechos": trechos_display,
         "valor_diarias_display": valor_diarias_display,
         "valor_diarias_extenso": valor_diarias_extenso,

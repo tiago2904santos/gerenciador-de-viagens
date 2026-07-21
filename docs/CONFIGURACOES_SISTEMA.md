@@ -9,14 +9,14 @@ Esta etapa copia/adapta do legacy a configuracao institucional, a resolucao da c
 ## Campos institucionais
 
 - Orgao: `nome_orgao`, `sigla_orgao`.
-- Cabecalho: `divisao`, `unidade`.
+- Cabecalho: `unidade`.
 - Rodape/endereco: `cep`, `logradouro`, `numero`, `bairro`, `cidade_endereco`, `uf`.
 - Contato: `telefone`, `email`.
 - Sede e chefia: `sede`, `nome_chefia`, `cargo_chefia`, `cidade_sede_padrao`.
 - Plano de Trabalho: `coordenador_adm_plano_trabalho`, `pt_ultimo_numero`, `pt_ano`.
 - Justificativas: `prazo_justificativa_dias`.
 
-Campos de orgao, sigla, divisao e unidade sao normalizados em maiusculo no backend. CEP e telefone sao persistidos apenas com digitos; a mascara e aplicada na UI e nas propriedades de exibicao.
+Campos de orgao, sigla e unidade sao normalizados em maiusculo no backend. CEP e telefone sao persistidos apenas com digitos; a mascara e aplicada na UI e nas propriedades de exibicao.
 
 ## CEP e cidade sede
 

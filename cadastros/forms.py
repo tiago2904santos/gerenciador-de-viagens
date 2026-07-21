@@ -503,7 +503,6 @@ class ConfiguracaoSistemaForm(forms.ModelForm):
     class Meta:
         model = ConfiguracaoSistema
         fields = [
-            "divisao",
             "unidade",
             "cep",
             "logradouro",
@@ -557,23 +556,6 @@ class ConfiguracaoSistemaForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        self.fields["divisao"].required = False
-        self.fields["divisao"].empty_label = ""
-        self.fields["divisao"].label = "Divisão"
-        self.fields["divisao"].widget = UnidadePorExtensoSearchSelect(
-            attrs={
-                "class": "cv-search-picker__native",
-                "data-cv-search-picker": "true",
-                "data-picker-mode": "single",
-                "data-picker-variant": "compact",
-                "data-picker-label": "Divisão",
-                "data-picker-hint": "Busque por sigla ou nome da unidade.",
-                "data-placeholder": "Buscar divisão",
-                "data-empty-message": "Nenhuma unidade encontrada.",
-            }
-        )
-        self.fields["divisao"].queryset = filter_queryset_by_area(Unidade.objects).order_by("nome")
 
         self.fields["unidade"].required = False
         self.fields["unidade"].empty_label = ""

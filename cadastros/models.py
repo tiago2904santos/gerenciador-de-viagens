@@ -501,14 +501,6 @@ class ConfiguracaoSistema(TimeStampedModel):
     prazo_justificativa_dias = models.PositiveIntegerField(default=10)
     nome_orgao = models.CharField(max_length=200, blank=True)
     sigla_orgao = models.CharField(max_length=20, blank=True)
-    divisao = models.ForeignKey(
-        Unidade,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="+",
-        verbose_name="Divisão",
-    )
     unidade = models.ForeignKey(
         Unidade,
         on_delete=models.SET_NULL,
