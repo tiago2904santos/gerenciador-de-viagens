@@ -4,10 +4,6 @@
    Aqui ficam apenas os ajustes específicos do evento.
    ══════════════════════════════════════════════════════════════════════════ */
 
-.evento-lc .oficio-lc__layout {
-  gap: var(--space-4);
-}
-
 /* Ofícios e documentos ocupam linhas independentes. */
 .evento-lc .oficio-lc__transport-row {
   grid-template-columns: minmax(0, 1fr);
