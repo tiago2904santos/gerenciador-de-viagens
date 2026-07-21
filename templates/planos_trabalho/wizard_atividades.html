@@ -3,17 +3,35 @@
 
 {% block extra_css %}
   {{ block.super }}
-  <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260613c-pt">
+  <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260721-pt-remodel">
 {% endblock %}
 
 {% block wizard_content %}
-  <div data-pt-atividades data-selecionadas-total="{{ atividades_selecionadas_total }}">
-
-    {% include "components/ui/forms/form_block.html" with shell="card" section_id="pt-atividades-title" extra_class="termo-card" title="Atividades previstas" description="Selecione as atividades — cada uma traz automaticamente sua meta e o recurso necessário." body_template="planos_trabalho/partials/_atividades_body.html" %}
-
-    {% include "components/ui/forms/form_block.html" with shell="card" section_id="pt-metas-recursos-title" extra_class="termo-card" title="Metas e recursos" description="Gerados automaticamente pelas atividades selecionadas acima." body_template="planos_trabalho/partials/_metas_recursos_body.html" footer_template="planos_trabalho/partials/_wizard_footer_next.html" %}
+  <div data-pt-atividades data-selecionadas-total="{{ atividades_selecionadas_total }}" data-oficio-wizard-step1>
 
     {{ atividades_catalogo_data|json_script:"pt-atividades-data" }}
+
+    <section
+      class="cv-wizard-section-card cv-form-card cv-wizard-section-card--described oficio-step1-card termo-form-card pt-form-card"
+      aria-labelledby="pt-atividades-title-card"
+    >
+      <header class="cv-wizard-section-header">
+        <div class="cv-wizard-section-header__copy">
+          <h3 class="cv-wizard-section-title" id="pt-atividades-title-card">Atividades, metas e recursos</h3>
+          <p class="cv-wizard-section-subtitle">Selecione as atividades — a meta e o recurso de cada uma entram automaticamente</p>
+        </div>
+      </header>
+
+      <div class="cv-wizard-section-body oficio-step1-body termo-form-body">
+        {% include "components/ui/forms/form_block.html" with section_id="pt-atividades-title" extra_class="oficio-step1-block termo-block" title="Atividades previstas" description="Selecione as atividades — cada uma traz automaticamente sua meta e o recurso necessário." body_extra_class="termo-block__body" body_template="planos_trabalho/partials/_atividades_body.html" %}
+
+        {% include "components/ui/forms/form_block.html" with section_id="pt-metas-recursos-title" extra_class="oficio-step1-block termo-block" title="Metas e recursos" description="Gerados automaticamente pelas atividades selecionadas acima." body_extra_class="termo-block__body" body_template="planos_trabalho/partials/_metas_recursos_body.html" %}
+      </div>
+
+      <div class="cv-form-card__footer">
+        {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar" secondary_action="wizard_back" primary_label="Salvar e avançar" primary_action="wizard_next" only %}
+      </div>
+    </section>
   </div>
 {% endblock %}
 

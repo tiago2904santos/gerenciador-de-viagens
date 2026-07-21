@@ -4,15 +4,33 @@
 {% block extra_css %}
   {{ block.super }}
   <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260718-cv-summary">
-  <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260614g-pt">
+  <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260721-pt-remodel">
 {% endblock %}
 
 {% block wizard_content %}
-  <div data-pt-efetivo-diarias data-api-calcular-url="{{ api_calcular_diarias_url }}">
+  <div data-pt-efetivo-diarias data-api-calcular-url="{{ api_calcular_diarias_url }}" data-oficio-wizard-step1>
 
-    {% include "components/ui/forms/form_block.html" with shell="card" element_id="pt-card-efetivo" section_id="pt-efetivo-title" extra_class="termo-card" title="Efetivo" description="Composição da equipe por unidade, cargo e quantidade. O total entra no cálculo das diárias." body_template="planos_trabalho/partials/_efetivo_body.html" %}
+    <section
+      class="cv-wizard-section-card cv-form-card cv-wizard-section-card--described oficio-step1-card termo-form-card pt-form-card"
+      aria-labelledby="pt-efetivo-diarias-title"
+    >
+      <header class="cv-wizard-section-header">
+        <div class="cv-wizard-section-header__copy">
+          <h3 class="cv-wizard-section-title" id="pt-efetivo-diarias-title">Efetivo e diárias</h3>
+          <p class="cv-wizard-section-subtitle">Composição da equipe e cálculo automático das diárias</p>
+        </div>
+      </header>
 
-    {% include "components/ui/forms/form_block.html" with shell="card" element_id="pt-card-diarias" section_id="pt-diarias-title" extra_class="termo-card" title="Deslocamento e diárias" description="Informe a saída e a chegada na sede — o sistema calcula a composição das diárias automaticamente." body_template="planos_trabalho/partials/_diarias_body.html" footer_template="planos_trabalho/partials/_wizard_footer_next.html" %}
+      <div class="cv-wizard-section-body oficio-step1-body termo-form-body">
+        {% include "components/ui/forms/form_block.html" with element_id="pt-card-efetivo" section_id="pt-efetivo-title" extra_class="oficio-step1-block termo-block" title="Efetivo" description="Composição da equipe por unidade, cargo e quantidade. O total entra no cálculo das diárias." body_extra_class="termo-block__body" body_template="planos_trabalho/partials/_efetivo_body.html" %}
+
+        {% include "components/ui/forms/form_block.html" with element_id="pt-card-diarias" section_id="pt-diarias-title" extra_class="oficio-step1-block termo-block" title="Deslocamento e diárias" description="Informe a saída e a chegada na sede — o sistema calcula a composição das diárias automaticamente." body_extra_class="termo-block__body" body_template="planos_trabalho/partials/_diarias_body.html" %}
+      </div>
+
+      <div class="cv-form-card__footer">
+        {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar" secondary_action="wizard_back" primary_label="Salvar e avançar" primary_action="wizard_next" only %}
+      </div>
+    </section>
   </div>
 {% endblock %}
 

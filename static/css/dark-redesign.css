@@ -514,22 +514,22 @@ html[data-theme="light-dark"] .page-header-rail__subtitle {
   color: var(--color-muted-strong);
 }
 
-/* Listas usam um cabeçalho mais leve e inteiramente azul, sem perder hierarquia. */
+/* Listas usam cabeçalho flat (list-header.css) — sem card/sombra no stack. */
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  .page-shell--list .page-header-stack {
+  .page-shell--list .page-header-stack:not(.list-header) {
   background: #0d1d30;
   border-color: color-mix(in srgb, var(--color-border) 84%, #31577c);
   box-shadow: 0 14px 32px rgba(0, 0, 0, 0.32);
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  .page-shell--list .page-header-band {
+  .page-shell--list .page-header-stack:not(.list-header) .page-header-band {
   background: #0d1d30;
   padding: 20px clamp(20px, 2.4vw, 30px) 16px;
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  .page-shell--list .page-header-rail {
+  .page-shell--list .page-header-stack:not(.list-header) .page-header-rail {
   background: #14263b;
   border-top-color: rgba(152, 184, 218, 0.22);
   padding: 14px clamp(20px, 2.4vw, 30px) 18px;
@@ -4791,20 +4791,20 @@ html[data-theme="light-dark"] :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-lay
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  .cv-filter-header {
+  .cv-filter-header:not(.list-header) {
   background: var(--color-surface-strong);
   border-color: var(--color-border-strong);
   box-shadow: var(--shadow-sm);
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  .cv-filter-header__heading {
+  .cv-filter-header:not(.list-header) .cv-filter-header__heading {
   background: var(--color-surface-strong);
   padding-bottom: 16px;
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  .cv-filter-header__controls {
+  .cv-filter-header:not(.list-header) .cv-filter-header__controls {
   background: var(--color-surface);
   border-top-color: var(--color-border-strong);
   padding-top: 18px;

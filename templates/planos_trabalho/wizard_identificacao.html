@@ -4,17 +4,17 @@
 {% block extra_css %}
   {{ block.super }}
   <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260718-cv-summary">
-  <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260614-pt-textos-coordenacao">
+  <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260721-pt-remodel">
   <link rel="stylesheet" href="{% static 'css/planos-trabalho-eventos.css' %}?v=20260616-pt-resumo15">
 {% endblock %}
 
 {% block wizard_content %}
-  <div data-pt-form data-api-cidades-url="{{ api_cidades_por_estado_url }}">
+  <div data-pt-form data-api-cidades-url="{{ api_cidades_por_estado_url }}" data-oficio-wizard-step1>
     {% if form.non_field_errors %}
       {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
     {% endif %}
 
-    {# ── 0. Eventos já adicionados (modo multi-evento) ──────────── #}
+    {# ── 0. Eventos já adicionados (modo multi-evento) — cards contextuais acima do card-mestre ── #}
     {% if is_multi_evento %}
       {% if em_edicao_evento %}
         <div class="pte-events__banner" role="status">
@@ -31,15 +31,34 @@
       {% endfor %}
     {% endif %}
 
-    {# ── 1. Programa solicitante ─────────────────────────────── #}
-    {% include "components/ui/forms/form_block.html" with shell="card" element_id="pt-card-programa" section_id="pt-programa-title" extra_class="termo-card" title="Programa solicitante" description="Programa que solicitou a ação. Entra automaticamente na contextualização." body_template="planos_trabalho/partials/_identificacao_programa_body.html" %}
-
-    {# ── 2. Evento: período + destino ────────────────────────── #}
-    {% include "components/ui/forms/form_block.html" with shell="card" element_id="pt-card-evento" section_id="pt-evento-title" extra_class="termo-card termo-card--evento" title="Evento" description="Período, destino e horário de atendimento da ação." body_extra_class="termo-evento-body" body_template="planos_trabalho/partials/_identificacao_evento_body.html" %}
-
-    {# ── 3. Textos do documento ──────────────────────────────── #}
     {{ pt_textos_padrao_templates|json_script:"pt-textos-padrao-data" }}
-    {% include "components/ui/forms/form_block.html" with shell="card" element_id="pt-card-textos" section_id="pt-textos-title" data_hook="pt-textos" extra_class="termo-card" title="Textos do documento" description="Já preenchidos com o texto padrão a partir do destino e do programa. Edite livremente quando quiser — o que você escrever é mantido." body_template="planos_trabalho/partials/_identificacao_textos_body.html" footer_template="planos_trabalho/partials/_identificacao_textos_footer.html" %}
+
+    <section
+      class="cv-wizard-section-card cv-form-card cv-wizard-section-card--described oficio-step1-card termo-form-card pt-form-card"
+      aria-labelledby="pt-identificacao-title"
+    >
+      <header class="cv-wizard-section-header">
+        <div class="cv-wizard-section-header__copy">
+          <h3 class="cv-wizard-section-title" id="pt-identificacao-title">Identificação e atuação</h3>
+          <p class="cv-wizard-section-subtitle">Programa solicitante, evento e textos do documento</p>
+        </div>
+      </header>
+
+      <div class="cv-wizard-section-body oficio-step1-body termo-form-body">
+        {# ── 1. Programa solicitante ─────────────────────────────── #}
+        {% include "components/ui/forms/form_block.html" with element_id="pt-card-programa" section_id="pt-programa-title" extra_class="oficio-step1-block termo-block" title="Programa solicitante" description="Programa que solicitou a ação. Entra automaticamente na contextualização." body_extra_class="termo-block__body" body_template="planos_trabalho/partials/_identificacao_programa_body.html" %}
+
+        {# ── 2. Evento: período + destino ────────────────────────── #}
+        {% include "components/ui/forms/form_block.html" with element_id="pt-card-evento" section_id="pt-evento-title" extra_class="oficio-step1-block termo-block" title="Evento" description="Período, destino e horário de atendimento da ação." body_extra_class="cv-form-stack termo-evento-body" body_template="planos_trabalho/partials/_identificacao_evento_body.html" %}
+
+        {# ── 3. Textos do documento ──────────────────────────────── #}
+        {% include "components/ui/forms/form_block.html" with element_id="pt-card-textos" section_id="pt-textos-title" data_hook="pt-textos" extra_class="oficio-step1-block termo-block" title="Textos do documento" description="Já preenchidos com o texto padrão a partir do destino e do programa. Edite livremente quando quiser — o que você escrever é mantido." body_extra_class="termo-block__body" body_template="planos_trabalho/partials/_identificacao_textos_body.html" %}
+      </div>
+
+      <div class="cv-form-card__footer">
+        {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar à lista" secondary_action="save_draft_list" primary_label="Salvar e avançar" primary_action="wizard_next" only %}
+      </div>
+    </section>
   </div>
 {% endblock %}
 

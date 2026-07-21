@@ -11,7 +11,7 @@
   max-height: 1400px;
 }
 
-.justificativas-page .page-header-rail--filters-quick-add .justificativa-quick-add__body {
+.justificativas-page .list-header--quick-add .justificativa-quick-add__body {
   align-items: stretch;
   display: grid;
   gap: var(--space-4);
@@ -125,7 +125,7 @@
   width: 100%;
 }
 
-.justificativas-page .page-header-rail--filters-quick-add .justificativa-quick-add__actions {
+.justificativas-page .list-header--quick-add .justificativa-quick-add__actions {
   justify-content: flex-end;
   margin-left: 0;
   width: 100%;
@@ -133,6 +133,30 @@
 
 .justificativa-quick-add .cv-field__control--textarea {
   min-height: var(--text-area-height-justificativa);
+}
+
+.list-header .quick-add-footer-button.justificativa-quick-add__toggle--ready,
+.list-header .quick-add-footer-button.justificativa-quick-add__toggle--ready[aria-expanded="true"],
+html[data-theme="dark"] .list-header .quick-add-footer-button.justificativa-quick-add__toggle--ready,
+html[data-theme="dark"] .list-header .quick-add-footer-button.justificativa-quick-add__toggle--ready[aria-expanded="true"] {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  border-style: solid;
+  color: var(--color-white);
+}
+
+.list-header .quick-add-footer-button.justificativa-quick-add__toggle--ready:hover,
+.list-header .quick-add-footer-button.justificativa-quick-add__toggle--ready:focus-visible,
+html[data-theme="dark"] .list-header .quick-add-footer-button.justificativa-quick-add__toggle--ready:hover,
+html[data-theme="dark"] .list-header .quick-add-footer-button.justificativa-quick-add__toggle--ready:focus-visible {
+  background: var(--color-primary-hover, var(--color-primary));
+  border-color: var(--color-primary-hover, var(--color-primary));
+  color: var(--color-white);
+}
+
+.list-header .quick-add-footer-button.justificativa-quick-add__toggle--ready .quick-add-footer-button__icon {
+  background: rgba(255, 255, 255, 0.18);
+  color: inherit;
 }
 
 .quick-add-footer-button.justificativa-quick-add__toggle--ready,
@@ -174,7 +198,7 @@ html[data-theme="dark"] .quick-add-footer-button.justificativa-quick-add__toggle
 
 
 @media (max-width: 720px) {
-  .justificativas-page .page-header-rail--filters-quick-add .justificativa-quick-add__actions {
+  .justificativas-page .list-header--quick-add .justificativa-quick-add__actions {
     align-items: stretch;
     flex-direction: column;
   }

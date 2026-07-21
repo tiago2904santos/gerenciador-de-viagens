@@ -12,8 +12,33 @@
     {% include "components/ui/feedback/pendencias_card.html" with items=pendencias_documentos lead="Corrija os itens abaixo antes de finalizar o plano ou gerar DOCX/PDF." only %}
   {% endif %}
 
-  {% include "components/ui/forms/form_block.html" with shell="card" section_id="pt-documentos-title" extra_class="oficio-documentos-preview-section document-inline-stack" title="Documento para conferência" description="Confira e baixe o plano de trabalho gerado." body_extra_class="oficio-documentos-preview-section__body" body_template="planos_trabalho/partials/_documentos_preview_body.html" footer_template="planos_trabalho/partials/_documentos_preview_footer.html" %}
+  <div data-oficio-wizard-documentos>
+    <section
+      class="cv-wizard-section-card cv-form-card cv-wizard-section-card--described oficio-documentos-unified-card oficio-documentos-card pt-form-card"
+      aria-labelledby="pt-documentos-card-title"
+    >
+      <header class="cv-wizard-section-header">
+        <div class="cv-wizard-section-header__copy">
+          <h3 class="cv-wizard-section-title" id="pt-documentos-card-title">Resumo e documentos</h3>
+          <p class="cv-wizard-section-subtitle">Confira, baixe e finalize o plano de trabalho gerado</p>
+        </div>
+      </header>
 
+      <div class="cv-wizard-section-body oficio-documentos-body">
+        {% include "components/ui/forms/form_block.html" with section_id="pt-documentos-title" extra_class="oficio-documentos-block oficio-documentos-preview-section document-inline-stack" title="Documento para conferência" description="Confira e baixe o plano de trabalho gerado." body_extra_class="oficio-documentos-preview-section__body" body_template="planos_trabalho/partials/_documentos_preview_body.html" %}
+      </div>
+
+      <div class="cv-form-card__footer">
+        {% if mostrar_pendencias %}
+          {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar" secondary_action="wizard_back" primary_label="Salvar rascunho" primary_action="save_draft_list" only %}
+        {% else %}
+          {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar" secondary_action="wizard_back" primary_label="Finalizar plano" primary_action="finalizar" only %}
+        {% endif %}
+      </div>
+    </section>
+  </div>
+
+  {# ── Resumo de cada evento (etapa de conferência) ────────────── #}
   {% with rd=resumo_documentos %}
     {% for ev in rd.eventos %}
       {% include "planos_trabalho/partials/resumo_evento_card.html" with ev=ev numero=rd.numero coordenador_adm_nome=rd.coordenador_adm_nome coordenador_adm_cargo=rd.coordenador_adm_cargo is_multi=rd.is_multi total_eventos=rd.total_eventos mostrar_acoes=False only %}

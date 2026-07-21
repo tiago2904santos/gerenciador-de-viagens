@@ -1,24 +1,18 @@
-{# Lista simples com header Quick Add. Usa os mesmos tokens/estruturas do UI Lab. #}
+{# Lista simples com header Quick Add (flat). #}
 <div class="page-shell page-shell--list"{% if not disable_realtime_filter %} data-cv-realtime-filter-scope{% endif %}>
-  <div class="cv-filter-header page-header-stack header-stack--quick-add{% if quick_add_compact %} header-stack--quick-add-compact{% endif %}">
-    <div class="cv-filter-header__heading page-header-band">
-      <div class="page-header-band__content">
-        <div class="page-header-band__text">
-          {% if eyebrow %}<span class="page-header-band__eyebrow">{{ eyebrow }}</span>{% endif %}
-          <h1 class="page-header-band__title">{{ title }}</h1>
+  <div class="list-header list-header--quick-add cv-filter-header{% if quick_add_compact %} list-header--quick-add-compact{% endif %}">
+    <div class="list-header__top">
+      <div class="list-header__title-block">
+        {% if eyebrow %}<span class="list-header__eyebrow">{{ eyebrow }}</span>{% endif %}
+        <div class="list-header__title-row">
+          <h1 class="list-header__title">{{ title }}</h1>
         </div>
       </div>
-    </div>
 
-    <div class="cv-filter-header__controls page-header-rail page-header-rail--filters page-header-rail--filters-quick-add">
-      {% if brand_mark %}
-        <div class="page-header-rail__marker" aria-hidden="true">{{ brand_mark }}</div>
-      {% endif %}
-
-      <form class="cv-filter-bar header-filter-bar" method="get" action="{{ request.path }}" data-cv-live-submit-form>
-        <div class="cv-filter-bar__search header-filter-bar__search">
+      <form class="list-header__filters" method="get" action="{{ request.path }}" data-cv-live-submit-form>
+        <div class="list-header__search">
           <input
-            class="cv-filter-bar__search-input header-filter-input"
+            class="list-header__search-input header-filter-input"
             type="search"
             name="q"
             placeholder="{{ search_placeholder|default:'Buscar itens' }}"
@@ -31,7 +25,7 @@
         {% if extra_hidden_field_name and extra_hidden_field_value %}
           <input type="hidden" name="{{ extra_hidden_field_name }}" value="{{ extra_hidden_field_value }}">
         {% endif %}
-        <div class="header-filter-bar__actions">
+        <div class="list-header__actions">
           {% if extra_hidden_field_name and extra_hidden_field_value %}
             {% include "components/ui/buttons/button.html" with href=request.path|add:"?"|add:extra_hidden_field_name|add:"="|add:extra_hidden_field_value label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" data_cv_filter_clear=True only %}
           {% else %}
@@ -39,22 +33,22 @@
           {% endif %}
         </div>
       </form>
-
-      <form class="quick-add-inline__panel quick-add-panel" id="{{ quick_add_panel_id }}" method="post" action="{{ request.path }}" data-create-action="{{ request.path }}" hidden novalidate>
-        {% csrf_token %}
-        {% if quick_add_next_url %}<input type="hidden" name="next" value="{{ quick_add_next_url }}">{% endif %}
-        <div class="quick-add-inline__body">
-          <div class="quick-add-inline__fields">
-            {% include quick_add_body_template with form=quick_add_form only %}
-          </div>
-          {% if not quick_add_compact %}
-          <div class="quick-add-inline__actions">
-            {% include "components/ui/buttons/button.html" with label=quick_add_submit_label|default:"Salvar" variant="primary" type="submit" icon="check" only %}
-          </div>
-          {% endif %}
-        </div>
-      </form>
     </div>
+
+    <form class="quick-add-inline__panel quick-add-panel" id="{{ quick_add_panel_id }}" method="post" action="{{ request.path }}" data-create-action="{{ request.path }}" hidden novalidate>
+      {% csrf_token %}
+      {% if quick_add_next_url %}<input type="hidden" name="next" value="{{ quick_add_next_url }}">{% endif %}
+      <div class="quick-add-inline__body">
+        <div class="quick-add-inline__fields">
+          {% include quick_add_body_template with form=quick_add_form only %}
+        </div>
+        {% if not quick_add_compact %}
+        <div class="quick-add-inline__actions">
+          {% include "components/ui/buttons/button.html" with label=quick_add_submit_label|default:"Salvar" variant="primary" type="submit" icon="check" only %}
+        </div>
+        {% endif %}
+      </div>
+    </form>
 
     <button class="quick-add-footer-button" type="button" data-quick-add-toggle{% if quick_add_compact %} data-quick-add-submit-when-open data-quick-add-save-label="{{ quick_add_submit_label|default:'Salvar' }}"{% endif %} aria-controls="{{ quick_add_panel_id }}" aria-expanded="{% if quick_add_form.errors %}true{% else %}false{% endif %}">
       <span class="quick-add-footer-button__icon" aria-hidden="true">+</span>

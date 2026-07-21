@@ -4,6 +4,15 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2, 8px);
+  margin: 0;
+  padding: 0;
+}
+
+/* Conexão visual com o header flat: abas logo abaixo do divisor. */
+.page-shell--list > .cv-list-tabs {
+  margin-top: calc(-1 * var(--space-1, 4px));
+  padding-bottom: var(--space-1, 4px);
+  padding-top: var(--space-3, 12px);
 }
 
 .cv-list-tab {
