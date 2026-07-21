@@ -4,6 +4,7 @@
 {% block extra_css %}
   {{ block.super }}
   <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260721-pt-remodel">
+  <link rel="stylesheet" href="{% static 'css/planos-trabalho-atividades.css' %}?v=20260721-pt-toolbar-limpa">
 {% endblock %}
 
 {% block wizard_content %}
@@ -23,7 +24,7 @@
       </header>
 
       <div class="cv-wizard-section-body oficio-step1-body termo-form-body">
-        {% include "components/ui/forms/form_block.html" with section_id="pt-atividades-title" extra_class="oficio-step1-block termo-block" title="Atividades previstas" description="Selecione as atividades — cada uma traz automaticamente sua meta e o recurso necessário." body_extra_class="termo-block__body" body_template="planos_trabalho/partials/_atividades_body.html" %}
+        {% include "components/ui/forms/form_block.html" with variant="resource" section_id="pt-atividades-title" extra_class="oficio-step1-block termo-block" title="Atividades previstas" description="Clique nas atividades para selecioná-las — a meta e o recurso de cada uma entram automaticamente." action_label="Gerenciar atividades" action_url=atividades_manager_url action_autosave=True body_template="planos_trabalho/partials/_atividades_body.html" %}
 
         {% include "components/ui/forms/form_block.html" with section_id="pt-metas-recursos-title" extra_class="oficio-step1-block termo-block" title="Metas e recursos" description="Gerados automaticamente pelas atividades selecionadas acima." body_extra_class="termo-block__body" body_template="planos_trabalho/partials/_metas_recursos_body.html" %}
       </div>
@@ -37,5 +38,5 @@
 
 {% block extra_js %}
   {{ block.super }}
-  <script src="{% static 'js/pages/planos-trabalho-wizard.js' %}?v=20260716-global-picker-migration" defer></script>
+  <script src="{% static 'js/pages/planos-trabalho-wizard.js' %}?v=20260721-pt-atividades-cards" defer></script>
 {% endblock %}

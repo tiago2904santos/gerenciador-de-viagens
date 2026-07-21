@@ -1,43 +1,37 @@
-<div class="pt-activity-live-grid">
-  <div class="pt-activity-live pt-activity-live--metas">
-    <div class="pt-activity-live-head">
-      <h4 class="pt-activity-live-title">Metas</h4>
+<div class="pt-live" data-pt-live>
+  <section class="pt-live-col pt-live-col--metas">
+    <header class="pt-live-col__head">
+      <span class="pt-live-col__title">Metas</span>
       <span data-pt-live-metas-count>
         {% include "components/ui/badges/chip.html" with tone="warning" size="compact" label=metas_preview|length only %}
       </span>
-    </div>
-    <p class="pt-activity-live-subtitle">Cada meta aparece conforme a atividade é marcada.</p>
-    <ul class="pt-activity-live-list" data-pt-live-metas-list>
+    </header>
+    <ul class="pt-live-list" data-pt-live-metas-list>
       {% for meta in metas_preview %}
-        <li class="pt-live-entry">
-          <span class="pt-live-entry-text">{{ meta }}</span>
-        </li>
+        <li class="pt-live-entry"><span class="pt-live-entry-text">{{ meta }}</span></li>
       {% endfor %}
     </ul>
-    <div class="pt-activity-live-empty" data-pt-live-metas-empty {% if metas_preview %}hidden{% endif %}>
+    <div class="pt-live-empty" data-pt-live-metas-empty {% if metas_preview %}hidden{% endif %}>
       <strong>Sem metas ainda</strong>
-      <span>Marque uma atividade para ver a meta correspondente.</span>
+      <span>Selecione uma atividade para ver a meta correspondente.</span>
     </div>
-  </div>
+  </section>
 
-  <div class="pt-activity-live pt-activity-live--recursos">
-    <div class="pt-activity-live-head">
-      <h4 class="pt-activity-live-title">Recursos</h4>
+  <section class="pt-live-col pt-live-col--recursos">
+    <header class="pt-live-col__head">
+      <span class="pt-live-col__title">Recursos</span>
       <span data-pt-live-recursos-count>
         {% include "components/ui/badges/chip.html" with tone="info" size="compact" label=recursos_preview|length only %}
       </span>
-    </div>
-    <p class="pt-activity-live-subtitle">Recursos necessários por atividade selecionada.</p>
-    <ul class="pt-activity-live-list" data-pt-live-recursos-list>
+    </header>
+    <ul class="pt-live-list" data-pt-live-recursos-list>
       {% for recurso in recursos_preview %}
-        <li class="pt-live-entry">
-          <span class="pt-live-entry-text">{{ recurso }}</span>
-        </li>
+        <li class="pt-live-entry"><span class="pt-live-entry-text">{{ recurso }}</span></li>
       {% endfor %}
     </ul>
-    <div class="pt-activity-live-empty" data-pt-live-recursos-empty {% if recursos_preview %}hidden{% endif %}>
+    <div class="pt-live-empty" data-pt-live-recursos-empty {% if recursos_preview %}hidden{% endif %}>
       <strong>Sem recursos ainda</strong>
       <span>O recurso é opcional — algumas atividades podem não ter um.</span>
     </div>
-  </div>
+  </section>
 </div>

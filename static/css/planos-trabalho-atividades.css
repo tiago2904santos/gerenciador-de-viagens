@@ -1,0 +1,263 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   Etapa 3 do Plano de Trabalho — seleção de atividades (grade clicável) e
+   painéis de Metas / Recursos derivados das atividades marcadas.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.pt-activity {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* ── Barra única: contador · busca · ações ──────────────────────────────── */
+.pt-activity__toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.pt-activity__counter {
+  align-items: center;
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+.pt-activity__counter .cv-chip {
+  box-sizing: border-box;
+  min-height: 44px;
+  padding-inline: var(--space-4);
+}
+
+.pt-activity__search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1 1 220px;
+  min-width: 180px;
+}
+
+.pt-activity__search-icon {
+  position: absolute;
+  left: 14px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  color: var(--color-muted);
+  pointer-events: none;
+}
+
+.pt-activity__search-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.pt-activity__search .pt-activity__search-input {
+  width: 100%;
+  padding-left: 42px;
+}
+
+/* ── Grade de cards clicáveis ───────────────────────────────────────────── */
+.pt-activity__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-2);
+}
+
+.pt-activity-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  align-items: center;
+  column-gap: 10px;
+  margin: 0;
+  min-height: 50px;
+  padding: 8px 10px;
+  border: 1px solid var(--color-border-soft);
+  border-radius: 9px;
+  background: var(--color-card-muted);
+  cursor: pointer;
+  transition: border-color .15s ease, background .15s ease, box-shadow .15s ease;
+  min-width: 0;
+}
+
+.pt-activity-card:hover {
+  border-color: var(--color-border);
+  background: color-mix(in srgb, var(--color-accent) 5%, var(--color-card-muted));
+}
+
+.pt-activity-card:focus-within {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent, #d9a40f) 26%, transparent);
+}
+
+/* checkbox nativo escondido (mantém foco por teclado) */
+.pt-activity-card__checkbox {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pt-activity-card__check {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border-soft);
+  background: color-mix(in srgb, var(--color-heading) 8%, transparent);
+  color: transparent;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.pt-activity-card__check svg {
+  width: 15px;
+  height: 15px;
+}
+
+.pt-activity-card__name {
+  color: var(--color-heading);
+  font-size: var(--font-size-xs, .8rem);
+  font-weight: 600;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+/* ── Estado selecionado (dourado) ───────────────────────────────────────── */
+.pt-activity-card.is-selected {
+  border-color: var(--color-accent-border-soft, color-mix(in srgb, var(--color-accent) 40%, var(--color-border-soft)));
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-card-muted));
+  box-shadow: inset 4px 0 0 var(--color-accent);
+}
+
+.pt-activity-card.is-selected .pt-activity-card__check {
+  background: var(--color-accent, #d9a40f);
+  border-color: var(--color-accent, #d9a40f);
+  color: #1a1200;
+}
+
+.pt-activity-card.is-selected .pt-activity-card__name {
+  color: var(--color-heading);
+}
+
+@container (min-width: 430px) {
+  .pt-activity__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container (min-width: 720px) {
+  .pt-activity__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.pt-activity__empty {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+  font-style: italic;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Metas / Recursos — painéis derivados
+   ══════════════════════════════════════════════════════════════════════════ */
+.pt-live {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.pt-live-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 0;
+  border-radius: var(--radius-card, 14px);
+  background: var(--color-surface);
+  min-width: 0;
+}
+
+.pt-live-col__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.pt-live-col__title {
+  color: var(--color-heading);
+  font-size: var(--font-size-sm, .95rem);
+  font-weight: 800;
+  letter-spacing: .01em;
+}
+
+.pt-live-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.pt-live-entry {
+  padding: var(--space-3) var(--space-4);
+  border: 0;
+  border-radius: var(--radius-control, 10px);
+  background: var(--step1-panel, var(--color-card-muted));
+  transition: background-color .15s ease, transform .15s ease;
+}
+
+.pt-live-entry:hover {
+  background: color-mix(in srgb, var(--color-heading) 4%, var(--step1-panel, var(--color-card-muted)));
+  transform: translateX(2px);
+}
+
+.pt-live-entry-text {
+  color: var(--color-heading);
+  font-size: var(--font-size-sm, .875rem);
+  font-weight: 500;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+/* Metas: acento dourado · Recursos: acento azul. */
+.pt-live-col--metas .pt-live-entry {
+  box-shadow: inset 3px 0 0 var(--color-accent, #d9a40f);
+}
+
+.pt-live-col--recursos .pt-live-entry {
+  box-shadow: inset 3px 0 0 var(--color-info, #3b82f6);
+}
+
+.pt-live-empty {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-4);
+  border: 0;
+  border-radius: var(--radius-control, 10px);
+  background: var(--step1-panel, var(--color-card-muted));
+  color: var(--color-muted);
+  text-align: center;
+}
+
+.pt-live-empty strong {
+  color: var(--color-muted-strong, var(--color-heading));
+  font-size: var(--font-size-sm);
+}
+
+.pt-live-empty span {
+  font-size: var(--font-size-xs);
+}
+
+@media (max-width: 720px) {
+  .pt-live {
+    grid-template-columns: 1fr;
+  }
+}

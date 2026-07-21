@@ -511,3 +511,180 @@
   .pt-add-evento__inner { grid-template-columns: 1fr; }
   .pt-add-evento__btn { width: 100%; }
 }
+
+/* ── Etapa 1 · Período do evento: Data inicial · Data final · Horário na mesma linha ──
+   O date-picker (range) embrulha as duas datas num field-grid--cols-2 próprio. Para que
+   as duas datas e o horário fiquem em 3 colunas iguais, achatamos o root do picker e seu
+   grid interno com display:contents — assim os três .cv-field viram itens diretos deste
+   grid. O painel do calendário é position:fixed e movido para o body via JS, então
+   achatar o root não afeta o dropdown. */
+.cv-form-subsection.pt-evento-periodo--inline {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3) var(--space-4);
+  align-items: start;
+}
+
+.pt-evento-periodo--inline > .cv-date-picker.pt-evento-periodo__dates,
+.pt-evento-periodo--inline > .cv-date-picker.pt-evento-periodo__dates > .field-grid--cols-2 {
+  display: contents;
+}
+
+@media (max-width: 700px) {
+  .cv-form-subsection.pt-evento-periodo--inline {
+    grid-template-columns: 1fr;
+  }
+
+  /* Empilhado: o picker volta a ser um bloco normal com as duas datas lado a lado. */
+  .pt-evento-periodo--inline > .cv-date-picker.pt-evento-periodo__dates {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .pt-evento-periodo--inline > .cv-date-picker.pt-evento-periodo__dates > .field-grid--cols-2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3) var(--space-4);
+  }
+}
+
+/* Textos do documento: mesmo acabamento dos campos Motivo e Justificativa
+   do cadastro de ofícios, inclusive a barra de rolagem discreta. */
+#pt-card-textos .cv-field__control--textarea {
+  field-sizing: content;
+  height: auto;
+  min-height: 120px;
+  max-height: 240px;
+  line-height: 1.5;
+  padding: var(--space-3) var(--cv-field-padding-x);
+  resize: vertical;
+  scrollbar-color: var(--color-border-strong) transparent;
+  scrollbar-width: thin;
+}
+
+#pt-card-textos .cv-field__control--textarea::-webkit-scrollbar {
+  width: 4px;
+}
+
+#pt-card-textos .cv-field__control--textarea::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#pt-card-textos .cv-field__control--textarea::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: 2px;
+}
+
+/* ── Etapa 2 · Deslocamento e diárias ────────────────────────────────────────
+   Linha única com 4 colunas na ordem: data de saída · hora de saída ·
+   data de chegada · hora de chegada. O date-picker (range) embrulha as duas
+   datas num field-grid--cols-2 próprio; achatamos com display:contents (mesmo
+   truque do período do evento na etapa 1) e reordenamos com `order`. */
+.cv-form-subsection.pt-diarias-linha {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3) var(--space-4);
+  align-items: start;
+}
+
+.pt-diarias-linha > .cv-date-picker.pt-diarias-linha__dates,
+.pt-diarias-linha > .cv-date-picker.pt-diarias-linha__dates > .field-grid--cols-2 {
+  display: contents;
+}
+
+.pt-diarias-linha > .cv-date-picker.pt-diarias-linha__dates > .field-grid--cols-2 > .cv-field:first-child { order: 1; }
+.pt-diarias-linha > .field.pt-diarias-hora-saida { order: 2; }
+.pt-diarias-linha > .cv-date-picker.pt-diarias-linha__dates > .field-grid--cols-2 > .cv-field:last-child { order: 3; }
+.pt-diarias-linha > .field.pt-diarias-hora-chegada { order: 4; }
+
+@media (max-width: 860px) {
+  .cv-form-subsection.pt-diarias-linha {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .cv-form-subsection.pt-diarias-linha {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Resultado do cálculo: cards com o mesmo fundo dos inputs e valores com
+   tamanho fluido (relativo à largura do card) para não quebrar linha. */
+#pt-card-diarias .oficio-lc__transport-card {
+  background: var(--cv-field-bg);
+  border: 0;
+  padding: var(--space-3) var(--space-4);
+}
+
+#pt-card-diarias .oficio-lc__transport-placa {
+  font-size: clamp(0.9rem, 8cqi, 1.6rem);
+  overflow: visible;
+  text-overflow: clip;
+}
+
+#pt-card-diarias .oficio-lc__valor-total {
+  font-size: clamp(1.1rem, 13cqi, 2.4rem);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+#pt-card-diarias .pt-diarias-resultado {
+  display: grid;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+/* ── Etapa 2 · Efetivo: linhas no visual das linhas de destino do ofício ─────
+   A linha base de destino tem 2 colunas (UF · cidade); o efetivo precisa de 3:
+   Unidade · Cargo · Quantidade. Sobrescrevemos o grid dos campos (inclusive a
+   regra dark escopada em [data-oficio-wizard-step1]) com especificidade maior. */
+.oficio-roteiro-destino-row__fields.pt-efetivo-fields {
+  align-items: end;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.35fr) minmax(0, 0.9fr);
+  gap: 10px 12px;
+}
+
+/* Supera a regra dark de 2 colunas (que já é escopada em html[data-theme] …). */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  :is([data-oficio-wizard-roteiro], .termos-page, [data-oficio-wizard-step1])
+  .oficio-roteiro-destino-row__fields.pt-efetivo-fields {
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.35fr) minmax(0, 0.9fr);
+}
+
+/* O stepper de quantidade ocupa a largura da coluna e não estica além dela. */
+.pt-efetivo-fields .pt-quantidade-stepper {
+  height: 44px;
+  width: 100%;
+}
+
+.pt-efetivo-fields .pt-quantidade-stepper > .cv-field__control,
+.pt-efetivo-fields .pt-quantidade-stepper > input {
+  height: 44px;
+  min-width: 0;
+}
+
+.pt-efetivo-fields .cv-search-picker__field,
+.pt-efetivo-fields .cv-search-picker__control,
+.pt-efetivo-fields .cv-custom-select__trigger,
+.pt-efetivo-fields .pt-quantidade-stepper > .cv-btn {
+  box-sizing: border-box;
+  height: 44px;
+  min-height: 44px;
+}
+
+/* O número acompanha a linha dos controles, não a altura total dos rótulos. */
+.pt-efetivo-card > .oficio-roteiro-destino-row__badge {
+  align-self: end;
+  height: 44px;
+}
+
+@media (max-width: 760px) {
+  .oficio-roteiro-destino-row__fields.pt-efetivo-fields,
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    :is([data-oficio-wizard-roteiro], .termos-page, [data-oficio-wizard-step1])
+    .oficio-roteiro-destino-row__fields.pt-efetivo-fields {
+    grid-template-columns: 1fr;
+  }
+}

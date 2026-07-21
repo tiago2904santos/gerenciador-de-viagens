@@ -1,10 +1,5 @@
-<section class="wizard-inner-section termo-evento-periodo" aria-label="Período do evento">
-  {% include "components/forms/cv_date_picker.html" with mode="range" picker_id="pt-evento-date-picker" extra_class="termo-date-picker" start_field=form.data_evento_inicio end_field=form.data_evento_fim start_label="Data inicial" end_label="Data final" start_input_id="id_pt_data_inicio_display" end_input_id="id_pt_data_fim_display" only %}
-  <div class="field-grid roteiro-sede-grid termo-evento-dates">
-    <div class="field cv-field">
-      {% include "components/forms/form_field.html" with field=form.horario_atendimento label="Horário de atendimento" action_url=horarios_url action_label="Gerenciar horários" only %}
-    </div>
-  </div>
+<section class="cv-form-subsection termo-evento-periodo pt-evento-periodo pt-evento-periodo--inline" aria-label="Período do evento">
+  {% include "components/forms/cv_date_picker.html" with mode="range" picker_id="pt-evento-date-picker" extra_class="termo-date-picker pt-evento-periodo__dates" start_field=form.data_evento_inicio end_field=form.data_evento_fim start_label="Data inicial" end_label="Data final" start_input_id="id_pt_data_inicio_display" end_input_id="id_pt_data_fim_display" show_summary=False only %}
+  {% include "components/forms/form_field.html" with field=form.horario_atendimento label="Horário de atendimento" action_url=horarios_url action_label="Gerenciar horários" only %}
 </section>
-{% include "components/domain/destinos_section.html" with section_id="pt-evento-destinos" title_id="pt-evento-destinos-title" title="Destinos" description="Cada destino usa o mesmo padrão visual da sede para manter o fluxo consistente." panel_aria_label="Destinos adicionados" add_button_pt=True prefix="pt" rows_template="components/domain/destinos/rows.html" errors_template="components/domain/destinos/errors.html" %}
-{% include "components/domain/destinos/template.html" with prefix="pt" %}
+{% include "planos_trabalho/partials/_identificacao_evento_destinos.html" %}

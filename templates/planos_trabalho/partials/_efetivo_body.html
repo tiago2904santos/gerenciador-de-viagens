@@ -2,65 +2,31 @@
 {% if formset.non_form_errors %}
   {% include "components/ui/feedback/field_error.html" with errors=formset.non_form_errors only %}
 {% endif %}
-<div class="cv-search-picker">
-  <section class="cv-search-picker__selected-panel roteiro-destinos-panel" aria-label="Efetivos do plano">
-    <div class="cv-search-picker__selected-header roteiro-destinos-panel__header">
-      <h4 class="cv-search-picker__selected-title">Efetivos adicionados</h4>
+
+<section class="cv-form-subsection oficio-roteiro-destinos pt-efetivo-section"
+         aria-labelledby="pt-efetivo-list-title"
+         id="pt-efetivo-section">
+  <header class="cv-form-subsection__header oficio-roteiro-destinos__header">
+    <div class="cv-form-subsection__copy">
+      <h4 class="cv-form-subsection__title" id="pt-efetivo-list-title">Efetivos adicionados</h4>
+      <p class="cv-form-subsection__description">Cada linha é um cargo com a respectiva quantidade de servidores.</p>
+    </div>
+    <div class="oficio-roteiro-destinos__actions">
       <button type="button" class="cv-btn cv-btn--secondary cv-btn--sm" data-pt-efetivo-add>
-        <span>+ Adicionar efetivo</span>
+        <span>Adicionar efetivo</span>
       </button>
     </div>
-    <div class="cv-search-picker__selected-list roteiro-destinos-list pt-efetivo-rows" data-pt-efetivo-rows>
-      {% for efetivo_form in formset %}
-        <div class="cv-search-picker__selected-card destino-row{% if forloop.first and formset|length == 1 %} destino-row--single{% endif %} termo-destino-row pt-efetivo-card" data-pt-efetivo-row>
-          {% for hidden in efetivo_form.hidden_fields %}{{ hidden }}{% endfor %}
-          <div hidden>{{ efetivo_form.DELETE }}</div>
-          <div class="cv-search-picker__selected-main">
-            <div class="field-grid pt-efetivo-card__grid">
-              <div class="field field-size-1 app-form-field">
-                <label class="cv-field__label" for="{{ efetivo_form.unidade.id_for_label }}">Unidade (opcional)</label>
-                {{ efetivo_form.unidade }}
-                {% if efetivo_form.unidade.errors %}{% include "components/ui/feedback/field_error.html" with errors=efetivo_form.unidade.errors only %}{% endif %}
-              </div>
-              {% include "components/forms/input_with_action.html" with field=efetivo_form.cargo action_url=cargos_url action_label="Gerenciar cargos" size_class="field-size-1" only %}
-              <div class="field field-size-1 app-form-field">
-                <label class="cv-field__label" for="{{ efetivo_form.quantidade.id_for_label }}">Quantidade</label>
-                <div class="roteiro-time-calc-stepper pt-quantidade-stepper">
-                  {{ efetivo_form.quantidade }}
-                  <button type="button" class="cv-btn cv-btn--secondary cv-btn--control" data-pt-quantidade-delta="-1" aria-label="Diminuir quantidade">−</button>
-                  <button type="button" class="cv-btn cv-btn--secondary cv-btn--control" data-pt-quantidade-delta="1" aria-label="Aumentar quantidade">+</button>
-                </div>
-                {% if efetivo_form.quantidade.errors %}{% include "components/ui/feedback/field_error.html" with errors=efetivo_form.quantidade.errors only %}{% endif %}
-              </div>
-            </div>
-          </div>
-          <button type="button" class="cv-search-picker__remove btn-remover-destino" title="Remover efetivo" aria-label="Remover efetivo" {% if forloop.first and formset|length == 1 %}hidden{% endif %} data-pt-efetivo-remove>x</button>
-        </div>
-      {% endfor %}
-    </div>
-  </section>
-</div>
-<template data-pt-efetivo-template>
-  <div class="cv-search-picker__selected-card destino-row termo-destino-row pt-efetivo-card" data-pt-efetivo-row>
-    {% for hidden in formset.empty_form.hidden_fields %}{{ hidden }}{% endfor %}
-    <div hidden>{{ formset.empty_form.DELETE }}</div>
-    <div class="cv-search-picker__selected-main">
-      <div class="field-grid pt-efetivo-card__grid">
-        <div class="field field-size-1 app-form-field">
-          <label class="cv-field__label" for="{{ formset.empty_form.unidade.id_for_label }}">Unidade (opcional)</label>
-          {{ formset.empty_form.unidade }}
-        </div>
-        {% include "components/forms/input_with_action.html" with field=formset.empty_form.cargo action_url=cargos_url action_label="Gerenciar cargos" size_class="field-size-1" only %}
-        <div class="field field-size-1 app-form-field">
-          <label class="cv-field__label" for="{{ formset.empty_form.quantidade.id_for_label }}">Quantidade</label>
-          <div class="roteiro-time-calc-stepper pt-quantidade-stepper">
-            {{ formset.empty_form.quantidade }}
-            <button type="button" class="cv-btn cv-btn--secondary cv-btn--control" data-pt-quantidade-delta="-1" aria-label="Diminuir quantidade">−</button>
-            <button type="button" class="cv-btn cv-btn--secondary cv-btn--control" data-pt-quantidade-delta="1" aria-label="Aumentar quantidade">+</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <button type="button" class="cv-search-picker__remove btn-remover-destino" title="Remover efetivo" aria-label="Remover efetivo" data-pt-efetivo-remove>x</button>
+  </header>
+
+  <div class="oficio-roteiro-destinos__list roteiro-destinos-list pt-efetivo-rows"
+       aria-label="Efetivos adicionados"
+       data-pt-efetivo-rows>
+    {% for efetivo_form in formset %}
+      {% include "planos_trabalho/partials/_efetivo_row.html" with efetivo_form=efetivo_form row_ordinal=forloop.counter total_forms=formset|length cargos_url=cargos_url only %}
+    {% endfor %}
   </div>
+</section>
+
+<template data-pt-efetivo-template>
+  {% include "planos_trabalho/partials/_efetivo_row.html" with efetivo_form=formset.empty_form row_ordinal=1 cargos_url=cargos_url only %}
 </template>

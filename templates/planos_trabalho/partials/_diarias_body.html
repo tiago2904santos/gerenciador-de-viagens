@@ -1,12 +1,14 @@
-{% include "components/forms/cv_date_picker.html" with mode="range" picker_id="pt-diarias-date-picker" extra_class="termo-date-picker" start_field=diarias_form.saida_sede_data end_field=diarias_form.chegada_sede_data start_label="Data de saída da sede" end_label="Data de chegada na sede" start_input_id="id_pt_saida_sede_data_display" end_input_id="id_pt_chegada_sede_data_display" only %}
-<div class="field-grid pt-diarias-grid">
-    {% include "components/forms/form_field.html" with field=diarias_form.saida_sede_hora label="Hora de saída" size_class="field-size-1" only %}
-    {% include "components/forms/form_field.html" with field=diarias_form.chegada_sede_hora label="Hora de chegada" size_class="field-size-1" only %}
+<div class="cv-form-subsection pt-diarias-linha" aria-label="Datas e horários do deslocamento">
+  {% include "components/forms/cv_date_picker.html" with mode="range" picker_id="pt-diarias-date-picker" extra_class="termo-date-picker pt-diarias-linha__dates" start_field=diarias_form.saida_sede_data end_field=diarias_form.chegada_sede_data start_label="Data de saída da sede" end_label="Data de chegada na sede" start_input_id="id_pt_saida_sede_data_display" end_input_id="id_pt_chegada_sede_data_display" show_summary=False only %}
+  {% include "components/forms/form_field.html" with field=diarias_form.saida_sede_hora label="Hora de saída" size_class="pt-diarias-hora-saida" only %}
+  {% include "components/forms/form_field.html" with field=diarias_form.chegada_sede_hora label="Hora de chegada" size_class="pt-diarias-hora-chegada" only %}
 </div>
 
-<section class="wizard-inner-section" aria-labelledby="pt-diarias-resultado-title">
-  <header class="wizard-inner-section__header">
-    <h4 class="wizard-inner-section__title" id="pt-diarias-resultado-title">Resultado do cálculo</h4>
+<section class="cv-form-subsection pt-diarias-resultado" aria-labelledby="pt-diarias-resultado-title">
+  <header class="cv-form-subsection__header">
+    <div class="cv-form-subsection__copy">
+      <h4 class="cv-form-subsection__title" id="pt-diarias-resultado-title">Resultado do cálculo</h4>
+    </div>
   </header>
   <div class="oficio-lc__transport-row" data-pt-diarias-resultado>
     <div class="oficio-lc__transport-card">

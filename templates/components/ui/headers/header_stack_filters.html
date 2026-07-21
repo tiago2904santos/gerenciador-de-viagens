@@ -1,11 +1,11 @@
-{# header_stack_filters.html — cabeçalho flat de listas. ver docs/ui-components.md #}
+{# header_stack_filters.html — cabeçalho compacto de listas. ver docs/ui-components.md #}
 {% if form_action %}
   <form class="list-header cv-filter-header{% if extra_class %} {{ extra_class }}{% endif %}" method="get" action="{{ form_action }}" data-cv-live-submit-form>
 {% else %}
   <div class="list-header cv-filter-header{% if extra_class %} {{ extra_class }}{% endif %}">
 {% endif %}
 
-  <div class="list-header__top">
+  <div class="list-header__band">
     <div class="list-header__title-block">
       {% if eyebrow %}<span class="list-header__eyebrow">{{ eyebrow }}</span>{% endif %}
       <div class="list-header__title-row">
@@ -15,8 +15,10 @@
         {% endif %}
       </div>
     </div>
+  </div>
 
-    {% if advanced %}
+  {% if advanced %}
+  <div class="list-header__rail list-header__rail--advanced">
     <div class="list-header__filters list-header__filters--advanced">
       <div class="list-header__search list-header__search--with-icon">
         <span class="list-header__search-icon" aria-hidden="true">
@@ -73,7 +75,9 @@
         {% include "components/ui/buttons/button.html" with href=search_clear_url label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" only %}
       {% endif %}
     </div>
-    {% else %}
+  </div>
+  {% else %}
+  <div class="list-header__rail">
     <div class="list-header__filters">
       <div class="list-header__search">
         <input
@@ -113,8 +117,8 @@
         </div>
       {% endif %}
     </div>
-    {% endif %}
   </div>
+  {% endif %}
 
 {% if form_action %}
   </form>

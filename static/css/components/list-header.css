@@ -1,61 +1,48 @@
 /* =========================================================
-   List Header (flat)
-   Cabeçalho compacto das páginas de lista — sem card,
-   sem faixa escura. Título à esquerda, filtros à direita,
-   divisor sutil abaixo.
+   List Header — bloco compacto de listas
+   Card com faixa de título + rail de filtros.
+   Mais leve que o page-header-stack antigo, mas ainda
+   lê como um cabeçalho (não some no fundo da página).
    ========================================================= */
 
 .list-header {
-  --list-header-gap: var(--space-3, 12px);
   --list-header-control-height: var(--filter-input-height, 40px);
-  background: transparent;
-  border: 0;
-  border-radius: 0;
-  box-shadow: none;
+  background: var(--app-hero-body-bg, var(--color-surface, #fff));
+  border: 1px solid var(--color-border, rgba(110, 140, 170, 0.28));
+  border-radius: var(--radius-lg, 14px);
+  box-shadow: var(--shadow-sm, 0 6px 18px rgba(11, 58, 102, 0.08));
   display: flex;
   flex-direction: column;
   gap: 0;
-  overflow: visible;
-  padding: 0 0 var(--space-3, 12px);
+  overflow: hidden;
+  padding: 0;
   position: relative;
   width: 100%;
 }
 
-.list-header::after {
-  background: var(--color-border, rgba(110, 140, 170, 0.28));
-  bottom: 0;
-  content: "";
-  height: 1px;
-  left: 0;
-  opacity: 0.9;
-  position: absolute;
-  right: 0;
-}
-
-.list-header__top {
-  align-items: flex-end;
+/* Faixa de título — compacta */
+.list-header__band {
+  background: var(--app-hero-stage-bg, #0d1d30);
+  box-sizing: border-box;
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--list-header-gap) var(--space-4, 16px);
-  justify-content: space-between;
-  min-width: 0;
+  flex-direction: column;
+  gap: 0;
+  padding: 14px clamp(16px, 2vw, 22px) 12px;
   width: 100%;
 }
 
 .list-header__title-block {
   display: flex;
-  flex: 1 1 12rem;
   flex-direction: column;
   gap: 2px;
   min-width: 0;
-  padding-bottom: 2px;
 }
 
 .list-header__eyebrow {
-  color: var(--theme-text-muted, #6b7c90);
+  color: var(--app-hero-eyebrow, var(--color-accent, #d8a21b));
   font-size: var(--font-size-xs, 0.75rem);
   font-weight: var(--font-weight-bold, 700);
-  letter-spacing: var(--letter-spacing-eyebrow, 0.08em);
+  letter-spacing: var(--letter-spacing-eyebrow, 0.1em);
   line-height: 1.2;
   margin: 0;
   text-transform: uppercase;
@@ -70,32 +57,49 @@
 }
 
 .list-header__title {
-  color: var(--theme-text-heading, #0b3a66);
-  font-size: clamp(1.15rem, 1.6vw, 1.45rem);
+  color: var(--app-hero-title, #f7fbff);
+  font-size: clamp(1.2rem, 1.8vw, 1.55rem);
   font-weight: var(--font-weight-extrabold, 800);
   letter-spacing: -0.02em;
   line-height: 1.2;
   margin: 0;
 }
 
+/* Rail de filtros — faixa clara abaixo do título */
+.list-header__rail {
+  /* Mesmo token da área interna dos cards (.oficio-lc__section). */
+  background: var(--cv-card-family-bg, var(--color-surface, #fff));
+  border-top: 1px solid var(--border-filter-bar, rgba(110, 140, 170, 0.22));
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3, 12px);
+  padding: 12px clamp(16px, 2vw, 22px);
+  width: 100%;
+}
+
+.list-header__rail--advanced,
+.list-header__rail--quick-add {
+  gap: var(--space-3, 12px);
+}
+
 .list-header__filters {
   align-items: center;
   display: flex;
-  flex: 1 1 18rem;
+  flex: 1 1 auto;
   flex-wrap: wrap;
   gap: var(--space-2, 8px);
-  justify-content: flex-end;
   min-width: 0;
+  width: 100%;
 }
 
 .list-header__filters--advanced {
-  flex: 1 1 28rem;
+  gap: 10px;
 }
 
 .list-header__search {
-  flex: 1 1 14rem;
-  max-width: 28rem;
-  min-width: 11rem;
+  flex: 1 1 16rem;
+  min-width: 12rem;
   position: relative;
 }
 
@@ -161,6 +165,7 @@
   display: flex;
   flex-shrink: 0;
   gap: var(--space-2, 8px);
+  margin-left: auto;
 }
 
 .list-header__filters .cv-btn--control {
@@ -179,7 +184,7 @@
   min-height: var(--list-header-control-height);
 }
 
-/* Compat: inputs que ainda usam classes antigas dentro do header flat */
+/* Compat: inputs que ainda usam classes antigas */
 .list-header .header-filter-input {
   background: var(--surface-filter-input, var(--color-input-bg, #fff));
   border: 1px solid var(--border-filter-input, var(--color-input-border, #c9d5e4));
@@ -198,13 +203,48 @@
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--border-focus, #4f8fd6) 22%, transparent);
 }
 
-/* Neutraliza overrides de card do dark-redesign / filter-header antigos */
-.list-header.cv-filter-header,
-.list-header.page-header-stack {
-  background: transparent !important;
+/*
+ * Controles do rail: mesma superfície dos cards de viajante.
+ * A especificidade e o !important neutralizam os backgrounds em camadas e
+ * bordas definidos por cv-select e pelo tema global.
+ */
+.list-header__rail {
+  --list-header-control-bg: var(--color-card-muted, var(--color-surface-soft, #eef3f8));
+}
+
+.list-header__rail .list-header__search-input.header-filter-input,
+.list-header__rail .cv-custom-select__trigger.cv-custom-select__trigger--v2,
+.list-header__rail .oficios-filter-range__btn,
+.list-header__rail .list-header__search-input.header-filter-input:hover,
+.list-header__rail .cv-custom-select__trigger.cv-custom-select__trigger--v2:hover,
+.list-header__rail .oficios-filter-range__btn:hover:not(:disabled) {
+  background: var(--list-header-control-bg) !important;
   border: 0 !important;
   box-shadow: none !important;
-  overflow: visible;
+}
+
+.list-header__rail .list-header__search-input.header-filter-input:focus,
+.list-header__rail .cv-custom-select__trigger.cv-custom-select__trigger--v2:focus,
+.list-header__rail .oficios-filter-range__btn:focus {
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: 2px solid var(--border-focus, var(--color-focus, #74aae0));
+  outline-offset: 2px;
+}
+
+.list-header__rail .list-header__search-input.header-filter-input:focus-visible,
+.list-header__rail .cv-custom-select__trigger.cv-custom-select__trigger--v2:focus-visible,
+.list-header__rail .oficios-filter-range__btn:focus-visible {
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: 2px solid var(--border-focus, var(--color-focus, #74aae0));
+  outline-offset: 2px;
+}
+
+/* Não herdar estilos de card do dark-redesign / filter-header antigos */
+.list-header.cv-filter-header,
+.list-header.page-header-stack {
+  overflow: hidden;
 }
 
 .list-header .cv-filter-header__heading,
@@ -221,17 +261,9 @@
    Quick Add — barra de largura total modernizada
    ========================================================= */
 
-.list-header--quick-add {
-  padding-bottom: 0;
-}
-
-.list-header--quick-add::after {
-  display: none;
-}
-
-.list-header--quick-add .list-header__top {
-  border-bottom: 1px solid var(--color-border, rgba(110, 140, 170, 0.28));
-  padding-bottom: var(--space-3, 12px);
+.list-header--quick-add .list-header__rail--quick-add {
+  border-bottom: 0;
+  flex-direction: column;
 }
 
 .list-header .quick-add-panel {
@@ -254,10 +286,121 @@
 }
 
 .list-header .quick-add-panel.is-open {
+  border-top: 1px solid var(--border-filter-bar, rgba(110, 140, 170, 0.22));
   max-height: 640px;
   opacity: 1;
-  padding: var(--space-3, 12px) 0;
+  padding: var(--space-3, 12px) 0 0;
   transform: translateY(0);
+}
+
+/*
+ * Campos do Quick Add: mesma superfície e geometria da busca do rail.
+ * Textareas mantêm sua altura própria; selects e controles customizados
+ * preservam o comportamento nativo, alterando apenas a camada visual.
+ */
+.list-header--quick-add .quick-add-panel
+  :is(
+    .form-control,
+    .form-select,
+    .cv-field__control,
+    .cv-custom-select__trigger,
+    .cv-search-picker__control,
+    .cv-search-picker__input
+  ) {
+  background: var(--list-header-control-bg) !important;
+  border: 0 !important;
+  border-radius: var(--radius-control, 10px);
+  box-shadow: none !important;
+  box-sizing: border-box;
+  color: var(--color-filter-text, var(--theme-text-body, #1a2b3c));
+  font-size: var(--font-size-sm, 0.875rem);
+}
+
+.list-header--quick-add .quick-add-panel
+  :is(
+    input.form-control,
+    select.form-control,
+    .form-select,
+    input.cv-field__control,
+    select.cv-field__control,
+    .cv-custom-select__trigger,
+    .cv-search-picker__control
+  ) {
+  height: var(--list-header-control-height);
+  min-height: var(--list-header-control-height);
+}
+
+.list-header--quick-add .quick-add-panel
+  :is(.form-control, .form-select, .cv-field__control, .cv-search-picker__input)::placeholder {
+  color: var(--color-filter-placeholder, rgba(80, 100, 120, 0.65));
+  opacity: 1;
+}
+
+.list-header--quick-add .quick-add-panel
+  :is(
+    .form-control,
+    .form-select,
+    .cv-field__control,
+    .cv-custom-select__trigger
+  ):focus,
+.list-header--quick-add .quick-add-panel
+  :is(
+    .form-control,
+    .form-select,
+    .cv-field__control,
+    .cv-custom-select__trigger
+  ):focus-visible,
+.list-header--quick-add .quick-add-panel
+  .cv-search-picker__control:focus-within {
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: 2px solid var(--border-focus, var(--color-focus, #74aae0));
+  outline-offset: 2px;
+}
+
+.list-header--quick-add .quick-add-panel
+  :is(
+    .form-control,
+    .form-select,
+    .cv-field__control,
+    .cv-custom-select__trigger,
+    .cv-search-picker__control
+  ):is(.is-invalid, [aria-invalid="true"]),
+.list-header--quick-add .quick-add-panel
+  :is(.app-form-field, .cv-field):has(.field-error)
+  :is(
+    .form-control,
+    .form-select,
+    .cv-field__control,
+    .cv-custom-select__trigger,
+    .cv-search-picker__control
+  ) {
+  border: 1px solid var(--color-danger, #dc3545) !important;
+}
+
+.list-header--quick-add .quick-add-panel
+  :is(
+    .form-control,
+    .form-select,
+    .cv-field__control,
+    .cv-custom-select__trigger
+  ):is(.is-invalid, [aria-invalid="true"]):focus,
+.list-header--quick-add .quick-add-panel
+  :is(
+    .form-control,
+    .form-select,
+    .cv-field__control,
+    .cv-custom-select__trigger
+  ):is(.is-invalid, [aria-invalid="true"]):focus-visible,
+.list-header--quick-add .quick-add-panel
+  :is(.app-form-field, .cv-field):has(.field-error)
+  :is(
+    .form-control,
+    .form-select,
+    .cv-field__control,
+    .cv-custom-select__trigger
+  ):focus {
+  outline-color: var(--color-danger, #dc3545);
 }
 
 .list-header .quick-add-inline__body {
@@ -282,17 +425,13 @@
   padding: 0;
 }
 
-.list-header--quick-add-compact .quick-add-panel.is-open {
-  border-bottom: 1px solid var(--color-border, rgba(110, 140, 170, 0.22));
-  padding: var(--space-3, 12px) 0;
-}
-
 .list-header .quick-add-footer-button {
   align-items: center;
   appearance: none;
-  background: color-mix(in srgb, var(--color-surface-soft, #f3f7fb) 88%, transparent);
-  border: 1px dashed var(--color-border, rgba(110, 140, 170, 0.45));
-  border-radius: var(--radius-control, 10px);
+  background: var(--cv-card-family-bg, var(--color-surface, #fff));
+  border: 0;
+  border-radius: 0;
+  border-top: 1px solid var(--border-filter-bar, rgba(110, 140, 170, 0.28));
   box-shadow: none;
   color: var(--theme-text-body, #1a2b3c);
   cursor: pointer;
@@ -301,7 +440,7 @@
   gap: var(--space-2, 8px);
   height: auto;
   justify-content: center;
-  margin-top: var(--space-3, 12px);
+  margin: 0;
   min-height: var(--control-height-md, 42px);
   padding: 10px var(--space-4, 16px);
   transition:
@@ -314,20 +453,16 @@
 
 .list-header .quick-add-footer-button:hover {
   background: color-mix(in srgb, var(--color-primary-soft, #dceaf8) 70%, #fff);
-  border-color: color-mix(in srgb, var(--color-primary, #0b3a66) 35%, var(--color-border, #c9d5e4));
-  border-style: solid;
 }
 
 .list-header .quick-add-footer-button:focus-visible {
   outline: 2px solid var(--border-focus, #4f8fd6);
-  outline-offset: 2px;
+  outline-offset: -2px;
 }
 
 .list-header .quick-add-footer-button.is-active,
 .list-header .quick-add-footer-button[aria-expanded="true"] {
   background: color-mix(in srgb, var(--color-primary-soft, #dceaf8) 55%, #fff);
-  border-color: color-mix(in srgb, var(--color-primary, #0b3a66) 28%, var(--color-border, #c9d5e4));
-  border-style: solid;
   box-shadow: none;
 }
 
@@ -335,7 +470,6 @@
   animation: list-header-quick-add-fill 0.35s ease forwards;
   background: var(--cv-btn-primary-bg, var(--color-primary, #0b3a66));
   border-color: var(--cv-btn-primary-border, var(--color-primary, #0b3a66));
-  border-style: solid;
   box-shadow: 0 6px 14px rgba(11, 58, 102, 0.16);
   color: var(--cv-btn-primary-color, #fff);
 }
@@ -348,7 +482,6 @@
 @keyframes list-header-quick-add-fill {
   from {
     background: color-mix(in srgb, var(--color-primary-soft, #dceaf8) 55%, #fff);
-    border-color: color-mix(in srgb, var(--color-primary, #0b3a66) 28%, var(--color-border, #c9d5e4));
     box-shadow: none;
     color: var(--theme-text-body, #1a2b3c);
   }
@@ -378,9 +511,9 @@
   font-weight: var(--font-weight-bold, 700);
 }
 
-/* Abas logo abaixo do header flat */
+/* Abas logo abaixo do header */
 .page-shell--list > .list-header + .cv-list-tabs {
-  margin-top: calc(-1 * var(--space-1, 4px));
+  margin-top: 0;
   padding-top: var(--space-3, 12px);
 }
 
@@ -389,9 +522,21 @@
    ========================================================= */
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .list-header {
+  background: var(--color-surface-muted, #131f2e);
+  border-color: var(--color-border);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+}
+
+/* Mesma cor do cabeçalho dos cards (.cv-entity-card__header) */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .list-header__band {
+  background: var(--color-surface-muted, #131f2e);
+}
+
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .list-header__eyebrow {
   color: var(--color-accent, #d8a21b);
-  letter-spacing: 0.1em;
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
@@ -399,24 +544,18 @@
   color: var(--color-heading, #f7fbff);
 }
 
+/* Mesma cor das seções internas do card (.oficio-lc__section). */
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  .list-header::after,
-:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  .list-header--quick-add .list-header__top {
-  border-color: rgba(152, 184, 218, 0.22);
-}
-
-:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  .list-header::after {
-  background: rgba(152, 184, 218, 0.22);
+  .list-header__rail {
+  background: var(--cv-card-family-bg, #1a2638);
+  border-top-color: var(--color-border);
+  --list-header-control-bg: var(--color-surface-soft, #223348);
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .list-header__search-input,
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .list-header .header-filter-input {
-  background: var(--color-input-bg, #14263b);
-  border-color: var(--color-input-border, rgba(152, 184, 218, 0.28));
   color: var(--color-text, #e8f0f8);
 }
 
@@ -427,8 +566,8 @@
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .list-header .quick-add-footer-button {
-  background: var(--color-card-muted, #213246);
-  border-color: rgba(152, 184, 218, 0.28);
+  background: var(--cv-card-family-bg, #1a2638);
+  border-top-color: rgba(152, 184, 218, 0.22);
   color: var(--theme-text-body, #d6e2ef);
 }
 
@@ -439,8 +578,6 @@
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .list-header .quick-add-footer-button[aria-expanded="true"] {
   background: color-mix(in srgb, var(--color-card-muted, #213246) 72%, #fff 10%);
-  border-color: rgba(184, 206, 230, 0.42);
-  border-style: solid;
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
@@ -462,30 +599,21 @@
   color: inherit;
 }
 
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .list-header .quick-add-panel.is-open {
+  border-top-color: rgba(152, 184, 218, 0.22);
+}
+
 /* =========================================================
    Responsivo
    ========================================================= */
 
-@media (max-width: 960px) {
-  .list-header__top {
-    align-items: stretch;
-    flex-direction: column;
+@media (max-width: 720px) {
+  .list-header__band,
+  .list-header__rail {
+    padding-inline: 14px;
   }
 
-  .list-header__filters,
-  .list-header__filters--advanced {
-    flex: 1 1 auto;
-    justify-content: stretch;
-    max-width: none;
-  }
-
-  .list-header__search {
-    flex: 1 1 100%;
-    max-width: none;
-  }
-}
-
-@media (max-width: 640px) {
   .list-header__select,
   .list-header__filters .cv-date-picker,
   .list-header__filters .oficios-filter-range,
@@ -495,6 +623,10 @@
     max-width: none;
     min-width: 0;
     width: 100%;
+  }
+
+  .list-header__actions {
+    margin-left: 0;
   }
 
   .list-header__filters .oficios-filter-range__btn,

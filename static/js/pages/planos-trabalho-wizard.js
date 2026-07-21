@@ -694,6 +694,8 @@
     });
 
     visibleRows.forEach(function (row, index) {
+      var ord = row.querySelector("[data-pt-efetivo-ord]");
+      if (ord) ord.textContent = String(index + 1);
       var removeBtn = row.querySelector("[data-pt-efetivo-remove]");
       if (!removeBtn) return;
       removeBtn.hidden = visibleRows.length <= 1 && index === 0;
@@ -848,6 +850,11 @@
     var recursosEmpty = scope.querySelector("[data-pt-live-recursos-empty]");
     var recursosCount = scope.querySelector("[data-pt-live-recursos-count]");
 
+    function syncCardState(cb) {
+      var card = cb.closest("[data-pt-activity-item]");
+      if (card) card.classList.toggle("is-selected", cb.checked);
+    }
+
     function refresh() {
       var checked = checkboxes.filter(function (cb) { return cb.checked; });
       setChipLabel(counter, checked.length + " selecionadas");
@@ -868,15 +875,19 @@
     }
 
     checkboxes.forEach(function (cb) {
-      cb.addEventListener("change", refresh);
+      cb.addEventListener("change", function () {
+        syncCardState(cb);
+        refresh();
+      });
     });
 
     if (selectAll) {
       selectAll.addEventListener("click", function () {
         checkboxes.forEach(function (cb) {
-          var item = cb.closest("[data-pt-activity-item]");
-          if (item && item.hidden) return; // respeita o filtro de busca
+          var card = cb.closest("[data-pt-activity-item]");
+          if (card && card.hidden) return; // respeita o filtro de busca
           cb.checked = true;
+          syncCardState(cb);
         });
         refresh();
       });
@@ -884,7 +895,7 @@
 
     if (clearBtn) {
       clearBtn.addEventListener("click", function () {
-        checkboxes.forEach(function (cb) { cb.checked = false; });
+        checkboxes.forEach(function (cb) { cb.checked = false; syncCardState(cb); });
         refresh();
       });
     }
@@ -893,10 +904,10 @@
       search.addEventListener("input", function () {
         var term = (search.value || "").trim().toLowerCase();
         var anyVisible = false;
-        items.forEach(function (item) {
-          var name = item.dataset.nome || "";
+        items.forEach(function (card) {
+          var name = card.dataset.nome || "";
           var match = !term || name.indexOf(term) >= 0;
-          item.hidden = !match;
+          card.hidden = !match;
           if (match) anyVisible = true;
         });
         if (emptyFilter) emptyFilter.hidden = anyVisible;

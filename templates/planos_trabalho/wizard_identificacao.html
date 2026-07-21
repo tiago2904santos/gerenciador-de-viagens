@@ -5,7 +5,7 @@
   {{ block.super }}
   <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260718-cv-summary">
   <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260721-pt-remodel">
-  <link rel="stylesheet" href="{% static 'css/planos-trabalho-eventos.css' %}?v=20260616-pt-resumo15">
+  <link rel="stylesheet" href="{% static 'css/planos-trabalho-eventos.css' %}?v=20260721-pt-textareas-auto">
 {% endblock %}
 
 {% block wizard_content %}
@@ -64,5 +64,5 @@
 
 {% block extra_js %}
   {{ block.super }}
-  <script src="{% static 'js/pages/planos-trabalho-wizard.js' %}?v=20260716-global-picker-migration" defer></script>
+  <script src="{% static 'js/pages/planos-trabalho-wizard.js' %}?v=20260721-pt-atividades-cards" defer></script>
 {% endblock %}
