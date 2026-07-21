@@ -54,9 +54,15 @@ def resolve_area_for_request(request):
 
 
 def filter_queryset_by_area(queryset, area=None):
-    """Aplica isolamento por area quando ha area atual resolvida."""
+    """Aplica isolamento por area quando ha area atual resolvida.
+
+    Registros legados com ``area`` nula continuam visíveis para a área ativa.
+    Sem isso, cadastros/documentos criados antes do multi-tenant somem das
+    listagens e quebram fluxos (ex.: novo ofício no evento, anexar termo).
+    """
+    from django.db.models import Q
 
     area = get_current_area() if area is None else area
     if area is None:
         return queryset.filter(area__isnull=True)
-    return queryset.filter(area=area)
+    return queryset.filter(Q(area=area) | Q(area__isnull=True))

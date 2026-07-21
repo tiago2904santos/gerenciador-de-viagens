@@ -365,8 +365,13 @@ def criar_oficio_rascunho(evento=None):
         from eventos.services import build_evento_document_seed
 
         seed = build_evento_document_seed(evento)
+    area = None
+    if evento is not None:
+        area = getattr(evento, "area", None)
+    if area is None:
+        area = get_current_area()
     oficio = Oficio.objects.create(
-        area=getattr(evento, "area", None) if evento is not None else get_current_area(),
+        area=area,
         evento=evento,
         data_criacao=timezone.localdate(),
         status=Oficio.STATUS_RASCUNHO,
@@ -707,13 +712,13 @@ def _dados_viajantes_from_oficio(oficio):
 
 @transaction.atomic
 def excluir_oficio(instance):
-    numero, ano = instance.numero, instance.ano
+    numero, ano, area = instance.numero, instance.ano, instance.area
     try:
         instance.delete()
     except ProtectedError as exc:
         raise OficioVinculadoError from exc
     if numero and ano:
-        OficioNumeroLacuna.objects.get_or_create(ano=ano, numero=numero)
+        OficioNumeroLacuna.objects.get_or_create(area=area, ano=ano, numero=numero)
 
 
 def cancelar_oficio(instance: Oficio, motivo: str) -> Oficio:

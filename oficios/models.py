@@ -219,8 +219,11 @@ class Oficio(TimeStampedModel, CancelavelModel):
         return max(maior_usado + 1, piso)
 
     def save(self, *args, **kwargs):
-        if self.area_id is None and self.evento_id and self.evento and self.evento.area_id:
-            self.area = self.evento.area
+        if self.area_id is None:
+            if self.evento_id and self.evento and self.evento.area_id:
+                self.area = self.evento.area
+            else:
+                self.area = get_current_area()
         self.protocolo = normalize_protocolo(self.protocolo)
         self.assunto = normalize_spaces(self.assunto)
         self.motivo = normalize_spaces(self.motivo)

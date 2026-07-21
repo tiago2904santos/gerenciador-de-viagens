@@ -77,3 +77,11 @@ SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+
+# Domínios HTTPS confiáveis para CSRF (obrigatório no Django 4+ atrás de proxy).
+# Ex.: CSRF_TRUSTED_ORIGINS=https://viagens.exemplo.gov.br,https://www.viagens.exemplo.gov.br
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",")
+    if origin.strip()
+]

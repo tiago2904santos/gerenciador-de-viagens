@@ -797,7 +797,9 @@ def _anexar_assinado_resolver(request, fallback_url, resolver):
 @require_POST
 def termo_oficio_assinado_anexar(request, pk, servidor_pk):
     oficio = get_oficio_by_id(pk)
-    servidor = get_object_or_404(filter_queryset_by_area(Servidor.objects), pk=servidor_pk)
+    # Servidor precisa pertencer ao termo do ofício; não filtrar só por área do
+    # cadastro — registros legados com area nula quebravam o anexo em produção.
+    servidor = get_object_or_404(oficio.servidores_termo_autorizacao.all(), pk=servidor_pk)
     fallback = reverse("oficios:wizard_documentos", args=[oficio.pk])
     return _anexar_assinado_resolver(
         request, fallback, lambda: resolver_artefato_termo_oficio(oficio, servidor)
@@ -816,7 +818,11 @@ def termo_cadastro_generico_assinado_anexar(request, pk):
 @require_POST
 def termo_cadastro_servidor_assinado_anexar(request, pk, servidor_pk):
     termo = get_object_or_404(_termo_queryset(), pk=pk)
-    servidor = get_object_or_404(filter_queryset_by_area(Servidor.objects), pk=servidor_pk)
+    servidor = get_object_or_404(Servidor, pk=servidor_pk)
+    # Aceita servidor efetivo do termo (próprio ou herdado do ofício vinculado).
+    efetivos = {s.pk for s, _oficio in termo.servidores_efetivos_com_oficio()}
+    if servidor.pk not in efetivos:
+        raise Http404("Servidor não pertence a este termo.")
     fallback = reverse("termos:editar", args=[termo.pk])
     return _anexar_assinado_resolver(
         request, fallback, lambda: resolver_artefato_termo_cadastro(termo, servidor)

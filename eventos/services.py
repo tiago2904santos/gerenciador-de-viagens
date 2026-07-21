@@ -112,9 +112,16 @@ def resolve_evento_from_request(request):
         evento_id = int(raw)
     except (TypeError, ValueError):
         return None
+    from core.tenancy import filter_queryset_by_area
+
     from .models import Evento
 
-    return Evento.objects.filter(pk=evento_id).select_related("unidade_responsavel", "responsavel").first()
+    return (
+        filter_queryset_by_area(Evento.objects)
+        .filter(pk=evento_id)
+        .select_related("unidade_responsavel", "responsavel", "area")
+        .first()
+    )
 
 
 def resolve_evento_cidade_estado(evento):

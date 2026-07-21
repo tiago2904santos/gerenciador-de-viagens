@@ -5,7 +5,7 @@
     <div class="oficio-lc__transport-card oficio-lc__transport-card--trechos">
       <span class="oficio-lc__transport-label">Ofícios{% if card.oficios_count %} ({{ card.oficios_count }}){% endif %}</span>
       {% if card.oficios %}
-      <div class="oficio-lc__trechos-list">
+      <div class="oficio-lc__trechos-list evento-lc__items-grid">
         {% for oficio in card.oficios %}
         <div class="oficio-lc__trecho oficio-lc__trecho--documento">
           <div class="oficio-lc__trecho-body">
@@ -58,10 +58,10 @@
       {% endif %}
     </div>
 
-    <div class="oficio-lc__transport-card oficio-lc__transport-card--trechos">
+    <div class="oficio-lc__transport-card oficio-lc__transport-card--trechos evento-lc__documentos-card">
       <span class="oficio-lc__transport-label">Documentos{% if card.documentos_count %} ({{ card.documentos_count }}){% endif %}</span>
       {% if card.documentos %}
-      <div class="oficio-lc__trechos-list">
+      <div class="oficio-lc__trechos-list evento-lc__items-grid">
         {% for doc in card.documentos %}
         <div class="oficio-lc__trecho oficio-lc__trecho--documento">
           <div class="oficio-lc__trecho-body">
@@ -113,19 +113,6 @@
       {% else %}
       <div class="oficio-lc__transport-modelo oficio-lc__text--empty">Nenhum plano, convite ou OS vinculado</div>
       {% endif %}
-    </div>
-
-    <div class="oficio-lc__transport-card oficio-lc__transport-card--valor">
-      <span class="oficio-lc__transport-label">Efetivo</span>
-      {% if card.servidores_flat_count %}
-      <div class="oficio-lc__valor-total oficio-lc__valor-total--fit">{{ card.servidores_flat_count }} servidor{{ card.servidores_flat_count|pluralize:"es" }}</div>
-      {% else %}
-      <div class="oficio-lc__valor-total oficio-lc__valor-total--fit oficio-lc__text--empty">—</div>
-      {% endif %}
-      <span class="oficio-lc__transport-label">Documentos</span>
-      {% with total_docs=card.oficios_count|add:card.documentos_count %}
-      <div class="oficio-lc__valor-medio oficio-lc__valor-medio--fit">{{ total_docs }} vinculado{{ total_docs|pluralize }}</div>
-      {% endwith %}
     </div>
 
   </div>

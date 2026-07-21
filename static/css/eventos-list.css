@@ -1,151 +1,54 @@
-.oficio-lc__traveller-badge--success {
-  background: color-mix(in srgb, var(--color-success) 18%, transparent);
-  border-color: color-mix(in srgb, var(--color-success) 55%, transparent);
-  color: var(--color-success);
-}
-
-.oficio-lc__traveller-badge--warning {
-  background: color-mix(in srgb, var(--color-warning) 18%, transparent);
-  border-color: color-mix(in srgb, var(--color-warning) 55%, transparent);
-  color: var(--color-warning);
-}
-
-.oficio-lc__traveller-badge--muted {
-  background: color-mix(in srgb, var(--color-muted) 18%, transparent);
-  border-color: color-mix(in srgb, var(--color-muted) 55%, transparent);
-  color: var(--color-muted);
-}
+/* ══════════════════════════════════════════════════════════════════════════
+   Lista de eventos — o card segue a linguagem do card de ofício:
+   linha de resumo (ofícios · documentos · efetivo) + grade de servidores.
+   Aqui ficam apenas os ajustes específicos do evento.
+   ══════════════════════════════════════════════════════════════════════════ */
 
 .evento-lc .oficio-lc__layout {
   gap: var(--space-4);
 }
 
-.evento-lc__section-head {
-  align-items: flex-start;
-  display: flex;
-  gap: var(--space-3);
-  justify-content: flex-end;
-  margin-bottom: var(--space-3);
-}
-
-.evento-lc__section-subtitle {
-  color: var(--color-muted);
-  font-size: var(--font-size-sm);
-  margin: var(--space-1) 0 0;
-}
-
-.evento-lc__section-link {
-  align-items: center;
-  border: 1px solid var(--color-border-soft);
-  border-radius: var(--radius-control);
-  color: var(--color-heading);
-  display: inline-flex;
-  flex: 0 0 auto;
-  font-size: var(--font-size-sm);
-  font-weight: 800;
-  min-height: 38px;
-  padding: 0 var(--space-3);
-  text-decoration: none;
-}
-
-.evento-lc__section-link:hover {
-  background: var(--color-card-muted);
-  border-color: var(--color-border-strong);
-}
-
-.evento-lc__doc-header {
-  align-items: flex-start;
-  display: flex;
-  gap: var(--space-3);
-  justify-content: space-between;
-  min-width: 0;
-}
-
-.evento-lc__doc-header .oficio-lc__trecho-actions {
-  margin-top: 0;
-}
-
-.evento-lc__oficios-card,
-.evento-lc__docs-card {
+/* Ofícios e documentos ocupam linhas independentes. */
+.evento-lc .oficio-lc__transport-row {
+  grid-template-columns: minmax(0, 1fr);
   max-height: none;
+  min-height: 0;
 }
 
-.evento-lc__oficios-list,
-.evento-lc__docs-list {
-  margin-top: var(--space-3);
+.evento-lc .oficio-lc__transport-card--trechos {
+  justify-content: flex-start;
   max-height: none;
+  min-height: 0;
 }
 
-.evento-lc .oficio-lc__transport-card--documentos {
-  height: auto;
-  max-height: none;
-}
-
-.evento-lc .oficio-lc__trechos-list {
-  box-sizing: border-box;
-  flex: 0 0 auto;
-  height: auto;
-  max-height: 264px;
-  max-width: 100%;
-  min-width: 0;
+.evento-lc .oficio-lc__transport-card--trechos .oficio-lc__trechos-list {
+  flex: 0 1 auto;
+  max-height: 152px;
   overflow-x: hidden;
   overflow-y: auto;
-  scrollbar-color: var(--color-border-strong) transparent;
-  scrollbar-width: thin;
-  width: 100%;
 }
 
-.evento-lc .oficio-lc__trechos-list > .oficio-lc__trecho {
-  box-sizing: border-box;
-  max-width: 100%;
-  min-width: 0;
-  width: 100%;
+.evento-lc__items-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
 }
 
-.evento-lc .oficio-lc__trechos-list .oficio-lc__trecho-body {
-  min-width: 0;
+@container (min-width: 680px) {
+  .evento-lc__items-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .evento-lc__items-grid > :last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
 }
 
-.evento-lc .oficio-lc__trechos-list::-webkit-scrollbar {
-  width: 4px;
+/* Badge do tipo/nº do documento não encolhe nem quebra dentro da linha. */
+.evento-lc .oficio-lc__trecho-rota .oficio-lc__traveller-badge {
+  flex-shrink: 0;
 }
 
-.evento-lc .oficio-lc__trechos-list::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.evento-lc .oficio-lc__trechos-list::-webkit-scrollbar-thumb {
-  background: var(--color-border-strong);
-  border-radius: 2px;
-}
-
-.evento-lc__sections {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  padding: 0 var(--space-4) var(--space-4);
-}
-
-.evento-lc__section-label {
-  color: var(--color-muted);
-  font-size: var(--font-size-xs);
-  font-weight: 700;
-  letter-spacing: 0.07em;
-  margin: 0 0 var(--space-2);
-  text-transform: uppercase;
-}
-
-.evento-lc__sections > .evento-lc__section-label + .oficio-lc__oficios-list,
-.evento-lc__sections > .evento-lc__section-label + .oficio-lc__documentos-list {
-  margin-top: 0;
-}
-
-.evento-lc__sections > p.evento-lc__section-label:not(:first-child) {
-  border-top: 1px solid var(--color-border-soft);
-  margin-top: var(--space-4);
-  padding-top: var(--space-4);
-}
-
+/* Unidade do servidor herda o peso do nome (separador discreto). */
 .evento-lc .oficio-lc__traveller-unidade {
   color: inherit;
   font-size: inherit;
@@ -157,130 +60,13 @@
   color: var(--color-muted);
 }
 
-.evento-lc__sections > .oficio-lc__oficios-list {
-  max-height: 165px;
-  overflow-x: hidden;
-  overflow-y: auto;
-  scrollbar-color: var(--color-border-strong) transparent;
-  scrollbar-width: thin;
-}
-
-.evento-lc__sections > .oficio-lc__oficios-list::-webkit-scrollbar { width: 4px; }
-.evento-lc__sections > .oficio-lc__oficios-list::-webkit-scrollbar-track { background: transparent; }
-.evento-lc__sections > .oficio-lc__oficios-list::-webkit-scrollbar-thumb { background: var(--color-border-strong); border-radius: 2px; }
-
-.evento-lc__sections > .oficio-lc__transport-card,
-.evento-lc__sections > .oficio-lc__documentos-list {
-  border-top: 1px solid var(--color-border-soft);
-  margin-top: var(--space-3);
-  padding-top: var(--space-3);
-}
-
-.evento-lc__sections > .oficio-lc__transport-card + .oficio-lc__transport-card {
-  border-top: 1px solid var(--color-border-soft);
-  margin-top: var(--space-3);
-  padding-top: var(--space-3);
-}
-
-.evento-lc__oficio-row {
-  flex-direction: column !important;
-  gap: 0;
-}
-
-.evento-lc__oficio-row-header {
-  align-items: center;
-  display: flex;
-  gap: var(--space-3);
-  justify-content: space-between;
-  width: 100%;
-}
-
-.evento-lc__oficio-row-trigger .oficio-lc__trecho-rota {
-  align-items: center;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-}
-
-
-.evento-lc__oficio-item {
-  padding: var(--space-4);
-}
-
-.evento-lc__oficio-item + .evento-lc__oficio-item {
-  margin-top: var(--space-3);
-}
-
-.evento-lc__oficio-header {
-  align-items: center;
-  display: flex;
-  gap: var(--space-3);
-  justify-content: space-between;
-  margin-bottom: var(--space-3);
-  min-width: 0;
-}
-
-.evento-lc__oficio-title {
-  min-width: 0;
-}
-
-.evento-lc__oficio-details {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  margin-top: var(--space-3);
-}
-
-[data-oficio-item] .evento-lc__oficio-details {
-  display: none;
-}
-
-[data-oficio-item].is-open .evento-lc__oficio-details {
-  display: flex;
-}
-
-.evento-lc__oficio-details .oficio-lc__traveller {
-  min-height: 64px;
-  width: 100%;
-}
-
-.evento-lc__oficio-collapse-btn {
-  align-items: flex-start;
-  background: none;
-  border: none;
-  color: inherit;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  padding: 0;
-  text-align: left;
-}
-
-
-.evento-lc__summary-card .oficio-lc__traveller-name {
-  color: var(--color-muted);
-  font-size: var(--font-size-xs);
-  letter-spacing: 0.08em;
-}
-
 @media (max-width: 640px) {
-  .evento-lc__section-head,
-  .evento-lc__doc-header,
-  .evento-lc__oficio-header,
-  .oficio-lc__trecho--documento {
+  .evento-lc .oficio-lc__trecho--documento {
     align-items: stretch;
     flex-direction: column;
   }
 
-  .evento-lc__section-link {
-    justify-content: center;
-    width: 100%;
-  }
-
-  .evento-lc__doc-header .oficio-lc__trecho-actions,
-  .evento-lc__oficio-header .oficio-lc__trecho-actions,
-  .oficio-lc__trecho--documento .oficio-lc__trecho-actions {
+  .evento-lc .oficio-lc__trecho--documento .oficio-lc__trecho-actions {
     justify-content: flex-start;
   }
 }
