@@ -349,11 +349,20 @@ class DarkRedesignContractTests(SimpleTestCase):
 
         self.assertIn('eyebrow="EVENTOS"', template)
         self.assertNotIn("CADASTRO DE OFICIO", template)
-        self.assertIn("Identificação do evento", template)
+        self.assertIn("Identificação", template)
         self.assertIn("Quando e onde", template)
         self.assertIn("Documentos vinculados", template)
-        self.assertIn("data-evento-doc-tabs", template)
-        self.assertIn('aria-labelledby="evento-doc-tab-oficios-d"', template)
+        documentos_body = (
+            Path(settings.BASE_DIR)
+            / "templates"
+            / "eventos"
+            / "partials"
+            / "_detalhe_documentos_body.html"
+        ).read_text(encoding="utf-8")
+        # Toggle segmentado (mesmo componente do Condução/Técnico/Apoio da OS)
+        self.assertIn("cv-segment-toggle evento-doc-toggle", documentos_body)
+        self.assertIn("data-evento-doc-toggle", documentos_body)
+        self.assertIn('data-doc-tab-target="oficios"', documentos_body)
         self.assertIn("cv-wizard-section-card--compact", page_shell)
         self.assertIn("cv-wizard-section-card--described", page_shell)
         self.assertIn("event.key === 'ArrowRight'", script)
