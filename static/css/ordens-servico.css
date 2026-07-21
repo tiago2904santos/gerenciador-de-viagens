@@ -4,12 +4,14 @@
   margin: 0;
   padding: 0;
   min-width: 0;
+  max-width: 100%;
 }
 
 .os-model-picker__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
   gap: var(--space-3);
+  max-width: 100%;
 }
 
 .os-model-card {
@@ -18,7 +20,9 @@
   align-items: flex-start;
   gap: var(--space-3);
   min-height: 100%;
+  min-width: 0;
   padding: var(--space-4);
+  box-sizing: border-box;
   border: 1px solid var(--color-border-soft);
   border-radius: var(--radius-control);
   background: var(--color-surface);
@@ -110,4 +114,75 @@
   color: var(--color-heading);
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-bold);
+}
+
+.os-servidor-role-panel {
+  margin-top: var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-muted);
+}
+
+.os-servidor-role-panel[hidden] {
+  display: none;
+}
+
+.os-servidor-role-panel__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-2);
+}
+
+.os-servidor-role-panel__title {
+  margin: 0 0 var(--space-1);
+  color: var(--color-heading);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+}
+
+.os-servidor-role-panel__hint {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  line-height: 1.45;
+}
+
+.os-servidor-role-panel__toggle {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.os-servidor-role-card {
+  cursor: pointer;
+}
+
+.os-servidor-role-card--assigned {
+  border-color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 10%, var(--selected-card-bg));
+}
+
+.os-servidor-role-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--space-6);
+  padding: 0 var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 42%, var(--color-border-soft));
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-primary) 12%, var(--color-surface));
+  color: var(--color-heading);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+}
+
+@media (max-width: 720px) {
+  .os-servidor-role-panel__header {
+    flex-direction: column;
+  }
+
+  .os-servidor-role-panel__toggle {
+    justify-content: flex-start;
+  }
 }

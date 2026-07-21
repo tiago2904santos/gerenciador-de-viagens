@@ -92,12 +92,15 @@ class GerarOrdemServicoDocxTests(TestCase):
             data_evento_inicio=date(2026, 8, 10),
             data_evento_fim=date(2026, 8, 12),
             motivo="evento institucional",
-            motorista_equipe=motorista,
-            tecnico_equipe=tecnico,
-            apoio_montagem=montagem,
-            apoio_escolta=escolta,
+            funcoes_servidores={
+                str(motorista.pk): OrdemServico.FUNCAO_CONDUCAO,
+                str(tecnico.pk): OrdemServico.FUNCAO_TECNICO,
+                str(montagem.pk): OrdemServico.FUNCAO_APOIO,
+                str(escolta.pk): OrdemServico.FUNCAO_APOIO,
+            },
         )
         ordem.destinos.set([cidade])
+        ordem.servidores.set([motorista, tecnico, montagem, escolta])
 
         response = gerar_os_docx_response(ordem)
 
@@ -108,3 +111,4 @@ class GerarOrdemServicoDocxTests(TestCase):
         self.assertIn("Deslocamento - Caminhão de apoio", text)
         self.assertIn("dois dias de antecedência", text)
         self.assertIn("Motorista Teste", text)
+        self.assertIn("conduzir a Unidade Móvel", text)

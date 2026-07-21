@@ -12,6 +12,7 @@
 
 {% block content %}
   {{ os_oficios_summary|json_script:"os-oficios-summary" }}
+  {{ os_funcoes_servidores|json_script:"os-servidor-funcoes" }}
 
   <div class="page-shell termos-page os-page">
     {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="DOCUMENTOS" title=page_title description="Cadastro de ordem de serviço" icon_label="OS" module_label="Ordens de Serviço" back_label=back_label back_url=index_url only %}
@@ -68,6 +69,20 @@
           </header>
           <div class="cv-wizard-section-body">
             {% include "components/forms/form_field.html" with field=form.servidores only %}
+            <section class="os-servidor-role-panel" data-os-model-fields="CAMINHAO" data-os-servidor-role-panel hidden>
+              <header class="os-servidor-role-panel__header">
+                <div>
+                  <h3 class="os-servidor-role-panel__title">Função no caminhão</h3>
+                  <p class="os-servidor-role-panel__hint">Escolha uma função e clique nos cards dos servidores selecionados para atribuir. Servidores sem função geram texto padrão.</p>
+                </div>
+                <div class="cv-segment-toggle os-servidor-role-panel__toggle" role="group" aria-label="Função dos servidores no caminhão">
+                  <button type="button" class="cv-segment-toggle__btn" data-os-role-mode="CONDUCAO" aria-pressed="true">Condução</button>
+                  <button type="button" class="cv-segment-toggle__btn" data-os-role-mode="TECNICO" aria-pressed="false">Técnico</button>
+                  <button type="button" class="cv-segment-toggle__btn" data-os-role-mode="APOIO" aria-pressed="false">Apoio</button>
+                </div>
+              </header>
+              <p class="os-servidor-role-panel__hint">Clique novamente em um card já marcado para remover a função.</p>
+            </section>
           </div>
         </section>
 
@@ -90,10 +105,8 @@
                       <span class="os-model-card__mark" aria-hidden="true"></span>
                       <span class="os-model-card__body">
                         <span class="os-model-card__title">{{ radio.choice_label }}</span>
-                        {% if radio.data.value == "OPERACAO_ANTECIPADA" %}
-                          <span class="os-model-card__hint">Justifica ida antecipada para preparar ou alinhar a operação policial.</span>
-                        {% elif radio.data.value == "OPERACAO_RETORNO_POSTERIOR" %}
-                          <span class="os-model-card__hint">Justifica retorno um dia após a operação policial.</span>
+                        {% if radio.data.value == "OPERACAO_RETORNO_POSTERIOR" %}
+                          <span class="os-model-card__hint">Justifica permanência da equipe policial um dia após a operação.</span>
                         {% elif radio.data.value == "CAMINHAO" %}
                           <span class="os-model-card__hint">Inclui motorista, técnico e apoios de montagem/escolta, com dois dias antes e depois.</span>
                         {% elif radio.data.value == "MICROONIBUS" %}
@@ -110,7 +123,7 @@
                 {% if form.tipo_necessidade.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.tipo_necessidade.errors only %}{% endif %}
               </fieldset>
 
-              <section class="os-model-fields field-size-4" data-os-model-fields="CAMINHAO MICROONIBUS" hidden>
+              <section class="os-model-fields field-size-4" data-os-model-fields="MICROONIBUS" hidden>
                 <header class="os-model-fields__header">
                   <h3 class="os-model-fields__title">Competências da equipe operacional</h3>
                   <p class="os-model-fields__hint">Campos usados no documento para descrever motorista, técnico e apoios.</p>

@@ -2,6 +2,12 @@
   "use strict";
 
   var CITIES_CACHE = {};
+  var OS_ROLE_ASSIGNMENTS = {};
+  var OS_ROLE_LABELS = {
+    CONDUCAO: "Condução",
+    TECNICO: "Técnico",
+    APOIO: "Apoio"
+  };
 
   /* ── Utilitários ────────────────────────────────────────────── */
 
@@ -9,6 +15,17 @@
     var script = document.getElementById("os-oficios-summary");
     if (!script) return {};
     try { return JSON.parse(script.textContent || "{}"); } catch (e) { return {}; }
+  }
+
+  function readRoleAssignments() {
+    var script = document.getElementById("os-servidor-funcoes");
+    if (!script) return {};
+    try {
+      var parsed = JSON.parse(script.textContent || "{}");
+      return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
+    } catch (e) {
+      return {};
+    }
   }
 
   function isoToDisplay(iso) {
@@ -285,6 +302,7 @@
       var input = card.querySelector("input[name='tipo_necessidade']");
       card.classList.toggle("is-selected", !!input && input.checked);
     });
+    syncServidorRoleUi(form);
     updateSubmitButtonLabel(form);
   }
 
@@ -296,6 +314,142 @@
       }
     });
     syncOsModelFields(form);
+  }
+
+  /* ── Caminhão: função direto nos cards de servidores ────────── */
+
+  function selectedServidorIds(form) {
+    var select = form.querySelector("select[name='servidores']");
+    if (!select) return [];
+    return Array.from(select.options)
+      .filter(function (option) { return option.selected; })
+      .map(function (option) { return String(option.value); })
+      .filter(Boolean);
+  }
+
+  function activeServidorRole(form) {
+    var active = form.querySelector("[data-os-role-mode][aria-pressed='true']");
+    return active ? active.dataset.osRoleMode : "CONDUCAO";
+  }
+
+  function syncServidorRoleButtons(form) {
+    form.querySelectorAll("[data-os-role-mode]").forEach(function (button) {
+      var active = button.dataset.osRoleMode === activeServidorRole(form);
+      button.setAttribute("aria-pressed", active ? "true" : "false");
+    });
+  }
+
+  function pruneServidorRoles(form) {
+    var selected = new Set(selectedServidorIds(form));
+    Object.keys(OS_ROLE_ASSIGNMENTS).forEach(function (id) {
+      if (!selected.has(String(id))) {
+        delete OS_ROLE_ASSIGNMENTS[id];
+      }
+    });
+  }
+
+  function syncServidorRoleInputs(form) {
+    form.querySelectorAll("[data-os-servidor-role-input]").forEach(function (input) {
+      input.remove();
+    });
+    if (selectedOsModel(form) !== "CAMINHAO") return;
+
+    selectedServidorIds(form).forEach(function (id) {
+      var role = OS_ROLE_ASSIGNMENTS[id];
+      if (!role) return;
+      var input = document.createElement("input");
+      input.type = "hidden";
+      input.name = "funcao_servidor_" + id;
+      input.value = role;
+      input.dataset.osServidorRoleInput = "true";
+      form.appendChild(input);
+    });
+  }
+
+  function renderServidorRoleCard(card, role, active) {
+    card.classList.toggle("os-servidor-role-card", active);
+    card.classList.toggle("os-servidor-role-card--assigned", !!role && active);
+    card.dataset.osServidorRole = role || "";
+
+    var badge = card.querySelector("[data-os-role-badge]");
+    if (!active) {
+      if (badge) badge.remove();
+      return;
+    }
+    if (!badge) {
+      badge = document.createElement("span");
+      badge.className = "os-servidor-role-badge";
+      badge.dataset.osRoleBadge = "true";
+      var titleRow = card.querySelector(".cv-search-picker__selected-title-row");
+      if (titleRow) {
+        titleRow.appendChild(badge);
+      } else {
+        card.appendChild(badge);
+      }
+    }
+    var label = role ? OS_ROLE_LABELS[role] : "Sem função - texto padrão";
+    badge.textContent = label;
+  }
+
+  function syncServidorRoleUi(form) {
+    var select = form.querySelector("select[name='servidores']");
+    if (!select) return;
+    var picker = select.nextElementSibling && select.nextElementSibling.classList.contains("cv-search-picker")
+      ? select.nextElementSibling
+      : null;
+    var isTruck = selectedOsModel(form) === "CAMINHAO";
+    pruneServidorRoles(form);
+    syncServidorRoleButtons(form);
+    syncServidorRoleInputs(form);
+
+    if (!picker) return;
+    picker.querySelectorAll(".cv-search-picker__selected-card[data-value]").forEach(function (card) {
+      var servidorId = String(card.dataset.value || "");
+      renderServidorRoleCard(card, OS_ROLE_ASSIGNMENTS[servidorId], isTruck);
+    });
+  }
+
+  function initServidorRolePicker(form) {
+    OS_ROLE_ASSIGNMENTS = readRoleAssignments();
+    form.addEventListener("click", function (event) {
+      if (selectedOsModel(form) !== "CAMINHAO") return;
+      if (event.target.closest("[data-os-role-mode]")) return;
+      if (event.target.closest(".cv-search-picker__remove")) return;
+
+      var card = event.target.closest(".cv-search-picker__selected-card[data-value]");
+      if (!card || !form.contains(card)) return;
+      var servidoresSelect = form.querySelector("select[name='servidores']");
+      var picker = servidoresSelect && servidoresSelect.nextElementSibling && servidoresSelect.nextElementSibling.classList.contains("cv-search-picker")
+        ? servidoresSelect.nextElementSibling
+        : null;
+      if (!picker || !picker.contains(card)) return;
+
+      var servidorId = String(card.dataset.value || "");
+      if (!servidorId) return;
+      var role = activeServidorRole(form);
+      if (OS_ROLE_ASSIGNMENTS[servidorId] === role) {
+        delete OS_ROLE_ASSIGNMENTS[servidorId];
+      } else {
+        OS_ROLE_ASSIGNMENTS[servidorId] = role;
+      }
+      syncServidorRoleUi(form);
+      form.dispatchEvent(new Event("change", { bubbles: true }));
+    }, true);
+
+    form.addEventListener("click", function (event) {
+      var button = event.target.closest("[data-os-role-mode]");
+      if (!button || !form.contains(button)) return;
+      form.querySelectorAll("[data-os-role-mode]").forEach(function (candidate) {
+        candidate.setAttribute("aria-pressed", candidate === button ? "true" : "false");
+      });
+      syncServidorRoleUi(form);
+    });
+    form.addEventListener("change", function (event) {
+      if (event.target && event.target.name === "servidores") {
+        window.setTimeout(function () { syncServidorRoleUi(form); }, 0);
+      }
+    });
+    window.setTimeout(function () { syncServidorRoleUi(form); }, 0);
   }
 
   /* ── Auto-fill a partir dos ofícios selecionados ───────────── */
@@ -335,6 +489,7 @@
     var servidoresSelect = form.querySelector("select[name='servidores']");
     if (servidoresSelect && allServidorIds.size) {
       setMultiSelectValues(servidoresSelect, Array.from(allServidorIds), form);
+      syncServidorRoleUi(form);
     }
 
     /* Motivo — só preenche se estiver vazio */
@@ -396,10 +551,14 @@
     var temEquipe = temServidores;
 
     if (model === "CAMINHAO" || model === "MICROONIBUS") {
-      temEquipe = ["motorista_equipe", "tecnico_equipe", "apoio_montagem", "apoio_escolta"].every(function (name) {
+      if (model === "CAMINHAO") {
+        temEquipe = temServidores;
+      } else {
+        temEquipe = ["motorista_equipe", "tecnico_equipe", "apoio_montagem", "apoio_escolta"].every(function (name) {
         var field = form.querySelector("select[name='" + name + "']");
         return !!(field && field.value);
       });
+      }
     } else if (model === "CERIMONIAL_ANTECIPADO") {
       temEquipe = ["coordenador_cerimonial", "apoio_cerimonial", "apoio_preparacao"].every(function (name) {
         var field = form.querySelector("select[name='" + name + "']");
@@ -589,6 +748,15 @@
       }
     });
 
+    Object.keys(draft).forEach(function (name) {
+      if (!name.startsWith("funcao_servidor_") || !draft[name] || !draft[name].length) return;
+      var servidorId = name.replace("funcao_servidor_", "");
+      var role = String(draft[name][0] || "").toUpperCase();
+      if (OS_ROLE_LABELS[role]) {
+        OS_ROLE_ASSIGNMENTS[servidorId] = role;
+      }
+    });
+
     if (draft.motivo && draft.motivo.length) {
       var motivoField = form.querySelector("[data-motivo-textarea='true']");
       if (motivoField) {
@@ -598,6 +766,7 @@
     }
 
     syncOsModelFields(form);
+    syncServidorRoleUi(form);
     updateSubmitButtonLabel(form);
   }
 
@@ -610,6 +779,7 @@
     var summaries = readSummaries();
     initModeloMotivo(form);
     initOsModelPicker(form);
+    initServidorRolePicker(form);
     initOficioAutoFill(form, summaries);
     syncDestinationCities(form);
     syncAddDestinationButton(form);
