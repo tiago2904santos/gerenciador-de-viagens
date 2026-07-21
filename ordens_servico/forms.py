@@ -16,6 +16,12 @@ from oficios.models import Oficio
 
 from .models import OrdemServico
 
+FUNCOES_SERVIDOR_VALIDAS = {
+    OrdemServico.FUNCAO_CONDUCAO,
+    OrdemServico.FUNCAO_TECNICO,
+    OrdemServico.FUNCAO_APOIO,
+}
+
 
 class OficioMultiSelectWidget(forms.SelectMultiple):
     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
@@ -354,16 +360,40 @@ class OrdemServicoForm(forms.ModelForm):
                 continue
             destinos.append(cidade_obj.pk)
         self.cleaned_destinos = destinos
+        self.cleaned_funcoes_servidores = self._clean_funcoes_servidores(cleaned)
 
         return cleaned
+
+    def _clean_funcoes_servidores(self, cleaned):
+        if cleaned.get("tipo_necessidade") != OrdemServico.TIPO_CAMINHAO:
+            return {}
+        servidores = cleaned.get("servidores")
+        servidor_ids = {str(servidor.pk) for servidor in servidores} if servidores is not None else set()
+        funcoes = {}
+        for name, value in self.data.items():
+            if not name.startswith("funcao_servidor_"):
+                continue
+            servidor_id = name.removeprefix("funcao_servidor_").strip()
+            funcao = (value or "").strip().upper()
+            if not servidor_id or servidor_id not in servidor_ids:
+                continue
+            if not funcao:
+                continue
+            if funcao not in FUNCOES_SERVIDOR_VALIDAS:
+                self.add_error(None, "Selecione uma função válida para os servidores da equipe.")
+                continue
+            funcoes[servidor_id] = funcao
+        return funcoes
 
     def save(self, commit=True):
         ordem = super().save(commit=commit)
         destino_ids = getattr(self, "cleaned_destinos", []) or []
         if not destino_ids and self.cleaned_data.get("destino_cidade"):
             destino_ids = [self.cleaned_data["destino_cidade"].pk]
+        ordem.funcoes_servidores = getattr(self, "cleaned_funcoes_servidores", {}) or {}
 
         if commit:
             ordem.destinos.set(destino_ids)
+            ordem.save(update_fields=["funcoes_servidores", "updated_at"])
 
         return ordem

@@ -9,6 +9,7 @@ from cadastros.models import Estado
 from cadastros.models import Servidor
 
 from ..docxtpl_context import build_os_docxtpl_context
+from ..forms import OrdemServicoForm
 from ..models import OrdemServico
 
 
@@ -20,6 +21,7 @@ class OrdemServicoDocxtplContextTests(TestCase):
         self.tecnico = Servidor.objects.create(nome="TECNICO TESTE")
         self.montagem = Servidor.objects.create(nome="APOIO MONTAGEM")
         self.escolta = Servidor.objects.create(nome="APOIO ESCOLTA")
+        self.apoio_extra = Servidor.objects.create(nome="APOIO EXTRA")
         self.coordenador = Servidor.objects.create(nome="COORDENADOR CERIMONIAL")
         self.apoio = Servidor.objects.create(nome="APOIO CERIMONIAL")
         self.preparacao = Servidor.objects.create(nome="APOIO PREPARACAO")
@@ -39,16 +41,56 @@ class OrdemServicoDocxtplContextTests(TestCase):
             apoio_preparacao=self.preparacao,
         )
         ordem.destinos.set([self.cidade])
+        ordem.servidores.set([
+            self.motorista,
+            self.tecnico,
+            self.montagem,
+            self.escolta,
+            self.apoio_extra,
+        ])
         return ordem
 
-    def test_caminhao_descreve_competencias_e_dois_dias(self):
-        ctx = build_os_docxtpl_context(self._ordem(OrdemServico.TIPO_CAMINHAO))
+    def test_caminhao_descreve_competencias_por_funcao_e_dois_dias(self):
+        ordem = self._ordem(OrdemServico.TIPO_CAMINHAO)
+        ordem.funcoes_servidores = {
+            str(self.motorista.pk): OrdemServico.FUNCAO_CONDUCAO,
+            str(self.tecnico.pk): OrdemServico.FUNCAO_TECNICO,
+            str(self.montagem.pk): OrdemServico.FUNCAO_APOIO,
+            str(self.escolta.pk): OrdemServico.FUNCAO_APOIO,
+        }
+        ordem.save(update_fields=["funcoes_servidores"])
+
+        ctx = build_os_docxtpl_context(ordem)
 
         self.assertEqual(ctx["referencia"], "Deslocamento - Caminhão de apoio")
-        self.assertEqual(len(ctx["competencias_equipe"]), 4)
-        self.assertIn("Motorista Teste", ctx["competencias_equipe"][0])
+        self.assertEqual(len(ctx["competencias_equipe"]), 3)
+        self.assertIn("Motorista Teste – conduzir a Unidade Móvel (caminhão)", ctx["competencias_equipe"][0])
+        self.assertIn("Tecnico Teste – prestar apoio técnico", ctx["competencias_equipe"][1])
+        self.assertIn("Apoio Montagem e Apoio Escolta: realizar a escolta", ctx["competencias_equipe"][2])
+        self.assertNotIn("Apoio Extra", " ".join(ctx["competencias_equipe"]))
         self.assertIn("dois dias de antecedência", " ".join(ctx["justificativas"]))
         self.assertIn("dois dias posteriores", " ".join(ctx["justificativas"]))
+
+    def test_caminhao_sem_funcao_gera_texto_padrao(self):
+        ctx = build_os_docxtpl_context(self._ordem(OrdemServico.TIPO_CAMINHAO))
+
+        self.assertEqual(ctx["referencia"], "Diligências")
+        self.assertEqual(ctx["competencias_equipe"], [])
+        self.assertEqual(ctx["justificativas"], [])
+
+    def test_caminhao_tecnico_e_opcional(self):
+        ordem = self._ordem(OrdemServico.TIPO_CAMINHAO)
+        ordem.funcoes_servidores = {
+            str(self.motorista.pk): OrdemServico.FUNCAO_CONDUCAO,
+            str(self.montagem.pk): OrdemServico.FUNCAO_APOIO,
+            str(self.escolta.pk): OrdemServico.FUNCAO_APOIO,
+        }
+        ordem.save(update_fields=["funcoes_servidores"])
+
+        ctx = build_os_docxtpl_context(ordem)
+
+        self.assertEqual(len(ctx["competencias_equipe"]), 2)
+        self.assertNotIn("prestar apoio técnico", " ".join(ctx["competencias_equipe"]))
 
     def test_microonibus_nao_aplica_regra_de_dois_dias(self):
         ctx = build_os_docxtpl_context(self._ordem(OrdemServico.TIPO_MICROONIBUS))
@@ -65,8 +107,42 @@ class OrdemServicoDocxtplContextTests(TestCase):
         self.assertIn("Coordenador Cerimonial", ctx["competencias_equipe"][0])
         self.assertIn("visita técnica prévia", " ".join(ctx["justificativas"]))
 
-    def test_operacao_retorno_posterior_justifica_um_dia(self):
+    def test_operacao_policial_justifica_apenas_um_dia_posterior(self):
         ctx = build_os_docxtpl_context(self._ordem(OrdemServico.TIPO_OPERACAO_RETORNO_POSTERIOR))
 
-        self.assertEqual(ctx["referencia"], "Deslocamento - Operação policial com retorno posterior")
-        self.assertIn("retorno um dia posterior", " ".join(ctx["justificativas"]))
+        self.assertEqual(ctx["referencia"], "Deslocamento - Operação policial com um dia posterior")
+        self.assertEqual(len(ctx["justificativas"]), 1)
+        justificativa = ctx["justificativas"][0]
+        self.assertIn("A concessão de um dia posterior justifica-se", justificativa)
+        self.assertIn("produção de material jornalístico durante o briefing", justificativa)
+        self.assertIn("assessoria de imprensa pós-operação", justificativa)
+        self.assertIn("permanência da equipe policial", justificativa)
+        self.assertNotIn("ida antecipada", justificativa.lower())
+
+    def test_form_salva_funcoes_dinamicas_dos_servidores(self):
+        form = OrdemServicoForm(
+            data={
+                "data_evento_inicio": "2026-08-10",
+                "data_evento_fim": "2026-08-12",
+                "destino_estado": str(self.estado.pk),
+                "destino_cidade": str(self.cidade.pk),
+                "servidores": [str(self.motorista.pk), str(self.montagem.pk), str(self.escolta.pk)],
+                "tipo_necessidade": OrdemServico.TIPO_CAMINHAO,
+                "funcao_servidor_%s" % self.motorista.pk: OrdemServico.FUNCAO_CONDUCAO,
+                "funcao_servidor_%s" % self.montagem.pk: OrdemServico.FUNCAO_APOIO,
+                "funcao_servidor_%s" % self.escolta.pk: OrdemServico.FUNCAO_APOIO,
+                "motivo": "evento institucional",
+            }
+        )
+
+        self.assertTrue(form.is_valid(), form.errors.as_data())
+        ordem = form.save()
+
+        self.assertEqual(
+            ordem.funcoes_servidores,
+            {
+                str(self.motorista.pk): OrdemServico.FUNCAO_CONDUCAO,
+                str(self.montagem.pk): OrdemServico.FUNCAO_APOIO,
+                str(self.escolta.pk): OrdemServico.FUNCAO_APOIO,
+            },
+        )

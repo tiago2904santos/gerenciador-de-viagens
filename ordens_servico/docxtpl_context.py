@@ -183,6 +183,55 @@ def _competencias_transporte(ordem: OrdemServico) -> list[str]:
     ]
 
 
+def _servidores_por_funcao(ordem: OrdemServico, funcao: str) -> list:
+    funcoes = {str(k): v for k, v in (ordem.funcoes_servidores or {}).items()}
+    servidor_ids = [int(servidor_id) for servidor_id, valor in funcoes.items() if valor == funcao and servidor_id.isdigit()]
+    if not servidor_ids:
+        return []
+    ordem_map = {servidor_id: index for index, servidor_id in enumerate(servidor_ids)}
+    servidores = [
+        servidor
+        for servidor in ordem.servidores.all()
+        if servidor.pk in ordem_map
+    ]
+    return sorted(servidores, key=lambda servidor: ordem_map[servidor.pk])
+
+
+def _lista_nomes(servidores) -> str:
+    nomes = [_nome_servidor(servidor) for servidor in servidores]
+    nomes = [nome for nome in nomes if nome]
+    if len(nomes) <= 1:
+        return nomes[0] if nomes else ""
+    return ", ".join(nomes[:-1]) + f" e {nomes[-1]}"
+
+
+def _competencia_grupo(servidores, texto: str) -> str:
+    nomes = _lista_nomes(servidores)
+    if not nomes:
+        return ""
+    separador = " – " if len(servidores) == 1 else ": "
+    return f"{nomes}{separador}{texto}"
+
+
+def _competencias_caminhao(ordem: OrdemServico) -> list[str]:
+    destino = _destinos_display(ordem) or "município de destino"
+    textos = [
+        _competencia_grupo(
+            _servidores_por_funcao(ordem, OrdemServico.FUNCAO_CONDUCAO),
+            "conduzir a Unidade Móvel (caminhão), realizando o deslocamento desde o local onde o veículo estiver estacionado até o município de destino e, ao término das atividades, o retorno ao local de guarda do veículo, computando-se todo o percurso. Caberá, ainda, prestar apoio às atividades de instalação, posicionamento, operação e desmontagem da estrutura da Unidade Móvel.",
+        ),
+        _competencia_grupo(
+            _servidores_por_funcao(ordem, OrdemServico.FUNCAO_TECNICO),
+            "prestar apoio técnico na instalação, configuração, testes e operação dos equipamentos de informática, rede lógica, comunicação e demais sistemas utilizados durante os atendimentos. Deverá deslocar-se antecipadamente ao local do evento para verificar as condições de fornecimento de energia elétrica, conectividade de internet e infraestrutura necessária ao funcionamento da Unidade Móvel, considerando que, em razão da dinâmica da operação, não foi possível a realização de visita técnica prévia.",
+        ),
+        _competencia_grupo(
+            _servidores_por_funcao(ordem, OrdemServico.FUNCAO_APOIO),
+            f"realizar a escolta e o apoio operacional da Unidade Móvel durante todo o deslocamento entre Curitiba e {destino}, bem como no retorno, computando-se todo o trajeto. Deverá auxiliar na montagem, organização, manutenção operacional e desmontagem dos equipamentos da Unidade Móvel.",
+        ),
+    ]
+    return [texto for texto in textos if texto]
+
+
 def _competencias_cerimonial(ordem: OrdemServico) -> list[str]:
     return [
         item
@@ -220,38 +269,29 @@ def _texto_modelo(ordem: OrdemServico, motivo: str) -> dict[str, object]:
         "finalidade": "A presente Ordem de Serviço tem por finalidade garantir a execução da atividade designada, com observância às normas administrativas aplicáveis.",
     }
 
-    if tipo == OrdemServico.TIPO_OPERACAO_ANTECIPADA:
+    if tipo == OrdemServico.TIPO_OPERACAO_RETORNO_POSTERIOR:
         textos.update({
-            "referencia": "Deslocamento - Operação policial com ida antecipada",
+            "referencia": "Deslocamento - Operação policial com um dia posterior",
             "determinacao": (
                 f"O deslocamento {_equipe_deslocamento(ordem)} para o município de {destino}, "
                 f"{_periodo_extenso(ordem.data_evento_inicio, ordem.data_evento_fim)}, para atuação em operação policial relacionada a {motivo_doc}."
             ),
             "justificativas": [
-                "A ida antecipada faz-se necessária para alinhamento prévio com as equipes envolvidas, reconhecimento do local de atuação, organização logística e preparação das providências indispensáveis à execução da operação policial.",
+                "A concessão de um dia posterior justifica-se pelo fato de que as atividades planejadas para a operação policial abrangem desde a produção de material jornalístico durante o briefing e o acompanhamento do cumprimento dos mandados judiciais, até a prestação de assessoria de imprensa pós-operação, incluindo a condução de entrevistas coletivas e o atendimento às demandas dos veículos de comunicação. Diante disso, evidencia-se a necessidade de permanência da equipe policial na referida localidade mesmo após a conclusão das diligências operacionais.",
             ],
-            "finalidade": "A presente Ordem de Serviço tem por finalidade assegurar que a equipe esteja previamente posicionada e preparada para o adequado cumprimento das atividades de polícia judiciária.",
-        })
-    elif tipo == OrdemServico.TIPO_OPERACAO_RETORNO_POSTERIOR:
-        textos.update({
-            "referencia": "Deslocamento - Operação policial com retorno posterior",
-            "determinacao": (
-                f"O deslocamento {_equipe_deslocamento(ordem)} para o município de {destino}, "
-                f"{_periodo_extenso(ordem.data_evento_inicio, ordem.data_evento_fim)}, para atuação em operação policial relacionada a {motivo_doc}."
-            ),
-            "justificativas": [
-                "O retorno um dia posterior à operação faz-se necessário em razão do encerramento das atividades, consolidação das providências administrativas e operacionais, recolhimento de materiais e deslocamento seguro da equipe após a finalização dos trabalhos.",
-            ],
-            "finalidade": "A presente Ordem de Serviço tem por finalidade assegurar a conclusão regular da operação policial e o retorno da equipe após o encerramento das providências necessárias.",
+            "finalidade": "A presente Ordem de Serviço tem por finalidade assegurar a cobertura jornalística, a assessoria de imprensa e o atendimento às demandas de comunicação vinculadas à operação policial.",
         })
     elif tipo == OrdemServico.TIPO_CAMINHAO:
+        competencias_caminhao = _competencias_caminhao(ordem)
+        if not competencias_caminhao:
+            return textos
         textos.update({
             "referencia": "Deslocamento - Caminhão de apoio",
             "determinacao": (
                 f"O deslocamento da equipe abaixo relacionada para o município de {destino}, "
                 f"{_periodo_extenso(ordem.data_evento_inicio, ordem.data_evento_fim)}, para apoio logístico com caminhão em {motivo_doc}, observadas as atribuições a seguir:"
             ),
-            "competencias_equipe": _competencias_transporte(ordem),
+            "competencias_equipe": competencias_caminhao,
             "justificativas": [
                 "O deslocamento do caminhão com dois dias de antecedência faz-se necessário para viabilizar o traslado, descarga, montagem, conferência técnica e adequação dos materiais e equipamentos no local do evento.",
                 "A permanência por dois dias posteriores ao evento justifica-se pela necessidade de desmontagem, conferência, acondicionamento, carregamento dos materiais e retorno do veículo com segurança, preservando os bens públicos utilizados.",
