@@ -263,11 +263,13 @@ def _ordem_is_completa(form, evento_display):
         tipo = (form.data.get("tipo_necessidade") or "").strip()
         tipo_ok = bool(tipo)
         motivo_ok = bool((form.data.get("motivo") or "").strip())
-        if tipo in {OrdemServico.TIPO_CAMINHAO, OrdemServico.TIPO_MICROONIBUS}:
+        if tipo == OrdemServico.TIPO_MICROONIBUS:
             equipe_ok = all(
                 bool((form.data.get(field_name) or "").strip())
                 for field_name in ("motorista_equipe", "tecnico_equipe", "apoio_montagem", "apoio_escolta")
             )
+        elif tipo == OrdemServico.TIPO_CAMINHAO:
+            equipe_ok = servidores_ok
         elif tipo == OrdemServico.TIPO_CERIMONIAL_ANTECIPADO:
             equipe_ok = all(
                 bool((form.data.get(field_name) or "").strip())
@@ -283,11 +285,13 @@ def _ordem_is_completa(form, evento_display):
         tipo = (getattr(form.instance, "tipo_necessidade", "") or "").strip()
         tipo_ok = bool(tipo)
         motivo_ok = bool((getattr(form.instance, "motivo", "") or "").strip())
-        if tipo in {OrdemServico.TIPO_CAMINHAO, OrdemServico.TIPO_MICROONIBUS}:
+        if tipo == OrdemServico.TIPO_MICROONIBUS:
             equipe_ok = all(
                 bool(getattr(form.instance, field_name + "_id", None))
                 for field_name in ("motorista_equipe", "tecnico_equipe", "apoio_montagem", "apoio_escolta")
             )
+        elif tipo == OrdemServico.TIPO_CAMINHAO:
+            equipe_ok = servidores_ok
         elif tipo == OrdemServico.TIPO_CERIMONIAL_ANTECIPADO:
             equipe_ok = all(
                 bool(getattr(form.instance, field_name + "_id", None))
@@ -329,6 +333,7 @@ def _form_context(*, request, form, ordem=None, evento=None):
         "evento_selected_dates_json": _evento_selected_dates_json(form),
         "evento_display": evento_display,
         "os_oficios_summary": summaries,
+        "os_funcoes_servidores": getattr(form.instance, "funcoes_servidores", None) or {},
         "os_is_completa": _ordem_is_completa(form, evento_display),
     }
 

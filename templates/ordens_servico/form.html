@@ -12,6 +12,7 @@
 
 {% block content %}
   {{ os_oficios_summary|json_script:"os-oficios-summary" }}
+  {{ os_funcoes_servidores|json_script:"os-servidor-funcoes" }}
 
   <div class="page-shell termos-page os-page">
     {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="DOCUMENTOS" title=page_title description="Cadastro de ordem de serviço" icon_label="OS" module_label="Ordens de Serviço" back_label=back_label back_url=index_url only %}

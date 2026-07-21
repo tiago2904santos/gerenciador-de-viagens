@@ -12,16 +12,24 @@ from oficios.models import Oficio
 
 class OrdemServico(TimeStampedModel, CancelavelModel):
     TIPO_PADRAO = "PADRAO"
-    TIPO_OPERACAO_ANTECIPADA = "OPERACAO_ANTECIPADA"
     TIPO_OPERACAO_RETORNO_POSTERIOR = "OPERACAO_RETORNO_POSTERIOR"
     TIPO_CAMINHAO = "CAMINHAO"
     TIPO_MICROONIBUS = "MICROONIBUS"
     TIPO_CERIMONIAL_ANTECIPADO = "CERIMONIAL_ANTECIPADO"
 
+    FUNCAO_CONDUCAO = "CONDUCAO"
+    FUNCAO_TECNICO = "TECNICO"
+    FUNCAO_APOIO = "APOIO"
+
+    FUNCAO_SERVIDOR_CHOICES = [
+        (FUNCAO_CONDUCAO, "Condução"),
+        (FUNCAO_TECNICO, "Técnico"),
+        (FUNCAO_APOIO, "Apoio"),
+    ]
+
     TIPO_NECESSIDADE_CHOICES = [
         (TIPO_PADRAO, "Padrão / texto livre"),
-        (TIPO_OPERACAO_ANTECIPADA, "Operação policial - ida antecipada"),
-        (TIPO_OPERACAO_RETORNO_POSTERIOR, "Operação policial - retorno posterior"),
+        (TIPO_OPERACAO_RETORNO_POSTERIOR, "Operação policial - um dia posterior"),
         (TIPO_CAMINHAO, "Caminhão - dois dias antes e depois"),
         (TIPO_MICROONIBUS, "Micro-ônibus"),
         (TIPO_CERIMONIAL_ANTECIPADO, "Cerimonial - ida antecipada"),
@@ -126,6 +134,7 @@ class OrdemServico(TimeStampedModel, CancelavelModel):
         related_name="+",
         verbose_name="Apoio de preparação",
     )
+    funcoes_servidores = models.JSONField("Funções dos servidores", blank=True, default=dict)
     motivo = models.TextField("Motivo", blank=True, default="")
 
     class Meta:
