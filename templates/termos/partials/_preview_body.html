@@ -67,10 +67,10 @@
   </details>
 
   {% if docs.servidores %}
-    {% if docs.servidores|length > 1 and docs.download_todos_pdf_url %}
-      <div class="document-inline-card document-inline-card--static">
-        <div class="document-inline-card__header">
-          <span class="document-inline-card__title">Termos por servidor</span>
+    <details class="document-inline-card document-inline-card--termos">
+      <summary class="document-inline-card__header">
+        <span class="document-inline-card__title">Termos por servidor</span>
+        {% if docs.servidores|length > 1 and docs.download_todos_pdf_url %}
           <span class="document-inline-card__header-end">
             <span class="document-inline-actions document-inline-actions--header" aria-label="Ações de todos os termos">
               <button
@@ -92,68 +92,72 @@
               </div>
             </span>
           </span>
-        </div>
-      </div>
-    {% endif %}
-    {% for doc in docs.servidores %}
-      <details class="document-inline-card document-inline-card--lazy" data-lazy-inline>
-        <summary class="document-inline-card__header">
-          <span class="document-inline-card__title">{{ doc.titulo }}</span>
-          <span class="document-inline-card__header-end">
-            <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do termo de {{ doc.servidor_nome }}">
-              <button
-                class="cv-icon-btn cv-icon-btn--settings"
-                type="button"
-                aria-label="Abrir ações do termo de {{ doc.servidor_nome }}"
-                aria-haspopup="true"
-                aria-expanded="false"
-                data-tooltip="Visualizar, baixar e anexar"
-                data-action-menu-trigger
-                data-action-menu-target="termo-cadastro-servidor-menu-{{ doc.id }}"
-              >{% include "components/ui/icons/icon.html" with icon="folder" only %}</button>
-              <div class="cv-action-menu cv-action-menu--rich" id="termo-cadastro-servidor-menu-{{ doc.id }}" role="menu" hidden>
-                {% if doc.assinado %}
-                  {% include "components/ui/menus/rich_menu_header.html" with title="Termo assinado" subtitle=doc.servidor_nome icon="sign" only %}
-                {% else %}
-                  {% include "components/ui/menus/rich_menu_header.html" with title="Termo de autorização" subtitle=doc.servidor_nome icon="folder" only %}
-                {% endif %}
-                {% include "components/ui/menus/rich_menu_link.html" with href=doc.inline_url title="Visualizar termo" description="Abrir o PDF no navegador" icon="eye" tone="preview" target_blank=True only %}
-                {% if doc.anexar_assinado_url %}
-                <button
-                  type="button"
-                  class="cv-action-menu__item cv-action-menu__item--rich{% if doc.assinado %} is-assinado{% endif %}"
-                  role="menuitem"
-                  data-attach-signed-trigger
-                  data-attach-signed-url="{{ doc.anexar_assinado_url }}"
-                  data-attach-signed-doc-label="o termo de {{ doc.servidor_nome }}"
-                  data-attach-signed-current-name="{{ doc.assinado_nome_original }}"
-                  data-attach-signed-current-view-url="{{ doc.assinado_view_url }}"
-                  data-attach-signed-current-remove-url="{{ doc.remover_assinado_url }}"
-                >
-                  <span class="cv-action-menu__item-icon cv-action-menu__item-icon--success" aria-hidden="true">
-                    {% include "components/ui/icons/icon.html" with icon="sign" only %}
-                  </span>
-                  <span class="cv-action-menu__item-copy">
-                    <strong>{% if doc.assinado %}Gerenciar assinado{% else %}Anexar termo assinado{% endif %}</strong>
-                    <small>{% if doc.assinado %}Visualizar, substituir ou remover{% else %}Enviar o PDF depois da assinatura{% endif %}</small>
-                  </span>
-                </button>
-                {% endif %}
+        {% endif %}
+      </summary>
+      <div class="document-inline-card__body document-inline-card__body--termos">
+        {% for doc in docs.servidores %}
+          <details class="document-inline-card document-inline-card--nested document-inline-card--lazy"
+                   data-lazy-inline
+                   data-termo-inline-url="{{ doc.inline_url }}">
+            <summary class="document-inline-card__header">
+              <span class="document-inline-card__title">{{ doc.titulo }}</span>
+              <span class="document-inline-card__header-end">
+                <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do termo de {{ doc.servidor_nome }}">
+                  <button
+                    class="cv-icon-btn cv-icon-btn--settings"
+                    type="button"
+                    aria-label="Abrir ações do termo de {{ doc.servidor_nome }}"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                    data-tooltip="Visualizar, baixar e anexar"
+                    data-action-menu-trigger
+                    data-action-menu-target="termo-cadastro-servidor-menu-{{ doc.id }}"
+                  >{% include "components/ui/icons/icon.html" with icon="folder" only %}</button>
+                  <div class="cv-action-menu cv-action-menu--rich" id="termo-cadastro-servidor-menu-{{ doc.id }}" role="menu" hidden>
+                    {% if doc.assinado %}
+                      {% include "components/ui/menus/rich_menu_header.html" with title="Termo assinado" subtitle=doc.servidor_nome icon="sign" only %}
+                    {% else %}
+                      {% include "components/ui/menus/rich_menu_header.html" with title="Termo de autorização" subtitle=doc.servidor_nome icon="folder" only %}
+                    {% endif %}
+                    {% include "components/ui/menus/rich_menu_link.html" with href=doc.inline_url title="Visualizar termo" description="Abrir o PDF no navegador" icon="eye" tone="preview" target_blank=True only %}
+                    {% if doc.anexar_assinado_url %}
+                    <button
+                      type="button"
+                      class="cv-action-menu__item cv-action-menu__item--rich{% if doc.assinado %} is-assinado{% endif %}"
+                      role="menuitem"
+                      data-attach-signed-trigger
+                      data-attach-signed-url="{{ doc.anexar_assinado_url }}"
+                      data-attach-signed-doc-label="o termo de {{ doc.servidor_nome }}"
+                      data-attach-signed-current-name="{{ doc.assinado_nome_original }}"
+                      data-attach-signed-current-view-url="{{ doc.assinado_view_url }}"
+                      data-attach-signed-current-remove-url="{{ doc.remover_assinado_url }}"
+                    >
+                      <span class="cv-action-menu__item-icon cv-action-menu__item-icon--success" aria-hidden="true">
+                        {% include "components/ui/icons/icon.html" with icon="sign" only %}
+                      </span>
+                      <span class="cv-action-menu__item-copy">
+                        <strong>{% if doc.assinado %}Gerenciar assinado{% else %}Anexar termo assinado{% endif %}</strong>
+                        <small>{% if doc.assinado %}Visualizar, substituir ou remover{% else %}Enviar o PDF depois da assinatura{% endif %}</small>
+                      </span>
+                    </button>
+                    {% endif %}
+                  </div>
+                </span>
+              </span>
+            </summary>
+            <div class="document-inline-card__body">
+              <div class="document-inline-viewer">
+                <iframe
+                  class="document-inline-viewer__frame"
+                  data-src="{{ doc.inline_url }}"
+                  title="Visualização do termo de {{ doc.servidor_nome }}"
+                  loading="lazy"
+                ></iframe>
               </div>
-            </span>
-          </span>
-        </summary>
-        <div class="document-inline-card__body">
-          <div class="document-inline-viewer">
-            <iframe
-              class="document-inline-viewer__frame"
-              data-src="{{ doc.inline_url }}"
-              title="Visualização do termo de {{ doc.servidor_nome }}"
-              loading="lazy"
-            ></iframe>
-          </div>
-        </div>
-      </details>
-    {% endfor %}
+            </div>
+          </details>
+        {% endfor %}
+      </div>
+    </details>
   {% endif %}
 {% endwith %}

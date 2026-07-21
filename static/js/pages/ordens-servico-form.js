@@ -3,12 +3,61 @@
 
   var CITIES_CACHE = {};
 
+  var ROUTE_AVATAR_ICON =
+    '<svg class="cv-icon oficio-roteiro-route-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false" fill="none">' +
+      '<circle cx="6" cy="19" r="2.5" fill="currentColor"></circle>' +
+      '<circle cx="18" cy="5" r="2.5" fill="currentColor"></circle>' +
+      '<path d="M8.2 18.2h6.1a3.3 3.3 0 0 0 0-6.6H9.7a3.3 3.3 0 0 1 0-6.6h6.1" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>' +
+    '</svg>';
+
   /* ── Utilitários ────────────────────────────────────────────── */
 
   function readSummaries() {
     var script = document.getElementById("os-oficios-summary");
     if (!script) return {};
     try { return JSON.parse(script.textContent || "{}"); } catch (e) { return {}; }
+  }
+
+  function normalize(value) {
+    return String(value || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+  }
+
+  function routeCardTitle(summary) {
+    var label = String(summary.label || "").trim();
+    var destino = String(summary.roteiro || summary.destino || "")
+      .trim()
+      .replace(/\s*->\s*/g, " \u2192 ");
+    return [label, destino].filter(Boolean).join(" ");
+  }
+
+  function firstNames(summary) {
+    var nomes = summary.servidores_nomes;
+    if (!nomes || !nomes.length) {
+      nomes = String(summary.servidores_label || "")
+        .split(",")
+        .map(function (nome) { return nome.trim(); })
+        .filter(Boolean);
+    }
+    return nomes
+      .map(function (nome) { return String(nome || "").trim().split(/\s+/)[0] || ""; })
+      .filter(Boolean);
+  }
+
+  function viaturaLabel(summary) {
+    var placa = String(summary.viatura || "").trim();
+    var modelo = String(summary.viatura_modelo || "").trim();
+    return [placa, modelo].filter(Boolean).join(" ");
+  }
+
+  function routeCardMeta(summary) {
+    var periodo = String(summary.periodo || "").trim();
+    var servidores = firstNames(summary).join(", ");
+    var viatura = viaturaLabel(summary);
+    var parts = [periodo, servidores, viatura].filter(Boolean);
+    return parts.length ? parts.join(" \u00b7 ") : "Sem informa\u00e7\u00f5es dispon\u00edveis";
   }
 
   function isoToDisplay(iso) {
@@ -140,6 +189,10 @@
         extraCityPrefix: "destino_cidade_",
         managedFlag: "osDestinosManaged",
         readyAttr: "osDestinoReady",
+        onRow: function (row, index) {
+          var badge = row.querySelector("[data-destino-ord]");
+          if (badge) badge.textContent = String(index + 1);
+        },
         loadCities: function (citySelect, stateId, selectedCityId) {
           return loadCitiesForState(form, citySelect, stateId, selectedCityId).then(function (cities) {
             updateSubmitButtonLabel(form);
@@ -300,14 +353,28 @@
 
   /* ── Auto-fill a partir dos ofícios selecionados ───────────── */
 
+  function selectedOficioIds(select) {
+    if (!select) return [];
+    return Array.from(select.options)
+      .filter(function (o) { return o.selected && o.value; })
+      .map(function (o) { return String(o.value); });
+  }
+
+  function setOficioSelected(select, id, selected) {
+    if (!select) return;
+    var target = String(id);
+    Array.from(select.options).forEach(function (opt) {
+      if (String(opt.value) === target) {
+        opt.selected = !!selected;
+      }
+    });
+  }
+
   function onOficiosChange(form, summaries) {
     var oficiosSelect = form.querySelector("select[name='oficios']");
     if (!oficiosSelect) return;
 
-    var selectedIds = Array.from(oficiosSelect.options)
-      .filter(function (o) { return o.selected; })
-      .map(function (o) { return o.value; });
-
+    var selectedIds = selectedOficioIds(oficiosSelect);
     if (!selectedIds.length) { return; }
 
     var allServidorIds = new Set();
@@ -371,11 +438,94 @@
     updateSubmitButtonLabel(form);
   }
 
-  function initOficioAutoFill(form, summaries) {
+  function syncOficioPicker(form, summaries) {
     var select = form.querySelector("select[name='oficios']");
-    if (!select) return;
-    select.addEventListener("change", function () { onOficiosChange(form, summaries); });
-    select.addEventListener("input",  function () { onOficiosChange(form, summaries); });
+    var search = form.querySelector("#id_os_oficio_busca");
+    var list = form.querySelector("#os-oficio-lista");
+    if (!select || !search || !list) return;
+
+    var items = Object.keys(summaries).map(function (key) {
+      return summaries[key];
+    });
+    items.sort(function (a, b) {
+      return (a.order || 0) - (b.order || 0);
+    });
+
+    function renderList(filterText) {
+      var emptyEl = form.querySelector("#os-oficio-lista-empty");
+      var term = normalize(filterText);
+      var tokens = term.split(/\s+/).filter(Boolean);
+      var selected = new Set(selectedOficioIds(select));
+      var filtered = items.filter(function (summary) {
+        var text = normalize(
+          summary.search_text ||
+          [summary.label, summary.numero, summary.protocolo, summary.destino, summary.periodo].join(" ")
+        );
+        return !tokens.length || tokens.every(function (token) {
+          return text.indexOf(token) !== -1;
+        });
+      });
+
+      list.innerHTML = "";
+      if (!filtered.length) {
+        if (emptyEl) emptyEl.hidden = false;
+        return;
+      }
+      if (emptyEl) emptyEl.hidden = true;
+
+      filtered.forEach(function (summary) {
+        var active = selected.has(String(summary.id));
+        var button = document.createElement("button");
+        button.type = "button";
+        button.className = "cv-search-picker__selected-card oficio-roteiro-route-item" + (active ? " is-active" : "");
+        button.dataset.routeId = String(summary.id);
+        button.setAttribute("aria-pressed", active ? "true" : "false");
+
+        var avatar = document.createElement("span");
+        avatar.className = "cv-search-picker__selected-avatar";
+        avatar.setAttribute("aria-hidden", "true");
+        avatar.innerHTML = ROUTE_AVATAR_ICON;
+
+        var main = document.createElement("div");
+        main.className = "cv-search-picker__selected-main";
+
+        var name = document.createElement("span");
+        name.className = "cv-search-picker__selected-name";
+        name.textContent = routeCardTitle(summary);
+
+        var meta = document.createElement("span");
+        meta.className = "cv-search-picker__selected-meta route-periodo";
+        meta.textContent = routeCardMeta(summary);
+
+        main.appendChild(name);
+        main.appendChild(meta);
+        button.appendChild(avatar);
+        button.appendChild(main);
+        button.addEventListener("click", function () {
+          setOficioSelected(select, summary.id, !active);
+          select.dispatchEvent(new Event("change", { bubbles: true }));
+        });
+        list.appendChild(button);
+      });
+    }
+
+    form._osRenderOficioList = renderList;
+
+    if (form.dataset.osOficioPickerBound === "true") {
+      renderList(search.value);
+      return;
+    }
+    form.dataset.osOficioPickerBound = "true";
+
+    select.addEventListener("change", function () {
+      renderList(search.value);
+      onOficiosChange(form, summaries);
+    });
+    search.addEventListener("input", function () {
+      renderList(search.value);
+    });
+
+    renderList(search.value);
   }
 
   /* ── Rótulo do botão principal: "Finalizar Ordem de Serviço" ou "Salvar como rascunho" ── */
@@ -554,6 +704,10 @@
     if (draft.oficios && draft.oficios.length) {
       var oficiosSelect = form.querySelector("select[name='oficios']");
       setMultiSelectValues(oficiosSelect, draft.oficios, form);
+      if (typeof form._osRenderOficioList === "function") {
+        var search = form.querySelector("#id_os_oficio_busca");
+        form._osRenderOficioList(search ? search.value : "");
+      }
     }
 
     var startIso = draft.data_evento_inicio ? draft.data_evento_inicio[0] : "";
@@ -610,7 +764,7 @@
     var summaries = readSummaries();
     initModeloMotivo(form);
     initOsModelPicker(form);
-    initOficioAutoFill(form, summaries);
+    syncOficioPicker(form, summaries);
     syncDestinationCities(form);
     syncAddDestinationButton(form);
     bindDraftAutosaveLinks(form);

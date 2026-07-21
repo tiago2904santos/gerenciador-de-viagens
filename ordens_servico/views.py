@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from datetime import datetime
 from urllib.parse import urlencode
 
@@ -28,6 +29,20 @@ from .models import OrdemServico
 from .presenters import apresentar_ordem_servico_card
 from .services import gerar_os_docx_response
 from .services import gerar_os_pdf_response
+
+
+def _digits(value):
+    return re.sub(r"\D", "", str(value or ""))
+
+
+def _roteiro_destino_label(item):
+    if not item:
+        return ""
+    if item.cidade_id:
+        return str(item.cidade)
+    if item.estado_id:
+        return str(item.estado)
+    return str(item)
 
 
 def index(request):
@@ -157,42 +172,98 @@ def _redirect_ordem_lista(ordem):
 
 
 def _build_oficio_summary(oficio):
-    data_inicio = data_fim = None
+    data_inicio = ""
+    data_fim = ""
+    periodo = ""
     cidade_ids = []
     estado_id = ""
     cidade_id = ""
+    destino = ""
+    roteiro_label = ""
+    sede = ""
 
     roteiro = oficio.roteiro
     if roteiro:
+        sede_obj = roteiro.origem_cidade or roteiro.origem_estado
+        sede = str(sede_obj) if sede_obj else ""
+        destinos = list(roteiro.destinos.select_related("cidade", "estado").order_by("ordem", "pk"))
+        destino_obj = destinos[0] if destinos else None
+        destino = _roteiro_destino_label(destino_obj)
+        destinos_label = ", ".join(_roteiro_destino_label(item) for item in destinos if item)
+        roteiro_label = " -> ".join(part for part in [sede, destinos_label or destino] if part)
+        if destino_obj:
+            estado_id = destino_obj.estado_id or ""
+            cidade_id = destino_obj.cidade_id or ""
+        cidade_ids = [item.cidade_id for item in destinos if item.cidade_id]
         if roteiro.saida_dt:
+            inicio = roteiro.saida_dt.strftime("%d/%m/%Y")
             data_inicio = roteiro.saida_dt.date().isoformat()
-        retorno = getattr(roteiro, "retorno_chegada_dt", None) or getattr(roteiro, "retorno_saida_dt", None)
-        if retorno:
-            data_fim = retorno.date().isoformat()
-        elif data_inicio:
-            data_fim = data_inicio
-        destinos_values = list(
-            roteiro.destinos
-            .filter(cidade__isnull=False)
-            .values("cidade_id", "estado_id")
-            .order_by("ordem", "pk")
-        )
-        cidade_ids = [d["cidade_id"] for d in destinos_values]
-        estado_id = destinos_values[0]["estado_id"] or "" if destinos_values else ""
-        cidade_id = destinos_values[0]["cidade_id"] or "" if destinos_values else ""
+            retorno = getattr(roteiro, "retorno_chegada_dt", None) or getattr(roteiro, "retorno_saida_dt", None)
+            fim = retorno.strftime("%d/%m/%Y") if retorno else inicio
+            data_fim = retorno.date().isoformat() if retorno else data_inicio
+            periodo = inicio if fim == inicio else f"{inicio} a {fim}"
 
-    servidor_ids = list(oficio.servidores.values_list("pk", flat=True))
+    servidores = list(oficio.servidores.all())
+    servidor_ids = [s.pk for s in servidores]
+    servidores_nomes = [s.nome for s in servidores]
+    viatura_id = oficio.viatura_id or ""
+    viatura = str(oficio.viatura) if viatura_id else ""
+    viatura_modelo = getattr(oficio.viatura, "modelo", "") if viatura_id else ""
 
     return {
         "id": oficio.pk,
-        "label": f"Ofício {oficio.numero_formatado}",
-        "data_inicio": data_inicio or "",
-        "data_fim": data_fim or "",
+        "label": f"Oficio {oficio.numero_formatado}",
+        "numero": oficio.numero_formatado,
+        "numero_busca": " ".join(
+            part
+            for part in [
+                str(oficio.numero or ""),
+                f"{oficio.numero:02d}" if oficio.numero else "",
+                str(oficio.ano or ""),
+                _digits(oficio.numero_formatado),
+            ]
+            if part
+        ),
+        "protocolo": oficio.protocolo or "",
+        "protocolo_busca": _digits(oficio.protocolo),
+        "sede": sede,
+        "destino": destino,
+        "roteiro": roteiro_label,
+        "periodo": periodo,
+        "data_inicio": data_inicio,
+        "data_fim": data_fim,
         "cidade_ids": cidade_ids,
         "estado_id": estado_id,
         "cidade_id": cidade_id,
         "servidor_ids": servidor_ids,
+        "viatura_id": viatura_id,
+        "servidores": len(servidor_ids),
+        "servidores_nomes": servidores_nomes,
+        "servidores_label": ", ".join(servidores_nomes),
+        "viatura": viatura,
+        "viatura_modelo": viatura_modelo,
         "motivo": oficio.motivo or "",
+        "search_text": " ".join(
+            part
+            for part in [
+                oficio.numero_formatado,
+                str(oficio.numero or ""),
+                f"{oficio.numero:02d}" if oficio.numero else "",
+                str(oficio.ano or ""),
+                _digits(oficio.numero_formatado),
+                oficio.protocolo or "",
+                _digits(oficio.protocolo),
+                sede,
+                destino,
+                roteiro_label,
+                periodo,
+                viatura,
+                viatura_modelo,
+                " ".join(servidores_nomes),
+                oficio.assunto or "",
+            ]
+            if part
+        ),
     }
 
 
@@ -300,13 +371,20 @@ def _ordem_is_completa(form, evento_display):
 
 
 def _form_context(*, request, form, ordem=None, evento=None):
-    oficios_qs = form.fields["oficios"].queryset.select_related("roteiro").prefetch_related(
+    oficios_qs = form.fields["oficios"].queryset.select_related(
+        "roteiro",
+        "roteiro__origem_cidade",
+        "roteiro__origem_estado",
+        "viatura",
+    ).prefetch_related(
         "roteiro__destinos__cidade",
+        "roteiro__destinos__estado",
         "servidores",
     )
     summaries = {}
-    for oficio in oficios_qs:
+    for order, oficio in enumerate(oficios_qs):
         s = _build_oficio_summary(oficio)
+        s["order"] = order
         summaries[str(s["id"])] = s
 
     servidor_create_url = (

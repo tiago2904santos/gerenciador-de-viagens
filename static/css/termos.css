@@ -34,8 +34,9 @@
   overflow: auto;
 }
 
-/* Lista de ofícios do termo: sempre uma coluna, um card por linha. */
+/* Lista de ofícios do termo/OS: sempre uma coluna, um card por linha. */
 .termos-wizard #termo-oficio-lista,
+.termos-wizard #os-oficio-lista,
 .termos-wizard .termo-oficio-picker .cv-search-picker__selected-list,
 .termos-wizard .oficio-roteiro-salvo-picker .cv-search-picker__selected-list {
   grid-template-columns: 1fr;
@@ -43,12 +44,25 @@
 
 .termos-wizard #termo-oficio-lista .cv-search-picker__selected-card,
 .termos-wizard #termo-oficio-lista .cv-search-picker__selected-card:only-child,
-.termos-wizard #termo-oficio-lista .cv-search-picker__selected-card:last-child:nth-child(odd) {
+.termos-wizard #termo-oficio-lista .cv-search-picker__selected-card:last-child:nth-child(odd),
+.termos-wizard #os-oficio-lista .cv-search-picker__selected-card,
+.termos-wizard #os-oficio-lista .cv-search-picker__selected-card:only-child,
+.termos-wizard #os-oficio-lista .cv-search-picker__selected-card:last-child:nth-child(odd) {
   grid-column: 1 / -1;
 }
 
 .termo-evento-periodo {
   margin-bottom: var(--space-4);
+}
+
+/* Dentro do stack: o gap já separa as seções — evita margem/padding extras. */
+.cv-form-stack > .termo-evento-periodo {
+  margin-bottom: 0;
+}
+
+.termo-evento-body > .cv-form-subsection + .cv-form-subsection {
+  border-top: 0;
+  padding-top: 0;
 }
 
 /* Compat: formulários antigos / preview cadastro */

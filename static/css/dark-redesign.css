@@ -1250,6 +1250,23 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
   box-shadow: none !important;
 }
 
+/* Os termos internos usam uma única superfície no cabeçalho e no corpo,
+   como o agrupamento equivalente da etapa 4 do ofício. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .termos-wizard
+  .termo-documentos-preview
+  .document-inline-card--termos
+  .document-inline-card--nested,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .termos-wizard
+  .termo-documentos-preview
+  .document-inline-card--termos
+  .document-inline-card--nested
+  > :is(.document-inline-card__header, .document-inline-card__body) {
+  background: var(--step1-panel, var(--color-surface-soft)) !important;
+  border-color: transparent !important;
+}
+
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .termos-wizard
   .termo-documentos-preview
@@ -2967,7 +2984,7 @@ html[data-theme="light-dark"] .cv-form-card .cv-search-picker__control:hover {
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   :is([data-oficio-wizard-roteiro], [data-oficio-wizard-step1]) .oficio-roteiro-salvo-picker.cv-search-picker--people.cv-search-picker--roster
-  .cv-search-picker__selected-list:is(#roteiro-lista, #termo-oficio-lista) {
+  .cv-search-picker__selected-list:is(#roteiro-lista, #termo-oficio-lista, #os-oficio-lista) {
   display: grid;
   gap: 8px;
   max-height: 280px;

@@ -1,4 +1,15 @@
 /* Ordens de Serviço — seletor de modelo e campos condicionais */
+.os-oficio-picker #os-oficio-lista {
+  contain: paint;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+}
+
+.os-oficio-picker .termo-oficio-summary-panel {
+  overflow: hidden;
+}
+
 .os-model-picker {
   border: 0;
   margin: 0;

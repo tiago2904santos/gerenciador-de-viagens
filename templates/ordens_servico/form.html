@@ -6,41 +6,58 @@
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260611-os">
   <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260718-cv-summary">
-  <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260611-os-evento-card">
-  <link rel="stylesheet" href="{% static 'css/ordens-servico.css' %}?v=20260720-modelos-os">
+  <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260720-os-oficio-cards">
+  <link rel="stylesheet" href="{% static 'css/ordens-servico.css' %}?v=20260720-os-termo-evento-2">
 {% endblock %}
 
 {% block content %}
   {{ os_oficios_summary|json_script:"os-oficios-summary" }}
 
-  <div class="page-shell termos-page os-page">
+  <div class="page-shell page-shell--wizard oficio-wizard app-wizard termos-wizard os-page" data-os-wizard-shell>
     {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="DOCUMENTOS" title=page_title description="Cadastro de ordem de serviço" icon_label="OS" module_label="Ordens de Serviço" back_label=back_label back_url=index_url only %}
 
-    <form method="post" class="termo-form os-form" data-os-form data-api-cidades-url="{{ api_cidades_por_estado_url }}">
-      {% csrf_token %}
+    <main class="main-form-panel main-form-panel--stack oficio-wizard__main">
+      <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
+        <form method="post" class="termo-form oficio-wizard__form os-form" data-os-form data-api-cidades-url="{{ api_cidades_por_estado_url }}">
+          {% csrf_token %}
 
-      <main class="main-form-panel main-form-panel--stack oficio-wizard__main">
-        {% if form.non_field_errors %}
-          {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
-        {% endif %}
+          {% if form.non_field_errors %}
+            {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
+          {% endif %}
 
-        {# ── 1. Ofícios vinculados ─────────────────────────────── #}
-        {% include "components/ui/forms/form_block.html" with shell="card" element_id="os-card-oficios" section_id="os-oficios-title" extra_class="termo-card" title="1. Ofícios vinculados" description="Opcional. Vincule um ou mais ofícios — destino, período, servidores e motivo serão preenchidos automaticamente." body_template="ordens_servico/partials/_oficios_body.html" %}
+          <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable" data-os-wizard-form>
+            <section
+              class="cv-wizard-section-card cv-form-card cv-wizard-section-card--described oficio-step1-card termo-form-card os-form-card"
+              aria-labelledby="os-form-main-title"
+            >
+              <header class="cv-wizard-section-header">
+                <div class="cv-wizard-section-header__copy">
+                  <h3 class="cv-wizard-section-title" id="os-form-main-title">Dados da ordem de serviço</h3>
+                  <p class="cv-wizard-section-subtitle">Ofícios, evento, equipe e necessidade da OS</p>
+                </div>
+              </header>
 
-        {# ── 2. Evento ─────────────────────────────────────────── #}
-        {% include "components/ui/forms/form_block.html" with shell="card" element_id="os-card-evento" section_id="os-evento-title" extra_class="termo-card termo-card--evento" title="2. Evento" description="Periodo da atividade." body_extra_class="termo-evento-body" body_template="ordens_servico/partials/_evento_body.html" %}
+              <div class="cv-wizard-section-body oficio-step1-body termo-form-body os-form-body">
+                {% include "components/ui/forms/form_block.html" with element_id="os-card-oficios" section_id="os-oficios-title" data_hook="oficio-wizard-step1" extra_class="oficio-step1-block termo-block os-block" title="Ofícios vinculados" description="Opcional. Reaproveite destino, período, servidores e motivo de um ou mais ofícios." body_extra_class="termo-block__body" body_template="ordens_servico/partials/_oficios_body.html" %}
 
-        {# ── 3. Servidores ─────────────────────────────────────── #}
-        {% include "components/ui/forms/form_block.html" with shell="card" element_id="os-card-servidores" section_id="os-servidores-title" extra_class="termo-card" title="3. Servidores" description="Opcional. Servidores que executarão esta OS." action_label="Cadastrar servidor" action_url=servidor_create_url action_autosave=True body_template="ordens_servico/partials/_servidores_body.html" %}
+                {% include "components/ui/forms/form_block.html" with element_id="os-card-evento" section_id="os-evento-title" data_hook="oficio-wizard-step1" extra_class="oficio-step1-block termo-block os-block" title="Evento" description="Período e destinos da atividade." body_extra_class="cv-form-stack termo-evento-body" body_template="ordens_servico/partials/_evento_body.html" %}
 
-        {# ── 4. Necessidade e motivo ────────────────────────────── #}
-        {% include "components/ui/forms/form_block.html" with shell="card" element_id="os-card-motivo" section_id="os-motivo-title" extra_class="termo-card" title="4. Necessidade e motivo" description="Escolha o tipo de OS e complemente com o motivo ou finalidade específica." body_template="ordens_servico/partials/_motivo_body.html" footer_template="ordens_servico/partials/_motivo_footer.html" %}
-      </main>
-    </form>
+                {% include "components/ui/forms/form_block.html" with element_id="os-card-servidores" section_id="os-servidores-title" variant="resource" extra_class="oficio-step1-block termo-block os-block" title="Equipe" description="Viajantes da ordem de serviço." action_label="Novo viajante" action_url=servidor_create_url action_autosave=True body_template="ordens_servico/partials/_servidores_body.html" %}
+
+                {% include "components/ui/forms/form_block.html" with element_id="os-card-motivo" section_id="os-motivo-title" extra_class="oficio-step1-block termo-block os-block" title="Necessidade e motivo" description="Escolha o tipo de OS e complemente com o motivo ou finalidade específica." body_extra_class="termo-block__body" body_template="ordens_servico/partials/_motivo_body.html" %}
+              </div>
+
+              <div class="cv-form-card__footer" id="os-form-footer">
+                {% include "ordens_servico/partials/_motivo_footer.html" %}
+              </div>
+            </section>
+          </div>
+        </form>
+      </div>
+    </main>
   </div>
 {% endblock %}
 
 {% block extra_js %}
-  <script src="{% static 'js/pages/oficios-dados-viajantes.js' %}" defer></script>
-  <script src="{% static 'js/pages/ordens-servico-form.js' %}?v=20260720-modelos-os" defer></script>
+  <script src="{% static 'js/pages/ordens-servico-form.js' %}?v=20260720-os-termo-evento" defer></script>
 {% endblock %}
