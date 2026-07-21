@@ -140,6 +140,8 @@
     }
 
     function wireRow(row) {
+      if (row.dataset.eventoRowBound === 'true') return;
+      row.dataset.eventoRowBound = 'true';
       var removeBtn = row.querySelector('[data-remover-destino]');
       if (removeBtn) {
         removeBtn.addEventListener('click', function () {
@@ -153,11 +155,16 @@
         ufExtra.addEventListener('change', function () {
           loadCidadesForUfD(form, cidadeExtra, ufExtra.value, '');
         });
+        // Destinos extras já persistidos: carrega as cidades da UF mantendo a
+        // cidade salva selecionada.
+        var savedCity = cidadeExtra.dataset.initialValue || '';
+        if (ufExtra.value) {
+          loadCidadesForUfD(form, cidadeExtra, ufExtra.value, savedCity);
+        }
       }
     }
 
-    var row0 = lista.querySelector('[data-destino-index="0"]');
-    if (row0) wireRow(row0);
+    lista.querySelectorAll('[data-destino-index]').forEach(wireRow);
     refreshRemoveButtonsD(lista);
 
     btn.addEventListener('click', function () {

@@ -1,2 +1,5 @@
 <input type="hidden" name="destinos_json" id="id-destinos-json-d">
 {% include "components/domain/destino_row.html" with row_extra_class="termo-destino-row" has_destino_index=True destino_index="0" remover_destino=True remove_hidden=True state_select_template="eventos/partials/_destino_primary_state.html" city_select_template="eventos/partials/_destino_primary_city.html" %}
+{% for destino in evento.destinos_extras %}
+  {% include "components/domain/destino_row.html" with row_extra_class="termo-destino-row" has_destino_index=True destino_index=forloop.counter remover_destino=True state_select_template="eventos/partials/_destino_extra_state_saved.html" city_select_template="eventos/partials/_destino_extra_city_saved.html" %}
+{% endfor %}

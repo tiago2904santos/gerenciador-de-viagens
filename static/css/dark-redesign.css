@@ -715,6 +715,7 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
   align-items: flex-start;
   flex-direction: column;
   gap: 4px;
+  min-width: 0;
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
@@ -729,6 +730,10 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
   font-size: 25px;
   letter-spacing: -0.02em;
   line-height: 1.15;
+  /* Título longo não pode escorregar por baixo do chip de status. */
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -764,6 +769,29 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
   font-weight: var(--font-weight-bold);
   line-height: 1.3;
   white-space: nowrap;
+}
+
+/* Eventos: a descrição da etapa é longa (etapa + nome + período). Ela quebra
+   em até duas linhas para não roubar espaço do título do evento no band. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .evento-guided-page .page-header-rail__subtitle {
+  max-width: 250px;
+  text-align: right;
+  white-space: normal;
+}
+
+/* O título do evento é livre (digitado pelo usuário): quebra em até duas
+   linhas em vez de sumir atrás do chip de status. */
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  .evento-guided-page .page-header-band__title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: 21px;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  text-overflow: ellipsis;
+  white-space: normal;
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])

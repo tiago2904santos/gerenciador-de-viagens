@@ -37,25 +37,43 @@
           <form method="post" class="oficio-wizard__form" novalidate data-evento-guided-form data-api-cidades-url="{% url 'eventos:api_cidades_por_uf' uf='0' %}" data-sede-uf="{{ sede_uf }}">
             {% csrf_token %}
             {% with form=evento_form %}
+            <div data-oficio-wizard-step1>
 
-            {% if form.non_field_errors %}
-              {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
-            {% endif %}
+              {% if form.non_field_errors %}
+                {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
+              {% endif %}
 
-            {# CARD 1 — O que é o evento #}
-            {% include "components/ui/forms/form_block.html" with shell="card" section_id="evento-wizard-tipo-title-d" extra_class="cv-wizard-section-card--compact cv-wizard-section-card--described" title="Identificação do evento" description="Escolha o tipo e registre o motivo que contextualiza esta atividade." body_template="eventos/partials/_detalhe_identificacao_body.html" %}
+              <section class="cv-wizard-section-card cv-form-card cv-wizard-section-card--described oficio-step1-card termo-form-card evento-step1-card" aria-labelledby="evento-step1-title">
+                <header class="cv-wizard-section-header">
+                  <div class="cv-wizard-section-header__copy">
+                    <h3 class="cv-wizard-section-title" id="evento-step1-title">Dados do evento</h3>
+                    <p class="cv-wizard-section-subtitle">Identificação, período, destinos e documentos vinculados</p>
+                  </div>
+                </header>
 
-            {# CARD 2 — Datas e destinos #}
-            {% include "components/ui/forms/form_block.html" with shell="card" element_id="evento-card-dados-d" section_id="evento-card-dados-title-d" extra_class="cv-wizard-section-card--compact cv-wizard-section-card--described termo-card termo-card--evento" title="Quando e onde" description="Informe o período e ao menos um destino para continuar." body_extra_class="termo-evento-body" body_template="eventos/partials/_detalhe_dados_body.html" %}
+                <div class="cv-wizard-section-body oficio-step1-body termo-form-body">
+                  {# ── 1. Identificação ─────────────────────────────── #}
+                  {% include "components/ui/forms/form_block.html" with element_id="evento-card-identificacao-d" section_id="evento-wizard-tipo-title-d" extra_class="oficio-step1-block termo-block" title="Identificação" description="Escolha o tipo e registre o motivo que contextualiza esta atividade." body_extra_class="termo-block__body" body_template="eventos/partials/_detalhe_identificacao_body.html" %}
 
-            {# CARD 3 — Documentos já existentes #}
-            {% include "components/ui/forms/form_block.html" with shell="card" element_id="evento-card-documentos-d" section_id="evento-card-documentos-title-d" extra_class="cv-wizard-section-card--compact cv-wizard-section-card--described termo-card" title="Documentos vinculados" description="Reaproveite documentos existentes. Marque para vincular e desmarque para remover o vínculo." body_template="eventos/partials/_detalhe_documentos_body.html" footer_template="eventos/partials/_detalhe_documentos_footer.html" %}
+                  {# ── 2. Quando e onde ─────────────────────────────── #}
+                  {% include "components/ui/forms/form_block.html" with element_id="evento-card-dados-d" section_id="evento-card-dados-title-d" extra_class="oficio-step1-block termo-block" title="Quando e onde" description="Informe o período e ao menos um destino para continuar." body_extra_class="cv-form-stack termo-evento-body" body_template="eventos/partials/_detalhe_dados_body.html" %}
+
+                  {# ── 3. Documentos vinculados ─────────────────────── #}
+                  {% include "components/ui/forms/form_block.html" with element_id="evento-card-documentos-d" section_id="evento-card-documentos-title-d" extra_class="oficio-step1-block termo-block" title="Documentos vinculados" description="Reaproveite documentos existentes. Marque para vincular e desmarque para remover o vínculo." body_extra_class="termo-block__body" body_template="eventos/partials/_detalhe_documentos_body.html" %}
+                </div>
+
+                <div class="cv-form-card__footer">
+                  {% url 'eventos:index' as back_url_eventos %}
+                  {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar à lista" secondary_url=back_url_eventos primary_label="Salvar e avançar" primary_action="wizard_next" only %}
+                </div>
+              </section>
+            </div>
             {% endwith %}
 
           </form>
 
           <script src="{% static 'js/pages/oficios-dados-viajantes.js' %}?v=20260618-eventos-det" defer></script>
-          <script src="{% static 'js/pages/eventos-detalhe.js' %}?v=20260718-tabs-registry" defer></script>
+          <script src="{% static 'js/pages/eventos-detalhe.js' %}?v=20260721-etapa1-remodel" defer></script>
         {% endif %}
 
         {% if etapa_atual == 2 %}
