@@ -1,0 +1,21 @@
+{# Espelho visual da linha de destino de termos/OS (oficio-roteiro-destino-row), mantendo o wiring de eventos (destino_uf/destinos_json). #}
+<div class="destino-row oficio-roteiro-destino-row{% if row_single %} destino-row--single{% endif %}"
+     data-destino-index="{{ destino_index }}">
+  <span class="oficio-roteiro-destino-row__badge" data-destino-ord aria-hidden="true">{{ row_ordinal|default:1 }}</span>
+  <div class="oficio-roteiro-destino-row__body">
+    <div class="field-grid roteiro-sede-grid roteiro-destino-grid oficio-roteiro-destino-row__fields">
+      <div class="field app-form-field">
+        {% include state_select_template %}
+      </div>
+      <div class="field app-form-field">
+        {% include city_select_template %}
+      </div>
+    </div>
+  </div>
+  <button type="button"
+          class="btn-remover-destino oficio-roteiro-destino-row__remove"
+          title="Remover destino"
+          aria-label="Remover destino"
+          data-remover-destino
+          {% if row_single or remove_hidden %}hidden{% endif %}>×</button>
+</div>
