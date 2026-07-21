@@ -10,7 +10,7 @@
   gap: var(--space-3);
 }
 
-/* ── Barra única: contador · busca · ações ──────────────────────────────── */
+/* ── Barra: presets + busca ─────────────────────────────────────────────── */
 .pt-activity__toolbar {
   display: flex;
   align-items: center;
@@ -18,16 +18,27 @@
   flex-wrap: wrap;
 }
 
-.pt-activity__counter {
+.pt-activity__preset {
+  display: flex;
   align-items: center;
-  display: inline-flex;
-  flex: 0 0 auto;
+  gap: var(--space-2);
+  flex: 1 1 280px;
+  min-width: 0;
 }
 
-.pt-activity__counter .cv-chip {
-  box-sizing: border-box;
+.pt-activity__preset-select {
+  flex: 1 1 auto;
+  min-width: 140px;
+}
+
+.pt-activity__preset-select .cv-custom-select__trigger {
   min-height: 44px;
-  padding-inline: var(--space-4);
+  width: 100%;
+}
+
+.pt-activity__preset .cv-btn {
+  flex: 0 0 auto;
+  min-height: 44px;
 }
 
 .pt-activity__search {
@@ -58,6 +69,11 @@
   padding-left: 42px;
 }
 
+.pt-activity__clear {
+  flex: 0 0 auto;
+  min-height: 44px;
+}
+
 /* ── Grade de cards clicáveis ───────────────────────────────────────────── */
 .pt-activity__grid {
   display: grid;
@@ -76,15 +92,15 @@
   padding: 8px 10px;
   border: 1px solid var(--color-border-soft);
   border-radius: 9px;
-  background: var(--color-card-muted);
+  background: var(--color-surface);
   cursor: pointer;
   transition: border-color .15s ease, background .15s ease, box-shadow .15s ease;
   min-width: 0;
 }
 
-.pt-activity-card:hover {
+.pt-activity-card:not(.is-selected):hover {
   border-color: var(--color-border);
-  background: color-mix(in srgb, var(--color-accent) 5%, var(--color-card-muted));
+  background: color-mix(in srgb, var(--color-accent) 5%, var(--color-surface));
 }
 
 .pt-activity-card:focus-within {
@@ -109,7 +125,7 @@
   height: 32px;
   border-radius: 8px;
   border: 1px solid var(--color-border-soft);
-  background: color-mix(in srgb, var(--color-heading) 8%, transparent);
+  background: var(--list-header-control-bg, var(--color-card-muted));
   color: transparent;
   transition: background .15s ease, border-color .15s ease, color .15s ease;
 }
@@ -260,4 +276,136 @@
   .pt-live {
     grid-template-columns: 1fr;
   }
+}
+
+/* Gerenciamento de presets: seleção visual igual à grade do wizard. */
+.pt-preset-activities-panel {
+  container-type: inline-size;
+  display: grid;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+  padding: 14px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--list-header-control-bg, var(--color-card-muted));
+}
+
+.pt-preset-activities-panel__header {
+  display: grid;
+  gap: 3px;
+}
+
+.pt-preset-activities-panel__title,
+.pt-preset-activities-panel__description {
+  margin: 0;
+}
+
+.pt-preset-activities-panel__title {
+  color: var(--color-heading);
+  font-size: var(--font-size-md, 1rem);
+  font-weight: 800;
+}
+
+.pt-preset-activities-panel__description {
+  color: var(--color-muted);
+  font-size: var(--font-size-xs, .8rem);
+  line-height: 1.45;
+}
+
+.pt-preset-activity-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-2);
+  max-height: 360px;
+  overflow-y: auto;
+  padding: var(--space-1);
+}
+
+@container (min-width: 430px) {
+  .pt-preset-activity-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container (min-width: 720px) {
+  .pt-preset-activity-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.pt-preset-activity-grid > div {
+  min-width: 0;
+}
+
+.pt-preset-activity-grid label {
+  position: relative;
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  min-height: 50px;
+  margin: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--color-border-soft);
+  border-radius: 9px;
+  background: var(--cv-card-family-bg, var(--color-surface));
+  color: var(--color-heading);
+  cursor: pointer;
+  font-size: var(--font-size-xs, .8rem);
+  font-weight: 600;
+  line-height: 1.25;
+  transition: background-color .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+
+.pt-preset-activity-grid label::before {
+  content: "";
+  box-sizing: border-box;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--color-border-soft);
+  border-radius: 8px;
+  background: var(--list-header-control-bg, var(--color-card-muted));
+}
+
+.pt-preset-activity-grid label::after {
+  content: "";
+  position: absolute;
+  left: 21px;
+  top: 50%;
+  width: 11px;
+  height: 6px;
+  border-left: 2px solid transparent;
+  border-bottom: 2px solid transparent;
+  transform: translateY(-65%) rotate(-45deg);
+}
+
+.pt-preset-activity-grid input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pt-preset-activity-grid label:has(input:checked) {
+  background: color-mix(
+    in srgb,
+    var(--color-accent) 12%,
+    var(--cv-card-family-bg, var(--color-surface))
+  );
+  border-color: var(--color-accent-border-soft);
+  box-shadow: inset 4px 0 0 var(--color-accent);
+}
+
+.pt-preset-activity-grid label:has(input:checked)::before {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.pt-preset-activity-grid label:has(input:checked)::after {
+  border-color: var(--color-on-accent, #081522);
+}
+
+.pt-preset-activity-grid label:focus-within {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 26%, transparent);
 }

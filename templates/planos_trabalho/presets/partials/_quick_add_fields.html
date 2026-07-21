@@ -1,0 +1,21 @@
+<div class="field-grid">
+  <div class="field-size-4">
+    {% include "components/forms/form_field.html" with field=form.nome only %}
+  </div>
+</div>
+<div class="field-grid">
+  <div class="field-size-4">
+    <div class="field app-form-field cv-field pt-preset-activities-field">
+      <section class="pt-preset-activities-panel" aria-labelledby="pt-preset-activities-title">
+        <header class="pt-preset-activities-panel__header">
+          <h3 class="pt-preset-activities-panel__title" id="pt-preset-activities-title">Atividades previstas</h3>
+          <p class="pt-preset-activities-panel__description">Clique nas atividades para incluí-las ou retirá-las deste preset.</p>
+        </header>
+        {{ form.atividades }}
+      </section>
+      {% if form.atividades.errors %}
+        {% include "components/ui/feedback/field_error.html" with errors=form.atividades.errors only %}
+      {% endif %}
+    </div>
+  </div>
+</div>

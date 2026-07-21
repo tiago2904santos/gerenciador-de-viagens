@@ -21,6 +21,7 @@ from .models import EventoPlano
 from .models import HorarioAtendimento
 from .models import PlanoDestino
 from .models import PlanoTrabalho
+from .models import PresetAtividadesPlanoTrabalho
 from .models import ProgramaSolicitante
 
 
@@ -780,6 +781,58 @@ class AtividadePlanoTrabalhoQuickAddForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
+
+
+class PresetAtividadesQuickAddForm(forms.ModelForm):
+    """Quick add/edit de presets: nome + atividades do catálogo da área."""
+
+    class Meta:
+        model = PresetAtividadesPlanoTrabalho
+        fields = ["nome", "atividades"]
+        labels = {
+            "nome": "Nome do preset",
+            "atividades": "Atividades",
+        }
+        widgets = {
+            "nome": forms.TextInput(
+                attrs={"class": "form-control", "autocomplete": "off", "placeholder": "Ex.: PCPR na Comunidade"},
+            ),
+            "atividades": forms.CheckboxSelectMultiple(
+                attrs={
+                    "class": "pt-preset-activity-grid",
+                    "data-pt-preset-atividades": "true",
+                },
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["nome"].required = True
+        self.fields["atividades"].required = True
+        self.fields["atividades"].queryset = (
+            filter_queryset_by_area(AtividadePlanoTrabalho.objects)
+            .filter(ativo=True)
+            .order_by("ordem", "nome")
+        )
+        self.fields["atividades"].label_from_instance = lambda atividade: atividade.nome
+        self.fields["atividades"].help_text = "Clique nas atividades para incluir ou retirar do preset."
+
+    def clean_nome(self):
+        nome = normalize_upper(self.cleaned_data.get("nome") or "")
+        if not nome:
+            raise forms.ValidationError("Informe o nome do preset.")
+        qs = filter_queryset_by_area(PresetAtividadesPlanoTrabalho.objects).filter(nome=nome)
+        if self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise forms.ValidationError("Já existe um preset com este nome.")
+        return nome
+
+    def clean_atividades(self):
+        atividades = list(self.cleaned_data.get("atividades") or [])
+        if not atividades:
+            raise forms.ValidationError("Selecione ao menos uma atividade.")
+        return atividades
 
 
 class HorarioAtendimentoForm(forms.ModelForm):

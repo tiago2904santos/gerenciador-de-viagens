@@ -136,6 +136,79 @@ class AtividadePlanoTrabalho(TimeStampedModel):
         super().save(*args, **kwargs)
 
 
+class PresetAtividadesPlanoTrabalho(TimeStampedModel):
+    """Conjunto reutilizável de atividades para aplicar na etapa 3 do wizard.
+
+    Presets são globais por área (não ligados a programa). Ao aplicar no wizard,
+    a seleção atual é substituída pelos códigos do preset; o usuário pode
+    ajustar livremente depois. Planos não guardam vínculo com o preset.
+    """
+
+    area = models.ForeignKey(
+        "usuarios.AreaTrabalho",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="presets_atividades_plano_trabalho",
+        verbose_name="Area de trabalho",
+    )
+    nome = models.CharField("Nome", max_length=200)
+    descricao = models.CharField("Descrição", max_length=255, blank=True, default="")
+    ordem = models.PositiveIntegerField("Ordem", default=100)
+    ativo = models.BooleanField("Ativo", default=True)
+    is_padrao = models.BooleanField("Padrão", default=False)
+    atividades = models.ManyToManyField(
+        AtividadePlanoTrabalho,
+        blank=True,
+        related_name="presets",
+        verbose_name="Atividades",
+    )
+
+    class Meta:
+        ordering = ["ordem", "nome"]
+        verbose_name = "Preset de atividades"
+        verbose_name_plural = "Presets de atividades"
+        indexes = [
+            models.Index(fields=["area", "ordem", "nome"], name="planos_preset_area_ordem_idx"),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["nome"],
+                condition=Q(area__isnull=True),
+                name="planos_preset_nome_global_unique",
+            ),
+            models.UniqueConstraint(
+                fields=["area", "nome"],
+                condition=Q(area__isnull=False),
+                name="planos_preset_area_nome_unique",
+            ),
+            models.UniqueConstraint(
+                fields=["area"],
+                condition=Q(area__isnull=False) & Q(is_padrao=True),
+                name="planos_preset_area_padrao_unique",
+            ),
+            models.UniqueConstraint(
+                fields=["is_padrao"],
+                condition=Q(area__isnull=True) & Q(is_padrao=True),
+                name="planos_preset_global_padrao_unique",
+            ),
+        ]
+
+    def __str__(self):
+        return self.nome
+
+    @transaction.atomic
+    def save(self, *args, **kwargs):
+        self.nome = normalize_upper(self.nome)
+        self.descricao = normalize_spaces(self.descricao)
+        if self.is_padrao:
+            PresetAtividadesPlanoTrabalho.objects.select_for_update().exclude(pk=self.pk).filter(
+                area=self.area,
+                is_padrao=True,
+            ).update(is_padrao=False)
+        super().save(*args, **kwargs)
+
+
 class PlanoTrabalho(TimeStampedModel, CancelavelModel):
     STATUS_RASCUNHO = "RASCUNHO"
     STATUS_GERADO = "GERADO"

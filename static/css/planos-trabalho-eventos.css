@@ -674,10 +674,25 @@
   min-height: 44px;
 }
 
-/* O número acompanha a linha dos controles, não a altura total dos rótulos. */
-.pt-efetivo-card > .oficio-roteiro-destino-row__badge {
+/* Badge e botão remover acompanham a linha dos controles (não o topo dos rótulos). */
+.pt-efetivo-card.oficio-roteiro-destino-row,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-step1]
+  .pt-efetivo-card.oficio-roteiro-destino-row.destino-row,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-step1]
+  .pt-efetivo-card.oficio-roteiro-destino-row.destino-row:hover {
+  align-items: end;
+}
+
+.pt-efetivo-card.oficio-roteiro-destino-row > .oficio-roteiro-destino-row__badge,
+:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  [data-oficio-wizard-step1]
+  .pt-efetivo-card.oficio-roteiro-destino-row
+  > .oficio-roteiro-destino-row__badge {
   align-self: end;
   height: 44px;
+  width: 42px;
 }
 
 @media (max-width: 760px) {

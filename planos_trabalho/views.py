@@ -38,11 +38,13 @@ from .forms import EfetivoPlanoFormSet
 from .forms import HorarioAtendimentoForm
 from .forms import PlanoDiariasForm
 from .forms import PlanoIdentificacaoForm
+from .forms import PresetAtividadesQuickAddForm
 from .forms import ProgramaSolicitanteForm
 from .models import AtividadePlanoTrabalho
 from .models import EventoPlano
 from .models import PlanoTrabalho
 from .models import HorarioAtendimento
+from .models import PresetAtividadesPlanoTrabalho
 from .models import ProgramaSolicitante
 from .presenters import apresentar_plano_card
 from .presenters import apresentar_resumo_documentos
@@ -69,6 +71,7 @@ from .services import adicionar_evento_ao_plano
 from .services import editar_evento_no_scratchpad
 from .services import eventos_para_cards
 from .services import remover_evento
+from .services import presets_atividades_ativos
 from .services import sincronizar_scratchpad
 from .services import sincronizar_atividades
 from .services import montar_texto_coordenacao
@@ -932,19 +935,38 @@ def _atividades_context(*, plano, catalogo, selected_codes):
         if recurso and recurso not in vistos:
             vistos.add(recurso)
             recursos_preview.append(recurso)
+    presets = presets_atividades_ativos()
+    presets_data = [
+        {
+            "id": preset.pk,
+            "nome": preset.nome,
+            "codigos": [
+                atividade.codigo
+                for atividade in sorted(preset.atividades.all(), key=lambda a: (a.ordem, a.nome))
+                if atividade.ativo
+            ],
+        }
+        for preset in presets
+    ]
+    preset_padrao = next((preset for preset in presets if preset.is_padrao), None)
+    wizard_url = reverse("planos_trabalho:wizard_atividades", args=[plano.pk])
     return {
         "page_title": "Plano de Trabalho",
         **_wizard_shell_ctx(plano=plano, etapa_atual="atividades"),
         "atividades_catalogo": catalogo_view,
         "atividades_catalogo_data": catalogo_data,
+        "atividades_presets": presets,
+        "atividades_presets_data": presets_data,
+        "atividades_preset_padrao_id": preset_padrao.pk if preset_padrao else None,
         "atividades_selecionadas_total": len(selecionados),
         "atividades_counter_label": f"{len(selecionados)} selecionadas",
         "metas_preview": metas_preview,
         "recursos_preview": recursos_preview,
         "atividades_manager_url": (
-            reverse("planos_trabalho:atividades_index")
-            + "?"
-            + urlencode({"next": reverse("planos_trabalho:wizard_atividades", args=[plano.pk])})
+            reverse("planos_trabalho:atividades_index") + "?" + urlencode({"next": wizard_url})
+        ),
+        "presets_manager_url": (
+            reverse("planos_trabalho:presets_index") + "?" + urlencode({"next": wizard_url})
         ),
         "wizard_autosave_url": reverse("planos_trabalho:atividades_autosave", args=[plano.pk]),
         "wizard_autosave_step": "atividades",
@@ -995,6 +1017,19 @@ def wizard_atividades(request, pk):
         return redirect("planos_trabalho:wizard_atividades", pk=plano.pk)
 
     selected_codes = set(plano.atividades_selecionadas.values_list("codigo", flat=True))
+    if not selected_codes:
+        preset_padrao = next((preset for preset in presets_atividades_ativos() if preset.is_padrao), None)
+        if preset_padrao:
+            catalogo_por_codigo = {item.codigo: item for item in catalogo}
+            selecionadas_padrao = [
+                catalogo_por_codigo[atividade.codigo]
+                for atividade in preset_padrao.atividades.all()
+                if atividade.codigo in catalogo_por_codigo
+            ]
+            if selecionadas_padrao:
+                plano.atividades_selecionadas.set(selecionadas_padrao)
+                sincronizar_atividades(plano)
+                selected_codes = {item.codigo for item in selecionadas_padrao}
     return render(
         request,
         "planos_trabalho/wizard_atividades.html",
@@ -1125,6 +1160,159 @@ def atividade_excluir(request, pk):
             "page_title": "Excluir atividade",
             "atividade": atividade,
             "cancel_url": reverse("planos_trabalho:atividades_index"),
+        },
+    )
+
+
+# ── Catálogo de presets de atividades ────────────────────────────────────────
+
+
+def _presets_back_url(request):
+    candidato = request.POST.get("next") or request.GET.get("next") or ""
+    if candidato and url_has_allowed_host_and_scheme(candidato, allowed_hosts={request.get_host()}):
+        return candidato
+    return reverse("planos_trabalho:index")
+
+
+def _presets_index_url(back_url, base=None):
+    base = base or reverse("planos_trabalho:presets_index")
+    if back_url and back_url != reverse("planos_trabalho:index"):
+        return f"{base}?{urlencode({'next': back_url})}"
+    return base
+
+
+def _preset_quick_add_field_values(preset):
+    return json.dumps(
+        {
+            "nome": preset.nome,
+            "atividades": [str(pk) for pk in preset.atividades.values_list("pk", flat=True)],
+        },
+        ensure_ascii=False,
+    )
+
+
+def presets_index(request):
+    from django.db.models import Q
+
+    q = request.GET.get("q", "").strip()
+    back_url = _presets_back_url(request)
+    form = PresetAtividadesQuickAddForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        preset = form.save(commit=False)
+        preset.area = getattr(request, "area", None)
+        preset.save()
+        form.save_m2m()
+        messages.success(request, "Preset cadastrado.")
+        return redirect(_presets_index_url(back_url))
+
+    presets = (
+        filter_queryset_by_area(PresetAtividadesPlanoTrabalho.objects)
+        .prefetch_related("atividades")
+        .order_by("ordem", "nome")
+    )
+    if q:
+        from core.normalizers import remove_accents
+
+        q_unaccent = remove_accents(q)
+        presets = presets.filter(
+            Q(nome__unaccent__icontains=q_unaccent)
+            | Q(descricao__unaccent__icontains=q_unaccent)
+        )
+    linhas = []
+    for preset in presets:
+        atividades = list(preset.atividades.order_by("ordem", "nome"))
+        resumo = ", ".join(item.nome for item in atividades[:3]) or "Nenhuma atividade"
+        if len(atividades) > 3:
+            resumo = f"{resumo} (+{len(atividades) - 3})"
+        linhas.append(
+            {
+                "title": preset.nome,
+                "badges": (
+                    ([build_badge("Padrão", "warning")] if preset.is_padrao else [])
+                    + ([build_badge("Inativo", "neutral")] if not preset.ativo else [])
+                ),
+                "meta": [
+                    build_meta("Atividades", f"{len(atividades)}"),
+                    build_meta("Inclui", _truncar(resumo, 110)),
+                ],
+                "edit_url": _presets_index_url(
+                    back_url,
+                    base=reverse("planos_trabalho:preset_editar", args=[preset.pk]),
+                ),
+                "edit_fields_json": _preset_quick_add_field_values(preset),
+                "delete_url": reverse("planos_trabalho:preset_excluir", args=[preset.pk]),
+                "delete_modal": True,
+                "set_default_url": (
+                    _presets_index_url(
+                        back_url,
+                        base=reverse("planos_trabalho:preset_definir_padrao", args=[preset.pk]),
+                    )
+                    if not preset.is_padrao
+                    else None
+                ),
+            }
+        )
+    is_wizard_back = back_url != reverse("planos_trabalho:index")
+    return render(
+        request,
+        "planos_trabalho/presets/index.html",
+        {
+            "page_title": "Gerenciamento de presets",
+            "page_description": "Monte conjuntos de atividades para aplicar de uma vez no wizard.",
+            "q": q,
+            "linhas": linhas,
+            "quick_add_form": form,
+            "quick_add_next_url": back_url if is_wizard_back else "",
+            "back_url": back_url,
+            "back_label": "Voltar pra plano de trabalho" if is_wizard_back else "Voltar",
+        },
+    )
+
+
+def preset_editar(request, pk):
+    preset = get_object_or_404(filter_queryset_by_area(PresetAtividadesPlanoTrabalho.objects), pk=pk)
+    back_url = _presets_back_url(request)
+    if request.method == "POST":
+        form = PresetAtividadesQuickAddForm(request.POST, instance=preset)
+        if form.is_valid():
+            preset = form.save(commit=False)
+            if not preset.area_id:
+                preset.area = getattr(request, "area", None)
+            preset.save()
+            form.save_m2m()
+            messages.success(request, "Preset atualizado.")
+        else:
+            for erros in form.errors.values():
+                for erro in erros:
+                    messages.error(request, erro)
+    return redirect(_presets_index_url(back_url))
+
+
+@require_POST
+def preset_definir_padrao(request, pk):
+    preset = get_object_or_404(filter_queryset_by_area(PresetAtividadesPlanoTrabalho.objects), pk=pk)
+    back_url = _presets_back_url(request)
+    preset.is_padrao = True
+    preset.save(update_fields=["is_padrao", "updated_at"])
+    messages.success(request, f"Preset “{preset.nome}” definido como padrão.")
+    return redirect(_presets_index_url(back_url))
+
+
+def preset_excluir(request, pk):
+    preset = get_object_or_404(filter_queryset_by_area(PresetAtividadesPlanoTrabalho.objects), pk=pk)
+    back_url = _presets_back_url(request)
+    if request.method == "POST":
+        nome = preset.nome
+        preset.delete()
+        messages.success(request, f"Preset “{nome}” excluído.")
+        return redirect(_presets_index_url(back_url))
+    return render(
+        request,
+        "planos_trabalho/presets/confirm_delete.html",
+        {
+            "page_title": "Excluir preset",
+            "preset": preset,
+            "cancel_url": _presets_index_url(back_url),
         },
     )
 

@@ -26,7 +26,7 @@
       {% if card.atividades %}
       <div class="oficio-lc__trechos-list">
         {% for atividade in card.atividades %}
-        <div class="oficio-lc__trecho oficio-lc__trecho--atividade">
+        <div class="oficio-lc__trecho">
           <div class="oficio-lc__trecho-rota">{{ atividade }}</div>
         </div>
         {% endfor %}
@@ -38,23 +38,23 @@
 
     <div class="oficio-lc__transport-card oficio-lc__transport-card--valor">
       <span class="oficio-lc__transport-label">Efetivo</span>
-      <div class="oficio-lc__valor-total">{{ card.efetivo_total }} servidores</div>
+      <div class="oficio-lc__valor-total oficio-lc__valor-total--fit">{{ card.efetivo_total }} servidores</div>
       {% if card.valor_unitario_display %}
       <span class="oficio-lc__transport-label">Valor por Servidor</span>
-      <div class="oficio-lc__valor-medio">{{ card.valor_unitario_display }}</div>
+      <div class="oficio-lc__valor-medio oficio-lc__valor-medio--fit">{{ card.valor_unitario_display }}</div>
       {% endif %}
     </div>
 
     <div class="oficio-lc__transport-card oficio-lc__transport-card--valor">
       <span class="oficio-lc__transport-label">Valor Total</span>
       {% if card.valor_total_display %}
-      <div class="oficio-lc__valor-total">{{ card.valor_total_display }}</div>
+      <div class="oficio-lc__valor-total oficio-lc__valor-total--fit">{{ card.valor_total_display }}</div>
       {% else %}
-      <div class="oficio-lc__valor-total oficio-lc__text--empty">—</div>
+      <div class="oficio-lc__valor-total oficio-lc__text--empty oficio-lc__valor-total--fit">—</div>
       {% endif %}
       {% if card.diarias_composicao %}
       <span class="oficio-lc__transport-label">Diárias</span>
-      <div class="oficio-lc__valor-medio">{{ card.diarias_composicao }}</div>
+      <div class="oficio-lc__valor-medio oficio-lc__valor-medio--fit">{{ card.diarias_composicao }}</div>
       {% endif %}
     </div>
   </div>

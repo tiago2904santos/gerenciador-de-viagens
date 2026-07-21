@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/planos-trabalho-atividades.css' %}?v=20260721-pt-check-bg">
+{% endblock %}
+
+{% block content %}
+  {% include "components/lists/list_page_quick_add.html" with title=page_title description=page_description eyebrow="Planos de Trabalho" brand_mark="PT" search_placeholder="Buscar presets" empty_message="Nenhum preset cadastrado." rows=linhas q=q quick_add_form=quick_add_form quick_add_panel_id="quick-add-preset" quick_add_label="Novo preset" quick_add_submit_label="Salvar preset" quick_add_body_template="planos_trabalho/presets/partials/_quick_add_fields.html" quick_add_compact=True disable_realtime_filter=True hide_realtime_count=True delete_modal_enabled=True delete_modal_title="Excluir preset?" delete_modal_entity="este preset" %}
+  {% include "components/ui/buttons/floating_action.html" with href=back_url label=back_label variant="secondary" icon="arrow-left" aria_label=back_label only %}
+{% endblock %}

@@ -3723,25 +3723,6 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
   margin-top: 2px;
 }
 
-/* Atividades selecionadas — mesmo tom dourado dos cards selecionados na etapa 3. */
-.oficio-lc__trecho--atividade {
-  background: color-mix(in srgb, var(--color-accent) 9%, var(--color-card-muted));
-  border-color: color-mix(in srgb, var(--color-accent) 40%, var(--color-border-soft));
-}
-
-.oficio-lc__trecho--atividade .oficio-lc__trecho-rota {
-  color: var(--color-accent);
-}
-
-html[data-theme="light"] .oficio-lc__trecho--atividade {
-  background: var(--color-card-muted);
-  border-color: color-mix(in srgb, var(--color-accent) 32%, var(--color-border-soft));
-}
-
-html[data-theme="light"] .oficio-lc__trecho--atividade .oficio-lc__trecho-rota {
-  color: var(--color-heading);
-}
-
 .oficio-lc__transport-card--documentos {
   max-height: none;
   min-height: 0;
@@ -3822,6 +3803,22 @@ html[data-theme="light"] .oficio-lc__trecho--atividade .oficio-lc__trecho-rota {
   letter-spacing: -0.01em;
   line-height: 1.1;
   margin-top: var(--space-1);
+}
+
+/* Valores fluidos conforme a largura do próprio card (sem quebra de linha). */
+.oficio-lc__valor-total--fit,
+.oficio-lc__valor-medio--fit {
+  overflow: hidden;
+  text-overflow: clip;
+  white-space: nowrap;
+}
+
+.oficio-lc__valor-total--fit {
+  font-size: clamp(1.05rem, 13cqi, 2.75rem);
+}
+
+.oficio-lc__valor-medio--fit {
+  font-size: clamp(.8rem, 9cqi, 1.75rem);
 }
 
 /* ── Estilos auxiliares ── */

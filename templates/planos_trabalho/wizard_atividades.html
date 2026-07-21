@@ -4,13 +4,14 @@
 {% block extra_css %}
   {{ block.super }}
   <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260721-pt-remodel">
-  <link rel="stylesheet" href="{% static 'css/planos-trabalho-atividades.css' %}?v=20260721-pt-toolbar-limpa">
+  <link rel="stylesheet" href="{% static 'css/planos-trabalho-atividades.css' %}?v=20260721-pt-check-bg">
 {% endblock %}
 
 {% block wizard_content %}
   <div data-pt-atividades data-selecionadas-total="{{ atividades_selecionadas_total }}" data-oficio-wizard-step1>
 
     {{ atividades_catalogo_data|json_script:"pt-atividades-data" }}
+    {{ atividades_presets_data|json_script:"pt-atividades-presets-data" }}
 
     <section
       class="cv-wizard-section-card cv-form-card cv-wizard-section-card--described oficio-step1-card termo-form-card pt-form-card"
@@ -38,5 +39,5 @@
 
 {% block extra_js %}
   {{ block.super }}
-  <script src="{% static 'js/pages/planos-trabalho-wizard.js' %}?v=20260721-pt-atividades-cards" defer></script>
+  <script src="{% static 'js/pages/planos-trabalho-wizard.js' %}?v=20260721-pt-limpar-selecao" defer></script>
 {% endblock %}

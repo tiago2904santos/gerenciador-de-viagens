@@ -746,6 +746,18 @@ def atividades_catalogo_ativas() -> list[AtividadePlanoTrabalho]:
     return list(filter_queryset_by_area(AtividadePlanoTrabalho.objects).filter(ativo=True).order_by("ordem", "nome"))
 
 
+def presets_atividades_ativos() -> list:
+    """Presets ativos da área corrente, com atividades pré-carregadas."""
+    from .models import PresetAtividadesPlanoTrabalho
+
+    return list(
+        filter_queryset_by_area(PresetAtividadesPlanoTrabalho.objects)
+        .filter(ativo=True)
+        .prefetch_related("atividades")
+        .order_by("ordem", "nome")
+    )
+
+
 def _atividades_selecionadas_ordenadas(plano: PlanoTrabalho) -> list[AtividadePlanoTrabalho]:
     """Atividades marcadas no plano, sempre na ordem oficial do catálogo."""
     if not plano.pk:

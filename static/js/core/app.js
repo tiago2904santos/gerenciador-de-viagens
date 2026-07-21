@@ -346,9 +346,25 @@ document.documentElement.dataset.appReady = "true";
 
       // Preenche os campos pelo name
       Object.keys(fields).forEach(function (name) {
-        var input = panel.querySelector('[name="' + name + '"]');
+        var inputs = panel.querySelectorAll('[name="' + name + '"]');
+        var input = inputs[0];
         if (!input) { return; }
-        if (input.type === "checkbox" || input.type === "radio") {
+        if (inputs.length > 1 && Array.isArray(fields[name]) &&
+            (input.type === "checkbox" || input.type === "radio")) {
+          var checkedValues = {};
+          fields[name].forEach(function (value) { checkedValues[String(value)] = true; });
+          Array.prototype.forEach.call(inputs, function (choice) {
+            choice.checked = Boolean(checkedValues[String(choice.value)]);
+            choice.dispatchEvent(new Event("change", { bubbles: true }));
+          });
+          return;
+        } else if (input.tagName === "SELECT" && input.multiple && Array.isArray(fields[name])) {
+          var wanted = {};
+          fields[name].forEach(function (value) { wanted[String(value)] = true; });
+          Array.prototype.forEach.call(input.options, function (option) {
+            option.selected = Boolean(wanted[String(option.value)]);
+          });
+        } else if (input.type === "checkbox" || input.type === "radio") {
           input.checked = Boolean(fields[name]) && fields[name] !== "false" && fields[name] !== "0";
         } else {
           input.value = fields[name];

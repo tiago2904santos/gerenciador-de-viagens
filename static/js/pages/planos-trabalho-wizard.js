@@ -833,13 +833,27 @@
     if (emptyEl) emptyEl.hidden = values.length > 0;
   }
 
+  function buildPresetsMap() {
+    var dataEl = document.getElementById("pt-atividades-presets-data");
+    var map = {};
+    if (!dataEl) return map;
+    var list = [];
+    try { list = JSON.parse(dataEl.textContent || "[]"); } catch (e) { list = []; }
+    list.forEach(function (item) {
+      if (item && item.id != null) map[String(item.id)] = item;
+    });
+    return map;
+  }
+
   function initAtividades(scope) {
     var catalog = buildCatalogMap();
+    var presets = buildPresetsMap();
     var counter = scope.querySelector("[data-pt-activity-counter]");
     var checkboxes = Array.prototype.slice.call(scope.querySelectorAll("[data-pt-activity-checkbox]"));
     var selectAll = scope.querySelector("[data-pt-activity-select-all]");
     var clearBtn = scope.querySelector("[data-pt-activity-clear]");
     var search = scope.querySelector("[data-pt-activity-search]");
+    var presetSelect = scope.querySelector("[data-pt-activity-preset]");
     var items = Array.prototype.slice.call(scope.querySelectorAll("[data-pt-activity-item]"));
     var emptyFilter = scope.querySelector("[data-pt-activity-empty]");
 
@@ -874,6 +888,18 @@
       renderLiveList(recursosList, recursosEmpty, recursosCount, recursos);
     }
 
+    function applyPresetCodes(codigos) {
+      var wanted = {};
+      (codigos || []).forEach(function (codigo) { wanted[String(codigo)] = true; });
+      checkboxes.forEach(function (cb) {
+        cb.checked = Boolean(wanted[cb.value]);
+        syncCardState(cb);
+      });
+      refresh();
+      var form = scope.closest("form") || document.querySelector("form[data-autosave='true']");
+      markSnapshot(form, "atividades", 600);
+    }
+
     checkboxes.forEach(function (cb) {
       cb.addEventListener("change", function () {
         syncCardState(cb);
@@ -885,7 +911,7 @@
       selectAll.addEventListener("click", function () {
         checkboxes.forEach(function (cb) {
           var card = cb.closest("[data-pt-activity-item]");
-          if (card && card.hidden) return; // respeita o filtro de busca
+          if (card && card.hidden) return;
           cb.checked = true;
           syncCardState(cb);
         });
@@ -897,6 +923,42 @@
       clearBtn.addEventListener("click", function () {
         checkboxes.forEach(function (cb) { cb.checked = false; syncCardState(cb); });
         refresh();
+        if (presetSelect) {
+          presetSelect.value = "";
+          presetSelect.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+      });
+    }
+
+    if (presetSelect) {
+      var previousPresetId = presetSelect.value || "";
+      var resettingPreset = false;
+      presetSelect.addEventListener("change", function () {
+        if (resettingPreset) {
+          resettingPreset = false;
+          return;
+        }
+        var presetId = (presetSelect.value || "").trim();
+        if (!presetId) {
+          previousPresetId = "";
+          return;
+        }
+        var preset = presets[presetId];
+        if (!preset) return;
+        var alreadyChecked = checkboxes.some(function (cb) { return cb.checked; });
+        if (alreadyChecked) {
+          var ok = window.confirm(
+            "Aplicar o preset “" + (preset.nome || "") + "” vai substituir a seleção atual. Continuar?"
+          );
+          if (!ok) {
+            resettingPreset = true;
+            presetSelect.value = previousPresetId;
+            presetSelect.dispatchEvent(new Event("change", { bubbles: true }));
+            return;
+          }
+        }
+        applyPresetCodes(preset.codigos || []);
+        previousPresetId = presetId;
       });
     }
 
