@@ -286,6 +286,26 @@
     return rangeGap(docStart, docEnd, refStart, refEnd) <= tolerance;
   }
 
+  /* Aceita apenas strings ISO (yyyy-mm-dd); descarta valores em outros formatos. */
+  function pickIso(value) {
+    value = String(value || '').trim();
+    return (value.length === 10 && value.charAt(4) === '-' && value.charAt(7) === '-') ? value : '';
+  }
+
+  /* Período do evento em dias-número, lendo primeiro os campos de data ativos
+     do formulário (o que o usuário acabou de escolher em "Quando e onde") e,
+     como fallback, o período salvo entregue nos data-attributes do picker. */
+  function readEventPeriod(picker) {
+    var form = (picker.closest && picker.closest('form')) || document;
+    var startInput = form.querySelector('input[data-cv-date-picker-start-value]')
+      || form.querySelector('input[name="data_inicio"]');
+    var endInput = form.querySelector('input[data-cv-date-picker-end-value]')
+      || form.querySelector('input[name="data_fim"]');
+    var startIso = pickIso(startInput && startInput.value) || (picker.dataset.eventoPeriodoInicio || '');
+    var endIso = pickIso(endInput && endInput.value) || (picker.dataset.eventoPeriodoFim || '');
+    return { start: isoToDayNumber(startIso), end: isoToDayNumber(endIso) };
+  }
+
   function normDocText(s) {
     return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
   }
@@ -342,22 +362,26 @@
     return button;
   }
 
-  function initDocPanel(root, key, items, eventStart, eventEnd, tolerance) {
+  function initDocPanel(root, key, items, getPeriod, tolerance) {
     var select = sourceSelectFor(root, key);
     var list = root.querySelector('[data-evento-doc-list="' + key + '"]');
     var search = root.querySelector('[data-evento-doc-search="' + key + '"]');
+    var clear = root.querySelector('[data-evento-doc-clear="' + key + '"]');
     var empty = root.querySelector('[data-evento-doc-empty="' + key + '"]');
-    if (!select || !list) return;
+    var pickerRoot = search ? search.closest('.cv-search-picker') : null;
+    if (!select || !list) return null;
 
     function render() {
+      var period = getPeriod();
       var selected = selectedIdsFromSelect(select);
       var term = normDocText(search ? search.value : '');
       var tokens = term.split(/\s+/).filter(Boolean);
+      if (pickerRoot) pickerRoot.classList.toggle('cv-search-picker--has-query', !!term);
 
       var visible = items.filter(function (summary) {
         var isSelected = selected.has(String(summary.id));
         // Documentos já vinculados aparecem sempre; os demais respeitam o filtro de datas.
-        if (!isSelected && !passesDateFilter(summary, eventStart, eventEnd, tolerance)) return false;
+        if (!isSelected && !passesDateFilter(summary, period.start, period.end, tolerance)) return false;
         if (!tokens.length) return true;
         var haystack = normDocText(summary.search_text || (summary.title + ' ' + summary.meta));
         return tokens.every(function (token) { return haystack.indexOf(token) !== -1; });
@@ -385,8 +409,16 @@
       search.dataset.eventoDocBound = 'true';
       search.addEventListener('input', render);
     }
+    if (clear && clear.dataset.eventoDocBound !== 'true') {
+      clear.dataset.eventoDocBound = 'true';
+      clear.addEventListener('click', function () {
+        if (search) { search.value = ''; search.focus(); }
+        render();
+      });
+    }
     select.addEventListener('change', render);
     render();
+    return render;
   }
 
   function initDocPickersD(root) {
@@ -399,13 +431,26 @@
       picker.dataset.eventoDocPickerBound = 'true';
 
       var summaries = readDocSummaries();
-      var eventStart = isoToDayNumber(picker.dataset.eventoPeriodoInicio || '');
-      var eventEnd = isoToDayNumber(picker.dataset.eventoPeriodoFim || '');
       var tolerance = parseInt(picker.dataset.eventoDocTolerancia || '5', 10);
       if (isNaN(tolerance)) tolerance = 5;
+      var getPeriod = function () { return readEventPeriod(picker); };
 
+      var renders = [];
       Object.keys(summaries).forEach(function (key) {
-        initDocPanel(picker, key, summaries[key] || [], eventStart, eventEnd, tolerance);
+        var render = initDocPanel(picker, key, summaries[key] || [], getPeriod, tolerance);
+        if (render) renders.push(render);
+      });
+
+      // Re-filtra as listas quando o período do evento muda em "Quando e onde".
+      var form = (picker.closest && picker.closest('form')) || document;
+      ['data_inicio', 'data_fim'].forEach(function (name) {
+        var input = form.querySelector('input[name="' + name + '"]');
+        if (input && input.dataset.eventoDocPeriodBound !== 'true') {
+          input.dataset.eventoDocPeriodBound = 'true';
+          input.addEventListener('change', function () {
+            renders.forEach(function (render) { render(); });
+          });
+        }
       });
 
       initDocToggle(picker);

@@ -3104,8 +3104,9 @@ html[data-theme="light"] .cv-segment-toggle {
  * função dos servidores (Condução / Técnico / Apoio) da Ordem de Serviço.
  */
 .evento-doc-toggle.cv-segment-toggle {
-  background: var(--color-surface-soft);
-  border-color: transparent;
+  /* Trilho na mesma cor (cinza azulado) do fundo dos cards. */
+  background: var(--cv-wizard-section-bg);
+  border: 1px solid var(--cv-wizard-section-border, var(--color-border));
   border-radius: 10px;
   box-shadow: none;
   display: grid;
