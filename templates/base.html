@@ -7,7 +7,7 @@
   <script src="{% static 'js/core/theme-shared.js' %}?v=20260513"></script>
   <script src="{% static 'js/core/theme-init.js' %}?v=20260513"></script>
   <title>{% block title %}Central de Viagens 3{% endblock %}</title>
-  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20260721-evento-card-remodel">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20260722-visual-standard">
   <link rel="stylesheet" href="{% static 'css/utilities.css' %}?v=20260717-data-table">
   <link rel="stylesheet" href="{% static 'css/page-shell.css' %}?v=20260718-global-components">
   <link rel="stylesheet" href="{% static 'css/cv-buttons.css' %}?v=20260720-settings-assinado">
@@ -27,11 +27,11 @@
   <link rel="stylesheet" href="{% static 'css/components/document-viewer.css' %}?v=20260717-canonical">
   <link rel="stylesheet" href="{% static 'css/components/dialog.css' %}?v=20260718-sidebar-center">
   <link rel="stylesheet" href="{% static 'css/dark-redesign.css' %}?v=20260721-evento-etapa1-remodel">
-  <link rel="stylesheet" href="{% static 'css/components/list-header.css' %}?v=20260721-quick-add-controls">
+  <link rel="stylesheet" href="{% static 'css/components/list-header.css' %}?v=20260722-visual-standard">
   {% block extra_css_after_theme %}{% endblock %}
 </head>
 <body>
-  <a class="cv-skip-link" href="#main-content">Pular para o conteÃºdo principal</a>
+  <a class="cv-skip-link" href="#main-content">Pular para o conteúdo principal</a>
   <div class="app-shell {% block shell_class %}{% endblock %}" data-app-shell>
     <header class="app-mobile-bar">
       <a class="app-mobile-bar__brand" href="{% url 'core:dashboard' %}">

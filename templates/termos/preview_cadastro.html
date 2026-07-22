@@ -4,12 +4,11 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260720-termos-wizard">
   <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260720-termos-wizard">
 {% endblock %}
 
 {% block content %}
-  <div class="page-shell page-shell--wizard travel-document-wizard app-wizard document-form-page">
+  <div class="page-shell page-shell--standard-simple travel-document-wizard app-wizard document-form-page">
     {% include "components/ui/headers/page_header.html" with eyebrow="TERMOS" title=page_title icon_label="TM" module_label="Termos" back_label="Editar termo" back_url=editar_url only %}
 
     <main class="main-form-panel main-form-panel--stack travel-document-wizard__main">

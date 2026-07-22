@@ -1,14 +1,14 @@
-<aside class="sidebar" id="app-sidebar" data-sidebar aria-label="NavegaÃ§Ã£o principal">
+<aside class="sidebar" id="app-sidebar" data-sidebar aria-label="Navegação principal">
   <div class="sidebar-header">
     <a class="sidebar-brand" href="{% url 'core:dashboard' %}" data-sidebar-root-link>
       <span class="sidebar-brand-badge">CV</span>
       <span>Central de Viagens 3</span>
     </a>
     <button class="sidebar-drawer-close" type="button" aria-label="Fechar menu principal" data-sidebar-drawer-close>
-      <span aria-hidden="true">Ã—</span>
+      <span aria-hidden="true">×</span>
     </button>
   </div>
-  <nav class="sidebar-nav" aria-label="MÃ³dulos da Central de Viagens">
+  <nav class="sidebar-nav" aria-label="Módulos da Central de Viagens">
     {% for item in navigation_items %}
       {% if item.has_children %}
         <div class="sidebar-item sidebar-item--collapsible{% if item.is_open %} is-open{% endif %}" data-sidebar-item="{{ item.id }}" data-sidebar-group="{{ item.id }}" data-sidebar-expandable>
@@ -78,7 +78,7 @@
   </nav>
   <div class="sidebar-footer">
     {% if request.user.is_authenticated %}
-      <section class="sidebar-account" aria-label="Conta do usuario">
+      <section class="sidebar-account" aria-label="Conta do usuário">
         <div class="sidebar-account__identity">
           <span class="sidebar-account__label">Conectado como</span>
           <strong class="sidebar-account__name">{{ request.user.get_username }}</strong>
@@ -95,12 +95,12 @@
         </div>
       </section>
     {% endif %}
-    <div class="sidebar-theme" role="group" aria-label="Tema visual da area principal">
+    <div class="sidebar-theme" role="group" aria-label="Tema visual da área principal">
       <span class="sidebar-theme__label" id="sidebar-theme-label">Tema</span>
       <div class="app-theme-grid" role="radiogroup" aria-labelledby="sidebar-theme-label">
         <button type="button" class="app-theme-grid__btn" role="radio" data-theme-mode="dark" aria-pressed="false" aria-checked="false" tabindex="-1">
           Escuro
-          <small>Contraste reforcado</small>
+          <small>Contraste reforçado</small>
         </button>
         <button type="button" class="app-theme-grid__btn" role="radio" data-theme-mode="light" aria-pressed="false" aria-checked="false" tabindex="-1">
           Claro

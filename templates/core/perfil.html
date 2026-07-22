@@ -4,131 +4,157 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/perfil.css' %}?v=20260717-deep-blue">
-  <link rel="stylesheet" href="{% static 'css/gdrive-config.css' %}?v=20260716-perfil">
+  <link rel="stylesheet" href="{% static 'css/gdrive-config.css' %}?v=20260722-visual-standard">
 {% endblock %}
 
 {% block content %}
-  <div class="page-shell perfil-page">
-    <header class="perfil-hero">
-      <div class="perfil-hero__identity">
-        <span class="perfil-hero__avatar" aria-hidden="true">{{ request.user.get_username|slice:":2"|upper }}</span>
-        <div class="perfil-hero__copy">
-          <span class="perfil-hero__eyebrow">Conta pessoal</span>
-          <h1>{{ request.user.get_full_name|default:request.user.get_username }}</h1>
-          <p>@{{ request.user.get_username }}{% if request.user.email %}<span aria-hidden="true"> · </span>{{ request.user.email }}{% endif %}</p>
-        </div>
-      </div>
+  <div class="page-shell page-shell--standard">
+    {% include "components/ui/headers/page_header.html" with eyebrow="CONTA" title=page_title description=page_description icon_label="PF" module_label="Conta e segurança" status_label="Sessão ativa" status_variant="complete" only %}
 
-      <dl class="perfil-hero__facts" aria-label="Resumo da conta">
-        <div>
-          <dt>Áreas</dt>
-          <dd>{{ vinculos_area|length }}</dd>
-        </div>
-        <div>
-          <dt>Área padrão</dt>
-          <dd>{% if vinculos_area %}{{ vinculos_area.0.area.sigla }}{% else %}—{% endif %}</dd>
-        </div>
-        <div>
-          <dt>Sessão</dt>
-          <dd><span class="perfil-status-dot" aria-hidden="true"></span>Ativa</dd>
-        </div>
-      </dl>
-
-      <form method="post" action="{% url 'core:logout' %}" class="perfil-logout">
-        {% csrf_token %}
-        <button class="cv-btn cv-btn--secondary cv-btn--sm" type="submit">Sair do sistema</button>
-      </form>
-    </header>
-
-    <main class="perfil-workspace">
-      <div class="perfil-workspace__main">
-        <section class="perfil-panel perfil-panel--identity" aria-labelledby="perfil-dados-title">
-          <header class="perfil-panel__header">
-            <span class="perfil-panel__index" aria-hidden="true">01</span>
-            <div>
-              <span class="perfil-panel__eyebrow">Identidade</span>
-              <h2 class="perfil-panel__title" id="perfil-dados-title">Dados pessoais</h2>
-              <p class="perfil-panel__description">Informações usadas para identificar sua conta no sistema.</p>
+    <main class="main-form-panel main-form-panel--stack">
+      <div class="cv-form-section-stack cv-form-section-stack--comfortable">
+        <section class="cv-form-section-card" aria-labelledby="perfil-resumo-title">
+          <header class="cv-form-section-header">
+            <div class="cv-form-section-header__copy">
+              <h2 class="cv-form-section-title" id="perfil-resumo-title">Resumo da conta</h2>
+              <p class="cv-form-section-subtitle">{{ request.user.get_full_name|default:request.user.get_username }} · @{{ request.user.get_username }}{% if request.user.email %} · {{ request.user.email }}{% endif %}</p>
             </div>
           </header>
-          <form class="perfil-form" method="post" novalidate>
-            {% csrf_token %}
-            {% if perfil_form.non_field_errors %}
-              {% include "components/ui/feedback/field_error.html" with errors=perfil_form.non_field_errors only %}
-            {% endif %}
-            <div class="field-grid field-grid--cols-2">
-              {% include "components/ui/forms/field.html" with field=perfil_form.nome_completo size_class="field-size-2" only %}
-              {% include "components/ui/forms/field.html" with field=perfil_form.username size_class="field-size-1" only %}
-              {% include "components/ui/forms/field.html" with field=perfil_form.email size_class="field-size-1" only %}
-            </div>
-            <div class="perfil-form__actions">
-              {% include "components/ui/buttons/button.html" with label="Salvar alterações" variant="primary" icon="arrow-right" icon_after=True type="submit" name="action" value="atualizar_perfil" only %}
-            </div>
-          </form>
-        </section>
-
-        <section class="perfil-panel perfil-panel--security" aria-labelledby="perfil-senha-title">
-          <header class="perfil-panel__header">
-            <span class="perfil-panel__index" aria-hidden="true">02</span>
-            <div>
-              <span class="perfil-panel__eyebrow">Segurança</span>
-              <h2 class="perfil-panel__title" id="perfil-senha-title">Senha de acesso</h2>
-              <p class="perfil-panel__description">Use uma senha forte e diferente das utilizadas em outros serviços.</p>
-            </div>
-          </header>
-          <form class="perfil-form" method="post" novalidate>
-            {% csrf_token %}
-            {% if senha_form.non_field_errors %}
-              {% include "components/ui/feedback/field_error.html" with errors=senha_form.non_field_errors only %}
-            {% endif %}
-            <div class="field-grid field-grid--cols-2">
-              {% include "components/ui/forms/field.html" with field=senha_form.old_password size_class="field-size-2" only %}
-              {% include "components/ui/forms/field.html" with field=senha_form.new_password1 size_class="field-size-1" only %}
-              {% include "components/ui/forms/field.html" with field=senha_form.new_password2 size_class="field-size-1" only %}
-            </div>
-            <div class="perfil-form__actions">
-              {% include "components/ui/buttons/button.html" with label="Alterar senha" variant="primary" icon="arrow-right" icon_after=True type="submit" name="action" value="alterar_senha" only %}
-            </div>
-          </form>
-        </section>
-      </div>
-
-      <aside class="perfil-workspace__aside" aria-labelledby="perfil-areas-title">
-        <section class="perfil-access">
-          <header class="perfil-access__header">
-            <div>
-              <span class="perfil-panel__eyebrow">Permissões</span>
-              <h2 class="perfil-access__title" id="perfil-areas-title">Áreas de trabalho</h2>
-              <p class="perfil-access__description">Espaços aos quais sua conta possui acesso.</p>
-            </div>
-            <span class="perfil-access__count" aria-label="{{ vinculos_area|length }} áreas">{{ vinculos_area|length }}</span>
-          </header>
-          <ul class="perfil-areas">
-            {% for vinculo in vinculos_area %}
-              <li class="perfil-areas__item">
-                <span class="perfil-areas__mark" aria-hidden="true">{{ vinculo.area.sigla|slice:":2" }}</span>
-                <div class="perfil-areas__text">
-                  <span class="perfil-areas__sigla">{{ vinculo.area.sigla }}</span>
-                  <span class="perfil-areas__nome">{{ vinculo.area.nome }}</span>
+          <div class="cv-form-section-body">
+            {% with default_area=vinculos_area.0.area.sigla|default:"—" %}
+              <div class="cv-summary-grid cv-summary-grid--3" role="list">
+                {% include "components/cards/summary_card.html" with label="Áreas de trabalho" value=vinculos_area|length description="Vínculos ativos" only %}
+                {% include "components/cards/summary_card.html" with label="Área padrão" value=default_area description="Contexto inicial da sessão" only %}
+                {% include "components/cards/summary_card.html" with label="Sessão" value="Ativa" description="Acesso autenticado" only %}
+              </div>
+            {% endwith %}
+          </div>
+          <div class="cv-form-card__footer">
+            <div class="cv-card-footer-section">
+              <div class="cv-card-footer-section__divider" aria-hidden="true"></div>
+              <footer class="cv-card-footer">
+                <div class="cv-card-footer__secondary"></div>
+                <div class="cv-card-footer__primary">
+                  <form method="post" action="{% url 'core:logout' %}">
+                    {% csrf_token %}
+                    {% include "components/ui/buttons/button.html" with label="Sair do sistema" variant="secondary" type="submit" only %}
+                  </form>
                 </div>
-                {% if vinculo.area_padrao %}
-                  {% include "components/ui/badges/chip.html" with tone="info" label="Padrão" size="compact" only %}
-                {% else %}
-                  <span class="perfil-areas__papel">{{ vinculo.get_papel_display }}</span>
-                {% endif %}
-              </li>
-            {% empty %}
-              <li class="perfil-areas__item perfil-areas__item--empty">Nenhuma área vinculada.</li>
-            {% endfor %}
-          </ul>
+              </footer>
+            </div>
+          </div>
         </section>
-      </aside>
-    </main>
 
-    <div class="perfil-integrations">
-      {% include "components/perfil/gdrive_card.html" %}
-    </div>
+        <form method="post" novalidate>
+          {% csrf_token %}
+          <section class="cv-form-section-card" aria-labelledby="perfil-dados-title">
+            <header class="cv-form-section-header">
+              <div class="cv-form-section-header__copy">
+                <h2 class="cv-form-section-title" id="perfil-dados-title">Dados pessoais</h2>
+                <p class="cv-form-section-subtitle">Informações usadas para identificar sua conta no sistema.</p>
+              </div>
+            </header>
+            <div class="cv-form-section-body">
+              {% if perfil_form.non_field_errors %}
+                {% include "components/ui/feedback/field_error.html" with errors=perfil_form.non_field_errors only %}
+              {% endif %}
+              <div class="field-grid field-grid--cols-2">
+                {% include "components/ui/forms/field.html" with field=perfil_form.nome_completo size_class="field-size-2" only %}
+                {% include "components/ui/forms/field.html" with field=perfil_form.username size_class="field-size-1" only %}
+                {% include "components/ui/forms/field.html" with field=perfil_form.email size_class="field-size-1" only %}
+              </div>
+            </div>
+            <div class="cv-form-card__footer">
+              <div class="cv-card-footer-section">
+                <div class="cv-card-footer-section__divider" aria-hidden="true"></div>
+                <footer class="cv-card-footer">
+                  <div class="cv-card-footer__secondary"></div>
+                  <div class="cv-card-footer__primary">
+                    {% include "components/ui/buttons/button.html" with label="Salvar alterações" variant="primary" icon="arrow-right" icon_after=True type="submit" name="action" value="atualizar_perfil" only %}
+                  </div>
+                </footer>
+              </div>
+            </div>
+          </section>
+        </form>
+
+        <form method="post" novalidate>
+          {% csrf_token %}
+          <section class="cv-form-section-card" aria-labelledby="perfil-senha-title">
+            <header class="cv-form-section-header">
+              <div class="cv-form-section-header__copy">
+                <h2 class="cv-form-section-title" id="perfil-senha-title">Senha de acesso</h2>
+                <p class="cv-form-section-subtitle">Use uma senha forte e diferente das utilizadas em outros serviços.</p>
+              </div>
+            </header>
+            <div class="cv-form-section-body">
+              {% if senha_form.non_field_errors %}
+                {% include "components/ui/feedback/field_error.html" with errors=senha_form.non_field_errors only %}
+              {% endif %}
+              <div class="field-grid field-grid--cols-2">
+                {% include "components/ui/forms/field.html" with field=senha_form.old_password size_class="field-size-2" only %}
+                {% include "components/ui/forms/field.html" with field=senha_form.new_password1 size_class="field-size-1" only %}
+                {% include "components/ui/forms/field.html" with field=senha_form.new_password2 size_class="field-size-1" only %}
+              </div>
+            </div>
+            <div class="cv-form-card__footer">
+              <div class="cv-card-footer-section">
+                <div class="cv-card-footer-section__divider" aria-hidden="true"></div>
+                <footer class="cv-card-footer">
+                  <div class="cv-card-footer__secondary"></div>
+                  <div class="cv-card-footer__primary">
+                    {% include "components/ui/buttons/button.html" with label="Alterar senha" variant="primary" icon="arrow-right" icon_after=True type="submit" name="action" value="alterar_senha" only %}
+                  </div>
+                </footer>
+              </div>
+            </div>
+          </section>
+        </form>
+
+        <section class="cv-form-section-card" aria-labelledby="perfil-areas-title">
+          <header class="cv-form-section-header">
+            <div class="cv-form-section-header__copy">
+              <h2 class="cv-form-section-title" id="perfil-areas-title">Áreas de trabalho</h2>
+              <p class="cv-form-section-subtitle">Espaços aos quais sua conta possui acesso.</p>
+            </div>
+            <div class="cv-form-section-header__meta">
+              {% include "components/ui/badges/chip.html" with tone="info" label=vinculos_area|length only %}
+            </div>
+          </header>
+          <div class="cv-form-section-body">
+            {% if vinculos_area %}
+              <div class="cv-record-list simple-list" role="list">
+                {% for vinculo in vinculos_area %}
+                  <div class="cv-record-row simple-list-item" role="listitem">
+                    <div class="simple-list-item__avatar" aria-hidden="true">{{ vinculo.area.sigla|slice:":2" }}</div>
+                    <div class="cv-record-row__content simple-list-item__body">
+                      <div class="cv-record-row__heading simple-list-item__title">
+                        <span class="cv-record-row__title simple-list-item__title-text">{{ vinculo.area.sigla }} · {{ vinculo.area.nome }}</span>
+                      </div>
+                      <div class="cv-record-row__meta simple-list-item__meta">
+                        <span class="cv-record-row__meta-item simple-list-item__meta-item">
+                          <span class="cv-record-row__meta-label simple-list-item__meta-label">Perfil</span>
+                          <span class="cv-record-row__meta-value simple-list-item__meta-value">{{ vinculo.get_papel_display }}</span>
+                        </span>
+                      </div>
+                    </div>
+                    {% if vinculo.area_padrao %}
+                      <div class="cv-record-row__actions simple-list-item__aside">
+                        {% include "components/ui/badges/chip.html" with tone="info" label="Padrão" size="compact" only %}
+                      </div>
+                    {% endif %}
+                  </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              {% include "components/ui/feedback/empty_state.html" with title="Nenhuma área vinculada" message="Solicite a um administrador o acesso a uma área de trabalho." only %}
+            {% endif %}
+          </div>
+        </section>
+
+        {% include "components/perfil/gdrive_card.html" %}
+      </div>
+    </main>
   </div>
 {% endblock %}
 

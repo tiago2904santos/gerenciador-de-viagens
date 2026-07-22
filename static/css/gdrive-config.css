@@ -10,7 +10,7 @@
   flex-direction: column;
   gap: 0;
   /* Vermelho nítido do botão Desconectar (variante escura no bloco de tema). */
-  --gd-unlink: #d23a2c;
+  --gd-unlink: var(--color-danger);
 }
 
 /* ── Blocos internos, separados por divisória sutil ───────────────────────── */
@@ -180,7 +180,7 @@
 .gdrive-btn-unlink:focus-visible {
   background: var(--gd-unlink);
   border-color: var(--gd-unlink);
-  color: #ffffff;
+  color: var(--color-white);
 }
 
 /* Texto de ajuda */

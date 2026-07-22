@@ -4,7 +4,6 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/oficios.css' %}?v=20260720-termos-wizard">
   <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260720-termos-wizard">
   <link rel="stylesheet" href="{% static 'css/oficios-documentos-inline.css' %}?v=20260720-termos-wizard">
   <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260720-termos-oficio-cards">
@@ -13,7 +12,7 @@
 
 {% block content %}
   {{ oficios_summary|json_script:"termos-oficios-summary" }}
-  <div class="page-shell page-shell--wizard travel-document-wizard app-wizard document-form-page" data-termo-wizard-shell>
+  <div class="page-shell page-shell--standard travel-document-wizard app-wizard document-form-page" data-termo-wizard-shell>
     {% include "components/ui/headers/page_header.html" with eyebrow="TERMOS" title=page_title description="Cadastro independente de termo de autorização" icon_label="TM" module_label="Termos" back_label=back_label back_url=index_url only %}
 
     <main class="main-form-panel main-form-panel--stack travel-document-wizard__main">

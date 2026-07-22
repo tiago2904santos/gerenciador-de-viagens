@@ -425,7 +425,7 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertIn('id="main-content"', self.base)
         self.assertIn("data-sidebar-drawer-toggle", self.base)
         self.assertIn('id="app-sidebar"', sidebar_template)
-        self.assertIn('aria-label="MÃ³dulos da Central de Viagens"', sidebar_template)
+        self.assertIn('aria-label="Módulos da Central de Viagens"', sidebar_template)
         self.assertIn("accordion.hidden = !isOpen", sidebar_js)
         self.assertIn("sidebar.inert = !shouldOpen", sidebar_js)
         self.assertIn('event.key === "Escape"', sidebar_js)
