@@ -2,7 +2,7 @@
 <input type="hidden" name="coordenacao_auto" value="{% if coordenacao_auto %}1{% else %}0{% endif %}" data-pt-texto-auto-flag="coordenacao">
 <input type="hidden" name="consideracao_auto" value="{% if consideracao_auto %}1{% else %}0{% endif %}" data-pt-texto-auto-flag="consideracao_final">
 <div class="field-grid">
-  {% include "components/forms/form_field.html" with field=form.contextualizacao label="Breve contextualização" size_class="field-size-4" only %}
-  {% include "components/forms/form_field.html" with field=form.coordenacao label="Coordenador do evento" size_class="field-size-4" only %}
-  {% include "components/forms/form_field.html" with field=form.consideracao_final label="Considerações finais" size_class="field-size-4" only %}
+  {% include "components/ui/forms/field.html" with field=form.contextualizacao label="Breve contextualização" size_class="field-size-4" only %}
+  {% include "components/ui/forms/field.html" with field=form.coordenacao label="Coordenador do evento" size_class="field-size-4" only %}
+  {% include "components/ui/forms/field.html" with field=form.consideracao_final label="Considerações finais" size_class="field-size-4" only %}
 </div>

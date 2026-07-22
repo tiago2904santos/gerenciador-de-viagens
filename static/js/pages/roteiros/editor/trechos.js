@@ -18,7 +18,7 @@ function isRoteiroOficio() {
 export function getTrechosEmptyHtml() {
   if (!isRoteiroOficio()) return TRECHOS_EMPTY_HTML;
   return (
-    '<section class="cv-form-block cv-form-block--resource roteiro-editor__section--trechos-empty oficio-roteiro-block" aria-labelledby="sec-trechos-empty">' +
+    '<section class="cv-form-block cv-form-block--resource roteiro-editor__section--trechos-empty route-section-block" aria-labelledby="sec-trechos-empty">' +
     '<header class="cv-form-block__header">' +
     '<div class="cv-form-block__copy">' +
     '<h4 class="cv-form-block__title" id="sec-trechos-empty">Trechos</h4>' +
@@ -246,7 +246,7 @@ export function buildTrechoCard(trecho, value, esc, formatDurationInput) {
   if (!oficio) return article;
 
   return (
-    '<section class="cv-form-block cv-form-block--resource roteiro-editor__section--trecho oficio-roteiro-block" aria-labelledby="' +
+    '<section class="cv-form-block cv-form-block--resource roteiro-editor__section--trecho route-section-block" aria-labelledby="' +
     titleId +
     '">' +
     '<header class="cv-form-block__header">' +

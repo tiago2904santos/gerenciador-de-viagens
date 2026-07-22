@@ -1,0 +1,32 @@
+<div class="destination-row travel-destination-row cv-ordered-field-row{% if row_single %} destination-row--single{% endif %}{% if row_extra_class %} {{ row_extra_class }}{% endif %}"
+     data-destination-row
+     {% if prefix %}data-{{ prefix }}-destination-row data-{{ prefix }}-destino-index="{{ row_index }}"{% endif %}
+     {% if has_destino_index %}data-destino-index="{{ destino_index }}"{% endif %}
+     {% if has_data_index %}data-index="{{ data_index }}"{% endif %}>
+  <span class="cv-ordered-field-row__badge" data-destination-order aria-hidden="true">{{ row_ordinal|default:1 }}</span>
+  <div class="cv-ordered-field-row__body">
+    <div class="field-grid roteiro-sede-grid roteiro-destino-grid cv-ordered-field-row__fields">
+      <div class="field app-form-field">
+        {% if state_select_template %}
+          {% include state_select_template %}
+        {% else %}
+          {{ state_field }}
+        {% endif %}
+      </div>
+      <div class="field app-form-field">
+        {% if city_select_template %}
+          {% include city_select_template %}
+        {% else %}
+          {{ city_field }}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <button type="button"
+          class="destination-remove-button cv-ordered-field-row__remove"
+          title="Remover destino"
+          aria-label="Remover destino"
+          {% if row_single or remove_hidden %}hidden{% endif %}
+          {% if prefix %}data-{{ prefix }}-remove-destino{% endif %}
+          {% if remover_destino %}data-remover-destino{% endif %}>×</button>
+</div>

@@ -2,7 +2,7 @@
 
 ## 1. Resumo executivo
 
-- **Migrado:** shell visual dos wizards de Ofícios e Roteiros para o modelo **UI Lab → Structures → Wizard** (`page-shell--wizard`, `header_stack_back_action`, `page-stepper`, `main-form-panel--stack`, `cv-form-section-stack`, `footer-actions`).
+- **Migrado:** shell visual dos wizards de Ofícios e Roteiros para o modelo **UI Lab → Structures → Wizard** (`page-shell--wizard`, `page_header`, `page-stepper`, `main-form-panel--stack`, `cv-form-section-stack`, `footer-actions`).
 - **Não migrado:** lógica de rotas/trechos, JS funcional (`roteiros/editor/index.js`, `roteiros-map.js`), endpoints, models, validações, ordem de steps.
 - **Riscos preservados:** `#roteiro-editor-form`, todos `data-api-*`, autosave, `OficioWizard` / `CV.fields`, submits (`name`/`value` de `action`), formulário embutido na etapa roteiro (sem form aninhado inválido).
 - **Fase 5 funcional:** **B — Liberado com ressalvas** (paridade estrutural concluída; smoke visual manual e screenshots dedicados pendentes se o servidor não estiver ativo).
@@ -14,7 +14,7 @@
 | Elemento Wizard UI Lab | Arquivo/component | Classe | Token | Ofício? | Roteiro? |
 |------------------------|-------------------|--------|-------|---------|----------|
 | Shell | `page-shell.css` | `page-shell page-shell--wizard` | `--surface-page-shell` | Sim | Sim |
-| Header band + rail | `header_stack_back_action.html` | `page-header-stack`, `page-header-band`, `page-header-rail` | chips, radius shell | Sim | Sim |
+| Header band + rail | `page_header.html` | `page-header-stack`, `page-header-band`, `page-header-rail` | chips, radius shell | Sim | Sim |
 | Status chip | header include | `page-header-status-chip--draft/active` | tema claro/escuro | Sim | Não (avulso) |
 | Stepper | `page_stepper.html` | `page-stepper page-stepper--horizontal` | `--surface-stepper`, `--border-stepper` | Sim | Não (roteiro avulso) |
 | Painel principal | `page-shell.css` | `main-form-panel main-form-panel--stack` | transparente, `--cv-form-section-stack-gap` | Sim | Sim |
@@ -27,7 +27,7 @@
 
 - `templates/components/ui/navigation/page_stepper.html` (novo)
 - `templates/components/ui/layouts/wizard_section_card.html` (novo, reutilizável)
-- `templates/components/ui/layouts/wizard_page.html` (ampliado com stepper opcional)
+- `templates/components/ui/headers/page_header.html` (ampliado com stepper opcional)
 - UI Lab `structures.html` passou a incluir `page_stepper.html`
 
 ---
@@ -36,7 +36,7 @@
 
 | Template | Antes | Depois | Components | Legado preservado | Risco | Status |
 |----------|-------|--------|------------|-------------------|-------|--------|
-| `roteiro_form_page.html` | `page-shell--wizard` + `app-form-shell` solto | `main-form-panel--stack` + `cv-form-section-stack` | header_stack_back_action | `app-page-shell--wizard` no editor | Baixo | OK |
+| `roteiro_form_page.html` | `page-shell--wizard` + `app-form-shell` solto | `main-form-panel--stack` + `cv-form-section-stack` | page_header | `app-page-shell--wizard` no editor | Baixo | OK |
 | `_roteiro_editor.html` | `card`/`card-section` wrapper | form direto no stack; intro como card wizard | — | `app-page-shell`, `roteiro-editor`, todos `data-*` | Baixo | OK |
 | `partials/roteiro/actions.html` | `div.roteiro-editor__actions` | `footer.footer-actions` + grupos | footer-actions | classes `roteiro-editor__actions`, submits | Baixo | OK |
 

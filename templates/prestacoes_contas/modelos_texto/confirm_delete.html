@@ -4,7 +4,7 @@
 
 {% block content %}
   <div class="page-shell page-shell--standard-simple">
-    {% include "components/ui/headers/header_stack_simple.html" with eyebrow="PRESTAÇÕES" title=page_title description=page_description icon_label="PC" module_label="Modelos de Texto" only %}
+    {% include "components/ui/headers/page_header.html" with eyebrow="PRESTAÇÕES" title=page_title description=page_description icon_label="PC" module_label="Modelos de Texto" only %}
     <form class="main-form-panel" method="post">
       {% csrf_token %}
       {% include "components/ui/layouts/form_section.html" with title="Confirmação de exclusão" description="Confirma a exclusão deste modelo de texto." section_id="modelos-texto-delete-section" only %}

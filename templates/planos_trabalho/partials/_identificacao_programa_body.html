@@ -1,7 +1,7 @@
 <div class="field-grid">
-  {% include "components/forms/form_field.html" with field=form.programa label="Programa" size_class="field-size-2" action_url=programas_url action_label="Gerenciar programas" only %}
+  {% include "components/ui/forms/field.html" with field=form.programa label="Programa" size_class="field-size-2" action_url=programas_url action_label="Gerenciar programas" only %}
   <div class="field-size-2" data-pt-programa-outros-field {% if not form.programa_outros_selected %}hidden{% endif %}>
-    {% include "components/forms/form_field.html" with field=form.programa_outros label="Outro programa" only %}
+    {% include "components/ui/forms/field.html" with field=form.programa_outros label="Outro programa" only %}
   </div>
 </div>
 <section class="wizard-inner-section cv-section-spaced" aria-labelledby="pt-coordenadores-title">
@@ -10,9 +10,9 @@
       {{ form.coordenador_adm_modo }}
       {{ form.coordenador_adm_nome_manual }}
       <div class="field-grid field-grid--cols-4">
-        {% include "components/forms/form_field.html" with field=form.coordenador_adm label="Nome" size_class="field-size-2" only %}
-        {% include "components/forms/input_with_action.html" with field=form.coordenador_adm_cargo_manual label="Cargo" action_url=cargos_url action_label="Gerenciar cargos" size_class="field-size-1" only %}
-        {% include "components/forms/form_field.html" with field=form.coordenador_adm_genero label="Gênero" size_class="field-size-1" only %}
+        {% include "components/ui/forms/field.html" with field=form.coordenador_adm label="Nome" size_class="field-size-2" only %}
+        {% include "components/ui/forms/field.html" with field=form.coordenador_adm_cargo_manual label="Cargo" action_url=cargos_url action_label="Gerenciar cargos" size_class="field-size-1" only %}
+        {% include "components/ui/forms/field.html" with field=form.coordenador_adm_genero label="Gênero" size_class="field-size-1" only %}
       </div>
     </div>
 
@@ -20,9 +20,9 @@
       {{ form.coordenador_op_modo }}
       {{ form.coordenador_op_nome_manual }}
       <div class="field-grid field-grid--cols-4">
-        {% include "components/forms/form_field.html" with field=form.coordenador_op label="Nome" size_class="field-size-2" only %}
-        {% include "components/forms/input_with_action.html" with field=form.coordenador_op_cargo_manual label="Cargo" action_url=cargos_url action_label="Gerenciar cargos" size_class="field-size-1" only %}
-        {% include "components/forms/form_field.html" with field=form.coordenador_op_genero label="Gênero" size_class="field-size-1" only %}
+        {% include "components/ui/forms/field.html" with field=form.coordenador_op label="Nome" size_class="field-size-2" only %}
+        {% include "components/ui/forms/field.html" with field=form.coordenador_op_cargo_manual label="Cargo" action_url=cargos_url action_label="Gerenciar cargos" size_class="field-size-1" only %}
+        {% include "components/ui/forms/field.html" with field=form.coordenador_op_genero label="Gênero" size_class="field-size-1" only %}
       </div>
     </div>
   </div>

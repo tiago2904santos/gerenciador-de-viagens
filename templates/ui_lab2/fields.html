@@ -14,16 +14,16 @@
 
     <div class="ui-lab2-col">
 
-      {% include "ui_lab2/partials/_component_open.html" with name="form_field · texto e obrigatorio" source="components/forms/form_field.html" note="Entrada de texto. O label e os erros saem do BoundField do Django." %}
+      {% include "ui_lab2/partials/_component_open.html" with name="form_field · texto e obrigatorio" source="components/ui/forms/field.html" note="Entrada de texto. O label e os erros saem do BoundField do Django." %}
         <div class="field-grid">
-          {% include "components/forms/form_field.html" with field=demo_form.texto size_class="field-size-2" only %}
-          {% include "components/forms/form_field.html" with field=demo_form.texto_obrigatorio size_class="field-size-2" only %}
+          {% include "components/ui/forms/field.html" with field=demo_form.texto size_class="field-size-2" only %}
+          {% include "components/ui/forms/field.html" with field=demo_form.texto_obrigatorio size_class="field-size-2" only %}
         </div>
       {% include "ui_lab2/partials/_component_close.html" with used_in=usage.form_field %}
 
       {% include "ui_lab2/partials/_component_open.html" with name="form_field · textarea" source="cv-field__control--textarea" note="Area de texto multilinha." %}
         <div class="field-grid">
-          {% include "components/forms/form_field.html" with field=demo_form.descricao size_class="field-size-4" only %}
+          {% include "components/ui/forms/field.html" with field=demo_form.descricao size_class="field-size-4" only %}
         </div>
       {% include "ui_lab2/partials/_component_close.html" with used_in=usage.form_field %}
 
@@ -36,8 +36,8 @@
         </div>
       {% include "ui_lab2/partials/_component_close.html" with used_in=usage.form_field %}
 
-      {% include "ui_lab2/partials/_component_open.html" with name="card_toggle (checkbox)" source="components/forms/card_toggle.html" note="Checkbox renderizado como card com estado LIGADA/DESLIGADA. field.html usa isto para BooleanField." %}
-        {% include "components/forms/form_field.html" with field=demo_form.aceite only %}
+      {% include "ui_lab2/partials/_component_open.html" with name="card_toggle (checkbox)" source="components/ui/forms/card_toggle.html" note="Checkbox renderizado como card com estado LIGADA/DESLIGADA. field.html usa isto para BooleanField." %}
+        {% include "components/ui/forms/field.html" with field=demo_form.aceite only %}
       {% include "ui_lab2/partials/_component_close.html" with used_in=usage.card_toggle %}
 
     </div>

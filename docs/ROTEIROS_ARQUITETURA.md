@@ -18,7 +18,7 @@ Outras observacoes de validacao:
 ### 1. O que ficou bom
 
 - Separacao clara: `selectors.py` para consultas, `services/roteiro_editor.py` para fluxo de persistencia e validacao de POST, `presenters.py` para dados de tela, views apenas orquestrando.
-- Componentes de dominio em `templates/components/domain/` centralizam includes do wizard sem duplicar o HTML dos partials em `roteiros/partials/roteiro/`.
+- Componentes de dominio em `templates/components/travel/` centralizam includes do wizard sem duplicar o HTML dos partials em `roteiros/partials/roteiro/`.
 - `get_roteiro_by_id` com `select_related` / `prefetch_related` evita N+1 em detalhe e edicao.
 - API `api_cidades_por_estado` usa selector com filtro opcional `q`.
 - Exclusao com `ProtectedError` tratada no service `excluir_roteiro`.
@@ -63,7 +63,7 @@ Outras observacoes de validacao:
 - Consulta direta de cidades em endpoint de API fora de selector.
 - Template de formulario com composicao misturada entre blocos de dominio e parciais de pagina.
 - CSS extenso e especifico de Roteiros sem camada de dominio reutilizavel explicita.
-- Componentes de dominio inexistentes em `templates/components/domain/`.
+- Componentes de dominio inexistentes em `templates/components/travel/`.
 
 ## Contrato de arquitetura
 
@@ -119,4 +119,4 @@ A view repassa `request` ao `roteiro_logic` porque o parser de diarias espera `r
 - Extraida orquestracao de fluxo de criacao/edicao para `roteiros/services/roteiro_editor.py`.
 - Centralizada consulta de cidades/estados relevantes em `roteiros/selectors.py`.
 - Mantida regra funcional existente via reutilizacao de `roteiro_logic`.
-- Criada camada de componentes de dominio em `templates/components/domain/`.
+- Criada camada de componentes de dominio em `templates/components/travel/`.

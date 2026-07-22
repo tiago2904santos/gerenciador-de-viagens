@@ -4,7 +4,7 @@
       <h3 class="cv-form-section-title" id="travel-document-wizard-viatura-title">Viatura</h3>
     </div>
     <div class="cv-form-section-header__actions">
-      {% include "components/buttons/action_button.html" with href=viatura_create_url label="Cadastrar nova viatura" variant="secondary" data_autosave_link=True only %}
+      {% include "components/ui/buttons/button.html" with href=viatura_create_url label="Cadastrar nova viatura" variant="secondary" data_autosave_link=True only %}
     </div>
   </header>
   <div class="cv-form-section-body">
@@ -12,7 +12,7 @@
       <p class="viatura-sugestoes__label">Sugestões</p>
       <div class="viatura-sugestoes__chips" data-viatura-sugestoes-chips></div>
     </div>
-    {% include "components/forms/form_field.html" with field=form.viatura only %}
+    {% include "components/ui/forms/field.html" with field=form.viatura only %}
   </div>
   <div class="cv-form-card__footer" data-oficio-viatura-footer{% if show_motorista_card %} hidden{% endif %}>
     {% include "components/ui/layouts/card_footer_section.html" with primary_label="Avançar" primary_action="wizard_next" only %}

@@ -15,7 +15,7 @@
           <p>Escolha um servidor cadastrado ou use o modo manual quando o motorista for externo à equipe.</p>
         </div>
         <div class="cv-form-section-header__actions oficio-transporte-card__header-actions oficio-transporte-card__header-actions--split">
-          {% include "components/buttons/action_button.html" with href=servidor_create_url label="Adicionar servidor" variant="secondary" data_autosave_link=True only %}
+          {% include "components/ui/buttons/button.html" with href=servidor_create_url label="Adicionar servidor" variant="secondary" data_autosave_link=True only %}
           <button type="button" class="cv-btn cv-btn--secondary" data-oficio-motorista-toggle>
             {% if form.motorista_modo.value == "MANUAL" %}Usar motorista cadastrado{% else %}Usar motorista manual{% endif %}
           </button>
@@ -26,14 +26,14 @@
       <div class="oficio-motorista-servidor" data-oficio-motorista-servidor>
         <div class="form-grid app-form-grid">
           <div class="field-span-12">
-            {% include "components/forms/form_field.html" with field=form.motorista label="MOTORISTA SERVIDOR" help_text="Busque e selecione um servidor; você pode trocar a qualquer momento." only %}
+            {% include "components/ui/forms/field.html" with field=form.motorista label="MOTORISTA SERVIDOR" help_text="Busque e selecione um servidor; você pode trocar a qualquer momento." only %}
           </div>
         </div>
       </div>
       <div class="oficio-motorista-manual app-form-grid-panel oficio-data-block form-field--hidden" data-oficio-motorista-manual>
         <div class="oficio-data-grid oficio-data-grid--full">
           <div class="oficio-data-grid__field">
-            {% include "components/forms/form_field.html" with field=form.motorista_manual_nome label="NOME DO MOTORISTA" only %}
+            {% include "components/ui/forms/field.html" with field=form.motorista_manual_nome label="NOME DO MOTORISTA" only %}
           </div>
         </div>
       </div>
@@ -55,10 +55,10 @@
       >
         <div class="oficio-data-grid oficio-data-grid--two">
           <div class="oficio-data-grid__field">
-            {% include "components/forms/oficio_motorista_split_field.html" with field=form.motorista_oficio_referencia label="Nº OFÍCIO MOTORISTA" ano=motorista_oficio_ano numero_inicial=motorista_oficio_numero_inicial only %}
+            {% include "components/ui/forms/document_number_field.html" with field=form.motorista_oficio_referencia label="Nº OFÍCIO MOTORISTA" ano=motorista_oficio_ano numero_inicial=motorista_oficio_numero_inicial only %}
           </div>
           <div class="oficio-data-grid__field">
-            {% include "components/forms/form_field.html" with field=form.motorista_protocolo_ref label="PROTOCOLO DO MOTORISTA" only %}
+            {% include "components/ui/forms/field.html" with field=form.motorista_protocolo_ref label="PROTOCOLO DO MOTORISTA" only %}
           </div>
         </div>
       </div>
@@ -69,7 +69,7 @@
 
 {% block extra_js %}
   {{ block.super }}
-  <script src="{% static 'js/components/oficio-motorista-suffix.js' %}?v=20260512" defer></script>
+  <script src="{% static 'js/components/document-number-field.js' %}?v=20260512" defer></script>
   <script src="{% static 'js/components/app-motorista-picker.js' %}?v=20260512" defer></script>
   <script src="{% static 'js/pages/oficios-transporte.js' %}?v=20260512" defer></script>
 {% endblock %}

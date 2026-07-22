@@ -1,4 +1,4 @@
-﻿# Arquitetura
+# Arquitetura
 
 ## Visao geral
 
@@ -52,7 +52,7 @@ Padrao interno do app (**modulo referencia** para os demais):
 - `services/` concentra calculos legacy (`diarias`, estimativa, etc.), `services/roteiro_editor.py` (persistencia e fluxo do editor avulso) e `services/routing/` (provedor OpenRouteService, assinatura/cache da rota consolidada, montagem de pontos a partir de `Cidade` com lat/lon no cadastro).
 - `selectors.py` concentra consultas e querysets.
 - `presenters.py` prepara dados de tela sem HTML.
-- `templates/components/domain/` contem blocos de dominio reutilizaveis; ver `docs/COMPONENTES_DOMINIO.md` e `docs/ROTEIROS_ARQUITETURA.md`.
+- `templates/components/travel/` contem blocos de dominio reutilizaveis; ver `docs/COMPONENTES_DOMINIO.md` e `docs/ROTEIROS_ARQUITETURA.md`.
 
 A interface publica em `/roteiros/` inclui listagem (busca `q`), criacao, edicao, detalhe, exclusao com confirmacao, wizard de trechos/destinos e endpoints de apoio (cidades, diarias, estimativa de trecho, **calculo de rota no mapa** via `POST /roteiros/api/calcular-rota/` que chama OpenRouteService no servidor — chave `OPENROUTESERVICE_API_KEY` apenas no `.env`), sem alterar regras do legado ja portadas.
 
@@ -70,7 +70,7 @@ Ate nova decisao de arquitetura, **Roteiros** e o modulo **referencia provisorio
 - calculadora (diarias no fluxo de roteiro);
 - resumo de rota.
 
-Os proximos modulos devem seguir o mesmo desenho (views magras, `selectors`, `services`, `presenters`, components em `templates/components/domain/`, `static/css/domain.css`). Quando um segundo modulo **passar a usar** o mesmo bloco em producao, pode ser necessaria **extração adicional** de HTML/CSS a partir dos partials atuais de Roteiros; isso e esperado e nao descaracteriza este aceite.
+Os proximos modulos devem seguir o mesmo desenho (views magras, `selectors`, `services`, `presenters`, components em `templates/components/travel/`, `static/css/domain.css`). Quando um segundo modulo **passar a usar** o mesmo bloco em producao, pode ser necessaria **extração adicional** de HTML/CSS a partir dos partials atuais de Roteiros; isso e esperado e nao descaracteriza este aceite.
 
 ## Padrao tecnico
 

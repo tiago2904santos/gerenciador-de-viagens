@@ -1,4 +1,0 @@
-{# Linhas iniciais (server-side) dos destinos do termo, a partir de form.destination_rows. #}
-{% for row in form.destination_rows %}
-  {% include "termos/partials/_evento_destino_row.html" with row=row row_index=row.index row_number=forloop.counter prefix="termo" %}
-{% endfor %}

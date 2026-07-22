@@ -172,9 +172,9 @@ COMPONENT_USAGE = {
         "templates/termos/form.html",
         "templates/planos_trabalho/wizard_identificacao.html",
         "templates/planos_trabalho/wizard_efetivo_diarias.html",
-        "templates/roteiros/partials/roteiro/trechos.html",
+        "templates/components/travel/route_segments.html",
         "templates/roteiros/partials/roteiro/bate_volta.html",
-        "templates/roteiros/partials/roteiro/retorno.html",
+        "templates/roteiros/partials/roteiro/_retorno_body.html",
     ],
     "input_date_time": [
         "templates/eventos/includes/_evento_form_sections.html",
@@ -193,15 +193,15 @@ COMPONENT_USAGE = {
         "templates/planos_trabalho/wizard_atividades.html",
         "templates/planos_trabalho/wizard_efetivo_diarias.html",
         "templates/planos_trabalho/wizard_documentos.html",
-        "templates/roteiros/partials/roteiro/trechos.html",
-        "templates/roteiros/partials/roteiro/retorno.html",
+        "templates/components/travel/route_segments.html",
+        "templates/roteiros/partials/roteiro/_retorno_body.html",
         "templates/roteiros/partials/roteiro/source.html",
         "templates/roteiros/includes/mapa_rota.html",
         "templates/documentos/pdf_viewer.html",
         "templates/oficios/partials/assinatura_central_documento.html",
         "templates/oficios/partials/assinatura_etiqueta_actions.html",
     ],
-    # button.html + action_button.html (wrapper compat) — usos fora de listas
+    # button.html — usos fora de listas
     "button_component": [
         "templates/eventos/form.html",
         "templates/ordens_servico/form.html",
@@ -237,7 +237,7 @@ COMPONENT_USAGE = {
         "templates/cadastros/unidades/form.html",
     ],
     # Headers
-    "header_stack_back_action": [
+    "page_header_back_action": [
         "templates/eventos/form.html",
         "templates/eventos/detalhe.html",
         "templates/oficios/wizard_base.html",
@@ -247,9 +247,8 @@ COMPONENT_USAGE = {
         "templates/termos/form.html",
         "templates/termos/preview.html",
         "templates/termos/preview_cadastro.html",
-        "templates/components/ui/layouts/wizard_page.html",
     ],
-    "header_stack_simple": [
+    "page_header_simple": [
         "templates/cadastros/servidores/form.html",
         "templates/cadastros/viaturas/form.html",
         "templates/cadastros/unidades/form.html",
@@ -264,14 +263,13 @@ COMPONENT_USAGE = {
         "templates/planos_trabalho/horarios/form.html",
         "templates/planos_trabalho/programas/form.html",
     ],
-    "header_band_status": [],
-    "header_stack_stepper": [],
+    "page_header_band_only": [],
+    "page_header_stepper": [],
     # Steppers
     "page_stepper": [
         "templates/oficios/wizard_base.html",
         "templates/planos_trabalho/wizard_base.html",
         "templates/roteiros/roteiro_form_page.html",
-        "templates/components/ui/layouts/wizard_page.html",
         "templates/oficios/partials/wizard_stepper.html",
     ],
     # Badges / Status
@@ -285,13 +283,13 @@ COMPONENT_USAGE = {
     "status_badge": [
         "templates/components/ui/modals/confirm_delete.html",
     ],
-    "status_pill": [
+    "status_badge": [
         "templates/oficios/wizard_documentos.html",
         "templates/components/cards/document_card.html",
     ],
     "page_header_status_chip": [
-        "templates/components/ui/headers/header_stack_back_action.html",
-        "templates/components/ui/headers/header_stack_simple.html",
+        "templates/components/ui/headers/page_header.html",
+        "templates/components/ui/headers/page_header.html",
     ],
     # Feedback
     "alert": [
@@ -322,7 +320,6 @@ COMPONENT_USAGE = {
         "templates/planos_trabalho/wizard_base.html",
         "templates/roteiros/roteiro_form_page.html",
         "templates/eventos/form.html",
-        "templates/components/ui/layouts/wizard_page.html",
     ],
     "main_form_panel": [
         "templates/oficios/wizard_base.html",
@@ -391,7 +388,7 @@ COMPONENT_USAGE = {
         "templates/cadastros/servidores/form.html",
         "templates/cadastros/viaturas/form.html",
     ],
-    "oficio_motorista_split_field": [
+    "document_number_field": [
         "templates/oficios/partials/wizard_dados_card_motorista_externo.html",
         "templates/oficios/wizard_transporte.html",
     ],

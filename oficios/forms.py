@@ -430,7 +430,7 @@ class OficioTransporteForm(forms.ModelForm):
             ),
             "motorista_oficio_referencia": forms.HiddenInput(
                 attrs={
-                    "data-oficio-motorista-hidden": "true",
+                    "data-document-number-value": "true",
                 },
             ),
             "motorista_protocolo_ref": forms.TextInput(
@@ -474,7 +474,7 @@ class OficioTransporteForm(forms.ModelForm):
             ano_motorista = tz.localdate().year
         ano_str = str(ano_motorista)
         self.fields["motorista_oficio_referencia"].widget.attrs["data-mask-year"] = ano_str
-        self.fields["motorista_oficio_referencia"].widget.attrs["data-oficio-ano"] = ano_str
+        self.fields["motorista_oficio_referencia"].widget.attrs["data-document-year"] = ano_str
 
         if not self.is_bound and self.instance.pk:
             modo = self.instance.motorista_modo or Oficio.MOTORISTA_MODO_SERVIDOR

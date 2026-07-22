@@ -1,6 +1,0 @@
-{# SEÇÃO 7: CALCULADORA DE DIÁRIAS #}
-{% if roteiro_editor_oficio %}
-  {% include "components/ui/forms/form_block.html" with shell="" extra_class="roteiro-editor__section--diarias oficio-roteiro-block" section_id="sec-diarias" data_hook="calculadora-rota" title="Diárias" description="Resumo financeiro calculado pelo roteiro e pela equipe." actions_template="roteiros/partials/roteiro/_diarias_actions.html" body_template="roteiros/partials/roteiro/_diarias_body.html" footer_template="" %}
-{% else %}
-  {% include "components/ui/forms/form_block.html" with shell="card" extra_class="roteiro-editor__section--diarias" section_id="sec-diarias" data_hook="calculadora-rota" title="Diárias" description="Resumo financeiro calculado pelo roteiro e pela equipe." actions_template="roteiros/partials/roteiro/_diarias_actions.html" body_template="roteiros/partials/roteiro/_diarias_body.html" footer_template="roteiros/partials/roteiro/actions.html" %}
-{% endif %}

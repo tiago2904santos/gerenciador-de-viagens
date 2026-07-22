@@ -480,8 +480,8 @@ export function initRoteirosEditor() {
     return prefix + '-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2);
   }
   function loadCities(select, estadoId, selectedId) {
-    if (window.CV && window.CV.destinos && typeof window.CV.destinos.loadCities === 'function') {
-      return window.CV.destinos.loadCities({
+    if (window.CV && window.CV.destinations && typeof window.CV.destinations.loadCities === 'function') {
+      return window.CV.destinations.loadCities({
         citySelect: select,
         stateId: estadoId,
         selectedId: selectedId,
@@ -879,11 +879,11 @@ export function initRoteirosEditor() {
   }
   function getDestinoRows() {
     var container = $('destinos-container');
-    return container ? Array.from(container.querySelectorAll('.destino-row')) : [];
+    return container ? Array.from(container.querySelectorAll('.destination-row')) : [];
   }
   function syncDestinoRowChrome(row, idx) {
     if (!row) return;
-    var ord = row.querySelector('[data-destino-ord]');
+    var ord = row.querySelector('[data-destination-order]');
     if (ord) ord.textContent = String(idx + 1);
     var es = row.querySelector('.destino-estado');
     var ci = row.querySelector('.destino-cidade');
@@ -903,9 +903,9 @@ export function initRoteirosEditor() {
     if (ciLabel) ciLabel.setAttribute('for', ciId);
   }
   function reindexDestinoRows() {
-    if (window.CV && window.CV.destinos && typeof window.CV.destinos.reindexRows === 'function') {
-      window.CV.destinos.reindexRows($('destinos-container'), {
-        rowSelector: '.destino-row',
+    if (window.CV && window.CV.destinations && typeof window.CV.destinations.reindexRows === 'function') {
+      window.CV.destinations.reindexRows($('destinos-container'), {
+        rowSelector: '.destination-row',
         indexAttr: 'index',
         onRow: function(row, idx) {
           syncDestinoRowChrome(row, idx);
@@ -919,19 +919,19 @@ export function initRoteirosEditor() {
     });
   }
   function refreshDestinoButtons() {
-    if (window.CV && window.CV.destinos && typeof window.CV.destinos.updateSingleRowState === 'function') {
-      window.CV.destinos.updateSingleRowState($('destinos-container'), {
-        rowSelector: '.destino-row',
-        removeSelector: '.btn-remover-destino'
+    if (window.CV && window.CV.destinations && typeof window.CV.destinations.updateSingleRowState === 'function') {
+      window.CV.destinations.updateSingleRowState($('destinos-container'), {
+        rowSelector: '.destination-row',
+        removeSelector: '.destination-remove-button'
       });
       return;
     }
     var rows = getDestinoRows();
     var single = rows.length <= 1;
     rows.forEach(function(row) {
-      var btn = row.querySelector('.btn-remover-destino');
+      var btn = row.querySelector('.destination-remove-button');
       if (btn) btn.hidden = single;
-      row.classList.toggle('destino-row--single', single);
+      row.classList.toggle('destination-row--single', single);
     });
   }
   function clearDestinoDropTargets() {
@@ -988,7 +988,7 @@ export function initRoteirosEditor() {
       destinoDragState.row.classList.remove('is-dragging');
     }
     destinoDragState = null;
-    document.body.classList.remove('is-dragging-destino');
+    document.body.classList.remove('is-dragging-destination');
     clearDestinoDropTargets();
     document.removeEventListener('pointermove', handleDestinoPointerMove);
     document.removeEventListener('pointerup', handleDestinoPointerUp);
@@ -1002,7 +1002,7 @@ export function initRoteirosEditor() {
       if (Math.sqrt((dx * dx) + (dy * dy)) < 8) return;
       destinoDragState.active = true;
       destinoDragState.row.classList.add('is-dragging');
-      document.body.classList.add('is-dragging-destino');
+      document.body.classList.add('is-dragging-destination');
     }
     e.preventDefault();
     destinoDragState.currentTarget = getDestinoDropTarget(e.clientY, destinoDragState.row);
@@ -1041,10 +1041,10 @@ export function initRoteirosEditor() {
     var isOficio = !!(form && form.closest && form.closest('[data-travel-document-wizard-roteiro]'));
     if (isOficio) {
       return '' +
-        '<div class="destino-row oficio-roteiro-destino-row" data-index="' + esc(String(idx)) + '">' +
-          '<span class="oficio-roteiro-destino-row__badge" data-destino-ord aria-hidden="true">' + esc(String(idx + 1)) + '</span>' +
-          '<div class="oficio-roteiro-destino-row__body">' +
-            '<div class="field-grid roteiro-sede-grid roteiro-destino-grid oficio-roteiro-destino-row__fields">' +
+        '<div class="destination-row cv-ordered-field-row" data-index="' + esc(String(idx)) + '">' +
+          '<span class="cv-ordered-field-row__badge" data-destination-order aria-hidden="true">' + esc(String(idx + 1)) + '</span>' +
+          '<div class="cv-ordered-field-row__body">' +
+            '<div class="field-grid roteiro-sede-grid roteiro-destino-grid cv-ordered-field-row__fields">' +
               '<div class="field app-form-field">' +
                 '<select name="destino_estado_' + idx + '" id="destino_estado_' + idx + '" class="destino-estado cv-search-picker__native" data-cv-search-picker="true" data-picker-mode="single" data-picker-variant="compact" data-placeholder="Buscar estado..." data-empty-message="Nenhum estado encontrado." aria-label="UF">' + estadoOptionsMarkup(selE) + '</select>' +
               '</div>' +
@@ -1055,11 +1055,11 @@ export function initRoteirosEditor() {
               '</div>' +
             '</div>' +
           '</div>' +
-          '<button type="button" class="btn-remover-destino oficio-roteiro-destino-row__remove" title="Remover destino" aria-label="Remover destino">×</button>' +
+          '<button type="button" class="destination-remove-button cv-ordered-field-row__remove" title="Remover destino" aria-label="Remover destino">×</button>' +
         '</div>';
     }
     return '' +
-      '<div class="cv-search-picker__selected-card destino-row" data-index="' + esc(String(idx)) + '">' +
+      '<div class="cv-search-picker__selected-card destination-row" data-index="' + esc(String(idx)) + '">' +
         '<div class="cv-search-picker__selected-main">' +
           '<div class="cv-search-picker__selected-title-row">' +
             '<span class="cv-search-picker__selected-name">Destino</span>' +
@@ -1075,11 +1075,11 @@ export function initRoteirosEditor() {
             '</div>' +
           '</div>' +
         '</div>' +
-        '<button type="button" class="cv-search-picker__remove btn-remover-destino" title="Remover destino" aria-label="Remover destino">x</button>' +
+        '<button type="button" class="cv-search-picker__remove destination-remove-button" title="Remover destino" aria-label="Remover destino">x</button>' +
       '</div>';
   }
   function bindDestinoRow(row) {
-    if (window.CV && window.CV.destinos && typeof window.CV.destinos.initDragDrop === 'function') {
+    if (window.CV && window.CV.destinations && typeof window.CV.destinations.initDragDrop === 'function') {
       return row;
     }
     row.addEventListener('pointerdown', function(e) {
@@ -1769,9 +1769,9 @@ export function initRoteirosEditor() {
   var destinosContainer = $('destinos-container');
   var btnAdicionarDestino = $('btn-adicionar-destino');
   if (destinosContainer) {
-    if (window.CV && window.CV.destinos && typeof window.CV.destinos.initDragDrop === 'function') {
-      window.CV.destinos.initDragDrop(destinosContainer, {
-        rowSelector: '.destino-row',
+    if (window.CV && window.CV.destinations && typeof window.CV.destinations.initDragDrop === 'function') {
+      window.CV.destinations.initDragDrop(destinosContainer, {
+        rowSelector: '.destination-row',
         onReorder: function() {
           reindexDestinoRows();
           renderTrechos(captureCurrentState(), { force: true });
@@ -1781,14 +1781,14 @@ export function initRoteirosEditor() {
       });
     }
     destinosContainer.addEventListener('change', function(e) {
-      if (applyingState) return; var row = e.target.closest('.destino-row'); if (!row) return;
+      if (applyingState) return; var row = e.target.closest('.destination-row'); if (!row) return;
       if (e.target.classList.contains('destino-estado')) { var cs = row.querySelector('.destino-cidade'); loadCities(cs, e.target.value||'', null).then(function() { renderTrechos(captureCurrentState()); scheduleRealtimeDiarias(); scheduleAutosave(); }); }
       else { renderTrechos(captureCurrentState()); scheduleRealtimeDiarias(); scheduleAutosave(); }
     });
     destinosContainer.addEventListener('click', function(e) {
-      var btn = e.target.closest('.btn-remover-destino'); if (!btn) return;
+      var btn = e.target.closest('.destination-remove-button'); if (!btn) return;
       var rows = getDestinoRows(); if (rows.length <= 1) return;
-      btn.closest('.destino-row').remove(); reindexDestinoRows(); refreshDestinoButtons(); renderTrechos(captureCurrentState()); scheduleRealtimeDiarias(); scheduleAutosave();
+      btn.closest('.destination-row').remove(); reindexDestinoRows(); refreshDestinoButtons(); renderTrechos(captureCurrentState()); scheduleRealtimeDiarias(); scheduleAutosave();
     });
   }
   if (btnAdicionarDestino) {

@@ -12,7 +12,7 @@
 
 | Problema | Antes | Depois | Arquivos alterados |
 |----------|-------|--------|-------------------|
-| Chip de status desalinhado/incorreto | Chip fora do padrão ou texto errado | `page-header-status-chip` na faixa azul com variantes `draft` / `pending` / `active` | `oficios/presenters.py`, `header_stack_back_action.html` |
+| Chip de status desalinhado/incorreto | Chip fora do padrão ou texto errado | `page-header-status-chip` na faixa azul com variantes `draft` / `pending` / `active` | `oficios/presenters.py`, `page_header.html` |
 | Stepper quebrado | Linhas/círculos sobre texto | `page_stepper.html` com track e conteúdo separados; flex/grid em `page-shell.css` | `page_stepper.html`, `page-shell.css` |
 | Camadas/cards em excesso | card > card > panel | `page-shell--wizard` → header → stepper → `cv-form-section-stack` → até 4 cards | `wizard_base.html`, `wizard_dados_viajantes.html` |
 | Footer etapa 1 poluído | DOCX, PDF, Termos, etc. | Apenas “Avançar →” (`wizard_footer_mode=step1_minimal`) | `wizard_actions.html`, `views.py` |
@@ -139,7 +139,7 @@ Evita que valores curtos de display como datas (`21/05/2026`) quebrem em colunas
 
 ### Component usado no botão Gerenciar modelos
 
-`components/forms/input_with_action.html` no campo **Modelo de motivo** — mesmo padrão do select **Cargo** em servidores: `cv-field-with-action--manage-reveal` + `field_manage_button.html` (ícone circular oculto até hover/focus).
+`components/ui/forms/field.html` no campo **Modelo de motivo** — mesmo padrão do select **Cargo** em servidores: `cv-field-with-action--manage-reveal` + `field_manage_button.html` (ícone circular oculto até hover/focus).
 
 ### Ajuste do textarea Motivo
 

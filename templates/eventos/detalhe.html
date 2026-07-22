@@ -14,7 +14,7 @@
 
 {% block content %}
   <div class="page-shell page-shell--wizard travel-document-wizard app-wizard evento-guided-page">
-    {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="EVENTOS" title=evento_header_title description=evento_header_description icon_label="EV" module_label="Eventos" back_label="Voltar para lista" back_url="/eventos/" status_label=evento.get_status_display status_variant=evento_status_variant only %}
+    {% include "components/ui/headers/page_header.html" with eyebrow="EVENTOS" title=evento_header_title description=evento_header_description icon_label="EV" module_label="Eventos" back_label="Voltar para lista" back_url="/eventos/" status_label=evento.get_status_display status_variant=evento_status_variant only %}
 
     {% if evento.status == "cancelado" %}
       <div class="cv-alert cv-alert--danger cv-alert--action">

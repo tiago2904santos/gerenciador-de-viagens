@@ -9,7 +9,7 @@
   </div>
   {% if href %}
     <footer class="cv-module-card__footer">
-      {% include "components/buttons/action_button.html" with href=href label=action_label|default:"Abrir" variant="secondary" size="sm" icon="arrow-right" icon_after=True only %}
+      {% include "components/ui/buttons/button.html" with href=href label=action_label|default:"Abrir" variant="secondary" size="sm" icon="arrow-right" icon_after=True only %}
     </footer>
   {% endif %}
 </article>

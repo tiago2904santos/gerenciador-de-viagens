@@ -1,7 +1,0 @@
-<div class="field-group{% if extra_class %} {{ extra_class }}{% endif %}"{% if group_id %} id="{{ group_id }}"{% endif %}>
-  {% if title %}<h3 class="field-group__title">{{ title }}</h3>{% endif %}
-  {% if description %}<p class="field-group__description">{{ description }}</p>{% endif %}
-  {% for field in fields %}
-    {% include "components/ui/forms/field.html" with field=field only %}
-  {% endfor %}
-</div>

@@ -25,7 +25,7 @@
       {% include "components/ui/feedback/field_error.html" with errors=field.errors only %}
     {% endif %}
     <section class="cv-search-picker__selected-panel evento-doc-summary-panel" aria-label="Documentos encontrados">
-      <div class="cv-search-picker__selected-list roteiro-editor__route-list oficio-roteiro-route-list roteiro-routes-list" data-evento-doc-list="{{ panel_key }}"></div>
+      <div class="cv-search-picker__selected-list roteiro-editor__route-list related-route-list related-route-list" data-evento-doc-list="{{ panel_key }}"></div>
       <p class="cv-search-picker__selected-empty" data-evento-doc-empty="{{ panel_key }}" hidden>{{ empty }}</p>
     </section>
   </div>

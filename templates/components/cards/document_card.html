@@ -4,13 +4,13 @@
       {% if card %}
         {% if card.status %}
           {% with sc_tone=card.status_class|cut:"status-chip--"|default:"muted" %}
-            {% include "components/ui/lists/status_pill.html" with label=card.status variant=sc_tone only %}
+            {% include "components/ui/badges/status_badge.html" with label=card.status variant=sc_tone only %}
           {% endwith %}
         {% endif %}
         <h3 class="cv-document-card__title">{{ card.title|default:"Documento" }}</h3>
       {% else %}
         {% with sc_tone=status_class|cut:"status-chip--"|default:"draft" %}
-          {% include "components/ui/lists/status_pill.html" with label=status|default:"Rascunho" variant=sc_tone only %}
+          {% include "components/ui/badges/status_badge.html" with label=status|default:"Rascunho" variant=sc_tone only %}
         {% endwith %}
         <h3 class="cv-document-card__title">{{ title|default:"Documento" }}</h3>
       {% endif %}
@@ -40,13 +40,13 @@
   <footer class="cv-document-card__actions document-actions">
     {% if card.actions %}
       {% for action in card.actions %}
-        {% include "components/buttons/action_button.html" with href=action.href label=action.label variant=action.variant size="sm" only %}
+        {% include "components/ui/buttons/button.html" with href=action.href label=action.label variant=action.variant size="sm" only %}
       {% endfor %}
     {% else %}
-      {% include "components/buttons/action_button.html" with href=open_url label="Abrir" variant="secondary" size="sm" only %}
-      {% include "components/buttons/action_button.html" with href=pdf_url label="PDF" variant="muted" size="sm" only %}
-      {% include "components/buttons/action_button.html" with href=docx_url label="DOCX" variant="muted" size="sm" only %}
-      {% include "components/buttons/action_button.html" with href=delete_url label="Excluir" variant="danger" size="sm" only %}
+      {% include "components/ui/buttons/button.html" with href=open_url label="Abrir" variant="secondary" size="sm" only %}
+      {% include "components/ui/buttons/button.html" with href=pdf_url label="PDF" variant="muted" size="sm" only %}
+      {% include "components/ui/buttons/button.html" with href=docx_url label="DOCX" variant="muted" size="sm" only %}
+      {% include "components/ui/buttons/button.html" with href=delete_url label="Excluir" variant="danger" size="sm" only %}
     {% endif %}
   </footer>
 </article>

@@ -1,5 +1,5 @@
 <section class="cv-form-subsection termo-evento-periodo" aria-label="Período do evento">
-  {% include "components/forms/cv_date_picker.html" with mode="range" picker_id="termo-evento-date-picker" extra_class="termo-date-picker" start_field=form.data_evento_inicio end_field=form.data_evento_fim start_label="Data inicial" end_label="Data final" start_input_id="id_data_evento_inicio_display" end_input_id="id_data_evento_fim_display" show_summary=False only %}
+  {% include "components/ui/forms/date_picker.html" with mode="range" picker_id="termo-evento-date-picker" extra_class="termo-date-picker" start_field=form.data_evento_inicio end_field=form.data_evento_fim start_label="Data inicial" end_label="Data final" start_input_id="id_data_evento_inicio_display" end_input_id="id_data_evento_fim_display" show_summary=False only %}
 </section>
 
 {% include "termos/partials/_evento_destinos_section.html" %}

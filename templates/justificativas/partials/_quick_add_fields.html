@@ -1,19 +1,19 @@
 <div class="justificativa-quick-add">
   <div class="field-grid">
     <div class="field-size-4">
-      {% include "components/forms/form_field.html" with field=form.oficios only %}
+      {% include "components/ui/forms/field.html" with field=form.oficios only %}
     </div>
   </div>
   <div class="field-grid">
     <div class="field-size-4">
       {% url 'justificativas:modelos_index' as modelos_url %}
       {% url 'justificativas:index' as justificativas_index_url %}
-      {% include "components/forms/input_with_action.html" with field=form.modelo action_url=modelos_url|add:"?next="|add:justificativas_index_url action_label="Gerenciar modelos" only %}
+      {% include "components/ui/forms/field.html" with field=form.modelo action_url=modelos_url|add:"?next="|add:justificativas_index_url action_label="Gerenciar modelos" only %}
     </div>
   </div>
   <div class="field-grid">
     <div class="field-size-4">
-      {% include "components/forms/form_field.html" with field=form.texto label="Justificativa" only %}
+      {% include "components/ui/forms/field.html" with field=form.texto label="Justificativa" only %}
     </div>
   </div>
 </div>

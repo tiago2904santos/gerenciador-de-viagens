@@ -16,21 +16,21 @@
     <div class="ui-lab2-grid">
 
       {# ── cv-date-picker · modo SINGLE ─────────────────────────── #}
-      {% include "ui_lab2/partials/_component_open.html" with name="cv-date-picker · data unica" source="components/forms/cv_date_picker.html with mode=\"single\"" note="Um campo de data com gatilho de icone. Clique no campo ou no icone para abrir. Marcacao vinda de components/forms/cv_date_picker.html — o modelo global, unico ponto de verdade." %}
+      {% include "ui_lab2/partials/_component_open.html" with name="cv-date-picker · data unica" source="components/ui/forms/date_picker.html with mode=\"single\"" note="Um campo de data com gatilho de icone. Clique no campo ou no icone para abrir. Marcacao vinda de components/ui/forms/date_picker.html — o modelo global, unico ponto de verdade." %}
         <div class="cv-demo-width--sm">
-          {% include "components/forms/cv_date_picker.html" with mode="single" picker_id="ui-lab-single-picker" single_input_id="ui-lab-date-single" single_hidden_id="ui-lab-date-single-value" single_hidden_name="ui_lab_date_single" only %}
+          {% include "components/ui/forms/date_picker.html" with mode="single" picker_id="ui-lab-single-picker" single_input_id="ui-lab-date-single" single_hidden_id="ui-lab-date-single-value" single_hidden_name="ui_lab_date_single" only %}
         </div>
       {% include "ui_lab2/partials/_component_close.html" with used_in=usage.cv_date_picker %}
 
       {# ── cv-date-picker · modo RANGE ──────────────────────────── #}
-      {% include "ui_lab2/partials/_component_open.html" with name="cv-date-picker · periodo (ida/volta)" source="components/forms/cv_date_picker.html with mode=\"range\"" note="Dois campos (inicial/final) ligados ao mesmo calendario. Modelo global usado em eventos, termos, ordens_servico, planos_trabalho e roteiros." %}
-        {% include "components/forms/cv_date_picker.html" with mode="range" picker_id="ui-lab-range-picker" start_input_id="ui-lab-date-start" end_input_id="ui-lab-date-end" start_hidden_id="ui-lab-date-start-value" end_hidden_id="ui-lab-date-end-value" start_hidden_name="ui_lab_date_start" end_hidden_name="ui_lab_date_end" only %}
+      {% include "ui_lab2/partials/_component_open.html" with name="cv-date-picker · periodo (ida/volta)" source="components/ui/forms/date_picker.html with mode=\"range\"" note="Dois campos (inicial/final) ligados ao mesmo calendario. Modelo global usado em eventos, termos, ordens_servico, planos_trabalho e roteiros." %}
+        {% include "components/ui/forms/date_picker.html" with mode="range" picker_id="ui-lab-range-picker" start_input_id="ui-lab-date-start" end_input_id="ui-lab-date-end" start_hidden_id="ui-lab-date-start-value" end_hidden_id="ui-lab-date-end-value" start_hidden_name="ui_lab_date_start" end_hidden_name="ui_lab_date_end" only %}
       {% include "ui_lab2/partials/_component_close.html" with used_in=usage.cv_date_picker %}
 
       {# ── cv-date-picker · modo MULTI ──────────────────────────── #}
-      {% include "ui_lab2/partials/_component_open.html" with name="cv-date-picker · multiplas datas" source="components/forms/cv_date_picker.html with mode=\"multi\"" note="Selecao de N datas com limite (ex: uma por trecho do roteiro). Modelo global usado para preencher as datas dos trechos em sequencia." %}
+      {% include "ui_lab2/partials/_component_open.html" with name="cv-date-picker · multiplas datas" source="components/ui/forms/date_picker.html with mode=\"multi\"" note="Selecao de N datas com limite (ex: uma por trecho do roteiro). Modelo global usado para preencher as datas dos trechos em sequencia." %}
         <div class="cv-demo-width--md">
-          {% include "components/forms/cv_date_picker.html" with mode="multi" picker_id="ui-lab-multi-picker" max_dates=3 multi_input_id="ui-lab-date-multi" multi_placeholder="Selecione ate 3 datas" only %}
+          {% include "components/ui/forms/date_picker.html" with mode="multi" picker_id="ui-lab-multi-picker" max_dates=3 multi_input_id="ui-lab-date-multi" multi_placeholder="Selecione ate 3 datas" only %}
         </div>
       {% include "ui_lab2/partials/_component_close.html" with used_in=usage.cv_date_picker %}
 

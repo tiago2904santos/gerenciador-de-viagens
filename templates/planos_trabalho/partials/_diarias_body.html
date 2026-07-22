@@ -1,7 +1,7 @@
 <div class="cv-form-subsection pt-diarias-linha" aria-label="Datas e horários do deslocamento">
-  {% include "components/forms/cv_date_picker.html" with mode="range" picker_id="pt-diarias-date-picker" extra_class="termo-date-picker pt-diarias-linha__dates" start_field=diarias_form.saida_sede_data end_field=diarias_form.chegada_sede_data start_label="Data de saída da sede" end_label="Data de chegada na sede" start_input_id="id_pt_saida_sede_data_display" end_input_id="id_pt_chegada_sede_data_display" show_summary=False only %}
-  {% include "components/forms/form_field.html" with field=diarias_form.saida_sede_hora label="Hora de saída" size_class="pt-diarias-hora-saida" only %}
-  {% include "components/forms/form_field.html" with field=diarias_form.chegada_sede_hora label="Hora de chegada" size_class="pt-diarias-hora-chegada" only %}
+  {% include "components/ui/forms/date_picker.html" with mode="range" picker_id="pt-diarias-date-picker" extra_class="termo-date-picker pt-diarias-linha__dates" start_field=diarias_form.saida_sede_data end_field=diarias_form.chegada_sede_data start_label="Data de saída da sede" end_label="Data de chegada na sede" start_input_id="id_pt_saida_sede_data_display" end_input_id="id_pt_chegada_sede_data_display" show_summary=False only %}
+  {% include "components/ui/forms/field.html" with field=diarias_form.saida_sede_hora label="Hora de saída" size_class="pt-diarias-hora-saida" only %}
+  {% include "components/ui/forms/field.html" with field=diarias_form.chegada_sede_hora label="Hora de chegada" size_class="pt-diarias-hora-chegada" only %}
 </div>
 
 <section class="cv-form-subsection pt-diarias-resultado" aria-labelledby="pt-diarias-resultado-title">

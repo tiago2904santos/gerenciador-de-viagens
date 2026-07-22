@@ -1,5 +1,5 @@
 {% if documentos_ctx.roteiro_card.status_chip_label %}
   {% with sc_tone=documentos_ctx.roteiro_card.status_chip_class|cut:"status-chip--"|default:"muted" %}
-    {% include "components/ui/lists/status_pill.html" with label=documentos_ctx.roteiro_card.status_chip_label variant=sc_tone extra_class="oficio-documentos-route-section__status-chip" only %}
+    {% include "components/ui/badges/status_badge.html" with label=documentos_ctx.roteiro_card.status_chip_label variant=sc_tone extra_class="oficio-documentos-route-section__status-chip" only %}
   {% endwith %}
 {% endif %}

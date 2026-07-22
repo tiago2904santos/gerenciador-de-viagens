@@ -5,7 +5,7 @@
       {% if row.badges %}
         <span class="cv-record-row__badges simple-list-item__badges">
           {% for badge in row.badges %}
-            {% include "components/ui/lists/status_pill.html" with label=badge.text variant=badge.variant|default:'accent' only %}
+            {% include "components/ui/badges/status_badge.html" with label=badge.text variant=badge.variant|default:'accent' only %}
           {% endfor %}
         </span>
       {% endif %}

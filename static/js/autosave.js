@@ -266,7 +266,7 @@
          Aqui a gente cancela o debounce pendente, garante que o snapshot atual
          seja enviado e só troca de página depois que a gravação terminar.
          Escuta no `document` (não no `form`) porque o header com o link
-         "Voltar" (header_stack_back_action.html) fica fora da tag <form> em
+         "Voltar" (page_header.html) fica fora da tag <form> em
          todos os wizards — um listener preso ao form nunca veria esse clique. */
       event.preventDefault();
       window.clearTimeout(inputTimer);

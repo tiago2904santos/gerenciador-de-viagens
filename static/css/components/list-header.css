@@ -174,12 +174,12 @@
 }
 
 .list-header__filters .cv-date-picker,
-.list-header__filters .oficios-filter-range {
+.list-header__filters .travel-period-filter {
   flex: 0 1 auto;
   min-width: 0;
 }
 
-.list-header__filters .oficios-filter-range__btn {
+.list-header__filters .travel-period-filter__btn {
   height: var(--list-header-control-height);
   min-height: var(--list-header-control-height);
 }
@@ -214,10 +214,10 @@
 
 .list-header__rail .list-header__search-input.header-filter-input,
 .list-header__rail .cv-custom-select__trigger.cv-custom-select__trigger--v2,
-.list-header__rail .oficios-filter-range__btn,
+.list-header__rail .travel-period-filter__btn,
 .list-header__rail .list-header__search-input.header-filter-input:hover,
 .list-header__rail .cv-custom-select__trigger.cv-custom-select__trigger--v2:hover,
-.list-header__rail .oficios-filter-range__btn:hover:not(:disabled) {
+.list-header__rail .travel-period-filter__btn:hover:not(:disabled) {
   background: var(--list-header-control-bg) !important;
   border: 0 !important;
   box-shadow: none !important;
@@ -225,7 +225,7 @@
 
 .list-header__rail .list-header__search-input.header-filter-input:focus,
 .list-header__rail .cv-custom-select__trigger.cv-custom-select__trigger--v2:focus,
-.list-header__rail .oficios-filter-range__btn:focus {
+.list-header__rail .travel-period-filter__btn:focus {
   border: 0 !important;
   box-shadow: none !important;
   outline: 2px solid var(--border-focus, var(--color-focus, #74aae0));
@@ -234,7 +234,7 @@
 
 .list-header__rail .list-header__search-input.header-filter-input:focus-visible,
 .list-header__rail .cv-custom-select__trigger.cv-custom-select__trigger--v2:focus-visible,
-.list-header__rail .oficios-filter-range__btn:focus-visible {
+.list-header__rail .travel-period-filter__btn:focus-visible {
   border: 0 !important;
   box-shadow: none !important;
   outline: 2px solid var(--border-focus, var(--color-focus, #74aae0));
@@ -616,7 +616,7 @@
 
   .list-header__select,
   .list-header__filters .cv-date-picker,
-  .list-header__filters .oficios-filter-range,
+  .list-header__filters .travel-period-filter,
   .list-header__filters .cv-btn--control,
   .list-header__actions {
     flex: 1 1 100%;
@@ -629,7 +629,7 @@
     margin-left: 0;
   }
 
-  .list-header__filters .oficios-filter-range__btn,
+  .list-header__filters .travel-period-filter__btn,
   .list-header__filters .cv-btn--control {
     justify-content: center;
     width: 100%;
@@ -638,18 +638,18 @@
 
 /* =========================================================
    Filter-pill do date picker (control_variant="filter-pill")
-   Classes históricas oficios-filter-range* usadas pelo
+   Classes históricas travel-period-filter* usadas pelo
    cv_date_picker.html e pelo JS — mantidas globalmente.
    ========================================================= */
 
-.oficios-filter-range {
+.travel-period-filter {
   display: inline-flex;
   flex: 0 1 auto;
   min-width: 0;
   position: relative;
 }
 
-.oficios-filter-range__btn {
+.travel-period-filter__btn {
   align-items: center;
   background:
     linear-gradient(var(--cv-select-bg), var(--cv-select-bg)) padding-box,
@@ -671,13 +671,13 @@
   white-space: nowrap;
 }
 
-.oficios-filter-range__btn:hover:not(:disabled) {
+.travel-period-filter__btn:hover:not(:disabled) {
   background:
     linear-gradient(var(--cv-select-bg-hover), var(--cv-select-bg-hover)) padding-box,
     linear-gradient(var(--cv-select-border-hover), var(--cv-select-border-hover)) border-box;
 }
 
-.oficios-filter-range__btn:focus-visible {
+.travel-period-filter__btn:focus-visible {
   background:
     linear-gradient(var(--cv-select-bg-hover), var(--cv-select-bg-hover)) padding-box,
     linear-gradient(var(--cv-select-border-focus), var(--cv-select-border-focus)) border-box;
@@ -685,45 +685,45 @@
   outline: none;
 }
 
-.oficios-filter-range__btn .cv-btn__icon {
+.travel-period-filter__btn .cv-btn__icon {
   align-items: center;
   color: var(--color-filter-placeholder, rgba(255, 255, 255, 0.6));
   display: inline-flex;
   flex: 0 0 auto;
 }
 
-.oficios-filter-range__label {
+.travel-period-filter__label {
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.01em;
 }
 
-.oficios-filter-range--active .oficios-filter-range__btn {
+.travel-period-filter--active .travel-period-filter__btn {
   background: rgba(99, 165, 255, 0.12);
   border-color: rgba(99, 165, 255, 0.55);
   color: #fff;
 }
 
-.oficios-filter-range--active .oficios-filter-range__btn .cv-btn__icon {
+.travel-period-filter--active .travel-period-filter__btn .cv-btn__icon {
   color: rgba(99, 165, 255, 0.95);
 }
 
-html[data-theme="light"] .oficios-filter-range--active .oficios-filter-range__btn,
-html[data-theme="dark-light"] .oficios-filter-range--active .oficios-filter-range__btn,
-html[data-theme="light-light"] .oficios-filter-range--active .oficios-filter-range__btn {
+html[data-theme="light"] .travel-period-filter--active .travel-period-filter__btn,
+html[data-theme="dark-light"] .travel-period-filter--active .travel-period-filter__btn,
+html[data-theme="light-light"] .travel-period-filter--active .travel-period-filter__btn {
   background: rgba(18, 111, 184, 0.12);
   border-color: rgba(11, 88, 150, 0.55);
   color: #0b3a66;
 }
 
-html[data-theme="light"] .oficios-filter-range--active .oficios-filter-range__btn .cv-btn__icon,
-html[data-theme="dark-light"] .oficios-filter-range--active .oficios-filter-range__btn .cv-btn__icon,
-html[data-theme="light-light"] .oficios-filter-range--active .oficios-filter-range__btn .cv-btn__icon {
+html[data-theme="light"] .travel-period-filter--active .travel-period-filter__btn .cv-btn__icon,
+html[data-theme="dark-light"] .travel-period-filter--active .travel-period-filter__btn .cv-btn__icon,
+html[data-theme="light-light"] .travel-period-filter--active .travel-period-filter__btn .cv-btn__icon {
   color: #126fb8;
 }
 
-html[data-theme="light"] .oficios-filter-range--active .oficios-filter-range__btn:hover:not(:disabled),
-html[data-theme="dark-light"] .oficios-filter-range--active .oficios-filter-range__btn:hover:not(:disabled),
-html[data-theme="light-light"] .oficios-filter-range--active .oficios-filter-range__btn:hover:not(:disabled) {
+html[data-theme="light"] .travel-period-filter--active .travel-period-filter__btn:hover:not(:disabled),
+html[data-theme="dark-light"] .travel-period-filter--active .travel-period-filter__btn:hover:not(:disabled),
+html[data-theme="light-light"] .travel-period-filter--active .travel-period-filter__btn:hover:not(:disabled) {
   background: rgba(18, 111, 184, 0.2);
   border-color: #126fb8;
   color: #072f54;

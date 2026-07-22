@@ -1,5 +1,5 @@
 {% if field.field.widget.input_type == 'checkbox' %}
-  {% include "components/forms/card_toggle.html" with field=field title=label|default:field.label description=help_text size_class=size_class only %}
+  {% include "components/ui/forms/card_toggle.html" with field=field title=label|default:field.label description=help_text size_class=size_class only %}
 {% elif field.field.widget.input_type == 'select' and field.field.widget.allow_multiple_selected %}
 <div class="field app-form-field cv-field{% if size_class %} {{ size_class }}{% endif %}">
   {% if "cv-search-picker__native" not in field.field.widget.attrs.class|default:"" %}

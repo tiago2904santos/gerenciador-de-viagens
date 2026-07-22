@@ -11,22 +11,22 @@ Todas as páginas internas que usavam o padrão antigo (`app-page`, `app-page-he
 
 | Página | Antes | Depois |
 |--------|-------|--------|
-| `roteiros/confirm_delete.html` | `app-page` + hero manual | `page-shell--standard-simple` + `header_stack_simple` |
-| `oficios/confirm_delete.html` | `app-page` + hero manual | `page-shell--standard-simple` + `header_stack_simple` |
+| `roteiros/confirm_delete.html` | `app-page` + hero manual | `page-shell--standard-simple` + `page_header` |
+| `oficios/confirm_delete.html` | `app-page` + hero manual | `page-shell--standard-simple` + `page_header` |
 | `oficios/modelos_motivo/form.html` | `app-page` + `app-form-shell` + `form-grid` | `page-shell--standard-simple` + `field-grid` |
 | `oficios/modelos_motivo/confirm_delete.html` | `app-page` + `app-form-shell` | `page-shell--standard-simple` + `footer_actions` |
 | `justificativas/modelos/form.html` | `app-page` + `app-form-shell` + `form-grid` + `field-span-12` | `page-shell--standard-simple` + `field-grid` + `field-size-4` |
 | `justificativas/modelos/confirm_delete.html` | `app-page` + `app-form-shell` | `page-shell--standard-simple` + `footer_actions` |
-| `termos/index.html` | `app-page` + `h1` solto | `page-shell--standard-simple` + `header_stack_simple` + `form_section` |
-| `termos/preview.html` | `app-page` + `h1` solto + link inline | `page-shell--standard-simple` + `header_stack_back_action` |
-| `roteiros/detail.html` | `page-shell--standard` + `header_band_status` + div duplo `form-section` | `page-shell--standard` + `header_stack_back_action` + seções corretas |
-| `planos_trabalho/index.html` | `app-page` + `module_placeholder` | `page-shell--standard-simple` + `header_stack_simple` |
-| `ordens_servico/index.html` | `app-page` + `module_placeholder` | `page-shell--standard-simple` + `header_stack_simple` |
-| `prestacoes_contas/index.html` | `app-page` + `module_placeholder` | `page-shell--standard-simple` + `header_stack_simple` |
-| `diario_bordo/index.html` | `app-page` + `module_placeholder` | `page-shell--standard-simple` + `header_stack_simple` |
-| `eventos/index.html` | `app-page` + `module_placeholder` | `page-shell--standard-simple` + `header_stack_simple` |
-| `documentos/index.html` | `app-page` + `module_placeholder` | `page-shell--standard-simple` + `header_stack_simple` |
-| `assinaturas/index.html` | `app-page` + `module_placeholder` | `page-shell--standard-simple` + `header_stack_simple` |
+| `termos/index.html` | `app-page` + `h1` solto | `page-shell--standard-simple` + `page_header` + `form_section` |
+| `termos/preview.html` | `app-page` + `h1` solto + link inline | `page-shell--standard-simple` + `page_header` |
+| `roteiros/detail.html` | `page-shell--standard` + `page_header` + div duplo `form-section` | `page-shell--standard` + `page_header` + seções corretas |
+| `planos_trabalho/index.html` | `app-page` + `module_placeholder` | `page-shell--standard-simple` + `page_header` |
+| `ordens_servico/index.html` | `app-page` + `module_placeholder` | `page-shell--standard-simple` + `page_header` |
+| `prestacoes_contas/index.html` | `app-page` + `module_placeholder` | `page-shell--standard-simple` + `page_header` |
+| `diario_bordo/index.html` | `app-page` + `module_placeholder` | `page-shell--standard-simple` + `page_header` |
+| `eventos/index.html` | `app-page` + `module_placeholder` | `page-shell--standard-simple` + `page_header` |
+| `documentos/index.html` | `app-page` + `module_placeholder` | `page-shell--standard-simple` + `page_header` |
+| `assinaturas/index.html` | `app-page` + `module_placeholder` | `page-shell--standard-simple` + `page_header` |
 
 ### Correções estruturais
 
@@ -34,7 +34,7 @@ Todas as páginas internas que usavam o padrão antigo (`app-page`, `app-page-he
 
 ### Componente corrigido
 
-- **`components/feedback/module_placeholder.html`** — Substituído `components/buttons/action_button.html` (caminho antigo) por `components/ui/buttons/button.html` (caminho correto). Resultado visual idêntico, mas agora usando o componente canônico.
+- **`components/feedback/module_placeholder.html`** — Substituído `components/ui/buttons/button.html` (caminho antigo) por `components/ui/buttons/button.html` (caminho correto). Resultado visual idêntico, mas agora usando o componente canônico.
 
 ### CSS limpo
 
@@ -86,7 +86,7 @@ static/css/roteiros-list.css
 
 Nenhum componente novo foi criado. Foram consolidados:
 - `module_placeholder.html` corrigido para usar o caminho canônico do botão
-- `roteiros/detail.html` consolidado para usar `header_stack_back_action` + `footer_actions` padrão + `empty_state` global em vez de estrutura própria
+- `roteiros/detail.html` consolidado para usar `page_header` + `footer_actions` padrão + `empty_state` global em vez de estrutura própria
 
 ---
 
@@ -172,7 +172,7 @@ git diff --stat --cached
 git commit -m "refactor: padroniza componentes visuais globais
 
 - Migra 17 páginas de app-page para page-shell (standard-simple/standard)
-- Substitui hero manual por header_stack_simple/back_action nos formulários
+- Substitui hero manual por page_header/back_action nos formulários
 - Migra form-grid/field-span-12 para field-grid/field-size-* nos módulos de ofícios
 - Corrige seções duplicadas em configuracao/form.html
 - Corrige module_placeholder para usar caminho canônico de button

@@ -1,4 +1,4 @@
-﻿# Padrao CRUD
+# Padrao CRUD
 
 ## Escopo atual
 
@@ -28,7 +28,7 @@ O app `roteiros` possui CRUD publico em `/roteiros/` (listagem, novo, editar, de
 - `services/roteiro_editor.py`: fluxo do wizard avulso e exclusao com `ProtectedError`.
 - `presenters.py`: card, contexto de formulario (delega montagem profunda ao `roteiro_logic`), pagina de detalhe.
 - `views.py`: orquestracao magra; endpoints de diarias e estimativa.
-- `templates/roteiros/` + `templates/components/domain/`: UI componentizada.
+- `templates/roteiros/` + `templates/components/travel/`: UI componentizada.
 
 Vinculos documentais em Oficios/Planos/OS usam o roteiro como referencia; esses modulos nao foram alterados nesta etapa.
 

@@ -534,13 +534,13 @@
         var startRangeFormatter = compactRangeDisplay ? formatCompactDisplayDate : formatDisplayDate;
         if (selectedStart && selectedEnd) {
           displayText.textContent = startRangeFormatter(selectedStart) + '  →  ' + formatDisplayDate(selectedEnd);
-          root.classList.add('oficios-filter-range--active');
+          root.classList.add('travel-period-filter--active');
         } else if (selectedStart) {
           displayText.textContent = startRangeFormatter(selectedStart) + '  →  …';
-          root.classList.add('oficios-filter-range--active');
+          root.classList.add('travel-period-filter--active');
         } else {
           displayText.textContent = displayPlaceholder;
-          root.classList.remove('oficios-filter-range--active');
+          root.classList.remove('travel-period-filter--active');
         }
       }
       if (summary) {

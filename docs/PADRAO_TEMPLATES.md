@@ -3,7 +3,7 @@
 ## Regras
 
 - Página deve compor components globais.
-- Domínio repetível vai para `templates/components/domain/`.
+- Domínio repetível vai para `templates/components/travel/`.
 - Sem CSS inline.
 - Sem JS inline.
 - Sem `href="#"`.
@@ -11,12 +11,12 @@
 ## Estrutura recomendada
 
 - `templates/components/layout/`
-- `templates/components/forms/`
+- `templates/components/ui/forms/`
 - `templates/components/lists/`
 - `templates/components/cards/`
 - `templates/components/buttons/`
 - `templates/components/feedback/`
-- `templates/components/domain/`
+- `templates/components/travel/`
 
 ## Domínio roteiros
 

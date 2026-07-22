@@ -20,10 +20,10 @@
           <span class="ui-lab-status-pill ui-lab-status-pill--done">Canônico</span>
         </div>
         <div class="field-grid field-grid--cols-2">
-          {% include "components/forms/form_field.html" with field=field_demo_form.nome size_class="field-size-1" only %}
-          {% include "components/forms/form_field.html" with field=field_demo_form.email help_text=field_demo_form.email.help_text size_class="field-size-1" only %}
-          {% include "components/forms/form_field.html" with field=field_demo_form.senha size_class="field-size-1" only %}
-          {% include "components/forms/form_field.html" with field=field_demo_form.quantidade size_class="field-size-1" only %}
+          {% include "components/ui/forms/field.html" with field=field_demo_form.nome size_class="field-size-1" only %}
+          {% include "components/ui/forms/field.html" with field=field_demo_form.email help_text=field_demo_form.email.help_text size_class="field-size-1" only %}
+          {% include "components/ui/forms/field.html" with field=field_demo_form.senha size_class="field-size-1" only %}
+          {% include "components/ui/forms/field.html" with field=field_demo_form.quantidade size_class="field-size-1" only %}
         </div>
       </article>
 
@@ -43,10 +43,10 @@
           <span class="ui-lab-status-pill ui-lab-status-pill--done">Canônico</span>
         </div>
         <div class="field-grid field-grid--cols-2">
-          {% include "components/forms/form_field.html" with field=field_demo_form.data_saida size_class="field-size-1" only %}
-          {% include "components/forms/form_field.html" with field=field_demo_form.unidade size_class="field-size-1" only %}
-          {% include "components/forms/form_field.html" with field=field_demo_form.motivo size_class="field-size-2" only %}
-          {% include "components/forms/form_field.html" with field=field_demo_form.participantes size_class="field-size-2" only %}
+          {% include "components/ui/forms/field.html" with field=field_demo_form.data_saida size_class="field-size-1" only %}
+          {% include "components/ui/forms/field.html" with field=field_demo_form.unidade size_class="field-size-1" only %}
+          {% include "components/ui/forms/field.html" with field=field_demo_form.motivo size_class="field-size-2" only %}
+          {% include "components/ui/forms/field.html" with field=field_demo_form.participantes size_class="field-size-2" only %}
         </div>
       </article>
 
@@ -61,14 +61,14 @@
               <h3 class="cv-date-picker-demo__title">Data unica</h3>
               <p class="cv-date-picker-demo__description">Um clique abre o calendário e grava uma data.</p>
             </div>
-            {% include "components/forms/cv_date_picker.html" with mode="single" picker_id="lab-date-single-picker" single_label="Data do evento" single_input_id="lab-date-single-display" single_hidden_id="lab-date-single" single_hidden_name="data_evento_unica" single_hidden_value="2026-05-18" initial_date="18/05/2026" only %}
+            {% include "components/ui/forms/date_picker.html" with mode="single" picker_id="lab-date-single-picker" single_label="Data do evento" single_input_id="lab-date-single-display" single_hidden_id="lab-date-single" single_hidden_name="data_evento_unica" single_hidden_value="2026-05-18" initial_date="18/05/2026" only %}
           </div>
           <div class="cv-date-picker-demo">
             <div class="cv-date-picker-demo__header">
               <h3 class="cv-date-picker-demo__title">Intervalo de datas</h3>
               <p class="cv-date-picker-demo__description">A mesma grade seleciona ida e volta.</p>
             </div>
-            {% include "components/forms/cv_date_picker.html" with mode="range" picker_id="lab-date-range-picker" start_label="Data inicial" end_label="Data final" start_input_id="lab-date-range-start-display" end_input_id="lab-date-range-end-display" start_hidden_id="lab-date-range-start" end_hidden_id="lab-date-range-end" start_hidden_name="data_evento_inicio" end_hidden_name="data_evento_fim" start_hidden_value="2026-05-18" end_hidden_value="2026-05-20" initial_date="18/05/2026" only %}
+            {% include "components/ui/forms/date_picker.html" with mode="range" picker_id="lab-date-range-picker" start_label="Data inicial" end_label="Data final" start_input_id="lab-date-range-start-display" end_input_id="lab-date-range-end-display" start_hidden_id="lab-date-range-start" end_hidden_id="lab-date-range-end" start_hidden_name="data_evento_inicio" end_hidden_name="data_evento_fim" start_hidden_value="2026-05-18" end_hidden_value="2026-05-20" initial_date="18/05/2026" only %}
           </div>
         </div>
       </article>
@@ -79,9 +79,9 @@
           <span class="ui-lab-status-pill ui-lab-status-pill--done">Estados</span>
         </div>
         <div class="field-grid field-grid--cols-2">
-          {% include "components/forms/form_field.html" with field=field_demo_form.protocolo size_class="field-size-1" only %}
-          {% include "components/forms/form_field.html" with field=field_demo_form.status size_class="field-size-1" only %}
-          {% include "components/forms/form_field.html" with field=field_demo_form.confirmacao help_text=field_demo_form.confirmacao.help_text size_class="field-size-2" only %}
+          {% include "components/ui/forms/field.html" with field=field_demo_form.protocolo size_class="field-size-1" only %}
+          {% include "components/ui/forms/field.html" with field=field_demo_form.status size_class="field-size-1" only %}
+          {% include "components/ui/forms/field.html" with field=field_demo_form.confirmacao help_text=field_demo_form.confirmacao.help_text size_class="field-size-2" only %}
         </div>
       </article>
 
@@ -91,8 +91,8 @@
           <span class="ui-lab-status-pill ui-lab-status-pill--issue">Validação</span>
         </div>
         <div class="field-grid field-grid--cols-2">
-          {% include "components/forms/form_field.html" with field=field_demo_form_bound.nome size_class="field-size-1" only %}
-          {% include "components/forms/form_field.html" with field=field_demo_form_bound.email help_text=field_demo_form_bound.email.help_text size_class="field-size-1" only %}
+          {% include "components/ui/forms/field.html" with field=field_demo_form_bound.nome size_class="field-size-1" only %}
+          {% include "components/ui/forms/field.html" with field=field_demo_form_bound.email help_text=field_demo_form_bound.email.help_text size_class="field-size-1" only %}
         </div>
       </article>
     </div>

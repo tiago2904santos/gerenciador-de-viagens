@@ -62,7 +62,7 @@
 | Background / shell | `app-shell--ui-lab` | `app-shell` + `theme.css` | Alta | `base.html`, `ui-lab.css` | Baixo | Nenhuma | — |
 | page-shell.css | Demo structures | `base.html` link global | Alta | `page-shell.css` | Baixo | Nenhuma | — |
 | app-page legado | Demos antigas | wizards, placeholders, assinaturas | Média | `wizard_base.html`, `termos` (parcial) | Médio | termos: `cv-btn` (cherry-pick) | Migrar wizard |
-| Header band/stack | `headers.html` inline + alguns includes | `components/ui/headers/*` em CRUDs | Alta cadastros | `header_stack_*.html` | Baixo | Nenhuma | Wizard header próprio |
+| Cabeçalho de página | `headers.html` inline + alguns includes | `components/ui/headers/page_header.html` em CRUDs | Alta cadastros | `page_header.html` | Baixo | Nenhuma | Wizard header próprio |
 | Header stepper | Demo wizard | `wizard_base` ainda legado | Baixa wizard | `wizard_base.html` | Alto | Nenhuma | Fase wizard shell |
 | Structures standard | `structures.html` | `page_shell.html`, forms | Alta | `standard_*_page.html` | Baixo | Nenhuma | — |
 | Quick Add | Inline demo | `list_page_quick_add` + `core/app.js` | Alta | `list_page_quick_add.html` | Baixo | Lab → `data-quick-add-*` | — |
@@ -111,7 +111,7 @@
 
 | Component | Status | Onde é usado | Onde deveria ser usado | Pendência |
 |-----------|--------|--------------|------------------------|-----------|
-| `header_stack_*` | Produção | CRUDs, listas | Wizard ofícios | Wizard |
+| `page_header` | Produção | CRUDs, listas | Wizard ofícios | Wizard |
 | `button.html` (cv-btn) | Produção parcial | termos, listas | wizard_actions, assinaturas | Migração |
 | `field.html` | Produção | forms novos | todos forms | Unificar |
 | `field_state_toggle` | Parcial | servidores/viaturas (outra branch?) | forms com RG | Verificar main |

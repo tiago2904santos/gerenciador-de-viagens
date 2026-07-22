@@ -1,0 +1,127 @@
+{# filter_page_header.html — cabeçalho canônico de listas com filtros. #}
+{% if form_action %}
+  <form class="list-header cv-filter-header{% if extra_class %} {{ extra_class }}{% endif %}" method="get" action="{{ form_action }}" data-cv-live-submit-form>
+{% else %}
+  <div class="list-header cv-filter-header{% if extra_class %} {{ extra_class }}{% endif %}">
+{% endif %}
+
+  <div class="list-header__band">
+    <div class="list-header__title-block">
+      {% if eyebrow %}<span class="list-header__eyebrow">{{ eyebrow }}</span>{% endif %}
+      <div class="list-header__title-row">
+        <h1 class="list-header__title">{{ title }}</h1>
+        {% if status_label %}
+          {% include "components/ui/badges/status_badge.html" with label=status_label variant=status_variant|default:"draft" extra_class="page-header-status-chip" only %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  {% if advanced %}
+  <div class="list-header__rail list-header__rail--advanced">
+    <div class="list-header__filters list-header__filters--advanced">
+      <div class="list-header__search list-header__search--with-icon">
+        <span class="list-header__search-icon" aria-hidden="true">
+          {% include "components/ui/icons/icon.html" with icon="search" only %}
+        </span>
+        <input
+          class="list-header__search-input header-filter-input"
+          type="search"
+          name="{{ search_name|default:'q' }}"
+          placeholder="{{ search_placeholder|default:'Buscar...' }}"
+          aria-label="{{ search_aria_label|default:search_placeholder|default:'Buscar' }}"
+          data-cv-filter="search"
+          {% if q %}value="{{ q }}"{% endif %}
+        >
+      </div>
+
+      {% if current_aba %}<input type="hidden" name="aba" value="{{ current_aba }}">{% endif %}
+
+      {% if status_options %}
+      <div class="list-header__select cv-filter-bar__select cv-custom-select" data-cv-select>
+        <select name="{{ status_name|default:'status' }}" aria-label="Status" data-cv-filter="select">
+          {% for opt in status_options %}
+            <option value="{{ opt.value }}"{% if opt.value == status %} selected{% endif %}>{{ opt.label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      {% endif %}
+
+      {% if temporal_options %}
+      <div class="list-header__select cv-filter-bar__select cv-custom-select" data-cv-select>
+        <select name="temporal" aria-label="Período da viagem" data-cv-filter="select">
+          {% for opt in temporal_options %}
+            <option value="{{ opt.value }}"{% if opt.value == temporal %} selected{% endif %}>{{ opt.label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      {% endif %}
+
+      {% if sort_options %}
+      <div class="list-header__select cv-filter-bar__select cv-custom-select" data-cv-select>
+        <select name="sort" aria-label="Ordenar por" data-cv-filter="select">
+          {% for opt in sort_options %}
+            <option value="{{ opt.value }}"{% if opt.value == sort or not sort and forloop.first %} selected{% endif %}>{{ opt.label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      {% endif %}
+
+      {% if not hide_date_filter %}
+      {% include "components/ui/forms/date_picker.html" with mode="range" control_variant="filter-pill" picker_id=date_picker_id|default:"list-filter-date-picker" extra_class="travel-period-filter" trigger_label="Período da viagem" trigger_aria_label="Filtrar por período da viagem" start_hidden_id=date_start_id|default:"id_list_viagem_de" end_hidden_id=date_end_id|default:"id_list_viagem_ate" start_hidden_name="viagem_de" end_hidden_name="viagem_ate" start_hidden_value=viagem_de end_hidden_value=viagem_ate initial_date=viagem_de filter_date=True show_summary=False only %}
+      {% endif %}
+
+      {% if search_clear_url %}
+        {% include "components/ui/buttons/button.html" with href=search_clear_url label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" only %}
+      {% endif %}
+    </div>
+  </div>
+  {% else %}
+  <div class="list-header__rail">
+    <div class="list-header__filters">
+      <div class="list-header__search">
+        <input
+          class="list-header__search-input header-filter-input"
+          type="search"
+          name="{{ search_name|default:'q' }}"
+          placeholder="{{ search_placeholder|default:'Buscar...' }}"
+          aria-label="{{ search_placeholder|default:'Buscar' }}"
+          data-cv-filter="search"
+          data-cv-live-submit-input
+          {% if search_value %}value="{{ search_value }}"{% endif %}
+        >
+      </div>
+      {% if current_aba %}<input type="hidden" name="aba" value="{{ current_aba }}">{% endif %}
+      {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
+      {% if status_options %}
+        <div class="list-header__select">
+          <select class="header-filter-select" name="{{ status_name|default:'status' }}" aria-label="{{ status_label|default:'Status' }}" data-cv-filter="status">
+            {% for option in status_options %}
+              <option value="{{ option.value }}"{% if option.value == status_value %} selected{% endif %}>{{ option.label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      {% endif %}
+      {% if search_value or status_value or primary_action_label and primary_action_url %}
+        <div class="list-header__actions">
+          {% if search_value or status_value %}
+            {% if search_clear_url and next_url %}
+              {% include "components/ui/buttons/button.html" with href=search_clear_url|add:"?next="|add:next_url label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" data_cv_filter_clear=True only %}
+            {% elif search_clear_url %}
+              {% include "components/ui/buttons/button.html" with href=search_clear_url label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" data_cv_filter_clear=True only %}
+            {% endif %}
+          {% endif %}
+          {% if primary_action_label and primary_action_url %}
+            {% include "components/ui/buttons/button.html" with href=primary_action_url label=primary_action_label variant="primary" icon="plus" extra_class="cv-btn--control" only %}
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+{% if form_action %}
+  </form>
+{% else %}
+  </div>
+{% endif %}

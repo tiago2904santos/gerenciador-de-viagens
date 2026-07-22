@@ -1,4 +1,4 @@
-{% include "components/forms/input_with_action.html" with field=form.modelo_motivo label="Modelo de motivo" action_url=modelos_motivo_url action_label="Gerenciar modelos" only %}
+{% include "components/ui/forms/field.html" with field=form.modelo_motivo label="Modelo de motivo" action_url=modelos_motivo_url action_label="Gerenciar modelos" only %}
 {% if not tem_modelos_motivo %}
   <div class="field">
     <p class="field-help">Nenhum modelo cadastrado. <a href="{{ modelos_motivo_url }}">Abrir gerenciamento de modelos</a></p>

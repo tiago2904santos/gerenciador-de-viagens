@@ -17,7 +17,7 @@ Apps auditados: `config`, `core`, `usuarios`, `cadastros`, `roteiros`, `eventos`
 | Presenters (ALTO) | Ações e meta repetidas | `cadastros/presenters.py`, `roteiros/presenters.py` | Extrair builders de presenter | `core/presenters/*` |
 | URLs (DOCUMENTAR) | Convenções mistas `novo/nova`, `*_index` etc. | `*/urls.py` | Preservar rotas existentes | `PADRAO_APP.md` |
 | Templates (BAIXO) | Base já componentizada; risco de regressão visual | `templates/components/**` | Sem refactor agressivo | `PADRAO_TEMPLATES.md` |
-| Components (DOCUMENTAR) | Domínio roteiros é referência congelada | `templates/components/domain/**` | Manter contrato atual | `PADRAO_TEMPLATES.md` |
+| Components (DOCUMENTAR) | Domínio roteiros é referência congelada | `templates/components/travel/**` | Manter contrato atual | `PADRAO_TEMPLATES.md` |
 | Tests (MÉDIO) | Cobertura desigual entre apps | `cadastros/tests`, `roteiros/tests` | Rodar smoke tests definidos | Validação técnica |
 | Docs (ALTO) | Ausência de padrão granular por camada | `docs/` | Criar guias por camada | `PADRAO_*.md` |
 

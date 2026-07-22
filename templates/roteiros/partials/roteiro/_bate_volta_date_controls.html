@@ -1,0 +1,53 @@
+<div class="oficio-roteiro-bate-volta__rows">
+  <div class="oficio-roteiro-bate-volta__row" aria-labelledby="bate-volta-ida-title">
+    <span class="cv-ordered-field-row__badge cv-ordered-field-row__label" id="bate-volta-ida-title">Ida</span>
+    <div class="cv-ordered-field-row__body">
+      <div class="field-grid oficio-roteiro-bate-volta__fields">
+        <div class="field cv-field">
+          <label class="cv-field__label" for="id_bate_volta_data_inicio_display">Data de ida</label>
+          <div class="cv-date-picker__control">
+            <input type="text" class="cv-field__control" id="id_bate_volta_data_inicio_display" placeholder="dd/mm/aaaa" autocomplete="off" inputmode="numeric" maxlength="10" data-cv-date-picker-start-display readonly>
+            <button type="button" class="cv-date-picker__trigger cv-date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-label="Abrir calendário">
+              {% include "components/ui/forms/_date_picker_icon.html" %}
+            </button>
+          </div>
+        </div>
+        <div class="field cv-field">
+          <label class="cv-field__label" for="id_bate_volta_ida_saida_hora">Horário de saída</label>
+          <input type="text" class="cv-field__control" id="id_bate_volta_ida_saida_hora" name="bate_volta_ida_saida_hora" data-mask="time" value="{{ roteiro_editor_state_json.bate_volta_diario.ida_saida_hora|default:'' }}" placeholder="00:00" inputmode="numeric" maxlength="5" autocomplete="off">
+        </div>
+        <div class="field cv-field">
+          <label class="cv-field__label" for="id_bate_volta_ida_tempo_hhmm">Tempo de ida</label>
+          <input type="text" class="cv-field__control" id="id_bate_volta_ida_tempo_hhmm" data-mask="time" value="" placeholder="00:00" inputmode="numeric" maxlength="5" autocomplete="off">
+          <input type="hidden" id="id_bate_volta_ida_tempo_min" name="bate_volta_ida_tempo_min" value="{{ roteiro_editor_state_json.bate_volta_diario.ida_tempo_min|default:'' }}">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="oficio-roteiro-bate-volta__row" aria-labelledby="bate-volta-volta-title">
+    <span class="cv-ordered-field-row__badge cv-ordered-field-row__label" id="bate-volta-volta-title">Volta</span>
+    <div class="cv-ordered-field-row__body">
+      <div class="field-grid oficio-roteiro-bate-volta__fields">
+        <div class="field cv-field">
+          <label class="cv-field__label" for="id_bate_volta_data_fim_display">Data de volta</label>
+          <div class="cv-date-picker__control">
+            <input type="text" class="cv-field__control" id="id_bate_volta_data_fim_display" placeholder="dd/mm/aaaa" autocomplete="off" inputmode="numeric" maxlength="10" data-cv-date-picker-end-display readonly>
+            <button type="button" class="cv-date-picker__trigger cv-date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-label="Abrir calendário">
+              {% include "components/ui/forms/_date_picker_icon.html" %}
+            </button>
+          </div>
+        </div>
+        <div class="field cv-field">
+          <label class="cv-field__label" for="id_bate_volta_volta_saida_hora">Horário de volta</label>
+          <input type="text" class="cv-field__control" id="id_bate_volta_volta_saida_hora" name="bate_volta_volta_saida_hora" data-mask="time" value="{{ roteiro_editor_state_json.bate_volta_diario.volta_saida_hora|default:'' }}" placeholder="00:00" inputmode="numeric" maxlength="5" autocomplete="off">
+        </div>
+        <div class="field cv-field">
+          <label class="cv-field__label" for="id_bate_volta_volta_tempo_hhmm">Tempo de retorno</label>
+          <input type="text" class="cv-field__control" id="id_bate_volta_volta_tempo_hhmm" data-mask="time" value="" placeholder="00:00" inputmode="numeric" maxlength="5" autocomplete="off">
+          <input type="hidden" id="id_bate_volta_volta_tempo_min" name="bate_volta_volta_tempo_min" value="{{ roteiro_editor_state_json.bate_volta_diario.volta_tempo_min|default:'' }}">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

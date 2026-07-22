@@ -48,7 +48,7 @@ Centralizar contratos reutilizaveis para evitar duplicacao entre modulos.
 - Evitar variacoes locais quando componente global ja cobre o caso.
 
 ### 2) Components de dominio
-- Blocos em `templates/components/domain/` nao podem:
+- Blocos em `templates/components/travel/` nao podem:
   - consultar banco;
   - calcular rota/diarias;
   - salvar dados;

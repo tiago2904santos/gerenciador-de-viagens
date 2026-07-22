@@ -60,7 +60,7 @@ O risco principal de continuar refatorando sem ordem e **quebrar convergencia ar
 - **tokens:** `tokens.css` + `theme.css`; politica de reduzir hardcode.
 - **theme:** `data-theme` em `html`, persistencia em `localStorage`, init antecipado em JS dedicado.
 - **componentes globais:** `templates/components/` (layout, forms, lists, cards, feedback, buttons).
-- **componentes de dominio:** `templates/components/domain/` com Roteiros como referencia congelada provisoria.
+- **componentes de dominio:** `templates/components/travel/` com Roteiros como referencia congelada provisoria.
 - **templates:** composicao por components/includes, sem logica pesada de negocio.
 - **JS:** centralizado em `static/js/core`, `static/js/components`, `static/js/pages`.
 - **proibicoes:** sem inline CSS/JS, sem `href="#"`, sem dependencia runtime de `legacy/`.

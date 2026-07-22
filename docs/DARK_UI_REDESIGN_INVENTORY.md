@@ -21,7 +21,7 @@
 | Cards | `components/cards/*` e `components/ui/layouts/*` | equivalentes e aliases por domínio | unificar superfície, borda, elevação e ritmo; página só compõe |
 | Listas | `components/lists/*` | estrutura canônica parcial | unificar linhas, filtros, tabelas, vazios e paginação |
 | Feedback | `components/ui/feedback/*` | globais disponíveis, estados locais persistem | consolidar cores de estado e foco por tokens funcionais |
-| Overlays | `components/modals/modal.html` + JS global | vários modais específicos | preservar contratos data-*; unificar painel, backdrop e foco |
+| Overlays | `components/ui/modals/confirm_action_modal.html` + JS global | vários modais específicos | preservar contratos data-*; unificar painel, backdrop e foco |
 | UI Lab | `templates/dev/ui_lab/*` e `templates/ui_lab2/*` | duas superfícies de demonstração | usar como matriz de paridade durante a migração |
 
 ## Decisões arquiteturais
@@ -61,8 +61,8 @@ Consolidações concluídas nesta rodada:
 
 - **Ícones**: sistema único em `templates/components/ui/icons/icon.html` (grid 24, stroke 1.75,
   pdf/docx com glifos desenhados). `dev/ui_lab/partials/_cv_icon.html` apenas delega.
-- **Destinos**: partials unificados em `templates/components/domain/destinos/` (prefix os|pt|termo).
-- **Cabeçalho de filtros**: modo `advanced` no `components/ui/headers/header_stack_filters.html`;
+- **Destinos**: partials unificados em `templates/components/travel/destinos/` (prefix os|pt|termo).
+- **Cabeçalho de filtros**: modo `advanced` no `components/ui/headers/filter_page_header.html`;
   o clone `oficios_cloned_list_header.html` e o form inline de ofícios foram removidos.
 - **Listas em cards**: `components/lists/list_page_cards.html` + casca `page-shell--cards`/`cv-card-grid`
   (CSS em `components/record-list.css`). As 5 index (ofícios, eventos, prestações, OS, PT) viraram 1 include.

@@ -16,19 +16,19 @@
 
       {% include "ui_lab2/partials/_component_open.html" with name="select (cv-custom-select)" source="components/ui/forms/select.html" note="Select nativo + UI customizada montada por JS. Renderizado por field.html para ChoiceField." %}
         <div class="field-grid">
-          {% include "components/forms/form_field.html" with field=demo_form.uf size_class="field-size-2" only %}
+          {% include "components/ui/forms/field.html" with field=demo_form.uf size_class="field-size-2" only %}
         </div>
       {% include "ui_lab2/partials/_component_close.html" with used_in=usage.select %}
 
       {% include "ui_lab2/partials/_component_open.html" with name="multiselect" source="components/ui/forms/multiselect.html" note="Selecao multipla. No sistema usa um widget customizado (cv-search-picker); aqui o BoundField nativo." %}
         <div class="field-grid">
-          {% include "components/forms/form_field.html" with field=demo_form.servidores size_class="field-size-2" only %}
+          {% include "components/ui/forms/field.html" with field=demo_form.servidores size_class="field-size-2" only %}
         </div>
       {% include "ui_lab2/partials/_component_close.html" with used_in=usage.multiselect %}
 
-      {% include "ui_lab2/partials/_component_open.html" with name="input_with_action" source="components/forms/input_with_action.html" note="Campo com botao de gerenciar acoplado (engrenagem)." %}
+      {% include "ui_lab2/partials/_component_open.html" with name="input_with_action" source="components/ui/forms/field.html" note="Campo com botao de gerenciar acoplado (engrenagem)." %}
         <div class="field-grid">
-          {% include "components/forms/input_with_action.html" with field=demo_form.uf action_url="#" action_label="Gerenciar UFs" size_class="field-size-2" only %}
+          {% include "components/ui/forms/field.html" with field=demo_form.uf action_url="#" action_label="Gerenciar UFs" size_class="field-size-2" only %}
         </div>
       {% include "ui_lab2/partials/_component_close.html" with used_in=usage.input_with_action %}
 
@@ -36,9 +36,9 @@
         {% include "components/ui/forms/dropdown.html" with trigger_label="Acoes" items=dropdown_items only %}
       {% include "ui_lab2/partials/_component_close.html" with used_in=usage.dropdown %}
 
-      {% include "ui_lab2/partials/_component_open.html" with name="oficio_motorista_split_field" source="components/forms/oficio_motorista_split_field.html" note="Campo composto: numero do oficio + /ano. Clone com BoundField oculto." %}
-        {% include "components/forms/oficio_motorista_split_field.html" with field=demo_form.motorista_ref label="Oficio do motorista" ano="2026" numero_inicial="123" only %}
-      {% include "ui_lab2/partials/_component_close.html" with used_in=usage.oficio_motorista_split_field %}
+      {% include "ui_lab2/partials/_component_open.html" with name="document_number_field" source="components/ui/forms/document_number_field.html" note="Campo composto: numero do oficio + /ano. Clone com BoundField oculto." %}
+        {% include "components/ui/forms/document_number_field.html" with field=demo_form.motorista_ref label="Oficio do motorista" ano="2026" numero_inicial="123" only %}
+      {% include "ui_lab2/partials/_component_close.html" with used_in=usage.document_number_field %}
 
       {% include "ui_lab2/partials/_component_open.html" with name="cv-search-picker (clone inline)" source=".cv-search-picker" note="Painel de itens selecionados com adicionar/remover. Clone literal do picker de destinos (ordens_servico/form.html, termos/form.html)." %}
         <div class="cv-search-picker">
@@ -48,7 +48,7 @@
               <button type="button" class="cv-btn cv-btn--secondary cv-btn--sm"><span>+ Adicionar destino</span></button>
             </div>
             <div class="cv-search-picker__selected-list">
-              <div class="cv-search-picker__selected-card destino-row destino-row--single">
+              <div class="cv-search-picker__selected-card destination-row destination-row--single">
                 <div class="cv-search-picker__selected-main">
                   <div class="cv-search-picker__selected-title-row">
                     <span class="cv-search-picker__selected-name">Curitiba/PR</span>

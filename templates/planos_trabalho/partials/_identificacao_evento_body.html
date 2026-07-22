@@ -1,5 +1,5 @@
 <section class="cv-form-subsection termo-evento-periodo pt-evento-periodo pt-evento-periodo--inline" aria-label="Período do evento">
-  {% include "components/forms/cv_date_picker.html" with mode="range" picker_id="pt-evento-date-picker" extra_class="termo-date-picker pt-evento-periodo__dates" start_field=form.data_evento_inicio end_field=form.data_evento_fim start_label="Data inicial" end_label="Data final" start_input_id="id_pt_data_inicio_display" end_input_id="id_pt_data_fim_display" show_summary=False only %}
-  {% include "components/forms/form_field.html" with field=form.horario_atendimento label="Horário de atendimento" action_url=horarios_url action_label="Gerenciar horários" only %}
+  {% include "components/ui/forms/date_picker.html" with mode="range" picker_id="pt-evento-date-picker" extra_class="termo-date-picker pt-evento-periodo__dates" start_field=form.data_evento_inicio end_field=form.data_evento_fim start_label="Data inicial" end_label="Data final" start_input_id="id_pt_data_inicio_display" end_input_id="id_pt_data_fim_display" show_summary=False only %}
+  {% include "components/ui/forms/field.html" with field=form.horario_atendimento label="Horário de atendimento" action_url=horarios_url action_label="Gerenciar horários" only %}
 </section>
 {% include "planos_trabalho/partials/_identificacao_evento_destinos.html" %}

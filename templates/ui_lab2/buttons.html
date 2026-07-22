@@ -39,7 +39,7 @@
       {% include "ui_lab2/partials/_component_close.html" with used_in=usage.cv_btn %}
 
       {# ── button.html (componente base via include) ────────────── #}
-      {% include "ui_lab2/partials/_component_open.html" with name="button.html (componente)" source="components/ui/buttons/button.html" note="Include parametrizavel (href, variant, size, icon). action_button.html e o wrapper compativel." %}
+      {% include "ui_lab2/partials/_component_open.html" with name="button.html (componente)" source="components/ui/buttons/button.html" note="Include parametrizavel por responsabilidade: href, variant, size e icon." %}
         <div class="ui-lab2-row">
           {% include "components/ui/buttons/button.html" with label="Salvar" variant="primary" icon="check" type="button" only %}
           {% include "components/ui/buttons/button.html" with label="Cancelar" variant="secondary" href="#" only %}

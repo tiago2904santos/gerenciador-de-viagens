@@ -1,202 +1,52 @@
-# Componentes de dominio
+# Componentes compartilhados de viagem
 
-## Congelamento provisorio (aceite arquitetural)
+Os conceitos reaproveitados por Eventos, Termos, Ordens de Serviço, Planos de Trabalho e Roteiros ficam em `templates/components/travel/`. Eles não consultam banco, não aplicam regra de negócio e não alteram os nomes enviados ao backend.
 
-**Roteiros** e o modulo **referencia provisorio** para estes blocos de dominio:
+## Destinos
 
-- destinos (sede + pernas);
-- trechos;
-- retorno;
-- calculadora / diarias no wizard;
-- resumo de rota (leitura).
+### `destination_section.html`
 
-Proximos modulos devem **reaproveitar este padrao** (selectors/services/presenters + `templates/components/domain/` + `domain.css`) onde o conceito for o mesmo.
+Compõe título, descrição, lista ordenável, botão de adição e template de nova linha.
 
-**Regra:** quando o **segundo** modulo passar a usar o mesmo bloco na pratica, pode ser necessaria **nova extracao** (HTML/CSS) a partir dos partials de Roteiros — isso nao invalida o padrao atual; apenas marca o momento de fundir duplicacao real.
+Parâmetros principais:
 
----
+- `prefix`: prefixo dos campos do formulário (`termo`, `os`, `pt`, `evento` etc.);
+- `rows_template` e `row_template`: fontes das linhas existentes e da linha nova;
+- `list_id`, `add_button_id`, `template_id`: IDs preservados quando o módulo depende deles;
+- `add_hook`, `list_hook`, `section_hook`: hooks adicionais específicos do consumidor;
+- `show_dates`, `show_remove`, `single`: variantes funcionais.
 
-Roteiros e o **modulo referencia**: os blocos abaixo devem ser reutilizados por Oficios, Planos, OS, etc., quando o fluxo exigir os mesmos conceitos (sem acoplar modelo `Roteiro` na camada de template além do contrato documentado).
+### `destination_row.html`
 
-Convencoes globais:
+É a única estrutura HTML de uma linha de destino. Usa `cv-ordered-field-row` para layout e os hooks globais `data-destination-row` e `data-destination-order`.
 
-- Nao consultar banco no component.
-- Nao calcular rota nem diarias no component.
-- Nao salvar dados no component.
-- Sem `href="#"`, sem CSS inline, sem JS inline.
-- Parametros opcionais: `title`, `description`, `readonly`, `empty_message`, `actions` (quando o partial filho suportar).
+Os subcomponentes em `travel/destinations/` isolam seleção de estado, seleção de cidade, erros, coleção de linhas e template vazio.
 
-CSS: `static/css/domain.css` + estilos do form em `roteiros.css` quando o partial usar `roteiro-editor__*`.
+Comportamento global: `static/js/components/destination-section.js`, disponível como `window.CV.destinations`. O componente preserva os nomes e IDs Django recebidos; cada página apenas informa os seletores específicos necessários ao seu fluxo.
 
----
+Consumidores em produção:
 
-## sede_destinos.html
+- Eventos: cadastro e detalhe;
+- Termos: seção de evento;
+- Ordens de Serviço: seção de evento;
+- Planos de Trabalho: identificação do evento;
+- Roteiros: fonte, sede e destinos.
 
-**Objetivo:** Bloco de sede (origem) e lista de destinos do wizard.
+## Trechos de rota
 
-**Quando usar:** Formularios que replicam o passo "sede + destinos" do legacy.
+`route_segments.html` contém a coleção editável de trechos do roteiro. O hook global é `data-route-segments`; cards usam `route-segment-card` e blocos usam `route-section-block`.
 
-**Parametros:** Herdados do contexto do formulario (`form`, `destinos_atuais`, `estados`, `fase_roteiro_state`, `destino_estado_fixo_*`, etc.) via `roteiros/partials/roteiro/sede_destinos.html`.
+O template continua recebendo o contexto já preparado pelo fluxo de Roteiros, inclusive JSON inicial e URLs presentes no formulário pai. Cálculo, persistência e validação continuam no backend e nos módulos JavaScript existentes.
 
-**Exemplo:**
+## Cálculo de diárias
 
-```django
-{% raw %}
-{% include "components/domain/sede_destinos.html" %}
-{% endraw %}
-```
+`travel_allowance_calculator.html` apresenta a seção de cálculo e os campos ocultos já definidos pelo formulário. O hook de integração é `data-travel-allowance-calculator`.
 
-**Nao deve:** Executar queries; depender de URL nomeada fora do contexto ja montado pelo presenter/logica.
+O componente não calcula valores por conta própria e não substitui endpoints ou regras de negócio.
 
-**Paginas agora:** Wizard avulso em `roteiros/partials/roteiro_form.html`.
+## Limites
 
-**Paginas futuras:** Oficios (fase roteiro), Planos com deslocamento, OS com trechos.
-
----
-
-## destinos.html
-
-**Objetivo:** Ponto unico de include para o bloco de destinos (hoje delega ao mesmo partial de sede+destinos usado no wizard).
-
-**Quando usar:** Quando um modulo quiser so o bloco de destinos sem renomear paths internos; hoje equivalente a `sede_destinos` no fluxo atual.
-
-**Parametros:** Mesmos de `sede_destinos.html` (contexto do form).
-
-**Exemplo:**
-
-```django
-{% raw %}
-{% include "components/domain/destinos.html" %}
-{% endraw %}
-```
-
-**Nao deve:** Introduzir HTML divergente do partial canon sem atualizar documentacao.
-
-**Paginas agora:** Inclusao indireta via `destinos` == `sede_destinos` no mesmo form.
-
-**Paginas futuras:** Telas que listem apenas pernas de destino com o mesmo markup.
-
----
-
-## trechos.html
-
-**Objetivo:** Secao de trechos (tabela dinamica, estimativa, IDs de cidade).
-
-**Quando usar:** Qualquer form que monte trechos com o mesmo contrato POST do legacy.
-
-**Parametros:** Contexto do wizard (`trechos`, `trechos_json`, `initial_trechos_data`, URLs em `data-*` no form pai).
-
-**Exemplo:**
-
-```django
-{% raw %}
-{% include "components/domain/trechos.html" %}
-{% endraw %}
-```
-
-**Nao deve:** Chamar API diretamente no template; o JS global le `data-url-trechos-estimar` do form.
-
-**Paginas agora:** `roteiro_form.html`.
-
-**Paginas futuras:** Oficios fase 3, documentos com trechos persistidos.
-
----
-
-## trecho_card.html
-
-**Objetivo:** Card de leitura de um `RoteiroTrecho` (ordem, tipo, origem/destino, datas, distancia).
-
-**Quando usar:** Detalhe de roteiro ou listagem compacta de trechos persistidos.
-
-**Parametros:**
-
-- `trecho` — instancia com `get_tipo_display`, FKs de cidade/estado, `saida_dt`, `chegada_dt`, `distancia_km`.
-
-**Exemplo:**
-
-```django
-{% raw %}
-{% include "components/domain/trecho_card.html" with trecho=trecho only %}
-{% endraw %}
-```
-
-**Nao deve:** Gerar links de edicao sem URL real; nao embutir regra de negocio.
-
-**Paginas agora:** `roteiros/detail.html`.
-
-**Paginas futuras:** Resumo em Oficio, OS, relatorios.
-
----
-
-## retorno.html
-
-**Objetivo:** Secao "Retorno final" (datas, cidade de saida readonly, campos de chegada).
-
-**Quando usar:** Wizard com retorno simetrico ao legacy.
-
-**Parametros:** `retorno_state` (dict no contexto do form).
-
-**Exemplo:**
-
-```django
-{% raw %}
-{% include "components/domain/retorno.html" %}
-{% endraw %}
-```
-
-**Nao deve:** Duplicar o partial (uma unica inclusao).
-
-**Paginas agora:** `roteiro_form.html`.
-
-**Paginas futuras:** Fluxos com retorno obrigatorio no mesmo modelo mental.
-
----
-
-## calculadora_rota.html
-
-**Objetivo:** Painel de diarias e resumo financeiro (include do partial de diarias).
-
-**Quando usar:** Apos trechos/retorno no wizard, quando o POST expoe campos de diarias.
-
-**Parametros:** `fase_roteiro_diarias_resultado`, IDs e campos hidden ja definidos no form pai.
-
-**Exemplo:**
-
-```django
-{% raw %}
-{% include "components/domain/calculadora_rota.html" %}
-{% endraw %}
-```
-
-**Nao deve:** Substituir o endpoint `calcular_diarias`; apenas exibe e envia campos.
-
-**Paginas agora:** `roteiro_form.html`.
-
-**Paginas futuras:** Qualquer tela que reuse o mesmo bloco de diarias periodizadas.
-
----
-
-## resumo_rota.html
-
-**Objetivo:** Resumo estatico (origem, quantidade de trechos, diarias, observacoes).
-
-**Quando usar:** Pagina de detalhe ou preview read-only.
-
-**Parametros:**
-
-- `roteiro` — instancia persistida.
-- `trechos` — iterable (para `length`).
-
-**Exemplo:**
-
-```django
-{% raw %}
-{% include "components/domain/resumo_rota.html" with roteiro=roteiro trechos=trechos only %}
-{% endraw %}
-```
-
-**Nao deve:** Exibir `updated_at` ou "Atualizado em".
-
-**Paginas agora:** `roteiros/detail.html`.
-
-**Paginas futuras:** Cabecalho de resumo em impressao/PDF de documentos de viagem.
+- HTML visual e comportamento genérico pertencem aos componentes desta pasta.
+- Labels, nomes POST, permissões, regras e mensagens de negócio pertencem aos módulos Django.
+- Uma diferença visual deve ser parâmetro/variante apenas quando representa estado real; diferenças cosméticas locais não justificam cópia.
+- Novos consumidores devem incluir os componentes canônicos diretamente, sem aliases intermediários.

@@ -17,7 +17,7 @@
 | Headers (band/stack/rail) | **Alta em cadastros e listas** | Components em `templates/components/ui/headers/` adotados na maior parte dos CRUDs e listas |
 | Structures (page-shell) | **Média-alta** | Cadastros e listas usam `page-shell--*`; wizards de ofício/roteiro ainda usam `app-page` / `app-page-shell` legado |
 | Buttons (`cv-btn`) | **Média** | Design system novo em components; ofícios, assinaturas, roteiros editor e wizards ainda usam `btn btn-*` em massa |
-| Listas / cards | **Alta em roteiros/ofícios** | `main_list_card.html` + `header_stack_filters`; cadastros simples usam `simple_list` via `list_page_standard` |
+| Listas / cards | **Alta em roteiros/ofícios** | `main_list_card.html` + `filter_page_header`; cadastros simples usam `simple_list` via `list_page_standard` |
 | Inputs / fields | **Média** | `form_field.html` → `field.html` no pipeline novo; UI Lab demonstra `cv-field-*` inline, não via includes |
 | Selects / pickers | **Média-alta** | `cv-custom-select`, `cv-search-picker` globais; ofício transporte tem busca viatura custom (`oficio-viatura-busca`) |
 | Toggles | **Média** | UI Lab: `cv-state-button`; produção: `field_action_button` (servidores/viaturas) + `app-card-toggle` (legado) |
@@ -36,7 +36,7 @@
 
 ### Principais divergências
 
-- Wizard de ofícios: header próprio (`travel-document-wizard__header`), não `header_stack_stepper` / `page-shell--wizard`.
+- Wizard de ofícios: header próprio (`travel-document-wizard__header`), não `page_header` / `page-shell--wizard`.
 - Páginas placeholder (`planos_trabalho`, `ordens_servico`, etc.): `app-page` sem `page-shell`.
 - `termos/index.html`: título manual + botão legado (corrigido nesta auditoria).
 - `oficios-assinaturas-central.css`: dezenas de cores `#hex` e `rgba` fixos (fora de tokens).
@@ -53,7 +53,7 @@
 
 ### O que ficou pendente (fases futuras)
 
-- Migrar wizard ofícios para `page-shell--wizard` + `header_stack_stepper`.
+- Migrar wizard ofícios para `page-shell--wizard` + `page_header`.
 - Substituir `btn btn-*` em `wizard_actions.html`, `wizard_documentos.html`, assinaturas públicas.
 - Tokenizar `oficios-assinaturas-central.css`, `roteiros-list.css`, trechos de `oficios.css`.
 - Promover demos inline do UI Lab para includes em `components/ui/*`.
@@ -102,7 +102,7 @@ Rotas: apenas com `DEBUG=True` (`core/urls.py`). Namespace `core:ui_lab_*`.
 | Component | Onde |
 |-----------|------|
 | `components/ui/buttons/button.html` | structures, lists (Limpar filtros) |
-| `components/ui/layouts/footer_actions.html` | structures |
+| `components/ui/layouts/card_footer_section.html` | structures |
 | `components/lists/simple_list_row.html` | lists |
 | `components/ui/badges/chip.html` | status |
 | `roteiros/partials/roteiro_list_card.html` | lists (cards demo) |
@@ -169,18 +169,18 @@ Tema claro/escuro: **`theme.css`** (313 ocorrências de overrides); UI Lab herda
 | Modelo UI Lab | Component global | Uso em produção | Gap |
 |---------------|------------------|-----------------|-----|
 | Header Band | (inline no lab) | Espelhado em structures demo | Band isolada rara em produção |
-| Header Band + status | `header_band_status.html` | Pouco usado diretamente | — |
-| Rail Simple | `header_stack_simple.html` | Cadastros forms, confirm_delete, configuração | OK |
-| Rail Back Action | `header_stack_back_action.html` | `wizard_page.html` (parcial) | Ofício wizard **não usa** |
-| Rail Filters | `header_stack_filters.html` | `list_page_standard`, ofícios/roteiros index | OK |
-| Advanced Filters + chips | `advanced_filters.html` / inline lab | Roteiros/ofícios (status no header_stack_filters) | Chips aplicados nem sempre via `filter_chip.html` |
+| Header Band + status | `page_header.html` | Pouco usado diretamente | — |
+| Rail Simple | `page_header.html` | Cadastros forms, confirm_delete, configuração | OK |
+| Rail Back Action | `page_header.html` | `wizard_page.html` (parcial) | Ofício wizard **não usa** |
+| Rail Filters | `filter_page_header.html` | `list_page_standard`, ofícios/roteiros index | OK |
+| Advanced Filters + chips | `advanced_filters.html` / inline lab | Roteiros/ofícios (status no filter_page_header) | Chips aplicados nem sempre via `filter_chip.html` |
 | Filters + Quick Add | `list_page_quick_add.html` | cargos, unidades, combustíveis index | OK |
-| Rail Stepper | `header_stack_stepper.html` | `roteiro_form_page.html` (parcial) | Ofício wizard usa `wizard_stepper` próprio |
+| Rail Stepper | `page_header.html` | `roteiro_form_page.html` (parcial) | Ofício wizard usa `wizard_stepper` próprio |
 
 ### Arquivos reais por tipo
 
-- **header_stack_simple:** todos `cadastros/*/form.html`, `confirm_delete`, `configuracao/form.html`
-- **header_stack_filters:** `components/lists/list_page_standard.html`, `oficios/index.html`, `roteiros/index.html`
+- **page_header:** todos `cadastros/*/form.html`, `confirm_delete`, `configuracao/form.html`
+- **filter_page_header:** `components/lists/list_page_standard.html`, `oficios/index.html`, `roteiros/index.html`
 - **Legado wizard:** `oficios/wizard_base.html` (`travel-document-wizard__header`), `roteiros/includes/_roteiro_editor.html` (`app-page-shell--wizard`)
 
 ### Hardcoded
@@ -194,7 +194,7 @@ Tema claro/escuro: **`theme.css`** (313 ocorrências de overrides); UI Lab herda
 
 ### Pendências
 
-- Migrar `oficios/wizard_base.html` para `header_stack_stepper` + status chip
+- Migrar `oficios/wizard_base.html` para `page_header` + status chip
 - Avaliar `roteiro_form_page` vs UI Lab wizard structure
 
 ---
@@ -223,8 +223,8 @@ Tema claro/escuro: **`theme.css`** (313 ocorrências de overrides); UI Lab herda
 
 ### Pendências
 
-- Padronizar placeholders com `page-shell--standard-simple` + `header_stack_simple`
-- Extrair `list_page` legado (`components/lists/list_page.html`) se ainda referenciado
+- Padronizar placeholders com `page-shell--standard-simple` + `page_header`
+- Extrair `list_page` legado (`components/lists/list_page_cards.html`) se ainda referenciado
 
 ---
 
@@ -254,7 +254,7 @@ Mapeamento função → component ideal (`components/ui/buttons/`):
 
 - **Grande:** `oficios/partials/wizard_actions.html` (~10 `btn` por etapa)
 - **Grande:** `wizard_documentos.html`, `assinatura_central_documento.html`
-- **Média:** `components/buttons/action_button.html` → deprecar em favor de `ui/buttons/button.html`
+- **Média:** `components/ui/buttons/button.html` → deprecar em favor de `ui/buttons/button.html`
 - Mover ícones de `dev/ui_lab/partials/_cv_icon.html`
 
 ---
@@ -263,7 +263,7 @@ Mapeamento função → component ideal (`components/ui/buttons/`):
 
 ### Modelo correto (UI Lab lists — variante cards)
 
-- Header: `header_stack_filters` (avançado com status)
+- Header: `filter_page_header` (avançado com status)
 - Container: `page-shell--list` + `list-panel`
 - Grid: `list-grid--roteiros` / `card-list--roteiros`
 - Item: `components/lists/main_list_card.html` (wrapper de domínio)
@@ -287,7 +287,7 @@ Mapeamento função → component ideal (`components/ui/buttons/`):
 ### Pendências
 
 - Unificar demo `_list_card` com `main_list_card` ou remover `cards.html`
-- Revisar chips de filtro aplicado no header avançado (usar `components/ui/filters/filter_chip.html`)
+- Revisar chips de filtro aplicado no header avançado (usar `components/ui/badges/chip.html`)
 
 ---
 
@@ -522,7 +522,7 @@ Mapeamento função → component ideal (`components/ui/buttons/`):
 
 ### Refatorações grandes (sprint)
 
-- Ofício wizard → `wizard_page.html` + `header_stack_stepper`
+- Ofício wizard → `wizard_page.html` + `page_header`
 - Roteiro editor legado → `page-shell--wizard`
 - UI Lab demos → includes globais (eliminar inline)
 - Deprecar `components/buttons/` e `components/lists/` legado
@@ -559,7 +559,7 @@ Mapeamento função → component ideal (`components/ui/buttons/`):
 
 **ui/buttons:** button, icon_button, floating_action, floating_primary_action, footer_action, field_action_button, field_manage_button  
 
-**ui/headers:** header_stack_simple, header_stack_filters, header_stack_back_action, header_stack_stepper, header_band_status  
+**ui/headers:** page_header, filter_page_header, page_header, page_header, page_header
 
 **ui/layouts:** page_shell, standard_page, standard_simple_page, wizard_page, main_panel, quick_add, form_section, footer_actions  
 

@@ -39,8 +39,8 @@
   }
 
   function loadCidadesForUfD(form, cidadeSel, uf, initialValue) {
-    if (window.CV && window.CV.destinos && typeof window.CV.destinos.loadCities === 'function') {
-      return window.CV.destinos.loadCities({
+    if (window.CV && window.CV.destinations && typeof window.CV.destinations.loadCities === 'function') {
+      return window.CV.destinations.loadCities({
         citySelect: cidadeSel,
         stateId: uf,
         selectedId: initialValue,
@@ -110,14 +110,14 @@
     rows.forEach(function (row) {
       if (row.hidden) return;
       ordinal += 1;
-      var badge = row.querySelector('[data-destino-ord]');
+      var badge = row.querySelector('[data-destination-order]');
       if (badge) badge.textContent = String(ordinal);
     });
   }
 
   function refreshRemoveButtonsD(lista) {
-    if (window.CV && window.CV.destinos && typeof window.CV.destinos.updateSingleRowState === 'function') {
-      window.CV.destinos.updateSingleRowState(lista, {
+    if (window.CV && window.CV.destinations && typeof window.CV.destinations.updateSingleRowState === 'function') {
+      window.CV.destinations.updateSingleRowState(lista, {
         rowSelector: '[data-destino-index]',
         removeSelector: '[data-remover-destino]'
       });
@@ -145,8 +145,8 @@
     var sedeUf = (form && form.dataset.sedeUf) || '';
     var extraCount = 0;
 
-    if (window.CV && window.CV.destinos && typeof window.CV.destinos.initDragDrop === 'function') {
-      window.CV.destinos.initDragDrop(lista, {
+    if (window.CV && window.CV.destinations && typeof window.CV.destinations.initDragDrop === 'function') {
+      window.CV.destinations.initDragDrop(lista, {
         rowSelector: '[data-destino-index]',
         removeSelector: '[data-remover-destino]',
         onReorder: function () { refreshRemoveButtonsD(lista); }
@@ -182,8 +182,8 @@
     refreshRemoveButtonsD(lista);
 
     btn.addEventListener('click', function () {
-      if (window.CV && window.CV.destinos && typeof window.CV.destinos.appendTemplateRow === 'function') {
-        var appended = window.CV.destinos.appendTemplateRow({
+      if (window.CV && window.CV.destinations && typeof window.CV.destinations.appendTemplateRow === 'function') {
+        var appended = window.CV.destinations.appendTemplateRow({
           list: lista,
           template: tmpl,
           rowSelector: '[data-destino-index]',

@@ -1,6 +1,6 @@
 <div class="field-grid">
   <div class="field-size-3">
-    {% include "components/forms/form_field.html" with field=form.nome only %}
+    {% include "components/ui/forms/field.html" with field=form.nome only %}
   </div>
-  {% include "components/forms/card_toggle.html" with field=form.ativo title="Ativo" description="Disponível para seleção nos eventos" compact=True size_class="field-size-1" only %}
+  {% include "components/ui/forms/card_toggle.html" with field=form.ativo title="Ativo" description="Disponível para seleção nos eventos" compact=True size_class="field-size-1" only %}
 </div>

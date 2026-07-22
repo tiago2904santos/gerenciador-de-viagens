@@ -1,4 +1,4 @@
-﻿# Design System
+# Design System
 
 ## Regras globais
 
@@ -85,7 +85,7 @@ Regras:
 - O card mostra icone, titulo forte, descricao pequena e badge de estado `LIGADA` / `DESLIGADA`.
 - Desligado usa fundo e borda vermelhos suaves, com badge vermelho.
 - Ligado usa azul institucional com acento amarelo/dourado, borda destacada e badge premium.
-- BooleanFields futuros renderizados manualmente devem usar `templates/components/forms/card_toggle.html`.
+- BooleanFields futuros renderizados manualmente devem usar `templates/components/ui/forms/card_toggle.html`.
 - JS de sincronismo em `static/js/components/card-toggle.js` (sem JS inline).
 
 ## Cadastros como referencia
@@ -94,15 +94,15 @@ As telas de `Unidade`, `Cidade`, `Cargo`, `Combustivel`, `Servidor` e `Viatura` 
 
 ## Tipos de listagem
 
-- **Lista simples** (`components/lists/list_page_simple.html`, `simple_list.html`): para cadastros enxutos com poucos campos — `Cargo`, `Combustivel`, `Unidade`, `Cidade`. Visual compacto, estilo tabela premium sem `<table>`, com linhas densas e acoes a direita.
+- **Lista simples** (`components/lists/list_page_standard.html`, `simple_list.html`): para cadastros enxutos com poucos campos — `Cargo`, `Combustivel`, `Unidade`, `Cidade`. Visual compacto, estilo tabela premium sem `<table>`, com linhas densas e acoes a direita.
 - **Cards ricos** (`list_page.html` + `document_card`): para entidades com mais contexto — `Servidor`, `Viatura` e, no futuro, documentos (Oficios, Termos, etc.).
 
 ## Regras para evolucao visual
 
 - Ajustes de header em `templates/components/layout/page_header.html` e `static/css/layout.css`.
 - Ajustes de sidebar em `templates/components/layout/sidebar.html`, `static/css/sidebar.css` e `static/js/components/sidebar.js`.
-- Ajustes de toolbar de lista em `templates/components/lists/list_toolbar.html` e `static/css/lists.css`.
-- Ajustes de formularios em `templates/components/forms/*.html` e `static/css/forms.css`.
+- Ajustes de toolbar de lista em `templates/components/ui/headers/filter_page_header.html` e `static/css/lists.css`.
+- Ajustes de formularios em `templates/components/ui/forms/*.html` e `static/css/forms.css`.
 - Ajustes de cards em `templates/components/cards/*.html` e `static/css/cards.css`.
 - Ajustes de feedback em `templates/components/feedback/*.html` e `static/css/utilities.css`.
 - Nunca copiar CSS bruto do legado em bloco; extrair o conceito e reconstruir no sistema atual.
@@ -112,7 +112,7 @@ As telas de `Unidade`, `Cidade`, `Cargo`, `Combustivel`, `Servidor` e `Viatura` 
 - Arquivo: `static/css/domain.css`.
 - Uso: blocos compartilhados de **roteiros, trechos, destinos, retorno, calculadora e resumo de rota** — classes semanticas como `.domain-block`, `.domain-block__title`, `.route-summary`, `.route-card`.
 - Regra: estilos que servem a **qualquer modulo** com o mesmo tipo de bloco ficam aqui; o que for **exclusivo do wizard avulso** (densidade, hero, grids do `roteiro-editor`) permanece em `static/css/roteiros.css`.
-- Paginas que incluem `templates/components/domain/*` devem importar `domain.css` no `extra_css` (alem de `style.css` via `base.html`).
+- Paginas que incluem `templates/components/travel/*` devem importar `domain.css` no `extra_css` (alem de `style.css` via `base.html`).
 - Proibido `style=""` nos templates; proibido variar o mesmo tipo de bloco com classes duplicadas em outro arquivo sem motivo.
 
 ## Layout do shell
@@ -204,11 +204,11 @@ Estas excecoes sao decisoes deliberadas e documentadas. O auditor (`scripts/audi
   <div class="form-section app-form-section">
     {# form_field.html — emite app-form-field, app-form-label, app-form-help, app-form-error #}
     <div class="form-grid app-form-grid">
-      {% include "components/forms/form_field.html" with field=form.campo only %}
+      {% include "components/ui/forms/field.html" with field=form.campo only %}
     </div>
   </div>
   <div class="form-actions">
-    {% include "components/buttons/action_button.html" with ... only %}
+    {% include "components/ui/buttons/button.html" with ... only %}
   </div>
 </form>
 {% endraw %}
@@ -219,7 +219,7 @@ Estas excecoes sao decisoes deliberadas e documentadas. O auditor (`scripts/audi
 ```html
 {% raw %}
 {# Via componente (preferido) #}
-{% include "components/buttons/action_button.html" with href=url label="Acao" variant="primary" only %}
+{% include "components/ui/buttons/button.html" with href=url label="Acao" variant="primary" only %}
 
 {# Saida: emite .btn.btn-primary.app-btn.app-btn--primary #}
 {% endraw %}

@@ -11,14 +11,14 @@
   width: 180px;
 }
 
-.oficio-lc__saque-range-picker .oficios-filter-range__btn {
+.oficio-lc__saque-range-picker .travel-period-filter__btn {
   gap: 5px;
   min-width: 0;
   padding-inline: 10px;
   width: 100%;
 }
 
-.oficio-lc__saque-range-picker .oficios-filter-range__label {
+.oficio-lc__saque-range-picker .travel-period-filter__label {
   font-size: 0.72rem;
   min-width: 0;
   overflow: hidden;

@@ -97,7 +97,7 @@
                 {% endfor %}
               </div>
             </section>
-            {% include "components/ui/layouts/footer_actions.html" with secondary_label="Voltar" primary_label="Salvar" only %}
+            {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar" primary_label="Salvar" only %}
           </main>
         </div>
       </article>
@@ -152,7 +152,7 @@
                 {% endfor %}
               </div>
             </section>
-            {% include "components/ui/layouts/footer_actions.html" with secondary_label="Voltar" primary_label="Salvar" only %}
+            {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar" primary_label="Salvar" only %}
           </main>
         </div>
       </article>
@@ -223,13 +223,13 @@
               <section class="cv-wizard-collection" aria-labelledby="structure-wizard-collection">
                 {% include "components/ui/layouts/collection_header.html" with title="Documentos vinculados" title_id="structure-wizard-collection" description="Cabeçalho autônomo organiza uma coleção sem envolver os cards da lista em outra superfície." only %}
                 <div class="cv-wizard-collection__body">
-                  {% include "components/feedback/empty_state.html" with title="Nenhum documento vinculado" message="A coleção preserva a mesma linguagem visual dos demais cards." only %}
+                  {% include "components/ui/feedback/empty_state.html" with title="Nenhum documento vinculado" message="A coleção preserva a mesma linguagem visual dos demais cards." only %}
                 </div>
               </section>
 
             </div>
 
-            {% include "components/ui/layouts/footer_actions.html" with secondary_label="Salvar rascunho" primary_label="Próximo" only %}
+            {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Salvar rascunho" primary_label="Próximo" only %}
           </main>
         </div>
       </article>

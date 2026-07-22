@@ -114,7 +114,7 @@ class DarkRedesignContractTests(SimpleTestCase):
                 source = (components / filename).read_text(encoding="utf-8")
                 self.assertIn("registerEnhancer", source)
 
-    def test_page_header_wrappers_share_one_canonical_markup(self):
+    def test_page_header_has_one_canonical_markup_without_legacy_wrappers(self):
         headers = Path(settings.BASE_DIR) / "templates" / "components" / "ui" / "headers"
         canonical = (headers / "page_header.html").read_text(encoding="utf-8")
 
@@ -128,9 +128,9 @@ class DarkRedesignContractTests(SimpleTestCase):
             "header_stack_stepper.html",
         ):
             with self.subTest(wrapper=wrapper_name):
-                wrapper = (headers / wrapper_name).read_text(encoding="utf-8")
-                self.assertIn('components/ui/headers/page_header.html', wrapper)
-                self.assertNotIn('class="page-header-band"', wrapper)
+                self.assertFalse((headers / wrapper_name).exists())
+
+        self.assertIn("band_only", canonical)
 
     def test_canonical_header_uses_a_valid_multiline_template_comment(self):
         canonical = (
@@ -160,17 +160,18 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertIn('aria-busy="true"', button)
         self.assertIn("disabled or loading", button)
 
-    def test_legacy_field_entrypoint_delegates_to_canonical_field(self):
+    def test_legacy_field_entrypoint_was_removed(self):
         wrapper = (
             Path(settings.BASE_DIR)
             / "templates"
             / "components"
             / "forms"
             / "form_field.html"
-        ).read_text(encoding="utf-8")
+        )
 
-        self.assertIn('components/ui/forms/field.html', wrapper)
-        self.assertNotIn("field.as_widget", wrapper)
+        self.assertFalse(wrapper.exists())
+        canonical = wrapper.parents[1] / "ui" / "forms" / "field.html"
+        self.assertTrue(canonical.exists())
 
     def test_selection_lab_uses_real_field_and_filter_components(self):
         lab = (
@@ -181,8 +182,8 @@ class DarkRedesignContractTests(SimpleTestCase):
             / "selects_filters.html"
         ).read_text(encoding="utf-8")
 
-        self.assertIn('components/forms/form_field.html', lab)
-        self.assertIn('components/ui/headers/header_stack_filters.html', lab)
+        self.assertIn('components/ui/forms/field.html', lab)
+        self.assertIn('components/ui/headers/filter_page_header.html', lab)
         self.assertIn("data-cv-realtime-filter-scope", lab)
         self.assertNotIn('<select name="lab-', lab)
 
@@ -592,16 +593,16 @@ class DarkRedesignContractTests(SimpleTestCase):
         module_card = (templates / "components" / "cards" / "module_card.html").read_text(encoding="utf-8")
 
         self.assertIn("page-shell dashboard-page", dashboard)
-        self.assertIn('components/ui/headers/header_stack_simple.html', dashboard)
+        self.assertIn('components/ui/headers/page_header.html', dashboard)
         self.assertIn('components/cards/summary_card.html', dashboard)
         self.assertIn('components/cards/module_card.html', dashboard)
         self.assertNotIn("dashboard-login-inspired", dashboard)
         self.assertIn("cv-module-card", module_card)
-        self.assertIn('components/buttons/action_button.html', module_card)
+        self.assertIn('components/ui/buttons/button.html', module_card)
 
         cadastros = (templates / "cadastros" / "index.html").read_text(encoding="utf-8")
         self.assertIn("page-shell cadastros-hub", cadastros)
-        self.assertIn('components/ui/headers/header_stack_simple.html', cadastros)
+        self.assertIn('components/ui/headers/page_header.html', cadastros)
         self.assertIn('components/cards/module_card.html', cadastros)
         self.assertNotIn("app-page-hero", cadastros)
 
@@ -668,7 +669,7 @@ class DarkRedesignContractTests(SimpleTestCase):
             with self.subTest(token=token):
                 self.assertIn(token, self.css)
 
-        wizard_header = self.css.split(".cv-form-section-header {", 1)[1]
+        wizard_header = self.css.rsplit(".cv-form-section-header {", 1)[1]
         wizard_header = wizard_header.split("}", 1)[0]
         list_header = self.css.split(".oficio-lc__id-row {", 1)[1]
         list_header = list_header.split("}", 1)[0]

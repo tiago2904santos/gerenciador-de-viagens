@@ -6,7 +6,7 @@
 {#   delete_modal_title/entity, cancel_modal_title/entity/hint, confirm_action_* , attach_signed_modal=True. #}
 <div class="page-shell page-shell--list page-shell--cards{% if page_extra_class %} {{ page_extra_class }}{% endif %}" data-cv-realtime-filter-scope>
 
-  {% include "components/ui/headers/header_stack_filters.html" with advanced=True form_action=request.path title=title|default:page_title eyebrow=eyebrow search_placeholder=search_placeholder search_aria_label=search_aria_label current_aba=aba date_picker_id=date_picker_id date_start_id=date_start_id date_end_id=date_end_id %}
+  {% include "components/ui/headers/filter_page_header.html" with advanced=True form_action=request.path title=title|default:page_title eyebrow=eyebrow search_placeholder=search_placeholder search_aria_label=search_aria_label current_aba=aba date_picker_id=date_picker_id date_start_id=date_start_id date_end_id=date_end_id %}
 
   {% if abas %}
     {% include "components/lists/list_tabs.html" with abas=abas tabs_aria_label=tabs_aria_label only %}

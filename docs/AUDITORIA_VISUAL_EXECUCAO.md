@@ -184,7 +184,7 @@ Zero violações de `style=""`, `onclick=`, `<script>` inline detectadas. ✅
 
 | Documento | O que diz | Estado atual |
 |-----------|-----------|-------------|
-| `docs/COMPONENTES.md` | Pode referenciar `list_page.html` + `document_card` para Cadastros | Cadastros usam `list_page_simple.html` + `simple_list_row.html` |
+| `docs/COMPONENTES.md` | Pode referenciar `list_page.html` + `document_card` para Cadastros | Cadastros usam `list_page_standard.html` + `simple_list_row.html` |
 | `docs/DESIGN_SYSTEM.md` | Descreve tokens e API visual | Parcialmente atualizado; falta seção de exceções e API final de forms |
 | `docs/PADRAO_TEMPLATES.md` | Documenta stack de templates | Pode estar desatualizado após remoção de 6 arquivos legados |
 

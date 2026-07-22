@@ -4,7 +4,7 @@
 
 {% block content %}
   <div class="page-shell page-shell--wizard">
-    {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="EVENTOS" title=page_title description=page_description icon_label="EV" module_label="Eventos" back_label="Voltar à lista" back_url=index_url status_label=status_label status_variant=status_variant only %}
+    {% include "components/ui/headers/page_header.html" with eyebrow="EVENTOS" title=page_title description=page_description icon_label="EV" module_label="Eventos" back_label="Voltar à lista" back_url=index_url status_label=status_label status_variant=status_variant only %}
 
     <form method="post">
       {% csrf_token %}

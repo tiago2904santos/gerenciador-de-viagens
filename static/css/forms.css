@@ -438,7 +438,6 @@
 }
 
 .roteiro-form--legacy-roteiro .travel-document-wizard-footer-actions .btn,
-.oficio-roteiro-page .travel-document-wizard-footer-actions .btn,
 .app-form-shell .form-actions .btn,
 .app-form-shell .app-form-actions .btn,
 .roteiro-editor__actions .btn {
@@ -832,12 +831,12 @@ textarea[readonly] {
   border-radius: var(--radius-md);
 }
 
-.app-form-shell .oficio-roteiro-destinos-stack input,
-.app-form-shell .oficio-roteiro-destinos-stack select,
-.app-form-shell .oficio-roteiro-destinos-stack textarea,
-.app-form-shell .oficio-roteiro-trecho-card input,
-.app-form-shell .oficio-roteiro-trecho-card select,
-.app-form-shell .oficio-roteiro-trecho-card textarea {
+.app-form-shell .cv-ordered-field-stack input,
+.app-form-shell .cv-ordered-field-stack select,
+.app-form-shell .cv-ordered-field-stack textarea,
+.app-form-shell .route-segment-card input,
+.app-form-shell .route-segment-card select,
+.app-form-shell .route-segment-card textarea {
   background: var(--color-card);
   border-color: var(--route-field-border);
   color: var(--route-field-text);

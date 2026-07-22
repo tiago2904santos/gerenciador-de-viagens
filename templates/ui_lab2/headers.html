@@ -13,25 +13,25 @@
 
     <div class="ui-lab2-col">
 
-      {% include "ui_lab2/partials/_component_open.html" with name="header_stack_back_action" source="components/ui/headers/header_stack_back_action.html" note="Cabecalho dos cadastros/wizards: band + rail com acao 'voltar a lista' ou acao primaria." %}
-        {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="OFICIOS" title="Novo oficio" description="Cadastro do documento em etapas." icon_label="OF" module_label="Oficios" status_label="Rascunho" status_variant="draft" back_label="Voltar a lista" back_url="#" only %}
-      {% include "ui_lab2/partials/_component_close.html" with used_in=usage.header_stack_back_action %}
+      {% include "ui_lab2/partials/_component_open.html" with name="page_header_back_action" source="components/ui/headers/page_header.html" note="Cabecalho dos cadastros/wizards: band + rail com acao 'voltar a lista' ou acao primaria." %}
+        {% include "components/ui/headers/page_header.html" with eyebrow="OFICIOS" title="Novo oficio" description="Cadastro do documento em etapas." icon_label="OF" module_label="Oficios" status_label="Rascunho" status_variant="draft" back_label="Voltar a lista" back_url="#" only %}
+      {% include "ui_lab2/partials/_component_close.html" with used_in=usage.page_header_back_action %}
 
-      {% include "ui_lab2/partials/_component_open.html" with name="header_stack_back_action · acao primaria" source="primary_action_label" note="Mesma estrutura, com botao primario (salvar) no lugar do voltar." %}
-        {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="EVENTOS" title="Editar evento" description="Atualize os dados do agrupador." icon_label="EV" module_label="Eventos" status_label="Em preparacao" status_variant="pending" primary_action_label="Salvar evento" primary_action_url="#" only %}
-      {% include "ui_lab2/partials/_component_close.html" with used_in=usage.header_stack_back_action %}
+      {% include "ui_lab2/partials/_component_open.html" with name="page_header_back_action · acao primaria" source="primary_action_label" note="Mesma estrutura, com botao primario (salvar) no lugar do voltar." %}
+        {% include "components/ui/headers/page_header.html" with eyebrow="EVENTOS" title="Editar evento" description="Atualize os dados do agrupador." icon_label="EV" module_label="Eventos" status_label="Em preparacao" status_variant="pending" primary_action_label="Salvar evento" primary_action_url="#" only %}
+      {% include "ui_lab2/partials/_component_close.html" with used_in=usage.page_header_back_action %}
 
-      {% include "ui_lab2/partials/_component_open.html" with name="header_stack_simple" source="components/ui/headers/header_stack_simple.html" note="Cabecalho dos cadastros base (sem acoes no rail)." %}
-        {% include "components/ui/headers/header_stack_simple.html" with eyebrow="CADASTROS" title="Servidores" description="Gerencie os servidores disponiveis para os documentos." icon_label="SV" module_label="Cadastros" only %}
-      {% include "ui_lab2/partials/_component_close.html" with used_in=usage.header_stack_simple %}
+      {% include "ui_lab2/partials/_component_open.html" with name="page_header_simple" source="components/ui/headers/page_header.html" note="Cabecalho dos cadastros base (sem acoes no rail)." %}
+        {% include "components/ui/headers/page_header.html" with eyebrow="CADASTROS" title="Servidores" description="Gerencie os servidores disponiveis para os documentos." icon_label="SV" module_label="Cadastros" only %}
+      {% include "ui_lab2/partials/_component_close.html" with used_in=usage.page_header_simple %}
 
-      {% include "ui_lab2/partials/_component_open.html" with name="header_band_status" source="components/ui/headers/header_band_status.html" note="So a band (titulo + status), sem rail. Componente disponivel no design system." %}
-        {% include "components/ui/headers/header_band_status.html" with eyebrow="TERMO" title="Termo de autorizacao" status_label="Assinado" status_variant="active" only %}
-      {% include "ui_lab2/partials/_component_close.html" with used_in=usage.header_band_status %}
+      {% include "ui_lab2/partials/_component_open.html" with name="page_header · somente faixa" source="components/ui/headers/page_header.html" note="Variante band_only: titulo e status, sem a faixa inferior." %}
+        {% include "components/ui/headers/page_header.html" with eyebrow="TERMO" title="Termo de autorizacao" status_label="Assinado" status_variant="active" band_only=True only %}
+      {% include "ui_lab2/partials/_component_close.html" with used_in=usage.page_header_band_only %}
 
-      {% include "ui_lab2/partials/_component_open.html" with name="header_stack_stepper" source="components/ui/headers/header_stack_stepper.html" note="Cabecalho com area reservada para o stepper no rail. Usa status_badge. Componente disponivel no design system." %}
-        {% include "components/ui/headers/header_stack_stepper.html" with eyebrow="PLANO DE TRABALHO" title="Novo plano" description="Wizard com etapas." icon_label="PT" module_label="Planos de Trabalho" status_label="Rascunho" status_variant="draft" only %}
-      {% include "ui_lab2/partials/_component_close.html" with used_in=usage.header_stack_stepper %}
+      {% include "ui_lab2/partials/_component_open.html" with name="page_header_stepper" source="components/ui/headers/page_header.html" note="Cabecalho com area reservada para o stepper no rail. Usa status_badge. Componente disponivel no design system." %}
+        {% include "components/ui/headers/page_header.html" with eyebrow="PLANO DE TRABALHO" title="Novo plano" description="Wizard com etapas." icon_label="PT" module_label="Planos de Trabalho" status_label="Rascunho" status_variant="draft" only %}
+      {% include "ui_lab2/partials/_component_close.html" with used_in=usage.page_header_stepper %}
 
     </div>
   </section>

@@ -1,21 +1,21 @@
 {% comment %}
-  Linha de efetivo no visual das linhas de destino do ofício (oficio-roteiro-destino-row),
+  Linha de efetivo no visual das linhas de destino do ofício (cv-ordered-field-row),
   mantendo os hooks de JS do plano (data-pt-efetivo-*). Campos: Unidade · Cargo · Quantidade.
   Params: efetivo_form, row_ordinal, total_forms, cargos_url.
   Linha única (primeira e sozinha) esconde o botão remover — o JS reavalia isso.
 {% endcomment %}
-<div class="destino-row oficio-roteiro-destino-row pt-efetivo-card{% if row_ordinal == 1 and total_forms == 1 %} destino-row--single{% endif %}" data-pt-efetivo-row>
+<div class="destination-row cv-ordered-field-row pt-efetivo-card{% if row_ordinal == 1 and total_forms == 1 %} destination-row--single{% endif %}" data-pt-efetivo-row>
   {% for hidden in efetivo_form.hidden_fields %}{{ hidden }}{% endfor %}
   <div hidden>{{ efetivo_form.DELETE }}</div>
-  <span class="oficio-roteiro-destino-row__badge" data-pt-efetivo-ord aria-hidden="true">{{ row_ordinal|default:1 }}</span>
-  <div class="oficio-roteiro-destino-row__body">
-    <div class="field-grid oficio-roteiro-destino-row__fields pt-efetivo-fields">
+  <span class="cv-ordered-field-row__badge" data-pt-efetivo-ord aria-hidden="true">{{ row_ordinal|default:1 }}</span>
+  <div class="cv-ordered-field-row__body">
+    <div class="field-grid cv-ordered-field-row__fields pt-efetivo-fields">
       <div class="field app-form-field">
         <label class="cv-field__label app-form-label" for="{{ efetivo_form.unidade.id_for_label }}">Unidade (opcional)</label>
         {{ efetivo_form.unidade }}
         {% if efetivo_form.unidade.errors %}{% include "components/ui/feedback/field_error.html" with errors=efetivo_form.unidade.errors only %}{% endif %}
       </div>
-      {% include "components/forms/input_with_action.html" with field=efetivo_form.cargo action_url=cargos_url action_label="Gerenciar cargos" only %}
+      {% include "components/ui/forms/field.html" with field=efetivo_form.cargo action_url=cargos_url action_label="Gerenciar cargos" only %}
       <div class="field app-form-field">
         <label class="cv-field__label app-form-label" for="{{ efetivo_form.quantidade.id_for_label }}">Quantidade</label>
         <div class="roteiro-time-calc-stepper pt-quantidade-stepper">
@@ -28,7 +28,7 @@
     </div>
   </div>
   <button type="button"
-          class="btn-remover-destino oficio-roteiro-destino-row__remove"
+          class="destination-remove-button cv-ordered-field-row__remove"
           title="Remover efetivo"
           aria-label="Remover efetivo"
           {% if row_ordinal == 1 and total_forms == 1 %}hidden{% endif %}

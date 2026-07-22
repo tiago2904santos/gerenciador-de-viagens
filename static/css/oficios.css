@@ -3292,16 +3292,16 @@ html[data-theme="dark"] [data-travel-document-wizard-step1] .cv-search-picker {
   gap: 10px;
 }
 
-:is([data-travel-document-wizard-step1] .travel-document-block, [data-travel-document-wizard-roteiro] .oficio-roteiro-block, [data-travel-document-wizard-justificativa] .oficio-justificativa-block, [data-travel-document-wizard-documentos] .oficio-documentos-block) {
+:is([data-travel-document-wizard-step1] .travel-document-block, [data-travel-document-wizard-roteiro] .route-section-block, [data-travel-document-wizard-justificativa] .oficio-justificativa-block, [data-travel-document-wizard-documentos] .oficio-documentos-block) {
   margin: 0;
 }
 
-:is([data-travel-document-wizard-step1] .travel-document-block, [data-travel-document-wizard-roteiro] .oficio-roteiro-block, [data-travel-document-wizard-justificativa] .oficio-justificativa-block, [data-travel-document-wizard-documentos] .oficio-documentos-block) > .cv-form-block__header .cv-form-block__copy {
+:is([data-travel-document-wizard-step1] .travel-document-block, [data-travel-document-wizard-roteiro] .route-section-block, [data-travel-document-wizard-justificativa] .oficio-justificativa-block, [data-travel-document-wizard-documentos] .oficio-documentos-block) > .cv-form-block__header .cv-form-block__copy {
   display: grid;
   gap: 3px;
 }
 
-:is([data-travel-document-wizard-step1] .travel-document-block, [data-travel-document-wizard-roteiro] .oficio-roteiro-block, [data-travel-document-wizard-justificativa] .oficio-justificativa-block, [data-travel-document-wizard-documentos] .oficio-documentos-block) .cv-form-block__description {
+:is([data-travel-document-wizard-step1] .travel-document-block, [data-travel-document-wizard-roteiro] .route-section-block, [data-travel-document-wizard-justificativa] .oficio-justificativa-block, [data-travel-document-wizard-documentos] .oficio-documentos-block) .cv-form-block__description {
   text-align: left;
 }
 
@@ -4110,14 +4110,14 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
   width: 180px;
 }
 
-.oficio-lc__saque-range-picker .oficios-filter-range__btn {
+.oficio-lc__saque-range-picker .travel-period-filter__btn {
   gap: 5px;
   min-width: 0;
   padding-inline: 10px;
   width: 100%;
 }
 
-.oficio-lc__saque-range-picker .oficios-filter-range__label {
+.oficio-lc__saque-range-picker .travel-period-filter__label {
   font-size: 0.72rem;
   min-width: 0;
   overflow: hidden;

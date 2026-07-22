@@ -1,4 +1,0 @@
-{# Linhas de destino de um formulário. Parâmetros: prefix (os|pt|termo), picker_open_all (opcional). #}
-{% for row in form.destination_rows %}
-  {% include "components/domain/destino_row.html" with row_single=row.is_primary row_extra_class="termo-destino-row" prefix=prefix row_index=row.index remove_hidden=row.is_primary picker_open_all=picker_open_all state_select_template="components/domain/destinos/state_select.html" city_select_template="components/domain/destinos/city_select.html" %}
-{% endfor %}

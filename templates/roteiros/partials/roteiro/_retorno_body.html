@@ -8,7 +8,7 @@
       </div>
       <div class="field cv-field field-size-1">
         <label class="cv-field__label" for="id_retorno_saida_data_display">Data</label>
-        {% include "components/forms/cv_date_picker.html" with mode="single" picker_id="retorno-saida-date-picker" single_input_id="id_retorno_saida_data_display" single_hidden_id="id_retorno_saida_data" single_hidden_name="retorno_saida_data" single_hidden_value=retorno_state.saida_data initial_date=retorno_state.saida_data trecho_date="saida" only %}
+        {% include "components/ui/forms/date_picker.html" with mode="single" picker_id="retorno-saida-date-picker" single_input_id="id_retorno_saida_data_display" single_hidden_id="id_retorno_saida_data" single_hidden_name="retorno_saida_data" single_hidden_value=retorno_state.saida_data initial_date=retorno_state.saida_data trecho_date="saida" only %}
       </div>
       <div class="field cv-field field-size-1">
         <label class="cv-field__label" for="id_retorno_saida_hora">Hora</label>
@@ -26,7 +26,7 @@
       </div>
       <div class="field cv-field field-size-1">
         <label class="cv-field__label" for="id_retorno_chegada_data_display">Data</label>
-        {% include "components/forms/cv_date_picker.html" with mode="single" picker_id="retorno-chegada-date-picker" single_input_id="id_retorno_chegada_data_display" single_hidden_id="id_retorno_chegada_data" single_hidden_name="retorno_chegada_data" single_hidden_value=retorno_state.chegada_data initial_date=retorno_state.chegada_data trecho_date="chegada" only %}
+        {% include "components/ui/forms/date_picker.html" with mode="single" picker_id="retorno-chegada-date-picker" single_input_id="id_retorno_chegada_data_display" single_hidden_id="id_retorno_chegada_data" single_hidden_name="retorno_chegada_data" single_hidden_value=retorno_state.chegada_data initial_date=retorno_state.chegada_data trecho_date="chegada" only %}
       </div>
       <div class="field cv-field field-size-1">
         <label class="cv-field__label" for="id_retorno_chegada_hora">Hora</label>

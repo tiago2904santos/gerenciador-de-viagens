@@ -20,8 +20,8 @@
           <span class="ui-lab-status-pill ui-lab-status-pill--done">BoundField</span>
         </div>
         <div class="field-grid field-grid--cols-2">
-          {% include "components/forms/form_field.html" with field=field_demo_form.unidade size_class="field-size-1" only %}
-          {% include "components/forms/form_field.html" with field=field_demo_form.participantes size_class="field-size-1" only %}
+          {% include "components/ui/forms/field.html" with field=field_demo_form.unidade size_class="field-size-1" only %}
+          {% include "components/ui/forms/field.html" with field=field_demo_form.participantes size_class="field-size-1" only %}
         </div>
       </article>
 
@@ -30,7 +30,7 @@
           <span class="ui-lab-preview-card__label">CV Picker Single</span>
           <span class="ui-lab-status-pill ui-lab-status-pill--done">Busca + teclado</span>
         </div>
-        {% include "components/forms/form_field.html" with field=field_demo_form.destino_picker only %}
+        {% include "components/ui/forms/field.html" with field=field_demo_form.destino_picker only %}
       </article>
 
       <article class="ui-lab-preview-card">
@@ -38,7 +38,7 @@
           <span class="ui-lab-preview-card__label">CV Picker Multiple</span>
           <span class="ui-lab-status-pill ui-lab-status-pill--done">Seleção detalhada</span>
         </div>
-        {% include "components/forms/form_field.html" with field=field_demo_form.servidores_picker only %}
+        {% include "components/ui/forms/field.html" with field=field_demo_form.servidores_picker only %}
       </article>
 
       <article class="ui-lab-preview-card">
@@ -47,7 +47,7 @@
           <span class="ui-lab-status-pill ui-lab-status-pill--done">Contrato data-*</span>
         </div>
         <div data-cv-realtime-filter-scope>
-          {% include "components/ui/headers/header_stack_filters.html" with eyebrow="Registros" title="Filtrar documentos" icon_label="FL" search_name="q" search_placeholder="Buscar por título" search_clear_url="#" status_options=ui_lab_filter_options status_name="status" status_label="Status" only %}
+          {% include "components/ui/headers/filter_page_header.html" with eyebrow="Registros" title="Filtrar documentos" icon_label="FL" search_name="q" search_placeholder="Buscar por título" search_clear_url="#" status_options=ui_lab_filter_options status_name="status" status_label="Status" only %}
           <div class="simple-list" role="list">
             {% for row in ui_lab_simple_rows %}
               {% include "components/lists/simple_list_row.html" with row=row only %}

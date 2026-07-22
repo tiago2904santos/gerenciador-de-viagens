@@ -265,7 +265,7 @@ class TermoAutorizacaoCadastroTests(TestCase):
         self.assertContains(response_novo, "id=\"id_oficio_busca\"")
         self.assertContains(response_novo, "id=\"termo-oficio-lista\"")
         self.assertContains(response_novo, "id=\"termo-evento-date-picker\"")
-        self.assertContains(response_novo, "id=\"btn-adicionar-destino\"")
+        self.assertContains(response_novo, "id=\"termo-btn-adicionar-destino\"")
 
         termo = TermoAutorizacao.objects.create(
             destino_estado=self.estado,

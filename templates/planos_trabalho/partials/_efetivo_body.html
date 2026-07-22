@@ -3,22 +3,22 @@
   {% include "components/ui/feedback/field_error.html" with errors=formset.non_form_errors only %}
 {% endif %}
 
-<section class="cv-form-subsection oficio-roteiro-destinos pt-efetivo-section"
+<section class="cv-form-subsection cv-ordered-field-collection pt-efetivo-section"
          aria-labelledby="pt-efetivo-list-title"
          id="pt-efetivo-section">
-  <header class="cv-form-subsection__header oficio-roteiro-destinos__header">
+  <header class="cv-form-subsection__header cv-ordered-field-collection__header">
     <div class="cv-form-subsection__copy">
       <h4 class="cv-form-subsection__title" id="pt-efetivo-list-title">Efetivos adicionados</h4>
       <p class="cv-form-subsection__description">Cada linha é um cargo com a respectiva quantidade de servidores.</p>
     </div>
-    <div class="oficio-roteiro-destinos__actions">
+    <div class="cv-ordered-field-collection__actions">
       <button type="button" class="cv-btn cv-btn--secondary cv-btn--sm" data-pt-efetivo-add>
         <span>Adicionar efetivo</span>
       </button>
     </div>
   </header>
 
-  <div class="oficio-roteiro-destinos__list roteiro-destinos-list pt-efetivo-rows"
+  <div class="cv-ordered-field-collection__list route-destinations-list pt-efetivo-rows"
        aria-label="Efetivos adicionados"
        data-pt-efetivo-rows>
     {% for efetivo_form in formset %}

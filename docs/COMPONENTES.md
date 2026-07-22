@@ -1,141 +1,72 @@
-﻿# Componentes
+# Catálogo canônico de componentes
 
-## Uso no cadastros
+Este catálogo descreve a árvore ativa em `templates/components/`. Um componente é nomeado pela responsabilidade que exerce; nomes de página, módulo ou UI Lab não são aceitos em APIs globais.
 
-O app `cadastros` usa listagens globais (`list_page` ou `list_page_simple`), `document_card` onde aplicavel, `form_field` e `form_actions` para os CRUDs de:
+## Organização
 
-- `Unidade`
-- `Cidade`
-- `Cargo`
-- `Combustivel`
-- `Servidor`
-- `Viatura`
+| Área | Responsabilidade | Componentes principais |
+| --- | --- | --- |
+| `ui/buttons` | ações e controles | `button`, `icon_button`, `field_manage_button`, `floating_action`, `footer_action` |
+| `ui/forms` | campos e grupos de formulário | `field`, `form_block`, `date_picker`, `document_number_field`, `card_toggle`, `file_picker`, `select`, `multiselect` |
+| `ui/headers` | cabeçalhos globais | `page_header`, `filter_page_header` |
+| `ui/feedback` | estados e validação | `alert`, `empty_state`, `field_error`, `form_errors`, `pendencias_card` |
+| `ui/badges` | chips e estados | `chip`, `status_badge` |
+| `ui/layouts` | seções e rodapés de cards | `form_section`, `collection_header`, `card_footer_section`, `card_footer_actions` |
+| `ui/lists` | primitivas de listas e cards | `entity_card*`, `file_list`, `pagination`, `list_card_actions` |
+| `ui/modals` | diálogos com comportamento real | `confirm_action_modal`, `confirm_delete`, `delete_confirm_modal`, `attach_signed_modal`, `cancel_reason_modal` |
+| `lists` | composições completas de listagem | `list_page_standard`, `list_page_cards`, `list_page_quick_add`, `main_list_card`, `simple_list*` |
+| `travel` | conceitos compartilhados de viagem | destinos, trechos e cálculo de diárias |
+| `cards`, `documents`, `feedback`, `layout`, `perfil` | composições globais já consumidas por páginas | cards documentais, assinatura/PDF, mensagens Django, sidebar e integração Drive |
 
-`Motorista` nao possui templates ativos.
+## Contratos centrais
 
-## Header de pagina (canônico)
+### Cabeçalho de página
 
-- Componente oficial: `app-page-hero` (inline nos templates — nao existe arquivo separado de componente).
-- Estrutura: `.app-page-hero__stage` (eyebrow + titulo) + `.app-page-hero__body > .app-page__hero-top > .app-page__brand + .app-page__hero-actions` + `.app-page-hero__ribbon`.
-- CSS: `static/css/app-ui.css`.
-- `templates/components/layout/page_header.html` foi **removido** (sem uso). `templates/components/cards/page_header.html` foi **removido** (sem uso).
-- Referência: `templates/cadastros/servidores/index.html` como modelo canônico.
+`components/ui/headers/page_header.html` é o único markup de cabeçalho comum. Suporta:
 
-## Listagem simples vs cards
+- faixa de título e status;
+- descrição e marcador de módulo;
+- ação de retorno ou ação primária;
+- stepper por `stepper_template`;
+- variante `band_only=True` sem a faixa inferior.
 
-- **Lista simples**: `list_page_simple.html`, `simple_list.html`, `simple_list_row.html`, estilos em `lists.css`. Para cadastros enxutos: Cargo, Combustivel, Unidade, Cidade. Na inclusao da lista, **nao use** `only` no `{% raw %}{% include %}{% endraw %}` da pagina para `list_page_simple` (nem na cadeia ate `simple_list_row`) quando houver formularios POST na linha — caso contrario `csrf_token` some do contexto e `{% raw %}{% csrf_token %}{% endraw %}` renderiza vazio.
-- **Cards**: `list_page.html` + `document_card` para Servidor, Viatura e listagens ricas futuras.
-- Listagens nao exibem data de atualizacao por padrao. Datas so devem aparecer quando forem informacao de negocio, como data de viagem, data do documento, periodo do roteiro, prazo ou data de criacao relevante.
+Listagens com busca, filtros, ordenação e período usam `filter_page_header.html`. A estrutura visual histórica foi preservada; a consolidação alterou apenas nomes, includes e responsabilidades.
 
-## Sidebar
+### Campos
 
-- Component: `templates/components/layout/sidebar.html`.
-- Dados: `core/navigation.py`, preparados por `core/context_processors.py`.
-- CSS principal: `static/css/sidebar.css`.
-- JS principal: `static/js/components/sidebar.js`.
-- Rodape: texto institucional e, para usuario autenticado, formulario **Sair** (POST para `core:logout`, classe `sidebar-logout-btn`).
-- Largura da coluna: token `--sidebar-width` (15%); area principal ~85% via grid em `layout.css`; `--page-max-width: 100%` no shell.
-- Somente o grupo **Cadastros** usa botao de expandir/recolher; dentro dele, lista plana com indentacao visual para `Cargos` (sob Servidores) e `Combustiveis` (sob Viaturas), sem segundo toggle por nivel.
-- Links principais usam `data-sidebar-root-link`; grupo expansivel usa `data-sidebar-item`, `data-sidebar-group`, `data-sidebar-expandable`; filhos do painel usam `data-sidebar-panel-link`.
-- Grupo abre ao alternar o toggle; **fecha ao navegar** para outro item principal (nao-Cadastros). Na carga da pagina: aberto se a rota for `/cadastros/`, fechado caso contrario; `localStorage` nao reabre o submenu fora de Cadastros.
-- Ordem principal no menu: Servidores, Cargos, Viaturas, Combustiveis, Unidades, Cidades.
-- `Motoristas` nao aparece no menu porque nao e cadastro independente.
-- `Estados` e tratado como base interna/administrativa: rota mantida em `cadastros:estados_index`, com exposicao na landing de Cadastros em bloco de base interna (sem entrar no menu lateral principal).
+`components/ui/forms/field.html` renderiza o `BoundField` Django e suas mensagens. Variações legítimas têm componentes próprios quando existe comportamento adicional:
 
-## List toolbar
+- `date_picker.html`: data única ou intervalo, com `cv-date-picker.js`;
+- `document_number_field.html`: número e ano sincronizados com campo oculto;
+- `card_toggle.html`: booleano apresentado como card;
+- `file_picker.html` e `multiselect.html`: controles compostos.
 
-- Component: `templates/components/lists/list_toolbar.html`.
-- Estrutura: busca + espaco para filtros + acoes principais.
-- CSS principal: `static/css/lists.css`.
+IDs, nomes de campos, validações e valores submetidos continuam definidos pelo backend. Hooks `data-*` globais descrevem comportamento; hooks de módulo só permanecem quando fazem parte do contrato do formulário daquela página.
 
-## Forms
+### Listagens
 
-- Components: `form_section`, `form_field`, `form_actions` (componente `form_page.html` foi removido).
-- `form_field.html`: emite `field app-form-field` (raiz), `app-form-label` (label), `field-help app-form-help` (help), `field-error app-form-error` (erro).
-- Regras: foco azul consistente, labels legiveis, erros visiveis e grid reutilizavel.
-- CSS principal: `static/css/forms.css`. CSS de dominio Oficios: `static/css/oficios.css`.
+- `list_page_standard.html`: lista compacta;
+- `list_page_cards.html`: cards e filtros avançados;
+- `list_page_quick_add.html`: lista com inclusão rápida;
+- `list_empty.html`: composição de empty state para listas;
+- `ui/lists/pagination.html`: paginação única.
 
-## Buttons
+### Botões, status e feedback
 
-- Component base: `templates/components/buttons/action_button.html`.
-- Variantes: `primary`, `secondary`, `muted`, `danger` e tamanho `sm`.
-- CSS principal: `static/css/buttons.css`.
+- botão base: `ui/buttons/button.html`;
+- status semântico: `ui/badges/status_badge.html`, que delega a aparência ao `chip.html`;
+- empty state base: `ui/feedback/empty_state.html`;
+- mensagens Django: `feedback/alerts.html`;
+- exclusão: `feedback/confirm_delete_block.html` ou modal canônico, conforme o fluxo.
 
-## Form fields
+## Regras de manutenção
 
-Campos de selecao devem usar `form-select`.
-Campos textuais usam `form-control`.
-Mascaras globais sao ativadas por atributo:
+1. Antes de criar um componente, procurar responsabilidade equivalente nesta árvore.
+2. Repetição real deve virar parâmetro ou variante legítima do componente canônico.
+3. Não criar wrappers que apenas encaminham contexto para outro include.
+4. Não manter aliases de compatibilidade sem consumidor e prazo de remoção explícito.
+5. CSS de demonstração pertence a `static/css/dev/`; produção não usa seletores `ui-lab-*`.
+6. JavaScript global expõe API por responsabilidade (`CV.destinations`), não pelo módulo que a originou.
+7. Templates de módulo podem compor componentes globais, mas não duplicar seu markup interno.
 
-- `data-mask="cpf"`
-- `data-mask="rg"`
-- `data-mask="telefone"`
-- `data-mask="placa"`
-
-### Card-toggle (`card_toggle.html`)
-
-Checkboxes booleanos visiveis devem usar `templates/components/forms/card_toggle.html` com widget `CheckboxInput` usando classes `app-card-toggle__input` + `sr-only`. Inspiracao conceitual: botao **Data unica** do Plano de Trabalho no legacy.
-
-O componente renderiza um card clicavel com icone, titulo, descricao e badge `LIGADA` / `DESLIGADA`. Checkbox cru do navegador nao deve aparecer na interface final. BooleanFields futuros renderizados manualmente devem seguir este componente.
-
-### Campo com acao (`input_with_action.html`)
-
-Para select ao lado de link **Gerenciar** (ex.: Cargo, Unidade, Combustivel em cadastros), usar `templates/components/forms/input_with_action.html` com classes `form-field-with-action` em `static/css/forms.css`.
-Nos formularios de `Servidor` e `Viatura`, esse componente e o padrao oficial para acesso rapido aos CRUDs auxiliares (Cargo, Unidade, Combustivel), sem variacoes locais.
-
-## Cards
-
-- Components: `card`, `module_card`, `document_card`, `summary_card`.
-- Regras: sombra elegante, titulo destacado, metadados compactos e acoes alinhadas.
-- CSS principal: `static/css/cards.css`.
-- Presenters enviam `title`, `subtitle`, `meta`, `actions`.
-- Templates nao montam metadados de negocio e nao formatam regra de dominio.
-
-## Roteiros
-
-A listagem de `roteiros` usa `components/lists/list_page.html`, `components/lists/list_toolbar.html`, `components/lists/list_grid.html`, `components/cards/document_card.html` e empty state global.
-
-O presenter `apresentar_roteiro_card` entrega `title`, `subtitle`, `meta` e `actions` sem HTML. A view apenas le `q`, chama selector, aplica presenter e renderiza o template.
-
-### Componentes de dominio
-
-Blocos reutilizaveis de dominio ficam em `templates/components/domain/`, estilos compartilhados em `static/css/domain.css`, e devem ser usados por Roteiros (**referencia**) e futuros modulos. Contrato, parametros e limites: `docs/COMPONENTES_DOMINIO.md`.
-
-- `sede_destinos.html`
-- `destinos.html`
-- `trechos.html`
-- `trecho_card.html`
-- `retorno.html`
-- `calculadora_rota.html`
-- `resumo_rota.html`
-
-## Alerts e feedback
-
-- Component: `templates/components/feedback/alerts.html`.
-- Tags esperadas do Django: `success`, `error`/`danger`, `warning`, `info`.
-- CSS principal: `static/css/utilities.css`.
-
-### Placeholder de modulo (`module_placeholder.html`)
-
-- Component global: `templates/components/feedback/module_placeholder.html`.
-- Uso: telas de modulo ainda nao implementado (placeholder honesto), sem simular listagem com busca.
-- Suporte: `title`, `description`, `status`, dependencias curtas (`dep_1`...`dep_4`) e CTA opcional real (`cta_label` + `cta_url`).
-- Proibido usar `href="#"` ou botoes sem backend para placeholder.
-- CSS principal: `static/css/cards.css` + `static/css/utilities.css`.
-
-## Empty state
-
-- Components: `templates/components/feedback/empty_state.html` e `templates/components/lists/list_empty.html`.
-- Deve ter titulo claro, texto curto e CTA principal quando houver acao.
-
-## Confirmacao de exclusao
-
-- Component global: `templates/components/feedback/confirm_delete_block.html`.
-- Mantem contexto de risco com acao `danger` e cancelamento secundario.
-
-## Regra de manutencao
-
-- Nao criar CSS/JS por pagina.
-- Qualquer ajuste visual de CRUD deve ser feito no component global correspondente.
-- `legacy/` pode inspirar a estetica, mas nunca deve ser dependencia tecnica do projeto novo.
-- Nao copiar templates inteiros do legado: recriar a ideia no component atual e manter coesao arquitetural.
+Os componentes de viagem e seus parâmetros estão detalhados em `docs/COMPONENTES_DOMINIO.md`.

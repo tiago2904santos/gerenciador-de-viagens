@@ -1,8 +1,8 @@
 {% comment %}
   Cabeçalho canônico de página.
 
-  Contratos compatíveis: simple, back-action e stepper. Os wrappers públicos
-  em header_stack_*.html encaminham o contexto para este único markup.
+  Variantes por responsabilidade: simples, ação de retorno, ação primária,
+  stepper e somente faixa (`band_only`). Todas compartilham este markup.
 {% endcomment %}
 <header class="page-header-stack{% if extra_class %} {{ extra_class }}{% endif %}">
   <div class="page-header-band">
@@ -17,6 +17,7 @@
     </div>
   </div>
 
+  {% if not band_only %}
   <div class="page-header-rail{% if stepper_template %} page-header-rail--stepper{% endif %}">
     {% if icon_label %}<div class="page-header-rail__marker" aria-hidden="true">{{ icon_label }}</div>{% endif %}
     {% if module_label or description %}
@@ -40,4 +41,5 @@
       </div>
     {% endif %}
   </div>
+  {% endif %}
 </header>

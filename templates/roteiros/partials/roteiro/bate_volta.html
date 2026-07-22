@@ -1,6 +1,6 @@
 {# SEÇÃO 3: BATE-VOLTA #}
 {% if roteiro_editor_oficio %}
-  {% include "components/ui/forms/form_block.html" with shell="" variant="resource" extra_class="roteiro-editor__section--bate-volta oficio-roteiro-block" section_id="sec-bate-volta" title="Bate-volta diário" description="Repita automaticamente a ida e a volta em um período." actions_template="roteiros/partials/roteiro/_bate_volta_actions.html" body_template="roteiros/partials/roteiro/_bate_volta_body.html" %}
+  {% include "components/ui/forms/form_block.html" with shell="" variant="resource" extra_class="roteiro-editor__section--bate-volta route-section-block" section_id="sec-bate-volta" title="Bate-volta diário" description="Repita automaticamente a ida e a volta em um período." actions_template="roteiros/partials/roteiro/_bate_volta_actions.html" body_template="roteiros/partials/roteiro/_bate_volta_body.html" %}
 {% else %}
   {% include "components/ui/forms/form_block.html" with shell="card" variant="resource" extra_class="roteiro-editor__section--bate-volta" section_id="sec-bate-volta" title="Bate-volta diário" description="Repita automaticamente a ida e a volta em um período." actions_template="roteiros/partials/roteiro/_bate_volta_actions.html" body_template="roteiros/partials/roteiro/_bate_volta_body.html" %}
 {% endif %}

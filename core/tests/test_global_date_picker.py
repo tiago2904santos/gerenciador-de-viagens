@@ -34,7 +34,7 @@ class GlobalDatePickerTests(SimpleTestCase):
         for mode, context in scenarios:
             with self.subTest(mode=mode):
                 html = render_to_string(
-                    "components/forms/cv_date_picker.html",
+                    "components/ui/forms/date_picker.html",
                     {"mode": mode, **context},
                 )
                 self.assertEqual(html.count("data-cv-date-picker\n"), 1)
@@ -43,7 +43,7 @@ class GlobalDatePickerTests(SimpleTestCase):
 
     def test_compact_variants_preserve_existing_triggers(self):
         filter_html = render_to_string(
-            "components/forms/cv_date_picker.html",
+            "components/ui/forms/date_picker.html",
             {
                 "mode": "range",
                 "control_variant": "filter-pill",
@@ -53,13 +53,13 @@ class GlobalDatePickerTests(SimpleTestCase):
                 "show_summary": False,
             },
         )
-        self.assertIn('class="oficios-filter-range__btn"', filter_html)
+        self.assertIn('class="travel-period-filter__btn"', filter_html)
         self.assertIn("Período da viagem", filter_html)
         self.assertNotIn("data-cv-date-picker-start-display", filter_html)
         self.assertNotIn("data-cv-date-picker-end-display", filter_html)
 
         action_html = render_to_string(
-            "components/forms/cv_date_picker.html",
+            "components/ui/forms/date_picker.html",
             {
                 "mode": "multi",
                 "control_variant": "action-button",
@@ -87,7 +87,7 @@ class GlobalDatePickerTests(SimpleTestCase):
 
     def test_calendar_markup_exists_only_in_the_global_partial(self):
         templates_root = Path(settings.BASE_DIR) / "templates"
-        global_partial = templates_root / "components" / "forms" / "cv_date_picker.html"
+        global_partial = templates_root / "components" / "ui" / "forms" / "date_picker.html"
 
         offenders = []
         for template in templates_root.rglob("*.html"):

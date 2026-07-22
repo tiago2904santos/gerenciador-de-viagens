@@ -1,5 +1,5 @@
 <input type="hidden" name="destinos_json" id="id-destinos-json-d">
-{% include "eventos/partials/_evento_destino_row.html" with destino_index="0" row_ordinal=1 remove_hidden=True state_select_template="eventos/partials/_destino_primary_state.html" city_select_template="eventos/partials/_destino_primary_city.html" %}
+{% include "components/travel/destination_row.html" with destino_index="0" has_destino_index=True row_ordinal=1 remove_hidden=True remover_destino=True state_select_template="eventos/partials/_destino_primary_state.html" city_select_template="eventos/partials/_destino_primary_city.html" %}
 {% for destino in evento.destinos_extras %}
-  {% include "eventos/partials/_evento_destino_row.html" with destino_index=forloop.counter row_ordinal=forloop.counter|add:1 state_select_template="eventos/partials/_destino_extra_state_saved.html" city_select_template="eventos/partials/_destino_extra_city_saved.html" %}
+  {% include "components/travel/destination_row.html" with destino_index=forloop.counter has_destino_index=True row_ordinal=forloop.counter|add:1 remover_destino=True state_select_template="eventos/partials/_destino_extra_state_saved.html" city_select_template="eventos/partials/_destino_extra_city_saved.html" %}
 {% endfor %}

@@ -11,8 +11,8 @@
   /* ── cv-search-picker: reset + reinit ──────────────────────── */
 
   function resetPicker(select) {
-    if (window.CV && window.CV.destinos && typeof window.CV.destinos.resetSearchPicker === "function") {
-      window.CV.destinos.resetSearchPicker(select);
+    if (window.CV && window.CV.destinations && typeof window.CV.destinations.resetSearchPicker === "function") {
+      window.CV.destinations.resetSearchPicker(select);
       return;
     }
     if (!select || select.dataset.cvSearchPickerReady !== "true") return;
@@ -24,8 +24,8 @@
   }
 
   function initPickers(scope) {
-    if (window.CV && window.CV.destinos && typeof window.CV.destinos.initSearchPickers === "function") {
-      window.CV.destinos.initSearchPickers(scope || document);
+    if (window.CV && window.CV.destinations && typeof window.CV.destinations.initSearchPickers === "function") {
+      window.CV.destinations.initSearchPickers(scope || document);
       return;
     }
     if (window.CvSearchPicker && window.CvSearchPicker.init) {
@@ -34,8 +34,8 @@
   }
 
   function updateCitySelect(form, citySelect, cities, selectedCityId) {
-    if (window.CV && window.CV.destinos && typeof window.CV.destinos.setSelectOptions === "function") {
-      window.CV.destinos.setSelectOptions(citySelect, cities, selectedCityId, { scope: form });
+    if (window.CV && window.CV.destinations && typeof window.CV.destinations.setSelectOptions === "function") {
+      window.CV.destinations.setSelectOptions(citySelect, cities, selectedCityId, { scope: form });
       return;
     }
     var selected = String(selectedCityId || "");
@@ -57,8 +57,8 @@
   }
 
   function clearCitySelect(form, citySelect) {
-    if (window.CV && window.CV.destinos && typeof window.CV.destinos.clearSelect === "function") {
-      window.CV.destinos.clearSelect(citySelect, { scope: form });
+    if (window.CV && window.CV.destinations && typeof window.CV.destinations.clearSelect === "function") {
+      window.CV.destinations.clearSelect(citySelect, { scope: form });
       return;
     }
     resetPicker(citySelect);
@@ -113,27 +113,27 @@
   }
 
   function updateDestinoRemoveButtons(form) {
-    if (window.CV && window.CV.destinos && typeof window.CV.destinos.updateSingleRowState === "function") {
-      window.CV.destinos.updateSingleRowState(form, {
-        rowSelector: "[data-pt-destino-row]",
+    if (window.CV && window.CV.destinations && typeof window.CV.destinations.updateSingleRowState === "function") {
+      window.CV.destinations.updateSingleRowState(form, {
+        rowSelector: "[data-pt-destination-row]",
         removeSelector: "[data-pt-remove-destino]"
       });
       return;
     }
-    var rows = Array.prototype.slice.call(form.querySelectorAll("[data-pt-destino-row]")).filter(function (r) {
+    var rows = Array.prototype.slice.call(form.querySelectorAll("[data-pt-destination-row]")).filter(function (r) {
       return !r.hidden;
     });
     rows.forEach(function (row) {
       var btn = row.querySelector("[data-pt-remove-destino]");
       if (btn) btn.hidden = rows.length <= 1;
-      row.classList.toggle("destino-row--single", rows.length <= 1);
+      row.classList.toggle("destination-row--single", rows.length <= 1);
     });
   }
 
   function reindexDestinoRows(form) {
-    if (!window.CV || !window.CV.destinos || typeof window.CV.destinos.reindexRows !== "function") return;
-    window.CV.destinos.reindexRows(form, {
-      rowSelector: "[data-pt-destino-row]",
+    if (!window.CV || !window.CV.destinations || typeof window.CV.destinations.reindexRows !== "function") return;
+    window.CV.destinations.reindexRows(form, {
+      rowSelector: "[data-pt-destination-row]",
       indexAttr: "ptDestinoIndex",
       onRow: function(row, index) {
         var stateSelect = row.querySelector("[data-pt-destino-state]");
@@ -181,13 +181,13 @@
   }
 
   function syncDestinationCities(form) {
-    Array.prototype.slice.call(form.querySelectorAll("[data-pt-destino-row]")).forEach(function (row) {
+    Array.prototype.slice.call(form.querySelectorAll("[data-pt-destination-row]")).forEach(function (row) {
       bindDestinationRow(form, row);
     });
     updateDestinoRemoveButtons(form);
-    if (window.CV && window.CV.destinos && typeof window.CV.destinos.initDragDrop === "function") {
-      window.CV.destinos.initDragDrop(form.querySelector(".roteiro-destinos-list"), {
-        rowSelector: "[data-pt-destino-row]",
+    if (window.CV && window.CV.destinations && typeof window.CV.destinations.initDragDrop === "function") {
+      window.CV.destinations.initDragDrop(form.querySelector(".route-destinations-list"), {
+        rowSelector: "[data-pt-destination-row]",
         removeSelector: "[data-pt-remove-destino]",
         onReorder: function() {
           reindexDestinoRows(form);
@@ -198,21 +198,21 @@
 
     var addButton = form.querySelector("[data-pt-add-destino]");
     var template = form.querySelector("template[data-pt-destino-template]");
-    var list = form.querySelector(".roteiro-destinos-list");
+    var list = form.querySelector(".route-destinations-list");
     if (!addButton || !template || !list) return;
 
     addButton.addEventListener("click", function () {
-      if (window.CV && window.CV.destinos && typeof window.CV.destinos.appendTemplateRow === "function") {
-        var existingRowsForHelper = Array.prototype.slice.call(form.querySelectorAll("[data-pt-destino-row]"));
+      if (window.CV && window.CV.destinations && typeof window.CV.destinations.appendTemplateRow === "function") {
+        var existingRowsForHelper = Array.prototype.slice.call(form.querySelectorAll("[data-pt-destination-row]"));
         var referenceRowForHelper = existingRowsForHelper.length ? existingRowsForHelper[existingRowsForHelper.length - 1] : null;
         var referenceStateForHelper = referenceRowForHelper ? referenceRowForHelper.querySelector("[data-pt-destino-state]") : null;
         var referenceStateIdForHelper = referenceStateForHelper
           ? String(referenceStateForHelper.value || referenceStateForHelper.dataset.pickerInitialValue || "").trim()
           : "";
-        window.CV.destinos.appendTemplateRow({
+        window.CV.destinations.appendTemplateRow({
           list: list,
           template: template,
-          rowSelector: "[data-pt-destino-row]",
+          rowSelector: "[data-pt-destination-row]",
           removeSelector: "[data-pt-remove-destino]",
           indexAttr: "ptDestinoIndex",
           beforeAppend: function(row) {
@@ -233,7 +233,7 @@
         });
         return;
       }
-      var indexes = Array.prototype.slice.call(form.querySelectorAll("[data-pt-destino-row]")).map(function (row) {
+      var indexes = Array.prototype.slice.call(form.querySelectorAll("[data-pt-destination-row]")).map(function (row) {
         return parseInt(row.dataset.ptDestinoIndex || "0", 10);
       }).filter(function (value) {
         return !isNaN(value);
@@ -243,7 +243,7 @@
       var holder = document.createElement("div");
       holder.innerHTML = html.trim();
       var row = holder.firstElementChild;
-      var existingRows = Array.prototype.slice.call(form.querySelectorAll("[data-pt-destino-row]"));
+      var existingRows = Array.prototype.slice.call(form.querySelectorAll("[data-pt-destination-row]"));
       var referenceRow = existingRows.length ? existingRows[existingRows.length - 1] : null;
       var referenceState = referenceRow ? referenceRow.querySelector("[data-pt-destino-state]") : null;
       var referenceStateId = referenceState
@@ -305,7 +305,7 @@
 
   function computeMunicipio(form) {
     var labels = [];
-    Array.prototype.slice.call(form.querySelectorAll("[data-pt-destino-row]")).forEach(function (row) {
+    Array.prototype.slice.call(form.querySelectorAll("[data-pt-destination-row]")).forEach(function (row) {
       if (row.hidden) return;
       var stateSelect = row.querySelector("[data-pt-destino-state]");
       var citySelect = row.querySelector("[data-pt-destino-city]");
@@ -699,7 +699,7 @@
       var removeBtn = row.querySelector("[data-pt-efetivo-remove]");
       if (!removeBtn) return;
       removeBtn.hidden = visibleRows.length <= 1 && index === 0;
-      row.classList.toggle("destino-row--single", visibleRows.length <= 1 && index === 0);
+      row.classList.toggle("destination-row--single", visibleRows.length <= 1 && index === 0);
     });
   }
 

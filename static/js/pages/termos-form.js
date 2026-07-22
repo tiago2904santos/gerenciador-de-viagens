@@ -63,8 +63,8 @@
   }
 
   function resetSearchPicker(select) {
-    if (window.CV && window.CV.destinos && typeof window.CV.destinos.resetSearchPicker === "function") {
-      window.CV.destinos.resetSearchPicker(select);
+    if (window.CV && window.CV.destinations && typeof window.CV.destinations.resetSearchPicker === "function") {
+      window.CV.destinations.resetSearchPicker(select);
       return;
     }
     if (!select) return;
@@ -78,8 +78,8 @@
   }
 
   function initSearchPickers(scope) {
-    if (window.CV && window.CV.destinos && typeof window.CV.destinos.initSearchPickers === "function") {
-      window.CV.destinos.initSearchPickers(scope || document);
+    if (window.CV && window.CV.destinations && typeof window.CV.destinations.initSearchPickers === "function") {
+      window.CV.destinations.initSearchPickers(scope || document);
       return;
     }
     if (window.CvSearchPicker && window.CvSearchPicker.init) {
@@ -299,8 +299,8 @@
   }
 
   function updateCitySelect(form, citySelect, cities, selectedCityId) {
-    if (window.CV && window.CV.destinos && typeof window.CV.destinos.setSelectOptions === "function") {
-      window.CV.destinos.setSelectOptions(citySelect, cities, selectedCityId, { scope: form });
+    if (window.CV && window.CV.destinations && typeof window.CV.destinations.setSelectOptions === "function") {
+      window.CV.destinations.setSelectOptions(citySelect, cities, selectedCityId, { scope: form });
       return;
     }
     var selected = String(selectedCityId || "");
@@ -322,8 +322,8 @@
   }
 
   function clearCitySelect(form, citySelect) {
-    if (window.CV && window.CV.destinos && typeof window.CV.destinos.clearSelect === "function") {
-      window.CV.destinos.clearSelect(citySelect, { scope: form });
+    if (window.CV && window.CV.destinations && typeof window.CV.destinations.clearSelect === "function") {
+      window.CV.destinations.clearSelect(citySelect, { scope: form });
       return;
     }
     resetSearchPicker(citySelect);
@@ -379,13 +379,13 @@
   }
 
   function syncDestinationCities(form) {
-    if (window.CV && window.CV.destinos && typeof window.CV.destinos.initManagedRows === "function") {
-      window.CV.destinos.initManagedRows({
+    if (window.CV && window.CV.destinations && typeof window.CV.destinations.initManagedRows === "function") {
+      window.CV.destinations.initManagedRows({
         form: form,
         sectionSelector: "#termo-evento-destinos",
         addSelector: "#termo-btn-adicionar-destino",
         templateSelector: "template[data-termo-destino-template]",
-        rowSelector: "[data-termo-destino-row]",
+        rowSelector: "[data-termo-destination-row]",
         stateSelector: "[data-termo-destino-state]",
         citySelector: "[data-termo-destino-city]",
         removeSelector: "[data-termo-remove-destino]",
@@ -397,7 +397,7 @@
         managedFlag: "termoDestinosManaged",
         readyAttr: "termoDestinoReady",
         onRow: function (row, index) {
-          var badge = row.querySelector("[data-destino-ord]");
+          var badge = row.querySelector("[data-destination-order]");
           if (badge) badge.textContent = String(index + 1);
         },
         loadCities: function (citySelect, stateId, selectedCityId) {
@@ -438,8 +438,8 @@
     if (!button || !destinationSection) return;
 
     button.addEventListener("click", function () {
-      if (window.CV && window.CV.destinos && typeof window.CV.destinos.focusFirstEmptyPicker === "function") {
-        window.CV.destinos.focusFirstEmptyPicker(destinationSection);
+      if (window.CV && window.CV.destinations && typeof window.CV.destinations.focusFirstEmptyPicker === "function") {
+        window.CV.destinations.focusFirstEmptyPicker(destinationSection);
         return;
       }
       var pickers = Array.prototype.slice.call(destinationSection.querySelectorAll(".cv-search-picker__input"));
@@ -568,7 +568,7 @@
     var rowsNeeded = indexes[indexes.length - 1] + 1;
 
     function rowsCount() {
-      return form.querySelectorAll("[data-termo-destino-row]").length;
+      return form.querySelectorAll("[data-termo-destination-row]").length;
     }
 
     var guard = 0;
@@ -577,7 +577,7 @@
       guard += 1;
     }
 
-    var rows = Array.prototype.slice.call(form.querySelectorAll("[data-termo-destino-row]"));
+    var rows = Array.prototype.slice.call(form.querySelectorAll("[data-termo-destination-row]"));
     indexes.forEach(function (idx) {
       var row = rows[idx];
       var entry = entries[idx];

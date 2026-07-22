@@ -1,5 +1,0 @@
-<article class="route-card{% if extra_class %} {{ extra_class }}{% endif %}">
-  {% if title %}<h3>{{ title }}</h3>{% endif %}
-  {% if description %}<p>{{ description }}</p>{% endif %}
-  {% if actions %}{% include "components/ui/lists/list_card_actions.html" with actions=actions only %}{% endif %}
-</article>

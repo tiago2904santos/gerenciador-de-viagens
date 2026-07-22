@@ -9,11 +9,11 @@
     </div>
     <div class="cv-signature-card__status">
       {% if signature.assinada %}
-        {% include "components/ui/lists/status_pill.html" with label="Assinado" variant="success" only %}
+        {% include "components/ui/badges/status_badge.html" with label="Assinado" variant="success" only %}
       {% elif signature.link_ativo %}
-        {% include "components/ui/lists/status_pill.html" with label="Aguardando assinatura" variant="info" only %}
+        {% include "components/ui/badges/status_badge.html" with label="Aguardando assinatura" variant="info" only %}
       {% else %}
-        {% include "components/ui/lists/status_pill.html" with label="Pendente" variant="warning" only %}
+        {% include "components/ui/badges/status_badge.html" with label="Pendente" variant="warning" only %}
       {% endif %}
     </div>
   </header>

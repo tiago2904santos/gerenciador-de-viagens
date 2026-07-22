@@ -37,10 +37,10 @@
 
 | Página / componente | Scope? | Search? | Status? | Items? | Empty state? | Counter? | Clear? | Observação |
 |----------------------|--------|---------|---------|--------|--------------|----------|--------|------------|
-| `list_page_standard.html` | sim | via `header_stack_filters` | se `status_options` | `simple_list_row` | `simple_list.html` | `simple_list.html` | via header | Cadastros: servidores, viaturas, cidades, estados |
+| `list_page_standard.html` | sim | via `filter_page_header` | se `status_options` | `simple_list_row` | `simple_list.html` | `simple_list.html` | via header | Cadastros: servidores, viaturas, cidades, estados |
 | `list_page_quick_add.html` | sim | sim | não | `simple_list_row` | `simple_list.html` | `simple_list.html` | sim | Cargos, unidades, combustíveis |
 | `list_page.html` | sim | herdado | — | herdado | herdado | herdado | — | Legado |
-| `header_stack_filters.html` | — | sim | opcional | — | — | — | opcional | GET preservado |
+| `filter_page_header.html` | — | sim | opcional | — | — | — | opcional | GET preservado |
 | `simple_list_row.html` | — | — | — | sim + `data-search-text` | — | — | — | |
 | `main_list_card.html` | — | — | `data-status-value` | sim + search | — | — | — | Ofícios/roteiros |
 | `oficios/index.html` | sim | header | header (server) | cards | sim | não | header | Paginação server |

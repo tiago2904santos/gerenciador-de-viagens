@@ -102,7 +102,14 @@ class UiLabFieldDemoForm(forms.Form):
     data_saida = forms.DateField(
         label="Data de saída",
         required=False,
-        widget=forms.DateInput(attrs={"type": "date", "class": "form-control"}),
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "dd/mm/aaaa",
+                "inputmode": "numeric",
+                "data-mask": "date",
+            }
+        ),
     )
     motivo = forms.CharField(
         label="Motivo da viagem",

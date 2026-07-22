@@ -4,7 +4,7 @@
 
 {% block content %}
   <div class="page-shell page-shell--standard-simple">
-    {% include "components/ui/headers/header_stack_simple.html" with eyebrow="PLANOS DE TRABALHO" title=page_title description=page_description icon_label="PT" module_label="Programas Solicitantes" only %}
+    {% include "components/ui/headers/page_header.html" with eyebrow="PLANOS DE TRABALHO" title=page_title description=page_description icon_label="PT" module_label="Programas Solicitantes" only %}
     <form class="main-form-panel" method="post">
       {% csrf_token %}
       {% include "components/ui/layouts/form_section.html" with title="Confirmação de exclusão" description="Confirma a exclusão do programa solicitante." section_id="pt-programa-delete-section" only %}

@@ -1,32 +1,8 @@
 <section class="cv-form-subsection termo-evento-periodo" aria-label="Período do evento">
-  {% include "components/forms/cv_date_picker.html" with mode="range" picker_id="evento-date-picker-d" extra_class="termo-date-picker" start_field=form.data_inicio end_field=form.data_fim start_label="Data inicial" end_label="Data final" start_input_id="id_data_inicio_display_d" end_input_id="id_data_fim_display_d" only %}
+  {% include "components/ui/forms/date_picker.html" with mode="range" picker_id="evento-date-picker-d" extra_class="termo-date-picker" start_field=form.data_inicio end_field=form.data_fim start_label="Data inicial" end_label="Data final" start_input_id="id_data_inicio_display_d" end_input_id="id_data_fim_display_d" only %}
 </section>
 
-<section class="cv-form-subsection oficio-roteiro-destinos"
-         aria-labelledby="evento-destinos-title-d"
-         id="evento-wizard-destinos-d"
-         data-destinos-section>
-  <header class="cv-form-subsection__header oficio-roteiro-destinos__header">
-    <div class="cv-form-subsection__copy">
-      <h4 class="cv-form-subsection__title" id="evento-destinos-title-d">Destinos</h4>
-      <p class="cv-form-subsection__description">Adicione os locais na ordem em que serão visitados.</p>
-    </div>
-    <div class="oficio-roteiro-destinos__actions">
-      <button type="button"
-              class="cv-btn cv-btn--secondary cv-btn--sm"
-              id="btn-adicionar-destino-d"
-              data-evento-add-destino-d>
-        <span>Adicionar destino</span>
-      </button>
-    </div>
-  </header>
-
-  <div class="oficio-roteiro-destinos__list roteiro-destinos-list"
-       aria-label="Destinos adicionados"
-       id="destinos-lista-d">
-    {% include "eventos/partials/_destinos_rows_detalhe.html" %}
-  </div>
-</section>
+{% include "components/travel/destination_section.html" with section_id="evento-wizard-destinos-d" title_id="evento-destinos-title-d" add_button_id="btn-adicionar-destino-d" add_button_evento_d=True list_id="destinos-lista-d" rows_template="eventos/partials/_destinos_rows_detalhe.html" %}
 
 <template id="tmpl-destino-extra-d">
   {% include "eventos/partials/_destino_extra_template.html" %}

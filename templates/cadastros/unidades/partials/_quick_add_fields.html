@@ -1,11 +1,11 @@
 <div class="field-grid">
   <div class="field-size-3">
-    {% include "components/forms/form_field.html" with field=form.nome only %}
+    {% include "components/ui/forms/field.html" with field=form.nome only %}
   </div>
   <div class="field-size-1">
-    {% include "components/forms/form_field.html" with field=form.sigla only %}
+    {% include "components/ui/forms/field.html" with field=form.sigla only %}
   </div>
   <div class="field-size-4">
-    {% include "components/forms/form_field.html" with field=form.servidores label="Filtrar servidores" help_text="Digite para buscar servidores cadastrados e vincular a esta unidade." only %}
+    {% include "components/ui/forms/field.html" with field=form.servidores label="Filtrar servidores" help_text="Digite para buscar servidores cadastrados e vincular a esta unidade." only %}
   </div>
 </div>
