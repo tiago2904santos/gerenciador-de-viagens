@@ -656,6 +656,18 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertIn("var(--cv-card-family-accent-bg)", dark_filete_rule)
         self.assertNotIn("var(--color-primary-bright)", dark_filete_rule)
 
+    def test_standard_simple_centers_a_tokenized_compact_panel(self):
+        page_shell = (
+            Path(settings.BASE_DIR) / "static" / "css" / "page-shell.css"
+        ).read_text(encoding="utf-8")
+        standard_simple = page_shell.split(
+            ".page-shell--standard-simple > .main-form-panel {", 1
+        )[1].split("}", 1)[0]
+
+        self.assertIn("max-width: var(--layout-form-panel-max-width);", standard_simple)
+        self.assertIn("margin-inline: auto;", standard_simple)
+        self.assertIn("page-shell.css' %}?v=20260722-standard-simple-width", self.base)
+
     def test_list_and_form_cards_share_the_dark_card_family(self):
         for token in (
             "--cv-card-family-bg:",

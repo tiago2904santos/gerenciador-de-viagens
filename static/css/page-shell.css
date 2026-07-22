@@ -419,14 +419,17 @@ html[data-theme="light"] {
    ========================================================= */
 
 /* Standard Simple: painel compacto centralizado (até 4 campos) */
-/* Largura controlada pelo .main-form-panel--compact */
+.page-shell--standard-simple > .main-form-panel {
+  margin-inline: auto;
+  max-width: var(--layout-form-panel-max-width);
+  width: 100%;
+}
 
 /* Standard: painel de largura confortável */
 /* Wizard: painel largo, comporta muitas seções */
 /* List: sem restrição — painel ocupa largura total */
 
-/* Nenhum dos variants exige regras de layout extras:
-   o max-width do painel é controlado pelo próprio painel. */
+/* Standard, Wizard e List preservam a largura integral do shell. */
 
 
 /* =========================================================
