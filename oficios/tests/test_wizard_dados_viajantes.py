@@ -90,7 +90,7 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertContains(response, f'name="numero" value="{oficio.numero}"')
         self.assertContains(response, f"/ {oficio.ano}")
         self.assertNotContains(response, "Data criação:")
-        self.assertContains(response, "cv-wizard-section-card")
+        self.assertContains(response, "cv-form-section-card")
         self.assertContains(response, "field-grid")
         self.assertNotContains(response, "DOCX")
         self.assertContains(response, "Avançar")
@@ -113,7 +113,7 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertContains(response, 'data-cv-search-picker="true"')
         self.assertContains(response, 'data-picker-variant="detailed"')
         self.assertContains(response, 'data-picker-term-control="true"')
-        self.assertContains(response, "cv-wizard-section-stack--comfortable")
+        self.assertContains(response, "cv-form-section-stack--comfortable")
         self.assertContains(response, "Equipe do ofício")
         self.assertNotContains(response, "Selecione os viajantes; um deles pode ser o motorista")
         self.assertContains(response, "Cadastrar novo viajante")
@@ -139,7 +139,7 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertContains(response, "cv-field__control cv-field__control--textarea")
         self.assertContains(response, 'rows="4"')
         self.assertContains(response, "wizard-inner-section")
-        self.assertContains(response, "id=\"oficio-wizard-motivo\"")
+        self.assertContains(response, "id=\"travel-document-wizard-motivo\"")
         self.assertNotContains(
             response,
             "Escolha um modelo para iniciar com texto pré-preenchido ou escreva manualmente o motivo.",
@@ -153,7 +153,7 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertNotContains(response, 'name="status"')
         self.assertNotContains(response, 'href="#"')
         self.assertNotContains(response, 'style="')
-        self.assertNotContains(response, "oficio-wizard__aside")
+        self.assertNotContains(response, "travel-document-wizard__aside")
         oficio_url = reverse("oficios:dados_viajantes", args=[oficio.pk])
         servidor_create_url = (
             f"{reverse('cadastros:servidor_create')}?"

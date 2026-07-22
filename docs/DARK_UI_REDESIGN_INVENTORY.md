@@ -113,7 +113,7 @@ miolos dos cards (remoção só depois de um redesign de miolo).
 ## Família visual de cards — formulários e listas
 
 - Cards de formulário e cards de lista passam a consumir os mesmos tokens escuros de superfície, cabeçalho, borda, sombra e acento.
-- A família cobre tanto seções de wizard (`cv-wizard-section-card`) quanto formulários CRUD compactos (`main-form-panel`).
+- A família cobre tanto seções de wizard (`cv-form-section-card`) quanto formulários CRUD compactos (`main-form-panel`).
 - O cabeçalho canônico de formulário usa a mesma superfície azul-marinho profunda e o mesmo banho dourado lateral dos cards de lista.
 - O filete dourado compartilha cor, espessura e acabamento; sua geometria continua acompanhando o conteúdo do formulário.
 - A diferença de comportamento é intencional: cards de lista podem elevar no hover; cards com campos permanecem estáveis durante o preenchimento.

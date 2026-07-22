@@ -1038,7 +1038,7 @@ export function initRoteirosEditor() {
       return String(template.innerHTML || '').replace(/__index__/g, esc(String(idx)));
     }
     var selE = destino && destino.estado_id ? destino.estado_id : (destinoEstadoDefaultId || '');
-    var isOficio = !!(form && form.closest && form.closest('[data-oficio-wizard-roteiro]'));
+    var isOficio = !!(form && form.closest && form.closest('[data-travel-document-wizard-roteiro]'));
     if (isOficio) {
       return '' +
         '<div class="destino-row oficio-roteiro-destino-row" data-index="' + esc(String(idx)) + '">' +
@@ -1709,7 +1709,7 @@ export function initRoteirosEditor() {
     return 'Roteiro salvo';
   }
   var ROUTE_AVATAR_ICON =
-    '<svg class="cv-icon oficio-roteiro-route-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false" fill="none">' +
+    '<svg class="cv-icon related-route-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false" fill="none">' +
       '<circle cx="6" cy="19" r="2.5" fill="currentColor"></circle>' +
       '<circle cx="18" cy="5" r="2.5" fill="currentColor"></circle>' +
       '<path d="M8.2 18.2h6.1a3.3 3.3 0 0 0 0-6.6H9.7a3.3 3.3 0 0 1 0-6.6h6.1" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>' +
@@ -1719,9 +1719,9 @@ export function initRoteirosEditor() {
     var emptyEl = $('roteiro-lista-empty');
     var selId = getSelectedRouteId(); var term = normalizeRouteSearch(filterText);
     var filtered = routes.filter(function(r) { if (!term) return true; return normalizeRouteSearch(routeSearchText(r)).indexOf(term)!==-1; });
-    var isOficioPicker = !!target.closest('.oficio-roteiro-salvo-picker');
+    var isOficioPicker = !!target.closest('.related-route-picker');
     if (!filtered.length) {
-      target.innerHTML = isOficioPicker ? '' : '<div class="oficio-roteiro-route-empty">Nenhum roteiro encontrado para a busca.</div>';
+      target.innerHTML = isOficioPicker ? '' : '<div class="related-route-empty">Nenhum roteiro encontrado para a busca.</div>';
       if (emptyEl) emptyEl.hidden = !isOficioPicker;
       return;
     }
@@ -1730,16 +1730,16 @@ export function initRoteirosEditor() {
       var rid=String(r.id); var ac=rid===selId?' is-active':'';
       var title = routeDisplayTitle(r);
       if (isOficioPicker) {
-        return '<button type="button" class="cv-search-picker__selected-card oficio-roteiro-route-item'+ac+'" data-route-id="'+esc(rid)+'" aria-pressed="'+(rid===selId?'true':'false')+'">' +
+        return '<button type="button" class="cv-search-picker__selected-card related-route-item'+ac+'" data-route-id="'+esc(rid)+'" aria-pressed="'+(rid===selId?'true':'false')+'">' +
           '<span class="cv-search-picker__selected-avatar" aria-hidden="true">'+ROUTE_AVATAR_ICON+'</span>' +
           '<div class="cv-search-picker__selected-main">' +
             '<span class="cv-search-picker__selected-name">'+esc(title)+'</span>' +
-            '<span class="cv-search-picker__selected-meta route-periodo">'+esc(routePeriodSummary(r))+'</span>' +
+            '<span class="cv-search-picker__selected-meta related-route-period">'+esc(routePeriodSummary(r))+'</span>' +
           '</div></button>';
       }
-      return '<button type="button" class="oficio-roteiro-route-item'+ac+'" data-route-id="'+esc(rid)+'">' +
-        '<span class="route-title">'+esc(title)+'</span>' +
-        '<span class="route-periodo">'+esc(routePeriodSummary(r))+'</span></button>';
+      return '<button type="button" class="related-route-item'+ac+'" data-route-id="'+esc(rid)+'">' +
+        '<span class="related-route-title">'+esc(title)+'</span>' +
+        '<span class="related-route-period">'+esc(routePeriodSummary(r))+'</span></button>';
     }).join('');
   }
   function routeResumo() {

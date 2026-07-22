@@ -1,15 +1,15 @@
 {% load static %}
 {# Card do Google Drive — usado em Meu perfil (core/perfil.html). #}
-<section class="cv-wizard-section-card gdrive-card" aria-labelledby="perfil-card-gdrive-title">
-  <header class="cv-wizard-section-header">
-    <div class="cv-wizard-section-header__copy">
-      <h3 class="cv-wizard-section-title" id="perfil-card-gdrive-title">Google Drive</h3>
-      <p class="cv-wizard-section-subtitle">
+<section class="cv-form-section-card gdrive-card" aria-labelledby="perfil-card-gdrive-title">
+  <header class="cv-form-section-header">
+    <div class="cv-form-section-header__copy">
+      <h3 class="cv-form-section-title" id="perfil-card-gdrive-title">Google Drive</h3>
+      <p class="cv-form-section-subtitle">
         Conecte sua conta Google para salvar e organizar os documentos automaticamente no Drive.
         A conexão é individual por usuário institucional.
       </p>
     </div>
-    <div class="cv-wizard-section-header__meta">
+    <div class="cv-form-section-header__meta">
       {% if drive_autorizado %}
         {% include "components/ui/badges/chip.html" with tone="success" label="Conectada" only %}
       {% else %}
@@ -21,7 +21,7 @@
     </div>
   </header>
 
-  <div class="cv-wizard-section-body gdrive-body">
+  <div class="cv-form-section-body gdrive-body">
 
     {# ── Bloco: Conta Google ── #}
     <section class="gdrive-block" aria-labelledby="gdrive-conta-section">

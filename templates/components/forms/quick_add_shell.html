@@ -1,12 +1,12 @@
 {# quick_add_shell.html — shell compacto reutilizável para quick add #}
 <section class="quick-create-panel quick-create-panel--page cv-form-card is-open{% if extra_class %} {{ extra_class }}{% endif %}"{% if section_id %} aria-labelledby="{{ section_id }}"{% endif %}>
-  <div class="quick-create-panel__header cv-wizard-section-header">
-    <div class="quick-create-panel__copy cv-wizard-section-header__copy">
-      <h2 class="quick-create-panel__title cv-wizard-section-title"{% if section_id %} id="{{ section_id }}"{% endif %}>{{ title }}</h2>
-      {% if description %}<p class="quick-create-panel__subtitle cv-wizard-section-subtitle">{{ description }}</p>{% endif %}
+  <div class="quick-create-panel__header cv-form-section-header">
+    <div class="quick-create-panel__copy cv-form-section-header__copy">
+      <h2 class="quick-create-panel__title cv-form-section-title"{% if section_id %} id="{{ section_id }}"{% endif %}>{{ title }}</h2>
+      {% if description %}<p class="quick-create-panel__subtitle cv-form-section-subtitle">{{ description }}</p>{% endif %}
     </div>
   </div>
-  <div class="quick-create-panel__body quick-create-panel__body--page cv-wizard-section-body">
+  <div class="quick-create-panel__body quick-create-panel__body--page cv-form-section-body">
     {% if body_template %}
       {% include body_template with form=form only %}
     {% endif %}

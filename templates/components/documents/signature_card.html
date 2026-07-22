@@ -1,9 +1,9 @@
-<section class="cv-signature-card cv-wizard-section-card" data-cv-signature-card aria-labelledby="signature-{{ signature.tipo }}-title">
-  <header class="cv-signature-card__header cv-wizard-section-header">
-    <div class="cv-wizard-section-header__copy">
+<section class="cv-signature-card cv-form-section-card" data-cv-signature-card aria-labelledby="signature-{{ signature.tipo }}-title">
+  <header class="cv-signature-card__header cv-form-section-header">
+    <div class="cv-form-section-header__copy">
       <span class="cv-signature-card__eyebrow">Fluxo documental</span>
-      <h2 class="cv-wizard-section-title" id="signature-{{ signature.tipo }}-title">Assinatura eletrônica</h2>
-      <p class="cv-wizard-section-subtitle">
+      <h2 class="cv-form-section-title" id="signature-{{ signature.tipo }}-title">Assinatura eletrônica</h2>
+      <p class="cv-form-section-subtitle">
         Gere um link e envie para <strong>{{ signature.signatario }}</strong> assinar pelo celular.
       </p>
     </div>
@@ -18,7 +18,7 @@
     </div>
   </header>
 
-  <div class="cv-signature-card__body cv-wizard-section-body">
+  <div class="cv-signature-card__body cv-form-section-body">
     {% if not signature.pode_assinar and not signature.assinada %}
       <p class="cv-signature-card__notice" role="status">{{ signature.motivo }}</p>
     {% elif signature.assinada %}

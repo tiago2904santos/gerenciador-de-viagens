@@ -7,7 +7,7 @@
     {% include "components/ui/headers/header_stack_filters.html" with eyebrow="PRESTAÇÕES" title=page_title icon_label="PC" form_action=request.path search_name="q" search_value=q search_placeholder="Buscar modelos de texto" search_clear_url=request.path %}
 
     <div class="list-panel">
-    <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
+    <div class="cv-form-section-stack cv-form-section-stack--comfortable">
       {% for grupo in grupos %}
         {% include "components/ui/forms/form_block.html" with shell="card" element_id="grupo-"|add:grupo.campo extra_class="modelos-grupo" title=grupo.label actions_template="prestacoes_contas/partials/_modelos_grupo_actions.html" body_template="prestacoes_contas/partials/_modelos_grupo_body.html" %}
       {% endfor %}

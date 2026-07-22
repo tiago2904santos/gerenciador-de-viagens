@@ -11,7 +11,7 @@
 (function () {
   'use strict';
 
-  var ROOT_SEL       = '[data-oficio-wizard-step1]';
+  var ROOT_SEL       = '[data-travel-document-wizard-step1]';
   var VIATURA_SEL    = 'select[name="viatura"][data-cv-search-picker]';
   var EQUIPE_SEL     = 'select[name="servidores"]';
   var MOTORISTA_SEL  = 'select[name="motorista"]';

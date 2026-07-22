@@ -13,16 +13,16 @@
     {% include "components/ui/feedback/pendencias_card.html" with items=pendencias_documentos lead="Corrija os itens abaixo antes de finalizar o ofício ou gerar DOCX/PDF." only %}
   {% endif %}
 
-  <div data-oficio-wizard-documentos>
-    <section class="cv-wizard-section-card cv-form-card cv-wizard-section-card--described oficio-documentos-unified-card oficio-documentos-card" aria-labelledby="oficio-documentos-unified-title">
-      <header class="cv-wizard-section-header">
-        <div class="cv-wizard-section-header__copy">
-          <h2 class="cv-wizard-section-title" id="oficio-documentos-unified-title">Documentos e conferência</h2>
-          <p class="cv-wizard-section-subtitle">Arquivos gerados, resumo e roteiro para revisão final</p>
+  <div data-travel-document-wizard-documentos>
+    <section class="cv-form-section-card cv-form-card cv-form-section-card--described oficio-documentos-unified-card oficio-documentos-card" aria-labelledby="oficio-documentos-unified-title">
+      <header class="cv-form-section-header">
+        <div class="cv-form-section-header__copy">
+          <h2 class="cv-form-section-title" id="oficio-documentos-unified-title">Documentos e conferência</h2>
+          <p class="cv-form-section-subtitle">Arquivos gerados, resumo e roteiro para revisão final</p>
         </div>
       </header>
 
-      <div class="cv-wizard-section-body oficio-documentos-body">
+      <div class="cv-form-section-body oficio-documentos-body">
         {% include "components/ui/forms/form_block.html" with title="Documentos para conferência" description="Visualize e baixe os arquivos gerados." section_id="documentos-conferencia-title" extra_class="oficio-documentos-block oficio-documentos-preview-section document-inline-stack" body_extra_class="oficio-documentos-preview-section__body" body_template="oficios/partials/documentos/_conferencia_body.html" %}
 
         {% include "components/ui/forms/form_block.html" with title="Resumo do ofício" description="Identificação e custeio." section_id="oficio-documentos-summary-title" extra_class="oficio-documentos-block oficio-documentos-info-section oficio-documentos-summary-section" body_template="oficios/partials/documentos/_resumo_body.html" %}
@@ -31,7 +31,7 @@
 
         {% include "components/ui/forms/form_block.html" with title="Viatura e condução" description="Dados do veículo e motorista." section_id="oficio-documentos-viatura-title" extra_class="oficio-documentos-block oficio-documentos-info-section oficio-documentos-viatura-section" body_template="oficios/partials/documentos/_viatura_body.html" %}
 
-        {% include "components/ui/forms/form_block.html" with variant="resource" title=documentos_ctx.roteiro_card.title|default:"Roteiro e diárias" section_id="oficio-documentos-route-title" extra_class="oficio-documentos-block oficio-documentos-route-section" actions_template="oficios/partials/documentos/_roteiro_actions.html" body_template="oficios/partials/documentos/_roteiro_body.html" %}
+        {% include "components/ui/forms/form_block.html" with variant="resource" title=documentos_ctx.roteiro_card.title|default:"Roteiro e diárias" section_id="oficio-documentos-related-route-title" extra_class="oficio-documentos-block oficio-documentos-route-section" actions_template="oficios/partials/documentos/_roteiro_actions.html" body_template="oficios/partials/documentos/_roteiro_body.html" %}
       </div>
 
       <div class="cv-form-card__footer">

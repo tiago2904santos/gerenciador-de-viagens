@@ -26,7 +26,7 @@
 
   function getWizardPage() {
     var header = qs('[data-oficio-sticky-header]');
-    return header ? header.closest('.oficio-wizard-page') : qs('.oficio-wizard-page');
+    return header ? header.closest('.travel-document-wizard-page') : qs('.travel-document-wizard-page');
   }
 
   function getEmptyText(element, fallback) {

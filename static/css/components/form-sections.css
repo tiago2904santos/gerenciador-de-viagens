@@ -6,7 +6,7 @@
    structure with module-prefixed selectors.
    ======================================================================== */
 
-.cv-form-card > .cv-wizard-section-body,
+.cv-form-card > .cv-form-section-body,
 .cv-form-card__body {
   display: grid;
   gap: 10px;

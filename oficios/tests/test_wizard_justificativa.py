@@ -101,7 +101,7 @@ class WizardJustificativaTests(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "oficios/wizard_justificativa.html")
-        self.assertContains(response, "cv-wizard-section-card oficio-justificativa-card")
+        self.assertContains(response, "cv-form-section-card oficio-justificativa-card")
         self.assertContains(response, "wizard-inner-section")
         self.assertContains(response, "Gerenciar modelos")
         self.assertContains(response, "Justificativa")

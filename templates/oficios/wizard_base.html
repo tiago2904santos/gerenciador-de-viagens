@@ -1,4 +1,4 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 {% load static %}
 
 {% block title %}{{ page_title }}{% endblock %}
@@ -8,16 +8,16 @@
 {% endblock %}
 
 {% block content %}
-  <div class="page-shell page-shell--wizard oficio-wizard app-wizard" data-oficio-wizard-shell>
+  <div class="page-shell page-shell--wizard travel-document-wizard app-wizard" data-travel-document-wizard-shell>
     {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="OFÍCIOS" title=wizard_header.title icon_label="OF" back_label=wizard_back_label back_url=wizard_back_url only %}
 
     {% include "components/ui/navigation/page_stepper.html" with steps=wizard_page_steps only %}
 
-    <main class="main-form-panel main-form-panel--stack oficio-wizard__main">
-      <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
+    <main class="main-form-panel main-form-panel--stack travel-document-wizard__main">
+      <div class="cv-form-section-stack cv-form-section-stack--comfortable">
         {% if wizard_use_outer_form != False %}
           <form
-            class="oficio-wizard__form"
+            class="travel-document-wizard__form"
             method="post"
             novalidate
             {% if wizard_autosave_url %}

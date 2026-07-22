@@ -8,26 +8,26 @@
 {% endblock %}
 
 {% block wizard_content %}
-  <div data-pt-atividades data-selecionadas-total="{{ atividades_selecionadas_total }}" data-oficio-wizard-step1>
+  <div data-pt-atividades data-selecionadas-total="{{ atividades_selecionadas_total }}" data-travel-document-wizard-step1>
 
     {{ atividades_catalogo_data|json_script:"pt-atividades-data" }}
     {{ atividades_presets_data|json_script:"pt-atividades-presets-data" }}
 
     <section
-      class="cv-wizard-section-card cv-form-card cv-wizard-section-card--described oficio-step1-card termo-form-card pt-form-card"
+      class="cv-form-section-card cv-form-card cv-form-section-card--described travel-document-card pt-form-card"
       aria-labelledby="pt-atividades-title-card"
     >
-      <header class="cv-wizard-section-header">
-        <div class="cv-wizard-section-header__copy">
-          <h3 class="cv-wizard-section-title" id="pt-atividades-title-card">Atividades, metas e recursos</h3>
-          <p class="cv-wizard-section-subtitle">Selecione as atividades — a meta e o recurso de cada uma entram automaticamente</p>
+      <header class="cv-form-section-header">
+        <div class="cv-form-section-header__copy">
+          <h3 class="cv-form-section-title" id="pt-atividades-title-card">Atividades, metas e recursos</h3>
+          <p class="cv-form-section-subtitle">Selecione as atividades — a meta e o recurso de cada uma entram automaticamente</p>
         </div>
       </header>
 
-      <div class="cv-wizard-section-body oficio-step1-body termo-form-body">
-        {% include "components/ui/forms/form_block.html" with variant="resource" section_id="pt-atividades-title" extra_class="oficio-step1-block termo-block" title="Atividades previstas" description="Clique nas atividades para selecioná-las — a meta e o recurso de cada uma entram automaticamente." action_label="Gerenciar atividades" action_url=atividades_manager_url action_autosave=True body_template="planos_trabalho/partials/_atividades_body.html" %}
+      <div class="cv-form-section-body travel-document-body">
+        {% include "components/ui/forms/form_block.html" with variant="resource" section_id="pt-atividades-title" extra_class="travel-document-block document-form-block" title="Atividades previstas" description="Clique nas atividades para selecioná-las — a meta e o recurso de cada uma entram automaticamente." action_label="Gerenciar atividades" action_url=atividades_manager_url action_autosave=True body_template="planos_trabalho/partials/_atividades_body.html" %}
 
-        {% include "components/ui/forms/form_block.html" with section_id="pt-metas-recursos-title" extra_class="oficio-step1-block termo-block" title="Metas e recursos" description="Gerados automaticamente pelas atividades selecionadas acima." body_extra_class="termo-block__body" body_template="planos_trabalho/partials/_metas_recursos_body.html" %}
+        {% include "components/ui/forms/form_block.html" with section_id="pt-metas-recursos-title" extra_class="travel-document-block document-form-block" title="Metas e recursos" description="Gerados automaticamente pelas atividades selecionadas acima." body_extra_class="termo-block__body" body_template="planos_trabalho/partials/_metas_recursos_body.html" %}
       </div>
 
       <div class="cv-form-card__footer">

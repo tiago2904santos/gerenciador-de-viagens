@@ -9,13 +9,13 @@
 {% endblock %}
 
 {% block content %}
-  <div class="page-shell page-shell--wizard oficio-wizard app-wizard">
+  <div class="page-shell page-shell--wizard travel-document-wizard app-wizard">
     {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="PRESTAÇÕES" title=page_title icon_label="PC" module_label="Prestações de Contas" back_label="Voltar à lista" back_url=back_url|default:"/prestacoes-contas/" status_label="Documentos" status_variant="draft" only %}
 
     {% include "components/ui/navigation/page_stepper.html" with steps=wizard_page_steps only %}
 
-    <main class="main-form-panel main-form-panel--stack oficio-wizard__main">
-      <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
+    <main class="main-form-panel main-form-panel--stack travel-document-wizard__main">
+      <div class="cv-form-section-stack cv-form-section-stack--comfortable">
 
         {# ── Resumo do ofício (mesmo layout das outras etapas) + despacho compartilhado ── #}
         {% include "components/ui/forms/form_block.html" with shell="card" section_id="prestacao-docs-resumo-title" extra_class="cv-summary-card rt-summary-card oficio-documentos-summary-section" title="Resumo do ofício" description="Dados e despacho compartilhados por todos os servidores desta prestação." body_template="prestacoes_contas/partials/_docs_resumo_body.html" %}
@@ -24,7 +24,7 @@
         {% for servidor in servidores %}
         <form method="post"
               enctype="multipart/form-data"
-              class="oficio-wizard__form"
+              class="travel-document-wizard__form"
               novalidate
               data-autosave="true"
               data-autosave-model="prestacao_servidor"
@@ -33,19 +33,19 @@
               data-autosave-object-id="{{ servidor.ps.pk }}"
               data-file-autosave-url="{{ servidor.arquivo_autosave_url }}">
           {% csrf_token %}
-          <section class="cv-wizard-section-card" aria-label="Documentos de {{ servidor.identificacao.nome_servidor }}">
-            <header class="cv-wizard-section-header">
-              <div class="cv-wizard-section-header__copy">
-                <h2 class="cv-wizard-section-title">
+          <section class="cv-form-section-card" aria-label="Documentos de {{ servidor.identificacao.nome_servidor }}">
+            <header class="cv-form-section-header">
+              <div class="cv-form-section-header__copy">
+                <h2 class="cv-form-section-title">
                   {{ servidor.identificacao.nome_servidor }}
                   {% if servidor.identificacao.is_motorista %}{% include "components/ui/badges/chip.html" with label="Motorista" tone="warning" size="compact" only %}{% endif %}
                 </h2>
-                <p class="cv-wizard-section-subtitle">
+                <p class="cv-form-section-subtitle">
                   {{ servidor.identificacao.cargo }}{% if servidor.identificacao.unidade %} · {{ servidor.identificacao.unidade }}{% endif %}{% if servidor.identificacao.cpf_servidor and servidor.identificacao.cpf_servidor != "—" %} · CPF {{ servidor.identificacao.cpf_servidor }}{% endif %}
                 </p>
               </div>
             </header>
-            <div class="cv-wizard-section-body">
+            <div class="cv-form-section-body">
               <div class="field-grid">
                 <div class="field app-form-field">
                   <label class="app-form-label" for="{{ servidor.form.numero_solicitacao.id_for_label }}">Número da solicitação</label>

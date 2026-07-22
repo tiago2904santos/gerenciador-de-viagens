@@ -81,15 +81,15 @@
   --field-group-gap:     var(--space-3);
 
   /* --- Wizard Section Cards --- */
-  --cv-wizard-section-bg:             var(--surface-form-section);
-  --cv-wizard-section-header-bg:      var(--surface-form-panel);
-  --cv-wizard-section-border:         var(--border-form-section);
-  --cv-wizard-section-shadow:         var(--shadow-sm);
-  --cv-wizard-section-radius:         var(--radius-card);
-  --cv-wizard-section-header-padding: var(--space-4) var(--space-6) var(--space-4) var(--space-10);
-  --cv-wizard-section-body-padding:   var(--space-5) var(--space-6);
-  --cv-wizard-section-stack-gap:             var(--space-4);
-  --cv-wizard-section-stack-gap-comfortable: var(--space-8);
+  --cv-form-section-bg:             var(--surface-form-section);
+  --cv-form-section-header-bg:      var(--surface-form-panel);
+  --cv-form-section-border:         var(--border-form-section);
+  --cv-form-section-shadow:         var(--shadow-sm);
+  --cv-form-section-radius:         var(--radius-card);
+  --cv-form-section-header-padding: var(--space-4) var(--space-6) var(--space-4) var(--space-10);
+  --cv-form-section-body-padding:   var(--space-5) var(--space-6);
+  --cv-form-section-stack-gap:             var(--space-4);
+  --cv-form-section-stack-gap-comfortable: var(--space-8);
 
   /* --- Stepper --- */
   --stepper-padding-x:   var(--space-6);
@@ -199,10 +199,10 @@ html[data-theme="dark"] {
   --surface-field-group:    rgba(255, 255, 255, 0.04);
   --border-field-group:     rgba(255, 255, 255, 0.09);
 
-  --cv-wizard-section-bg:        var(--surface-form-section);
-  --cv-wizard-section-header-bg: var(--surface-form-panel);
-  --cv-wizard-section-border:    var(--theme-border-card);
-  --cv-wizard-section-shadow:    var(--theme-shadow-hero);
+  --cv-form-section-bg:        var(--surface-form-section);
+  --cv-form-section-header-bg: var(--surface-form-panel);
+  --cv-form-section-border:    var(--theme-border-card);
+  --cv-form-section-shadow:    var(--theme-shadow-hero);
 
   --surface-list-panel:     var(--theme-surface-card);
   --border-list-panel:      var(--theme-border-card);
@@ -305,10 +305,10 @@ html[data-theme="light"] {
   --surface-field-group:    #edf3f9;
   --border-field-group:     #d0dce8;
 
-  --cv-wizard-section-bg:        var(--surface-form-panel);
-  --cv-wizard-section-header-bg: var(--surface-form-section);
-  --cv-wizard-section-border:    var(--border-form-section);
-  --cv-wizard-section-shadow:    var(--shadow-sm);
+  --cv-form-section-bg:        var(--surface-form-panel);
+  --cv-form-section-header-bg: var(--surface-form-section);
+  --cv-form-section-border:    var(--border-form-section);
+  --cv-form-section-shadow:    var(--shadow-sm);
 
   --surface-list-panel:     var(--color-surface);
   --border-list-panel:      #d4dde9;
@@ -939,7 +939,7 @@ html[data-theme="light"] {
   border:        none;
   border-radius: 0;
   box-shadow:    none;
-  gap:           var(--cv-wizard-section-stack-gap);
+  gap:           var(--cv-form-section-stack-gap);
   overflow:      visible;
   padding:       0;
 }
@@ -947,40 +947,40 @@ html[data-theme="light"] {
 
 /* =========================================================
    Footer colado ao último card do stack.
-   Aplica-se em 100% das páginas que usam .cv-wizard-section-stack.
+   Aplica-se em 100% das páginas que usam .cv-form-section-stack.
    margin-top negativo cancela exatamente o gap do stack pai
    (usa --_stack-gap herdada, que varia conforme a variante usada).
    ========================================================= */
-.cv-wizard-section-stack > .footer-actions,
-.cv-wizard-section-stack > form > .footer-actions {
-  background:    var(--cv-wizard-section-bg);
-  border-radius: 0 0 var(--cv-wizard-section-radius) var(--cv-wizard-section-radius);
-  border-top:    1px solid var(--cv-wizard-section-border);
-  box-shadow:    var(--cv-wizard-section-shadow);
-  margin-top:    calc(-1 * var(--_stack-gap, var(--cv-wizard-section-stack-gap)));
+.cv-form-section-stack > .footer-actions,
+.cv-form-section-stack > form > .footer-actions {
+  background:    var(--cv-form-section-bg);
+  border-radius: 0 0 var(--cv-form-section-radius) var(--cv-form-section-radius);
+  border-top:    1px solid var(--cv-form-section-border);
+  box-shadow:    var(--cv-form-section-shadow);
+  margin-top:    calc(-1 * var(--_stack-gap, var(--cv-form-section-stack-gap)));
 }
 
 /* Ponte: seções legadas do wizard dentro do stack (ofícios/roteiros) */
-.main-form-panel--stack .cv-wizard-section-stack > .form-section.app-form-section,
+.main-form-panel--stack .cv-form-section-stack > .form-section.app-form-section,
 .main-form-panel--stack .roteiro-editor--avulso .roteiro-editor__section,
 .main-form-panel--stack .roteiro-editor--oficio .roteiro-editor__section {
-  background:    var(--cv-wizard-section-bg);
-  border:        1px solid var(--cv-wizard-section-border);
-  border-radius: var(--cv-wizard-section-radius);
-  box-shadow:    var(--cv-wizard-section-shadow);
+  background:    var(--cv-form-section-bg);
+  border:        1px solid var(--cv-form-section-border);
+  border-radius: var(--cv-form-section-radius);
+  box-shadow:    var(--cv-form-section-shadow);
   overflow:      hidden;
   width:         100%;
 }
 
-.main-form-panel--stack .cv-wizard-section-stack > .form-section.app-form-section > .form-section-header {
-  background:       var(--cv-wizard-section-header-bg);
+.main-form-panel--stack .cv-form-section-stack > .form-section.app-form-section > .form-section-header {
+  background:       var(--cv-form-section-header-bg);
   background-image: linear-gradient(to right, color-mix(in srgb, var(--color-accent) 7%, transparent) 0px, transparent 76px);
-  border-bottom:    1px solid var(--cv-wizard-section-border);
+  border-bottom:    1px solid var(--cv-form-section-border);
   margin:           0;
-  padding:          var(--cv-wizard-section-header-padding);
+  padding:          var(--cv-form-section-header-padding);
 }
 
-.main-form-panel--stack .cv-wizard-section-stack > .form-section.app-form-section > .form-section-header .app-form-section__title {
+.main-form-panel--stack .cv-form-section-stack > .form-section.app-form-section > .form-section-header .app-form-section__title {
   color:          var(--theme-text-heading);
   font-size:      var(--font-size-md);
   font-weight:    var(--font-weight-bold);
@@ -988,8 +988,8 @@ html[data-theme="light"] {
   text-transform: uppercase;
 }
 
-.main-form-panel--stack .cv-wizard-section-stack > .form-section.app-form-section > :not(.form-section-header) {
-  padding: var(--cv-wizard-section-body-padding);
+.main-form-panel--stack .cv-form-section-stack > .form-section.app-form-section > :not(.form-section-header) {
+  padding: var(--cv-form-section-body-padding);
 }
 
 
@@ -1064,51 +1064,51 @@ html[data-theme="light"] {
 
 
 /* =========================================================
-   11b. cv-wizard-section — Cards independentes por seção do wizard
+   11b. cv-form-section — Cards independentes por seção do wizard
    Substitui o padrão de sections separadas por border-bottom
    dentro de um card único. Cada section vira um card autônomo
    com header de tonalidade distinta e body para os campos.
    ========================================================= */
 
-.cv-wizard-section-stack {
-  --_stack-gap:   var(--cv-wizard-section-stack-gap);
+.cv-form-section-stack {
+  --_stack-gap:   var(--cv-form-section-stack-gap);
   display:        flex;
   flex-direction: column;
   gap:            var(--_stack-gap);
   width:          100%;
 }
 
-.cv-wizard-section-stack--comfortable {
-  --_stack-gap: var(--cv-wizard-section-stack-gap-comfortable);
+.cv-form-section-stack--comfortable {
+  --_stack-gap: var(--cv-form-section-stack-gap-comfortable);
   gap:          var(--_stack-gap);
 }
 
 /* O form dentro do stack herda --_stack-gap e replica o mesmo layout flex,
    garantindo gap entre os cards mesmo quando estão dentro de um <form>. */
-.cv-wizard-section-stack > form {
+.cv-form-section-stack > form {
   display:        flex;
   flex-direction: column;
-  gap:            var(--_stack-gap, var(--cv-wizard-section-stack-gap));
+  gap:            var(--_stack-gap, var(--cv-form-section-stack-gap));
   width:          100%;
 }
 
-.cv-wizard-section-card {
-  background:    var(--cv-wizard-section-bg);
-  border:        1px solid var(--cv-wizard-section-border);
-  border-radius: var(--cv-wizard-section-radius);
-  box-shadow:    var(--cv-wizard-section-shadow);
+.cv-form-section-card {
+  background:    var(--cv-form-section-bg);
+  border:        1px solid var(--cv-form-section-border);
+  border-radius: var(--cv-form-section-radius);
+  box-shadow:    var(--cv-form-section-shadow);
   overflow:      hidden;
   width:         100%;
 }
 
 /* =========================================================
    cv-card-footer — rodapé padronizado do último card.
-   Fica dentro do cv-wizard-section-card ou form-section,
+   Fica dentro do cv-form-section-card ou form-section,
    após o corpo de conteúdo, separado por uma linha.
    ========================================================= */
 .cv-card-footer {
   align-items:     center;
-  border-top:      1px solid var(--cv-wizard-section-border, var(--border-form-section));
+  border-top:      1px solid var(--cv-form-section-border, var(--border-form-section));
   display:         flex;
   gap:             var(--space-3);
   justify-content: space-between;
@@ -1131,7 +1131,7 @@ html[data-theme="light"] {
 }
 
 .cv-card-footer-section__divider {
-  border-top: 1px solid var(--cv-wizard-section-border, var(--border-form-section));
+  border-top: 1px solid var(--cv-form-section-border, var(--border-form-section));
 }
 
 .cv-card-footer-section > .cv-card-footer {
@@ -1144,24 +1144,24 @@ html[data-theme="light"] {
   padding-inline: var(--form-section-padding-x, var(--space-6));
 }
 
-.cv-wizard-section-header {
+.cv-form-section-header {
   --_wizard-filete-inset-block: var(--space-4);
   --_wizard-filete-left:        var(--space-6);
   --_wizard-filete-width:       6px;
   align-items:      center;
-  background:       var(--cv-wizard-section-header-bg);
+  background:       var(--cv-form-section-header-bg);
   background-image: linear-gradient(to right, color-mix(in srgb, var(--color-accent) 7%, transparent) 0px, transparent 76px);
-  border-bottom:    1px solid var(--cv-wizard-section-border);
+  border-bottom:    1px solid var(--cv-form-section-border);
   display:          flex;
   gap:              var(--space-4);
   justify-content:  space-between;
   /* altura fixa: garante consistência com ou sem botões/toggles no header */
   min-height:       calc(2 * var(--space-4) + var(--control-height-sm));
-  padding:          var(--cv-wizard-section-header-padding);
+  padding:          var(--cv-form-section-header-padding);
   position:         relative;
 }
 
-.cv-wizard-section-header::before {
+.cv-form-section-header::before {
   background:    linear-gradient(180deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 50%, transparent) 100%);
   border-radius: var(--radius-pill);
   box-shadow:
@@ -1179,21 +1179,21 @@ html[data-theme="light"] {
   width:         var(--_wizard-filete-width);
 }
 
-.cv-wizard-section-header__copy {
+.cv-form-section-header__copy {
   display:        flex;
   flex-direction: column;
   gap:            var(--space-1);
   min-width:      0;
 }
 
-.cv-wizard-section-header__actions {
+.cv-form-section-header__actions {
   align-items: center;
   display:     flex;
   flex-shrink: 0;
   gap:         var(--space-2);
 }
 
-.cv-wizard-section-title {
+.cv-form-section-title {
   color:          var(--theme-text-heading);
   font-size:      var(--font-size-lg);
   font-weight:    var(--font-weight-extrabold);
@@ -1205,9 +1205,9 @@ html[data-theme="light"] {
 }
 
 /* Botões dentro do cabeçalho: compactos e contidos no min-height do header */
-.cv-wizard-section-header__actions .btn,
-.cv-wizard-section-header__actions .app-btn,
-.cv-wizard-section-header__actions .cv-btn {
+.cv-form-section-header__actions .btn,
+.cv-form-section-header__actions .app-btn,
+.cv-form-section-header__actions .cv-btn {
   font-size:  var(--font-size-xs);
   height:     var(--control-height-sm);
   min-height: var(--control-height-sm);
@@ -1215,19 +1215,19 @@ html[data-theme="light"] {
   padding:    0 var(--space-3);
 }
 
-.cv-wizard-section-subtitle {
+.cv-form-section-subtitle {
   display:     none;
 }
 
 /* Modificadores canônicos para formulários que precisam explicar a tarefa
    sem transformar cada seção em um cabeçalho pesado. */
-.cv-wizard-section-card--described .cv-wizard-section-subtitle {
+.cv-form-section-card--described .cv-form-section-subtitle {
   display: block;
   line-height: 1.45;
   max-width: 72ch;
 }
 
-.cv-wizard-section-header--described .cv-wizard-section-subtitle {
+.cv-form-section-header--described .cv-form-section-subtitle {
   display: block;
   line-height: 1.45;
   max-width: 72ch;
@@ -1246,46 +1246,46 @@ html[data-theme="light"] {
   min-width: 0;
 }
 
-.cv-wizard-section-header--standalone {
-  border: 1px solid var(--cv-wizard-section-border);
-  border-radius: var(--cv-wizard-section-radius);
-  box-shadow: var(--cv-wizard-section-shadow);
+.cv-form-section-header--standalone {
+  border: 1px solid var(--cv-form-section-border);
+  border-radius: var(--cv-form-section-radius);
+  box-shadow: var(--cv-form-section-shadow);
   min-height: 0;
   overflow: hidden;
   padding-block: var(--space-4);
 }
 
-.cv-wizard-section-card--compact .cv-wizard-section-header {
+.cv-form-section-card--compact .cv-form-section-header {
   --_wizard-filete-width: 4px;
   min-height: 0;
   padding-block: var(--space-4);
 }
 
-.cv-wizard-section-card--compact .cv-wizard-section-header::before {
+.cv-form-section-card--compact .cv-form-section-header::before {
   width: var(--_wizard-filete-width);
 }
 
-.cv-wizard-section-card--compact .cv-wizard-section-title {
+.cv-form-section-card--compact .cv-form-section-title {
   font-size: var(--font-size-base);
   letter-spacing: 0.045em;
 }
 
-.cv-wizard-section-body {
+.cv-form-section-body {
   display:        flex;
   flex-direction: column;
   gap:            var(--form-section-inner-gap);
-  padding:        var(--cv-wizard-section-body-padding);
+  padding:        var(--cv-form-section-body-padding);
 }
 
-.cv-wizard-section-body--sections {
+.cv-form-section-body--sections {
   gap: 0;
 }
 
-.cv-wizard-section-body--sections > .wizard-inner-section:not(:last-child) {
+.cv-form-section-body--sections > .wizard-inner-section:not(:last-child) {
   padding-bottom: var(--space-5);
 }
 
-.cv-wizard-section-body--sections > .wizard-inner-section + .wizard-inner-section {
+.cv-form-section-body--sections > .wizard-inner-section + .wizard-inner-section {
   padding-top: var(--space-5);
 }
 
@@ -2059,17 +2059,17 @@ body.has-delete-modal-open {
     padding: var(--space-4);
   }
 
-  .cv-wizard-section-header {
+  .cv-form-section-header {
     --_wizard-filete-inset-block: var(--space-3);
     --_wizard-filete-left:        var(--space-4);
     padding: var(--space-3) var(--space-4) var(--space-3) var(--space-8);
   }
 
-  .cv-wizard-section-card--compact .cv-wizard-section-header {
+  .cv-form-section-card--compact .cv-form-section-header {
     padding-block: var(--space-3);
   }
 
-  .cv-wizard-section-body {
+  .cv-form-section-body {
     padding: var(--space-4);
   }
 
@@ -3454,18 +3454,18 @@ html[data-theme="dark"] .quick-add-footer-button.is-filled:hover {
     right: auto;
   }
 
-  .cv-wizard-section-header {
+  .cv-form-section-header {
     align-items: flex-start;
     flex-wrap: wrap;
     gap: var(--space-3);
   }
 
-  .cv-wizard-section-header__copy,
-  .cv-wizard-section-header__actions {
+  .cv-form-section-header__copy,
+  .cv-form-section-header__actions {
     min-width: 0;
   }
 
-  .cv-wizard-section-header__actions {
+  .cv-form-section-header__actions {
     flex-wrap: wrap;
     justify-content: flex-start;
   }
@@ -3546,25 +3546,25 @@ html[data-theme="dark"] .quick-add-footer-button.is-filled:hover {
     font-size: 9px;
   }
 
-  .cv-wizard-section-header {
+  .cv-form-section-header {
     --_wizard-filete-inset-block: var(--space-4);
     --_wizard-filete-left:        var(--space-4);
     min-height: 0;
     padding: var(--space-4) var(--space-4) var(--space-4) var(--space-8);
   }
 
-  .cv-wizard-section-card--compact .cv-wizard-section-header {
+  .cv-form-section-card--compact .cv-form-section-header {
     padding-block: var(--space-4);
   }
 
-  .cv-wizard-section-header__actions,
-  .cv-wizard-section-header__actions .btn,
-  .cv-wizard-section-header__actions .app-btn,
-  .cv-wizard-section-header__actions .cv-btn {
+  .cv-form-section-header__actions,
+  .cv-form-section-header__actions .btn,
+  .cv-form-section-header__actions .app-btn,
+  .cv-form-section-header__actions .cv-btn {
     width: 100%;
   }
 
-  .cv-wizard-section-body {
+  .cv-form-section-body {
     padding: var(--space-4);
   }
 

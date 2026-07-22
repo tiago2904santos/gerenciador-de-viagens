@@ -14,7 +14,7 @@
 |----------|-------|--------|-------------------|
 | Chip de status desalinhado/incorreto | Chip fora do padrão ou texto errado | `page-header-status-chip` na faixa azul com variantes `draft` / `pending` / `active` | `oficios/presenters.py`, `header_stack_back_action.html` |
 | Stepper quebrado | Linhas/círculos sobre texto | `page_stepper.html` com track e conteúdo separados; flex/grid em `page-shell.css` | `page_stepper.html`, `page-shell.css` |
-| Camadas/cards em excesso | card > card > panel | `page-shell--wizard` → header → stepper → `cv-wizard-section-stack` → até 4 cards | `wizard_base.html`, `wizard_dados_viajantes.html` |
+| Camadas/cards em excesso | card > card > panel | `page-shell--wizard` → header → stepper → `cv-form-section-stack` → até 4 cards | `wizard_base.html`, `wizard_dados_viajantes.html` |
 | Footer etapa 1 poluído | DOCX, PDF, Termos, etc. | Apenas “Avançar →” (`wizard_footer_mode=step1_minimal`) | `wizard_actions.html`, `views.py` |
 | Etapa 1 desorganizada | Blocos legados | 4 cards: Dados principais, Equipe+motorista, Viatura, Motorista externo | `wizard_dados_viajantes.html`, partials novos |
 
@@ -74,8 +74,8 @@
 
 | ID / data attribute | Arquivo | Preservado? | Observação |
 |---------------------|---------|-------------|------------|
-| `data-oficio-wizard-shell` | wizard_base | Sim | Shell |
-| `data-oficio-wizard-step1` | wizard_dados_viajantes | Sim | Driver state |
+| `data-travel-document-wizard-shell` | wizard_base | Sim | Shell |
+| `data-travel-document-wizard-step1` | wizard_dados_viajantes | Sim | Driver state |
 | `data-oficio-driver-external-card` | card motorista | Sim | Card 4 |
 | `data-oficio-viatura-*` | card viatura | Sim | Transporte JS |
 | `data-app-multiselect` | servidores | Sim | Multiselect |

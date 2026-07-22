@@ -638,7 +638,7 @@
 /* ── Etapa 2 · Efetivo: linhas no visual das linhas de destino do ofício ─────
    A linha base de destino tem 2 colunas (UF · cidade); o efetivo precisa de 3:
    Unidade · Cargo · Quantidade. Sobrescrevemos o grid dos campos (inclusive a
-   regra dark escopada em [data-oficio-wizard-step1]) com especificidade maior. */
+   regra dark escopada em [data-travel-document-wizard-step1]) com especificidade maior. */
 .oficio-roteiro-destino-row__fields.pt-efetivo-fields {
   align-items: end;
   display: grid;
@@ -648,7 +648,7 @@
 
 /* Supera a regra dark de 2 colunas (que já é escopada em html[data-theme] …). */
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  :is([data-oficio-wizard-roteiro], .termos-page, [data-oficio-wizard-step1])
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1])
   .oficio-roteiro-destino-row__fields.pt-efetivo-fields {
   grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.35fr) minmax(0, 0.9fr);
 }
@@ -677,17 +677,17 @@
 /* Badge e botão remover acompanham a linha dos controles (não o topo dos rótulos). */
 .pt-efetivo-card.oficio-roteiro-destino-row,
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  [data-oficio-wizard-step1]
+  [data-travel-document-wizard-step1]
   .pt-efetivo-card.oficio-roteiro-destino-row.destino-row,
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  [data-oficio-wizard-step1]
+  [data-travel-document-wizard-step1]
   .pt-efetivo-card.oficio-roteiro-destino-row.destino-row:hover {
   align-items: end;
 }
 
 .pt-efetivo-card.oficio-roteiro-destino-row > .oficio-roteiro-destino-row__badge,
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  [data-oficio-wizard-step1]
+  [data-travel-document-wizard-step1]
   .pt-efetivo-card.oficio-roteiro-destino-row
   > .oficio-roteiro-destino-row__badge {
   align-self: end;
@@ -698,7 +698,7 @@
 @media (max-width: 760px) {
   .oficio-roteiro-destino-row__fields.pt-efetivo-fields,
   :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-    :is([data-oficio-wizard-roteiro], .termos-page, [data-oficio-wizard-step1])
+    :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1])
     .oficio-roteiro-destino-row__fields.pt-efetivo-fields {
     grid-template-columns: 1fr;
   }

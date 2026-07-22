@@ -186,16 +186,16 @@
           </div>
           {% include "components/ui/navigation/page_stepper.html" with steps=ui_lab_steps only %}
           <main class="main-form-panel main-form-panel--stack">
-            <div class="cv-wizard-section-stack">
+            <div class="cv-form-section-stack">
 
-              <section class="cv-wizard-section-card cv-wizard-section-card--compact cv-wizard-section-card--described" aria-labelledby="structure-wizard-primary">
-                <header class="cv-wizard-section-header">
-                  <div class="cv-wizard-section-header__copy">
-                    <h3 class="cv-wizard-section-title" id="structure-wizard-primary">Identificação</h3>
-                    <p class="cv-wizard-section-subtitle">Descrição curta da tarefa e dos dados esperados nesta seção.</p>
+              <section class="cv-form-section-card cv-form-section-card--compact cv-form-section-card--described" aria-labelledby="structure-wizard-primary">
+                <header class="cv-form-section-header">
+                  <div class="cv-form-section-header__copy">
+                    <h3 class="cv-form-section-title" id="structure-wizard-primary">Identificação</h3>
+                    <p class="cv-form-section-subtitle">Descrição curta da tarefa e dos dados esperados nesta seção.</p>
                   </div>
                 </header>
-                <div class="cv-wizard-section-body">
+                <div class="cv-form-section-body">
                   <div class="field-grid">
                     {% for field in ui_lab_fields.wizard_primary %}
                       {% include "dev/ui_lab/partials/_demo_field.html" with field=field only %}
@@ -204,14 +204,14 @@
                 </div>
               </section>
 
-              <section class="cv-wizard-section-card cv-wizard-section-card--compact cv-wizard-section-card--described" aria-labelledby="structure-wizard-secondary">
-                <header class="cv-wizard-section-header">
-                  <div class="cv-wizard-section-header__copy">
-                    <h3 class="cv-wizard-section-title" id="structure-wizard-secondary">Detalhes complementares</h3>
-                    <p class="cv-wizard-section-subtitle">Campos relacionados permanecem próximos, com menor peso visual.</p>
+              <section class="cv-form-section-card cv-form-section-card--compact cv-form-section-card--described" aria-labelledby="structure-wizard-secondary">
+                <header class="cv-form-section-header">
+                  <div class="cv-form-section-header__copy">
+                    <h3 class="cv-form-section-title" id="structure-wizard-secondary">Detalhes complementares</h3>
+                    <p class="cv-form-section-subtitle">Campos relacionados permanecem próximos, com menor peso visual.</p>
                   </div>
                 </header>
-                <div class="cv-wizard-section-body">
+                <div class="cv-form-section-body">
                   <div class="field-grid">
                     {% for field in ui_lab_fields.wizard_secondary %}
                       {% include "dev/ui_lab/partials/_demo_field.html" with field=field only %}

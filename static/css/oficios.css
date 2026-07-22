@@ -108,8 +108,8 @@
 
 
 /* Wizard Ofício: campos diretos no section-body devem ocupar largura total */
-.cv-wizard-section-body > .cv-field,
-.cv-wizard-section-body > .field {
+.cv-form-section-body > .cv-field,
+.cv-form-section-body > .field {
   align-self: stretch;
   width: 100%;
 }
@@ -140,8 +140,8 @@
 }
 
 /* Textarea de Motivo no wizard: visual idêntico ao input, só com altura maior */
-.oficio-wizard .cv-field__control,
-.oficio-wizard .cv-field__select {
+.travel-document-wizard .cv-field__control,
+.travel-document-wizard .cv-field__select {
   background: var(--cv-field-bg);
   border: 1px solid var(--cv-field-border);
   border-radius: var(--cv-field-radius);
@@ -159,23 +159,23 @@
   width: 100%;
 }
 
-.oficio-wizard .cv-field__control:hover:not(:disabled):not([readonly]) {
+.travel-document-wizard .cv-field__control:hover:not(:disabled):not([readonly]) {
   background: var(--cv-field-bg-hover);
   border-color: var(--cv-field-border-hover);
 }
 
-.oficio-wizard .cv-field__control:focus-visible {
+.travel-document-wizard .cv-field__control:focus-visible {
   border-color: var(--cv-field-focus-border);
   box-shadow: var(--cv-field-shadow-focus);
   outline: none;
 }
 
-.oficio-wizard .form-control:-webkit-autofill,
-.oficio-wizard .form-control:-webkit-autofill:hover,
-.oficio-wizard .form-control:-webkit-autofill:focus,
-.oficio-wizard .cv-field__control:-webkit-autofill,
-.oficio-wizard .cv-field__control:-webkit-autofill:hover,
-.oficio-wizard .cv-field__control:-webkit-autofill:focus {
+.travel-document-wizard .form-control:-webkit-autofill,
+.travel-document-wizard .form-control:-webkit-autofill:hover,
+.travel-document-wizard .form-control:-webkit-autofill:focus,
+.travel-document-wizard .cv-field__control:-webkit-autofill,
+.travel-document-wizard .cv-field__control:-webkit-autofill:hover,
+.travel-document-wizard .cv-field__control:-webkit-autofill:focus {
   -webkit-box-shadow: 0 0 0 1000px var(--field-bg-soft, var(--color-input-bg)) inset, var(--cv-field-shadow-focus);
   -webkit-text-fill-color: var(--field-text, var(--color-input-text));
   border-color: var(--field-border-focus, var(--cv-field-focus-border));
@@ -183,8 +183,8 @@
   color: var(--field-text, var(--color-input-text));
 }
 
-.oficio-wizard .cv-field--readonly .cv-field__control,
-.oficio-wizard .cv-field__control[readonly] {
+.travel-document-wizard .cv-field--readonly .cv-field__control,
+.travel-document-wizard .cv-field__control[readonly] {
   background: var(--cv-field-readonly-bg);
   border-color: var(--color-border-strong);
   box-shadow: none;
@@ -193,7 +193,7 @@
   opacity: 1;
 }
 
-.oficio-wizard .cv-field__control--textarea {
+.travel-document-wizard .cv-field__control--textarea {
   height: var(--text-area-height-md);
   min-height: var(--text-area-height-md);
   max-height: none;
@@ -819,7 +819,7 @@
 /* --------------------------------------------------------------------------
    7. Wizard de oficios
    -------------------------------------------------------------------------- */
-.oficio-wizard__top {
+.travel-document-wizard__top {
   background: var(--color-card);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
@@ -827,7 +827,7 @@
   overflow: hidden;
 }
 
-.oficio-wizard__header {
+.travel-document-wizard__header {
   align-items: center;
   background:
     linear-gradient(135deg, rgba(11, 58, 102, 0.96), rgba(21, 91, 154, 0.92)),
@@ -841,34 +841,34 @@
   padding: var(--space-5) var(--space-5) var(--space-6);
 }
 
-.oficio-wizard__header-copy {
+.travel-document-wizard__header-copy {
   display: grid;
   gap: var(--space-1);
   min-width: 0;
 }
 
-.oficio-wizard__title {
+.travel-document-wizard__title {
   color: var(--color-white);
   font-size: var(--font-size-2xl);
   line-height: 1.1;
   margin: 0;
 }
 
-.oficio-wizard__subtitle {
+.travel-document-wizard__subtitle {
   color: var(--color-accent-soft);
   font-size: var(--font-size-lg);
   font-weight: 800;
   margin: 0;
 }
 
-.oficio-wizard__layout {
+.travel-document-wizard__layout {
   align-items: start;
   display: grid;
   gap: var(--space-5);
   grid-template-columns: minmax(0, 1fr);
 }
 
-.oficio-wizard__main {
+.travel-document-wizard__main {
   min-width: 0;
 }
 
@@ -1027,25 +1027,25 @@
   color: rgba(255, 255, 255, 0.45);
 }
 
-.oficio-wizard__actions {
+.travel-document-wizard__actions {
   background: var(--surface-form-section);
   flex-wrap:  wrap;
   /* Fica por cima dos cards */
   position:   relative;
   z-index:    2;
-  /* Mesmas dimensões do cv-wizard-section-header */
+  /* Mesmas dimensões do cv-form-section-header */
   min-height: calc(2 * var(--space-4) + var(--control-height-sm));
   padding:    var(--space-4) var(--space-6);
   gap:        var(--space-3);
   /* Fecha o contorno: page-shell já põe border-top, adicionamos os 3 lados restantes */
-  border-top:    1px solid var(--cv-wizard-section-border);
-  border-left:   1px solid var(--cv-wizard-section-border);
-  border-right:  1px solid var(--cv-wizard-section-border);
-  border-bottom: 1px solid var(--cv-wizard-section-border);
+  border-top:    1px solid var(--cv-form-section-border);
+  border-left:   1px solid var(--cv-form-section-border);
+  border-right:  1px solid var(--cv-form-section-border);
+  border-bottom: 1px solid var(--cv-form-section-border);
 }
 
 /* Botões do footer: altura padrão do sistema de botões */
-.oficio-wizard__actions .cv-btn {
+.travel-document-wizard__actions .cv-btn {
   font-size:  var(--font-size-sm);
   height:     var(--cv-btn-height);
   min-height: var(--cv-btn-height);
@@ -1054,55 +1054,55 @@
 }
 
 
-.oficio-wizard__main .cv-wizard-section-stack--comfortable {
+.travel-document-wizard__main .cv-form-section-stack--comfortable {
   --_stack-gap: var(--space-6);
   gap:          var(--_stack-gap);
 }
 
-.oficio-wizard__main .cv-wizard-section-stack > form > .footer-actions,
-.oficio-wizard__main .cv-wizard-section-stack > .footer-actions {
+.travel-document-wizard__main .cv-form-section-stack > form > .footer-actions,
+.travel-document-wizard__main .cv-form-section-stack > .footer-actions {
   margin-top: calc(-1 * var(--space-6));
 }
 
 @media (max-width: 960px) {
-  .oficio-wizard__layout {
+  .travel-document-wizard__layout {
     grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 640px) {
-  .oficio-wizard__header {
+  .travel-document-wizard__header {
     align-items: flex-start;
   }
 
-  .oficio-wizard__title {
+  .travel-document-wizard__title {
     font-size: var(--font-size-xl);
   }
 
-  .oficio-wizard__subtitle {
+  .travel-document-wizard__subtitle {
     font-size: var(--font-size-md);
   }
 
-  .oficio-wizard__actions > * {
+  .travel-document-wizard__actions > * {
     width: 100%;
   }
 }
 
 /* Ajuste da pagina 2: header e stepper em um bloco unico, sem resumo lateral. */
-.oficio-wizard__section {
+.travel-document-wizard__section {
   width: 100%;
 }
 
-.oficio-wizard__shell {
+.travel-document-wizard__shell {
   display: grid;
   gap: var(--space-5);
 }
 
-.oficio-wizard__layout {
+.travel-document-wizard__layout {
   grid-template-columns: minmax(0, 1fr);
 }
 
-.oficio-wizard__main {
+.travel-document-wizard__main {
   min-width: 0;
 }
 
@@ -3166,7 +3166,7 @@ html[data-theme="light"] .cv-segment-toggle {
 }
 
 /*
- * Driver toggle — prefixo [data-oficio-wizard-step1] garante especificidade
+ * Driver toggle — prefixo [data-travel-document-wizard-step1] garante especificidade
  * (0,3,0) que bate qualquer regra de cv-search-picker.css (0,2,0).
  *
  * Lógica de cores:
@@ -3180,17 +3180,17 @@ html[data-theme="light"] .cv-segment-toggle {
  */
 
 /* ── Tema claro — inativo ──────────────────────────────────────── */
-[data-oficio-wizard-step1] .cv-search-picker__driver-toggle {
+[data-travel-document-wizard-step1] .cv-search-picker__driver-toggle {
   background:   var(--selected-card-bg);
   border-color: color-mix(in srgb, var(--color-primary-bright) 50%, var(--color-border-soft));
   color:        color-mix(in srgb, var(--color-primary-bright) 75%, var(--color-text));
 }
 
 /* ── Tema claro — hover / focus / ativo ────────────────────────── */
-[data-oficio-wizard-step1] .cv-search-picker__driver-toggle:hover,
-[data-oficio-wizard-step1] .cv-search-picker__driver-toggle:focus-visible,
-[data-oficio-wizard-step1] .cv-search-picker__driver-toggle--active,
-[data-oficio-wizard-step1] .cv-search-picker__driver-toggle[aria-pressed="true"] {
+[data-travel-document-wizard-step1] .cv-search-picker__driver-toggle:hover,
+[data-travel-document-wizard-step1] .cv-search-picker__driver-toggle:focus-visible,
+[data-travel-document-wizard-step1] .cv-search-picker__driver-toggle--active,
+[data-travel-document-wizard-step1] .cv-search-picker__driver-toggle[aria-pressed="true"] {
   background:   color-mix(in srgb, var(--color-primary-bright) 14%, var(--selected-card-bg));
   border-color: var(--color-primary-bright);
   box-shadow:   0 0 0 1px color-mix(in srgb, var(--color-primary-bright) 30%, transparent),
@@ -3199,17 +3199,17 @@ html[data-theme="light"] .cv-segment-toggle {
 }
 
 /* ── Tema escuro — inativo ─────────────────────────────────────── */
-html[data-theme="dark"] [data-oficio-wizard-step1] .cv-search-picker__driver-toggle {
+html[data-theme="dark"] [data-travel-document-wizard-step1] .cv-search-picker__driver-toggle {
   background:   var(--selected-card-bg);
   border-color: color-mix(in srgb, var(--color-accent) 45%, var(--color-border-soft));
   color:        color-mix(in srgb, var(--color-accent) 75%, var(--color-text));
 }
 
 /* ── Tema escuro — hover / focus / ativo ───────────────────────── */
-html[data-theme="dark"] [data-oficio-wizard-step1] .cv-search-picker__driver-toggle:hover,
-html[data-theme="dark"] [data-oficio-wizard-step1] .cv-search-picker__driver-toggle:focus-visible,
-html[data-theme="dark"] [data-oficio-wizard-step1] .cv-search-picker__driver-toggle--active,
-html[data-theme="dark"] [data-oficio-wizard-step1] .cv-search-picker__driver-toggle[aria-pressed="true"] {
+html[data-theme="dark"] [data-travel-document-wizard-step1] .cv-search-picker__driver-toggle:hover,
+html[data-theme="dark"] [data-travel-document-wizard-step1] .cv-search-picker__driver-toggle:focus-visible,
+html[data-theme="dark"] [data-travel-document-wizard-step1] .cv-search-picker__driver-toggle--active,
+html[data-theme="dark"] [data-travel-document-wizard-step1] .cv-search-picker__driver-toggle[aria-pressed="true"] {
   background:   color-mix(in srgb, var(--color-accent) 22%, var(--selected-card-bg));
   border-color: var(--color-accent);
   box-shadow:   0 0 0 1px color-mix(in srgb, var(--color-accent) 35%, transparent),
@@ -3222,7 +3222,7 @@ html[data-theme="dark"] [data-oficio-wizard-step1] .cv-search-picker__driver-tog
  * Os tokens --driver-* são declarados em .cv-search-picker (não em :root),
  * então o override precisa ser no mesmo nível ou mais específico.
  */
-html[data-theme="dark"] [data-oficio-wizard-step1] .cv-search-picker {
+html[data-theme="dark"] [data-travel-document-wizard-step1] .cv-search-picker {
   --driver-bg:     color-mix(in srgb, var(--color-accent) 18%, transparent);
   --driver-border: color-mix(in srgb, var(--color-accent) 65%, transparent);
   --driver-text:   var(--color-accent);
@@ -3230,7 +3230,7 @@ html[data-theme="dark"] [data-oficio-wizard-step1] .cv-search-picker {
 
 /* Equipe (step1): cards selecionados em até 2 colunas quando houver espaço.
    Escopo restrito ao roster do step1 — outros pickers (ex.: roteiro) seguem 1 coluna. */
-[data-oficio-wizard-step1] .oficio-step1-body
+[data-travel-document-wizard-step1] .travel-document-body
   .cv-search-picker--people.cv-search-picker--roster
   .cv-search-picker__selected-list {
   display: grid;
@@ -3239,13 +3239,13 @@ html[data-theme="dark"] [data-oficio-wizard-step1] .cv-search-picker {
   min-width: 0;
 }
 
-[data-oficio-wizard-step1] .oficio-step1-body
+[data-travel-document-wizard-step1] .travel-document-body
   .cv-search-picker--people.cv-search-picker--roster
   .cv-search-picker__selected-card {
   min-width: 0;
 }
 
-[data-oficio-wizard-step1] .oficio-step1-body
+[data-travel-document-wizard-step1] .travel-document-body
   .cv-search-picker--people.cv-search-picker--roster
   .cv-search-picker__selected-name {
   overflow: hidden;
@@ -3253,26 +3253,26 @@ html[data-theme="dark"] [data-oficio-wizard-step1] .cv-search-picker {
   white-space: nowrap;
 }
 
-[data-oficio-wizard-step1] .oficio-step1-body
+[data-travel-document-wizard-step1] .travel-document-body
   .cv-search-picker--people.cv-search-picker--roster
   .cv-search-picker__selected-card:only-child,
-[data-oficio-wizard-step1] .oficio-step1-body
+[data-travel-document-wizard-step1] .travel-document-body
   .cv-search-picker--people.cv-search-picker--roster
   .cv-search-picker__selected-card:last-child:nth-child(odd) {
   grid-column: 1 / -1;
 }
 
 @media (max-width: 720px) {
-  [data-oficio-wizard-step1] .oficio-step1-body
+  [data-travel-document-wizard-step1] .travel-document-body
     .cv-search-picker--people.cv-search-picker--roster
     .cv-search-picker__selected-list {
     grid-template-columns: 1fr;
   }
 
-  [data-oficio-wizard-step1] .oficio-step1-body
+  [data-travel-document-wizard-step1] .travel-document-body
     .cv-search-picker--people.cv-search-picker--roster
     .cv-search-picker__selected-card:only-child,
-  [data-oficio-wizard-step1] .oficio-step1-body
+  [data-travel-document-wizard-step1] .travel-document-body
     .cv-search-picker--people.cv-search-picker--roster
     .cv-search-picker__selected-card:last-child:nth-child(odd) {
     grid-column: auto;
@@ -3280,28 +3280,28 @@ html[data-theme="dark"] [data-oficio-wizard-step1] .cv-search-picker {
 }
 
 /* ── Etapa 1 / Roteiro: painéis por seção (layout estrutural) ─ */
-.page-shell--wizard.oficio-wizard {
+.page-shell--wizard.travel-document-wizard {
   --stepper-missing-bg: color-mix(in srgb, var(--color-danger) 10%, transparent);
   --stepper-missing-border: color-mix(in srgb, var(--color-danger) 28%, transparent);
   --stepper-missing-color: color-mix(in srgb, var(--color-danger) 78%, var(--color-heading));
   --stepper-status-missing-color: color-mix(in srgb, var(--color-danger) 68%, var(--color-muted));
 }
 
-:is([data-oficio-wizard-step1], [data-oficio-wizard-roteiro], [data-oficio-wizard-justificativa], [data-oficio-wizard-documentos]) :is(.oficio-step1-body, .oficio-roteiro-body, .oficio-justificativa-body, .oficio-documentos-body) {
+:is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos]) :is(.travel-document-body, .oficio-roteiro-body, .oficio-justificativa-body, .oficio-documentos-body) {
   display: grid;
   gap: 10px;
 }
 
-:is([data-oficio-wizard-step1] .oficio-step1-block, [data-oficio-wizard-roteiro] .oficio-roteiro-block, [data-oficio-wizard-justificativa] .oficio-justificativa-block, [data-oficio-wizard-documentos] .oficio-documentos-block) {
+:is([data-travel-document-wizard-step1] .travel-document-block, [data-travel-document-wizard-roteiro] .oficio-roteiro-block, [data-travel-document-wizard-justificativa] .oficio-justificativa-block, [data-travel-document-wizard-documentos] .oficio-documentos-block) {
   margin: 0;
 }
 
-:is([data-oficio-wizard-step1] .oficio-step1-block, [data-oficio-wizard-roteiro] .oficio-roteiro-block, [data-oficio-wizard-justificativa] .oficio-justificativa-block, [data-oficio-wizard-documentos] .oficio-documentos-block) > .cv-form-block__header .cv-form-block__copy {
+:is([data-travel-document-wizard-step1] .travel-document-block, [data-travel-document-wizard-roteiro] .oficio-roteiro-block, [data-travel-document-wizard-justificativa] .oficio-justificativa-block, [data-travel-document-wizard-documentos] .oficio-documentos-block) > .cv-form-block__header .cv-form-block__copy {
   display: grid;
   gap: 3px;
 }
 
-:is([data-oficio-wizard-step1] .oficio-step1-block, [data-oficio-wizard-roteiro] .oficio-roteiro-block, [data-oficio-wizard-justificativa] .oficio-justificativa-block, [data-oficio-wizard-documentos] .oficio-documentos-block) .cv-form-block__description {
+:is([data-travel-document-wizard-step1] .travel-document-block, [data-travel-document-wizard-roteiro] .oficio-roteiro-block, [data-travel-document-wizard-justificativa] .oficio-justificativa-block, [data-travel-document-wizard-documentos] .oficio-documentos-block) .cv-form-block__description {
   text-align: left;
 }
 
@@ -3310,10 +3310,10 @@ html[data-theme="dark"] [data-oficio-wizard-step1] .cv-search-picker {
 
 /* ── Ofício List Card (oficio-lc) ───────────────────────────────── */
 .oficio-lc {
-  background: var(--cv-wizard-section-bg, var(--color-card));
-  border: 1px solid var(--cv-wizard-section-border, var(--color-border-soft));
-  border-radius: var(--cv-wizard-section-radius, var(--radius-card));
-  box-shadow: var(--cv-wizard-section-shadow, var(--shadow-card));
+  background: var(--cv-form-section-bg, var(--color-card));
+  border: 1px solid var(--cv-form-section-border, var(--color-border-soft));
+  border-radius: var(--cv-form-section-radius, var(--radius-card));
+  box-shadow: var(--cv-form-section-shadow, var(--shadow-card));
   overflow: hidden;
   transition:
     box-shadow var(--transition-base),
@@ -3321,7 +3321,7 @@ html[data-theme="dark"] [data-oficio-wizard-step1] .cv-search-picker {
 }
 
 .oficio-lc:hover {
-  box-shadow: var(--cv-wizard-section-shadow, var(--shadow-card));
+  box-shadow: var(--cv-form-section-shadow, var(--shadow-card));
   transform: none;
 }
 
@@ -3332,9 +3332,9 @@ html[data-theme="dark"] [data-oficio-wizard-step1] .cv-search-picker {
 /* ── IDENTIFICAÇÃO: Número · Protocolo · Data de Criação (topo do card) ── */
 .oficio-lc__id-row {
   align-items: center;
-  background: var(--cv-wizard-section-header-bg);
+  background: var(--cv-form-section-header-bg);
   background-image: linear-gradient(to right, color-mix(in srgb, var(--color-accent) 7%, transparent) 0px, transparent 76px);
-  border-bottom: 1px solid var(--cv-wizard-section-border);
+  border-bottom: 1px solid var(--cv-form-section-border);
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-4);
@@ -3456,7 +3456,7 @@ html[data-theme="dark"] [data-oficio-wizard-step1] .cv-search-picker {
 }
 
 .oficio-lc__section + .oficio-lc__section::before {
-  background: var(--cv-wizard-section-border, var(--color-border-soft));
+  background: var(--cv-form-section-border, var(--color-border-soft));
   content: "";
   height: 1px;
   left: var(--space-6);
@@ -4041,8 +4041,8 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
 
 /* ── FOOTER ── */
 .oficio-lc__footer {
-  background: var(--cv-wizard-section-bg, var(--color-surface));
-  border-top: 1px solid var(--cv-wizard-section-border, var(--color-border-soft));
+  background: var(--cv-form-section-bg, var(--color-surface));
+  border-top: 1px solid var(--cv-form-section-border, var(--color-border-soft));
   padding: var(--space-3) var(--space-6);
 }
 
@@ -4200,11 +4200,11 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
 }
 
 @media (max-width: 700px) {
-  .oficio-wizard__main .cv-wizard-section-stack--comfortable {
+  .travel-document-wizard__main .cv-form-section-stack--comfortable {
     --_stack-gap: var(--space-5);
   }
 
-  .oficio-wizard .cv-wizard-section-title {
+  .travel-document-wizard .cv-form-section-title {
     font-size: clamp(1.08rem, 5vw, 1.45rem);
     letter-spacing: 0.04em;
     overflow-wrap: anywhere;

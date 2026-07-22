@@ -13,7 +13,7 @@
 {% endblock %}
 
 {% block content %}
-  <div class="page-shell page-shell--wizard oficio-wizard app-wizard evento-guided-page">
+  <div class="page-shell page-shell--wizard travel-document-wizard app-wizard evento-guided-page">
     {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="EVENTOS" title=evento_header_title description=evento_header_description icon_label="EV" module_label="Eventos" back_label="Voltar para lista" back_url="/eventos/" status_label=evento.get_status_display status_variant=evento_status_variant only %}
 
     {% if evento.status == "cancelado" %}
@@ -31,35 +31,35 @@
 
     {% include "components/ui/navigation/page_stepper.html" with steps=evento_page_steps aria_label="Etapas do evento" only %}
 
-    <main class="main-form-panel main-form-panel--stack oficio-wizard__main">
-      <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
+    <main class="main-form-panel main-form-panel--stack travel-document-wizard__main">
+      <div class="cv-form-section-stack cv-form-section-stack--comfortable">
         {% if etapa_atual == 1 %}
-          <form method="post" class="oficio-wizard__form" novalidate data-evento-guided-form data-api-cidades-url="{% url 'eventos:api_cidades_por_uf' uf='0' %}" data-sede-uf="{{ sede_uf }}">
+          <form method="post" class="travel-document-wizard__form" novalidate data-evento-guided-form data-api-cidades-url="{% url 'eventos:api_cidades_por_uf' uf='0' %}" data-sede-uf="{{ sede_uf }}">
             {% csrf_token %}
             {% with form=evento_form %}
-            <div data-oficio-wizard-step1>
+            <div data-travel-document-wizard-step1>
 
               {% if form.non_field_errors %}
                 {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
               {% endif %}
 
-              <section class="cv-wizard-section-card cv-form-card cv-wizard-section-card--described oficio-step1-card termo-form-card evento-step1-card" aria-labelledby="evento-step1-title">
-                <header class="cv-wizard-section-header">
-                  <div class="cv-wizard-section-header__copy">
-                    <h3 class="cv-wizard-section-title" id="evento-step1-title">Dados do evento</h3>
-                    <p class="cv-wizard-section-subtitle">Identificação, período, destinos e documentos vinculados</p>
+              <section class="cv-form-section-card cv-form-card cv-form-section-card--described travel-document-card evento-step1-card" aria-labelledby="evento-step1-title">
+                <header class="cv-form-section-header">
+                  <div class="cv-form-section-header__copy">
+                    <h3 class="cv-form-section-title" id="evento-step1-title">Dados do evento</h3>
+                    <p class="cv-form-section-subtitle">Identificação, período, destinos e documentos vinculados</p>
                   </div>
                 </header>
 
-                <div class="cv-wizard-section-body oficio-step1-body termo-form-body">
+                <div class="cv-form-section-body travel-document-body">
                   {# ── 1. Identificação ─────────────────────────────── #}
-                  {% include "components/ui/forms/form_block.html" with element_id="evento-card-identificacao-d" section_id="evento-wizard-tipo-title-d" extra_class="oficio-step1-block termo-block" title="Identificação" description="Escolha o tipo e registre o motivo que contextualiza esta atividade." body_extra_class="termo-block__body" body_template="eventos/partials/_detalhe_identificacao_body.html" %}
+                  {% include "components/ui/forms/form_block.html" with element_id="evento-card-identificacao-d" section_id="evento-wizard-tipo-title-d" extra_class="travel-document-block document-form-block" title="Identificação" description="Escolha o tipo e registre o motivo que contextualiza esta atividade." body_extra_class="termo-block__body" body_template="eventos/partials/_detalhe_identificacao_body.html" %}
 
                   {# ── 2. Quando e onde ─────────────────────────────── #}
-                  {% include "components/ui/forms/form_block.html" with element_id="evento-card-dados-d" section_id="evento-card-dados-title-d" extra_class="oficio-step1-block termo-block" title="Quando e onde" description="Informe o período e ao menos um destino para continuar." body_extra_class="cv-form-stack termo-evento-body" body_template="eventos/partials/_detalhe_dados_body.html" %}
+                  {% include "components/ui/forms/form_block.html" with element_id="evento-card-dados-d" section_id="evento-card-dados-title-d" extra_class="travel-document-block document-form-block" title="Quando e onde" description="Informe o período e ao menos um destino para continuar." body_extra_class="cv-form-stack termo-evento-body" body_template="eventos/partials/_detalhe_dados_body.html" %}
 
                   {# ── 3. Documentos vinculados ─────────────────────── #}
-                  {% include "components/ui/forms/form_block.html" with element_id="evento-card-documentos-d" section_id="evento-card-documentos-title-d" extra_class="oficio-step1-block termo-block" title="Documentos vinculados" description="Reaproveite documentos existentes. Marque para vincular e desmarque para remover o vínculo." body_extra_class="termo-block__body" body_template="eventos/partials/_detalhe_documentos_body.html" %}
+                  {% include "components/ui/forms/form_block.html" with element_id="evento-card-documentos-d" section_id="evento-card-documentos-title-d" extra_class="travel-document-block document-form-block" title="Documentos vinculados" description="Reaproveite documentos existentes. Marque para vincular e desmarque para remover o vínculo." body_extra_class="termo-block__body" body_template="eventos/partials/_detalhe_documentos_body.html" %}
                 </div>
 
                 <div class="cv-form-card__footer">
@@ -105,7 +105,7 @@
         {% endif %}
 
         {% if etapa_atual == 4 %}
-          {% include "components/ui/forms/form_block.html" with shell="card" section_id="evento-solicitacao-title" extra_class="cv-wizard-section-card--compact cv-wizard-section-card--described" title="Documentos de solicitação" description="Anexe ofícios solicitantes, convites, despachos assinados ou imagens que fundamentam este evento. Esses documentos complementam ou substituem a Ordem de Serviço e o Plano de Trabalho." body_template="eventos/partials/_detalhe_solicitacao_body.html" %}
+          {% include "components/ui/forms/form_block.html" with shell="card" section_id="evento-solicitacao-title" extra_class="cv-form-section-card--compact cv-form-section-card--described" title="Documentos de solicitação" description="Anexe ofícios solicitantes, convites, despachos assinados ou imagens que fundamentam este evento. Esses documentos complementam ou substituem a Ordem de Serviço e o Plano de Trabalho." body_template="eventos/partials/_detalhe_solicitacao_body.html" %}
 
           <section class="cv-wizard-collection" aria-labelledby="evento-planejamento-title">
             {% include "components/ui/layouts/collection_header.html" with title="Planejamento e autorização" title_id="evento-planejamento-title" description="Vincule o Plano de Trabalho e a Ordem de Serviço que orientam a execução da viagem." only %}

@@ -55,7 +55,7 @@ class OficioViewsTests(TestCase):
         self.assertEqual(oficio.data_criacao, timezone.localdate())
 
         response = self.client.get(response.url)
-        self.assertContains(response, "cv-wizard-section-card")
+        self.assertContains(response, "cv-form-section-card")
         self.assertContains(response, "field-grid")
         self.assertContains(response, f'name="numero" value="{oficio.numero}"')
         self.assertContains(response, f"/ {oficio.ano}")

@@ -9,15 +9,15 @@
     <form method="post">
       {% csrf_token %}
       <main class="main-form-panel main-form-panel--stack">
-        <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
-          <section class="cv-wizard-section-card cv-form-card" aria-labelledby="evento-form-title">
-            <header class="cv-wizard-section-header">
-              <div class="cv-wizard-section-header__copy">
-                <h2 class="cv-wizard-section-title" id="evento-form-title">Informações do evento</h2>
+        <div class="cv-form-section-stack cv-form-section-stack--comfortable">
+          <section class="cv-form-section-card cv-form-card" aria-labelledby="evento-form-title">
+            <header class="cv-form-section-header">
+              <div class="cv-form-section-header__copy">
+                <h2 class="cv-form-section-title" id="evento-form-title">Informações do evento</h2>
               </div>
             </header>
 
-            <div class="cv-wizard-section-body">
+            <div class="cv-form-section-body">
               {% include "eventos/includes/_evento_form_sections.html" with form=form section_prefix="evento-real" only %}
             </div>
 

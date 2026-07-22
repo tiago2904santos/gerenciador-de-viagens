@@ -7,7 +7,7 @@
 
     var equipeSelect    = document.querySelector("select[name='servidores']");
     var motoristaSelect = document.querySelector("select[name='motorista']");
-    var step1           = document.querySelector("[data-oficio-wizard-step1]");
+    var step1           = document.querySelector("[data-travel-document-wizard-step1]");
 
     var container = document.querySelector("[data-viatura-sugestoes]");
     var chipsEl   = container && container.querySelector("[data-viatura-sugestoes-chips]");

@@ -11,13 +11,13 @@ Espera:
   total_eventos          : total de eventos (subtítulo em multi)
   mostrar_acoes          : bool — exibe editar/remover (usa ev.editar_url / ev.excluir_url)
 {% endcomment %}
-<section class="cv-summary-card cv-wizard-section-card" aria-label="{% if is_multi %}Resumo do evento {{ ev.ordem }}{% else %}Resumo do plano{% endif %}">
-  <header class="cv-wizard-section-header pt-resumo-card-header">
-    <div class="cv-wizard-section-header__copy">
-      <h3 class="cv-wizard-section-title">
+<section class="cv-summary-card cv-form-section-card" aria-label="{% if is_multi %}Resumo do evento {{ ev.ordem }}{% else %}Resumo do plano{% endif %}">
+  <header class="cv-form-section-header pt-resumo-card-header">
+    <div class="cv-form-section-header__copy">
+      <h3 class="cv-form-section-title">
         {% if is_multi %}Resumo do evento {{ ev.ordem }}{% else %}Resumo do plano{% endif %}
       </h3>
-      <p class="cv-wizard-section-subtitle">
+      <p class="cv-form-section-subtitle">
         {% if is_multi %}Evento {{ ev.ordem }}{% if total_eventos %} de {{ total_eventos }}{% endif %} · {{ ev.programa }}{% else %}Dados utilizados para montar o documento.{% endif %}
       </p>
     </div>
@@ -37,7 +37,7 @@ Espera:
     {% endif %}
   </header>
 
-  <div class="cv-wizard-section-body">
+  <div class="cv-form-section-body">
     <div class="cv-summary-card__body pt-resumo-evento">
 
       {# ── Linha 1: identificação (4 colunas) ───────────────────── #}

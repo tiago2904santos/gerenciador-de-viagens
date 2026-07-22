@@ -2,7 +2,7 @@
 
 ## 1. Resumo executivo
 
-- **Migrado:** shell visual dos wizards de Ofícios e Roteiros para o modelo **UI Lab → Structures → Wizard** (`page-shell--wizard`, `header_stack_back_action`, `page-stepper`, `main-form-panel--stack`, `cv-wizard-section-stack`, `footer-actions`).
+- **Migrado:** shell visual dos wizards de Ofícios e Roteiros para o modelo **UI Lab → Structures → Wizard** (`page-shell--wizard`, `header_stack_back_action`, `page-stepper`, `main-form-panel--stack`, `cv-form-section-stack`, `footer-actions`).
 - **Não migrado:** lógica de rotas/trechos, JS funcional (`roteiros/editor/index.js`, `roteiros-map.js`), endpoints, models, validações, ordem de steps.
 - **Riscos preservados:** `#roteiro-editor-form`, todos `data-api-*`, autosave, `OficioWizard` / `CV.fields`, submits (`name`/`value` de `action`), formulário embutido na etapa roteiro (sem form aninhado inválido).
 - **Fase 5 funcional:** **B — Liberado com ressalvas** (paridade estrutural concluída; smoke visual manual e screenshots dedicados pendentes se o servidor não estiver ativo).
@@ -17,9 +17,9 @@
 | Header band + rail | `header_stack_back_action.html` | `page-header-stack`, `page-header-band`, `page-header-rail` | chips, radius shell | Sim | Sim |
 | Status chip | header include | `page-header-status-chip--draft/active` | tema claro/escuro | Sim | Não (avulso) |
 | Stepper | `page_stepper.html` | `page-stepper page-stepper--horizontal` | `--surface-stepper`, `--border-stepper` | Sim | Não (roteiro avulso) |
-| Painel principal | `page-shell.css` | `main-form-panel main-form-panel--stack` | transparente, `--cv-wizard-section-stack-gap` | Sim | Sim |
-| Stack de cards | `page-shell.css` | `cv-wizard-section-stack` | `--cv-wizard-section-stack-gap` | Sim | Sim |
-| Card de seção | `page-shell.css` / bridge | `cv-wizard-section-card` | `--cv-wizard-section-*` | Bridge CSS | Bridge CSS |
+| Painel principal | `page-shell.css` | `main-form-panel main-form-panel--stack` | transparente, `--cv-form-section-stack-gap` | Sim | Sim |
+| Stack de cards | `page-shell.css` | `cv-form-section-stack` | `--cv-form-section-stack-gap` | Sim | Sim |
+| Card de seção | `page-shell.css` / bridge | `cv-form-section-card` | `--cv-form-section-*` | Bridge CSS | Bridge CSS |
 | Footer | `footer_actions` pattern | `footer-actions`, `footer-actions__secondary/primary` | `--surface-footer-actions` | Sim | Sim |
 | Campos | `forms.css` | `field-grid`, `field-size-*` | `--field-grid-gap` | Sim | Sim |
 
@@ -36,7 +36,7 @@
 
 | Template | Antes | Depois | Components | Legado preservado | Risco | Status |
 |----------|-------|--------|------------|-------------------|-------|--------|
-| `roteiro_form_page.html` | `page-shell--wizard` + `app-form-shell` solto | `main-form-panel--stack` + `cv-wizard-section-stack` | header_stack_back_action | `app-page-shell--wizard` no editor | Baixo | OK |
+| `roteiro_form_page.html` | `page-shell--wizard` + `app-form-shell` solto | `main-form-panel--stack` + `cv-form-section-stack` | header_stack_back_action | `app-page-shell--wizard` no editor | Baixo | OK |
 | `_roteiro_editor.html` | `card`/`card-section` wrapper | form direto no stack; intro como card wizard | — | `app-page-shell`, `roteiro-editor`, todos `data-*` | Baixo | OK |
 | `partials/roteiro/actions.html` | `div.roteiro-editor__actions` | `footer.footer-actions` + grupos | footer-actions | classes `roteiro-editor__actions`, submits | Baixo | OK |
 
@@ -46,11 +46,11 @@
 
 | Template/step | Antes | Depois | Components | Legado preservado | Risco | Status |
 |---------------|-------|--------|------------|-------------------|-------|--------|
-| `wizard_base.html` | `app-page oficio-wizard`, header legado, `oficio-stepper` | `page-shell--wizard` + header global + `page-stepper` | header_stack, page_stepper, stack | `oficio-wizard`, `app-wizard`, `oficio-wizard__*` | Baixo | OK |
+| `wizard_base.html` | `app-page travel-document-wizard`, header legado, `oficio-stepper` | `page-shell--wizard` + header global + `page-stepper` | header_stack, page_stepper, stack | `travel-document-wizard`, `app-wizard`, `travel-document-wizard__*` | Baixo | OK |
 | `wizard_roteiro.html` | shell duplicado | `extends wizard_base`, `wizard_use_outer_form=False` | mesmo shell | `#roteiro-editor-form` único | Médio | OK |
 | `wizard_assinaturas.html` | shell legado | `extends wizard_base` | header + stepper | centralizadora intacta | Baixo | OK |
 | `partials/wizard_actions.html` | `div.form-actions` | `footer.footer-actions` + cv-btn bridge | footer-actions | `name`/`value` submits, links DOCX/PDF | Baixo | OK |
-| Steps 1–6 conteúdo | `form-section` | bridge CSS → aparência `cv-wizard-section-card` | — | markup interno inalterado | Baixo | OK |
+| Steps 1–6 conteúdo | `form-section` | bridge CSS → aparência `cv-form-section-card` | — | markup interno inalterado | Baixo | OK |
 
 **Presenter:** `apresentar_oficio_wizard_page_steps()` adapta steps para `page_stepper`; header com `description` (Etapa N de 6) e `status_label` no chip.
 
@@ -71,9 +71,9 @@
 
 | Arquivo | Alteração |
 |---------|-----------|
-| `static/css/page-shell.css` | Footer no form do stack; bridge `.form-section.app-form-section` e `.roteiro-editor__section` → tokens `cv-wizard-section-*` |
+| `static/css/page-shell.css` | Footer no form do stack; bridge `.form-section.app-form-section` e `.roteiro-editor__section` → tokens `cv-form-section-*` |
 
-**Compatibilidades temporárias (documentadas):** `oficio-wizard`, `app-page`, `app-page-shell--wizard`, `oficio-wizard__actions`, `btn btn-*` junto com `cv-btn` e `footer-actions`.
+**Compatibilidades temporárias (documentadas):** `travel-document-wizard`, `app-page`, `app-page-shell--wizard`, `travel-document-wizard__actions`, `btn btn-*` junto com `cv-btn` e `footer-actions`.
 
 ---
 

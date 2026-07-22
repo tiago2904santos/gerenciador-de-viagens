@@ -1,11 +1,11 @@
 {# Cabeçalho autônomo para coleções em fluxos e páginas de detalhe. #}
-<header class="cv-wizard-section-header cv-wizard-section-header--standalone cv-wizard-section-header--described{% if extra_class %} {{ extra_class }}{% endif %}">
-  <div class="cv-wizard-section-header__copy">
-    <h2 class="cv-wizard-section-title"{% if title_id %} id="{{ title_id }}"{% endif %}>{{ title }}</h2>
-    {% if description %}<p class="cv-wizard-section-subtitle">{{ description }}</p>{% endif %}
+<header class="cv-form-section-header cv-form-section-header--standalone cv-form-section-header--described{% if extra_class %} {{ extra_class }}{% endif %}">
+  <div class="cv-form-section-header__copy">
+    <h2 class="cv-form-section-title"{% if title_id %} id="{{ title_id }}"{% endif %}>{{ title }}</h2>
+    {% if description %}<p class="cv-form-section-subtitle">{{ description }}</p>{% endif %}
   </div>
   {% if primary_label and primary_url or secondary_label and secondary_url %}
-    <div class="cv-wizard-section-header__actions">
+    <div class="cv-form-section-header__actions">
       {% if secondary_label and secondary_url %}
         {% include "components/ui/buttons/button.html" with href=secondary_url label=secondary_label variant="secondary" icon=secondary_icon only %}
       {% endif %}

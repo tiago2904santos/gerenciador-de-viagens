@@ -229,21 +229,21 @@
 
 /* Cabeçalho do card igual ao dos cards do cadastro de ofício. */
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  .os-page .os-form-card > .cv-wizard-section-header {
+  .os-page .os-form-card > .cv-form-section-header {
   background: transparent;
   background-image: none;
   min-height: 64px;
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  .os-page .os-form-card > .cv-wizard-section-header .cv-wizard-section-title {
+  .os-page .os-form-card > .cv-form-section-header .cv-form-section-title {
   font-size: 1.05rem;
   letter-spacing: 0.02em;
   text-transform: none;
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  .os-page .os-form-card > .cv-wizard-section-header .cv-wizard-section-subtitle {
+  .os-page .os-form-card > .cv-form-section-header .cv-form-section-subtitle {
   color: var(--color-muted);
   display: block;
   font-size: var(--font-size-xs);

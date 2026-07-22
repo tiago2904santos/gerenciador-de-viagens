@@ -24,7 +24,7 @@
           {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="EVENTOS" title="Cadastro de Evento" description="Agrupe documentos, roteiros e anexos sem tornar o evento obrigatorio." icon_label="EV" module_label="Eventos" back_label="Voltar à lista" back_url="#" status_label="Novo" status_variant="draft" only %}
           <main class="main-form-panel main-form-panel--stack">
             <form method="post" action="#">
-              <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
+              <div class="cv-form-section-stack cv-form-section-stack--comfortable">
                 {% include "eventos/includes/_evento_form_sections.html" with form=evento_create_form section_prefix="evento-lab-create" only %}
                 <div class="footer-actions">
                   <div class="footer-actions__secondary">
@@ -49,7 +49,7 @@
           {% include "components/ui/headers/header_stack_back_action.html" with eyebrow="EVENTOS" title="Editar Evento" description="Agrupe documentos, roteiros e anexos sem tornar o evento obrigatorio." icon_label="EV" module_label="Eventos" back_label="Voltar à lista" back_url="#" status_label=evento_edit_mock.get_status_display status_variant="active" only %}
           <main class="main-form-panel main-form-panel--stack">
             <form method="post" action="#">
-              <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
+              <div class="cv-form-section-stack cv-form-section-stack--comfortable">
                 {% include "eventos/includes/_evento_form_sections.html" with form=evento_edit_form section_prefix="evento-lab-edit" only %}
                 <div class="footer-actions">
                   <div class="footer-actions__secondary">

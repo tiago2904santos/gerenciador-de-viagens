@@ -28,19 +28,19 @@
       placeholder = document.createComment("cv-floating-dropdown");
       menu.parentNode.insertBefore(placeholder, menu);
       // O menu sai da árvore do anchor ao ir para o body, então tokens de tema
-      // escopados por atributo (ex.: [data-oficio-wizard-step1]) deixam de
+      // escopados por atributo (ex.: [data-travel-document-wizard-step1]) deixam de
       // cascatear. Copiamos o marcador para o menu preservar o tema do anchor.
-      if (anchor.closest("[data-oficio-wizard-step1]")) {
-        menu.setAttribute("data-oficio-wizard-step1", "");
+      if (anchor.closest("[data-travel-document-wizard-step1]")) {
+        menu.setAttribute("data-travel-document-wizard-step1", "");
       }
-      if (anchor.closest("[data-oficio-wizard-roteiro]")) {
-        menu.setAttribute("data-oficio-wizard-roteiro", "");
+      if (anchor.closest("[data-travel-document-wizard-roteiro]")) {
+        menu.setAttribute("data-travel-document-wizard-roteiro", "");
       }
-      if (anchor.closest("[data-oficio-wizard-justificativa]")) {
-        menu.setAttribute("data-oficio-wizard-justificativa", "");
+      if (anchor.closest("[data-travel-document-wizard-justificativa]")) {
+        menu.setAttribute("data-travel-document-wizard-justificativa", "");
       }
-      if (anchor.closest("[data-oficio-wizard-documentos]")) {
-        menu.setAttribute("data-oficio-wizard-documentos", "");
+      if (anchor.closest("[data-travel-document-wizard-documentos]")) {
+        menu.setAttribute("data-travel-document-wizard-documentos", "");
       }
       document.body.appendChild(menu);
       menu.dataset.cvFloatingActive = "true";
@@ -61,10 +61,10 @@
       menu.style.right = "";
       menu.style.minWidth = "";
       delete menu.dataset.cvFloatingActive;
-      menu.removeAttribute("data-oficio-wizard-step1");
-      menu.removeAttribute("data-oficio-wizard-roteiro");
-      menu.removeAttribute("data-oficio-wizard-justificativa");
-      menu.removeAttribute("data-oficio-wizard-documentos");
+      menu.removeAttribute("data-travel-document-wizard-step1");
+      menu.removeAttribute("data-travel-document-wizard-roteiro");
+      menu.removeAttribute("data-travel-document-wizard-justificativa");
+      menu.removeAttribute("data-travel-document-wizard-documentos");
       if (placeholder && placeholder.parentNode) {
         placeholder.parentNode.insertBefore(menu, placeholder);
         placeholder.remove();

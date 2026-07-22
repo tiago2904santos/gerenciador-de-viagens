@@ -437,8 +437,8 @@
   justify-content: space-between;
 }
 
-.roteiro-form--legacy-roteiro .oficio-wizard-footer-actions .btn,
-.oficio-roteiro-page .oficio-wizard-footer-actions .btn,
+.roteiro-form--legacy-roteiro .travel-document-wizard-footer-actions .btn,
+.oficio-roteiro-page .travel-document-wizard-footer-actions .btn,
 .app-form-shell .form-actions .btn,
 .app-form-shell .app-form-actions .btn,
 .roteiro-editor__actions .btn {
@@ -1041,7 +1041,7 @@ html[data-theme="light-dark"] input[type="checkbox"] {
 
 /* ==========================================================================
    ALIASES CANONICOS DO DESIGN SYSTEM — Fase 10: Wizard shell
-   .app-wizard-* e .app-stepper-* como aliases de .oficio-wizard-* e
+   .app-wizard-* e .app-stepper-* como aliases de .travel-document-wizard-* e
    .oficio-stepper-*. Classes originais nao removidas.
    Tratamento visual completo aqui: garante que o wizard funcione mesmo
    sem oficios.css carregado (ex.: cache antigo de style.css).

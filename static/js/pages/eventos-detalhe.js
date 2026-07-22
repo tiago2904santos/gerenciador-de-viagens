@@ -1,7 +1,7 @@
 /* Página de detalhe do evento (wizard guiado) — extraído do script inline de eventos/detalhe.html.
    Etapa 1: destinos dinâmicos (UF→cidades) e o picker de "Documentos vinculados"
    (toggle segmentado + lista estilo ofícios da OS com pré-filtro por datas).
-   Dados de template chegam por data-attributes no form (.oficio-wizard__form):
+   Dados de template chegam por data-attributes no form (.travel-document-wizard__form):
    data-api-cidades-url e data-sede-uf; e no #evento-doc-summaries (JSON). */
 (function () {
   "use strict";
@@ -236,7 +236,7 @@
   /* ── Documentos vinculados: toggle segmentado + lista com pré-filtro de datas ── */
 
   var DOC_AVATAR_ICON =
-    '<svg class="cv-icon oficio-roteiro-route-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false" fill="none">' +
+    '<svg class="cv-icon related-route-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false" fill="none">' +
       '<circle cx="6" cy="19" r="2.5" fill="currentColor"></circle>' +
       '<circle cx="18" cy="5" r="2.5" fill="currentColor"></circle>' +
       '<path d="M8.2 18.2h6.1a3.3 3.3 0 0 0 0-6.6H9.7a3.3 3.3 0 0 1 0-6.6h6.1" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>' +
@@ -315,7 +315,7 @@
   function buildDocCard(summary, active) {
     var button = document.createElement('button');
     button.type = 'button';
-    button.className = 'cv-search-picker__selected-card oficio-roteiro-route-item' + (active ? ' is-active' : '');
+    button.className = 'cv-search-picker__selected-card related-route-item' + (active ? ' is-active' : '');
     button.dataset.value = String(summary.id);
     button.setAttribute('aria-pressed', active ? 'true' : 'false');
 
@@ -332,7 +332,7 @@
     name.textContent = summary.title || '';
 
     var meta = document.createElement('span');
-    meta.className = 'cv-search-picker__selected-meta route-periodo';
+    meta.className = 'cv-search-picker__selected-meta related-route-period';
     meta.textContent = summary.meta || '';
 
     main.appendChild(name);

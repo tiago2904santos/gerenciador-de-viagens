@@ -6,10 +6,10 @@
   align-items: center;
   background:
     linear-gradient(135deg, color-mix(in srgb, var(--color-accent) 9%, transparent), transparent 60%),
-    var(--cv-wizard-section-bg);
-  border: 1px solid var(--cv-wizard-section-border);
-  border-radius: var(--cv-wizard-section-radius);
-  box-shadow: var(--cv-wizard-section-shadow);
+    var(--cv-form-section-bg);
+  border: 1px solid var(--cv-form-section-border);
+  border-radius: var(--cv-form-section-radius);
+  box-shadow: var(--cv-form-section-shadow);
   display: grid;
   gap: var(--space-5);
   grid-template-columns: minmax(0, 1fr) auto;

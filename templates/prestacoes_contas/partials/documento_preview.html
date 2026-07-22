@@ -1,14 +1,14 @@
 {# Visualizador inline de PDF — espelha o padrão da etapa de Documentos do ofício. #}
 {# Parâmetros: preview_anchor, preview_title, preview_subtitle, preview_doc_title, #}
 {#             preview_inline_url e, opcionalmente, preview_pdf_url / preview_docx_url / preview_xlsx_url. #}
-<section class="cv-wizard-section-card document-inline-stack" aria-labelledby="{{ preview_anchor }}-title">
-  <header class="cv-wizard-section-header">
-    <div class="cv-wizard-section-header__copy">
-      <h2 class="cv-wizard-section-title" id="{{ preview_anchor }}-title">{{ preview_title|default:"Pré-visualização do documento" }}</h2>
-      <p class="cv-wizard-section-subtitle">{{ preview_subtitle|default:"Confira o documento gerado antes de baixar." }}</p>
+<section class="cv-form-section-card document-inline-stack" aria-labelledby="{{ preview_anchor }}-title">
+  <header class="cv-form-section-header">
+    <div class="cv-form-section-header__copy">
+      <h2 class="cv-form-section-title" id="{{ preview_anchor }}-title">{{ preview_title|default:"Pré-visualização do documento" }}</h2>
+      <p class="cv-form-section-subtitle">{{ preview_subtitle|default:"Confira o documento gerado antes de baixar." }}</p>
     </div>
   </header>
-  <div class="cv-wizard-section-body">
+  <div class="cv-form-section-body">
     <details class="document-inline-card document-inline-card--lazy" data-lazy-inline>
       <summary class="document-inline-card__header">
         <span class="document-inline-card__title">{{ preview_doc_title|default:"Documento" }}</span>

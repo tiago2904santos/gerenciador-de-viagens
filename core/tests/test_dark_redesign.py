@@ -363,8 +363,8 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertIn("cv-segment-toggle evento-doc-toggle", documentos_body)
         self.assertIn("data-evento-doc-toggle", documentos_body)
         self.assertIn('data-doc-tab-target="oficios"', documentos_body)
-        self.assertIn("cv-wizard-section-card--compact", page_shell)
-        self.assertIn("cv-wizard-section-card--described", page_shell)
+        self.assertIn("cv-form-section-card--compact", page_shell)
+        self.assertIn("cv-form-section-card--described", page_shell)
         self.assertIn("event.key === 'ArrowRight'", script)
         self.assertIn("event.key === 'Home'", script)
         self.assertIn("registerEnhancer('eventoGuided', initD)", script)
@@ -384,9 +384,9 @@ class DarkRedesignContractTests(SimpleTestCase):
             / "layouts"
             / "collection_header.html"
         ).read_text(encoding="utf-8")
-        self.assertIn("cv-wizard-section-header--standalone", collection_header)
-        self.assertIn("cv-wizard-section-header--described", collection_header)
-        self.assertIn("cv-wizard-section-header__actions", collection_header)
+        self.assertIn("cv-form-section-header--standalone", collection_header)
+        self.assertIn("cv-form-section-header--described", collection_header)
+        self.assertIn("cv-form-section-header__actions", collection_header)
 
         obsolete_wizard = (
             Path(settings.BASE_DIR) / "templates" / "eventos" / "wizard_novo.html"
@@ -567,9 +567,9 @@ class DarkRedesignContractTests(SimpleTestCase):
             Path(settings.BASE_DIR) / "templates" / "oficios" / "wizard_transporte.html"
         ).read_text(encoding="utf-8")
 
-        self.assertIn("cv-wizard-section-card", source)
-        self.assertIn("cv-wizard-section-header", source)
-        self.assertIn("cv-wizard-section-body", source)
+        self.assertIn("cv-form-section-card", source)
+        self.assertIn("cv-form-section-header", source)
+        self.assertIn("cv-form-section-body", source)
         self.assertIn("cv-btn cv-btn--secondary", source)
         self.assertNotIn("form-section app-form-section", source)
         self.assertNotIn("btn btn-secondary", source)
@@ -650,7 +650,7 @@ class DarkRedesignContractTests(SimpleTestCase):
             page_shell,
         )
 
-        dark_filete_rule = self.css.split(".cv-wizard-section-header::before", 1)[1]
+        dark_filete_rule = self.css.split(".cv-form-section-header::before", 1)[1]
         dark_filete_rule = dark_filete_rule.split("}", 1)[0]
         self.assertIn("var(--cv-card-family-accent-bg)", dark_filete_rule)
         self.assertNotIn("var(--color-primary-bright)", dark_filete_rule)
@@ -668,7 +668,7 @@ class DarkRedesignContractTests(SimpleTestCase):
             with self.subTest(token=token):
                 self.assertIn(token, self.css)
 
-        wizard_header = self.css.split(".cv-wizard-section-header {", 1)[1]
+        wizard_header = self.css.split(".cv-form-section-header {", 1)[1]
         wizard_header = wizard_header.split("}", 1)[0]
         list_header = self.css.split(".oficio-lc__id-row {", 1)[1]
         list_header = list_header.split("}", 1)[0]

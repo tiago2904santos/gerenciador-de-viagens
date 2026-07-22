@@ -1,13 +1,13 @@
-<section class="cv-wizard-section-card cv-form-card oficio-step1-resource-card oficio-step1-resource-card--vehicle" aria-labelledby="oficio-wizard-viatura-title" data-oficio-viatura-card>
-  <header class="cv-wizard-section-header">
-    <div class="cv-wizard-section-header__copy">
-      <h3 class="cv-wizard-section-title" id="oficio-wizard-viatura-title">Viatura</h3>
+<section class="cv-form-section-card cv-form-card travel-document-resource-card travel-document-resource-card--vehicle" aria-labelledby="travel-document-wizard-viatura-title" data-oficio-viatura-card>
+  <header class="cv-form-section-header">
+    <div class="cv-form-section-header__copy">
+      <h3 class="cv-form-section-title" id="travel-document-wizard-viatura-title">Viatura</h3>
     </div>
-    <div class="cv-wizard-section-header__actions">
+    <div class="cv-form-section-header__actions">
       {% include "components/buttons/action_button.html" with href=viatura_create_url label="Cadastrar nova viatura" variant="secondary" data_autosave_link=True only %}
     </div>
   </header>
-  <div class="cv-wizard-section-body">
+  <div class="cv-form-section-body">
     <div class="viatura-sugestoes" data-viatura-sugestoes hidden>
       <p class="viatura-sugestoes__label">Sugestões</p>
       <div class="viatura-sugestoes__chips" data-viatura-sugestoes-chips></div>

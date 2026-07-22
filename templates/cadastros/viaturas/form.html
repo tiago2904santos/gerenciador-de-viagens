@@ -6,18 +6,18 @@
     {% include "components/ui/headers/header_stack_simple.html" with eyebrow="CADASTROS" title=page_title description=page_description icon_label="VT" module_label="Viaturas" only %}
 
     <main class="main-form-panel main-form-panel--stack">
-      <div class="cv-wizard-section-stack cv-wizard-section-stack--comfortable">
+      <div class="cv-form-section-stack cv-form-section-stack--comfortable">
         <form method="post" novalidate data-viatura-form>
           {% csrf_token %}
           {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
-          <section class="cv-wizard-section-card cv-form-card" aria-labelledby="viaturas-form-card-title">
-            <header class="cv-wizard-section-header">
-              <div class="cv-wizard-section-header__copy">
-                <h3 class="cv-wizard-section-title" id="viaturas-form-card-title">Dados da viatura</h3>
+          <section class="cv-form-section-card cv-form-card" aria-labelledby="viaturas-form-card-title">
+            <header class="cv-form-section-header">
+              <div class="cv-form-section-header__copy">
+                <h3 class="cv-form-section-title" id="viaturas-form-card-title">Dados da viatura</h3>
               </div>
             </header>
 
-            <div class="cv-wizard-section-body">
+            <div class="cv-form-section-body">
               {% include "components/ui/forms/form_block.html" with title="Identificação" description="Placa, modelo, tipo e combustível" section_id="viaturas-identificacao-title" body_template="cadastros/viaturas/partials/_identity_fields.html" %}
               {% include "components/ui/forms/form_block.html" with title="Lotação" description="Unidade responsável pela viatura" section_id="viaturas-lotacao-title" body_template="cadastros/viaturas/partials/_assignment_fields.html" %}
               {% include "components/ui/forms/form_block.html" with title="Motoristas" description="Servidores autorizados a conduzir" section_id="viaturas-motoristas-title" variant="resource" body_template="cadastros/viaturas/partials/_drivers_fields.html" %}

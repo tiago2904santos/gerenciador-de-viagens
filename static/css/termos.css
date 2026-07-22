@@ -1,11 +1,11 @@
 /* Cadastro de termos — shell alinhado ao wizard de ofícios */
 
-.termos-wizard .oficio-wizard__main {
+.document-form-page .travel-document-wizard__main {
   gap: var(--space-5);
 }
 
-.termo-form .cv-wizard-section-card,
-.termo-block {
+.document-form .cv-form-section-card,
+.document-form-block {
   scroll-margin-top: 24px;
 }
 
@@ -27,7 +27,7 @@
 }
 
 .termo-oficio-summary-panel .cv-search-picker__selected-list,
-.termo-oficio-summary-panel .roteiro-routes-list {
+.termo-oficio-summary-panel .related-route-list {
   display: grid;
   gap: 8px;
   max-height: 280px;
@@ -35,19 +35,19 @@
 }
 
 /* Lista de ofícios do termo/OS: sempre uma coluna, um card por linha. */
-.termos-wizard #termo-oficio-lista,
-.termos-wizard #os-oficio-lista,
-.termos-wizard .termo-oficio-picker .cv-search-picker__selected-list,
-.termos-wizard .oficio-roteiro-salvo-picker .cv-search-picker__selected-list {
+.document-form-page #termo-oficio-lista,
+.document-form-page #os-oficio-lista,
+.document-form-page .termo-oficio-picker .cv-search-picker__selected-list,
+.document-form-page .related-route-picker .cv-search-picker__selected-list {
   grid-template-columns: 1fr;
 }
 
-.termos-wizard #termo-oficio-lista .cv-search-picker__selected-card,
-.termos-wizard #termo-oficio-lista .cv-search-picker__selected-card:only-child,
-.termos-wizard #termo-oficio-lista .cv-search-picker__selected-card:last-child:nth-child(odd),
-.termos-wizard #os-oficio-lista .cv-search-picker__selected-card,
-.termos-wizard #os-oficio-lista .cv-search-picker__selected-card:only-child,
-.termos-wizard #os-oficio-lista .cv-search-picker__selected-card:last-child:nth-child(odd) {
+.document-form-page #termo-oficio-lista .cv-search-picker__selected-card,
+.document-form-page #termo-oficio-lista .cv-search-picker__selected-card:only-child,
+.document-form-page #termo-oficio-lista .cv-search-picker__selected-card:last-child:nth-child(odd),
+.document-form-page #os-oficio-lista .cv-search-picker__selected-card,
+.document-form-page #os-oficio-lista .cv-search-picker__selected-card:only-child,
+.document-form-page #os-oficio-lista .cv-search-picker__selected-card:last-child:nth-child(odd) {
   grid-column: 1 / -1;
 }
 

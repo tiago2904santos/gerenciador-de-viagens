@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block wizard_content %}
-  <div data-pt-form data-api-cidades-url="{{ api_cidades_por_estado_url }}" data-oficio-wizard-step1>
+  <div data-pt-form data-api-cidades-url="{{ api_cidades_por_estado_url }}" data-travel-document-wizard-step1>
     {% if form.non_field_errors %}
       {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
     {% endif %}
@@ -34,25 +34,25 @@
     {{ pt_textos_padrao_templates|json_script:"pt-textos-padrao-data" }}
 
     <section
-      class="cv-wizard-section-card cv-form-card cv-wizard-section-card--described oficio-step1-card termo-form-card pt-form-card"
+      class="cv-form-section-card cv-form-card cv-form-section-card--described travel-document-card pt-form-card"
       aria-labelledby="pt-identificacao-title"
     >
-      <header class="cv-wizard-section-header">
-        <div class="cv-wizard-section-header__copy">
-          <h3 class="cv-wizard-section-title" id="pt-identificacao-title">Identificação e atuação</h3>
-          <p class="cv-wizard-section-subtitle">Programa solicitante, evento e textos do documento</p>
+      <header class="cv-form-section-header">
+        <div class="cv-form-section-header__copy">
+          <h3 class="cv-form-section-title" id="pt-identificacao-title">Identificação e atuação</h3>
+          <p class="cv-form-section-subtitle">Programa solicitante, evento e textos do documento</p>
         </div>
       </header>
 
-      <div class="cv-wizard-section-body oficio-step1-body termo-form-body">
+      <div class="cv-form-section-body travel-document-body">
         {# ── 1. Programa solicitante ─────────────────────────────── #}
-        {% include "components/ui/forms/form_block.html" with element_id="pt-card-programa" section_id="pt-programa-title" extra_class="oficio-step1-block termo-block" title="Programa solicitante" description="Programa que solicitou a ação. Entra automaticamente na contextualização." body_extra_class="termo-block__body" body_template="planos_trabalho/partials/_identificacao_programa_body.html" %}
+        {% include "components/ui/forms/form_block.html" with element_id="pt-card-programa" section_id="pt-programa-title" extra_class="travel-document-block document-form-block" title="Programa solicitante" description="Programa que solicitou a ação. Entra automaticamente na contextualização." body_extra_class="termo-block__body" body_template="planos_trabalho/partials/_identificacao_programa_body.html" %}
 
         {# ── 2. Evento: período + destino ────────────────────────── #}
-        {% include "components/ui/forms/form_block.html" with element_id="pt-card-evento" section_id="pt-evento-title" extra_class="oficio-step1-block termo-block" title="Evento" description="Período, destino e horário de atendimento da ação." body_extra_class="cv-form-stack termo-evento-body" body_template="planos_trabalho/partials/_identificacao_evento_body.html" %}
+        {% include "components/ui/forms/form_block.html" with element_id="pt-card-evento" section_id="pt-evento-title" extra_class="travel-document-block document-form-block" title="Evento" description="Período, destino e horário de atendimento da ação." body_extra_class="cv-form-stack termo-evento-body" body_template="planos_trabalho/partials/_identificacao_evento_body.html" %}
 
         {# ── 3. Textos do documento ──────────────────────────────── #}
-        {% include "components/ui/forms/form_block.html" with element_id="pt-card-textos" section_id="pt-textos-title" data_hook="pt-textos" extra_class="oficio-step1-block termo-block" title="Textos do documento" description="Já preenchidos com o texto padrão a partir do destino e do programa. Edite livremente quando quiser — o que você escrever é mantido." body_extra_class="termo-block__body" body_template="planos_trabalho/partials/_identificacao_textos_body.html" %}
+        {% include "components/ui/forms/form_block.html" with element_id="pt-card-textos" section_id="pt-textos-title" data_hook="pt-textos" extra_class="travel-document-block document-form-block" title="Textos do documento" description="Já preenchidos com o texto padrão a partir do destino e do programa. Edite livremente quando quiser — o que você escrever é mantido." body_extra_class="termo-block__body" body_template="planos_trabalho/partials/_identificacao_textos_body.html" %}
       </div>
 
       <div class="cv-form-card__footer">

@@ -36,7 +36,7 @@
 
 ### Principais divergências
 
-- Wizard de ofícios: header próprio (`oficio-wizard__header`), não `header_stack_stepper` / `page-shell--wizard`.
+- Wizard de ofícios: header próprio (`travel-document-wizard__header`), não `header_stack_stepper` / `page-shell--wizard`.
 - Páginas placeholder (`planos_trabalho`, `ordens_servico`, etc.): `app-page` sem `page-shell`.
 - `termos/index.html`: título manual + botão legado (corrigido nesta auditoria).
 - `oficios-assinaturas-central.css`: dezenas de cores `#hex` e `rgba` fixos (fora de tokens).
@@ -181,7 +181,7 @@ Tema claro/escuro: **`theme.css`** (313 ocorrências de overrides); UI Lab herda
 
 - **header_stack_simple:** todos `cadastros/*/form.html`, `confirm_delete`, `configuracao/form.html`
 - **header_stack_filters:** `components/lists/list_page_standard.html`, `oficios/index.html`, `roteiros/index.html`
-- **Legado wizard:** `oficios/wizard_base.html` (`oficio-wizard__header`), `roteiros/includes/_roteiro_editor.html` (`app-page-shell--wizard`)
+- **Legado wizard:** `oficios/wizard_base.html` (`travel-document-wizard__header`), `roteiros/includes/_roteiro_editor.html` (`app-page-shell--wizard`)
 
 ### Hardcoded
 
@@ -440,7 +440,7 @@ Mapeamento função → component ideal (`components/ui/buttons/`):
 
 ### Classes exclusivas de página que deveriam ser component
 
-- `oficio-wizard__*`, `oficio-viatura-busca__*`, `assinaturas-document-card__*` (OK como módulo, mas tokenizar cores)
+- `travel-document-wizard__*`, `oficio-viatura-busca__*`, `assinaturas-document-card__*` (OK como módulo, mas tokenizar cores)
 
 ### Tokens ausentes
 
