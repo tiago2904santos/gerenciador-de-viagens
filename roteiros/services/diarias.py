@@ -256,27 +256,32 @@ def build_periods(
             }
         )
 
-    # Regra de pernoites: diárias integrais mínimas = noites fora da sede
+    # Regra da viagem única (saída da sede → retorno à sede):
+    # a diária NÃO é a soma de trechos independentes. As diárias integrais são
+    # as noites fora da sede (pernoites) e há, no máximo, UM percentual
+    # complementar (15%/30%) sobre o tempo que sobra além das noites inteiras.
+    # Nunca um complemento por trecho — do contrário a mesma viagem acumularia
+    # 15% de um trecho + 30% de outro, inflando o total.
     total_pernoites = _count_period_pernoites(periodos)
-    total_full = sum(int(p.get('n_diarias', 0) or 0) for p in periodos)
-    if total_pernoites > 0 and total_full < total_pernoites:
-        # A fração final (dia de retorno) não pode ser descartada: o tempo que
-        # sobra além das noites inteiras ainda gera um percentual complementar
-        # (15%/30%), na mesma regra usada por período em `_segment_breakdown`.
-        trip_start = periodos[0]['_period_start']
-        trip_end = periodos[-1]['_period_end']
+    trip_start = periodos[0]['_period_start']
+    trip_end = periodos[-1]['_period_end']
+
+    if total_pernoites > 0:
+        # Percentual complementar único, medido sobre a viagem inteira: o tempo
+        # que excede as noites inteiras (pode ser negativo quando o retorno se dá
+        # antes de completar o último bloco de 24h → sem complemento).
         leftover_seconds = (trip_end - trip_start).total_seconds() - (total_pernoites * 24 * 3600)
         leftover_percentual = 0
         if leftover_seconds > 6 * 3600:
             leftover_percentual = 15 if leftover_seconds <= 8 * 3600 else 30
 
         for p in periodos:
+            # Cada noite é faturada na categoria da cidade onde foi dormida.
             n_in_period = int(p.get('_pernoites_periodo', 0) or 0)
             p['n_diarias'] = n_in_period
             p['percentual_adicional'] = 0
             tabela = TABELA_DIARIAS.get(p['tipo'], TABELA_DIARIAS['INTERIOR'])
-            valor_24h = tabela['24h']
-            valor_1_servidor = valor_24h * n_in_period
+            valor_1_servidor = tabela['24h'] * n_in_period
             subtotal_novo = valor_1_servidor * servidores
             p['subtotal'] = formatar_valor_diarias(subtotal_novo)
             p['subtotal_decimal'] = subtotal_novo
@@ -291,6 +296,30 @@ def build_periods(
             alvo['percentual_adicional'] = leftover_percentual
             valor_1_servidor = (tabela['24h'] * alvo['n_diarias']) + valor_parcial
             subtotal_novo = valor_1_servidor * servidores
+            alvo['subtotal'] = formatar_valor_diarias(subtotal_novo)
+            alvo['subtotal_decimal'] = subtotal_novo
+    else:
+        # Viagem sem pernoite: também é uma única viagem. Aplica no máximo um
+        # complemento, sobre a duração total, no destino mais oneroso — em vez
+        # de somar uma fração por trecho.
+        leftover_seconds = (trip_end - trip_start).total_seconds()
+        leftover_percentual = 0
+        if leftover_seconds > 6 * 3600:
+            leftover_percentual = 15 if leftover_seconds <= 8 * 3600 else 30
+
+        for p in periodos:
+            p['n_diarias'] = 0
+            p['percentual_adicional'] = 0
+            p['subtotal'] = formatar_valor_diarias(Decimal('0.00'))
+            p['subtotal_decimal'] = Decimal('0.00')
+
+        if leftover_percentual:
+            ordem_tipo = {'INTERIOR': 0, 'CAPITAL': 1, 'BRASILIA': 2}
+            alvo = max(periodos, key=lambda p: ordem_tipo.get(p['tipo'], 0))
+            tabela = TABELA_DIARIAS.get(alvo['tipo'], TABELA_DIARIAS['INTERIOR'])
+            valor_parcial = tabela['15'] if leftover_percentual == 15 else tabela['30']
+            alvo['percentual_adicional'] = leftover_percentual
+            subtotal_novo = valor_parcial * servidores
             alvo['subtotal'] = formatar_valor_diarias(subtotal_novo)
             alvo['subtotal_decimal'] = subtotal_novo
 
