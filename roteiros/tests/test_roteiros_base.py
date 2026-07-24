@@ -99,6 +99,38 @@ class RoteirosBaseTests(TestCase):
         )
         self.assertEqual(t.roteiro, r)
 
+    def test_infer_destinos_preserva_cidade_repetida_nao_consecutiva(self):
+        # Laranjeiras -> Guarapuava -> Laranjeiras: revisitar uma cidade é
+        # legítimo e o destino repetido precisa ser preservado (senão não salva).
+        trechos = [
+            {"destino_estado_id": self.estado.pk, "destino_cidade_id": self.cidade_dest_2.pk, "destino_nome": "LONDRINA"},
+            {"destino_estado_id": self.estado.pk, "destino_cidade_id": self.cidade_dest_3.pk, "destino_nome": "MARINGA"},
+            {"destino_estado_id": self.estado.pk, "destino_cidade_id": self.cidade_dest_2.pk, "destino_nome": "LONDRINA"},
+        ]
+        destinos = roteiro_logic._infer_roteiro_destinos_from_trechos(
+            trechos, sede_estado=self.estado, sede_cidade=self.cidade_sede
+        )
+        self.assertEqual(
+            [d["cidade_id"] for d in destinos],
+            [self.cidade_dest_2.pk, self.cidade_dest_3.pk, self.cidade_dest_2.pk],
+        )
+
+    def test_infer_destinos_descarta_repeticao_consecutiva_espuria(self):
+        # Duas linhas seguidas para a mesma cidade seriam um trecho X->X (impossível);
+        # a repetição consecutiva é colapsada, mas a não-consecutiva permanece.
+        trechos = [
+            {"destino_estado_id": self.estado.pk, "destino_cidade_id": self.cidade_dest_2.pk, "destino_nome": "LONDRINA"},
+            {"destino_estado_id": self.estado.pk, "destino_cidade_id": self.cidade_dest_2.pk, "destino_nome": "LONDRINA"},
+            {"destino_estado_id": self.estado.pk, "destino_cidade_id": self.cidade_dest_3.pk, "destino_nome": "MARINGA"},
+        ]
+        destinos = roteiro_logic._infer_roteiro_destinos_from_trechos(
+            trechos, sede_estado=self.estado, sede_cidade=self.cidade_sede
+        )
+        self.assertEqual(
+            [d["cidade_id"] for d in destinos],
+            [self.cidade_dest_2.pk, self.cidade_dest_3.pk],
+        )
+
     def test_calculo_diarias_com_roteiro_salvo_sem_evento_id(self):
         r = Roteiro.objects.create(
             tipo=Roteiro.TIPO_AVULSO,
