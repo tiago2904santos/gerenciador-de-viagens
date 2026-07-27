@@ -46,11 +46,21 @@ urlpatterns = [
         name="prestacao_despacho_assinado_anexar",
     ),
     path(
+        "prestacao/<int:pc_pk>/oficio-assinado/anexar/",
+        views.prestacao_oficio_assinado_anexar,
+        name="prestacao_oficio_assinado_anexar",
+    ),
+    path(
         "servidor-prestacao/<int:ps_pk>/assinado/<str:tipo>/anexar/",
         views.prestacao_servidor_assinado_anexar,
         name="prestacao_servidor_assinado_anexar",
     ),
     path("prestacao/<int:pc_pk>/anexo/<int:anexo_pk>/excluir/", views.prestacao_documento_excluir, name="prestacao_documento_excluir"),
+    path(
+        "prestacao/<int:pc_pk>/anexo/<int:anexo_pk>/conteudo/",
+        views.prestacao_documento_conteudo,
+        name="prestacao_documento_conteudo",
+    ),
     path("servidor-prestacao/<int:ps_pk>/solicitacao/autosave/", views.prestacao_servidor_solicitacao_autosave, name="prestacao_servidor_solicitacao_autosave"),
     path("servidor-prestacao/<int:ps_pk>/comprovante/autosave/", views.prestacao_servidor_arquivo_autosave, name="prestacao_servidor_arquivo_autosave"),
     path("prestacao/<int:pc_pk>/rt/", views.rt_criar, name="rt_criar"),

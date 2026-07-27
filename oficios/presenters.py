@@ -306,7 +306,7 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None):
         header_parts.append(destino)
     if data_evento:
         header_parts.append(data_evento)
-    header_chips = []
+    header_chips = [entity_cards.chip(status_chip_tone, status_chip_label)]
     if oficio.retificado_documento:
         header_chips.append(entity_cards.chip("warning", "Retificado"))
     elif oficio.complementar_documento:

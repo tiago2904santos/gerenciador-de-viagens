@@ -311,6 +311,14 @@ def resolve_pdf_engine(
             missing_engines=(),
             install_hints=tuple(_default_install_hints()),
         )
+    if explicit in {"simple", "simple_fallback"} and _module_present("fpdf"):
+        return PdfEngineResolution(
+            attempt_chain=("simple_fallback",),
+            reason="motor explícito: simple",
+            available_engines=("simple_fallback",),
+            missing_engines=(),
+            install_hints=tuple(_default_install_hints()),
+        )
 
     avail, missing = _scan_availability()
     available = set(avail)

@@ -24,6 +24,7 @@ from documentos.services.pdf_engine import build_pdf_unavailable_message
 from documentos.services.pdf_engine import resolve_pdf_engine
 from documentos.services.types import DocumentoFormato
 from documentos.services.types import DocumentoTipo
+from documentos.services.timing import track_document_generation
 from oficios.assunto_oficio import resolver_assunto_oficio
 from oficios.documents import build_canonical_document_payload
 from oficios.docxtpl_context import build_oficio_docxtpl_context
@@ -60,7 +61,18 @@ def _as_local_date(dt):
 
 
 def _data_retorno_oficio(oficio):
-    roteiro = getattr(oficio, "roteiro", None)
+    # A prestação/relatório pode manter em memória uma instância de Ofício
+    # anterior à edição do roteiro. Releia a relação para que o documento use
+    # sempre a data efetivamente persistida, inclusive em workers assíncronos.
+    persisted = None
+    if getattr(oficio, "pk", None):
+        persisted = (
+            type(oficio).objects
+            .select_related("roteiro")
+            .filter(pk=oficio.pk)
+            .first()
+        )
+    roteiro = getattr(persisted or oficio, "roteiro", None)
     if roteiro is None:
         return None
 
@@ -290,6 +302,7 @@ def gerar_relatorio_tecnico_docx(relatorio: RelatorioTecnico, servidor_prestacao
     return render_docx_bytes(template_path=template_path, context=context)
 
 
+@track_document_generation("prestacao_gerar_relatorio_tecnico_pdf")
 def gerar_relatorio_tecnico_pdf(relatorio: RelatorioTecnico, servidor_prestacao) -> bytes:
     docx_bytes = gerar_relatorio_tecnico_docx(relatorio, servidor_prestacao)
     explicit = (getattr(settings, "DOCUMENTOS_DEFAULT_PDF_ENGINE", "auto") or "auto").strip().lower()
@@ -465,6 +478,7 @@ def gerar_oficio_prestacao_pdf(prestacao) -> bytes:
     return doc.conteudo
 
 
+@track_document_generation("prestacao_gerar_consolidado_pdf")
 def gerar_prestacao_consolidado_pdf(servidor_prestacao) -> bytes:
     """Pacote final de um servidor: ofício + despacho (compartilhados) + RT do
     servidor + diário (compartilhado) + comprovante do servidor.
@@ -493,6 +507,12 @@ def gerar_prestacao_consolidado_pdf(servidor_prestacao) -> bytes:
     from .assinatura_services import pdf_db_assinado_ou_gerado
     from .assinatura_services import pdf_rt_assinado_ou_gerado
 
+    oficio_upload_parts = _pdf_parts_from_anexos_opcional(
+        prestacao.documentos_anexos.filter(tipo=PrestacaoDocumentoAnexo.TIPO_OFICIO_ASSINADO),
+        "ofício assinado",
+    )
+    oficio_parts = oficio_upload_parts or [("ofício", gerar_oficio_prestacao_pdf(prestacao))]
+
     # RT assinado anexado pelo servidor tem prioridade sobre a versão gerada.
     rt_upload_parts = _pdf_parts_from_anexos_opcional(
         servidor_prestacao.documentos_anexos.filter(tipo=PrestacaoDocumentoAnexo.TIPO_RT_ASSINADO),
@@ -509,7 +529,7 @@ def gerar_prestacao_consolidado_pdf(servidor_prestacao) -> bytes:
 
     return _merge_pdf_parts(
         [
-            ("ofício", gerar_oficio_prestacao_pdf(prestacao)),
+            *oficio_parts,
             *despacho_parts,
             *rt_parts,
             *db_parts,

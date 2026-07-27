@@ -3,10 +3,10 @@ from django.db.models import Q
 from django.utils import timezone
 
 from core.tenancy import get_current_area
-from cadastros.models import CancelavelModel
+from core.models import CancelavelModel
 from cadastros.models import Combustivel
 from cadastros.models import Servidor
-from cadastros.models import TimeStampedModel
+from core.models import TimeStampedModel
 from cadastros.models import Unidade
 from cadastros.models import Viatura
 from core.normalizers import normalize_spaces
@@ -193,8 +193,14 @@ class Oficio(TimeStampedModel, CancelavelModel):
         from django.conf import settings
 
         resolved_year = ano or timezone.localdate().year
-        piso = max(getattr(settings, "OFICIO_NUMERO_INICIAL", {}).get(resolved_year, 0), 1)
         area = get_current_area() if area is None else area
+        configuracao = None
+        if getattr(settings, "OFICIO_NUMERACAO_USAR_CONFIGURACAO", True):
+            configuracao = ConfiguracaoNumeracaoOficio.objects.filter(
+                Q(area=area) | Q(area__isnull=True),
+                ano=resolved_year,
+            ).order_by(models.F("area_id").desc(nulls_last=True)).first()
+        piso = max(configuracao.numero_inicial if configuracao else 1, 1)
         qs = cls.objects.filter(ano=resolved_year)
         lacunas_qs = OficioNumeroLacuna.objects.filter(ano=resolved_year, numero__gte=piso)
         if area is not None:
@@ -270,6 +276,38 @@ class Oficio(TimeStampedModel, CancelavelModel):
             "valor_extenso": valor_por_extenso_ptbr(total),
             "quantidade_servidores": qtd_servidores,
         }
+
+
+class ConfiguracaoNumeracaoOficio(models.Model):
+    area = models.ForeignKey(
+        "usuarios.AreaTrabalho",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="configuracoes_numeracao_oficio",
+    )
+    ano = models.PositiveIntegerField()
+    numero_inicial = models.PositiveIntegerField(default=1)
+    atualizado_em = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-ano", "area_id"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["ano"],
+                condition=Q(area__isnull=True),
+                name="oficios_numeracao_global_ano_unique",
+            ),
+            models.UniqueConstraint(
+                fields=["area", "ano"],
+                condition=Q(area__isnull=False),
+                name="oficios_numeracao_area_ano_unique",
+            ),
+        ]
+
+    def __str__(self):
+        escopo = self.area.sigla if self.area_id else "Global"
+        return f"{escopo} · {self.ano}: inicia em {self.numero_inicial}"
 
 
 class OficioNumeroLacuna(models.Model):

@@ -94,7 +94,11 @@ def _ordem_item(ordem):
 
 
 def _convite_item(anexo):
-    arquivo_url = anexo.arquivo.url if anexo.arquivo else ""
+    arquivo_url = (
+        reverse("eventos:evento_anexo_conteudo", args=[anexo.evento_id, anexo.pk])
+        if anexo.arquivo
+        else ""
+    )
     return {
         "kind": "Convite",
         "title": anexo.titulo or anexo.get_tipo_display(),
@@ -108,7 +112,11 @@ def _convite_item(anexo):
 
 
 def _solicitacao_item(doc):
-    arquivo_url = doc.arquivo.url if doc.arquivo else ""
+    arquivo_url = (
+        reverse("eventos:solicitacao_anexo_conteudo", args=[doc.evento_id, doc.pk])
+        if doc.arquivo
+        else ""
+    )
     nome = doc.nome_original or doc.arquivo.name.split("/")[-1]
     return {
         "kind": "Solicitação",

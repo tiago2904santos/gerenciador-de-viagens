@@ -42,7 +42,10 @@ def _anexo_assinado_info(anexos, *, tipo, anexar_url, prestacao_pk):
         "assinado": True,
         "anexar_url": anexar_url,
         "nome_original": atual.nome_original or atual.arquivo.name.rsplit("/", 1)[-1],
-        "view_url": atual.arquivo.url,
+        "view_url": reverse(
+            "prestacoes_contas:prestacao_documento_conteudo",
+            args=[prestacao_pk, atual.pk],
+        ),
         "remover_url": reverse(
             "prestacoes_contas:prestacao_documento_excluir",
             args=[prestacao_pk, atual.pk],

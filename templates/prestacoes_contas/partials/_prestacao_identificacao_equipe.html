@@ -1,0 +1,5 @@
+{% include "components/ui/forms/form_block.html" with title="Identificação" description="Número, protocolo, destino e período" section_id="prestacao-identificacao-title" heading_level=form_block_heading_level variant="split" extra_class="travel-document-block oficio-documentos-block oficio-documentos-summary-section" body_template="prestacoes_contas/partials/_rt_identificacao_body.html" %}
+
+{% if not omit_equipe %}
+{% include "components/ui/forms/form_block.html" with title="Equipe" description="Servidores desta prestação" section_id="prestacao-equipe-title" heading_level=form_block_heading_level variant="split" extra_class="travel-document-block oficio-documentos-block oficio-documentos-viajantes-section" body_template=equipe_body_template|default:"prestacoes_contas/partials/_rt_equipe_body.html" %}
+{% endif %}

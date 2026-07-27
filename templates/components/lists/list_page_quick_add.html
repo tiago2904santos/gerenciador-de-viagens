@@ -36,6 +36,7 @@
         </div>
       </form>
 
+      {% if can_edit_area %}
       <form class="quick-add-inline__panel quick-add-panel" id="{{ quick_add_panel_id }}" method="post" action="{{ request.path }}" data-create-action="{{ request.path }}" hidden novalidate>
         {% csrf_token %}
         {% if quick_add_next_url %}<input type="hidden" name="next" value="{{ quick_add_next_url }}">{% endif %}
@@ -50,12 +51,15 @@
           {% endif %}
         </div>
       </form>
+      {% endif %}
     </div>
 
+    {% if can_edit_area %}
     <button class="quick-add-footer-button" type="button" data-quick-add-toggle{% if quick_add_compact %} data-quick-add-submit-when-open data-quick-add-save-label="{{ quick_add_submit_label|default:'Salvar' }}"{% endif %} aria-controls="{{ quick_add_panel_id }}" aria-expanded="{% if quick_add_form.errors %}true{% else %}false{% endif %}">
       <span class="quick-add-footer-button__icon" aria-hidden="true">+</span>
       <span class="quick-add-footer-button__label">{{ quick_add_label|default:"Cadastrar item" }}</span>
     </button>
+    {% endif %}
   </div>
 
   <div class="list-panel">

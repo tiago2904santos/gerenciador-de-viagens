@@ -27,14 +27,15 @@ class SincronizarConteudoAssinadoTests(TestCase):
 
     def _artefato(self):
         arquivo, digest = _pdf("termo.pdf")
-        return DocumentoArtefato.objects.create(
-            tipo="termo_autorizacao",
-            formato="pdf",
-            oficio=self.oficio,
-            servidor=self.ana,
-            hash_sha256=digest,
-            arquivo=arquivo,
-        )
+        with self.captureOnCommitCallbacks(execute=True):
+            return DocumentoArtefato.objects.create(
+                tipo="termo_autorizacao",
+                formato="pdf",
+                oficio=self.oficio,
+                servidor=self.ana,
+                hash_sha256=digest,
+                arquivo=arquivo,
+            )
 
     def test_cria_no_drive_quando_ainda_nao_organizado(self):
         art = self._artefato()

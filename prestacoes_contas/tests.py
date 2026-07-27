@@ -1015,12 +1015,11 @@ class RelatorioTecnicoDocumentoTests(TestCase):
             response = self.client.get(reverse("prestacoes_contas:consolidado_servidor", args=[self.ps.pk]))
 
         self.assertEqual(response.status_code, 200)
-        itens = response.context["itens_consolidado"]
-        self.assertTrue(itens[0]["status"])
-        self.assertEqual(itens[0]["value"], "despacho.pdf")
+        self.assertNotContains(response, "Conferência")
+        self.assertContains(response, "Pacote final")
         servidor_ctx = response.context["servidores"][0]
-        self.assertTrue(servidor_ctx["comprovante_resumo"]["status"])
-        self.assertEqual(servidor_ctx["comprovante_resumo"]["value"], "2 arquivos anexados")
+        self.assertEqual(servidor_ctx["nome"], self.ps.servidor.nome)
+        self.assertIn("download_url", servidor_ctx)
 
     @mock.patch("prestacoes_contas.views.gerar_prestacao_consolidado_pdf", return_value=b"%PDF-1.4\n%%EOF\n")
     def test_download_pdf_consolidado(self, _mock_pdf):

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 import enum
+import hashlib
 import json
 import uuid
 from decimal import Decimal
@@ -15,6 +16,7 @@ from django.db.models.query import QuerySet
 from django.utils import timezone
 
 from documentos.models import DocumentoArtefato
+from documentos.models import DocumentoAssinaturaVersao
 from documentos.services.exceptions import ArquivoAssinadoInvalido
 from documentos.services.facade import DocumentoGerado
 from documentos.services.timing import measure_step
@@ -133,9 +135,32 @@ def anexar_arquivo_assinado(artefato: DocumentoArtefato, upload: UploadedFile) -
     download (``access.select_artefato_pdf_fieldfile``) e no Drive.
     """
     _validar_upload_assinado(upload)
-    if artefato.arquivo_assinado:
-        artefato.arquivo_assinado.delete(save=False)
-    artefato.arquivo_assinado.save(f"assinado_{artefato.pk}.pdf", ContentFile(upload.read()), save=False)
+    raw = upload.read()
+    request = None
+    try:
+        from core.middleware import get_current_request
+
+        request = get_current_request()
+    except Exception:
+        pass
+    actor = getattr(request, "user", None)
+    if not getattr(actor, "is_authenticated", False):
+        actor = None
+    versao = DocumentoAssinaturaVersao(
+        artefato=artefato,
+        hash_sha256=hashlib.sha256(raw).hexdigest(),
+        nome_original=upload.name or "",
+        criado_por=actor,
+    )
+    versao.arquivo.save(
+        f"assinado_{artefato.pk}_{versao.pk}.pdf",
+        ContentFile(raw),
+        save=False,
+    )
+    versao.save()
+    # Compatibilidade de leitura para integrações antigas. O arquivo anterior
+    # não é apagado e permanece preservado na respectiva versão.
+    artefato.arquivo_assinado = versao.arquivo.name
     artefato.assinado_em = timezone.now()
     artefato.assinado_nome_original = upload.name or ""
     artefato.save(update_fields=["arquivo_assinado", "assinado_em", "assinado_nome_original"])
@@ -143,9 +168,23 @@ def anexar_arquivo_assinado(artefato: DocumentoArtefato, upload: UploadedFile) -
 
 
 def remover_arquivo_assinado(artefato: DocumentoArtefato) -> DocumentoArtefato:
-    """Remove o anexo assinado, voltando a servir a versão gerada pelo sistema."""
-    if artefato.arquivo_assinado:
-        artefato.arquivo_assinado.delete(save=False)
+    """Revoga a versão vigente sem apagar o arquivo probatório."""
+    versao = artefato.versoes_assinadas.filter(
+        revogada_em__isnull=True,
+    ).order_by("-criado_em").first()
+    if versao is not None:
+        request = None
+        try:
+            from core.middleware import get_current_request
+
+            request = get_current_request()
+        except Exception:
+            pass
+        actor = getattr(request, "user", None)
+        versao.revogada_em = timezone.now()
+        versao.revogada_por = actor if getattr(actor, "is_authenticated", False) else None
+        versao.save(update_fields=["revogada_em", "revogada_por"])
+    artefato.arquivo_assinado = ""
     artefato.assinado_em = None
     artefato.assinado_nome_original = ""
     artefato.save(update_fields=["arquivo_assinado", "assinado_em", "assinado_nome_original"])

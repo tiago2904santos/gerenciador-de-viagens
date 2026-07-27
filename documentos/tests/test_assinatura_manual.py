@@ -1,6 +1,7 @@
 import hashlib
 
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
@@ -10,6 +11,7 @@ from django.urls import reverse
 from cadastros.models import Cargo
 from cadastros.models import Servidor
 from documentos.models import DocumentoArtefato
+from documentos.models import DocumentoAssinaturaVersao
 from documentos.services.access import select_artefato_pdf_fieldfile
 from documentos.services.exceptions import ArquivoAssinadoInvalido
 from documentos.services.persistence import anexar_arquivo_assinado
@@ -39,6 +41,23 @@ class AnexarArquivoAssinadoServiceTests(TestCase):
         self.assertTrue(self.artefato.esta_assinado)
         self.assertIsNotNone(self.artefato.assinado_em)
         self.assertEqual(self.artefato.assinado_nome_original, "assinado.pdf")
+        self.assertEqual(self.artefato.versoes_assinadas.count(), 1)
+
+    def test_substituir_preserva_as_versoes_anteriores(self):
+        anexar_arquivo_assinado(
+            self.artefato,
+            SimpleUploadedFile("v1.pdf", _pdf_bytes(b"v1")),
+        )
+        anexar_arquivo_assinado(
+            self.artefato,
+            SimpleUploadedFile("v2.pdf", _pdf_bytes(b"v2")),
+        )
+
+        self.assertEqual(self.artefato.versoes_assinadas.count(), 2)
+        self.assertEqual(
+            self.artefato.versoes_assinadas.values("hash_sha256").distinct().count(),
+            2,
+        )
 
     def test_anexar_rejeita_extensao_errada(self):
         upload = SimpleUploadedFile("assinado.docx", _pdf_bytes(), content_type="application/pdf")
@@ -61,6 +80,18 @@ class AnexarArquivoAssinadoServiceTests(TestCase):
         self.assertFalse(self.artefato.esta_assinado)
         self.assertIsNone(self.artefato.assinado_em)
         self.assertEqual(self.artefato.assinado_nome_original, "")
+        versao = self.artefato.versoes_assinadas.get()
+        self.assertIsNotNone(versao.revogada_em)
+        self.assertTrue(versao.arquivo.storage.exists(versao.arquivo.name))
+
+    def test_versao_assinada_nao_pode_ser_excluida(self):
+        anexar_arquivo_assinado(
+            self.artefato,
+            SimpleUploadedFile("assinado.pdf", _pdf_bytes(b"imutavel")),
+        )
+
+        with self.assertRaises(ValidationError):
+            DocumentoAssinaturaVersao.objects.get().delete()
 
     def test_select_artefato_pdf_fieldfile_prefere_assinado(self):
         upload = SimpleUploadedFile("assinado.pdf", _pdf_bytes(b"assinado"), content_type="application/pdf")

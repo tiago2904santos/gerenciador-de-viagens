@@ -24,29 +24,34 @@ class ExclusaoEventoCascataTests(TestCase):
 
     def setUp(self):
         services._reset_client()
-        self.evento = Evento.objects.create(
-            titulo="Evento de teste", destino_cidade="Curitiba", data_inicio=date(2026, 7, 3),
-        )
+        with self.captureOnCommitCallbacks(execute=True):
+            self.evento = Evento.objects.create(
+                titulo="Evento de teste", destino_cidade="Curitiba", data_inicio=date(2026, 7, 3),
+            )
         self.oficio = Oficio.objects.create(evento=self.evento, assunto="Assunto teste")
         arquivo, hash_ = _pdf("oficio.pdf")
-        self.artefato = DocumentoArtefato.objects.create(
-            tipo="oficio", formato="pdf", oficio=self.oficio, evento=self.evento,
-            hash_sha256=hash_, arquivo=arquivo,
-        )
+        with self.captureOnCommitCallbacks(execute=True):
+            self.artefato = DocumentoArtefato.objects.create(
+                tipo="oficio", formato="pdf", oficio=self.oficio, evento=self.evento,
+                hash_sha256=hash_, arquivo=arquivo,
+            )
 
-    def test_excluir_evento_exclui_oficio_e_artefato(self):
+    def test_excluir_evento_exclui_oficio_e_preserva_artefato(self):
         oficio_pk, artefato_pk = self.oficio.pk, self.artefato.pk
         self.evento.delete()
         self.assertFalse(Oficio.objects.filter(pk=oficio_pk).exists())
-        self.assertFalse(DocumentoArtefato.objects.filter(pk=artefato_pk).exists())
+        artefato = DocumentoArtefato.objects.get(pk=artefato_pk)
+        self.assertIsNone(artefato.oficio_id)
+        self.assertIsNone(artefato.evento_id)
 
-    def test_excluir_evento_move_artefato_para_lixeira_no_drive(self):
+    def test_excluir_evento_preserva_artefato_no_drive(self):
         self.artefato.refresh_from_db()
         file_id = self.artefato.drive_arquivo.file_id
         self.assertTrue(file_id)
         with patch("integracoes.google_drive.services._MockClient.mover_para_lixeira") as mock_lixeira:
             self.evento.delete()
-        mock_lixeira.assert_any_call(file_id)
+        self.assertNotIn(file_id, [call.args[0] for call in mock_lixeira.call_args_list])
+        self.assertTrue(DriveArquivo.objects.filter(file_id=file_id).exists())
 
     def test_excluir_evento_move_pasta_do_evento_para_lixeira_no_drive(self):
         self.evento.refresh_from_db()
@@ -79,9 +84,10 @@ class ExclusaoDocumentoLimpaDriveTests(TestCase):
 
     def test_excluir_artefato_move_arquivo_e_remove_registro_drive(self):
         arquivo, hash_ = _pdf("plano.pdf")
-        artefato = DocumentoArtefato.objects.create(
-            tipo="plano_trabalho", formato="pdf", evento=self.evento, hash_sha256=hash_, arquivo=arquivo,
-        )
+        with self.captureOnCommitCallbacks(execute=True):
+            artefato = DocumentoArtefato.objects.create(
+                tipo="plano_trabalho", formato="pdf", evento=self.evento, hash_sha256=hash_, arquivo=arquivo,
+            )
         artefato.refresh_from_db()
         file_id = artefato.drive_arquivo.file_id
         self.assertTrue(file_id)
@@ -93,10 +99,11 @@ class ExclusaoDocumentoLimpaDriveTests(TestCase):
         self.assertFalse(DriveArquivo.objects.filter(file_id=file_id).exists())
 
     def test_excluir_evento_anexo_move_arquivo_e_remove_registro_externo(self):
-        anexo = EventoAnexo.objects.create(
-            evento=self.evento, tipo=EventoAnexo.TIPO_CONVITE,
-            arquivo=ContentFile(b"conteudo", name="convite.pdf"),
-        )
+        with self.captureOnCommitCallbacks(execute=True):
+            anexo = EventoAnexo.objects.create(
+                evento=self.evento, tipo=EventoAnexo.TIPO_CONVITE,
+                arquivo=ContentFile(b"conteudo", name="convite.pdf"),
+            )
         ct = ContentType.objects.get_for_model(EventoAnexo)
         reg = DriveArquivoExterno.objects.get(content_type=ct, object_id=anexo.pk, campo="arquivo")
         file_id = reg.file_id

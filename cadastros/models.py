@@ -8,44 +8,9 @@ from core.normalizers import normalize_digits
 from core.normalizers import normalize_plate
 from core.normalizers import normalize_spaces
 from core.normalizers import normalize_upper
+from core.models import CancelavelModel
+from core.models import TimeStampedModel
 from core.utils.masks import RG_NAO_POSSUI_CANONICAL, format_masked_display, format_placa
-
-
-class TimeStampedModel(models.Model):
-    created_at = models.DateTimeField(default=timezone.now, editable=False)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        abstract = True
-
-
-class CancelavelModel(models.Model):
-    """Mixin para documentos que podem ser cancelados (com motivo obrigatório).
-
-    Usado por Oficio, OrdemServico, PlanoTrabalho, TermoAutorizacao e Roteiro para
-    suportar tanto o cancelamento individual quanto o cascade disparado pelo
-    cancelamento do Evento ao qual estão vinculados.
-    """
-
-    cancelado = models.BooleanField("Cancelado", default=False)
-    motivo_cancelamento = models.TextField("Motivo do cancelamento", blank=True, default="")
-    cancelado_em = models.DateTimeField("Cancelado em", null=True, blank=True)
-
-    class Meta:
-        abstract = True
-
-    def cancelar(self, motivo: str) -> None:
-        motivo = (motivo or "").strip()
-        self.cancelado = True
-        self.motivo_cancelamento = motivo
-        self.cancelado_em = timezone.now()
-        self.save(update_fields=["cancelado", "motivo_cancelamento", "cancelado_em"])
-
-    def reativar(self) -> None:
-        self.cancelado = False
-        self.motivo_cancelamento = ""
-        self.cancelado_em = None
-        self.save(update_fields=["cancelado", "motivo_cancelamento", "cancelado_em"])
 
 
 class Unidade(TimeStampedModel):

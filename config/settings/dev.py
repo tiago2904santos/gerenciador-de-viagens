@@ -12,6 +12,11 @@ if "LOGIN_ENFORCED" not in os.environ:
 
 from .base import *
 
+if not FIELD_ENCRYPTION_KEYS:
+    FIELD_ENCRYPTION_KEYS = (
+        "RbJU2kb8Nz8Wp2-31RCWLqETNsn6qEBBo-bLcqdSDTE=",
+    )
+
 
 DEBUG = True
 

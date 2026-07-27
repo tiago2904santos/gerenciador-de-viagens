@@ -783,7 +783,7 @@ def _anexar_assinado_resolver(request, fallback_url, resolver):
     """
     from documentos.services.exceptions import ArquivoAssinadoInvalido
     from documentos.services.persistence import anexar_arquivo_assinado
-    from integracoes.google_drive.services import sincronizar_assinatura_manual
+    from integracoes.google_drive.services import agendar_sincronizacao_assinatura_manual
 
     upload = request.FILES.get("arquivo")
     if not upload:
@@ -798,7 +798,7 @@ def _anexar_assinado_resolver(request, fallback_url, resolver):
     except ArquivoAssinadoInvalido as exc:
         messages.error(request, str(exc))
         return redirect(_safe_next_url(request, fallback_url))
-    sincronizar_assinatura_manual(artefato)
+    agendar_sincronizacao_assinatura_manual(artefato, usuario=request.user)
     messages.success(request, "Documento assinado anexado.")
     return redirect(_safe_next_url(request, fallback_url))
 
@@ -827,10 +827,17 @@ def termo_cadastro_generico_assinado_anexar(request, pk):
 @require_POST
 def termo_cadastro_servidor_assinado_anexar(request, pk, servidor_pk):
     termo = get_object_or_404(_termo_queryset(), pk=pk)
-    servidor = get_object_or_404(Servidor, pk=servidor_pk)
-    # Aceita servidor efetivo do termo (próprio ou herdado do ofício vinculado).
-    efetivos = {s.pk for s, _oficio in termo.servidores_efetivos_com_oficio()}
-    if servidor.pk not in efetivos:
+    # Resolve somente dentro dos servidores efetivos do termo (próprios ou
+    # herdados do ofício vinculado), sem consultar um cadastro de outra área.
+    servidor = next(
+        (
+            item
+            for item, _oficio in termo.servidores_efetivos_com_oficio()
+            if item.pk == servidor_pk
+        ),
+        None,
+    )
+    if servidor is None:
         raise Http404("Servidor não pertence a este termo.")
     fallback = reverse("termos:editar", args=[termo.pk])
     return _anexar_assinado_resolver(

@@ -1,7 +1,10 @@
 import json
+from datetime import date
 
 from django.contrib.auth import get_user_model
+from django.db import connection
 from django.test import TestCase
+from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 
 from cadastros.models import Cargo
@@ -34,8 +37,40 @@ class PlanoWizardViewsTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "20/2026/ASCOM")
 
-    def test_novo_cria_rascunho_numerado_e_redireciona_para_etapa_1(self):
+    def test_index_pagina_e_mantem_orcamento_de_queries(self):
+        PlanoTrabalho.objects.bulk_create(
+            [
+                PlanoTrabalho(
+                    numero=numero,
+                    ano=2026,
+                    sufixo_numero="ASCOM",
+                    destino_estado=self.maringa.estado,
+                    destino_cidade=self.maringa,
+                    data_evento_inicio=date(2026, 6, 25),
+                    data_evento_fim=date(2026, 6, 27),
+                )
+                for numero in range(1, 26)
+            ],
+        )
+
+        with CaptureQueriesContext(connection) as queries:
+            response = self.client.get(reverse("planos_trabalho:index") + "?aba=atuais")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context["page_obj"].object_list), 20)
+        self.assertLessEqual(
+            len(queries),
+            22,
+            msg="\n".join(query["sql"] for query in queries.captured_queries),
+        )
+
+    def test_get_novo_nao_cria_rascunho(self):
         response = self.client.get(reverse("planos_trabalho:novo"))
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(PlanoTrabalho.objects.exists())
+
+    def test_post_novo_cria_rascunho_numerado_e_redireciona_para_etapa_1(self):
+        response = self.client.post(reverse("planos_trabalho:novo"))
         plano = PlanoTrabalho.objects.latest("pk")
         self.assertRedirects(
             response,

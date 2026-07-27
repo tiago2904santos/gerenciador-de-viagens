@@ -3,15 +3,10 @@
 
 {% block title %}Assinar {{ doc_label }}{% endblock %}
 
-{% block head_extra %}
-  <script>
-    window.__ASGN_WORKER__ = "{{ worker_src|escapejs }}";
-  </script>
-{% endblock %}
-
 {% block content %}
 <section class="asgn-card asgn-card--wide" id="asgn-app"
          data-pdf-url="{{ pdf_url }}"
+         data-worker-src="{{ worker_src }}"
          data-nome="{{ nome|escape }}">
   <header class="asgn-sign-head">
     <h1 class="asgn-title">Assinar {{ doc_label }}</h1>

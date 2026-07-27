@@ -2,6 +2,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
 from django.db import models
+from core.db_fields import EncryptedTextField
 
 
 class DriveCredenciais(models.Model):
@@ -15,8 +16,8 @@ class DriveCredenciais(models.Model):
         related_name="google_drive_credenciais",
         verbose_name="Usuario",
     )
-    access_token = models.TextField()
-    refresh_token = models.TextField()
+    access_token = EncryptedTextField()
+    refresh_token = EncryptedTextField()
     token_expiry = models.DateTimeField(null=True, blank=True)
     scope = models.TextField(blank=True)
     pasta_raiz_id = models.CharField(max_length=200, blank=True, default="")

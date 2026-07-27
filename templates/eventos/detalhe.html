@@ -30,7 +30,7 @@
 
     {% include "components/ui/navigation/page_stepper.html" with steps=evento_page_steps aria_label="Etapas do evento" only %}
 
-    <main class="main-form-panel main-form-panel--stack travel-document-wizard__main">
+    <div class="main-form-panel main-form-panel--stack travel-document-wizard__main">
       <div class="cv-form-section-stack cv-form-section-stack--comfortable">
         {% if etapa_atual == 1 %}
           <form method="post" class="travel-document-wizard__form" novalidate data-evento-guided-form data-api-cidades-url="{% url 'eventos:api_cidades_por_uf' uf='0' %}" data-sede-uf="{{ sede_uf }}">
@@ -146,7 +146,7 @@
           </div>
         {% endif %}
       </div>
-    </main>
+    </div>
   </div>
   {% include "components/ui/modals/delete_confirm_modal.html" %}
   {% include "components/ui/modals/cancel_reason_modal.html" with cancel_modal_hint="Um ofício cancelado deixa de gerar prestação de contas e não pode mais ser usado em novas Ordens de Serviço. Ao cancelar o evento, todos os documentos vinculados a ele também serão cancelados." %}

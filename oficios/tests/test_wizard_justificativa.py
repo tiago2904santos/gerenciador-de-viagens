@@ -45,7 +45,7 @@ class WizardJustificativaTests(TestCase):
         self.viatura.motoristas.add(self.motorista_v)
 
     def _oficio_ate_transporte(self):
-        self.client.get(reverse("oficios:novo"))
+        self.client.post(reverse("oficios:novo"))
         oficio = Oficio.objects.get()
         self.client.post(
             reverse("oficios:dados_viajantes", args=[oficio.pk]),
@@ -101,8 +101,8 @@ class WizardJustificativaTests(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "oficios/wizard_justificativa.html")
-        self.assertContains(response, "cv-form-section-card oficio-justificativa-card")
-        self.assertContains(response, "wizard-inner-section")
+        self.assertContains(response, "oficio-justificativa-card")
+        self.assertContains(response, "cv-form-block--resource")
         self.assertContains(response, "Gerenciar modelos")
         self.assertContains(response, "Justificativa")
         self.assertContains(response, "data-modelo-justificativa-select")

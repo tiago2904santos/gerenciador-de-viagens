@@ -46,7 +46,7 @@ class OficioWizardRoteiroDiariasTests(TestCase):
         self.viatura.motoristas.add(self.motorista_v)
 
     def _oficio_ate_transporte(self, servidor_pks):
-        self.client.get(reverse("oficios:novo"))
+        self.client.post(reverse("oficios:novo"))
         oficio = Oficio.objects.get()
         payload = {
             "protocolo": "12.345.678-9",

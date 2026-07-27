@@ -1,6 +1,5 @@
 import json
 import logging
-import threading
 
 from django.conf import settings
 from django.contrib import messages
@@ -293,7 +292,17 @@ def reorganizar_tudo(request):
     if sincrono:
         _executar_reorganizacao(job.pk, usuario, area)
     else:
-        threading.Thread(target=_executar_reorganizacao, args=(job.pk, usuario, area), daemon=True).start()
+        from .tasks import reorganizar_drive
+
+        try:
+            reorganizar_drive.delay(job.pk, usuario.pk, getattr(area, "pk", None))
+        except Exception:
+            job.status = DriveReorganizacaoJob.STATUS_ERRO
+            job.mensagem = "Não foi possível enviar a tarefa ao processador assíncrono."
+            job.finalizado_em = timezone.now()
+            job.save(update_fields=["status", "mensagem", "finalizado_em"])
+            messages.error(request, job.mensagem)
+            return redirect("core:perfil")
 
     messages.success(
         request,
@@ -439,7 +448,14 @@ def reprocessar_pendencias(request):
     if sincrono:
         _reprocessar_pendencias_em_thread(usuario, area)
     else:
-        threading.Thread(target=_reprocessar_pendencias_em_thread, args=(usuario, area), daemon=True).start()
+        from .tasks import reprocessar_pendencias
+
+        try:
+            reprocessar_pendencias.delay(usuario.pk, getattr(area, "pk", None))
+        except Exception:
+            logger.exception("[Drive] falha ao agendar reprocessamento de pendências")
+            messages.error(request, "Não foi possível iniciar o reenvio agora.")
+            return redirect("core:perfil")
     messages.success(
         request,
         "Reenvio das pendências iniciado em segundo plano. "

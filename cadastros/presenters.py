@@ -175,6 +175,18 @@ def apresentar_linha_lista_simples_unidade(unidade, edit_url="#", delete_url="#"
     }
 
 
+def apresentar_linha_lista_simples_cidade(cidade):
+    return {
+        "avatar": "CI",
+        "title": cidade.nome,
+        "badges": [],
+        "meta": [
+            build_meta("UF", cidade.uf),
+            build_meta("IBGE", cidade.codigo_ibge or "—"),
+        ],
+    }
+
+
 def apresentar_linha_lista_simples_estado(estado, edit_url="#", delete_url="#", delete_modal=False):
     cod = str(estado.codigo_ibge) if estado.codigo_ibge is not None else "—"
     return {

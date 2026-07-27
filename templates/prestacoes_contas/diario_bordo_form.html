@@ -4,8 +4,9 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260620-diario">
-  <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}?v=20260710-motorista">
+  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260727-diario-retorno">
+  <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}?v=20260727-diario-retorno">
+  <link rel="stylesheet" href="{% static 'css/oficios-documentos-inline.css' %}?v=20260727-order-scope">
   <link rel="stylesheet" href="{% static 'css/prestacoes-documento-preview.css' %}?v=20260621-preview">
 {% endblock %}
 
@@ -17,9 +18,11 @@
   <div class="page-shell page-shell--wizard travel-document-wizard app-wizard">
     {% include "components/ui/headers/page_header.html" with eyebrow="PRESTAÇÕES" title=page_title icon_label="PC" module_label="Prestações de Contas" back_label="Voltar à lista" back_url=back_url|default:"/prestacoes-contas/" status_label="Diário de Bordo" status_variant="draft" only %}
 
-    {% include "components/ui/navigation/page_stepper.html" with steps=wizard_page_steps only %}
+    {% if wizard_page_steps %}
+      {% include "components/ui/navigation/page_stepper.html" with steps=wizard_page_steps only %}
+    {% endif %}
 
-    <main class="main-form-panel main-form-panel--stack travel-document-wizard__main">
+    <div class="main-form-panel main-form-panel--stack travel-document-wizard__main">
       <div class="cv-form-section-stack cv-form-section-stack--comfortable">
         <form method="post"
               class="travel-document-wizard__form"
@@ -36,50 +39,55 @@
             {% include "components/ui/feedback/field_error.html" with errors=formset.non_form_errors only %}
           {% endif %}
 
-          {# CARD — Identificação (reaproveita o resumo do ofício) #}
-          {% include "components/ui/forms/form_block.html" with shell="card" section_id="diario-identificacao-title" extra_class="cv-summary-card rt-summary-card oficio-documentos-summary-section" title="Resumo do ofício" description="O cabeçalho do diário (motorista, viatura e protocolo) é montado a partir do ofício." actions_template="prestacoes_contas/partials/_diario_resumo_actions.html" body_template="prestacoes_contas/partials/_diario_resumo_body.html" %}
+          {% if diaria_info.alterada %}
+            <div class="diario-diaria-alert" role="alert">
+              <strong>Atenção:</strong> a alteração do roteiro mudou o valor da diária —
+              <span class="diario-diaria-alert__values">{{ diaria_info.valor_oficio_label }} (ofício) → {{ diaria_info.valor_ajustado_label }} (ajustado)</span>.
+              Justifique a diferença em <a href="{{ rt_url }}">Informações complementares</a> do Relatório Técnico.
+            </div>
+          {% endif %}
 
-          {# Um card solto por trecho (estilo retorno final, sem tempos) #}
-          {% for item in trechos %}
-            {% with form=item.form d=item.display %}
-              {% with ordem_str=d.ordem|stringformat:"s" %}
-                {% include "components/ui/forms/form_block.html" with shell="card" extra_class="diario-trecho-card" title="Trecho "|add:ordem_str|add:" — "|add:d.rota description="Data, horário, origem e destino vêm do roteiro. Informe KM inicial/final e a necessidade de abastecimento." body_template="prestacoes_contas/partials/_diario_trecho_body.html" %}
-              {% endwith %}
-            {% endwith %}
-          {% empty %}
-            <section class="cv-form-section-card">
-              <div class="cv-form-section-body">
-                {% include "components/ui/feedback/empty_state.html" with message="Nenhum trecho no roteiro deste ofício. Defina o roteiro do ofício para gerar o diário de bordo." only %}
+          <div data-travel-document-wizard-diario data-travel-document-wizard-documentos>
+            <section class="cv-form-section-card cv-form-card cv-form-section-card--described travel-document-card diario-wizard-card" aria-labelledby="diario-wizard-title">
+              <header class="cv-form-section-header">
+                <div class="cv-form-section-header__copy">
+                  <h3 class="cv-form-section-title" id="diario-wizard-title">Diário de bordo</h3>
+                  <p class="cv-form-section-subtitle">Resumo do ofício, trechos do roteiro e pré-visualização</p>
+                </div>
+              </header>
+
+              <div class="cv-form-section-body travel-document-body diario-wizard-body">
+                {% include "prestacoes_contas/partials/_prestacao_identificacao_equipe.html" with omit_equipe=True %}
+
+                {% include "components/ui/forms/form_block.html" with title="Motorista" description="Motorista efetivo deste diário" section_id="diario-motorista-title" variant="resource" extra_class="travel-document-block oficio-documentos-block" actions_template="prestacoes_contas/partials/_diario_motorista_actions.html" body_template="prestacoes_contas/partials/_diario_motorista_body.html" %}
+
+                {% for item in trechos %}
+                  {% with form=item.form d=item.display %}
+                    {% with ordem_str=d.ordem|stringformat:"s" %}
+                      {% include "components/ui/forms/form_block.html" with title="Trecho "|add:ordem_str|add:" — "|add:d.rota description="Dados do roteiro. Informe KM e abastecimento." variant="resource" extra_class="travel-document-block roteiro-editor__section--retorno route-section-block diario-trecho-block" body_extra_class="roteiro-editor__retorno-body" body_template="prestacoes_contas/partials/_diario_trecho_body.html" %}
+                    {% endwith %}
+                  {% endwith %}
+                {% empty %}
+                  {% include "components/ui/forms/form_block.html" with title="Trechos do roteiro" description="Defina o roteiro do ofício para gerar o diário de bordo" section_id="diario-trechos-empty-title" variant="resource" extra_class="travel-document-block roteiro-editor__section--retorno route-section-block diario-trecho-block" body_template="prestacoes_contas/partials/_diario_trechos_empty.html" %}
+                {% endfor %}
+
+                {% if trechos %}
+                  {% include "components/ui/forms/form_block.html" with title="Pré-visualização do diário" description="O PDF é gerado com os dados salvos. Reabra o card após editar para atualizar." section_id="diario-preview-title" extra_class="travel-document-block oficio-documentos-block oficio-documentos-preview-section document-inline-stack" body_extra_class="oficio-documentos-preview-section__body document-inline-stack" body_template="prestacoes_contas/partials/_diario_preview_body.html" %}
+                {% endif %}
+              </div>
+
+              <div class="cv-form-card__footer">
+                {% include "prestacoes_contas/partials/_diario_footer.html" %}
               </div>
             </section>
-          {% endfor %}
+          </div>
 
           {# Assinatura eletrônica temporariamente oculta (fluxo indisponível). #}
           {% comment %}
           {% include "components/documents/signature_card.html" with signature=assinatura next_url=assinatura_next_url only %}
           {% endcomment %}
-
-          {% if trechos %}
-            {% include "prestacoes_contas/partials/documento_preview.html" with preview_anchor="diario-preview" preview_title="Pré-visualização do diário" preview_subtitle="O PDF é gerado com os dados salvos do diário. Reabra o card após editar para atualizar." preview_doc_title="Diário de Bordo" preview_inline_url=preview_inline_url preview_pdf_url=preview_pdf_url preview_xlsx_url=preview_xlsx_url only %}
-          {% endif %}
-
-          <section class="cv-card-footer-section">
-            <div class="cv-card-footer-section__divider" aria-hidden="true"></div>
-            <footer class="cv-card-footer">
-              <div class="cv-card-footer__secondary">
-                {% include "components/ui/buttons/button.html" with href=rt_url label="Voltar ao Relatório Técnico" variant="secondary" icon="arrow-left" only %}
-              </div>
-              <div class="cv-card-footer__primary">
-                {% if trechos %}
-                  {% include "components/ui/buttons/button.html" with label="Gerar XLSX" variant="secondary" icon="download" icon_after=True type="submit" name="action" value="download_xlsx" only %}
-                  {% include "components/ui/buttons/button.html" with label="Gerar PDF" variant="secondary" icon="download" icon_after=True type="submit" name="action" value="download_pdf" only %}
-                {% endif %}
-                {% include "components/ui/buttons/button.html" with href=documentos_url label="Ir para Documentos" variant="primary" icon="arrow-right" icon_after=True only %}
-              </div>
-            </footer>
-          </section>
         </form>
       </div>
-    </main>
+    </div>
   </div>
 {% endblock %}

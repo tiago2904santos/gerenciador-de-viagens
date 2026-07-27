@@ -1,6 +1,12 @@
 from django.contrib.auth import get_user_model
+from django.contrib.contenttypes.models import ContentType
+from django.db import connection
 from django.test import TestCase
+from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
+
+from eventos.models import Evento
+from integracoes.google_drive.models import DriveSyncStatus
 
 
 class PerfilUsuarioTests(TestCase):
@@ -28,6 +34,31 @@ class PerfilUsuarioTests(TestCase):
         self.assertContains(response, "Conta e segurança")
         self.assertContains(response, "Dados pessoais")
         self.assertContains(response, "Sair do sistema")
+
+    def test_perfil_nao_faz_n_mais_um_nas_pendencias_do_drive(self):
+        self.client.force_login(self.user)
+        content_type = ContentType.objects.get_for_model(Evento)
+        eventos = Evento.objects.bulk_create(
+            [Evento(titulo=f"Evento {index}") for index in range(20)],
+        )
+        DriveSyncStatus.objects.bulk_create(
+            [
+                DriveSyncStatus(
+                    usuario=self.user,
+                    content_type=content_type,
+                    object_id=str(evento.pk),
+                    ultimo_erro="timeout",
+                )
+                for evento in eventos
+            ],
+        )
+
+        with CaptureQueriesContext(connection) as queries:
+            response = self.client.get(reverse("core:perfil"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["drive_total_pendencias"], 20)
+        self.assertLessEqual(len(queries), 25)
 
     def test_sidebar_exibe_acesso_ao_perfil_e_logout(self):
         self.client.force_login(self.user)

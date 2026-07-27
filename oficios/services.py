@@ -138,7 +138,7 @@ def resolver_roteiro_padrao_evento(evento):
     return None
 
 
-def obter_roteiro_escolhido_do_post(post, evento=None):
+def obter_roteiro_escolhido_do_post(post, evento=None, area=None):
     """Retorna o Roteiro salvo selecionado no picker, ou None (sem efeitos colaterais)."""
     if (post.get("roteiro_modo") or "").strip() != "EVENTO_EXISTENTE":
         return None
@@ -149,15 +149,23 @@ def obter_roteiro_escolhido_do_post(post, evento=None):
         return None
     if not roteiro_id:
         return None
+    area = area or getattr(evento, "area", None) or get_current_area()
     condicao = Q(tipo=Roteiro.TIPO_AVULSO)
     if evento is not None:
         condicao |= Q(evento=evento) | Q(oficios__evento=evento)
-    return Roteiro.objects.filter(condicao, pk=roteiro_id).first()
+    queryset = Roteiro.objects.filter(condicao, pk=roteiro_id)
+    if area is not None:
+        queryset = queryset.filter(area=area)
+    else:
+        queryset = queryset.filter(area__isnull=True)
+    return queryset.first()
 
 
 @transaction.atomic
 def vincular_roteiro_ao_oficio_sem_copia(oficio: Oficio, roteiro_escolhido: Roteiro, rascunho_antigo=None) -> None:
     """Vincula oficio diretamente ao roteiro existente (estado equivalente, sem alteracoes)."""
+    if oficio.area_id != roteiro_escolhido.area_id:
+        raise ValueError("Não é permitido vincular roteiro de outra área ao ofício.")
     oficio.roteiro = roteiro_escolhido
     oficio.save(update_fields=["roteiro", "updated_at"])
 
@@ -631,6 +639,7 @@ def gerar_resposta_documento_oficio(oficio, formato: DocumentoFormato):
     with measure_step(
         "oficio_gerar_resposta_documento_oficio",
         {"oficio_id": oficio.pk, "formato": formato.value},
+        track_sla=True,
     ):
         payload = build_canonical_document_payload(oficio, DocumentoTipo.OFICIO)
         docxtpl = build_oficio_docxtpl_context(oficio)
@@ -685,6 +694,7 @@ def gerar_resposta_justificativa_documento(oficio, formato: DocumentoFormato):
     with measure_step(
         "oficio_gerar_resposta_justificativa_documento",
         {"oficio_id": oficio.pk, "formato": formato.value},
+        track_sla=True,
     ):
         payload = build_justificativa_payload(oficio)
         docxtpl = build_justificativa_docxtpl_context(oficio)

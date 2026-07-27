@@ -41,7 +41,7 @@ class FilterQuerysetByAreaLegacyTests(TestCase):
 
         mw._local.request = None
 
-    def test_filtro_inclui_registros_legados_sem_area(self):
+    def test_filtro_nao_compartilha_registros_legados_sem_area(self):
         self._activate_area()
         legado = Servidor.objects.create(nome="Servidor Legado", cargo=self.cargo)
         da_area = Servidor.objects.create(nome="Servidor Area", cargo=self.cargo, area=self.area)
@@ -50,7 +50,7 @@ class FilterQuerysetByAreaLegacyTests(TestCase):
 
         qs = filter_queryset_by_area(Servidor.objects)
         ids = set(qs.values_list("pk", flat=True))
-        self.assertIn(legado.pk, ids)
+        self.assertNotIn(legado.pk, ids)
         self.assertIn(da_area.pk, ids)
         self.assertEqual(qs.filter(area=outra).count(), 0)
 
@@ -92,7 +92,7 @@ class NovoOficioEventoAreaTests(TestCase):
         self.client.force_login(self.user)
         evento = Evento.objects.create(titulo="Evento com area", area=self.area)
 
-        response = self.client.get(reverse("oficios:novo"), {"evento": evento.pk})
+        response = self.client.post(reverse("oficios:novo"), {"evento": evento.pk})
 
         self.assertEqual(response.status_code, 302)
         oficio = Oficio.objects.latest("pk")

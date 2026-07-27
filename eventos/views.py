@@ -3,6 +3,7 @@ from pathlib import Path
 from urllib.parse import urlencode
 
 from django.contrib import messages
+from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
@@ -18,6 +19,7 @@ from django.views.decorators.http import require_POST
 from cadastros.models import ConfiguracaoSistema
 from cadastros.models import Estado
 from core.normalizers import remove_accents
+from core.private_media import private_file_response
 from core.tenancy import filter_queryset_by_area
 from roteiros.selectors import listar_cidades_para_select
 
@@ -34,6 +36,7 @@ from .forms import EventoForm
 from .forms import EventoNovoCadastroForm
 from .forms import TipoEventoForm
 from .models import Evento
+from .models import EventoAnexo
 from .models import EventoDocumentoSolicitacao
 from .models import EVENTO_SOLICITACAO_EXTENSOES
 from .models import TipoEvento
@@ -212,7 +215,10 @@ def index(request):
         preserved={"q": q, "sort": sort, "viagem_de": viagem_de, "viagem_ate": viagem_ate},
     )
     has_filters = any([q, viagem_de, viagem_ate, sort])
-    cards = [apresentar_evento_list_card(evento) for evento in lista]
+    page_obj = Paginator(lista, 20).get_page(request.GET.get("page"))
+    cards = [apresentar_evento_list_card(evento) for evento in page_obj.object_list]
+    page_querystring = request.GET.copy()
+    page_querystring.pop("page", None)
 
     return render(
         request,
@@ -227,8 +233,10 @@ def index(request):
             "viagem_ate": viagem_ate,
             "sort": sort,
             "has_filters": has_filters,
-            "eventos": lista,
+            "eventos": page_obj.object_list,
             "cards": cards,
+            "page_obj": page_obj,
+            "page_querystring": page_querystring.urlencode(),
             "novo_url": reverse("eventos:novo"),
             "search_clear_url": f"{reverse('eventos:index')}?aba={aba}",
             "sort_options": [
@@ -403,8 +411,19 @@ def _garantir_termo_automatico(evento):
     )
 
 
-@require_http_methods(["GET"])
+@require_http_methods(["GET", "POST"])
 def novo(request):
+    if request.method == "GET":
+        return render(
+            request,
+            "components/create_draft.html",
+            {
+                "page_title": "Novo evento",
+                "page_description": "Confirme para iniciar o cadastro guiado do evento.",
+                "confirm_label": "Criar evento",
+                "back_url": reverse("eventos:index"),
+            },
+        )
     evento = Evento(area=getattr(request, "area", None))
     evento.save()
     return redirect("eventos:guiado_etapa", pk=evento.pk, etapa=1)
@@ -486,7 +505,7 @@ def detalhe(request, pk, etapa=1):
         {
             "id": a.pk,
             "nome": a.nome_original or a.arquivo.name.split("/")[-1],
-            "url": a.arquivo.url,
+            "url": reverse("eventos:solicitacao_anexo_conteudo", args=[evento.pk, a.pk]),
             "delete_url": reverse("eventos:excluir_solicitacao_anexo", args=[evento.pk, a.pk]),
         }
         for a in evento.documentos_solicitacao.all()
@@ -550,6 +569,22 @@ def excluir_solicitacao_anexo(request, pk, anexo_pk):
     except EventoDocumentoSolicitacao.DoesNotExist:
         messages.error(request, "Documento não encontrado.")
     return redirect("eventos:guiado_etapa", pk=pk, etapa=4)
+
+
+def solicitacao_anexo_conteudo(request, pk, anexo_pk):
+    evento = get_object_or_404(_evento_queryset(), pk=pk)
+    anexo = get_object_or_404(
+        EventoDocumentoSolicitacao,
+        pk=anexo_pk,
+        evento=evento,
+    )
+    return private_file_response(anexo.arquivo)
+
+
+def evento_anexo_conteudo(request, pk, anexo_pk):
+    evento = get_object_or_404(_evento_queryset(), pk=pk)
+    anexo = get_object_or_404(EventoAnexo, pk=anexo_pk, evento=evento)
+    return private_file_response(anexo.arquivo)
 
 
 def guiado_termos(request, pk):

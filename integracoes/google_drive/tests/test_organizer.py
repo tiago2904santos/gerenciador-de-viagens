@@ -346,10 +346,11 @@ class CancelamentoTests(TestCase):
         services._reset_client()
         self.cargo = Cargo.objects.create(nome="Investigador")
         self.ana = Servidor.objects.create(nome="Ana", cargo=self.cargo, cpf="12345678901")
-        self.evento = Evento.objects.create(
-            titulo="Evento de teste", destino_cidade="Maringá", destino_uf="PR",
-            data_inicio=date(2026, 7, 22), data_fim=date(2026, 7, 23),
-        )
+        with self.captureOnCommitCallbacks(execute=True):
+            self.evento = Evento.objects.create(
+                titulo="Evento de teste", destino_cidade="Maringá", destino_uf="PR",
+                data_inicio=date(2026, 7, 22), data_fim=date(2026, 7, 23),
+            )
         self.evento.tipos.add(TipoEvento.objects.get_or_create(nome="PCPR na Comunidade")[0])
         self.oficio = Oficio.objects.create(
             numero=1, ano=2026, protocolo="123456789", motivo="m", evento=self.evento,
@@ -485,7 +486,8 @@ class SincronizarPastaEventoTests(TestCase):
             data_fim=date(2026, 7, 3),
         )
         dados.update(overrides)
-        return Evento.objects.create(**dados)
+        with self.captureOnCommitCallbacks(execute=True):
+            return Evento.objects.create(**dados)
 
     def test_sincronizar_pasta_evento_nao_cria_pasta_sem_dados_essenciais(self):
         evento = Evento.objects.create()

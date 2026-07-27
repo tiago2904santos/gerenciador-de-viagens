@@ -78,6 +78,12 @@
     if (!url) return;
     setState(form, "saving");
     setPickerBusy(source, true);
+    if (window.CV && window.CV.documentProgress) {
+      window.CV.documentProgress.begin(source, {
+        title: "Anexando documento…",
+        detail: "Salvando o arquivo sem bloquear a página.",
+      });
+    }
     fetch(url, {
       method: "POST",
       credentials: "same-origin",
@@ -94,6 +100,9 @@
           }
           setState(form, "saved");
           applySuccessfulFileChange(source);
+          if (window.CV && window.CV.documentProgress) {
+            window.CV.documentProgress.finish(source);
+          }
           if (source && source.hasAttribute && source.hasAttribute("data-file-upload-button")) {
             window.location.reload();
           }
@@ -102,6 +111,9 @@
       .catch(function (error) {
         setState(form, "error");
         setPickerBusy(source, false);
+        if (window.CV && window.CV.documentProgress) {
+          window.CV.documentProgress.error(source, error && error.message);
+        }
         console.error("[autosave] arquivo", error);
       });
   }

@@ -218,5 +218,6 @@ class AssinaturaCardRenderTests(TestCase):
     def test_consolidado_page_mostra_secao(self):
         r = self.client.get(reverse("prestacoes_contas:consolidado_servidor", args=[self.ps.pk]))
         self.assertEqual(r.status_code, 200)
-        self.assertContains(r, "Pacote final deste servidor")
-        self.assertIn("assinatura_db", r.context)
+        self.assertContains(r, "Resumo, conferência e pacote consolidado deste servidor")
+        self.assertIn("servidores", r.context)
+        self.assertIn("assinatura_rt", r.context["servidores"][0])

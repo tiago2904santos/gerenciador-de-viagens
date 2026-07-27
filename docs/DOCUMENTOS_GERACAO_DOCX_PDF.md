@@ -75,10 +75,15 @@ Sugere ou executa comandos **no terminal** para instalar dependências Python ou
 
 Não usa `sudo` em silêncio sem avisos explícitos na saída quando aplicável.
 
-### `python manage.py documentos_unoserver_check --benchmark --max-ms 1000`
+### `python manage.py documentos_unoserver_check --benchmark --representative-resources --max-ms 1000 --iterations 3`
 
-Valida a porta e executa uma conversão real. O comando termina com erro quando
-o tempo fica acima do SLA informado; use-o após cada deploy do conversor.
+Valida a porta e executa conversões reais sem cache usando os maiores modelos
+DOCX e XLSX do sistema. O comando termina com erro quando qualquer execução
+fica acima do SLA informado; use-o após cada deploy do conversor. A CI usa três
+execuções por formato e bloqueia a entrega se alguma atingir 1 s.
+
+Conversões DOCX/XLSX idênticas usam cache por SHA-256 após a primeira execução.
+Configure `REDIS_URL` em produção para compartilhar esse cache entre workers.
 
 ## Variáveis de ambiente (referência)
 
@@ -90,6 +95,8 @@ o tempo fica acima do SLA informado; use-o após cada deploy do conversor.
 | `DOCUMENTOS_UNOSERVER_URL` | URL XML-RPC interna do unoserver persistente |
 | `DOCUMENTOS_UNOSERVER_TIMEOUT_SECONDS` | Timeout da verificação rápida do serviço |
 | `DOCUMENTOS_ENGINE_PROBE_CACHE_SECONDS` | Janela para reutilizar as sondas de disponibilidade dos motores |
+| `DOCUMENTOS_BINARY_CONVERSION_CACHE` | Reutilizar PDF convertido pela hash exata do DOCX/XLSX |
+| `DOCUMENTOS_BINARY_CACHE_SECONDS` | TTL do PDF convertido no Redis/cache Django |
 | `DOCUMENTOS_SIMPLE_PDF_FALLBACK` | Permitir PDF mínimo `fpdf2` |
 | `DOCUMENTOS_ENABLE_LIBREOFFICE` | Flag em `settings` (ex.: `deploy/docker-compose.documentos.yml`); reservada para cenários com LibreOffice em contentores |
 | `DOCUMENTOS_TMP_DIR` | Pasta temporária para conversões |

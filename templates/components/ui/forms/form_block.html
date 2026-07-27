@@ -60,7 +60,13 @@
   {% if title or description or action_label or actions_template %}
   <header class="cv-form-block__header">
     <div class="cv-form-block__copy">
-      {% if title %}<h4 class="cv-form-block__title"{% if section_id %} id="{{ section_id }}"{% endif %}>{{ title }}</h4>{% endif %}
+      {% if title %}
+        {% if heading_level == 3 %}
+          <h3 class="cv-form-block__title"{% if section_id %} id="{{ section_id }}"{% endif %}>{{ title }}</h3>
+        {% else %}
+          <h4 class="cv-form-block__title"{% if section_id %} id="{{ section_id }}"{% endif %}>{{ title }}</h4>
+        {% endif %}
+      {% endif %}
       {% if description %}<p class="cv-form-block__description">{{ description }}</p>{% endif %}
     </div>
 

@@ -22,3 +22,9 @@ class CoreConfig(AppConfig):
 
     def ready(self):
         connection_created.connect(_register_sqlite_unaccent)
+        from . import checks  # noqa: F401
+        from .audit import connect_audit_signals
+        from .tenancy import connect_area_integrity_signals
+
+        connect_audit_signals()
+        connect_area_integrity_signals()

@@ -1,0 +1,16 @@
+{# Botão de anexar/gerenciar documento assinado — requer attach_kinds no contexto. #}
+<button
+  type="button"
+  class="cv-icon-btn cv-icon-btn--sign{% if doc.assinado %} is-assinado{% endif %}"
+  aria-label="{% if doc.assinado %}Gerenciar {{ title }}{% else %}Anexar {{ title }}{% endif %}"
+  data-tooltip="{% if doc.assinado %}Gerenciar assinado{% else %}Anexar assinado{% endif %}"
+  data-attach-signed-trigger
+  data-attach-signed-reopen-key="{{ reopen_key }}"
+  data-attach-signed-initial-kind="{{ initial_kind|default:'primary' }}"
+  data-attach-signed-accept="application/pdf,image/png,image/jpeg,.pdf,.png,.jpg,.jpeg"
+  data-attach-signed-file-description="um arquivo em PDF, PNG ou JPEG"
+  data-attach-signed-file-help="Selecione um único arquivo em PDF, PNG, JPG ou JPEG."
+  data-attach-signed-choose-label="Escolher arquivo"
+  data-attach-signed-upload-label="Anexar arquivo"
+  {% include "prestacoes_contas/partials/_docs_attach_kinds_attrs.html" %}
+>{% include "components/ui/icons/icon.html" with icon="sign" only %}</button>

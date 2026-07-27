@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 
 from django.contrib import messages
+from django.core.paginator import Paginator
 from django.db.models import Max
 from django.http import Http404
 from django.http import JsonResponse
@@ -14,6 +15,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.dateparse import parse_date
 from django.views.decorators.http import require_GET
+from django.views.decorators.http import require_http_methods
 from django.views.decorators.http import require_POST
 
 from urllib.parse import urlencode
@@ -288,6 +290,14 @@ def index(request):
         "programa",
         "destino_cidade__estado",
         "coordenador_adm__cargo",
+        "coordenador_op__cargo",
+    ).prefetch_related(
+        "atividades_selecionadas",
+        "efetivos",
+        "destinos__cidade__estado",
+        "eventos__programa",
+        "eventos__destino_cidade__estado",
+        "eventos__efetivos",
     )
     if status:
         planos = planos.filter(status=status)
@@ -348,7 +358,10 @@ def index(request):
                    "viagem_de": viagem_de, "viagem_ate": viagem_ate},
     )
 
-    cards = [apresentar_plano_card(plano) for plano in lista]
+    page_obj = Paginator(lista, 20).get_page(request.GET.get("page"))
+    cards = [apresentar_plano_card(plano) for plano in page_obj.object_list]
+    page_querystring = request.GET.copy()
+    page_querystring.pop("page", None)
     has_filters = any([q, status, viagem_de, viagem_ate, sort])
     return render(
         request,
@@ -365,6 +378,8 @@ def index(request):
             "sort": sort,
             "has_filters": has_filters,
             "cards": cards,
+            "page_obj": page_obj,
+            "page_querystring": page_querystring.urlencode(),
             "create_url": reverse("planos_trabalho:novo"),
             "search_clear_url": f"{reverse('planos_trabalho:index')}?aba={aba}",
             "programas_url": reverse("planos_trabalho:programas_index"),
@@ -383,7 +398,19 @@ def index(request):
         },
     )
 
+@require_http_methods(["GET", "POST"])
 def novo(request):
+    if request.method == "GET":
+        return render(
+            request,
+            "components/create_draft.html",
+            {
+                "page_title": "Novo plano de trabalho",
+                "page_description": "Confirme para reservar a numeração e iniciar o cadastro.",
+                "confirm_label": "Criar plano",
+                "back_url": reverse("planos_trabalho:index"),
+            },
+        )
     evento = resolve_evento_from_request(request)
     plano = criar_plano_rascunho(evento=evento)
     messages.success(request, f"Plano de Trabalho {plano.numero_formatado} criado como rascunho.")

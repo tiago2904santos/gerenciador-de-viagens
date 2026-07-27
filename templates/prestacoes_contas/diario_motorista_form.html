@@ -19,7 +19,7 @@
 
     {% include "components/ui/navigation/page_stepper.html" with steps=wizard_page_steps only %}
 
-    <main class="main-form-panel main-form-panel--stack travel-document-wizard__main">
+    <div class="main-form-panel main-form-panel--stack travel-document-wizard__main">
       <div class="cv-form-section-stack cv-form-section-stack--comfortable">
         <form method="post" class="travel-document-wizard__form dmv-form"
               novalidate
@@ -44,6 +44,6 @@
           {% include "components/ui/forms/form_block.html" with shell="card" section_id="dmv-viatura-title" title="Viatura" description="Qual veículo foi usado nesta viagem?" body_template="prestacoes_contas/partials/_dmv_viatura_body.html" footer_template="prestacoes_contas/partials/_dmv_viatura_footer.html" %}
         </form>
       </div>
-    </main>
+    </div>
   </div>
 {% endblock %}

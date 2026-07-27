@@ -1,0 +1,147 @@
+from __future__ import annotations
+
+import datetime
+from decimal import Decimal
+from uuid import UUID
+
+from django.db import transaction
+
+from core.middleware import get_current_request
+
+AUDITED_APP_LABELS = {
+    "cadastros",
+    "roteiros",
+    "eventos",
+    "documentos",
+    "oficios",
+    "termos",
+    "justificativas",
+    "planos_trabalho",
+    "ordens_servico",
+    "prestacoes_contas",
+    "google_drive",
+}
+SENSITIVE_NAMES = {
+    "password",
+    "access_token",
+    "refresh_token",
+    "link_token",
+    "client_secret",
+    "assinatura_png",
+}
+
+
+def _audited(sender) -> bool:
+    return (
+        sender._meta.app_label in AUDITED_APP_LABELS
+        and sender._meta.label_lower != "core.auditevent"
+    )
+
+
+def _json_value(value):
+    if value is None or isinstance(value, (bool, int, float, str)):
+        return value
+    if isinstance(value, (datetime.date, datetime.datetime, datetime.time)):
+        return value.isoformat()
+    if isinstance(value, (Decimal, UUID)):
+        return str(value)
+    if hasattr(value, "name"):
+        return value.name
+    if hasattr(value, "pk"):
+        return value.pk
+    return str(value)
+
+
+def _snapshot(instance):
+    values = {}
+    for field in instance._meta.concrete_fields:
+        if field.name in SENSITIVE_NAMES:
+            continue
+        try:
+            values[field.name] = _json_value(field.value_from_object(instance))
+        except Exception:
+            continue
+    return values
+
+
+def capture_before_save(sender, instance, raw=False, **kwargs):
+    if raw or not _audited(sender) or not instance.pk:
+        return
+    old = sender._default_manager.filter(pk=instance.pk).first()
+    instance._audit_old = _snapshot(old) if old is not None else {}
+
+
+def _context(instance):
+    request = get_current_request()
+    user = getattr(request, "user", None)
+    actor_id = user.pk if user and user.is_authenticated else None
+    area_id = getattr(instance, "area_id", None) or getattr(
+        getattr(request, "area", None),
+        "pk",
+        None,
+    )
+    return {
+        "actor_id": actor_id,
+        "area_id": area_id,
+        "request_path": getattr(request, "path", "")[:500],
+        "request_id": getattr(request, "request_id", ""),
+    }
+
+
+def _write_event(payload):
+    from core.models import AuditEvent
+
+    AuditEvent.objects.create(**payload)
+
+
+def capture_after_save(sender, instance, created=False, raw=False, **kwargs):
+    if raw or not _audited(sender):
+        return
+    new = _snapshot(instance)
+    old = getattr(instance, "_audit_old", {})
+    if created:
+        changes = {"new": new}
+        action = "CREATE"
+    else:
+        delta = {
+            name: {"old": old.get(name), "new": value}
+            for name, value in new.items()
+            if old.get(name) != value
+        }
+        if not delta:
+            return
+        changes = delta
+        action = "UPDATE"
+    payload = {
+        **_context(instance),
+        "action": action,
+        "model_label": instance._meta.label,
+        "object_id": str(instance.pk),
+        "object_repr": str(instance)[:255],
+        "changes": changes,
+    }
+    transaction.on_commit(lambda payload=payload: _write_event(payload))
+
+
+def capture_before_delete(sender, instance, **kwargs):
+    if not _audited(sender):
+        return
+    payload = {
+        **_context(instance),
+        "action": "DELETE",
+        "model_label": instance._meta.label,
+        "object_id": str(instance.pk),
+        "object_repr": str(instance)[:255],
+        "changes": {"old": _snapshot(instance)},
+    }
+    transaction.on_commit(lambda payload=payload: _write_event(payload))
+
+
+def connect_audit_signals():
+    from django.db.models.signals import post_save
+    from django.db.models.signals import pre_delete
+    from django.db.models.signals import pre_save
+
+    pre_save.connect(capture_before_save, dispatch_uid="core.audit.pre_save")
+    post_save.connect(capture_after_save, dispatch_uid="core.audit.post_save")
+    pre_delete.connect(capture_before_delete, dispatch_uid="core.audit.pre_delete")

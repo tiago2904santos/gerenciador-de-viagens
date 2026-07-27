@@ -1,3 +1,5 @@
+import hashlib
+
 from django.db import models
 from django.db.models import Q
 from django.core.validators import FileExtensionValidator
@@ -6,6 +8,8 @@ from cadastros.models import Servidor
 from cadastros.models import Viatura
 from oficios.models import Oficio
 from roteiros.models import RoteiroTrecho
+from core.db_fields import EncryptedTextField
+from core.uploads import validate_private_document_upload
 
 
 PRESTACAO_DOCUMENTO_EXTENSOES = ["pdf", "png", "jpg", "jpeg"]
@@ -236,12 +240,14 @@ class PrestacaoServidor(models.Model):
 
 class PrestacaoDocumentoAnexo(models.Model):
     TIPO_DESPACHO = "despacho"
+    TIPO_OFICIO_ASSINADO = "oficio_assinado"
     TIPO_COMPROVANTE = "comprovante"
     TIPO_RT_ASSINADO = "rt_assinado"
     TIPO_DB_ASSINADO = "db_assinado"
 
     TIPO_CHOICES = [
         (TIPO_DESPACHO, "Despacho assinado do ofício"),
+        (TIPO_OFICIO_ASSINADO, "Ofício assinado"),
         (TIPO_COMPROVANTE, "Comprovante de saque/transferência"),
         (TIPO_RT_ASSINADO, "Relatório técnico assinado"),
         (TIPO_DB_ASSINADO, "Diário de bordo assinado"),
@@ -252,8 +258,8 @@ class PrestacaoDocumentoAnexo(models.Model):
         on_delete=models.CASCADE,
         related_name="documentos_anexos",
     )
-    # Comprovante, RT assinado (individual) e diário assinado (do motorista)
-    # apontam para o servidor; despacho é compartilhado → fica nulo (referencia
+    # Comprovante e RT assinado (individual) apontam para o servidor; despacho,
+    # ofício e diário assinados são compartilhados → ficam nulos (referenciam
     # apenas a prestação do ofício).
     servidor_prestacao = models.ForeignKey(
         PrestacaoServidor,
@@ -265,7 +271,7 @@ class PrestacaoDocumentoAnexo(models.Model):
     tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, db_index=True)
     arquivo = models.FileField(
         upload_to=prestacao_documento_anexo_upload_to,
-        validators=[FileExtensionValidator(PRESTACAO_DOCUMENTO_EXTENSOES)],
+        validators=[validate_private_document_upload],
     )
     nome_original = models.CharField(max_length=255, blank=True, default="")
     criado_em = models.DateTimeField(auto_now_add=True)
@@ -503,7 +509,8 @@ class AssinaturaDocumento(models.Model):
     status = models.CharField(max_length=12, choices=STATUS_CHOICES, default=STATUS_PENDENTE)
 
     # Link enviado ao signatário (token compartilhado entre RT/DB no "link único").
-    link_token = models.CharField(max_length=64, blank=True, default="", db_index=True)
+    link_token = EncryptedTextField(blank=True, default="")
+    link_token_hash = models.CharField(max_length=64, blank=True, default="", db_index=True)
     link_criado_em = models.DateTimeField(null=True, blank=True)
     link_expira_em = models.DateTimeField(null=True, blank=True)
 
@@ -552,6 +559,17 @@ class AssinaturaDocumento(models.Model):
 
     def __str__(self):
         return f"Assinatura {self.get_tipo_display()} — {self.prestacao_id}"
+
+    def save(self, *args, **kwargs):
+        self.link_token_hash = (
+            hashlib.sha256(self.link_token.encode("utf-8")).hexdigest()
+            if self.link_token
+            else ""
+        )
+        update_fields = kwargs.get("update_fields")
+        if update_fields is not None and "link_token" in update_fields:
+            kwargs["update_fields"] = [*set(update_fields), "link_token_hash"]
+        return super().save(*args, **kwargs)
 
     @property
     def assinada(self) -> bool:

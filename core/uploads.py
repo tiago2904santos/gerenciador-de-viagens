@@ -1,0 +1,89 @@
+from __future__ import annotations
+
+from pathlib import Path
+import re
+import subprocess
+import tempfile
+import unicodedata
+import warnings
+
+from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.core.validators import FileExtensionValidator
+
+
+def validate_private_document_upload(uploaded_file):
+    """Política central para anexos privados PDF/imagem."""
+    max_bytes = getattr(settings, "PRIVATE_UPLOAD_MAX_BYTES", 20 * 1024 * 1024)
+    if uploaded_file.size > max_bytes:
+        raise ValidationError(
+            f"O arquivo excede o limite de {max_bytes // (1024 * 1024)} MB.",
+        )
+
+    FileExtensionValidator(["pdf", "png", "jpg", "jpeg"])(uploaded_file)
+    extension = Path(uploaded_file.name).suffix.lower()
+    uploaded_file.name = normalize_upload_filename(uploaded_file.name)
+    position = uploaded_file.tell() if hasattr(uploaded_file, "tell") else 0
+    try:
+        uploaded_file.seek(0)
+        header = uploaded_file.read(16)
+        if extension == ".pdf":
+            if not header.startswith(b"%PDF-"):
+                raise ValidationError("O conteúdo não corresponde a um PDF válido.")
+        else:
+            uploaded_file.seek(0)
+            try:
+                from PIL import Image
+                from PIL import UnidentifiedImageError
+
+                with warnings.catch_warnings():
+                    warnings.simplefilter("error", Image.DecompressionBombWarning)
+                    image = Image.open(uploaded_file)
+                    image.verify()
+            except (UnidentifiedImageError, OSError, ValueError, Image.DecompressionBombWarning) as exc:
+                raise ValidationError("O conteúdo não corresponde a uma imagem válida.") from exc
+    finally:
+        uploaded_file.seek(position)
+
+    if getattr(settings, "PRIVATE_UPLOAD_REQUIRE_ANTIVIRUS", False):
+        _scan_with_clamav(uploaded_file)
+
+
+def normalize_upload_filename(filename: str) -> str:
+    path = Path(filename or "arquivo")
+    extension = path.suffix.lower()
+    stem = unicodedata.normalize("NFKD", path.stem)
+    stem = stem.encode("ascii", "ignore").decode("ascii")
+    stem = re.sub(r"[^A-Za-z0-9._-]+", "-", stem).strip("._-") or "arquivo"
+    return f"{stem[:120]}{extension}"
+
+
+def _scan_with_clamav(uploaded_file):
+    command = getattr(settings, "CLAMAV_SCAN_COMMAND", "clamdscan")
+    position = uploaded_file.tell() if hasattr(uploaded_file, "tell") else 0
+    try:
+        uploaded_file.seek(0)
+        with tempfile.NamedTemporaryFile(suffix=Path(uploaded_file.name).suffix) as temp:
+            for chunk in uploaded_file.chunks():
+                temp.write(chunk)
+            temp.flush()
+            try:
+                result = subprocess.run(
+                    [command, "--no-summary", temp.name],
+                    capture_output=True,
+                    text=True,
+                    timeout=30,
+                    check=False,
+                )
+            except (FileNotFoundError, subprocess.TimeoutExpired) as exc:
+                raise ValidationError(
+                    "O serviço antivírus está indisponível; tente novamente mais tarde.",
+                ) from exc
+            if result.returncode == 1:
+                raise ValidationError("O arquivo foi rejeitado pela verificação antivírus.")
+            if result.returncode != 0:
+                raise ValidationError(
+                    "Não foi possível concluir a verificação antivírus.",
+                )
+    finally:
+        uploaded_file.seek(position)

@@ -1,6 +1,6 @@
 from django.db import models
 
-from cadastros.models import TimeStampedModel
+from core.models import TimeStampedModel
 from core.normalizers import normalize_spaces
 from core.normalizers import normalize_upper
 

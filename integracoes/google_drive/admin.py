@@ -12,7 +12,8 @@ from integracoes.google_drive.models import (
 @admin.register(DriveCredenciais)
 class DriveCredenciaisAdmin(admin.ModelAdmin):
     list_display = ("__str__", "usuario", "scope", "token_expiry", "atualizado_em")
-    readonly_fields = ("access_token", "refresh_token", "token_expiry", "scope", "criado_em", "atualizado_em")
+    exclude = ("access_token", "refresh_token")
+    readonly_fields = ("token_expiry", "scope", "criado_em", "atualizado_em")
 
     def has_add_permission(self, request):
         return False

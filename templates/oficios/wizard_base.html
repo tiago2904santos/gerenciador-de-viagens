@@ -9,7 +9,7 @@
 
     {% include "components/ui/navigation/page_stepper.html" with steps=wizard_page_steps only %}
 
-    <main class="main-form-panel main-form-panel--stack travel-document-wizard__main">
+    <div class="main-form-panel main-form-panel--stack travel-document-wizard__main">
       <div class="cv-form-section-stack cv-form-section-stack--comfortable">
         {% if wizard_use_outer_form != False %}
           <form
@@ -33,7 +33,7 @@
           </form>
         {% endif %}
       </div>
-    </main>
+    </div>
   </div>
 
   {% block wizard_modals %}{% endblock %}

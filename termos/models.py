@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from django.db import models
 
-from cadastros.models import CancelavelModel
+from core.models import CancelavelModel
 from cadastros.models import Cidade
 from cadastros.models import Estado
 from cadastros.models import Servidor
-from cadastros.models import TimeStampedModel
+from core.models import TimeStampedModel
 from cadastros.models import Viatura
 from oficios.models import Oficio
 

@@ -90,10 +90,11 @@ class SignalRetryTests(TestCase):
             ) as organizar_mock, patch(
                 "integracoes.google_drive.tasks.processar_artefato.delay"
             ) as delay_mock:
-                art = DocumentoArtefato.objects.create(
-                    tipo="oficio", formato="pdf", oficio=self.oficio,
-                    hash_sha256=digest, arquivo=arquivo,
-                )
+                with self.captureOnCommitCallbacks(execute=True):
+                    art = DocumentoArtefato.objects.create(
+                        tipo="oficio", formato="pdf", oficio=self.oficio,
+                        hash_sha256=digest, arquivo=arquivo,
+                    )
         finally:
             core_middleware._local.request = None
 
@@ -114,10 +115,11 @@ class SignalRetryTests(TestCase):
             ), patch(
                 "integracoes.google_drive.organizer.organizar_artefato"
             ) as organizar_mock:
-                art = DocumentoArtefato.objects.create(
-                    tipo="oficio", formato="pdf", oficio=self.oficio,
-                    hash_sha256=digest, arquivo=arquivo,
-                )
+                with self.captureOnCommitCallbacks(execute=True):
+                    art = DocumentoArtefato.objects.create(
+                        tipo="oficio", formato="pdf", oficio=self.oficio,
+                        hash_sha256=digest, arquivo=arquivo,
+                    )
         finally:
             core_middleware._local.request = None
 
@@ -136,10 +138,11 @@ class SignalRetryTests(TestCase):
         core_middleware._local.request = request
         try:
             with patch("integracoes.google_drive.tasks.processar_artefato.delay"):
-                DocumentoArtefato.objects.create(
-                    tipo="oficio", formato="pdf", oficio=self.oficio,
-                    hash_sha256=digest, arquivo=arquivo,
-                )
+                with self.captureOnCommitCallbacks(execute=True):
+                    DocumentoArtefato.objects.create(
+                        tipo="oficio", formato="pdf", oficio=self.oficio,
+                        hash_sha256=digest, arquivo=arquivo,
+                    )
         finally:
             core_middleware._local.request = None
 
@@ -158,10 +161,11 @@ class SignalRetryTests(TestCase):
                 "integracoes.google_drive.tasks.processar_artefato.delay",
                 side_effect=ConnectionRefusedError("sem broker"),
             ):
-                art = DocumentoArtefato.objects.create(
-                    tipo="oficio", formato="pdf", oficio=self.oficio,
-                    hash_sha256=digest, arquivo=arquivo,
-                )
+                with self.captureOnCommitCallbacks(execute=True):
+                    art = DocumentoArtefato.objects.create(
+                        tipo="oficio", formato="pdf", oficio=self.oficio,
+                        hash_sha256=digest, arquivo=arquivo,
+                    )
         finally:
             core_middleware._local.request = None
 

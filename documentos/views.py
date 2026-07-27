@@ -138,9 +138,9 @@ def artefato_assinado_anexar(request, pk):
     except ArquivoAssinadoInvalido as exc:
         messages.error(request, str(exc))
         return redirect(_safe_next_url(request, fallback))
-    from integracoes.google_drive.services import sincronizar_assinatura_manual
+    from integracoes.google_drive.services import agendar_sincronizacao_assinatura_manual
 
-    sincronizar_assinatura_manual(artefato)
+    agendar_sincronizacao_assinatura_manual(artefato, usuario=request.user)
     messages.success(request, "Documento assinado anexado.")
     return redirect(_safe_next_url(request, fallback))
 
@@ -151,9 +151,8 @@ def artefato_assinado_remover(request, pk):
     ensure_request_may_view_artefato_pdf(request, artefato)
     fallback = _artefato_fallback_url(artefato)
     remover_arquivo_assinado(artefato)
-    from integracoes.google_drive.services import sincronizar_assinatura_manual
+    from integracoes.google_drive.services import agendar_sincronizacao_assinatura_manual
 
-    sincronizar_assinatura_manual(artefato)
+    agendar_sincronizacao_assinatura_manual(artefato, usuario=request.user)
     messages.success(request, "Documento assinado removido.")
     return redirect(_safe_next_url(request, fallback))
-

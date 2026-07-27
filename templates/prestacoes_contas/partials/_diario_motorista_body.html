@@ -1,0 +1,22 @@
+<section class="oficio-documentos-admin-facts" aria-label="Motorista do diário">
+  <div class="oficio-documentos-card__body">
+    <dl class="oficio-documentos-facts oficio-documentos-facts--admin">
+      <div class="oficio-documentos-fact diario-motorista-fact">
+        <dt>Motorista</dt>
+        <dd>
+          <span>{{ motorista_resumo.nome }}</span>
+          {% if motorista_resumo.cpf %}<span class="diario-motorista-fact__cpf">CPF {{ motorista_resumo.cpf }}</span>{% endif %}
+        </dd>
+      </div>
+      <div class="oficio-documentos-fact diario-motorista-fact">
+        <dt>Origem do motorista</dt>
+        <dd>
+          <span>{{ motorista_resumo.origem }}</span>
+          {% if motorista_resumo.alterado %}
+            {% include "components/ui/badges/chip.html" with label="Alterado" tone="warning" size="compact" only %}
+          {% endif %}
+        </dd>
+      </div>
+    </dl>
+  </div>
+</section>

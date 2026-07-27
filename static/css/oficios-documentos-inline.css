@@ -12,31 +12,33 @@
   order: 0;
 }
 
-.oficio-documentos-summary-section {
+/* Ordem visual só na etapa Documentos do ofício (preview no DOM primeiro).
+   RT/Diário reutilizam as mesmas classes sem reordenar. */
+.oficio-documentos-unified-card .oficio-documentos-summary-section {
   order: 10;
 }
 
-.oficio-documentos-viajantes-section {
+.oficio-documentos-unified-card .oficio-documentos-viajantes-section {
   order: 12;
 }
 
-.oficio-documentos-viatura-section {
+.oficio-documentos-unified-card .oficio-documentos-viatura-section {
   order: 14;
 }
 
-.oficio-documentos-route-section {
+.oficio-documentos-unified-card .oficio-documentos-route-section {
   order: 20;
 }
 
-.oficio-documentos-justification-section {
+.oficio-documentos-unified-card .oficio-documentos-justification-section {
   order: 30;
 }
 
-.oficio-documentos-preview-section {
+.oficio-documentos-unified-card .oficio-documentos-preview-section {
   order: 40;
 }
 
-.travel-document-wizard__form:has(.oficio-documentos-preview-section) .travel-document-wizard__actions {
+.travel-document-wizard__form:has(.oficio-documentos-unified-card .oficio-documentos-preview-section) .travel-document-wizard__actions {
   order: 50;
 }
 

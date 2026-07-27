@@ -364,7 +364,27 @@ sudo systemctl enable --now gerenciador-viagens-unoserver
 sudo systemctl restart gerenciador-viagens gerenciador-viagens-celery
 cd /var/www/gerenciador-viagens/app
 source /var/www/gerenciador-viagens/venv/bin/activate
-python manage.py documentos_unoserver_check --benchmark --max-ms 1000
+python manage.py documentos_unoserver_check \
+  --benchmark --representative-resources --max-ms 1000 --iterations 3
+```
+
+Gere uma chave de criptografia para os tokens OAuth e salve-a no `.env`
+(nunca no banco ou no repositório):
+
+```bash
+python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+# FIELD_ENCRYPTION_KEYS=cole_a_chave_aqui
+```
+
+Para rotação sem indisponibilidade, informe `chave_nova,chave_antiga`, execute
+as migrações e, depois de recriptografar os registros, remova a chave antiga.
+
+Os uploads privados exigem antivírus em produção. Instale e habilite o ClamAV:
+
+```bash
+sudo apt-get install -y clamav-daemon
+sudo systemctl enable --now clamav-daemon
+clamdscan --version
 ```
 
 Não exponha a porta 2003 no firewall ou no Nginx; o protocolo não possui
@@ -395,8 +415,15 @@ server {
         add_header Cache-Control "public, immutable";
     }
 
-    location /media/ {
+    # Nunca exponha /media/ diretamente. O Django autoriza o usuário/área e,
+    # depois disso, delega a transferência ao Nginx por X-Accel-Redirect.
+    location /_protected_media/ {
+        internal;
         alias /var/www/gerenciador-viagens/media/;
+    }
+
+    location /media/ {
+        return 404;
     }
 
     location / {

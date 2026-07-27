@@ -11,7 +11,7 @@
   <div class="page-shell page-shell--standard">
     {% include "components/ui/headers/page_header.html" with eyebrow="Administração" title=page_title description=page_description icon_label="AD" module_label="Administração" status_label="Acesso administrativo" status_variant="pending" only %}
 
-    <main class="main-form-panel main-form-panel--stack">
+    <div class="main-form-panel main-form-panel--stack">
       <div class="cv-form-section-stack cv-form-section-stack--comfortable">
 
         <section class="admin-overview" aria-label="Resumo administrativo">
@@ -40,6 +40,6 @@
 
         {% include "components/ui/forms/form_block.html" with shell="card" section_id="admin-card-conferencia-title" title="Conferência de acessos" description="Consulte áreas cadastradas e permissões existentes." body_template="usuarios/partials/_admin_conferencia_body.html" %}
       </div>
-    </main>
+    </div>
   </div>
 {% endblock %}

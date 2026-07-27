@@ -1157,6 +1157,7 @@ def gerar_plano_documento(plano: PlanoTrabalho, formato: DocumentoFormato):
     with measure_step(
         "plano_trabalho_gerar_documento",
         {"plano_id": plano.pk, "formato": formato.value},
+        track_sla=True,
     ):
         contexto = build_plano_docxtpl_context(plano)
         payload = {"institucional": build_configuracao_context(), "plano": contexto}

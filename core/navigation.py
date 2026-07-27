@@ -8,87 +8,62 @@ from django.urls import reverse
 NAVIGATION_ITEMS = [
     {"id": "dashboard", "label": "Dashboard", "url_name": "core:dashboard", "icon": "DG"},
     {
-        "id": "perfil",
-        "label": "Perfil",
-        "url_name": "core:perfil",
-        "icon": "PF",
-        "active_when": ["core:perfil"],
-        "auth_only": True,
+        "id": "planejamento",
+        "label": "Planejamento",
+        "icon": "PL",
+        "active_when": ["eventos:", "roteiros:", "planos_trabalho:", "ordens_servico:"],
+        "children": [
+            {"id": "eventos", "label": "Eventos", "url_name": "eventos:index", "active_when": ["eventos:"]},
+            {"id": "roteiros", "label": "Roteiros", "url_name": "roteiros:index", "active_when": ["roteiros:"]},
+            {"id": "planos", "label": "Planos de Trabalho", "url_name": "planos_trabalho:index", "active_when": ["planos_trabalho:"]},
+            {"id": "ordens", "label": "Ordens de Serviço", "url_name": "ordens_servico:index", "active_when": ["ordens_servico:"]},
+        ],
     },
     {
-        "id": "usuarios",
-        "label": "Admin",
-        "url_name": "usuarios:index",
-        "icon": "US",
-        "active_when": ["usuarios:"],
-        "staff_only": True,
+        "id": "documentos-operacionais",
+        "label": "Documentos",
+        "icon": "DC",
+        "active_when": ["oficios:", "termos:", "justificativas:"],
+        "children": [
+            {"id": "oficios", "label": "Ofícios", "url_name": "oficios:index", "active_when": ["oficios:"]},
+            {"id": "termos", "label": "Termos", "url_name": "termos:index", "active_when": ["termos:"]},
+            {"id": "justificativas", "label": "Justificativas", "url_name": "justificativas:index", "active_when": ["justificativas:"]},
+        ],
     },
     {
-        "id": "cadastros",
-        "label": "Cadastros",
-        "url_name": "cadastros:servidores_index",
-        "icon": "CD",
-        "active_when": ["cadastros:"],
+        "id": "execucao",
+        "label": "Execução e prestação",
+        "icon": "EX",
+        "active_when": ["prestacoes_contas:"],
         "children": [
             {
-                "id": "cadastros-servidores",
-                "label": "Servidores",
-                "url_name": "cadastros:servidores_index",
-                "active_when": ["cadastros:servidor_", "cadastros:servidores_index"],
-            },
-            {
-                "id": "cadastros-cargos",
-                "label": "Cargos",
-                "url_name": "cadastros:cargos_index",
-                "active_when": ["cadastros:cargo_", "cadastros:cargos_index"],
-            },
-            {
-                "id": "cadastros-viaturas",
-                "label": "Viaturas",
-                "url_name": "cadastros:viaturas_index",
-                "active_when": ["cadastros:viatura_", "cadastros:viaturas_index"],
-            },
-            {
-                "id": "cadastros-combustiveis",
-                "label": "Combustíveis",
-                "url_name": "cadastros:combustiveis_index",
-                "active_when": [
-                    "cadastros:combustivel_",
-                    "cadastros:combustiveis_index",
-                ],
-            },
-            {
-                "id": "cadastros-unidades",
-                "label": "Unidades",
-                "url_name": "cadastros:unidades_index",
-                "active_when": ["cadastros:unidade_", "cadastros:unidades_index"],
-            },
-            {
-                "id": "cadastros-configuracao",
-                "label": "Configurações",
-                "url_name": "cadastros:configuracao",
-                "active_when": ["cadastros:configuracao"],
+                "id": "prestacoes",
+                "label": "Prestações de Contas",
+                "url_name": "prestacoes_contas:index",
+                "active_when": ["prestacoes_contas:"],
             },
         ],
     },
-    {"id": "roteiros", "label": "Roteiros", "url_name": "roteiros:index", "icon": "RT"},
-    {"id": "eventos", "label": "Eventos", "url_name": "eventos:index", "icon": "EV", "active_when": ["eventos:"]},
-    {"id": "oficios", "label": "Ofícios", "url_name": "oficios:index", "icon": "OF"},
-    {"id": "termos", "label": "Termos", "url_name": "termos:index", "icon": "TM"},
-    {"id": "ordens_servico", "label": "Ordens de Serviço", "url_name": "ordens_servico:index", "icon": "OS", "active_when": ["ordens_servico:"]},
-    {"id": "planos_trabalho", "label": "Planos de Trabalho", "url_name": "planos_trabalho:index", "icon": "PT", "active_when": ["planos_trabalho:"]},
     {
-        "id": "justificativas",
-        "label": "Justificativas",
-        "url_name": "justificativas:index",
-        "icon": "JS",
-    },
-    {
-        "id": "prestacoes_contas",
-        "label": "Prestações de Contas",
-        "url_name": "prestacoes_contas:index",
-        "icon": "PC",
-        "active_when": ["prestacoes_contas:"],
+        "id": "administracao",
+        "label": "Administração",
+        "icon": "AD",
+        "active_when": ["cadastros:", "usuarios:"],
+        "children": [
+            {"id": "servidores", "label": "Servidores", "url_name": "cadastros:servidores_index", "active_when": ["cadastros:servidor_", "cadastros:servidores_index"]},
+            {"id": "cargos", "label": "Cargos", "url_name": "cadastros:cargos_index", "active_when": ["cadastros:cargo_", "cadastros:cargos_index"]},
+            {"id": "viaturas", "label": "Viaturas", "url_name": "cadastros:viaturas_index", "active_when": ["cadastros:viatura_", "cadastros:viaturas_index"]},
+            {"id": "combustiveis", "label": "Combustíveis", "url_name": "cadastros:combustiveis_index", "active_when": ["cadastros:combustivel_", "cadastros:combustiveis_index"]},
+            {"id": "unidades", "label": "Unidades", "url_name": "cadastros:unidades_index", "active_when": ["cadastros:unidade_", "cadastros:unidades_index"]},
+            {"id": "configuracao", "label": "Configurações", "url_name": "cadastros:configuracao", "active_when": ["cadastros:configuracao"]},
+            {
+                "id": "usuarios",
+                "label": "Usuários e áreas",
+                "url_name": "usuarios:index",
+                "active_when": ["usuarios:"],
+                "staff_only": True,
+            },
+        ],
     },
 ]
 
@@ -108,30 +83,29 @@ def build_navigation(request):
     current_view_name = ""
     if request.resolver_match:
         current_view_name = request.resolver_match.view_name or ""
-
     return [
-        _build_item(item, current_view_name)
+        _build_item(item, current_view_name, request)
         for item in NAVIGATION_ITEMS
         if _is_visible_for_request(item, request)
     ]
 
 
-def _build_item(item, current_view_name):
+def _build_item(item, current_view_name, request):
     built_item = deepcopy(item)
     built_item["url"] = _resolve_url(built_item.get("url_name"))
-
-    children = [_build_item(child, current_view_name) for child in built_item.get("children", [])]
+    children = [
+        _build_item(child, current_view_name, request)
+        for child in built_item.get("children", [])
+        if _is_visible_for_request(child, request)
+    ]
     built_item["children"] = children
-
     is_active = _matches_current_view(built_item, current_view_name)
     has_active_child = any(child["is_active"] or child["is_open"] for child in children)
-
     built_item["is_current"] = is_active
     built_item["is_active"] = is_active or has_active_child
     built_item["is_open"] = has_active_child
     built_item["has_children"] = bool(children)
     built_item["children_id"] = f"sidebar-children-{built_item['id']}"
-
     return built_item
 
 
@@ -148,7 +122,6 @@ def _matches_current_view(item, current_view_name):
     url_name = item.get("url_name")
     if url_name and current_view_name == url_name:
         return True
-
     return any(current_view_name.startswith(prefix) for prefix in item.get("active_when", []))
 
 

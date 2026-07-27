@@ -13,6 +13,7 @@
   {% endif %}
 
   <div class="list-panel">
+    {% include "components/ui/lists/pagination.html" %}
     <div class="cv-card-grid" data-cv-list-container>
       {% for card in cards %}
         {% include card_template with card=card csrf_token=csrf_token current_url=request.get_full_path only %}
@@ -40,7 +41,7 @@
     {% include "components/ui/modals/attach_signed_modal.html" %}
   {% endif %}
 
-  {% if action_label and action_url %}
+  {% if action_label and action_url and can_edit_area %}
     {% include "components/ui/buttons/floating_action.html" with href=action_url label=action_label variant="primary" icon="plus" aria_label=action_aria_label|default:action_label only %}
   {% endif %}
 

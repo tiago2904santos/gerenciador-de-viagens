@@ -33,4 +33,10 @@ def render_pdf_bytes_weasyprint(
         css_path = resolve_stylesheet_path(rel)
         if css_path.exists():
             stylesheets.append(CSS(filename=str(css_path)))
-    return HTML(string=html_string, base_url=base_url).write_pdf(stylesheets=stylesheets)
+    # Não habilitar dicas de apresentação vindas do HTML. Além de os nossos
+    # templates não dependerem disso, essa opção reduz a superfície de ataque
+    # ao renderizar conteúdo preenchido por usuários.
+    return HTML(string=html_string, base_url=base_url).write_pdf(
+        stylesheets=stylesheets,
+        presentational_hints=False,
+    )

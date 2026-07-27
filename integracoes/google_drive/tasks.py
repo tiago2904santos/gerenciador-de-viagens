@@ -1,15 +1,17 @@
-"""Tarefas Celery de retry em segundo plano para uploads ao Drive.
+"""Tarefas Celery em segundo plano para uploads ao Drive.
 
-Disparadas por ``signals.py`` quando a tentativa síncrona (a que roda dentro
-do próprio request, ao salvar o objeto) falha. Cada tarefa é idempotente
-(delega para as mesmas funções de ``organizer`` usadas no caminho síncrono) e
-tenta de novo automaticamente, com backoff exponencial, até ``_RETRY_MAX``
-vezes — depois disso, o objeto continua marcado como pendência (ver
-``status.py``) até um reenvio manual (botão "Tentar novamente" ou os comandos
-``gdrive_upload_pendentes``/"Reorganizar tudo").
+Os signals agendam estas tarefas somente depois do commit: a API do Google
+Drive nunca participa do tempo de resposta que salva ou anexa um arquivo.
+Cada tarefa é idempotente e tenta novamente com backoff exponencial até
+``_RETRY_MAX`` vezes. Depois disso, o objeto permanece marcado como pendente
+para reenvio manual.
 """
 
 from __future__ import annotations
+
+from datetime import timedelta
+
+from django.utils import timezone
 
 try:
     from celery import shared_task
@@ -67,6 +69,23 @@ def processar_artefato(self, artefato_id: int, usuario_id=None) -> None:
 
 
 @shared_task(**_TASK_KWARGS)
+def sincronizar_assinatura_manual(self, artefato_id: int, usuario_id=None) -> None:
+    from documentos.models import DocumentoArtefato
+
+    artefato = DocumentoArtefato.objects.filter(pk=artefato_id).first()
+    if artefato is None:
+        status.limpar_pendencia_orfa(DocumentoArtefato, artefato_id)
+        return
+    usuario = _usuario_por_id(usuario_id)
+    with organizer.usar_usuario(usuario):
+        status.executar_e_rastrear(
+            organizer.sincronizar_conteudo_assinado,
+            artefato,
+            usuario=usuario,
+        )
+
+
+@shared_task(**_TASK_KWARGS)
 def processar_prestacao(self, prestacao_id: int, usuario_id=None) -> None:
     from prestacoes_contas.models import PrestacaoContas
 
@@ -115,3 +134,63 @@ def processar_sincronizar_pasta_evento(self, evento_id: int, usuario_id=None) ->
     usuario = _usuario_por_id(usuario_id)
     with organizer.usar_usuario(usuario):
         status.executar_e_rastrear(organizer.sincronizar_pasta_evento, evento, usuario=usuario)
+
+
+@shared_task(**_TASK_KWARGS)
+def organizar_oficio(self, oficio_id: int, usuario_id=None) -> None:
+    from oficios.models import Oficio
+
+    oficio = Oficio.objects.filter(pk=oficio_id).first()
+    if oficio is None:
+        return
+    usuario = _usuario_por_id(usuario_id)
+    with organizer.usar_usuario(usuario):
+        status.executar_e_rastrear(organizer.organizar_oficio, oficio, usuario=usuario)
+
+
+@shared_task(**_TASK_KWARGS)
+def organizar_evento(self, evento_id: int, usuario_id=None) -> None:
+    from eventos.models import Evento
+
+    evento = Evento.objects.filter(pk=evento_id).first()
+    if evento is None:
+        return
+    usuario = _usuario_por_id(usuario_id)
+    with organizer.usar_usuario(usuario):
+        status.executar_e_rastrear(organizer.organizar_evento, evento, usuario=usuario)
+
+
+@shared_task(**_TASK_KWARGS)
+def reorganizar_drive(self, job_id: int, usuario_id=None, area_id=None) -> None:
+    from usuarios.models import AreaTrabalho
+    from .views import _executar_reorganizacao
+
+    usuario = _usuario_por_id(usuario_id)
+    area = AreaTrabalho.objects.filter(pk=area_id).first() if area_id else None
+    _executar_reorganizacao(job_id, usuario, area)
+
+
+@shared_task(**_TASK_KWARGS)
+def reprocessar_pendencias(self, usuario_id=None, area_id=None) -> None:
+    from usuarios.models import AreaTrabalho
+    from .views import _reprocessar_pendencias_em_thread
+
+    usuario = _usuario_por_id(usuario_id)
+    area = AreaTrabalho.objects.filter(pk=area_id).first() if area_id else None
+    _reprocessar_pendencias_em_thread(usuario, area)
+
+
+@shared_task
+def marcar_reorganizacoes_orfas(max_age_minutes: int = 30) -> int:
+    """Encerra jobs abandonados sem consultar o banco no startup do Django."""
+    from .models import DriveReorganizacaoJob
+
+    limite = timezone.now() - timedelta(minutes=max(1, max_age_minutes))
+    return DriveReorganizacaoJob.objects.filter(
+        status=DriveReorganizacaoJob.STATUS_EM_ANDAMENTO,
+        iniciado_em__lt=limite,
+    ).update(
+        status=DriveReorganizacaoJob.STATUS_ERRO,
+        finalizado_em=timezone.now(),
+        mensagem="Processamento interrompido antes da conclusão.",
+    )

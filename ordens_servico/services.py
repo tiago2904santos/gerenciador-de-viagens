@@ -18,6 +18,7 @@ from documentos.services.persistence import persist_geracao
 from documentos.services.resources_paths import resolve_resource_docx
 from documentos.services.responses import build_download_response
 from documentos.services.timing import measure_step
+from documentos.services.timing import track_document_generation
 from documentos.services.types import DocumentoFormato
 from documentos.services.types import DocumentoTipo
 
@@ -61,6 +62,7 @@ def gerar_resposta_ordem_servico_documento(oficio: Oficio, formato: DocumentoFor
     with measure_step(
         "ordem_servico_gerar_resposta_documento",
         {"oficio_id": oficio.pk, "formato": formato.value},
+        track_sla=True,
     ):
         payload = build_canonical_document_payload(oficio, DocumentoTipo.ORDEM_SERVICO)
         reference = f"{oficio.numero_formatado.replace('/', '-')}-ordem-servico"
@@ -118,6 +120,7 @@ def gerar_resposta_ordem_servico_documento(oficio: Oficio, formato: DocumentoFor
         return response
 
 
+@track_document_generation("ordem_servico_gerar_docx")
 def gerar_os_docx_response(ordem: OrdemServico):
     """Gera e retorna HttpResponse com o DOCX da Ordem de Serviço."""
     ctx = build_os_docxtpl_context(ordem)
@@ -173,6 +176,7 @@ def _persistir_ordem_servico_artefato(
         logger.warning("Não foi possível persistir artefato da ordem de serviço.", exc_info=True)
 
 
+@track_document_generation("ordem_servico_gerar_pdf")
 def gerar_os_pdf_response(ordem: OrdemServico):
     """Gera e retorna HttpResponse com o PDF da Ordem de Serviço."""
     ctx = build_os_docxtpl_context(ordem)

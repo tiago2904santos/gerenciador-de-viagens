@@ -3,7 +3,7 @@
 <section class="cv-form-section-card gdrive-card" aria-labelledby="perfil-card-gdrive-title">
   <header class="cv-form-section-header">
     <div class="cv-form-section-header__copy">
-      <h3 class="cv-form-section-title" id="perfil-card-gdrive-title">Google Drive</h3>
+      <h2 class="cv-form-section-title" id="perfil-card-gdrive-title">Google Drive</h2>
       <p class="cv-form-section-subtitle">
         Conecte sua conta Google para salvar e organizar os documentos automaticamente no Drive.
         A conexão é individual por usuário institucional.
@@ -37,7 +37,7 @@
           </svg>
         </span>
         <div class="gdrive-block__headtext">
-          <h4 class="gdrive-block__title" id="gdrive-conta-section">Conta Google</h4>
+          <h3 class="gdrive-block__title" id="gdrive-conta-section">Conta Google</h3>
           <p class="gdrive-block__sub">
             {% if drive_autorizado and drive_creds %}Tokens armazenados e renovados automaticamente.{% else %}Nenhuma conta conectada ainda.{% endif %}
           </p>
@@ -208,7 +208,7 @@
           <div class="gdrive-subsection">
             <div class="gdrive-subsection__head">
               <div class="gdrive-subsection__headtext">
-                <h5 class="gdrive-subsection__title">Organização em massa</h5>
+                <h4 class="gdrive-subsection__title">Organização em massa</h4>
                 <p class="gdrive-block__sub">
                   Reorganiza no Drive todos os eventos e ofícios avulsos: move/renomeia o
                   que já foi enviado e sobe o que falta. Documentos novos já são
@@ -261,7 +261,7 @@
         <div class="gdrive-block__head">
           <span class="gdrive-block__icon" aria-hidden="true">{% include "components/ui/icons/icon.html" with icon="list" only %}</span>
           <div class="gdrive-block__headtext">
-            <h4 class="gdrive-block__title" id="gdrive-pendencias-section">Pendências</h4>
+            <h3 class="gdrive-block__title" id="gdrive-pendencias-section">Pendências</h3>
             <p class="gdrive-block__sub">
               Estes documentos não chegaram ao Drive. O sistema tenta reenviar
               sozinho em segundo plano — cada item mostra o motivo e o que fazer.

@@ -5,6 +5,13 @@ from .base import *
 
 DEBUG = False
 SECRET_KEY = os.environ["SECRET_KEY"]
+PRIVATE_MEDIA_X_ACCEL_REDIRECT = True
+PRIVATE_UPLOAD_REQUIRE_ANTIVIRUS = os.getenv(
+    "PRIVATE_UPLOAD_REQUIRE_ANTIVIRUS",
+    "true",
+).lower() in {"1", "true", "yes"}
+if not FIELD_ENCRYPTION_KEYS:
+    raise RuntimeError("FIELD_ENCRYPTION_KEYS é obrigatória em produção.")
 
 ALLOWED_HOSTS = [
     host.strip()
@@ -55,14 +62,24 @@ STORAGES = {
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+    "formatters": {
+        "structured": {
+            "()": "core.logging.JsonFormatter",
+        },
+    },
+    "filters": {
+        "request_context": {"()": "core.logging.RequestContextFilter"},
+    },
     "handlers": {
-        "file": {
-            "class": "logging.FileHandler",
-            "filename": "/var/www/gerenciador-viagens/logs/django.log",
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "structured",
+            "filters": ["request_context"],
         },
     },
     "loggers": {
-        "django": {"handlers": ["file"], "level": "ERROR", "propagate": True},
+        "django": {"handlers": ["console"], "level": "INFO", "propagate": False},
+        "": {"handlers": ["console"], "level": os.getenv("LOG_LEVEL", "INFO")},
     },
 }
 
@@ -77,6 +94,8 @@ SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+SECURE_SSL_REDIRECT = True
 
 # Domínios HTTPS confiáveis para CSRF (obrigatório no Django 4+ atrás de proxy).
 # Ex.: CSRF_TRUSTED_ORIGINS=https://viagens.exemplo.gov.br,https://www.viagens.exemplo.gov.br

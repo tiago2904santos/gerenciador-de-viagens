@@ -3,10 +3,10 @@ from decimal import Decimal, InvalidOperation
 from django.db import models
 from django.utils import timezone
 
-from cadastros.models import CancelavelModel
+from core.models import CancelavelModel
 from cadastros.models import Cidade
 from cadastros.models import Estado
-from cadastros.models import TimeStampedModel
+from core.models import TimeStampedModel
 
 
 class Roteiro(CancelavelModel):

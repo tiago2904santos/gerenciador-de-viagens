@@ -3336,7 +3336,7 @@ html[data-theme="dark"] [data-travel-document-wizard-step1] .cv-search-picker {
   --stepper-status-missing-color: color-mix(in srgb, var(--color-danger) 68%, var(--color-muted));
 }
 
-:is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos]) :is(.travel-document-body, .oficio-roteiro-body, .oficio-justificativa-body, .oficio-documentos-body) {
+:is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-consolidado]) :is(.travel-document-body, .oficio-roteiro-body, .oficio-justificativa-body, .oficio-documentos-body) {
   display: grid;
   gap: 10px;
 }

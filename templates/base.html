@@ -7,14 +7,14 @@
   <script src="{% static 'js/core/theme-shared.js' %}?v=20260513"></script>
   <script src="{% static 'js/core/theme-init.js' %}?v=20260513"></script>
   <title>{% block title %}Central de Viagens 3{% endblock %}</title>
-  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20260727-evento-doc-field-height">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20260727-pc-shell-parity">
   <link rel="stylesheet" href="{% static 'css/utilities.css' %}?v=20260717-data-table">
   <link rel="stylesheet" href="{% static 'css/page-shell.css' %}?v=20260722-standard-simple-width">
   <link rel="stylesheet" href="{% static 'css/cv-buttons.css' %}?v=20260720-settings-assinado">
   <link rel="stylesheet" href="{% static 'css/components/cv-date-picker.css' %}?v=20260720-action-btn-trigger">
   {% block extra_css %}{% endblock %}
   <link rel="stylesheet" href="{% static 'css/components/file-picker.css' %}?v=20260718-deep-registry">
-  <link rel="stylesheet" href="{% static 'css/components/action-system.css' %}?v=20260720-settings-assinado">
+  <link rel="stylesheet" href="{% static 'css/components/action-system.css' %}?v=20260727-five-kinds">
   <link rel="stylesheet" href="{% static 'css/components/record-list.css' %}?v=20260718-rich-meta-grid">
   <link rel="stylesheet" href="{% static 'css/components/list-tabs.css' %}?v=20260721-flat-header">
   <link rel="stylesheet" href="{% static 'css/components/filter-header.css' %}?v=20260721-flat-header">
@@ -26,7 +26,8 @@
   <link rel="stylesheet" href="{% static 'css/components/content-cards.css' %}?v=20260717-canonical">
   <link rel="stylesheet" href="{% static 'css/components/document-viewer.css' %}?v=20260717-canonical">
   <link rel="stylesheet" href="{% static 'css/components/dialog.css' %}?v=20260718-sidebar-center">
-  <link rel="stylesheet" href="{% static 'css/dark-redesign.css' %}?v=20260721-evento-etapa1-remodel">
+  <link rel="stylesheet" href="{% static 'css/components/document-download-loading.css' %}?v=20260727-real-completion">
+  <link rel="stylesheet" href="{% static 'css/dark-redesign.css' %}?v=20260727-diario-retorno">
   <link rel="stylesheet" href="{% static 'css/components/list-header.css' %}?v=20260722-visual-standard">
   {% block extra_css_after_theme %}{% endblock %}
 </head>
@@ -51,6 +52,13 @@
       </section>
     </main>
   </div>
+  <div class="cv-document-loading" data-document-loading role="status" aria-live="polite" aria-atomic="true" hidden>
+    <div class="cv-document-loading__panel">
+      <span class="cv-document-loading__spinner" aria-hidden="true"></span>
+      <p class="cv-document-loading__title" data-document-loading-title>Gerando documento…</p>
+      <p class="cv-document-loading__detail" data-document-loading-detail>Aguarde enquanto o arquivo é preparado.</p>
+    </div>
+  </div>
   <script src="{% static 'js/theme-toggle.js' %}?v=20260513" defer></script>
   <script src="{% static 'js/core/http.js' %}?v=20260520" defer></script>
   <script src="{% static 'js/autosave.js' %}?v=20260715-link-flush-document" defer></script>
@@ -65,7 +73,7 @@
   <script src="{% static 'js/components/delete-confirm-modal.js' %}?v=20260717-dialog-registry" defer></script>
   <script src="{% static 'js/components/cancel-reason-modal.js' %}?v=20260717-dialog-registry" defer></script>
   <script src="{% static 'js/components/confirm-action-modal.js' %}?v=20260717-dialog-registry" defer></script>
-  <script src="{% static 'js/components/attach-signed-modal.js' %}?v=20260718-dialog-registry" defer></script>
+  <script src="{% static 'js/components/attach-signed-modal.js' %}?v=20260727-five-kinds" defer></script>
   <script src="{% static 'js/components/action-menu.js' %}?v=20260707-fixedpos" defer></script>
   <script src="{% static 'js/components/file-picker.js' %}?v=20260718-registry-drop" defer></script>
   <script src="{% static 'js/components/signature-actions.js' %}?v=20260717-canonical" defer></script>
@@ -76,6 +84,7 @@
   <script src="{% static 'js/components/cv-date-picker.js' %}?v=20260717-registry" defer></script>
   <script src="{% static 'js/cv-select.js' %}?v=20260520" defer></script>
   <script src="{% static 'js/components/fields-init.js' %}?v=20260520-fase3" defer></script>
+  <script src="{% static 'js/components/document-download.js' %}?v=20260727-real-completion" defer></script>
   {% block extra_js %}{% endblock %}
 </body>
 </html>

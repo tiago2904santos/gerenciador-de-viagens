@@ -32,20 +32,15 @@
              autocomplete="off" placeholder="000.000.000-00" required>
     </div>
 
-    <script>
-      document.getElementById('cpf').addEventListener('input', function () {
-        var v = this.value.replace(/\D/g, '').slice(0, 11);
-        if (v.length > 9) v = v.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, '$1.$2.$3-$4');
-        else if (v.length > 6) v = v.replace(/^(\d{3})(\d{3})(\d{3})/, '$1.$2.$3');
-        else if (v.length > 3) v = v.replace(/^(\d{3})(\d{3})/, '$1.$2');
-        this.value = v;
-      });
-    </script>
-
     <button class="asgn-btn asgn-btn--primary" type="submit">Continuar para assinar</button>
   </form>
   {% endif %}
 
   <p class="asgn-help">O nome está incorreto? Entre em contato com quem enviou o link.</p>
 </section>
+{% endblock %}
+
+{% block body_js %}
+  {% load static %}
+  <script src="{% static 'js/pages/assinatura-identidade.js' %}" defer></script>
 {% endblock %}

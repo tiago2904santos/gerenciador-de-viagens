@@ -229,7 +229,7 @@ class AreaDataIsolationTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_plano_trabalho_criado_recebe_area_do_usuario(self):
-        response = self.client.get(reverse("planos_trabalho:novo"))
+        response = self.client.post(reverse("planos_trabalho:novo"))
 
         plano = PlanoTrabalho.objects.get()
         self.assertRedirects(response, reverse("planos_trabalho:wizard_identificacao", args=[plano.pk]))

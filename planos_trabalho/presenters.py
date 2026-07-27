@@ -346,11 +346,23 @@ def apresentar_plano_card(plano):
     ]
 
     # ── Atividades selecionadas no plano
-    atividades = (
-        [a.nome for a in plano.atividades_selecionadas.order_by("ordem", "nome")]
-        if plano.pk
-        else []
+    prefetched_atividades = getattr(plano, "_prefetched_objects_cache", {}).get(
+        "atividades_selecionadas",
     )
+    if prefetched_atividades is not None:
+        atividades = [
+            atividade.nome
+            for atividade in sorted(
+                prefetched_atividades,
+                key=lambda item: (item.ordem, item.nome),
+            )
+        ]
+    else:
+        atividades = (
+            [a.nome for a in plano.atividades_selecionadas.order_by("ordem", "nome")]
+            if plano.pk
+            else []
+        )
 
     numero_label = plano.numero_formatado
     status_label = "Cancelado" if plano.cancelado else plano.get_status_display()

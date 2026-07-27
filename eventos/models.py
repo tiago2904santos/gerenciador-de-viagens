@@ -1,11 +1,12 @@
 # Eventos serao agrupadores OPCIONAIS de documentos, nao fluxo obrigatorio.
 from django.db import models
+from core.uploads import validate_private_document_upload
 from django.db.models import Q
 from django.utils import timezone
 
 from core.normalizers import normalize_spaces
 from core.normalizers import normalize_upper
-from cadastros.models import TimeStampedModel
+from core.models import TimeStampedModel
 
 
 class Evento(models.Model):
@@ -206,7 +207,10 @@ class EventoDocumentoSolicitacao(models.Model):
         on_delete=models.CASCADE,
         related_name="documentos_solicitacao",
     )
-    arquivo = models.FileField(upload_to=evento_solicitacao_upload_to)
+    arquivo = models.FileField(
+        upload_to=evento_solicitacao_upload_to,
+        validators=[validate_private_document_upload],
+    )
     nome_original = models.CharField(max_length=255, blank=True, default="")
     criado_em = models.DateTimeField(auto_now_add=True)
 
@@ -300,7 +304,11 @@ class EventoAnexo(models.Model):
     )
     tipo = models.CharField(max_length=30, choices=TIPO_CHOICES, default=TIPO_OUTRO)
     titulo = models.CharField("Titulo", max_length=255, blank=True, default="")
-    arquivo = models.FileField("Arquivo", upload_to="eventos/anexos/%Y/%m/")
+    arquivo = models.FileField(
+        "Arquivo",
+        upload_to="eventos/anexos/%Y/%m/",
+        validators=[validate_private_document_upload],
+    )
     observacoes = models.TextField("Observacoes", blank=True, default="")
     criado_em = models.DateTimeField(auto_now_add=True)
 

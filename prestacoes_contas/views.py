@@ -4,6 +4,7 @@ import json
 import re
 
 from django.contrib import messages
+from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -22,6 +23,7 @@ from core.autosave import parse_autosave_payload
 from core.normalizers import normalize_spaces
 from core.normalizers import remove_accents
 from core.presenters.meta import build_meta
+from core.private_media import private_file_response
 from core.tenancy import filter_queryset_by_area
 from core.tenancy import get_current_area
 from core.utils.masks import format_cpf
@@ -58,6 +60,7 @@ from .forms import OUTRO_VALUE
 from .forms import PrestacaoDespachoForm
 from .forms import PrestacaoServidorDiariaForm
 from .forms import PrestacaoServidorDocumentosForm
+from .forms import PrestacaoSolicitacaoForm
 from .forms import RelatorioTecnicoForm
 from .forms import get_custeio_valores_fixos
 from .models import DiarioBordo
@@ -66,6 +69,7 @@ from .models import PrestacaoContas
 from .models import PrestacaoDocumentoAnexo
 from .models import PrestacaoServidor
 from .models import RelatorioTecnico
+from .presenters import _anexo_assinado_info
 from .presenters import apresentar_prestacao_servidor_card
 from .presenters import marcar_agrupamento_cards
 from .selectors import ABA_ARQUIVADOS
@@ -154,6 +158,7 @@ def _build_campos_modelo(form) -> list:
                 "textarea": form[campo],
                 "manage_url": f"{base_url}#grupo-{campo}",
                 "tem_modelos": select.field.queryset.exists(),
+                "section_id": f"rt-topic-{campo}-title",
             }
         )
     return campos
@@ -183,6 +188,8 @@ def _build_campos_custeio(form) -> list:
 
 
 def _servidor_identificacao(ps) -> dict:
+    from oficios.presenters import _iniciais_nome_servidor
+
     servidor = ps.servidor
     return {
         "ps_pk": ps.pk,
@@ -192,6 +199,7 @@ def _servidor_identificacao(ps) -> dict:
         "unidade": str(servidor.unidade) if servidor.unidade_id else "",
         "is_motorista": ps.is_motorista,
         "numero_solicitacao": ps.numero_solicitacao,
+        "iniciais": _iniciais_nome_servidor(servidor.nome),
     }
 
 
@@ -243,7 +251,10 @@ def _anexos_rows(prestacao, anexos_qs):
             {
                 "id": anexo.pk,
                 "nome": anexo.nome_original or Path(anexo.arquivo.name).name,
-                "url": anexo.arquivo.url,
+                "url": reverse(
+                    "prestacoes_contas:prestacao_documento_conteudo",
+                    args=[prestacao.pk, anexo.pk],
+                ),
                 "delete_url": reverse(
                     "prestacoes_contas:prestacao_documento_excluir",
                     args=[prestacao.pk, anexo.pk],
@@ -253,14 +264,14 @@ def _anexos_rows(prestacao, anexos_qs):
     return rows
 
 
-def _anexos_resumo(anexos_qs):
-    anexos = list(anexos_qs)
-    if not anexos:
-        return {"status": False, "value": "Pendente"}
-    if len(anexos) == 1:
-        nome = anexos[0].nome_original or Path(anexos[0].arquivo.name).name
-        return {"status": True, "value": nome}
-    return {"status": True, "value": f"{len(anexos)} arquivos anexados"}
+def prestacao_documento_conteudo(request, pc_pk, anexo_pk):
+    prestacao = get_object_or_404(_prestacao_queryset(), pk=pc_pk)
+    anexo = get_object_or_404(
+        PrestacaoDocumentoAnexo,
+        pk=anexo_pk,
+        prestacao=prestacao,
+    )
+    return private_file_response(anexo.arquivo)
 
 
 def _build_prestacao_steps(ps, atual: str) -> list:
@@ -532,9 +543,12 @@ def index(request):
         sort=sort or None,
     )
 
+    page_obj = Paginator(prestacoes, 20).get_page(request.GET.get("page"))
     cards = marcar_agrupamento_cards(
-        [apresentar_prestacao_servidor_card(ps) for ps in prestacoes]
+        [apresentar_prestacao_servidor_card(ps) for ps in page_obj.object_list]
     )
+    page_querystring = request.GET.copy()
+    page_querystring.pop("page", None)
 
     has_filters = any([q, status, viagem_de, viagem_ate, sort])
 
@@ -553,6 +567,8 @@ def index(request):
             "page_title": "Prestações de Contas",
             "page_description": "Acompanhamento das prestações de contas por servidor, agrupadas por ofício.",
             "cards": cards,
+            "page_obj": page_obj,
+            "page_querystring": page_querystring.urlencode(),
             "q":          q,
             "status":     status,
             "aba":        aba,
@@ -754,22 +770,46 @@ def _prestacao_servidor_full(ps_pk):
 
 
 def _servidor_documentos_ctx(prestacao, ps):
-    form = PrestacaoServidorDocumentosForm(instance=ps, prefix=f"ps-{ps.pk}")
-    comprovantes = ps.documentos_anexos.filter(tipo=PrestacaoDocumentoAnexo.TIPO_COMPROVANTE)
-    rt_assinados = ps.documentos_anexos.filter(tipo=PrestacaoDocumentoAnexo.TIPO_RT_ASSINADO)
-    diario_assinados = ps.documentos_anexos.filter(tipo=PrestacaoDocumentoAnexo.TIPO_DB_ASSINADO)
+    form = PrestacaoSolicitacaoForm(instance=ps, prefix=f"ps-{ps.pk}")
+    anexos_ps = list(ps.documentos_anexos.all())
+    anexos_pc = list(
+        prestacao.documentos_anexos.filter(tipo=PrestacaoDocumentoAnexo.TIPO_DB_ASSINADO)
+    )
     return {
         "ps": ps,
+        "ps_pk": ps.pk,
+        "name": ps.servidor.nome,
         "identificacao": _servidor_identificacao(ps),
         "form": form,
-        "comprovante_anexos": _anexos_rows(prestacao, comprovantes),
-        "rt_assinado_anexos": _anexos_rows(prestacao, rt_assinados),
-        "diario_assinado_anexos": _anexos_rows(prestacao, diario_assinados),
-        "arquivo_autosave_url": reverse(
-            "prestacoes_contas:prestacao_servidor_arquivo_autosave", args=[ps.pk]
-        ),
         "solicitacao_autosave_url": reverse(
             "prestacoes_contas:prestacao_servidor_solicitacao_autosave", args=[ps.pk]
+        ),
+        "rt_assinado": _anexo_assinado_info(
+            anexos_ps,
+            tipo=PrestacaoDocumentoAnexo.TIPO_RT_ASSINADO,
+            anexar_url=reverse(
+                "prestacoes_contas:prestacao_servidor_assinado_anexar",
+                args=[ps.pk, PrestacaoDocumentoAnexo.TIPO_RT_ASSINADO],
+            ),
+            prestacao_pk=prestacao.pk,
+        ),
+        "comprovante_anexo": _anexo_assinado_info(
+            anexos_ps,
+            tipo=PrestacaoDocumentoAnexo.TIPO_COMPROVANTE,
+            anexar_url=reverse(
+                "prestacoes_contas:prestacao_servidor_assinado_anexar",
+                args=[ps.pk, PrestacaoDocumentoAnexo.TIPO_COMPROVANTE],
+            ),
+            prestacao_pk=prestacao.pk,
+        ),
+        "diario_assinado": _anexo_assinado_info(
+            anexos_pc,
+            tipo=PrestacaoDocumentoAnexo.TIPO_DB_ASSINADO,
+            anexar_url=reverse(
+                "prestacoes_contas:prestacao_servidor_assinado_anexar",
+                args=[ps.pk, PrestacaoDocumentoAnexo.TIPO_DB_ASSINADO],
+            ),
+            prestacao_pk=prestacao.pk,
         ),
     }
 
@@ -794,24 +834,12 @@ def _servidor_rt_ctx(ps):
 
 
 def _servidor_consolidado_ctx(request, ps):
-    comprovante_resumo = _anexos_resumo(
-        ps.documentos_anexos.filter(tipo=PrestacaoDocumentoAnexo.TIPO_COMPROVANTE)
-    )
-    rt_assinado_resumo = _anexos_resumo(
-        ps.documentos_anexos.filter(tipo=PrestacaoDocumentoAnexo.TIPO_RT_ASSINADO)
-    )
-    diario_assinado_resumo = _anexos_resumo(
-        ps.documentos_anexos.filter(tipo=PrestacaoDocumentoAnexo.TIPO_DB_ASSINADO)
-    )
     return {
         "ps_pk": ps.pk,
         "nome": ps.servidor.nome,
         "is_motorista": ps.is_motorista,
         "numero_solicitacao": ps.numero_solicitacao,
         "numero_ok": bool((ps.numero_solicitacao or "").strip()),
-        "comprovante_resumo": comprovante_resumo,
-        "rt_assinado_resumo": rt_assinado_resumo,
-        "diario_assinado_resumo": diario_assinado_resumo,
         "assinatura_rt": _assinatura_rt_card(request, ps),
         "download_url": reverse("prestacoes_contas:consolidado_download", args=[ps.pk]),
         "preview_inline_url": reverse("prestacoes_contas:consolidado_download", args=[ps.pk]) + "?inline=1",
@@ -828,27 +856,91 @@ def documentos_servidor(request, ps_pk):
     """Etapa 3: despacho compartilhado + documentos do servidor atual."""
     ps = _prestacao_servidor_full(ps_pk)
     prestacao = ps.prestacao
-    despacho_form = PrestacaoDespachoForm(instance=prestacao)
-    despacho_anexos = prestacao.documentos_anexos.filter(tipo=PrestacaoDocumentoAnexo.TIPO_DESPACHO)
+    servidor = _servidor_documentos_ctx(prestacao, ps)
+    anexos_compartilhados = list(
+        prestacao.documentos_anexos.filter(
+            tipo__in=(
+                PrestacaoDocumentoAnexo.TIPO_DESPACHO,
+                PrestacaoDocumentoAnexo.TIPO_OFICIO_ASSINADO,
+            )
+        )
+    )
+    despacho_assinado = _anexo_assinado_info(
+        anexos_compartilhados,
+        tipo=PrestacaoDocumentoAnexo.TIPO_DESPACHO,
+        anexar_url=reverse(
+            "prestacoes_contas:prestacao_despacho_assinado_anexar",
+            args=[prestacao.pk],
+        ),
+        prestacao_pk=prestacao.pk,
+    )
+    oficio_assinado = _anexo_assinado_info(
+        anexos_compartilhados,
+        tipo=PrestacaoDocumentoAnexo.TIPO_OFICIO_ASSINADO,
+        anexar_url=reverse(
+            "prestacoes_contas:prestacao_oficio_assinado_anexar",
+            args=[prestacao.pk],
+        ),
+        prestacao_pk=prestacao.pk,
+    )
+    identificacao = _build_identificacao(prestacao)
+    numero = identificacao.get("numero") or ""
+
+    def _kind(doc, *, option_label, doc_label):
+        return {
+            "option_label": option_label,
+            "doc_label": doc_label,
+            "url": doc["anexar_url"],
+            "current_name": doc["nome_original"],
+            "current_view_url": doc["view_url"],
+            "current_remove_url": doc["remover_url"],
+        }
+
+    attach_kinds = {
+        "primary": _kind(
+            despacho_assinado,
+            option_label="Despacho",
+            doc_label=f"o despacho do ofício {numero}",
+        ),
+        "secondary": _kind(
+            oficio_assinado,
+            option_label="Ofício",
+            doc_label=f"o ofício {numero}",
+        ),
+        "tertiary": _kind(
+            servidor["rt_assinado"],
+            option_label="RT",
+            doc_label=f"o relatório técnico de {servidor['name']}",
+        ),
+        "quaternary": _kind(
+            servidor["diario_assinado"],
+            option_label="DB",
+            doc_label=f"o diário de bordo do ofício {numero}",
+        ),
+        "quinary": _kind(
+            servidor["comprovante_anexo"],
+            option_label="Comprovante",
+            doc_label=f"o comprovante de saque ou transferência de {servidor['name']}",
+        ),
+    }
 
     return render(
         request,
         "prestacoes_contas/documentos_form.html",
         {
             "page_title": f"Documentos — {ps.servidor.nome}",
-            "despacho_form": despacho_form,
             "prestacao": prestacao,
             "ps": ps,
-            "servidores": [_servidor_documentos_ctx(prestacao, ps)],
-            "identificacao": _build_identificacao(prestacao),
+            "servidor": servidor,
+            "servidores": [servidor],
+            "identificacao": identificacao,
+            "despacho_assinado": despacho_assinado,
+            "oficio_assinado": oficio_assinado,
+            "attach_kinds": attach_kinds,
             "wizard_page_steps": _build_prestacao_steps(ps, "documentos"),
             "back_url": reverse("prestacoes_contas:index"),
             "diario_url": reverse("prestacoes_contas:diario_servidor", args=[ps.pk]),
             "consolidado_url": reverse("prestacoes_contas:consolidado_servidor", args=[ps.pk]),
-            "despacho_autosave_url": reverse(
-                "prestacoes_contas:prestacao_arquivo_autosave", args=[prestacao.pk]
-            ),
-            "despacho_anexos": _anexos_rows(prestacao, despacho_anexos),
         },
     )
 
@@ -958,6 +1050,16 @@ def prestacao_despacho_assinado_anexar(request, pc_pk):
         request,
         prestacao=prestacao,
         tipo=PrestacaoDocumentoAnexo.TIPO_DESPACHO,
+    )
+
+
+@require_POST
+def prestacao_oficio_assinado_anexar(request, pc_pk):
+    prestacao = get_object_or_404(_prestacao_queryset(), pk=pc_pk)
+    return _prestacao_assinado_upload(
+        request,
+        prestacao=prestacao,
+        tipo=PrestacaoDocumentoAnexo.TIPO_OFICIO_ASSINADO,
     )
 
 
@@ -1647,34 +1749,6 @@ def consolidado_servidor(request, ps_pk):
     ps = _prestacao_servidor_full(ps_pk)
     prestacao = ps.prestacao
 
-    try:
-        prestacao.relatorio_tecnico
-        relatorio_ok = True
-    except RelatorioTecnico.DoesNotExist:
-        relatorio_ok = False
-    diario_ok = DiarioBordo.objects.filter(prestacao=prestacao).exists()
-    despacho_resumo = _anexos_resumo(
-        prestacao.documentos_anexos.filter(tipo=PrestacaoDocumentoAnexo.TIPO_DESPACHO)
-    )
-
-    itens = [
-        {
-            "label": "Despacho assinado do ofício",
-            "status": despacho_resumo["status"],
-            "value": despacho_resumo["value"],
-        },
-        {
-            "label": "Relatório Técnico",
-            "status": relatorio_ok,
-            "value": "Criado" if relatorio_ok else "Será criado com os dados atuais",
-        },
-        {
-            "label": "Diário de Bordo",
-            "status": diario_ok,
-            "value": "Criado" if diario_ok else "Será criado com os dados atuais",
-        },
-    ]
-
     return render(
         request,
         "prestacoes_contas/consolidado.html",
@@ -1684,11 +1758,8 @@ def consolidado_servidor(request, ps_pk):
             "ps": ps,
             "identificacao": _build_identificacao(prestacao),
             "wizard_page_steps": _build_prestacao_steps(ps, "consolidado"),
-            "itens_consolidado": itens,
             "servidores": [_servidor_consolidado_ctx(request, ps)],
             "back_url": reverse("prestacoes_contas:index"),
-            "assinatura_db": _assinatura_db_card(request, prestacao),
-            "assinatura_next_url": reverse("prestacoes_contas:consolidado_servidor", args=[ps.pk]),
             "documentos_url": reverse("prestacoes_contas:documentos_servidor", args=[ps.pk]),
         },
     )

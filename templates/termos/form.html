@@ -15,7 +15,7 @@
   <div class="page-shell page-shell--standard travel-document-wizard app-wizard document-form-page" data-termo-wizard-shell>
     {% include "components/ui/headers/page_header.html" with eyebrow="TERMOS" title=page_title description="Cadastro independente de termo de autorização" icon_label="TM" module_label="Termos" back_label=back_label back_url=index_url only %}
 
-    <main class="main-form-panel main-form-panel--stack travel-document-wizard__main">
+    <div class="main-form-panel main-form-panel--stack travel-document-wizard__main">
       <div class="cv-form-section-stack cv-form-section-stack--comfortable">
         <form
           method="post"
@@ -67,7 +67,7 @@
           {% include "components/ui/modals/attach_signed_modal.html" %}
         {% endif %}
       </div>
-    </main>
+    </div>
   </div>
 {% endblock %}
 

@@ -14,6 +14,7 @@ from core.utils.masks import only_digits
 from .models import Servidor
 from .models import Viatura
 from .forms import CargoForm
+from .forms import CidadeForm
 from .forms import CombustivelForm
 from .forms import ConfiguracaoAssinaturasForm
 from .forms import ConfiguracaoDestinatarioForm
@@ -23,6 +24,7 @@ from .forms import ServidorForm
 from .forms import UnidadeForm
 from .forms import ViaturaForm
 from .presenters import apresentar_linha_lista_simples_cargo
+from .presenters import apresentar_linha_lista_simples_cidade
 from .presenters import apresentar_linha_lista_simples_estado
 from .presenters import apresentar_linha_lista_simples_combustivel
 from .presenters import apresentar_linha_lista_simples_servidor
@@ -35,6 +37,7 @@ from .selectors import get_servidor_by_id
 from .selectors import get_unidade_by_id
 from .selectors import get_viatura_by_id
 from .selectors import listar_cargos
+from .selectors import listar_cidades
 from .selectors import listar_estados
 from .selectors import listar_combustiveis
 from .selectors import listar_servidores
@@ -48,6 +51,7 @@ from .services import atualizar_unidade
 from .services import atualizar_viatura
 from .services import CadastroVinculadoError
 from .services import criar_cargo
+from .services import criar_cidade
 from .services import criar_estado
 from .services import criar_combustivel
 from .services import criar_servidor
@@ -68,6 +72,47 @@ from .services_via_cep import ViaCEPServiceError
 
 
 CADASTROS_PER_PAGE = 15
+
+
+def cidades_index(request):
+    q = request.GET.get("q", "").strip()
+    form = CidadeForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        criar_cidade(form)
+        messages.success(request, "Cidade criada com sucesso.")
+        return redirect("cadastros:cidades_index")
+    cidades = listar_cidades(q=q)
+    paginator = Paginator(cidades, CADASTROS_PER_PAGE)
+    page_obj = paginator.get_page(request.GET.get("page"))
+    rows = [
+        apresentar_linha_lista_simples_cidade(cidade)
+        for cidade in page_obj.object_list
+    ]
+    return _render_listagem(
+        request,
+        "cadastros/cidades/index.html",
+        {
+            "page_title": "Cidades",
+            "page_description": "Base geográfica utilizada nos roteiros e documentos.",
+            "rows": rows,
+            "q": q,
+            "quick_add_form": form,
+            "page_obj": page_obj,
+            "pagination_pages": _pagination_pages(page_obj),
+            "page_querystring": urlencode({"q": q}) if q else "",
+        },
+    )
+
+
+def cidades_export_csv(request):
+    response = HttpResponse(content_type="text/csv; charset=utf-8")
+    response["Content-Disposition"] = 'attachment; filename="cidades.csv"'
+    response.write("\ufeff")
+    writer = csv.writer(response)
+    writer.writerow(["Cidade", "UF"])
+    for cidade in listar_cidades():
+        writer.writerow([cidade.nome, cidade.uf])
+    return response
 SERVIDORES_PER_PAGE = 25
 
 

@@ -4,7 +4,7 @@
   <div class="page-shell page-shell--standard-simple">
     {% url "oficios:dados_viajantes" oficio.pk as oficio_url %}
     {% include "components/ui/headers/page_header.html" with eyebrow="OFÍCIOS" title=page_title icon_label="TM" module_label="Termos" back_label="Voltar ao ofício" back_url=oficio_url only %}
-    <main class="main-form-panel">
+    <div class="main-form-panel">
       {% include "components/ui/layouts/form_section.html" with title="Pré-visualização" section_id="termos-preview-section" only %}
       <div class="field-grid">
         <div class="field-size-4">
@@ -24,6 +24,6 @@
         </div>
       </div>
       </section>
-    </main>
+    </div>
   </div>
 {% endblock %}

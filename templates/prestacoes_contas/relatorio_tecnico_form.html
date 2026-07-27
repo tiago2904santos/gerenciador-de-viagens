@@ -4,7 +4,8 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}?v=20260715-diaria-override">
+  <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}?v=20260727-pc-resumo-clone">
+  <link rel="stylesheet" href="{% static 'css/oficios-documentos-inline.css' %}?v=20260727-order-scope">
   <link rel="stylesheet" href="{% static 'css/prestacoes-documento-preview.css' %}?v=20260621-preview">
 {% endblock %}
 
@@ -21,7 +22,7 @@
       {% include "components/ui/navigation/page_stepper.html" with steps=wizard_page_steps only %}
     {% endif %}
 
-    <main class="main-form-panel main-form-panel--stack travel-document-wizard__main">
+    <div class="main-form-panel main-form-panel--stack travel-document-wizard__main">
       <div class="cv-form-section-stack cv-form-section-stack--comfortable">
         <form method="post"
               class="travel-document-wizard__form"
@@ -44,18 +45,34 @@
             </div>
           {% endif %}
 
-          {# CARD 1 — Identificação #}
-          {% include "components/ui/forms/form_block.html" with shell="card" section_id="rt-identificacao-title" extra_class="cv-summary-card rt-summary-card oficio-documentos-summary-section" title="Resumo do ofício" description="Dados do ofício, viajante e custeios informados no relatório." body_template="prestacoes_contas/partials/_rt_resumo_body.html" %}
+          <div data-travel-document-wizard-rt data-travel-document-wizard-documentos>
+            <section class="cv-form-section-card cv-form-card cv-form-section-card--described travel-document-card rt-wizard-card" aria-labelledby="rt-wizard-title">
+              <header class="cv-form-section-header">
+                <div class="cv-form-section-header__copy">
+                  <h3 class="cv-form-section-title" id="rt-wizard-title">Relatório técnico</h3>
+                  <p class="cv-form-section-subtitle">Resumo do ofício, custeios e texto compartilhado do relatório</p>
+                </div>
+              </header>
 
-          {# Cards de conteúdo do relatório #}
-          {% for c in campos_modelo %}
-            {% include "components/ui/forms/form_block.html" with shell="card" section_id="rt-topic-"|add:c.campo|add:"-title" extra_class="rt-topic-card" title=c.label description="Escolha um modelo para este tópico ou escreva livremente." body_template="prestacoes_contas/partials/_rt_topico_body.html" %}
-          {% endfor %}
+              <div class="cv-form-section-body travel-document-body rt-wizard-body">
+                {% include "prestacoes_contas/partials/_prestacao_identificacao_equipe.html" %}
 
-          {# Download do RT por servidor (mesmo texto, dados pessoais de cada um) #}
-          {% include "components/ui/forms/form_block.html" with shell="card" section_id="rt-downloads-title" title="Relatório Técnico deste servidor" description="O texto acima é compartilhado com os demais servidores do ofício e salvo automaticamente. A pré-visualização e o download abaixo são só deste servidor." body_extra_class="document-inline-stack" body_template="prestacoes_contas/partials/_rt_downloads_body.html" footer_template="prestacoes_contas/partials/_rt_downloads_footer.html" %}
+                {% include "components/ui/forms/form_block.html" with title="Custeios" description="Diária, translado, combustível e passagem" section_id="rt-custeios-title" variant="split" extra_class="travel-document-block rt-custeios-block" body_template="prestacoes_contas/partials/_rt_custeio_body.html" %}
+
+                {% for c in campos_modelo %}
+                  {% include "components/ui/forms/form_block.html" with title=c.label description="Escolha um modelo para este tópico ou escreva livremente" section_id=c.section_id variant="resource" extra_class="travel-document-block rt-topic-block" action_label="Gerenciar modelos" action_url=c.manage_url action_autosave=True body_extra_class="cv-form-stack" body_template="prestacoes_contas/partials/_rt_topico_body.html" %}
+                {% endfor %}
+
+                {% include "components/ui/forms/form_block.html" with title="Relatório Técnico deste servidor" description="O texto acima é compartilhado e salvo automaticamente. A pré-visualização e o download abaixo são só deste servidor." section_id="rt-downloads-title" extra_class="travel-document-block oficio-documentos-block oficio-documentos-preview-section document-inline-stack" body_extra_class="oficio-documentos-preview-section__body document-inline-stack" body_template="prestacoes_contas/partials/_rt_downloads_body.html" %}
+              </div>
+
+              <div class="cv-form-card__footer">
+                {% include "prestacoes_contas/partials/_rt_downloads_footer.html" %}
+              </div>
+            </section>
+          </div>
         </form>
       </div>
-    </main>
+    </div>
   </div>
 {% endblock %}

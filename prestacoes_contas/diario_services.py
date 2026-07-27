@@ -22,6 +22,7 @@ from documentos.services.exceptions import DocumentValidationError
 from documentos.services.libreoffice_resolve import resolve_libreoffice_binary
 from documentos.services.pdf_engine import build_pdf_unavailable_message
 from documentos.services.pdf_engine import resolve_pdf_engine
+from documentos.services.timing import track_document_generation
 from cadastros.models import Viatura
 from oficios.models import Oficio
 from roteiros.models import RoteiroTrecho
@@ -498,6 +499,7 @@ def gerar_diario_bordo_xlsx(diario: DiarioBordo) -> bytes:
     return fill_diario_bordo_xlsx(template_path=_template_path(), header=header, trechos=trechos)
 
 
+@track_document_generation("prestacao_gerar_diario_bordo_pdf")
 def gerar_diario_bordo_pdf(diario: DiarioBordo) -> bytes:
     from documentos.services.adapters.excel_pdf import convert_xlsx_to_pdf_excel_com
     from documentos.services.adapters.libreoffice_pdf import convert_xlsx_to_pdf_libreoffice

@@ -557,3 +557,31 @@ def sincronizar_assinatura_manual(artefato) -> tuple[str, str] | None:
             getattr(artefato, "pk", "?"), exc, exc_info=True,
         )
         return None
+
+
+def agendar_sincronizacao_assinatura_manual(artefato, *, usuario=None) -> None:
+    """Salva a request do usuário sem aguardar rede ou API do Google Drive."""
+    if _cfg().get("MODO", "mock").lower() == "mock" and not _cfg().get("UPLOAD_EM_MOCK", False):
+        return
+
+    from django.db import transaction
+
+    from . import status, tasks
+
+    usuario_id = getattr(usuario, "pk", None)
+
+    def enviar():
+        try:
+            tasks.sincronizar_assinatura_manual.delay(
+                artefato.pk,
+                usuario_id=usuario_id,
+            )
+        except Exception as exc:
+            status.registrar_falha(artefato, exc, usuario=usuario)
+            logger.warning(
+                "[Drive] assinatura do artefato %s ficou pendente: %s",
+                getattr(artefato, "pk", "?"),
+                exc,
+            )
+
+    transaction.on_commit(enviar)

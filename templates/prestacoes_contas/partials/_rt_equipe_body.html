@@ -1,0 +1,29 @@
+<article class="oficio-documentos-card oficio-documentos-card--travellers" aria-label="Servidores da prestação">
+  <div class="oficio-documentos-card__body">
+    {% with n=identificacao.servidores_count %}
+    <div class="oficio-documentos-travellers-grid{% if n == 1 %} oficio-documentos-travellers-grid--single{% endif %}" role="list">
+      {% for s in identificacao.servidores %}
+        <article
+          class="oficio-documentos-traveller-tile{% if s.is_motorista %} oficio-documentos-traveller-tile--motorista{% endif %}"
+          role="listitem"
+        >
+          <span class="oficio-documentos-traveller-tile__avatar" aria-hidden="true">{{ s.iniciais }}</span>
+          <div class="oficio-documentos-traveller-tile__main">
+            <div class="oficio-documentos-traveller-tile__title-row">
+              <strong class="oficio-documentos-traveller-tile__name">{{ s.nome_servidor }}</strong>
+              {% if s.is_motorista %}
+                <span class="oficio-documentos-traveller-tile__badge">Motorista</span>
+              {% endif %}
+            </div>
+            <span class="oficio-documentos-traveller-tile__meta">
+              {{ s.cargo }}{% if s.unidade %} · {{ s.unidade }}{% endif %}{% if s.cpf_servidor and s.cpf_servidor != "—" %} · CPF {{ s.cpf_servidor }}{% endif %}
+            </span>
+          </div>
+        </article>
+      {% empty %}
+        <div class="oficio-documentos-travellers-empty">Nenhum servidor vinculado a esta prestação.</div>
+      {% endfor %}
+    </div>
+    {% endwith %}
+  </div>
+</article>

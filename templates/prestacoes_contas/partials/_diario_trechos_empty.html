@@ -1,0 +1,9 @@
+<div class="roteiro-editor__empty diario-trechos-empty">
+  <p class="roteiro-editor__empty-title">Trechos ainda não disponíveis</p>
+  <p class="roteiro-editor__empty-text">Defina o roteiro do ofício para gerar o diário de bordo.</p>
+  {% if editar_roteiro_url %}
+    <div class="diario-trechos-empty__actions">
+      {% include "components/ui/buttons/button.html" with href=editar_roteiro_url label="Definir roteiro" variant="secondary" icon="route" only %}
+    </div>
+  {% endif %}
+</div>

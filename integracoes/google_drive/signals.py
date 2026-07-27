@@ -5,6 +5,18 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+def _agendar_apos_commit(task, *args) -> None:
+    from django.db import transaction
+
+    def enviar():
+        try:
+            task.delay(*args)
+        except Exception:
+            logger.exception("[Drive] não foi possível agendar tarefa assíncrona")
+
+    transaction.on_commit(enviar)
+
+
 def conectar() -> None:
     from django.db.models.signals import post_save, pre_delete
 
@@ -118,65 +130,50 @@ def _usuario_por_id(usuario_id):
 
 
 def _processar_com_retry(fn, obj, task) -> None:
-    """Tenta ``fn(obj)`` na hora (como sempre foi); se falhar, avisa o usuário
-    e agenda um retry em segundo plano (Celery) com backoff.
+    """Agenda a sincronização somente depois do commit.
 
-    Nunca deixa a exceção do Drive subir e quebrar o ``save()`` que disparou
-    o signal — no pior caso (fila também indisponível), o objeto fica
-    registrado como pendência (``status.py``) para reenvio manual depois.
+    ``fn`` permanece no contrato para documentar qual operação a tarefa
+    representa, mas rede/Drive nunca executa dentro do request que salvou o
+    objeto. Isso evita que anexos pareçam travados após o arquivo já estar
+    persistido localmente.
     """
-    from . import status
-
+    _ = fn
     usuario = _usuario_atual()
-    try:
-        status.executar_e_rastrear(fn, obj, usuario=usuario)
-    except Exception as exc:
-        logger.error(
-            "[Drive] falha ao sincronizar %s #%s: %s",
-            obj.__class__.__name__,
-            obj.pk,
-            exc,
-            exc_info=True,
-        )
-        _avisar_usuario(
-            f'Não foi possível enviar "{_descrever(obj)}" ao Google Drive agora. '
-            "O sistema vai tentar novamente automaticamente em segundo plano."
-        )
+    usuario_id = getattr(usuario, "pk", None)
+
+    def enviar():
+        from . import status
+
         try:
-            task.delay(obj.pk, usuario_id=getattr(usuario, "pk", None))
-        except Exception as exc2:
+            task.delay(obj.pk, usuario_id=usuario_id)
+        except Exception as exc:
+            status.registrar_falha(obj, exc, usuario=usuario)
             logger.warning(
-                "[Drive] fila de retry indisponível (%s); %s #%s fica pendente até reenvio manual",
-                exc2,
+                "[Drive] fila indisponível (%s); %s #%s fica pendente até reenvio manual",
+                exc,
                 obj.__class__.__name__,
                 obj.pk,
             )
+            _avisar_usuario(
+                f'O arquivo "{_descrever(obj)}" foi salvo, mas o envio ao '
+                "Google Drive ficou pendente."
+            )
+
+    from django.db import transaction
+
+    transaction.on_commit(enviar)
 
 
 def _upload_artefato(sender, instance, created: bool, **kwargs) -> None:
     if not created or _drive_desligado():
         return
-    from . import status, tasks
+    from . import organizer, tasks
 
-    usuario = _usuario_atual()
-    try:
-        # Upload de rede nunca participa do tempo de geração/resposta HTTP.
-        # A tarefa já possui retry, backoff e rastreamento de pendência.
-        tasks.processar_artefato.delay(
-            instance.pk,
-            usuario_id=getattr(usuario, "pk", None),
-        )
-    except Exception as exc:
-        status.registrar_falha(instance, exc, usuario=usuario)
-        logger.warning(
-            "[Drive] fila indisponível; artefato %s ficou pendente para reenvio",
-            instance.pk,
-            exc_info=True,
-        )
-        _avisar_usuario(
-            f'O documento "{_descrever(instance)}" foi gerado, mas o envio ao '
-            "Google Drive ficou pendente."
-        )
+    _processar_com_retry(
+        organizer.organizar_artefato,
+        instance,
+        tasks.processar_artefato,
+    )
 
 
 # Campos que não afetam os documentos da prestação no Drive: arquivar/finalizar
@@ -233,7 +230,7 @@ def _organizar_oficio_ao_salvar(sender, instance, **kwargs) -> None:
     ainda faltar (ofício, justificativa, termos, ordem de serviço) — sem
     depender de alguém abrir/baixar o documento manualmente.
 
-    Roda em segundo plano (thread) porque envolve GERAR PDFs de verdade (não é
+    Roda em segundo plano (Celery) porque envolve GERAR PDFs de verdade (não é
     só subir um arquivo já pronto) — fazer isso de forma síncrona deixaria o
     salvamento do ofício lento. As funções de backfill (``_garantir_*``) só
     geram o que ainda não existe, então salvar o ofício várias vezes não
@@ -243,13 +240,13 @@ def _organizar_oficio_ao_salvar(sender, instance, **kwargs) -> None:
         return
     if instance.status == instance.STATUS_RASCUNHO:
         return
-    import threading
+    from .tasks import organizar_oficio
 
-    threading.Thread(
-        target=_organizar_oficio_em_thread,
-        args=(instance.pk, getattr(_usuario_atual(), "pk", None)),
-        daemon=True,
-    ).start()
+    _agendar_apos_commit(
+        organizar_oficio,
+        instance.pk,
+        getattr(_usuario_atual(), "pk", None),
+    )
 
 
 def _organizar_oficio_em_thread(oficio_id: int, usuario_id=None) -> None:
@@ -291,13 +288,13 @@ def _organizar_evento_ao_salvar(sender, instance, **kwargs) -> None:
         return
     if instance.status == instance.STATUS_RASCUNHO:
         return
-    import threading
+    from .tasks import organizar_evento
 
-    threading.Thread(
-        target=_organizar_evento_em_thread,
-        args=(instance.pk, getattr(_usuario_atual(), "pk", None)),
-        daemon=True,
-    ).start()
+    _agendar_apos_commit(
+        organizar_evento,
+        instance.pk,
+        getattr(_usuario_atual(), "pk", None),
+    )
 
 
 def _sincronizar_pasta_evento_ao_salvar(sender, instance, **kwargs) -> None:
@@ -307,7 +304,7 @@ def _sincronizar_pasta_evento_ao_salvar(sender, instance, **kwargs) -> None:
 
     Diferente de ``_organizar_evento_ao_salvar`` (que só roda quando o evento
     sai do rascunho, pois organiza documentos e gera PDFs reais em segundo
-    plano), aqui só sincronizamos a pasta em si: uma chamada leve, síncrona
+    plano), aqui sincronizamos a pasta em uma tarefa assíncrona curta
     (mesmo padrão de ``_organizar_evento_anexo``/``_organizar_solicitacao``).
     A função chamada (``organizer.sincronizar_pasta_evento``) não faz nada
     enquanto a Etapa 1 ainda não tiver dados suficientes.

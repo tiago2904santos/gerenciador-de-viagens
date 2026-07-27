@@ -94,7 +94,8 @@ Templates usam apenas components globais. CSS/JS por pagina seguem proibidos.
 - Exclusão protegida em `core/deletion.py`.
 - Builders de presenter em `core/presenters/actions.py`, `core/presenters/badges.py`, `core/presenters/meta.py`.
 - Auditorias automáticas:
-  - `python scripts/audit_frontend_standards.py`
+  - `python scripts/audit_frontend_standards.py --max-warnings 465`
+    mantém a dívida histórica inventariada e bloqueia qualquer aumento na CI.
   - `python scripts/audit_django_architecture.py`
 
 ### Regras negativas (proibicoes)

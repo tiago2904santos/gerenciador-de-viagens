@@ -1,12 +1,16 @@
 from __future__ import annotations
 
+from django.db import IntegrityError
+from django.db import connection
 from django.db import models
+from django.db import transaction
+from django.db.models import Q
 from django.utils import timezone
 
-from cadastros.models import CancelavelModel
+from core.models import CancelavelModel
 from cadastros.models import Cidade
 from cadastros.models import Servidor
-from cadastros.models import TimeStampedModel
+from core.models import TimeStampedModel
 from oficios.models import Oficio
 
 
@@ -143,6 +147,13 @@ class OrdemServico(TimeStampedModel, CancelavelModel):
 
     class Meta:
         ordering = ["-ano", "-numero"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["area", "ano", "numero"],
+                condition=Q(ano__isnull=False, numero__isnull=False),
+                name="ordens_servico_area_ano_numero_unique",
+            ),
+        ]
         verbose_name = "Ordem de Serviço"
         verbose_name_plural = "Ordens de Serviço"
 
@@ -183,9 +194,24 @@ class OrdemServico(TimeStampedModel, CancelavelModel):
                 from core.tenancy import get_current_area
 
                 self.area = get_current_area()
-        if not self.numero:
-            self._assign_numero()
-        super().save(*args, **kwargs)
+        if self.numero:
+            return super().save(*args, **kwargs)
+
+        ano = timezone.localdate().year
+        with transaction.atomic():
+            self._lock_numero_scope(ano)
+            for attempt in range(3):
+                self._assign_numero()
+                try:
+                    with transaction.atomic():
+                        return super().save(*args, **kwargs)
+                except IntegrityError as exc:
+                    if "ordens_servico_area_ano_numero_unique" not in str(exc):
+                        raise
+                    self.numero = None
+                    self.ano = None
+                    if attempt == 2:
+                        raise
 
     def _assign_numero(self):
         ano = timezone.localdate().year
@@ -197,3 +223,23 @@ class OrdemServico(TimeStampedModel, CancelavelModel):
         last = queryset.order_by("-numero").values_list("numero", flat=True).first()
         self.numero = (last or 0) + 1
         self.ano = ano
+
+    def _lock_numero_scope(self, ano):
+        if connection.vendor == "postgresql":
+            namespace = 0x4F534E55  # "OSNU"
+            scope = (((self.area_id or 0) * 4096) + (ano % 4096)) % 2_147_483_647
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "SELECT pg_advisory_xact_lock(%s, %s)",
+                    [namespace, scope],
+                )
+            return
+        if self.area_id:
+            area_model = self._meta.get_field("area").remote_field.model
+            area_model.objects.select_for_update().filter(pk=self.area_id).exists()
+        else:
+            list(
+                OrdemServico.objects.select_for_update()
+                .filter(area__isnull=True, ano=ano)
+                .exclude(numero__isnull=True)
+            )

@@ -22,6 +22,16 @@ urlpatterns = [
     path("<int:pk>/cancelar/", views.cancelar, name="cancelar"),
     path("<int:pk>/reativar/", views.reativar, name="reativar"),
     path(
+        "<int:pk>/anexo/<int:anexo_pk>/conteudo/",
+        views.evento_anexo_conteudo,
+        name="evento_anexo_conteudo",
+    ),
+    path(
+        "<int:pk>/solicitacao-anexo/<int:anexo_pk>/conteudo/",
+        views.solicitacao_anexo_conteudo,
+        name="solicitacao_anexo_conteudo",
+    ),
+    path(
         "<int:pk>/solicitacao-anexo/<int:anexo_pk>/excluir/",
         views.excluir_solicitacao_anexo,
         name="excluir_solicitacao_anexo",

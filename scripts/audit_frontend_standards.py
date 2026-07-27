@@ -7,6 +7,7 @@ Saída em três níveis:
 """
 import re
 import sys
+import argparse
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -205,8 +206,8 @@ def audit_css() -> list[tuple]:
 # Relatório
 # ---------------------------------------------------------------------------
 
-def print_findings(findings: list[tuple]) -> int:
-    """Print grouped findings. Returns count of ERROs."""
+def print_findings(findings: list[tuple]) -> tuple[int, int]:
+    """Print grouped findings. Returns counts of errors and warnings."""
     erros   = [f for f in findings if f[0] == "ERRO"]
     avisos  = [f for f in findings if f[0] == "AVISO"]
     excecoes = [f for f in findings if f[0] == "EXCEC"]
@@ -234,10 +235,18 @@ def print_findings(findings: list[tuple]) -> int:
 
     print(f"\nTotal: {len(erros)} ERROS, {len(avisos)} AVISOS, {len(unique_excecoes)} EXCECOES (arquivo/regra)")
 
-    return len(erros)
+    return len(erros), len(avisos)
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--max-warnings",
+        type=int,
+        default=None,
+        help="Falha se a dívida não bloqueante ultrapassar este limite.",
+    )
+    args = parser.parse_args()
     print("== Auditoria Frontend Standards — Central de Viagens 3.0 ==")
 
     template_findings = audit_templates()
@@ -248,7 +257,13 @@ def main() -> None:
         print("Nenhuma suspeita encontrada. ✅")
         sys.exit(0)
 
-    erros = print_findings(all_findings)
+    erros, avisos = print_findings(all_findings)
+    if args.max_warnings is not None and avisos > args.max_warnings:
+        print(
+            f"\nERRO: avisos aumentaram para {avisos}; "
+            f"a linha de base aceita no máximo {args.max_warnings}."
+        )
+        erros += 1
     sys.exit(1 if erros else 0)
 
 

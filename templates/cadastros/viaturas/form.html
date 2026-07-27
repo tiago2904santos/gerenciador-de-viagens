@@ -5,7 +5,7 @@
   <div class="page-shell page-shell--standard">
     {% include "components/ui/headers/page_header.html" with eyebrow="CADASTROS" title=page_title description=page_description icon_label="VT" module_label="Viaturas" only %}
 
-    <main class="main-form-panel main-form-panel--stack">
+    <div class="main-form-panel main-form-panel--stack">
       <div class="cv-form-section-stack cv-form-section-stack--comfortable">
         <form method="post" novalidate data-viatura-form>
           {% csrf_token %}
@@ -29,7 +29,7 @@
           </section>
         </form>
       </div>
-    </main>
+    </div>
   </div>
 {% endblock %}
 

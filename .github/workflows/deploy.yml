@@ -1,9 +1,10 @@
 name: Deploy para produção
 
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: ["Tests"]
+    types: [completed]
+    branches: [main]
 
 concurrency:
   group: deploy-producao
@@ -11,23 +12,38 @@ concurrency:
 
 jobs:
   deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy via SSH
+      - name: Deploy tested commit via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            set -euo pipefail
             cd /var/www/gerenciador-viagens/app
-            git pull origin main
+            BEFORE_SHA="$(git rev-parse HEAD)"
+            TARGET_SHA="${{ github.event.workflow_run.head_sha }}"
+            git fetch origin "$TARGET_SHA"
+            git checkout --detach "$TARGET_SHA"
             source /var/www/gerenciador-viagens/venv/bin/activate
-            export $(grep -v '^#' .env | xargs)
-            pip install -r requirements/prod.txt --quiet
+            set -a
+            source .env
+            set +a
+            python -m pip install -r requirements/lock.txt --quiet
+            APP_ROOT=/var/www/gerenciador-viagens/app \
+              bash scripts/backup_production.sh
             python manage.py migrate --noinput
             python manage.py collectstatic --noinput --clear
             systemctl restart gerenciador-viagens
             systemctl restart gerenciador-viagens-celery
-            echo "Deploy concluído!"
+            if ! curl --fail --silent --show-error --max-time 15 http://127.0.0.1:8000/health/; then
+              git checkout --detach "$BEFORE_SHA"
+              python -m pip install -r requirements/lock.txt --quiet
+              systemctl restart gerenciador-viagens
+              systemctl restart gerenciador-viagens-celery
+              exit 1
+            fi

@@ -78,8 +78,8 @@
 
   function loadPdf() {
     if (typeof pdfjsLib === "undefined") return;
-    if (window.__ASGN_WORKER__) {
-      pdfjsLib.GlobalWorkerOptions.workerSrc = window.__ASGN_WORKER__;
+    if (app.dataset.workerSrc) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = app.dataset.workerSrc;
     }
     pdfjsLib
       .getDocument({ url: pdfUrl, withCredentials: true })

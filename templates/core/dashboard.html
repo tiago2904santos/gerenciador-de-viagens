@@ -16,7 +16,7 @@
       </div>
       <div class="cv-entity-card__body dashboard-page__welcome-body">
         <p>Gerencie documentos oficiais de viagem com organização, padronização e rastreabilidade.</p>
-        <p class="dashboard-page__welcome-note">Os indicadores permanecem neutros até que uma consulta de dados seja habilitada para esta tela.</p>
+        <p class="dashboard-page__welcome-note">Use os indicadores abaixo para priorizar pendências e viagens próximas.</p>
       </div>
     </section>
 
@@ -28,10 +28,33 @@
         </div>
       </div>
       <div class="cv-summary-grid cv-summary-grid--4" role="list">
-        {% include "components/cards/summary_card.html" with label="Total de ofícios" value="—" description="Aguardando dados" only %}
-        {% include "components/cards/summary_card.html" with label="Rascunhos" value="—" description="Aguardando dados" only %}
-        {% include "components/cards/summary_card.html" with label="Documentos recentes" value="—" description="Sem consulta adicional" only %}
-        {% include "components/cards/summary_card.html" with label="Pendências" value="—" description="Sem consulta adicional" only %}
+        {% include "components/cards/summary_card.html" with label="Total de ofícios" value=total_oficios description="Na área ativa" only %}
+        {% include "components/cards/summary_card.html" with label="Ofícios em rascunho" value=oficios_rascunho description="Aguardando conclusão" only %}
+        {% include "components/cards/summary_card.html" with label="Assinaturas pendentes" value=assinaturas_pendentes description="Links ainda não concluídos" only %}
+        {% include "components/cards/summary_card.html" with label="Prestações pendentes" value=prestacoes_pendentes description="Por servidor" only %}
+      </div>
+    </section>
+
+    <section aria-labelledby="dashboard-upcoming-title">
+      <div class="dashboard-page__section-heading">
+        <div>
+          <span class="dashboard-page__eyebrow">Próximos 30 dias</span>
+          <h2 id="dashboard-upcoming-title">Viagens próximas</h2>
+        </div>
+      </div>
+      <div class="cv-entity-card">
+        <div class="cv-entity-card__body">
+          <ul class="summary-items">
+            {% for evento in proximas_viagens %}
+              <li>
+                <a href="{% url 'eventos:detalhe' evento.id %}">{{ evento.titulo|default:"Evento sem título" }}</a>
+                <span>{{ evento.data_inicio|date:"d/m/Y" }}</span>
+              </li>
+            {% empty %}
+              <li>Nenhuma viagem programada para os próximos 30 dias.</li>
+            {% endfor %}
+          </ul>
+        </div>
       </div>
     </section>
 

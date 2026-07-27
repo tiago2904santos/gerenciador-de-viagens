@@ -5,6 +5,7 @@ from unittest import mock
 
 from django.core.management import call_command
 from django.core.management.base import CommandError
+from django.core.cache import cache
 from django.test import SimpleTestCase
 from django.test import override_settings
 
@@ -12,6 +13,27 @@ from documentos.services.adapters import libreoffice_pdf
 
 
 class UnoserverAdapterTests(SimpleTestCase):
+    @override_settings(DOCUMENTOS_BINARY_CONVERSION_CACHE=True)
+    def test_cache_por_hash_evitar_segunda_conversao(self):
+        cache.clear()
+        converter = mock.Mock(return_value=b"%PDF-1.7\ncache")
+
+        first = libreoffice_pdf._convert_with_cache(
+            data=b"PK-conteudo-estavel",
+            source_format="docx",
+            engine="teste",
+            converter=converter,
+        )
+        second = libreoffice_pdf._convert_with_cache(
+            data=b"PK-conteudo-estavel",
+            source_format="docx",
+            engine="teste",
+            converter=converter,
+        )
+
+        self.assertEqual(first, second)
+        converter.assert_called_once()
+
     @mock.patch.object(libreoffice_pdf, "unoserver_healthcheck", return_value=True)
     def test_usa_cliente_xmlrpc_oficial_e_retorna_pdf(self, _healthcheck):
         client_instance = mock.Mock()

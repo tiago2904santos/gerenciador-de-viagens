@@ -1,5 +1,6 @@
 import uuid
 
+from django.core.exceptions import ValidationError
 from django.db import models
 
 
@@ -21,7 +22,7 @@ class DocumentoArtefato(models.Model):
     formato = models.CharField(max_length=16, db_index=True)
     oficio = models.ForeignKey(
         "oficios.Oficio",
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name="documentos_gerados",
@@ -35,7 +36,7 @@ class DocumentoArtefato(models.Model):
     )
     evento = models.ForeignKey(
         "eventos.Evento",
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name="documentos_gerados",
@@ -43,7 +44,7 @@ class DocumentoArtefato(models.Model):
     )
     termo = models.ForeignKey(
         "termos.TermoAutorizacao",
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name="documentos_gerados",
@@ -95,6 +96,8 @@ class DocumentoArtefato(models.Model):
 
     @property
     def esta_assinado(self) -> bool:
+        if self.pk and self.versoes_assinadas.filter(revogada_em__isnull=True).exists():
+            return True
         arq = self.arquivo_assinado
         if not arq or not getattr(arq, "name", ""):
             return False
@@ -106,4 +109,67 @@ class DocumentoArtefato(models.Model):
     @property
     def arquivo_efetivo(self):
         """Arquivo a considerar "oficial": assinado se existir no storage, senão o gerado."""
+        if self.pk:
+            versao = self.versoes_assinadas.filter(
+                revogada_em__isnull=True,
+            ).order_by("-criado_em").first()
+            if versao is not None:
+                return versao.arquivo
         return self.arquivo_assinado if self.esta_assinado else self.arquivo
+
+
+class DocumentoAssinaturaVersao(models.Model):
+    """Versão assinada append-only; revogação é tombstone, nunca exclusão."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    artefato = models.ForeignKey(
+        DocumentoArtefato,
+        on_delete=models.PROTECT,
+        related_name="versoes_assinadas",
+    )
+    arquivo = models.FileField(upload_to="documentos/assinados/versoes/%Y/%m/")
+    hash_sha256 = models.CharField(max_length=64, editable=False)
+    nome_original = models.CharField(max_length=255, blank=True, default="")
+    criado_em = models.DateTimeField(auto_now_add=True)
+    criado_por = models.ForeignKey(
+        "auth.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+    )
+    revogada_em = models.DateTimeField(null=True, blank=True)
+    revogada_por = models.ForeignKey(
+        "auth.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+    )
+
+    class Meta:
+        ordering = ["-criado_em"]
+        verbose_name = "Versão assinada"
+        verbose_name_plural = "Versões assinadas"
+
+    def save(self, *args, **kwargs):
+        if self.pk and not self._state.adding:
+            anterior = type(self).objects.get(pk=self.pk)
+            campos_imutaveis = (
+                "artefato_id",
+                "arquivo",
+                "hash_sha256",
+                "nome_original",
+                "criado_por_id",
+            )
+            if any(
+                getattr(anterior, campo) != getattr(self, campo)
+                for campo in campos_imutaveis
+            ):
+                raise ValidationError("Versões documentais assinadas são imutáveis.")
+            if anterior.revogada_em and self.revogada_em != anterior.revogada_em:
+                raise ValidationError("A revogação documental é imutável.")
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Versões documentais não podem ser excluídas.")

@@ -16,6 +16,11 @@ ENV_FILE = os.getenv("ENV_FILE", ".env")
 load_dotenv(BASE_DIR / ENV_FILE)
 
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-insecure-key")
+FIELD_ENCRYPTION_KEYS = tuple(
+    key.strip()
+    for key in os.getenv("FIELD_ENCRYPTION_KEYS", "").split(",")
+    if key.strip()
+)
 DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
 ALLOWED_HOSTS = [
@@ -52,12 +57,33 @@ INSTALLED_APPS = [
 _MIDDLEWARE_CORE = [
     "core.middleware.CurrentRequestMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "core.middleware.SecurityHeadersMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "core.middleware.CurrentAreaMiddleware",
+    "core.middleware.AreaRoleRequiredMiddleware",
 ]
+SSO_REMOTE_USER_ENABLED = os.getenv("SSO_REMOTE_USER_ENABLED", "false").lower() in {
+    "1",
+    "true",
+    "yes",
+}
+SSO_MFA_REQUIRED = os.getenv("SSO_MFA_REQUIRED", "true").lower() in {"1", "true", "yes"}
+SSO_MFA_ASSERTION_HEADER = os.getenv("SSO_MFA_ASSERTION_HEADER", "HTTP_X_AUTH_MFA")
+SSO_MFA_ACCEPTED_VALUES = tuple(
+    value.strip().lower()
+    for value in os.getenv("SSO_MFA_ACCEPTED_VALUES", "true,1,yes").split(",")
+    if value.strip()
+)
+if SSO_REMOTE_USER_ENABLED:
+    _auth_index = _MIDDLEWARE_CORE.index("django.contrib.auth.middleware.AuthenticationMiddleware")
+    _MIDDLEWARE_CORE.insert(_auth_index + 1, "core.auth.TrustedProxyRemoteUserMiddleware")
+
+AUTHENTICATION_BACKENDS = ["django.contrib.auth.backends.ModelBackend"]
+if SSO_REMOTE_USER_ENABLED:
+    AUTHENTICATION_BACKENDS.insert(0, "django.contrib.auth.backends.RemoteUserBackend")
 _MIDDLEWARE_TAIL = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -75,6 +101,33 @@ MIDDLEWARE.extend(_MIDDLEWARE_TAIL)
 LOGIN_URL = "core:login"
 LOGIN_REDIRECT_URL = "core:dashboard"
 LOGOUT_REDIRECT_URL = "core:login"
+AUTH_PASSWORD_VALIDATORS = [
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator", "OPTIONS": {"min_length": 12}},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+]
+SESSION_COOKIE_AGE = int(os.getenv("SESSION_COOKIE_AGE", "28800"))
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+_redis_url = os.getenv("REDIS_URL", "").strip()
+CACHES = {
+    "default": {
+        "BACKEND": (
+            "django.core.cache.backends.redis.RedisCache"
+            if _redis_url
+            else "django.core.cache.backends.locmem.LocMemCache"
+        ),
+        **({"LOCATION": _redis_url} if _redis_url else {}),
+    }
+}
+TRUSTED_PROXY_IPS = tuple(
+    value.strip()
+    for value in os.getenv("TRUSTED_PROXY_IPS", "127.0.0.1,::1").split(",")
+    if value.strip()
+)
+METRICS_TOKEN = os.getenv("METRICS_TOKEN", "")
 
 ROOT_URLCONF = "config.urls"
 
@@ -88,6 +141,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "core.context_processors.area_permissions",
                 "core.context_processors.navigation",
             ],
         },
@@ -117,10 +171,25 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Quando definido, o próximo número gerado nunca fica abaixo do piso para aquele ano;
 # a sequência segue normalmente em diante (piso, piso+1, ...). Não afeta números já existentes.
 # Ex.: {2026: 75} faz o próximo ofício de 2026 ser 75/2026 (se o maior atual for < 75).
-OFICIO_NUMERO_INICIAL = {2026: 75}
 
 # Armazenamento de artefatos documentais gerados (assinatura, auditoria).
 MEDIA_URL = "/media/"
+PRIVATE_MEDIA_X_ACCEL_REDIRECT = False
+PRIVATE_MEDIA_INTERNAL_URL = "/_protected_media/"
+OFICIO_NUMERACAO_USAR_CONFIGURACAO = True
+PRIVATE_UPLOAD_MAX_BYTES = int(os.getenv("PRIVATE_UPLOAD_MAX_BYTES", str(20 * 1024 * 1024)))
+DATA_UPLOAD_MAX_MEMORY_SIZE = int(
+    os.getenv("DATA_UPLOAD_MAX_MEMORY_SIZE", str(25 * 1024 * 1024)),
+)
+FILE_UPLOAD_MAX_MEMORY_SIZE = int(
+    os.getenv("FILE_UPLOAD_MAX_MEMORY_SIZE", str(5 * 1024 * 1024)),
+)
+DATA_UPLOAD_MAX_NUMBER_FILES = int(os.getenv("DATA_UPLOAD_MAX_NUMBER_FILES", "20"))
+PRIVATE_UPLOAD_REQUIRE_ANTIVIRUS = os.getenv(
+    "PRIVATE_UPLOAD_REQUIRE_ANTIVIRUS",
+    "false",
+).lower() in {"1", "true", "yes"}
+CLAMAV_SCAN_COMMAND = os.getenv("CLAMAV_SCAN_COMMAND", "clamdscan")
 MEDIA_ROOT = env_path("MEDIA_ROOT", "media")
 
 # Núcleo documental (DOCX/PDF, conversão opcional, assinatura).
@@ -145,6 +214,11 @@ DOCUMENTOS_ENGINE_PROBE_CACHE_SECONDS = int(
 )
 DOCUMENTOS_GENERATOR_VERSION = (os.getenv("DOCUMENTOS_GENERATOR_VERSION") or "1").strip() or "1"
 DOCUMENTOS_ARTIFACT_CACHE = os.getenv("DOCUMENTOS_ARTIFACT_CACHE", "true").lower() in ("1", "true", "yes")
+DOCUMENTOS_BINARY_CONVERSION_CACHE = os.getenv(
+    "DOCUMENTOS_BINARY_CONVERSION_CACHE",
+    "true",
+).lower() in ("1", "true", "yes")
+DOCUMENTOS_BINARY_CACHE_SECONDS = int(os.getenv("DOCUMENTOS_BINARY_CACHE_SECONDS", "86400"))
 DOCUMENTOS_PREGENERATE_PDF = os.getenv("DOCUMENTOS_PREGENERATE_PDF", "true").lower() in ("1", "true", "yes")
 DOCUMENTOS_TMP_DIR = Path(os.getenv("DOCUMENTOS_TMP_DIR", str(BASE_DIR / "media" / "tmp_documentos")))
 DOCUMENTOS_PERSIST_ARTEFATOS = os.getenv("DOCUMENTOS_PERSIST_ARTEFATOS", "true").lower() in (
@@ -202,9 +276,8 @@ GOOGLE_DRIVE = {
 # ---------------------------------------------------------------------------
 # Celery (fila de retry em segundo plano — ex.: reenvio automático ao Drive
 # quando o upload falha na hora). Sem CELERY_BROKER_URL configurado, aponta
-# para um Redis local; se não houver worker/broker disponível, o código que
-# despacha tarefas (integracoes/google_drive/signals.py) cai de volta para o
-# caminho síncrono e não quebra a aplicação.
+# para um Redis local; se não houver worker/broker disponível, o objeto fica
+# registrado como pendente sem executar rede no request do usuário.
 # ---------------------------------------------------------------------------
 CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
 CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", CELERY_BROKER_URL)
@@ -212,12 +285,24 @@ CELERY_TASK_ALWAYS_EAGER = _env_flag("CELERY_TASK_ALWAYS_EAGER", "false")
 CELERY_TASK_EAGER_PROPAGATES = True
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_TASK_TRACK_STARTED = True
+CELERY_BEAT_SCHEDULE = {
+    "google-drive-reorganizacoes-orfas": {
+        "task": "integracoes.google_drive.tasks.marcar_reorganizacoes_orfas",
+        "schedule": 600.0,
+    },
+}
+
+# Em produção, qualquer escrita exige vínculo ativo com uma área. A opção
+# existe apenas para que suítes legadas possam construir objetos sem todo o
+# contexto de tenancy; não deve ser desativada no ambiente implantado.
+AREA_RBAC_REQUIRE_MEMBERSHIP = _env_flag("AREA_RBAC_REQUIRE_MEMBERSHIP", "true")
 # Sem isso, ".delay()" pode ficar preso indefinidamente tentando conectar num
 # broker inalcançável (rede instável, host errado) — o mesmo tipo de trava sem
 # timeout que já mordeu a integração com o Google Drive. Falha rápido em vez
 # de travar quem chamou (ex.: a view "Tentar novamente agora").
-CELERY_BROKER_CONNECTION_TIMEOUT = float(os.getenv("CELERY_BROKER_CONNECTION_TIMEOUT") or 5)
+CELERY_BROKER_CONNECTION_TIMEOUT = float(os.getenv("CELERY_BROKER_CONNECTION_TIMEOUT") or 0.2)
+CELERY_TASK_PUBLISH_RETRY = False
 CELERY_BROKER_TRANSPORT_OPTIONS = {
-    "socket_connect_timeout": float(os.getenv("CELERY_BROKER_CONNECTION_TIMEOUT") or 5),
-    "socket_timeout": float(os.getenv("CELERY_BROKER_CONNECTION_TIMEOUT") or 5),
+    "socket_connect_timeout": CELERY_BROKER_CONNECTION_TIMEOUT,
+    "socket_timeout": CELERY_BROKER_CONNECTION_TIMEOUT,
 }

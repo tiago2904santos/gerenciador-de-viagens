@@ -474,15 +474,17 @@ class DarkRedesignContractTests(SimpleTestCase):
 
         for relative in (
             "relatorio_tecnico_form.html",
-            "consolidado.html",
-            "documentos_form.html",
             "diario_bordo_form.html",
+            "documentos_form.html",
+            "consolidado.html",
         ):
             with self.subTest(template=relative):
                 source = (
                     Path(settings.BASE_DIR) / "templates" / "prestacoes_contas" / relative
                 ).read_text(encoding="utf-8")
-                self.assertIn("cv-summary-card", source)
+                self.assertIn("travel-document-card", source)
+                self.assertIn("travel-document-body", source)
+                self.assertIn("cv-form-card__footer", source)
 
     def test_cards_lab_renders_canonical_product_components(self):
         lab = (

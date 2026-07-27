@@ -12,6 +12,7 @@ media/
 .pytest_cache/
 .coverage
 htmlcov/
+.local-backups/
 .idea/
 .vscode/
 legacy/

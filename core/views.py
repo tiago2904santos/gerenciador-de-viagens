@@ -1,12 +1,18 @@
 from django.contrib import messages
+from django.conf import settings
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_not_required
 from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.core.paginator import Paginator
+from django.core.cache import cache
 from django.http import Http404
+from django.http import HttpResponse
+from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.utils import timezone
 
 from eventos.forms import EventoForm
 from eventos.models import Evento
@@ -15,6 +21,49 @@ from .forms import AlterarSenhaForm
 from .forms import LoginForm
 from .forms import PerfilUsuarioForm
 from .forms import UiLabFieldDemoForm
+
+
+@login_not_required
+def health(request):
+    from django.db import connection
+    from django.db.utils import DatabaseError
+
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+            cursor.fetchone()
+    except DatabaseError:
+        return JsonResponse({"status": "unavailable"}, status=503)
+    return JsonResponse({"status": "ok"})
+
+
+@login_not_required
+def metrics(request):
+    expected = (getattr(settings, "METRICS_TOKEN", "") or "").strip()
+    supplied = request.headers.get("Authorization", "")
+    if not expected or supplied != f"Bearer {expected}":
+        raise Http404
+    from core.metrics import prometheus_text
+
+    return HttpResponse(
+        prometheus_text(),
+        content_type="text/plain; version=0.0.4; charset=utf-8",
+    )
+
+
+def _encerrar_outras_sessoes(request) -> None:
+    from django.contrib.sessions.models import Session
+    from django.utils import timezone
+
+    current_key = request.session.session_key
+    for session in Session.objects.filter(expire_date__gt=timezone.now()).iterator():
+        if session.session_key == current_key:
+            continue
+        try:
+            if str(session.get_decoded().get("_auth_user_id")) == str(request.user.pk):
+                session.delete()
+        except Exception:
+            continue
 
 
 UI_LAB_PAGE_DEFINITIONS = [
@@ -920,8 +969,68 @@ class LoginView(DjangoLoginView):
     redirect_authenticated_user = True
     authentication_form = LoginForm
 
+    limit = 5
+    window_seconds = 15 * 60
+
+    def _rate_key(self):
+        import hashlib
+        import ipaddress
+
+        remote_ip = self.request.META.get("REMOTE_ADDR", "")
+        trusted = remote_ip in settings.TRUSTED_PROXY_IPS
+        real_ip = self.request.META.get("HTTP_X_REAL_IP", "") if trusted else remote_ip
+        try:
+            real_ip = str(ipaddress.ip_address(real_ip))
+        except ValueError:
+            real_ip = "invalid"
+        username = (self.request.POST.get("username") or "").strip().casefold()
+        digest = hashlib.sha256(f"{real_ip}|{username}".encode()).hexdigest()
+        return f"login-attempt:{digest}"
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.method == "POST" and cache.get(self._rate_key(), 0) >= self.limit:
+            form = self.get_form()
+            form.add_error(
+                None,
+                "Muitas tentativas de acesso. Aguarde 15 minutos e tente novamente.",
+            )
+            return self.render_to_response(self.get_context_data(form=form), status=429)
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_invalid(self, form):
+        key = self._rate_key()
+        try:
+            cache.incr(key)
+        except ValueError:
+            cache.set(key, 1, timeout=self.window_seconds)
+        return super().form_invalid(form)
+
+    def form_valid(self, form):
+        cache.delete(self._rate_key())
+        return super().form_valid(form)
+
 
 def dashboard(request):
+    from datetime import timedelta
+
+    from core.tenancy import filter_queryset_by_area
+    from oficios.models import Oficio
+    from prestacoes_contas.models import AssinaturaDocumento
+    from prestacoes_contas.models import PrestacaoContas
+    from prestacoes_contas.models import PrestacaoServidor
+
+    today = timezone.localdate()
+    oficios = filter_queryset_by_area(Oficio.objects)
+    eventos = filter_queryset_by_area(Evento.objects)
+    prestacoes_area = filter_queryset_by_area(PrestacaoContas.objects)
+    proximas_viagens = list(
+        eventos.filter(
+            data_inicio__gte=today,
+            data_inicio__lte=today + timedelta(days=30),
+        )
+        .order_by("data_inicio")
+        .values("id", "titulo", "data_inicio")[:5]
+    )
     return render(
         request,
         "core/dashboard.html",
@@ -929,6 +1038,17 @@ def dashboard(request):
             "page_title": "Central de Viagens 3",
             "page_section": "Dashboard",
             "page_description": "Fundacao visual para os fluxos documentais do sistema.",
+            "total_oficios": oficios.count(),
+            "oficios_rascunho": oficios.filter(status=Oficio.STATUS_RASCUNHO).count(),
+            "assinaturas_pendentes": AssinaturaDocumento.objects.filter(
+                prestacao__in=prestacoes_area,
+                status=AssinaturaDocumento.STATUS_PENDENTE,
+            ).count(),
+            "prestacoes_pendentes": PrestacaoServidor.objects.filter(
+                prestacao__in=prestacoes_area,
+                finalizada=False,
+            ).count(),
+            "proximas_viagens": proximas_viagens,
         },
     )
 
@@ -967,6 +1087,7 @@ def perfil(request):
             if senha_form.is_valid():
                 user = senha_form.save()
                 update_session_auth_hash(request, user)
+                _encerrar_outras_sessoes(request)
                 messages.success(request, "Senha alterada com sucesso.")
                 return redirect("core:perfil")
         else:
@@ -985,6 +1106,11 @@ def perfil(request):
     drive_modo = cfg_drive.get("MODO", "mock").lower()
     drive_autorizado = esta_autorizado(usuario_drive)
     drive_pasta_raiz_id = get_pasta_raiz_id(usuario_drive)
+    drive_pendencias_resumo = drive_status.resumo_pendencias(
+        limite=20,
+        usuario=usuario_drive,
+        area=area_drive,
+    )
 
     return render(
         request,
@@ -1013,15 +1139,8 @@ def perfil(request):
                 area=area_drive,
             ).order_by("-iniciado_em").first(),
             # Pendências (falhas de envio ao Drive)
-            "drive_total_pendencias": drive_status.contagem_pendencias(
-                usuario=usuario_drive,
-                area=area_drive,
-            ),
-            "drive_pendencias": drive_status.listar_pendencias_detalhadas(
-                limite=20,
-                usuario=usuario_drive,
-                area=area_drive,
-            ),
+            "drive_total_pendencias": drive_pendencias_resumo["total"],
+            "drive_pendencias": drive_pendencias_resumo["itens"],
         },
     )
 

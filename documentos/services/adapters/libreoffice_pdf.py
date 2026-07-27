@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import os
 import socket
 import subprocess
@@ -7,11 +8,35 @@ import tempfile
 from pathlib import Path
 from urllib.parse import urlparse
 
+from django.conf import settings
+from django.core.cache import cache
+
 # Invocações concorrentes de `soffice` sem perfil isolado disputam o lock do
 # perfil de utilizador padrão (~/.config/libreoffice/.../.lock): uma delas
 # falha ou bloqueia indefinidamente. `-env:UserInstallation` isola cada
 # chamada no seu próprio diretório temporário, eliminando essa disputa.
 _LIBREOFFICE_TIMEOUT_SECONDS = 90
+
+
+def _conversion_cache_key(*, data: bytes, source_format: str, engine: str) -> str:
+    version = str(getattr(settings, "DOCUMENTOS_GENERATOR_VERSION", "1") or "1")
+    digest = hashlib.sha256(data).hexdigest()
+    return f"cv3:document-conversion:{version}:{engine}:{source_format}:{digest}"
+
+
+def _convert_with_cache(*, data: bytes, source_format: str, engine: str, converter) -> bytes:
+    enabled = bool(getattr(settings, "DOCUMENTOS_BINARY_CONVERSION_CACHE", True))
+    key = _conversion_cache_key(data=data, source_format=source_format, engine=engine)
+    if enabled:
+        cached = cache.get(key)
+        if isinstance(cached, bytes) and cached.startswith(b"%PDF"):
+            return cached
+
+    result = converter()
+    if enabled:
+        timeout = int(getattr(settings, "DOCUMENTOS_BINARY_CACHE_SECONDS", 86400) or 86400)
+        cache.set(key, result, timeout=max(1, timeout))
+    return result
 
 
 def _headless_subprocess_kwargs() -> dict[str, int]:
@@ -59,19 +84,29 @@ def convert_docx_to_pdf_libreoffice(*, docx_bytes: bytes, libreoffice_binary: st
     """
     Converte DOCX em PDF via LibreOffice em modo headless (sem unoserver).
     """
-    return _convert_via_libreoffice(
-        input_bytes=docx_bytes,
-        filename="entrada.docx",
-        libreoffice_binary=libreoffice_binary,
+    return _convert_with_cache(
+        data=docx_bytes,
+        source_format="docx",
+        engine="libreoffice",
+        converter=lambda: _convert_via_libreoffice(
+            input_bytes=docx_bytes,
+            filename="entrada.docx",
+            libreoffice_binary=libreoffice_binary,
+        ),
     )
 
 
 def convert_xlsx_to_pdf_libreoffice(*, xlsx_bytes: bytes, libreoffice_binary: str) -> bytes:
     """Converte XLSX em PDF via LibreOffice em modo headless (sem unoserver)."""
-    return _convert_via_libreoffice(
-        input_bytes=xlsx_bytes,
-        filename="entrada.xlsx",
-        libreoffice_binary=libreoffice_binary,
+    return _convert_with_cache(
+        data=xlsx_bytes,
+        source_format="xlsx",
+        engine="libreoffice",
+        converter=lambda: _convert_via_libreoffice(
+            input_bytes=xlsx_bytes,
+            filename="entrada.xlsx",
+            libreoffice_binary=libreoffice_binary,
+        ),
     )
 
 
@@ -95,11 +130,16 @@ def convert_docx_to_pdf_unoserver(
     timeout_seconds: float = 3,
 ) -> bytes:
     """Converte DOCX → PDF pelo cliente XML-RPC oficial do unoserver."""
-    return _convert_via_unoserver(
+    return _convert_with_cache(
         data=docx_bytes,
-        filename="documento.docx",
-        unoserver_url=unoserver_url,
-        timeout_seconds=timeout_seconds,
+        source_format="docx",
+        engine=f"unoserver:{unoserver_url}",
+        converter=lambda: _convert_via_unoserver(
+            data=docx_bytes,
+            filename="documento.docx",
+            unoserver_url=unoserver_url,
+            timeout_seconds=timeout_seconds,
+        ),
     )
 
 
@@ -110,11 +150,16 @@ def convert_xlsx_to_pdf_unoserver(
     timeout_seconds: float = 3,
 ) -> bytes:
     """Converte XLSX → PDF pelo cliente XML-RPC oficial do unoserver."""
-    return _convert_via_unoserver(
+    return _convert_with_cache(
         data=xlsx_bytes,
-        filename="documento.xlsx",
-        unoserver_url=unoserver_url,
-        timeout_seconds=timeout_seconds,
+        source_format="xlsx",
+        engine=f"unoserver:{unoserver_url}",
+        converter=lambda: _convert_via_unoserver(
+            data=xlsx_bytes,
+            filename="documento.xlsx",
+            unoserver_url=unoserver_url,
+            timeout_seconds=timeout_seconds,
+        ),
     )
 
 

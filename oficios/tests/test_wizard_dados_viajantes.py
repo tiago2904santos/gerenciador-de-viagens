@@ -63,12 +63,19 @@ class OficioWizardDadosViajantesTests(TestCase):
         return data
 
     def _novo_rascunho_url(self):
-        response = self.client.get(reverse("oficios:novo"))
+        response = self.client.post(reverse("oficios:novo"))
         self.assertEqual(response.status_code, 302)
         return response.url
 
-    def test_get_novo_renderiza_wizard(self):
+    def test_get_novo_solicita_confirmacao_sem_criar_rascunho(self):
         response = self.client.get(reverse("oficios:novo"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Criar ofício")
+        self.assertFalse(Oficio.objects.exists())
+
+    def test_post_novo_renderiza_wizard(self):
+        response = self.client.post(reverse("oficios:novo"))
 
         self.assertEqual(response.status_code, 302)
         oficio = Oficio.objects.get()
@@ -114,11 +121,22 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertContains(response, 'data-picker-variant="detailed"')
         self.assertContains(response, 'data-picker-term-control="true"')
         self.assertContains(response, "cv-form-section-stack--comfortable")
-        self.assertContains(response, "Equipe do ofício")
+        self.assertContains(response, "Equipe")
         self.assertNotContains(response, "Selecione os viajantes; um deles pode ser o motorista")
-        self.assertContains(response, "Cadastrar novo viajante")
+        html = response.content.decode()
+        self.assertEqual(len(re.findall(r"<main\b", html)), 1)
+        self.assertIsNotNone(
+            re.search(
+                r"<h1\b[^>]*>.*?</h1>.*?<h2\b[^>]*>.*?</h2>.*?<h3\b",
+                html,
+                flags=re.DOTALL,
+            )
+        )
+        self.assertIn('href="#main-content"', html)
+        self.assertIn('id="main-content"', html)
+        self.assertContains(response, "Novo viajante")
         self.assertContains(response, 'data-placeholder="Buscar por nome, CPF ou RG"')
-        self.assertContains(response, 'data-panel-title="EQUIPE DO OFÍCIO"')
+        self.assertContains(response, 'data-panel-title="PESSOAS NA EQUIPE"')
         self.assertContains(response, 'data-empty-selected="Nenhum viajante selecionado."')
         self.assertContains(response, "data-main=")
         self.assertContains(response, "data-cpf=")
@@ -138,8 +156,8 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertContains(response, 'name="motivo"')
         self.assertContains(response, "cv-field__control cv-field__control--textarea")
         self.assertContains(response, 'rows="4"')
-        self.assertContains(response, "wizard-inner-section")
-        self.assertContains(response, "id=\"travel-document-wizard-motivo\"")
+        self.assertContains(response, "cv-form-block--resource")
+        self.assertContains(response, 'id="travel-document-purpose-title"')
         self.assertNotContains(
             response,
             "Escolha um modelo para iniciar com texto pré-preenchido ou escreva manualmente o motivo.",
@@ -571,6 +589,7 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertContains(response, "Informe o motivo.")
         self.assertContains(response, "Selecione ao menos um viajante.")
 
+        oficio.protocolo = "123456789"
         oficio.motivo = "Motivo"
         oficio.save()
         oficio.servidores.add(self.servidor)
@@ -583,12 +602,11 @@ class OficioWizardDadosViajantesTests(TestCase):
         ano = timezone.localdate().year
         Oficio.objects.create(numero=1, ano=ano, motivo="Motivo card", protocolo="123456789", custeio=Oficio.CUSTEIO_UNIDADE_DPC)
 
-        response = self.client.get(reverse("oficios:index"))
+        response = self.client.get(reverse("oficios:index") + "?aba=atuais")
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "N° do Ofício")
+        self.assertContains(response, "Ofício")
         self.assertContains(response, f"01/{ano}")
-        self.assertContains(response, "Motivo card")
         self.assertContains(response, "12.345.678-9")
 
     def test_index_exibe_referencias_e_layout_compacto_para_motorista_fora_do_oficio(self):

@@ -4,6 +4,15 @@
   var activeTrigger = null;
   var currentRemoveUrl = "";
   var BOUND = "data-attach-signed-bound";
+  var KINDS = ["primary", "secondary", "tertiary", "quaternary", "quinary"];
+
+  function kindPrefix(kind) {
+    if (kind === "secondary") return "data-attach-signed-secondary-";
+    if (kind === "tertiary") return "data-attach-signed-tertiary-";
+    if (kind === "quaternary") return "data-attach-signed-quaternary-";
+    if (kind === "quinary") return "data-attach-signed-quinary-";
+    return "data-attach-signed-";
+  }
 
   function init(root) {
     var scope = root && root.querySelector ? root : document;
@@ -22,10 +31,6 @@
     var currentOpen = modal.querySelector("[data-attach-signed-current-open]");
     var kindSelector = modal.querySelector("[data-attach-signed-kind-selector]");
     var kindButtons = modal.querySelectorAll("[data-attach-signed-kind]");
-    var primaryOptionLabel = modal.querySelector("[data-attach-signed-primary-option-label]");
-    var secondaryOptionLabel = modal.querySelector("[data-attach-signed-secondary-option-label]");
-    var tertiaryOptionLabel = modal.querySelector("[data-attach-signed-tertiary-option-label]");
-    var tertiaryOptionButton = modal.querySelector('[data-attach-signed-kind="tertiary"]');
     var fileDescription = modal.querySelector("[data-attach-signed-file-description]");
     var fileHelp = modal.querySelector("[data-attach-signed-file-help]");
     var fileInput = modal.querySelector('input[type="file"]');
@@ -49,9 +54,7 @@
 
     function documentData(kind) {
       if (!activeTrigger) return null;
-      var prefix = "data-attach-signed-";
-      if (kind === "secondary") prefix += "secondary-";
-      if (kind === "tertiary") prefix += "tertiary-";
+      var prefix = kindPrefix(kind);
       return {
         url: activeTrigger.getAttribute(prefix + "url") || "",
         label: activeTrigger.getAttribute(prefix + "doc-label") || "este documento",
@@ -59,6 +62,13 @@
         currentViewUrl: activeTrigger.getAttribute(prefix + "current-view-url") || "",
         currentRemoveUrl: activeTrigger.getAttribute(prefix + "current-remove-url") || "",
       };
+    }
+
+    function availableKinds() {
+      return KINDS.filter(function (kind) {
+        var data = documentData(kind);
+        return data && data.url;
+      });
     }
 
     function updateReturnUrl(kind) {
@@ -117,13 +127,16 @@
     }
 
     function openModal(trigger, initialKind) {
-      var url = trigger.getAttribute("data-attach-signed-url");
-      if (!url || !form) return;
+      if (!form) return;
 
       activeTrigger = trigger;
 
-      var secondaryUrl = trigger.getAttribute("data-attach-signed-secondary-url") || "";
-      var tertiaryUrl = trigger.getAttribute("data-attach-signed-tertiary-url") || "";
+      var kinds = availableKinds();
+      if (!kinds.length) {
+        activeTrigger = null;
+        return;
+      }
+
       if (fileInput) {
         fileInput.setAttribute(
           "accept",
@@ -146,22 +159,27 @@
         uploadButton.textContent =
           trigger.getAttribute("data-attach-signed-upload-label") || fileDefaults.upload;
       }
-      if (kindSelector) kindSelector.hidden = !secondaryUrl;
-      if (tertiaryOptionButton) tertiaryOptionButton.hidden = !tertiaryUrl;
-      if (primaryOptionLabel) {
-        primaryOptionLabel.textContent =
-          trigger.getAttribute("data-attach-signed-primary-option-label") || "Documento principal";
-      }
-      if (secondaryOptionLabel) {
-        secondaryOptionLabel.textContent =
-          trigger.getAttribute("data-attach-signed-secondary-option-label") || "Documento adicional";
-      }
-      if (tertiaryOptionLabel) {
-        tertiaryOptionLabel.textContent =
-          trigger.getAttribute("data-attach-signed-tertiary-option-label") || "Outro documento";
-      }
-      var selectedKind = initialKind || "primary";
-      if (!documentData(selectedKind) || !documentData(selectedKind).url) selectedKind = "primary";
+
+      if (kindSelector) kindSelector.hidden = kinds.length < 2;
+
+      kindButtons.forEach(function (button) {
+        var kind = button.getAttribute("data-attach-signed-kind");
+        var hasUrl = kinds.indexOf(kind) !== -1;
+        button.hidden = !hasUrl;
+        var labelNode = button.querySelector("[data-attach-signed-" + kind + "-option-label]");
+        if (labelNode) {
+          labelNode.textContent =
+            trigger.getAttribute("data-attach-signed-" + kind + "-option-label") ||
+            labelNode.textContent;
+        }
+      });
+
+      var preferred =
+        initialKind ||
+        trigger.getAttribute("data-attach-signed-initial-kind") ||
+        "primary";
+      var selectedKind = preferred;
+      if (kinds.indexOf(selectedKind) === -1) selectedKind = kinds[0] || "primary";
       selectDocument(selectedKind, false);
 
       if (window.CV && window.CV.dialogs) {
@@ -194,7 +212,10 @@
       var trigger = event.target.closest("[data-attach-signed-trigger]");
       if (trigger) {
         event.preventDefault();
-        openModal(trigger, "primary");
+        openModal(
+          trigger,
+          trigger.getAttribute("data-attach-signed-initial-kind") || "primary"
+        );
         return;
       }
 
@@ -223,6 +244,17 @@
       }
     });
 
+    if (form) {
+      form.addEventListener("submit", function () {
+        if (window.CV && window.CV.documentProgress) {
+          window.CV.documentProgress.begin(uploadButton, {
+            title: "Anexando documento…",
+            detail: "O arquivo será salvo; você pode continuar navegando.",
+          });
+        }
+      });
+    }
+
     var reopenParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
     var reopenKey = reopenParams.get("attach-signed");
     if (reopenKey) {
@@ -232,7 +264,9 @@
           return trigger.getAttribute("data-attach-signed-reopen-key") === reopenKey;
         }
       );
-      if (reopenTrigger) openModal(reopenTrigger, reopenParams.get("kind") || "primary");
+      if (reopenTrigger) {
+        openModal(reopenTrigger, reopenParams.get("kind") || reopenTrigger.getAttribute("data-attach-signed-initial-kind") || "primary");
+      }
     }
     return true;
   }

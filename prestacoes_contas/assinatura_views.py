@@ -7,8 +7,12 @@ app (template próprio) e isentas de login (``login_not_required``).
 from __future__ import annotations
 
 import base64
+import hashlib
+import ipaddress
 
+from django.conf import settings
 from django.contrib.auth.decorators import login_not_required
+from django.core.cache import cache
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.shortcuts import render
@@ -41,22 +45,52 @@ FONTES_ASSINATURA = [
 
 
 def _client_ip(request) -> str:
-    xff = request.META.get("HTTP_X_FORWARDED_FOR", "")
-    if xff:
-        return xff.split(",")[0].strip()
-    return request.META.get("REMOTE_ADDR", "") or ""
+    remote_ip = request.META.get("REMOTE_ADDR", "")
+    candidate = (
+        request.META.get("HTTP_X_REAL_IP", "")
+        if remote_ip in settings.TRUSTED_PROXY_IPS
+        else remote_ip
+    )
+    try:
+        return str(ipaddress.ip_address(candidate))
+    except ValueError:
+        return ""
 
 
 def _ok_key(token, tipo):
     return f"assin_ok_{token}_{tipo}"
 
 
-def _tries_key(token, tipo):
-    return f"assin_tries_{token}_{tipo}"
+def _attempt_keys(request, token, tipo):
+    token_digest = hashlib.sha256(f"{token}|{tipo}".encode()).hexdigest()
+    ip_digest = hashlib.sha256(_client_ip(request).encode()).hexdigest()[:20]
+    return (
+        f"assin-attempt:{token_digest}:{ip_digest}",
+        f"assin-attempt-global:{token_digest}",
+    )
 
 
-def _block_key(token, tipo):
-    return f"assin_block_{token}_{tipo}"
+def _attempt_count(key):
+    return int(cache.get(key, 0))
+
+
+def _record_failed_attempt(request, token, tipo):
+    values = []
+    for key in _attempt_keys(request, token, tipo):
+        if not cache.add(key, 1, timeout=_BLOQUEIO_MINUTOS * 60):
+            try:
+                cache.incr(key)
+            except ValueError:
+                cache.set(key, 1, timeout=_BLOQUEIO_MINUTOS * 60)
+        values.append(_attempt_count(key))
+    return values
+
+
+def _blocked(request, token, tipo):
+    per_ip, global_token = (
+        _attempt_count(key) for key in _attempt_keys(request, token, tipo)
+    )
+    return per_ip >= _MAX_TENTATIVAS or global_token >= (_MAX_TENTATIVAS * 4)
 
 
 def _identidade_confirmada(request, token, tipo) -> bool:
@@ -123,8 +157,7 @@ def publico_identidade(request, token, tipo):
     if _identidade_confirmada(request, token, tipo):
         return redirect(assinar_url)
 
-    bloqueio = request.session.get(_block_key(token, tipo))
-    bloqueado = bool(bloqueio and timezone.now().timestamp() < bloqueio)
+    bloqueado = _blocked(request, token, tipo)
 
     erro = ""
     if request.method == "POST" and not bloqueado:
@@ -134,17 +167,13 @@ def publico_identidade(request, token, tipo):
             erro = "Confirme que o nome exibido é o seu para continuar."
         elif validar_identidade(doc, cpf):
             request.session[_ok_key(token, tipo)] = True
-            request.session.pop(_tries_key(token, tipo), None)
-            request.session.pop(_block_key(token, tipo), None)
+            for key in _attempt_keys(request, token, tipo):
+                cache.delete(key)
             return redirect(assinar_url)
         else:
-            tentativas = int(request.session.get(_tries_key(token, tipo), 0)) + 1
-            request.session[_tries_key(token, tipo)] = tentativas
+            tentativas, _global = _record_failed_attempt(request, token, tipo)
             restantes = _MAX_TENTATIVAS - tentativas
             if restantes <= 0:
-                request.session[_block_key(token, tipo)] = (
-                    timezone.now() + timezone.timedelta(minutes=_BLOQUEIO_MINUTOS)
-                ).timestamp()
                 bloqueado = True
                 erro = "Muitas tentativas. Tente novamente mais tarde."
             else:

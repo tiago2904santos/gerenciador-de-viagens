@@ -33,10 +33,9 @@ class LimparRoteirosOrfaosTests(TestCase):
         Oficio.objects.create(numero=1, ano=2026, roteiro=referenciado_por_oficio)
         referenciado_por_prestacao = Roteiro.objects.create(tipo=Roteiro.TIPO_AVULSO, origem_cidade=self.cidade_sede)
         oficio_da_prestacao = Oficio.objects.create(numero=99, ano=2026)
-        servidor = Servidor.objects.create(nome="Servidor Teste")
-        PrestacaoContas.objects.create(
-            oficio=oficio_da_prestacao, servidor=servidor, roteiro_ajustado=referenciado_por_prestacao
-        )
+        prestacao = PrestacaoContas.objects.get(oficio=oficio_da_prestacao)
+        prestacao.roteiro_ajustado = referenciado_por_prestacao
+        prestacao.save(update_fields=["roteiro_ajustado", "atualizado_em"])
         referenciado_por_evento = Roteiro.objects.create(
             tipo=Roteiro.TIPO_EVENTO,
             origem_cidade=self.cidade_sede,

@@ -9,6 +9,28 @@ on:
 jobs:
   django:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: gerenciador_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d gerenciador_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      TEST_USE_POSTGRES: "true"
+      DB_NAME: gerenciador_test
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_HOST: 127.0.0.1
+      DB_PORT: "5432"
+
     steps:
       - uses: actions/checkout@v4
 
@@ -17,25 +39,75 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install LibreOffice (DOCX→PDF e deteção soffice)
+      - name: Install LibreOffice
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends libreoffice-writer
+          sudo apt-get install -y --no-install-recommends libreoffice-writer libreoffice-calc python3-uno
 
-      - name: Install Python dependencies
-        run: pip install -r requirements/dev.txt
-
-      - name: Run Django tests (SQLite, núcleo documental)
+      - name: Install locked dependencies
         run: |
-          python manage.py test \
-            documentos.tests.test_docxtpl_nested_templates \
-            documentos.tests.test_facade \
-            documentos.tests.test_libreoffice_resolve \
-            documentos.tests.test_simple_pdf_fallback \
-            documentos.tests.test_templates \
-            documentos.tests.test_validators \
-            documentos.tests.test_filenames \
-            documentos.tests.test_responses \
-            documentos.tests.test_registry \
-            documentos.tests.test_placeholders \
-            --settings=config.settings.test -v 1
+          python -m pip install --upgrade pip==26.1.2
+          python -m pip install -r requirements/lock.txt
+          python -m pip install "pip-audit>=2.9,<3.0"
+
+      - name: Validate migrations and Django configuration
+        run: |
+          python manage.py makemigrations --check --dry-run --settings=config.settings.test
+          python manage.py check --settings=config.settings.test
+
+      - name: Block new frontend standards debt
+        run: python scripts/audit_frontend_standards.py --max-warnings 465
+
+      - name: Validate production security settings
+        env:
+          SECRET_KEY: "ci-only-not-for-production-7c8d2c39f9f54f6c8d25aa12"
+          FIELD_ENCRYPTION_KEYS: "RbJU2kb8Nz8Wp2-31RCWLqETNsn6qEBBo-bLcqdSDTE="
+          ALLOWED_HOSTS: "localhost"
+          CSRF_TRUSTED_ORIGINS: "https://localhost"
+          DOCUMENTOS_DEFAULT_PDF_ENGINE: "unoserver"
+          DOCUMENTOS_UNOSERVER_URL: "http://127.0.0.1:2003"
+        run: python manage.py check --deploy --settings=config.settings.prod
+
+      - name: Audit Python dependencies
+        # WeasyPrint has no fixed release for PYSEC-2026-3412. Our adapter
+        # explicitly disables presentational_hints and regression-tests it.
+        run: >-
+          python -m pip_audit -r requirements/lock.txt --disable-pip
+          --ignore-vuln PYSEC-2026-3412
+
+      - name: Enforce real document generation SLA
+        run: |
+          SITE_PACKAGES="$(python -c 'import site; print(site.getsitepackages()[0])')"
+          PYTHONPATH="$SITE_PACKAGES" /usr/bin/python3 -m unoserver.server \
+            --interface 127.0.0.1 --port 2003 \
+            --uno-interface 127.0.0.1 --uno-port 2002 \
+            --conversion-timeout 10 --stop-after 1000 \
+            > "$RUNNER_TEMP/unoserver.log" 2>&1 &
+          for attempt in $(seq 1 40); do
+            if (echo > /dev/tcp/127.0.0.1/2003) 2>/dev/null; then break; fi
+            sleep 0.25
+          done
+          DOCUMENTOS_UNOSERVER_URL=http://127.0.0.1:2003 \
+          DOCUMENTOS_DEFAULT_PDF_ENGINE=unoserver \
+          python manage.py documentos_unoserver_check \
+            --benchmark --representative-resources --max-ms 1000 --iterations 3
+
+      - name: Exercise encrypted database and media restore
+        env:
+          PGPASSWORD: postgres
+          BACKUP_ENCRYPTION_KEY: "ci-restore-drill-only-key"
+          RESTORE_CONFIRM: "RESTAURAR"
+        run: |
+          mkdir -p "$RUNNER_TEMP/media" "$RUNNER_TEMP/backups"
+          printf 'restore-drill\n' > "$RUNNER_TEMP/media/probe.txt"
+          APP_ROOT="$GITHUB_WORKSPACE" \
+          MEDIA_ROOT="$RUNNER_TEMP/media" \
+          BACKUP_ROOT="$RUNNER_TEMP/backups" \
+            bash scripts/backup_production.sh
+          BACKUP_FILE="$(find "$RUNNER_TEMP/backups" -name '*.tar.gz.enc' -print -quit)"
+          MEDIA_ROOT="$RUNNER_TEMP/media" \
+            bash scripts/restore_backup.sh "$BACKUP_FILE"
+          test "$(cat "$RUNNER_TEMP/media/probe.txt")" = "restore-drill"
+
+      - name: Run complete Django test suite on PostgreSQL
+        run: python manage.py test --settings=config.settings.test -v 1

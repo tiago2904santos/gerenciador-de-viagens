@@ -56,13 +56,12 @@ class ExcluirEventoTests(TestCase):
 
     def test_excluir_evento_preserva_roteiro_usado_em_prestacao_de_contas_de_outro_evento(self):
         outro_evento = Evento.objects.create(titulo="Outro evento")
-        servidor = Servidor.objects.create(nome="Servidor Um", cpf="12345678901")
         roteiro = Roteiro.objects.create(evento=self.evento)
         Oficio.objects.create(evento=self.evento, roteiro=roteiro)
         oficio_outro_evento = Oficio.objects.create(evento=outro_evento)
-        prestacao = PrestacaoContas.objects.create(
-            oficio=oficio_outro_evento, servidor=servidor, roteiro_ajustado=roteiro,
-        )
+        prestacao = PrestacaoContas.objects.get(oficio=oficio_outro_evento)
+        prestacao.roteiro_ajustado = roteiro
+        prestacao.save(update_fields=["roteiro_ajustado", "atualizado_em"])
 
         excluir_evento(self.evento)
 

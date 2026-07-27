@@ -74,3 +74,4 @@
 {{ roteiro_editor_state_json|default:'{}'|json_script:"roteiro-editor-state-data" }}
 {{ roteiro_routes_json|default_if_none:''|json_script:"roteiro-editor-routes-data" }}
 {{ roteiro_diarias_resultado|default_if_none:''|json_script:"roteiro-editor-diarias-data" }}
+<script src="{% static 'js/pages/roteiros/editor/source-toggle.js' %}" defer></script>

@@ -16,7 +16,7 @@
   <div class="page-shell page-shell--standard travel-document-wizard app-wizard document-form-page os-page" data-os-wizard-shell>
     {% include "components/ui/headers/page_header.html" with eyebrow="DOCUMENTOS" title=page_title description="Cadastro de ordem de serviço" icon_label="OS" module_label="Ordens de Serviço" back_label=back_label back_url=index_url only %}
 
-    <main class="main-form-panel main-form-panel--stack travel-document-wizard__main">
+    <div class="main-form-panel main-form-panel--stack travel-document-wizard__main">
       <div class="cv-form-section-stack cv-form-section-stack--comfortable">
         <form method="post" class="document-form travel-document-wizard__form os-form" data-os-form data-api-cidades-url="{{ api_cidades_por_estado_url }}">
           {% csrf_token %}
@@ -56,7 +56,7 @@
           </div>
         </form>
       </div>
-    </main>
+    </div>
   </div>
 {% endblock %}
 

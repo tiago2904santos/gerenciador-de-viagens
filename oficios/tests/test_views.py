@@ -30,7 +30,7 @@ class OficioViewsTests(TestCase):
         self.servidor = Servidor.objects.create(nome="Servidor Teste", cargo=self.cargo, cpf="12345678901")
 
     def test_get_index_retorna_200(self):
-        response = self.client.get(reverse("oficios:index"))
+        response = self.client.get(reverse("oficios:index") + "?aba=atuais")
         self.assertEqual(response.status_code, 200)
 
     def test_index_usa_modal_para_excluir_oficio(self):
@@ -44,8 +44,13 @@ class OficioViewsTests(TestCase):
         self.assertContains(response, f'data-delete-url="{excluir_url}?{next_qs}"')
         self.assertNotContains(response, f'href="{excluir_url}"')
 
-    def test_get_novo_cria_rascunho_e_redireciona(self):
+    def test_get_novo_nao_cria_rascunho(self):
         response = self.client.get(reverse("oficios:novo"))
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(Oficio.objects.exists())
+
+    def test_post_novo_cria_rascunho_e_redireciona(self):
+        response = self.client.post(reverse("oficios:novo"))
         self.assertEqual(response.status_code, 302)
         oficio = Oficio.objects.get()
         self.assertEqual(response.url, reverse("oficios:dados_viajantes", args=[oficio.pk]))
@@ -100,14 +105,14 @@ class OficioViewsTests(TestCase):
 
     def test_lista_continua_exibindo_status_rascunho(self):
         Oficio.objects.create(numero=1, ano=timezone.localdate().year, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
-        response = self.client.get(reverse("oficios:index"))
+        response = self.client.get(reverse("oficios:index") + "?aba=atuais")
         self.assertContains(response, "Rascunho")
 
     def test_lista_visualizar_documento_aponta_para_etapa_documentos(self):
         oficio = Oficio.objects.create(numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
         oficio.servidores.add(self.servidor)
-        response = self.client.get(reverse("oficios:index"))
-        self.assertContains(response, "Visualizar documento")
+        response = self.client.get(reverse("oficios:index") + "?aba=atuais")
+        self.assertContains(response, "Visualizar ofício")
         self.assertContains(response, reverse("oficios:wizard_documentos", args=[oficio.pk]))
         self.assertNotContains(
             response,
@@ -145,9 +150,9 @@ class OficioViewsTests(TestCase):
         )
         response = self.client.get(reverse("oficios:wizard_documentos", args=[oficio.pk]))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "cv-icon-btn--preview")
-        self.assertContains(response, "cv-icon-btn--pdf")
-        self.assertContains(response, "cv-icon-btn--docx")
+        self.assertContains(response, "Visualizar documento")
+        self.assertContains(response, "Baixar PDF")
+        self.assertContains(response, "Baixar DOCX")
         self.assertContains(response, reverse("oficios:baixar_documento", args=[oficio.pk, "docx"]))
 
     @mock.patch("documentos.services.warm_cache.ensure_document_artifact_cached")
@@ -182,9 +187,9 @@ class OficioViewsTests(TestCase):
         response = self.client.get(reverse("oficios:wizard_documentos", args=[oficio.pk]))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Justificativa")
-        self.assertContains(response, "cv-icon-btn--preview")
-        self.assertContains(response, "cv-icon-btn--pdf")
-        self.assertContains(response, "cv-icon-btn--docx")
+        self.assertContains(response, "Visualizar documento")
+        self.assertContains(response, "Baixar PDF")
+        self.assertContains(response, "Baixar DOCX")
         self.assertContains(response, reverse("oficios:baixar_justificativa_documento", args=[oficio.pk, "docx"]))
 
     @mock.patch("documentos.services.warm_cache.ensure_document_artifact_cached")
@@ -331,9 +336,9 @@ class OficioViewsTests(TestCase):
         self.assertContains(response, f'data-termo-inline-url="{inline_url}"')
         self.assertNotContains(response, "data-open-all-termos")
         self.assertNotContains(response, "data-download-all-termos")
-        self.assertContains(response, "cv-icon-btn--preview")
-        self.assertContains(response, "cv-icon-btn--pdf")
-        self.assertContains(response, "cv-icon-btn--docx")
+        self.assertContains(response, "Visualizar termo")
+        self.assertContains(response, "Baixar PDF")
+        self.assertContains(response, "Baixar DOCX")
         self.assertContains(
             response,
             reverse("termos:baixar_termo_servidor", args=[oficio.pk, self.servidor.pk, "pdf"]),
@@ -380,9 +385,9 @@ class OficioViewsTests(TestCase):
         self.assertContains(response, "data-download-all-termos")
         self.assertContains(response, "data-termo-inline-url=", count=2)
         self.assertContains(response, "data-termo-download-pdf-url=", count=2)
-        self.assertContains(response, "cv-icon-btn--preview")
-        self.assertContains(response, "cv-icon-btn--pdf")
-        self.assertContains(response, "cv-icon-btn--docx")
+        self.assertContains(response, "Visualizar termo")
+        self.assertContains(response, "Baixar PDF")
+        self.assertContains(response, "Baixar DOCX")
         self.assertContains(response, reverse("termos:baixar_termo_lote_zip", args=[oficio.pk, "docx"]))
 
     @mock.patch("documentos.services.warm_cache.ensure_document_artifact_cached")
@@ -450,7 +455,7 @@ class OficioViewsTests(TestCase):
         oficio.servidores.add(self.servidor)
         response = self.client.get(reverse("oficios:wizard_documentos", args=[oficio.pk]))
         inline_url = reverse("termos:termo_servidor_pdf_inline", args=[oficio.pk, self.servidor.pk])
-        self.assertContains(response, "Nenhum servidor selecionado para Termo de AutorizaÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o.")
+        self.assertContains(response, "Nenhum servidor selecionado para Termo de Autorização.")
         self.assertNotContains(response, inline_url)
 
     def test_get_detalhe_redireciona_para_dados_viajantes(self):
@@ -540,10 +545,8 @@ class OficioViewsTests(TestCase):
 
         new_get = self.client.get(reverse("oficios:modelo_motivo_novo"))
         self.assertEqual(new_get.status_code, 200)
-        self.assertContains(new_get, "Novo modelo de motivo")
-        self.assertContains(new_get, "Texto do modelo")
-        self.assertNotContains(new_get, "Modelo padrÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o")
-        self.assertNotContains(new_get, "Is padrÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o")
+        self.assertContains(new_get, "Novo modelo")
+        self.assertContains(new_get, 'name="texto"')
 
         new_post = self.client.post(
             reverse("oficios:modelos_motivo_index"),
@@ -557,7 +560,7 @@ class OficioViewsTests(TestCase):
         modelo = listar_modelos_motivo().first()
 
         edit_get = self.client.get(reverse("oficios:modelo_motivo_editar", args=[modelo.pk]))
-        self.assertEqual(edit_get.status_code, 200)
+        self.assertRedirects(edit_get, reverse("oficios:modelos_motivo_index"))
 
         edit_post = self.client.post(
             reverse("oficios:modelo_motivo_editar", args=[modelo.pk]),
@@ -595,13 +598,13 @@ class OficioViewsTests(TestCase):
 
         response = self.client.get(reverse("oficios:modelos_motivo_index"))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "PadrÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o")
+        self.assertContains(response, "Padrão")
 
     def test_templates_modelos_motivo_sem_href_falso_css_ou_js_inline(self):
         template_paths = [
             Path("templates/oficios/modelos_motivo/index.html"),
-            Path("templates/oficios/modelos_motivo/form.html"),
             Path("templates/oficios/modelos_motivo/confirm_delete.html"),
+            Path("templates/oficios/modelos_motivo/partials/_quick_add_fields.html"),
         ]
         for template_path in template_paths:
             content = template_path.read_text(encoding="utf-8")

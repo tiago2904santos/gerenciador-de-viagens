@@ -198,21 +198,30 @@ def build_document_environment_report() -> DocumentEnvironmentReport:
 
     unos = (getattr(settings, "DOCUMENTOS_UNOSERVER_URL", None) or "").strip()
     if unos:
-        details.append(
-            DocumentEngineStatus(
-                name="unoserver",
-                available=False,
-                detail=f"DOCUMENTOS_UNOSERVER_URL definido ({unos}), conversão HTTP ainda não implementada na façade",
+        from documentos.services.adapters.libreoffice_pdf import unoserver_healthcheck
+
+        unos_ok = unoserver_healthcheck(
+            unos,
+            timeout=float(
+                getattr(settings, "DOCUMENTOS_UNOSERVER_TIMEOUT_SECONDS", 3) or 3
             ),
         )
+        note(
+            "unoserver",
+            unos_ok,
+            f"{unos} ({'pronto' if unos_ok else 'inacessível'})",
+        )
+        if unos_ok:
+            preferred = "unoserver"
 
-    preferred = _preferred_engine(
-        osn,
-        word=word_ok,
-        lo=lo_ok,
-        weasy=weasy_ok,
-        simple=simple_ok,
-    )
+    if not unos or not unos_ok:
+        preferred = _preferred_engine(
+            osn,
+            word=word_ok,
+            lo=lo_ok,
+            weasy=weasy_ok,
+            simple=simple_ok,
+        )
     pdf_ok = bool(preferred)
 
     hints = _build_install_hints(

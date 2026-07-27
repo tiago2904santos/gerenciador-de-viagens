@@ -148,10 +148,13 @@ def documentos_do_link(token: str):
     """Documentos válidos (token confere e link não expirado), em ordem RT→DB."""
     if not token:
         return []
+    import hashlib
+
+    token_hash = hashlib.sha256(token.encode("utf-8")).hexdigest()
     docs = list(
         AssinaturaDocumento.objects.select_related(
             "prestacao__oficio", "servidor_prestacao__servidor", "signer"
-        ).filter(link_token=token)
+        ).filter(link_token_hash=token_hash)
     )
     validos = [d for d in docs if not d.link_expirado]
     ordem = {AssinaturaDocumento.TIPO_RT: 0, AssinaturaDocumento.TIPO_DB: 1}

@@ -4,6 +4,7 @@ from urllib.parse import urlencode
 
 from django.conf import settings
 from django.contrib import messages
+from django.db.models import Q
 from django.http import Http404
 from django.http import JsonResponse
 from django.http import QueryDict
@@ -15,6 +16,7 @@ from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_GET
+from django.views.decorators.http import require_http_methods
 from django.views.decorators.http import require_POST
 
 from core.autosave import AutosavePayloadError
@@ -576,7 +578,19 @@ def index(request):
     )
 
 
+@require_http_methods(["GET", "POST"])
 def novo(request):
+    if request.method == "GET":
+        return render(
+            request,
+            "components/create_draft.html",
+            {
+                "page_title": "Novo ofício",
+                "page_description": "Confirme para reservar a numeração e iniciar o cadastro.",
+                "confirm_label": "Criar ofício",
+                "back_url": reverse("oficios:index"),
+            },
+        )
     evento = resolve_evento_from_request(request)
     oficio = criar_oficio_rascunho(evento=evento)
     return redirect("oficios:dados_viajantes", pk=oficio.pk)
@@ -744,7 +758,7 @@ def transporte_autosave(request, pk):
     return autosave_json_response(ok=True, object_id=oficio.pk, version=_oficio_autosave_version(oficio))
 
 
-def _resolver_roteiro_rascunho_autosave(post):
+def _resolver_roteiro_rascunho_autosave(post, *, oficio):
     """Resolve um rascunho de Roteiro ja criado por autosave nesta mesma edicao
     (o JS guarda o pk em `autosave_obj_id` assim que o primeiro autosave cria a linha)."""
     raw = (post.get("autosave_obj_id") or "").strip()
@@ -754,7 +768,17 @@ def _resolver_roteiro_rascunho_autosave(post):
         pk = int(raw)
     except (TypeError, ValueError):
         return None
-    return Roteiro.objects.filter(pk=pk).first()
+    return (
+        Roteiro.objects.filter(
+            pk=pk,
+            area_id=oficio.area_id,
+            tipo=Roteiro.TIPO_AVULSO,
+            status=Roteiro.STATUS_RASCUNHO,
+        )
+        .filter(Q(oficios__isnull=True) | Q(oficios=oficio))
+        .distinct()
+        .first()
+    )
 
 
 @require_POST
@@ -810,7 +834,10 @@ def wizard_roteiro(request, pk):
 
     if request.method == "POST":
         if roteiro_vinculado is None:
-            roteiro_vinculado = _resolver_roteiro_rascunho_autosave(request.POST)
+            roteiro_vinculado = _resolver_roteiro_rascunho_autosave(
+                request.POST,
+                oficio=oficio,
+            )
         form = RoteiroForm(request.POST, instance=roteiro_vinculado)
         preparar_querysets_formulario_roteiro(
             form, method=request.method, post=request.POST, instance=roteiro_vinculado
@@ -819,7 +846,11 @@ def wizard_roteiro(request, pk):
             request.POST, route_state_map, roteiro=roteiro_vinculado
         )
         if form.is_valid() and validated["ok"]:
-            roteiro_escolhido = obter_roteiro_escolhido_do_post(request.POST, evento=oficio.evento)
+            roteiro_escolhido = obter_roteiro_escolhido_do_post(
+                request.POST,
+                evento=oficio.evento,
+                area=oficio.area,
+            )
             if roteiro_escolhido and roteiro_state_equivalente_ao_roteiro(roteiro_escolhido, roteiro_state, validated):
                 # Sem alterações: vincular diretamente ao roteiro selecionado
                 rascunho_antigo = roteiro_vinculado if (roteiro_vinculado and roteiro_vinculado.status == Roteiro.STATUS_RASCUNHO) else None

@@ -7,12 +7,12 @@ from django.utils import timezone
 from django.utils.text import slugify
 
 from cadastros.models import Cargo
-from cadastros.models import CancelavelModel
+from core.models import CancelavelModel
 from cadastros.models import Cidade
 from cadastros.models import ConfiguracaoSistema
 from cadastros.models import Estado
 from cadastros.models import Servidor
-from cadastros.models import TimeStampedModel
+from core.models import TimeStampedModel
 from cadastros.models import Unidade
 from core.normalizers import normalize_spaces
 from core.normalizers import normalize_upper
@@ -437,15 +437,22 @@ class PlanoTrabalho(TimeStampedModel, CancelavelModel):
 
     @property
     def destino_display(self) -> str:
-        destinos = (
-            list(
-                self.destinos.filter(evento__isnull=True)
-                .select_related("cidade", "estado")
-                .order_by("ordem", "pk")
+        prefetched = getattr(self, "_prefetched_objects_cache", {}).get("destinos")
+        if prefetched is not None:
+            destinos = sorted(
+                (destino for destino in prefetched if destino.evento_id is None),
+                key=lambda destino: (destino.ordem, destino.pk),
             )
-            if self.pk
-            else []
-        )
+        else:
+            destinos = (
+                list(
+                    self.destinos.filter(evento__isnull=True)
+                    .select_related("cidade", "estado")
+                    .order_by("ordem", "pk")
+                )
+                if self.pk
+                else []
+            )
         if destinos:
             labels = [f"{destino.cidade.nome}/{destino.cidade.uf}" for destino in destinos if destino.cidade_id]
             if labels:
@@ -477,6 +484,9 @@ class PlanoTrabalho(TimeStampedModel, CancelavelModel):
         """Efetivo do rascunho atual (linhas EfetivoPlano). Em multi, é o evento em edição."""
         if not self.pk:
             return 0
+        prefetched = getattr(self, "_prefetched_objects_cache", {}).get("efetivos")
+        if prefetched is not None:
+            return sum(int(item.quantidade or 0) for item in prefetched)
         agregado = self.efetivos.aggregate(total=models.Sum("quantidade"))
         return int(agregado["total"] or 0)
 
@@ -755,6 +765,9 @@ class EventoPlano(TimeStampedModel):
     def total_efetivo(self) -> int:
         if not self.pk:
             return 0
+        prefetched = getattr(self, "_prefetched_objects_cache", {}).get("efetivos")
+        if prefetched is not None:
+            return sum(int(item.quantidade or 0) for item in prefetched)
         agregado = self.efetivos.aggregate(total=models.Sum("quantidade"))
         return int(agregado["total"] or 0)
 

@@ -136,7 +136,12 @@ def executar_e_rastrear(fn, obj, usuario=None) -> None:
 def _pendencias_queryset(usuario=_UNSET):
     from .models import DriveSyncStatus
 
-    qs = DriveSyncStatus.objects.select_related("content_type", "usuario").order_by("-atualizado_em")
+    qs = (
+        DriveSyncStatus.objects
+        .select_related("content_type", "usuario")
+        .prefetch_related("origem")
+        .order_by("-atualizado_em")
+    )
     if usuario is not _UNSET:
         qs = qs.filter(usuario=usuario)
     return qs
@@ -262,20 +267,35 @@ def listar_pendencias_detalhadas(limite: int = 20, usuario=_UNSET, area=_UNSET):
     ``atualizado_em``, ``motivo``/``acao`` (explicação amigável) e ``detalhe``
     (erro técnico cru, para o expansível).
     """
-    itens = []
-    for pendencia in listar_pendencias(limite=limite, usuario=usuario, area=area):
-        origem = pendencia.origem  # resolve o GenericForeignKey (1 query por item)
-        motivo, acao = _motivo_amigavel(pendencia.ultimo_erro)
-        itens.append(
-            {
-                "titulo": _titulo_pendencia(origem, pendencia.content_type),
-                "tipo_label": _tipo_label(pendencia.content_type),
-                "contexto": _contexto_pendencia(origem),
-                "tentativas": pendencia.tentativas,
-                "atualizado_em": pendencia.atualizado_em,
-                "motivo": motivo,
-                "acao": acao,
-                "detalhe": (pendencia.ultimo_erro or "").strip(),
-            }
-        )
-    return itens
+    return [
+        _detalhar_pendencia(pendencia)
+        for pendencia in listar_pendencias(limite=limite, usuario=usuario, area=area)
+    ]
+
+
+def _detalhar_pendencia(pendencia):
+    origem = pendencia.origem
+    motivo, acao = _motivo_amigavel(pendencia.ultimo_erro)
+    return {
+        "titulo": _titulo_pendencia(origem, pendencia.content_type),
+        "tipo_label": _tipo_label(pendencia.content_type),
+        "contexto": _contexto_pendencia(origem),
+        "tentativas": pendencia.tentativas,
+        "atualizado_em": pendencia.atualizado_em,
+        "motivo": motivo,
+        "acao": acao,
+        "detalhe": (pendencia.ultimo_erro or "").strip(),
+    }
+
+
+def resumo_pendencias(limite: int = 20, usuario=_UNSET, area=_UNSET):
+    """Carrega uma vez, agrupa GenericFK por tipo e devolve total + detalhes."""
+    pendencias = _filtrar_pendencias(
+        _pendencias_queryset(usuario=usuario),
+        area=area,
+        limite=None,
+    )
+    return {
+        "total": len(pendencias),
+        "itens": [_detalhar_pendencia(item) for item in pendencias[:limite]],
+    }

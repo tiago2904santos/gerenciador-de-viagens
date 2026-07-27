@@ -39,7 +39,7 @@ class OficioWizardTransporteTests(TestCase):
         self.viatura.motoristas.add(self.motorista_viatura)
 
     def _oficio_com_etapa1_minima(self):
-        url_novo = self.client.get(reverse("oficios:novo")).url
+        url_novo = self.client.post(reverse("oficios:novo")).url
         self.client.post(
             url_novo,
             data={

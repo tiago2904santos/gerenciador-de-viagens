@@ -1,0 +1,23 @@
+<div class="docs-equipe-solicitacao" aria-label="Servidor e número da solicitação">
+  {% with s=servidor.identificacao %}
+  <article class="oficio-documentos-traveller-tile{% if s.is_motorista %} oficio-documentos-traveller-tile--motorista{% endif %} docs-equipe-solicitacao__tile">
+    <span class="oficio-documentos-traveller-tile__avatar" aria-hidden="true">{{ s.iniciais }}</span>
+    <div class="oficio-documentos-traveller-tile__main">
+      <div class="oficio-documentos-traveller-tile__title-row">
+        <strong class="oficio-documentos-traveller-tile__name">{{ s.nome_servidor }}</strong>
+        {% if s.is_motorista %}
+          <span class="oficio-documentos-traveller-tile__badge">Motorista</span>
+        {% endif %}
+      </div>
+      <span class="oficio-documentos-traveller-tile__meta">
+        {{ s.cargo }}{% if s.unidade %} · {{ s.unidade }}{% endif %}{% if s.cpf_servidor and s.cpf_servidor != "—" %} · CPF {{ s.cpf_servidor }}{% endif %}
+      </span>
+    </div>
+  </article>
+  {% endwith %}
+
+  <div class="oficio-documentos-fact docs-equipe-solicitacao__field">
+    <label class="docs-equipe-solicitacao__label" for="{{ servidor.form.numero_solicitacao.id_for_label }}">Número da solicitação</label>
+    {{ servidor.form.numero_solicitacao }}
+  </div>
+</div>

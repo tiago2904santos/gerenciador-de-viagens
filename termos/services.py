@@ -19,6 +19,7 @@ from documentos.services.document_cache import build_document_cache_key
 from documentos.services.document_cache import build_template_cache_signature
 from documentos.services.document_cache import documento_gerado_from_artifact
 from documentos.services.document_cache import get_cached_document_artifact
+from documentos.services.timing import track_document_generation
 from documentos.services.pdf_engine import resolve_pdf_engine
 from documentos.services.templates import DocumentTemplateDefinition
 from documentos.services.templates import DocumentTemplateRegistry
@@ -129,6 +130,7 @@ def _legacy_docx_context(payload: dict) -> dict:
     }
 
 
+@track_document_generation("termo_gerar_documento")
 def gerar_termo_um(
     oficio: Oficio,
     servidor: Servidor,

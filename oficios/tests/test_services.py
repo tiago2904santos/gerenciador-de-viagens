@@ -286,7 +286,11 @@ class OficioServicesTests(TestCase):
         self.assertIn("Informe o motivo.", avaliacao_incompleta["pendencias"])
         self.assertIn("Selecione ao menos um viajante.", avaliacao_incompleta["pendencias"])
 
-        completo = Oficio.objects.create(motivo="Motivo", custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        completo = Oficio.objects.create(
+            protocolo="12.345.678-9",
+            motivo="Motivo",
+            custeio=Oficio.CUSTEIO_UNIDADE_DPC,
+        )
         completo.servidores.add(self.servidor)
         avaliacao_completa = avaliar_oficio_dados_viajantes(completo)
         self.assertEqual(avaliacao_completa["status"], "complete")
