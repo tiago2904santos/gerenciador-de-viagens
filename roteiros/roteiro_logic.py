@@ -309,13 +309,16 @@ def _extract_roteiro_posted_trechos(request):
 
 def _infer_roteiro_destinos_from_trechos(raw_trechos, sede_estado=None, sede_cidade=None):
     destinos = []
-    seen = set()
+    prev_kept_key = None
     for trecho in raw_trechos or []:
         destino_estado_id = _parse_int(trecho.get('destino_estado_id'))
         destino_cidade_id = _parse_int(trecho.get('destino_cidade_id'))
         destino_nome = trecho.get('destino_nome') or ''
         destino_cidade = Cidade.objects.select_related('estado').filter(pk=destino_cidade_id).first() if destino_cidade_id else None
         destino_estado = Estado.objects.filter(pk=destino_estado_id or getattr(destino_cidade, 'estado_id', None)).first() if (destino_estado_id or destino_cidade) else None
+        # Voltas à sede (ex.: o retorno diário do bate-volta) não são destinos e
+        # não interrompem a comparação de repetição — o próximo destino continua
+        # sendo confrontado com o último destino REALMENTE mantido.
         if _roteiro_locations_equivalent(
             cidade_a=destino_cidade,
             estado_a=destino_estado,
@@ -324,10 +327,14 @@ def _infer_roteiro_destinos_from_trechos(raw_trechos, sede_estado=None, sede_cid
             estado_b=sede_estado,
         ):
             continue
+        # Descarta apenas repetição do último destino mantido (um trecho X->X é
+        # impossível; num loop diário o mesmo destino se repete). Já revisitar uma
+        # cidade após passar por outra é legítimo (ex.: Laranjeiras -> Guarapuava
+        # -> Laranjeiras) e precisa ser preservado, senão o destino não é salvo.
         key = (destino_estado_id, destino_cidade_id, str(destino_nome or '').strip().upper())
-        if key in seen:
+        if key == prev_kept_key:
             continue
-        seen.add(key)
+        prev_kept_key = key
         destinos.append(
             {
                 'estado_id': destino_estado_id,
