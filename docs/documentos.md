@@ -13,9 +13,12 @@ Os ficheiros seguem o nome do enum `DocumentoTipo` (ex.: `oficio.docx`, `justifi
 | Ofício, Justificativa | Chaves planas `{% raw %}{{ protocolo }}{% endraw %}`, etc. | `docxtpl_context` montado em `oficios.docxtpl_context` |
 | Termo, Plano de trabalho, Ordem de serviço | Aninhados `{% raw %}{{ oficio.numero_formatado }}{% endraw %}`, `{% raw %}{{ termo.participante.nome }}{% endraw %}`, … | Payload canónico (`oficios.documents`) sem `docxtpl_context` |
 
-## PDF: motor por defeito (HTML + WeasyPrint)
+## PDF: motor por defeito
 
-Com `DOCUMENTOS_DEFAULT_PDF_ENGINE=weasyprint` (padrão), o PDF é gerado a partir de **templates HTML/CSS** em `templates/documentos/pdf/`, não a partir do DOCX preenchido. O payload canónico alimenta o template HTML.
+Com `DOCUMENTOS_DEFAULT_PDF_ENGINE=auto` (padrão), o sistema escolhe o melhor
+motor disponível. Em produção, para manter fidelidade ao DOCX e baixa latência,
+configure `unoserver`; o LibreOffice permanece residente em vez de iniciar um
+processo novo a cada PDF.
 
 ## PDF: LibreOffice (DOCX preenchido → PDF)
 
@@ -36,7 +39,7 @@ Em desenvolvimento no Windows, se WeasyPrint e LibreOffice falharem, pode ativar
 | Variável | Função |
 |----------|--------|
 | `DOCUMENTOS_RESOURCES_DIR` | Pasta dos `.docx` (default: `BASE_DIR/documentos/resources`) |
-| `DOCUMENTOS_DEFAULT_PDF_ENGINE` | `weasyprint` ou `libreoffice` |
+| `DOCUMENTOS_DEFAULT_PDF_ENGINE` | `auto`, `unoserver`, `libreoffice`, `word_com`, `weasyprint` ou `simple` |
 | `DOCUMENTOS_LIBREOFFICE_BINARY` | Caminho do `soffice` |
 | `DOCUMENTOS_SIMPLE_PDF_FALLBACK` | `true` para permitir PDF mínimo em dev |
 | `DOCUMENTOS_PERSIST_ARTEFATOS` | `false` na suíte de testes; em produção grava artefactos em `MEDIA_ROOT` |

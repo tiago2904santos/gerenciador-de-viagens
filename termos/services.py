@@ -4,6 +4,8 @@ import hashlib
 import io
 import logging
 
+from django.conf import settings
+
 logger = logging.getLogger(__name__)
 
 from cadastros.models import Servidor
@@ -13,6 +15,11 @@ from core.utils.masks import format_placa
 
 from documentos.services.facade import DocumentoFacade
 from documentos.services.facade import DocumentoGerado
+from documentos.services.document_cache import build_document_cache_key
+from documentos.services.document_cache import build_template_cache_signature
+from documentos.services.document_cache import documento_gerado_from_artifact
+from documentos.services.document_cache import get_cached_document_artifact
+from documentos.services.pdf_engine import resolve_pdf_engine
 from documentos.services.templates import DocumentTemplateDefinition
 from documentos.services.templates import DocumentTemplateRegistry
 from documentos.services.templates import default_template_registry
@@ -139,19 +146,67 @@ def gerar_termo_um(
     ref = f"{oficio.numero_formatado.replace('/', '-')}-termo-{servidor.pk}"
     variante_efetiva = payload["termo"]["variante"]
     template_docx = _TEMPLATE_DOCX_BY_VARIANTE.get(variante_efetiva, "termo_autorizacao.docx")
+    docxtpl_context = _legacy_docx_context(payload)
+    attempt_chain = ()
+    if formato == DocumentoFormato.PDF:
+        attempt_chain = resolve_pdf_engine(
+            explicit_setting=getattr(settings, "DOCUMENTOS_DEFAULT_PDF_ENGINE", "auto"),
+            prefer_docx_pipeline=True,
+        ).attempt_chain
+    cache_key = build_document_cache_key(
+        tipo=DocumentoTipo.TERMO_AUTORIZACAO,
+        formato=formato,
+        reference=ref,
+        payload=payload,
+        docxtpl_context=docxtpl_context,
+        attempt_chain=attempt_chain,
+        template_signature=build_template_cache_signature(
+            tipo=DocumentoTipo.TERMO_AUTORIZACAO,
+            formato=formato,
+            docx_template_path=template_docx,
+        ),
+    )
+    cached = get_cached_document_artifact(
+        oficio_id=oficio.pk,
+        servidor_id=servidor.pk,
+        tipo=DocumentoTipo.TERMO_AUTORIZACAO,
+        formato=formato,
+        cache_key=cache_key,
+    )
+    if cached is not None:
+        return documento_gerado_from_artifact(
+            cached,
+            tipo=DocumentoTipo.TERMO_AUTORIZACAO,
+            formato=formato,
+            reference=ref,
+        )
+
     facade = _facade_termo_com_template(template_docx)
     doc = facade.gerar(
         tipo=DocumentoTipo.TERMO_AUTORIZACAO,
         formato=formato,
         payload=payload,
         reference=ref,
-        docxtpl_context=_legacy_docx_context(payload),
+        docxtpl_context=docxtpl_context,
     )
-    _persistir_termo_artefato(oficio, servidor, doc)
+    _persistir_termo_artefato(
+        oficio,
+        servidor,
+        doc,
+        cache_key=cache_key,
+        payload_snapshot=payload,
+    )
     return doc
 
 
-def _persistir_termo_artefato(oficio: Oficio, servidor: Servidor, doc: DocumentoGerado) -> None:
+def _persistir_termo_artefato(
+    oficio: Oficio,
+    servidor: Servidor,
+    doc: DocumentoGerado,
+    *,
+    cache_key: str = "",
+    payload_snapshot: dict | None = None,
+) -> None:
     """Persiste o termo como ``DocumentoArtefato`` (para auto-organização no Drive).
 
     Idempotente por conteúdo (hash). É no-op quando a persistência está desligada
@@ -173,6 +228,9 @@ def _persistir_termo_artefato(oficio: Oficio, servidor: Servidor, doc: Documento
             servidor_id=servidor.pk,
             evento_id=getattr(oficio, "evento_id", None),
             nome_drive=naming.nome_termo(oficio, servidor, cidade),
+            payload_snapshot=payload_snapshot,
+            cache_key=cache_key,
+            engine=doc.pdf_engine_used or "",
         )
     except Exception:
         logger.warning("Não foi possível persistir artefato do termo.", exc_info=True)
@@ -591,6 +649,20 @@ def fundir_termos_docx(documentos: list[DocumentoGerado]) -> bytes:
 
 def fundir_termos_pdf(documentos: list[DocumentoGerado]) -> bytes:
     return fundir_termos_pdf_bytes([doc.conteudo for doc in documentos])
+
+
+def gerar_termos_pdf_consolidado(oficio: Oficio) -> bytes:
+    """Gera o lote com uma única conversão DOCX→PDF."""
+    documentos = gerar_termo_lote(oficio, DocumentoFormato.DOCX)
+    if not documentos:
+        return b""
+    docx = documentos[0].conteudo if len(documentos) == 1 else fundir_termos_docx(documentos)
+    facade = DocumentoFacade()
+    pdf, _engine = facade.converter_docx_pronto_para_pdf(
+        docx,
+        tipo=DocumentoTipo.TERMO_AUTORIZACAO,
+    )
+    return pdf
 
 
 def fundir_termos_pdf_bytes(conteudos: list[bytes]) -> bytes:

@@ -47,11 +47,22 @@ def _file_fp(path: Path) -> str:
         return f"{path}:missing"
 
 
-def build_template_cache_signature(*, tipo: DocumentoTipo, formato: DocumentoFormato) -> str:
+def build_template_cache_signature(
+    *,
+    tipo: DocumentoTipo,
+    formato: DocumentoFormato,
+    docx_template_path: str | None = None,
+) -> str:
     """DOCX + (para PDF) HTML e CSS registados — invalida cache quando o modelo muda."""
     parts: list[str] = []
     docx_def = default_template_registry.get(tipo, DocumentoFormato.DOCX)
-    parts.append(_file_fp(resolve_resource_docx(docx_def.template_path)))
+    parts.append(
+        _file_fp(
+            resolve_resource_docx(
+                docx_template_path or docx_def.template_path,
+            )
+        )
+    )
     if formato == DocumentoFormato.PDF:
         html_def = default_template_registry.get(tipo, DocumentoFormato.PDF)
         base = Path(settings.BASE_DIR)
@@ -94,7 +105,10 @@ def build_document_cache_key(
 
 def get_cached_document_artifact(
     *,
-    oficio_id: int,
+    oficio_id: int | None = None,
+    evento_id: int | None = None,
+    termo_id: int | None = None,
+    servidor_id: int | None = None,
     tipo: DocumentoTipo,
     formato: DocumentoFormato,
     cache_key: str,
@@ -102,16 +116,20 @@ def get_cached_document_artifact(
     if not cache_key or not getattr(settings, "DOCUMENTOS_ARTIFACT_CACHE", True):
         return None
     try:
-        art = (
-            DocumentoArtefato.objects.filter(
-                oficio_id=oficio_id,
-                tipo=tipo.value,
-                formato=formato.value,
-                cache_key=cache_key,
-            )
-            .order_by("-criado_em")
-            .first()
-        )
+        filters: dict[str, Any] = {
+            "tipo": tipo.value,
+            "formato": formato.value,
+            "cache_key": cache_key,
+        }
+        if oficio_id is not None:
+            filters["oficio_id"] = oficio_id
+        if evento_id is not None:
+            filters["evento_id"] = evento_id
+        if termo_id is not None:
+            filters["termo_id"] = termo_id
+        if servidor_id is not None:
+            filters["servidor_id"] = servidor_id
+        art = DocumentoArtefato.objects.filter(**filters).order_by("-criado_em").first()
     except Exception:
         logger.exception("Falha ao consultar cache documental.")
         return None
@@ -131,3 +149,26 @@ def get_cached_document_artifact(
 def read_artifact_file_bytes(artefato: DocumentoArtefato) -> bytes:
     with artefato.arquivo.open("rb") as fh:
         return fh.read()
+
+
+def documento_gerado_from_artifact(
+    artefato: DocumentoArtefato,
+    *,
+    tipo: DocumentoTipo,
+    formato: DocumentoFormato,
+    reference: str | None,
+):
+    """Reconstrói o valor de domínio sem executar novamente o renderizador."""
+    from documentos.services.facade import DocumentoGerado
+    from documentos.services.filenames import build_document_filename
+    from documentos.services.responses import get_content_type_for_format
+
+    return DocumentoGerado(
+        tipo=tipo,
+        formato=formato,
+        nome_arquivo=build_document_filename(tipo, formato, reference=reference),
+        content_type=get_content_type_for_format(formato),
+        conteudo=read_artifact_file_bytes(artefato),
+        hash_sha256=artefato.hash_sha256,
+        pdf_engine_used=artefato.engine or None,
+    )

@@ -297,6 +297,74 @@ class DocumentoFacade:
             )
         return convert_docx_to_pdf_libreoffice(docx_bytes=docx_bytes, libreoffice_binary=binary)
 
+    def converter_docx_pronto_para_pdf(
+        self,
+        docx_bytes: bytes,
+        *,
+        tipo: DocumentoTipo,
+    ) -> tuple[bytes, str]:
+        """Converte um DOCX já montado sem renderizá-lo novamente.
+
+        Usado por lotes: todos os documentos são unidos como DOCX e passam uma
+        única vez pelo conversor persistente.
+        """
+        explicit = (
+            getattr(settings, "DOCUMENTOS_DEFAULT_PDF_ENGINE", "auto") or "auto"
+        ).strip().lower()
+        resolution = resolve_pdf_engine(
+            explicit_setting=explicit,
+            prefer_docx_pipeline=True,
+        )
+        last_error: BaseException | None = None
+        for engine in resolution.attempt_chain:
+            try:
+                if engine == "unoserver":
+                    from documentos.services.adapters.libreoffice_pdf import (
+                        convert_docx_to_pdf_unoserver,
+                    )
+
+                    url = (getattr(settings, "DOCUMENTOS_UNOSERVER_URL", None) or "").strip()
+                    timeout = float(
+                        getattr(settings, "DOCUMENTOS_UNOSERVER_TIMEOUT_SECONDS", 3) or 3
+                    )
+                    return (
+                        convert_docx_to_pdf_unoserver(
+                            docx_bytes=docx_bytes,
+                            unoserver_url=url,
+                            timeout_seconds=timeout,
+                        ),
+                        engine,
+                    )
+                if engine == "libreoffice":
+                    return (
+                        self._pdf_via_libreoffice(
+                            tipo,
+                            {},
+                            docx_bytes=docx_bytes,
+                        ),
+                        engine,
+                    )
+                if engine == "word_com":
+                    from documentos.services.adapters.word_pdf import (
+                        convert_docx_to_pdf_word_com,
+                    )
+
+                    return convert_docx_to_pdf_word_com(docx_bytes), engine
+            except Exception as exc:
+                last_error = exc
+                logger.warning(
+                    "Conversor DOCX em lote %s falhou para %s: %s",
+                    engine,
+                    tipo.value,
+                    exc,
+                    exc_info=True,
+                )
+
+        message = build_pdf_unavailable_message(resolution)
+        if last_error is not None:
+            raise DocumentValidationError(message) from last_error
+        raise DocumentValidationError(message)
+
 
 def build_default_facade() -> DocumentoFacade:
     return DocumentoFacade()

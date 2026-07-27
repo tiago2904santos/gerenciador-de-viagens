@@ -63,8 +63,7 @@ class ExecutarERastrearTests(TestCase):
 
 @override_settings(GOOGLE_DRIVE={"MODO": "mock", "UPLOAD_EM_MOCK": True})
 class SignalRetryTests(TestCase):
-    """Testa o caminho do signal: tentativa síncrona → falha → pendência +
-    aviso ao usuário + agendamento de retry em segundo plano."""
+    """Testa o caminho assíncrono do signal de artefato."""
 
     def setUp(self):
         services._reset_client()
@@ -80,15 +79,15 @@ class SignalRetryTests(TestCase):
         )
         self.oficio.servidores.add(self.ana)
 
-    def test_falha_no_upload_registra_pendencia_avisa_e_agenda_retry(self):
+    def test_criacao_agenda_upload_sem_chamar_drive_sincrono(self):
         arquivo, digest = _pdf("doc.pdf")
         request, storage = _request_com_mensagens()
 
         core_middleware._local.request = request
         try:
             with patch.object(
-                organizer, "organizar_artefato", side_effect=RuntimeError("Drive fora do ar")
-            ), patch(
+                organizer, "organizar_artefato"
+            ) as organizar_mock, patch(
                 "integracoes.google_drive.tasks.processar_artefato.delay"
             ) as delay_mock:
                 art = DocumentoArtefato.objects.create(
@@ -98,14 +97,37 @@ class SignalRetryTests(TestCase):
         finally:
             core_middleware._local.request = None
 
+        organizar_mock.assert_not_called()
+        delay_mock.assert_called_once_with(art.pk, usuario_id=None)
+        self.assertEqual(DriveSyncStatus.objects.count(), 0)
+        self.assertEqual(list(storage), [])
+
+    def test_fila_indisponivel_registra_pendencia_e_avisa(self):
+        arquivo, digest = _pdf("doc.pdf")
+        request, storage = _request_com_mensagens()
+
+        core_middleware._local.request = request
+        try:
+            with patch(
+                "integracoes.google_drive.tasks.processar_artefato.delay",
+                side_effect=ConnectionRefusedError("sem broker"),
+            ), patch(
+                "integracoes.google_drive.organizer.organizar_artefato"
+            ) as organizar_mock:
+                art = DocumentoArtefato.objects.create(
+                    tipo="oficio", formato="pdf", oficio=self.oficio,
+                    hash_sha256=digest, arquivo=arquivo,
+                )
+        finally:
+            core_middleware._local.request = None
+
+        organizar_mock.assert_not_called()
         pendencia = DriveSyncStatus.objects.get()
         self.assertEqual(pendencia.tentativas, 1)
-        self.assertIn("Drive fora do ar", pendencia.ultimo_erro)
+        self.assertIn("sem broker", pendencia.ultimo_erro)
 
         mensagens = [str(m) for m in storage]
-        self.assertTrue(any("Não foi possível enviar" in m for m in mensagens))
-
-        delay_mock.assert_called_once_with(art.pk, usuario_id=None)
+        self.assertTrue(any("ficou pendente" in m for m in mensagens))
 
     def test_sucesso_nao_cria_pendencia_nem_mensagem(self):
         arquivo, digest = _pdf("doc.pdf")
@@ -113,10 +135,11 @@ class SignalRetryTests(TestCase):
 
         core_middleware._local.request = request
         try:
-            DocumentoArtefato.objects.create(
-                tipo="oficio", formato="pdf", oficio=self.oficio,
-                hash_sha256=digest, arquivo=arquivo,
-            )
+            with patch("integracoes.google_drive.tasks.processar_artefato.delay"):
+                DocumentoArtefato.objects.create(
+                    tipo="oficio", formato="pdf", oficio=self.oficio,
+                    hash_sha256=digest, arquivo=arquivo,
+                )
         finally:
             core_middleware._local.request = None
 
@@ -131,9 +154,7 @@ class SignalRetryTests(TestCase):
 
         core_middleware._local.request = request
         try:
-            with patch.object(
-                organizer, "organizar_artefato", side_effect=RuntimeError("Drive fora do ar")
-            ), patch(
+            with patch(
                 "integracoes.google_drive.tasks.processar_artefato.delay",
                 side_effect=ConnectionRefusedError("sem broker"),
             ):

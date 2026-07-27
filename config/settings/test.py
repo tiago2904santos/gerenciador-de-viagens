@@ -33,3 +33,11 @@ OFICIO_NUMERO_INICIAL = {}
 # Sem broker na suíte: tarefas do Celery (ex.: retry de upload ao Drive)
 # rodam na hora, no mesmo processo, em vez de tentar conectar a um Redis.
 CELERY_TASK_ALWAYS_EAGER = True
+
+# Testes que não exercitam a integração não podem herdar GOOGLE_DRIVE_MODO=ativo
+# do .env local. Os módulos de Drive habilitam explicitamente o modo necessário.
+GOOGLE_DRIVE = {
+    **GOOGLE_DRIVE,
+    "MODO": "mock",
+    "UPLOAD_EM_MOCK": False,
+}

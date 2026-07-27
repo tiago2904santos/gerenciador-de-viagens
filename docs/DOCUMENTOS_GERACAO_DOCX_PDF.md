@@ -42,7 +42,16 @@ Valores suportados na configuração (quando não usa `auto`): `word_com`, `libr
 
 ### UNOSERVER
 
-`DOCUMENTOS_UNOSERVER_URL` existe nas settings para cenários futuros (ex.: conversão via serviço em Docker). A conversão HTTP por UNOSERVER **não** está implementada no fluxo actual; o comando `documentos_check` pode referir o estado “reservado” ou indisponível.
+`DOCUMENTOS_UNOSERVER_URL` ativa o cliente XML-RPC oficial do unoserver. O
+serviço mantém o LibreOffice residente e evita reiniciar a suíte em cada PDF.
+Use, por exemplo, `http://libreoffice:2003` junto de
+`deploy/docker-compose.documentos.yml`. A porta não possui autenticação e deve
+ficar restrita à rede interna do serviço.
+
+No deploy tradicional com systemd, use `http://127.0.0.1:2003` e siga a
+seção **5.4 UNOSERVER** de `docs/DEPLOY_VPS.md`. Definir apenas a URL sem manter
+o serviço ativo faz o resolver cair para o LibreOffice por processo, que
+preserva a geração, mas não o SLA de latência.
 
 ## Comandos de gestão
 
@@ -66,14 +75,21 @@ Sugere ou executa comandos **no terminal** para instalar dependências Python ou
 
 Não usa `sudo` em silêncio sem avisos explícitos na saída quando aplicável.
 
+### `python manage.py documentos_unoserver_check --benchmark --max-ms 1000`
+
+Valida a porta e executa uma conversão real. O comando termina com erro quando
+o tempo fica acima do SLA informado; use-o após cada deploy do conversor.
+
 ## Variáveis de ambiente (referência)
 
 | Variável | Descrição |
 |----------|-----------|
-| `DOCUMENTOS_DEFAULT_PDF_ENGINE` | `auto` (omissão), `word_com`, `libreoffice`, `weasyprint`, `simple` |
+| `DOCUMENTOS_DEFAULT_PDF_ENGINE` | `auto` (omissão), `unoserver`, `word_com`, `libreoffice`, `weasyprint`, `simple` |
 | `DOCUMENTOS_PDF_AUTO_FALLBACK` | `true` / `false` — tentar motores alternativos após falha |
 | `DOCUMENTOS_LIBREOFFICE_BINARY` | Caminho explícito para `soffice` |
-| `DOCUMENTOS_UNOSERVER_URL` | URL reservada para futuro serviço de conversão |
+| `DOCUMENTOS_UNOSERVER_URL` | URL XML-RPC interna do unoserver persistente |
+| `DOCUMENTOS_UNOSERVER_TIMEOUT_SECONDS` | Timeout da verificação rápida do serviço |
+| `DOCUMENTOS_ENGINE_PROBE_CACHE_SECONDS` | Janela para reutilizar as sondas de disponibilidade dos motores |
 | `DOCUMENTOS_SIMPLE_PDF_FALLBACK` | Permitir PDF mínimo `fpdf2` |
 | `DOCUMENTOS_ENABLE_LIBREOFFICE` | Flag em `settings` (ex.: `deploy/docker-compose.documentos.yml`); reservada para cenários com LibreOffice em contentores |
 | `DOCUMENTOS_TMP_DIR` | Pasta temporária para conversões |

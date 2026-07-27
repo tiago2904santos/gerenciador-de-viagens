@@ -247,11 +247,11 @@ sudo systemctl start gerenciador-viagens
 sudo systemctl status gerenciador-viagens
 ```
 
-### 5.3 Worker Celery (retry automático de uploads ao Drive)
+### 5.3 Worker Celery (uploads ao Drive e aquecimento de cache)
 
-Opcional, mas recomendado: sem ele, o envio ao Drive continua funcionando
-normalmente (síncrono, como sempre foi) — só o reenvio automático de uploads
-que falharem fica indisponível, ficando visível como pendência na tela
+Obrigatório quando a integração com o Drive estiver ativa. O request de geração
+apenas coloca o upload na fila, para não somar latência de rede ao download. Sem
+o worker, o artefato fica visível como pendência na tela
 `/integracoes/google-drive/` até um reenvio manual.
 
 ```bash
@@ -293,6 +293,84 @@ sudo systemctl enable gerenciador-viagens-celery
 sudo systemctl start gerenciador-viagens-celery
 sudo systemctl status gerenciador-viagens-celery
 ```
+
+### 5.4 UNOSERVER (PDF em menos de 1 segundo)
+
+O LibreOffice iniciado para cada documento demora vários segundos. Para o SLA de
+PDF, mantenha uma instância residente e acessível apenas pelo host local:
+
+```bash
+sudo apt update
+sudo apt install -y libreoffice-writer python3-uno python3-venv
+python3 -m venv --system-site-packages /var/www/gerenciador-viagens/unoserver-venv
+/var/www/gerenciador-viagens/unoserver-venv/bin/pip install "unoserver>=3.4,<4.0"
+mkdir -p /var/www/gerenciador-viagens/unoserver-home
+sudo chown -R viagens:viagens \
+  /var/www/gerenciador-viagens/unoserver-venv \
+  /var/www/gerenciador-viagens/unoserver-home
+```
+
+Crie `/etc/systemd/system/gerenciador-viagens-unoserver.service`:
+
+```ini
+[Unit]
+Description=Gerenciador de Viagens — conversor PDF persistente
+After=network.target
+
+[Service]
+User=viagens
+Group=viagens
+Environment="HOME=/var/www/gerenciador-viagens/unoserver-home"
+ExecStart=/var/www/gerenciador-viagens/unoserver-venv/bin/unoserver \
+          --interface 127.0.0.1 \
+          --port 2003 \
+          --conversion-timeout 30 \
+          --stop-after 1000 \
+          --quiet
+ExecStartPost=/var/www/gerenciador-viagens/unoserver-venv/bin/unoconvert \
+              --host 127.0.0.1 \
+              --port 2003 \
+              --host-location local \
+              --dont-update-index \
+              /var/www/gerenciador-viagens/app/deploy/unoserver/warmup.rtf \
+              /tmp/gerenciador-viagens-unoserver-warmup.pdf
+Restart=always
+RestartSec=2
+PrivateTmp=true
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target
+```
+
+No `.env` da aplicação:
+
+```bash
+DOCUMENTOS_DEFAULT_PDF_ENGINE=unoserver
+DOCUMENTOS_UNOSERVER_URL=http://127.0.0.1:2003
+DOCUMENTOS_UNOSERVER_TIMEOUT_SECONDS=5
+DOCUMENTOS_ENGINE_PROBE_CACHE_SECONDS=60
+DOCUMENTOS_PDF_AUTO_FALLBACK=true
+```
+
+Ative e valide antes de reiniciar a aplicação:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now gerenciador-viagens-unoserver
+/var/www/gerenciador-viagens/unoserver-venv/bin/unoping \
+  --host 127.0.0.1 \
+  --port 2003
+sudo systemctl restart gerenciador-viagens gerenciador-viagens-celery
+cd /var/www/gerenciador-viagens/app
+source /var/www/gerenciador-viagens/venv/bin/activate
+python manage.py documentos_unoserver_check --benchmark --max-ms 1000
+```
+
+Não exponha a porta 2003 no firewall ou no Nginx; o protocolo não possui
+autenticação. O `ExecStartPost` é intencional: o serviço só fica pronto após
+uma conversão de aquecimento, evitando que o primeiro usuário pague o custo de
+carregar os filtros do LibreOffice.
 
 ---
 

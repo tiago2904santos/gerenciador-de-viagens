@@ -1,6 +1,4 @@
-"""
-Pré-materialização de artefatos (ex.: PDF) quando o ofício está completo — sem Celery.
-"""
+"""Pré-materialização assíncrona de artefatos documentais."""
 
 from __future__ import annotations
 
@@ -8,7 +6,6 @@ import logging
 
 from django.conf import settings
 
-from documentos.services.types import DocumentoFormato
 from documentos.services.types import DocumentoTipo
 
 logger = logging.getLogger(__name__)
@@ -26,11 +23,11 @@ def pdf_artefato_original_acessivel(artefato) -> bool:
 
 def ensure_document_artifact_cached(oficio, *, tipo: DocumentoTipo = DocumentoTipo.OFICIO) -> None:
     """
-    Garante PDF em cache para o ofício completo (best-effort; falhas de motor não rebentam a view).
+    Agenda o PDF em cache para o ofício completo sem bloquear a resposta HTTP.
 
     Em `dev.py` a pré-geração global pode estar desligada (`DOCUMENTOS_PREGENERATE_PDF=false`)
-    para não bloquear o GET; com persistência de artefatos ativa ainda assim tentamos **uma**
-    geração quando não existe `DocumentoArtefato` PDF válido, para o wizard mostrar Assinar/Verificar.
+    para não bloquear o GET; com persistência de artefatos ativa agendamos uma
+    geração quando não existe `DocumentoArtefato` PDF válido.
     """
     pre = getattr(settings, "DOCUMENTOS_PREGENERATE_PDF", True)
     persist = getattr(settings, "DOCUMENTOS_PERSIST_ARTEFATOS", False)
@@ -52,12 +49,12 @@ def ensure_document_artifact_cached(oficio, *, tipo: DocumentoTipo = DocumentoTi
         return None
     try:
         if tipo == DocumentoTipo.OFICIO:
-            from oficios.services import gerar_resposta_documento_oficio
+            from documentos.tasks import gerar_pdf_oficio_cache
 
-            gerar_resposta_documento_oficio(oficio, DocumentoFormato.PDF)
+            gerar_pdf_oficio_cache.delay(oficio.pk)
     except Exception:
         logger.warning(
-            "Pré-geração PDF ignorada (motor ou dados). O download tentará de novo.",
+            "Pré-geração PDF não foi enfileirada. O download tentará gerar sob demanda.",
             exc_info=True,
         )
     return None

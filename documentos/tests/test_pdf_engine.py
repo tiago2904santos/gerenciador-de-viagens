@@ -30,10 +30,16 @@ class WeasyImportProbeTests(SimpleTestCase):
 
 
 class ResolvePdfEngineTests(SimpleTestCase):
+    def setUp(self):
+        pe._availability_cache.clear()
+
+    def tearDown(self):
+        pe._availability_cache.clear()
+
     @mock.patch.object(pe, "resolve_libreoffice_binary", return_value="/x/soffice")
     def test_libreoffice_disponivel_exige_verificacao_do_executavel(self, m_resolve):
         self.assertTrue(pe._libreoffice_ok())
-        m_resolve.assert_called_once_with(verify_version=True)
+        m_resolve.assert_called_once_with(verify_version=False)
 
     @mock.patch.object(pe, "_word_ok", return_value=True)
     @mock.patch.object(pe, "_libreoffice_ok", return_value=False)
@@ -72,3 +78,53 @@ class ResolvePdfEngineTests(SimpleTestCase):
         )
         msg = build_pdf_unavailable_message(r)
         self.assertIn("documentos_check", msg)
+
+    @override_settings(DOCUMENTOS_ENGINE_PROBE_CACHE_SECONDS=60)
+    @mock.patch.object(pe.time, "monotonic", return_value=120)
+    @mock.patch.object(pe, "_unoserver_ok", return_value=False)
+    @mock.patch.object(pe, "_word_ok", return_value=False)
+    @mock.patch.object(pe, "_libreoffice_ok", return_value=True)
+    @mock.patch.object(pe, "_weasy_import_ok", return_value=False)
+    @mock.patch.object(pe, "_simple_fallback_allowed", return_value=False)
+    def test_sondas_de_motor_sao_reutilizadas_na_mesma_janela(
+        self,
+        m_simple,
+        m_weasy,
+        m_libreoffice,
+        m_word,
+        m_unoserver,
+        _monotonic,
+    ):
+        first = resolve_pdf_engine(
+            explicit_setting="auto",
+            prefer_docx_pipeline=True,
+        )
+        second = resolve_pdf_engine(
+            explicit_setting="auto",
+            prefer_docx_pipeline=True,
+        )
+
+        self.assertEqual(first.attempt_chain, second.attempt_chain)
+        for probe in (m_simple, m_weasy, m_libreoffice, m_word, m_unoserver):
+            probe.assert_called_once()
+
+    @override_settings(
+        DOCUMENTOS_UNOSERVER_URL="http://127.0.0.1:2003",
+        DOCUMENTOS_PDF_AUTO_FALLBACK=True,
+    )
+    @mock.patch.object(pe, "_scan_availability")
+    @mock.patch.object(pe, "resolve_libreoffice_binary", return_value="/usr/bin/libreoffice")
+    @mock.patch.object(pe, "_module_present", return_value=False)
+    def test_unoserver_explicito_nao_executa_sondas_pesadas(
+        self,
+        _module_present,
+        _resolve_libreoffice,
+        m_scan,
+    ):
+        result = resolve_pdf_engine(
+            explicit_setting="unoserver",
+            prefer_docx_pipeline=True,
+        )
+
+        self.assertEqual(result.attempt_chain, ("unoserver", "libreoffice"))
+        m_scan.assert_not_called()

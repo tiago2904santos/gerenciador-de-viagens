@@ -42,6 +42,7 @@ from .services import fundir_termos_docx
 from .services import fundir_termos_pdf_bytes
 from .services import gerar_termo_cadastro_um
 from .services import gerar_termo_lote
+from .services import gerar_termos_pdf_consolidado
 from .services import gerar_termo_um
 from .services import listar_servidores_com_termo
 from .services import pdf_termo_cadastro_assinado_ou_gerado
@@ -705,10 +706,14 @@ def baixar_termos_todos_pdf(request, pk):
             return redirect(f"{redirect_para_corrigir_documento_oficio(oficio)}?documento_incompleto=1")
 
     try:
-        conteudos = [pdf_termo_oficio_assinado_ou_gerado(oficio, s) for s in servidores]
+        assinados = [termo_oficio_tem_assinado(oficio, s) for s in servidores]
+        if len(servidores) > 1 and not any(assinados):
+            pdf_bytes = gerar_termos_pdf_consolidado(oficio)
+        else:
+            conteudos = [pdf_termo_oficio_assinado_ou_gerado(oficio, s) for s in servidores]
+            pdf_bytes = conteudos[0] if len(conteudos) == 1 else fundir_termos_pdf_bytes(conteudos)
     except DocumentValidationError as exc:
         return _termo_oficio_pdf_error_redirect(request, oficio, exc)
-    pdf_bytes = fundir_termos_pdf_bytes(conteudos)
     nome = f"termos_oficio_{oficio.numero_formatado.replace('/', '-')}.pdf"
     response = HttpResponse(pdf_bytes, content_type="application/pdf")
     response["Content-Disposition"] = f'attachment; filename="{nome}"'
@@ -737,8 +742,12 @@ def baixar_termo_lote_zip(request, pk, formato):
 
     try:
         if fmt == DocumentoFormato.PDF:
-            conteudos = [pdf_termo_oficio_assinado_ou_gerado(oficio, s) for s in servidores]
-            content = conteudos[0] if len(conteudos) == 1 else fundir_termos_pdf_bytes(conteudos)
+            assinados = [termo_oficio_tem_assinado(oficio, s) for s in servidores]
+            if len(servidores) > 1 and not any(assinados):
+                content = gerar_termos_pdf_consolidado(oficio)
+            else:
+                conteudos = [pdf_termo_oficio_assinado_ou_gerado(oficio, s) for s in servidores]
+                content = conteudos[0] if len(conteudos) == 1 else fundir_termos_pdf_bytes(conteudos)
             content_type = "application/pdf"
         else:
             docs = gerar_termo_lote(oficio, fmt)

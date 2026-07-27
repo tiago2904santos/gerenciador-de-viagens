@@ -102,6 +102,7 @@ from .services import obter_roteiro_escolhido_do_post
 from .services import vincular_roteiro_ao_oficio_sem_copia
 from .services import redirect_para_corrigir_documento_oficio
 from .services import oficio_esta_completo_para_finalizar
+from .services import OficioNumeroConflitoError
 from .services import tocar_data_criacao_oficio
 from .services import validar_oficio_para_documento
 
@@ -606,17 +607,21 @@ def dados_viajantes(request, pk):
         transp_ok = (not save_transport) or transporte_valido or nav_action == "wizard_next"
         if dados_ok and transp_ok:
             persist_action = _wizard_persist_action_para_dados_viajantes(nav_action)
-            oficio = atualizar_oficio_dados_viajantes(oficio, form, action=persist_action)
-            if transporte_valido:
-                transporte_form = OficioTransporteForm(request.POST, instance=oficio)
-                _prepare_transporte_form(transporte_form)
-                transporte_form.is_valid()
-                oficio = atualizar_oficio_transporte(
-                    oficio,
-                    transporte_form,
-                    action="save_continue" if nav_action == "wizard_next" else "save_draft",
-                )
-            return _redirect_after_dados_viajantes_save(request, oficio, nav_action=nav_action, created=False)
+            try:
+                oficio = atualizar_oficio_dados_viajantes(oficio, form, action=persist_action)
+            except OficioNumeroConflitoError as exc:
+                form.add_error("numero", str(exc))
+            else:
+                if transporte_valido:
+                    transporte_form = OficioTransporteForm(request.POST, instance=oficio)
+                    _prepare_transporte_form(transporte_form)
+                    transporte_form.is_valid()
+                    oficio = atualizar_oficio_transporte(
+                        oficio,
+                        transporte_form,
+                        action="save_continue" if nav_action == "wizard_next" else "save_draft",
+                    )
+                return _redirect_after_dados_viajantes_save(request, oficio, nav_action=nav_action, created=False)
     avaliacao = avaliar_oficio_dados_viajantes(form=form, oficio=oficio)
     mostrar_pendencias_documento = request.GET.get("documento_incompleto") == "1"
     return render(
@@ -666,7 +671,15 @@ def dados_viajantes_autosave(request, pk):
                 message="Alguns campos ainda precisam de ajuste antes do autosave.",
                 errors=_autosave_form_errors(form),
             )
-        oficio = atualizar_oficio_dados_viajantes(oficio, form, action="save_draft")
+        try:
+            oficio = atualizar_oficio_dados_viajantes(oficio, form, action="save_draft")
+        except OficioNumeroConflitoError as exc:
+            form.add_error("numero", str(exc))
+            return autosave_json_response(
+                ok=False,
+                message=str(exc),
+                errors=_autosave_form_errors(form),
+            )
 
     if dirty_names & transporte_fields:
         transporte_form = OficioTransporteForm(data, instance=oficio)

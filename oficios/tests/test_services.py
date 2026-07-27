@@ -2,6 +2,7 @@ import datetime
 from types import SimpleNamespace
 from unittest import mock
 
+from django.db import IntegrityError
 from django.test import TestCase
 from django.core.files.base import ContentFile
 from django.test import override_settings
@@ -32,6 +33,8 @@ from oficios.services import excluir_modelo_motivo
 from oficios.services import excluir_oficio
 from oficios.services import get_next_available_numero_oficio
 from oficios.services import criar_oficio_rascunho
+from oficios.services import OficioNumeroConflitoError
+from oficios.services import reservar_numero_oficio
 from oficios.services import _preencher_roteiro_oficio_com_evento
 from oficios.services import redirect_para_corrigir_documento_oficio
 from oficios.services import validar_oficio_para_documento
@@ -64,6 +67,43 @@ class OficioServicesTests(TestCase):
         self.assertEqual(oficio.ano, timezone.localdate().year)
         self.assertEqual(oficio.status, Oficio.STATUS_RASCUNHO)
         self.assertEqual(list(oficio.servidores.all()), [self.servidor])
+
+    @mock.patch("oficios.services._bloquear_escopo_numeracao_oficio")
+    @mock.patch(
+        "oficios.services.get_next_available_numero_oficio",
+        side_effect=[77, 78],
+    )
+    def test_reserva_repete_apos_colisao_de_worker_antigo(
+        self,
+        _proximo_numero,
+        _bloqueio,
+    ):
+        ano = timezone.localdate().year
+        Oficio.objects.create(
+            numero=77,
+            ano=ano,
+            custeio=Oficio.CUSTEIO_UNIDADE_DPC,
+        )
+        rascunho = Oficio.objects.create(
+            custeio=Oficio.CUSTEIO_UNIDADE_DPC,
+        )
+        original_save = rascunho.save
+        chamadas = 0
+
+        def save_com_primeira_colisao(*args, **kwargs):
+            nonlocal chamadas
+            chamadas += 1
+            if chamadas == 1:
+                raise IntegrityError(
+                    'duplicate key violates "oficios_oficio_area_ano_numero_unique"',
+                )
+            return original_save(*args, **kwargs)
+
+        with mock.patch.object(rascunho, "save", side_effect=save_com_primeira_colisao):
+            reservado = reservar_numero_oficio(rascunho, ano=ano)
+
+        self.assertEqual(reservado.numero, 78)
+        self.assertEqual(chamadas, 2)
 
     def test_get_next_available_numero_reaproveita_lacuna_apos_exclusao(self):
         ano = timezone.localdate().year
@@ -131,6 +171,35 @@ class OficioServicesTests(TestCase):
         )
         self.assertFalse(form.is_valid())
         self.assertIn("numero", form.errors)
+
+    def test_servico_rejeita_numero_ocupado_depois_da_validacao(self):
+        ano = timezone.localdate().year
+        oficio = Oficio.objects.create(
+            numero=77,
+            ano=ano,
+            custeio=Oficio.CUSTEIO_UNIDADE_DPC,
+        )
+        form = OficioDadosViajantesForm(
+            data={
+                "numero": "78",
+                "custeio": Oficio.CUSTEIO_UNIDADE_DPC,
+                "custeio_observacao": "",
+            },
+            instance=oficio,
+        )
+        self.assertTrue(form.is_valid(), form.errors)
+        Oficio.objects.create(
+            numero=78,
+            ano=ano,
+            custeio=Oficio.CUSTEIO_UNIDADE_DPC,
+        )
+
+        with self.assertRaises(OficioNumeroConflitoError):
+            atualizar_oficio_dados_viajantes(
+                oficio,
+                form,
+                action="save_draft",
+            )
 
     def test_preencher_roteiro_oficio_com_evento_so_preenche_sede_e_destino(self):
         estado = Estado.objects.create(nome="Parana", sigla="PR")

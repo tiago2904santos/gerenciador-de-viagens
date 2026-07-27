@@ -1,5 +1,7 @@
 import re
 
+from django.db import connection
+from django.db import IntegrityError
 from django.db import transaction
 from django.urls import reverse
 from django.db.models import ProtectedError
@@ -73,21 +75,16 @@ def _try_cached_download(
     tipo: DocumentoTipo,
     formato: DocumentoFormato,
     reference: str,
-    payload: dict,
-    docxtpl_context: dict | None,
-    prefer_docx: bool,
+    cache_key: str,
 ):
     if not getattr(django_settings, "DOCUMENTOS_ARTIFACT_CACHE", True):
         return None
-    key = _document_cache_key(
+    art = get_cached_document_artifact(
+        oficio_id=oficio_id,
         tipo=tipo,
         formato=formato,
-        reference=reference,
-        payload=payload,
-        docxtpl_context=docxtpl_context,
-        prefer_docx=prefer_docx,
+        cache_key=cache_key,
     )
-    art = get_cached_document_artifact(oficio_id=oficio_id, tipo=tipo, formato=formato, cache_key=key)
     if art is None:
         return None
     content = read_artifact_file_bytes(art)
@@ -111,6 +108,10 @@ from roteiros.models import RoteiroDestino
 
 class OficioVinculadoError(Exception):
     """Exclusão bloqueada porque o ofício possui vínculos protegidos."""
+
+
+class OficioNumeroConflitoError(Exception):
+    """O número escolhido foi ocupado por outra requisição."""
 
 
 def tocar_data_criacao_oficio(oficio: Oficio) -> Oficio:
@@ -288,7 +289,30 @@ def atualizar_oficio_dados_viajantes(oficio, form, action="save_draft"):
     modelo_motivo = form.cleaned_data.get("modelo_motivo")
     aplicar_modelo_motivo_no_oficio(atualizado, modelo_motivo, form.cleaned_data.get("motivo"))
     atualizar_status_automatico_oficio(atualizado, action=action, form=form)
-    atualizado.save()
+    _bloquear_escopo_numeracao_oficio(
+        area_id=atualizado.area_id,
+        ano=atualizado.ano,
+    )
+    conflito = Oficio.objects.filter(
+        area_id=atualizado.area_id,
+        ano=atualizado.ano,
+        numero=atualizado.numero,
+    ).exclude(pk=atualizado.pk)
+    if conflito.exists():
+        raise OficioNumeroConflitoError(
+            f"O número {atualizado.numero}/{atualizado.ano} acabou de ser usado "
+            "por outro ofício. Atualize a página e escolha outro número.",
+        )
+    try:
+        with transaction.atomic():
+            atualizado.save()
+    except IntegrityError as exc:
+        if "oficios_oficio_area_ano_numero_unique" not in str(exc):
+            raise
+        raise OficioNumeroConflitoError(
+            f"O número {atualizado.numero}/{atualizado.ano} acabou de ser usado "
+            "por outro ofício. Atualize a página e escolha outro número.",
+        ) from exc
     form.save_m2m()
     return atualizado
 
@@ -388,22 +412,74 @@ def get_next_available_numero_oficio(ano, area=None):
     return Oficio.get_next_available_numero(ano, area=area)
 
 
+def _bloquear_escopo_numeracao_oficio(*, area_id: int | None, ano: int) -> None:
+    """Serializa a escolha do próximo número para uma área/ano.
+
+    Bloquear apenas linhas de ``Oficio`` não protege o próximo número, pois ele
+    ainda não existe. No PostgreSQL, o advisory lock transacional cobre
+    exatamente esse intervalo lógico sem exigir uma tabela de contadores.
+    """
+    if connection.vendor == "postgresql":
+        namespace = 0x4F464943  # "OFIC"
+        scope = (((area_id or 0) * 4096) + (int(ano) % 4096)) % 2_147_483_647
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT pg_advisory_xact_lock(%s, %s)",
+                [namespace, scope],
+            )
+        return
+
+    # Fallback para bancos usados em desenvolvimento/testes.
+    if area_id:
+        area_model = Oficio._meta.get_field("area").remote_field.model
+        area_model.objects.select_for_update().filter(pk=area_id).exists()
+    else:
+        list(
+            Oficio.objects.select_for_update()
+            .filter(area__isnull=True, ano=ano)
+            .exclude(numero__isnull=True)
+        )
+
+
 @transaction.atomic
 def reservar_numero_oficio(oficio, ano=None):
     if oficio.numero and oficio.ano:
         return oficio
 
     resolved_year = ano or timezone.localdate().year
-    qs = Oficio.objects.select_for_update().filter(ano=resolved_year).exclude(numero__isnull=True)
-    if oficio.area_id:
-        qs = qs.filter(area=oficio.area)
-    else:
-        qs = qs.filter(area__isnull=True)
-    list(qs)
-    oficio.ano = resolved_year
-    oficio.numero = get_next_available_numero_oficio(resolved_year, area=oficio.area)
-    oficio.save()
-    return oficio
+    _bloquear_escopo_numeracao_oficio(
+        area_id=oficio.area_id,
+        ano=resolved_year,
+    )
+
+    original_pk = oficio.pk
+    original_adding = oficio._state.adding
+    last_error: IntegrityError | None = None
+    for _attempt in range(3):
+        oficio.ano = resolved_year
+        oficio.numero = get_next_available_numero_oficio(
+            resolved_year,
+            area=oficio.area,
+        )
+        try:
+            # Savepoint interno: uma colisão causada por um worker antigo não
+            # inutiliza a transação externa; a consulta seguinte já verá o
+            # número que venceu a corrida.
+            with transaction.atomic():
+                oficio.save()
+            return oficio
+        except IntegrityError as exc:
+            if "oficios_oficio_area_ano_numero_unique" not in str(exc):
+                raise
+            last_error = exc
+            oficio.numero = None
+            oficio.ano = None
+            if original_adding:
+                oficio.pk = original_pk
+                oficio._state.adding = True
+
+    assert last_error is not None
+    raise last_error
 
 
 def avaliar_oficio_dados_viajantes(oficio=None, form=None):
@@ -559,17 +635,6 @@ def gerar_resposta_documento_oficio(oficio, formato: DocumentoFormato):
         payload = build_canonical_document_payload(oficio, DocumentoTipo.OFICIO)
         docxtpl = build_oficio_docxtpl_context(oficio)
         reference = oficio.numero_formatado.replace("/", "-")
-        hit = _try_cached_download(
-            oficio_id=oficio.pk,
-            tipo=DocumentoTipo.OFICIO,
-            formato=formato,
-            reference=reference,
-            payload=payload,
-            docxtpl_context=docxtpl,
-            prefer_docx=True,
-        )
-        if hit is not None:
-            return hit
         cache_key = _document_cache_key(
             tipo=DocumentoTipo.OFICIO,
             formato=formato,
@@ -578,6 +643,15 @@ def gerar_resposta_documento_oficio(oficio, formato: DocumentoFormato):
             docxtpl_context=docxtpl,
             prefer_docx=True,
         )
+        hit = _try_cached_download(
+            oficio_id=oficio.pk,
+            tipo=DocumentoTipo.OFICIO,
+            formato=formato,
+            reference=reference,
+            cache_key=cache_key,
+        )
+        if hit is not None:
+            return hit
         facade = build_default_facade()
         doc = facade.gerar(
             tipo=DocumentoTipo.OFICIO,
@@ -615,17 +689,6 @@ def gerar_resposta_justificativa_documento(oficio, formato: DocumentoFormato):
         payload = build_justificativa_payload(oficio)
         docxtpl = build_justificativa_docxtpl_context(oficio)
         reference = f"{oficio.numero_formatado.replace('/', '-')}-justificativa"
-        hit = _try_cached_download(
-            oficio_id=oficio.pk,
-            tipo=DocumentoTipo.JUSTIFICATIVA,
-            formato=formato,
-            reference=reference,
-            payload=payload,
-            docxtpl_context=docxtpl,
-            prefer_docx=True,
-        )
-        if hit is not None:
-            return hit
         cache_key = _document_cache_key(
             tipo=DocumentoTipo.JUSTIFICATIVA,
             formato=formato,
@@ -634,6 +697,15 @@ def gerar_resposta_justificativa_documento(oficio, formato: DocumentoFormato):
             docxtpl_context=docxtpl,
             prefer_docx=True,
         )
+        hit = _try_cached_download(
+            oficio_id=oficio.pk,
+            tipo=DocumentoTipo.JUSTIFICATIVA,
+            formato=formato,
+            reference=reference,
+            cache_key=cache_key,
+        )
+        if hit is not None:
+            return hit
         facade = build_default_facade()
         doc = facade.gerar(
             tipo=DocumentoTipo.JUSTIFICATIVA,

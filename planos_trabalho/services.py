@@ -7,6 +7,7 @@ from datetime import date
 from datetime import datetime
 from decimal import Decimal
 
+from django.conf import settings
 from django.db.models import Max
 from django.utils import timezone
 
@@ -14,8 +15,13 @@ from cadastros.models import ConfiguracaoSistema
 from core.tenancy import filter_queryset_by_area
 from core.tenancy import get_current_area
 from documentos.services.facade import build_default_facade
+from documentos.services.document_cache import build_document_cache_key
+from documentos.services.document_cache import build_template_cache_signature
+from documentos.services.document_cache import documento_gerado_from_artifact
+from documentos.services.document_cache import get_cached_document_artifact
 from documentos.services.formatters import format_city_uf
 from documentos.services.formatters import format_document_display
+from documentos.services.pdf_engine import resolve_pdf_engine
 from documentos.services.responses import build_download_response
 from documentos.services.timing import measure_step
 from documentos.services.types import DocumentoFormato
@@ -1159,6 +1165,40 @@ def gerar_plano_documento(plano: PlanoTrabalho, formato: DocumentoFormato):
         )
         # Multi-evento usa um template dedicado (loops por evento); single mantém o padrão.
         docx_template = "plano_trabalho_multievento.docx" if plano.is_multi_evento else None
+        attempt_chain = ()
+        if formato == DocumentoFormato.PDF:
+            attempt_chain = resolve_pdf_engine(
+                explicit_setting=getattr(settings, "DOCUMENTOS_DEFAULT_PDF_ENGINE", "auto"),
+                prefer_docx_pipeline=True,
+            ).attempt_chain
+        cache_key = build_document_cache_key(
+            tipo=DocumentoTipo.PLANO_TRABALHO,
+            formato=formato,
+            reference=reference,
+            payload=payload,
+            docxtpl_context=contexto,
+            attempt_chain=attempt_chain,
+            template_signature=build_template_cache_signature(
+                tipo=DocumentoTipo.PLANO_TRABALHO,
+                formato=formato,
+                docx_template_path=docx_template,
+            ),
+        )
+        if plano.evento_id:
+            cached = get_cached_document_artifact(
+                evento_id=plano.evento_id,
+                tipo=DocumentoTipo.PLANO_TRABALHO,
+                formato=formato,
+                cache_key=cache_key,
+            )
+            if cached is not None:
+                return documento_gerado_from_artifact(
+                    cached,
+                    tipo=DocumentoTipo.PLANO_TRABALHO,
+                    formato=formato,
+                    reference=reference,
+                )
+
         facade = build_default_facade()
         doc = facade.gerar(
             tipo=DocumentoTipo.PLANO_TRABALHO,
@@ -1168,11 +1208,22 @@ def gerar_plano_documento(plano: PlanoTrabalho, formato: DocumentoFormato):
             docxtpl_context=contexto,
             docx_template_path=docx_template,
         )
-        _persistir_plano_artefato(plano, doc)
+        _persistir_plano_artefato(
+            plano,
+            doc,
+            cache_key=cache_key,
+            payload_snapshot=payload,
+        )
         return doc
 
 
-def _persistir_plano_artefato(plano: PlanoTrabalho, doc) -> None:
+def _persistir_plano_artefato(
+    plano: PlanoTrabalho,
+    doc,
+    *,
+    cache_key: str = "",
+    payload_snapshot: dict | None = None,
+) -> None:
     try:
         from documentos.models import DocumentoArtefato
         from documentos.services.persistence import persist_geracao
@@ -1188,6 +1239,9 @@ def _persistir_plano_artefato(plano: PlanoTrabalho, doc) -> None:
             evento_id=plano.evento_id,
             oficio_id=(oficio.pk if oficio else None),
             nome_drive=naming.nome_plano(plano),
+            payload_snapshot=payload_snapshot,
+            cache_key=cache_key,
+            engine=doc.pdf_engine_used or "",
         )
     except Exception:
         logger.warning("Não foi possível persistir artefato do plano de trabalho.", exc_info=True)

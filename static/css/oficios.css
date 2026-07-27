@@ -3104,7 +3104,7 @@ html[data-theme="light"] .cv-segment-toggle {
  * função dos servidores (Condução / Técnico / Apoio) da Ordem de Serviço.
  */
 .evento-doc-toggle.cv-segment-toggle {
-  background: var(--color-surface-soft);
+  background: var(--step1-field);
   border-color: transparent;
   border-radius: 10px;
   box-shadow: none;
@@ -3151,8 +3151,57 @@ html[data-theme="light"] .cv-segment-toggle {
   margin-top: var(--space-4);
 }
 
+/* forms.css declara --form-control-height só em `.main-form-panel .field`, e o
+   picker de documentos não usa esse wrapper. Sem a variável, a regra
+   `.main-form-panel .cv-search-picker__control` (height/min-height/max-height)
+   fica inválida e o campo colapsa para a altura do texto (~19px) em vez de 44px.
+   Mesmo remédio já usado em .related-route-picker (dark-redesign.css). */
+.evento-doc-source-picker {
+  --form-control-height: var(--control-height-md, 44px);
+}
+
 .evento-doc-summary-panel {
   margin-top: var(--space-3);
+}
+
+/* O roster genérico (dark-redesign.css) força overflow:visible na lista de
+   selecionados; aqui a lista reaproveita o scroll de 220px do roteiro-editor,
+   então sem overflow:auto os cards vazam para fora do card do documento. */
+.evento-doc-summary-panel .cv-search-picker__selected-list {
+  overflow-y: auto !important;
+}
+
+/* Destaque do card marcado (Documentos vinculados). .related-route-item.is-active
+   (roteiros.css) depende de --re-accent-border/--re-choice-ring, que só existem
+   dentro de .roteiro-editor; e o destaque do tema escuro (dark-redesign.css) só
+   existe dentro de .related-route-picker. Nenhum dos dois envolve este card, então
+   o clique marcava o item (select/aria-pressed) sem qualquer sinal visual. */
+#evento-card-documentos-d .related-route-item.is-active {
+  background: color-mix(in srgb, var(--color-primary-bright) 12%, var(--color-surface-muted, var(--color-card)));
+  border-color: color-mix(in srgb, var(--color-primary-bright) 45%, var(--color-border-soft));
+  box-shadow: inset 4px 0 0 var(--color-primary-bright);
+}
+
+#evento-card-documentos-d .related-route-item.is-active .cv-search-picker__selected-avatar {
+  background: var(--color-primary-bright);
+  border-color: var(--color-primary-bright);
+  color: var(--color-on-accent, #ffffff);
+}
+
+html[data-theme="dark"] #evento-card-documentos-d .related-route-item.is-active,
+html[data-theme="dark-dark"] #evento-card-documentos-d .related-route-item.is-active,
+html[data-theme="light-dark"] #evento-card-documentos-d .related-route-item.is-active {
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface-muted));
+  border-color: color-mix(in srgb, var(--color-accent) 45%, var(--color-border-soft));
+  box-shadow: inset 4px 0 0 var(--color-accent);
+}
+
+html[data-theme="dark"] #evento-card-documentos-d .related-route-item.is-active .cv-search-picker__selected-avatar,
+html[data-theme="dark-dark"] #evento-card-documentos-d .related-route-item.is-active .cv-search-picker__selected-avatar,
+html[data-theme="light-dark"] #evento-card-documentos-d .related-route-item.is-active .cv-search-picker__selected-avatar {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-on-accent, #081522);
 }
 
 [data-oficio-motorista-servidor],

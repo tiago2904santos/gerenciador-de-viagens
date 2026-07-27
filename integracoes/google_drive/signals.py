@@ -156,9 +156,27 @@ def _processar_com_retry(fn, obj, task) -> None:
 def _upload_artefato(sender, instance, created: bool, **kwargs) -> None:
     if not created or _drive_desligado():
         return
-    from . import organizer, tasks
+    from . import status, tasks
 
-    _processar_com_retry(organizer.organizar_artefato, instance, tasks.processar_artefato)
+    usuario = _usuario_atual()
+    try:
+        # Upload de rede nunca participa do tempo de geração/resposta HTTP.
+        # A tarefa já possui retry, backoff e rastreamento de pendência.
+        tasks.processar_artefato.delay(
+            instance.pk,
+            usuario_id=getattr(usuario, "pk", None),
+        )
+    except Exception as exc:
+        status.registrar_falha(instance, exc, usuario=usuario)
+        logger.warning(
+            "[Drive] fila indisponível; artefato %s ficou pendente para reenvio",
+            instance.pk,
+            exc_info=True,
+        )
+        _avisar_usuario(
+            f'O documento "{_descrever(instance)}" foi gerado, mas o envio ao '
+            "Google Drive ficou pendente."
+        )
 
 
 # Campos que não afetam os documentos da prestação no Drive: arquivar/finalizar

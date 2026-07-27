@@ -103,6 +103,29 @@ class TermoServidorPdfInlineTests(TestCase):
         self.oficio.servidores.add(self.servidor_ok)
         self.oficio.servidores_termo_autorizacao.add(self.servidor_ok)
 
+    @mock.patch("termos.services._facade_termo_com_template")
+    @mock.patch("termos.services.documento_gerado_from_artifact")
+    @mock.patch("termos.services.get_cached_document_artifact")
+    def test_cache_hit_nao_renderiza_novamente(
+        self,
+        m_get_cached,
+        m_from_artifact,
+        m_facade,
+    ):
+        artefato = mock.Mock()
+        esperado = mock.Mock()
+        m_get_cached.return_value = artefato
+        m_from_artifact.return_value = esperado
+
+        result = gerar_termo_um(
+            self.oficio,
+            self.servidor_ok,
+            DocumentoFormato.PDF,
+        )
+
+        self.assertIs(result, esperado)
+        m_facade.assert_not_called()
+
     @mock.patch("termos.views.validar_oficio_para_documento", return_value={"pendencias": ["x"]})
     def test_redirect_quando_oficio_incompleto(self, _m):
         url = reverse("termos:termo_servidor_pdf_inline", args=[self.oficio.pk, self.servidor_ok.pk])
@@ -153,12 +176,11 @@ class TermoServidorPdfInlineTests(TestCase):
         m_gerar.assert_called_once_with(self.oficio, self.servidor_ok)
 
     @mock.patch("termos.views.validar_oficio_para_documento", return_value={"pendencias": []})
-    @mock.patch("termos.views.fundir_termos_pdf_bytes")
-    @mock.patch("termos.views.pdf_termo_oficio_assinado_ou_gerado")
-    def test_download_todos_pdf_usa_arquivo_consolidado(self, m_gerar, m_fundir, _m_val):
-        self.oficio.servidores_termo_autorizacao.add(self.servidor_ok)
-        m_gerar.return_value = b"%PDF-1.4\n1"
-        m_fundir.return_value = b"%PDF-1.4\nmerged"
+    @mock.patch("termos.views.gerar_termos_pdf_consolidado")
+    def test_download_todos_pdf_usa_conversao_unica(self, m_consolidar, _m_val):
+        self.oficio.servidores.add(self.servidor_no)
+        self.oficio.servidores_termo_autorizacao.add(self.servidor_no)
+        m_consolidar.return_value = b"%PDF-1.4\nconsolidated"
 
         url = reverse("termos:baixar_termos_todos_pdf", args=[self.oficio.pk])
         response = self.client.get(url)
@@ -167,8 +189,8 @@ class TermoServidorPdfInlineTests(TestCase):
         self.assertEqual(response["Content-Type"], "application/pdf")
         self.assertIn("attachment", response["Content-Disposition"])
         self.assertIn("termos_oficio_", response["Content-Disposition"])
-        self.assertEqual(response.content, b"%PDF-1.4\nmerged")
-        m_fundir.assert_called_once_with([b"%PDF-1.4\n1"])
+        self.assertEqual(response.content, b"%PDF-1.4\nconsolidated")
+        m_consolidar.assert_called_once_with(self.oficio)
 
     def test_template_html_oficial_renderiza_dados_reais(self):
         payload = build_termo_payload(self.oficio, self.servidor_ok)

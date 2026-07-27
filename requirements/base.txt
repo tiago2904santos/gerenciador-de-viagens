@@ -18,3 +18,4 @@ google-auth>=2.20,<3.0
 google-auth-oauthlib>=1.0,<2.0
 celery>=5.4,<6.0
 redis>=5.0,<6.0
+unoserver>=3.4,<4.0

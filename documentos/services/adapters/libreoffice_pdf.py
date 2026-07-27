@@ -7,8 +7,6 @@ import tempfile
 from pathlib import Path
 from urllib.parse import urlparse
 
-import requests
-
 # Invocações concorrentes de `soffice` sem perfil isolado disputam o lock do
 # perfil de utilizador padrão (~/.config/libreoffice/.../.lock): uma delas
 # falha ou bloqueia indefinidamente. `-env:UserInstallation` isola cada
@@ -96,10 +94,7 @@ def convert_docx_to_pdf_unoserver(
     unoserver_url: str,
     timeout_seconds: float = 3,
 ) -> bytes:
-    """
-    Converte DOCX → PDF via unoserver HTTP (POST /request com ficheiro).
-    Tenta nomes de campo comuns (`upload`, `file`) por compatibilidade.
-    """
+    """Converte DOCX → PDF pelo cliente XML-RPC oficial do unoserver."""
     return _convert_via_unoserver(
         data=docx_bytes,
         filename="documento.docx",
@@ -114,7 +109,7 @@ def convert_xlsx_to_pdf_unoserver(
     unoserver_url: str,
     timeout_seconds: float = 3,
 ) -> bytes:
-    """Converte XLSX → PDF via unoserver HTTP."""
+    """Converte XLSX → PDF pelo cliente XML-RPC oficial do unoserver."""
     return _convert_via_unoserver(
         data=xlsx_bytes,
         filename="documento.xlsx",
@@ -130,24 +125,62 @@ def _convert_via_unoserver(
     unoserver_url: str,
     timeout_seconds: float = 3,
 ) -> bytes:
-    base = unoserver_url.rstrip("/")
-    url = f"{base}/request"
-    last_err: Exception | None = None
-    for field in ("upload", "file"):
-        try:
-            r = requests.post(
-                url,
-                files={field: (filename, data)},
-                timeout=timeout_seconds,
+    """Converte pelo protocolo XML-RPC nativo do ``unoserver``.
+
+    A porta 2003 do unoserver não é uma API REST. O cliente oficial envia os
+    bytes via XML-RPC e reutiliza o processo LibreOffice já residente.
+    """
+    parsed = urlparse(unoserver_url)
+    host = parsed.hostname
+    if not host:
+        raise RuntimeError("DOCUMENTOS_UNOSERVER_URL não possui host válido.")
+    port = parsed.port or 2003
+    protocol = (parsed.scheme or "http").lower()
+    if protocol not in ("http", "https"):
+        raise RuntimeError("DOCUMENTOS_UNOSERVER_URL deve usar http:// ou https://.")
+
+    # Falha rápida. O limite da conversão também deve ser configurado no
+    # servidor com ``unoserver --conversion-timeout``.
+    if not unoserver_healthcheck(unoserver_url, timeout=timeout_seconds):
+        raise RuntimeError("unoserver indisponível.")
+
+    try:
+        from unoserver.client import UnoClient
+    except ImportError as exc:
+        raise RuntimeError(
+            "Cliente unoserver não instalado. Instale as dependências do projeto."
+        ) from exc
+
+    try:
+        local_server = host.lower() in {"127.0.0.1", "localhost", "::1"}
+        client = UnoClient(
+            server=host,
+            port=str(port),
+            host_location="local" if local_server else "remote",
+            protocol=protocol,
+        )
+        if local_server:
+            # No mesmo host, caminhos evitam o custo do base64/XML-RPC e também
+            # a limitação de NamedTemporaryFile do unoserver no Windows.
+            with tempfile.TemporaryDirectory(prefix="cv3_unoserver_") as tmp:
+                input_path = Path(tmp) / filename
+                output_path = Path(tmp) / "documento.pdf"
+                input_path.write_bytes(data)
+                client.convert(
+                    inpath=str(input_path),
+                    outpath=str(output_path),
+                    update_index=False,
+                )
+                resposta = output_path.read_bytes()
+        else:
+            resposta = client.convert(
+                indata=data,
+                convert_to="pdf",
+                update_index=False,
             )
-            if r.status_code != 200:
-                last_err = RuntimeError(f"unoserver HTTP {r.status_code}")
-                continue
-            resposta = r.content
-            if len(resposta) > 4 and resposta[:4] == b"%PDF":
-                return resposta
-            last_err = RuntimeError("Resposta unoserver não é PDF")
-        except requests.RequestException as exc:
-            last_err = exc
-            continue
-    raise RuntimeError(f"unoserver indisponível ou resposta inválida: {last_err}")
+    except Exception as exc:
+        raise RuntimeError(f"unoserver falhou ao converter {filename}: {exc}") from exc
+
+    if not isinstance(resposta, bytes) or not resposta.startswith(b"%PDF"):
+        raise RuntimeError("Resposta unoserver não é um PDF válido.")
+    return resposta

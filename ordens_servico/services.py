@@ -9,6 +9,7 @@ from django.conf import settings as django_settings
 from documentos.services.adapters.docxtpl_render import render_docx_bytes
 from documentos.services.document_cache import build_document_cache_key
 from documentos.services.document_cache import build_template_cache_signature
+from documentos.services.document_cache import documento_gerado_from_artifact
 from documentos.services.document_cache import get_cached_document_artifact
 from documentos.services.document_cache import read_artifact_file_bytes
 from documentos.services.facade import build_default_facade
@@ -63,13 +64,13 @@ def gerar_resposta_ordem_servico_documento(oficio: Oficio, formato: DocumentoFor
     ):
         payload = build_canonical_document_payload(oficio, DocumentoTipo.ORDEM_SERVICO)
         reference = f"{oficio.numero_formatado.replace('/', '-')}-ordem-servico"
+        cache_key = _ordem_cache_key(oficio, formato, payload)
         if getattr(django_settings, "DOCUMENTOS_ARTIFACT_CACHE", True):
-            ck = _ordem_cache_key(oficio, formato, payload)
             art = get_cached_document_artifact(
                 oficio_id=oficio.pk,
                 tipo=DocumentoTipo.ORDEM_SERVICO,
                 formato=formato,
-                cache_key=ck,
+                cache_key=cache_key,
             )
             if art is not None:
                 content = read_artifact_file_bytes(art)
@@ -82,7 +83,6 @@ def gerar_resposta_ordem_servico_documento(oficio: Oficio, formato: DocumentoFor
                 )
                 response["X-Document-SHA256"] = art.hash_sha256
                 return response
-        cache_key = _ordem_cache_key(oficio, formato, payload)
         facade = build_default_facade()
         doc = facade.gerar(
             tipo=DocumentoTipo.ORDEM_SERVICO,
@@ -136,7 +136,13 @@ def gerar_os_docx_response(ordem: OrdemServico):
     )
 
 
-def _persistir_ordem_servico_artefato(ordem: OrdemServico, doc) -> None:
+def _persistir_ordem_servico_artefato(
+    ordem: OrdemServico,
+    doc,
+    *,
+    cache_key: str = "",
+    payload_snapshot: dict | None = None,
+) -> None:
     """Persiste a OS gerada (conteúdo real, com os servidores designados) como
     ``DocumentoArtefato`` — para auto-organização/upload no Drive.
 
@@ -159,6 +165,9 @@ def _persistir_ordem_servico_artefato(ordem: OrdemServico, doc) -> None:
             oficio_id=oficio.pk,
             evento_id=getattr(oficio, "evento_id", None),
             nome_drive=naming.nome_os(ordem),
+            payload_snapshot=payload_snapshot,
+            cache_key=cache_key,
+            engine=doc.pdf_engine_used or "",
         )
     except Exception:
         logger.warning("Não foi possível persistir artefato da ordem de serviço.", exc_info=True)
@@ -172,19 +181,64 @@ def gerar_os_pdf_response(ordem: OrdemServico):
         if ordem.numero and ordem.ano
         else f"os-{ordem.pk}"
     )
+    template_path = _template_ordem_servico(ordem)
+    payload = {"institucional": {}, "oficio": {}}
+    chain = _ordem_chain()
+    cache_key = build_document_cache_key(
+        tipo=DocumentoTipo.ORDEM_SERVICO,
+        formato=DocumentoFormato.PDF,
+        reference=reference,
+        payload=payload,
+        docxtpl_context=ctx,
+        attempt_chain=chain,
+        template_signature=build_template_cache_signature(
+            tipo=DocumentoTipo.ORDEM_SERVICO,
+            formato=DocumentoFormato.PDF,
+            docx_template_path=template_path,
+        ),
+    )
+    oficio = ordem.oficios.first()
+    if oficio is not None:
+        cached = get_cached_document_artifact(
+            oficio_id=oficio.pk,
+            tipo=DocumentoTipo.ORDEM_SERVICO,
+            formato=DocumentoFormato.PDF,
+            cache_key=cache_key,
+        )
+        if cached is not None:
+            doc = documento_gerado_from_artifact(
+                cached,
+                tipo=DocumentoTipo.ORDEM_SERVICO,
+                formato=DocumentoFormato.PDF,
+                reference=reference,
+            )
+            return build_download_response(
+                content=doc.conteudo,
+                tipo=DocumentoTipo.ORDEM_SERVICO,
+                formato=DocumentoFormato.PDF,
+                reference=reference,
+                cache_hit=True,
+            )
+
     facade = build_default_facade()
     doc = facade.gerar(
         tipo=DocumentoTipo.ORDEM_SERVICO,
         formato=DocumentoFormato.PDF,
-        payload={"institucional": {}, "oficio": {}},
+        payload=payload,
         docxtpl_context=ctx,
-        docx_template_path=_template_ordem_servico(ordem),
+        docx_template_path=template_path,
         reference=reference,
     )
-    _persistir_ordem_servico_artefato(ordem, doc)
+    _persistir_ordem_servico_artefato(
+        ordem,
+        doc,
+        cache_key=cache_key,
+        payload_snapshot=payload,
+    )
     return build_download_response(
         content=doc.conteudo,
         tipo=DocumentoTipo.ORDEM_SERVICO,
         formato=DocumentoFormato.PDF,
         reference=reference,
+        cache_hit=False,
     )

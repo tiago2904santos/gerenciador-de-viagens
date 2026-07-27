@@ -7,6 +7,9 @@ Não executa conversões — apenas decide a cadeia de tentativas e mensagens de
 from __future__ import annotations
 
 import platform
+import importlib.util
+import threading
+import time
 from dataclasses import dataclass
 
 from django.conf import settings
@@ -16,6 +19,10 @@ from documentos.services.adapters.word_pdf import is_word_pdf_available
 from documentos.services.libreoffice_resolve import resolve_libreoffice_binary
 from documentos.services.libreoffice_resolve import sys_platform_is_darwin
 from documentos.services.libreoffice_resolve import sys_platform_is_linux
+
+
+_availability_cache: dict[tuple[object, ...], tuple[list[str], list[str]]] = {}
+_availability_cache_lock = threading.Lock()
 
 
 @dataclass(frozen=True)
@@ -41,8 +48,10 @@ def _os_label() -> str:
 
 
 def _libreoffice_ok() -> bool:
-    # Um executável existente pode pertencer a uma instalação incompleta.
-    return bool(resolve_libreoffice_binary(verify_version=True))
+    # O resolver participa do request HTTP: não inicie ``soffice --version``
+    # apenas para montar a cadeia. A conversão real valida o executável e cai
+    # para o próximo motor se a instalação estiver incompleta.
+    return bool(resolve_libreoffice_binary(verify_version=False))
 
 
 def _unoserver_ok() -> bool:
@@ -89,7 +98,7 @@ def _simple_fallback_allowed() -> bool:
     return False
 
 
-def _scan_availability() -> tuple[list[str], list[str]]:
+def _scan_availability_uncached() -> tuple[list[str], list[str]]:
     avail: list[str] = []
     missing: list[str] = []
     for name, ok in (
@@ -106,7 +115,51 @@ def _scan_availability() -> tuple[list[str], list[str]]:
     return avail, missing
 
 
-def _auto_chain(*, prefer_docx_pipeline: bool) -> list[str]:
+def _scan_availability() -> tuple[list[str], list[str]]:
+    """Sonda motores no máximo uma vez por janela e por configuração.
+
+    Importar motores opcionais pode carregar bibliotecas nativas. Repetir essas
+    sondagens durante a mesma requisição consumia centenas de milissegundos até
+    em cache hit.
+    """
+    ttl = max(
+        0,
+        int(getattr(settings, "DOCUMENTOS_ENGINE_PROBE_CACHE_SECONDS", 60) or 0),
+    )
+    if ttl == 0:
+        return _scan_availability_uncached()
+
+    bucket = int(time.monotonic() // ttl)
+    key = (
+        bucket,
+        platform.system(),
+        getattr(settings, "DOCUMENTOS_UNOSERVER_URL", None),
+        getattr(settings, "DOCUMENTOS_UNOSERVER_TIMEOUT_SECONDS", None),
+        getattr(settings, "DOCUMENTOS_LIBREOFFICE_BINARY", None),
+        getattr(settings, "DOCUMENTOS_SIMPLE_PDF_FALLBACK", False),
+        getattr(settings, "DOCUMENTOS_PDF_AUTO_FALLBACK", False),
+        getattr(settings, "DEBUG", False),
+        # mock.patch troca a função; incluir a identidade mantém os testes
+        # isolados e também permite substituições controladas em runtime.
+        id(_unoserver_ok),
+        id(_word_ok),
+        id(_libreoffice_ok),
+        id(_weasy_import_ok),
+        id(_simple_fallback_allowed),
+    )
+    with _availability_cache_lock:
+        cached = _availability_cache.get(key)
+        if cached is not None:
+            return list(cached[0]), list(cached[1])
+
+    result = _scan_availability_uncached()
+    with _availability_cache_lock:
+        _availability_cache.clear()
+        _availability_cache[key] = (list(result[0]), list(result[1]))
+    return result
+
+
+def _auto_chain(*, prefer_docx_pipeline: bool, available: set[str] | None = None) -> list[str]:
     osys = platform.system()
     if prefer_docx_pipeline:
         if osys == "Windows":
@@ -126,7 +179,9 @@ def _auto_chain(*, prefer_docx_pipeline: bool) -> list[str]:
             raw = ["unoserver", "libreoffice", "weasyprint", "word_com", "simple_fallback"]
         else:
             raw = ["unoserver", "libreoffice", "weasyprint", "simple_fallback"]
-    return [e for e in raw if _engine_available(e)]
+    if available is None:
+        available = set(_scan_availability()[0])
+    return [e for e in raw if e in available]
 
 
 def _engine_available(name: str) -> bool:
@@ -143,7 +198,12 @@ def _engine_available(name: str) -> bool:
     return False
 
 
-def _explicit_chain(explicit: str, *, auto_fallback: bool) -> list[str]:
+def _explicit_chain(
+    explicit: str,
+    *,
+    auto_fallback: bool,
+    available: set[str] | None = None,
+) -> list[str]:
     explicit = (explicit or "").strip().lower()
     if explicit == "simple":
         explicit = "simple_fallback"
@@ -151,16 +211,45 @@ def _explicit_chain(explicit: str, *, auto_fallback: bool) -> list[str]:
         return []
     if explicit not in ("word_com", "libreoffice", "weasyprint", "simple_fallback", "unoserver"):
         return []
+    if available is None:
+        available = set(_scan_availability()[0])
     out: list[str] = []
-    if _engine_available(explicit):
+    if explicit in available:
         out.append(explicit)
     elif not auto_fallback:
         return []
     if auto_fallback:
         for e in ("unoserver", "libreoffice", "weasyprint", "word_com", "simple_fallback"):
-            if e != explicit and _engine_available(e) and e not in out:
+            if e != explicit and e in available and e not in out:
                 out.append(e)
     return out
+
+
+def _module_present(name: str) -> bool:
+    try:
+        return importlib.util.find_spec(name) is not None
+    except (ImportError, ModuleNotFoundError, ValueError):
+        return False
+
+
+def _fast_unoserver_chain(*, auto_fallback: bool) -> list[str]:
+    """Monta a cadeia de produção sem iniciar/importar motores de fallback.
+
+    O cliente unoserver fará o healthcheck imediatamente antes da conversão.
+    Os candidatos posteriores são validados apenas se o motor principal falhar.
+    """
+    chain = ["unoserver"]
+    if not auto_fallback:
+        return chain
+    if resolve_libreoffice_binary(verify_version=False):
+        chain.append("libreoffice")
+    if platform.system() == "Windows" and _module_present("win32com.client"):
+        chain.append("word_com")
+    if _module_present("weasyprint"):
+        chain.append("weasyprint")
+    if getattr(settings, "DOCUMENTOS_SIMPLE_PDF_FALLBACK", False) and _module_present("fpdf"):
+        chain.append("simple_fallback")
+    return chain
 
 
 def build_pdf_unavailable_message(resolution: PdfEngineResolution) -> str:
@@ -207,13 +296,37 @@ def resolve_pdf_engine(
     """
     explicit = (explicit_setting or "auto").strip().lower()
     auto_fb = bool(getattr(settings, "DOCUMENTOS_PDF_AUTO_FALLBACK", False))
+
+    # Caminho crítico do deploy: não importe WeasyPrint, não abra Word e não
+    # execute ``soffice --version`` antes de falar com o serviço persistente.
+    if explicit == "unoserver" and (
+        getattr(settings, "DOCUMENTOS_UNOSERVER_URL", None) or ""
+    ).strip():
+        chain = _fast_unoserver_chain(auto_fallback=auto_fb)
+        return PdfEngineResolution(
+            attempt_chain=tuple(chain),
+            reason="motor explícito: unoserver"
+            + (" + fallback sob demanda" if auto_fb else ""),
+            available_engines=("unoserver",),
+            missing_engines=(),
+            install_hints=tuple(_default_install_hints()),
+        )
+
     avail, missing = _scan_availability()
+    available = set(avail)
 
     if explicit == "auto":
-        chain = _auto_chain(prefer_docx_pipeline=prefer_docx_pipeline)
+        chain = _auto_chain(
+            prefer_docx_pipeline=prefer_docx_pipeline,
+            available=available,
+        )
         reason = "auto: primeira opção disponível por SO e fidelidade ao DOCX"
     else:
-        chain = _explicit_chain(explicit, auto_fallback=auto_fb)
+        chain = _explicit_chain(
+            explicit,
+            auto_fallback=auto_fb,
+            available=available,
+        )
         reason = f"motor explícito: {explicit}" + (" + fallback" if auto_fb else "")
 
     hints = _default_install_hints()

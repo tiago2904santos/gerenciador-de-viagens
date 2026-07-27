@@ -1422,7 +1422,7 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
 
 /* Destinos (ofício): subsection limpa + linhas no tom do roster/Equipe. */
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1]) .cv-ordered-field-collection {
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .cv-ordered-field-collection {
   background: transparent;
   border: 0;
   border-radius: 0;
@@ -1431,40 +1431,40 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1]) .cv-ordered-field-collection__header {
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .cv-ordered-field-collection__header {
   align-items: flex-start;
   gap: 12px;
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1]) .cv-ordered-field-collection__actions {
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .cv-ordered-field-collection__actions {
   flex: 0 0 auto;
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1]) .cv-ordered-field-collection__actions .cv-btn {
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .cv-ordered-field-collection__actions .cv-btn {
   background: transparent;
   border-color: color-mix(in srgb, var(--color-border) 70%, transparent);
   box-shadow: none;
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1]) .cv-ordered-field-collection__actions .cv-btn:hover {
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .cv-ordered-field-collection__actions .cv-btn:hover {
   background: color-mix(in srgb, #fff 4%, transparent);
   border-color: color-mix(in srgb, var(--color-border) 90%, var(--color-text) 10%);
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1]) .cv-ordered-field-collection__list {
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .cv-ordered-field-collection__list {
   display: grid;
   gap: 8px;
   min-width: 0;
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1]) .cv-ordered-field-row.destination-row,
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .cv-ordered-field-row.destination-row,
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1]) .cv-ordered-field-row.destination-row:hover {
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .cv-ordered-field-row.destination-row:hover {
   align-items: center;
   background: color-mix(in srgb, #fff 3.5%, var(--step1-panel, var(--color-surface-soft)));
   border: 1px solid color-mix(in srgb, var(--color-border) 40%, transparent);
@@ -1481,15 +1481,15 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1]) .cv-ordered-field-row.destination-row:hover {
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .cv-ordered-field-row.destination-row:hover {
   background: color-mix(in srgb, var(--color-accent) 6%, var(--step1-panel, var(--color-surface-soft)));
   border-color: color-mix(in srgb, var(--color-border) 70%, transparent);
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1]) .cv-ordered-field-row.destination-row--single,
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .cv-ordered-field-row.destination-row--single,
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1]) .cv-ordered-field-row.destination-row--single:hover {
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .cv-ordered-field-row.destination-row--single:hover {
   grid-template-columns: 42px minmax(0, 1fr);
 }
 
@@ -1519,7 +1519,7 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1]) .cv-ordered-field-row__badge {
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .cv-ordered-field-row__badge {
   align-items: center;
   background: var(--color-accent-soft);
   border: 1px solid var(--color-accent-border-soft);
@@ -1536,14 +1536,14 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1]) .cv-ordered-field-row__body {
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .cv-ordered-field-row__body {
   grid-column: 2;
   min-width: 0;
   width: 100%;
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1]) .cv-ordered-field-row__fields {
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .cv-ordered-field-row__fields {
   gap: 10px 12px;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   margin: 0;
@@ -1551,14 +1551,14 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1]) .cv-ordered-field-row__fields > .field {
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .cv-ordered-field-row__fields > .field {
   gap: 6px;
   margin: 0;
   min-width: 0;
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1]) .cv-ordered-field-row__fields .app-form-label {
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .cv-ordered-field-row__fields .app-form-label {
   color: var(--color-muted-strong);
   font-size: 0.72rem;
   font-weight: var(--font-weight-bold);
@@ -1566,7 +1566,7 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1]) .cv-ordered-field-row__remove {
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .cv-ordered-field-row__remove {
   align-items: center;
   align-self: stretch;
   appearance: none;
@@ -1596,7 +1596,7 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1]) .cv-ordered-field-row__remove::before {
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .cv-ordered-field-row__remove::before {
   color: var(--color-muted);
   content: "×";
   display: block;
@@ -1608,13 +1608,13 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1]) .cv-ordered-field-row__remove:hover,
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .cv-ordered-field-row__remove:hover,
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1]) .cv-ordered-field-row__remove:focus-visible,
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .cv-ordered-field-row__remove:focus-visible,
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1]) .destination-row > .cv-ordered-field-row__remove:hover,
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .destination-row > .cv-ordered-field-row__remove:hover,
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1]) .destination-row > .cv-ordered-field-row__remove:focus-visible {
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .destination-row > .cv-ordered-field-row__remove:focus-visible {
   background: transparent;
   border-color: color-mix(in srgb, var(--color-border) 55%, transparent);
   border-left-color: color-mix(in srgb, var(--color-border) 55%, transparent);
@@ -1625,43 +1625,43 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1]) .cv-ordered-field-row__remove:hover::before,
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .cv-ordered-field-row__remove:hover::before,
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1]) .cv-ordered-field-row__remove:focus-visible::before {
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .cv-ordered-field-row__remove:focus-visible::before {
   color: var(--color-muted);
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1]) .cv-ordered-field-row.destination-row--single .cv-ordered-field-row__remove {
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .cv-ordered-field-row.destination-row--single .cv-ordered-field-row__remove {
   display: none;
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1]) .cv-ordered-field-row.is-dragging {
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .cv-ordered-field-row.is-dragging {
   opacity: 0.72;
   transform: scale(0.985);
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1]) .cv-ordered-field-row.is-drop-target {
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .cv-ordered-field-row.is-drop-target {
   box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--color-accent) 55%, transparent);
 }
 
 @media (max-width: 720px) {
   :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-    :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1]) .cv-ordered-field-row.destination-row,
+    :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .cv-ordered-field-row.destination-row,
   :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-    :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1]) .cv-ordered-field-row.destination-row:hover,
+    :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .cv-ordered-field-row.destination-row:hover,
   :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-    :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1]) .cv-ordered-field-row.destination-row--single,
+    :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .cv-ordered-field-row.destination-row--single,
   :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-    :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1]) .cv-ordered-field-row.destination-row--single:hover {
+    :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .cv-ordered-field-row.destination-row--single:hover {
     grid-template-columns: 42px minmax(0, 1fr);
     row-gap: 8px;
   }
 
   :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-    :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1]) .cv-ordered-field-row__remove {
+    :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .cv-ordered-field-row__remove {
     border-left: 0;
     border-top: 1px solid color-mix(in srgb, var(--color-border) 55%, transparent);
     border-radius: 0 0 10px 10px;
@@ -1672,7 +1672,7 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
   }
 
   :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-    :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1]) .cv-ordered-field-row.destination-row--single .cv-ordered-field-row__remove {
+    :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .cv-ordered-field-row.destination-row--single .cv-ordered-field-row__remove {
     display: none;
   }
 }
@@ -2247,49 +2247,6 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
   border: 1px dashed color-mix(in srgb, var(--color-border) 78%, var(--color-muted) 22%);
   border-radius: 12px;
   padding: 12px;
-}
-
-:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  .cv-ordered-field-collection__list > .destination-row {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 10px;
-  column-gap: 8px;
-  grid-template-columns: minmax(0, 1fr) 36px;
-  padding: 10px 8px 10px 12px;
-}
-
-:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  .cv-ordered-field-collection__list > .destination-row:hover {
-  background: var(--color-surface);
-  border-color: color-mix(in srgb, var(--color-border) 78%, var(--color-text) 22%);
-  column-gap: 8px;
-  grid-template-columns: minmax(0, 1fr) 36px;
-}
-
-:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  .cv-ordered-field-collection__list > .destination-row > .destination-remove-button {
-  align-self: stretch;
-  background: transparent;
-  border: 0;
-  border-left: 1px solid var(--color-border-soft);
-  border-radius: 0;
-  color: var(--color-muted);
-  display: grid;
-  opacity: 1;
-  place-items: center;
-  transform: none;
-  width: 36px;
-}
-
-:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  .cv-ordered-field-collection__list > .destination-row > .destination-remove-button:hover,
-:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  .cv-ordered-field-collection__list > .destination-row > .destination-remove-button:focus-visible {
-  background: transparent;
-  border-color: var(--color-border-soft);
-  box-shadow: none;
-  color: var(--color-heading);
 }
 
 /* Controles da ficha: superfícies sólidas, raios menores e nenhuma luz de
