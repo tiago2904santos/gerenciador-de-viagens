@@ -290,6 +290,7 @@ Pares off-by-one (`720/721`, `840/841`, `1180/1181`, `767/768`, `599/600`, `479/
 | T-02 | 🟠 | Zero testes de JS | §5.3 |
 | T-03 | ✅ | `coverage` no CI com relatório e piso versionado por app | §5.3 |
 | T-04 | ✅ | O `coverage run` do CI encerrava antes dos testes: comentários dentro da continuação de linha (`\`) faziam o `#` comentar o resto do comando, levando junto o `--omit` e o `manage.py test`. Introduzido no PR #73, **corrigido no #75** | NOVO |
+| NOVO-09 | 🟠 | O número de solicitação tem dois caminhos de gravação que divergem: o autosave (com JS) marca o servidor como `em_preenchimento` e recusa data inválida com mensagem; o lote (`action=save_solicitacoes`, o *fallback* sem JS) não marca o status e engole a data inválida em silêncio, preservando a anterior. O estado do registro passa a depender de o navegador ter JavaScript | NOVO |
 | D-01 | 🟡 | 5 motores de PDF sem teste de paridade visual entre eles | §6.1 |
 | D-02 | 🟠 | `organizer.py` (1.181 l., 19 `except Exception`) sem testes de contrato | §6.2 |
 | R-01 | 🟠 | 35 breakpoints distintos, com 6 pares off-by-one | §7.1 |
