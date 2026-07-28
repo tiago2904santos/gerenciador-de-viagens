@@ -318,7 +318,9 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
 - [ ] `S-06` documentos assíncronos via Celery
 
 ### Etapa 5 — Motores JS
-- [ ] `J-06` apagar 8 arquivos órfãos + hooks sem dono (−989 linhas)
+- [x] `J-06` apagados os 9 arquivos órfãos do Anexo A (989 linhas) e as 6
+  emissões remanescentes de hooks sem consumidor. O catálogo dizia 8 arquivos,
+  mas enumerava 9; os demais hooks da estimativa original já não eram emitidos.
 - [ ] `J-02` `CV.registry.destroy(root)` e limpeza do `action-menu`
 - [ ] `J-01` registrar 8 componentes como enhancer
 - [ ] `J-04` Quick Add/Quick Edit como enhancer
