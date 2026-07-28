@@ -4,6 +4,7 @@
 {#   card_template (path do card), empty_message, empty_action_label/url, filter_empty_message, #}
 {#   action_label/action_url (FAB), tabs_aria_label, page_extra_class, #}
 {#   delete_modal_title/entity, cancel_modal_title/entity/hint, confirm_action_* , attach_signed_modal=True. #}
+{# A view DEVE pôr page_obj (+ pagination_pages, page_querystring) no contexto — ver core/pagination.py. #}
 <div class="page-shell page-shell--list page-shell--cards{% if page_extra_class %} {{ page_extra_class }}{% endif %}" data-cv-realtime-filter-scope>
 
   {% include "components/ui/headers/filter_page_header.html" with advanced=True form_action=request.path title=title|default:page_title eyebrow=eyebrow search_placeholder=search_placeholder search_aria_label=search_aria_label current_aba=aba date_picker_id=date_picker_id date_start_id=date_start_id date_end_id=date_end_id %}
@@ -13,7 +14,8 @@
   {% endif %}
 
   <div class="list-panel">
-    {% include "components/ui/lists/pagination.html" %}
+    {# Toda lista em cards é paginada: entregar page_obj é contrato, não opção (N-07). #}
+    {% include "components/ui/lists/pagination.html" with page_obj=page_obj pagination_pages=pagination_pages page_querystring=page_querystring paginacao_obrigatoria=True only %}
     <div class="cv-card-grid" data-cv-list-container>
       {% for card in cards %}
         {% include card_template with card=card csrf_token=csrf_token current_url=request.get_full_path only %}
