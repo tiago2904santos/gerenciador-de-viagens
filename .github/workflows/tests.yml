@@ -131,7 +131,12 @@ jobs:
         run: |
           python -m coverage run \
             --source="$COVERAGE_APPS" \
-            --omit="*/migrations/*,*/tests/*" \
+            # prestacoes_contas guarda os testes em modulos soltos (tests.py,
+            # tests_assinatura.py, test_*.py), fora de uma pasta tests/. Sem
+            # inclui-los aqui, 925 statements de teste entravam na conta como
+            # producao 100% coberta — e escrever teste novo subiria o piso
+            # sozinho, que e exatamente o que o gate existe para impedir.
+            --omit="*/migrations/*,*/tests/*,*/tests.py,*/tests_*.py,*/test_*.py" \
             manage.py test --settings=config.settings.test -v 1
           python -m coverage json -o coverage.json
 
