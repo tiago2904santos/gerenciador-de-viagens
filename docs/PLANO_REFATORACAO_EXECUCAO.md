@@ -189,10 +189,10 @@ tem o número **reduzido a cada PR**. Ele nunca sobe.
 Marque aqui, no mesmo PR que faz o trabalho. `[ ]` pendente · `[~]` em andamento · `[x]` pronto.
 
 ### Etapa 1 — Correções críticas isoladas
-- [ ] `D-01` toast de download sem fundo/sombra (aparece em toda a aplicação)
-- [ ] `D-02` `.cv-dialog--danger/--warning/--success/--document` sem CSS
-- [ ] `D-03` `.summary-items` sem estilo (Dashboard)
-- [ ] `D-04` `variant="muted"` de botão inexistente
+- [x] `D-01` toast de download sem fundo/sombra (aparece em toda a aplicação)
+- [x] `D-02` `.cv-dialog--danger/--warning/--success/--document` sem CSS
+- [x] `D-03` `.summary-items` sem estilo (Dashboard)
+- [x] `D-04` `variant="muted"` de botão inexistente
 - [ ] `D-20` / `D-21` `.pte-card` sem regra dark, texto quase preto
 - [ ] `D-22` `.app-card-toggle` pastel claro em tema escuro
 - [ ] `J-05` `extra-download.js` morto em 4 módulos
