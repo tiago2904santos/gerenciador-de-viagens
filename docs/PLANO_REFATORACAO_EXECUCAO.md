@@ -262,15 +262,16 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
 > `J-03` (Etapa 5). Decidir se recebe paliativo antes disso.
 
 ### Etapa 2 — Rede de segurança
-- [ ] `T-01` suíte de Prestações: 5 etapas + assinatura pública — **fatias 1 a 4 de 6**
+- [ ] `T-01` suíte de Prestações: 5 etapas + assinatura pública — **fatias 1 a 5 de 6**
   concluídas: listagem/entrada (12 asserções, isolamento por área pelo caminho real —
   vínculo + sessão + middleware, sem mock) e solicitação do servidor (14 asserções,
   os dois caminhos de gravação; divergência entre eles catalogada em `NOVO-09`) e
   comprovante/anexos (12 asserções, incluindo o portão do arquivo privado:
   anônimo vai ao login, anexo de outra área dá 404, e trocar a prestação-pai na
   URL não abre o arquivo) e relatório técnico (9 asserções, primeira fatia com
-  dinheiro; `NOVO-10` catalogado). Faltam: finalização e arquivamento e
-  assinatura pública.
+  dinheiro; `NOVO-10` catalogado) e finalização/arquivamento (12 asserções; os
+  endpoints são alternadores e finalizar não tem pré-condição — caracterizado).
+  Falta: assinatura pública.
 - [x] `N-04` *golden files* dos 11 documentos gerados — 13 testes que **abrem** o
   arquivo produzido e comparam o texto. Cobrem o template, não o construtor de
   contexto: o contexto é sintético de propósito, para isolar as duas falhas. A
