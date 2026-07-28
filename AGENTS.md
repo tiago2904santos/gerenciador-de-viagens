@@ -89,7 +89,7 @@ Etapa N do docs/PLANO_REFATORACAO_EXECUCAO.md
 
 ## Como verifiquei
 - [ ] Suíte completa verde (N testes, Xs)
-- [ ] audit_frontend_standards: 465 → 461 avisos
+- [ ] audit_frontend_standards: 449 → 445 avisos
 - [ ] Telas afetadas conferidas em tema claro e escuro (print no PR)
 
 ## O que NÃO fiz
@@ -117,7 +117,7 @@ python manage.py test --settings=config.settings.test        # suíte completa
 python manage.py test <app> --settings=config.settings.test  # suíte de um app
 python manage.py check --deploy --settings=config.settings.prod
 python manage.py makemigrations --check --dry-run --settings=config.settings.test
-python scripts/audit_frontend_standards.py --max-warnings 465
+python scripts/audit_frontend_standards.py --max-warnings 449   # teto atual; confira em tests.yml
 python manage.py runserver 0.0.0.0:8000
 ```
 
