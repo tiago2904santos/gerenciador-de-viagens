@@ -229,6 +229,7 @@ html[data-theme="dark"] {
 }
 
 .cv-btn--secondary,
+.cv-btn--muted,
 .cv-btn--neutral,
 .cv-btn--back,
 .cv-btn--back-list,
@@ -247,6 +248,7 @@ html[data-theme="dark"] {
 }
 
 .cv-btn--secondary:hover,
+.cv-btn--muted:hover,
 .cv-btn--neutral:hover,
 .cv-btn--back:hover,
 .cv-btn--back-list:hover,

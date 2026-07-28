@@ -18,6 +18,7 @@ from django.views.decorators.http import require_GET
 from django.views.decorators.http import require_http_methods
 
 from core.normalizers import remove_accents
+from core.pagination import contexto_paginacao
 from core.tenancy import filter_queryset_by_area
 from documentos.services.responses import build_inline_pdf_response_from_download_response
 from documentos.services.types import DocumentoTipo
@@ -29,6 +30,10 @@ from .models import OrdemServico
 from .presenters import apresentar_ordem_servico_card
 from .services import gerar_os_docx_response
 from .services import gerar_os_pdf_response
+
+
+# Mesmo tamanho de página das demais listas em cards (Ofícios, Eventos, PT).
+ORDENS_POR_PAGINA = 20
 
 
 def _digits(value):
@@ -106,7 +111,8 @@ def index(request):
         preserved={"q": q, "sort": sort, "viagem_de": viagem_de, "viagem_ate": viagem_ate},
     )
 
-    cards = [apresentar_ordem_servico_card(ordem) for ordem in lista]
+    paginacao = contexto_paginacao(lista, request, ORDENS_POR_PAGINA)
+    cards = [apresentar_ordem_servico_card(ordem) for ordem in paginacao["page_obj"].object_list]
     has_filters = any([q, viagem_de, viagem_ate, sort])
 
     return render(
@@ -134,6 +140,7 @@ def index(request):
                 {"value": "viagem_desc", "label": "Viagem: mais distante"},
             ],
             "empty_message": "Nenhuma OS encontrada com os filtros aplicados." if has_filters else "Nenhuma OS cadastrada ainda.",
+            **paginacao,
         },
     )
 
