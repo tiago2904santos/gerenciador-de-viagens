@@ -157,9 +157,49 @@ GATE:
 - suíte verde, com o número de testes antes/depois no PR
 - coverage adicionado ao CI com piso por app; prestacoes_contas com piso declarado
 - cada golden file tem um comentário dizendo o que garante
+- CADA teste novo rodado também contra origin/main, com o resultado no PR (ver abaixo)
 
 ENTREGA: PR com o corpo do AGENTS.md §5 e as linhas da Etapa 2 marcadas no plano.
 ```
+
+### Por que rodar cada teste contra o `origin/main`
+
+Um teste que passa antes e depois não prova nada. Na Etapa 1, a primeira versão do teste
+do `J-11` passou contra o código defeituoso — o caminho exercitado escondia o defeito — e
+só foi refeita porque o resultado não batia com a leitura do código.
+
+Nesta etapa a leitura é outra, porque aqui não se corrige nada: o teste **deve passar** no
+`main`. Se ele falhar, você não escreveu rede — encontrou defeito. Aí a regra do
+`AGENTS.md` §2 vale: registre como linha `NOVO` no catálogo e siga; a correção é outro PR.
+
+| No `origin/main` | Significa | O que fazer |
+|---|---|---|
+| passa | o teste descreve o comportamento atual | segue no PR |
+| falha | há defeito no `main` | linha `NOVO` no catálogo, correção em PR separado |
+| erro de import | o arquivo não foi copiado para o worktree | não é resultado; copie e rode de novo |
+
+### Como rodar contra o `origin/main`
+
+Worktree, para não mexer no diretório de trabalho nem depender de `stash`:
+
+```powershell
+# uma vez
+git worktree add ..\gv-main origin/main
+
+# a cada comparação — atualizar primeiro, senão compara contra um main velho
+cd ..\gv-main
+git fetch origin main
+git checkout --detach origin/main
+cd "..\Gerenciador de Viagens"
+
+copy prestacoes_contas\tests\<arquivo>.py "..\gv-main\prestacoes_contas\tests\"
+cd ..\gv-main
+python manage.py test prestacoes_contas.tests.<arquivo> --settings=config.settings.test
+cd "..\Gerenciador de Viagens"
+```
+
+O `.env` só é necessário no worktree para `runserver` ou para rodar contra PostgreSQL;
+`config.settings.test` no padrão usa SQLite e não precisa dele.
 
 ---
 
