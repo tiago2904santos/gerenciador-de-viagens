@@ -201,6 +201,138 @@ cd "..\Gerenciador de Viagens"
 O `.env` só é necessário no worktree para `runserver` ou para rodar contra PostgreSQL;
 `config.settings.test` no padrão usa SQLite e não precisa dele.
 
+
+---
+
+## Etapa 2 no Codex — quando o Claude Code não estiver disponível
+
+O plano atribui a Etapa 2 ao Claude Code porque escrever a suíte de Prestações exige
+julgamento, e o `AGENTS.md` §6 desaconselha o Codex para trabalho sem critério objetivo de
+pronto. Quando essa não for a opção disponível, **o caminho não é afrouxar o prompt — é
+fabricar o critério**, transformando "escreva uma boa suíte" em número que o agente
+persegue sozinho.
+
+O risco a neutralizar tem nome: uma suíte que **passa e não protege** — testes que
+exercitam o caminho feliz, conferem `status_code == 200` e não afirmam nada sobre valores.
+Como a Etapa 2 é a rede das Etapas 3 a 7, rede que não segura é pior que rede nenhuma:
+você confia nela.
+
+### Os três gates que substituem o julgamento
+
+| Gate | Transforma |
+|---|---|
+| **Piso de cobertura por app** | "a suíte está completa?" → um número que sobe |
+| **Asserção de negócio obrigatória** | "o teste é bom?" → grep verificável |
+| **Um PR por fatia do fluxo** | "revisar 2.000 linhas" → revisar 5 vezes 400 |
+
+### 2.C1 — Codex: a régua antes da suíte
+
+```
+Etapa 2, fatia 1 de 3 — defeito T-03. Nada de teste de Prestações neste PR.
+
+FONTE: docs/AUDITORIA_BACKEND_INFRA_COMPLETA.md §5.3.
+
+TAREFA: instrumentar a medição que as fatias seguintes vão perseguir.
+1. Adicionar `coverage` ao .github/workflows/tests.yml, medindo a suíte completa.
+2. Publicar o relatório por app no log do CI (percentual por app, ordenado).
+3. Criar um piso POR APP em arquivo versionado, com o valor ATUAL de cada app —
+   nao um valor desejado. O CI falha se algum app cair abaixo do proprio piso.
+
+ESCOPO FECHADO:
+- .github/workflows/tests.yml, requirements/, e o arquivo de pisos
+- NAO escreva nenhum teste novo
+- NAO altere codigo de producao
+
+GATE (pronto = tudo verdadeiro):
+- o CI passa com os pisos atuais
+- baixar artificialmente um piso e rodar de novo faz o CI FALHAR (cole a evidencia)
+- o log mostra o percentual de prestacoes_contas, que hoje deve sair proximo de 4%
+
+ENTREGA: PR com o corpo do AGENTS.md §5.
+```
+
+O terceiro item do gate é o que impede o teatro: um piso que nunca falha não é gate.
+
+### 2.C2 — Codex: uma fatia do fluxo por PR
+
+Repita este prompt **uma vez por fatia**, nesta ordem. Cada PR fecha uma fatia.
+Fatias: `(1) criação da prestação` · `(2) solicitação do servidor` · `(3) comprovante e
+anexos` · `(4) relatório técnico e diário` · `(5) finalização e arquivamento` ·
+`(6) assinatura pública`.
+
+```
+Etapa 2, fatia <N> de 6: <nome da fatia> — defeito T-01.
+
+FONTE: prestacoes_contas/urls.py (as rotas da fatia) e as views que elas apontam.
+Leia SOMENTE o codigo dessa fatia.
+
+TAREFA: escrever os testes que descrevem o comportamento ATUAL dessa fatia.
+Esta etapa nao corrige nada — ela fotografa o que o sistema faz hoje.
+
+ANTES DE ESCREVER, PARE E LISTE: as assercoes que pretende fazer, uma linha cada,
+e aguarde minha aprovacao. Nao escreva codigo antes dessa resposta.
+
+ESCOPO FECHADO:
+- prestacoes_contas/tests/ apenas
+- NAO altere codigo de producao. Se um teste revelar defeito, registre linha NOVO
+  no catalogo da auditoria e siga — a correcao e outro PR.
+
+GATE (pronto = tudo verdadeiro):
+- todo teste novo afirma pelo menos UM valor de negocio: numero, valor monetario,
+  status de dominio, campo persistido. Teste que so confere status_code HTTP nao
+  conta e sera rejeitado.
+- todo teste novo roda tambem contra origin/main e PASSA la (receita acima). Cole o
+  resultado no PR. Se falhar no main, e defeito: linha NOVO, nao conserto aqui.
+- o piso de cobertura de prestacoes_contas SOBE neste PR; declare o antes e o depois.
+- a suite completa continua verde.
+
+ENTREGA: PR com o corpo do AGENTS.md §5. Um PR por fatia — nao emende a proxima.
+```
+
+### 2.C3 — Codex: golden files dos documentos
+
+```
+Etapa 2, fatia 3 de 3 — defeito N-04.
+
+FONTE: docs/AUDITORIA_FINAL_CORRECAO_E_CUSTO.md §7 e documentos/services/.
+
+TAREFA: criar o teste que ABRE o arquivo gerado e confere o conteudo, para os 11
+documentos. Hoje nenhum teste le o arquivo produzido, com 5 motores de PDF
+intercambiaveis.
+
+GATE (pronto = tudo verdadeiro):
+- cada golden file tem comentario dizendo o que garante
+- para pelo menos um documento, alterar de proposito um campo do contexto faz o teste
+  FALHAR (cole a evidencia) — golden file que nao quebra nao protege
+- a suite completa continua verde
+
+ESCOPO FECHADO: documentos/tests/ apenas. NAO altere os motores.
+
+ENTREGA: PR com o corpo do AGENTS.md §5.
+```
+
+### Armadilha conhecida: onde colocar os arquivos
+
+`prestacoes_contas` **não tem pasta `tests/`** — tem arquivos soltos (`tests.py`,
+`tests_assinatura.py`, `test_diario_motorista.py`). Se o agente criar a pasta, ela
+**precisa** de `__init__.py`, senão o Django não descobre nada e a suíte fica verde sem
+rodar teste nenhum.
+
+Foi assim que 95 testes de `core/tests/` passaram meses sem executar (`NOVO-08`). Inclua
+no prompt da fatia:
+
+```
+Se criar prestacoes_contas/tests/, crie tambem o __init__.py e PROVE a descoberta:
+`python manage.py test prestacoes_contas --settings=config.settings.test` deve mostrar
+um numero de testes MAIOR que o de antes. Cole os dois numeros no PR.
+```
+
+### O que continua sendo seu
+
+O passo **"PARE E LISTE as asserções"** do 2.C2 é onde entra o julgamento que o Codex não
+tem. Ler 15 linhas de asserções propostas e responder "falta conferir o valor da diária
+no consolidado" custa minutos e é o que separa uma rede de um teatro. Não pule.
+
 ---
 
 ## Etapa 3 — Diárias (Claude Code, plan mode obrigatório)
