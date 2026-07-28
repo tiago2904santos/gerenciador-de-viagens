@@ -81,6 +81,10 @@ jobs:
 
       - name: Enforce real document generation SLA
         run: |
+          # Este é o único passo que roda sem --settings, então cai em
+          # config.settings.dev — que agora exige FIELD_ENCRYPTION_KEYS. O valor
+          # é irrelevante aqui (nada é cifrado), então é gerado, não commitado.
+          export FIELD_ENCRYPTION_KEYS="$(python -c 'from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())')"
           SITE_PACKAGES="$(python -c 'import site; print(site.getsitepackages()[0])')"
           PYTHONPATH="$SITE_PACKAGES" /usr/bin/python3 -m unoserver.server \
             --interface 127.0.0.1 --port 2003 \
