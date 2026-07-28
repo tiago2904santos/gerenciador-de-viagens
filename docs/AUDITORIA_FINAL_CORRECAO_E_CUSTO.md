@@ -304,6 +304,7 @@ Um erro de português (`Voltar a lista`) e três padrões de capitalização con
 | N-10 | 🟡 | Pernoite de 2 horas gera diária integral, sem teste de borda nem documentação | `diarias.py:125-133` |
 | N-11 | 🟡 | 4 variantes de "Voltar à lista", incluindo erro de crase; 3 padrões de capitalização | §8 |
 | N-12 | 🟡 | `media/` com 191 MB / 19.175 arquivos sincronizando pelo OneDrive | — |
+| NOVO-10 | 🟠 | `PrestacaoServidor.diaria_valor_override` guarda **valor monetário como texto livre**: `CharField(max_length=255)` sem validador, só `normalize_spaces`. `"abc"`, `"-90"` e `"350,00,00"` persistem e chegam ao relatório técnico do servidor e ao texto de WhatsApp. Encontrado ao escrever a fatia 4 de `T-01`; caracterizado por teste, não corrigido | `models.py:147`, `rt_views.py:51-69` |
 | N-13 | 🟡 | `docs/REGRAS_DE_NEGOCIO.md` tem 77 linhas para um sistema de 116 models — não documenta diárias, numeração nem status | `docs/` |
 
 **Achados novos desta auditoria, descobertos ao medir a Etapa 1** (origem: `NOVO`):
