@@ -189,21 +189,23 @@ tem o número **reduzido a cada PR**. Ele nunca sobe.
 Marque aqui, no mesmo PR que faz o trabalho. `[ ]` pendente · `[~]` em andamento · `[x]` pronto.
 
 ### Etapa 1 — Correções críticas isoladas
-- [ ] `D-01` toast de download sem fundo/sombra (aparece em toda a aplicação)
-- [ ] `D-02` `.cv-dialog--danger/--warning/--success/--document` sem CSS
-- [ ] `D-03` `.summary-items` sem estilo (Dashboard)
-- [ ] `D-04` `variant="muted"` de botão inexistente
+- [x] `D-01` toast de download sem fundo/sombra (aparece em toda a aplicação)
+- [x] `D-02` `.cv-dialog--danger/--warning/--success/--document` sem CSS
+- [x] `D-03` `.summary-items` sem estilo (Dashboard)
+- [x] `D-04` `variant="muted"` de botão inexistente
 - [ ] `D-20` / `D-21` `.pte-card` sem regra dark, texto quase preto
 - [ ] `D-22` `.app-card-toggle` pastel claro em tema escuro
 - [ ] `J-05` `extra-download.js` morto em 4 módulos
 - [ ] `J-11` `data-confirm-submit` dispara `confirm()` duas vezes
-- [ ] `N-02` listas de Ofícios e OS sem paginação
+- [x] `N-02` listas de Ofícios e OS sem paginação
 - [ ] `N-03` 3 pares de cor abaixo de 2,3:1
-- [ ] `N-07` paginação incluída em listas sem `page_obj`
-- [x] `S-01` chave Fernet literal em `dev.py` (rotacionar) — dev passa a exigir chave
-  própria do `.env`; a de teste virou distinta e rotulada; a do CI é descartável.
-  Correção do gate: o defeito é chave capaz de decifrar **dado real**, não o literal
-  em si. Chave de teste/CI é legítima desde que distinta e nunca usada em dev/prod.
+- [x] `N-07` paginação incluída em listas sem `page_obj`
+- [x] `S-01` chave Fernet literal em `dev.py` (rotacionar) — **zero chave commitada**:
+  dev exige a do `.env` (e recusa placeholder), teste gera a cada execução, CI gera
+  no runner. O gate declarado no prompt ("zero chave literal") estava mal formulado,
+  mas a intuição era certa: tentei primeiro manter literais "descartáveis" e o
+  GitGuardian reprovou — chave Fernet válida commitada é indistinguível de segredo
+  real, para o scanner e para quem lê. O critério final é o mais simples: nenhuma.
 - [ ] 18 tokens indefinidos (`D-01`, `D-03`, `D-06`, `D-20`, `D-21`)
 
 **Achados novos (28/07, fora das auditorias — descobertos ao destravar o CI):**
@@ -222,6 +224,21 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
 > **Consequência para o plano:** a Etapa 2 só começa com a suíte verde em PostgreSQL — o
 > banco de produção. Esse pré-requisito está satisfeito desde o PR #62; a regra permanece
 > aqui porque toda etapa seguinte assume a mesma linha de base: **verde nos dois bancos**.
+
+**Achados novos (28/07, descobertos ao medir a paginação de `N-02`):**
+
+- [ ] `NOVO-07` 🟠 **N+1 real na lista de Ordens de Serviço** — ~6 queries por card
+  (`ordens_servico/presenters.py`): `_destinos_display_os` refaz a query e anula o
+  `prefetch_related` da view; `servidores.count()` roda por card; `_get_assinante_os()` relê o
+  singleton de configuração por card. Com 300 OS eram **1.814 queries**; a paginação segurou em
+  **135 por página**, mas o custo por card continua. Corrige a §4.1 da auditoria final: "não
+  existe N+1" valia só para Ofícios. Fica para a Etapa 4 (camada de views/presenters) ou um PR
+  próprio; o teste `ordens_servico/tests/test_list_performance.py` já trava o crescimento e tem
+  o teto pronto para ser baixado.
+- [x] `NOVO-08` 🟠 **`core/tests/` não tinha `__init__.py`** — 95 testes existentes nunca foram
+  descobertos pelo runner (`manage.py test core` rodava 0 testes), incluindo
+  `test_tenancy_integrity`, `test_sso`, `test_uploads` e `test_dark_redesign`. Corrigido na
+  Etapa 1: todos passam, e a suíte de referência vai de **812 para 924 testes verdes**.
 
 ### Etapa 2 — Rede de segurança
 - [ ] `T-01` suíte de Prestações: 5 etapas + assinatura pública

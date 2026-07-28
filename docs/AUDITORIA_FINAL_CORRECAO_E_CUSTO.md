@@ -133,7 +133,7 @@ Isso é o tipo de coisa que a banca encontra lendo o próprio comentário do có
 
 Instrumentei as páginas com `CaptureQueriesContext` e populei o banco progressivamente.
 
-### 4.1 ✅ Não existe N+1 — resultado forte
+### 4.1 ✅ Não existe N+1 **em Ofícios** — resultado forte
 
 | Registros na lista | Queries | HTML |
 |---|---|---|
@@ -143,6 +143,11 @@ Instrumentei as páginas com `CaptureQueriesContext` e populei o banco progressi
 **+0,00 query por registro adicional.** A estratégia de `prefetch_related` de `oficios/selectors.py` (17 otimizações em 14 funções, com `Prefetch` aninhado para servidores, termos, destinos e trechos) funciona. Páginas em banco vazio ficam entre 6 e 16 queries — dentro do razoável.
 
 Este é o melhor resultado das quatro auditorias e vale ser apresentado ativamente: é a pergunta clássica de banca sobre Django, e a resposta é medida, não afirmada.
+
+> **Correção (28/07, PR da Etapa 1 / `N-02`).** A medição acima cobriu **só a lista de
+> Ofícios**. Medida do mesmo jeito, a lista de **Ordens de Serviço tem N+1 clássico**:
+> 26 queries com 1 OS, 134 com 20, **1.814 com 300** — ~6 queries por card. A frase
+> "não existe N+1" vale para Ofícios, não para o sistema. Ver `NOVO-07`.
 
 ### 4.2 🔴 O problema é o payload, não a query
 
@@ -165,14 +170,23 @@ E aqui está a causa:
 | Eventos | ✅ 20/página |
 | Roteiros | ✅ 15/página |
 | Termos, Planos de Trabalho, Prestações, Justificativas, Cadastros | ✅ |
-| **Ofícios** | ❌ **carrega tudo** |
-| **Ordens de Serviço** | ❌ **carrega tudo** |
+| **Ofícios** | ✅ 20/página — *corrigido na Etapa 1* |
+| **Ordens de Serviço** | ✅ 20/página — *corrigido na Etapa 1* |
 | `oficios/catalog_views.py` (modelos de motivo) | ❌ |
 | `planos_trabalho/catalog_views.py` (4 catálogos) | ❌ |
 
 Agravante: `list_page_cards.html` **inclui o componente de paginação** em todas as listas. Como `page_obj` nunca entra no contexto dessas páginas, o `{% if page_obj %}` falha em silêncio e o componente não renderiza. A interface parece suportar paginação e não suporta.
 
 **Ofícios é a lista mais usada do sistema e a que você indicou como referência visual.** Com 300 ofícios num ano — plausível para um órgão — a página entrega 6,5 MB e monta ~1.200 cards no DOM. Numa apresentação com dados reais, isso trava.
+
+**Medido depois da correção**, com a mesma instrumentação e 300 registros:
+
+| Lista | HTML antes | HTML depois | Queries antes | Queries depois |
+|---|---|---|---|---|
+| Ofícios | 5.855 KB | **434 KB** | 16 | **17** (as 16 + o `COUNT` do `Paginator`) |
+| Ordens de Serviço | 2.648 KB | **205 KB** | 1.814 | **135** (`NOVO-07` em aberto) |
+
+Os catálogos (`catalog_views.py`) seguem sem paginação — fora do escopo da Etapa 1.
 
 ---
 
@@ -279,18 +293,25 @@ Um erro de português (`Voltar a lista`) e três padrões de capitalização con
 | # | Sev | Defeito | Local |
 |---|---|---|---|
 | N-01 | 🔴 | Tabela de diárias fixada no código, sem vigência e sem congelamento do valor no documento | `roteiros/services/diarias.py:11-27` |
-| N-02 | 🔴 | Lista de Ofícios e de Ordens de Serviço sem paginação — 22,1 KB de HTML por card; 300 ofícios = 6,5 MB | `oficios/views.py:460`, `ordens_servico/views.py` |
+| N-02 | 🔴 | ~~Lista de Ofícios e de Ordens de Serviço sem paginação — 22,1 KB de HTML por card; 300 ofícios = 6,5 MB~~ **corrigido na Etapa 1** | `oficios/views.py:460`, `ordens_servico/views.py` |
 | N-03 | 🔴 | 5 pares de cor reprovam WCAG AA, sendo 3 abaixo de 2,3:1 (praticamente ilegíveis) | §6.2 |
 | N-04 | 🔴 | Nenhum teste verifica o **conteúdo** do documento gerado, com 5 motores de PDF intercambiáveis | `documentos/services/` |
 | N-05 | 🟠 | Duas regras de cobrança de complemento coexistem; o comentário do código condena o que o outro ramo faz | `diarias.py:279-303` × `313-351` |
 | N-06 | 🟠 | `CAPITAIS_POR_UF` duplica a base geográfica IBGE — divergência silencia como cobrança a menor | `diarias.py:29-57` |
-| N-07 | 🟠 | Componente de paginação incluído em listas que nunca recebem `page_obj` — falha em silêncio | `list_page_cards.html:16` |
+| N-07 | 🟠 | ~~Componente de paginação incluído em listas que nunca recebem `page_obj` — falha em silêncio~~ **corrigido na Etapa 1** | `list_page_cards.html:16` |
 | N-08 | 🟡 | `_segment_breakdown` produz valores descartados no caminho dominante — duas definições de "diária integral" | `diarias.py:140-168` |
 | N-09 | 🟡 | `valor_por_servidor × servidores` pode não fechar com `total_valor` | `diarias.py:409-415` |
 | N-10 | 🟡 | Pernoite de 2 horas gera diária integral, sem teste de borda nem documentação | `diarias.py:125-133` |
 | N-11 | 🟡 | 4 variantes de "Voltar à lista", incluindo erro de crase; 3 padrões de capitalização | §8 |
 | N-12 | 🟡 | `media/` com 191 MB / 19.175 arquivos sincronizando pelo OneDrive | — |
 | N-13 | 🟡 | `docs/REGRAS_DE_NEGOCIO.md` tem 77 linhas para um sistema de 116 models — não documenta diárias, numeração nem status | `docs/` |
+
+**Achados novos desta auditoria, descobertos ao medir a Etapa 1** (origem: `NOVO`):
+
+| # | Sev | Defeito | Local |
+|---|---|---|---|
+| NOVO-07 | 🟠 | N+1 na lista de Ordens de Serviço: ~6 queries por card (`_destinos_display_os` refaz a query e anula o `prefetch_related`; `servidores.count()` por card; `_get_assinante_os()` relê o singleton de configuração por card). A paginação limitou o dano a 135 queries por página, mas o custo por card continua | `ordens_servico/presenters.py:76,124,205` |
+| NOVO-08 | 🟠 | `core/tests/` não tinha `__init__.py`: **95 testes existentes nunca rodaram** desde que a pasta foi criada — incluindo `test_tenancy_integrity`, `test_sso`, `test_uploads` e `test_dark_redesign`. Corrigido na Etapa 1 (todos passam; a suíte vai de 812 para 924) | `core/tests/__init__.py` |
 
 ---
 
