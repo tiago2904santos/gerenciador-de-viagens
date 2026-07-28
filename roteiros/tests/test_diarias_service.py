@@ -6,7 +6,7 @@ from django.test import TestCase
 from roteiros import roteiro_logic
 from roteiros.services.diarias import (
     PeriodMarker,
-    TABELA_DIARIAS,
+    TABELA_DIARIAS_HISTORICA as TABELA_DIARIAS,
     calculate_periodized_diarias,
 )
 
