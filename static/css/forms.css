@@ -509,16 +509,17 @@
 /* --------------------------------------------------------------------------
    4. Card-toggle (BooleanField)
    -------------------------------------------------------------------------- */
-/* Card toggle global para BooleanFields visiveis. */
+/* Card toggle global para BooleanFields visiveis.
+   Usa tokens danger/success (adaptam light/dark) — sem pastéis claros fixos. */
 .field-card-toggle {
   grid-column: span 6;
 }
 
 .app-card-toggle {
   align-items: center;
-  background: #fff7f7;
-  border: 1px solid #fecaca;
-  border-radius: 16px;
+  background: var(--color-danger-soft);
+  border: 1px solid var(--color-danger-border-soft);
+  border-radius: var(--radius-card);
   box-shadow: none;
   cursor: pointer;
   display: grid;
@@ -545,17 +546,18 @@
 
 .app-card-toggle__input:focus-visible ~ .app-card-toggle__icon,
 .app-card-toggle:focus-within {
-  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.14);
-  outline: 2px solid rgba(34, 197, 94, 0.44);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-success) 22%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--color-success) 55%, transparent);
   outline-offset: 2px;
 }
 
 .app-card-toggle__icon {
   align-items: center;
-  background: #fee2e2;
-  border: 1px solid #fca5a5;
+  background: var(--color-danger-soft);
+  border: 1px solid var(--color-danger-border-strong);
   border-radius: 10px;
-  color: #b42318;
+  /* Mix com heading: escurece no light e clareia no dark (≥ 4,5:1). */
+  color: color-mix(in srgb, var(--color-danger) 75%, var(--color-heading));
   display: inline-flex;
   font-size: 12px;
   font-weight: 900;
@@ -593,32 +595,12 @@
   white-space: nowrap;
 }
 
-/* O fundo do toggle é claro em todos os temas (verde/vermelho pastel);
-   nos temas escuros os tokens de texto viram claros e somem sobre ele. */
-html[data-theme="dark"] .app-card-toggle__title,
-html[data-theme="dark-dark"] .app-card-toggle__title,
-html[data-theme="light-dark"] .app-card-toggle__title,
-html[data-theme="dark"] .app-page__form-card .app-card-toggle__title,
-html[data-theme="dark-dark"] .app-page__form-card .app-card-toggle__title,
-html[data-theme="light-dark"] .app-page__form-card .app-card-toggle__title {
-  color: #071a33;
-}
-
-html[data-theme="dark"] .app-card-toggle__description,
-html[data-theme="dark-dark"] .app-card-toggle__description,
-html[data-theme="light-dark"] .app-card-toggle__description,
-html[data-theme="dark"] .app-page__form-card .app-card-toggle__description,
-html[data-theme="dark-dark"] .app-page__form-card .app-card-toggle__description,
-html[data-theme="light-dark"] .app-page__form-card .app-card-toggle__description {
-  color: #52657a;
-}
-
 .app-card-toggle__state {
   align-items: center;
-  background: #f7c8c8;
+  background: color-mix(in srgb, var(--color-danger) 16%, var(--color-danger-soft));
   border: 0;
   border-radius: var(--radius-pill);
-  color: #b42318;
+  color: color-mix(in srgb, var(--color-danger) 75%, var(--color-heading));
   display: inline-flex;
   font-size: 12px;
   font-weight: 900;
@@ -632,27 +614,27 @@ html[data-theme="light-dark"] .app-page__form-card .app-card-toggle__description
 }
 
 .app-card-toggle:hover {
-  border-color: #fca5a5;
-  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+  border-color: var(--color-danger-border-strong);
+  box-shadow: var(--shadow-xs);
   transform: none;
 }
 
 .app-card-toggle.is-checked {
-  background: #f0fdf4;
-  border-color: #bbf7d0;
+  background: var(--color-success-soft);
+  border-color: var(--color-success-border-soft);
   box-shadow: none;
 }
 
 .app-card-toggle.is-checked .app-card-toggle__icon {
-  background: #dcfce7;
-  border-color: #86efac;
-  color: #15803d;
+  background: var(--color-success-soft);
+  border-color: var(--color-success-border-soft);
+  color: color-mix(in srgb, var(--color-success) 75%, var(--color-heading));
 }
 
 .app-card-toggle.is-checked .app-card-toggle__state {
-  background: #bbf7d0;
+  background: color-mix(in srgb, var(--color-success) 16%, var(--color-success-soft));
   box-shadow: none;
-  color: #15803d;
+  color: color-mix(in srgb, var(--color-success) 75%, var(--color-heading));
 }
 
 .app-card-toggle.is-disabled {
