@@ -12,10 +12,33 @@ if "LOGIN_ENFORCED" not in os.environ:
 
 from .base import *
 
-if not FIELD_ENCRYPTION_KEYS:
-    FIELD_ENCRYPTION_KEYS = (
-        "RbJU2kb8Nz8Wp2-31RCWLqETNsn6qEBBo-bLcqdSDTE=",
+def _exigir_chave_de_cifragem(chaves):
+    """Falha no boot, com instrução, em vez de estourar na primeira cifragem.
+
+    Sem validar o formato, o placeholder do `.env.example` passaria batido aqui
+    e só quebraria mais tarde, num ponto sem relação aparente com a causa.
+    """
+    from cryptography.fernet import Fernet
+
+    if not chaves:
+        motivo = "não está definida"
+    else:
+        try:
+            Fernet(chaves[0].encode() if isinstance(chaves[0], str) else chaves[0])
+        except Exception:
+            motivo = "não é uma chave Fernet válida (o valor do .env.example é só um lembrete)"
+        else:
+            return
+    raise RuntimeError(
+        f"FIELD_ENCRYPTION_KEYS {motivo}.\n"
+        "Gere a sua e coloque no .env (ela nunca vai para o repositório):\n"
+        '  python -c "from cryptography.fernet import Fernet; '
+        'print(Fernet.generate_key().decode())"\n'
+        "Consulte docs/AMBIENTES.md."
     )
+
+
+_exigir_chave_de_cifragem(FIELD_ENCRYPTION_KEYS)
 
 
 DEBUG = True

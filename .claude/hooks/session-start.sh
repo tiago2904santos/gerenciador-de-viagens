@@ -31,6 +31,11 @@ if [ ! -f "$PROJECT_DIR/.env" ]; then
   sed -i 's/^SECRET_KEY=.*/SECRET_KEY=dev-insecure-key-for-remote-session/' "$PROJECT_DIR/.env"
   sed -i 's/^ALLOWED_HOSTS=.*/ALLOWED_HOSTS=127.0.0.1,localhost,0.0.0.0,*/' "$PROJECT_DIR/.env"
   echo "LOGIN_ENFORCED=false" >> "$PROJECT_DIR/.env"
+  # Chave de cifragem descartável, própria desta sessão efêmera. O .env.example
+  # traz só um lembrete, e o settings de dev recusa placeholder.
+  SESSION_FERNET_KEY=$("$VENV_DIR/bin/python" -c \
+    "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())")
+  sed -i "s|^FIELD_ENCRYPTION_KEYS=.*|FIELD_ENCRYPTION_KEYS=$SESSION_FERNET_KEY|" "$PROJECT_DIR/.env"
 fi
 
 # --- Start PostgreSQL ---

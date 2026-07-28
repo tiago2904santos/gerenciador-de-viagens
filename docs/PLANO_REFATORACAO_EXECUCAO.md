@@ -200,7 +200,10 @@ Marque aqui, no mesmo PR que faz o trabalho. `[ ]` pendente · `[~]` em andament
 - [ ] `N-02` listas de Ofícios e OS sem paginação
 - [ ] `N-03` 3 pares de cor abaixo de 2,3:1
 - [ ] `N-07` paginação incluída em listas sem `page_obj`
-- [ ] `S-01` chave Fernet literal em `dev.py` (rotacionar)
+- [x] `S-01` chave Fernet literal em `dev.py` (rotacionar) — dev passa a exigir chave
+  própria do `.env`; a de teste virou distinta e rotulada; a do CI é descartável.
+  Correção do gate: o defeito é chave capaz de decifrar **dado real**, não o literal
+  em si. Chave de teste/CI é legítima desde que distinta e nunca usada em dev/prod.
 - [ ] 18 tokens indefinidos (`D-01`, `D-03`, `D-06`, `D-20`, `D-21`)
 
 **Achados novos (28/07, fora das auditorias — descobertos ao destravar o CI):**

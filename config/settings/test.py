@@ -19,9 +19,20 @@ DOCUMENTOS_BINARY_CONVERSION_CACHE = False
 DOCUMENTOS_SIMPLE_PDF_FALLBACK = True
 DOCUMENTOS_PDF_AUTO_FALLBACK = False
 SECRET_KEY = "django-insecure-central-viagens-3-test-key"
-FIELD_ENCRYPTION_KEYS = (
-    "RbJU2kb8Nz8Wp2-31RCWLqETNsn6qEBBo-bLcqdSDTE=",
-)
+# Chave gerada a cada execução da suíte, nunca escrita no repositório.
+#
+# A suíte precisa de cifragem consistente *dentro* de uma execução, não do mesmo
+# valor entre execuções: o banco de teste nasce vazio e morre no fim, então nada
+# cifrado sobrevive de uma rodada para a outra.
+#
+# Antes havia aqui um literal — e era a MESMA chave do dev, o que significava
+# que quem tivesse o repositório decifrava o que tivesse sido cifrado em
+# desenvolvimento. Trocar por outro literal apenas moveria o problema: uma chave
+# Fernet válida commitada é indistinguível de um segredo de verdade, para o
+# scanner de segredos e para quem lê o arquivo.
+from cryptography.fernet import Fernet as _Fernet
+
+FIELD_ENCRYPTION_KEYS = (_Fernet.generate_key().decode(),)
 OFICIO_NUMERACAO_USAR_CONFIGURACAO = False
 ALLOWED_HOSTS = ["testserver", "localhost", "127.0.0.1"]
 
