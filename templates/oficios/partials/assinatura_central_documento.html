@@ -33,7 +33,7 @@
         <a class="cv-btn cv-btn--secondary" href="{{ painel.etiqueta_urls.pdf_assinado }}" target="_blank" rel="noopener noreferrer">Ver PDF assinado</a>
       {% endif %}
       {% if painel.pedido_pendente %}
-        <button class="cv-btn cv-btn--secondary" type="button" data-copy-value="{{ painel.pedido_pendente.link_publico }}">Copiar link</button>
+        <button class="cv-btn cv-btn--secondary" type="button">Copiar link</button>
         <form method="post" action="{{ painel.etiqueta_urls.revogar }}" class="assinaturas-central-inline-form">
           {% csrf_token %}
           <input type="hidden" name="next" value="{{ request.get_full_path }}">
@@ -67,7 +67,7 @@
               {% elif pedido.status == "expirado" or pedido.status == "revogada" or pedido.status == "recusada" %}
                 <a class="cv-btn cv-btn--secondary" href="{{ painel.etiqueta_urls.gerar_link }}?next={{ request.get_full_path|urlencode }}&forcar_novo=1">Gerar novo link</a>
               {% else %}
-                <button class="cv-btn cv-btn--secondary" type="button" data-copy-value="{{ pedido.link_publico }}">Copiar link</button>
+                <button class="cv-btn cv-btn--secondary" type="button">Copiar link</button>
               {% endif %}
             </div>
           </article>

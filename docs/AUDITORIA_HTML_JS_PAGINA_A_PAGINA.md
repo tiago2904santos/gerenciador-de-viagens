@@ -43,7 +43,7 @@
 | Páginas de produção | 76 | — |
 | Linhas de JS (produção) | **18.301** | 63 arquivos |
 | JS carregado em **toda** página (`base.html`) | **28 arquivos** | Sem bundling, sem code-splitting |
-| **Arquivos JS órfãos** (nunca carregados) | **8** (~1.000 linhas) | Código morto servido no repositório |
+| **Arquivos JS órfãos** (nunca carregados) | **9** (989 linhas) | Removidos em J-06 |
 | Namespaces globais em `window` | **22** | `CV` + 21 outros |
 | Listeners em `document`/`window` | **116** | — |
 | Arquivos que registram no motor de enhancers | **12 de 63** | O registry existe e quase ninguém usa |
@@ -457,7 +457,7 @@ Severidade: 🔴 crítico · 🟠 alto · 🟡 médio.
 | J-03 | 🔴 | **Dois motores de filtro ativos na mesma lista** (cliente + servidor) nas 5 listas em card | `realtime-filters.js` × `live-search-submit.js` |
 | J-04 | 🔴 | Quick Add e autosave **morrem após filtro AJAX** (bind direto em DOMContentLoaded dentro do `.list-panel`) | `app.js:201`, `autosave.js:365` |
 | J-05 | 🔴 | `extra-download.js` carregado só em Eventos, mas o hook é emitido pelo componente global `rich_menu_link.html` → **recurso silenciosamente morto em 4 módulos** | §4.9 |
-| J-06 | 🟠 | **~989 linhas de JS órfão** em 8 arquivos + ~15 hooks `data-*` sem consumidor | §4.8 |
+| J-06 | ✅ | **989 linhas de JS órfão removidas** em 9 arquivos; 6 emissões remanescentes de hooks sem consumidor removidas | §4.8 |
 | J-07 | 🟠 | **CSRF reimplementado em 11 arquivos**; 13 arquivos usam `fetch()` sem `CV.http` (sem tratamento de 401/HTML-em-vez-de-JSON) | §4.5 |
 | J-08 | 🟠 | **6 implementações da cascata estado→cidade** (~1.200 linhas) | §4.5 |
 | J-09 | 🟠 | **22 namespaces globais**, vários duplicando `CV.*` | §4.6 |
@@ -869,7 +869,7 @@ Cada fase é independente, verificável e não depende da reconstrução do CSS.
 
 | Fase | Ação | Resolve | Ganho |
 |---|---|---|---|
-| **0** | Apagar os 8 arquivos JS órfãos e os ~15 hooks `data-*` sem dono | J-06 | −989 linhas, zero risco |
+| **0** | ✅ Apagar os 9 arquivos JS órfãos e os hooks `data-*` sem dono ainda emitidos | J-06 | −989 linhas |
 | **1** | Carregar `extra-download.js` no bundle base; remover `masks.js` duplicado de `diario_motorista_form.html` | J-05, J-14 | Recurso morto volta a funcionar em 4 módulos |
 | **2** | Corrigir `data-confirm-submit` (escutar só `submit`) | J-11 | Fim do `confirm()` duplo |
 | **3** | Adicionar `CV.registry.destroy(root)` e chamá-lo antes de `replaceWith` em `live-search-submit`; `action-menu` devolve o menu ao dono no `destroy` | J-02 | Fim dos nós órfãos e IDs duplicados |

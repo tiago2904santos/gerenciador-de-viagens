@@ -1,9 +1,9 @@
-{# Lista global de arquivos anexados. anexos: [{id?, nome, url, delete_url}] #}
-{# Parâmetros: subtitle, extra_class, empty_message, delete_form=True (POST com confirm; senão botão data-file-delete-url), delete_confirm_message, csrf_token (obrigatório com delete_form). #}
+{# Lista global de arquivos anexados. anexos: [{nome, url, delete_url}] #}
+{# Parâmetros: subtitle, extra_class, empty_message, delete_form=True (POST com confirm), delete_confirm_message, csrf_token (obrigatório com delete_form). #}
 {% if anexos %}
-  <ul class="prestacao-file-list{% if extra_class %} {{ extra_class }}{% endif %}" data-file-list>
+  <ul class="prestacao-file-list{% if extra_class %} {{ extra_class }}{% endif %}">
     {% for anexo in anexos %}
-      <li class="prestacao-file-list__item"{% if anexo.id %} data-documento-anexo-id="{{ anexo.id }}"{% endif %}>
+      <li class="prestacao-file-list__item">
         <div class="prestacao-file-widget__meta">
           <strong class="prestacao-file-widget__name" title="{{ anexo.nome }}">{{ anexo.nome }}</strong>
           <span class="prestacao-file-widget__subtitle">{{ subtitle|default:"Arquivo anexado" }}</span>
@@ -32,8 +32,7 @@
             <button class="cv-icon-btn cv-icon-btn--delete prestacao-file-widget__action"
                     type="button"
                     aria-label="Excluir arquivo"
-                    data-tooltip="Excluir"
-                    data-file-delete-url="{{ anexo.delete_url }}">
+                    data-tooltip="Excluir">
               {% include "components/ui/icons/icon.html" with icon="delete" only %}
             </button>
           {% endif %}
