@@ -118,6 +118,11 @@ class UnoserverAdapterTests(SimpleTestCase):
 
 
 class UnoserverCheckCommandTests(SimpleTestCase):
+    @override_settings(DOCUMENTOS_UNOSERVER_URL="")
+    def test_benchmark_sem_url_reprova_em_vez_de_pular_gate(self):
+        with self.assertRaisesRegex(CommandError, "não definido"):
+            call_command("documentos_unoserver_check", "--benchmark")
+
     @override_settings(
         DOCUMENTOS_UNOSERVER_URL="http://libreoffice:2003",
         DOCUMENTOS_UNOSERVER_TIMEOUT_SECONDS=2,
@@ -144,6 +149,7 @@ class UnoserverCheckCommandTests(SimpleTestCase):
                 stdout=output,
             )
         self.assertIn("SLA atendido", output.getvalue())
+        self.assertIn("sintetico.docx: 400.0 ms", output.getvalue())
 
     @override_settings(
         DOCUMENTOS_UNOSERVER_URL="http://libreoffice:2003",

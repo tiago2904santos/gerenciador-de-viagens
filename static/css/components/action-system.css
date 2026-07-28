@@ -5,7 +5,7 @@
    ========================================================================== */
 
 :root {
-  --action-height: 42px;
+  --action-height: var(--control-height-md);
   --action-radius: 12px;
   --action-radius-sm: 10px;
   --action-group-radius: 16px;

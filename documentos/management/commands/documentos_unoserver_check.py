@@ -52,7 +52,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         url = (getattr(settings, "DOCUMENTOS_UNOSERVER_URL", None) or "").strip()
         if not url:
-            self.stdout.write(self.style.WARNING("DOCUMENTOS_UNOSERVER_URL não definido."))
+            message = "DOCUMENTOS_UNOSERVER_URL não definido."
+            if options["benchmark"]:
+                raise CommandError(message)
+            self.stdout.write(self.style.WARNING(message))
             return
         timeout = float(getattr(settings, "DOCUMENTOS_UNOSERVER_TIMEOUT_SECONDS", 3) or 3)
         ok = unoserver_healthcheck(url, timeout=timeout)
@@ -79,6 +82,7 @@ class Command(BaseCommand):
             targets = [("sintetico.docx", ".docx", docx.getvalue())]
 
         elapsed_values = []
+        elapsed_by_resource = {}
         result_sizes = {}
         iterations = max(1, int(options["iterations"]))
         with override_settings(DOCUMENTOS_BINARY_CONVERSION_CACHE=False):
@@ -97,7 +101,9 @@ class Command(BaseCommand):
                             unoserver_url=url,
                             timeout_seconds=timeout,
                         )
-                    elapsed_values.append((time.perf_counter() - started) * 1000)
+                    elapsed = (time.perf_counter() - started) * 1000
+                    elapsed_values.append(elapsed)
+                    elapsed_by_resource.setdefault(filename, []).append(elapsed)
                     result_sizes[filename] = len(pdf)
         elapsed_ms = max(elapsed_values)
         limit_ms = max(1.0, float(options["max_ms"]))
@@ -105,9 +111,13 @@ class Command(BaseCommand):
             f"{filename}→{size} bytes"
             for filename, size in result_sizes.items()
         )
+        timings = "; ".join(
+            f"{filename}: " + ", ".join(f"{value:.1f} ms" for value in values)
+            for filename, values in elapsed_by_resource.items()
+        )
         message = (
             f"conversão real: máximo {elapsed_ms:.1f} ms; "
-            f"{iterations} execução(ões) por modelo; {resources}"
+            f"{iterations} execução(ões) por modelo; {timings}; {resources}"
         )
         if elapsed_ms >= limit_ms:
             raise CommandError(f"{message}; SLA excedido ({limit_ms:.0f} ms)")

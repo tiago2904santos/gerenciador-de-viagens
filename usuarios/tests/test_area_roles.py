@@ -43,3 +43,12 @@ class AreaRoleMiddlewareTests(TestCase):
         response = self.client.post(reverse("eventos:novo"))
 
         self.assertEqual(response.status_code, 403)
+
+    def test_usuario_sem_area_nao_cria_evento_sem_escopo(self):
+        self.vinculo.delete()
+
+        response = self.client.post(reverse("eventos:novo"))
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(Evento.objects.count(), 1)
+        self.assertFalse(Evento.objects.filter(area__isnull=True).exists())

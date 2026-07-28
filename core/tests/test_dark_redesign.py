@@ -326,16 +326,18 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertIn("window.CV.dialogs.open", attach_script)
         self.assertIn("window.CV.dialogs.close", attach_script)
 
-    def test_compact_form_sections_are_explicitly_closed(self):
+    def test_incomplete_form_section_component_was_removed(self):
         templates = Path(settings.BASE_DIR) / "templates"
-        include_contract = 'components/ui/layouts/form_section.html'
+        legacy_component = templates / "components" / "ui" / "layouts" / "form_section.html"
+        self.assertFalse(legacy_component.exists())
 
+        offenders = []
         for template in templates.rglob("*.html"):
             source = template.read_text(encoding="utf-8")
-            if include_contract not in source or template.as_posix().endswith("components/ui/forms/form_section.html"):
-                continue
-            with self.subTest(template=template):
-                self.assertGreaterEqual(source.count("</section>"), source.count(include_contract))
+            if "components/ui/layouts/form_section.html" in source:
+                offenders.append(str(template.relative_to(templates)))
+
+        self.assertEqual(offenders, [])
 
     def test_event_guided_flow_uses_task_sections_and_accessible_tabs(self):
         template = (

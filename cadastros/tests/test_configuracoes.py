@@ -79,6 +79,14 @@ class ConfiguracaoSistemaFormTests(TestCase):
 
 
 class ConfiguracaoSistemaAreaTests(TestCase):
+    def test_get_singleton_sem_contexto_nao_recria_registro_sem_area(self):
+        cfg = ConfiguracaoSistema.get_singleton()
+
+        self.assertIsNotNone(cfg.pk)
+        self.assertIsNotNone(cfg.area_id)
+        self.assertFalse(cfg.area.ativa)
+        self.assertFalse(ConfiguracaoSistema.objects.filter(area__isnull=True).exists())
+
     def test_get_for_area_mantem_configuracoes_independentes(self):
         ascom = AreaTrabalho.objects.create(nome="Assessoria de Comunicacao Social", sigla="ASCOM")
         dpcap = AreaTrabalho.objects.create(nome="DPCAP", sigla="DPCAP")
@@ -95,10 +103,10 @@ class ConfiguracaoSistemaAreaTests(TestCase):
         cfg_dpcap.save()
 
         self.assertNotEqual(cfg_ascom.pk, cfg_dpcap.pk)
-        self.assertNotEqual(cfg_global.pk, cfg_ascom.pk)
+        self.assertIsNotNone(cfg_global.pk)
+        self.assertIsNotNone(cfg_global.area_id)
         self.assertEqual(ConfiguracaoSistema.get_for_area(ascom).pt_sufixo_numero, "ASCOM")
         self.assertEqual(ConfiguracaoSistema.get_for_area(dpcap).pt_sufixo_numero, "DPCAP")
-        self.assertIsNone(cfg_global.area_id)
 
 
 class ApiConsultaCepTests(TestCase):

@@ -1,11 +1,9 @@
 import logging
 import re
-from urllib.parse import urlencode
 
 from django.conf import settings
 from django.contrib import messages
 from django.db.models import Q
-from django.http import Http404
 from django.http import JsonResponse
 from django.http import QueryDict
 from django.shortcuts import get_object_or_404
@@ -13,7 +11,6 @@ from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_GET
 from django.views.decorators.http import require_http_methods
@@ -53,20 +50,18 @@ from roteiros.services import (
 from cadastros.models import Combustivel
 from cadastros.models import Servidor
 from documentos.selectors import get_latest_artefato_pdf_for_oficio
-from documentos.services.downloads import download_documento_or_redirect_pdf_error
 from documentos.services.warm_cache import pdf_artefato_original_acessivel
-from documentos.services.responses import build_inline_pdf_response_from_download_response
-from documentos.services.timing import measure_step
-from documentos.services.types import DocumentoFormato
-from documentos.services.types import DocumentoTipo
 from eventos.services import resolve_evento_from_request
-from ordens_servico.services import gerar_resposta_ordem_servico_documento
+from .document_views import baixar_documento
+from .document_views import baixar_justificativa_documento
+from .document_views import baixar_ordem_servico_documento
+from .document_views import justificativa_pdf_inline
+from .document_views import oficio_pdf_inline
+from .document_views import ordem_servico_pdf_inline
 from .forms import OficioDadosViajantesForm
 from .forms import OficioTransporteForm
-from .forms import ModeloMotivoOficioForm
 from .models import Oficio
 from .presenters import apresentar_acoes_oficio
-from .presenters import apresentar_linha_lista_simples_modelo_motivo
 from .presenters import apresentar_oficio_card
 from .presenters import apresentar_oficio_wizard_documentos_context
 from .presenters import apresentar_oficio_wizard_summary
@@ -74,75 +69,41 @@ from .presenters import apresentar_oficio_wizard_header
 from .presenters import apresentar_oficio_wizard_page_steps
 from .presenters import apresentar_oficio_wizard_steps
 from .selectors import get_oficio_by_id
-from .selectors import get_modelo_motivo_by_id
 from .selectors import buscar_viaturas_para_oficio
 from .selectors import get_viatura_por_placa_normalizada
 from .selectors import viatura_para_resultado_busca
-from .selectors import listar_modelos_motivo
 from .selectors import listar_oficios
 from .selectors import listar_servidores_para_oficio
 from .selectors import listar_viaturas_para_oficio
-from .services import atualizar_modelo_motivo
-from .services import OficioVinculadoError
-from .services import cancelar_oficio
-from .services import retificar_oficio
-from .services import desfazer_retificacao_oficio
-from .services import marcar_oficio_complementar
-from .services import desfazer_complementar_oficio
 from .services import atualizar_oficio_dados_viajantes
 from .services import atualizar_oficio_transporte
 from .services import avaliar_oficio_dados_viajantes
 from .services import avaliar_oficio_transporte
-from .services import criar_modelo_motivo
 from .services import criar_oficio_rascunho
-from .services import excluir_modelo_motivo
-from .services import excluir_oficio
-from .services import gerar_resposta_documento_oficio
-from .services import gerar_resposta_justificativa_documento
 from .services import resolver_roteiro_padrao_evento
 from .services import obter_roteiro_escolhido_do_post
 from .services import vincular_roteiro_ao_oficio_sem_copia
-from .services import redirect_para_corrigir_documento_oficio
 from .services import oficio_esta_completo_para_finalizar
 from .services import OficioNumeroConflitoError
 from .services import tocar_data_criacao_oficio
 from .services import validar_oficio_para_documento
+from .catalog_views import modelo_motivo_definir_padrao
+from .catalog_views import modelo_motivo_editar
+from .catalog_views import modelo_motivo_excluir
+from .catalog_views import modelos_motivo_index
+from .lifecycle_views import cancelar
+from .lifecycle_views import excluir
+from .lifecycle_views import marcar_complementar
+from .lifecycle_views import retificar
+from .view_navigation import cadastro_create_url as _cadastro_create_url
+from .view_navigation import evento_etapa_url as _evento_etapa_url
+from .view_navigation import oficio_back_label as _oficio_back_label
+from .view_navigation import oficio_back_url as _oficio_back_url
+from .view_navigation import safe_next_url as _safe_next_url
+from .view_navigation import url_with_next as _url_with_next
 
 
 logger = logging.getLogger(__name__)
-
-
-def _evento_etapa_url(evento_id, etapa):
-    if evento_id:
-        return reverse("eventos:guiado_etapa", kwargs={"pk": evento_id, "etapa": etapa})
-    return ""
-
-
-def _oficio_back_url(oficio):
-    return _evento_etapa_url(getattr(oficio, "evento_id", None), 3) or reverse("oficios:index")
-
-
-def _oficio_back_label(oficio):
-    return "Dados do evento" if getattr(oficio, "evento_id", None) else "Voltar à lista"
-
-
-def _cadastro_create_url(create_url_name, next_url):
-    return f"{reverse(create_url_name)}?{urlencode({'next': next_url})}"
-
-
-def _url_with_next(url_name, next_url):
-    return f"{reverse(url_name)}?{urlencode({'next': next_url})}"
-
-
-def _safe_next_url(request, fallback_url):
-    next_url = request.POST.get("next") or request.GET.get("next")
-    if next_url and url_has_allowed_host_and_scheme(
-        next_url,
-        allowed_hosts={request.get_host()},
-        require_https=request.is_secure(),
-    ):
-        return next_url
-    return fallback_url
 
 
 def _redirect_lista_oficio(request, oficio, message):
@@ -803,7 +764,14 @@ def wizard_roteiro_autosave_criar(request, pk):
     if not has_minimum_roteiro_content(clean_fields, payload.snapshots):
         return autosave_json_response(ok=False, message="Conteúdo insuficiente para criar rascunho.")
 
-    roteiro = build_roteiro_draft()
+    area = oficio.area or getattr(request, "area", None)
+    if area is None:
+        # Compatibilidade transitória para ofícios legados ainda sem área:
+        # a configuração resolve uma área explícita (única ou técnica), nunca NULL.
+        from cadastros.models import ConfiguracaoSistema
+
+        area = ConfiguracaoSistema.get_singleton().area
+    roteiro = build_roteiro_draft(area=area)
     version = apply_roteiro_autosave(roteiro, clean_fields, payload.snapshots)
     if not roteiro.origem_cidade_id and not roteiro.origem_estado_id:
         # A sede exibida na tela (herdada do evento/config) nao chega "suja" no payload de
@@ -1200,318 +1168,3 @@ def api_viatura_por_placa(request, pk):
     reason_order = {"motorista": 0, "unidade": 1}
     results.sort(key=lambda r: reason_order.get(r.get("suggestion_reason") or "", 2))
     return JsonResponse({"results": results})
-
-
-def _redirect_se_oficio_documento_incompleto(request, oficio):
-    avaliacao = validar_oficio_para_documento(oficio)
-    if avaliacao["pendencias"]:
-        messages.error(request, "Documento nao gerado porque o oficio esta incompleto.")
-        alvo = redirect_para_corrigir_documento_oficio(oficio)
-        return redirect(f"{alvo}?documento_incompleto=1")
-    return None
-
-
-def _pdf_inline_response(request, oficio, *, gerar, tipo: DocumentoTipo, reference: str, step_name: str):
-    bloqueio = _redirect_se_oficio_documento_incompleto(request, oficio)
-    if bloqueio is not None:
-        return bloqueio
-    with measure_step(step_name, {"oficio_id": oficio.pk}):
-        resp = download_documento_or_redirect_pdf_error(
-            request,
-            oficio_id=oficio.pk,
-            formato=DocumentoFormato.PDF,
-            gerar=gerar,
-        )
-    if getattr(resp, "status_code", 200) in (301, 302, 303, 307, 308):
-        return resp
-    return build_inline_pdf_response_from_download_response(
-        request,
-        resp,
-        tipo=tipo,
-        reference=reference,
-        now=timezone.now(),
-    )
-
-
-@require_GET
-def oficio_pdf_inline(request, pk):
-    oficio = get_oficio_by_id(pk)
-    ref = oficio.numero_formatado.replace("/", "-")
-    return _pdf_inline_response(
-        request,
-        oficio,
-        gerar=lambda: gerar_resposta_documento_oficio(oficio, DocumentoFormato.PDF),
-        tipo=DocumentoTipo.OFICIO,
-        reference=ref,
-        step_name="http_oficio_pdf_inline",
-    )
-
-
-@require_GET
-def justificativa_pdf_inline(request, pk):
-    oficio = get_oficio_by_id(pk)
-    ref = f"{oficio.numero_formatado.replace('/', '-')}-justificativa"
-    return _pdf_inline_response(
-        request,
-        oficio,
-        gerar=lambda: gerar_resposta_justificativa_documento(oficio, DocumentoFormato.PDF),
-        tipo=DocumentoTipo.JUSTIFICATIVA,
-        reference=ref,
-        step_name="http_justificativa_pdf_inline",
-    )
-
-
-@require_GET
-def ordem_servico_pdf_inline(request, pk):
-    oficio = get_oficio_by_id(pk)
-    ref = f"{oficio.numero_formatado.replace('/', '-')}-ordem-servico"
-    return _pdf_inline_response(
-        request,
-        oficio,
-        gerar=lambda: gerar_resposta_ordem_servico_documento(oficio, DocumentoFormato.PDF),
-        tipo=DocumentoTipo.ORDEM_SERVICO,
-        reference=ref,
-        step_name="http_ordem_servico_pdf_inline",
-    )
-
-
-def baixar_documento(request, pk, formato):
-    oficio = get_oficio_by_id(pk)
-    try:
-        formato_documento = DocumentoFormato(formato)
-    except ValueError as exc:
-        raise Http404("Formato documental nao suportado.") from exc
-
-    avaliacao = validar_oficio_para_documento(oficio)
-    if avaliacao["pendencias"]:
-        messages.error(request, "Documento nao gerado porque o oficio esta incompleto.")
-        alvo = redirect_para_corrigir_documento_oficio(oficio)
-        return redirect(f"{alvo}?documento_incompleto=1")
-    with measure_step(
-        "http_baixar_documento",
-        {"oficio_id": oficio.pk, "formato": formato_documento.value},
-    ):
-        return download_documento_or_redirect_pdf_error(
-            request,
-            oficio_id=oficio.pk,
-            formato=formato_documento,
-            gerar=lambda: gerar_resposta_documento_oficio(oficio, formato_documento),
-        )
-
-
-def baixar_justificativa_documento(request, pk, formato):
-    oficio = get_oficio_by_id(pk)
-    try:
-        formato_documento = DocumentoFormato(formato)
-    except ValueError as exc:
-        raise Http404("Formato documental nao suportado.") from exc
-
-    with measure_step(
-        "http_baixar_justificativa_documento",
-        {"oficio_id": oficio.pk, "formato": formato_documento.value},
-    ):
-        response = download_documento_or_redirect_pdf_error(
-            request,
-            oficio_id=oficio.pk,
-            formato=formato_documento,
-            gerar=lambda: gerar_resposta_justificativa_documento(oficio, formato_documento),
-        )
-    if hasattr(response, "headers") and response.get("Content-Disposition", "").startswith("attachment"):
-        ext = "pdf" if formato_documento == DocumentoFormato.PDF else "docx"
-        safe_numero = oficio.numero_formatado.replace("/", "-")
-        response["Content-Disposition"] = f'attachment; filename="Justificativa {safe_numero}.{ext}"'
-    return response
-
-
-def baixar_ordem_servico_documento(request, pk, formato):
-    oficio = get_oficio_by_id(pk)
-    try:
-        formato_documento = DocumentoFormato(formato)
-    except ValueError as exc:
-        raise Http404("Formato documental nao suportado.") from exc
-
-    avaliacao = validar_oficio_para_documento(oficio)
-    if avaliacao["pendencias"]:
-        messages.error(request, "Documento nao gerado porque o oficio esta incompleto.")
-        alvo = redirect_para_corrigir_documento_oficio(oficio)
-        return redirect(f"{alvo}?documento_incompleto=1")
-    with measure_step(
-        "http_baixar_ordem_servico_documento",
-        {"oficio_id": oficio.pk, "formato": formato_documento.value},
-    ):
-        return download_documento_or_redirect_pdf_error(
-            request,
-            oficio_id=oficio.pk,
-            formato=formato_documento,
-            gerar=lambda: gerar_resposta_ordem_servico_documento(oficio, formato_documento),
-        )
-
-
-def excluir(request, pk):
-    oficio = get_oficio_by_id(pk)
-    evento_id = oficio.evento_id
-
-    def _fallback_url():
-        if evento_id:
-            return redirect("eventos:guiado_etapa", pk=evento_id, etapa=3)
-        return redirect("oficios:index")
-
-    if request.method == "POST":
-        next_url = _safe_next_url(request, "")
-        try:
-            excluir_oficio(oficio)
-        except OficioVinculadoError:
-            messages.error(
-                request,
-                "Não foi possível excluir o ofício porque ele está vinculado a outros registros.",
-            )
-            return redirect(next_url) if next_url else _fallback_url()
-        messages.success(request, "Ofício excluído com sucesso.")
-        return redirect(next_url) if next_url else _fallback_url()
-    return redirect(_oficio_back_url(oficio))
-
-
-@require_POST
-def cancelar(request, pk):
-    oficio = get_oficio_by_id(pk)
-    next_url = _safe_next_url(request, "")
-
-    def _fallback_url():
-        if oficio.evento_id:
-            return redirect("eventos:guiado_etapa", pk=oficio.evento_id, etapa=3)
-        return redirect("oficios:index")
-
-    if oficio.cancelado:
-        messages.error(request, "Este ofício já está cancelado.")
-        return redirect(next_url) if next_url else _fallback_url()
-
-    motivo = (request.POST.get("motivo") or "").strip()
-    if not motivo:
-        messages.error(request, "Informe o motivo do cancelamento.")
-        return redirect(next_url) if next_url else _fallback_url()
-
-    cancelar_oficio(oficio, motivo)
-    messages.success(request, "Ofício cancelado. Ele não gera mais prestação de contas nem pode ser usado em novas Ordens de Serviço.")
-    return redirect(next_url) if next_url else _fallback_url()
-
-
-@require_POST
-def retificar(request, pk):
-    oficio = get_oficio_by_id(pk)
-    next_url = _safe_next_url(request, "")
-
-    def _fallback_url():
-        if oficio.evento_id:
-            return redirect("eventos:guiado_etapa", pk=oficio.evento_id, etapa=3)
-        return redirect("oficios:index")
-
-    if oficio.retificado_documento:
-        desfazer_retificacao_oficio(oficio)
-        messages.success(request, "Retificação removida. O ofício voltou ao rótulo padrão do documento.")
-        return redirect(next_url) if next_url else _fallback_url()
-
-    retificar_oficio(oficio)
-    messages.success(request, "Ofício marcado como retificado. Edite o que for necessário — o documento passará a exibir \"Retificado\" ao lado do número.")
-    return redirect("oficios:dados_viajantes", pk=oficio.pk)
-
-
-@require_POST
-def marcar_complementar(request, pk):
-    oficio = get_oficio_by_id(pk)
-    next_url = _safe_next_url(request, "")
-
-    def _fallback_url():
-        if oficio.evento_id:
-            return redirect("eventos:guiado_etapa", pk=oficio.evento_id, etapa=3)
-        return redirect("oficios:index")
-
-    if oficio.complementar_documento:
-        desfazer_complementar_oficio(oficio)
-        messages.success(request, "Marcação de complementar removida do ofício.")
-        return redirect(next_url) if next_url else _fallback_url()
-
-    marcar_oficio_complementar(oficio)
-    messages.success(request, "Ofício marcado como complementar. Edite o que for necessário — o documento passará a exibir \"Complementar\" ao lado do número.")
-    return redirect("oficios:dados_viajantes", pk=oficio.pk)
-
-
-def modelos_motivo_index(request):
-    q = request.GET.get("q", "").strip()
-    back_url = _safe_next_url(request, reverse("oficios:novo"))
-    _os_prefix = reverse("ordens_servico:index")
-    if back_url.startswith(_os_prefix):
-        back_label = "Voltar para a Ordem de Serviço"
-        back_aria_label = "Voltar para o cadastro de Ordem de Serviço"
-    else:
-        back_label = "Voltar para o ofício"
-        back_aria_label = "Voltar para o cadastro de ofício"
-    form = ModeloMotivoOficioForm(request.POST or None)
-    if request.method == "POST" and form.is_valid():
-        criar_modelo_motivo(form)
-        messages.success(request, "Modelo de motivo criado com sucesso.")
-        return redirect(_url_with_next("oficios:modelos_motivo_index", back_url))
-    modelos = listar_modelos_motivo(q=q or None, incluir_inativos=True)
-    rows = [
-        apresentar_linha_lista_simples_modelo_motivo(
-            modelo,
-            edit_url=reverse("oficios:modelo_motivo_editar", args=[modelo.pk]),
-            delete_url=reverse("oficios:modelo_motivo_excluir", args=[modelo.pk]),
-            delete_modal=True,
-        )
-        for modelo in modelos
-    ]
-    return render(
-        request,
-        "oficios/modelos_motivo/index.html",
-        {
-            "page_title": "Modelos de motivo",
-            "page_description": "Cadastre textos reutilizáveis para preencher rapidamente o motivo dos ofícios.",
-            "q": q,
-            "rows": rows,
-            "quick_add_form": form,
-            "quick_add_next_url": back_url,
-            "back_to_oficio_url": back_url,
-            "back_label": back_label,
-            "back_aria_label": back_aria_label,
-        },
-    )
-
-
-@require_POST
-def modelo_motivo_definir_padrao(request, pk):
-    modelo = get_modelo_motivo_by_id(pk)
-    modelo.is_padrao = True
-    modelo.save()
-    messages.success(request, "Modelo definido como padrão.")
-    return redirect("oficios:modelos_motivo_index")
-
-
-def modelo_motivo_editar(request, pk):
-    """Edição inline via quick edit da lista; a página standalone foi removida."""
-    modelo = get_modelo_motivo_by_id(pk)
-    form = ModeloMotivoOficioForm(request.POST or None, instance=modelo)
-    if request.method == "POST":
-        if form.is_valid():
-            atualizar_modelo_motivo(modelo, form)
-            messages.success(request, "Modelo de motivo atualizado com sucesso.")
-        else:
-            messages.error(request, "Não foi possível salvar o modelo. Verifique os dados informados.")
-    return redirect("oficios:modelos_motivo_index")
-
-
-def modelo_motivo_excluir(request, pk):
-    modelo = get_modelo_motivo_by_id(pk)
-    if request.method == "POST":
-        excluir_modelo_motivo(modelo)
-        messages.success(request, "Modelo de motivo excluído com sucesso.")
-        return redirect("oficios:modelos_motivo_index")
-    return render(
-        request,
-        "oficios/modelos_motivo/confirm_delete.html",
-        {
-            "page_title": "Excluir modelo de motivo",
-            "page_description": "Confirme a remoção deste modelo de motivo.",
-            "object": modelo,
-            "back_url": reverse("oficios:modelos_motivo_index"),
-        },
-    )

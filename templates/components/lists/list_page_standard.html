@@ -8,7 +8,7 @@
 
   <div class="list-panel{% if not rows %} list-panel--empty{% endif %}">
     {% include "components/ui/lists/pagination.html" %}
-    {% include "components/lists/simple_list.html" with rows=rows empty_message=empty_message empty_action_label=empty_action_label empty_action_url=empty_action_url hide_realtime_count=hide_realtime_count %}
+    {% include "components/lists/simple_list.html" with rows=rows empty_message=empty_message empty_action_label=empty_action_label empty_action_url=empty_action_url empty_variant="compact" hide_realtime_count=hide_realtime_count %}
   </div>
 
   {% if delete_modal_enabled %}

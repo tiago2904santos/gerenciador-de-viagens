@@ -10,5 +10,5 @@
   id="{{ form.destino_uf.id_for_label }}"
 >
   <option value="">Selecione o estado</option>
-  {% for value, label in form.destino_uf.field.choices %}{% if value %}<option value="{{ value }}"{% if value == form.destino_uf.value %} selected{% endif %}>{{ label }}</option>{% endif %}{% endfor %}
+  {% for estado in estados %}<option value="{{ estado.sigla }}"{% if estado.sigla == form.destino_uf.value %} selected{% endif %}>{{ estado.nome }} ({{ estado.sigla }})</option>{% endfor %}
 </select>

@@ -83,6 +83,28 @@
   min-width: 0;
 }
 
+.cv-travel-schedule {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.cv-travel-schedule__period-fields {
+  align-items: start;
+  display: grid;
+  gap: var(--space-3) var(--space-4);
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+}
+
+.cv-travel-schedule__period-fields--with-extra {
+  grid-template-columns: minmax(0, 2fr) minmax(14rem, 1fr);
+}
+
+.cv-travel-schedule__period-fields > * {
+  min-width: 0;
+}
+
 .cv-form-subsection {
   display: grid;
   gap: var(--space-3);
@@ -163,6 +185,10 @@
     align-items: baseline;
     display: flex;
     justify-content: space-between;
+  }
+
+  .cv-travel-schedule__period-fields--with-extra {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 

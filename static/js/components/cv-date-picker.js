@@ -167,6 +167,9 @@
     root.dataset.cvDatePickerReady = 'true';
 
     var mode = root.dataset.mode === 'range' ? 'range' : root.dataset.mode === 'multi' ? 'multi' : 'single';
+    // Multi sequencial (roteiro): cada clique preenche o proximo trecho, a mesma data pode se
+    // repetir (sair e chegar no mesmo dia, ida e volta no mesmo dia) e o clique nao remove.
+    var multiSequential = mode === 'multi' && root.dataset.allowRepeatDates === 'true';
     var triggers = Array.prototype.slice.call(root.querySelectorAll('[data-cv-date-picker-trigger]'));
     var trigger = triggers[0];
     var display = root.querySelector('[data-cv-date-picker-display]');
@@ -200,6 +203,7 @@
     var focusedDate = null;
     var dayButtons = [];
     var confirmBtn = root.querySelector('[data-cv-date-picker-confirm]');
+    var undoBtn = root.querySelector('[data-cv-date-picker-undo]');
 
     function syncStateFromInputs() {
       if (mode === 'multi') {
@@ -378,26 +382,46 @@
       render();
     }
 
+    /** Multi sequencial: desfaz a ultima data escolhida (o clique no dia nao remove mais). */
+    function undoLastMultiDate() {
+      if (mode !== 'multi' || !selectedDates.length) return;
+      selectedDates.pop();
+      syncOutputs();
+      render();
+    }
+
     function pickDate(date) {
       var picked = cloneDate(date);
 
       if (mode === 'multi') {
-        var found = false;
-        for (var mi = 0; mi < selectedDates.length; mi++) {
-          if (isSameDay(selectedDates[mi], picked)) {
-            selectedDates.splice(mi, 1);
-            found = true;
-            break;
-          }
-        }
-        if (!found) {
-          // Respeita o limite definido pelo atributo data-max-dates (ex: número de trechos)
-          var maxDates = parseInt(root.dataset.maxDates, 10);
-          if (!isNaN(maxDates) && maxDates > 0 && selectedDates.length >= maxDates) {
+        // Respeita o limite definido pelo atributo data-max-dates (ex: número de trechos)
+        var maxDates = parseInt(root.dataset.maxDates, 10);
+        var hasMaxDates = !isNaN(maxDates) && maxDates > 0;
+        if (multiSequential) {
+          if (hasMaxDates && selectedDates.length >= maxDates) {
             return; // já atingiu o máximo permitido
           }
+          var ultimaSelecionada = selectedDates[selectedDates.length - 1];
+          if (ultimaSelecionada && isBeforeDay(picked, ultimaSelecionada)) {
+            return; // os trechos seguem a ordem da rota: nao pode voltar no tempo
+          }
           selectedDates.push(picked);
-          selectedDates.sort(function (a, b) { return a.getTime() - b.getTime(); });
+        } else {
+          var found = false;
+          for (var mi = 0; mi < selectedDates.length; mi++) {
+            if (isSameDay(selectedDates[mi], picked)) {
+              selectedDates.splice(mi, 1);
+              found = true;
+              break;
+            }
+          }
+          if (!found) {
+            if (hasMaxDates && selectedDates.length >= maxDates) {
+              return; // já atingiu o máximo permitido
+            }
+            selectedDates.push(picked);
+            selectedDates.sort(function (a, b) { return a.getTime() - b.getTime(); });
+          }
         }
         syncOutputs();
         var expectedMultiDates = parseInt(root.dataset.maxDates, 10);
@@ -478,6 +502,9 @@
           }
         }
 
+        if (undoBtn) {
+          undoBtn.disabled = !selectedDates.length;
+        }
         if (confirmBtn) {
           var n = selectedDates.length;
           confirmBtn.textContent = n > 0
@@ -618,27 +645,41 @@
       button.classList.toggle('cv-date-picker__day--multi-single', isMultiSingle);
 
       if (mode === 'multi' && isMultiSel) {
-        var multiStepIndex = -1;
+        // Uma mesma data pode atender mais de um trecho (chegar e seguir viagem no mesmo dia).
+        var multiStepIndexes = [];
         for (var stepIndex = 0; stepIndex < selectedDates.length; stepIndex += 1) {
           if (isSameDay(selectedDates[stepIndex], date)) {
-            multiStepIndex = stepIndex;
-            break;
+            multiStepIndexes.push(stepIndex);
           }
         }
+        var multiStepIndex = multiStepIndexes.length ? multiStepIndexes[0] : -1;
         var hasMiddleStep = multiStepIndex > 0 && multiStepIndex < selectedDates.length - 1;
-        if (hasMiddleStep) {
+        if (hasMiddleStep || multiStepIndexes.length > 1) {
           var badge = document.createElement('span');
           badge.className = 'cv-date-picker__day-badge';
-          badge.textContent = String(multiStepIndex + 1);
+          badge.textContent = multiStepIndexes.map(function (index) {
+            return String(index + 1);
+          }).join('·');
           button.appendChild(badge);
-          if (routeSteps[multiStepIndex] && routeSteps[multiStepIndex].label) {
-            button.title = routeSteps[multiStepIndex].label;
-            button.setAttribute(
-              'aria-label',
-              dayAriaLabel + ' - ' + routeSteps[multiStepIndex].label
-            );
+          var stepLabels = multiStepIndexes.map(function (index) {
+            return routeSteps[index] ? routeSteps[index].label : '';
+          }).filter(function (label) {
+            return !!label;
+          });
+          if (stepLabels.length) {
+            button.title = stepLabels.join(' | ');
+            button.setAttribute('aria-label', dayAriaLabel + ' - ' + stepLabels.join(' | '));
           }
         }
+      }
+
+      if (multiSequential) {
+        var maxSequentialDates = parseInt(root.dataset.maxDates, 10);
+        var sequentialFull = !isNaN(maxSequentialDates)
+          && maxSequentialDates > 0
+          && selectedDates.length >= maxSequentialDates;
+        var ultimaEscolhida = selectedDates[selectedDates.length - 1];
+        button.disabled = sequentialFull || (!!ultimaEscolhida && isBeforeDay(date, ultimaEscolhida));
       }
 
       button.addEventListener('click', function () {
@@ -733,6 +774,13 @@
     if (today) {
       today.addEventListener('click', function () {
         pickDate(new Date());
+      });
+    }
+
+    if (undoBtn) {
+      undoBtn.addEventListener('click', function () {
+        undoLastMultiDate();
+        openPicker();
       });
     }
 

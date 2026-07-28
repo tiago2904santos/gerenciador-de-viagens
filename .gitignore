@@ -13,6 +13,7 @@ media/
 .coverage
 htmlcov/
 .local-backups/
+.runtime/
 .idea/
 .vscode/
 legacy/

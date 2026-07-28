@@ -43,8 +43,8 @@
   gap: var(--space-6);
 }
 
-/* form_section.html renderiza apenas .form-section-header. Um único .form-section no template pai
-   deve envolver cabeçalho + .form-grid; dois .form-section seguidos para a mesma seção geram faixa vazia. */
+/* Compatibilidade visual para seções legadas completas. Novas composições usam
+   ui/forms/form_block.html, que possui abertura e fechamento do próprio shell. */
 
 .form-section {
   background: var(--color-card);

@@ -71,6 +71,30 @@ class GlobalDatePickerTests(SimpleTestCase):
         self.assertNotIn("data-cv-date-picker-display", action_html)
         self.assertEqual(action_html.count("data-cv-date-picker-panel"), 1)
 
+    def test_multi_mode_opts_into_repeated_dates_only_when_requested(self):
+        sem_repeticao = render_to_string(
+            "components/ui/forms/date_picker.html",
+            {"mode": "multi", "multi_input_id": "multi-display", "max_dates": 3},
+        )
+        self.assertNotIn("data-allow-repeat-dates", sem_repeticao)
+        self.assertNotIn("data-cv-date-picker-undo", sem_repeticao)
+
+        com_repeticao = render_to_string(
+            "components/ui/forms/date_picker.html",
+            {
+                "mode": "multi",
+                "multi_input_id": "multi-display",
+                "max_dates": 3,
+                "allow_repeat_dates": True,
+            },
+        )
+        self.assertIn('data-allow-repeat-dates="true"', com_repeticao)
+        self.assertIn("data-cv-date-picker-undo", com_repeticao)
+
+    def test_roteiro_trechos_calendar_allows_repeated_dates(self):
+        html = render_to_string("roteiros/partials/roteiro/_trechos_actions.html")
+        self.assertIn('data-allow-repeat-dates="true"', html)
+
     def test_calendar_grid_uses_an_integer_uniform_gap(self):
         css_path = (
             Path(settings.BASE_DIR)

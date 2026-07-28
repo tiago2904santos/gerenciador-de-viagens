@@ -7,15 +7,7 @@
     {% include "components/ui/headers/page_header.html" with eyebrow="PLANOS DE TRABALHO" title=page_title description=page_description icon_label="PT" module_label="Horários de Atendimento" only %}
     <form class="main-form-panel" method="post">
       {% csrf_token %}
-      {% include "components/ui/layouts/form_section.html" with title="Confirmação de exclusão" description="Confirma a exclusão do horário de atendimento." section_id="pt-horario-delete-section" only %}
-      <div class="field-grid">
-        <div class="field-size-4">
-          <p class="delete-confirm-copy">Confirma a exclusão do horário <strong>{{ horario.faixa }}</strong>?</p>
-          {% include "components/ui/feedback/alert.html" with variant="warning" message="Planos já criados que usam este horário não são alterados." only %}
-        </div>
-      </div>
-      </section>
-      {% include "components/ui/layouts/card_footer_actions.html" with secondary_label="Cancelar" secondary_url=cancel_url primary_label="Excluir" primary_variant="danger" only %}
+      {% include "components/feedback/confirm_delete_block.html" with object_label=horario.faixa message="Planos já criados que usam este horário não são alterados." primary_label="Excluir horário" back_url=cancel_url only %}
     </form>
   </div>
 {% endblock %}

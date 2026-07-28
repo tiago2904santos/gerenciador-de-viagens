@@ -1,0 +1,17 @@
+<div class="field-grid">
+  <div class="field-size-4">
+    {% if preview.erro %}
+      {% include "components/ui/feedback/alert.html" with variant="danger" message=preview.erro only %}
+    {% else %}
+      <p class="section-header__description document-preview-heading"><strong>Servidores com Termo de Autorização</strong></p>
+      <ul class="document-preview-list">
+        {% for servidor in preview.servidores %}
+          <li>{{ servidor.nome }}</li>
+        {% empty %}
+          <li>Nenhum servidor selecionado para Termo de Autorização neste ofício.</li>
+        {% endfor %}
+      </ul>
+      {% include "components/ui/buttons/button.html" with href="?format=json" label="Ver JSON" variant="secondary" icon="code" only %}
+    {% endif %}
+  </div>
+</div>

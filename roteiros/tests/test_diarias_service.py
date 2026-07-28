@@ -102,6 +102,136 @@ class DiariasServiceTests(TestCase):
         expected_total = TABELA_DIARIAS["INTERIOR"]["24h"] * 2
         self.assertEqual(resultado["totais"]["total_valor_decimal"], expected_total)
 
+    def test_roteiro_que_mistura_categorias_tem_complemento_por_permanencia(self):
+        # Curitiba 12/08 08:00 -> Florianópolis; sai de lá 13/08 15:00 -> Cambé;
+        # sai de Cambé 14/08 08:00 e chega em Curitiba 14/08 12:00.
+        # Misturando capital e interior, cada permanência é faturada na sua tarifa e
+        # com o próprio complemento: 31h em Florianópolis = 1 diária + 7h -> 15%.
+        markers = [
+            PeriodMarker(
+                saida=datetime(2026, 8, 12, 8, 0),
+                destino_cidade="FLORIANOPOLIS",
+                destino_uf="SC",
+            ),
+            PeriodMarker(
+                saida=datetime(2026, 8, 13, 15, 0),
+                destino_cidade="CAMBE",
+                destino_uf="PR",
+            ),
+            PeriodMarker(
+                saida=datetime(2026, 8, 14, 8, 0),
+                destino_cidade="CURITIBA",
+                destino_uf="PR",
+            ),
+        ]
+        resultado = calculate_periodized_diarias(
+            markers,
+            datetime(2026, 8, 14, 12, 0),
+            quantidade_servidores=1,
+            sede_cidade="CURITIBA",
+            sede_uf="PR",
+        )
+
+        self.assertEqual(resultado["totais"]["total_diarias"], "2 x 100% + 1 x 15%")
+        expected_total = (
+            TABELA_DIARIAS["CAPITAL"]["24h"]
+            + TABELA_DIARIAS["CAPITAL"]["15"]
+            + TABELA_DIARIAS["INTERIOR"]["24h"]
+        )
+        self.assertEqual(resultado["totais"]["total_valor_decimal"], expected_total)
+
+    def test_volta_para_sede_nao_carrega_o_complemento(self):
+        # Bate-volta a partir de uma sede que é capital: as 14h fora rendem 30%, mas
+        # na tarifa do destino visitado (interior) — a volta pra casa não pode puxar
+        # o complemento para a tarifa da própria sede.
+        markers = [
+            PeriodMarker(
+                saida=datetime(2026, 8, 18, 8, 0),
+                destino_cidade="CAMBE",
+                destino_uf="PR",
+            ),
+            PeriodMarker(
+                saida=datetime(2026, 8, 18, 16, 0),
+                destino_cidade="CURITIBA",
+                destino_uf="PR",
+            ),
+        ]
+        resultado = calculate_periodized_diarias(
+            markers,
+            datetime(2026, 8, 18, 22, 0),
+            quantidade_servidores=1,
+            sede_cidade="CURITIBA",
+            sede_uf="PR",
+        )
+
+        self.assertEqual(resultado["totais"]["total_diarias"], "1 x 30%")
+        self.assertEqual(
+            resultado["totais"]["total_valor_decimal"],
+            TABELA_DIARIAS["INTERIOR"]["30"],
+        )
+
+    def test_trechos_seguidos_no_mesmo_horario_nao_invalidam_o_calculo(self):
+        # Curitiba -> Cambé -> Cianorte -> Curitiba, com o segundo destino no mesmo
+        # dia do primeiro. Quando as horas de saída coincidem, a parada tem duração
+        # zero: ela não gera diária, mas também não pode derrubar o cálculo.
+        markers = [
+            PeriodMarker(
+                saida=datetime(2026, 8, 10, 8, 0),
+                destino_cidade="CAMBE",
+                destino_uf="PR",
+            ),
+            PeriodMarker(
+                saida=datetime(2026, 8, 12, 8, 0),
+                destino_cidade="CIANORTE",
+                destino_uf="PR",
+            ),
+            PeriodMarker(
+                saida=datetime(2026, 8, 12, 8, 0),
+                destino_cidade="MARINGA",
+                destino_uf="PR",
+            ),
+        ]
+        resultado = calculate_periodized_diarias(
+            markers,
+            datetime(2026, 8, 12, 20, 0),
+            quantidade_servidores=1,
+            sede_cidade="MARINGA",
+            sede_uf="PR",
+        )
+
+        # 10/08 08:00 -> 12/08 20:00 = 2 pernoites em Cambé + 12h de sobra (-> 30%).
+        self.assertEqual(resultado["totais"]["total_diarias"], "2 x 100% + 1 x 30%")
+        expected_total = (TABELA_DIARIAS["INTERIOR"]["24h"] * 2) + TABELA_DIARIAS["INTERIOR"]["30"]
+        self.assertEqual(resultado["totais"]["total_valor_decimal"], expected_total)
+
+    def test_ida_e_volta_no_mesmo_dia_e_no_mesmo_horario(self):
+        markers = [
+            PeriodMarker(
+                saida=datetime(2026, 8, 18, 8, 0),
+                destino_cidade="CAMBE",
+                destino_uf="PR",
+            ),
+            PeriodMarker(
+                saida=datetime(2026, 8, 18, 8, 0),
+                destino_cidade="MARINGA",
+                destino_uf="PR",
+            ),
+        ]
+        resultado = calculate_periodized_diarias(
+            markers,
+            datetime(2026, 8, 18, 22, 0),
+            quantidade_servidores=1,
+            sede_cidade="MARINGA",
+            sede_uf="PR",
+        )
+
+        # Sem pernoite: 14h fora da sede -> apenas o complemento de 30%.
+        self.assertEqual(resultado["totais"]["total_diarias"], "1 x 30%")
+        self.assertEqual(
+            resultado["totais"]["total_valor_decimal"],
+            TABELA_DIARIAS["INTERIOR"]["30"],
+        )
+
     def test_periodizacao_sem_percentual_complementar(self):
         markers = [
             PeriodMarker(

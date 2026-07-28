@@ -17,9 +17,9 @@ class DocumentoPdfErroAmigavelTests(TestCase):
         self.user = get_user_model().objects.create_user(username="tester_pdf_ux", password="123456")
         self.client.force_login(self.user)
 
-    @mock.patch("oficios.views.validar_oficio_para_documento", return_value={"pendencias": [], "status": "complete", "checks": {}})
+    @mock.patch("oficios.document_views.validar_oficio_para_documento", return_value={"pendencias": [], "status": "complete", "checks": {}})
     @mock.patch(
-        "oficios.views.gerar_resposta_documento_oficio",
+        "oficios.document_views.gerar_resposta_documento_oficio",
         side_effect=DocumentValidationError("Motor PDF indisponível para teste."),
     )
     def test_baixar_oficio_pdf_erro_redireciona_com_mensagem(self, *_mocks):
@@ -30,8 +30,8 @@ class DocumentoPdfErroAmigavelTests(TestCase):
         self.assertEqual(response.redirect_chain[0][1], 302)
         self.assertContains(response, "Motor PDF indisponível para teste.")
 
-    @mock.patch("oficios.views.validar_oficio_para_documento", return_value={"pendencias": [], "status": "complete", "checks": {}})
-    @mock.patch("oficios.views.gerar_resposta_documento_oficio")
+    @mock.patch("oficios.document_views.validar_oficio_para_documento", return_value={"pendencias": [], "status": "complete", "checks": {}})
+    @mock.patch("oficios.document_views.gerar_resposta_documento_oficio")
     def test_baixar_oficio_docx_nao_usa_redirect_de_pdf(self, m_gerar, _m_validar):
         oficio = Oficio.objects.create(numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
         m_gerar.return_value = HttpResponse(b"x", content_type="application/octet-stream")

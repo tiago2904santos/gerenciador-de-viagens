@@ -35,6 +35,9 @@ Modo single:
 
 Modo multi:
   max_dates             numero maximo de datas (ex.: 1 por trecho do roteiro)
+  allow_repeat_dates    selecao sequencial: cada clique preenche o proximo trecho, a mesma data
+                        pode se repetir (mesmo dia em trechos seguidos / ida e volta) e o rodape
+                        ganha "Desfazer" no lugar do clique-para-remover
   selected_dates_json   JSON com as datas ja selecionadas (opcional)
   multi_input_id        id do input de exibicao (unico campo, somente leitura)
   multi_placeholder     placeholder do input (default: "Selecione as datas")
@@ -53,6 +56,7 @@ Modo multi:
   {% if trecho_date %}data-trecho-date="{{ trecho_date }}"{% endif %}
   {% if mode == "multi" %}
     {% if max_dates %}data-max-dates="{{ max_dates }}"{% endif %}
+    {% if allow_repeat_dates %}data-allow-repeat-dates="true"{% endif %}
     data-selected-dates='{{ selected_dates_json|default:"[]" }}'
   {% endif %}
 >
@@ -237,6 +241,9 @@ Modo multi:
     <div class="cv-date-picker__footer">
       {% if mode == "multi" %}
         <button type="button" class="cv-date-picker__footer-action" data-cv-date-picker-clear>Limpar</button>
+        {% if allow_repeat_dates %}
+          <button type="button" class="cv-date-picker__footer-action" data-cv-date-picker-undo>Desfazer</button>
+        {% endif %}
         {% if show_confirm|default_if_none:True %}
           <button type="button" class="cv-btn cv-btn--primary cv-btn--sm" data-cv-date-picker-confirm><span>Aplicar datas</span></button>
         {% endif %}

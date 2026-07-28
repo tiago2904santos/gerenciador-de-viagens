@@ -5,7 +5,7 @@ from urllib.parse import urlencode
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Q
-from django.http import JsonResponse
+from django.http import HttpResponseForbidden, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
@@ -424,7 +424,12 @@ def novo(request):
                 "back_url": reverse("eventos:index"),
             },
         )
-    evento = Evento(area=getattr(request, "area", None))
+    area = getattr(request, "area", None)
+    if area is None:
+        return HttpResponseForbidden(
+            "Selecione uma área de trabalho antes de criar o evento.",
+        )
+    evento = Evento(area=area)
     evento.save()
     return redirect("eventos:guiado_etapa", pk=evento.pk, etapa=1)
 
@@ -533,6 +538,7 @@ def detalhe(request, pk, etapa=1):
             "evento_header_title": evento_header_title,
             "evento_header_description": evento_header_description,
             "evento_form": form,
+            "estados": Estado.objects.order_by("nome"),
             "oficio_cards": [
                 apresentar_oficio_card(
                     oficio,

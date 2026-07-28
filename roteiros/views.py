@@ -676,6 +676,12 @@ def calcular_rota_preview(request):
 @require_http_methods(["POST"])
 def roteiro_autosave_create(request):
     evento = resolve_evento_from_request(request)
+    area = getattr(evento, "area", None) or getattr(request, "area", None)
+    if area is None:
+        return autosave_json_response(
+            ok=False,
+            message="Selecione uma área de trabalho antes de criar o roteiro.",
+        )
     try:
         payload = parse_autosave_payload(request, expected_model="roteiro")
     except AutosavePayloadError as exc:
@@ -685,7 +691,7 @@ def roteiro_autosave_create(request):
     if not has_minimum_roteiro_content(clean_fields, payload.snapshots):
         return autosave_json_response(ok=False, message="Conteúdo insuficiente para criar rascunho.")
 
-    roteiro = build_roteiro_draft()
+    roteiro = build_roteiro_draft(area=area)
     if evento is not None:
         roteiro.evento = evento
         roteiro.tipo = Roteiro.TIPO_EVENTO

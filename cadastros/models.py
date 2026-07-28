@@ -533,11 +533,38 @@ class ConfiguracaoSistema(TimeStampedModel):
 
     @classmethod
     def get_singleton(cls):
+        """Compatibilidade para chamadas antigas sem criar configuração sem área.
+
+        Em uma requisição normal, o middleware mantém a área corrente no
+        contexto e a configuração correta é resolvida por ela. Sem esse
+        contexto, uma configuração legada ainda pode ser lida durante a
+        migração. Depois do saneamento, instalações de área única usam essa
+        área e instalações sem contexto inequívoco usam uma área técnica
+        inativa; ``area=NULL`` nunca é recriado.
+        """
+        from core.tenancy import get_current_area
+
+        current_area = get_current_area()
+        if current_area is not None:
+            return cls.get_for_area(current_area)
         obj = cls.objects.filter(area__isnull=True).order_by("pk").first()
         if obj is not None:
             return obj
-        obj = cls.objects.create(prazo_justificativa_dias=10)
-        return obj
+
+        from usuarios.models import AreaTrabalho
+
+        active_areas = AreaTrabalho.objects.filter(ativa=True)
+        if active_areas.count() == 1:
+            fallback_area = active_areas.first()
+        else:
+            fallback_area, _ = AreaTrabalho.objects.get_or_create(
+                sigla="__SISTEMA__",
+                defaults={
+                    "nome": "Configuração técnica sem contexto de área",
+                    "ativa": False,
+                },
+            )
+        return cls.get_for_area(fallback_area)
 
     @classmethod
     def get_for_area(cls, area):

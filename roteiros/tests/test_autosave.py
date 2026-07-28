@@ -6,6 +6,7 @@ from django.urls import reverse
 
 from cadastros.models import Cidade, Estado
 from roteiros.models import Roteiro, RoteiroDestino, RoteiroTrecho
+from usuarios.models import AreaTrabalho, VinculoUsuarioArea
 
 
 class RoteiroAutosaveTests(TestCase):
@@ -79,6 +80,12 @@ class RoteiroAutosaveTests(TestCase):
         self.assertEqual(roteiro.observacoes, "")
 
     def test_cria_rascunho_com_conteudo_minimo(self):
+        area = AreaTrabalho.objects.create(nome="Área de autosave", sigla="AUTOSAVE")
+        VinculoUsuarioArea.objects.create(
+            usuario=self.user,
+            area=area,
+            area_padrao=True,
+        )
         response = self.client.post(
             reverse("roteiros:roteiro-autosave-create"),
             data=json.dumps(
@@ -94,7 +101,26 @@ class RoteiroAutosaveTests(TestCase):
         payload = response.json()
         self.assertTrue(payload["ok"])
         self.assertTrue(payload["created"])
-        self.assertTrue(Roteiro.objects.filter(pk=payload["object_id"]).exists())
+        self.assertTrue(
+            Roteiro.objects.filter(pk=payload["object_id"], area=area).exists(),
+        )
+
+    def test_nao_cria_rascunho_sem_area_de_trabalho(self):
+        response = self.client.post(
+            reverse("roteiros:roteiro-autosave-create"),
+            data=json.dumps(
+                self._payload(
+                    dirty_fields=["origem_cidade"],
+                    fields={"origem_cidade": str(self.cidade_sede.pk)},
+                )
+            ),
+            content_type="application/json",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(response.json()["ok"])
+        self.assertFalse(Roteiro.objects.exists())
 
     def test_nao_cria_rascunho_vazio(self):
         response = self.client.post(

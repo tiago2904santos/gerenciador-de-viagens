@@ -1,0 +1,42 @@
+{% comment %}
+Composição global para formulários de viagem que sempre pedem período e destinos.
+
+O componente é dono da estrutura completa e compõe diretamente os globais
+date_picker.html e destination_section.html. Parâmetros de módulo são aceitos
+somente como hooks temporários para os scripts legados; novas integrações devem
+usar data-destination-add e data-destination-section.
+
+Slots opcionais:
+- period_extra_template: campo adicional ao lado das datas (ex.: horário);
+- destination_row_template: <template> usado para adicionar novas linhas.
+{% endcomment %}
+<div class="cv-travel-schedule{% if extra_class %} {{ extra_class }}{% endif %}" data-travel-schedule>
+  <section
+    class="cv-form-subsection cv-travel-schedule__period{% if period_extra_class %} {{ period_extra_class }}{% endif %}"
+    aria-labelledby="{{ period_title_id|default:'travel-period-title' }}"
+  >
+    <header class="cv-form-subsection__header">
+      <div class="cv-form-subsection__copy">
+        <h4 class="cv-form-subsection__title" id="{{ period_title_id|default:'travel-period-title' }}">
+          {{ period_title|default:"Período" }}
+        </h4>
+        {% if period_description %}
+          <p class="cv-form-subsection__description">{{ period_description }}</p>
+        {% endif %}
+      </div>
+    </header>
+
+    <div class="cv-travel-schedule__period-fields{% if period_fields_extra_class %} {{ period_fields_extra_class }}{% endif %}">
+      {% include "components/ui/forms/date_picker.html" with mode="range" picker_id=picker_id extra_class=picker_extra_class start_field=start_field end_field=end_field start_label=start_label|default:"Data inicial" end_label=end_label|default:"Data final" start_input_id=start_input_id end_input_id=end_input_id start_hidden_id=start_hidden_id end_hidden_id=end_hidden_id start_hidden_name=start_hidden_name end_hidden_name=end_hidden_name start_hidden_value=start_hidden_value end_hidden_value=end_hidden_value initial_date=initial_date show_summary=False only %}
+      {% if period_extra_template %}
+        {% include period_extra_template %}
+      {% endif %}
+    </div>
+  </section>
+
+  {% include "components/travel/destination_section.html" with section_id=destination_section_id title_id=destination_title_id title=destination_title|default:"Destinos" description=destination_description|default:"Adicione os locais na ordem em que serão visitados." add_button_id=destination_add_button_id add_button_pt=add_button_pt add_button_termo=add_button_termo add_button_os=add_button_os add_button_evento=add_button_evento add_button_evento_d=add_button_evento_d list_id=destination_list_id rows_template=destination_rows_template errors_template=destination_errors_template section_extra_class=destination_extra_class panel_aria_label=destination_aria_label %}
+
+  {% if destination_row_template %}
+    {% include destination_row_template %}
+  {% endif %}
+</div>

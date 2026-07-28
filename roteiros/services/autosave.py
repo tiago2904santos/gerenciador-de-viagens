@@ -106,6 +106,12 @@ def apply_roteiro_autosave(roteiro, clean_fields, snapshots):
     return version
 
 
-def build_roteiro_draft():
-    roteiro = Roteiro.objects.create(tipo=Roteiro.TIPO_AVULSO, status=Roteiro.STATUS_RASCUNHO)
+def build_roteiro_draft(*, area):
+    if area is None:
+        raise ValueError("Selecione uma área de trabalho antes de criar o roteiro.")
+    roteiro = Roteiro.objects.create(
+        area=area,
+        tipo=Roteiro.TIPO_AVULSO,
+        status=Roteiro.STATUS_RASCUNHO,
+    )
     return roteiro

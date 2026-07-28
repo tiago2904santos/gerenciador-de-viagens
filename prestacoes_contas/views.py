@@ -32,6 +32,32 @@ from core.utils.masks import format_protocolo
 from documentos.services.exceptions import DocumentValidationError
 from oficios.models import Oficio
 
+from .diario_views import (
+    diario_autosave,
+    diario_criar,
+    diario_download,
+    diario_editar_roteiro,
+    diario_motorista,
+    diario_servidor,
+    diario_servidor_autosave,
+    diario_servidor_editar_roteiro,
+    diario_servidor_motorista,
+)
+from .document_views import (
+    documentos,
+    documentos_servidor,
+    prestacao_arquivo_autosave,
+    prestacao_despacho_assinado_anexar,
+    prestacao_documento_conteudo,
+    prestacao_documento_excluir,
+    prestacao_oficio_assinado_anexar,
+    prestacao_servidor_arquivo_autosave,
+    prestacao_servidor_assinado_anexar,
+)
+from .model_views import modelo_editar
+from .model_views import modelo_excluir
+from .model_views import modelo_novo
+from .model_views import modelos_index
 from .assinatura_services import AssinaturaError
 from .assinatura_services import assinatura_db
 from .assinatura_services import assinatura_rt
@@ -87,248 +113,80 @@ from .services import nome_arquivo_prestacao_consolidado
 from .services import nome_arquivo_rt
 
 
-def _area_related_queryset(queryset, area_field="prestacao__area"):
-    area = get_current_area()
-    if area is None:
-        return queryset.filter(**{f"{area_field}__isnull": True})
-    return queryset.filter(**{area_field: area})
 
 
-def _prestacao_queryset():
-    return filter_queryset_by_area(PrestacaoContas.objects)
 
 
-def _prestacao_servidor_queryset():
-    return _area_related_queryset(PrestacaoServidor.objects)
 
 
-def _relatorio_queryset():
-    return _area_related_queryset(RelatorioTecnico.objects)
 
 
-def _diario_queryset():
-    return _area_related_queryset(DiarioBordo.objects)
 
 
-def _destino_display(oficio) -> str:
-    try:
-        destinos = list(oficio.roteiro.destinos.select_related("cidade", "estado").order_by("ordem"))
-        if not destinos:
-            return ""
-        parts = [f"{d.cidade} ({d.estado.sigla})" for d in destinos[:3]]
-        result = ", ".join(parts)
-        if len(destinos) > 3:
-            result += f" +{len(destinos) - 3}"
-        return result
-    except Exception:
-        return ""
 
 
-def _periodo_display(oficio) -> str:
-    try:
-        from django.utils import timezone as tz_module
-        roteiro = oficio.roteiro
-        saida_dt = roteiro.saida_dt
-        if not saida_dt:
-            return ""
-        current_tz = tz_module.get_current_timezone()
-        saida = saida_dt.astimezone(current_tz).date() if tz_module.is_aware(saida_dt) else saida_dt.date()
-        chegada_dt = getattr(roteiro, "retorno_chegada_dt", None) or getattr(roteiro, "chegada_dt", None)
-        if chegada_dt:
-            chegada = chegada_dt.astimezone(current_tz).date() if tz_module.is_aware(chegada_dt) else chegada_dt.date()
-            if saida == chegada:
-                return saida.strftime("%d/%m/%Y")
-            return f"{saida.strftime('%d/%m/%Y')} a {chegada.strftime('%d/%m/%Y')}"
-        return saida.strftime("%d/%m/%Y")
-    except Exception:
-        return ""
 
 
-def _build_campos_modelo(form) -> list:
-    """Para cada campo de texto longo: select de modelos + textarea + URL de gerência."""
-    base_url = reverse("prestacoes_contas:modelos_index")
-    campos = []
-    for campo, label in CAMPOS_COM_MODELO:
-        select = form[f"modelo_{campo}"]
-        campos.append(
-            {
-                "campo": campo,
-                "label": label,
-                "select": select,
-                "textarea": form[campo],
-                "manage_url": f"{base_url}#grupo-{campo}",
-                "tem_modelos": select.field.queryset.exists(),
-                "section_id": f"rt-topic-{campo}-title",
-            }
-        )
-    return campos
 
 
-def _build_campos_custeio(form) -> list:
-    campos = [
-        {
-            "campo": "diaria",
-            "label": "Diária",
-            "field": form["diaria"],
-            "other": None,
-            "uses_other": False,
-        }
-    ]
-    for campo, label in CAMPOS_CUSTEIO_COM_OUTRO:
-        campos.append(
-            {
-                "campo": campo,
-                "label": label,
-                "field": form[campo],
-                "other": form[f"{campo}_outro"],
-                "uses_other": True,
-            }
-        )
-    return campos
 
 
-def _servidor_identificacao(ps) -> dict:
-    from oficios.presenters import _iniciais_nome_servidor
-
-    servidor = ps.servidor
-    return {
-        "ps_pk": ps.pk,
-        "nome_servidor": servidor.nome,
-        "cpf_servidor": servidor.cpf_formatado,
-        "cargo": str(servidor.cargo) if servidor.cargo_id else "—",
-        "unidade": str(servidor.unidade) if servidor.unidade_id else "",
-        "is_motorista": ps.is_motorista,
-        "numero_solicitacao": ps.numero_solicitacao,
-        "iniciais": _iniciais_nome_servidor(servidor.nome),
-    }
 
 
-def _build_identificacao(prestacao) -> dict:
-    """Identificação de nível ofício + lista de servidores da prestação."""
-    oficio = prestacao.oficio
-    servidores = [_servidor_identificacao(ps) for ps in prestacao.servidores_prestacao.all()]
-    return {
-        "numero": oficio.numero_formatado,
-        "protocolo": format_protocolo(oficio.protocolo) or "—",
-        "data_oficio": oficio.data_criacao.strftime("%d/%m/%Y") if oficio.data_criacao else "—",
-        "custeio": oficio.get_custeio_display() if oficio.custeio else "—",
-        "destino": _destino_display(oficio) or "—",
-        "periodo": _periodo_display(oficio) or "—",
-        "servidores": servidores,
-        "servidores_count": len(servidores),
-    }
 
 
-def _marcar_servidor_em_preenchimento(ps):
-    if ps is not None:
-        ps.marcar_em_preenchimento()
 
 
-def _marcar_servidores_pendentes(prestacao):
-    """Marca em preenchimento todos os servidores ainda pendentes do ofício."""
-    if prestacao is None:
-        return
-    for ps in prestacao.servidores_prestacao.filter(status=PrestacaoServidor.STATUS_PENDENTE):
-        ps.marcar_em_preenchimento()
 
 
-def _primeiro_servidor(prestacao):
-    return prestacao.servidores_prestacao.order_by("pk").first()
 
 
-def _redirect_primeiro_servidor(request, prestacao, viewname):
-    ps = _primeiro_servidor(prestacao)
-    if ps is None:
-        messages.error(request, "Esta prestação ainda não possui servidores.")
-        return redirect("prestacoes_contas:index")
-    return redirect(viewname, ps_pk=ps.pk)
 
 
-def _anexos_rows(prestacao, anexos_qs):
-    rows = []
-    for anexo in anexos_qs.order_by("criado_em", "pk"):
-        rows.append(
-            {
-                "id": anexo.pk,
-                "nome": anexo.nome_original or Path(anexo.arquivo.name).name,
-                "url": reverse(
-                    "prestacoes_contas:prestacao_documento_conteudo",
-                    args=[prestacao.pk, anexo.pk],
-                ),
-                "delete_url": reverse(
-                    "prestacoes_contas:prestacao_documento_excluir",
-                    args=[prestacao.pk, anexo.pk],
-                ),
-            },
-        )
-    return rows
+from .rt_views import (
+    rt_autosave,
+    rt_criar,
+    rt_download_servidor,
+    rt_servidor,
+    rt_servidor_autosave,
+)
+from .signature_views import (
+    _assinatura_db_card,
+    _assinatura_rt_card,
+    assinatura_db_cancelar,
+    assinatura_db_gerar,
+    assinatura_rt_cancelar,
+    assinatura_rt_gerar,
+)
+from .view_common import (
+    _autosave_form_errors,
+    _autosave_version,
+    _build_campos_custeio,
+    _build_campos_modelo,
+    _build_identificacao,
+    _build_prestacao_steps,
+    _diario_queryset,
+    _marcar_servidor_em_preenchimento,
+    _is_inline_request,
+    _marcar_servidores_pendentes,
+    _prestacao_full,
+    _prestacao_queryset,
+    _prestacao_servidor_full,
+    _prestacao_servidor_queryset,
+    _primeiro_servidor,
+    _redirect_primeiro_servidor,
+    _preview_error_response,
+    _relatorio_queryset,
+)
 
 
-def prestacao_documento_conteudo(request, pc_pk, anexo_pk):
-    prestacao = get_object_or_404(_prestacao_queryset(), pk=pc_pk)
-    anexo = get_object_or_404(
-        PrestacaoDocumentoAnexo,
-        pk=anexo_pk,
-        prestacao=prestacao,
-    )
-    return private_file_response(anexo.arquivo)
 
 
-def _build_prestacao_steps(ps, atual: str) -> list:
-    """Etapas do wizard da prestação de contas (navegação por servidor)."""
-    documentos_url = reverse("prestacoes_contas:documentos_servidor", args=[ps.pk])
-    rt_url = reverse("prestacoes_contas:rt_servidor", args=[ps.pk])
-    diario_url = reverse("prestacoes_contas:diario_servidor", args=[ps.pk])
-    consolidado_url = reverse("prestacoes_contas:consolidado_servidor", args=[ps.pk])
-    etapas = [
-        ("rt", "Etapa 1", "Relatório Técnico", rt_url),
-        ("diario", "Etapa 2", "Diário de Bordo", diario_url),
-        ("documentos", "Etapa 3", "Documentos", documentos_url),
-        ("consolidado", "Etapa 4", "PDF Final", consolidado_url),
-    ]
-    steps = []
-    atingiu_atual = False
-    for chave, step_label, titulo, url in etapas:
-        if chave == atual:
-            state_class = "is-current"
-            aria_current = "step"
-            atingiu_atual = True
-            status = "Em edição"
-        elif atingiu_atual:
-            state_class = ""
-            aria_current = ""
-            status = "A seguir"
-        else:
-            state_class = "is-complete"
-            aria_current = ""
-            status = "Concluído"
-        steps.append(
-            {
-                "marker": "✓" if state_class == "is-complete" else str(len(steps) + 1),
-                "step_label": step_label,
-                "title": titulo,
-                "status": status,
-                "state_class": state_class,
-                "aria_current": aria_current,
-                "url": url,
-            }
-        )
-    return steps
 
 
-def _autosave_version(obj, field_name="atualizado_em") -> int:
-    obj.refresh_from_db()
-    value = getattr(obj, field_name, None)
-    if value is None:
-        return 0
-    return int(timezone.localtime(value).timestamp())
 
 
-def _autosave_form_errors(form):
-    return {
-        field: [str(item) for item in messages_list]
-        for field, messages_list in form.errors.items()
-    }
+
 
 
 def _solicitacao_autosave_value(payload):
@@ -355,134 +213,18 @@ def _parse_iso_date(texto):
     return datetime.date.fromisoformat(texto)
 
 
-def _salvar_diaria_overrides(prestacao, fields):
-    """Salva os campos ``ps-<pk>-diaria_valor_override`` presentes em ``fields``.
-
-    Usado tanto pelo autosave do RT (um campo por servidor no mesmo formulário)
-    quanto pelo fallback sem JS do POST de ``rt_criar``.
-    """
-    atualizacoes = {}
-    for name, value in fields.items():
-        match = re.match(r"^ps-(\d+)-diaria_valor_override$", str(name or ""))
-        if match:
-            atualizacoes[int(match.group(1))] = normalize_spaces(value or "")
-    if not atualizacoes:
-        return
-    servidores = PrestacaoServidor.objects.filter(pk__in=atualizacoes.keys(), prestacao=prestacao)
-    for ps in servidores:
-        novo = atualizacoes.get(ps.pk, "")
-        if ps.diaria_valor_override != novo:
-            ps.diaria_valor_override = novo
-            ps.save(update_fields=["diaria_valor_override", "atualizado_em"])
 
 
-def _salvar_rt_autosave(relatorio, clean_fields):
-    if not clean_fields:
-        return
-    update_fields = set()
-    for campo, value in clean_fields.items():
-        if campo.endswith("_outro"):
-            base = campo.removesuffix("_outro")
-            if base in {item[0] for item in CAMPOS_CUSTEIO_COM_OUTRO}:
-                text = normalize_spaces(value or "")
-                if text:
-                    setattr(relatorio, base, text)
-                    update_fields.add(base)
-            continue
-        if campo in {item[0] for item in CAMPOS_CUSTEIO_COM_OUTRO}:
-            text = normalize_spaces(value or "")
-            if text == OUTRO_VALUE:
-                continue
-            if text in get_custeio_valores_fixos(campo):
-                setattr(relatorio, campo, text)
-                update_fields.add(campo)
-            continue
-        setattr(relatorio, campo, normalize_spaces(value or ""))
-        update_fields.add(campo)
-    if update_fields:
-        relatorio.save(update_fields=[*update_fields, "atualizado_em"])
 
 
-def _parse_km_autosave(value):
-    digitos = re.sub(r"\D", "", str(value or ""))
-    return int(digitos) if digitos else None
 
 
-def _salvar_diario_autosave(diario, payload):
-    linhas = list(
-        diario.trechos.select_related("trecho").order_by("ordem", "pk")
-    )
-    changed = False
-    for dirty_name in payload.dirty_fields:
-        match = re.match(r"^form-(\d+)-(km_inicial|km_final|abastecimento)$", str(dirty_name or ""))
-        if not match:
-            continue
-        index = int(match.group(1))
-        field = match.group(2)
-        if index >= len(linhas):
-            continue
-        linha = linhas[index]
-        value = payload.fields.get(dirty_name)
-        if field in {"km_inicial", "km_final"}:
-            setattr(linha, field, _parse_km_autosave(value))
-        elif field == "abastecimento":
-            linha.abastecimento = str(value or "") != "nao"
-        linha.save(update_fields=[field])
-        changed = True
-    if changed:
-        diario.save(update_fields=["atualizado_em"])
 
 
-def _is_inline_request(request) -> bool:
-    """Indica se o PDF deve ser servido embutido (iframe) em vez de baixado."""
-    return (request.GET.get("inline") or "").strip() in {"1", "true", "sim"}
 
 
-def _preview_error_response(exc) -> HttpResponse:
-    """Mensagem amigável renderizada dentro do iframe quando a geração falha."""
-    html = (
-        '<!doctype html><html lang="pt-br"><head><meta charset="utf-8">'
-        '<style>body{margin:0;display:flex;align-items:center;justify-content:center;'
-        "min-height:100vh;font-family:system-ui,sans-serif;color:#52657a;background:#f8fafd;}"
-        ".msg{max-width:32rem;padding:1.5rem;text-align:center;line-height:1.5;}</style>"
-        "</head><body><div class=\"msg\">"
-        "<strong>Não foi possível gerar a pré-visualização.</strong><br>"
-        f"{escape(str(exc))}</div></body></html>"
-    )
-    return HttpResponse(html, content_type="text/html; charset=utf-8", status=422)
 
 
-def _trecho_display(linha) -> dict:
-    """Dados somente-leitura de um trecho (origem/destino/datas) para o card do diário."""
-    from django.utils import timezone as tz
-
-    trecho = linha.trecho
-
-    def cidade(c, e):
-        if c is not None:
-            return str(getattr(c, "nome", c)).upper()
-        if e is not None:
-            return str(getattr(e, "sigla", e)).upper()
-        return "—"
-
-    def fmt(dt):
-        if not dt:
-            return {"data": "", "hora": ""}
-        local = tz.localtime(dt) if tz.is_aware(dt) else dt
-        return {"data": local.strftime("%d/%m/%Y"), "hora": local.strftime("%H:%M")}
-
-    origem = cidade(getattr(trecho, "origem_cidade", None), getattr(trecho, "origem_estado", None)) if trecho else "—"
-    destino = cidade(getattr(trecho, "destino_cidade", None), getattr(trecho, "destino_estado", None)) if trecho else "—"
-    saida = fmt(getattr(trecho, "saida_dt", None)) if trecho else {"data": "", "hora": ""}
-    chegada = fmt(getattr(trecho, "chegada_dt", None)) if trecho else {"data": "", "hora": ""}
-    return {
-        "ordem": linha.ordem + 1,
-        "origem": origem,
-        "destino": destino,
-        "rota": f"{origem} → {destino}",
-        "saida": saida,
-        "chegada": chegada,
-    }
 
 
 _ABA_LABELS = [
@@ -738,99 +480,12 @@ def prestacao_servidor_solicitacao_autosave(request, ps_pk):
     )
 
 
-def _prestacao_full(pc_pk):
-    return get_object_or_404(
-        _prestacao_queryset().select_related("oficio__roteiro").prefetch_related(
-            "servidores_prestacao__servidor__cargo",
-            "servidores_prestacao__servidor__unidade",
-            "servidores_prestacao__documentos_anexos",
-            "documentos_anexos",
-        ),
-        pk=pc_pk,
-    )
 
 
-def _prestacao_servidor_full(ps_pk):
-    return get_object_or_404(
-        _prestacao_servidor_queryset()
-        .select_related(
-            "prestacao__oficio__roteiro",
-            "servidor__cargo",
-            "servidor__unidade",
-        )
-        .prefetch_related(
-            "prestacao__servidores_prestacao__servidor__cargo",
-            "prestacao__servidores_prestacao__servidor__unidade",
-            "prestacao__servidores_prestacao__documentos_anexos",
-            "prestacao__documentos_anexos",
-            "documentos_anexos",
-        ),
-        pk=ps_pk,
-    )
 
 
-def _servidor_documentos_ctx(prestacao, ps):
-    form = PrestacaoSolicitacaoForm(instance=ps, prefix=f"ps-{ps.pk}")
-    anexos_ps = list(ps.documentos_anexos.all())
-    anexos_pc = list(
-        prestacao.documentos_anexos.filter(tipo=PrestacaoDocumentoAnexo.TIPO_DB_ASSINADO)
-    )
-    return {
-        "ps": ps,
-        "ps_pk": ps.pk,
-        "name": ps.servidor.nome,
-        "identificacao": _servidor_identificacao(ps),
-        "form": form,
-        "solicitacao_autosave_url": reverse(
-            "prestacoes_contas:prestacao_servidor_solicitacao_autosave", args=[ps.pk]
-        ),
-        "rt_assinado": _anexo_assinado_info(
-            anexos_ps,
-            tipo=PrestacaoDocumentoAnexo.TIPO_RT_ASSINADO,
-            anexar_url=reverse(
-                "prestacoes_contas:prestacao_servidor_assinado_anexar",
-                args=[ps.pk, PrestacaoDocumentoAnexo.TIPO_RT_ASSINADO],
-            ),
-            prestacao_pk=prestacao.pk,
-        ),
-        "comprovante_anexo": _anexo_assinado_info(
-            anexos_ps,
-            tipo=PrestacaoDocumentoAnexo.TIPO_COMPROVANTE,
-            anexar_url=reverse(
-                "prestacoes_contas:prestacao_servidor_assinado_anexar",
-                args=[ps.pk, PrestacaoDocumentoAnexo.TIPO_COMPROVANTE],
-            ),
-            prestacao_pk=prestacao.pk,
-        ),
-        "diario_assinado": _anexo_assinado_info(
-            anexos_pc,
-            tipo=PrestacaoDocumentoAnexo.TIPO_DB_ASSINADO,
-            anexar_url=reverse(
-                "prestacoes_contas:prestacao_servidor_assinado_anexar",
-                args=[ps.pk, PrestacaoDocumentoAnexo.TIPO_DB_ASSINADO],
-            ),
-            prestacao_pk=prestacao.pk,
-        ),
-    }
 
 
-def _servidor_rt_ctx(ps):
-    return {
-        "ps_pk": ps.pk,
-        "nome": ps.servidor.nome,
-        "is_motorista": ps.is_motorista,
-        "diaria_ajustada": bool(ps.diaria_valor_override),
-        "diaria_form": PrestacaoServidorDiariaForm(instance=ps, prefix=f"ps-{ps.pk}"),
-        "download_pdf_url": reverse(
-            "prestacoes_contas:rt_download_servidor_formato", args=[ps.pk, "pdf"]
-        ),
-        "download_docx_url": reverse(
-            "prestacoes_contas:rt_download_servidor_formato", args=[ps.pk, "docx"]
-        ),
-        "preview_inline_url": reverse(
-            "prestacoes_contas:rt_download_servidor_formato", args=[ps.pk, "pdf"]
-        ) + "?inline=1",
-    }
 
 
 def _servidor_consolidado_ctx(request, ps):
@@ -846,897 +501,94 @@ def _servidor_consolidado_ctx(request, ps):
     }
 
 
-def documentos(request, pc_pk):
-    """Compatibilidade: redireciona para o primeiro servidor."""
-    prestacao = get_object_or_404(_prestacao_queryset(), pk=pc_pk)
-    return _redirect_primeiro_servidor(request, prestacao, "prestacoes_contas:documentos_servidor")
 
 
-def documentos_servidor(request, ps_pk):
-    """Etapa 3: despacho compartilhado + documentos do servidor atual."""
-    ps = _prestacao_servidor_full(ps_pk)
-    prestacao = ps.prestacao
-    servidor = _servidor_documentos_ctx(prestacao, ps)
-    anexos_compartilhados = list(
-        prestacao.documentos_anexos.filter(
-            tipo__in=(
-                PrestacaoDocumentoAnexo.TIPO_DESPACHO,
-                PrestacaoDocumentoAnexo.TIPO_OFICIO_ASSINADO,
-            )
-        )
-    )
-    despacho_assinado = _anexo_assinado_info(
-        anexos_compartilhados,
-        tipo=PrestacaoDocumentoAnexo.TIPO_DESPACHO,
-        anexar_url=reverse(
-            "prestacoes_contas:prestacao_despacho_assinado_anexar",
-            args=[prestacao.pk],
-        ),
-        prestacao_pk=prestacao.pk,
-    )
-    oficio_assinado = _anexo_assinado_info(
-        anexos_compartilhados,
-        tipo=PrestacaoDocumentoAnexo.TIPO_OFICIO_ASSINADO,
-        anexar_url=reverse(
-            "prestacoes_contas:prestacao_oficio_assinado_anexar",
-            args=[prestacao.pk],
-        ),
-        prestacao_pk=prestacao.pk,
-    )
-    identificacao = _build_identificacao(prestacao)
-    numero = identificacao.get("numero") or ""
-
-    def _kind(doc, *, option_label, doc_label):
-        return {
-            "option_label": option_label,
-            "doc_label": doc_label,
-            "url": doc["anexar_url"],
-            "current_name": doc["nome_original"],
-            "current_view_url": doc["view_url"],
-            "current_remove_url": doc["remover_url"],
-        }
-
-    attach_kinds = {
-        "primary": _kind(
-            despacho_assinado,
-            option_label="Despacho",
-            doc_label=f"o despacho do ofício {numero}",
-        ),
-        "secondary": _kind(
-            oficio_assinado,
-            option_label="Ofício",
-            doc_label=f"o ofício {numero}",
-        ),
-        "tertiary": _kind(
-            servidor["rt_assinado"],
-            option_label="RT",
-            doc_label=f"o relatório técnico de {servidor['name']}",
-        ),
-        "quaternary": _kind(
-            servidor["diario_assinado"],
-            option_label="DB",
-            doc_label=f"o diário de bordo do ofício {numero}",
-        ),
-        "quinary": _kind(
-            servidor["comprovante_anexo"],
-            option_label="Comprovante",
-            doc_label=f"o comprovante de saque ou transferência de {servidor['name']}",
-        ),
-    }
-
-    return render(
-        request,
-        "prestacoes_contas/documentos_form.html",
-        {
-            "page_title": f"Documentos — {ps.servidor.nome}",
-            "prestacao": prestacao,
-            "ps": ps,
-            "servidor": servidor,
-            "servidores": [servidor],
-            "identificacao": identificacao,
-            "despacho_assinado": despacho_assinado,
-            "oficio_assinado": oficio_assinado,
-            "attach_kinds": attach_kinds,
-            "wizard_page_steps": _build_prestacao_steps(ps, "documentos"),
-            "back_url": reverse("prestacoes_contas:index"),
-            "diario_url": reverse("prestacoes_contas:diario_servidor", args=[ps.pk]),
-            "consolidado_url": reverse("prestacoes_contas:consolidado_servidor", args=[ps.pk]),
-        },
-    )
 
 
 @require_POST
-def prestacao_arquivo_autosave(request, pc_pk):
-    """Autosave do despacho (compartilhado)."""
-    prestacao = get_object_or_404(_prestacao_queryset(), pk=pc_pk)
-    form = PrestacaoDespachoForm(request.POST, request.FILES, instance=prestacao)
-    if not form.is_valid():
-        return autosave_json_response(
-            ok=False,
-            message="Alguns anexos ainda precisam de ajuste antes do autosave.",
-            errors=_autosave_form_errors(form),
-        )
-    form.save()
-    _marcar_servidores_pendentes(prestacao)
-    return autosave_json_response(
-        ok=True,
-        object_id=prestacao.pk,
-        version=_autosave_version(prestacao),
-    )
 
 
 @require_POST
-def prestacao_servidor_arquivo_autosave(request, ps_pk):
-    """Autosave do comprovante de saque (individual do servidor).
-
-    Salva apenas os anexos — não reescreve o ``numero_solicitacao`` (que tem seu
-    próprio autosave), evitando apagá-lo quando o POST traz só o arquivo.
-    """
-    ps = get_object_or_404(_prestacao_servidor_queryset().select_related("prestacao"), pk=ps_pk)
-    form = PrestacaoServidorDocumentosForm(request.POST, request.FILES, instance=ps, prefix=f"ps-{ps.pk}")
-    if not form.is_valid():
-        return autosave_json_response(
-            ok=False,
-            message="Alguns anexos ainda precisam de ajuste antes do autosave.",
-            errors=_autosave_form_errors(form),
-        )
-    form.save_anexos(ps)
-    _marcar_servidor_em_preenchimento(ps)
-    return autosave_json_response(
-        ok=True,
-        object_id=ps.pk,
-        version=_autosave_version(ps),
-    )
 
 
-def _prestacao_upload_next_url(request, fallback_url):
-    next_url = request.POST.get("next")
-    if next_url and url_has_allowed_host_and_scheme(
-        next_url,
-        allowed_hosts={request.get_host()},
-        require_https=request.is_secure(),
-    ):
-        return next_url
-    return fallback_url
 
 
-def _prestacao_assinado_upload(
-    request,
-    *,
-    prestacao,
-    tipo,
-    servidor_prestacao=None,
-    substituir_todos_do_tipo=False,
-):
-    fallback_url = reverse("prestacoes_contas:index")
-    destino = _prestacao_upload_next_url(request, fallback_url)
-    arquivo = request.FILES.get("arquivo")
-    if not arquivo:
-        messages.error(request, "Selecione um arquivo PDF para anexar.")
-        return redirect(destino)
-
-    nome_original = Path(getattr(arquivo, "name", "") or "").name
-    if Path(nome_original).suffix.lower() not in {".pdf", ".png", ".jpg", ".jpeg"}:
-        messages.error(request, "O documento deve ser enviado em PDF, PNG, JPG ou JPEG.")
-        return redirect(destino)
-
-    anteriores = PrestacaoDocumentoAnexo.objects.filter(prestacao=prestacao, tipo=tipo)
-    if not substituir_todos_do_tipo:
-        anteriores = anteriores.filter(servidor_prestacao=servidor_prestacao)
-    for anexo in anteriores:
-        if anexo.arquivo:
-            anexo.arquivo.delete(save=False)
-    anteriores.delete()
-
-    PrestacaoDocumentoAnexo.objects.create(
-        prestacao=prestacao,
-        servidor_prestacao=servidor_prestacao,
-        tipo=tipo,
-        arquivo=arquivo,
-        nome_original=nome_original,
-    )
-    if servidor_prestacao is not None:
-        _marcar_servidor_em_preenchimento(servidor_prestacao)
-    else:
-        _marcar_servidores_pendentes(prestacao)
-    messages.success(request, "Documento assinado anexado.")
-    return redirect(destino)
 
 
 @require_POST
-def prestacao_despacho_assinado_anexar(request, pc_pk):
-    prestacao = get_object_or_404(_prestacao_queryset(), pk=pc_pk)
-    return _prestacao_assinado_upload(
-        request,
-        prestacao=prestacao,
-        tipo=PrestacaoDocumentoAnexo.TIPO_DESPACHO,
-    )
 
 
 @require_POST
-def prestacao_oficio_assinado_anexar(request, pc_pk):
-    prestacao = get_object_or_404(_prestacao_queryset(), pk=pc_pk)
-    return _prestacao_assinado_upload(
-        request,
-        prestacao=prestacao,
-        tipo=PrestacaoDocumentoAnexo.TIPO_OFICIO_ASSINADO,
-    )
 
 
 @require_POST
-def prestacao_servidor_assinado_anexar(request, ps_pk, tipo):
-    servidor_prestacao = get_object_or_404(
-        _prestacao_servidor_queryset().select_related("prestacao__oficio"),
-        pk=ps_pk,
-    )
-    tipos_permitidos = {
-        PrestacaoDocumentoAnexo.TIPO_RT_ASSINADO,
-        PrestacaoDocumentoAnexo.TIPO_COMPROVANTE,
-        PrestacaoDocumentoAnexo.TIPO_DB_ASSINADO,
-    }
-    if tipo not in tipos_permitidos:
-        return HttpResponse(status=404)
-    diario_compartilhado = tipo == PrestacaoDocumentoAnexo.TIPO_DB_ASSINADO
-    return _prestacao_assinado_upload(
-        request,
-        prestacao=servidor_prestacao.prestacao,
-        servidor_prestacao=None if diario_compartilhado else servidor_prestacao,
-        tipo=tipo,
-        substituir_todos_do_tipo=diario_compartilhado,
-    )
 
 
 @require_POST
-def prestacao_documento_excluir(request, pc_pk, anexo_pk):
-    prestacao = get_object_or_404(_prestacao_queryset(), pk=pc_pk)
-    anexo = get_object_or_404(
-        PrestacaoDocumentoAnexo,
-        pk=anexo_pk,
-        prestacao=prestacao,
-    )
-    ps_marcar = anexo.servidor_prestacao
-    if anexo.arquivo:
-        anexo.arquivo.delete(save=False)
-    anexo.delete()
-    if ps_marcar is not None:
-        _marcar_servidor_em_preenchimento(ps_marcar)
-    else:
-        _marcar_servidores_pendentes(prestacao)
-    return autosave_json_response(
-        ok=True,
-        object_id=prestacao.pk,
-        version=_autosave_version(prestacao),
-    )
 
 
 # ─────────────────────────────────────────────────────────────────
 # Assinatura eletrônica (RT por servidor e Diário de Bordo por ofício)
 # ─────────────────────────────────────────────────────────────────
 
-def _whatsapp_data(link_absoluto, signer, doc_labels) -> dict:
-    """Telefone (com DDI) e mensagem; o front monta a URL por app/aparelho no clique."""
-    docs_txt = " e ".join(doc_labels)
-    msg = (
-        "Olá! Para concluir a prestação de contas, preciso da sua assinatura no "
-        f"{docs_txt}. Acesse o link, confirme sua identidade e assine: {link_absoluto}"
-    )
-    telefone = (getattr(signer, "telefone", "") or "").strip() if signer else ""
-    fone = f"55{telefone}" if (len(telefone) == 11 and telefone.isdigit()) else ""
-    return {"phone": fone, "msg": msg}
 
 
-def _assinatura_card(request, *, doc, signer, tipo, label, motivo_sem_signer, gerar_url, cancelar_url) -> dict:
-    cpf_ok = bool(signer and len((getattr(signer, "cpf", "") or "").strip()) == 11)
-    motivo = ""
-    if signer is None:
-        motivo = motivo_sem_signer
-    elif not cpf_ok:
-        quem = "motorista" if tipo == AssinaturaDocumento.TIPO_DB else "servidor"
-        motivo = f"Cadastre o CPF do {quem} ({signer}) para gerar o link de assinatura."
-
-    assinada = bool(doc and doc.status == AssinaturaDocumento.STATUS_ASSINADA)
-    link_ativo = bool(doc and doc.link_ativo)
-    link_abs = ""
-    wa = {"phone": "", "msg": ""}
-    if link_ativo:
-        link_abs = request.build_absolute_uri(
-            reverse("prestacoes_contas:assinatura_landing", args=[doc.link_token])
-        )
-        wa = _whatsapp_data(link_abs, signer, [label])
-
-    return {
-        "tipo": tipo,
-        "label": label,
-        "signatario": str(signer) if signer else "—",
-        "assinada": assinada,
-        "assinado_em": doc.assinado_em if assinada else None,
-        "codigo": doc.codigo_verificacao if assinada else "",
-        "pode_assinar": cpf_ok,
-        "motivo": motivo,
-        "link_ativo": link_ativo,
-        "link_absoluto": link_abs,
-        "expira_em": doc.link_expira_em if link_ativo else None,
-        "whatsapp_phone": wa["phone"],
-        "whatsapp_msg": wa["msg"],
-        "gerar_url": gerar_url,
-        "cancelar_url": cancelar_url,
-    }
 
 
-def _assinatura_rt_card(request, ps) -> dict:
-    return _assinatura_card(
-        request,
-        doc=assinatura_rt(ps),
-        signer=signer_rt(ps),
-        tipo=AssinaturaDocumento.TIPO_RT,
-        label=f"Relatório Técnico — {ps.servidor.nome}",
-        motivo_sem_signer="Servidor da prestação não definido.",
-        gerar_url=reverse("prestacoes_contas:assinatura_rt_gerar", args=[ps.pk]),
-        cancelar_url=reverse("prestacoes_contas:assinatura_rt_cancelar", args=[ps.pk]),
-    )
 
 
-def _assinatura_db_card(request, prestacao) -> dict:
-    return _assinatura_card(
-        request,
-        doc=assinatura_db(prestacao),
-        signer=signer_db(prestacao),
-        tipo=AssinaturaDocumento.TIPO_DB,
-        label="Diário de Bordo",
-        motivo_sem_signer="Defina o motorista do ofício para gerar o link.",
-        gerar_url=reverse("prestacoes_contas:assinatura_db_gerar", args=[prestacao.pk]),
-        cancelar_url=reverse("prestacoes_contas:assinatura_db_cancelar", args=[prestacao.pk]),
-    )
 
 
 @require_POST
-def assinatura_rt_gerar(request, ps_pk):
-    ps = get_object_or_404(
-        _prestacao_servidor_queryset().select_related("prestacao__oficio", "servidor"), pk=ps_pk
-    )
-    forcar = request.POST.get("forcar") == "1"
-    next_url = request.POST.get("next") or reverse(
-        "prestacoes_contas:consolidado_servidor", args=[ps.pk]
-    )
-    try:
-        token, _docs = emitir_link_rt(ps, forcar=forcar)
-    except (AssinaturaError, DocumentValidationError) as exc:
-        messages.error(request, str(exc))
-        return redirect(next_url)
-    link = request.build_absolute_uri(
-        reverse("prestacoes_contas:assinatura_landing", args=[token])
-    )
-    messages.success(request, f"Link de assinatura gerado. Envie ao signatário: {link}")
-    return redirect(next_url)
 
 
 @require_POST
-def assinatura_db_gerar(request, pc_pk):
-    prestacao = get_object_or_404(
-        _prestacao_queryset().select_related("oficio__motorista"), pk=pc_pk
-    )
-    forcar = request.POST.get("forcar") == "1"
-    next_url = request.POST.get("next")
-    if not next_url:
-        ps = _primeiro_servidor(prestacao)
-        next_url = (
-            reverse("prestacoes_contas:consolidado_servidor", args=[ps.pk])
-            if ps is not None
-            else reverse("prestacoes_contas:index")
-        )
-    try:
-        token, _docs = emitir_link_db(prestacao, forcar=forcar)
-    except (AssinaturaError, DocumentValidationError) as exc:
-        messages.error(request, str(exc))
-        return redirect(next_url)
-    link = request.build_absolute_uri(
-        reverse("prestacoes_contas:assinatura_landing", args=[token])
-    )
-    messages.success(request, f"Link de assinatura gerado. Envie ao signatário: {link}")
-    return redirect(next_url)
 
 
 @require_POST
-def assinatura_rt_cancelar(request, ps_pk):
-    ps = get_object_or_404(_prestacao_servidor_queryset(), pk=ps_pk)
-    next_url = request.POST.get("next") or reverse(
-        "prestacoes_contas:consolidado_servidor", args=[ps.pk]
-    )
-    cancelar_assinatura_rt(ps)
-    messages.success(request, "Link/assinatura removidos. Você pode gerar um novo link.")
-    return redirect(next_url)
 
 
 @require_POST
-def assinatura_db_cancelar(request, pc_pk):
-    prestacao = get_object_or_404(_prestacao_queryset(), pk=pc_pk)
-    next_url = request.POST.get("next")
-    if not next_url:
-        ps = _primeiro_servidor(prestacao)
-        next_url = (
-            reverse("prestacoes_contas:consolidado_servidor", args=[ps.pk])
-            if ps is not None
-            else reverse("prestacoes_contas:index")
-        )
-    cancelar_assinatura_db(prestacao)
-    messages.success(request, "Link/assinatura removidos. Você pode gerar um novo link.")
-    return redirect(next_url)
 
 
-def rt_criar(request, pc_pk):
-    """Compatibilidade: redireciona para o primeiro servidor."""
-    prestacao = get_object_or_404(_prestacao_queryset(), pk=pc_pk)
-    return _redirect_primeiro_servidor(request, prestacao, "prestacoes_contas:rt_servidor")
 
 
-def rt_servidor(request, ps_pk):
-    """Edição do texto compartilhado do RT; preview/download só do servidor atual."""
-    ps = _prestacao_servidor_full(ps_pk)
-    prestacao = ps.prestacao
-
-    relatorio, _ = RelatorioTecnico.objects.get_or_create(prestacao=prestacao)
-    garantir_campos_padrao_relatorio_tecnico(relatorio)
-    identificacao = _build_identificacao(prestacao)
-
-    if request.method == "POST":
-        form = RelatorioTecnicoForm(request.POST, instance=relatorio, relatorio=relatorio)
-        if form.is_valid():
-            form.save()
-            _salvar_diaria_overrides(prestacao, request.POST)
-            _marcar_servidor_em_preenchimento(ps)
-            messages.success(request, "Texto do relatório técnico salvo.")
-            return redirect("prestacoes_contas:rt_servidor", ps_pk=ps.pk)
-    else:
-        initial = {}
-        if not relatorio.diaria:
-            initial["diaria"] = diaria_inicial_da_prestacao(prestacao)
-        if not relatorio.motivo:
-            initial["motivo"] = prestacao.oficio.motivo or ""
-        form = RelatorioTecnicoForm(instance=relatorio, relatorio=relatorio, initial=initial)
-
-    servidores_ctx = [_servidor_rt_ctx(ps)]
-
-    return render(
-        request,
-        "prestacoes_contas/relatorio_tecnico_form.html",
-        {
-            "page_title": f"Relatório Técnico — {ps.servidor.nome}",
-            "form": form,
-            "campos_modelo": _build_campos_modelo(form),
-            "campos_custeio": _build_campos_custeio(form),
-            "relatorio": relatorio,
-            "prestacao": prestacao,
-            "ps": ps,
-            "identificacao": identificacao,
-            "servidores": servidores_ctx,
-            "wizard_page_steps": _build_prestacao_steps(ps, "rt"),
-            "diaria_info": diaria_info(prestacao),
-            "back_url": reverse("prestacoes_contas:index"),
-            "documentos_url": reverse("prestacoes_contas:documentos_servidor", args=[ps.pk]),
-            "diario_url": reverse("prestacoes_contas:diario_servidor", args=[ps.pk]),
-            "autosave_url": reverse("prestacoes_contas:rt_servidor_autosave", args=[ps.pk]),
-            "preview_inline_url": servidores_ctx[0]["preview_inline_url"],
-        },
-    )
 
 
 @require_POST
-def rt_servidor_autosave(request, ps_pk):
-    ps = get_object_or_404(_prestacao_servidor_queryset().select_related("prestacao"), pk=ps_pk)
-    relatorio = get_object_or_404(_relatorio_queryset(), prestacao=ps.prestacao)
-    try:
-        payload = parse_autosave_payload(request, expected_model="relatorio_tecnico")
-    except AutosavePayloadError as exc:
-        return autosave_json_response(ok=False, message=str(exc))
-
-    allowed_fields = {
-        "diaria",
-        "translado",
-        "combustivel",
-        "passagem",
-        "translado_outro",
-        "combustivel_outro",
-        "passagem_outro",
-        "motivo",
-        "atividade",
-        "conclusao",
-        "medidas",
-        "info_complementares",
-    }
-    clean_fields = filter_allowed_fields(payload.fields, payload.dirty_fields, allowed_fields)
-    _salvar_rt_autosave(relatorio, clean_fields)
-    _salvar_diaria_overrides(
-        ps.prestacao,
-        {name: payload.fields.get(name) for name in payload.dirty_fields},
-    )
-    if payload.dirty_fields:
-        _marcar_servidor_em_preenchimento(ps)
-    return autosave_json_response(
-        ok=True,
-        object_id=relatorio.pk,
-        version=_autosave_version(relatorio),
-    )
 
 
 @require_POST
-def rt_autosave(request, pk):
-    relatorio = get_object_or_404(_relatorio_queryset(), pk=pk)
-    try:
-        payload = parse_autosave_payload(request, expected_model="relatorio_tecnico")
-    except AutosavePayloadError as exc:
-        return autosave_json_response(ok=False, message=str(exc))
-
-    allowed_fields = {
-        "diaria",
-        "translado",
-        "combustivel",
-        "passagem",
-        "translado_outro",
-        "combustivel_outro",
-        "passagem_outro",
-        "motivo",
-        "atividade",
-        "conclusao",
-        "medidas",
-        "info_complementares",
-    }
-    clean_fields = filter_allowed_fields(payload.fields, payload.dirty_fields, allowed_fields)
-    _salvar_rt_autosave(relatorio, clean_fields)
-    _salvar_diaria_overrides(
-        relatorio.prestacao,
-        {name: payload.fields.get(name) for name in payload.dirty_fields},
-    )
-    if payload.dirty_fields:
-        _marcar_servidores_pendentes(relatorio.prestacao)
-    return autosave_json_response(
-        ok=True,
-        object_id=relatorio.pk,
-        version=_autosave_version(relatorio),
-    )
 
 
-def rt_download_servidor(request, ps_pk, formato="docx"):
-    ps = get_object_or_404(
-        _prestacao_servidor_queryset().select_related(
-            "prestacao__oficio__roteiro", "servidor"
-        ),
-        pk=ps_pk,
-    )
-    relatorio, _ = RelatorioTecnico.objects.get_or_create(prestacao=ps.prestacao)
-    garantir_campos_padrao_relatorio_tecnico(relatorio)
-
-    inline = _is_inline_request(request)
-    formato = (formato or "docx").strip().lower()
-    if formato == "pdf":
-        try:
-            from .assinatura_services import pdf_rt_assinado_ou_gerado
-            conteudo = pdf_rt_assinado_ou_gerado(ps)
-        except DocumentValidationError as exc:
-            if inline:
-                return _preview_error_response(exc)
-            messages.error(request, str(exc))
-            return redirect("prestacoes_contas:rt_servidor", ps_pk=ps.pk)
-        content_type = "application/pdf"
-    else:
-        conteudo = gerar_relatorio_tecnico_docx(relatorio, ps)
-        formato = "docx"
-        content_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-
-    nome = nome_arquivo_rt(relatorio, ps.servidor, formato=formato)
-    disposition = "inline" if inline and formato == "pdf" else "attachment"
-    response = HttpResponse(conteudo, content_type=content_type)
-    response["Content-Disposition"] = f'{disposition}; filename="{nome}"'
-    if disposition == "inline":
-        response["X-Frame-Options"] = "SAMEORIGIN"
-    return response
 
 
-def diario_criar(request, pc_pk):
-    """Compatibilidade: redireciona para o primeiro servidor."""
-    prestacao = get_object_or_404(_prestacao_queryset(), pk=pc_pk)
-    return _redirect_primeiro_servidor(request, prestacao, "prestacoes_contas:diario_servidor")
 
 
-def diario_servidor(request, ps_pk):
-    """Etapa 2 do wizard: diário compartilhado; navegação por servidor."""
-    ps = _prestacao_servidor_full(ps_pk)
-    prestacao = ps.prestacao
-
-    diario, _ = DiarioBordo.objects.get_or_create(prestacao=prestacao)
-    sincronizar_trechos(diario)
-    queryset = diario.trechos.select_related(
-        "trecho__origem_cidade",
-        "trecho__origem_estado",
-        "trecho__destino_cidade",
-        "trecho__destino_estado",
-    ).order_by("ordem", "pk")
-
-    if request.method == "POST":
-        formset = DiarioBordoTrechoFormSet(request.POST, queryset=queryset)
-        if formset.is_valid():
-            formset.save()
-            _marcar_servidor_em_preenchimento(ps)
-            formato = "pdf" if request.POST.get("action") == "download_pdf" else "xlsx"
-            return redirect("prestacoes_contas:diario_download_formato", pk=diario.pk, formato=formato)
-    else:
-        formset = DiarioBordoTrechoFormSet(queryset=queryset)
-
-    linhas = list(queryset)
-    trechos = [
-        {"form": form, "display": _trecho_display(linha)}
-        for form, linha in zip(formset.forms, linhas)
-    ]
-
-    return render(
-        request,
-        "prestacoes_contas/diario_bordo_form.html",
-        {
-            "page_title": f"Diário de Bordo — {ps.servidor.nome}",
-            "prestacao": prestacao,
-            "ps": ps,
-            "diario": diario,
-            "formset": formset,
-            "trechos": trechos,
-            "identificacao": _build_identificacao(prestacao),
-            "wizard_page_steps": _build_prestacao_steps(ps, "diario"),
-            "diaria_info": diaria_info(prestacao),
-            "back_url": reverse("prestacoes_contas:index"),
-            "assinatura": _assinatura_db_card(request, prestacao),
-            "assinatura_next_url": reverse("prestacoes_contas:diario_servidor", args=[ps.pk]),
-            "editar_roteiro_url": reverse("prestacoes_contas:diario_servidor_editar_roteiro", args=[ps.pk]),
-            "editar_motorista_url": reverse("prestacoes_contas:diario_servidor_motorista", args=[ps.pk]),
-            "motorista_resumo": _motorista_resumo(diario),
-            "rt_url": reverse("prestacoes_contas:rt_servidor", args=[ps.pk]),
-            "documentos_url": reverse("prestacoes_contas:documentos_servidor", args=[ps.pk]),
-            "autosave_url": reverse("prestacoes_contas:diario_servidor_autosave", args=[ps.pk]),
-            "preview_inline_url": reverse("prestacoes_contas:diario_download_formato", args=[diario.pk, "pdf"]) + "?inline=1",
-            "preview_pdf_url": reverse("prestacoes_contas:diario_download_formato", args=[diario.pk, "pdf"]),
-            "preview_xlsx_url": reverse("prestacoes_contas:diario_download_formato", args=[diario.pk, "xlsx"]),
-        },
-    )
 
 
 @require_POST
-def diario_servidor_autosave(request, ps_pk):
-    ps = get_object_or_404(_prestacao_servidor_queryset().select_related("prestacao"), pk=ps_pk)
-    diario = get_object_or_404(_diario_queryset(), prestacao=ps.prestacao)
-    sincronizar_trechos(diario)
-    try:
-        payload = parse_autosave_payload(request, expected_model="diario_bordo")
-    except AutosavePayloadError as exc:
-        return autosave_json_response(ok=False, message=str(exc))
-
-    _salvar_diario_autosave(diario, payload)
-    if payload.dirty_fields:
-        _marcar_servidor_em_preenchimento(ps)
-    return autosave_json_response(
-        ok=True,
-        object_id=diario.pk,
-        version=_autosave_version(diario),
-    )
 
 
 @require_POST
-def diario_autosave(request, pk):
-    diario = get_object_or_404(_diario_queryset().select_related("prestacao"), pk=pk)
-    sincronizar_trechos(diario)
-    try:
-        payload = parse_autosave_payload(request, expected_model="diario_bordo")
-    except AutosavePayloadError as exc:
-        return autosave_json_response(ok=False, message=str(exc))
-
-    _salvar_diario_autosave(diario, payload)
-    if payload.dirty_fields:
-        _marcar_servidores_pendentes(diario.prestacao)
-    return autosave_json_response(
-        ok=True,
-        object_id=diario.pk,
-        version=_autosave_version(diario),
-    )
 
 
-def diario_editar_roteiro(request, pc_pk):
-    """Compatibilidade: redireciona para o primeiro servidor."""
-    prestacao = get_object_or_404(_prestacao_queryset(), pk=pc_pk)
-    return _redirect_primeiro_servidor(request, prestacao, "prestacoes_contas:diario_servidor_editar_roteiro")
 
 
-def diario_servidor_editar_roteiro(request, ps_pk):
-    """Abre o editor de roteiro sobre a cópia da prestação (clona do ofício na 1ª vez)."""
-    from urllib.parse import urlencode
-
-    ps = get_object_or_404(
-        _prestacao_servidor_queryset().select_related("prestacao__oficio__roteiro"),
-        pk=ps_pk,
-    )
-    prestacao = ps.prestacao
-    copia = garantir_roteiro_ajustado(prestacao)
-    diario_url = reverse("prestacoes_contas:diario_servidor", args=[ps.pk])
-    if copia is None:
-        messages.error(request, "Este ofício não possui roteiro para editar.")
-        return redirect(diario_url)
-    editar_url = reverse("roteiros:editar", args=[copia.pk])
-    return redirect(f"{editar_url}?{urlencode({'next': diario_url})}")
 
 
-_MOTORISTA_ORIGEM_LABEL = {
-    DiarioBordo.MOTORISTA_MODO_OFICIO: "Motorista do ofício",
-    DiarioBordo.MOTORISTA_MODO_SERVIDOR: "Outro servidor deste ofício",
-    DiarioBordo.MOTORISTA_MODO_OUTRO: "Motorista de outro ofício",
-}
 
 
-def _motorista_resumo(diario) -> dict:
-    """Motorista efetivo do diário (considerando a troca) para exibir na Etapa 3."""
-    nome, cpf = motorista_diario(diario)
-    return {
-        "nome": nome or "—",
-        "cpf": cpf or "",
-        "origem": _MOTORISTA_ORIGEM_LABEL.get(diario.motorista_modo, "Motorista do ofício"),
-        "alterado": diario.motorista_alterado,
-    }
 
 
-def _sincronizar_info_complementares_rt(prestacao):
-    """Após trocar motorista/viatura, gera a prévia em Informações complementares do
-    RT — apenas quando o campo ainda está vazio (não sobrescreve texto do usuário)."""
-    from .services import descricao_ajustes_prestacao
-
-    relatorio = RelatorioTecnico.objects.filter(prestacao=prestacao).first()
-    if relatorio is None or normalize_spaces(relatorio.info_complementares or ""):
-        return
-    texto = descricao_ajustes_prestacao(prestacao)
-    if texto:
-        relatorio.info_complementares = texto
-        relatorio.save(update_fields=["info_complementares", "atualizado_em"])
 
 
-def _oficio_prefill_dados(oficio) -> dict:
-    """Dados de um ofício para auto-preencher o formulário de troca (motorista + viatura)."""
-    from .diario_services import _viatura_dados  # uso interno no mesmo app
-
-    nome, cpf = motorista_do_oficio(oficio)
-    numero = str(oficio.numero or "").strip()
-    ano = str(oficio.ano or "").strip()
-    numero_ano = f"{numero}/{ano}" if numero and ano else numero
-
-    viatura = {"modo": "", "id": "", "modelo": "", "placa": "", "tipo": "", "combustivel": ""}
-    if oficio.viatura_id:
-        v = oficio.viatura
-        viatura = {
-            "modo": DiarioBordo.VIATURA_MODO_BANCO,
-            "id": str(oficio.viatura_id),
-            "modelo": v.modelo or "",
-            "placa": v.placa or "",
-            "tipo": v.tipo or "",
-            "combustivel": str(v.combustivel) if v.combustivel_id else "",
-        }
-    elif (oficio.transporte_modelo_manual or oficio.transporte_placa_manual or oficio.transporte_tipo_manual):
-        viatura = {
-            "modo": DiarioBordo.VIATURA_MODO_MANUAL,
-            "id": "",
-            "modelo": oficio.transporte_modelo_manual or "",
-            "placa": oficio.transporte_placa_manual or "",
-            "tipo": oficio.transporte_tipo_manual or "",
-            "combustivel": str(oficio.transporte_combustivel_manual) if oficio.transporte_combustivel_manual_id else "",
-        }
-
-    label = numero_ano or f"Ofício {oficio.pk}"
-    if nome:
-        label = f"{label} — {nome}"
-    return {
-        "id": oficio.pk,
-        "label": label,
-        "numero_ano": numero_ano,
-        "protocolo": format_protocolo(oficio.protocolo) or "",
-        "motorista_nome": nome or "",
-        "motorista_cpf": format_cpf(cpf) or cpf or "",
-        "viatura": viatura,
-    }
 
 
-def diario_motorista(request, pc_pk):
-    """Compatibilidade: redireciona para o primeiro servidor."""
-    prestacao = get_object_or_404(_prestacao_queryset(), pk=pc_pk)
-    return _redirect_primeiro_servidor(request, prestacao, "prestacoes_contas:diario_servidor_motorista")
 
 
-def diario_servidor_motorista(request, ps_pk):
-    """Etapa 2 — troca o motorista/viatura apenas deste diário, sem alterar o ofício."""
-    ps = get_object_or_404(
-        _prestacao_servidor_queryset()
-        .select_related("prestacao__oficio", "prestacao__oficio__viatura")
-        .prefetch_related(
-            "prestacao__oficio__servidores__cargo",
-            "prestacao__oficio__servidores__unidade",
-        ),
-        pk=ps_pk,
-    )
-    prestacao = ps.prestacao
-    diario, _ = DiarioBordo.objects.get_or_create(prestacao=prestacao)
-    diario_url = reverse("prestacoes_contas:diario_servidor", args=[ps.pk])
-
-    if request.method == "POST":
-        form = DiarioMotoristaForm(request.POST, instance=diario, oficio=prestacao.oficio)
-        if form.is_valid():
-            form.save()
-            _sincronizar_info_complementares_rt(prestacao)
-            _marcar_servidor_em_preenchimento(ps)
-            messages.success(request, "Diário de bordo atualizado (motorista/viatura).")
-            return redirect(diario_url)
-    else:
-        form = DiarioMotoristaForm(instance=diario, oficio=prestacao.oficio)
-
-    oficio_nome, oficio_cpf = motorista_do_oficio(prestacao.oficio)
-
-    oficios = (
-        filter_queryset_by_area(Oficio.objects)
-        .select_related("viatura", "viatura__combustivel", "motorista", "transporte_combustivel_manual")
-        .exclude(pk=prestacao.oficio_id)
-        .filter(numero__isnull=False)
-        .order_by("-ano", "-numero")[:200]
-    )
-    oficios_prefill = [_oficio_prefill_dados(o) for o in oficios]
-
-    return render(
-        request,
-        "prestacoes_contas/diario_motorista_form.html",
-        {
-            "page_title": "Trocar motorista / viatura",
-            "prestacao": prestacao,
-            "ps": ps,
-            "diario": diario,
-            "form": form,
-            "identificacao": _build_identificacao(prestacao),
-            "wizard_page_steps": _build_prestacao_steps(ps, "diario"),
-            "back_url": reverse("prestacoes_contas:index"),
-            "motorista_oficio_nome": oficio_nome or "—",
-            "motorista_oficio_cpf": oficio_cpf,
-            "viatura_oficio": viatura_resumo_oficio(prestacao.oficio),
-            "oficios_prefill": oficios_prefill,
-            "oficios_prefill_json": json.dumps(oficios_prefill),
-            "diario_url": diario_url,
-        },
-    )
 
 
-def diario_download(request, pk, formato="xlsx"):
-    diario = get_object_or_404(
-        _diario_queryset().select_related(
-            "prestacao__oficio__roteiro",
-            "prestacao__oficio__viatura",
-            "prestacao__oficio__motorista",
-        ),
-        pk=pk,
-    )
-
-    inline = _is_inline_request(request)
-    formato = (formato or "xlsx").strip().lower()
-    if formato == "pdf":
-        try:
-            from .assinatura_services import pdf_db_assinado_ou_gerado
-            conteudo = pdf_db_assinado_ou_gerado(diario.prestacao)
-        except DocumentValidationError as exc:
-            if inline:
-                return _preview_error_response(exc)
-            messages.error(request, str(exc))
-            ps = _primeiro_servidor(diario.prestacao)
-            if ps is not None:
-                return redirect("prestacoes_contas:diario_servidor", ps_pk=ps.pk)
-            return redirect("prestacoes_contas:index")
-        content_type = "application/pdf"
-    else:
-        conteudo = gerar_diario_bordo_xlsx(diario)
-        formato = "xlsx"
-        content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-
-    nome = nome_arquivo_diario(diario, formato=formato)
-    disposition = "inline" if inline and formato == "pdf" else "attachment"
-    response = HttpResponse(conteudo, content_type=content_type)
-    response["Content-Disposition"] = f'{disposition}; filename="{nome}"'
-    if disposition == "inline":
-        response["X-Frame-Options"] = "SAMEORIGIN"
-    return response
 
 
 def consolidado(request, pc_pk):
@@ -1795,128 +647,3 @@ def consolidado_download(request, ps_pk):
 # ─────────────────────────────────────────────────────────────────
 
 _CAMPO_LABELS = dict(ModeloTextoRelatorioTecnico.CAMPO_CHOICES)
-
-
-def modelos_index(request):
-    q = (request.GET.get("q") or "").strip()
-    novo_base = reverse("prestacoes_contas:modelo_novo")
-
-    grupos = []
-    for campo, label in ModeloTextoRelatorioTecnico.CAMPO_CHOICES:
-        modelos = filter_queryset_by_area(ModeloTextoRelatorioTecnico.objects).filter(campo=campo)
-        if q:
-            q_unaccent = remove_accents(q)
-            modelos = modelos.filter(Q(nome__unaccent__icontains=q_unaccent) | Q(texto__unaccent__icontains=q_unaccent))
-
-        rows = []
-        for modelo in modelos:
-            texto = (modelo.texto or "").strip()
-            if len(texto) > 90:
-                texto = f"{texto[:90]}..."
-            rows.append(
-                {
-                    "title": modelo.nome,
-                    "badges": [],
-                    "meta": [build_meta("Prévia", texto or "—")],
-                    "edit_url": reverse("prestacoes_contas:modelo_editar", args=[modelo.pk]),
-                    "delete_url": reverse("prestacoes_contas:modelo_excluir", args=[modelo.pk]),
-                }
-            )
-
-        grupos.append(
-            {
-                "campo": campo,
-                "label": label,
-                "rows": rows,
-                "new_url": f"{novo_base}?campo={campo}",
-            }
-        )
-
-    return render(
-        request,
-        "prestacoes_contas/modelos_texto/index.html",
-        {
-            "page_title": "Modelos de texto do RT",
-            "page_description": "Textos reutilizáveis para preencher rapidamente os campos do relatório técnico.",
-            "q": q,
-            "grupos": grupos,
-        },
-    )
-
-
-def modelo_novo(request):
-    initial = {}
-    campo = (request.GET.get("campo") or "").strip()
-    if campo in _CAMPO_LABELS:
-        initial["campo"] = campo
-
-    form = ModeloTextoRelatorioTecnicoForm(request.POST or None, initial=initial)
-    if request.method == "POST" and form.is_valid():
-        modelo = form.save(commit=False)
-        modelo.area = getattr(request, "area", None)
-        modelo.save()
-        messages.success(request, "Modelo criado com sucesso.")
-        return redirect(_voltar_modelos_url(form.cleaned_data["campo"]))
-
-    return render(
-        request,
-        "prestacoes_contas/modelos_texto/form.html",
-        {
-            "page_title": "Novo modelo de texto",
-            "page_description": "Crie textos reutilizáveis para agilizar o preenchimento do relatório técnico.",
-            "form": form,
-            "back_url": reverse("prestacoes_contas:modelos_index"),
-            "submit_label": "Salvar modelo",
-        },
-    )
-
-
-def modelo_editar(request, pk):
-    modelo = get_object_or_404(filter_queryset_by_area(ModeloTextoRelatorioTecnico.objects), pk=pk)
-    form = ModeloTextoRelatorioTecnicoForm(request.POST or None, instance=modelo)
-    if request.method == "POST" and form.is_valid():
-        modelo = form.save(commit=False)
-        if not modelo.area_id:
-            modelo.area = getattr(request, "area", None)
-        modelo.save()
-        messages.success(request, "Modelo atualizado com sucesso.")
-        return redirect(_voltar_modelos_url(form.cleaned_data["campo"]))
-
-    return render(
-        request,
-        "prestacoes_contas/modelos_texto/form.html",
-        {
-            "page_title": "Editar modelo de texto",
-            "page_description": "Edite o texto reutilizável usado no relatório técnico.",
-            "form": form,
-            "back_url": _voltar_modelos_url(modelo.campo),
-            "submit_label": "Salvar alterações",
-        },
-    )
-
-
-def modelo_excluir(request, pk):
-    modelo = get_object_or_404(filter_queryset_by_area(ModeloTextoRelatorioTecnico.objects), pk=pk)
-    if request.method == "POST":
-        campo = modelo.campo
-        modelo.delete()
-        messages.success(request, "Modelo excluído com sucesso.")
-        return redirect(_voltar_modelos_url(campo))
-
-    return render(
-        request,
-        "prestacoes_contas/modelos_texto/confirm_delete.html",
-        {
-            "page_title": "Excluir modelo de texto",
-            "page_description": "Confirme a remoção deste modelo.",
-            "object": modelo,
-            "back_url": _voltar_modelos_url(modelo.campo),
-        },
-    )
-
-
-def _voltar_modelos_url(campo) -> str:
-    url = reverse("prestacoes_contas:modelos_index")
-    if campo in _CAMPO_LABELS:
-        return f"{url}?campo={campo}"
-    return url

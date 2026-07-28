@@ -11,7 +11,7 @@ Este catálogo descreve a árvore ativa em `templates/components/`. Um component
 | `ui/headers` | cabeçalhos globais | `page_header`, `filter_page_header` |
 | `ui/feedback` | estados e validação | `alert`, `empty_state`, `field_error`, `form_errors`, `pendencias_card` |
 | `ui/badges` | chips e estados | `chip`, `status_badge` |
-| `ui/layouts` | seções e rodapés de cards | `form_section`, `collection_header`, `card_footer_section`, `card_footer_actions` |
+| `ui/layouts` | seções e rodapés de cards | `collection_header`, `card_footer_section`, `card_footer_actions` |
 | `ui/lists` | primitivas de listas e cards | `entity_card*`, `file_list`, `pagination`, `list_card_actions` |
 | `ui/modals` | diálogos com comportamento real | `confirm_action_modal`, `confirm_delete`, `delete_confirm_modal`, `attach_signed_modal`, `cancel_reason_modal` |
 | `lists` | composições completas de listagem | `list_page_standard`, `list_page_cards`, `list_page_quick_add`, `main_list_card`, `simple_list*` |
@@ -43,6 +43,36 @@ Listagens com busca, filtros, ordenação e período usam `filter_page_header.ht
 
 IDs, nomes de campos, validações e valores submetidos continuam definidos pelo backend. Hooks `data-*` globais descrevem comportamento; hooks de módulo só permanecem quando fazem parte do contrato do formulário daquela página.
 
+### Camadas de composição
+
+Os componentes globais são organizados por nível de responsabilidade:
+
+1. **tokens**: cor, tipografia, espaçamento, raio, sombra e altura de controle;
+2. **primitivas**: botão, campo, ícone, badge, feedback e seletor;
+3. **compostos**: uma tarefa completa formada por primitivas, como
+   `travel/period_destinations_section.html`;
+4. **padrões de página**: cabeçalho de filtros, lista em cards, formulário e
+   rodapé de ações.
+
+Uma página escolhe e configura compostos; ela não deve remontar internamente a
+mesma tarefa com fragmentos soltos.
+
+### Período e destinos
+
+`components/travel/period_destinations_section.html` é o composto canônico para
+uma etapa que coleta datas e destinos. Ele:
+
+- possui toda a estrutura da seção;
+- inclui diretamente `ui/forms/date_picker.html`;
+- inclui diretamente `travel/destination_section.html`;
+- aceita `period_extra_template` para campos relacionados, como horário;
+- aceita `destination_row_template` para o molde de novas linhas;
+- expõe `data-travel-schedule`, `data-destination-section` e
+  `data-destination-add` como hooks globais.
+
+Hooks antigos de módulo ainda podem ser informados durante a migração dos
+scripts, mas não fazem parte da API recomendada para novas páginas.
+
 ### Listagens
 
 - `list_page_standard.html`: lista compacta;
@@ -50,6 +80,10 @@ IDs, nomes de campos, validações e valores submetidos continuam definidos pelo
 - `list_page_quick_add.html`: lista com inclusão rápida;
 - `list_empty.html`: composição de empty state para listas;
 - `ui/lists/pagination.html`: paginação única.
+
+O estado vazio é centralizado por padrão. Listas administrativas compactas usam
+a variante explícita `variant="compact"`; diferenças de layout não devem ser
+inferidas pelo nome da página ou pelo container externo.
 
 ### Botões, status e feedback
 
@@ -64,6 +98,8 @@ IDs, nomes de campos, validações e valores submetidos continuam definidos pelo
 1. Antes de criar um componente, procurar responsabilidade equivalente nesta árvore.
 2. Repetição real deve virar parâmetro ou variante legítima do componente canônico.
 3. Não criar wrappers que apenas encaminham contexto para outro include.
+   Componentes compostos são válidos quando possuem uma tarefa, estrutura e
+   contrato próprios.
 4. Não manter aliases de compatibilidade sem consumidor e prazo de remoção explícito.
 5. CSS de demonstração pertence a `static/css/dev/`; produção não usa seletores `ui-lab-*`.
 6. JavaScript global expõe API por responsabilidade (`CV.destinations`), não pelo módulo que a originou.

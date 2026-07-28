@@ -116,6 +116,8 @@
 }
 
 .list-header__search-icon .cv-icon {
+  display: block;
+  flex: 0 0 auto;
   height: 16px;
   width: 16px;
 }
@@ -221,6 +223,12 @@
   background: var(--list-header-control-bg);
   border: 0;
   box-shadow: none;
+}
+
+.list-header__rail .cv-custom-select__trigger.cv-custom-select__trigger--v2 {
+  border-radius: var(--radius-control);
+  height: var(--list-header-control-height);
+  min-height: var(--list-header-control-height);
 }
 
 .list-header__rail .list-header__search-input.header-filter-input:focus,
@@ -607,6 +615,47 @@
 /* =========================================================
    Responsivo
    ========================================================= */
+
+/*
+ * A sidebar reduz o espaço útil muito antes do breakpoint móvel. Neste
+ * intervalo, busca e selects continuam compactos, enquanto ações de data e
+ * limpeza ocupam uma segunda linha previsível em vez de serem comprimidas.
+ */
+@media (min-width: 721px) and (max-width: 1180px) {
+  .list-header__filters--advanced .list-header__search {
+    flex-basis: 18rem;
+  }
+
+  .list-header__filters--advanced .cv-date-picker,
+  .list-header__filters--advanced .travel-period-filter,
+  .list-header__filters--advanced .cv-btn--control {
+    flex: 1 1 calc(50% - var(--space-2));
+  }
+
+  .list-header__filters--advanced .travel-period-filter__btn,
+  .list-header__filters--advanced .cv-btn--control {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+/*
+ * Listas com dois ou mais selects (status + ordenação, por exemplo) precisam
+ * antecipar somente o par de ações finais. Assim a segunda linha nunca fica
+ * com um botão isolado em desktops médios.
+ */
+@media (min-width: 1181px) and (max-width: 1400px) {
+  .list-header__filters--advanced:has(.list-header__select + .list-header__select)
+    :is(.cv-date-picker, .travel-period-filter, .cv-btn--control) {
+    flex: 1 1 calc(50% - var(--space-2));
+  }
+
+  .list-header__filters--advanced:has(.list-header__select + .list-header__select)
+    :is(.travel-period-filter__btn, .cv-btn--control) {
+    justify-content: center;
+    width: 100%;
+  }
+}
 
 @media (max-width: 720px) {
   .list-header__band,

@@ -5,25 +5,7 @@
     {% url "oficios:dados_viajantes" oficio.pk as oficio_url %}
     {% include "components/ui/headers/page_header.html" with eyebrow="OFÍCIOS" title=page_title icon_label="TM" module_label="Termos" back_label="Voltar ao ofício" back_url=oficio_url only %}
     <div class="main-form-panel">
-      {% include "components/ui/layouts/form_section.html" with title="Pré-visualização" section_id="termos-preview-section" only %}
-      <div class="field-grid">
-        <div class="field-size-4">
-          {% if preview.erro %}
-            {% include "components/ui/feedback/alert.html" with variant="danger" message=preview.erro only %}
-          {% else %}
-            <p class="section-header__description document-preview-heading"><strong>Servidores com Termo de Autorização</strong></p>
-            <ul class="document-preview-list">
-              {% for servidor in preview.servidores %}
-                <li>{{ servidor.nome }}</li>
-              {% empty %}
-                <li>Nenhum servidor selecionado para Termo de Autorização neste ofício.</li>
-              {% endfor %}
-            </ul>
-            {% include "components/ui/buttons/button.html" with href="?format=json" label="Ver JSON" variant="secondary" icon="code" only %}
-          {% endif %}
-        </div>
-      </div>
-      </section>
+      {% include "components/ui/forms/form_block.html" with title="Pré-visualização" section_id="termos-preview-section" body_template="termos/partials/_oficio_preview_body.html" %}
     </div>
   </div>
 {% endblock %}

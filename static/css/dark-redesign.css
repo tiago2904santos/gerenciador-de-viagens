@@ -543,7 +543,7 @@ html[data-theme="light-dark"] .page-header-rail__subtitle {
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  .page-shell--list .list-panel--empty .empty-state {
+  .empty-state--compact {
   align-items: center;
   background: #142338;
   border: 1px solid rgba(152, 184, 218, 0.32);
@@ -557,14 +557,14 @@ html[data-theme="light-dark"] .page-header-rail__subtitle {
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  .page-shell--list .list-panel--empty .empty-state__mark {
+  .empty-state--compact .empty-state__mark {
   background: #0d4d7f;
   border: 1px solid #397aa8;
   grid-row: 1 / span 2;
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
-  .page-shell--list .list-panel--empty :is(.empty-state__title, .empty-state__message) {
+  .empty-state--compact :is(.empty-state__title, .empty-state__message) {
   margin-inline: 0;
 }
 
@@ -1661,6 +1661,11 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
   }
 
   :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+    :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .cv-ordered-field-row__fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
     :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .cv-ordered-field-row__remove {
     border-left: 0;
     border-top: 1px solid color-mix(in srgb, var(--color-border) 55%, transparent);
@@ -2258,7 +2263,7 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
   border-radius: 10px;
   box-shadow: none;
   color: var(--color-text);
-  min-height: 46px;
+  min-height: var(--control-height-md);
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
@@ -2297,7 +2302,7 @@ html[data-theme="light-dark"] :is(.cv-custom-select__trigger, .cv-search-picker_
   display: grid;
   gap: 0;
   grid-template-columns: minmax(0, 1fr) auto;
-  min-height: 46px;
+  min-height: var(--control-height-md);
   overflow: hidden;
 }
 
@@ -3024,7 +3029,7 @@ html[data-theme="light-dark"] .cv-form-card .cv-search-picker__control:hover {
   border-radius: 12px;
   box-shadow: 0 6px 16px rgba(2, 10, 18, 0.28);
   color: var(--color-text);
-  min-height: 46px;
+  min-height: var(--control-height-md);
   padding: 0 18px;
   transform: none;
 }
@@ -4046,7 +4051,7 @@ html[data-theme="light-dark"] .empty-state__title {
   border: 1px solid var(--color-border) !important;
   border-radius: 10px;
   box-shadow: none !important;
-  min-height: 46px;
+  min-height: var(--control-height-md);
   padding: 0 12px;
 }
 
@@ -5034,7 +5039,7 @@ html[data-theme="light-dark"] .empty-state__title {
   box-shadow: none;
   color: var(--color-text);
   gap: 0;
-  min-height: 46px;
+  min-height: var(--control-height-md);
   overflow: hidden;
   padding: 0;
   transition: border-color 120ms ease;

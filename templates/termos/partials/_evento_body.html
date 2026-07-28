@@ -1,5 +1,1 @@
-<section class="cv-form-subsection termo-evento-periodo" aria-label="Período do evento">
-  {% include "components/ui/forms/date_picker.html" with mode="range" picker_id="termo-evento-date-picker" extra_class="termo-date-picker" start_field=form.data_evento_inicio end_field=form.data_evento_fim start_label="Data inicial" end_label="Data final" start_input_id="id_data_evento_inicio_display" end_input_id="id_data_evento_fim_display" show_summary=False only %}
-</section>
-
-{% include "termos/partials/_evento_destinos_section.html" %}
+{% include "components/travel/period_destinations_section.html" with period_title_id="termo-periodo-title" period_title="Período do evento" picker_id="termo-evento-date-picker" picker_extra_class="termo-date-picker" start_field=form.data_evento_inicio end_field=form.data_evento_fim start_input_id="id_data_evento_inicio_display" end_input_id="id_data_evento_fim_display" destination_section_id="termo-evento-destinos" destination_title_id="termo-evento-destinos-title" destination_add_button_id="termo-btn-adicionar-destino" add_button_termo=True destination_list_id="termo-destinos-list" destination_rows_template="components/travel/destinations/rows.html" destination_errors_template="components/travel/destinations/errors.html" destination_row_template="components/travel/destinations/row_template.html" prefix="termo" %}

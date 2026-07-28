@@ -205,8 +205,13 @@ def build_periods(
     for idx, marker in enumerate(sorted_markers):
         start = marker.saida
         end = sorted_markers[idx + 1].saida if idx + 1 < len(sorted_markers) else chegada_final_sede
-        if end <= start:
+        if end < start:
             raise ValueError('Preencha datas e horas para calcular.')
+        if end == start:
+            # Parada instantanea: o trecho seguinte sai no mesmo instante em que este comecou
+            # (chegar num destino e seguir viagem no mesmo dia/horario). Nao ha permanencia,
+            # entao o periodo nao gera diaria — mas tambem nao invalida o roteiro.
+            continue
 
         is_last_marker = idx == (total_markers - 1)
         if (
@@ -253,15 +258,58 @@ def build_periods(
                 '_period_start': start,
                 '_period_end': end,
                 '_pernoites_periodo': count_pernoites(start, end),
+                '_parcial_periodo': parcial,
+                '_retorno_final': is_last_marker,
             }
         )
+
+    if not periodos:
+        raise ValueError('Preencha datas e horas para calcular.')
+
+    # O último período é o deslocamento de volta para a sede. Ele nunca carrega o
+    # complemento: o servidor está indo para casa e não pode herdar a tarifa da sede
+    # (numa sede capital isso cobraria o dia da volta como capital).
+    periodos_permanencia = [item for item in periodos if not item['_retorno_final']]
+    tipos_permanencia = {item['tipo'] for item in periodos_permanencia}
+
+    if len(tipos_permanencia) > 1:
+        # Roteiro que mistura categorias (interior/capital/Brasília): cada permanência é
+        # faturada na tarifa da sua cidade e com o próprio complemento. Um complemento
+        # único da viagem teria de escolher arbitrariamente uma das tarifas.
+        for item in periodos:
+            n_in_period = int(item.get('_pernoites_periodo', 0) or 0)
+            parcial_periodo = (
+                0 if item['_retorno_final'] else int(item.get('_parcial_periodo', 0) or 0)
+            )
+            tabela = TABELA_DIARIAS.get(item['tipo'], TABELA_DIARIAS['INTERIOR'])
+            valor_parcial = Decimal('0.00')
+            if parcial_periodo == 15:
+                valor_parcial = tabela['15']
+            elif parcial_periodo == 30:
+                valor_parcial = tabela['30']
+            item['n_diarias'] = n_in_period
+            item['percentual_adicional'] = parcial_periodo
+            subtotal_novo = ((tabela['24h'] * n_in_period) + valor_parcial) * servidores
+            item['subtotal'] = formatar_valor_diarias(subtotal_novo)
+            item['subtotal_decimal'] = subtotal_novo
+
+        for item in periodos:
+            item.pop('_period_start', None)
+            item.pop('_period_end', None)
+            item.pop('_pernoites_periodo', None)
+            item.pop('_parcial_periodo', None)
+            item.pop('_retorno_final', None)
+
+        return periodos
 
     # Regra da viagem única (saída da sede → retorno à sede):
     # a diária NÃO é a soma de trechos independentes. As diárias integrais são
     # as noites fora da sede (pernoites) e há, no máximo, UM percentual
     # complementar (15%/30%) sobre o tempo que sobra além das noites inteiras.
     # Nunca um complemento por trecho — do contrário a mesma viagem acumularia
-    # 15% de um trecho + 30% de outro, inflando o total.
+    # 15% de um trecho + 30% de outro, inflando o total. (Vale para o roteiro que
+    # permanece numa única categoria; misturando categorias, o bloco acima já
+    # faturou cada permanência na sua própria tarifa.)
     total_pernoites = _count_period_pernoites(periodos)
     trip_start = periodos[0]['_period_start']
     trip_end = periodos[-1]['_period_end']
@@ -290,7 +338,10 @@ def build_periods(
             # Atribui a fração ao último período com pernoite real (o trecho
             # puramente de retorno à sede, sem pernoite, não deve "herdar" a
             # tarifa da sede para o dia da volta).
-            alvo = next((p for p in reversed(periodos) if p['n_diarias'] > 0), periodos[-1])
+            alvo = next(
+                (p for p in reversed(periodos) if p['n_diarias'] > 0 and not p['_retorno_final']),
+                (periodos_permanencia or periodos)[-1],
+            )
             tabela = TABELA_DIARIAS.get(alvo['tipo'], TABELA_DIARIAS['INTERIOR'])
             valor_parcial = tabela['15'] if leftover_percentual == 15 else tabela['30']
             alvo['percentual_adicional'] = leftover_percentual
@@ -301,7 +352,8 @@ def build_periods(
     else:
         # Viagem sem pernoite: também é uma única viagem. Aplica no máximo um
         # complemento, sobre a duração total, no destino mais oneroso — em vez
-        # de somar uma fração por trecho.
+        # de somar uma fração por trecho. O período de volta à sede fica de fora
+        # da escolha para não cobrar o dia da volta na tarifa da própria sede.
         leftover_seconds = (trip_end - trip_start).total_seconds()
         leftover_percentual = 0
         if leftover_seconds > 6 * 3600:
@@ -315,7 +367,7 @@ def build_periods(
 
         if leftover_percentual:
             ordem_tipo = {'INTERIOR': 0, 'CAPITAL': 1, 'BRASILIA': 2}
-            alvo = max(periodos, key=lambda p: ordem_tipo.get(p['tipo'], 0))
+            alvo = max(periodos_permanencia or periodos, key=lambda p: ordem_tipo.get(p['tipo'], 0))
             tabela = TABELA_DIARIAS.get(alvo['tipo'], TABELA_DIARIAS['INTERIOR'])
             valor_parcial = tabela['15'] if leftover_percentual == 15 else tabela['30']
             alvo['percentual_adicional'] = leftover_percentual
@@ -327,6 +379,8 @@ def build_periods(
         p.pop('_period_start', None)
         p.pop('_period_end', None)
         p.pop('_pernoites_periodo', None)
+        p.pop('_parcial_periodo', None)
+        p.pop('_retorno_final', None)
 
     return periodos
 

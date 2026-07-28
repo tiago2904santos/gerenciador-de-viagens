@@ -393,6 +393,17 @@ html[data-theme="light-light"] .cv-date-picker__day-badge {
   opacity: 0.55;
 }
 
+/* Multi sequencial: dias fora da ordem da rota (antes do trecho anterior) ficam bloqueados. */
+.cv-date-picker__day:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+.cv-date-picker__day:disabled:hover {
+  background-color: transparent;
+  filter: none;
+}
+
 .cv-date-picker__day--today {
   border-color: transparent;
 }

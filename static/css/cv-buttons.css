@@ -12,7 +12,7 @@
    ========================================================= */
 :root {
   /* Régua única */
-  --cv-btn-height: 42px;
+  --cv-btn-height: var(--control-height-md);
   --cv-btn-size: var(--cv-btn-height);
   --cv-btn-icon-size: 17px;
   --cv-btn-padding-x: 13px;
@@ -26,7 +26,7 @@
   --cv-btn-height-xs:      28px;
   --cv-btn-height-sm:      32px;
   --cv-btn-height-md:      var(--cv-btn-height);
-  --cv-btn-height-lg:      40px;
+  --cv-btn-height-lg:      var(--control-height-lg);
   --cv-btn-height-control: var(--control-height-md); /* 44px — emparelha com inputs */
 
   /* Padding por tamanho, mantido para compatibilidade */
