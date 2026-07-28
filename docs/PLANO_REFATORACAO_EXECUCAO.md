@@ -281,7 +281,20 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
 - [ ] `D-02` (backend) testes de contrato de `organizer.py`
 
 ### Etapa 3 — Regra de negócio
-- [ ] `N-01` tabela de diárias com vigência + congelamento do valor no roteiro
+- [x] `N-01` tabela de diárias com vigência — **as 3 partes** concluídas: o modelo
+  `TabelaDiaria` com derivação de 15%/30% no `save()` e semente de `2000-01-01`
+  reproduzindo os valores que estavam em código (parte 1, 14 testes); o cálculo
+  resolvendo a tabela pela data de saída do roteiro em vez da constante do módulo
+  (parte 2, 7 testes); e a seção **Valores de diária** na tela de configurações,
+  com três campos onde só um é digitado (parte 3, 6 testes). Cobertura de
+  `cadastros`: 60,05 → 62,36%.
+  - Falta ainda o **congelamento do valor no roteiro** — hoje o histórico é
+    preservado porque a vigência é resolvida pela data de saída, não porque o
+    valor esteja gravado no documento. Enquanto a tabela só crescer com vigências
+    novas o efeito é o mesmo; editar uma vigência já usada recalcularia o
+    passado. Entra com `N-05`.
+- [ ] `NOVO-10` `diaria_valor_override` como dinheiro validado (hoje `CharField`
+  livre: `"abc"`, `"-90"` e `"350,00,00"` chegam ao RT assinado)
 - [ ] `N-05` unificar as duas regras de complemento
 - [ ] `N-06` `CAPITAIS_POR_UF` → base geográfica IBGE
 - [ ] `N-08` / `N-09` / `N-10` bordas de `_segment_breakdown`, fechamento por servidor, pernoite curto

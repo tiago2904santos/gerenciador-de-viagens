@@ -12,8 +12,19 @@ from .models import Cidade
 from .models import Combustivel
 from .models import Estado
 from .models import Servidor
+from .models import TabelaDiaria
 from .models import Unidade
 from .models import Viatura
+
+
+def listar_tabelas_diaria():
+    """Vigências de diária, da mais recente para a mais antiga.
+
+    Não passa por ``filter_queryset_by_area``: os valores de diária vêm de
+    norma externa e valem para todas as áreas — separá-los por área abriria a
+    porta para duas áreas cobrarem valores diferentes pela mesma viagem.
+    """
+    return TabelaDiaria.objects.all()
 
 
 def listar_unidades(q=None):

@@ -24,7 +24,14 @@
           {% include "components/ui/forms/form_block.html" with shell="card" section_id="config-card-assinantes-title" title="Assinantes padrão por documento" body_template="cadastros/configuracao/partials/_assinantes_body.html" footer_template="cadastros/configuracao/partials/_form_footer.html" %}
         </form>
 
-        {# CARD 2B — Destinatário padrão do Ofício #}
+        {# CARD 3 — Valores de diária #}
+        <form method="post" novalidate>
+          {% csrf_token %}
+          <input type="hidden" name="form_id" value="diarias">
+          {% include "components/ui/forms/form_block.html" with shell="card" extra_class="cv-form-section-card--described" section_id="config-card-diarias-title" title="Valores de diária" description="Informe apenas o valor de 24 horas; 15% e 30% são calculados. Cada tabela vale a partir da data de vigência, e roteiros com saída anterior mantêm o valor que valia na época." body_template="cadastros/configuracao/partials/_diarias_body.html" footer_template="cadastros/configuracao/partials/_form_footer.html" %}
+        </form>
+
+        {# CARD 4 — Destinatário padrão do Ofício #}
         <form method="post" action="{% url 'cadastros:configuracao' %}" data-destinatario-form>
           {% csrf_token %}
           <input type="hidden" name="form_id" value="destinatarios">
@@ -38,5 +45,6 @@
 {% endblock %}
 
 {% block extra_js %}
+  <script src="{% static 'js/components/diaria-derivados.js' %}?v=20260728-diarias" defer></script>
   <script src="{% static 'js/pages/configuracoes.js' %}" defer></script>
 {% endblock %}
