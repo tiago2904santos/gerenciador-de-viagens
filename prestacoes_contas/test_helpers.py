@@ -3,16 +3,17 @@
 from dataclasses import dataclass
 from datetime import date
 from datetime import datetime
-from unittest import mock
-
 from django.contrib.auth import get_user_model
 from django.urls import reverse
+
+from core.tenancy import AREA_SESSION_KEY
 
 from cadastros.models import Cargo
 from cadastros.models import Servidor
 from oficios.models import Oficio
 from prestacoes_contas.models import PrestacaoContas
 from usuarios.models import AreaTrabalho
+from usuarios.models import VinculoUsuarioArea
 
 
 @dataclass(frozen=True)
@@ -35,8 +36,21 @@ class PrestacaoFixturesMixin:
         self.client.force_login(self.user)
         self.area = AreaTrabalho.objects.create(nome="Área Alfa", sigla="ALFA")
         self.outra_area = AreaTrabalho.objects.create(nome="Área Beta", sigla="BETA")
+        # Vínculo real, não mock: é ele que o middleware resolve em
+        # resolve_area_for_request e grava na sessão. Sem isso, a asserção de
+        # isolamento provaria só que o selector filtra — não que a requisição
+        # chega com a área certa, que é onde um vazamento entre áreas apareceria.
+        VinculoUsuarioArea.objects.create(
+            usuario=self.user, area=self.area, area_padrao=True, ativo=True
+        )
         self._cargos = {}
         self._cpf_sequence = 0
+
+    def vincular_usuario(self, area, *, padrao=False):
+        """Dá ao usuário de teste acesso a outra área (para trocar de área)."""
+        return VinculoUsuarioArea.objects.create(
+            usuario=self.user, area=area, area_padrao=padrao, ativo=True
+        )
 
     def criar_servidor(self, nome, *, area=None):
         area = area or self.area
@@ -115,6 +129,14 @@ class PrestacaoFixturesMixin:
         )
 
     def get_listagem(self, *, area=None, **params):
-        area = area or self.area
-        with mock.patch("prestacoes_contas.selectors.get_current_area", return_value=area):
-            return self.client.get(reverse("prestacoes_contas:index"), params)
+        """GET na listagem pelo caminho real: sessão → middleware → selector.
+
+        Trocar de área é trocar a chave da sessão, que é o que a tela de seleção
+        de área faz. Nada de mock: o objetivo é justamente exercitar a cadeia
+        que isola os dados entre áreas.
+        """
+        if area is not None and area.pk != self.area.pk:
+            sessao = self.client.session
+            sessao[AREA_SESSION_KEY] = area.pk
+            sessao.save()
+        return self.client.get(reverse("prestacoes_contas:index"), params)
