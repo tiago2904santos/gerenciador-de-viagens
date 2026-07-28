@@ -264,7 +264,7 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
 ### Etapa 2 — Rede de segurança
 - [ ] `T-01` suíte de Prestações: 5 etapas + assinatura pública
 - [ ] `N-04` *golden files* dos 11 documentos gerados
-- [ ] `T-03` `coverage` no CI com piso por app
+- [x] `T-03` `coverage` no CI com piso por app
 - [ ] `D-02` (backend) testes de contrato de `organizer.py`
 
 ### Etapa 3 — Regra de negócio

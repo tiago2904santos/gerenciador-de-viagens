@@ -194,7 +194,8 @@ O que **não** existe: rate limiting no login, lockout por tentativas, e qualque
 ### 5.3 O que não existe
 
 - **Nenhum teste de JS** (0 arquivos). Os 16 motores propostos na auditoria JS nascerão sem rede.
-- Sem medição de cobertura (`coverage`) no CI — a assimetria acima é invisível hoje.
+- **T-03 remediado:** o CI mede a suíte completa com `coverage`, publica o percentual
+  ordenado dos apps locais e bloqueia regressões contra pisos versionados por app.
 - Os 3 scripts de auditoria em `scripts/` (`audit_django_architecture.py`, `audit_frontend_standards.py`, `audit_ui_patterns.py`) **não rodam no CI** — são manuais.
 
 ---
@@ -287,7 +288,7 @@ Pares off-by-one (`720/721`, `840/841`, `1180/1181`, `767/768`, `599/600`, `479/
 | S-06 | 🟡 | Celery ocioso: geração de documento é síncrona no request | §4.2 |
 | T-01 | 🔴 | Prestações de Contas: razão teste/código 0,04 (351 l. para 8.238) no fluxo com assinatura pública e dinheiro | §5.2 |
 | T-02 | 🟠 | Zero testes de JS | §5.3 |
-| T-03 | 🟡 | Sem `coverage` no CI; scripts de auditoria de `scripts/` não rodam no CI | §5.3 |
+| T-03 | ✅ | `coverage` no CI com relatório e piso versionado por app | §5.3 |
 | D-01 | 🟡 | 5 motores de PDF sem teste de paridade visual entre eles | §6.1 |
 | D-02 | 🟠 | `organizer.py` (1.181 l., 19 `except Exception`) sem testes de contrato | §6.2 |
 | R-01 | 🟠 | 35 breakpoints distintos, com 6 pares off-by-one | §7.1 |
