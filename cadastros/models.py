@@ -1,4 +1,5 @@
 ﻿import re
+from decimal import ROUND_HALF_UP, Decimal
 
 from django.db import models, transaction
 from django.db.models import Q, UniqueConstraint
@@ -654,3 +655,97 @@ class AssinaturaConfiguracao(TimeStampedModel):
         return f"{self.get_tipo_display()} – {self.servidor or '—'}"
 
 
+
+class TabelaDiaria(TimeStampedModel):
+    """Valores de diária vigentes a partir de uma data.
+
+    Substitui a tabela que estava fixada em ``roteiros/services/diarias.py``
+    (defeito ``N-01``): mudar valor exigia deploy, e o histórico era recalculado
+    retroativamente porque não havia noção de vigência.
+
+    O operador informa **apenas o valor de 24 horas**; os percentuais de 15% e
+    30% são derivados dele. Guardar os três calculados evita que uma mudança
+    futura na regra de arredondamento altere documento já emitido — o valor
+    gravado é o que valeu.
+
+    Arredondamento: ``ROUND_HALF_UP`` em duas casas. A tabela anterior seguia
+    essa regra em 8 dos 9 valores; a exceção (Brasília 30%, R$ 140,43 em vez de
+    R$ 140,44) era inconsistência isolada, corrigida com a adoção da regra única.
+    """
+
+    PERCENTUAL_15 = Decimal("0.15")
+    PERCENTUAL_30 = Decimal("0.30")
+    CENTAVOS = Decimal("0.01")
+
+    FAIXA_INTERIOR = "INTERIOR"
+    FAIXA_CAPITAL = "CAPITAL"
+    FAIXA_BRASILIA = "BRASILIA"
+    FAIXA_CHOICES = [
+        (FAIXA_INTERIOR, "Interior"),
+        (FAIXA_CAPITAL, "Capital"),
+        (FAIXA_BRASILIA, "Brasília"),
+    ]
+
+    faixa = models.CharField("Faixa", max_length=20, choices=FAIXA_CHOICES)
+    vigencia_inicio = models.DateField(
+        "Vigente a partir de",
+        help_text="Roteiros com saída a partir desta data usam estes valores.",
+    )
+    valor_24h = models.DecimalField(
+        "Diária de 24 horas",
+        max_digits=10,
+        decimal_places=2,
+    )
+    # Derivados de valor_24h, gravados para congelar o valor que valeu.
+    valor_15 = models.DecimalField("15%", max_digits=10, decimal_places=2, editable=False)
+    valor_30 = models.DecimalField("30%", max_digits=10, decimal_places=2, editable=False)
+
+    class Meta:
+        ordering = ["-vigencia_inicio", "faixa"]
+        verbose_name = "Tabela de diárias"
+        verbose_name_plural = "Tabelas de diárias"
+        constraints = [
+            UniqueConstraint(
+                fields=("faixa", "vigencia_inicio"),
+                name="uniq_tabela_diaria_faixa_vigencia",
+            ),
+            models.CheckConstraint(
+                condition=Q(valor_24h__gt=0),
+                name="tabela_diaria_valor_24h_positivo",
+            ),
+        ]
+        indexes = [
+            models.Index(
+                fields=["faixa", "-vigencia_inicio"],
+                name="cadastros_tabdiaria_busca_idx",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.get_faixa_display()} — a partir de {self.vigencia_inicio:%d/%m/%Y}"
+
+    @classmethod
+    def derivar(cls, valor_24h):
+        """Devolve (15%, 30%) de ``valor_24h``, em centavos, ROUND_HALF_UP."""
+        base = Decimal(valor_24h)
+        return (
+            (base * cls.PERCENTUAL_15).quantize(cls.CENTAVOS, rounding=ROUND_HALF_UP),
+            (base * cls.PERCENTUAL_30).quantize(cls.CENTAVOS, rounding=ROUND_HALF_UP),
+        )
+
+    def save(self, *args, **kwargs):
+        self.valor_15, self.valor_30 = self.derivar(self.valor_24h)
+        return super().save(*args, **kwargs)
+
+    @classmethod
+    def vigente_em(cls, faixa, data):
+        """Tabela da faixa vigente na data — a mais recente que já começou.
+
+        Devolve ``None`` quando não há vigência iniciada até a data, em vez de
+        cair num valor padrão: cobrar com valor inventado é pior que falhar.
+        """
+        return (
+            cls.objects.filter(faixa=faixa, vigencia_inicio__lte=data)
+            .order_by("-vigencia_inicio")
+            .first()
+        )
