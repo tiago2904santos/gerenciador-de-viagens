@@ -20,6 +20,7 @@ from core.autosave import AutosavePayloadError
 from core.autosave import autosave_json_response
 from core.autosave import filter_allowed_fields
 from core.autosave import parse_autosave_payload
+from core.pagination import contexto_paginacao
 from core.tenancy import filter_queryset_by_area
 
 from justificativas.forms import JustificativaOficioForm
@@ -104,6 +105,10 @@ from .view_navigation import url_with_next as _url_with_next
 
 
 logger = logging.getLogger(__name__)
+
+# Cada card de ofício custa ~20 KB de HTML (auditoria §4.2). 20 por página é o
+# mesmo tamanho já usado por Eventos, Planos de Trabalho e Prestações.
+OFICIOS_POR_PAGINA = 20
 
 
 def _redirect_lista_oficio(request, oficio, message):
@@ -494,8 +499,9 @@ def index(request):
                    "criacao_de": criacao_de, "criacao_ate": criacao_ate,
                    "viagem_de": viagem_de, "viagem_ate": viagem_ate},
     )
+    paginacao = contexto_paginacao(oficios, request, OFICIOS_POR_PAGINA)
     cards = []
-    for oficio in oficios:
+    for oficio in paginacao["page_obj"].object_list:
         card = apresentar_oficio_card(oficio, excluir_next_url=reverse("oficios:index"))
         card["actions"] = apresentar_acoes_oficio(
             editar_url=reverse("oficios:editar", args=[oficio.pk]),
@@ -535,6 +541,7 @@ def index(request):
                 {"value": "viagem_desc",  "label": "Viagem: mais distante"},
             ],
             "empty_message": "Nenhum ofício encontrado com os filtros aplicados.",
+            **paginacao,
         },
     )
 
