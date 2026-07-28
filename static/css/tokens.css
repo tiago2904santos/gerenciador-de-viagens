@@ -25,6 +25,9 @@
   --color-primary-hover: #082f55;
   --color-primary-bright: #155b9a;
   --color-primary-soft: #e5eff8;
+  /* Halo de foco. Era usado sem estar definido, entao .cv-data-table-shell
+     ficava sem anel de foco visivel (D-06). */
+  --color-focus-ring: rgba(21, 91, 154, 0.22);
   --color-secondary: #155b9a;
   --color-secondary-hover: #0f477a;
   --color-secondary-soft: #e3f0fb;

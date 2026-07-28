@@ -1269,7 +1269,7 @@ html[data-theme="light"] {
 }
 
 .cv-form-section-card--compact .cv-form-section-title {
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-md);
   letter-spacing: 0.045em;
 }
 
@@ -2777,7 +2777,7 @@ html[data-theme="dark"] .quick-add-footer-button.is-filled:hover {
 }
 
 .simple-list-item__meta-value {
-  color: var(--theme-text);
+  color: var(--color-text);
   font-weight: var(--font-weight-medium);
 }
 .simple-list-item__aside {

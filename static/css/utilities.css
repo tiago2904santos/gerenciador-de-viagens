@@ -352,7 +352,7 @@ html[data-theme="light"] {
 }
 
 .cv-chip.is-selected {
-  box-shadow: var(--cv-chip-shadow-hover), 0 0 0 2px var(--_cv-chip-border);
+  box-shadow: var(--_cv-chip-glow), var(--shadow-sm), 0 0 0 2px var(--_cv-chip-border);
 }
 
 .cv-chip.is-disabled {

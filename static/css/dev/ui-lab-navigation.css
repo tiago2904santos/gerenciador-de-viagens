@@ -11,7 +11,7 @@
 
 .ui-lab-nav__link {
   align-items: center;
-  background: var(--surface-panel);
+  background: var(--color-surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-soft);

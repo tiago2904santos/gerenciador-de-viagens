@@ -69,6 +69,8 @@ html[data-theme="light-dark"] {
   --color-accent-border-strong: #a5851f;
   --glow-accent: 0 14px 34px rgba(216, 162, 27, 0.22);
   --color-focus: #e0ab3c;
+  /* No escuro o halo acompanha o foco ambar, nao o azul do tema claro. */
+  --color-focus-ring: rgba(224, 171, 60, 0.38);
   --color-selection: rgba(216, 162, 27, 0.34);
 
   /* Functional states */
@@ -4107,10 +4109,10 @@ html[data-theme="light-dark"] .empty-state__title {
   border-radius: 14px;
   box-shadow: var(--shadow-card);
   transition:
-    background-color var(--motion-fast) var(--ease-standard),
-    border-color var(--motion-fast) var(--ease-standard),
-    box-shadow var(--motion-fast) var(--ease-standard),
-    transform var(--motion-fast) var(--ease-standard);
+    background-color var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard),
+    box-shadow var(--duration-fast) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-standard);
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
@@ -4405,10 +4407,10 @@ html[data-theme="light-dark"] .empty-state__title {
   border-radius: 14px;
   box-shadow: var(--shadow-card);
   transition:
-    background-color var(--motion-fast) var(--ease-standard),
-    border-color var(--motion-fast) var(--ease-standard),
-    box-shadow var(--motion-fast) var(--ease-standard),
-    transform var(--motion-fast) var(--ease-standard);
+    background-color var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard),
+    box-shadow var(--duration-fast) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-standard);
 }
 
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
@@ -4506,7 +4508,7 @@ html[data-theme="light-dark"] .empty-state__title {
 :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
   .main-form-panel .section-header__title {
   color: var(--color-heading);
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-md);
   font-weight: var(--font-weight-extrabold);
   letter-spacing: 0.045em;
   text-transform: uppercase;

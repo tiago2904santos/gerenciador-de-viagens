@@ -195,8 +195,17 @@ Marque aqui, no mesmo PR que faz o trabalho. `[ ]` pendente · `[~]` em andament
 - [x] `D-04` `variant="muted"` de botão inexistente
 - [x] `D-20` / `D-21` `.pte-card` sem regra dark, texto quase preto
 - [x] `D-22` `.app-card-toggle` pastel claro em tema escuro
-- [ ] `J-05` `extra-download.js` morto em 4 módulos
-- [ ] `J-11` `data-confirm-submit` dispara `confirm()` duas vezes
+- [x] `J-05` `extra-download.js` morto em 4 módulos — **o enunciado estava vencido**:
+  só Eventos passa `extra_download_url`, e só Eventos carregava o script, então não
+  havia recurso morto. O defeito real era a armadilha: componente global
+  (`rich_menu_link`) com motor local. Script movido para o `base.html`. Junto,
+  `J-14`: `masks.js` era carregado duas vezes em `diario_motorista_form` (duas cópias,
+  `?v=` diferentes).
+- [x] `J-11` `data-confirm-submit` dispara `confirm()` duas vezes — **só ao aceitar**,
+  e só quando o atributo está no `<form>`; ao cancelar, o `preventDefault` do clique
+  escondia o defeito. A correção sugerida pela auditoria (ouvir só `submit`) teria
+  **removido a confirmação** dos botões de excluir, que carregam o atributo no próprio
+  `<button>`. Um ouvinte só, resolvendo o dono a partir do `event.submitter`.
 - [x] `N-02` listas de Ofícios e OS sem paginação
 - [x] `N-03` 3 pares de cor abaixo de 2,3:1
 - [x] `N-07` paginação incluída em listas sem `page_obj`
@@ -206,7 +215,10 @@ Marque aqui, no mesmo PR que faz o trabalho. `[ ]` pendente · `[~]` em andament
   mas a intuição era certa: tentei primeiro manter literais "descartáveis" e o
   GitGuardian reprovou — chave Fernet válida commitada é indistinguível de segredo
   real, para o scanner e para quem lê. O critério final é o mais simples: nenhuma.
-- [ ] 18 tokens indefinidos (`D-01`, `D-03`, `D-06`, `D-20`, `D-21`)
+- [x] tokens indefinidos (`D-01`, `D-03`, `D-06`, `D-20`, `D-21`) — medidos, não
+  estimados: sobravam **7**, não 18 (os PRs #64 e #65 já haviam fechado o resto).
+  Seis mapeados para tokens existentes; `--color-focus-ring` passou a ser definido
+  nos dois temas (`D-06`). Verificação: zero `var(--x)` sem fallback e sem definição.
 
 **Achados novos (28/07, fora das auditorias — descobertos ao destravar o CI):**
 
@@ -239,6 +251,15 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
   descobertos pelo runner (`manage.py test core` rodava 0 testes), incluindo
   `test_tenancy_integrity`, `test_sso`, `test_uploads` e `test_dark_redesign`. Corrigido na
   Etapa 1: todos passam, e a suíte de referência vai de **812 para 924 testes verdes**.
+
+> **Etapa 1 fechada.** Catraca do CI baixada de 465 para **449** avisos. Suíte em 924
+> testes verdes nos dois bancos. Três correções de rumo às auditorias ficaram registradas
+> acima (`J-05`, `J-11`, tokens) — em todas, o enunciado original estava mais largo ou mais
+> antigo do que o código.
+>
+> **Pendência aberta, herdada do `N-02`:** a paginação fez a busca em tempo real filtrar
+> apenas a página corrente. É comportamento que vai ao usuário agora e só se resolve no
+> `J-03` (Etapa 5). Decidir se recebe paliativo antes disso.
 
 ### Etapa 2 — Rede de segurança
 - [ ] `T-01` suíte de Prestações: 5 etapas + assinatura pública
