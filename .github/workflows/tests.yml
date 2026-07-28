@@ -94,6 +94,12 @@ jobs:
 
       - name: Exercise encrypted database and media restore
         env:
+          # O Postgres do CI é um service container, alcançável só por TCP.
+          # pg_dump/pg_restore leem PGHOST/PGPORT/PGUSER (não DB_HOST/DB_USER);
+          # sem isto tentam o socket Unix local, que não existe no runner.
+          PGHOST: 127.0.0.1
+          PGPORT: "5432"
+          PGUSER: postgres
           PGPASSWORD: postgres
           BACKUP_ENCRYPTION_KEY: "ci-restore-drill-only-key"
           RESTORE_CONFIRM: "RESTAURAR"
