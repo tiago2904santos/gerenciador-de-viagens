@@ -19,9 +19,9 @@
   padding: 14px 16px;
   border: 1px solid var(--theme-border-card);
   border-radius: 18px;
-  background: var(--theme-card-bg);
+  background: var(--theme-surface-card);
   color: var(--color-text);
-  box-shadow: var(--theme-shadow-card);
+  box-shadow: var(--theme-shadow-block);
   text-align: left;
 }
 
