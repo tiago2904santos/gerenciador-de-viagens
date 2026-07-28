@@ -286,9 +286,10 @@ Pares off-by-one (`720/721`, `840/841`, `1180/1181`, `767/768`, `599/600`, `479/
 | S-04 | 🟠 | Sem Content-Security-Policy (agrava CDN externa do Leaflet) | §4.2 |
 | S-05 | 🟡 | `SECRET_KEY` com default inseguro no `base.py` | §4.2 |
 | S-06 | 🟡 | Celery ocioso: geração de documento é síncrona no request | §4.2 |
-| T-01 | 🔴 | Prestações de Contas: razão teste/código 0,04 (351 l. para 8.238) no fluxo com assinatura pública e dinheiro | §5.2 |
+| T-01 | 🔴 | Prestações de Contas: razão teste/código 0,04 (351 l. para 8.238) no fluxo com assinatura pública e dinheiro. Fatia 1/6 concluída: listagem e entrada caracterizadas | §5.2 |
 | T-02 | 🟠 | Zero testes de JS | §5.3 |
 | T-03 | ✅ | `coverage` no CI com relatório e piso versionado por app | §5.3 |
+| T-04 | ✅ | O `coverage run` do CI encerrava antes dos testes: comentários dentro da continuação de linha (`\`) faziam o `#` comentar o resto do comando, levando junto o `--omit` e o `manage.py test`. Introduzido no PR #73, **corrigido no #75** | NOVO |
 | D-01 | 🟡 | 5 motores de PDF sem teste de paridade visual entre eles | §6.1 |
 | D-02 | 🟠 | `organizer.py` (1.181 l., 19 `except Exception`) sem testes de contrato | §6.2 |
 | R-01 | 🟠 | 35 breakpoints distintos, com 6 pares off-by-one | §7.1 |
