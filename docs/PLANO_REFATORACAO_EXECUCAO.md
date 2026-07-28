@@ -311,7 +311,10 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
 ### Etapa 4 — Backend de aderência
 - [ ] `P-01` selectors em eventos, termos, OS, PT + gate anti-ORM-em-view
 - [ ] `P-02` `core/catalog.py` e migração dos 13 catálogos
-- [ ] `P-04` **widget base com classes canônicas** (pré-requisito das Etapas 6 e 7)
+- [x] `P-04` **widget base com classes canônicas** (pré-requisito das Etapas 6 e 7) —
+  19 contratos CSS centralizados em `core/forms/widgets.py`; 194 `attrs` migrados
+  sem alterar o HTML renderizado de Ofícios, Prestações, Plano de Trabalho,
+  Roteiros e Eventos.
 - [ ] `P-05` `core/errors.py` + varredura dos 57 `except` do Drive
 - [ ] `P-06` fatiar `planos_trabalho/views.py` e `oficios/views.py`
 - [ ] `P-07` `__str__` nos 3 models de `core`

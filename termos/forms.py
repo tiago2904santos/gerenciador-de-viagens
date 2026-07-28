@@ -9,6 +9,8 @@ from cadastros.models import Estado
 from cadastros.models import Servidor
 from cadastros.models import Viatura
 from cadastros.services import resolver_sede_ids_desde_configuracao
+from core.forms.widgets import WidgetStyle
+from core.forms.widgets import widget_attrs
 from core.tenancy import filter_queryset_by_area
 from oficios.models import Oficio
 
@@ -54,13 +56,13 @@ class TermoAutorizacaoForm(forms.ModelForm):
         widgets = {
             "oficio": OficioSelectSingle(
                 attrs={
-                    "class": "termo-oficio-source-select",
+                    **widget_attrs(WidgetStyle.TERM_OFICIO_SOURCE),
                     "hidden": True,
                 },
             ),
             "destino_estado": forms.Select(
                 attrs={
-                    "class": "cv-search-picker__native",
+                    **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
                     "data-cv-search-picker": "true",
                     "data-picker-mode": "single",
                     "data-picker-variant": "compact",
@@ -70,7 +72,7 @@ class TermoAutorizacaoForm(forms.ModelForm):
             ),
             "destino_cidade": forms.Select(
                 attrs={
-                    "class": "cv-search-picker__native",
+                    **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
                     "data-cv-search-picker": "true",
                     "data-picker-mode": "single",
                     "data-picker-variant": "compact",
@@ -82,7 +84,7 @@ class TermoAutorizacaoForm(forms.ModelForm):
             "data_evento_fim": forms.HiddenInput(attrs={"data-cv-date-picker-end-value": "true"}),
             "servidores": ServidorEquipeSelectMultiple(
                 attrs={
-                    "class": "form-select cv-search-picker__native",
+                    **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
                     "data-cv-search-picker": "true",
                     "data-picker-mode": "multi",
                     "data-picker-variant": "detailed",
@@ -97,7 +99,7 @@ class TermoAutorizacaoForm(forms.ModelForm):
             ),
             "viatura": ViaturaSelectSingle(
                 attrs={
-                    "class": "form-select cv-search-picker__native",
+                    **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
                     "data-cv-search-picker": "true",
                     "data-picker-mode": "single",
                     "data-picker-variant": "detailed",

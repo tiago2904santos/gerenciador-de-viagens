@@ -3,6 +3,9 @@ import re
 from django import forms
 from django.utils import timezone
 
+from core.forms.widgets import set_widget_style
+from core.forms.widgets import WidgetStyle
+from core.forms.widgets import widget_attrs
 from core.normalizers import normalize_plate
 from core.normalizers import normalize_spaces
 from core.tenancy import filter_queryset_by_area
@@ -162,22 +165,22 @@ class OficioForm(forms.ModelForm):
         widgets = {
             # Datas editaveis sao apresentadas pelos modelos globais cv_date_picker.
             "data_criacao": forms.HiddenInput(),
-            "motivo": forms.Textarea(attrs={"class": "form-control", "rows": 4}),
-            "roteiro": forms.Select(attrs={"class": "form-select"}),
-            "solicitante": forms.Select(attrs={"class": "form-select"}),
-            "status": forms.Select(attrs={"class": "form-select"}),
-            "servidores": forms.SelectMultiple(attrs={"class": "form-select", "size": "8"}),
-            "servidores_termo_autorizacao": forms.SelectMultiple(attrs={"class": "form-select", "size": "8"}),
-            "viatura": forms.Select(attrs={"class": "form-select"}),
-            "motorista": forms.Select(attrs={"class": "form-select"}),
-            "custeio": forms.Select(attrs={"class": "form-select"}),
+            "motivo": forms.Textarea(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL), "rows": 4}),
+            "roteiro": forms.Select(attrs={**widget_attrs(WidgetStyle.FORM_SELECT)}),
+            "solicitante": forms.Select(attrs={**widget_attrs(WidgetStyle.FORM_SELECT)}),
+            "status": forms.Select(attrs={**widget_attrs(WidgetStyle.FORM_SELECT)}),
+            "servidores": forms.SelectMultiple(attrs={**widget_attrs(WidgetStyle.FORM_SELECT), "size": "8"}),
+            "servidores_termo_autorizacao": forms.SelectMultiple(attrs={**widget_attrs(WidgetStyle.FORM_SELECT), "size": "8"}),
+            "viatura": forms.Select(attrs={**widget_attrs(WidgetStyle.FORM_SELECT)}),
+            "motorista": forms.Select(attrs={**widget_attrs(WidgetStyle.FORM_SELECT)}),
+            "custeio": forms.Select(attrs={**widget_attrs(WidgetStyle.FORM_SELECT)}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field_name, field in self.fields.items():
             if isinstance(field.widget, (forms.TextInput, forms.NumberInput)):
-                field.widget.attrs.setdefault("class", "form-control")
+                set_widget_style(field.widget, WidgetStyle.FORM_CONTROL, overwrite=False)
             if field_name in {"protocolo", "assunto"}:
                 field.widget.attrs.setdefault("data-mask", "upper")
         for optional_field in (
@@ -213,7 +216,7 @@ class OficioDadosViajantesForm(OficioForm):
         queryset=ModeloMotivoOficio.objects.none(),
         required=False,
         empty_label="Selecione um modelo (opcional)",
-        widget=ModeloMotivoSelect(attrs={"class": "form-select", "data-modelo-motivo-select": "true"}),
+        widget=ModeloMotivoSelect(attrs={**widget_attrs(WidgetStyle.FORM_SELECT), "data-modelo-motivo-select": "true"}),
     )
 
     class Meta(OficioForm.Meta):
@@ -228,22 +231,22 @@ class OficioDadosViajantesForm(OficioForm):
             "servidores_termo_autorizacao",
         ]
         widgets = {
-            "numero": forms.NumberInput(attrs={"class": "form-control", "min": "1", "data-oficio-numero-field": "true"}),
-            "protocolo": forms.TextInput(attrs={"class": "form-control", "data-mask": "protocolo"}),
+            "numero": forms.NumberInput(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL), "min": "1", "data-oficio-numero-field": "true"}),
+            "protocolo": forms.TextInput(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL), "data-mask": "protocolo"}),
             "motivo": forms.Textarea(
                 attrs={
-                    "class": "cv-field__control cv-field__control--textarea",
+                    **widget_attrs(WidgetStyle.FIELD_CONTROL_TEXTAREA),
                     "rows": 4,
                     "data-motivo-textarea": "true",
                 },
             ),
             "custeio": forms.Select(
-                attrs={"class": "form-select", "data-oficio-custeio-field": "true"},
+                attrs={**widget_attrs(WidgetStyle.FORM_SELECT), "data-oficio-custeio-field": "true"},
             ),
-            "custeio_observacao": forms.TextInput(attrs={"class": "form-control"}),
+            "custeio_observacao": forms.TextInput(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL)}),
             "viatura": ViaturaSelectSingle(
                 attrs={
-                    "class": "form-select cv-search-picker__native",
+                    **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
                     "data-cv-search-picker": "true",
                     "data-picker-mode": "single",
                     "data-picker-variant": "detailed",
@@ -258,7 +261,7 @@ class OficioDadosViajantesForm(OficioForm):
             ),
             "servidores": ServidorEquipeSelectMultiple(
                 attrs={
-                    "class": "form-select cv-search-picker__native",
+                    **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
                     "data-cv-search-picker": "true",
                     "data-picker-mode": "multi",
                     "data-picker-variant": "detailed",
@@ -276,7 +279,7 @@ class OficioDadosViajantesForm(OficioForm):
             ),
             "servidores_termo_autorizacao": ServidorEquipeSelectMultiple(
                 attrs={
-                    "class": "form-select cv-search-picker__termos-native",
+                    **widget_attrs(WidgetStyle.FORM_SELECT_TERMS_PICKER),
                 },
             ),
         }
@@ -362,7 +365,7 @@ class OficioTransporteForm(forms.ModelForm):
         required=False,
         widget=forms.TextInput(
             attrs={
-                "class": "cv-search-picker__input",
+                **widget_attrs(WidgetStyle.SEARCH_PICKER_INPUT),
                 "data-oficio-viatura-busca": "true",
                 "placeholder": "Buscar por placa, unidade, combustível ou tipo",
                 "autocomplete": "off",
@@ -377,7 +380,7 @@ class OficioTransporteForm(forms.ModelForm):
         label="Porte/transporte de armas",
         coerce=lambda v: v == "sim",
         choices=[("sim", "Sim"), ("nao", "Não")],
-        widget=forms.Select(attrs={"class": "form-select", "data-oficio-porte-armas": "true"}),
+        widget=forms.Select(attrs={**widget_attrs(WidgetStyle.FORM_SELECT), "data-oficio-porte-armas": "true"}),
     )
 
     class Meta:
@@ -400,17 +403,17 @@ class OficioTransporteForm(forms.ModelForm):
             "motorista_modo": forms.HiddenInput(attrs={"data-oficio-motorista-modo": "true"}),
             "transporte_placa_manual": forms.HiddenInput(attrs={"data-oficio-placa-hidden": "true"}),
             "transporte_modelo_manual": forms.TextInput(
-                attrs={"class": "form-control", "data-oficio-viatura-modelo": "true", "data-mask": "upper"},
+                attrs={**widget_attrs(WidgetStyle.FORM_CONTROL), "data-oficio-viatura-modelo": "true", "data-mask": "upper"},
             ),
             "transporte_combustivel_manual": forms.Select(
-                attrs={"class": "form-select", "data-oficio-viatura-combustivel": "true"},
+                attrs={**widget_attrs(WidgetStyle.FORM_SELECT), "data-oficio-viatura-combustivel": "true"},
             ),
             "transporte_tipo_manual": forms.Select(
-                attrs={"class": "form-select", "data-oficio-viatura-tipo": "true"},
+                attrs={**widget_attrs(WidgetStyle.FORM_SELECT), "data-oficio-viatura-tipo": "true"},
             ),
             "motorista": ServidorMotoristaSelect(
                 attrs={
-                    "class": "form-select cv-search-picker__native",
+                    **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
                     "data-cv-search-picker": "true",
                     "data-picker-mode": "single",
                     "data-picker-variant": "detailed",
@@ -422,7 +425,7 @@ class OficioTransporteForm(forms.ModelForm):
             ),
             "motorista_manual_nome": forms.TextInput(
                 attrs={
-                    "class": "form-control",
+                    **widget_attrs(WidgetStyle.FORM_CONTROL),
                     "data-mask": "upper",
                     "data-oficio-motorista-manual": "true",
                     "placeholder": "Digite o nome do motorista",
@@ -435,7 +438,7 @@ class OficioTransporteForm(forms.ModelForm):
             ),
             "motorista_protocolo_ref": forms.TextInput(
                 attrs={
-                    "class": "form-control",
+                    **widget_attrs(WidgetStyle.FORM_CONTROL),
                     "data-mask": "protocolo",
                     "inputmode": "numeric",
                     "autocomplete": "off",
@@ -547,18 +550,18 @@ class ModeloMotivoOficioForm(forms.ModelForm):
     nome = forms.CharField(
         label="Nome",
         help_text="Use um nome curto para identificar o modelo.",
-        widget=forms.TextInput(attrs={"class": "form-control"}),
+        widget=forms.TextInput(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL)}),
     )
     texto = forms.CharField(
         label="Texto do modelo",
         help_text="Este texto será copiado para o motivo do ofício e poderá ser editado antes de salvar.",
-        widget=forms.Textarea(attrs={"class": "cv-field__control cv-field__control--textarea", "rows": 4}),
+        widget=forms.Textarea(attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL_TEXTAREA), "rows": 4}),
     )
     is_padrao = forms.BooleanField(
         label="Modelo padrão",
         required=False,
         help_text="Marque apenas se este modelo deve ser sugerido como principal.",
-        widget=forms.CheckboxInput(attrs={"class": "app-card-toggle__input"}),
+        widget=forms.CheckboxInput(attrs={**widget_attrs(WidgetStyle.CARD_TOGGLE)}),
     )
 
     class Meta:

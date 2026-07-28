@@ -11,6 +11,8 @@ from cadastros.models import Estado
 from cadastros.models import Servidor
 from cadastros.models import Unidade
 from cadastros.services import resolver_sede_ids_desde_configuracao
+from core.forms.widgets import WidgetStyle
+from core.forms.widgets import widget_attrs
 from core.normalizers import normalize_upper
 from core.tenancy import filter_queryset_by_area
 
@@ -28,7 +30,7 @@ from .models import ProgramaSolicitante
 def _servidor_picker_widget(panel_title: str, field_label: str) -> forms.Select:
     return ServidorMotoristaSelect(
         attrs={
-            "class": "form-select cv-search-picker__native",
+            **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
             "data-cv-search-picker": "true",
             "data-pt-coordenador-picker": "true",
             "data-picker-mode": "single",
@@ -53,7 +55,7 @@ class PlanoIdentificacaoForm(forms.ModelForm):
         required=False,
         widget=forms.Select(
             attrs={
-                "class": "form-select",
+                **widget_attrs(WidgetStyle.FORM_SELECT),
                 "data-pt-programa-select": "true",
                 "data-pt-programa-outro-value": PROGRAMA_OUTRO_VALUE,
             },
@@ -63,7 +65,7 @@ class PlanoIdentificacaoForm(forms.ModelForm):
         required=False,
         widget=forms.Select(
             attrs={
-                "class": "form-select",
+                **widget_attrs(WidgetStyle.FORM_SELECT),
             },
         ),
     )
@@ -95,14 +97,14 @@ class PlanoIdentificacaoForm(forms.ModelForm):
         widgets = {
             "programa_outros": forms.TextInput(
                 attrs={
-                    "class": "cv-field__control",
+                    **widget_attrs(WidgetStyle.FIELD_CONTROL),
                     "placeholder": "Informe o programa quando não estiver na lista",
                     "autocomplete": "off",
                 },
             ),
             "destino_estado": forms.Select(
                 attrs={
-                    "class": "cv-search-picker__native",
+                    **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
                     "data-cv-search-picker": "true",
                     "data-picker-mode": "single",
                     "data-picker-variant": "compact",
@@ -112,7 +114,7 @@ class PlanoIdentificacaoForm(forms.ModelForm):
             ),
             "destino_cidade": forms.Select(
                 attrs={
-                    "class": "cv-search-picker__native",
+                    **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
                     "data-cv-search-picker": "true",
                     "data-picker-mode": "single",
                     "data-picker-variant": "compact",
@@ -125,21 +127,21 @@ class PlanoIdentificacaoForm(forms.ModelForm):
             "contextualizacao": forms.Textarea(
                 attrs={
                     "rows": 7,
-                    "class": "cv-field__control cv-field__control--textarea",
+                    **widget_attrs(WidgetStyle.FIELD_CONTROL_TEXTAREA),
                     "placeholder": "Deixe em branco para gerar automaticamente a partir do destino e do programa.",
                 },
             ),
             "consideracao_final": forms.Textarea(
                 attrs={
                     "rows": 4,
-                    "class": "cv-field__control cv-field__control--textarea",
+                    **widget_attrs(WidgetStyle.FIELD_CONTROL_TEXTAREA),
                     "placeholder": "Deixe em branco para gerar automaticamente a partir do destino.",
                 },
             ),
             "coordenacao": forms.Textarea(
                 attrs={
                     "rows": 4,
-                    "class": "cv-field__control cv-field__control--textarea",
+                    **widget_attrs(WidgetStyle.FIELD_CONTROL_TEXTAREA),
                     "placeholder": "Deixe em branco para gerar automaticamente a partir dos coordenadores.",
                 },
             ),
@@ -149,19 +151,19 @@ class PlanoIdentificacaoForm(forms.ModelForm):
                 attrs={"data-pt-coordenador-nome-manual": "adm"},
             ),
             "coordenador_adm_cargo_manual": forms.Select(
-                attrs={"class": "form-select"},
+                attrs={**widget_attrs(WidgetStyle.FORM_SELECT)},
             ),
             "coordenador_adm_genero": forms.Select(
-                attrs={"class": "form-select", "data-pt-coordenador-genero": "adm"},
+                attrs={**widget_attrs(WidgetStyle.FORM_SELECT), "data-pt-coordenador-genero": "adm"},
             ),
             "coordenador_op_nome_manual": forms.HiddenInput(
                 attrs={"data-pt-coordenador-nome-manual": "op"},
             ),
             "coordenador_op_cargo_manual": forms.Select(
-                attrs={"class": "form-select"},
+                attrs={**widget_attrs(WidgetStyle.FORM_SELECT)},
             ),
             "coordenador_op_genero": forms.Select(
-                attrs={"class": "form-select", "data-pt-coordenador-genero": "op"},
+                attrs={**widget_attrs(WidgetStyle.FORM_SELECT), "data-pt-coordenador-genero": "op"},
             ),
         }
 
@@ -478,12 +480,12 @@ class PlanoDiariasForm(forms.ModelForm):
         widgets = {
             "saida_sede_data": forms.HiddenInput(attrs={"data-pt-diarias-saida-data": "true", "data-pt-diarias-input": "true"}),
             "saida_sede_hora": forms.TimeInput(
-                attrs={"type": "time", "class": "cv-field__control", "data-pt-diarias-input": "true"},
+                attrs={"type": "time", **widget_attrs(WidgetStyle.FIELD_CONTROL), "data-pt-diarias-input": "true"},
                 format="%H:%M",
             ),
             "chegada_sede_data": forms.HiddenInput(attrs={"data-pt-diarias-chegada-data": "true", "data-pt-diarias-input": "true"}),
             "chegada_sede_hora": forms.TimeInput(
-                attrs={"type": "time", "class": "cv-field__control", "data-pt-diarias-input": "true"},
+                attrs={"type": "time", **widget_attrs(WidgetStyle.FIELD_CONTROL), "data-pt-diarias-input": "true"},
                 format="%H:%M",
             ),
         }
@@ -514,7 +516,7 @@ class EfetivoPlanoForm(forms.ModelForm):
         widgets = {
             "unidade": forms.Select(
                 attrs={
-                    "class": "cv-search-picker__native",
+                    **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
                     "data-cv-search-picker": "true",
                     "data-picker-mode": "single",
                     "data-picker-variant": "compact",
@@ -523,9 +525,9 @@ class EfetivoPlanoForm(forms.ModelForm):
                     "data-pt-efetivo-unidade": "true",
                 }
             ),
-            "cargo": forms.Select(attrs={"class": "form-select", "data-pt-efetivo-cargo": "true"}),
+            "cargo": forms.Select(attrs={**widget_attrs(WidgetStyle.FORM_SELECT), "data-pt-efetivo-cargo": "true"}),
             "quantidade": forms.NumberInput(
-                attrs={"class": "cv-field__control", "min": "1", "step": "1", "data-pt-efetivo-qtd": "true"},
+                attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL), "min": "1", "step": "1", "data-pt-efetivo-qtd": "true"},
             ),
         }
 
@@ -580,14 +582,14 @@ class EventoPlanoForm(forms.ModelForm):
         ]
         widgets = {
             "ordem": forms.HiddenInput(),
-            "programa": forms.Select(attrs={"class": "form-select", "data-pt-evento-programa": "true"}),
+            "programa": forms.Select(attrs={**widget_attrs(WidgetStyle.FORM_SELECT), "data-pt-evento-programa": "true"}),
             "programa_outros": forms.TextInput(
-                attrs={"class": "cv-field__control", "data-pt-evento-programa-outros": "true"},
+                attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL), "data-pt-evento-programa-outros": "true"},
             ),
             "data_evento_inicio": forms.HiddenInput(attrs={"data-pt-evento-inicio": "true"}),
             "data_evento_fim": forms.HiddenInput(attrs={"data-pt-evento-fim": "true"}),
             "horario_atendimento": forms.TextInput(
-                attrs={"class": "cv-field__control", "data-pt-evento-horario": "true"},
+                attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL), "data-pt-evento-horario": "true"},
             ),
         }
 
@@ -621,7 +623,7 @@ class EfetivoEventoForm(forms.ModelForm):
         widgets = {
             "unidade": forms.Select(
                 attrs={
-                    "class": "cv-search-picker__native",
+                    **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
                     "data-cv-search-picker": "true",
                     "data-picker-mode": "single",
                     "data-picker-variant": "compact",
@@ -630,9 +632,9 @@ class EfetivoEventoForm(forms.ModelForm):
                     "data-pt-efetivo-unidade": "true",
                 }
             ),
-            "cargo": forms.Select(attrs={"class": "form-select", "data-pt-efetivo-cargo": "true"}),
+            "cargo": forms.Select(attrs={**widget_attrs(WidgetStyle.FORM_SELECT), "data-pt-efetivo-cargo": "true"}),
             "quantidade": forms.NumberInput(
-                attrs={"class": "cv-field__control", "min": "1", "step": "1", "data-pt-efetivo-qtd": "true"},
+                attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL), "min": "1", "step": "1", "data-pt-efetivo-qtd": "true"},
             ),
         }
 
@@ -676,8 +678,8 @@ class ProgramaSolicitanteForm(forms.ModelForm):
         model = ProgramaSolicitante
         fields = ["nome", "ativo", "ordem"]
         widgets = {
-            "nome": forms.TextInput(attrs={"class": "cv-field__control", "data-mask": "upper"}),
-            "ordem": forms.NumberInput(attrs={"class": "cv-field__control", "min": "0", "step": "1"}),
+            "nome": forms.TextInput(attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL), "data-mask": "upper"}),
+            "ordem": forms.NumberInput(attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL), "min": "0", "step": "1"}),
         }
 
 
@@ -689,18 +691,18 @@ class AtividadePlanoTrabalhoForm(forms.ModelForm):
         fields = ["codigo", "nome", "meta", "recurso_necessario", "ordem", "ativo"]
         widgets = {
             "codigo": forms.TextInput(
-                attrs={"class": "cv-field__control", "placeholder": "Ex.: CIN", "autocomplete": "off"},
+                attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL), "placeholder": "Ex.: CIN", "autocomplete": "off"},
             ),
             "nome": forms.TextInput(
-                attrs={"class": "cv-field__control", "autocomplete": "off"},
+                attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL), "autocomplete": "off"},
             ),
             "meta": forms.Textarea(
-                attrs={"rows": 4, "class": "cv-field__control cv-field__control--textarea"},
+                attrs={"rows": 4, **widget_attrs(WidgetStyle.FIELD_CONTROL_TEXTAREA)},
             ),
             "recurso_necessario": forms.Textarea(
-                attrs={"rows": 4, "class": "cv-field__control cv-field__control--textarea"},
+                attrs={"rows": 4, **widget_attrs(WidgetStyle.FIELD_CONTROL_TEXTAREA)},
             ),
-            "ordem": forms.NumberInput(attrs={"class": "cv-field__control", "min": "0", "step": "10"}),
+            "ordem": forms.NumberInput(attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL), "min": "0", "step": "10"}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -740,19 +742,19 @@ class AtividadePlanoTrabalhoQuickAddForm(forms.ModelForm):
         }
         widgets = {
             "nome": forms.TextInput(
-                attrs={"class": "form-control", "autocomplete": "off", "placeholder": "Nome da atividade"},
+                attrs={**widget_attrs(WidgetStyle.FORM_CONTROL), "autocomplete": "off", "placeholder": "Nome da atividade"},
             ),
             "recurso_necessario": forms.Textarea(
                 attrs={
                     "rows": 3,
-                    "class": "cv-field__control cv-field__control--textarea",
+                    **widget_attrs(WidgetStyle.FIELD_CONTROL_TEXTAREA),
                     "placeholder": "Recursos necessários para a atividade",
                 },
             ),
             "meta": forms.Textarea(
                 attrs={
                     "rows": 3,
-                    "class": "cv-field__control cv-field__control--textarea",
+                    **widget_attrs(WidgetStyle.FIELD_CONTROL_TEXTAREA),
                     "placeholder": "Meta exibida no documento",
                 },
             ),
@@ -795,11 +797,11 @@ class PresetAtividadesQuickAddForm(forms.ModelForm):
         }
         widgets = {
             "nome": forms.TextInput(
-                attrs={"class": "form-control", "autocomplete": "off", "placeholder": "Ex.: PCPR na Comunidade"},
+                attrs={**widget_attrs(WidgetStyle.FORM_CONTROL), "autocomplete": "off", "placeholder": "Ex.: PCPR na Comunidade"},
             ),
             "atividades": forms.CheckboxSelectMultiple(
                 attrs={
-                    "class": "pt-preset-activity-grid",
+                    **widget_attrs(WidgetStyle.PT_PRESET_ACTIVITY_GRID),
                     "data-pt-preset-atividades": "true",
                 },
             ),
@@ -840,6 +842,6 @@ class HorarioAtendimentoForm(forms.ModelForm):
         model = HorarioAtendimento
         fields = ["faixa", "ativo", "ordem"]
         widgets = {
-            "faixa": forms.TextInput(attrs={"class": "cv-field__control", "placeholder": "Ex.: 09:00 até 17:00"}),
-            "ordem": forms.NumberInput(attrs={"class": "cv-field__control", "min": "0", "step": "1"}),
+            "faixa": forms.TextInput(attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL), "placeholder": "Ex.: 09:00 até 17:00"}),
+            "ordem": forms.NumberInput(attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL), "min": "0", "step": "1"}),
         }

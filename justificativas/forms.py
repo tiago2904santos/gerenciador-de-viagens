@@ -1,5 +1,7 @@
 from django import forms
 
+from core.forms.widgets import WidgetStyle
+from core.forms.widgets import widget_attrs
 from oficios.models import Oficio
 
 from .models import Justificativa
@@ -55,13 +57,13 @@ class JustificativaOficioForm(forms.ModelForm):
         widgets = {
             "modelo": ModeloJustificativaSelect(
                 attrs={
-                    "class": "form-select cv-field__control cv-field__control--select",
+                    **widget_attrs(WidgetStyle.FORM_SELECT_FIELD_CONTROL),
                     "data-modelo-justificativa-select": "true",
                 },
             ),
             "texto": forms.Textarea(
                 attrs={
-                    "class": "cv-field__control cv-field__control--textarea",
+                    **widget_attrs(WidgetStyle.FIELD_CONTROL_TEXTAREA),
                     "rows": 6,
                     "placeholder": "",
                     "data-justificativa-textarea": "true",
@@ -91,7 +93,7 @@ class JustificativaQuickAddForm(forms.Form):
         required=True,
         widget=OficioJustificativaSelectMultiple(
             attrs={
-                "class": "form-select cv-search-picker__native",
+                **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
                 "data-cv-search-picker": "true",
                 "data-picker-mode": "multi",
                 "data-picker-variant": "detailed",
@@ -110,7 +112,7 @@ class JustificativaQuickAddForm(forms.Form):
         empty_label="Selecione um modelo (opcional)",
         widget=ModeloJustificativaSelect(
             attrs={
-                "class": "form-select cv-field__control cv-field__control--select",
+                **widget_attrs(WidgetStyle.FORM_SELECT_FIELD_CONTROL),
                 "data-modelo-justificativa-select": "true",
             },
         ),
@@ -120,7 +122,7 @@ class JustificativaQuickAddForm(forms.Form):
         required=True,
         widget=forms.Textarea(
             attrs={
-                "class": "cv-field__control cv-field__control--textarea",
+                **widget_attrs(WidgetStyle.FIELD_CONTROL_TEXTAREA),
                 "rows": 6,
                 "placeholder": "",
                 "data-justificativa-textarea": "true",
@@ -146,18 +148,18 @@ class ModeloJustificativaForm(forms.ModelForm):
     nome = forms.CharField(
         label="Nome",
         help_text="Use um nome curto para identificar o modelo.",
-        widget=forms.TextInput(attrs={"class": "form-control"}),
+        widget=forms.TextInput(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL)}),
     )
     texto = forms.CharField(
         label="Texto do modelo",
         help_text="Este texto será copiado para a justificativa do ofício e poderá ser editado antes de salvar.",
-        widget=forms.Textarea(attrs={"class": "form-control", "rows": 4}),
+        widget=forms.Textarea(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL), "rows": 4}),
     )
     is_padrao = forms.BooleanField(
         label="Modelo padrão",
         required=False,
         help_text="Marque apenas se este modelo deve ser sugerido como principal.",
-        widget=forms.CheckboxInput(attrs={"class": "app-card-toggle__input"}),
+        widget=forms.CheckboxInput(attrs={**widget_attrs(WidgetStyle.CARD_TOGGLE)}),
     )
 
     class Meta:

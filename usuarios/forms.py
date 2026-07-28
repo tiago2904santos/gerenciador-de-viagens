@@ -3,13 +3,17 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
 from django.db import transaction
 
+from core.forms.widgets import set_widget_style
+from core.forms.widgets import WidgetStyle
+from core.forms.widgets import widget_attrs
+
 from .models import AreaTrabalho
 from .models import VinculoUsuarioArea
 
 
 def _cv_picker_single_attrs(*, label, placeholder, empty_message):
     return {
-        "class": "cv-search-picker__native",
+        **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
         "data-cv-search-picker": "true",
         "data-picker-mode": "single",
         "data-picker-variant": "compact",
@@ -26,14 +30,13 @@ class EstiloCamposMixin:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
-            attrs = getattr(field.widget, "attrs", None)
-            if attrs is None:
+            if getattr(field.widget, "attrs", None) is None:
                 continue
             if isinstance(field.widget, forms.CheckboxInput):
-                attrs.setdefault("class", "app-card-toggle__input sr-only")
-                attrs.setdefault("role", "switch")
+                set_widget_style(field.widget, WidgetStyle.CARD_TOGGLE_SR_ONLY, overwrite=False)
+                field.widget.attrs.setdefault("role", "switch")
             else:
-                attrs.setdefault("class", "form-control")
+                set_widget_style(field.widget, WidgetStyle.FORM_CONTROL, overwrite=False)
 
 
 class AreaTrabalhoForm(EstiloCamposMixin, forms.ModelForm):

@@ -9,6 +9,8 @@ from cadastros.models import Cidade
 from cadastros.models import Estado
 from cadastros.models import Servidor
 from cadastros.services import resolver_sede_ids_desde_configuracao
+from core.forms.widgets import WidgetStyle
+from core.forms.widgets import widget_attrs
 from core.tenancy import filter_queryset_by_area
 from oficios.forms import ModeloMotivoSelect
 from oficios.models import ModeloMotivoOficio
@@ -49,7 +51,7 @@ class OrdemServicoForm(forms.ModelForm):
         required=False,
         widget=forms.Select(
             attrs={
-                "class": "cv-search-picker__native",
+                **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
                 "data-cv-search-picker": "true",
                 "data-picker-mode": "single",
                 "data-picker-variant": "compact",
@@ -64,7 +66,7 @@ class OrdemServicoForm(forms.ModelForm):
         required=False,
         widget=forms.Select(
             attrs={
-                "class": "cv-search-picker__native",
+                **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
                 "data-cv-search-picker": "true",
                 "data-picker-mode": "single",
                 "data-picker-variant": "compact",
@@ -80,7 +82,7 @@ class OrdemServicoForm(forms.ModelForm):
         required=False,
         empty_label="Selecione um modelo (opcional)",
         widget=ModeloMotivoSelect(attrs={
-            "class": "form-select",
+            **widget_attrs(WidgetStyle.FORM_SELECT),
             "data-modelo-motivo-select": "true",
         }),
     )
@@ -104,13 +106,13 @@ class OrdemServicoForm(forms.ModelForm):
         ]
         widgets = {
             "oficios": OficioMultiSelectWidget(attrs={
-                "class": "termo-oficio-source-select os-oficio-source-select",
+                **widget_attrs(WidgetStyle.TERM_OFICIO_OS_SOURCE),
                 "hidden": True,
             }),
             "data_evento_inicio": forms.HiddenInput(attrs={"data-cv-date-picker-start-value": "true"}),
             "data_evento_fim": forms.HiddenInput(attrs={"data-cv-date-picker-end-value": "true"}),
             "servidores": ServidorEquipeSelectMultiple(attrs={
-                "class": "form-select cv-search-picker__native",
+                **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
                 "data-cv-search-picker": "true",
                 "data-picker-mode": "multi",
                 "data-picker-variant": "detailed",
@@ -126,7 +128,7 @@ class OrdemServicoForm(forms.ModelForm):
                 "data-os-model-option": "true",
             }),
             "motorista_equipe": ServidorMotoristaSelect(attrs={
-                "class": "form-select cv-search-picker__native",
+                **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
                 "data-cv-search-picker": "true",
                 "data-picker-mode": "single",
                 "data-picker-variant": "detailed",
@@ -134,7 +136,7 @@ class OrdemServicoForm(forms.ModelForm):
                 "data-empty-message": "Nenhum servidor encontrado.",
             }),
             "tecnico_equipe": ServidorMotoristaSelect(attrs={
-                "class": "form-select cv-search-picker__native",
+                **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
                 "data-cv-search-picker": "true",
                 "data-picker-mode": "single",
                 "data-picker-variant": "detailed",
@@ -142,7 +144,7 @@ class OrdemServicoForm(forms.ModelForm):
                 "data-empty-message": "Nenhum servidor encontrado.",
             }),
             "apoio_montagem": ServidorMotoristaSelect(attrs={
-                "class": "form-select cv-search-picker__native",
+                **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
                 "data-cv-search-picker": "true",
                 "data-picker-mode": "single",
                 "data-picker-variant": "detailed",
@@ -150,7 +152,7 @@ class OrdemServicoForm(forms.ModelForm):
                 "data-empty-message": "Nenhum servidor encontrado.",
             }),
             "apoio_escolta": ServidorMotoristaSelect(attrs={
-                "class": "form-select cv-search-picker__native",
+                **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
                 "data-cv-search-picker": "true",
                 "data-picker-mode": "single",
                 "data-picker-variant": "detailed",
@@ -158,7 +160,7 @@ class OrdemServicoForm(forms.ModelForm):
                 "data-empty-message": "Nenhum servidor encontrado.",
             }),
             "coordenador_cerimonial": ServidorMotoristaSelect(attrs={
-                "class": "form-select cv-search-picker__native",
+                **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
                 "data-cv-search-picker": "true",
                 "data-picker-mode": "single",
                 "data-picker-variant": "detailed",
@@ -166,7 +168,7 @@ class OrdemServicoForm(forms.ModelForm):
                 "data-empty-message": "Nenhum servidor encontrado.",
             }),
             "apoio_cerimonial": ServidorMotoristaSelect(attrs={
-                "class": "form-select cv-search-picker__native",
+                **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
                 "data-cv-search-picker": "true",
                 "data-picker-mode": "single",
                 "data-picker-variant": "detailed",
@@ -174,7 +176,7 @@ class OrdemServicoForm(forms.ModelForm):
                 "data-empty-message": "Nenhum servidor encontrado.",
             }),
             "apoio_preparacao": ServidorMotoristaSelect(attrs={
-                "class": "form-select cv-search-picker__native",
+                **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
                 "data-cv-search-picker": "true",
                 "data-picker-mode": "single",
                 "data-picker-variant": "detailed",
@@ -183,7 +185,7 @@ class OrdemServicoForm(forms.ModelForm):
             }),
             "motivo": forms.Textarea(attrs={
                 "rows": 5,
-                "class": "cv-field__control cv-field__control--textarea",
+                **widget_attrs(WidgetStyle.FIELD_CONTROL_TEXTAREA),
                 "placeholder": "Descreva o motivo ou finalidade desta ordem de serviço...",
                 "data-motivo-textarea": "true",
             }),

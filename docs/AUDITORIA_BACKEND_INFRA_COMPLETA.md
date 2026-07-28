@@ -126,6 +126,11 @@ A memória do projeto registra o sintoma disso: "roteiro duplicado sobrescreve" 
 
 Todos os 9 `forms.py` embutem classe CSS e placeholder no widget (`planos_trabalho/forms.py` sozinho tem 48). Consequência direta para a reconstrução do CSS: **renomear uma classe de campo exige tocar 9 arquivos Python**. O contrato de classes de campo (`form-control`, `cv-field__control`, `cv-search-picker__native`…) precisa viver num único lugar (widget base próprio ou o `field.html`), não espalhado em Python.
 
+**Resolvido (P-04):** os 19 valores distintos de classe foram centralizados em
+`core/forms/widgets.py`; os `forms.py` agora referenciam estilos canônicos sem
+embutir o nome CSS. O HTML renderizado de cinco formulários representativos
+permaneceu byte a byte idêntico.
+
 ### 3.5 Tratamento de erro — 155 `except Exception`
 
 Concentração: `integracoes/google_drive` (**57** entre organizer/views/signals/services/status), `prestacoes_contas/services.py` (7), adapters de PDF (11). Para uma integração externa, engolir exceção é às vezes correto — mas 57 no mesmo pacote sem canal de observabilidade padronizado significa que falha de upload/organização de Drive é invisível. `core/logging.py` (JSON estruturado) existe e é usado no prod — os `except` deveriam todos logar por ele.
@@ -275,7 +280,7 @@ Pares off-by-one (`720/721`, `840/841`, `1180/1181`, `767/768`, `599/600`, `479/
 | P-01 | 🟠 | Selectors ausentes nos 4 apps com mais ORM em view (eventos 17×, termos 7×, OS 7×, PT 5×) | §3.1 |
 | P-02 | 🟠 | CRUD de catálogo reimplementado em 5 arquivos | §3.2 |
 | P-03 | 🟠 | `roteiros`, `termos`, `justificativas` com **0 constraints e 0 indexes**; dedupe de roteiro feito em aplicação | §3.3 |
-| P-04 | 🟠 | 194 `attrs={...}` com classes CSS dentro de `forms.py` — acopla a reconstrução do CSS ao Python | §3.4 |
+| P-04 | ✅ | 194 classes de widget centralizadas em `core/forms/widgets.py`, sem alteração do HTML emitido | §3.4 |
 | P-05 | 🟠 | 155 `except Exception`, 57 no Google Drive, sem logging obrigatório | §3.5 |
 | P-06 | 🟡 | `planos_trabalho/views.py` (1.235 l.) e `oficios/views.py` (1.170 l.) monolíticos | §3.1 |
 | P-07 | 🟡 | `core/models.py`: 3 models sem `__str__` | §3.3 |

@@ -2,6 +2,9 @@
 
 from django import forms
 
+from core.forms.widgets import set_widget_style
+from core.forms.widgets import WidgetStyle
+from core.forms.widgets import widget_attrs
 from core.normalizers import normalize_plate
 from core.normalizers import normalize_upper
 from core.tenancy import filter_queryset_by_area
@@ -52,16 +55,15 @@ class BaseCadastroForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for _name, field in self.fields.items():
-            attrs = getattr(field.widget, "attrs", None)
-            if attrs is None:
+            if getattr(field.widget, "attrs", None) is None:
                 continue
             if isinstance(field.widget, forms.CheckboxInput):
-                attrs.setdefault("class", "app-card-toggle__input sr-only")
-                attrs.setdefault("role", "switch")
+                set_widget_style(field.widget, WidgetStyle.CARD_TOGGLE_SR_ONLY, overwrite=False)
+                field.widget.attrs.setdefault("role", "switch")
                 continue
-            attrs.setdefault("class", "form-control")
+            set_widget_style(field.widget, WidgetStyle.FORM_CONTROL, overwrite=False)
             if isinstance(field, forms.CharField):
-                attrs.setdefault("data-mask", "upper")
+                field.widget.attrs.setdefault("data-mask", "upper")
 
 
 def _servidor_option_attrs(servidor):
@@ -141,7 +143,7 @@ class UnidadeForm(BaseCadastroForm):
         queryset=Servidor.objects.none(),
         widget=ServidorFiltroSelectMultiple(
             attrs={
-                "class": "cv-search-picker__native",
+                **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
                 "data-cv-search-picker": "true",
                 "data-picker-mode": "multi",
                 "data-picker-variant": "compact",
@@ -216,7 +218,7 @@ class CidadeForm(BaseCadastroForm):
         super().__init__(*args, **kwargs)
         self.fields["estado"].queryset = Estado.objects.order_by("nome")
         self.fields["estado"].empty_label = "Selecione"
-        self.fields["estado"].widget.attrs["class"] = "form-select"
+        set_widget_style(self.fields["estado"].widget, WidgetStyle.FORM_SELECT)
         for fname in ("latitude", "longitude"):
             if fname in self.fields:
                 self.fields[fname].required = False
@@ -229,7 +231,7 @@ class CidadeForm(BaseCadastroForm):
 
 _TOGGLE_WIDGET = forms.CheckboxInput(
     attrs={
-        "class": "app-card-toggle__input sr-only",
+        **widget_attrs(WidgetStyle.CARD_TOGGLE_SR_ONLY),
         "role": "switch",
     },
 )
@@ -295,7 +297,7 @@ class ServidorForm(BaseCadastroForm):
                 "autocomplete": "off",
                 "data-mask": "cpf",
                 "maxlength": "14",
-                "class": "form-control",
+                **widget_attrs(WidgetStyle.FORM_CONTROL),
             },
         ),
     )
@@ -308,7 +310,7 @@ class ServidorForm(BaseCadastroForm):
                 "placeholder": "00.000.000-0",
                 "autocomplete": "off",
                 "data-mask": "rg",
-                "class": "form-control",
+                **widget_attrs(WidgetStyle.FORM_CONTROL),
             },
         ),
     )
@@ -322,7 +324,7 @@ class ServidorForm(BaseCadastroForm):
                 "inputmode": "numeric",
                 "autocomplete": "off",
                 "data-mask": "telefone",
-                "class": "form-control",
+                **widget_attrs(WidgetStyle.FORM_CONTROL),
             },
         ),
     )
@@ -334,13 +336,13 @@ class ServidorForm(BaseCadastroForm):
         super().__init__(*args, **kwargs)
         self.fields["cargo"].required = False
         self.fields["cargo"].empty_label = "Selecione (opcional)"
-        self.fields["cargo"].widget.attrs["class"] = "form-select"
+        set_widget_style(self.fields["cargo"].widget, WidgetStyle.FORM_SELECT)
         self.fields["cargo"].queryset = filter_queryset_by_area(Cargo.objects).order_by("nome")
         self.fields["unidade"].required = False
         self.fields["unidade"].empty_label = "Selecione (opcional)"
         self.fields["unidade"].widget = UnidadeSearchSelect(
             attrs={
-                "class": "cv-search-picker__native",
+                **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
                 "data-cv-search-picker": "true",
                 "data-picker-mode": "single",
                 "data-picker-variant": "compact",
@@ -432,13 +434,13 @@ class ViaturaForm(BaseCadastroForm):
                     "placeholder": "AAA1234 ou AAA1A23",
                     "autocomplete": "off",
                     "data-mask": "placa",
-                    "class": "form-control",
+                    **widget_attrs(WidgetStyle.FORM_CONTROL),
                 },
             ),
-            "tipo": forms.Select(attrs={"class": "form-select"}),
+            "tipo": forms.Select(attrs={**widget_attrs(WidgetStyle.FORM_SELECT)}),
             "motoristas": ServidorFiltroSelectMultiple(
                 attrs={
-                    "class": "cv-search-picker__native",
+                    **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
                     "data-cv-search-picker": "true",
                     "data-picker-mode": "multi",
                     "data-picker-variant": "compact",
@@ -455,7 +457,7 @@ class ViaturaForm(BaseCadastroForm):
         super().__init__(*args, **kwargs)
         self.fields["combustivel"].required = False
         self.fields["combustivel"].empty_label = "Selecione (opcional)"
-        self.fields["combustivel"].widget.attrs["class"] = "form-select"
+        set_widget_style(self.fields["combustivel"].widget, WidgetStyle.FORM_SELECT)
         self.fields["combustivel"].queryset = filter_queryset_by_area(Combustivel.objects).order_by("nome")
         self.fields["tipo"].required = False
         self.fields["unidade"].required = False
@@ -463,7 +465,7 @@ class ViaturaForm(BaseCadastroForm):
         self.fields["unidade"].label = "Unidade (opcional)"
         self.fields["unidade"].widget = UnidadeSearchSelect(
             attrs={
-                "class": "cv-search-picker__native",
+                **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
                 "data-cv-search-picker": "true",
                 "data-picker-mode": "single",
                 "data-picker-variant": "compact",
@@ -518,20 +520,20 @@ class ConfiguracaoSistemaForm(forms.ModelForm):
         widgets = {
             "cep": forms.TextInput(
                 attrs={
-                    "class": "form-control",
+                    **widget_attrs(WidgetStyle.FORM_CONTROL),
                     "data-mask": "cep",
                     "inputmode": "numeric",
                     "placeholder": "00000-000",
                     "autocomplete": "off",
                 }
             ),
-            "logradouro": forms.TextInput(attrs={"class": "form-control", "data-mask": "upper"}),
-            "numero": forms.TextInput(attrs={"class": "form-control", "autocomplete": "off"}),
-            "bairro": forms.TextInput(attrs={"class": "form-control", "data-mask": "upper"}),
-            "cidade_endereco": forms.TextInput(attrs={"class": "form-control", "data-mask": "upper"}),
+            "logradouro": forms.TextInput(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL), "data-mask": "upper"}),
+            "numero": forms.TextInput(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL), "autocomplete": "off"}),
+            "bairro": forms.TextInput(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL), "data-mask": "upper"}),
+            "cidade_endereco": forms.TextInput(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL), "data-mask": "upper"}),
             "telefone": forms.TextInput(
                 attrs={
-                    "class": "form-control",
+                    **widget_attrs(WidgetStyle.FORM_CONTROL),
                     "data-mask": "telefone",
                     "inputmode": "numeric",
                     "placeholder": "(00) 00000-0000",
@@ -540,7 +542,7 @@ class ConfiguracaoSistemaForm(forms.ModelForm):
             ),
             "ramal": forms.TextInput(
                 attrs={
-                    "class": "form-control",
+                    **widget_attrs(WidgetStyle.FORM_CONTROL),
                     "autocomplete": "off",
                     "maxlength": "20",
                     "placeholder": "Ex.: 1234",
@@ -548,7 +550,7 @@ class ConfiguracaoSistemaForm(forms.ModelForm):
             ),
             "email": forms.EmailInput(
                 attrs={
-                    "class": "form-control",
+                    **widget_attrs(WidgetStyle.FORM_CONTROL),
                     "type": "email",
                     "autocomplete": "off",
                 }
@@ -563,7 +565,7 @@ class ConfiguracaoSistemaForm(forms.ModelForm):
         self.fields["unidade"].label = "Unidade"
         self.fields["unidade"].widget = UnidadePorExtensoSearchSelect(
             attrs={
-                "class": "cv-search-picker__native",
+                **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
                 "data-cv-search-picker": "true",
                 "data-picker-mode": "single",
                 "data-picker-variant": "compact",
@@ -590,7 +592,7 @@ class ConfiguracaoSistemaForm(forms.ModelForm):
             required=False,
             widget=forms.TextInput(
                 attrs={
-                    "class": "form-control",
+                    **widget_attrs(WidgetStyle.FORM_CONTROL),
                     "readonly": "readonly",
                     "tabindex": "-1",
                     "data-uf-nome": "true",
@@ -701,7 +703,7 @@ class ConfiguracaoAssinaturasForm(forms.Form):
                 initial=existing.get(tipo),
                 widget=_AssinanteServidorSelect(
                     attrs={
-                        "class": "cv-search-picker__native",
+                        **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
                         "data-cv-search-picker": "true",
                         "data-picker-mode": "single",
                         "data-picker-variant": "compact",
@@ -749,10 +751,10 @@ class ConfiguracaoDestinatarioForm(forms.ModelForm):
         widgets = {
             "destinatario_oficio_nome": forms.HiddenInput(),
             "destinatario_oficio_cargo": forms.TextInput(
-                attrs={"class": "form-control", "data-mask": "upper", "placeholder": "Cargo do destinatário"}
+                attrs={**widget_attrs(WidgetStyle.FORM_CONTROL), "data-mask": "upper", "placeholder": "Cargo do destinatário"}
             ),
             "destinatario_oficio_unidade": forms.TextInput(
-                attrs={"class": "form-control", "data-mask": "upper", "placeholder": "Unidade lotada do destinatário"}
+                attrs={**widget_attrs(WidgetStyle.FORM_CONTROL), "data-mask": "upper", "placeholder": "Unidade lotada do destinatário"}
             ),
         }
 
@@ -763,7 +765,7 @@ class ConfiguracaoDestinatarioForm(forms.ModelForm):
         self.fields["destinatario_oficio"].label = "Nome"
         self.fields["destinatario_oficio"].widget = _AssinanteServidorSelect(
             attrs={
-                "class": "cv-search-picker__native",
+                **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
                 "data-cv-search-picker": "true",
                 "data-picker-mode": "single",
                 "data-picker-variant": "compact",
@@ -807,13 +809,13 @@ class TabelaDiariaForm(forms.ModelForm):
         model = TabelaDiaria
         fields = ["faixa", "vigencia_inicio", "valor_24h"]
         widgets = {
-            "faixa": forms.Select(attrs={"class": "form-control cv-field__control"}),
+            "faixa": forms.Select(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL_FIELD_CONTROL)}),
             # O calendário do sistema é o componente global `cv-date-picker`;
             # o campo em si é só o hidden que ele preenche.
             "vigencia_inicio": forms.HiddenInput(attrs={"data-cv-date-picker-value": ""}),
             "valor_24h": forms.NumberInput(
                 attrs={
-                    "class": "form-control cv-field__control",
+                    **widget_attrs(WidgetStyle.FORM_CONTROL_FIELD_CONTROL),
                     "step": "0.01",
                     "min": "0.01",
                     "inputmode": "decimal",
