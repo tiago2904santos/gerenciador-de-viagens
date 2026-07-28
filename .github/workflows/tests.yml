@@ -30,6 +30,10 @@ jobs:
       DB_PASSWORD: postgres
       DB_HOST: 127.0.0.1
       DB_PORT: "5432"
+      COVERAGE_APPS: >-
+        core,usuarios,cadastros,roteiros,eventos,documentos,oficios,termos,
+        justificativas,planos_trabalho,ordens_servico,diario_bordo,
+        integracoes.google_drive,prestacoes_contas,ui_lab2
 
     steps:
       - uses: actions/checkout@v4
@@ -48,6 +52,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip==26.1.2
           python -m pip install -r requirements/lock.txt
+          python -m pip install -r requirements/test-lock.txt
           python -m pip install "pip-audit>=2.9,<3.0"
 
       - name: Validate migrations and Django configuration
@@ -125,5 +130,53 @@ jobs:
             bash scripts/restore_backup.sh "$BACKUP_FILE"
           test "$(cat "$RUNNER_TEMP/media/probe.txt")" = "restore-drill"
 
-      - name: Run complete Django test suite on PostgreSQL
-        run: python manage.py test --settings=config.settings.test -v 1
+      - name: Run complete Django test suite with coverage on PostgreSQL
+        run: |
+          python -m coverage run \
+            --source="$COVERAGE_APPS" \
+            --omit="*/migrations/*,*/tests/*" \
+            manage.py test --settings=config.settings.test -v 1
+          python -m coverage json -o coverage.json
+
+      - name: Report and enforce coverage floors by app
+        run: |
+          python - <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          floors = json.loads(Path(".github/coverage-floors.json").read_text())
+          report = json.loads(Path("coverage.json").read_text())
+          files = report["files"]
+          failures = []
+
+          print(f"{'App':28} {'Coverage':>10} {'Floor':>10}  Status")
+          print(f"{'-' * 28} {'-' * 10} {'-' * 10}  {'-' * 6}")
+          for app, floor in sorted(floors.items()):
+              prefix = app.replace(".", "/") + "/"
+              summaries = [
+                  details["summary"]
+                  for filename, details in files.items()
+                  if filename.replace("\\", "/").startswith(prefix)
+              ]
+              statements = sum(item["num_statements"] for item in summaries)
+              covered = sum(item["covered_lines"] for item in summaries)
+              if not statements:
+                  failures.append(f"{app}: no measured production statements")
+                  print(f"{app:28} {'n/a':>10} {floor:9.2f}%  FAIL")
+                  continue
+
+              percent = round(100 * covered / statements, 2)
+              passed = percent >= floor
+              status = "PASS" if passed else "FAIL"
+              print(f"{app:28} {percent:9.2f}% {floor:9.2f}%  {status}")
+              if not passed:
+                  failures.append(
+                      f"{app}: coverage {percent:.2f}% is below floor {floor:.2f}%"
+                  )
+
+          if failures:
+              for failure in failures:
+                  print(f"::error title=Coverage floor regression::{failure}")
+              sys.exit(1)
+          PY
