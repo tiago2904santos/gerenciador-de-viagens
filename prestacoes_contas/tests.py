@@ -171,14 +171,14 @@ class PrestacaoServidorDiariaOverrideTests(TestCase):
         self.assertEqual(contexto["diaria"], "R$100,00")
 
     def test_contexto_usa_override_apenas_do_servidor_ajustado(self):
-        self.ps_b.diaria_valor_override = "R$80,00"
+        self.ps_b.diaria_valor_override = Decimal("80.00")
         self.ps_b.save(update_fields=["diaria_valor_override"])
 
         self.assertEqual(build_relatorio_tecnico_context(self.relatorio, self.ps_a)["diaria"], "R$100,00")
         self.assertEqual(build_relatorio_tecnico_context(self.relatorio, self.ps_b)["diaria"], "R$80,00")
 
     def test_rt_criar_get_mostra_selo_so_no_servidor_com_override(self):
-        self.ps_b.diaria_valor_override = "R$80,00"
+        self.ps_b.diaria_valor_override = Decimal("80.00")
         self.ps_b.save(update_fields=["diaria_valor_override"])
 
         response = self.client.get(reverse("prestacoes_contas:rt_servidor", args=[self.ps_b.pk]))
@@ -209,8 +209,9 @@ class PrestacaoServidorDiariaOverrideTests(TestCase):
         self.ps_a.refresh_from_db()
         self.ps_b.refresh_from_db()
         self.relatorio.refresh_from_db()
-        self.assertEqual(self.ps_b.diaria_valor_override, "R$80,00 (saque)")
-        self.assertEqual(self.ps_a.diaria_valor_override, "")
+        self.assertEqual(self.ps_b.diaria_valor_override, Decimal("80.00"))
+        self.assertEqual(self.ps_b.diaria_valor_override_observacao, "(saque)")
+        self.assertIsNone(self.ps_a.diaria_valor_override)
         self.assertEqual(self.relatorio.diaria, "R$100,00")
 
     def test_rt_criar_post_salva_override_sem_js(self):
@@ -235,8 +236,8 @@ class PrestacaoServidorDiariaOverrideTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.ps_a.refresh_from_db()
         self.ps_b.refresh_from_db()
-        self.assertEqual(self.ps_b.diaria_valor_override, "R$80,00")
-        self.assertEqual(self.ps_a.diaria_valor_override, "")
+        self.assertEqual(self.ps_b.diaria_valor_override, Decimal("80.00"))
+        self.assertIsNone(self.ps_a.diaria_valor_override)
 
     def test_autosave_salva_periodo_de_liberacao_e_saque(self):
         liberacao_name = f"ps-{self.ps_a.pk}-data_liberacao_diarias"

@@ -16,6 +16,7 @@ from oficios.presenters import (
 )
 
 from .forms import PrestacaoSolicitacaoForm
+from .services import diaria_recebida_display
 from .models import PrestacaoDocumentoAnexo
 
 
@@ -90,7 +91,7 @@ def _servidor_row(ps, solicitacao_form=None, prestacao_anexos=None, diario_pdf_u
         ),
         "diario_pdf_url": diario_pdf_url,
         "whatsapp_phone": _whatsapp_phone(servidor),
-        "whatsapp_diaria_override": (ps.diaria_valor_override or "").strip(),
+        "whatsapp_diaria_override": diaria_recebida_display(ps),
     }
     row["rt_assinado"] = _anexo_assinado_info(
         anexos,

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from decimal import Decimal
+from decimal import ROUND_HALF_UP
 from io import BytesIO
 from datetime import timedelta
 from pathlib import Path
@@ -10,6 +11,8 @@ from django.utils import timezone
 
 from cadastros.selectors import build_configuracao_context
 from core.normalizers import normalize_spaces
+from core.utils.dinheiro import ValorMonetarioInvalido
+from core.utils.dinheiro import parse_valor_monetario
 from documentos.services.facade import build_default_facade
 from documentos.services.adapters.docxtpl_render import render_docx_bytes
 from documentos.services.adapters.libreoffice_pdf import convert_docx_to_pdf_libreoffice
@@ -182,6 +185,67 @@ def descricao_ajustes_prestacao(prestacao) -> str:
     return f"{corpo}. Justificativa: "
 
 
+def valor_diaria_liberado(servidor_prestacao) -> Decimal | None:
+    """Quanto foi liberado para este servidor, arredondado como no documento.
+
+    É o teto do que ele pode ter recebido. Arredondado antes de comparar
+    porque a divisão por servidor pode ter mais casas do que o documento
+    mostra — sem isso, digitar exatamente o valor impresso seria recusado.
+    """
+    prestacao = servidor_prestacao.prestacao
+    total_servidores = prestacao.oficio.servidores.count() or 1
+    valor = _diaria_por_servidor(roteiro_efetivo(prestacao), total_servidores)
+    if valor is None:
+        return None
+    return valor.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+
+def diaria_recebida_display(servidor_prestacao) -> str:
+    """Número e anotação remontados, como o operador digitou e o documento imprime."""
+    valor = servidor_prestacao.diaria_valor_override
+    if valor is None:
+        return normalize_spaces(servidor_prestacao.diaria_valor_override_observacao or "")
+    partes = [
+        format_currency_br(valor),
+        normalize_spaces(servidor_prestacao.diaria_valor_override_observacao or ""),
+    ]
+    return " ".join(parte for parte in partes if parte)
+
+
+def aplicar_diaria_recebida(servidor_prestacao, texto) -> list[str]:
+    """Interpreta o texto digitado e grava valor + observação. Devolve os erros.
+
+    Um único campo na tela, duas colunas no banco: o operador continua
+    escrevendo "R$ 87,00 (saque)" e o servidor é quem separa. Devolver a lista
+    de erros em vez de levantar exceção é o que permite ao autosave responder
+    campo a campo sem derrubar o resto do formulário.
+    """
+    try:
+        valor, observacao = parse_valor_monetario(texto)
+    except ValorMonetarioInvalido:
+        return [
+            "Informe um valor em reais, como \u201cR$ 87,00\u201d. "
+            "Se precisar explicar a diferença, escreva depois do valor: "
+            "\u201cR$ 87,00 (saque)\u201d."
+        ]
+
+    if valor is not None and valor <= 0:
+        return ["O valor recebido precisa ser maior que zero."]
+
+    if valor is not None:
+        liberado = valor_diaria_liberado(servidor_prestacao)
+        if liberado is not None and valor > liberado:
+            return [
+                f"O valor recebido não pode passar do liberado "
+                f"({format_currency_br(liberado)}). O servidor pode receber "
+                "menos — no saque o caixa não entrega centavos —, nunca mais."
+            ]
+
+    servidor_prestacao.diaria_valor_override = valor
+    servidor_prestacao.diaria_valor_override_observacao = observacao
+    return []
+
+
 def relatorio_tecnico_default_values(prestacao) -> dict:
     values = dict(DEFAULT_CUSTEIO_VALUES)
     diaria = diaria_inicial_da_prestacao(prestacao)
@@ -257,7 +321,9 @@ def build_relatorio_tecnico_context(relatorio: RelatorioTecnico, servidor_presta
     pc = relatorio.prestacao
     oficio = pc.oficio
     servidor = servidor_prestacao.servidor
-    diaria_override = normalize_spaces(getattr(servidor_prestacao, "diaria_valor_override", "") or "")
+    # Número e observação voltam a ser uma string só na hora de imprimir:
+    # o documento continua saindo "R$80,00 (saque)", como sempre saiu.
+    diaria_override = diaria_recebida_display(servidor_prestacao)
     data_rt = _data_relatorio_tecnico(oficio)
     inst = build_configuracao_context()
     defaults = relatorio_tecnico_default_values(pc)

@@ -4,25 +4,29 @@ Primeira fatia em que **dinheiro** aparece. É a rede que a Etapa 3 vai precisar
 o `N-01` (tabela de diárias fixada no código, sem vigência) mexe justamente no
 valor que chega aqui, e sem estes testes a mudança seria feita no escuro.
 
-Duas coisas ficam registradas, ambas caracterizadas e não corrigidas:
+O valor de diária por servidor era **texto livre** — `CharField` sem validação,
+e qualquer string chegava ao documento e ao texto de WhatsApp (`NOVO-10`).
+Estes testes caracterizaram o defeito antes de existir a correção; hoje
+afirmam a regra: o valor é dinheiro, é positivo e **nunca passa do liberado**.
 
-* o valor de diária por servidor é **texto livre** — `CharField` sem validação,
-  só `normalize_spaces`. Qualquer string persiste e chega ao documento e ao
-  texto de WhatsApp (`NOVO-10`);
-* os campos de custeio do RT têm dois regimes: os de lista fechada só aceitam
-  valor do conjunto permitido, os livres aceitam qualquer texto.
+Continua caracterizado, sem juízo de valor: os campos de custeio do RT têm dois
+regimes — os de lista fechada só aceitam valor do conjunto permitido, os livres
+aceitam qualquer texto.
 """
 
 from __future__ import annotations
 
 import json
+from decimal import Decimal
 
 from django.test import TestCase
 from django.urls import reverse
 
+from oficios.models import Oficio
 from prestacoes_contas.models import PrestacaoServidor
 from prestacoes_contas.models import RelatorioTecnico
 from prestacoes_contas.test_helpers import PrestacaoFixturesMixin
+from roteiros.models import Roteiro
 
 
 class DiariaOverrideTests(PrestacaoFixturesMixin, TestCase):
@@ -59,33 +63,98 @@ class DiariaOverrideTests(PrestacaoFixturesMixin, TestCase):
 
         ps_a.refresh_from_db()
         ps_b.refresh_from_db()
-        self.assertEqual(ps_a.diaria_valor_override, "350,00")
-        self.assertEqual(ps_b.diaria_valor_override, "")
+        self.assertEqual(ps_a.diaria_valor_override, Decimal("350.00"))
+        self.assertIsNone(ps_b.diaria_valor_override)
 
-    def test_override_aceita_qualquer_texto_sem_validacao(self):
-        """Caracteriza `NOVO-10`, deliberadamente — não é aprovação.
+    def test_texto_que_nao_e_valor_e_recusado_e_nada_e_gravado(self):
+        """`NOVO-10` corrigido: o que não é número não vira valor de diária.
 
-        `diaria_valor_override` é CharField sem validador. Um erro de digitação
-        vira o valor de diária impresso no relatório técnico do servidor e no
-        texto enviado por WhatsApp, sem nada avisar.
+        Era o defeito mais direto do módulo — um erro de digitação virava o
+        valor impresso no relatório técnico do servidor e no texto de WhatsApp,
+        sem nada avisar. O autosave agora responde 400 e não grava.
         """
         for entrada in ("abc", "R$ mil reais", "-90", "350,00,00"):
             with self.subTest(entrada=entrada):
-                self.autosave_rt(
+                response = self.autosave_rt(
                     **{f"ps-{self.ps.pk}-diaria_valor_override": entrada}
                 )
+
+                self.assertEqual(response.status_code, 400)
+                self.assertIn(
+                    f"ps-{self.ps.pk}-diaria_valor_override",
+                    response.json()["errors"],
+                )
                 self.ps.refresh_from_db()
-                self.assertEqual(self.ps.diaria_valor_override, entrada)
+                self.assertIsNone(self.ps.diaria_valor_override)
+
+    def test_valor_com_anotacao_guarda_numero_e_texto_separados(self):
+        """Uma caixa na tela, duas colunas no banco.
+
+        O operador escreve "R$ 87,00 (saque)" porque o caixa não entrega
+        centavos. O número passa a ser validável; a explicação continua indo
+        para o documento.
+        """
+        self.autosave_rt(
+            **{f"ps-{self.ps.pk}-diaria_valor_override": "R$ 87,00 (saque)"}
+        )
+
+        self.ps.refresh_from_db()
+        self.assertEqual(self.ps.diaria_valor_override, Decimal("87.00"))
+        self.assertEqual(self.ps.diaria_valor_override_observacao, "(saque)")
+
+    def test_valor_recebido_nao_pode_passar_do_liberado(self):
+        """A regra que o campo existia para respeitar e nunca respeitou.
+
+        O servidor pode receber menos do que foi liberado — sacar 87,00 de
+        87,17, porque moeda não sai do caixa. Mais do que o liberado, nunca.
+        """
+        roteiro = Roteiro.objects.create(valor_diarias=Decimal("87.17"))
+        Oficio.objects.filter(pk=self.fixture.oficio.pk).update(roteiro=roteiro)
+
+        recusado = self.autosave_rt(
+            **{f"ps-{self.ps.pk}-diaria_valor_override": "R$ 90,00"}
+        )
+
+        self.assertEqual(recusado.status_code, 400)
+        self.ps.refresh_from_db()
+        self.assertIsNone(self.ps.diaria_valor_override)
+
+        # Abaixo do liberado entra, e o valor exato do documento também.
+        for aceito in ("R$ 87,00", "R$ 87,17"):
+            with self.subTest(valor=aceito):
+                self.autosave_rt(
+                    **{f"ps-{self.ps.pk}-diaria_valor_override": aceito}
+                )
+                self.ps.refresh_from_db()
+                self.assertIsNotNone(self.ps.diaria_valor_override)
+
+    def test_o_documento_continua_imprimindo_valor_e_anotacao_juntos(self):
+        """A separação é interna: o RT sai igual ao que saía antes.
+
+        Se esta asserção quebrar, a migração mudou documento assinado — que é
+        exatamente o que ela não pode fazer.
+        """
+        from prestacoes_contas.services import build_relatorio_tecnico_context
+
+        self.autosave_rt(
+            **{f"ps-{self.ps.pk}-diaria_valor_override": "R$ 87,00 (saque)"}
+        )
+        self.ps.refresh_from_db()
+        self.relatorio.refresh_from_db()
+
+        contexto = build_relatorio_tecnico_context(self.relatorio, self.ps)
+
+        self.assertEqual(contexto["diaria"], "R$87,00 (saque)")
 
     def test_override_em_branco_volta_a_usar_o_valor_compartilhado(self):
         self.autosave_rt(**{f"ps-{self.ps.pk}-diaria_valor_override": "500,00"})
         self.ps.refresh_from_db()
-        self.assertEqual(self.ps.diaria_valor_override, "500,00")
+        self.assertEqual(self.ps.diaria_valor_override, Decimal("500.00"))
 
         self.autosave_rt(**{f"ps-{self.ps.pk}-diaria_valor_override": "   "})
 
         self.ps.refresh_from_db()
-        self.assertEqual(self.ps.diaria_valor_override, "")
+        self.assertIsNone(self.ps.diaria_valor_override)
 
     def test_override_nao_alcanca_servidor_de_outra_prestacao(self):
         """O `filter(prestacao=prestacao)` impede escrita cruzada entre ofícios."""
@@ -97,7 +166,7 @@ class DiariaOverrideTests(PrestacaoFixturesMixin, TestCase):
         )
 
         ps_vizinho.refresh_from_db()
-        self.assertEqual(ps_vizinho.diaria_valor_override, "")
+        self.assertIsNone(ps_vizinho.diaria_valor_override)
 
     def test_autosave_de_rt_de_outra_area_responde_404(self):
         alheia = self.criar_prestacao(numero=90, area=self.outra_area)
