@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <title>Etapa 1 — contraste N-03 / D-20–D-22</title>
+  <link rel="stylesheet" href="/static/css/tokens.css" />
+  <link rel="stylesheet" href="/static/css/theme.css" />
+  <link rel="stylesheet" href="/static/css/dark-redesign.css" />
+  <link rel="stylesheet" href="/static/css/forms.css" />
+  <link rel="stylesheet" href="/static/css/planos-trabalho-eventos.css" />
+  <style>
+    body { margin: 0; padding: 24px; font-family: "Segoe UI", Arial, sans-serif; background: var(--color-bg); color: var(--color-text); }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
+    .panel { display: flex; flex-direction: column; gap: 16px; }
+    h1 { font-size: 1.1rem; color: var(--color-heading); margin: 0 0 8px; }
+    .toolbar { display: flex; gap: 8px; margin-bottom: 20px; }
+    .toolbar button { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-card); color: var(--color-heading); cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <button type="button" data-set-theme="dark">Tema escuro</button>
+    <button type="button" data-set-theme="light">Tema claro</button>
+  </div>
+  <div class="row">
+    <div class="panel">
+      <h1>pte-card (D-20 / D-21 / N-03)</h1>
+      <div class="pte-events__banner">
+        <span>Evento ainda sem deslocamento cadastrado.</span>
+      </div>
+      <article class="pte-card">
+        <header class="pte-card__header">
+          <div class="pte-card__heading">
+            <span class="pte-card__ordem">1</span>
+            <h4 class="pte-card__title">Operação Fronteira Sul</h4>
+          </div>
+        </header>
+        <div class="pte-card__body">
+          <div class="pte-card__info">
+            <div class="pte-card__field">
+              <span class="pte-card__label">Solicitante</span>
+              <span class="pte-card__value">DEIC / Núcleo Especial</span>
+            </div>
+            <div class="pte-card__field">
+              <span class="pte-card__label">Destino</span>
+              <span class="pte-card__value">Foz do Iguaçu / PR</span>
+            </div>
+            <div class="pte-card__field">
+              <span class="pte-card__label">Período</span>
+              <span class="pte-card__value">12/08/2026 — 15/08/2026</span>
+            </div>
+            <div class="pte-card__field">
+              <span class="pte-card__label">Valor</span>
+              <span class="pte-card__value pte-card__value--valor">R$ 4.320,00</span>
+            </div>
+          </div>
+          <div class="pte-card__chips">
+            <span class="pte-card__chip">Multi-evento</span>
+            <span class="pte-card__chip">Com diárias</span>
+          </div>
+        </div>
+      </article>
+    </div>
+    <div class="panel">
+      <h1>app-card-toggle (D-22)</h1>
+      <label class="app-card-toggle" data-card-toggle>
+        <input class="app-card-toggle__input" type="checkbox" />
+        <span class="app-card-toggle__icon" aria-hidden="true">i</span>
+        <span class="app-card-toggle__content">
+          <span class="app-card-toggle__title">Modelo padrão</span>
+          <span class="app-card-toggle__description">Sugestão principal no select</span>
+        </span>
+        <span class="app-card-toggle__state">DESLIGADA</span>
+      </label>
+      <label class="app-card-toggle is-checked" data-card-toggle>
+        <input class="app-card-toggle__input" type="checkbox" checked />
+        <span class="app-card-toggle__icon" aria-hidden="true">i</span>
+        <span class="app-card-toggle__content">
+          <span class="app-card-toggle__title">Ativo</span>
+          <span class="app-card-toggle__description">Disponível para seleção</span>
+        </span>
+        <span class="app-card-toggle__state">LIGADA</span>
+      </label>
+    </div>
+  </div>
+  <script>
+    document.querySelectorAll("[data-set-theme]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.documentElement.setAttribute("data-theme", btn.getAttribute("data-set-theme"));
+      });
+    });
+  </script>
+</body>
+</html>

@@ -193,12 +193,12 @@ Marque aqui, no mesmo PR que faz o trabalho. `[ ]` pendente · `[~]` em andament
 - [ ] `D-02` `.cv-dialog--danger/--warning/--success/--document` sem CSS
 - [ ] `D-03` `.summary-items` sem estilo (Dashboard)
 - [ ] `D-04` `variant="muted"` de botão inexistente
-- [ ] `D-20` / `D-21` `.pte-card` sem regra dark, texto quase preto
-- [ ] `D-22` `.app-card-toggle` pastel claro em tema escuro
+- [x] `D-20` / `D-21` `.pte-card` sem regra dark, texto quase preto
+- [x] `D-22` `.app-card-toggle` pastel claro em tema escuro
 - [ ] `J-05` `extra-download.js` morto em 4 módulos
 - [ ] `J-11` `data-confirm-submit` dispara `confirm()` duas vezes
 - [ ] `N-02` listas de Ofícios e OS sem paginação
-- [ ] `N-03` 3 pares de cor abaixo de 2,3:1
+- [x] `N-03` 3 pares de cor abaixo de 2,3:1
 - [ ] `N-07` paginação incluída em listas sem `page_obj`
 - [ ] `S-01` chave Fernet literal em `dev.py` (rotacionar)
 - [ ] 18 tokens indefinidos (`D-01`, `D-03`, `D-06`, `D-20`, `D-21`)
