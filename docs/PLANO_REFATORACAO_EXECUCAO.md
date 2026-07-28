@@ -341,6 +341,18 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
 
 ---
 
+## 7.1 Escopo novo, fora das oito etapas
+
+Pedidos que não vieram das auditorias entram aqui, com posição decidida antes de
+começarem. Escopo novo que se infiltra numa etapa em curso é como a Etapa 1
+perde o prazo e a Etapa 2 perde a rede.
+
+| Proposta | Estimativa | Situação |
+|---|---:|---|
+| [Arquitetura de configurações](PROPOSTA_CONFIGURACOES.md) — tela por seções declaradas, config por documento, preferências por usuário | 17–28 dias | **aguardando decisão** de posição na fila |
+
+---
+
 ## 8. Os erros que matam este refactor
 
 1. **Começar pelo CSS.** Discutido em §1. É a etapa 7, não a 1.
