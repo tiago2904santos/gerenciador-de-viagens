@@ -131,6 +131,31 @@ Cada `.env` deve ter:
 - `DB_NAME`, `DB_USER` e `DB_PASSWORD` exclusivos daquele ambiente
 - `MEDIA_ROOT` exclusivo daquele ambiente
 - `STATIC_ROOT` exclusivo daquele ambiente
+- `FIELD_ENCRYPTION_KEYS` exclusiva daquele ambiente
+
+### Chave de cifragem de campos
+
+`FIELD_ENCRYPTION_KEYS` protege os campos sensiveis gravados no banco (tokens
+OAuth do Google Drive, entre outros). E obrigatoria em todos os ambientes,
+inclusive desenvolvimento, e **cada ambiente tem a sua**.
+
+Gere assim:
+
+```bash
+python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+```
+
+Regras:
+
+- A chave nunca entra no repositorio — so no `.env` daquele ambiente.
+- Nao reaproveite a chave de outro ambiente. Chave compartilhada significa que
+  quem tem acesso a um ambiente decifra os dados dos outros.
+- **Perder a chave e perder os dados cifrados por ela.** Guarde junto com os
+  segredos do ambiente, com o mesmo cuidado da senha do banco.
+- Para rotacionar: coloque a nova chave primeiro na lista e mantenha a antiga
+  em seguida, separadas por virgula. O sistema passa a cifrar com a nova e
+  continua conseguindo ler o que foi cifrado com a antiga. So remova a antiga
+  depois de reescrever os registros.
 
 ## 4. Rodar migrations em cada ambiente
 

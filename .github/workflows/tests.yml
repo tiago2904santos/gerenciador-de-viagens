@@ -61,12 +61,16 @@ jobs:
       - name: Validate production security settings
         env:
           SECRET_KEY: "ci-only-not-for-production-7c8d2c39f9f54f6c8d25aa12"
-          FIELD_ENCRYPTION_KEYS: "RbJU2kb8Nz8Wp2-31RCWLqETNsn6qEBBo-bLcqdSDTE="
           ALLOWED_HOSTS: "localhost"
           CSRF_TRUSTED_ORIGINS: "https://localhost"
           DOCUMENTOS_DEFAULT_PDF_ENGINE: "unoserver"
           DOCUMENTOS_UNOSERVER_URL: "http://127.0.0.1:2003"
-        run: python manage.py check --deploy --settings=config.settings.prod
+        # A chave é gerada aqui, não commitada: o `check --deploy` só exige que
+        # ela exista e seja válida — não cifra nada. Um literal no arquivo seria
+        # indistinguível de um segredo de verdade, para o scanner e para quem lê.
+        run: |
+          export FIELD_ENCRYPTION_KEYS="$(python -c 'from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())')"
+          python manage.py check --deploy --settings=config.settings.prod
 
       - name: Audit Python dependencies
         # WeasyPrint has no fixed release for PYSEC-2026-3412. Our adapter
@@ -77,6 +81,10 @@ jobs:
 
       - name: Enforce real document generation SLA
         run: |
+          # Este é o único passo que roda sem --settings, então cai em
+          # config.settings.dev — que agora exige FIELD_ENCRYPTION_KEYS. O valor
+          # é irrelevante aqui (nada é cifrado), então é gerado, não commitado.
+          export FIELD_ENCRYPTION_KEYS="$(python -c 'from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())')"
           SITE_PACKAGES="$(python -c 'import site; print(site.getsitepackages()[0])')"
           PYTHONPATH="$SITE_PACKAGES" /usr/bin/python3 -m unoserver.server \
             --interface 127.0.0.1 --port 2003 \

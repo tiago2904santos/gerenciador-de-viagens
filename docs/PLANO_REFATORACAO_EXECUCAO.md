@@ -200,7 +200,12 @@ Marque aqui, no mesmo PR que faz o trabalho. `[ ]` pendente · `[~]` em andament
 - [x] `N-02` listas de Ofícios e OS sem paginação
 - [x] `N-03` 3 pares de cor abaixo de 2,3:1
 - [x] `N-07` paginação incluída em listas sem `page_obj`
-- [ ] `S-01` chave Fernet literal em `dev.py` (rotacionar)
+- [x] `S-01` chave Fernet literal em `dev.py` (rotacionar) — **zero chave commitada**:
+  dev exige a do `.env` (e recusa placeholder), teste gera a cada execução, CI gera
+  no runner. O gate declarado no prompt ("zero chave literal") estava mal formulado,
+  mas a intuição era certa: tentei primeiro manter literais "descartáveis" e o
+  GitGuardian reprovou — chave Fernet válida commitada é indistinguível de segredo
+  real, para o scanner e para quem lê. O critério final é o mais simples: nenhuma.
 - [ ] 18 tokens indefinidos (`D-01`, `D-03`, `D-06`, `D-20`, `D-21`)
 
 **Achados novos (28/07, fora das auditorias — descobertos ao destravar o CI):**
