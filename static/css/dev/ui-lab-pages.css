@@ -98,7 +98,7 @@
 .ui-lab-overview-card,
 .ui-lab-preview-card,
 .ui-lab-placeholder {
-  background: var(--surface-panel);
+  background: var(--color-surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-soft);
@@ -285,7 +285,7 @@
 
 .ui-lab-status-showcase,
 .ui-lab-status-card {
-  background: var(--surface-panel);
+  background: var(--color-surface);
   border: var(--cv-chip-border-width) solid var(--border-subtle);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-soft);

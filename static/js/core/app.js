@@ -392,19 +392,32 @@ document.documentElement.dataset.appReady = "true";
   }
 
   function initConfirmSubmitContracts() {
-    document.addEventListener("click", function (event) {
-      var trigger = event.target.closest("[data-confirm-submit]");
-      if (!trigger) return;
-      var message = trigger.getAttribute("data-confirm-message") || "Confirmar esta ação?";
-      if (!window.confirm(message)) {
-        event.preventDefault();
-      }
-    });
-
+    // Um unico ouvinte, em `submit`. Antes havia dois — um em `click` e outro em
+    // `submit` — e quando o atributo estava no <form> os dois disparavam para o
+    // mesmo envio: o usuario confirmava duas vezes (J-11).
+    //
+    // O atributo aparece nas duas posicoes no sistema: no proprio <form>
+    // (perfil/Drive, reativar evento) e no <button type="submit"> (excluir
+    // documento, remover evento do plano). Por isso o dono da confirmacao e
+    // resolvido a partir do botao que enviou E do formulario — ficar so no
+    // `form[data-confirm-submit]` tiraria a confirmacao dos botoes de excluir.
     document.addEventListener("submit", function (event) {
-      var form = event.target.closest("form[data-confirm-submit]");
-      if (!form) return;
-      var message = form.getAttribute("data-confirm-message") || "Confirmar esta ação?";
+      var form = event.target;
+      if (!form || !form.matches) return;
+
+      // `submitter` diz qual botao enviou; activeElement cobre navegadores
+      // antigos que ainda nao o expoem.
+      var submitter = event.submitter || document.activeElement;
+      var holder = null;
+      if (submitter && submitter.closest) {
+        holder = submitter.closest("[data-confirm-submit]");
+      }
+      if (!holder && form.matches("[data-confirm-submit]")) {
+        holder = form;
+      }
+      if (!holder) return;
+
+      var message = holder.getAttribute("data-confirm-message") || "Confirmar esta ação?";
       if (!window.confirm(message)) {
         event.preventDefault();
       }

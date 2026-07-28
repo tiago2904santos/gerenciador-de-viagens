@@ -56,7 +56,9 @@ jobs:
           python manage.py check --settings=config.settings.test
 
       - name: Block new frontend standards debt
-        run: python scripts/audit_frontend_standards.py --max-warnings 465
+        # Catraca: este número só desce. A Etapa 1 levou 465 → 449 (os hex
+        # hardcoded que saíram de forms.css e planos-trabalho-eventos.css).
+        run: python scripts/audit_frontend_standards.py --max-warnings 449
 
       - name: Validate production security settings
         env:

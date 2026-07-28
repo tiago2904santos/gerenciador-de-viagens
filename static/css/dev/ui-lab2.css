@@ -35,7 +35,7 @@
 .ui-lab2-component__preview {
   border: 1px dashed var(--border-subtle);
   border-radius: var(--radius-lg);
-  background: var(--surface-panel);
+  background: var(--color-surface);
   padding: var(--space-4);
   overflow: auto;
 }
@@ -124,7 +124,7 @@
 .ui-lab2-placeholder {
   border: 1px dashed var(--border-subtle);
   border-radius: var(--radius-lg);
-  background: var(--surface-panel);
+  background: var(--color-surface);
   padding: var(--space-6);
   text-align: center;
   color: var(--theme-text-muted);

@@ -1396,7 +1396,7 @@
 }
 
 .oficio-viatura-selected__pill {
-  background: var(--surface-stepper, var(--surface-card));
+  background: var(--surface-stepper, var(--color-card));
   border: 1px solid var(--border-stepper, var(--border-subtle));
   border-radius: var(--radius-pill);
   color: var(--text-primary, var(--theme-text-heading));

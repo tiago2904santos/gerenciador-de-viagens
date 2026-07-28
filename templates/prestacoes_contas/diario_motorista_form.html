@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block extra_js %}
-  <script src="{% static 'js/components/masks.js' %}?v=20260711" defer></script>
+  {# masks.js ja vem do base.html; carregar de novo baixava duas copias (versoes ?v= diferentes). #}
   <script src="{% static 'js/pages/diario-motorista.js' %}?v=20260711" defer></script>
 {% endblock %}
 
