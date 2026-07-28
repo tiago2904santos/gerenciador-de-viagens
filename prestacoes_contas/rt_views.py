@@ -25,7 +25,9 @@ from .forms import (
 )
 from .models import PrestacaoServidor, RelatorioTecnico
 from .services import (
+    aplicar_diaria_recebida,
     diaria_inicial_da_prestacao,
+    diaria_recebida_display,
     garantir_campos_padrao_relatorio_tecnico,
     gerar_relatorio_tecnico_docx,
     nome_arquivo_rt,
@@ -53,6 +55,9 @@ def _salvar_diaria_overrides(prestacao, fields):
 
     Usado tanto pelo autosave do RT (um campo por servidor no mesmo formulário)
     quanto pelo fallback sem JS do POST de ``rt_criar``.
+
+    Devolve ``{nome_do_campo: [mensagens]}`` para o que foi recusado — vazio
+    quando tudo entrou.
     """
     atualizacoes = {}
     for name, value in fields.items():
@@ -60,13 +65,29 @@ def _salvar_diaria_overrides(prestacao, fields):
         if match:
             atualizacoes[int(match.group(1))] = normalize_spaces(value or "")
     if not atualizacoes:
-        return
+        return {}
+
+    erros = {}
     servidores = PrestacaoServidor.objects.filter(pk__in=atualizacoes.keys(), prestacao=prestacao)
     for ps in servidores:
-        novo = atualizacoes.get(ps.pk, "")
-        if ps.diaria_valor_override != novo:
-            ps.diaria_valor_override = novo
-            ps.save(update_fields=["diaria_valor_override", "atualizado_em"])
+        texto = atualizacoes.get(ps.pk, "")
+        anterior = (ps.diaria_valor_override, ps.diaria_valor_override_observacao)
+        problemas = aplicar_diaria_recebida(ps, texto)
+        if problemas:
+            # Não grava nada deste servidor: um valor recusado não pode virar
+            # meia gravação. O autosave devolve o erro no nome do campo, e a
+            # tela mostra ao lado do input que o operador acabou de digitar.
+            erros[f"ps-{ps.pk}-diaria_valor_override"] = problemas
+            continue
+        if (ps.diaria_valor_override, ps.diaria_valor_override_observacao) != anterior:
+            ps.save(
+                update_fields=[
+                    "diaria_valor_override",
+                    "diaria_valor_override_observacao",
+                    "atualizado_em",
+                ]
+            )
+    return erros
 
 
 def _salvar_rt_autosave(relatorio, clean_fields):
@@ -101,7 +122,13 @@ def _servidor_rt_ctx(ps):
         "ps_pk": ps.pk,
         "nome": ps.servidor.nome,
         "is_motorista": ps.is_motorista,
-        "diaria_ajustada": bool(ps.diaria_valor_override),
+        # O selo também acende quando só sobrou a observação: é o caso dos
+        # valores legados que a migração não conseguiu virar número, e são
+        # justamente os que alguém precisa olhar.
+        "diaria_ajustada": bool(
+            ps.diaria_valor_override is not None
+            or ps.diaria_valor_override_observacao
+        ),
         "diaria_form": PrestacaoServidorDiariaForm(instance=ps, prefix=f"ps-{ps.pk}"),
         "download_pdf_url": reverse(
             "prestacoes_contas:rt_download_servidor_formato", args=[ps.pk, "pdf"]
@@ -134,9 +161,14 @@ def rt_servidor(request, ps_pk):
         form = RelatorioTecnicoForm(request.POST, instance=relatorio, relatorio=relatorio)
         if form.is_valid():
             form.save()
-            _salvar_diaria_overrides(prestacao, request.POST)
+            erros = _salvar_diaria_overrides(prestacao, request.POST)
             _marcar_servidor_em_preenchimento(ps)
-            messages.success(request, "Texto do relatório técnico salvo.")
+            if erros:
+                for mensagens in erros.values():
+                    for mensagem in mensagens:
+                        messages.error(request, mensagem)
+            else:
+                messages.success(request, "Texto do relatório técnico salvo.")
             return redirect("prestacoes_contas:rt_servidor", ps_pk=ps.pk)
     else:
         initial = {}
@@ -196,10 +228,16 @@ def rt_servidor_autosave(request, ps_pk):
     }
     clean_fields = filter_allowed_fields(payload.fields, payload.dirty_fields, allowed_fields)
     _salvar_rt_autosave(relatorio, clean_fields)
-    _salvar_diaria_overrides(
+    erros = _salvar_diaria_overrides(
         ps.prestacao,
         {name: payload.fields.get(name) for name in payload.dirty_fields},
     )
+    if erros:
+        return autosave_json_response(
+            ok=False,
+            errors=erros,
+            message="O valor da diária não foi salvo.",
+        )
     if payload.dirty_fields:
         _marcar_servidor_em_preenchimento(ps)
     return autosave_json_response(
@@ -232,10 +270,19 @@ def rt_autosave(request, pk):
     }
     clean_fields = filter_allowed_fields(payload.fields, payload.dirty_fields, allowed_fields)
     _salvar_rt_autosave(relatorio, clean_fields)
-    _salvar_diaria_overrides(
+    erros = _salvar_diaria_overrides(
         relatorio.prestacao,
         {name: payload.fields.get(name) for name in payload.dirty_fields},
     )
+    if erros:
+        # O texto do RT já foi salvo acima; o que não entrou foi só o valor
+        # recusado. Salvar automaticamente um valor que a regra proíbe seria
+        # pior que devolver erro: ninguém revisa o que salvou sozinho.
+        return autosave_json_response(
+            ok=False,
+            errors=erros,
+            message="O valor da diária não foi salvo.",
+        )
     if payload.dirty_fields:
         _marcar_servidores_pendentes(relatorio.prestacao)
     return autosave_json_response(

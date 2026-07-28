@@ -515,28 +515,53 @@ class PrestacaoSolicitacaoForm(forms.ModelForm):
         }
 
 
-class PrestacaoServidorDiariaForm(forms.ModelForm):
-    """Valor de diária específico de um servidor, usado só no RT dele."""
+class PrestacaoServidorDiariaForm(forms.Form):
+    """Valor de diária efetivamente recebido por um servidor, usado só no RT dele.
 
-    class Meta:
-        model = PrestacaoServidor
-        fields = ["diaria_valor_override"]
-        labels = {"diaria_valor_override": "Diária deste servidor (se for diferente)"}
-        widgets = {
-            "diaria_valor_override": forms.TextInput(
-                attrs={
-                    "class": "form-control cv-field__control",
-                    "placeholder": 'Deixe em branco para usar o valor padrão acima',
-                    "autocomplete": "off",
-                },
-            ),
-        }
-        help_texts = {
-            "diaria_valor_override": (
-                'Ex.: "R$ 80,00". Preencha só quando este servidor recebeu um valor '
-                "diferente do padrão (ex.: houve saque em vez de transferência)."
-            ),
-        }
+    Deixou de ser ``ModelForm``: na tela é **um** campo de texto, no banco são
+    dois (número e observação). Quem separa é ``aplicar_diaria_recebida`` — o
+    mesmo serviço que o autosave usa, para que os dois caminhos de gravação não
+    validem por regras diferentes.
+    """
+
+    diaria_valor_override = forms.CharField(
+        label="Diária recebida por este servidor",
+        required=False,
+        help_text=(
+            'Ex.: "R$ 87,00 (saque)". Preencha só quando o servidor recebeu valor '
+            "diferente do liberado — no saque o caixa não entrega centavos. "
+            "Nunca pode ser maior que o valor liberado."
+        ),
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control cv-field__control",
+                "placeholder": "Deixe em branco para usar o valor padrão acima",
+                "autocomplete": "off",
+            },
+        ),
+    )
+
+    def __init__(self, *args, instance=None, **kwargs):
+        # Import adiado: services importa DEFAULT_CUSTEIO_VALUES deste módulo.
+        from .services import diaria_recebida_display
+
+        self.instance = instance
+        if instance is not None and not kwargs.get("initial"):
+            kwargs["initial"] = {
+                "diaria_valor_override": diaria_recebida_display(instance)
+            }
+        super().__init__(*args, **kwargs)
+
+    def clean_diaria_valor_override(self):
+        from .services import aplicar_diaria_recebida
+
+        texto = self.cleaned_data.get("diaria_valor_override") or ""
+        if self.instance is None:
+            return texto
+        problemas = aplicar_diaria_recebida(self.instance, texto)
+        if problemas:
+            raise forms.ValidationError(problemas)
+        return texto
 
 
 class RelatorioTecnicoForm(forms.ModelForm):

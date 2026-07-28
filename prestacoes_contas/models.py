@@ -144,8 +144,22 @@ class PrestacaoServidor(models.Model):
     # (ex.: quando ele recebeu por saque em vez de transferência e o valor
     # ficou diferente do padrão calculado para o ofício). Em branco usa o
     # valor compartilhado (``RelatorioTecnico.diaria``).
-    diaria_valor_override = models.CharField(
-        "Diária deste servidor (se for diferente)",
+    # Valor que o servidor efetivamente recebeu, quando difere do liberado.
+    # O caso típico é o saque: o caixa não entrega centavos, então de R$ 87,17
+    # liberados o servidor saca R$ 87,00. Nunca mais do que o liberado — essa
+    # é a regra que a validação protege (NOVO-10).
+    diaria_valor_override = models.DecimalField(
+        "Diária recebida por este servidor",
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+    )
+    # Por que o valor difere ("(saque)", "(devolução parcial)"). Fica ao lado
+    # do número no documento, como sempre esteve — antes os dois dividiam um
+    # CharField só, e por isso "abc" chegava ao RT assinado.
+    diaria_valor_override_observacao = models.CharField(
+        "Observação sobre o valor recebido",
         max_length=255,
         blank=True,
         default="",
@@ -185,7 +199,15 @@ class PrestacaoServidor(models.Model):
             models.UniqueConstraint(
                 fields=["prestacao", "servidor"],
                 name="unique_servidor_por_prestacao",
-            )
+            ),
+            # O teto (não passar do liberado) depende do roteiro e fica no
+            # serviço. O piso não depende de nada: dinheiro recebido é
+            # positivo, e disso o banco dá conta.
+            models.CheckConstraint(
+                check=models.Q(diaria_valor_override__isnull=True)
+                | models.Q(diaria_valor_override__gt=0),
+                name="prest_serv_diaria_recebida_positiva",
+            ),
         ]
 
     def __str__(self):

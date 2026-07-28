@@ -293,8 +293,15 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
     valor esteja gravado no documento. Enquanto a tabela só crescer com vigências
     novas o efeito é o mesmo; editar uma vigência já usada recalcularia o
     passado. Entra com `N-05`.
-- [ ] `NOVO-10` `diaria_valor_override` como dinheiro validado (hoje `CharField`
-  livre: `"abc"`, `"-90"` e `"350,00,00"` chegam ao RT assinado)
+- [x] `NOVO-10` `diaria_valor_override` como dinheiro validado. O campo não era
+  "valor diferente por capricho": é o **valor efetivamente recebido**, e a regra
+  que ninguém aplicava é que ele **nunca passa do liberado** — o servidor pode
+  receber menos (no saque o caixa não entrega centavos: de R$ 87,17 ele saca
+  R$ 87,00), nunca mais. Virou `DecimalField` com teto validado nos dois
+  caminhos de gravação, mais um campo de observação para o "(saque)" que antes
+  dividia o mesmo `CharField` com o número. O documento sai idêntico. Migração
+  exercitada no PostgreSQL contra dados legados; valores que não eram número
+  viram observação, sem perda. Cobertura de `core`: 85,99 → 87,11%.
 - [ ] `N-05` unificar as duas regras de complemento
 - [ ] `N-06` `CAPITAIS_POR_UF` → base geográfica IBGE
 - [ ] `N-08` / `N-09` / `N-10` bordas de `_segment_breakdown`, fechamento por servidor, pernoite curto
