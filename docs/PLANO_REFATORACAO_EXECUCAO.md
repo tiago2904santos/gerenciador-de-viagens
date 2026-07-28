@@ -166,6 +166,17 @@ Marque aqui, no mesmo PR que faz o trabalho. `[ ]` pendente · `[~]` em andament
 - [ ] `S-01` chave Fernet literal em `dev.py` (rotacionar)
 - [ ] 18 tokens indefinidos (`D-01`, `D-03`, `D-06`, `D-20`, `D-21`)
 
+**Achados novos (28/07, fora das auditorias — descobertos ao destravar o CI):**
+
+- [x] `NOVO-01` 🔴 O passo *restore drill* do CI nunca passou desde que foi criado (`39f16be`, 27/07): `pg_dump`/`pg_restore` liam o socket Unix local em vez do service container. **Corrigido** em `00930fb`.
+- [ ] `NOVO-02` 🔴 **A suíte é verde em SQLite e vermelha em PostgreSQL** — 2 falhas e 17 erros. Como o CI parava antes de chegar nos testes, isso ficou 5 commits invisível. Produção é PostgreSQL; a suíte local, SQLite. Enquanto essa divergência existir, "812 testes verdes" não é evidência de nada.
+- [ ] `NOVO-03` 🟠 16 dos 17 erros: os mocks do Google Drive montam `file_id`/`atalho_id` em formato de caminho (`mock-atalho-mock-pasta-mock-pasta-root-Eventos-…`) e estouram `varchar(200)`. SQLite ignora o limite; PostgreSQL não. IDs reais do Drive têm ~33 caracteres — **o defeito está no dublê de teste, não no schema**.
+- [ ] `NOVO-04` 🟠 `OficioNumberingConcurrencyTests` (`TransactionTestCase` com `reset_sequences = True`) colide com o signal de auditoria: `duplicate key value violates unique constraint "core_auditevent_pkey"`. O `AuditEvent` entrou em 27/07 e nunca rodou contra PostgreSQL.
+- [ ] `NOVO-05` 🟡 `test_servidores_index_limita_25_por_pagina` assume `pk=1` (`data-delete-url=".../servidores/1/excluir/"`) — dependente de sequência.
+- [ ] `NOVO-06` 🟡 `test_reprocessar_agenda_tasks_pendentes` responde 400 onde espera 302.
+
+> **Consequência para o plano:** `NOVO-02` é pré-requisito da Etapa 2. Não adianta escrever a suíte de Prestações como rede de segurança se a rede só é verificada num banco que não é o de produção.
+
 ### Etapa 2 — Rede de segurança
 - [ ] `T-01` suíte de Prestações: 5 etapas + assinatura pública
 - [ ] `N-04` *golden files* dos 11 documentos gerados
