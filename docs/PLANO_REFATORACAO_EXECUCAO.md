@@ -128,6 +128,43 @@ Decisão de produto continua sendo sua: qual a tabela de diárias vigente, se `d
 vive ou morre (`P-08`), qual motor de PDF é o canônico (`D-01` do backend). Os agentes
 implementam a decisão; não a tomam.
 
+### 5.6 A mecânica: branch, PR e merge
+
+**Nada é feito no `main`.** O `main` só recebe merge de PR aprovado e com CI verde.
+
+**Uma branch por PR, sempre a partir do `main` atualizado:**
+
+```bash
+git checkout main
+git pull origin main            # SEMPRE antes de criar a branch
+git checkout -b codex/etapa1-componentes-globais
+# ... trabalho ...
+git push -u origin codex/etapa1-componentes-globais
+# abrir PR em draft; sair do draft quando o gate da etapa passar
+```
+
+**Convenção de nome:** `<ferramenta>/etapa<N>-<assunto>`. A ferramenta no prefixo faz o
+histórico mostrar quem fez o quê sem abrir o PR — e deixa evidente se duas ferramentas
+encostaram na mesma camada, o que a §4 proíbe.
+
+```
+codex/etapa1-componentes-globais       cursor/etapa1-contraste-wcag
+claude/etapa2-suite-prestacoes         claude/etapa3-diarias-vigencia
+codex/etapa7-css-morto                 cursor/etapa7-record-card
+```
+
+**Nunca empilhe branch sobre branch.** Se a Etapa 6 depende da 4.b, espere a 4.b entrar no
+`main` e só então crie a branch da 6 a partir dele. Branch empilhada transforma um conflito
+em três.
+
+**Depois de cada merge**, atualize o `main` local antes da próxima branch. Quem pula esse
+passo refaz trabalho já mergeado.
+
+**Se o `main` andar enquanto seu PR está aberto:** traga o `main` para dentro da sua branch
+(`git merge origin/main`), resolva na sua branch e empurre. Nunca o contrário.
+
+---
+
 ## 6. Gates — o que trava a regressão
 
 Cada etapa entrega, além do código, **um teste de CI que impede o defeito de voltar**. Sem
@@ -169,13 +206,19 @@ Marque aqui, no mesmo PR que faz o trabalho. `[ ]` pendente · `[~]` em andament
 **Achados novos (28/07, fora das auditorias — descobertos ao destravar o CI):**
 
 - [x] `NOVO-01` 🔴 O passo *restore drill* do CI nunca passou desde que foi criado (`39f16be`, 27/07): `pg_dump`/`pg_restore` liam o socket Unix local em vez do service container. **Corrigido** em `00930fb`.
-- [ ] `NOVO-02` 🔴 **A suíte é verde em SQLite e vermelha em PostgreSQL** — 2 falhas e 17 erros. Como o CI parava antes de chegar nos testes, isso ficou 5 commits invisível. Produção é PostgreSQL; a suíte local, SQLite. Enquanto essa divergência existir, "812 testes verdes" não é evidência de nada.
-- [ ] `NOVO-03` 🟠 16 dos 17 erros: os mocks do Google Drive montam `file_id`/`atalho_id` em formato de caminho (`mock-atalho-mock-pasta-mock-pasta-root-Eventos-…`) e estouram `varchar(200)`. SQLite ignora o limite; PostgreSQL não. IDs reais do Drive têm ~33 caracteres — **o defeito está no dublê de teste, não no schema**.
-- [ ] `NOVO-04` 🟠 `OficioNumberingConcurrencyTests` (`TransactionTestCase` com `reset_sequences = True`) colide com o signal de auditoria: `duplicate key value violates unique constraint "core_auditevent_pkey"`. O `AuditEvent` entrou em 27/07 e nunca rodou contra PostgreSQL.
-- [ ] `NOVO-05` 🟡 `test_servidores_index_limita_25_por_pagina` assume `pk=1` (`data-delete-url=".../servidores/1/excluir/"`) — dependente de sequência.
-- [ ] `NOVO-06` 🟡 `test_reprocessar_agenda_tasks_pendentes` responde 400 onde espera 302.
+- [x] `NOVO-02` 🔴 **A suíte é verde em SQLite e vermelha em PostgreSQL** — 2 falhas e 17 erros. Como o CI parava antes de chegar nos testes, isso ficou 5 commits invisível. Produção é PostgreSQL; a suíte local, SQLite. Enquanto essa divergência existir, "812 testes verdes" não é evidência de nada.
+- [x] `NOVO-03` 🟠 16 dos 17 erros: os mocks do Google Drive montam `file_id`/`atalho_id` em formato de caminho (`mock-atalho-mock-pasta-mock-pasta-root-Eventos-…`) e estouram `varchar(200)`. SQLite ignora o limite; PostgreSQL não. IDs reais do Drive têm ~33 caracteres — **o defeito está no dublê de teste, não no schema**.
+- [x] `NOVO-04` 🟠 `OficioNumberingConcurrencyTests` (`TransactionTestCase` com `reset_sequences = True`) colide com o signal de auditoria: `duplicate key value violates unique constraint "core_auditevent_pkey"`. O `AuditEvent` entrou em 27/07 e nunca rodou contra PostgreSQL.
+- [x] `NOVO-05` 🟡 `test_servidores_index_limita_25_por_pagina` assume `pk=1` (`data-delete-url=".../servidores/1/excluir/"`) — dependente de sequência.
+- [x] `NOVO-06` 🟡 `test_reprocessar_agenda_tasks_pendentes` responde 400 onde espera 302.
 
-> **Consequência para o plano:** `NOVO-02` é pré-requisito da Etapa 2. Não adianta escrever a suíte de Prestações como rede de segurança se a rede só é verificada num banco que não é o de produção.
+`NOVO-02`..`NOVO-06` **corrigidos e mergeados** (PR #62): 812 testes verdes nos dois bancos.
+`NOVO-04` era defeito de produção, não de teste — migrações de dados escreviam na trilha de
+auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com regressão.
+
+> **Consequência para o plano:** a Etapa 2 só começa com a suíte verde em PostgreSQL — o
+> banco de produção. Esse pré-requisito está satisfeito desde o PR #62; a regra permanece
+> aqui porque toda etapa seguinte assume a mesma linha de base: **verde nos dois bancos**.
 
 ### Etapa 2 — Rede de segurança
 - [ ] `T-01` suíte de Prestações: 5 etapas + assinatura pública
