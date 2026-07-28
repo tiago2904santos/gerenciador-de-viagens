@@ -22,6 +22,7 @@ from .models import Cargo
 from .models import Cidade
 from .models import Combustivel
 from .models import ConfiguracaoSistema
+from .models import TabelaDiaria
 from .models import Estado
 from .models import Servidor
 from .models import Unidade
@@ -792,3 +793,52 @@ class ConfiguracaoDestinatarioForm(forms.ModelForm):
                 cleaned["destinatario_oficio_unidade"] = servidor.unidade.nome
         return cleaned
 
+
+
+class TabelaDiariaForm(forms.ModelForm):
+    """Nova vigência de valores de diária.
+
+    Só o valor de 24 horas é digitado. Os percentuais de 15% e 30% são
+    derivados no ``save()`` do modelo — o formulário nem os expõe, para que não
+    exista caminho de entrada que os contradiga.
+    """
+
+    class Meta:
+        model = TabelaDiaria
+        fields = ["faixa", "vigencia_inicio", "valor_24h"]
+        widgets = {
+            "faixa": forms.Select(attrs={"class": "form-control cv-field__control"}),
+            # O calendário do sistema é o componente global `cv-date-picker`;
+            # o campo em si é só o hidden que ele preenche.
+            "vigencia_inicio": forms.HiddenInput(attrs={"data-cv-date-picker-value": ""}),
+            "valor_24h": forms.NumberInput(
+                attrs={
+                    "class": "form-control cv-field__control",
+                    "step": "0.01",
+                    "min": "0.01",
+                    "inputmode": "decimal",
+                    "data-diaria-base": "",
+                    "autocomplete": "off",
+                },
+            ),
+        }
+
+    def clean_valor_24h(self):
+        valor = self.cleaned_data["valor_24h"]
+        if valor is None or valor <= 0:
+            raise forms.ValidationError("Informe um valor maior que zero.")
+        return valor
+
+    def clean(self):
+        dados = super().clean()
+        faixa, inicio = dados.get("faixa"), dados.get("vigencia_inicio")
+        if faixa and inicio:
+            existente = TabelaDiaria.objects.filter(faixa=faixa, vigencia_inicio=inicio)
+            if self.instance.pk:
+                existente = existente.exclude(pk=self.instance.pk)
+            if existente.exists():
+                raise forms.ValidationError(
+                    "Já existe uma vigência desta faixa nesta data. "
+                    "Edite a existente ou escolha outra data de início.",
+                )
+        return dados

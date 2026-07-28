@@ -21,6 +21,7 @@ from .forms import ConfiguracaoDestinatarioForm
 from .forms import ConfiguracaoSistemaForm
 from .forms import EstadoForm
 from .forms import ServidorForm
+from .forms import TabelaDiariaForm
 from .forms import UnidadeForm
 from .forms import ViaturaForm
 from .presenters import apresentar_linha_lista_simples_cargo
@@ -41,6 +42,7 @@ from .selectors import listar_cidades
 from .selectors import listar_estados
 from .selectors import listar_combustiveis
 from .selectors import listar_servidores
+from .selectors import listar_tabelas_diaria
 from .selectors import listar_unidades
 from .selectors import listar_viaturas
 from .services import atualizar_cargo
@@ -737,8 +739,10 @@ def configuracao_sistema(request):
     from .models import ConfiguracaoSistema
 
     obj = ConfiguracaoSistema.get_for_area(getattr(request, "area", None))
-    is_post_dados = request.method == "POST" and request.POST.get("form_id") != "destinatarios"
-    is_post_destinatarios = request.method == "POST" and request.POST.get("form_id") == "destinatarios"
+    form_id = request.POST.get("form_id") if request.method == "POST" else None
+    is_post_dados = request.method == "POST" and form_id not in {"destinatarios", "diarias"}
+    is_post_destinatarios = form_id == "destinatarios"
+    is_post_diarias = form_id == "diarias"
 
     post_data = request.POST if is_post_dados else None
     form = ConfiguracaoSistemaForm(post_data, instance=obj)
@@ -746,6 +750,7 @@ def configuracao_sistema(request):
     destinatario_form = ConfiguracaoDestinatarioForm(
         request.POST if is_post_destinatarios else None, instance=obj,
     )
+    diaria_form = TabelaDiariaForm(request.POST if is_post_diarias else None)
 
     if is_post_dados and form.is_valid() and assinaturas_form.is_valid():
         _, cidade_resolvida = salvar_configuracao_sistema(form)
@@ -767,6 +772,15 @@ def configuracao_sistema(request):
         messages.success(request, "Destinatário salvo com sucesso.")
         return redirect("cadastros:configuracao")
 
+    if is_post_diarias and diaria_form.is_valid():
+        tabela = diaria_form.save()
+        messages.success(
+            request,
+            f"Valores de {tabela.get_faixa_display()} valendo a partir de "
+            f"{tabela.vigencia_inicio:%d/%m/%Y}. Roteiros anteriores mantêm o valor da época.",
+        )
+        return redirect("cadastros:configuracao")
+
     return render(
         request,
         "cadastros/configuracao/form.html",
@@ -776,6 +790,8 @@ def configuracao_sistema(request):
             "form": form,
             "assinaturas_form": assinaturas_form,
             "destinatario_form": destinatario_form,
+            "diaria_form": diaria_form,
+            "diarias_vigentes": listar_tabelas_diaria(),
             "submit_label": "Salvar configuração",
             "submit_icon": "check",
             "back_url": reverse("core:dashboard"),
