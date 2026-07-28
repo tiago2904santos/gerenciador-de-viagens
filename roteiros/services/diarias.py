@@ -2,13 +2,16 @@ from __future__ import annotations
 
 import unicodedata
 from dataclasses import dataclass
-from datetime import datetime, time, timedelta
+from datetime import date, datetime, time, timedelta
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 
 from roteiros.services.valor_extenso import valor_por_extenso_ptbr
 
 
-TABELA_DIARIAS = {
+# Valores que estavam fixados aqui até a Etapa 3. Mantidos só como referência
+# histórica e como último recurso quando não há vigência cadastrada (banco novo,
+# teste que não roda migração). A fonte de verdade é cadastros.TabelaDiaria.
+TABELA_DIARIAS_HISTORICA = {
     'INTERIOR': {
         '24h': Decimal('290.55'),
         '15': Decimal('43.58'),
@@ -62,6 +65,39 @@ class PeriodMarker:
     saida: datetime
     destino_cidade: str
     destino_uf: str
+
+
+def tabela_vigente_em(data_referencia) -> dict:
+    """Valores por faixa vigentes na data, no formato usado pelo cálculo.
+
+    Lê de ``cadastros.TabelaDiaria`` (defeito ``N-01``). O formato de retorno é
+    idêntico ao da constante antiga — ``{faixa: {'24h', '15', '30'}}`` — para
+    que os pontos de cálculo não mudem: menos diff, menos risco num motor que
+    produz valor monetário.
+
+    Sem vigência cadastrada para a data, cai na tabela histórica em vez de
+    falhar. Um roteiro anterior à primeira vigência é situação de dados, não de
+    código, e derrubar a calculadora deixaria o operador sem saída.
+    """
+    from cadastros.models import TabelaDiaria
+
+    resultado = {}
+    for faixa, _rotulo in TabelaDiaria.FAIXA_CHOICES:
+        vigente = TabelaDiaria.vigente_em(faixa, data_referencia)
+        if vigente is None:
+            resultado[faixa] = TABELA_DIARIAS_HISTORICA[faixa]
+            continue
+        resultado[faixa] = {
+            "24h": vigente.valor_24h,
+            "15": vigente.valor_15,
+            "30": vigente.valor_30,
+        }
+    return resultado
+
+
+def _data_de_referencia(markers) -> "date":
+    """Data que decide qual vigência vale: a saída mais antiga do roteiro."""
+    return min(marker.saida for marker in markers).date()
 
 
 def _normalize_city_name(value: str | None) -> str:
@@ -197,6 +233,11 @@ def build_periods(
     if not markers or not chegada_final_sede:
         raise ValueError('Preencha datas e horas para calcular.')
 
+    # Uma resolução por cálculo: a vigência é a mesma para o roteiro inteiro,
+    # decidida pela saída mais antiga. Resolver por trecho abriria a porta para
+    # um roteiro que atravessa a virada de vigência cobrar dois valores.
+    tabela_por_faixa = tabela_vigente_em(_data_de_referencia(markers))
+
     sorted_markers = sorted(markers, key=lambda item: item.saida)
     periodos = []
     servidores = max(0, int(quantidade_servidores or 0))
@@ -229,7 +270,7 @@ def build_periods(
 
         tipo = classify(marker.destino_cidade, marker.destino_uf)
         dias_inteiros, parcial, horas_adicionais, total_horas = _segment_breakdown(start, end)
-        tabela = TABELA_DIARIAS.get(tipo, TABELA_DIARIAS['INTERIOR'])
+        tabela = tabela_por_faixa.get(tipo, tabela_por_faixa['INTERIOR'])
         valor_24h = tabela['24h']
         valor_parcial = Decimal('0.00')
         if parcial == 15:
@@ -281,7 +322,7 @@ def build_periods(
             parcial_periodo = (
                 0 if item['_retorno_final'] else int(item.get('_parcial_periodo', 0) or 0)
             )
-            tabela = TABELA_DIARIAS.get(item['tipo'], TABELA_DIARIAS['INTERIOR'])
+            tabela = tabela_por_faixa.get(item['tipo'], tabela_por_faixa['INTERIOR'])
             valor_parcial = Decimal('0.00')
             if parcial_periodo == 15:
                 valor_parcial = tabela['15']
@@ -328,7 +369,7 @@ def build_periods(
             n_in_period = int(p.get('_pernoites_periodo', 0) or 0)
             p['n_diarias'] = n_in_period
             p['percentual_adicional'] = 0
-            tabela = TABELA_DIARIAS.get(p['tipo'], TABELA_DIARIAS['INTERIOR'])
+            tabela = tabela_por_faixa.get(p['tipo'], tabela_por_faixa['INTERIOR'])
             valor_1_servidor = tabela['24h'] * n_in_period
             subtotal_novo = valor_1_servidor * servidores
             p['subtotal'] = formatar_valor_diarias(subtotal_novo)
@@ -342,7 +383,7 @@ def build_periods(
                 (p for p in reversed(periodos) if p['n_diarias'] > 0 and not p['_retorno_final']),
                 (periodos_permanencia or periodos)[-1],
             )
-            tabela = TABELA_DIARIAS.get(alvo['tipo'], TABELA_DIARIAS['INTERIOR'])
+            tabela = tabela_por_faixa.get(alvo['tipo'], tabela_por_faixa['INTERIOR'])
             valor_parcial = tabela['15'] if leftover_percentual == 15 else tabela['30']
             alvo['percentual_adicional'] = leftover_percentual
             valor_1_servidor = (tabela['24h'] * alvo['n_diarias']) + valor_parcial
@@ -368,7 +409,7 @@ def build_periods(
         if leftover_percentual:
             ordem_tipo = {'INTERIOR': 0, 'CAPITAL': 1, 'BRASILIA': 2}
             alvo = max(periodos_permanencia or periodos, key=lambda p: ordem_tipo.get(p['tipo'], 0))
-            tabela = TABELA_DIARIAS.get(alvo['tipo'], TABELA_DIARIAS['INTERIOR'])
+            tabela = tabela_por_faixa.get(alvo['tipo'], tabela_por_faixa['INTERIOR'])
             valor_parcial = tabela['15'] if leftover_percentual == 15 else tabela['30']
             alvo['percentual_adicional'] = leftover_percentual
             subtotal_novo = valor_parcial * servidores
