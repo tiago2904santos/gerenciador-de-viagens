@@ -73,7 +73,8 @@ segue o `PADRAO_*` correspondente; divergência é defeito, não estilo pessoal.
 7. Abrir PR com o template da seção 5.
 ```
 
-Suíte de referência: **812 testes verdes em ~18,5 s**. Um PR que reduz o número de testes
+Suíte de referência: **924 testes verdes** (eram 812 até `NOVO-08` devolver ao runner os 95
+testes de `core/tests/`, que nunca foram descobertos). Um PR que reduz o número de testes
 verdes ou aumenta o tempo em mais de 20% precisa justificar no corpo.
 
 ## 5. Corpo de PR obrigatório
