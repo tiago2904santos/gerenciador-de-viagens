@@ -129,13 +129,15 @@ jobs:
 
       - name: Run complete Django test suite with coverage on PostgreSQL
         run: |
+          # O omit precisa cobrir tambem os modulos de teste soltos de
+          # prestacoes_contas (tests.py, tests_assinatura.py, test_*.py), que
+          # ficam fora de uma pasta tests/. Sem eles na lista, 925 statements de
+          # teste entram na conta como producao 100% coberta — e escrever teste
+          # novo sobe o piso sozinho, que e o que o gate existe para impedir.
+          # Comentario aqui em cima, e nao no meio dos `\`: dentro de uma
+          # continuacao de linha o `#` comenta o resto do comando.
           python -m coverage run \
             --source="$COVERAGE_APPS" \
-            # prestacoes_contas guarda os testes em modulos soltos (tests.py,
-            # tests_assinatura.py, test_*.py), fora de uma pasta tests/. Sem
-            # inclui-los aqui, 925 statements de teste entravam na conta como
-            # producao 100% coberta — e escrever teste novo subiria o piso
-            # sozinho, que e exatamente o que o gate existe para impedir.
             --omit="*/migrations/*,*/tests/*,*/tests.py,*/tests_*.py,*/test_*.py" \
             manage.py test --settings=config.settings.test -v 1
           python -m coverage json -o coverage.json
