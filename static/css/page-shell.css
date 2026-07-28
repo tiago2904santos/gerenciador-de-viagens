@@ -1683,6 +1683,23 @@ html[data-theme="light"] {
   width: 14px;
 }
 
+/* Contrato quebrado: lista declarada como paginada renderizada sem page_obj. */
+.pagination-shell--erro {
+  justify-content: flex-start;
+}
+
+.pagination-shell__erro {
+  background:    color-mix(in srgb, var(--color-danger) 12%, transparent);
+  border:        1px solid color-mix(in srgb, var(--color-danger) 46%, transparent);
+  border-radius: var(--radius-md);
+  color:         var(--color-danger);
+  display:       block;
+  font-size:     var(--font-size-sm);
+  font-weight:   var(--font-weight-semibold);
+  padding:       10px 16px;
+  width:         100%;
+}
+
 body.has-delete-modal-open {
   overflow: hidden;
 }

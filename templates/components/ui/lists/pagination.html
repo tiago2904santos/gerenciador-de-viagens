@@ -1,4 +1,20 @@
-{% if page_obj and page_obj.paginator.num_pages > 1 %}
+{# Paginação das listas.                                                             #}
+{# Parâmetros: page_obj (obrigatório para renderizar), pagination_pages,             #}
+{#   page_querystring, paginacao_obrigatoria.                                        #}
+{# CONTRATO (N-07): quem inclui com paginacao_obrigatoria=True declara que a lista É #}
+{# paginada; se page_obj não chegar, o componente denuncia a falha na tela em vez de #}
+{# sumir — era assim que listas sem paginação nenhuma pareciam paginadas. Shells que #}
+{# ainda hospedam listas não paginadas incluem sem a flag e nada é renderizado.      #}
+{# page_obj vazio (Page sem itens) é falsy: por isso o teste é page_obj.paginator.   #}
+{% if not page_obj.paginator %}
+  {% if paginacao_obrigatoria %}
+<p class="pagination-shell pagination-shell--erro" role="alert">
+  <span class="pagination-shell__erro">
+    Paginação indisponível: esta lista foi renderizada sem <code>page_obj</code> no contexto.
+  </span>
+</p>
+  {% endif %}
+{% elif page_obj.paginator.num_pages > 1 %}
 <nav class="pagination-shell" aria-label="Paginação">
   <p class="pagination-shell__info" aria-live="polite">
     <span class="pagination-shell__info-pill">
