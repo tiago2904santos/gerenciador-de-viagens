@@ -232,8 +232,12 @@ def _pode_reorganizar(usuario=None) -> bool:
     return bool(get_pasta_raiz_id(usuario)) and (esta_autorizado(usuario) or modo == "mock")
 
 
-def _executar_reorganizacao(job_id: int, usuario, area) -> None:
-    """Roda a reorganização e atualiza o job. Pensado para rodar numa thread."""
+def _executar_reorganizacao(job_id: int, usuario, area, *, encerrar_conexao: bool = True) -> None:
+    """Roda a reorganização e atualiza o job. Pensado para rodar numa thread.
+
+    ``encerrar_conexao=False`` quando a execução é inline no thread do request:
+    a conexão é de quem chamou, e fechá-la derruba a transação em andamento.
+    """
     from django.db import connection
 
     from integracoes.google_drive import organizer
@@ -262,7 +266,8 @@ def _executar_reorganizacao(job_id: int, usuario, area) -> None:
         )
     finally:
         # Threads abrem a própria conexão; fechá-la evita vazamento.
-        connection.close()
+        if encerrar_conexao:
+            connection.close()
 
 
 @login_required
@@ -290,7 +295,7 @@ def reorganizar_tudo(request):
     # Em testes (ou se configurado), roda de forma síncrona para ser determinístico.
     sincrono = getattr(settings, "GOOGLE_DRIVE", {}).get("REORG_SINCRONO", False)
     if sincrono:
-        _executar_reorganizacao(job.pk, usuario, area)
+        _executar_reorganizacao(job.pk, usuario, area, encerrar_conexao=False)
     else:
         from .tasks import reorganizar_drive
 
@@ -408,8 +413,12 @@ def _task_por_modelo() -> dict:
     return _TASK_POR_MODELO
 
 
-def _reprocessar_pendencias_em_thread(usuario, area) -> None:
-    """Roda o reenvio de pendências fora do request (ver ``reprocessar_pendencias``)."""
+def _reprocessar_pendencias_em_thread(usuario, area, *, encerrar_conexao: bool = True) -> None:
+    """Roda o reenvio de pendências fora do request (ver ``reprocessar_pendencias``).
+
+    ``encerrar_conexao=False`` na execução inline, pelo mesmo motivo descrito
+    em ``_executar_reorganizacao``.
+    """
     from django.db import connection
 
     from integracoes.google_drive import status
@@ -425,7 +434,8 @@ def _reprocessar_pendencias_em_thread(usuario, area) -> None:
             except Exception as exc:
                 logger.warning("[Drive] falha ao reagendar pendência %s: %s", pendencia.pk, exc)
     finally:
-        connection.close()
+        if encerrar_conexao:
+            connection.close()
 
 
 @login_required
@@ -446,7 +456,7 @@ def reprocessar_pendencias(request):
     area = getattr(request, "area", None)
     sincrono = getattr(settings, "GOOGLE_DRIVE", {}).get("REORG_SINCRONO", False)
     if sincrono:
-        _reprocessar_pendencias_em_thread(usuario, area)
+        _reprocessar_pendencias_em_thread(usuario, area, encerrar_conexao=False)
     else:
         from .tasks import reprocessar_pendencias
 

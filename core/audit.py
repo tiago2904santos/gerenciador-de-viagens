@@ -35,7 +35,19 @@ def _audited(sender) -> bool:
     return (
         sender._meta.app_label in AUDITED_APP_LABELS
         and sender._meta.label_lower != "core.auditevent"
+        and not _historico_de_migracao(sender)
     )
+
+
+def _historico_de_migracao(sender) -> bool:
+    """Identifica os modelos históricos que as migrações de dados usam.
+
+    ``apps.get_model()`` dentro de uma migração devolve uma classe recriada no
+    módulo ``__fake__``. Sem esta guarda, toda migração de dados escreve na
+    trilha de auditoria eventos sem ator e sem requisição — descrevendo o
+    deploy, não uma ação de usuário.
+    """
+    return sender.__module__ == "__fake__"
 
 
 def _json_value(value):

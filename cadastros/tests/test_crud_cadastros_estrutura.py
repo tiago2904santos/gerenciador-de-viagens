@@ -174,8 +174,13 @@ class ServidorCrudTests(TestCase):
         self.assertNotContains(response, "data-cv-realtime-filter-scope")
         self.assertContains(response, "data-delete-confirm-modal")
         self.assertContains(response, "data-delete-modal-trigger")
-        self.assertContains(response, 'data-delete-url="/cadastros/servidores/1/excluir/"')
-        self.assertNotContains(response, 'href="/cadastros/servidores/1/excluir/"')
+        # A exclusão sai como gatilho de modal, nunca como link direto. O pk vem
+        # do registro, não fixo: em PostgreSQL a sequência não recomeça em 1 a
+        # cada teste, e o literal fazia a asserção depender do banco.
+        primeiro = Servidor.objects.get(nome="SERVIDOR PAGINADO 00")
+        url_exclusao = reverse("cadastros:servidor_delete", args=[primeiro.pk])
+        self.assertContains(response, f'data-delete-url="{url_exclusao}"')
+        self.assertNotContains(response, f'href="{url_exclusao}"')
 
         response = self.client.get(reverse("cadastros:servidores_index"), {"q": "PAGINADO", "page": 2})
         self.assertEqual(response.status_code, 200)

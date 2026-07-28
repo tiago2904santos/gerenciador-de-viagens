@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import io
 import logging
 from datetime import datetime, timezone
@@ -109,15 +110,33 @@ def get_pasta_raiz_id(usuario=None) -> str:
 # Clients
 # ---------------------------------------------------------------------------
 
+def _mock_id(prefixo: str, *partes: str) -> str:
+    """ID determinístico e de tamanho limitado para o cliente de mock.
+
+    IDs reais do Drive são opacos e curtos (~33 caracteres). Compor o ID
+    concatenando o ID do pai fazia o valor crescer a cada nível de pasta,
+    estourando os campos ``varchar(200)`` de ``DriveArquivo`` em bancos que
+    aplicam o limite — o SQLite ignora, o PostgreSQL rejeita.
+
+    O hash preserva a propriedade de que os testes dependem: mesmo nome e
+    mesmo pai devolvem sempre o mesmo ID. O trecho legível existe só para
+    manter o log de mock inteligível.
+    """
+    chave = "|".join(partes)
+    digest = hashlib.sha1(chave.encode("utf-8")).hexdigest()[:16]
+    legivel = "".join(c if c.isalnum() else "-" for c in (partes[-1] if partes else ""))[:40]
+    return f"{prefixo}-{legivel}-{digest}".strip("-") if legivel else f"{prefixo}-{digest}"
+
+
 class _MockClient:
     def upload(self, nome: str, conteudo: bytes, mimetype: str, pasta_id: str | None = None) -> tuple[str, str]:
-        fake_id = f"mock-{nome}"
+        fake_id = _mock_id("mock", pasta_id or "root", nome)
         fake_url = f"https://drive.google.com/mock/{fake_id}"
         logger.info("[Drive MOCK] upload nome=%s pasta_id=%s → id=%s", nome, pasta_id, fake_id)
         return fake_id, fake_url
 
     def get_or_create_pasta(self, nome: str, pai_id: str | None = None) -> str:
-        fake_id = f"mock-pasta-{pai_id or 'root'}-{nome}"
+        fake_id = _mock_id("mock-pasta", pai_id or "root", nome)
         logger.debug("[Drive MOCK] get_or_create_pasta nome=%s pai_id=%s", nome, pai_id)
         return fake_id
 
@@ -133,7 +152,7 @@ class _MockClient:
     def criar_ou_atualizar_atalho(
         self, nome: str, target_id: str, pasta_id: str, existing_id: str | None = None
     ) -> str:
-        fake_id = existing_id or f"mock-atalho-{pasta_id}-{nome}"
+        fake_id = existing_id or _mock_id("mock-atalho", pasta_id, nome)
         logger.info(
             "[Drive MOCK] atalho nome=%s target=%s pasta_id=%s → %s",
             nome,
