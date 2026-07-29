@@ -344,7 +344,13 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
   Corrigia nos dois sentidos: pagava a menos em **todo trecho acima de 12
   horas** (até −R$ 259,88) e cobrava diária cheia por dois minutos entre 23:59
   e 00:01. Medido em 10.800 roteiros realistas: 0 divergência depois.
-- [ ] `N-09` `valor_por_servidor × servidores` pode não fechar com `total_valor`
+- [x] `N-09` **não reproduz — travado por teste.** Cada trecho calcula
+  `valor_1_servidor × servidores`, então o total é o produto exato e a divisão
+  de volta não perde centavo. O que faltava era a afirmação: 12 combinações
+  (3 formatos de roteiro × 1, 2, 3 e 7 servidores) mais o caso de equipe vazia.
+  Provado por canário — quebrando o arredondamento, o teste reprova apontando
+  os dois valores. O teste que já existia prova que o total **escala** com a
+  equipe, que é outra afirmação: escalar não garante reconciliar.
 - [ ] `N-10` pernoite curto — **mesma causa do `N-08`**; resolve junto
 - [ ] `P-03` constraints e indexes em roteiros/termos/justificativas
 - [x] `N-13` `REGRAS_DE_NEGOCIO.md`: 77 → 231 linhas. Diárias documentadas por
