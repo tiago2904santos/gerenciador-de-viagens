@@ -31,6 +31,7 @@ from roteiros.services.diarias import calculate_periodized_diarias
 
 SAO_PAULO = ("SAO PAULO", "SP")
 ABATIA = ("ABATIA", "PR")
+FLORIANOPOLIS = ("FLORIANOPOLIS", "SC")
 CURITIBA = ("CURITIBA", "PR")
 
 
@@ -132,6 +133,65 @@ class DemonstrativoOficialTests(TestCase):
             datetime(2026, 8, 15, 18, 0),
         )
 
+        self.assertEqual(resultado["totais"]["total_valor_decimal"], Decimal("1144.45"))
+
+    def test_destinos_seguidos_do_mesmo_grupo_formam_um_trecho_so(self):
+        """Demonstrativo oficial: total R$ 1.169,47, num **único** trecho.
+
+        | Trecho | Grupo    | Período                 | Dias/Horas | Diária      |
+        |--------|----------|-------------------------|------------|-------------|
+        | 1      | Capitais | 12/08 08:00–15/08 16:00 | 3 dias + 8h | R$ 1.169,47 |
+
+        São Paulo, Florianópolis e São Paulo de novo — três destinos, um trecho.
+        O oficial funde períodos consecutivos do mesmo grupo tarifário e cobra
+        **um** complemento sobre a sobra da soma (8h → 15%).
+
+        É o caso que decidiu o `N-05`. As sobras de cada permanência isolada
+        (6h, 2h, 0h) não chegam a 6 horas e nenhuma geraria complemento sozinha;
+        somadas dentro do trecho, dão 8h e valem 15%.
+        """
+        resultado = self.calcular(
+            [
+                marcador(datetime(2026, 8, 12, 8, 0), datetime(2026, 8, 12, 18, 0), SAO_PAULO),
+                marcador(datetime(2026, 8, 13, 8, 0), datetime(2026, 8, 13, 14, 0), FLORIANOPOLIS),
+                marcador(datetime(2026, 8, 14, 8, 0), datetime(2026, 8, 14, 16, 0), SAO_PAULO),
+                marcador(datetime(2026, 8, 15, 8, 0), datetime(2026, 8, 15, 16, 0), CURITIBA),
+            ],
+            datetime(2026, 8, 15, 16, 0),
+        )
+
+        self.assertEqual(resultado["totais"]["total_valor_decimal"], Decimal("1169.47"))
+        self.assertEqual(len(resultado["periodos"]), 1)
+
+        trecho = resultado["periodos"][0]
+        self.assertEqual(trecho["tipo"], "CAPITAL")
+        self.assertEqual(trecho["data_saida"], "12/08/2026")
+        self.assertEqual(trecho["hora_saida"], "08:00")
+        self.assertEqual(trecho["data_chegada"], "15/08/2026")
+        self.assertEqual(trecho["hora_chegada"], "16:00")
+        self.assertEqual(trecho["n_diarias"], 3)
+        self.assertEqual(trecho["percentual_adicional"], 15)
+
+    def test_grupo_diferente_no_meio_quebra_a_sequencia(self):
+        """A fusão é de consecutivos: um interior no meio abre trecho novo.
+
+        É o demonstrativo de quatro trechos — capital, interior, capital. As
+        duas capitais não se fundem porque não são vizinhas.
+        """
+        resultado = self.calcular(
+            [
+                marcador(datetime(2026, 8, 12, 8, 0), datetime(2026, 8, 12, 18, 0), SAO_PAULO),
+                marcador(datetime(2026, 8, 13, 8, 0), datetime(2026, 8, 13, 18, 0), ABATIA),
+                marcador(datetime(2026, 8, 14, 8, 0), datetime(2026, 8, 14, 18, 0), SAO_PAULO),
+                marcador(datetime(2026, 8, 15, 8, 0), datetime(2026, 8, 15, 18, 0), CURITIBA),
+            ],
+            datetime(2026, 8, 15, 18, 0),
+        )
+
+        self.assertEqual(
+            [p["tipo"] for p in resultado["periodos"]],
+            ["CAPITAL", "INTERIOR", "CAPITAL"],
+        )
         self.assertEqual(resultado["totais"]["total_valor_decimal"], Decimal("1144.45"))
 
     def test_o_deslocamento_entre_destinos_nao_desaparece_da_conta(self):
