@@ -91,9 +91,9 @@
           var b = res.body || {};
           var detail = b.summary || b.detail || b.reason || "";
           if (b.ok) {
-            window.alert("Assinatura válida.\n" + (detail || "Integridade confirmada."));
+            return window.CV.feedback.alert("Assinatura válida.\n" + (detail || "Integridade confirmada."));
           } else {
-            window.alert(
+            return window.CV.feedback.alert(
               "Verificação não passou (HTTP " +
                 res.status +
                 ").\n" +
@@ -102,7 +102,7 @@
           }
         })
         .catch(function () {
-          window.alert("Não foi possível concluir a verificação. Tente novamente.");
+          return window.CV.feedback.alert("Não foi possível concluir a verificação. Tente novamente.");
         })
         .finally(function () {
           btn.disabled = false;

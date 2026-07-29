@@ -159,6 +159,12 @@ JS_RULES_ERRO = [
         "Implementação local de normalização textual — usar CV.util.normalize",
         JS_UTIL_OWNER,
     ),
+    (
+        "native_feedback",
+        re.compile(r"(?<![\w.])(?:window\.)?(?:alert|confirm)\s*\("),
+        "Feedback nativo — usar CV.feedback",
+        None,
+    ),
 ]
 
 # ---------------------------------------------------------------------------
@@ -253,7 +259,7 @@ def audit_js() -> list[tuple]:
 
         for idx, line in enumerate(lines, start=1):
             for rule_name, pattern, message, owner in JS_RULES_ERRO:
-                if rp == owner:
+                if owner and rp == owner:
                     continue
                 if pattern.search(line):
                     findings.append(("ERRO", rp, idx, rule_name, message, line.strip(), ""))

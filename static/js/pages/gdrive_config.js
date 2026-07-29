@@ -285,7 +285,7 @@
           if (item) item.querySelector(".gdrive-folder-item__select")?.click();
         });
       } catch (err) {
-        alert("Não foi possível criar a pasta: " + err.message);
+        await window.CV.feedback.alert("Não foi possível criar a pasta: " + err.message);
       } finally {
         btnCriar.disabled = false;
         btnCriar.textContent = "Criar pasta";
