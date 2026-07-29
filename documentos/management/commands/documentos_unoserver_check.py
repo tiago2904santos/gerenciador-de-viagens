@@ -41,6 +41,16 @@ class Command(BaseCommand):
             help="Quantidade de conversões reais, sem cache (padrão: 1).",
         )
         parser.add_argument(
+            "--max-cold-ms",
+            type=float,
+            default=None,
+            help=(
+                "Limite, em milissegundos, da PRIMEIRA conversão de cada modelo — "
+                "a que paga o start do LibreOffice. Sem este argumento, a primeira "
+                "conversão entra no mesmo limite das demais (comportamento antigo)."
+            ),
+        )
+        parser.add_argument(
             "--representative-resources",
             action="store_true",
             help=(
@@ -105,8 +115,28 @@ class Command(BaseCommand):
                     elapsed_values.append(elapsed)
                     elapsed_by_resource.setdefault(filename, []).append(elapsed)
                     result_sizes[filename] = len(pdf)
-        elapsed_ms = max(elapsed_values)
         limit_ms = max(1.0, float(options["max_ms"]))
+        cold_limit_ms = options["max_cold_ms"]
+
+        # A primeira conversão de cada modelo paga o start do LibreOffice/UNO e
+        # custa uma ordem de grandeza a mais que as seguintes (medido no CI:
+        # 1119 ms contra 96 e 93 ms). Somar as duas num `max` só faz o gate
+        # reprovar por aquecimento e nada dizer sobre o regime estável — mas
+        # jogar a primeira fora esconderia um custo que o usuário sente de
+        # verdade, na primeira geração depois de um período ocioso. Por isso
+        # são dois orçamentos, não um.
+        if cold_limit_ms is None:
+            frios = []
+            quentes = elapsed_values
+        else:
+            frios = [valores[0] for valores in elapsed_by_resource.values()]
+            quentes = [
+                valor
+                for valores in elapsed_by_resource.values()
+                for valor in valores[1:]
+            ] or frios
+
+        elapsed_ms = max(quentes)
         resources = ", ".join(
             f"{filename}→{size} bytes"
             for filename, size in result_sizes.items()
@@ -119,6 +149,14 @@ class Command(BaseCommand):
             f"conversão real: máximo {elapsed_ms:.1f} ms; "
             f"{iterations} execução(ões) por modelo; {timings}; {resources}"
         )
+        if frios:
+            frio_ms = max(frios)
+            message = f"{message}; primeira conversão (a frio) {frio_ms:.1f} ms"
+            cold_limit = max(1.0, float(cold_limit_ms))
+            if frio_ms >= cold_limit:
+                raise CommandError(
+                    f"{message}; SLA de partida a frio excedido ({cold_limit:.0f} ms)"
+                )
         if elapsed_ms >= limit_ms:
             raise CommandError(f"{message}; SLA excedido ({limit_ms:.0f} ms)")
         self.stdout.write(self.style.SUCCESS(f"{message}; SLA atendido"))

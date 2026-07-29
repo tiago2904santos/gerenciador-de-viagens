@@ -309,7 +309,6 @@ def index(request):
         "efetivos",
         "destinos__cidade__estado",
         "eventos__programa",
-        "eventos__destino_cidade__estado",
         "eventos__efetivos",
     )
     if status:
