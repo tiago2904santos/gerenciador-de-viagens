@@ -309,3 +309,59 @@ class RoteiroCompletoTests(TestCase):
         )
 
         self.assertEqual(resultado["totais"]["total_valor_decimal"], Decimal("773.19"))
+
+
+class UmaDefinicaoDeDiariaTests(TestCase):
+    """`N-08` — o cálculo tem uma definição de "diária integral", não duas.
+
+    O módulo carregava dois critérios: duração (`_segment_breakdown`) e noites
+    de calendário (`count_pernoites`). Depois do `N-05` o segundo ficou órfão —
+    nenhum caminho de cálculo o consultava — e foi removido.
+
+    O que **continua** sendo por calendário é a exceção dentro do próprio
+    `_segment_breakdown`: um período que cruza a meia-noite e dura menos de 24h
+    conta como diária inteira. Está caracterizada abaixo, não corrigida: mudar
+    isso muda dinheiro e exige o demonstrativo oficial de um roteiro que
+    atravesse a madrugada.
+    """
+
+    def test_periodo_que_cruza_a_meia_noite_conta_diaria_inteira(self):
+        """Caracterização, não aprovação.
+
+        Viagem noturna de 16 horas: sai às 20:00, volta às 12:00 do dia
+        seguinte. Rende **uma diária inteira**. Uma viagem de 14 horas que
+        começa e termina no mesmo dia rende 30%. A diferença entre as duas é
+        onde o relógio estava quando o dia virou.
+        """
+        resultado = calculate_periodized_diarias(
+            [
+                marcador(datetime(2026, 8, 12, 20, 0), datetime(2026, 8, 13, 2, 0), SAO_PAULO),
+                marcador(datetime(2026, 8, 13, 6, 0), datetime(2026, 8, 13, 12, 0), CURITIBA),
+            ],
+            datetime(2026, 8, 13, 12, 0),
+            quantidade_servidores=1,
+            sede_cidade="CURITIBA",
+            sede_uf="PR",
+        )
+
+        trecho = resultado["periodos"][0]
+        self.assertEqual(trecho["n_diarias"], 1)
+        self.assertEqual(trecho["percentual_adicional"], 0)
+        self.assertEqual(resultado["totais"]["total_valor_decimal"], Decimal("371.26"))
+
+    def test_mesma_duracao_sem_cruzar_a_meia_noite_rende_apenas_o_complemento(self):
+        """O contraste que torna a exceção visível."""
+        resultado = calculate_periodized_diarias(
+            [
+                marcador(datetime(2026, 8, 12, 6, 0), datetime(2026, 8, 12, 8, 0), SAO_PAULO),
+                marcador(datetime(2026, 8, 12, 20, 0), datetime(2026, 8, 12, 22, 0), CURITIBA),
+            ],
+            datetime(2026, 8, 12, 22, 0),
+            quantidade_servidores=1,
+            sede_cidade="CURITIBA",
+            sede_uf="PR",
+        )
+
+        trecho = resultado["periodos"][0]
+        self.assertEqual(trecho["n_diarias"], 0)
+        self.assertEqual(trecho["percentual_adicional"], 30)

@@ -328,7 +328,19 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
   documento precisar exibir as duas colunas separadas, é derivação do valor que
   já existe (70% e 30%), sem mudança de regra nem de valor.
 - [ ] `N-06` `CAPITAIS_POR_UF` → base geográfica IBGE
-- [ ] `N-08` / `N-09` / `N-10` bordas de `_segment_breakdown`, fechamento por servidor, pernoite curto
+- [~] `N-08` **uma definição de diária integral, não duas.** O módulo carregava
+  duração (`_segment_breakdown`) e noites de calendário (`count_pernoites`).
+  Depois do `N-05` o segundo ficou órfão — nenhum caminho de cálculo o
+  consultava — e foi removido com prova de grep, junto com o breakdown que era
+  calculado por período e jogado fora sempre que houvesse fusão. Zero mudança
+  de comportamento: 1.055 testes verdes e 0 divergência em 10.800 roteiros.
+  **Falta a exceção por calendário dentro do próprio `_segment_breakdown`**
+  (um período que cruza a meia-noite e dura menos de 24h vira diária inteira —
+  2 minutos rendem R$ 371,26, enquanto 14 horas no mesmo dia rendem R$ 111,38).
+  Caracterizada por teste, não corrigida: precisa do demonstrativo oficial de um
+  roteiro que atravesse a madrugada. É o mesmo defeito que o `N-10`.
+- [ ] `N-09` `valor_por_servidor × servidores` pode não fechar com `total_valor`
+- [ ] `N-10` pernoite curto — **mesma causa do `N-08`**; resolve junto
 - [ ] `P-03` constraints e indexes em roteiros/termos/justificativas
 - [ ] `N-13` documentar diárias, numeração e status em `REGRAS_DE_NEGOCIO.md`
 
