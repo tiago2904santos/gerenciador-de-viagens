@@ -782,7 +782,7 @@
 
 .docs-attach-item {
   align-items: center;
-  background: var(--cv-form-field-bg, var(--color-surface-raised, #101828));
+  background: var(--cv-form-field-bg);
   border: 1px solid var(--cv-form-section-border, var(--color-border-soft));
   border-radius: var(--radius-md, 10px);
   display: flex;

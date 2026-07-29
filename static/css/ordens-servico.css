@@ -196,7 +196,7 @@
   background: var(--color-accent);
   border-color: var(--color-accent);
   box-shadow: none;
-  color: var(--color-on-accent, #081522);
+  color: var(--color-on-accent);
   transform: none;
 }
 

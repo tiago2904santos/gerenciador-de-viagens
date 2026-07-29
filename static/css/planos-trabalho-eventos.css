@@ -87,7 +87,7 @@
 
 .pte-card__title {
   margin: 0;
-  font-size: var(--font-size-base, 1rem);
+  font-size: var(--font-size-base);
   font-weight: 700;
   color: var(--color-heading);
   white-space: nowrap;
@@ -172,8 +172,8 @@
 
 /* Card destacado quando o evento está sendo editado no rascunho. */
 .pte-card--editing {
-  border-color: var(--color-warning-border, #f59e0b);
-  box-shadow: 0 0 0 2px var(--color-warning-soft, rgba(245, 158, 11, 0.18));
+  border-color: var(--color-warning-border);
+  box-shadow: 0 0 0 2px var(--color-warning-soft);
 }
 
 .pte-card__badge {
@@ -183,7 +183,7 @@
   border-radius: 999px;
   font-size: 0.68rem;
   font-weight: 600;
-  background: var(--color-warning-soft, rgba(245, 158, 11, 0.18));
+  background: var(--color-warning-soft);
   color: var(--color-warning-strong, #b45309);
 }
 

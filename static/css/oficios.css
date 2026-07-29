@@ -1820,7 +1820,7 @@
 .oficio-documentos-traveller-tile--motorista .oficio-documentos-traveller-tile__avatar {
   background: var(--color-accent);
   border-color: var(--color-accent);
-  color: var(--color-on-accent, #081522);
+  color: var(--color-on-accent);
 }
 
 .oficio-documentos-traveller-tile__main {
@@ -1853,7 +1853,7 @@
   align-items: center;
   background: var(--color-accent);
   border-radius: 999px;
-  color: var(--color-on-accent, #081522);
+  color: var(--color-on-accent);
   display: inline-flex;
   flex-shrink: 0;
   font-size: 10px;
@@ -3126,7 +3126,7 @@ html[data-theme="light"] .cv-segment-toggle {
   background: var(--color-accent);
   border-color: var(--color-accent);
   box-shadow: none;
-  color: var(--color-on-accent, #081522);
+  color: var(--color-on-accent);
   transform: none;
 }
 
@@ -3180,7 +3180,7 @@ html[data-theme="light"] .cv-segment-toggle {
 #evento-card-documentos-d .related-route-item.is-active .cv-search-picker__selected-avatar {
   background: var(--color-primary-bright);
   border-color: var(--color-primary-bright);
-  color: var(--color-on-accent, #ffffff);
+  color: var(--color-white);
 }
 
 html[data-theme="dark"] #evento-card-documentos-d .related-route-item.is-active {
@@ -3192,7 +3192,7 @@ html[data-theme="dark"] #evento-card-documentos-d .related-route-item.is-active 
 html[data-theme="dark"] #evento-card-documentos-d .related-route-item.is-active .cv-search-picker__selected-avatar {
   background: var(--color-accent);
   border-color: var(--color-accent);
-  color: var(--color-on-accent, #081522);
+  color: var(--color-on-accent);
 }
 
 [data-oficio-motorista-servidor],
@@ -3603,7 +3603,7 @@ html[data-theme="dark"] [data-travel-document-wizard-step1] .cv-search-picker {
 .oficio-lc__traveller--motorista .oficio-lc__traveller-avatar {
   background: var(--color-accent);
   border-color: var(--color-accent);
-  color: var(--color-on-accent, #081522);
+  color: var(--color-on-accent);
 }
 
 html[data-theme="light"] .oficio-lc__traveller--motorista {
@@ -3678,7 +3678,7 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
 .oficio-lc__traveller--motorista .oficio-lc__traveller-badge {
   background: var(--color-accent);
   border: 0;
-  color: var(--color-on-accent, #081522);
+  color: var(--color-on-accent);
 }
 
 .oficio-lc__traveller-actions,

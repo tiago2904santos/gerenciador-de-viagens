@@ -379,7 +379,10 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
   `dark-light` e `light-light`; os seletores canônicos `dark`/`light` foram
   preservados.
 - [ ] Fase 1: apagar CSS morto e blocos `.app-form-shell`/`.form-shell`
-- [ ] Fase 2: corrigir tokens indefinidos (`D-01`, `D-03`, `D-06`, `D-20`, `D-21`)
+- [x] Fase 2: corrigidos os tokens indefinidos (`D-01`, `D-03`, `D-06`,
+  `D-20`, `D-21`). Divergência do inventário histórico: 11 dos 18 nomes já
+  estavam definidos ou sem consumidores após correções anteriores; os 7 usos
+  indefinidos restantes foram centralizados ou substituídos por tokens canônicos.
 - [ ] Fase 3: CSS faltante dos componentes globais
 - [ ] Fase 4: tirar `auth.css` e `oficios.css` do `@import` global
 - [ ] Fase 5: consolidar escala (raio, sombra, motion, z-index, tipografia)
