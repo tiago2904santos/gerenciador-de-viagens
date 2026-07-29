@@ -117,6 +117,7 @@ class OrganizerContractTests(TestCase):
             nome="Ana Contrato", cargo=cargo, cpf="12345678901"
         )
         self.evento = Evento.objects.create(
+            titulo="Operação contrato",
             destino_cidade="Maringá",
             destino_uf="PR",
             data_inicio=date(2026, 7, 22),
