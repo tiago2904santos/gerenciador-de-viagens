@@ -412,6 +412,14 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
   - [x] **ordens_servico** — `ordens_servico/selectors.py` com 3 consultas; catraca
     **40 → 37**. Lista, lista com busca e formulário de edição fixados em teste.
   - [ ] planos_trabalho (5)
+- [x] **`NOVO-13` 🔴 lista de Plano de Trabalho quebrava com plano multi-evento** —
+  `prefetch_related("eventos__destino_cidade__estado")` apontava para um campo que
+  `EventoPlano` não tem. O Django só valida o segundo nível quando o primeiro traz
+  linha, então a página abria enquanto nenhum plano tivesse evento e devolvia 500
+  assim que um tivesse. Nenhuma auditoria viu; a suíte não pegava porque nenhum
+  teste da lista criava `EventoPlano`. Encontrado ao engrossar o fixture do teste
+  de orçamento de queries do `P-01` — o canário do prefetch não disparava, e o
+  motivo era que a relação estava vazia.
 - [ ] `P-02` `core/catalog.py` e migração dos 13 catálogos
 - [x] `P-04` **widget base com classes canônicas** (pré-requisito das Etapas 6 e 7) —
   19 contratos CSS centralizados em `core/forms/widgets.py`; 194 `attrs` migrados
