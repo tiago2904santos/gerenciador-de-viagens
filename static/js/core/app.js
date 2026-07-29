@@ -8,6 +8,38 @@ document.documentElement.dataset.appReady = "true";
   "use strict";
 
   window.CV = window.CV || {};
+  window.CV.util = {
+    debounce: function (fn, delay) {
+      var timer = null;
+      function debounced() {
+        var args = arguments;
+        var context = this;
+        window.clearTimeout(timer);
+        timer = window.setTimeout(function () {
+          timer = null;
+          fn.apply(context, args);
+        }, delay);
+      }
+      debounced.cancel = function () {
+        window.clearTimeout(timer);
+        timer = null;
+      };
+      return debounced;
+    },
+    escapeHtml: function (value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    },
+    normalize: function (value) {
+      return String(value || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+    },
+  };
 
   var enhancers = new Map();
   var pendingRoots = new Set();

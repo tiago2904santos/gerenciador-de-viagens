@@ -12,19 +12,6 @@
   var LIST_PANEL_SELECTOR = '.list-panel';
   var DEBOUNCE_MS = 300;
 
-  function debounce(fn, delay) {
-    var timer = null;
-    return function () {
-      var args = arguments;
-      var ctx = this;
-      if (timer) window.clearTimeout(timer);
-      timer = window.setTimeout(function () {
-        timer = null;
-        fn.apply(ctx, args);
-      }, delay);
-    };
-  }
-
   function hasListPanel() {
     return !!document.querySelector(LIST_PANEL_SELECTOR);
   }
@@ -112,7 +99,7 @@
         });
     }
 
-    var debouncedRun = debounce(run, DEBOUNCE_MS);
+    var debouncedRun = window.CV.util.debounce(run, DEBOUNCE_MS);
 
     controls.forEach(function (control) {
       var tag = (control.tagName || '').toLowerCase();
