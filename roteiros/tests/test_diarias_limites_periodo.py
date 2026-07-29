@@ -430,3 +430,77 @@ class EscadaDoRestoTests(TestCase):
 
         self.assertEqual(dias, 1)
         self.assertEqual(parcial, 100)
+
+
+class ReconciliacaoPorServidorTests(TestCase):
+    """`N-09` — o valor por servidor tem de fechar com o total.
+
+    O documento mostra os dois: o ofício traz o total da equipe, o relatório
+    técnico traz o valor daquele servidor. Se `por_servidor × servidores` não
+    der `total`, os dois papéis não batem — e quem confere não tem como saber
+    qual está certo.
+
+    A auditoria registra isso como possível. Não reproduz: cada trecho calcula
+    `valor_1_servidor × servidores`, então o total é o produto exato e a divisão
+    de volta não perde centavo. O que faltava era a afirmação — sem ela, uma
+    mudança futura no arredondamento quebraria isso em silêncio.
+
+    O teste existente `test_total_valor_multiplica_servidores` prova que o total
+    **escala** com a equipe. É outra afirmação: escalar não garante reconciliar.
+    """
+
+    def cenario(self, nome):
+        roteiros = {
+            "misto": (
+                [
+                    marcador(datetime(2026, 8, 12, 8, 0), datetime(2026, 8, 12, 18, 0), SAO_PAULO),
+                    marcador(datetime(2026, 8, 13, 8, 0), datetime(2026, 8, 13, 18, 0), ABATIA),
+                    marcador(datetime(2026, 8, 14, 8, 0), datetime(2026, 8, 14, 18, 0), CURITIBA),
+                ],
+                datetime(2026, 8, 14, 18, 0),
+            ),
+            "categoria_unica": (
+                [
+                    marcador(datetime(2026, 8, 12, 8, 0), datetime(2026, 8, 12, 18, 0), SAO_PAULO),
+                    marcador(datetime(2026, 8, 13, 8, 0), datetime(2026, 8, 13, 14, 0), FLORIANOPOLIS),
+                    marcador(datetime(2026, 8, 14, 8, 0), datetime(2026, 8, 14, 16, 0), SAO_PAULO),
+                    marcador(datetime(2026, 8, 15, 8, 0), datetime(2026, 8, 15, 16, 0), CURITIBA),
+                ],
+                datetime(2026, 8, 15, 16, 0),
+            ),
+            "com_complemento": (
+                [
+                    marcador(datetime(2026, 8, 12, 8, 0), datetime(2026, 8, 12, 12, 0), ABATIA),
+                    marcador(datetime(2026, 8, 12, 19, 0), datetime(2026, 8, 12, 20, 1), CURITIBA),
+                ],
+                datetime(2026, 8, 12, 20, 1),
+            ),
+        }
+        return roteiros[nome]
+
+    def test_o_valor_por_servidor_reconstroi_o_total(self):
+        for nome in ("misto", "categoria_unica", "com_complemento"):
+            markers, chegada = self.cenario(nome)
+            for servidores in (1, 2, 3, 7):
+                with self.subTest(roteiro=nome, servidores=servidores):
+                    totais = calculate_periodized_diarias(
+                        markers, chegada, quantidade_servidores=servidores,
+                        sede_cidade="CURITIBA", sede_uf="PR",
+                    )["totais"]
+
+                    self.assertEqual(
+                        totais["valor_por_servidor_decimal"] * servidores,
+                        totais["total_valor_decimal"],
+                        "o valor por servidor não reconstrói o total",
+                    )
+
+    def test_equipe_sem_servidor_nao_divide_por_zero(self):
+        markers, chegada = self.cenario("misto")
+
+        totais = calculate_periodized_diarias(
+            markers, chegada, quantidade_servidores=0,
+            sede_cidade="CURITIBA", sede_uf="PR",
+        )["totais"]
+
+        self.assertEqual(totais["valor_por_servidor_decimal"], Decimal("0.00"))
+        self.assertEqual(totais["total_valor_decimal"], Decimal("0.00"))
