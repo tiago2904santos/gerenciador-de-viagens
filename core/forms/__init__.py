@@ -3,6 +3,10 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.forms import PasswordChangeForm
 
+from .widgets import set_widget_style
+from .widgets import WidgetStyle
+from .widgets import widget_attrs
+
 
 class LoginForm(AuthenticationForm):
     """Formulario de login com foco inicial no usuario e classes para auth.css."""
@@ -13,13 +17,13 @@ class LoginForm(AuthenticationForm):
             {
                 "autofocus": True,
                 "autocomplete": "username",
-                "class": "auth-field-input",
+                **widget_attrs(WidgetStyle.AUTH_FIELD_INPUT),
             }
         )
         self.fields["password"].widget.attrs.update(
             {
                 "autocomplete": "current-password",
-                "class": "auth-field-input",
+                **widget_attrs(WidgetStyle.AUTH_FIELD_INPUT),
             }
         )
 
@@ -28,7 +32,7 @@ class PerfilUsuarioForm(forms.ModelForm):
     nome_completo = forms.CharField(
         label="Nome completo",
         required=False,
-        widget=forms.TextInput(attrs={"autocomplete": "name", "class": "form-control"}),
+        widget=forms.TextInput(attrs={"autocomplete": "name", **widget_attrs(WidgetStyle.FORM_CONTROL)}),
     )
 
     class Meta:
@@ -39,8 +43,8 @@ class PerfilUsuarioForm(forms.ModelForm):
             "email": "E-mail institucional",
         }
         widgets = {
-            "username": forms.TextInput(attrs={"autocomplete": "username", "class": "form-control"}),
-            "email": forms.EmailInput(attrs={"autocomplete": "email", "class": "form-control"}),
+            "username": forms.TextInput(attrs={"autocomplete": "username", **widget_attrs(WidgetStyle.FORM_CONTROL)}),
+            "email": forms.EmailInput(attrs={"autocomplete": "email", **widget_attrs(WidgetStyle.FORM_CONTROL)}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -65,7 +69,7 @@ class AlterarSenhaForm(PasswordChangeForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field_name, field in self.fields.items():
-            field.widget.attrs.setdefault("class", "form-control")
+            set_widget_style(field.widget, WidgetStyle.FORM_CONTROL, overwrite=False)
             field.widget.attrs.setdefault(
                 "autocomplete",
                 "current-password" if field_name == "old_password" else "new-password",
@@ -78,33 +82,33 @@ class UiLabFieldDemoForm(forms.Form):
     nome = forms.CharField(
         label="Nome completo",
         initial="Ana Souza",
-        widget=forms.TextInput(attrs={"autocomplete": "name", "class": "form-control"}),
+        widget=forms.TextInput(attrs={"autocomplete": "name", **widget_attrs(WidgetStyle.FORM_CONTROL)}),
     )
     email = forms.EmailField(
         label="E-mail institucional",
         required=False,
         initial="ana.souza@pc.pr.gov.br",
         help_text="Usado para notificações e identificação da conta.",
-        widget=forms.EmailInput(attrs={"autocomplete": "email", "class": "form-control"}),
+        widget=forms.EmailInput(attrs={"autocomplete": "email", **widget_attrs(WidgetStyle.FORM_CONTROL)}),
     )
     senha = forms.CharField(
         label="Senha de acesso",
         required=False,
-        widget=forms.PasswordInput(attrs={"autocomplete": "new-password", "class": "form-control"}),
+        widget=forms.PasswordInput(attrs={"autocomplete": "new-password", **widget_attrs(WidgetStyle.FORM_CONTROL)}),
     )
     quantidade = forms.IntegerField(
         label="Quantidade de diárias",
         required=False,
         initial=2,
         min_value=0,
-        widget=forms.NumberInput(attrs={"class": "form-control"}),
+        widget=forms.NumberInput(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL)}),
     )
     data_saida = forms.DateField(
         label="Data de saída",
         required=False,
         widget=forms.TextInput(
             attrs={
-                "class": "form-control",
+                **widget_attrs(WidgetStyle.FORM_CONTROL),
                 "placeholder": "dd/mm/aaaa",
                 "inputmode": "numeric",
                 "data-mask": "date",
@@ -115,19 +119,19 @@ class UiLabFieldDemoForm(forms.Form):
         label="Motivo da viagem",
         required=False,
         initial="Atendimento institucional em outra unidade.",
-        widget=forms.Textarea(attrs={"rows": 4, "class": "form-control"}),
+        widget=forms.Textarea(attrs={"rows": 4, **widget_attrs(WidgetStyle.FORM_CONTROL)}),
     )
     unidade = forms.ChoiceField(
         label="Unidade responsável",
         required=False,
         choices=(("", "Selecione..."), ("dpc", "DPC"), ("dti", "DTI")),
-        widget=forms.Select(attrs={"class": "form-select"}),
+        widget=forms.Select(attrs={**widget_attrs(WidgetStyle.FORM_SELECT)}),
     )
     participantes = forms.MultipleChoiceField(
         label="Participantes",
         required=False,
         choices=(("ana", "Ana Souza"), ("carlos", "Carlos Lima"), ("marina", "Marina Alves")),
-        widget=forms.SelectMultiple(attrs={"class": "form-select"}),
+        widget=forms.SelectMultiple(attrs={**widget_attrs(WidgetStyle.FORM_SELECT)}),
     )
     destino_picker = forms.ChoiceField(
         label="Destino",
@@ -141,7 +145,7 @@ class UiLabFieldDemoForm(forms.Form):
         ),
         widget=forms.Select(
             attrs={
-                "class": "cv-search-picker__native",
+                **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
                 "data-cv-search-picker": "true",
                 "data-picker-mode": "single",
                 "data-picker-variant": "compact",
@@ -163,7 +167,7 @@ class UiLabFieldDemoForm(forms.Form):
         ),
         widget=forms.SelectMultiple(
             attrs={
-                "class": "cv-search-picker__native",
+                **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
                 "data-cv-search-picker": "true",
                 "data-picker-mode": "multi",
                 "data-picker-variant": "detailed",
@@ -179,14 +183,14 @@ class UiLabFieldDemoForm(forms.Form):
         label="Protocolo gerado",
         required=False,
         initial="2026.07.17.0042",
-        widget=forms.TextInput(attrs={"readonly": "readonly", "class": "form-control"}),
+        widget=forms.TextInput(attrs={"readonly": "readonly", **widget_attrs(WidgetStyle.FORM_CONTROL)}),
     )
     status = forms.CharField(
         label="Status bloqueado",
         required=False,
         initial="Finalizado",
         disabled=True,
-        widget=forms.TextInput(attrs={"class": "form-control"}),
+        widget=forms.TextInput(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL)}),
     )
     confirmacao = forms.BooleanField(
         label="Confirmo os dados informados",

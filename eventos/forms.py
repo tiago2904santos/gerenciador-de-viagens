@@ -3,6 +3,8 @@ from django.db.models import Q
 from django.utils import timezone
 
 from cadastros.models import ConfiguracaoSistema
+from core.forms.widgets import WidgetStyle
+from core.forms.widgets import widget_attrs
 from core.tenancy import filter_queryset_by_area
 from core.tenancy import get_current_area
 from oficios.forms import ModeloMotivoSelect
@@ -120,7 +122,7 @@ class EventoNovoCadastroForm(forms.ModelForm):
         queryset=ModeloMotivoOficio.objects.none(),
         required=False,
         empty_label="Selecione um modelo (opcional)",
-        widget=ModeloMotivoSelect(attrs={"class": "form-select", "data-modelo-motivo-select": "true"}),
+        widget=ModeloMotivoSelect(attrs={**widget_attrs(WidgetStyle.FORM_SELECT), "data-modelo-motivo-select": "true"}),
     )
     tipos = forms.ModelMultipleChoiceField(
         label="Tipo do evento",
@@ -134,7 +136,7 @@ class EventoNovoCadastroForm(forms.ModelForm):
         required=False,
         widget=forms.Select(
             attrs={
-                "class": "cv-search-picker__native",
+                **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
                 "data-cv-search-picker": "true",
                 "data-picker-mode": "single",
                 "data-picker-variant": "compact",
@@ -152,7 +154,7 @@ class EventoNovoCadastroForm(forms.ModelForm):
         queryset=Oficio.objects.none(),
         required=False,
         widget=OficioMultiSelectWidget(attrs={
-            "class": "evento-doc-source-select",
+            **widget_attrs(WidgetStyle.EVENT_DOCUMENT_SOURCE),
             "hidden": True,
             "data-evento-doc-field": "oficios",
         }),
@@ -162,7 +164,7 @@ class EventoNovoCadastroForm(forms.ModelForm):
         queryset=OrdemServico.objects.none(),
         required=False,
         widget=OrdemServicoMultiSelectWidget(attrs={
-            "class": "evento-doc-source-select",
+            **widget_attrs(WidgetStyle.EVENT_DOCUMENT_SOURCE),
             "hidden": True,
             "data-evento-doc-field": "os",
         }),
@@ -172,7 +174,7 @@ class EventoNovoCadastroForm(forms.ModelForm):
         queryset=PlanoTrabalho.objects.none(),
         required=False,
         widget=PlanoTrabalhoMultiSelectWidget(attrs={
-            "class": "evento-doc-source-select",
+            **widget_attrs(WidgetStyle.EVENT_DOCUMENT_SOURCE),
             "hidden": True,
             "data-evento-doc-field": "pt",
         }),
@@ -182,7 +184,7 @@ class EventoNovoCadastroForm(forms.ModelForm):
         queryset=TermoAutorizacao.objects.none(),
         required=False,
         widget=TermoAutorizacaoMultiSelectWidget(attrs={
-            "class": "evento-doc-source-select",
+            **widget_attrs(WidgetStyle.EVENT_DOCUMENT_SOURCE),
             "hidden": True,
             "data-evento-doc-field": "termos",
         }),
@@ -192,7 +194,7 @@ class EventoNovoCadastroForm(forms.ModelForm):
         queryset=Roteiro.objects.none(),
         required=False,
         widget=RoteiroMultiSelectWidget(attrs={
-            "class": "evento-doc-source-select",
+            **widget_attrs(WidgetStyle.EVENT_DOCUMENT_SOURCE),
             "hidden": True,
             "data-evento-doc-field": "roteiros",
         }),
@@ -211,7 +213,7 @@ class EventoNovoCadastroForm(forms.ModelForm):
         widgets = {
             "motivo": forms.Textarea(
                 attrs={
-                    "class": "cv-field__control cv-field__control--textarea",
+                    **widget_attrs(WidgetStyle.FIELD_CONTROL_TEXTAREA),
                     "rows": 4,
                     "data-motivo-textarea": "true",
                 }
@@ -221,7 +223,7 @@ class EventoNovoCadastroForm(forms.ModelForm):
             "destino_cidade": forms.Select(
                 choices=[("", "---------")],
                 attrs={
-                    "class": "cv-search-picker__native",
+                    **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
                     "data-cv-search-picker": "true",
                     "data-picker-mode": "single",
                     "data-picker-variant": "compact",
@@ -330,18 +332,18 @@ class EventoForm(forms.ModelForm):
             "drive_folder_url",
         ]
         widgets = {
-            "titulo": forms.TextInput(attrs={"class": "cv-field__control"}),
-            "descricao": forms.Textarea(attrs={"class": "cv-field__control cv-field__control--textarea", "rows": 4}),
-            "destino_uf": forms.TextInput(attrs={"class": "cv-field__control", "maxlength": 2}),
-            "destino_cidade": forms.TextInput(attrs={"class": "cv-field__control"}),
+            "titulo": forms.TextInput(attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL)}),
+            "descricao": forms.Textarea(attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL_TEXTAREA), "rows": 4}),
+            "destino_uf": forms.TextInput(attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL), "maxlength": 2}),
+            "destino_cidade": forms.TextInput(attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL)}),
             "data_inicio": forms.HiddenInput(attrs={"data-cv-date-picker-start-value": ""}),
             "data_fim": forms.HiddenInput(attrs={"data-cv-date-picker-end-value": ""}),
-            "horario_inicio": forms.TimeInput(attrs={"class": "cv-field__control", "type": "time"}),
-            "horario_fim": forms.TimeInput(attrs={"class": "cv-field__control", "type": "time"}),
-            "unidade_responsavel": forms.Select(attrs={"class": "form-select"}),
-            "responsavel": forms.Select(attrs={"class": "form-select"}),
-            "status": forms.Select(attrs={"class": "form-select"}),
-            "drive_folder_url": forms.URLInput(attrs={"class": "cv-field__control"}),
+            "horario_inicio": forms.TimeInput(attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL), "type": "time"}),
+            "horario_fim": forms.TimeInput(attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL), "type": "time"}),
+            "unidade_responsavel": forms.Select(attrs={**widget_attrs(WidgetStyle.FORM_SELECT)}),
+            "responsavel": forms.Select(attrs={**widget_attrs(WidgetStyle.FORM_SELECT)}),
+            "status": forms.Select(attrs={**widget_attrs(WidgetStyle.FORM_SELECT)}),
+            "drive_folder_url": forms.URLInput(attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL)}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -372,14 +374,14 @@ class TipoEventoForm(forms.ModelForm):
     nome = forms.CharField(
         label="Nome",
         help_text="Ex.: PCPR na Comunidade, Justiça no Bairro.",
-        widget=forms.TextInput(attrs={"class": "form-control"}),
+        widget=forms.TextInput(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL)}),
     )
     ativo = forms.BooleanField(
         label="Ativo",
         required=False,
         initial=True,
         help_text="Desmarque para ocultar este tipo da seleção sem apagar eventos já vinculados.",
-        widget=forms.CheckboxInput(attrs={"class": "app-card-toggle__input"}),
+        widget=forms.CheckboxInput(attrs={**widget_attrs(WidgetStyle.CARD_TOGGLE)}),
     )
 
     class Meta:

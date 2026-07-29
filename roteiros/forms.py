@@ -1,6 +1,8 @@
 from django import forms
 
 from .models import Roteiro
+from core.forms.widgets import WidgetStyle
+from core.forms.widgets import widget_attrs
 
 
 class RoteiroForm(forms.ModelForm):
@@ -19,25 +21,25 @@ class RoteiroForm(forms.ModelForm):
             "rota_ajuste_justificativa",
         ]
         widgets = {
-            "origem_estado": forms.Select(attrs={"class": ""}),
-            "origem_cidade": forms.Select(attrs={"class": ""}),
+            "origem_estado": forms.Select(attrs={**widget_attrs(WidgetStyle.UNSTYLED)}),
+            "origem_cidade": forms.Select(attrs={**widget_attrs(WidgetStyle.UNSTYLED)}),
             "saida_dt": forms.DateTimeInput(
-                attrs={"class": "form-control", "type": "datetime-local"},
+                attrs={**widget_attrs(WidgetStyle.FORM_CONTROL), "type": "datetime-local"},
                 format="%Y-%m-%dT%H:%M",
             ),
             "retorno_saida_dt": forms.DateTimeInput(
-                attrs={"class": "form-control", "type": "datetime-local"},
+                attrs={**widget_attrs(WidgetStyle.FORM_CONTROL), "type": "datetime-local"},
                 format="%Y-%m-%dT%H:%M",
             ),
-            "observacoes": forms.Textarea(attrs={"class": "form-control", "rows": 2}),
+            "observacoes": forms.Textarea(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL), "rows": 2}),
             "rota_distancia_manual_km": forms.NumberInput(
-                attrs={"class": "form-control", "min": "0"}
+                attrs={**widget_attrs(WidgetStyle.FORM_CONTROL), "min": "0"}
             ),
             "rota_duracao_manual_min": forms.NumberInput(
-                attrs={"class": "form-control", "min": "0"}
+                attrs={**widget_attrs(WidgetStyle.FORM_CONTROL), "min": "0"}
             ),
             "rota_ajuste_justificativa": forms.Textarea(
-                attrs={"class": "form-control", "rows": 2}
+                attrs={**widget_attrs(WidgetStyle.FORM_CONTROL), "rows": 2}
             ),
         }
 

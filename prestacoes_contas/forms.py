@@ -8,8 +8,11 @@ from django.forms.renderers import TemplatesSetting
 
 from cadastros.models import Servidor
 from cadastros.models import Viatura
-from core.tenancy import filter_queryset_by_area
+from core.forms.widgets import set_widget_style
+from core.forms.widgets import WidgetStyle
+from core.forms.widgets import widget_attrs
 from core.normalizers import normalize_spaces
+from core.tenancy import filter_queryset_by_area
 from core.utils.masks import normalize_protocolo
 
 from .models import DiarioBordo
@@ -41,7 +44,7 @@ class DiarioBordoTrechoForm(forms.ModelForm):
         required=False,
         widget=forms.TextInput(
             attrs={
-                "class": "cv-field__control",
+                **widget_attrs(WidgetStyle.FIELD_CONTROL),
                 "inputmode": "numeric",
                 "placeholder": "0",
                 "autocomplete": "off",
@@ -53,7 +56,7 @@ class DiarioBordoTrechoForm(forms.ModelForm):
         required=False,
         widget=forms.TextInput(
             attrs={
-                "class": "cv-field__control",
+                **widget_attrs(WidgetStyle.FIELD_CONTROL),
                 "inputmode": "numeric",
                 "placeholder": "0",
                 "autocomplete": "off",
@@ -110,7 +113,7 @@ class DiarioMotoristaForm(forms.ModelForm):
         max_length=14,
         widget=forms.TextInput(
             attrs={
-                "class": "cv-field__control",
+                **widget_attrs(WidgetStyle.FIELD_CONTROL),
                 "placeholder": "000.000.000-00",
                 "autocomplete": "off",
                 "inputmode": "numeric",
@@ -123,7 +126,7 @@ class DiarioMotoristaForm(forms.ModelForm):
         max_length=30,
         widget=forms.TextInput(
             attrs={
-                "class": "cv-field__control",
+                **widget_attrs(WidgetStyle.FIELD_CONTROL),
                 "placeholder": "00.000.000-0",
                 "autocomplete": "off",
                 "inputmode": "numeric",
@@ -136,7 +139,7 @@ class DiarioMotoristaForm(forms.ModelForm):
         max_length=8,
         widget=forms.TextInput(
             attrs={
-                "class": "cv-field__control",
+                **widget_attrs(WidgetStyle.FIELD_CONTROL),
                 "placeholder": "ABC-1D23",
                 "autocomplete": "off",
                 "data-mask": "placa",
@@ -164,14 +167,14 @@ class DiarioMotoristaForm(forms.ModelForm):
             "motorista_modo": forms.RadioSelect(),
             "motorista_manual_nome": forms.TextInput(
                 attrs={
-                    "class": "cv-field__control",
+                    **widget_attrs(WidgetStyle.FIELD_CONTROL),
                     "placeholder": "Nome do motorista",
                     "autocomplete": "off",
                 },
             ),
             "motorista_oficio_referencia": forms.TextInput(
                 attrs={
-                    "class": "cv-field__control",
+                    **widget_attrs(WidgetStyle.FIELD_CONTROL),
                     "placeholder": "15/2026",
                     "autocomplete": "off",
                 },
@@ -179,14 +182,14 @@ class DiarioMotoristaForm(forms.ModelForm):
             "viatura_modo": forms.RadioSelect(),
             "viatura_manual_modelo": forms.TextInput(
                 attrs={
-                    "class": "cv-field__control",
+                    **widget_attrs(WidgetStyle.FIELD_CONTROL),
                     "placeholder": "Ex.: Onix",
                     "autocomplete": "off",
                 },
             ),
             "viatura_manual_combustivel": forms.TextInput(
                 attrs={
-                    "class": "cv-field__control",
+                    **widget_attrs(WidgetStyle.FIELD_CONTROL),
                     "placeholder": "Ex.: Gasolina",
                     "autocomplete": "off",
                 },
@@ -204,7 +207,7 @@ class DiarioMotoristaForm(forms.ModelForm):
         servidor_field.queryset = servidores
         servidor_field.required = False
         servidor_field.empty_label = "Selecione um servidor"
-        servidor_field.widget.attrs["class"] = "form-select"
+        set_widget_style(servidor_field.widget, WidgetStyle.FORM_SELECT)
         self.fields["motorista_modo"].required = False
 
         # Viatura do cadastro (modo BANCO).
@@ -214,14 +217,14 @@ class DiarioMotoristaForm(forms.ModelForm):
         )
         viatura_field.required = False
         viatura_field.empty_label = "Selecione uma viatura"
-        viatura_field.widget.attrs["class"] = "form-select"
+        set_widget_style(viatura_field.widget, WidgetStyle.FORM_SELECT)
 
         # Tipo (caracterizada/descaracterizada) da viatura manual.
         tipo_field = self.fields["viatura_manual_tipo"]
         tipo_field.required = False
         tipo_field.widget = forms.Select(
             choices=[("", "Selecione")] + list(Viatura.TIPO_CHOICES),
-            attrs={"class": "form-select"},
+            attrs={**widget_attrs(WidgetStyle.FORM_SELECT)},
         )
         self.fields["viatura_modo"].required = False
 
@@ -410,7 +413,7 @@ def _anexo_multiple_file_field(label):
         help_text="Anexe PDF, PNG, JPG ou JPEG.",
         widget=PrestacaoMultipleFileInput(
             attrs={
-                "class": "form-control cv-field__control prestacao-file-input",
+                **widget_attrs(WidgetStyle.PRESTACAO_FILE_INPUT),
                 "accept": "application/pdf,image/png,image/jpeg,image/*",
             },
         ),
@@ -462,7 +465,7 @@ class PrestacaoServidorDocumentosForm(forms.ModelForm):
         widgets = {
             "numero_solicitacao": forms.TextInput(
                 attrs={
-                    "class": "form-control cv-field__control",
+                    **widget_attrs(WidgetStyle.FORM_CONTROL_FIELD_CONTROL),
                     "placeholder": "Informe o número da solicitação",
                     "autocomplete": "off",
                 },
@@ -507,7 +510,7 @@ class PrestacaoSolicitacaoForm(forms.ModelForm):
         widgets = {
             "numero_solicitacao": forms.TextInput(
                 attrs={
-                    "class": "form-control cv-field__control",
+                    **widget_attrs(WidgetStyle.FORM_CONTROL_FIELD_CONTROL),
                     "placeholder": "Número da solicitação",
                     "autocomplete": "off",
                 },
@@ -534,7 +537,7 @@ class PrestacaoServidorDiariaForm(forms.Form):
         ),
         widget=forms.TextInput(
             attrs={
-                "class": "form-control cv-field__control",
+                **widget_attrs(WidgetStyle.FORM_CONTROL_FIELD_CONTROL),
                 "placeholder": "Deixe em branco para usar o valor padrão acima",
                 "autocomplete": "off",
             },
@@ -568,17 +571,17 @@ class RelatorioTecnicoForm(forms.ModelForm):
     translado_outro = forms.CharField(
         label="Translado - outro",
         required=False,
-        widget=forms.TextInput(attrs={"class": "form-control cv-field__control", "data-rt-other-input": "translado"}),
+        widget=forms.TextInput(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL_FIELD_CONTROL), "data-rt-other-input": "translado"}),
     )
     combustivel_outro = forms.CharField(
         label="Combustível - outro",
         required=False,
-        widget=forms.TextInput(attrs={"class": "form-control cv-field__control", "data-rt-other-input": "combustivel"}),
+        widget=forms.TextInput(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL_FIELD_CONTROL), "data-rt-other-input": "combustivel"}),
     )
     passagem_outro = forms.CharField(
         label="Passagem - outro",
         required=False,
-        widget=forms.TextInput(attrs={"class": "form-control cv-field__control", "data-rt-other-input": "passagem"}),
+        widget=forms.TextInput(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL_FIELD_CONTROL), "data-rt-other-input": "passagem"}),
     )
 
     class Meta:
@@ -616,7 +619,11 @@ class RelatorioTecnicoForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self._relatorio = relatorio
 
-        self.fields["diaria"].widget.attrs.setdefault("class", "form-control cv-field__control")
+        set_widget_style(
+            self.fields["diaria"].widget,
+            WidgetStyle.FORM_CONTROL_FIELD_CONTROL,
+            overwrite=False,
+        )
         for campo, label in CAMPOS_CUSTEIO_COM_OUTRO:
             self.fields[campo] = forms.ChoiceField(
                 label=label,
@@ -624,7 +631,7 @@ class RelatorioTecnicoForm(forms.ModelForm):
                 required=False,
                 widget=forms.Select(
                     attrs={
-                        "class": "form-select",
+                        **widget_attrs(WidgetStyle.FORM_SELECT),
                         "data-rt-other-select": campo,
                         "data-rt-other-value": OUTRO_VALUE,
                     },
@@ -642,7 +649,7 @@ class RelatorioTecnicoForm(forms.ModelForm):
             self.fields[campo].required = False
             self.fields[campo].widget = forms.Textarea(
                 attrs={
-                    "class": "cv-field__control cv-field__control--textarea",
+                    **widget_attrs(WidgetStyle.FIELD_CONTROL_TEXTAREA),
                     "rows": rows.get(campo, 4),
                     "data-rt-textarea": campo,
                 },
@@ -658,7 +665,7 @@ class RelatorioTecnicoForm(forms.ModelForm):
                 empty_label="Selecione um modelo (opcional)",
                 widget=ModeloTextoSelect(
                     attrs={
-                        "class": "form-select",
+                        **widget_attrs(WidgetStyle.FORM_SELECT),
                         "data-rt-modelo-select": "true",
                         "data-rt-target": campo,
                     },
@@ -699,18 +706,18 @@ class ModeloTextoRelatorioTecnicoForm(forms.ModelForm):
     campo = forms.ChoiceField(
         label="Campo do relatório",
         choices=ModeloTextoRelatorioTecnico.CAMPO_CHOICES,
-        widget=forms.Select(attrs={"class": "form-select"}),
+        widget=forms.Select(attrs={**widget_attrs(WidgetStyle.FORM_SELECT)}),
     )
     nome = forms.CharField(
         label="Nome",
         help_text="Use um nome curto para identificar o modelo.",
-        widget=forms.TextInput(attrs={"class": "form-control"}),
+        widget=forms.TextInput(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL)}),
     )
     texto = forms.CharField(
         label="Texto do modelo",
         help_text="Este texto será copiado para o campo do relatório e poderá ser editado antes de gerar.",
         widget=forms.Textarea(
-            attrs={"class": "form-control", "rows": 6, "style": "width: 100%; height: 150px;"},
+            attrs={**widget_attrs(WidgetStyle.FORM_CONTROL), "rows": 6, "style": "width: 100%; height: 150px;"},
         ),
     )
 
