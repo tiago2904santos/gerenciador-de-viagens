@@ -339,7 +339,10 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
   debounces, 2 escapes HTML e 7 normalizações (14 cópias, não 17); todas foram
   removidas. A assinatura pública, que não carrega o núcleo global, passou a
   coalescer o redimensionamento com `requestAnimationFrame`.
-- [ ] `J-12` `CV.feedback` (−13 `alert`/`confirm`)
+- [x] `J-12` criado `CV.feedback` e removidos todos os `alert()`/`confirm()`
+  nativos, com gate bloqueante no auditor de CI. **NOVO — divergência da
+  auditoria histórica:** o inventário vivo encontrou 12 chamadas (não 13);
+  todas foram migradas.
 - [ ] `H-01` + `J-08` `CV.locationRows` — fim das 6 cópias de destinos
 - [ ] `J-15` `CV.documentSource` · `CV.picker` · `CV.overlay`
 - [ ] `J-09` colapsar 22 namespaces em `CV.*`
