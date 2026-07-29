@@ -470,7 +470,10 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
   Roteiros e Eventos.
 - [ ] `P-05` `core/errors.py` + varredura dos 57 `except` do Drive
 - [ ] `P-06` fatiar `planos_trabalho/views.py` e `oficios/views.py`
-- [ ] `P-07` `__str__` nos 3 models de `core`
+- [x] `P-07` `__str__` em `core` — o inventário histórico contou 3 classes,
+  mas `TimeStampedModel` e `CancelavelModel` são abstratas; só `AuditEvent` é
+  model concreto. Sua representação agora identifica ação, model, ID e objeto,
+  coberta por teste antes da mudança.
 - [ ] `S-06` documentos assíncronos via Celery
 
 ### Etapa 5 — Motores JS

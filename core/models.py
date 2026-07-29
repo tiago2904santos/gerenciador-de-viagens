@@ -69,6 +69,14 @@ class AuditEvent(models.Model):
             ),
         ]
 
+    def __str__(self) -> str:
+        identificador = f"{self.action} {self.model_label} #{self.object_id}"
+        return (
+            f"{identificador} — {self.object_repr}"
+            if self.object_repr
+            else identificador
+        )
+
     def save(self, *args, **kwargs):
         if self.pk:
             raise TypeError("Eventos de auditoria são imutáveis.")

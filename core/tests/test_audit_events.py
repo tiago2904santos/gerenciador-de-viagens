@@ -6,6 +6,21 @@ from eventos.models import Evento
 
 
 class AuditEventTests(TestCase):
+    def test_representacao_identifica_acao_modelo_e_objeto(self):
+        event = AuditEvent(
+            action=AuditEvent.ACTION_UPDATE,
+            model_label="eventos.Evento",
+            object_id="42",
+            object_repr="Evento auditado",
+        )
+        self.assertEqual(
+            str(event),
+            "UPDATE eventos.Evento #42 — Evento auditado",
+        )
+
+        event.object_repr = ""
+        self.assertEqual(str(event), "UPDATE eventos.Evento #42")
+
     def test_registra_criacao_e_alteracao_de_dominio(self):
         with self.captureOnCommitCallbacks(execute=True):
             evento = Evento.objects.create(titulo="Auditado")
