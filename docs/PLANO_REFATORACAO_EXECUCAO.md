@@ -309,9 +309,16 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
   antes → depois: R$ 661,81 → **R$ 773,19** e R$ 1.033,07 → **R$ 1.144,45**,
   ambos batendo ao centavo com o oficial. A hora de chegada já existia na tela e
   no banco (`RoteiroTrecho.chegada_dt`); só o cálculo a descartava.
-- [ ] `N-05` unificar as duas regras de complemento — **reavaliar**: nos dois
-  roteiros de referência as duas regras convergem depois do `NOVO-11`. Medir de
-  novo antes de mexer, agora que os limites estão certos.
+- [x] `N-05` as duas regras de complemento eram **casos extremos de uma regra
+  que faltava**: o *trecho tarifário*. O sistema oficial funde períodos
+  consecutivos do mesmo grupo (três capitais seguidas = um trecho, com um
+  complemento sobre a sobra da soma) e abre trecho novo quando o grupo muda.
+  O ramo "por permanência" acertava quando os grupos alternavam a cada destino;
+  o ramo "por viagem" acertava quando havia um grupo só. Ambos erravam no meio,
+  que é o caso comum. Medido em 10.800 roteiros realistas: **21% davam valor
+  diferente do oficial** antes, **0% depois**. Os três demonstrativos oficiais
+  viraram teste. A auditoria descreveu o sintoma (duas regras) e não a causa —
+  registro histórico mantido como está.
 - [~] `NOVO-12` hospedagem 70% / alimentação 30%. O sistema oficial permite
   declarar "Sem Hospedagem" ou "Sem Alimentação" por trecho, zerando a parcela.
   **Decisão de produto (29/07/2026): não implementar as condições editáveis** —
