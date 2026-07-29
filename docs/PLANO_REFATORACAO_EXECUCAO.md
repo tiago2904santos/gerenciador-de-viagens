@@ -327,7 +327,14 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
   este sistema calcula. Sobra apenas a pergunta de apresentação: se algum dia o
   documento precisar exibir as duas colunas separadas, é derivação do valor que
   já existe (70% e 30%), sem mudança de regra nem de valor.
-- [ ] `N-06` `CAPITAIS_POR_UF` → base geográfica IBGE
+- [x] `N-06` **a base geográfica manda**; `CAPITAIS_POR_UF` vira rede de
+  segurança para quando ela não tiver a UF. Medi antes de mexer: as 27 capitais
+  **convergem** — não havia cobrança a menor, havia risco de passar a haver em
+  silêncio. Por isso o teste que importa é o **anti-deriva**, comparando o mapa
+  com `scripts/fixture_dados.json` (a base real, 5.571 municípios), e não com
+  uma cópia de si mesmo. O fallback é deliberado: consulta seca faria todo
+  destino virar `INTERIOR` num banco sem a base importada — a correção
+  introduziria o defeito que ela corrige.
 - [x] `N-08` / `N-10` **a escada do resto, por duração**. Os dois eram o mesmo
   defeito. A regra oficial, confirmada por cinco demonstrativos — um deles um
   experimento que isola a variável (12h01 dentro do mesmo dia, sem virada de

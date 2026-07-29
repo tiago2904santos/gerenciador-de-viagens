@@ -29,6 +29,10 @@ TABELA_DIARIAS_HISTORICA = {
     },
 }
 
+# Rede de seguranca do N-06: a fonte de verdade e' a base geografica
+# (``Cidade.capital``). Este mapa so entra quando a base nao tem a UF — banco
+# recem-criado ou ambiente sem a importacao rodada. Um teste afirma que os dois
+# concordam nas 27 UFs, para a duplicacao nao voltar a divergir em silencio.
 CAPITAIS_POR_UF = {
     'AC': 'RIO BRANCO',
     'AL': 'MACEIO',
@@ -58,6 +62,8 @@ CAPITAIS_POR_UF = {
     'SE': 'ARACAJU',
     'TO': 'PALMAS',
 }
+
+_CAPITAIS_DA_BASE: dict[str, str] | None = None
 
 
 @dataclass(frozen=True)
@@ -151,12 +157,51 @@ def calcular_diarias_com_valor(qtd, valor_unitario, pessoas):
     }
 
 
+def _capitais_da_base() -> dict[str, str]:
+    """Capitais por UF vindas da base geografica, memorizadas no processo.
+
+    ``classify`` roda uma vez por marcador de roteiro; consultar o banco a cada
+    chamada viraria N+1 no editor. Quem importar a base deve chamar
+    ``limpar_cache_capitais()``.
+    """
+    global _CAPITAIS_DA_BASE
+    if _CAPITAIS_DA_BASE is None:
+        from cadastros.models import Cidade
+
+        _CAPITAIS_DA_BASE = {
+            (uf or '').strip().upper(): _normalize_city_name(nome)
+            for nome, uf in Cidade.objects.filter(capital=True).values_list('nome', 'uf')
+            if uf
+        }
+    return _CAPITAIS_DA_BASE
+
+
+def limpar_cache_capitais() -> None:
+    """Esquece as capitais memorizadas (usar apos importar a base geografica)."""
+    global _CAPITAIS_DA_BASE
+    _CAPITAIS_DA_BASE = None
+
+
+def _capital_da_uf(uf_norm: str) -> str | None:
+    """Nome normalizado da capital daquela UF (N-06).
+
+    A base geografica manda; ``CAPITAIS_POR_UF`` so entra quando ela nao tem a
+    UF. Sem esse fallback, um banco sem a base importada faria todo destino
+    virar INTERIOR — que e' exatamente a cobranca a menor que o N-06 existe para
+    evitar. A correcao introduziria o defeito.
+    """
+    da_base = _capitais_da_base().get(uf_norm)
+    if da_base:
+        return da_base
+    return CAPITAIS_POR_UF.get(uf_norm)
+
+
 def classify(cidade: str | None, uf: str | None) -> str:
     uf_norm = (uf or '').strip().upper()
     cidade_norm = _normalize_city_name(cidade)
     if uf_norm == 'DF' and cidade_norm == 'BRASILIA':
         return 'BRASILIA'
-    if uf_norm and cidade_norm and CAPITAIS_POR_UF.get(uf_norm) == cidade_norm:
+    if uf_norm and cidade_norm and _capital_da_uf(uf_norm) == cidade_norm:
         return 'CAPITAL'
     return 'INTERIOR'
 
