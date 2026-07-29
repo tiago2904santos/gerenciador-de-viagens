@@ -262,3 +262,40 @@ class ModelosJustificativaTests(_CatalogoMixin, TestCase):
 
         response = self.client.get(self._index())
         self.assertEqual(response.context["back_label"], "Voltar para as justificativas")
+
+
+class DefinirPadraoNaoAceitaGetTests(TestCase):
+    """Definir padrão é escrita — um GET não pode gravar.
+
+    As views antigas eram `@require_POST`. A primeira versão da fábrica não tinha
+    guarda de método, então um GET passava a marcar o padrão: mutação de estado
+    por navegação. Os testes de caracterização não pegaram porque só exercitavam
+    o POST — a mesma cegueira que já tinha escondido o `NOVO-13`.
+    """
+
+    def setUp(self):
+        self.client.force_login(
+            get_user_model().objects.create_user(username="get_padrao")
+        )
+
+    def test_modelo_de_motivo_recusa_get(self):
+        modelo = ModeloMotivoOficio.objects.create(nome="M", texto="T")
+
+        response = self.client.get(
+            reverse("oficios:modelo_motivo_definir_padrao", args=[modelo.pk])
+        )
+
+        self.assertEqual(response.status_code, 405)
+        modelo.refresh_from_db()
+        self.assertFalse(modelo.is_padrao)
+
+    def test_modelo_de_justificativa_recusa_get(self):
+        modelo = ModeloJustificativa.objects.create(nome="J", texto="T")
+
+        response = self.client.get(
+            reverse("justificativas:modelo_definir_padrao", args=[modelo.pk])
+        )
+
+        self.assertEqual(response.status_code, 405)
+        modelo.refresh_from_db()
+        self.assertFalse(modelo.is_padrao)

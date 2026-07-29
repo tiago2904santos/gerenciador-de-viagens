@@ -35,6 +35,7 @@ from django.contrib import messages
 from django.core.paginator import Paginator
 from django.http import HttpRequest
 from django.http import HttpResponse
+from django.http import HttpResponseNotAllowed
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -99,6 +100,11 @@ class CatalogConfig:
     #: se as URLs de editar/excluir da linha carregam o `?next=`.
     #: Ofícios, eventos e os catálogos simples do PT usam a URL nua.
     urls_de_linha_com_next: bool = True
+    #: o que "definir padrão" faz num GET. Presets, modelos de motivo e modelos
+    #: de justificativa eram `@require_POST` — GET devolve 405. Cargos e
+    #: combustíveis redirecionavam em silêncio. Nos dois casos o GET **não**
+    #: altera nada: definir padrão é escrita e não pode acontecer por navegação.
+    definir_padrao_get_redireciona: bool = False
 
     # ── escrita: services do app, quando existirem ───────────────────────────
     criar: Callable[..., Any] | None = None
@@ -319,7 +325,20 @@ def _excluir_padrao(obj) -> None:
 
 
 def set_default_view(config: CatalogConfig) -> Callable[..., HttpResponse]:
+    """Definir padrão é escrita, então só acontece por POST.
+
+    As views antigas garantiam isso de duas formas: `@require_POST` (presets,
+    modelos de motivo, modelos de justificativa) ou um `if request.method !=
+    "POST": return redirect(...)` silencioso (cargos, combustíveis). As duas
+    estão preservadas — o que nenhuma das duas faz é gravar num GET.
+    """
+
     def view(request: HttpRequest, pk) -> HttpResponse:
+        if request.method != "POST":
+            if config.definir_padrao_get_redireciona:
+                return redirect(_url_index(config, _next_url(request, config)))
+            return HttpResponseNotAllowed(["POST"])
+
         obj = config.get_by_id(pk)
         next_url = _next_url(request, config)
         if config.definir_padrao is not None:
