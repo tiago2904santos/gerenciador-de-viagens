@@ -88,10 +88,10 @@ from .services import oficio_esta_completo_para_finalizar
 from .services import OficioNumeroConflitoError
 from .services import tocar_data_criacao_oficio
 from .services import validar_oficio_para_documento
-from .catalog_views import modelo_motivo_definir_padrao
-from .catalog_views import modelo_motivo_editar
-from .catalog_views import modelo_motivo_excluir
-from .catalog_views import modelos_motivo_index
+from .catalogs import modelo_motivo_definir_padrao
+from .catalogs import modelo_motivo_editar
+from .catalogs import modelo_motivo_excluir
+from .catalogs import modelos_motivo_index
 from .lifecycle_views import cancelar
 from .lifecycle_views import excluir
 from .lifecycle_views import marcar_complementar

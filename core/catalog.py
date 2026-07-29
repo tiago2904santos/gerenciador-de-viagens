@@ -35,6 +35,7 @@ from django.contrib import messages
 from django.core.paginator import Paginator
 from django.http import HttpRequest
 from django.http import HttpResponse
+from django.http import HttpResponseNotAllowed
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -90,6 +91,20 @@ class CatalogConfig:
     back_label_sem_next: str = ""
     #: JSON dos campos do quick edit, quando o presenter não o monta sozinho
     edit_fields_json: Callable[[Any], str] | None = None
+    #: os presenters de ofícios e justificativas montam o `set_default_url`
+    #: sozinhos, revertendo a URL por dentro; os do PT recebem pronto
+    presenter_recebe_set_default: bool = True
+    #: só o presenter de justificativas precisa do `next_url` para compor o
+    #: link de "definir padrão"
+    presenter_recebe_next_url: bool = False
+    #: se as URLs de editar/excluir da linha carregam o `?next=`.
+    #: Ofícios, eventos e os catálogos simples do PT usam a URL nua.
+    urls_de_linha_com_next: bool = True
+    #: o que "definir padrão" faz num GET. Presets, modelos de motivo e modelos
+    #: de justificativa eram `@require_POST` — GET devolve 405. Cargos e
+    #: combustíveis redirecionavam em silêncio. Nos dois casos o GET **não**
+    #: altera nada: definir padrão é escrita e não pode acontecer por navegação.
+    definir_padrao_get_redireciona: bool = False
 
     # ── escrita: services do app, quando existirem ───────────────────────────
     criar: Callable[..., Any] | None = None
@@ -161,8 +176,17 @@ def _salvar(form, request: HttpRequest, config: CatalogConfig, *, instance=None)
 # ── views ────────────────────────────────────────────────────────────────────
 
 
-def index_view(config: CatalogConfig) -> Callable[[HttpRequest], HttpResponse]:
-    """Lista + quick add."""
+def index_view(
+    config: CatalogConfig,
+    *,
+    contexto_extra: Callable[[HttpRequest, str], dict] | None = None,
+) -> Callable[[HttpRequest], HttpResponse]:
+    """Lista + quick add.
+
+    `contexto_extra` recebe a requisição e o `?next=` já validado. Existe para os
+    catálogos cujo rótulo de retorno depende da tela de origem — modelos de
+    motivo dizem "Voltar para a Ordem de Serviço" quando se chega por lá.
+    """
 
     def view(request: HttpRequest) -> HttpResponse:
         q = request.GET.get("q", "").strip() if config.buscar else ""
@@ -193,6 +217,7 @@ def index_view(config: CatalogConfig) -> Callable[[HttpRequest], HttpResponse]:
             "quick_add_next_url": next_url if externo else "",
             **_contexto_navegacao(config, next_url, externo),
             **config.contexto,
+            **(contexto_extra(request, next_url) if contexto_extra else {}),
         }
         if page_obj is not None:
             contexto["page_obj"] = page_obj
@@ -214,23 +239,22 @@ def _contexto_navegacao(config: CatalogConfig, next_url: str, externo: bool) -> 
 
 
 def _linha(obj, config: CatalogConfig, next_url: str) -> dict:
+    def com_next(base: str) -> str:
+        return _com_next(base, next_url, config) if config.urls_de_linha_com_next else base
+
     kwargs = {
-        "edit_url": _url_index(
-            config, next_url, base=reverse(config.url_editar, args=[obj.pk])
-        ),
-        "delete_url": reverse(config.url_excluir, args=[obj.pk]),
+        "edit_url": com_next(reverse(config.url_editar, args=[obj.pk])),
+        "delete_url": com_next(reverse(config.url_excluir, args=[obj.pk])),
         "delete_modal": True,
     }
-    if config.url_definir_padrao:
+    if config.url_definir_padrao and config.presenter_recebe_set_default:
         kwargs["set_default_url"] = (
             None
             if getattr(obj, "is_padrao", False)
-            else _url_index(
-                config,
-                next_url,
-                base=reverse(config.url_definir_padrao, args=[obj.pk]),
-            )
+            else com_next(reverse(config.url_definir_padrao, args=[obj.pk]))
         )
+    if config.presenter_recebe_next_url:
+        kwargs["next_url"] = next_url
     linha = config.row_presenter(obj, **kwargs)
     if config.edit_fields_json is not None:
         linha["edit_fields_json"] = config.edit_fields_json(obj)
@@ -301,7 +325,20 @@ def _excluir_padrao(obj) -> None:
 
 
 def set_default_view(config: CatalogConfig) -> Callable[..., HttpResponse]:
+    """Definir padrão é escrita, então só acontece por POST.
+
+    As views antigas garantiam isso de duas formas: `@require_POST` (presets,
+    modelos de motivo, modelos de justificativa) ou um `if request.method !=
+    "POST": return redirect(...)` silencioso (cargos, combustíveis). As duas
+    estão preservadas — o que nenhuma das duas faz é gravar num GET.
+    """
+
     def view(request: HttpRequest, pk) -> HttpResponse:
+        if request.method != "POST":
+            if config.definir_padrao_get_redireciona:
+                return redirect(_url_index(config, _next_url(request, config)))
+            return HttpResponseNotAllowed(["POST"])
+
         obj = config.get_by_id(pk)
         next_url = _next_url(request, config)
         if config.definir_padrao is not None:

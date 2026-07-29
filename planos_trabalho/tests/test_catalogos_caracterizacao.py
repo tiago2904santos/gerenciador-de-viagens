@@ -295,3 +295,27 @@ class HorariosTests(CatalogoCaracterizacaoMixin, TestCase):
 
         self.assertFalse(HorarioAtendimento.objects.filter(pk=horario.pk).exists())
         self.assertIn("Horário “07:15 até 11:45” excluído.", self._mensagens(response))
+
+
+class PresetDefinirPadraoNaoAceitaGetTests(TestCase):
+    """O `preset_definir_padrao` antigo era `@require_POST`.
+
+    A primeira versão da fábrica perdeu essa guarda, e o teste de caracterização
+    não notou porque só fazia POST. Um GET não pode gravar.
+    """
+
+    def setUp(self):
+        self.client.force_login(
+            get_user_model().objects.create_user(username="get_padrao_preset")
+        )
+
+    def test_get_nao_define_o_padrao(self):
+        preset = PresetAtividadesPlanoTrabalho.objects.create(nome="Preset G")
+
+        response = self.client.get(
+            reverse("planos_trabalho:preset_definir_padrao", args=[preset.pk])
+        )
+
+        self.assertEqual(response.status_code, 405)
+        preset.refresh_from_db()
+        self.assertFalse(preset.is_padrao)
