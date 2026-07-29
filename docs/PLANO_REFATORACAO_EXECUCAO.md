@@ -511,6 +511,16 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
 
 ## 7.1 Escopo novo, fora das oito etapas
 
+### Rascunhos antigos triados em 29/07
+
+- [x] **#32** — destino em CAIXA ALTA no documento da Ordem de Serviço. Confirmado
+  presente e corrigido: `format_document_display` no `_destinos_display`.
+- [x] **#44 (metade)** — `Cache-Control: no-store` ausente nas respostas de PDF; o
+  navegador podia servir a versão pré-retificação. A **outra metade do #44 já
+  estava corrigida**: `assunto_termo` hoje só devolve "autorização"/"convalidação",
+  nunca "retificação"/"complementação" — o rótulo do número virou campo separado.
+- [x] **#27** — substituído pelo #106 (recursão do editor de roteiro).
+
 Pedidos que não vieram das auditorias entram aqui, com posição decidida antes de
 começarem. Escopo novo que se infiltra numa etapa em curso é como a Etapa 1
 perde o prazo e a Etapa 2 perde a rede.

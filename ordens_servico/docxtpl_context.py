@@ -39,9 +39,13 @@ def _destinos_display(ordem: OrdemServico) -> str:
     destinos = list(ordem.destinos.select_related("estado").order_by("nome"))
     if not destinos:
         return ""
+    # O banco guarda o nome da cidade em caixa alta (`Cidade.save()` normaliza).
+    # O documento e para leitura humana e assinatura — o resto do modulo ja
+    # aplica `format_document_display` a nome de servidor e ao motivo.
+    nomes = [format_document_display(d.nome) or str(d.nome) for d in destinos]
     parts = [
-        f"{d.nome}/{d.estado.sigla}" if d.estado_id else d.nome
-        for d in destinos
+        f"{nome}/{d.estado.sigla}" if d.estado_id else nome
+        for d, nome in zip(destinos, nomes)
     ]
     if len(parts) == 1:
         return parts[0]
