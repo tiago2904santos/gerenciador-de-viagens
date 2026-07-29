@@ -7,7 +7,7 @@ import {
   initTrechosFields,
   setTrechoDateValue,
   queryTrechoCards,
-} from './trechos.js?v=20260720-date-picker-header';
+} from './trechos.js?v=20260729-recalc-loop';
 import { createRetornoModule } from './retorno.js';
 import { createDiariasModule } from './diarias.js';
 import { createMapaModule } from './mapa.js';
@@ -595,17 +595,21 @@ export function initRoteirosEditor() {
     var shEl = card.querySelector('[name="trecho_' + o + '_saida_hora"]');
     var chEl = card.querySelector('[name="trecho_' + o + '_chegada_hora"]');
     if (suggestArrival && sdEl && shEl) {
+      // `silent` é obrigatório aqui: o `change` do hidden de chegada sobe até o
+      // listener do container, que chama `recalcCard` de novo — e a recursão só
+      // termina quando a pilha estoura. Quem chama `recalcCard` já dispara
+      // `updateResumo`/`scheduleRealtimeDiarias`/`scheduleAutosave` por conta.
       if (!sdEl.value || !shEl.value) {
-        setTrechoDateValue(card, 'chegada', '');
+        setTrechoDateValue(card, 'chegada', '', { silent: true });
         if (chEl) chEl.value = '';
       } else if (total > 0) {
         var cheg = calcularChegada(sdEl.value, shEl.value, cru, add);
         if (cheg) {
-          setTrechoDateValue(card, 'chegada', cheg.data);
+          setTrechoDateValue(card, 'chegada', cheg.data, { silent: true });
           if (chEl) chEl.value = cheg.hora;
         }
       } else {
-        setTrechoDateValue(card, 'chegada', '');
+        setTrechoDateValue(card, 'chegada', '', { silent: true });
         if (chEl) chEl.value = '';
       }
     }
