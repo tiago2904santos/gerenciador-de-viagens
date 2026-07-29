@@ -13,10 +13,11 @@ from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_GET
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.http import require_POST
+
+from core.retorno import voltar_para
 
 
 from documentos.services.exceptions import DocumentValidationError
@@ -721,15 +722,6 @@ def baixar_termo_lote_zip(request, pk, formato):
     return response
 
 
-def _safe_next_url(request, fallback_url):
-    next_url = request.POST.get("next") or request.GET.get("next")
-    if next_url and url_has_allowed_host_and_scheme(
-        next_url,
-        allowed_hosts={request.get_host()},
-        require_https=request.is_secure(),
-    ):
-        return next_url
-    return fallback_url
 
 
 def _anexar_assinado_resolver(request, fallback_url, resolver):
@@ -747,19 +739,19 @@ def _anexar_assinado_resolver(request, fallback_url, resolver):
     upload = request.FILES.get("arquivo")
     if not upload:
         messages.error(request, "Selecione um arquivo PDF para anexar.")
-        return redirect(_safe_next_url(request, fallback_url))
+        return redirect(voltar_para(request, fallback_url))
     artefato = resolver()
     if artefato is None:
         messages.error(request, "Não foi possível gerar o termo para anexar o assinado.")
-        return redirect(_safe_next_url(request, fallback_url))
+        return redirect(voltar_para(request, fallback_url))
     try:
         anexar_arquivo_assinado(artefato, upload)
     except ArquivoAssinadoInvalido as exc:
         messages.error(request, str(exc))
-        return redirect(_safe_next_url(request, fallback_url))
+        return redirect(voltar_para(request, fallback_url))
     agendar_sincronizacao_assinatura_manual(artefato, usuario=request.user)
     messages.success(request, "Documento assinado anexado.")
-    return redirect(_safe_next_url(request, fallback_url))
+    return redirect(voltar_para(request, fallback_url))
 
 
 @require_POST

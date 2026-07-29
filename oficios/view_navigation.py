@@ -3,7 +3,9 @@
 from urllib.parse import urlencode
 
 from django.urls import reverse
-from django.utils.http import url_has_allowed_host_and_scheme
+
+from core.retorno import url_de_cadastro
+from core.retorno import voltar_para
 
 
 def evento_etapa_url(evento_id, etapa):
@@ -30,15 +32,10 @@ def cadastro_create_url(create_url_name, next_url):
 
 
 def url_with_next(url_name, next_url):
-    return f"{reverse(url_name)}?{urlencode({'next': next_url})}"
+    """Mantido como fachada: `core.retorno` e o dono da politica (`NOVO-15`)."""
+    return url_de_cadastro(url_name, next_url)
 
 
 def safe_next_url(request, fallback_url):
-    next_url = request.POST.get("next") or request.GET.get("next")
-    if next_url and url_has_allowed_host_and_scheme(
-        next_url,
-        allowed_hosts={request.get_host()},
-        require_https=request.is_secure(),
-    ):
-        return next_url
-    return fallback_url
+    """Mantido como fachada: `core.retorno` e o dono da politica (`NOVO-15`)."""
+    return voltar_para(request, fallback_url)

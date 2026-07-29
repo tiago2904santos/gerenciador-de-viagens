@@ -63,6 +63,16 @@
         </div>
       </div>
       </div>
+
+      {# Era a unica etapa sem rodape: dependia do stepper e do autosave para o
+         usuario sair dela. A view ja tratava `wizard_back`/`wizard_next`, entao
+         faltava so oferecer os botoes — iguais aos das etapas 2 e 4.
+         (A etapa 2 parecia estar sem tambem, mas os botoes dela vem de um
+         include aninhado no editor de roteiro; medir na tela renderizada, e nao
+         no grep do template, foi o que mostrou isso.) #}
+      <div class="cv-form-card__footer">
+        {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar" secondary_action="wizard_back" primary_label="Avançar" primary_action="wizard_next" only %}
+      </div>
     </section>
   </div>
 {% endblock %}

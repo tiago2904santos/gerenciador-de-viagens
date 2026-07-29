@@ -10,10 +10,10 @@ from django.shortcuts import redirect
 from django.shortcuts import render
 from django.templatetags.static import static
 from django.urls import reverse
-from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_GET
 from django.views.decorators.http import require_POST
 
+from core.retorno import voltar_para
 from core.tenancy import filter_queryset_by_area
 
 from .models import DocumentoArtefato
@@ -99,15 +99,6 @@ def artefato_pdf_visualizar(request, pk):
     )
 
 
-def _safe_next_url(request, fallback_url):
-    next_url = request.POST.get("next") or request.GET.get("next")
-    if next_url and url_has_allowed_host_and_scheme(
-        next_url,
-        allowed_hosts={request.get_host()},
-        require_https=request.is_secure(),
-    ):
-        return next_url
-    return fallback_url
 
 
 def _artefato_fallback_url(artefato: DocumentoArtefato) -> str:
@@ -132,17 +123,17 @@ def artefato_assinado_anexar(request, pk):
     upload = request.FILES.get("arquivo")
     if not upload:
         messages.error(request, "Selecione um arquivo PDF para anexar.")
-        return redirect(_safe_next_url(request, fallback))
+        return redirect(voltar_para(request, fallback))
     try:
         anexar_arquivo_assinado(artefato, upload)
     except ArquivoAssinadoInvalido as exc:
         messages.error(request, str(exc))
-        return redirect(_safe_next_url(request, fallback))
+        return redirect(voltar_para(request, fallback))
     from integracoes.google_drive.services import agendar_sincronizacao_assinatura_manual
 
     agendar_sincronizacao_assinatura_manual(artefato, usuario=request.user)
     messages.success(request, "Documento assinado anexado.")
-    return redirect(_safe_next_url(request, fallback))
+    return redirect(voltar_para(request, fallback))
 
 
 @require_POST
@@ -155,4 +146,4 @@ def artefato_assinado_remover(request, pk):
 
     agendar_sincronizacao_assinatura_manual(artefato, usuario=request.user)
     messages.success(request, "Documento assinado removido.")
-    return redirect(_safe_next_url(request, fallback))
+    return redirect(voltar_para(request, fallback))
