@@ -25,6 +25,7 @@
   --color-primary-hover: #082f55;
   --color-primary-bright: #155b9a;
   --color-primary-soft: #e5eff8;
+  --color-on-accent: var(--color-primary-dark);
   /* Halo de foco. Era usado sem estar definido, entao .cv-data-table-shell
      ficava sem anel de foco visivel (D-06). */
   --color-focus-ring: rgba(21, 91, 154, 0.22);
@@ -38,6 +39,7 @@
   --color-danger-soft: #fdecec;
   --color-warning: #d8a21b;
   --color-warning-soft: #fff3cf;
+  --color-warning-border: var(--color-accent-border-strong);
   --color-success: #16805a;
   --color-success-soft: #e5f6ef;
   --color-info: #155b9a;
@@ -119,6 +121,7 @@
   --font-size-xs: 12px;
   --font-size-sm: 14px;
   --font-size-md: 16px;
+  --font-size-base: var(--font-size-md);
   --font-size-lg: 20px;
   --font-size-xl: 24px;
   --font-size-2xl: 32px;
@@ -150,6 +153,7 @@
   --cv-field-gap: var(--space-2);
   --cv-field-border: 1px solid var(--color-border-strong);
   --cv-field-bg: var(--color-surface);
+  --cv-form-field-bg: var(--cv-field-bg);
   --cv-field-color: var(--color-text);
   --cv-field-focus-ring: 0 0 0 3px rgba(21, 91, 154, 0.28);
   --cv-card-border: 1px solid var(--color-border);

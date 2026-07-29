@@ -257,6 +257,8 @@ html[data-theme="dark"] {
   /* Header Filter Bar */
   --surface-filter-input:         rgba(255, 255, 255, 0.05);
   --border-filter-input:          rgba(255, 255, 255, 0.12);
+  --surface-filter-chip:          var(--surface-filter-input);
+  --border-filter-chip:           var(--border-filter-input);
   --color-filter-placeholder:     rgba(255, 255, 255, 0.35);
   --color-filter-text:            var(--theme-text-body);
   --surface-filter-button:        rgba(255, 255, 255, 0.06);
@@ -363,6 +365,8 @@ html[data-theme="light"] {
   /* Header Filter Bar */
   --surface-filter-input:         var(--color-surface);
   --border-filter-input:          var(--color-border);
+  --surface-filter-chip:          var(--surface-filter-input);
+  --border-filter-chip:           var(--border-filter-input);
   --color-filter-placeholder:     var(--theme-text-muted);
   --color-filter-text:            var(--theme-text-body);
   --surface-filter-button:        var(--color-surface);
@@ -3283,8 +3287,8 @@ html[data-theme="dark"] .quick-add-footer-button.is-filled:hover {
 
 .header-applied-chip {
   align-items:     center;
-  background:      var(--surface-filter-chip, var(--surface-filter-input));
-  border:          1px solid var(--border-filter-chip, var(--border-filter-input));
+  background:      var(--surface-filter-chip);
+  border:          1px solid var(--border-filter-chip);
   border-radius:   var(--radius-pill, 999px);
   color:           var(--color-filter-text);
   cursor:          default;
