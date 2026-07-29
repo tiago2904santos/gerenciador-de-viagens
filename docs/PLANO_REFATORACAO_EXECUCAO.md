@@ -289,7 +289,10 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
   contexto: o contexto é sintético de propósito, para isolar as duas falhas. A
   correção dos valores é dos testes de cada módulo.
 - [x] `T-03` `coverage` no CI com piso por app
-- [ ] `D-02` (backend) testes de contrato de `organizer.py`
+- [x] `D-02` (backend) — 6 testes de contrato de `organizer.py` com double de
+  Drive com estado: operações idempotentes, árvore/arquivo existente, ausência
+  de arquivo, resposta parcial, falha transitória com retry, atalhos/IDs
+  persistidos e prevenção de pasta órfã.
 
 ### Etapa 3 — Regra de negócio
 - [x] `N-01` tabela de diárias com vigência — **as 3 partes** concluídas: o modelo
