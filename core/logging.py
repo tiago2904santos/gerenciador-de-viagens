@@ -27,6 +27,9 @@ class JsonFormatter(logging.Formatter):
             "method": getattr(record, "request_method", ""),
             "path": getattr(record, "request_path", ""),
         }
+        for field in ("error_context", "error_type", "error_data"):
+            if hasattr(record, field):
+                payload[field] = getattr(record, field)
         if record.exc_info:
             payload["exception"] = self.formatException(record.exc_info)
         return json.dumps(payload, ensure_ascii=False, separators=(",", ":"))

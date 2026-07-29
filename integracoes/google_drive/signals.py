@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import logging
 
+from core.errors import capture
+
 logger = logging.getLogger(__name__)
 
 
@@ -11,7 +13,8 @@ def _agendar_apos_commit(task, *args) -> None:
     def enviar():
         try:
             task.delay(*args)
-        except Exception:
+        except Exception as exc:
+            capture(exc, "drive.signals.enviar")  # pragma: no cover
             logger.exception("[Drive] não foi possível agendar tarefa assíncrona")
 
     transaction.on_commit(enviar)
@@ -108,8 +111,9 @@ def _avisar_usuario(mensagem: str) -> None:
         return
     try:
         messages.warning(request, mensagem)
-    except Exception:
+    except Exception as exc:
         # Sem MessageMiddleware ativo (ex.: comando de management, shell) — ignora.
+        capture(exc, "drive.signals._avisar_usuario")  # pragma: no cover
         pass
 
 
@@ -147,6 +151,7 @@ def _processar_com_retry(fn, obj, task) -> None:
         try:
             task.delay(obj.pk, usuario_id=usuario_id)
         except Exception as exc:
+            capture(exc, "drive.signals.enviar")  # pragma: no cover
             status.registrar_falha(obj, exc, usuario=usuario)
             logger.warning(
                 "[Drive] fila indisponível (%s); %s #%s fica pendente até reenvio manual",
@@ -266,7 +271,8 @@ def _organizar_oficio_em_thread(oficio_id: int, usuario_id=None) -> None:
             usuario = _usuario_por_id(usuario_id)
             with organizer.usar_usuario(usuario):
                 status.executar_e_rastrear(organizer.organizar_oficio, oficio, usuario=usuario)
-        except Exception:
+        except Exception as exc:
+            capture(exc, "drive.signals._organizar_oficio_em_thread")  # pragma: no cover
             logger.error(
                 "[Drive] falha ao gerar/organizar ofício #%s em segundo plano",
                 oficio_id, exc_info=True,
@@ -323,12 +329,14 @@ def _excluir_no_drive(client, reg) -> None:
     if reg.file_id:
         try:
             client.mover_para_lixeira(reg.file_id)
-        except Exception:
+        except Exception as exc:
+            capture(exc, "drive.signals._excluir_no_drive")  # pragma: no cover
             logger.error("[Drive] falha ao mover file_id=%s para a lixeira", reg.file_id, exc_info=True)
     if getattr(reg, "atalho_id", ""):
         try:
             client.mover_para_lixeira(reg.atalho_id)
-        except Exception:
+        except Exception as exc:
+            capture(exc, "drive.signals._excluir_no_drive")  # pragma: no cover
             logger.error("[Drive] falha ao mover atalho_id=%s para a lixeira", reg.atalho_id, exc_info=True)
 
 
@@ -344,7 +352,8 @@ def _limpar_drive_artefato(sender, instance, **kwargs) -> None:
 
     try:
         client = get_client()
-    except Exception:
+    except Exception as exc:
+        capture(exc, "drive.signals._limpar_drive_artefato")  # pragma: no cover
         logger.error(
             "[Drive] falha ao obter client para excluir artefato %s", instance.pk, exc_info=True
         )
@@ -374,7 +383,8 @@ def _limpar_drive_externo(sender, instance, **kwargs) -> None:
 
     try:
         client = get_client()
-    except Exception:
+    except Exception as exc:
+        capture(exc, "drive.signals._limpar_drive_externo")  # pragma: no cover
         logger.error(
             "[Drive] falha ao obter client para excluir arquivos de %s #%s",
             instance.__class__.__name__, instance.pk, exc_info=True,
@@ -409,7 +419,8 @@ def _limpar_pasta_evento(sender, instance, **kwargs) -> None:
 
     try:
         client = get_client()
-    except Exception:
+    except Exception as exc:
+        capture(exc, "drive.signals._limpar_pasta_evento")  # pragma: no cover
         logger.error(
             "[Drive] falha ao obter client para excluir pasta do evento #%s", instance.pk, exc_info=True
         )
@@ -417,14 +428,16 @@ def _limpar_pasta_evento(sender, instance, **kwargs) -> None:
     if pasta_id is None:
         try:
             pasta_id = organizer._pasta_evento_folder(client, instance)
-        except Exception:
+        except Exception as exc:
+            capture(exc, "drive.signals._limpar_pasta_evento")  # pragma: no cover
             logger.error(
                 "[Drive] falha ao localizar pasta do evento #%s", instance.pk, exc_info=True
             )
             return
     try:
         client.mover_para_lixeira(pasta_id)
-    except Exception:
+    except Exception as exc:
+        capture(exc, "drive.signals._limpar_pasta_evento")  # pragma: no cover
         logger.error(
             "[Drive] falha ao mover pasta do evento #%s para a lixeira", instance.pk, exc_info=True
         )
@@ -457,7 +470,8 @@ def _organizar_evento_em_thread(evento_id: int, usuario_id=None) -> None:
             usuario = _usuario_por_id(usuario_id)
             with organizer.usar_usuario(usuario):
                 status.executar_e_rastrear(organizer.organizar_evento, evento, usuario=usuario)
-        except Exception:
+        except Exception as exc:
+            capture(exc, "drive.signals._organizar_evento_em_thread")  # pragma: no cover
             logger.error(
                 "[Drive] falha ao gerar/organizar evento #%s em segundo plano",
                 evento_id, exc_info=True,

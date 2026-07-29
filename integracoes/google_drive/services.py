@@ -6,6 +6,8 @@ import logging
 from datetime import datetime, timezone
 
 from django.conf import settings
+
+from core.errors import capture
 from core.middleware import get_current_request
 
 logger = logging.getLogger(__name__)
@@ -55,7 +57,8 @@ def escopo_faltante(usuario=None) -> list[str]:
     """
     try:
         creds = get_credenciais(usuario)
-    except Exception:
+    except Exception as exc:
+        capture(exc, "drive.services.escopo_faltante")  # pragma: no cover
         return []
     if not creds or not (creds.scope or "").strip():
         return []
@@ -101,7 +104,8 @@ def get_pasta_raiz_id(usuario=None) -> str:
         creds = get_credenciais(usuario)
         if creds and creds.pasta_raiz_id:
             return creds.pasta_raiz_id
-    except Exception:
+    except Exception as exc:
+        capture(exc, "drive.services.get_pasta_raiz_id")  # pragma: no cover
         pass
     return _cfg().get("PASTA_RAIZ_ID", "")
 
@@ -338,7 +342,8 @@ class _RealClient:
                 fileId=pasta_id, fields="name", supportsAllDrives=True
             ).execute()
             return result.get("name", pasta_id)
-        except Exception:
+        except Exception as exc:
+            capture(exc, "drive.services.nome_pasta")  # pragma: no cover
             return pasta_id
 
     def mover_renomear(self, file_id: str, novo_nome: str, nova_pasta_id: str | None = None) -> str:
@@ -391,6 +396,7 @@ class _RealClient:
                 self.mover_renomear(existing_id, nome, pasta_id)
                 return existing_id
             except Exception as exc:
+                capture(exc, "drive.services.criar_ou_atualizar_atalho")  # pragma: no cover
                 logger.warning("[Drive] atalho %s inválido, recriando: %s", existing_id, exc)
         meta = {
             "name": nome,
@@ -432,6 +438,7 @@ class _RealClient:
             self._svc.files().delete(fileId=file_id, supportsAllDrives=True).execute()
             logger.info("[Drive] arquivo excluído file_id=%s", file_id)
         except Exception as exc:
+            capture(exc, "drive.services.excluir_arquivo")  # pragma: no cover
             logger.warning("[Drive] falha ao excluir file_id=%s: %s", file_id, exc)
 
     def mover_para_lixeira(self, file_id: str) -> None:
@@ -442,6 +449,7 @@ class _RealClient:
             ).execute()
             logger.info("[Drive] arquivo movido para a lixeira file_id=%s", file_id)
         except Exception as exc:
+            capture(exc, "drive.services.mover_para_lixeira")  # pragma: no cover
             logger.warning("[Drive] falha ao mover para a lixeira file_id=%s: %s", file_id, exc)
 
     def buscar_arquivo_por_nome(self, nome: str, pasta_id: str) -> str | None:
@@ -535,7 +543,8 @@ def is_mock(usuario=None) -> bool:
 def esta_autorizado(usuario=None) -> bool:
     try:
         return get_credenciais(usuario) is not None
-    except Exception:
+    except Exception as exc:
+        capture(exc, "drive.services.esta_autorizado")  # pragma: no cover
         return False
 
 
@@ -554,6 +563,7 @@ def upload_artefato(artefato) -> tuple[str, str] | None:
 
         return organizer.organizar_artefato(artefato)
     except Exception as exc:
+        capture(exc, "drive.services.upload_artefato")  # pragma: no cover
         logger.error("[Drive] falha ao enviar artefato %s: %s", getattr(artefato, "pk", "?"), exc, exc_info=True)
         return None
 
@@ -571,6 +581,7 @@ def sincronizar_assinatura_manual(artefato) -> tuple[str, str] | None:
 
         return organizer.sincronizar_conteudo_assinado(artefato)
     except Exception as exc:
+        capture(exc, "drive.services.sincronizar_assinatura_manual")  # pragma: no cover
         logger.error(
             "[Drive] falha ao sincronizar assinatura manual do artefato %s: %s",
             getattr(artefato, "pk", "?"), exc, exc_info=True,
@@ -596,6 +607,7 @@ def agendar_sincronizacao_assinatura_manual(artefato, *, usuario=None) -> None:
                 usuario_id=usuario_id,
             )
         except Exception as exc:
+            capture(exc, "drive.services.enviar")  # pragma: no cover
             status.registrar_falha(artefato, exc, usuario=usuario)
             logger.warning(
                 "[Drive] assinatura do artefato %s ficou pendente: %s",

@@ -39,6 +39,8 @@ import contextvars
 import logging
 import mimetypes
 
+from core.errors import capture
+
 from . import naming
 from .services import get_client, is_mock, mimetype_para_formato
 
@@ -81,6 +83,7 @@ def _ler_filefield(ff) -> bytes | None:
         finally:
             ff.close()
     except Exception as exc:  # arquivo ausente no storage, etc.
+        capture(exc, "drive.organizer._ler_filefield")  # pragma: no cover
         logger.warning("[Drive] não foi possível ler %s: %s", getattr(ff, "name", "?"), exc)
         return None
 
@@ -830,7 +833,8 @@ def _garantir_termos(oficio) -> None:
 
     try:
         from termos.services import gerar_termo_um, listar_servidores_com_termo
-    except Exception:
+    except Exception as exc:
+        capture(exc, "drive.organizer._garantir_termos")  # pragma: no cover
         return
 
     existentes = set(
@@ -842,6 +846,7 @@ def _garantir_termos(oficio) -> None:
         try:
             gerar_termo_um(oficio, servidor, DocumentoFormato.PDF)
         except Exception as exc:  # noqa: BLE001
+            capture(exc, "drive.organizer._garantir_termos")  # pragma: no cover
             logger.warning("[Drive] backfill termo (oficio %s, serv %s) falhou: %s", oficio.pk, servidor.pk, exc)
 
 
@@ -858,12 +863,14 @@ def _garantir_ordens_servico(oficio) -> None:
     """
     try:
         from ordens_servico.services import gerar_os_pdf_response
-    except Exception:
+    except Exception as exc:
+        capture(exc, "drive.organizer._garantir_ordens_servico")  # pragma: no cover
         return
 
     try:
         ordens = list(oficio.ordens_servico.all())
-    except Exception:
+    except Exception as exc:
+        capture(exc, "drive.organizer._garantir_ordens_servico")  # pragma: no cover
         return
     for ordem in ordens:
         oficio_ancora = ordem.oficios.first()
@@ -874,6 +881,7 @@ def _garantir_ordens_servico(oficio) -> None:
         try:
             gerar_os_pdf_response(ordem)
         except Exception as exc:  # noqa: BLE001
+            capture(exc, "drive.organizer._garantir_ordens_servico")  # pragma: no cover
             logger.warning("[Drive] backfill ordem de serviço (OS %s) falhou: %s", ordem.pk, exc)
 
 
@@ -891,6 +899,7 @@ def _garantir_documento_oficio(oficio) -> None:
 
             gerar_resposta_documento_oficio(oficio, DocumentoFormato.PDF)
         except Exception as exc:  # noqa: BLE001
+            capture(exc, "drive.organizer._garantir_documento_oficio")  # pragma: no cover
             logger.warning("[Drive] backfill ofício (oficio %s) falhou: %s", oficio.pk, exc)
 
     if not oficio.documentos_gerados.filter(tipo="justificativa").exists():
@@ -909,6 +918,7 @@ def _garantir_documento_oficio(oficio) -> None:
 
                 gerar_resposta_justificativa_documento(oficio, DocumentoFormato.PDF)
         except Exception as exc:  # noqa: BLE001
+            capture(exc, "drive.organizer._garantir_documento_oficio")  # pragma: no cover
             logger.warning("[Drive] backfill justificativa (oficio %s) falhou: %s", oficio.pk, exc)
 
 
@@ -922,12 +932,14 @@ def _garantir_planos(evento) -> None:
 
     try:
         from planos_trabalho.services import gerar_plano_documento
-    except Exception:
+    except Exception as exc:
+        capture(exc, "drive.organizer._garantir_planos")  # pragma: no cover
         return
 
     try:
         planos = list(evento.planos_trabalho.all())
-    except Exception:
+    except Exception as exc:
+        capture(exc, "drive.organizer._garantir_planos")  # pragma: no cover
         return
 
     for plano in planos:
@@ -939,6 +951,7 @@ def _garantir_planos(evento) -> None:
         try:
             gerar_plano_documento(plano, DocumentoFormato.PDF)
         except Exception as exc:  # noqa: BLE001
+            capture(exc, "drive.organizer._garantir_planos")  # pragma: no cover
             logger.warning("[Drive] backfill plano %s falhou: %s", getattr(plano, "pk", "?"), exc)
 
 
@@ -979,6 +992,7 @@ def organizar_oficio(oficio) -> None:
         try:
             status.executar_e_rastrear(organizar_artefato, artefato)
         except Exception as exc:
+            capture(exc, "drive.organizer.organizar_oficio")  # pragma: no cover
             logger.error("[Drive] erro ao organizar artefato %s: %s", artefato.pk, exc, exc_info=True)
     # ``prestacao_contas`` é OneToOne (uma prestação por ofício, não vários) —
     # ``getattr`` com default retorna ``None`` quando ainda não existe, em vez
@@ -988,6 +1002,7 @@ def organizar_oficio(oficio) -> None:
         try:
             status.executar_e_rastrear(organizar_prestacao, prestacao)
         except Exception as exc:
+            capture(exc, "drive.organizer.organizar_oficio")  # pragma: no cover
             logger.error("[Drive] erro ao organizar prestação %s: %s", prestacao.pk, exc, exc_info=True)
 
 
@@ -1034,6 +1049,7 @@ def organizar_evento(evento) -> None:
     try:
         organizar_motivo_cancelamento(evento)
     except Exception as exc:
+        capture(exc, "drive.organizer.organizar_evento")  # pragma: no cover
         logger.error("[Drive] erro ao gravar motivo de cancelamento do evento %s: %s", evento.pk, exc, exc_info=True)
     for oficio in evento.oficios.all():
         organizar_oficio(oficio)
@@ -1042,16 +1058,19 @@ def organizar_evento(evento) -> None:
         try:
             status.executar_e_rastrear(organizar_artefato, artefato)
         except Exception as exc:
+            capture(exc, "drive.organizer.organizar_evento")  # pragma: no cover
             logger.error("[Drive] erro ao organizar artefato %s: %s", artefato.pk, exc, exc_info=True)
     for anexo in evento.anexos.all():
         try:
             status.executar_e_rastrear(organizar_evento_anexo, anexo)
         except Exception as exc:
+            capture(exc, "drive.organizer.organizar_evento")  # pragma: no cover
             logger.error("[Drive] erro ao organizar anexo %s: %s", anexo.pk, exc, exc_info=True)
     for doc in evento.documentos_solicitacao.all():
         try:
             status.executar_e_rastrear(organizar_solicitacao_evento, doc)
         except Exception as exc:
+            capture(exc, "drive.organizer.organizar_evento")  # pragma: no cover
             logger.error("[Drive] erro ao organizar solicitação %s: %s", doc.pk, exc, exc_info=True)
 
 
@@ -1158,6 +1177,7 @@ def reorganizar_tudo(evento_id: int | None = None, progress=None, usuario=None, 
                 organizar_evento(evento)
                 resumo["eventos"] += 1
             except Exception as exc:  # noqa: BLE001
+                capture(exc, "drive.organizer.reorganizar_tudo")  # pragma: no cover
                 resumo["erros"] += 1
                 logger.error("[Drive] erro ao reorganizar evento %s: %s", evento.pk, exc, exc_info=True)
             processados += 1
@@ -1175,6 +1195,7 @@ def reorganizar_tudo(evento_id: int | None = None, progress=None, usuario=None, 
                     organizar_oficio(oficio)
                     resumo["avulsos"] += 1
                 except Exception as exc:  # noqa: BLE001
+                    capture(exc, "drive.organizer.reorganizar_tudo")  # pragma: no cover
                     resumo["erros"] += 1
                     logger.error("[Drive] erro ao reorganizar ofício avulso %s: %s", oficio.pk, exc, exc_info=True)
 

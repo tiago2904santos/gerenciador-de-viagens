@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
+from core.errors import capture
+
 
 class Command(BaseCommand):
     help = "Verifica configuração e status de autorização do Google Drive"
@@ -70,4 +72,5 @@ class Command(BaseCommand):
             else:
                 self.stdout.write(self.style.WARNING("GOOGLE_DRIVE_PASTA_RAIZ_ID não definido — pulando teste de pasta."))
         except Exception as exc:
+            capture(exc, "drive.management.commands.gdrive_check.handle")  # pragma: no cover
             self.stdout.write(self.style.ERROR(f"Falha: {exc}"))
