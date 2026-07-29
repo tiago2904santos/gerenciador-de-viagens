@@ -7,10 +7,8 @@ from urllib.parse import urlencode
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.core.serializers.json import DjangoJSONEncoder
-from django.db.models import Q
 from django.http import Http404
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -20,9 +18,6 @@ from django.views.decorators.http import require_GET
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.http import require_POST
 
-from cadastros.models import Servidor
-from core.tenancy import filter_queryset_by_area
-from core.normalizers import remove_accents
 
 from documentos.services.exceptions import DocumentValidationError
 from documentos.services.responses import build_inline_pdf_response
@@ -38,6 +33,10 @@ from oficios.services import validar_oficio_para_documento
 from .forms import TermoAutorizacaoForm
 from .models import TermoAutorizacao
 from .presenters import apresentar_linha_lista_simples_termo
+from .selectors import get_servidor_do_termo_do_oficio
+from .selectors import get_servidor_para_termo
+from .selectors import get_termo_by_id
+from .selectors import listar_termos
 from .services import fundir_termos_docx
 from .services import fundir_termos_pdf_bytes
 from .services import gerar_termo_cadastro_um
@@ -63,37 +62,7 @@ TERMOS_PER_PAGE = 15
 def index(request):
     q = request.GET.get("q", "").strip()
     q_digits = _digits(q)
-    termos = (
-        filter_queryset_by_area(TermoAutorizacao.objects)
-        .select_related(
-            "oficio",
-            "destino_estado",
-            "destino_cidade",
-            "viatura",
-        )
-        .prefetch_related("servidores")
-        .order_by("-created_at")
-    )
-    if q:
-        q_unaccent = remove_accents(q)
-        query = (
-            Q(destino_cidade__nome__unaccent__icontains=q_unaccent)
-            | Q(destino_cidade__uf__unaccent__icontains=q_unaccent)
-            | Q(destino_estado__nome__unaccent__icontains=q_unaccent)
-            | Q(destino_estado__sigla__unaccent__icontains=q_unaccent)
-            | Q(oficio__numero__icontains=q)
-            | Q(oficio__protocolo__icontains=q)
-            | Q(oficio__servidores__nome__unaccent__icontains=q_unaccent)
-            | Q(oficio__servidores_termo_autorizacao__nome__unaccent__icontains=q_unaccent)
-            | Q(servidores__nome__unaccent__icontains=q_unaccent)
-            | Q(viatura__placa__icontains=q)
-            | Q(viatura__modelo__unaccent__icontains=q_unaccent)
-            | Q(oficio__viatura__placa__icontains=q)
-            | Q(oficio__viatura__modelo__unaccent__icontains=q_unaccent)
-        )
-        if q_digits:
-            query |= Q(oficio__protocolo__icontains=q_digits) | Q(oficio__numero__icontains=q_digits)
-        termos = termos.filter(query).distinct()
+    termos = listar_termos(q=q or None, q_digits=q_digits or None)
     paginator = Paginator(termos, TERMOS_PER_PAGE)
     page_obj = paginator.get_page(request.GET.get("page"))
     rows = [
@@ -134,16 +103,6 @@ def _pagination_pages(page_obj, *, on_each_side=1, on_ends=1):
             on_ends=on_ends,
         )
     ]
-
-
-def _termo_queryset():
-    return filter_queryset_by_area(TermoAutorizacao.objects).select_related(
-        "oficio",
-        "oficio__roteiro",
-        "destino_estado",
-        "destino_cidade",
-        "viatura",
-    ).prefetch_related("servidores")
 
 
 def _evento_etapa_url(evento_id):
@@ -455,7 +414,7 @@ def novo(request):
 
 @require_http_methods(["GET", "POST"])
 def editar(request, pk):
-    termo = get_object_or_404(_termo_queryset(), pk=pk)
+    termo = get_termo_by_id(pk)
     if request.method == "POST":
         form = TermoAutorizacaoForm(request.POST, instance=termo)
         if form.is_valid():
@@ -469,7 +428,7 @@ def editar(request, pk):
 
 @require_http_methods(["POST"])
 def excluir(request, pk):
-    termo = get_object_or_404(_termo_queryset(), pk=pk)
+    termo = get_termo_by_id(pk)
     termo.delete()
     messages.success(request, "Termo excluido.")
     return redirect("termos:index")
@@ -482,7 +441,7 @@ def _termo_pdf_error_redirect(request, termo, exc: DocumentValidationError):
 
 @require_GET
 def termo_cadastro_pdf_inline(request, pk):
-    termo = get_object_or_404(_termo_queryset(), pk=pk)
+    termo = get_termo_by_id(pk)
     servidores = servidores_para_termo_cadastro(termo)
     try:
         conteudos = [pdf_termo_cadastro_assinado_ou_gerado(termo, servidor) for servidor in servidores]
@@ -501,7 +460,7 @@ def termo_cadastro_pdf_inline(request, pk):
 
 @require_GET
 def termo_cadastro_generico_pdf_inline(request, pk):
-    termo = get_object_or_404(_termo_queryset(), pk=pk)
+    termo = get_termo_by_id(pk)
     try:
         content = pdf_termo_cadastro_assinado_ou_gerado(termo, None)
     except DocumentValidationError as exc:
@@ -518,8 +477,8 @@ def termo_cadastro_generico_pdf_inline(request, pk):
 
 @require_GET
 def termo_cadastro_servidor_pdf_inline(request, pk, servidor_pk):
-    termo = get_object_or_404(_termo_queryset(), pk=pk)
-    servidor = get_object_or_404(filter_queryset_by_area(Servidor.objects), pk=servidor_pk)
+    termo = get_termo_by_id(pk)
+    servidor = get_servidor_para_termo(servidor_pk)
     if not termo.servidores_efetivos().filter(pk=servidor.pk).exists():
         raise Http404("Servidor nao selecionado para este termo.")
     try:
@@ -565,7 +524,7 @@ def _termo_oficio_pdf_error_redirect(request, oficio, exc: DocumentValidationErr
 
 @require_GET
 def baixar_termo_cadastro_pdf(request, pk):
-    termo = get_object_or_404(_termo_queryset(), pk=pk)
+    termo = get_termo_by_id(pk)
     try:
         conteudos = _termo_cadastro_pdf_bytes_com_generico(termo)
     except DocumentValidationError as exc:
@@ -580,7 +539,7 @@ def baixar_termo_cadastro_pdf(request, pk):
 
 @require_GET
 def baixar_termo_cadastro_docx(request, pk):
-    termo = get_object_or_404(_termo_queryset(), pk=pk)
+    termo = get_termo_by_id(pk)
     docs = _termo_cadastro_docs_com_generico(termo, DocumentoFormato.DOCX)
     if len(docs) == 1:
         doc = docs[0]
@@ -603,7 +562,7 @@ def preview_termo_oficio(request, pk):
     servidor_pk = request.GET.get("servidor")
     servidor = None
     if servidor_pk:
-        servidor = get_object_or_404(filter_queryset_by_area(Servidor.objects), pk=int(servidor_pk))
+        servidor = get_servidor_para_termo(int(servidor_pk))
     ctx = preview_termo_context(oficio, servidor, modo_semipreenchido=modo)
     if request.GET.get("format") == "json":
         return HttpResponse(
@@ -626,7 +585,7 @@ def preview_termo_oficio(request, pk):
 @require_GET
 def termo_servidor_pdf_inline(request, pk, servidor_pk):
     oficio = get_oficio_by_id(pk)
-    servidor = get_object_or_404(filter_queryset_by_area(Servidor.objects), pk=servidor_pk)
+    servidor = get_servidor_para_termo(servidor_pk)
     if not oficio.servidores.filter(pk=servidor.pk).exists():
         raise Http404("Servidor nao participa deste oficio.")
     if not listar_servidores_com_termo(oficio).filter(pk=servidor.pk).exists():
@@ -660,7 +619,7 @@ def baixar_termo_servidor(request, pk, servidor_pk, formato):
     except ValueError as exc:
         raise Http404("Formato nao suportado.") from exc
 
-    servidor = get_object_or_404(filter_queryset_by_area(Servidor.objects), pk=servidor_pk)
+    servidor = get_servidor_para_termo(servidor_pk)
     if not oficio.servidores.filter(pk=servidor.pk).exists():
         raise Http404("Servidor nao participa deste oficio.")
     if not listar_servidores_com_termo(oficio).filter(pk=servidor.pk).exists():
@@ -808,7 +767,7 @@ def termo_oficio_assinado_anexar(request, pk, servidor_pk):
     oficio = get_oficio_by_id(pk)
     # Servidor precisa pertencer ao termo do ofício; não filtrar só por área do
     # cadastro — registros legados com area nula quebravam o anexo em produção.
-    servidor = get_object_or_404(oficio.servidores_termo_autorizacao.all(), pk=servidor_pk)
+    servidor = get_servidor_do_termo_do_oficio(oficio, servidor_pk)
     fallback = reverse("oficios:wizard_documentos", args=[oficio.pk])
     return _anexar_assinado_resolver(
         request, fallback, lambda: resolver_artefato_termo_oficio(oficio, servidor)
@@ -817,7 +776,7 @@ def termo_oficio_assinado_anexar(request, pk, servidor_pk):
 
 @require_POST
 def termo_cadastro_generico_assinado_anexar(request, pk):
-    termo = get_object_or_404(_termo_queryset(), pk=pk)
+    termo = get_termo_by_id(pk)
     fallback = reverse("termos:editar", args=[termo.pk])
     return _anexar_assinado_resolver(
         request, fallback, lambda: resolver_artefato_termo_cadastro(termo, None)
@@ -826,7 +785,7 @@ def termo_cadastro_generico_assinado_anexar(request, pk):
 
 @require_POST
 def termo_cadastro_servidor_assinado_anexar(request, pk, servidor_pk):
-    termo = get_object_or_404(_termo_queryset(), pk=pk)
+    termo = get_termo_by_id(pk)
     # Resolve somente dentro dos servidores efetivos do termo (próprios ou
     # herdados do ofício vinculado), sem consultar um cadastro de outra área.
     servidor = next(

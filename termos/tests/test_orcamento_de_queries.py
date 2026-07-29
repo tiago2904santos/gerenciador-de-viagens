@@ -1,0 +1,99 @@
+"""Caracterização do custo de banco das telas de Termo, antes do `P-01`.
+
+Mesmo raciocínio do teste equivalente em `eventos`: a camada de selectors muda
+*onde* a consulta mora, não *qual* consulta roda — então o número exato de
+queries de cada tela é fixado antes de mexer e exigido de novo depois.
+
+Igualdade, não `assertLessEqual`: um teto com folga passa igual se o refactor
+enfiar um N+1 dentro dela.
+"""
+
+from __future__ import annotations
+
+from datetime import date
+
+from django.contrib.auth import get_user_model
+from django.db import connection
+from django.test import TestCase
+from django.test.utils import CaptureQueriesContext
+from django.urls import reverse
+
+from cadastros.models import Cargo
+from cadastros.models import Cidade
+from cadastros.models import Estado
+from cadastros.models import Servidor
+from cadastros.models import Unidade
+from termos.models import TermoAutorizacao
+
+
+class OrcamentoDeQueriesTermoTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.estado = Estado.objects.create(nome="Parana", sigla="PR")
+        cls.cidade = Cidade.objects.create(nome="Curitiba", estado=cls.estado, uf="PR")
+        cargo = Cargo.objects.create(nome="Investigador")
+        unidade = Unidade.objects.create(nome="Unidade", sigla="UN")
+
+        cls.servidores = [
+            Servidor.objects.create(
+                nome=f"Servidor {numero}",
+                cargo=cargo,
+                unidade=unidade,
+                cpf=f"1111111111{numero}",
+                rg=f"123456{numero}",
+            )
+            for numero in range(3)
+        ]
+
+        for numero in range(20):
+            termo = TermoAutorizacao.objects.create(
+                destino_estado=cls.estado,
+                destino_cidade=cls.cidade,
+                data_evento_inicio=date(2026, 6, 1),
+                data_evento_fim=date(2026, 6, 2),
+            )
+            termo.servidores.set(cls.servidores)
+            if numero == 0:
+                cls.termo = termo
+
+    def setUp(self):
+        user = get_user_model().objects.create_user(username="termos_orcamento")
+        self.client.force_login(user)
+
+    def _contar(self, url):
+        with CaptureQueriesContext(connection) as queries:
+            response = self.client.get(url)
+        self.assertEqual(response.status_code, 200, url)
+        return len(queries), queries
+
+    def test_a_lista_custa_o_mesmo_numero_de_queries(self):
+        total, queries = self._contar(reverse("termos:index"))
+
+        self.assertEqual(
+            total,
+            self.QUERIES_LISTA,
+            msg="\n".join(q["sql"] for q in queries.captured_queries),
+        )
+
+    def test_a_lista_com_busca_custa_o_mesmo_numero_de_queries(self):
+        total, queries = self._contar(reverse("termos:index") + "?q=Curitiba")
+
+        self.assertEqual(
+            total,
+            self.QUERIES_LISTA_BUSCA,
+            msg="\n".join(q["sql"] for q in queries.captured_queries),
+        )
+
+    def test_o_formulario_de_edicao_custa_o_mesmo_numero_de_queries(self):
+        total, queries = self._contar(reverse("termos:editar", args=[self.termo.pk]))
+
+        self.assertEqual(
+            total,
+            self.QUERIES_EDITAR,
+            msg="\n".join(q["sql"] for q in queries.captured_queries),
+        )
+
+    # Medidos no `main` em 29/07/2026, antes da camada de selectors.
+    QUERIES_LISTA = 54
+    QUERIES_LISTA_BUSCA = 54
+    QUERIES_EDITAR = 21
