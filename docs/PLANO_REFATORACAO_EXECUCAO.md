@@ -312,10 +312,14 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
 - [ ] `N-05` unificar as duas regras de complemento — **reavaliar**: nos dois
   roteiros de referência as duas regras convergem depois do `NOVO-11`. Medir de
   novo antes de mexer, agora que os limites estão certos.
-- [ ] `NOVO-12` hospedagem 70% / alimentação 30% como condições editáveis por
-  trecho, como no sistema oficial (dá para declarar "Sem Hospedagem" e zerar os
-  70%). Hoje a diária é um valor único. Só importa se o documento precisar bater
-  linha a linha com o demonstrativo oficial
+- [~] `NOVO-12` hospedagem 70% / alimentação 30%. O sistema oficial permite
+  declarar "Sem Hospedagem" ou "Sem Alimentação" por trecho, zerando a parcela.
+  **Decisão de produto (29/07/2026): não implementar as condições editáveis** —
+  o ofício nunca pede menos do que o servidor tem direito, então a diária é
+  sempre integral. Com as condições padrão o total já bate ao centavo, e é o que
+  este sistema calcula. Sobra apenas a pergunta de apresentação: se algum dia o
+  documento precisar exibir as duas colunas separadas, é derivação do valor que
+  já existe (70% e 30%), sem mudança de regra nem de valor.
 - [ ] `N-06` `CAPITAIS_POR_UF` → base geográfica IBGE
 - [ ] `N-08` / `N-09` / `N-10` bordas de `_segment_breakdown`, fechamento por servidor, pernoite curto
 - [ ] `P-03` constraints e indexes em roteiros/termos/justificativas
