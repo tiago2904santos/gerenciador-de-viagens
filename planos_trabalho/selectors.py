@@ -24,8 +24,12 @@ from core.tenancy import filter_queryset_by_area
 from core.tenancy import get_current_area
 from prestacoes_contas.models import PrestacaoServidor
 
+from .models import AtividadePlanoTrabalho
 from .models import EventoPlano
+from .models import HorarioAtendimento
 from .models import PlanoTrabalho
+from .models import PresetAtividadesPlanoTrabalho
+from .models import ProgramaSolicitante
 
 
 _SORT_MAP = {
@@ -123,3 +127,61 @@ def cargo_pertence_a_area(pk) -> bool:
 
 def unidade_pertence_a_area(pk) -> bool:
     return filter_queryset_by_area(Unidade.objects).filter(pk=pk).exists()
+
+
+# ── catálogos administráveis (`P-02`) ────────────────────────────────────────
+
+
+def listar_atividades(q=None):
+    atividades = filter_queryset_by_area(AtividadePlanoTrabalho.objects).order_by(
+        "ordem", "nome"
+    )
+    if q:
+        q_unaccent = remove_accents(q)
+        atividades = atividades.filter(
+            Q(nome__unaccent__icontains=q_unaccent)
+            | Q(codigo__unaccent__icontains=q_unaccent)
+            | Q(meta__unaccent__icontains=q_unaccent)
+        )
+    return atividades
+
+
+def get_atividade_by_id(pk):
+    return get_object_or_404(filter_queryset_by_area(AtividadePlanoTrabalho.objects), pk=pk)
+
+
+def listar_presets(q=None):
+    presets = (
+        filter_queryset_by_area(PresetAtividadesPlanoTrabalho.objects)
+        .prefetch_related("atividades")
+        .order_by("ordem", "nome")
+    )
+    if q:
+        q_unaccent = remove_accents(q)
+        presets = presets.filter(
+            Q(nome__unaccent__icontains=q_unaccent)
+            | Q(descricao__unaccent__icontains=q_unaccent)
+        )
+    return presets
+
+
+def get_preset_by_id(pk):
+    return get_object_or_404(
+        filter_queryset_by_area(PresetAtividadesPlanoTrabalho.objects), pk=pk
+    )
+
+
+def listar_programas():
+    return filter_queryset_by_area(ProgramaSolicitante.objects).order_by("ordem", "nome")
+
+
+def get_programa_by_id(pk):
+    return get_object_or_404(filter_queryset_by_area(ProgramaSolicitante.objects), pk=pk)
+
+
+def listar_horarios():
+    return filter_queryset_by_area(HorarioAtendimento.objects).order_by("ordem", "faixa")
+
+
+def get_horario_by_id(pk):
+    return get_object_or_404(filter_queryset_by_area(HorarioAtendimento.objects), pk=pk)

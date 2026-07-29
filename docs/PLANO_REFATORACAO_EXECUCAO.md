@@ -428,7 +428,22 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
   teste da lista criava `EventoPlano`. Encontrado ao engrossar o fixture do teste
   de orçamento de queries do `P-01` — o canário do prefetch não disparava, e o
   motivo era que a relação estava vazia.
-- [ ] `P-02` `core/catalog.py` e migração dos 13 catálogos
+- [ ] `P-02` `core/catalog.py` e migração dos catálogos
+  - [x] **motor + `planos_trabalho`** — `core/catalog.py` com `CatalogConfig`; os
+    quatro catálogos do PT viraram declarações e `catalog_views.py` (430 linhas)
+    foi apagado. 19 testes de caracterização escritos **antes**, contra o código
+    antigo, passaram sem alteração contra a fábrica.
+    **NOVO — divergências da auditoria:** são **11** catálogos com o padrão
+    completo, não 13 (`cadastros/views.py:cidades_index` é lista + export, sem
+    CRUD), e **1.008** linhas duplicadas, não ~1.500. E a conta de linhas deste
+    PR **sobe**, não desce: −430 do arquivo apagado contra +686 (motor 317,
+    declarações 210, presenters 97, selectors 62). O motor se paga a partir do
+    segundo app; prometer economia já no primeiro seria falso.
+    **`NOVO-14`:** o presenter de presets faz `atividades.order_by(...)` por
+    linha e descarta o `prefetch_related` — mesma doença do `NOVO-07`.
+    Preservado como estava, porque o `P-02` move e não otimiza.
+  - [ ] `oficios`, `eventos`, `justificativas` (261 linhas)
+  - [ ] `cadastros` (317 linhas — único com paginação e erro de vínculo)
 - [x] `P-04` **widget base com classes canônicas** (pré-requisito das Etapas 6 e 7) —
   19 contratos CSS centralizados em `core/forms/widgets.py`; 194 `attrs` migrados
   sem alterar o HTML renderizado de Ofícios, Prestações, Plano de Trabalho,
