@@ -41,6 +41,9 @@ jobs:
 
             # Backup antes do checkout: o snapshot precisa ser do estado que
             # está no ar, não do commit que ainda vai entrar.
+            # Cria o diretório aqui: o script na VPS ainda é o do commit antigo
+            # e pode falhar no mktemp se /var/backups/... não existir.
+            mkdir -p /var/backups/gerenciador-viagens
             APP_ROOT=/var/www/gerenciador-viagens/app \
               bash scripts/backup_production.sh
 
