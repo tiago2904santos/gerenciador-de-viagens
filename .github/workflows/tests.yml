@@ -63,9 +63,9 @@ jobs:
         run: python scripts/audit_frontend_standards.py --max-warnings 417
 
       - name: Block new ORM in views (P-01)
-        # Catraca: este número só desce. A camada de selectors em `eventos`
-        # levou 61 → 46. Alvo final: zero — ver docs/PADRAO_SELECTORS.md.
-        run: python scripts/audit_django_architecture.py --max-orm-em-view 46
+        # Catraca: este número só desce. `eventos` levou 61 → 46; `termos`,
+        # 46 → 40. Alvo final: zero — ver docs/PADRAO_SELECTORS.md.
+        run: python scripts/audit_django_architecture.py --max-orm-em-view 40
 
       - name: Validate production security settings
         env:
