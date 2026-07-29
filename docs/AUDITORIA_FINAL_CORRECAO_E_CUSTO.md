@@ -305,6 +305,7 @@ Um erro de português (`Voltar a lista`) e três padrões de capitalização con
 | N-11 | 🟡 | 4 variantes de "Voltar à lista", incluindo erro de crase; 3 padrões de capitalização | §8 |
 | N-12 | 🟡 | `media/` com 191 MB / 19.175 arquivos sincronizando pelo OneDrive | — |
 | NOVO-10 | 🟠 | `PrestacaoServidor.diaria_valor_override` guarda **valor monetário como texto livre**: `CharField(max_length=255)` sem validador, só `normalize_spaces`. `"abc"`, `"-90"` e `"350,00,00"` persistem e chegam ao relatório técnico do servidor e ao texto de WhatsApp. Encontrado ao escrever a fatia 4 de `T-01`; caracterizado por teste, não corrigido | `models.py:147`, `rt_views.py:51-69` |
+| NOVO-11 | 🔴 | **O cálculo de diárias fechava cada período na SAÍDA do trecho seguinte, não na CHEGADA.** O tempo de deslocamento entre dois destinos caía no trecho de retorno à sede, que por regra não carrega complemento, e sumia da conta. Conferido contra o demonstrativo do **sistema oficial de solicitação**: roteiro Curitiba→São Paulo→Abatiá→Curitiba dava R$ 661,81 aqui contra R$ 773,19 lá (−14,4%); com quatro trechos, R$ 1.033,07 contra R$ 1.144,45. Pagamento **a menor**. Encontrado ao investigar o `N-05`, a partir de telas do sistema oficial enviadas pelo usuário — não estava em nenhuma auditoria | `roteiro_logic.py:1296`, `diarias.py:248` |
 | N-13 | 🟡 | `docs/REGRAS_DE_NEGOCIO.md` tem 77 linhas para um sistema de 116 models — não documenta diárias, numeração nem status | `docs/` |
 
 **Achados novos desta auditoria, descobertos ao medir a Etapa 1** (origem: `NOVO`):

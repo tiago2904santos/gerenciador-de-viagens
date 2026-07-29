@@ -302,7 +302,24 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
   dividia o mesmo `CharField` com o número. O documento sai idêntico. Migração
   exercitada no PostgreSQL contra dados legados; valores que não eram número
   viram observação, sem perda. Cobertura de `core`: 85,99 → 87,11%.
-- [ ] `N-05` unificar as duas regras de complemento
+- [x] `NOVO-11` **limites de período pela chegada, não pela saída.** Achado ao
+  investigar o `N-05`, comparando com o demonstrativo do sistema oficial de
+  solicitação: o tempo de estrada entre dois destinos caía no trecho de retorno,
+  que não carrega complemento, e não era cobrado. Dois roteiros de referência,
+  antes → depois: R$ 661,81 → **R$ 773,19** e R$ 1.033,07 → **R$ 1.144,45**,
+  ambos batendo ao centavo com o oficial. A hora de chegada já existia na tela e
+  no banco (`RoteiroTrecho.chegada_dt`); só o cálculo a descartava.
+- [ ] `N-05` unificar as duas regras de complemento — **reavaliar**: nos dois
+  roteiros de referência as duas regras convergem depois do `NOVO-11`. Medir de
+  novo antes de mexer, agora que os limites estão certos.
+- [~] `NOVO-12` hospedagem 70% / alimentação 30%. O sistema oficial permite
+  declarar "Sem Hospedagem" ou "Sem Alimentação" por trecho, zerando a parcela.
+  **Decisão de produto (29/07/2026): não implementar as condições editáveis** —
+  o ofício nunca pede menos do que o servidor tem direito, então a diária é
+  sempre integral. Com as condições padrão o total já bate ao centavo, e é o que
+  este sistema calcula. Sobra apenas a pergunta de apresentação: se algum dia o
+  documento precisar exibir as duas colunas separadas, é derivação do valor que
+  já existe (70% e 30%), sem mudança de regra nem de valor.
 - [ ] `N-06` `CAPITAIS_POR_UF` → base geográfica IBGE
 - [ ] `N-08` / `N-09` / `N-10` bordas de `_segment_breakdown`, fechamento por servidor, pernoite curto
 - [ ] `P-03` constraints e indexes em roteiros/termos/justificativas

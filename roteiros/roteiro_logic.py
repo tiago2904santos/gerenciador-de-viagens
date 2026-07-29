@@ -1281,6 +1281,17 @@ def _collect_roteiro_markers_payload(state, oficio=None):
         saida_hora = _parse_roteiro_time(trecho.get('saida_hora'))
         if not saida_data or not saida_hora:
             raise ValueError('Preencha datas e horas para calcular.')
+        # A chegada de cada trecho decide onde o periodo termina (NOVO-11). A
+        # tela ja coleta e o banco ja guarda (RoteiroTrecho.chegada_dt); so o
+        # calculo a descartava, e por isso o tempo de estrada entre destinos
+        # sumia da conta.
+        chegada_data = _parse_roteiro_date(trecho.get('chegada_data'))
+        chegada_hora = _parse_roteiro_time(trecho.get('chegada_hora'))
+        chegada_trecho = (
+            datetime.combine(chegada_data, chegada_hora)
+            if chegada_data and chegada_hora
+            else None
+        )
         cidade = cidades_map.get(trecho.get('destino_cidade_id'))
         estado = getattr(cidade, 'estado', None) or estados_map.get(trecho.get('destino_estado_id'))
         cidade_nome = cidade.nome if cidade else (trecho.get('destino_nome') or '').split('/', 1)[0]
@@ -1296,6 +1307,7 @@ def _collect_roteiro_markers_payload(state, oficio=None):
         markers.append(
             PeriodMarker(
                 saida=datetime.combine(saida_data, saida_hora),
+                chegada=chegada_trecho,
                 destino_cidade=cidade_nome,
                 destino_uf=uf_sigla,
             )
