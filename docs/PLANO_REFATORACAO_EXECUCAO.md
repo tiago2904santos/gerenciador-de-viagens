@@ -246,14 +246,18 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
 
 **Achados novos (28/07, descobertos ao medir a paginação de `N-02`):**
 
-- [ ] `NOVO-07` 🟠 **N+1 real na lista de Ordens de Serviço** — ~6 queries por card
-  (`ordens_servico/presenters.py`): `_destinos_display_os` refaz a query e anula o
-  `prefetch_related` da view; `servidores.count()` roda por card; `_get_assinante_os()` relê o
-  singleton de configuração por card. Com 300 OS eram **1.814 queries**; a paginação segurou em
-  **135 por página**, mas o custo por card continua. Corrige a §4.1 da auditoria final: "não
-  existe N+1" valia só para Ofícios. Fica para a Etapa 4 (camada de views/presenters) ou um PR
-  próprio; o teste `ordens_servico/tests/test_list_performance.py` já trava o crescimento e tem
-  o teto pronto para ser baixado.
+- [x] `NOVO-07` 🟠 **N+1 real na lista de Ordens de Serviço** — a lista caiu de
+  **138 para 22 queries** por página (fixture com 25 OS, cada uma com 2 destinos,
+  3 servidores e 1 ofício). Duas causas, não três: `_destinos_display_os` refazia
+  `select_related`/`order_by` sobre o related manager e descartava o prefetch
+  (1 query/card), e `_get_assinante_os()` relia o singleton e as assinaturas por
+  card (**5** queries/card, não 2). O teto de `test_list_performance.py` desceu de
+  140 para 30. **NOVO — divergência da auditoria:** `servidores.count()` **não**
+  custava query. `QuerySet.count()` devolve `len(self._result_cache)` quando o
+  prefetch já preencheu o cache; o canário confirmou — trocar `len` de volta por
+  `.count()` não muda a contagem. Ficou o `len` mesmo assim, porque não depende
+  do prefetch existir. Falta a mesma doença em Termos (54 queries/página,
+  `termo_cadastro_assinado_info` consulta por linha).
 - [x] `NOVO-08` 🟠 **`core/tests/` não tinha `__init__.py`** — 95 testes existentes nunca foram
   descobertos pelo runner (`manage.py test core` rodava 0 testes), incluindo
   `test_tenancy_integrity`, `test_sso`, `test_uploads` e `test_dark_redesign`. Corrigido na

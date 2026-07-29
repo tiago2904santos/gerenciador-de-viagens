@@ -4,9 +4,13 @@ A lista carregava a base inteira: 300 OS = 2,6 MB de HTML e 1.814 queries. A
 paginação corta as duas coisas — e, sobretudo, desliga o crescimento: o custo de
 uma página passa a ser o mesmo com 20 ou com 300 registros cadastrados.
 
-O custo por página ainda é alto (`NOVO-07`: o presenter do card emite queries por
-card). Este teste trava o crescimento; o teto continua alto de propósito, para
-ser baixado pelo PR que corrigir `NOVO-07`.
+O custo por página era alto porque o presenter do card emitia queries por card
+(`NOVO-07`, corrigido): destinos refazendo a consulta apesar do prefetch,
+`servidores.count()` e o assinante relido a cada card. O teto desceu de 140 para
+30 quando isso saiu.
+
+Este teste responde a "o custo cresce com o volume?". Quem trava o número exato é
+`test_orcamento_de_queries.py`; os dois juntos cobrem crescimento e regressão.
 """
 from datetime import timedelta
 
@@ -24,7 +28,8 @@ from usuarios.models import VinculoUsuarioArea
 
 
 # Teto atual de queries por página, medido. Não é um alvo: é uma catraca.
-TETO_QUERIES_POR_PAGINA = 140
+# 140 antes do `NOVO-07`; a correção levou a página real para ~22.
+TETO_QUERIES_POR_PAGINA = 30
 
 
 def _criar_ordens(quantidade, *, area=None, primeiro_numero=1):

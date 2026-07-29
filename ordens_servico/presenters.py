@@ -7,7 +7,10 @@ from core import entity_cards
 from oficios.presenters import _iniciais_nome_servidor
 
 
-def _get_assinante_os() -> dict | None:
+_ASSINANTE_NAO_RESOLVIDO = object()
+
+
+def get_assinante_os() -> dict | None:
     try:
         from cadastros.models import AssinaturaConfiguracao
         from cadastros.models import ConfiguracaoSistema
@@ -76,7 +79,10 @@ def _servidores_display_os(ordem):
 
 
 def _destinos_display_os(ordem):
-    destinos = list(ordem.destinos.select_related("estado").order_by("nome"))
+    # `.all()` aproveita o `Prefetch` do selector (ja ordenado por nome, com o
+    # estado junto). Reordenar ou refazer `select_related` aqui descartaria o
+    # cache e custaria uma query por card — era o `NOVO-07`.
+    destinos = list(ordem.destinos.all())
     if not destinos:
         return ""
     parts = [f"{d.nome} ({d.estado.sigla})" for d in destinos[:3]]
@@ -121,7 +127,16 @@ def _periodo_display_curto(ordem) -> str:
     return f"{inicio.strftime('%d/%m/%Y')} a {fim.strftime('%d/%m/%Y')}"
 
 
-def apresentar_ordem_servico_card(ordem):
+def apresentar_ordem_servico_card(ordem, *, assinante=_ASSINANTE_NAO_RESOLVIDO):
+    """Monta o card de uma OS.
+
+    `assinante` e o mesmo para todas as OS da pagina — quem monta uma lista
+    resolve uma vez com `get_assinante_os()` e passa aqui. O padrao resolve
+    sozinho, para quem exibe um card so.
+    """
+    if assinante is _ASSINANTE_NAO_RESOLVIDO:
+        assinante = get_assinante_os()
+
     data_criacao_display = ""
     if ordem.created_at:
         try:
@@ -198,13 +213,19 @@ def apresentar_ordem_servico_card(ordem):
         "temporal_label": temporal_label,
         "temporal_tone": temporal_tone,
         "servidores": servidores,
-        "servidores_count": ordem.servidores.count(),
+        # `len` da lista ja materializada. Ao contrario do que a auditoria
+        # supoe, `.count()` aqui NAO custava query: `QuerySet.count()` devolve
+        # `len(self._result_cache)` quando o prefetch ja preencheu o cache, e o
+        # canario confirmou (trocar de volta nao muda a contagem). O `len` fica
+        # porque nao depende do prefetch existir — um chamador que monte o card
+        # sem ele pagaria a consulta.
+        "servidores_count": len(servidores),
         "oficios_vinculados": oficios_vinculados,
         "cancelado": ordem.cancelado,
         "motivo_cancelamento": ordem.motivo_cancelamento,
         "motivo": motivo,
         "motivo_resumido": motivo_resumido,
-        "assinante": _get_assinante_os(),
+        "assinante": assinante,
         "editar_url": editar_url,
         "docx_url": reverse("ordens_servico:baixar_docx", args=[ordem.pk]),
         "pdf_url": reverse("ordens_servico:baixar_pdf", args=[ordem.pk]),

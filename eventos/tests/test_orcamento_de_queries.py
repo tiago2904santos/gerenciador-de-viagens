@@ -22,6 +22,7 @@ from django.urls import reverse
 from cadastros.models import Cidade
 from cadastros.models import Estado
 from eventos.models import Evento
+from ordens_servico.models import OrdemServico
 from roteiros.models import Roteiro
 from roteiros.models import RoteiroDestino
 from termos.models import TermoAutorizacao
@@ -113,3 +114,53 @@ class OrcamentoDeQueriesEventoTests(TestCase):
     QUERIES_LISTA_BUSCA = 18
     QUERIES_DETALHE = 74
     QUERIES_TIPOS = 7
+
+
+class OrcamentoDeQueriesEventoComOrdensTests(TestCase):
+    """O detalhe do evento também monta cards de Ordem de Serviço.
+
+    O fixture da classe acima não tem OS, então ele não exercita esse caminho —
+    e sem este teste dá para apagar o `assinante=` do `eventos/views.py` sem
+    nada falhar, devolvendo a consulta por card que o `NOVO-07` tirou.
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        estado = Estado.objects.create(sigla="PR", nome="Parana")
+        cidade = Cidade.objects.create(nome="CURITIBA", estado=estado, uf="PR")
+        cls.evento = Evento.objects.create(
+            titulo="Evento com OS",
+            data_inicio=date(2026, 6, 1),
+            data_fim=date(2026, 6, 2),
+        )
+        for numero in range(1, 4):
+            ordem = OrdemServico.objects.create(
+                evento=cls.evento,
+                numero=numero,
+                ano=2026,
+                motivo="Apoio logistico.",
+                data_evento_inicio=date(2026, 6, 1),
+                data_evento_fim=date(2026, 6, 2),
+            )
+            ordem.destinos.set([cidade])
+
+    def setUp(self):
+        user = get_user_model().objects.create_user(username="evento_com_os")
+        self.client.force_login(user)
+
+    def test_o_assinante_da_os_e_resolvido_uma_vez_por_pagina(self):
+        url = reverse("eventos:detalhe", args=[self.evento.pk])
+        with CaptureQueriesContext(connection) as queries:
+            response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context["ordem_cards"]), 3)
+        self.assertEqual(
+            len(queries),
+            self.QUERIES_DETALHE_COM_OS,
+            msg="\n".join(q["sql"] for q in queries.captured_queries),
+        )
+
+    # Três OS na página. Se este número crescer de três em três, o assinante
+    # voltou a ser resolvido por card.
+    QUERIES_DETALHE_COM_OS = 64
