@@ -265,9 +265,7 @@
 }
 
 /* Dark — espelha o padrão do state button (16% → 26% bg, text misturado com white) */
-html[data-theme="dark"],
-html[data-theme="dark-dark"],
-html[data-theme="light-dark"] {
+html[data-theme="dark"] {
   --cv-chip-focus-ring: 0 0 0 3px rgba(112, 184, 255, 0.32);
 
   /* info/pending/entity — success/warning/danger/neutral já herdam via --state-* */

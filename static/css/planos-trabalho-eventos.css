@@ -648,7 +648,7 @@
 }
 
 /* Supera a regra dark de 2 colunas (que já é escopada em html[data-theme] …). */
-:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+:is(html[data-theme="dark"])
   :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1])
   .cv-ordered-field-row__fields.pt-efetivo-fields {
   grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.35fr) minmax(0, 0.9fr);
@@ -677,17 +677,17 @@
 
 /* Badge e botão remover acompanham a linha dos controles (não o topo dos rótulos). */
 .pt-efetivo-card.cv-ordered-field-row,
-:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+:is(html[data-theme="dark"])
   [data-travel-document-wizard-step1]
   .pt-efetivo-card.cv-ordered-field-row.destination-row,
-:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+:is(html[data-theme="dark"])
   [data-travel-document-wizard-step1]
   .pt-efetivo-card.cv-ordered-field-row.destination-row:hover {
   align-items: end;
 }
 
 .pt-efetivo-card.cv-ordered-field-row > .cv-ordered-field-row__badge,
-:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+:is(html[data-theme="dark"])
   [data-travel-document-wizard-step1]
   .pt-efetivo-card.cv-ordered-field-row
   > .cv-ordered-field-row__badge {
@@ -698,7 +698,7 @@
 
 @media (max-width: 760px) {
   .cv-ordered-field-row__fields.pt-efetivo-fields,
-  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+:is(html[data-theme="dark"])
     :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1])
     .cv-ordered-field-row__fields.pt-efetivo-fields {
     grid-template-columns: 1fr;

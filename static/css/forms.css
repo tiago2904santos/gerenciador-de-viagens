@@ -833,19 +833,6 @@ html[data-theme="dark"] .app-form-shell textarea {
   color: var(--route-field-text);
 }
 
-html[data-theme="dark-dark"] .app-form-shell select option,
-html[data-theme="light-dark"] .app-form-shell select option {
-  background: var(--color-surface);
-  color: var(--color-text);
-}
-
-html[data-theme="dark-dark"] .app-form-shell select option:disabled,
-html[data-theme="light-dark"] .app-form-shell select option:disabled,
-html[data-theme="dark-dark"] .app-form-shell select optgroup,
-html[data-theme="light-dark"] .app-form-shell select optgroup {
-  color: var(--color-text-muted);
-}
-
 .field-rg-wrap.field--locked label::after {
   color: var(--color-help);
   content: " — bloqueado";
@@ -854,14 +841,8 @@ html[data-theme="light-dark"] .app-form-shell select optgroup {
 }
 
 html[data-theme="dark"] .form-check-input,
-html[data-theme="dark-dark"] .form-check-input,
-html[data-theme="light-dark"] .form-check-input,
 html[data-theme="dark"] input[type="radio"],
-html[data-theme="dark-dark"] input[type="radio"],
-html[data-theme="light-dark"] input[type="radio"],
-html[data-theme="dark"] input[type="checkbox"],
-html[data-theme="dark-dark"] input[type="checkbox"],
-html[data-theme="light-dark"] input[type="checkbox"] {
+html[data-theme="dark"] input[type="checkbox"] {
   accent-color: var(--color-accent);
 }
 .form-field--hidden {

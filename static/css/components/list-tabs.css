@@ -73,7 +73,7 @@
   color: var(--cv-list-tab-active-count-color);
 }
 
-:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+:is(html[data-theme="dark"])
   .cv-list-tab {
   --cv-list-tab-bg: var(--color-surface-strong, #111e2f);
   --cv-list-tab-border: var(--color-border-strong, rgba(214, 227, 244, 0.38));
@@ -89,24 +89,24 @@
   --cv-list-tab-active-count-color: #211806;
 }
 
-:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+:is(html[data-theme="dark"])
   .cv-list-tab--active {
   box-shadow: inset 3px 0 0 var(--color-accent);
 }
 
-:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+:is(html[data-theme="dark"])
   .cv-list-tab:focus-visible {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-focus, #74aae0) 28%, transparent);
 }
 
 @media (max-width: 560px) {
-  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  :is(html[data-theme="dark"])
     .cv-list-tabs {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  :is(html[data-theme="dark"])
     .cv-list-tab {
     justify-content: space-between;
     min-width: 0;
@@ -114,7 +114,7 @@
 }
 
 @media (max-width: 360px) {
-  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  :is(html[data-theme="dark"])
     .cv-list-tabs {
     grid-template-columns: minmax(0, 1fr);
   }
