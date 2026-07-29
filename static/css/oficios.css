@@ -4,7 +4,6 @@
    Nao importar diretamente — carregado via style.css apos cards.css.
    ========================================================================== */
 
-
 /* --------------------------------------------------------------------------
    4. Oficios
    -------------------------------------------------------------------------- */
@@ -105,7 +104,6 @@
   font-weight: 700;
   margin: 0;
 }
-
 
 /* Wizard Ofício: campos diretos no section-body devem ocupar largura total */
 .cv-form-section-body > .cv-field,
@@ -241,7 +239,6 @@
   gap: var(--space-3);
   grid-template-columns: minmax(0, 1fr);
 }
-
 
 .app-multiselect__native {
   height: 1px;
@@ -815,7 +812,6 @@
   }
 }
 
-
 /* --------------------------------------------------------------------------
    7. Wizard de oficios
    -------------------------------------------------------------------------- */
@@ -1052,7 +1048,6 @@
   max-height: var(--cv-btn-height);
   padding:    0 var(--space-4);
 }
-
 
 .travel-document-wizard__main .cv-form-section-stack--comfortable {
   --_stack-gap: var(--space-6);
@@ -3188,17 +3183,13 @@ html[data-theme="light"] .cv-segment-toggle {
   color: var(--color-on-accent, #ffffff);
 }
 
-html[data-theme="dark"] #evento-card-documentos-d .related-route-item.is-active,
-html[data-theme="dark-dark"] #evento-card-documentos-d .related-route-item.is-active,
-html[data-theme="light-dark"] #evento-card-documentos-d .related-route-item.is-active {
+html[data-theme="dark"] #evento-card-documentos-d .related-route-item.is-active {
   background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface-muted));
   border-color: color-mix(in srgb, var(--color-accent) 45%, var(--color-border-soft));
   box-shadow: inset 4px 0 0 var(--color-accent);
 }
 
-html[data-theme="dark"] #evento-card-documentos-d .related-route-item.is-active .cv-search-picker__selected-avatar,
-html[data-theme="dark-dark"] #evento-card-documentos-d .related-route-item.is-active .cv-search-picker__selected-avatar,
-html[data-theme="light-dark"] #evento-card-documentos-d .related-route-item.is-active .cv-search-picker__selected-avatar {
+html[data-theme="dark"] #evento-card-documentos-d .related-route-item.is-active .cv-search-picker__selected-avatar {
   background: var(--color-accent);
   border-color: var(--color-accent);
   color: var(--color-on-accent, #081522);

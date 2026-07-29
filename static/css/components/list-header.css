@@ -529,7 +529,7 @@
    Tema escuro
    ========================================================= */
 
-:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+:is(html[data-theme="dark"])
   .list-header {
   background: var(--color-surface-muted);
   border-color: var(--color-border);
@@ -537,77 +537,77 @@
 }
 
 /* Mesma cor do cabeçalho dos cards (.cv-entity-card__header) */
-:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+:is(html[data-theme="dark"])
   .list-header__band {
   background: var(--color-surface-muted);
 }
 
-:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+:is(html[data-theme="dark"])
   .list-header__eyebrow {
   color: var(--color-accent);
 }
 
-:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+:is(html[data-theme="dark"])
   .list-header__title {
   color: var(--color-heading);
 }
 
 /* Mesma cor das seções internas do card (.oficio-lc__section). */
-:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+:is(html[data-theme="dark"])
   .list-header__rail {
   background: var(--cv-card-family-bg);
   border-top-color: var(--color-border);
   --list-header-control-bg: var(--color-surface-soft);
 }
 
-:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+:is(html[data-theme="dark"])
   .list-header__search-input,
-:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+:is(html[data-theme="dark"])
   .list-header .header-filter-input {
   color: var(--color-text);
 }
 
-:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+:is(html[data-theme="dark"])
   .list-header__search-icon {
   color: var(--color-filter-placeholder);
 }
 
-:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+:is(html[data-theme="dark"])
   .list-header .quick-add-footer-button {
   background: var(--cv-card-family-bg);
   border-top-color: var(--border-filter-bar);
   color: var(--theme-text-body);
 }
 
-:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+:is(html[data-theme="dark"])
   .list-header .quick-add-footer-button:hover,
-:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+:is(html[data-theme="dark"])
   .list-header .quick-add-footer-button.is-active,
-:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+:is(html[data-theme="dark"])
   .list-header .quick-add-footer-button[aria-expanded="true"] {
   background: color-mix(in srgb, var(--color-card-muted) 72%, var(--color-white) 10%);
 }
 
-:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+:is(html[data-theme="dark"])
   .list-header .quick-add-footer-button__icon {
   background: color-mix(in srgb, var(--color-accent) 16%, transparent);
   color: var(--color-accent);
 }
 
-:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+:is(html[data-theme="dark"])
   .list-header .quick-add-footer-button.is-filled {
   background: var(--cv-btn-primary-bg);
   border-color: var(--cv-btn-primary-border);
   color: var(--cv-btn-primary-color);
 }
 
-:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+:is(html[data-theme="dark"])
   .list-header .quick-add-footer-button.is-filled .quick-add-footer-button__icon {
   background: color-mix(in srgb, var(--color-white) 16%, transparent);
   color: inherit;
 }
 
-:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+:is(html[data-theme="dark"])
   .list-header .quick-add-panel.is-open {
   border-top-color: var(--border-filter-bar);
 }

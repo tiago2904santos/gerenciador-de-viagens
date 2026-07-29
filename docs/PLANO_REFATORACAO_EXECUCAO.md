@@ -358,8 +358,12 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
 - [ ] `H-06` / `H-10` `aria-controls` nos 29 `aria-expanded`; `for`/`id` nos 14 `<label>`
 
 ### Etapa 7 — Reconstrução do CSS
-- [ ] Fase 0–1: apagar aliases de tema e CSS morto (−3.000 linhas)
-- [ ] Fase 2–3: tokens indefinidos + CSS faltante dos componentes globais
+- [x] Fase 0: apagados os aliases mortos de tema `dark-dark`, `light-dark`,
+  `dark-light` e `light-light`; os seletores canônicos `dark`/`light` foram
+  preservados.
+- [ ] Fase 1: apagar CSS morto e blocos `.app-form-shell`/`.form-shell`
+- [ ] Fase 2: corrigir tokens indefinidos (`D-01`, `D-03`, `D-06`, `D-20`, `D-21`)
+- [ ] Fase 3: CSS faltante dos componentes globais
 - [ ] Fase 4: tirar `auth.css` e `oficios.css` do `@import` global
 - [ ] Fase 5: consolidar escala (raio, sombra, motion, z-index, tipografia)
 - [ ] Fase 6: `dark-redesign.css` → `03-theme-dark.css` (só tokens)

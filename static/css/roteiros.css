@@ -1193,13 +1193,10 @@
   }
 }
 
-
 /* Destinos em card (igual ao componente cv-search-picker) */
 .roteiro-destinos-panel {
   padding-right: var(--space-4);
 }
-
-
 
 .route-destinations-list {
   gap: var(--space-3);
@@ -1595,7 +1592,6 @@
   font-weight: 800;
   margin: 0 0 var(--space-3);
 }
-
 
 /* --------------------------------------------------------------------------
    7. Retorno final
@@ -2256,201 +2252,6 @@
    Mantidos apenas para blocos legados do wizard que ainda nao receberam
    estrutura 100% orientada a token sem risco visual.
    -------------------------------------------------------------------------- */
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__reference-block,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__reference-block,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__section,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__section,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__routes-panel--source,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__routes-panel--source,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__nest-block--destinos .roteiro-editor__destinos-stack,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__nest-block--destinos .roteiro-editor__destinos-stack,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__nest-block--sede > .roteiro-editor__grid,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__nest-block--sede > .roteiro-editor__grid,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__section--bate-volta > .roteiro-editor__panel-surface,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__section--bate-volta > .roteiro-editor__panel-surface,
-html[data-theme="dark-dark"] .roteiro-editor--avulso #retorno-card .roteiro-editor__subpanel,
-html[data-theme="light-dark"] .roteiro-editor--avulso #retorno-card .roteiro-editor__subpanel,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .route-segment-card .roteiro-editor__subpanel,
-html[data-theme="light-dark"] .roteiro-editor--avulso .route-segment-card .roteiro-editor__subpanel {
-  background: var(--route-card-inner-bg);
-  border-color: var(--route-section-border);
-  box-shadow: var(--shadow-soft);
-}
-
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__routes-panel--source .roteiro-editor__input,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__routes-panel--source .roteiro-editor__input,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .route-segment-card .form-control,
-html[data-theme="light-dark"] .roteiro-editor--avulso .route-segment-card .form-control,
-html[data-theme="dark-dark"] .roteiro-editor--avulso #retorno-card .form-control,
-html[data-theme="light-dark"] .roteiro-editor--avulso #retorno-card .form-control {
-  background: var(--color-card);
-  border-color: var(--route-field-border);
-  color: var(--route-card-text);
-}
-
-html[data-theme="dark-dark"] .roteiro-editor--avulso .related-route-item,
-html[data-theme="light-dark"] .roteiro-editor--avulso .related-route-item,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__drag-handle,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__drag-handle {
-  background: var(--color-card);
-}
-
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__section-title,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__section-title,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__nest-title,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__nest-title,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__routes-panel-title,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__routes-panel-title,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .related-route-title,
-html[data-theme="light-dark"] .roteiro-editor--avulso .related-route-title {
-  color: var(--color-section-title);
-}
-
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__section-desc,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__section-desc,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__nest-desc,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__nest-desc,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .related-route-destinations,
-html[data-theme="light-dark"] .roteiro-editor--avulso .related-route-destinations,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .related-route-period,
-html[data-theme="light-dark"] .roteiro-editor--avulso .related-route-period,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__helper,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__helper {
-  color: var(--color-description);
-}
-
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__field-label,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__field-label,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__routes-panel-title,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__routes-panel-title,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__routes-panel--source .roteiro-editor__field-label,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__routes-panel--source .roteiro-editor__field-label {
-  color: var(--color-label-strong);
-}
-
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__routes-panel--source,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__routes-panel--source,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__choice-card,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__choice-card {
-  background: var(--route-card-inner-bg);
-  border-color: var(--route-section-border);
-}
-
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__choice-card:has(input:checked),
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__choice-card:has(input:checked) {
-  background: var(--route-card-inner-bg);
-  border-color: var(--color-info-border);
-}
-
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__choice-desc,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__choice-desc {
-  color: var(--color-help);
-}
-
-html[data-theme="dark-dark"] .roteiro-editor__empty,
-html[data-theme="light-dark"] .roteiro-editor__empty,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__section--trechos .roteiro-editor__empty,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__section--trechos .roteiro-editor__empty {
-  background: var(--route-card-bg);
-  border-color: var(--color-info-border);
-  color: var(--color-info-text);
-}
-
-html[data-theme="dark-dark"] .roteiro-editor--avulso #retorno-card .form-control[readonly],
-html[data-theme="light-dark"] .roteiro-editor--avulso #retorno-card .form-control[readonly] {
-  background: var(--route-field-disabled-bg);
-  color: var(--route-field-disabled-text);
-}
-
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-time-calc-grid,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-time-calc-grid,
-html[data-theme="dark-dark"] .roteiro-editor--avulso #retorno-card .roteiro-editor__subpanel,
-html[data-theme="light-dark"] .roteiro-editor--avulso #retorno-card .roteiro-editor__subpanel,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .route-segment-card .roteiro-editor__subpanel,
-html[data-theme="light-dark"] .roteiro-editor--avulso .route-segment-card .roteiro-editor__subpanel {
-  background: var(--route-card-bg);
-  border-color: var(--route-section-border);
-}
-
-html[data-theme="dark-dark"] .roteiro-editor--avulso #retorno-card .roteiro-editor__subpanel-title,
-html[data-theme="light-dark"] .roteiro-editor--avulso #retorno-card .roteiro-editor__subpanel-title,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-time-calc-grid .cv-field__label,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-time-calc-grid .cv-field__label,
-html[data-theme="dark-dark"] .roteiro-editor--avulso #retorno-card .oficio-roteiro-time-calc-grid .form-label,
-html[data-theme="light-dark"] .roteiro-editor--avulso #retorno-card .oficio-roteiro-time-calc-grid .form-label {
-  color: var(--color-label);
-}
-
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-time-calc-grid .cv-field__control,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-time-calc-grid .cv-field__control,
-html[data-theme="dark-dark"] .roteiro-editor--avulso #retorno-card .oficio-roteiro-time-calc-grid .form-control,
-html[data-theme="light-dark"] .roteiro-editor--avulso #retorno-card .oficio-roteiro-time-calc-grid .form-control,
-html[data-theme="dark-dark"] .roteiro-editor--avulso #retorno-card .form-control,
-html[data-theme="light-dark"] .roteiro-editor--avulso #retorno-card .form-control {
-  background: var(--color-card);
-  border-color: var(--route-field-border);
-  color: var(--route-card-text);
-}
-
-html[data-theme="dark-dark"] .roteiro-editor__map-card,
-html[data-theme="light-dark"] .roteiro-editor__map-card,
-html[data-theme="dark-dark"] .roteiro-mapa__stats,
-html[data-theme="light-dark"] .roteiro-mapa__stats {
-  background: var(--route-card-inner-bg);
-  border-color: var(--color-border-soft);
-}
-
-html[data-theme="dark-dark"] .roteiro-mapa__canvas-shell,
-html[data-theme="light-dark"] .roteiro-mapa__canvas-shell {
-  border-color: var(--cv-form-section-border, var(--route-section-border));
-}
-
-html[data-theme="dark-dark"] .roteiro-editor__map-card .card-body,
-html[data-theme="light-dark"] .roteiro-editor__map-card .card-body {
-  background: var(--route-card-bg);
-}
-
-html[data-theme="dark-dark"] .roteiro-mapa__canvas-head,
-html[data-theme="light-dark"] .roteiro-mapa__canvas-head,
-html[data-theme="dark-dark"] .roteiro-mapa__stats dt,
-html[data-theme="light-dark"] .roteiro-mapa__stats dt {
-  color: var(--color-label);
-  border-color: var(--color-border-soft);
-}
-
-html[data-theme="dark-dark"] .roteiro-mapa__stats dd,
-html[data-theme="light-dark"] .roteiro-mapa__stats dd,
-html[data-theme="dark-dark"] .roteiro-mapa__subtitle,
-html[data-theme="light-dark"] .roteiro-mapa__subtitle {
-  color: var(--color-description);
-}
-
-html[data-theme="dark-dark"] .roteiro-mapa__frame,
-html[data-theme="light-dark"] .roteiro-mapa__frame {
-  border-color: var(--color-border-soft);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.16) inset;
-}
-
-html[data-theme="dark-dark"] .roteiro-editor svg,
-html[data-theme="light-dark"] .roteiro-editor svg,
-html[data-theme="dark-dark"] .roteiro-editor i,
-html[data-theme="light-dark"] .roteiro-editor i,
-html[data-theme="dark-dark"] .roteiro-editor .icon,
-html[data-theme="light-dark"] .roteiro-editor .icon {
-  color: var(--color-icon);
-}
-
-html[data-theme="dark-dark"] .roteiro-editor .btn-icon,
-html[data-theme="light-dark"] .roteiro-editor .btn-icon {
-  color: var(--color-icon-strong);
-}
-
-html[data-theme="dark-dark"] .roteiro-editor input[type="radio"],
-html[data-theme="light-dark"] .roteiro-editor input[type="radio"],
-html[data-theme="dark-dark"] .roteiro-editor input[type="checkbox"],
-html[data-theme="light-dark"] .roteiro-editor input[type="checkbox"] {
-  accent-color: var(--color-accent);
-}
 
 /* --------------------------------------------------------------------------
    11. Responsividade
@@ -2846,203 +2647,13 @@ html[data-theme="light-dark"] .roteiro-editor input[type="checkbox"] {
   }
 }
 
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__routes-panel--source,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__routes-panel--source,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__nest-block--destinos .roteiro-editor__destinos-stack,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__nest-block--destinos .roteiro-editor__destinos-stack,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__nest-block--sede > .roteiro-editor__grid,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__nest-block--sede > .roteiro-editor__grid,
-html[data-theme="dark-dark"] .roteiro-editor--avulso #retorno-card .roteiro-editor__subpanel,
-html[data-theme="light-dark"] .roteiro-editor--avulso #retorno-card .roteiro-editor__subpanel,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-time-calc-grid,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-time-calc-grid,
-html[data-theme="dark-dark"] .roteiro-editor--avulso #retorno-card .oficio-roteiro-time-calc-grid,
-html[data-theme="light-dark"] .roteiro-editor--avulso #retorno-card .oficio-roteiro-time-calc-grid,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-trecho-card .roteiro-time-calc-grid,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-trecho-card .roteiro-time-calc-grid,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .route-segment-card .roteiro-editor__subpanel,
-html[data-theme="light-dark"] .roteiro-editor--avulso .route-segment-card .roteiro-editor__subpanel,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .route-segment-card .oficio-roteiro-time-calc-grid,
-html[data-theme="light-dark"] .roteiro-editor--avulso .route-segment-card .oficio-roteiro-time-calc-grid,
-html[data-theme="dark-dark"] .roteiro-mapa__stats,
-html[data-theme="light-dark"] .roteiro-mapa__stats,
-html[data-theme="dark-dark"] .roteiro-mapa__canvas-shell,
-html[data-theme="light-dark"] .roteiro-mapa__canvas-shell {
-  background: var(--route-card-inner-bg);
-  border-color: var(--route-section-border);
-  box-shadow: var(--shadow-soft);
-}
-
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__routes-panel-title,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__routes-panel-title,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__nest-title,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__nest-title,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__diarias-title,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__diarias-title,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .cv-summary-value,
-html[data-theme="light-dark"] .roteiro-editor--avulso .cv-summary-value,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .cv-summary-value--principal,
-html[data-theme="light-dark"] .roteiro-editor--avulso .cv-summary-value--principal,
-html[data-theme="dark-dark"] .roteiro-mapa__stats dd,
-html[data-theme="light-dark"] .roteiro-mapa__stats dd,
-html[data-theme="dark-dark"] .roteiro-mapa__title,
-html[data-theme="light-dark"] .roteiro-mapa__title {
-  color: var(--color-text);
-}
-
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__nest-desc,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__nest-desc,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__diarias-subtitle,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__diarias-subtitle,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__diarias-note,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__diarias-note,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .cv-summary-label,
-html[data-theme="light-dark"] .roteiro-editor--avulso .cv-summary-label,
-html[data-theme="dark-dark"] .roteiro-mapa__stats dt,
-html[data-theme="light-dark"] .roteiro-mapa__stats dt,
-html[data-theme="dark-dark"] .roteiro-mapa__subtitle,
-html[data-theme="light-dark"] .roteiro-mapa__subtitle,
-html[data-theme="dark-dark"] #diarias-extenso,
-html[data-theme="light-dark"] #diarias-extenso {
-  color: var(--color-text-muted);
-}
-
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__routes-panel--source .roteiro-editor__input,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__routes-panel--source .roteiro-editor__input,
-html[data-theme="dark-dark"] .roteiro-editor--avulso #retorno-card .form-control,
-html[data-theme="light-dark"] .roteiro-editor--avulso #retorno-card .form-control,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .route-segment-card .form-control,
-html[data-theme="light-dark"] .roteiro-editor--avulso .route-segment-card .form-control {
-  background: var(--color-card);
-  border-color: var(--route-field-border);
-  color: var(--route-card-text);
-}
-
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__reference-block--source .roteiro-editor__choice-card,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__reference-block--source .roteiro-editor__choice-card,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__reference-block--source .roteiro-editor__choice-card:has(input:checked),
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__reference-block--source .roteiro-editor__choice-card:has(input:checked) {
-  background: var(--route-card-inner-bg);
-}
-
-html[data-theme="dark-dark"] .roteiro-editor--avulso #retorno-card .form-control[readonly],
-html[data-theme="light-dark"] .roteiro-editor--avulso #retorno-card .form-control[readonly],
-html[data-theme="dark-dark"] .roteiro-editor--avulso .route-segment-card .form-control[readonly],
-html[data-theme="light-dark"] .roteiro-editor--avulso .route-segment-card .form-control[readonly] {
-  background: var(--route-field-disabled-bg);
-  color: var(--route-field-disabled-text);
-  opacity: 1;
-}
-
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__section--diarias > .roteiro-editor__diarias,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__section--diarias > .roteiro-editor__diarias,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .cv-summary-item,
-html[data-theme="light-dark"] .roteiro-editor--avulso .cv-summary-item,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .cv-summary-item--principal,
-html[data-theme="light-dark"] .roteiro-editor--avulso .cv-summary-item--principal,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .cv-summary-item--secondary,
-html[data-theme="light-dark"] .roteiro-editor--avulso .cv-summary-item--secondary {
-  background: var(--route-card-inner-bg);
-}
-
-.roteiro-editor__section.roteiro-editor__section--diarias,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__section.roteiro-editor__section--diarias,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__section.roteiro-editor__section--diarias {
+.roteiro-editor__section.roteiro-editor__section--diarias {
   background: var(--route-card-bg);
 }
 
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__section--diarias #diarias-status,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__section--diarias #diarias-status {
-  background: var(--route-card-inner-bg);
-  border-color: var(--route-status-muted-border);
-  color: var(--route-status-muted-text);
-}
-
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__reference-block--source .roteiro-editor__choice-card:hover,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__reference-block--source .roteiro-editor__choice-card:hover {
-  border-color: var(--color-border-strong);
-  box-shadow: var(--shadow-soft);
-}
-
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__reference-block--source .roteiro-editor__choice-title,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__reference-block--source .roteiro-editor__choice-title {
-  color: var(--color-text);
-}
-
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__reference-block--source .roteiro-editor__choice-desc,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__reference-block--source .roteiro-editor__choice-desc {
-  color: var(--color-text-muted);
-}
-
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__add-btn#btn-adicionar-destino,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__add-btn#btn-adicionar-destino {
-  background: var(--route-button-secondary-bg);
-  border-color: var(--route-button-secondary-border);
-  color: var(--route-button-secondary-text);
-}
-
-html[data-theme="dark-dark"] .roteiro-editor__map-card,
-html[data-theme="light-dark"] .roteiro-editor__map-card,
-html[data-theme="dark-dark"] .roteiro-editor__map-card .card-body,
-html[data-theme="light-dark"] .roteiro-editor__map-card .card-body,
-html[data-theme="dark-dark"] .roteiro-mapa__summary,
-html[data-theme="light-dark"] .roteiro-mapa__summary,
-html[data-theme="dark-dark"] .roteiro-mapa__stats,
-html[data-theme="light-dark"] .roteiro-mapa__stats {
-  background: var(--route-card-inner-bg);
-  border-color: var(--route-section-border);
-}
-
-html[data-theme="dark-dark"] .roteiro-mapa__canvas-head,
-html[data-theme="light-dark"] .roteiro-mapa__canvas-head,
-html[data-theme="dark-dark"] .roteiro-mapa__frame,
-html[data-theme="light-dark"] .roteiro-mapa__frame {
-  border-color: var(--color-border);
-}
-
-html[data-theme="dark-dark"] .roteiro-mapa__action-btn--secondary,
-html[data-theme="light-dark"] .roteiro-mapa__action-btn--secondary {
-  background: var(--route-button-secondary-bg);
-  border-color: var(--route-button-secondary-border);
-  color: var(--route-button-secondary-text);
-}
-
-html[data-theme="dark-dark"] .roteiro-mapa__action-btn--secondary:hover,
-html[data-theme="light-dark"] .roteiro-mapa__action-btn--secondary:hover,
-html[data-theme="dark-dark"] .roteiro-mapa__action-btn--secondary:focus-visible,
-html[data-theme="light-dark"] .roteiro-mapa__action-btn--secondary:focus-visible {
-  background: var(--route-button-secondary-hover-bg);
-  border-color: var(--route-button-secondary-hover-border);
-  color: var(--route-button-secondary-text);
-}
-
-/* OpÃ§Ãµes de <select> (dark-dark / light-dark): forms.css (.app-form-shell). */
+/* OpÃ§Ãµes de <select> no tema escuro: forms.css (.app-form-shell). */
 
 /* Hotfix de contraste: tÃ­tulos e descriÃ§Ãµes internos de Sede/Destinos/Loop */
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__nest-block--sede .roteiro-editor__sede-card-header,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__nest-block--sede .roteiro-editor__sede-card-header,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__nest-block--destinos .roteiro-editor__destinos-card-header,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__nest-block--destinos .roteiro-editor__destinos-card-header {
-  color: var(--color-label-strong);
-}
-
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__nest-block--sede .roteiro-editor__sede-card-header .roteiro-editor__nest-title,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__nest-block--sede .roteiro-editor__sede-card-header .roteiro-editor__nest-title,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__nest-block--destinos .roteiro-editor__destinos-card-header .roteiro-editor__nest-title,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__nest-block--destinos .roteiro-editor__destinos-card-header .roteiro-editor__nest-title,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__routes-panel-title,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__routes-panel-title {
-  color: var(--color-section-title);
-}
-
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__nest-block--sede .roteiro-editor__sede-card-header .roteiro-editor__nest-desc,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__nest-block--sede .roteiro-editor__sede-card-header .roteiro-editor__nest-desc,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__nest-block--destinos .roteiro-editor__destinos-card-header .roteiro-editor__nest-desc,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__nest-block--destinos .roteiro-editor__destinos-card-header .roteiro-editor__nest-desc,
-html[data-theme="dark-dark"] .roteiro-editor--avulso .roteiro-editor__routes-panel--source .roteiro-editor__helper,
-html[data-theme="light-dark"] .roteiro-editor--avulso .roteiro-editor__routes-panel--source .roteiro-editor__helper {
-  color: var(--color-description);
-}
 
 /* Tema escuro oficial: reforco de hierarquia premium no fluxo de roteiros */
 html[data-theme="dark"] .roteiro-editor__main.card,
@@ -3069,16 +2680,12 @@ html[data-theme="dark"] .roteiro-editor--avulso .route-segment-card .card-header
   font-weight: 900;
 }
 
-html[data-theme="light"] .roteiro-editor--avulso .roteiro-editor__reference-block--source .roteiro-editor__choice-card:has(input:checked),
-html[data-theme="light-light"] .roteiro-editor--avulso .roteiro-editor__reference-block--source .roteiro-editor__choice-card:has(input:checked),
-html[data-theme="dark-light"] .roteiro-editor--avulso .roteiro-editor__reference-block--source .roteiro-editor__choice-card:has(input:checked) {
+html[data-theme="light"] .roteiro-editor--avulso .roteiro-editor__reference-block--source .roteiro-editor__choice-card:has(input:checked) {
   border-color: var(--route-status-draft-border);
   box-shadow:
     0 0 0 1px var(--route-status-draft-border),
     0 10px 22px rgba(216, 162, 27, 0.14);
 }
-
-
 
 /* ── Ofício wizard roteiro: zero visual de foco (pedido explícito) ─ */
 [data-travel-document-wizard-roteiro] .oficio-roteiro-body,
@@ -3168,9 +2775,9 @@ html[data-theme="dark-light"] .roteiro-editor--avulso .roteiro-editor__reference
 }
 
 /* Sobrescreve o focus canônico do dark-redesign neste escopo */
-:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+:is(html[data-theme="dark"])
   [data-travel-document-wizard-roteiro] .oficio-roteiro-body :is(button, a, input, select, textarea, [tabindex]):focus-visible,
-:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+:is(html[data-theme="dark"])
   .roteiro-editor--oficio .oficio-roteiro-body :is(button, a, input, select, textarea, [tabindex]):focus-visible {
   outline: none !important;
   outline-offset: 0 !important;
@@ -3182,7 +2789,7 @@ html[data-theme="dark-light"] .roteiro-editor--avulso .roteiro-editor__reference
    Também reforçado pós-tema no wizard_roteiro (extra_css_after_theme).
    --color-surface-soft (#223348) ≠ --step1-field do leg (≈ #132538).
    ======================================================================== */
-:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+:is(html[data-theme="dark"])
   [data-travel-document-wizard-roteiro]
   .roteiro-trecho-card__leg
   :is(
@@ -3194,7 +2801,7 @@ html[data-theme="dark-light"] .roteiro-editor--avulso .roteiro-editor__reference
     .cv-field__control[readonly],
     input[readonly]
   ),
-:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+:is(html[data-theme="dark"])
   [data-travel-document-wizard-roteiro]
   #retorno-card
   .roteiro-trecho-card__leg

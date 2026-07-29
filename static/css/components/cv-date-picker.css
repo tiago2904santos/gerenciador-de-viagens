@@ -20,16 +20,12 @@ html {
   --cv-date-picker-selected-hover-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
 }
 
-html[data-theme="dark"],
-html[data-theme="dark-dark"],
-html[data-theme="light-dark"] {
+html[data-theme="dark"] {
   --cv-date-picker-selected-shadow: 0 1px 2px rgba(0, 0, 0, 0.22);
   --cv-date-picker-selected-hover-shadow: 0 1px 2px rgba(0, 0, 0, 0.22);
 }
 
-html[data-theme="light"],
-html[data-theme="dark-light"],
-html[data-theme="light-light"] {
+html[data-theme="light"] {
   --cv-date-picker-selected-shadow: 0 1px 2px rgba(0, 0, 0, 0.16);
   --cv-date-picker-selected-hover-shadow: 0 1px 2px rgba(0, 0, 0, 0.16);
 }
@@ -372,17 +368,13 @@ html[data-theme="light-light"] {
   z-index: 4;
 }
 
-html[data-theme="dark"] .cv-date-picker__day-badge,
-html[data-theme="dark-dark"] .cv-date-picker__day-badge,
-html[data-theme="light-dark"] .cv-date-picker__day-badge {
+html[data-theme="dark"] .cv-date-picker__day-badge {
   background: var(--color-white);
   border-color: var(--stepper-active-bg, var(--color-accent));
   color: var(--stepper-active-bg, var(--color-accent));
 }
 
-html[data-theme="light"] .cv-date-picker__day-badge,
-html[data-theme="dark-light"] .cv-date-picker__day-badge,
-html[data-theme="light-light"] .cv-date-picker__day-badge {
+html[data-theme="light"] .cv-date-picker__day-badge {
   background: var(--color-white);
   border-color: #0b3a66;
   color: #0b3a66;
@@ -532,35 +524,15 @@ html[data-theme="light-light"] .cv-date-picker__day-badge {
 }
 
 html[data-theme="dark"] .cv-date-picker .cv-date-picker__day--multi-selected,
-html[data-theme="dark-dark"] .cv-date-picker .cv-date-picker__day--multi-selected,
-html[data-theme="light-dark"] .cv-date-picker .cv-date-picker__day--multi-selected,
 html[data-theme="dark"] .cv-date-picker .cv-date-picker__day--multi-start,
-html[data-theme="dark-dark"] .cv-date-picker .cv-date-picker__day--multi-start,
-html[data-theme="light-dark"] .cv-date-picker .cv-date-picker__day--multi-start,
 html[data-theme="dark"] .cv-date-picker .cv-date-picker__day--multi-middle,
-html[data-theme="dark-dark"] .cv-date-picker .cv-date-picker__day--multi-middle,
-html[data-theme="light-dark"] .cv-date-picker .cv-date-picker__day--multi-middle,
 html[data-theme="dark"] .cv-date-picker .cv-date-picker__day--multi-end,
-html[data-theme="dark-dark"] .cv-date-picker .cv-date-picker__day--multi-end,
-html[data-theme="light-dark"] .cv-date-picker .cv-date-picker__day--multi-end,
 html[data-theme="dark"] .cv-date-picker .cv-date-picker__day--multi-single,
-html[data-theme="dark-dark"] .cv-date-picker .cv-date-picker__day--multi-single,
-html[data-theme="light-dark"] .cv-date-picker .cv-date-picker__day--multi-single,
 html[data-theme="light"] .cv-date-picker .cv-date-picker__day--multi-selected,
-html[data-theme="dark-light"] .cv-date-picker .cv-date-picker__day--multi-selected,
-html[data-theme="light-light"] .cv-date-picker .cv-date-picker__day--multi-selected,
 html[data-theme="light"] .cv-date-picker .cv-date-picker__day--multi-start,
-html[data-theme="dark-light"] .cv-date-picker .cv-date-picker__day--multi-start,
-html[data-theme="light-light"] .cv-date-picker .cv-date-picker__day--multi-start,
 html[data-theme="light"] .cv-date-picker .cv-date-picker__day--multi-middle,
-html[data-theme="dark-light"] .cv-date-picker .cv-date-picker__day--multi-middle,
-html[data-theme="light-light"] .cv-date-picker .cv-date-picker__day--multi-middle,
 html[data-theme="light"] .cv-date-picker .cv-date-picker__day--multi-end,
-html[data-theme="dark-light"] .cv-date-picker .cv-date-picker__day--multi-end,
-html[data-theme="light-light"] .cv-date-picker .cv-date-picker__day--multi-end,
-html[data-theme="light"] .cv-date-picker .cv-date-picker__day--multi-single,
-html[data-theme="dark-light"] .cv-date-picker .cv-date-picker__day--multi-single,
-html[data-theme="light-light"] .cv-date-picker .cv-date-picker__day--multi-single {
+html[data-theme="light"] .cv-date-picker .cv-date-picker__day--multi-single {
   background-color: transparent !important;
   background-image: none !important;
   border-color: transparent !important;
@@ -569,46 +541,22 @@ html[data-theme="light-light"] .cv-date-picker .cv-date-picker__day--multi-singl
 }
 
 html[data-theme="dark"] .cv-date-picker .cv-date-picker__day--multi-single::before,
-html[data-theme="dark-dark"] .cv-date-picker .cv-date-picker__day--multi-single::before,
-html[data-theme="light-dark"] .cv-date-picker .cv-date-picker__day--multi-single::before,
-html[data-theme="light"] .cv-date-picker .cv-date-picker__day--multi-single::before,
-html[data-theme="dark-light"] .cv-date-picker .cv-date-picker__day--multi-single::before,
-html[data-theme="light-light"] .cv-date-picker .cv-date-picker__day--multi-single::before {
+html[data-theme="light"] .cv-date-picker .cv-date-picker__day--multi-single::before {
   background: var(--cv-date-picker-selected-bg-start) !important;
   border-color: transparent !important;
   box-shadow: var(--cv-date-picker-selected-shadow) !important;
 }
 
 html[data-theme="dark"] .cv-date-picker .cv-date-picker__day--multi-selected:hover,
-html[data-theme="dark-dark"] .cv-date-picker .cv-date-picker__day--multi-selected:hover,
-html[data-theme="light-dark"] .cv-date-picker .cv-date-picker__day--multi-selected:hover,
 html[data-theme="dark"] .cv-date-picker .cv-date-picker__day--multi-start:hover,
-html[data-theme="dark-dark"] .cv-date-picker .cv-date-picker__day--multi-start:hover,
-html[data-theme="light-dark"] .cv-date-picker .cv-date-picker__day--multi-start:hover,
 html[data-theme="dark"] .cv-date-picker .cv-date-picker__day--multi-middle:hover,
-html[data-theme="dark-dark"] .cv-date-picker .cv-date-picker__day--multi-middle:hover,
-html[data-theme="light-dark"] .cv-date-picker .cv-date-picker__day--multi-middle:hover,
 html[data-theme="dark"] .cv-date-picker .cv-date-picker__day--multi-end:hover,
-html[data-theme="dark-dark"] .cv-date-picker .cv-date-picker__day--multi-end:hover,
-html[data-theme="light-dark"] .cv-date-picker .cv-date-picker__day--multi-end:hover,
 html[data-theme="dark"] .cv-date-picker .cv-date-picker__day--multi-single:hover,
-html[data-theme="dark-dark"] .cv-date-picker .cv-date-picker__day--multi-single:hover,
-html[data-theme="light-dark"] .cv-date-picker .cv-date-picker__day--multi-single:hover,
 html[data-theme="light"] .cv-date-picker .cv-date-picker__day--multi-selected:hover,
-html[data-theme="dark-light"] .cv-date-picker .cv-date-picker__day--multi-selected:hover,
-html[data-theme="light-light"] .cv-date-picker .cv-date-picker__day--multi-selected:hover,
 html[data-theme="light"] .cv-date-picker .cv-date-picker__day--multi-start:hover,
-html[data-theme="dark-light"] .cv-date-picker .cv-date-picker__day--multi-start:hover,
-html[data-theme="light-light"] .cv-date-picker .cv-date-picker__day--multi-start:hover,
 html[data-theme="light"] .cv-date-picker .cv-date-picker__day--multi-middle:hover,
-html[data-theme="dark-light"] .cv-date-picker .cv-date-picker__day--multi-middle:hover,
-html[data-theme="light-light"] .cv-date-picker .cv-date-picker__day--multi-middle:hover,
 html[data-theme="light"] .cv-date-picker .cv-date-picker__day--multi-end:hover,
-html[data-theme="dark-light"] .cv-date-picker .cv-date-picker__day--multi-end:hover,
-html[data-theme="light-light"] .cv-date-picker .cv-date-picker__day--multi-end:hover,
-html[data-theme="light"] .cv-date-picker .cv-date-picker__day--multi-single:hover,
-html[data-theme="dark-light"] .cv-date-picker .cv-date-picker__day--multi-single:hover,
-html[data-theme="light-light"] .cv-date-picker .cv-date-picker__day--multi-single:hover {
+html[data-theme="light"] .cv-date-picker .cv-date-picker__day--multi-single:hover {
   filter: brightness(1.08);
   z-index: 2;
 }

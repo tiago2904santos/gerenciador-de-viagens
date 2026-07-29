@@ -5,7 +5,7 @@
  * (3) contraste de texto quando a superfície for escura
  *
  * IDs oficiais: dark | light
- * Aliases legados aceitos apenas para migração: dark-dark, light-light, dark-light, light-dark
+ * Temas canônicos: light e dark.
  * Sidebar (--sidebar-*): ajustada por tema oficial.
  * Variáveis --theme-*: usar em dashboard, app-page.css, app-ui (hero).
  * --app-hero-stage-start / --app-hero-stage-end / --app-hero-stage-bg: definidos por tema.
@@ -13,7 +13,7 @@
 
 :root {
   /* --------------------------------------------------------------------------
-     Tokens semanticos globais (default: light-light)
+     Tokens semanticos globais (default: light)
      -------------------------------------------------------------------------- */
   --color-shell: var(--color-bg);
   --color-card: var(--color-surface);
@@ -88,7 +88,7 @@
   --sidebar-logout-fg: rgba(230, 241, 255, 0.95);
   --sidebar-focus-ring: rgba(216, 162, 27, 0.35);
 
-  /* Fallback antes do JS (equivalente a light-light) */
+  /* Fallback antes do JS (equivalente a light) */
   --app-body-bg: linear-gradient(180deg, #f8fbff 0%, #eef4fb 48%, #e3ecf6 100%);
   --app-main-bg: transparent;
   --app-featured-bg-fallback: #bed0e4;
@@ -229,11 +229,8 @@
   --app-success: var(--color-success);
 }
 
-
 /* ========== 2 tema escuro oficial (inclui aliases legados escuros) ========== */
-html[data-theme="dark"],
-html[data-theme="dark-dark"],
-html[data-theme="light-dark"] {
+html[data-theme="dark"] {
   --color-bg: #07111d;
   --color-shell: #081827;
   --color-surface: #1a2638;
@@ -404,9 +401,7 @@ html[data-theme="light-dark"] {
 }
 
 /* ========== 3 tema claro oficial (inclui alias legado claro) ========== */
-html[data-theme="light"],
-html[data-theme="dark-light"],
-html[data-theme="light-light"] {
+html[data-theme="light"] {
   --color-bg: #f2f6fb;
   --color-surface: var(--color-white);
   --color-surface-strong: #f8fafd;

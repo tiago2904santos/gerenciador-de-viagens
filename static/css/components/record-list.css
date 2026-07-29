@@ -60,7 +60,7 @@
 /* Registros ricos (servidor, viatura etc.) deixam de comprimir quatro ou mais
    pares em uma frase única. Os dados continuam na mesma linha semântica, mas
    passam a formar uma grade leve de rótulo e valor. */
-:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+:is(html[data-theme="dark"])
   .cv-record-row__meta:has(.cv-record-row__meta-item:nth-child(4)) {
   display: grid;
   gap: 8px 18px;
@@ -68,7 +68,7 @@
   overflow: visible;
 }
 
-:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+:is(html[data-theme="dark"])
   .cv-record-row__meta:has(.cv-record-row__meta-item:nth-child(4))
   .cv-record-row__meta-item {
   align-items: flex-start;
@@ -77,13 +77,13 @@
   min-width: 0;
 }
 
-:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+:is(html[data-theme="dark"])
   .cv-record-row__meta:has(.cv-record-row__meta-item:nth-child(4))
   .cv-record-row__meta-label {
   margin-right: 0;
 }
 
-:is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+:is(html[data-theme="dark"])
   .cv-record-row__meta:has(.cv-record-row__meta-item:nth-child(4))
   .cv-record-row__meta-value {
   overflow-wrap: anywhere;
@@ -121,14 +121,14 @@
     width: 100%;
   }
 
-  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  :is(html[data-theme="dark"])
     .cv-record-row__meta:has(.cv-record-row__meta-item:nth-child(4)) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 420px) {
-  :is(html[data-theme="dark"], html[data-theme="dark-dark"], html[data-theme="light-dark"])
+  :is(html[data-theme="dark"])
     .cv-record-row__meta:has(.cv-record-row__meta-item:nth-child(4)) {
     grid-template-columns: minmax(0, 1fr);
   }
