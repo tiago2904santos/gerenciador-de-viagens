@@ -63,10 +63,13 @@ jobs:
         run: python scripts/audit_frontend_standards.py --max-warnings 417
 
       - name: Block new ORM in views (P-01)
-        # Catraca: este número só desce. `eventos` levou 61 → 46; `termos`,
-        # 46 → 40; `ordens_servico`, 40 → 37. Alvo final: zero — ver
+        # Catraca: este número só desce. O P-01 fechou os quatro apps do
+        # escopo: eventos 61 → 46, termos → 40, ordens_servico → 37,
+        # planos_trabalho → 32. O que resta está fora do P-01 —
+        # integracoes/google_drive (10), core (9), documentos (4), oficios (4),
+        # usuarios (3) e roteiros (2). Alvo final segue sendo zero; ver
         # docs/PADRAO_SELECTORS.md.
-        run: python scripts/audit_django_architecture.py --max-orm-em-view 37
+        run: python scripts/audit_django_architecture.py --max-orm-em-view 32
 
       - name: Validate production security settings
         env:
