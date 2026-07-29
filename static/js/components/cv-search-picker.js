@@ -5,14 +5,6 @@
 
   /* ── Utilitários ─────────────────────────────────────────────── */
 
-  function normalize(value) {
-    return (value || "")
-      .toString()
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[̀-ͯ]/g, "");
-  }
-
   function el(tag, className, text) {
     const node = document.createElement(tag);
     if (className) node.className = className;
@@ -86,7 +78,7 @@
     return values
       .map((value) => (value || "").trim())
       .filter((value) => {
-        const key = normalize(value);
+        const key = window.CV.util.normalize(value);
         if (!key || seen.has(key)) return false;
         seen.add(key);
         return true;
@@ -251,19 +243,19 @@
     }
 
     function filteredItems() {
-      const term = normalize(query);
+      const term = window.CV.util.normalize(query);
       if (!term && openAllOnFocus && isOpen) {
         return options.filter((o) => !o.disabled);
       }
       if (!term) return [];
       if (mode === "single") {
-        return options.filter((o) => normalize(o.search).includes(term));
+        return options.filter((o) => window.CV.util.normalize(o.search).includes(term));
       }
       return options.filter((o) => {
         if (o.kind === "unidade") {
-          return !unidadeFullySelected(o) && normalize(o.search).includes(term);
+          return !unidadeFullySelected(o) && window.CV.util.normalize(o.search).includes(term);
         }
-        return !o.selected && normalize(o.search).includes(term);
+        return !o.selected && window.CV.util.normalize(o.search).includes(term);
       });
     }
 

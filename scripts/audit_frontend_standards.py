@@ -127,16 +127,37 @@ CSS_RULES_AVISO = [
 # ---------------------------------------------------------------------------
 
 JS_HTTP_OWNER = "static/js/core/http.js"
+JS_UTIL_OWNER = "static/js/core/app.js"
 JS_RULES_ERRO = [
     (
         "raw_fetch",
         re.compile(r"\bfetch\s*\("),
         "fetch() cru — usar CV.http",
+        JS_HTTP_OWNER,
     ),
     (
         "duplicated_csrf_header",
         re.compile(r"""["']X-CSRFToken["']"""),
         "Cabeçalho CSRF fora do núcleo — usar CV.http",
+        JS_HTTP_OWNER,
+    ),
+    (
+        "duplicated_debounce",
+        re.compile(r"\b(?:function\s+debounc\w*\s*\(|(?:const|let|var)\s+debounce\s*=)"),
+        "Implementação local de debounce — usar CV.util.debounce",
+        JS_UTIL_OWNER,
+    ),
+    (
+        "duplicated_escape_html",
+        re.compile(r"\b(?:function\s+(?:escapeHtml|esc)\s*\(|(?:const|let|var)\s+(?:escapeHtml|esc)\s*=)"),
+        "Implementação local de escape HTML — usar CV.util.escapeHtml",
+        JS_UTIL_OWNER,
+    ),
+    (
+        "duplicated_normalize",
+        re.compile(r"""\.normalize\s*\(\s*["']NFD["']\s*\)"""),
+        "Implementação local de normalização textual — usar CV.util.normalize",
+        JS_UTIL_OWNER,
     ),
 ]
 
@@ -225,15 +246,15 @@ def audit_js() -> list[tuple]:
     findings = []
     for path in sorted(JS_DIR.rglob("*.js")):
         rp = rel(path)
-        if rp == JS_HTTP_OWNER:
-            continue
         try:
             lines = path.read_text(encoding="utf-8").splitlines()
         except UnicodeDecodeError:
             lines = path.read_text(encoding="latin-1").splitlines()
 
         for idx, line in enumerate(lines, start=1):
-            for rule_name, pattern, message in JS_RULES_ERRO:
+            for rule_name, pattern, message, owner in JS_RULES_ERRO:
+                if rp == owner:
+                    continue
                 if pattern.search(line):
                     findings.append(("ERRO", rp, idx, rule_name, message, line.strip(), ""))
 

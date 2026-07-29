@@ -99,9 +99,14 @@
   btnNext.addEventListener("click", function () {
     if (currentPage < totalPages) renderPage(currentPage + 1);
   });
-  window.addEventListener("resize", debounce(function () {
-    if (pdfDoc) renderPage(currentPage);
-  }, 200));
+  let resizeFrame = null;
+  window.addEventListener("resize", function () {
+    if (resizeFrame !== null) window.cancelAnimationFrame(resizeFrame);
+    resizeFrame = window.requestAnimationFrame(function () {
+      resizeFrame = null;
+      if (pdfDoc) renderPage(currentPage);
+    });
+  });
 
   // ── Builder: abas ──────────────────────────────────────────────
   function precarregarFontes() {
@@ -379,14 +384,6 @@
 
   // ── Utils ──────────────────────────────────────────────────────
   function clamp(v, min, max) { return Math.min(max, Math.max(min, v)); }
-
-  function debounce(fn, ms) {
-    let t;
-    return function () {
-      clearTimeout(t);
-      t = setTimeout(fn, ms);
-    };
-  }
 
   function trimCanvas(src) {
     const ctx = src.getContext("2d");

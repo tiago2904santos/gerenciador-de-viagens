@@ -5,23 +5,6 @@
       .replace(/[^A-Z0-9]/g, "");
   }
 
-  function debounce(fn, ms) {
-    let handle = null;
-    function debounced() {
-      const args = arguments;
-      window.clearTimeout(handle);
-      handle = window.setTimeout(function () {
-        handle = null;
-        fn.apply(null, args);
-      }, ms);
-    }
-    debounced.cancel = function () {
-      window.clearTimeout(handle);
-      handle = null;
-    };
-    return debounced;
-  }
-
   function dispatchFieldEvents(element) {
     if (!element) return;
     element.dispatchEvent(new Event("input", { bubbles: true }));
@@ -117,7 +100,7 @@
     const self = this;
     if (!this.buscaInput || !this.apiUrl) return;
 
-    this.runViaturaSearchDebounced = debounce(function () {
+    this.runViaturaSearchDebounced = window.CV.util.debounce(function () {
       self.runViaturaSearch();
     }, 380);
 

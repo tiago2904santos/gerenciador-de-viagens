@@ -15,16 +15,8 @@
     return document;
   }
 
-  function normalizeText(value) {
-    return String(value || '')
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase()
-      .trim();
-  }
-
   function searchTerms(query) {
-    var norm = normalizeText(query);
+    var norm = window.CV.util.normalize(query).trim();
     if (!norm) return [];
     return norm.split(/\s+/).filter(Boolean);
   }
@@ -37,11 +29,11 @@
       var value = (input.value || '').trim();
       if (type === 'search') {
         filters.searchRaw = value;
-        filters.search = normalizeText(value);
+        filters.search = window.CV.util.normalize(value).trim();
         filters.searchTerms = searchTerms(value);
       } else if (type === 'status') {
         filters.status = value;
-        filters.statusNorm = value ? normalizeText(value) : '';
+        filters.statusNorm = value ? window.CV.util.normalize(value).trim() : '';
       }
     });
     return filters;
@@ -49,7 +41,7 @@
 
   function matchesFilter(item, filters) {
     if (filters.searchTerms && filters.searchTerms.length) {
-      var searchText = normalizeText(item.getAttribute('data-search-text') || item.textContent || '');
+      var searchText = window.CV.util.normalize(item.getAttribute('data-search-text') || item.textContent || '').trim();
       for (var i = 0; i < filters.searchTerms.length; i++) {
         if (searchText.indexOf(filters.searchTerms[i]) === -1) {
           return false;
@@ -58,7 +50,7 @@
     }
 
     if (filters.status) {
-      var statusValue = normalizeText(item.getAttribute('data-status-value') || '');
+      var statusValue = window.CV.util.normalize(item.getAttribute('data-status-value') || '').trim();
       if (!statusValue || statusValue !== filters.statusNorm) {
         return false;
       }
@@ -144,19 +136,6 @@
     return result;
   }
 
-  function debounce(fn, delay) {
-    var timer = null;
-    return function () {
-      var args = arguments;
-      var ctx = this;
-      if (timer) window.clearTimeout(timer);
-      timer = window.setTimeout(function () {
-        fn.apply(ctx, args);
-        timer = null;
-      }, delay);
-    };
-  }
-
   function clear(scope) {
     if (!scope) return applyFilters(document);
     var filterInputs = scope.querySelectorAll('[data-cv-filter]');
@@ -203,7 +182,7 @@
         (input.type === 'text' || input.type === 'search' || input.type === '');
 
       if (isText) {
-        var debouncedApply = debounce(function () {
+        var debouncedApply = window.CV.util.debounce(function () {
           applyFilters(scope);
         }, 250);
         input.addEventListener('input', debouncedApply);
