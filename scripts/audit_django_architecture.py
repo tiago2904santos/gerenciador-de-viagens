@@ -12,6 +12,20 @@ ROOT = Path(__file__).resolve().parents[1]
 # num PR só: `core`, `documentos` e `usuarios` estão fora do escopo do `P-01`.
 ORM_EM_VIEW = re.compile(r"\.objects\b")
 DRIVE_ROOT = ROOT / "integracoes" / "google_drive"
+P06_SPLIT_VIEW_MODULES = {
+    "oficios/api_views.py",
+    "oficios/list_views.py",
+    "oficios/route_views.py",
+    "oficios/traveler_views.py",
+    "oficios/view_helpers.py",
+    "oficios/wizard_document_views.py",
+    "planos_trabalho/activity_views.py",
+    "planos_trabalho/document_views.py",
+    "planos_trabalho/identification_views.py",
+    "planos_trabalho/list_views.py",
+    "planos_trabalho/per_diem_views.py",
+    "planos_trabalho/view_helpers.py",
+}
 
 PY_RULES = [
     ("query_direta_view", ("views.py", ".objects.filter(")),
@@ -96,12 +110,17 @@ def contar_orm_em_views():
     """Conta ocorrências de `.objects` em cada `views.py`, por app."""
     por_app = {}
     for path in iter_files(".py"):
-        if path.name != "views.py":
+        path_rel = rel(path)
+        if path.name != "views.py" and path_rel not in P06_SPLIT_VIEW_MODULES:
             continue
-        app = rel(path).rsplit("/", 1)[0] or "."
+        app = (
+            path_rel.split("/", 1)[0]
+            if path_rel in P06_SPLIT_VIEW_MODULES
+            else path_rel.rsplit("/", 1)[0] or "."
+        )
         total = len(ORM_EM_VIEW.findall(path.read_text(encoding="utf-8")))
         if total:
-            por_app[app] = total
+            por_app[app] = por_app.get(app, 0) + total
     return por_app
 
 
@@ -176,7 +195,7 @@ def main():
 
     por_app = contar_orm_em_views()
     total_orm = sum(por_app.values())
-    print("\n== ORM em views.py (P-01) ==")
+    print("\n== ORM em módulos de view (P-01) ==")
     for app, total in sorted(por_app.items(), key=lambda item: (-item[1], item[0])):
         print(f"  {app}: {total}")
     print(f"Total: {total_orm}")
