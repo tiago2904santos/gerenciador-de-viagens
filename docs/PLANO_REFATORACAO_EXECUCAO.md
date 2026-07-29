@@ -342,7 +342,14 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
 - [ ] `N-09` `valor_por_servidor × servidores` pode não fechar com `total_valor`
 - [ ] `N-10` pernoite curto — **mesma causa do `N-08`**; resolve junto
 - [ ] `P-03` constraints e indexes em roteiros/termos/justificativas
-- [ ] `N-13` documentar diárias, numeração e status em `REGRAS_DE_NEGOCIO.md`
+- [x] `N-13` `REGRAS_DE_NEGOCIO.md`: 77 → 231 linhas. Diárias documentadas por
+  inteiro (grupos, vigência, limites de período, trecho tarifário, faixas de
+  complemento, valor recebido e as duas pendências conhecidas), mais numeração
+  — três estratégias diferentes, descritas como são — e o vocabulário de status
+  de cada fluxo. Corrigida a linha que dizia "não há cálculo de diárias", falsa
+  desde a Etapa 3. Duas afirmações minhas estavam erradas na primeira escrita e
+  foram corrigidas conferindo o código: o número é reservado na criação (não ao
+  sair de rascunho), e a reserva do ofício roda em laço de até 3 tentativas.
 
 ### Etapa 4 — Backend de aderência
 - [ ] `P-01` selectors em eventos, termos, OS, PT + gate anti-ORM-em-view
