@@ -7,7 +7,7 @@
  * IDs oficiais: dark | light
  * Temas canônicos: light e dark.
  * Sidebar (--sidebar-*): ajustada por tema oficial.
- * Variáveis --theme-*: usar em dashboard, app-page.css, app-ui (hero).
+ * Variáveis --theme-*: usar nas superfícies semânticas da aplicação.
  * --app-hero-stage-start / --app-hero-stage-end / --app-hero-stage-bg: definidos por tema.
  */
 

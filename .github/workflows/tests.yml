@@ -58,9 +58,9 @@ jobs:
           python manage.py check --settings=config.settings.test
 
       - name: Block new frontend standards debt
-        # Catraca: este número só desce. A Etapa 1 levou 465 → 449; a Etapa 7,
-        # fase 2, removeu fallbacks de tokens indefinidos e levou 449 → 438.
-        run: python scripts/audit_frontend_standards.py --max-warnings 438
+        # Catraca: este número só desce. A Etapa 1 levou 465 → 449; a Etapa 7
+        # levou 449 → 438 na fase 2 e 438 → 417 na fase 1.
+        run: python scripts/audit_frontend_standards.py --max-warnings 417
 
       - name: Validate production security settings
         env:

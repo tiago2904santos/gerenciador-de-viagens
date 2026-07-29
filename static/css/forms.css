@@ -3,26 +3,9 @@
    ========================================================================== */
 
 /* ============================================================
-   Form system — shell premium (referência visual: Roteiros)
-   Classes: .app-form-shell (canônico), .form-shell (alias legado)
+   Form system — referência visual: Roteiros
    ============================================================ */
 
-.app-form-shell,
-.form-shell {
-  background: var(--route-card-bg);
-  border: 1px solid var(--route-section-border);
-  border-radius: var(--radius-shell);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.65) inset,
-    0 20px 44px rgba(15, 34, 54, 0.1);
-  box-sizing: border-box;
-  display: grid;
-  gap: var(--space-2);
-  padding: clamp(18px, 2.2vw, 26px) clamp(18px, 2.5vw, 28px);
-  width: 100%;
-}
-
-.app-page__shell > .app-form-shell,
 .app-page__shell > .roteiro-form-shell {
   background: var(--route-card-bg);
   border: 1px solid var(--route-section-border);
@@ -54,37 +37,10 @@
   padding: var(--space-5);
 }
 
-.app-form-shell .form-section,
-.form-shell .form-section {
-  background: var(--route-section-bg);
-  border: 1px solid var(--route-section-border);
-  border-radius: var(--radius-section);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
-  overflow: visible;
-}
-
-.app-form-shell .field,
-.app-form-shell .field-grid,
-.form-shell .field,
-.form-shell .field-grid,
-.app-form-shell .cv-search-picker,
-.form-shell .cv-search-picker,
-.app-form-shell .cv-custom-select,
-.form-shell .cv-custom-select,
-.app-form-shell .oficio-viatura-busca__wrap,
-.form-shell .oficio-viatura-busca__wrap {
-  overflow: visible;
-}
-
 .form-section-header {
   border-bottom: 1px solid var(--color-border-soft);
   margin-bottom: var(--space-4);
   padding-bottom: var(--space-3);
-}
-
-.app-form-shell .form-section-header,
-.form-shell .form-section-header {
-  border-bottom-color: var(--route-card-inner-border);
 }
 
 .form-section-header h3 {
@@ -92,26 +48,11 @@
   margin-bottom: var(--space-1);
 }
 
-.app-form-shell .form-section-header h3,
-.form-shell .form-section-header h3 {
-  color: var(--theme-text-heading);
-  font-size: 1.06rem;
-  font-weight: 900;
-  letter-spacing: -0.02em;
-}
-
 .form-section-header p,
 .field-help {
   color: var(--color-help);
   font-size: var(--font-size-sm);
   margin-bottom: 0;
-}
-
-.app-form-shell .form-section-header p,
-.form-shell .form-section-header p {
-  color: var(--theme-text-muted);
-  line-height: 1.45;
-  max-width: 68ch;
 }
 
 .form-grid {
@@ -217,11 +158,6 @@
   letter-spacing: 0.01em;
 }
 
-.app-form-shell .field label,
-.form-shell .field label {
-  color: var(--theme-text-muted-strong);
-}
-
 .form-control {
   background: var(--color-input-bg);
   border-color: var(--color-input-border);
@@ -240,95 +176,6 @@
   width: 100%;
 }
 
-.app-form-shell .form-control,
-.app-form-shell .form-select,
-.app-form-shell select {
-  background: var(--color-card);
-  border-color: var(--route-field-border);
-  border-radius: var(--radius-sm);
-  box-shadow: var(--shadow-inner-light);
-  color: var(--route-field-text);
-}
-
-.app-form-shell input[type="text"],
-.app-form-shell input[type="date"],
-.app-form-shell input[type="time"],
-.app-form-shell input[type="number"],
-.app-form-shell input[type="search"],
-.app-form-shell input[type="email"],
-.app-form-shell input[type="url"],
-.app-form-shell textarea,
-.app-form-shell .oficio-equipe-picker__input,
-.form-shell input[type="text"],
-.form-shell input[type="date"],
-.form-shell input[type="time"],
-.form-shell input[type="number"],
-.form-shell input[type="search"],
-.form-shell input[type="email"],
-.form-shell input[type="url"],
-.form-shell textarea,
-.form-shell .oficio-equipe-picker__input {
-  background: var(--color-card);
-  border-color: var(--route-field-border);
-  color: var(--route-field-text);
-}
-
-.app-form-shell textarea,
-.form-shell textarea {
-  min-height: var(--text-area-height-md);
-}
-
-.app-form-shell .oficio-equipe-picker__input {
-  border-style: solid;
-  border-width: 1px;
-}
-
-.app-form-shell .form-control:focus,
-.app-form-shell .form-select:focus,
-.app-form-shell select:focus,
-.form-shell .form-control:focus,
-.form-shell .form-select:focus,
-.form-shell select:focus {
-  border-color: var(--route-button-primary-border);
-  box-shadow: 0 0 0 3px var(--route-focus-ring);
-  outline: none;
-}
-
-.app-form-shell .form-control::placeholder,
-.app-form-shell .form-select::placeholder,
-.app-form-shell textarea::placeholder,
-.form-shell .form-control::placeholder,
-.form-shell .form-select::placeholder,
-.form-shell textarea::placeholder {
-  color: var(--route-field-placeholder);
-  opacity: 1;
-}
-
-.app-form-shell input:disabled,
-.app-form-shell select:disabled,
-.app-form-shell textarea:disabled,
-.app-form-shell input[readonly],
-.app-form-shell select[readonly],
-.app-form-shell textarea[readonly],
-.form-shell input:disabled,
-.form-shell select:disabled,
-.form-shell textarea:disabled,
-.form-shell input[readonly],
-.form-shell select[readonly],
-.form-shell textarea[readonly] {
-  background: var(--route-field-disabled-bg);
-  border-color: var(--route-field-border);
-  color: var(--route-field-disabled-text);
-  opacity: 1;
-}
-
-.app-form-shell .form-control.is-invalid,
-.app-form-shell .form-select.is-invalid,
-.form-shell .form-control.is-invalid,
-.form-shell .form-select.is-invalid {
-  border-color: var(--color-danger);
-}
-
 .form-check-input {
   accent-color: var(--color-accent);
   height: 18px;
@@ -342,15 +189,12 @@
   font-weight: 600;
   margin-bottom: 0;
 }
-.app-form-shell .btn-primary,
 .app-page--roteiros-form .btn-primary {
   background: var(--route-button-primary-bg);
   border-color: var(--route-button-primary-border);
   color: var(--route-button-primary-text);
 }
 
-.app-form-shell .btn-primary:hover,
-.app-form-shell .btn-primary:focus-visible,
 .app-page--roteiros-form .btn-primary:hover,
 .app-page--roteiros-form .btn-primary:focus-visible {
   background: var(--route-button-primary-hover-bg);
@@ -358,9 +202,6 @@
   color: var(--route-button-primary-text);
 }
 
-.app-form-shell .btn-secondary,
-.app-form-shell .btn-outline-secondary,
-.app-form-shell .btn-muted,
 .app-page--roteiros-form .btn-secondary,
 .app-page--roteiros-form .btn-outline-secondary,
 .app-page--roteiros-form .btn-muted {
@@ -369,12 +210,6 @@
   color: var(--route-button-secondary-text);
 }
 
-.app-form-shell .btn-secondary:hover,
-.app-form-shell .btn-secondary:focus-visible,
-.app-form-shell .btn-outline-secondary:hover,
-.app-form-shell .btn-outline-secondary:focus-visible,
-.app-form-shell .btn-muted:hover,
-.app-form-shell .btn-muted:focus-visible,
 .app-page--roteiros-form .btn-secondary:hover,
 .app-page--roteiros-form .btn-secondary:focus-visible,
 .app-page--roteiros-form .btn-outline-secondary:hover,
@@ -386,15 +221,12 @@
   color: var(--route-button-secondary-text);
 }
 
-.app-form-shell .btn-danger,
 .app-page--roteiros-form .btn-danger {
   background: var(--route-button-danger-bg);
   border-color: var(--route-button-danger-border);
   color: var(--route-button-danger-text);
 }
 
-.app-form-shell .btn-danger:hover,
-.app-form-shell .btn-danger:focus-visible,
 .app-page--roteiros-form .btn-danger:hover,
 .app-page--roteiros-form .btn-danger:focus-visible {
   background: var(--route-button-danger-hover-bg);
@@ -402,7 +234,6 @@
   color: var(--route-button-danger-text);
 }
 
-.app-form-shell .btn:focus-visible,
 .app-page--roteiros-form .btn:focus-visible {
   box-shadow: 0 0 0 3px var(--route-focus-ring), var(--shadow-xs);
   outline: none;
@@ -418,8 +249,6 @@
   padding: var(--space-3) var(--space-5) var(--space-3) 0;
 }
 
-.app-form-shell .form-actions,
-.app-form-shell .app-form-actions,
 .roteiro-editor__actions {
   align-items: center;
   background: var(--route-card-bg);
@@ -438,8 +267,6 @@
 }
 
 .roteiro-form--legacy-roteiro .travel-document-wizard-footer-actions .btn,
-.app-form-shell .form-actions .btn,
-.app-form-shell .app-form-actions .btn,
 .roteiro-editor__actions .btn {
   border-radius: var(--radius-pill);
   min-height: var(--control-height-md);
@@ -447,8 +274,6 @@
   padding-right: var(--space-5);
 }
 
-.app-form-shell .form-actions .btn-primary,
-.app-form-shell .app-form-actions .btn-primary,
 .roteiro-editor__actions .btn-primary {
   background: var(--route-button-primary-bg);
   border-color: var(--route-button-primary-border);
@@ -458,10 +283,6 @@
   color: var(--route-button-primary-text);
 }
 
-.app-form-shell .form-actions .btn-primary:hover,
-.app-form-shell .form-actions .btn-primary:focus-visible,
-.app-form-shell .app-form-actions .btn-primary:hover,
-.app-form-shell .app-form-actions .btn-primary:focus-visible,
 .roteiro-editor__actions .btn-primary:hover,
 .roteiro-editor__actions .btn-primary:focus-visible {
   background: var(--route-button-primary-hover-bg);
@@ -469,10 +290,6 @@
   color: var(--route-button-primary-text);
 }
 
-.app-form-shell .form-actions .btn-outline-secondary,
-.app-form-shell .form-actions .btn-secondary,
-.app-form-shell .app-form-actions .btn-outline-secondary,
-.app-form-shell .app-form-actions .btn-secondary,
 .roteiro-editor__actions .btn-outline-secondary,
 .roteiro-editor__actions .btn-secondary {
   background: var(--route-button-secondary-bg);
@@ -480,14 +297,6 @@
   color: var(--route-button-secondary-text);
 }
 
-.app-form-shell .form-actions .btn-outline-secondary:hover,
-.app-form-shell .form-actions .btn-outline-secondary:focus-visible,
-.app-form-shell .form-actions .btn-secondary:hover,
-.app-form-shell .form-actions .btn-secondary:focus-visible,
-.app-form-shell .app-form-actions .btn-outline-secondary:hover,
-.app-form-shell .app-form-actions .btn-outline-secondary:focus-visible,
-.app-form-shell .app-form-actions .btn-secondary:hover,
-.app-form-shell .app-form-actions .btn-secondary:focus-visible,
 .roteiro-editor__actions .btn-outline-secondary:hover,
 .roteiro-editor__actions .btn-outline-secondary:focus-visible,
 .roteiro-editor__actions .btn-secondary:hover,
@@ -807,30 +616,6 @@ textarea[readonly] {
   border-color: var(--color-border);
   color: var(--color-input-disabled-text);
   opacity: 1;
-}
-
-.app-form-shell .alert {
-  border-radius: var(--radius-md);
-}
-
-.app-form-shell .cv-ordered-field-stack input,
-.app-form-shell .cv-ordered-field-stack select,
-.app-form-shell .cv-ordered-field-stack textarea,
-.app-form-shell .route-segment-card input,
-.app-form-shell .route-segment-card select,
-.app-form-shell .route-segment-card textarea {
-  background: var(--color-card);
-  border-color: var(--route-field-border);
-  color: var(--route-field-text);
-}
-
-html[data-theme="dark"] .app-form-shell .form-control,
-html[data-theme="dark"] .app-form-shell .form-select,
-html[data-theme="dark"] .app-form-shell select,
-html[data-theme="dark"] .app-form-shell textarea {
-  background: var(--color-card);
-  border-color: var(--route-field-border);
-  color: var(--route-field-text);
 }
 
 .field-rg-wrap.field--locked label::after {

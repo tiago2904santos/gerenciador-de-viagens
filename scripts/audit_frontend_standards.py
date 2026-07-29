@@ -27,11 +27,7 @@ TEMPLATE_EXCEPTIONS: dict[str, dict] = {
 
 CSS_EXCEPTIONS: dict[str, dict] = {
     "static/css/forms.css": {
-        "reason": ".roteiro-editor__* sao joint selectors de .app-form-shell -- pareados, nao removiveis sem refactor. --route-* tokens sao variaveis globais de tema.",
-        "rules": {"domain_selector_in_global", "route_token_in_global", "hex_color_outside_tokens"},
-    },
-    "static/css/app-page.css": {
-        "reason": ".roteiro-detail/* em app-page.css: domínio a mover para roteiros.css (Prompt 6).",
+        "reason": ".roteiro-editor__* permanece como dominio em CSS global; --route-* sao variaveis globais de tema.",
         "rules": {"domain_selector_in_global", "route_token_in_global", "hex_color_outside_tokens"},
     },
     "static/css/cards.css": {
@@ -56,10 +52,6 @@ CSS_EXCEPTIONS: dict[str, dict] = {
     },
     "static/css/dashboard.css": {
         "reason": "Dashboard e excecao oficial -- hex restantes sao fallbacks de var() no botao do hero.",
-        "rules": {"hex_color_outside_tokens"},
-    },
-    "static/css/buttons.css": {
-        "reason": "Gradientes de botão danger sem token equivalente — dívida de token a criar.",
         "rules": {"hex_color_outside_tokens"},
     },
 }
@@ -90,9 +82,6 @@ GLOBAL_CSS = {
     "static/css/forms.css",
     "static/css/lists.css",
     "static/css/cards.css",
-    "static/css/buttons.css",
-    "static/css/app-ui.css",
-    "static/css/app-page.css",
     "static/css/layout.css",
     "static/css/base.css",
     "static/css/utilities.css",

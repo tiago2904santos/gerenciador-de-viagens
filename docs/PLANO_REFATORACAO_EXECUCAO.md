@@ -385,7 +385,12 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
 - [x] Fase 0: apagados os aliases mortos de tema `dark-dark`, `light-dark`,
   `dark-light` e `light-light`; os seletores canônicos `dark`/`light` foram
   preservados.
-- [ ] Fase 1: apagar CSS morto e blocos `.app-form-shell`/`.form-shell`
+- [x] Fase 1: apagados os quatro arquivos confirmados sem referência
+  (`app-page.css`, `buttons.css`, `buttons-functional.css`, `app-ui.css`) e os
+  ramos mortos `.app-form-shell`/`.form-shell`. **NOVO — divergência do Anexo
+  C:** preservados `style.css`, `filter-header.css`, `roteiros-list.css` e
+  `eventos-list.css` por referências vivas; `documents.css` também foi mantido
+  porque ainda estiliza `.document-card-body`, emitido pelo componente global.
 - [x] Fase 2: corrigidos os tokens indefinidos (`D-01`, `D-03`, `D-06`,
   `D-20`, `D-21`). Divergência do inventário histórico: 11 dos 18 nomes já
   estavam definidos ou sem consumidores após correções anteriores; os 7 usos

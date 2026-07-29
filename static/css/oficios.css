@@ -1238,17 +1238,6 @@
   color: var(--color-success);
 }
 
-.form-shell .form-control.is-viatura-cadastro,
-.app-form-shell .form-control.is-viatura-cadastro {
-  opacity: 0.92;
-}
-
-.form-shell select.is-viatura-cadastro:disabled,
-.app-form-shell select.is-viatura-cadastro:disabled {
-  cursor: not-allowed;
-  opacity: 0.92;
-}
-
 .oficio-viatura-busca__wrap {
   position: relative;
   width: 100%;
