@@ -38,6 +38,12 @@ def build_download_response(
         filename = build_document_filename(tipo, formato, reference=reference, now=now)
         response = HttpResponse(content, content_type=get_content_type_for_format(formato))
         response["Content-Disposition"] = f'attachment; filename="{filename}"'
+        # Documento oficial nao pode vir do cache do navegador: "Visualizar" aponta
+        # sempre para a mesma URL por documento, entao sem isto uma retificacao
+        # continuaria exibindo a versao anterior. O servidor ja regenera por hash do
+        # conteudo; o que faltava era avisar o navegador.
+        response["Cache-Control"] = "no-store, must-revalidate"
+        response["Pragma"] = "no-cache"
         if cache_hit is True:
             response["X-Document-Cache"] = "HIT"
         elif cache_hit is False:

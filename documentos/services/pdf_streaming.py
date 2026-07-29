@@ -35,6 +35,12 @@ def apply_pdf_response_headers(response: HttpResponse, *, filename: str) -> None
     response["X-Content-Type-Options"] = "nosniff"
     response["X-Frame-Options"] = "SAMEORIGIN"
     response["Cross-Origin-Resource-Policy"] = "same-origin"
+    # Documento oficial nao pode vir do cache do navegador: "Visualizar" aponta
+    # sempre para a mesma URL por documento, entao sem isto uma retificacao
+    # continuaria exibindo a versao anterior. O servidor ja regenera por hash do
+    # conteudo; o que faltava era avisar o navegador.
+    response["Cache-Control"] = "no-store, must-revalidate"
+    response["Pragma"] = "no-cache"
 
 
 def _parse_first_byte_range(range_header: str | None, file_size: int) -> tuple[int, int] | str | None:
