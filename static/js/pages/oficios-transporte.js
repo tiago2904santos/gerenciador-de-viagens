@@ -193,12 +193,11 @@
     const params = ["q=" + encodeURIComponent(term)];
     if (motoristaId) params.push("motorista_id=" + encodeURIComponent(motoristaId));
     const url = this.apiUrl + "?" + params.join("&");
-    window
-      .fetch(url, { credentials: "same-origin", headers: { Accept: "application/json" } })
-      .then(function (response) {
-        return response.json();
-      })
-      .then(function (data) {
+    window.CV.http
+      .fetchJson(url, { headers: { Accept: "application/json" } })
+      .then(function (result) {
+        var data = result.data || {};
+        if (!result.ok) throw new Error(data.error || "Falha ao buscar viaturas.");
         const results = (data && data.results) || [];
         self.resultsEl.innerHTML = "";
         if (!results.length) {

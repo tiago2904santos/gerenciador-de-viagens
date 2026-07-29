@@ -62,9 +62,10 @@
     cidadeSel.disabled = true;
     reinitPickerD(cidadeSel);
     var url = urlTemplate.replace('/0/', '/' + encodeURIComponent(uf) + '/');
-    fetch(url, { headers: { Accept: 'application/json' } })
-      .then(function (r) { return r.json(); })
-      .then(function (data) {
+    window.CV.http.fetchJson(url, { headers: { Accept: 'application/json' } })
+      .then(function (result) {
+        if (!result.ok) throw new Error('Falha ao carregar cidades');
+        var data = result.data || [];
         CIDADES_CACHE_D[uf] = data;
         populateCidadesD(cidadeSel, data, initialValue);
       })

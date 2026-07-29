@@ -31,33 +31,10 @@
     const endpoint = cepInput.dataset.cepLookupUrlTemplate.replace("00000000", cepDigits);
 
     try {
-      const http = window.CV && window.CV.http;
-      let payload = {};
-      let ok = false;
-      let status = 0;
-
-      if (http && typeof http.fetchJson === "function") {
-        const result = await http.fetchJson(endpoint, { method: "GET" });
-        payload = result.data || {};
-        ok = result.ok;
-        status = result.status;
-      } else {
-        const response = await fetch(endpoint, {
-          credentials: "same-origin",
-          headers: { "X-Requested-With": "XMLHttpRequest" },
-        });
-        status = response.status;
-        ok = response.ok;
-        try {
-          payload = await response.json();
-        } catch (_jsonError) {
-          payload = {};
-        }
-        if (response.redirected) {
-          setFieldError(cepInput, "Sessão expirada. Atualize a página e tente novamente.");
-          return false;
-        }
-      }
+      const result = await window.CV.http.fetchJson(endpoint);
+      const payload = result.data || {};
+      const ok = result.ok;
+      const status = result.status;
 
       if (status === 401) {
         setFieldError(cepInput, "Sessão expirada. Atualize a página e tente novamente.");

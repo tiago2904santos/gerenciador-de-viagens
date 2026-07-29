@@ -196,12 +196,12 @@
     clearCitySelect(form, citySelect);
 
     var url = urlTemplate.replace("/0/", "/" + encodeURIComponent(state) + "/");
-    return fetch(url, { headers: { Accept: "application/json" } })
-      .then(function (response) {
-        if (!response.ok) {
+    return window.CV.http.fetchJson(url, { headers: { Accept: "application/json" } })
+      .then(function (result) {
+        if (!result.ok) {
           throw new Error("Falha ao carregar cidades");
         }
-        return response.json();
+        return result.data;
       })
       .then(function (data) {
         if (citySelect.dataset.osCitiesRequest !== requestToken) {

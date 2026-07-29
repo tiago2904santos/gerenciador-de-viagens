@@ -83,16 +83,13 @@
 
       var currentRequest = ++requestId;
 
-      window
-        .fetch(url, {
+      window.CV.http
+        .fetchText(url, {
           headers: { 'X-Requested-With': 'fetch' },
-          credentials: 'same-origin',
         })
-        .then(function (response) {
-          if (!response.ok) throw new Error('request_failed');
-          return response.text();
-        })
-        .then(function (htmlText) {
+        .then(function (result) {
+          if (!result.ok) throw new Error('request_failed');
+          var htmlText = result.data;
           if (currentRequest !== requestId) return;
           if (!swapListPanel(htmlText)) {
             window.location.assign(url);

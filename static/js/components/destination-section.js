@@ -106,10 +106,10 @@
     citySelect.dataset[requestAttr] = token;
     clearSelect(citySelect, { scope: scope });
 
-    return fetch(url, { headers: { Accept: "application/json" } })
-      .then(function (response) {
-        if (!response.ok) throw new Error("Falha ao carregar cidades");
-        return response.json();
+    return window.CV.http.fetchJson(url, { headers: { Accept: "application/json" } })
+      .then(function (result) {
+        if (!result.ok) throw new Error("Falha ao carregar cidades");
+        return result.data;
       })
       .then(function (data) {
         if (citySelect.dataset[requestAttr] !== token) return [];

@@ -213,24 +213,22 @@
       }
       dirty = false;
       setStatus('saving');
-      activeRequest = fetch(url, {
+      activeRequest = window.CV.http.fetchJson(url, {
         method: 'POST',
-        headers: { 'X-Requested-With': 'XMLHttpRequest' },
-        credentials: 'same-origin',
+        form: form,
         body: buildPayload()
       })
-        .then(function(response) {
-          return response.json().catch(function() { return {}; }).then(function(data) {
-            if (!response.ok || data.ok === false) {
-              throw new Error(data.error || 'Falha no autosave.');
-            }
-            lastSavedAtLabel = data.saved_at || '';
-            setStatus('saved');
-            if (onSuccess) {
-              onSuccess(data);
-            }
-            return true;
-          });
+        .then(function(result) {
+          var data = result.data || {};
+          if (!result.ok || data.ok === false) {
+            throw new Error(data.error || 'Falha no autosave.');
+          }
+          lastSavedAtLabel = data.saved_at || '';
+          setStatus('saved');
+          if (onSuccess) {
+            onSuccess(data);
+          }
+          return true;
         })
         .catch(function(error) {
           dirty = true;
