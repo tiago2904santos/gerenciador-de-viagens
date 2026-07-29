@@ -31,22 +31,21 @@ from prestacoes_contas.forms import PrestacaoMultipleFileInput
 
 from .forms import EventoForm
 from .forms import EventoNovoCadastroForm
-from .forms import TipoEventoForm
 from .models import Evento
 from .models import EVENTO_SOLICITACAO_EXTENSOES
+from .catalogs import tipo_editar  # noqa: F401  (re-export para urls.py)
+from .catalogs import tipo_excluir  # noqa: F401
+from .catalogs import tipos_index  # noqa: F401
 from .presenters import apresentar_evento_list_card
-from .presenters import apresentar_linha_lista_simples_tipo_evento
 from .presenters import build_evento_documentos_context
 from .selectors import buscar_documento_solicitacao
 from .selectors import get_documento_solicitacao_by_id
 from .selectors import get_evento_anexo_by_id
 from .selectors import get_evento_by_id
-from .selectors import get_tipo_evento_by_id
 from .selectors import listar_eventos
 from .selectors import listar_roteiros_do_evento
 from .selectors import listar_termos_do_evento
 from .selectors import listar_termos_genericos_do_evento
-from .selectors import listar_tipos_evento
 from .services import anexar_documentos_solicitacao
 from .services import build_evento_guided_context
 from .services import excluir_documento_solicitacao
@@ -72,75 +71,6 @@ def api_cidades_por_uf(request, uf):
         return JsonResponse([], safe=False)
     cidades = listar_cidades_para_select(estado_id=estado.pk)
     return JsonResponse([{"id": c.nome, "nome": c.nome} for c in cidades], safe=False)
-
-
-def tipos_index(request):
-    q = request.GET.get("q", "").strip()
-    back_url = _safe_next_url(request, reverse("eventos:index"))
-    form = TipoEventoForm(request.POST or None)
-    if request.method == "POST" and form.is_valid():
-        tipo = form.save(commit=False)
-        tipo.area = getattr(request, "area", None)
-        tipo.save()
-        messages.success(request, "Tipo de evento criado com sucesso.")
-        redirect_url = reverse("eventos:tipos_index")
-        if back_url:
-            redirect_url = f"{redirect_url}?{urlencode({'next': back_url})}"
-        return redirect(redirect_url)
-    tipos = listar_tipos_evento(q=q or None)
-    rows = [
-        apresentar_linha_lista_simples_tipo_evento(
-            tipo,
-            edit_url=reverse("eventos:tipo_editar", args=[tipo.pk]),
-            delete_url=reverse("eventos:tipo_excluir", args=[tipo.pk]),
-            delete_modal=True,
-        )
-        for tipo in tipos
-    ]
-    return render(
-        request,
-        "eventos/tipos/index.html",
-        {
-            "page_title": "Tipos de evento",
-            "page_description": "Cadastre os tipos que podem ser selecionados (mais de um por evento).",
-            "q": q,
-            "rows": rows,
-            "quick_add_form": form,
-            "quick_add_next_url": back_url,
-            "back_url": back_url,
-        },
-    )
-
-
-def tipo_editar(request, pk):
-    """Edição inline via quick edit da lista; a página standalone foi removida."""
-    tipo = get_tipo_evento_by_id(pk)
-    form = TipoEventoForm(request.POST or None, instance=tipo)
-    if request.method == "POST":
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Tipo de evento atualizado com sucesso.")
-        else:
-            messages.error(request, "Não foi possível salvar o tipo. Verifique os dados informados.")
-    return redirect("eventos:tipos_index")
-
-
-def tipo_excluir(request, pk):
-    tipo = get_tipo_evento_by_id(pk)
-    if request.method == "POST":
-        tipo.delete()
-        messages.success(request, "Tipo de evento excluído com sucesso.")
-        return redirect("eventos:tipos_index")
-    return render(
-        request,
-        "eventos/tipos/confirm_delete.html",
-        {
-            "page_title": "Excluir tipo de evento",
-            "page_description": "Confirme a remoção deste tipo de evento.",
-            "object": tipo,
-            "back_url": reverse("eventos:tipos_index"),
-        },
-    )
 
 
 def index(request):

@@ -442,7 +442,14 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
     **`NOVO-14`:** o presenter de presets faz `atividades.order_by(...)` por
     linha e descarta o `prefetch_related` — mesma doença do `NOVO-07`.
     Preservado como estava, porque o `P-02` move e não otimiza.
-  - [ ] `oficios`, `eventos`, `justificativas` (261 linhas)
+  - [x] **oficios, eventos, justificativas** — os tres catalogos viraram
+    `CatalogConfig`; `oficios/catalog_views.py` (105 linhas) apagado e os blocos
+    saem de `eventos/views.py` e `justificativas/views.py`. 16 testes de
+    caracterizacao escritos antes, verdes contra a fabrica. A fabrica ganhou
+    `contexto_extra` (rotulo de volta condicional) e tres flags para os presenters
+    que montam o `set_default_url` por dentro. **NOVO:** a normalizacao do
+    `quick_add_next_url` quando `next == fallback` (entrada que a UI nunca produz)
+    e a unica diferenca observavel, documentada no teste.
   - [ ] `cadastros` (317 linhas — único com paginação e erro de vínculo)
 - [x] `P-04` **widget base com classes canônicas** (pré-requisito das Etapas 6 e 7) —
   19 contratos CSS centralizados em `core/forms/widgets.py`; 194 `attrs` migrados
