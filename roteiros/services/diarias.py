@@ -184,17 +184,26 @@ def _segment_breakdown(start: datetime, end: datetime) -> tuple[int, int, Decima
     dias_inteiros = int(total_seconds // (24 * 3600))
     resto_seconds = total_seconds - (dias_inteiros * 24 * 3600)
 
-    parcial = 0
-    if start.date() != end.date() and total_seconds < 24 * 3600:
-        dias_inteiros = 1
-        resto_seconds = 0
+    # A escada do resto (N-08 / N-10), por DURACAO — o calendario nao entra.
+    #
+    # Confirmada por cinco demonstrativos do sistema oficial, um deles um
+    # experimento que isola a variavel: 12h01 dentro do MESMO dia, sem virada de
+    # meia-noite, rende 100% da diaria.
+    #
+    # Antes havia teto de 30% acima de 8h mais uma excecao que dava diaria
+    # inteira a qualquer periodo que cruzasse a meia-noite. Errava nos dois
+    # sentidos: pagava a menos em toda viagem acima de 12 horas (ate R$ 259,88
+    # por trecho) e cobrava diaria cheia por dois minutos entre 23:59 e 00:01.
+    # As duas definicoes de "diaria integral" que o N-08 aponta eram justamente
+    # essa excecao convivendo com a contagem por duracao.
+    if resto_seconds <= 6 * 3600:
+        parcial = 0
+    elif resto_seconds <= 8 * 3600:
+        parcial = 15
+    elif resto_seconds <= 12 * 3600:
+        parcial = 30
     else:
-        if resto_seconds <= 6 * 3600:
-            parcial = 0
-        elif resto_seconds <= 8 * 3600:
-            parcial = 15
-        else:
-            parcial = 30
+        parcial = 100
 
     horas_adicionais = Decimal(str(resto_seconds / 3600)).quantize(
         Decimal('0.01'),
@@ -208,7 +217,13 @@ def _format_dt(value: datetime) -> tuple[str, str]:
 
 
 def _total_diarias_resumo(periodos: list[dict]) -> str:
+    # Resto acima de 12 horas vale uma diaria cheia, entao entra na contagem de
+    # 100% e nao como percentual — senao o resumo diria "0 x 100%" para uma
+    # viagem que paga uma diaria inteira.
     full = sum(int(item.get('n_diarias', 0) or 0) for item in periodos)
+    full += sum(
+        1 for item in periodos if int(item.get('percentual_adicional', 0) or 0) == 100
+    )
     p15 = sum(1 for item in periodos if int(item.get('percentual_adicional', 0) or 0) == 15)
     p30 = sum(1 for item in periodos if int(item.get('percentual_adicional', 0) or 0) == 30)
     partes = []
@@ -360,6 +375,14 @@ def build_periods(
             valor_parcial = tabela['15']
         elif parcial == 30:
             valor_parcial = tabela['30']
+        elif parcial == 100:
+            # Resto acima de 12 horas vale uma diaria cheia. No demonstrativo
+            # oficial ela aparece decomposta em hospedagem 70% + alimentacao
+            # 30%; somar o valor de 24h direto da o mesmo numero e evita
+            # arredondar duas vezes. (Se um dia o documento precisar das duas
+            # colunas: alimentacao e' 30% arredondado e hospedagem e' o que
+            # sobra da diaria, nao 70% arredondado.)
+            valor_parcial = tabela['24h']
         subtotal = ((tabela['24h'] * dias_inteiros) + valor_parcial) * servidores
         data_chegada, hora_chegada = _format_dt(end)
         trecho['data_chegada'] = data_chegada

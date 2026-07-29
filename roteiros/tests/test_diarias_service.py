@@ -40,8 +40,8 @@ class DiariasServiceTests(TestCase):
     def test_viagem_unica_gera_apenas_um_percentual_complementar(self):
         # Uma única viagem (saída da sede → retorno à sede) não pode acumular um
         # complemento por trecho. Aqui são 3 pernoites + ~15h30 além das noites
-        # inteiras, o que gera UM único complemento de 30% sobre a viagem toda —
-        # e não 15% de um trecho somado a 30% de outro.
+        # inteiras. O resto passa de 12 horas, entao vale uma diaria cheia (N-08):
+        # sao 4 x 100%, nao 3 x 100% + 30%.
         markers = [
             PeriodMarker(
                 saida=datetime(2026, 5, 1, 8, 0),
@@ -62,8 +62,8 @@ class DiariasServiceTests(TestCase):
             sede_uf="PR",
         )
 
-        self.assertEqual(resultado["totais"]["total_diarias"], "3 x 100% + 1 x 30%")
-        expected_total = (TABELA_DIARIAS["CAPITAL"]["24h"] * 3) + TABELA_DIARIAS["CAPITAL"]["30"]
+        self.assertEqual(resultado["totais"]["total_diarias"], "4 x 100%")
+        expected_total = TABELA_DIARIAS["CAPITAL"]["24h"] * 4
         self.assertEqual(resultado["totais"]["total_valor_decimal"], expected_total)
 
     def test_multiplos_destinos_nao_somam_complemento_por_trecho(self):
@@ -141,9 +141,9 @@ class DiariasServiceTests(TestCase):
         self.assertEqual(resultado["totais"]["total_valor_decimal"], expected_total)
 
     def test_volta_para_sede_nao_carrega_o_complemento(self):
-        # Bate-volta a partir de uma sede que é capital: as 14h fora rendem 30%, mas
-        # na tarifa do destino visitado (interior) — a volta pra casa não pode puxar
-        # o complemento para a tarifa da própria sede.
+        # Bate-volta a partir de uma sede que é capital: as 14h fora passam de 12
+        # horas e valem uma diaria cheia (N-08), na tarifa do destino visitado
+        # (interior) — a volta pra casa nao puxa a tarifa da propria sede.
         markers = [
             PeriodMarker(
                 saida=datetime(2026, 8, 18, 8, 0),
@@ -164,10 +164,10 @@ class DiariasServiceTests(TestCase):
             sede_uf="PR",
         )
 
-        self.assertEqual(resultado["totais"]["total_diarias"], "1 x 30%")
+        self.assertEqual(resultado["totais"]["total_diarias"], "1 x 100%")
         self.assertEqual(
             resultado["totais"]["total_valor_decimal"],
-            TABELA_DIARIAS["INTERIOR"]["30"],
+            TABELA_DIARIAS["INTERIOR"]["24h"],
         )
 
     def test_trechos_seguidos_no_mesmo_horario_nao_invalidam_o_calculo(self):
@@ -225,11 +225,11 @@ class DiariasServiceTests(TestCase):
             sede_uf="PR",
         )
 
-        # Sem pernoite: 14h fora da sede -> apenas o complemento de 30%.
-        self.assertEqual(resultado["totais"]["total_diarias"], "1 x 30%")
+        # 14h fora da sede passam de 12 horas -> uma diaria cheia (N-08).
+        self.assertEqual(resultado["totais"]["total_diarias"], "1 x 100%")
         self.assertEqual(
             resultado["totais"]["total_valor_decimal"],
-            TABELA_DIARIAS["INTERIOR"]["30"],
+            TABELA_DIARIAS["INTERIOR"]["24h"],
         )
 
     def test_periodizacao_sem_percentual_complementar(self):
