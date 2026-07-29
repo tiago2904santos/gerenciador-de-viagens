@@ -62,9 +62,23 @@ CAPITAIS_POR_UF = {
 
 @dataclass(frozen=True)
 class PeriodMarker:
+    """Um destino do roteiro: quando se sai para ele e quando se chega nele.
+
+    ``chegada`` é opcional porque nem todo chamador conhece as duas pontas. O
+    plano de trabalho monta marcadores a partir de eventos, que têm data de
+    início e não têm hora de chegada; nesse caso o único instante conhecido é
+    tratado como a chegada ao destino. A regra é uma só — muda a informação
+    disponível, não o critério.
+    """
+
     saida: datetime
     destino_cidade: str
     destino_uf: str
+    chegada: datetime | None = None
+
+    @property
+    def instante_de_chegada(self) -> datetime:
+        return self.chegada or self.saida
 
 
 def tabela_vigente_em(data_referencia) -> dict:
@@ -243,9 +257,24 @@ def build_periods(
     servidores = max(0, int(quantidade_servidores or 0))
 
     total_markers = len(sorted_markers)
+    # Onde cada período começa e termina (NOVO-11). O período de um destino vai
+    # da CHEGADA nele até a CHEGADA no destino seguinte — não de uma saída à
+    # outra. O primeiro é a exceção: começa na saída da sede, porque a ida já é
+    # faturada no destino para onde se vai.
+    #
+    # Isso faz o tempo de estrada entre dois destinos ser cobrado na tarifa de
+    # onde o servidor estava. Com limites por saída ele caía no trecho de volta
+    # à sede, que não carrega complemento, e sumia da conta: num roteiro
+    # Curitiba→São Paulo→Abatiá→Curitiba, R$ 111,38 a menos que o sistema
+    # oficial. Os dois demonstrativos que serviram de régua estão em
+    # roteiros/tests/test_diarias_limites_periodo.py.
     for idx, marker in enumerate(sorted_markers):
-        start = marker.saida
-        end = sorted_markers[idx + 1].saida if idx + 1 < len(sorted_markers) else chegada_final_sede
+        start = marker.saida if idx == 0 else marker.instante_de_chegada
+        end = (
+            sorted_markers[idx + 1].instante_de_chegada
+            if idx + 1 < len(sorted_markers)
+            else chegada_final_sede
+        )
         if end < start:
             raise ValueError('Preencha datas e horas para calcular.')
         if end == start:
