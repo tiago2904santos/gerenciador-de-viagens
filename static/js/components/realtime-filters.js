@@ -15,8 +15,12 @@
     return document;
   }
 
+  function normalizeFilterText(value) {
+    return window.CV.util.normalize(value).trim();
+  }
+
   function searchTerms(query) {
-    var norm = window.CV.util.normalize(query).trim();
+    var norm = normalizeFilterText(query);
     if (!norm) return [];
     return norm.split(/\s+/).filter(Boolean);
   }
@@ -29,11 +33,11 @@
       var value = (input.value || '').trim();
       if (type === 'search') {
         filters.searchRaw = value;
-        filters.search = window.CV.util.normalize(value).trim();
+        filters.search = normalizeFilterText(value);
         filters.searchTerms = searchTerms(value);
       } else if (type === 'status') {
         filters.status = value;
-        filters.statusNorm = value ? window.CV.util.normalize(value).trim() : '';
+        filters.statusNorm = value ? normalizeFilterText(value) : '';
       }
     });
     return filters;
@@ -41,7 +45,7 @@
 
   function matchesFilter(item, filters) {
     if (filters.searchTerms && filters.searchTerms.length) {
-      var searchText = window.CV.util.normalize(item.getAttribute('data-search-text') || item.textContent || '').trim();
+      var searchText = normalizeFilterText(item.getAttribute('data-search-text') || item.textContent || '');
       for (var i = 0; i < filters.searchTerms.length; i++) {
         if (searchText.indexOf(filters.searchTerms[i]) === -1) {
           return false;
@@ -50,7 +54,7 @@
     }
 
     if (filters.status) {
-      var statusValue = window.CV.util.normalize(item.getAttribute('data-status-value') || '').trim();
+      var statusValue = normalizeFilterText(item.getAttribute('data-status-value') || '');
       if (!statusValue || statusValue !== filters.statusNorm) {
         return false;
       }
@@ -227,7 +231,7 @@
     clear: clear,
     getState: getState,
     applyFilters: applyFilters,
-    normalizeText: normalizeText,
+    normalizeText: normalizeFilterText,
     matchesFilter: matchesFilter,
   };
 
@@ -240,7 +244,7 @@
     update: update,
     clear: clear,
     getState: getState,
-    normalizeText: normalizeText,
+    normalizeText: normalizeFilterText,
     matchesFilter: matchesFilter,
   };
 
