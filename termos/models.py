@@ -70,6 +70,10 @@ class TermoAutorizacao(TimeStampedModel, CancelavelModel):
     )
 
     class Meta:
+        # A listagem filtra por area e ordena por data (P-03).
+        indexes = [
+            models.Index(fields=["area", "-created_at"], name="termo_area_created_idx"),
+        ]
         ordering = ["-created_at"]
         verbose_name = "Termo de autorizacao"
         verbose_name_plural = "Termos de autorizacao"

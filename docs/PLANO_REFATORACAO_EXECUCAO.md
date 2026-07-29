@@ -339,7 +339,17 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
   e 00:01. Medido em 10.800 roteiros realistas: 0 divergência depois.
 - [ ] `N-09` `valor_por_servidor × servidores` pode não fechar com `total_valor`
 - [ ] `N-10` pernoite curto — **mesma causa do `N-08`**; resolve junto
-- [ ] `P-03` constraints e indexes em roteiros/termos/justificativas
+- [x] `P-03` **índices compostos**; as duas constraints candidatas foram
+  recusadas com evidência, não por cautela. Correção ao enunciado: *toda FK já
+  tem índice* (o Django cria por padrão) — o que faltava era o composto que casa
+  com a ordenação. Medido: com ele o banco faz uma busca só; sem ele usa o
+  índice da FK e monta B-tree temporária para ordenar.
+  **Unicidade `(roteiro, ordem)`: recusada** — os trechos são atualizados no
+  lugar (`roteiro_logic.py:1581`), então reordenar passa por estado transitório
+  com ordens duplicadas e a constraint quebraria a tela.
+  **`chegada_dt >= saida_dt`: recusada** — o modelo aceita invertido hoje e o
+  `full_clean()` não reclama, então seria regra nova, não codificação de
+  invariante. Entra junto com a validação, se você quiser.
 - [x] `N-13` `REGRAS_DE_NEGOCIO.md`: 77 → 231 linhas. Diárias documentadas por
   inteiro (grupos, vigência, limites de período, trecho tarifário, faixas de
   complemento, valor recebido e as duas pendências conhecidas), mais numeração

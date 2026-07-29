@@ -201,6 +201,10 @@ class RoteiroDestino(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
+        # Mesmo caso dos trechos: sempre lidos por roteiro e em ordem (P-03).
+        indexes = [
+            models.Index(fields=["roteiro", "ordem"], name="roteiro_destino_ordem_idx"),
+        ]
         ordering = ["roteiro", "ordem"]
         verbose_name = "Destino do roteiro"
         verbose_name_plural = "Destinos do roteiro"
@@ -281,6 +285,12 @@ class RoteiroTrecho(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
+        # O carregamento quente do sistema: todo card de lista puxa os trechos
+        # de um roteiro em ordem. Sem o composto, o banco usa o indice da FK e
+        # ordena depois; com ele, e' uma varredura so (P-03).
+        indexes = [
+            models.Index(fields=["roteiro", "ordem"], name="roteiro_trecho_ordem_idx"),
+        ]
         ordering = ["roteiro", "ordem"]
         verbose_name = "Trecho do roteiro"
         verbose_name_plural = "Trechos do roteiro"
