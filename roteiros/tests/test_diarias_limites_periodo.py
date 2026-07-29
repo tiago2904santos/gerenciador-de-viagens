@@ -22,6 +22,7 @@ exatamente o que acontecia antes (`NOVO-11`).
 from __future__ import annotations
 
 from datetime import datetime
+from datetime import timedelta
 from decimal import Decimal
 
 from django.test import TestCase
@@ -32,6 +33,7 @@ from roteiros.services.diarias import calculate_periodized_diarias
 SAO_PAULO = ("SAO PAULO", "SP")
 ABATIA = ("ABATIA", "PR")
 FLORIANOPOLIS = ("FLORIANOPOLIS", "SC")
+ADRIANOPOLIS = ("ADRIANOPOLIS", "PR")
 CURITIBA = ("CURITIBA", "PR")
 
 
@@ -311,57 +313,120 @@ class RoteiroCompletoTests(TestCase):
         self.assertEqual(resultado["totais"]["total_valor_decimal"], Decimal("773.19"))
 
 
-class UmaDefinicaoDeDiariaTests(TestCase):
-    """`N-08` — o cálculo tem uma definição de "diária integral", não duas.
+class EscadaDoRestoTests(TestCase):
+    """`N-08` / `N-10` — quanto vale o tempo que sobra depois dos dias inteiros.
 
-    O módulo carregava dois critérios: duração (`_segment_breakdown`) e noites
-    de calendário (`count_pernoites`). Depois do `N-05` o segundo ficou órfão —
-    nenhum caminho de cálculo o consultava — e foi removido.
+    A escada vem de cinco demonstrativos do sistema oficial, um deles um
+    experimento desenhado para isolar a variável: 12h01 **dentro do mesmo dia**,
+    sem nenhuma virada de meia-noite, rendendo 100% da diária. Isso prova que o
+    corte é por **duração**, não por calendário.
 
-    O que **continua** sendo por calendário é a exceção dentro do próprio
-    `_segment_breakdown`: um período que cruza a meia-noite e dura menos de 24h
-    conta como diária inteira. Está caracterizada abaixo, não corrigida: mudar
-    isso muda dinheiro e exige o demonstrativo oficial de um roteiro que
-    atravesse a madrugada.
+        resto ≤ 6h        →   0%
+        resto > 6h  ≤ 8h  →  15%
+        resto > 8h  ≤ 12h →  30%
+        resto > 12h       → 100%
+
+    Antes, o cálculo tinha teto de 30% acima de 8h e uma exceção que dava diária
+    inteira a qualquer período que cruzasse a meia-noite. Errava nos dois
+    sentidos: pagava a menos em toda viagem acima de 12 horas e cobrava diária
+    cheia por dois minutos entre 23:59 e 00:01.
     """
 
-    def test_periodo_que_cruza_a_meia_noite_conta_diaria_inteira(self):
-        """Caracterização, não aprovação.
+    def calcular(self, markers, chegada_final):
+        return calculate_periodized_diarias(
+            markers, chegada_final, quantidade_servidores=1,
+            sede_cidade="CURITIBA", sede_uf="PR",
+        )
 
-        Viagem noturna de 16 horas: sai às 20:00, volta às 12:00 do dia
-        seguinte. Rende **uma diária inteira**. Uma viagem de 14 horas que
-        começa e termina no mesmo dia rende 30%. A diferença entre as duas é
-        onde o relógio estava quando o dia virou.
+    def test_doze_horas_e_um_minuto_no_mesmo_dia_rendem_diaria_inteira(self):
+        """Demonstrativo oficial: R$ 290,55, e o experimento que decidiu a regra.
+
+        | Trecho | Grupo  | Período                 | Dias/Horas  | Diária    |
+        |--------|--------|-------------------------|-------------|-----------|
+        | 1      | Demais | 12/08 08:00–12/08 20:01 | 0 dias + 12h01 | R$ 290,55 |
+
+        Sai às 08:00 e volta às 20:01 do **mesmo dia**. Não há pernoite, não há
+        virada de data — e mesmo assim vale uma diária cheia. Antes daqui o
+        sistema pagava R$ 87,17 (o teto de 30%): R$ 203,38 a menos.
         """
-        resultado = calculate_periodized_diarias(
+        resultado = self.calcular(
+            [
+                marcador(datetime(2026, 8, 12, 8, 0), datetime(2026, 8, 12, 12, 0), ADRIANOPOLIS),
+                marcador(datetime(2026, 8, 12, 19, 0), datetime(2026, 8, 12, 20, 1), CURITIBA),
+            ],
+            datetime(2026, 8, 12, 20, 1),
+        )
+
+        self.assertEqual(resultado["totais"]["total_valor_decimal"], Decimal("290.55"))
+        trecho = resultado["periodos"][0]
+        self.assertEqual(trecho["tipo"], "INTERIOR")
+        self.assertEqual(trecho["n_diarias"], 0)
+        self.assertEqual(trecho["percentual_adicional"], 100)
+
+    def test_dezesseis_horas_atravessando_a_madrugada(self):
+        """Demonstrativo oficial: R$ 371,26, como **0 dias + 16h**.
+
+        O total já batia antes, mas por outro caminho: o código chamava isso de
+        "uma diária inteira" por ter cruzado a meia-noite. Coincidência —
+        70% + 30% também dá 100%.
+        """
+        resultado = self.calcular(
             [
                 marcador(datetime(2026, 8, 12, 20, 0), datetime(2026, 8, 13, 2, 0), SAO_PAULO),
                 marcador(datetime(2026, 8, 13, 6, 0), datetime(2026, 8, 13, 12, 0), CURITIBA),
             ],
             datetime(2026, 8, 13, 12, 0),
-            quantidade_servidores=1,
-            sede_cidade="CURITIBA",
-            sede_uf="PR",
         )
 
-        trecho = resultado["periodos"][0]
-        self.assertEqual(trecho["n_diarias"], 1)
-        self.assertEqual(trecho["percentual_adicional"], 0)
         self.assertEqual(resultado["totais"]["total_valor_decimal"], Decimal("371.26"))
-
-    def test_mesma_duracao_sem_cruzar_a_meia_noite_rende_apenas_o_complemento(self):
-        """O contraste que torna a exceção visível."""
-        resultado = calculate_periodized_diarias(
-            [
-                marcador(datetime(2026, 8, 12, 6, 0), datetime(2026, 8, 12, 8, 0), SAO_PAULO),
-                marcador(datetime(2026, 8, 12, 20, 0), datetime(2026, 8, 12, 22, 0), CURITIBA),
-            ],
-            datetime(2026, 8, 12, 22, 0),
-            quantidade_servidores=1,
-            sede_cidade="CURITIBA",
-            sede_uf="PR",
-        )
-
         trecho = resultado["periodos"][0]
         self.assertEqual(trecho["n_diarias"], 0)
-        self.assertEqual(trecho["percentual_adicional"], 30)
+        self.assertEqual(trecho["percentual_adicional"], 100)
+
+    def test_a_escada_completa(self):
+        """As quatro faixas, medidas na função que decide."""
+        from roteiros.services.diarias import _segment_breakdown
+
+        base = datetime(2026, 8, 12, 6, 0)
+        casos = {
+            5: 0, 6: 0,          # ate 6h: nada
+            7: 15, 8: 15,        # >6h ate 8h
+            9: 30, 12: 30,       # >8h ate 12h
+            13: 100, 20: 100,    # >12h: diaria inteira
+        }
+        for horas, esperado in casos.items():
+            with self.subTest(horas=horas):
+                _dias, parcial, _h, _t = _segment_breakdown(base, base + timedelta(hours=horas))
+                self.assertEqual(parcial, esperado)
+
+    def test_cruzar_a_meia_noite_nao_e_mais_criterio(self):
+        """Dois minutos entre 23:59 e 00:01 valiam uma diária inteira.
+
+        Valem zero: é menos de 6 horas. O calendário saiu do cálculo — o que
+        sobrava eram duas definições de "diária integral" convivendo (`N-08`),
+        e o pernoite curto era o sintoma visível (`N-10`).
+        """
+        from roteiros.services.diarias import _segment_breakdown
+
+        dias, parcial, _h, _t = _segment_breakdown(
+            datetime(2026, 8, 12, 23, 59), datetime(2026, 8, 13, 0, 1)
+        )
+
+        self.assertEqual(dias, 0)
+        self.assertEqual(parcial, 0)
+
+    def test_dia_inteiro_mais_resto_longo_soma_duas_diarias(self):
+        """44 horas = 1 dia + 20h. O resto passa de 12h, então vale outra diária.
+
+        É a forma comum de viagem — sair de manhã e voltar de madrugada dois
+        dias depois — e era onde o teto de 30% custava mais caro: R$ 482,64 no
+        lugar de R$ 742,52.
+        """
+        from roteiros.services.diarias import _segment_breakdown
+
+        dias, parcial, _h, _t = _segment_breakdown(
+            datetime(2026, 8, 12, 8, 0), datetime(2026, 8, 14, 4, 0)
+        )
+
+        self.assertEqual(dias, 1)
+        self.assertEqual(parcial, 100)
