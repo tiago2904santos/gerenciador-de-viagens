@@ -172,21 +172,6 @@ def infer_tipo_destino_from_paradas(paradas: list[tuple[str | None, str | None]]
     return tipo_destino
 
 
-def count_pernoites(saida: datetime, chegada: datetime) -> int:
-    """
-    Número de pernoites (noites dormidas) fora da sede entre saida e chegada.
-    Regra: cada noite entre saida.date() e chegada.date() conta como 1 pernoite.
-    Ex.: saida 15/03 14:00, chegada 18/03 11:30 → 3 pernoites (noites 15→16, 16→17, 17→18).
-    """
-    if chegada.date() <= saida.date():
-        return 0
-    return (chegada.date() - saida.date()).days
-
-
-def _count_period_pernoites(periodos: list[dict]) -> int:
-    return sum(int(item.get('_pernoites_periodo', 0) or 0) for item in periodos)
-
-
 def _segment_breakdown(start: datetime, end: datetime) -> tuple[int, int, Decimal, Decimal]:
     total_seconds = (end - start).total_seconds()
     if total_seconds <= 0:
@@ -298,37 +283,22 @@ def build_periods(
             continue
 
         tipo = classify(marker.destino_cidade, marker.destino_uf)
-        dias_inteiros, parcial, horas_adicionais, total_horas = _segment_breakdown(start, end)
-        tabela = tabela_por_faixa.get(tipo, tabela_por_faixa['INTERIOR'])
-        valor_24h = tabela['24h']
-        valor_parcial = Decimal('0.00')
-        if parcial == 15:
-            valor_parcial = tabela['15']
-        elif parcial == 30:
-            valor_parcial = tabela['30']
-
-        valor_1_servidor = (valor_24h * dias_inteiros) + valor_parcial
-        subtotal = valor_1_servidor * servidores
+        # Aqui so se monta o esqueleto do periodo (N-08). Dinheiro e' contado
+        # uma vez so, mais abaixo, depois que os periodos consecutivos do mesmo
+        # grupo viram um trecho. Antes o breakdown era calculado duas vezes: uma
+        # por periodo, cujo resultado era jogado fora sempre que houvesse fusao,
+        # e outra por trecho.
         data_saida, hora_saida = _format_dt(start)
-        data_chegada, hora_chegada = _format_dt(end)
         periodos.append(
             {
                 'tipo': tipo,
                 'data_saida': data_saida,
                 'hora_saida': hora_saida,
-                'data_chegada': data_chegada,
-                'hora_chegada': hora_chegada,
-                'n_diarias': dias_inteiros,
-                'horas_adicionais': float(horas_adicionais),
-                'valor_diaria': formatar_valor_diarias(valor_24h),
-                'subtotal': formatar_valor_diarias(subtotal),
-                'subtotal_decimal': subtotal,
-                'percentual_adicional': parcial,
-                'total_horas_periodo': float(total_horas),
+                'valor_diaria': formatar_valor_diarias(
+                    tabela_por_faixa.get(tipo, tabela_por_faixa['INTERIOR'])['24h']
+                ),
                 '_period_start': start,
                 '_period_end': end,
-                '_pernoites_periodo': count_pernoites(start, end),
-                '_parcial_periodo': parcial,
                 '_retorno_final': is_last_marker,
                 # "Ultimo marcador" nao e' o mesmo que "volta para casa": no
                 # plano de trabalho o ultimo marcador e' um destino de verdade.
