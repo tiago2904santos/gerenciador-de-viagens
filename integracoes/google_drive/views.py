@@ -9,6 +9,7 @@ from django.shortcuts import redirect
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
+from core.errors import capture
 from core.tenancy import filter_queryset_by_area
 from integracoes.google_drive.models import (
     DriveCredenciais,
@@ -122,6 +123,7 @@ def oauth_callback(request):
         _reset_client()
         messages.success(request, "Conta Google conectada com sucesso!")
     except Exception as exc:
+        capture(exc, "drive.views.oauth_callback")  # pragma: no cover
         messages.error(request, f"Erro ao completar autorização: {exc}")
 
     return redirect("core:perfil")
@@ -148,6 +150,7 @@ def api_listar_pastas(request):
         pastas = client.listar_pastas(pai_id=pai_id)
         return JsonResponse({"pastas": pastas})
     except Exception as exc:
+        capture(exc, "drive.views.api_listar_pastas")  # pragma: no cover
         return JsonResponse({"erro": str(exc)}, status=500)
 
 
@@ -158,6 +161,7 @@ def api_listar_drives_compartilhados(request):
         drives = client.listar_drives_compartilhados()
         return JsonResponse({"pastas": drives})
     except Exception as exc:
+        capture(exc, "drive.views.api_listar_drives_compartilhados")  # pragma: no cover
         return JsonResponse({"erro": str(exc)}, status=500)
 
 
@@ -168,6 +172,7 @@ def api_listar_compartilhados_comigo(request):
         pastas = client.listar_compartilhados_comigo()
         return JsonResponse({"pastas": pastas})
     except Exception as exc:
+        capture(exc, "drive.views.api_listar_compartilhados_comigo")  # pragma: no cover
         return JsonResponse({"erro": str(exc)}, status=500)
 
 
@@ -189,6 +194,7 @@ def api_criar_pasta(request):
         pasta = client.criar_pasta(nome, pai_id=pai_id)
         return JsonResponse({"pasta": pasta})
     except Exception as exc:
+        capture(exc, "drive.views.api_criar_pasta")  # pragma: no cover
         return JsonResponse({"erro": str(exc)}, status=500)
 
 
@@ -211,7 +217,8 @@ def salvar_pasta_raiz(request):
     if not pasta_nome:
         try:
             pasta_nome = get_client(usuario).nome_pasta(pasta_id)
-        except Exception:
+        except Exception as exc:
+            capture(exc, "drive.views.salvar_pasta_raiz")  # pragma: no cover
             pasta_nome = pasta_id
 
     creds.pasta_raiz_id = pasta_id
@@ -258,6 +265,7 @@ def _executar_reorganizacao(job_id: int, usuario, area, *, encerrar_conexao: boo
             finalizado_em=timezone.now(),
         )
     except Exception as exc:  # noqa: BLE001
+        capture(exc, "drive.views._executar_reorganizacao")  # pragma: no cover
         logger.error("[Drive] reorganização (job %s) falhou: %s", job_id, exc, exc_info=True)
         DriveReorganizacaoJob.objects.filter(pk=job_id).update(
             status=DriveReorganizacaoJob.STATUS_ERRO,
@@ -301,7 +309,8 @@ def reorganizar_tudo(request):
 
         try:
             reorganizar_drive.delay(job.pk, usuario.pk, getattr(area, "pk", None))
-        except Exception:
+        except Exception as exc:
+            capture(exc, "drive.views.reorganizar_tudo")  # pragma: no cover
             job.status = DriveReorganizacaoJob.STATUS_ERRO
             job.mensagem = "Não foi possível enviar a tarefa ao processador assíncrono."
             job.finalizado_em = timezone.now()
@@ -363,7 +372,8 @@ def previa_reorganizacao(request):
     for evento in filter_queryset_by_area(Evento.objects, area=area).iterator():
         try:
             linhas.extend(organizer.planejar_evento(evento))
-        except Exception:
+        except Exception as exc:
+            capture(exc, "drive.views.previa_reorganizacao")  # pragma: no cover
             itens_com_erro += 1
             logger.warning("[Drive] falha ao planejar prévia do evento %s", evento.pk, exc_info=True)
             continue
@@ -374,7 +384,8 @@ def previa_reorganizacao(request):
         for oficio in filter_queryset_by_area(Oficio.objects, area=area).filter(evento__isnull=True).iterator():
             try:
                 linhas.extend(organizer.planejar_oficio(oficio))
-            except Exception:
+            except Exception as exc:
+                capture(exc, "drive.views.previa_reorganizacao")  # pragma: no cover
                 itens_com_erro += 1
                 logger.warning("[Drive] falha ao planejar prévia do ofício %s", oficio.pk, exc_info=True)
                 continue
@@ -432,6 +443,7 @@ def _reprocessar_pendencias_em_thread(usuario, area, *, encerrar_conexao: bool =
             try:
                 task.delay(pendencia.object_id, usuario_id=getattr(usuario, "pk", None))
             except Exception as exc:
+                capture(exc, "drive.views._reprocessar_pendencias_em_thread")  # pragma: no cover
                 logger.warning("[Drive] falha ao reagendar pendência %s: %s", pendencia.pk, exc)
     finally:
         if encerrar_conexao:
@@ -462,7 +474,8 @@ def reprocessar_pendencias(request):
 
         try:
             reprocessar_pendencias.delay(usuario.pk, getattr(area, "pk", None))
-        except Exception:
+        except Exception as exc:
+            capture(exc, "drive.views.reprocessar_pendencias")  # pragma: no cover
             logger.exception("[Drive] falha ao agendar reprocessamento de pendências")
             messages.error(request, "Não foi possível iniciar o reenvio agora.")
             return redirect("core:perfil")

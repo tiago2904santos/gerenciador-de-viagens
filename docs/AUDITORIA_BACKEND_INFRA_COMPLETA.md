@@ -131,9 +131,14 @@ Todos os 9 `forms.py` embutem classe CSS e placeholder no widget (`planos_trabal
 embutir o nome CSS. O HTML renderizado de cinco formulários representativos
 permaneceu byte a byte idêntico.
 
-### 3.5 Tratamento de erro — 155 `except Exception`
+### 3.5 Tratamento de erro — captura estruturada no Google Drive
 
-Concentração: `integracoes/google_drive` (**57** entre organizer/views/signals/services/status), `prestacoes_contas/services.py` (7), adapters de PDF (11). Para uma integração externa, engolir exceção é às vezes correto — mas 57 no mesmo pacote sem canal de observabilidade padronizado significa que falha de upload/organização de Drive é invisível. `core/logging.py` (JSON estruturado) existe e é usado no prod — os `except` deveriam todos logar por ele.
+**Resolvido (P-05):** a reconferência do código vivo encontrou **64**
+`except Exception` em `integracoes/google_drive`, não 57. Todos agora começam
+com `core.errors.capture(exc, contexto)`, que emite tipo, contexto, metadados e
+traceback no logger estruturado sem alterar o fallback ou a repropagação de cada
+fluxo. `audit_django_architecture.py` analisa a AST e bloqueia no CI qualquer
+handler genérico novo que não faça a captura como primeira instrução.
 
 ### 3.6 Autorização — modelo global correto, exceções pontuais
 
@@ -281,7 +286,7 @@ Pares off-by-one (`720/721`, `840/841`, `1180/1181`, `767/768`, `599/600`, `479/
 | P-02 | ✅ | Os 11 catálogos com CRUD completo declaram `CatalogConfig` e usam um único motor em `core/catalog.py`; Cidade ficou fora por ser lista + criação + exportação, sem editar/excluir | §3.2 |
 | P-03 | 🟠 | `roteiros`, `termos`, `justificativas` com **0 constraints e 0 indexes**; dedupe de roteiro feito em aplicação | §3.3 |
 | P-04 | ✅ | 194 classes de widget centralizadas em `core/forms/widgets.py`, sem alteração do HTML emitido | §3.4 |
-| P-05 | 🟠 | 155 `except Exception`, 57 no Google Drive, sem logging obrigatório | §3.5 |
+| P-05 | ✅ | 64 handlers genéricos do Google Drive cobertos por captura estruturada obrigatória e gate AST no CI | §3.5 |
 | P-06 | 🟡 | `planos_trabalho/views.py` (1.235 l.) e `oficios/views.py` (1.170 l.) monolíticos | §3.1 |
 | P-07 | ✅ | `AuditEvent` ganhou `__str__` com ação, model, ID e representação; a contagem histórica de 3 incluía 2 bases abstratas sem tabela | §3.3 |
 | P-08 | 🟡 | `diario_bordo` é um app-casca (1 URL, 1 placeholder, 0 models) — decidir: implementar ou remover | — |
@@ -323,7 +328,7 @@ Pares off-by-one (`720/721`, `840/841`, `1180/1181`, `767/768`, `599/600`, `479/
 | **justificativas** | 984 | ✅ | 0 constraints (baixo risco — catálogo). |
 | **documentos** | 4.619 | ✅ | 5 motores PDF (D-01); melhor razão de testes (0,43). |
 | **usuarios** | 515 | ✅ | Testes 1,17 ✅. |
-| **integracoes** | 4.790 | ❌ | 57 `except Exception` (P-05, D-02). |
+| **integracoes** | 4.790 | ✅ | 64 `except Exception` do Drive preservam seus fallbacks, agora com captura estruturada obrigatória (P-05). |
 | **diario_bordo** | ~0 | — | App-casca (P-08). |
 
 ---
@@ -337,7 +342,7 @@ Espelho dos "motores globais" do JS — um dono por capacidade:
 | 1 | **`core/catalog.py`** — fábrica de CRUD de catálogo (`CatalogConfig`: model, form, campos do quick add, regra de exclusão) | 5 implementações (§3.2) | ~1.500 → ~400 linhas; novos catálogos em ~20 linhas |
 | 2 | **Selectors obrigatórios** — criar `eventos/selectors.py`, `termos/selectors.py`, `ordens_servico/selectors.py`, `planos_trabalho/selectors.py` e migrar as 36 chamadas ORM | P-01 | teste de CI: `grep .objects` proibido em `views.py` |
 | 3 | **Widget base próprio** (`core/forms.py`) que injeta as classes CSS canônicas — `forms.py` dos apps param de conhecer CSS | 194 `attrs` (P-04) | desacopla a reconstrução visual do Python |
-| 4 | **`core/errors.py`** — `capture(exc, contexto)` que loga estruturado; proibir `except Exception` sem `capture` via CI | 155 ocorrências (P-05) | Drive deixa de falhar em silêncio |
+| 4 | ✅ **`core/errors.py`** — `capture(exc, contexto)` com logging estruturado e gate AST no CI | 64 handlers do Drive (inventário vivo do P-05) | Drive deixa de falhar em silêncio |
 | 5 | **Geração assíncrona de documentos** — mover `facade.gerar_*` para task Celery com polling (o toast JS já existe) | S-06 | request nunca bloqueia em LibreOffice |
 | 6 | **Constraints de dados** — migração única: unicidade de Roteiro (hash do conteúdo), índices de FK quentes em trechos, `__str__` nos models de core | P-03, P-07 | dedupe sai do código de aplicação |
 | 7 | **Escala de breakpoints** — 6 valores documentados + teste de CI que rejeita `@media` fora da lista | R-01 | pré-requisito da reconstrução CSS |

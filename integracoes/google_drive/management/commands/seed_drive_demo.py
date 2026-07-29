@@ -28,6 +28,8 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils import timezone
 
+from core.errors import capture
+
 TAG = "[DRIVE DEMO]"
 PLANO_TAG = "DEMO"
 N_OFICIOS = 10
@@ -52,7 +54,8 @@ def _pdf_generico(titulo: str) -> bytes:
         c.showPage()
         c.save()
         return buf.getvalue()
-    except Exception:
+    except Exception as exc:
+        capture(exc, "drive.management.commands.seed_drive_demo._pdf_generico")  # pragma: no cover
         return (
             b"%PDF-1.1\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n"
             b"2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n"
@@ -379,6 +382,7 @@ class Command(BaseCommand):
                 fn()
                 ok += 1
             except Exception as exc:  # noqa: BLE001
+                capture(exc, "drive.management.commands.seed_drive_demo._try")  # pragma: no cover
                 err += 1
                 self.stderr.write(self.style.ERROR(f"  falhou {desc}: {exc}"))
 

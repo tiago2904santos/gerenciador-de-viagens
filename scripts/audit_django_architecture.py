@@ -1,4 +1,5 @@
 import argparse
+import ast
 import re
 import sys
 from pathlib import Path
@@ -10,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 # frontend e do piso de cobertura. O alvo final é zero, mas ele não é atingível
 # num PR só: `core`, `documentos` e `usuarios` estão fora do escopo do `P-01`.
 ORM_EM_VIEW = re.compile(r"\.objects\b")
+DRIVE_ROOT = ROOT / "integracoes" / "google_drive"
 
 PY_RULES = [
     ("query_direta_view", ("views.py", ".objects.filter(")),
@@ -103,6 +105,50 @@ def contar_orm_em_views():
     return por_app
 
 
+def _is_exception_handler(node: ast.ExceptHandler) -> bool:
+    if isinstance(node.type, ast.Name):
+        return node.type.id == "Exception"
+    if isinstance(node.type, ast.Tuple):
+        return any(isinstance(item, ast.Name) and item.id == "Exception" for item in node.type.elts)
+    return False
+
+
+def _is_capture_call(node: ast.AST) -> bool:
+    if not isinstance(node, ast.Call):
+        return False
+    if isinstance(node.func, ast.Name):
+        return node.func.id == "capture"
+    return isinstance(node.func, ast.Attribute) and node.func.attr == "capture"
+
+
+def _handler_starts_with_capture(node: ast.ExceptHandler) -> bool:
+    if not node.body or not isinstance(node.body[0], ast.Expr):
+        return False
+    return _is_capture_call(node.body[0].value)
+
+
+def except_exception_without_capture(code: str) -> list[int]:
+    tree = ast.parse(code)
+    return [
+        node.lineno
+        for node in ast.walk(tree)
+        if isinstance(node, ast.ExceptHandler)
+        and _is_exception_handler(node)
+        and not _handler_starts_with_capture(node)
+    ]
+
+
+def drive_excepts_without_capture():
+    findings = []
+    for path in DRIVE_ROOT.rglob("*.py"):
+        if not path.is_file():
+            continue
+        text = path.read_text(encoding="utf-8")
+        for line_no in except_exception_without_capture(text):
+            findings.append((rel(path), line_no))
+    return findings
+
+
 def main():
     parser = argparse.ArgumentParser(description="Auditoria de arquitetura Django")
     parser.add_argument(
@@ -110,6 +156,12 @@ def main():
         type=int,
         default=None,
         help="falha se o total de `.objects` em views.py passar deste número (catraca do P-01)",
+    )
+    parser.add_argument(
+        "--max-drive-except-without-capture",
+        type=int,
+        default=None,
+        help="falha se handlers `except Exception` do Drive não chamarem core.errors.capture",
     )
     args = parser.parse_args()
 
@@ -134,6 +186,23 @@ def main():
             f"\nERRO: {total_orm} usos de ORM em views.py, acima da catraca "
             f"de {args.max_orm_em_view}. A camada de selectors existe para isso "
             f"(docs/PADRAO_SELECTORS.md); a catraca só desce.",
+        )
+        sys.exit(1)
+
+    drive_findings = drive_excepts_without_capture()
+    print("\n== except Exception sem capture no Google Drive (P-05) ==")
+    for file_path, line_no in drive_findings:
+        print(f"  {file_path}:{line_no}")
+    print(f"Total: {len(drive_findings)}")
+
+    if (
+        args.max_drive_except_without_capture is not None
+        and len(drive_findings) > args.max_drive_except_without_capture
+    ):
+        print(
+            f"\nERRO: {len(drive_findings)} handlers genéricos do Drive sem "
+            "core.errors.capture, acima da catraca de "
+            f"{args.max_drive_except_without_capture}.",
         )
         sys.exit(1)
 

@@ -16,6 +16,8 @@ from __future__ import annotations
 
 from django.core.management.base import BaseCommand
 
+from core.errors import capture
+
 
 class Command(BaseCommand):
     help = "Remove OS 'rascunho em branco' (bug do backfill antigo) do banco e do Drive."
@@ -47,7 +49,8 @@ class Command(BaseCommand):
             drive_info = ""
             try:
                 drive_info = f" | drive_file_id={art.drive_arquivo.file_id}"
-            except Exception:
+            except Exception as exc:
+                capture(exc, "drive.management.commands.gdrive_limpar_os_rascunho.handle")  # pragma: no cover
                 pass
             self.stdout.write(f"  - {art.pk} | oficio={art.oficio_id}{drive_info}")
 
@@ -60,7 +63,8 @@ class Command(BaseCommand):
         for art in quebrados:
             try:
                 reg = art.drive_arquivo
-            except Exception:
+            except Exception as exc:
+                capture(exc, "drive.management.commands.gdrive_limpar_os_rascunho.handle")  # pragma: no cover
                 reg = None
             if reg is not None and reg.file_id and not reg.mock:
                 client.excluir_arquivo(reg.file_id)

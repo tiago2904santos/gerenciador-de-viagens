@@ -9,6 +9,8 @@ e o painel de pendências da tela de configuração (ver ``views.py``).
 
 from __future__ import annotations
 
+from core.errors import capture
+
 _LIMITE_ERRO = 2000  # trunca mensagens de exceção muito longas antes de persistir.
 
 
@@ -25,13 +27,15 @@ def _resolve_usuario(usuario=None):
         user = getattr(request, "user", None) if request is not None else None
         if user is not None and getattr(user, "is_authenticated", False):
             return user
-    except Exception:
+    except Exception as exc:
+        capture(exc, "drive.status._resolve_usuario")  # pragma: no cover
         pass
     try:
         from .organizer import get_usuario_contexto
 
         return get_usuario_contexto()
-    except Exception:
+    except Exception as exc:
+        capture(exc, "drive.status._resolve_usuario")  # pragma: no cover
         return None
 
 
@@ -42,7 +46,8 @@ def _resolve_area(area=_UNSET):
         from core.tenancy import get_current_area
 
         return get_current_area()
-    except Exception:
+    except Exception as exc:
+        capture(exc, "drive.status._resolve_area")  # pragma: no cover
         return None
 
 
@@ -127,6 +132,7 @@ def executar_e_rastrear(fn, obj, usuario=None) -> None:
     try:
         fn(obj)
     except Exception as exc:
+        capture(exc, "drive.status.executar_e_rastrear")  # pragma: no cover
         registrar_falha(obj, exc, usuario=usuario)
         raise
     else:

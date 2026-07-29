@@ -468,7 +468,9 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
   19 contratos CSS centralizados em `core/forms/widgets.py`; 194 `attrs` migrados
   sem alterar o HTML renderizado de Ofícios, Prestações, Plano de Trabalho,
   Roteiros e Eventos.
-- [ ] `P-05` `core/errors.py` + varredura dos 57 `except` do Drive
+- [x] `P-05` `core/errors.py` + varredura dos handlers genéricos do Drive —
+  inventário vivo corrigido de 57 para 64; todos chamam captura estruturada
+  como primeira instrução e o CI bloqueia regressões por análise da AST.
 - [ ] `P-06` fatiar `planos_trabalho/views.py` e `oficios/views.py`
 - [x] `P-07` `__str__` em `core` — o inventário histórico contou 3 classes,
   mas `TimeStampedModel` e `CancelavelModel` são abstratas; só `AuditEvent` é

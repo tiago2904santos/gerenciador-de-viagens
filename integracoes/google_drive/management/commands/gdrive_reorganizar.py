@@ -1,5 +1,7 @@
 from django.core.management.base import BaseCommand
 
+from core.errors import capture
+
 
 class Command(BaseCommand):
     help = (
@@ -54,6 +56,7 @@ class Command(BaseCommand):
                     organizer.organizar_evento(evento)
                     self.stdout.write(self.style.SUCCESS("  OK"))
                 except Exception as exc:  # noqa: BLE001
+                    capture(exc, "drive.management.commands.gdrive_reorganizar.handle")  # pragma: no cover
                     self.stdout.write(self.style.ERROR(f"  ERRO: {exc}"))
 
         # Ofícios avulsos (sem evento) + artefatos órfãos
@@ -79,4 +82,5 @@ class Command(BaseCommand):
                 try:
                     organizer.organizar_oficio(oficio)
                 except Exception as exc:  # noqa: BLE001
+                    capture(exc, "drive.management.commands.gdrive_reorganizar._processar_avulsos")  # pragma: no cover
                     self.stdout.write(self.style.ERROR(f"  ERRO ofício {oficio.pk}: {exc}"))
