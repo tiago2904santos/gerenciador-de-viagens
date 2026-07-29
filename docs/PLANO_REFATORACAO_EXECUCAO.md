@@ -57,12 +57,19 @@ Etapas 3, 4 e 5 podem correr ao mesmo tempo em branches separadas — são camad
 Se houver banca/entrega antes do refactor completo, o mínimo aceitável é **Etapas 1 + 2 + 3**
 (41–56 dias-pessoa). É o conjunto exato que elimina as quatro respostas negativas previstas:
 
-| Pergunta da banca | Hoje | Depois das Etapas 1–3 |
+| Pergunta da banca | Antes | Hoje |
 |---|---|---|
-| "E quando o valor da diária mudar?" | exige deploy e recalcula o histórico | vigência + valor congelado no documento |
+| "E quando o valor da diária mudar?" | exigia deploy e recalculava o histórico | tabela com vigência, editável na tela; roteiro anterior mantém o valor da época |
+| "A conta bate com o sistema oficial?" | não se sabia — ninguém tinha comparado | **bate ao centavo** nos cinco demonstrativos, com os cinco travados por teste |
 | "A lista aguenta 500 ofícios?" | 11 MB de HTML, sem paginação | paginada |
-| "O documento gerado confere?" | nenhum teste abre o arquivo | *golden files* dos 11 documentos |
+| "O documento gerado confere?" | nenhum teste abria o arquivo | *golden files* dos 11 documentos |
 | "Qual a cobertura?" | assimétrica, Prestações a 0,04 | piso por app no CI |
+
+A segunda linha não estava prevista. Ela apareceu quando comparamos o cálculo
+com o sistema oficial de solicitação e achamos **dois defeitos que nenhuma
+auditoria tinha visto** (`NOVO-11` e a faixa de 12h do `N-08`), ambos mexendo
+em dinheiro, um deles pagando a menor em toda viagem acima de 12 horas.
+É a evidência de que auditoria por leitura tem limite: a régua veio de fora.
 
 ## 4. Quem faz o quê
 
@@ -351,7 +358,8 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
   Provado por canário — quebrando o arredondamento, o teste reprova apontando
   os dois valores. O teste que já existia prova que o total **escala** com a
   equipe, que é outra afirmação: escalar não garante reconciliar.
-- [ ] `N-10` pernoite curto — **mesma causa do `N-08`**; resolve junto
+- [x] `N-10` pernoite curto — era a mesma causa do `N-08` e saiu no mesmo PR:
+  o corte por duração aos 12 horas.
 - [x] `P-03` **índices compostos**; as duas constraints candidatas foram
   recusadas com evidência, não por cautela. Correção ao enunciado: *toda FK já
   tem índice* (o Django cria por padrão) — o que faltava era o composto que casa
@@ -371,6 +379,21 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
   desde a Etapa 3. Duas afirmações minhas estavam erradas na primeira escrita e
   foram corrigidas conferindo o código: o número é reservado na criação (não ao
   sair de rascunho), e a reserva do ofício roda em laço de até 3 tentativas.
+
+> **Etapa 3 fechada.** Os dez defeitos do bloco de diárias saíram, e o cálculo
+> passou a bater ao centavo com o sistema oficial de solicitação nos cinco
+> demonstrativos levantados — todos travados por teste.
+>
+> **Dois dos maiores não estavam em auditoria nenhuma.** O `NOVO-11` (o período
+> fechava na saída do trecho seguinte, e não na chegada, fazendo o tempo de
+> estrada entre destinos sumir da conta) e a faixa de 12h do `N-08` (todo trecho
+> acima de 12 horas pagava a menos) só apareceram porque comparamos com o
+> sistema real. Três outros — `N-05`, `N-06` e `N-09` — eram **diferentes do que
+> a auditoria descrevia**: um era outra causa, um não tinha efeito e um não
+> reproduzia.
+>
+> Fica a lição para as próximas etapas: o número da auditoria é estimativa a
+> reconferir, não especificação. Cinco vezes ele não bateu.
 
 ### Etapa 4 — Backend de aderência
 - [ ] `P-01` selectors em eventos, termos, OS, PT + gate anti-ORM-em-view
