@@ -175,3 +175,86 @@ class UnoserverCheckCommandTests(SimpleTestCase):
                     "--max-ms",
                     "1000",
                 )
+
+
+class UnoserverCheckPartidaAFrioTests(SimpleTestCase):
+    """Dois orçamentos, porque são dois custos diferentes.
+
+    A primeira conversão paga o start do LibreOffice/UNO e custa uma ordem de
+    grandeza a mais que as seguintes. Medido no CI em 29/07/2026:
+    `ordem_servico.docx: 1119.4 ms, 96.7 ms, 93.2 ms`. Com um `max` só, o gate
+    reprovava por aquecimento e não dizia nada sobre o regime estável — foram
+    três reprovações seguidas, inclusive no `main`.
+
+    Jogar a primeira medição fora seria a saída fácil e esconderia um custo
+    real: quem gera o primeiro documento depois de um período ocioso espera
+    aquele 1,1 s. Por isso ela continua vigiada, com limite próprio.
+    """
+
+    settings_do_gate = dict(
+        DOCUMENTOS_UNOSERVER_URL="http://libreoffice:2003",
+        DOCUMENTOS_UNOSERVER_TIMEOUT_SECONDS=2,
+    )
+
+    def _rodar(self, marcas, *args):
+        """`marcas` são pares (início, fim) em segundos, um por conversão."""
+        instantes = [valor for par in marcas for valor in par]
+        saida = StringIO()
+        with override_settings(**self.settings_do_gate):
+            with mock.patch(
+                "documentos.management.commands.documentos_unoserver_check."
+                "unoserver_healthcheck",
+                return_value=True,
+            ), mock.patch(
+                "documentos.management.commands.documentos_unoserver_check."
+                "convert_docx_to_pdf_unoserver",
+                return_value=b"%PDF-1.7\nok",
+            ), mock.patch(
+                "documentos.management.commands.documentos_unoserver_check."
+                "time.perf_counter",
+                side_effect=instantes,
+            ):
+                call_command(
+                    "documentos_unoserver_check",
+                    "--benchmark",
+                    "--iterations",
+                    str(len(marcas)),
+                    *args,
+                    stdout=saida,
+                )
+        return saida.getvalue()
+
+    # 1119 ms a frio, 96 e 93 ms depois — os números reais do CI.
+    MARCAS_DO_CI = [(10.0, 11.1194), (12.0, 12.0967), (13.0, 13.0932)]
+
+    def test_o_caso_que_reprovava_no_ci_agora_passa(self):
+        saida = self._rodar(
+            self.MARCAS_DO_CI, "--max-ms", "1000", "--max-cold-ms", "1500"
+        )
+
+        self.assertIn("SLA atendido", saida)
+        self.assertIn("primeira conversão (a frio)", saida)
+
+    def test_a_partida_a_frio_continua_vigiada(self):
+        """O ponto do orçamento separado: ele ainda reprova quando estoura."""
+        with self.assertRaisesRegex(CommandError, "SLA de partida a frio excedido"):
+            self._rodar(
+                self.MARCAS_DO_CI, "--max-ms", "1000", "--max-cold-ms", "1000"
+            )
+
+    def test_regressao_no_regime_estavel_reprova_mesmo_com_partida_boa(self):
+        """Aquecimento rápido não pode servir de disfarce para o resto lento."""
+        marcas = [(10.0, 10.1), (12.0, 13.2), (14.0, 15.3)]
+
+        with self.assertRaisesRegex(CommandError, "SLA excedido"):
+            self._rodar(marcas, "--max-ms", "1000", "--max-cold-ms", "1500")
+
+    def test_sem_o_argumento_o_comportamento_antigo_e_preservado(self):
+        """Quem chamar sem `--max-cold-ms` segue com um limite só, como antes."""
+        with self.assertRaisesRegex(CommandError, "SLA excedido"):
+            self._rodar(self.MARCAS_DO_CI, "--max-ms", "1000")
+
+    def test_uma_iteracao_so_mede_a_propria_partida_a_frio(self):
+        """Com `--iterations 1` não há regime estável: a única medida vale pelos dois."""
+        with self.assertRaisesRegex(CommandError, "SLA excedido"):
+            self._rodar([(10.0, 11.1194)], "--max-ms", "1000", "--max-cold-ms", "1500")

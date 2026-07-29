@@ -105,10 +105,18 @@ jobs:
             if (echo > /dev/tcp/127.0.0.1/2003) 2>/dev/null; then break; fi
             sleep 0.25
           done
+          # Dois orçamentos, porque são dois custos. A primeira conversão de
+          # cada modelo paga o start do LibreOffice/UNO — medido em 1119 ms
+          # contra 96 e 93 ms nas seguintes. Com um limite só, o gate reprovava
+          # por aquecimento (3 vezes seguidas em 29/07, inclusive no main) e não
+          # dizia nada sobre o regime estável. Descartar a primeira medição
+          # esconderia um custo que o usuário sente na primeira geração depois
+          # de ocioso; por isso ela continua vigiada, com limite próprio.
           DOCUMENTOS_UNOSERVER_URL=http://127.0.0.1:2003 \
           DOCUMENTOS_DEFAULT_PDF_ENGINE=unoserver \
           python manage.py documentos_unoserver_check \
-            --benchmark --representative-resources --max-ms 1000 --iterations 3
+            --benchmark --representative-resources --iterations 3 \
+            --max-ms 1000 --max-cold-ms 1500
 
       - name: Exercise encrypted database and media restore
         env:
