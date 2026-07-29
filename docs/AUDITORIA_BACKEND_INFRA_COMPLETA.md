@@ -278,7 +278,7 @@ Pares off-by-one (`720/721`, `840/841`, `1180/1181`, `767/768`, `599/600`, `479/
 | # | Sev | Defeito | Local |
 |---|---|---|---|
 | P-01 | 🟠 | Selectors ausentes nos 4 apps com mais ORM em view (eventos 17×, termos 7×, OS 7×, PT 5×) | §3.1 |
-| P-02 | 🟠 | CRUD de catálogo reimplementado em 5 arquivos | §3.2 |
+| P-02 | ✅ | Os 11 catálogos com CRUD completo declaram `CatalogConfig` e usam um único motor em `core/catalog.py`; Cidade ficou fora por ser lista + criação + exportação, sem editar/excluir | §3.2 |
 | P-03 | 🟠 | `roteiros`, `termos`, `justificativas` com **0 constraints e 0 indexes**; dedupe de roteiro feito em aplicação | §3.3 |
 | P-04 | ✅ | 194 classes de widget centralizadas em `core/forms/widgets.py`, sem alteração do HTML emitido | §3.4 |
 | P-05 | 🟠 | 155 `except Exception`, 57 no Google Drive, sem logging obrigatório | §3.5 |

@@ -41,6 +41,8 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils.http import url_has_allowed_host_and_scheme
 
+from core.retorno import next_valido
+
 
 @dataclass(frozen=True)
 class CatalogMessages:
@@ -75,6 +77,7 @@ class CatalogConfig:
     template_index: str = ""
     template_confirm_delete: str = ""
     contexto: dict[str, Any] = field(default_factory=dict)
+    contexto_delete: dict[str, Any] = field(default_factory=dict)
     #: `planos_trabalho` usa "linhas"; os demais, "rows"
     rows_context_key: str = "rows"
 
@@ -84,6 +87,8 @@ class CatalogConfig:
     rotulo: Callable[[Any], str] = lambda obj: str(obj)
     buscar: bool = True
     paginar_por: int | None = None
+    #: aceita `?next=` sem inventar fallback; usado pelos catálogos de cadastros
+    aceitar_next: bool = False
     #: fallback do `?next=`; sem ele, o catálogo não carrega retorno
     url_fallback_next: str | None = None
     #: rótulo do botão de voltar quando há `?next=` externo, e quando não há
@@ -100,6 +105,12 @@ class CatalogConfig:
     #: se as URLs de editar/excluir da linha carregam o `?next=`.
     #: Ofícios, eventos e os catálogos simples do PT usam a URL nua.
     urls_de_linha_com_next: bool = True
+    #: sobrescritas granulares; `None` herda `urls_de_linha_com_next`
+    url_editar_com_next: bool | None = None
+    url_excluir_com_next: bool | None = None
+    url_definir_padrao_com_next: bool | None = None
+    #: alguns catálogos antigos redirecionam GET em vez de abrir confirmação
+    confirmar_exclusao_em_get: bool = True
     #: o que "definir padrão" faz num GET. Presets, modelos de motivo e modelos
     #: de justificativa eram `@require_POST` — GET devolve 405. Cargos e
     #: combustíveis redirecionavam em silêncio. Nos dois casos o GET **não**
@@ -122,7 +133,7 @@ class CatalogConfig:
 def _next_url(request: HttpRequest, config: CatalogConfig) -> str:
     """`?next=` validado contra o host, com o fallback do catálogo."""
     if not config.url_fallback_next:
-        return ""
+        return next_valido(request) if config.aceitar_next else ""
     candidato = request.POST.get("next") or request.GET.get("next") or ""
     if candidato and url_has_allowed_host_and_scheme(
         candidato, allowed_hosts={request.get_host()}
@@ -133,9 +144,12 @@ def _next_url(request: HttpRequest, config: CatalogConfig) -> str:
 
 def _com_next(base: str, next_url: str, config: CatalogConfig) -> str:
     """Anexa `?next=` só quando ele aponta para fora do próprio catálogo."""
-    if not config.url_fallback_next or not next_url:
+    if not (config.url_fallback_next or config.aceitar_next) or not next_url:
         return base
-    if next_url == reverse(config.url_fallback_next):
+    if (
+        config.url_fallback_next
+        and next_url == reverse(config.url_fallback_next)
+    ):
         return base
     return f"{base}?{urlencode({'next': next_url})}"
 
@@ -145,7 +159,11 @@ def _url_index(config: CatalogConfig, next_url: str = "", base: str | None = Non
 
 
 def _e_retorno_externo(next_url: str, config: CatalogConfig) -> bool:
-    if not config.url_fallback_next or not next_url:
+    if not next_url:
+        return False
+    if config.aceitar_next and not config.url_fallback_next:
+        return True
+    if not config.url_fallback_next:
         return False
     return next_url != reverse(config.url_fallback_next)
 
@@ -221,7 +239,15 @@ def index_view(
         }
         if page_obj is not None:
             contexto["page_obj"] = page_obj
-            contexto["page_querystring"] = urlencode({"q": q}) if q else ""
+            contexto["pagination_pages"] = _pagination_pages(page_obj)
+            page_params = {}
+            if q:
+                page_params["q"] = q
+            if config.aceitar_next and next_url:
+                page_params["next"] = next_url
+            contexto["page_querystring"] = (
+                urlencode(page_params) if page_params else ""
+            )
         return render(request, config.template_index, contexto)
 
     return view
@@ -238,20 +264,45 @@ def _contexto_navegacao(config: CatalogConfig, next_url: str, externo: bool) -> 
     }
 
 
+def _pagination_pages(page_obj, *, on_each_side=1, on_ends=1) -> list[int | str]:
+    return [
+        page_number if isinstance(page_number, int) else "..."
+        for page_number in page_obj.paginator.get_elided_page_range(
+            page_obj.number,
+            on_each_side=on_each_side,
+            on_ends=on_ends,
+        )
+    ]
+
+
 def _linha(obj, config: CatalogConfig, next_url: str) -> dict:
-    def com_next(base: str) -> str:
-        return _com_next(base, next_url, config) if config.urls_de_linha_com_next else base
+    def com_next(base: str, sobrescrita: bool | None) -> str:
+        habilitado = (
+            config.urls_de_linha_com_next
+            if sobrescrita is None
+            else sobrescrita
+        )
+        return _com_next(base, next_url, config) if habilitado else base
 
     kwargs = {
-        "edit_url": com_next(reverse(config.url_editar, args=[obj.pk])),
-        "delete_url": com_next(reverse(config.url_excluir, args=[obj.pk])),
+        "edit_url": com_next(
+            reverse(config.url_editar, args=[obj.pk]),
+            config.url_editar_com_next,
+        ),
+        "delete_url": com_next(
+            reverse(config.url_excluir, args=[obj.pk]),
+            config.url_excluir_com_next,
+        ),
         "delete_modal": True,
     }
     if config.url_definir_padrao and config.presenter_recebe_set_default:
         kwargs["set_default_url"] = (
             None
             if getattr(obj, "is_padrao", False)
-            else com_next(reverse(config.url_definir_padrao, args=[obj.pk]))
+            else com_next(
+                reverse(config.url_definir_padrao, args=[obj.pk]),
+                config.url_definir_padrao_com_next,
+            )
         )
     if config.presenter_recebe_next_url:
         kwargs["next_url"] = next_url
@@ -311,10 +362,19 @@ def delete_view(config: CatalogConfig) -> Callable[..., HttpResponse]:
             messages.success(request, config.mensagens.excluido.format(rotulo))
             return redirect(destino)
 
+        if not config.confirmar_exclusao_em_get:
+            return redirect(destino)
+
         return render(
             request,
             config.template_confirm_delete,
-            {"object": obj, "back_url": destino, "cancel_url": destino, **config.contexto},
+            {
+                "object": obj,
+                "back_url": destino,
+                "cancel_url": destino,
+                **config.contexto,
+                **config.contexto_delete,
+            },
         )
 
     return view
