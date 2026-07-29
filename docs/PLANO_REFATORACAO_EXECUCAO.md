@@ -434,7 +434,7 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
   teste da lista criava `EventoPlano`. Encontrado ao engrossar o fixture do teste
   de orçamento de queries do `P-01` — o canário do prefetch não disparava, e o
   motivo era que a relação estava vazia.
-- [ ] `P-02` `core/catalog.py` e migração dos catálogos
+- [x] `P-02` `core/catalog.py` e migração dos catálogos
   - [x] **motor + `planos_trabalho`** — `core/catalog.py` com `CatalogConfig`; os
     quatro catálogos do PT viraram declarações e `catalog_views.py` (430 linhas)
     foi apagado. 19 testes de caracterização escritos **antes**, contra o código
@@ -456,7 +456,14 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
     que montam o `set_default_url` por dentro. **NOVO:** a normalizacao do
     `quick_add_next_url` quando `next == fallback` (entrada que a UI nunca produz)
     e a unica diferenca observavel, documentada no teste.
-  - [ ] `cadastros` (317 linhas — único com paginação e erro de vínculo)
+  - [x] **cadastros** — Estados, Unidades, Cargos e Combustíveis viraram quatro
+    declarações em `cadastros/catalogs.py`; 11 testes de caracterização foram
+    escritos **antes** e passaram contra as duas implementações. A fábrica
+    ganhou apenas as variações que já existiam: paginação, `?next=` opcional,
+    URLs granulares com retorno, confirmação por GET e erro de vínculo.
+    `cadastros/views.py` perdeu 349 linhas. Cidade ficou fora com prova: é lista
+    + criação + exportação, sem editar/excluir, portanto não é o CRUD completo
+    que `CatalogConfig` representa.
 - [x] `P-04` **widget base com classes canônicas** (pré-requisito das Etapas 6 e 7) —
   19 contratos CSS centralizados em `core/forms/widgets.py`; 194 `attrs` migrados
   sem alterar o HTML renderizado de Ofícios, Prestações, Plano de Trabalho,

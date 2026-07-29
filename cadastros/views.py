@@ -13,61 +13,45 @@ from core.retorno import com_next
 from core.retorno import next_valido
 from core.retorno import voltar_para
 from core.utils.masks import only_digits
+from .catalogs import cargo_delete  # noqa: F401  (re-export para urls.py)
+from .catalogs import cargo_set_default  # noqa: F401
+from .catalogs import cargo_update  # noqa: F401
+from .catalogs import cargos_index  # noqa: F401
+from .catalogs import combustivel_delete  # noqa: F401
+from .catalogs import combustivel_set_default  # noqa: F401
+from .catalogs import combustivel_update  # noqa: F401
+from .catalogs import combustiveis_index  # noqa: F401
+from .catalogs import estado_delete  # noqa: F401
+from .catalogs import estado_update  # noqa: F401
+from .catalogs import estados_index  # noqa: F401
+from .catalogs import unidade_delete  # noqa: F401
+from .catalogs import unidade_update  # noqa: F401
+from .catalogs import unidades_index  # noqa: F401
 from .models import Servidor
 from .models import Viatura
-from .forms import CargoForm
 from .forms import CidadeForm
-from .forms import CombustivelForm
 from .forms import ConfiguracaoAssinaturasForm
 from .forms import ConfiguracaoDestinatarioForm
 from .forms import ConfiguracaoSistemaForm
-from .forms import EstadoForm
 from .forms import ServidorForm
 from .forms import TabelaDiariaForm
-from .forms import UnidadeForm
 from .forms import ViaturaForm
-from .presenters import apresentar_linha_lista_simples_cargo
 from .presenters import apresentar_linha_lista_simples_cidade
-from .presenters import apresentar_linha_lista_simples_estado
-from .presenters import apresentar_linha_lista_simples_combustivel
 from .presenters import apresentar_linha_lista_simples_servidor
-from .presenters import apresentar_linha_lista_simples_unidade
 from .presenters import apresentar_linha_lista_simples_viatura
-from .selectors import get_cargo_by_id
-from .selectors import get_estado_by_id
-from .selectors import get_combustivel_by_id
 from .selectors import get_servidor_by_id
-from .selectors import get_unidade_by_id
 from .selectors import get_viatura_by_id
-from .selectors import listar_cargos
 from .selectors import listar_cidades
-from .selectors import listar_estados
-from .selectors import listar_combustiveis
 from .selectors import listar_servidores
 from .selectors import listar_tabelas_diaria
-from .selectors import listar_unidades
 from .selectors import listar_viaturas
-from .services import atualizar_cargo
-from .services import atualizar_estado
-from .services import atualizar_combustivel
 from .services import atualizar_servidor
-from .services import atualizar_unidade
 from .services import atualizar_viatura
 from .services import CadastroVinculadoError
-from .services import criar_cargo
 from .services import criar_cidade
-from .services import criar_estado
-from .services import criar_combustivel
 from .services import criar_servidor
-from .services import criar_unidade
 from .services import criar_viatura
-from .services import excluir_cargo
-from .services import excluir_estado
-from .services import excluir_combustivel
 from .services import excluir_servidor
-from .services import excluir_unidade
-from .services import definir_cargo_padrao
-from .services import definir_combustivel_padrao
 from .services import excluir_viatura
 from .services import salvar_configuracao_sistema
 from .services import consultar_cep
@@ -209,324 +193,6 @@ def index(request):
             ],
         },
     )
-
-
-def estados_index(request):
-    q = request.GET.get("q", "").strip()
-    form = EstadoForm(request.POST or None)
-    if request.method == "POST" and form.is_valid():
-        criar_estado(form)
-        messages.success(request, "Estado criado com sucesso.")
-        return redirect("cadastros:estados_index")
-    estados = listar_estados(q=q)
-    paginator = Paginator(estados, CADASTROS_PER_PAGE)
-    page_obj = paginator.get_page(request.GET.get("page"))
-    rows = [
-        apresentar_linha_lista_simples_estado(
-            estado,
-            edit_url=reverse("cadastros:estado_update", args=[estado.pk]),
-            delete_url=reverse("cadastros:estado_delete", args=[estado.pk]),
-            delete_modal=True,
-        )
-        for estado in page_obj.object_list
-    ]
-    return _render_listagem(
-        request,
-        "cadastros/estados/index.html",
-        {
-            "page_title": "Estados",
-            "page_description": "Base administrativa interna de unidades federativas (UF).",
-            "rows": rows,
-            "q": q,
-            "quick_add_form": form,
-            "page_eyebrow": "Cadastros internos",
-            "page_obj": page_obj,
-            "pagination_pages": _pagination_pages(page_obj),
-            "page_querystring": urlencode({"q": q}) if q else "",
-        },
-    )
-
-
-def estado_update(request, pk):
-    # Edição acontece pelo quick add/quick edit da lista; a página standalone foi removida.
-    estado = get_estado_by_id(pk)
-    form = EstadoForm(request.POST or None, instance=estado)
-    if request.method == "POST":
-        if form.is_valid():
-            atualizar_estado(estado, form)
-            messages.success(request, "Estado atualizado com sucesso.")
-        else:
-            messages.error(request, "Não foi possível salvar o estado. Verifique os dados informados.")
-    return redirect("cadastros:estados_index")
-
-
-def estado_delete(request, pk):
-    estado = get_estado_by_id(pk)
-    if request.method == "POST":
-        try:
-            excluir_estado(estado)
-        except CadastroVinculadoError:
-            _vinculo_error(request)
-            return redirect("cadastros:estados_index")
-        messages.success(request, "Estado excluído com sucesso.")
-        return redirect("cadastros:estados_index")
-    return render(
-        request,
-        "cadastros/estados/confirm_delete.html",
-        {
-            "page_title": "Excluir estado",
-            "page_description": "Não é possível excluir se existirem cidades vinculadas.",
-            "object": estado,
-            "back_url": reverse("cadastros:estados_index"),
-        },
-    )
-
-
-def unidades_index(request):
-    q = request.GET.get("q", "").strip()
-    next_url = _validated_next(request)
-    self_url_with_next = _url_with_next(reverse("cadastros:unidades_index"), next_url)
-    form = UnidadeForm(request.POST or None)
-    if request.method == "POST" and form.is_valid():
-        criar_unidade(form)
-        messages.success(request, "Unidade criada com sucesso.")
-        return redirect(self_url_with_next)
-    unidades = listar_unidades(q=q)
-    paginator = Paginator(unidades, CADASTROS_PER_PAGE)
-    page_obj = paginator.get_page(request.GET.get("page"))
-    rows = [
-        apresentar_linha_lista_simples_unidade(
-            unidade,
-            edit_url=reverse("cadastros:unidade_update", args=[unidade.pk]),
-            delete_url=_url_with_next(reverse("cadastros:unidade_delete", args=[unidade.pk]), next_url),
-            delete_modal=True,
-        )
-        for unidade in page_obj.object_list
-    ]
-    page_params = {}
-    if q:
-        page_params["q"] = q
-    if next_url:
-        page_params["next"] = next_url
-    return _render_listagem(
-        request,
-        "cadastros/unidades/index.html",
-        {
-            "page_title": "Unidades",
-            "page_description": "Unidades administrativas reutilizadas nos fluxos.",
-            "rows": rows,
-            "q": q,
-            "quick_add_form": form,
-            "page_obj": page_obj,
-            "pagination_pages": _pagination_pages(page_obj),
-            "page_querystring": urlencode(page_params) if page_params else "",
-            "back_url": next_url or None,
-            "back_label": "Voltar ao servidor",
-            "next_url": next_url,
-        },
-    )
-
-
-def unidade_update(request, pk):
-    # Edição acontece pelo quick add/quick edit da lista; a página standalone foi removida.
-    unidade = get_unidade_by_id(pk)
-    form = UnidadeForm(request.POST or None, instance=unidade)
-    if request.method == "POST":
-        if form.is_valid():
-            atualizar_unidade(unidade, form)
-            messages.success(request, "Unidade atualizada com sucesso.")
-        else:
-            messages.error(request, "Não foi possível salvar a unidade. Verifique os dados informados.")
-    return redirect("cadastros:unidades_index")
-
-
-def unidade_delete(request, pk):
-    unidade = get_unidade_by_id(pk)
-    redirect_url = _url_with_next(reverse("cadastros:unidades_index"), _validated_next(request))
-    if request.method == "POST":
-        try:
-            excluir_unidade(unidade)
-        except CadastroVinculadoError:
-            _vinculo_error(request)
-            return redirect(redirect_url)
-        messages.success(request, "Unidade excluída com sucesso.")
-        return redirect(redirect_url)
-    return redirect(redirect_url)
-
-
-def cargos_index(request):
-    q = request.GET.get("q", "").strip()
-    next_url = _validated_next(request)
-    self_url = reverse("cadastros:cargos_index")
-    self_url_with_next = _url_with_next(self_url, next_url)
-    form = CargoForm(request.POST or None)
-    if request.method == "POST" and form.is_valid():
-        criar_cargo(form)
-        messages.success(request, "Cargo criado com sucesso.")
-        return redirect(self_url_with_next)
-    cargos = listar_cargos(q=q)
-    paginator = Paginator(cargos, CADASTROS_PER_PAGE)
-    page_obj = paginator.get_page(request.GET.get("page"))
-    rows = [
-        apresentar_linha_lista_simples_cargo(
-            cargo,
-            edit_url=reverse("cadastros:cargo_update", args=[cargo.pk]),
-            delete_url=_url_with_next(reverse("cadastros:cargo_delete", args=[cargo.pk]), next_url),
-            delete_modal=True,
-            set_default_url=(
-                _url_with_next(reverse("cadastros:cargo_set_default", args=[cargo.pk]), next_url)
-                if not cargo.is_padrao
-                else None
-            ),
-        )
-        for cargo in page_obj.object_list
-    ]
-    page_params = {}
-    if q:
-        page_params["q"] = q
-    if next_url:
-        page_params["next"] = next_url
-    return _render_listagem(
-        request,
-        "cadastros/cargos/index.html",
-        {
-            "page_title": "Cargos",
-            "page_description": "Cadastre os cargos utilizados em servidores.",
-            "rows": rows,
-            "q": q,
-            "quick_add_form": form,
-            "page_obj": page_obj,
-            "pagination_pages": _pagination_pages(page_obj),
-            "page_querystring": urlencode(page_params) if page_params else "",
-            "back_url": next_url or None,
-            "back_label": "Voltar ao servidor",
-            "next_url": next_url,
-        },
-    )
-
-
-def cargo_update(request, pk):
-    # Edição acontece pelo quick add/quick edit da lista; a página standalone foi removida.
-    cargo = get_cargo_by_id(pk)
-    form = CargoForm(request.POST or None, instance=cargo)
-    if request.method == "POST":
-        if form.is_valid():
-            atualizar_cargo(cargo, form)
-            messages.success(request, "Cargo atualizado com sucesso.")
-        else:
-            messages.error(request, "Não foi possível salvar o cargo. Verifique os dados informados.")
-    return redirect("cadastros:cargos_index")
-
-
-def cargo_set_default(request, pk):
-    redirect_url = _url_with_next(reverse("cadastros:cargos_index"), _validated_next(request))
-    if request.method != "POST":
-        return redirect(redirect_url)
-    cargo = get_cargo_by_id(pk)
-    definir_cargo_padrao(cargo)
-    messages.success(request, "Cargo definido como padrão com sucesso.")
-    return redirect(redirect_url)
-
-
-def cargo_delete(request, pk):
-    cargo = get_cargo_by_id(pk)
-    redirect_url = _url_with_next(reverse("cadastros:cargos_index"), _validated_next(request))
-    if request.method != "POST":
-        return redirect(redirect_url)
-    try:
-        excluir_cargo(cargo)
-    except CadastroVinculadoError:
-        _vinculo_error(request)
-        return redirect(redirect_url)
-    messages.success(request, "Cargo excluído com sucesso.")
-    return redirect(redirect_url)
-
-
-def combustiveis_index(request):
-    q = request.GET.get("q", "").strip()
-    next_url = _validated_next(request)
-    self_url_with_next = _url_with_next(reverse("cadastros:combustiveis_index"), next_url)
-    form = CombustivelForm(request.POST or None)
-    if request.method == "POST" and form.is_valid():
-        criar_combustivel(form)
-        messages.success(request, "Combustível criado com sucesso.")
-        return redirect(self_url_with_next)
-    combustiveis = listar_combustiveis(q=q)
-    paginator = Paginator(combustiveis, CADASTROS_PER_PAGE)
-    page_obj = paginator.get_page(request.GET.get("page"))
-    rows = [
-        apresentar_linha_lista_simples_combustivel(
-            combustivel,
-            edit_url=reverse("cadastros:combustivel_update", args=[combustivel.pk]),
-            delete_url=_url_with_next(reverse("cadastros:combustivel_delete", args=[combustivel.pk]), next_url),
-            set_default_url=(
-                _url_with_next(reverse("cadastros:combustivel_set_default", args=[combustivel.pk]), next_url)
-                if not combustivel.is_padrao
-                else None
-            ),
-            delete_modal=True,
-        )
-        for combustivel in page_obj.object_list
-    ]
-    page_params = {}
-    if q:
-        page_params["q"] = q
-    if next_url:
-        page_params["next"] = next_url
-    return _render_listagem(
-        request,
-        "cadastros/combustiveis/index.html",
-        {
-            "page_title": "Combustíveis",
-            "page_description": "Cadastre os combustíveis disponíveis para viaturas.",
-            "rows": rows,
-            "q": q,
-            "quick_add_form": form,
-            "page_obj": page_obj,
-            "pagination_pages": _pagination_pages(page_obj),
-            "page_querystring": urlencode(page_params) if page_params else "",
-            "back_url": next_url or None,
-            "back_label": "Voltar à viatura",
-            "next_url": next_url,
-        },
-    )
-
-
-def combustivel_update(request, pk):
-    # Edição acontece pelo quick add/quick edit da lista; a página standalone foi removida.
-    combustivel = get_combustivel_by_id(pk)
-    form = CombustivelForm(request.POST or None, instance=combustivel)
-    if request.method == "POST":
-        if form.is_valid():
-            atualizar_combustivel(combustivel, form)
-            messages.success(request, "Combustível atualizado com sucesso.")
-        else:
-            messages.error(request, "Não foi possível salvar o combustível. Verifique os dados informados.")
-    return redirect("cadastros:combustiveis_index")
-
-
-def combustivel_set_default(request, pk):
-    redirect_url = _url_with_next(reverse("cadastros:combustiveis_index"), _validated_next(request))
-    if request.method != "POST":
-        return redirect(redirect_url)
-    combustivel = get_combustivel_by_id(pk)
-    definir_combustivel_padrao(combustivel)
-    messages.success(request, "Combustível definido como padrão com sucesso.")
-    return redirect(redirect_url)
-
-
-def combustivel_delete(request, pk):
-    combustivel = get_combustivel_by_id(pk)
-    redirect_url = _url_with_next(reverse("cadastros:combustiveis_index"), _validated_next(request))
-    if request.method == "POST":
-        try:
-            excluir_combustivel(combustivel)
-        except CadastroVinculadoError:
-            _vinculo_error(request)
-            return redirect(redirect_url)
-        messages.success(request, "Combustível excluído com sucesso.")
-        return redirect(redirect_url)
-    return redirect(redirect_url)
 
 
 def servidores_index(request):
