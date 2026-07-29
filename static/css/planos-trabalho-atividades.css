@@ -403,7 +403,7 @@
 }
 
 .pt-preset-activity-grid label:has(input:checked)::after {
-  border-color: var(--color-on-accent, #081522);
+  border-color: var(--color-on-accent);
 }
 
 .pt-preset-activity-grid label:focus-within {
