@@ -1,6 +1,15 @@
+import argparse
+import re
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+
+# `P-01`: ORM montado dentro de views.py. A catraca desce a cada app que ganha
+# selectors e nunca sobe — mesma convenção do `--max-warnings` do auditor de
+# frontend e do piso de cobertura. O alvo final é zero, mas ele não é atingível
+# num PR só: `core`, `documentos` e `usuarios` estão fora do escopo do `P-01`.
+ORM_EM_VIEW = re.compile(r"\.objects\b")
 
 PY_RULES = [
     ("query_direta_view", ("views.py", ".objects.filter(")),
@@ -81,15 +90,52 @@ def audit_templates():
     return findings
 
 
+def contar_orm_em_views():
+    """Conta ocorrências de `.objects` em cada `views.py`, por app."""
+    por_app = {}
+    for path in iter_files(".py"):
+        if path.name != "views.py":
+            continue
+        app = rel(path).rsplit("/", 1)[0] or "."
+        total = len(ORM_EM_VIEW.findall(path.read_text(encoding="utf-8")))
+        if total:
+            por_app[app] = total
+    return por_app
+
+
 def main():
+    parser = argparse.ArgumentParser(description="Auditoria de arquitetura Django")
+    parser.add_argument(
+        "--max-orm-em-view",
+        type=int,
+        default=None,
+        help="falha se o total de `.objects` em views.py passar deste número (catraca do P-01)",
+    )
+    args = parser.parse_args()
+
     findings = [*audit_python(), *audit_templates()]
     print("== Auditoria Django Arquitetura (suspeitas) ==")
-    if not findings:
+    if findings:
+        for file_path, line_no, rule_name, line in findings:
+            print(f"{file_path}:{line_no} [{rule_name}] {line}")
+        print(f"Total de suspeitas: {len(findings)}")
+    else:
         print("Nenhuma suspeita encontrada.")
-        return
-    for file_path, line_no, rule_name, line in findings:
-        print(f"{file_path}:{line_no} [{rule_name}] {line}")
-    print(f"Total de suspeitas: {len(findings)}")
+
+    por_app = contar_orm_em_views()
+    total_orm = sum(por_app.values())
+    print("\n== ORM em views.py (P-01) ==")
+    for app, total in sorted(por_app.items(), key=lambda item: (-item[1], item[0])):
+        print(f"  {app}: {total}")
+    print(f"Total: {total_orm}")
+
+    if args.max_orm_em_view is not None and total_orm > args.max_orm_em_view:
+        print(
+            f"\nERRO: {total_orm} usos de ORM em views.py, acima da catraca "
+            f"de {args.max_orm_em_view}. A camada de selectors existe para isso "
+            f"(docs/PADRAO_SELECTORS.md); a catraca só desce.",
+        )
+        sys.exit(1)
 
 
 if __name__ == "__main__":

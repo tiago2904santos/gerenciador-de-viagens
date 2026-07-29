@@ -62,6 +62,11 @@ jobs:
         # levou 449 → 438 na fase 2 e 438 → 417 na fase 1.
         run: python scripts/audit_frontend_standards.py --max-warnings 417
 
+      - name: Block new ORM in views (P-01)
+        # Catraca: este número só desce. A camada de selectors em `eventos`
+        # levou 61 → 46. Alvo final: zero — ver docs/PADRAO_SELECTORS.md.
+        run: python scripts/audit_django_architecture.py --max-orm-em-view 46
+
       - name: Validate production security settings
         env:
           SECRET_KEY: "ci-only-not-for-production-7c8d2c39f9f54f6c8d25aa12"

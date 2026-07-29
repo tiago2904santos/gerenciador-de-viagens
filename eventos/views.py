@@ -1,26 +1,22 @@
 import json
-from pathlib import Path
 from urllib.parse import urlencode
 
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import HttpResponseForbidden, JsonResponse
-from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
-from django.utils import timezone
 from django.utils.dateparse import parse_date
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.http import require_POST
 
 from cadastros.models import ConfiguracaoSistema
-from cadastros.models import Estado
-from core.normalizers import remove_accents
+from cadastros.selectors import buscar_estado_por_sigla
+from cadastros.selectors import listar_estados
 from core.private_media import private_file_response
-from core.tenancy import filter_queryset_by_area
 from roteiros.selectors import listar_cidades_para_select
 
 from oficios.presenters import apresentar_oficio_card
@@ -36,15 +32,25 @@ from .forms import EventoForm
 from .forms import EventoNovoCadastroForm
 from .forms import TipoEventoForm
 from .models import Evento
-from .models import EventoAnexo
-from .models import EventoDocumentoSolicitacao
 from .models import EVENTO_SOLICITACAO_EXTENSOES
-from .models import TipoEvento
 from .presenters import apresentar_evento_list_card
 from .presenters import apresentar_linha_lista_simples_tipo_evento
 from .presenters import build_evento_documentos_context
+from .selectors import buscar_documento_solicitacao
+from .selectors import get_documento_solicitacao_by_id
+from .selectors import get_evento_anexo_by_id
+from .selectors import get_evento_by_id
+from .selectors import get_tipo_evento_by_id
+from .selectors import listar_eventos
+from .selectors import listar_roteiros_do_evento
+from .selectors import listar_termos_do_evento
+from .selectors import listar_termos_genericos_do_evento
+from .selectors import listar_tipos_evento
+from .services import anexar_documentos_solicitacao
 from .services import build_evento_guided_context
+from .services import excluir_documento_solicitacao
 from .services import excluir_evento
+from .services import garantir_termo_automatico
 
 
 def _safe_next_url(request, fallback_url):
@@ -60,9 +66,8 @@ def _safe_next_url(request, fallback_url):
 
 def api_cidades_por_uf(request, uf):
     uf = (uf or "").strip().upper()
-    try:
-        estado = Estado.objects.get(sigla=uf)
-    except Estado.DoesNotExist:
+    estado = buscar_estado_por_sigla(uf)
+    if estado is None:
         return JsonResponse([], safe=False)
     cidades = listar_cidades_para_select(estado_id=estado.pk)
     return JsonResponse([{"id": c.nome, "nome": c.nome} for c in cidades], safe=False)
@@ -81,10 +86,7 @@ def tipos_index(request):
         if back_url:
             redirect_url = f"{redirect_url}?{urlencode({'next': back_url})}"
         return redirect(redirect_url)
-    tipos = filter_queryset_by_area(TipoEvento.objects).all()
-    if q:
-        query = remove_accents(q)
-        tipos = tipos.filter(nome__unaccent__icontains=query)
+    tipos = listar_tipos_evento(q=q or None)
     rows = [
         apresentar_linha_lista_simples_tipo_evento(
             tipo,
@@ -111,7 +113,7 @@ def tipos_index(request):
 
 def tipo_editar(request, pk):
     """Edição inline via quick edit da lista; a página standalone foi removida."""
-    tipo = get_object_or_404(filter_queryset_by_area(TipoEvento.objects), pk=pk)
+    tipo = get_tipo_evento_by_id(pk)
     form = TipoEventoForm(request.POST or None, instance=tipo)
     if request.method == "POST":
         if form.is_valid():
@@ -123,7 +125,7 @@ def tipo_editar(request, pk):
 
 
 def tipo_excluir(request, pk):
-    tipo = get_object_or_404(filter_queryset_by_area(TipoEvento.objects), pk=pk)
+    tipo = get_tipo_evento_by_id(pk)
     if request.method == "POST":
         tipo.delete()
         messages.success(request, "Tipo de evento excluído com sucesso.")
@@ -141,9 +143,7 @@ def tipo_excluir(request, pk):
 
 
 def index(request):
-    from django.db.models import OuterRef
     from core import documento_abas as tabs
-    from prestacoes_contas.models import PrestacaoServidor
 
     q = request.GET.get("q", "").strip()
     aba = tabs.normalizar_aba(request.GET.get("aba", ""))
@@ -151,61 +151,13 @@ def index(request):
     viagem_ate = request.GET.get("viagem_ate", "").strip()
     sort = request.GET.get("sort", "").strip()
 
-    eventos = filter_queryset_by_area(Evento.objects).select_related("unidade_responsavel", "responsavel").prefetch_related(
-        "anexos",
-        "oficios",
-        "oficios__servidores",
-        "oficios__servidores__cargo",
-        "oficios__servidores__unidade",
-        "oficios__servidores_termo_autorizacao",
-        "oficios__viatura",
-        "oficios__motorista",
-        "oficios__roteiro",
-        "oficios__roteiro__origem_cidade",
-        "oficios__roteiro__destinos__cidade__estado",
-        "oficios__roteiro__trechos",
-        "roteiros",
-        "roteiros__origem_cidade",
-        "planos_trabalho",
-        "planos_trabalho__programa",
-        "planos_trabalho__destino_cidade__estado",
-        "ordens_servico",
-        "ordens_servico__destinos__estado",
-        "documentos_solicitacao",
+    eventos = listar_eventos(
+        q=q or None,
+        viagem_de=parse_date(viagem_de) if viagem_de else None,
+        viagem_ate=parse_date(viagem_ate) if viagem_ate else None,
+        sort=sort or None,
     )
-    if q:
-        q_unaccent = remove_accents(q)
-        eventos = eventos.filter(
-            Q(titulo__unaccent__icontains=q_unaccent)
-            | Q(descricao__unaccent__icontains=q_unaccent)
-            | Q(motivo__unaccent__icontains=q_unaccent)
-            | Q(destino_cidade__unaccent__icontains=q_unaccent)
-            | Q(destino_uf__unaccent__icontains=q_unaccent)
-            | Q(responsavel__nome__unaccent__icontains=q_unaccent)
-            | Q(unidade_responsavel__nome__unaccent__icontains=q_unaccent)
-        )
 
-    viagem_de_date = parse_date(viagem_de) if viagem_de else None
-    viagem_ate_date = parse_date(viagem_ate) if viagem_ate else None
-    if viagem_de_date:
-        eventos = eventos.filter(Q(data_fim__gte=viagem_de_date) | Q(data_fim__isnull=True))
-    if viagem_ate_date:
-        eventos = eventos.filter(data_inicio__lte=viagem_ate_date)
-
-    sort_map = {
-        "numero_desc": ("-data_inicio", "-criado_em"),
-        "numero_asc": ("data_inicio", "criado_em"),
-        "criacao_desc": ("-criado_em",),
-        "criacao_asc": ("criado_em",),
-        "viagem_asc": ("data_inicio", "-criado_em"),
-        "viagem_desc": ("-data_inicio", "-criado_em"),
-    }
-    eventos = eventos.order_by(*sort_map.get(sort or "criacao_desc", sort_map["criacao_desc"]))
-
-    # Abas: Finalizado = todas as prestações dos ofícios (não cancelados) do
-    # evento já finalizadas.
-    sub = PrestacaoServidor.objects.filter(prestacao__oficio__evento=OuterRef("pk"), prestacao__oficio__cancelado=False)
-    eventos = tabs.anotar_finalizacao(eventos, sub, sub.filter(finalizada=False))
     cancelado_q = Q(status=Evento.STATUS_CANCELADO)
     date_field = "data_inicio"
     lista = eventos.filter(tabs.q_da_aba(aba, date_field=date_field, cancelado_q=cancelado_q))
@@ -250,34 +202,6 @@ def index(request):
         },
     )
 
-def _evento_queryset():
-    return filter_queryset_by_area(Evento.objects).select_related("unidade_responsavel", "responsavel").prefetch_related(
-        "oficios",
-        "oficios__servidores",
-        "oficios__servidores_termo_autorizacao",
-        "oficios__roteiro__destinos__cidade__estado",
-        "oficios__roteiro__trechos",
-        "oficios__viatura",
-        "oficios__motorista",
-        "roteiros",
-        "roteiros__destinos__cidade__estado",
-        "roteiros__trechos",
-        "planos_trabalho",
-        "planos_trabalho__programa",
-        "planos_trabalho__destino_cidade__estado",
-        "planos_trabalho__coordenador_adm__cargo",
-        "ordens_servico",
-        "ordens_servico__destinos__estado",
-        "ordens_servico__servidores",
-        "ordens_servico__oficios",
-        "termos_autorizacao",
-        "termos_autorizacao__oficio",
-        "termos_autorizacao__destino_cidade__estado",
-        "termos_autorizacao__viatura",
-        "termos_autorizacao__servidores",
-    )
-
-
 def _form_context(form, evento=None):
     is_edit = bool(evento and evento.pk)
     return {
@@ -310,14 +234,7 @@ def _save_destinos_extras(evento, request):
 
 def _roteiro_rows_do_evento(evento):
     """Retorna linhas de roteiros do evento: diretos (roteiro.evento) + via oficios."""
-    from roteiros.models import Roteiro
-
-    roteiros = (
-        Roteiro.objects.filter(Q(evento=evento) | Q(oficios__evento=evento))
-        .distinct()
-        .order_by("-created_at")
-        .prefetch_related("destinos__cidade__estado", "trechos")
-    )
+    roteiros = listar_roteiros_do_evento(evento)
     next_url = reverse("eventos:guiado_etapa", kwargs={"pk": evento.pk, "etapa": 2})
     return [
         apresentar_linha_lista_simples_roteiro(
@@ -349,29 +266,15 @@ def _apresentar_termos_rows(termos_qs):
 
 def _termo_generico_rows_do_evento(evento):
     """Termo(s) genérico(s) do evento (evento.termo direto, sem ofício) — sempre no topo da lista."""
-    from termos.models import TermoAutorizacao
-
-    termos = (
-        TermoAutorizacao.objects.filter(evento=evento, oficio__isnull=True)
-        .select_related("destino_cidade__estado", "destino_estado", "viatura")
-        .prefetch_related("servidores")
-        .order_by("-created_at")
-    )
-    return _apresentar_termos_rows(termos)
+    return _apresentar_termos_rows(listar_termos_genericos_do_evento(evento))
 
 
 def _termos_servidor_rows_do_evento(evento):
     """Termos individuais por servidor: um card por servidor efetivo de cada termo do evento."""
-    from termos.models import TermoAutorizacao
     from termos.presenters import apresentar_linha_lista_simples_termo_servidor
     from termos.services import termo_cadastro_assinado_info
 
-    termos = (
-        TermoAutorizacao.objects.filter(Q(evento=evento) | Q(oficio__evento=evento))
-        .select_related("destino_cidade__estado", "destino_estado", "viatura", "oficio")
-        .prefetch_related("servidores")
-        .order_by("-created_at")
-    )
+    termos = listar_termos_do_evento(evento)
     rows = []
     vistos = set()
     for termo in termos:
@@ -391,24 +294,6 @@ def _termos_servidor_rows_do_evento(evento):
                 )
             )
     return rows
-
-
-def _garantir_termo_automatico(evento):
-    """Cria um TermoAutorizacao vazio vinculado ao evento se ainda não existir nenhum."""
-    from termos.models import TermoAutorizacao
-
-    if TermoAutorizacao.objects.filter(Q(evento=evento) | Q(oficio__evento=evento)).exists():
-        return
-    from eventos.services import resolve_evento_cidade_estado
-
-    cidade, estado = resolve_evento_cidade_estado(evento)
-    TermoAutorizacao.objects.create(
-        evento=evento,
-        destino_estado=estado,
-        destino_cidade=cidade,
-        data_evento_inicio=evento.data_inicio,
-        data_evento_fim=evento.data_fim or evento.data_inicio,
-    )
 
 
 @require_http_methods(["GET", "POST"])
@@ -436,7 +321,7 @@ def novo(request):
 
 @require_http_methods(["GET", "POST"])
 def editar(request, pk):
-    evento = get_object_or_404(_evento_queryset(), pk=pk)
+    evento = get_evento_by_id(pk)
     if request.method == "POST":
         form = EventoForm(request.POST, instance=evento)
         if form.is_valid():
@@ -450,7 +335,7 @@ def editar(request, pk):
 
 @require_http_methods(["GET", "POST"])
 def detalhe(request, pk, etapa=1):
-    evento = get_object_or_404(_evento_queryset(), pk=pk)
+    evento = get_evento_by_id(pk)
 
     # Etapa 1 é o formulário de dados do evento (edição inline)
     if etapa == 1 and request.method == "POST":
@@ -465,7 +350,7 @@ def detalhe(request, pk, etapa=1):
             evento.save()
             form.save_m2m()
             form.sincronizar_documentos_vinculados(evento)
-            _garantir_termo_automatico(evento)
+            garantir_termo_automatico(evento)
             messages.success(request, "Dados do evento atualizados.")
             return redirect("eventos:guiado_etapa", pk=evento.pk, etapa=2)
     else:
@@ -497,12 +382,7 @@ def detalhe(request, pk, etapa=1):
             else:
                 messages.error(request, "Formato inválido. Aceita apenas PDF, PNG, JPG ou JPEG.")
         else:
-            for arquivo_pdf in convertidos:
-                EventoDocumentoSolicitacao.objects.create(
-                    evento=evento,
-                    arquivo=arquivo_pdf,
-                    nome_original=Path(arquivo_pdf.name).name,
-                )
+            anexar_documentos_solicitacao(evento, convertidos)
             messages.success(request, "Documentos de solicitação anexados com sucesso.")
         return redirect("eventos:guiado_etapa", pk=evento.pk, etapa=4)
 
@@ -538,7 +418,7 @@ def detalhe(request, pk, etapa=1):
             "evento_header_title": evento_header_title,
             "evento_header_description": evento_header_description,
             "evento_form": form,
-            "estados": Estado.objects.order_by("nome"),
+            "estados": listar_estados(),
             "oficio_cards": [
                 apresentar_oficio_card(
                     oficio,
@@ -566,30 +446,25 @@ def detalhe(request, pk, etapa=1):
 
 @require_POST
 def excluir_solicitacao_anexo(request, pk, anexo_pk):
-    evento = get_object_or_404(_evento_queryset(), pk=pk)
-    try:
-        anexo = EventoDocumentoSolicitacao.objects.get(pk=anexo_pk, evento=evento)
-        anexo.arquivo.delete(save=False)
-        anexo.delete()
-        messages.success(request, "Documento removido.")
-    except EventoDocumentoSolicitacao.DoesNotExist:
+    evento = get_evento_by_id(pk)
+    anexo = buscar_documento_solicitacao(evento, anexo_pk)
+    if anexo is None:
         messages.error(request, "Documento não encontrado.")
+    else:
+        excluir_documento_solicitacao(anexo)
+        messages.success(request, "Documento removido.")
     return redirect("eventos:guiado_etapa", pk=pk, etapa=4)
 
 
 def solicitacao_anexo_conteudo(request, pk, anexo_pk):
-    evento = get_object_or_404(_evento_queryset(), pk=pk)
-    anexo = get_object_or_404(
-        EventoDocumentoSolicitacao,
-        pk=anexo_pk,
-        evento=evento,
-    )
+    evento = get_evento_by_id(pk)
+    anexo = get_documento_solicitacao_by_id(evento, anexo_pk)
     return private_file_response(anexo.arquivo)
 
 
 def evento_anexo_conteudo(request, pk, anexo_pk):
-    evento = get_object_or_404(_evento_queryset(), pk=pk)
-    anexo = get_object_or_404(EventoAnexo, pk=anexo_pk, evento=evento)
+    evento = get_evento_by_id(pk)
+    anexo = get_evento_anexo_by_id(evento, anexo_pk)
     return private_file_response(anexo.arquivo)
 
 
@@ -599,7 +474,7 @@ def guiado_termos(request, pk):
 
 @require_http_methods(["POST"])
 def excluir(request, pk):
-    evento = get_object_or_404(_evento_queryset(), pk=pk)
+    evento = get_evento_by_id(pk)
     titulo = evento.titulo or f"Evento #{pk}"
     excluir_evento(evento)
     messages.success(request, f'Evento "{titulo}" excluído.')
@@ -608,7 +483,7 @@ def excluir(request, pk):
 
 @require_POST
 def cancelar(request, pk):
-    evento = get_object_or_404(_evento_queryset(), pk=pk)
+    evento = get_evento_by_id(pk)
 
     if evento.status == Evento.STATUS_CANCELADO:
         messages.error(request, "Este evento já está cancelado.")
@@ -626,7 +501,7 @@ def cancelar(request, pk):
 
 @require_POST
 def reativar(request, pk):
-    evento = get_object_or_404(_evento_queryset(), pk=pk)
+    evento = get_evento_by_id(pk)
 
     if evento.status != Evento.STATUS_CANCELADO:
         messages.error(request, "Este evento não está cancelado.")

@@ -397,6 +397,16 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
 
 ### Etapa 4 — Backend de aderência
 - [ ] `P-01` selectors em eventos, termos, OS, PT + gate anti-ORM-em-view
+  - [x] **eventos** — `eventos/selectors.py` com 13 consultas; as duas escritas que
+    moravam na view (termo automático, anexo de solicitação) desceram para
+    `services.py`. Catraca nova `--max-orm-em-view` no CI: **61 → 46**. As quatro
+    telas do app tiveram a contagem de queries fixada em teste antes de mexer.
+    **NOVO — divergência da auditoria:** o inventário vivo contou `.objects` em
+    `views.py` como **eventos 15** (auditoria: 17), **termos 6** (7),
+    **ordens_servico 3** (7) e **planos_trabalho 5** (5). A auditoria também não
+    listou `integracoes/google_drive` (10) nem `core` (9), que são hoje o maior
+    bolo restante e estão fora do escopo do `P-01`.
+  - [ ] termos (6) · ordens_servico (3) · planos_trabalho (5)
 - [ ] `P-02` `core/catalog.py` e migração dos 13 catálogos
 - [x] `P-04` **widget base com classes canônicas** (pré-requisito das Etapas 6 e 7) —
   19 contratos CSS centralizados em `core/forms/widgets.py`; 194 `attrs` migrados

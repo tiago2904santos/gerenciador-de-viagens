@@ -68,6 +68,11 @@ def get_estado_by_id(pk):
     return get_object_or_404(Estado, pk=pk)
 
 
+def buscar_estado_por_sigla(sigla):
+    """Devolve `None` quando a sigla nao existe — quem chama decide a resposta."""
+    return Estado.objects.filter(sigla=sigla).first()
+
+
 def listar_cargos(q=None):
     queryset = filter_queryset_by_area(Cargo.objects).order_by("nome")
     if q:

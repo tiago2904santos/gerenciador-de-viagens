@@ -34,6 +34,47 @@ def converter_para_pdf_se_necessario(arquivo):
     return ContentFile(buffer.read(), name=nome_pdf)
 
 
+def anexar_documentos_solicitacao(evento, arquivos_pdf) -> None:
+    """Guarda os PDFs de solicitacao ja convertidos, preservando o nome original.
+
+    Veio da view junto com o `P-01`: escrita nao e selector, entao desceu para
+    servicos em vez de virar consulta.
+    """
+    from .models import EventoDocumentoSolicitacao
+
+    for arquivo_pdf in arquivos_pdf:
+        EventoDocumentoSolicitacao.objects.create(
+            evento=evento,
+            arquivo=arquivo_pdf,
+            nome_original=Path(arquivo_pdf.name).name,
+        )
+
+
+def excluir_documento_solicitacao(anexo) -> None:
+    """Apaga o arquivo do disco antes do registro — a ordem importa."""
+    anexo.arquivo.delete(save=False)
+    anexo.delete()
+
+
+def garantir_termo_automatico(evento) -> None:
+    """Cria um TermoAutorizacao vazio vinculado ao evento se ainda nao existir nenhum."""
+    from termos.models import TermoAutorizacao
+
+    from .selectors import existe_termo_do_evento
+
+    if existe_termo_do_evento(evento):
+        return
+
+    cidade, estado = resolve_evento_cidade_estado(evento)
+    TermoAutorizacao.objects.create(
+        evento=evento,
+        destino_estado=estado,
+        destino_cidade=cidade,
+        data_evento_inicio=evento.data_inicio,
+        data_evento_fim=evento.data_fim or evento.data_inicio,
+    )
+
+
 @transaction.atomic
 def excluir_evento(evento) -> None:
     """Exclui o evento e cascateia a exclusão dos documentos vinculados.
