@@ -118,7 +118,7 @@ Cada um repete: montar `quick_add_form`, tratar POST create/edit, validar víncu
 | **roteiros** | **0** | **0** | Roteiro/Trecho sem unicidade nem índice — e é a entidade mais consultada do sistema (toda lista carrega trechos) |
 | **termos** | **0** | 0 | — |
 | **justificativas** | **0** | 0 | — |
-| core | 0 | 5 | 3 models **sem `__str__`** |
+| core | 0 | 5 | `AuditEvent` era o único model concreto sem `__str__`; os outros 2 são bases abstratas |
 
 A memória do projeto registra o sintoma disso: "roteiro duplicado sobrescreve" — deduplicação feita em código de aplicação porque o banco não tem constraint de unicidade.
 
@@ -283,7 +283,7 @@ Pares off-by-one (`720/721`, `840/841`, `1180/1181`, `767/768`, `599/600`, `479/
 | P-04 | ✅ | 194 classes de widget centralizadas em `core/forms/widgets.py`, sem alteração do HTML emitido | §3.4 |
 | P-05 | 🟠 | 155 `except Exception`, 57 no Google Drive, sem logging obrigatório | §3.5 |
 | P-06 | 🟡 | `planos_trabalho/views.py` (1.235 l.) e `oficios/views.py` (1.170 l.) monolíticos | §3.1 |
-| P-07 | 🟡 | `core/models.py`: 3 models sem `__str__` | §3.3 |
+| P-07 | ✅ | `AuditEvent` ganhou `__str__` com ação, model, ID e representação; a contagem histórica de 3 incluía 2 bases abstratas sem tabela | §3.3 |
 | P-08 | 🟡 | `diario_bordo` é um app-casca (1 URL, 1 placeholder, 0 models) — decidir: implementar ou remover | — |
 | S-01 | 🔴 | Chave Fernet literal commitada em `dev.py` | §4.2 |
 | S-02 | 🟠 | Zero configuração de e-mail (sem reset de senha, sem alerta de erro) | §4.2 |
