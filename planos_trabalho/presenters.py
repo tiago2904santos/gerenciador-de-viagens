@@ -431,3 +431,100 @@ def apresentar_plano_card(plano):
         "baixar_pdf_url": reverse("planos_trabalho:baixar_documento", args=[plano.pk, "pdf"]),
         "pdf_inline_url": reverse("planos_trabalho:pdf_inline", args=[plano.pk]),
     }
+
+
+# ── linhas dos catálogos administráveis (`P-02`) ─────────────────────────────
+#
+# Vieram de `catalog_views.py`, onde eram dicionários montados dentro da view.
+# O conteúdo é o mesmo, campo por campo — o que mudou é o lugar.
+
+
+def _truncar(texto: str, limite: int = 90) -> str:
+    texto = (texto or "").strip()
+    return texto if len(texto) <= limite else texto[: limite - 1].rstrip() + "…"
+
+
+def apresentar_linha_lista_simples_atividade(
+    atividade, *, edit_url="#", delete_url="#", delete_modal=False
+):
+    from core.presenters.badges import build_badge
+    from core.presenters.meta import build_meta
+
+    return {
+        "title": atividade.nome,
+        "badges": [build_badge("Inativa", "neutral")] if not atividade.ativo else [],
+        "meta": [
+            build_meta("Recurso", _truncar(atividade.recurso_necessario) or "—"),
+            build_meta("Meta", _truncar(atividade.meta)),
+        ],
+        "edit_url": edit_url,
+        "delete_url": delete_url,
+        "delete_modal": delete_modal,
+    }
+
+
+def apresentar_linha_lista_simples_preset(
+    preset, *, edit_url="#", delete_url="#", delete_modal=False, set_default_url=None
+):
+    from core.presenters.badges import build_badge
+    from core.presenters.meta import build_meta
+
+    # `order_by` aqui refaz a consulta e descarta o `prefetch_related` da lista —
+    # uma query por linha. Preservado como estava: o `P-02` move, não otimiza.
+    # Anotado como `NOVO-14` para entrar junto do resto do `NOVO-07`.
+    atividades = list(preset.atividades.order_by("ordem", "nome"))
+    resumo = ", ".join(item.nome for item in atividades[:3]) or "Nenhuma atividade"
+    if len(atividades) > 3:
+        resumo = f"{resumo} (+{len(atividades) - 3})"
+    return {
+        "title": preset.nome,
+        "badges": (
+            ([build_badge("Padrão", "warning")] if preset.is_padrao else [])
+            + ([build_badge("Inativo", "neutral")] if not preset.ativo else [])
+        ),
+        "meta": [
+            build_meta("Atividades", f"{len(atividades)}"),
+            build_meta("Inclui", _truncar(resumo, 110)),
+        ],
+        "edit_url": edit_url,
+        "delete_url": delete_url,
+        "delete_modal": delete_modal,
+        "set_default_url": set_default_url,
+    }
+
+
+def _linha_ordenavel(obj, titulo, *, edit_url, delete_url, delete_modal):
+    from core.presenters.badges import build_badge
+
+    return {
+        "title": titulo,
+        "badges": [] if obj.ativo else [build_badge("Inativo", "neutral")],
+        "meta": [{"label": "Ordem", "value": str(obj.ordem)}],
+        "edit_url": edit_url,
+        "delete_url": delete_url,
+        "delete_modal": delete_modal,
+    }
+
+
+def apresentar_linha_lista_simples_programa(
+    programa, *, edit_url="#", delete_url="#", delete_modal=False
+):
+    return _linha_ordenavel(
+        programa,
+        programa.nome,
+        edit_url=edit_url,
+        delete_url=delete_url,
+        delete_modal=delete_modal,
+    )
+
+
+def apresentar_linha_lista_simples_horario(
+    horario, *, edit_url="#", delete_url="#", delete_modal=False
+):
+    return _linha_ordenavel(
+        horario,
+        horario.faixa,
+        edit_url=edit_url,
+        delete_url=delete_url,
+        delete_modal=delete_modal,
+    )
