@@ -111,7 +111,7 @@
         item.innerHTML = `
           <button type="button" class="gdrive-folder-item__select" aria-label="Selecionar pasta ${pasta.name}">
             <span class="gdrive-folder-item__icon" aria-hidden="true">${icon}</span>
-            <span class="gdrive-folder-item__name">${escapeHtml(pasta.name)}</span>
+            <span class="gdrive-folder-item__name">${window.CV.util.escapeHtml(pasta.name)}</span>
           </button>
           <button type="button" class="gdrive-folder-item__enter cv-btn cv-btn--ghost cv-btn--xs"
                   aria-label="Abrir pasta ${pasta.name}">
@@ -169,7 +169,7 @@
         if (!result.ok) throw new Error(data.erro || "Erro ao carregar pastas");
         renderFolders(data.pastas || []);
       } catch (err) {
-        folderList.innerHTML = `<p class="gdrive-error">Erro: ${escapeHtml(String(err.message))}</p>`;
+        folderList.innerHTML = `<p class="gdrive-error">Erro: ${window.CV.util.escapeHtml(String(err.message))}</p>`;
         folderList.hidden = false;
         folderEmpty.hidden = true;
       } finally {
@@ -191,7 +191,7 @@
         if (!result.ok) throw new Error(data.erro || "Erro ao carregar Drives compartilhados");
         renderFolders(data.pastas || [], { sharedDriveIcon: true });
       } catch (err) {
-        folderList.innerHTML = `<p class="gdrive-error">Erro: ${escapeHtml(String(err.message))}</p>`;
+        folderList.innerHTML = `<p class="gdrive-error">Erro: ${window.CV.util.escapeHtml(String(err.message))}</p>`;
         folderList.hidden = false;
         folderEmpty.hidden = true;
       } finally {
@@ -213,7 +213,7 @@
         if (!result.ok) throw new Error(data.erro || "Erro ao carregar pastas compartilhadas comigo");
         renderFolders(data.pastas || []);
       } catch (err) {
-        folderList.innerHTML = `<p class="gdrive-error">Erro: ${escapeHtml(String(err.message))}</p>`;
+        folderList.innerHTML = `<p class="gdrive-error">Erro: ${window.CV.util.escapeHtml(String(err.message))}</p>`;
         folderList.hidden = false;
         folderEmpty.hidden = true;
       } finally {
@@ -285,7 +285,7 @@
           if (item) item.querySelector(".gdrive-folder-item__select")?.click();
         });
       } catch (err) {
-        alert("Não foi possível criar a pasta: " + err.message);
+        await window.CV.feedback.alert("Não foi possível criar a pasta: " + err.message);
       } finally {
         btnCriar.disabled = false;
         btnCriar.textContent = "Criar pasta";
@@ -305,14 +305,6 @@
       inputPastaNome.value = selectedFolder.name;
       formSalvar.submit();
     });
-  }
-
-  function escapeHtml(str) {
-    return String(str)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;");
   }
 
   function initPreviaMassa(container) {

@@ -924,7 +924,7 @@
     if (presetSelect) {
       var previousPresetId = presetSelect.value || "";
       var resettingPreset = false;
-      presetSelect.addEventListener("change", function () {
+      presetSelect.addEventListener("change", async function () {
         if (resettingPreset) {
           resettingPreset = false;
           return;
@@ -938,9 +938,11 @@
         if (!preset) return;
         var alreadyChecked = checkboxes.some(function (cb) { return cb.checked; });
         if (alreadyChecked) {
-          var ok = window.confirm(
+          presetSelect.disabled = true;
+          var ok = await window.CV.feedback.confirm(
             "Aplicar o preset “" + (preset.nome || "") + "” vai substituir a seleção atual. Continuar?"
           );
+          presetSelect.disabled = false;
           if (!ok) {
             resettingPreset = true;
             presetSelect.value = previousPresetId;

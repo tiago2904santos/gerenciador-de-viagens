@@ -50,17 +50,17 @@
     }
     if (!liberacaoInput || !liberacaoInput.value) {
       if (rangeTrigger) rangeTrigger.focus();
-      window.alert("Informe a data de liberação antes de enviar o aviso.");
+      window.CV.feedback.alert("Informe a data de liberação antes de enviar o aviso.");
       return null;
     }
     if (prazoInput && !prazoInput.value) {
       if (rangeTrigger) rangeTrigger.focus();
-      window.alert("Informe o prazo limite para saque antes de enviar o aviso.");
+      window.CV.feedback.alert("Informe o prazo limite para saque antes de enviar o aviso.");
       return null;
     }
     if (liberacaoInput.value > diariaTodayIso()) {
       if (rangeTrigger) rangeTrigger.focus();
-      window.alert(
+      window.CV.feedback.alert(
         "O aviso só poderá ser enviado a partir de " +
         diariaDateText(liberacaoInput.value) +
         ", data de liberação das diárias."
@@ -117,16 +117,16 @@
       };
       if (navigator.clipboard) {
         navigator.clipboard.writeText(ctx.msg).then(marcarCopiado, function () {
-          window.alert("Não foi possível copiar automaticamente. Copie a mensagem manualmente.");
+          window.CV.feedback.alert("Não foi possível copiar automaticamente. Copie a mensagem manualmente.");
         });
       } else {
-        window.alert("Não foi possível copiar automaticamente. Copie a mensagem manualmente.");
+        window.CV.feedback.alert("Não foi possível copiar automaticamente. Copie a mensagem manualmente.");
       }
       return;
     }
 
     if (!ctx.phone) {
-      window.alert("Este servidor não tem um celular válido cadastrado (DDD + 9 dígitos) para enviar o aviso por WhatsApp.");
+      window.CV.feedback.alert("Este servidor não tem um celular válido cadastrado (DDD + 9 dígitos) para enviar o aviso por WhatsApp.");
       return;
     }
     var enc = encodeURIComponent(ctx.msg);

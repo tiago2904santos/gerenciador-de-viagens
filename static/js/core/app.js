@@ -8,6 +8,38 @@ document.documentElement.dataset.appReady = "true";
   "use strict";
 
   window.CV = window.CV || {};
+  window.CV.util = {
+    debounce: function (fn, delay) {
+      var timer = null;
+      function debounced() {
+        var args = arguments;
+        var context = this;
+        window.clearTimeout(timer);
+        timer = window.setTimeout(function () {
+          timer = null;
+          fn.apply(context, args);
+        }, delay);
+      }
+      debounced.cancel = function () {
+        window.clearTimeout(timer);
+        timer = null;
+      };
+      return debounced;
+    },
+    escapeHtml: function (value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    },
+    normalize: function (value) {
+      return String(value || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+    },
+  };
 
   var enhancers = new Map();
   var pendingRoots = new Set();
@@ -177,6 +209,154 @@ document.documentElement.dataset.appReady = "true";
     current: currentDialog,
     focusableElements: focusableElements,
     open: open,
+  };
+}());
+
+/* Feedback global: substitui diálogos nativos por um fluxo assíncrono acessível. */
+(function () {
+  "use strict";
+
+  window.CV = window.CV || {};
+
+  var queue = [];
+  var active = null;
+  var modal = null;
+
+  function element(tag, className, attributes) {
+    var node = document.createElement(tag);
+    if (className) node.className = className;
+    Object.keys(attributes || {}).forEach(function (name) {
+      node.setAttribute(name, attributes[name]);
+    });
+    return node;
+  }
+
+  function ensureModal() {
+    if (modal) return modal;
+
+    modal = element("div", "cv-dialog cv-dialog--warning delete-confirm-modal", {
+      "data-cv-feedback-modal": "",
+      hidden: "",
+    });
+    modal.hidden = true;
+
+    var backdrop = element("div", "cv-dialog__backdrop delete-confirm-modal__backdrop", {
+      "data-cv-feedback-cancel": "",
+    });
+    var panel = element("section", "cv-dialog__panel cv-dialog__panel--sm delete-confirm-modal__dialog", {
+      role: "dialog",
+      "aria-modal": "true",
+      "aria-labelledby": "cv-feedback-title",
+      "aria-describedby": "cv-feedback-message",
+      tabindex: "-1",
+    });
+    var header = element("header", "cv-dialog__header cv-dialog__header--warning");
+    var heading = element("div", "cv-dialog__heading delete-confirm-modal__copy");
+    var eyebrow = element("span", "cv-dialog__eyebrow delete-confirm-modal__eyebrow");
+    eyebrow.textContent = "Central de Viagens";
+    var title = element("h2", "cv-dialog__title delete-confirm-modal__title", { id: "cv-feedback-title" });
+    var closeButton = element("button", "cv-dialog__close cv-icon-btn cv-icon-btn--sm", {
+      type: "button",
+      "aria-label": "Fechar",
+      "data-cv-feedback-cancel": "",
+    });
+    closeButton.textContent = "×";
+    var body = element("div", "cv-dialog__body delete-confirm-modal__body");
+    var message = element("p", "cv-dialog__message delete-confirm-modal__message", {
+      id: "cv-feedback-message",
+    });
+    var footer = element("div", "cv-dialog__footer delete-confirm-modal__actions");
+    var cancelButton = element("button", "cv-btn cv-btn--secondary", {
+      type: "button",
+      "data-cv-feedback-cancel": "",
+    });
+    cancelButton.textContent = "Voltar";
+    var acceptButton = element("button", "cv-btn cv-btn--secondary", {
+      type: "button",
+      "data-cv-feedback-accept": "",
+    });
+
+    heading.appendChild(eyebrow);
+    heading.appendChild(title);
+    header.appendChild(heading);
+    header.appendChild(closeButton);
+    body.appendChild(message);
+    footer.appendChild(cancelButton);
+    footer.appendChild(acceptButton);
+    panel.appendChild(header);
+    panel.appendChild(body);
+    panel.appendChild(footer);
+    modal.appendChild(backdrop);
+    modal.appendChild(panel);
+    document.body.appendChild(modal);
+
+    modal.addEventListener("click", function (event) {
+      if (event.target.closest("[data-cv-feedback-accept]")) finish(true);
+      else if (event.target.closest("[data-cv-feedback-cancel]")) finish(false);
+    });
+    return modal;
+  }
+
+  function renderMessage(node, value) {
+    while (node.firstChild) node.removeChild(node.firstChild);
+    String(value || "").split("\n").forEach(function (line, index) {
+      if (index) node.appendChild(document.createElement("br"));
+      node.appendChild(document.createTextNode(line));
+    });
+  }
+
+  function present() {
+    if (active || !queue.length) return;
+    active = queue.shift();
+    var container = ensureModal();
+    var isConfirm = active.kind === "confirm";
+    var title = container.querySelector("#cv-feedback-title");
+    var message = container.querySelector("#cv-feedback-message");
+    var cancelButton = container.querySelector("[data-cv-feedback-cancel].cv-btn");
+    var acceptButton = container.querySelector("[data-cv-feedback-accept]");
+    var panel = container.querySelector('[role="dialog"]');
+
+    title.textContent = active.options.title || (isConfirm ? "Confirmar ação" : "Aviso");
+    renderMessage(message, active.message);
+    cancelButton.hidden = !isConfirm;
+    acceptButton.textContent = active.options.acceptLabel || (isConfirm ? "Confirmar" : "Entendi");
+
+    window.CV.dialogs.open(container, {
+      opener: active.options.opener || document.activeElement,
+      initialFocus: isConfirm ? cancelButton : acceptButton,
+      onRequestClose: function () { finish(false); },
+    });
+    panel.setAttribute("aria-labelledby", title.id);
+  }
+
+  function finish(accepted) {
+    if (!active) return;
+    var completed = active;
+    active = null;
+    window.CV.dialogs.close(modal);
+    completed.resolve(completed.kind === "confirm" ? accepted : undefined);
+    window.setTimeout(present, 0);
+  }
+
+  function enqueue(kind, message, options) {
+    return new Promise(function (resolve) {
+      queue.push({
+        kind: kind,
+        message: message,
+        options: options || {},
+        resolve: resolve,
+      });
+      present();
+    });
+  }
+
+  window.CV.feedback = {
+    alert: function (message, options) {
+      return enqueue("alert", message, options);
+    },
+    confirm: function (message, options) {
+      return enqueue("confirm", message, options);
+    },
   };
 }());
 
@@ -392,6 +572,9 @@ document.documentElement.dataset.appReady = "true";
   }
 
   function initConfirmSubmitContracts() {
+    var confirmedSubmissions = new WeakSet();
+    var pendingConfirmations = new WeakSet();
+
     // Um unico ouvinte, em `submit`. Antes havia dois — um em `click` e outro em
     // `submit` — e quando o atributo estava no <form> os dois disparavam para o
     // mesmo envio: o usuario confirmava duas vezes (J-11).
@@ -404,6 +587,10 @@ document.documentElement.dataset.appReady = "true";
     document.addEventListener("submit", function (event) {
       var form = event.target;
       if (!form || !form.matches) return;
+      if (confirmedSubmissions.has(form)) {
+        confirmedSubmissions.delete(form);
+        return;
+      }
 
       // `submitter` diz qual botao enviou; activeElement cobre navegadores
       // antigos que ainda nao o expoem.
@@ -418,9 +605,19 @@ document.documentElement.dataset.appReady = "true";
       if (!holder) return;
 
       var message = holder.getAttribute("data-confirm-message") || "Confirmar esta ação?";
-      if (!window.confirm(message)) {
-        event.preventDefault();
-      }
+      event.preventDefault();
+      if (pendingConfirmations.has(form)) return;
+      pendingConfirmations.add(form);
+
+      window.CV.feedback.confirm(message, { opener: submitter }).then(function (accepted) {
+        pendingConfirmations.delete(form);
+        if (!accepted) return;
+        confirmedSubmissions.add(form);
+        if (typeof form.requestSubmit === "function") {
+          if (submitter) form.requestSubmit(submitter);
+          else form.requestSubmit();
+        } else form.submit();
+      });
     });
   }
 

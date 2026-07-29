@@ -45,13 +45,6 @@
     try { return JSON.parse(script.textContent || "{}"); } catch (e) { return {}; }
   }
 
-  function normalize(value) {
-    return String(value || "")
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "");
-  }
-
   function routeCardTitle(summary) {
     var label = String(summary.label || "").trim();
     var destino = String(summary.roteiro || summary.destino || "")
@@ -783,11 +776,11 @@
 
     function renderList(filterText) {
       var emptyEl = form.querySelector("#os-oficio-lista-empty");
-      var term = normalize(filterText);
+      var term = window.CV.util.normalize(filterText);
       var tokens = term.split(/\s+/).filter(Boolean);
       var selected = new Set(selectedOficioIds(select));
       var filtered = items.filter(function (summary) {
-        var text = normalize(
+        var text = window.CV.util.normalize(
           summary.search_text ||
           [summary.label, summary.numero, summary.protocolo, summary.destino, summary.periodo].join(" ")
         );
@@ -891,11 +884,9 @@
   function initSubmitButtonLabel(form) {
     updateSubmitButtonLabel(form);
 
-    var debounceTimer = null;
-    function debouncedUpdate() {
-      window.clearTimeout(debounceTimer);
-      debounceTimer = window.setTimeout(function () { updateSubmitButtonLabel(form); }, 150);
-    }
+    var debouncedUpdate = window.CV.util.debounce(function () {
+      updateSubmitButtonLabel(form);
+    }, 150);
     form.addEventListener("input", debouncedUpdate);
     form.addEventListener("change", debouncedUpdate);
   }

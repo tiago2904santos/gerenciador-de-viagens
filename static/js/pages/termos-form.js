@@ -55,13 +55,6 @@
     }
   }
 
-  function normalize(value) {
-    return String(value || "")
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "");
-  }
-
   function resetSearchPicker(select) {
     if (window.CV && window.CV.destinations && typeof window.CV.destinations.resetSearchPicker === "function") {
       window.CV.destinations.resetSearchPicker(select);
@@ -230,10 +223,10 @@
 
     function renderList(filterText) {
       var emptyEl = form.querySelector("#termo-oficio-lista-empty");
-      var term = normalize(filterText);
+      var term = window.CV.util.normalize(filterText);
       var tokens = term.split(/\s+/).filter(Boolean);
       var filtered = items.filter(function (summary) {
-        var text = normalize(summary.search_text || [summary.label, summary.numero, summary.protocolo, summary.destino, summary.periodo].join(" "));
+        var text = window.CV.util.normalize(summary.search_text || [summary.label, summary.numero, summary.protocolo, summary.destino, summary.periodo].join(" "));
         return !tokens.length || tokens.every(function (token) {
           return text.indexOf(token) !== -1;
         });

@@ -456,7 +456,6 @@ export function initRoteirosEditor() {
     notifyRouteStateChanged();
   }
   function selectedText(el) { return el && el.selectedIndex >= 0 && el.options[el.selectedIndex] ? String(el.options[el.selectedIndex].text || '').trim() : ''; }
-  function esc(value) { return String(value || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
   function makeStableKey(prefix) {
     if (window.crypto && window.crypto.randomUUID) return prefix + '-' + window.crypto.randomUUID();
     return prefix + '-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2);
@@ -1008,20 +1007,20 @@ export function initRoteirosEditor() {
       var v = String(opt.value || '');
       if (!v) return '<option value="">---------</option>';
       var sel = String(selectedId || '') === v ? ' selected' : '';
-      return '<option value="' + esc(v) + '"' + sel + '>' + esc(String(opt.textContent || '').trim()) + '</option>';
+      return '<option value="' + window.CV.util.escapeHtml(v) + '"' + sel + '>' + window.CV.util.escapeHtml(String(opt.textContent || '').trim()) + '</option>';
     }).join('');
   }
   function buildDestinoRowMarkup(idx, destino) {
     var template = $('tmpl-destino-roteiro');
     if (template) {
-      return String(template.innerHTML || '').replace(/__index__/g, esc(String(idx)));
+      return String(template.innerHTML || '').replace(/__index__/g, window.CV.util.escapeHtml(String(idx)));
     }
     var selE = destino && destino.estado_id ? destino.estado_id : (destinoEstadoDefaultId || '');
     var isOficio = !!(form && form.closest && form.closest('[data-travel-document-wizard-roteiro]'));
     if (isOficio) {
       return '' +
-        '<div class="destination-row cv-ordered-field-row" data-index="' + esc(String(idx)) + '">' +
-          '<span class="cv-ordered-field-row__badge" data-destination-order aria-hidden="true">' + esc(String(idx + 1)) + '</span>' +
+        '<div class="destination-row cv-ordered-field-row" data-index="' + window.CV.util.escapeHtml(String(idx)) + '">' +
+          '<span class="cv-ordered-field-row__badge" data-destination-order aria-hidden="true">' + window.CV.util.escapeHtml(String(idx + 1)) + '</span>' +
           '<div class="cv-ordered-field-row__body">' +
             '<div class="field-grid roteiro-sede-grid roteiro-destino-grid cv-ordered-field-row__fields">' +
               '<div class="field app-form-field">' +
@@ -1038,7 +1037,7 @@ export function initRoteirosEditor() {
         '</div>';
     }
     return '' +
-      '<div class="cv-search-picker__selected-card destination-row" data-index="' + esc(String(idx)) + '">' +
+      '<div class="cv-search-picker__selected-card destination-row" data-index="' + window.CV.util.escapeHtml(String(idx)) + '">' +
         '<div class="cv-search-picker__selected-main">' +
           '<div class="cv-search-picker__selected-title-row">' +
             '<span class="cv-search-picker__selected-name">Destino</span>' +
@@ -1296,7 +1295,7 @@ export function initRoteirosEditor() {
                 destino_nome: trecho.destino_nome || '',
               },
               Object.assign({}, trecho, { ordem: idx }),
-              esc,
+              window.CV.util.escapeHtml,
               formatDurationInput
             );
           })
@@ -1363,7 +1362,7 @@ export function initRoteirosEditor() {
           return buildTrechoCard(
             t,
             preferSeed ? Object.assign({}, cv, sv) : Object.assign({}, sv, cv),
-            esc,
+            window.CV.util.escapeHtml,
             formatDurationInput
           );
         })
@@ -1658,14 +1657,6 @@ export function initRoteirosEditor() {
     if (!names.length) return 'Sem destinos';
     return names.slice(0,3).join(' â€¢ ')+(names.length>3?' +'+(names.length-3):'');
   }
-  function normalizeRouteSearch(value) {
-    return String(value || '')
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/\s+/g, ' ')
-      .trim()
-      .toLowerCase();
-  }
   function routeSearchText(route) {
     return [
       route && route.label,
@@ -1692,8 +1683,8 @@ export function initRoteirosEditor() {
   function renderRouteList(filterText) {
     var target = $('roteiro-lista'); if (!target) return;
     var emptyEl = $('roteiro-lista-empty');
-    var selId = getSelectedRouteId(); var term = normalizeRouteSearch(filterText);
-    var filtered = routes.filter(function(r) { if (!term) return true; return normalizeRouteSearch(routeSearchText(r)).indexOf(term)!==-1; });
+    var selId = getSelectedRouteId(); var term = window.CV.util.normalize(filterText).replace(/\s+/g, ' ').trim();
+    var filtered = routes.filter(function(r) { if (!term) return true; return window.CV.util.normalize(routeSearchText(r)).replace(/\s+/g, ' ').trim().indexOf(term)!==-1; });
     var isOficioPicker = !!target.closest('.related-route-picker');
     if (!filtered.length) {
       target.innerHTML = isOficioPicker ? '' : '<div class="related-route-empty">Nenhum roteiro encontrado para a busca.</div>';
@@ -1705,16 +1696,16 @@ export function initRoteirosEditor() {
       var rid=String(r.id); var ac=rid===selId?' is-active':'';
       var title = routeDisplayTitle(r);
       if (isOficioPicker) {
-        return '<button type="button" class="cv-search-picker__selected-card related-route-item'+ac+'" data-route-id="'+esc(rid)+'" aria-pressed="'+(rid===selId?'true':'false')+'">' +
+        return '<button type="button" class="cv-search-picker__selected-card related-route-item'+ac+'" data-route-id="'+window.CV.util.escapeHtml(rid)+'" aria-pressed="'+(rid===selId?'true':'false')+'">' +
           '<span class="cv-search-picker__selected-avatar" aria-hidden="true">'+ROUTE_AVATAR_ICON+'</span>' +
           '<div class="cv-search-picker__selected-main">' +
-            '<span class="cv-search-picker__selected-name">'+esc(title)+'</span>' +
-            '<span class="cv-search-picker__selected-meta related-route-period">'+esc(routePeriodSummary(r))+'</span>' +
+            '<span class="cv-search-picker__selected-name">'+window.CV.util.escapeHtml(title)+'</span>' +
+            '<span class="cv-search-picker__selected-meta related-route-period">'+window.CV.util.escapeHtml(routePeriodSummary(r))+'</span>' +
           '</div></button>';
       }
-      return '<button type="button" class="related-route-item'+ac+'" data-route-id="'+esc(rid)+'">' +
-        '<span class="related-route-title">'+esc(title)+'</span>' +
-        '<span class="related-route-period">'+esc(routePeriodSummary(r))+'</span></button>';
+      return '<button type="button" class="related-route-item'+ac+'" data-route-id="'+window.CV.util.escapeHtml(rid)+'">' +
+        '<span class="related-route-title">'+window.CV.util.escapeHtml(title)+'</span>' +
+        '<span class="related-route-period">'+window.CV.util.escapeHtml(routePeriodSummary(r))+'</span></button>';
     }).join('');
   }
   function routeResumo() {

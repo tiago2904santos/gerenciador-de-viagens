@@ -8,18 +8,14 @@
 
   var CIDADES_CACHE_D = {};
 
-  function normStrD(s) {
-    return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
-  }
-
   function populateCidadesD(cidadeSel, data, initialValue) {
-    var normInitial = normStrD(initialValue);
+    var normInitial = window.CV.util.normalize(initialValue).trim();
     cidadeSel.innerHTML = '<option value="">---------</option>';
     data.forEach(function (c) {
       var opt = document.createElement('option');
       opt.value = c.id;
       opt.textContent = c.nome;
-      if (normInitial && normStrD(c.id) === normInitial) opt.selected = true;
+      if (normInitial && window.CV.util.normalize(c.id).trim() === normInitial) opt.selected = true;
       cidadeSel.appendChild(opt);
     });
     cidadeSel.disabled = false;
@@ -287,10 +283,6 @@
     return rangeGap(docStart, docEnd, refStart, refEnd) <= tolerance;
   }
 
-  function normDocText(s) {
-    return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
-  }
-
   function sourceSelectFor(root, key) {
     return root.querySelector('[data-evento-doc-field="' + key + '"]');
   }
@@ -352,7 +344,7 @@
 
     function render() {
       var selected = selectedIdsFromSelect(select);
-      var term = normDocText(search ? search.value : '');
+      var term = window.CV.util.normalize(search ? search.value : '');
       var tokens = term.split(/\s+/).filter(Boolean);
 
       var visible = items.filter(function (summary) {
@@ -360,7 +352,7 @@
         // Documentos já vinculados aparecem sempre; os demais respeitam o filtro de datas.
         if (!isSelected && !passesDateFilter(summary, eventStart, eventEnd, tolerance)) return false;
         if (!tokens.length) return true;
-        var haystack = normDocText(summary.search_text || (summary.title + ' ' + summary.meta));
+        var haystack = window.CV.util.normalize(summary.search_text || (summary.title + ' ' + summary.meta));
         return tokens.every(function (token) { return haystack.indexOf(token) !== -1; });
       });
 
