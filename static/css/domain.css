@@ -80,7 +80,7 @@
 }
 
 .route-summary {
-  /* Conteudo interno: .roteiro-detail__grid (app-page.css) ate migrarmos grid para ca. */
+  /* Conteudo interno do detalhe de roteiro permanece no componente de domínio. */
 }
 
 .route-summary[data-route-summary] {
