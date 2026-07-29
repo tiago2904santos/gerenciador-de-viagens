@@ -8,7 +8,6 @@ from urllib.parse import urlencode
 from django.contrib import messages
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import Q
-from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -17,9 +16,7 @@ from django.utils.dateparse import parse_date
 from django.views.decorators.http import require_GET
 from django.views.decorators.http import require_http_methods
 
-from core.normalizers import remove_accents
 from core.pagination import contexto_paginacao
-from core.tenancy import filter_queryset_by_area
 from documentos.services.responses import build_inline_pdf_response_from_download_response
 from documentos.services.types import DocumentoTipo
 from eventos.services import build_evento_document_seed
@@ -28,6 +25,8 @@ from eventos.services import resolve_evento_from_request
 from .forms import OrdemServicoForm
 from .models import OrdemServico
 from .presenters import apresentar_ordem_servico_card
+from .selectors import get_ordem_servico_by_id
+from .selectors import listar_ordens_servico
 from .services import gerar_os_docx_response
 from .services import gerar_os_pdf_response
 
@@ -51,9 +50,7 @@ def _roteiro_destino_label(item):
 
 
 def index(request):
-    from django.db.models import OuterRef
     from core import documento_abas as tabs
-    from prestacoes_contas.models import PrestacaoServidor
 
     q = request.GET.get("q", "").strip()
     aba = tabs.normalizar_aba(request.GET.get("aba", ""))
@@ -61,47 +58,13 @@ def index(request):
     viagem_ate = request.GET.get("viagem_ate", "").strip()
     sort = request.GET.get("sort", "").strip()
 
-    ordens = filter_queryset_by_area(OrdemServico.objects).prefetch_related(
-        "destinos__estado",
-        "servidores__cargo",
-        "servidores__unidade",
-        "oficios",
+    ordens = listar_ordens_servico(
+        q=q or None,
+        viagem_de=parse_date(viagem_de) if viagem_de else None,
+        viagem_ate=parse_date(viagem_ate) if viagem_ate else None,
+        sort=sort or None,
     )
-    if q:
-        q_unaccent = remove_accents(q)
-        filters = (
-            Q(motivo__unaccent__icontains=q_unaccent)
-            | Q(destinos__nome__unaccent__icontains=q_unaccent)
-            | Q(servidores__nome__unaccent__icontains=q_unaccent)
-        )
-        if q.isdigit():
-            filters |= Q(numero=int(q)) | Q(ano=int(q)) | Q(oficios__numero=int(q))
-        ordens = ordens.filter(filters).distinct()
 
-    viagem_de_date = parse_date(viagem_de) if viagem_de else None
-    viagem_ate_date = parse_date(viagem_ate) if viagem_ate else None
-    if viagem_de_date:
-        ordens = ordens.filter(Q(data_evento_fim__gte=viagem_de_date) | Q(data_evento_fim__isnull=True))
-    if viagem_ate_date:
-        ordens = ordens.filter(data_evento_inicio__lte=viagem_ate_date)
-
-    sort_map = {
-        "numero_desc": ("-ano", "-numero"),
-        "numero_asc": ("ano", "numero"),
-        "criacao_desc": ("-created_at",),
-        "criacao_asc": ("created_at",),
-        "viagem_asc": ("data_evento_inicio", "-ano", "-numero"),
-        "viagem_desc": ("-data_evento_inicio", "-ano", "-numero"),
-    }
-    ordens = ordens.order_by(*sort_map.get(sort or "numero_desc", sort_map["numero_desc"]))
-
-    # Abas: Finalizado = todas as prestações dos ofícios (não cancelados)
-    # vinculados à OS já finalizadas.
-    sub = PrestacaoServidor.objects.filter(
-        prestacao__oficio__ordens_servico=OuterRef("pk"),
-        prestacao__oficio__cancelado=False,
-    )
-    ordens = tabs.anotar_finalizacao(ordens, sub, sub.filter(finalizada=False))
     cancelado_q = Q(cancelado=True)
     date_field = "data_evento_inicio"
     lista = ordens.filter(tabs.q_da_aba(aba, date_field=date_field, cancelado_q=cancelado_q))
@@ -143,22 +106,6 @@ def index(request):
             **paginacao,
         },
     )
-
-def _os_queryset():
-    return (
-        filter_queryset_by_area(OrdemServico.objects)
-        .select_related(
-            "motorista_equipe",
-            "tecnico_equipe",
-            "apoio_montagem",
-            "apoio_escolta",
-            "coordenador_cerimonial",
-            "apoio_cerimonial",
-            "apoio_preparacao",
-        )
-        .prefetch_related("destinos__estado", "servidores", "oficios")
-    )
-
 
 def _evento_etapa_url(evento_id):
     if evento_id:
@@ -458,7 +405,7 @@ def nova(request):
 
 @require_http_methods(["GET", "POST"])
 def editar(request, pk):
-    ordem = get_object_or_404(_os_queryset(), pk=pk)
+    ordem = get_ordem_servico_by_id(pk)
     if request.method == "POST":
         form = OrdemServicoForm(request.POST, instance=ordem)
         if form.is_valid():
@@ -472,19 +419,19 @@ def editar(request, pk):
 
 @require_http_methods(["GET"])
 def baixar_docx(request, pk):
-    ordem = get_object_or_404(_os_queryset(), pk=pk)
+    ordem = get_ordem_servico_by_id(pk)
     return gerar_os_docx_response(ordem)
 
 
 @require_GET
 def baixar_pdf(request, pk):
-    ordem = get_object_or_404(_os_queryset(), pk=pk)
+    ordem = get_ordem_servico_by_id(pk)
     return gerar_os_pdf_response(ordem)
 
 
 @require_GET
 def pdf_inline(request, pk):
-    ordem = get_object_or_404(_os_queryset(), pk=pk)
+    ordem = get_ordem_servico_by_id(pk)
     reference = (
         f"os-{ordem.numero:03d}-{ordem.ano}"
         if ordem.numero and ordem.ano
@@ -501,7 +448,7 @@ def pdf_inline(request, pk):
 
 @require_http_methods(["POST"])
 def excluir(request, pk):
-    ordem = get_object_or_404(_os_queryset(), pk=pk)
+    ordem = get_ordem_servico_by_id(pk)
     numero = ordem.numero_formatado
     ordem.delete()
     messages.success(request, f"Ordem de Serviço {numero} excluída.")

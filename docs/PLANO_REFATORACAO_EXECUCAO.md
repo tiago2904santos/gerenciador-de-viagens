@@ -409,7 +409,9 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
   - [x] **termos** — `termos/selectors.py` com 5 consultas; `_termo_queryset()` e os
     13 `get_object_or_404` da view saíram. Catraca: **46 → 40**. Lista, lista com
     busca e formulário de edição com contagem de queries fixada em teste.
-  - [ ] ordens_servico (3) · planos_trabalho (5)
+  - [x] **ordens_servico** — `ordens_servico/selectors.py` com 3 consultas; catraca
+    **40 → 37**. Lista, lista com busca e formulário de edição fixados em teste.
+  - [ ] planos_trabalho (5)
 - [ ] `P-02` `core/catalog.py` e migração dos 13 catálogos
 - [x] `P-04` **widget base com classes canônicas** (pré-requisito das Etapas 6 e 7) —
   19 contratos CSS centralizados em `core/forms/widgets.py`; 194 `attrs` migrados
