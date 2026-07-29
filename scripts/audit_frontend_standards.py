@@ -13,6 +13,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 TEMPLATES_DIR = ROOT / "templates"
 CSS_DIR = ROOT / "static" / "css"
+JS_DIR = ROOT / "static" / "js"
 
 # ---------------------------------------------------------------------------
 # Exceções documentadas — chave: caminho relativo ao ROOT (posix)
@@ -122,6 +123,24 @@ CSS_RULES_AVISO = [
 ]
 
 # ---------------------------------------------------------------------------
+# Regras de JavaScript
+# ---------------------------------------------------------------------------
+
+JS_HTTP_OWNER = "static/js/core/http.js"
+JS_RULES_ERRO = [
+    (
+        "raw_fetch",
+        re.compile(r"\bfetch\s*\("),
+        "fetch() cru — usar CV.http",
+    ),
+    (
+        "duplicated_csrf_header",
+        re.compile(r"""["']X-CSRFToken["']"""),
+        "Cabeçalho CSRF fora do núcleo — usar CV.http",
+    ),
+]
+
+# ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
@@ -202,6 +221,25 @@ def audit_css() -> list[tuple]:
     return findings
 
 
+def audit_js() -> list[tuple]:
+    findings = []
+    for path in sorted(JS_DIR.rglob("*.js")):
+        rp = rel(path)
+        if rp == JS_HTTP_OWNER:
+            continue
+        try:
+            lines = path.read_text(encoding="utf-8").splitlines()
+        except UnicodeDecodeError:
+            lines = path.read_text(encoding="latin-1").splitlines()
+
+        for idx, line in enumerate(lines, start=1):
+            for rule_name, pattern, message in JS_RULES_ERRO:
+                if pattern.search(line):
+                    findings.append(("ERRO", rp, idx, rule_name, message, line.strip(), ""))
+
+    return findings
+
+
 # ---------------------------------------------------------------------------
 # Relatório
 # ---------------------------------------------------------------------------
@@ -251,7 +289,8 @@ def main() -> None:
 
     template_findings = audit_templates()
     css_findings = audit_css()
-    all_findings = template_findings + css_findings
+    js_findings = audit_js()
+    all_findings = template_findings + css_findings + js_findings
 
     if not all_findings:
         print("Nenhuma suspeita encontrada. ✅")

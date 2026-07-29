@@ -3,11 +3,6 @@
 
   var CITIES_CACHE = {};
 
-  function getCookie(name) {
-    var match = document.cookie.match(new RegExp("(^|;\\s*)" + name + "=([^;]*)"));
-    return match ? decodeURIComponent(match[2]) : "";
-  }
-
   /* ── cv-search-picker: reset + reinit ──────────────────────── */
 
   function resetPicker(select) {
@@ -88,12 +83,12 @@
     clearCitySelect(form, citySelect);
 
     var url = urlTemplate.replace("/0/", "/" + encodeURIComponent(state) + "/");
-    return fetch(url, { headers: { Accept: "application/json" } })
-      .then(function (response) {
-        if (!response.ok) {
+    return window.CV.http.fetchJson(url, { headers: { Accept: "application/json" } })
+      .then(function (result) {
+        if (!result.ok) {
           throw new Error("Falha ao carregar cidades");
         }
-        return response.json();
+        return result.data;
       })
       .then(function (data) {
         if (citySelect.dataset.ptCitiesRequest !== requestToken) {
@@ -752,18 +747,14 @@
       chegada_sede_hora: fieldValue(scope, "chegada_sede_hora"),
       total_efetivo: totalEfetivo(scope),
     };
-    fetch(url, {
+    window.CV.http.fetchJson(url, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": getCookie("csrftoken"),
-      },
-      body: JSON.stringify(payload),
+      body: payload,
     })
-      .then(function (response) { return response.json(); })
-      .then(function (data) {
+      .then(function (result) {
+        var data = result.data || {};
         var errosEl = scope.querySelector("[data-pt-diarias-erros]");
-        if (!data.ok) {
+        if (!result.ok || !data.ok) {
           setText(scope, "[data-pt-resultado-composicao]", "—");
           setText(scope, "[data-pt-resultado-efetivo]", "—");
           setText(scope, "[data-pt-resultado-unitario]", "—");

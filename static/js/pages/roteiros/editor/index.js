@@ -37,7 +37,6 @@ export function initRoteirosEditor() {
   routes.forEach(function(item) { routeMap[String(item.id)] = item; });
   var apiCidades = form.dataset.apiCidadesUrl || '';
   var apiDiarias = form.dataset.apiDiariasUrl || '';
-  var csrf = (form.querySelector('input[name="csrfmiddlewaretoken"]') || {}).value || '';
   var urlTrechosEstimar = form.dataset.urlTrechosEstimar || '';
   var urlCalcularRotaPreview = form.dataset.apiCalcularRotaPreviewUrl || '';
   var autosaveIdInput = $('id_autosave_obj_id');
@@ -74,23 +73,6 @@ export function initRoteirosEditor() {
       trechos.length
     );
   };
-  function readJsonResponse(resp) {
-    var contentType = (resp.headers && resp.headers.get('content-type')) || '';
-    if (contentType.indexOf('application/json') !== -1) {
-      return resp.json().then(function(data) { return { ok: resp.ok, data: data }; });
-    }
-    return resp.text().then(function() {
-      return {
-        ok: false,
-        data: {
-          ok: false,
-          error: resp.status === 401
-            ? 'Sessao expirada. Faca login novamente para continuar.'
-            : 'O servidor retornou uma resposta invalida para a calculadora.'
-        }
-      };
-    });
-  }
   var autosave = window.AppAutosave ? window.AppAutosave.registerForm(form, {
     model: 'roteiro',
     statusElement: autosaveStatus
@@ -521,7 +503,9 @@ export function initRoteirosEditor() {
       return Promise.resolve();
     }
     select.disabled = true;
-    return fetch(cidadesUrl(estadoId)).then(function(r) { return r.json(); }).then(function(data) {
+    return window.CV.http.fetchJson(cidadesUrl(estadoId)).then(function(result) {
+      if (!result.ok) throw new Error('Falha ao carregar cidades');
+      var data = result.data || [];
       var cidades = Array.isArray(data) ? data : (data.cidades || []);
       citiesCache[String(estadoId)] = cidades;
       applyCities(cidades);
@@ -857,16 +841,11 @@ export function initRoteirosEditor() {
       return seq.then(function() {
         var ocid = card.dataset.origemCidadeId;
         var dcid = card.dataset.destinoCidadeId;
-        return fetch(urlTrechosEstimar, {
+        return window.CV.http.fetchJson(urlTrechosEstimar, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': csrf,
-            'X-Requested-With': 'XMLHttpRequest'
-          },
-          credentials: 'same-origin',
-          body: JSON.stringify({ origem_cidade_id: parseInt(ocid, 10), destino_cidade_id: parseInt(dcid, 10) })
-        }).then(readJsonResponse).then(function(result) {
+          form: form,
+          body: { origem_cidade_id: parseInt(ocid, 10), destino_cidade_id: parseInt(dcid, 10) }
+        }).then(function(result) {
           var data = result && result.data;
           if (!data || !data.ok) return;
           applyEstimarPayloadToTrechoCard(card, data);
@@ -1580,15 +1559,11 @@ export function initRoteirosEditor() {
       errPre.classList.add('d-none');
     }
     setDiariasStatus('pending', 'Calculando diárias...');
-    return fetch(apiDiarias, {
+    return window.CV.http.fetchJson(apiDiarias, {
       method: 'POST',
-      headers: {
-        'X-CSRFToken': csrf,
-        'X-Requested-With': 'XMLHttpRequest'
-      },
-      credentials: 'same-origin',
+      form: form,
       body: collectDiariasFormData()
-    }).then(readJsonResponse)
+    })
       .then(function(result) {
         if (!result.ok || !result.data || !result.data.ok) {
           var errs = (result.data && result.data.errors) || [];

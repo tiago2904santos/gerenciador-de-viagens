@@ -547,28 +547,11 @@
       return;
     }
 
-    var request =
-      window.CV && window.CV.http && window.CV.http.fetchJson
-        ? window.CV.http.fetchJson(targetUrl, {
-            method: 'POST',
-            form: form,
-            body: payload,
-          })
-        : fetch(targetUrl, {
-            method: 'POST',
-            credentials: 'same-origin',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-CSRFToken':
-                (form.querySelector('[name=csrfmiddlewaretoken]') || {}).value || '',
-              'X-Requested-With': 'XMLHttpRequest',
-            },
-            body: JSON.stringify(payload),
-          }).then(function (r) {
-            return r.json().then(function (body) {
-              return { ok: r.ok, status: r.status, data: body };
-            });
-          });
+    var request = window.CV.http.fetchJson(targetUrl, {
+      method: 'POST',
+      form: form,
+      body: payload,
+    });
 
     request
       .then(function (res) {

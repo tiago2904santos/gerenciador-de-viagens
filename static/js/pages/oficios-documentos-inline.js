@@ -83,11 +83,9 @@
       var url = btn.getAttribute(urlAttr);
       if (!url) return;
       btn.disabled = true;
-      fetch(url, { headers: { Accept: "application/json" }, credentials: "same-origin" })
-        .then(function (r) {
-          return r.json().then(function (body) {
-            return { okHttp: r.ok, status: r.status, body: body };
-          });
+      window.CV.http.fetchJson(url, { headers: { Accept: "application/json" } })
+        .then(function (result) {
+          return { okHttp: result.ok, status: result.status, body: result.data || {} };
         })
         .then(function (res) {
           var b = res.body || {};

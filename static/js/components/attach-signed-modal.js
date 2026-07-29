@@ -197,12 +197,9 @@
 
     function removeCurrentSigned() {
       if (!currentRemoveUrl || !form) return;
-      var csrfInput = form.querySelector('input[name="csrfmiddlewaretoken"]');
-      var token = csrfInput ? csrfInput.value : "";
-      fetch(currentRemoveUrl, {
+      window.CV.http.request(currentRemoveUrl, {
         method: "POST",
-        credentials: "same-origin",
-        headers: { "X-CSRFToken": token },
+        form: form,
       }).then(function () {
         window.location.reload();
       });

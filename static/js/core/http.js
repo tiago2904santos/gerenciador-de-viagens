@@ -65,7 +65,7 @@
     return { body: JSON.stringify(body), headers: nextHeaders };
   }
 
-  function fetchJson(url, options) {
+  function request(url, options) {
     options = options || {};
     var headers = Object.assign(
       { 'X-Requested-With': 'XMLHttpRequest' },
@@ -76,13 +76,20 @@
       headers['X-CSRFToken'] = token;
     }
     var prepared = prepareBody(options.body, headers);
-    return fetch(url, {
+    var requestOptions = Object.assign({}, options, {
       method: options.method || 'GET',
       credentials: 'same-origin',
       headers: prepared.headers,
       body: prepared.body,
-      signal: options.signal,
-    }).then(function (response) {
+    });
+    delete requestOptions.form;
+    delete requestOptions.rawResponse;
+    return fetch(url, requestOptions);
+  }
+
+  function fetchJson(url, options) {
+    options = options || {};
+    return request(url, options).then(function (response) {
       if (options.rawResponse) {
         return response;
       }
@@ -90,10 +97,20 @@
     });
   }
 
+  function fetchText(url, options) {
+    return request(url, options).then(function (response) {
+      return response.text().then(function (data) {
+        return { ok: response.ok, status: response.status, data: data, response: response };
+      });
+    });
+  }
+
   window.CV.http = {
     getCookie: getCookie,
     getCsrfToken: getCsrfToken,
     readJsonResponse: readJsonResponse,
+    request: request,
     fetchJson: fetchJson,
+    fetchText: fetchText,
   };
 })();

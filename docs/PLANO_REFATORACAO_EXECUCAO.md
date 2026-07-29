@@ -328,7 +328,11 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
 - [ ] `J-01` registrar 8 componentes como enhancer
 - [ ] `J-04` Quick Add/Quick Edit como enhancer
 - [ ] `J-03` um motor de filtro por lista (`data-collection-mode`)
-- [ ] `J-07` migrar 13 arquivos para `CV.http`; apagar 11 cópias de CSRF
+- [x] `J-07` migrados todos os consumidores para `CV.http`; `fetch()` e
+  `X-CSRFToken` agora só existem no núcleo `static/js/core/http.js`, com gate
+  bloqueante no auditor de CI. **NOVO — divergência da auditoria histórica:**
+  o inventário vivo encontrou 16 consumidores de `fetch()` (não 13) e 7
+  arquivos com `X-CSRFToken` (não 11); todos foram migrados.
 - [ ] `J-16` `CV.util` (−17 cópias) · `J-12` `CV.feedback` (−13 `alert`/`confirm`)
 - [ ] `H-01` + `J-08` `CV.locationRows` — fim das 6 cópias de destinos
 - [ ] `J-15` `CV.documentSource` · `CV.picker` · `CV.overlay`

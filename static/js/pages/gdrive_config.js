@@ -17,8 +17,6 @@
     const urlCriar = container.dataset.urlCriar;
     const urlDrives = container.dataset.urlDrives;
     const urlCompartilhadosComigo = container.dataset.urlCompartilhadosComigo;
-    const csrf = container.dataset.csrf;
-
     const btnMeuDrive = container.querySelector("#gdrive-btn-meu-drive");
     const btnDrivesCompartilhados = container.querySelector("#gdrive-btn-drives-compartilhados");
     const btnCompartilhadosComigo = container.querySelector("#gdrive-btn-compartilhados-comigo");
@@ -166,12 +164,9 @@
 
       try {
         const url = paiId ? `${urlListar}?pai_id=${encodeURIComponent(paiId)}` : urlListar;
-        const resp = await fetch(url, {
-          credentials: "same-origin",
-          headers: { "X-Requested-With": "XMLHttpRequest" },
-        });
-        const data = await resp.json();
-        if (!resp.ok) throw new Error(data.erro || "Erro ao carregar pastas");
+        const result = await window.CV.http.fetchJson(url);
+        const data = result.data || {};
+        if (!result.ok) throw new Error(data.erro || "Erro ao carregar pastas");
         renderFolders(data.pastas || []);
       } catch (err) {
         folderList.innerHTML = `<p class="gdrive-error">Erro: ${escapeHtml(String(err.message))}</p>`;
@@ -191,12 +186,9 @@
       updateBreadcrumb();
 
       try {
-        const resp = await fetch(urlDrives, {
-          credentials: "same-origin",
-          headers: { "X-Requested-With": "XMLHttpRequest" },
-        });
-        const data = await resp.json();
-        if (!resp.ok) throw new Error(data.erro || "Erro ao carregar Drives compartilhados");
+        const result = await window.CV.http.fetchJson(urlDrives);
+        const data = result.data || {};
+        if (!result.ok) throw new Error(data.erro || "Erro ao carregar Drives compartilhados");
         renderFolders(data.pastas || [], { sharedDriveIcon: true });
       } catch (err) {
         folderList.innerHTML = `<p class="gdrive-error">Erro: ${escapeHtml(String(err.message))}</p>`;
@@ -216,12 +208,9 @@
       updateBreadcrumb();
 
       try {
-        const resp = await fetch(urlCompartilhadosComigo, {
-          credentials: "same-origin",
-          headers: { "X-Requested-With": "XMLHttpRequest" },
-        });
-        const data = await resp.json();
-        if (!resp.ok) throw new Error(data.erro || "Erro ao carregar pastas compartilhadas comigo");
+        const result = await window.CV.http.fetchJson(urlCompartilhadosComigo);
+        const data = result.data || {};
+        if (!result.ok) throw new Error(data.erro || "Erro ao carregar pastas compartilhadas comigo");
         renderFolders(data.pastas || []);
       } catch (err) {
         folderList.innerHTML = `<p class="gdrive-error">Erro: ${escapeHtml(String(err.message))}</p>`;
@@ -279,18 +268,12 @@
       btnCriar.textContent = "Criando…";
 
       try {
-        const resp = await fetch(urlCriar, {
+        const result = await window.CV.http.fetchJson(urlCriar, {
           method: "POST",
-          credentials: "same-origin",
-          headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": csrf,
-            "X-Requested-With": "XMLHttpRequest",
-          },
-          body: JSON.stringify({ nome, pai_id: currentPaiId() || "" }),
+          body: { nome, pai_id: currentPaiId() || "" },
         });
-        const data = await resp.json();
-        if (!resp.ok) throw new Error(data.erro || "Erro ao criar pasta");
+        const data = result.data || {};
+        if (!result.ok) throw new Error(data.erro || "Erro ao criar pasta");
 
         novaPastaNome.value = "";
         newFolderPanel.hidden = true;
@@ -347,8 +330,9 @@
       btnPrevia.disabled = true;
       btnPrevia.textContent = "Carregando…";
       try {
-        const resp = await fetch(urlPrevia, { headers: { "X-Requested-With": "XMLHttpRequest" } });
-        const data = await resp.json();
+        const result = await window.CV.http.fetchJson(urlPrevia);
+        const data = result.data || {};
+        if (!result.ok) throw new Error(data.erro || "Falha ao carregar a prévia.");
         previaLista.innerHTML = "";
         if (data.erro) {
           previaAviso.hidden = false;
@@ -455,8 +439,9 @@
 
     async function poll() {
       try {
-        const resp = await fetch(urlStatus, { headers: { "X-Requested-With": "XMLHttpRequest" } });
-        const data = await resp.json();
+        const result = await window.CV.http.fetchJson(urlStatus);
+        const data = result.data || {};
+        if (!result.ok) throw new Error(data.erro || "Falha ao consultar o status.");
         render(data);
         if (data && data.existe && data.em_andamento) {
           timer = setTimeout(poll, 3000);

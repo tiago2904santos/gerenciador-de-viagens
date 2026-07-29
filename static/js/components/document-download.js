@@ -144,10 +144,7 @@
   async function downloadLink(trigger) {
     begin(trigger);
     try {
-      var response = await fetch(trigger.href, {
-        credentials: "same-origin",
-        headers: { "X-Requested-With": "XMLHttpRequest" },
-      });
+      var response = await window.CV.http.request(trigger.href);
       await consumeResponse(response, trigger);
       finish(trigger);
     } catch (error) {
@@ -171,11 +168,10 @@
   async function downloadForm(form, submitter) {
     begin(submitter);
     try {
-      var response = await fetch(form.action || window.location.href, {
+      var response = await window.CV.http.request(form.action || window.location.href, {
         method: (form.method || "post").toUpperCase(),
         body: formDataWithSubmitter(form, submitter),
-        credentials: "same-origin",
-        headers: { "X-Requested-With": "XMLHttpRequest" },
+        form: form,
       });
       await consumeResponse(response, submitter);
       finish(submitter);
