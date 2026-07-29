@@ -21,6 +21,7 @@ from roteiros.selectors import listar_cidades_para_select
 
 from oficios.presenters import apresentar_oficio_card
 from ordens_servico.presenters import apresentar_ordem_servico_card
+from ordens_servico.presenters import get_assinante_os
 from planos_trabalho.presenters import apresentar_plano_card
 from roteiros.presenters import apresentar_linha_lista_simples_roteiro
 from termos.presenters import apresentar_linha_lista_simples_termo
@@ -408,6 +409,11 @@ def detalhe(request, pk, etapa=1):
     if evento.periodo_display:
         evento_header_description += f" · {evento.periodo_display}"
     config = ConfiguracaoSistema.get_singleton()
+    # O assinante e o mesmo para todas as OS do evento, entao e resolvido uma
+    # vez — mas so quando ha OS. Resolver incondicionalmente custaria consulta
+    # em todo evento sem Ordem de Servico, que e a maioria.
+    ordens_do_evento = list(evento.ordens_servico.all())
+    assinante_os = get_assinante_os() if ordens_do_evento else None
     from django.urls import reverse as _reverse
     return render(
         request,
@@ -428,7 +434,10 @@ def detalhe(request, pk, etapa=1):
             ],
             "roteiro_rows": _roteiro_rows_do_evento(evento),
             "plano_cards": [apresentar_plano_card(plano) for plano in evento.planos_trabalho.all()],
-            "ordem_cards": [apresentar_ordem_servico_card(ordem) for ordem in evento.ordens_servico.all()],
+            "ordem_cards": [
+                apresentar_ordem_servico_card(ordem, assinante=assinante_os)
+                for ordem in ordens_do_evento
+            ],
             "termo_generico_rows": _termo_generico_rows_do_evento(evento),
             "termos_servidor_rows": _termos_servidor_rows_do_evento(evento),
             "sede_uf": config.uf if config else "",

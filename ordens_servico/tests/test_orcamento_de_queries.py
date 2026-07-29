@@ -25,6 +25,7 @@ from cadastros.models import Cidade
 from cadastros.models import Estado
 from cadastros.models import Servidor
 from cadastros.models import Unidade
+from oficios.models import Oficio
 from ordens_servico.models import OrdemServico
 
 
@@ -32,7 +33,10 @@ class OrcamentoDeQueriesOrdemServicoTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         estado = Estado.objects.create(nome="Parana", sigla="PR")
-        Cidade.objects.create(nome="Curitiba", estado=estado, uf="PR")
+        cidades = [
+            Cidade.objects.create(nome=nome, estado=estado, uf="PR")
+            for nome in ("Curitiba", "Londrina")
+        ]
         cargo = Cargo.objects.create(nome="Investigador")
         unidade = Unidade.objects.create(nome="Unidade", sigla="UN")
         servidores = [
@@ -55,7 +59,13 @@ class OrcamentoDeQueriesOrdemServicoTests(TestCase):
                 data_evento_inicio=inicio,
                 data_evento_fim=inicio + timedelta(days=1),
             )
+            # O card le destinos, servidores e oficios vinculados. Sem os tres
+            # o teste nao exercita os `prefetch_related` da lista — foi essa
+            # cegueira que escondeu o `NOVO-13` na lista de Plano de Trabalho.
             ordem.servidores.set(servidores)
+            ordem.destinos.set(cidades)
+            oficio = Oficio.objects.create(motorista=servidores[0])
+            ordem.oficios.set([oficio])
             if numero == 1:
                 cls.ordem = ordem
 
@@ -103,7 +113,10 @@ class OrcamentoDeQueriesOrdemServicoTests(TestCase):
             msg="\n".join(q["sql"] for q in queries.captured_queries),
         )
 
-    # Medidos no `main` em 29/07/2026, antes da camada de selectors.
-    QUERIES_LISTA = 137
-    QUERIES_LISTA_BUSCA = 137
-    QUERIES_EDITAR = 23
+    # Medidos no `main`. A primeira leitura (P-01) era 138/138/27 com este
+    # fixture; o `NOVO-07` derrubou a lista para 22 ao parar de consultar por
+    # card. O numero so desce daqui: se subir, alguem devolveu uma consulta
+    # para dentro do laco dos cards.
+    QUERIES_LISTA = 22
+    QUERIES_LISTA_BUSCA = 22
+    QUERIES_EDITAR = 26

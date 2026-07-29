@@ -25,6 +25,7 @@ from eventos.services import resolve_evento_from_request
 from .forms import OrdemServicoForm
 from .models import OrdemServico
 from .presenters import apresentar_ordem_servico_card
+from .presenters import get_assinante_os
 from .selectors import get_ordem_servico_by_id
 from .selectors import listar_ordens_servico
 from .services import gerar_os_docx_response
@@ -75,7 +76,12 @@ def index(request):
     )
 
     paginacao = contexto_paginacao(lista, request, ORDENS_POR_PAGINA)
-    cards = [apresentar_ordem_servico_card(ordem) for ordem in paginacao["page_obj"].object_list]
+    # Um assinante por pagina, nao um por card (`NOVO-07`).
+    assinante = get_assinante_os()
+    cards = [
+        apresentar_ordem_servico_card(ordem, assinante=assinante)
+        for ordem in paginacao["page_obj"].object_list
+    ]
     has_filters = any([q, viagem_de, viagem_ate, sort])
 
     return render(

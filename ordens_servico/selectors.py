@@ -9,15 +9,28 @@ ordenação. O custo em queries está travado em
 from __future__ import annotations
 
 from django.db.models import OuterRef
+from django.db.models import Prefetch
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
+from cadastros.models import Cidade
 from core import documento_abas as tabs
 from core.normalizers import remove_accents
 from core.tenancy import filter_queryset_by_area
 from prestacoes_contas.models import PrestacaoServidor
 
 from .models import OrdemServico
+
+
+# `destinos` e M2M para Cidade. O presenter do card precisa deles ordenados por
+# nome e com o estado junto; pedir isso aqui, no `Prefetch`, e o que permite ele
+# usar `ordem.destinos.all()` — qualquer `.select_related()`/`.order_by()` no
+# related manager descarta o cache do prefetch e emite uma query por card
+# (`NOVO-07`).
+_DESTINOS_DO_CARD = Prefetch(
+    "destinos",
+    queryset=Cidade.objects.select_related("estado").order_by("nome"),
+)
 
 
 _SORT_MAP = {
@@ -37,7 +50,7 @@ def listar_ordens_servico(q=None, viagem_de=None, viagem_ate=None, sort=None):
     cai; a view continua dona de *qual* aba mostrar.
     """
     ordens = filter_queryset_by_area(OrdemServico.objects).prefetch_related(
-        "destinos__estado",
+        _DESTINOS_DO_CARD,
         "servidores__cargo",
         "servidores__unidade",
         "oficios",
@@ -83,7 +96,7 @@ def queryset_ordem_servico_detalhe():
             "apoio_cerimonial",
             "apoio_preparacao",
         )
-        .prefetch_related("destinos__estado", "servidores", "oficios")
+        .prefetch_related(_DESTINOS_DO_CARD, "servidores", "oficios")
     )
 
 
