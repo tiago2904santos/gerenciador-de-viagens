@@ -23,27 +23,45 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            set -euo pipefail
+            set -Eeuo pipefail
             cd /var/www/gerenciador-viagens/app
             BEFORE_SHA="$(git rev-parse HEAD)"
             TARGET_SHA="${{ github.event.workflow_run.head_sha }}"
-            git fetch origin "$TARGET_SHA"
-            git checkout --detach "$TARGET_SHA"
             source /var/www/gerenciador-viagens/venv/bin/activate
             set -a
             source .env
             set +a
-            python -m pip install -r requirements/lock.txt --quiet
+
+            # Pré-checagens: qualquer coisa que falte precisa abortar ANTES do
+            # checkout, senão produção fica com código novo e serviço antigo.
+            : "${DB_NAME:?DB_NAME ausente no .env da VPS}"
+            : "${BACKUP_ENCRYPTION_KEY:?BACKUP_ENCRYPTION_KEY ausente no .env da VPS}"
+
+            git fetch origin "$TARGET_SHA"
+
+            # Backup antes do checkout: o snapshot precisa ser do estado que
+            # está no ar, não do commit que ainda vai entrar.
             APP_ROOT=/var/www/gerenciador-viagens/app \
               bash scripts/backup_production.sh
-            python manage.py migrate --noinput
-            python manage.py collectstatic --noinput --clear
-            systemctl restart gerenciador-viagens
-            systemctl restart gerenciador-viagens-celery
-            if ! curl --fail --silent --show-error --max-time 15 http://127.0.0.1:8000/health/; then
+
+            reverter() {
+              echo "deploy falhou — revertendo para $BEFORE_SHA"
               git checkout --detach "$BEFORE_SHA"
               python -m pip install -r requirements/lock.txt --quiet
               systemctl restart gerenciador-viagens
               systemctl restart gerenciador-viagens-celery
+            }
+            trap 'reverter; exit 1' ERR
+
+            git checkout --detach "$TARGET_SHA"
+            python -m pip install -r requirements/lock.txt --quiet
+            python manage.py migrate --noinput
+            python manage.py collectstatic --noinput --clear
+            systemctl restart gerenciador-viagens
+            systemctl restart gerenciador-viagens-celery
+
+            trap - ERR
+            if ! curl --fail --silent --show-error --max-time 15 http://127.0.0.1:8000/health/; then
+              reverter
               exit 1
             fi
