@@ -293,6 +293,9 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
   Drive com estado: operações idempotentes, árvore/arquivo existente, ausência
   de arquivo, resposta parcial, falha transitória com retry, atalhos/IDs
   persistidos e prevenção de pasta órfã.
+- [x] `NOVO-16` — o contrato de pasta órfã criava evento sem `titulo`, entrada
+  que deve ser *no-op* até a Etapa 1 ficar completa; a fixture passou a cumprir
+  o portão real (`titulo` + data + destino), restaurando a suíte verde.
 
 ### Etapa 3 — Regra de negócio
 - [x] `N-01` tabela de diárias com vigência — **as 3 partes** concluídas: o modelo
