@@ -471,7 +471,9 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
 - [x] `P-05` `core/errors.py` + varredura dos handlers genéricos do Drive —
   inventário vivo corrigido de 57 para 64; todos chamam captura estruturada
   como primeira instrução e o CI bloqueia regressões por análise da AST.
-- [ ] `P-06` fatiar `planos_trabalho/views.py` e `oficios/views.py`
+- [x] `P-06` fatiar `planos_trabalho/views.py` e `oficios/views.py` — fachadas
+  reduzidas a 43/38 linhas, 12 módulos por tela abaixo de 500 linhas, imports
+  públicos preservados e catraca P-01 adaptada sem esconder as 32 ocorrências.
 - [x] `P-07` `__str__` em `core` — o inventário histórico contou 3 classes,
   mas `TimeStampedModel` e `CancelavelModel` são abstratas; só `AuditEvent` é
   model concreto. Sua representação agora identifica ação, model, ID e objeto,

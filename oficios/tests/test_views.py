@@ -134,7 +134,7 @@ class OficioViewsTests(TestCase):
         },
     )
     @mock.patch("oficios.services.validar_oficio_para_documento", return_value={"status": "complete", "pendencias": []})
-    @mock.patch("oficios.views.validar_oficio_para_documento", return_value={"status": "complete", "pendencias": []})
+    @mock.patch("oficios.wizard_document_views.validar_oficio_para_documento", return_value={"status": "complete", "pendencias": []})
     def test_wizard_documentos_exibe_baixar_docx_no_documento_original(
         self,
         _m_view_val,
@@ -170,7 +170,7 @@ class OficioViewsTests(TestCase):
         },
     )
     @mock.patch("oficios.services.validar_oficio_para_documento", return_value={"status": "complete", "pendencias": []})
-    @mock.patch("oficios.views.validar_oficio_para_documento", return_value={"status": "complete", "pendencias": []})
+    @mock.patch("oficios.wizard_document_views.validar_oficio_para_documento", return_value={"status": "complete", "pendencias": []})
     def test_wizard_documentos_exibe_baixar_docx_na_justificativa(
         self,
         _m_view_val,
@@ -228,7 +228,7 @@ class OficioViewsTests(TestCase):
 
     @mock.patch("documentos.services.warm_cache.ensure_document_artifact_cached")
     @mock.patch("oficios.services.validar_oficio_para_documento", return_value={"status": "complete", "pendencias": []})
-    @mock.patch("oficios.views.validar_oficio_para_documento", return_value={"status": "complete", "pendencias": []})
+    @mock.patch("oficios.wizard_document_views.validar_oficio_para_documento", return_value={"status": "complete", "pendencias": []})
     def test_wizard_documentos_footer_mostra_voltar_e_finalizar_quando_sem_pendencias(
         self,
         _m_view_val,
@@ -258,7 +258,7 @@ class OficioViewsTests(TestCase):
 
     @mock.patch("documentos.services.warm_cache.ensure_document_artifact_cached")
     @mock.patch("oficios.services.validar_oficio_para_documento", return_value={"status": "incomplete", "pendencias": ["Pendencia de teste"]})
-    @mock.patch("oficios.views.validar_oficio_para_documento", return_value={"status": "incomplete", "pendencias": ["Pendencia de teste"]})
+    @mock.patch("oficios.wizard_document_views.validar_oficio_para_documento", return_value={"status": "incomplete", "pendencias": ["Pendencia de teste"]})
     def test_wizard_documentos_footer_mostra_voltar_e_salvar_rascunho_quando_ha_pendencias(
         self,
         _m_view_val,
@@ -300,7 +300,7 @@ class OficioViewsTests(TestCase):
 
     @mock.patch("documentos.services.warm_cache.ensure_document_artifact_cached")
     @mock.patch("oficios.services.validar_oficio_para_documento", return_value={"status": "complete", "pendencias": []})
-    @mock.patch("oficios.views.validar_oficio_para_documento", return_value={"status": "complete", "pendencias": []})
+    @mock.patch("oficios.wizard_document_views.validar_oficio_para_documento", return_value={"status": "complete", "pendencias": []})
     @mock.patch(
         "oficios.document_generation.get_document_generation_status",
         return_value={
@@ -350,7 +350,7 @@ class OficioViewsTests(TestCase):
 
     @mock.patch("documentos.services.warm_cache.ensure_document_artifact_cached")
     @mock.patch("oficios.services.validar_oficio_para_documento", return_value={"status": "complete", "pendencias": []})
-    @mock.patch("oficios.views.validar_oficio_para_documento", return_value={"status": "complete", "pendencias": []})
+    @mock.patch("oficios.wizard_document_views.validar_oficio_para_documento", return_value={"status": "complete", "pendencias": []})
     @mock.patch(
         "oficios.document_generation.get_document_generation_status",
         return_value={
@@ -425,7 +425,7 @@ class OficioViewsTests(TestCase):
 
     @mock.patch("documentos.services.warm_cache.ensure_document_artifact_cached")
     @mock.patch("oficios.services.validar_oficio_para_documento", return_value={"status": "complete", "pendencias": []})
-    @mock.patch("oficios.views.validar_oficio_para_documento", return_value={"status": "complete", "pendencias": []})
+    @mock.patch("oficios.wizard_document_views.validar_oficio_para_documento", return_value={"status": "complete", "pendencias": []})
     @mock.patch(
         "oficios.document_generation.get_document_generation_status",
         return_value={

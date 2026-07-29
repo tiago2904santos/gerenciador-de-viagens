@@ -84,14 +84,22 @@ core/ → infraestrutura compartilhada (tenancy, permissions, autosave, entity_c
 
 | Arquivo | Linhas | Defs | ORM direto |
 |---|---|---|---|
-| `planos_trabalho/views.py` | **1.235** | 46 | 5 |
-| `oficios/views.py` | **1.170** | 37 | 3 |
+| `planos_trabalho/views.py` | **43** | 0 | 0 ✅ |
+| `oficios/views.py` | **38** | 0 | 0 ✅ |
 | `cadastros/views.py` | 820 | 33 | 0 ✅ |
 | `roteiros/views.py` | 713 | 18 | 1 |
 | `prestacoes_contas/views.py` | 649 | 16 | 2 |
 | `eventos/views.py` | 637 | 24 | **17** |
 | `termos/views.py` | — | — | 7 |
 | `ordens_servico/views.py` | — | — | 7 |
+
+**Resolvido (P-06):** as duas fachadas públicas agora apenas reexportam os
+callables usados pelas URLs e pelos imports legados. Os fluxos foram divididos
+em 12 módulos coesos de lista, identificação/viajantes, diárias, roteiro,
+atividades, documentos, API e helpers. O maior módulo novo tem 401 linhas;
+testes estruturais limitam as fachadas a 160 e cada módulo a 500. A catraca
+P-01 acompanha explicitamente os arquivos fatiados, mantendo as 32 ocorrências
+ORM conhecidas em vez de escondê-las pela troca do nome do arquivo.
 
 **Selectors existem em 6 apps** (`cadastros`, `documentos`, `justificativas`, `oficios`, `prestacoes_contas`, `roteiros`) **e faltam exatamente nos apps que mais fazem ORM na view**: `eventos` (17 chamadas), `termos` (7), `ordens_servico` (7), `planos_trabalho` (5). O padrão existe, está documentado, e a metade nova do sistema o ignora.
 
@@ -287,7 +295,7 @@ Pares off-by-one (`720/721`, `840/841`, `1180/1181`, `767/768`, `599/600`, `479/
 | P-03 | 🟠 | `roteiros`, `termos`, `justificativas` com **0 constraints e 0 indexes**; dedupe de roteiro feito em aplicação | §3.3 |
 | P-04 | ✅ | 194 classes de widget centralizadas em `core/forms/widgets.py`, sem alteração do HTML emitido | §3.4 |
 | P-05 | ✅ | 64 handlers genéricos do Google Drive cobertos por captura estruturada obrigatória e gate AST no CI | §3.5 |
-| P-06 | 🟡 | `planos_trabalho/views.py` (1.235 l.) e `oficios/views.py` (1.170 l.) monolíticos | §3.1 |
+| P-06 | ✅ | Fachadas de 43/38 linhas; fluxos de Planos e Ofícios distribuídos em 12 módulos por tela, com limites estruturais e catraca ORM preservada | §3.1 |
 | P-07 | ✅ | `AuditEvent` ganhou `__str__` com ação, model, ID e representação; a contagem histórica de 3 incluía 2 bases abstratas sem tabela | §3.3 |
 | P-08 | 🟡 | `diario_bordo` é um app-casca (1 URL, 1 placeholder, 0 models) — decidir: implementar ou remover | — |
 | S-01 | 🔴 | Chave Fernet literal commitada em `dev.py` | §4.2 |
@@ -318,12 +326,12 @@ Pares off-by-one (`720/721`, `840/841`, `1180/1181`, `767/768`, `599/600`, `479/
 |---|---|---|---|
 | **core** | 3.516 | ✅ é o padrão | Infra enxuta (996 l. somados). 3 models sem `__str__`. `SecurityHeadersMiddleware` sem CSP. |
 | **cadastros** | 5.894 | ✅ views sem ORM | 6 catálogos com CRUD repetido (P-02). 23 constraints ✅. Testes 0,16 ⚠️. |
-| **oficios** | 6.434 | ✅ referência | `views.py` 1.170 l. (P-06); `presenters.py` 1.051 l. — dividir por tela. Melhor suíte do sistema (3.308 l.). |
+| **oficios** | 6.434 | ✅ referência | `views.py` virou fachada de 38 linhas; fluxos divididos por lista, viajantes, roteiro, documentos e API (P-06). |
 | **eventos** | 2.485 | ❌ pior aderência | **17 ORM em views, sem selectors** (P-01). Testes 0,19. |
 | **roteiros** | 8.197 | ⚠️ services ✅, models ❌ | Maior app. **0 constraints/0 indexes** (P-03). Services bem divididos (`roteiro_editor`, `routing/`). |
 | **termos** | 2.294 | ⚠️ | 7 ORM em views, sem selectors; 0 constraints. |
 | **ordens_servico** | 2.053 | ⚠️ | 7 ORM em views, sem selectors. Testes 0,17. |
-| **planos_trabalho** | 5.379 | ⚠️ | `views.py` 1.235 l. (maior do sistema); sem selectors; 14 constraints ✅. Testes 0,17. |
+| **planos_trabalho** | 5.379 | ✅ | `views.py` virou fachada de 43 linhas; fluxos divididos por lista, identificação, diárias, atividades e documentos (P-06). |
 | **prestacoes_contas** | 8.238 | ⚠️ selectors ✅ | **Testes 0,04 (T-01)** — o gap mais perigoso do sistema. 29 migrações. |
 | **justificativas** | 984 | ✅ | 0 constraints (baixo risco — catálogo). |
 | **documentos** | 4.619 | ✅ | 5 motores PDF (D-01); melhor razão de testes (0,43). |
