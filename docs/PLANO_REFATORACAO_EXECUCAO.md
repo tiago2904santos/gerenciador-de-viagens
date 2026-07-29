@@ -396,7 +396,7 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
 > reconferir, não especificação. Cinco vezes ele não bateu.
 
 ### Etapa 4 — Backend de aderência
-- [ ] `P-01` selectors em eventos, termos, OS, PT + gate anti-ORM-em-view
+- [x] `P-01` selectors em eventos, termos, OS, PT + gate anti-ORM-em-view — **catraca 61 → 32**
   - [x] **eventos** — `eventos/selectors.py` com 13 consultas; as duas escritas que
     moravam na view (termo automático, anexo de solicitação) desceram para
     `services.py`. Catraca nova `--max-orm-em-view` no CI: **61 → 46**. As quatro
@@ -411,7 +411,11 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
     busca e formulário de edição com contagem de queries fixada em teste.
   - [x] **ordens_servico** — `ordens_servico/selectors.py` com 3 consultas; catraca
     **40 → 37**. Lista, lista com busca e formulário de edição fixados em teste.
-  - [ ] planos_trabalho (5)
+  - [x] **planos_trabalho** — `planos_trabalho/selectors.py` com 7 consultas; as duas
+    validações de vínculo do autosave de efetivo viraram selectors de existência
+    (`cargo_pertence_a_area`/`unidade_pertence_a_area`), não service: são consulta, e
+    com recorte por área. `catalog_views.py` (13 consultas) fica de fora de propósito —
+    é território do `P-02`, que apaga o arquivo. Catraca: **37 → 32**.
 - [x] **`NOVO-13` 🔴 lista de Plano de Trabalho quebrava com plano multi-evento** —
   `prefetch_related("eventos__destino_cidade__estado")` apontava para um campo que
   `EventoPlano` não tem. O Django só valida o segundo nível quando o primeiro traz

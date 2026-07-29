@@ -8,7 +8,6 @@ from django.db.models import Max
 from django.http import Http404
 from django.http import JsonResponse
 from django.http import QueryDict
-from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -33,7 +32,6 @@ from documentos.services.timing import measure_step
 from documentos.services.types import DocumentoFormato
 from documentos.services.types import DocumentoTipo
 from eventos.services import resolve_evento_from_request
-from core.tenancy import filter_queryset_by_area
 
 from .catalog_views import atividade_editar
 from .catalog_views import atividade_excluir
@@ -56,11 +54,15 @@ from .forms import PlanoIdentificacaoForm
 from .forms import PresetAtividadesQuickAddForm
 from .forms import ProgramaSolicitanteForm
 from .models import AtividadePlanoTrabalho
-from .models import EventoPlano
 from .models import PlanoTrabalho
 from .models import HorarioAtendimento
 from .models import PresetAtividadesPlanoTrabalho
 from .models import ProgramaSolicitante
+from .selectors import cargo_pertence_a_area
+from .selectors import get_evento_do_plano_by_id
+from .selectors import get_plano_by_id
+from .selectors import listar_planos_trabalho
+from .selectors import unidade_pertence_a_area
 from .presenters import apresentar_plano_card
 from .presenters import apresentar_resumo_documentos
 from .presenters import apresentar_resumo_evento_card
@@ -102,17 +104,7 @@ from .services import textos_padrao_templates
 
 
 def _get_plano(pk) -> PlanoTrabalho:
-    return get_object_or_404(
-        filter_queryset_by_area(PlanoTrabalho.objects).select_related(
-            "evento",
-            "programa",
-            "destino_estado",
-            "destino_cidade__estado",
-            "coordenador_adm__cargo",
-            "coordenador_op__cargo",
-        ).prefetch_related("destinos__cidade", "destinos__estado"),
-        pk=pk,
-    )
+    return get_plano_by_id(pk)
 
 
 def _wizard_normalizar_acao(post, *, default: str = "wizard_next") -> str:
@@ -288,9 +280,8 @@ def _autosave_form_errors(*forms):
 
 
 def index(request):
-    from django.db.models import OuterRef, Q
+    from django.db.models import Q
     from core import documento_abas as tabs
-    from prestacoes_contas.models import PrestacaoServidor
 
     q = request.GET.get("q", "").strip()
     status = request.GET.get("status", "").strip()
@@ -299,67 +290,14 @@ def index(request):
     viagem_ate = request.GET.get("viagem_ate", "").strip()
     sort = request.GET.get("sort", "").strip()
 
-    planos = filter_queryset_by_area(PlanoTrabalho.objects).select_related(
-        "programa",
-        "destino_cidade__estado",
-        "coordenador_adm__cargo",
-        "coordenador_op__cargo",
-    ).prefetch_related(
-        "atividades_selecionadas",
-        "efetivos",
-        "destinos__cidade__estado",
-        "eventos__programa",
-        "eventos__efetivos",
+    planos = listar_planos_trabalho(
+        q=q or None,
+        status=status or None,
+        viagem_de=parse_date(viagem_de) if viagem_de else None,
+        viagem_ate=parse_date(viagem_ate) if viagem_ate else None,
+        sort=sort or None,
     )
-    if status:
-        planos = planos.filter(status=status)
-    if q:
-        from django.db.models import Q
 
-        from core.normalizers import remove_accents
-
-        q_unaccent = remove_accents(q)
-        filtro = (
-            Q(destino_cidade__nome__unaccent__icontains=q_unaccent)
-            | Q(programa__nome__unaccent__icontains=q_unaccent)
-            | Q(programa_outros__unaccent__icontains=q_unaccent)
-            | Q(contextualizacao__unaccent__icontains=q_unaccent)
-        )
-        if q.isdigit():
-            filtro = filtro | Q(numero=int(q)) | Q(ano=int(q))
-        planos = planos.filter(filtro)
-
-    viagem_de_date = parse_date(viagem_de) if viagem_de else None
-    viagem_ate_date = parse_date(viagem_ate) if viagem_ate else None
-    if viagem_de_date:
-        planos = planos.filter(data_evento_fim__gte=viagem_de_date)
-    if viagem_ate_date:
-        planos = planos.filter(data_evento_inicio__lte=viagem_ate_date)
-
-    sort_map = {
-        "numero_desc": ("-ano", "-numero", "-created_at"),
-        "numero_asc": ("ano", "numero", "created_at"),
-        "criacao_desc": ("-created_at",),
-        "criacao_asc": ("created_at",),
-        "viagem_asc": ("data_evento_inicio", "-ano", "-numero"),
-        "viagem_desc": ("-data_evento_inicio", "-ano", "-numero"),
-    }
-    planos = planos.order_by(*sort_map.get(sort or "numero_desc", sort_map["numero_desc"]))
-
-    # Abas: Finalizado = todas as prestações dos ofícios (não cancelados) do
-    # evento vinculado ao plano já finalizadas.
-    from core.tenancy import get_current_area
-
-    area = get_current_area()
-    sub = PrestacaoServidor.objects.filter(
-        prestacao__oficio__evento=OuterRef("evento_id"),
-        prestacao__oficio__cancelado=False,
-    )
-    if area is None:
-        sub = sub.filter(prestacao__area__isnull=True)
-    else:
-        sub = sub.filter(prestacao__area=area)
-    planos = tabs.anotar_finalizacao(planos, sub, sub.filter(finalizada=False))
     cancelado_q = Q(cancelado=True)
     date_field = "data_evento_inicio"
     lista = planos.filter(tabs.q_da_aba(aba, date_field=date_field, cancelado_q=cancelado_q))
@@ -643,8 +581,6 @@ def _apply_efetivo_snapshot(plano: PlanoTrabalho, rows):
     incompletas são ignoradas (placeholders no formulário). IDs ausentes no
     snapshot são removidos do banco para refletir o estado atual da tela.
     """
-    from cadastros.models import Cargo, Unidade  # import lazy para evitar ciclos
-
     existentes = {efetivo.pk: efetivo for efetivo in plano.efetivos.all()}
     mantidos: set[int] = set()
     saida: list[dict] = []
@@ -661,9 +597,9 @@ def _apply_efetivo_snapshot(plano: PlanoTrabalho, rows):
             client_idx = index
         if not cargo_id or not quantidade or quantidade <= 0:
             continue
-        if not filter_queryset_by_area(Cargo.objects).filter(pk=cargo_id).exists():
+        if not cargo_pertence_a_area(cargo_id):
             continue
-        if unidade_id and not filter_queryset_by_area(Unidade.objects).filter(pk=unidade_id).exists():
+        if unidade_id and not unidade_pertence_a_area(unidade_id):
             unidade_id = None
         chave = (unidade_id, cargo_id)
         if chave in vistos:
@@ -866,7 +802,7 @@ def evento_adicionar(request, pk):
 def evento_editar(request, pk, evento_pk):
     """Carrega um evento commitado no rascunho para edição (salvando o rascunho atual)."""
     plano = _get_plano(pk)
-    evento = get_object_or_404(EventoPlano, pk=evento_pk, plano=plano)
+    evento = get_evento_do_plano_by_id(plano, evento_pk)
     editar_evento_no_scratchpad(plano, evento)
     messages.success(request, f"Editando o evento {evento.ordem}.")
     return redirect("planos_trabalho:wizard_identificacao", pk=plano.pk)
@@ -875,7 +811,7 @@ def evento_editar(request, pk, evento_pk):
 @require_POST
 def evento_remover(request, pk, evento_pk):
     plano = _get_plano(pk)
-    evento = get_object_or_404(EventoPlano, pk=evento_pk, plano=plano)
+    evento = get_evento_do_plano_by_id(plano, evento_pk)
     remover_evento(plano, evento)
     if request.headers.get("X-Requested-With") == "XMLHttpRequest":
         return JsonResponse({"ok": True, "is_multi_evento": plano.is_multi_evento})
