@@ -286,8 +286,12 @@ export function setTrechoDateValue(card, role, isoDate, options) {
   var o = card.dataset.ordem;
   var hidden = card.querySelector('[name="trecho_' + o + '_' + role + '_data"]');
   if (hidden) {
+    // Só avisa quando a data realmente mudou. O `change` sobe até o listener do
+    // container do editor, que recalcula o card e pode voltar aqui; sem esta
+    // guarda, um chamador que esqueça o `silent` reabre a recursão infinita.
+    var mudou = hidden.value !== (isoDate || '');
     hidden.value = isoDate || '';
-    if (!opts.silent) {
+    if (mudou && !opts.silent) {
       hidden.dispatchEvent(new Event('change', { bubbles: true }));
     }
   }
