@@ -9,16 +9,19 @@ MEDIA_ROOT="${MEDIA_ROOT:-/var/www/gerenciador-viagens/media}"
 BACKUP_ROOT="${BACKUP_ROOT:-/var/backups/gerenciador-viagens}"
 RETENTION_DAYS="${BACKUP_RETENTION_DAYS:-30}"
 STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
-WORK_DIR="$(mktemp -d "${BACKUP_ROOT}/.backup-${STAMP}-XXXXXX")"
 ARCHIVE="${BACKUP_ROOT}/gerenciador-${STAMP}.tar.gz"
 ENCRYPTED="${ARCHIVE}.enc"
+
+# O diretório pai precisa existir antes do mktemp; sem isto o deploy
+# aborta com "No such file or directory" na VPS nova.
+mkdir -p -- "${BACKUP_ROOT}"
+WORK_DIR="$(mktemp -d "${BACKUP_ROOT}/.backup-${STAMP}-XXXXXX")"
 
 cleanup() {
   rm -rf -- "${WORK_DIR}"
 }
 trap cleanup EXIT
 
-mkdir -p -- "${BACKUP_ROOT}"
 pg_dump --format=custom --file="${WORK_DIR}/database.dump" "${DB_NAME}"
 tar -C "${MEDIA_ROOT}" -czf "${WORK_DIR}/media.tar.gz" .
 git -C "${APP_ROOT}" rev-parse HEAD > "${WORK_DIR}/commit-sha.txt"
