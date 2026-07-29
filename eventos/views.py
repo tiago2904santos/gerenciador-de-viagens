@@ -9,7 +9,6 @@ from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.dateparse import parse_date
-from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.http import require_POST
 
@@ -53,15 +52,6 @@ from .services import excluir_evento
 from .services import garantir_termo_automatico
 
 
-def _safe_next_url(request, fallback_url):
-    next_url = request.POST.get("next") or request.GET.get("next")
-    if next_url and url_has_allowed_host_and_scheme(
-        next_url,
-        allowed_hosts={request.get_host()},
-        require_https=request.is_secure(),
-    ):
-        return next_url
-    return fallback_url
 
 
 def api_cidades_por_uf(request, uf):

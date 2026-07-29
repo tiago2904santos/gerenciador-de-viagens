@@ -8,8 +8,10 @@ from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
-from django.utils.http import url_has_allowed_host_and_scheme
 
+from core.retorno import com_next
+from core.retorno import next_valido
+from core.retorno import voltar_para
 from core.utils.masks import only_digits
 from .models import Servidor
 from .models import Viatura
@@ -140,28 +142,16 @@ def _vinculo_error(request):
     )
 
 
-def _safe_next_url(request, fallback_url):
-    next_url = request.POST.get("next") or request.GET.get("next")
-    if next_url and url_has_allowed_host_and_scheme(
-        next_url,
-        allowed_hosts={request.get_host()},
-        require_https=request.is_secure(),
-    ):
-        return next_url
-    return fallback_url
 
 
 def _validated_next(request):
-    next_url = request.GET.get("next") or request.POST.get("next") or ""
-    if next_url and not url_has_allowed_host_and_scheme(
-        next_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()
-    ):
-        next_url = ""
-    return next_url
+    """Fachada de `core.retorno.next_valido` (`NOVO-15`)."""
+    return next_valido(request)
 
 
 def _url_with_next(url, next_url):
-    return url + ("?" + urlencode({"next": next_url}) if next_url else "")
+    """Fachada de `core.retorno.com_next` (`NOVO-15`)."""
+    return com_next(url, next_url)
 
 
 def index(request):
@@ -579,7 +569,7 @@ def servidores_index(request):
 
 def servidor_create(request):
     index_url = reverse("cadastros:servidores_index")
-    next_url = _safe_next_url(request, index_url)
+    next_url = voltar_para(request, index_url)
     form = ServidorForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
         servidor = criar_servidor(form)
@@ -679,7 +669,7 @@ def viaturas_index(request):
 
 def viatura_create(request):
     index_url = reverse("cadastros:viaturas_index")
-    next_url = _safe_next_url(request, index_url)
+    next_url = voltar_para(request, index_url)
     form = ViaturaForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
         viatura = criar_viatura(form)
