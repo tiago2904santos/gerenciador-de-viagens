@@ -65,8 +65,8 @@
             aria-haspopup="true"
             aria-expanded="false"
             data-tooltip="Ações do documento"
-            data-action-menu-trigger
-            data-action-menu-target="ui-lab-document-actions"
+            data-overlay-trigger data-overlay-kind="menu"
+            data-overlay-target="ui-lab-document-actions"
           >{% include "components/ui/icons/icon.html" with icon="more" only %}</button>
           <div class="cv-action-menu cv-action-menu--rich" id="ui-lab-document-actions" role="menu" hidden>
             {% include "components/ui/menus/rich_menu_header.html" with title="Documento" subtitle="Ofício 621/2026" icon="document" only %}

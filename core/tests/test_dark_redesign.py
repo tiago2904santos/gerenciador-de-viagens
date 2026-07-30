@@ -102,9 +102,7 @@ class DarkRedesignContractTests(SimpleTestCase):
             "picker.js",
             "cv-date-picker.js",
             "collection.js",
-            "delete-confirm-modal.js",
-            "confirm-action-modal.js",
-            "cancel-reason-modal.js",
+            "overlay.js",
         )
         components = Path(settings.BASE_DIR) / "static" / "js" / "components"
         for filename in component_files:
@@ -224,17 +222,17 @@ class DarkRedesignContractTests(SimpleTestCase):
             / "ui_lab"
             / "overlays.html"
         ).read_text(encoding="utf-8")
-        app_js = (
-            Path(settings.BASE_DIR) / "static" / "js" / "core" / "app.js"
+        overlay_js = (
+            Path(settings.BASE_DIR) / "static" / "js" / "components" / "overlay.js"
         ).read_text(encoding="utf-8")
 
         self.assertIn('components/ui/modals/delete_confirm_modal.html', lab)
         self.assertIn("data_delete_url", lab)
         self.assertNotIn("ui-lab-overlay-frame", lab)
-        self.assertIn("window.CV.dialogs", app_js)
-        self.assertIn('event.key !== "Tab"', app_js)
-        self.assertIn('event.key === "Escape"', app_js)
-        self.assertIn("data-action-menu-trigger", lab)
+        self.assertIn("window.CV.overlay", overlay_js)
+        self.assertIn('event.key === "Tab"', overlay_js)
+        self.assertIn('event.key === "Escape"', overlay_js)
+        self.assertIn('data-overlay-kind="menu"', lab)
         self.assertIn("data-tooltip", lab)
         self.assertIn("data-sidebar-drawer-toggle", lab)
         self.assertIn('components/ui/menus/rich_menu_link.html', lab)
@@ -324,8 +322,8 @@ class DarkRedesignContractTests(SimpleTestCase):
             / "attach-signed-modal.js"
         ).read_text(encoding="utf-8")
         self.assertIn('registerEnhancer("attachSignedModal", init)', attach_script)
-        self.assertIn("window.CV.dialogs.open", attach_script)
-        self.assertIn("window.CV.dialogs.close", attach_script)
+        self.assertIn("window.CV.overlay.openDialog", attach_script)
+        self.assertIn("window.CV.overlay.closeDialog", attach_script)
 
     def test_incomplete_form_section_component_was_removed(self):
         templates = Path(settings.BASE_DIR) / "templates"

@@ -52,7 +52,7 @@ def menu_cancel(url, label, *, title="Cancelar", description="Interromper o flux
 
 
 def menu_confirm(url, label, title, description, *, icon="check", icon_tone="success"):
-    """Item que abre o modal global de confirmação (data-confirm-action-trigger)."""
+    """Item que abre o diálogo global pelo contrato data-overlay-trigger."""
     return {
         "type": "confirm",
         "url": url,

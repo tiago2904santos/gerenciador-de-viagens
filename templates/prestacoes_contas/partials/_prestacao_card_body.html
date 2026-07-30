@@ -50,8 +50,8 @@
               data-tooltip="Baixar documentos"
               aria-haspopup="true"
               aria-expanded="false"
-              data-action-menu-trigger
-              data-action-menu-target="prestacao-docs-menu-{{ servidor.ps_pk }}"
+              data-overlay-trigger data-overlay-kind="menu"
+              data-overlay-target="prestacao-docs-menu-{{ servidor.ps_pk }}"
       >{% include "components/ui/icons/icon.html" with icon="folder" only %}</button>
       <div class="cv-action-menu oficio-lc__action-menu oficio-lc__document-menu"
            id="prestacao-docs-menu-{{ servidor.ps_pk }}"
@@ -149,8 +149,8 @@
               data-tooltip="Enviar aviso de liberação (WhatsApp)"
               aria-haspopup="true"
               aria-expanded="false"
-              data-action-menu-trigger
-              data-action-menu-target="diaria-wa-menu-{{ servidor.ps_pk }}"
+              data-overlay-trigger data-overlay-kind="menu"
+              data-overlay-target="diaria-wa-menu-{{ servidor.ps_pk }}"
               data-wa-phone="{{ servidor.whatsapp_phone }}"
               data-wa-oficio="{{ servidor.whatsapp_oficio }}"
               data-wa-unidade="{{ servidor.whatsapp_unidade }}"

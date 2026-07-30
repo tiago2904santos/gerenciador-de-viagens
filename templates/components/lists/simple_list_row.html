@@ -42,8 +42,8 @@
             aria-haspopup="true"
             aria-expanded="false"
             data-tooltip="{% if row.remover_assinado_url %}Documentos e assinado{% else %}Documentos{% endif %}"
-            data-action-menu-trigger
-            data-action-menu-target="simple-row-document-menu-{{ row.title|slugify }}-{{ menu_suffix }}"
+            data-overlay-trigger data-overlay-kind="menu"
+            data-overlay-target="simple-row-document-menu-{{ row.title|slugify }}-{{ menu_suffix }}"
           >{% include "components/ui/icons/icon.html" with icon="folder" only %}</button>
           <div
             class="cv-action-menu cv-action-menu--rich"
@@ -106,7 +106,7 @@
           <button
             class="cv-icon-btn cv-icon-btn--delete"
             type="button"
-            data-delete-modal-trigger
+            data-overlay-trigger data-overlay-kind="dialog" data-overlay-target="delete-confirm-modal"
             data-delete-url="{{ row.delete_url }}"
             data-delete-label="{{ row.title }}"
             aria-label="Excluir"

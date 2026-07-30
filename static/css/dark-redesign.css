@@ -1071,7 +1071,7 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
   border-color: color-mix(in srgb, var(--color-border) 90%, var(--color-text) 10%);
 }
 
-/* Menu do select reanexado ao <body> (cv-floating-dropdown.js). */
+/* Menu do select reanexado ao <body> por CV.overlay. */
 :is(html[data-theme="dark"])
   .cv-custom-select__menu--v2.cv-floating-dropdown--active:is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) {
   --cv-cs-menu-bg: var(--step1-surface, color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%));

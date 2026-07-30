@@ -26,8 +26,8 @@
           aria-haspopup="true"
           aria-expanded="false"
           data-tooltip="{% if s.termo_assinado %}Termo assinado — ações{% else %}Ações do termo{% endif %}"
-          data-action-menu-trigger
-          data-action-menu-target="termo-action-menu-{{ card.oficio_pk }}-{{ s.servidor_pk }}"
+          data-overlay-trigger data-overlay-kind="menu"
+          data-overlay-target="termo-action-menu-{{ card.oficio_pk }}-{{ s.servidor_pk }}"
         >{% include "components/ui/icons/icon.html" with icon="more" only %}</button>
         <div class="cv-action-menu cv-action-menu--rich" id="termo-action-menu-{{ card.oficio_pk }}-{{ s.servidor_pk }}" role="menu" hidden>
           {% if s.termo_assinado %}
@@ -162,8 +162,8 @@
           aria-haspopup="true"
           aria-expanded="false"
           data-tooltip="Visualizar e baixar"
-          data-action-menu-trigger
-          data-action-menu-target="justificativa-document-menu-{{ card.oficio_pk }}"
+          data-overlay-trigger data-overlay-kind="menu"
+          data-overlay-target="justificativa-document-menu-{{ card.oficio_pk }}"
         >{% include "components/ui/icons/icon.html" with icon="folder" only %}</button>
         <div class="cv-action-menu cv-action-menu--rich" id="justificativa-document-menu-{{ card.oficio_pk }}" role="menu" hidden>
           {% include "components/ui/menus/rich_menu_header.html" with title="Justificativa" subtitle=card.numero_display icon="folder" only %}

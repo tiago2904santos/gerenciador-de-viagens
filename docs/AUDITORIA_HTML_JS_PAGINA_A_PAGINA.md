@@ -796,7 +796,7 @@ Alvo: **16 motores globais**, todos registrados via `CV.registerEnhancer`, todos
 
 | # | Motor | Substitui | Contrato |
 |---|---|---|---|
-| 15 | **`CV.overlay`** | `action-menu` + `cv-floating-dropdown` + 4 modais + `CV.dialogs` | Portal com **registro de nós movidos** e limpeza no `destroy` (resolve **J-02**). Um único `openDialog(config)` para os 4 modais (~520 linhas → ~180) |
+| 15 | **`CV.overlay`** | ✅ substituiu `action-menu` + `cv-floating-dropdown` + 3 controladores duplicados + `CV.dialogs`; o anexo assinado permanece só como controlador de domínio | Portal, menus, dropdowns, focus trap e diálogos sob um namespace/enhancer, com limpeza no `destroy` (**J-02**) |
 | 16 | **`CV.actions`** | `document-download` + `extra-download` + `signature-actions` + `icon-tooltips` + `prestacoes-diaria-wa` | Delegação global de ações declarativas: download (com extras), copiar, compartilhar, tooltip. Carregado sempre. Resolve **J-05** |
 
 ### 10.5 O que sobra como script de página
@@ -892,7 +892,7 @@ Cada fase é independente, verificável e não depende da reconstrução do CSS.
 | **12** | Criar `CV.locationRows` + `components/form/location_rows.html`; migrar os 6 módulos; unificar contrato em `estado.pk` | H-01, J-08 | −20 templates, −950 linhas de JS |
 | **13** | ✅ Criar `CV.documentSource`; migrar Termos, OS e Diário-motorista | J-15 | −3 implementações |
 | **14** | ✅ Criar `CV.picker`; unificar hooks, namespace, enhancer e renderers vivos | — | Um contrato de seleção |
-| **15** | Criar `CV.overlay`; fundir os 4 modais e o action-menu | J-02 | −340 linhas |
+| **15** | ✅ Criar `CV.overlay`; fundir o ciclo de vida dos 4 modais, menus e dropdowns | J-02 | Um namespace, um enhancer e contrato `data-overlay-*` |
 | **16** | Colapsar os 22 namespaces em `CV.*` | J-09 | — |
 | **17** | Trocar os 88 `?v=` manuais por `ManifestStaticFilesStorage` (hash automático); remover os `?v=` dos `import` ESM | J-13 | Fim da cache incoerente |
 | **18** | Refatorar `form_block.html` para receber `context` explícito e incluir o body com `only` | H-04 | Componentes seláveis e testáveis |

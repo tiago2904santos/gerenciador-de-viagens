@@ -222,8 +222,8 @@
     if (manageBtn) control.appendChild(manageBtn);
 
     const floatingMenu =
-      window.CvFloatingDropdown && window.CvFloatingDropdown.attach
-        ? window.CvFloatingDropdown.attach(dropdown, control)
+      window.CV.overlay && window.CV.overlay.attachDropdown
+        ? window.CV.overlay.attachDropdown(dropdown, control)
         : null;
     if (floatingMenu) root.classList.add("cv-search-picker--menu-portal");
 

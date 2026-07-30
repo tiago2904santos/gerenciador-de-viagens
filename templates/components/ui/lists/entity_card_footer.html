@@ -16,7 +16,7 @@
           type="button"
           aria-label="{{ footer.delete_aria|default:'Excluir' }}"
           data-tooltip="Excluir"
-          data-delete-modal-trigger
+          data-overlay-trigger data-overlay-kind="dialog" data-overlay-target="delete-confirm-modal"
           data-delete-url="{{ footer.delete_modal_url }}"
           data-delete-label="{{ footer.delete_modal_label }}"
           {% if footer.delete_modal_title %}data-delete-title="{{ footer.delete_modal_title }}"{% endif %}

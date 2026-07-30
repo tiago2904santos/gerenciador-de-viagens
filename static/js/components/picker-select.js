@@ -156,8 +156,8 @@
     this.root.appendChild(menu);
 
     this._floatingMenu =
-      window.CvFloatingDropdown && window.CvFloatingDropdown.attach
-        ? window.CvFloatingDropdown.attach(menu, trigger)
+      window.CV.overlay && window.CV.overlay.attachDropdown
+        ? window.CV.overlay.attachDropdown(menu, trigger)
         : null;
     if (this._floatingMenu) this.root.classList.add('cv-custom-select--menu-portal');
 
@@ -428,7 +428,7 @@
     });
 
     // Clique fora → fechar (o menu pode estar "flutuando" no body via
-    // CvFloatingDropdown, entao um clique nele nao conta como "fora").
+    // CV.overlay, entao um clique nele nao conta como "fora").
     document.addEventListener('click', function (e) {
       if (self._isOpen && !self.root.contains(e.target) && !self.menu.contains(e.target)) {
         self._close();
