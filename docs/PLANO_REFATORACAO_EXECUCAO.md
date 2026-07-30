@@ -555,7 +555,21 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
 - [ ] `H-04` `form_block.html` com contexto explícito e `only`
 - [ ] `D-41` contrato único de classe no `field.html`
 - [ ] `H-08` semântica (`<nav>`, `<ul>`, `<table>`, `<footer>`)
-- [ ] `H-06` / `H-10` `aria-controls` nos 29 `aria-expanded`; `for`/`id` nos 14 `<label>`
+- [x] `H-06` / `H-10` — os números do catálogo estavam **exatos**: 29 e 14. Dos 29,
+  **16** foram um `aria-controls` de uma linha, porque o gatilho já declarava
+  `data-overlay-target` com o id do painel; os outros **13** são 4 componentes de
+  gatilho+painel onde o painel **não pode** ter id de template (o componente
+  aparece várias vezes na mesma página e o painel do date picker é movido para
+  `document.body` em runtime) — o par sai do enhancer, via `CV.a11y.vincularExpansivel`
+  novo em `core/app.js`, que absorveu também o contador `_uid` próprio que o
+  `cv-select.js` mantinha. Dos 14 rótulos, 8 embrulhavam o input (`for` sai de
+  `id_for_label`) e **6**, em `_diario_trecho_body.html`, são espelho readonly do
+  roteiro e não tinham id nenhum: ganharam id derivado do `prefix` do formset.
+  Catracas novas `--max-aria-expanded-sem-controls 0` e `--max-label-sem-for 0`;
+  os 4 templates isentos só ficam isentos porque
+  `core/tests/test_acessibilidade_contrato.py` prova que os enhancers cumprem.
+  Conferido no Chromium: 39 gatilhos renderizados em 4 telas, todos com
+  `aria-controls` que resolve.
 
 ### Etapa 7 — Reconstrução do CSS
 - [x] Fase 0: apagados os aliases mortos de tema `dark-dark`, `light-dark`,
