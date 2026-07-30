@@ -533,6 +533,16 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
   órfãos e os namespaces de tema/autosave/roteiros foram consolidados.
 - [x] `J-13` storage com manifesto, compressão e reescrita de imports ESM;
   150 tokens manuais removidos e `collectstatic` validado na CI.
+- [x] **`NOVO-17` 🟠 `whitenoise` prod-only quebrava a suíte fora do CI** —
+  achado na conferência das Etapas 1–5. `config/staticfiles.py` importa
+  `whitenoise.storage` e é importado por `core/tests/test_static_asset_versioning.py`,
+  que roda em toda execução; a dependência estava só em `prod.txt`, então
+  qualquer ambiente que instala `dev.txt` (inclusive o hook de sessão do próprio
+  projeto) coletava a suíte com `ModuleNotFoundError: No module named 'whitenoise'`
+  — **1.229 testes, zero rodando**. O CI passava porque instala `lock.txt`,
+  compilado de `prod.txt`. `whitenoise` passou para `base.txt` e o contrato ficou
+  guardado por teste. Lição registrada: gate verde no CI não é prova de suíte
+  verde, quando CI e dev instalam arquivos de requirements diferentes.
 - [x] `J-10` autosave usa um único par de listeners globais e destrói
   listeners de formulário, timers e requests quando o nó sai do DOM.
 - [x] `J-19` `CV.log` centraliza debug/warn/error e emite `cv:log`; chamadas
