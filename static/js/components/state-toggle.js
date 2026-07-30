@@ -244,13 +244,11 @@
     update: update,
   };
 
-  function boot() {
-    init(document);
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', boot);
+  if (typeof window.CV.registerEnhancer === 'function') {
+    window.CV.registerEnhancer('stateToggle', init);
+  } else if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () { init(document); });
   } else {
-    boot();
+    init(document);
   }
 })();

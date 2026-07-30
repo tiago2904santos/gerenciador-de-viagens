@@ -49,11 +49,15 @@
   }
 
   function initWrapper(wrapper) {
+    if (wrapper.dataset.documentNumberBound === "true") {
+      return;
+    }
     const hidden = wrapper.querySelector("[data-document-number-value]");
     const num = wrapper.querySelector("[data-document-number-input]");
     if (!hidden || !num) {
       return;
     }
+    wrapper.dataset.documentNumberBound = "true";
     syncFromHidden(wrapper);
     ["input", "blur"].forEach(function (ev) {
       num.addEventListener(ev, function () {
@@ -62,13 +66,22 @@
     });
   }
 
-  function boot() {
-    document.querySelectorAll("[data-document-number-field]").forEach(initWrapper);
+  function init(root) {
+    const scope = root && root.querySelectorAll ? root : document;
+    if (scope.matches && scope.matches("[data-document-number-field]")) {
+      initWrapper(scope);
+    }
+    scope.querySelectorAll("[data-document-number-field]").forEach(initWrapper);
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", boot);
+  window.CV = window.CV || {};
+  window.CV.documentNumberField = { init: init };
+
+  if (typeof window.CV.registerEnhancer === "function") {
+    window.CV.registerEnhancer("documentNumberField", init);
+  } else if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", function () { init(document); });
   } else {
-    boot();
+    init(document);
   }
 })();

@@ -289,10 +289,16 @@
 
   var forms = new WeakMap();
   window.AppAutosave = {
-    init: function () {
+    init: function (root) {
       debug('arquivo carregado');
       debug('init executado');
-      var nodes = document.querySelectorAll('form[data-autosave="true"]');
+      var scope = root && root.querySelectorAll ? root : document;
+      var nodes = Array.prototype.slice.call(
+        scope.querySelectorAll('form[data-autosave="true"]')
+      );
+      if (scope.matches && scope.matches('form[data-autosave="true"]')) {
+        nodes.unshift(scope);
+      }
       debug('forms encontrados', nodes.length);
       nodes.forEach(function (form) {
         if (forms.has(form)) return;
@@ -341,7 +347,9 @@
   window.CV = window.CV || {};
   window.CV.autosave = window.AppAutosave;
 
-  if (document.readyState === 'loading') {
+  if (typeof window.CV.registerEnhancer === 'function') {
+    window.CV.registerEnhancer('autosave', window.AppAutosave.init);
+  } else if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function () { window.AppAutosave.init(); });
   } else {
     window.AppAutosave.init();

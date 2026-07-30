@@ -491,8 +491,13 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
   também ao observar nós removidos; o `action-menu` registra a origem do menu
   portado ao `<body>` e o devolve ao dono no `destroy`, eliminando órfãos e IDs
   duplicados.
-- [ ] `J-01` registrar 8 componentes como enhancer
-- [ ] `J-04` Quick Add/Quick Edit como enhancer
+- [x] `J-01` os 8 componentes sensíveis a swap (`fields`, `masks`,
+  `stateToggle`, `cardToggle`, `dropdowns`, `documentNumberField`,
+  `destinations`, `autosave`) registram inicializadores idempotentes no
+  `CV.registry`.
+- [x] `J-04` Quick Add/Quick Edit agora pertencem a `CV.inlineCreate`, com
+  delegação/guards idempotentes; autosave encontra também formulários inseridos
+  por AJAX.
 - [ ] `J-03` um motor de filtro por lista (`data-collection-mode`)
 - [x] `J-07` migrados todos os consumidores para `CV.http`; `fetch()` e
   `X-CSRFToken` agora só existem no núcleo `static/js/core/http.js`, com gate
