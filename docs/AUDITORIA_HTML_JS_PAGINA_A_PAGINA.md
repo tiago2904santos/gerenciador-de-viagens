@@ -475,22 +475,22 @@ Severidade: 🔴 crítico · 🟠 alto · 🟡 médio.
 | J-02 | ✅ | **Corrigido:** `CV.registry.destroy(root)` executa os destruidores antes do swap; `action-menu.js` devolve ao dono qualquer menu movido para `<body>` | `core/app.js`, `collection.js`, `action-menu.js` |
 | J-03 | ✅ | **Corrigido:** `CV.collection` escolhe exatamente um modo `client|server`; os dois motores e hooks antigos foram removidos | `collection.js`, componentes `list_page_*` |
 | J-04 | ✅ | **Corrigido:** `CV.inlineCreate` e `CV.autosave` reinicializam conteúdo inserido e impedem listeners duplicados | `core/app.js`, `autosave.js` |
-| J-05 | 🔴 | `extra-download.js` carregado só em Eventos, mas o hook é emitido pelo componente global `rich_menu_link.html` → **recurso silenciosamente morto em 4 módulos** | §4.9 |
+| J-05 | ✅ | **Corrigido:** `extra-download.js` é carregado no shell global e atende qualquer emissão de `data-extra-download-url` | §4.9 |
 | J-06 | ✅ | **989 linhas de JS órfão removidas** em 9 arquivos; 6 emissões remanescentes de hooks sem consumidor removidas | §4.8 |
-| J-07 | 🟠 | **CSRF reimplementado em 11 arquivos**; 13 arquivos usam `fetch()` sem `CV.http` (sem tratamento de 401/HTML-em-vez-de-JSON) | §4.5 |
+| J-07 | ✅ | **Corrigido:** somente `CV.http` usa `fetch()` e `X-CSRFToken`; auditor bloqueante impede regressão | §4.5 |
 | J-08 | ✅ | **Corrigido:** `CV.locationRows` é a única cascata estado→cidade; fallbacks por página removidos | §3.3, `location-rows.js` |
 | J-09 | ✅ | **Corrigido:** somente `window.CV` é publicado; aliases, fallbacks órfãos e namespaces do editor foram colapsados em `CV.*` | §4.6 |
-| J-10 | 🟠 | `autosave.js` registra **um `beforeunload` e um listener de captura em `document` por formulário**, nunca removidos | `autosave.js:250,283` |
-| J-11 | 🟠 | `app.js:394-412` — `data-confirm-submit` escuta **click e submit**; num `<form data-confirm-submit>` com botão submit dentro, o `confirm()` aparece **duas vezes** | `app.js`, disparado por `eventos/detalhe.html:24` |
-| J-12 | 🟠 | **13 `window.alert`/`confirm` nativos** num sistema com 4 modais próprios e um toast | `app.js`, `gdrive_config.js`, `oficios-documentos-inline.js`, `planos-trabalho-wizard.js`, `prestacoes-diaria-wa.js` |
+| J-10 | ✅ | **Corrigido:** autosave mantém um único `click`/`beforeunload` global e destrói listeners de formulário, timers e requests ao sair do DOM | `autosave.js` |
+| J-11 | ✅ | **Corrigido:** um único listener de `submit` resolve o dono pelo `event.submitter` ou pelo formulário | `core/app.js` |
+| J-12 | ✅ | **Corrigido:** `CV.feedback` substituiu todos os `alert()`/`confirm()` nativos; auditor bloqueante impede regressão | `core/app.js` |
 | J-13 | ✅ | **Corrigido:** 150 ocorrências manuais removidas; manifesto reescreve CSS e imports ESM, com `collectstatic` validado na CI | §4.7 |
-| J-14 | 🟠 | `masks.js` é carregado **duas vezes** em `diario_motorista_form.html` (base + página) | `diario_motorista_form.html:11` |
+| J-14 | ✅ | **Corrigido:** `masks.js` é carregado apenas pelo shell global | `base.html`, `diario_motorista_form.html` |
 | J-15 | ✅ | **Corrigido:** `CV.documentSource` lê, seleciona, agrega e aplica campos de documento-fonte; Termos, OS e Diário-motorista usam o mesmo motor e contrato `data-source-document` | `document-source.js`, `termos-form.js`, `ordens-servico-form.js`, `diario-motorista.js` |
-| J-16 | 🟡 | `debounce` redefinido em 5 arquivos; `escapeHtml` em 2 | §4.5 |
+| J-16 | ✅ | **Corrigido:** `CV.util` é o dono único de `debounce`, `escapeHtml` e normalização textual | §4.5 |
 | J-17 | 🟡 | `eventos/detalhe.html` carrega `pages/oficios-dados-viajantes.js` — script de outro módulo | `eventos/detalhe.html` |
 | J-18 | 🟡 | `oficios-transporte.js` (634 l.) carregado nas etapas 1 **e** 2 do ofício | `wizard_dados_viajantes.html:41` |
-| J-19 | 🟡 | `console.error`/`warn`/`debug` em 4 arquivos sem canal de log centralizado | `autosave.js`, `fields-init.js`, `prestacoes-contas-documentos.js` |
-| J-20 | 🟡 | `window.__prestDiariaWaBound` — guard de bind com flag global ad-hoc | `prestacoes-diaria-wa.js:7` |
+| J-19 | ✅ | **Corrigido:** logs da aplicação passam por `CV.log`, que também emite o evento estruturado `cv:log` | `core/app.js`, `autosave.js`, `fields-init.js` |
+| J-20 | ✅ | **Corrigido:** o guard global ad-hoc foi removido; o script usa carregamento único e delegação | `prestacoes-diaria-wa.js` |
 | J-21 | 🟡 | 28 `<script>` em `base.html`, sem `type=module`, sem bundling; ordem importa e não é declarada | `base.html:62-87` |
 | J-22 | 🟡 | Leaflet carregado de **CDN externa** (`unpkg.com`) em 2 páginas | `wizard_roteiro.html:6`, `roteiro_form_page.html:7` |
 
@@ -888,15 +888,15 @@ Cada fase é independente, verificável e não depende da reconstrução do CSS.
 | Fase | Ação | Resolve | Ganho |
 |---|---|---|---|
 | **0** | ✅ Apagar os 9 arquivos JS órfãos e os hooks `data-*` sem dono ainda emitidos | J-06 | −989 linhas |
-| **1** | Carregar `extra-download.js` no bundle base; remover `masks.js` duplicado de `diario_motorista_form.html` | J-05, J-14 | Recurso morto volta a funcionar em 4 módulos |
-| **2** | Corrigir `data-confirm-submit` (escutar só `submit`) | J-11 | Fim do `confirm()` duplo |
+| **1** | ✅ Carregar `extra-download.js` no shell base; remover `masks.js` duplicado de `diario_motorista_form.html` | J-05, J-14 | Motor disponível globalmente sem carga duplicada |
+| **2** | ✅ Corrigir `data-confirm-submit` com um único listener de `submit` | J-11 | Fim do `confirm()` duplo |
 | **3** | ✅ Adicionar `CV.registry.destroy(root)` e chamá-lo antes de `replaceWith` em `live-search-submit`; `action-menu` devolve o menu ao dono no `destroy` | J-02 | Fim dos nós órfãos e IDs duplicados |
 | **4** | ✅ Registrar como enhancer: `fields-init`, `masks`, `state-toggle`, `card-toggle`, `cv-select`, `document-number-field`, `destination-section`, `autosave` | J-01, J-04 | 8 componentes passam a sobreviver ao AJAX |
 | **5** | ✅ Quick Add/Quick Edit pertencem ao enhancer idempotente `CV.inlineCreate` | J-04 | Quick Add volta a funcionar após filtro |
 | **6** | ✅ Escolher **um** motor de filtro por lista (`data-collection-mode`) | J-03 | Fim do duplo filtro nas 5 listas em card |
-| **7** | Proibir `fetch()` cru: migrar os 13 arquivos para `CV.http`; apagar as 11 cópias de CSRF | J-07 | Tratamento único de erro/sessão |
-| **8** | Criar `CV.util` (debounce, escapeHtml, normalize) e remover as 17 cópias | J-16 | — |
-| **9** | Criar `CV.feedback`; substituir os 13 `alert`/`confirm` | J-12 | Feedback consistente com o design system |
+| **7** | ✅ Proibir `fetch()` cru: migrar consumidores para `CV.http`; apagar as cópias de CSRF | J-07 | Tratamento único de erro/sessão |
+| **8** | ✅ Criar `CV.util` e remover cópias de `debounce`, `escapeHtml` e normalização | J-16 | Utilitários únicos |
+| **9** | ✅ Criar `CV.feedback`; substituir `alert`/`confirm` | J-12 | Feedback consistente com o design system |
 | **10** | Criar `components/page/flow_base.html` e migrar Prestações (5), Termos, OS, Eventos-detalhe, Roteiro-avulso | H-02 | −180 linhas de estrutura duplicada |
 | **11** | Criar `components/form/card.html` (card mestre com header) e migrar as 20+ páginas | H-05 | Fim do header à mão |
 | **12** | Criar `CV.locationRows` + `components/form/location_rows.html`; migrar os 6 módulos; unificar contrato em `estado.pk` | H-01, J-08 | −20 templates, −950 linhas de JS |

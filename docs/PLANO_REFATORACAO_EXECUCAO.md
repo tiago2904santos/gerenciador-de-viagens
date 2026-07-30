@@ -533,6 +533,10 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
   órfãos e os namespaces de tema/autosave/roteiros foram consolidados.
 - [x] `J-13` storage com manifesto, compressão e reescrita de imports ESM;
   150 tokens manuais removidos e `collectstatic` validado na CI.
+- [x] `J-10` autosave usa um único par de listeners globais e destrói
+  listeners de formulário, timers e requests quando o nó sai do DOM.
+- [x] `J-19` `CV.log` centraliza debug/warn/error e emite `cv:log`; chamadas
+  diretas a `console.*` ficaram proibidas por teste estrutural.
 
 ### Etapa 6 — Estrutura HTML
 - [ ] `H-02` `components/page/flow_base.html` + migrar Prestações, Termos, OS, Eventos, Roteiro avulso

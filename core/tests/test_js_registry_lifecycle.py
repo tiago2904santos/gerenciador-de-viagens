@@ -16,6 +16,9 @@ class JavascriptRegistryLifecycleTests(SimpleTestCase):
         cls.overlay_source = (
             static_js / "components" / "overlay.js"
         ).read_text(encoding="utf-8")
+        cls.autosave_source = (static_js / "autosave.js").read_text(
+            encoding="utf-8"
+        )
 
     def test_registry_exposes_destroy_and_runs_cleanup_for_removed_nodes(self):
         self.assertIn("function destroy(root)", self.registry_source)
@@ -72,4 +75,29 @@ class JavascriptRegistryLifecycleTests(SimpleTestCase):
         self.assertLess(
             base.index("js/core/app.js"),
             base.index("js/autosave.js"),
+        )
+
+    def test_autosave_unregisters_global_and_form_listeners_on_destroy(self):
+        self.assertIn(
+            "registerEnhancer('autosave', window.CV.autosave.init, destroy)",
+            self.autosave_source,
+        )
+        for contract in (
+            "form.removeEventListener('input', onInput, true)",
+            "form.removeEventListener('change', onChange, true)",
+            "form.removeEventListener('blur', onBlur, true)",
+            "form.removeEventListener('submit', onSubmit, true)",
+            "activeInstances.delete(instance)",
+            "forms.delete(form)",
+        ):
+            with self.subTest(contract=contract):
+                self.assertIn(contract, self.autosave_source)
+
+        self.assertEqual(
+            self.autosave_source.count("document.addEventListener('click'"),
+            1,
+        )
+        self.assertEqual(
+            self.autosave_source.count("window.addEventListener('beforeunload'"),
+            1,
         )
