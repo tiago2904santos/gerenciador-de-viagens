@@ -1,0 +1,80 @@
+name: Reparar produção (FIELD_ENCRYPTION_KEYS)
+
+on:
+  workflow_dispatch:
+    inputs:
+      instalar_chave_ssh_local:
+        description: "Instalar a chave SSH pública do PC (para acesso local futuro)"
+        type: boolean
+        default: true
+      chave_ssh_publica:
+        description: "Conteúdo de ~/.ssh/id_ed25519.pub (uma linha)"
+        type: string
+        required: false
+        default: ""
+
+jobs:
+  reparar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validar segredo FIELD_ENCRYPTION_KEYS
+        env:
+          FIELD_ENCRYPTION_KEYS: ${{ secrets.FIELD_ENCRYPTION_KEYS }}
+        run: |
+          if [ -z "${FIELD_ENCRYPTION_KEYS}" ]; then
+            echo "Crie o secret FIELD_ENCRYPTION_KEYS no repositório (Settings → Secrets) e rode de novo."
+            exit 1
+          fi
+          echo "Secret FIELD_ENCRYPTION_KEYS presente (len=${#FIELD_ENCRYPTION_KEYS})."
+
+      - name: Aplicar chave no .env e reiniciar serviços
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          FIELD_ENCRYPTION_KEYS: ${{ secrets.FIELD_ENCRYPTION_KEYS }}
+          SSH_PUBKEY: ${{ inputs.chave_ssh_publica }}
+          INSTALL_SSH: ${{ inputs.instalar_chave_ssh_local }}
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          envs: FIELD_ENCRYPTION_KEYS,SSH_PUBKEY,INSTALL_SSH
+          script: |
+            set -Eeuo pipefail
+            cd /var/www/gerenciador-viagens/app
+
+            if [ "${INSTALL_SSH}" = "true" ] && [ -n "${SSH_PUBKEY}" ]; then
+              mkdir -p ~/.ssh
+              chmod 700 ~/.ssh
+              touch ~/.ssh/authorized_keys
+              chmod 600 ~/.ssh/authorized_keys
+              if ! grep -qxF "${SSH_PUBKEY}" ~/.ssh/authorized_keys; then
+                echo "${SSH_PUBKEY}" >> ~/.ssh/authorized_keys
+                echo "chave SSH local instalada em authorized_keys"
+              else
+                echo "chave SSH local ja estava em authorized_keys"
+              fi
+            fi
+
+            if grep -qE '^FIELD_ENCRYPTION_KEYS=.+' .env; then
+              echo "FIELD_ENCRYPTION_KEYS ja existe no .env — nao sobrescrevi"
+            else
+              # Aspas evitam que o '=' final da Fernet quebre o EnvironmentFile do systemd
+              printf 'FIELD_ENCRYPTION_KEYS="%s"\n' "${FIELD_ENCRYPTION_KEYS}" >> .env
+              echo "FIELD_ENCRYPTION_KEYS adicionada ao .env"
+            fi
+
+            mkdir -p /var/www/gerenciador-viagens/logs
+            systemctl restart gerenciador-viagens
+            sleep 3
+            systemctl is-active gerenciador-viagens
+            systemctl status gerenciador-viagens --no-pager -l | head -20
+
+            if [ -S /var/www/gerenciador-viagens/gunicorn.sock ]; then
+              curl -sS -o /dev/null -w "health_sock: %{http_code}\n" --max-time 10 \
+                --unix-socket /var/www/gerenciador-viagens/gunicorn.sock \
+                http://localhost/health/ || echo "health via socket falhou"
+            else
+              echo "gunicorn.sock ausente"
+              journalctl -u gerenciador-viagens -n 40 --no-pager
+              exit 1
+            fi
