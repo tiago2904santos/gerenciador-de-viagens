@@ -575,7 +575,19 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
     como **erro** (não catraca) e teste que também mede a premissa do Django.
     Lição: conferência de tela acha o que grep de template e suíte não acham.
 - [ ] `H-04` `form_block.html` com contexto explícito e `only`
-- [ ] `D-41` contrato único de classe no `field.html`
+- [x] `D-41` contrato único de classe no `field.html` — em vez de só igualar as
+  strings, container e rótulo passaram a ser escritos **uma vez** e o que varia
+  por tipo saiu para `_field_control.html`; o componente foi de 74 para 51 linhas
+  e de 3 contratos para 1. **Divergência da previsão:** eu previa diff visual no
+  tema escuro; medindo com `getComputedStyle`, no escuro o valor resolvido é
+  idêntico antes e depois — o diff real está no **tema claro** (rótulo de texto
+  vai de `rgb(51,76,99)`/700 para `rgb(7,26,51)`/600, igualando o rótulo de
+  select que já estava ao lado, no mesmo painel). Achado latente corrigido junto:
+  o ramo de `select` lia `widget.attrs.class` sem `|default:""`, e sem classe o
+  `{% if %}` engolia o `VariableDoesNotExist` e o `<select>` perdia o rótulo
+  inteiro em silêncio — não alcançável hoje, mas passaria a ser. Verificação:
+  21 páginas renderizadas antes/depois com diff normalizado, **zero mudanças
+  inesperadas**.
 - [ ] `H-08` semântica (`<nav>`, `<ul>`, `<table>`, `<footer>`)
 - [ ] `H-06` / `H-10` `aria-controls` nos 29 `aria-expanded`; `for`/`id` nos 14 `<label>`
 
