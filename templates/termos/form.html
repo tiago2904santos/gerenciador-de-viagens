@@ -4,10 +4,10 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260720-termos-wizard">
-  <link rel="stylesheet" href="{% static 'css/oficios-documentos-inline.css' %}?v=20260720-termos-wizard">
-  <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260720-termos-oficio-cards">
-  <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}?v=20260715-assinado">
+  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}">
+  <link rel="stylesheet" href="{% static 'css/oficios-documentos-inline.css' %}">
+  <link rel="stylesheet" href="{% static 'css/termos.css' %}">
+  <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -72,6 +72,6 @@
 {% endblock %}
 
 {% block extra_js %}
-  <script src="{% static 'js/pages/termos-form.js' %}?v=20260720-termos-oficio-cards" defer></script>
-  <script src="{% static 'js/pages/oficios-documentos-inline.js' %}?v=20260720-termos-wizard" defer></script>
+  <script src="{% static 'js/pages/termos-form.js' %}" defer></script>
+  <script src="{% static 'js/pages/oficios-documentos-inline.js' %}" defer></script>
 {% endblock %}

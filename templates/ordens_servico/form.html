@@ -4,9 +4,9 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260718-cv-summary">
-  <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260720-os-oficio-cards">
-  <link rel="stylesheet" href="{% static 'css/ordens-servico.css' %}?v=20260721-os-header-oficio">
+  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}">
+  <link rel="stylesheet" href="{% static 'css/termos.css' %}">
+  <link rel="stylesheet" href="{% static 'css/ordens-servico.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -61,5 +61,5 @@
 {% endblock %}
 
 {% block extra_js %}
-  <script src="{% static 'js/pages/ordens-servico-form.js' %}?v=20260721-os-cerimonial-roles" defer></script>
+  <script src="{% static 'js/pages/ordens-servico-form.js' %}" defer></script>
 {% endblock %}

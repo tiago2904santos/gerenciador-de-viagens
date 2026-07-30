@@ -3,8 +3,8 @@
 
 {% block extra_css %}
   {{ block.super }}
-  <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260721-pt-remodel">
-  <link rel="stylesheet" href="{% static 'css/planos-trabalho-atividades.css' %}?v=20260721-pt-check-bg">
+  <link rel="stylesheet" href="{% static 'css/termos.css' %}">
+  <link rel="stylesheet" href="{% static 'css/planos-trabalho-atividades.css' %}">
 {% endblock %}
 
 {% block wizard_content %}
@@ -39,5 +39,5 @@
 
 {% block extra_js %}
   {{ block.super }}
-  <script src="{% static 'js/pages/planos-trabalho-wizard.js' %}?v=20260721-pt-limpar-selecao" defer></script>
+  <script src="{% static 'js/pages/planos-trabalho-wizard.js' %}" defer></script>
 {% endblock %}

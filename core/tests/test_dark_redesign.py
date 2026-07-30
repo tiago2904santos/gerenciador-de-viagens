@@ -669,7 +669,10 @@ class DarkRedesignContractTests(SimpleTestCase):
 
         self.assertIn("max-width: var(--layout-form-panel-max-width);", standard_simple)
         self.assertIn("margin-inline: auto;", standard_simple)
-        self.assertIn("page-shell.css' %}?v=20260722-standard-simple-width", self.base)
+        self.assertIn(
+            """{% static 'css/page-shell.css' %}">""",
+            self.base,
+        )
 
     def test_list_and_form_cards_share_the_dark_card_family(self):
         for token in (

@@ -4,11 +4,11 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/roteiros-list.css' %}?v=20260718-higiene">
-  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}?v=20260618-eventos">
-  <link rel="stylesheet" href="{% static 'css/termos.css' %}?v=20260618-eventos">
-  <link rel="stylesheet" href="{% static 'css/planos-trabalho-eventos.css' %}?v=20260618-eventos">
-  <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}?v=20260629f">
+  <link rel="stylesheet" href="{% static 'css/roteiros-list.css' %}">
+  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}">
+  <link rel="stylesheet" href="{% static 'css/termos.css' %}">
+  <link rel="stylesheet" href="{% static 'css/planos-trabalho-eventos.css' %}">
+  <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -71,8 +71,8 @@
 
           </form>
 
-          <script src="{% static 'js/pages/oficios-dados-viajantes.js' %}?v=20260618-eventos-det" defer></script>
-          <script src="{% static 'js/pages/eventos-detalhe.js' %}?v=20260721-destinos-oficio-doc-toggle" defer></script>
+          <script src="{% static 'js/pages/oficios-dados-viajantes.js' %}" defer></script>
+          <script src="{% static 'js/pages/eventos-detalhe.js' %}" defer></script>
         {% endif %}
 
         {% if etapa_atual == 2 %}

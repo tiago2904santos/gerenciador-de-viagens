@@ -4,31 +4,31 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="{% static 'js/core/theme-shared.js' %}?v=20260513"></script>
-  <script src="{% static 'js/core/theme-init.js' %}?v=20260513"></script>
+  <script src="{% static 'js/core/theme-shared.js' %}"></script>
+  <script src="{% static 'js/core/theme-init.js' %}"></script>
   <title>{% block title %}Central de Viagens 3{% endblock %}</title>
-  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20260727-pc-shell-parity">
-  <link rel="stylesheet" href="{% static 'css/utilities.css' %}?v=20260717-data-table">
-  <link rel="stylesheet" href="{% static 'css/page-shell.css' %}?v=20260722-standard-simple-width">
-  <link rel="stylesheet" href="{% static 'css/cv-buttons.css' %}?v=20260727-dark-visual-audit">
-  <link rel="stylesheet" href="{% static 'css/components/cv-date-picker.css' %}?v=20260727-multi-datas-repetidas">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'css/utilities.css' %}">
+  <link rel="stylesheet" href="{% static 'css/page-shell.css' %}">
+  <link rel="stylesheet" href="{% static 'css/cv-buttons.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components/cv-date-picker.css' %}">
   {% block extra_css %}{% endblock %}
-  <link rel="stylesheet" href="{% static 'css/components/file-picker.css' %}?v=20260718-deep-registry">
-  <link rel="stylesheet" href="{% static 'css/components/action-system.css' %}?v=20260727-dark-control-ruler">
-  <link rel="stylesheet" href="{% static 'css/components/record-list.css' %}?v=20260718-rich-meta-grid">
-  <link rel="stylesheet" href="{% static 'css/components/list-tabs.css' %}?v=20260721-flat-header">
-  <link rel="stylesheet" href="{% static 'css/components/filter-header.css' %}?v=20260721-flat-header">
-  <link rel="stylesheet" href="{% static 'css/components/form-panel.css' %}?v=20260717-canonical">
-  <link rel="stylesheet" href="{% static 'css/components/form-sections.css' %}?v=20260727-period-destinations">
-  <link rel="stylesheet" href="{% static 'css/components/pendencias.css' %}?v=20260718-global-v1">
-  <link rel="stylesheet" href="{% static 'css/components/summary-items.css' %}?v=20260718-global-v1">
-  <link rel="stylesheet" href="{% static 'css/components/app-shell.css' %}?v=20260717-drawer">
-  <link rel="stylesheet" href="{% static 'css/components/content-cards.css' %}?v=20260717-canonical">
-  <link rel="stylesheet" href="{% static 'css/components/document-viewer.css' %}?v=20260717-canonical">
-  <link rel="stylesheet" href="{% static 'css/components/dialog.css' %}?v=20260718-sidebar-center">
-  <link rel="stylesheet" href="{% static 'css/components/document-download-loading.css' %}?v=20260727-real-completion">
-  <link rel="stylesheet" href="{% static 'css/dark-redesign.css' %}?v=20260727-dark-visual-audit">
-  <link rel="stylesheet" href="{% static 'css/components/list-header.css' %}?v=20260727-dark-visual-audit">
+  <link rel="stylesheet" href="{% static 'css/components/file-picker.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components/action-system.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components/record-list.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components/list-tabs.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components/filter-header.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components/form-panel.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components/form-sections.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components/pendencias.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components/summary-items.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components/app-shell.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components/content-cards.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components/document-viewer.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components/dialog.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components/document-download-loading.css' %}">
+  <link rel="stylesheet" href="{% static 'css/dark-redesign.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components/list-header.css' %}">
   {% block extra_css_after_theme %}{% endblock %}
 </head>
 <body>
@@ -59,30 +59,30 @@
       <p class="cv-document-loading__detail" data-document-loading-detail>Aguarde enquanto o arquivo é preparado.</p>
     </div>
   </div>
-  <script src="{% static 'js/theme-toggle.js' %}?v=20260513" defer></script>
-  <script src="{% static 'js/core/http.js' %}?v=20260520" defer></script>
-  <script src="{% static 'js/core/app.js' %}?v=20260729-j04-inline-create" defer></script>
-  <script src="{% static 'js/autosave.js' %}?v=20260729-j01-enhancer" defer></script>
-  <script src="{% static 'js/components/sidebar.js' %}?v=20260717-accessible-drawer" defer></script>
-  <script src="{% static 'js/components/masks.js' %}?v=20260729-j01-enhancer" defer></script>
-  <script src="{% static 'js/components/state-toggle.js' %}?v=20260729-j01-enhancer" defer></script>
-  <script src="{% static 'js/components/card-toggle.js' %}?v=20260729-j01-enhancer" defer></script>
-  <script src="{% static 'js/components/collection.js' %}?v=20260729-j03-collection" defer></script>
-  <script src="{% static 'js/components/icon-tooltips.js' %}?v=20260707-menu-hide" defer></script>
-  <script src="{% static 'js/components/overlay.js' %}?v=20260729-cv-overlay" defer></script>
-  <script src="{% static 'js/components/attach-signed-modal.js' %}?v=20260727-five-kinds" defer></script>
-  <script src="{% static 'js/components/file-picker.js' %}?v=20260718-registry-drop" defer></script>
-  <script src="{% static 'js/components/signature-actions.js' %}?v=20260717-canonical" defer></script>
-  <script src="{% static 'js/components/picker.js' %}?v=20260729-cv-picker" defer></script>
-  <script src="{% static 'js/components/picker-select.js' %}?v=20260729-cv-picker" defer></script>
-  <script src="{% static 'js/components/location-rows.js' %}?v=20260729-h01-j08" defer></script>
-  <script src="{% static 'js/components/document-source.js' %}?v=20260729-j15" defer></script>
-  <script src="{% static 'js/components/cv-date-picker.js' %}?v=20260727-multi-datas-repetidas" defer></script>
-  <script src="{% static 'js/cv-select.js' %}?v=20260729-j01-enhancer" defer></script>
-  <script src="{% static 'js/components/fields-init.js' %}?v=20260729-j01-enhancer" defer></script>
-  <script src="{% static 'js/components/document-download.js' %}?v=20260729-s06-polling" defer></script>
+  <script src="{% static 'js/theme-toggle.js' %}" defer></script>
+  <script src="{% static 'js/core/http.js' %}" defer></script>
+  <script src="{% static 'js/core/app.js' %}" defer></script>
+  <script src="{% static 'js/autosave.js' %}" defer></script>
+  <script src="{% static 'js/components/sidebar.js' %}" defer></script>
+  <script src="{% static 'js/components/masks.js' %}" defer></script>
+  <script src="{% static 'js/components/state-toggle.js' %}" defer></script>
+  <script src="{% static 'js/components/card-toggle.js' %}" defer></script>
+  <script src="{% static 'js/components/collection.js' %}" defer></script>
+  <script src="{% static 'js/components/icon-tooltips.js' %}" defer></script>
+  <script src="{% static 'js/components/overlay.js' %}" defer></script>
+  <script src="{% static 'js/components/attach-signed-modal.js' %}" defer></script>
+  <script src="{% static 'js/components/file-picker.js' %}" defer></script>
+  <script src="{% static 'js/components/signature-actions.js' %}" defer></script>
+  <script src="{% static 'js/components/picker.js' %}" defer></script>
+  <script src="{% static 'js/components/picker-select.js' %}" defer></script>
+  <script src="{% static 'js/components/location-rows.js' %}" defer></script>
+  <script src="{% static 'js/components/document-source.js' %}" defer></script>
+  <script src="{% static 'js/components/cv-date-picker.js' %}" defer></script>
+  <script src="{% static 'js/cv-select.js' %}" defer></script>
+  <script src="{% static 'js/components/fields-init.js' %}" defer></script>
+  <script src="{% static 'js/components/document-download.js' %}" defer></script>
   {# Motor do data-extra-download-url, emitido pelo componente global rich_menu_link. #}
-  <script src="{% static 'js/components/extra-download.js' %}?v=20260708-extra-download" defer></script>
+  <script src="{% static 'js/components/extra-download.js' %}" defer></script>
   {% block extra_js %}{% endblock %}
 </body>
 </html>

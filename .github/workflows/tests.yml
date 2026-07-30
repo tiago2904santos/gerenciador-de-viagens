@@ -89,6 +89,7 @@ jobs:
         run: |
           export FIELD_ENCRYPTION_KEYS="$(python -c 'from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())')"
           python manage.py check --deploy --settings=config.settings.prod
+          STATIC_ROOT="$RUNNER_TEMP/staticfiles" python manage.py collectstatic --noinput --clear --settings=config.settings.prod
 
       - name: Audit Python dependencies
         # WeasyPrint has no fixed release for PYSEC-2026-3412. Our adapter

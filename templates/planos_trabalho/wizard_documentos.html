@@ -3,8 +3,8 @@
 
 {% block extra_css %}
   {{ block.super }}
-  <link rel="stylesheet" href="{% static 'css/oficios-documentos-inline.css' %}?v=20260718-cv-summary">
-  <link rel="stylesheet" href="{% static 'css/planos-trabalho-eventos.css' %}?v=20260721-pt-evento-inline">
+  <link rel="stylesheet" href="{% static 'css/oficios-documentos-inline.css' %}">
+  <link rel="stylesheet" href="{% static 'css/planos-trabalho-eventos.css' %}">
 {% endblock %}
 
 {% block wizard_content %}
@@ -65,5 +65,5 @@
 
 {% block extra_js %}
   {{ block.super }}
-  <script src="{% static 'js/pages/oficios-documentos-inline.js' %}?v=20260720-action-menu" defer></script>
+  <script src="{% static 'js/pages/oficios-documentos-inline.js' %}" defer></script>
 {% endblock %}
