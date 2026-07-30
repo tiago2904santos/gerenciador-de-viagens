@@ -39,9 +39,7 @@
   /* ── Utilitários ────────────────────────────────────────────── */
 
   function readSummaries() {
-    var script = document.getElementById("os-oficios-summary");
-    if (!script) return {};
-    try { return JSON.parse(script.textContent || "{}"); } catch (e) { return {}; }
+    return window.CV.documentSource.read("os-oficios-summary");
   }
 
   function routeCardTitle(summary) {
@@ -561,69 +559,38 @@
     var oficiosSelect = form.querySelector("select[name='oficios']");
     if (!oficiosSelect) return;
 
-    var selectedIds = selectedOficioIds(oficiosSelect);
-    if (!selectedIds.length) { return; }
+    var documents = window.CV.documentSource.selected(oficiosSelect, summaries);
+    if (!documents.length) return;
 
-    var allServidorIds = new Set();
-    var startDates     = [];
-    var endDates       = [];
-    var firstMotivo    = "";
-
-    selectedIds.forEach(function (id) {
-      var s = summaries[id];
-      if (!s) return;
-      (s.servidor_ids || []).forEach(function (sid) { allServidorIds.add(String(sid)); });
-      if (s.data_inicio) startDates.push(s.data_inicio);
-      if (s.data_fim)    endDates.push(s.data_fim);
-      if (!firstMotivo && s.motivo) firstMotivo = s.motivo;
+    window.CV.documentSource.apply(form, documents, [
+      {
+        type: "date-range",
+        startName: "data_evento_inicio",
+        endName: "data_evento_fim",
+        startPath: "data_inicio",
+        endPath: "data_fim",
+        startStrategy: "min",
+        endStrategy: "max",
+        picker: "#os-evento-date-picker",
+      },
+      {
+        type: "multi",
+        name: "servidores",
+        path: "servidor_ids",
+        strategy: "union",
+        after: function () { syncServidorRoleUi(form); },
+      },
+      { type: "value", name: "motivo", path: "motivo", preserve: true, events: true },
+      {
+        type: "location",
+        stateName: "destino_estado",
+        cityName: "destino_cidade",
+        statePath: "estado_id",
+        cityPath: "cidade_id",
+      },
+    ]).then(function () {
+      updateSubmitButtonLabel(form);
     });
-
-    /* Datas: menor início, maior fim */
-    startDates.sort();
-    endDates.sort();
-    var startIso = startDates[0]                    || "";
-    var endIso   = endDates[endDates.length - 1]   || "";
-    if (startIso) setDateFields(form, startIso, endIso);
-
-    /* Servidores */
-    var servidoresSelect = form.querySelector("select[name='servidores']");
-    if (servidoresSelect && allServidorIds.size) {
-      setMultiSelectValues(servidoresSelect, Array.from(allServidorIds), form);
-      syncServidorRoleUi(form);
-    }
-
-    /* Motivo — só preenche se estiver vazio */
-    var motivoField = form.querySelector("[data-motivo-textarea='true']");
-    if (motivoField && !motivoField.value.trim() && firstMotivo) {
-      motivoField.value = firstMotivo;
-      motivoField.dispatchEvent(new Event("input",  { bubbles: true }));
-      motivoField.dispatchEvent(new Event("change", { bubbles: true }));
-    }
-
-    /* Destino — usa o primeiro ofício que tiver estado */
-    var destinoStateId = "";
-    var destinoCityId = "";
-    for (var i = 0; i < selectedIds.length; i++) {
-      var sd = summaries[selectedIds[i]];
-      if (sd && sd.estado_id) {
-        destinoStateId = String(sd.estado_id);
-        destinoCityId = String(sd.cidade_id || "");
-        break;
-      }
-    }
-    if (destinoStateId) {
-      var stateSelect = form.querySelector("select[name='destino_estado']");
-      var citySelect  = form.querySelector("select[name='destino_cidade']");
-      if (stateSelect && citySelect) {
-        stateSelect.value = destinoStateId;
-        stateSelect.dispatchEvent(new Event("change", { bubbles: true }));
-        loadCitiesForState(form, citySelect, destinoStateId, destinoCityId).then(function () {
-          updateSubmitButtonLabel(form);
-        });
-      }
-    }
-
-    updateSubmitButtonLabel(form);
   }
 
   function syncOficioPicker(form, summaries) {

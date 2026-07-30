@@ -1,8 +1,7 @@
 // Troca de motorista / viatura do diário.
 // - Cada "picker" (motorista/viatura) mostra o grupo de campos conforme a opção
 //   escolhida e marca o card selecionado (.is-selected — fallback do :has()).
-// - Ao escolher um ofício no select de prefill, preenche motorista + viatura a
-//   partir dos dados embutidos (data-oficios), disparando eventos para as máscaras.
+// - CV.documentSource preenche motorista + viatura a partir do ofício escolhido.
 // Sem JS, todos os grupos ficam visíveis e a validação é feita no servidor.
 (function () {
   "use strict";
@@ -50,59 +49,23 @@
   setupPicker("motorista_modo", "data-motorista-group");
   setupPicker("viatura_modo", "data-viatura-group");
 
-  // ── Auto-preenchimento a partir de um ofício existente ──
-  var oficios = [];
-  try {
-    oficios = JSON.parse(form.getAttribute("data-oficios") || "[]");
-  } catch (e) {
-    oficios = [];
-  }
-  var porId = {};
-  oficios.forEach(function (o) {
-    porId[String(o.id)] = o;
-  });
-
-  function setValor(name, value) {
-    var el = form.querySelector('[name="' + name + '"]');
-    if (!el) {
-      return;
-    }
-    el.value = value == null ? "" : value;
-    el.dispatchEvent(new Event("input", { bubbles: true }));
-    el.dispatchEvent(new Event("change", { bubbles: true }));
-  }
-
-  function marcarRadio(name, value) {
-    var el = form.querySelector('input[name="' + name + '"][value="' + value + '"]');
-    if (el) {
-      el.checked = true;
-      el.dispatchEvent(new Event("change", { bubbles: true }));
-    }
-  }
-
   var prefill = form.querySelector("[data-oficio-prefill]");
   if (prefill) {
     prefill.addEventListener("change", function () {
-      var dados = porId[prefill.value];
-      if (!dados) {
-        return;
-      }
-      setValor("motorista_manual_nome", dados.motorista_nome || "");
-      setValor("motorista_manual_cpf", dados.motorista_cpf || "");
-      setValor("motorista_oficio_referencia", dados.numero_ano || "");
-      setValor("motorista_protocolo_ref", dados.protocolo || "");
-
-      var v = dados.viatura || {};
-      if (v.modo === "BANCO" && v.id) {
-        marcarRadio("viatura_modo", "BANCO");
-        setValor("viatura", v.id);
-      } else if (v.modo === "MANUAL") {
-        marcarRadio("viatura_modo", "MANUAL");
-        setValor("viatura_manual_modelo", v.modelo || "");
-        setValor("viatura_manual_placa", v.placa || "");
-        setValor("viatura_manual_tipo", v.tipo || "");
-        setValor("viatura_manual_combustivel", v.combustivel || "");
-      }
+      var source = window.CV.documentSource.selected(prefill);
+      if (!source.length) return;
+      window.CV.documentSource.apply(form, source, [
+        { type: "value", name: "motorista_manual_nome", path: "motorista_nome", events: true, clear: true },
+        { type: "value", name: "motorista_manual_cpf", path: "motorista_cpf", events: true, clear: true },
+        { type: "value", name: "motorista_oficio_referencia", path: "numero_ano", events: true, clear: true },
+        { type: "value", name: "motorista_protocolo_ref", path: "protocolo", events: true, clear: true },
+        { type: "radio", name: "viatura_modo", path: "viatura.modo", when: { path: "viatura.modo" }, events: true },
+        { type: "value", name: "viatura", path: "viatura.id", when: { path: "viatura.modo", equals: "BANCO" }, events: true },
+        { type: "value", name: "viatura_manual_modelo", path: "viatura.modelo", when: { path: "viatura.modo", equals: "MANUAL" }, events: true, clear: true },
+        { type: "value", name: "viatura_manual_placa", path: "viatura.placa", when: { path: "viatura.modo", equals: "MANUAL" }, events: true, clear: true },
+        { type: "value", name: "viatura_manual_tipo", path: "viatura.tipo", when: { path: "viatura.modo", equals: "MANUAL" }, events: true, clear: true },
+        { type: "value", name: "viatura_manual_combustivel", path: "viatura.combustivel", when: { path: "viatura.modo", equals: "MANUAL" }, events: true, clear: true },
+      ]);
     });
   }
 })();

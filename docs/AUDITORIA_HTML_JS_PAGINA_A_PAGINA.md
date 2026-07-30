@@ -475,7 +475,7 @@ Severidade: 🔴 crítico · 🟠 alto · 🟡 médio.
 | J-12 | 🟠 | **13 `window.alert`/`confirm` nativos** num sistema com 4 modais próprios e um toast | `app.js`, `gdrive_config.js`, `oficios-documentos-inline.js`, `planos-trabalho-wizard.js`, `prestacoes-diaria-wa.js` |
 | J-13 | 🟠 | **88 tokens `?v=` manuais**; 11 arquivos servidos com tokens divergentes; cadeia ESM bustada à mão em 3 níveis com 4 módulos de fora | §4.7 |
 | J-14 | 🟠 | `masks.js` é carregado **duas vezes** em `diario_motorista_form.html` (base + página) | `diario_motorista_form.html:11` |
-| J-15 | 🟠 | 3 implementações independentes de **prefill a partir de ofício**, cada uma com seu `json_script` | `termos-form.js`, `ordens-servico-form.js`, `diario-motorista.js` |
+| J-15 | ✅ | **Corrigido:** `CV.documentSource` lê, seleciona, agrega e aplica campos de documento-fonte; Termos, OS e Diário-motorista usam o mesmo motor e contrato `data-source-document` | `document-source.js`, `termos-form.js`, `ordens-servico-form.js`, `diario-motorista.js` |
 | J-16 | 🟡 | `debounce` redefinido em 5 arquivos; `escapeHtml` em 2 | §4.5 |
 | J-17 | 🟡 | `eventos/detalhe.html` carrega `pages/oficios-dados-viajantes.js` — script de outro módulo | `eventos/detalhe.html` |
 | J-18 | 🟡 | `oficios-transporte.js` (634 l.) carregado nas etapas 1 **e** 2 do ofício | `wizard_dados_viajantes.html:41` |
@@ -890,7 +890,7 @@ Cada fase é independente, verificável e não depende da reconstrução do CSS.
 | **10** | Criar `components/page/flow_base.html` e migrar Prestações (5), Termos, OS, Eventos-detalhe, Roteiro-avulso | H-02 | −180 linhas de estrutura duplicada |
 | **11** | Criar `components/form/card.html` (card mestre com header) e migrar as 20+ páginas | H-05 | Fim do header à mão |
 | **12** | Criar `CV.locationRows` + `components/form/location_rows.html`; migrar os 6 módulos; unificar contrato em `estado.pk` | H-01, J-08 | −20 templates, −950 linhas de JS |
-| **13** | Criar `CV.documentSource`; migrar Termos, OS e Diário-motorista | J-15 | −3 implementações |
+| **13** | ✅ Criar `CV.documentSource`; migrar Termos, OS e Diário-motorista | J-15 | −3 implementações |
 | **14** | Criar `CV.picker`; absorver os 5 pickers | — | −800 linhas |
 | **15** | Criar `CV.overlay`; fundir os 4 modais e o action-menu | J-02 | −340 linhas |
 | **16** | Colapsar os 22 namespaces em `CV.*` | J-09 | — |

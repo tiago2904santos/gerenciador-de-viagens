@@ -39,7 +39,7 @@
       </div>
       <div class="dmv-prefill__body">
         <label class="cv-field__label" for="dmv-oficio-prefill">Puxar dados de um ofício existente <span class="dmv-muted">(opcional)</span></label>
-        <select id="dmv-oficio-prefill" class="form-select" data-oficio-prefill>
+        <select id="dmv-oficio-prefill" class="form-select" data-oficio-prefill data-source-document="dmv-oficios-source">
           <option value="">Selecione um ofício…</option>
           {% for o in oficios_prefill %}
             <option value="{{ o.id }}">{{ o.label }}</option>

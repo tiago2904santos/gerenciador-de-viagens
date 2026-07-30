@@ -45,13 +45,7 @@
   }
 
   function readSummaries() {
-    var script = document.getElementById("termos-oficios-summary");
-    if (!script) return {};
-    try {
-      return JSON.parse(script.textContent || "{}");
-    } catch (err) {
-      return {};
-    }
+    return window.CV.documentSource.read("termos-oficios-summary");
   }
 
   function resetSearchPicker(select) {
@@ -112,70 +106,28 @@
     initSearchPickers(form);
   }
 
-  function clearOficioFields(form) {
-    setDateFields(form, "", "");
-
-    var stateSelect = form.querySelector("select[name='destino_estado']");
-    var citySelect = form.querySelector("select[name='destino_cidade']");
-    if (stateSelect) {
-      stateSelect.value = "";
-      resetSearchPicker(stateSelect);
-      initSearchPickers(form);
-    }
-    if (citySelect) {
-      clearCitySelect(form, citySelect);
-    }
-
-    var servidoresSelect = form.querySelector("select[name='servidores']");
-    if (servidoresSelect) {
-      setMultiSelectValues(servidoresSelect, [], form);
-    }
-
-    var viaturaSelect = form.querySelector("select[name='viatura']");
-    if (viaturaSelect) {
-      viaturaSelect.value = "";
-      resetSearchPicker(viaturaSelect);
-      initSearchPickers(form);
-    }
-  }
-
-  function autoFillFromOficio(form, summary) {
-    if (!summary) {
-      clearOficioFields(form);
-      return;
-    }
-
-    if (summary.data_inicio) {
-      setDateFields(form, summary.data_inicio, summary.data_fim || summary.data_inicio);
-    }
-
-    var stateId = String(summary.estado_id || "");
-    var cityId  = String(summary.cidade_id  || "");
-    if (stateId) {
-      var stateSelect = form.querySelector("select[name='destino_estado']");
-      var citySelect  = form.querySelector("select[name='destino_cidade']");
-      if (stateSelect && citySelect) {
-        stateSelect.value = stateId;
-        resetSearchPicker(stateSelect);
-        initSearchPickers(form);
-        loadCitiesForState(form, citySelect, stateId, cityId);
-      }
-    }
-
-    if (summary.servidor_ids && summary.servidor_ids.length) {
-      var servidoresSelect = form.querySelector("select[name='servidores']");
-      setMultiSelectValues(servidoresSelect, summary.servidor_ids, form);
-    }
-
-    var viaturaId = String(summary.viatura_id || "");
-    if (viaturaId) {
-      var viaturaSelect = form.querySelector("select[name='viatura']");
-      if (viaturaSelect) {
-        viaturaSelect.value = viaturaId;
-        resetSearchPicker(viaturaSelect);
-        initSearchPickers(form);
-      }
-    }
+  function applyOficioSource(form, summary) {
+    window.CV.documentSource.apply(form, summary ? [summary] : [], [
+      {
+        type: "date-range",
+        startName: "data_evento_inicio",
+        endName: "data_evento_fim",
+        startPath: "data_inicio",
+        endPath: "data_fim",
+        picker: "#termo-evento-date-picker",
+        clear: true,
+      },
+      {
+        type: "location",
+        stateName: "destino_estado",
+        cityName: "destino_cidade",
+        statePath: "estado_id",
+        cityPath: "cidade_id",
+        clear: true,
+      },
+      { type: "multi", name: "servidores", path: "servidor_ids", strategy: "union", clear: true },
+      { type: "value", name: "viatura", path: "viatura_id", clear: true },
+    ]);
   }
 
   function syncOficioSummary(form, summaries) {
@@ -280,7 +232,7 @@
     select.addEventListener("change", function () {
       renderList(search.value);
       renderSummary();
-      autoFillFromOficio(form, selectedSummary());
+      applyOficioSource(form, selectedSummary());
     });
     search.addEventListener("input", function () {
       renderList(search.value);

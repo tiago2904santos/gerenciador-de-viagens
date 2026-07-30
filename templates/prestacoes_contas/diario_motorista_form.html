@@ -14,6 +14,7 @@
 {% endblock %}
 
 {% block content %}
+  {{ oficios_prefill|json_script:"dmv-oficios-source" }}
   <div class="page-shell page-shell--wizard travel-document-wizard app-wizard">
     {% include "components/ui/headers/page_header.html" with eyebrow="PRESTAÇÕES" title=page_title icon_label="PC" module_label="Prestações de Contas" back_label="Voltar ao diário" back_url=diario_url status_label="Diário de Bordo" status_variant="draft" only %}
 
@@ -23,8 +24,7 @@
       <div class="cv-form-section-stack cv-form-section-stack--comfortable">
         <form method="post" class="travel-document-wizard__form dmv-form"
               novalidate
-              data-diario-motorista-form
-              data-oficios='{{ oficios_prefill_json }}'>
+              data-diario-motorista-form>
           {% csrf_token %}
 
           {% if form.non_field_errors %}

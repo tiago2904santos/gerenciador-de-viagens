@@ -139,6 +139,8 @@ class MotoristaViewTest(DiarioMotoristaBaseTest):
         response = self.client.get(self.url())
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Trocar motorista / viatura")
+        self.assertContains(response, 'id="dmv-oficios-source"')
+        self.assertNotContains(response, "data-oficios=")
 
     def test_post_servidor_persiste_e_redireciona(self):
         response = self.client.post(

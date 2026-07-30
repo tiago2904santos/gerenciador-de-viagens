@@ -521,7 +521,10 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
   `estado.pk`, 1.158 linhas e seis partials de Eventos foram
   removidos; a fronteira legada de Eventos converte pk para sigla/nome somente
   ao serializar seu modelo.
-- [ ] `J-15` `CV.documentSource` · `CV.picker` · `CV.overlay`
+- [x] `J-15` `CV.documentSource` é o motor único de prefill para Termos, OS e
+  Diário-motorista; os três consumidores usam JSON seguro e o contrato
+  `data-source-document`.
+- [ ] `CV.picker` · `CV.overlay`
 - [ ] `J-09` colapsar 22 namespaces em `CV.*`
 - [ ] `J-13` `ManifestStaticFilesStorage` no lugar dos 88 `?v=`
 
