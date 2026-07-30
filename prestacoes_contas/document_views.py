@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 from django.contrib import messages
@@ -13,6 +14,7 @@ from core.private_media import private_file_response
 from .forms import PrestacaoDespachoForm, PrestacaoServidorDocumentosForm, PrestacaoSolicitacaoForm
 from .models import PrestacaoDocumentoAnexo
 from .presenters import _anexo_assinado_info
+from .presenters import kinds_de_anexo_assinado
 from .view_common import (
     _autosave_form_errors,
     _autosave_version,
@@ -143,43 +145,36 @@ def documentos_servidor(request, ps_pk):
     identificacao = _build_identificacao(prestacao)
     numero = identificacao.get("numero") or ""
 
-    def _kind(doc, *, option_label, doc_label):
-        return {
-            "option_label": option_label,
-            "doc_label": doc_label,
-            "url": doc["anexar_url"],
-            "current_name": doc["nome_original"],
-            "current_view_url": doc["view_url"],
-            "current_remove_url": doc["remover_url"],
-        }
-
-    attach_kinds = {
-        "primary": _kind(
-            despacho_assinado,
-            option_label="Despacho",
-            doc_label=f"o despacho do ofício {numero}",
-        ),
-        "secondary": _kind(
-            oficio_assinado,
-            option_label="Ofício",
-            doc_label=f"o ofício {numero}",
-        ),
-        "tertiary": _kind(
-            servidor["rt_assinado"],
-            option_label="RT",
-            doc_label=f"o relatório técnico de {servidor['name']}",
-        ),
-        "quaternary": _kind(
-            servidor["diario_assinado"],
-            option_label="DB",
-            doc_label=f"o diário de bordo do ofício {numero}",
-        ),
-        "quinary": _kind(
-            servidor["comprovante_anexo"],
-            option_label="Comprovante",
-            doc_label=f"o comprovante de saque ou transferência de {servidor['name']}",
-        ),
-    }
+    # `H-03`: eram cinco chaves ordinais (`primary`…`quinary`) — nome que dizia a
+    # POSIÇÃO, não o documento. Cada uma virava 6 atributos `data-*` planos no
+    # gatilho, 30 no total. Ver `kinds_de_anexo_assinado`.
+    attach_kinds = kinds_de_anexo_assinado(
+        [
+            ("despacho", "Despacho", f"o despacho do ofício {numero}", despacho_assinado),
+            ("oficio", "Ofício", f"o ofício {numero}", oficio_assinado),
+            (
+                "rt",
+                "RT",
+                f"o relatório técnico de {servidor['name']}",
+                servidor["rt_assinado"],
+            ),
+            (
+                "diario",
+                "DB",
+                f"o diário de bordo do ofício {numero}",
+                servidor["diario_assinado"],
+            ),
+            (
+                "comprovante",
+                "Comprovante",
+                (
+                    "o comprovante de saque ou transferência de "
+                    f"{servidor['name']}"
+                ),
+                servidor["comprovante_anexo"],
+            ),
+        ]
+    )
 
     return render(
         request,
@@ -194,6 +189,9 @@ def documentos_servidor(request, ps_pk):
             "despacho_assinado": despacho_assinado,
             "oficio_assinado": oficio_assinado,
             "attach_kinds": attach_kinds,
+            # Um payload só, no gatilho, em vez de 30 atributos planos. Sai como
+            # string e o template escapa: quem monta o HTML não é o Python.
+            "attach_kinds_json": json.dumps(attach_kinds, ensure_ascii=False),
             "wizard_page_steps": _build_prestacao_steps(ps, "documentos"),
             "back_url": reverse("prestacoes_contas:index"),
             "diario_url": reverse("prestacoes_contas:diario_servidor", args=[ps.pk]),

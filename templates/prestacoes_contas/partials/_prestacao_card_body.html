@@ -106,24 +106,11 @@
           data-attach-signed-file-help="Selecione um único arquivo em PDF, PNG, JPG ou JPEG."
           data-attach-signed-choose-label="Escolher arquivo"
           data-attach-signed-upload-label="Anexar arquivo"
-          data-attach-signed-url="{{ servidor.rt_assinado.anexar_url }}"
-          data-attach-signed-doc-label="o relatório técnico de {{ servidor.name }}"
-          data-attach-signed-current-name="{{ servidor.rt_assinado.nome_original }}"
-          data-attach-signed-current-view-url="{{ servidor.rt_assinado.view_url }}"
-          data-attach-signed-current-remove-url="{{ servidor.rt_assinado.remover_url }}"
-          data-attach-signed-primary-option-label="Relatório técnico"
-          data-attach-signed-secondary-url="{{ servidor.diario_assinado.anexar_url }}"
-          data-attach-signed-secondary-doc-label="o diário de bordo do ofício {{ card.numero_display }}"
-          data-attach-signed-secondary-current-name="{{ servidor.diario_assinado.nome_original }}"
-          data-attach-signed-secondary-current-view-url="{{ servidor.diario_assinado.view_url }}"
-          data-attach-signed-secondary-current-remove-url="{{ servidor.diario_assinado.remover_url }}"
-          data-attach-signed-secondary-option-label="Diário de bordo"
-          data-attach-signed-tertiary-url="{{ servidor.comprovante_anexo.anexar_url }}"
-          data-attach-signed-tertiary-doc-label="o comprovante de saque ou transferência de {{ servidor.name }}"
-          data-attach-signed-tertiary-current-name="{{ servidor.comprovante_anexo.nome_original }}"
-          data-attach-signed-tertiary-current-view-url="{{ servidor.comprovante_anexo.view_url }}"
-          data-attach-signed-tertiary-current-remove-url="{{ servidor.comprovante_anexo.remover_url }}"
-          data-attach-signed-tertiary-option-label="Comprovante"
+          {# Eram 17 atributos ordinais aqui, e o `primary` deste gatilho era o
+             relatório técnico enquanto o `primary` da etapa Documentos era o
+             despacho — mesmo modal, mesmo nome, documento diferente (H-03).
+             O payload agora vem do presenter, com chave semântica. #}
+          data-attach-signed-kinds="{{ card.attach_kinds_json }}"
         >
           <span class="oficio-lc__action-menu-item-icon cv-action-menu__item-icon--success" aria-hidden="true">
             {% include "components/ui/icons/icon.html" with icon="sign" only %}

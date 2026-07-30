@@ -18,25 +18,14 @@
       </span>
     </p>
 
+    {# H-03: eram cinco botões escritos à mão, nomeados por ordinal latino
+       (`primary`…`quinary`) e ocultados por `hidden` quando a tela tinha menos
+       tipos. O número de documentos anexáveis virava constante em três lugares —
+       aqui, no gatilho e na lista `KINDS` do JS. Agora o gatilho declara seus
+       tipos num payload e `attach-signed-modal.js` monta os botões. #}
     <div class="attach-signed-modal__kind" data-attach-signed-kind-selector hidden>
       <span class="attach-signed-modal__kind-label">Documento</span>
-      <div class="attach-signed-modal__kind-options" role="group" aria-label="Selecionar documento assinado">
-        <button type="button" class="attach-signed-modal__kind-option is-active" aria-pressed="true" data-attach-signed-kind="primary">
-          <span data-attach-signed-primary-option-label>Despacho</span>
-        </button>
-        <button type="button" class="attach-signed-modal__kind-option" aria-pressed="false" data-attach-signed-kind="secondary" hidden>
-          <span data-attach-signed-secondary-option-label>Ofício</span>
-        </button>
-        <button type="button" class="attach-signed-modal__kind-option" aria-pressed="false" data-attach-signed-kind="tertiary" hidden>
-          <span data-attach-signed-tertiary-option-label>RT</span>
-        </button>
-        <button type="button" class="attach-signed-modal__kind-option" aria-pressed="false" data-attach-signed-kind="quaternary" hidden>
-          <span data-attach-signed-quaternary-option-label>DB</span>
-        </button>
-        <button type="button" class="attach-signed-modal__kind-option" aria-pressed="false" data-attach-signed-kind="quinary" hidden>
-          <span data-attach-signed-quinary-option-label>Comprovante</span>
-        </button>
-      </div>
+      <div class="attach-signed-modal__kind-options" role="group" aria-label="Selecionar documento assinado" data-attach-signed-kind-options></div>
     </div>
 
     <form method="post" enctype="multipart/form-data" class="cv-dialog__form attach-signed-modal__form" data-attach-signed-form>
