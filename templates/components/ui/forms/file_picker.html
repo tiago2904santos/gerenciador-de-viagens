@@ -23,11 +23,11 @@
     </div>
     <span class="sr-only" id="{{ field_id }}-status" role="status" aria-live="polite" data-file-picker-status>Nenhum arquivo selecionado</span>
     <div class="cv-file-selection prestacao-file-selection" data-file-selection-dropdown hidden>
-      <button class="cv-file-selection__toggle prestacao-file-selection__toggle" type="button" aria-expanded="false" data-file-selection-toggle>
+      <button class="cv-file-selection__toggle prestacao-file-selection__toggle" type="button" aria-expanded="false" aria-controls="{{ field_id }}-file-menu" data-file-selection-toggle>
         <span data-file-selection-summary>Arquivos selecionados</span>
         <span class="cv-file-selection__chevron prestacao-file-selection__chevron" aria-hidden="true"></span>
       </button>
-      <div class="cv-file-selection__menu prestacao-file-selection__menu" data-file-selection-menu hidden>
+      <div class="cv-file-selection__menu prestacao-file-selection__menu" id="{{ field_id }}-file-menu" data-file-selection-menu hidden>
         <ul class="cv-file-selection__list prestacao-file-selection__list" data-file-selection-list></ul>
       </div>
     </div>

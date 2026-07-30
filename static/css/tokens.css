@@ -143,7 +143,7 @@
   --text-area-height-md: 88px;
   --text-area-height-lg: 176px;
   --text-area-height-justificativa: 220px;
-  --cv-btn-height: 36px;
+  --cv-btn-height: var(--control-height-md);
   --cv-btn-padding-x: 13px;
   --cv-btn-gap: 5px;
   --cv-btn-icon-size: 17px;
@@ -171,18 +171,65 @@
   --cv-status-success-bg: var(--color-success-soft);
   --cv-status-warning-bg: var(--color-warning-soft);
   --cv-status-danger-bg: var(--color-danger-soft);
-  --transition-fast: 140ms ease;
-  --transition-base: 160ms ease;
-  --transition-slow: 220ms ease;
+
+  /* --------------------------------------------------------------------------
+     Motion (duracao + easing + aliases semanticos)
+     -------------------------------------------------------------------------- */
+  --ease-standard: ease;
+  --ease-emphasis: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --duration-fast: 140ms;
+  --duration-base: 160ms;
+  --duration-normal: var(--duration-base);
+  --duration-slow: 220ms;
+  --transition-fast: var(--duration-fast) var(--ease-standard);
+  --transition-base: var(--duration-base) var(--ease-standard);
+  --transition-slow: var(--duration-slow) var(--ease-standard);
 
   /* --------------------------------------------------------------------------
      Pilha de camadas
      -------------------------------------------------------------------------- */
   --font-sans: "Segoe UI", Arial, sans-serif;
+  --z-background: 0;
+  --z-page-shell: 1;
+  --z-stepper: 2;
+  --z-footer-actions: 10;
+  --z-footer-actions-fixed: 10;
   --z-sidebar: 20;
   --z-dropdown: 50;
+  --z-overlay: 60;
   --z-modal: 100;
   --z-toast: 120;
+  --z-sticky-stepper: 1100;
+
+  /* --------------------------------------------------------------------------
+     Breakpoints (R-01) — escala fechada para @media (min|max)-width.
+     Custom properties sao referencia para JS/documentacao; @media usa px literal
+     (propriedades CSS nao funcionam dentro de @media nos browsers).
+
+     Escala fechada — use SOMENTE estes valores em @media width:
+       420  520  600  640  720  721  768  800  820  840  841  900
+       1080  1180  1181  1400  1480
+
+     Companions (*-min): 721 = xl+1, 841 = 2xl+1, 1181 = 5xl+1 — pares de
+     min-width para nao sobrepor max-width do degrau anterior no mesmo px.
+     -------------------------------------------------------------------------- */
+  --breakpoint-xs: 420px;
+  --breakpoint-sm: 520px;
+  --breakpoint-md: 600px;
+  --breakpoint-lg: 640px;
+  --breakpoint-xl: 720px;
+  --breakpoint-xl-min: 721px;
+  --breakpoint-tablet: 768px;
+  --breakpoint-xl-upper: 800px;
+  --breakpoint-2xl-entry: 820px;
+  --breakpoint-2xl: 840px;
+  --breakpoint-2xl-min: 841px;
+  --breakpoint-3xl: 900px;
+  --breakpoint-4xl: 1080px;
+  --breakpoint-5xl: 1180px;
+  --breakpoint-5xl-min: 1181px;
+  --breakpoint-6xl: 1400px;
+  --breakpoint-7xl: 1480px;
 
   /* Shell: sidebar fixa em % da viewport; conteudo usa o restante (grid em layout.css). */
   --sidebar-width: 15%;
@@ -222,4 +269,16 @@
   --app-font-weight-normal: 400;
   --app-font-weight-semibold: var(--font-weight-semibold);
   --app-font-weight-bold: var(--font-weight-bold);
+
+  /* Motion */
+  --app-duration-fast: var(--duration-fast);
+  --app-duration-base: var(--duration-base);
+  --app-duration-slow: var(--duration-slow);
+  --app-ease-standard: var(--ease-standard);
+
+  /* Z-index */
+  --app-z-sidebar: var(--z-sidebar);
+  --app-z-dropdown: var(--z-dropdown);
+  --app-z-modal: var(--z-modal);
+  --app-z-toast: var(--z-toast);
 }

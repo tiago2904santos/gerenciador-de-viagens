@@ -7,7 +7,7 @@
           <label class="cv-field__label" for="id_bate_volta_data_inicio_display">Data de ida</label>
           <div class="cv-date-picker__control">
             <input type="text" class="cv-field__control" id="id_bate_volta_data_inicio_display" placeholder="dd/mm/aaaa" autocomplete="off" inputmode="numeric" maxlength="10" data-cv-date-picker-start-display readonly>
-            <button type="button" class="cv-date-picker__trigger cv-date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-label="Abrir calendário">
+            <button type="button" class="cv-date-picker__trigger cv-date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-controls="{{ panel_id }}" aria-label="Abrir calendário">
               {% include "components/ui/forms/_date_picker_icon.html" %}
             </button>
           </div>
@@ -33,7 +33,7 @@
           <label class="cv-field__label" for="id_bate_volta_data_fim_display">Data de volta</label>
           <div class="cv-date-picker__control">
             <input type="text" class="cv-field__control" id="id_bate_volta_data_fim_display" placeholder="dd/mm/aaaa" autocomplete="off" inputmode="numeric" maxlength="10" data-cv-date-picker-end-display readonly>
-            <button type="button" class="cv-date-picker__trigger cv-date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-label="Abrir calendário">
+            <button type="button" class="cv-date-picker__trigger cv-date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-controls="{{ panel_id }}" aria-label="Abrir calendário">
               {% include "components/ui/forms/_date_picker_icon.html" %}
             </button>
           </div>

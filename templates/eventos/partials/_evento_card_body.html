@@ -1,36 +1,37 @@
 {# Miolo do card de evento — mesma linguagem do card de ofício: resumo em cartões (ofícios · documentos · efetivo) + servidores. #}
-<div class="oficio-lc__section">
-  <div class="oficio-lc__transport-row">
+<div class="cv-record-card__band">
+  <div class="cv-fact-grid">
 
-    <div class="oficio-lc__transport-card oficio-lc__transport-card--trechos">
-      <span class="oficio-lc__transport-label">Ofícios{% if card.oficios_count %} ({{ card.oficios_count }}){% endif %}</span>
+    <div class="cv-fact-block cv-fact-block--trechos">
+      <span class="cv-fact-block__label">Ofícios{% if card.oficios_count %} ({{ card.oficios_count }}){% endif %}</span>
       {% if card.oficios %}
-      <ul class="oficio-lc__trechos-list evento-lc__items-grid">
+      <ul class="cv-itinerary cv-fact-grid--dense">
         {% for oficio in card.oficios %}
-        <li class="oficio-lc__trecho oficio-lc__trecho--documento">
-          <div class="oficio-lc__trecho-body">
-            <div class="oficio-lc__trecho-rota">
+        <li class="cv-itinerary__leg cv-itinerary__leg--documento">
+          <div class="cv-itinerary__leg-body">
+            <div class="cv-itinerary__route">
               <span>{{ oficio.numero }}</span>
             </div>
             {% if oficio.protocolo or oficio.data_evento_display or oficio.destino_display %}
-            <div class="oficio-lc__trecho-times">
+            <div class="cv-itinerary__time">
               {% if oficio.protocolo %}{{ oficio.protocolo }}{% endif %}{% if oficio.protocolo and oficio.data_evento_display %} · {% endif %}{% if oficio.data_evento_display %}{{ oficio.data_evento_display }}{% endif %}{% if oficio.destino_display and oficio.protocolo or oficio.destino_display and oficio.data_evento_display %} · {% endif %}{% if oficio.destino_display %}{{ oficio.destino_display }}{% endif %}
             </div>
             {% endif %}
           </div>
-          <div class="oficio-lc__trecho-actions">
+          <div class="cv-itinerary__leg-actions">
             <button
               type="button"
-              class="cv-icon-btn cv-icon-btn--settings oficio-lc__document-menu-trigger"
+              class="cv-icon-btn cv-icon-btn--settings cv-icon-btn--documents"
               aria-label="Abrir ações do ofício {{ oficio.numero }}"
               aria-haspopup="true"
               aria-expanded="false"
+              aria-controls="evento-oficio-menu-{{ card.pk }}-{{ oficio.oficio_pk }}"
               data-tooltip="Ações e documentos"
               data-overlay-trigger data-overlay-kind="menu"
               data-overlay-target="evento-oficio-menu-{{ card.pk }}-{{ oficio.oficio_pk }}"
             >{% include "components/ui/icons/icon.html" with icon="folder" only %}</button>
             <div
-              class="cv-action-menu cv-action-menu--rich oficio-lc__document-menu"
+              class="cv-action-menu cv-action-menu--rich cv-action-menu--documents"
               id="evento-oficio-menu-{{ card.pk }}-{{ oficio.oficio_pk }}"
               role="menu"
               hidden
@@ -54,40 +55,41 @@
         {% endfor %}
       </ul>
       {% else %}
-      <div class="oficio-lc__transport-modelo oficio-lc__text--empty">Nenhum ofício vinculado</div>
+      <div class="cv-fact-block__value--secondary cv-empty-hint">Nenhum ofício vinculado</div>
       {% endif %}
     </div>
 
-    <div class="oficio-lc__transport-card oficio-lc__transport-card--trechos evento-lc__documentos-card">
-      <span class="oficio-lc__transport-label">Documentos{% if card.documentos_count %} ({{ card.documentos_count }}){% endif %}</span>
+    <div class="cv-fact-block cv-fact-block--trechos cv-fact-block--documents">
+      <span class="cv-fact-block__label">Documentos{% if card.documentos_count %} ({{ card.documentos_count }}){% endif %}</span>
       {% if card.documentos %}
-      <ul class="oficio-lc__trechos-list evento-lc__items-grid">
+      <ul class="cv-itinerary cv-fact-grid--dense">
         {% for doc in card.documentos %}
-        <li class="oficio-lc__trecho oficio-lc__trecho--documento">
-          <div class="oficio-lc__trecho-body">
-            <div class="oficio-lc__trecho-rota">
+        <li class="cv-itinerary__leg cv-itinerary__leg--documento">
+          <div class="cv-itinerary__leg-body">
+            <div class="cv-itinerary__route">
               <span>{{ doc.title }}</span>
-              <span class="oficio-lc__traveller-badge">{{ doc.kind }}</span>
+              <span class="cv-person-row__badge">{{ doc.kind }}</span>
             </div>
             {% if doc.meta or doc.detail %}
-            <div class="oficio-lc__trecho-times">
+            <div class="cv-itinerary__time">
               {% if doc.meta %}{{ doc.meta }}{% endif %}{% if doc.meta and doc.detail %} · {% endif %}{% if doc.detail %}{{ doc.detail }}{% endif %}
             </div>
             {% endif %}
           </div>
-          <div class="oficio-lc__trecho-actions">
+          <div class="cv-itinerary__leg-actions">
             <button
               type="button"
-              class="cv-icon-btn cv-icon-btn--settings oficio-lc__document-menu-trigger"
+              class="cv-icon-btn cv-icon-btn--settings cv-icon-btn--documents"
               aria-label="Abrir ações de {{ doc.title }}"
               aria-haspopup="true"
               aria-expanded="false"
+              aria-controls="evento-documento-menu-{{ card.pk }}-{{ forloop.counter }}"
               data-tooltip="Ações e documentos"
               data-overlay-trigger data-overlay-kind="menu"
               data-overlay-target="evento-documento-menu-{{ card.pk }}-{{ forloop.counter }}"
             >{% include "components/ui/icons/icon.html" with icon="folder" only %}</button>
             <div
-              class="cv-action-menu cv-action-menu--rich oficio-lc__document-menu"
+              class="cv-action-menu cv-action-menu--rich cv-action-menu--documents"
               id="evento-documento-menu-{{ card.pk }}-{{ forloop.counter }}"
               role="menu"
               hidden
@@ -111,7 +113,7 @@
         {% endfor %}
       </ul>
       {% else %}
-      <div class="oficio-lc__transport-modelo oficio-lc__text--empty">Nenhum plano, convite ou OS vinculado</div>
+      <div class="cv-fact-block__value--secondary cv-empty-hint">Nenhum plano, convite ou OS vinculado</div>
       {% endif %}
     </div>
 
@@ -119,31 +121,32 @@
 </div>
 
 {% if card.servidores_flat %}
-<div class="oficio-lc__section">
-  <ul class="oficio-lc__travellers oficio-lc__travellers--n{% if card.servidores_flat_count == 1 %}1{% else %}2{% endif %}">
+<div class="cv-record-card__band">
+  <ul class="cv-person-list cv-person-list--n{% if card.servidores_flat_count == 1 %}1{% else %}2{% endif %}">
     {% for oficio in card.oficios %}
       {% for s in oficio.servidores %}
-      <li class="oficio-lc__traveller{% if s.is_motorista %} oficio-lc__traveller--motorista{% endif %}">
-        <span class="oficio-lc__traveller-avatar" aria-hidden="true">{{ s.initials }}</span>
+      <li class="cv-person-row{% if s.is_motorista %} cv-person-row--highlight{% endif %}">
+        <span class="cv-person-row__avatar" aria-hidden="true">{{ s.initials }}</span>
 
-        <div class="oficio-lc__traveller-body">
-          <div class="oficio-lc__traveller-name-row">
-            <span class="oficio-lc__traveller-name">{{ s.name }}</span>
-            <span class="oficio-lc__traveller-badge">{{ oficio.numero }}</span>
+        <div class="cv-person-row__body">
+          <div class="cv-person-row__name-row">
+            <span class="cv-person-row__name">{{ s.name }}</span>
+            <span class="cv-person-row__badge">{{ oficio.numero }}</span>
           </div>
           {% if s.cargo or s.unidade %}
-          <span class="oficio-lc__traveller-meta">{% if s.cargo %}{{ s.cargo }}{% endif %}{% if s.cargo and s.unidade %} · {% endif %}{% if s.unidade %}{{ s.unidade }}{% endif %}</span>
+          <span class="cv-person-row__meta">{% if s.cargo %}{{ s.cargo }}{% endif %}{% if s.cargo and s.unidade %} · {% endif %}{% if s.unidade %}{{ s.unidade }}{% endif %}</span>
           {% endif %}
         </div>
 
         {% if s.has_termo %}
-        <div class="oficio-lc__traveller-actions">
+        <div class="cv-person-row__actions">
           <button
             type="button"
             class="cv-icon-btn cv-icon-btn--edit{% if s.termo_assinado %} is-assinado{% endif %}"
             aria-label="Ações do termo de {{ s.name }}"
             aria-haspopup="true"
             aria-expanded="false"
+            aria-controls="evento-termo-action-menu-{{ oficio.oficio_pk }}-{{ s.servidor_pk }}"
             data-tooltip="{% if s.termo_assinado %}Termo assinado — ações{% else %}Ações do termo{% endif %}"
             data-overlay-trigger data-overlay-kind="menu"
             data-overlay-target="evento-termo-action-menu-{{ oficio.oficio_pk }}-{{ s.servidor_pk }}"

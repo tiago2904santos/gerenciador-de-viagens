@@ -307,7 +307,7 @@
   --cv-icon-btn-icon-size: 18px;
 }
 
-@media (max-width: 620px) {
+@media (max-width: 640px) {
   .cv-file-picker,
   .prestacao-file-picker {
     grid-template-columns: 1fr;

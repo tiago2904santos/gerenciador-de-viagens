@@ -623,7 +623,7 @@ class OficioWizardDadosViajantesTests(TestCase):
 
         response = self.client.get(reverse("oficios:index") + "?aba=atuais")
 
-        self.assertContains(response, "oficio-lc__transport-card--motorista-externo")
+        self.assertContains(response, "cv-fact-block--motorista-externo")
         self.assertContains(response, "Ofício 79/2026 · Protocolo 15.000.003-9")
         self.assertNotContains(response, "Externo ao ofício")
 

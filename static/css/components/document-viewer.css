@@ -158,7 +158,7 @@
   .doc-pdf-thumb { flex: 0 0 86px; }
 }
 
-@media (max-width: 680px) {
+@media (max-width: 720px) {
   .doc-pdf-toolbar { align-items: stretch; }
   .doc-pdf-toolbar__left,
   .doc-pdf-toolbar__center,

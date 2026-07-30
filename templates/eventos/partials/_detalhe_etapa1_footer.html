@@ -1,0 +1,2 @@
+{% url 'eventos:index' as back_url_eventos %}
+{% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar à lista" secondary_url=back_url_eventos primary_label="Salvar e avançar" primary_action="wizard_next" only %}

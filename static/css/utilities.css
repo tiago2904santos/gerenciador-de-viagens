@@ -124,10 +124,14 @@
    2. Alertas semanticos
    -------------------------------------------------------------------------- */
 .alert {
+  align-items: flex-start;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-xs);
+  display: grid;
   font-weight: 600;
+  gap: var(--space-1) var(--space-2);
+  grid-template-columns: auto minmax(0, 1fr);
   padding: var(--space-3) var(--space-4);
   position: relative;
 }
@@ -136,9 +140,26 @@
   border-radius: var(--radius-pill);
   content: "";
   display: inline-block;
+  grid-row: 1 / span 2;
   height: 8px;
-  margin-right: var(--space-2);
+  margin: 6px 0 0;
   width: 8px;
+}
+
+.alert__title {
+  color: inherit;
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  grid-column: 2;
+}
+
+.alert__message {
+  color: inherit;
+  display: block;
+  font-weight: var(--font-weight-semibold);
+  grid-column: 2;
+  line-height: 1.45;
 }
 
 .alert-success {

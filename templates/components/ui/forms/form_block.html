@@ -1,5 +1,5 @@
 {% comment %}
-  Canonical internal form block.
+  Canonical internal form block (`H-04`).
 
   Shells:
   - block (default): cv-form-block, para seções dentro de um card maior
@@ -19,7 +19,11 @@
 
   Business behaviour belongs to data-* hooks supplied through extra_class or
   to the included body template; this component owns only shared structure.
+
+  Os parâmetros DESTE componente são zerados antes de incluir body, actions e
+  footer — os `form_block` aninhados usam os mesmos nomes (`H-04`).
 {% endcomment %}
+{% with corpo=body_template acoes=actions_template rodape=footer_template %}
 {% if shell == "card" %}
 <section
   class="cv-form-section-card{% if extra_class %} {{ extra_class }}{% endif %}"
@@ -33,10 +37,12 @@
       {% if description %}<p class="cv-form-section-subtitle">{{ description }}</p>{% endif %}
     </div>
 
-    {% if action_label or actions_template %}
+    {% if action_label or acoes %}
       <div class="cv-form-section-header__actions">
-        {% if actions_template %}
-          {% include actions_template %}
+        {% if acoes %}
+          {% with title="" description="" title_id="" section_id="" element_id="" extra_class="" body_extra_class="" body_template="" footer_template="" actions_template="" variant="" shell="" action_label="" action_url="" action_autosave="" action_variant="" data_hook="" heading_level="" body_id="" aria_label="" %}
+            {% include acoes %}
+          {% endwith %}
         {% else %}
           {% include "components/ui/buttons/button.html" with href=action_url label=action_label variant=action_variant|default:"secondary" data_autosave_link=action_autosave only %}
         {% endif %}
@@ -45,10 +51,16 @@
   </header>
 
   <div class="cv-form-section-body{% if body_extra_class %} {{ body_extra_class }}{% endif %}"{% if body_id %} id="{{ body_id }}"{% endif %}>
-    {% if body_template %}{% include body_template %}{% endif %}
+    {% with title="" description="" title_id="" section_id="" element_id="" extra_class="" body_extra_class="" body_template="" footer_template="" actions_template="" variant="" shell="" action_label="" action_url="" action_autosave="" action_variant="" data_hook="" heading_level="" body_id="" aria_label="" %}
+      {% if corpo %}{% include corpo %}{% endif %}
+    {% endwith %}
   </div>
 
-  {% if footer_template %}{% include footer_template %}{% endif %}
+  {% if rodape %}
+    {% with title="" description="" title_id="" section_id="" element_id="" extra_class="" body_extra_class="" body_template="" footer_template="" actions_template="" variant="" shell="" action_label="" action_url="" action_autosave="" action_variant="" data_hook="" heading_level="" body_id="" aria_label="" %}
+      {% include rodape %}
+    {% endwith %}
+  {% endif %}
 </section>
 {% else %}
 <section
@@ -57,7 +69,7 @@
   {% if section_id %}aria-labelledby="{{ section_id }}"{% elif aria_label %}aria-label="{{ aria_label }}"{% endif %}
   {% if data_hook %}data-{{ data_hook }}{% endif %}
 >
-  {% if title or description or action_label or actions_template %}
+  {% if title or description or action_label or acoes %}
   <header class="cv-form-block__header">
     <div class="cv-form-block__copy">
       {% if title %}
@@ -70,10 +82,12 @@
       {% if description %}<p class="cv-form-block__description">{{ description }}</p>{% endif %}
     </div>
 
-    {% if action_label or actions_template %}
+    {% if action_label or acoes %}
       <div class="cv-form-block__actions">
-        {% if actions_template %}
-          {% include actions_template %}
+        {% if acoes %}
+          {% with title="" description="" title_id="" section_id="" element_id="" extra_class="" body_extra_class="" body_template="" footer_template="" actions_template="" variant="" shell="" action_label="" action_url="" action_autosave="" action_variant="" data_hook="" heading_level="" body_id="" aria_label="" %}
+            {% include acoes %}
+          {% endwith %}
         {% else %}
           {% include "components/ui/buttons/button.html" with href=action_url label=action_label variant=action_variant|default:"secondary" data_autosave_link=action_autosave only %}
         {% endif %}
@@ -83,9 +97,16 @@
   {% endif %}
 
   <div class="cv-form-block__body{% if body_extra_class %} {{ body_extra_class }}{% endif %}"{% if body_id %} id="{{ body_id }}"{% endif %}>
-    {% if body_template %}{% include body_template %}{% endif %}
+    {% with title="" description="" title_id="" section_id="" element_id="" extra_class="" body_extra_class="" body_template="" footer_template="" actions_template="" variant="" shell="" action_label="" action_url="" action_autosave="" action_variant="" data_hook="" heading_level="" body_id="" aria_label="" %}
+      {% if corpo %}{% include corpo %}{% endif %}
+    {% endwith %}
   </div>
 
-  {% if footer_template %}{% include footer_template %}{% endif %}
+  {% if rodape %}
+    {% with title="" description="" title_id="" section_id="" element_id="" extra_class="" body_extra_class="" body_template="" footer_template="" actions_template="" variant="" shell="" action_label="" action_url="" action_autosave="" action_variant="" data_hook="" heading_level="" body_id="" aria_label="" %}
+      {% include rodape %}
+    {% endwith %}
+  {% endif %}
 </section>
 {% endif %}
+{% endwith %}

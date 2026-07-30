@@ -158,21 +158,6 @@
   --text-secondary: var(--theme-text-body);
   --text-muted:     var(--theme-text-muted);
   --text-inverse:   var(--color-white);
-
-  /* --- Duração e easing --- */
-  --duration-fast:   140ms;
-  --duration-normal: 160ms;
-  --duration-slow:   220ms;
-  --ease-standard:   ease;
-
-  /* --- Z-index das camadas de página --- */
-  --z-background:           0;
-  --z-page-shell:           1;
-  --z-stepper:              2;
-  --z-footer-actions:       10;
-  --z-footer-actions-fixed: 10;
-  --z-sticky-stepper:       1100; /* acima do Leaflet (~400–800) no wizard */
-  --z-overlay:              60;
 }
 
 
@@ -420,10 +405,15 @@ html[data-theme="light"] {
 /* =========================================================
    06. Page Shell Variants
    Controles de largura e composição por tipo de página.
+
+   Aliases canônicos (Etapa 7, Fase 9): cv-page--flow/form/narrow/collection*
+   espelham page-shell--wizard/standard/standard-simple/list/cards até a
+   renomeação completa de page-shell → cv-page.
    ========================================================= */
 
 /* Standard Simple: painel compacto centralizado (até 4 campos) */
-.page-shell--standard-simple > .main-form-panel {
+.page-shell--standard-simple > .main-form-panel,
+.cv-page--narrow > .main-form-panel {
   margin-inline: auto;
   max-width: var(--layout-form-panel-max-width);
   width: 100%;
@@ -884,7 +874,8 @@ html[data-theme="light"] {
 }
 
 /* Stepper fora do painel stack — card isolado como no UI Lab */
-.page-shell--wizard > .page-stepper {
+.page-shell--wizard > .page-stepper,
+.cv-page--flow > .page-stepper {
   background: var(--surface-stepper);
   isolation: isolate;
   position: sticky;
@@ -3538,7 +3529,8 @@ html[data-theme="dark"] .quick-add-footer-button.is-filled:hover {
     flex-basis: 100%;
   }
 
-  .page-shell--wizard > .page-stepper {
+  .page-shell--wizard > .page-stepper,
+  .cv-page--flow > .page-stepper {
     position: relative;
     top: auto;
   }

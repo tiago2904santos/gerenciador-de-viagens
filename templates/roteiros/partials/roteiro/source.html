@@ -1,6 +1,2 @@
 {# SEÇÃO 1: FONTE DO ROTEIRO #}
-{% if roteiro_editor_oficio %}
-  {% include "components/ui/forms/form_block.html" with shell="" variant="resource" extra_class="roteiro-editor__section--fonte route-section-block" section_id="sec-fonte" title="Origem e destinos" description="Use um roteiro salvo ou defina a sede e os destinos." actions_template="roteiros/partials/roteiro/_fonte_actions.html" body_template="roteiros/partials/roteiro/_fonte_body.html" %}
-{% else %}
-  {% include "components/ui/forms/form_block.html" with shell="card" variant="resource" extra_class="roteiro-editor__section--fonte" section_id="sec-fonte" title="Origem e destinos" description="Use um roteiro salvo ou defina a sede e os destinos." actions_template="roteiros/partials/roteiro/_fonte_actions.html" body_template="roteiros/partials/roteiro/_fonte_body.html" %}
-{% endif %}
+{% include "components/ui/forms/form_block.html" with shell="" variant="resource" extra_class="roteiro-editor__section--fonte route-section-block" section_id="sec-fonte" title="Origem e destinos" description="Use um roteiro salvo ou defina a sede e os destinos." actions_template="roteiros/partials/roteiro/_fonte_actions.html" body_template="roteiros/partials/roteiro/_fonte_body.html" %}

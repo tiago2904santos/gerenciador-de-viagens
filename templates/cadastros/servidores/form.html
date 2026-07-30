@@ -10,21 +10,7 @@
         <form method="post" novalidate data-servidor-form>
           {% csrf_token %}
           {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
-          <section class="cv-form-section-card cv-form-card" aria-labelledby="servidores-form-card-title">
-            <header class="cv-form-section-header">
-              <div class="cv-form-section-header__copy">
-                <h3 class="cv-form-section-title" id="servidores-form-card-title">Dados do servidor</h3>
-              </div>
-            </header>
-
-            <div class="cv-form-section-body">
-              {% include "components/ui/forms/form_block.html" with title="Identificação funcional" description="Dados pessoais, cargo e unidade de lotação" section_id="servidores-form-id" body_extra_class="cv-form-stack" body_template="cadastros/servidores/partials/_form_fields.html" %}
-            </div>
-
-            <div class="cv-form-card__footer">
-              {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar" secondary_url=back_url primary_label="Salvar" only %}
-            </div>
-          </section>
+          {% include "components/form/card.html" with title="Dados do servidor" title_id="servidores-form-card-title" body_template="cadastros/servidores/partials/_form_card_body.html" footer_template="cadastros/servidores/partials/_form_card_footer.html" %}
         </form>
       </div>
     </div>

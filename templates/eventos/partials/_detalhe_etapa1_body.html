@@ -1,0 +1,8 @@
+{# ── 1. Identificação ─────────────────────────────── #}
+{% include "components/ui/forms/form_block.html" with element_id="evento-card-identificacao-d" section_id="evento-wizard-tipo-title-d" extra_class="travel-document-block document-form-block" title="Identificação" description="Escolha o tipo e registre o motivo que contextualiza esta atividade." body_extra_class="termo-block__body" body_template="eventos/partials/_detalhe_identificacao_body.html" %}
+
+{# ── 2. Quando e onde ─────────────────────────────── #}
+{% include "components/ui/forms/form_block.html" with element_id="evento-card-dados-d" section_id="evento-card-dados-title-d" extra_class="travel-document-block document-form-block" title="Quando e onde" description="Informe o período e ao menos um destino para continuar." body_extra_class="cv-form-stack termo-evento-body" body_template="eventos/partials/_detalhe_dados_body.html" %}
+
+{# ── 3. Documentos vinculados ─────────────────────── #}
+{% include "components/ui/forms/form_block.html" with element_id="evento-card-documentos-d" section_id="evento-card-documentos-title-d" extra_class="travel-document-block document-form-block" title="Documentos vinculados" description="Reaproveite documentos existentes. Marque para vincular e desmarque para remover o vínculo." body_extra_class="termo-block__body" body_template="eventos/partials/_detalhe_documentos_body.html" %}

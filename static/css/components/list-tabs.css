@@ -9,7 +9,8 @@
 }
 
 /* Conexão visual com o header flat: abas logo abaixo do divisor. */
-.page-shell--list > .cv-list-tabs {
+.page-shell--list > .cv-list-tabs,
+.cv-page--collection > .cv-list-tabs {
   margin-top: calc(-1 * var(--space-1, 4px));
   padding-bottom: var(--space-1, 4px);
   padding-top: var(--space-3, 12px);
@@ -99,7 +100,7 @@
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-focus, #74aae0) 28%, transparent);
 }
 
-@media (max-width: 560px) {
+@media (max-width: 600px) {
   :is(html[data-theme="dark"])
     .cv-list-tabs {
     display: grid;
@@ -113,7 +114,7 @@
   }
 }
 
-@media (max-width: 360px) {
+@media (max-width: 420px) {
   :is(html[data-theme="dark"])
     .cv-list-tabs {
     grid-template-columns: minmax(0, 1fr);

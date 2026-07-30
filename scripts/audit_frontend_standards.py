@@ -42,8 +42,12 @@ CSS_EXCEPTIONS: dict[str, dict] = {
         "reason": "Arquivo de tema — cores hex são a definição original, permitidas aqui.",
         "rules": {"hex_color_outside_tokens"},
     },
-    "static/css/dark-redesign.css": {
-        "reason": "Official dark-theme layer; literal values define its tokens and theme-only finishes.",
+    "static/css/03-theme-dark.css": {
+        "reason": "Official dark-theme token layer; literal values define semantic tokens.",
+        "rules": {"hex_color_outside_tokens"},
+    },
+    "static/css/components/theme-dark-components.css": {
+        "reason": "Transitional dark-theme component overrides; literals allowed until dissolved into components.",
         "rules": {"hex_color_outside_tokens"},
     },
     "static/css/auth.css": {

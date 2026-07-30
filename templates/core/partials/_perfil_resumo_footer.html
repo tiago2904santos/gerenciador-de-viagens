@@ -1,0 +1,12 @@
+<div class="cv-card-footer-section">
+  <div class="cv-card-footer-section__divider" aria-hidden="true"></div>
+  <footer class="cv-card-footer">
+    <div class="cv-card-footer__secondary"></div>
+    <div class="cv-card-footer__primary">
+      <form method="post" action="{% url 'core:logout' %}">
+        {% csrf_token %}
+        {% include "components/ui/buttons/button.html" with label="Sair do sistema" variant="secondary" type="submit" only %}
+      </form>
+    </div>
+  </footer>
+</div>

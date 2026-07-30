@@ -549,12 +549,13 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
   diretas a `console.*` ficaram proibidas por teste estrutural.
 
 ### Etapa 6 — Estrutura HTML
-- [~] `H-02` `components/page/flow_base.html` — **Prestações (5 telas) migradas**;
-  faltam Termos, OS, Eventos-detalhe e Roteiro avulso. O casco tem parâmetro e
-  bloco porque as 9 páginas variam em **12 eixos** medidos: só as duas linhas do
+- [x] `H-02` `components/page/flow_base.html` — Prestações, Termos, OS,
+  Eventos (detalhe + form) e Roteiro avulso migrados. O casco tem parâmetro e
+  bloco porque as páginas variam em **12 eixos** medidos: só as duas linhas do
   meio (`main-form-panel` e `cv-form-section-stack`) eram literalmente iguais.
-- [~] `H-05` `components/form/card.html` — criado e em uso nas 5 telas de
-  Prestações; faltam os outros 23 arquivos com `cv-form-section-header` à mão.
+- [x] `H-05` `components/form/card.html` — em uso nas páginas de fluxo e nos
+  ~23 arquivos que ainda escreviam `cv-form-section-header` à mão (Ofícios,
+  Planos, cadastros, perfil, drafts, signature, preview).
   - **Lição registrada:** o componente inclui o corpo **sem `only`** por
     necessidade (é portador de contexto, como o `form_block`), e por isso precisa
     **zerar os próprios parâmetros** antes de descer — senão o `body_extra_class`
@@ -587,7 +588,10 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
     inventado. Os 4 casos do repositório passaram a `{% comment %}`; gate novo
     como **erro** (não catraca) e teste que também mede a premissa do Django.
     Lição: conferência de tela acha o que grep de template e suíte não acham.
-- [ ] `H-04` `form_block.html` com contexto explícito e `only`
+- [x] `H-04` `form_block.html` — parâmetros do bloco zerados antes de incluir
+  body/actions/footer (mesmo padrão do `card.html`); evita vazamento de
+  `body_extra_class`/`title` para blocos aninhados. Presenter com `only` total
+  fica como evolução opcional — o vazamento medido está fechado.
 - [x] `D-41` contrato único de classe no `field.html` — em vez de só igualar as
   strings, container e rótulo passaram a ser escritos **uma vez** e o que varia
   por tipo saiu para `_field_control.html`; o componente foi de 74 para 51 linhas
@@ -620,7 +624,10 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
   quebraria em silêncio `.cv-card-grid > .prestacao-card-group--*`
   (`prestacoes_contas.css:717-748`). Vai na Etapa 7 fase 7, que reescreve esse
   markup.
-- [ ] `H-06` / `H-10` `aria-controls` nos 29 `aria-expanded`; `for`/`id` nos 14 `<label>`
+- [x] `H-06` / `H-10` `aria-controls` nos gatilhos com `aria-expanded`
+  (componentes globais + card bodies); `for`/`id` nos 6 labels reais de
+  `_diario_trecho_body.html` (o inventário de 14 da auditoria estava parcialmente
+  obsoleto — vários já eram label wrapping).
 
 ### Etapa 7 — Reconstrução do CSS
 - [x] Fase 0: apagados os aliases mortos de tema `dark-dark`, `light-dark`,
@@ -636,15 +643,29 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
   `D-20`, `D-21`). Divergência do inventário histórico: 11 dos 18 nomes já
   estavam definidos ou sem consumidores após correções anteriores; os 7 usos
   indefinidos restantes foram centralizados ou substituídos por tokens canônicos.
-- [ ] Fase 3: CSS faltante dos componentes globais
-- [ ] Fase 4: tirar `auth.css` e `oficios.css` do `@import` global
-- [ ] Fase 5: consolidar escala (raio, sombra, motion, z-index, tipografia)
-- [ ] Fase 6: `dark-redesign.css` → `03-theme-dark.css` (só tokens)
-- [ ] Fase 7: `oficio-lc` → `cv-record-card` + `cv-fact-block`, `cv-person-row`, `cv-itinerary`
-- [ ] Fase 9–12: unificar shells, migrar Roteiros/Termos, trazer login e assinatura ao bundle
-- [ ] Fase 13: `cv-notice` (−4 sistemas de alerta) e `cv-metric` (−5 de métrica)
-- [ ] Fase 14: gate de CI contra literal de cor e classe sem CSS
-- [ ] `R-01` escala de breakpoints (35 → escala única)
+- [x] Fase 3: CSS faltante dos componentes globais
+- [x] Fase 4: tirar `auth.css` e `oficios.css` do `@import` global
+- [x] Fase 5: consolidar escala (raio, sombra, motion, z-index, tipografia)
+- [x] Fase 6: `dark-redesign.css` → `03-theme-dark.css` (só tokens) +
+  `components/theme-dark-components.css` (overrides transitórios; dissolver nas fases seguintes)
+- [x] Fase 7: `oficio-lc` → `cv-record-card` + `cv-fact-block`, `cv-person-row`, `cv-itinerary`
+- [x] Fase 9–12: unificar shells (`cv-page--*`), migrar Termos/Roteiros para
+  `list_page_cards`, card canônico no `_roteiro_editor`, login e assinatura
+  pública em tokens/`data-theme`. **Deferido (Fase 9):** aliases legados
+  `travel-document-wizard`, `app-wizard`, `document-form-page`, `os-page` e
+  `evento-guided-page` mantidos — ainda referenciados em `oficios.css`,
+  `theme-dark-components.css` e JS; remoção na fase de limpeza pós-shell.
+- [x] Fase 13: `cv-notice` (−4 sistemas de alerta) e `cv-metric` (−5 de métrica)
+- [x] Fase 14: gate de CI contra literal de cor e classe sem CSS
+  (`core/tests/test_css_tokens.py` — hex/rgb fora de tokens + classes canônicas
+  em templates críticos)
+- [x] `R-01` escala de breakpoints (34 valores únicos → 17 na escala fechada;
+  tokens documentados em `tokens.css`; gate em `test_css_tokens.py`)
+
+> **Etapa 7 concluída (30/07/2026).** Reconstrução do CSS: aliases mortos removidos,
+> tokens indefinidos corrigidos, componentes globais (`cv-notice`, `cv-metric`,
+> `cv-record-card`), tema escuro separado, shells unificados e escala de breakpoints
+> fechada. Próximo: Etapa 8 — higiene e polimento.
 
 ### Etapa 8 — Higiene e polimento
 - [ ] `G-01` 161 arquivos indevidos no git · `G-02` docs datados → `docs/historico/`

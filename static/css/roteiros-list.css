@@ -22,15 +22,15 @@
   margin: 0 0 var(--space-1);
 }
 
-/* ── Reuso do card de ofício (oficio-lc) na lista de roteiros ── */
+/* ── Reuso do card de ofício (cv-record-card) na lista de roteiros ── */
 
 /* Rota pode ocupar várias linhas em vez de truncar com reticências */
-.oficio-lc--roteiro .oficio-lc__info-value--rota {
+.cv-record-card--roteiro .cv-record-card__info-value--rota {
   white-space: normal;
 }
 
 /* Trechos: 2 colunas de 3 · Valor Total: 1 coluna de 3 */
-.oficio-lc--roteiro .oficio-lc__transport-card--span2 {
+.cv-record-card--roteiro .cv-fact-block--span2 {
   grid-column: span 2;
 }
 
@@ -503,7 +503,7 @@
   padding-top: var(--space-1);
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 1080px) {
   .roteiro-list-card__body {
     grid-template-columns: minmax(0, 1.5fr) minmax(240px, 1fr);
   }

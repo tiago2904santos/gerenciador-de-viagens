@@ -5,64 +5,64 @@
    ══════════════════════════════════════════════════════════════════════════ */
 
 /* Ofícios e documentos ocupam linhas independentes. */
-.evento-lc .oficio-lc__transport-row {
+.evento-lc .cv-fact-grid {
   grid-template-columns: minmax(0, 1fr);
   max-height: none;
   min-height: 0;
 }
 
-.evento-lc .oficio-lc__transport-card--trechos {
+.evento-lc .cv-fact-block--trechos {
   justify-content: flex-start;
   max-height: none;
   min-height: 0;
 }
 
-.evento-lc .oficio-lc__transport-card--trechos .oficio-lc__trechos-list {
+.evento-lc .cv-fact-block--trechos .cv-itinerary {
   flex: 0 1 auto;
   max-height: 152px;
   overflow-x: hidden;
   overflow-y: auto;
 }
 
-.evento-lc__items-grid {
+.cv-fact-grid--dense {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
 }
 
 @container (min-width: 680px) {
-  .evento-lc__items-grid {
+  .cv-fact-grid--dense {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .evento-lc__items-grid > :last-child:nth-child(odd) {
+  .cv-fact-grid--dense > :last-child:nth-child(odd) {
     grid-column: 1 / -1;
   }
 }
 
 /* Badge do tipo/nº do documento não encolhe nem quebra dentro da linha. */
-.evento-lc .oficio-lc__trecho-rota .oficio-lc__traveller-badge {
+.evento-lc .cv-itinerary__route .cv-person-row__badge {
   flex-shrink: 0;
 }
 
 /* Unidade do servidor herda o peso do nome (separador discreto). */
-.evento-lc .oficio-lc__traveller-unidade {
+.evento-lc .cv-person-row__unidade {
   color: inherit;
   font-size: inherit;
   font-weight: inherit;
   letter-spacing: inherit;
 }
 
-.evento-lc .oficio-lc__traveller-unidade-sep {
+.evento-lc .cv-person-row__unidade-sep {
   color: var(--color-muted);
 }
 
 @media (max-width: 640px) {
-  .evento-lc .oficio-lc__trecho--documento {
+  .evento-lc .cv-itinerary__leg--documento {
     align-items: stretch;
     flex-direction: column;
   }
 
-  .evento-lc .oficio-lc__trecho--documento .oficio-lc__trecho-actions {
+  .evento-lc .cv-itinerary__leg--documento .cv-itinerary__leg-actions {
     justify-content: flex-start;
   }
 }

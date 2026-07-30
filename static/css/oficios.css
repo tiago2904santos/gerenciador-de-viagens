@@ -1059,7 +1059,7 @@
   margin-top: calc(-1 * var(--space-6));
 }
 
-@media (max-width: 960px) {
+@media (max-width: 900px) {
   .travel-document-wizard__layout {
     grid-template-columns: 1fr;
   }
@@ -1195,7 +1195,7 @@
   max-width: none;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1080px) {
   .oficio-data-grid--four,
   .oficio-data-grid--three,
   .oficio-data-grid--two {
@@ -1203,7 +1203,7 @@
   }
 }
 
-@media (max-width: 560px) {
+@media (max-width: 600px) {
   .oficio-data-grid--four,
   .oficio-data-grid--three,
   .oficio-data-grid--two {
@@ -1568,7 +1568,7 @@
   color: var(--color-muted-strong);
 }
 
-@media (max-width: 560px) {
+@media (max-width: 600px) {
   .motivo-card__actions {
     margin-left: 0;
     width: 100%;
@@ -1899,7 +1899,7 @@
 }
 
 /* Card da lista de ofícios: campos sem borda (mesma linguagem do cadastro) */
-.oficio-lc :is(.oficio-lc__transport-card, .oficio-lc__traveller, .oficio-lc__trecho) {
+.cv-record-card :is(.cv-fact-block, .cv-person-row, .cv-itinerary__leg) {
   border-color: transparent;
 }
 
@@ -2076,7 +2076,7 @@
   }
 }
 
-@media (min-width: 721px) and (max-width: 799px) {
+@media (min-width: 721px) and (max-width: 800px) {
   .oficio-documentos-traveller-line {
     flex-basis: 45%;
   }
@@ -2090,7 +2090,7 @@
   }
 }
 
-@media (max-width: 479px) {
+@media (max-width: 520px) {
   .oficio-documentos-vehicle-executive__facts {
     grid-template-columns: 1fr;
   }
@@ -2633,7 +2633,7 @@
   font-size: var(--font-size-xs);
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 1080px) {
   .oficio-documentos-route-card__body {
     grid-template-columns: minmax(0, 1.5fr) minmax(240px, 1fr);
   }
@@ -3125,7 +3125,7 @@ html[data-theme="light"] .cv-segment-toggle {
 }
 
 /* Telas estreitas: quebra o toggle em duas colunas para não espremer os rótulos. */
-@media (max-width: 680px) {
+@media (max-width: 720px) {
   .evento-doc-toggle.cv-segment-toggle {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -3309,7 +3309,8 @@ html[data-theme="dark"] [data-travel-document-wizard-step1] .cv-search-picker {
 }
 
 /* ── Etapa 1 / Roteiro: painéis por seção (layout estrutural) ─ */
-.page-shell--wizard.travel-document-wizard {
+.page-shell--wizard.travel-document-wizard,
+.cv-page--flow.travel-document-wizard {
   --stepper-missing-bg: color-mix(in srgb, var(--color-danger) 10%, transparent);
   --stepper-missing-border: color-mix(in srgb, var(--color-danger) 28%, transparent);
   --stepper-missing-color: color-mix(in srgb, var(--color-danger) 78%, var(--color-heading));
@@ -3337,8 +3338,8 @@ html[data-theme="dark"] [data-travel-document-wizard-step1] .cv-search-picker {
 /* ── Sugestões de viatura: sem corte (JS já limita a 8 chips) ───── */
 /* max-height removido — overflow: hidden cortava chips na segunda linha */
 
-/* ── Ofício List Card (oficio-lc) ───────────────────────────────── */
-.oficio-lc {
+/* ── Ofício List Card (cv-record-card) ───────────────────────────────── */
+.cv-record-card {
   background: var(--cv-form-section-bg, var(--color-card));
   border: 1px solid var(--cv-form-section-border, var(--color-border-soft));
   border-radius: var(--cv-form-section-radius, var(--radius-card));
@@ -3349,17 +3350,17 @@ html[data-theme="dark"] [data-travel-document-wizard-step1] .cv-search-picker {
     transform var(--transition-base);
 }
 
-.oficio-lc:hover {
+.cv-record-card:hover {
   box-shadow: var(--cv-form-section-shadow, var(--shadow-card));
   transform: none;
 }
 
-.oficio-lc__layout {
+.cv-record-card__layout {
   display: grid;
 }
 
 /* ── IDENTIFICAÇÃO: Número · Protocolo · Data de Criação (topo do card) ── */
-.oficio-lc__id-row {
+.cv-record-card__id-row {
   align-items: center;
   background: var(--cv-form-section-header-bg);
   background-image: linear-gradient(to right, color-mix(in srgb, var(--color-accent) 7%, transparent) 0px, transparent 76px);
@@ -3372,7 +3373,7 @@ html[data-theme="dark"] [data-travel-document-wizard-step1] .cv-search-picker {
   position: relative;
 }
 
-.oficio-lc__id-row::before {
+.cv-record-card__id-row::before {
   background: linear-gradient(180deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 50%, transparent) 100%);
   border-radius: var(--radius-pill);
   box-shadow:
@@ -3388,17 +3389,17 @@ html[data-theme="dark"] [data-travel-document-wizard-step1] .cv-search-picker {
   width: 8px;
 }
 
-.oficio-lc__id-row .oficio-lc__info-item {
+.cv-record-card__id-row .cv-record-card__info-item {
   padding: var(--space-4) 0 var(--space-4) var(--space-1);
 }
 
 /* ── LINHA SECUNDÁRIA DE INFO (Destino · Data do Evento) ── */
-.oficio-lc__info-row {
+.cv-record-card__info-row {
   display: flex;
   flex-wrap: wrap;
 }
 
-.oficio-lc__info-item {
+.cv-record-card__info-item {
   display: flex;
   flex: 1 1 120px;
   flex-direction: column;
@@ -3407,11 +3408,11 @@ html[data-theme="dark"] [data-travel-document-wizard-step1] .cv-search-picker {
   padding: var(--space-4) var(--space-4);
 }
 
-.oficio-lc__info-item--wide {
+.cv-record-card__info-item--wide {
   flex-basis: 200px;
 }
 
-.oficio-lc__info-label {
+.cv-record-card__info-label {
   color: var(--color-muted);
   font-size: var(--font-size-xs);
   font-weight: 700;
@@ -3420,7 +3421,7 @@ html[data-theme="dark"] [data-travel-document-wizard-step1] .cv-search-picker {
   text-transform: uppercase;
 }
 
-.oficio-lc__info-value {
+.cv-record-card__info-value {
   color: var(--color-heading);
   font-size: var(--font-size-xl);
   font-weight: 800;
@@ -3435,8 +3436,8 @@ html[data-theme="dark"] [data-travel-document-wizard-step1] .cv-search-picker {
    trabalho): em vez de truncar com reticências (que exige que o item flexível
    encolha corretamente em todo layout/viewport), deixa quebrar em várias
    linhas para nunca forçar overflow horizontal do card e esconder os botões
-   de ação. Mesmo raciocínio já aplicado em .oficio-lc__info-value--rota. */
-.oficio-lc__info-value--wrap {
+   de ação. Mesmo raciocínio já aplicado em .cv-record-card__info-value--rota. */
+.cv-record-card__info-value--wrap {
   overflow: visible;
   overflow-wrap: anywhere;
   text-overflow: clip;
@@ -3444,7 +3445,7 @@ html[data-theme="dark"] [data-travel-document-wizard-step1] .cv-search-picker {
 }
 
 /* ── BADGES DE STATUS ── */
-.oficio-lc__status-badge {
+.cv-record-card__status-badge {
   border-radius: var(--radius-pill);
   font-size: var(--font-size-xs);
   font-weight: 800;
@@ -3454,37 +3455,37 @@ html[data-theme="dark"] [data-travel-document-wizard-step1] .cv-search-picker {
   white-space: nowrap;
 }
 
-.oficio-lc__status-badge--success {
+.cv-record-card__status-badge--success {
   background: var(--color-success-soft);
   color: var(--color-success);
 }
 
-.oficio-lc__status-badge--warning {
+.cv-record-card__status-badge--warning {
   background: color-mix(in srgb, var(--color-accent) 14%, transparent);
   color: var(--color-accent);
 }
 
-.oficio-lc__status-badge--muted {
+.cv-record-card__status-badge--muted {
   background: var(--color-card-muted);
   border: 1px solid var(--color-border-soft);
   color: var(--color-muted-strong);
 }
 
-.oficio-lc__status-badge--info {
+.cv-record-card__status-badge--info {
   background: color-mix(in srgb, var(--color-primary) 12%, transparent);
   color: var(--color-primary);
 }
 
 /* ── SEÇÕES INTERNAS ── */
-.oficio-lc__section {
+.cv-record-card__band {
   padding: var(--space-5) var(--space-6);
 }
 
-.oficio-lc__section + .oficio-lc__section {
+.cv-record-card__band + .cv-record-card__band {
   position: relative;
 }
 
-.oficio-lc__section + .oficio-lc__section::before {
+.cv-record-card__band + .cv-record-card__band::before {
   background: var(--cv-form-section-border, var(--color-border-soft));
   content: "";
   height: 1px;
@@ -3494,7 +3495,7 @@ html[data-theme="dark"] [data-travel-document-wizard-step1] .cv-search-picker {
   top: 0;
 }
 
-.oficio-lc__section-heading {
+.cv-record-card__band-heading {
   color: var(--color-muted);
   font-size: var(--font-size-xs);
   font-weight: 700;
@@ -3507,44 +3508,44 @@ html[data-theme="dark"] [data-travel-document-wizard-step1] .cv-search-picker {
 /* H-08: estas listas viraram <ul>/<li>. O reset do user-agent (bullet, recuo de
    ~40px e margem vertical) precisa ser zerado aqui — `base.css` nao tem reset
    universal de lista, entao nada mais zeraria isto. */
-.oficio-lc__travellers,
-.oficio-lc__trechos-list {
+.cv-person-list,
+.cv-itinerary {
   list-style: none;
   margin-block: 0;
   padding-inline-start: 0;
 }
 
-.oficio-lc__traveller,
-.oficio-lc__trecho,
-.oficio-lc__empty-hint {
+.cv-person-row,
+.cv-itinerary__leg,
+.cv-empty-hint {
   list-style: none;
 }
 
-.oficio-lc__travellers {
+.cv-person-list {
   display: grid;
   gap: var(--space-2);
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.oficio-lc__travellers--n0,
-.oficio-lc__travellers--n1 {
+.cv-person-list--n0,
+.cv-person-list--n1 {
   grid-template-columns: minmax(0, 1fr);
 }
 
-.oficio-lc__travellers--n3 {
+.cv-person-list--n3 {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.oficio-lc__travellers--n5,
-.oficio-lc__travellers--n6,
-.oficio-lc__travellers--n7,
-.oficio-lc__travellers--n8,
-.oficio-lc__travellers--n9 {
+.cv-person-list--n5,
+.cv-person-list--n6,
+.cv-person-list--n7,
+.cv-person-list--n8,
+.cv-person-list--n9 {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 /* base card — alinhado ao tile de Documentos / Equipe */
-.oficio-lc__traveller {
+.cv-person-row {
   align-items: center;
   background: var(--color-card-muted);
   border: 1px solid var(--color-border-soft);
@@ -3556,11 +3557,11 @@ html[data-theme="dark"] [data-travel-document-wizard-step1] .cv-search-picker {
   padding: 10px 12px;
 }
 
-.oficio-lc__traveller:not(:has(.oficio-lc__traveller-avatar)) {
+.cv-person-row:not(:has(.cv-person-row__avatar)) {
   grid-template-columns: minmax(0, 1fr) auto;
 }
 
-.oficio-lc__traveller-avatar {
+.cv-person-row__avatar {
   align-items: center;
   background: color-mix(in srgb, var(--color-heading) 8%, transparent);
   border: 1px solid var(--color-border-soft);
@@ -3576,68 +3577,68 @@ html[data-theme="dark"] [data-travel-document-wizard-step1] .cv-search-picker {
   width: 40px;
 }
 
-.oficio-lc__traveller-body {
+.cv-person-row__body {
   display: grid;
   gap: 2px;
   min-width: 0;
 }
 
-.oficio-lc__traveller-actions {
+.cv-person-row__actions {
   align-items: center;
   display: inline-flex;
   flex-shrink: 0;
   justify-content: center;
 }
 
-.oficio-lc__travellers--n0 .oficio-lc__traveller,
-.oficio-lc__travellers--n1 .oficio-lc__traveller {
+.cv-person-list--n0 .cv-person-row,
+.cv-person-list--n1 .cv-person-row {
   grid-column: 1 / -1;
 }
 
 /* Motorista — mesmos tokens da Equipe / Documentos */
-.oficio-lc__traveller--motorista {
+.cv-person-row--highlight {
   background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface-muted, var(--color-card-muted)));
   border-color: var(--color-accent-border-soft, color-mix(in srgb, var(--color-accent) 40%, var(--color-border-soft)));
   box-shadow: inset 4px 0 0 var(--color-accent);
 }
 
-.oficio-lc__traveller--motorista .oficio-lc__traveller-name {
+.cv-person-row--highlight .cv-person-row__name {
   color: var(--color-heading);
 }
 
-.oficio-lc__traveller--motorista .oficio-lc__traveller-avatar {
+.cv-person-row--highlight .cv-person-row__avatar {
   background: var(--color-accent);
   border-color: var(--color-accent);
   color: var(--color-on-accent);
 }
 
-html[data-theme="light"] .oficio-lc__traveller--motorista {
+html[data-theme="light"] .cv-person-row--highlight {
   background: color-mix(in srgb, var(--color-accent) 8%, var(--color-card-muted));
   border-color: var(--color-accent-border-soft, var(--color-border-soft));
 }
 
-html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-name {
+html[data-theme="light"] .cv-person-row--highlight .cv-person-row__name {
   color: var(--color-heading);
 }
 
-.oficio-lc__traveller--justificativa {
+.cv-fact-row {
   background: var(--color-card-muted);
   border-color: var(--color-border-soft);
   min-height: 68px;
 }
 
-.oficio-lc__traveller--justificativa .oficio-lc__traveller-meta {
+.cv-fact-row .cv-person-row__meta {
   white-space: normal;
 }
 
 /* ASSINANTE é curto por natureza (nome · cargo): evita quebrar em 2 linhas e destoar da altura dos servidores */
-.oficio-lc__traveller--assinante .oficio-lc__traveller-meta {
+.cv-person-row--assinante .cv-person-row__meta {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.oficio-lc__traveller-name-row {
+.cv-person-row__name-row {
   align-items: center;
   display: flex;
   flex-wrap: wrap;
@@ -3645,7 +3646,7 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
   min-width: 0;
 }
 
-.oficio-lc__traveller-name {
+.cv-person-row__name {
   color: var(--color-heading);
   font-size: var(--font-size-sm);
   font-weight: 800;
@@ -3654,7 +3655,7 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
   min-width: 0;
 }
 
-.oficio-lc__traveller-meta {
+.cv-person-row__meta {
   color: var(--color-muted);
   flex-basis: 100%;
   font-size: var(--font-size-xs);
@@ -3663,7 +3664,7 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
   min-width: 0;
 }
 
-.oficio-lc__traveller-badge {
+.cv-person-row__badge {
   align-items: center;
   background: color-mix(in srgb, var(--color-accent) 18%, transparent);
   border: 1px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
@@ -3680,14 +3681,14 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
   white-space: nowrap;
 }
 
-.oficio-lc__traveller--motorista .oficio-lc__traveller-badge {
+.cv-person-row--highlight .cv-person-row__badge {
   background: var(--color-accent);
   border: 0;
   color: var(--color-on-accent);
 }
 
-.oficio-lc__traveller-actions,
-.oficio-lc__traveller-termo {
+.cv-person-row__actions,
+.cv-person-row__termo {
   align-items: center;
   display: inline-flex;
   flex-shrink: 0;
@@ -3696,7 +3697,7 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
 
 /* ── VIATURA E CONDUÇÃO ── */
 
-.oficio-lc__transport-row {
+.cv-fact-grid {
   align-items: stretch;
   display: grid;
   gap: var(--space-3);
@@ -3705,7 +3706,7 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
   max-height: 185px;
 }
 
-.oficio-lc__transport-card {
+.cv-fact-block {
   background: var(--color-card-muted);
   border: 1px solid var(--color-border-soft);
   border-radius: var(--radius-control);
@@ -3720,7 +3721,7 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
   max-height: 185px;
 }
 
-.oficio-lc__transport-label {
+.cv-fact-block__label {
   color: var(--color-accent);
   font-size: 10px;
   font-weight: 900;
@@ -3729,11 +3730,11 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
   text-transform: uppercase;
 }
 
-.oficio-lc__transport-label:first-child {
+.cv-fact-block__label:first-child {
   margin-top: 0;
 }
 
-.oficio-lc__transport-placa {
+.cv-fact-block__value {
   color: var(--color-heading);
   font-size: clamp(1.55rem, 14cqi, 2.85rem);
   font-weight: 900;
@@ -3744,7 +3745,7 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
   text-overflow: ellipsis;
 }
 
-.oficio-lc__transport-modelo {
+.cv-fact-block__value--secondary {
   color: var(--color-heading);
   font-size: clamp(1.25rem, 11cqi, 2.35rem);
   font-weight: 900;
@@ -3757,15 +3758,15 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
 
 /* Com motorista fora da equipe, placa e modelo dividem o card com nome e
    referências do ofício do condutor; reduza-os para preservar a hierarquia. */
-.oficio-lc__transport-card--motorista-externo .oficio-lc__transport-placa {
+.cv-fact-block--motorista-externo .cv-fact-block__value {
   font-size: clamp(1.25rem, 10cqi, 2rem);
 }
 
-.oficio-lc__transport-card--motorista-externo .oficio-lc__transport-modelo {
+.cv-fact-block--motorista-externo .cv-fact-block__value--secondary {
   font-size: clamp(1rem, 8cqi, 1.55rem);
 }
 
-.oficio-lc__transport-driver {
+.cv-fact-block__value {
   color: var(--color-heading);
   font-size: var(--font-size-md);
   font-weight: 800;
@@ -3773,7 +3774,7 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
   word-break: break-word;
 }
 
-.oficio-lc__transport-hint {
+.cv-fact-block__hint {
   color: var(--color-muted);
   font-size: var(--font-size-xs);
   line-height: 1.3;
@@ -3781,16 +3782,16 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
 }
 
 /* coluna de trechos: mais larga, scroll interno */
-.oficio-lc__transport-card--trechos {
+.cv-fact-block--trechos {
   /* mesma largura que as demais — herda flex: 1 1 0 */
 }
 
-.oficio-lc__transport-card--valor {
+.cv-fact-block--valor {
   /* mesma largura que as demais — herda flex: 1 1 0 */
 }
 
 /* lista de trechos com scroll — preenche o espaço restante do card */
-.oficio-lc__trechos-list {
+.cv-itinerary {
   display: flex;
   flex: 1 1 0;
   flex-direction: column;
@@ -3802,27 +3803,27 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
   scrollbar-width: thin;
 }
 
-.oficio-lc__trechos-list::-webkit-scrollbar {
+.cv-itinerary::-webkit-scrollbar {
   width: 4px;
 }
 
-.oficio-lc__trechos-list::-webkit-scrollbar-track {
+.cv-itinerary::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.oficio-lc__trechos-list::-webkit-scrollbar-thumb {
+.cv-itinerary::-webkit-scrollbar-thumb {
   background: var(--color-border-strong);
   border-radius: 2px;
 }
 
-.oficio-lc__trecho {
+.cv-itinerary__leg {
   background: transparent;
   border: 1px solid transparent;
   border-radius: var(--radius-sm);
   padding: var(--space-2) var(--space-3);
 }
 
-.oficio-lc__trecho-rota {
+.cv-itinerary__route {
   color: var(--color-heading);
   font-size: var(--font-size-sm);
   font-weight: 800;
@@ -3830,26 +3831,26 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
   word-break: break-word;
 }
 
-.oficio-lc__trecho-times {
+.cv-itinerary__time {
   color: var(--color-muted);
   font-size: var(--font-size-xs);
   margin-top: 2px;
 }
 
-.oficio-lc__transport-card--documentos {
+.cv-fact-block--documents {
   max-height: none;
   min-height: 0;
   width: 100%;
 }
 
-.oficio-lc__transport-card--documentos .oficio-lc__trechos-list {
+.cv-fact-block--documents .cv-itinerary {
   flex: 0 1 auto;
   max-height: 11.5rem;
   overflow-x: hidden;
   overflow-y: auto;
 }
 
-.oficio-lc__trecho--documento {
+.cv-itinerary__leg--documento {
   align-items: center;
   display: flex;
   gap: var(--space-3);
@@ -3857,32 +3858,32 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
   width: 100%;
 }
 
-.oficio-lc__trecho-body {
+.cv-itinerary__leg-body {
   flex: 1 1 0;
   min-width: 0;
 }
 
-.oficio-lc__trecho--documento .oficio-lc__trecho-rota {
+.cv-itinerary__leg--documento .cv-itinerary__route {
   align-items: center;
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
 }
 
-.oficio-lc__trecho--documento .oficio-lc__trecho-rota > span:first-child {
+.cv-itinerary__leg--documento .cv-itinerary__route > span:first-child {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.oficio-lc__trecho--documento .oficio-lc__trecho-times {
+.cv-itinerary__leg--documento .cv-itinerary__time {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.oficio-lc__trecho-actions {
+.cv-itinerary__leg-actions {
   align-items: center;
   display: flex;
   flex-shrink: 0;
@@ -3891,7 +3892,7 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
 }
 
 /* valor total das diárias */
-.oficio-lc__valor-total {
+.cv-fact-block__value--strong {
   color: var(--color-heading);
   font-size: clamp(32px, 3.5vw, 56px);
   font-weight: 900;
@@ -3900,7 +3901,7 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
   margin-top: var(--space-1);
 }
 
-.oficio-lc__valor-extenso {
+.cv-fact-block__value--long {
   color: var(--color-heading);
   font-size: var(--font-size-sm);
   font-weight: 700;
@@ -3909,7 +3910,7 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
 }
 
 /* valor em tamanho médio (ex.: valor por servidor, composição das diárias) */
-.oficio-lc__valor-medio {
+.cv-fact-block__value--average {
   color: var(--color-heading);
   font-size: var(--font-size-xl);
   font-weight: 900;
@@ -3919,29 +3920,29 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
 }
 
 /* Valores fluidos conforme a largura do próprio card (sem quebra de linha). */
-.oficio-lc__valor-total--fit,
-.oficio-lc__valor-medio--fit {
+.cv-fact-block__value--strong--fit,
+.cv-fact-block__value--average--fit {
   overflow: hidden;
   text-overflow: clip;
   white-space: nowrap;
 }
 
-.oficio-lc__valor-total--fit {
+.cv-fact-block__value--strong--fit {
   font-size: clamp(1.05rem, 13cqi, 2.75rem);
 }
 
-.oficio-lc__valor-medio--fit {
+.cv-fact-block__value--average--fit {
   font-size: clamp(.8rem, 9cqi, 1.75rem);
 }
 
 /* ── Estilos auxiliares ── */
-.oficio-lc__text--empty {
+.cv-empty-hint {
   color: var(--color-muted);
   font-style: italic;
   font-weight: 400;
 }
 
-.oficio-lc__empty-hint {
+.cv-empty-hint {
   color: var(--color-muted);
   font-size: var(--font-size-sm);
   font-style: italic;
@@ -3949,7 +3950,7 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
 }
 
 /* ── SUBCARD de justificativa ── */
-.oficio-lc__subcard {
+.cv-record-card__subcard {
   background: var(--color-card-muted);
   border: 1px solid var(--color-border-soft);
   border-radius: var(--radius-card);
@@ -3958,20 +3959,20 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
   padding: var(--space-4);
 }
 
-.oficio-lc__subcard-header {
+.cv-record-card__subcard-header {
   align-items: flex-start;
   display: flex;
   gap: var(--space-3);
   justify-content: space-between;
 }
 
-.oficio-lc__subcard-subtitle {
+.cv-record-card__subcard-subtitle {
   color: var(--color-muted);
   font-size: var(--font-size-xs);
   margin: 0;
 }
 
-.oficio-lc__badge {
+.cv-record-card__badge {
   border-radius: var(--radius-pill);
   flex-shrink: 0;
   font-size: var(--font-size-xs);
@@ -3980,40 +3981,40 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
   white-space: nowrap;
 }
 
-.oficio-lc__badge--success {
+.cv-record-card__badge--success {
   background: var(--color-success-soft);
   color: var(--color-success);
 }
 
-.oficio-lc__badge--warning {
+.cv-record-card__badge--warning {
   background: color-mix(in srgb, var(--color-accent) 14%, transparent);
   color: var(--color-accent);
 }
 
-.oficio-lc__badge--muted {
+.cv-record-card__badge--muted {
   background: var(--route-card-inner-bg, var(--color-card));
   border: 1px solid var(--route-card-inner-border, var(--color-border-soft));
   color: var(--color-muted-strong);
 }
 
-.oficio-lc__badge--info {
+.cv-record-card__badge--info {
   background: var(--color-info-bg);
   border: 1px solid var(--color-info-border);
   color: var(--color-info-text);
 }
 
-.oficio-lc__temporal-chip {
+.cv-record-card__temporal-chip {
   margin-left: auto;
 }
 
-.oficio-lc__subcard-text {
+.cv-record-card__subcard-text {
   color: var(--color-text);
   font-size: var(--font-size-sm);
   line-height: 1.6;
   margin: 0;
 }
 
-.oficio-lc__subcard-actions {
+.cv-record-card__subcard-actions {
   align-items: center;
   display: flex;
   flex-wrap: wrap;
@@ -4021,7 +4022,7 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
 }
 
 /* ── BOTÕES DE DOCUMENTO ── */
-.oficio-lc__doc-btn {
+.cv-record-card__doc-btn {
   align-items: center;
   border: 1px solid transparent;
   border-radius: var(--radius-control);
@@ -4040,58 +4041,58 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
   white-space: nowrap;
 }
 
-.oficio-lc__doc-btn--primary {
+.cv-record-card__doc-btn--primary {
   background: var(--color-accent);
   border-color: var(--color-accent);
   color: var(--color-white);
 }
 
-.oficio-lc__doc-btn--primary:hover {
+.cv-record-card__doc-btn--primary:hover {
   color: var(--color-white);
   filter: brightness(0.9);
 }
 
-.oficio-lc__doc-btn--secondary {
+.cv-record-card__doc-btn--secondary {
   background: var(--color-card);
   border-color: var(--color-border);
   color: var(--color-text);
 }
 
-.oficio-lc__doc-btn--secondary:hover {
+.cv-record-card__doc-btn--secondary:hover {
   background: var(--color-card-muted);
   border-color: var(--color-border-strong);
 }
 
-.oficio-lc__doc-btn--pdf {
+.cv-record-card__doc-btn--pdf {
   background: var(--color-danger-soft, #fef2f2);
   border-color: color-mix(in srgb, var(--color-danger) 40%, transparent);
   color: var(--color-danger);
 }
 
-.oficio-lc__doc-btn--pdf:hover {
+.cv-record-card__doc-btn--pdf:hover {
   background: color-mix(in srgb, var(--color-danger) 15%, transparent);
   color: var(--color-danger);
 }
 
-.oficio-lc__doc-btn--danger {
+.cv-record-card__doc-btn--danger {
   background: var(--color-card);
   border-color: var(--color-border-soft);
   color: var(--color-danger);
 }
 
-.oficio-lc__doc-btn--danger:hover {
+.cv-record-card__doc-btn--danger:hover {
   background: var(--color-danger-soft, #fef2f2);
   border-color: var(--color-danger);
 }
 
 /* ── FOOTER ── */
-.oficio-lc__footer {
+.cv-record-card__footer {
   background: var(--cv-form-section-bg, var(--color-surface));
   border-top: 1px solid var(--cv-form-section-border, var(--color-border-soft));
   padding: var(--space-3) var(--space-6);
 }
 
-.oficio-lc__footer-actions {
+.cv-record-card__footer-actions {
   align-items: center;
   display: flex;
   flex-wrap: wrap;
@@ -4100,33 +4101,33 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
   width: 100%;
 }
 
-.oficio-lc__footer-actions-main,
-.oficio-lc__footer-actions-danger {
+.cv-record-card__footer-actions-main,
+.cv-record-card__footer-actions--danger {
   display: flex;
   flex-wrap: wrap;
 }
 
-.oficio-lc__footer-actions-danger {
+.cv-record-card__footer-actions--danger {
   margin-left: auto;
 }
 
 /* ── Campo "Número da solicitação" (prestação de contas) ── */
-.oficio-lc__solicitacao-form {
+.cv-record-card__inline-form {
   align-items: flex-end;
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-3);
 }
 
-.oficio-lc__solicitacao-form .app-form-field,
-.oficio-lc__solicitacao-form .field {
+.cv-record-card__inline-form .app-form-field,
+.cv-record-card__inline-form .field {
   flex: 1 1 220px;
   margin: 0;
   min-width: 0;
 }
 
 /* ── Linha de servidor da prestação: solicitação à esquerda, nome/meta à direita ── */
-.oficio-lc__traveller.oficio-lc__traveller--prestacao {
+.cv-person-row.cv-person-row--prestacao {
   align-items: center;
   flex-basis: 100%;
   flex-wrap: nowrap;
@@ -4134,7 +4135,7 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
   grid-template-columns: max-content minmax(0, 1fr) auto auto;
 }
 
-.oficio-lc__solicitacao-form--inline {
+.cv-record-card__inline-form--inline {
   align-items: center;
   display: flex;
   flex: 0 0 auto;
@@ -4143,49 +4144,49 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
   margin: 0;
 }
 
-.oficio-lc__solicitacao-input {
+.cv-record-card__inline-input {
   width: 101px;
   min-width: 0;
 }
 
-.oficio-lc__saque-range-picker {
+.cv-record-card__inline-range {
   display: inline-flex;
   flex: 0 0 180px;
   min-width: 0;
   width: 180px;
 }
 
-.oficio-lc__saque-range-picker .travel-period-filter__btn {
+.cv-record-card__inline-range .travel-period-filter__btn {
   gap: 5px;
   min-width: 0;
   padding-inline: 10px;
   width: 100%;
 }
 
-.oficio-lc__saque-range-picker .travel-period-filter__label {
+.cv-record-card__inline-range .travel-period-filter__label {
   font-size: 0.72rem;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.oficio-lc__traveller--prestacao .oficio-lc__traveller-body {
+.cv-person-row--prestacao .cv-person-row__body {
   flex: 1 1 auto;
   min-width: 0;
 }
 
-.oficio-lc__traveller-badge--ok {
+.cv-person-row__badge--ok {
   background: color-mix(in srgb, var(--color-success, #1a7f4b) 16%, transparent);
   border-color: color-mix(in srgb, var(--color-success, #1a7f4b) 50%, transparent);
   color: var(--color-success, #1a7f4b);
 }
 
-@media (max-width: 599px) {
-  .oficio-lc__traveller.oficio-lc__traveller--prestacao {
+@media (max-width: 600px) {
+  .cv-person-row.cv-person-row--prestacao {
     flex-wrap: wrap;
     grid-template-columns: minmax(0, 1fr) auto auto;
   }
-  .oficio-lc__solicitacao-form--inline {
+  .cv-record-card__inline-form--inline {
     flex-basis: 100%;
     grid-column: 1 / -1;
     max-width: none;
@@ -4196,55 +4197,55 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
 /* ── RESPONSIVO ── */
 
 /* mobile estreito: 1 viajante por linha */
-@media (max-width: 599px) {
-  .oficio-lc__traveller {
+@media (max-width: 600px) {
+  .cv-person-row {
     flex-basis: 100%;
   }
 }
 
 /* tablet: no máximo 2 por linha */
-@media (min-width: 600px) and (max-width: 799px) {
-  .oficio-lc__traveller {
+@media (min-width: 600px) and (max-width: 800px) {
+  .cv-person-row {
     flex-basis: 45%;
   }
 }
 
 @media (max-width: 900px) {
-  .oficio-lc__id-row,
-  .oficio-lc__transport-row {
+  .cv-record-card__id-row,
+  .cv-fact-grid {
     grid-template-columns: 1fr;
   }
 
-  .oficio-lc__transport-row {
+  .cv-fact-grid {
     height: auto;
   }
 
-  .oficio-lc__transport-card {
+  .cv-fact-block {
     max-height: none;
   }
 }
 
 /* mobile: id-row e info-row viram uma coluna */
 @media (max-width: 520px) {
-  .oficio-lc__id-row,
-  .oficio-lc__info-row {
+  .cv-record-card__id-row,
+  .cv-record-card__info-row {
     display: grid;
     grid-template-columns: 1fr;
   }
 
-  .oficio-lc__info-item {
+  .cv-record-card__info-item {
     border-right: none;
   }
 }
 
 @media (max-width: 900px) {
-  .oficio-lc__transport-row {
+  .cv-fact-grid {
     max-height: none;
     min-height: 0;
   }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 720px) {
   .travel-document-wizard__main .cv-form-section-stack--comfortable {
     --_stack-gap: var(--space-5);
   }
@@ -4255,111 +4256,111 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
     overflow-wrap: anywhere;
   }
 
-  .oficio-lc {
+  .cv-record-card {
     border-radius: var(--radius-lg);
   }
 
-  .oficio-lc__id-row {
+  .cv-record-card__id-row {
     gap: var(--space-2);
     min-height: 0;
     padding: var(--space-4) var(--space-4) var(--space-4) var(--space-8);
   }
 
-  .oficio-lc__id-row::before {
+  .cv-record-card__id-row::before {
     height: 2.1em;
     left: var(--space-4);
     width: 6px;
   }
 
-  .oficio-lc__id-row .oficio-lc__info-item {
+  .cv-record-card__id-row .cv-record-card__info-item {
     padding: 0;
   }
 
-  .oficio-lc__section {
+  .cv-record-card__band {
     padding: var(--space-4);
   }
 
-  .oficio-lc__section + .oficio-lc__section::before {
+  .cv-record-card__band + .cv-record-card__band::before {
     left: var(--space-4);
     right: var(--space-4);
   }
 
-  .oficio-lc__info-item {
+  .cv-record-card__info-item {
     flex-basis: 100%;
     padding: var(--space-3) 0;
   }
 
-  .oficio-lc__info-value {
+  .cv-record-card__info-value {
     overflow-wrap: anywhere;
     white-space: normal;
   }
 
-  .oficio-lc__temporal-chip {
+  .cv-record-card__temporal-chip {
     margin-left: 0;
     width: 100%;
   }
 
-  .oficio-lc__travellers {
+  .cv-person-list {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .oficio-lc__traveller {
+  .cv-person-row {
     grid-column: 1 / -1;
   }
 
-  .oficio-lc__transport-row {
+  .cv-fact-grid {
     gap: var(--space-3);
     grid-template-columns: 1fr;
     max-height: none;
     min-height: 0;
   }
 
-  .oficio-lc__transport-card {
+  .cv-fact-block {
     max-height: none;
     min-height: 0;
     min-width: 0;
   }
 
-  .oficio-lc__valor-total {
+  .cv-fact-block__value--strong {
     font-size: clamp(1.65rem, 9vw, 2.45rem);
     overflow-wrap: anywhere;
   }
 
-  .oficio-lc__footer {
+  .cv-record-card__footer {
     padding: var(--space-3) var(--space-4);
   }
 }
 
-@media (max-width: 599px) {
-  .oficio-lc__traveller {
+@media (max-width: 600px) {
+  .cv-person-row {
     align-items: center;
   }
 
-  .oficio-lc__traveller-name,
-  .oficio-lc__traveller-meta {
+  .cv-person-row__name,
+  .cv-person-row__meta {
     overflow-wrap: anywhere;
   }
 
-  .oficio-lc__traveller-termo {
+  .cv-person-row__termo {
     justify-content: flex-start;
     margin-left: 0;
     width: 100%;
   }
 
-  .oficio-lc__traveller-termo.cv-icon-btn-group {
+  .cv-person-row__termo.cv-icon-btn-group {
     gap: var(--space-2);
   }
 
-  .oficio-lc__footer-actions {
+  .cv-record-card__footer-actions {
     align-items: stretch;
   }
 
-  .oficio-lc__footer-actions-main,
-  .oficio-lc__footer-actions-danger {
+  .cv-record-card__footer-actions-main,
+  .cv-record-card__footer-actions--danger {
     justify-content: flex-start;
   }
 
-  .oficio-lc__footer-actions-danger {
+  .cv-record-card__footer-actions--danger {
     margin-left: 0;
   }
 
@@ -4369,25 +4370,25 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
 }
 
 @media (max-width: 420px) {
-  .oficio-lc__section {
+  .cv-record-card__band {
     padding: var(--space-3);
   }
 
-  .oficio-lc__section + .oficio-lc__section::before {
+  .cv-record-card__band + .cv-record-card__band::before {
     left: var(--space-3);
     right: var(--space-3);
   }
 
-  .oficio-lc__id-row {
+  .cv-record-card__id-row {
     padding: var(--space-3) var(--space-3) var(--space-3) var(--space-7);
   }
 
-  .oficio-lc__id-row::before {
+  .cv-record-card__id-row::before {
     left: var(--space-3);
   }
 
-  .oficio-lc__traveller,
-  .oficio-lc__transport-card {
+  .cv-person-row,
+  .cv-fact-block {
     padding: var(--space-3);
   }
 
@@ -4473,7 +4474,7 @@ html[data-theme="light"] .oficio-lc__traveller--motorista .oficio-lc__traveller-
   grid-template-columns: minmax(190px, 0.8fr) minmax(240px, 1.2fr);
 }
 
-@media (max-width: 760px) {
+@media (max-width: 720px) {
   .oficio-external-driver__reference {
     align-items: stretch;
     grid-template-columns: 1fr;

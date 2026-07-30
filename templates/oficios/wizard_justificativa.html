@@ -3,22 +3,7 @@
 
 {% block wizard_content %}
   <div data-travel-document-wizard-justificativa>
-    <section class="cv-form-section-card cv-form-card cv-form-section-card--described oficio-justificativa-card" aria-labelledby="justificativa-panel-title">
-      <header class="cv-form-section-header">
-        <div class="cv-form-section-header__copy">
-          <h3 class="cv-form-section-title" id="justificativa-panel-title">Justificativa</h3>
-          <p class="cv-form-section-subtitle">Texto que fundamenta a necessidade da viagem</p>
-        </div>
-      </header>
-
-      <div class="cv-form-section-body oficio-justificativa-body">
-        {% include "components/ui/forms/form_block.html" with title="Conteúdo" description="Use um modelo ou escreva a justificativa completa" section_id="oficio-justificativa-conteudo" variant="resource" extra_class="oficio-justificativa-block" action_label="Gerenciar modelos" action_url=modelos_justificativa_url action_autosave=True body_extra_class="cv-form-stack" body_template="oficios/partials/justificativa/_fields.html" %}
-      </div>
-
-      <div class="cv-form-card__footer">
-        {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar" secondary_action="wizard_back" primary_label="Avançar" primary_action="wizard_next" only %}
-      </div>
-    </section>
+    {% include "components/form/card.html" with title="Justificativa" description="Texto que fundamenta a necessidade da viagem" title_id="justificativa-panel-title" extra_class="oficio-justificativa-card" body_extra_class="oficio-justificativa-body" body_template="oficios/partials/_justificativa_wizard_body.html" footer_template="oficios/partials/_justificativa_wizard_footer.html" %}
   </div>
 {% endblock %}
 

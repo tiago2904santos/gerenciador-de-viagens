@@ -34,11 +34,11 @@
   function diariaWaContext(el) {
     var trigger = diariaWaTrigger(el);
     if (!trigger) return null;
-    var row = trigger.closest(".oficio-lc__traveller");
+    var row = trigger.closest(".cv-person-row");
     var numInput = row ? row.querySelector('input[name$="-numero_solicitacao"]') : null;
     var liberacaoInput = row ? row.querySelector('input[name$="-data_liberacao_diarias"]') : null;
     var prazoInput = row ? row.querySelector('input[name$="-prazo_limite_saque"]') : null;
-    var rangeTrigger = row ? row.querySelector(".oficio-lc__saque-range-picker [data-cv-date-picker-trigger]") : null;
+    var rangeTrigger = row ? row.querySelector(".cv-record-card__inline-range [data-cv-date-picker-trigger]") : null;
 
     if (numInput && !numInput.value.trim()) {
       numInput.focus();

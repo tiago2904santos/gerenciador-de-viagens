@@ -358,12 +358,22 @@ def _form_context(*, request, form, ordem=None, evento=None):
 
     evento_display = _evento_display_values(form)
 
+    index_url = _ordem_lista_url(ordem=ordem, evento=evento)
+    back_label = _ordem_back_label(ordem=ordem, evento=evento)
+
     return {
         "page_title": "Nova Ordem de Serviço" if ordem is None or not ordem.pk else f"Editar {ordem.numero_formatado}",
         "form": form,
         "ordem": ordem,
-        "index_url": _ordem_lista_url(ordem=ordem, evento=evento),
-        "back_label": _ordem_back_label(ordem=ordem, evento=evento),
+        "index_url": index_url,
+        "back_label": back_label,
+        # `H-02`: contexto do casco único (`components/page/flow_base.html`).
+        "flow_eyebrow": "DOCUMENTOS",
+        "flow_description": "Cadastro de ordem de serviço",
+        "flow_icon_label": "OS",
+        "flow_module_label": "Ordens de Serviço",
+        "flow_back_label": back_label,
+        "flow_back_url": index_url,
         "servidor_create_url": servidor_create_url,
         "modelos_motivo_url": f"{reverse('oficios:modelos_motivo_index')}?{urlencode({'next': request.get_full_path()})}",
         "tem_modelos_motivo": form.fields["modelo_motivo"].queryset.exists(),

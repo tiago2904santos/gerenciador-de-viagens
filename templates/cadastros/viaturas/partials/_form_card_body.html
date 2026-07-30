@@ -1,0 +1,5 @@
+{% include "components/ui/forms/form_block.html" with title="Identificação" description="Placa, modelo, tipo e combustível" section_id="viaturas-identificacao-title" body_template="cadastros/viaturas/partials/_identity_fields.html" %}
+
+{% include "components/ui/forms/form_block.html" with title="Lotação" description="Unidade responsável pela viatura" section_id="viaturas-lotacao-title" body_template="cadastros/viaturas/partials/_assignment_fields.html" %}
+
+{% include "components/ui/forms/form_block.html" with title="Motoristas" description="Servidores autorizados a conduzir" section_id="viaturas-motoristas-title" variant="resource" body_template="cadastros/viaturas/partials/_drivers_fields.html" %}

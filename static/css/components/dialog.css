@@ -1,4 +1,4 @@
-/* Structural contract for global dialogs. Dark-theme appearance lives in dark-redesign.css. */
+/* Structural contract for global dialogs. Dark-theme appearance lives in theme-dark-components.css. */
 
 .cv-dialog[hidden] {
   display: none;
@@ -142,7 +142,7 @@ html[data-theme="dark"] .cv-dialog--document :is(.cv-dialog__icon, .cv-dialog__e
   color: var(--color-info);
 }
 
-@media (max-width: 560px) {
+@media (max-width: 600px) {
   .cv-dialog__panel {
     bottom: 0;
     left: 0;

@@ -1,7 +1,7 @@
 {% if messages %}
-  <div class="alerts">
+  <div class="cv-notice-stack alerts">
     {% for message in messages %}
-      <div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>
+      <div class="cv-notice cv-notice--{{ message.tags|default:'info' }} alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>
     {% endfor %}
   </div>
 {% endif %}

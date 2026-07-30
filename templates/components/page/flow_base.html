@@ -18,7 +18,7 @@
     wizard_page_steps     lista de etapas; sem ela o stepper não é renderizado
 
   Blocos para o que não cabe em parâmetro:
-    flow_shell_modifier   `page-shell--wizard` (padrão) ou `page-shell--standard`
+    flow_shell_modifier   `page-shell--wizard cv-page--flow` (padrão) ou `page-shell--standard cv-page--form`
     flow_shell_extra      classes extras do shell
     flow_shell_attrs      atributos `data-*` do shell
     flow_header           cabeçalho inteiro, para quem precisa de outro
@@ -30,7 +30,7 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block content %}
-  <div class="page-shell {% block flow_shell_modifier %}page-shell--wizard{% endblock %} travel-document-wizard app-wizard{% block flow_shell_extra %}{% endblock %}"{% block flow_shell_attrs %}{% endblock %}>
+  <div class="page-shell cv-page {% block flow_shell_modifier %}page-shell--wizard cv-page--flow{% endblock %} travel-document-wizard app-wizard{% block flow_shell_extra %}{% endblock %}"{% block flow_shell_attrs %}{% endblock %}>
     {% block flow_header %}
       {% include "components/ui/headers/page_header.html" with eyebrow=flow_eyebrow title=page_title description=flow_description icon_label=flow_icon_label module_label=flow_module_label back_label=flow_back_label back_url=flow_back_url status_label=flow_status_label status_variant=flow_status_variant only %}
     {% endblock %}

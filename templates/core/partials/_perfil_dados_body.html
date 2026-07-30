@@ -1,0 +1,8 @@
+{% if perfil_form.non_field_errors %}
+  {% include "components/ui/feedback/field_error.html" with errors=perfil_form.non_field_errors only %}
+{% endif %}
+<div class="field-grid field-grid--cols-2">
+  {% include "components/ui/forms/field.html" with field=perfil_form.nome_completo size_class="field-size-2" only %}
+  {% include "components/ui/forms/field.html" with field=perfil_form.username size_class="field-size-1" only %}
+  {% include "components/ui/forms/field.html" with field=perfil_form.email size_class="field-size-1" only %}
+</div>

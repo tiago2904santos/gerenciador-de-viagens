@@ -1,9 +1,8 @@
-{% extends "base.html" %}
+{% extends "components/page/flow_base.html" %}
 {% load static %}
 
-{% block title %}{{ page_title }}{% endblock %}
-
 {% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/oficios.css' %}">
   <link rel="stylesheet" href="{% static 'css/roteiros-list.css' %}">
   <link rel="stylesheet" href="{% static 'css/roteiros.css' %}">
   <link rel="stylesheet" href="{% static 'css/termos.css' %}">
@@ -11,143 +10,119 @@
   <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}">
 {% endblock %}
 
-{% block content %}
-  <div class="page-shell page-shell--wizard travel-document-wizard app-wizard evento-guided-page">
-    {% include "components/ui/headers/page_header.html" with eyebrow="EVENTOS" title=evento_header_title description=evento_header_description icon_label="EV" module_label="Eventos" back_label="Voltar para lista" back_url="/eventos/" status_label=evento.get_status_display status_variant=evento_status_variant only %}
+{% block flow_shell_extra %} evento-guided-page{% endblock %}
 
-    {% if evento.status == "cancelado" %}
-      <div class="cv-alert cv-alert--danger cv-alert--action">
-        <span>
-          <strong>Evento cancelado.</strong>
-          {% if evento.motivo_cancelamento %} Motivo: {{ evento.motivo_cancelamento }}{% endif %}
-        </span>
-        <form method="post" action="{{ reativar_evento_url }}" data-confirm-submit data-confirm-message="Reativar este evento? Os documentos cancelados junto com ele também serão reativados.">
-          {% csrf_token %}
-          {% include "components/ui/buttons/button.html" with label="Reativar evento" variant="secondary" type="submit" icon="unarchive" only %}
-        </form>
-      </div>
-    {% endif %}
-
-    {% include "components/ui/navigation/page_stepper.html" with steps=evento_page_steps aria_label="Etapas do evento" only %}
-
-    <div class="main-form-panel main-form-panel--stack travel-document-wizard__main">
-      <div class="cv-form-section-stack cv-form-section-stack--comfortable">
-        {% if etapa_atual == 1 %}
-          <form method="post" class="travel-document-wizard__form" novalidate data-evento-guided-form data-api-cidades-url="{% url 'roteiros:api_cidades_por_estado' estado_id=0 %}" data-sede-uf="{{ sede_uf }}">
-            {% csrf_token %}
-            {% with form=evento_form %}
-            <div data-travel-document-wizard-step1>
-
-              {% if form.non_field_errors %}
-                {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
-              {% endif %}
-
-              <section class="cv-form-section-card cv-form-card cv-form-section-card--described travel-document-card evento-step1-card" aria-labelledby="evento-step1-title">
-                <header class="cv-form-section-header">
-                  <div class="cv-form-section-header__copy">
-                    <h3 class="cv-form-section-title" id="evento-step1-title">Dados do evento</h3>
-                    <p class="cv-form-section-subtitle">Identificação, período, destinos e documentos vinculados</p>
-                  </div>
-                </header>
-
-                <div class="cv-form-section-body travel-document-body">
-                  {# ── 1. Identificação ─────────────────────────────── #}
-                  {% include "components/ui/forms/form_block.html" with element_id="evento-card-identificacao-d" section_id="evento-wizard-tipo-title-d" extra_class="travel-document-block document-form-block" title="Identificação" description="Escolha o tipo e registre o motivo que contextualiza esta atividade." body_extra_class="termo-block__body" body_template="eventos/partials/_detalhe_identificacao_body.html" %}
-
-                  {# ── 2. Quando e onde ─────────────────────────────── #}
-                  {% include "components/ui/forms/form_block.html" with element_id="evento-card-dados-d" section_id="evento-card-dados-title-d" extra_class="travel-document-block document-form-block" title="Quando e onde" description="Informe o período e ao menos um destino para continuar." body_extra_class="cv-form-stack termo-evento-body" body_template="eventos/partials/_detalhe_dados_body.html" %}
-
-                  {# ── 3. Documentos vinculados ─────────────────────── #}
-                  {% include "components/ui/forms/form_block.html" with element_id="evento-card-documentos-d" section_id="evento-card-documentos-title-d" extra_class="travel-document-block document-form-block" title="Documentos vinculados" description="Reaproveite documentos existentes. Marque para vincular e desmarque para remover o vínculo." body_extra_class="termo-block__body" body_template="eventos/partials/_detalhe_documentos_body.html" %}
-                </div>
-
-                <div class="cv-form-card__footer">
-                  {% url 'eventos:index' as back_url_eventos %}
-                  {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar à lista" secondary_url=back_url_eventos primary_label="Salvar e avançar" primary_action="wizard_next" only %}
-                </div>
-              </section>
-            </div>
-            {% endwith %}
-
-          </form>
-
-          <script src="{% static 'js/pages/oficios-dados-viajantes.js' %}" defer></script>
-          <script src="{% static 'js/pages/eventos-detalhe.js' %}" defer></script>
-        {% endif %}
-
-        {% if etapa_atual == 2 %}
-          <section class="cv-wizard-collection" aria-labelledby="evento-roteiros-title">
-            {% include "components/ui/layouts/collection_header.html" with title="Roteiros do evento" title_id="evento-roteiros-title" description="Organize os deslocamentos, horários e trechos previstos para esta viagem." only %}
-            <div class="cv-wizard-collection__body">
-              {% include "components/lists/simple_list.html" with rows=roteiro_rows empty_message="Nenhum roteiro vinculado a este evento." hide_realtime_count=True only %}
-            </div>
-          </section>
-          <div class="cv-fab-container">
-            {% include "components/ui/buttons/button.html" with href=create_urls.roteiro label="Novo roteiro" variant="primary" icon="plus" extra_class="cv-fab" only %}
-          </div>
-        {% endif %}
-
-        {% if etapa_atual == 3 %}
-          <section class="cv-wizard-collection" aria-labelledby="evento-oficios-title">
-            {% include "components/ui/layouts/collection_header.html" with title="Ofícios e justificativas" title_id="evento-oficios-title" description="Registre as autorizações e justificativas que formalizam a participação no evento." only %}
-            <div class="cv-wizard-collection__body list-content app-list-grid">
-              {% for card in oficio_cards %}
-                {% include "oficios/partials/oficio_list_card.html" with card=card csrf_token=csrf_token only %}
-              {% empty %}
-                {% include "components/lists/list_empty.html" with message="Nenhum ofício vinculado a este evento." only %}
-              {% endfor %}
-            </div>
-          </section>
-          <div class="cv-fab-container">
-            {% include "components/ui/buttons/button.html" with href=create_urls.oficio label="Novo ofício" variant="primary" icon="plus" extra_class="cv-fab" only %}
-          </div>
-        {% endif %}
-
-        {% if etapa_atual == 4 %}
-          {% include "components/ui/forms/form_block.html" with shell="card" section_id="evento-solicitacao-title" extra_class="cv-form-section-card--compact cv-form-section-card--described" title="Documentos de solicitação" description="Anexe ofícios solicitantes, convites, despachos assinados ou imagens que fundamentam este evento. Esses documentos complementam ou substituem a Ordem de Serviço e o Plano de Trabalho." body_template="eventos/partials/_detalhe_solicitacao_body.html" %}
-
-          <section class="cv-wizard-collection" aria-labelledby="evento-planejamento-title">
-            {% include "components/ui/layouts/collection_header.html" with title="Planejamento e autorização" title_id="evento-planejamento-title" description="Vincule o Plano de Trabalho e a Ordem de Serviço que orientam a execução da viagem." only %}
-            <div class="cv-wizard-collection__body list-content app-list-grid">
-              {% for card in plano_cards %}
-                {% include "planos_trabalho/partials/plano_list_card.html" with card=card only %}
-              {% endfor %}
-              {% for card in ordem_cards %}
-                {% include "ordens_servico/partials/os_list_card.html" with card=card only %}
-              {% endfor %}
-              {% if not plano_cards and not ordem_cards %}
-                {% include "components/lists/list_empty.html" with message="Nenhum plano ou OS vinculado a este evento." only %}
-              {% endif %}
-            </div>
-          </section>
-          <div class="cv-fab-container">
-            {% include "components/ui/buttons/button.html" with href=create_urls.plano label="Novo plano" variant="primary" icon="plus" extra_class="cv-fab" only %}
-            {% include "components/ui/buttons/button.html" with href=create_urls.ordem label="Nova OS" variant="secondary" icon="plus" extra_class="cv-fab" only %}
-          </div>
-        {% endif %}
-
-        {% if etapa_atual == 5 %}
-          <section class="cv-wizard-collection" aria-labelledby="evento-termo-geral-title">
-            {% include "components/ui/layouts/collection_header.html" with title="Termo do evento" title_id="evento-termo-geral-title" description="Crie o termo geral com as condições e responsabilidades desta viagem." only %}
-            <div class="cv-wizard-collection__body">
-              {% include "components/lists/simple_list.html" with rows=termo_generico_rows empty_message="Nenhum termo vinculado." hide_realtime_count=True only %}
-            </div>
-          </section>
-
-          <section class="cv-wizard-collection" aria-labelledby="evento-termos-servidor-title">
-            {% include "components/ui/layouts/collection_header.html" with title="Termos por servidor" title_id="evento-termos-servidor-title" description="Acompanhe os termos individuais gerados para cada participante vinculado." only %}
-            <div class="cv-wizard-collection__body">
-              {% include "components/lists/simple_list.html" with rows=termos_servidor_rows empty_message="Nenhum servidor vinculado a termos deste evento." hide_realtime_count=True only %}
-            </div>
-          </section>
-
-          <div class="cv-fab-container">
-            {% include "components/ui/buttons/button.html" with href=create_urls.termo label="Novo termo" variant="primary" icon="plus" extra_class="cv-fab" only %}
-          </div>
-        {% endif %}
-      </div>
+{% block flow_stepper %}
+  {% if evento.status == "cancelado" %}
+    <div class="cv-notice cv-notice--danger cv-notice--action cv-alert cv-alert--danger cv-alert--action">
+      <span>
+        <strong>Evento cancelado.</strong>
+        {% if evento.motivo_cancelamento %} Motivo: {{ evento.motivo_cancelamento }}{% endif %}
+      </span>
+      <form method="post" action="{{ reativar_evento_url }}" data-confirm-submit data-confirm-message="Reativar este evento? Os documentos cancelados junto com ele também serão reativados.">
+        {% csrf_token %}
+        {% include "components/ui/buttons/button.html" with label="Reativar evento" variant="secondary" type="submit" icon="unarchive" only %}
+      </form>
     </div>
-  </div>
+  {% endif %}
+
+  {% include "components/ui/navigation/page_stepper.html" with steps=evento_page_steps aria_label="Etapas do evento" only %}
+{% endblock %}
+
+{% block flow_body %}
+  {% if etapa_atual == 1 %}
+    <form method="post" class="travel-document-wizard__form" novalidate data-evento-guided-form data-api-cidades-url="{% url 'roteiros:api_cidades_por_estado' estado_id=0 %}" data-sede-uf="{{ sede_uf }}">
+      {% csrf_token %}
+      {% with form=evento_form %}
+      <div data-travel-document-wizard-step1>
+
+        {% if form.non_field_errors %}
+          {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
+        {% endif %}
+
+        {% include "components/form/card.html" with title="Dados do evento" description="Identificação, período, destinos e documentos vinculados" title_id="evento-step1-title" extra_class="evento-step1-card" body_template="eventos/partials/_detalhe_etapa1_body.html" footer_template="eventos/partials/_detalhe_etapa1_footer.html" %}
+      </div>
+      {% endwith %}
+
+    </form>
+
+    <script src="{% static 'js/pages/oficios-dados-viajantes.js' %}" defer></script>
+    <script src="{% static 'js/pages/eventos-detalhe.js' %}" defer></script>
+  {% endif %}
+
+  {% if etapa_atual == 2 %}
+    <section class="cv-wizard-collection" aria-labelledby="evento-roteiros-title">
+      {% include "components/ui/layouts/collection_header.html" with title="Roteiros do evento" title_id="evento-roteiros-title" description="Organize os deslocamentos, horários e trechos previstos para esta viagem." only %}
+      <div class="cv-wizard-collection__body">
+        {% include "components/lists/simple_list.html" with rows=roteiro_rows empty_message="Nenhum roteiro vinculado a este evento." hide_realtime_count=True only %}
+      </div>
+    </section>
+    <div class="cv-fab-container">
+      {% include "components/ui/buttons/button.html" with href=create_urls.roteiro label="Novo roteiro" variant="primary" icon="plus" extra_class="cv-fab" only %}
+    </div>
+  {% endif %}
+
+  {% if etapa_atual == 3 %}
+    <section class="cv-wizard-collection" aria-labelledby="evento-oficios-title">
+      {% include "components/ui/layouts/collection_header.html" with title="Ofícios e justificativas" title_id="evento-oficios-title" description="Registre as autorizações e justificativas que formalizam a participação no evento." only %}
+      <div class="cv-wizard-collection__body list-content app-list-grid">
+        {% for card in oficio_cards %}
+          {% include "oficios/partials/oficio_list_card.html" with card=card csrf_token=csrf_token only %}
+        {% empty %}
+          {% include "components/lists/list_empty.html" with message="Nenhum ofício vinculado a este evento." only %}
+        {% endfor %}
+      </div>
+    </section>
+    <div class="cv-fab-container">
+      {% include "components/ui/buttons/button.html" with href=create_urls.oficio label="Novo ofício" variant="primary" icon="plus" extra_class="cv-fab" only %}
+    </div>
+  {% endif %}
+
+  {% if etapa_atual == 4 %}
+    {% include "components/ui/forms/form_block.html" with shell="card" section_id="evento-solicitacao-title" extra_class="cv-form-section-card--compact cv-form-section-card--described" title="Documentos de solicitação" description="Anexe ofícios solicitantes, convites, despachos assinados ou imagens que fundamentam este evento. Esses documentos complementam ou substituem a Ordem de Serviço e o Plano de Trabalho." body_template="eventos/partials/_detalhe_solicitacao_body.html" %}
+
+    <section class="cv-wizard-collection" aria-labelledby="evento-planejamento-title">
+      {% include "components/ui/layouts/collection_header.html" with title="Planejamento e autorização" title_id="evento-planejamento-title" description="Vincule o Plano de Trabalho e a Ordem de Serviço que orientam a execução da viagem." only %}
+      <div class="cv-wizard-collection__body list-content app-list-grid">
+        {% for card in plano_cards %}
+          {% include "planos_trabalho/partials/plano_list_card.html" with card=card only %}
+        {% endfor %}
+        {% for card in ordem_cards %}
+          {% include "ordens_servico/partials/os_list_card.html" with card=card only %}
+        {% endfor %}
+        {% if not plano_cards and not ordem_cards %}
+          {% include "components/lists/list_empty.html" with message="Nenhum plano ou OS vinculado a este evento." only %}
+        {% endif %}
+      </div>
+    </section>
+    <div class="cv-fab-container">
+      {% include "components/ui/buttons/button.html" with href=create_urls.plano label="Novo plano" variant="primary" icon="plus" extra_class="cv-fab" only %}
+      {% include "components/ui/buttons/button.html" with href=create_urls.ordem label="Nova OS" variant="secondary" icon="plus" extra_class="cv-fab" only %}
+    </div>
+  {% endif %}
+
+  {% if etapa_atual == 5 %}
+    <section class="cv-wizard-collection" aria-labelledby="evento-termo-geral-title">
+      {% include "components/ui/layouts/collection_header.html" with title="Termo do evento" title_id="evento-termo-geral-title" description="Crie o termo geral com as condições e responsabilidades desta viagem." only %}
+      <div class="cv-wizard-collection__body">
+        {% include "components/lists/simple_list.html" with rows=termo_generico_rows empty_message="Nenhum termo vinculado." hide_realtime_count=True only %}
+      </div>
+    </section>
+
+    <section class="cv-wizard-collection" aria-labelledby="evento-termos-servidor-title">
+      {% include "components/ui/layouts/collection_header.html" with title="Termos por servidor" title_id="evento-termos-servidor-title" description="Acompanhe os termos individuais gerados para cada participante vinculado." only %}
+      <div class="cv-wizard-collection__body">
+        {% include "components/lists/simple_list.html" with rows=termos_servidor_rows empty_message="Nenhum servidor vinculado a termos deste evento." hide_realtime_count=True only %}
+      </div>
+    </section>
+
+    <div class="cv-fab-container">
+      {% include "components/ui/buttons/button.html" with href=create_urls.termo label="Novo termo" variant="primary" icon="plus" extra_class="cv-fab" only %}
+    </div>
+  {% endif %}
+{% endblock %}
+
+{% block flow_modals %}
   {% include "components/ui/modals/delete_confirm_modal.html" %}
   {% include "components/ui/modals/cancel_reason_modal.html" with cancel_modal_hint="Um ofício cancelado deixa de gerar prestação de contas e não pode mais ser usado em novas Ordens de Serviço. Ao cancelar o evento, todos os documentos vinculados a ele também serão cancelados." %}
   {% include "components/ui/modals/attach_signed_modal.html" %}

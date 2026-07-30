@@ -11,13 +11,8 @@
    1. Tokens locais do cv-btn
    ========================================================= */
 :root {
-  /* Régua única */
-  --cv-btn-height: var(--control-height-md);
+  /* Régua única — tokens canônicos definidos em tokens.css */
   --cv-btn-size: var(--cv-btn-height);
-  --cv-btn-icon-size: 17px;
-  --cv-btn-padding-x: 13px;
-  --cv-btn-radius: var(--radius-pill);
-  --cv-btn-gap: 5px;
   --cv-btn-font-size: 0.86rem;
   --cv-btn-font-weight: 700;
   --cv-btn-control-radius: var(--radius-control);
