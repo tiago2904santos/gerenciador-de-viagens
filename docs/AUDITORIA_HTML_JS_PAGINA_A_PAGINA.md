@@ -357,7 +357,12 @@ Ao digitar na busca das listas de **Ofícios, Eventos, OS, Planos de Trabalho e 
 | **Picker de entidade** | **1** | **Corrigido:** `CV.picker` possui um enhancer e renderers de busca/select sob o contrato `data-entity-picker`; sugestões de viatura e coordenadores operam sobre o mesmo select canônico |
 | **Feedback ao usuário** | **3** | `cv-document-loading` (toast de progresso), 4 modais `cv-dialog`, e **13 `window.alert`/`confirm`** |
 
-### 4.6 Namespaces globais: 22
+### 4.6 Namespaces globais: 22 → 1
+
+**Corrigido (J-09):** o bloco abaixo registra a fotografia original. A
+aplicação agora publica somente `window.CV`. Aliases duplicados, fallbacks
+órfãos e os quatro globais do editor de roteiros foram removidos; tema,
+autosave, mapa, editor e wizard vivem em sub-APIs de `CV`.
 
 ```
 window.CV  (24 sub-APIs)      ← o certo
@@ -370,7 +375,8 @@ window.RoteirosMap            window.RoteirosMapBoot        window.OficioWizard
 window.OSFocusDestino         window.__prestDiariaWaBound   window.DEBUG_AUTOSAVE
 ```
 
-Vários são **duplicatas** de uma entrada em `CV`: `MaskEngine` ≡ `CV.masks`, `CvSelect` ≡ `CV.dropdowns`, `AppAutosave` ≡ `CV.autosave`, `CVRealtimeFilters` ≡ `CV.filters`.
+Vários eram **duplicatas** de uma entrada em `CV`; o teste estrutural de J-09
+impede que esses aliases voltem a ser publicados.
 
 ### 4.7 Cache-busting manual: 88 tokens, 11 arquivos incoerentes
 
@@ -469,7 +475,7 @@ Severidade: 🔴 crítico · 🟠 alto · 🟡 médio.
 | J-06 | ✅ | **989 linhas de JS órfão removidas** em 9 arquivos; 6 emissões remanescentes de hooks sem consumidor removidas | §4.8 |
 | J-07 | 🟠 | **CSRF reimplementado em 11 arquivos**; 13 arquivos usam `fetch()` sem `CV.http` (sem tratamento de 401/HTML-em-vez-de-JSON) | §4.5 |
 | J-08 | ✅ | **Corrigido:** `CV.locationRows` é a única cascata estado→cidade; fallbacks por página removidos | §3.3, `location-rows.js` |
-| J-09 | 🟠 | **22 namespaces globais**, vários duplicando `CV.*` | §4.6 |
+| J-09 | ✅ | **Corrigido:** somente `window.CV` é publicado; aliases, fallbacks órfãos e namespaces do editor foram colapsados em `CV.*` | §4.6 |
 | J-10 | 🟠 | `autosave.js` registra **um `beforeunload` e um listener de captura em `document` por formulário**, nunca removidos | `autosave.js:250,283` |
 | J-11 | 🟠 | `app.js:394-412` — `data-confirm-submit` escuta **click e submit**; num `<form data-confirm-submit>` com botão submit dentro, o `confirm()` aparece **duas vezes** | `app.js`, disparado por `eventos/detalhe.html:24` |
 | J-12 | 🟠 | **13 `window.alert`/`confirm` nativos** num sistema com 4 modais próprios e um toast | `app.js`, `gdrive_config.js`, `oficios-documentos-inline.js`, `planos-trabalho-wizard.js`, `prestacoes-diaria-wa.js` |
@@ -893,7 +899,7 @@ Cada fase é independente, verificável e não depende da reconstrução do CSS.
 | **13** | ✅ Criar `CV.documentSource`; migrar Termos, OS e Diário-motorista | J-15 | −3 implementações |
 | **14** | ✅ Criar `CV.picker`; unificar hooks, namespace, enhancer e renderers vivos | — | Um contrato de seleção |
 | **15** | ✅ Criar `CV.overlay`; fundir o ciclo de vida dos 4 modais, menus e dropdowns | J-02 | Um namespace, um enhancer e contrato `data-overlay-*` |
-| **16** | Colapsar os 22 namespaces em `CV.*` | J-09 | — |
+| **16** | ✅ Colapsar os 22 namespaces em `CV.*` | J-09 | Um namespace de aplicação |
 | **17** | Trocar os 88 `?v=` manuais por `ManifestStaticFilesStorage` (hash automático); remover os `?v=` dos `import` ESM | J-13 | Fim da cache incoerente |
 | **18** | Refatorar `form_block.html` para receber `context` explícito e incluir o body com `only` | H-04 | Componentes seláveis e testáveis |
 | **19** | Semântica: `<nav>` em stepper/abas/paginação; `<ul>`/`<table>` nas listas de dados; `<footer>` nos rodapés de card | H-08 | — |

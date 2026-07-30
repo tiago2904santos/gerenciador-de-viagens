@@ -885,13 +885,11 @@
     init(document);
   }
 
-  window.CvDatePicker = {
+  window.CV = window.CV || {};
+  window.CV.datePicker = {
     init: init,
     boot: boot,
   };
-  window.CV = window.CV || {};
-  window.CV.datePicker = window.CvDatePicker;
-
   if (typeof window.CV.registerEnhancer === 'function') {
     window.CV.registerEnhancer('datePicker', init);
   } else if (document.readyState === 'loading') {

@@ -56,7 +56,7 @@ Evento no modo cliente: `cv:collection:updated`, com
 A busca cliente ignora caixa e acentos e combina palavras com AND. No modo
 servidor, o backend continua sendo o dono da semântica de busca e paginação.
 
-## Máscaras (`masks.js` / `MaskEngine`)
+## Máscaras (`masks.js` / `CV.masks`)
 
 | Atributo | Elemento | Valores |
 |----------|----------|---------|
@@ -67,16 +67,16 @@ API:
 
 | Método | Uso |
 |--------|-----|
-| `MaskEngine.scan(root?)` | Inicializa campos em `document` ou subárvore |
-| `MaskEngine.apply(input)` | Aplica máscara ao valor atual |
-| `MaskEngine.format(value, mask)` | Formata string sem DOM |
+| `CV.masks.scan(root?)` | Inicializa campos em `document` ou subárvore |
+| `CV.masks.apply(input)` | Aplica máscara ao valor atual |
+| `CV.masks.format(value, mask)` | Formata string sem DOM |
 
-Aliases: `window.CV.masks` = `window.MaskEngine`.
+API pública: `window.CV.masks`.
 
 Exemplo após DOM dinâmico (Quick Add):
 
 ```javascript
-window.MaskEngine.scan(panelElement);
+window.CV.masks.scan(panelElement);
 ```
 
 Chamado automaticamente em `core/app.js` ao abrir painel Quick Add / quick edit.
@@ -111,7 +111,7 @@ Evento: `cv:state-toggle:change` — `detail`: `{ value, input, toggle, fromUser
 | `data-autosave-model` | chave snapshots/validators |
 | `data-autosave-url` / `data-autosave-create-url` | endpoints |
 
-Hooks: `window.AppAutosaveSnapshots[model]`, `window.AppAutosaveValidators[model]`.
+Hooks: `window.CV.autosaveSnapshots[model]`, `window.CV.autosaveValidators[model]`.
 
 ## Fields Init (`fields-init.js`)
 
@@ -136,8 +136,8 @@ Exemplo após DOM dinâmico:
 window.CV.fields.init(panelElement);
 ```
 
-Quick Add chama `CV.fields.init(panel)` automaticamente em `core/app.js`.  
-`OficioWizard.refreshSelectPickers(root)` delega para `CV.fields.init(root)`.
+Quick Add e o wizard de ofícios chamam `CV.fields.init(root)` para inicializar
+campos inseridos dinamicamente.
 
 ## Selects / dropdowns (motores individuais)
 
@@ -162,4 +162,4 @@ Marcadores de idempotência: `_cvSelect`, `data-cv-search-picker-ready`, `_cvDro
 
 Atributos no `#roteiro-editor-form`: `data-api-calcular-rota-url`, `data-api-calcular-rota-preview-url`, `data-url-trechos-estimar`, `data-api-cidades-url`, `data-api-diarias-url`.
 
-Bridge: `window.RoteirosEditor`, `window.RoteirosMap`.
+APIs públicas: `window.CV.roteiros.editor` e `window.CV.roteiros.map`.

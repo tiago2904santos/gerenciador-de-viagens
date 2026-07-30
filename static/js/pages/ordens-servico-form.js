@@ -171,13 +171,6 @@
     });
   }
 
-  window.OSFocusDestino = function (button) {
-    var form = button && button.closest ? button.closest("[data-os-form]") : document.querySelector("[data-os-form]");
-    if (form) {
-      focusDestinationPicker(form);
-    }
-  };
-
   function setMultiSelectValues(select, ids, form) {
     if (!select) return;
     var idSet = new Set(ids.map(String));

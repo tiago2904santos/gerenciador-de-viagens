@@ -325,15 +325,13 @@
     initCvFilterDropdowns(scope);
   }
 
-  window.CvSelect = {
+  window.CV = window.CV || {};
+  window.CV.dropdowns = {
     init: init,
     initDropdowns: initCvDropdowns,
     initFilterDropdowns: initCvFilterDropdowns,
     closeAll: closeAllDropdowns
   };
-  window.CV = window.CV || {};
-  window.CV.dropdowns = window.CvSelect;
-
   if (typeof window.CV.registerEnhancer === 'function') {
     window.CV.registerEnhancer('dropdowns', init);
   } else if (document.readyState === 'loading') {

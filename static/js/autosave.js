@@ -1,5 +1,8 @@
 (function () {
   'use strict';
+  window.CV = window.CV || {};
+  window.CV.autosaveSnapshots = window.CV.autosaveSnapshots || {};
+  window.CV.autosaveValidators = window.CV.autosaveValidators || {};
   var DEBUG_AUTOSAVE = !!window.DEBUG_AUTOSAVE;
   function debug() {
     if (!DEBUG_AUTOSAVE) return;
@@ -61,7 +64,7 @@
       });
 
       var snapshots = {};
-      var provider = (window.AppAutosaveSnapshots || {})[model];
+      var provider = (window.CV.autosaveSnapshots || {})[model];
       if (typeof provider === 'function') {
         snapshots = provider(form, { dirtySnapshots: Array.from(dirtySnapshots) }) || {};
       }
@@ -77,7 +80,7 @@
 
     function shouldCreate(payload) {
       if (payload.object_id) return true;
-      var validator = (window.AppAutosaveValidators || {})[model];
+      var validator = (window.CV.autosaveValidators || {})[model];
       if (typeof validator !== 'function') return true;
       return !!validator(payload, form);
     }
@@ -288,7 +291,7 @@
   }
 
   var forms = new WeakMap();
-  window.AppAutosave = {
+  window.CV.autosave = {
     init: function (root) {
       debug('arquivo carregado');
       debug('init executado');
@@ -344,14 +347,11 @@
       instance.schedule(typeof delay === 'number' ? delay : 900);
     }
   };
-  window.CV = window.CV || {};
-  window.CV.autosave = window.AppAutosave;
-
   if (typeof window.CV.registerEnhancer === 'function') {
-    window.CV.registerEnhancer('autosave', window.AppAutosave.init);
+    window.CV.registerEnhancer('autosave', window.CV.autosave.init);
   } else if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function () { window.AppAutosave.init(); });
+    document.addEventListener('DOMContentLoaded', function () { window.CV.autosave.init(); });
   } else {
-    window.AppAutosave.init();
+    window.CV.autosave.init();
   }
 })();

@@ -48,7 +48,8 @@
     } catch (e) {}
   }
 
-  global.CVThemeShared = {
+  global.CV = global.CV || {};
+  global.CV.theme = {
     STORAGE_KEY: STORAGE_KEY,
     VALID_THEMES: VALID_THEMES,
     normalizeTheme: normalizeTheme,
