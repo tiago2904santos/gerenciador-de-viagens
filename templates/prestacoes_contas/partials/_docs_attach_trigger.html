@@ -1,4 +1,8 @@
-{# Botão de anexar/gerenciar documento assinado — requer attach_kinds no contexto. #}
+{% comment %} Botão de anexar/gerenciar documento assinado.
+   Requer `attach_kinds_json` no contexto: um JSON com a lista ordenada dos
+   documentos que este gatilho pode anexar. Era um include de 37 linhas com 30
+   atributos `data-*` nomeados por ordinal latino (`primary`…`quinary`) —
+   acrescentar um sexto documento exigia editar template, JS e modal. {% endcomment %}
 <button
   type="button"
   class="cv-icon-btn cv-icon-btn--sign{% if doc.assinado %} is-assinado{% endif %}"
@@ -6,11 +10,11 @@
   data-tooltip="{% if doc.assinado %}Gerenciar assinado{% else %}Anexar assinado{% endif %}"
   data-attach-signed-trigger
   data-attach-signed-reopen-key="{{ reopen_key }}"
-  data-attach-signed-initial-kind="{{ initial_kind|default:'primary' }}"
+  data-attach-signed-kinds="{{ attach_kinds_json }}"
+  data-attach-signed-initial-kind="{{ initial_kind|default:'' }}"
   data-attach-signed-accept="application/pdf,image/png,image/jpeg,.pdf,.png,.jpg,.jpeg"
   data-attach-signed-file-description="um arquivo em PDF, PNG ou JPEG"
   data-attach-signed-file-help="Selecione um único arquivo em PDF, PNG, JPG ou JPEG."
   data-attach-signed-choose-label="Escolher arquivo"
   data-attach-signed-upload-label="Anexar arquivo"
-  {% include "prestacoes_contas/partials/_docs_attach_kinds_attrs.html" %}
 >{% include "components/ui/icons/icon.html" with icon="sign" only %}</button>

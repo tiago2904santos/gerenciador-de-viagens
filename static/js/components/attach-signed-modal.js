@@ -4,14 +4,40 @@
   var activeTrigger = null;
   var currentRemoveUrl = "";
   var BOUND = "data-attach-signed-bound";
-  var KINDS = ["primary", "secondary", "tertiary", "quaternary", "quinary"];
 
-  function kindPrefix(kind) {
-    if (kind === "secondary") return "data-attach-signed-secondary-";
-    if (kind === "tertiary") return "data-attach-signed-tertiary-";
-    if (kind === "quaternary") return "data-attach-signed-quaternary-";
-    if (kind === "quinary") return "data-attach-signed-quinary-";
-    return "data-attach-signed-";
+  /* H-03: aqui havia `KINDS`, uma lista fixa de cinco ordinais latinos, e
+   * `kindPrefix`, que traduzia cada ordinal no prefixo dos seus 6 atributos
+   * `data-*`. O gatilho agora declara seus tipos num payload JSON, então o
+   * número de documentos anexáveis não é mais constante em lugar nenhum.
+   *
+   * Duas formas de gatilho continuam valendo, porque são dois casos de uso:
+   *  - multi-tipo (`data-attach-signed-kinds`): o modal mostra os botões de
+   *    seleção — etapa Documentos e menu do card de prestação;
+   *  - tipo único (atributos planos no próprio botão): o menu de ações do
+   *    entity card, onde o botão JÁ é o documento. Sem ordinal nenhum. */
+  function kindsDoGatilho(trigger) {
+    if (!trigger) return [];
+    var payload = trigger.getAttribute("data-attach-signed-kinds");
+    if (payload) {
+      try {
+        var lista = JSON.parse(payload);
+        return Array.isArray(lista) ? lista : [];
+      } catch (error) {
+        window.CV.log.error("attachSigned", "payload de tipos inválido", error);
+        return [];
+      }
+    }
+    var url = trigger.getAttribute("data-attach-signed-url");
+    if (!url) return [];
+    return [{
+      key: "",
+      option_label: "",
+      doc_label: trigger.getAttribute("data-attach-signed-doc-label") || "",
+      url: url,
+      current_name: trigger.getAttribute("data-attach-signed-current-name") || "",
+      current_view_url: trigger.getAttribute("data-attach-signed-current-view-url") || "",
+      current_remove_url: trigger.getAttribute("data-attach-signed-current-remove-url") || "",
+    }];
   }
 
   function init(root) {
@@ -30,7 +56,7 @@
     var currentName = modal.querySelector("[data-attach-signed-current-name]");
     var currentOpen = modal.querySelector("[data-attach-signed-current-open]");
     var kindSelector = modal.querySelector("[data-attach-signed-kind-selector]");
-    var kindButtons = modal.querySelectorAll("[data-attach-signed-kind]");
+    var kindOptions = modal.querySelector("[data-attach-signed-kind-options]");
     var fileDescription = modal.querySelector("[data-attach-signed-file-description]");
     var fileHelp = modal.querySelector("[data-attach-signed-file-help]");
     var fileInput = modal.querySelector('input[type="file"]');
@@ -52,23 +78,22 @@
       input.dispatchEvent(new Event("change", { bubbles: true }));
     }
 
-    function documentData(kind) {
-      if (!activeTrigger) return null;
-      var prefix = kindPrefix(kind);
-      return {
-        url: activeTrigger.getAttribute(prefix + "url") || "",
-        label: activeTrigger.getAttribute(prefix + "doc-label") || "este documento",
-        currentName: activeTrigger.getAttribute(prefix + "current-name") || "",
-        currentViewUrl: activeTrigger.getAttribute(prefix + "current-view-url") || "",
-        currentRemoveUrl: activeTrigger.getAttribute(prefix + "current-remove-url") || "",
-      };
-    }
+    /* Tipos do gatilho ativo, já sem os que não têm URL de upload — um documento
+     * sem `anexar_url` não é anexável e nunca deve virar botão. */
+    var kindsAtivos = [];
 
-    function availableKinds() {
-      return KINDS.filter(function (kind) {
-        var data = documentData(kind);
-        return data && data.url;
-      });
+    function documentData(kind) {
+      var achado = kindsAtivos.filter(function (item) {
+        return item.key === kind;
+      })[0];
+      if (!achado) return null;
+      return {
+        url: achado.url || "",
+        label: achado.doc_label || "este documento",
+        currentName: achado.current_name || "",
+        currentViewUrl: achado.current_view_url || "",
+        currentRemoveUrl: achado.current_remove_url || "",
+      };
     }
 
     function updateReturnUrl(kind) {
@@ -95,10 +120,32 @@
       if (currentOpen) currentOpen.setAttribute("href", data.currentViewUrl || "#");
       updateReturnUrl(kind);
 
-      kindButtons.forEach(function (button) {
-        var active = button.getAttribute("data-attach-signed-kind") === kind;
-        button.classList.toggle("is-active", active);
-        button.setAttribute("aria-pressed", active ? "true" : "false");
+      if (!kindOptions) return;
+      Array.prototype.forEach.call(
+        kindOptions.querySelectorAll("[data-attach-signed-kind]"),
+        function (button) {
+          var active = button.getAttribute("data-attach-signed-kind") === kind;
+          button.classList.toggle("is-active", active);
+          button.setAttribute("aria-pressed", active ? "true" : "false");
+        }
+      );
+    }
+
+    /* Os botões de tipo são montados a partir do payload do gatilho, não escritos
+     * no template: era ali que o número de documentos anexáveis ficava fixo em 5. */
+    function montarBotoesDeTipo() {
+      if (!kindOptions) return;
+      kindOptions.innerHTML = "";
+      kindsAtivos.forEach(function (item) {
+        var button = document.createElement("button");
+        button.type = "button";
+        button.className = "attach-signed-modal__kind-option";
+        button.setAttribute("aria-pressed", "false");
+        button.setAttribute("data-attach-signed-kind", item.key);
+        var rotulo = document.createElement("span");
+        rotulo.textContent = item.option_label || "";
+        button.appendChild(rotulo);
+        kindOptions.appendChild(button);
       });
     }
 
@@ -125,8 +172,10 @@
 
       activeTrigger = trigger;
 
-      var kinds = availableKinds();
-      if (!kinds.length) {
+      kindsAtivos = kindsDoGatilho(trigger).filter(function (item) {
+        return item && item.url;
+      });
+      if (!kindsAtivos.length) {
         activeTrigger = null;
         return;
       }
@@ -154,27 +203,17 @@
           trigger.getAttribute("data-attach-signed-upload-label") || fileDefaults.upload;
       }
 
-      if (kindSelector) kindSelector.hidden = kinds.length < 2;
+      if (kindSelector) kindSelector.hidden = kindsAtivos.length < 2;
+      montarBotoesDeTipo();
 
-      kindButtons.forEach(function (button) {
-        var kind = button.getAttribute("data-attach-signed-kind");
-        var hasUrl = kinds.indexOf(kind) !== -1;
-        button.hidden = !hasUrl;
-        var labelNode = button.querySelector("[data-attach-signed-" + kind + "-option-label]");
-        if (labelNode) {
-          labelNode.textContent =
-            trigger.getAttribute("data-attach-signed-" + kind + "-option-label") ||
-            labelNode.textContent;
-        }
-      });
-
-      var preferred =
-        initialKind ||
-        trigger.getAttribute("data-attach-signed-initial-kind") ||
-        "primary";
-      var selectedKind = preferred;
-      if (kinds.indexOf(selectedKind) === -1) selectedKind = kinds[0] || "primary";
-      selectDocument(selectedKind, false);
+      // O tipo inicial pode vir do hash (reabrir depois de salvar) ou do gatilho.
+      // Antes o fallback era o literal "primary"; agora é o primeiro tipo que o
+      // gatilho declarou — que é o que "primeiro" sempre quis dizer.
+      var chaves = kindsAtivos.map(function (item) { return item.key; });
+      var preferido =
+        initialKind || trigger.getAttribute("data-attach-signed-initial-kind") || "";
+      var escolhido = chaves.indexOf(preferido) !== -1 ? preferido : chaves[0];
+      selectDocument(escolhido, false);
 
       window.CV.overlay.openDialog(modal, {
         opener: trigger,
@@ -199,7 +238,7 @@
         event.preventDefault();
         openModal(
           trigger,
-          trigger.getAttribute("data-attach-signed-initial-kind") || "primary"
+          trigger.getAttribute("data-attach-signed-initial-kind") || ""
         );
         return;
       }
@@ -244,7 +283,7 @@
         }
       );
       if (reopenTrigger) {
-        openModal(reopenTrigger, reopenParams.get("kind") || reopenTrigger.getAttribute("data-attach-signed-initial-kind") || "primary");
+        openModal(reopenTrigger, reopenParams.get("kind") || reopenTrigger.getAttribute("data-attach-signed-initial-kind") || "");
       }
     }
     return true;
