@@ -427,11 +427,22 @@ class PrestacaoAssinadoUploadTests(TestCase):
             self.assertEqual(anexos.count(), 1)
             self.assertEqual(anexos.get().nome_original, "diario-motorista.pdf")
 
+            # O que importa é o compartilhamento: os DOIS cards do ofício
+            # anunciam o mesmo diário assinado. Antes isso era medido pelo nome
+            # de um atributo ordinal (`...-secondary-current-name`); no `H-03` os
+            # tipos viajam num payload, então a asserção passou a ler o payload —
+            # a promessa é a mesma, a forma de transporte é que mudou.
             lista = self.client.get(reverse("prestacoes_contas:index"))
-            self.assertContains(
-                lista,
-                'data-attach-signed-secondary-current-name="diario-motorista.pdf"',
-                count=2,
+            diarios = [
+                kind
+                for card in lista.context["cards"]
+                for kind in json.loads(card["attach_kinds_json"])
+                if kind["key"] == "diario"
+            ]
+            self.assertEqual(len(diarios), 2)
+            self.assertEqual(
+                [k["current_name"] for k in diarios],
+                ["diario-motorista.pdf", "diario-motorista.pdf"],
             )
 
     def test_rejeita_formato_de_documento_nao_suportado(self):
@@ -529,18 +540,22 @@ class PrestacaoAssinadoUploadTests(TestCase):
         self.assertContains(response, "Anexar documentos assinados", count=2)
         self.assertNotContains(response, "Anexar RT assinado")
         self.assertNotContains(response, "Anexar diário assinado")
-        self.assertContains(response, "data-attach-signed-secondary-url", count=2)
-        self.assertContains(response, "data-attach-signed-tertiary-url", count=2)
-        self.assertContains(
-            response,
-            'data-attach-signed-secondary-option-label="Diário de bordo"',
-            count=2,
-        )
-        self.assertContains(
-            response,
-            'data-attach-signed-tertiary-option-label="Comprovante"',
-            count=2,
-        )
+        # `H-03`: era medido pelo nome dos atributos ordinais
+        # (`...-secondary-url`, `...-tertiary-option-label`). O contrato de
+        # verdade é *quais* três documentos o menu do card oferece e com que
+        # rótulo — hoje isso vem no payload, com chave semântica.
+        payloads = [json.loads(card["attach_kinds_json"]) for card in response.context["cards"]]
+        self.assertEqual(len(payloads), 2)
+        for payload in payloads:
+            self.assertEqual(
+                [(k["key"], k["option_label"]) for k in payload],
+                [
+                    ("rt", "Relatório técnico"),
+                    ("diario", "Diário de bordo"),
+                    ("comprovante", "Comprovante"),
+                ],
+            )
+        self.assertContains(response, "data-attach-signed-kinds", count=2)
         self.assertContains(response, "data-attach-signed-kind-selector", count=1)
         self.assertContains(response, "Anexar despacho assinado", count=4)
         self.assertContains(response, "data-attach-signed-modal", count=1)

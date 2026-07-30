@@ -370,7 +370,10 @@ def _texto_modelo(ordem: OrdemServico, motivo: str) -> dict[str, object]:
 
 
 def build_os_docxtpl_context(ordem: OrdemServico) -> dict[str, Any]:
-    inst = build_configuracao_context()
+    # Sempre amarra a configuração à área da OS: geração assíncrona (Celery)
+    # não tem request/área corrente e, sem isso, cai no singleton legado —
+    # trocando o Assinante padrão da OS pelo Destinatário padrão do Ofício.
+    inst = build_configuracao_context(area=getattr(ordem, "area", None))
 
     def _txt(v: object) -> str:
         return str(v or "").strip()
@@ -381,7 +384,11 @@ def build_os_docxtpl_context(ordem: OrdemServico) -> dict[str, Any]:
     divisao = _txt(inst.get("divisao"))
     unidade = unidade_campo or nome_orgao or sigla
 
-    nome_chefia, cargo_chefia = _assinatura_nome_cargo(inst, "ORDEM_SERVICO")
+    nome_chefia, cargo_chefia = _assinatura_nome_cargo(
+        inst,
+        "ORDEM_SERVICO",
+        fallback_geral=False,
+    )
 
     numero_str = (
         f"{ordem.numero:03d}/{ordem.ano}"

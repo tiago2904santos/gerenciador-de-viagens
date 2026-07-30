@@ -1,3 +1,5 @@
+import json
+
 from django.urls import reverse
 
 from cadastros.selectors import get_configuracao_sistema
@@ -52,6 +54,39 @@ def _anexo_assinado_info(anexos, *, tipo, anexar_url, prestacao_pk):
             args=[prestacao_pk, atual.pk],
         ),
     }
+
+
+def kinds_de_anexo_assinado(documentos):
+    """Payload do modal de anexo assinado: uma lista ordenada, com chave semântica.
+
+    `H-03`. Antes, cada documento anexável era identificado por **ordinal latino**
+    (`primary`…`quinary`) e viajava como 6 atributos `data-*` planos no gatilho.
+    Duas consequências:
+
+    - o mesmo ordinal significava documentos **diferentes** em telas diferentes —
+      `primary` era o despacho na etapa Documentos e o relatório técnico no card
+      da lista, contra o mesmo modal;
+    - o JS carregava uma lista fixa dos cinco ordinais e o modal tinha os cinco
+      botões escritos à mão, então um sexto documento exigia editar view,
+      template, modal e JS.
+
+    `documentos` é uma lista de `(key, option_label, doc_label, info)`, onde
+    `info` é o retorno de `_anexo_assinado_info`. A ordem da lista é a ordem em
+    que os botões aparecem no modal.
+    """
+    return [
+        {
+            "key": key,
+            "option_label": option_label,
+            "doc_label": doc_label,
+            "url": info["anexar_url"],
+            "current_name": info["nome_original"],
+            "current_view_url": info["view_url"],
+            "current_remove_url": info["remover_url"],
+        }
+        for key, option_label, doc_label, info in documentos
+        if info and info.get("anexar_url")
+    ]
 
 
 def _servidor_row(ps, solicitacao_form=None, prestacao_anexos=None, diario_pdf_url=""):
@@ -242,6 +277,37 @@ def apresentar_prestacao_servidor_card(ps, *, group_position="alone", solicitaca
             header_chips,
         ),
         "numero_display": oficio.numero_formatado,
+        # Os três anexáveis do menu de ações do card. Rótulos mantidos como
+        # estavam no template (ver comentário abaixo): este PR troca o ordinal,
+        # não o microcopy.
+        "attach_kinds_json": json.dumps(
+            kinds_de_anexo_assinado(
+                [
+                    (
+                        "rt",
+                        "Relatório técnico",
+                        f"o relatório técnico de {servidor['name']}",
+                        servidor["rt_assinado"],
+                    ),
+                    (
+                        "diario",
+                        "Diário de bordo",
+                        f"o diário de bordo do ofício {oficio.numero_formatado}",
+                        servidor["diario_assinado"],
+                    ),
+                    (
+                        "comprovante",
+                        "Comprovante",
+                        (
+                            "o comprovante de saque ou transferência de "
+                            f"{servidor['name']}"
+                        ),
+                        servidor["comprovante_anexo"],
+                    ),
+                ]
+            ),
+            ensure_ascii=False,
+        ),
         "protocolo_display": protocolo_display,
         "destino_display": destino_display,
         "data_evento_display": data_evento_display,

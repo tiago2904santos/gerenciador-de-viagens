@@ -10,11 +10,12 @@ from oficios.presenters import _iniciais_nome_servidor
 _ASSINANTE_NAO_RESOLVIDO = object()
 
 
-def get_assinante_os() -> dict | None:
+def get_assinante_os(area=None) -> dict | None:
     try:
         from cadastros.models import AssinaturaConfiguracao
-        from cadastros.models import ConfiguracaoSistema
-        config = ConfiguracaoSistema.get_singleton()
+        from cadastros.selectors import get_configuracao_sistema
+
+        config = get_configuracao_sistema(area=area)
         ass = (
             config.assinaturas
             .filter(tipo=AssinaturaConfiguracao.ORDEM_SERVICO, ativo=True)
@@ -135,7 +136,7 @@ def apresentar_ordem_servico_card(ordem, *, assinante=_ASSINANTE_NAO_RESOLVIDO):
     sozinho, para quem exibe um card so.
     """
     if assinante is _ASSINANTE_NAO_RESOLVIDO:
-        assinante = get_assinante_os()
+        assinante = get_assinante_os(area=getattr(ordem, "area", None))
 
     data_criacao_display = ""
     if ordem.created_at:

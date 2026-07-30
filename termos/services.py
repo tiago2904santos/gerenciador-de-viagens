@@ -372,7 +372,7 @@ def _oficio_payload_termo(termo: TermoAutorizacao) -> dict:
         "protocolo_formatado": "-",
         "data_criacao": _format_date(termo.created_at.date() if termo.created_at else None),
         "assunto": "Termo de autorizacao avulso",
-        "origem": build_configuracao_context().get("unidade") or "-",
+        "origem": build_configuracao_context(area=getattr(termo, "area", None)).get("unidade") or "-",
         "destino": "Direcao/chefia competente",
     }
 
@@ -399,7 +399,8 @@ def build_termo_cadastro_payload(
     termo: TermoAutorizacao,
     servidor: Servidor | None = None,
 ) -> dict:
-    institucional = build_configuracao_context()
+    area = getattr(termo, "area", None) or getattr(getattr(termo, "oficio", None), "area", None)
+    institucional = build_configuracao_context(area=area)
     payload = {
         "institucional": institucional,
         "oficio": _oficio_payload_termo(termo),

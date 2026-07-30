@@ -325,7 +325,8 @@ def build_relatorio_tecnico_context(relatorio: RelatorioTecnico, servidor_presta
     # o documento continua saindo "R$80,00 (saque)", como sempre saiu.
     diaria_override = diaria_recebida_display(servidor_prestacao)
     data_rt = _data_relatorio_tecnico(oficio)
-    inst = build_configuracao_context()
+    area = getattr(pc, "area", None) or getattr(oficio, "area", None)
+    inst = build_configuracao_context(area=area)
     defaults = relatorio_tecnico_default_values(pc)
 
     divisao_cabecalho = _upper_header_value(inst.get("divisao"))
