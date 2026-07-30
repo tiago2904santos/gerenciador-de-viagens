@@ -2,6 +2,9 @@
 (function () {
   'use strict';
 
+  window.CV = window.CV || {};
+  window.CV.roteiros = window.CV.roteiros || {};
+
   var MSG_GEOM_DESENHO =
     'Rota calculada, mas a geometria retornada não pôde ser desenhada no mapa.';
 
@@ -36,15 +39,14 @@
   var lastFocusedPointKey = null;
   var LEG_COLORS = ['#0f5f8f', '#1d74a3'];
   var initial = readJsonScript('roteiro-mapa-inicial') || {};
-  var mapConfig = window.ROTEIRO_MAP_CONFIG || {};
   // Prioriza sempre o valor resolvido no backend (CEP/configuração do sistema).
   // O config global fica como fallback de compatibilidade.
   var defaultCenter = Array.isArray(initial.default_center)
     ? initial.default_center
-    : (Array.isArray(mapConfig.defaultCenter) ? mapConfig.defaultCenter : [-24.89, -51.55]);
+    : [-24.89, -51.55];
   var defaultZoom = Number.isFinite(Number(initial.default_zoom))
     ? Number(initial.default_zoom)
-    : (Number.isFinite(Number(mapConfig.defaultZoom)) ? Number(mapConfig.defaultZoom) : 7);
+    : 7;
   var rid = initial.roteiro_id;
   var hadGeometry = !!(initial.route && initial.route.geometry && initial.route.geometry.type === 'LineString');
 
@@ -122,7 +124,7 @@
   }
 
   function isDailyRoundTripActive() {
-    var roteiro = window.RoteirosEditor;
+    var roteiro = window.CV.roteiros.editor;
     if (roteiro && typeof roteiro.isLoopModeActive === 'function') {
       return roteiro.isLoopModeActive();
     }
@@ -172,7 +174,7 @@
   }
 
   function previewIncludesReturn() {
-    var roteiro = window.RoteirosEditor;
+    var roteiro = window.CV.roteiros.editor;
     if (!roteiro || typeof roteiro.buildRoutePreviewPayload !== 'function') return false;
     var payload = roteiro.buildRoutePreviewPayload();
     return !!(payload && payload.incluir_retorno);
@@ -519,7 +521,7 @@
     var urlPersistido = form.getAttribute('data-api-calcular-rota-url');
     var urlPreview = form.getAttribute('data-api-calcular-rota-preview-url');
     var hasSaved = !!rid;
-    var roteiro = window.RoteirosEditor;
+    var roteiro = window.CV.roteiros.editor;
     var previewPayload = (roteiro && roteiro.buildRoutePreviewPayload && roteiro.buildRoutePreviewPayload()) || null;
     var usePreviewPayload = !!(previewPayload && urlPreview);
     if (isDailyRoundTripActive()) {
@@ -605,7 +607,7 @@
   }
 
   function refreshRouteReadyState() {
-    var roteiro = window.RoteirosEditor;
+    var roteiro = window.CV.roteiros.editor;
     var canPreview = !!(roteiro && roteiro.canCalculateRoutePreview && roteiro.canCalculateRoutePreview());
     var blockedByLoop = isDailyRoundTripActive();
     var canCalculate = !blockedByLoop && (rid || canPreview);
@@ -779,7 +781,7 @@
   }
 
   function scheduleMapBoot() {
-    if (window.RoteirosEditor) {
+    if (window.CV.roteiros.editor) {
       bootMap();
       return;
     }
@@ -792,6 +794,9 @@
     scheduleMapBoot();
   }
 
-  window.RoteirosMap = { onDestinosReordered: onDestinosReordered, applyExternalRoute: applyExternalRoute };
-  window.RoteirosMapBoot = bootMap;
+  window.CV.roteiros.map = {
+    applyExternalRoute: applyExternalRoute,
+    boot: bootMap,
+    onDestinosReordered: onDestinosReordered,
+  };
 })();

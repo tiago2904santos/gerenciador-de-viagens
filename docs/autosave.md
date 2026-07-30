@@ -12,9 +12,9 @@ Esta base foi criada para permitir autosave reutilizável em qualquer cadastro.
    - `data-autosave-object-id` (id atual ou vazio)
 2. Inclua `static/js/autosave.js`.
 3. Registre snapshots específicos (opcional):
-   - `window.AppAutosaveSnapshots.meu_modelo = function(form) { ... }`
+   - `window.CV.autosaveSnapshots.meu_modelo = function(form) { ... }`
 4. Registre regra mínima para criar rascunho (opcional):
-   - `window.AppAutosaveValidators.meu_modelo = function(payload) { ... }`
+   - `window.CV.autosaveValidators.meu_modelo = function(payload) { ... }`
 
 ## Backend
 

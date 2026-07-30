@@ -363,7 +363,9 @@
     };
   }
 
-  window.OficioWizard = {
+  window.CV = window.CV || {};
+  window.CV.roteiros = window.CV.roteiros || {};
+  window.CV.roteiros.wizard = {
     bindStickyLayout: bindStickyLayout,
     bindGlanceDrawer: bindGlanceDrawer,
     createAutosave: createAutosave,
@@ -377,9 +379,6 @@
       }
       if (window.CV && window.CV.picker && typeof window.CV.picker.initSelect === 'function') {
         window.CV.picker.initSelect(scope);
-      }
-      if (window.OficioSelectPicker && typeof window.OficioSelectPicker.refresh === 'function') {
-        window.OficioSelectPicker.refresh(scope);
       }
     }
   };

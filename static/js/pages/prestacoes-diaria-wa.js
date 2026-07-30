@@ -4,9 +4,6 @@
 (function () {
   "use strict";
 
-  if (window.__prestDiariaWaBound) return;
-  window.__prestDiariaWaBound = true;
-
   // Os itens do menu (Enviar WhatsApp/Business/Copiar) ficam dentro de
   // .cv-action-menu, que o CV.overlay move para <body> ao abrir — por
   // isso não dá pra usar closest() a partir do item para achar a linha do

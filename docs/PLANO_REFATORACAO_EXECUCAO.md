@@ -529,7 +529,8 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
 - [x] `CV.overlay` concentra diálogos, menus e dropdowns portaled em um único
   enhancer; remove os cinco motores legados e padroniza os gatilhos vivos em
   `data-overlay-*`.
-- [ ] `J-09` colapsar 22 namespaces em `CV.*`
+- [x] `J-09` somente `window.CV` é publicado; aliases duplicados, fallbacks
+  órfãos e os namespaces de tema/autosave/roteiros foram consolidados.
 - [ ] `J-13` `ManifestStaticFilesStorage` no lugar dos 88 `?v=`
 
 ### Etapa 6 — Estrutura HTML

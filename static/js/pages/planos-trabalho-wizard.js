@@ -235,10 +235,10 @@
       // When cargo_manual changes, also mark the companion fields dirty so the
       // autosave payload includes enough context to clear any stale servidor data.
       var cargoManualMatch = /^coordenador_(adm|op)_cargo_manual$/.exec(target.name || "");
-      if (cargoManualMatch && window.AppAutosave) {
+      if (cargoManualMatch && window.CV.autosave) {
         var papel = cargoManualMatch[1];
-        window.AppAutosave.markDirty(form, "coordenador_" + papel, 900);
-        window.AppAutosave.markDirty(form, "coordenador_" + papel + "_nome_manual", 900);
+        window.CV.autosave.markDirty(form, "coordenador_" + papel, 900);
+        window.CV.autosave.markDirty(form, "coordenador_" + papel + "_nome_manual", 900);
       }
     });
     form.addEventListener("input", function (event) {
@@ -774,8 +774,8 @@
     return { codigos: codigos };
   }
 
-  window.AppAutosaveSnapshots = window.AppAutosaveSnapshots || {};
-  window.AppAutosaveSnapshots.plano_trabalho = function (form) {
+  window.CV.autosaveSnapshots = window.CV.autosaveSnapshots || {};
+  window.CV.autosaveSnapshots.plano_trabalho = function (form) {
     var step = form.dataset.autosaveStep || "";
     var snapshots = {};
     if (step === "efetivo_diarias") {
@@ -791,8 +791,8 @@
   }
 
   function markSnapshot(form, name, delay) {
-    if (!form || !window.AppAutosave || !window.AppAutosave.markSnapshotChanged) return;
-    window.AppAutosave.markSnapshotChanged(form, name, delay);
+    if (!form || !window.CV.autosave || !window.CV.autosave.markSnapshotChanged) return;
+    window.CV.autosave.markSnapshotChanged(form, name, delay);
   }
 
   function applyEfetivoIdsFromResponse(scope, snapshotResult) {

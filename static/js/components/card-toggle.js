@@ -60,15 +60,15 @@
         rg.dataset.previousValue = rg.value;
       }
       rg.value = "";
-      if (window.MaskEngine && typeof window.MaskEngine.apply === "function") {
-        window.MaskEngine.apply(rg);
+      if (window.CV && window.CV.masks && typeof window.CV.masks.apply === "function") {
+        window.CV.masks.apply(rg);
       }
     } else if (!active && rg.value === "NAO POSSUI RG") {
       rg.value = "";
     } else if (!active && rg.dataset.previousValue && !rg.value) {
       rg.value = rg.dataset.previousValue;
-      if (window.MaskEngine && typeof window.MaskEngine.apply === "function") {
-        window.MaskEngine.apply(rg);
+      if (window.CV && window.CV.masks && typeof window.CV.masks.apply === "function") {
+        window.CV.masks.apply(rg);
       }
     }
   }

@@ -146,7 +146,6 @@
     format: format,
   };
 
-  window.MaskEngine = MaskEngine;
   window.CV = window.CV || {};
   window.CV.masks = MaskEngine;
 

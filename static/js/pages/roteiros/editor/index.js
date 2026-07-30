@@ -20,7 +20,9 @@ export function initRoteirosEditor() {
     diarias: createDiariasModule(),
     mapa: createMapaModule(),
   };
-  window.RoteirosEditorModules = modules;
+  window.CV = window.CV || {};
+  window.CV.roteiros = window.CV.roteiros || {};
+  window.CV.roteiros.modules = modules;
 
   (function () {
   'use strict';
@@ -41,9 +43,10 @@ export function initRoteirosEditor() {
   var urlCalcularRotaPreview = form.dataset.apiCalcularRotaPreviewUrl || '';
   var autosaveIdInput = $('id_autosave_obj_id');
   var autosaveStatus = $('roteiro-autosave-status');
-  window.AppAutosaveSnapshots = window.AppAutosaveSnapshots || {};
-  window.AppAutosaveValidators = window.AppAutosaveValidators || {};
-  window.AppAutosaveSnapshots.roteiro = function() {
+  window.CV = window.CV || {};
+  window.CV.autosaveSnapshots = window.CV.autosaveSnapshots || {};
+  window.CV.autosaveValidators = window.CV.autosaveValidators || {};
+  window.CV.autosaveSnapshots.roteiro = function() {
     return {
       roteiro_editor_state: captureCurrentState(),
       roteiro_mapa: {
@@ -61,7 +64,7 @@ export function initRoteirosEditor() {
       }
     };
   };
-  window.AppAutosaveValidators.roteiro = function(payload) {
+  window.CV.autosaveValidators.roteiro = function(payload) {
     if (payload.object_id) return true;
     var fields = payload.fields || {};
     var state = ((payload.snapshots || {}).roteiro_editor_state) || {};
@@ -73,7 +76,7 @@ export function initRoteirosEditor() {
       trechos.length
     );
   };
-  var autosave = window.AppAutosave ? window.AppAutosave.registerForm(form, {
+  var autosave = window.CV.autosave ? window.CV.autosave.registerForm(form, {
     model: 'roteiro',
     statusElement: autosaveStatus
   }) : null;
@@ -119,8 +122,8 @@ export function initRoteirosEditor() {
     placeTrechosDatePickerInFirstHeader();
   }
   function refreshSelectPickers(root) {
-    if (window.OficioWizard && typeof window.OficioWizard.refreshSelectPickers === 'function') {
-      window.OficioWizard.refreshSelectPickers(root || form);
+    if (window.CV.roteiros.wizard && typeof window.CV.roteiros.wizard.refreshSelectPickers === 'function') {
+      window.CV.roteiros.wizard.refreshSelectPickers(root || form);
     }
   }
   function scheduleAutosave() {
@@ -1260,15 +1263,15 @@ export function initRoteirosEditor() {
       if ($('id_retorno_tempo_adicional_hhmm')) $('id_retorno_tempo_adicional_hhmm').value = '';
       if ($('id_retorno_tempo_cru_estimado_min')) $('id_retorno_tempo_cru_estimado_min').value = '';
       recalcRetorno(false);
-      if (window.RoteirosMap && typeof window.RoteirosMap.applyExternalRoute === 'function') {
-        window.RoteirosMap.applyExternalRoute(null);
+      if (window.CV.roteiros.map && typeof window.CV.roteiros.map.applyExternalRoute === 'function') {
+        window.CV.roteiros.map.applyExternalRoute(null);
       }
     });
   }
   function applyRouteSelection(r) {
     return applyState(r.state).then(function() {
-      if (window.RoteirosMap && typeof window.RoteirosMap.applyExternalRoute === 'function') {
-        window.RoteirosMap.applyExternalRoute(r.state.mapa_rota || null);
+      if (window.CV.roteiros.map && typeof window.CV.roteiros.map.applyExternalRoute === 'function') {
+        window.CV.roteiros.map.applyExternalRoute(r.state.mapa_rota || null);
       }
     });
   }
@@ -1788,7 +1791,7 @@ export function initRoteirosEditor() {
       window.history.replaceState({}, '', editPath);
     }
   });
-  window.RoteirosEditor = {
+  window.CV.roteiros.editor = {
     canCalculateRoutePreview: canCalculateRoutePreview,
     buildRoutePreviewPayload: buildRoutePreviewPayload,
     applyRoutePreviewResult: applyRoutePreviewResult,
@@ -1796,8 +1799,8 @@ export function initRoteirosEditor() {
     isLoopModeActive: isLoopModeActive,
   };
   window.dispatchEvent(new CustomEvent('roteiros:editor-ready'));
-  if (typeof window.RoteirosMapBoot === 'function') {
-    window.RoteirosMapBoot();
+  if (window.CV.roteiros.map && typeof window.CV.roteiros.map.boot === 'function') {
+    window.CV.roteiros.map.boot();
   }
   })();
 }

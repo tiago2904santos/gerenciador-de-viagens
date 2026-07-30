@@ -3,12 +3,12 @@
  */
 export function createMapaModule() {
   function boot() {
-    if (typeof window.RoteirosMapBoot === 'function') {
-      window.RoteirosMapBoot();
+    if (window.CV.roteiros.map && typeof window.CV.roteiros.map.boot === 'function') {
+      window.CV.roteiros.map.boot();
     }
   }
 
-  if (window.RoteirosEditor) {
+  if (window.CV.roteiros.editor) {
     boot();
   } else {
     window.addEventListener('roteiros:editor-ready', boot, { once: true });
@@ -17,8 +17,8 @@ export function createMapaModule() {
   return {
     name: 'mapa',
     refresh: function () {
-      if (typeof window.RoteirosMapBoot === 'function') {
-        window.RoteirosMapBoot();
+      if (window.CV.roteiros.map && typeof window.CV.roteiros.map.boot === 'function') {
+        window.CV.roteiros.map.boot();
       }
     },
   };

@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  var shared = window.CVThemeShared;
+  var shared = window.CV && window.CV.theme;
   if (!shared) return;
   var theme = shared.readStoredTheme();
   document.documentElement.setAttribute("data-theme", theme);

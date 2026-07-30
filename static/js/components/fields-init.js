@@ -30,10 +30,6 @@
         window.CV.masks.scan(root);
         return 1;
       }
-      if (window.MaskEngine && typeof window.MaskEngine.scan === 'function') {
-        window.MaskEngine.scan(root);
-        return 1;
-      }
       return 0;
     });
   }
@@ -72,7 +68,7 @@
 
   function initDatePickers(root) {
     return safeCall('datePicker', function () {
-      var api = (window.CV && window.CV.datePicker) || window.CvDatePicker;
+      var api = window.CV && window.CV.datePicker;
       if (api && typeof api.init === 'function') {
         api.init(root);
         return 1;
@@ -83,7 +79,7 @@
 
   function initDropdowns(root) {
     return safeCall('dropdowns', function () {
-      var api = (window.CV && window.CV.dropdowns) || window.CvSelect;
+      var api = window.CV && window.CV.dropdowns;
       if (api && typeof api.init === 'function') {
         api.init(root);
         return 1;
@@ -94,7 +90,7 @@
 
   function initMultiselects(root) {
     return safeCall('multiselect', function () {
-      var api = (window.CV && window.CV.multiselect) || window.AppMultiselect;
+      var api = window.CV && window.CV.multiselect;
       if (api && typeof api.init === 'function') {
         api.init(root);
         return 1;

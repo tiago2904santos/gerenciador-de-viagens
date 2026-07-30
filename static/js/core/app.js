@@ -301,9 +301,7 @@ document.documentElement.dataset.appReady = "true";
       window.CV.fields.init(panel);
       return;
     }
-    if (window.MaskEngine && typeof window.MaskEngine.scan === "function") {
-      window.MaskEngine.scan(panel);
-    } else if (window.CV && window.CV.masks && typeof window.CV.masks.scan === "function") {
+    if (window.CV && window.CV.masks && typeof window.CV.masks.scan === "function") {
       window.CV.masks.scan(panel);
     }
   }
