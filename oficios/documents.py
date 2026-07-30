@@ -155,7 +155,7 @@ def build_canonical_document_payload(oficio: Oficio, tipo: DocumentoTipo) -> dic
         {"oficio_id": oid, "tipo": tipo.value},
     ):
         base = build_oficio_document_payload(oficio)
-        institucional = build_configuracao_context()
+        institucional = build_configuracao_context(area=getattr(oficio, "area", None))
         oficio_bloco = {
             **base,
             "roteiro_detalhe": _roteiro_resumo(oficio),

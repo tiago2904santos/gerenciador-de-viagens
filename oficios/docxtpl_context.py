@@ -532,8 +532,12 @@ def _build_oficio_docxtpl_context_impl(
     *,
     solicitacoes_por_servidor: Mapping[int, str] | None = None,
 ) -> dict[str, Any]:
-    inst = build_configuracao_context()
-    nome_chefia, cargo_chefia = _assinatura_nome_cargo(inst, "OFICIO")
+    inst = build_configuracao_context(area=getattr(oficio, "area", None))
+    nome_chefia, cargo_chefia = _assinatura_nome_cargo(
+        inst,
+        "OFICIO",
+        fallback_geral=False,
+    )
     nome_destinatario, cargo_destinatario = _destinatario_nome_cargo(inst)
     nome_orgao_raw = _txt(inst.get("nome_orgao"))
     unidade_campo_raw = _txt(inst.get("unidade"))
@@ -619,8 +623,8 @@ def build_justificativa_docxtpl_context(oficio: Oficio) -> dict[str, Any]:
 
 
 def _build_justificativa_docxtpl_context_impl(oficio: Oficio) -> dict[str, Any]:
-    inst = build_configuracao_context()
-    nome_a, cargo_a = _assinatura_nome_cargo(inst, "JUSTIFICATIVA")
+    inst = build_configuracao_context(area=getattr(oficio, "area", None))
+    nome_a, cargo_a = _assinatura_nome_cargo(inst, "JUSTIFICATIVA", fallback_geral=False)
     unidade = _txt(inst.get("unidade")) or _txt(inst.get("nome_orgao")) or _txt(inst.get("sigla_orgao"))
     texto = ""
     try:

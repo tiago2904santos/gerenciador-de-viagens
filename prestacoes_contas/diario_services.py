@@ -440,7 +440,8 @@ def _abastecimento_label(valor) -> str:
 
 def build_diario_bordo_context(diario: DiarioBordo) -> tuple[dict, list[dict]]:
     oficio = diario.prestacao.oficio
-    inst = build_configuracao_context()
+    area = getattr(diario.prestacao, "area", None) or getattr(oficio, "area", None)
+    inst = build_configuracao_context(area=area)
     motorista_nome, motorista_cpf = motorista_diario(diario)
     viatura = _viatura_dados_diario(diario)
 
