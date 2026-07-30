@@ -549,8 +549,21 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
   diretas a `console.*` ficaram proibidas por teste estrutural.
 
 ### Etapa 6 — Estrutura HTML
-- [ ] `H-02` `components/page/flow_base.html` + migrar Prestações, Termos, OS, Eventos, Roteiro avulso
-- [ ] `H-05` `components/form/card.html` + migrar 20+ páginas
+- [~] `H-02` `components/page/flow_base.html` — **Prestações (5 telas) migradas**;
+  faltam Termos, OS, Eventos-detalhe e Roteiro avulso. O casco tem parâmetro e
+  bloco porque as 9 páginas variam em **12 eixos** medidos: só as duas linhas do
+  meio (`main-form-panel` e `cv-form-section-stack`) eram literalmente iguais.
+- [~] `H-05` `components/form/card.html` — criado e em uso nas 5 telas de
+  Prestações; faltam os outros 23 arquivos com `cv-form-section-header` à mão.
+  - **Lição registrada:** o componente inclui o corpo **sem `only`** por
+    necessidade (é portador de contexto, como o `form_block`), e por isso precisa
+    **zerar os próprios parâmetros** antes de descer — senão o `body_extra_class`
+    do card mestre reaparece em todos os blocos internos. Só apareceu no diff de
+    HTML renderizado; nenhum teste pegaria, porque o defeito é uma classe a mais.
+  - **Lição de método:** a primeira comparação antes/depois foi **vazia** — o
+    `git stash` não achou nada para guardar (tudo já commitado) e as duas
+    renderizações usaram o mesmo código. O jeito correto é `git worktree` no
+    commit anterior. Comparação que dá zero merece desconfiança, não alívio.
 - [x] `H-03` fim dos ordinais latinos — **a auditoria catalogava só
   `_docs_attach_kinds_attrs.html`, e havia um segundo consumidor**: 17 atributos
   ordinais inline em `_prestacao_card_body.html`, onde o `primary` era o
