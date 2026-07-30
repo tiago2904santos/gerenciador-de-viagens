@@ -1,4 +1,3 @@
-import json
 import re
 from urllib.parse import urlencode
 
@@ -366,7 +365,6 @@ def diario_servidor_motorista(request, ps_pk):
             "motorista_oficio_cpf": oficio_cpf,
             "viatura_oficio": viatura_resumo_oficio(prestacao.oficio),
             "oficios_prefill": oficios_prefill,
-            "oficios_prefill_json": json.dumps(oficios_prefill),
             "diario_url": diario_url,
         },
     )

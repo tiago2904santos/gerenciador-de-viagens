@@ -58,6 +58,7 @@ class TermoAutorizacaoForm(forms.ModelForm):
                 attrs={
                     **widget_attrs(WidgetStyle.TERM_OFICIO_SOURCE),
                     "hidden": True,
+                    "data-source-document": "termos-oficios-summary",
                 },
             ),
             "destino_estado": forms.Select(

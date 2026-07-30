@@ -108,6 +108,7 @@ class OrdemServicoForm(forms.ModelForm):
             "oficios": OficioMultiSelectWidget(attrs={
                 **widget_attrs(WidgetStyle.TERM_OFICIO_OS_SOURCE),
                 "hidden": True,
+                "data-source-document": "os-oficios-summary",
             }),
             "data_evento_inicio": forms.HiddenInput(attrs={"data-cv-date-picker-start-value": "true"}),
             "data_evento_fim": forms.HiddenInput(attrs={"data-cv-date-picker-end-value": "true"}),
