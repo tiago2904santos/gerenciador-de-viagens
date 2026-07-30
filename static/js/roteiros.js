@@ -1,4 +1,4 @@
-import { initRoteirosEditor } from './pages/roteiros/editor/index.js?v=20260729-recalc-loop';
+import { initRoteirosEditor } from './pages/roteiros/editor/index.js';
 
 function bootRoteirosEditor() {
   const form = document.getElementById('roteiro-editor-form');

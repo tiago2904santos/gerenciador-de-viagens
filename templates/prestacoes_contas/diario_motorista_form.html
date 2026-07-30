@@ -4,13 +4,13 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}?v=20260711-motorista">
-  <link rel="stylesheet" href="{% static 'css/diario-troca.css' %}?v=20260711">
+  <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}">
+  <link rel="stylesheet" href="{% static 'css/diario-troca.css' %}">
 {% endblock %}
 
 {% block extra_js %}
-  {# masks.js ja vem do base.html; carregar de novo baixava duas copias (versoes ?v= diferentes). #}
-  <script src="{% static 'js/pages/diario-motorista.js' %}?v=20260711" defer></script>
+  {# masks.js ja vem do base.html; carregar de novo executaria o mesmo motor duas vezes. #}
+  <script src="{% static 'js/pages/diario-motorista.js' %}" defer></script>
 {% endblock %}
 
 {% block content %}

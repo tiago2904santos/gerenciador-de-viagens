@@ -378,9 +378,13 @@ window.OSFocusDestino         window.__prestDiariaWaBound   window.DEBUG_AUTOSAV
 Vários eram **duplicatas** de uma entrada em `CV`; o teste estrutural de J-09
 impede que esses aliases voltem a ser publicados.
 
-### 4.7 Cache-busting manual: 88 tokens, 11 arquivos incoerentes
+### 4.7 Cache-busting manual: 88 tokens → 0
 
-O mesmo arquivo é servido com `?v=` diferentes conforme a página:
+**Corrigido (J-13):** a auditoria registrou 88 tokens e, no fechamento, havia
+150 ocorrências. Todas foram removidas. Produção usa storage com manifesto,
+compressão e reescrita de imports ESM; a CI executa `collectstatic` para provar
+que toda referência local é resolvida. A tabela abaixo preserva a fotografia
+original:
 
 | Arquivo | Tokens divergentes |
 |---|---|
@@ -479,7 +483,7 @@ Severidade: 🔴 crítico · 🟠 alto · 🟡 médio.
 | J-10 | 🟠 | `autosave.js` registra **um `beforeunload` e um listener de captura em `document` por formulário**, nunca removidos | `autosave.js:250,283` |
 | J-11 | 🟠 | `app.js:394-412` — `data-confirm-submit` escuta **click e submit**; num `<form data-confirm-submit>` com botão submit dentro, o `confirm()` aparece **duas vezes** | `app.js`, disparado por `eventos/detalhe.html:24` |
 | J-12 | 🟠 | **13 `window.alert`/`confirm` nativos** num sistema com 4 modais próprios e um toast | `app.js`, `gdrive_config.js`, `oficios-documentos-inline.js`, `planos-trabalho-wizard.js`, `prestacoes-diaria-wa.js` |
-| J-13 | 🟠 | **88 tokens `?v=` manuais**; 11 arquivos servidos com tokens divergentes; cadeia ESM bustada à mão em 3 níveis com 4 módulos de fora | §4.7 |
+| J-13 | ✅ | **Corrigido:** 150 ocorrências manuais removidas; manifesto reescreve CSS e imports ESM, com `collectstatic` validado na CI | §4.7 |
 | J-14 | 🟠 | `masks.js` é carregado **duas vezes** em `diario_motorista_form.html` (base + página) | `diario_motorista_form.html:11` |
 | J-15 | ✅ | **Corrigido:** `CV.documentSource` lê, seleciona, agrega e aplica campos de documento-fonte; Termos, OS e Diário-motorista usam o mesmo motor e contrato `data-source-document` | `document-source.js`, `termos-form.js`, `ordens-servico-form.js`, `diario-motorista.js` |
 | J-16 | 🟡 | `debounce` redefinido em 5 arquivos; `escapeHtml` em 2 | §4.5 |
@@ -503,9 +507,9 @@ Legenda: **✅** conforme · **⚠️** desvio · **❌** fora do padrão
 | Lista | ⚠️ `list_page_cards` ✅; **J-03** dois motores de filtro; **J-02** menus de ação órfãos após filtro | ⚠️ `extra-download.js` **não** carregado apesar de `rich_menu_link` emitir o hook (**J-05**) |
 | Etapa 1 | ✅ referência. ⚠️ header do card à mão (**H-05**); `form_block` sem `only` ×4 | ❌ 4 scripts de página, **nenhum** enhancer; `oficios-transporte.js` (634 l.) carregado aqui e na etapa 2 |
 | Etapa 2 | ⚠️ campos direto no body, sem `form_block` (**RH-03**) | ⚠️ `app-motorista-picker.js` (264 l.) carregado; **nenhum template emite `data-app-motorista-picker`** → morto |
-| Etapa 3 | ⚠️ delega a `_roteiro_editor.html`; card canônico condicional | ❌ ESM com cache-bust manual em 3 níveis (**J-13**); Leaflet de CDN (**J-22**); `roteiros_wizard.js` + `roteiros.js` + `roteiros-map.js` = 3 entradas |
+| Etapa 3 | ⚠️ delega a `_roteiro_editor.html`; card canônico condicional | ⚠️ Cache ESM corrigido (**J-13**); Leaflet de CDN (**J-22**); `roteiros_wizard.js` + `roteiros.js` + `roteiros-map.js` = 3 entradas |
 | Etapa 4 | ✅ | ⚠️ `oficios-justificativa-wizard.js` — DOMContentLoaded |
-| Etapa 5 | ⚠️ blocos com 5 aliases | ⚠️ `oficios-documentos-inline.js` com 4 tokens `?v=` diferentes entre páginas (**J-13**); 3 `window.alert` (**J-12**) |
+| Etapa 5 | ⚠️ blocos com 5 aliases | ⚠️ Cache unificado (**J-13**); 3 `window.alert` (**J-12**) |
 | Modelos de motivo | ⚠️ Quick Add | ❌ Quick Add morre após filtro (**J-04**) |
 
 ### 7.2 Termos
@@ -900,7 +904,7 @@ Cada fase é independente, verificável e não depende da reconstrução do CSS.
 | **14** | ✅ Criar `CV.picker`; unificar hooks, namespace, enhancer e renderers vivos | — | Um contrato de seleção |
 | **15** | ✅ Criar `CV.overlay`; fundir o ciclo de vida dos 4 modais, menus e dropdowns | J-02 | Um namespace, um enhancer e contrato `data-overlay-*` |
 | **16** | ✅ Colapsar os 22 namespaces em `CV.*` | J-09 | Um namespace de aplicação |
-| **17** | Trocar os 88 `?v=` manuais por `ManifestStaticFilesStorage` (hash automático); remover os `?v=` dos `import` ESM | J-13 | Fim da cache incoerente |
+| **17** | ✅ Trocar os tokens manuais por manifesto com hash automático e reescrita de imports ESM | J-13 | Fim da cache incoerente |
 | **18** | Refatorar `form_block.html` para receber `context` explícito e incluir o body com `only` | H-04 | Componentes seláveis e testáveis |
 | **19** | Semântica: `<nav>` em stepper/abas/paginação; `<ul>`/`<table>` nas listas de dados; `<footer>` nos rodapés de card | H-08 | — |
 | **20** | Adicionar `aria-controls` nos 29 `aria-expanded`; `for`/`id` nos 14 `<label>` | H-06, H-10 | — |

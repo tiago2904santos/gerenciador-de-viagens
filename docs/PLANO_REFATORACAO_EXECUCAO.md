@@ -531,7 +531,8 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
   `data-overlay-*`.
 - [x] `J-09` somente `window.CV` é publicado; aliases duplicados, fallbacks
   órfãos e os namespaces de tema/autosave/roteiros foram consolidados.
-- [ ] `J-13` `ManifestStaticFilesStorage` no lugar dos 88 `?v=`
+- [x] `J-13` storage com manifesto, compressão e reescrita de imports ESM;
+  150 tokens manuais removidos e `collectstatic` validado na CI.
 
 ### Etapa 6 — Estrutura HTML
 - [ ] `H-02` `components/page/flow_base.html` + migrar Prestações, Termos, OS, Eventos, Roteiro avulso
