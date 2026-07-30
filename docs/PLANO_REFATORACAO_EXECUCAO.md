@@ -554,7 +554,25 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
 - [ ] `H-03` `_docs_attach_kinds_attrs.html` — fim dos ordinais latinos
 - [ ] `H-04` `form_block.html` com contexto explícito e `only`
 - [ ] `D-41` contrato único de classe no `field.html`
-- [ ] `H-08` semântica (`<nav>`, `<ul>`, `<table>`, `<footer>`)
+- [x] `H-08` semântica — **o item estava em grande parte obsoleto quando o abri**:
+  `page_stepper.html:2`, `list_tabs.html:6` e `pagination.html:18` já eram
+  `<nav>`, e `card_footer_actions.html:1` já era `<footer>`. A parte de rodapé
+  que a auditoria pede seria **regressão**: os ~30 `<div class="cv-form-card__footer">`
+  são wrapper de layout POR FORA daquele `<footer>`, e trocá-los produziria
+  `<footer>` dentro de `<footer>` (inválido por spec) além de quebrar
+  `oficios/tests/test_views.py:245`, que faz `html.index('<section class="cv-card-footer-section">')`.
+  Registrado por escrito para ninguém "corrigir" isso depois.
+  Feito de fato: as 7 listas de servidores e 6 de trechos viraram `<ul>`/`<li>`
+  em 6 partials de card. Duas coisas que a auditoria não previa: o `{% empty %}`
+  emitia `<p>` como filho direto (inválido em `<ul>`) e **não existia reset de
+  lista** — sem `list-style: none` e `padding-inline-start: 0`, o user agent
+  empurra todo o conteúdo do card 40px para a direita (conferido em print; os
+  bullets não aparecem porque `display: grid` blockifica os `<li>`, então minha
+  previsão do plano acertou o recuo e errou o marcador).
+  `cv-card-grid` ficou **fora**, de propósito: envolver os `<article>` em `<li>`
+  quebraria em silêncio `.cv-card-grid > .prestacao-card-group--*`
+  (`prestacoes_contas.css:717-748`). Vai na Etapa 7 fase 7, que reescreve esse
+  markup.
 - [ ] `H-06` / `H-10` `aria-controls` nos 29 `aria-expanded`; `for`/`id` nos 14 `<label>`
 
 ### Etapa 7 — Reconstrução do CSS
