@@ -1,5 +1,5 @@
 {# Lista simples com header Quick Add (compacto, com bloco visual). #}
-<div class="page-shell page-shell--list"{% if not disable_realtime_filter %} data-cv-realtime-filter-scope{% endif %}>
+<div class="page-shell page-shell--list" data-collection data-collection-mode="server">
   <div class="list-header list-header--quick-add cv-filter-header{% if quick_add_compact %} list-header--quick-add-compact{% endif %}">
     <div class="list-header__band">
       <div class="list-header__title-block">
@@ -11,7 +11,7 @@
     </div>
 
     <div class="list-header__rail list-header__rail--quick-add">
-      <form class="list-header__filters" method="get" action="{{ request.path }}" data-cv-live-submit-form>
+      <form class="list-header__filters" method="get" action="{{ request.path }}" data-collection-form>
         <div class="list-header__search">
           <input
             class="list-header__search-input header-filter-input"
@@ -19,8 +19,7 @@
             name="q"
             placeholder="{{ search_placeholder|default:'Buscar itens' }}"
             aria-label="{{ search_placeholder|default:'Buscar itens' }}"
-            data-cv-filter="search"
-            data-cv-live-submit-input
+            data-collection-filter="search"
             {% if q %}value="{{ q }}"{% endif %}
           >
         </div>

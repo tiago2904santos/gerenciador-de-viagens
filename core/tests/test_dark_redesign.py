@@ -102,8 +102,7 @@ class DarkRedesignContractTests(SimpleTestCase):
             "cv-custom-select.js",
             "cv-search-picker.js",
             "cv-date-picker.js",
-            "realtime-filters.js",
-            "live-search-submit.js",
+            "collection.js",
             "delete-confirm-modal.js",
             "confirm-action-modal.js",
             "cancel-reason-modal.js",
@@ -184,7 +183,7 @@ class DarkRedesignContractTests(SimpleTestCase):
 
         self.assertIn('components/ui/forms/field.html', lab)
         self.assertIn('components/ui/headers/filter_page_header.html', lab)
-        self.assertIn("data-cv-realtime-filter-scope", lab)
+        self.assertIn('data-collection-mode="client"', lab)
         self.assertNotIn('<select name="lab-', lab)
 
     def test_feedback_lab_uses_canonical_feedback_components(self):

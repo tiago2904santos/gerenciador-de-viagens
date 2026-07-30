@@ -22,7 +22,7 @@
           <span class="ui-lab-preview-card__label">Lista standard</span>
           <span class="ui-lab-status-pill ui-lab-status-pill--done">Pronto</span>
         </div>
-        <div class="page-shell page-shell--list ui-lab-list-panel--flush-footer" data-cv-realtime-filter-scope>
+        <div class="page-shell page-shell--list ui-lab-list-panel--flush-footer" data-collection data-collection-mode="client">
           <div class="page-header-stack">
             <div class="page-header-band">
               <div class="page-header-band__content">
@@ -37,7 +37,7 @@
               <div class="page-header-rail__marker" aria-hidden="true">TP</div>
               <div class="header-filter-bar">
                 <div class="header-filter-bar__search">
-                  <input class="header-filter-input" type="search" placeholder="Buscar itens..." aria-label="Buscar" data-cv-filter="search">
+                  <input class="header-filter-input" type="search" placeholder="Buscar itens..." aria-label="Buscar" data-collection-filter="search">
                 </div>
               </div>
               <div class="page-header-rail__actions">
@@ -54,11 +54,11 @@
                 {% include "components/lists/simple_list_row.html" with row=row row_index=forloop.counter only %}
               {% endfor %}
             </div>
-            <div data-cv-empty-state hidden>
+            <div data-collection-empty hidden>
               {% include "components/lists/list_empty.html" with message="Nenhum item encontrado com os filtros atuais." only %}
             </div>
             <div class="pagination-shell">
-              <span class="pagination-shell__info" data-cv-results-count data-cv-results-count-template="{% verbatim %}{{visible}}{% endverbatim %} visíveis" aria-live="polite"></span>
+              <span class="pagination-shell__info" data-collection-count data-collection-count-template="{% verbatim %}{{visible}}{% endverbatim %} visíveis" aria-live="polite"></span>
               <div class="pagination-shell__controls">
                 <button class="btn btn-secondary" type="button" disabled aria-label="Página anterior">←</button>
                 <button class="btn btn-primary" type="button" aria-current="page">1</button>
@@ -76,7 +76,7 @@
           <span class="ui-lab-preview-card__label">Lista standard + quick add</span>
           <span class="ui-lab-status-pill ui-lab-status-pill--review">Quick add</span>
         </div>
-        <div class="page-shell page-shell--list ui-lab-list-panel--flush-footer" data-cv-realtime-filter-scope>
+        <div class="page-shell page-shell--list ui-lab-list-panel--flush-footer" data-collection data-collection-mode="client">
           <div class="page-header-stack header-stack--quick-add">
             <div class="page-header-band">
               <div class="page-header-band__content">
@@ -90,7 +90,7 @@
               <div class="page-header-rail__marker" aria-hidden="true">TP</div>
               <div class="header-filter-bar">
                 <div class="header-filter-bar__search">
-                  <input class="header-filter-input" type="search" placeholder="Buscar itens..." aria-label="Buscar" data-cv-filter="search">
+                  <input class="header-filter-input" type="search" placeholder="Buscar itens..." aria-label="Buscar" data-collection-filter="search">
                 </div>
               </div>
               <div class="page-header-rail__actions">
@@ -122,11 +122,11 @@
                 {% include "components/lists/simple_list_row.html" with row=row row_index=forloop.counter only %}
               {% endfor %}
             </div>
-            <div data-cv-empty-state hidden>
+            <div data-collection-empty hidden>
               {% include "components/lists/list_empty.html" with message="Nenhum item encontrado com os filtros atuais." only %}
             </div>
             <div class="pagination-shell">
-              <span class="pagination-shell__info" data-cv-results-count data-cv-results-count-template="{% verbatim %}{{visible}}{% endverbatim %} visíveis" aria-live="polite"></span>
+              <span class="pagination-shell__info" data-collection-count data-collection-count-template="{% verbatim %}{{visible}}{% endverbatim %} visíveis" aria-live="polite"></span>
               <div class="pagination-shell__controls">
                 <button class="btn btn-secondary" type="button" disabled aria-label="Página anterior">←</button>
                 <button class="btn btn-primary" type="button" aria-current="page">1</button>
@@ -144,7 +144,7 @@
           <span class="ui-lab-preview-card__label">Lista com cards</span>
           <span class="ui-lab-status-pill ui-lab-status-pill--done">Cards</span>
         </div>
-        <div class="page-shell page-shell--list ui-lab-list-panel--flush-footer" data-cv-realtime-filter-scope>
+        <div class="page-shell page-shell--list ui-lab-list-panel--flush-footer" data-collection data-collection-mode="client">
           <div class="page-header-stack">
             <div class="page-header-band">
               <div class="page-header-band__content">
@@ -159,7 +159,7 @@
               <div class="page-header-rail__marker" aria-hidden="true">TP</div>
               <div class="header-filter-bar header-filter-bar--advanced">
                 <div class="header-filter-bar__search">
-                  <input class="header-filter-input" type="search" placeholder="Buscar itens..." aria-label="Buscar" data-cv-filter="search">
+                  <input class="header-filter-input" type="search" placeholder="Buscar itens..." aria-label="Buscar" data-collection-filter="search">
                 </div>
                 <div class="header-filter-bar__row">
                   <div class="header-filter-bar__fields">
@@ -182,7 +182,7 @@
                       </select>
                     </div>
                     <div class="header-filter-field header-filter-field--status">
-                      <select class="header-filter-select" aria-label="Status" data-cv-filter="status">
+                      <select class="header-filter-select" aria-label="Status" data-collection-filter="status">
                         <option value="">Todos os status</option>
                         <option value="rascunho">Rascunho</option>
                         <option value="ativo">Ativo</option>
@@ -208,11 +208,11 @@
                 {% include "roteiros/partials/roteiro_list_card.html" with card=card only %}
               {% endfor %}
             </div>
-            <div data-cv-empty-state hidden>
+            <div data-collection-empty hidden>
               {% include "components/lists/list_empty.html" with message="Nenhum card encontrado com os filtros atuais." only %}
             </div>
             <div class="pagination-shell">
-              <span class="pagination-shell__info" data-cv-results-count data-cv-results-count-template="{% verbatim %}{{visible}}{% endverbatim %} visíveis" aria-live="polite"></span>
+              <span class="pagination-shell__info" data-collection-count data-collection-count-template="{% verbatim %}{{visible}}{% endverbatim %} visíveis" aria-live="polite"></span>
             </div>
           </div>
         </div>

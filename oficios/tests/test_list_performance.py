@@ -47,7 +47,7 @@ class OficioListPaginacaoTests(TestCase):
         self.assertEqual(page_obj.paginator.count, 300)
         self.assertEqual(page_obj.paginator.num_pages, 15)
         # O que chega ao DOM é a página, não a base inteira.
-        self.assertEqual(response.content.count(b"data-cv-filter-item"), OFICIOS_POR_PAGINA)
+        self.assertEqual(response.content.count(b"data-collection-item"), OFICIOS_POR_PAGINA)
 
     def test_numero_de_queries_nao_cresce_com_o_volume(self):
         _criar_oficios(20)

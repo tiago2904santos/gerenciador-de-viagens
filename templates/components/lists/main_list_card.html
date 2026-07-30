@@ -1,5 +1,5 @@
 <article class="cv-entity-card roteiro-list-card roteiro-list-card--status-{{ card.status_variant|default:'outro' }} {{ card.faixa_lateral_class|default:'' }} roteiro-list-card--trechos-{{ card.trechos_count|default:0 }} roteiro-list-card--layout-{{ card.roteiro_card_layout|default:'compact' }}"
-  data-cv-filter-item
+  data-collection-item
   data-search-text="{{ card.title|default:'' }}{% if card.subtitle %} {{ card.subtitle }}{% endif %}{% if card.trechos %}{% for t in card.trechos %} {{ t.rota }}{% endfor %}{% endif %}{% if card.meta %}{% for item in card.meta %} {{ item.label }} {{ item.value }}{% endfor %}{% endif %}"
   {% if card.status_variant %}data-status-value="{{ card.status_variant }}"{% endif %}
 >

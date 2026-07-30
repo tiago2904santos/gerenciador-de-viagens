@@ -540,7 +540,7 @@ document.documentElement.dataset.appReady = "true";
     if (quickEditBound) return;
     quickEditBound = true;
     // Delegado no document: os botões costumam ser trocados via AJAX (filtro
-    // de listas com live-search-submit.js), então um bind direto nos nós
+    // de listas com CV.collection), então um bind direto nos nós
     // encontrados no load perde os botões recriados depois do swap do painel.
     document.addEventListener("click", function (event) {
       var button = event.target.closest("[data-quick-edit]");
