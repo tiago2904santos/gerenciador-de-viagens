@@ -78,3 +78,32 @@ class DocxtplContextTests(TestCase):
         conteudo = render_docx_bytes(template_path=path, context=contexto)
         self.assertGreater(len(conteudo), 1000)
         self.assertEqual(conteudo[:2], b"PK")
+
+
+class AssinanteSemAreaTests(TestCase):
+    """Plano **sem área** continua tendo assinante — medido, não suposto.
+
+    `b970a84` passou a resolver o assinante pela área do registro com
+    `fallback_geral=False`, e `PlanoTrabalho.area` é `null=True`. Eu suspeitei
+    que planos sem área passariam a gerar documento sem nome de chefia, o que
+    seria regressão em documento assinado. **Não é o caso:**
+    `get_configuracao_sistema(area=None)` devolve a configuração global, e o
+    assinante dela é usado.
+
+    O teste fica para que essa garantia seja explícita: se um dia a resolução
+    por área deixar de cair na configuração global, é aqui que aparece — em vez
+    de aparecer num ofício impresso sem quem assina.
+    """
+
+    def setUp(self):
+        _, self.curitiba, self.maringa, _ = criar_base_geografica()
+        configurar_sistema(self.curitiba)
+        self.plano = criar_plano_maringa(self.maringa)
+
+    def test_plano_sem_area_usa_o_assinante_da_configuracao_global(self):
+        self.assertIsNone(self.plano.area_id)
+
+        contexto = build_plano_docxtpl_context(self.plano)
+
+        self.assertEqual(contexto["nome_chefia"], "João Mário Nunes de Góes")
+        self.assertEqual(contexto["cargo_chefia"], "Assessor de Comunicação Social")
