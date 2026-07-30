@@ -668,8 +668,17 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
 > fechada. Próximo: Etapa 8 — higiene e polimento.
 
 ### Etapa 8 — Higiene e polimento
+- [x] `NOVO-12` 🟠 **Shell sem bundle** — `base.html` carregava 24 CSS + 25 JS por
+  página. Entrega agora é `static/css/shell.bundle.css` + `static/js/shell.bundle.js`
+  (fontes intactas; gerador `scripts/build_shell_bundles.py` com `--check`;
+  `theme-shared.js`/`theme-init.js` permanecem no `<head>` sem defer). Hook de
+  build antes do `collectstatic` nos scripts de deploy. Gate em
+  `core/tests/test_shell_bundles.py`.
 - [ ] `G-01` 161 arquivos indevidos no git · `G-02` docs datados → `docs/historico/`
 - [ ] `G-03` repositório fora do OneDrive · `N-12` `media/` de 191 MB
+  *(ação de ambiente: mover o clone para fora do OneDrive ou marcar `.venv/`,
+  `staticfiles/`, `media/`, `tmp/`, `legacy/` como "sempre local" — sem isso o
+  local continua lento mesmo com o bundle)*
 - [ ] `S-02` e-mail · `S-03` rate limit no login · `S-04` CSP · `S-05` `SECRET_KEY` default
 - [ ] `R-02` sistema de ícones (208 linhas de if/elif, 17 órfãos)
 - [ ] `N-11` microcopy: 4 variantes de "Voltar à lista"

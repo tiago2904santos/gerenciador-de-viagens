@@ -49,6 +49,9 @@ echo "=== migrate ==="
 export DJANGO_SETTINGS_MODULE=config.settings.prod
 python manage.py migrate --noinput
 
+echo "=== shell bundles (NOVO-12) ==="
+python scripts/build_shell_bundles.py
+
 echo "=== collectstatic ==="
 python manage.py collectstatic --noinput
 

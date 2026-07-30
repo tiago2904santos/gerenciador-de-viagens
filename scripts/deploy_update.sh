@@ -24,6 +24,9 @@ echo "==> Rodando migrations..."
 cd ${APP_DIR}
 DJANGO_SETTINGS_MODULE=config.settings.prod python manage.py migrate --noinput
 
+echo "==> Gerando bundles do shell (NOVO-12)..."
+python scripts/build_shell_bundles.py
+
 echo "==> Coletando arquivos estaticos..."
 DJANGO_SETTINGS_MODULE=config.settings.prod python manage.py collectstatic --noinput --clear
 

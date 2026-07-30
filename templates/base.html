@@ -7,31 +7,9 @@
   <script src="{% static 'js/core/theme-shared.js' %}"></script>
   <script src="{% static 'js/core/theme-init.js' %}"></script>
   <title>{% block title %}Central de Viagens 3{% endblock %}</title>
-  <link rel="stylesheet" href="{% static 'css/style.css' %}">
-  <link rel="stylesheet" href="{% static 'css/03-theme-dark.css' %}">
-  <link rel="stylesheet" href="{% static 'css/utilities.css' %}">
-  <link rel="stylesheet" href="{% static 'css/page-shell.css' %}">
-  <link rel="stylesheet" href="{% static 'css/cv-buttons.css' %}">
-  <link rel="stylesheet" href="{% static 'css/components/cv-date-picker.css' %}">
+  {# NOVO-12: um CSS de shell no lugar de 24 requests. Fontes em static/css/; regenere com scripts/build_shell_bundles.py #}
+  <link rel="stylesheet" href="{% static 'css/shell.bundle.css' %}">
   {% block extra_css %}{% endblock %}
-  <link rel="stylesheet" href="{% static 'css/components/file-picker.css' %}">
-  <link rel="stylesheet" href="{% static 'css/components/action-system.css' %}">
-  <link rel="stylesheet" href="{% static 'css/components/record-list.css' %}">
-  <link rel="stylesheet" href="{% static 'css/components/list-tabs.css' %}">
-  <link rel="stylesheet" href="{% static 'css/components/filter-header.css' %}">
-  <link rel="stylesheet" href="{% static 'css/components/form-panel.css' %}">
-  <link rel="stylesheet" href="{% static 'css/components/form-sections.css' %}">
-  <link rel="stylesheet" href="{% static 'css/components/pendencias.css' %}">
-  <link rel="stylesheet" href="{% static 'css/components/summary-items.css' %}">
-  <link rel="stylesheet" href="{% static 'css/components/cv-notice.css' %}">
-  <link rel="stylesheet" href="{% static 'css/components/cv-metric.css' %}">
-  <link rel="stylesheet" href="{% static 'css/components/app-shell.css' %}">
-  <link rel="stylesheet" href="{% static 'css/components/content-cards.css' %}">
-  <link rel="stylesheet" href="{% static 'css/components/document-viewer.css' %}">
-  <link rel="stylesheet" href="{% static 'css/components/dialog.css' %}">
-  <link rel="stylesheet" href="{% static 'css/components/document-download-loading.css' %}">
-  <link rel="stylesheet" href="{% static 'css/components/theme-dark-components.css' %}">
-  <link rel="stylesheet" href="{% static 'css/components/list-header.css' %}">
   {% block extra_css_after_theme %}{% endblock %}
 </head>
 <body>
@@ -62,30 +40,8 @@
       <p class="cv-document-loading__detail" data-document-loading-detail>Aguarde enquanto o arquivo é preparado.</p>
     </div>
   </div>
-  <script src="{% static 'js/theme-toggle.js' %}" defer></script>
-  <script src="{% static 'js/core/http.js' %}" defer></script>
-  <script src="{% static 'js/core/app.js' %}" defer></script>
-  <script src="{% static 'js/autosave.js' %}" defer></script>
-  <script src="{% static 'js/components/sidebar.js' %}" defer></script>
-  <script src="{% static 'js/components/masks.js' %}" defer></script>
-  <script src="{% static 'js/components/state-toggle.js' %}" defer></script>
-  <script src="{% static 'js/components/card-toggle.js' %}" defer></script>
-  <script src="{% static 'js/components/collection.js' %}" defer></script>
-  <script src="{% static 'js/components/icon-tooltips.js' %}" defer></script>
-  <script src="{% static 'js/components/overlay.js' %}" defer></script>
-  <script src="{% static 'js/components/attach-signed-modal.js' %}" defer></script>
-  <script src="{% static 'js/components/file-picker.js' %}" defer></script>
-  <script src="{% static 'js/components/signature-actions.js' %}" defer></script>
-  <script src="{% static 'js/components/picker.js' %}" defer></script>
-  <script src="{% static 'js/components/picker-select.js' %}" defer></script>
-  <script src="{% static 'js/components/location-rows.js' %}" defer></script>
-  <script src="{% static 'js/components/document-source.js' %}" defer></script>
-  <script src="{% static 'js/components/cv-date-picker.js' %}" defer></script>
-  <script src="{% static 'js/cv-select.js' %}" defer></script>
-  <script src="{% static 'js/components/fields-init.js' %}" defer></script>
-  <script src="{% static 'js/components/document-download.js' %}" defer></script>
-  {# Motor do data-extra-download-url, emitido pelo componente global rich_menu_link. #}
-  <script src="{% static 'js/components/extra-download.js' %}" defer></script>
+  {# NOVO-12: um JS de shell (defer) no lugar de 23 requests; theme-* ficam no head sem defer. #}
+  <script src="{% static 'js/shell.bundle.js' %}" defer></script>
   {% block extra_js %}{% endblock %}
 </body>
 </html>

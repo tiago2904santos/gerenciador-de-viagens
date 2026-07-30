@@ -58,6 +58,15 @@ CSS_EXCEPTIONS: dict[str, dict] = {
         "reason": "Dashboard e excecao oficial -- hex restantes sao fallbacks de var() no botao do hero.",
         "rules": {"hex_color_outside_tokens"},
     },
+    "static/css/shell.bundle.css": {
+        "reason": "Bundle gerado (NOVO-12) — literais e seletores vêm das fontes; auditar as fontes.",
+        "rules": {
+            "hex_color_outside_tokens",
+            "domain_selector_in_global",
+            "route_token_in_global",
+            "legacy_page_header_in_css",
+        },
+    },
 }
 
 # ---------------------------------------------------------------------------
@@ -217,6 +226,9 @@ def audit_css() -> list[tuple]:
     findings = []
     for path in sorted(CSS_DIR.glob("*.css")):
         rp = rel(path)
+        # Bundle gerado (NOVO-12): auditar as fontes, não a concatenação.
+        if path.name.endswith(".bundle.css"):
+            continue
         try:
             lines = path.read_text(encoding="utf-8").splitlines()
         except UnicodeDecodeError:
@@ -252,6 +264,9 @@ def audit_js() -> list[tuple]:
     findings = []
     for path in sorted(JS_DIR.rglob("*.js")):
         rp = rel(path)
+        # Bundle gerado (NOVO-12): auditar as fontes, não a concatenação.
+        if path.name.endswith(".bundle.js"):
+            continue
         try:
             lines = path.read_text(encoding="utf-8").splitlines()
         except UnicodeDecodeError:

@@ -22,6 +22,7 @@ COLOR_LITERAL_ALLOWED = {
     "static/css/03-theme-dark.css",
     "static/css/components/theme-dark-components.css",  # transitório — dissolver nas fases seguintes
     "static/css/auth.css",  # transitório — login fora do bundle global
+    "static/css/shell.bundle.css",  # gerado (NOVO-12); literais vêm das fontes acima
 }
 
 _HEX_COLOR = re.compile(r"(?<![\w#])#([0-9a-fA-F]{3,8})\b")
@@ -70,16 +71,6 @@ def _strip_comments(line: str) -> str:
     return _CSS_COMMENT.sub("", line)
 
 
-def _css_bundle_text() -> str:
-    parts: list[str] = []
-    for path in sorted(CSS_DIR.rglob("*.css")):
-        try:
-            parts.append(path.read_text(encoding="utf-8"))
-        except UnicodeDecodeError:
-            parts.append(path.read_text(encoding="latin-1"))
-    return "\n".join(parts)
-
-
 def _find_color_literals(path: Path) -> list[tuple[int, str]]:
     rel = _rel_css(path)
     if rel in COLOR_LITERAL_ALLOWED:
@@ -103,6 +94,8 @@ def _find_color_literals(path: Path) -> list[tuple[int, str]]:
 def _find_media_width_violations() -> list[str]:
     violations: list[str] = []
     for path in sorted(CSS_DIR.rglob("*.css")):
+        if path.name.endswith(".bundle.css"):
+            continue
         try:
             text = path.read_text(encoding="utf-8")
         except UnicodeDecodeError:
@@ -120,9 +113,23 @@ def _find_media_width_violations() -> list[str]:
 def _count_all_color_literal_violations() -> list[str]:
     violations: list[str] = []
     for path in sorted(CSS_DIR.rglob("*.css")):
+        if path.name.endswith(".bundle.css"):
+            continue
         for line_no, snippet in _find_color_literals(path):
             violations.append(f"{_rel_css(path)}:{line_no}: {snippet}")
     return violations
+
+
+def _css_bundle_text() -> str:
+    parts: list[str] = []
+    for path in sorted(CSS_DIR.rglob("*.css")):
+        if path.name.endswith(".bundle.css"):
+            continue
+        try:
+            parts.append(path.read_text(encoding="utf-8"))
+        except UnicodeDecodeError:
+            parts.append(path.read_text(encoding="latin-1"))
+    return "\n".join(parts)
 
 
 class CssTokenGateTests(SimpleTestCase):
@@ -184,7 +191,14 @@ class CssTokenGateTests(SimpleTestCase):
                 with self.subTest(template=rel_path, token=token):
                     self.assertIn(token, text)
 
-    def test_base_html_links_notice_and_metric_stylesheets(self):
+    def test_base_html_links_shell_bundle_with_notice_and_metric(self):
+        """NOVO-12: o shell entrega um CSS; notice/metric entram via bundle gerado."""
         base = (ROOT / "templates" / "base.html").read_text(encoding="utf-8")
-        self.assertIn("css/components/cv-notice.css", base)
-        self.assertIn("css/components/cv-metric.css", base)
+        self.assertIn("css/shell.bundle.css", base)
+        self.assertNotIn("css/components/cv-notice.css", base)
+        self.assertNotIn("css/components/cv-metric.css", base)
+        bundle = (ROOT / "static" / "css" / "shell.bundle.css").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(">>> css/components/cv-notice.css >>>", bundle)
+        self.assertIn(">>> css/components/cv-metric.css >>>", bundle)

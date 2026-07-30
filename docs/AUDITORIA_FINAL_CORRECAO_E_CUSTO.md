@@ -314,6 +314,7 @@ Um erro de português (`Voltar a lista`) e três padrões de capitalização con
 |---|---|---|---|
 | NOVO-07 | 🟠 | N+1 na lista de Ordens de Serviço: ~6 queries por card (`_destinos_display_os` refaz a query e anula o `prefetch_related`; `servidores.count()` por card; `_get_assinante_os()` relê o singleton de configuração por card). A paginação limitou o dano a 135 queries por página, mas o custo por card continua | `ordens_servico/presenters.py:76,124,205` |
 | NOVO-08 | 🟠 | `core/tests/` não tinha `__init__.py`: **95 testes existentes nunca rodaram** desde que a pasta foi criada — incluindo `test_tenancy_integrity`, `test_sso`, `test_uploads` e `test_dark_redesign`. Corrigido na Etapa 1 (todos passam; a suíte vai de 812 para 924) | `core/tests/__init__.py` |
+| NOVO-12 | 🟠 | ~~Shell sem bundle: `base.html` carregava **24 CSS + 25 JS** em toda página (~454 KB + ~256 KB raw; WhiteNoise servia cada arquivo via Python). Após a Etapa 7 o CSS foi fatiado em componentes e o waterfall piorou.~~ **corrigido:** `shell.bundle.css` + `shell.bundle.js` (fontes intactas; `scripts/build_shell_bundles.py`; theme-init permanece no head) | `templates/base.html` |
 
 ---
 

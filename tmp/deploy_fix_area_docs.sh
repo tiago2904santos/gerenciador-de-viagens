@@ -9,6 +9,7 @@ git fetch origin main
 git checkout --detach origin/main
 python -m pip install -r requirements/lock.txt --quiet
 python manage.py migrate --noinput
+python scripts/build_shell_bundles.py
 python manage.py collectstatic --noinput
 systemctl restart gerenciador-viagens gerenciador-viagens-celery gerenciador-viagens-celery-beat
 sleep 3

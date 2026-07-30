@@ -14,6 +14,14 @@ Documentos sao o centro da arquitetura. Eventos podem agrupar documentos, mas na
 
 ## Criar ambiente virtual
 
+> **Desempenho local (`G-03` / `N-12`):** não clone nem rode o projeto de dentro do
+> OneDrive. Sync de `.venv/`, `staticfiles/` e `media/` deixa pip, runserver e o
+> editor lentos. Prefira `C:\dev\gerenciador-viagens` (ou equivalente fora do
+> OneDrive). Se ainda estiver no OneDrive, marque pelo menos `.venv/`,
+> `staticfiles/`, `media/`, `tmp/` e `legacy/` como "Manter neste dispositivo" /
+> exclusos da sync, e não deixe `media/` de desenvolvimento (centenas de MB)
+> sincronizar.
+
 ```powershell
 python -m venv .venv
 ```
