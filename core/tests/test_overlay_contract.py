@@ -75,7 +75,11 @@ class OverlayContractTests(SimpleTestCase):
 
     def test_base_loads_only_the_canonical_overlay_engine(self):
         base = (self.root / "templates" / "base.html").read_text(encoding="utf-8")
-        self.assertIn("js/components/overlay.js", base)
+        bundle = (self.root / "static" / "js" / "shell.bundle.js").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("js/shell.bundle.js", base)
+        self.assertIn(">>> js/components/overlay.js >>>", bundle)
         for filename in (
             "action-menu.js",
             "cancel-reason-modal.js",
@@ -84,3 +88,4 @@ class OverlayContractTests(SimpleTestCase):
             "delete-confirm-modal.js",
         ):
             self.assertNotIn(filename, base)
+            self.assertNotIn(f">>> js/components/{filename} >>>", bundle)

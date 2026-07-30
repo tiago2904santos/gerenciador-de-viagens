@@ -17,27 +17,34 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.css = f"{self.tokens_css}\n{self.components_css}"
 
     def test_dark_redesign_is_the_final_global_css_layer(self):
-        style_index = self.base.index("css/style.css")
-        theme_dark_tokens_index = self.base.index("css/03-theme-dark.css")
-        extra_css_index = self.base.index("{% block extra_css %}")
-        file_picker_index = self.base.index("css/components/file-picker.css")
-        action_system_index = self.base.index("css/components/action-system.css")
-        record_list_index = self.base.index("css/components/record-list.css")
-        filter_header_index = self.base.index("css/components/filter-header.css")
-        form_panel_index = self.base.index("css/components/form-panel.css")
-        app_shell_index = self.base.index("css/components/app-shell.css")
-        content_cards_index = self.base.index("css/components/content-cards.css")
-        document_viewer_index = self.base.index("css/components/document-viewer.css")
-        dialog_index = self.base.index("css/components/dialog.css")
-        theme_dark_components_index = self.base.index(
-            "css/components/theme-dark-components.css"
+        # NOVO-12: ordem canônica está no shell.bundle.css; base só linka o bundle.
+        bundle = (
+            Path(settings.BASE_DIR) / "static" / "css" / "shell.bundle.css"
+        ).read_text(encoding="utf-8")
+        style_index = bundle.index(">>> css/style.css >>>")
+        theme_dark_tokens_index = bundle.index(">>> css/03-theme-dark.css >>>")
+        file_picker_index = bundle.index(">>> css/components/file-picker.css >>>")
+        action_system_index = bundle.index(">>> css/components/action-system.css >>>")
+        record_list_index = bundle.index(">>> css/components/record-list.css >>>")
+        filter_header_index = bundle.index(">>> css/components/filter-header.css >>>")
+        form_panel_index = bundle.index(">>> css/components/form-panel.css >>>")
+        app_shell_index = bundle.index(">>> css/components/app-shell.css >>>")
+        content_cards_index = bundle.index(">>> css/components/content-cards.css >>>")
+        document_viewer_index = bundle.index(
+            ">>> css/components/document-viewer.css >>>"
         )
+        dialog_index = bundle.index(">>> css/components/dialog.css >>>")
+        theme_dark_components_index = bundle.index(
+            ">>> css/components/theme-dark-components.css >>>"
+        )
+        extra_css_index = self.base.index("{% block extra_css %}")
+        shell_bundle_index = self.base.index("css/shell.bundle.css")
 
         self.assertLess(style_index, theme_dark_tokens_index)
         self.assertNotIn("css/dark-redesign.css", self.base)
-        self.assertLess(extra_css_index, file_picker_index)
+        self.assertNotIn("css/dark-redesign.css", bundle)
+        self.assertLess(shell_bundle_index, extra_css_index)
         self.assertLess(file_picker_index, action_system_index)
-        self.assertLess(extra_css_index, action_system_index)
         self.assertLess(action_system_index, dialog_index)
         self.assertLess(action_system_index, record_list_index)
         self.assertLess(record_list_index, filter_header_index)
@@ -745,10 +752,11 @@ class DarkRedesignContractTests(SimpleTestCase):
 
         self.assertIn("max-width: var(--layout-form-panel-max-width);", standard_simple)
         self.assertIn("margin-inline: auto;", standard_simple)
-        self.assertIn(
-            """{% static 'css/page-shell.css' %}">""",
-            self.base,
-        )
+        self.assertIn("css/shell.bundle.css", self.base)
+        bundle = (
+            Path(settings.BASE_DIR) / "static" / "css" / "shell.bundle.css"
+        ).read_text(encoding="utf-8")
+        self.assertIn(">>> css/page-shell.css >>>", bundle)
 
     def test_list_and_form_cards_share_the_dark_card_family(self):
         for token in (

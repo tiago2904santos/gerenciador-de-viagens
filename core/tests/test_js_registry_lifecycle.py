@@ -69,12 +69,13 @@ class JavascriptRegistryLifecycleTests(SimpleTestCase):
         self.assertIn("if (quickEditBound) return", self.registry_source)
 
     def test_registry_loads_before_autosave(self):
-        base = (
-            Path(settings.BASE_DIR) / "templates" / "base.html"
+        # NOVO-12: ordem de carga do shell está no bundle JS.
+        bundle = (
+            Path(settings.BASE_DIR) / "static" / "js" / "shell.bundle.js"
         ).read_text(encoding="utf-8")
         self.assertLess(
-            base.index("js/core/app.js"),
-            base.index("js/autosave.js"),
+            bundle.index(">>> js/core/app.js >>>"),
+            bundle.index(">>> js/autosave.js >>>"),
         )
 
     def test_autosave_unregisters_global_and_form_listeners_on_destroy(self):

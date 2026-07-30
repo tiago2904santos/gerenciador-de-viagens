@@ -59,7 +59,11 @@ class PickerContractTests(SimpleTestCase):
         self.assertIn('data-entity-picker-mode="multi"', sources)
 
         base = (templates / "base.html").read_text(encoding="utf-8")
-        self.assertIn("js/components/picker.js", base)
-        self.assertIn("js/components/picker-select.js", base)
+        bundle = (
+            self.root / "static" / "js" / "shell.bundle.js"
+        ).read_text(encoding="utf-8")
+        self.assertIn("js/shell.bundle.js", base)
+        self.assertIn(">>> js/components/picker.js >>>", bundle)
+        self.assertIn(">>> js/components/picker-select.js >>>", bundle)
         self.assertNotIn("cv-search-picker.js", base)
         self.assertNotIn("cv-custom-select.js", base)

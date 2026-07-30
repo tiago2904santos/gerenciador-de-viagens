@@ -82,11 +82,18 @@ class GlobalActionSystemTests(SimpleTestCase):
         self.assertIn("simple-row-document-menu-destino-nao-informado-7", html)
 
     def test_base_loads_action_system_after_the_legacy_button_styles(self):
-        base = (Path(settings.BASE_DIR) / "templates" / "base.html").read_text(
+        root = Path(settings.BASE_DIR)
+        base = (root / "templates" / "base.html").read_text(encoding="utf-8")
+        bundle = (root / "static" / "css" / "shell.bundle.css").read_text(
             encoding="utf-8"
         )
-        legacy_index = base.index("css/cv-buttons.css")
-        page_styles_index = base.index("{% block extra_css %}")
-        action_index = base.index("css/components/action-system.css")
-        self.assertLess(legacy_index, action_index)
-        self.assertLess(page_styles_index, action_index)
+        # NOVO-12: ordem de cascata mora no bundle; extra_css vem depois do shell.
+        self.assertIn("css/shell.bundle.css", base)
+        self.assertLess(
+            base.index("css/shell.bundle.css"),
+            base.index("{% block extra_css %}"),
+        )
+        self.assertLess(
+            bundle.index(">>> css/cv-buttons.css >>>"),
+            bundle.index(">>> css/components/action-system.css >>>"),
+        )
