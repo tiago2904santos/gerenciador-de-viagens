@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from django.conf import settings
+from django.template.loader import render_to_string
 from django.test import SimpleTestCase
 
 
@@ -473,19 +474,29 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertIn("cv-summary-grid--4", plan_summary)
         self.assertIn("@media (max-width: 620px)", component_css)
 
-        for relative in (
-            "relatorio_tecnico_form.html",
-            "diario_bordo_form.html",
-            "documentos_form.html",
-            "consolidado.html",
+        # As classes do card mestre das 4 telas de prestação são medidas no HTML
+        # **renderizado**, não no texto-fonte do arquivo da página.
+        #
+        # A versão anterior lia o `.html` da página com `read_text` e procurava a
+        # string. Isso confundia "onde a string está escrita" com "o que a página
+        # entrega": no `H-02` o card mestre passou a vir de
+        # `components/form/card.html`, o HTML final ficou idêntico e o teste
+        # falhou mesmo assim — ele guardava o arquivo, não o contrato.
+        for relative, card in (
+            ("relatorio_tecnico_form.html", "rt-wizard-card"),
+            ("diario_bordo_form.html", "diario-wizard-card"),
+            ("documentos_form.html", "docs-wizard-card"),
+            ("consolidado.html", "consolidado-wizard-card"),
         ):
             with self.subTest(template=relative):
-                source = (
-                    Path(settings.BASE_DIR) / "templates" / "prestacoes_contas" / relative
-                ).read_text(encoding="utf-8")
-                self.assertIn("travel-document-card", source)
-                self.assertIn("travel-document-body", source)
-                self.assertIn("cv-form-card__footer", source)
+                html = render_to_string(
+                    f"prestacoes_contas/{relative}",
+                    {"page_title": "Contrato", "wizard_page_steps": []},
+                )
+                self.assertIn("travel-document-card", html)
+                self.assertIn("travel-document-body", html)
+                self.assertIn("cv-form-card__footer", html)
+                self.assertIn(card, html)
 
     def test_cards_lab_renders_canonical_product_components(self):
         lab = (

@@ -212,6 +212,32 @@ def _build_prestacao_steps(ps, atual: str) -> list:
     return steps
 
 
+# `H-02`: as 5 telas do fluxo repetiam o mesmo `page_header` no template, com
+# quatro constantes iguais e só o `status_label` variando. Como o rótulo da etapa
+# já é dado por `_build_prestacao_steps`, ele sai daqui — o template deixa de
+# carregar copy do módulo e a chave da etapa passa a ter um dono só.
+_ROTULO_DA_ETAPA = {
+    "rt": "Relatório Técnico",
+    "diario": "Diário de Bordo",
+    "documentos": "Documentos",
+    "consolidado": "PDF Final",
+}
+
+
+def contexto_do_fluxo(ps, atual: str, *, back_label=None, back_url=None) -> dict:
+    """Cabeçalho e stepper das telas de fluxo da prestação, num lugar só."""
+    return {
+        "wizard_page_steps": _build_prestacao_steps(ps, atual),
+        "flow_eyebrow": "PRESTAÇÕES",
+        "flow_icon_label": "PC",
+        "flow_module_label": "Prestações de Contas",
+        "flow_back_label": back_label or "Voltar à lista",
+        "flow_back_url": back_url or reverse("prestacoes_contas:index"),
+        "flow_status_label": _ROTULO_DA_ETAPA[atual],
+        "flow_status_variant": "draft",
+    }
+
+
 def _autosave_version(obj, field_name="atualizado_em") -> int:
     obj.refresh_from_db()
     value = getattr(obj, field_name, None)

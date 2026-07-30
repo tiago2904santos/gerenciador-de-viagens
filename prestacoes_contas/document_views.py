@@ -19,7 +19,7 @@ from .view_common import (
     _autosave_form_errors,
     _autosave_version,
     _build_identificacao,
-    _build_prestacao_steps,
+    contexto_do_fluxo,
     _marcar_servidor_em_preenchimento,
     _marcar_servidores_pendentes,
     _prestacao_queryset,
@@ -192,7 +192,9 @@ def documentos_servidor(request, ps_pk):
             # Um payload só, no gatilho, em vez de 30 atributos planos. Sai como
             # string e o template escapa: quem monta o HTML não é o Python.
             "attach_kinds_json": json.dumps(attach_kinds, ensure_ascii=False),
-            "wizard_page_steps": _build_prestacao_steps(ps, "documentos"),
+            # `contexto_do_fluxo` já entrega `wizard_page_steps` junto com os
+            # metadados de cabeçalho (H-02).
+            **contexto_do_fluxo(ps, "documentos"),
             "back_url": reverse("prestacoes_contas:index"),
             "diario_url": reverse("prestacoes_contas:diario_servidor", args=[ps.pk]),
             "consolidado_url": reverse("prestacoes_contas:consolidado_servidor", args=[ps.pk]),
