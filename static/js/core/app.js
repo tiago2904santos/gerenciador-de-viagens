@@ -393,6 +393,8 @@ document.documentElement.dataset.appReady = "true";
 }());
 
 (function () {
+  var quickEditBound = false;
+
   function getPanelId(toggle) {
     return toggle.getAttribute("aria-controls") || toggle.getAttribute("data-quick-add-toggle");
   }
@@ -410,16 +412,20 @@ document.documentElement.dataset.appReady = "true";
     }
   }
 
-  function initQuickAddToggles() {
-    var toggles = Array.prototype.slice.call(document.querySelectorAll("[data-quick-add-toggle]"));
+  function initQuickAddToggles(root) {
+    var scope = root && root.querySelectorAll ? root : document;
+    var toggles = Array.prototype.slice.call(scope.querySelectorAll("[data-quick-add-toggle]"));
+    if (scope.matches && scope.matches("[data-quick-add-toggle]")) toggles.unshift(scope);
 
     toggles.forEach(function (toggle) {
+      if (toggle.dataset.inlineCreateBound === "true") return;
       var panelId = getPanelId(toggle);
       var panel = panelId ? document.getElementById(panelId) : null;
 
       if (!panel) {
         return;
       }
+      toggle.dataset.inlineCreateBound = "true";
 
       var closeButtons = Array.prototype.slice.call(panel.querySelectorAll("[data-quick-add-close]"));
       var hideTimer = null;
@@ -531,6 +537,8 @@ document.documentElement.dataset.appReady = "true";
   }
 
   function initQuickEditButtons() {
+    if (quickEditBound) return;
+    quickEditBound = true;
     // Delegado no document: os botões costumam ser trocados via AJAX (filtro
     // de listas com live-search-submit.js), então um bind direto nos nós
     // encontrados no load perde os botões recriados depois do swap do painel.
@@ -653,15 +661,21 @@ document.documentElement.dataset.appReady = "true";
     });
   }
 
+  function initInlineCreate(root) {
+    initQuickAddToggles(root);
+    initQuickEditButtons();
+  }
+
+  window.CV.inlineCreate = {
+    init: initInlineCreate,
+  };
+  window.CV.registerEnhancer("inlineCreate", initInlineCreate);
+
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", function () {
-      initQuickAddToggles();
-      initQuickEditButtons();
       initConfirmSubmitContracts();
     });
   } else {
-    initQuickAddToggles();
-    initQuickEditButtons();
     initConfirmSubmitContracts();
   }
 }());

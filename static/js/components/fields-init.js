@@ -159,13 +159,11 @@
   window.CV.fields = fieldsApi;
   window.CV.initFields = init;
 
-  function boot() {
-    init(document);
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', boot);
+  if (typeof window.CV.registerEnhancer === 'function') {
+    window.CV.registerEnhancer('fields', init);
+  } else if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () { init(document); });
   } else {
-    boot();
+    init(document);
   }
 })();

@@ -31,6 +31,13 @@
     return Array.prototype.slice.call((root || document).querySelectorAll(selector));
   }
 
+  function matching(selector, root) {
+    var scope = root && root.querySelectorAll ? root : document;
+    var nodes = qsa(selector, scope);
+    if (scope.matches && scope.matches(selector)) nodes.unshift(scope);
+    return nodes;
+  }
+
   /* ─────────────────────────────────────────────────────────────────────────
      Fechar todos os dropdowns abertos (exceto um)
      ───────────────────────────────────────────────────────────────────────── */
@@ -135,7 +142,7 @@
      ───────────────────────────────────────────────────────────────────────── */
 
   function initCvDropdowns(root) {
-    qsa('[data-cv-dropdown]', root).forEach(function (wrapper) {
+    matching('[data-cv-dropdown]', root).forEach(function (wrapper) {
       if (wrapper._cvDropdownReady) return;
       wrapper._cvDropdownReady = true;
 
@@ -188,7 +195,7 @@
      ───────────────────────────────────────────────────────────────────────── */
 
   function initCvFilterDropdowns(root) {
-    qsa('[data-cv-filter-dropdown]', root).forEach(function (wrapper) {
+    matching('[data-cv-filter-dropdown]', root).forEach(function (wrapper) {
       if (wrapper._cvFilterDropdownReady) return;
       wrapper._cvFilterDropdownReady = true;
 
@@ -318,12 +325,6 @@
     initCvFilterDropdowns(scope);
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function () { init(document); });
-  } else {
-    init(document);
-  }
-
   window.CvSelect = {
     init: init,
     initDropdowns: initCvDropdowns,
@@ -332,5 +333,13 @@
   };
   window.CV = window.CV || {};
   window.CV.dropdowns = window.CvSelect;
+
+  if (typeof window.CV.registerEnhancer === 'function') {
+    window.CV.registerEnhancer('dropdowns', init);
+  } else if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () { init(document); });
+  } else {
+    init(document);
+  }
 
 }());

@@ -452,10 +452,10 @@ Severidade: 🔴 crítico · 🟠 alto · 🟡 médio.
 
 | # | Sev | Defeito | Local |
 |---|---|---|---|
-| J-01 | 🔴 | **51 de 63 arquivos não registram enhancer** — morrem em qualquer troca de DOM | §4.1 |
+| J-01 | ✅ | **Corrigido no conjunto sensível a swap:** os 8 componentes da fase 4 registram enhancers idempotentes e aceitam `root` | §4.1, fase 4 |
 | J-02 | ✅ | **Corrigido:** `CV.registry.destroy(root)` executa os destruidores antes do swap; `action-menu.js` devolve ao dono qualquer menu movido para `<body>` | `core/app.js`, `live-search-submit.js`, `action-menu.js` |
 | J-03 | 🔴 | **Dois motores de filtro ativos na mesma lista** (cliente + servidor) nas 5 listas em card | `realtime-filters.js` × `live-search-submit.js` |
-| J-04 | 🔴 | Quick Add e autosave **morrem após filtro AJAX** (bind direto em DOMContentLoaded dentro do `.list-panel`) | `app.js:201`, `autosave.js:365` |
+| J-04 | ✅ | **Corrigido:** `CV.inlineCreate` e `CV.autosave` reinicializam conteúdo inserido e impedem listeners duplicados | `core/app.js`, `autosave.js` |
 | J-05 | 🔴 | `extra-download.js` carregado só em Eventos, mas o hook é emitido pelo componente global `rich_menu_link.html` → **recurso silenciosamente morto em 4 módulos** | §4.9 |
 | J-06 | ✅ | **989 linhas de JS órfão removidas** em 9 arquivos; 6 emissões remanescentes de hooks sem consumidor removidas | §4.8 |
 | J-07 | 🟠 | **CSRF reimplementado em 11 arquivos**; 13 arquivos usam `fetch()` sem `CV.http` (sem tratamento de 401/HTML-em-vez-de-JSON) | §4.5 |
@@ -873,8 +873,8 @@ Cada fase é independente, verificável e não depende da reconstrução do CSS.
 | **1** | Carregar `extra-download.js` no bundle base; remover `masks.js` duplicado de `diario_motorista_form.html` | J-05, J-14 | Recurso morto volta a funcionar em 4 módulos |
 | **2** | Corrigir `data-confirm-submit` (escutar só `submit`) | J-11 | Fim do `confirm()` duplo |
 | **3** | ✅ Adicionar `CV.registry.destroy(root)` e chamá-lo antes de `replaceWith` em `live-search-submit`; `action-menu` devolve o menu ao dono no `destroy` | J-02 | Fim dos nós órfãos e IDs duplicados |
-| **4** | Registrar como enhancer: `fields-init`, `masks`, `state-toggle`, `card-toggle`, `cv-select`, `document-number-field`, `destination-section`, `autosave` | J-01, J-04 | 8 componentes passam a sobreviver ao AJAX |
-| **5** | Mover Quick Add/Quick Edit de `app.js` para enhancer `CV.inlineCreate` | J-04 | Quick Add volta a funcionar após filtro |
+| **4** | ✅ Registrar como enhancer: `fields-init`, `masks`, `state-toggle`, `card-toggle`, `cv-select`, `document-number-field`, `destination-section`, `autosave` | J-01, J-04 | 8 componentes passam a sobreviver ao AJAX |
+| **5** | ✅ Quick Add/Quick Edit pertencem ao enhancer idempotente `CV.inlineCreate` | J-04 | Quick Add volta a funcionar após filtro |
 | **6** | Escolher **um** motor de filtro por lista (`data-collection-mode`) | J-03 | Fim do duplo filtro nas 5 listas em card |
 | **7** | Proibir `fetch()` cru: migrar os 13 arquivos para `CV.http`; apagar as 11 cópias de CSRF | J-07 | Tratamento único de erro/sessão |
 | **8** | Criar `CV.util` (debounce, escapeHtml, normalize) e remover as 17 cópias | J-16 | — |

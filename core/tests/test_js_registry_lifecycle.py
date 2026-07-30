@@ -42,3 +42,34 @@ class JavascriptRegistryLifecycleTests(SimpleTestCase):
             'window.CV.registerEnhancer("actionMenu", init, destroy)',
             self.action_menu_source,
         )
+
+    def test_ajax_sensitive_components_register_as_enhancers(self):
+        static_js = Path(settings.BASE_DIR) / "static" / "js"
+        contracts = {
+            "autosave.js": "registerEnhancer('autosave'",
+            "cv-select.js": "registerEnhancer('dropdowns'",
+            "components/card-toggle.js": 'registerEnhancer("cardToggle"',
+            "components/destination-section.js": 'registerEnhancer("destinations"',
+            "components/document-number-field.js": 'registerEnhancer("documentNumberField"',
+            "components/fields-init.js": "registerEnhancer('fields'",
+            "components/masks.js": "registerEnhancer('masks'",
+            "components/state-toggle.js": "registerEnhancer('stateToggle'",
+        }
+        for relative_path, registration in contracts.items():
+            with self.subTest(component=relative_path):
+                source = (static_js / relative_path).read_text(encoding="utf-8")
+                self.assertIn(registration, source)
+
+    def test_inline_create_is_idempotent_enhancer(self):
+        self.assertIn('window.CV.registerEnhancer("inlineCreate"', self.registry_source)
+        self.assertIn('dataset.inlineCreateBound === "true"', self.registry_source)
+        self.assertIn("if (quickEditBound) return", self.registry_source)
+
+    def test_registry_loads_before_autosave(self):
+        base = (
+            Path(settings.BASE_DIR) / "templates" / "base.html"
+        ).read_text(encoding="utf-8")
+        self.assertLess(
+            base.index("js/core/app.js"),
+            base.index("js/autosave.js"),
+        )

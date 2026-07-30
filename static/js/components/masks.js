@@ -136,6 +136,7 @@
   function scan(root) {
     var scope = root && root.querySelectorAll ? root : document;
     if (!scope || !scope.querySelectorAll) return;
+    if (scope.matches && scope.matches('input[data-mask], textarea[data-mask]')) bind(scope);
     scope.querySelectorAll('input[data-mask], textarea[data-mask]').forEach(bind);
   }
 
@@ -149,13 +150,11 @@
   window.CV = window.CV || {};
   window.CV.masks = MaskEngine;
 
-  function boot() {
-    scan(document);
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', boot);
+  if (typeof window.CV.registerEnhancer === 'function') {
+    window.CV.registerEnhancer('masks', scan);
+  } else if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () { scan(document); });
   } else {
-    boot();
+    scan(document);
   }
 })();

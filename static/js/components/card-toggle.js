@@ -22,13 +22,22 @@
     }
   }
 
-  function initCardToggles() {
-    document.querySelectorAll("[data-card-toggle]").forEach((root) => {
-      const input = root.querySelector('input[type="checkbox"]');
-      if (!input) return;
+  function matching(root, selector) {
+    const scope = root && root.querySelectorAll ? root : document;
+    const matches = Array.from(scope.querySelectorAll(selector));
+    if (scope.matches && scope.matches(selector)) matches.unshift(scope);
+    return matches;
+  }
 
-      syncCardToggle(root);
-      input.addEventListener("change", () => syncCardToggle(root));
+  function initCardToggles(root) {
+    matching(root, "[data-card-toggle]").forEach((toggleRoot) => {
+      if (toggleRoot.dataset.cardToggleBound === "true") return;
+      const input = toggleRoot.querySelector('input[type="checkbox"]');
+      if (!input) return;
+      toggleRoot.dataset.cardToggleBound = "true";
+
+      syncCardToggle(toggleRoot);
+      input.addEventListener("change", () => syncCardToggle(toggleRoot));
     });
   }
 
@@ -64,10 +73,12 @@
     }
   }
 
-  function initServidorSemRg() {
-    document.querySelectorAll("[data-servidor-sem-rg-form]").forEach((form) => {
+  function initServidorSemRg(root) {
+    matching(root, "[data-servidor-sem-rg-form]").forEach((form) => {
+      if (form.dataset.servidorSemRgBound === "true") return;
       const semRg = form.querySelector("#id_sem_rg");
       if (!semRg) return;
+      form.dataset.servidorSemRgBound = "true";
 
       if (window.CV && window.CV.stateToggle && typeof window.CV.stateToggle.init === "function") {
         window.CV.stateToggle.init(form);
@@ -81,14 +92,19 @@
     });
   }
 
-  function boot() {
-    initCardToggles();
-    initServidorSemRg();
+  function init(root) {
+    initCardToggles(root);
+    initServidorSemRg(root);
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", boot);
+  window.CV = window.CV || {};
+  window.CV.cardToggle = { init: init };
+
+  if (typeof window.CV.registerEnhancer === "function") {
+    window.CV.registerEnhancer("cardToggle", init);
+  } else if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", function () { init(document); });
   } else {
-    boot();
+    init(document);
   }
 })();
