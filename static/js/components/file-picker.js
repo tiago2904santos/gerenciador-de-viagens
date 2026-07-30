@@ -191,6 +191,15 @@
       input.setAttribute("aria-describedby", describedBy.join(" "));
     }
 
+    // H-06: o gatilho da lista de arquivos tem `aria-expanded`; sem
+    // `aria-controls` o leitor de tela nao sabe qual painel abriu. O id sai
+    // daqui porque o picker aparece varias vezes na mesma tela.
+    window.CV.a11y.vincularExpansivel(
+      picker.querySelector("[data-file-selection-toggle]"),
+      picker.querySelector("[data-file-selection-menu]"),
+      "cv-file-selection-menu"
+    );
+
     input.addEventListener("change", function () { update(picker); });
 
     picker.addEventListener("click", function (event) {

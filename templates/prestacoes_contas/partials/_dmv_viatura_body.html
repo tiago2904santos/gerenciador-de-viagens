@@ -2,7 +2,7 @@
   <legend class="sr-only">Viatura do diário</legend>
   <div class="dmv-picker__grid">
     {% for radio in form.viatura_modo %}
-      <label class="dmv-option">
+      <label class="dmv-option" for="{{ radio.id_for_label }}">
         {{ radio.tag }}
         <span class="dmv-option__mark" aria-hidden="true"></span>
         <span class="dmv-option__content">

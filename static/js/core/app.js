@@ -63,6 +63,37 @@ document.documentElement.dataset.appReady = "true";
     },
   };
 
+  var sequenciaDeId = 0;
+
+  /* H-06: `aria-expanded` sozinho n\u00e3o diz ao leitor de tela O QUE abriu \u2014 falta
+   * o par `aria-controls` no gatilho apontando para o `id` do painel.
+   *
+   * Nos componentes de gatilho+painel (date picker, dropdown flutuante, file
+   * picker) esse par n\u00e3o pode vir do template: o mesmo componente aparece
+   * v\u00e1rias vezes na mesma p\u00e1gina, ent\u00e3o um `id` escrito no HTML se duplicaria \u2014
+   * e o painel do date picker ainda \u00e9 movido para `document.body` em runtime.
+   * Por isso o par \u00e9 montado aqui, no enhancer, que \u00e9 quem j\u00e1 conhece as duas
+   * pontas. Os demais gatilhos do sistema declaram `aria-controls` no template,
+   * porque l\u00e1 o `id` do painel j\u00e1 \u00e9 \u00fanico (`data-overlay-target`). */
+  window.CV.a11y = {
+    idUnico: function (prefixo) {
+      sequenciaDeId += 1;
+      return (prefixo || "cv-expansivel") + "-" + sequenciaDeId;
+    },
+    /* Idempotente de prop\u00f3sito: o coordenador reaplica enhancers em conte\u00fado
+     * inserido por AJAX, e reescrever o mesmo valor n\u00e3o pode gerar id novo. */
+    vincularExpansivel: function (gatilhos, painel, prefixo) {
+      if (!painel) return "";
+      if (!painel.id) painel.id = window.CV.a11y.idUnico(prefixo);
+      var lista = gatilhos && typeof gatilhos.length === "number" ? gatilhos : [gatilhos];
+      Array.prototype.forEach.call(lista, function (gatilho) {
+        if (!gatilho || gatilho.getAttribute("aria-controls") === painel.id) return;
+        gatilho.setAttribute("aria-controls", painel.id);
+      });
+      return painel.id;
+    },
+  };
+
   var enhancers = new Map();
   var pendingRoots = new Set();
   var flushScheduled = false;

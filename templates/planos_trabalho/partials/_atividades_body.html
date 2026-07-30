@@ -47,6 +47,7 @@
     <div class="pt-activity__grid" data-pt-activity-grid role="group" aria-label="Atividades disponíveis">
       {% for atividade in atividades_catalogo %}
         <label class="pt-activity-card{% if atividade.selected %} is-selected{% endif %}"
+               for="pt-atividade-{{ atividade.codigo }}"
                data-pt-activity-item
                data-nome="{{ atividade.nome|lower }}"
                title="{{ atividade.nome }}">

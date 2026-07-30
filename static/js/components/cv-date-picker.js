@@ -193,6 +193,13 @@
     var context = root.querySelector('[data-cv-date-picker-context]');
     var contextStep = root.querySelector('[data-cv-date-picker-context-step]');
     var contextRoute = root.querySelector('[data-cv-date-picker-context-route]');
+
+    // H-06: liga `aria-controls` de cada gatilho ao painel. Feito aqui e nao no
+    // template porque o painel e movido para `document.body` mais abaixo
+    // (portal) e o componente aparece varias vezes por pagina — id de template
+    // se duplicaria.
+    window.CV.a11y.vincularExpansivel(triggers, panel, 'cv-date-picker-panel');
+
     var activeDate = new Date();
     var selectedSingle = null;
     var selectedStart = null;

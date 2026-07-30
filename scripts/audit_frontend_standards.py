@@ -202,6 +202,79 @@ def audit_templates() -> list[tuple]:
     return findings
 
 
+# ---------------------------------------------------------------------------
+# Contadores de acessibilidade (H-06 / H-10)
+#
+# Estes dois não entram em `audit_templates()` porque não são regra de linha: um
+# `aria-expanded` e o `aria-controls` que o acompanha moram na mesma **tag**, que
+# quase sempre ocupa várias linhas. Medir linha a linha daria falso positivo em
+# todo componente formatado com um atributo por linha.
+# ---------------------------------------------------------------------------
+
+_TAG_COM_ARIA_EXPANDED = re.compile(r"<[a-zA-Z][^>]*aria-expanded[^>]*>", re.S)
+_TAG_LABEL = re.compile(r"<label\b[^>]*>", re.S)
+# O laboratório de UI é bancada de protótipo, não tela de produção: não entra na
+# catraca (mas continua sujeito às regras de linha de `audit_templates`).
+_DIRS_FORA_DA_CATRACA = {"ui_lab", "ui_lab2", "dev"}
+
+# Gatilhos cujo `aria-controls` é escrito pelo enhancer, não pelo template: o
+# painel que eles abrem não tem id fixo porque o componente pode aparecer várias
+# vezes na mesma página, e no caso do date picker o painel ainda é movido para
+# `document.body` em runtime (`cv-date-picker.js`). O par gatilho/painel desses
+# quatro é garantido por teste estrutural sobre o JS, não por grep de template.
+ARIA_CONTROLS_VIA_ENHANCER = {
+    "templates/components/ui/forms/date_picker.html":
+        "cv-date-picker.js gera o id e move o painel para document.body",
+    "templates/components/ui/forms/dropdown.html":
+        "cv-select.js gera o id do menu flutuante",
+    "templates/components/ui/forms/file_picker.html":
+        "file-picker.js gera o id do painel de seleção",
+    "templates/roteiros/partials/roteiro/_bate_volta_date_controls.html":
+        "reusa os gatilhos do cv-date-picker",
+}
+
+
+def _templates_de_producao():
+    for path in sorted(TEMPLATES_DIR.rglob("*.html")):
+        if _DIRS_FORA_DA_CATRACA & set(path.parts):
+            continue
+        yield path
+
+
+def _ocorrencias_de_tag(
+    pattern: re.Pattern,
+    ausente: str,
+    isentos: dict[str, str] | None = None,
+) -> list[tuple[str, int, str]]:
+    achados = []
+    for path in _templates_de_producao():
+        rp = rel(path)
+        if isentos and rp in isentos:
+            continue
+        try:
+            texto = path.read_text(encoding="utf-8-sig")
+        except UnicodeDecodeError:
+            texto = path.read_text(encoding="latin-1")
+        for match in pattern.finditer(texto):
+            if ausente in match.group(0):
+                continue
+            linha = texto[: match.start()].count("\n") + 1
+            achados.append((rp, linha, " ".join(match.group(0).split())[:110]))
+    return achados
+
+
+def aria_expanded_sem_controls() -> list[tuple[str, int, str]]:
+    """`aria-expanded` sem `aria-controls` — o leitor de tela não sabe o que abriu."""
+    return _ocorrencias_de_tag(
+        _TAG_COM_ARIA_EXPANDED, "aria-controls", ARIA_CONTROLS_VIA_ENHANCER
+    )
+
+
+def label_sem_for() -> list[tuple[str, int, str]]:
+    """`<label>` sem `for` — clicar no rótulo não foca o campo quando ele é irmão."""
+    return _ocorrencias_de_tag(_TAG_LABEL, "for=")
+
+
 def audit_css() -> list[tuple]:
     findings = []
     for path in sorted(CSS_DIR.glob("*.css")):
@@ -300,6 +373,18 @@ def main() -> None:
         default=None,
         help="Falha se a dívida não bloqueante ultrapassar este limite.",
     )
+    parser.add_argument(
+        "--max-aria-expanded-sem-controls",
+        type=int,
+        default=None,
+        help="Falha se houver mais `aria-expanded` sem `aria-controls` que este número (H-06).",
+    )
+    parser.add_argument(
+        "--max-label-sem-for",
+        type=int,
+        default=None,
+        help="Falha se houver mais `<label>` sem `for` que este número (H-10).",
+    )
     args = parser.parse_args()
     print("== Auditoria Frontend Standards — Central de Viagens 3.0 ==")
 
@@ -308,18 +393,50 @@ def main() -> None:
     js_findings = audit_js()
     all_findings = template_findings + css_findings + js_findings
 
-    if not all_findings:
-        print("Nenhuma suspeita encontrada. ✅")
-        sys.exit(0)
+    erros, avisos = 0, 0
+    if all_findings:
+        erros, avisos = print_findings(all_findings)
+        if args.max_warnings is not None and avisos > args.max_warnings:
+            print(
+                f"\nERRO: avisos aumentaram para {avisos}; "
+                f"a linha de base aceita no máximo {args.max_warnings}."
+            )
+            erros += 1
+    else:
+        print("Nenhuma suspeita de regra de linha encontrada. ✅")
 
-    erros, avisos = print_findings(all_findings)
-    if args.max_warnings is not None and avisos > args.max_warnings:
-        print(
-            f"\nERRO: avisos aumentaram para {avisos}; "
-            f"a linha de base aceita no máximo {args.max_warnings}."
-        )
-        erros += 1
+    erros += _catraca(
+        "aria-expanded sem aria-controls (H-06)",
+        aria_expanded_sem_controls(),
+        args.max_aria_expanded_sem_controls,
+        ARIA_CONTROLS_VIA_ENHANCER,
+    )
+    erros += _catraca(
+        "<label> sem for (H-10)",
+        label_sem_for(),
+        args.max_label_sem_for,
+    )
+
     sys.exit(1 if erros else 0)
+
+
+def _catraca(
+    titulo: str,
+    achados: list[tuple[str, int, str]],
+    maximo: int | None,
+    isentos: dict[str, str] | None = None,
+) -> int:
+    """Imprime uma catraca e devolve 1 se ela estourou. A catraca só desce."""
+    print(f"\n=== {titulo} ===")
+    for rp, linha, trecho in achados:
+        print(f"  {rp}:{linha} {trecho}")
+    for rp, motivo in sorted((isentos or {}).items()):
+        print(f"  ISENTO {rp} -- {motivo}")
+    print(f"Total: {len(achados)}")
+    if maximo is not None and len(achados) > maximo:
+        print(f"\nERRO: {len(achados)} ocorrências, acima da catraca de {maximo}.")
+        return 1
+    return 0
 
 
 if __name__ == "__main__":

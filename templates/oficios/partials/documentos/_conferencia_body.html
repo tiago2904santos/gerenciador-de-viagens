@@ -11,7 +11,7 @@
                     aria-expanded="false"
                     data-tooltip="Visualizar e baixar"
                     data-overlay-trigger data-overlay-kind="menu"
-                    data-overlay-target="wizard-oficio-document-menu">
+                    aria-controls="wizard-oficio-document-menu" data-overlay-target="wizard-oficio-document-menu">
               {% include "components/ui/icons/icon.html" with icon="folder" only %}
             </button>
             <div class="cv-action-menu cv-action-menu--rich" id="wizard-oficio-document-menu" role="menu" hidden>
@@ -52,7 +52,7 @@
                     aria-expanded="false"
                     data-tooltip="Visualizar e baixar"
                     data-overlay-trigger data-overlay-kind="menu"
-                    data-overlay-target="wizard-justificativa-document-menu">
+                    aria-controls="wizard-justificativa-document-menu" data-overlay-target="wizard-justificativa-document-menu">
               {% include "components/ui/icons/icon.html" with icon="folder" only %}
             </button>
             <div class="cv-action-menu cv-action-menu--rich" id="wizard-justificativa-document-menu" role="menu" hidden>
@@ -93,7 +93,7 @@
                     aria-expanded="false"
                     data-tooltip="Visualizar e baixar"
                     data-overlay-trigger data-overlay-kind="menu"
-                    data-overlay-target="wizard-termos-document-menu">
+                    aria-controls="wizard-termos-document-menu" data-overlay-target="wizard-termos-document-menu">
               {% include "components/ui/icons/icon.html" with icon="folder" only %}
             </button>
             <div class="cv-action-menu cv-action-menu--rich" id="wizard-termos-document-menu" role="menu" hidden>
@@ -131,7 +131,7 @@
                     aria-expanded="false"
                     data-tooltip="{% if t.assinado %}Termo assinado — ações{% else %}Visualizar, baixar e anexar{% endif %}"
                     data-overlay-trigger data-overlay-kind="menu"
-                    data-overlay-target="wizard-termo-document-menu-{{ forloop.counter }}"
+                    aria-controls="wizard-termo-document-menu-{{ forloop.counter }}" data-overlay-target="wizard-termo-document-menu-{{ forloop.counter }}"
                   >{% include "components/ui/icons/icon.html" with icon="folder" only %}</button>
                   <div class="cv-action-menu cv-action-menu--rich" id="wizard-termo-document-menu-{{ forloop.counter }}" role="menu" hidden>
                     {% if t.assinado %}

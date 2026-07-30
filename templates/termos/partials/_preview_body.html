@@ -14,7 +14,7 @@
             aria-expanded="false"
             data-tooltip="Visualizar, baixar e anexar"
             data-overlay-trigger data-overlay-kind="menu"
-            data-overlay-target="termo-cadastro-generico-menu"
+            aria-controls="termo-cadastro-generico-menu" data-overlay-target="termo-cadastro-generico-menu"
           >{% include "components/ui/icons/icon.html" with icon="folder" only %}</button>
           <div class="cv-action-menu cv-action-menu--rich" id="termo-cadastro-generico-menu" role="menu" hidden>
             {% if docs.generico.assinado %}
@@ -81,7 +81,7 @@
                 aria-expanded="false"
                 data-tooltip="Baixar todos"
                 data-overlay-trigger data-overlay-kind="menu"
-                data-overlay-target="termo-cadastro-todos-menu"
+                aria-controls="termo-cadastro-todos-menu" data-overlay-target="termo-cadastro-todos-menu"
               >{% include "components/ui/icons/icon.html" with icon="folder" only %}</button>
               <div class="cv-action-menu cv-action-menu--rich" id="termo-cadastro-todos-menu" role="menu" hidden>
                 {% include "components/ui/menus/rich_menu_header.html" with title="Termos de autorização" subtitle="Todos os servidores" icon="folder" only %}
@@ -111,7 +111,7 @@
                     aria-expanded="false"
                     data-tooltip="Visualizar, baixar e anexar"
                     data-overlay-trigger data-overlay-kind="menu"
-                    data-overlay-target="termo-cadastro-servidor-menu-{{ doc.id }}"
+                    aria-controls="termo-cadastro-servidor-menu-{{ doc.id }}" data-overlay-target="termo-cadastro-servidor-menu-{{ doc.id }}"
                   >{% include "components/ui/icons/icon.html" with icon="folder" only %}</button>
                   <div class="cv-action-menu cv-action-menu--rich" id="termo-cadastro-servidor-menu-{{ doc.id }}" role="menu" hidden>
                     {% if doc.assinado %}

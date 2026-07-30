@@ -151,12 +151,12 @@
 
       if (!trigger || !menu) return;
 
-      // ARIA inicial
-      var menuId = menu.id || ('cv-dd-menu-' + (++_uid));
-      menu.id = menuId;
+      // ARIA inicial. O par aria-expanded/aria-controls sai do enhancer (H-06):
+      // o dropdown aparece varias vezes por pagina, entao id de template
+      // duplicaria. CV.a11y e o unico gerador de id do sistema.
+      window.CV.a11y.vincularExpansivel(trigger, menu, 'cv-dd-menu');
       trigger.setAttribute('aria-haspopup', 'true');
       trigger.setAttribute('aria-expanded', 'false');
-      trigger.setAttribute('aria-controls', menuId);
       menu.hidden = true;
 
       // Clique no trigger
@@ -205,12 +205,10 @@
 
       if (!trigger || !menu) return;
 
-      // ARIA inicial
-      var menuId = menu.id || ('cv-fd-menu-' + (++_uid));
-      menu.id = menuId;
+      // ARIA inicial — ver comentario em initCvDropdowns (H-06).
+      window.CV.a11y.vincularExpansivel(trigger, menu, 'cv-fd-menu');
       trigger.setAttribute('aria-haspopup', 'listbox');
       trigger.setAttribute('aria-expanded', 'false');
-      trigger.setAttribute('aria-controls', menuId);
       menu.hidden = true;
 
       var filterName = wrapper.dataset.cvFilterDropdown || '';
@@ -288,12 +286,6 @@
       });
     });
   }
-
-  /* ─────────────────────────────────────────────────────────────────────────
-     Contador de UID para IDs unicos
-     ───────────────────────────────────────────────────────────────────────── */
-
-  var _uid = 0;
 
   /* ─────────────────────────────────────────────────────────────────────────
      Fechar ao clicar fora

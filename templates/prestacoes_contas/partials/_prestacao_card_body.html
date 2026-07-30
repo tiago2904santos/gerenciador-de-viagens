@@ -51,7 +51,7 @@
               aria-haspopup="true"
               aria-expanded="false"
               data-overlay-trigger data-overlay-kind="menu"
-              data-overlay-target="prestacao-docs-menu-{{ servidor.ps_pk }}"
+              aria-controls="prestacao-docs-menu-{{ servidor.ps_pk }}" data-overlay-target="prestacao-docs-menu-{{ servidor.ps_pk }}"
       >{% include "components/ui/icons/icon.html" with icon="folder" only %}</button>
       <div class="cv-action-menu oficio-lc__action-menu oficio-lc__document-menu"
            id="prestacao-docs-menu-{{ servidor.ps_pk }}"
@@ -150,7 +150,7 @@
               aria-haspopup="true"
               aria-expanded="false"
               data-overlay-trigger data-overlay-kind="menu"
-              data-overlay-target="diaria-wa-menu-{{ servidor.ps_pk }}"
+              aria-controls="diaria-wa-menu-{{ servidor.ps_pk }}" data-overlay-target="diaria-wa-menu-{{ servidor.ps_pk }}"
               data-wa-phone="{{ servidor.whatsapp_phone }}"
               data-wa-oficio="{{ servidor.whatsapp_oficio }}"
               data-wa-unidade="{{ servidor.whatsapp_unidade }}"

@@ -3,7 +3,7 @@
     <legend class="cv-field__label">Modelo de OS</legend>
     <div class="os-model-picker__grid">
       {% for radio in form.tipo_necessidade %}
-        <label class="os-model-card">
+        <label class="os-model-card" for="{{ radio.id_for_label }}">
           {{ radio.tag }}
           <span class="os-model-card__mark" aria-hidden="true"></span>
           <span class="os-model-card__body">

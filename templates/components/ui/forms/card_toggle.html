@@ -1,6 +1,6 @@
 {% if compact %}
 <div class="field-option-card-wrap {{ size_class }}">
-  <label class="field-option-card{% if field.value %} is-checked{% endif %}{% if field.field.disabled %} is-disabled{% endif %}">
+  <label class="field-option-card{% if field.value %} is-checked{% endif %}{% if field.field.disabled %} is-disabled{% endif %}" for="{{ field.id_for_label }}">
     {{ field.as_widget }}
     <span class="field-option-card__label">{{ title|default:field.label }}</span>
     {% if description %}
@@ -11,7 +11,7 @@
 </div>
 {% else %}
 <div class="field field-card-toggle">
-  <label class="app-card-toggle{% if field.value %} is-checked{% endif %}{% if field.field.disabled %} is-disabled{% endif %}" data-card-toggle data-on-label="{{ on_label|default:'LIGADA' }}" data-off-label="{{ off_label|default:'DESLIGADA' }}">
+  <label class="app-card-toggle{% if field.value %} is-checked{% endif %}{% if field.field.disabled %} is-disabled{% endif %}" for="{{ field.id_for_label }}" data-card-toggle data-on-label="{{ on_label|default:'LIGADA' }}" data-off-label="{{ off_label|default:'DESLIGADA' }}">
     {{ field.as_widget }}
     <span class="app-card-toggle__icon" aria-hidden="true">{{ icon|default:"i" }}</span>
     <span class="app-card-toggle__content">
