@@ -74,7 +74,7 @@ def index(request):
 
     paginacao = contexto_paginacao(lista, request, ORDENS_POR_PAGINA)
     # Um assinante por pagina, nao um por card (`NOVO-07`).
-    assinante = get_assinante_os()
+    assinante = get_assinante_os(area=getattr(request, "area", None))
     cards = [
         apresentar_ordem_servico_card(ordem, assinante=assinante)
         for ordem in paginacao["page_obj"].object_list

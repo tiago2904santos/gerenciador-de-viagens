@@ -1160,7 +1160,10 @@ def gerar_plano_documento(plano: PlanoTrabalho, formato: DocumentoFormato):
         track_sla=True,
     ):
         contexto = build_plano_docxtpl_context(plano)
-        payload = {"institucional": build_configuracao_context(), "plano": contexto}
+        payload = {
+            "institucional": build_configuracao_context(area=getattr(plano, "area", None)),
+            "plano": contexto,
+        }
         reference = (
             f"{plano.numero:02d}-{plano.ano}" if plano.numero and plano.ano else f"plano-{plano.pk}"
         )

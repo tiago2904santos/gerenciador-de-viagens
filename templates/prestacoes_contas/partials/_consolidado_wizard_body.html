@@ -1,0 +1,6 @@
+{% comment %}
+  Corpo do card mestre do PDF Final. Extraído no `H-02`.
+{% endcomment %}
+{% include "prestacoes_contas/partials/_prestacao_identificacao_equipe.html" with form_block_heading_level=3 %}
+
+{% include "components/ui/forms/form_block.html" with title="Pacote final" description="Ofício, despacho, RT, diário e comprovante reunidos em um PDF" section_id="consolidado-pacote-title" heading_level=3 extra_class="travel-document-block oficio-documentos-block oficio-documentos-preview-section document-inline-stack" body_extra_class="oficio-documentos-preview-section__body document-inline-stack" body_template="prestacoes_contas/partials/_consolidado_pacotes_body.html" %}

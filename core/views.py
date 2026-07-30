@@ -13,6 +13,7 @@ from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 
 from eventos.forms import EventoForm
 from eventos.models import Evento
@@ -964,6 +965,7 @@ def _render_ui_lab(request, template_name, active_slug):
     return render(request, template_name, _build_ui_lab_context(active_slug))
 
 
+@method_decorator(login_not_required, name="dispatch")
 class LoginView(DjangoLoginView):
     template_name = "core/login.html"
     redirect_authenticated_user = True

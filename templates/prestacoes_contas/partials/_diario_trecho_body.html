@@ -1,7 +1,9 @@
 {{ form.id }}
-{# H-10: os seis campos abaixo sao espelho do roteiro (readonly) e nao vinham do
-   form, logo nao tinham id — o rotulo era irmao sem `for`, e clicar nele nao
-   focava nada. O id sai do `prefix` do formset, ja unico por trecho. #}
+{% comment %}
+  H-10: os seis campos abaixo sao espelho do roteiro (readonly) e nao vinham do
+  form, logo nao tinham id — o rotulo era irmao sem `for`, e clicar nele nao
+  focava nada. O id sai do `prefix` do formset, ja unico por trecho.
+{% endcomment %}
 <div class="roteiro-trecho-card__route-row field-grid field-grid--cols-2">
   <div class="roteiro-trecho-card__leg">
     <div class="roteiro-trecho-card__leg-title">Saída</div>

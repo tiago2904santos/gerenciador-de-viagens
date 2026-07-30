@@ -28,7 +28,7 @@ from .signature_views import _assinatura_db_card
 from .view_common import (
     _autosave_version,
     _build_identificacao,
-    _build_prestacao_steps,
+    contexto_do_fluxo,
     _diario_queryset,
     _is_inline_request,
     _marcar_servidor_em_preenchimento,
@@ -158,7 +158,7 @@ def diario_servidor(request, ps_pk):
             "formset": formset,
             "trechos": trechos,
             "identificacao": _build_identificacao(prestacao),
-            "wizard_page_steps": _build_prestacao_steps(ps, "diario"),
+            **contexto_do_fluxo(ps, "diario"),
             "diaria_info": diaria_info(prestacao),
             "back_url": reverse("prestacoes_contas:index"),
             "assinatura": _assinatura_db_card(request, prestacao),
@@ -359,7 +359,9 @@ def diario_servidor_motorista(request, ps_pk):
             "diario": diario,
             "form": form,
             "identificacao": _build_identificacao(prestacao),
-            "wizard_page_steps": _build_prestacao_steps(ps, "diario"),
+            **contexto_do_fluxo(
+                ps, "diario", back_label="Voltar ao diário", back_url=diario_url
+            ),
             "back_url": reverse("prestacoes_contas:index"),
             "motorista_oficio_nome": oficio_nome or "—",
             "motorista_oficio_cpf": oficio_cpf,

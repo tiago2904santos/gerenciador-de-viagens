@@ -3504,6 +3504,22 @@ html[data-theme="dark"] [data-travel-document-wizard-step1] .cv-search-picker {
 }
 
 /* ── VIAJANTES: roster (avatar + corpo + ações do termo) ── */
+/* H-08: estas listas viraram <ul>/<li>. O reset do user-agent (bullet, recuo de
+   ~40px e margem vertical) precisa ser zerado aqui — `base.css` nao tem reset
+   universal de lista, entao nada mais zeraria isto. */
+.oficio-lc__travellers,
+.oficio-lc__trechos-list {
+  list-style: none;
+  margin-block: 0;
+  padding-inline-start: 0;
+}
+
+.oficio-lc__traveller,
+.oficio-lc__trecho,
+.oficio-lc__empty-hint {
+  list-style: none;
+}
+
 .oficio-lc__travellers {
   display: grid;
   gap: var(--space-2);
