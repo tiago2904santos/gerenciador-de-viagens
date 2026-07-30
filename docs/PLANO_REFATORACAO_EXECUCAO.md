@@ -493,7 +493,7 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
   duplicados.
 - [x] `J-01` os 8 componentes sensíveis a swap (`fields`, `masks`,
   `stateToggle`, `cardToggle`, `dropdowns`, `documentNumberField`,
-  `destinations`, `autosave`) registram inicializadores idempotentes no
+  `locationRows`, `autosave`) registram inicializadores idempotentes no
   `CV.registry`.
 - [x] `J-04` Quick Add/Quick Edit agora pertencem a `CV.inlineCreate`, com
   delegação/guards idempotentes; autosave encontra também formulários inseridos
@@ -516,7 +516,11 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
   nativos, com gate bloqueante no auditor de CI. **NOVO — divergência da
   auditoria histórica:** o inventário vivo encontrou 12 chamadas (não 13);
   todas foram migradas.
-- [ ] `H-01` + `J-08` `CV.locationRows` — fim das 6 cópias de destinos
+- [x] `H-01` + `J-08` `CV.locationRows` é o motor único de linhas de destino:
+  os seis consumidores usam `data-location-*`, a cascata consulta por
+  `estado.pk`, 1.158 linhas e seis partials de Eventos foram
+  removidos; a fronteira legada de Eventos converte pk para sigla/nome somente
+  ao serializar seu modelo.
 - [ ] `J-15` `CV.documentSource` · `CV.picker` · `CV.overlay`
 - [ ] `J-09` colapsar 22 namespaces em `CV.*`
 - [ ] `J-13` `ManifestStaticFilesStorage` no lugar dos 88 `?v=`

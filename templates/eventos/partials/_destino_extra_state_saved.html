@@ -1,4 +1,0 @@
-<select class="cv-search-picker__native" data-cv-search-picker="true" data-picker-mode="single" data-picker-variant="compact" data-placeholder="Buscar estado..." data-empty-message="Nenhum estado encontrado." data-destino-uf-extra aria-label="Estado">
-  <option value="">Selecione o estado</option>
-  {% for estado in estados %}<option value="{{ estado.sigla }}"{% if estado.sigla == destino.uf %} selected{% endif %}>{{ estado.nome }} ({{ estado.sigla }})</option>{% endfor %}
-</select>

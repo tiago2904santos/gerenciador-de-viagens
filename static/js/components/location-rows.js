@@ -1,6 +1,8 @@
 (function () {
   "use strict";
 
+  var locationCache = {};
+
   function asRoot(root) {
     return root || document;
   }
@@ -54,7 +56,7 @@
       var opt = document.createElement("option");
       opt.value = String(optionValue(item));
       opt.textContent = optionLabel(item);
-      if (selected && String(opt.value) === selected) {
+      if (selected && (String(opt.value) === selected || String(opt.textContent).trim() === selected)) {
         opt.selected = true;
       }
       select.appendChild(opt);
@@ -128,7 +130,7 @@
 
   function rows(root, options) {
     options = options || {};
-    var selector = options.rowSelector || ".destination-row";
+    var selector = options.rowSelector || "[data-location-row]";
     return Array.prototype.slice.call(asRoot(root).querySelectorAll(selector)).filter(function (row) {
       return !row.hidden;
     });
@@ -139,7 +141,7 @@
     var allRows = rows(root, options);
     var single = allRows.length <= (options.minRows || 1);
     allRows.forEach(function (row) {
-      var button = row.querySelector(options.removeSelector || ".destination-remove-button");
+      var button = row.querySelector(options.removeSelector || "[data-location-remove]");
       if (button) button.hidden = single;
       row.classList.toggle(options.singleClass || "destination-row--single", single);
     });
@@ -185,7 +187,7 @@
       delete el.dataset.cvSearchPickerReady;
     });
 
-    var row = fragment.querySelector(options.rowSelector || ".destination-row");
+    var row = fragment.querySelector(options.rowSelector || "[data-location-row]");
     if (row && options.indexAttr && row.dataset) {
       row.dataset[options.indexAttr] = String(index);
     }
@@ -244,8 +246,8 @@
   function initDragDrop(root, options) {
     root = asRoot(root);
     options = options || {};
-    if (!root || root.dataset.destinationDragDropReady === "true") return;
-    root.dataset.destinationDragDropReady = "true";
+    if (!root || root.dataset.locationDragDropReady === "true") return;
+    root.dataset.locationDragDropReady = "true";
 
     var dragState = null;
 
@@ -307,7 +309,7 @@
     root.addEventListener("pointerdown", function (event) {
       if (event.button !== 0) return;
       if (rows(root, options).length <= 1) return;
-      var row = event.target.closest(options.rowSelector || ".destination-row");
+      var row = event.target.closest(options.rowSelector || "[data-location-row]");
       if (!row || !root.contains(row)) return;
       var blocked = event.target.closest(options.ignoreSelector || [
         "button",
@@ -342,10 +344,19 @@
   function initManagedRows(options) {
     options = options || {};
     var form = options.form || document;
-    var section = options.section || (options.sectionSelector ? form.querySelector(options.sectionSelector) : null);
-    var list = options.list || (section ? section.querySelector(options.listSelector || ".route-destinations-list") : null);
-    var addButton = options.addButton || (options.addSelector ? form.querySelector(options.addSelector) : null);
-    var template = options.template || (options.templateSelector ? form.querySelector(options.templateSelector) : null);
+    var section = options.section || (options.sectionSelector ? form.querySelector(options.sectionSelector) : form.querySelector("[data-location-rows]"));
+    var list = options.list || (section ? section.querySelector(options.listSelector || "[data-location-list]") : null);
+    var addButton = options.addButton || form.querySelector(options.addSelector || "[data-location-add]");
+    var template = options.template || form.querySelector(options.templateSelector || "template[data-location-template]");
+    options.rowSelector = options.rowSelector || "[data-location-row]";
+    options.stateSelector = options.stateSelector || "[data-location-state]";
+    options.citySelector = options.citySelector || "[data-location-city]";
+    options.removeSelector = options.removeSelector || "[data-location-remove]";
+    options.indexAttr = options.indexAttr || "locationIndex";
+    options.primaryStateName = options.primaryStateName || "destino_estado";
+    options.primaryCityName = options.primaryCityName || "destino_cidade";
+    options.extraStatePrefix = options.extraStatePrefix || "destino_estado_";
+    options.extraCityPrefix = options.extraCityPrefix || "destino_cidade_";
     if (!list) return null;
 
     if (options.managedFlag && form.dataset) {
@@ -359,12 +370,14 @@
         onRow: function (row, index) {
           var stateSelect = row.querySelector(options.stateSelector);
           var citySelect = row.querySelector(options.citySelector);
-          if (stateSelect && options.primaryStateName && options.extraStatePrefix) {
+          if (options.renameFields !== false && stateSelect && options.primaryStateName && options.extraStatePrefix) {
             stateSelect.name = index === 0 ? options.primaryStateName : options.extraStatePrefix + index;
           }
-          if (citySelect && options.primaryCityName && options.extraCityPrefix) {
+          if (options.renameFields !== false && citySelect && options.primaryCityName && options.extraCityPrefix) {
             citySelect.name = index === 0 ? options.primaryCityName : options.extraCityPrefix + index;
           }
+          var badge = row.querySelector("[data-location-order]");
+          if (badge) badge.textContent = String(index + 1);
           if (typeof options.onRow === "function") {
             options.onRow(row, index);
           }
@@ -387,20 +400,43 @@
 
     function bindRow(row) {
       if (!row || !row.dataset) return;
-      var readyKey = options.readyAttr || "destinationManagedReady";
+      var readyKey = options.readyAttr || "locationRowReady";
       if (row.dataset[readyKey] === "true") return;
       row.dataset[readyKey] = "true";
 
       var stateSelect = row.querySelector(options.stateSelector);
       var citySelect = row.querySelector(options.citySelector);
-      if (stateSelect && citySelect && typeof options.loadCities === "function") {
+      if (stateSelect && citySelect) {
         var initialStateId = (stateSelect.dataset.pickerInitialValue || "").trim();
         var initialCityId = (citySelect.dataset.pickerInitialValue || "").trim();
         stateSelect.addEventListener("change", function () {
-          options.loadCities(citySelect, stateSelect.value || initialStateId, citySelect.value || initialCityId, row);
-          notifyChange();
+          loadCities({
+            citySelect: citySelect,
+            stateId: stateSelect.value,
+            selectedId: "",
+            form: form,
+            scope: row,
+            cache: options.cache || locationCache,
+          }).then(function (cities) {
+            if (typeof options.afterCitiesLoaded === "function") {
+              options.afterCitiesLoaded(citySelect, cities, row);
+            }
+            notifyChange();
+          });
         });
-        options.loadCities(citySelect, stateSelect.value || initialStateId, citySelect.value || initialCityId, row);
+        loadCities({
+          citySelect: citySelect,
+          stateId: stateSelect.value || initialStateId,
+          selectedId: citySelect.value || initialCityId,
+          form: form,
+          scope: row,
+          cache: options.cache || locationCache,
+        }).then(function (cities) {
+          if (typeof options.afterCitiesLoaded === "function") {
+            options.afterCitiesLoaded(citySelect, cities, row);
+          }
+        });
+        citySelect.addEventListener("change", notifyChange);
       }
 
       var removeButton = row.querySelector(options.removeSelector);
@@ -427,8 +463,8 @@
       }
     });
 
-    if (addButton && template && addButton.dataset.destinationAddBound !== "true") {
-      addButton.dataset.destinationAddBound = "true";
+    if (addButton && template && addButton.dataset.locationAddBound !== "true") {
+      addButton.dataset.locationAddBound = "true";
       addButton.addEventListener("click", function () {
         var currentRows = rows(list, { rowSelector: options.rowSelector });
         var referenceRow = currentRows.length ? currentRows[currentRows.length - 1] : null;
@@ -491,16 +527,16 @@
   function init(root) {
     var scope = asRoot(root);
     var sections = Array.prototype.slice.call(
-      scope.querySelectorAll ? scope.querySelectorAll("[data-destination-section]") : []
+      scope.querySelectorAll ? scope.querySelectorAll("[data-location-rows]") : []
     );
-    if (scope.matches && scope.matches("[data-destination-section]")) {
+    if (scope.matches && scope.matches("[data-location-rows]")) {
       sections.unshift(scope);
     }
     sections.forEach(initSearchPickers);
   }
 
   window.CV = window.CV || {};
-  window.CV.destinations = {
+  window.CV.locationRows = {
     appendTemplateRow: appendTemplateRow,
     clearSelect: clearSelect,
     focusFirstEmptyPicker: focusFirstEmptyPicker,
@@ -519,7 +555,7 @@
   };
 
   if (typeof window.CV.registerEnhancer === "function") {
-    window.CV.registerEnhancer("destinations", init);
+    window.CV.registerEnhancer("locationRows", init);
   } else if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", function () { init(document); });
   } else {

@@ -6,228 +6,46 @@
 (function () {
   "use strict";
 
-  var CIDADES_CACHE_D = {};
-
-  function populateCidadesD(cidadeSel, data, initialValue) {
-    var normInitial = window.CV.util.normalize(initialValue).trim();
-    cidadeSel.innerHTML = '<option value="">---------</option>';
-    data.forEach(function (c) {
-      var opt = document.createElement('option');
-      opt.value = c.id;
-      opt.textContent = c.nome;
-      if (normInitial && window.CV.util.normalize(c.id).trim() === normInitial) opt.selected = true;
-      cidadeSel.appendChild(opt);
-    });
-    cidadeSel.disabled = false;
-    reinitPickerD(cidadeSel);
+  function selectedText(select) {
+    var option = select && select.options ? select.options[select.selectedIndex] : null;
+    return option ? String(option.textContent || '').trim() : '';
   }
 
-  function reinitPickerD(select) {
-    if (!select || !window.CV || !window.CV.fields || !window.CV.fields.initSearchPickers) return;
-    if (select.dataset.cvSearchPickerReady === 'true') {
-      delete select.dataset.cvSearchPickerReady;
-      var nextEl = select.nextElementSibling;
-      if (nextEl && nextEl.classList && nextEl.classList.contains('cv-search-picker')) {
-        nextEl.parentNode.removeChild(nextEl);
-      }
-    }
-    window.CV.fields.initSearchPickers(select.parentNode || document);
-  }
-
-  function loadCidadesForUfD(form, cidadeSel, uf, initialValue) {
-    if (window.CV && window.CV.destinations && typeof window.CV.destinations.loadCities === 'function') {
-      return window.CV.destinations.loadCities({
-        citySelect: cidadeSel,
-        stateId: uf,
-        selectedId: initialValue,
-        form: form,
-        cache: CIDADES_CACHE_D,
-        requestAttr: 'eventoCitiesRequestD'
-      });
-    }
-    uf = String(uf || '').trim();
-    var urlTemplate = (form && form.dataset.apiCidadesUrl) || '';
-    cidadeSel.innerHTML = '<option value="">---------</option>';
-    if (!uf || !urlTemplate) {
-      cidadeSel.disabled = true;
-      reinitPickerD(cidadeSel);
-      return;
-    }
-    var cached = CIDADES_CACHE_D[uf];
-    if (cached) { populateCidadesD(cidadeSel, cached, initialValue); return; }
-    cidadeSel.disabled = true;
-    reinitPickerD(cidadeSel);
-    var url = urlTemplate.replace('/0/', '/' + encodeURIComponent(uf) + '/');
-    window.CV.http.fetchJson(url, { headers: { Accept: 'application/json' } })
-      .then(function (result) {
-        if (!result.ok) throw new Error('Falha ao carregar cidades');
-        var data = result.data || [];
-        CIDADES_CACHE_D[uf] = data;
-        populateCidadesD(cidadeSel, data, initialValue);
-      })
-      .catch(function () {
-        cidadeSel.disabled = true;
-        reinitPickerD(cidadeSel);
-      });
-  }
-
-  function initCidadePickerD(form) {
-    var ufSel = form.querySelector('select[name="destino_uf"]');
-    var cidadeSel = form.querySelector('[data-destino-cidade-picker]');
-    if (!ufSel || !cidadeSel || ufSel.dataset.eventoCityBound === 'true') return;
-    ufSel.dataset.eventoCityBound = 'true';
-    var initialValue = cidadeSel.dataset.initialValue || '';
-    ufSel.addEventListener('change', function () {
-      loadCidadesForUfD(form, cidadeSel, ufSel.value, '');
-    });
-    if (ufSel.value) {
-      loadCidadesForUfD(form, cidadeSel, ufSel.value, initialValue);
-    }
-  }
-
-  function serializeDestinosD() {
-    var lista = document.getElementById('destinos-lista-d');
-    var jsonInput = document.getElementById('id-destinos-json-d');
-    if (!lista || !jsonInput) return;
-    var rows = lista.querySelectorAll('[data-destino-index]');
-    var result = [];
-    rows.forEach(function (row) {
-      var ufSel = row.querySelector('select[name="destino_uf"], [data-destino-uf-extra]');
-      var cidadeSel = row.querySelector('[data-destino-cidade-picker], [data-destino-cidade-extra]');
-      var uf = ufSel ? ufSel.value : '';
-      var cidade = cidadeSel ? cidadeSel.value : '';
-      result.push({ uf: uf, cidade: cidade });
+  function serializeDestinosD(form) {
+    var jsonInput = form.querySelector('#id-destinos-json-d');
+    if (!jsonInput) return;
+    var result = Array.prototype.slice.call(form.querySelectorAll('[data-location-row]')).map(function (row) {
+      var state = row.querySelector('[data-location-state]');
+      var city = row.querySelector('[data-location-city]');
+      var selectedState = state && state.options ? state.options[state.selectedIndex] : null;
+      return {
+        uf: selectedState ? String(selectedState.dataset.locationStateCode || '') : '',
+        cidade: city && city.value ? selectedText(city) : '',
+      };
     });
     jsonInput.value = JSON.stringify(result);
-  }
-
-  function renumberBadgesD(lista) {
-    var rows = lista.querySelectorAll('[data-destino-index]');
-    var ordinal = 0;
-    rows.forEach(function (row) {
-      if (row.hidden) return;
-      ordinal += 1;
-      var badge = row.querySelector('[data-destination-order]');
-      if (badge) badge.textContent = String(ordinal);
-    });
-  }
-
-  function refreshRemoveButtonsD(lista) {
-    if (window.CV && window.CV.destinations && typeof window.CV.destinations.updateSingleRowState === 'function') {
-      window.CV.destinations.updateSingleRowState(lista, {
-        rowSelector: '[data-destino-index]',
-        removeSelector: '[data-remover-destino]'
-      });
-      renumberBadgesD(lista);
-      return;
-    }
-    var rows = lista.querySelectorAll('[data-destino-index]');
-    var count = rows.length;
-    rows.forEach(function (row) {
-      var btn = row.querySelector('[data-remover-destino]');
-      if (btn) btn.hidden = count <= 1;
-    });
-    renumberBadgesD(lista);
+    var primary = result[0] || { uf: '', cidade: '' };
+    var stateOutput = form.querySelector('[data-location-state-output]');
+    var cityOutput = form.querySelector('[data-location-city-output]');
+    if (stateOutput) stateOutput.value = primary.uf;
+    if (cityOutput) cityOutput.value = primary.cidade;
   }
 
   function initAddDestinoD() {
-    var btn = document.getElementById('btn-adicionar-destino-d');
-    var lista = document.getElementById('destinos-lista-d');
-    var tmpl = document.getElementById('tmpl-destino-extra-d');
-    var cardEl = document.getElementById('evento-card-dados-d');
-    var form = cardEl ? cardEl.closest('form') : null;
-    if (!btn || !lista || !tmpl || btn.dataset.eventoDestinosBound === 'true') return;
-    btn.dataset.eventoDestinosBound = 'true';
-
-    var sedeUf = (form && form.dataset.sedeUf) || '';
-    var extraCount = 0;
-
-    if (window.CV && window.CV.destinations && typeof window.CV.destinations.initDragDrop === 'function') {
-      window.CV.destinations.initDragDrop(lista, {
-        rowSelector: '[data-destino-index]',
-        removeSelector: '[data-remover-destino]',
-        onReorder: function () { refreshRemoveButtonsD(lista); }
-      });
-    }
-
-    function wireRow(row) {
-      if (row.dataset.eventoRowBound === 'true') return;
-      row.dataset.eventoRowBound = 'true';
-      var removeBtn = row.querySelector('[data-remover-destino]');
-      if (removeBtn) {
-        removeBtn.addEventListener('click', function () {
-          row.parentNode.removeChild(row);
-          refreshRemoveButtonsD(lista);
-        });
-      }
-      var ufExtra = row.querySelector('[data-destino-uf-extra]');
-      var cidadeExtra = row.querySelector('[data-destino-cidade-extra]');
-      if (ufExtra && cidadeExtra) {
-        ufExtra.addEventListener('change', function () {
-          loadCidadesForUfD(form, cidadeExtra, ufExtra.value, '');
-        });
-        // Destinos extras já persistidos: carrega as cidades da UF mantendo a
-        // cidade salva selecionada.
-        var savedCity = cidadeExtra.dataset.initialValue || '';
-        if (ufExtra.value) {
-          loadCidadesForUfD(form, cidadeExtra, ufExtra.value, savedCity);
-        }
-      }
-    }
-
-    lista.querySelectorAll('[data-destino-index]').forEach(wireRow);
-    refreshRemoveButtonsD(lista);
-
-    btn.addEventListener('click', function () {
-      if (window.CV && window.CV.destinations && typeof window.CV.destinations.appendTemplateRow === 'function') {
-        var appended = window.CV.destinations.appendTemplateRow({
-          list: lista,
-          template: tmpl,
-          rowSelector: '[data-destino-index]',
-          removeSelector: '[data-remover-destino]',
-          indexAttr: 'destinoIndex',
-          bindRow: wireRow,
-          afterAppend: function (row) {
-            refreshRemoveButtonsD(lista);
-            if (sedeUf && row) {
-              var ufExtra = row.querySelector('[data-destino-uf-extra]');
-              if (ufExtra) {
-                ufExtra.value = sedeUf;
-                ufExtra.dispatchEvent(new Event('change', { bubbles: true }));
-              }
-            }
-          }
-        });
-        if (appended) refreshRemoveButtonsD(lista);
-        return;
-      }
-      extraCount += 1;
-      var clone = tmpl.content.cloneNode(true);
-      var row = clone.querySelector('[data-destino-index]');
-      if (row) row.dataset.destinoIndex = String(extraCount);
-      var ufSel = clone.querySelector('[data-destino-uf-extra]');
-      if (ufSel) ufSel.removeAttribute('data-cv-search-picker-ready');
-      lista.appendChild(clone);
-      var newRow = lista.querySelector('[data-destino-index="' + extraCount + '"]');
-      if (newRow) {
-        wireRow(newRow);
-        refreshRemoveButtonsD(lista);
-        if (window.CV && window.CV.fields && window.CV.fields.initSearchPickers) {
-          window.CV.fields.initSearchPickers(newRow);
-        }
-        if (sedeUf) {
-          var ufExtra = newRow.querySelector('[data-destino-uf-extra]');
-          if (ufExtra) {
-            ufExtra.value = sedeUf;
-            ufExtra.dispatchEvent(new Event('change', { bubbles: true }));
-          }
-        }
-      }
+    var card = document.getElementById('evento-card-dados-d');
+    var form = card ? card.closest('form') : null;
+    if (!form) return;
+    window.CV.locationRows.initManagedRows({
+      form: form,
+      renameFields: false,
+      onChange: function () { serializeDestinosD(form); },
+      onRow: function (row, index) {
+        var badge = row.querySelector('[data-location-order]');
+        if (badge) badge.textContent = String(index + 1);
+      },
     });
-
-    if (form) {
-      form.addEventListener('submit', function () { serializeDestinosD(); });
-    }
+    form.addEventListener('submit', function () { serializeDestinosD(form); });
+    serializeDestinosD(form);
   }
 
   /* ── Documentos vinculados: toggle segmentado + lista com pré-filtro de datas ── */
@@ -466,7 +284,6 @@
     forms.forEach(function (form) {
       if (form.dataset.eventoGuidedBound === 'true') return;
       form.dataset.eventoGuidedBound = 'true';
-      initCidadePickerD(form);
       initAddDestinoD();
     });
     initDocPickersD(scope);

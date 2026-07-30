@@ -153,6 +153,15 @@ CV.registerEnhancer(nome, init)   // init(root) idempotente
 
 ### 3.3 O caso do destino: um conceito, seis implementações
 
+**Corrigido (H-01/J-08):** `CV.locationRows` e os hooks `data-location-*`
+passaram a ser o único contrato vivo. Planos, Termos, OS, Eventos e Roteiros
+não contêm mais fallback de cascata, criação de linha ou drag-and-drop. Os seis
+partials de select exclusivos de Eventos foram removidos; seus controles agora
+também usam `estado.pk`, convertendo para a sigla/nome exigidos pelo modelo
+legado somente na serialização. O corte removeu 1.158 linhas.
+
+O inventário abaixo registra a linha de base histórica que motivou a correção:
+
 | # | Implementação | Templates | JS | Contrato de valor |
 |---|---|---|---|---|
 | 1 | **Global** `components/travel/destinations/*` | 5 arquivos | `destination-section.js` (508 l.) | `estado.pk` |
@@ -427,7 +436,7 @@ Severidade: 🔴 crítico · 🟠 alto · 🟡 médio.
 
 | # | Sev | Defeito | Local |
 |---|---|---|---|
-| H-01 | 🔴 | **Sistema de destinos duplicado 6×** (20 templates, contratos de valor incompatíveis `pk`/`sigla`) | §3.3 |
+| H-01 | ✅ | **Corrigido:** um componente global e contrato `data-location-*`; Eventos também usa `estado.pk` e converte apenas na fronteira do modelo legado | §3.3, `location-rows.js` |
 | H-02 | 🔴 | **Prestações não tem `wizard_base`** — 5 páginas repetem 25 linhas de shell cada | `prestacoes_contas/*_form.html`, `consolidado.html` |
 | H-03 | 🔴 | `_docs_attach_kinds_attrs.html` passa uma **lista** como 30 atributos com ordinais latinos (`primary`…`quinary`); o JS tem `KINDS` fixo de 5 | `prestacoes_contas/partials/_docs_attach_kinds_attrs.html`, `attach-signed-modal.js:7` |
 | H-04 | 🟠 | 190 includes **sem `only`**; `form_block.html` sozinho em ~50 | §3.2 |
@@ -459,7 +468,7 @@ Severidade: 🔴 crítico · 🟠 alto · 🟡 médio.
 | J-05 | 🔴 | `extra-download.js` carregado só em Eventos, mas o hook é emitido pelo componente global `rich_menu_link.html` → **recurso silenciosamente morto em 4 módulos** | §4.9 |
 | J-06 | ✅ | **989 linhas de JS órfão removidas** em 9 arquivos; 6 emissões remanescentes de hooks sem consumidor removidas | §4.8 |
 | J-07 | 🟠 | **CSRF reimplementado em 11 arquivos**; 13 arquivos usam `fetch()` sem `CV.http` (sem tratamento de 401/HTML-em-vez-de-JSON) | §4.5 |
-| J-08 | 🟠 | **6 implementações da cascata estado→cidade** (~1.200 linhas) | §4.5 |
+| J-08 | ✅ | **Corrigido:** `CV.locationRows` é a única cascata estado→cidade; fallbacks por página removidos | §3.3, `location-rows.js` |
 | J-09 | 🟠 | **22 namespaces globais**, vários duplicando `CV.*` | §4.6 |
 | J-10 | 🟠 | `autosave.js` registra **um `beforeunload` e um listener de captura em `document` por formulário**, nunca removidos | `autosave.js:250,283` |
 | J-11 | 🟠 | `app.js:394-412` — `data-confirm-submit` escuta **click e submit**; num `<form data-confirm-submit>` com botão submit dentro, o `confirm()` aparece **duas vezes** | `app.js`, disparado por `eventos/detalhe.html:24` |
@@ -773,7 +782,7 @@ Alvo: **16 motores globais**, todos registrados via `CV.registerEnhancer`, todos
 | 8 | **`CV.datePicker`** | `cv-date-picker` | ✅ já enhancer — só padronizar `aria-controls` (**H-06**) |
 | 9 | **`CV.filePicker`** | `file-picker` | ✅ já enhancer |
 | 10 | **`CV.autosave`** | `autosave.js` | Virar enhancer; **um** listener global de `beforeunload`/click em vez de um por form (resolve **J-10**) |
-| 11 | **`CV.locationRows`** | `destination-section` + 5 cópias por módulo | `data-location-row/-state/-city/-add/-remove/-template`. Cascata estado→cidade **única**, contrato de valor **único** (`pk`). Resolve **H-01**/**J-08** (~1.200 linhas → ~250) |
+| 11 | **`CV.locationRows`** | ✅ substituiu `destination-section` + 5 cópias por módulo | `data-location-row/-state/-city/-add/-remove/-template`. Cascata estado→cidade **única**, contrato de valor **único** (`pk`). **H-01/J-08 resolvidos** |
 | 12 | **`CV.documentSource`** | prefill em `termos-form` + `ordens-servico-form` + `diario-motorista` | `data-source-document` + JSON de campos. Resolve **J-15** |
 
 ### 10.3 Coleções

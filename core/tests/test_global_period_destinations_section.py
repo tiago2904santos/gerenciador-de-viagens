@@ -23,8 +23,9 @@ class GlobalPeriodDestinationsSectionTests(SimpleTestCase):
 
         self.assertEqual(html.count("data-travel-schedule"), 1)
         self.assertEqual(html.count("data-cv-date-picker\n"), 1)
-        self.assertEqual(html.count("data-destination-section"), 1)
-        self.assertEqual(html.count("data-destination-add"), 1)
+        self.assertEqual(html.count("data-location-rows"), 1)
+        self.assertEqual(html.count("data-location-add"), 1)
+        self.assertEqual(html.count("data-location-list"), 1)
         self.assertIn('id="audit-period-title"', html)
         self.assertIn('id="audit-destinations"', html)
 
