@@ -453,7 +453,7 @@ Severidade: 🔴 crítico · 🟠 alto · 🟡 médio.
 | # | Sev | Defeito | Local |
 |---|---|---|---|
 | J-01 | 🔴 | **51 de 63 arquivos não registram enhancer** — morrem em qualquer troca de DOM | §4.1 |
-| J-02 | 🔴 | **`action-menu.js` move menus para `<body>` e nunca limpa** → nós órfãos + `id` duplicado após filtro → `getElementById` devolve o menu obsoleto | `action-menu.js:36` |
+| J-02 | ✅ | **Corrigido:** `CV.registry.destroy(root)` executa os destruidores antes do swap; `action-menu.js` devolve ao dono qualquer menu movido para `<body>` | `core/app.js`, `live-search-submit.js`, `action-menu.js` |
 | J-03 | 🔴 | **Dois motores de filtro ativos na mesma lista** (cliente + servidor) nas 5 listas em card | `realtime-filters.js` × `live-search-submit.js` |
 | J-04 | 🔴 | Quick Add e autosave **morrem após filtro AJAX** (bind direto em DOMContentLoaded dentro do `.list-panel`) | `app.js:201`, `autosave.js:365` |
 | J-05 | 🔴 | `extra-download.js` carregado só em Eventos, mas o hook é emitido pelo componente global `rich_menu_link.html` → **recurso silenciosamente morto em 4 módulos** | §4.9 |
@@ -872,7 +872,7 @@ Cada fase é independente, verificável e não depende da reconstrução do CSS.
 | **0** | ✅ Apagar os 9 arquivos JS órfãos e os hooks `data-*` sem dono ainda emitidos | J-06 | −989 linhas |
 | **1** | Carregar `extra-download.js` no bundle base; remover `masks.js` duplicado de `diario_motorista_form.html` | J-05, J-14 | Recurso morto volta a funcionar em 4 módulos |
 | **2** | Corrigir `data-confirm-submit` (escutar só `submit`) | J-11 | Fim do `confirm()` duplo |
-| **3** | Adicionar `CV.registry.destroy(root)` e chamá-lo antes de `replaceWith` em `live-search-submit`; `action-menu` devolve o menu ao dono no `destroy` | J-02 | Fim dos nós órfãos e IDs duplicados |
+| **3** | ✅ Adicionar `CV.registry.destroy(root)` e chamá-lo antes de `replaceWith` em `live-search-submit`; `action-menu` devolve o menu ao dono no `destroy` | J-02 | Fim dos nós órfãos e IDs duplicados |
 | **4** | Registrar como enhancer: `fields-init`, `masks`, `state-toggle`, `card-toggle`, `cv-select`, `document-number-field`, `destination-section`, `autosave` | J-01, J-04 | 8 componentes passam a sobreviver ao AJAX |
 | **5** | Mover Quick Add/Quick Edit de `app.js` para enhancer `CV.inlineCreate` | J-04 | Quick Add volta a funcionar após filtro |
 | **6** | Escolher **um** motor de filtro por lista (`data-collection-mode`) | J-03 | Fim do duplo filtro nas 5 listas em card |

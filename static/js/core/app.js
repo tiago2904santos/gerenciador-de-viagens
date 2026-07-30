@@ -46,9 +46,9 @@ document.documentElement.dataset.appReady = "true";
   var flushScheduled = false;
   var observer = null;
 
-  function safelyEnhance(name, initializer, root) {
+  function safelyEnhance(name, entry, root) {
     try {
-      initializer(root || document);
+      entry.init(root || document);
     } catch (error) {
       document.dispatchEvent(new CustomEvent("cv:enhancer-error", {
         detail: { name: name, message: error.message },
@@ -57,8 +57,31 @@ document.documentElement.dataset.appReady = "true";
   }
 
   function enhance(root) {
-    enhancers.forEach(function (initializer, name) {
-      safelyEnhance(name, initializer, root || document);
+    enhancers.forEach(function (entry, name) {
+      safelyEnhance(name, entry, root || document);
+    });
+  }
+
+  function safelyDestroy(name, entry, root) {
+    if (typeof entry.destroy !== "function") return;
+    try {
+      entry.destroy(root);
+    } catch (error) {
+      document.dispatchEvent(new CustomEvent("cv:enhancer-error", {
+        detail: { name: name, phase: "destroy", message: error.message },
+      }));
+    }
+  }
+
+  function destroy(root) {
+    if (!root || (root.nodeType !== 1 && root.nodeType !== 9)) return;
+    pendingRoots.forEach(function (pendingRoot) {
+      if (pendingRoot === root || (root.contains && root.contains(pendingRoot))) {
+        pendingRoots.delete(pendingRoot);
+      }
+    });
+    enhancers.forEach(function (entry, name) {
+      safelyDestroy(name, entry, root);
     });
   }
 
@@ -78,10 +101,11 @@ document.documentElement.dataset.appReady = "true";
     else window.setTimeout(flush, 0);
   }
 
-  function register(name, initializer) {
+  function register(name, initializer, destroyer) {
     if (!name || typeof initializer !== "function") return;
-    enhancers.set(name, initializer);
-    if (document.readyState !== "loading") safelyEnhance(name, initializer, document);
+    var entry = { init: initializer, destroy: destroyer };
+    enhancers.set(name, entry);
+    if (document.readyState !== "loading") safelyEnhance(name, entry, document);
   }
 
   function start() {
@@ -90,6 +114,7 @@ document.documentElement.dataset.appReady = "true";
     if (typeof MutationObserver !== "function") return;
     observer = new MutationObserver(function (mutations) {
       mutations.forEach(function (mutation) {
+        Array.prototype.forEach.call(mutation.removedNodes, destroy);
         Array.prototype.forEach.call(mutation.addedNodes, schedule);
       });
     });
@@ -98,7 +123,14 @@ document.documentElement.dataset.appReady = "true";
 
   window.CV.registerEnhancer = register;
   window.CV.enhance = enhance;
+  window.CV.registry = {
+    destroy: destroy,
+    enhance: enhance,
+    register: register,
+    registered: function () { return Array.from(enhancers.keys()); },
+  };
   window.CV.componentRegistry = {
+    destroy: destroy,
     enhance: enhance,
     register: register,
     registered: function () { return Array.from(enhancers.keys()); },
