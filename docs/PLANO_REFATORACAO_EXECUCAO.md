@@ -487,7 +487,10 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
 - [x] `J-06` apagados os 9 arquivos órfãos do Anexo A (989 linhas) e as 6
   emissões remanescentes de hooks sem consumidor. O catálogo dizia 8 arquivos,
   mas enumerava 9; os demais hooks da estimativa original já não eram emitidos.
-- [ ] `J-02` `CV.registry.destroy(root)` e limpeza do `action-menu`
+- [x] `J-02` `CV.registry.destroy(root)` limpa componentes antes de swaps e
+  também ao observar nós removidos; o `action-menu` registra a origem do menu
+  portado ao `<body>` e o devolve ao dono no `destroy`, eliminando órfãos e IDs
+  duplicados.
 - [ ] `J-01` registrar 8 componentes como enhancer
 - [ ] `J-04` Quick Add/Quick Edit como enhancer
 - [ ] `J-03` um motor de filtro por lista (`data-collection-mode`)

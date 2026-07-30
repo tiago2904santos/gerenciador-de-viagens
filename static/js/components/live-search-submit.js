@@ -36,6 +36,9 @@
     var nextPanel = nextDoc.querySelector(LIST_PANEL_SELECTOR);
     var currentPanel = document.querySelector(LIST_PANEL_SELECTOR);
     if (!nextPanel || !currentPanel) return false;
+    if (window.CV.registry && typeof window.CV.registry.destroy === 'function') {
+      window.CV.registry.destroy(currentPanel);
+    }
     currentPanel.replaceWith(nextPanel);
     return true;
   }

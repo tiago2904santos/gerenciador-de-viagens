@@ -1,13 +1,49 @@
 (function () {
   "use strict";
 
+  window.CV = window.CV || {};
+
+  var ownerByMenu = typeof WeakMap !== "undefined" ? new WeakMap() : new Map();
+  var listenersBound = false;
+
+  function triggerFor(menu) {
+    if (!menu || !menu.id) return null;
+    return document.querySelector('[data-action-menu-target="' + menu.id + '"]');
+  }
+
+  function close(menu) {
+    if (!menu) return;
+    menu.classList.remove("cv-action-menu--open");
+    menu.hidden = true;
+    var trigger = triggerFor(menu);
+    if (trigger) trigger.setAttribute("aria-expanded", "false");
+  }
+
   function closeAll() {
-    document.querySelectorAll(".cv-action-menu--open").forEach(function (menu) {
-      menu.classList.remove("cv-action-menu--open");
-      menu.hidden = true;
-      var trigger = document.querySelector('[data-action-menu-target="' + menu.id + '"]');
-      if (trigger) trigger.setAttribute("aria-expanded", "false");
+    document.querySelectorAll(".cv-action-menu--open").forEach(close);
+  }
+
+  function rememberOwner(menu) {
+    if (ownerByMenu.has(menu)) return;
+    ownerByMenu.set(menu, {
+      parent: menu.parentNode,
+      nextSibling: menu.nextSibling,
     });
+  }
+
+  function restoreOwner(menu) {
+    var owner = ownerByMenu.get(menu);
+    close(menu);
+    if (!owner || !owner.parent) return;
+    if (owner.nextSibling && owner.nextSibling.parentNode === owner.parent) {
+      owner.parent.insertBefore(menu, owner.nextSibling);
+    } else {
+      owner.parent.appendChild(menu);
+    }
+    menu.style.removeProperty("position");
+    menu.style.removeProperty("top");
+    menu.style.removeProperty("left");
+    ownerByMenu.delete(menu);
   }
 
   function position(trigger, menu) {
@@ -24,7 +60,7 @@
     menu.style.left = left + "px";
   }
 
-  document.addEventListener("click", function (event) {
+  function onClick(event) {
     var trigger = event.target.closest("[data-action-menu-trigger]");
     if (trigger) {
       event.preventDefault();
@@ -33,6 +69,7 @@
       var wasOpen = menu.classList.contains("cv-action-menu--open");
       closeAll();
       if (!wasOpen) {
+        rememberOwner(menu);
         if (menu.parentNode !== document.body) document.body.appendChild(menu);
         menu.hidden = false;
         menu.classList.add("cv-action-menu--open");
@@ -48,12 +85,56 @@
     }
 
     closeAll();
-  });
+  }
 
-  document.addEventListener("keydown", function (event) {
+  function onKeydown(event) {
     if (event.key === "Escape") closeAll();
-  });
+  }
 
-  window.addEventListener("scroll", closeAll, true);
-  window.addEventListener("resize", closeAll);
-})();
+  function bindListeners() {
+    if (listenersBound) return;
+    listenersBound = true;
+    document.addEventListener("click", onClick);
+    document.addEventListener("keydown", onKeydown);
+    window.addEventListener("scroll", closeAll, true);
+    window.addEventListener("resize", closeAll);
+  }
+
+  function menusOwnedBy(root) {
+    var menus = [];
+    var triggers = [];
+    if (root.matches && root.matches("[data-action-menu-trigger]")) triggers.push(root);
+    if (root.querySelectorAll) {
+      triggers = triggers.concat(
+        Array.prototype.slice.call(root.querySelectorAll("[data-action-menu-trigger]"))
+      );
+    }
+    triggers.forEach(function (trigger) {
+      var menu = document.getElementById(trigger.getAttribute("data-action-menu-target"));
+      if (menu && menus.indexOf(menu) === -1) menus.push(menu);
+    });
+    return menus;
+  }
+
+  function init() {
+    bindListeners();
+  }
+
+  function destroy(root) {
+    menusOwnedBy(root).forEach(restoreOwner);
+  }
+
+  window.CV.actionMenu = {
+    closeAll: closeAll,
+    destroy: destroy,
+    init: init,
+  };
+
+  if (typeof window.CV.registerEnhancer === "function") {
+    window.CV.registerEnhancer("actionMenu", init, destroy);
+  } else if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init, { once: true });
+  } else {
+    init();
+  }
+}());
