@@ -103,13 +103,7 @@
     }
 
     function closeModal() {
-      if (window.CV && window.CV.dialogs) {
-        window.CV.dialogs.close(modal);
-      } else {
-        modal.hidden = true;
-        document.body.classList.remove("has-delete-modal-open");
-        if (activeTrigger && typeof activeTrigger.focus === "function") activeTrigger.focus();
-      }
+      window.CV.overlay.closeDialog(modal);
       activeTrigger = null;
       currentRemoveUrl = "";
       clearSelectedFile();
@@ -182,17 +176,11 @@
       if (kinds.indexOf(selectedKind) === -1) selectedKind = kinds[0] || "primary";
       selectDocument(selectedKind, false);
 
-      if (window.CV && window.CV.dialogs) {
-        window.CV.dialogs.open(modal, {
-          opener: trigger,
-          initialFocus: fileInput || dialog,
-          onRequestClose: closeModal,
-        });
-      } else {
-        modal.hidden = false;
-        document.body.classList.add("has-delete-modal-open");
-        if (dialog && typeof dialog.focus === "function") dialog.focus();
-      }
+      window.CV.overlay.openDialog(modal, {
+        opener: trigger,
+        initialFocus: fileInput || dialog,
+        onRequestClose: closeModal,
+      });
     }
 
     function removeCurrentSigned() {
@@ -232,12 +220,6 @@
       if (!modal.hidden && kindButton) {
         event.preventDefault();
         selectDocument(kindButton.getAttribute("data-attach-signed-kind"), true);
-      }
-    });
-
-    document.addEventListener("keydown", function (event) {
-      if ((!window.CV || !window.CV.dialogs) && !modal.hidden && event.key === "Escape") {
-        closeModal();
       }
     });
 

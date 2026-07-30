@@ -83,7 +83,7 @@ html[data-theme="dark"] .oficio-lc__wa-trigger:focus {
   color: #c2ecd9;
 }
 
-/* Os menus são movidos para o body pelo action-menu.js, por isso o escopo
+/* Os menus são movidos para o body por CV.overlay, por isso o escopo
    precisa estar na própria classe do widget. */
 .oficio-lc__action-menu {
   background: color-mix(in srgb, var(--surface-list-panel) 96%, transparent);

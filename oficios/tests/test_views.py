@@ -38,7 +38,7 @@ class OficioViewsTests(TestCase):
         # Ofício sem data de viagem cai na aba "Em andamento e realizados" (atuais).
         response = self.client.get(reverse("oficios:index") + "?aba=atuais")
         self.assertContains(response, "data-delete-confirm-modal")
-        self.assertContains(response, "data-delete-modal-trigger")
+        self.assertContains(response, 'data-overlay-target="delete-confirm-modal"')
         excluir_url = reverse("oficios:excluir", args=[oficio.pk])
         next_qs = urlencode({"next": reverse("oficios:index")})
         self.assertContains(response, f'data-delete-url="{excluir_url}?{next_qs}"')

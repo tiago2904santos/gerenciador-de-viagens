@@ -35,11 +35,12 @@
     this.controlEl = root.querySelector(".cv-search-picker__control");
     this.clearBtn = root.querySelector("[data-oficio-viatura-clear]");
     this.viaturaFloatingMenu =
-      window.CvFloatingDropdown &&
-      window.CvFloatingDropdown.attach &&
+      window.CV &&
+      window.CV.overlay &&
+      window.CV.overlay.attachDropdown &&
       this.dropdown &&
       this.controlEl
-        ? window.CvFloatingDropdown.attach(this.dropdown, this.controlEl)
+        ? window.CV.overlay.attachDropdown(this.dropdown, this.controlEl)
         : null;
     // Painel "VIATURA SELECIONADA" — card visualmente igual ao multiselect detalhado
     this.selectedList = root.querySelector("[data-oficio-viatura-selected-list]");

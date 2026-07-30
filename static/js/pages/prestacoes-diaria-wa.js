@@ -8,14 +8,16 @@
   window.__prestDiariaWaBound = true;
 
   // Os itens do menu (Enviar WhatsApp/Business/Copiar) ficam dentro de
-  // .cv-action-menu, que o action-menu.js move para <body> ao abrir — por
+  // .cv-action-menu, que o CV.overlay move para <body> ao abrir — por
   // isso não dá pra usar closest() a partir do item para achar a linha do
   // servidor; volta-se ao botão-gatilho original (que continua no lugar)
   // pelo id do menu.
   function diariaWaTrigger(el) {
     var menu = el.closest(".cv-action-menu");
     if (!menu) return null;
-    return document.querySelector('[data-action-menu-target="' + menu.id + '"]');
+    return document.querySelector(
+      '[data-overlay-kind="menu"][data-overlay-target="' + menu.id + '"]'
+    );
   }
 
   function diariaDateText(value) {

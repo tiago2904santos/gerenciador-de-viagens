@@ -7,8 +7,8 @@
   aria-haspopup="true"
   aria-expanded="false"
   data-tooltip="{{ menu.trigger_tooltip|default:'Visualizar e baixar' }}"
-  data-action-menu-trigger
-  data-action-menu-target="{{ menu.id }}"
+  data-overlay-trigger data-overlay-kind="menu"
+  data-overlay-target="{{ menu.id }}"
 >{% include "components/ui/icons/icon.html" with icon=menu.trigger_icon|default:"folder" only %}</button>
 <div class="cv-action-menu cv-action-menu--rich" id="{{ menu.id }}" role="menu" hidden>
   {% include "components/ui/menus/rich_menu_header.html" with title=menu.title subtitle=menu.subtitle icon=menu.icon|default:"folder" only %}
@@ -30,7 +30,7 @@
         type="button"
         class="cv-action-menu__item cv-action-menu__item--rich"
         role="menuitem"
-        data-confirm-action-trigger
+        data-overlay-trigger data-overlay-kind="dialog" data-overlay-target="confirm-action-modal"
         data-confirm-action-url="{{ item.url }}"
         data-confirm-action-label-text="{{ item.label }}"
       >
@@ -44,7 +44,7 @@
         type="button"
         class="cv-action-menu__item cv-action-menu__item--rich"
         role="menuitem"
-        data-cancel-modal-trigger
+        data-overlay-trigger data-overlay-kind="dialog" data-overlay-target="cancel-reason-modal"
         data-cancel-url="{{ item.url }}"
         data-cancel-label="{{ item.label }}"
       >
@@ -58,7 +58,7 @@
         type="button"
         class="cv-action-menu__item cv-action-menu__item--rich"
         role="menuitem"
-        data-delete-modal-trigger
+        data-overlay-trigger data-overlay-kind="dialog" data-overlay-target="delete-confirm-modal"
         data-delete-url="{{ item.url }}"
         data-delete-label="{{ item.label }}"
       >

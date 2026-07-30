@@ -140,110 +140,6 @@ document.documentElement.dataset.appReady = "true";
   else start();
 }());
 
-/* Dialog accessibility shared by confirmation, upload and cancellation flows. */
-(function () {
-  "use strict";
-
-  window.CV = window.CV || {};
-
-  var dialogStates = typeof WeakMap !== "undefined" ? new WeakMap() : new Map();
-  var openDialogs = [];
-  var focusableSelector = [
-    "a[href]",
-    "button:not([disabled])",
-    "input:not([disabled]):not([type='hidden'])",
-    "select:not([disabled])",
-    "textarea:not([disabled])",
-    "[tabindex]:not([tabindex='-1'])",
-  ].join(",");
-
-  function focusableElements(container) {
-    return Array.prototype.filter.call(container.querySelectorAll(focusableSelector), function (element) {
-      return !element.hidden && element.getAttribute("aria-hidden") !== "true";
-    });
-  }
-
-  function currentDialog() {
-    return openDialogs.length ? openDialogs[openDialogs.length - 1] : null;
-  }
-
-  function open(container, options) {
-    if (!container) return false;
-    var config = options || {};
-    var opener = config.opener || document.activeElement;
-    dialogStates.set(container, { opener: opener, onRequestClose: config.onRequestClose });
-    openDialogs = openDialogs.filter(function (item) { return item !== container; });
-    openDialogs.push(container);
-    container.hidden = false;
-    document.body.classList.add("has-dialog-open", "has-delete-modal-open");
-
-    var initialFocus = config.initialFocus;
-    if (!initialFocus) {
-      initialFocus = focusableElements(container)[0] || container.querySelector('[role="dialog"]');
-    }
-    window.requestAnimationFrame(function () {
-      if (initialFocus && typeof initialFocus.focus === "function") initialFocus.focus();
-    });
-    container.dispatchEvent(new CustomEvent("cv:dialog:opened", { bubbles: true }));
-    return true;
-  }
-
-  function close(container, options) {
-    if (!container) return false;
-    var config = options || {};
-    var state = dialogStates.get(container) || {};
-    container.hidden = true;
-    openDialogs = openDialogs.filter(function (item) { return item !== container; });
-    if (!openDialogs.length) {
-      document.body.classList.remove("has-dialog-open", "has-delete-modal-open");
-    }
-    dialogStates.delete(container);
-    if (config.restoreFocus !== false && state.opener && typeof state.opener.focus === "function") {
-      state.opener.focus();
-    }
-    container.dispatchEvent(new CustomEvent("cv:dialog:closed", { bubbles: true }));
-    return true;
-  }
-
-  document.addEventListener("keydown", function (event) {
-    var container = currentDialog();
-    if (!container) return;
-    var state = dialogStates.get(container) || {};
-
-    if (event.key === "Escape") {
-      event.preventDefault();
-      if (typeof state.onRequestClose === "function") state.onRequestClose();
-      else close(container);
-      return;
-    }
-
-    if (event.key !== "Tab") return;
-    var focusable = focusableElements(container);
-    if (!focusable.length) {
-      event.preventDefault();
-      var dialog = container.querySelector('[role="dialog"]');
-      if (dialog) dialog.focus();
-      return;
-    }
-    var first = focusable[0];
-    var last = focusable[focusable.length - 1];
-    if (event.shiftKey && document.activeElement === first) {
-      event.preventDefault();
-      last.focus();
-    } else if (!event.shiftKey && document.activeElement === last) {
-      event.preventDefault();
-      first.focus();
-    }
-  });
-
-  window.CV.dialogs = {
-    close: close,
-    current: currentDialog,
-    focusableElements: focusableElements,
-    open: open,
-  };
-}());
-
 /* Feedback global: substitui diálogos nativos por um fluxo assíncrono acessível. */
 (function () {
   "use strict";
@@ -353,7 +249,7 @@ document.documentElement.dataset.appReady = "true";
     cancelButton.hidden = !isConfirm;
     acceptButton.textContent = active.options.acceptLabel || (isConfirm ? "Confirmar" : "Entendi");
 
-    window.CV.dialogs.open(container, {
+    window.CV.overlay.openDialog(container, {
       opener: active.options.opener || document.activeElement,
       initialFocus: isConfirm ? cancelButton : acceptButton,
       onRequestClose: function () { finish(false); },
@@ -365,7 +261,7 @@ document.documentElement.dataset.appReady = "true";
     if (!active) return;
     var completed = active;
     active = null;
-    window.CV.dialogs.close(modal);
+    window.CV.overlay.closeDialog(modal);
     completed.resolve(completed.kind === "confirm" ? accepted : undefined);
     window.setTimeout(present, 0);
   }

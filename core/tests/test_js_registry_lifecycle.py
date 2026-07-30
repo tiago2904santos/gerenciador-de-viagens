@@ -13,8 +13,8 @@ class JavascriptRegistryLifecycleTests(SimpleTestCase):
         cls.collection_source = (
             static_js / "components" / "collection.js"
         ).read_text(encoding="utf-8")
-        cls.action_menu_source = (
-            static_js / "components" / "action-menu.js"
+        cls.overlay_source = (
+            static_js / "components" / "overlay.js"
         ).read_text(encoding="utf-8")
 
     def test_registry_exposes_destroy_and_runs_cleanup_for_removed_nodes(self):
@@ -36,11 +36,11 @@ class JavascriptRegistryLifecycleTests(SimpleTestCase):
         )
 
     def test_action_menu_registers_cleanup_that_restores_portaled_menu(self):
-        self.assertIn("function restoreOwner(menu)", self.action_menu_source)
-        self.assertIn("owner.parent.insertBefore(menu", self.action_menu_source)
+        self.assertIn("function restoreOwner(overlay)", self.overlay_source)
+        self.assertIn("owner.parent.insertBefore(overlay", self.overlay_source)
         self.assertIn(
-            'window.CV.registerEnhancer("actionMenu", init, destroy)',
-            self.action_menu_source,
+            'window.CV.registerEnhancer("overlay", init, destroy)',
+            self.overlay_source,
         )
 
     def test_ajax_sensitive_components_register_as_enhancers(self):

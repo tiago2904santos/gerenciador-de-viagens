@@ -173,7 +173,7 @@ class ServidorCrudTests(TestCase):
         self.assertNotContains(response, "data-cv-results-count")
         self.assertNotContains(response, "data-cv-realtime-filter-scope")
         self.assertContains(response, "data-delete-confirm-modal")
-        self.assertContains(response, "data-delete-modal-trigger")
+        self.assertContains(response, 'data-overlay-target="delete-confirm-modal"')
         # A exclusão sai como gatilho de modal, nunca como link direto. O pk vem
         # do registro, não fixo: em PostgreSQL a sequência não recomeça em 1 a
         # cada teste, e o literal fazia a asserção depender do banco.

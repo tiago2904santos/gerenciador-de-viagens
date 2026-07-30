@@ -4,16 +4,16 @@
   /** Evita que cliques nos links do cabeçalho alternem o estado do <details>.
    *
    * Exceto gatilhos que dependem de delegação no `document`
-   * (action-menu.js, attach-signed-modal.js, delete-confirm-modal.js):
+   * (CV.overlay e attach-signed-modal.js):
    * esses precisam que o clique continue borbulhando até lá.
-   * action-menu.js já chama preventDefault no trigger, então o <details>
+   * CV.overlay já chama preventDefault no trigger, então o <details>
    * não alterna.
    */
   document.querySelectorAll(".document-inline-actions--header").forEach(function (el) {
     el.addEventListener("click", function (e) {
       if (
         e.target.closest(
-          "[data-action-menu-trigger], [data-attach-signed-trigger], [data-delete-modal-trigger]",
+          '[data-overlay-trigger], [data-attach-signed-trigger]',
         )
       ) {
         return;
