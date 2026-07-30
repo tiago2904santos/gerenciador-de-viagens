@@ -99,8 +99,7 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertIn("new MutationObserver", app_js)
 
         component_files = (
-            "cv-custom-select.js",
-            "cv-search-picker.js",
+            "picker.js",
             "cv-date-picker.js",
             "collection.js",
             "delete-confirm-modal.js",
@@ -112,6 +111,9 @@ class DarkRedesignContractTests(SimpleTestCase):
             with self.subTest(component=filename):
                 source = (components / filename).read_text(encoding="utf-8")
                 self.assertIn("registerEnhancer", source)
+
+        picker_select = (components / "picker-select.js").read_text(encoding="utf-8")
+        self.assertIn("window.CV.picker.registerRenderer(initAll)", picker_select)
 
     def test_page_header_has_one_canonical_markup_without_legacy_wrappers(self):
         headers = Path(settings.BASE_DIR) / "templates" / "components" / "ui" / "headers"

@@ -14,8 +14,8 @@ from .models import VinculoUsuarioArea
 def _cv_picker_single_attrs(*, label, placeholder, empty_message):
     return {
         **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
-        "data-cv-search-picker": "true",
-        "data-picker-mode": "single",
+        "data-entity-picker": "true",
+        "data-entity-picker-mode": "single",
         "data-picker-variant": "compact",
         "data-picker-label": label,
         "data-picker-open-all": "true",

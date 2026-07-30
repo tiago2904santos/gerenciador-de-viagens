@@ -137,8 +137,8 @@ class EventoNovoCadastroForm(forms.ModelForm):
         widget=forms.Select(
             attrs={
                 **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
-                "data-cv-search-picker": "true",
-                "data-picker-mode": "single",
+                "data-entity-picker": "true",
+                "data-entity-picker-mode": "single",
                 "data-picker-variant": "compact",
                 "data-placeholder": "Buscar estado...",
                 "data-empty-message": "Nenhum estado encontrado.",
@@ -224,8 +224,8 @@ class EventoNovoCadastroForm(forms.ModelForm):
                 choices=[("", "---------")],
                 attrs={
                     **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
-                    "data-cv-search-picker": "true",
-                    "data-picker-mode": "single",
+                    "data-entity-picker": "true",
+                    "data-entity-picker-mode": "single",
                     "data-picker-variant": "compact",
                     "data-placeholder": "Buscar cidade...",
                     "data-empty-message": "Nenhuma cidade encontrada.",

@@ -31,9 +31,9 @@ def _servidor_picker_widget(panel_title: str, field_label: str) -> forms.Select:
     return ServidorMotoristaSelect(
         attrs={
             **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
-            "data-cv-search-picker": "true",
+            "data-entity-picker": "true",
             "data-pt-coordenador-picker": "true",
-            "data-picker-mode": "single",
+            "data-entity-picker-mode": "single",
             "data-picker-variant": "compact",
             "data-picker-label": field_label,
             "data-panel-title": panel_title,
@@ -105,8 +105,8 @@ class PlanoIdentificacaoForm(forms.ModelForm):
             "destino_estado": forms.Select(
                 attrs={
                     **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
-                    "data-cv-search-picker": "true",
-                    "data-picker-mode": "single",
+                    "data-entity-picker": "true",
+                    "data-entity-picker-mode": "single",
                     "data-picker-variant": "compact",
                     "data-placeholder": "Buscar estado...",
                     "data-empty-message": "Nenhum estado encontrado.",
@@ -115,8 +115,8 @@ class PlanoIdentificacaoForm(forms.ModelForm):
             "destino_cidade": forms.Select(
                 attrs={
                     **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
-                    "data-cv-search-picker": "true",
-                    "data-picker-mode": "single",
+                    "data-entity-picker": "true",
+                    "data-entity-picker-mode": "single",
                     "data-picker-variant": "compact",
                     "data-placeholder": "Buscar cidade...",
                     "data-empty-message": "Nenhuma cidade encontrada.",
@@ -517,8 +517,8 @@ class EfetivoPlanoForm(forms.ModelForm):
             "unidade": forms.Select(
                 attrs={
                     **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
-                    "data-cv-search-picker": "true",
-                    "data-picker-mode": "single",
+                    "data-entity-picker": "true",
+                    "data-entity-picker-mode": "single",
                     "data-picker-variant": "compact",
                     "data-placeholder": "Buscar unidade...",
                     "data-empty-message": "Nenhuma unidade encontrada.",
@@ -624,8 +624,8 @@ class EfetivoEventoForm(forms.ModelForm):
             "unidade": forms.Select(
                 attrs={
                     **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
-                    "data-cv-search-picker": "true",
-                    "data-picker-mode": "single",
+                    "data-entity-picker": "true",
+                    "data-entity-picker-mode": "single",
                     "data-picker-variant": "compact",
                     "data-placeholder": "Buscar unidade...",
                     "data-empty-message": "Nenhuma unidade encontrada.",

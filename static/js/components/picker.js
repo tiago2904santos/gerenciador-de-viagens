@@ -1,7 +1,8 @@
 (function () {
   "use strict";
 
-  const SELECTOR = "select[data-cv-search-picker]";
+  const SELECTOR = "select[data-entity-picker]";
+  const renderers = [];
 
   /* ── Utilitários ─────────────────────────────────────────────── */
 
@@ -88,11 +89,11 @@
   /* ── Inicialização do picker ──────────────────────────────────── */
 
   function initPicker(select) {
-    if (!select || select.dataset.cvSearchPickerReady === "true") return;
-    select.dataset.cvSearchPickerReady = "true";
+    if (!select || select.dataset.entityPickerReady === "true") return;
+    select.dataset.entityPickerReady = "true";
 
     /* Configuração via data-* */
-    const mode         = select.dataset.pickerMode        || "multi";   /* single | multi */
+    const mode         = select.dataset.entityPickerMode  || "multi";   /* single | multi */
     const variant      = select.dataset.pickerVariant     || "compact"; /* compact | detailed */
     const presentation = select.dataset.pickerPresentation || "default";
     const placeholder  = select.dataset.placeholder       || "Digite para buscar";
@@ -844,18 +845,27 @@
     const scope = root && root.querySelectorAll ? root : document;
     if (scope.matches && scope.matches(SELECTOR)) initPicker(scope);
     scope.querySelectorAll(SELECTOR).forEach(initPicker);
+    renderers.forEach((renderer) => renderer(scope));
   }
 
   function boot() {
     init(document);
   }
 
-  window.CvSearchPicker = { boot, init };
   window.CV = window.CV || {};
-  window.CV.searchPicker = window.CvSearchPicker;
+  window.CV.picker = {
+    boot,
+    init,
+    initSearch: init,
+    registerRenderer(renderer) {
+      if (typeof renderer === "function" && !renderers.includes(renderer)) {
+        renderers.push(renderer);
+      }
+    },
+  };
 
   if (typeof window.CV.registerEnhancer === "function") {
-    window.CV.registerEnhancer("searchPicker", init);
+    window.CV.registerEnhancer("picker", init);
   } else if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", boot);
   } else {

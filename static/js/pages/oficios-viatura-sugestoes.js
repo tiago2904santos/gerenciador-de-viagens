@@ -2,7 +2,7 @@
   "use strict";
 
   function init() {
-    var viaturaSelect   = document.querySelector("select[name='viatura'][data-cv-search-picker]");
+    var viaturaSelect   = document.querySelector("select[name='viatura'][data-entity-picker]");
     if (!viaturaSelect) return;
 
     var equipeSelect    = document.querySelector("select[name='servidores']");

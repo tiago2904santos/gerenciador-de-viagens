@@ -54,8 +54,8 @@
       return;
     }
     if (!select) return;
-    if (select.dataset.cvSearchPickerReady === "true") {
-      delete select.dataset.cvSearchPickerReady;
+    if (select.dataset.entityPickerReady === "true") {
+      delete select.dataset.entityPickerReady;
       var nextEl = select.nextElementSibling;
       if (nextEl && nextEl.classList && nextEl.classList.contains("cv-search-picker")) {
         nextEl.parentNode.removeChild(nextEl);
@@ -68,8 +68,8 @@
       window.CV.locationRows.initSearchPickers(scope || document);
       return;
     }
-    if (window.CvSearchPicker && window.CvSearchPicker.init) {
-      window.CvSearchPicker.init(scope || document);
+    if (window.CV && window.CV.picker && window.CV.picker.initSearch) {
+      window.CV.picker.initSearch(scope || document);
     }
   }
 

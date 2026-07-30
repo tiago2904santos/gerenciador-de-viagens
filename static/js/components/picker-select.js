@@ -1,10 +1,10 @@
 /* ==========================================================================
-   cv-custom-select.js
+   CV.picker select renderer
    Custom Select Premium — dropdown 100% customizado, sem menu nativo.
    O <select> nativo permanece oculto para submissão do formulário.
 
    Uso:
-     <div class="cv-custom-select" data-cv-select>
+     <div class="cv-custom-select" data-entity-picker data-entity-picker-renderer="select">
        <select name="campo">
          <option value="">Selecione</option>
          <option value="1">Opção 1</option>
@@ -442,25 +442,21 @@
   function initAll(root) {
     var scope = root && root.querySelectorAll ? root : document;
     var els = [];
-    if (scope.matches && scope.matches('[data-cv-select]')) els.push(scope);
-    els = els.concat(Array.prototype.slice.call(scope.querySelectorAll('[data-cv-select]')));
+    if (scope.matches && scope.matches('[data-entity-picker-renderer="select"]')) els.push(scope);
+    els = els.concat(Array.prototype.slice.call(scope.querySelectorAll('[data-entity-picker-renderer="select"]')));
     for (var i = 0; i < els.length; i++) {
       if (!els[i]._cvSelect) {
-        els[i].setAttribute('data-cv-select-bound', 'true');
+        els[i].setAttribute('data-entity-picker-ready', 'true');
         var inst = new CustomSelect(els[i]);
         els[i]._cvSelect = inst;
       }
     }
   }
 
-  window.CvCustomSelect = { init: initAll, CustomSelect: CustomSelect };
   window.CV = window.CV || {};
-  window.CV.customSelect = window.CvCustomSelect;
-  if (typeof window.CV.registerEnhancer === 'function') {
-    window.CV.registerEnhancer('customSelect', initAll);
-  } else if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function () { initAll(document); });
-  } else {
-    initAll(document);
+  if (window.CV.picker) {
+    window.CV.picker.initSelect = initAll;
+    window.CV.picker.SelectRenderer = CustomSelect;
+    window.CV.picker.registerRenderer(initAll);
   }
 }());

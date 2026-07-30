@@ -94,8 +94,8 @@ class JustificativaQuickAddForm(forms.Form):
         widget=OficioJustificativaSelectMultiple(
             attrs={
                 **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
-                "data-cv-search-picker": "true",
-                "data-picker-mode": "multi",
+                "data-entity-picker": "true",
+                "data-entity-picker-mode": "multi",
                 "data-picker-variant": "detailed",
                 "data-picker-label": "Oficios",
                 "data-panel-title": "OFICIOS DA JUSTIFICATIVA",

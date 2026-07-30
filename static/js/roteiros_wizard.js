@@ -375,8 +375,8 @@
         window.CV.fields.init(scope);
         return;
       }
-      if (window.CvCustomSelect && typeof window.CvCustomSelect.init === 'function') {
-        window.CvCustomSelect.init(scope);
+      if (window.CV && window.CV.picker && typeof window.CV.picker.initSelect === 'function') {
+        window.CV.picker.initSelect(scope);
       }
       if (window.OficioSelectPicker && typeof window.OficioSelectPicker.refresh === 'function') {
         window.OficioSelectPicker.refresh(scope);

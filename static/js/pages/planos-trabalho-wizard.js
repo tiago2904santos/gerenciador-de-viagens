@@ -8,8 +8,8 @@
       window.CV.locationRows.resetSearchPicker(select);
       return;
     }
-    if (!select || select.dataset.cvSearchPickerReady !== "true") return;
-    delete select.dataset.cvSearchPickerReady;
+    if (!select || select.dataset.entityPickerReady !== "true") return;
+    delete select.dataset.entityPickerReady;
     var next = select.nextElementSibling;
     if (next && next.classList && next.classList.contains("cv-search-picker")) {
       next.parentNode.removeChild(next);
@@ -21,8 +21,8 @@
       window.CV.locationRows.initSearchPickers(scope || document);
       return;
     }
-    if (window.CvSearchPicker && window.CvSearchPicker.init) {
-      window.CvSearchPicker.init(scope || document);
+    if (window.CV && window.CV.picker && window.CV.picker.initSearch) {
+      window.CV.picker.initSearch(scope || document);
     }
   }
 
@@ -260,7 +260,7 @@
 
   function refreshCustomSelect(select) {
     if (!select || !select.closest) return;
-    var root = select.closest("[data-cv-select]");
+    var root = select.closest('[data-entity-picker-renderer="select"]');
     if (root && root._cvSelect && typeof root._cvSelect.refresh === "function") {
       root._cvSelect.refresh();
     }
@@ -417,8 +417,8 @@
       rowsContainer.appendChild(row);
       totalInput.value = String(index + 1);
       bindEfetivoInputs(scope, row);
-      var cvSelect = (window.CV && window.CV.customSelect) || window.CvCustomSelect;
-      if (cvSelect && cvSelect.init) cvSelect.init(row);
+      var picker = window.CV && window.CV.picker;
+      if (picker && picker.initSelect) picker.initSelect(row);
       initPickers(scope);
       updateEfetivoRemoveButtons(scope);
     });
