@@ -290,6 +290,10 @@ CELERY_BEAT_SCHEDULE = {
         "task": "integracoes.google_drive.tasks.marcar_reorganizacoes_orfas",
         "schedule": 600.0,
     },
+    "documentos-geracoes-orfas-e-expiradas": {
+        "task": "documentos.tasks.manter_geracoes_documentais",
+        "schedule": 600.0,
+    },
 }
 
 # Em produção, qualquer escrita exige vínculo ativo com uma área. A opção

@@ -74,6 +74,7 @@ jobs:
           python scripts/audit_django_architecture.py
           --max-orm-em-view 32
           --max-drive-except-without-capture 0
+          --max-sync-document-generations 0
 
       - name: Validate production security settings
         env:

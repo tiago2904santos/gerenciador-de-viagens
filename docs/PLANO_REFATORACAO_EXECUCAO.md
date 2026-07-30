@@ -478,7 +478,10 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
   mas `TimeStampedModel` e `CancelavelModel` são abstratas; só `AuditEvent` é
   model concreto. Sua representação agora identifica ação, model, ID e objeto,
   coberta por teste antes da mudança.
-- [ ] `S-06` documentos assíncronos via Celery
+- [x] `S-06` documentos assíncronos via Celery — Ofícios, Justificativas,
+  Ordens de Serviço, Planos, Termos e Prestações usam job persistido, polling,
+  download protegido por área, deduplicação e retenção de 24 h; a catraca de
+  arquitetura mantém geração pesada fora das views.
 
 ### Etapa 5 — Motores JS
 - [x] `J-06` apagados os 9 arquivos órfãos do Anexo A (989 linhas) e as 6

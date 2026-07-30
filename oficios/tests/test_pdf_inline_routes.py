@@ -30,7 +30,7 @@ class PdfInlineRoutesTests(TestCase):
         self.assertEqual(response.status_code, 302)
 
     @mock.patch("oficios.document_views.validar_oficio_para_documento", return_value={"pendencias": []})
-    @mock.patch("oficios.document_views.download_documento_or_redirect_pdf_error")
+    @mock.patch("documentos.services.async_generation.gerar_resposta_do_job")
     def test_oficio_pdf_inline_disposition_inline(self, m_dl, _m_val):
         m_dl.return_value = self._mock_download_pdf()
         url = reverse("oficios:oficio_pdf_inline", args=[self.oficio.pk])
@@ -42,7 +42,7 @@ class PdfInlineRoutesTests(TestCase):
         _ = b"".join(response.streaming_content)
 
     @mock.patch("oficios.document_views.validar_oficio_para_documento", return_value={"pendencias": []})
-    @mock.patch("oficios.document_views.download_documento_or_redirect_pdf_error")
+    @mock.patch("documentos.services.async_generation.gerar_resposta_do_job")
     def test_justificativa_ordem_urls_resolvem(self, m_dl, _m_val):
         m_dl.return_value = self._mock_download_pdf()
         for name in (

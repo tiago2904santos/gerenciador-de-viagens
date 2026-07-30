@@ -29,7 +29,7 @@ from core.tenancy import get_current_area
 from core.utils.masks import format_cpf
 from core.utils.masks import format_placa
 from core.utils.masks import format_protocolo
-from documentos.services.exceptions import DocumentValidationError
+from documentos.services.async_generation import enfileirar_documento
 from oficios.models import Oficio
 
 from .diario_views import (
@@ -70,10 +70,8 @@ from .assinatura_services import signer_rt
 from .models import AssinaturaDocumento
 from .diario_services import diaria_info
 from .diario_services import garantir_roteiro_ajustado
-from .diario_services import gerar_diario_bordo_xlsx
 from .diario_services import motorista_diario
 from .diario_services import motorista_do_oficio
-from .diario_services import nome_arquivo_diario
 from .diario_services import sincronizar_trechos
 from .diario_services import viatura_resumo_diario
 from .diario_services import viatura_resumo_oficio
@@ -105,12 +103,8 @@ from .selectors import ABA_NAO_LIBERADAS
 from .selectors import contar_por_aba
 from .selectors import listar_prestacoes
 from .selectors import normalizar_aba
-from .services import gerar_relatorio_tecnico_docx
-from .services import gerar_prestacao_consolidado_pdf
 from .services import diaria_inicial_da_prestacao
 from .services import garantir_campos_padrao_relatorio_tecnico
-from .services import nome_arquivo_prestacao_consolidado
-from .services import nome_arquivo_rt
 
 
 
@@ -625,21 +619,12 @@ def consolidado_download(request, ps_pk):
         pk=ps_pk,
     )
     inline = _is_inline_request(request)
-    try:
-        conteudo = gerar_prestacao_consolidado_pdf(ps)
-    except DocumentValidationError as exc:
-        if inline:
-            return _preview_error_response(exc)
-        messages.error(request, str(exc))
-        return redirect("prestacoes_contas:consolidado_servidor", ps_pk=ps.pk)
-
-    nome = nome_arquivo_prestacao_consolidado(ps)
-    disposition = "inline" if inline else "attachment"
-    response = HttpResponse(conteudo, content_type="application/pdf")
-    response["Content-Disposition"] = f'{disposition}; filename="{nome}"'
-    if disposition == "inline":
-        response["X-Frame-Options"] = "SAMEORIGIN"
-    return response
+    return enfileirar_documento(
+        request,
+        tipo="prestacao_consolidado",
+        parametros={"object_id": ps.pk, "formato": "pdf"},
+        disposicao="inline" if inline else "attachment",
+    )
 
 
 # ─────────────────────────────────────────────────────────────────

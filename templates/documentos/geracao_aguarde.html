@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+  <section
+    class="main-form-panel"
+    data-document-generation-wait
+    data-status-url="{{ geracao.status_url }}"
+  >
+    <h1>Preparando documento</h1>
+    <p data-document-generation-message>
+      A geração continua em segundo plano. Esta página abrirá o arquivo assim que ele estiver pronto.
+    </p>
+    <p><a class="cv-btn cv-btn--secondary" href="{% url 'documentos:index' %}">Voltar</a></p>
+  </section>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'js/components/document-generation-wait.js' %}?v=20260729-s06" defer></script>
+{% endblock %}

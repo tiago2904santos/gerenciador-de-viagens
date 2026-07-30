@@ -12,16 +12,14 @@ from core.autosave import AutosavePayloadError, autosave_json_response, parse_au
 from core.normalizers import normalize_spaces
 from core.tenancy import filter_queryset_by_area
 from core.utils.masks import format_cpf, format_protocolo
-from documentos.services.exceptions import DocumentValidationError
+from documentos.services.async_generation import enfileirar_documento
 from oficios.models import Oficio
 
 from .diario_services import (
     diaria_info,
     garantir_roteiro_ajustado,
-    gerar_diario_bordo_xlsx,
     motorista_diario,
     motorista_do_oficio,
-    nome_arquivo_diario,
     sincronizar_trechos,
     viatura_resumo_oficio,
 )
@@ -39,7 +37,6 @@ from .view_common import (
     _prestacao_queryset,
     _prestacao_servidor_full,
     _prestacao_servidor_queryset,
-    _preview_error_response,
     _primeiro_servidor,
     _redirect_primeiro_servidor,
 )
@@ -387,28 +384,11 @@ def diario_download(request, pk, formato="xlsx"):
 
     inline = _is_inline_request(request)
     formato = (formato or "xlsx").strip().lower()
-    if formato == "pdf":
-        try:
-            from .assinatura_services import pdf_db_assinado_ou_gerado
-            conteudo = pdf_db_assinado_ou_gerado(diario.prestacao)
-        except DocumentValidationError as exc:
-            if inline:
-                return _preview_error_response(exc)
-            messages.error(request, str(exc))
-            ps = _primeiro_servidor(diario.prestacao)
-            if ps is not None:
-                return redirect("prestacoes_contas:diario_servidor", ps_pk=ps.pk)
-            return redirect("prestacoes_contas:index")
-        content_type = "application/pdf"
-    else:
-        conteudo = gerar_diario_bordo_xlsx(diario)
+    if formato not in {"pdf", "xlsx"}:
         formato = "xlsx"
-        content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-
-    nome = nome_arquivo_diario(diario, formato=formato)
-    disposition = "inline" if inline and formato == "pdf" else "attachment"
-    response = HttpResponse(conteudo, content_type=content_type)
-    response["Content-Disposition"] = f'{disposition}; filename="{nome}"'
-    if disposition == "inline":
-        response["X-Frame-Options"] = "SAMEORIGIN"
-    return response
+    return enfileirar_documento(
+        request,
+        tipo="prestacao_diario",
+        parametros={"object_id": diario.pk, "formato": formato},
+        disposicao="inline" if inline and formato == "pdf" else "attachment",
+    )

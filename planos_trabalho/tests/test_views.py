@@ -428,7 +428,7 @@ class PlanoWizardViewsTests(TestCase):
             reverse("planos_trabalho:baixar_documento", args=[plano.pk, "docx"]),
         )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content[:2], b"PK")
+        self.assertEqual(b"".join(response.streaming_content)[:2], b"PK")
         plano.refresh_from_db()
         self.assertEqual(plano.status, PlanoTrabalho.STATUS_GERADO)
 

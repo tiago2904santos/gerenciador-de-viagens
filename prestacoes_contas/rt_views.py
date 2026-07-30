@@ -13,7 +13,7 @@ from core.autosave import (
     parse_autosave_payload,
 )
 from core.normalizers import normalize_spaces
-from documentos.services.exceptions import DocumentValidationError
+from documentos.services.async_generation import enfileirar_documento
 
 from .diario_services import diaria_info
 from .forms import (
@@ -29,8 +29,6 @@ from .services import (
     diaria_inicial_da_prestacao,
     diaria_recebida_display,
     garantir_campos_padrao_relatorio_tecnico,
-    gerar_relatorio_tecnico_docx,
-    nome_arquivo_rt,
 )
 from .view_common import (
     _autosave_version,
@@ -44,7 +42,6 @@ from .view_common import (
     _prestacao_queryset,
     _prestacao_servidor_full,
     _prestacao_servidor_queryset,
-    _preview_error_response,
     _redirect_primeiro_servidor,
     _relatorio_queryset,
 )
@@ -299,30 +296,13 @@ def rt_download_servidor(request, ps_pk, formato="docx"):
         ),
         pk=ps_pk,
     )
-    relatorio, _ = RelatorioTecnico.objects.get_or_create(prestacao=ps.prestacao)
-    garantir_campos_padrao_relatorio_tecnico(relatorio)
-
     inline = _is_inline_request(request)
     formato = (formato or "docx").strip().lower()
-    if formato == "pdf":
-        try:
-            from .assinatura_services import pdf_rt_assinado_ou_gerado
-            conteudo = pdf_rt_assinado_ou_gerado(ps)
-        except DocumentValidationError as exc:
-            if inline:
-                return _preview_error_response(exc)
-            messages.error(request, str(exc))
-            return redirect("prestacoes_contas:rt_servidor", ps_pk=ps.pk)
-        content_type = "application/pdf"
-    else:
-        conteudo = gerar_relatorio_tecnico_docx(relatorio, ps)
+    if formato not in {"pdf", "docx"}:
         formato = "docx"
-        content_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-
-    nome = nome_arquivo_rt(relatorio, ps.servidor, formato=formato)
-    disposition = "inline" if inline and formato == "pdf" else "attachment"
-    response = HttpResponse(conteudo, content_type=content_type)
-    response["Content-Disposition"] = f'{disposition}; filename="{nome}"'
-    if disposition == "inline":
-        response["X-Frame-Options"] = "SAMEORIGIN"
-    return response
+    return enfileirar_documento(
+        request,
+        tipo="prestacao_rt",
+        parametros={"object_id": ps.pk, "formato": formato},
+        disposicao="inline" if inline and formato == "pdf" else "attachment",
+    )

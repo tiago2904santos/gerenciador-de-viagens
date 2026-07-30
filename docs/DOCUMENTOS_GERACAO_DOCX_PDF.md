@@ -107,7 +107,14 @@ Variáveis adicionais reconhecidas pelo resolver: `SOFFICE_PATH`, `LIBREOFFICE_S
 
 ## Erros no browser
 
-Quando um download de **PDF** falha por configuração de motor, as vistas de download redireccionam para o passo **Documentos** do wizard do ofício e mostram uma mensagem de erro (DOCX não é afectado pelo mesmo redirect de motor).
+Downloads criam um `DocumentoGeracao` e recebem `202` com `status_url`. O motor
+global de download consulta esse endpoint até receber `result_url`; links
+diretos e iframes recebem uma página de espera equivalente. Falhas do
+renderizador ou da fila aparecem no próprio feedback de geração.
+
+Os resultados ficam no storage por 24 horas. O Celery beat marca jobs parados
+há 30 minutos como erro e remove arquivos expirados. Status e resultado passam
+pelo mesmo isolamento por área aplicado aos demais documentos.
 
 ## Validação local sugerida
 

@@ -5,6 +5,7 @@ from django.conf import settings
 from django.test import SimpleTestCase
 
 from scripts.audit_django_architecture import contar_orm_em_views
+from scripts.audit_django_architecture import sync_document_generations_in_views
 
 
 APP_MODULES = {
@@ -64,3 +65,6 @@ class ViewModuleBoundaryTests(SimpleTestCase):
 
         self.assertEqual(counts["oficios"], 4)
         self.assertEqual(sum(counts.values()), 32)
+
+    def test_views_nao_executam_geradores_documentais_pesados(self):
+        self.assertEqual(sync_document_generations_in_views(), [])
