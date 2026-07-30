@@ -147,12 +147,21 @@ def get_viatura_by_id(pk):
     )
 
 
-def get_configuracao_sistema():
-    return ConfiguracaoSistema.get_for_area(get_current_area())
+def get_configuracao_sistema(area=None):
+    """Resolve a configuração institucional da área.
+
+    Prefira passar ``area`` (ex.: ``ordem.area`` / ``oficio.area``) quando o
+    documento já conhece o tenant — em Celery e outros contextos sem request,
+    ``get_current_area()`` é ``None`` e cairia na configuração legada sem área,
+    trocando o assinante da OS pelo destinatário global do Ofício.
+    """
+    if area is None:
+        area = get_current_area()
+    return ConfiguracaoSistema.get_for_area(area)
 
 
-def build_configuracao_context():
-    configuracao = get_configuracao_sistema()
+def build_configuracao_context(area=None):
+    configuracao = get_configuracao_sistema(area=area)
     cidade_doc = configuracao.cidade_endereco or ""
     assinaturas: dict = {}
     for ass in configuracao.assinaturas.filter(ativo=True).select_related("servidor__cargo").order_by("tipo", "ordem"):

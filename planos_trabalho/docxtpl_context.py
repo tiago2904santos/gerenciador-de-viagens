@@ -167,8 +167,12 @@ def build_plano_docxtpl_context(plano: PlanoTrabalho) -> dict[str, Any]:
         recursos_txt = montar_recursos_texto(_itens)
         valor_txt = montar_valor_do_plano_texto(plano)
 
-    inst = build_configuracao_context()
-    nome_chefia, cargo_chefia = _assinatura_nome_cargo(inst, "PLANO_TRABALHO")
+    inst = build_configuracao_context(area=getattr(plano, "area", None))
+    nome_chefia, cargo_chefia = _assinatura_nome_cargo(
+        inst,
+        "PLANO_TRABALHO",
+        fallback_geral=False,
+    )
 
     destinos_display = _destinos_unicos(plano) if plano.is_multi_evento else (
         format_city_uf(plano.destino_display) if plano.destino_cidade_id else ""

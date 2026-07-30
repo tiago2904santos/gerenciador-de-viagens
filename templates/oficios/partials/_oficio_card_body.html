@@ -1,8 +1,8 @@
 {# Miolo do card de ofício — viajantes (modelo roster), transporte/roteiro e justificativa. #}
 <div class="oficio-lc__section">
-  <div class="oficio-lc__travellers oficio-lc__travellers--n{{ card.servidores_count|default:0 }}">
+  <ul class="oficio-lc__travellers oficio-lc__travellers--n{{ card.servidores_count|default:0 }}">
     {% for s in card.servidores %}
-    <div class="oficio-lc__traveller{% if s.is_motorista %} oficio-lc__traveller--motorista{% endif %}">
+    <li class="oficio-lc__traveller{% if s.is_motorista %} oficio-lc__traveller--motorista{% endif %}">
       <span class="oficio-lc__traveller-avatar" aria-hidden="true">{{ s.initials }}</span>
 
       <div class="oficio-lc__traveller-body">
@@ -69,11 +69,11 @@
       </div>
       {% endif %}
 
-    </div>
+    </li>
     {% empty %}
-    <p class="oficio-lc__empty-hint">Nenhum servidor informado</p>
+    <li class="oficio-lc__empty-hint">Nenhum servidor informado</li>
     {% endfor %}
-  </div>
+  </ul>
 </div>
 
 <div class="oficio-lc__section">
@@ -102,9 +102,9 @@
     {% if card.trechos %}
     <div class="oficio-lc__transport-card oficio-lc__transport-card--trechos">
       <span class="oficio-lc__transport-label">Trechos encontrados</span>
-      <div class="oficio-lc__trechos-list">
+      <ul class="oficio-lc__trechos-list">
         {% for trecho in card.trechos %}
-        <div class="oficio-lc__trecho">
+        <li class="oficio-lc__trecho">
           <div class="oficio-lc__trecho-rota">{{ trecho.rota }}</div>
           {% if trecho.saida or trecho.chegada %}
           <div class="oficio-lc__trecho-times">
@@ -113,9 +113,9 @@
             {% if trecho.chegada %}{{ trecho.chegada }}{% endif %}
           </div>
           {% endif %}
-        </div>
+        </li>
         {% endfor %}
-      </div>
+      </ul>
     </div>
     {% endif %}
 
@@ -134,8 +134,8 @@
 </div>
 
 <div class="oficio-lc__section oficio-lc__section--justificativas">
-  <div class="oficio-lc__travellers oficio-lc__travellers--n1">
-    <div class="oficio-lc__traveller oficio-lc__traveller--justificativa">
+  <ul class="oficio-lc__travellers oficio-lc__travellers--n1">
+    <li class="oficio-lc__traveller oficio-lc__traveller--justificativa">
       <div class="oficio-lc__traveller-body">
         <div class="oficio-lc__traveller-name-row">
           <span class="oficio-lc__traveller-name">JUSTIFICATIVA</span>
@@ -172,6 +172,6 @@
           {% include "components/ui/menus/rich_menu_link.html" with href=card.justificativa_docx_url title="Baixar DOCX" description="Arquivo editável da justificativa" icon="docx" tone="docx" download=True only %}
         </div>
       </div>
-    </div>
-  </div>
+    </li>
+  </ul>
 </div>

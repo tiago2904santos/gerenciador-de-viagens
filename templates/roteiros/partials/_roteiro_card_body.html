@@ -5,9 +5,9 @@
     <div class="oficio-lc__transport-card oficio-lc__transport-card--trechos oficio-lc__transport-card--span2">
       <span class="oficio-lc__transport-label">Trechos encontrados</span>
       {% if card.trechos %}
-      <div class="oficio-lc__trechos-list">
+      <ul class="oficio-lc__trechos-list">
         {% for trecho in card.trechos %}
-        <div class="oficio-lc__trecho">
+        <li class="oficio-lc__trecho">
           <div class="oficio-lc__trecho-rota">{{ trecho.rota }}</div>
           {% if trecho.saida or trecho.chegada %}
           <div class="oficio-lc__trecho-times">
@@ -16,9 +16,9 @@
             {% if trecho.chegada %}{{ trecho.chegada }}{% endif %}
           </div>
           {% endif %}
-        </div>
+        </li>
         {% endfor %}
-      </div>
+      </ul>
       {% else %}
       <div class="oficio-lc__trecho-rota oficio-lc__text--empty">Nenhum trecho cadastrado</div>
       {% endif %}

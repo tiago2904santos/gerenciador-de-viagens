@@ -551,10 +551,62 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
 ### Etapa 6 — Estrutura HTML
 - [ ] `H-02` `components/page/flow_base.html` + migrar Prestações, Termos, OS, Eventos, Roteiro avulso
 - [ ] `H-05` `components/form/card.html` + migrar 20+ páginas
-- [ ] `H-03` `_docs_attach_kinds_attrs.html` — fim dos ordinais latinos
+- [x] `H-03` fim dos ordinais latinos — **a auditoria catalogava só
+  `_docs_attach_kinds_attrs.html`, e havia um segundo consumidor**: 17 atributos
+  ordinais inline em `_prestacao_card_body.html`, onde o `primary` era o
+  *relatório técnico* enquanto o `primary` da etapa Documentos era o *despacho* —
+  mesmo modal, mesmo nome, documento diferente. O número de documentos era
+  constante em três lugares (os 30 atributos do gatilho, a lista `KINDS` do JS e
+  os 5 botões escritos à mão no modal). Agora `kinds_de_anexo_assinado` em
+  `presenters.py` é o dono do formato, os tipos viajam num payload JSON com chave
+  semântica (`despacho`, `oficio`, `rt`, `diario`, `comprovante`) e o JS monta os
+  botões. `_docs_attach_kinds_attrs.html` (37 linhas) apagado; `KINDS` e
+  `kindPrefix` mortos. Os gatilhos de tipo único (menu do entity card) seguem com
+  atributos planos — ali o botão *é* o documento e nunca houve ordinal.
+  - **`NOVO-18` 🟠 comentário `{# #}` multilinha vazava para o HTML** — achado com
+    Playwright ao conferir este item na tela. `{# #}` é comentário de **uma
+    linha**; aberto numa linha e fechado em outra, o Django devolve o texto
+    verbatim. Havia um caso **vivo em produção**:
+    `templates/oficios/wizard_transporte.html:67`, 6 linhas de comentário
+    aparecendo como texto na etapa Transporte do wizard — introduzido pelo PR #119
+    e invisível para a suíte, porque nenhum teste lia o HTML daquela região.
+    Dentro de uma tag é pior: o navegador vira cada palavra num atributo
+    inventado. Os 4 casos do repositório passaram a `{% comment %}`; gate novo
+    como **erro** (não catraca) e teste que também mede a premissa do Django.
+    Lição: conferência de tela acha o que grep de template e suíte não acham.
 - [ ] `H-04` `form_block.html` com contexto explícito e `only`
-- [ ] `D-41` contrato único de classe no `field.html`
-- [ ] `H-08` semântica (`<nav>`, `<ul>`, `<table>`, `<footer>`)
+- [x] `D-41` contrato único de classe no `field.html` — em vez de só igualar as
+  strings, container e rótulo passaram a ser escritos **uma vez** e o que varia
+  por tipo saiu para `_field_control.html`; o componente foi de 74 para 51 linhas
+  e de 3 contratos para 1. **Divergência da previsão:** eu previa diff visual no
+  tema escuro; medindo com `getComputedStyle`, no escuro o valor resolvido é
+  idêntico antes e depois — o diff real está no **tema claro** (rótulo de texto
+  vai de `rgb(51,76,99)`/700 para `rgb(7,26,51)`/600, igualando o rótulo de
+  select que já estava ao lado, no mesmo painel). Achado latente corrigido junto:
+  o ramo de `select` lia `widget.attrs.class` sem `|default:""`, e sem classe o
+  `{% if %}` engolia o `VariableDoesNotExist` e o `<select>` perdia o rótulo
+  inteiro em silêncio — não alcançável hoje, mas passaria a ser. Verificação:
+  21 páginas renderizadas antes/depois com diff normalizado, **zero mudanças
+  inesperadas**.
+- [x] `H-08` semântica — **o item estava em grande parte obsoleto quando o abri**:
+  `page_stepper.html:2`, `list_tabs.html:6` e `pagination.html:18` já eram
+  `<nav>`, e `card_footer_actions.html:1` já era `<footer>`. A parte de rodapé
+  que a auditoria pede seria **regressão**: os ~30 `<div class="cv-form-card__footer">`
+  são wrapper de layout POR FORA daquele `<footer>`, e trocá-los produziria
+  `<footer>` dentro de `<footer>` (inválido por spec) além de quebrar
+  `oficios/tests/test_views.py:245`, que faz `html.index('<section class="cv-card-footer-section">')`.
+  Registrado por escrito para ninguém "corrigir" isso depois.
+  Feito de fato: as 7 listas de servidores e 6 de trechos viraram `<ul>`/`<li>`
+  em 6 partials de card. Duas coisas que a auditoria não previa: o `{% empty %}`
+  emitia `<p>` como filho direto (inválido em `<ul>`) e **não existia reset de
+  lista** — sem `list-style: none` e `padding-inline-start: 0`, o user agent
+  empurra todo o conteúdo do card 40px para a direita (conferido em print; os
+  bullets não aparecem porque `display: grid` blockifica os `<li>`, então minha
+  previsão do plano acertou o recuo e errou o marcador).
+  `cv-card-grid` ficou **fora**, de propósito: envolver os `<article>` em `<li>`
+  quebraria em silêncio `.cv-card-grid > .prestacao-card-group--*`
+  (`prestacoes_contas.css:717-748`). Vai na Etapa 7 fase 7, que reescreve esse
+  markup.
 - [ ] `H-06` / `H-10` `aria-controls` nos 29 `aria-expanded`; `for`/`id` nos 14 `<label>`
 
 ### Etapa 7 — Reconstrução do CSS
