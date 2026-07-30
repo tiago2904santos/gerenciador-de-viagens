@@ -1,7 +1,7 @@
 {# Rodapé específico da prestação — abrir/assinar despacho + finalizar/arquivar (POST com next=current_url). #}
-<div class="cv-entity-card__footer oficio-lc__footer">
-  <div class="oficio-lc__footer-actions">
-    <div class="oficio-lc__footer-actions-main cv-icon-btn-group">
+<div class="cv-entity-card__footer cv-record-card__footer">
+  <div class="cv-record-card__footer-actions">
+    <div class="cv-record-card__footer-actions-main cv-icon-btn-group">
       {% include "components/ui/buttons/icon_button.html" with href=card.rt_url action="edit" aria_label="Abrir prestação na etapa 1" tooltip="Abrir prestação" only %}
       <button
         type="button"
@@ -23,8 +23,8 @@
       >{% include "components/ui/icons/icon.html" with icon="sign" only %}</button>
     </div>
 
-    <div class="oficio-lc__footer-actions-manage cv-icon-btn-group">
-      <form method="post" action="{{ card.finalizar_url }}" class="oficio-lc__inline-action">
+    <div class="cv-record-card__footer-actions--manage cv-icon-btn-group">
+      <form method="post" action="{{ card.finalizar_url }}" class="cv-record-card__inline-action">
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ current_url }}">
         {% if card.finalizada %}
@@ -34,7 +34,7 @@
         {% endif %}
       </form>
 
-      <form method="post" action="{{ card.arquivar_url }}" class="oficio-lc__inline-action">
+      <form method="post" action="{{ card.arquivar_url }}" class="cv-record-card__inline-action">
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ current_url }}">
         {% if card.arquivada %}

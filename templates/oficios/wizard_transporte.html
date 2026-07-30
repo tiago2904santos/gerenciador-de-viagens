@@ -8,72 +8,7 @@
     data-oficio-motorista-mod-inicial="{{ form.motorista_modo.value|default:'SERVIDOR' }}"
     data-equipe-servidor-ids="{{ equipe_servidor_ids_csv }}"
   >
-    <section class="cv-form-section-card oficio-transporte-card oficio-motorista-card" aria-labelledby="oficio-motorista-title">
-      <header class="cv-form-section-header oficio-equipe-section__header">
-        <div class="cv-form-section-header__copy oficio-equipe-section__copy">
-          <h3 class="cv-form-section-title" id="oficio-motorista-title">Motorista</h3>
-          <p>Escolha um servidor cadastrado ou use o modo manual quando o motorista for externo à equipe.</p>
-        </div>
-        <div class="cv-form-section-header__actions oficio-transporte-card__header-actions oficio-transporte-card__header-actions--split">
-          {% include "components/ui/buttons/button.html" with href=servidor_create_url label="Adicionar servidor" variant="secondary" data_autosave_link=True only %}
-          <button type="button" class="cv-btn cv-btn--secondary" data-oficio-motorista-toggle>
-            {% if form.motorista_modo.value == "MANUAL" %}Usar motorista cadastrado{% else %}Usar motorista manual{% endif %}
-          </button>
-        </div>
-      </header>
-      <div class="cv-form-section-body">
-      {{ form.motorista_modo }}
-      <div class="oficio-motorista-servidor" data-oficio-motorista-servidor>
-        <div class="form-grid app-form-grid">
-          <div class="field-span-12">
-            {% include "components/ui/forms/field.html" with field=form.motorista label="MOTORISTA SERVIDOR" help_text="Busque e selecione um servidor; você pode trocar a qualquer momento." only %}
-          </div>
-        </div>
-      </div>
-      <div class="oficio-motorista-manual app-form-grid-panel oficio-data-block form-field--hidden" data-oficio-motorista-manual>
-        <div class="oficio-data-grid oficio-data-grid--full">
-          <div class="oficio-data-grid__field">
-            {% include "components/ui/forms/field.html" with field=form.motorista_manual_nome label="NOME DO MOTORISTA" only %}
-          </div>
-        </div>
-      </div>
-      <div class="oficio-motorista-helpers" data-oficio-motorista-helpers>
-        <p class="field-help form-field--hidden" data-oficio-motorista-helper-in>
-          Motorista selecionado faz parte da equipe do ofício.
-        </p>
-        <p class="field-help form-field--hidden" data-oficio-motorista-helper-out>
-          Motorista fora da equipe do ofício. Informe o ofício e o protocolo do motorista.
-        </p>
-        <p class="field-help form-field--hidden" data-oficio-motorista-helper-manual>
-          Motorista informado manualmente. Informe também o ofício e o protocolo do motorista.
-        </p>
-      </div>
-      <div
-        class="app-form-grid-panel oficio-data-block oficio-motorista-extras{% if not motorista_extras_visivel %} form-field--hidden{% endif %}"
-        data-oficio-motorista-extras
-        {% if not motorista_extras_visivel %}aria-hidden="true"{% else %}aria-hidden="false"{% endif %}
-      >
-        <div class="oficio-data-grid oficio-data-grid--two">
-          <div class="oficio-data-grid__field">
-            {% include "components/ui/forms/document_number_field.html" with field=form.motorista_oficio_referencia label="Nº OFÍCIO MOTORISTA" ano=motorista_oficio_ano numero_inicial=motorista_oficio_numero_inicial only %}
-          </div>
-          <div class="oficio-data-grid__field">
-            {% include "components/ui/forms/field.html" with field=form.motorista_protocolo_ref label="PROTOCOLO DO MOTORISTA" only %}
-          </div>
-        </div>
-      </div>
-      </div>
-
-      {% comment %} Era a unica etapa sem rodape: dependia do stepper e do autosave para o
-         usuario sair dela. A view ja tratava `wizard_back`/`wizard_next`, entao
-         faltava so oferecer os botoes — iguais aos das etapas 2 e 4.
-         (A etapa 2 parecia estar sem tambem, mas os botoes dela vem de um
-         include aninhado no editor de roteiro; medir na tela renderizada, e nao
-         no grep do template, foi o que mostrou isso.) {% endcomment %}
-      <div class="cv-form-card__footer">
-        {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar" secondary_action="wizard_back" primary_label="Avançar" primary_action="wizard_next" only %}
-      </div>
-    </section>
+    {% include "components/form/card.html" with title="Motorista" description="Escolha um servidor cadastrado ou use o modo manual quando o motorista for externo à equipe." title_id="oficio-motorista-title" extra_class="oficio-transporte-card oficio-motorista-card" header_extra_class="oficio-equipe-section__header" copy_extra_class="oficio-equipe-section__copy" actions_template="oficios/partials/_transporte_header_actions.html" actions_extra_class="oficio-transporte-card__header-actions oficio-transporte-card__header-actions--split" body_template="oficios/partials/_transporte_body.html" footer_template="oficios/partials/_transporte_footer.html" %}
   </div>
 {% endblock %}
 

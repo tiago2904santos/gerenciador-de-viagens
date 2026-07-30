@@ -1,42 +1,4 @@
 {# Visualizador inline de PDF — espelha o padrão da etapa de Documentos do ofício. #}
 {# Parâmetros: preview_anchor, preview_title, preview_subtitle, preview_doc_title, #}
 {#             preview_inline_url e, opcionalmente, preview_pdf_url / preview_docx_url / preview_xlsx_url. #}
-<section class="cv-form-section-card document-inline-stack" aria-labelledby="{{ preview_anchor }}-title">
-  <header class="cv-form-section-header">
-    <div class="cv-form-section-header__copy">
-      <h2 class="cv-form-section-title" id="{{ preview_anchor }}-title">{{ preview_title|default:"Pré-visualização do documento" }}</h2>
-      <p class="cv-form-section-subtitle">{{ preview_subtitle|default:"Confira o documento gerado antes de baixar." }}</p>
-    </div>
-  </header>
-  <div class="cv-form-section-body">
-    <details class="document-inline-card document-inline-card--lazy" data-lazy-inline>
-      <summary class="document-inline-card__header">
-        <span class="document-inline-card__title">{{ preview_doc_title|default:"Documento" }}</span>
-        <span class="document-inline-card__header-end">
-          <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do documento">
-            {% include "components/ui/buttons/icon_button.html" with href=preview_inline_url action="preview" aria_label="Abrir em nova aba" tooltip="Abrir em nova aba" only %}
-            {% if preview_pdf_url %}
-              {% include "components/ui/buttons/icon_button.html" with href=preview_pdf_url action="pdf" aria_label="Baixar PDF" tooltip="Baixar PDF" only %}
-            {% endif %}
-            {% if preview_docx_url %}
-              {% include "components/ui/buttons/icon_button.html" with href=preview_docx_url action="docx" aria_label="Baixar DOCX" tooltip="Baixar DOCX" only %}
-            {% endif %}
-            {% if preview_xlsx_url %}
-              {% include "components/ui/buttons/icon_button.html" with href=preview_xlsx_url action="download" aria_label="Baixar XLSX" tooltip="Baixar XLSX" only %}
-            {% endif %}
-          </span>
-        </span>
-      </summary>
-      <div class="document-inline-card__body">
-        <div class="document-inline-viewer">
-          <iframe
-            class="document-inline-viewer__frame"
-            data-src="{{ preview_inline_url }}"
-            title="{{ preview_doc_title|default:'Documento' }}"
-            loading="lazy"
-          ></iframe>
-        </div>
-      </div>
-    </details>
-  </div>
-</section>
+{% include "components/form/card.html" with title=preview_title|default:"Pré-visualização do documento" description=preview_subtitle|default:"Confira o documento gerado antes de baixar." title_id=preview_anchor|add:"-title" heading_level=2 extra_class="document-inline-stack" body_template="prestacoes_contas/partials/_documento_preview_body.html" %}

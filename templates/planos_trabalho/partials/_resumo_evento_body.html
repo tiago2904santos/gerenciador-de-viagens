@@ -1,0 +1,75 @@
+<div class="cv-summary-card__body pt-resumo-evento">
+
+  {# ── Linha 1: identificação (4 colunas) ───────────────────── #}
+  <div class="cv-summary-grid cv-summary-grid--4 pt-resumo-grid pt-resumo-grid--4">
+    <div class="pt-resumo-box">
+      <span class="pt-resumo-box__label">Número do plano</span>
+      <span class="pt-resumo-box__value">{{ numero }}</span>
+    </div>
+    <div class="pt-resumo-box">
+      <span class="pt-resumo-box__label">Destino</span>
+      <span class="pt-resumo-box__value">{{ ev.destino }}</span>
+    </div>
+    <div class="pt-resumo-box">
+      <span class="pt-resumo-box__label">Data do evento</span>
+      <span class="pt-resumo-box__value">{{ ev.data_evento_extenso|upper }}</span>
+    </div>
+    <div class="pt-resumo-box">
+      <span class="pt-resumo-box__label">Horário de atendimento</span>
+      <span class="pt-resumo-box__value">{{ ev.horario }}</span>
+    </div>
+  </div>
+
+  {# ── Linha 2: solicitante + coordenação ───────────────────── #}
+  <div class="cv-summary-grid {% if ev.coordenador_op_presente %}cv-summary-grid--3 pt-resumo-grid--3{% else %}cv-summary-grid--2 pt-resumo-grid--2{% endif %} pt-resumo-grid">
+    <div class="pt-resumo-box">
+      <span class="pt-resumo-box__label">Solicitante</span>
+      <span class="pt-resumo-box__value">{{ ev.programa }}</span>
+    </div>
+    <div class="pt-resumo-box">
+      <span class="pt-resumo-box__label">Coordenador administrativo</span>
+      <span class="pt-resumo-box__value">{{ coordenador_adm_nome }}{% if coordenador_adm_cargo %} <span class="pt-resumo-soft">· {{ coordenador_adm_cargo }}</span>{% endif %}</span>
+    </div>
+    {% if ev.coordenador_op_presente %}
+      <div class="pt-resumo-box">
+        <span class="pt-resumo-box__label">Coordenador operacional</span>
+        <span class="pt-resumo-box__value">{{ ev.coordenador_op }}{% if ev.coordenador_op_cargo %} <span class="pt-resumo-soft">· {{ ev.coordenador_op_cargo }}</span>{% endif %}</span>
+      </div>
+    {% endif %}
+  </div>
+
+  {# ── Linha 3: efetivo · valor/diárias · atividades (3 colunas) #}
+  <div class="cv-summary-grid cv-summary-grid--3 pt-resumo-grid3">
+    <div class="pt-resumo-box pt-resumo-efetivo">
+      <span class="pt-resumo-box__label">Efetivo{% if ev.efetivo_total %} ({{ ev.efetivo_total }} servidor{{ ev.efetivo_total|pluralize:"es" }}){% endif %}</span>
+      <div class="pt-resumo-list">
+        {% for it in ev.efetivo_itens %}
+          <span class="pt-resumo-list__item">
+            <span class="pt-resumo-list__qty">{{ it.quantidade }}</span>
+            <span class="pt-resumo-list__text">{{ it.cargo }}{% if it.unidade %} <span class="pt-resumo-soft">· {{ it.unidade }}</span>{% endif %}</span>
+          </span>
+        {% empty %}
+          <span class="pt-resumo-atividades__empty">Nenhum efetivo informado.</span>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="pt-resumo-box pt-resumo-valor">
+      <span class="pt-resumo-box__label pt-resumo-box__label--accent">Valor total</span>
+      <span class="pt-resumo-valor__amount">{{ ev.valor_total_display }}</span>
+      <span class="pt-resumo-box__label pt-resumo-box__label--accent">Quantidade de diárias</span>
+      <span class="pt-resumo-box__value pt-resumo-box__value--lg">{{ ev.diarias_composicao }}</span>
+    </div>
+
+    <div class="pt-resumo-box pt-resumo-atividades">
+      <span class="pt-resumo-box__label">Atividades{% if ev.atividades_count %} ({{ ev.atividades_count }}){% endif %}</span>
+      <div class="pt-resumo-atividades__list">
+        {% for nome in ev.atividades %}
+          <span class="pt-resumo-atividades__item">{{ nome }}</span>
+        {% empty %}
+          <span class="pt-resumo-atividades__empty">Nenhuma atividade selecionada.</span>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>

@@ -1083,7 +1083,7 @@ html[data-theme="dark"] .ui-lab-page {
   }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 720px) {
   .cv-field-grid--2,
   .cv-field-grid--3,
   .cv-field-grid--4 {

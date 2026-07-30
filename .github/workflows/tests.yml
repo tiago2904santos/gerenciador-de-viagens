@@ -59,7 +59,8 @@ jobs:
 
       - name: Block new frontend standards debt
         # Catraca: este número só desce. A Etapa 1 levou 465 → 449; a Etapa 7
-        # levou 449 → 438 na fase 2 e 438 → 417 na fase 1.
+        # levou 449 → 438 na fase 2, 438 → 417 na fase 1 e 417 → 401 no
+        # fechamento da Etapa 6 HTML + fases 3-14 da Etapa 7.
         # H-06/H-10 nascem já em zero: os 29 `aria-expanded` sem `aria-controls`
         # e os 14 `<label>` sem `for` do catálogo foram fechados na Etapa 6, e a
         # catraca existe para não voltarem. Quatro componentes de gatilho+painel
@@ -68,7 +69,7 @@ jobs:
         # core/tests/test_acessibilidade_contrato.py, não pela isenção.
         run: >-
           python scripts/audit_frontend_standards.py
-          --max-warnings 417
+          --max-warnings 401
           --max-aria-expanded-sem-controls 0
           --max-label-sem-for 0
 

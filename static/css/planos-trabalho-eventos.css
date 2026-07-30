@@ -187,7 +187,7 @@
   color: var(--color-warning-strong, #b45309);
 }
 
-@media (max-width: 540px) {
+@media (max-width: 520px) {
   .pte-card__info { grid-template-columns: 1fr; }
 }
 
@@ -449,7 +449,7 @@
   .pt-resumo-valor__amount { white-space: normal; }
 }
 
-@media (max-width: 560px) {
+@media (max-width: 600px) {
   .pt-resumo-grid--4,
   .pt-resumo-grid--3,
   .pt-resumo-grid--2 { grid-template-columns: 1fr; }
@@ -508,7 +508,7 @@
   flex: 0 0 auto;
 }
 
-@media (max-width: 560px) {
+@media (max-width: 600px) {
   .pt-add-evento__inner { grid-template-columns: 1fr; }
   .pt-add-evento__btn { width: 100%; }
 }
@@ -531,7 +531,7 @@
   display: contents;
 }
 
-@media (max-width: 700px) {
+@media (max-width: 720px) {
   .cv-form-subsection.pt-evento-periodo--inline {
     grid-template-columns: 1fr;
   }
@@ -598,7 +598,7 @@
 .pt-diarias-linha > .cv-date-picker.pt-diarias-linha__dates > .field-grid--cols-2 > .cv-field:last-child { order: 3; }
 .pt-diarias-linha > .field.pt-diarias-hora-chegada { order: 4; }
 
-@media (max-width: 860px) {
+@media (max-width: 840px) {
   .cv-form-subsection.pt-diarias-linha {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -612,19 +612,19 @@
 
 /* Resultado do cálculo: cards com o mesmo fundo dos inputs e valores com
    tamanho fluido (relativo à largura do card) para não quebrar linha. */
-#pt-card-diarias .oficio-lc__transport-card {
+#pt-card-diarias .cv-fact-block {
   background: var(--cv-field-bg);
   border: 0;
   padding: var(--space-3) var(--space-4);
 }
 
-#pt-card-diarias .oficio-lc__transport-placa {
+#pt-card-diarias .cv-fact-block__value {
   font-size: clamp(0.9rem, 8cqi, 1.6rem);
   overflow: visible;
   text-overflow: clip;
 }
 
-#pt-card-diarias .oficio-lc__valor-total {
+#pt-card-diarias .cv-fact-block__value--strong {
   font-size: clamp(1.1rem, 13cqi, 2.4rem);
   letter-spacing: -0.01em;
   white-space: nowrap;
@@ -696,7 +696,7 @@
   width: 42px;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 720px) {
   .cv-ordered-field-row__fields.pt-efetivo-fields,
 :is(html[data-theme="dark"])
     :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1])

@@ -41,6 +41,7 @@ from .models import Roteiro
 from .presenters import (
     apresentar_contexto_formulario_roteiro_avulso,
     apresentar_linha_lista_simples_roteiro,
+    apresentar_roteiro_card,
 )
 from .selectors import (
     get_roteiro_by_id,
@@ -148,15 +149,15 @@ def index(request):
     paginator = Paginator(lista, ROTEIROS_PER_PAGE)
     page_obj = paginator.get_page(request.GET.get("page"))
     next_url = request.get_full_path()
-    rows = [
-        apresentar_linha_lista_simples_roteiro(
-            roteiro,
-            edit_url=f"{reverse('roteiros:editar', args=[roteiro.pk])}?{urlencode({'next': next_url})}",
-            delete_url=reverse("roteiros:excluir", args=[roteiro.pk]),
-            delete_modal=True,
-        )
-        for roteiro in page_obj.object_list
-    ]
+    cards = []
+    for roteiro in page_obj.object_list:
+        card = apresentar_roteiro_card(roteiro)
+        card["footer"]["edit_url"] = f"{reverse('roteiros:editar', args=[roteiro.pk])}?{urlencode({'next': next_url})}"
+        card["footer"]["delete_modal_url"] = reverse("roteiros:excluir", args=[roteiro.pk])
+        card["footer"]["delete_modal_label"] = card["title"]
+        card["footer"]["delete_modal_title"] = "Excluir roteiro?"
+        card["footer"]["delete_url"] = None
+        cards.append(card)
     return render(
         request,
         "roteiros/index.html",
@@ -166,7 +167,7 @@ def index(request):
             "create_url": reverse("roteiros:novo"),
             "search_clear_url": f"{reverse('roteiros:index')}?aba={aba}",
             "empty_message": "Nenhum roteiro cadastrado ainda.",
-            "rows": rows,
+            "cards": cards,
             "q": q,
             "aba": aba,
             "abas": abas,

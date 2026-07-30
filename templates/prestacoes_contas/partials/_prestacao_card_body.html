@@ -1,11 +1,11 @@
 {# Miolo do card de prestação — servidores (solicitação/saque/docs/WhatsApp) + transporte/roteiro. #}
-<div class="oficio-lc__section">
-  <ul class="oficio-lc__travellers oficio-lc__travellers--n1">
+<div class="cv-record-card__band">
+  <ul class="cv-person-list cv-person-list--n1">
     {% for servidor in card.servidores %}
-    <li class="oficio-lc__traveller oficio-lc__traveller--prestacao{% if servidor.is_motorista %} oficio-lc__traveller--motorista{% endif %}">
+    <li class="cv-person-row cv-person-row--prestacao{% if servidor.is_motorista %} cv-person-row--highlight{% endif %}">
       <form method="post"
             action="{% url 'prestacoes_contas:index' %}"
-            class="oficio-lc__solicitacao-form oficio-lc__solicitacao-form--inline"
+            class="cv-record-card__inline-form cv-record-card__inline-form--inline"
             novalidate
             data-autosave="true"
             data-autosave-model="prestacao_servidor"
@@ -16,7 +16,7 @@
         <input type="hidden" name="action" value="save_solicitacoes">
         <input type="text"
                name="ps-{{ servidor.ps_pk }}-numero_solicitacao"
-               class="form-control cv-field__control oficio-lc__solicitacao-input"
+               class="form-control cv-field__control cv-record-card__inline-input"
                placeholder="Solicitação"
                aria-label="Número da solicitação de {{ servidor.name }}"
                autocomplete="off"
@@ -24,41 +24,42 @@
                value="{{ servidor.numero_solicitacao }}">
         {% with ps_id=servidor.ps_pk|stringformat:"s" %}
           {% with liberacao_name="ps-"|add:ps_id|add:"-data_liberacao_diarias" liberacao_hidden_id="id_ps_"|add:ps_id|add:"_data_liberacao_diarias" prazo_name="ps-"|add:ps_id|add:"-prazo_limite_saque" prazo_hidden_id="id_ps_"|add:ps_id|add:"_prazo_limite_saque" range_picker_id="id_ps_"|add:ps_id|add:"_periodo_saque" %}
-            {% include "components/ui/forms/date_picker.html" with mode="range" control_variant="filter-pill" compact_range_display=True picker_id=range_picker_id extra_class="travel-period-filter oficio-lc__saque-range-picker" trigger_label="Liberação → saque" trigger_aria_label="Selecionar data de liberação e prazo para saque de "|add:servidor.name start_hidden_id=liberacao_hidden_id end_hidden_id=prazo_hidden_id start_hidden_name=liberacao_name end_hidden_name=prazo_name start_hidden_value=servidor.data_liberacao_diarias end_hidden_value=servidor.prazo_limite_saque initial_date=servidor.data_liberacao_diarias show_summary=False only %}
+            {% include "components/ui/forms/date_picker.html" with mode="range" control_variant="filter-pill" compact_range_display=True picker_id=range_picker_id extra_class="travel-period-filter cv-record-card__inline-range" trigger_label="Liberação → saque" trigger_aria_label="Selecionar data de liberação e prazo para saque de "|add:servidor.name start_hidden_id=liberacao_hidden_id end_hidden_id=prazo_hidden_id start_hidden_name=liberacao_name end_hidden_name=prazo_name start_hidden_value=servidor.data_liberacao_diarias end_hidden_value=servidor.prazo_limite_saque initial_date=servidor.data_liberacao_diarias show_summary=False only %}
           {% endwith %}
         {% endwith %}
       </form>
 
-      <div class="oficio-lc__traveller-body">
-        <div class="oficio-lc__traveller-name-row">
-          <span class="oficio-lc__traveller-name">{{ servidor.name }}</span>
+      <div class="cv-person-row__body">
+        <div class="cv-person-row__name-row">
+          <span class="cv-person-row__name">{{ servidor.name }}</span>
           {% if servidor.is_motorista %}
-          <span class="oficio-lc__traveller-badge">Motorista</span>
+          <span class="cv-person-row__badge">Motorista</span>
           {% endif %}
           {% if servidor.comprovante_ok %}
-          <span class="oficio-lc__traveller-badge oficio-lc__traveller-badge--ok" title="Comprovante de saque anexado">✓ Comprovante</span>
+          <span class="cv-person-row__badge cv-person-row__badge--ok" title="Comprovante de saque anexado">✓ Comprovante</span>
           {% endif %}
         </div>
         {% if servidor.cargo or servidor.unidade %}
-        <span class="oficio-lc__traveller-meta">{% if servidor.cargo %}{{ servidor.cargo }}{% endif %}{% if servidor.cargo and servidor.unidade %} · {% endif %}{% if servidor.unidade %}{{ servidor.unidade }}{% endif %}</span>
+        <span class="cv-person-row__meta">{% if servidor.cargo %}{{ servidor.cargo }}{% endif %}{% if servidor.cargo and servidor.unidade %} · {% endif %}{% if servidor.unidade %}{{ servidor.unidade }}{% endif %}</span>
         {% endif %}
       </div>
 
       <button type="button"
-              class="cv-icon-btn oficio-lc__document-menu-trigger"
+              class="cv-icon-btn cv-icon-btn--documents"
               aria-label="Abrir opções de documentos de {{ servidor.name }}"
               data-tooltip="Baixar documentos"
               aria-haspopup="true"
               aria-expanded="false"
+              aria-controls="prestacao-docs-menu-{{ servidor.ps_pk }}"
               data-overlay-trigger data-overlay-kind="menu"
               aria-controls="prestacao-docs-menu-{{ servidor.ps_pk }}" data-overlay-target="prestacao-docs-menu-{{ servidor.ps_pk }}"
       >{% include "components/ui/icons/icon.html" with icon="folder" only %}</button>
-      <div class="cv-action-menu oficio-lc__action-menu oficio-lc__document-menu"
+      <div class="cv-action-menu cv-action-menu--documents"
            id="prestacao-docs-menu-{{ servidor.ps_pk }}"
            role="menu"
            hidden>
-        <div class="oficio-lc__action-menu-heading">
-          <span class="oficio-lc__action-menu-heading-icon">
+        <div class="cv-action-menu__heading">
+          <span class="cv-action-menu__heading-icon">
             {% include "components/ui/icons/icon.html" with icon="download" only %}
           </span>
           <span>
@@ -66,30 +67,30 @@
             <small>{{ servidor.name }}</small>
           </span>
         </div>
-        <a class="cv-action-menu__item oficio-lc__action-menu-item"
+        <a class="cv-action-menu__item cv-action-menu__item"
            href="{{ servidor.rt_download_url }}"
            download
            role="menuitem">
-          <span class="oficio-lc__action-menu-item-icon oficio-lc__action-menu-item-icon--pdf">
+          <span class="cv-action-menu__item-icon cv-action-menu__item-icon--pdf">
             {% include "components/ui/icons/icon.html" with icon="pdf" only %}
           </span>
           <span><strong>Relatório técnico</strong><small>Salvar PDF individual</small></span>
         </a>
         {% if servidor.diario_pdf_url %}
-        <a class="cv-action-menu__item oficio-lc__action-menu-item"
+        <a class="cv-action-menu__item cv-action-menu__item"
            href="{{ servidor.diario_pdf_url }}"
            download
            role="menuitem">
-          <span class="oficio-lc__action-menu-item-icon oficio-lc__action-menu-item-icon--route">
+          <span class="cv-action-menu__item-icon cv-action-menu__item-icon--route">
             {% include "components/ui/icons/icon.html" with icon="route" only %}
           </span>
           <span><strong>Diário de bordo</strong><small>Salvar PDF do diário</small></span>
         </a>
         {% else %}
-        <span class="cv-action-menu__item oficio-lc__action-menu-item is-disabled"
+        <span class="cv-action-menu__item cv-action-menu__item is-disabled"
               role="menuitem"
               aria-disabled="true">
-          <span class="oficio-lc__action-menu-item-icon oficio-lc__action-menu-item-icon--route">
+          <span class="cv-action-menu__item-icon cv-action-menu__item-icon--route">
             {% include "components/ui/icons/icon.html" with icon="route" only %}
           </span>
           <span><strong>Diário de bordo</strong><small>Ainda não foi criado</small></span>
@@ -103,7 +104,7 @@
         {% endcomment %}
         <button
           type="button"
-          class="cv-action-menu__item oficio-lc__action-menu-item{% if servidor.rt_assinado.assinado or servidor.diario_assinado.assinado or servidor.comprovante_anexo.assinado %} is-assinado{% endif %}"
+          class="cv-action-menu__item cv-action-menu__item{% if servidor.rt_assinado.assinado or servidor.diario_assinado.assinado or servidor.comprovante_anexo.assinado %} is-assinado{% endif %}"
           role="menuitem"
           data-attach-signed-trigger
           data-attach-signed-reopen-key="prestacao-servidor-{{ servidor.ps_pk }}"
@@ -114,7 +115,7 @@
           data-attach-signed-upload-label="Anexar arquivo"
           data-attach-signed-kinds="{{ card.attach_kinds_json }}"
         >
-          <span class="oficio-lc__action-menu-item-icon cv-action-menu__item-icon--success" aria-hidden="true">
+          <span class="cv-action-menu__item-icon cv-action-menu__item-icon--success" aria-hidden="true">
             {% include "components/ui/icons/icon.html" with icon="sign" only %}
           </span>
           <span>
@@ -122,22 +123,23 @@
             <small>RT, diário ou comprovante</small>
           </span>
         </button>
-        <a class="cv-action-menu__item oficio-lc__action-menu-item"
+        <a class="cv-action-menu__item cv-action-menu__item"
            href="{{ servidor.pacote_url }}"
            download
            role="menuitem">
-          <span class="oficio-lc__action-menu-item-icon oficio-lc__action-menu-item-icon--package">
+          <span class="cv-action-menu__item-icon cv-action-menu__item-icon--package">
             {% include "components/ui/icons/icon.html" with icon="folder" only %}
           </span>
           <span><strong>Anexo completo</strong><small>Salvar PDF consolidado</small></span>
         </a>
       </div>
       <button type="button"
-              class="cv-icon-btn oficio-lc__wa-trigger"
+              class="cv-icon-btn cv-icon-btn--whatsapp"
               aria-label="Enviar aviso de liberação de diárias por WhatsApp"
               data-tooltip="Enviar aviso de liberação (WhatsApp)"
               aria-haspopup="true"
               aria-expanded="false"
+              aria-controls="diaria-wa-menu-{{ servidor.ps_pk }}"
               data-overlay-trigger data-overlay-kind="menu"
               aria-controls="diaria-wa-menu-{{ servidor.ps_pk }}" data-overlay-target="diaria-wa-menu-{{ servidor.ps_pk }}"
               data-wa-phone="{{ servidor.whatsapp_phone }}"
@@ -147,9 +149,9 @@
               data-wa-servidor="{{ servidor.name }}"
               data-wa-diaria="{{ servidor.whatsapp_diaria }}"
       >{% include "components/ui/icons/icon.html" with icon="whatsapp-modern" only %}</button>
-      <div class="cv-action-menu oficio-lc__action-menu oficio-lc__wa-menu" id="diaria-wa-menu-{{ servidor.ps_pk }}" role="menu" hidden>
-        <div class="oficio-lc__action-menu-heading">
-          <span class="oficio-lc__action-menu-heading-icon oficio-lc__action-menu-heading-icon--wa">
+      <div class="cv-action-menu cv-action-menu--whatsapp" id="diaria-wa-menu-{{ servidor.ps_pk }}" role="menu" hidden>
+        <div class="cv-action-menu__heading">
+          <span class="cv-action-menu__heading-icon cv-action-menu__heading-icon--wa">
             {% include "components/ui/icons/icon.html" with icon="whatsapp-modern" only %}
           </span>
           <span>
@@ -157,20 +159,20 @@
             <small>Escolha como enviar</small>
           </span>
         </div>
-        <button type="button" class="cv-action-menu__item oficio-lc__action-menu-item oficio-lc__action-menu-item--wa" role="menuitem" data-diaria-wa-send data-wa-app="normal">
-          <span class="oficio-lc__action-menu-item-icon oficio-lc__action-menu-item-icon--wa">
+        <button type="button" class="cv-action-menu__item cv-action-menu__item cv-action-menu__item--wa" role="menuitem" data-diaria-wa-send data-wa-app="normal">
+          <span class="cv-action-menu__item-icon cv-action-menu__item-icon--wa">
             {% include "components/ui/icons/icon.html" with icon="whatsapp-modern" only %}
           </span>
           <span><strong>WhatsApp</strong><small>Abrir no aplicativo pessoal</small></span>
         </button>
-        <button type="button" class="cv-action-menu__item oficio-lc__action-menu-item oficio-lc__action-menu-item--wa" role="menuitem" data-diaria-wa-send data-wa-app="business">
-          <span class="oficio-lc__action-menu-item-icon oficio-lc__action-menu-item-icon--business">
+        <button type="button" class="cv-action-menu__item cv-action-menu__item cv-action-menu__item--wa" role="menuitem" data-diaria-wa-send data-wa-app="business">
+          <span class="cv-action-menu__item-icon cv-action-menu__item-icon--business">
             {% include "components/ui/icons/icon.html" with icon="whatsapp-business" only %}
           </span>
           <span><strong>WhatsApp Business</strong><small>Abrir no aplicativo profissional</small></span>
         </button>
-        <button type="button" class="cv-action-menu__item oficio-lc__action-menu-item" role="menuitem" data-diaria-wa-copy>
-          <span class="oficio-lc__action-menu-item-icon oficio-lc__action-menu-item-icon--copy">
+        <button type="button" class="cv-action-menu__item cv-action-menu__item" role="menuitem" data-diaria-wa-copy>
+          <span class="cv-action-menu__item-icon cv-action-menu__item-icon--copy">
             {% include "components/ui/icons/icon.html" with icon="copy-modern" only %}
           </span>
           <span><strong>Copiar mensagem</strong><small>Copiar o texto para a área de transferência</small></span>
@@ -181,31 +183,31 @@
   </ul>
 </div>
 
-<div class="oficio-lc__section">
-  <div class="oficio-lc__transport-row">
+<div class="cv-record-card__band">
+  <div class="cv-fact-grid">
 
-    <div class="oficio-lc__transport-card">
-      <span class="oficio-lc__transport-label">Placa</span>
+    <div class="cv-fact-block">
+      <span class="cv-fact-block__label">Placa</span>
       {% if card.veiculo_placa %}
-        <div class="oficio-lc__transport-placa">{{ card.veiculo_placa }}</div>
+        <div class="cv-fact-block__value">{{ card.veiculo_placa }}</div>
       {% else %}
-        <div class="oficio-lc__transport-placa oficio-lc__text--empty">Não informado</div>
+        <div class="cv-fact-block__value cv-empty-hint">Não informado</div>
       {% endif %}
       {% if card.veiculo_modelo %}
-        <span class="oficio-lc__transport-label">Modelo</span>
-        <div class="oficio-lc__transport-modelo">{{ card.veiculo_modelo }}</div>
+        <span class="cv-fact-block__label">Modelo</span>
+        <div class="cv-fact-block__value--secondary">{{ card.veiculo_modelo }}</div>
       {% endif %}
     </div>
 
     {% if card.trechos %}
-    <div class="oficio-lc__transport-card oficio-lc__transport-card--trechos">
-      <span class="oficio-lc__transport-label">Trechos encontrados</span>
-      <ul class="oficio-lc__trechos-list">
+    <div class="cv-fact-block cv-fact-block--trechos">
+      <span class="cv-fact-block__label">Trechos encontrados</span>
+      <ul class="cv-itinerary">
         {% for trecho in card.trechos %}
-        <li class="oficio-lc__trecho">
-          <div class="oficio-lc__trecho-rota">{{ trecho.rota }}</div>
+        <li class="cv-itinerary__leg">
+          <div class="cv-itinerary__route">{{ trecho.rota }}</div>
           {% if trecho.saida or trecho.chegada %}
-          <div class="oficio-lc__trecho-times">
+          <div class="cv-itinerary__time">
             {% if trecho.saida %}{{ trecho.saida }}{% endif %}
             {% if trecho.saida and trecho.chegada %} → {% endif %}
             {% if trecho.chegada %}{{ trecho.chegada }}{% endif %}
@@ -218,12 +220,12 @@
     {% endif %}
 
     {% if card.valor_diarias_display %}
-    <div class="oficio-lc__transport-card oficio-lc__transport-card--valor">
-      <span class="oficio-lc__transport-label">Valor Total</span>
-      <div class="oficio-lc__valor-total">{{ card.valor_diarias_display }}</div>
+    <div class="cv-fact-block cv-fact-block--valor">
+      <span class="cv-fact-block__label">Valor Total</span>
+      <div class="cv-fact-block__value--strong">{{ card.valor_diarias_display }}</div>
       {% if card.valor_diarias_extenso %}
-      <span class="oficio-lc__transport-label">Valor por Extenso</span>
-      <div class="oficio-lc__valor-extenso">{{ card.valor_diarias_extenso }}</div>
+      <span class="cv-fact-block__label">Valor por Extenso</span>
+      <div class="cv-fact-block__value--long">{{ card.valor_diarias_extenso }}</div>
       {% endif %}
     </div>
     {% endif %}

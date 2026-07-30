@@ -1,5 +1,5 @@
 {# Lista Standard oficial, promovida do modelo aprovado no UI Lab. #}
-<div class="page-shell page-shell--list" data-collection data-collection-mode="server">
+<div class="page-shell cv-page page-shell--list cv-page--collection" data-collection data-collection-mode="server">
   {% include "components/ui/headers/filter_page_header.html" with eyebrow=eyebrow title=title icon_label=brand_mark form_action=request.path search_name="q" search_value=q search_placeholder=search_placeholder search_clear_url=search_clear_url|default:request.path status_options=status_options status_value=status_value current_aba=current_aba next_url=next_url %}
 
   {% if abas %}

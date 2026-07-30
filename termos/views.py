@@ -32,6 +32,7 @@ from oficios.services import validar_oficio_para_documento
 from .forms import TermoAutorizacaoForm
 from .models import TermoAutorizacao
 from .presenters import apresentar_linha_lista_simples_termo
+from .presenters import apresentar_termo_card
 from .selectors import get_servidor_do_termo_do_oficio
 from .selectors import get_servidor_para_termo
 from .selectors import get_termo_by_id
@@ -55,8 +56,8 @@ def index(request):
     termos = listar_termos(q=q or None, q_digits=q_digits or None)
     paginator = Paginator(termos, TERMOS_PER_PAGE)
     page_obj = paginator.get_page(request.GET.get("page"))
-    rows = [
-        apresentar_linha_lista_simples_termo(
+    cards = [
+        apresentar_termo_card(
             termo,
             edit_url=reverse("termos:editar", args=[termo.pk]),
             delete_url=reverse("termos:excluir", args=[termo.pk]),
@@ -73,7 +74,7 @@ def index(request):
         {
             "page_title": "Termos de Autorização",
             "page_description": "Cadastre termos avulsos ou vinculados a ofícios existentes.",
-            "rows": rows,
+            "cards": cards,
             "q": q,
             "page_obj": page_obj,
             "pagination_pages": _pagination_pages(page_obj),
@@ -350,12 +351,20 @@ def _form_context(*, request, form, termo=None, evento=None):
         summary = _oficio_summary(oficio)
         summary["order"] = index
         summaries[str(summary["id"])] = summary
+    index_url = _termo_lista_url(termo=termo, evento=evento)
+    back_label = _termo_back_label(termo=termo, evento=evento)
     return {
         "page_title": "Cadastro de termo",
         "form": form,
         "termo": termo,
-        "index_url": _termo_lista_url(termo=termo, evento=evento),
-        "back_label": _termo_back_label(termo=termo, evento=evento),
+        "index_url": index_url,
+        "back_label": back_label,
+        "flow_eyebrow": "TERMOS",
+        "flow_description": "Cadastro independente de termo de autorização",
+        "flow_icon_label": "TM",
+        "flow_module_label": "Termos",
+        "flow_back_label": back_label,
+        "flow_back_url": index_url,
         "servidor_create_url": _cadastro_create_url("cadastros:servidor_create", next_url),
         "viatura_create_url": _cadastro_create_url("cadastros:viatura_create", next_url),
         "api_cidades_por_estado_url": reverse("roteiros:api_cidades_por_estado", kwargs={"estado_id": 0}),

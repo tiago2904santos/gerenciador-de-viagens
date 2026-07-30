@@ -1,10 +1,22 @@
 /* Canonical summary and document cards. Theme-specific appearance is separate. */
 
 .cv-summary-tile {
+  background: var(--cv-card-bg);
+  border: var(--cv-card-border);
+  border-radius: var(--cv-card-radius);
+  box-shadow: var(--cv-card-shadow);
   display: grid;
-  gap: 5px;
+  gap: var(--space-2);
   min-width: 0;
-  padding: 16px;
+  padding: var(--space-4);
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.cv-summary-tile:hover {
+  box-shadow: var(--shadow-panel);
 }
 
 .cv-summary-tile__label,
@@ -13,8 +25,17 @@
   margin: 0;
 }
 
+.cv-summary-tile__label {
+  color: var(--color-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-label);
+  text-transform: uppercase;
+}
+
 .cv-summary-tile__value {
-  font-size: clamp(1.15rem, 2vw, 1.55rem);
+  color: var(--color-heading);
+  font-size: clamp(var(--font-size-lg), 2vw, 1.55rem);
   line-height: 1.2;
   overflow-wrap: anywhere;
 }
@@ -42,10 +63,30 @@
 }
 
 .cv-document-card {
+  background: var(--cv-card-bg);
+  border: var(--cv-card-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--cv-card-shadow);
   display: grid;
   gap: 0;
   padding: 0;
   position: relative;
+  transition: box-shadow var(--transition-fast);
+}
+
+.cv-document-card::before {
+  background: var(--color-accent);
+  border-radius: 0 0 var(--space-1) var(--space-1);
+  content: "";
+  height: 3px;
+  left: var(--space-5);
+  position: absolute;
+  top: 0;
+  width: 42px;
+}
+
+.cv-document-card:hover {
+  box-shadow: var(--shadow-panel);
 }
 
 .cv-document-card__header,
@@ -58,8 +99,9 @@
 
 .cv-document-card__header {
   align-items: start;
+  background: var(--color-surface-muted);
   display: flex;
-  gap: 12px;
+  gap: var(--space-3);
   justify-content: space-between;
 }
 
@@ -74,15 +116,27 @@
   margin: 0;
 }
 
+.cv-document-card__title {
+  color: var(--color-heading);
+}
+
+.cv-document-card__subtitle,
+.cv-document-card__body {
+  color: var(--color-muted-strong);
+}
+
 .cv-document-card__meta {
-  border-block: 1px solid transparent;
+  background: var(--color-surface-soft);
+  border-block: 1px solid var(--color-border-soft);
 }
 
 .cv-document-card__actions {
   align-items: center;
+  background: var(--color-surface-muted);
+  border-top: 1px solid var(--color-border);
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 /* Shared structural contract for rich entity cards across product modules. */
@@ -179,14 +233,14 @@
 
 .cv-module-card__mark {
   align-items: center;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   display: flex;
   flex: 0 0 auto;
-  font-size: 0.72rem;
-  font-weight: 900;
-  height: 34px;
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-black);
+  height: var(--control-height-sm);
   justify-content: center;
-  width: 34px;
+  width: var(--control-height-sm);
 }
 
 .cv-module-card__eyebrow,
@@ -211,7 +265,7 @@
   }
 }
 
-@media (max-width: 620px) {
+@media (max-width: 640px) {
   .cv-summary-grid--2,
   .cv-summary-grid--3,
   .cv-summary-grid--4 {

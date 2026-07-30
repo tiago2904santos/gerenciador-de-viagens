@@ -11,27 +11,7 @@
 {% block wizard_content %}
   <div data-pt-efetivo-diarias data-api-calcular-url="{{ api_calcular_diarias_url }}" data-travel-document-wizard-step1>
 
-    <section
-      class="cv-form-section-card cv-form-card cv-form-section-card--described travel-document-card pt-form-card"
-      aria-labelledby="pt-efetivo-diarias-title"
-    >
-      <header class="cv-form-section-header">
-        <div class="cv-form-section-header__copy">
-          <h3 class="cv-form-section-title" id="pt-efetivo-diarias-title">Efetivo e diárias</h3>
-          <p class="cv-form-section-subtitle">Composição da equipe e cálculo automático das diárias</p>
-        </div>
-      </header>
-
-      <div class="cv-form-section-body travel-document-body">
-        {% include "components/ui/forms/form_block.html" with element_id="pt-card-efetivo" section_id="pt-efetivo-title" extra_class="travel-document-block document-form-block" title="Efetivo" description="Composição da equipe por unidade, cargo e quantidade. O total entra no cálculo das diárias." body_extra_class="termo-block__body" body_template="planos_trabalho/partials/_efetivo_body.html" %}
-
-        {% include "components/ui/forms/form_block.html" with element_id="pt-card-diarias" section_id="pt-diarias-title" extra_class="travel-document-block document-form-block" title="Deslocamento e diárias" description="Informe a saída e a chegada na sede — o sistema calcula a composição das diárias automaticamente." body_extra_class="termo-block__body" body_template="planos_trabalho/partials/_diarias_body.html" %}
-      </div>
-
-      <div class="cv-form-card__footer">
-        {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar" secondary_action="wizard_back" primary_label="Salvar e avançar" primary_action="wizard_next" only %}
-      </div>
-    </section>
+    {% include "components/form/card.html" with title="Efetivo e diárias" description="Composição da equipe e cálculo automático das diárias" title_id="pt-efetivo-diarias-title" extra_class="pt-form-card" body_extra_class="travel-document-body" body_template="planos_trabalho/partials/_efetivo_diarias_wizard_body.html" footer_template="planos_trabalho/partials/_efetivo_diarias_wizard_footer.html" %}
   </div>
 {% endblock %}
 

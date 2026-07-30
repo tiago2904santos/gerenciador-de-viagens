@@ -192,7 +192,7 @@
   }
 }
 
-@media (max-width: 620px) {
+@media (max-width: 640px) {
   .cv-form-block:not(.cv-form-block--split):not(.cv-form-block--resource) >
     .cv-form-block__header .cv-form-block__copy {
     align-items: flex-start;

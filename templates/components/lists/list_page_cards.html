@@ -5,7 +5,7 @@
 {#   action_label/action_url (FAB), tabs_aria_label, page_extra_class, #}
 {#   delete_modal_title/entity, cancel_modal_title/entity/hint, confirm_action_* , attach_signed_modal=True. #}
 {# A view DEVE pôr page_obj (+ pagination_pages, page_querystring) no contexto — ver core/pagination.py. #}
-<div class="page-shell page-shell--list page-shell--cards{% if page_extra_class %} {{ page_extra_class }}{% endif %}" data-collection data-collection-mode="server">
+<div class="page-shell cv-page page-shell--list cv-page--collection page-shell--cards cv-page--collection-cards{% if page_extra_class %} {{ page_extra_class }}{% endif %}" data-collection data-collection-mode="server">
 
   {% include "components/ui/headers/filter_page_header.html" with advanced=True form_action=request.path title=title|default:page_title eyebrow=eyebrow search_placeholder=search_placeholder search_aria_label=search_aria_label current_aba=aba date_picker_id=date_picker_id date_start_id=date_start_id date_end_id=date_end_id %}
 

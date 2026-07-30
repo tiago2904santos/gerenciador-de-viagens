@@ -17,7 +17,7 @@
     {# ── 0. Eventos já adicionados (modo multi-evento) — cards contextuais acima do card-mestre ── #}
     {% if is_multi_evento %}
       {% if em_edicao_evento %}
-        <div class="pte-events__banner" role="status">
+        <div class="cv-notice cv-notice--info pte-events__banner" role="status">
           {% include "components/ui/icons/icon.html" with icon="edit" extra_class="pte-events__banner-icon" only %}
           <span>Editando um evento existente — preencha as etapas e salve. Para criar um novo evento, finalize este e use “Adicionar evento ao plano” na última etapa.</span>
         </div>
@@ -33,32 +33,7 @@
 
     {{ pt_textos_padrao_templates|json_script:"pt-textos-padrao-data" }}
 
-    <section
-      class="cv-form-section-card cv-form-card cv-form-section-card--described travel-document-card pt-form-card"
-      aria-labelledby="pt-identificacao-title"
-    >
-      <header class="cv-form-section-header">
-        <div class="cv-form-section-header__copy">
-          <h3 class="cv-form-section-title" id="pt-identificacao-title">Identificação e atuação</h3>
-          <p class="cv-form-section-subtitle">Programa solicitante, evento e textos do documento</p>
-        </div>
-      </header>
-
-      <div class="cv-form-section-body travel-document-body">
-        {# ── 1. Programa solicitante ─────────────────────────────── #}
-        {% include "components/ui/forms/form_block.html" with element_id="pt-card-programa" section_id="pt-programa-title" extra_class="travel-document-block document-form-block" title="Programa solicitante" description="Programa que solicitou a ação. Entra automaticamente na contextualização." body_extra_class="termo-block__body" body_template="planos_trabalho/partials/_identificacao_programa_body.html" %}
-
-        {# ── 2. Evento: período + destino ────────────────────────── #}
-        {% include "components/ui/forms/form_block.html" with element_id="pt-card-evento" section_id="pt-evento-title" extra_class="travel-document-block document-form-block" title="Evento" description="Período, destino e horário de atendimento da ação." body_extra_class="cv-form-stack termo-evento-body" body_template="planos_trabalho/partials/_identificacao_evento_body.html" %}
-
-        {# ── 3. Textos do documento ──────────────────────────────── #}
-        {% include "components/ui/forms/form_block.html" with element_id="pt-card-textos" section_id="pt-textos-title" data_hook="pt-textos" extra_class="travel-document-block document-form-block" title="Textos do documento" description="Já preenchidos com o texto padrão a partir do destino e do programa. Edite livremente quando quiser — o que você escrever é mantido." body_extra_class="termo-block__body" body_template="planos_trabalho/partials/_identificacao_textos_body.html" %}
-      </div>
-
-      <div class="cv-form-card__footer">
-        {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar à lista" secondary_action="save_draft_list" primary_label="Salvar e avançar" primary_action="wizard_next" only %}
-      </div>
-    </section>
+    {% include "components/form/card.html" with title="Identificação e atuação" description="Programa solicitante, evento e textos do documento" title_id="pt-identificacao-title" extra_class="pt-form-card" body_extra_class="travel-document-body" body_template="planos_trabalho/partials/_identificacao_wizard_body.html" footer_template="planos_trabalho/partials/_identificacao_wizard_footer.html" %}
   </div>
 {% endblock %}
 

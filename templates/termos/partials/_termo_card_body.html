@@ -1,0 +1,21 @@
+{# Miolo do card de termo avulso — metadados principais. #}
+<div class="cv-record-card__band">
+  <div class="cv-fact-grid cv-fact-grid--termo">
+    <div class="cv-fact-block">
+      <span class="cv-fact-block__label">Período</span>
+      <div class="cv-fact-block__value">{{ card.periodo|default:"—" }}</div>
+    </div>
+    <div class="cv-fact-block">
+      <span class="cv-fact-block__label">Ofício</span>
+      <div class="cv-fact-block__value">{{ card.oficio_label|default:"—" }}</div>
+    </div>
+    <div class="cv-fact-block">
+      <span class="cv-fact-block__label">Servidores</span>
+      <div class="cv-fact-block__value">{{ card.servidores_label|default:"—" }}</div>
+    </div>
+    <div class="cv-fact-block">
+      <span class="cv-fact-block__label">Viatura</span>
+      <div class="cv-fact-block__value">{{ card.viatura_label|default:"—" }}</div>
+    </div>
+  </div>
+</div>

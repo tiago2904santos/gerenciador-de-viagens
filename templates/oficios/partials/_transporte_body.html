@@ -1,0 +1,40 @@
+{{ form.motorista_modo }}
+<div class="oficio-motorista-servidor" data-oficio-motorista-servidor>
+  <div class="form-grid app-form-grid">
+    <div class="field-span-12">
+      {% include "components/ui/forms/field.html" with field=form.motorista label="MOTORISTA SERVIDOR" help_text="Busque e selecione um servidor; você pode trocar a qualquer momento." only %}
+    </div>
+  </div>
+</div>
+<div class="oficio-motorista-manual app-form-grid-panel oficio-data-block form-field--hidden" data-oficio-motorista-manual>
+  <div class="oficio-data-grid oficio-data-grid--full">
+    <div class="oficio-data-grid__field">
+      {% include "components/ui/forms/field.html" with field=form.motorista_manual_nome label="NOME DO MOTORISTA" only %}
+    </div>
+  </div>
+</div>
+<div class="oficio-motorista-helpers" data-oficio-motorista-helpers>
+  <p class="field-help form-field--hidden" data-oficio-motorista-helper-in>
+    Motorista selecionado faz parte da equipe do ofício.
+  </p>
+  <p class="field-help form-field--hidden" data-oficio-motorista-helper-out>
+    Motorista fora da equipe do ofício. Informe o ofício e o protocolo do motorista.
+  </p>
+  <p class="field-help form-field--hidden" data-oficio-motorista-helper-manual>
+    Motorista informado manualmente. Informe também o ofício e o protocolo do motorista.
+  </p>
+</div>
+<div
+  class="app-form-grid-panel oficio-data-block oficio-motorista-extras{% if not motorista_extras_visivel %} form-field--hidden{% endif %}"
+  data-oficio-motorista-extras
+  {% if not motorista_extras_visivel %}aria-hidden="true"{% else %}aria-hidden="false"{% endif %}
+>
+  <div class="oficio-data-grid oficio-data-grid--two">
+    <div class="oficio-data-grid__field">
+      {% include "components/ui/forms/document_number_field.html" with field=form.motorista_oficio_referencia label="Nº OFÍCIO MOTORISTA" ano=motorista_oficio_ano numero_inicial=motorista_oficio_numero_inicial only %}
+    </div>
+    <div class="oficio-data-grid__field">
+      {% include "components/ui/forms/field.html" with field=form.motorista_protocolo_ref label="PROTOCOLO DO MOTORISTA" only %}
+    </div>
+  </div>
+</div>

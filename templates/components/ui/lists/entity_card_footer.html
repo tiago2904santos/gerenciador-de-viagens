@@ -1,7 +1,7 @@
 {# Rodapé data-driven do entity card. footer = core.entity_cards.footer(...). #}
-<div class="cv-entity-card__footer oficio-lc__footer">
-  <div class="oficio-lc__footer-actions">
-    <div class="oficio-lc__footer-actions-main cv-icon-btn-group">
+<div class="cv-entity-card__footer cv-record-card__footer">
+  <div class="cv-record-card__footer-actions">
+    <div class="cv-record-card__footer-actions-main cv-icon-btn-group">
       {% if footer.edit_url %}
         {% include "components/ui/buttons/icon_button.html" with href=footer.edit_url action="edit" aria_label=footer.edit_aria tooltip=footer.edit_tooltip|default:"Editar" only %}
       {% endif %}
@@ -9,7 +9,7 @@
         {% include "components/ui/lists/entity_card_menu.html" with menu=menu csrf_token=csrf_token only %}
       {% endfor %}
     </div>
-    <div class="oficio-lc__footer-actions-danger cv-icon-btn-group">
+    <div class="cv-record-card__footer-actions--danger cv-icon-btn-group">
       {% if footer.delete_modal_url %}
         <button
           class="cv-icon-btn cv-icon-btn--delete"

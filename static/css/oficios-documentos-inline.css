@@ -341,7 +341,7 @@
   display: inline;
 }
 
-@media (max-width: 700px) {
+@media (max-width: 720px) {
   .oficio-documentos-route-summary-grid {
     grid-template-columns: 1fr 1fr;
   }
@@ -563,7 +563,7 @@
   border: 0;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1080px) {
   .document-inline-viewer__frame {
     height: min(72vh, 620px);
   }
@@ -593,7 +593,7 @@
   text-decoration: none;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 520px) {
   .document-inline-actions--header {
     width: 100%;
     justify-content: stretch;
@@ -820,7 +820,7 @@
   align-items: flex-start;
 }
 
-@media (max-width: 960px) {
+@media (max-width: 900px) {
   .assinatura-oficio-layout {
     grid-template-columns: 1fr;
   }

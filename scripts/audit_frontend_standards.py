@@ -42,8 +42,12 @@ CSS_EXCEPTIONS: dict[str, dict] = {
         "reason": "Arquivo de tema — cores hex são a definição original, permitidas aqui.",
         "rules": {"hex_color_outside_tokens"},
     },
-    "static/css/dark-redesign.css": {
-        "reason": "Official dark-theme layer; literal values define its tokens and theme-only finishes.",
+    "static/css/03-theme-dark.css": {
+        "reason": "Official dark-theme token layer; literal values define semantic tokens.",
+        "rules": {"hex_color_outside_tokens"},
+    },
+    "static/css/components/theme-dark-components.css": {
+        "reason": "Transitional dark-theme component overrides; literals allowed until dissolved into components.",
         "rules": {"hex_color_outside_tokens"},
     },
     "static/css/auth.css": {
@@ -224,23 +228,16 @@ _TAG_LABEL = re.compile(r"<label\b[^>]*>", re.S)
 # catraca (mas continua sujeito às regras de linha de `audit_templates`).
 _DIRS_FORA_DA_CATRACA = {"ui_lab", "ui_lab2", "dev"}
 
-# Gatilhos cujo `aria-controls` é escrito pelo enhancer, não pelo template: o
-# painel que eles abrem não tem id fixo porque o componente pode aparecer várias
-# vezes na mesma página, e no caso do date picker o painel ainda é movido para
-# `document.body` em runtime (`cv-date-picker.js`). O par gatilho/painel desses
-# quatro é garantido por teste estrutural sobre o JS, não por grep de template.
-ARIA_CONTROLS_VIA_ENHANCER = {
-    "templates/components/ui/forms/date_picker.html":
-        "cv-date-picker.js gera o id e move o painel para document.body",
-    "templates/components/ui/forms/dropdown.html":
-        "cv-select.js gera o id do menu flutuante",
-    "templates/components/ui/forms/file_picker.html":
-        "file-picker.js gera o id do painel de seleção",
-    "templates/roteiros/partials/roteiro/_bate_volta_date_controls.html":
-        "reusa os gatilhos do cv-date-picker",
-}
-
-
+# NOTA — a catraca não tem isentos, e isso foi medido, não presumido.
+#
+# Ela nasceu com 4 templates isentos: 13 gatilhos de date picker / dropdown /
+# file picker cujo `aria-controls` eu concluí que só o enhancer poderia escrever,
+# porque o painel não teria id fixo. O `cee354f` desmentiu isso — passou o
+# `panel_id` pelo `{% include %}` e declarou os 13 no próprio template. Medido nas
+# duas pontas: em `823deff` a lista de isentos escondia 13 achados; depois do
+# merge, esconde 0. Uma isenção que não isenta nada é pior que nenhuma, porque
+# sugere um problema que já não existe — então ela saiu, e os 4 templates passaram
+# a ser verificados como todos os outros.
 def _templates_de_producao():
     for path in sorted(TEMPLATES_DIR.rglob("*.html")):
         if _DIRS_FORA_DA_CATRACA & set(path.parts):
@@ -251,13 +248,10 @@ def _templates_de_producao():
 def _ocorrencias_de_tag(
     pattern: re.Pattern,
     ausente: str,
-    isentos: dict[str, str] | None = None,
 ) -> list[tuple[str, int, str]]:
     achados = []
     for path in _templates_de_producao():
         rp = rel(path)
-        if isentos and rp in isentos:
-            continue
         try:
             texto = path.read_text(encoding="utf-8-sig")
         except UnicodeDecodeError:
@@ -272,9 +266,7 @@ def _ocorrencias_de_tag(
 
 def aria_expanded_sem_controls() -> list[tuple[str, int, str]]:
     """`aria-expanded` sem `aria-controls` — o leitor de tela não sabe o que abriu."""
-    return _ocorrencias_de_tag(
-        _TAG_COM_ARIA_EXPANDED, "aria-controls", ARIA_CONTROLS_VIA_ENHANCER
-    )
+    return _ocorrencias_de_tag(_TAG_COM_ARIA_EXPANDED, "aria-controls")
 
 
 def label_sem_for() -> list[tuple[str, int, str]]:
@@ -416,7 +408,6 @@ def main() -> None:
         "aria-expanded sem aria-controls (H-06)",
         aria_expanded_sem_controls(),
         args.max_aria_expanded_sem_controls,
-        ARIA_CONTROLS_VIA_ENHANCER,
     )
     erros += _catraca(
         "<label> sem for (H-10)",
@@ -431,14 +422,11 @@ def _catraca(
     titulo: str,
     achados: list[tuple[str, int, str]],
     maximo: int | None,
-    isentos: dict[str, str] | None = None,
 ) -> int:
     """Imprime uma catraca e devolve 1 se ela estourou. A catraca só desce."""
     print(f"\n=== {titulo} ===")
     for rp, linha, trecho in achados:
         print(f"  {rp}:{linha} {trecho}")
-    for rp, motivo in sorted((isentos or {}).items()):
-        print(f"  ISENTO {rp} -- {motivo}")
     print(f"Total: {len(achados)}")
     if maximo is not None and len(achados) > maximo:
         print(f"\nERRO: {len(achados)} ocorrências, acima da catraca de {maximo}.")

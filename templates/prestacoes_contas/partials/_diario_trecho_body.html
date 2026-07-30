@@ -1,24 +1,19 @@
 {{ form.id }}
-{% comment %}
-  H-10: os seis campos abaixo sao espelho do roteiro (readonly) e nao vinham do
-  form, logo nao tinham id — o rotulo era irmao sem `for`, e clicar nele nao
-  focava nada. O id sai do `prefix` do formset, ja unico por trecho.
-{% endcomment %}
 <div class="roteiro-trecho-card__route-row field-grid field-grid--cols-2">
   <div class="roteiro-trecho-card__leg">
     <div class="roteiro-trecho-card__leg-title">Saída</div>
     <div class="field-grid field-grid--cols-2 roteiro-trecho-card__leg-grid">
       <div class="field cv-field cv-field--readonly roteiro-trecho-card__leg-cidade">
-        <label class="cv-field__label" for="{{ form.prefix }}-saida-cidade">Cidade de saída</label>
-        <input type="text" class="cv-field__control" id="{{ form.prefix }}-saida-cidade" value="{{ d.origem }}" readonly tabindex="-1" aria-readonly="true">
+        <label class="cv-field__label" for="diario-trecho-{{ form.id.value|default:form.instance.pk|default:'novo' }}-origem">Cidade de saída</label>
+        <input type="text" class="cv-field__control" id="diario-trecho-{{ form.id.value|default:form.instance.pk|default:'novo' }}-origem" value="{{ d.origem }}" readonly tabindex="-1" aria-readonly="true">
       </div>
       <div class="field cv-field cv-field--readonly field-size-1">
-        <label class="cv-field__label" for="{{ form.prefix }}-saida-data">Data</label>
-        <input type="text" class="cv-field__control" id="{{ form.prefix }}-saida-data" value="{{ d.saida.data }}" readonly tabindex="-1" aria-readonly="true">
+        <label class="cv-field__label" for="diario-trecho-{{ form.id.value|default:form.instance.pk|default:'novo' }}-saida-data">Data</label>
+        <input type="text" class="cv-field__control" id="diario-trecho-{{ form.id.value|default:form.instance.pk|default:'novo' }}-saida-data" value="{{ d.saida.data }}" readonly tabindex="-1" aria-readonly="true">
       </div>
       <div class="field cv-field cv-field--readonly field-size-1">
-        <label class="cv-field__label" for="{{ form.prefix }}-saida-hora">Hora</label>
-        <input type="text" class="cv-field__control" id="{{ form.prefix }}-saida-hora" value="{{ d.saida.hora }}" readonly tabindex="-1" aria-readonly="true">
+        <label class="cv-field__label" for="diario-trecho-{{ form.id.value|default:form.instance.pk|default:'novo' }}-saida-hora">Hora</label>
+        <input type="text" class="cv-field__control" id="diario-trecho-{{ form.id.value|default:form.instance.pk|default:'novo' }}-saida-hora" value="{{ d.saida.hora }}" readonly tabindex="-1" aria-readonly="true">
       </div>
     </div>
   </div>
@@ -27,16 +22,16 @@
     <div class="roteiro-trecho-card__leg-title">Chegada</div>
     <div class="field-grid field-grid--cols-2 roteiro-trecho-card__leg-grid">
       <div class="field cv-field cv-field--readonly roteiro-trecho-card__leg-cidade">
-        <label class="cv-field__label" for="{{ form.prefix }}-chegada-cidade">Cidade de chegada</label>
-        <input type="text" class="cv-field__control" id="{{ form.prefix }}-chegada-cidade" value="{{ d.destino }}" readonly tabindex="-1" aria-readonly="true">
+        <label class="cv-field__label" for="diario-trecho-{{ form.id.value|default:form.instance.pk|default:'novo' }}-destino">Cidade de chegada</label>
+        <input type="text" class="cv-field__control" id="diario-trecho-{{ form.id.value|default:form.instance.pk|default:'novo' }}-destino" value="{{ d.destino }}" readonly tabindex="-1" aria-readonly="true">
       </div>
       <div class="field cv-field cv-field--readonly field-size-1">
-        <label class="cv-field__label" for="{{ form.prefix }}-chegada-data">Data</label>
-        <input type="text" class="cv-field__control" id="{{ form.prefix }}-chegada-data" value="{{ d.chegada.data }}" readonly tabindex="-1" aria-readonly="true">
+        <label class="cv-field__label" for="diario-trecho-{{ form.id.value|default:form.instance.pk|default:'novo' }}-chegada-data">Data</label>
+        <input type="text" class="cv-field__control" id="diario-trecho-{{ form.id.value|default:form.instance.pk|default:'novo' }}-chegada-data" value="{{ d.chegada.data }}" readonly tabindex="-1" aria-readonly="true">
       </div>
       <div class="field cv-field cv-field--readonly field-size-1">
-        <label class="cv-field__label" for="{{ form.prefix }}-chegada-hora">Hora</label>
-        <input type="text" class="cv-field__control" id="{{ form.prefix }}-chegada-hora" value="{{ d.chegada.hora }}" readonly tabindex="-1" aria-readonly="true">
+        <label class="cv-field__label" for="diario-trecho-{{ form.id.value|default:form.instance.pk|default:'novo' }}-chegada-hora">Hora</label>
+        <input type="text" class="cv-field__control" id="diario-trecho-{{ form.id.value|default:form.instance.pk|default:'novo' }}-chegada-hora" value="{{ d.chegada.hora }}" readonly tabindex="-1" aria-readonly="true">
       </div>
     </div>
   </div>

@@ -1,4 +1,4 @@
-/* Canonical record list. Visual theme overrides live in dark-redesign.css. */
+/* Canonical record list. Visual theme overrides live in theme-dark-components.css. */
 
 .cv-record-list {
   display: grid;
@@ -139,14 +139,16 @@
    Substitui a pilha app-page--main-card-list / oficios-list-page /
    list-content list-grid list-grid--roteiros app-list-grid.
    ========================================================= */
-.page-shell--cards > .list-panel {
+.page-shell--cards > .list-panel,
+.cv-page--collection-cards > .list-panel {
   background: transparent;
   border: 0;
   border-radius: 0;
   box-shadow: none;
 }
 
-.page-shell--cards .cv-card-grid {
+.page-shell--cards .cv-card-grid,
+.cv-page--collection-cards .cv-card-grid {
   box-sizing: border-box;
   display: grid;
   gap: var(--space-6);

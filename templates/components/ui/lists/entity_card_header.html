@@ -1,12 +1,12 @@
 {# Cabeçalho data-driven do entity card. header = core.entity_cards.header(items, chips). #}
-<div class="cv-entity-card__header oficio-lc__id-row">
+<div class="cv-entity-card__header cv-record-card__id-row">
   {% for item in header.items %}
-  <div class="oficio-lc__info-item{% if item.wide %} oficio-lc__info-item--wide{% endif %}">
-    <span class="oficio-lc__info-label">{{ item.label }}</span>
-    <span class="oficio-lc__info-value{% if item.wrap %} oficio-lc__info-value--wrap{% endif %}{% if item.value_class %} {{ item.value_class }}{% endif %}">{{ item.value }}</span>
+  <div class="cv-record-card__info-item{% if item.wide %} cv-record-card__info-item--wide{% endif %}">
+    <span class="cv-record-card__info-label">{{ item.label }}</span>
+    <span class="cv-record-card__info-value{% if item.wrap %} cv-record-card__info-value--wrap{% endif %}{% if item.value_class %} {{ item.value_class }}{% endif %}">{{ item.value }}</span>
   </div>
   {% endfor %}
   {% for chip in header.chips %}
-    {% include "components/ui/badges/chip.html" with tone=chip.tone label=chip.label extra_class="oficio-lc__temporal-chip" only %}
+    {% include "components/ui/badges/chip.html" with tone=chip.tone label=chip.label extra_class="cv-record-card__temporal-chip" only %}
   {% endfor %}
 </div>

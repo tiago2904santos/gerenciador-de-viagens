@@ -10,34 +10,34 @@
       <h4 class="cv-form-subsection__title" id="pt-diarias-resultado-title">Resultado do cálculo</h4>
     </div>
   </header>
-  <div class="oficio-lc__transport-row" data-pt-diarias-resultado>
-    <div class="oficio-lc__transport-card">
-      <span class="oficio-lc__transport-label">Composição por servidor</span>
-      <div class="oficio-lc__transport-placa" data-pt-resultado-composicao>
+  <div class="cv-fact-grid" data-pt-diarias-resultado>
+    <div class="cv-fact-block">
+      <span class="cv-fact-block__label">Composição por servidor</span>
+      <div class="cv-fact-block__value" data-pt-resultado-composicao>
         {% if diarias_resultado.ok %}{{ diarias_resultado.composicao }}{% else %}—{% endif %}
       </div>
-      <span class="oficio-lc__transport-label">Efetivo total</span>
-      <div class="oficio-lc__transport-modelo" data-pt-resultado-efetivo>
+      <span class="cv-fact-block__label">Efetivo total</span>
+      <div class="cv-fact-block__value--secondary" data-pt-resultado-efetivo>
         {% if diarias_resultado.ok %}{{ diarias_resultado.quantidade_servidores }} servidor(es){% else %}—{% endif %}
       </div>
     </div>
-    <div class="oficio-lc__transport-card">
-      <span class="oficio-lc__transport-label">Valor por servidor</span>
-      <div class="oficio-lc__valor-total" data-pt-resultado-unitario>
+    <div class="cv-fact-block">
+      <span class="cv-fact-block__label">Valor por servidor</span>
+      <div class="cv-fact-block__value--strong" data-pt-resultado-unitario>
         {% if diarias_resultado.ok %}R${{ diarias_resultado.valor_unitario_display }}{% else %}—{% endif %}
       </div>
-      <span class="oficio-lc__transport-label">Por extenso</span>
-      <div class="oficio-lc__valor-extenso" data-pt-resultado-unitario-extenso>
+      <span class="cv-fact-block__label">Por extenso</span>
+      <div class="cv-fact-block__value--long" data-pt-resultado-unitario-extenso>
         {% if diarias_resultado.ok %}{{ diarias_resultado.valor_unitario_extenso }}{% else %}—{% endif %}
       </div>
     </div>
-    <div class="oficio-lc__transport-card oficio-lc__transport-card--valor">
-      <span class="oficio-lc__transport-label">Valor total do plano</span>
-      <div class="oficio-lc__valor-total" data-pt-resultado-total>
+    <div class="cv-fact-block cv-fact-block--valor">
+      <span class="cv-fact-block__label">Valor total do plano</span>
+      <div class="cv-fact-block__value--strong" data-pt-resultado-total>
         {% if diarias_resultado.ok %}R${{ diarias_resultado.valor_total_display }}{% else %}—{% endif %}
       </div>
-      <span class="oficio-lc__transport-label">Por extenso</span>
-      <div class="oficio-lc__valor-extenso" data-pt-resultado-total-extenso>
+      <span class="cv-fact-block__label">Por extenso</span>
+      <div class="cv-fact-block__value--long" data-pt-resultado-total-extenso>
         {% if diarias_resultado.ok %}{{ diarias_resultado.valor_total_extenso }}{% else %}—{% endif %}
       </div>
     </div>

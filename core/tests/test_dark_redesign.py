@@ -8,11 +8,17 @@ from django.test import SimpleTestCase
 class DarkRedesignContractTests(SimpleTestCase):
     def setUp(self):
         self.base_path = Path(settings.BASE_DIR) / "templates" / "base.html"
-        self.css_path = Path(settings.BASE_DIR) / "static" / "css" / "dark-redesign.css"
+        css_root = Path(settings.BASE_DIR) / "static" / "css"
+        self.tokens_path = css_root / "03-theme-dark.css"
+        self.components_path = css_root / "components" / "theme-dark-components.css"
         self.base = self.base_path.read_text(encoding="utf-8")
-        self.css = self.css_path.read_text(encoding="utf-8")
+        self.tokens_css = self.tokens_path.read_text(encoding="utf-8")
+        self.components_css = self.components_path.read_text(encoding="utf-8")
+        self.css = f"{self.tokens_css}\n{self.components_css}"
 
     def test_dark_redesign_is_the_final_global_css_layer(self):
+        style_index = self.base.index("css/style.css")
+        theme_dark_tokens_index = self.base.index("css/03-theme-dark.css")
         extra_css_index = self.base.index("{% block extra_css %}")
         file_picker_index = self.base.index("css/components/file-picker.css")
         action_system_index = self.base.index("css/components/action-system.css")
@@ -23,8 +29,12 @@ class DarkRedesignContractTests(SimpleTestCase):
         content_cards_index = self.base.index("css/components/content-cards.css")
         document_viewer_index = self.base.index("css/components/document-viewer.css")
         dialog_index = self.base.index("css/components/dialog.css")
-        dark_redesign_index = self.base.index("css/dark-redesign.css")
+        theme_dark_components_index = self.base.index(
+            "css/components/theme-dark-components.css"
+        )
 
+        self.assertLess(style_index, theme_dark_tokens_index)
+        self.assertNotIn("css/dark-redesign.css", self.base)
         self.assertLess(extra_css_index, file_picker_index)
         self.assertLess(file_picker_index, action_system_index)
         self.assertLess(extra_css_index, action_system_index)
@@ -37,13 +47,14 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertLess(content_cards_index, document_viewer_index)
         self.assertLess(document_viewer_index, dialog_index)
         self.assertLess(content_cards_index, dialog_index)
-        self.assertLess(dialog_index, dark_redesign_index)
-        self.assertLess(action_system_index, dark_redesign_index)
+        self.assertLess(dialog_index, theme_dark_components_index)
+        self.assertLess(action_system_index, theme_dark_components_index)
 
     def test_theme_layer_does_not_target_official_light_theme(self):
-        self.assertNotIn('html[data-theme="light"]', self.css)
-        self.assertNotIn('html[data-theme="light-light"]', self.css)
-        self.assertNotIn('html[data-theme="dark-light"]', self.css)
+        for layer_css in (self.tokens_css, self.components_css):
+            self.assertNotIn('html[data-theme="light"]', layer_css)
+            self.assertNotIn('html[data-theme="light-light"]', layer_css)
+            self.assertNotIn('html[data-theme="dark-light"]', layer_css)
 
     def test_semantic_dark_contract_covers_core_component_needs(self):
         required_tokens = (
@@ -64,13 +75,13 @@ class DarkRedesignContractTests(SimpleTestCase):
 
         for token in required_tokens:
             with self.subTest(token=token):
-                self.assertIn(token, self.css)
+                self.assertIn(token, self.tokens_css)
 
     def test_reduced_motion_and_mobile_shell_are_explicit(self):
-        self.assertIn("@media (prefers-reduced-motion: reduce)", self.css)
-        self.assertIn("@media (max-width: 600px)", self.css)
-        self.assertIn("height: 100dvh;", self.css)
-        self.assertIn("max-height: none;", self.css)
+        self.assertIn("@media (prefers-reduced-motion: reduce)", self.components_css)
+        self.assertIn("@media (max-width: 600px)", self.components_css)
+        self.assertIn("height: 100dvh;", self.components_css)
+        self.assertIn("max-height: none;", self.components_css)
 
     def test_templates_do_not_reintroduce_inline_visual_or_event_contracts(self):
         templates = Path(settings.BASE_DIR) / "templates"
@@ -211,6 +222,8 @@ class DarkRedesignContractTests(SimpleTestCase):
 
         self.assertIn("alert-{{ alert_variant }}", alert)
         self.assertIn("alert--{{ alert_variant }}", alert)
+        self.assertIn("cv-notice", alert)
+        self.assertIn("cv-notice--", alert)
         self.assertIn("action_label and action_url", empty_state)
         self.assertIn('components/ui/buttons/button.html', empty_state)
         self.assertIn("form.errors or errors", form_errors)
@@ -285,7 +298,7 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertIn('data-file-picker-status', component)
         self.assertIn(".cv-file-picker", component_css)
         self.assertIn(".is-dragover", component_css)
-        self.assertIn("@media (max-width: 620px)", component_css)
+        self.assertIn("@media (max-width: 640px)", component_css)
 
         script = (
             Path(settings.BASE_DIR) / "static" / "js" / "components" / "file-picker.js"
@@ -350,11 +363,31 @@ class DarkRedesignContractTests(SimpleTestCase):
             Path(settings.BASE_DIR) / "static" / "css" / "page-shell.css"
         ).read_text(encoding="utf-8")
 
-        self.assertIn('eyebrow="EVENTOS"', template)
+        # `H-02`: a página passou a estender `components/page/flow_base.html`,
+        # que já é coberto por teste próprio. O eyebrow não é mais escrito à mão
+        # no template — vem do contexto da view (`flow_eyebrow`), então o
+        # contrato certo a medir é "a view manda EVENTOS", não "o template tem a
+        # string" (mesma lição do card mestre de Prestações, ver
+        # `test_summary_and_document_cards_share_global_contracts`).
+        self.assertIn('extends "components/page/flow_base.html"', template)
+        eventos_views = (
+            Path(settings.BASE_DIR) / "eventos" / "views.py"
+        ).read_text(encoding="utf-8")
+        self.assertIn('"flow_eyebrow": "EVENTOS"', eventos_views)
         self.assertNotIn("CADASTRO DE OFICIO", template)
-        self.assertIn("Identificação", template)
-        self.assertIn("Quando e onde", template)
-        self.assertIn("Documentos vinculados", template)
+        # `H-05`: o card da etapa 1 saiu do `detalhe.html` e virou
+        # `components/form/card.html` com `body_template`; os títulos dos
+        # blocos internos moraram para o partial extraído.
+        etapa1_body = (
+            Path(settings.BASE_DIR)
+            / "templates"
+            / "eventos"
+            / "partials"
+            / "_detalhe_etapa1_body.html"
+        ).read_text(encoding="utf-8")
+        self.assertIn("Identificação", etapa1_body)
+        self.assertIn("Quando e onde", etapa1_body)
+        self.assertIn("Documentos vinculados", etapa1_body)
         documentos_body = (
             Path(settings.BASE_DIR)
             / "templates"
@@ -460,6 +493,13 @@ class DarkRedesignContractTests(SimpleTestCase):
             / "partials"
             / "resumo_evento_card.html"
         ).read_text(encoding="utf-8")
+        plan_summary_body = (
+            Path(settings.BASE_DIR)
+            / "templates"
+            / "planos_trabalho"
+            / "partials"
+            / "_resumo_evento_body.html"
+        ).read_text(encoding="utf-8")
         component_css = (
             Path(settings.BASE_DIR)
             / "static"
@@ -469,10 +509,13 @@ class DarkRedesignContractTests(SimpleTestCase):
         ).read_text(encoding="utf-8")
 
         self.assertIn("cv-summary-tile", summary)
+        self.assertIn("cv-metric", summary)
+        self.assertIn("cv-metric--tile", summary)
         self.assertIn("cv-document-card", document)
         self.assertIn("cv-summary-card", plan_summary)
-        self.assertIn("cv-summary-grid--4", plan_summary)
-        self.assertIn("@media (max-width: 620px)", component_css)
+        # `H-05`: o grid saiu do casco e vive no partial do corpo.
+        self.assertIn("cv-summary-grid--4", plan_summary_body)
+        self.assertIn("@media (max-width: 640px)", component_css)
 
         # As classes do card mestre das 4 telas de prestação são medidas no HTML
         # **renderizado**, não no texto-fonte do arquivo da página.
@@ -555,6 +598,9 @@ class DarkRedesignContractTests(SimpleTestCase):
         templates = Path(settings.BASE_DIR) / "templates"
         viewer = (templates / "components" / "documents" / "pdf_viewer.html").read_text(encoding="utf-8")
         signature = (templates / "components" / "documents" / "signature_card.html").read_text(encoding="utf-8")
+        signature_body = (
+            templates / "components" / "documents" / "partials" / "_signature_card_body.html"
+        ).read_text(encoding="utf-8")
         viewer_page = (templates / "documentos" / "pdf_viewer.html").read_text(encoding="utf-8")
         documents_lab = (templates / "dev" / "ui_lab" / "documents.html").read_text(encoding="utf-8")
         signature_lab = (templates / "dev" / "ui_lab" / "signature.html").read_text(encoding="utf-8")
@@ -567,7 +613,8 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertIn('components/documents/pdf_viewer.html', viewer_page)
         self.assertIn('components/documents/pdf_viewer.html', documents_lab)
         self.assertIn("cv-signature-card", signature)
-        self.assertIn("data-cv-signature-copy", signature)
+        # `H-05`: o hook de cópia mora no partial do corpo, não no casco.
+        self.assertIn("data-cv-signature-copy", signature_body)
         self.assertIn('components/documents/signature_card.html', signature_lab)
         self.assertIn('components/documents/signature_card.html', (
             templates / "prestacoes_contas" / "diario_bordo_form.html"
@@ -581,11 +628,24 @@ class DarkRedesignContractTests(SimpleTestCase):
         source = (
             Path(settings.BASE_DIR) / "templates" / "oficios" / "wizard_transporte.html"
         ).read_text(encoding="utf-8")
+        card = (
+            Path(settings.BASE_DIR) / "templates" / "components" / "form" / "card.html"
+        ).read_text(encoding="utf-8")
+        header_actions = (
+            Path(settings.BASE_DIR)
+            / "templates"
+            / "oficios"
+            / "partials"
+            / "_transporte_header_actions.html"
+        ).read_text(encoding="utf-8")
 
-        self.assertIn("cv-form-section-card", source)
-        self.assertIn("cv-form-section-header", source)
-        self.assertIn("cv-form-section-body", source)
-        self.assertIn("cv-btn cv-btn--secondary", source)
+        # `H-05`: o casco do card veio de `components/form/card.html`; a página
+        # só aponta o include. O contrato visual continua no componente canônico.
+        self.assertIn('components/form/card.html', source)
+        self.assertIn("cv-form-section-card", card)
+        self.assertIn("cv-form-section-header", card)
+        self.assertIn("cv-form-section-body", card)
+        self.assertIn("cv-btn cv-btn--secondary", header_actions)
         self.assertNotIn("form-section app-form-section", source)
         self.assertNotIn("btn btn-secondary", source)
 
@@ -646,7 +706,9 @@ class DarkRedesignContractTests(SimpleTestCase):
         ):
             with self.subTest(token=token):
                 declaration = next(
-                    line.strip() for line in self.css.splitlines() if line.strip().startswith(token)
+                    line.strip()
+                    for line in self.tokens_css.splitlines()
+                    if line.strip().startswith(token)
                 )
                 self.assertIn("var(--color-primary", declaration)
                 self.assertNotIn("var(--color-accent", declaration)
@@ -674,9 +736,12 @@ class DarkRedesignContractTests(SimpleTestCase):
         page_shell = (
             Path(settings.BASE_DIR) / "static" / "css" / "page-shell.css"
         ).read_text(encoding="utf-8")
-        standard_simple = page_shell.split(
-            ".page-shell--standard-simple > .main-form-panel {", 1
-        )[1].split("}", 1)[0]
+        # `H-05`/Fase 9: o seletor ganhou o alias `cv-page--narrow` na mesma regra.
+        marker = ".page-shell--standard-simple > .main-form-panel"
+        self.assertIn(marker, page_shell)
+        standard_simple = page_shell.split(marker, 1)[1]
+        # Pula aliases agrupados até o bloco `{ ... }`
+        standard_simple = standard_simple.split("{", 1)[1].split("}", 1)[0]
 
         self.assertIn("max-width: var(--layout-form-panel-max-width);", standard_simple)
         self.assertIn("margin-inline: auto;", standard_simple)
@@ -696,11 +761,11 @@ class DarkRedesignContractTests(SimpleTestCase):
             "--cv-card-family-accent-width:",
         ):
             with self.subTest(token=token):
-                self.assertIn(token, self.css)
+                self.assertIn(token, self.tokens_css)
 
         wizard_header = self.css.rsplit(".cv-form-section-header {", 1)[1]
         wizard_header = wizard_header.split("}", 1)[0]
-        list_header = self.css.split(".oficio-lc__id-row {", 1)[1]
+        list_header = self.css.split(".cv-record-card__id-row {", 1)[1]
         list_header = list_header.split("}", 1)[0]
 
         for shared_token in (
@@ -712,7 +777,7 @@ class DarkRedesignContractTests(SimpleTestCase):
                 self.assertIn(shared_token, wizard_header)
                 self.assertIn(shared_token, list_header)
 
-        self.assertEqual(self.css.count(".oficio-lc__id-row::before"), 1)
+        self.assertEqual(self.css.count(".cv-record-card__id-row::before"), 1)
 
         simple_form_header = self.css.split(
             ".main-form-panel > .form-section > .section-header {", 1

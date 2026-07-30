@@ -5,5 +5,5 @@
   <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}">
 {% endblock %}
 {% block content %}
-  {% include "components/lists/list_page_standard.html" with title=page_title description=page_description eyebrow="Termos" search_placeholder="Buscar por destino, ofício, protocolo, viatura ou servidor" action_label="Novo termo" action_url=novo_url action_aria_label="Cadastrar termo" empty_message="Nenhum termo cadastrado ainda." rows=rows q=q disable_realtime_filter=True hide_realtime_count=True delete_modal_enabled=True delete_modal_title="Excluir termo?" delete_modal_entity="este termo" attach_signed_modal_enabled=True %}
+  {% include "components/lists/list_page_cards.html" with title=page_title eyebrow="Termos" search_placeholder="Buscar por destino, ofício, protocolo, viatura ou servidor" search_aria_label="Buscar termos" card_template="termos/partials/termo_list_card.html" empty_message="Nenhum termo cadastrado ainda." empty_action_label="Novo termo" empty_action_url=novo_url action_label="Novo termo" action_url=novo_url delete_modal_title="Excluir termo?" delete_modal_entity="este termo" attach_signed_modal=True %}
 {% endblock %}

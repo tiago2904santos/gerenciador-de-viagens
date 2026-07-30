@@ -1164,7 +1164,7 @@
   display: none;
 }
 
-@media (max-width: 920px) {
+@media (max-width: 900px) {
   .roteiro-editor--avulso .roteiro-editor__destination-card.destination-row {
     grid-template-columns: 132px minmax(0, 1fr) 132px;
   }
@@ -1518,7 +1518,7 @@
   width: 100%;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 768px) {
   .roteiro-trecho-card__route-row.field-grid--cols-2 {
     grid-template-columns: 1fr;
   }

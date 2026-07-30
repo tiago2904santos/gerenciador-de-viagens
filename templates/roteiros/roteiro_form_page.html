@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "components/page/flow_base.html" %}
 {% load static %}
 
 {% block title %}{% if object %}Editar roteiro{% else %}Novo roteiro{% endif %}{% endblock %}
@@ -16,19 +16,11 @@
   <script src="{% static 'js/roteiros-map.js' %}"></script>
 {% endblock %}
 
-{% block content %}
-  <div class="page-shell page-shell--wizard travel-document-wizard app-wizard">
-    {% include "components/ui/headers/page_header.html" with eyebrow="ROTEIROS" title=wizard_header.title description=wizard_header.description icon_label="RT" module_label="Roteiros" back_label=wizard_back_label back_url=wizard_back_url status_label=wizard_header.status_label status_variant=wizard_header.status_variant only %}
+{% block flow_header %}
+  {% include "components/ui/headers/page_header.html" with eyebrow="ROTEIROS" title=wizard_header.title description=wizard_header.description icon_label="RT" module_label="Roteiros" back_label=wizard_back_label back_url=wizard_back_url status_label=wizard_header.status_label status_variant=wizard_header.status_variant only %}
+{% endblock %}
 
-    {% if wizard_page_steps %}
-      {% include "components/ui/navigation/page_stepper.html" with steps=wizard_page_steps only %}
-    {% endif %}
-
-    <div class="main-form-panel main-form-panel--stack travel-document-wizard__main">
-      <div class="cv-form-section-stack cv-form-section-stack--comfortable">
-        {{ initial_trechos_data|json_script:"initialTrechosData" }}
-        {% include "roteiros/includes/_roteiro_editor.html" %}
-      </div>
-    </div>
-  </div>
+{% block flow_body %}
+  {{ initial_trechos_data|json_script:"initialTrechosData" }}
+  {% include "roteiros/includes/_roteiro_editor.html" %}
 {% endblock %}

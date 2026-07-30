@@ -1,48 +1,48 @@
 {# Miolo do card de Ordem de Serviço — servidores + motivo/assinante. #}
-<div class="oficio-lc__section">
-  <ul class="oficio-lc__travellers oficio-lc__travellers--n{{ card.servidores_count|default:0 }}">
+<div class="cv-record-card__band">
+  <ul class="cv-person-list cv-person-list--n{{ card.servidores_count|default:0 }}">
     {% for s in card.servidores %}
-    <li class="oficio-lc__traveller{% if s.is_motorista %} oficio-lc__traveller--motorista{% endif %}">
-      <span class="oficio-lc__traveller-avatar" aria-hidden="true">{{ s.initials }}</span>
+    <li class="cv-person-row{% if s.is_motorista %} cv-person-row--highlight{% endif %}">
+      <span class="cv-person-row__avatar" aria-hidden="true">{{ s.initials }}</span>
 
-      <div class="oficio-lc__traveller-body">
-        <div class="oficio-lc__traveller-name-row">
-          <span class="oficio-lc__traveller-name">{{ s.name }}</span>
+      <div class="cv-person-row__body">
+        <div class="cv-person-row__name-row">
+          <span class="cv-person-row__name">{{ s.name }}</span>
           {% if s.is_motorista %}
-          <span class="oficio-lc__traveller-badge">Motorista</span>
+          <span class="cv-person-row__badge">Motorista</span>
           {% endif %}
         </div>
         {% if s.cargo or s.unidade %}
-        <span class="oficio-lc__traveller-meta">{% if s.cargo %}{{ s.cargo }}{% endif %}{% if s.cargo and s.unidade %} · {% endif %}{% if s.unidade %}{{ s.unidade }}{% endif %}</span>
+        <span class="cv-person-row__meta">{% if s.cargo %}{{ s.cargo }}{% endif %}{% if s.cargo and s.unidade %} · {% endif %}{% if s.unidade %}{{ s.unidade }}{% endif %}</span>
         {% endif %}
       </div>
 
     </li>
     {% empty %}
-    <li class="oficio-lc__empty-hint">Nenhum servidor informado</li>
+    <li class="cv-empty-hint">Nenhum servidor informado</li>
     {% endfor %}
   </ul>
 </div>
 
-<div class="oficio-lc__section oficio-lc__section--justificativas">
-  <ul class="oficio-lc__travellers oficio-lc__travellers--n{% if card.assinante %}2{% else %}1{% endif %}">
-    <li class="oficio-lc__traveller oficio-lc__traveller--justificativa">
-      <div class="oficio-lc__traveller-body">
-        <div class="oficio-lc__traveller-name-row">
-          <span class="oficio-lc__traveller-name">MOTIVO</span>
+<div class="cv-record-card__band cv-record-card__band--justificativas">
+  <ul class="cv-person-list cv-person-list--n{% if card.assinante %}2{% else %}1{% endif %}">
+    <li class="cv-person-row cv-fact-row">
+      <div class="cv-person-row__body">
+        <div class="cv-person-row__name-row">
+          <span class="cv-person-row__name">MOTIVO</span>
         </div>
-        <span class="oficio-lc__traveller-meta">
+        <span class="cv-person-row__meta">
           {% if card.motivo_resumido %}{{ card.motivo_resumido }}{% else %}Nenhum motivo informado.{% endif %}
         </span>
       </div>
     </li>
     {% if card.assinante %}
-    <li class="oficio-lc__traveller oficio-lc__traveller--justificativa oficio-lc__traveller--assinante">
-      <div class="oficio-lc__traveller-body">
-        <div class="oficio-lc__traveller-name-row">
-          <span class="oficio-lc__traveller-name">ASSINANTE</span>
+    <li class="cv-person-row cv-fact-row cv-person-row--assinante">
+      <div class="cv-person-row__body">
+        <div class="cv-person-row__name-row">
+          <span class="cv-person-row__name">ASSINANTE</span>
         </div>
-        <span class="oficio-lc__traveller-meta">{{ card.assinante.nome }}{% if card.assinante.cargo %} · {{ card.assinante.cargo }}{% endif %}</span>
+        <span class="cv-person-row__meta">{{ card.assinante.nome }}{% if card.assinante.cargo %} · {{ card.assinante.cargo }}{% endif %}</span>
       </div>
     </li>
     {% endif %}

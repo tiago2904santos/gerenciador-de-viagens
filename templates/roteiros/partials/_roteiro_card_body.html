@@ -1,16 +1,16 @@
 {# Miolo do card de roteiro — Trechos (2/3) · Valor Total (1/3). #}
-<div class="oficio-lc__section">
-  <div class="oficio-lc__transport-row oficio-lc__transport-row--roteiro">
+<div class="cv-record-card__band">
+  <div class="cv-fact-grid cv-fact-grid--roteiro">
 
-    <div class="oficio-lc__transport-card oficio-lc__transport-card--trechos oficio-lc__transport-card--span2">
-      <span class="oficio-lc__transport-label">Trechos encontrados</span>
+    <div class="cv-fact-block cv-fact-block--trechos cv-fact-block--span2">
+      <span class="cv-fact-block__label">Trechos encontrados</span>
       {% if card.trechos %}
-      <ul class="oficio-lc__trechos-list">
+      <ul class="cv-itinerary">
         {% for trecho in card.trechos %}
-        <li class="oficio-lc__trecho">
-          <div class="oficio-lc__trecho-rota">{{ trecho.rota }}</div>
+        <li class="cv-itinerary__leg">
+          <div class="cv-itinerary__route">{{ trecho.rota }}</div>
           {% if trecho.saida or trecho.chegada %}
-          <div class="oficio-lc__trecho-times">
+          <div class="cv-itinerary__time">
             {% if trecho.saida %}{{ trecho.saida }}{% endif %}
             {% if trecho.saida and trecho.chegada %} → {% endif %}
             {% if trecho.chegada %}{{ trecho.chegada }}{% endif %}
@@ -20,20 +20,20 @@
         {% endfor %}
       </ul>
       {% else %}
-      <div class="oficio-lc__trecho-rota oficio-lc__text--empty">Nenhum trecho cadastrado</div>
+      <div class="cv-itinerary__route cv-empty-hint">Nenhum trecho cadastrado</div>
       {% endif %}
     </div>
 
-    <div class="oficio-lc__transport-card oficio-lc__transport-card--valor">
-      <span class="oficio-lc__transport-label">Valor Total</span>
+    <div class="cv-fact-block cv-fact-block--valor">
+      <span class="cv-fact-block__label">Valor Total</span>
       {% if card.valor_diarias_display %}
-      <div class="oficio-lc__valor-total">{{ card.valor_diarias_display }}</div>
+      <div class="cv-fact-block__value--strong">{{ card.valor_diarias_display }}</div>
       {% if card.valor_diarias_extenso %}
-      <span class="oficio-lc__transport-label">Valor por Extenso</span>
-      <div class="oficio-lc__valor-extenso">{{ card.valor_diarias_extenso }}</div>
+      <span class="cv-fact-block__label">Valor por Extenso</span>
+      <div class="cv-fact-block__value--long">{{ card.valor_diarias_extenso }}</div>
       {% endif %}
       {% else %}
-      <div class="oficio-lc__valor-total oficio-lc__text--empty">—</div>
+      <div class="cv-fact-block__value--strong cv-empty-hint">—</div>
       {% endif %}
     </div>
 

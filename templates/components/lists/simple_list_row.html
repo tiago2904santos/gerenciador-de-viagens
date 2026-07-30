@@ -41,6 +41,7 @@
             aria-label="Abrir documentos de {{ row.title }}"
             aria-haspopup="true"
             aria-expanded="false"
+            aria-controls="simple-row-document-menu-{{ row.title|slugify }}-{{ menu_suffix }}"
             data-tooltip="{% if row.remover_assinado_url %}Documentos e assinado{% else %}Documentos{% endif %}"
             data-overlay-trigger data-overlay-kind="menu"
             aria-controls="simple-row-document-menu-{{ row.title|slugify }}-{{ menu_suffix }}" data-overlay-target="simple-row-document-menu-{{ row.title|slugify }}-{{ menu_suffix }}"

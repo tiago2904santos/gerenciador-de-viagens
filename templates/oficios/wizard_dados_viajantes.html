@@ -8,30 +8,7 @@
 
   <input type="hidden" name="transporte_embed" value="1">
   <div class="cv-form-section-stack cv-form-section-stack--comfortable" data-travel-document-wizard-step1 data-oficio-driver-source>
-    <section class="cv-form-section-card cv-form-card cv-form-section-card--described travel-document-card" aria-labelledby="travel-document-wizard-dados-principais">
-      <header class="cv-form-section-header">
-        <div class="cv-form-section-header__copy">
-          <h2 class="cv-form-section-title" id="travel-document-wizard-dados-principais">Informações da viagem</h2>
-          <p class="cv-form-section-subtitle">Identificação, finalidade, equipe e transporte</p>
-        </div>
-      </header>
-
-      <div class="cv-form-section-body travel-document-body">
-        {% include "components/ui/forms/form_block.html" with title="Identificação" description="Número, protocolo e custeio" section_id="travel-document-identity-title" heading_level=3 variant="split" extra_class="travel-document-block" body_template="oficios/partials/step1/_identity_fields.html" %}
-
-        {% include "components/ui/forms/form_block.html" with title="Finalidade" description="Motivo e descrição da viagem" section_id="travel-document-purpose-title" heading_level=3 extra_class="travel-document-block" body_extra_class="cv-form-stack" body_template="oficios/partials/step1/_purpose_fields.html" %}
-
-        {% include "components/ui/forms/form_block.html" with title="Equipe" description="Viajantes e motorista" section_id="travel-document-wizard-equipe-title" heading_level=3 variant="resource" extra_class="travel-document-block" action_label="Novo viajante" action_url=servidor_create_url action_autosave=True body_template="oficios/partials/step1/_team_fields.html" %}
-
-        {% include "components/ui/forms/form_block.html" with title="Transporte" description="Viatura utilizada" section_id="travel-document-wizard-viatura-title" heading_level=3 variant="resource" extra_class="travel-document-block" action_label="Nova viatura" action_url=viatura_create_url action_autosave=True data_hook="oficio-viatura-card" body_template="oficios/partials/step1/_transport_fields.html" %}
-
-        {% include "oficios/partials/wizard_dados_card_motorista_externo.html" %}
-      </div>
-
-      <div class="cv-form-card__footer" data-oficio-viatura-footer>
-        {% include "components/ui/layouts/card_footer_section.html" with primary_label="Avançar" primary_action="wizard_next" only %}
-      </div>
-    </section>
+    {% include "components/form/card.html" with title="Informações da viagem" description="Identificação, finalidade, equipe e transporte" title_id="travel-document-wizard-dados-principais" heading_level=2 body_extra_class="travel-document-body" body_template="oficios/partials/_dados_viajantes_body.html" footer_template="oficios/partials/_dados_viajantes_footer.html" footer_data_hook="oficio-viatura-footer" %}
   </div>
 {% endblock %}
 

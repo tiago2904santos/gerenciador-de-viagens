@@ -2,6 +2,7 @@
 {% load static %}
 
 {% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/oficios.css' %}">
   <link rel="stylesheet" href="{% static 'css/roteiros.css' %}">
   <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}">
   <link rel="stylesheet" href="{% static 'css/oficios-documentos-inline.css' %}">
@@ -29,9 +30,9 @@
     {% endif %}
 
     {% if diaria_info.alterada %}
-      <div class="diario-diaria-alert" role="alert">
+      <div class="cv-notice cv-notice--warning diario-diaria-alert" role="alert">
         <strong>Atenção:</strong> a alteração do roteiro mudou o valor da diária —
-        <span class="diario-diaria-alert__values">{{ diaria_info.valor_oficio_label }} (ofício) → {{ diaria_info.valor_ajustado_label }} (ajustado)</span>.
+        <span class="cv-notice__values diario-diaria-alert__values">{{ diaria_info.valor_oficio_label }} (ofício) → {{ diaria_info.valor_ajustado_label }} (ajustado)</span>.
         Justifique a diferença em <a href="{{ rt_url }}">Informações complementares</a> do Relatório Técnico.
       </div>
     {% endif %}

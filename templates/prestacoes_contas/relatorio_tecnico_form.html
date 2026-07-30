@@ -2,6 +2,7 @@
 {% load static %}
 
 {% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/oficios.css' %}">
   <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}">
   <link rel="stylesheet" href="{% static 'css/oficios-documentos-inline.css' %}">
   <link rel="stylesheet" href="{% static 'css/prestacoes-documento-preview.css' %}">
@@ -28,7 +29,7 @@
     {% endif %}
 
     {% if diaria_info.alterada %}
-      <div class="diario-diaria-alert" role="alert">
+      <div class="cv-notice cv-notice--warning diario-diaria-alert" role="alert">
         <strong>Roteiro ajustado nesta prestação.</strong>
         Preenchemos automaticamente em <strong>Informações complementares</strong> o que mudou (datas, horários e diária) — revise e complete a justificativa.
       </div>

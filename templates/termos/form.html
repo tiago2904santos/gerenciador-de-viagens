@@ -1,77 +1,47 @@
-{% extends "base.html" %}
+{% extends "components/page/flow_base.html" %}
 {% load static %}
 
-{% block title %}{{ page_title }}{% endblock %}
-
 {% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/oficios.css' %}">
   <link rel="stylesheet" href="{% static 'css/roteiros.css' %}">
   <link rel="stylesheet" href="{% static 'css/oficios-documentos-inline.css' %}">
   <link rel="stylesheet" href="{% static 'css/termos.css' %}">
   <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}">
 {% endblock %}
 
-{% block content %}
-  {{ oficios_summary|json_script:"termos-oficios-summary" }}
-  <div class="page-shell page-shell--standard travel-document-wizard app-wizard document-form-page" data-termo-wizard-shell>
-    {% include "components/ui/headers/page_header.html" with eyebrow="TERMOS" title=page_title description="Cadastro independente de termo de autorização" icon_label="TM" module_label="Termos" back_label=back_label back_url=index_url only %}
-
-    <div class="main-form-panel main-form-panel--stack travel-document-wizard__main">
-      <div class="cv-form-section-stack cv-form-section-stack--comfortable">
-        <form
-          method="post"
-          class="document-form travel-document-wizard__form"
-          data-termo-form
-          data-api-cidades-url="{{ api_cidades_por_estado_url }}"
-          data-termo-evento-selected-dates='{{ termo_evento_selected_dates_json|escape }}'
-        >
-          {% csrf_token %}
-
-          {% if form.non_field_errors %}
-            {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
-          {% endif %}
-
-          <div class="cv-form-section-stack cv-form-section-stack--comfortable" data-termo-wizard-form data-travel-document-wizard-step1>
-            <section
-              class="cv-form-section-card cv-form-card cv-form-section-card--described travel-document-card"
-              aria-labelledby="termo-form-main-title"
-            >
-              <header class="cv-form-section-header">
-                <div class="cv-form-section-header__copy">
-                  <h3 class="cv-form-section-title" id="termo-form-main-title">Dados do termo</h3>
-                  <p class="cv-form-section-subtitle">Ofício, evento, equipe, transporte e documentos</p>
-                </div>
-              </header>
-
-              <div class="cv-form-section-body travel-document-body">
-                {% include "components/ui/forms/form_block.html" with element_id="termo-block-oficio" section_id="termo-oficio-title" extra_class="travel-document-block document-form-block" title="Ofício vinculado" description="Opcional. Reaproveite destino, período, servidores e viatura de um ofício." body_extra_class="termo-block__body" body_template="termos/partials/_oficio_body.html" %}
-
-                {% include "components/ui/forms/form_block.html" with element_id="termo-block-evento" section_id="termo-evento-title" extra_class="travel-document-block document-form-block" title="Evento" description="Destino e período — obrigatórios quando não vierem do ofício." body_extra_class="cv-form-stack termo-evento-body" body_template="termos/partials/_evento_body.html" %}
-
-                {% include "components/ui/forms/form_block.html" with element_id="termo-block-servidores" section_id="termo-servidores-title" variant="resource" extra_class="travel-document-block document-form-block" title="Equipe" description="Viajantes do termo. Com vários servidores, gera um termo para cada um." action_label="Novo viajante" action_url=servidor_create_url action_autosave=True body_template="termos/partials/_servidores_body.html" %}
-
-                {% include "components/ui/forms/form_block.html" with element_id="termo-block-viatura" section_id="termo-viatura-title" variant="resource" extra_class="travel-document-block document-form-block" title="Transporte" description="Opcional. Se vazio, pode usar a viatura do ofício vinculado." action_label="Nova viatura" action_url=viatura_create_url action_autosave=True body_template="termos/partials/_viatura_body.html" %}
-
-                {% if termo and termo.pk %}
-                  {% include "components/ui/forms/form_block.html" with element_id="termo-block-documentos" section_id="termo-documentos-title" data_hook="travel-document-wizard-documentos" extra_class="travel-document-block oficio-documentos-block document-form-block termo-documentos-preview oficio-documentos-preview-section document-inline-stack" title="Documentos para conferência" description="Visualize, baixe e anexe os termos assinados." body_extra_class="oficio-documentos-preview-section__body" body_template="termos/partials/_preview_body.html" %}
-                {% endif %}
-              </div>
-
-              <div class="cv-form-card__footer" id="termo-form-footer">
-                {% include "termos/partials/_viatura_footer.html" %}
-              </div>
-            </section>
-          </div>
-        </form>
-
-        {% if termo and termo.pk %}
-          {% include "components/ui/modals/attach_signed_modal.html" %}
-        {% endif %}
-      </div>
-    </div>
-  </div>
-{% endblock %}
-
 {% block extra_js %}
   <script src="{% static 'js/pages/termos-form.js' %}" defer></script>
   <script src="{% static 'js/pages/oficios-documentos-inline.js' %}" defer></script>
+{% endblock %}
+
+{% block flow_shell_modifier %}page-shell--standard cv-page--form{% endblock %}
+{% block flow_shell_extra %} document-form-page{% endblock %}
+{% block flow_shell_attrs %} data-termo-wizard-shell{% endblock %}
+
+{% block flow_body %}
+  {{ oficios_summary|json_script:"termos-oficios-summary" }}
+
+  <form
+    method="post"
+    class="document-form travel-document-wizard__form"
+    data-termo-form
+    data-api-cidades-url="{{ api_cidades_por_estado_url }}"
+    data-termo-evento-selected-dates='{{ termo_evento_selected_dates_json|escape }}'
+  >
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+      {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
+    {% endif %}
+
+    <div data-termo-wizard-form data-travel-document-wizard-step1>
+      {% include "components/form/card.html" with title="Dados do termo" description="Ofício, evento, equipe, transporte e documentos" title_id="termo-form-main-title" body_template="termos/partials/_termo_form_body.html" footer_template="termos/partials/_viatura_footer.html" footer_id="termo-form-footer" %}
+    </div>
+  </form>
+{% endblock %}
+
+{% block flow_modals %}
+  {% if termo and termo.pk %}
+    {% include "components/ui/modals/attach_signed_modal.html" %}
+  {% endif %}
 {% endblock %}

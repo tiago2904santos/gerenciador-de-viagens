@@ -10,23 +10,7 @@
         <form method="post" novalidate data-viatura-form>
           {% csrf_token %}
           {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
-          <section class="cv-form-section-card cv-form-card" aria-labelledby="viaturas-form-card-title">
-            <header class="cv-form-section-header">
-              <div class="cv-form-section-header__copy">
-                <h3 class="cv-form-section-title" id="viaturas-form-card-title">Dados da viatura</h3>
-              </div>
-            </header>
-
-            <div class="cv-form-section-body">
-              {% include "components/ui/forms/form_block.html" with title="Identificação" description="Placa, modelo, tipo e combustível" section_id="viaturas-identificacao-title" body_template="cadastros/viaturas/partials/_identity_fields.html" %}
-              {% include "components/ui/forms/form_block.html" with title="Lotação" description="Unidade responsável pela viatura" section_id="viaturas-lotacao-title" body_template="cadastros/viaturas/partials/_assignment_fields.html" %}
-              {% include "components/ui/forms/form_block.html" with title="Motoristas" description="Servidores autorizados a conduzir" section_id="viaturas-motoristas-title" variant="resource" body_template="cadastros/viaturas/partials/_drivers_fields.html" %}
-            </div>
-
-            <div class="cv-form-card__footer">
-              {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar" secondary_url=back_url primary_label="Salvar" only %}
-            </div>
-          </section>
+          {% include "components/form/card.html" with title="Dados da viatura" title_id="viaturas-form-card-title" body_template="cadastros/viaturas/partials/_form_card_body.html" footer_template="cadastros/viaturas/partials/_form_card_footer.html" %}
         </form>
       </div>
     </div>

@@ -9,6 +9,7 @@
                     aria-label="Abrir ações do ofício"
                     aria-haspopup="true"
                     aria-expanded="false"
+                    aria-controls="wizard-oficio-document-menu"
                     data-tooltip="Visualizar e baixar"
                     data-overlay-trigger data-overlay-kind="menu"
                     aria-controls="wizard-oficio-document-menu" data-overlay-target="wizard-oficio-document-menu">
@@ -50,6 +51,7 @@
                     aria-label="Abrir ações da justificativa"
                     aria-haspopup="true"
                     aria-expanded="false"
+                    aria-controls="wizard-justificativa-document-menu"
                     data-tooltip="Visualizar e baixar"
                     data-overlay-trigger data-overlay-kind="menu"
                     aria-controls="wizard-justificativa-document-menu" data-overlay-target="wizard-justificativa-document-menu">
@@ -91,6 +93,7 @@
                     aria-label="Abrir ações dos termos"
                     aria-haspopup="true"
                     aria-expanded="false"
+                    aria-controls="wizard-termos-document-menu"
                     data-tooltip="Visualizar e baixar"
                     data-overlay-trigger data-overlay-kind="menu"
                     aria-controls="wizard-termos-document-menu" data-overlay-target="wizard-termos-document-menu">
@@ -129,6 +132,7 @@
                     aria-label="Abrir ações do termo de {{ t.servidor_nome }}"
                     aria-haspopup="true"
                     aria-expanded="false"
+                    aria-controls="wizard-termo-document-menu-{{ forloop.counter }}"
                     data-tooltip="{% if t.assinado %}Termo assinado — ações{% else %}Visualizar, baixar e anexar{% endif %}"
                     data-overlay-trigger data-overlay-kind="menu"
                     aria-controls="wizard-termo-document-menu-{{ forloop.counter }}" data-overlay-target="wizard-termo-document-menu-{{ forloop.counter }}"

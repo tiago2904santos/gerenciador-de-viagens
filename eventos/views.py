@@ -125,15 +125,28 @@ def index(request):
 
 def _form_context(form, evento=None):
     is_edit = bool(evento and evento.pk)
+    page_description = "Agrupe documentos, roteiros e anexos sem tornar o evento obrigatório."
+    index_url = reverse("eventos:index")
+    status_label = evento.get_status_display() if is_edit else "Novo"
+    status_variant = "active" if is_edit else "draft"
     return {
         "page_title": "Editar Evento" if is_edit else "Cadastro de Evento",
-        "page_description": "Agrupe documentos, roteiros e anexos sem tornar o evento obrigatório.",
+        "page_description": page_description,
         "form": form,
         "evento": evento,
-        "index_url": reverse("eventos:index"),
+        "index_url": index_url,
         "panel_url": reverse("eventos:detalhe", kwargs={"pk": evento.pk}) if is_edit else "",
-        "status_label": evento.get_status_display() if is_edit else "Novo",
-        "status_variant": "active" if is_edit else "draft",
+        "status_label": status_label,
+        "status_variant": status_variant,
+        # `H-02`: contexto do casco único (`components/page/flow_base.html`).
+        "flow_eyebrow": "EVENTOS",
+        "flow_description": page_description,
+        "flow_icon_label": "EV",
+        "flow_module_label": "Eventos",
+        "flow_back_label": "Voltar à lista",
+        "flow_back_url": index_url,
+        "flow_status_label": status_label,
+        "flow_status_variant": status_variant,
     }
 
 
@@ -343,6 +356,14 @@ def detalhe(request, pk, etapa=1):
             "evento": evento,
             "evento_header_title": evento_header_title,
             "evento_header_description": evento_header_description,
+            # `H-02`: contexto do casco único (`components/page/flow_base.html`).
+            "flow_eyebrow": "EVENTOS",
+            "flow_description": evento_header_description,
+            "flow_icon_label": "EV",
+            "flow_module_label": "Eventos",
+            "flow_back_label": "Voltar para lista",
+            "flow_back_url": _reverse("eventos:index"),
+            "flow_status_label": evento.get_status_display(),
             "evento_form": form,
             "estados": listar_estados(),
             "oficio_cards": [
@@ -365,6 +386,7 @@ def detalhe(request, pk, etapa=1):
             "tipos_evento_url": f"{_reverse('eventos:tipos_index')}?{urlencode({'next': request.path})}",
             "solicitacao_anexos": solicitacao_anexos,
             "evento_status_variant": "danger" if evento.status == Evento.STATUS_CANCELADO else "active",
+            "flow_status_variant": "danger" if evento.status == Evento.STATUS_CANCELADO else "active",
             "cancelar_evento_url": _reverse("eventos:cancelar", kwargs={"pk": evento.pk}),
             "reativar_evento_url": _reverse("eventos:reativar", kwargs={"pk": evento.pk}),
             **guided_context,

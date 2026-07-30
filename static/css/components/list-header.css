@@ -67,7 +67,7 @@
 
 /* Rail de filtros — faixa clara abaixo do título */
 .list-header__rail {
-  /* Mesmo token da área interna dos cards (.oficio-lc__section). */
+  /* Mesmo token da área interna dos cards (.cv-record-card__band). */
   background: var(--cv-card-family-bg);
   border-top: 1px solid var(--border-filter-bar);
   box-sizing: border-box;
@@ -520,7 +520,8 @@
 }
 
 /* Abas logo abaixo do header */
-.page-shell--list > .list-header + .cv-list-tabs {
+.page-shell--list > .list-header + .cv-list-tabs,
+.cv-page--collection > .list-header + .cv-list-tabs {
   margin-top: 0;
   padding-top: var(--space-3);
 }
@@ -552,7 +553,7 @@
   color: var(--color-heading);
 }
 
-/* Mesma cor das seções internas do card (.oficio-lc__section). */
+/* Mesma cor das seções internas do card (.cv-record-card__band). */
 :is(html[data-theme="dark"])
   .list-header__rail {
   background: var(--cv-card-family-bg);

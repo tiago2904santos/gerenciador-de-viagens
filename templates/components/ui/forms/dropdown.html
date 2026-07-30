@@ -9,6 +9,7 @@ Parametros:
   items          — lista de {label, href, icon, danger, disabled, separator_before}
   align_left     — booleano (menu alinha a esquerda ao inves de direita)
   extra_class    — classes adicionais no wrapper
+  menu_id        — id do menu ul (padrao: cv-dropdown-menu)
 {% endcomment %}
 <div class="cv-action-dropdown{% if extra_class %} {{ extra_class }}{% endif %}"
      data-cv-dropdown>
@@ -16,7 +17,8 @@ Parametros:
           class="{{ trigger_class|default:'cv-btn cv-btn--secondary' }}"
           data-cv-dropdown-trigger
           aria-haspopup="true"
-          aria-expanded="false">
+          aria-expanded="false"
+          aria-controls="{{ menu_id|default:'cv-dropdown-menu' }}">
     {% if trigger_icon %}
       <span class="cv-btn__icon" aria-hidden="true">{{ trigger_icon }}</span>
     {% endif %}
@@ -30,6 +32,7 @@ Parametros:
     </span>
   </button>
   <ul class="cv-action-dropdown__menu{% if align_left %} cv-action-dropdown__menu--left{% endif %}"
+      id="{{ menu_id|default:'cv-dropdown-menu' }}"
       role="menu"
       data-cv-dropdown-menu
       hidden>
