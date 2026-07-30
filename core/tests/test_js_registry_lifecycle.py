@@ -49,7 +49,7 @@ class JavascriptRegistryLifecycleTests(SimpleTestCase):
             "autosave.js": "registerEnhancer('autosave'",
             "cv-select.js": "registerEnhancer('dropdowns'",
             "components/card-toggle.js": 'registerEnhancer("cardToggle"',
-            "components/destination-section.js": 'registerEnhancer("destinations"',
+            "components/location-rows.js": 'registerEnhancer("locationRows"',
             "components/document-number-field.js": 'registerEnhancer("documentNumberField"',
             "components/fields-init.js": "registerEnhancer('fields'",
             "components/masks.js": "registerEnhancer('masks'",

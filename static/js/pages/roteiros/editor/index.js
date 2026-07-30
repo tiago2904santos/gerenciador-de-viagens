@@ -85,7 +85,6 @@ export function initRoteirosEditor() {
   var routeSearchTimer = null;
   var loopRenderTimer = null;
   var autoEstimarTimer = null;
-  var destinoDragState = null;
   var citiesCache = {};
   var lastTrechosSignature = null;
   function getTrechoCards() {
@@ -461,54 +460,15 @@ export function initRoteirosEditor() {
     return prefix + '-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2);
   }
   function loadCities(select, estadoId, selectedId) {
-    if (window.CV && window.CV.destinations && typeof window.CV.destinations.loadCities === 'function') {
-      return window.CV.destinations.loadCities({
-        citySelect: select,
-        stateId: estadoId,
-        selectedId: selectedId,
-        cache: citiesCache,
-        scope: select ? select.parentNode : form,
-        requestAttr: 'roteiroCitiesRequest',
-        urlForState: function(stateId) { return cidadesUrl(stateId); }
-      });
-    }
-    /* Remove cv-search-picker existente para reinicializar com as novas opções */
-    function resetSearchPicker() {
-      if (select.dataset.cvSearchPickerReady) {
-        delete select.dataset.cvSearchPickerReady;
-        var nextEl = select.nextElementSibling;
-        if (nextEl && nextEl.classList && nextEl.classList.contains('cv-search-picker')) {
-          nextEl.parentNode.removeChild(nextEl);
-        }
-      }
-    }
-    var pickerScope = select.parentNode || select;
-    if (!estadoId) { resetSearchPicker(); select.innerHTML = '<option value="">---------</option>'; select.disabled = true; refreshSelectPickers(pickerScope); return Promise.resolve(); }
-    function applyCities(cidades) {
-      resetSearchPicker();
-      select.innerHTML = '<option value="">---------</option>';
-      cidades.forEach(function(cidade) {
-        var opt = document.createElement('option');
-        opt.value = cidade.id;
-        opt.textContent = cidade.nome;
-        if (String(cidade.id) === String(selectedId || '')) opt.selected = true;
-        select.appendChild(opt);
-      });
-      select.disabled = false;
-      refreshSelectPickers(pickerScope);
-    }
-    if (citiesCache[String(estadoId)]) {
-      applyCities(citiesCache[String(estadoId)]);
-      return Promise.resolve();
-    }
-    select.disabled = true;
-    return window.CV.http.fetchJson(cidadesUrl(estadoId)).then(function(result) {
-      if (!result.ok) throw new Error('Falha ao carregar cidades');
-      var data = result.data || [];
-      var cidades = Array.isArray(data) ? data : (data.cidades || []);
-      citiesCache[String(estadoId)] = cidades;
-      applyCities(cidades);
-    }).catch(function() { select.disabled = false; refreshSelectPickers(pickerScope); });
+    return window.CV.locationRows.loadCities({
+      citySelect: select,
+      stateId: estadoId,
+      selectedId: selectedId,
+      cache: citiesCache,
+      scope: select ? select.parentNode : form,
+      requestAttr: 'roteiroCitiesRequest',
+      urlForState: function(stateId) { return cidadesUrl(stateId); }
+    });
   }
   function currentTrechosMap() {
     // Preserva campos manuais usando a chave estavel do trecho; a ordem visual pode mudar.
@@ -861,14 +821,14 @@ export function initRoteirosEditor() {
   }
   function getDestinoRows() {
     var container = $('destinos-container');
-    return container ? Array.from(container.querySelectorAll('.destination-row')) : [];
+    return container ? Array.from(container.querySelectorAll('[data-location-row]')) : [];
   }
   function syncDestinoRowChrome(row, idx) {
     if (!row) return;
-    var ord = row.querySelector('[data-destination-order]');
+    var ord = row.querySelector('[data-location-order]');
     if (ord) ord.textContent = String(idx + 1);
-    var es = row.querySelector('.destino-estado');
-    var ci = row.querySelector('.destino-cidade');
+    var es = row.querySelector('[data-location-state]');
+    var ci = row.querySelector('[data-location-city]');
     var esId = 'destino_estado_' + idx;
     var ciId = 'destino_cidade_' + idx;
     if (es) {
@@ -885,218 +845,48 @@ export function initRoteirosEditor() {
     if (ciLabel) ciLabel.setAttribute('for', ciId);
   }
   function reindexDestinoRows() {
-    if (window.CV && window.CV.destinations && typeof window.CV.destinations.reindexRows === 'function') {
-      window.CV.destinations.reindexRows($('destinos-container'), {
-        rowSelector: '.destination-row',
-        indexAttr: 'index',
-        onRow: function(row, idx) {
-          syncDestinoRowChrome(row, idx);
-        }
-      });
-      return;
-    }
-    getDestinoRows().forEach(function(row, idx) {
-      row.dataset.index = String(idx);
-      syncDestinoRowChrome(row, idx);
+    window.CV.locationRows.reindexRows($('destinos-container'), {
+      rowSelector: '[data-location-row]',
+      indexAttr: 'locationIndex',
+      onRow: function(row, idx) {
+        syncDestinoRowChrome(row, idx);
+      }
     });
   }
   function refreshDestinoButtons() {
-    if (window.CV && window.CV.destinations && typeof window.CV.destinations.updateSingleRowState === 'function') {
-      window.CV.destinations.updateSingleRowState($('destinos-container'), {
-        rowSelector: '.destination-row',
-        removeSelector: '.destination-remove-button'
-      });
-      return;
-    }
-    var rows = getDestinoRows();
-    var single = rows.length <= 1;
-    rows.forEach(function(row) {
-      var btn = row.querySelector('.destination-remove-button');
-      if (btn) btn.hidden = single;
-      row.classList.toggle('destination-row--single', single);
+    window.CV.locationRows.updateSingleRowState($('destinos-container'), {
+      rowSelector: '[data-location-row]',
+      removeSelector: '[data-location-remove]'
     });
-  }
-  function clearDestinoDropTargets() {
-    getDestinoRows().forEach(function(row) {
-      row.classList.remove('is-drop-target', 'is-drop-before', 'is-drop-after');
-    });
-  }
-  function getDestinoDropTarget(clientY, dragged) {
-    var rows = getDestinoRows().filter(function(row) { return row !== dragged; });
-    var target = null;
-    var closestDistance = Infinity;
-    rows.forEach(function(row) {
-      var rect = row.getBoundingClientRect();
-      var centerY = rect.top + (rect.height / 2);
-      var distance = Math.abs(clientY - centerY);
-      if (distance < closestDistance) {
-        target = {
-          row: row,
-          placeAfter: clientY >= centerY
-        };
-        closestDistance = distance;
-      }
-    });
-    return target;
-  }
-  function setDestinoDropTarget(target) {
-    clearDestinoDropTargets();
-    if (!target || !target.row) return;
-    target.row.classList.add('is-drop-target');
-    target.row.classList.add(target.placeAfter ? 'is-drop-after' : 'is-drop-before');
-  }
-  function markDestinoReordered(row) {
-    if (!row) return;
-    row.classList.add('is-reordered');
-    window.setTimeout(function() { row.classList.remove('is-reordered'); }, 460);
-  }
-  function moveDestinoRow(dragged, target) {
-    if (!dragged || !target || !target.row || dragged === target.row) return false;
-    var container = $('destinos-container');
-    if (!container) return false;
-    var reference = target.placeAfter ? target.row.nextSibling : target.row;
-    if (reference === dragged) return false;
-    container.insertBefore(dragged, reference);
-    clearDestinoDropTargets();
-    reindexDestinoRows();
-    markDestinoReordered(dragged);
-    renderTrechos(captureCurrentState(), { force: true });
-    scheduleRealtimeDiarias();
-    scheduleAutosave();
-    return true;
-  }
-  function cleanupDestinoPointerDrag() {
-    if (destinoDragState && destinoDragState.row) {
-      destinoDragState.row.classList.remove('is-dragging');
-    }
-    destinoDragState = null;
-    document.body.classList.remove('is-dragging-destination');
-    clearDestinoDropTargets();
-    document.removeEventListener('pointermove', handleDestinoPointerMove);
-    document.removeEventListener('pointerup', handleDestinoPointerUp);
-    document.removeEventListener('pointercancel', cancelDestinoPointerDrag);
-  }
-  function handleDestinoPointerMove(e) {
-    if (!destinoDragState) return;
-    var dx = e.clientX - destinoDragState.startX;
-    var dy = e.clientY - destinoDragState.startY;
-    if (!destinoDragState.active) {
-      if (Math.sqrt((dx * dx) + (dy * dy)) < 8) return;
-      destinoDragState.active = true;
-      destinoDragState.row.classList.add('is-dragging');
-      document.body.classList.add('is-dragging-destination');
-    }
-    e.preventDefault();
-    destinoDragState.currentTarget = getDestinoDropTarget(e.clientY, destinoDragState.row);
-    setDestinoDropTarget(destinoDragState.currentTarget);
-  }
-  function handleDestinoPointerUp(e) {
-    if (!destinoDragState) return;
-    if (!destinoDragState.active) {
-      cleanupDestinoPointerDrag();
-      return;
-    }
-    e.preventDefault();
-    var target = destinoDragState.currentTarget || getDestinoDropTarget(e.clientY, destinoDragState.row);
-    var dragged = destinoDragState.row;
-    cleanupDestinoPointerDrag();
-    moveDestinoRow(dragged, target);
-  }
-  function cancelDestinoPointerDrag() {
-    cleanupDestinoPointerDrag();
-  }
-  function estadoOptionsMarkup(selectedId) {
-    var se = $('id_origem_estado');
-    return (se ? Array.from(se.options) : []).map(function(opt) {
-      var v = String(opt.value || '');
-      if (!v) return '<option value="">---------</option>';
-      var sel = String(selectedId || '') === v ? ' selected' : '';
-      return '<option value="' + window.CV.util.escapeHtml(v) + '"' + sel + '>' + window.CV.util.escapeHtml(String(opt.textContent || '').trim()) + '</option>';
-    }).join('');
-  }
-  function buildDestinoRowMarkup(idx, destino) {
-    var template = $('tmpl-destino-roteiro');
-    if (template) {
-      return String(template.innerHTML || '').replace(/__index__/g, window.CV.util.escapeHtml(String(idx)));
-    }
-    var selE = destino && destino.estado_id ? destino.estado_id : (destinoEstadoDefaultId || '');
-    var isOficio = !!(form && form.closest && form.closest('[data-travel-document-wizard-roteiro]'));
-    if (isOficio) {
-      return '' +
-        '<div class="destination-row cv-ordered-field-row" data-index="' + window.CV.util.escapeHtml(String(idx)) + '">' +
-          '<span class="cv-ordered-field-row__badge" data-destination-order aria-hidden="true">' + window.CV.util.escapeHtml(String(idx + 1)) + '</span>' +
-          '<div class="cv-ordered-field-row__body">' +
-            '<div class="field-grid roteiro-sede-grid roteiro-destino-grid cv-ordered-field-row__fields">' +
-              '<div class="field app-form-field">' +
-                '<select name="destino_estado_' + idx + '" id="destino_estado_' + idx + '" class="destino-estado cv-search-picker__native" data-cv-search-picker="true" data-picker-mode="single" data-picker-variant="compact" data-placeholder="Buscar estado..." data-empty-message="Nenhum estado encontrado." aria-label="UF">' + estadoOptionsMarkup(selE) + '</select>' +
-              '</div>' +
-              '<div class="field app-form-field">' +
-                '<select name="destino_cidade_' + idx + '" id="destino_cidade_' + idx + '" class="destino-cidade cv-search-picker__native" data-cv-search-picker="true" data-picker-mode="single" data-picker-variant="compact" data-placeholder="Buscar cidade..." data-empty-message="Nenhuma cidade encontrada." aria-label="Cidade" disabled>' +
-                  '<option value="">---------</option>' +
-                '</select>' +
-              '</div>' +
-            '</div>' +
-          '</div>' +
-          '<button type="button" class="destination-remove-button cv-ordered-field-row__remove" title="Remover destino" aria-label="Remover destino">×</button>' +
-        '</div>';
-    }
-    return '' +
-      '<div class="cv-search-picker__selected-card destination-row" data-index="' + window.CV.util.escapeHtml(String(idx)) + '">' +
-        '<div class="cv-search-picker__selected-main">' +
-          '<div class="cv-search-picker__selected-title-row">' +
-            '<span class="cv-search-picker__selected-name">Destino</span>' +
-          '</div>' +
-          '<div class="field-grid roteiro-sede-grid roteiro-destino-grid">' +
-            '<div class="field app-form-field">' +
-              '<select name="destino_estado_' + idx + '" id="destino_estado_' + idx + '" class="destino-estado cv-search-picker__native" data-cv-search-picker="true" data-picker-mode="single" data-picker-variant="compact" data-placeholder="Buscar estado..." data-empty-message="Nenhum estado encontrado.">' + estadoOptionsMarkup(selE) + '</select>' +
-            '</div>' +
-            '<div class="field app-form-field">' +
-              '<select name="destino_cidade_' + idx + '" id="destino_cidade_' + idx + '" class="destino-cidade cv-search-picker__native" data-cv-search-picker="true" data-picker-mode="single" data-picker-variant="compact" data-placeholder="Buscar cidade..." data-empty-message="Nenhuma cidade encontrada." disabled>' +
-                '<option value="">---------</option>' +
-              '</select>' +
-            '</div>' +
-          '</div>' +
-        '</div>' +
-        '<button type="button" class="cv-search-picker__remove destination-remove-button" title="Remover destino" aria-label="Remover destino">x</button>' +
-      '</div>';
-  }
-  function bindDestinoRow(row) {
-    if (window.CV && window.CV.destinations && typeof window.CV.destinations.initDragDrop === 'function') {
-      return row;
-    }
-    row.addEventListener('pointerdown', function(e) {
-      if (e.button !== 0 || getDestinoRows().length <= 1) return;
-      if (destinoDragState) cleanupDestinoPointerDrag();
-      destinoDragState = {
-        row: row,
-        startX: e.clientX,
-        startY: e.clientY,
-        currentTarget: null,
-        active: false
-      };
-      document.addEventListener('pointermove', handleDestinoPointerMove);
-      document.addEventListener('pointerup', handleDestinoPointerUp);
-      document.addEventListener('pointercancel', cancelDestinoPointerDrag);
-    });
-    return row;
   }
   function addDestinoRow(destino) {
     var container = $('destinos-container');
     if (!container) return Promise.resolve(null);
     var idx = getDestinoRows().length;
-    var row = document.createElement('div');
-    row.innerHTML = buildDestinoRowMarkup(idx, destino || {});
-    row = row.firstElementChild;
-    row.draggable = false;
-    row.dataset.key = (destino && (destino.key || destino.destino_key || destino.id)) ? String(destino.key || destino.destino_key || destino.id) : makeStableKey('destino');
-    var estado = row.querySelector('.destino-estado');
-    var cidade = row.querySelector('.destino-cidade');
     var estadoId = destino && destino.estado_id ? destino.estado_id : (destinoEstadoDefaultId || '');
     var cidadeId = destino && destino.cidade_id ? destino.cidade_id : null;
-    if (estado) estado.value = String(estadoId || '');
-    container.appendChild(row);
+    var stableKey = (destino && (destino.key || destino.destino_key || destino.id))
+      ? String(destino.key || destino.destino_key || destino.id)
+      : makeStableKey('destino');
+    var row = window.CV.locationRows.appendTemplateRow({
+      list: container,
+      template: $('tmpl-destino-roteiro'),
+      index: idx,
+      rowSelector: '[data-location-row]',
+      removeSelector: '[data-location-remove]',
+      indexAttr: 'locationIndex',
+      beforeAppend: function (newRow) {
+        if (!newRow) return;
+        newRow.dataset.key = stableKey;
+        var state = newRow.querySelector('[data-location-state]');
+        if (state) state.value = String(estadoId || '');
+      },
+    });
+    if (!row) return Promise.resolve(null);
+    row.draggable = false;
+    row.dataset.key = stableKey;
+    var cidade = row.querySelector('[data-location-city]');
     refreshSelectPickers(row);
-    bindDestinoRow(row);
     var promise = estadoId ? loadCities(cidade, estadoId, cidadeId) : Promise.resolve();
     return promise.then(function() {
       reindexDestinoRows();
@@ -1120,8 +910,8 @@ export function initRoteirosEditor() {
   }
   function getDestinos() {
     return getDestinoRows().map(function(row) {
-      var es = row.querySelector('.destino-estado');
-      var ci = row.querySelector('.destino-cidade');
+      var es = row.querySelector('[data-location-state]');
+      var ci = row.querySelector('[data-location-city]');
       return {
         key: row.dataset.key || '',
         estado_id: es ? es.value || null : null,
@@ -1739,9 +1529,10 @@ export function initRoteirosEditor() {
   var destinosContainer = $('destinos-container');
   var btnAdicionarDestino = $('btn-adicionar-destino');
   if (destinosContainer) {
-    if (window.CV && window.CV.destinations && typeof window.CV.destinations.initDragDrop === 'function') {
-      window.CV.destinations.initDragDrop(destinosContainer, {
-        rowSelector: '.destination-row',
+    if (window.CV && window.CV.locationRows && typeof window.CV.locationRows.initDragDrop === 'function') {
+      window.CV.locationRows.initDragDrop(destinosContainer, {
+        rowSelector: '[data-location-row]',
+        removeSelector: '[data-location-remove]',
         onReorder: function() {
           reindexDestinoRows();
           renderTrechos(captureCurrentState(), { force: true });
@@ -1751,14 +1542,14 @@ export function initRoteirosEditor() {
       });
     }
     destinosContainer.addEventListener('change', function(e) {
-      if (applyingState) return; var row = e.target.closest('.destination-row'); if (!row) return;
-      if (e.target.classList.contains('destino-estado')) { var cs = row.querySelector('.destino-cidade'); loadCities(cs, e.target.value||'', null).then(function() { renderTrechos(captureCurrentState()); scheduleRealtimeDiarias(); scheduleAutosave(); }); }
+      if (applyingState) return; var row = e.target.closest('[data-location-row]'); if (!row) return;
+      if (e.target.matches('[data-location-state]')) { var cs = row.querySelector('[data-location-city]'); loadCities(cs, e.target.value||'', null).then(function() { renderTrechos(captureCurrentState()); scheduleRealtimeDiarias(); scheduleAutosave(); }); }
       else { renderTrechos(captureCurrentState()); scheduleRealtimeDiarias(); scheduleAutosave(); }
     });
     destinosContainer.addEventListener('click', function(e) {
-      var btn = e.target.closest('.destination-remove-button'); if (!btn) return;
+      var btn = e.target.closest('[data-location-remove]'); if (!btn) return;
       var rows = getDestinoRows(); if (rows.length <= 1) return;
-      btn.closest('.destination-row').remove(); reindexDestinoRows(); refreshDestinoButtons(); renderTrechos(captureCurrentState()); scheduleRealtimeDiarias(); scheduleAutosave();
+      btn.closest('[data-location-row]').remove(); reindexDestinoRows(); refreshDestinoButtons(); renderTrechos(captureCurrentState()); scheduleRealtimeDiarias(); scheduleAutosave();
     });
   }
   if (btnAdicionarDestino) {
