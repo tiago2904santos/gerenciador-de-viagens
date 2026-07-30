@@ -16,44 +16,48 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /var/www/gerenciador-viagens/app
-            source /var/www/gerenciador-viagens/venv/bin/activate
-            export DJANGO_SETTINGS_MODULE=config.settings.prod
-            export $(grep -v '^#' .env | xargs)
+            echo "=== HEAD do repo na VPS ==="
+            git rev-parse HEAD
+            git log --oneline -1
+
+            echo
             echo "=== Servicos ==="
-            systemctl show gerenciador-viagens --property=ActiveEnterTimestamp,MainPID
-            systemctl show gerenciador-viagens-celery --property=ActiveEnterTimestamp,MainPID,ActiveState 2>&1 || echo "servico celery nao encontrado"
-            date
+            systemctl status gerenciador-viagens --no-pager -l 2>&1 | tail -30
+            echo "---- celery ----"
+            systemctl status gerenciador-viagens-celery --no-pager -l 2>&1 | tail -15
 
-            cat > /tmp/diag.py << 'PYEOF'
-            from integracoes.google_drive.services import get_client, get_pasta_raiz_id
-            from integracoes.google_drive.models import DriveCredenciais
+            echo
+            echo "=== journalctl gunicorn (80 linhas) ==="
+            journalctl -u gerenciador-viagens -n 80 --no-pager 2>&1
 
-            client = get_client()
-            svc = client._svc
+            echo
+            echo "=== gunicorn error.log (40 linhas) ==="
+            tail -40 /var/www/gerenciador-viagens/logs/error.log 2>&1 || echo "sem error.log"
 
-            raiz = get_pasta_raiz_id()
-            print('pasta_raiz_id configurada:', raiz)
-            if raiz:
-                try:
-                    meta = svc.files().get(
-                        fileId=raiz,
-                        fields='id,name,trashed,driveId,parents,capabilities,owners',
-                        supportsAllDrives=True,
-                    ).execute()
-                    print('raiz ->', meta)
-                except Exception as exc:
-                    print('raiz -> ERRO:', exc)
+            echo
+            echo "=== health check local ==="
+            curl -sS -o /dev/null -w "health: %{http_code}\n" --max-time 10 http://127.0.0.1:8000/health/ || echo "curl falhou"
 
-                print()
-                print('busca fresca por pasta "Oficios" dentro da raiz:')
-                q = "name = '" + "Ofícios" + "' and mimeType = 'application/vnd.google-apps.folder' and trashed = false and '" + raiz + "' in parents"
-                res = svc.files().list(q=q, fields='files(id,name)', pageSize=5, supportsAllDrives=True, includeItemsFromAllDrives=True).execute()
-                print('resultado:', res.get('files'))
+            echo
+            echo "=== .env: chaves presentes (sem valores) ==="
+            grep -oE '^[A-Z_][A-Z0-9_]*' .env | sort
+            if grep -qE '^FIELD_ENCRYPTION_KEYS=.+' .env; then
+              echo "FIELD_ENCRYPTION_KEYS: presente e nao vazia"
+            else
+              echo "FIELD_ENCRYPTION_KEYS: AUSENTE ou vazia (isso derruba o gunicorn)"
+            fi
+            if grep -qE '^DB_USER=.+' .env; then
+              echo "DB_USER: presente"
+            else
+              echo "DB_USER: AUSENTE"
+            fi
 
-            creds = DriveCredenciais.objects.first()
-            if creds:
-                print()
-                print('credencial: scope=' + str(creds.scope) + ' atualizado_em=' + str(creds.atualizado_em))
-            PYEOF
-            python manage.py shell < /tmp/diag.py
-            rm -f /tmp/diag.py
+            echo
+            echo "=== nginx / site publico ==="
+            hostname -I 2>/dev/null || true
+            curl -sS -o /dev/null -w "nginx_local: %{http_code}\n" --max-time 10 http://127.0.0.1/ || echo "nginx curl falhou"
+            systemctl is-active nginx 2>&1 || true
+
+            echo
+            echo "=== disco ==="
+            df -h / | tail -2
