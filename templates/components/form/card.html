@@ -1,0 +1,49 @@
+{% comment %}
+  Card mestre de uma página de fluxo (`H-05`).
+
+  O `<header>` deste card era escrito à mão em 28 arquivos, apesar de
+  `form_block.html shell="card"` já produzir exatamente esse markup — só que
+  `form_block` é bloco *dentro* de um card, e faltava a versão que é o card da
+  página inteira. Este componente é essa versão.
+
+  Parâmetros:
+    title / description   copy do cabeçalho
+    title_id              id do `<h3>`, referenciado por `aria-labelledby`
+    extra_class           modificador do card (ex.: "rt-wizard-card")
+    body_extra_class      modificador do corpo (ex.: "rt-wizard-body")
+    body_template         template do conteúdo
+    footer_template       template do rodapé (dentro de `cv-form-card__footer`)
+    footer_id             id do rodapé, quando o JS precisa achá-lo
+    heading_level         2 ou 3 (padrão); o PDF Final usa 2 desde antes desta
+                          migração, e mudar isso seria alteração de conteúdo
+                          disfarçada de refactor
+
+  O rodapé sai num `<div>`, e não num `<footer>`: o rodapé semântico já existe
+  dentro de `card_footer_actions.html`, e aninhar `<footer>` em `<footer>` é
+  inválido. Está medido e escrito no `H-08`.
+{% endcomment %}
+<section
+  class="cv-form-section-card cv-form-card cv-form-section-card--described travel-document-card{% if extra_class %} {{ extra_class }}{% endif %}"
+  {% if title_id %}aria-labelledby="{{ title_id }}"{% endif %}
+>
+  <header class="cv-form-section-header">
+    <div class="cv-form-section-header__copy">
+      {% if heading_level == 2 %}
+        <h2 class="cv-form-section-title"{% if title_id %} id="{{ title_id }}"{% endif %}>{{ title }}</h2>
+      {% else %}
+        <h3 class="cv-form-section-title"{% if title_id %} id="{{ title_id }}"{% endif %}>{{ title }}</h3>
+      {% endif %}
+      {% if description %}<p class="cv-form-section-subtitle">{{ description }}</p>{% endif %}
+    </div>
+  </header>
+
+  <div class="cv-form-section-body travel-document-body{% if body_extra_class %} {{ body_extra_class }}{% endif %}">
+    {% if body_template %}{% include body_template %}{% endif %}
+  </div>
+
+  {% if footer_template %}
+    <div class="cv-form-card__footer"{% if footer_id %} id="{{ footer_id }}"{% endif %}>
+      {% include footer_template %}
+    </div>
+  {% endif %}
+</section>

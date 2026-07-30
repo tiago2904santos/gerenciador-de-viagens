@@ -1,59 +1,28 @@
-{% extends "base.html" %}
+{% extends "components/page/flow_base.html" %}
 {% load static %}
-
-{% block title %}{{ page_title }}{% endblock %}
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}">
   <link rel="stylesheet" href="{% static 'css/oficios-documentos-inline.css' %}">
 {% endblock %}
 
-{% block content %}
-  <div class="page-shell page-shell--wizard travel-document-wizard app-wizard">
-    {% include "components/ui/headers/page_header.html" with eyebrow="PRESTAÇÕES" title=page_title icon_label="PC" module_label="Prestações de Contas" back_label="Voltar à lista" back_url=back_url|default:"/prestacoes-contas/" status_label="Documentos" status_variant="draft" only %}
+{% block flow_body %}
+  <form method="post"
+        class="travel-document-wizard__form"
+        novalidate
+        data-autosave="true"
+        data-autosave-model="prestacao_servidor"
+        data-autosave-step="documentos"
+        data-autosave-url="{{ servidor.solicitacao_autosave_url }}"
+        data-autosave-object-id="{{ servidor.ps_pk }}">
+    {% csrf_token %}
 
-    {% if wizard_page_steps %}
-      {% include "components/ui/navigation/page_stepper.html" with steps=wizard_page_steps only %}
-    {% endif %}
-
-    <div class="main-form-panel main-form-panel--stack travel-document-wizard__main">
-      <div class="cv-form-section-stack cv-form-section-stack--comfortable">
-        <form method="post"
-              class="travel-document-wizard__form"
-              novalidate
-              data-autosave="true"
-              data-autosave-model="prestacao_servidor"
-              data-autosave-step="documentos"
-              data-autosave-url="{{ servidor.solicitacao_autosave_url }}"
-              data-autosave-object-id="{{ servidor.ps_pk }}">
-          {% csrf_token %}
-
-          <div data-travel-document-wizard-documentos>
-            <section class="cv-form-section-card cv-form-card cv-form-section-card--described travel-document-card docs-wizard-card" aria-labelledby="docs-wizard-title">
-              <header class="cv-form-section-header">
-                <div class="cv-form-section-header__copy">
-                  <h3 class="cv-form-section-title" id="docs-wizard-title">Documentos da prestação</h3>
-                  <p class="cv-form-section-subtitle">Resumo do ofício, solicitação e anexos assinados</p>
-                </div>
-              </header>
-
-              <div class="cv-form-section-body travel-document-body docs-wizard-body">
-                {% include "prestacoes_contas/partials/_prestacao_identificacao_equipe.html" with equipe_body_template="prestacoes_contas/partials/_docs_equipe_body.html" %}
-
-                {% include "components/ui/forms/form_block.html" with title="Documentos do ofício" description="Despacho e ofício assinados, compartilhados por todos os servidores" section_id="docs-despacho-title" extra_class="travel-document-block oficio-documentos-block oficio-documentos-preview-section document-inline-stack docs-attach-block" body_extra_class="oficio-documentos-preview-section__body document-inline-stack" body_template="prestacoes_contas/partials/_docs_despacho_body.html" %}
-
-                {% include "components/ui/forms/form_block.html" with title="Documentos assinados" description="Relatório técnico, diário de bordo e comprovante deste servidor" section_id="docs-anexos-title" extra_class="travel-document-block oficio-documentos-block oficio-documentos-preview-section document-inline-stack docs-attach-block" body_extra_class="oficio-documentos-preview-section__body document-inline-stack" body_template="prestacoes_contas/partials/_docs_anexos_servidor_body.html" %}
-              </div>
-
-              <div class="cv-form-card__footer">
-                {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar ao Diário de Bordo" secondary_url=diario_url primary_label="Ir para PDF Final" primary_url=consolidado_url only %}
-              </div>
-            </section>
-          </div>
-        </form>
-      </div>
+    <div data-travel-document-wizard-documentos>
+      {% include "components/form/card.html" with title="Documentos da prestação" description="Resumo do ofício, solicitação e anexos assinados" title_id="docs-wizard-title" extra_class="docs-wizard-card" body_extra_class="docs-wizard-body" body_template="prestacoes_contas/partials/_docs_wizard_body.html" footer_template="prestacoes_contas/partials/_docs_footer.html" %}
     </div>
-  </div>
+  </form>
+{% endblock %}
 
+{% block flow_modals %}
   {% include "components/ui/modals/attach_signed_modal.html" %}
 {% endblock %}

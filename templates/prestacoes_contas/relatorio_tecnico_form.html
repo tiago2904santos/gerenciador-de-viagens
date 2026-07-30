@@ -1,7 +1,5 @@
-{% extends "base.html" %}
+{% extends "components/page/flow_base.html" %}
 {% load static %}
-
-{% block title %}{{ page_title }}{% endblock %}
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/prestacoes_contas.css' %}">
@@ -14,65 +12,30 @@
   <script src="{% static 'js/pages/oficios-documentos-inline.js' %}" defer></script>
 {% endblock %}
 
-{% block content %}
-  <div class="page-shell page-shell--wizard travel-document-wizard app-wizard">
-    {% include "components/ui/headers/page_header.html" with eyebrow="PRESTAÇÕES" title=page_title icon_label="PC" module_label="Prestações de Contas" back_label="Voltar à lista" back_url=back_url|default:"/prestacoes-contas/" status_label="Relatório Técnico" status_variant="draft" only %}
+{% block flow_body %}
+  <form method="post"
+        class="travel-document-wizard__form"
+        novalidate
+        data-autosave="true"
+        data-autosave-model="relatorio_tecnico"
+        data-autosave-step="rt"
+        data-autosave-url="{{ autosave_url }}"
+        data-autosave-object-id="{{ relatorio.pk }}">
+    {% csrf_token %}
 
-    {% if wizard_page_steps %}
-      {% include "components/ui/navigation/page_stepper.html" with steps=wizard_page_steps only %}
+    {% if form.non_field_errors %}
+      {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
     {% endif %}
 
-    <div class="main-form-panel main-form-panel--stack travel-document-wizard__main">
-      <div class="cv-form-section-stack cv-form-section-stack--comfortable">
-        <form method="post"
-              class="travel-document-wizard__form"
-              novalidate
-              data-autosave="true"
-              data-autosave-model="relatorio_tecnico"
-              data-autosave-step="rt"
-              data-autosave-url="{{ autosave_url }}"
-              data-autosave-object-id="{{ relatorio.pk }}">
-          {% csrf_token %}
-
-          {% if form.non_field_errors %}
-            {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
-          {% endif %}
-
-          {% if diaria_info.alterada %}
-            <div class="diario-diaria-alert" role="alert">
-              <strong>Roteiro ajustado nesta prestação.</strong>
-              Preenchemos automaticamente em <strong>Informações complementares</strong> o que mudou (datas, horários e diária) — revise e complete a justificativa.
-            </div>
-          {% endif %}
-
-          <div data-travel-document-wizard-rt data-travel-document-wizard-documentos>
-            <section class="cv-form-section-card cv-form-card cv-form-section-card--described travel-document-card rt-wizard-card" aria-labelledby="rt-wizard-title">
-              <header class="cv-form-section-header">
-                <div class="cv-form-section-header__copy">
-                  <h3 class="cv-form-section-title" id="rt-wizard-title">Relatório técnico</h3>
-                  <p class="cv-form-section-subtitle">Resumo do ofício, custeios e texto compartilhado do relatório</p>
-                </div>
-              </header>
-
-              <div class="cv-form-section-body travel-document-body rt-wizard-body">
-                {% include "prestacoes_contas/partials/_prestacao_identificacao_equipe.html" %}
-
-                {% include "components/ui/forms/form_block.html" with title="Custeios" description="Diária, translado, combustível e passagem" section_id="rt-custeios-title" variant="split" extra_class="travel-document-block rt-custeios-block" body_template="prestacoes_contas/partials/_rt_custeio_body.html" %}
-
-                {% for c in campos_modelo %}
-                  {% include "components/ui/forms/form_block.html" with title=c.label description="Escolha um modelo para este tópico ou escreva livremente" section_id=c.section_id variant="resource" extra_class="travel-document-block rt-topic-block" action_label="Gerenciar modelos" action_url=c.manage_url action_autosave=True body_extra_class="cv-form-stack" body_template="prestacoes_contas/partials/_rt_topico_body.html" %}
-                {% endfor %}
-
-                {% include "components/ui/forms/form_block.html" with title="Relatório Técnico deste servidor" description="O texto acima é compartilhado e salvo automaticamente. A pré-visualização e o download abaixo são só deste servidor." section_id="rt-downloads-title" extra_class="travel-document-block oficio-documentos-block oficio-documentos-preview-section document-inline-stack" body_extra_class="oficio-documentos-preview-section__body document-inline-stack" body_template="prestacoes_contas/partials/_rt_downloads_body.html" %}
-              </div>
-
-              <div class="cv-form-card__footer">
-                {% include "prestacoes_contas/partials/_rt_downloads_footer.html" %}
-              </div>
-            </section>
-          </div>
-        </form>
+    {% if diaria_info.alterada %}
+      <div class="diario-diaria-alert" role="alert">
+        <strong>Roteiro ajustado nesta prestação.</strong>
+        Preenchemos automaticamente em <strong>Informações complementares</strong> o que mudou (datas, horários e diária) — revise e complete a justificativa.
       </div>
+    {% endif %}
+
+    <div data-travel-document-wizard-rt data-travel-document-wizard-documentos>
+      {% include "components/form/card.html" with title="Relatório técnico" description="Resumo do ofício, custeios e texto compartilhado do relatório" title_id="rt-wizard-title" extra_class="rt-wizard-card" body_extra_class="rt-wizard-body" body_template="prestacoes_contas/partials/_rt_wizard_body.html" footer_template="prestacoes_contas/partials/_rt_downloads_footer.html" %}
     </div>
-  </div>
+  </form>
 {% endblock %}

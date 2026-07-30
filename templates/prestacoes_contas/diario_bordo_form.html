@@ -1,7 +1,5 @@
-{% extends "base.html" %}
+{% extends "components/page/flow_base.html" %}
 {% load static %}
-
-{% block title %}{{ page_title }}{% endblock %}
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/roteiros.css' %}">
@@ -14,80 +12,37 @@
   <script src="{% static 'js/pages/oficios-documentos-inline.js' %}" defer></script>
 {% endblock %}
 
-{% block content %}
-  <div class="page-shell page-shell--wizard travel-document-wizard app-wizard">
-    {% include "components/ui/headers/page_header.html" with eyebrow="PRESTAÇÕES" title=page_title icon_label="PC" module_label="Prestações de Contas" back_label="Voltar à lista" back_url=back_url|default:"/prestacoes-contas/" status_label="Diário de Bordo" status_variant="draft" only %}
+{% block flow_body %}
+  <form method="post"
+        class="travel-document-wizard__form"
+        novalidate
+        data-autosave="true"
+        data-autosave-model="diario_bordo"
+        data-autosave-step="diario"
+        data-autosave-url="{{ autosave_url }}"
+        data-autosave-object-id="{{ diario.pk }}">
+    {% csrf_token %}
+    {{ formset.management_form }}
 
-    {% if wizard_page_steps %}
-      {% include "components/ui/navigation/page_stepper.html" with steps=wizard_page_steps only %}
+    {% if formset.non_form_errors %}
+      {% include "components/ui/feedback/field_error.html" with errors=formset.non_form_errors only %}
     {% endif %}
 
-    <div class="main-form-panel main-form-panel--stack travel-document-wizard__main">
-      <div class="cv-form-section-stack cv-form-section-stack--comfortable">
-        <form method="post"
-              class="travel-document-wizard__form"
-              novalidate
-              data-autosave="true"
-              data-autosave-model="diario_bordo"
-              data-autosave-step="diario"
-              data-autosave-url="{{ autosave_url }}"
-              data-autosave-object-id="{{ diario.pk }}">
-          {% csrf_token %}
-          {{ formset.management_form }}
-
-          {% if formset.non_form_errors %}
-            {% include "components/ui/feedback/field_error.html" with errors=formset.non_form_errors only %}
-          {% endif %}
-
-          {% if diaria_info.alterada %}
-            <div class="diario-diaria-alert" role="alert">
-              <strong>Atenção:</strong> a alteração do roteiro mudou o valor da diária —
-              <span class="diario-diaria-alert__values">{{ diaria_info.valor_oficio_label }} (ofício) → {{ diaria_info.valor_ajustado_label }} (ajustado)</span>.
-              Justifique a diferença em <a href="{{ rt_url }}">Informações complementares</a> do Relatório Técnico.
-            </div>
-          {% endif %}
-
-          <div data-travel-document-wizard-diario data-travel-document-wizard-documentos>
-            <section class="cv-form-section-card cv-form-card cv-form-section-card--described travel-document-card diario-wizard-card" aria-labelledby="diario-wizard-title">
-              <header class="cv-form-section-header">
-                <div class="cv-form-section-header__copy">
-                  <h3 class="cv-form-section-title" id="diario-wizard-title">Diário de bordo</h3>
-                  <p class="cv-form-section-subtitle">Resumo do ofício, trechos do roteiro e pré-visualização</p>
-                </div>
-              </header>
-
-              <div class="cv-form-section-body travel-document-body diario-wizard-body">
-                {% include "prestacoes_contas/partials/_prestacao_identificacao_equipe.html" with omit_equipe=True %}
-
-                {% include "components/ui/forms/form_block.html" with title="Motorista" description="Motorista efetivo deste diário" section_id="diario-motorista-title" variant="resource" extra_class="travel-document-block oficio-documentos-block" actions_template="prestacoes_contas/partials/_diario_motorista_actions.html" body_template="prestacoes_contas/partials/_diario_motorista_body.html" %}
-
-                {% for item in trechos %}
-                  {% with form=item.form d=item.display %}
-                    {% with ordem_str=d.ordem|stringformat:"s" %}
-                      {% include "components/ui/forms/form_block.html" with title="Trecho "|add:ordem_str|add:" — "|add:d.rota description="Dados do roteiro. Informe KM e abastecimento." variant="resource" extra_class="travel-document-block roteiro-editor__section--retorno route-section-block diario-trecho-block" body_extra_class="roteiro-editor__retorno-body" body_template="prestacoes_contas/partials/_diario_trecho_body.html" %}
-                    {% endwith %}
-                  {% endwith %}
-                {% empty %}
-                  {% include "components/ui/forms/form_block.html" with title="Trechos do roteiro" description="Defina o roteiro do ofício para gerar o diário de bordo" section_id="diario-trechos-empty-title" variant="resource" extra_class="travel-document-block roteiro-editor__section--retorno route-section-block diario-trecho-block" body_template="prestacoes_contas/partials/_diario_trechos_empty.html" %}
-                {% endfor %}
-
-                {% if trechos %}
-                  {% include "components/ui/forms/form_block.html" with title="Pré-visualização do diário" description="O PDF é gerado com os dados salvos. Reabra o card após editar para atualizar." section_id="diario-preview-title" extra_class="travel-document-block oficio-documentos-block oficio-documentos-preview-section document-inline-stack" body_extra_class="oficio-documentos-preview-section__body document-inline-stack" body_template="prestacoes_contas/partials/_diario_preview_body.html" %}
-                {% endif %}
-              </div>
-
-              <div class="cv-form-card__footer">
-                {% include "prestacoes_contas/partials/_diario_footer.html" %}
-              </div>
-            </section>
-          </div>
-
-          {# Assinatura eletrônica temporariamente oculta (fluxo indisponível). #}
-          {% comment %}
-          {% include "components/documents/signature_card.html" with signature=assinatura next_url=assinatura_next_url only %}
-          {% endcomment %}
-        </form>
+    {% if diaria_info.alterada %}
+      <div class="diario-diaria-alert" role="alert">
+        <strong>Atenção:</strong> a alteração do roteiro mudou o valor da diária —
+        <span class="diario-diaria-alert__values">{{ diaria_info.valor_oficio_label }} (ofício) → {{ diaria_info.valor_ajustado_label }} (ajustado)</span>.
+        Justifique a diferença em <a href="{{ rt_url }}">Informações complementares</a> do Relatório Técnico.
       </div>
+    {% endif %}
+
+    <div data-travel-document-wizard-diario data-travel-document-wizard-documentos>
+      {% include "components/form/card.html" with title="Diário de bordo" description="Resumo do ofício, trechos do roteiro e pré-visualização" title_id="diario-wizard-title" extra_class="diario-wizard-card" body_extra_class="diario-wizard-body" body_template="prestacoes_contas/partials/_diario_wizard_body.html" footer_template="prestacoes_contas/partials/_diario_footer.html" %}
     </div>
-  </div>
+
+    {# Assinatura eletrônica temporariamente oculta (fluxo indisponível). #}
+    {% comment %}
+    {% include "components/documents/signature_card.html" with signature=assinatura next_url=assinatura_next_url only %}
+    {% endcomment %}
+  </form>
 {% endblock %}

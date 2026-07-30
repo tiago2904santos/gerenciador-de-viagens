@@ -1,0 +1,10 @@
+{% comment %}
+  Corpo do card mestre da etapa Documentos. Extraído no `H-02`, junto com o
+  casco da página (`components/page/flow_base.html`) e o card
+  (`components/form/card.html`).
+{% endcomment %}
+{% include "prestacoes_contas/partials/_prestacao_identificacao_equipe.html" with equipe_body_template="prestacoes_contas/partials/_docs_equipe_body.html" %}
+
+{% include "components/ui/forms/form_block.html" with title="Documentos do ofício" description="Despacho e ofício assinados, compartilhados por todos os servidores" section_id="docs-despacho-title" extra_class="travel-document-block oficio-documentos-block oficio-documentos-preview-section document-inline-stack docs-attach-block" body_extra_class="oficio-documentos-preview-section__body document-inline-stack" body_template="prestacoes_contas/partials/_docs_despacho_body.html" %}
+
+{% include "components/ui/forms/form_block.html" with title="Documentos assinados" description="Relatório técnico, diário de bordo e comprovante deste servidor" section_id="docs-anexos-title" extra_class="travel-document-block oficio-documentos-block oficio-documentos-preview-section document-inline-stack docs-attach-block" body_extra_class="oficio-documentos-preview-section__body document-inline-stack" body_template="prestacoes_contas/partials/_docs_anexos_servidor_body.html" %}
