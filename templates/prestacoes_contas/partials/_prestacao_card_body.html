@@ -1,8 +1,8 @@
 {# Miolo do card de prestação — servidores (solicitação/saque/docs/WhatsApp) + transporte/roteiro. #}
 <div class="oficio-lc__section">
-  <div class="oficio-lc__travellers oficio-lc__travellers--n1">
+  <ul class="oficio-lc__travellers oficio-lc__travellers--n1">
     {% for servidor in card.servidores %}
-    <div class="oficio-lc__traveller oficio-lc__traveller--prestacao{% if servidor.is_motorista %} oficio-lc__traveller--motorista{% endif %}">
+    <li class="oficio-lc__traveller oficio-lc__traveller--prestacao{% if servidor.is_motorista %} oficio-lc__traveller--motorista{% endif %}">
       <form method="post"
             action="{% url 'prestacoes_contas:index' %}"
             class="oficio-lc__solicitacao-form oficio-lc__solicitacao-form--inline"
@@ -176,9 +176,9 @@
           <span><strong>Copiar mensagem</strong><small>Copiar o texto para a área de transferência</small></span>
         </button>
       </div>
-    </div>
+    </li>
     {% endfor %}
-  </div>
+  </ul>
 </div>
 
 <div class="oficio-lc__section">
@@ -200,9 +200,9 @@
     {% if card.trechos %}
     <div class="oficio-lc__transport-card oficio-lc__transport-card--trechos">
       <span class="oficio-lc__transport-label">Trechos encontrados</span>
-      <div class="oficio-lc__trechos-list">
+      <ul class="oficio-lc__trechos-list">
         {% for trecho in card.trechos %}
-        <div class="oficio-lc__trecho">
+        <li class="oficio-lc__trecho">
           <div class="oficio-lc__trecho-rota">{{ trecho.rota }}</div>
           {% if trecho.saida or trecho.chegada %}
           <div class="oficio-lc__trecho-times">
@@ -211,9 +211,9 @@
             {% if trecho.chegada %}{{ trecho.chegada }}{% endif %}
           </div>
           {% endif %}
-        </div>
+        </li>
         {% endfor %}
-      </div>
+      </ul>
     </div>
     {% endif %}
 
