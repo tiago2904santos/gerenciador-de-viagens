@@ -66,6 +66,13 @@ TEMPLATE_RULES_ERRO = [
     ("onchange_inline", re.compile(r'\bonchange='),           'Evento onchange inline — usar addEventListener'),
     ("oninput_inline",  re.compile(r'\boninput='),            'Evento oninput inline — usar addEventListener'),
     ("js_void",         re.compile(r'javascript:void'),       'javascript:void — usar href ou button'),
+    # `{# #}` do Django é comentário de UMA linha. Aberto numa linha e fechado em
+    # outra, o Django não reconhece e devolve o texto VERBATIM para o HTML — como
+    # texto visível na página, ou como lixo no meio de uma tag, virando atributos
+    # inventados. Achado em produção: 6 linhas de comentário apareciam na etapa
+    # Transporte do wizard de ofício. Use `{% comment %}` para várias linhas.
+    ("comentario_django_multilinha", re.compile(r'\{#(?![^\n]*#\})'),
+     'Comentário {# #} sem fechar na mesma linha — vaza para o HTML; use {% comment %}'),
 ]
 
 TEMPLATE_RULES_AVISO = [

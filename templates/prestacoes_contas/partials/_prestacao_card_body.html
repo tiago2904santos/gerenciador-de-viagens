@@ -95,6 +95,12 @@
           <span><strong>Diário de bordo</strong><small>Ainda não foi criado</small></span>
         </span>
         {% endif %}
+        {% comment %}
+          Eram 17 atributos ordinais no botão abaixo, e o `primary` deste gatilho
+          era o relatório técnico enquanto o `primary` da etapa Documentos era o
+          despacho — mesmo modal, mesmo nome, documento diferente (H-03). O
+          payload agora vem do presenter, com chave semântica.
+        {% endcomment %}
         <button
           type="button"
           class="cv-action-menu__item oficio-lc__action-menu-item{% if servidor.rt_assinado.assinado or servidor.diario_assinado.assinado or servidor.comprovante_anexo.assinado %} is-assinado{% endif %}"
@@ -106,10 +112,6 @@
           data-attach-signed-file-help="Selecione um único arquivo em PDF, PNG, JPG ou JPEG."
           data-attach-signed-choose-label="Escolher arquivo"
           data-attach-signed-upload-label="Anexar arquivo"
-          {# Eram 17 atributos ordinais aqui, e o `primary` deste gatilho era o
-             relatório técnico enquanto o `primary` da etapa Documentos era o
-             despacho — mesmo modal, mesmo nome, documento diferente (H-03).
-             O payload agora vem do presenter, com chave semântica. #}
           data-attach-signed-kinds="{{ card.attach_kinds_json }}"
         >
           <span class="oficio-lc__action-menu-item-icon cv-action-menu__item-icon--success" aria-hidden="true">

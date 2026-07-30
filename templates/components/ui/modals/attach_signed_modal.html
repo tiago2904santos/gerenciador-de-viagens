@@ -18,11 +18,11 @@
       </span>
     </p>
 
-    {# H-03: eram cinco botões escritos à mão, nomeados por ordinal latino
+    {% comment %} H-03: eram cinco botões escritos à mão, nomeados por ordinal latino
        (`primary`…`quinary`) e ocultados por `hidden` quando a tela tinha menos
        tipos. O número de documentos anexáveis virava constante em três lugares —
        aqui, no gatilho e na lista `KINDS` do JS. Agora o gatilho declara seus
-       tipos num payload e `attach-signed-modal.js` monta os botões. #}
+       tipos num payload e `attach-signed-modal.js` monta os botões. {% endcomment %}
     <div class="attach-signed-modal__kind" data-attach-signed-kind-selector hidden>
       <span class="attach-signed-modal__kind-label">Documento</span>
       <div class="attach-signed-modal__kind-options" role="group" aria-label="Selecionar documento assinado" data-attach-signed-kind-options></div>

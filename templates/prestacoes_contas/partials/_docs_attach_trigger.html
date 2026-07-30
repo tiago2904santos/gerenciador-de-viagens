@@ -1,8 +1,8 @@
-{# Botão de anexar/gerenciar documento assinado.
+{% comment %} Botão de anexar/gerenciar documento assinado.
    Requer `attach_kinds_json` no contexto: um JSON com a lista ordenada dos
    documentos que este gatilho pode anexar. Era um include de 37 linhas com 30
    atributos `data-*` nomeados por ordinal latino (`primary`…`quinary`) —
-   acrescentar um sexto documento exigia editar template, JS e modal. #}
+   acrescentar um sexto documento exigia editar template, JS e modal. {% endcomment %}
 <button
   type="button"
   class="cv-icon-btn cv-icon-btn--sign{% if doc.assinado %} is-assinado{% endif %}"
