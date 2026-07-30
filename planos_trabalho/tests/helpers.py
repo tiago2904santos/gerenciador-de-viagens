@@ -7,6 +7,7 @@ from datetime import time
 
 from cadastros.models import Cargo
 from cadastros.models import Cidade
+from cadastros.models import AssinaturaConfiguracao
 from cadastros.models import ConfiguracaoSistema
 from cadastros.models import Estado
 from cadastros.models import Servidor
@@ -38,6 +39,20 @@ def configurar_sistema(curitiba):
     config.cargo_chefia = "Assessor de Comunicação Social"
     config.pt_sufixo_numero = "ASCOM"
     config.save()
+    # `b970a84` fez o documento resolver o assinante pela ÁREA do registro, com
+    # `fallback_geral=False` — `config.nome_chefia` deixou de ser usado como
+    # último recurso. Sem uma linha de assinatura, o nome sai vazio. A fixture
+    # passou a declarar o assinante de verdade, que é o contrato novo.
+    cargo = Cargo.objects.create(nome="Assessor de Comunicação Social")
+    chefia = Servidor.objects.create(
+        nome="João Mário Nunes de Góes", cpf="98765432100", cargo=cargo
+    )
+    AssinaturaConfiguracao.objects.create(
+        configuracao=config,
+        tipo=AssinaturaConfiguracao.PLANO_TRABALHO,
+        servidor=chefia,
+        ordem=1,
+    )
     return config
 
 
