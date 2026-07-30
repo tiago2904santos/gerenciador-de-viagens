@@ -247,8 +247,8 @@ class OficioDadosViajantesForm(OficioForm):
             "viatura": ViaturaSelectSingle(
                 attrs={
                     **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
-                    "data-cv-search-picker": "true",
-                    "data-picker-mode": "single",
+                    "data-entity-picker": "true",
+                    "data-entity-picker-mode": "single",
                     "data-picker-variant": "detailed",
                     "data-picker-presentation": "vehicle",
                     "data-picker-label": "Escolher viatura",
@@ -262,8 +262,8 @@ class OficioDadosViajantesForm(OficioForm):
             "servidores": ServidorEquipeSelectMultiple(
                 attrs={
                     **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
-                    "data-cv-search-picker": "true",
-                    "data-picker-mode": "multi",
+                    "data-entity-picker": "true",
+                    "data-entity-picker-mode": "multi",
                     "data-picker-variant": "detailed",
                     "data-picker-presentation": "people",
                     "data-picker-term-control": "true",
@@ -414,8 +414,8 @@ class OficioTransporteForm(forms.ModelForm):
             "motorista": ServidorMotoristaSelect(
                 attrs={
                     **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
-                    "data-cv-search-picker": "true",
-                    "data-picker-mode": "single",
+                    "data-entity-picker": "true",
+                    "data-entity-picker-mode": "single",
                     "data-picker-variant": "detailed",
                     "data-empty-selected": "Nenhum motorista selecionado.",
                     "data-empty-message": "Nenhum servidor encontrado.",

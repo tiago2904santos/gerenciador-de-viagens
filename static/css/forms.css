@@ -1172,7 +1172,7 @@ html[data-theme="dark"] input[type="checkbox"] {
   z-index: 5;
 }
 
-/* Search picker + botão de gerenciar: cv-search-picker.js move o botão para
+/* Search picker + botão de gerenciar: picker.js move o botão para
    dentro do controle de busca (ao lado de "Limpar busca") em vez de
    sobrepor o rótulo/dica do campo. Fica sempre visível (o controle já não
    é tão compacto quanto um select simples, então esconder no hover

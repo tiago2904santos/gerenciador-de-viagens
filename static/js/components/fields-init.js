@@ -49,10 +49,10 @@
   }
 
   function initSelects(root) {
-    return safeCall('customSelect', function () {
-      var api = (window.CV && window.CV.customSelect) || window.CvCustomSelect;
-      if (api && typeof api.init === 'function') {
-        api.init(root);
+    return safeCall('pickerSelect', function () {
+      var api = window.CV && window.CV.picker;
+      if (api && typeof api.initSelect === 'function') {
+        api.initSelect(root);
         return 1;
       }
       return 0;
@@ -60,10 +60,10 @@
   }
 
   function initSearchPickers(root) {
-    return safeCall('searchPicker', function () {
-      var api = (window.CV && window.CV.searchPicker) || window.CvSearchPicker;
-      if (api && typeof api.init === 'function') {
-        api.init(root);
+    return safeCall('pickerSearch', function () {
+      var api = window.CV && window.CV.picker;
+      if (api && typeof api.initSearch === 'function') {
+        api.initSearch(root);
         return 1;
       }
       return 0;

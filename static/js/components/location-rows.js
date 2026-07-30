@@ -10,7 +10,7 @@
   function resetSearchPicker(select) {
     if (!select) return;
     if (select.dataset) {
-      delete select.dataset.cvSearchPickerReady;
+      delete select.dataset.entityPickerReady;
     }
     var nextEl = select.nextElementSibling;
     if (nextEl && nextEl.classList && nextEl.classList.contains("cv-search-picker")) {
@@ -26,8 +26,8 @@
       api.initSearchPickers(asRoot(scope));
       return;
     }
-    if (window.CvSearchPicker && typeof window.CvSearchPicker.init === "function") {
-      window.CvSearchPicker.init(asRoot(scope));
+    if (window.CV && window.CV.picker && typeof window.CV.picker.initSearch === "function") {
+      window.CV.picker.initSearch(asRoot(scope));
     }
   }
 
@@ -183,8 +183,8 @@
     var fragment = document.createDocumentFragment();
     while (holder.firstChild) fragment.appendChild(holder.firstChild);
 
-    Array.prototype.slice.call(fragment.querySelectorAll("[data-cv-search-picker-ready]")).forEach(function (el) {
-      delete el.dataset.cvSearchPickerReady;
+    Array.prototype.slice.call(fragment.querySelectorAll("[data-entity-picker-ready]")).forEach(function (el) {
+      delete el.dataset.entityPickerReady;
     });
 
     var row = fragment.querySelector(options.rowSelector || "[data-location-row]");

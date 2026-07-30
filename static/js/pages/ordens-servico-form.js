@@ -113,8 +113,8 @@
       window.CV.locationRows.resetSearchPicker(select);
       return;
     }
-    if (!select || select.dataset.cvSearchPickerReady !== "true") return;
-    delete select.dataset.cvSearchPickerReady;
+    if (!select || select.dataset.entityPickerReady !== "true") return;
+    delete select.dataset.entityPickerReady;
     var next = select.nextElementSibling;
     if (next && next.classList && next.classList.contains("cv-search-picker")) {
       next.parentNode.removeChild(next);
@@ -126,8 +126,8 @@
       window.CV.locationRows.initSearchPickers(scope || document);
       return;
     }
-    if (window.CvSearchPicker && window.CvSearchPicker.init) {
-      window.CvSearchPicker.init(scope || document);
+    if (window.CV && window.CV.picker && window.CV.picker.initSearch) {
+      window.CV.picker.initSearch(scope || document);
     }
   }
 

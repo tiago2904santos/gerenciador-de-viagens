@@ -12,7 +12,7 @@
   'use strict';
 
   var ROOT_SEL       = '[data-travel-document-wizard-step1]';
-  var VIATURA_SEL    = 'select[name="viatura"][data-cv-search-picker]';
+  var VIATURA_SEL    = 'select[name="viatura"][data-entity-picker]';
   var EQUIPE_SEL     = 'select[name="servidores"]';
   var MOTORISTA_SEL  = 'select[name="motorista"]';
   var MODO_SEL       = 'input[name="motorista_modo"]';

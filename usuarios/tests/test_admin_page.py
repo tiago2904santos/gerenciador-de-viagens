@@ -48,8 +48,9 @@ class UsuariosAdminPageTests(TestCase):
         response = self.client.get(reverse("usuarios:index"))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'data-cv-search-picker="true"', count=3)
-        self.assertContains(response, 'data-picker-mode="single"', count=3)
+        self.assertContains(response, 'data-entity-picker="true"', count=3)
+        self.assertContains(response, 'data-entity-picker-mode="single"', count=5)
+        self.assertContains(response, 'data-entity-picker-renderer="select"', count=2)
 
     def test_cria_usuario_vinculado_a_area(self):
         self.client.force_login(self.admin)

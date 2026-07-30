@@ -146,8 +146,8 @@ class UiLabFieldDemoForm(forms.Form):
         widget=forms.Select(
             attrs={
                 **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
-                "data-cv-search-picker": "true",
-                "data-picker-mode": "single",
+                "data-entity-picker": "true",
+                "data-entity-picker-mode": "single",
                 "data-picker-variant": "compact",
                 "data-field-label": "Destino",
                 "data-placeholder": "Buscar destino...",
@@ -168,8 +168,8 @@ class UiLabFieldDemoForm(forms.Form):
         widget=forms.SelectMultiple(
             attrs={
                 **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
-                "data-cv-search-picker": "true",
-                "data-picker-mode": "multi",
+                "data-entity-picker": "true",
+                "data-entity-picker-mode": "multi",
                 "data-picker-variant": "detailed",
                 "data-field-label": "Servidores",
                 "data-placeholder": "Buscar servidor...",

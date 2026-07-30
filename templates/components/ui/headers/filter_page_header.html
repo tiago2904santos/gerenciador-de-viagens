@@ -38,7 +38,7 @@
       {% if current_aba %}<input type="hidden" name="aba" value="{{ current_aba }}">{% endif %}
 
       {% if status_options %}
-      <div class="list-header__select cv-filter-bar__select cv-custom-select" data-cv-select>
+      <div class="list-header__select cv-filter-bar__select cv-custom-select" data-entity-picker data-entity-picker-renderer="select" data-entity-picker-mode="single">
         <select name="{{ status_name|default:'status' }}" aria-label="Status" data-collection-filter="select">
           {% for opt in status_options %}
             <option value="{{ opt.value }}"{% if opt.value == status %} selected{% endif %}>{{ opt.label }}</option>
@@ -48,7 +48,7 @@
       {% endif %}
 
       {% if temporal_options %}
-      <div class="list-header__select cv-filter-bar__select cv-custom-select" data-cv-select>
+      <div class="list-header__select cv-filter-bar__select cv-custom-select" data-entity-picker data-entity-picker-renderer="select" data-entity-picker-mode="single">
         <select name="temporal" aria-label="Período da viagem" data-collection-filter="select">
           {% for opt in temporal_options %}
             <option value="{{ opt.value }}"{% if opt.value == temporal %} selected{% endif %}>{{ opt.label }}</option>
@@ -58,7 +58,7 @@
       {% endif %}
 
       {% if sort_options %}
-      <div class="list-header__select cv-filter-bar__select cv-custom-select" data-cv-select>
+      <div class="list-header__select cv-filter-bar__select cv-custom-select" data-entity-picker data-entity-picker-renderer="select" data-entity-picker-mode="single">
         <select name="sort" aria-label="Ordenar por" data-collection-filter="select">
           {% for opt in sort_options %}
             <option value="{{ opt.value }}"{% if opt.value == sort or not sort and forloop.first %} selected{% endif %}>{{ opt.label }}</option>

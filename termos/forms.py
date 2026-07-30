@@ -64,8 +64,8 @@ class TermoAutorizacaoForm(forms.ModelForm):
             "destino_estado": forms.Select(
                 attrs={
                     **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
-                    "data-cv-search-picker": "true",
-                    "data-picker-mode": "single",
+                    "data-entity-picker": "true",
+                    "data-entity-picker-mode": "single",
                     "data-picker-variant": "compact",
                     "data-placeholder": "Buscar estado...",
                     "data-empty-message": "Nenhum estado encontrado.",
@@ -74,8 +74,8 @@ class TermoAutorizacaoForm(forms.ModelForm):
             "destino_cidade": forms.Select(
                 attrs={
                     **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
-                    "data-cv-search-picker": "true",
-                    "data-picker-mode": "single",
+                    "data-entity-picker": "true",
+                    "data-entity-picker-mode": "single",
                     "data-picker-variant": "compact",
                     "data-placeholder": "Buscar cidade...",
                     "data-empty-message": "Nenhuma cidade encontrada.",
@@ -86,8 +86,8 @@ class TermoAutorizacaoForm(forms.ModelForm):
             "servidores": ServidorEquipeSelectMultiple(
                 attrs={
                     **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
-                    "data-cv-search-picker": "true",
-                    "data-picker-mode": "multi",
+                    "data-entity-picker": "true",
+                    "data-entity-picker-mode": "multi",
                     "data-picker-variant": "detailed",
                     "data-picker-presentation": "people",
                     "data-picker-label": "Adicionar à equipe",
@@ -101,8 +101,8 @@ class TermoAutorizacaoForm(forms.ModelForm):
             "viatura": ViaturaSelectSingle(
                 attrs={
                     **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
-                    "data-cv-search-picker": "true",
-                    "data-picker-mode": "single",
+                    "data-entity-picker": "true",
+                    "data-entity-picker-mode": "single",
                     "data-picker-variant": "detailed",
                     "data-picker-presentation": "vehicle",
                     "data-picker-label": "Adicionar viatura",

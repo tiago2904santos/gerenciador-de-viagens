@@ -117,7 +117,7 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertContains(response, 'name="servidores_termo_autorizacao_present"')
         self.assertContains(response, 'name="servidores_termo_autorizacao"')
         self.assertContains(response, "cv-search-picker__termos-native")
-        self.assertContains(response, 'data-cv-search-picker="true"')
+        self.assertContains(response, 'data-entity-picker="true"')
         self.assertContains(response, 'data-picker-variant="detailed"')
         self.assertContains(response, 'data-picker-term-control="true"')
         self.assertContains(response, "cv-form-section-stack--comfortable")

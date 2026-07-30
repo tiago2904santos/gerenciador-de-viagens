@@ -354,7 +354,7 @@ Ao digitar na busca das listas de **Ofícios, Eventos, OS, Planos de Trabalho e 
 | **`fetch` sem `CV.http`** | **13 arquivos** | sem tratamento padronizado de 401/403/HTML-em-vez-de-JSON |
 | **`debounce`** | **5** | `live-search-submit`, `realtime-filters`, `oficios-transporte`, `ordens-servico-form`, `prestacoes-assinatura` |
 | **Prefill a partir de ofício** | **3** | `termos-form.js`, `ordens-servico-form.js`, `diario-motorista.js` — cada um com seu `json_script` e sua rotina |
-| **Picker de entidade** | **5** | `cv-search-picker.js` (global) + `app-motorista-picker.js` + `app-multiselect.js` + `oficio-viatura-sugestoes.js` + pickers ad-hoc em `planos-trabalho-wizard.js` (coordenador) e `diario-motorista.js` (dmv) |
+| **Picker de entidade** | **1** | **Corrigido:** `CV.picker` possui um enhancer e renderers de busca/select sob o contrato `data-entity-picker`; sugestões de viatura e coordenadores operam sobre o mesmo select canônico |
 | **Feedback ao usuário** | **3** | `cv-document-loading` (toast de progresso), 4 modais `cv-dialog`, e **13 `window.alert`/`confirm`** |
 
 ### 4.6 Namespaces globais: 22
@@ -778,7 +778,7 @@ Alvo: **16 motores globais**, todos registrados via `CV.registerEnhancer`, todos
 | # | Motor | Substitui | Contrato |
 |---|---|---|---|
 | 6 | **`CV.fields`** | `fields-init` + `masks` + `state-toggle` + `card-toggle` + `cv-select` + `document-number-field` | Enhancer único que varre `root` e inicializa todo controle. Resolve **J-01** para 6 arquivos |
-| 7 | **`CV.picker`** | `cv-search-picker` + `cv-custom-select` + `app-multiselect` + `app-motorista-picker` + `oficios-viatura-sugestoes` + pickers ad-hoc | `data-entity-picker` + `data-entity-picker-kind`. Resolve 5 duplicações |
+| 7 | **`CV.picker`** | ✅ substituiu `cv-search-picker` + `cv-custom-select`; motores órfãos já removidos; comportamentos de domínio operam sobre o select canônico | `data-entity-picker` + `data-entity-picker-mode="single\|multi"` |
 | 8 | **`CV.datePicker`** | `cv-date-picker` | ✅ já enhancer — só padronizar `aria-controls` (**H-06**) |
 | 9 | **`CV.filePicker`** | `file-picker` | ✅ já enhancer |
 | 10 | **`CV.autosave`** | `autosave.js` | Virar enhancer; **um** listener global de `beforeunload`/click em vez de um por form (resolve **J-10**) |
@@ -891,7 +891,7 @@ Cada fase é independente, verificável e não depende da reconstrução do CSS.
 | **11** | Criar `components/form/card.html` (card mestre com header) e migrar as 20+ páginas | H-05 | Fim do header à mão |
 | **12** | Criar `CV.locationRows` + `components/form/location_rows.html`; migrar os 6 módulos; unificar contrato em `estado.pk` | H-01, J-08 | −20 templates, −950 linhas de JS |
 | **13** | ✅ Criar `CV.documentSource`; migrar Termos, OS e Diário-motorista | J-15 | −3 implementações |
-| **14** | Criar `CV.picker`; absorver os 5 pickers | — | −800 linhas |
+| **14** | ✅ Criar `CV.picker`; unificar hooks, namespace, enhancer e renderers vivos | — | Um contrato de seleção |
 | **15** | Criar `CV.overlay`; fundir os 4 modais e o action-menu | J-02 | −340 linhas |
 | **16** | Colapsar os 22 namespaces em `CV.*` | J-09 | — |
 | **17** | Trocar os 88 `?v=` manuais por `ManifestStaticFilesStorage` (hash automático); remover os `?v=` dos `import` ESM | J-13 | Fim da cache incoerente |

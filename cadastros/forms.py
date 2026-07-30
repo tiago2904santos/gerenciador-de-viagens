@@ -144,8 +144,8 @@ class UnidadeForm(BaseCadastroForm):
         widget=ServidorFiltroSelectMultiple(
             attrs={
                 **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
-                "data-cv-search-picker": "true",
-                "data-picker-mode": "multi",
+                "data-entity-picker": "true",
+                "data-entity-picker-mode": "multi",
                 "data-picker-variant": "compact",
                 "data-picker-label": "Servidores",
                 "data-picker-hint": "Busque por nome, cargo, CPF ou RG.",
@@ -343,8 +343,8 @@ class ServidorForm(BaseCadastroForm):
         self.fields["unidade"].widget = UnidadeSearchSelect(
             attrs={
                 **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
-                "data-cv-search-picker": "true",
-                "data-picker-mode": "single",
+                "data-entity-picker": "true",
+                "data-entity-picker-mode": "single",
                 "data-picker-variant": "compact",
                 "data-picker-label": "Unidade",
                 "data-picker-hint": "Busque por sigla ou nome da unidade.",
@@ -441,8 +441,8 @@ class ViaturaForm(BaseCadastroForm):
             "motoristas": ServidorFiltroSelectMultiple(
                 attrs={
                     **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
-                    "data-cv-search-picker": "true",
-                    "data-picker-mode": "multi",
+                    "data-entity-picker": "true",
+                    "data-entity-picker-mode": "multi",
                     "data-picker-variant": "compact",
                     "data-picker-label": "Motoristas",
                     "data-panel-title": "MOTORISTAS SELECIONADOS",
@@ -466,8 +466,8 @@ class ViaturaForm(BaseCadastroForm):
         self.fields["unidade"].widget = UnidadeSearchSelect(
             attrs={
                 **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
-                "data-cv-search-picker": "true",
-                "data-picker-mode": "single",
+                "data-entity-picker": "true",
+                "data-entity-picker-mode": "single",
                 "data-picker-variant": "compact",
                 "data-picker-label": "Unidade (opcional)",
                 "data-placeholder": "Buscar unidade",
@@ -566,8 +566,8 @@ class ConfiguracaoSistemaForm(forms.ModelForm):
         self.fields["unidade"].widget = UnidadePorExtensoSearchSelect(
             attrs={
                 **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
-                "data-cv-search-picker": "true",
-                "data-picker-mode": "single",
+                "data-entity-picker": "true",
+                "data-entity-picker-mode": "single",
                 "data-picker-variant": "compact",
                 "data-picker-label": "Unidade",
                 "data-picker-hint": "Busque por sigla ou nome da unidade.",
@@ -704,8 +704,8 @@ class ConfiguracaoAssinaturasForm(forms.Form):
                 widget=_AssinanteServidorSelect(
                     attrs={
                         **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
-                        "data-cv-search-picker": "true",
-                        "data-picker-mode": "single",
+                        "data-entity-picker": "true",
+                        "data-entity-picker-mode": "single",
                         "data-picker-variant": "compact",
                         "data-picker-label": picker_label,
                         "data-picker-hint": "Busque por nome, cargo ou CPF.",
@@ -766,8 +766,8 @@ class ConfiguracaoDestinatarioForm(forms.ModelForm):
         self.fields["destinatario_oficio"].widget = _AssinanteServidorSelect(
             attrs={
                 **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
-                "data-cv-search-picker": "true",
-                "data-picker-mode": "single",
+                "data-entity-picker": "true",
+                "data-entity-picker-mode": "single",
                 "data-picker-variant": "compact",
                 "data-picker-label": "Nome",
                 "data-placeholder": "Buscar ou digitar nome",
