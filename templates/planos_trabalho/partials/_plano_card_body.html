@@ -1,9 +1,9 @@
 {# Miolo do card de Plano de Trabalho — participantes + atividades/efetivo/valores. #}
 {% if card.participantes %}
 <div class="oficio-lc__section">
-  <div class="oficio-lc__travellers oficio-lc__travellers--n{{ card.participantes|length }}">
+  <ul class="oficio-lc__travellers oficio-lc__travellers--n{{ card.participantes|length }}">
     {% for p in card.participantes %}
-    <div class="oficio-lc__traveller">
+    <li class="oficio-lc__traveller">
       <div class="oficio-lc__traveller-body">
         <div class="oficio-lc__traveller-name-row">
           <span class="oficio-lc__traveller-name">{{ p.name }}</span>
@@ -13,9 +13,9 @@
         <span class="oficio-lc__traveller-meta">{{ p.meta }}</span>
         {% endif %}
       </div>
-    </div>
+    </li>
     {% endfor %}
-  </div>
+  </ul>
 </div>
 {% endif %}
 
@@ -24,13 +24,13 @@
     <div class="oficio-lc__transport-card oficio-lc__transport-card--trechos">
       <span class="oficio-lc__transport-label">Atividades selecionadas{% if card.atividades_count %} ({{ card.atividades_count }}){% endif %}</span>
       {% if card.atividades %}
-      <div class="oficio-lc__trechos-list">
+      <ul class="oficio-lc__trechos-list">
         {% for atividade in card.atividades %}
-        <div class="oficio-lc__trecho">
+        <li class="oficio-lc__trecho">
           <div class="oficio-lc__trecho-rota">{{ atividade }}</div>
-        </div>
+        </li>
         {% endfor %}
-      </div>
+      </ul>
       {% else %}
       <div class="oficio-lc__transport-modelo oficio-lc__text--empty">Nenhuma atividade selecionada</div>
       {% endif %}

@@ -5,9 +5,9 @@
     <div class="oficio-lc__transport-card oficio-lc__transport-card--trechos">
       <span class="oficio-lc__transport-label">Ofícios{% if card.oficios_count %} ({{ card.oficios_count }}){% endif %}</span>
       {% if card.oficios %}
-      <div class="oficio-lc__trechos-list evento-lc__items-grid">
+      <ul class="oficio-lc__trechos-list evento-lc__items-grid">
         {% for oficio in card.oficios %}
-        <div class="oficio-lc__trecho oficio-lc__trecho--documento">
+        <li class="oficio-lc__trecho oficio-lc__trecho--documento">
           <div class="oficio-lc__trecho-body">
             <div class="oficio-lc__trecho-rota">
               <span>{{ oficio.numero }}</span>
@@ -50,9 +50,9 @@
               {% include "components/ui/menus/rich_menu_link.html" with href=oficio.editar_url title="Editar ofício" description="Abrir o cadastro para alterações" icon="edit" tone="edit" only %}
             </div>
           </div>
-        </div>
+        </li>
         {% endfor %}
-      </div>
+      </ul>
       {% else %}
       <div class="oficio-lc__transport-modelo oficio-lc__text--empty">Nenhum ofício vinculado</div>
       {% endif %}
@@ -61,9 +61,9 @@
     <div class="oficio-lc__transport-card oficio-lc__transport-card--trechos evento-lc__documentos-card">
       <span class="oficio-lc__transport-label">Documentos{% if card.documentos_count %} ({{ card.documentos_count }}){% endif %}</span>
       {% if card.documentos %}
-      <div class="oficio-lc__trechos-list evento-lc__items-grid">
+      <ul class="oficio-lc__trechos-list evento-lc__items-grid">
         {% for doc in card.documentos %}
-        <div class="oficio-lc__trecho oficio-lc__trecho--documento">
+        <li class="oficio-lc__trecho oficio-lc__trecho--documento">
           <div class="oficio-lc__trecho-body">
             <div class="oficio-lc__trecho-rota">
               <span>{{ doc.title }}</span>
@@ -107,9 +107,9 @@
               {% endif %}
             </div>
           </div>
-        </div>
+        </li>
         {% endfor %}
-      </div>
+      </ul>
       {% else %}
       <div class="oficio-lc__transport-modelo oficio-lc__text--empty">Nenhum plano, convite ou OS vinculado</div>
       {% endif %}
@@ -120,10 +120,10 @@
 
 {% if card.servidores_flat %}
 <div class="oficio-lc__section">
-  <div class="oficio-lc__travellers oficio-lc__travellers--n{% if card.servidores_flat_count == 1 %}1{% else %}2{% endif %}">
+  <ul class="oficio-lc__travellers oficio-lc__travellers--n{% if card.servidores_flat_count == 1 %}1{% else %}2{% endif %}">
     {% for oficio in card.oficios %}
       {% for s in oficio.servidores %}
-      <div class="oficio-lc__traveller{% if s.is_motorista %} oficio-lc__traveller--motorista{% endif %}">
+      <li class="oficio-lc__traveller{% if s.is_motorista %} oficio-lc__traveller--motorista{% endif %}">
         <span class="oficio-lc__traveller-avatar" aria-hidden="true">{{ s.initials }}</span>
 
         <div class="oficio-lc__traveller-body">
@@ -187,9 +187,9 @@
           </div>
         </div>
         {% endif %}
-      </div>
+      </li>
       {% endfor %}
     {% endfor %}
-  </div>
+  </ul>
 </div>
 {% endif %}
