@@ -199,27 +199,27 @@ html[data-theme="dark"] .page-header-rail__subtitle {
 
 /* Listas usam cabeçalho flat (list-header.css) — sem card/sombra no stack. */
 :is(html[data-theme="dark"])
-  .page-shell--list, .cv-page--collection .page-header-stack:not(.list-header) {
+  :is(.page-shell--list, .cv-page--collection) .page-header-stack:not(.list-header) {
   background: #0d1d30;
   border-color: color-mix(in srgb, var(--color-border) 84%, #31577c);
   box-shadow: 0 14px 32px rgba(0, 0, 0, 0.32);
 }
 
 :is(html[data-theme="dark"])
-  .page-shell--list, .cv-page--collection .page-header-stack:not(.list-header) .page-header-band {
+  :is(.page-shell--list, .cv-page--collection) .page-header-stack:not(.list-header) .page-header-band {
   background: #0d1d30;
   padding: 20px clamp(20px, 2.4vw, 30px) 16px;
 }
 
 :is(html[data-theme="dark"])
-  .page-shell--list, .cv-page--collection .page-header-stack:not(.list-header) .page-header-rail {
+  :is(.page-shell--list, .cv-page--collection) .page-header-stack:not(.list-header) .page-header-rail {
   background: #14263b;
   border-top-color: rgba(152, 184, 218, 0.22);
   padding: 14px clamp(20px, 2.4vw, 30px) 18px;
 }
 
 :is(html[data-theme="dark"])
-  .page-shell--list, .cv-page--collection .header-filter-input {
+  :is(.page-shell--list, .cv-page--collection) .header-filter-input {
   background: #0b1d2e;
   border-color: #526f89;
   min-height: 44px;
@@ -341,14 +341,14 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
    form cards, internal blocks and composed fields.
    ========================================================= */
 :is(html[data-theme="dark"])
-  .page-shell--wizard, .cv-page--flow {
+  :is(.page-shell--wizard, .cv-page--flow) {
   --cv-form-section-header-padding: 12px 18px 12px 30px;
   --cv-form-section-body-padding: 16px 18px;
   --cv-wizard-shell-header-height: 91.2px;
 }
 
 :is(html[data-theme="dark"])
-  .page-shell--wizard, .cv-page--flow .page-header-stack {
+  :is(.page-shell--wizard, .cv-page--flow) .page-header-stack {
   align-items: stretch;
   background: #12243a;
   border: 1px solid rgba(145, 177, 211, 0.34);
@@ -361,7 +361,7 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
 }
 
 :is(html[data-theme="dark"])
-  .page-shell--wizard, .cv-page--flow :is(.page-header-band, .page-header-rail) {
+  :is(.page-shell--wizard, .cv-page--flow) :is(.page-header-band, .page-header-rail) {
   background: transparent;
   border: 0;
   border-radius: 0;
@@ -370,19 +370,19 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
 }
 
 :is(html[data-theme="dark"])
-  .page-shell--wizard, .cv-page--flow .page-header-band {
+  :is(.page-shell--wizard, .cv-page--flow) .page-header-band {
   justify-content: center;
   padding: 10px 14px 10px 18px;
 }
 
 :is(html[data-theme="dark"])
-  .page-shell--wizard, .cv-page--flow .page-header-band__content {
+  :is(.page-shell--wizard, .cv-page--flow) .page-header-band__content {
   gap: 14px;
   justify-content: flex-start;
 }
 
 :is(html[data-theme="dark"])
-  .page-shell--wizard, .cv-page--flow .page-header-band__text {
+  :is(.page-shell--wizard, .cv-page--flow) .page-header-band__text {
   align-items: flex-start;
   flex-direction: column;
   gap: 4px;
@@ -390,14 +390,14 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
 }
 
 :is(html[data-theme="dark"])
-  .page-shell--wizard, .cv-page--flow .page-header-band__eyebrow {
+  :is(.page-shell--wizard, .cv-page--flow) .page-header-band__eyebrow {
   font-size: 10px;
   letter-spacing: 0.14em;
   line-height: 1;
 }
 
 :is(html[data-theme="dark"])
-  .page-shell--wizard, .cv-page--flow .page-header-band__title {
+  :is(.page-shell--wizard, .cv-page--flow) .page-header-band__title {
   font-size: 25px;
   letter-spacing: -0.02em;
   line-height: 1.15;
@@ -409,7 +409,7 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
 }
 
 :is(html[data-theme="dark"])
-  .page-shell--wizard, .cv-page--flow .page-header-status-chip {
+  :is(.page-shell--wizard, .cv-page--flow) .page-header-status-chip {
   box-shadow: none;
   font-size: 10px;
   min-height: 22px;
@@ -417,24 +417,24 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
 }
 
 :is(html[data-theme="dark"])
-  .page-shell--wizard, .cv-page--flow .page-header-rail {
+  :is(.page-shell--wizard, .cv-page--flow) .page-header-rail {
   gap: 12px;
   justify-content: flex-end;
   padding: 10px 14px 10px 8px;
 }
 
 :is(html[data-theme="dark"])
-  .page-shell--wizard, .cv-page--flow .page-header-rail__content {
+  :is(.page-shell--wizard, .cv-page--flow) .page-header-rail__content {
   flex: 0 1 auto;
 }
 
 :is(html[data-theme="dark"])
-  .page-shell--wizard, .cv-page--flow :is(.page-header-rail__marker, .page-header-rail__eyebrow) {
+  :is(.page-shell--wizard, .cv-page--flow) :is(.page-header-rail__marker, .page-header-rail__eyebrow) {
   display: none;
 }
 
 :is(html[data-theme="dark"])
-  .page-shell--wizard, .cv-page--flow .page-header-rail__subtitle {
+  :is(.page-shell--wizard, .cv-page--flow) .page-header-rail__subtitle {
   color: #c5d4e5;
   font-size: 12px;
   font-weight: var(--font-weight-bold);
@@ -466,13 +466,13 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
 }
 
 :is(html[data-theme="dark"])
-  .page-shell--wizard, .cv-page--flow .page-header-rail__actions .cv-btn {
+  :is(.page-shell--wizard, .cv-page--flow) .page-header-rail__actions .cv-btn {
   min-height: 38px;
   padding: 8px 13px;
 }
 
 :is(html[data-theme="dark"])
-  .page-shell--wizard, .cv-page--flow > .page-stepper {
+  :is(.page-shell--wizard, .cv-page--flow) > .page-stepper {
   --stepper-marker-size: 32px;
   --stepper-missing-bg: color-mix(in srgb, var(--color-danger) 12%, transparent);
   --stepper-missing-border: color-mix(in srgb, var(--color-danger) 30%, transparent);
@@ -483,47 +483,47 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
 }
 
 :is(html[data-theme="dark"])
-  .page-shell--wizard, .cv-page--flow .page-stepper__item.is-missing .page-stepper__status {
+  :is(.page-shell--wizard, .cv-page--flow) .page-stepper__item.is-missing .page-stepper__status {
   font-weight: 600;
   letter-spacing: 0.01em;
   opacity: 0.92;
 }
 
 :is(html[data-theme="dark"])
-  .page-shell--wizard, .cv-page--flow .page-stepper__list {
+  :is(.page-shell--wizard, .cv-page--flow) .page-stepper__list {
   gap: 0;
 }
 
 :is(html[data-theme="dark"])
-  .page-shell--wizard, .cv-page--flow .page-stepper__item {
+  :is(.page-shell--wizard, .cv-page--flow) .page-stepper__item {
   gap: 4px;
 }
 
 :is(html[data-theme="dark"])
-  .page-shell--wizard, .cv-page--flow .page-stepper__track {
+  :is(.page-shell--wizard, .cv-page--flow) .page-stepper__track {
   margin-inline: 0;
   width: 100%;
 }
 
 :is(html[data-theme="dark"])
-  .page-shell--wizard, .cv-page--flow .page-stepper__eyebrow {
+  :is(.page-shell--wizard, .cv-page--flow) .page-stepper__eyebrow {
   display: none;
 }
 
 :is(html[data-theme="dark"])
-  .page-shell--wizard, .cv-page--flow .page-stepper__content {
+  :is(.page-shell--wizard, .cv-page--flow) .page-stepper__content {
   gap: 0;
 }
 
 :is(html[data-theme="dark"])
-  .page-shell--wizard, .cv-page--flow .page-stepper__label {
+  :is(.page-shell--wizard, .cv-page--flow) .page-stepper__label {
   font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: -0.01em;
 }
 
 :is(html[data-theme="dark"])
-  .page-shell--wizard, .cv-page--flow .page-stepper__status {
+  :is(.page-shell--wizard, .cv-page--flow) .page-stepper__status {
   font-size: 0.68rem;
   font-weight: 600;
 }
@@ -2724,12 +2724,12 @@ html[data-theme="dark"] .cv-form-card .cv-search-picker__control:hover {
 
 @media (max-width: 900px) {
   :is(html[data-theme="dark"])
-    .page-shell--wizard, .cv-page--flow .page-header-stack {
+    :is(.page-shell--wizard, .cv-page--flow) .page-header-stack {
     grid-template-columns: minmax(300px, 1fr) auto;
   }
 
   :is(html[data-theme="dark"])
-    .page-shell--wizard, .cv-page--flow .page-header-rail {
+    :is(.page-shell--wizard, .cv-page--flow) .page-header-rail {
     border-left: 0;
     border-top: 0;
     min-height: 90px;
@@ -2739,18 +2739,18 @@ html[data-theme="dark"] .cv-form-card .cv-search-picker__control:hover {
 
 @media (max-width: 720px) {
   :is(html[data-theme="dark"])
-    .page-shell--wizard, .cv-page--flow .page-header-stack {
+    :is(.page-shell--wizard, .cv-page--flow) .page-header-stack {
     grid-template-columns: 1fr;
   }
 
   :is(html[data-theme="dark"])
-    .page-shell--wizard, .cv-page--flow .page-header-band {
+    :is(.page-shell--wizard, .cv-page--flow) .page-header-band {
     min-height: 68px;
     padding-right: 14px;
   }
 
   :is(html[data-theme="dark"])
-    .page-shell--wizard, .cv-page--flow .page-header-rail {
+    :is(.page-shell--wizard, .cv-page--flow) .page-header-rail {
     border-top: 1px solid rgba(145, 177, 211, 0.22);
     min-height: 50px;
     padding-block: 6px;
@@ -4530,7 +4530,7 @@ html[data-theme="dark"] *::after {
 
 /* Grid de cards: respiro vertical consistente. */
 :is(html[data-theme="dark"])
-  .page-shell--cards, .cv-page--collection-cards .cv-card-grid {
+  :is(.page-shell--cards, .cv-page--collection-cards) .cv-card-grid {
   gap: var(--space-6);
 }
 

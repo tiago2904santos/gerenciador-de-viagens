@@ -56,6 +56,29 @@ class DarkRedesignContractTests(SimpleTestCase):
             self.assertNotIn('html[data-theme="light-light"]', layer_css)
             self.assertNotIn('html[data-theme="dark-light"]', layer_css)
 
+    def test_page_shell_aliases_use_is_not_bare_comma_descendants(self):
+        """Aliases cv-page--* não podem abrir seletor com vírgula solta.
+
+        Forma errada: `.page-shell--wizard, .cv-page--flow .filho { display: none }`
+        — o primeiro termo vira o shell inteiro e some no tema escuro.
+        Forma correta: `:is(.page-shell--wizard, .cv-page--flow) .filho`.
+        """
+        import re
+
+        bare = re.compile(
+            r"(?<!:is\()\.page-shell--[\w-]+,\s*\.cv-page--[\w-]+"
+        )
+        offenders = [
+            f"L{i}: {line.strip()}"
+            for i, line in enumerate(self.components_css.splitlines(), 1)
+            if bare.search(line)
+        ]
+        self.assertEqual(
+            offenders,
+            [],
+            "seletores page-shell/cv-page com vírgula solta escondem o wizard",
+        )
+
     def test_semantic_dark_contract_covers_core_component_needs(self):
         required_tokens = (
             "--color-bg:",
