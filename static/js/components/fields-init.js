@@ -18,7 +18,7 @@
       return fn() || 0;
     } catch (err) {
       if (DEBUG) {
-        console.warn('[CV.fields]', label, err);
+        window.CV.log.warn('CV.fields', label, err);
       }
       return 0;
     }

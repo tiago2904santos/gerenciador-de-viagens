@@ -8,6 +8,28 @@ document.documentElement.dataset.appReady = "true";
   "use strict";
 
   window.CV = window.CV || {};
+  function writeLog(level, scope, args) {
+    var values = Array.prototype.slice.call(args);
+    var prefix = scope ? "[" + scope + "]" : "[CV]";
+    document.dispatchEvent(new CustomEvent("cv:log", {
+      detail: { level: level, scope: scope || "CV", values: values },
+    }));
+    if (!window.console || typeof window.console[level] !== "function") return;
+    window.console[level].apply(window.console, [prefix].concat(values));
+  }
+
+  window.CV.log = {
+    debug: function (scope) {
+      writeLog("debug", scope, Array.prototype.slice.call(arguments, 1));
+    },
+    error: function (scope) {
+      writeLog("error", scope, Array.prototype.slice.call(arguments, 1));
+    },
+    warn: function (scope) {
+      writeLog("warn", scope, Array.prototype.slice.call(arguments, 1));
+    },
+  };
+
   window.CV.util = {
     debounce: function (fn, delay) {
       var timer = null;
