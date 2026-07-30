@@ -1,64 +1,37 @@
+{% comment %}
+  Campo de formulário em grade — UM contrato de classe para todo tipo de widget.
+
+  `D-41`: este componente emitia TRÊS contratos diferentes. `select` e
+  multiselect recebiam `field app-form-field cv-field` com rótulo
+  `app-form-label cv-field__label`; input de texto recebia só
+  `field app-form-field` com rótulo `app-form-label`. Escrever CSS para "todo
+  campo do sistema" era impossível: qualquer regra precisava listar as duas
+  variantes, e quem esquecesse uma metade estilizava metade dos campos.
+
+  Agora container e rótulo são escritos UMA vez e só o controle varia por tipo.
+
+  Duas exceções, ambas deliberadas:
+  - `checkbox` sai por `card_toggle.html`. É cartão clicável, não campo em
+    grade — contrato próprio, de propósito.
+  - o rótulo é omitido quando o widget é um `cv-search-picker__native`: nesse
+    caso o próprio picker desenha o seu rótulo. A condição vale para todos os
+    tipos porque só selects carregam essa classe; aplicá-la ao texto é inócuo.
+
+  Parâmetros: field (obrigatório), label, help_text, size_class,
+  action_url / action_label / action_type (botão acoplado ao campo).
+{% endcomment %}
 {% if field.field.widget.input_type == 'checkbox' %}
   {% include "components/ui/forms/card_toggle.html" with field=field title=label|default:field.label description=help_text size_class=size_class only %}
-{% elif field.field.widget.input_type == 'select' and field.field.widget.allow_multiple_selected %}
-<div class="field app-form-field cv-field{% if size_class %} {{ size_class }}{% endif %}">
-  {% if "cv-search-picker__native" not in field.field.widget.attrs.class|default:"" %}
-  <label class="app-form-label cv-field__label" for="{{ field.id_for_label }}">{{ label|default:field.label }}</label>
-  {% endif %}
-  {% if action_url or action_label %}
-    <div class="cv-field-with-action cv-field-with-action--manage-reveal{% if "cv-search-picker__native" in field.field.widget.attrs.class|default:"" %} cv-field-with-action--search-picker{% endif %}">
-      {% include "components/ui/forms/multiselect.html" with field=field only %}
-      {% if action_url %}
-        {% include "components/ui/buttons/field_manage_button.html" with href=action_url action_label=action_label data_autosave_link=True only %}
-      {% elif action_label %}
-        {% include "components/ui/buttons/field_manage_button.html" with action_label=action_label type=action_type|default:"button" only %}
-      {% endif %}
-    </div>
-  {% else %}
-    {% include "components/ui/forms/multiselect.html" with field=field only %}
-  {% endif %}
-  {% if help_text %}<p class="field-help app-form-help">{{ help_text }}</p>{% endif %}
-  {% if field.errors %}{% include "components/ui/feedback/field_error.html" with errors=field.errors only %}{% endif %}
-</div>
-{% elif field.field.widget.input_type == 'select' %}
-<div class="field app-form-field cv-field{% if size_class %} {{ size_class }}{% endif %}">
-  {% if "cv-search-picker__native" not in field.field.widget.attrs.class %}
-  <label class="app-form-label cv-field__label" for="{{ field.id_for_label }}">{{ label|default:field.label }}</label>
-  {% endif %}
-  {% if "cv-search-picker__native" in field.field.widget.attrs.class %}
-    {% if action_url or action_label %}
-      <div class="cv-field-with-action cv-field-with-action--manage-reveal cv-field-with-action--search-picker">
-        {{ field.as_widget }}
-        {% if action_url %}
-          {% include "components/ui/buttons/field_manage_button.html" with href=action_url action_label=action_label data_autosave_link=True only %}
-        {% elif action_label %}
-          {% include "components/ui/buttons/field_manage_button.html" with action_label=action_label type=action_type|default:"button" only %}
-        {% endif %}
-      </div>
-    {% else %}
-      {{ field.as_widget }}
-    {% endif %}
-  {% elif action_url or action_label %}
-    <div class="cv-field-with-action cv-field-with-action--manage-reveal">
-      {% include "components/ui/forms/select.html" with field=field only %}
-      {% if action_url %}
-        {% include "components/ui/buttons/field_manage_button.html" with href=action_url action_label=action_label data_autosave_link=True only %}
-      {% elif action_label %}
-        {% include "components/ui/buttons/field_manage_button.html" with action_label=action_label type=action_type|default:"button" only %}
-      {% endif %}
-    </div>
-  {% else %}
-    {% include "components/ui/forms/select.html" with field=field only %}
-  {% endif %}
-  {% if help_text %}<p class="field-help app-form-help">{{ help_text }}</p>{% endif %}
-  {% if field.errors %}{% include "components/ui/feedback/field_error.html" with errors=field.errors only %}{% endif %}
-</div>
 {% else %}
-<div class="field app-form-field{% if size_class %} {{ size_class }}{% endif %}">
-  <label class="app-form-label" for="{{ field.id_for_label }}">{{ label|default:field.label }}</label>
+{% with classe_do_widget=field.field.widget.attrs.class|default:"" %}
+<div class="field app-form-field cv-field{% if size_class %} {{ size_class }}{% endif %}">
+  {% if "cv-search-picker__native" not in classe_do_widget %}
+    <label class="app-form-label cv-field__label" for="{{ field.id_for_label }}">{{ label|default:field.label }}</label>
+  {% endif %}
+
   {% if action_url or action_label %}
-    <div class="cv-field-with-action cv-field-with-action--manage-reveal">
-      {{ field.as_widget }}
+    <div class="cv-field-with-action cv-field-with-action--manage-reveal{% if "cv-search-picker__native" in classe_do_widget %} cv-field-with-action--search-picker{% endif %}">
+      {% include "components/ui/forms/_field_control.html" with field=field classe_do_widget=classe_do_widget input_class=input_class only %}
       {% if action_url %}
         {% include "components/ui/buttons/field_manage_button.html" with href=action_url action_label=action_label data_autosave_link=True only %}
       {% elif action_label %}
@@ -66,9 +39,11 @@
       {% endif %}
     </div>
   {% else %}
-    {{ field.as_widget }}
+    {% include "components/ui/forms/_field_control.html" with field=field classe_do_widget=classe_do_widget input_class=input_class only %}
   {% endif %}
+
   {% if help_text %}<p class="field-help app-form-help">{{ help_text }}</p>{% endif %}
   {% if field.errors %}{% include "components/ui/feedback/field_error.html" with errors=field.errors only %}{% endif %}
 </div>
+{% endwith %}
 {% endif %}
