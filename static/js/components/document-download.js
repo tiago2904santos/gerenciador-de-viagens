@@ -117,8 +117,42 @@
     return (response.headers.get("Content-Type") || "").toLowerCase().includes("text/html");
   }
 
+  function responseIsJson(response) {
+    return (response.headers.get("Content-Type") || "").toLowerCase().includes("application/json");
+  }
+
+  function wait(milliseconds) {
+    return new Promise(function (resolve) {
+      window.setTimeout(resolve, milliseconds);
+    });
+  }
+
+  async function waitForGeneration(response, trigger) {
+    var data = await response.json();
+    while (data.status !== "complete") {
+      if (data.status === "error") {
+        throw new Error(data.error || "Não foi possível gerar o documento.");
+      }
+      await wait(data.retry_after_ms || 1000);
+      var statusResponse = await window.CV.http.request(data.status_url);
+      if (!statusResponse.ok || !responseIsJson(statusResponse)) {
+        throw new Error("Não foi possível consultar a geração do documento.");
+      }
+      data = await statusResponse.json();
+    }
+    var resultResponse = await window.CV.http.request(data.result_url);
+    return consumeResponse(resultResponse, trigger);
+  }
+
   async function consumeResponse(response, trigger) {
+    if (response.status === 202 && responseIsJson(response)) {
+      return waitForGeneration(response, trigger);
+    }
     if (!response.ok) {
+      if (responseIsJson(response)) {
+        var errorPayload = await response.json();
+        throw new Error(errorPayload.error || "O servidor retornou o erro " + response.status + ".");
+      }
       throw new Error("O servidor retornou o erro " + response.status + ".");
     }
     if (responseIsHtml(response)) {

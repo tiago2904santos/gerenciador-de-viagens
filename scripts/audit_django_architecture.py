@@ -26,6 +26,27 @@ P06_SPLIT_VIEW_MODULES = {
     "planos_trabalho/per_diem_views.py",
     "planos_trabalho/view_helpers.py",
 }
+SYNC_DOCUMENT_GENERATORS = {
+    "gerar_resposta_documento_oficio",
+    "gerar_resposta_justificativa_documento",
+    "gerar_resposta_ordem_servico_documento",
+    "gerar_resposta_plano_documento",
+    "gerar_os_docx_response",
+    "gerar_os_pdf_response",
+    "gerar_termo_cadastro_um",
+    "gerar_termo_lote",
+    "gerar_termos_pdf_consolidado",
+    "gerar_termo_um",
+    "pdf_termo_cadastro_assinado_ou_gerado",
+    "pdf_termo_oficio_assinado_ou_gerado",
+    "gerar_prestacao_consolidado_pdf",
+    "gerar_relatorio_tecnico_docx",
+    "gerar_relatorio_tecnico_pdf",
+    "gerar_diario_bordo_xlsx",
+    "gerar_diario_bordo_pdf",
+    "pdf_rt_assinado_ou_gerado",
+    "pdf_db_assinado_ou_gerado",
+}
 
 PY_RULES = [
     ("query_direta_view", ("views.py", ".objects.filter(")),
@@ -168,6 +189,29 @@ def drive_excepts_without_capture():
     return findings
 
 
+def sync_document_generations_in_views():
+    findings = []
+    for path in iter_files(".py"):
+        path_rel = rel(path)
+        if "/tests/" in f"/{path_rel}" or path.name.startswith("test"):
+            continue
+        if path.name != "views.py" and not path.name.endswith("_views.py"):
+            continue
+        tree = ast.parse(path.read_text(encoding="utf-8-sig"))
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Call):
+                continue
+            if isinstance(node.func, ast.Name):
+                name = node.func.id
+            elif isinstance(node.func, ast.Attribute):
+                name = node.func.attr
+            else:
+                continue
+            if name in SYNC_DOCUMENT_GENERATORS:
+                findings.append((path_rel, node.lineno, name))
+    return findings
+
+
 def main():
     parser = argparse.ArgumentParser(description="Auditoria de arquitetura Django")
     parser.add_argument(
@@ -175,6 +219,12 @@ def main():
         type=int,
         default=None,
         help="falha se o total de `.objects` em views.py passar deste número (catraca do P-01)",
+    )
+    parser.add_argument(
+        "--max-sync-document-generations",
+        type=int,
+        default=None,
+        help="falha se uma view chamar diretamente um gerador documental pesado (S-06)",
     )
     parser.add_argument(
         "--max-drive-except-without-capture",
@@ -222,6 +272,23 @@ def main():
             f"\nERRO: {len(drive_findings)} handlers genéricos do Drive sem "
             "core.errors.capture, acima da catraca de "
             f"{args.max_drive_except_without_capture}.",
+        )
+        sys.exit(1)
+
+    sync_findings = sync_document_generations_in_views()
+    print("\n== Geração documental síncrona em views (S-06) ==")
+    for file_path, line_no, name in sync_findings:
+        print(f"  {file_path}:{line_no} {name}")
+    print(f"Total: {len(sync_findings)}")
+
+    if (
+        args.max_sync_document_generations is not None
+        and len(sync_findings) > args.max_sync_document_generations
+    ):
+        print(
+            f"\nERRO: {len(sync_findings)} chamadas diretas a geradores documentais "
+            "em views, acima da catraca de "
+            f"{args.max_sync_document_generations}. Use DocumentoGeracao + Celery.",
         )
         sys.exit(1)
 

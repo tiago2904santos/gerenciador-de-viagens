@@ -11,14 +11,13 @@ from django.db.models import Q
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
-from django.utils import timezone
 from django.utils.dateparse import parse_date
 from django.views.decorators.http import require_GET
 from django.views.decorators.http import require_http_methods
 
 from core.pagination import contexto_paginacao
-from documentos.services.responses import build_inline_pdf_response_from_download_response
-from documentos.services.types import DocumentoTipo
+from documentos.services.async_generation import enfileirar_documento
+from documentos.services.types import DocumentoFormato
 from eventos.services import build_evento_document_seed
 from eventos.services import resolve_evento_from_request
 
@@ -28,8 +27,6 @@ from .presenters import apresentar_ordem_servico_card
 from .presenters import get_assinante_os
 from .selectors import get_ordem_servico_by_id
 from .selectors import listar_ordens_servico
-from .services import gerar_os_docx_response
-from .services import gerar_os_pdf_response
 
 
 # Mesmo tamanho de página das demais listas em cards (Ofícios, Eventos, PT).
@@ -426,29 +423,31 @@ def editar(request, pk):
 @require_http_methods(["GET"])
 def baixar_docx(request, pk):
     ordem = get_ordem_servico_by_id(pk)
-    return gerar_os_docx_response(ordem)
+    return enfileirar_documento(
+        request,
+        tipo="ordem_servico",
+        parametros={"object_id": ordem.pk, "formato": DocumentoFormato.DOCX.value},
+    )
 
 
 @require_GET
 def baixar_pdf(request, pk):
     ordem = get_ordem_servico_by_id(pk)
-    return gerar_os_pdf_response(ordem)
+    return enfileirar_documento(
+        request,
+        tipo="ordem_servico",
+        parametros={"object_id": ordem.pk, "formato": DocumentoFormato.PDF.value},
+    )
 
 
 @require_GET
 def pdf_inline(request, pk):
     ordem = get_ordem_servico_by_id(pk)
-    reference = (
-        f"os-{ordem.numero:03d}-{ordem.ano}"
-        if ordem.numero and ordem.ano
-        else f"os-{ordem.pk}"
-    )
-    download_resp = gerar_os_pdf_response(ordem)
-    return build_inline_pdf_response_from_download_response(
+    return enfileirar_documento(
         request,
-        download_resp,
-        tipo=DocumentoTipo.ORDEM_SERVICO,
-        reference=reference,
+        tipo="ordem_servico",
+        parametros={"object_id": ordem.pk, "formato": DocumentoFormato.PDF.value},
+        disposicao="inline",
     )
 
 

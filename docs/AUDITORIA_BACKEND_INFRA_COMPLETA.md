@@ -178,7 +178,7 @@ O que **não** existe: rate limiting no login, lockout por tentativas, e qualque
 | S-03 🟠 | **Sem rate limit / lockout** | Login aceita tentativas ilimitadas. Para sistema institucional exposto, `django-axes` ou equivalente é o mínimo. |
 | S-04 🟠 | **Sem CSP** | `SecurityHeadersMiddleware` existe (`core/middleware.py`), mas não emite `Content-Security-Policy`. Relevante porque o roteiro carrega Leaflet de `unpkg.com` (auditoria JS, J-22). |
 | S-05 🟡 | `SECRET_KEY` com default `"dev-insecure-key"` no `base.py` | Mitigado pelo prod exigir env — mas o default deveria não existir (falhar em qualquer ambiente sem chave). |
-| S-06 🟡 | Celery configurado (`config/celery.py` + redis) mas **um único consumidor** (`google_drive/tasks.py`, 196 l.) | Toda a geração de PDF/DOCX é síncrona no request. As telas de "Gerando documento…" (toast do JS) existem exatamente porque o request bloqueia. |
+| S-06 ✅ | **Geração documental assíncrona implantada** | Ofícios, justificativas, OS, planos, termos e documentos de Prestações criam `DocumentoGeracao`, executam no Celery e expõem polling/resultado durável. Links AJAX e páginas/iframes sem JS aguardam sem ocupar o request; a CI bloqueia chamadas diretas aos geradores em views. |
 | S-07 🟡 | `LOGIN_ENFORCED=false` como default de dev | Correto para agentes/testes, mas vale um banner visual no dev para nunca confundir com prod. |
 
 ---
@@ -303,7 +303,7 @@ Pares off-by-one (`720/721`, `840/841`, `1180/1181`, `767/768`, `599/600`, `479/
 | S-03 | 🟠 | Sem rate limit/lockout no login | §4.2 |
 | S-04 | 🟠 | Sem Content-Security-Policy (agrava CDN externa do Leaflet) | §4.2 |
 | S-05 | 🟡 | `SECRET_KEY` com default inseguro no `base.py` | §4.2 |
-| S-06 | 🟡 | Celery ocioso: geração de documento é síncrona no request | §4.2 |
+| S-06 | ✅ | Fila Celery + `DocumentoGeracao`, polling, resultado durável, deduplicação, expiração e catraca anti-gerador em view | §4.2 |
 | T-01 | 🔴 | Prestações de Contas: razão teste/código 0,04 (351 l. para 8.238) no fluxo com assinatura pública e dinheiro. Fatia 1/6 concluída: listagem e entrada caracterizadas | §5.2 |
 | T-02 | 🟠 | Zero testes de JS | §5.3 |
 | T-03 | ✅ | `coverage` no CI com relatório e piso versionado por app | §5.3 |
@@ -351,7 +351,7 @@ Espelho dos "motores globais" do JS — um dono por capacidade:
 | 2 | **Selectors obrigatórios** — criar `eventos/selectors.py`, `termos/selectors.py`, `ordens_servico/selectors.py`, `planos_trabalho/selectors.py` e migrar as 36 chamadas ORM | P-01 | teste de CI: `grep .objects` proibido em `views.py` |
 | 3 | **Widget base próprio** (`core/forms.py`) que injeta as classes CSS canônicas — `forms.py` dos apps param de conhecer CSS | 194 `attrs` (P-04) | desacopla a reconstrução visual do Python |
 | 4 | ✅ **`core/errors.py`** — `capture(exc, contexto)` com logging estruturado e gate AST no CI | 64 handlers do Drive (inventário vivo do P-05) | Drive deixa de falhar em silêncio |
-| 5 | **Geração assíncrona de documentos** — mover `facade.gerar_*` para task Celery com polling (o toast JS já existe) | S-06 | request nunca bloqueia em LibreOffice |
+| 5 | ✅ **Geração assíncrona de documentos** — `DocumentoGeracao` + task Celery + polling e resultado protegido por área | S-06 | request não bloqueia em LibreOffice; jobs órfãos/expirados são tratados pelo beat |
 | 6 | **Constraints de dados** — migração única: unicidade de Roteiro (hash do conteúdo), índices de FK quentes em trechos, `__str__` nos models de core | P-03, P-07 | dedupe sai do código de aplicação |
 | 7 | **Escala de breakpoints** — 6 valores documentados + teste de CI que rejeita `@media` fora da lista | R-01 | pré-requisito da reconstrução CSS |
 | 8 | **Sprite de ícones** — 1 SVG, 27 símbolos, 1 nome por conceito | R-02 | −208 linhas de if/elif |

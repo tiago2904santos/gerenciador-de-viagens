@@ -2,6 +2,7 @@ from django.contrib import admin
 
 from .models import DocumentoArtefato
 from .models import DocumentoAssinaturaVersao
+from .models import DocumentoGeracao
 
 
 @admin.register(DocumentoArtefato)
@@ -36,6 +37,38 @@ class DocumentoAssinaturaVersaoAdmin(admin.ModelAdmin):
         "criado_por",
         "revogada_em",
         "revogada_por",
+    )
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(DocumentoGeracao)
+class DocumentoGeracaoAdmin(admin.ModelAdmin):
+    list_display = ("tipo", "status", "area", "usuario", "criado_em", "concluido_em")
+    list_filter = ("tipo", "status", "area")
+    readonly_fields = (
+        "tipo",
+        "parametros",
+        "status",
+        "dedupe_key",
+        "disposicao",
+        "nome_arquivo",
+        "content_type",
+        "hash_sha256",
+        "arquivo",
+        "erro",
+        "area",
+        "usuario",
+        "criado_em",
+        "iniciado_em",
+        "concluido_em",
     )
 
     def has_add_permission(self, request):

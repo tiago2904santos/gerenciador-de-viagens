@@ -17,6 +17,8 @@ from core.retorno import voltar_para
 from core.tenancy import filter_queryset_by_area
 
 from .models import DocumentoArtefato
+from .services.async_generation import geracao_resultado as _geracao_resultado
+from .services.async_generation import geracao_status as _geracao_status
 from .services import default_document_registry
 from .services.access import artefato_pdf_download_filename
 from .services.access import build_pdf_http_response_for_artefato
@@ -47,6 +49,16 @@ def index(request):
             "core_types_with_format": available_count,
         },
     )
+
+
+@require_GET
+def geracao_status(request, pk):
+    return _geracao_status(request, pk)
+
+
+@require_GET
+def geracao_resultado(request, pk):
+    return _geracao_resultado(request, pk)
 
 
 @require_GET

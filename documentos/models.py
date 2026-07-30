@@ -118,6 +118,63 @@ class DocumentoArtefato(models.Model):
         return self.arquivo_assinado if self.esta_assinado else self.arquivo
 
 
+class DocumentoGeracao(models.Model):
+    """Estado durável de uma geração executada fora do request HTTP."""
+
+    STATUS_NA_FILA = "queued"
+    STATUS_PROCESSANDO = "processing"
+    STATUS_CONCLUIDO = "complete"
+    STATUS_ERRO = "error"
+    STATUS_CHOICES = (
+        (STATUS_NA_FILA, "Na fila"),
+        (STATUS_PROCESSANDO, "Processando"),
+        (STATUS_CONCLUIDO, "Concluído"),
+        (STATUS_ERRO, "Erro"),
+    )
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    area = models.ForeignKey(
+        "usuarios.AreaTrabalho",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="documentos_geracoes",
+    )
+    usuario = models.ForeignKey(
+        "auth.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="documentos_geracoes",
+    )
+    tipo = models.CharField(max_length=64)
+    parametros = models.JSONField(default=dict)
+    status = models.CharField(
+        max_length=16,
+        choices=STATUS_CHOICES,
+        default=STATUS_NA_FILA,
+        db_index=True,
+    )
+    dedupe_key = models.CharField(max_length=64, blank=True, default="", db_index=True)
+    disposicao = models.CharField(max_length=16, default="attachment")
+    nome_arquivo = models.CharField(max_length=255, blank=True, default="")
+    content_type = models.CharField(max_length=128, blank=True, default="")
+    hash_sha256 = models.CharField(max_length=64, blank=True, default="")
+    arquivo = models.FileField(upload_to="documentos/jobs/%Y/%m/", blank=True)
+    erro = models.CharField(max_length=500, blank=True, default="")
+    criado_em = models.DateTimeField(auto_now_add=True, db_index=True)
+    iniciado_em = models.DateTimeField(null=True, blank=True)
+    concluido_em = models.DateTimeField(null=True, blank=True, db_index=True)
+
+    class Meta:
+        ordering = ["-criado_em"]
+        verbose_name = "Geração documental"
+        verbose_name_plural = "Gerações documentais"
+
+    def __str__(self) -> str:
+        return f"{self.tipo} — {self.get_status_display()}"
+
+
 class DocumentoAssinaturaVersao(models.Model):
     """Versão assinada append-only; revogação é tombstone, nunca exclusão."""
 

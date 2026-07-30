@@ -153,7 +153,7 @@ class TermoServidorPdfInlineTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     @mock.patch("termos.views.validar_oficio_para_documento", return_value={"pendencias": []})
-    @mock.patch("termos.views.pdf_termo_oficio_assinado_ou_gerado")
+    @mock.patch("termos.async_documents.pdf_termo_oficio_assinado_ou_gerado")
     def test_inline_com_sha256(self, m_gerar, _m_val):
         m_gerar.return_value = b"%PDF-1.4\n"
         url = reverse("termos:termo_servidor_pdf_inline", args=[self.oficio.pk, self.servidor_ok.pk])
@@ -164,7 +164,7 @@ class TermoServidorPdfInlineTests(TestCase):
         _ = b"".join(response.streaming_content)
 
     @mock.patch("termos.views.validar_oficio_para_documento", return_value={"pendencias": []})
-    @mock.patch("termos.views.pdf_termo_oficio_assinado_ou_gerado")
+    @mock.patch("termos.async_documents.pdf_termo_oficio_assinado_ou_gerado")
     def test_download_pdf_anexo_com_sha256(self, m_gerar, _m_val):
         m_gerar.return_value = b"%PDF-1.4\n"
         url = reverse("termos:baixar_termo_servidor", args=[self.oficio.pk, self.servidor_ok.pk, "pdf"])
@@ -176,7 +176,7 @@ class TermoServidorPdfInlineTests(TestCase):
         m_gerar.assert_called_once_with(self.oficio, self.servidor_ok)
 
     @mock.patch("termos.views.validar_oficio_para_documento", return_value={"pendencias": []})
-    @mock.patch("termos.views.gerar_termos_pdf_consolidado")
+    @mock.patch("termos.async_documents.gerar_termos_pdf_consolidado")
     def test_download_todos_pdf_usa_conversao_unica(self, m_consolidar, _m_val):
         self.oficio.servidores.add(self.servidor_no)
         self.oficio.servidores_termo_autorizacao.add(self.servidor_no)
@@ -189,7 +189,7 @@ class TermoServidorPdfInlineTests(TestCase):
         self.assertEqual(response["Content-Type"], "application/pdf")
         self.assertIn("attachment", response["Content-Disposition"])
         self.assertIn("termos_oficio_", response["Content-Disposition"])
-        self.assertEqual(response.content, b"%PDF-1.4\nconsolidated")
+        self.assertEqual(b"".join(response.streaming_content), b"%PDF-1.4\nconsolidated")
         m_consolidar.assert_called_once_with(self.oficio)
 
     def test_template_html_oficial_renderiza_dados_reais(self):

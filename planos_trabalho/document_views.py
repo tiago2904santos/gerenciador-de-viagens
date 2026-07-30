@@ -4,15 +4,11 @@ from django.http import Http404
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
-from django.utils import timezone
 from django.views.decorators.http import require_GET
-from documentos.services.responses import build_inline_pdf_response_from_download_response
-from documentos.services.timing import measure_step
+from documentos.services.async_generation import enfileirar_documento
 from documentos.services.types import DocumentoFormato
-from documentos.services.types import DocumentoTipo
 from .presenters import apresentar_resumo_documentos
 from .services import avaliar_pendencias_documento
-from .services import gerar_resposta_plano_documento
 from .services import marcar_plano_gerado
 from .services import montar_efetivo_texto
 from .services import sincronizar_scratchpad
@@ -85,19 +81,11 @@ def pdf_inline(request, pk):
     if pendencias:
         messages.error(request, "Documento não gerado porque o plano está incompleto.")
         return redirect(f"{reverse('planos_trabalho:wizard_documentos', args=[plano.pk])}?documento_incompleto=1")
-    reference = f"{plano.numero:02d}-{plano.ano}" if plano.numero and plano.ano else f"plano-{plano.pk}"
-    with measure_step("http_plano_trabalho_pdf_inline", {"plano_id": plano.pk}):
-        try:
-            resp = gerar_resposta_plano_documento(plano, DocumentoFormato.PDF)
-        except Exception as exc:  # noqa: BLE001 — superfície amigável p/ erro de motor PDF
-            messages.error(request, str(exc))
-            return redirect("planos_trabalho:wizard_documentos", pk=plano.pk)
-    return build_inline_pdf_response_from_download_response(
+    return enfileirar_documento(
         request,
-        resp,
-        tipo=DocumentoTipo.PLANO_TRABALHO,
-        reference=reference,
-        now=timezone.now(),
+        tipo="plano_trabalho",
+        parametros={"object_id": plano.pk, "formato": DocumentoFormato.PDF.value},
+        disposicao="inline",
     )
 
 
@@ -112,16 +100,8 @@ def baixar_documento(request, pk, formato):
     if pendencias:
         messages.error(request, "Documento não gerado porque o plano está incompleto.")
         return redirect(f"{reverse('planos_trabalho:wizard_documentos', args=[plano.pk])}?documento_incompleto=1")
-    with measure_step(
-        "http_baixar_plano_trabalho",
-        {"plano_id": plano.pk, "formato": formato_documento.value},
-    ):
-        try:
-            response = gerar_resposta_plano_documento(plano, formato_documento)
-        except Exception as exc:  # noqa: BLE001
-            if formato_documento == DocumentoFormato.PDF:
-                messages.error(request, str(exc))
-                return redirect("planos_trabalho:wizard_documentos", pk=plano.pk)
-            raise
-    marcar_plano_gerado(plano)
-    return response
+    return enfileirar_documento(
+        request,
+        tipo="plano_trabalho",
+        parametros={"object_id": plano.pk, "formato": formato_documento.value},
+    )

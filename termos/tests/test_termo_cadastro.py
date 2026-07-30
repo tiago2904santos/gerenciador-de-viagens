@@ -303,7 +303,7 @@ class TermoAutorizacaoCadastroTests(TestCase):
 
         return _fake
 
-    @mock.patch("termos.views.gerar_termo_cadastro_um")
+    @mock.patch("termos.async_documents.gerar_termo_cadastro_um")
     def test_download_docx_multiplo_retorna_arquivo_unico(self, m_um):
         termo = TermoAutorizacao.objects.create(
             destino_estado=self.estado,
@@ -321,13 +321,13 @@ class TermoAutorizacaoCadastroTests(TestCase):
         self.assertEqual(response["Content-Type"], content_type)
         self.assertEqual(response["Content-Disposition"], f'attachment; filename="termo_{termo.pk}.docx"')
 
-        merged = DocxDocument(BytesIO(response.content))
+        merged = DocxDocument(BytesIO(b"".join(response.streaming_content)))
         textos = [p.text for p in merged.paragraphs]
         self.assertIn("GENERICO", textos)
         self.assertIn("SERVIDOR A", textos)
         self.assertIn("SERVIDOR B", textos)
 
-    @mock.patch("termos.views.gerar_termo_cadastro_um")
+    @mock.patch("termos.async_documents.gerar_termo_cadastro_um")
     def test_download_sem_servidor_nao_duplica_termo_generico(self, m_um):
         """Termo sem servidores efetivos gera UM genérico apenas (sem página repetida)."""
         termo = TermoAutorizacao.objects.create(

@@ -652,7 +652,7 @@ class RelatorioTecnicoDocumentoTests(TestCase):
         self.assertEqual(response["Content-Type"], "application/pdf")
         self.assertIn(".pdf", response["Content-Disposition"])
 
-    @mock.patch("prestacoes_contas.views.gerar_relatorio_tecnico_docx", return_value=b"docx")
+    @mock.patch("prestacoes_contas.async_documents.gerar_relatorio_tecnico_docx", return_value=b"docx")
     def test_download_rt_materializa_campos_padrao_antes_de_gerar(self, _mock_docx):
         roteiro = Roteiro.objects.create(valor_diarias=Decimal("210.00"))
         self.oficio.roteiro = roteiro
@@ -1022,7 +1022,10 @@ class RelatorioTecnicoDocumentoTests(TestCase):
         self.assertEqual(servidor_ctx["nome"], self.ps.servidor.nome)
         self.assertIn("download_url", servidor_ctx)
 
-    @mock.patch("prestacoes_contas.views.gerar_prestacao_consolidado_pdf", return_value=b"%PDF-1.4\n%%EOF\n")
+    @mock.patch(
+        "prestacoes_contas.async_documents.gerar_prestacao_consolidado_pdf",
+        return_value=b"%PDF-1.4\n%%EOF\n",
+    )
     def test_download_pdf_consolidado(self, _mock_pdf):
         response = self.client.get(reverse("prestacoes_contas:consolidado_download", args=[self.ps.pk]))
 

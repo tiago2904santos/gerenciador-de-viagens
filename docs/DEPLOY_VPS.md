@@ -64,7 +64,9 @@ apt install -y \
     shared-mime-info fonts-liberation fonts-dejavu-core
 ```
 
-> `redis-server` é o broker do Celery — usado apenas para reenviar automaticamente ao Google Drive os documentos cujo upload falhou na hora (ver seção 5.3). Sem ele, o sistema funciona normalmente; só o retry automático fica indisponível.
+> `redis-server` é o broker do Celery para gerar PDF/DOCX/XLSX fora do request
+> e sincronizar o Drive (seção 5.3). Redis, worker e beat são obrigatórios em
+> produção; sem a fila, novos downloads falham rápido em vez de bloquear o web worker.
 
 > **Por que essas libs?** `libpango`, `libcairo` e `libharfbuzz` são exigidas pelo WeasyPrint para renderizar HTML em PDF. Sem elas, a geração de documentos falha silenciosamente.
 
@@ -247,12 +249,10 @@ sudo systemctl start gerenciador-viagens
 sudo systemctl status gerenciador-viagens
 ```
 
-### 5.3 Worker Celery (uploads ao Drive e aquecimento de cache)
+### 5.3 Celery (documentos, Drive e manutenção dos jobs)
 
-Obrigatório quando a integração com o Drive estiver ativa. O request de geração
-apenas coloca o upload na fila, para não somar latência de rede ao download. Sem
-o worker, o artefato fica visível como pendência na tela
-`/integracoes/google-drive/` até um reenvio manual.
+Obrigatório em produção. O request cria um job durável e retorna polling; o
+worker gera o arquivo e o beat encerra jobs órfãos e remove resultados após 24 h.
 
 ```bash
 # Garanta que o Redis (instalado no passo 2.3) está ativo
@@ -292,6 +292,36 @@ sudo systemctl daemon-reload
 sudo systemctl enable gerenciador-viagens-celery
 sudo systemctl start gerenciador-viagens-celery
 sudo systemctl status gerenciador-viagens-celery
+```
+
+Crie também `/etc/systemd/system/gerenciador-viagens-celery-beat.service`:
+
+```ini
+[Unit]
+Description=Gerenciador de Viagens — Celery beat
+After=network.target redis-server.service
+
+[Service]
+User=viagens
+Group=viagens
+WorkingDirectory=/var/www/gerenciador-viagens/app
+EnvironmentFile=/var/www/gerenciador-viagens/app/.env
+Environment="DJANGO_SETTINGS_MODULE=config.settings.prod"
+ExecStart=/var/www/gerenciador-viagens/venv/bin/celery \
+          -A config beat \
+          --loglevel=info \
+          --logfile=/var/www/gerenciador-viagens/logs/celery-beat.log
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now gerenciador-viagens-celery-beat
+sudo systemctl status gerenciador-viagens-celery-beat
 ```
 
 ### 5.4 UNOSERVER (PDF em menos de 1 segundo)
@@ -361,7 +391,7 @@ sudo systemctl enable --now gerenciador-viagens-unoserver
 /var/www/gerenciador-viagens/unoserver-venv/bin/unoping \
   --host 127.0.0.1 \
   --port 2003
-sudo systemctl restart gerenciador-viagens gerenciador-viagens-celery
+sudo systemctl restart gerenciador-viagens gerenciador-viagens-celery gerenciador-viagens-celery-beat
 cd /var/www/gerenciador-viagens/app
 source /var/www/gerenciador-viagens/venv/bin/activate
 python manage.py documentos_unoserver_check \
@@ -479,7 +509,7 @@ python manage.py migrate --noinput
 python manage.py collectstatic --noinput --clear
 
 sudo systemctl restart gerenciador-viagens
-sudo systemctl restart gerenciador-viagens-celery  # se o worker estiver configurado (seção 5.3)
+sudo systemctl restart gerenciador-viagens-celery gerenciador-viagens-celery-beat
 ```
 
 Ou use o script pronto:
@@ -522,7 +552,7 @@ Acesse `http://SEU_IP_VPS/admin` e faça login com o superusuário criado.
 - [ ] `python manage.py importar_base_geografica` executado (dados de cidades)
 - [ ] Superusuário criado (`createsuperuser`)
 - [ ] Serviço systemd ativo e respondendo
-- [ ] (Opcional) Redis + worker Celery configurados (retry automático de uploads ao Drive — seção 5.3)
+- [ ] Redis + worker + beat Celery configurados (documentos e Drive — seção 5.3)
 - [ ] Nginx configurado e recarregado
 - [ ] (Opcional) HTTPS configurado com Certbot
 - [ ] Login funcional no navegador
