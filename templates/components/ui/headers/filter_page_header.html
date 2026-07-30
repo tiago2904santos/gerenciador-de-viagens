@@ -1,6 +1,6 @@
 {# filter_page_header.html — cabeçalho canônico de listas com filtros. #}
 {% if form_action %}
-  <form class="list-header cv-filter-header{% if extra_class %} {{ extra_class }}{% endif %}" method="get" action="{{ form_action }}" data-cv-live-submit-form>
+  <form class="list-header cv-filter-header{% if extra_class %} {{ extra_class }}{% endif %}" method="get" action="{{ form_action }}" data-collection-form>
 {% else %}
   <div class="list-header cv-filter-header{% if extra_class %} {{ extra_class }}{% endif %}">
 {% endif %}
@@ -30,7 +30,7 @@
           name="{{ search_name|default:'q' }}"
           placeholder="{{ search_placeholder|default:'Buscar...' }}"
           aria-label="{{ search_aria_label|default:search_placeholder|default:'Buscar' }}"
-          data-cv-filter="search"
+          data-collection-filter="search"
           {% if q %}value="{{ q }}"{% endif %}
         >
       </div>
@@ -39,7 +39,7 @@
 
       {% if status_options %}
       <div class="list-header__select cv-filter-bar__select cv-custom-select" data-cv-select>
-        <select name="{{ status_name|default:'status' }}" aria-label="Status" data-cv-filter="select">
+        <select name="{{ status_name|default:'status' }}" aria-label="Status" data-collection-filter="select">
           {% for opt in status_options %}
             <option value="{{ opt.value }}"{% if opt.value == status %} selected{% endif %}>{{ opt.label }}</option>
           {% endfor %}
@@ -49,7 +49,7 @@
 
       {% if temporal_options %}
       <div class="list-header__select cv-filter-bar__select cv-custom-select" data-cv-select>
-        <select name="temporal" aria-label="Período da viagem" data-cv-filter="select">
+        <select name="temporal" aria-label="Período da viagem" data-collection-filter="select">
           {% for opt in temporal_options %}
             <option value="{{ opt.value }}"{% if opt.value == temporal %} selected{% endif %}>{{ opt.label }}</option>
           {% endfor %}
@@ -59,7 +59,7 @@
 
       {% if sort_options %}
       <div class="list-header__select cv-filter-bar__select cv-custom-select" data-cv-select>
-        <select name="sort" aria-label="Ordenar por" data-cv-filter="select">
+        <select name="sort" aria-label="Ordenar por" data-collection-filter="select">
           {% for opt in sort_options %}
             <option value="{{ opt.value }}"{% if opt.value == sort or not sort and forloop.first %} selected{% endif %}>{{ opt.label }}</option>
           {% endfor %}
@@ -86,8 +86,7 @@
           name="{{ search_name|default:'q' }}"
           placeholder="{{ search_placeholder|default:'Buscar...' }}"
           aria-label="{{ search_placeholder|default:'Buscar' }}"
-          data-cv-filter="search"
-          data-cv-live-submit-input
+          data-collection-filter="search"
           {% if search_value %}value="{{ search_value }}"{% endif %}
         >
       </div>
@@ -95,7 +94,7 @@
       {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
       {% if status_options %}
         <div class="list-header__select">
-          <select class="header-filter-select" name="{{ status_name|default:'status' }}" aria-label="{{ status_label|default:'Status' }}" data-cv-filter="status">
+          <select class="header-filter-select" name="{{ status_name|default:'status' }}" aria-label="{{ status_label|default:'Status' }}" data-collection-filter="status">
             {% for option in status_options %}
               <option value="{{ option.value }}"{% if option.value == status_value %} selected{% endif %}>{{ option.label }}</option>
             {% endfor %}

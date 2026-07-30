@@ -453,8 +453,8 @@ Severidade: 🔴 crítico · 🟠 alto · 🟡 médio.
 | # | Sev | Defeito | Local |
 |---|---|---|---|
 | J-01 | ✅ | **Corrigido no conjunto sensível a swap:** os 8 componentes da fase 4 registram enhancers idempotentes e aceitam `root` | §4.1, fase 4 |
-| J-02 | ✅ | **Corrigido:** `CV.registry.destroy(root)` executa os destruidores antes do swap; `action-menu.js` devolve ao dono qualquer menu movido para `<body>` | `core/app.js`, `live-search-submit.js`, `action-menu.js` |
-| J-03 | 🔴 | **Dois motores de filtro ativos na mesma lista** (cliente + servidor) nas 5 listas em card | `realtime-filters.js` × `live-search-submit.js` |
+| J-02 | ✅ | **Corrigido:** `CV.registry.destroy(root)` executa os destruidores antes do swap; `action-menu.js` devolve ao dono qualquer menu movido para `<body>` | `core/app.js`, `collection.js`, `action-menu.js` |
+| J-03 | ✅ | **Corrigido:** `CV.collection` escolhe exatamente um modo `client|server`; os dois motores e hooks antigos foram removidos | `collection.js`, componentes `list_page_*` |
 | J-04 | ✅ | **Corrigido:** `CV.inlineCreate` e `CV.autosave` reinicializam conteúdo inserido e impedem listeners duplicados | `core/app.js`, `autosave.js` |
 | J-05 | 🔴 | `extra-download.js` carregado só em Eventos, mas o hook é emitido pelo componente global `rich_menu_link.html` → **recurso silenciosamente morto em 4 módulos** | §4.9 |
 | J-06 | ✅ | **989 linhas de JS órfão removidas** em 9 arquivos; 6 emissões remanescentes de hooks sem consumidor removidas | §4.8 |
@@ -626,8 +626,7 @@ Legenda: **✅** conforme · **⚠️** desvio · **❌** fora do padrão
 | **File picker** | `components/file-picker.js` | 274 | enhancer | ✅ |
 | **Dropdown flutuante** | `components/cv-floating-dropdown.js` | 79 | IIFE | ⚠️ |
 | **Dropdowns legados** | `cv-select.js` | 336 | DOMContentLoaded | ❌ **J-01**; sobrepõe `cv-custom-select` |
-| **Filtro cliente** | `components/realtime-filters.js` | 277 | enhancer | ⚠️ **J-03** |
-| **Filtro servidor** | `components/live-search-submit.js` | 171 | enhancer | ⚠️ **J-03** |
+| **Coleções cliente/servidor** | `components/collection.js` | único | enhancer | ✅ **J-03** |
 | **Menu de ações** | `components/action-menu.js` | 59 | delegação | ❌ **J-02** vazamento |
 | **Tooltips** | `components/icon-tooltips.js` | 101 | delegação | ✅ |
 | **Toggle de estado** | `components/state-toggle.js` | 256 | DOMContentLoaded | ❌ **J-01** |
@@ -726,8 +725,8 @@ Princípio (o mesmo da auditoria de CSS): **o nome descreve a função, nunca a 
 | `data-attach-signed-{primary…quinary}-*` (30 atributos) | **`data-attach-signed`** com JSON: `[{url, label, currentName, viewUrl, removeUrl}]` |
 | `data-travel-document-wizard-shell/-form/-step1/-rt/-documentos/-consolidado/-diario/-roteiro`, `data-os-wizard-shell/-form`, `data-pt-wizard-shell`, `data-termo-wizard-shell/-form` | **`data-flow`** + `data-flow-step="<slug>"` |
 | `data-quick-add-toggle/-close/-submit-when-open/-save-label`, `data-quick-edit`, `data-edit-url`, `data-edit-fields` | **`data-inline-create-*`** / **`data-inline-edit-*`** |
-| `data-cv-realtime-filter-scope` + `data-cv-live-submit-form` | **`data-collection`** + `data-collection-mode="client\|server"` |
-| `data-cv-filter`, `data-cv-filter-item`, `data-cv-filter-clear` | manter (**já são funcionais**) |
+| `data-cv-realtime-filter-scope` + `data-cv-live-submit-form` | ✅ **`data-collection`** + `data-collection-mode="client\|server"` |
+| `data-cv-filter`, `data-cv-filter-item`, `data-cv-filter-clear` | ✅ `data-collection-filter`, `data-collection-item`, `data-collection-clear` |
 | `data-oficio-glance-*`, `data-oficio-sticky-header`, `data-oficio-toggle`, `data-oficio-termos-selector`, `data-app-multiselect`, `data-filterable-multiselect-input`, `data-viatura-motorista-form/-panel` | ❌ **apagar** (JS órfão) |
 | `data-wa-*` (8 atributos) | **`data-share-whatsapp`** com JSON |
 | `data-rt-*` (6), `data-modelo-justificativa-select`, `data-modelo-motivo-select`, `data-texto-modelo` | **`data-text-template-*`** |
@@ -875,7 +874,7 @@ Cada fase é independente, verificável e não depende da reconstrução do CSS.
 | **3** | ✅ Adicionar `CV.registry.destroy(root)` e chamá-lo antes de `replaceWith` em `live-search-submit`; `action-menu` devolve o menu ao dono no `destroy` | J-02 | Fim dos nós órfãos e IDs duplicados |
 | **4** | ✅ Registrar como enhancer: `fields-init`, `masks`, `state-toggle`, `card-toggle`, `cv-select`, `document-number-field`, `destination-section`, `autosave` | J-01, J-04 | 8 componentes passam a sobreviver ao AJAX |
 | **5** | ✅ Quick Add/Quick Edit pertencem ao enhancer idempotente `CV.inlineCreate` | J-04 | Quick Add volta a funcionar após filtro |
-| **6** | Escolher **um** motor de filtro por lista (`data-collection-mode`) | J-03 | Fim do duplo filtro nas 5 listas em card |
+| **6** | ✅ Escolher **um** motor de filtro por lista (`data-collection-mode`) | J-03 | Fim do duplo filtro nas 5 listas em card |
 | **7** | Proibir `fetch()` cru: migrar os 13 arquivos para `CV.http`; apagar as 11 cópias de CSRF | J-07 | Tratamento único de erro/sessão |
 | **8** | Criar `CV.util` (debounce, escapeHtml, normalize) e remover as 17 cópias | J-16 | — |
 | **9** | Criar `CV.feedback`; substituir os 13 `alert`/`confirm` | J-12 | Feedback consistente com o design system |

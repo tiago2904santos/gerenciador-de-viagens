@@ -131,10 +131,10 @@ Modo multi:
     {% endif %}
 
     {% if start_field %}{{ start_field }}{% else %}
-      <input type="hidden" name="{{ start_hidden_name }}"{% if start_hidden_id %} id="{{ start_hidden_id }}"{% endif %} value="{{ start_hidden_value|default:'' }}" data-cv-date-picker-start-value{% if filter_date %} data-cv-filter="date"{% endif %}>
+      <input type="hidden" name="{{ start_hidden_name }}"{% if start_hidden_id %} id="{{ start_hidden_id }}"{% endif %} value="{{ start_hidden_value|default:'' }}" data-cv-date-picker-start-value{% if filter_date %} data-collection-filter="date"{% endif %}>
     {% endif %}
     {% if end_field %}{{ end_field }}{% else %}
-      <input type="hidden" name="{{ end_hidden_name }}"{% if end_hidden_id %} id="{{ end_hidden_id }}"{% endif %} value="{{ end_hidden_value|default:'' }}" data-cv-date-picker-end-value{% if filter_date %} data-cv-filter="date"{% endif %}>
+      <input type="hidden" name="{{ end_hidden_name }}"{% if end_hidden_id %} id="{{ end_hidden_id }}"{% endif %} value="{{ end_hidden_value|default:'' }}" data-cv-date-picker-end-value{% if filter_date %} data-collection-filter="date"{% endif %}>
     {% endif %}
     {% if start_field.errors %}
       {% include "components/ui/feedback/field_error.html" with errors=start_field.errors only %}

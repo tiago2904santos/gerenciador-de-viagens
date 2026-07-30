@@ -498,7 +498,9 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
 - [x] `J-04` Quick Add/Quick Edit agora pertencem a `CV.inlineCreate`, com
   delegação/guards idempotentes; autosave encontra também formulários inseridos
   por AJAX.
-- [ ] `J-03` um motor de filtro por lista (`data-collection-mode`)
+- [x] `J-03` `CV.collection` é o dono único de filtros de lista, com modo
+  explícito `client|server`; os dois motores antigos e seus hooks foram
+  removidos, e as listas paginadas usam somente o modo servidor.
 - [x] `J-07` migrados todos os consumidores para `CV.http`; `fetch()` e
   `X-CSRFToken` agora só existem no núcleo `static/js/core/http.js`, com gate
   bloqueante no auditor de CI. **NOVO — divergência da auditoria histórica:**

@@ -1,13 +1,13 @@
 {% if rows %}
   {% if not hide_realtime_count %}
-    <span class="pagination-shell__info" data-cv-results-count data-cv-results-count-template="{% verbatim %}{{visible}} de {{total}}{% endverbatim %} visíveis" hidden aria-live="polite"></span>
+    <span class="pagination-shell__info" data-collection-count data-collection-count-template="{% verbatim %}{{visible}} de {{total}}{% endverbatim %} visíveis" hidden aria-live="polite"></span>
   {% endif %}
-  <div class="cv-record-list simple-list" role="list" data-cv-list-container>
+  <div class="cv-record-list simple-list" role="list" data-collection-container>
     {% for row in rows %}
       {% include "components/lists/simple_list_row.html" with row=row row_index=forloop.counter %}
     {% endfor %}
   </div>
-  <div data-cv-empty-state hidden>
+  <div data-collection-empty hidden>
     {% include "components/lists/list_empty.html" with message=empty_message action_label=empty_action_label action_url=empty_action_url variant=empty_variant only %}
   </div>
 {% else %}

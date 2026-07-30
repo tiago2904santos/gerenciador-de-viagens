@@ -46,7 +46,7 @@
           <span class="ui-lab-preview-card__label">Filtro cliente</span>
           <span class="ui-lab-status-pill ui-lab-status-pill--done">Contrato data-*</span>
         </div>
-        <div data-cv-realtime-filter-scope>
+        <div data-collection data-collection-mode="client">
           {% include "components/ui/headers/filter_page_header.html" with eyebrow="Registros" title="Filtrar documentos" icon_label="FL" search_name="q" search_placeholder="Buscar por título" search_clear_url="#" status_options=ui_lab_filter_options status_name="status" status_label="Status" only %}
           <div class="simple-list" role="list">
             {% for row in ui_lab_simple_rows %}

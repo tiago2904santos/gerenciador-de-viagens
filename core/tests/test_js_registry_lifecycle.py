@@ -10,8 +10,8 @@ class JavascriptRegistryLifecycleTests(SimpleTestCase):
         super().setUpClass()
         static_js = Path(settings.BASE_DIR) / "static" / "js"
         cls.registry_source = (static_js / "core" / "app.js").read_text(encoding="utf-8")
-        cls.live_search_source = (
-            static_js / "components" / "live-search-submit.js"
+        cls.collection_source = (
+            static_js / "components" / "collection.js"
         ).read_text(encoding="utf-8")
         cls.action_menu_source = (
             static_js / "components" / "action-menu.js"
@@ -29,10 +29,10 @@ class JavascriptRegistryLifecycleTests(SimpleTestCase):
     def test_live_search_destroys_old_panel_before_replacing_it(self):
         destroy_call = "window.CV.registry.destroy(currentPanel)"
         replace_call = "currentPanel.replaceWith(nextPanel)"
-        self.assertIn(destroy_call, self.live_search_source)
+        self.assertIn(destroy_call, self.collection_source)
         self.assertLess(
-            self.live_search_source.index(destroy_call),
-            self.live_search_source.index(replace_call),
+            self.collection_source.index(destroy_call),
+            self.collection_source.index(replace_call),
         )
 
     def test_action_menu_registers_cleanup_that_restores_portaled_menu(self):

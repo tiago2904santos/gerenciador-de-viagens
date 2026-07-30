@@ -25,48 +25,36 @@ Carregado em `base.html` via `static/js/core/http.js`.
 
 Painel: `#id` com classe `quick-add-panel` (ou equivalente com transição `is-open`).
 
-## Filtros em tempo real (`realtime-filters.js` / `CV.filters`)
+## Coleções (`collection.js` / `CV.collection`)
+
+Cada lista declara exatamente um modo. `client` filtra os itens já renderizados;
+`server` envia os filtros por GET, troca apenas `.list-panel` e atualiza a URL.
 
 | Atributo | Elemento | Obrigatório |
 |----------|----------|-------------|
-| `data-cv-realtime-filter-scope` | container da lista/cards | sim (escopo) |
-| `data-cv-filter="search"` | `input` texto/busca | opcional |
-| `data-cv-filter="status"` | `select` status | opcional |
-| `data-cv-filter-item` | linha, card, item da lista | sim (por item) |
-| `data-search-text` | texto indexado (preferencial) | recomendado |
-| `data-status-value` | valor do status do item | se filtrar status |
-| `data-cv-empty-state` | bloco empty (fica `hidden` quando há itens) | opcional |
-| `data-cv-results-count` | elemento do contador | opcional |
-| `data-cv-results-count-template` | template do contador (`{{visible}}`, `{{total}}`) | opcional |
-| `data-cv-filter-clear` | botão limpar | opcional |
-| `data-cv-filter-bound` | escopo (interno) | idempotência |
+| `data-collection` | container da lista/cards | sim |
+| `data-collection-mode="client|server"` | container | sim |
+| `data-collection-form` | `form` GET | no modo `server` |
+| `data-collection-filter="search|status|select|date"` | controle | sim por filtro |
+| `data-collection-item` | linha, card, item | no modo `client` |
+| `data-search-text` | item | recomendado no modo `client` |
+| `data-status-value` | item | se filtrar status no cliente |
+| `data-collection-container` | container dos itens | opcional |
+| `data-collection-empty` | estado vazio | opcional |
+| `data-collection-count` | contador | opcional |
+| `data-collection-count-template` | template `{{visible}}`/`{{total}}` | opcional |
+| `data-collection-clear` | botão de limpar | opcional |
+| `data-collection-bound` | container (interno) | idempotência |
 
-API oficial:
+API oficial: `CV.collection.init(root?)`, `apply(collection)`,
+`clear(collection)`, `getState(collection)`, `matches(item, filters)` e
+`normalize(value)`.
 
-| API | Uso |
-|-----|-----|
-| `window.CV.filters.init(root?)` | Inicializa filtros em `document` ou subárvore |
-| `window.CV.filters.update(scope)` | Recalcula visibilidade de um escopo |
-| `window.CV.filters.clear(scope)` | Limpa busca/status e reaplica |
-| `window.CV.filters.getState(scope)` | Último estado `{ scope, total, visible, hidden, state }` |
+Evento no modo cliente: `cv:collection:updated`, com
+`{ collection, filters, total, visible, hidden }`.
 
-Compatibilidade: `window.CVRealtimeFilters` delega para `CV.filters` (`init`, `applyFilters`, `update`, `clear`, `getState`, `normalizeText`, `matchesFilter`).
-
-Evento: `cv:filters:updated` — `detail`: `{ scope, total, visible, hidden, state }`.
-
-Busca: case-insensitive, sem acento (`normalize('NFD')`), trim, várias palavras com **AND** (todas devem aparecer em `data-search-text` ou `textContent`).
-
-Status: compara `data-status-value` normalizado com o valor do `select`; vazio = todos.
-
-Limpar: `data-cv-filter-clear` zera inputs do escopo, não submete form, não altera querystring nesta fase.
-
-Inicialização global em `DOMContentLoaded`. **Não** é chamado por `CV.fields.init` (motores separados para evitar ordem/duplicação em painéis dinâmicos).
-
-Exemplo após DOM dinâmico:
-
-```javascript
-window.CV.filters.init(panelElement);
-```
+A busca cliente ignora caixa e acentos e combina palavras com AND. No modo
+servidor, o backend continua sendo o dono da semântica de busca e paginação.
 
 ## Máscaras (`masks.js` / `MaskEngine`)
 
