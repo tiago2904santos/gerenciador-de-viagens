@@ -994,16 +994,33 @@ document.documentElement.dataset.appReady = "true";
       window.clearTimeout(inputTimer);
       paused = true;
       var submitter = event.submitter;
-      inFlight.finally(function () {
+      var settled = false;
+      function resumeSubmit() {
+        if (settled) return;
+        settled = true;
         readyToSubmit = true;
         window.clearTimeout(inputTimer);
+        /* requestSubmit preserva o submitter; click() em botão com ícone SVG
+           pode falhar em alguns browsers se o alvo do evento for o ícone. */
+        if (typeof form.requestSubmit === 'function') {
+          try {
+            form.requestSubmit(submitter || undefined);
+            return;
+          } catch (err) {
+            /* fall through */
+          }
+        }
         if (submitter && typeof submitter.click === 'function') {
           submitter.click();
-        } else if (typeof form.requestSubmit === 'function') {
-          form.requestSubmit();
         } else {
           form.submit();
         }
+      }
+      /* Rede travada não pode segurar o "Avançar" para sempre. */
+      var safety = window.setTimeout(resumeSubmit, 8000);
+      inFlight.finally(function () {
+        window.clearTimeout(safety);
+        resumeSubmit();
       });
     }
 
@@ -4099,6 +4116,21 @@ document.documentElement.dataset.appReady = "true";
         return card;
       }
 
+      if (presentation === "vehicle") {
+        const plate = String(item.label || "").split(/\s*[-–]\s*/)[0].replace(/[^A-Za-z0-9]/g, "");
+        const initials = (plate.slice(0, 2) || "V").toUpperCase();
+        const avatar = el("span", "cv-search-picker__selected-avatar", initials);
+        avatar.setAttribute("aria-hidden", "true");
+        const titleRow = body.querySelector(".cv-search-picker__selected-title-row");
+        if (titleRow) {
+          titleRow.appendChild(el("span", "cv-search-picker__vehicle-chip", "Viatura"));
+        }
+        card.appendChild(avatar);
+        card.appendChild(body);
+        card.appendChild(removeBtn);
+        return card;
+      }
+
       card.appendChild(body);
       card.appendChild(removeBtn);
 
@@ -4930,15 +4962,7 @@ document.documentElement.dataset.appReady = "true";
     if (typeof options.beforeAppend === "function") {
       options.beforeAppend(row, index, fragment);
     }
-    var insertAfter = options.insertAfter;
-    var insertBefore = options.insertBefore;
-    if (insertAfter && insertAfter.parentNode === list) {
-      list.insertBefore(fragment, insertAfter.nextSibling);
-    } else if (insertBefore && insertBefore.parentNode === list) {
-      list.insertBefore(fragment, insertBefore);
-    } else {
-      list.appendChild(fragment);
-    }
+    list.appendChild(fragment);
     if (!row && options.indexAttr) {
       row = list.querySelector("[data-" + options.indexAttr.replace(/[A-Z]/g, function (m) { return "-" + m.toLowerCase(); }) + "='" + String(index) + "']");
     }
@@ -5207,19 +5231,11 @@ document.documentElement.dataset.appReady = "true";
       }
     });
 
-    var addRoot = section || list;
-    var addSelector = options.addSelector || "[data-location-add]";
-    if (template && addRoot && addRoot.dataset && addRoot.dataset.locationAddBound !== "true") {
-      addRoot.dataset.locationAddBound = "true";
-      addRoot.addEventListener("click", function (event) {
-        var button = event.target.closest(addSelector);
-        if (!button || !addRoot.contains(button)) return;
-
-        var sourceRow = button.closest(options.rowSelector);
-        if (sourceRow && !list.contains(sourceRow)) sourceRow = null;
-
+    if (addButton && template && addButton.dataset.locationAddBound !== "true") {
+      addButton.dataset.locationAddBound = "true";
+      addButton.addEventListener("click", function () {
         var currentRows = rows(list, { rowSelector: options.rowSelector });
-        var referenceRow = sourceRow || (currentRows.length ? currentRows[currentRows.length - 1] : null);
+        var referenceRow = currentRows.length ? currentRows[currentRows.length - 1] : null;
         var referenceState = referenceRow ? referenceRow.querySelector(options.stateSelector) : null;
         var referenceStateId = referenceState
           ? String(referenceState.value || referenceState.dataset.pickerInitialValue || "").trim()
@@ -5230,7 +5246,6 @@ document.documentElement.dataset.appReady = "true";
           rowSelector: options.rowSelector,
           removeSelector: options.removeSelector,
           indexAttr: options.indexAttr,
-          insertAfter: sourceRow || null,
           beforeAppend: function (row) {
             if (!row || !referenceStateId || options.copyLastState === false) return;
             var stateSelect = row.querySelector(options.stateSelector);
@@ -7151,7 +7166,9 @@ document.documentElement.dataset.appReady = "true";
   async function downloadForm(form, submitter) {
     begin(submitter);
     try {
-      var response = await window.CV.http.request(form.action || window.location.href, {
+      var response = await window.CV.http.request(
+        (form.getAttribute("action") || window.location.href),
+        {
         method: (form.method || "post").toUpperCase(),
         body: formDataWithSubmitter(form, submitter),
         form: form,

@@ -212,16 +212,33 @@
       window.clearTimeout(inputTimer);
       paused = true;
       var submitter = event.submitter;
-      inFlight.finally(function () {
+      var settled = false;
+      function resumeSubmit() {
+        if (settled) return;
+        settled = true;
         readyToSubmit = true;
         window.clearTimeout(inputTimer);
+        /* requestSubmit preserva o submitter; click() em botão com ícone SVG
+           pode falhar em alguns browsers se o alvo do evento for o ícone. */
+        if (typeof form.requestSubmit === 'function') {
+          try {
+            form.requestSubmit(submitter || undefined);
+            return;
+          } catch (err) {
+            /* fall through */
+          }
+        }
         if (submitter && typeof submitter.click === 'function') {
           submitter.click();
-        } else if (typeof form.requestSubmit === 'function') {
-          form.requestSubmit();
         } else {
           form.submit();
         }
+      }
+      /* Rede travada não pode segurar o "Avançar" para sempre. */
+      var safety = window.setTimeout(resumeSubmit, 8000);
+      inFlight.finally(function () {
+        window.clearTimeout(safety);
+        resumeSubmit();
       });
     }
 

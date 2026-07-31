@@ -705,6 +705,21 @@
         return card;
       }
 
+      if (presentation === "vehicle") {
+        const plate = String(item.label || "").split(/\s*[-–]\s*/)[0].replace(/[^A-Za-z0-9]/g, "");
+        const initials = (plate.slice(0, 2) || "V").toUpperCase();
+        const avatar = el("span", "cv-search-picker__selected-avatar", initials);
+        avatar.setAttribute("aria-hidden", "true");
+        const titleRow = body.querySelector(".cv-search-picker__selected-title-row");
+        if (titleRow) {
+          titleRow.appendChild(el("span", "cv-search-picker__vehicle-chip", "Viatura"));
+        }
+        card.appendChild(avatar);
+        card.appendChild(body);
+        card.appendChild(removeBtn);
+        return card;
+      }
+
       card.appendChild(body);
       card.appendChild(removeBtn);
 

@@ -202,7 +202,9 @@
   async function downloadForm(form, submitter) {
     begin(submitter);
     try {
-      var response = await window.CV.http.request(form.action || window.location.href, {
+      var response = await window.CV.http.request(
+        (form.getAttribute("action") || window.location.href),
+        {
         method: (form.method || "post").toUpperCase(),
         body: formDataWithSubmitter(form, submitter),
         form: form,

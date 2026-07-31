@@ -23,7 +23,12 @@ def _redirect_lista_oficio(request, oficio, message):
 
 
 def _wizard_normalizar_acao(post, *, default: str = "wizard_next") -> str:
-    action = (post.get("action") or default).strip()
+    # Preferir wizard_action: name="action" colide com form.action no DOM
+    # (RadioNodeList) e quebra JS que lê a URL de submit do formulário.
+    raw = post.get("wizard_action")
+    if raw in (None, ""):
+        raw = post.get("action")
+    action = (raw or default).strip()
     if action == "save_continue":
         return "wizard_next"
     return action
