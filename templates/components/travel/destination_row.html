@@ -3,14 +3,15 @@
      data-location-index="{% if prefix %}{{ row_index }}{% elif has_destino_index %}{{ destino_index }}{% elif has_data_index %}{{ data_index }}{% else %}0{% endif %}">
   {% if show_row_add %}
   <button type="button"
-          class="route-destinos-add"
+          class="route-destinos-add cv-ordered-field-row__add"
           data-location-add
-          title="Adicionar destino abaixo"
-          aria-label="Adicionar destino abaixo">
+          title="Adicionar destino"
+          aria-label="Adicionar destino"
+          {% if add_button_id %}id="{{ add_button_id }}"{% endif %}>
     <span class="route-destinos-add__glyph" aria-hidden="true">+</span>
   </button>
   {% endif %}
-  <span class="cv-ordered-field-row__badge{% if hide_order_badge %} sr-only{% endif %}" data-location-order aria-hidden="true">{{ row_ordinal|default:1 }}</span>
+  <span class="cv-ordered-field-row__badge{% if hide_order_badge or show_row_add %} sr-only{% endif %}" data-location-order aria-hidden="true">{{ row_ordinal|default:1 }}</span>
   <div class="cv-ordered-field-row__body">
     <div class="field-grid roteiro-sede-grid roteiro-destino-grid cv-ordered-field-row__fields">
       <div class="field app-form-field">
@@ -35,6 +36,6 @@
           aria-label="Remover destino"
           {% if row_single or remove_hidden %}hidden{% endif %}
           data-location-remove>
-    <span class="cv-ordered-field-row__remove-glyph" aria-hidden="true">×</span>
+    <span class="cv-ordered-field-row__remove-glyph" aria-hidden="true">&#215;</span>
   </button>
 </div>

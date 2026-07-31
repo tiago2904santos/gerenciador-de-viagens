@@ -8533,6 +8533,23 @@ html[data-theme="dark"] .cv-action-menu {
   padding-top: var(--space-3);
 }
 
+.cv-form-subsection--split {
+  align-items: end;
+  grid-template-columns: minmax(160px, 0.7fr) minmax(0, 2fr);
+}
+
+.cv-form-subsection--split > .cv-form-subsection__header {
+  align-self: center;
+  display: grid;
+  gap: 3px;
+  justify-content: start;
+}
+
+.cv-form-subsection--split > :not(.cv-form-subsection__header) {
+  align-self: end;
+  min-width: 0;
+}
+
 .cv-form-subsection__header,
 .cv-resource-picker__header {
   align-items: baseline;
@@ -8599,6 +8616,17 @@ html[data-theme="dark"] .cv-action-menu {
   }
 
   .cv-form-block--split > .cv-form-block__header {
+    align-items: baseline;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .cv-form-subsection--split {
+    align-items: stretch;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cv-form-subsection--split > .cv-form-subsection__header {
     align-items: baseline;
     display: flex;
     justify-content: space-between;

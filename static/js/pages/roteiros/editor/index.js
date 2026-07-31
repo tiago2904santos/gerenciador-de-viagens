@@ -857,9 +857,18 @@ export function initRoteirosEditor() {
     });
   }
   function refreshDestinoButtons() {
-    window.CV.locationRows.updateSingleRowState($('destinos-container'), {
+    var container = $('destinos-container');
+    window.CV.locationRows.updateSingleRowState(container, {
       rowSelector: '[data-location-row]',
       removeSelector: '[data-location-remove]'
+    });
+    var rows = getDestinoRows();
+    rows.forEach(function (row, index) {
+      var addBtn = row.querySelector('[data-location-add]');
+      if (!addBtn) return;
+      addBtn.hidden = false;
+      if (index === 0 && !addBtn.id) addBtn.id = 'btn-adicionar-destino';
+      if (index !== 0 && addBtn.id === 'btn-adicionar-destino') addBtn.removeAttribute('id');
     });
   }
   function addDestinoRow(destino, options) {
