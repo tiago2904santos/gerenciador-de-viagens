@@ -4930,7 +4930,15 @@ document.documentElement.dataset.appReady = "true";
     if (typeof options.beforeAppend === "function") {
       options.beforeAppend(row, index, fragment);
     }
-    list.appendChild(fragment);
+    var insertAfter = options.insertAfter;
+    var insertBefore = options.insertBefore;
+    if (insertAfter && insertAfter.parentNode === list) {
+      list.insertBefore(fragment, insertAfter.nextSibling);
+    } else if (insertBefore && insertBefore.parentNode === list) {
+      list.insertBefore(fragment, insertBefore);
+    } else {
+      list.appendChild(fragment);
+    }
     if (!row && options.indexAttr) {
       row = list.querySelector("[data-" + options.indexAttr.replace(/[A-Z]/g, function (m) { return "-" + m.toLowerCase(); }) + "='" + String(index) + "']");
     }
@@ -5199,11 +5207,19 @@ document.documentElement.dataset.appReady = "true";
       }
     });
 
-    if (addButton && template && addButton.dataset.locationAddBound !== "true") {
-      addButton.dataset.locationAddBound = "true";
-      addButton.addEventListener("click", function () {
+    var addRoot = section || list;
+    var addSelector = options.addSelector || "[data-location-add]";
+    if (template && addRoot && addRoot.dataset && addRoot.dataset.locationAddBound !== "true") {
+      addRoot.dataset.locationAddBound = "true";
+      addRoot.addEventListener("click", function (event) {
+        var button = event.target.closest(addSelector);
+        if (!button || !addRoot.contains(button)) return;
+
+        var sourceRow = button.closest(options.rowSelector);
+        if (sourceRow && !list.contains(sourceRow)) sourceRow = null;
+
         var currentRows = rows(list, { rowSelector: options.rowSelector });
-        var referenceRow = currentRows.length ? currentRows[currentRows.length - 1] : null;
+        var referenceRow = sourceRow || (currentRows.length ? currentRows[currentRows.length - 1] : null);
         var referenceState = referenceRow ? referenceRow.querySelector(options.stateSelector) : null;
         var referenceStateId = referenceState
           ? String(referenceState.value || referenceState.dataset.pickerInitialValue || "").trim()
@@ -5214,6 +5230,7 @@ document.documentElement.dataset.appReady = "true";
           rowSelector: options.rowSelector,
           removeSelector: options.removeSelector,
           indexAttr: options.indexAttr,
+          insertAfter: sourceRow || null,
           beforeAppend: function (row) {
             if (!row || !referenceStateId || options.copyLastState === false) return;
             var stateSelect = row.querySelector(options.stateSelector);

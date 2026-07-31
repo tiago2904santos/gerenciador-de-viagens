@@ -1,4 +1,4 @@
-{# Radios ocultos — lidos pelo JS para detectar e submeter o modo #}
+{# Radios ocultos â€” lidos pelo JS para detectar e submeter o modo #}
 <input type="radio" name="roteiro_modo" id="id_roteiro_modo_evento" value="EVENTO_EXISTENTE"
        {% if roteiro_modo == 'EVENTO_EXISTENTE' %}checked{% endif %}
        {% if not has_event_routes %}disabled{% endif %}
@@ -7,7 +7,7 @@
        {% if roteiro_modo != 'EVENTO_EXISTENTE' %}checked{% endif %}
        hidden>
 
-{# ── Painel: Roteiro salvo ── #}
+{# â”€â”€ Painel: Roteiro salvo â”€â”€ #}
 <div id="roteiro-selector-wrapper"
      class="roteiro-editor__routes-panel">
 
@@ -29,7 +29,7 @@
            value="{{ roteiro_id|default:'' }}"
            data-route-selected-input
            {% if not has_event_routes %}disabled{% endif %}>
-    <section class="cv-search-picker__selected-panel" aria-label="Roteiros disponíveis">
+    <section class="cv-search-picker__selected-panel" aria-label="Roteiros disponÃ­veis">
       <div id="roteiro-lista" class="cv-search-picker__selected-list roteiro-editor__route-list related-route-list related-route-list"></div>
       <p class="cv-search-picker__selected-empty" id="roteiro-lista-empty" hidden>Nenhum roteiro encontrado para a busca.</p>
     </section>
@@ -39,7 +39,7 @@
     <header class="wizard-inner-section__header">
       <div>
         <h4 class="wizard-inner-section__title" id="sec-roteiro-salvo-title">Roteiros salvos</h4>
-        <p class="wizard-inner-section__description">Reaproveite um roteiro já validado.</p>
+        <p class="wizard-inner-section__description">Reaproveite um roteiro jÃ¡ validado.</p>
       </div>
     </header>
     <div class="field-grid roteiro-sede-grid">
@@ -67,59 +67,21 @@
   {% endif %}
 </div>
 
-{# Painel: Roteiro novo — Sede #}
+{# Painel: Roteiro novo â€” Sede #}
 <div id="panel-roteiro-novo"
      {% if roteiro_modo == 'EVENTO_EXISTENTE' %}hidden{% endif %}>
 
   {# Sede #}
-  <section class="{% if roteiro_editor_oficio %}cv-form-subsection cv-form-subsection--split{% else %}wizard-inner-section{% endif %}" aria-labelledby="sec-sede-title" id="sec-sede">
-    <header class="{% if roteiro_editor_oficio %}cv-form-subsection__header{% else %}wizard-inner-section__header{% endif %}">
-      <div class="{% if roteiro_editor_oficio %}cv-form-subsection__copy{% endif %}">
-        <h4 class="{% if roteiro_editor_oficio %}cv-form-subsection__title{% else %}wizard-inner-section__title{% endif %}" id="sec-sede-title">Sede</h4>
-        <p class="{% if roteiro_editor_oficio %}cv-form-subsection__description{% else %}wizard-inner-section__description{% endif %}">Unidade de origem da viagem.</p>
+  {% if roteiro_editor_oficio %}
+  {% include "components/ui/forms/form_block.html" with title="Sede" description="Unidade de origem da viagem." section_id="sec-sede-title" element_id="sec-sede" heading_level=4 variant="split" extra_class="route-sede-block" body_template="roteiros/partials/roteiro/_sede_fields.html" %}
+  {% else %}
+  <section class="wizard-inner-section" aria-labelledby="sec-sede-title" id="sec-sede">
+    <header class="wizard-inner-section__header">
+      <div>
+        <h4 class="wizard-inner-section__title" id="sec-sede-title">Sede</h4>
+        <p class="wizard-inner-section__description">Unidade de origem da viagem.</p>
       </div>
     </header>
-    {% if roteiro_editor_oficio %}
-    <div class="field-grid roteiro-sede-grid">
-      <div class="field app-form-field">
-        <select name="origem_estado" id="id_origem_estado"
-                class="cv-search-picker__native"
-                data-entity-picker="true"
-                data-entity-picker-mode="single"
-                data-picker-variant="compact"
-                data-placeholder="Buscar estado..."
-                data-empty-message="Nenhum estado encontrado."
-                aria-label="UF">
-          <option value="">---------</option>
-          {% for estado in estados %}
-          <option value="{{ estado.pk }}" {% if sede_estado_id == estado.pk %}selected{% endif %}>{{ estado.nome }} ({{ estado.sigla }})</option>
-          {% endfor %}
-        </select>
-        {% if form.origem_estado.errors %}
-          {% include "components/ui/feedback/field_error.html" with errors=form.origem_estado.errors only %}
-        {% endif %}
-      </div>
-      <div class="field app-form-field">
-        <select name="origem_cidade" id="id_origem_cidade"
-                class="cv-search-picker__native"
-                data-entity-picker="true"
-                data-entity-picker-mode="single"
-                data-picker-variant="compact"
-                data-placeholder="Buscar cidade..."
-                data-empty-message="Nenhuma cidade encontrada."
-                aria-label="Cidade"
-                {% if not sede_estado_id %}disabled{% endif %}>
-          <option value="">---------</option>
-          {% for cidade in sede_cidades_qs %}
-          <option value="{{ cidade.pk }}" {% if sede_cidade_id == cidade.pk %}selected{% endif %}>{{ cidade.nome }}</option>
-          {% endfor %}
-        </select>
-        {% if form.origem_cidade.errors %}
-          {% include "components/ui/feedback/field_error.html" with errors=form.origem_cidade.errors only %}
-        {% endif %}
-      </div>
-    </div>
-    {% else %}
     <div class="field-grid roteiro-sede-grid">
       <div class="field app-form-field">
         <label class="app-form-label" for="id_origem_estado">UF</label>
@@ -159,16 +121,17 @@
         {% endif %}
       </div>
     </div>
-    {% endif %}
   </section>
+  {% endif %}
 
-  {% include "components/travel/destination_section.html" with section_id="sec-destinos" title_id="sec-destinos-title" add_button_id="btn-adicionar-destino" list_id="destinos-container" title="Destinos" description="Adicione os locais na ordem em que serão visitados." %}
+  {% include "components/travel/destination_section.html" with section_id="sec-destinos" title_id="sec-destinos-title" add_button_id="btn-adicionar-destino" list_id="destinos-container" title="Destinos" description="Locais na ordem da visita." layout="split" %}
   <template id="tmpl-destino-roteiro" data-location-template>
     {% if roteiro_editor_oficio %}
-      {% include "components/travel/destination_row.html" with data_index="__index__" has_data_index=True row_ordinal=1 state_select_template="roteiros/partials/roteiro/_destino_template_state.html" city_select_template="roteiros/partials/roteiro/_destino_template_city.html" %}
+      {% include "components/travel/destination_row.html" with data_index="__index__" has_data_index=True row_ordinal=1 hide_order_badge=True show_row_add=True state_select_template="roteiros/partials/roteiro/_destino_template_state.html" city_select_template="roteiros/partials/roteiro/_destino_template_city.html" %}
     {% else %}
-      {% include "components/travel/destination_row.html" with state_select_template="roteiros/partials/roteiro/_destino_template_state.html" city_select_template="roteiros/partials/roteiro/_destino_template_city.html" %}
+      {% include "components/travel/destination_row.html" with hide_order_badge=True show_row_add=True state_select_template="roteiros/partials/roteiro/_destino_template_state.html" city_select_template="roteiros/partials/roteiro/_destino_template_city.html" %}
     {% endif %}
   </template>
 
 </div>{# /panel-roteiro-novo #}
+

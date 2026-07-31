@@ -862,9 +862,11 @@ export function initRoteirosEditor() {
       removeSelector: '[data-location-remove]'
     });
   }
-  function addDestinoRow(destino) {
+  function addDestinoRow(destino, options) {
     var container = $('destinos-container');
     if (!container) return Promise.resolve(null);
+    options = options || {};
+    var insertAfter = options.insertAfter || null;
     var idx = getDestinoRows().length;
     var estadoId = destino && destino.estado_id ? destino.estado_id : (destinoEstadoDefaultId || '');
     var cidadeId = destino && destino.cidade_id ? destino.cidade_id : null;
@@ -878,6 +880,7 @@ export function initRoteirosEditor() {
       rowSelector: '[data-location-row]',
       removeSelector: '[data-location-remove]',
       indexAttr: 'locationIndex',
+      insertAfter: insertAfter,
       beforeAppend: function (newRow) {
         if (!newRow) return;
         newRow.dataset.key = stableKey;
@@ -923,6 +926,45 @@ export function initRoteirosEditor() {
       };
     });
   }
+
+  function renderDestinosTrechosPreview() {
+    var list = document.querySelector("[data-route-destinos-trechos]");
+    if (!list) return;
+    var escape = (window.CV && window.CV.util && typeof window.CV.util.escapeHtml === "function")
+      ? window.CV.util.escapeHtml
+      : function (value) { return String(value == null ? "" : value); };
+    function cityLabel(raw, fallback) {
+      var nome = String(raw || "").trim();
+      if (!nome || nome === "---------") return fallback;
+      return nome;
+    }
+    var sede = cityLabel(selectedText($("id_origem_cidade")), "Sede");
+    var destinos = getDestinos();
+    if (!destinos.length) {
+      list.innerHTML = "";
+      return;
+    }
+    var names = destinos.map(function (destino, index) {
+      return cityLabel(destino.cidade_nome, "Destino " + (index + 1));
+    });
+    var steps = [];
+    var from = sede;
+    names.forEach(function (to) {
+      steps.push({ from: from, to: to, isReturn: false });
+      from = to;
+    });
+    steps.push({ from: from, to: sede, isReturn: true });
+    list.innerHTML = steps.map(function (step) {
+      return (
+        '<li class="route-destinos-trechos__item' + (step.isReturn ? " route-destinos-trechos__item--return" : "") + '">' +
+          '<span class="route-destinos-trechos__from">' + escape(step.from) + "</span>" +
+          '<span class="route-destinos-trechos__sep" aria-hidden="true">&gt;</span>' +
+          '<span class="route-destinos-trechos__to">' + escape(step.to) + "</span>" +
+        "</li>"
+      );
+    }).join("");
+  }
+
   function updateRetornoCities() {
     var cards = getTrechoCards();
     var sede = selectedText($('id_origem_cidade'));
@@ -1028,6 +1070,7 @@ export function initRoteirosEditor() {
     return true;
   }
   function renderTrechos(seedState, options) {
+    renderDestinosTrechosPreview();
     // Re-renderizar trechos nao pode sobrescrever data/hora/tempo manual com vazio/default.
     // Por isso os valores atuais da tela sao combinados com o seed antes de montar os cards.
     var opts = options || {};
@@ -1038,6 +1081,7 @@ export function initRoteirosEditor() {
     var signature = computeTrechosSignature(seedState);
     if (!force && !preferSeed && signature === lastTrechosSignature) {
       updateResumo();
+      renderDestinosTrechosPreview();
       return;
     }
 
@@ -1530,7 +1574,6 @@ export function initRoteirosEditor() {
     routeResumo();
   }
   var destinosContainer = $('destinos-container');
-  var btnAdicionarDestino = $('btn-adicionar-destino');
   if (destinosContainer) {
     if (window.CV && window.CV.locationRows && typeof window.CV.locationRows.initDragDrop === 'function') {
       window.CV.locationRows.initDragDrop(destinosContainer, {
@@ -1550,13 +1593,27 @@ export function initRoteirosEditor() {
       else { renderTrechos(captureCurrentState()); scheduleRealtimeDiarias(); scheduleAutosave(); }
     });
     destinosContainer.addEventListener('click', function(e) {
+      var addBtn = e.target.closest('[data-location-add]');
+      if (addBtn && destinosContainer.contains(addBtn)) {
+        var sourceRow = addBtn.closest('[data-location-row]');
+        var referenceState = sourceRow ? sourceRow.querySelector('[data-location-state]') : null;
+        var estadoId = referenceState
+          ? (referenceState.value || destinoEstadoDefaultId || null)
+          : (destinoEstadoDefaultId || null);
+        addDestinoRow(
+          { estado_id: estadoId, cidade_id: null },
+          { insertAfter: sourceRow || null }
+        ).then(function() {
+          renderTrechos(captureCurrentState());
+          scheduleRealtimeDiarias();
+          scheduleAutosave();
+        });
+        return;
+      }
       var btn = e.target.closest('[data-location-remove]'); if (!btn) return;
       var rows = getDestinoRows(); if (rows.length <= 1) return;
       btn.closest('[data-location-row]').remove(); reindexDestinoRows(); refreshDestinoButtons(); renderTrechos(captureCurrentState()); scheduleRealtimeDiarias(); scheduleAutosave();
     });
-  }
-  if (btnAdicionarDestino) {
-    btnAdicionarDestino.addEventListener('click', function() { addDestinoRow({ estado_id: destinoEstadoDefaultId||null, cidade_id: null }).then(function() { renderTrechos(captureCurrentState()); scheduleRealtimeDiarias(); scheduleAutosave(); }); });
   }
   $('id_origem_estado').addEventListener('change', function() { if (applyingState) return; loadCities($('id_origem_cidade'), $('id_origem_estado').value, null).then(function() { renderTrechos(captureCurrentState()); scheduleRealtimeDiarias(); scheduleAutosave(); notifyRouteStateChanged(); }); });
   $('id_origem_cidade').addEventListener('change', function() { if (applyingState) return; renderTrechos(captureCurrentState()); scheduleRealtimeDiarias(); scheduleAutosave(); notifyRouteStateChanged(); });

@@ -1,3 +1,35 @@
+{% if layout == "split" %}
+<section class="cv-form-subsection travel-destinations cv-ordered-field-collection route-destinos-block route-destinos-block--split{% if section_extra_class %} {{ section_extra_class }}{% endif %}"
+         aria-labelledby="{{ title_id|default:'destinos-title' }}"
+         id="{{ section_id|default:'sec-destinos' }}"
+         data-location-rows>
+  <header class="route-destinos-block__header">
+    <div class="route-destinos-block__copy">
+      <h4 class="route-destinos-block__title" id="{{ title_id|default:'destinos-title' }}">{{ title|default:'Destinos' }}</h4>
+      <ul class="route-destinos-trechos"
+          data-route-destinos-trechos
+          aria-label="Trechos da rota"></ul>
+    </div>
+  </header>
+
+  <div class="route-destinos-block__body">
+    <div class="route-destinos-block__editor">
+      <div class="cv-ordered-field-collection__list route-destinations-list"
+           data-location-list
+           aria-label="{{ panel_aria_label|default:'Destinos adicionados' }}"
+           {% if list_id %}id="{{ list_id }}"{% endif %}>
+        {% if rows_template %}
+          {% include rows_template %}
+        {% endif %}
+      </div>
+    </div>
+
+    {% if errors_template %}
+      {% include errors_template %}
+    {% endif %}
+  </div>
+</section>
+{% else %}
 <section class="cv-form-subsection travel-destinations cv-ordered-field-collection{% if section_extra_class %} {{ section_extra_class }}{% endif %}"
          aria-labelledby="{{ title_id|default:'destinos-title' }}"
          id="{{ section_id|default:'sec-destinos' }}"
@@ -30,3 +62,4 @@
     {% include errors_template %}
   {% endif %}
 </section>
+{% endif %}
