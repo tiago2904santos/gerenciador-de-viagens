@@ -1,0 +1,39 @@
+<div class="field-grid roteiro-sede-grid">
+  <div class="field app-form-field">
+    <select name="origem_estado" id="id_origem_estado"
+            class="cv-search-picker__native"
+            data-entity-picker="true"
+            data-entity-picker-mode="single"
+            data-picker-variant="compact"
+            data-placeholder="Buscar estado..."
+            data-empty-message="Nenhum estado encontrado."
+            aria-label="UF">
+      <option value="">---------</option>
+      {% for estado in estados %}
+      <option value="{{ estado.pk }}" {% if sede_estado_id == estado.pk %}selected{% endif %}>{{ estado.nome }} ({{ estado.sigla }})</option>
+      {% endfor %}
+    </select>
+    {% if form.origem_estado.errors %}
+      {% include "components/ui/feedback/field_error.html" with errors=form.origem_estado.errors only %}
+    {% endif %}
+  </div>
+  <div class="field app-form-field">
+    <select name="origem_cidade" id="id_origem_cidade"
+            class="cv-search-picker__native"
+            data-entity-picker="true"
+            data-entity-picker-mode="single"
+            data-picker-variant="compact"
+            data-placeholder="Buscar cidade..."
+            data-empty-message="Nenhuma cidade encontrada."
+            aria-label="Cidade"
+            {% if not sede_estado_id %}disabled{% endif %}>
+      <option value="">---------</option>
+      {% for cidade in sede_cidades_qs %}
+      <option value="{{ cidade.pk }}" {% if sede_cidade_id == cidade.pk %}selected{% endif %}>{{ cidade.nome }}</option>
+      {% endfor %}
+    </select>
+    {% if form.origem_cidade.errors %}
+      {% include "components/ui/feedback/field_error.html" with errors=form.origem_cidade.errors only %}
+    {% endif %}
+  </div>
+</div>

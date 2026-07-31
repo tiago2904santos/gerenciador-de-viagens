@@ -33,7 +33,9 @@ def wizard_justificativa(request, pk):
     inst = get_or_create_justificativa_oficio(oficio)
     bypass_texto_obrigatorio = False
     if request.method == "POST":
-        raw_action = (request.POST.get("action") or "").strip()
+        raw_action = (
+            request.POST.get("wizard_action") or request.POST.get("action") or ""
+        ).strip()
         if raw_action in ("wizard_back", "save_draft_list"):
             bypass_texto_obrigatorio = True
     form = JustificativaOficioForm(

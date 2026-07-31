@@ -5,7 +5,7 @@
       {% if secondary_url %}
         {% include "components/ui/buttons/button.html" with href=secondary_url label=secondary_label variant=secondary_variant|default:"secondary" icon=secondary_icon|default:"arrow-left" link_target=secondary_link_target link_rel=secondary_link_rel only %}
       {% else %}
-        {% include "components/ui/buttons/button.html" with label=secondary_label variant=secondary_variant|default:"secondary" icon=secondary_icon|default:"arrow-left" type="submit" extra_class=secondary_extra_class name="action" value=secondary_action|default:"wizard_back" only %}
+        {% include "components/ui/buttons/button.html" with label=secondary_label variant=secondary_variant|default:"secondary" icon=secondary_icon|default:"arrow-left" type="submit" extra_class=secondary_extra_class name="wizard_action" value=secondary_action|default:"wizard_back" only %}
       {% endif %}
     {% endif %}
   </div>
@@ -15,7 +15,7 @@
       {% if primary_url %}
         {% include "components/ui/buttons/button.html" with href=primary_url label=primary_label variant=primary_variant|default:"primary" icon=primary_icon|default:"arrow-right" icon_after=True link_target=primary_link_target link_rel=primary_link_rel only %}
       {% else %}
-        {% include "components/ui/buttons/button.html" with label=primary_label variant=primary_variant|default:"primary" icon=primary_icon|default:"arrow-right" icon_after=True type="submit" extra_class=primary_extra_class name="action" value=primary_action only %}
+        {% include "components/ui/buttons/button.html" with label=primary_label variant=primary_variant|default:"primary" icon=primary_icon|default:"arrow-right" icon_after=True type="submit" extra_class=primary_extra_class name="wizard_action" value=primary_action only %}
       {% endif %}
     {% endif %}
   </div>

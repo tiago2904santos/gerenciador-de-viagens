@@ -994,16 +994,33 @@ document.documentElement.dataset.appReady = "true";
       window.clearTimeout(inputTimer);
       paused = true;
       var submitter = event.submitter;
-      inFlight.finally(function () {
+      var settled = false;
+      function resumeSubmit() {
+        if (settled) return;
+        settled = true;
         readyToSubmit = true;
         window.clearTimeout(inputTimer);
+        /* requestSubmit preserva o submitter; click() em botão com ícone SVG
+           pode falhar em alguns browsers se o alvo do evento for o ícone. */
+        if (typeof form.requestSubmit === 'function') {
+          try {
+            form.requestSubmit(submitter || undefined);
+            return;
+          } catch (err) {
+            /* fall through */
+          }
+        }
         if (submitter && typeof submitter.click === 'function') {
           submitter.click();
-        } else if (typeof form.requestSubmit === 'function') {
-          form.requestSubmit();
         } else {
           form.submit();
         }
+      }
+      /* Rede travada não pode segurar o "Avançar" para sempre. */
+      var safety = window.setTimeout(resumeSubmit, 8000);
+      inFlight.finally(function () {
+        window.clearTimeout(safety);
+        resumeSubmit();
       });
     }
 
@@ -4099,6 +4116,21 @@ document.documentElement.dataset.appReady = "true";
         return card;
       }
 
+      if (presentation === "vehicle") {
+        const plate = String(item.label || "").split(/\s*[-–]\s*/)[0].replace(/[^A-Za-z0-9]/g, "");
+        const initials = (plate.slice(0, 2) || "V").toUpperCase();
+        const avatar = el("span", "cv-search-picker__selected-avatar", initials);
+        avatar.setAttribute("aria-hidden", "true");
+        const titleRow = body.querySelector(".cv-search-picker__selected-title-row");
+        if (titleRow) {
+          titleRow.appendChild(el("span", "cv-search-picker__vehicle-chip", "Viatura"));
+        }
+        card.appendChild(avatar);
+        card.appendChild(body);
+        card.appendChild(removeBtn);
+        return card;
+      }
+
       card.appendChild(body);
       card.appendChild(removeBtn);
 
@@ -7134,7 +7166,9 @@ document.documentElement.dataset.appReady = "true";
   async function downloadForm(form, submitter) {
     begin(submitter);
     try {
-      var response = await window.CV.http.request(form.action || window.location.href, {
+      var response = await window.CV.http.request(
+        (form.getAttribute("action") || window.location.href),
+        {
         method: (form.method || "post").toUpperCase(),
         body: formDataWithSubmitter(form, submitter),
         form: form,
