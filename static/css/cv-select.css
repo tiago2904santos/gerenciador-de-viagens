@@ -794,11 +794,21 @@ html[data-theme="dark"] {
 }
 
 .cv-custom-select--open .cv-custom-select__chevron {
-  color: var(--cv-select-border-focus);
+  color: var(--cv-cs-chevron-color);
 }
 
 .cv-custom-select--open .cv-custom-select__chevron svg {
   transform: rotate(180deg);
+}
+
+html[data-theme="dark"] .cv-custom-select--v2 {
+  --cv-cs-chevron-color: var(--color-accent);
+}
+
+html[data-theme="dark"] .cv-custom-select--v2 .cv-custom-select__chevron,
+html[data-theme="dark"] .cv-custom-select--v2 .cv-custom-select__chevron svg {
+  color: var(--color-accent);
+  stroke: currentColor;
 }
 
 @keyframes cv-cs-menu-enter {

@@ -409,6 +409,7 @@ html[data-theme="dark"] {
 
 .cv-icon-btn--complete,
 .cv-icon-btn--sign.is-assinado,
+.cv-icon-btn--edit.is-assinado,
 .cv-icon-btn--settings.is-assinado,
 .cv-icon-btn--whatsapp {
   background: var(--action-success-bg);
@@ -431,7 +432,15 @@ html[data-theme="dark"] {
   color: var(--action-docx-text);
 }
 
-.cv-icon-btn--settings,
+.cv-icon-btn--documents {
+  background: var(--action-warning-bg);
+  border-color: var(--action-warning-border);
+  box-shadow: var(--action-shadow);
+  color: var(--action-warning-text);
+}
+
+.cv-icon-btn--edit:not(.is-assinado),
+.cv-icon-btn--settings:not(.is-assinado),
 .cv-icon-btn--signature {
   background: var(--action-info-bg);
   border-color: var(--action-info-border);
@@ -444,12 +453,6 @@ html[data-theme="dark"] {
   border-color: var(--action-pdf-border);
   box-shadow: var(--action-shadow);
   color: var(--action-pdf-text);
-}
-
-.cv-icon-btn--edit {
-  background: var(--action-edit-bg);
-  border-color: var(--action-edit-border);
-  color: var(--action-edit-text);
 }
 
 .cv-icon-btn--archive {
@@ -479,11 +482,22 @@ html[data-theme="dark"] {
   color: var(--action-preview-text);
 }
 
-.cv-icon-btn--edit:hover,
-.cv-icon-btn--edit:focus {
-  background: color-mix(in srgb, var(--action-edit-bg) 82%, var(--action-edit-text) 18%);
-  border-color: var(--action-edit-text);
-  color: var(--action-edit-text);
+.cv-icon-btn--edit:not(.is-assinado):hover,
+.cv-icon-btn--edit:not(.is-assinado):focus {
+  background: var(--action-info-hover-bg);
+  border-color: var(--action-info-border);
+  color: var(--action-info-text);
+}
+
+.cv-icon-btn--edit.is-assinado:hover,
+.cv-icon-btn--edit.is-assinado:focus,
+.cv-icon-btn--settings.is-assinado:hover,
+.cv-icon-btn--settings.is-assinado:focus,
+.cv-icon-btn--sign.is-assinado:hover,
+.cv-icon-btn--sign.is-assinado:focus {
+  background: var(--action-success-hover-bg);
+  border-color: var(--action-success-border);
+  color: var(--action-success-text);
 }
 
 /* Agrupamentos: uma unica superficie reduz ruido e organiza a hierarquia. */

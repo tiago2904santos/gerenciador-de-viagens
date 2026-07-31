@@ -108,7 +108,14 @@ def documents_menu(menu_id, subtitle, *, title, view_url=None, pdf_url=None, doc
     if docx_url:
         items.append(menu_link(docx_url, "Baixar DOCX", docx_description, "docx", "docx", download=True))
     items.extend(extra_items or [])
-    return menu(menu_id, title, subtitle, items, trigger_aria=trigger_aria)
+    return menu(
+        menu_id,
+        title,
+        subtitle,
+        items,
+        trigger_aria=trigger_aria,
+        trigger_variant="documents",
+    )
 
 
 def footer(*, edit_url=None, edit_aria="Editar", edit_tooltip="Editar", menus=None,

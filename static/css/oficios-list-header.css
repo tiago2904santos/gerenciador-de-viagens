@@ -25,62 +25,33 @@
   text-overflow: ellipsis;
 }
 
-/* Ações individuais da prestação: documentos e aviso de liberação. */
-.cv-icon-btn--documents,
-.cv-icon-btn--whatsapp {
-  background: linear-gradient(145deg, #f8fbff, #edf3f9);
-  border-color: #b9cbe0;
-  box-shadow: 0 5px 14px rgba(24, 61, 102, 0.1);
-  color: #315a82;
+/* Ações individuais: pasta amarela (warning), WhatsApp verde (success). */
+.cv-icon-btn--documents {
+  background: var(--action-warning-bg);
+  border-color: var(--action-warning-border);
+  box-shadow: var(--action-shadow);
+  color: var(--action-warning-text);
 }
 
 .cv-icon-btn--documents:hover,
 .cv-icon-btn--documents:focus {
-  background: linear-gradient(145deg, #edf5fc, #e2edf8);
-  border-color: #86a9ca;
-  color: #174c7a;
+  background: var(--action-warning-hover-bg);
+  border-color: var(--action-warning-border);
+  color: var(--action-warning-text);
 }
 
 .cv-icon-btn--whatsapp {
-  background: linear-gradient(145deg, #f2faf6, #e4f3eb);
-  border-color: #9bc9b2;
-  box-shadow: 0 5px 14px rgba(28, 112, 75, 0.12);
-  color: #23734f;
+  background: var(--action-success-bg);
+  border-color: var(--action-success-border);
+  box-shadow: var(--action-shadow);
+  color: var(--action-success-text);
 }
 
 .cv-icon-btn--whatsapp:hover,
 .cv-icon-btn--whatsapp:focus {
-  background: linear-gradient(145deg, #e7f6ee, #d8ecdf);
-  border-color: #72af90;
-  color: #155f3e;
-}
-
-html[data-theme="dark"] .cv-icon-btn--documents {
-  background: linear-gradient(145deg, #172b3d, #132535);
-  border-color: #385873;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22);
-  color: #a9c9e7;
-}
-
-html[data-theme="dark"] .cv-icon-btn--documents:hover,
-html[data-theme="dark"] .cv-icon-btn--documents:focus {
-  background: linear-gradient(145deg, #1c354b, #182e41);
-  border-color: #527899;
-  color: #d0e6f8;
-}
-
-html[data-theme="dark"] .cv-icon-btn--whatsapp {
-  background: linear-gradient(145deg, #18342e, #142b27);
-  border-color: #3f6a5c;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22);
-  color: #9bd8bd;
-}
-
-html[data-theme="dark"] .cv-icon-btn--whatsapp:hover,
-html[data-theme="dark"] .cv-icon-btn--whatsapp:focus {
-  background: linear-gradient(145deg, #1e4037, #19372f);
-  border-color: #568777;
-  color: #c2ecd9;
+  background: var(--action-success-hover-bg);
+  border-color: var(--action-success-border);
+  color: var(--action-success-text);
 }
 
 /* Os menus são movidos para o body por CV.overlay, por isso o escopo
