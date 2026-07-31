@@ -124,12 +124,12 @@
   </section>
   {% endif %}
 
-  {% include "components/travel/destination_section.html" with section_id="sec-destinos" title_id="sec-destinos-title" add_button_id="btn-adicionar-destino" list_id="destinos-container" title="Destinos" description="Adicione os locais na ordem em que serão visitados." %}
+  {% include "components/travel/destination_section.html" with section_id="sec-destinos" title_id="sec-destinos-title" add_button_id="btn-adicionar-destino" list_id="destinos-container" title="Destinos" description="Locais na ordem da visita." layout="split" %}
   <template id="tmpl-destino-roteiro" data-location-template>
     {% if roteiro_editor_oficio %}
-      {% include "components/travel/destination_row.html" with data_index="__index__" has_data_index=True row_ordinal=1 state_select_template="roteiros/partials/roteiro/_destino_template_state.html" city_select_template="roteiros/partials/roteiro/_destino_template_city.html" %}
+      {% include "components/travel/destination_row.html" with data_index="__index__" has_data_index=True row_ordinal=1 hide_order_badge=True show_row_add=True state_select_template="roteiros/partials/roteiro/_destino_template_state.html" city_select_template="roteiros/partials/roteiro/_destino_template_city.html" %}
     {% else %}
-      {% include "components/travel/destination_row.html" with state_select_template="roteiros/partials/roteiro/_destino_template_state.html" city_select_template="roteiros/partials/roteiro/_destino_template_city.html" %}
+      {% include "components/travel/destination_row.html" with hide_order_badge=True show_row_add=True state_select_template="roteiros/partials/roteiro/_destino_template_state.html" city_select_template="roteiros/partials/roteiro/_destino_template_city.html" %}
     {% endif %}
   </template>
 

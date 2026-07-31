@@ -3,15 +3,16 @@
          aria-labelledby="{{ title_id|default:'destinos-title' }}"
          id="{{ section_id|default:'sec-destinos' }}"
          data-location-rows>
-  <header class="route-destinos-block__header">
+  <div class="route-destinos-block__rail">
     <div class="route-destinos-block__copy">
       <h4 class="route-destinos-block__title" id="{{ title_id|default:'destinos-title' }}">{{ title|default:'Destinos' }}</h4>
-      <ul class="route-destinos-trechos"
-          data-route-destinos-trechos
-          aria-label="Trechos da rota"></ul>
+      <p class="route-destinos-block__subtitle" data-route-destinos-subtitle hidden></p>
     </div>
-  </header>
-
+    <ul class="route-destinos-trechos"
+        data-route-destinos-trechos
+        hidden
+        aria-label="Trechos da rota"></ul>
+  </div>
   <div class="route-destinos-block__body">
     <div class="route-destinos-block__editor">
       <div class="cv-ordered-field-collection__list route-destinations-list"
