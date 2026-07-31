@@ -88,7 +88,7 @@ page-shell page-shell--wizard
 2. O card mestre tem sempre título + subtítulo (`--described`).
 3. Ações finais só no `cv-form-card__footer`, via `card_footer_section.html`.
 4. O cabeçalho da página nunca contém botão de submit (só "Voltar à lista").
-5. `form_block` tem 3 variantes: padrão (empilhado), `split` (copy à esquerda, campos à direita), `resource` (picker de entidade com botão "Novo X" no header).
+5. `form_block` tem 3 variantes: padrão (empilhado), `split` (copy à esquerda, campos à direita), `resource` (picker de entidade com botão "Novo X" no header). Subseções internas usam `cv-form-subsection` (e `--split` quando o copy e os campos cabem na mesma linha).
 6. Campos sempre via `field.html` dentro de `.field-grid` com `field-size-1..4`.
 
 ### 2.2 Anatomia da lista aprovada
@@ -334,6 +334,7 @@ Numerados para rastreio. Severidade: 🔴 crítico (quebra a leitura) · 🟠 al
 | D-54 | 🟠 | **Confirmação de exclusão** | modal JS `delete_confirm_modal.html` (listas de cards) · página inteira `confirm_delete.html` (12 páginas de catálogo) — e a página usa `.cv-confirm-page*`, **sem CSS**, caindo em `.form-section`/`.section-header` legados |
 | D-55 | 🟡 | **Resumo/estatística** | `cv-summary-item/-label/-value` (summary-items.css) · `cv-summary-tile` (content-cards.css) · `pt-resumo-box` (dentro de content-cards.css!) · `admin-overview__stats` com `<dl>` (usuarios) |
 | D-56 | 🟡 | **Grid de campos** | `.field-grid` + `.field-size-1..4` (padrão) · `.field-grid--cols-2/3/4` (segundo padrão) · `.field-grid-rows` (terceiro) |
+| NOVO-19 | 🟡 | **Sede do roteiro ofício espelhava Destinos** — card interno (`.oficio-roteiro-sede-row`) + badge dourado `SEDE` + título empilhado: três camadas de chrome para um par UF/cidade. **Corrigido:** `cv-form-subsection--split` (copy à esquerda, campos à direita), sem badge/card. | `_fonte_body.html` · `form-sections.css` |
 
 ---
 
@@ -741,6 +742,7 @@ Alvo: **~40 componentes globais**, cada um com um único arquivo CSS, um único 
 | Card de formulário | `cv-form-card` | `cv-form-section-card` + 8 aliases de módulo |
 | Pilha de cards | `cv-form-stack` | `cv-form-section-stack` |
 | Bloco de formulário | `cv-form-block` (`--split`, `--resource`, `--leg`) | `cv-form-block` + 8 aliases |
+| Subseção de formulário | `cv-form-subsection` (`--split`) | `cv-form-subsection`, `wizard-inner-section` |
 | Grade de campos | `cv-field-grid` | `field-grid` + `--cols-N` + `field-grid-rows` |
 | Campo | `cv-field` | `field` + `app-form-field` + `cv-field` |
 | Select customizado | `cv-select` | `cv-custom-select`, `form-select` |

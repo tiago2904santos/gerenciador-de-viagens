@@ -72,7 +72,7 @@
      {% if roteiro_modo == 'EVENTO_EXISTENTE' %}hidden{% endif %}>
 
   {# Sede #}
-  <section class="{% if roteiro_editor_oficio %}cv-form-subsection{% else %}wizard-inner-section{% endif %}" aria-labelledby="sec-sede-title" id="sec-sede">
+  <section class="{% if roteiro_editor_oficio %}cv-form-subsection cv-form-subsection--split{% else %}wizard-inner-section{% endif %}" aria-labelledby="sec-sede-title" id="sec-sede">
     <header class="{% if roteiro_editor_oficio %}cv-form-subsection__header{% else %}wizard-inner-section__header{% endif %}">
       <div class="{% if roteiro_editor_oficio %}cv-form-subsection__copy{% endif %}">
         <h4 class="{% if roteiro_editor_oficio %}cv-form-subsection__title{% else %}wizard-inner-section__title{% endif %}" id="sec-sede-title">Sede</h4>
@@ -80,48 +80,43 @@
       </div>
     </header>
     {% if roteiro_editor_oficio %}
-    <div class="oficio-roteiro-sede-row">
-      <span class="cv-ordered-field-row__badge cv-ordered-field-row__label">Sede</span>
-      <div class="cv-ordered-field-row__body">
-        <div class="field-grid roteiro-sede-grid cv-ordered-field-row__fields">
-          <div class="field app-form-field">
-            <select name="origem_estado" id="id_origem_estado"
-                    class="cv-search-picker__native"
-                    data-entity-picker="true"
-                    data-entity-picker-mode="single"
-                    data-picker-variant="compact"
-                    data-placeholder="Buscar estado..."
-                    data-empty-message="Nenhum estado encontrado."
-                    aria-label="UF">
-              <option value="">---------</option>
-              {% for estado in estados %}
-              <option value="{{ estado.pk }}" {% if sede_estado_id == estado.pk %}selected{% endif %}>{{ estado.nome }} ({{ estado.sigla }})</option>
-              {% endfor %}
-            </select>
-            {% if form.origem_estado.errors %}
-              {% include "components/ui/feedback/field_error.html" with errors=form.origem_estado.errors only %}
-            {% endif %}
-          </div>
-          <div class="field app-form-field">
-            <select name="origem_cidade" id="id_origem_cidade"
-                    class="cv-search-picker__native"
-                    data-entity-picker="true"
-                    data-entity-picker-mode="single"
-                    data-picker-variant="compact"
-                    data-placeholder="Buscar cidade..."
-                    data-empty-message="Nenhuma cidade encontrada."
-                    aria-label="Cidade"
-                    {% if not sede_estado_id %}disabled{% endif %}>
-              <option value="">---------</option>
-              {% for cidade in sede_cidades_qs %}
-              <option value="{{ cidade.pk }}" {% if sede_cidade_id == cidade.pk %}selected{% endif %}>{{ cidade.nome }}</option>
-              {% endfor %}
-            </select>
-            {% if form.origem_cidade.errors %}
-              {% include "components/ui/feedback/field_error.html" with errors=form.origem_cidade.errors only %}
-            {% endif %}
-          </div>
-        </div>
+    <div class="field-grid roteiro-sede-grid">
+      <div class="field app-form-field">
+        <select name="origem_estado" id="id_origem_estado"
+                class="cv-search-picker__native"
+                data-entity-picker="true"
+                data-entity-picker-mode="single"
+                data-picker-variant="compact"
+                data-placeholder="Buscar estado..."
+                data-empty-message="Nenhum estado encontrado."
+                aria-label="UF">
+          <option value="">---------</option>
+          {% for estado in estados %}
+          <option value="{{ estado.pk }}" {% if sede_estado_id == estado.pk %}selected{% endif %}>{{ estado.nome }} ({{ estado.sigla }})</option>
+          {% endfor %}
+        </select>
+        {% if form.origem_estado.errors %}
+          {% include "components/ui/feedback/field_error.html" with errors=form.origem_estado.errors only %}
+        {% endif %}
+      </div>
+      <div class="field app-form-field">
+        <select name="origem_cidade" id="id_origem_cidade"
+                class="cv-search-picker__native"
+                data-entity-picker="true"
+                data-entity-picker-mode="single"
+                data-picker-variant="compact"
+                data-placeholder="Buscar cidade..."
+                data-empty-message="Nenhuma cidade encontrada."
+                aria-label="Cidade"
+                {% if not sede_estado_id %}disabled{% endif %}>
+          <option value="">---------</option>
+          {% for cidade in sede_cidades_qs %}
+          <option value="{{ cidade.pk }}" {% if sede_cidade_id == cidade.pk %}selected{% endif %}>{{ cidade.nome }}</option>
+          {% endfor %}
+        </select>
+        {% if form.origem_cidade.errors %}
+          {% include "components/ui/feedback/field_error.html" with errors=form.origem_cidade.errors only %}
+        {% endif %}
       </div>
     </div>
     {% else %}

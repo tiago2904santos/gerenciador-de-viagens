@@ -860,10 +860,6 @@
   background: var(--route-card-inner-bg);
 }
 
-.roteiro-editor--oficio #sec-sede {
-  padding-bottom: var(--space-4);
-}
-
 .roteiro-editor--oficio .field-grid.roteiro-sede-grid {
   gap: var(--space-3) var(--space-4);
   grid-template-columns: repeat(2, minmax(0, 1fr)) !important;

@@ -8385,6 +8385,23 @@ html[data-theme="dark"] .cv-action-menu {
   padding-top: var(--space-3);
 }
 
+.cv-form-subsection--split {
+  align-items: end;
+  grid-template-columns: minmax(160px, 0.7fr) minmax(0, 2fr);
+}
+
+.cv-form-subsection--split > .cv-form-subsection__header {
+  align-self: center;
+  display: grid;
+  gap: 3px;
+  justify-content: start;
+}
+
+.cv-form-subsection--split > :not(.cv-form-subsection__header) {
+  align-self: end;
+  min-width: 0;
+}
+
 .cv-form-subsection__header,
 .cv-resource-picker__header {
   align-items: baseline;
@@ -8451,6 +8468,17 @@ html[data-theme="dark"] .cv-action-menu {
   }
 
   .cv-form-block--split > .cv-form-block__header {
+    align-items: baseline;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .cv-form-subsection--split {
+    align-items: stretch;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cv-form-subsection--split > .cv-form-subsection__header {
     align-items: baseline;
     display: flex;
     justify-content: space-between;
@@ -11115,31 +11143,7 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
   grid-template-columns: 42px minmax(0, 1fr);
 }
 
-/* Sede: mesma linha visual dos destinos (badge + campos). */
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .oficio-roteiro-sede-row,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .oficio-roteiro-sede-row:hover {
-  align-items: center;
-  background: color-mix(in srgb, #fff 3.5%, var(--step1-panel, var(--color-surface-soft)));
-  border: 1px solid color-mix(in srgb, var(--color-border) 40%, transparent);
-  border-radius: 12px;
-  box-shadow: none;
-  column-gap: 12px;
-  display: grid;
-  grid-template-columns: minmax(42px, max-content) minmax(0, 1fr);
-  min-height: 78px;
-  padding: 11px 12px;
-  row-gap: 0;
-  transition: background-color 140ms ease, border-color 140ms ease;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .oficio-roteiro-sede-row:hover {
-  background: color-mix(in srgb, var(--color-accent) 6%, var(--step1-panel, var(--color-surface-soft)));
-  border-color: color-mix(in srgb, var(--color-border) 70%, transparent);
-}
-
+/* Badge de linhas ordenadas (destinos etc.). */
 :is(html[data-theme="dark"])
   :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .cv-ordered-field-row__badge {
   align-items: center;
