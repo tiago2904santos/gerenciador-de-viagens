@@ -1,21 +1,37 @@
 {# Paginação das listas.                                                             #}
 {# Parâmetros: page_obj (obrigatório para renderizar), pagination_pages,             #}
-{#   page_querystring, paginacao_obrigatoria.                                        #}
+{#   page_querystring, paginacao_obrigatoria,                                        #}
+{#   pagination_part: ""|"full" (padrão), "controls" (só setas/páginas),              #}
+{#                    "info" (só "Mostrando X–Y de Z"), "erro" (só alerta N-07).      #}
 {# CONTRATO (N-07): quem inclui com paginacao_obrigatoria=True declara que a lista É #}
 {# paginada; se page_obj não chegar, o componente denuncia a falha na tela em vez de #}
-{# sumir — era assim que listas sem paginação nenhuma pareciam paginadas. Shells que #}
-{# ainda hospedam listas não paginadas incluem sem a flag e nada é renderizado.      #}
-{# page_obj vazio (Page sem itens) é falsy: por isso o teste é page_obj.paginator.   #}
+{# sumir. page_obj vazio (Page sem itens) é falsy: o teste é page_obj.paginator.     #}
 {% if not page_obj.paginator %}
-  {% if paginacao_obrigatoria %}
+  {% if paginacao_obrigatoria and pagination_part != "controls" %}
 <p class="pagination-shell pagination-shell--erro" role="alert">
   <span class="pagination-shell__erro">
     Paginação indisponível: esta lista foi renderizada sem <code>page_obj</code> no contexto.
   </span>
 </p>
   {% endif %}
+{% elif pagination_part == "erro" %}
+{# Só o contrato N-07; sem contagem nem controles. #}
 {% elif page_obj.paginator.num_pages > 1 %}
-<nav class="pagination-shell" aria-label="Paginação">
+  {% with part=pagination_part|default:"full" %}
+
+  {% if part == "info" %}
+<p class="pagination-shell pagination-shell--info-only" aria-live="polite">
+  <span class="pagination-shell__info-pill">
+    <span class="pagination-shell__info-label">Mostrando</span>
+    <strong>{{ page_obj.start_index }}-{{ page_obj.end_index }}</strong>
+    <span class="pagination-shell__info-separator">de</span>
+    <strong>{{ page_obj.paginator.count }}</strong>
+    <span>registros</span>
+  </span>
+</p>
+  {% else %}
+<nav class="pagination-shell{% if part == "controls" %} pagination-shell--controls-only{% endif %}" aria-label="Paginação">
+  {% if part != "controls" %}
   <p class="pagination-shell__info" aria-live="polite">
     <span class="pagination-shell__info-pill">
       <span class="pagination-shell__info-label">Mostrando</span>
@@ -25,6 +41,8 @@
       <span>registros</span>
     </span>
   </p>
+  {% endif %}
+
   <div class="pagination-shell__controls">
     {% if page_obj.has_previous %}
       <a class="pagination-shell__nav pagination-shell__nav--prev" href="?{% if page_querystring %}{{ page_querystring }}&{% endif %}page={{ page_obj.previous_page_number }}" aria-label="Página anterior">
@@ -59,4 +77,7 @@
     {% endif %}
   </div>
 </nav>
+  {% endif %}
+
+  {% endwith %}
 {% endif %}

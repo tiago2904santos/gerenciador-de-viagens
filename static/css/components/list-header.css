@@ -140,6 +140,11 @@
   padding-left: 38px;
 }
 
+/* Compat header-filter-input redefine padding shorthand — preservar folga do ícone. */
+.list-header__search--with-icon .list-header__search-input.header-filter-input {
+  padding-left: 38px;
+}
+
 .list-header__search-input::placeholder {
   color: var(--color-filter-placeholder);
 }
@@ -206,20 +211,22 @@
 }
 
 /*
- * Controles do rail: mesma superfície dos cards de viajante.
+ * Controles do rail: superfície única (card-soft) e foco discreto.
  * A ordem global de carregamento permite neutralizar as camadas visuais de
  * cv-select sem elevar artificialmente a especificidade.
  */
 .list-header__rail {
-  --list-header-control-bg: var(--color-card-muted);
+  --list-header-control-bg: var(--color-card-soft);
 }
 
 .list-header__rail .list-header__search-input.header-filter-input,
 .list-header__rail .cv-custom-select__trigger.cv-custom-select__trigger--v2,
 .list-header__rail .travel-period-filter__btn,
+.list-header__rail .cv-btn.cv-btn--secondary.cv-btn--control,
 .list-header__rail .list-header__search-input.header-filter-input:hover,
 .list-header__rail .cv-custom-select__trigger.cv-custom-select__trigger--v2:hover,
-.list-header__rail .travel-period-filter__btn:hover:not(:disabled) {
+.list-header__rail .travel-period-filter__btn:hover:not(:disabled),
+.list-header__rail .cv-btn.cv-btn--secondary.cv-btn--control:hover {
   background: var(--list-header-control-bg);
   border: 0;
   box-shadow: none;
@@ -231,22 +238,18 @@
   min-height: var(--list-header-control-height);
 }
 
+/* Foco visível, mas sem anel azul saturado de 2px. */
 .list-header__rail .list-header__search-input.header-filter-input:focus,
-.list-header__rail .cv-custom-select__trigger.cv-custom-select__trigger--v2:focus,
-.list-header__rail .travel-period-filter__btn:focus {
-  border: 0;
-  box-shadow: none;
-  outline: 2px solid var(--border-focus);
-  outline-offset: 2px;
-}
-
 .list-header__rail .list-header__search-input.header-filter-input:focus-visible,
+.list-header__rail .cv-custom-select__trigger.cv-custom-select__trigger--v2:focus,
 .list-header__rail .cv-custom-select__trigger.cv-custom-select__trigger--v2:focus-visible,
-.list-header__rail .travel-period-filter__btn:focus-visible {
-  border: 0;
-  box-shadow: none;
-  outline: 2px solid var(--border-focus);
-  outline-offset: 2px;
+.list-header__rail .travel-period-filter__btn:focus,
+.list-header__rail .travel-period-filter__btn:focus-visible,
+.list-header__rail .cv-btn.cv-btn--secondary.cv-btn--control:focus,
+.list-header__rail .cv-btn.cv-btn--secondary.cv-btn--control:focus-visible {
+  border: 1px solid color-mix(in srgb, var(--border-focus) 42%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--border-focus) 12%, transparent);
+  outline: none;
 }
 
 /* Não herdar estilos de card do dark-redesign / filter-header antigos */
@@ -558,7 +561,29 @@
   .list-header__rail {
   background: var(--cv-card-family-bg);
   border-top-color: var(--color-border);
-  --list-header-control-bg: var(--color-surface-soft);
+  --list-header-control-bg: var(--color-card-soft);
+}
+
+/* Quatro controles do filtro: card-soft (#223348). Vence input-bg / secondary. */
+:is(html[data-theme="dark"])
+  .list-header__rail
+  :is(
+    .list-header__search-input.header-filter-input,
+    .cv-custom-select__trigger.cv-custom-select__trigger--v2,
+    .travel-period-filter__btn,
+    .cv-btn.cv-btn--secondary.cv-btn--control
+  ),
+:is(html[data-theme="dark"])
+  .list-header__rail
+  :is(
+    .list-header__search-input.header-filter-input,
+    .cv-custom-select__trigger.cv-custom-select__trigger--v2,
+    .travel-period-filter__btn,
+    .cv-btn.cv-btn--secondary.cv-btn--control
+  ):is(:hover, :hover:not(:disabled)) {
+  background: var(--color-card-soft);
+  border-color: transparent;
+  box-shadow: none;
 }
 
 :is(html[data-theme="dark"])
@@ -571,6 +596,37 @@
 :is(html[data-theme="dark"])
   .list-header__search-icon {
   color: var(--color-filter-placeholder);
+}
+
+/* Select do rail: chevron sempre accent (fechado = aberto). */
+:is(html[data-theme="dark"])
+  .list-header__rail .cv-custom-select--v2 {
+  --cv-cs-chevron-color: var(--color-accent);
+}
+
+:is(html[data-theme="dark"])
+  .list-header__rail
+  .cv-custom-select__trigger--v2
+  .cv-custom-select__chevron,
+:is(html[data-theme="dark"])
+  .list-header__rail
+  .cv-custom-select__trigger--v2:is(:hover, :focus, :focus-visible, [aria-expanded="true"])
+  .cv-custom-select__chevron,
+:is(html[data-theme="dark"])
+  .list-header__rail
+  .cv-custom-select--v2.cv-custom-select--open
+  .cv-custom-select__chevron {
+  color: var(--color-accent);
+}
+
+:is(html[data-theme="dark"])
+  .list-header__rail
+  .cv-custom-select__trigger--v2
+  .cv-custom-select__chevron
+  svg {
+  color: var(--color-accent);
+  fill: none;
+  stroke: currentColor;
 }
 
 :is(html[data-theme="dark"])
@@ -754,7 +810,7 @@
 }
 
 .travel-period-filter--active .travel-period-filter__btn .cv-btn__icon {
-  color: var(--color-primary-bright);
+  color: var(--color-accent);
 }
 
 .travel-period-filter--active .travel-period-filter__btn:hover:not(:disabled) {

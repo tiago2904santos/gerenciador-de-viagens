@@ -9,13 +9,18 @@
 
   {% include "components/ui/headers/filter_page_header.html" with advanced=True form_action=request.path title=title|default:page_title eyebrow=eyebrow search_placeholder=search_placeholder search_aria_label=search_aria_label current_aba=aba date_picker_id=date_picker_id date_start_id=date_start_id date_end_id=date_end_id %}
 
-  {% if abas %}
-    {% include "components/lists/list_tabs.html" with abas=abas tabs_aria_label=tabs_aria_label only %}
+  {% if abas or page_obj.paginator.num_pages > 1 %}
+  <div class="list-toolbar">
+    {% if abas %}
+      {% include "components/lists/list_tabs.html" with abas=abas tabs_aria_label=tabs_aria_label only %}
+    {% endif %}
+    {% include "components/ui/lists/pagination.html" with page_obj=page_obj pagination_pages=pagination_pages page_querystring=page_querystring pagination_part="controls" only %}
+  </div>
   {% endif %}
 
   <div class="list-panel">
-    {# Toda lista em cards é paginada: entregar page_obj é contrato, não opção (N-07). #}
-    {% include "components/ui/lists/pagination.html" with page_obj=page_obj pagination_pages=pagination_pages page_querystring=page_querystring paginacao_obrigatoria=True only %}
+    {# Controles ficam no toolbar; aqui só o alerta N-07 se faltar page_obj. #}
+    {% include "components/ui/lists/pagination.html" with page_obj=page_obj paginacao_obrigatoria=True pagination_part="erro" only %}
     <div class="cv-card-grid" data-collection-container>
       {% for card in cards %}
         {% include card_template with card=card csrf_token=csrf_token current_url=request.get_full_path only %}

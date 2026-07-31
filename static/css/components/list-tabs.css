@@ -8,6 +8,59 @@
   padding: 0;
 }
 
+/* Toolbar: abas + paginação soltos (sem card/caixa envolvente). */
+.list-toolbar {
+  --list-toolbar-h: 44px;
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2, 8px);
+  justify-content: space-between;
+  padding: 0;
+  width: 100%;
+}
+
+.page-shell--list > .list-toolbar,
+.cv-page--collection > .list-toolbar {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  margin-top: calc(-1 * var(--space-1, 4px));
+  padding: var(--space-3, 12px) 0 var(--space-1, 4px);
+}
+
+.list-toolbar .cv-list-tabs {
+  flex: 1 1 auto;
+  margin: 0;
+  min-width: 0;
+  padding: 0;
+}
+
+.list-toolbar .pagination-shell--controls-only {
+  flex: 0 0 auto;
+  margin-left: auto;
+  padding: 0;
+}
+
+.list-toolbar .pagination-shell__controls {
+  box-sizing: border-box;
+  height: var(--list-toolbar-h);
+  min-height: var(--list-toolbar-h);
+  padding: 3px;
+}
+
+.list-toolbar :is(.pagination-shell__nav, .pagination-shell__page) {
+  box-sizing: border-box;
+  height: calc(var(--list-toolbar-h) - 6px);
+  min-height: calc(var(--list-toolbar-h) - 6px);
+  min-width: calc(var(--list-toolbar-h) - 6px);
+  width: calc(var(--list-toolbar-h) - 6px);
+}
+
 /* Conexão visual com o header flat: abas logo abaixo do divisor. */
 .page-shell--list > .cv-list-tabs,
 .cv-page--collection > .cv-list-tabs {
@@ -33,13 +86,15 @@
   background: var(--cv-list-tab-bg);
   border: 1px solid var(--cv-list-tab-border);
   border-radius: var(--radius-pill, 999px);
+  box-sizing: border-box;
   color: var(--cv-list-tab-color);
   display: inline-flex;
   font-size: var(--font-size-sm, 0.875rem);
   font-weight: 600;
   gap: var(--space-2, 8px);
   line-height: 1;
-  padding: 8px 14px;
+  min-height: var(--list-toolbar-h, 44px);
+  padding: 0 14px;
   text-decoration: none;
   transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
@@ -76,12 +131,12 @@
 
 :is(html[data-theme="dark"])
   .cv-list-tab {
-  --cv-list-tab-bg: var(--color-surface-strong, #111e2f);
-  --cv-list-tab-border: var(--color-border-strong, rgba(214, 227, 244, 0.38));
+  --cv-list-tab-bg: var(--color-card-soft);
+  --cv-list-tab-border: var(--color-border-soft);
   --cv-list-tab-color: var(--theme-text-muted, #b8c8dc);
-  --cv-list-tab-hover-bg: var(--color-card-soft, #24384e);
-  --cv-list-tab-hover-border: rgba(237, 244, 255, 0.55);
-  --cv-list-tab-hover-color: var(--color-heading, #f7fbff);
+  --cv-list-tab-hover-bg: color-mix(in srgb, var(--color-card-soft) 82%, #fff 18%);
+  --cv-list-tab-hover-border: var(--color-border-strong, rgba(214, 227, 244, 0.5));
+  --cv-list-tab-hover-color: var(--color-muted-strong, #d3dfef);
   --cv-list-tab-count-bg: rgba(255, 255, 255, 0.12);
   --cv-list-tab-active-bg: var(--color-accent-soft, #3b3320);
   --cv-list-tab-active-border: var(--color-accent-border-strong, #a5851f);
@@ -90,14 +145,23 @@
   --cv-list-tab-active-count-color: #211806;
 }
 
+/* Aba ativa: hover sobe no dourado (não vai para branco) e sem barra esquerda. */
 :is(html[data-theme="dark"])
-  .cv-list-tab--active {
-  box-shadow: inset 3px 0 0 var(--color-accent);
+  .cv-list-tab--active:is(:hover, :focus-visible) {
+  background: color-mix(in srgb, var(--color-accent-soft, #3b3320) 72%, var(--color-accent, #d8a21b) 28%);
+  border-color: var(--color-accent-hover, #e0ab3c);
+  box-shadow: none;
+  color: var(--color-accent-hover, #e0ab3c);
 }
 
 :is(html[data-theme="dark"])
   .cv-list-tab:focus-visible {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-focus, #74aae0) 28%, transparent);
+}
+
+:is(html[data-theme="dark"])
+  .cv-list-tab--active:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent, #d8a21b) 32%, transparent);
 }
 
 @media (max-width: 600px) {
@@ -111,6 +175,20 @@
     .cv-list-tab {
     justify-content: space-between;
     min-width: 0;
+  }
+
+  .list-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .list-toolbar .pagination-shell--controls-only {
+    margin-left: 0;
+  }
+
+  .list-toolbar .pagination-shell__controls {
+    justify-content: center;
+    width: 100%;
   }
 }
 

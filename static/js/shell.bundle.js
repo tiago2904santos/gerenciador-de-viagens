@@ -3800,8 +3800,8 @@ document.documentElement.dataset.appReady = "true";
       if (toggle) {
         toggle.setAttribute("aria-pressed", enabled ? "true" : "false");
         toggle.textContent = presentation === "people"
-          ? (enabled ? "Termo: sim" : "Termo: não")
-          : (enabled ? "Gerar termo" : "Nao gerar");
+          ? (enabled ? "Com termo" : "Sem termo")
+          : (enabled ? "Gerar termo" : "Não gerar");
         toggle.setAttribute("aria-label", enabled ? "Não gerar termo de autorização" : "Gerar termo de autorização");
         toggle.classList.toggle("cv-field-side-action--success", enabled);
         toggle.classList.toggle("cv-field-side-action--danger", !enabled);
@@ -3934,8 +3934,8 @@ document.documentElement.dataset.appReady = "true";
         "button",
         "cv-field-side-action cv-field-side-action--toggle cv-field-side-action--state " + stateClass,
         presentation === "people"
-          ? (enabled ? "Termo: sim" : "Termo: não")
-          : (enabled ? "Gerar termo" : "Nao gerar"),
+          ? (enabled ? "Com termo" : "Sem termo")
+          : (enabled ? "Gerar termo" : "Não gerar"),
       );
 
       toggle.type = "button";

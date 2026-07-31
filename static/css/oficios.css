@@ -3478,21 +3478,17 @@ html[data-theme="dark"] [data-travel-document-wizard-step1] .cv-search-picker {
 
 /* ── SEÇÕES INTERNAS ── */
 .cv-record-card__band {
-  padding: var(--space-5) var(--space-6);
+  padding: var(--space-3) var(--space-6);
 }
 
 .cv-record-card__band + .cv-record-card__band {
+  padding-top: var(--space-2);
   position: relative;
 }
 
 .cv-record-card__band + .cv-record-card__band::before {
-  background: var(--cv-form-section-border, var(--color-border-soft));
-  content: "";
-  height: 1px;
-  left: var(--space-6);
-  position: absolute;
-  right: var(--space-6);
-  top: 0;
+  /* Teste visual: sem divisores entre sections do card */
+  display: none;
 }
 
 .cv-record-card__band-heading {
@@ -3702,8 +3698,8 @@ html[data-theme="light"] .cv-person-row--highlight .cv-person-row__name {
   display: grid;
   gap: var(--space-3);
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  min-height: 167px;
-  max-height: 185px;
+  min-height: 0;
+  max-height: none;
 }
 
 .cv-fact-block {
@@ -3718,7 +3714,7 @@ html[data-theme="light"] .cv-person-row--highlight .cv-person-row__name {
   min-width: 160px;
   overflow: hidden;
   padding: var(--space-3) var(--space-4);
-  max-height: 185px;
+  max-height: none;
 }
 
 .cv-fact-block__label {
@@ -3736,7 +3732,7 @@ html[data-theme="light"] .cv-person-row--highlight .cv-person-row__name {
 
 .cv-fact-block__value {
   color: var(--color-heading);
-  font-size: clamp(1.55rem, 14cqi, 2.85rem);
+  font-size: clamp(1.7rem, 16cqi, 3rem);
   font-weight: 900;
   letter-spacing: 0.02em;
   line-height: 1.05;
@@ -3747,7 +3743,7 @@ html[data-theme="light"] .cv-person-row--highlight .cv-person-row__name {
 
 .cv-fact-block__value--secondary {
   color: var(--color-heading);
-  font-size: clamp(1.25rem, 11cqi, 2.35rem);
+  font-size: clamp(1.35rem, 12.5cqi, 2.4rem);
   font-weight: 900;
   letter-spacing: -0.01em;
   line-height: 1.1;
@@ -3764,14 +3760,6 @@ html[data-theme="light"] .cv-person-row--highlight .cv-person-row__name {
 
 .cv-fact-block--motorista-externo .cv-fact-block__value--secondary {
   font-size: clamp(1rem, 8cqi, 1.55rem);
-}
-
-.cv-fact-block__value {
-  color: var(--color-heading);
-  font-size: var(--font-size-md);
-  font-weight: 800;
-  line-height: 1.3;
-  word-break: break-word;
 }
 
 .cv-fact-block__hint {
