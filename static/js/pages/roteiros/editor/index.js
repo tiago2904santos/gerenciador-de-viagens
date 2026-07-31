@@ -958,21 +958,34 @@ export function initRoteirosEditor() {
         '<span class="route-destinos-trechos__to">' + escape(step.to) + "</span>"
       );
     }
-    function setTrechosVisible(visible) {
-      list.hidden = !visible;
+    function staticSubtitleCopy() {
+      if (!subtitle) return "Locais na ordem da visita.";
+      var fromData = String(subtitle.getAttribute("data-static-copy") || "").trim();
+      if (fromData) return fromData;
+      return "Locais na ordem da visita.";
+    }
+    function setMode(mode) {
+      var single = mode === "single";
+      list.hidden = single;
       if (subtitle) {
-        if (!visible) {
+        if (single) {
+          subtitle.textContent = staticSubtitleCopy();
+          subtitle.hidden = false;
+        } else {
           subtitle.hidden = true;
-          subtitle.innerHTML = "";
+          subtitle.textContent = "";
         }
       }
-      if (block) block.classList.toggle("route-destinos-block--with-trechos", !!visible);
+      if (!block) return;
+      block.classList.toggle("route-destinos-block--single", single);
+      block.classList.toggle("route-destinos-block--multi", !single);
+      block.classList.toggle("route-destinos-block--with-trechos", !single);
     }
     var sede = cityLabel(selectedText($("id_origem_cidade")), "Sede");
     var destinos = getDestinos();
     if (destinos.length <= 1) {
       list.innerHTML = "";
-      setTrechosVisible(false);
+      setMode("single");
       return;
     }
     var names = destinos.map(function (destino, index) {
@@ -981,25 +994,17 @@ export function initRoteirosEditor() {
     var steps = [];
     var from = sede;
     names.forEach(function (to) {
-      steps.push({ from: from, to: to, isReturn: false });
+      steps.push({ from: from, to: to });
       from = to;
     });
-    steps.push({ from: from, to: sede, isReturn: true });
-    var first = steps.shift();
-    if (subtitle && first) {
-      subtitle.innerHTML = trechoHtml(first);
-      subtitle.hidden = false;
-      subtitle.classList.toggle("route-destinos-block__subtitle--return", !!first.isReturn);
-    }
     list.innerHTML = steps.map(function (step) {
       return (
-        '<li class="route-destinos-trechos__item' + (step.isReturn ? " route-destinos-trechos__item--return" : "") + '">' +
+        '<li class="route-destinos-trechos__item">' +
           trechoHtml(step) +
         "</li>"
       );
     }).join("");
-    list.hidden = steps.length === 0;
-    if (block) block.classList.toggle("route-destinos-block--with-trechos", true);
+    setMode("multi");
   }
 
   function updateRetornoCities() {

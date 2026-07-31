@@ -1473,10 +1473,6 @@
   min-height: 44px;
 }
 
-.roteiro-editor--oficio .route-destinos-trechos__item--return {
-  color: var(--color-muted-strong, var(--color-muted));
-}
-
 .roteiro-editor--oficio .route-destinos-trechos__sep {
   color: var(--color-muted-strong, var(--color-muted));
   flex-shrink: 0;
@@ -3101,10 +3097,6 @@ html[data-theme="light"] .roteiro-editor--avulso .roteiro-editor__reference-bloc
   line-height: 1.35;
 }
 
-.roteiro-editor--oficio .route-destinos-trechos__item--return {
-  color: var(--color-muted-strong, var(--color-muted));
-}
-
 .roteiro-editor--oficio .route-destinos-trechos__sep {
   color: var(--color-muted-strong, var(--color-muted));
   flex-shrink: 0;
@@ -3459,4 +3451,23 @@ html[data-theme="light"] .roteiro-editor--avulso .roteiro-editor__reference-bloc
   grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   margin: 0;
   width: 100%;
+}
+
+/* Single: + encolhe só a UF; cidade ≈ metade da faixa Sede */
+.roteiro-editor--oficio .route-destinos-block .destination-row--single .roteiro-destino-grid,
+.roteiro-editor--oficio .route-destinos-block .destination-row--with-add.destination-row--single .roteiro-destino-grid {
+  grid-template-columns: minmax(0, 1fr) calc(50% + 27px) !important;
+}
+
+.roteiro-editor--oficio .route-destinos-block--single .route-destinos-block__copy {
+  min-height: 44px;
+}
+
+.roteiro-editor--oficio .route-destinos-block--multi .route-destinos-block__copy {
+  min-height: 0;
+}
+
+.roteiro-editor--oficio .route-destinos-block--multi .route-destinos-block__subtitle,
+.roteiro-editor--oficio .route-destinos-block--multi .route-destinos-block__subtitle[hidden] {
+  display: none !important;
 }

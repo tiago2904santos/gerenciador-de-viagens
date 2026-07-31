@@ -1,12 +1,14 @@
 {% if layout == "split" %}
-<section class="cv-form-subsection travel-destinations cv-ordered-field-collection route-destinos-block route-destinos-block--split{% if section_extra_class %} {{ section_extra_class }}{% endif %}"
+<section class="cv-form-subsection travel-destinations cv-ordered-field-collection route-destinos-block route-destinos-block--split route-destinos-block--single{% if section_extra_class %} {{ section_extra_class }}{% endif %}"
          aria-labelledby="{{ title_id|default:'destinos-title' }}"
          id="{{ section_id|default:'sec-destinos' }}"
          data-location-rows>
   <div class="route-destinos-block__rail">
     <div class="route-destinos-block__copy">
       <h4 class="route-destinos-block__title" id="{{ title_id|default:'destinos-title' }}">{{ title|default:'Destinos' }}</h4>
-      <p class="route-destinos-block__subtitle" data-route-destinos-subtitle hidden></p>
+      <p class="route-destinos-block__subtitle"
+         data-route-destinos-subtitle
+         data-static-copy="{{ description|default:'Locais na ordem da visita.' }}">{{ description|default:'Locais na ordem da visita.' }}</p>
     </div>
     <ul class="route-destinos-trechos"
         data-route-destinos-trechos

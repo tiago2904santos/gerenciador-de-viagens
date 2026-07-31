@@ -1722,11 +1722,6 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
 }
 
 :is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-trechos__item--return {
-  color: var(--color-muted-strong);
-}
-
-:is(html[data-theme="dark"])
   [data-travel-document-wizard-roteiro] .route-destinos-trechos__from,
 :is(html[data-theme="dark"])
   [data-travel-document-wizard-roteiro] .route-destinos-trechos__to {
@@ -5824,11 +5819,6 @@ html[data-theme="dark"] *::after {
 }
 
 :is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-trechos__item--return {
-  color: var(--color-muted-strong);
-}
-
-:is(html[data-theme="dark"])
   [data-travel-document-wizard-roteiro] .route-destinos-trechos__from,
 :is(html[data-theme="dark"])
   [data-travel-document-wizard-roteiro] .route-destinos-trechos__to {
@@ -6151,11 +6141,6 @@ html[data-theme="dark"] *::after {
   line-height: 1.35;
   min-height: 44px;
   min-width: 0;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--with-trechos .route-destinos-trechos__item--return {
-  color: var(--color-muted-strong);
 }
 
 :is(html[data-theme="dark"])
@@ -6622,11 +6607,6 @@ html[data-theme="dark"] .cv-form-card .route-sede-block .cv-search-picker__contr
 }
 
 :is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--with-trechos .route-destinos-trechos__item--return {
-  color: var(--color-muted-strong);
-}
-
-:is(html[data-theme="dark"])
   [data-travel-document-wizard-roteiro] .route-destinos-block--with-trechos .route-destinos-trechos__from,
 :is(html[data-theme="dark"])
   [data-travel-document-wizard-roteiro] .route-destinos-block--with-trechos .route-destinos-trechos__to {
@@ -6707,4 +6687,29 @@ html[data-theme="dark"] .cv-form-card .route-sede-block .cv-search-picker__contr
   grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   margin: 0;
   width: 100%;
+}
+
+/* Single: + (44+10) encolhe só a UF; cidade ≈ metade da faixa Sede */
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .route-destinos-block .destination-row--single .roteiro-destino-grid,
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .route-destinos-block .destination-row--with-add.destination-row--single .roteiro-destino-grid {
+  grid-template-columns: minmax(0, 1fr) calc(50% + 27px) !important;
+}
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .route-destinos-block--single .route-destinos-block__copy {
+  min-height: 44px;
+}
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .route-destinos-block--multi .route-destinos-block__copy {
+  min-height: 0;
+}
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .route-destinos-block--multi .route-destinos-block__subtitle,
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .route-destinos-block--multi .route-destinos-block__subtitle[hidden] {
+  display: none !important;
 }
