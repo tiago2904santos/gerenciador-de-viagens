@@ -77,6 +77,17 @@ class JustificativasQuickAddTests(TestCase):
         self.assertContains(response, "Adicionar ofício")
         self.assertContains(response, reverse("justificativas:modelos_index"))
 
+    def test_oficios_summary_ordena_pelo_ultimo_criado(self):
+        antigo = Oficio.objects.create(numero=150, ano=2026, data_criacao="2026-08-01")
+        recente = Oficio.objects.create(numero=5, ano=2026, data_criacao="2026-05-01")
+        Oficio.objects.filter(pk=antigo.pk).update(created_at="2026-07-01 12:00:00+00:00")
+        Oficio.objects.filter(pk=recente.pk).update(created_at="2026-08-01 18:00:00+00:00")
+
+        response = self.client.get(reverse("justificativas:index"))
+        summaries = response.context["oficios_summary"]
+        ordered = sorted(summaries.values(), key=lambda item: item["order"])
+        self.assertEqual([item["id"] for item in ordered[:2]], [recente.pk, antigo.pk])
+
     def test_quick_add_cria_justificativa_para_varios_oficios(self):
         oficio_a = Oficio.objects.create(numero=1, ano=2026, data_criacao="2026-05-10")
         oficio_b = Oficio.objects.create(numero=2, ano=2026, data_criacao="2026-05-10")

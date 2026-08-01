@@ -40,7 +40,7 @@ def _oficios_summary_for_quick_add():
             "servidores",
             "servidores_termo_autorizacao",
         )
-        .order_by("-data_criacao", "-created_at")
+        .order_by("-created_at", "-pk")
     )
     summaries = {}
     for index, oficio in enumerate(oficios):

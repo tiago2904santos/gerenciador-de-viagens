@@ -102,7 +102,7 @@ class JustificativaQuickAddForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["oficios"].queryset = Oficio.objects.order_by("-data_criacao", "-created_at")
+        self.fields["oficios"].queryset = Oficio.objects.order_by("-created_at", "-pk")
         self.fields["modelo"].queryset = listar_modelos_justificativa()
 
     def clean_texto(self):
