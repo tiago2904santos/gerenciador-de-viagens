@@ -278,6 +278,14 @@ class TermoAutorizacaoCadastroTests(TestCase):
         self.assertNotContains(response_edit, "page-stepper page-stepper--horizontal")
         self.assertContains(response_edit, "id=\"id_oficio_busca\"")
 
+    @mock.patch("termos.views.resolver_sede_ids_desde_configuracao")
+    def test_form_expoe_sede_das_configuracoes_na_previa_de_destinos(self, m_resolver):
+        m_resolver.return_value = (self.estado.pk, self.cidade.pk, "")
+        response = self.client.get(reverse("termos:novo"))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["sede_config_label"], "CURITIBA")
+        self.assertContains(response, 'data-sede-label="CURITIBA"')
+
     @staticmethod
     def _docx_bytes(texto):
         doc = DocxDocument()

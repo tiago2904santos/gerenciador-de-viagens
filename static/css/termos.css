@@ -15,7 +15,23 @@
 
 .termo-oficio-picker {
   display: grid;
-  gap: var(--space-3);
+  gap: 0;
+}
+
+/* Mesmo ritmo do Quick Add de justificativas: label 7px, bloco sem gap extra, cards 8px. */
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-step1]
+  .related-route-picker.termo-oficio-picker.cv-search-picker--people.cv-search-picker--roster,
+.document-form-page .related-route-picker.termo-oficio-picker.cv-search-picker--people.cv-search-picker--roster {
+  gap: 0 !important;
+}
+
+.termo-oficio-picker .cv-search-picker__field,
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-step1]
+  .related-route-picker.termo-oficio-picker
+  .cv-search-picker__field {
+  gap: 7px !important;
 }
 
 .termo-oficio-summary-panel {
@@ -27,9 +43,13 @@
 }
 
 .termo-oficio-summary-panel .cv-search-picker__selected-list,
-.termo-oficio-summary-panel .related-route-list {
+.termo-oficio-summary-panel .related-route-list,
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-step1]
+  .related-route-picker.termo-oficio-picker
+  :is(.cv-search-picker__selected-list, #termo-oficio-lista, #os-oficio-lista) {
   display: grid;
-  gap: 8px;
+  gap: 8px !important;
   max-height: 280px;
   overflow: auto;
 }

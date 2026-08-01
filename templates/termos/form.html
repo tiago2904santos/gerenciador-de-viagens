@@ -26,6 +26,7 @@
     class="document-form travel-document-wizard__form"
     data-termo-form
     data-api-cidades-url="{{ api_cidades_por_estado_url }}"
+    data-sede-label="{{ sede_config_label|default:'' }}"
     data-termo-evento-selected-dates='{{ termo_evento_selected_dates_json|escape }}'
   >
     {% csrf_token %}

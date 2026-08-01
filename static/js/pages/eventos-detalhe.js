@@ -38,6 +38,10 @@
     window.CV.locationRows.initManagedRows({
       form: form,
       renameFields: false,
+      getOriginLabel: function () {
+        return String(form.getAttribute('data-sede-label') || '').trim();
+      },
+      originFallback: 'Sede',
       onChange: function () { serializeDestinosD(form); },
       onRow: function (row, index) {
         var badge = row.querySelector('[data-location-order]');

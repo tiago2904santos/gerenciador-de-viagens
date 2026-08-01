@@ -268,12 +268,9 @@
       form: form,
       managedFlag: "termoDestinosManaged",
       getOriginLabel: function () {
-        var select = form.querySelector("select[name='oficio']");
-        if (!select || !select.value) return "";
-        var summaries = readSummaries();
-        var summary = summaries[String(select.value)] || null;
-        return summary && summary.sede ? String(summary.sede).trim() : "";
+        return String(form.getAttribute("data-sede-label") || "").trim();
       },
+      originFallback: "Sede",
     });
   }
 

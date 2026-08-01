@@ -704,3 +704,33 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Identificação do evento: split só no tipo; modelo/motivo largura total no mesmo painel. */
+.evento-identificacao-block > .cv-form-block__body {
+  gap: var(--space-3);
+}
+
+.evento-identificacao-block .evento-identificacao-split.cv-form-block--split {
+  align-items: center;
+  gap: 16px;
+  grid-template-columns: minmax(148px, 0.62fr) minmax(0, 2.1fr);
+}
+
+.evento-identificacao-block .evento-identificacao-split > .cv-form-block__header {
+  align-self: center;
+}
+
+.evento-identificacao-block .evento-identificacao-split > .cv-form-block__body {
+  align-self: center;
+}
+
+.evento-identificacao-motivo-fields {
+  width: 100%;
+}
+
+@media (max-width: 720px) {
+  .evento-identificacao-block .evento-identificacao-split.cv-form-block--split {
+    align-items: stretch;
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

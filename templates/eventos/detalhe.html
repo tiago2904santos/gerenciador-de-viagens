@@ -33,7 +33,7 @@
 
 {% block flow_body %}
   {% if etapa_atual == 1 %}
-    <form method="post" class="travel-document-wizard__form" novalidate data-evento-guided-form data-api-cidades-url="{% url 'roteiros:api_cidades_por_estado' estado_id=0 %}" data-sede-uf="{{ sede_uf }}">
+    <form method="post" class="travel-document-wizard__form" novalidate data-evento-guided-form data-api-cidades-url="{% url 'roteiros:api_cidades_por_estado' estado_id=0 %}" data-sede-uf="{{ sede_uf }}" data-sede-label="{{ sede_config_label|default:'' }}">
       {% csrf_token %}
       {% with form=evento_form %}
       <div data-travel-document-wizard-step1>

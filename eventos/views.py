@@ -12,9 +12,12 @@ from django.utils.dateparse import parse_date
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.http import require_POST
 
+from cadastros.models import Cidade
 from cadastros.models import ConfiguracaoSistema
+from cadastros.models import Estado
 from cadastros.selectors import buscar_estado_por_sigla
 from cadastros.selectors import listar_estados
+from cadastros.services import resolver_sede_ids_desde_configuracao
 from core.private_media import private_file_response
 from roteiros.selectors import listar_cidades_para_select
 
@@ -52,6 +55,18 @@ from .services import excluir_evento
 from .services import garantir_termo_automatico
 
 
+def _sede_config_label():
+    """Nome da sede das Configurações — origem fixa da prévia de Destinos."""
+    estado_id, cidade_id, _aviso = resolver_sede_ids_desde_configuracao()
+    if cidade_id:
+        cidade = Cidade.objects.filter(pk=cidade_id).only("nome").first()
+        if cidade and cidade.nome:
+            return cidade.nome
+    if estado_id:
+        estado = Estado.objects.filter(pk=estado_id).only("sigla", "nome").first()
+        if estado:
+            return estado.sigla or estado.nome
+    return ""
 
 
 def api_cidades_por_uf(request, uf):
@@ -382,6 +397,7 @@ def detalhe(request, pk, etapa=1):
             "termo_generico_rows": _termo_generico_rows_do_evento(evento),
             "termos_servidor_rows": _termos_servidor_rows_do_evento(evento),
             "sede_uf": config.uf if config else "",
+            "sede_config_label": _sede_config_label(),
             "modelos_motivo_url": _reverse("oficios:modelos_motivo_index"),
             "tipos_evento_url": f"{_reverse('eventos:tipos_index')}?{urlencode({'next': request.path})}",
             "solicitacao_anexos": solicitacao_anexos,

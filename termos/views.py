@@ -20,6 +20,9 @@ from django.views.decorators.http import require_POST
 from core.retorno import voltar_para
 
 
+from cadastros.models import Cidade
+from cadastros.models import Estado
+from cadastros.services import resolver_sede_ids_desde_configuracao
 from documentos.services.async_generation import enfileirar_documento
 from documentos.services.types import DocumentoFormato
 from eventos.services import build_evento_document_seed
@@ -48,6 +51,20 @@ from .services import termo_oficio_tem_assinado
 
 
 TERMOS_PER_PAGE = 15
+
+
+def _sede_config_label():
+    """Nome da sede das Configurações — origem fixa da prévia de Destinos."""
+    estado_id, cidade_id, _aviso = resolver_sede_ids_desde_configuracao()
+    if cidade_id:
+        cidade = Cidade.objects.filter(pk=cidade_id).only("nome").first()
+        if cidade and cidade.nome:
+            return cidade.nome
+    if estado_id:
+        estado = Estado.objects.filter(pk=estado_id).only("sigla", "nome").first()
+        if estado:
+            return estado.sigla or estado.nome
+    return ""
 
 
 def index(request):
@@ -369,6 +386,7 @@ def _form_context(*, request, form, termo=None, evento=None):
         "viatura_create_url": _cadastro_create_url("cadastros:viatura_create", next_url),
         "api_cidades_por_estado_url": reverse("roteiros:api_cidades_por_estado", kwargs={"estado_id": 0}),
         "oficios_summary": summaries,
+        "sede_config_label": _sede_config_label(),
         "termo_preview_documents": _termo_preview_documents(termo),
         "termo_evento_selected_dates_json": _termo_evento_selected_dates_json(form),
         "termo_evento_display": _termo_evento_display_values(form),
