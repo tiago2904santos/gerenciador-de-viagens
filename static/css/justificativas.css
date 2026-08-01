@@ -12,16 +12,19 @@
   --step1-field: var(--step1-surface);
 }
 
-/* Lista inteira (header, rail e linhas) na superfície step1. */
+/* Lista (rail, botão e linhas) na superfície step1; band = cabeçalho dos ofícios. */
 .justificativas-page .list-header,
-.justificativas-page .list-header__band,
 .justificativas-page .list-header__rail,
 .justificativas-page .list-header .quick-add-footer-button,
 :is(html[data-theme="dark"]) .justificativas-page .list-header,
-:is(html[data-theme="dark"]) .justificativas-page .list-header__band,
 :is(html[data-theme="dark"]) .justificativas-page .list-header__rail,
 :is(html[data-theme="dark"]) .justificativas-page .list-header .quick-add-footer-button {
   background: var(--step1-surface);
+}
+
+.justificativas-page .list-header__band,
+:is(html[data-theme="dark"]) .justificativas-page .list-header__band {
+  background: var(--color-surface-muted);
 }
 
 .justificativas-page .cv-record-row.simple-list-item,
@@ -31,6 +34,18 @@
 
 :is(html[data-theme="dark"]) .justificativas-page .cv-record-row.simple-list-item:hover {
   background: var(--step1-panel);
+}
+
+/* Aberto: sem linha; gap só o do rail (mesmo ritmo do padding). */
+.justificativas-page .list-header__rail--quick-add {
+  gap: var(--space-3);
+  padding: var(--space-3) clamp(var(--space-4), 2vw, var(--space-5));
+}
+
+.justificativas-page .list-header .quick-add-panel.is-open,
+:is(html[data-theme="dark"]) .justificativas-page .list-header .quick-add-panel.is-open {
+  border-top: 0;
+  padding-top: 0;
 }
 
 .justificativa-quick-add {
@@ -76,6 +91,41 @@
     #termo-oficio-lista
   ) {
   max-height: 160px !important;
+}
+
+/* Picker: sem gap extra no bloco; cards da lista mantêm 8px. */
+:is(html[data-theme="dark"])
+  [data-justificativa-quick-add]
+  [data-travel-document-wizard-step1]
+  .related-route-picker.termo-oficio-picker,
+[data-justificativa-quick-add]
+  [data-travel-document-wizard-step1]
+  .related-route-picker.termo-oficio-picker {
+  gap: 0 !important;
+}
+
+:is(html[data-theme="dark"])
+  [data-justificativa-quick-add]
+  [data-travel-document-wizard-step1]
+  .related-route-picker.termo-oficio-picker
+  .cv-search-picker__field,
+[data-justificativa-quick-add]
+  [data-travel-document-wizard-step1]
+  .related-route-picker.termo-oficio-picker
+  .cv-search-picker__field {
+  gap: 7px !important;
+}
+
+:is(html[data-theme="dark"])
+  [data-justificativa-quick-add]
+  [data-travel-document-wizard-step1]
+  .related-route-picker.termo-oficio-picker
+  :is(.cv-search-picker__selected-list, #termo-oficio-lista),
+[data-justificativa-quick-add]
+  [data-travel-document-wizard-step1]
+  .related-route-picker.termo-oficio-picker
+  :is(.cv-search-picker__selected-list, #termo-oficio-lista) {
+  gap: 8px !important;
 }
 
 [data-justificativa-quick-add] .oficio-motivo-field .cv-field__control--textarea,
