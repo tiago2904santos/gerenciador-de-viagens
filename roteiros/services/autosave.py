@@ -91,9 +91,10 @@ def _apply_roteiro_snapshot(roteiro, snapshots):
         return
     state = dedupe_roteiro_loop_retorno_final(state)
     validated = roteiro_logic._validate_roteiro_state(state)
-    if not validated.get("ok"):
-        return
-    roteiro_logic._salvar_roteiro_avulso_from_roteiro_state(roteiro, state, validated, diarias_resultado=None)
+    # Mesmo incompleto: persiste trechos/destinos parseados (datas podem ser null).
+    roteiro_logic._salvar_roteiro_avulso_from_roteiro_state(
+        roteiro, state, validated, diarias_resultado=None
+    )
 
 
 def apply_roteiro_autosave(roteiro, clean_fields, snapshots):

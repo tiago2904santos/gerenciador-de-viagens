@@ -157,14 +157,8 @@
   width: 100%;
 }
 
-.travel-document-wizard .cv-field__control:hover:not(:disabled):not([readonly]) {
-  background: var(--cv-field-bg-hover);
-  border-color: var(--cv-field-border-hover);
-}
-
+.travel-document-wizard .cv-field__control:focus,
 .travel-document-wizard .cv-field__control:focus-visible {
-  border-color: var(--cv-field-focus-border);
-  box-shadow: var(--cv-field-shadow-focus);
   outline: none;
 }
 
@@ -286,10 +280,8 @@
   width: 100%;
 }
 
-.app-multiselect--open .app-multiselect__control,
 .app-multiselect__control:focus-within {
-  border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px rgba(216, 162, 27, 0.22), var(--shadow-inner-light);
+  outline: none;
 }
 
 .app-multiselect__chips {
@@ -533,9 +525,9 @@
   width: 100%;
 }
 
-.oficio-equipe-picker__input:focus {
-  border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px rgba(216, 162, 27, 0.22), var(--shadow-inner-light);
+.oficio-equipe-picker__input:focus,
+.oficio-equipe-picker__input:focus-visible {
+  outline: none;
 }
 
 .oficio-equipe-picker__input::placeholder {

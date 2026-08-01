@@ -47,10 +47,7 @@ textarea {
 }
 
 button:focus-visible,
-a:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible {
+a:focus-visible {
   outline: 2px solid rgba(37, 99, 168, 0.45);
   outline-offset: 2px;
 }
@@ -64,7 +61,6 @@ textarea {
   color: var(--color-text);
   min-height: var(--control-height-md);
   padding: 0 var(--space-3);
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast);
 }
 
 textarea {
@@ -81,11 +77,13 @@ textarea::placeholder {
   opacity: 1;
 }
 
+/* Campos: sem chrome de hover/focus (temporário). */
 input:focus,
+input:focus-visible,
 select:focus,
-textarea:focus {
-  border-color: rgba(37, 99, 168, 0.55);
-  box-shadow: 0 0 0 4px rgba(37, 99, 168, 0.12);
+select:focus-visible,
+textarea:focus,
+textarea:focus-visible {
   outline: none;
 }
 

@@ -3363,7 +3363,10 @@ html[data-theme="dark"] .quick-add-footer-button.is-filled:hover {
 
 .header-filter-input::placeholder { color: var(--color-filter-placeholder); }
 
-.header-filter-input:focus { border-color: var(--border-focus); }
+.header-filter-input:focus,
+.header-filter-input:focus-visible {
+  outline: none;
+}
 
 /* Select de filtro */
 .header-filter-select {
@@ -3382,7 +3385,10 @@ html[data-theme="dark"] .quick-add-footer-button.is-filled:hover {
   width:         100%;
 }
 
-.header-filter-select:focus { border-color: var(--border-focus); }
+.header-filter-select:focus,
+.header-filter-select:focus-visible {
+  outline: none;
+}
 
 /* Botão secundário da filter bar */
 .header-filter-button {
@@ -3706,14 +3712,8 @@ html[data-theme="dark"] .quick-add-footer-button.is-filled:hover {
   width: 100%;
 }
 
-#quick-add-modelo-motivo .cv-field__control--textarea:hover:not(:disabled):not([readonly]) {
-  background: var(--cv-field-bg-hover);
-  border-color: var(--cv-field-border-hover);
-}
-
+#quick-add-modelo-motivo .cv-field__control--textarea:focus,
 #quick-add-modelo-motivo .cv-field__control--textarea:focus-visible {
-  border-color: var(--cv-field-focus-border);
-  box-shadow: var(--cv-field-shadow-focus);
   outline: none;
 }
 
@@ -3754,14 +3754,8 @@ html[data-theme="dark"] .quick-add-footer-button.is-filled:hover {
   width: 100%;
 }
 
-#quick-add-atividade .cv-field__control--textarea:hover:not(:disabled):not([readonly]) {
-  background: var(--color-input-bg);
-  border-color: var(--cv-field-border-hover);
-}
-
+#quick-add-atividade .cv-field__control--textarea:focus,
 #quick-add-atividade .cv-field__control--textarea:focus-visible {
-  border-color: var(--cv-field-focus-border);
-  box-shadow: var(--cv-field-shadow-focus);
   outline: none;
 }
 

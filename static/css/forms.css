@@ -652,11 +652,6 @@ html[data-theme="dark"] input[type="checkbox"] {
   width: 100%;
 }
 
-.app-input-addon:focus-within {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 1px rgba(21, 91, 154, 0.2);
-}
-
 .app-input-addon__control {
   background: transparent;
   border: none !important;
@@ -666,7 +661,8 @@ html[data-theme="dark"] input[type="checkbox"] {
   min-width: 0;
 }
 
-.app-input-addon__control:focus {
+.app-input-addon__control:focus,
+.app-input-addon__control:focus-visible {
   outline: none;
 }
 
@@ -987,17 +983,8 @@ html[data-theme="dark"] input[type="checkbox"] {
     box-shadow var(--transition-fast);
 }
 
-.main-form-panel .form-control:hover:not(:disabled):not([readonly]) {
-  background:
-    linear-gradient(var(--field-bg-soft), var(--field-bg-soft)) padding-box,
-    linear-gradient(var(--field-border-hover), var(--field-border-hover)) border-box;
-}
-
-.main-form-panel .form-control:focus {
-  background:
-    linear-gradient(var(--field-bg-soft), var(--field-bg-soft)) padding-box,
-    linear-gradient(var(--field-border-focus), var(--field-border-focus)) border-box;
-  box-shadow: var(--cv-field-shadow-focus);
+.main-form-panel .form-control:focus,
+.main-form-panel .form-control:focus-visible {
   outline: none;
 }
 
@@ -1028,25 +1015,12 @@ html[data-theme="dark"] input[type="checkbox"] {
     box-shadow var(--transition-fast);
 }
 
-.main-form-panel select:not([class]):hover:not(:disabled),
-.main-form-panel .form-select:hover:not(:disabled),
-.main-form-panel select.form-select:hover:not(:disabled) {
-  background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2352657a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")
-    no-repeat right var(--space-3) center / 16px 16px,
-    linear-gradient(var(--field-bg-soft), var(--field-bg-soft)) padding-box,
-    linear-gradient(var(--field-border-hover), var(--field-border-hover)) border-box;
-}
-
 .main-form-panel select:not([class]):focus,
+.main-form-panel select:not([class]):focus-visible,
 .main-form-panel .form-select:focus,
-.main-form-panel select.form-select:focus {
-  background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2352657a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")
-    no-repeat right var(--space-3) center / 16px 16px,
-    linear-gradient(var(--field-bg-soft), var(--field-bg-soft)) padding-box,
-    linear-gradient(var(--field-border-focus), var(--field-border-focus)) border-box;
-  box-shadow: var(--cv-field-shadow-focus);
+.main-form-panel .form-select:focus-visible,
+.main-form-panel select.form-select:focus,
+.main-form-panel select.form-select:focus-visible {
   outline: none;
 }
 
@@ -1059,18 +1033,9 @@ html[data-theme="dark"] input[type="checkbox"] {
   color: var(--field-text);
 }
 
-.main-form-panel .cv-custom-select__trigger:hover:not(:disabled) {
-  background:
-    linear-gradient(var(--field-bg-soft), var(--field-bg-soft)) padding-box,
-    linear-gradient(var(--field-border-hover), var(--field-border-hover)) border-box;
-}
-
-.main-form-panel .cv-custom-select__trigger:focus-visible,
-.main-form-panel .cv-custom-select--open .cv-custom-select__trigger {
-  background:
-    linear-gradient(var(--field-bg-soft), var(--field-bg-soft)) padding-box,
-    linear-gradient(var(--field-border-focus), var(--field-border-focus)) border-box;
-  box-shadow: var(--cv-field-shadow-focus);
+.main-form-panel .cv-custom-select__trigger:focus,
+.main-form-panel .cv-custom-select__trigger:focus-visible {
+  outline: none;
 }
 
 .main-form-panel .cv-custom-select--open:not(.cv-custom-select--menu-portal) .cv-custom-select__trigger {

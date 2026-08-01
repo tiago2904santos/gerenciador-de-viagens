@@ -163,7 +163,7 @@ def _estrutura_trechos(roteiro, destinos_list=None):
         o_estado, o_cidade = estado_id, cidade_id
         o_nome = d_nome
         ordem += 1
-    # Retorno: Ãºltimo destino -> sede
+    # Retorno: último destino -> sede
     sede_nome = (roteiro.origem_cidade.nome if roteiro.origem_cidade else (roteiro.origem_estado.sigla if roteiro.origem_estado else 'â€”'))
     t_db = trechos_db.get(ordem)
     t_adic = getattr(t_db, 'tempo_adicional_min', None) if t_db else 0
@@ -677,7 +677,7 @@ def _maybe_apply_sede_padrao_configuracao(roteiro, state):
         state['seed_source_label'] = f"{prev} {aviso}".strip() if prev else aviso
 
 
-def _build_roteiro_state_from_roteiro_evento(roteiro, seed_source_label='PrÃ©-preenchido com o roteiro salvo.'):
+def _build_roteiro_state_from_roteiro_evento(roteiro, seed_source_label='Pré-preenchido com o roteiro salvo.'):
     state = _build_roteiro_state_from_saved_trechos(
         roteiro,
         seed_source_label=seed_source_label,
@@ -1088,11 +1088,11 @@ def _validate_roteiro_state(state, oficio=None):
     roteiro_evento = None
     if roteiro_modo == ROTEIRO_MODO_EVENTO:
         if not roteiro_evento_id:
-            errors.append('Selecione um roteiro salvo para usar neste ofÃ­cio.')
+            errors.append('Selecione um roteiro salvo para usar neste ofício.')
         else:
             roteiro_evento = Roteiro.objects.filter(pk=roteiro_evento_id).first()
             if not roteiro_evento:
-                errors.append('O roteiro salvo selecionado nÃ£o estÃ¡ mais disponÃ­vel.')
+                errors.append('O roteiro salvo selecionado não está mais disponível.')
 
     sede_estado_id = state.get('sede_estado_id')
     sede_cidade_id = state.get('sede_cidade_id')
@@ -1119,7 +1119,7 @@ def _validate_roteiro_state(state, oficio=None):
         errors.append(msg_destinos)
     bate_volta_diario = _build_roteiro_bate_volta_diario_state(state.get('bate_volta_diario'))
     if bate_volta_diario['ativo'] and len(destinos_list) != 1:
-        errors.append('No modo bate-volta diÃ¡rio, informe exatamente um destino operacional.')
+        errors.append('No modo bate-volta diário, informe exatamente um destino operacional.')
 
     cleaned_trechos = []
     raw_trechos = state.get('trechos', [])
@@ -1127,20 +1127,20 @@ def _validate_roteiro_state(state, oficio=None):
         errors.append('Adicione ao menos um trecho antes de salvar.')
     for idx, trecho in enumerate(raw_trechos, start=1):
         if not trecho.get('origem_estado_id') or not trecho.get('origem_cidade_id'):
-            errors.append(f'Trecho {idx}: informe uma origem vÃ¡lida.')
+            errors.append(f'Trecho {idx}: informe uma origem válida.')
         if not trecho.get('destino_estado_id') or not trecho.get('destino_cidade_id'):
-            errors.append(f'Trecho {idx}: informe um destino vÃ¡lido.')
+            errors.append(f'Trecho {idx}: informe um destino válido.')
         saida_data = _parse_roteiro_date(trecho.get('saida_data'))
         saida_hora = _parse_roteiro_time(trecho.get('saida_hora'))
         chegada_data = _parse_roteiro_date(trecho.get('chegada_data'))
         chegada_hora = _parse_roteiro_time(trecho.get('chegada_hora'))
         if not saida_data or not saida_hora:
-            errors.append(f'Trecho {idx}: informe a saÃ­da (data e hora).')
+            errors.append(f'Trecho {idx}: informe a saída (data e hora).')
         if not chegada_data or not chegada_hora:
             errors.append(f'Trecho {idx}: informe a chegada (data e hora).')
         if saida_data and saida_hora and chegada_data and chegada_hora:
             if datetime.combine(chegada_data, chegada_hora) < datetime.combine(saida_data, saida_hora):
-                errors.append(f'Trecho {idx}: a chegada deve ocorrer no mesmo momento ou apÃ³s a saÃ­da.')
+                errors.append(f'Trecho {idx}: a chegada deve ocorrer no mesmo momento ou após a saída.')
 
         tempo_cru = trecho.get('tempo_cru_estimado_min')
         try:
@@ -1187,12 +1187,12 @@ def _validate_roteiro_state(state, oficio=None):
     retorno_chegada_data = _parse_roteiro_date(retorno.get('chegada_data'))
     retorno_chegada_hora = _parse_roteiro_time(retorno.get('chegada_hora'))
     if not retorno_saida_data or not retorno_saida_hora:
-        errors.append('Informe a saÃ­da do retorno (data e hora).')
+        errors.append('Informe a saída do retorno (data e hora).')
     if not retorno_chegada_data or not retorno_chegada_hora:
         errors.append('Informe a chegada do retorno (data e hora).')
     if retorno_saida_data and retorno_saida_hora and retorno_chegada_data and retorno_chegada_hora:
         if datetime.combine(retorno_chegada_data, retorno_chegada_hora) < datetime.combine(retorno_saida_data, retorno_saida_hora):
-            errors.append('O retorno deve chegar no mesmo momento ou apÃ³s a saÃ­da.')
+            errors.append('O retorno deve chegar no mesmo momento ou após a saída.')
     retorno_validado = {
         'saida_cidade': retorno.get('saida_cidade') or retorno.get('origem_nome') or '',
         'chegada_cidade': retorno.get('chegada_cidade') or retorno.get('destino_nome') or '',
@@ -1237,7 +1237,7 @@ def _validate_roteiro_state(state, oficio=None):
         chegada_final_ida = datetime.combine(ultimo_trecho['chegada_data'], ultimo_trecho['chegada_hora'])
         saida_retorno = datetime.combine(retorno_saida_data, retorno_saida_hora)
         if saida_retorno < chegada_final_ida:
-            errors.append('O retorno deve sair no mesmo momento ou apÃ³s a chegada do Ãºltimo trecho.')
+            errors.append('O retorno deve sair no mesmo momento ou após a chegada do último trecho.')
 
     return {
         'ok': not errors,
@@ -1259,7 +1259,7 @@ def _collect_roteiro_markers_payload(state, oficio=None):
     roteiro_modo = state.get('roteiro_modo') or ROTEIRO_MODO_PROPRIO
     roteiro_evento_id = state.get('roteiro_evento_id')
     if roteiro_modo == ROTEIRO_MODO_EVENTO and not roteiro_evento_id:
-        raise ValueError('Selecione um roteiro salvo para usar neste ofÃ­cio.')
+        raise ValueError('Selecione um roteiro salvo para usar neste ofício.')
     trechos = state.get('trechos') or []
     if not trechos:
         raise ValueError('Preencha datas e horas para calcular.')
@@ -1678,8 +1678,8 @@ def _build_roteiro_form_context(
     diarias_quantidade_servidores=1,
 ):
     """
-    Monta contexto completo para o formulÃ¡rio de roteiro (guiado e avulso).
-    Quando roteiro_state Ã© fornecido, usa diretamente; caso contrÃ¡rio, constrÃ³i
+    Monta contexto completo para o formulário de roteiro (guiado e avulso).
+    Quando roteiro_state é fornecido, usa diretamente; caso contrário, constrói
     a partir de trechos_list + destinos_atuais (compatibilidade com forms guiados).
     """
     if roteiro_state is None:

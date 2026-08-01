@@ -51,9 +51,9 @@ html[data-theme="light"] {
   min-width: 0;
 }
 
-/* Campo de input: chrome de field. Gatilhos action-button com .cv-btn
-   (ex.: "Preencher datas") ficam de fora — herdam o visual do botão. */
-.cv-date-picker__trigger:not(.cv-btn) {
+/* Campo de input: chrome de field. Gatilhos action-button (.cv-btn) e
+   ícone embutido (--icon) ficam de fora — cada um tem visual próprio. */
+.cv-date-picker__trigger:not(.cv-btn):not(.cv-date-picker__trigger--icon) {
   align-items: center;
   appearance: none;
   background:
@@ -79,15 +79,8 @@ html[data-theme="light"] {
     color var(--transition-fast);
 }
 
-.cv-date-picker__trigger:not(.cv-btn):hover {
-  background:
-    linear-gradient(var(--cv-field-bg-hover), var(--cv-field-bg-hover)) padding-box,
-    linear-gradient(var(--cv-field-border-hover, var(--color-border-strong)), var(--cv-field-border-hover, var(--color-border-strong))) border-box;
-}
-
-.cv-date-picker__trigger:not(.cv-btn):focus-visible {
-  border-color: transparent;
-  box-shadow: var(--cv-field-shadow-focus);
+.cv-date-picker__trigger:not(.cv-btn):not(.cv-date-picker__trigger--icon):focus,
+.cv-date-picker__trigger:not(.cv-btn):not(.cv-date-picker__trigger--icon):focus-visible {
   outline: none;
 }
 
@@ -97,9 +90,19 @@ html[data-theme="light"] {
 }
 
 .cv-date-picker__trigger--icon {
+  align-items: center;
+  appearance: none;
+  background: transparent;
+  border: 0;
   border-radius: 50%;
+  box-shadow: none;
+  color: var(--theme-text-body);
+  cursor: pointer;
+  display: inline-flex;
+  flex: 0 0 auto;
   height: 28px;
-  min-height: unset;
+  justify-content: center;
+  min-height: 0;
   opacity: 0;
   padding: 0;
   pointer-events: none;
@@ -110,6 +113,13 @@ html[data-theme="light"] {
   transition: opacity 150ms ease, transform 150ms ease, box-shadow 150ms ease;
   width: 28px;
   z-index: 2;
+}
+
+.cv-date-picker__trigger--icon svg {
+  display: block;
+  flex: 0 0 auto;
+  height: 16px;
+  width: 16px;
 }
 
 .cv-date-picker__control:hover .cv-date-picker__trigger--icon,

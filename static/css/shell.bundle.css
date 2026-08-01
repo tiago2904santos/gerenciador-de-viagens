@@ -483,11 +483,17 @@ html[data-theme="dark"] {
   position: relative;
 }
 
+.alert > * {
+  grid-column: 2;
+  min-width: 0;
+}
+
 .alert::before {
   border-radius: var(--radius-pill);
   content: "";
   display: inline-block;
-  grid-row: 1 / span 2;
+  grid-column: 1;
+  grid-row: 1 / -1;
   height: 8px;
   margin: 6px 0 0;
   width: 8px;
@@ -4315,7 +4321,10 @@ html[data-theme="dark"] .quick-add-footer-button.is-filled:hover {
 
 .header-filter-input::placeholder { color: var(--color-filter-placeholder); }
 
-.header-filter-input:focus { border-color: var(--border-focus); }
+.header-filter-input:focus,
+.header-filter-input:focus-visible {
+  outline: none;
+}
 
 /* Select de filtro */
 .header-filter-select {
@@ -4334,7 +4343,10 @@ html[data-theme="dark"] .quick-add-footer-button.is-filled:hover {
   width:         100%;
 }
 
-.header-filter-select:focus { border-color: var(--border-focus); }
+.header-filter-select:focus,
+.header-filter-select:focus-visible {
+  outline: none;
+}
 
 /* Botão secundário da filter bar */
 .header-filter-button {
@@ -4658,14 +4670,8 @@ html[data-theme="dark"] .quick-add-footer-button.is-filled:hover {
   width: 100%;
 }
 
-#quick-add-modelo-motivo .cv-field__control--textarea:hover:not(:disabled):not([readonly]) {
-  background: var(--cv-field-bg-hover);
-  border-color: var(--cv-field-border-hover);
-}
-
+#quick-add-modelo-motivo .cv-field__control--textarea:focus,
 #quick-add-modelo-motivo .cv-field__control--textarea:focus-visible {
-  border-color: var(--cv-field-focus-border);
-  box-shadow: var(--cv-field-shadow-focus);
   outline: none;
 }
 
@@ -4706,14 +4712,8 @@ html[data-theme="dark"] .quick-add-footer-button.is-filled:hover {
   width: 100%;
 }
 
-#quick-add-atividade .cv-field__control--textarea:hover:not(:disabled):not([readonly]) {
-  background: var(--color-input-bg);
-  border-color: var(--cv-field-border-hover);
-}
-
+#quick-add-atividade .cv-field__control--textarea:focus,
 #quick-add-atividade .cv-field__control--textarea:focus-visible {
-  border-color: var(--cv-field-focus-border);
-  box-shadow: var(--cv-field-shadow-focus);
   outline: none;
 }
 
@@ -5979,9 +5979,9 @@ html[data-theme="light"] {
   min-width: 0;
 }
 
-/* Campo de input: chrome de field. Gatilhos action-button com .cv-btn
-   (ex.: "Preencher datas") ficam de fora — herdam o visual do botão. */
-.cv-date-picker__trigger:not(.cv-btn) {
+/* Campo de input: chrome de field. Gatilhos action-button (.cv-btn) e
+   ícone embutido (--icon) ficam de fora — cada um tem visual próprio. */
+.cv-date-picker__trigger:not(.cv-btn):not(.cv-date-picker__trigger--icon) {
   align-items: center;
   appearance: none;
   background:
@@ -6007,15 +6007,8 @@ html[data-theme="light"] {
     color var(--transition-fast);
 }
 
-.cv-date-picker__trigger:not(.cv-btn):hover {
-  background:
-    linear-gradient(var(--cv-field-bg-hover), var(--cv-field-bg-hover)) padding-box,
-    linear-gradient(var(--cv-field-border-hover, var(--color-border-strong)), var(--cv-field-border-hover, var(--color-border-strong))) border-box;
-}
-
-.cv-date-picker__trigger:not(.cv-btn):focus-visible {
-  border-color: transparent;
-  box-shadow: var(--cv-field-shadow-focus);
+.cv-date-picker__trigger:not(.cv-btn):not(.cv-date-picker__trigger--icon):focus,
+.cv-date-picker__trigger:not(.cv-btn):not(.cv-date-picker__trigger--icon):focus-visible {
   outline: none;
 }
 
@@ -6025,9 +6018,19 @@ html[data-theme="light"] {
 }
 
 .cv-date-picker__trigger--icon {
+  align-items: center;
+  appearance: none;
+  background: transparent;
+  border: 0;
   border-radius: 50%;
+  box-shadow: none;
+  color: var(--theme-text-body);
+  cursor: pointer;
+  display: inline-flex;
+  flex: 0 0 auto;
   height: 28px;
-  min-height: unset;
+  justify-content: center;
+  min-height: 0;
   opacity: 0;
   padding: 0;
   pointer-events: none;
@@ -6038,6 +6041,13 @@ html[data-theme="light"] {
   transition: opacity 150ms ease, transform 150ms ease, box-shadow 150ms ease;
   width: 28px;
   z-index: 2;
+}
+
+.cv-date-picker__trigger--icon svg {
+  display: block;
+  flex: 0 0 auto;
+  height: 16px;
+  width: 16px;
 }
 
 .cv-date-picker__control:hover .cv-date-picker__trigger--icon,
@@ -8533,6 +8543,23 @@ html[data-theme="dark"] .cv-action-menu {
   padding-top: var(--space-3);
 }
 
+.cv-form-subsection--split {
+  align-items: end;
+  grid-template-columns: minmax(160px, 0.7fr) minmax(0, 2fr);
+}
+
+.cv-form-subsection--split > .cv-form-subsection__header {
+  align-self: center;
+  display: grid;
+  gap: 3px;
+  justify-content: start;
+}
+
+.cv-form-subsection--split > :not(.cv-form-subsection__header) {
+  align-self: end;
+  min-width: 0;
+}
+
 .cv-form-subsection__header,
 .cv-resource-picker__header {
   align-items: baseline;
@@ -8599,6 +8626,17 @@ html[data-theme="dark"] .cv-action-menu {
   }
 
   .cv-form-block--split > .cv-form-block__header {
+    align-items: baseline;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .cv-form-subsection--split {
+    align-items: stretch;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cv-form-subsection--split > .cv-form-subsection__header {
     align-items: baseline;
     display: flex;
     justify-content: space-between;
@@ -8867,12 +8905,20 @@ html[data-theme="dark"] .cv-action-menu {
   position: relative;
 }
 
+.cv-notice > *,
+.alert > *,
+.cv-alert > * {
+  grid-column: 2;
+  min-width: 0;
+}
+
 .cv-notice::before,
 .alert::before {
   border-radius: var(--radius-pill);
   content: "";
   display: inline-block;
-  grid-row: 1 / span 2;
+  grid-column: 1;
+  grid-row: 1 / -1;
   height: 8px;
   margin: 6px 0 0;
   width: 8px;
@@ -10243,10 +10289,15 @@ html[data-theme="dark"] .sidebar-account {
   background: currentColor;
 }
 
-/* Canonical focus */
-html[data-theme="dark"] :is(button, a, input, select, textarea, [tabindex]):focus-visible {
+/* Canonical focus — botões/links; campos sem chrome de focus. */
+html[data-theme="dark"] :is(button, a, [tabindex]):focus-visible {
   outline: 1px solid var(--color-focus);
   outline-offset: 2px;
+}
+
+html[data-theme="dark"] :is(input, select, textarea):focus,
+html[data-theme="dark"] :is(input, select, textarea):focus-visible {
+  outline: none;
 }
 
 :is(html[data-theme="dark"])
@@ -10384,15 +10435,6 @@ html[data-theme="dark"] :is(input, select, textarea) {
   box-shadow: none;
 }
 
-html[data-theme="dark"] :is(input, select, textarea):hover:not(:disabled):not([readonly]) {
-  border-color: #7894a8;
-}
-
-html[data-theme="dark"] :is(input, select, textarea):focus {
-  border-color: var(--color-accent-border-strong);
-  box-shadow: var(--focus-ring);
-  outline: none;
-}
 
 /* Modal cancelar: textarea sem borda/hover/focus. */
 :is(html[data-theme="dark"])
@@ -10805,21 +10847,7 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
   box-shadow: none !important;
 }
 
-/* Não pintar .cv-custom-select no hover: o wrapper tem radius 0 e o fundo
-   quadrado vaza pelos cantos do trigger arredondado. */
-:is(html[data-theme="dark"])
-  :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) :is(
-    input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
-    textarea,
-    select,
-    .form-control,
-    .form-select,
-    .cv-composite-field__control,
-    .cv-custom-select__trigger,
-    .cv-field__control,
-    .cv-search-picker__input,
-    .cv-search-picker__control
-  ):is(:hover, :focus, :focus-within, :focus-visible),
+/* Open state do select: mesmo poço; sem chrome extra de hover/focus nos campos. */
 :is(html[data-theme="dark"])
   :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .cv-custom-select--open .cv-custom-select__trigger {
   background: var(--step1-field) !important;
@@ -11159,11 +11187,10 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
   background: transparent !important;
   border: 0 !important;
   box-shadow: none !important;
-  column-gap: 10px;
+  /* Duas metades iguais à sede: [drag + add + UF] | [Cidade + ×] */
+  column-gap: 12px;
   display: grid;
-  /* [+] | UF/Cidade | [×] — colunas explícitas nos filhos (abaixo) evitam o
-     grid-row:1 legado de .destination-row > .destination-remove-button. */
-  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   min-height: 0;
   padding: 0 !important;
   transition: none !important;
@@ -11173,15 +11200,29 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
   [data-travel-document-wizard-roteiro] .route-destinos-block .destination-row--single,
 :is(html[data-theme="dark"])
   [data-travel-document-wizard-roteiro] .route-destinos-block .destination-row--single:hover {
-  grid-template-columns: 44px minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .route-destinos-block .destination-row__half {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  min-width: 0;
+  width: 100%;
+}
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .route-destinos-block .destination-row__field {
+  flex: 1 1 auto;
+  margin: 0;
+  min-width: 0;
 }
 
 :is(html[data-theme="dark"])
   [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row__badge.sr-only {
   clip: rect(0, 0, 0, 0);
   display: none !important;
-  grid-column: auto !important;
-  grid-row: auto !important;
   height: 1px;
   overflow: hidden;
   position: absolute;
@@ -11189,36 +11230,46 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
 }
 
 :is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row__drag-handle {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 10px;
+  color: var(--color-muted);
+  cursor: grab;
+  display: inline-flex;
+  flex: 0 0 auto;
+  height: 44px;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  touch-action: none;
+  user-select: none;
+  width: 28px;
+}
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row__drag-handle:active {
+  cursor: grabbing;
+  color: var(--color-heading);
+}
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row__drag-handle .cv-icon {
+  display: block;
+  height: 16px;
+  width: 16px;
+}
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .route-destinos-block .destination-row--single .cv-ordered-field-row__drag-handle {
+  display: none;
+}
+
+:is(html[data-theme="dark"])
   [data-travel-document-wizard-roteiro] .route-destinos-block .route-destinos-add,
 :is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row__add {
-  grid-column: 1 !important;
-  grid-row: 1 !important;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row__body {
-  grid-column: 2 !important;
-  grid-row: 1 !important;
-  min-width: 0;
-  width: 100%;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .roteiro-destino-grid {
-  gap: 10px 12px !important;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
-  width: 100%;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .destination-row--single .roteiro-destino-grid {
-  /* Com 1 destino (+ sem ×): cidade preserva largura; UF absorve o encolhimento. */
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr) !important;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .route-destinos-add,
+  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row__add,
 :is(html[data-theme="dark"])
   [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row__remove,
 :is(html[data-theme="dark"])
@@ -11229,6 +11280,7 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
   box-shadow: none !important;
   cursor: pointer;
   display: inline-flex;
+  flex: 0 0 auto;
   height: 44px;
   justify-content: center;
   line-height: 1;
@@ -11253,10 +11305,7 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
   background: color-mix(in srgb, var(--color-danger) 12%, var(--step1-panel)) !important;
   color: var(--color-heading) !important;
   font-size: 1.25rem;
-  /* Anula grid-column:2 / grid-row:1 do layout legado em roteiros.css. */
-  grid-column: 3 !important;
-  grid-row: 1 !important;
-  justify-self: stretch;
+  justify-self: auto;
 }
 
 :is(html[data-theme="dark"])
@@ -11266,7 +11315,7 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
 }
 
 :is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .roteiro-destino-grid :is(
+  [data-travel-document-wizard-roteiro] .route-destinos-block .destination-row__field :is(
     .cv-search-picker__control,
     .cv-search-picker__input,
     .cv-search-picker__control:hover,
@@ -11808,7 +11857,7 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
   }
 }
 
-/* Destinos (wizard roteiro): reforço pós-regras genéricas — 44×44, flush, sem card aninhado. */
+/* Destinos (wizard roteiro): reforço pós-regras genéricas — metades iguais à sede. */
 :is(html[data-theme="dark"])
   [data-travel-document-wizard-roteiro] .route-destinos-block .destination-row,
 :is(html[data-theme="dark"])
@@ -11818,9 +11867,9 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
   border: 0 !important;
   border-radius: 0;
   box-shadow: none !important;
-  column-gap: 10px;
+  column-gap: 12px;
   display: grid;
-  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   min-height: 0;
   padding: 0 !important;
   row-gap: 0;
@@ -11831,26 +11880,27 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
   [data-travel-document-wizard-roteiro] .route-destinos-block .destination-row--single,
 :is(html[data-theme="dark"])
   [data-travel-document-wizard-roteiro] .route-destinos-block .destination-row--single:hover {
-  grid-template-columns: 44px minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .route-destinos-block .destination-row__half {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  min-width: 0;
+  width: 100%;
+}
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .route-destinos-block .destination-row--single .cv-ordered-field-row__drag-handle {
+  display: none;
 }
 
 :is(html[data-theme="dark"])
   [data-travel-document-wizard-roteiro] .route-destinos-block .route-destinos-add,
 :is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row__add {
-  cursor: pointer;
-  grid-column: 1 !important;
-  grid-row: 1 !important;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row__body {
-  grid-column: 2 !important;
-  grid-row: 1 !important;
-  min-width: 0;
-  width: 100%;
-}
-
+  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row__add,
 :is(html[data-theme="dark"])
   [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row__remove,
 :is(html[data-theme="dark"])
@@ -11859,8 +11909,7 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
   border: 0 !important;
   border-radius: 10px !important;
   cursor: pointer;
-  grid-column: 3 !important;
-  grid-row: 1 !important;
+  flex: 0 0 auto;
   height: 44px;
   margin: 0 !important;
   min-width: 44px;
@@ -11883,21 +11932,8 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
     [data-travel-document-wizard-roteiro] .route-destinos-block .destination-row--single,
   :is(html[data-theme="dark"])
     [data-travel-document-wizard-roteiro] .route-destinos-block .destination-row--single:hover {
-    grid-template-columns: 44px minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
     row-gap: 8px;
-  }
-
-  :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row__remove,
-  :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .route-destinos-block .destination-remove-button {
-    border-top: 0 !important;
-    grid-column: 1 !important;
-    grid-row: 2 !important;
-    justify-self: end;
-    margin: 0 !important;
-    min-height: 0;
-    width: 44px;
   }
 }
 
@@ -12289,25 +12325,33 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
   opacity: 1;
 }
 
-/* Stepper −/+: mesmo poço dos inputs do wizard (vence .cv-btn--secondary global). */
+/* Stepper −/+: mesmo secondary filled soft do "Preencher datas"
+   (.cv-form-block__actions .cv-btn--secondary). */
 :is(html[data-theme="dark"])
   [data-travel-document-wizard-roteiro]
   :is(.roteiro-time-calc-stepper, .roteiro-trecho-card__time-stepper)
   :is(.trecho-tempo-add-btn, .cv-btn--control.cv-btn--secondary) {
-  background: var(--step1-field, var(--color-input-bg)) !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
-  color: var(--color-text) !important;
+  background: var(--step1-surface);
+  border: 0;
+  border-radius: 12px;
+  box-shadow: none;
+  color: var(--color-heading);
+  font-weight: var(--font-weight-bold);
 }
 
 :is(html[data-theme="dark"])
   [data-travel-document-wizard-roteiro]
   :is(.roteiro-time-calc-stepper, .roteiro-trecho-card__time-stepper)
-  :is(.trecho-tempo-add-btn, .cv-btn--control.cv-btn--secondary):is(:hover, :focus, :focus-visible, :active) {
-  background: color-mix(in srgb, var(--color-accent) 8%, var(--step1-field, var(--color-input-bg))) !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
-  color: var(--color-text) !important;
+  :is(.trecho-tempo-add-btn, .cv-btn--control.cv-btn--secondary):is(
+    :hover,
+    :focus-visible,
+    :active
+  ) {
+  background: color-mix(in srgb, var(--color-accent) 14%, var(--color-surface-muted));
+  border: 0;
+  box-shadow: none;
+  color: var(--color-accent-text);
+  outline: 0;
 }
 
 /* Toggle bate-volta (ofício): pill compacta — controle real, não texto dourado. */
@@ -12627,19 +12671,10 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
 }
 
 :is(html[data-theme="dark"])
-  .cv-form-card :is(.form-control, .cv-custom-select__trigger, textarea):hover {
-  background: var(--color-input-bg);
-  border-color: color-mix(in srgb, var(--color-border) 78%, var(--color-text) 22%);
-  box-shadow: none;
-}
-
-:is(html[data-theme="dark"])
   .cv-form-card :is(.form-control, .cv-custom-select__trigger, textarea):focus,
 :is(html[data-theme="dark"])
-  .cv-form-card .cv-custom-select__trigger[aria-expanded="true"] {
-  border-color: var(--color-accent-border-soft);
-  box-shadow: none;
-  outline: 0;
+  .cv-form-card :is(.form-control, .cv-custom-select__trigger, textarea):focus-visible {
+  outline: none;
 }
 
 :is(html[data-theme="dark"])
@@ -12664,16 +12699,6 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
   grid-template-columns: minmax(0, 1fr) auto;
   min-height: var(--control-height-md);
   overflow: hidden;
-}
-
-:is(html[data-theme="dark"])
-  .cv-composite-field__control:hover {
-  border-color: color-mix(in srgb, var(--color-border) 78%, var(--color-text) 22%);
-}
-
-:is(html[data-theme="dark"])
-  .cv-composite-field__control:focus-within {
-  border-color: var(--color-accent-border-soft);
 }
 
 :is(html[data-theme="dark"])
@@ -12716,24 +12741,15 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
   }
 }
 
-/* No hover, somente a borda clareia discretamente. Fundo e sombra permanecem
-   estáveis, inclusive contra os hovers globais de forms e do search picker. */
-html[data-theme="dark"] .cv-form-card :is(input, textarea):hover:not(:disabled):not([readonly]) {
-  background: var(--color-input-bg) !important;
-  border-color: color-mix(in srgb, var(--color-border) 78%, var(--color-text) 22%) !important;
-  box-shadow: none !important;
-}
-
-html[data-theme="dark"] .cv-composite-field__control .form-control:hover {
+html[data-theme="dark"] .cv-composite-field__control .form-control:hover,
+html[data-theme="dark"] .cv-composite-field__control .form-control:focus,
+html[data-theme="dark"] .cv-composite-field__control .form-control:focus-visible {
   background: transparent !important;
   border: 0 !important;
+  box-shadow: none !important;
+  outline: none;
 }
 
-html[data-theme="dark"] .cv-form-card .cv-search-picker__control:hover {
-  background: var(--color-input-bg) !important;
-  border-color: color-mix(in srgb, var(--color-input-border) 78%, var(--color-text) 22%) !important;
-  box-shadow: none !important;
-}
 
 /* Multipicker de pessoas: uma lista operacional, não uma grade de cards. Cada
    pessoa usa toda a largura e mantém suas ações disponíveis no mouse, teclado
@@ -13966,8 +13982,14 @@ html[data-theme="dark"] .alert {
 }
 
 html[data-theme="dark"] .alert::before {
-  grid-row: 1 / span 2;
+  grid-column: 1;
+  grid-row: 1 / -1;
   margin: 6px 0 0;
+}
+
+html[data-theme="dark"] .alert > * {
+  grid-column: 2;
+  min-width: 0;
 }
 
 html[data-theme="dark"] .alert__title {
@@ -13981,9 +14003,13 @@ html[data-theme="dark"] :is(.alert-success, .alert--success) {
 }
 
 html[data-theme="dark"] :is(.alert-warning, .alert--warning) {
-  background: #5a3d13;
-  border-color: #b97f2d;
-  color: #fff0c6;
+  background: color-mix(in srgb, var(--color-warning) 10%, var(--color-surface-muted));
+  border: 0;
+  border-left: 3px solid var(--color-warning);
+  border-radius: var(--radius-sm);
+  box-shadow: none;
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-semibold);
 }
 
 html[data-theme="dark"] :is(.alert-danger, .alert-error, .alert--danger, .alert--error) {
@@ -14628,18 +14654,6 @@ html[data-theme="dark"] .empty-state__title {
   padding: 0 12px;
 }
 
-:is(html[data-theme="dark"])
-  .oficio-external-driver .cv-search-picker__control:hover {
-  background: var(--color-input-bg) !important;
-  border-color: color-mix(in srgb, var(--color-border) 78%, var(--color-text) 22%) !important;
-}
-
-:is(html[data-theme="dark"])
-  .oficio-external-driver .cv-search-picker__field:focus-within .cv-search-picker__control {
-  background: var(--color-input-bg) !important;
-  border-color: var(--color-accent-border-soft) !important;
-  box-shadow: none !important;
-}
 
 :is(html[data-theme="dark"])
   .oficio-external-driver .cv-search-picker__input {
@@ -15345,26 +15359,18 @@ html[data-theme="dark"] *::after {
 }
 
 :is(html[data-theme="dark"])
-  .cv-filter-bar__search:hover {
-  border-color: var(--color-border-strong);
-}
-
-:is(html[data-theme="dark"])
-  .cv-filter-bar__search:focus-within {
-  border-color: var(--color-border-strong);
-  box-shadow: var(--focus-ring);
-}
-
-:is(html[data-theme="dark"])
   .cv-filter-bar__search-input {
   border-color: transparent;
   box-shadow: none;
 }
 
 :is(html[data-theme="dark"])
-  .cv-filter-bar__search-input:focus {
+  .cv-filter-bar__search-input:focus,
+:is(html[data-theme="dark"])
+  .cv-filter-bar__search-input:focus-visible {
   border-color: transparent;
   box-shadow: none;
+  outline: none;
 }
 
 :is(html[data-theme="dark"])
@@ -15570,9 +15576,9 @@ html[data-theme="dark"] *::after {
 }
 
 :is(html[data-theme="dark"])
+  .oficios-filter-bar .header-filter-input:focus,
+:is(html[data-theme="dark"])
   .oficios-filter-bar .header-filter-input:focus-visible {
-  border-color: var(--color-focus);
-  box-shadow: none;
   outline: none;
 }
 
@@ -15611,21 +15617,10 @@ html[data-theme="dark"] *::after {
 }
 
 :is(html[data-theme="dark"])
-  .cv-custom-select__trigger--v2:hover:not(:disabled) {
-  background: var(--color-input-bg);
-  border-color: color-mix(in srgb, var(--color-input-border) 78%, var(--color-text) 22%);
-  border-radius: 10px;
-}
-
+  .cv-custom-select__trigger--v2:focus,
 :is(html[data-theme="dark"])
-  .cv-custom-select__trigger--v2:focus-visible,
-:is(html[data-theme="dark"])
-  .cv-custom-select--v2.cv-custom-select--open .cv-custom-select__trigger--v2 {
-  background: var(--color-input-bg);
-  border-color: var(--color-accent-border-soft);
-  border-radius: 10px;
-  box-shadow: none;
-  outline: 0;
+  .cv-custom-select__trigger--v2:focus-visible {
+  outline: none;
 }
 
 :is(html[data-theme="dark"])
@@ -16108,9 +16103,9 @@ html[data-theme="dark"] *::after {
   color: var(--color-filter-placeholder);
 }
 
-.list-header__search-input:focus {
-  border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--border-focus) 22%, transparent);
+.list-header__search-input:focus,
+.list-header__search-input:focus-visible {
+  outline: none;
 }
 
 .list-header__select {
@@ -16164,9 +16159,9 @@ html[data-theme="dark"] *::after {
   width: 100%;
 }
 
-.list-header .header-filter-input:focus {
-  border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--border-focus) 22%, transparent);
+.list-header .header-filter-input:focus,
+.list-header .header-filter-input:focus-visible {
+  outline: none;
 }
 
 /*
@@ -16197,11 +16192,16 @@ html[data-theme="dark"] *::after {
   min-height: var(--list-header-control-height);
 }
 
-/* Foco visível, mas sem anel azul saturado de 2px. */
+/* Campos do rail: sem chrome de focus. Botões mantêm foco discreto. */
 .list-header__rail .list-header__search-input.header-filter-input:focus,
 .list-header__rail .list-header__search-input.header-filter-input:focus-visible,
 .list-header__rail .cv-custom-select__trigger.cv-custom-select__trigger--v2:focus,
-.list-header__rail .cv-custom-select__trigger.cv-custom-select__trigger--v2:focus-visible,
+.list-header__rail .cv-custom-select__trigger.cv-custom-select__trigger--v2:focus-visible {
+  border: 0;
+  box-shadow: none;
+  outline: none;
+}
+
 .list-header__rail .travel-period-filter__btn:focus,
 .list-header__rail .travel-period-filter__btn:focus-visible,
 .list-header__rail .cv-btn.cv-btn--secondary.cv-btn--control:focus,
@@ -16324,8 +16324,7 @@ html[data-theme="dark"] *::after {
   .cv-search-picker__control:focus-within {
   border: 0;
   box-shadow: none;
-  outline: 2px solid var(--border-focus);
-  outline-offset: 2px;
+  outline: none;
 }
 
 .list-header--quick-add .quick-add-panel
@@ -16348,30 +16347,6 @@ html[data-theme="dark"] *::after {
   border: 1px solid var(--color-danger);
 }
 
-.list-header--quick-add .quick-add-panel
-  :is(
-    .form-control,
-    .form-select,
-    .cv-field__control,
-    .cv-custom-select__trigger
-  ):is(.is-invalid, [aria-invalid="true"]):focus,
-.list-header--quick-add .quick-add-panel
-  :is(
-    .form-control,
-    .form-select,
-    .cv-field__control,
-    .cv-custom-select__trigger
-  ):is(.is-invalid, [aria-invalid="true"]):focus-visible,
-.list-header--quick-add .quick-add-panel
-  :is(.app-form-field, .cv-field):has(.field-error)
-  :is(
-    .form-control,
-    .form-select,
-    .cv-field__control,
-    .cv-custom-select__trigger
-  ):focus {
-  outline-color: var(--color-danger);
-}
 
 .list-header .quick-add-inline__body {
   align-items: flex-end;

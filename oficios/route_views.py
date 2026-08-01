@@ -15,7 +15,7 @@ from roteiros.services.autosave import ROTEIRO_AUTOSAVE_FIELDS
 from roteiros.services.autosave import apply_roteiro_autosave
 from roteiros.services.autosave import build_roteiro_draft
 from roteiros.services.autosave import has_minimum_roteiro_content
-from roteiros.services import atualizar_roteiro, carregar_opcoes_rotas_avulsas_salvas, montar_contexto_editor_roteiro, montar_estado_editor_roteiro_evento_selecionado, montar_initial_roteiro_evento_sem_datas, normalizar_destinos_e_trechos_apos_erro_post, preparar_estado_editor_roteiro_para_get, preparar_querysets_formulario_roteiro, roteiro_state_equivalente_ao_roteiro, validar_submissao_editor_roteiro
+from roteiros.services import atualizar_roteiro, carregar_opcoes_rotas_avulsas_salvas, montar_contexto_editor_roteiro, montar_estado_editor_roteiro_evento_selecionado, montar_initial_roteiro_evento_sem_datas, normalizar_destinos_e_trechos_apos_erro_post, persistir_roteiro_rascunho_parcial, preparar_estado_editor_roteiro_para_get, preparar_querysets_formulario_roteiro, roteiro_state_equivalente_ao_roteiro, validar_submissao_editor_roteiro
 from .presenters import apresentar_oficio_wizard_summary
 from .selectors import get_oficio_by_id
 from .services import avaliar_oficio_dados_viajantes
@@ -159,6 +159,40 @@ def wizard_roteiro(request, pk):
                 return _redirect_lista_oficio(request, oficio, "Roteiro e diárias salvos.")
             messages.success(request, "Rascunho do roteiro salvo.")
             return redirect("oficios:wizard_roteiro", pk=oficio.pk)
+
+        nav_action = _wizard_normalizar_acao(request.POST)
+        if nav_action in ("wizard_next", "wizard_back"):
+            # Soft-advance: grava rascunho parcial e deixa navegar sem validação completa.
+            if roteiro_vinculado is None or roteiro_vinculado.status != Roteiro.STATUS_RASCUNHO:
+                area = oficio.area
+                if area is None:
+                    from cadastros.models import ConfiguracaoSistema
+
+                    area = ConfiguracaoSistema.get_singleton().area
+                roteiro_vinculado = Roteiro(
+                    tipo=Roteiro.TIPO_AVULSO,
+                    status=Roteiro.STATUS_RASCUNHO,
+                    area=area,
+                )
+                form.instance = roteiro_vinculado
+            roteiro_salvo = persistir_roteiro_rascunho_parcial(
+                roteiro_vinculado, form, roteiro_state, validated
+            )
+            if oficio.roteiro_id != roteiro_salvo.pk:
+                oficio.roteiro = roteiro_salvo
+                oficio.save(update_fields=["roteiro", "updated_at"])
+            oficio = tocar_data_criacao_oficio(oficio)
+            if nav_action == "wizard_next":
+                messages.info(
+                    request,
+                    "Roteiro incompleto salvo como rascunho. Você pode completar depois.",
+                )
+                if oficio_exige_justificativa(oficio):
+                    return redirect("oficios:wizard_justificativa", pk=oficio.pk)
+                return redirect("oficios:wizard_documentos", pk=oficio.pk)
+            messages.info(request, "Roteiro incompleto salvo como rascunho.")
+            return redirect("oficios:dados_viajantes", pk=oficio.pk)
+
         for error in validated.get("errors", []):
             form.add_error(None, error)
         destinos_atuais, trechos_list = normalizar_destinos_e_trechos_apos_erro_post(roteiro_state)

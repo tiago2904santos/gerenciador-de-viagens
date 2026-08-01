@@ -137,19 +137,6 @@
     box-shadow var(--transition-fast);
 }
 
-.cv-search-picker__control:hover {
-  background:
-    linear-gradient(var(--field-bg-soft), var(--field-bg-soft)) padding-box,
-    linear-gradient(var(--field-border-hover), var(--field-border-hover)) border-box;
-}
-
-.cv-search-picker__field:focus-within .cv-search-picker__control {
-  background:
-    linear-gradient(var(--field-bg-soft), var(--field-bg-soft)) padding-box,
-    linear-gradient(var(--field-border-focus), var(--field-border-focus)) border-box;
-  box-shadow: var(--cv-search-picker-focus-shadow);
-}
-
 /* Com menu no body, mantém cantos arredondados no campo */
 .cv-search-picker--open:not(.cv-search-picker--menu-portal) .cv-search-picker__control {
   border-bottom-left-radius: 0;

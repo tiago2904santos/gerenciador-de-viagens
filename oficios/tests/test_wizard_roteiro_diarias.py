@@ -147,15 +147,69 @@ class OficioWizardRoteiroDiariasTests(TestCase):
         self.assertContains(response, 'name="quantidade_servidores"')
         self.assertContains(response, 'value="2"')
 
-    def test_post_vazio_permite_rascunho_incompleto_sem_redirect(self):
-        """POST sem dados de roteiro não avança para o resumo (validação do editor)."""
+    def test_post_vazio_com_wizard_next_faz_soft_advance(self):
+        """POST incompleto com Avançar grava rascunho parcial e redireciona."""
         oficio = self._oficio_ate_transporte([self.servidor_a.pk])
         self.client.get(reverse("oficios:wizard_roteiro", args=[oficio.pk]))
         response = self.client.post(
             reverse("oficios:wizard_roteiro", args=[oficio.pk]),
             data={"action": "save_continue"},
         )
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(
+            response.url,
+            {
+                reverse("oficios:wizard_documentos", args=[oficio.pk]),
+                reverse("oficios:wizard_justificativa", args=[oficio.pk]),
+            },
+        )
+        oficio.refresh_from_db()
+        self.assertIsNotNone(oficio.roteiro_id)
+        self.assertEqual(oficio.roteiro.status, Roteiro.STATUS_RASCUNHO)
+
+    def test_post_parcial_wizard_next_preserva_dados_ao_voltar(self):
+        """Soft-advance com sede/destino parciais mantém os dados no GET de volta."""
+        est = Estado.objects.create(nome="Paraná Soft", sigla="PS")
+        sede = Cidade.objects.create(nome="Curitiba Soft", estado=est)
+        destino = Cidade.objects.create(nome="Londrina Soft", estado=est)
+        oficio = self._oficio_ate_transporte([self.servidor_a.pk])
+        self.client.get(reverse("oficios:wizard_roteiro", args=[oficio.pk]))
+        response = self.client.post(
+            reverse("oficios:wizard_roteiro", args=[oficio.pk]),
+            data={
+                "action": "wizard_next",
+                "origem_estado": str(est.pk),
+                "origem_cidade": str(sede.pk),
+                "destino_estado_0": str(est.pk),
+                "destino_cidade_0": str(destino.pk),
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        oficio.refresh_from_db()
+        self.assertIsNotNone(oficio.roteiro_id)
+        roteiro = oficio.roteiro
+        self.assertEqual(roteiro.status, Roteiro.STATUS_RASCUNHO)
+        self.assertEqual(roteiro.origem_estado_id, est.pk)
+        self.assertEqual(roteiro.origem_cidade_id, sede.pk)
+        destinos = list(roteiro.destinos.order_by("ordem").values_list("cidade_id", flat=True))
+        self.assertEqual(destinos, [destino.pk])
+
+        get_back = self.client.get(reverse("oficios:wizard_roteiro", args=[oficio.pk]))
+        self.assertEqual(get_back.status_code, 200)
+        self.assertContains(get_back, f'value="{est.pk}" selected')
+        self.assertContains(get_back, f'value="{sede.pk}" selected')
+        self.assertContains(get_back, f'value="{destino.pk}"')
+
+    def test_post_incompleto_save_draft_permanece_com_erros(self):
+        """Salvar rascunho sem navegar continua na página e mostra erros de validação."""
+        oficio = self._oficio_ate_transporte([self.servidor_a.pk])
+        self.client.get(reverse("oficios:wizard_roteiro", args=[oficio.pk]))
+        response = self.client.post(
+            reverse("oficios:wizard_roteiro", args=[oficio.pk]),
+            data={"action": "save_draft"},
+        )
         self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "alert alert-danger")
 
     def test_wizard_resumo_e_alias_da_etapa_documentos(self):
         oficio = self._oficio_ate_transporte([self.servidor_a.pk])

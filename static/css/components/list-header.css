@@ -149,9 +149,9 @@
   color: var(--color-filter-placeholder);
 }
 
-.list-header__search-input:focus {
-  border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--border-focus) 22%, transparent);
+.list-header__search-input:focus,
+.list-header__search-input:focus-visible {
+  outline: none;
 }
 
 .list-header__select {
@@ -205,9 +205,9 @@
   width: 100%;
 }
 
-.list-header .header-filter-input:focus {
-  border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--border-focus) 22%, transparent);
+.list-header .header-filter-input:focus,
+.list-header .header-filter-input:focus-visible {
+  outline: none;
 }
 
 /*
@@ -238,11 +238,16 @@
   min-height: var(--list-header-control-height);
 }
 
-/* Foco visível, mas sem anel azul saturado de 2px. */
+/* Campos do rail: sem chrome de focus. Botões mantêm foco discreto. */
 .list-header__rail .list-header__search-input.header-filter-input:focus,
 .list-header__rail .list-header__search-input.header-filter-input:focus-visible,
 .list-header__rail .cv-custom-select__trigger.cv-custom-select__trigger--v2:focus,
-.list-header__rail .cv-custom-select__trigger.cv-custom-select__trigger--v2:focus-visible,
+.list-header__rail .cv-custom-select__trigger.cv-custom-select__trigger--v2:focus-visible {
+  border: 0;
+  box-shadow: none;
+  outline: none;
+}
+
 .list-header__rail .travel-period-filter__btn:focus,
 .list-header__rail .travel-period-filter__btn:focus-visible,
 .list-header__rail .cv-btn.cv-btn--secondary.cv-btn--control:focus,
@@ -365,8 +370,7 @@
   .cv-search-picker__control:focus-within {
   border: 0;
   box-shadow: none;
-  outline: 2px solid var(--border-focus);
-  outline-offset: 2px;
+  outline: none;
 }
 
 .list-header--quick-add .quick-add-panel
@@ -389,30 +393,6 @@
   border: 1px solid var(--color-danger);
 }
 
-.list-header--quick-add .quick-add-panel
-  :is(
-    .form-control,
-    .form-select,
-    .cv-field__control,
-    .cv-custom-select__trigger
-  ):is(.is-invalid, [aria-invalid="true"]):focus,
-.list-header--quick-add .quick-add-panel
-  :is(
-    .form-control,
-    .form-select,
-    .cv-field__control,
-    .cv-custom-select__trigger
-  ):is(.is-invalid, [aria-invalid="true"]):focus-visible,
-.list-header--quick-add .quick-add-panel
-  :is(.app-form-field, .cv-field):has(.field-error)
-  :is(
-    .form-control,
-    .form-select,
-    .cv-field__control,
-    .cv-custom-select__trigger
-  ):focus {
-  outline-color: var(--color-danger);
-}
 
 .list-header .quick-add-inline__body {
   align-items: flex-end;

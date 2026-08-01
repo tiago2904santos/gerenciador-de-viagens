@@ -474,6 +474,67 @@ def atualizar_roteiro(instance, form, roteiro_state, validated, diarias_resultad
     return roteiro
 
 
+def _apply_origem_parcial_from_form(roteiro, form):
+    """Aplica sede/obs do POST sem exigir form.is_valid() completo."""
+    if not form.is_bound:
+        return
+    data = form.data
+    if "observacoes" in data:
+        roteiro.observacoes = str(data.get("observacoes") or "").strip().upper()
+    for field_name, attr in (
+        ("origem_estado", "origem_estado_id"),
+        ("origem_cidade", "origem_cidade_id"),
+    ):
+        if field_name not in data:
+            continue
+        raw = str(data.get(field_name) or "").strip()
+        if not raw:
+            setattr(roteiro, attr, None)
+            continue
+        try:
+            setattr(roteiro, attr, int(raw))
+        except (TypeError, ValueError):
+            pass
+
+
+@transaction.atomic
+def persistir_roteiro_rascunho_parcial(instance, form, roteiro_state, validated):
+    """Grava rascunho do editor sem exigir validação completa.
+
+    `_validate_roteiro_state` já devolve trechos/retorno parseados mesmo com erros;
+    usamos esse payload para persistir datas nulas quando faltarem.
+    """
+    validated = validated or {}
+    if form.is_valid():
+        roteiro = form.save(commit=False)
+    else:
+        roteiro = instance or form.instance
+        _apply_origem_parcial_from_form(roteiro, form)
+
+    sede_estado = validated.get("sede_estado")
+    sede_cidade = validated.get("sede_cidade")
+    if sede_estado is not None:
+        roteiro.origem_estado = sede_estado
+    if sede_cidade is not None:
+        roteiro.origem_cidade = sede_cidade
+
+    roteiro.tipo = roteiro.tipo or getattr(instance, "tipo", None) or Roteiro.TIPO_AVULSO
+    roteiro.status = Roteiro.STATUS_RASCUNHO
+    if not roteiro.area_id and instance is not None and getattr(instance, "area_id", None):
+        roteiro.area_id = instance.area_id
+    roteiro.save()
+
+    roteiro_logic._salvar_roteiro_avulso_from_roteiro_state(
+        roteiro,
+        roteiro_state or {},
+        validated,
+        diarias_resultado=None,
+    )
+    if form.is_bound:
+        _apply_saved_map_route_from_post(roteiro, form.data)
+    return roteiro
+
+
 @transaction.atomic
 def sobrescrever_roteiro_duplicado(
     duplicado,

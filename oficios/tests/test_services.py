@@ -279,6 +279,33 @@ class OficioServicesTests(TestCase):
         self.assertEqual(list(atualizado.servidores.all()), [self.servidor])
         self.assertEqual(atualizado.status, Oficio.STATUS_GERADO)
 
+    def test_atualizar_oficio_dados_viajantes_preenche_ano_quando_ausente(self):
+        oficio = Oficio.objects.create(
+            numero=150,
+            ano=None,
+            status=Oficio.STATUS_RASCUNHO,
+            custeio=Oficio.CUSTEIO_UNIDADE_DPC,
+        )
+        oficio.servidores.add(self.servidor)
+        form = OficioDadosViajantesForm(
+            data={
+                "numero": "150",
+                "protocolo": "44.444.444-4",
+                "motivo": "Motivo sem ano prévio",
+                "servidores": [str(self.servidor.pk)],
+                "custeio": Oficio.CUSTEIO_UNIDADE_DPC,
+                "custeio_observacao": "",
+            },
+            instance=oficio,
+        )
+        self.assertTrue(form.is_valid(), form.errors)
+
+        atualizado = atualizar_oficio_dados_viajantes(oficio, form, action="save_draft")
+        atualizado.refresh_from_db()
+
+        self.assertEqual(atualizado.numero, 150)
+        self.assertEqual(atualizado.ano, timezone.localdate().year)
+
     def test_avaliar_oficio_dados_viajantes_incomplete_e_complete(self):
         incompleto = Oficio.objects.create(custeio=Oficio.CUSTEIO_UNIDADE_DPC)
         avaliacao_incompleta = avaliar_oficio_dados_viajantes(incompleto)

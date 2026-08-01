@@ -289,7 +289,8 @@ def atualizar_oficio_dados_viajantes(oficio, form, action="save_draft"):
     atualizado = form.save(commit=False)
     if atualizado.numero is None:
         atualizado.numero = original.numero
-    atualizado.ano = oficio.ano
+    # Ano não vem no formulário da etapa; rascunhos legados podem estar sem ano.
+    atualizado.ano = original.ano or atualizado.ano or timezone.localdate().year
     atualizado.data_criacao = timezone.localdate()
     for field_name, value in transporte_original.items():
         setattr(atualizado, field_name, value)
@@ -420,16 +421,17 @@ def get_next_available_numero_oficio(ano, area=None):
     return Oficio.get_next_available_numero(ano, area=area)
 
 
-def _bloquear_escopo_numeracao_oficio(*, area_id: int | None, ano: int) -> None:
+def _bloquear_escopo_numeracao_oficio(*, area_id: int | None, ano: int | None) -> None:
     """Serializa a escolha do próximo número para uma área/ano.
 
     Bloquear apenas linhas de ``Oficio`` não protege o próximo número, pois ele
     ainda não existe. No PostgreSQL, o advisory lock transacional cobre
     exatamente esse intervalo lógico sem exigir uma tabela de contadores.
     """
+    resolved_ano = int(ano) if ano is not None else timezone.localdate().year
     if connection.vendor == "postgresql":
         namespace = 0x4F464943  # "OFIC"
-        scope = (((area_id or 0) * 4096) + (int(ano) % 4096)) % 2_147_483_647
+        scope = (((area_id or 0) * 4096) + (resolved_ano % 4096)) % 2_147_483_647
         with connection.cursor() as cursor:
             cursor.execute(
                 "SELECT pg_advisory_xact_lock(%s, %s)",
@@ -444,7 +446,7 @@ def _bloquear_escopo_numeracao_oficio(*, area_id: int | None, ano: int) -> None:
     else:
         list(
             Oficio.objects.select_for_update()
-            .filter(area__isnull=True, ano=ano)
+            .filter(area__isnull=True, ano=resolved_ano)
             .exclude(numero__isnull=True)
         )
 

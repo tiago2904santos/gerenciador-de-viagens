@@ -371,14 +371,8 @@ html[data-theme="dark"] .ui-lab-page {
   opacity: 1;
 }
 
-.cv-field__control:hover:not(:disabled):not([readonly]) {
-  background: var(--cv-field-bg-hover);
-  border-color: var(--cv-field-border-hover);
-}
-
+.cv-field__control:focus,
 .cv-field__control:focus-visible {
-  border-color: var(--cv-field-focus-border);
-  box-shadow: var(--cv-field-shadow-focus);
   outline: none;
 }
 
@@ -400,16 +394,6 @@ html[data-theme="dark"] .ui-lab-page {
     linear-gradient(var(--cv-select-border), var(--cv-select-border)) border-box;
   cursor: pointer;
   padding-right: calc(var(--space-6) + var(--space-2));
-}
-
-.cv-field__control--select:hover:not(:disabled) {
-  background:
-    linear-gradient(45deg, transparent 50%, var(--cv-select-chevron) 50%)
-      calc(100% - var(--space-6) - var(--space-1)) calc(50% - var(--space-1)) / var(--space-2) var(--space-2) no-repeat,
-    linear-gradient(135deg, var(--cv-select-chevron) 50%, transparent 50%)
-      calc(100% - var(--space-4)) calc(50% - var(--space-1)) / var(--space-2) var(--space-2) no-repeat,
-    linear-gradient(var(--cv-select-bg-hover), var(--cv-select-bg-hover)) padding-box,
-    linear-gradient(var(--cv-select-border-hover), var(--cv-select-border-hover)) border-box;
 }
 
 .cv-field__control--select option,
@@ -472,19 +456,8 @@ html[data-theme="dark"] .ui-lab-page {
   width: 100%;
 }
 
-.cv-select__control:hover:not(:disabled) {
-  background:
-    linear-gradient(var(--cv-select-bg-hover), var(--cv-select-bg-hover)) padding-box,
-    linear-gradient(var(--cv-select-border-hover), var(--cv-select-border-hover)) border-box;
-}
-
 .cv-select__control:focus,
 .cv-select__control:focus-visible {
-  background:
-    linear-gradient(var(--cv-select-bg-hover), var(--cv-select-bg-hover)) padding-box,
-    linear-gradient(var(--cv-select-border-focus), var(--cv-select-border-focus)) border-box;
-  border-color: transparent;
-  box-shadow: var(--cv-select-focus-shadow);
   outline: none;
 }
 
@@ -501,7 +474,6 @@ html[data-theme="dark"] .ui-lab-page {
     linear-gradient(var(--cv-select-border-hover), var(--cv-select-border-hover)) border-box;
 }
 
-.cv-select__wrapper:focus-within::after,
 .cv-field--focus-demo .cv-select__wrapper::after {
   color: var(--cv-select-border-focus);
   transform: translateY(calc(var(--space-1) * -1)) rotate(225deg);
@@ -591,26 +563,13 @@ html[data-theme="dark"] .ui-lab-page {
   border-color: var(--cv-field-error-border);
 }
 
-.cv-field--error .cv-field__control:focus-visible,
-.cv-field__control[aria-invalid="true"]:focus-visible {
-  box-shadow: var(--cv-field-error-shadow);
-}
-
 .cv-field--success .cv-field__control {
   border-color: var(--cv-field-success);
-}
-
-.cv-field--success .cv-field__control:focus-visible {
-  box-shadow: var(--cv-field-success-shadow);
 }
 
 .cv-field--error .cv-multiselect__control {
   background: var(--cv-field-error-bg);
   border-color: var(--cv-field-error-border);
-}
-
-.cv-field--error .cv-multiselect__control:focus-within {
-  box-shadow: var(--cv-field-error-shadow);
 }
 
 .cv-field__help,
@@ -814,14 +773,8 @@ html[data-theme="dark"] .ui-lab-page {
     box-shadow var(--transition-fast);
 }
 
-.cv-multiselect__control:hover {
-  background: var(--cv-field-bg-hover);
-  border-color: var(--cv-field-border-hover);
-}
-
 .cv-multiselect__control:focus-within {
-  border-color: var(--cv-field-focus-border);
-  box-shadow: var(--cv-field-shadow-focus);
+  outline: none;
 }
 
 .cv-multiselect__header {
@@ -1195,17 +1148,8 @@ html[data-theme="dark"] .ui-lab-page {
   width: 100%;
 }
 
-.cv-custom-select__trigger:hover:not(:disabled) {
-  background:
-    linear-gradient(var(--cv-select-bg-hover), var(--cv-select-bg-hover)) padding-box,
-    linear-gradient(var(--cv-select-border-hover), var(--cv-select-border-hover)) border-box;
-}
-
+.cv-custom-select__trigger:focus,
 .cv-custom-select__trigger:focus-visible {
-  background:
-    linear-gradient(var(--cv-select-bg-hover), var(--cv-select-bg-hover)) padding-box,
-    linear-gradient(var(--cv-select-border-focus), var(--cv-select-border-focus)) border-box;
-  box-shadow: var(--cv-select-focus-shadow);
   outline: none;
 }
 
@@ -1371,7 +1315,6 @@ html[data-theme="dark"] .ui-lab-page {
     linear-gradient(var(--cv-field-error-border), var(--cv-field-error-border)) border-box;
 }
 
-.cv-custom-select--error .cv-custom-select__trigger:focus-visible,
 .cv-custom-select--error.cv-custom-select--open .cv-custom-select__trigger {
   box-shadow: var(--cv-select-error-shadow);
 }

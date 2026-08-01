@@ -136,11 +136,17 @@
   position: relative;
 }
 
+.alert > * {
+  grid-column: 2;
+  min-width: 0;
+}
+
 .alert::before {
   border-radius: var(--radius-pill);
   content: "";
   display: inline-block;
-  grid-row: 1 / span 2;
+  grid-column: 1;
+  grid-row: 1 / -1;
   height: 8px;
   margin: 6px 0 0;
   width: 8px;

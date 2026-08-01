@@ -1626,6 +1626,7 @@ export function initRoteirosEditor() {
       window.CV.locationRows.initDragDrop(destinosContainer, {
         rowSelector: '[data-location-row]',
         removeSelector: '[data-location-remove]',
+        dragHandleSelector: '[data-location-drag-handle]',
         onReorder: function() {
           reindexDestinoRows();
           renderTrechos(captureCurrentState(), { force: true });

@@ -205,14 +205,8 @@
   width: 100%;
 }
 
-.auth-field-input:hover {
-  background: var(--color-surface-soft);
-  border-color: var(--color-border-strong);
-}
-
+.auth-field-input:focus,
 .auth-field-input:focus-visible {
-  border-color: var(--color-primary-bright, var(--color-primary));
-  box-shadow: 0 0 0 2px var(--color-focus-ring, rgb(134 169 194 / 24%));
   outline: none;
 }
 
