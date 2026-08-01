@@ -299,7 +299,11 @@
 
   function ensureMap() {
     var container = $('roteiro-mapa-container');
-    if (!container || typeof L === 'undefined') return;
+    if (!container) return false;
+    if (typeof L === 'undefined') {
+      showError('Biblioteca de mapa indisponível. Recarregue a página.');
+      return false;
+    }
     if (!mapInstance) {
       mapInstance = L.map(container, { scrollWheelZoom: false }).setView(defaultCenter, defaultZoom);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -314,6 +318,7 @@
         }
       }, 0);
     }
+    return true;
   }
 
   function clearMapLayers() {
@@ -421,7 +426,7 @@
    * Desenha rota (segmentada por leg quando disponível). Retorna true se desenhou algo.
    */
   function drawRoute(geometry, geomWarning, legs, points) {
-    ensureMap();
+    if (!ensureMap()) return false;
     var container = $('roteiro-mapa-container');
     if (!container || typeof L === 'undefined') return false;
 
@@ -624,6 +629,12 @@
     var form = getEditorForm();
     var container = $('roteiro-mapa-container');
     if (!form || !container) return;
+
+    if (typeof L === 'undefined') {
+      showError('Biblioteca de mapa indisponível. Recarregue a página.');
+      setCalcularEnabled(false);
+      return;
+    }
 
     hideElement($('roteiro-mapa-loading'));
     hideElement($('roteiro-mapa-error'));

@@ -1808,29 +1808,30 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
   min-height: 600px;
 }
 
-/* Toolbar do mapa: mesmo painel da seção (--step1-panel) onde vive
-   "Preencher datas". Poço (--step1-field) faria o secondary filled soft
-   (também --step1-surface) sumir no fundo. */
+/* Toolbar do mapa: surface-muted tingido de primary (mesmo tom dos menus
+   reanexados / painéis soft do wizard). */
 :is(html[data-theme="dark"])
   [data-travel-document-wizard-roteiro]
   .roteiro-mapa__canvas-head {
-  background: var(--step1-panel, var(--color-surface-soft));
+  background: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
   background-image: none;
-  border-bottom-color: transparent;
+  border-bottom: 0;
 }
 
-/* Botões do canvas: mesmo secondary filled soft do "Preencher datas"
-   (.cv-form-block__actions .cv-btn--secondary). */
+/* Botões do canvas: mesma linguagem do Voltar do footer
+   (.cv-form-card__footer .cv-card-footer__secondary .cv-btn). */
 :is(html[data-theme="dark"])
   [data-travel-document-wizard-roteiro]
   .roteiro-mapa__canvas-head
   .cv-btn--secondary {
-  background: var(--step1-surface);
+  background: var(--step1-panel, var(--color-surface-soft));
+  background-image: none;
   border: 0;
   border-radius: 12px;
   box-shadow: none;
   color: var(--color-heading);
   font-weight: var(--font-weight-bold);
+  transform: none;
 }
 
 :is(html[data-theme="dark"])
@@ -1842,10 +1843,12 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
   .roteiro-mapa__canvas-head
   .cv-btn--secondary:focus-visible {
   background: color-mix(in srgb, var(--color-accent) 14%, var(--color-surface-muted));
+  background-image: none;
   border: 0;
   box-shadow: none;
   color: var(--color-accent-text);
   outline: 0;
+  transform: none;
 }
 
 @media (max-width: 720px) {

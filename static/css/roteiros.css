@@ -2744,11 +2744,11 @@
 
 .roteiro-mapa__canvas-shell {
   --roteiro-mapa-toolbar-bg: var(--cv-form-section-header-bg, var(--route-card-bg));
-  --roteiro-mapa-toolbar-border: var(--cv-form-section-border, var(--route-card-inner-border));
+  --roteiro-mapa-toolbar-border: transparent;
   background: var(--cv-form-section-bg, var(--route-card-bg));
-  border: 1px solid var(--roteiro-mapa-toolbar-border);
+  border: 0;
   border-radius: var(--cv-form-section-radius, 13px);
-  box-shadow: var(--cv-form-section-shadow, 0 1px 0 rgba(255, 255, 255, 0.9) inset);
+  box-shadow: none;
   isolation: isolate;
   overflow: hidden;
   position: relative;
@@ -2764,7 +2764,7 @@
     color-mix(in srgb, var(--color-accent) 6%, transparent) 0,
     transparent 72px
   );
-  border-bottom: 1px solid var(--roteiro-mapa-toolbar-border);
+  border-bottom: 0;
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
@@ -2975,10 +2975,10 @@
   width: 100%;
   border-radius: 13px;
   overflow: hidden;
-  border: 1px solid #cadbea;
+  border: 0;
   margin-top: 0;
   background: var(--route-card-bg);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset;
+  box-shadow: none;
 }
 
 .roteiro-mapa__frame #map,
@@ -3021,7 +3021,9 @@ html[data-theme="dark"] .card.roteiro-editor__trecho-card,
 html[data-theme="dark"] .roteiro-editor__subpanel,
 html[data-theme="dark"] .roteiro-mapa__stats,
 html[data-theme="dark"] .roteiro-mapa__canvas-shell {
-  border-color: var(--route-card-inner-border);
+  border: 0;
+  border-color: transparent;
+  box-shadow: none;
 }
 
 html[data-theme="dark"] .roteiro-editor__trecho-card .card-header,

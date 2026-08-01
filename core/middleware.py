@@ -68,7 +68,8 @@ class SecurityHeadersMiddleware:
                     "default-src 'self'",
                     "script-src 'self'",
                     "style-src 'self' 'unsafe-inline'",
-                    "img-src 'self' data: blob:",
+                    # Tiles OSM do Leaflet (mapa do roteiro).
+                    "img-src 'self' data: blob: https://*.tile.openstreetmap.org",
                     "font-src 'self' data:",
                     "connect-src 'self'",
                     "frame-src 'self'",
