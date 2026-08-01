@@ -12,6 +12,10 @@
 
 {% block flow_shell_extra %} evento-guided-page{% endblock %}
 
+{% block flow_header %}
+  {% include "components/ui/headers/wizard_page_header.html" with eyebrow="EVENTOS" title=page_title status_label=flow_status_label status_variant=flow_status_variant steps=evento_page_steps stepper_aria_label="Etapas do evento" back_label=flow_back_label back_url=flow_back_url only %}
+{% endblock %}
+
 {% block flow_stepper %}
   {% if evento.status == "cancelado" %}
     <div class="cv-notice cv-notice--danger cv-notice--action cv-alert cv-alert--danger cv-alert--action">
@@ -25,8 +29,6 @@
       </form>
     </div>
   {% endif %}
-
-  {% include "components/ui/navigation/page_stepper.html" with steps=evento_page_steps aria_label="Etapas do evento" only %}
 {% endblock %}
 
 {% block flow_body %}

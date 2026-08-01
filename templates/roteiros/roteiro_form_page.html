@@ -17,7 +17,7 @@
 {% endblock %}
 
 {% block flow_header %}
-  {% include "components/ui/headers/page_header.html" with eyebrow="ROTEIROS" title=wizard_header.title description=wizard_header.description icon_label="RT" module_label="Roteiros" back_label=wizard_back_label back_url=wizard_back_url status_label=wizard_header.status_label status_variant=wizard_header.status_variant only %}
+  {% include "components/ui/headers/wizard_page_header.html" with eyebrow="ROTEIROS" title=wizard_header.title status_label=wizard_header.status_label status_variant=wizard_header.status_variant steps=wizard_page_steps back_label=wizard_back_label back_url=wizard_back_url only %}
 {% endblock %}
 
 {% block flow_body %}

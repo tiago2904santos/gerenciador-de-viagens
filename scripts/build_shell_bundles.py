@@ -72,6 +72,7 @@ SHELL_JS: tuple[str, ...] = (
     "js/components/fields-init.js",
     "js/components/document-download.js",
     "js/components/extra-download.js",
+    "js/components/wizard-sticky-header.js",
 )
 
 CSS_BUNDLE = STATIC / "css" / "shell.bundle.css"

@@ -937,78 +937,15 @@ export function initRoteirosEditor() {
   }
 
   function renderDestinosTrechosPreview() {
-    var list = document.querySelector("[data-route-destinos-trechos]");
-    if (!list) return;
-    var block = list.closest(".route-destinos-block--split") || list.closest(".route-destinos-block");
-    var subtitle = block
-      ? block.querySelector("[data-route-destinos-subtitle]")
-      : document.querySelector("[data-route-destinos-subtitle]");
-    var escape = (window.CV && window.CV.util && typeof window.CV.util.escapeHtml === "function")
-      ? window.CV.util.escapeHtml
-      : function (value) { return String(value == null ? "" : value); };
-    function cityLabel(raw, fallback) {
-      var nome = String(raw || "").trim();
-      if (!nome || nome === "---------") return fallback;
-      return nome;
-    }
-    function trechoHtml(step) {
-      return (
-        '<span class="route-destinos-trechos__from">' + escape(step.from) + "</span>" +
-        '<span class="route-destinos-trechos__sep" aria-hidden="true">&gt;</span>' +
-        '<span class="route-destinos-trechos__to">' + escape(step.to) + "</span>"
-      );
-    }
-    function staticSubtitleCopy() {
-      if (!subtitle) return "Locais na ordem da visita.";
-      var fromData = String(subtitle.getAttribute("data-static-copy") || "").trim();
-      if (fromData) return fromData;
-      return "Locais na ordem da visita.";
-    }
-    function setMode(mode, opts) {
-      var single = mode === "single";
-      var restCount = opts && opts.restCount ? opts.restCount : 0;
-      list.hidden = single || restCount === 0;
-      if (subtitle) {
-        if (single) {
-          subtitle.textContent = staticSubtitleCopy();
-          subtitle.hidden = false;
-        } else if (opts && opts.firstHtml) {
-          subtitle.innerHTML = opts.firstHtml;
-          subtitle.hidden = false;
-        }
-      }
-      if (!block) return;
-      block.classList.toggle("route-destinos-block--single", single);
-      block.classList.toggle("route-destinos-block--multi", !single);
-      block.classList.toggle("route-destinos-block--with-trechos", !single && restCount > 0);
-    }
-    var sede = cityLabel(selectedText($("id_origem_cidade")), "Sede");
-    var destinos = getDestinos();
-    if (destinos.length <= 1) {
-      list.innerHTML = "";
-      setMode("single");
+    if (!window.CV || !window.CV.locationRows || typeof window.CV.locationRows.renderTrechosPreview !== "function") {
       return;
     }
-    var names = destinos.map(function (destino, index) {
-      return cityLabel(destino.cidade_nome, "Destino " + (index + 1));
-    });
-    var steps = [];
-    var from = sede;
-    names.forEach(function (to) {
-      steps.push({ from: from, to: to });
-      from = to;
-    });
-    var first = steps.shift();
-    list.innerHTML = steps.map(function (step) {
-      return (
-        '<li class="route-destinos-trechos__item">' +
-          trechoHtml(step) +
-        "</li>"
-      );
-    }).join("");
-    setMode("multi", {
-      firstHtml: first ? trechoHtml(first) : "",
-      restCount: steps.length
+    window.CV.locationRows.renderTrechosPreview({
+      section: document.querySelector("#sec-destinos") || document.querySelector(".route-destinos-block"),
+      getOriginLabel: function () {
+        return selectedText($("id_origem_cidade"));
+      },
+      originFallback: "Sede",
     });
   }
 

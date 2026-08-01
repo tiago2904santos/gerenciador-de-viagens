@@ -335,6 +335,7 @@ Numerados para rastreio. Severidade: 🔴 crítico (quebra a leitura) · 🟠 al
 | D-55 | 🟡 | **Resumo/estatística** | `cv-summary-item/-label/-value` (summary-items.css) · `cv-summary-tile` (content-cards.css) · `pt-resumo-box` (dentro de content-cards.css!) · `admin-overview__stats` com `<dl>` (usuarios) |
 | D-56 | 🟡 | **Grid de campos** | `.field-grid` + `.field-size-1..4` (padrão) · `.field-grid--cols-2/3/4` (segundo padrão) · `.field-grid-rows` (terceiro) |
 | NOVO-19 | 🟡 | **Sede do roteiro ofício espelhava Destinos** — card interno (`.oficio-roteiro-sede-row`) + badge dourado `SEDE` + título empilhado: três camadas de chrome para um par UF/cidade. **Corrigido:** `cv-form-subsection--split` (copy à esquerda, campos à direita), sem badge/card. | `_fonte_body.html` · `form-sections.css` |
+| NOVO-20 | 🟠 | **Header de wizard quebrava a identidade das listas** — `page-header-stack` (band+rail horizontal no dark) era visualmente outro sistema que o `.list-header` das listas. **Corrigido:** `wizard_page_header.html` reusa `.list-header` + stepper no rail; sticky com `is-detached` (cantos arredondam ao descolar). | `wizard_page_header.html` · `list-header.css` · `wizard-sticky-header.js` |
 
 ---
 

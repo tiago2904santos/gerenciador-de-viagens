@@ -797,3 +797,245 @@
   background: color-mix(in srgb, var(--color-primary-bright) 20%, transparent);
   border-color: var(--color-primary-bright);
 }
+
+/* =========================================================
+   Wizard sticky header (NOVO-20)
+   .wizard-sticky-scope envolve header + formulário (pai alto do sticky).
+   Band sobe com a página; stepper cola e descola com radius na junção.
+   ========================================================= */
+
+.wizard-sticky-scope {
+  display: flex;
+  flex-direction: column;
+  gap: var(--page-shell-gap, var(--space-6));
+  position: relative;
+  width: 100%;
+}
+
+.wizard-sticky-header__sentinel {
+  height: 1px;
+  margin: 0;
+  pointer-events: none;
+  width: 100%;
+}
+
+/* Anula o gap do scope entre band e stepper (colados). */
+.wizard-sticky-scope > .list-header--wizard-stepper {
+  margin-top: calc(-1 * var(--page-shell-gap, var(--space-6)));
+}
+
+/* Sem borda dupla na junção enquanto colados. */
+.list-header--wizard-band:not(.is-detached) {
+  border-bottom-color: transparent;
+  border-bottom-width: 0;
+}
+
+.list-header--wizard-stepper:not(.is-detached) {
+  border-top-color: transparent;
+  border-top-width: 0;
+}
+
+.list-header--wizard-band,
+.list-header--wizard-stepper {
+  box-shadow: var(--shadow-sm);
+  transition:
+    border-radius 240ms ease,
+    box-shadow 240ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .list-header--wizard-band,
+  .list-header--wizard-stepper {
+    transition: none;
+  }
+}
+
+/* Band: sobe com a página. Colado → base reta; descola → base com radius. */
+.list-header--wizard-band {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-top-left-radius: var(--radius-lg);
+  border-top-right-radius: var(--radius-lg);
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+.list-header--wizard-band.is-detached {
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.list-header--wizard-band .list-header__band {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  gap: var(--space-3);
+  justify-content: space-between;
+  width: 100%;
+}
+
+.list-header__band-actions {
+  flex: 0 0 auto;
+}
+
+.list-header__wizard-back {
+  min-height: var(--control-height-md, 44px);
+  padding: 0 18px;
+}
+
+/* Stepper: sticky no scope alto. Colado → topo reto; descola → topo com radius.
+   Base sempre arredondada. */
+.list-header--wizard-stepper {
+  border-bottom-left-radius: var(--radius-lg);
+  border-bottom-right-radius: var(--radius-lg);
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  overflow: hidden;
+  position: sticky;
+  top: 12px;
+  z-index: var(--z-sticky-stepper, 1100);
+}
+
+.list-header--wizard-stepper.is-detached {
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+
+.list-header__rail--wizard {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  justify-content: stretch;
+  padding: 10px clamp(var(--space-4), 2vw, var(--space-5));
+}
+
+.list-header__wizard-stepper {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+}
+
+.list-header__wizard-stepper .page-stepper {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  isolation: auto;
+  padding: 0;
+  position: static;
+  top: auto;
+  width: 100%;
+}
+
+:is(html[data-theme="dark"]) .list-header--wizard-band {
+  background: var(--color-surface-muted);
+  border-color: var(--color-border);
+}
+
+:is(html[data-theme="dark"]) .list-header--wizard-band .list-header__band {
+  background: var(--color-surface-muted);
+}
+
+:is(html[data-theme="dark"]) .list-header--wizard-stepper {
+  background: var(--cv-card-family-bg, var(--color-card));
+  border-color: var(--color-border);
+}
+
+:is(html[data-theme="dark"]) .list-header--wizard-stepper .list-header__rail--wizard {
+  background: var(--cv-card-family-bg, var(--color-card));
+  border-top: 0;
+}
+
+/* Voltar no band = mesma linguagem do Voltar do footer. */
+:is(html[data-theme="dark"])
+  .list-header--wizard-band
+  .list-header__wizard-back.cv-btn--secondary {
+  background: var(--step1-panel, var(--color-surface-soft));
+  background-image: none;
+  border: 0;
+  border-radius: 12px;
+  box-shadow: none;
+  color: var(--color-heading);
+  font-weight: var(--font-weight-bold);
+  transform: none;
+}
+
+:is(html[data-theme="dark"])
+  .list-header--wizard-band
+  .list-header__wizard-back.cv-btn--secondary:hover,
+:is(html[data-theme="dark"])
+  .list-header--wizard-band
+  .list-header__wizard-back.cv-btn--secondary:focus-visible {
+  background: color-mix(in srgb, var(--color-accent) 14%, var(--color-surface-muted));
+  background-image: none;
+  border: 0;
+  box-shadow: none;
+  color: var(--color-accent-text);
+  outline: 0;
+  transform: none;
+}
+
+:is(html[data-theme="dark"])
+  .list-header--wizard-band
+  .list-header__wizard-back
+  .cv-btn__icon {
+  color: inherit;
+}
+
+:is(html[data-theme="dark"])
+  .list-header--wizard-stepper
+  .list-header__wizard-stepper
+  .page-stepper {
+  --stepper-marker-size: 32px;
+  --stepper-missing-bg: color-mix(in srgb, var(--color-danger) 12%, transparent);
+  --stepper-missing-border: color-mix(in srgb, var(--color-danger) 30%, transparent);
+  --stepper-missing-color: color-mix(in srgb, var(--color-danger) 72%, #e8eef6);
+  --stepper-status-missing-color: color-mix(in srgb, var(--color-danger) 62%, #b8c7d8);
+  background: transparent;
+}
+
+:is(html[data-theme="dark"])
+  .list-header--wizard-stepper
+  .page-stepper__eyebrow {
+  display: none;
+}
+
+:is(html[data-theme="dark"])
+  .list-header--wizard-stepper
+  .page-stepper__label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+:is(html[data-theme="dark"])
+  .list-header--wizard-stepper
+  .page-stepper__status {
+  font-size: 0.68rem;
+  font-weight: 600;
+}
+
+:is(html[data-theme="dark"])
+  .list-header--wizard-stepper
+  .page-stepper__item.is-missing
+  .page-stepper__status {
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  opacity: 0.92;
+}
+
+@media (max-width: 900px) {
+  .list-header--wizard-stepper {
+    top: 8px;
+  }
+
+  .list-header--wizard-band .list-header__band {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .list-header__band-actions .cv-btn {
+    width: 100%;
+  }
+}

@@ -873,7 +873,8 @@ html[data-theme="light"] {
   margin-left: auto;
 }
 
-/* Stepper fora do painel stack — card isolado como no UI Lab */
+/* Stepper legado como irmão do header — UI Lab / demos.
+   Wizards de produção embutem o stepper no `.list-header--wizard` (NOVO-20). */
 .page-shell--wizard > .page-stepper,
 .cv-page--flow > .page-stepper {
   background: var(--surface-stepper);

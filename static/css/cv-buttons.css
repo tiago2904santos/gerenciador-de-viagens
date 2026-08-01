@@ -705,6 +705,21 @@ html[data-theme="light"] {
   color: var(--cv-btn-secondary-hover-color);
 }
 
+/* Gerenciar modelos (engrenagem ao lado do campo) — accent dourado. */
+.cv-icon-btn--field-manage.cv-icon-btn--settings {
+  background: color-mix(in srgb, var(--color-accent) 16%, var(--color-surface-soft, var(--cv-btn-neutral-bg)));
+  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--color-border, transparent));
+  color: var(--color-accent);
+}
+
+.cv-icon-btn--field-manage.cv-icon-btn--settings:hover,
+.cv-icon-btn--field-manage.cv-icon-btn--settings:focus,
+.cv-icon-btn--field-manage.cv-icon-btn--settings:focus-visible {
+  background: color-mix(in srgb, var(--color-accent) 26%, var(--color-surface-muted, var(--cv-btn-neutral-bg)));
+  border-color: var(--color-accent);
+  color: var(--color-accent-text, var(--color-accent));
+}
+
 /* Sign — assinar (primary blue, caneta) */
 .cv-icon-btn--sign {
   background: var(--cv-btn-primary-bg);
@@ -932,6 +947,14 @@ html[data-theme="light"] {
 .cv-global-tooltip.is-visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* Tooltip do botão Gerenciar modelos — amarelo dourado (accent). */
+.cv-global-tooltip.cv-global-tooltip--accent {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--color-accent) 35%, transparent);
+  color: var(--color-on-accent, #19232d);
 }
 
 /* =========================================================

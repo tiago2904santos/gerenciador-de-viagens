@@ -683,6 +683,9 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
 - [ ] `R-02` sistema de ícones (208 linhas de if/elif, 17 órfãos)
 - [ ] `N-11` microcopy: 4 variantes de "Voltar à lista"
 - [ ] `P-08` decidir `diario_bordo` · motor de PDF canônico
+- [x] `NOVO-20` 🟠 **Header de wizard alinhado às listas** — `wizard_page_header`
+  (`.list-header--wizard` + stepper no rail + sticky `is-detached`).
+  Substitui o `page-header-stack` horizontal dos wizards.
 
 ---
 

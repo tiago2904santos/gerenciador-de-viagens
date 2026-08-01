@@ -85,7 +85,7 @@
 
 .cv-travel-schedule {
   display: grid;
-  gap: var(--space-4);
+  gap: var(--space-3);
   min-width: 0;
 }
 

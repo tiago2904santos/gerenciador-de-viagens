@@ -130,7 +130,7 @@
     ]);
   }
 
-  function syncOficioSummary(form, summaries) {
+  function syncOficioSummary(form, summaries, destinosApi) {
     var select = form.querySelector("select[name='oficio']");
     var root = form.querySelector("[data-termo-oficio-summary]");
     var search = form.querySelector("#id_oficio_busca");
@@ -152,6 +152,12 @@
 
     function selectedSummary() {
       return summaries[String(select.value || "")] || null;
+    }
+
+    function refreshTrechos() {
+      if (destinosApi && typeof destinosApi.refreshTrechosPreview === "function") {
+        destinosApi.refreshTrechosPreview();
+      }
     }
 
     function renderSummary() {
@@ -233,6 +239,7 @@
       renderList(search.value);
       renderSummary();
       applyOficioSource(form, selectedSummary());
+      refreshTrechos();
     });
     search.addEventListener("input", function () {
       renderList(search.value);
@@ -257,9 +264,17 @@
   }
 
   function syncDestinationCities(form) {
-    window.CV.locationRows.initManagedRows({
+    return window.CV.locationRows.initManagedRows({
       form: form,
       managedFlag: "termoDestinosManaged",
+      getOriginLabel: function () {
+        var select = form.querySelector("select[name='oficio']");
+        if (!select || !select.value) return "";
+        var summaries = readSummaries();
+        var summary = summaries[String(select.value)] || null;
+        return summary && summary.sede ? String(summary.sede).trim() : "";
+      },
+      originFallback: "Sede",
     });
   }
 
@@ -384,7 +399,8 @@
       .sort(function (a, b) { return a - b; });
     if (!indexes.length) return;
 
-    var addButton = form.querySelector("#termo-btn-adicionar-destino");
+    var addButton = form.querySelector("#termo-btn-adicionar-destino")
+      || form.querySelector("#termo-evento-destinos [data-location-add]");
     var rowsNeeded = indexes[indexes.length - 1] + 1;
 
     function rowsCount() {
@@ -395,6 +411,8 @@
     while (rowsCount() < rowsNeeded && addButton && guard < 50) {
       addButton.click();
       guard += 1;
+      addButton = form.querySelector("#termo-btn-adicionar-destino")
+        || form.querySelector("#termo-evento-destinos [data-location-add]");
     }
 
     var rows = Array.prototype.slice.call(form.querySelectorAll("[data-location-row]"));
@@ -431,8 +449,8 @@
     var draft = takeDraft();
     if (draft) applyDraftSimpleFields(form, draft);
 
-    syncOficioSummary(form, readSummaries());
-    syncDestinationCities(form);
+    var destinosApi = syncDestinationCities(form);
+    syncOficioSummary(form, readSummaries(), destinosApi);
     syncAddDestinationButton(form);
     if (draft) applyDraftDestinos(form, draft);
 

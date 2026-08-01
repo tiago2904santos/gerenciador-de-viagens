@@ -349,6 +349,130 @@
     });
   }
 
+  function selectedOptionText(select) {
+    if (!select || select.selectedIndex < 0 || !select.options || !select.options[select.selectedIndex]) {
+      return "";
+    }
+    return String(select.options[select.selectedIndex].text || "").trim();
+  }
+
+  function escapeHtml(value) {
+    if (window.CV && window.CV.util && typeof window.CV.util.escapeHtml === "function") {
+      return window.CV.util.escapeHtml(value);
+    }
+    return String(value == null ? "" : value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function cityLabel(raw, fallback) {
+    var nome = String(raw || "").trim();
+    if (!nome || nome === "---------") return fallback;
+    return nome;
+  }
+
+  function trechoHtml(step) {
+    return (
+      '<span class="route-destinos-trechos__from">' + escapeHtml(step.from) + "</span>" +
+      '<span class="route-destinos-trechos__sep" aria-hidden="true">&gt;</span>' +
+      '<span class="route-destinos-trechos__to">' + escapeHtml(step.to) + "</span>"
+    );
+  }
+
+  /**
+   * Prévia Sede/Destino > Destino no rail do layout split.
+   * Sem origem: pares consecutivos entre destinos. Com origem: origem → d1 → d2…
+   */
+  function renderTrechosPreview(options) {
+    options = options || {};
+    var section = options.section
+      || (options.sectionSelector ? document.querySelector(options.sectionSelector) : null)
+      || document.querySelector(".route-destinos-block--split")
+      || document.querySelector(".route-destinos-block");
+    if (!section) return null;
+    var trechosList = section.querySelector(options.trechosSelector || "[data-route-destinos-trechos]");
+    if (!trechosList) return null;
+    var subtitle = section.querySelector(options.subtitleSelector || "[data-route-destinos-subtitle]");
+    var rowList = section.querySelector(options.listSelector || "[data-location-list]") || section;
+    var citySelector = options.citySelector || "[data-location-city]";
+    var rowSelector = options.rowSelector || "[data-location-row]";
+
+    function staticSubtitleCopy() {
+      if (!subtitle) return "Locais na ordem da visita.";
+      var fromData = String(subtitle.getAttribute("data-static-copy") || "").trim();
+      return fromData || "Locais na ordem da visita.";
+    }
+
+    function setMode(mode, opts) {
+      var single = mode === "single";
+      var restCount = opts && opts.restCount ? opts.restCount : 0;
+      trechosList.hidden = single || restCount === 0;
+      if (subtitle) {
+        if (single) {
+          subtitle.textContent = staticSubtitleCopy();
+          subtitle.hidden = false;
+        } else if (opts && opts.firstHtml) {
+          subtitle.innerHTML = opts.firstHtml;
+          subtitle.hidden = false;
+        }
+      }
+      section.classList.toggle("route-destinos-block--single", single);
+      section.classList.toggle("route-destinos-block--multi", !single);
+      section.classList.toggle("route-destinos-block--with-trechos", !single && restCount > 0);
+    }
+
+    var names = rows(rowList, { rowSelector: rowSelector }).map(function (row, index) {
+      var citySelect = row.querySelector(citySelector);
+      return cityLabel(selectedOptionText(citySelect), "Destino " + (index + 1));
+    });
+
+    var originLabel = "";
+    if (typeof options.getOriginLabel === "function") {
+      originLabel = cityLabel(options.getOriginLabel(), options.originFallback || "Sede");
+    } else if (options.originLabel != null) {
+      originLabel = cityLabel(options.originLabel, options.originFallback || "Sede");
+    }
+
+    if (names.length <= 1 && !originLabel) {
+      trechosList.innerHTML = "";
+      setMode("single");
+      return section;
+    }
+    // Com origem, um único destino ainda é modo single no rail (cópia estática),
+    // alinhado ao editor de roteiro: trechos só a partir do 2º destino.
+    if (names.length <= 1) {
+      trechosList.innerHTML = "";
+      setMode("single");
+      return section;
+    }
+
+    var steps = [];
+    var from = originLabel || names[0];
+    var startIndex = originLabel ? 0 : 1;
+    for (var i = startIndex; i < names.length; i += 1) {
+      steps.push({ from: from, to: names[i] });
+      from = names[i];
+    }
+    if (!steps.length) {
+      trechosList.innerHTML = "";
+      setMode("single");
+      return section;
+    }
+
+    var first = steps.shift();
+    trechosList.innerHTML = steps.map(function (step) {
+      return '<li class="route-destinos-trechos__item">' + trechoHtml(step) + "</li>";
+    }).join("");
+    setMode("multi", {
+      firstHtml: first ? trechoHtml(first) : "",
+      restCount: steps.length,
+    });
+    return section;
+  }
+
   function initManagedRows(options) {
     options = options || {};
     var form = options.form || document;
@@ -369,6 +493,19 @@
 
     if (options.managedFlag && form.dataset) {
       form.dataset[options.managedFlag] = "true";
+    }
+
+    function refreshTrechosPreview() {
+      if (!section || !section.querySelector("[data-route-destinos-trechos]")) return;
+      renderTrechosPreview({
+        section: section,
+        listSelector: options.listSelector || "[data-location-list]",
+        rowSelector: options.rowSelector,
+        citySelector: options.citySelector,
+        getOriginLabel: options.getOriginLabel,
+        originLabel: options.originLabel,
+        originFallback: options.originFallback,
+      });
     }
 
     function renameRows() {
@@ -401,6 +538,7 @@
     }
 
     function notifyChange() {
+      refreshTrechosPreview();
       if (typeof options.onChange === "function") {
         options.onChange(list);
       }
@@ -461,6 +599,7 @@
     rows(list, { rowSelector: options.rowSelector }).forEach(bindRow);
     renameRows();
     refreshRows();
+    refreshTrechosPreview();
     initDragDrop(list, {
       rowSelector: options.rowSelector,
       removeSelector: options.removeSelector,
@@ -521,6 +660,7 @@
       bindRow: bindRow,
       refreshRows: refreshRows,
       renameRows: renameRows,
+      refreshTrechosPreview: refreshTrechosPreview,
     };
   }
 
@@ -565,6 +705,7 @@
     nextIndex: nextIndex,
     reindexRows: reindexRows,
     reinitSearchPicker: reinitSearchPicker,
+    renderTrechosPreview: renderTrechosPreview,
     resetSearchPicker: resetSearchPicker,
     rows: rows,
     setSelectOptions: setSelectOptions,
