@@ -964,22 +964,23 @@ export function initRoteirosEditor() {
       if (fromData) return fromData;
       return "Locais na ordem da visita.";
     }
-    function setMode(mode) {
+    function setMode(mode, opts) {
       var single = mode === "single";
-      list.hidden = single;
+      var restCount = opts && opts.restCount ? opts.restCount : 0;
+      list.hidden = single || restCount === 0;
       if (subtitle) {
         if (single) {
           subtitle.textContent = staticSubtitleCopy();
           subtitle.hidden = false;
-        } else {
-          subtitle.hidden = true;
-          subtitle.textContent = "";
+        } else if (opts && opts.firstHtml) {
+          subtitle.innerHTML = opts.firstHtml;
+          subtitle.hidden = false;
         }
       }
       if (!block) return;
       block.classList.toggle("route-destinos-block--single", single);
       block.classList.toggle("route-destinos-block--multi", !single);
-      block.classList.toggle("route-destinos-block--with-trechos", !single);
+      block.classList.toggle("route-destinos-block--with-trechos", !single && restCount > 0);
     }
     var sede = cityLabel(selectedText($("id_origem_cidade")), "Sede");
     var destinos = getDestinos();
@@ -997,6 +998,7 @@ export function initRoteirosEditor() {
       steps.push({ from: from, to: to });
       from = to;
     });
+    var first = steps.shift();
     list.innerHTML = steps.map(function (step) {
       return (
         '<li class="route-destinos-trechos__item">' +
@@ -1004,7 +1006,10 @@ export function initRoteirosEditor() {
         "</li>"
       );
     }).join("");
-    setMode("multi");
+    setMode("multi", {
+      firstHtml: first ? trechoHtml(first) : "",
+      restCount: steps.length
+    });
   }
 
   function updateRetornoCities() {

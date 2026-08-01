@@ -82,7 +82,8 @@ Modo multi:
         >{{ trigger_label|default:"Período da viagem" }}</span>
       </button>
     {% elif range_controls_template %}
-      {% include range_controls_template with panel_id=panel_id only %}
+      {# Herda o contexto do chamador (ex.: estado do roteiro) e o panel_id do with acima. #}
+      {% include range_controls_template %}
     {% else %}
     {% if start_field %}{% with start_default_id=start_field.id_for_label|add:"_display" %}{% with start_id=start_input_id|default:start_default_id start_lbl=start_label|default:start_field.label %}
       <div class="field-grid field-grid--cols-2">

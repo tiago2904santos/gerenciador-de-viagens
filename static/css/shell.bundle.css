@@ -11022,172 +11022,296 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
   }
 }
 
-/* Sede: split 14rem | campos (UF+Cidade lado a lado). */
+/* Sede: card --step1-surface; split 14rem | campos; pickers --step1-panel. Sem hover. */
 :is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-sede-block.cv-form-block--split {
+  [data-travel-document-wizard-roteiro] .route-sede-block.cv-form-block--split,
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .route-sede-block.cv-form-block--split:hover {
   align-items: center;
   background: var(--step1-surface) !important;
   border: 0 !important;
   border-radius: 14px;
   box-shadow: none !important;
   column-gap: 16px;
-  display: grid;
-  grid-template-columns: 14rem minmax(0, 1fr) !important;
+  filter: none !important;
+  grid-template-columns: 14rem minmax(0, 1fr);
   margin: 0;
   padding: 14px;
-  row-gap: 0;
+  transform: none !important;
+  transition: none !important;
 }
 
 :is(html[data-theme="dark"])
   [data-travel-document-wizard-roteiro] .route-sede-block.cv-form-block--split > .cv-form-block__header {
-  align-self: center;
-  grid-column: 1;
   max-width: 14rem;
-  min-width: 0;
-  position: relative;
-  z-index: 1;
+  min-width: 14rem;
+  width: 14rem;
 }
 
 :is(html[data-theme="dark"])
   [data-travel-document-wizard-roteiro] .route-sede-block.cv-form-block--split > .cv-form-block__body {
   align-self: center;
-  grid-column: 2;
   min-width: 0;
-  position: relative;
   width: 100%;
-  z-index: 1;
 }
 
 :is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-sede-block .roteiro-sede-grid {
-  align-items: stretch;
-  display: grid !important;
+  [data-travel-document-wizard-roteiro] .route-sede-block .field-grid.roteiro-sede-grid {
   gap: 10px 12px;
   grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  margin: 0;
-  min-width: 0;
   width: 100%;
 }
 
 :is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-sede-block .roteiro-sede-grid > .field,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-sede-block .roteiro-sede-grid > .app-form-field {
-  min-width: 0;
-  width: 100%;
-}
-
-/* ── Par UF|Cidade: um trilho contínuo (Sede + Destinos) ───────── */
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-location-pair {
-  align-items: stretch;
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, #fff 4.5%, var(--step1-field, var(--color-input-bg))) 0%,
-      var(--step1-field, var(--color-input-bg)) 100%
-    );
-  border: 1px solid color-mix(in srgb, var(--color-border) 42%, transparent);
-  border-radius: 14px;
-  box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 5%, transparent);
-  display: grid;
-  gap: 0 !important;
-  grid-template-columns: minmax(9rem, 0.85fr) minmax(0, 1.15fr) !important;
-  overflow: hidden;
-  padding: 0;
-  width: 100%;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-location-pair > .route-location-pair__cell,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-location-pair > .field {
-  display: grid;
-  gap: 6px;
-  margin: 0;
-  min-width: 0;
-  padding: 10px 14px 12px;
-  position: relative;
-  width: 100%;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-location-pair > .field + .field {
-  border-left: 1px solid color-mix(in srgb, var(--color-border) 48%, transparent);
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-location-pair__cap {
-  color: color-mix(in srgb, var(--color-accent-text) 88%, var(--color-muted));
-  font-size: 0.62rem;
-  font-weight: var(--font-weight-black);
-  letter-spacing: 0.1em;
-  line-height: 1;
-  text-transform: uppercase;
-}
-
-/* Poço único: pickers internos sem segundo fundo. */
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-location-pair :is(
+  [data-travel-document-wizard-roteiro] .route-sede-block .roteiro-sede-grid :is(
     .cv-search-picker__control,
     .cv-search-picker__input,
     .cv-search-picker__control:hover,
+    .cv-search-picker__control:focus,
     .cv-search-picker__control:focus-within,
     .cv-search-picker__input:hover,
     .cv-search-picker__input:focus
   ) {
-  background: transparent !important;
+  background: var(--step1-panel) !important;
+  background-color: var(--step1-panel) !important;
   border-color: transparent !important;
-  border-radius: 0;
   box-shadow: none !important;
-  height: auto !important;
-  max-height: none !important;
-  min-height: 1.65rem !important;
+  transition: none !important;
+}
+
+/* Destinos: mesmo card/split da Sede; rail 14rem | editor. */
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .route-destinos-block.route-destinos-block--split,
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .route-destinos-block.route-destinos-block--split:hover {
+  align-items: start;
+  background: var(--step1-surface) !important;
+  border: 0 !important;
+  border-radius: 14px;
+  box-shadow: none !important;
+  column-gap: 16px;
+  display: grid;
+  filter: none !important;
+  grid-template-columns: 14rem minmax(0, 1fr);
+  margin: 14px 0 0;
+  padding: 14px;
+  row-gap: 0;
+  transform: none !important;
+  transition: none !important;
 }
 
 :is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-location-pair .cv-search-picker__control {
-  padding-inline: 0;
+  [data-travel-document-wizard-roteiro] .route-destinos-block--split > .route-destinos-block__rail {
+  align-self: start;
+  display: grid;
+  gap: 4px;
+  max-width: 14rem;
+  min-width: 14rem;
+  width: 14rem;
 }
 
 :is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-location-pair .cv-search-picker__input {
-  font-size: 0.95rem;
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: 0.01em;
-  line-height: 1.3;
-  padding-block: 0;
+  [data-travel-document-wizard-roteiro] .route-destinos-block--split .route-destinos-block__copy {
+  display: grid;
+  gap: 3px;
+  min-height: 44px;
 }
 
 :is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-location-pair .cv-search-picker__icon {
-  opacity: 0.55;
+  [data-travel-document-wizard-roteiro] .route-destinos-block--split .route-destinos-block__title {
+  color: var(--color-heading);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-black);
+  letter-spacing: 0;
+  line-height: 1.2;
+  margin: 0;
 }
 
 :is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-location-pair .cv-search-picker--has-query .cv-search-picker__icon {
-  opacity: 0.85;
-  filter: none;
+  [data-travel-document-wizard-roteiro] .route-destinos-block--split .route-destinos-block__subtitle,
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .route-destinos-block--split .route-destinos-block__description {
+  color: var(--color-muted);
+  font-size: var(--font-size-xs);
+  line-height: 1.45;
+  margin: 0;
+  text-align: left;
 }
 
 :is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-location-pair:focus-within {
-  border-color: color-mix(in srgb, var(--color-accent) 40%, var(--color-border));
-  box-shadow:
-    inset 0 1px 0 color-mix(in srgb, #fff 5%, transparent),
-    0 0 0 1px color-mix(in srgb, var(--color-accent) 18%, transparent);
+  [data-travel-document-wizard-roteiro] .route-destinos-block--split .route-destinos-trechos {
+  display: grid;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .route-destinos-block--split .route-destinos-trechos[hidden] {
+  display: none !important;
+}
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .route-destinos-block--split .route-destinos-trechos__item {
+  align-items: center;
+  color: var(--color-muted);
+  display: flex;
+  font-size: var(--font-size-xs);
+  line-height: 1.35;
+  min-height: 44px;
+}
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .route-destinos-block--split > .route-destinos-block__body {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  width: 100%;
+}
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .route-destinos-block--split .route-destinos-block__editor,
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .route-destinos-block--split .cv-ordered-field-collection__list {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .route-destinos-block .destination-row,
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .route-destinos-block .destination-row:hover {
+  align-items: center;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  column-gap: 10px;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  min-height: 0;
+  padding: 0 !important;
+  transition: none !important;
+}
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .route-destinos-block .destination-row--single,
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .route-destinos-block .destination-row--single:hover {
+  grid-template-columns: 44px minmax(0, 1fr);
+}
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row__badge.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row__body {
+  min-width: 0;
+  width: 100%;
+}
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .route-destinos-block .roteiro-destino-grid {
+  gap: 10px 12px !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  width: 100%;
+}
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .route-destinos-block .destination-row--single .roteiro-destino-grid {
+  /* Com 1 destino (+ sem ×): cidade preserva largura; UF absorve o encolhimento. */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr) !important;
+}
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .route-destinos-block .route-destinos-add,
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row__remove {
+  align-items: center;
+  border: 0 !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+  display: inline-flex;
+  height: 44px;
+  justify-content: center;
+  line-height: 1;
+  margin: 0 !important;
+  padding: 0 !important;
+  transition: none;
+  width: 44px;
+}
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .route-destinos-block .route-destinos-add {
+  background: color-mix(in srgb, var(--color-success) 14%, var(--step1-panel)) !important;
+  color: var(--color-heading) !important;
+}
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row__remove {
+  background: color-mix(in srgb, var(--color-danger) 12%, var(--step1-panel)) !important;
+  color: var(--color-heading) !important;
+  font-size: 1.25rem;
+}
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row__remove::before {
+  content: none !important;
+  display: none !important;
+}
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .route-destinos-block .roteiro-destino-grid :is(
+    .cv-search-picker__control,
+    .cv-search-picker__input,
+    .cv-search-picker__control:hover,
+    .cv-search-picker__control:focus,
+    .cv-search-picker__control:focus-within,
+    .cv-search-picker__input:hover,
+    .cv-search-picker__input:focus
+  ) {
+  background: var(--step1-panel) !important;
+  background-color: var(--step1-panel) !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  transition: none !important;
+}
+
+@media (max-width: 720px) {
+  :is(html[data-theme="dark"])
+    [data-travel-document-wizard-roteiro] .route-sede-block.cv-form-block--split,
+  :is(html[data-theme="dark"])
+    [data-travel-document-wizard-roteiro] .route-destinos-block.route-destinos-block--split {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 12px;
+  }
+
+  :is(html[data-theme="dark"])
+    [data-travel-document-wizard-roteiro] .route-sede-block.cv-form-block--split > .cv-form-block__header,
+  :is(html[data-theme="dark"])
+    [data-travel-document-wizard-roteiro] .route-destinos-block--split > .route-destinos-block__rail {
+    max-width: none;
+    min-width: 0;
+    width: auto;
+  }
+
+  :is(html[data-theme="dark"])
+    [data-travel-document-wizard-roteiro] .route-sede-block .field-grid.roteiro-sede-grid {
+    grid-template-columns: 1fr !important;
+  }
 }
 
 @media (max-width: 600px) {
   :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .route-location-pair {
-    grid-template-columns: minmax(0, 1fr) !important;
-  }
-
-  :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .route-location-pair > .field + .field {
-    border-left: 0;
-    border-top: 1px solid color-mix(in srgb, var(--color-border) 48%, transparent);
+    [data-travel-document-wizard-roteiro] .route-sede-block .field-grid.roteiro-sede-grid {
+    grid-template-columns: 1fr !important;
   }
 }
 
@@ -11686,208 +11810,11 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
   }
 }
 
-/* Destinos (só wizard roteiro): casca leve + badge em “parada”; o trilho carrega o visual. */
+/* Destinos (wizard roteiro): reforço pós-regras genéricas — 44×44, flush, sem card aninhado. */
 :is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .cv-ordered-field-row.destination-row,
+  [data-travel-document-wizard-roteiro] .route-destinos-block .destination-row,
 :is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .cv-ordered-field-row.destination-row:hover {
-  align-items: center;
-  background: transparent !important;
-  border: 0 !important;
-  border-radius: 0;
-  box-shadow: none !important;
-  column-gap: 12px;
-  display: grid;
-  grid-template-columns: 40px minmax(0, 1fr) 36px;
-  min-height: 0;
-  padding: 0 !important;
-  row-gap: 0;
-  transition: none;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .cv-ordered-field-row.destination-row--single,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .cv-ordered-field-row.destination-row--single:hover {
-  grid-template-columns: 40px minmax(0, 1fr);
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .cv-ordered-field-row__badge {
-  border-radius: 999px;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 12%, transparent);
-  height: 36px;
-  justify-self: center;
-  width: 36px;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .cv-ordered-field-row__fields.route-location-pair {
-  margin: 0;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .cv-ordered-field-row__remove {
-  align-self: center;
-  border: 0 !important;
-  border-radius: 10px;
-  margin: 0 !important;
-  min-width: 36px;
-  width: 36px;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .cv-ordered-field-row__remove:hover::before,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .cv-ordered-field-row__remove:focus-visible::before {
-  color: var(--color-danger, #f07178);
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .cv-ordered-field-row.is-drop-target {
-  box-shadow: none;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .cv-ordered-field-row.is-drop-target .route-location-pair {
-  box-shadow:
-    inset 0 1px 0 color-mix(in srgb, #fff 5%, transparent),
-    0 0 0 2px color-mix(in srgb, var(--color-accent) 45%, transparent);
-}
-
-@media (max-width: 720px) {
-  :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .cv-ordered-field-row.destination-row,
-  :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .cv-ordered-field-row.destination-row:hover,
-  :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .cv-ordered-field-row.destination-row--single,
-  :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .cv-ordered-field-row.destination-row--single:hover {
-    grid-template-columns: 40px minmax(0, 1fr);
-    row-gap: 8px;
-  }
-
-  :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .cv-ordered-field-row__remove {
-    border-top: 0 !important;
-    grid-column: 2;
-    justify-self: end;
-    margin: 0 !important;
-    min-height: 0;
-    width: 36px;
-  }
-}
-
-/* Destinos split (ofício): coluna esquerda = trechos; rows = [+][UF|Cidade][×]. */
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split:hover {
-  align-items: start;
-  background: var(--step1-field, color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%));
-  border: 0;
-  border-radius: 14px;
-  box-shadow: none !important;
-  column-gap: 16px;
-  display: grid;
-  filter: none !important;
-  gap: 12px;
-  grid-template-columns: 14rem minmax(0, 1fr);
-  margin: 0;
-  padding: 14px;
-  row-gap: 0;
-  transform: none !important;
-  transition: none !important;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split > .route-destinos-block__header {
-  align-self: stretch;
-  display: flex;
-  flex-direction: column;
-  max-width: 14rem;
-  min-width: 0;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split .route-destinos-block__copy {
-  display: grid;
-  gap: 3px;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split .route-destinos-block__title {
-  color: var(--color-heading);
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-black);
-  letter-spacing: 0;
-  line-height: 1.2;
-  margin: 0;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-trechos {
-  display: grid;
-  gap: 10px;
-  list-style: none;
-  margin: 8px 0 0;
-  min-width: 0;
-  padding: 0;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-trechos__item {
-  align-items: center;
-  color: var(--color-muted);
-  display: flex;
-  flex-wrap: wrap;
-  font-size: var(--font-size-xs);
-  gap: 4px;
-  line-height: 1.35;
-  min-height: 44px;
-  min-width: 0;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-trechos__from,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-trechos__to {
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-trechos__sep {
-  color: var(--color-muted-strong);
-  flex-shrink: 0;
-  font-weight: var(--font-weight-bold, 700);
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split > .route-destinos-block__body,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split .route-destinos-block__editor {
-  display: block;
-  min-width: 0;
-  width: 100%;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split .cv-ordered-field-collection__list {
-  display: grid;
-  gap: 10px;
-  min-width: 0;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split .cv-ordered-field-row.destination-row,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split .cv-ordered-field-row.destination-row:hover,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split .cv-ordered-field-row.destination-row--single,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split .cv-ordered-field-row.destination-row--single:hover {
+  [data-travel-document-wizard-roteiro] .route-destinos-block .destination-row:hover {
   align-items: center;
   background: transparent !important;
   border: 0 !important;
@@ -11895,185 +11822,65 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
   box-shadow: none !important;
   column-gap: 10px;
   display: grid;
-  grid-template-columns: 36px minmax(0, 1fr) 36px;
-  min-height: 44px;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  min-height: 0;
   padding: 0 !important;
   row-gap: 0;
   transition: none !important;
 }
 
 :is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split .cv-ordered-field-row.destination-row--single,
+  [data-travel-document-wizard-roteiro] .route-destinos-block .destination-row--single,
 :is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split .cv-ordered-field-row.destination-row--single:hover {
-  grid-template-columns: 36px minmax(0, 1fr);
+  [data-travel-document-wizard-roteiro] .route-destinos-block .destination-row--single:hover {
+  grid-template-columns: 44px minmax(0, 1fr);
 }
 
 :is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split .cv-ordered-field-row__badge {
-  display: none !important;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split .route-destinos-add,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split .cv-ordered-field-row__add {
-  align-items: center;
-  align-self: center;
-  background: var(--step1-panel) !important;
-  border: 0 !important;
-  border-radius: 10px;
-  box-shadow: none !important;
-  color: var(--color-muted-strong);
-  cursor: pointer;
-  display: inline-flex;
-  flex-shrink: 0;
-  font: inherit;
-  grid-column: 1;
-  height: 44px;
-  justify-content: center;
-  margin: 0;
-  min-height: 44px;
-  outline: none;
-  padding: 0;
-  transition: none;
-  width: 36px;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split .route-destinos-add:is(:hover, :focus-visible),
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split .cv-ordered-field-row__add:is(:hover, :focus-visible) {
-  background: var(--step1-panel);
-  color: var(--color-heading);
-  outline: none;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split .route-destinos-add__glyph {
-  font-size: 1.25rem;
-  font-weight: 500;
-  line-height: 1;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split .cv-ordered-field-row__body {
-  grid-column: 2;
+  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row__body {
+  grid-column: auto;
   min-width: 0;
   width: 100%;
 }
 
 :is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split .cv-ordered-field-row__fields {
-  gap: 10px 12px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  margin: 0;
-  width: 100%;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split .cv-ordered-field-row__fields .app-form-label {
-  display: none;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split .roteiro-destino-grid :is(
-    .cv-search-picker__control,
-    .cv-search-picker__input,
-    .cv-search-picker__control:hover,
-    .cv-search-picker__control:focus,
-    .cv-search-picker__control:focus-within,
-    .cv-search-picker__input:hover,
-    .cv-search-picker__input:focus
-  ) {
-  background: var(--step1-panel) !important;
-  background-color: var(--step1-panel) !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
-  min-height: 44px;
-  transition: none !important;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split .cv-ordered-field-row__remove {
-  align-items: center;
+  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row__remove {
   align-self: center;
-  appearance: none;
-  background: var(--step1-panel) !important;
   border: 0 !important;
-  border-left: 0 !important;
   border-radius: 10px !important;
-  box-shadow: none !important;
-  color: var(--color-muted-strong) !important;
-  cursor: pointer;
-  display: inline-flex;
-  font-size: 1.25rem;
-  font-weight: 500;
-  grid-column: 3;
+  grid-column: auto;
   height: 44px;
-  justify-content: center;
-  justify-self: stretch;
-  line-height: 1;
   margin: 0 !important;
-  min-width: 36px;
-  opacity: 1;
-  overflow: visible;
-  padding: 0 !important;
-  transform: none;
-  width: 36px;
+  min-width: 44px;
+  width: 44px;
 }
 
 :is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split .cv-ordered-field-row__remove::before {
-  content: none !important;
-  display: none !important;
-  transform: none !important;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split .cv-ordered-field-row__remove-glyph {
-  color: inherit;
-  font-size: 1.25rem;
-  font-weight: 500;
-  line-height: 1;
-  transform: none;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split .cv-ordered-field-row.destination-row--single .cv-ordered-field-row__remove {
-  display: none;
+  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row.is-drop-target {
+  box-shadow: none;
 }
 
 @media (max-width: 720px) {
   :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .route-destinos-block--split,
+    [data-travel-document-wizard-roteiro] .route-destinos-block .destination-row,
   :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .route-destinos-block--split:hover {
-    align-items: stretch;
-    grid-template-columns: minmax(0, 1fr);
-    row-gap: 12px;
+    [data-travel-document-wizard-roteiro] .route-destinos-block .destination-row:hover,
+  :is(html[data-theme="dark"])
+    [data-travel-document-wizard-roteiro] .route-destinos-block .destination-row--single,
+  :is(html[data-theme="dark"])
+    [data-travel-document-wizard-roteiro] .route-destinos-block .destination-row--single:hover {
+    grid-template-columns: 44px minmax(0, 1fr);
+    row-gap: 8px;
   }
 
   :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .route-destinos-block--split > .route-destinos-block__header {
-    max-width: none;
-  }
-
-  :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .route-destinos-block--split .cv-ordered-field-row.destination-row,
-  :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .route-destinos-block--split .cv-ordered-field-row.destination-row:hover,
-  :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .route-destinos-block--split .cv-ordered-field-row.destination-row--single,
-  :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .route-destinos-block--split .cv-ordered-field-row.destination-row--single:hover {
-    grid-template-columns: 36px minmax(0, 1fr);
-  }
-
-  :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .route-destinos-block--split .cv-ordered-field-row__remove {
-    grid-column: 2;
+    [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row__remove {
+    border-top: 0 !important;
+    grid-column: auto;
     justify-self: end;
+    margin: 0 !important;
+    min-height: 0;
+    width: 44px;
   }
 }
 
@@ -12094,13 +11901,44 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
   min-height: 600px;
 }
 
-/* Toolbar do mapa: mesmo poço dos inputs do resumo (.cv-field__control / --step1-field). */
+/* Toolbar do mapa: mesmo painel da seção (--step1-panel) onde vive
+   "Preencher datas". Poço (--step1-field) faria o secondary filled soft
+   (também --step1-surface) sumir no fundo. */
 :is(html[data-theme="dark"])
   [data-travel-document-wizard-roteiro]
   .roteiro-mapa__canvas-head {
-  background: var(--step1-field, var(--color-input-bg));
+  background: var(--step1-panel, var(--color-surface-soft));
   background-image: none;
   border-bottom-color: transparent;
+}
+
+/* Botões do canvas: mesmo secondary filled soft do "Preencher datas"
+   (.cv-form-block__actions .cv-btn--secondary). */
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro]
+  .roteiro-mapa__canvas-head
+  .cv-btn--secondary {
+  background: var(--step1-surface);
+  border: 0;
+  border-radius: 12px;
+  box-shadow: none;
+  color: var(--color-heading);
+  font-weight: var(--font-weight-bold);
+}
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro]
+  .roteiro-mapa__canvas-head
+  .cv-btn--secondary:hover,
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro]
+  .roteiro-mapa__canvas-head
+  .cv-btn--secondary:focus-visible {
+  background: color-mix(in srgb, var(--color-accent) 14%, var(--color-surface-muted));
+  border: 0;
+  box-shadow: none;
+  color: var(--color-accent-text);
+  outline: 0;
 }
 
 @media (max-width: 720px) {
@@ -12130,7 +11968,7 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
   box-shadow: none;
 }
 
-/* Bate-volta (ofício): duas linhas estilo Sede (I / V) com 3 campos cada. */
+/* Bate-volta (ofício): header+toggle no topo; abaixo duas pernas split (Ida / Volta). */
 :is(html[data-theme="dark"])
   [data-travel-document-wizard-roteiro] .oficio-roteiro-bate-volta {
   display: block;
@@ -12146,45 +11984,46 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
 :is(html[data-theme="dark"])
   [data-travel-document-wizard-roteiro] .oficio-roteiro-bate-volta__rows {
   display: grid;
-  gap: 8px;
+  gap: 10px;
   min-width: 0;
 }
 
 :is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .oficio-roteiro-bate-volta__row,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .oficio-roteiro-bate-volta__row:hover {
+  [data-travel-document-wizard-roteiro] .oficio-roteiro-bate-volta__leg.route-bate-volta-leg.cv-form-block--split {
   align-items: center;
-  background: color-mix(in srgb, #fff 3.5%, var(--step1-panel, var(--color-surface-soft)));
-  border: 1px solid color-mix(in srgb, var(--color-border) 40%, transparent);
-  border-radius: 12px;
+  background: var(--step1-surface, var(--color-surface-muted));
+  border: 0;
+  border-radius: 14px;
   box-shadow: none;
-  column-gap: 12px;
-  display: grid;
-  grid-template-columns: minmax(42px, max-content) minmax(0, 1fr);
-  min-height: 78px;
-  padding: 11px 12px;
+  column-gap: 16px;
+  /* Mesma coluna fixa da Sede (14rem) — Ida/Volta não encolhem no texto. */
+  grid-template-columns: 14rem minmax(0, 1fr);
+  margin: 0;
+  padding: 12px 14px;
   row-gap: 0;
-  transition: background-color 140ms ease, border-color 140ms ease;
 }
 
 :is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .oficio-roteiro-bate-volta__row:hover {
-  background: color-mix(in srgb, var(--color-accent) 6%, var(--step1-panel, var(--color-surface-soft)));
-  border-color: color-mix(in srgb, var(--color-border) 70%, transparent);
+  [data-travel-document-wizard-roteiro] .oficio-roteiro-bate-volta__leg.route-bate-volta-leg.cv-form-block--split > .cv-form-block__header {
+  max-width: 14rem;
+  min-width: 14rem;
+  width: 14rem;
 }
 
 :is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .cv-ordered-field-row__label,
+  [data-travel-document-wizard-roteiro] .oficio-roteiro-bate-volta__leg.route-bate-volta-leg.cv-form-block--split > .cv-form-block__body {
+  align-self: center;
+  min-width: 0;
+  width: 100%;
+}
+
 :is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .oficio-roteiro-bate-volta__badge {
-  font-size: 0.58rem;
-  letter-spacing: 0.03em;
-  line-height: 1;
-  min-width: 42px;
-  padding: 0 5px;
-  text-transform: uppercase;
-  width: auto;
+  [data-travel-document-wizard-roteiro] .oficio-roteiro-bate-volta__leg .cv-form-block__title {
+  color: var(--color-heading);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-black);
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 :is(html[data-theme="dark"])
@@ -12211,7 +12050,40 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
   margin: 0;
 }
 
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro] .oficio-roteiro-bate-volta__leg :is(
+    .cv-field__control,
+    .cv-date-picker__control,
+    .cv-date-picker__control .cv-field__control,
+    .cv-field__control:hover,
+    .cv-field__control:focus,
+    .cv-date-picker__control:hover,
+    .cv-date-picker__control:focus-within,
+    .cv-date-picker__control .cv-field__control:hover,
+    .cv-date-picker__control .cv-field__control:focus
+  ) {
+  background: var(--step1-panel) !important;
+  background-color: var(--step1-panel) !important;
+  border-color: transparent !important;
+  border-radius: 10px;
+  box-shadow: none !important;
+  transition: none !important;
+}
+
 @media (max-width: 720px) {
+  :is(html[data-theme="dark"])
+    [data-travel-document-wizard-roteiro] .oficio-roteiro-bate-volta__leg.route-bate-volta-leg.cv-form-block--split {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 10px;
+  }
+
+  :is(html[data-theme="dark"])
+    [data-travel-document-wizard-roteiro] .oficio-roteiro-bate-volta__leg.route-bate-volta-leg.cv-form-block--split > .cv-form-block__header {
+    max-width: none;
+    min-width: 0;
+    width: auto;
+  }
+
   :is(html[data-theme="dark"])
     [data-travel-document-wizard-roteiro] .oficio-roteiro-bate-volta__fields {
     grid-template-columns: 1fr;
@@ -12421,43 +12293,115 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
   color: var(--color-text) !important;
 }
 
+/* Toggle bate-volta (ofício): pill compacta — controle real, não texto dourado. */
 :is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .oficio-roteiro-bate-volta-toggle .cv-field-side-action--success,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .oficio-roteiro-bate-volta-toggle .cv-field-side-action--success:hover {
-  background: color-mix(in srgb, var(--color-accent) 14%, var(--color-input-bg));
-  border-color: var(--color-accent-border-soft);
-  box-shadow: none;
-  color: var(--color-accent-text);
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .oficio-roteiro-bate-volta-toggle .cv-field-side-action--danger,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .oficio-roteiro-bate-volta-toggle .cv-field-side-action--danger:hover {
-  background: var(--color-input-bg);
-  border-color: var(--color-border);
-  box-shadow: none;
-  color: var(--color-muted-strong);
+  [data-travel-document-wizard-roteiro]
+  .oficio-roteiro-bate-volta-toggle
+  .cv-field-side-action--toggle {
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  box-shadow: none !important;
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 0.8125rem;
+  font-weight: var(--font-weight-bold, 700);
+  gap: 8px;
+  height: 38px;
+  justify-content: center;
+  letter-spacing: 0;
+  line-height: 1.2;
+  min-height: 38px;
+  min-width: 11.5rem;
+  padding: 0 14px;
+  text-transform: none;
+  transform: none !important;
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease;
+  white-space: nowrap;
 }
 
 :is(html[data-theme="dark"])
   [data-travel-document-wizard-roteiro]
   .oficio-roteiro-bate-volta-toggle
-  .cv-field-side-action--state.cv-field-side-action--success::before {
-  background: var(--color-accent);
-  box-shadow: none;
+  .cv-field-side-action--toggle:is(:hover, :focus, :focus-visible, :active) {
+  box-shadow: none !important;
+  filter: none;
+  transform: none !important;
 }
 
 :is(html[data-theme="dark"])
   [data-travel-document-wizard-roteiro]
   .oficio-roteiro-bate-volta-toggle
-  .cv-field-side-action--state.cv-field-side-action--danger::before {
-  background: var(--color-muted);
-  box-shadow: none;
+  .cv-field-side-action--toggle:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
+  outline-offset: 2px;
 }
 
-/* Bate-volta fechado: centraliza o header na altura do painel.
+/* OFF — painel muted */
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro]
+  .oficio-roteiro-bate-volta-toggle
+  .cv-field-side-action--toggle:is(.cv-field-side-action--danger, .is-inactive),
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro]
+  .oficio-roteiro-bate-volta-toggle
+  .cv-field-side-action--toggle:is(.cv-field-side-action--danger, .is-inactive):is(:hover, :focus, :focus-visible) {
+  background: var(--step1-panel, var(--color-surface-soft)) !important;
+  border-color: color-mix(in srgb, var(--color-border) 55%, transparent) !important;
+  color: var(--color-muted-strong) !important;
+}
+
+/* ON — success soft filled (evita texto/fill dourado do accent) */
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro]
+  .oficio-roteiro-bate-volta-toggle
+  .cv-field-side-action--toggle:is(.cv-field-side-action--success, .is-active, [aria-pressed="true"]),
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro]
+  .oficio-roteiro-bate-volta-toggle
+  .cv-field-side-action--toggle:is(.cv-field-side-action--success, .is-active, [aria-pressed="true"]):is(:hover, :focus, :focus-visible) {
+  background: color-mix(in srgb, var(--color-success) 22%, var(--step1-panel, var(--color-surface-soft))) !important;
+  border-color: var(--color-success-border-soft, color-mix(in srgb, var(--color-success) 40%, transparent)) !important;
+  color: var(--color-heading) !important;
+}
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro]
+  .oficio-roteiro-bate-volta-toggle
+  .cv-field-side-action--toggle:is(.cv-field-side-action--danger, .is-inactive):is(:hover, :focus-visible) {
+  background: color-mix(in srgb, #fff 4%, var(--step1-panel, var(--color-surface-soft))) !important;
+  border-color: color-mix(in srgb, var(--color-border) 70%, transparent) !important;
+}
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro]
+  .oficio-roteiro-bate-volta-toggle
+  .cv-field-side-action--state::before {
+  border-radius: 999px;
+  box-shadow: none !important;
+  flex: 0 0 auto;
+  height: 7px;
+  width: 7px;
+}
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro]
+  .oficio-roteiro-bate-volta-toggle
+  .cv-field-side-action--state:is(.cv-field-side-action--success, .is-active)::before {
+  background: var(--color-success) !important;
+}
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-roteiro]
+  .oficio-roteiro-bate-volta-toggle
+  .cv-field-side-action--state:is(.cv-field-side-action--danger, .is-inactive)::before {
+  background: var(--color-muted) !important;
+}
+
+/* Bate-volta fechado: uma coluna, header em flex (título + toggle).
    O body continua no DOM (só #bate-volta-body fica [hidden]); sem isso o
    gap 12px do bloco soma padding inferior e empurra o conteúdo pra cima. */
 :is(html[data-theme="dark"])
@@ -12465,6 +12409,7 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
   .roteiro-editor__section--bate-volta.route-section-block:has(#bate-volta-body[hidden]) {
   align-content: center;
   gap: 0;
+  grid-template-columns: minmax(0, 1fr);
 }
 
 :is(html[data-theme="dark"])
@@ -12479,8 +12424,11 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
   .roteiro-editor__section--bate-volta.route-section-block:has(#bate-volta-body[hidden])
   > .cv-form-block__header {
   align-items: center;
+  display: flex;
   justify-content: space-between;
+  max-width: none;
   text-align: left;
+  width: 100%;
 }
 
 :is(html[data-theme="dark"])
@@ -12513,13 +12461,9 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
   background: var(--color-surface-soft);
   border: 0;
   border-radius: 14px;
+  grid-template-columns: minmax(0, 1fr);
   margin: 0;
   padding: 14px;
-}
-
-:is(html[data-theme="dark"])
-  .cv-form-block:not(.cv-form-block--split) {
-  grid-template-columns: minmax(0, 1fr);
 }
 
 :is(html[data-theme="dark"])
@@ -13520,41 +13464,98 @@ html[data-theme="dark"] .cv-form-card .cv-search-picker__control:hover {
   display: none;
 }
 
+/* Voltar: fundo --step1-panel (#223348 / --color-surface-soft)
+   (escopo: só footer do form-card — não altera .cv-btn--secondary global). */
 :is(html[data-theme="dark"])
   .cv-form-card__footer
-  .cv-card-footer__primary .cv-btn {
-  background: #123a5a;
+  .cv-card-footer__secondary
+  .cv-btn,
+:is(html[data-theme="dark"])
+  .cv-form-card__footer
+  .cv-card-footer__secondary
+  .cv-btn--secondary {
+  background: var(--step1-panel, var(--color-surface-soft));
   background-image: none;
-  border: 1px solid rgba(214, 227, 244, 0.34);
+  border: 0;
   border-radius: 12px;
-  box-shadow: 0 6px 16px rgba(2, 10, 18, 0.28);
-  color: var(--color-text);
-  min-height: var(--control-height-md);
+  box-shadow: none;
+  color: var(--color-heading);
+  font-weight: var(--font-weight-bold);
+  min-height: var(--control-height-md, 44px);
   padding: 0 18px;
   transform: none;
 }
 
 :is(html[data-theme="dark"])
   .cv-form-card__footer
-  .cv-card-footer__primary .cv-btn .cv-btn__icon {
+  .cv-card-footer__secondary
+  .cv-btn:hover,
+:is(html[data-theme="dark"])
+  .cv-form-card__footer
+  .cv-card-footer__secondary
+  .cv-btn--secondary:hover,
+:is(html[data-theme="dark"])
+  .cv-form-card__footer
+  .cv-card-footer__secondary
+  .cv-btn--secondary:focus-visible {
+  background: color-mix(in srgb, var(--color-accent) 14%, var(--color-surface-muted));
+  background-image: none;
+  border: 0;
+  box-shadow: none;
   color: var(--color-accent-text);
+  outline: 0;
+  transform: none;
+}
+
+:is(html[data-theme="dark"])
+  .cv-form-card__footer
+  .cv-card-footer__secondary
+  .cv-btn
+  .cv-btn__icon {
+  color: inherit;
+}
+
+/* Avançar: primary dourado (accent) — hierarquia acima do Voltar soft. */
+:is(html[data-theme="dark"])
+  .cv-form-card__footer
+  .cv-card-footer__primary .cv-btn {
+  background: var(--color-accent);
+  background-image: none;
+  border: 0;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-accent) 28%, transparent);
+  color: var(--color-on-accent, #19232d);
+  font-weight: var(--font-weight-bold);
+  min-height: var(--control-height-md, 44px);
+  padding: 0 18px;
+  text-shadow: none;
+  transform: none;
+}
+
+:is(html[data-theme="dark"])
+  .cv-form-card__footer
+  .cv-card-footer__primary .cv-btn .cv-btn__icon {
+  color: inherit;
 }
 
 :is(html[data-theme="dark"])
   .cv-form-card__footer
   .cv-card-footer__primary .cv-btn:hover {
-  background: #16486e;
+  background: var(--color-accent-hover);
   background-image: none;
-  border-color: rgba(224, 171, 60, 0.55);
-  box-shadow: 0 6px 16px rgba(2, 10, 18, 0.28);
+  border: 0;
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--color-accent) 36%, transparent);
+  color: var(--color-on-accent, #19232d);
   transform: none;
 }
 
 :is(html[data-theme="dark"])
   .cv-form-card__footer
   .cv-card-footer__primary .cv-btn:focus-visible {
-  border-color: var(--color-accent-border-soft);
-  box-shadow: 0 6px 16px rgba(2, 10, 18, 0.28);
+  border: 0;
+  box-shadow:
+    0 4px 14px color-mix(in srgb, var(--color-accent) 28%, transparent),
+    0 0 0 3px color-mix(in srgb, var(--color-accent) 32%, transparent);
   outline: none;
 }
 
@@ -13655,6 +13656,63 @@ html[data-theme="dark"] :is(.cv-date-picker__panel, .cv-popover) {
   border: 1px solid var(--color-border-strong);
   color: var(--color-text);
   box-shadow: var(--shadow-elevated);
+}
+
+/* Date-picker footer: Limpar/Desfazer/Hoje = secondary soft (--step1-panel);
+   Aplicar = accent primary — mesma linguagem do Voltar/Avançar do wizard. */
+html[data-theme="dark"] .cv-date-picker__footer .cv-date-picker__footer-action {
+  background: var(--step1-panel, var(--color-surface-soft));
+  background-image: none;
+  border: 0;
+  border-radius: 10px;
+  box-shadow: none;
+  color: var(--color-heading, var(--theme-text-heading));
+  font-weight: var(--font-weight-bold);
+  min-height: var(--control-height-sm, 34px);
+  padding: 0 14px;
+  transform: none;
+}
+
+html[data-theme="dark"] .cv-date-picker__footer .cv-date-picker__footer-action:hover,
+html[data-theme="dark"] .cv-date-picker__footer .cv-date-picker__footer-action:focus-visible {
+  background: color-mix(in srgb, var(--color-accent) 14%, var(--color-surface-muted));
+  background-image: none;
+  border: 0;
+  box-shadow: none;
+  color: var(--color-accent-text, var(--color-accent));
+  outline: 0;
+  transform: none;
+}
+
+html[data-theme="dark"] .cv-date-picker__footer .cv-btn.cv-btn--primary {
+  background: var(--color-accent);
+  background-image: none;
+  border: 0;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px color-mix(in srgb, var(--color-accent) 28%, transparent);
+  color: var(--color-on-accent, var(--color-primary-dark));
+  font-weight: var(--font-weight-bold);
+  min-height: var(--control-height-sm, 34px);
+  padding: 0 14px;
+  text-shadow: none;
+  transform: none;
+}
+
+html[data-theme="dark"] .cv-date-picker__footer .cv-btn.cv-btn--primary:hover {
+  background: var(--color-accent-hover, var(--color-accent));
+  background-image: none;
+  border: 0;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-accent) 36%, transparent);
+  color: var(--color-on-accent, var(--color-primary-dark));
+  transform: none;
+}
+
+html[data-theme="dark"] .cv-date-picker__footer .cv-btn.cv-btn--primary:focus-visible {
+  border: 0;
+  box-shadow:
+    0 3px 10px color-mix(in srgb, var(--color-accent) 28%, transparent),
+    0 0 0 3px color-mix(in srgb, var(--color-accent) 32%, transparent);
+  outline: none;
 }
 
 html[data-theme="dark"] :is(.cv-custom-select__option:hover, .cv-custom-select__option--focused, .cv-search-picker__option:hover, .cv-search-picker__option--active) {
@@ -15878,968 +15936,6 @@ html[data-theme="dark"] *::after {
   box-shadow: none !important;
   color: var(--color-text);
   opacity: 1;
-}
-
-
-/* ===== Destinos split (ofício wizard) — badge→+, trechos, alinhamento × ===== */
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block.cv-ordered-field-collection,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block.cv-ordered-field-collection:hover {
-  background: var(--step1-surface) !important;
-  border: 0 !important;
-  border-radius: 14px;
-  box-shadow: none !important;
-  gap: 12px;
-  padding: 14px;
-  transition: none !important;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split.cv-ordered-field-collection,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split.cv-ordered-field-collection:hover {
-  align-items: start;
-  column-gap: 16px;
-  display: grid;
-  grid-template-columns: 14rem minmax(0, 1fr);
-  row-gap: 0;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split .route-destinos-block__header {
-  align-self: stretch;
-  display: flex;
-  flex-direction: column;
-  max-width: 14rem;
-  min-width: 0;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split .route-destinos-block__title {
-  color: var(--color-heading);
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-black);
-  line-height: 1.2;
-  margin: 0;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-trechos {
-  display: grid;
-  gap: 6px;
-  list-style: none;
-  margin: 8px 0 0;
-  min-width: 0;
-  padding: 0;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-trechos__item {
-  align-items: baseline;
-  color: var(--color-muted);
-  display: flex;
-  flex-wrap: wrap;
-  font-size: var(--font-size-xs);
-  gap: 4px;
-  line-height: 1.35;
-  min-width: 0;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-trechos__from,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-trechos__to {
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-trechos__sep {
-  color: var(--color-muted-strong);
-  flex-shrink: 0;
-  font-weight: var(--font-weight-bold, 700);
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split > .route-destinos-block__body,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split .route-destinos-block__editor,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split .cv-ordered-field-collection__list {
-  display: grid;
-  gap: 10px;
-  min-width: 0;
-  width: 100%;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row.destination-row,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row.destination-row:hover {
-  align-items: center;
-  background: transparent !important;
-  border: 0 !important;
-  border-radius: 0;
-  box-shadow: none !important;
-  column-gap: 10px;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 36px;
-  min-height: 0;
-  padding: 0 !important;
-  row-gap: 0;
-  transition: none !important;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row.destination-row--single,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row.destination-row--single:hover {
-  grid-template-columns: minmax(0, 1fr);
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row.destination-row--with-add,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row.destination-row--with-add:hover {
-  grid-template-columns: 36px minmax(0, 1fr) 36px;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row.destination-row--with-add.destination-row--single,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row.destination-row--with-add.destination-row--single:hover {
-  grid-template-columns: 36px minmax(0, 1fr);
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split .cv-ordered-field-row__badge,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .destination-row--with-add .cv-ordered-field-row__badge {
-  display: none !important;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row__body {
-  grid-column: 1;
-  min-width: 0;
-  width: 100%;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .destination-row--with-add .cv-ordered-field-row__body {
-  grid-column: 2;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row__fields {
-  gap: 10px 12px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  margin: 0;
-  width: 100%;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row__fields .app-form-label {
-  display: none;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .destination-row--with-add .route-destinos-add,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row__add {
-  align-items: center;
-  align-self: center;
-  background: var(--step1-panel) !important;
-  border: 0 !important;
-  border-radius: 10px;
-  box-shadow: none !important;
-  color: var(--color-muted-strong);
-  cursor: pointer;
-  display: inline-flex;
-  flex-shrink: 0;
-  font: inherit;
-  grid-column: 1;
-  height: 44px;
-  justify-content: center;
-  margin: 0;
-  min-height: 44px;
-  outline: none;
-  padding: 0;
-  width: 36px;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .destination-row--with-add .route-destinos-add:is(:hover, :focus-visible),
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row__add:is(:hover, :focus-visible) {
-  color: var(--color-heading);
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .route-destinos-add__glyph {
-  font-size: 1.25rem;
-  font-weight: 500;
-  line-height: 1;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row__remove {
-  align-items: center;
-  align-self: center;
-  appearance: none;
-  background: var(--step1-panel) !important;
-  border: 0 !important;
-  border-left: 0 !important;
-  border-radius: 10px !important;
-  box-shadow: none !important;
-  color: var(--color-muted-strong) !important;
-  cursor: pointer;
-  display: inline-flex;
-  font-size: 1.25rem;
-  font-weight: 500;
-  grid-column: 2;
-  height: 44px;
-  justify-content: center;
-  justify-self: end;
-  line-height: 1;
-  margin: 0 !important;
-  min-width: 36px;
-  opacity: 1;
-  overflow: visible;
-  padding: 0 !important;
-  transform: none;
-  width: 36px;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .destination-row--with-add .cv-ordered-field-row__remove {
-  grid-column: 3;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row__remove::before {
-  content: none !important;
-  display: none !important;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row__remove-glyph {
-  color: inherit;
-  font-size: 1.25rem;
-  font-weight: 500;
-  line-height: 1;
-  transform: none;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row.destination-row--single .cv-ordered-field-row__remove {
-  display: none;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .roteiro-destino-grid :is(
-    .cv-search-picker__control,
-    .cv-search-picker__input,
-    .cv-search-picker__control:hover,
-    .cv-search-picker__control:focus,
-    .cv-search-picker__control:focus-within,
-    .cv-search-picker__input:hover,
-    .cv-search-picker__input:focus
-  ) {
-  background: var(--step1-panel) !important;
-  background-color: var(--step1-panel) !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
-  transition: none !important;
-}
-
-@media (max-width: 720px) {
-  :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .route-destinos-block--split.cv-ordered-field-collection,
-  :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .route-destinos-block--split.cv-ordered-field-collection:hover {
-    grid-template-columns: minmax(0, 1fr);
-    row-gap: 12px;
-  }
-
-  :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .route-destinos-block--split .route-destinos-block__header {
-    max-width: none;
-  }
-
-  :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row.destination-row--with-add,
-  :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row.destination-row--with-add:hover {
-    grid-template-columns: 36px minmax(0, 1fr);
-  }
-
-  :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row__remove {
-    grid-column: 1 / -1;
-    justify-self: end;
-  }
-}
-
-
-/* ===== Destinos/Sede polish: trechos align, square actions, no picker hover ===== */
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split.cv-ordered-field-collection,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split.cv-ordered-field-collection:hover {
-  align-items: center;
-  column-gap: 16px;
-  display: grid;
-  grid-template-columns: 14rem minmax(0, 1fr);
-  row-gap: 0;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split > .route-destinos-block__title {
-  align-self: center;
-  color: var(--color-heading);
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-black);
-  grid-column: 1;
-  grid-row: 1;
-  letter-spacing: 0;
-  line-height: 1.2;
-  margin: 0;
-  max-width: 14rem;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split > .route-destinos-trechos[hidden] {
-  display: none !important;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split > .route-destinos-block__body {
-  display: block;
-  grid-column: 2;
-  grid-row: 1;
-  min-width: 0;
-  width: 100%;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split.route-destinos-block--with-trechos,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split.route-destinos-block--with-trechos:hover {
-  align-items: start;
-  grid-template-rows: auto;
-  row-gap: 0;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--with-trechos > .route-destinos-block__title {
-  /* superseded by Destinos rail rules */
-  grid-column: unset;
-  max-width: none;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--with-trechos > .route-destinos-trechos {
-  align-content: start;
-  display: grid;
-  gap: 10px;
-  grid-column: 1;
-  grid-row: 2;
-  list-style: none;
-  margin: 0;
-  min-width: 0;
-  padding: 0;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--with-trechos > .route-destinos-block__body {
-  grid-column: 2;
-  grid-row: 1;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--with-trechos .route-destinos-trechos__item {
-  align-items: center;
-  color: var(--color-muted);
-  display: flex;
-  flex-wrap: wrap;
-  font-size: var(--font-size-xs);
-  gap: 4px;
-  line-height: 1.35;
-  min-height: 44px;
-  min-width: 0;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--with-trechos .route-destinos-trechos__from,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--with-trechos .route-destinos-trechos__to {
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--with-trechos .route-destinos-trechos__sep {
-  color: var(--color-muted-strong);
-  flex-shrink: 0;
-  font-weight: var(--font-weight-bold, 700);
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split .cv-ordered-field-collection__list {
-  display: grid;
-  gap: 10px;
-  min-width: 0;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row.destination-row,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row.destination-row:hover,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row.destination-row--with-add,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row.destination-row--with-add:hover {
-  align-items: center;
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
-  column-gap: 10px;
-  display: grid;
-  grid-template-columns: 44px minmax(0, 1fr) 44px;
-  min-height: 44px;
-  padding: 0 !important;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row.destination-row--single,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row.destination-row--single:hover,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row.destination-row--with-add.destination-row--single,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row.destination-row--with-add.destination-row--single:hover {
-  grid-template-columns: 44px minmax(0, 1fr);
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .destination-row--with-add .route-destinos-add,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .route-destinos-add,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row__add {
-  align-items: center;
-  align-self: center;
-  background: color-mix(in srgb, var(--color-success) 16%, var(--step1-panel)) !important;
-  border: 1px solid color-mix(in srgb, var(--color-success) 28%, transparent) !important;
-  border-radius: 10px;
-  box-shadow: none !important;
-  color: color-mix(in srgb, var(--color-success) 72%, #fff) !important;
-  cursor: pointer;
-  display: inline-flex;
-  flex-shrink: 0;
-  font: inherit;
-  grid-column: 1;
-  height: 44px;
-  justify-content: center;
-  margin: 0;
-  min-height: 44px;
-  min-width: 44px;
-  outline: none;
-  padding: 0;
-  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
-  width: 44px;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .destination-row--with-add .route-destinos-add:is(:hover, :focus-visible),
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .route-destinos-add:is(:hover, :focus-visible),
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row__add:is(:hover, :focus-visible) {
-  background: color-mix(in srgb, var(--color-success) 24%, var(--step1-panel)) !important;
-  border-color: color-mix(in srgb, var(--color-success) 40%, transparent) !important;
-  color: color-mix(in srgb, var(--color-success) 85%, #fff) !important;
-  outline: none;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .route-destinos-add__glyph {
-  color: inherit;
-  font-size: 1.35rem;
-  font-weight: 600;
-  line-height: 1;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row__remove,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .destination-remove-button {
-  align-items: center;
-  align-self: center;
-  appearance: none;
-  background: color-mix(in srgb, var(--color-danger) 12%, var(--step1-panel)) !important;
-  border: 1px solid color-mix(in srgb, var(--color-danger) 22%, transparent) !important;
-  border-radius: 10px !important;
-  box-shadow: none !important;
-  color: color-mix(in srgb, var(--color-danger) 68%, #fff) !important;
-  cursor: pointer;
-  display: inline-flex;
-  font-size: 1.35rem;
-  font-weight: 600;
-  grid-column: 3;
-  height: 44px;
-  justify-content: center;
-  line-height: 1;
-  margin: 0 !important;
-  min-height: 44px;
-  min-width: 44px;
-  outline: none;
-  padding: 0 !important;
-  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
-  width: 44px;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row__remove:is(:hover, :focus-visible),
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .destination-remove-button:is(:hover, :focus-visible) {
-  background: color-mix(in srgb, var(--color-danger) 20%, var(--step1-panel)) !important;
-  border-color: color-mix(in srgb, var(--color-danger) 36%, transparent) !important;
-  color: color-mix(in srgb, var(--color-danger) 82%, #fff) !important;
-  outline: none;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row__remove-glyph {
-  color: inherit;
-  font-size: 1.35rem;
-  font-weight: 600;
-  line-height: 1;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row.destination-row--single .cv-ordered-field-row__remove {
-  display: none;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .destination-row--with-add .cv-ordered-field-row__body,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split .cv-ordered-field-row__body {
-  grid-column: 2;
-  min-width: 0;
-}
-
-/* Kill picker hover/focus visual shift — beat wizard :is() max-specificity */
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro]
-  .route-destinos-block
-  .roteiro-destino-grid
-  :is(
-    input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
-    .cv-search-picker__input,
-    .cv-search-picker__control
-  ),
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro]
-  .route-destinos-block
-  .roteiro-destino-grid
-  :is(
-    input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
-    .cv-search-picker__input,
-    .cv-search-picker__control
-  ):is(:hover, :focus, :focus-within, :focus-visible),
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro]
-  .route-sede-block
-  .roteiro-sede-grid
-  :is(
-    input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
-    .cv-search-picker__input,
-    .cv-search-picker__control
-  ),
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro]
-  .route-sede-block
-  .roteiro-sede-grid
-  :is(
-    input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
-    .cv-search-picker__input,
-    .cv-search-picker__control
-  ):is(:hover, :focus, :focus-within, :focus-visible) {
-  background: var(--step1-panel) !important;
-  background-color: var(--step1-panel) !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
-  filter: none !important;
-  transform: none !important;
-  transition: none !important;
-}
-
-html[data-theme="dark"] .cv-form-card .route-destinos-block .cv-search-picker__control:hover,
-html[data-theme="dark"] .cv-form-card .route-sede-block .cv-search-picker__control:hover {
-  background: var(--step1-panel) !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
-}
-
-@media (max-width: 720px) {
-  :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .route-destinos-block--split.cv-ordered-field-collection,
-  :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .route-destinos-block--split.cv-ordered-field-collection:hover,
-  :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .route-destinos-block--with-trechos {
-    grid-template-columns: minmax(0, 1fr);
-    row-gap: 12px;
-  }
-
-  :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .route-destinos-block--split > .route-destinos-block__title,
-  :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .route-destinos-block--with-trechos > .route-destinos-trechos,
-  :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .route-destinos-block--split > .route-destinos-block__body,
-  :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .route-destinos-block--with-trechos > .route-destinos-block__body {
-    grid-column: 1;
-    grid-row: auto;
-    max-width: none;
-  }
-
-  :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row.destination-row--with-add,
-  :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row.destination-row--with-add:hover {
-    grid-template-columns: 44px minmax(0, 1fr);
-  }
-
-  :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row__remove {
-    grid-column: 1 / -1;
-    justify-self: end;
-  }
-}
-
-/* ===== URGENTE Sede restore ===== */
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-sede-block.cv-form-block--split,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-sede-block.cv-form-block--split:hover {
-  align-items: center;
-  background: var(--step1-surface) !important;
-  border: 0 !important;
-  border-radius: 14px;
-  box-shadow: none !important;
-  column-gap: 16px;
-  display: grid !important;
-  grid-template-columns: 14rem minmax(0, 1fr) !important;
-  margin: 0;
-  padding: 14px;
-  row-gap: 0;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-sede-block.cv-form-block--split > .cv-form-block__header {
-  align-self: center;
-  display: grid;
-  gap: 3px;
-  grid-column: 1;
-  justify-content: start;
-  max-width: 14rem;
-  min-width: 0;
-  position: static;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-sede-block.cv-form-block--split > .cv-form-block__body {
-  align-self: center;
-  grid-column: 2;
-  min-width: 0;
-  position: static;
-  width: 100%;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-sede-block .roteiro-sede-grid {
-  display: grid !important;
-  gap: 10px 12px;
-  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  width: 100%;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro]
-  .route-sede-block
-  .roteiro-sede-grid
-  :is(
-    input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
-    .cv-search-picker__input,
-    .cv-search-picker__control
-  ),
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro]
-  .route-sede-block
-  .roteiro-sede-grid
-  :is(
-    input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
-    .cv-search-picker__input,
-    .cv-search-picker__control
-  ):is(:hover, :focus, :focus-within, :focus-visible) {
-  background: var(--step1-panel) !important;
-  background-color: var(--step1-panel) !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
-  filter: none !important;
-  transform: none !important;
-  transition: none !important;
-}
-
-@media (max-width: 720px) {
-  :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .route-sede-block.cv-form-block--split {
-    grid-template-columns: minmax(0, 1fr) !important;
-    row-gap: 12px;
-  }
-
-  :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .route-sede-block.cv-form-block--split > .cv-form-block__header,
-  :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .route-sede-block.cv-form-block--split > .cv-form-block__body {
-    grid-column: 1;
-    max-width: none;
-  }
-
-  :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .route-sede-block .roteiro-sede-grid {
-    grid-template-columns: minmax(0, 1fr) !important;
-  }
-}
-
-
-/* ===== Destinos rail: título + 1º trecho empilhados; faixa alinhada à Sede ===== */
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split.cv-ordered-field-collection,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split.cv-ordered-field-collection:hover,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split.route-destinos-block--with-trechos,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split.route-destinos-block--with-trechos:hover {
-  align-items: start;
-  column-gap: 16px;
-  display: grid !important;
-  grid-template-columns: 14rem minmax(0, 1fr) !important;
-  grid-template-rows: auto !important;
-  row-gap: 0 !important;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split > .route-destinos-block__rail {
-  align-self: start;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  grid-column: 1;
-  grid-row: 1;
-  max-width: 14rem;
-  min-width: 0;
-  width: 100%;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split .route-destinos-block__copy {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  justify-content: center;
-  min-height: 44px;
-  min-width: 0;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split .route-destinos-block__title {
-  color: var(--color-heading);
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-black);
-  letter-spacing: 0;
-  line-height: 1.2;
-  margin: 0;
-  max-width: none;
-  white-space: nowrap;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split .route-destinos-block__subtitle {
-  align-items: center;
-  color: var(--color-muted);
-  display: flex;
-  flex-wrap: wrap;
-  font-size: var(--font-size-xs);
-  gap: 4px;
-  line-height: 1.35;
-  margin: 0;
-  min-width: 0;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split .route-destinos-block__subtitle[hidden] {
-  display: none !important;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split .route-destinos-block__subtitle .route-destinos-trechos__sep {
-  color: var(--color-muted-strong);
-  flex-shrink: 0;
-  font-weight: var(--font-weight-bold, 700);
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split .route-destinos-trechos[hidden] {
-  display: none !important;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split > .route-destinos-block__body {
-  display: block;
-  grid-column: 2;
-  grid-row: 1;
-  min-width: 0;
-  width: 100%;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--with-trechos .route-destinos-trechos {
-  align-content: start;
-  display: grid !important;
-  gap: 10px;
-  list-style: none;
-  margin: 0;
-  min-width: 0;
-  padding: 0;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--with-trechos .route-destinos-trechos__item {
-  align-items: center;
-  color: var(--color-muted);
-  display: flex;
-  flex-wrap: wrap;
-  font-size: var(--font-size-xs);
-  gap: 4px;
-  line-height: 1.35;
-  min-height: 44px;
-  min-width: 0;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--with-trechos .route-destinos-trechos__from,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--with-trechos .route-destinos-trechos__to {
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--with-trechos .route-destinos-trechos__sep {
-  color: var(--color-muted-strong);
-  flex-shrink: 0;
-  font-weight: var(--font-weight-bold, 700);
-}
-
-@media (max-width: 720px) {
-  :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .route-destinos-block--split.cv-ordered-field-collection,
-  :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .route-destinos-block--split.route-destinos-block--with-trechos {
-    grid-template-columns: minmax(0, 1fr) !important;
-    row-gap: 12px !important;
-  }
-
-  :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .route-destinos-block--split > .route-destinos-block__rail,
-  :is(html[data-theme="dark"])
-    [data-travel-document-wizard-roteiro] .route-destinos-block--split > .route-destinos-block__body {
-    grid-column: 1;
-    max-width: none;
-  }
-}
-
-
-/* ===== Gap Sede↔Destinos + faixa [+][UF][Cidade][×] = largura Sede [UF][Cidade] ===== */
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] #panel-roteiro-novo {
-  display: grid;
-  gap: 14px;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block.route-destinos-block--split {
-  margin-top: 0;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row.destination-row--with-add,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row.destination-row--with-add:hover {
-  column-gap: 10px;
-  grid-template-columns: 44px minmax(0, 1fr) 44px;
-  margin-inline: 0 !important;
-  width: 100% !important;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row.destination-row--with-add.destination-row--single,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .cv-ordered-field-row.destination-row--with-add.destination-row--single:hover {
-  grid-template-columns: 44px minmax(0, 1fr);
-  margin-inline: 0 !important;
-  width: 100% !important;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .destination-row--with-add .cv-ordered-field-row__body,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--split .cv-ordered-field-row__body {
-  grid-column: 2;
-  min-width: 0;
-  width: 100%;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .roteiro-destino-grid {
-  display: grid !important;
-  gap: 10px 12px;
-  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  margin: 0;
-  width: 100%;
-}
-
-/* Single: + (44+10) encolhe só a UF; cidade ≈ metade da faixa Sede */
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .destination-row--single .roteiro-destino-grid,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block .destination-row--with-add.destination-row--single .roteiro-destino-grid {
-  grid-template-columns: minmax(0, 1fr) calc(50% + 27px) !important;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--single .route-destinos-block__copy {
-  min-height: 44px;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--multi .route-destinos-block__copy {
-  min-height: 0;
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--multi .route-destinos-block__subtitle,
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-destinos-block--multi .route-destinos-block__subtitle[hidden] {
-  display: none !important;
 }
 /* <<< css/components/theme-dark-components.css <<< */
 

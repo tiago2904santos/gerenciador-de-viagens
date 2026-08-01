@@ -1,8 +1,8 @@
 <div id="bate-volta-body" {% if not roteiro_editor_state_json.bate_volta_diario.ativo %}hidden{% endif %}>
   {% if roteiro_editor_oficio %}
-  <div id="bate-volta-panel" class="roteiro-editor__bate-volta-grid-v2 oficio-roteiro-bate-volta">
-    {# O componente global mantém raiz, painel e estado; este fluxo fornece apenas o layout dos controles. #}
-    {% include "components/ui/forms/date_picker.html" with mode="range" picker_id="bate-volta-date-picker" extra_class="oficio-roteiro-bate-volta__picker" range_controls_template="roteiros/partials/roteiro/_bate_volta_date_controls.html" start_hidden_id="id_bate_volta_data_inicio_native" end_hidden_id="id_bate_volta_data_fim_native" start_hidden_name="bate_volta_data_inicio" end_hidden_name="bate_volta_data_fim" start_hidden_value=roteiro_editor_state_json.bate_volta_diario.data_inicio end_hidden_value=roteiro_editor_state_json.bate_volta_diario.data_fim initial_date=roteiro_editor_state_json.bate_volta_diario.data_inicio show_summary=False only %}
+  <div id="bate-volta-panel" class="oficio-roteiro-bate-volta">
+    {# Sem `only`: o partial de controles precisa de roteiro_editor_state_json + panel_id. #}
+    {% include "components/ui/forms/date_picker.html" with mode="range" picker_id="bate-volta-date-picker" extra_class="oficio-roteiro-bate-volta__picker" range_controls_template="roteiros/partials/roteiro/_bate_volta_date_controls.html" start_hidden_id="id_bate_volta_data_inicio_native" end_hidden_id="id_bate_volta_data_fim_native" start_hidden_name="bate_volta_data_inicio" end_hidden_name="bate_volta_data_fim" start_hidden_value=roteiro_editor_state_json.bate_volta_diario.data_inicio end_hidden_value=roteiro_editor_state_json.bate_volta_diario.data_fim initial_date=roteiro_editor_state_json.bate_volta_diario.data_inicio show_summary=False %}
   </div>
   {% else %}
   <div id="bate-volta-panel" class="roteiro-editor__bate-volta-grid-v2">
