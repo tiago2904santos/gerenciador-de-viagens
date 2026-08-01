@@ -9,30 +9,6 @@ from .models import ModeloJustificativa
 from .selectors import listar_modelos_justificativa
 
 
-class OficioJustificativaSelectMultiple(forms.SelectMultiple):
-    def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
-        option = super().create_option(name, value, label, selected, index, subindex=subindex, attrs=attrs)
-        oficio = getattr(value, "instance", None)
-        if oficio is None:
-            return option
-
-        numero = f"Oficio {oficio.numero_formatado}"
-        protocolo = oficio.protocolo or ""
-        assunto = oficio.assunto or ""
-        data = oficio.data_criacao.strftime("%d/%m/%Y") if oficio.data_criacao else ""
-        search = " ".join(part for part in [numero, protocolo, assunto, data, str(oficio.pk)] if part)
-        option["label"] = " - ".join(part for part in [numero, protocolo] if part)
-        option["attrs"].update(
-            {
-                "data-main": numero,
-                "data-cargo": " - ".join(part for part in [protocolo, data] if part),
-                "data-meta": assunto,
-                "data-search": search,
-            },
-        )
-        return option
-
-
 class ModeloJustificativaSelect(forms.Select):
     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
         option = super().create_option(name, value, label, selected, index, subindex=subindex, attrs=attrs)
@@ -88,31 +64,25 @@ class JustificativaOficioForm(forms.ModelForm):
 
 class JustificativaQuickAddForm(forms.Form):
     oficios = forms.ModelMultipleChoiceField(
-        label="Oficios",
+        label="Ofícios",
         queryset=Oficio.objects.none(),
         required=True,
-        widget=OficioJustificativaSelectMultiple(
+        widget=forms.SelectMultiple(
             attrs={
-                **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
-                "data-entity-picker": "true",
-                "data-entity-picker-mode": "multi",
-                "data-picker-variant": "detailed",
-                "data-picker-label": "Oficios",
-                "data-panel-title": "OFICIOS DA JUSTIFICATIVA",
-                "data-placeholder": "Buscar por numero, protocolo ou assunto",
-                "data-empty-message": "Nenhum oficio encontrado.",
-                "data-empty-selected": "Nenhum oficio selecionado.",
+                **widget_attrs(WidgetStyle.TERM_OFICIO_SOURCE),
+                "hidden": True,
+                "data-source-document": "justificativas-oficios-summary",
             },
         ),
     )
     modelo = forms.ModelChoiceField(
-        label="Modelo",
+        label="Modelo de justificativa",
         queryset=ModeloJustificativa.objects.none(),
         required=False,
         empty_label="Selecione um modelo (opcional)",
         widget=ModeloJustificativaSelect(
             attrs={
-                **widget_attrs(WidgetStyle.FORM_SELECT_FIELD_CONTROL),
+                **widget_attrs(WidgetStyle.FORM_SELECT),
                 "data-modelo-justificativa-select": "true",
             },
         ),
@@ -123,7 +93,7 @@ class JustificativaQuickAddForm(forms.Form):
         widget=forms.Textarea(
             attrs={
                 **widget_attrs(WidgetStyle.FIELD_CONTROL_TEXTAREA),
-                "rows": 6,
+                "rows": 4,
                 "placeholder": "",
                 "data-justificativa-textarea": "true",
             },

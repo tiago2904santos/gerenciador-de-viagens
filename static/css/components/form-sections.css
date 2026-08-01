@@ -85,8 +85,14 @@
 
 .cv-travel-schedule {
   display: grid;
-  gap: var(--space-3);
+  /* Mesmo espaçamento Sede↔Destinos do ofício (14px). */
+  gap: 14px;
   min-width: 0;
+}
+
+/* O bloco Destinos já traz margin-top no ofício; dentro do schedule o gap cobre. */
+.cv-travel-schedule .route-destinos-block.route-destinos-block--split {
+  margin-top: 0;
 }
 
 .cv-travel-schedule__period-fields {

@@ -274,7 +274,6 @@
         var summary = summaries[String(select.value)] || null;
         return summary && summary.sede ? String(summary.sede).trim() : "";
       },
-      originFallback: "Sede",
     });
   }
 

@@ -1,0 +1,26 @@
+{# Markup idêntico a termos/partials/_oficio_body.html; multi via select[name=oficios]. #}
+<div class="cv-search-picker cv-search-picker--single cv-search-picker--detailed cv-search-picker--people cv-search-picker--roster related-route-picker termo-oficio-picker">
+  <div class="cv-search-picker__field">
+    <div class="cv-search-picker__label">Adicionar ofício</div>
+    <div class="cv-search-picker__control">
+      <span class="cv-search-picker__icon" aria-hidden="true"></span>
+      <input
+        type="search"
+        id="id_oficio_busca"
+        class="cv-search-picker__input"
+        placeholder="Buscar por número, protocolo, destino, sede, viatura ou servidor"
+        autocomplete="off"
+        role="searchbox"
+        aria-label="Buscar ofício vinculado"
+      >
+    </div>
+  </div>
+  {{ form.oficios }}
+  {% if form.oficios.errors %}
+    {% include "components/ui/feedback/field_error.html" with errors=form.oficios.errors only %}
+  {% endif %}
+  <section class="cv-search-picker__selected-panel termo-oficio-summary-panel" aria-label="Ofícios encontrados">
+    <div id="termo-oficio-lista" class="cv-search-picker__selected-list roteiro-editor__route-list related-route-list related-route-list"></div>
+    <p class="cv-search-picker__selected-empty" id="termo-oficio-lista-empty" hidden>Nenhum ofício encontrado para a busca.</p>
+  </section>
+</div>

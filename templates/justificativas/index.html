@@ -4,9 +4,17 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/oficios.css' %}">
+  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}">
+  <link rel="stylesheet" href="{% static 'css/termos.css' %}">
   <link rel="stylesheet" href="{% static 'css/justificativas.css' %}">
 {% endblock %}
 
 {% block content %}
+  {{ oficios_summary|json_script:"justificativas-oficios-summary" }}
   {% include "components/lists/list_page_quick_add.html" with title=page_title description=page_description eyebrow="Justificativas" search_placeholder="Buscar justificativas" empty_message="Nenhuma justificativa cadastrada ainda." rows=rows q=q quick_add_form=quick_add_form quick_add_panel_id="quick-add-justificativa" quick_add_label="Cadastrar justificativa" quick_add_submit_label="Salvar justificativa" quick_add_body_template="justificativas/partials/_quick_add_fields.html" quick_add_compact=True disable_realtime_filter=True hide_realtime_count=True delete_modal_enabled=True delete_modal_title="Excluir justificativa?" delete_modal_entity="esta justificativa" %}
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'js/pages/justificativas-index.js' %}" defer></script>
 {% endblock %}

@@ -72,7 +72,9 @@ class JustificativasQuickAddTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "quick-add-justificativa")
         self.assertContains(response, "Cadastrar justificativa")
-        self.assertContains(response, "OFICIOS DA JUSTIFICATIVA")
+        self.assertContains(response, "Ofício vinculado")
+        self.assertContains(response, "termo-oficio-lista")
+        self.assertContains(response, "Adicionar ofício")
         self.assertContains(response, reverse("justificativas:modelos_index"))
 
     def test_quick_add_cria_justificativa_para_varios_oficios(self):

@@ -430,10 +430,17 @@
     });
 
     var originLabel = "";
+    var rawOrigin = null;
     if (typeof options.getOriginLabel === "function") {
-      originLabel = cityLabel(options.getOriginLabel(), options.originFallback || "Sede");
+      rawOrigin = options.getOriginLabel();
     } else if (options.originLabel != null) {
-      originLabel = cityLabel(options.originLabel, options.originFallback || "Sede");
+      rawOrigin = options.originLabel;
+    }
+    if (rawOrigin != null && String(rawOrigin).trim()) {
+      originLabel = cityLabel(rawOrigin, options.originFallback || "Sede");
+    } else if (options.originFallback) {
+      // Roteiro: sem cidade de sede ainda, mantém o rótulo "Sede" na prévia.
+      originLabel = String(options.originFallback).trim();
     }
 
     if (names.length <= 1 && !originLabel) {

@@ -1,4 +1,5 @@
 import json
+import re
 from urllib.parse import urlencode
 
 from core.presenters.badges import build_badge
@@ -89,6 +90,91 @@ def apresentar_linha_lista_simples_justificativa(
         "delete_modal": delete_modal,
         "pdf_url": pdf_url or reverse("oficios:baixar_justificativa_documento", args=[oficio.pk, "pdf"]),
         "docx_url": docx_url or reverse("oficios:baixar_justificativa_documento", args=[oficio.pk, "docx"]),
+    }
+
+
+def _roteiro_destino_label(item):
+    if not item:
+        return ""
+    if item.cidade_id:
+        return str(item.cidade)
+    if item.estado_id:
+        return str(item.estado)
+    return str(item)
+
+
+def _digits(value):
+    return re.sub(r"\D", "", str(value or ""))
+
+
+def apresentar_oficio_picker_summary(oficio):
+    """Resumo para a lista de Ofício vinculado (mesmo contrato visual dos termos)."""
+    roteiro = oficio.roteiro
+    destino = ""
+    roteiro_label = ""
+    periodo = ""
+    sede = ""
+    if roteiro:
+        sede_obj = roteiro.origem_cidade or roteiro.origem_estado
+        sede = str(sede_obj) if sede_obj else ""
+        destinos = list(roteiro.destinos.all())
+        destinos.sort(key=lambda d: (d.ordem or 0, d.pk))
+        destino_obj = destinos[0] if destinos else None
+        destino = _roteiro_destino_label(destino_obj)
+        destinos_label = ", ".join(_roteiro_destino_label(item) for item in destinos if item)
+        roteiro_label = " -> ".join(part for part in [sede, destinos_label or destino] if part)
+        if roteiro.saida_dt:
+            inicio = roteiro.saida_dt.strftime("%d/%m/%Y")
+            retorno = roteiro.retorno_chegada_dt or roteiro.retorno_saida_dt
+            fim = retorno.strftime("%d/%m/%Y") if retorno else inicio
+            periodo = inicio if fim == inicio else f"{inicio} a {fim}"
+
+    servidores_termo = list(oficio.servidores_termo_autorizacao.all())
+    servidores_oficio = list(oficio.servidores.all())
+    servidores_nomes = []
+    seen = set()
+    for servidor in servidores_termo + servidores_oficio:
+        if servidor.pk in seen:
+            continue
+        seen.add(servidor.pk)
+        servidores_nomes.append(servidor.nome)
+
+    viatura = str(oficio.viatura) if oficio.viatura_id else ""
+    viatura_modelo = getattr(oficio.viatura, "modelo", "") if oficio.viatura_id else ""
+
+    return {
+        "id": oficio.pk,
+        "label": f"Oficio {oficio.numero_formatado}",
+        "numero": oficio.numero_formatado,
+        "protocolo": oficio.protocolo or "",
+        "sede": sede,
+        "destino": destino,
+        "roteiro": roteiro_label,
+        "periodo": periodo,
+        "servidores_nomes": servidores_nomes,
+        "servidores_label": ", ".join(servidores_nomes),
+        "viatura": viatura,
+        "viatura_modelo": viatura_modelo,
+        "search_text": " ".join(
+            part
+            for part in [
+                oficio.numero_formatado,
+                str(oficio.numero or ""),
+                str(oficio.ano or ""),
+                _digits(oficio.numero_formatado),
+                oficio.protocolo or "",
+                _digits(oficio.protocolo),
+                sede,
+                destino,
+                roteiro_label,
+                periodo,
+                viatura,
+                viatura_modelo,
+                " ".join(servidores_nomes),
+                oficio.assunto or "",
+            ]
+            if part
+        ),
     }
 
 

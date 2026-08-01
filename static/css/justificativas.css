@@ -7,6 +7,37 @@
   gap: var(--space-3);
 }
 
+.justificativa-oficio-picker {
+  display: grid;
+  gap: var(--space-3);
+}
+
+/* Lista do Ofício vinculado: mesma do termo, só um pouco mais baixa. */
+:is(html[data-theme="dark"])
+  [data-justificativa-quick-add]
+  :is(
+    .termo-oficio-summary-panel .cv-search-picker__selected-list,
+    .termo-oficio-summary-panel .related-route-list,
+    #termo-oficio-lista
+  ) {
+  max-height: 160px !important;
+}
+
+[data-justificativa-quick-add] .justificativa-quick-add__card {
+  margin: 0;
+}
+
+[data-justificativa-quick-add] .oficio-motivo-field .cv-field__control--textarea,
+[data-justificativa-quick-add] .oficio-motivo-field textarea {
+  min-height: 6.5rem;
+  width: 100%;
+}
+
+[data-justificativa-quick-add] .oficio-reveal-panel {
+  opacity: 1;
+  transform: none;
+}
+
 .justificativa-quick-add.is-open {
   max-height: 1400px;
 }

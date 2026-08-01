@@ -981,17 +981,48 @@
 
 :is(.roteiro-editor--oficio, [data-travel-document-wizard-step1]) .travel-period-block--split :is(
   .cv-date-picker__control,
+  .cv-date-picker__control .cv-field__control,
+  .cv-date-picker__control > input.cv-field__control,
   .cv-field__control,
+  input.cv-field__control,
+  input.cv-field__control[readonly],
   .cv-date-picker__control:hover,
-  .cv-field__control:hover,
   .cv-date-picker__control:focus-within,
-  .cv-field__control:focus
+  .cv-field__control:hover,
+  .cv-field__control:focus,
+  .cv-date-picker__control .cv-field__control:hover,
+  .cv-date-picker__control .cv-field__control:focus
 ) {
-  background: var(--step1-panel, var(--color-card)) !important;
-  background-color: var(--step1-panel, var(--color-card)) !important;
+  background: var(--step1-panel, var(--color-surface-soft, var(--color-card))) !important;
+  background-color: var(--step1-panel, var(--color-surface-soft, var(--color-card))) !important;
   border-color: transparent !important;
+  border-radius: 10px !important;
   box-shadow: none !important;
   transition: none !important;
+}
+
+/* Calendário do período: mesmo filled soft de "Novo viajante". */
+:is(.roteiro-editor--oficio, [data-travel-document-wizard-step1])
+  .travel-period-block--split
+  :is(
+    .cv-date-picker__control:hover .cv-date-picker__trigger--icon,
+    .cv-date-picker__control:focus-within .cv-date-picker__trigger--icon,
+    .cv-date-picker--open .cv-date-picker__trigger--icon
+  ) {
+  background: var(--step1-surface, var(--color-surface-muted)) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  color: var(--color-heading, inherit) !important;
+}
+
+:is(.roteiro-editor--oficio, [data-travel-document-wizard-step1])
+  .travel-period-block--split
+  .cv-date-picker__trigger--icon:is(:hover, :focus-visible) {
+  background: color-mix(in srgb, var(--color-accent) 14%, var(--color-surface-muted)) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  color: var(--color-accent-text, var(--color-accent)) !important;
+  outline: 0;
 }
 
 :is(.roteiro-editor--oficio, [data-travel-document-wizard-step1]) .travel-period-block--split + .route-destinos-block--split,
@@ -1017,6 +1048,13 @@
   row-gap: 0;
   transform: none !important;
   transition: none !important;
+}
+
+/* No schedule do termo o gap do container já é o espaçamento Sede↔Destinos. */
+:is(.roteiro-editor--oficio, [data-travel-document-wizard-step1])
+  .cv-travel-schedule
+  .route-destinos-block.route-destinos-block--split {
+  margin-top: 0;
 }
 
 :is(.roteiro-editor--oficio, [data-travel-document-wizard-step1]) .route-destinos-block--split > .route-destinos-block__rail {

@@ -1,19 +1,12 @@
-<div class="justificativa-quick-add">
-  <div class="field-grid">
-    <div class="field-size-4">
-      {% include "components/ui/forms/field.html" with field=form.oficios only %}
-    </div>
-  </div>
-  <div class="field-grid">
-    <div class="field-size-4">
-      {% url 'justificativas:modelos_index' as modelos_url %}
-      {% url 'justificativas:index' as justificativas_index_url %}
-      {% include "components/ui/forms/field.html" with field=form.modelo action_url=modelos_url|add:"?next="|add:justificativas_index_url action_label="Gerenciar modelos" only %}
-    </div>
-  </div>
-  <div class="field-grid">
-    <div class="field-size-4">
-      {% include "components/ui/forms/field.html" with field=form.texto label="Justificativa" only %}
-    </div>
+<div class="justificativa-quick-add" data-justificativa-quick-add>
+  {# Mesmo shell do cadastro de termo: step1 + travel-document-card (tokens e painéis). #}
+  <div data-travel-document-wizard-step1>
+    <section class="cv-form-section-card cv-form-card travel-document-card justificativa-quick-add__card" aria-label="Cadastro de justificativa">
+      <div class="cv-form-section-body travel-document-body">
+        {% include "components/ui/forms/form_block.html" with element_id="justificativa-block-oficio" section_id="justificativa-oficio-title" extra_class="travel-document-block document-form-block" title="Ofício vinculado" description="Selecione um ou mais ofícios para receber a justificativa." body_extra_class="termo-block__body" body_template="justificativas/partials/_oficio_picker.html" heading_level=3 %}
+
+        {% include "components/ui/forms/form_block.html" with element_id="justificativa-block-finalidade" section_id="justificativa-finalidade-title" extra_class="travel-document-block document-form-block" title="Finalidade" description="Modelo e texto da justificativa" body_extra_class="cv-form-stack" body_template="justificativas/partials/_finalidade_fields.html" heading_level=3 %}
+      </div>
+    </section>
   </div>
 </div>

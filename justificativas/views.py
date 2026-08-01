@@ -9,6 +9,7 @@ from django.urls import reverse
 from django.views.decorators.http import require_POST
 
 from core.normalizers import remove_accents
+from oficios.models import Oficio
 
 from .catalogs import modelo_definir_padrao  # noqa: F401  (re-export para urls.py)
 from .catalogs import modelo_editar  # noqa: F401
@@ -16,6 +17,7 @@ from .catalogs import modelo_excluir  # noqa: F401
 from .catalogs import modelos_index  # noqa: F401
 from .forms import JustificativaQuickAddForm
 from .presenters import apresentar_linha_lista_simples_justificativa
+from .presenters import apresentar_oficio_picker_summary
 from .selectors import get_justificativa_by_id
 from .selectors import listar_justificativas
 from .services import criar_justificativas_quick_add
@@ -23,6 +25,29 @@ from .services import excluir_justificativa
 
 
 JUSTIFICATIVAS_PER_PAGE = 15
+
+
+def _oficios_summary_for_quick_add():
+    oficios = (
+        Oficio.objects.select_related(
+            "roteiro__origem_cidade",
+            "roteiro__origem_estado",
+            "viatura",
+        )
+        .prefetch_related(
+            "roteiro__destinos__cidade",
+            "roteiro__destinos__estado",
+            "servidores",
+            "servidores_termo_autorizacao",
+        )
+        .order_by("-data_criacao", "-created_at")
+    )
+    summaries = {}
+    for index, oficio in enumerate(oficios):
+        summary = apresentar_oficio_picker_summary(oficio)
+        summary["order"] = index
+        summaries[str(summary["id"])] = summary
+    return summaries
 
 
 def _pagination_pages(page_obj, *, on_each_side=1, on_ends=1):
@@ -72,6 +97,7 @@ def index(request):
             "page_title": "Justificativas",
             "page_description": "Crie justificativas livres vinculadas a um ou mais oficios.",
             "quick_add_form": form,
+            "oficios_summary": _oficios_summary_for_quick_add(),
             "q": q,
             "rows": rows,
             "modelos_url": reverse("justificativas:modelos_index"),

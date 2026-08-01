@@ -29,7 +29,7 @@ Slots opcionais:
     </div>
     <div class="travel-period-block__body">
       <div class="cv-travel-schedule__period-fields{% if period_fields_extra_class %} {{ period_fields_extra_class }}{% endif %}">
-        {% include "components/ui/forms/date_picker.html" with mode="range" picker_id=picker_id extra_class=picker_extra_class start_field=start_field end_field=end_field start_label=start_label|default:"Data inicial" end_label=end_label|default:"Data final" start_input_id=start_input_id end_input_id=end_input_id start_hidden_id=start_hidden_id end_hidden_id=end_hidden_id start_hidden_name=start_hidden_name end_hidden_name=end_hidden_name start_hidden_value=start_hidden_value end_hidden_value=end_hidden_value initial_date=initial_date show_summary=False only %}
+        {% include "components/ui/forms/date_picker.html" with mode="range" picker_id=picker_id extra_class=picker_extra_class start_field=start_field end_field=end_field start_label=start_label|default:"Data inicial" end_label=end_label|default:"Data final" start_placeholder=start_placeholder|default:"dd/mm/aaaa" end_placeholder=end_placeholder|default:"dd/mm/aaaa" start_input_id=start_input_id end_input_id=end_input_id start_hidden_id=start_hidden_id end_hidden_id=end_hidden_id start_hidden_name=start_hidden_name end_hidden_name=end_hidden_name start_hidden_value=start_hidden_value end_hidden_value=end_hidden_value initial_date=initial_date show_summary=False hide_labels=True only %}
         {% if period_extra_template %}
           {% include period_extra_template %}
         {% endif %}
