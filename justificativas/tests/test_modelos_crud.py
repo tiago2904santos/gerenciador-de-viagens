@@ -74,7 +74,7 @@ class JustificativasQuickAddTests(TestCase):
         self.assertContains(response, "Cadastrar justificativa")
         self.assertContains(response, "Ofício vinculado")
         self.assertContains(response, "termo-oficio-lista")
-        self.assertContains(response, "Adicionar ofício")
+        self.assertContains(response, "Buscar ofício vinculado")
         self.assertContains(response, reverse("justificativas:modelos_index"))
 
     def test_oficios_summary_ordena_pelo_ultimo_criado(self):

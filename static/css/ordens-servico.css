@@ -1,6 +1,7 @@
 /* Ordens de Serviço — seletor de modelo e campos condicionais */
 .os-oficio-picker #os-oficio-lista {
   contain: paint;
+  margin-top: 8px;
   overflow-x: hidden !important;
   overflow-y: auto !important;
   overscroll-behavior: contain;

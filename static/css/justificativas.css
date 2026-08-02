@@ -126,6 +126,7 @@
   .related-route-picker.termo-oficio-picker
   :is(.cv-search-picker__selected-list, #termo-oficio-lista) {
   gap: 8px !important;
+  margin-top: 8px;
 }
 
 [data-justificativa-quick-add] .oficio-motivo-field .cv-field__control--textarea,

@@ -3124,7 +3124,7 @@ html[data-theme="light"] .cv-segment-toggle {
 }
 
 .evento-doc-panel {
-  margin-top: var(--space-4);
+  margin-top: 8px;
 }
 
 /* forms.css declara --form-control-height só em `.main-form-panel .field`, e o
@@ -3134,10 +3134,27 @@ html[data-theme="light"] .cv-segment-toggle {
    Mesmo remédio já usado em .related-route-picker (dark-redesign.css). */
 .evento-doc-source-picker {
   --form-control-height: var(--control-height-md, 44px);
+  /* gap:0 — o select oculto no meio do grid dobraria qualquer gap. */
+  gap: 0 !important;
+}
+
+.evento-doc-source-picker .cv-search-picker__field {
+  gap: 7px;
 }
 
 .evento-doc-summary-panel {
-  margin-top: var(--space-3);
+  margin-top: 0;
+}
+
+.evento-doc-source-picker .cv-search-picker__selected-panel {
+  gap: 8px;
+}
+
+/* .roteiro-editor__route-list traz space-3 (12px); aqui 8px entre busca e lista. */
+.evento-doc-source-picker .cv-search-picker__selected-list,
+.evento-doc-source-picker .roteiro-editor__route-list {
+  gap: 8px;
+  margin-top: 8px;
 }
 
 /* O roster genérico (dark-redesign.css) força overflow:visible na lista de

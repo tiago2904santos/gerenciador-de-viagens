@@ -34,9 +34,23 @@
   function initAddDestinoD() {
     var card = document.getElementById('evento-card-dados-d');
     var form = card ? card.closest('form') : null;
-    if (!form) return;
-    window.CV.locationRows.initManagedRows({
+    if (!form) return false;
+    if (!window.CV || !window.CV.locationRows || typeof window.CV.locationRows.initManagedRows !== 'function') {
+      return false;
+    }
+    var section = form.querySelector('#evento-wizard-destinos-d');
+    var list = section ? section.querySelector('[data-location-list]') : null;
+    var template = form.querySelector('#tmpl-destino-extra-d') || form.querySelector('template[data-location-template]');
+    if (!section || !list || !template) return false;
+
+    // Impede o listener delegado interno e trata o "+" neste módulo —
+    // o clique no botão da linha precisa funcionar mesmo com o picker por cima.
+    section.dataset.locationAddBound = 'true';
+    var managed = window.CV.locationRows.initManagedRows({
       form: form,
+      section: section,
+      list: list,
+      template: template,
       renameFields: false,
       getOriginLabel: function () {
         return String(form.getAttribute('data-sede-label') || '').trim();
@@ -48,8 +62,55 @@
         if (badge) badge.textContent = String(index + 1);
       },
     });
+
+    if (form.dataset.eventoDestinosAddBound !== 'true') {
+      form.dataset.eventoDestinosAddBound = 'true';
+      form.addEventListener('click', function (event) {
+        var button = event.target.closest('#evento-wizard-destinos-d [data-location-add]');
+        if (!button || !form.contains(button)) return;
+        event.preventDefault();
+        var sourceRow = button.closest('[data-location-row]');
+        var referenceState = sourceRow ? sourceRow.querySelector('[data-location-state]') : null;
+        var referenceStateId = referenceState
+          ? String(referenceState.value || referenceState.dataset.pickerInitialValue || '').trim()
+          : '';
+        window.CV.locationRows.appendTemplateRow({
+          list: list,
+          template: template,
+          rowSelector: '[data-location-row]',
+          removeSelector: '[data-location-remove]',
+          indexAttr: 'locationIndex',
+          insertAfter: sourceRow || null,
+          beforeAppend: function (row) {
+            if (!row || !referenceStateId) return;
+            var stateSelect = row.querySelector('[data-location-state]');
+            if (stateSelect) {
+              stateSelect.value = referenceStateId;
+              stateSelect.dataset.pickerInitialValue = referenceStateId;
+            }
+          },
+          bindRow: function (row) {
+            if (managed && typeof managed.bindRow === 'function') managed.bindRow(row);
+            if (managed && typeof managed.renameRows === 'function') managed.renameRows();
+          },
+          afterAppend: function () {
+            if (managed) {
+              if (typeof managed.renameRows === 'function') managed.renameRows();
+              if (typeof managed.refreshRows === 'function') managed.refreshRows();
+              if (typeof managed.refreshTrechosPreview === 'function') managed.refreshTrechosPreview();
+            }
+            if (typeof window.CV.locationRows.initSearchPickers === 'function') {
+              window.CV.locationRows.initSearchPickers(list);
+            }
+            serializeDestinosD(form);
+          },
+        });
+      });
+    }
+
     form.addEventListener('submit', function () { serializeDestinosD(form); });
     serializeDestinosD(form);
+    return true;
   }
 
   /* ── Documentos vinculados: toggle segmentado + lista com pré-filtro de datas ── */
@@ -287,8 +348,9 @@
     if (scope.matches && scope.matches('[data-evento-guided-form]')) forms.unshift(scope);
     forms.forEach(function (form) {
       if (form.dataset.eventoGuidedBound === 'true') return;
+      // Só marca bound depois que locationRows estiver disponível (shell.bundle).
+      if (!initAddDestinoD()) return;
       form.dataset.eventoGuidedBound = 'true';
-      initAddDestinoD();
     });
     initDocPickersD(scope);
   }

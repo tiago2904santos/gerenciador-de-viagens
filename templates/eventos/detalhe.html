@@ -12,6 +12,12 @@
 
 {% block flow_shell_extra %} evento-guided-page{% endblock %}
 
+{% block extra_js %}
+  {# Depois do shell.bundle — destinos/cidade dependem de CV.locationRows. #}
+  <script src="{% static 'js/pages/oficios-dados-viajantes.js' %}" defer></script>
+  <script src="{% static 'js/pages/eventos-detalhe.js' %}" defer></script>
+{% endblock %}
+
 {% block flow_header %}
   {% include "components/ui/headers/wizard_page_header.html" with eyebrow="EVENTOS" title=page_title status_label=flow_status_label status_variant=flow_status_variant steps=evento_page_steps stepper_aria_label="Etapas do evento" back_label=flow_back_label back_url=flow_back_url only %}
 {% endblock %}
@@ -47,9 +53,6 @@
       {% endwith %}
 
     </form>
-
-    <script src="{% static 'js/pages/oficios-dados-viajantes.js' %}" defer></script>
-    <script src="{% static 'js/pages/eventos-detalhe.js' %}" defer></script>
   {% endif %}
 
   {% if etapa_atual == 2 %}

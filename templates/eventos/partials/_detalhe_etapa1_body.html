@@ -1,8 +1,11 @@
-{# ── 1. Identificação (split só no tipo; modelo/motivo largura total) ── #}
-{% include "components/ui/forms/form_block.html" with element_id="evento-card-identificacao-d" aria_label="Identificação" extra_class="travel-document-block document-form-block evento-identificacao-block" body_extra_class="cv-form-stack" body_template="eventos/partials/_detalhe_identificacao_full.html" %}
+{# ── 1. Identificação (só tipo, layout split) ───────── #}
+{% include "components/ui/forms/form_block.html" with element_id="evento-card-identificacao-d" section_id="evento-wizard-tipo-title-d" heading_level=3 variant="split" extra_class="travel-document-block document-form-block evento-identificacao-block evento-identificacao-split" title="Identificação" description="Escolha o tipo desta atividade." body_extra_class="termo-block__body" body_template="eventos/partials/_detalhe_identificacao_body.html" %}
 
-{# ── 2. Evento (período + destinos — mesmo bloco do termo) ── #}
+{# ── 2. Motivo (modelo + texto, largura total) ──────── #}
+{% include "components/ui/forms/form_block.html" with element_id="evento-card-motivo-d" section_id="evento-card-motivo-title-d" extra_class="travel-document-block document-form-block" title="Motivo" description="Contextualize a atividade com um modelo ou texto livre." body_extra_class="cv-form-stack" body_template="eventos/partials/_detalhe_identificacao_motivo_fields.html" %}
+
+{# ── 3. Evento (período + destinos — mesmo bloco do termo) ── #}
 {% include "components/ui/forms/form_block.html" with element_id="evento-card-dados-d" section_id="evento-card-dados-title-d" extra_class="travel-document-block document-form-block" title="Evento" description="Destino e período — obrigatórios quando não vierem do ofício." body_extra_class="cv-form-stack termo-evento-body" body_template="eventos/partials/_detalhe_dados_body.html" %}
 
-{# ── 3. Documentos vinculados ─────────────────────── #}
+{# ── 4. Documentos vinculados ─────────────────────── #}
 {% include "components/ui/forms/form_block.html" with element_id="evento-card-documentos-d" section_id="evento-card-documentos-title-d" extra_class="travel-document-block document-form-block" title="Documentos vinculados" description="Reaproveite documentos existentes. Marque para vincular e desmarque para remover o vínculo." body_extra_class="termo-block__body" body_template="eventos/partials/_detalhe_documentos_body.html" %}

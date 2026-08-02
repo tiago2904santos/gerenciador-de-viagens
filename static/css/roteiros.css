@@ -571,6 +571,20 @@
   overflow: auto;
 }
 
+/* Picker de roteiro salvo (ofício): mesmo ritmo do picker de Documentos vinculados. */
+.related-route-picker.cv-search-picker--people.cv-search-picker--roster {
+  gap: 0 !important;
+}
+
+.related-route-picker .cv-search-picker__field {
+  gap: 7px;
+}
+
+.related-route-picker .cv-search-picker__selected-list.roteiro-editor__route-list {
+  gap: 8px;
+  margin-top: 8px;
+}
+
 .roteiro-routes-panel__header {
   padding-right: var(--space-4);
 }

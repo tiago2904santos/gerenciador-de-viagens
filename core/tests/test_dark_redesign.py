@@ -393,9 +393,18 @@ class DarkRedesignContractTests(SimpleTestCase):
             / "_detalhe_etapa1_body.html"
         ).read_text(encoding="utf-8")
         self.assertIn("Identificação", etapa1_body)
+        self.assertIn("Motivo", etapa1_body)
         self.assertIn("Evento", etapa1_body)
         self.assertIn("Destino e período", etapa1_body)
         self.assertIn("Documentos vinculados", etapa1_body)
+        # Scripts de página depois do shell.bundle (extra_js), senão
+        # CV.locationRows ainda não existe e destinos/cidade quebram.
+        self.assertIn("{% block extra_js %}", template)
+        self.assertIn("eventos-detalhe.js", template)
+        self.assertLess(
+            template.index("{% block extra_js %}"),
+            template.index("eventos-detalhe.js"),
+        )
         documentos_body = (
             Path(settings.BASE_DIR)
             / "templates"

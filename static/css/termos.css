@@ -18,11 +18,13 @@
   gap: 0;
 }
 
-/* Mesmo ritmo do Quick Add de justificativas: label 7px, bloco sem gap extra, cards 8px. */
+/* Mesmo ritmo do picker de Documentos vinculados (Eventos):
+   busca e lista próximas (8px), sem gap do grid (select oculto no meio). */
 :is(html[data-theme="dark"])
   [data-travel-document-wizard-step1]
   .related-route-picker.termo-oficio-picker.cv-search-picker--people.cv-search-picker--roster,
-.document-form-page .related-route-picker.termo-oficio-picker.cv-search-picker--people.cv-search-picker--roster {
+.document-form-page .related-route-picker.termo-oficio-picker.cv-search-picker--people.cv-search-picker--roster,
+.termo-oficio-picker.cv-search-picker--people.cv-search-picker--roster {
   gap: 0 !important;
 }
 
@@ -39,9 +41,13 @@
   border: 0;
   border-radius: 0;
   box-shadow: none;
+  margin-top: 0;
   padding: 0;
 }
 
+/* .roteiro-editor__route-list traz space-3; aqui 8px entre busca e cards. */
+.termo-oficio-picker .cv-search-picker__selected-list,
+.termo-oficio-picker .roteiro-editor__route-list,
 .termo-oficio-summary-panel .cv-search-picker__selected-list,
 .termo-oficio-summary-panel .related-route-list,
 :is(html[data-theme="dark"])
@@ -50,6 +56,7 @@
   :is(.cv-search-picker__selected-list, #termo-oficio-lista, #os-oficio-lista) {
   display: grid;
   gap: 8px !important;
+  margin-top: 8px;
   max-height: 280px;
   overflow: auto;
 }
