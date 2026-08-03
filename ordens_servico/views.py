@@ -16,6 +16,9 @@ from django.views.decorators.http import require_GET
 from django.views.decorators.http import require_http_methods
 
 from core.pagination import contexto_paginacao
+from cadastros.models import Cidade
+from cadastros.models import Estado
+from cadastros.services import resolver_sede_ids_desde_configuracao
 from documentos.services.async_generation import enfileirar_documento
 from documentos.services.types import DocumentoFormato
 from eventos.services import build_evento_document_seed
@@ -35,6 +38,20 @@ ORDENS_POR_PAGINA = 20
 
 def _digits(value):
     return re.sub(r"\D", "", str(value or ""))
+
+
+def _sede_config_label():
+    """Nome da sede das Configurações — origem fixa da prévia de Destinos."""
+    estado_id, cidade_id, _aviso = resolver_sede_ids_desde_configuracao()
+    if cidade_id:
+        cidade = Cidade.objects.filter(pk=cidade_id).only("nome").first()
+        if cidade and cidade.nome:
+            return cidade.nome
+    if estado_id:
+        estado = Estado.objects.filter(pk=estado_id).only("sigla", "nome").first()
+        if estado:
+            return estado.sigla or estado.nome
+    return ""
 
 
 def _roteiro_destino_label(item):
@@ -383,6 +400,7 @@ def _form_context(*, request, form, ordem=None, evento=None):
         "os_oficios_summary": summaries,
         "os_funcoes_servidores": getattr(form.instance, "funcoes_servidores", None) or {},
         "os_is_completa": _ordem_is_completa(form, evento_display),
+        "sede_config_label": _sede_config_label(),
     }
 
 

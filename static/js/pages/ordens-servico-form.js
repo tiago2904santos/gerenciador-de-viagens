@@ -145,6 +145,10 @@
     window.CV.locationRows.initManagedRows({
       form: form,
       managedFlag: "osDestinosManaged",
+      getOriginLabel: function () {
+        return String(form.getAttribute("data-sede-label") || "").trim();
+      },
+      originFallback: "Sede",
       afterCitiesLoaded: function () { updateSubmitButtonLabel(form); },
       onChange: function () { updateSubmitButtonLabel(form); },
     });

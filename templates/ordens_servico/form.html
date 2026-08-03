@@ -5,7 +5,7 @@
   <link rel="stylesheet" href="{% static 'css/oficios.css' %}">
   <link rel="stylesheet" href="{% static 'css/roteiros.css' %}">
   <link rel="stylesheet" href="{% static 'css/termos.css' %}">
-  <link rel="stylesheet" href="{% static 'css/ordens-servico.css' %}">
+  <link rel="stylesheet" href="{% static 'css/ordens-servico.css' %}?v=20260803-os3">
 {% endblock %}
 
 {% block flow_shell_modifier %}page-shell--standard cv-page--form{% endblock %}
@@ -16,14 +16,14 @@
   {{ os_oficios_summary|json_script:"os-oficios-summary" }}
   {{ os_funcoes_servidores|json_script:"os-servidor-funcoes" }}
 
-  <form method="post" class="document-form travel-document-wizard__form os-form" data-os-form data-api-cidades-url="{{ api_cidades_por_estado_url }}">
+  <form method="post" class="document-form travel-document-wizard__form os-form" data-os-form data-api-cidades-url="{{ api_cidades_por_estado_url }}" data-sede-label="{{ sede_config_label|default:'' }}">
     {% csrf_token %}
 
     {% if form.non_field_errors %}
       {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
     {% endif %}
 
-    <div class="cv-form-section-stack cv-form-section-stack--comfortable" data-os-wizard-form>
+    <div class="cv-form-section-stack cv-form-section-stack--comfortable" data-os-wizard-form data-travel-document-wizard-step1>
       {% include "components/form/card.html" with title="Dados da ordem de serviço" description="Ofícios, evento, equipe e necessidade da OS" title_id="os-form-main-title" extra_class="os-form-card" body_extra_class="os-form-body" body_template="ordens_servico/partials/_os_form_body.html" footer_template="ordens_servico/partials/_motivo_footer.html" footer_id="os-form-footer" %}
     </div>
   </form>

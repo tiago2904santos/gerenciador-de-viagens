@@ -30,7 +30,21 @@
 }
 
 /* Os valores usam as variantes --fit (cqi), que escalam com a largura do próprio
-   bloco. Sem isso, --strong cai em 3.5vw e passa a acompanhar a janela. */
+   bloco. Sem isso, --strong cai em 3.5vw e passa a acompanhar a janela.
+
+   O padrão 13cqi/2.75rem deixa o valor das diárias menor que o "tipo de destino"
+   ao lado (16cqi/3rem), invertendo a hierarquia do bloco. 15cqi é o maior
+   coeficiente que ainda acomoda "R$ 12.500,00" sem corte — o --fit usa
+   text-overflow: clip, e valor cortado em campo de dinheiro é inaceitável. */
+.cv-record-card--roteiro .cv-fact-block__value--strong--fit {
+  font-size: clamp(1.05rem, 15cqi, 3.25rem);
+}
+
+/* "Tipo de destino" é uma categoria curta e herda o tamanho que no card de
+   ofício pertence à placa. Reduzido para o valor das diárias liderar o bloco. */
+.cv-record-card--roteiro .cv-fact-block__value {
+  font-size: clamp(0.95rem, 12cqi, 2.25rem);
+}
 
 .roteiro-list-card {
   background: var(--route-card-bg);

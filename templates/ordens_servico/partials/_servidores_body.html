@@ -1,14 +1,15 @@
 {% include "components/ui/forms/field.html" with field=form.servidores only %}
-<section class="os-servidor-role-panel" data-os-model-fields="CAMINHAO MICROONIBUS CERIMONIAL_ANTECIPADO" data-os-servidor-role-panel hidden>
-  <header class="os-servidor-role-panel__header">
-    <h3 class="os-servidor-role-panel__title">Função no caminhão</h3>
-    <p class="os-servidor-role-panel__hint">Escolha uma função e pesquise os servidores que serão adicionados à equipe.</p>
-  </header>
+<section
+  class="os-servidor-role-panel"
+  data-os-model-fields="CAMINHAO MICROONIBUS CERIMONIAL_ANTECIPADO"
+  data-os-servidor-role-panel
+  hidden
+>
+  {# Mesmo ritmo de Documentos vinculados (eventos): toggle → busca → lista. #}
   <div class="cv-segment-toggle os-servidor-role-panel__toggle" role="group" aria-label="Função dos servidores no caminhão">
     <button type="button" class="cv-segment-toggle__btn" data-os-role-mode="CONDUCAO" aria-pressed="true">Condução</button>
     <button type="button" class="cv-segment-toggle__btn" data-os-role-mode="TECNICO" aria-pressed="false">Técnico</button>
     <button type="button" class="cv-segment-toggle__btn" data-os-role-mode="APOIO" aria-pressed="false">Apoio</button>
   </div>
-  <p class="os-servidor-role-panel__hint">Escolha a função e clique nos cards abaixo para atribuir. Clique de novo para remover.</p>
   <div class="os-servidor-role-panel__picker" data-os-servidor-picker-field-host></div>
 </section>
