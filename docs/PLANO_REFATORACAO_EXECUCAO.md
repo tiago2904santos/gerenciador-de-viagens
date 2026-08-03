@@ -711,6 +711,8 @@ perde o prazo e a Etapa 2 perde a rede.
 | Linha de Cadastros roster (`cv-record-row`) | 1 PR | ✅ D-52 parcial — avatar/subtitle/facts; sem `simple-list-item` |
 | Filtro por cargo na lista de Servidores (top 3) | — | ✅ NOVO-21 — abas na `list-toolbar` |
 | Filtro unidade/combustível na lista de Viaturas | — | ✅ NOVO-22 — unidade da config + top 3 combustíveis |
+| Ação flutuante secundária empilhada | — | ✅ NOVO-23 — modificador `--stacked` era vencido pela base de `cv-buttons.css` |
+| Usuários/Áreas em duas listas (`list_page_standard`) | 1 PR | ✅ NOVO-24 — camadas `selectors`/`presenters`/`services` no app `usuarios`; ORM em view 39 → 36 |
 | [Arquitetura de configurações](PROPOSTA_CONFIGURACOES.md) — tela por seções declaradas, config por documento, preferências por usuário | 17–28 dias | **aguardando decisão** de posição na fila |
 
 ---

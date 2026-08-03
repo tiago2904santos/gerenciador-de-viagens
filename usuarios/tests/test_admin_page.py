@@ -26,40 +26,53 @@ class UsuariosAdminPageTests(TestCase):
 
         self.assertEqual(response.status_code, 403)
 
+    def test_todas_as_paginas_da_administracao_exigem_administrador(self):
+        comum = get_user_model().objects.create_user(username="outro_comum", password="123456")
+        self.client.force_login(comum)
+
+        for nome in (
+            "usuarios:index",
+            "usuarios:areas_index",
+            "usuarios:usuario_create",
+            "usuarios:area_create",
+            "usuarios:vinculo_create",
+        ):
+            with self.subTest(rota=nome):
+                self.assertEqual(self.client.get(reverse(nome)).status_code, 403)
+
     def test_cria_area_pela_pagina(self):
         self.client.force_login(self.admin)
 
         response = self.client.post(
-            reverse("usuarios:index"),
+            reverse("usuarios:area_create"),
             {
-                "action": "criar_area",
                 "area-nome": "Assessoria de Comunicacao Social",
                 "area-sigla": "ASCOM",
                 "area-ativa": "on",
             },
         )
 
-        self.assertRedirects(response, reverse("usuarios:index"))
+        self.assertRedirects(response, reverse("usuarios:areas_index"))
         self.assertTrue(AreaTrabalho.objects.filter(sigla="ASCOM").exists())
 
-    def test_renderiza_tres_cv_pickers_single(self):
+    def test_renderiza_cv_pickers_single_nos_formularios(self):
         self.client.force_login(self.admin)
 
-        response = self.client.get(reverse("usuarios:index"))
-
+        response = self.client.get(reverse("usuarios:usuario_create"))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'data-entity-picker="true"', count=3)
-        self.assertContains(response, 'data-entity-picker-mode="single"', count=5)
-        self.assertContains(response, 'data-entity-picker-renderer="select"', count=2)
+        self.assertContains(response, 'data-entity-picker="true"', count=1)
+
+        response = self.client.get(reverse("usuarios:vinculo_create"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'data-entity-picker="true"', count=2)
 
     def test_cria_usuario_vinculado_a_area(self):
         self.client.force_login(self.admin)
         area = AreaTrabalho.objects.create(nome="DPCAP", sigla="DPCAP")
 
         response = self.client.post(
-            reverse("usuarios:index"),
+            reverse("usuarios:usuario_create"),
             {
-                "action": "criar_usuario",
                 "usuario-username": "adm.tsantos",
                 "usuario-email": "adm.tsantos@pc.pr.gov.br",
                 "usuario-nome_completo": "Tiago Santos",
@@ -92,9 +105,8 @@ class UsuariosAdminPageTests(TestCase):
         area = AreaTrabalho.objects.create(nome="ASCOM", sigla="ASCOM")
 
         response = self.client.post(
-            reverse("usuarios:index"),
+            reverse("usuarios:vinculo_create"),
             {
-                "action": "vincular_usuario",
                 "vinculo-usuario": str(user.pk),
                 "vinculo-area": str(area.pk),
                 "vinculo-papel": VinculoUsuarioArea.PAPEL_EDITOR,
@@ -113,10 +125,22 @@ class UsuariosAdminPageTests(TestCase):
             ).exists()
         )
 
-    def test_busca_filtra_areas_e_vinculos(self):
+    def test_busca_filtra_a_lista_de_areas(self):
+        self.client.force_login(self.admin)
+        AreaTrabalho.objects.create(nome="Assessoria de Comunicacao", sigla="ASCOM")
+        AreaTrabalho.objects.create(nome="Divisao de Planejamento", sigla="DPCAP")
+
+        response = self.client.get(reverse("usuarios:areas_index"), {"q": "ASCOM"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Assessoria de Comunicacao")
+        self.assertNotContains(response, "Divisao de Planejamento")
+        # O contador do alternador conta o total, não o resultado filtrado.
+        self.assertEqual(response.context["total_areas"], 2)
+
+    def test_busca_filtra_a_lista_de_usuarios_pela_area(self):
         self.client.force_login(self.admin)
         area_ascom = AreaTrabalho.objects.create(nome="Assessoria de Comunicacao", sigla="ASCOM")
-        area_dpcap = AreaTrabalho.objects.create(nome="Divisao de Planejamento", sigla="DPCAP")
         user = get_user_model().objects.create_user(
             username="operador_ascom",
             password="123456",
@@ -131,8 +155,57 @@ class UsuariosAdminPageTests(TestCase):
         response = self.client.get(reverse("usuarios:index"), {"q": "ASCOM"})
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Assessoria de Comunicacao")
-        self.assertContains(response, "operador_ascom")
-        self.assertNotContains(response, "Divisao de Planejamento")
-        self.assertEqual(response.context["total_areas"], 2)
-        self.assertEqual(response.context["total_vinculos"], 1)
+        # A conta chega pela sigla da área, não pelo próprio nome. A asserção é
+        # sobre as linhas: o nome do usuário logado aparece na barra lateral.
+        titulos = [row["title"] for row in response.context["rows"]]
+        self.assertEqual(titulos, ["operador_ascom"])
+
+    def test_usuario_com_duas_areas_aparece_em_uma_linha_so(self):
+        self.client.force_login(self.admin)
+        diop = AreaTrabalho.objects.create(nome="Diretoria de Operacoes", sigla="DIOP")
+        gabin = AreaTrabalho.objects.create(nome="Gabinete", sigla="GABIN")
+        user = get_user_model().objects.create_user(
+            username="m.oliveira",
+            password="123456",
+            first_name="Marcos",
+            last_name="Oliveira",
+        )
+        VinculoUsuarioArea.objects.create(
+            usuario=user, area=diop, papel=VinculoUsuarioArea.PAPEL_ADMIN, area_padrao=True
+        )
+        VinculoUsuarioArea.objects.create(
+            usuario=user, area=gabin, papel=VinculoUsuarioArea.PAPEL_LEITOR
+        )
+
+        response = self.client.get(reverse("usuarios:index"))
+
+        linhas = [row for row in response.context["rows"] if row["title"] == "Marcos Oliveira"]
+        self.assertEqual(len(linhas), 1)
+        # Área padrão primeiro, e só ela marcada.
+        self.assertEqual(
+            [(fato["label"], fato["value"]) for fato in linhas[0]["facts"]],
+            [("DIOP", "Administrador (padrão)"), ("GABIN", "Leitor")],
+        )
+
+    def test_busca_por_area_nao_duplica_usuario_com_duas_areas(self):
+        self.client.force_login(self.admin)
+        for sigla in ("DIOP", "DIOPE"):
+            area = AreaTrabalho.objects.create(nome=f"Area {sigla}", sigla=sigla)
+            VinculoUsuarioArea.objects.create(
+                usuario=self.admin, area=area, papel=VinculoUsuarioArea.PAPEL_EDITOR
+            )
+
+        response = self.client.get(reverse("usuarios:index"), {"q": "DIOP"})
+
+        titulos = [row["title"] for row in response.context["rows"]]
+        self.assertEqual(titulos.count("admin_usuarios"), 1)
+
+    def test_alternador_leva_de_usuarios_para_areas(self):
+        self.client.force_login(self.admin)
+
+        response = self.client.get(reverse("usuarios:index"))
+
+        abas = response.context["abas"]
+        self.assertEqual([aba["label"] for aba in abas], ["Usuários", "Áreas"])
+        self.assertTrue(abas[0]["is_active"])
+        self.assertEqual(abas[1]["url"], reverse("usuarios:areas_index"))

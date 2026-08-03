@@ -1,0 +1,5 @@
+{% extends "base.html" %}
+{% block title %}Áreas{% endblock %}
+{% block content %}
+  {% include "components/lists/list_page_standard.html" with eyebrow="Administração" title=page_title search_placeholder="Buscar por sigla ou nome da área" search_aria_label="Buscar áreas" tabs_aria_label=tabs_aria_label band_tabs_template="components/lists/list_toggle.html" action_label="Nova área" action_url=nova_area_url action_aria_label="Cadastrar área" empty_message="Nenhuma área cadastrada ainda." empty_action_label="Nova área" empty_action_url=nova_area_url rows=rows q=q disable_realtime_filter=True hide_realtime_count=True %}
+{% endblock %}

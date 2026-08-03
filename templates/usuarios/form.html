@@ -1,0 +1,22 @@
+{% extends "components/page/flow_base.html" %}
+
+{% comment %}
+  Página de criação da administração, compartilhada pelos três formulários
+  (usuário, área e vínculo). A view escolhe `body_template`, `card_title` e
+  `submit_label`; o casco é o mesmo do `cadastros/*/form.html`.
+{% endcomment %}
+
+{% block flow_shell_modifier %}page-shell--standard cv-page--form{% endblock %}
+{% block flow_shell_extra %} document-form-page{% endblock %}
+
+{% block flow_body %}
+  <form method="post" class="document-form travel-document-wizard__form" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+      {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
+    {% endif %}
+    <div class="cv-form-section-stack cv-form-section-stack--comfortable" data-travel-document-wizard-step1>
+      {% include "components/form/card.html" with title=card_title description=page_description title_id="usuarios-form-card-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template=body_template footer_template="usuarios/partials/_form_card_footer.html" %}
+    </div>
+  </form>
+{% endblock %}
