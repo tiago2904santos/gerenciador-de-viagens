@@ -2368,11 +2368,9 @@ html[data-theme="light"] {
   z-index: calc(var(--z-footer-actions-fixed) + 20);
 }
 
-/* Segunda ação flutuante na mesma página (ex.: "Voltar" ao lado do "+"
-   principal) — empilha acima em vez de sobrepor. */
-.cv-floating-action--stacked {
-  bottom: calc(clamp(var(--space-4), 2vw, var(--space-5)) + var(--control-height-md) + var(--space-3));
-}
+/* `.cv-floating-action--stacked` mora em `cv-buttons.css` (NOVO-23): aquele
+   arquivo redeclara `.cv-floating-action { bottom }` e vem depois deste no
+   bundle, então um modificador definido aqui nunca chegava a valer. */
 
 .cv-floating-action__button {
   box-shadow: 0 18px 32px rgba(11, 58, 102, 0.18);
@@ -5834,6 +5832,23 @@ html[data-theme="light"] {
     left: var(--space-4);
     right: var(--space-4);
     width: auto;
+  }
+}
+
+/* Segunda ação flutuante na mesma página (ex.: "Vincular usuário" acima de
+   "Novo usuário") — empilha em vez de sobrepor.
+
+   Precisa ficar DEPOIS da base deste arquivo: `page-shell.css` também declara
+   `.cv-floating-action { bottom }` e, no bundle, este arquivo é o último a
+   falar sobre a propriedade. Enquanto o modificador morou lá, ele era vencido
+   pela base daqui e as duas ações caíam uma em cima da outra (NOVO-23). */
+.cv-floating-action--stacked {
+  bottom: calc(var(--space-6) + var(--control-height-md) + var(--space-3));
+}
+
+@media (max-width: 640px) {
+  .cv-floating-action--stacked {
+    bottom: calc(var(--space-4) + var(--control-height-md) + var(--space-3));
   }
 }
 
@@ -9701,7 +9716,7 @@ html[data-theme="light"] .cv-segment-toggle {
    Substitui progressivamente: cv-summary-item/label/value, cv-summary-tile,
    pt-resumo-box.
    Aliases via seletores agrupados; overrides contextuais permanecem nos
-   CSS de módulo (roteiros, planos-trabalho, usuarios.css).
+   CSS de módulo (roteiros, planos-trabalho).
    ======================================================================== */
 
 /* Grid de métricas */
