@@ -23,10 +23,10 @@
 <p class="pagination-shell pagination-shell--info-only" aria-live="polite">
   <span class="pagination-shell__info-pill">
     <span class="pagination-shell__info-label">Mostrando</span>
-    <strong>{{ page_obj.start_index }}-{{ page_obj.end_index }}</strong>
+    <strong>{{ page_obj.start_index }}–{{ page_obj.end_index }}</strong>
     <span class="pagination-shell__info-separator">de</span>
     <strong>{{ page_obj.paginator.count }}</strong>
-    <span>registros</span>
+    <span class="pagination-shell__info-unit">registros</span>
   </span>
 </p>
   {% else %}
@@ -35,10 +35,10 @@
   <p class="pagination-shell__info" aria-live="polite">
     <span class="pagination-shell__info-pill">
       <span class="pagination-shell__info-label">Mostrando</span>
-      <strong>{{ page_obj.start_index }}-{{ page_obj.end_index }}</strong>
+      <strong>{{ page_obj.start_index }}–{{ page_obj.end_index }}</strong>
       <span class="pagination-shell__info-separator">de</span>
       <strong>{{ page_obj.paginator.count }}</strong>
-      <span>registros</span>
+      <span class="pagination-shell__info-unit">registros</span>
     </span>
   </p>
   {% endif %}
