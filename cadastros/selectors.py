@@ -1,4 +1,5 @@
-﻿from django.db.models import Q
+﻿from django.db.models import Count
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
 from core.normalizers import remove_accents
@@ -95,8 +96,20 @@ def get_combustivel_by_id(pk):
     return get_object_or_404(filter_queryset_by_area(Combustivel.objects), pk=pk)
 
 
-def listar_servidores(q=None):
+def cargos_mais_frequentes_servidores(limit=3):
+    """Cargos com mais servidores na área atual (só os que têm ao menos um)."""
+    return list(
+        filter_queryset_by_area(Cargo.objects)
+        .annotate(servidores_count=Count("servidores"))
+        .filter(servidores_count__gt=0)
+        .order_by("-servidores_count", "nome")[:limit]
+    )
+
+
+def listar_servidores(q=None, cargo_id=None):
     queryset = filter_queryset_by_area(Servidor.objects).select_related("cargo", "unidade").order_by("nome")
+    if cargo_id:
+        queryset = queryset.filter(cargo_id=cargo_id)
     if q:
         q_unaccent = remove_accents(q)
         queryset = queryset.filter(

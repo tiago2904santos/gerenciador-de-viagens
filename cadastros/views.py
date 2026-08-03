@@ -3,6 +3,7 @@ from urllib.parse import urlencode
 
 from django.contrib import messages
 from django.core.paginator import Paginator
+from django.http import Http404
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.shortcuts import redirect
@@ -39,6 +40,8 @@ from .forms import ViaturaForm
 from .presenters import apresentar_linha_lista_simples_cidade
 from .presenters import apresentar_linha_lista_simples_servidor
 from .presenters import apresentar_linha_lista_simples_viatura
+from .selectors import cargos_mais_frequentes_servidores
+from .selectors import get_cargo_by_id
 from .selectors import get_servidor_by_id
 from .selectors import get_viatura_by_id
 from .selectors import listar_cidades
@@ -195,10 +198,61 @@ def index(request):
     )
 
 
+def _servidor_cargo_id(request):
+    raw = (request.GET.get("cargo") or "").strip()
+    if not raw.isdigit():
+        return None
+    try:
+        return get_cargo_by_id(int(raw)).pk
+    except Http404:
+        return None
+
+
+def _build_servidor_cargo_abas(*, cargo_atual, top_cargos, q, next_url):
+    """Abas Todos + top cargos; contagens respeitam a busca atual."""
+    index_url = reverse("cadastros:servidores_index")
+    preserved = []
+    if q:
+        preserved.append(("q", q))
+    if next_url:
+        preserved.append(("next", next_url))
+
+    def _url(cargo_pk=None):
+        params = list(preserved)
+        if cargo_pk:
+            params.append(("cargo", cargo_pk))
+        query = urlencode(params)
+        return f"{index_url}?{query}" if query else index_url
+
+    base_qs = listar_servidores(q=q)
+    abas = [
+        {
+            "key": "",
+            "label": "Todos",
+            "count": base_qs.count(),
+            "url": _url(),
+            "is_active": cargo_atual is None,
+        }
+    ]
+    for cargo in top_cargos:
+        abas.append(
+            {
+                "key": str(cargo.pk),
+                "label": cargo.nome,
+                "count": base_qs.filter(cargo_id=cargo.pk).count(),
+                "url": _url(cargo.pk),
+                "is_active": cargo_atual == cargo.pk,
+            }
+        )
+    return abas
+
+
 def servidores_index(request):
     q = request.GET.get("q", "").strip()
     next_url = _validated_next(request)
-    servidores = listar_servidores(q=q)
+    cargo_id = _servidor_cargo_id(request)
+    top_cargos = cargos_mais_frequentes_servidores(limit=3)
+    servidores = listar_servidores(q=q, cargo_id=cargo_id)
     paginator = Paginator(servidores, SERVIDORES_PER_PAGE)
     page_obj = paginator.get_page(request.GET.get("page"))
     rows = [
@@ -213,8 +267,16 @@ def servidores_index(request):
     page_params = {}
     if q:
         page_params["q"] = q
+    if cargo_id:
+        page_params["cargo"] = cargo_id
     if next_url:
         page_params["next"] = next_url
+    abas = _build_servidor_cargo_abas(
+        cargo_atual=cargo_id,
+        top_cargos=top_cargos,
+        q=q,
+        next_url=next_url,
+    ) if top_cargos else None
     return _render_listagem(
         request,
         "cadastros/servidores/index.html",
@@ -229,6 +291,9 @@ def servidores_index(request):
             "back_url": next_url or None,
             "back_label": "Voltar à viatura",
             "next_url": next_url,
+            "abas": abas,
+            "tabs_aria_label": "Filtrar servidores por cargo",
+            "cargo_filter": cargo_id or "",
         },
     )
 

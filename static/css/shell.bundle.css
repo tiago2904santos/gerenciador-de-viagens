@@ -8494,6 +8494,19 @@ html[data-theme="dark"] #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete,
   padding: 0;
 }
 
+.list-toolbar .cv-list-tab {
+  flex: 0 1 auto;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.list-toolbar .cv-list-tab__label {
+  max-width: 22ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .list-toolbar .pagination-shell--controls-only {
   flex: 0 0 auto;
   margin-left: auto;

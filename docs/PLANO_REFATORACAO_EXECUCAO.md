@@ -709,6 +709,7 @@ perde o prazo e a Etapa 2 perde a rede.
 |---|---:|---|
 | Reescrita visual Administração (Cadastros + Usuários) | 4 PRs | ✅ PR1–PR4 (D-53/D-54 local/D-55/step1 Cadastros+Usuários) |
 | Linha de Cadastros roster (`cv-record-row`) | 1 PR | ✅ D-52 parcial — avatar/subtitle/facts; sem `simple-list-item` |
+| Filtro por cargo na lista de Servidores (top 3) | — | ✅ NOVO-21 — abas na `list-toolbar` |
 | [Arquitetura de configurações](PROPOSTA_CONFIGURACOES.md) — tela por seções declaradas, config por documento, preferências por usuário | 17–28 dias | **aguardando decisão** de posição na fila |
 
 ---

@@ -188,6 +188,36 @@ class ServidorCrudTests(TestCase):
         self.assertContains(response, ">26-30<")
         self.assertContains(response, ">30<")
 
+    def test_servidores_index_filtra_pelos_tres_cargos_mais_usados(self):
+        cargo_a = Cargo.objects.create(nome="DELEGADO")
+        cargo_b = Cargo.objects.create(nome="ESCRIVAO")
+        cargo_c = Cargo.objects.create(nome="MOTORISTA")
+        cargo_d = Cargo.objects.create(nome="RARO")
+        for i in range(5):
+            Servidor.objects.create(nome=f"SRV A {i}", cargo=cargo_a)
+        for i in range(3):
+            Servidor.objects.create(nome=f"SRV B {i}", cargo=cargo_b)
+        for i in range(2):
+            Servidor.objects.create(nome=f"SRV C {i}", cargo=cargo_c)
+        Servidor.objects.create(nome="SRV D", cargo=cargo_d)
+
+        response = self.client.get(reverse("cadastros:servidores_index"))
+        self.assertEqual(response.status_code, 200)
+        abas = response.context["abas"]
+        self.assertEqual([aba["label"] for aba in abas], ["Todos", "DELEGADO", "ESCRIVAO", "MOTORISTA"])
+        self.assertEqual(abas[0]["count"], 11)
+        self.assertNotIn("RARO", [aba["label"] for aba in abas])
+        self.assertContains(response, 'class="cv-list-tabs"')
+        self.assertContains(response, f"cargo={cargo_a.pk}")
+
+        filtrado = self.client.get(reverse("cadastros:servidores_index"), {"cargo": cargo_a.pk})
+        self.assertEqual(filtrado.status_code, 200)
+        self.assertEqual(len(filtrado.context["rows"]), 5)
+        self.assertTrue(
+            any(aba["is_active"] and aba["key"] == str(cargo_a.pk) for aba in filtrado.context["abas"])
+        )
+        self.assertContains(filtrado, f'name="cargo" value="{cargo_a.pk}"')
+
     def test_servidor_delete_get_redireciona_para_lista(self):
         servidor = Servidor.objects.create(nome="SERVIDOR SEM PAGINA DE DELETE", cargo=self.cargo)
 

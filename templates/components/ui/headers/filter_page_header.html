@@ -81,6 +81,7 @@
         >
       </div>
       {% if current_aba %}<input type="hidden" name="aba" value="{{ current_aba }}">{% endif %}
+      {% if cargo_filter %}<input type="hidden" name="cargo" value="{{ cargo_filter }}">{% endif %}
       {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
       {% if status_options %}
         <div class="list-header__select">
