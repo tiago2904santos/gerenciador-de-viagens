@@ -129,12 +129,14 @@ def apresentar_termo_card(
         footer_kwargs["delete_url"] = delete_url
         footer_kwargs["delete_aria"] = "Excluir termo"
 
-    header_items = [entity_cards.header_item("Destino", destino, wide=True)]
-    # periodo_display devolve a sentinela "Periodo nao informado" (truthy) quando
-    # nao ha data; sem data o cabecalho fica so com o destino.
-    if termo.periodo_efetivo()[0] is not None:
-        # "dd/mm/aaaa a dd/mm/aaaa" nao cabe no info-value, que trunca por padrao.
-        header_items.append(entity_cards.header_item("Período", periodo, wrap=True))
+    # Titulo unico "destino · periodo", como o card de roteiro faz com a rota.
+    # periodo_display devolve a sentinela "Periodo nao informado" (truthy)
+    # quando nao ha data; nesse caso o titulo fica so com o destino.
+    tem_periodo = termo.periodo_efetivo()[0] is not None
+    titulo = " · ".join(p for p in [destino, periodo if tem_periodo else ""] if p)
+    header_items = [
+        entity_cards.header_item("Termo", titulo or destino, wide=True, wrap=True)
+    ]
     header_chips = [entity_cards.chip("muted", oficio_label)] if oficio_label else []
 
     # Sem servidores e sem viatura o miolo nao renderiza faixa alguma; nesse caso
