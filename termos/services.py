@@ -385,8 +385,15 @@ def _transporte_payload_termo(termo: TermoAutorizacao) -> dict:
     return _viatura_payload(None)
 
 
-def _resolver_variante_termo_cadastro(termo: TermoAutorizacao, servidor: Servidor | None) -> str:
+def _resolver_variante_termo_cadastro(
+    termo: TermoAutorizacao, servidor: Servidor | None, *, forcar_viatura: bool = False
+) -> str:
     if servidor is None:
+        # Termo so da viatura: usa o template completo (o unico com placa,
+        # viatura e combustivel) com os campos de servidor vazios. Sem esta
+        # excecao, servidor=None cai no SEMIPREENCHIDO, que so tem destino e data.
+        if forcar_viatura and termo.viatura_efetiva() is not None:
+            return VarianteTermo.COMPLETO_COM_VIATURA
         return VarianteTermo.SEMIPREENCHIDO
     if termo.viatura_id:
         return VarianteTermo.COMPLETO_COM_VIATURA
@@ -398,6 +405,8 @@ def _resolver_variante_termo_cadastro(termo: TermoAutorizacao, servidor: Servido
 def build_termo_cadastro_payload(
     termo: TermoAutorizacao,
     servidor: Servidor | None = None,
+    *,
+    forcar_viatura: bool = False,
 ) -> dict:
     area = getattr(termo, "area", None) or getattr(getattr(termo, "oficio", None), "area", None)
     institucional = build_configuracao_context(area=area)
@@ -405,7 +414,7 @@ def build_termo_cadastro_payload(
         "institucional": institucional,
         "oficio": _oficio_payload_termo(termo),
     }
-    variante = _resolver_variante_termo_cadastro(termo, servidor)
+    variante = _resolver_variante_termo_cadastro(termo, servidor, forcar_viatura=forcar_viatura)
     payload["termo"] = {
         "variante": variante,
         "participante": _participante_payload(servidor),
@@ -438,12 +447,19 @@ def gerar_termo_cadastro_um(
     termo: TermoAutorizacao,
     servidor: Servidor | None,
     formato: DocumentoFormato,
+    *,
+    forcar_viatura: bool = False,
 ) -> DocumentoGerado:
-    payload = build_termo_cadastro_payload(termo, servidor)
+    payload = build_termo_cadastro_payload(termo, servidor, forcar_viatura=forcar_viatura)
     variante_efetiva = payload["termo"]["variante"]
     template_docx = _TEMPLATE_DOCX_BY_VARIANTE.get(variante_efetiva, "termo_autorizacao.docx")
     facade = _facade_termo_com_template(template_docx)
-    ref_servidor = servidor.pk if servidor is not None else "sem-servidor"
+    if servidor is not None:
+        ref_servidor = servidor.pk
+    else:
+        # Referencia distinta da generica: ambos saem sem servidor, mas geram
+        # documentos diferentes e nao podem dividir cache nem artefato.
+        ref_servidor = "viatura" if forcar_viatura else "sem-servidor"
     ref = f"termo-{termo.pk}-cadastro-{ref_servidor}"
     doc = facade.gerar(
         tipo=DocumentoTipo.TERMO_AUTORIZACAO,

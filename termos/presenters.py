@@ -15,6 +15,9 @@ def apresentar_termo_card(
     generico_docx_url="",
     servidor_url_builder=None,
     servidor_view_url_builder=None,
+    viatura_view_url="",
+    viatura_pdf_url="",
+    viatura_docx_url="",
     assinado=False,
     anexar_assinado_url="",
     remover_assinado_url="",
@@ -54,13 +57,23 @@ def apresentar_termo_card(
             "view_url": servidor_view_url_builder(servidor.pk) if servidor_view_url_builder else "",
         })
 
-    viatura_display = None
+    # A viatura ocupa uma linha na mesma lista dos servidores e se comporta
+    # como um deles; o download dela e o termo sem servidor, so com o veiculo.
+    viatura_row = None
     if viatura is not None:
-        viatura_display = {
-            "placa": format_placa(viatura.placa) if viatura.placa else "",
-            "modelo": viatura.modelo or "",
-            "tipo": viatura.get_tipo_display() if viatura.tipo else "",
-            "unidade": str(viatura.unidade) if viatura.unidade_id else "",
+        placa_fmt = format_placa(viatura.placa) if viatura.placa else ""
+        titulo = " · ".join(p for p in [placa_fmt, viatura.modelo or ""] if p)
+        meta = " · ".join(p for p in [
+            viatura.get_tipo_display() if viatura.tipo else "",
+            str(viatura.unidade) if viatura.unidade_id else "",
+        ] if p)
+        viatura_row = {
+            "initials": "VT",
+            "name": titulo or "Viatura",
+            "meta": meta,
+            "view_url": viatura_view_url,
+            "pdf_url": viatura_pdf_url,
+            "docx_url": viatura_docx_url,
         }
 
     menus = []
@@ -124,7 +137,7 @@ def apresentar_termo_card(
 
     # Sem servidores e sem viatura o miolo nao renderiza faixa alguma; nesse caso
     # cabecalho e acoes dividem a mesma linha (ver static/css/termos.css).
-    compacto = not servidores_display and viatura_display is None
+    compacto = not servidores_display and viatura_row is None
 
     return {
         "termo_pk": termo.pk,
@@ -141,7 +154,8 @@ def apresentar_termo_card(
         "servidores": servidores_display,
         "servidores_count": len(servidores_display),
         "com_viatura": com_viatura,
-        "viatura": viatura_display,
+        "viatura_row": viatura_row,
+        "linhas_count": len(servidores_display) + (1 if viatura_row else 0),
         "viatura_label": str(viatura) if viatura else "—",
         "servidores_label": str(len(servidores_display)) if servidores_display else "sem servidor",
     }

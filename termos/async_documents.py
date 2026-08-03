@@ -33,6 +33,16 @@ def gerar_termo_cadastro_response(
     modo: str,
     servidor=None,
 ) -> HttpResponse:
+    if modo == "viatura":
+        # Gerado direto: a resolucao de "assinado" e por servidor/generico e
+        # nao se aplica ao termo da viatura.
+        doc = gerar_termo_cadastro_um(termo, None, formato, forcar_viatura=True)
+        return _response(
+            doc.conteudo,
+            content_type=doc.content_type,
+            filename=doc.nome_arquivo,
+        )
+
     if formato == DocumentoFormato.PDF:
         if modo == "generico":
             conteudos = [pdf_termo_cadastro_assinado_ou_gerado(termo, None)]
