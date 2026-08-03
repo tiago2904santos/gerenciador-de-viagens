@@ -1137,16 +1137,47 @@ html[data-theme="dark"] input[type="checkbox"] {
   z-index: 5;
 }
 
-/* Search picker + botão de gerenciar: picker.js move o botão para
-   dentro do controle de busca (ao lado de "Limpar busca") em vez de
-   sobrepor o rótulo/dica do campo. Fica sempre visível (o controle já não
-   é tão compacto quanto um select simples, então esconder no hover
-   prejudicaria a descoberta do botão). */
-.main-form-panel .cv-field-with-action--search-picker .cv-search-picker__control > .cv-icon-btn--field-manage {
-  flex: 0 0 auto;
-  height: calc(var(--cv-search-picker-height) - 8px);
-  width: calc(var(--cv-search-picker-height) - 8px);
-  position: static;
+/* Search picker + gerenciar: mesmo padrão do cargo (reveal no hover).
+   O botão fica irmão do controle dentro de `.cv-search-picker__field`,
+   alinhado à linha do input — não dentro do controle. */
+.main-form-panel .cv-field-with-action--search-picker .cv-search-picker__field {
+  position: relative;
+}
+
+.main-form-panel .cv-field-with-action--search-picker .cv-search-picker__control {
+  box-sizing: border-box;
+  max-width: 100%;
+  min-width: 0;
+  transition: width var(--transition-fast), max-width var(--transition-fast);
+  width: 100%;
+}
+
+.main-form-panel .cv-field-with-action--search-picker:hover .cv-search-picker__control,
+.main-form-panel .cv-field-with-action--search-picker:focus-within .cv-search-picker__control {
+  max-width: calc(100% - var(--field-manage-btn-size) - var(--field-manage-btn-gap));
+  width: calc(100% - var(--field-manage-btn-size) - var(--field-manage-btn-gap));
+}
+
+.main-form-panel .cv-field-with-action--search-picker .cv-search-picker__field > .cv-icon-btn--field-manage {
+  height: var(--field-manage-btn-size);
+  max-height: var(--field-manage-btn-size);
+  min-height: var(--field-manage-btn-size);
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  transform: none;
+  transition: opacity var(--transition-fast);
+  width: var(--field-manage-btn-size);
+  z-index: 1;
+}
+
+.main-form-panel .cv-field-with-action--search-picker:hover .cv-search-picker__field > .cv-icon-btn--field-manage,
+.main-form-panel .cv-field-with-action--search-picker:focus-within .cv-search-picker__field > .cv-icon-btn--field-manage {
+  opacity: 1;
+  pointer-events: auto;
+  z-index: 5;
 }
 
 /* Search picker single: só label interna + controle (sem painel de selecionados) */

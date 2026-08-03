@@ -8,8 +8,8 @@
 {% endblock %}
 {% block content %}
   {% if simples %}
-    {% include "components/lists/list_page_standard.html" with eyebrow="Termos" title=page_title search_placeholder="Buscar por destino ou ofício" search_clear_url=termos_url tabs_aria_label="Abas de termos" empty_message="Nenhum termo sem equipe." empty_action_label="Novo termo" empty_action_url=novo_url action_label="Novo termo" action_url=novo_url delete_modal_enabled=True attach_signed_modal_enabled=True %}
+    {% include "components/lists/list_page_standard.html" with eyebrow="Termos" title=page_title search_placeholder="Buscar por destino ou ofício" search_clear_url=termos_url tabs_aria_label="Alternar entre termos com e sem equipe" tabs_template="components/lists/list_toggle.html" empty_message="Nenhum termo sem equipe." empty_action_label="Novo termo" empty_action_url=novo_url action_label="Novo termo" action_url=novo_url delete_modal_enabled=True attach_signed_modal_enabled=True %}
   {% else %}
-    {% include "components/lists/list_page_cards.html" with title=page_title eyebrow="Termos" search_placeholder="Buscar por destino, ofício, protocolo, viatura ou servidor" search_aria_label="Buscar termos" card_template="termos/partials/termo_list_card.html" tabs_aria_label="Abas de termos" empty_message="Nenhum termo com equipe." empty_action_label="Novo termo" empty_action_url=novo_url action_label="Novo termo" action_url=novo_url delete_modal_title="Excluir termo?" delete_modal_entity="este termo" attach_signed_modal=True %}
+    {% include "components/lists/list_page_cards.html" with title=page_title eyebrow="Termos" search_placeholder="Buscar por destino, ofício, protocolo, viatura ou servidor" search_aria_label="Buscar termos" card_template="termos/partials/termo_list_card.html" tabs_aria_label="Alternar entre termos com e sem equipe" tabs_template="components/lists/list_toggle.html" empty_message="Nenhum termo com equipe." empty_action_label="Novo termo" empty_action_url=novo_url action_label="Novo termo" action_url=novo_url delete_modal_title="Excluir termo?" delete_modal_entity="este termo" attach_signed_modal=True %}
   {% endif %}
 {% endblock %}

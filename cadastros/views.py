@@ -319,7 +319,7 @@ def servidor_create(request):
         "cadastros/servidores/form.html",
         {
             "page_title": "Novo servidor",
-            "page_description": "Apenas o nome é obrigatório — cargo, CPF, RG e unidade podem ser completados depois; o cadastro fica como rascunho até então.",
+            "page_description": "Só o nome é obrigatório; demais campos podem ser completados depois.",
             "flow_eyebrow": "CADASTROS",
             "flow_back_label": "Voltar",
             "flow_back_url": next_url,
@@ -350,7 +350,7 @@ def servidor_update(request, pk):
         "cadastros/servidores/form.html",
         {
             "page_title": "Editar servidor",
-            "page_description": "Atualize os dados do servidor. Cargo, CPF, RG e unidade podem ser completados depois; o cadastro fica como rascunho até então.",
+            "page_description": "Atualize os dados do servidor; campos pendentes podem ser completados depois.",
             "flow_eyebrow": "CADASTROS",
             "flow_back_label": "Voltar",
             "flow_back_url": reverse("cadastros:servidores_index"),
@@ -522,7 +522,7 @@ def viatura_create(request):
         "cadastros/viaturas/form.html",
         {
             "page_title": "Nova viatura",
-            "page_description": "Apenas a placa é obrigatória — modelo, combustível e tipo podem ser completados depois; o cadastro fica como rascunho até então.",
+            "page_description": "Só a placa é obrigatória; demais campos podem ser completados depois.",
             "flow_eyebrow": "CADASTROS",
             "flow_back_label": "Voltar",
             "flow_back_url": next_url,
@@ -554,7 +554,7 @@ def viatura_update(request, pk):
         "cadastros/viaturas/form.html",
         {
             "page_title": "Editar viatura",
-            "page_description": "Atualize os dados da viatura. Modelo, combustível e tipo podem ser completados depois; o cadastro fica como rascunho até então.",
+            "page_description": "Atualize os dados da viatura; campos pendentes podem ser completados depois.",
             "flow_eyebrow": "CADASTROS",
             "flow_back_label": "Voltar",
             "flow_back_url": reverse("cadastros:viaturas_index"),

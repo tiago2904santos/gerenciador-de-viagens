@@ -331,6 +331,56 @@ html[data-theme="light"] .cv-segment-toggle__btn:hover:not([aria-pressed="true"]
   transform: scale(1.01);
 }
 
+/* ── Variante de navegacao (components/lists/list_toggle.html) ──
+   Aqui os segmentos sao links, e link nao aceita aria-pressed: o ativo vem de
+   aria-current="page". As regras abaixo so reapontam o estado; a aparencia e a
+   mesma do toggle de botoes. */
+.cv-segment-toggle--nav .cv-segment-toggle__btn {
+  text-decoration: none;
+}
+
+.cv-segment-toggle--nav .cv-segment-toggle__btn[aria-current="page"] {
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-hover));
+  border-color: var(--color-accent-hover);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.30),
+    0 0 0 1px color-mix(in srgb, var(--color-accent) 45%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  color: #071a33;
+  transform: scale(1.01);
+}
+
+html[data-theme="light"] .cv-segment-toggle--nav .cv-segment-toggle__btn[aria-current="page"] {
+  background: var(--color-primary-bright);
+  border-color: color-mix(in srgb, var(--color-primary-bright) 70%, #000);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.18),
+    0 0 0 1px color-mix(in srgb, var(--color-primary-bright) 45%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.20);
+  color: #fff;
+  transform: scale(1.01);
+}
+
+.cv-segment-toggle--nav .cv-segment-toggle__btn:hover:not([aria-current="page"]) {
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  color: var(--color-accent);
+}
+
+html[data-theme="light"] .cv-segment-toggle--nav .cv-segment-toggle__btn:hover:not([aria-current="page"]) {
+  background: color-mix(in srgb, var(--color-primary-bright) 10%, transparent);
+  color: var(--color-primary-bright);
+}
+
+/* contador herda a cor do segmento, entao funciona nos dois estados */
+.cv-segment-toggle__count {
+  background: color-mix(in srgb, currentColor 16%, transparent);
+  border-radius: var(--radius-pill);
+  font-size: 0.9em;
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+  padding: 2px 6px;
+}
+
 html[data-theme="light"] .cv-segment-toggle__btn[aria-pressed="true"] {
   background: var(--color-primary-bright);
   border-color: color-mix(in srgb, var(--color-primary-bright) 70%, #000);

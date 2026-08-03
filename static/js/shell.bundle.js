@@ -3516,10 +3516,12 @@ document.documentElement.dataset.appReady = "true";
     const emptyMsg     = select.dataset.emptyMessage      || "Nenhum resultado encontrado.";
     const emptyPanelMsg = select.dataset.emptySelected    || "Nenhum item selecionado.";
     const panelTitle   = select.dataset.panelTitle        || "SELECIONADOS";
+    const hideSelectedHeader = select.dataset.pickerHideSelectedHeader === "true";
     const termosName   = select.dataset.cvTermosName      || "";
     const openAllOnFocus = select.dataset.pickerOpenAll === "true";
     const showTermCtrl   = select.dataset.pickerTermControl   === "true" || !!termosName;
     const showDriverCtrl = select.dataset.pickerDriverControl === "true";
+    const allAsDrivers = select.dataset.pickerAllDrivers === "true";
     const allowFreeText  = select.dataset.pickerAllowFreeText === "true";
     const freeTextMsg    = select.dataset.pickerFreeTextMessage || "Pressione Enter para confirmar este nome.";
     const forceUppercase = select.dataset.pickerUppercase === "true";
@@ -3612,7 +3614,7 @@ document.documentElement.dataset.appReady = "true";
       grid       = el("div",  "cv-search-picker__selected-list");
       panelEmpty = el("p",    "cv-search-picker__selected-empty", emptyPanelMsg);
 
-      if (presentation !== "people" && presentation !== "vehicle") {
+      if (presentation !== "people" && presentation !== "vehicle" && !hideSelectedHeader) {
         const panelHeader = el("div", "cv-search-picker__selected-header");
         panelTitleEl = el("h4", "cv-search-picker__selected-title", panelTitle);
         panelHeader.appendChild(panelTitleEl);
@@ -3629,13 +3631,15 @@ document.documentElement.dataset.appReady = "true";
     select.insertAdjacentElement("afterend", root);
 
     /* Campo com botão de gerenciar (field.html): o botão nasce como irmão
-       do <select> dentro do wrapper .cv-field-with-action--search-picker.
-       Move para dentro do controle de busca para alinhar com "Limpar
-       busca" em vez de sobrepor o rótulo/dica renderizados acima. */
+       do <select> dentro do wrapper .cv-field-with-action--manage-reveal.
+       Move para o `.cv-search-picker__field` (irmão do controle, não dentro
+       dele) para o mesmo padrão do cargo: encolhe no hover e revela a
+       engrenagem à direita, sem competir com "Limpar busca" nem ficar
+       centrado sobre o rótulo/dica. */
     const manageBtn = select.parentElement
       ? select.parentElement.querySelector(":scope > .cv-icon-btn--field-manage")
       : null;
-    if (manageBtn) control.appendChild(manageBtn);
+    if (manageBtn) field.appendChild(manageBtn);
 
     const floatingMenu =
       window.CV.overlay && window.CV.overlay.attachDropdown
@@ -4031,7 +4035,7 @@ document.documentElement.dataset.appReady = "true";
       if (presentation === "people") {
         const name = el("span", "cv-search-picker__selected-name", item.label);
         title.appendChild(name);
-        if (showDriverCtrl) title.appendChild(el("span", "cv-search-picker__driver-chip", "Motorista"));
+        if (showDriverCtrl || allAsDrivers) title.appendChild(el("span", "cv-search-picker__driver-chip", "Motorista"));
         if (item.rascunho) title.appendChild(el("span", "cv-chip cv-chip--warning cv-chip--compact", "Rascunho"));
         body.appendChild(title);
 
@@ -4088,7 +4092,10 @@ document.documentElement.dataset.appReady = "true";
       removeBtn.setAttribute("aria-label", "Remover " + item.label);
       removeBtn.addEventListener("click", () => removeItem(item.value));
 
-      card.classList.toggle("cv-search-picker__selected-card--driver", driverValue === item.value);
+      card.classList.toggle(
+        "cv-search-picker__selected-card--driver",
+        allAsDrivers || driverValue === item.value,
+      );
 
       if (presentation === "people") {
         const nameParts = item.label.trim().split(/\s+/).filter(Boolean);
