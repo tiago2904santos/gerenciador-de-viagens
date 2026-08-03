@@ -4396,6 +4396,7 @@ html[data-theme="light"] .cv-person-row--highlight .cv-person-row__name {
 
 /* --------------------------------------------------------------------------
    FAB — Floating Action Button container (eventos wizard etapas 2-5)
+   Primário no mesmo tom do Avançar do cadastro de ofícios (accent dourado).
    -------------------------------------------------------------------------- */
 .cv-fab-container {
   position: fixed;
@@ -4406,6 +4407,32 @@ html[data-theme="light"] .cv-person-row--highlight .cv-person-row__name {
   align-items: flex-end;
   gap: var(--space-3, 0.75rem);
   z-index: 100;
+}
+
+html[data-theme="dark"] .cv-fab-container > .cv-btn--primary {
+  background: var(--color-accent);
+  background-image: none;
+  border: 0;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-accent) 28%, transparent);
+  color: var(--color-on-accent, #19232d);
+  font-weight: var(--font-weight-bold);
+  min-height: var(--control-height-md, 44px);
+  padding: 0 18px;
+  text-shadow: none;
+}
+
+html[data-theme="dark"] .cv-fab-container > .cv-btn--primary:hover,
+html[data-theme="dark"] .cv-fab-container > .cv-btn--primary:focus-visible {
+  background: var(--color-accent-hover);
+  background-image: none;
+  border: 0;
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--color-accent) 36%, transparent);
+  color: var(--color-on-accent, #19232d);
+}
+
+html[data-theme="dark"] .cv-fab-container > .cv-btn--primary .cv-btn__icon {
+  color: inherit;
 }
 
 .cv-fab-container .cv-fab {

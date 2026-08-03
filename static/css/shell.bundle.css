@@ -7660,8 +7660,18 @@ html[data-theme="dark"] .cv-action-menu {
 }
 
 /* Modal de documento assinado. */
+.attach-signed-modal__dialog.delete-confirm-modal__dialog,
 .attach-signed-modal__dialog {
+  --step1-surface: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
+  --step1-panel: var(--color-surface-soft);
+  background: var(--step1-surface);
+  gap: 0;
   max-width: min(100%, 610px);
+}
+
+.attach-signed-modal__dialog > .cv-dialog__header {
+  /* Header mantém o tom do diálogo; o restante do painel é --step1-surface. */
+  margin: -1px -1px 18px;
 }
 
 .attach-signed-modal__icon {
@@ -7678,16 +7688,16 @@ html[data-theme="dark"] .cv-action-menu {
 
 .attach-signed-modal__intro {
   align-items: flex-start;
-  background: var(--action-bg-soft);
-  border: 1px solid var(--action-border);
-  border-radius: 14px;
+  background: var(--step1-panel, var(--color-surface-soft));
+  border: 0;
+  border-radius: 15px;
   color: var(--action-muted);
   display: flex;
   font-size: 0.84rem;
   gap: 10px;
   line-height: 1.55;
-  margin: 0;
-  padding: 12px 14px;
+  margin: 0 0 4px;
+  padding: 10px 12px;
 }
 
 .attach-signed-modal__intro .cv-icon {
@@ -7719,7 +7729,7 @@ html[data-theme="dark"] .cv-action-menu {
 }
 
 .attach-signed-modal__kind-options {
-  background: var(--action-bg-soft);
+  background: var(--step1-panel, var(--action-bg-soft));
   border: 1px solid var(--action-border);
   border-radius: 12px;
   display: grid;
@@ -7758,21 +7768,6 @@ html[data-theme="dark"] .cv-action-menu {
   color: var(--action-info-text);
 }
 
-.attach-signed-modal__upload-heading {
-  display: grid;
-  gap: 3px;
-}
-
-.attach-signed-modal__upload-heading strong {
-  color: var(--action-text-strong);
-  font-size: 0.85rem;
-}
-
-.attach-signed-modal__upload-heading span {
-  color: var(--action-muted);
-  font-size: 0.72rem;
-}
-
 .attach-signed-modal__form > .app-form-field {
   margin: 0;
 }
@@ -7791,24 +7786,30 @@ html[data-theme="dark"] .cv-action-menu {
   width: 1px;
 }
 
-.attach-signed-modal__form .prestacao-file-widget {
-  background: var(--action-bg-soft);
-  border: 1px dashed var(--action-border-strong);
+/* Área de arquivo: --step1-panel, sem borda e sem hover. */
+.attach-signed-modal__form .prestacao-file-widget,
+.attach-signed-modal__form .cv-file-widget {
+  background: var(--step1-panel, var(--color-surface-soft));
+  border: 0;
   border-radius: 15px;
   box-shadow: none;
   display: grid;
   gap: 8px;
   padding: 13px;
-  transition: background var(--transition-fast), border-color var(--transition-fast);
+  transition: none;
 }
 
 .attach-signed-modal__form .prestacao-file-widget:hover,
-.attach-signed-modal__form .prestacao-file-widget:focus-within {
-  background: var(--action-bg-hover);
-  border-color: var(--action-info-border);
+.attach-signed-modal__form .cv-file-widget:hover,
+.attach-signed-modal__form .prestacao-file-widget:focus-within,
+.attach-signed-modal__form .cv-file-widget:focus-within {
+  background: var(--step1-panel, var(--color-surface-soft));
+  border: 0;
+  box-shadow: none;
 }
 
-.attach-signed-modal__form .prestacao-file-picker {
+.attach-signed-modal__form .prestacao-file-picker,
+.attach-signed-modal__form .cv-file-picker {
   background: transparent;
   border: 0;
   border-radius: 0;
@@ -7821,17 +7822,20 @@ html[data-theme="dark"] .cv-action-menu {
 }
 
 .attach-signed-modal__form .prestacao-file-picker:hover,
-.attach-signed-modal__form .prestacao-file-picker:focus-within {
+.attach-signed-modal__form .cv-file-picker:hover,
+.attach-signed-modal__form .prestacao-file-picker:focus-within,
+.attach-signed-modal__form .cv-file-picker:focus-within {
   background: transparent;
-  border-color: transparent;
+  border: 0;
   box-shadow: none;
 }
 
-.attach-signed-modal__form .prestacao-file-picker__action {
+.attach-signed-modal__form .prestacao-file-picker__action,
+.attach-signed-modal__form .cv-file-picker__action {
   align-items: center;
   align-self: start;
   background: var(--action-bg);
-  border: 1px solid var(--action-border);
+  border: 0;
   border-radius: 11px;
   color: var(--action-text);
   display: inline-flex;
@@ -7845,7 +7849,14 @@ html[data-theme="dark"] .cv-action-menu {
   width: fit-content;
 }
 
-.attach-signed-modal__form .prestacao-file-picker__value {
+.attach-signed-modal__form .prestacao-file-picker__action:hover,
+.attach-signed-modal__form .cv-file-picker__action:hover {
+  background: var(--action-bg);
+  color: var(--action-text);
+}
+
+.attach-signed-modal__form .prestacao-file-picker__value,
+.attach-signed-modal__form .cv-file-picker__value {
   align-self: end;
   color: var(--action-muted);
   font-size: 0.78rem;
@@ -7858,23 +7869,39 @@ html[data-theme="dark"] .cv-action-menu {
   display: none;
 }
 
-.attach-signed-modal__form .prestacao-file-picker__upload {
+/* Anexar = mesmo dourado do Avançar do cadastro de ofícios. */
+.attach-signed-modal__form .prestacao-file-picker__upload,
+.attach-signed-modal__form .cv-file-picker__upload {
   align-self: start;
-  background: var(--action-primary-bg);
-  border: 1px solid var(--action-primary-border);
-  border-radius: 11px;
-  color: var(--action-primary-text);
+  background: var(--color-accent);
+  background-image: none;
+  border: 0;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-accent) 28%, transparent);
+  color: var(--color-on-accent, #19232d);
   font-size: 0.8rem;
-  font-weight: 720;
+  font-weight: var(--font-weight-bold, 750);
   grid-column: 2;
   grid-row: 1;
   min-height: 38px;
   padding: 0 14px;
+  text-shadow: none;
 }
 
-.attach-signed-modal__form .prestacao-file-picker__upload:disabled {
+.attach-signed-modal__form .prestacao-file-picker__upload:hover:not(:disabled),
+.attach-signed-modal__form .cv-file-picker__upload:hover:not(:disabled) {
+  background: var(--color-accent-hover, var(--color-accent));
+  background-image: none;
+  border: 0;
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--color-accent) 36%, transparent);
+  color: var(--color-on-accent, #19232d);
+}
+
+.attach-signed-modal__form .prestacao-file-picker__upload:disabled,
+.attach-signed-modal__form .cv-file-picker__upload:disabled {
   background: var(--action-bg);
-  border-color: var(--action-border);
+  border: 1px solid var(--action-border);
+  box-shadow: none;
   color: var(--action-muted);
   display: none;
   opacity: 0.52;
@@ -7885,14 +7912,299 @@ html[data-theme="dark"] .cv-action-menu {
 }
 
 .attach-signed-modal__form .prestacao-file-selection__menu,
+.attach-signed-modal__form .cv-file-selection__menu,
 .attach-signed-modal [data-attach-signed-current] {
-  background: var(--action-bg-soft);
-  border: 1px solid var(--action-border);
-  border-radius: 14px;
+  background: transparent;
+  border: 0 !important;
+  border-radius: 0;
+  box-shadow: none;
 }
 
-.attach-signed-modal__form .prestacao-file-selection {
+.attach-signed-modal__form .prestacao-file-selection__toggle[hidden] + .prestacao-file-selection__menu,
+.attach-signed-modal__form .cv-file-selection__toggle[hidden] + .cv-file-selection__menu {
+  border: 0 !important;
+  border-radius: 0;
+}
+
+.attach-signed-modal__form .prestacao-file-selection,
+.attach-signed-modal__form .cv-file-selection {
   margin-top: 2px;
+}
+
+.attach-signed-modal__form .prestacao-file-selection__item,
+.attach-signed-modal__form .cv-file-selection__item {
+  background: var(--step1-surface, color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%));
+  border: 0;
+  border-radius: 12px;
+  box-shadow: none;
+  min-height: 0;
+  padding: 8px 10px;
+  transition: none;
+}
+
+.attach-signed-modal__form .prestacao-file-selection__item:hover,
+.attach-signed-modal__form .cv-file-selection__item:hover {
+  background: var(--step1-surface, color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%));
+}
+
+.attach-signed-modal__form .prestacao-file-selection__item + .prestacao-file-selection__item,
+.attach-signed-modal__form .cv-file-selection__item + .cv-file-selection__item {
+  border-top: 0;
+}
+
+/* Ícones Visualizar / Remover: cores canônicas (vence o reset dark de .cv-icon-btn). */
+html[data-theme="dark"] #attach-signed-modal .cv-icon-btn.cv-icon-btn--preview,
+#attach-signed-modal .cv-icon-btn.cv-icon-btn--preview {
+  background: var(--action-preview-bg);
+  border: 1px solid var(--action-preview-border);
+  box-shadow: var(--action-shadow);
+  color: var(--action-preview-text);
+}
+
+html[data-theme="dark"] #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete,
+#attach-signed-modal .cv-icon-btn.cv-icon-btn--delete {
+  background: var(--action-danger-bg);
+  border: 1px solid var(--action-danger-border);
+  box-shadow: var(--action-shadow);
+  color: var(--action-danger-text);
+}
+
+/* Cancelar = mesmo soft do Voltar do cadastro de ofícios. */
+.attach-signed-modal__cancel.cv-btn,
+.attach-signed-modal__cancel.cv-btn--secondary {
+  background: var(--step1-panel, var(--color-surface-soft));
+  background-image: none;
+  border: 0;
+  border-radius: 12px;
+  box-shadow: none;
+  color: var(--color-heading);
+  font-weight: var(--font-weight-bold);
+  min-height: var(--control-height-md, 44px);
+  padding: 0 18px;
+  transform: none;
+}
+
+/*
+ * Cores FIXAS no modal — sem hover, sem focus, sem dragover.
+ * Nunca use inherit aqui (puxa cor do pai e parece “hover”).
+ */
+#attach-signed-modal {
+  --asm-panel: var(--step1-panel, var(--color-surface-soft));
+  --asm-action-bg: var(--action-bg);
+  --asm-action-border: var(--action-border);
+  --asm-action-text: var(--action-text);
+  --asm-accent: var(--color-accent);
+  --asm-accent-text: var(--color-on-accent, #19232d);
+  --asm-preview-bg: var(--action-preview-bg);
+  --asm-preview-border: var(--action-preview-border);
+  --asm-preview-text: var(--action-preview-text);
+  --asm-danger-bg: var(--action-danger-bg);
+  --asm-danger-border: var(--action-danger-border);
+  --asm-danger-text: var(--action-danger-text);
+  --asm-cancel-bg: var(--step1-panel, var(--color-surface-soft));
+  --asm-cancel-text: var(--color-heading);
+}
+
+#attach-signed-modal :is(
+  .prestacao-file-widget,
+  .cv-file-widget,
+  .prestacao-file-widget.is-selected,
+  .cv-file-widget.is-selected,
+  .prestacao-file-widget.is-dragover,
+  .cv-file-widget.is-dragover,
+  .prestacao-file-widget:hover,
+  .cv-file-widget:hover,
+  .prestacao-file-widget:focus,
+  .cv-file-widget:focus,
+  .prestacao-file-widget:focus-within,
+  .cv-file-widget:focus-within
+) {
+  background: var(--asm-panel) !important;
+  background-color: var(--asm-panel) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+  transition: none !important;
+}
+
+#attach-signed-modal :is(
+  .prestacao-file-picker,
+  .cv-file-picker,
+  .prestacao-file-picker:hover,
+  .cv-file-picker:hover,
+  .prestacao-file-picker:focus,
+  .cv-file-picker:focus,
+  .prestacao-file-picker:focus-within,
+  .cv-file-picker:focus-within,
+  .prestacao-file-widget.is-selected .prestacao-file-picker,
+  .cv-file-widget.is-selected .cv-file-picker,
+  .prestacao-file-widget.is-dragover .prestacao-file-picker,
+  .cv-file-widget.is-dragover .cv-file-picker
+) {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+  transition: none !important;
+}
+
+#attach-signed-modal :is(
+  .prestacao-file-selection__menu,
+  .cv-file-selection__menu,
+  .prestacao-file-selection__menu:hover,
+  .cv-file-selection__menu:hover
+) {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+  transition: none !important;
+}
+
+#attach-signed-modal :is(
+  .prestacao-file-selection__item,
+  .cv-file-selection__item,
+  .prestacao-file-list__item,
+  .prestacao-file-selection__item:hover,
+  .cv-file-selection__item:hover,
+  .prestacao-file-list__item:hover,
+  .prestacao-file-selection__item:focus,
+  .cv-file-selection__item:focus,
+  .prestacao-file-selection__item:focus-within,
+  .cv-file-selection__item:focus-within
+) {
+  background: var(--step1-surface, color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%)) !important;
+  background-color: var(--step1-surface, color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%)) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+  transition: none !important;
+}
+
+#attach-signed-modal :is(
+  .prestacao-file-picker__action,
+  .cv-file-picker__action
+) {
+  background: var(--asm-action-bg) !important;
+  background-color: var(--asm-action-bg) !important;
+  border: 0 !important;
+  color: var(--asm-action-text) !important;
+  box-shadow: none !important;
+  outline: none !important;
+  transform: none !important;
+}
+
+#attach-signed-modal :is(
+  .prestacao-file-picker__action,
+  .cv-file-picker__action
+):is(:hover, :focus-visible) {
+  background: var(--action-bg-hover, color-mix(in srgb, var(--color-accent) 14%, var(--color-surface-muted))) !important;
+  background-color: var(--action-bg-hover, color-mix(in srgb, var(--color-accent) 14%, var(--color-surface-muted))) !important;
+  border: 0 !important;
+  color: var(--action-text-strong, var(--color-accent-text, var(--asm-action-text))) !important;
+  box-shadow: none !important;
+  outline: none !important;
+  transform: none !important;
+}
+
+#attach-signed-modal :is(
+  .prestacao-file-picker__upload,
+  .cv-file-picker__upload
+):not(:disabled) {
+  background: var(--asm-accent) !important;
+  background-color: var(--asm-accent) !important;
+  background-image: none !important;
+  border: 0 !important;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-accent) 28%, transparent) !important;
+  color: var(--asm-accent-text) !important;
+  outline: none !important;
+  transition: background var(--transition-fast, 0.15s ease), box-shadow var(--transition-fast, 0.15s ease) !important;
+  transform: none !important;
+}
+
+#attach-signed-modal :is(
+  .prestacao-file-picker__upload,
+  .cv-file-picker__upload
+):is(:hover, :focus-visible):not(:disabled) {
+  background: var(--color-accent-hover, var(--asm-accent)) !important;
+  background-color: var(--color-accent-hover, var(--asm-accent)) !important;
+  background-image: none !important;
+  border: 0 !important;
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--color-accent) 36%, transparent) !important;
+  color: var(--asm-accent-text) !important;
+  outline: none !important;
+  transform: none !important;
+}
+
+#attach-signed-modal :is(
+  .cv-icon-btn--preview,
+  .cv-icon-btn--preview:hover,
+  .cv-icon-btn--preview:focus,
+  .cv-icon-btn--preview:focus-visible
+) {
+  background: var(--asm-preview-bg) !important;
+  background-color: var(--asm-preview-bg) !important;
+  border: 1px solid var(--asm-preview-border) !important;
+  color: var(--asm-preview-text) !important;
+  box-shadow: var(--action-shadow) !important;
+  outline: none !important;
+  transition: none !important;
+  transform: none !important;
+}
+
+#attach-signed-modal :is(
+  .cv-icon-btn--delete,
+  .cv-icon-btn--delete:hover,
+  .cv-icon-btn--delete:focus,
+  .cv-icon-btn--delete:focus-visible
+) {
+  background: var(--asm-danger-bg) !important;
+  background-color: var(--asm-danger-bg) !important;
+  border: 1px solid var(--asm-danger-border) !important;
+  color: var(--asm-danger-text) !important;
+  box-shadow: var(--action-shadow) !important;
+  outline: none !important;
+  transition: none !important;
+  transform: none !important;
+}
+
+#attach-signed-modal :is(
+  .attach-signed-modal__cancel,
+  .attach-signed-modal__cancel:hover,
+  .attach-signed-modal__cancel:focus,
+  .attach-signed-modal__cancel:focus-visible
+) {
+  background: var(--asm-cancel-bg) !important;
+  background-color: var(--asm-cancel-bg) !important;
+  background-image: none !important;
+  border: 0 !important;
+  color: var(--asm-cancel-text) !important;
+  box-shadow: none !important;
+  outline: none !important;
+  transition: none !important;
+  transform: none !important;
+}
+
+#attach-signed-modal :is(
+  .attach-signed-modal__kind-option,
+  .attach-signed-modal__kind-option:hover,
+  .attach-signed-modal__kind-option:focus-visible
+) {
+  background: transparent !important;
+  color: var(--action-muted) !important;
+  outline: none !important;
+  transition: none !important;
+}
+
+#attach-signed-modal :is(
+  .attach-signed-modal__kind-option.is-active,
+  .attach-signed-modal__kind-option.is-active:hover,
+  .attach-signed-modal__kind-option.is-active:focus-visible
+) {
+  background: var(--action-info-bg) !important;
+  color: var(--action-info-text) !important;
 }
 
 @media (min-width: 841px) {
@@ -13865,6 +14177,30 @@ html[data-theme="dark"] .cv-icon-btn--whatsapp:is(:hover, :focus) {
   color: var(--action-success-text);
 }
 
+html[data-theme="dark"] .cv-icon-btn--preview {
+  background: var(--action-preview-bg);
+  border-color: var(--action-preview-border);
+  color: var(--action-preview-text);
+}
+
+html[data-theme="dark"] .cv-icon-btn--preview:is(:hover, :focus) {
+  background: color-mix(in srgb, var(--action-preview-bg) 82%, var(--action-preview-text) 18%);
+  border-color: var(--action-preview-text);
+  color: var(--action-preview-text);
+}
+
+html[data-theme="dark"] .cv-icon-btn--delete {
+  background: var(--action-danger-bg);
+  border-color: var(--action-danger-border);
+  color: var(--action-danger-text);
+}
+
+html[data-theme="dark"] .cv-icon-btn--delete:is(:hover, :focus) {
+  background: var(--action-danger-hover-bg, var(--action-danger-bg));
+  border-color: var(--action-danger-border);
+  color: var(--action-danger-text);
+}
+
 html[data-theme="dark"] :is(.cv-icon-btn--edit, .cv-icon-btn--settings):not(.is-assinado) {
   background: var(--action-info-bg);
   border-color: var(--action-info-border);
@@ -14185,6 +14521,7 @@ html[data-theme="dark"] .empty-state__title {
 :is(html[data-theme="dark"])
   .attach-signed-modal__intro {
   margin-top: 18px;
+  margin-bottom: 4px;
 }
 
 .cv-dialog__form {
@@ -14273,6 +14610,31 @@ html[data-theme="dark"] .empty-state__title {
   background: var(--color-input-bg);
   border-color: var(--color-input-border);
   color: var(--color-text);
+}
+
+:is(html[data-theme="dark"])
+  #attach-signed-modal
+  :is(.cv-file-selection__menu, .prestacao-file-selection__menu) {
+  background: transparent;
+  border: 0;
+  border-color: transparent;
+}
+
+:is(html[data-theme="dark"])
+  #attach-signed-modal
+  :is(
+    .cv-file-selection__item,
+    .prestacao-file-selection__item,
+    .cv-file-selection__item:hover,
+    .prestacao-file-selection__item:hover,
+    .cv-file-selection__item:focus,
+    .prestacao-file-selection__item:focus,
+    .cv-file-selection__item:focus-within,
+    .prestacao-file-selection__item:focus-within
+  ) {
+  background: var(--step1-surface, color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%)) !important;
+  background-color: var(--step1-surface, color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%)) !important;
+  transition: none !important;
 }
 
 :is(html[data-theme="dark"])

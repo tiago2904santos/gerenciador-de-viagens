@@ -326,6 +326,7 @@ class DarkRedesignContractTests(SimpleTestCase):
             ("delete_confirm_modal.html", "data-delete-confirm-modal"),
             ("cancel_reason_modal.html", "data-cancel-reason-modal"),
             ("confirm_action_modal.html", "data-confirm-action-modal"),
+            ("attach_signed_modal.html", "data-attach-signed-modal"),
         ):
             with self.subTest(modal=filename):
                 source = (modals / filename).read_text(encoding="utf-8")
@@ -421,11 +422,6 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertIn("event.key === 'ArrowRight'", script)
         self.assertIn("event.key === 'Home'", script)
         self.assertIn("registerEnhancer('eventoGuided', initD)", script)
-        self.assertIn("components/ui/layouts/collection_header.html", template)
-        self.assertIn("Roteiros do evento", template)
-        self.assertIn("Ofícios e justificativas", template)
-        self.assertIn("Planejamento e autorização", template)
-        self.assertIn("Termos por servidor", template)
         self.assertEqual(template.count('class="cv-fab-container"'), 4)
         self.assertIn('extra_class="cv-fab"', template)
 

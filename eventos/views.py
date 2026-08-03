@@ -213,6 +213,11 @@ def _apresentar_termos_rows(termos_qs):
     ]
 
 
+def _termo_rows_do_evento(evento):
+    """Lista unificada: termos genéricos do evento + termos por servidor."""
+    return _termo_generico_rows_do_evento(evento) + _termos_servidor_rows_do_evento(evento)
+
+
 def _termo_generico_rows_do_evento(evento):
     """Termo(s) genérico(s) do evento (evento.termo direto, sem ofício) — sempre no topo da lista."""
     return _apresentar_termos_rows(listar_termos_genericos_do_evento(evento))
@@ -394,8 +399,7 @@ def detalhe(request, pk, etapa=1):
                 apresentar_ordem_servico_card(ordem, assinante=assinante_os)
                 for ordem in ordens_do_evento
             ],
-            "termo_generico_rows": _termo_generico_rows_do_evento(evento),
-            "termos_servidor_rows": _termos_servidor_rows_do_evento(evento),
+            "termo_rows": _termo_rows_do_evento(evento),
             "sede_uf": config.uf if config else "",
             "sede_config_label": _sede_config_label(),
             "modelos_motivo_url": _reverse("oficios:modelos_motivo_index"),
@@ -409,6 +413,36 @@ def detalhe(request, pk, etapa=1):
             **build_evento_documentos_context(form),
         },
     )
+
+
+@require_POST
+def anexar_solicitacao(request, pk):
+    """Upload via modal Anexar documento (campo ``arquivo`` do attach-signed)."""
+    from django.core.validators import FileExtensionValidator
+    from django.core.exceptions import ValidationError
+    from PIL import UnidentifiedImageError
+
+    from core.retorno import voltar_para
+    from .services import converter_para_pdf_se_necessario
+
+    evento = get_evento_by_id(pk)
+    fallback = reverse("eventos:guiado_etapa", kwargs={"pk": pk, "etapa": 4})
+    arquivo = request.FILES.get("arquivo")
+    if not arquivo:
+        messages.error(request, "Nenhum arquivo selecionado.")
+        return redirect(voltar_para(request, fallback))
+
+    validator = FileExtensionValidator(EVENTO_SOLICITACAO_EXTENSOES)
+    try:
+        validator(arquivo)
+        convertido = converter_para_pdf_se_necessario(arquivo)
+    except (ValidationError, UnidentifiedImageError):
+        messages.error(request, "Formato inválido. Aceita apenas PDF, PNG, JPG ou JPEG.")
+        return redirect(voltar_para(request, fallback))
+
+    anexar_documentos_solicitacao(evento, [convertido])
+    messages.success(request, "Documentos de solicitação anexados com sucesso.")
+    return redirect(voltar_para(request, fallback))
 
 
 @require_POST

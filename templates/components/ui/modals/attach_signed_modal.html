@@ -1,4 +1,4 @@
-<div id="attach-signed-modal" class="cv-dialog cv-dialog--document delete-confirm-modal" data-attach-signed-modal data-overlay-panel hidden>
+<div id="attach-signed-modal" class="cv-dialog cv-dialog--document delete-confirm-modal attach-signed-modal" data-attach-signed-modal data-overlay-panel hidden>
   <div class="cv-dialog__backdrop delete-confirm-modal__backdrop" data-attach-signed-cancel></div>
   <section
     class="cv-dialog__panel cv-dialog__panel--lg delete-confirm-modal__dialog attach-signed-modal__dialog"
@@ -32,10 +32,7 @@
       {% csrf_token %}
       <input type="hidden" name="next" data-attach-signed-next value="">
       <div class="attach-signed-modal__upload">
-        <div class="attach-signed-modal__upload-heading">
-          <strong>Arquivo assinado</strong>
-          <span data-attach-signed-file-help>Selecione um único arquivo em formato PDF.</span>
-        </div>
+        <span class="sr-only" data-attach-signed-file-help>Selecione um único arquivo em formato PDF.</span>
         {% include "components/ui/forms/file_picker.html" with field_id="id-attach-signed-arquivo" field_name="arquivo" accept="application/pdf,.pdf" single=True action_label="Escolher PDF" empty_label="Arraste ou escolha o documento assinado" upload_label="Anexar PDF" only %}
       </div>
       <ul class="prestacao-file-list" data-attach-signed-current hidden>

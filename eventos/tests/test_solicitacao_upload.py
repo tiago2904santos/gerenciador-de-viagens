@@ -40,6 +40,7 @@ class UploadSolicitacaoViewTests(TestCase):
         self.client.force_login(self.user)
         self.evento = Evento.objects.create(titulo="Evento de teste")
         self.url = reverse("eventos:guiado_etapa", kwargs={"pk": self.evento.pk, "etapa": 4})
+        self.anexar_url = reverse("eventos:solicitacao_anexar", kwargs={"pk": self.evento.pk})
 
     def test_upload_imagem_e_salvo_como_pdf(self):
         arquivo = SimpleUploadedFile("convite.png", _png_bytes(), content_type="image/png")
@@ -65,6 +66,26 @@ class UploadSolicitacaoViewTests(TestCase):
         resp = self.client.post(self.url, {"action": "upload_solicitacao", "solicitacao_arquivos": arquivo})
         self.assertEqual(resp.status_code, 302)
         self.assertFalse(EventoDocumentoSolicitacao.objects.filter(evento=self.evento).exists())
+
+    def test_modal_anexar_aceita_arquivo_unico(self):
+        arquivo = SimpleUploadedFile("convite.png", _png_bytes(), content_type="image/png")
+        resp = self.client.post(self.anexar_url, {"arquivo": arquivo})
+        self.assertEqual(resp.status_code, 302)
+
+        anexo = EventoDocumentoSolicitacao.objects.get(evento=self.evento)
+        self.assertTrue(anexo.arquivo.name.lower().endswith(".pdf"))
+
+    def test_etapa4_oferece_mais_acoes_com_anexar_documento(self):
+        resp = self.client.get(self.url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "evento-etapa4-actions-menu")
+        self.assertContains(resp, "Anexar documento")
+        self.assertContains(resp, "Plano de trabalho")
+        self.assertContains(resp, "Ordem de serviço")
+        self.assertContains(resp, "data-attach-signed-url")
+        self.assertContains(resp, self.anexar_url)
+        self.assertNotContains(resp, "Novo plano")
+        self.assertNotContains(resp, "Nova OS")
 
 
 class SolicitacaoConteudoPrivadoTests(TestCase):

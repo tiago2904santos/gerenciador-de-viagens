@@ -108,11 +108,14 @@ class OrcamentoDeQueriesEventoTests(TestCase):
         )
 
     # Medidos no `main` em 29/07/2026, antes da camada de selectors.
-    # O detalhe é caro (74) e este teste NÃO tenta baratear: o `P-01` move consulta
+    # Atualizado em 02/08/2026 (+4): lista unificada de termos na etapa 5 e
+    # limpeza visual das etapas 4/5 do guiado — mesma montagem de contexto,
+    # orçamento re-medido no fixture desta classe.
+    # O detalhe é caro e este teste NÃO tenta baratear: o `P-01` move consulta
     # de lugar. Baixar esse número é trabalho de outro defeito, com outra medição.
     QUERIES_LISTA = 18
     QUERIES_LISTA_BUSCA = 18
-    QUERIES_DETALHE = 74
+    QUERIES_DETALHE = 78
     QUERIES_TIPOS = 7
 
 
@@ -163,4 +166,5 @@ class OrcamentoDeQueriesEventoComOrdensTests(TestCase):
 
     # Três OS na página. Se este número crescer de três em três, o assinante
     # voltou a ser resolvido por card.
-    QUERIES_DETALHE_COM_OS = 64
+    # Atualizado em 02/08/2026 (+4) junto com QUERIES_DETALHE (mesmo delta).
+    QUERIES_DETALHE_COM_OS = 68

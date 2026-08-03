@@ -3689,6 +3689,30 @@ html[data-theme="dark"] .cv-icon-btn--whatsapp:is(:hover, :focus) {
   color: var(--action-success-text);
 }
 
+html[data-theme="dark"] .cv-icon-btn--preview {
+  background: var(--action-preview-bg);
+  border-color: var(--action-preview-border);
+  color: var(--action-preview-text);
+}
+
+html[data-theme="dark"] .cv-icon-btn--preview:is(:hover, :focus) {
+  background: color-mix(in srgb, var(--action-preview-bg) 82%, var(--action-preview-text) 18%);
+  border-color: var(--action-preview-text);
+  color: var(--action-preview-text);
+}
+
+html[data-theme="dark"] .cv-icon-btn--delete {
+  background: var(--action-danger-bg);
+  border-color: var(--action-danger-border);
+  color: var(--action-danger-text);
+}
+
+html[data-theme="dark"] .cv-icon-btn--delete:is(:hover, :focus) {
+  background: var(--action-danger-hover-bg, var(--action-danger-bg));
+  border-color: var(--action-danger-border);
+  color: var(--action-danger-text);
+}
+
 html[data-theme="dark"] :is(.cv-icon-btn--edit, .cv-icon-btn--settings):not(.is-assinado) {
   background: var(--action-info-bg);
   border-color: var(--action-info-border);
@@ -4009,6 +4033,7 @@ html[data-theme="dark"] .empty-state__title {
 :is(html[data-theme="dark"])
   .attach-signed-modal__intro {
   margin-top: 18px;
+  margin-bottom: 4px;
 }
 
 .cv-dialog__form {
@@ -4097,6 +4122,31 @@ html[data-theme="dark"] .empty-state__title {
   background: var(--color-input-bg);
   border-color: var(--color-input-border);
   color: var(--color-text);
+}
+
+:is(html[data-theme="dark"])
+  #attach-signed-modal
+  :is(.cv-file-selection__menu, .prestacao-file-selection__menu) {
+  background: transparent;
+  border: 0;
+  border-color: transparent;
+}
+
+:is(html[data-theme="dark"])
+  #attach-signed-modal
+  :is(
+    .cv-file-selection__item,
+    .prestacao-file-selection__item,
+    .cv-file-selection__item:hover,
+    .prestacao-file-selection__item:hover,
+    .cv-file-selection__item:focus,
+    .prestacao-file-selection__item:focus,
+    .cv-file-selection__item:focus-within,
+    .prestacao-file-selection__item:focus-within
+  ) {
+  background: var(--step1-surface, color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%)) !important;
+  background-color: var(--step1-surface, color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%)) !important;
+  transition: none !important;
 }
 
 :is(html[data-theme="dark"])

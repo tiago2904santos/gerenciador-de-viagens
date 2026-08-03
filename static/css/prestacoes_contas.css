@@ -997,3 +997,17 @@
   padding: 0;
 }
 
+
+/* Modal anexar assinado: item selecionado sem hover (esta folha carrega depois do shell). */
+#attach-signed-modal .prestacao-file-selection__item,
+#attach-signed-modal .cv-file-selection__item,
+#attach-signed-modal .prestacao-file-selection__item:hover,
+#attach-signed-modal .cv-file-selection__item:hover,
+#attach-signed-modal .prestacao-file-selection__item:focus,
+#attach-signed-modal .cv-file-selection__item:focus,
+#attach-signed-modal .prestacao-file-selection__item:focus-within,
+#attach-signed-modal .cv-file-selection__item:focus-within {
+  background: var(--step1-surface, color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%)) !important;
+  background-color: var(--step1-surface, color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%)) !important;
+  transition: none !important;
+}

@@ -56,8 +56,7 @@
   {% endif %}
 
   {% if etapa_atual == 2 %}
-    <section class="cv-wizard-collection" aria-labelledby="evento-roteiros-title">
-      {% include "components/ui/layouts/collection_header.html" with title="Roteiros do evento" title_id="evento-roteiros-title" description="Organize os deslocamentos, horários e trechos previstos para esta viagem." only %}
+    <section class="cv-wizard-collection" aria-label="Roteiros do evento">
       <div class="cv-wizard-collection__body">
         {% include "components/lists/simple_list.html" with rows=roteiro_rows empty_message="Nenhum roteiro vinculado a este evento." hide_realtime_count=True only %}
       </div>
@@ -68,8 +67,7 @@
   {% endif %}
 
   {% if etapa_atual == 3 %}
-    <section class="cv-wizard-collection" aria-labelledby="evento-oficios-title">
-      {% include "components/ui/layouts/collection_header.html" with title="Ofícios e justificativas" title_id="evento-oficios-title" description="Registre as autorizações e justificativas que formalizam a participação no evento." only %}
+    <section class="cv-wizard-collection" aria-label="Ofícios e justificativas">
       <div class="cv-wizard-collection__body list-content app-list-grid">
         {% for card in oficio_cards %}
           {% include "oficios/partials/oficio_list_card.html" with card=card csrf_token=csrf_token only %}
@@ -84,10 +82,15 @@
   {% endif %}
 
   {% if etapa_atual == 4 %}
-    {% include "components/ui/forms/form_block.html" with shell="card" section_id="evento-solicitacao-title" extra_class="cv-form-section-card--compact cv-form-section-card--described" title="Documentos de solicitação" description="Anexe ofícios solicitantes, convites, despachos assinados ou imagens que fundamentam este evento. Esses documentos complementam ou substituem a Ordem de Serviço e o Plano de Trabalho." body_template="eventos/partials/_detalhe_solicitacao_body.html" %}
+    {% if solicitacao_anexos %}
+      <section class="cv-wizard-collection" aria-label="Documentos de solicitação">
+        <div class="cv-wizard-collection__body">
+          {% include "eventos/partials/_detalhe_solicitacao_body.html" %}
+        </div>
+      </section>
+    {% endif %}
 
-    <section class="cv-wizard-collection" aria-labelledby="evento-planejamento-title">
-      {% include "components/ui/layouts/collection_header.html" with title="Planejamento e autorização" title_id="evento-planejamento-title" description="Vincule o Plano de Trabalho e a Ordem de Serviço que orientam a execução da viagem." only %}
+    <section class="cv-wizard-collection" aria-label="Planejamento e autorização">
       <div class="cv-wizard-collection__body list-content app-list-grid">
         {% for card in plano_cards %}
           {% include "planos_trabalho/partials/plano_list_card.html" with card=card only %}
@@ -101,23 +104,56 @@
       </div>
     </section>
     <div class="cv-fab-container">
-      {% include "components/ui/buttons/button.html" with href=create_urls.plano label="Novo plano" variant="primary" icon="plus" extra_class="cv-fab" only %}
-      {% include "components/ui/buttons/button.html" with href=create_urls.ordem label="Nova OS" variant="secondary" icon="plus" extra_class="cv-fab" only %}
+      <button
+        type="button"
+        class="cv-btn cv-btn--primary"
+        aria-label="Mais ações"
+        aria-haspopup="true"
+        aria-expanded="false"
+        aria-controls="evento-etapa4-actions-menu"
+        data-overlay-trigger
+        data-overlay-kind="menu"
+        data-overlay-target="evento-etapa4-actions-menu"
+      >
+        <span class="cv-btn__icon" aria-hidden="true">{% include "components/ui/icons/icon.html" with icon="more" only %}</span>
+        <span>Mais ações</span>
+      </button>
+      <div class="cv-action-menu cv-action-menu--rich" id="evento-etapa4-actions-menu" role="menu" hidden>
+        {% include "components/ui/menus/rich_menu_header.html" with title="Mais ações" subtitle="Documentos e planejamento" icon="folder" only %}
+        <button
+          type="button"
+          class="cv-action-menu__item cv-action-menu__item--rich"
+          role="menuitem"
+          data-attach-signed-trigger
+          data-attach-signed-url="{% url 'eventos:solicitacao_anexar' evento.pk %}"
+          data-attach-signed-doc-label=""
+          data-attach-signed-title="Anexar documento"
+          data-attach-signed-eyebrow="Documentos de solicitação"
+          data-attach-signed-accept="application/pdf,image/png,image/jpeg,.pdf,.png,.jpg,.jpeg"
+          data-attach-signed-file-description="o ofício solicitante, convite, despacho ou imagem deste evento"
+          data-attach-signed-file-help="Selecione um arquivo em PDF, PNG, JPG ou JPEG."
+          data-attach-signed-hint="Ele fica disponível na lista de documentos de solicitação."
+          data-attach-signed-choose-label="Escolher arquivo"
+          data-attach-signed-upload-label="Anexar documento"
+        >
+          <span class="cv-action-menu__item-icon cv-action-menu__item-icon--success" aria-hidden="true">
+            {% include "components/ui/icons/icon.html" with icon="document" only %}
+          </span>
+          <span class="cv-action-menu__item-copy">
+            <strong>Anexar documento</strong>
+            <small>Ofícios solicitantes, convites, despachos ou imagens</small>
+          </span>
+        </button>
+        {% include "components/ui/menus/rich_menu_link.html" with href=create_urls.plano title="Plano de trabalho" description="Criar um novo plano vinculado a este evento" icon="document" tone="preview" only %}
+        {% include "components/ui/menus/rich_menu_link.html" with href=create_urls.ordem title="Ordem de serviço" description="Criar uma nova OS vinculada a este evento" icon="clipboard-copy" tone="pdf" only %}
+      </div>
     </div>
   {% endif %}
 
   {% if etapa_atual == 5 %}
-    <section class="cv-wizard-collection" aria-labelledby="evento-termo-geral-title">
-      {% include "components/ui/layouts/collection_header.html" with title="Termo do evento" title_id="evento-termo-geral-title" description="Crie o termo geral com as condições e responsabilidades desta viagem." only %}
+    <section class="cv-wizard-collection" aria-label="Termos do evento">
       <div class="cv-wizard-collection__body">
-        {% include "components/lists/simple_list.html" with rows=termo_generico_rows empty_message="Nenhum termo vinculado." hide_realtime_count=True only %}
-      </div>
-    </section>
-
-    <section class="cv-wizard-collection" aria-labelledby="evento-termos-servidor-title">
-      {% include "components/ui/layouts/collection_header.html" with title="Termos por servidor" title_id="evento-termos-servidor-title" description="Acompanhe os termos individuais gerados para cada participante vinculado." only %}
-      <div class="cv-wizard-collection__body">
-        {% include "components/lists/simple_list.html" with rows=termos_servidor_rows empty_message="Nenhum servidor vinculado a termos deste evento." hide_realtime_count=True only %}
+        {% include "components/lists/simple_list.html" with rows=termo_rows empty_message="Nenhum termo vinculado a este evento." hide_realtime_count=True only %}
       </div>
     </section>
 

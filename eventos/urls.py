@@ -27,6 +27,11 @@ urlpatterns = [
         name="evento_anexo_conteudo",
     ),
     path(
+        "<int:pk>/solicitacao/anexar/",
+        views.anexar_solicitacao,
+        name="solicitacao_anexar",
+    ),
+    path(
         "<int:pk>/solicitacao-anexo/<int:anexo_pk>/conteudo/",
         views.solicitacao_anexo_conteudo,
         name="solicitacao_anexo_conteudo",
