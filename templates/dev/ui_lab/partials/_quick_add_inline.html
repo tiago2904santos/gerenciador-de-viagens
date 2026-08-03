@@ -8,37 +8,37 @@ Parameters:
 - save_label
 - cancel_label
 {% endcomment %}
-<div class="quick-add-inline">
-  <div class="quick-add-inline__tab-row">
+<div class="cv-inline-create">
+  <div class="cv-inline-create__tab-row">
     <button
-      class="quick-add-inline__tab"
+      class="cv-inline-create__tab"
       type="button"
       aria-expanded="false"
       aria-controls="{{ panel_id }}"
-      data-quick-add-toggle>
-      <span class="quick-add-inline__tab-icon" aria-hidden="true">+</span>
-      <span class="quick-add-inline__tab-label">{{ toggle_label }}</span>
+      data-inline-create-toggle>
+      <span class="cv-inline-create__tab-icon" aria-hidden="true">+</span>
+      <span class="cv-inline-create__tab-label">{{ toggle_label }}</span>
     </button>
   </div>
 
-  <div class="quick-add-inline__panel" id="{{ panel_id }}" hidden>
-    <div class="quick-add-inline__header">
-      <h3 class="quick-add-inline__title">{{ panel_title }}</h3>
-      <button class="quick-add-inline__close" type="button" aria-label="Fechar painel" data-quick-add-close>
+  <div class="cv-inline-create__panel" id="{{ panel_id }}" hidden>
+    <div class="cv-inline-create__header">
+      <h3 class="cv-inline-create__title">{{ panel_title }}</h3>
+      <button class="cv-inline-create__close" type="button" aria-label="Fechar painel" data-inline-create-close>
         &times;
       </button>
     </div>
 
-    <div class="quick-add-inline__body">
-      <div class="quick-add-inline__fields">
+    <div class="cv-inline-create__body">
+      <div class="cv-inline-create__fields">
         <div class="field-grid">
           {% for field in fields %}
             {% include "dev/ui_lab/partials/_demo_field.html" with field=field only %}
           {% endfor %}
         </div>
       </div>
-      <div class="quick-add-inline__actions">
-        <button class="btn btn-secondary" type="button" data-quick-add-close>{{ cancel_label|default:"Cancelar" }}</button>
+      <div class="cv-inline-create__actions">
+        <button class="btn btn-secondary" type="button" data-inline-create-close>{{ cancel_label|default:"Cancelar" }}</button>
         <button class="btn btn-primary" type="button">{{ save_label|default:"Salvar" }}</button>
       </div>
     </div>

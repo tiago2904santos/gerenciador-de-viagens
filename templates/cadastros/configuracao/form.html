@@ -1,46 +1,36 @@
-{% extends "base.html" %}
+{% extends "components/page/flow_base.html" %}
 {% load static %}
 
-{% block title %}{{ page_title }}{% endblock %}
+{% block flow_shell_modifier %}page-shell--standard cv-page--form{% endblock %}
+{% block flow_shell_extra %} document-form-page cadastros-form-page{% endblock %}
+{% block flow_shell_attrs %} data-configuracoes-shell{% endblock %}
 
-{% block content %}
-  <div class="page-shell page-shell--standard">
-    {% include "components/ui/headers/page_header.html" with eyebrow="CADASTROS" title=page_title description=page_description icon_label="CF" module_label="Configurações" only %}
+{% block flow_body %}
+  <div class="cv-form-section-stack cv-form-section-stack--comfortable" data-travel-document-wizard-step1>
+    <form
+      method="post"
+      class="document-form travel-document-wizard__form"
+      novalidate
+      data-configuracoes-form
+      data-cep-lookup-url-template="{% url 'cadastros:api_consulta_cep' '00000000' %}"
+    >
+      {% csrf_token %}
+      {% include "components/form/card.html" with title="Dados da unidade e endereço" description="Unidade operacional e endereço usado nos documentos." title_id="config-card-unidade-endereco-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="cadastros/configuracao/partials/_unidade_endereco_body.html" %}
+      {% include "components/form/card.html" with title="Assinantes padrão por documento" description="Servidores que assinam cada tipo de documento por padrão." title_id="config-card-assinantes-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="cadastros/configuracao/partials/_assinantes_body.html" footer_template="cadastros/configuracao/partials/_form_footer.html" %}
+    </form>
 
-    <div class="main-form-panel main-form-panel--stack">
-      <div class="cv-form-section-stack cv-form-section-stack--comfortable">
-        <form
-          method="post"
-          novalidate
-          data-configuracoes-form
-          data-cep-lookup-url-template="{% url 'cadastros:api_consulta_cep' '00000000' %}"
-        >
-          {% csrf_token %}
+    <form method="post" class="document-form travel-document-wizard__form" novalidate>
+      {% csrf_token %}
+      <input type="hidden" name="form_id" value="diarias">
+      {% include "components/form/card.html" with title="Valores de diária" description="Informe apenas o valor de 24 horas; 15% e 30% são calculados. Cada tabela vale a partir da data de vigência, e roteiros com saída anterior mantêm o valor que valia na época." title_id="config-card-diarias-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="cadastros/configuracao/partials/_diarias_body.html" footer_template="cadastros/configuracao/partials/_form_footer.html" %}
+    </form>
 
-          {# CARD 1 — Dados da unidade e Endereço dos documentos #}
-          {% include "components/ui/forms/form_block.html" with shell="card" section_id="config-card-unidade-endereco-title" title="Dados da unidade e Endereço dos documentos" body_template="cadastros/configuracao/partials/_unidade_endereco_body.html" %}
-
-          {# CARD 2 — Assinantes padrão por documento #}
-          {% include "components/ui/forms/form_block.html" with shell="card" section_id="config-card-assinantes-title" title="Assinantes padrão por documento" body_template="cadastros/configuracao/partials/_assinantes_body.html" footer_template="cadastros/configuracao/partials/_form_footer.html" %}
-        </form>
-
-        {# CARD 3 — Valores de diária #}
-        <form method="post" novalidate>
-          {% csrf_token %}
-          <input type="hidden" name="form_id" value="diarias">
-          {% include "components/ui/forms/form_block.html" with shell="card" extra_class="cv-form-section-card--described" section_id="config-card-diarias-title" title="Valores de diária" description="Informe apenas o valor de 24 horas; 15% e 30% são calculados. Cada tabela vale a partir da data de vigência, e roteiros com saída anterior mantêm o valor que valia na época." body_template="cadastros/configuracao/partials/_diarias_body.html" footer_template="cadastros/configuracao/partials/_form_footer.html" %}
-        </form>
-
-        {# CARD 4 — Destinatário padrão do Ofício #}
-        <form method="post" action="{% url 'cadastros:configuracao' %}" data-destinatario-form>
-          {% csrf_token %}
-          <input type="hidden" name="form_id" value="destinatarios">
-          {{ destinatario_form.destinatario_oficio_nome }}
-          {% include "components/ui/forms/form_block.html" with shell="card" section_id="config-card-destinatario-title" title="Destinatário padrão do Ofício" description="Busque um servidor cadastrado (cargo e unidade são preenchidos automaticamente) ou digite os dados manualmente." body_template="cadastros/configuracao/partials/_destinatario_body.html" footer_template="cadastros/configuracao/partials/_form_footer.html" %}
-        </form>
-
-      </div>
-    </div>
+    <form method="post" action="{% url 'cadastros:configuracao' %}" class="document-form travel-document-wizard__form" data-destinatario-form>
+      {% csrf_token %}
+      <input type="hidden" name="form_id" value="destinatarios">
+      {{ destinatario_form.destinatario_oficio_nome }}
+      {% include "components/form/card.html" with title="Destinatário padrão do Ofício" description="Busque um servidor cadastrado (cargo e unidade são preenchidos automaticamente) ou digite os dados manualmente." title_id="config-card-destinatario-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="cadastros/configuracao/partials/_destinatario_body.html" footer_template="cadastros/configuracao/partials/_form_footer.html" %}
+    </form>
   </div>
 {% endblock %}
 

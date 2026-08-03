@@ -1,16 +1,12 @@
-{# Lista simples com header Quick Add (compacto, com bloco visual). #}
+{# Lista com criação inline (cv-inline-create). Cabeçalho via banda canônica (D-53). #}
 <div class="page-shell page-shell--list" data-collection data-collection-mode="server">
-  <div class="list-header list-header--quick-add cv-filter-header{% if quick_add_compact %} list-header--quick-add-compact{% endif %}">
-    <div class="list-header__band">
-      <div class="list-header__title-block">
-        {% if eyebrow %}<span class="list-header__eyebrow">{{ eyebrow }}</span>{% endif %}
-        <div class="list-header__title-row">
-          <h1 class="list-header__title">{{ title }}</h1>
-        </div>
-      </div>
-    </div>
+  <div
+    class="list-header list-header--inline-create cv-filter-header{% if quick_add_compact %} list-header--inline-create-compact{% endif %}"
+    {% if can_edit_area %}data-travel-document-wizard-step1{% endif %}
+  >
+    {% include "components/ui/headers/_list_header_band.html" with title=title eyebrow=eyebrow only %}
 
-    <div class="list-header__rail list-header__rail--quick-add">
+    <div class="list-header__rail list-header__rail--inline-create">
       <form class="list-header__filters" method="get" action="{{ request.path }}" data-collection-form>
         <div class="list-header__search">
           <input
@@ -36,15 +32,23 @@
       </form>
 
       {% if can_edit_area %}
-      <form class="quick-add-inline__panel quick-add-panel" id="{{ quick_add_panel_id }}" method="post" action="{{ request.path }}" data-create-action="{{ request.path }}" hidden novalidate>
+      <form
+        class="cv-inline-create__panel"
+        id="{{ quick_add_panel_id }}"
+        method="post"
+        action="{{ request.path }}"
+        data-create-action="{{ request.path }}"
+        hidden
+        novalidate
+      >
         {% csrf_token %}
         {% if quick_add_next_url %}<input type="hidden" name="next" value="{{ quick_add_next_url }}">{% endif %}
-        <div class="quick-add-inline__body">
-          <div class="quick-add-inline__fields">
+        <div class="cv-inline-create__body">
+          <div class="cv-inline-create__fields">
             {% include quick_add_body_template with form=quick_add_form only %}
           </div>
           {% if not quick_add_compact %}
-          <div class="quick-add-inline__actions">
+          <div class="cv-inline-create__actions">
             {% include "components/ui/buttons/button.html" with label=quick_add_submit_label|default:"Salvar" variant="primary" type="submit" icon="check" only %}
           </div>
           {% endif %}
@@ -54,9 +58,16 @@
     </div>
 
     {% if can_edit_area %}
-    <button class="quick-add-footer-button" type="button" data-quick-add-toggle{% if quick_add_compact %} data-quick-add-submit-when-open data-quick-add-save-label="{{ quick_add_submit_label|default:'Salvar' }}"{% endif %} aria-controls="{{ quick_add_panel_id }}" aria-expanded="{% if quick_add_form.errors %}true{% else %}false{% endif %}">
-      <span class="quick-add-footer-button__icon" aria-hidden="true">+</span>
-      <span class="quick-add-footer-button__label">{{ quick_add_label|default:"Cadastrar item" }}</span>
+    <button
+      class="cv-inline-create__toggle"
+      type="button"
+      data-inline-create-toggle
+      {% if quick_add_compact %}data-inline-create-submit-when-open data-inline-create-save-label="{{ quick_add_submit_label|default:'Salvar' }}"{% endif %}
+      aria-controls="{{ quick_add_panel_id }}"
+      aria-expanded="{% if quick_add_form.errors %}true{% else %}false{% endif %}"
+    >
+      <span class="cv-inline-create__toggle-icon" aria-hidden="true">+</span>
+      <span class="cv-inline-create__toggle-label">{{ quick_add_label|default:"Cadastrar item" }}</span>
     </button>
     {% endif %}
   </div>

@@ -251,6 +251,9 @@ def servidor_create(request):
         {
             "page_title": "Novo servidor",
             "page_description": "Apenas o nome é obrigatório — cargo, CPF, RG e unidade podem ser completados depois; o cadastro fica como rascunho até então.",
+            "flow_eyebrow": "CADASTROS",
+            "flow_back_label": "Voltar",
+            "flow_back_url": next_url,
             "form": form,
             "submit_label": "Criar servidor",
             "submit_icon": "plus",
@@ -279,6 +282,9 @@ def servidor_update(request, pk):
         {
             "page_title": "Editar servidor",
             "page_description": "Atualize os dados do servidor. Cargo, CPF, RG e unidade podem ser completados depois; o cadastro fica como rascunho até então.",
+            "flow_eyebrow": "CADASTROS",
+            "flow_back_label": "Voltar",
+            "flow_back_url": reverse("cadastros:servidores_index"),
             "form": form,
             "submit_label": "Salvar servidor",
             "submit_icon": "check",
@@ -351,6 +357,9 @@ def viatura_create(request):
         {
             "page_title": "Nova viatura",
             "page_description": "Apenas a placa é obrigatória — modelo, combustível e tipo podem ser completados depois; o cadastro fica como rascunho até então.",
+            "flow_eyebrow": "CADASTROS",
+            "flow_back_label": "Voltar",
+            "flow_back_url": next_url,
             "form": form,
             "submit_label": "Criar viatura",
             "submit_icon": "plus",
@@ -380,6 +389,9 @@ def viatura_update(request, pk):
         {
             "page_title": "Editar viatura",
             "page_description": "Atualize os dados da viatura. Modelo, combustível e tipo podem ser completados depois; o cadastro fica como rascunho até então.",
+            "flow_eyebrow": "CADASTROS",
+            "flow_back_label": "Voltar",
+            "flow_back_url": reverse("cadastros:viaturas_index"),
             "form": form,
             "submit_label": "Salvar viatura",
             "submit_icon": "check",
@@ -443,6 +455,9 @@ def configuracao_sistema(request):
         {
             "page_title": "Configurações do sistema",
             "page_description": "Unidade, cidade em documentos e assinantes padrão por tipo.",
+            "flow_eyebrow": "CADASTROS",
+            "flow_back_label": "Voltar",
+            "flow_back_url": reverse("core:dashboard"),
             "form": form,
             "assinaturas_form": assinaturas_form,
             "destinatario_form": destinatario_form,
@@ -486,6 +501,9 @@ def viatura_delete(request, pk):
         {
             "page_title": "Excluir viatura",
             "page_description": "Esta ação excluirá o cadastro. Se houver vínculos com outros registros, a exclusão será bloqueada.",
+            "flow_eyebrow": "CADASTROS",
+            "flow_back_label": "Voltar",
+            "flow_back_url": reverse("cadastros:viaturas_index"),
             "object": viatura,
             "back_url": reverse("cadastros:viaturas_index"),
         },

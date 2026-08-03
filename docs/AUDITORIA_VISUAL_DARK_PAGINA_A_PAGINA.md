@@ -330,9 +330,9 @@ Numerados para rastreio. Severidade: 🔴 crítico (quebra a leitura) · 🟠 al
 | D-50 | 🟠 | **Botões** | `.cv-btn` (vivo) · `.btn`/`.btn-primary`/`.btn-*` (morto) · `.app-btn`/`.app-btn--*` (morto) · `.btn--document-*` (morto) · `.cv-icon-btn` (vivo) |
 | D-51 | 🟠 | **Alertas/banners** | `.alert`/`.alert-*` (utilities) · `.cv-alert`/`.cv-alert--*` (page-shell) · `.diario-diaria-alert` (RT) · `.pte-events__banner` (PT) |
 | D-52 | 🟠 | **Cards de lista** | `.cv-entity-card` + `.oficio-lc__*` (vivo, 6 módulos) · `.roteiro-list-card__*` (599 linhas, morto em produção) · `.evento-lc__*` (2 regras) · `.cv-document-card` (sem cor) |
-| D-53 | 🟠 | **Cabeçalho de lista** | `filter_page_header.html` (canônico) · markup inline duplicado em `list_page_quick_add.html:3-11` |
+| D-53 | ✅ | **Cabeçalho de lista** | `filter_page_header.html` + `_list_header_band.html` compartilhados; `list_page_quick_add` usa a banda canônica; classes `cv-inline-create__*` |
 | D-54 | 🟠 | **Confirmação de exclusão** | modal JS `delete_confirm_modal.html` (listas de cards) · página inteira `confirm_delete.html` (12 páginas de catálogo) — e a página usa `.cv-confirm-page*`, **sem CSS**, caindo em `.form-section`/`.section-header` legados |
-| D-55 | 🟡 | **Resumo/estatística** | `cv-summary-item/-label/-value` (summary-items.css) · `cv-summary-tile` (content-cards.css) · `pt-resumo-box` (dentro de content-cards.css!) · `admin-overview__stats` com `<dl>` (usuarios) |
+| D-55 | ✅ | **Resumo/estatística** | Usuários usa `cv-metric` / `summary_card` + `cv-metric-grid`; `admin-overview__stats` e `workspace-admin.css` removidos |
 | D-56 | 🟡 | **Grid de campos** | `.field-grid` + `.field-size-1..4` (padrão) · `.field-grid--cols-2/3/4` (segundo padrão) · `.field-grid-rows` (terceiro) |
 | NOVO-19 | 🟡 | **Sede do roteiro ofício espelhava Destinos** — card interno (`.oficio-roteiro-sede-row`) + badge dourado `SEDE` + título empilhado: três camadas de chrome para um par UF/cidade. **Corrigido:** `cv-form-subsection--split` (copy à esquerda, campos à direita), sem badge/card. | `_fonte_body.html` · `form-sections.css` |
 | NOVO-20 | 🟠 | **Header de wizard quebrava a identidade das listas** — `page-header-stack` (band+rail horizontal no dark) era visualmente outro sistema que o `.list-header` das listas. **Corrigido:** `wizard_page_header.html` reusa `.list-header` + stepper no rail; sticky com `is-detached` (cantos arredondam ao descolar). | `wizard_page_header.html` · `list-header.css` · `wizard-sticky-header.js` |
@@ -447,7 +447,7 @@ Legenda: **✅ conforme** · **⚠️ desvio** · **❌ fora do padrão**
 | Dashboard | `core/dashboard.html` | ❌ `page-shell` sem modificador. ❌ `.summary-items` sem CSS (D-03). ⚠️ mistura `cv-entity-card` (card de lista) com conteúdo editorial. `dashboard-page__*` = vocabulário local. |
 | Login | `core/login.html` | ❌ ilha (D-24): não estende `base.html`, sem tokens do sistema, sem tema. |
 | Perfil | `core/perfil.html` | ⚠️ usa `cv-form-section-card` **sem** `cv-form-card` (único no sistema). ❌ **footer escrito à mão ×3** em vez de `card_footer_section.html`. `<h2>`. Carrega `gdrive-config.css` (892 linhas) com vocabulário `gdrive-*` inteiramente próprio. |
-| Administração / Usuários | `usuarios/index.html` | ❌ `.admin-overview` + `<dl class="admin-overview__stats">` — **quinto** sistema de estatística (D-55). `workspace-admin.css` com vocabulário `admin-*`. |
+| Administração / Usuários | `usuarios/index.html` | ✅ `flow_base` + step1 + `summary_card`/`cv-metric-grid` (D-55). Vocabulário `admin-*` / `workspace-admin.css` removidos. |
 | Documentos (placeholder) | `documentos/index.html` | ⚠️ `module_placeholder.html`; `.module-placeholder-card__header` e `__status` sem CSS. |
 | Diário de Bordo (placeholder) | `diario_bordo/index.html` | ⚠️ idem. |
 | Visualizador de PDF | `documentos/pdf_viewer.html` | ⚠️ `doc-pdf-toolbar`, `doc-pdf-toolbar__btn`, `doc-section`, `doc-title`, `doc-meta`, `doc-muted`, `doc-orgao`, `doc-unidade` — 8 classes sem CSS no bundle. |
@@ -488,7 +488,7 @@ Legenda: **✅ conforme** · **⚠️ desvio** · **❌ fora do padrão**
 | `list-header` (CSS) | `components/list-header.css` (762) | ⚠️ contém também o `filter-pill` do date picker e o Quick Add inteiro — três responsabilidades. Consome `--cv-card-family-bg`, definido só em `dark-redesign.css:126`. |
 | `list_tabs` | `components/lists/list_tabs.html` | ✅ ok. `.cv-list-tab__label` sem CSS. |
 | `filter-header.css` | `components/filter-header.css` (18) | ❌ "compat residual", 3 regras — absorver e apagar. |
-| Quick Add | `list_page_quick_add.html` | ❌ duplica o markup do `filter_page_header` (linhas 3-11) em vez de incluí-lo (D-53). |
+| Quick Add / inline create | `list_page_quick_add.html` | ✅ banda canônica `_list_header_band.html` (D-53); classes `cv-inline-create__*` |
 
 ### 6.3 Cards de lista
 
@@ -942,7 +942,7 @@ Cada fase é independente e verificável.
 | `utilities.css` | 583 | **Fatiar** → `20-primitives/notice` + `20-primitives/chip` + utilitários reais |
 | `buttons-functional.css` | 496 | ❌ **apagar** (morto) |
 | `ordens-servico.css` | 469 | **Dissolver** (23 `!important`) |
-| `workspace-admin.css` | 457 | → `50-content/*` |
+| `workspace-admin.css` | ~~457~~ | ❌ **apagado** (D-55; página Usuários usa `usuarios.css` + step1) |
 | `planos-trabalho-atividades.css` | 411 | → `50-content/checklist` |
 | `sidebar.css` | 391 | → `10-layout/sidebar` |
 | `prestacoes-assinatura.css` | 354 | → `50-content/signature` (com tokens) |

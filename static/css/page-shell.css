@@ -109,16 +109,16 @@
   --filter-input-height:        var(--control-height-md);
 
   /* --- Quick Add Folder Tab --- */
-  --quick-add-tab-radius:     var(--radius-md);  /* 14px — aba mais arredondada */
-  --quick-add-tab-px:         var(--space-5);    /* 20px — aba mais larga      */
-  --quick-add-tab-py:         var(--space-3);    /* 12px — aba mais alta        */
-  --quick-add-tab-icon-size:  var(--space-5);    /* 20px — círculo do ícone     */
-  --quick-add-tab-width:      230px;
-  --quick-add-tab-height:     35px;
-  --quick-add-tab-clip-path:  path("M 0 0 H 230 V 35 H 46 Q 38 35 33 32 Q 11 11 2 0 Z");
-  --quick-add-tab-shadow:     -1px -3px 12px rgba(0, 0, 0, 0.15), 1px -3px 12px rgba(0, 0, 0, 0.10);
-  --quick-add-actions-offset: 1px;
-  --quick-add-primary-border: rgba(255, 255, 255, 0.4);
+  --inline-create-tab-radius:     var(--radius-md);  /* 14px — aba mais arredondada */
+  --inline-create-tab-px:         var(--space-5);    /* 20px — aba mais larga      */
+  --inline-create-tab-py:         var(--space-3);    /* 12px — aba mais alta        */
+  --inline-create-tab-icon-size:  var(--space-5);    /* 20px — círculo do ícone     */
+  --inline-create-tab-width:      230px;
+  --inline-create-tab-height:     35px;
+  --inline-create-tab-clip-path:  path("M 0 0 H 230 V 35 H 46 Q 38 35 33 32 Q 11 11 2 0 Z");
+  --inline-create-tab-shadow:     -1px -3px 12px rgba(0, 0, 0, 0.15), 1px -3px 12px rgba(0, 0, 0, 0.10);
+  --inline-create-actions-offset: 1px;
+  --inline-create-primary-border: rgba(255, 255, 255, 0.4);
 
   /* --- Footer Actions --- */
   --footer-actions-padding-x: var(--form-section-padding-x);
@@ -233,11 +233,11 @@ html[data-theme="dark"] {
   --shadow-quick-create:         none;
 
   /* Quick Add Folder Tab */
-  --surface-quick-add-tab:        rgba(11, 58, 102, 0.50);   /* azul primário com opacidade */
-  --border-quick-add-tab:         rgba(255, 255, 255, 0.22);
-  --color-quick-add-tab:          #ccdff5;                   /* texto claro sobre fundo escuro */
-  --color-quick-add-tab-icon-bg:  var(--color-accent);       /* círculo dourado */
-  --color-quick-add-tab-icon-fg:  var(--color-primary-dark); /* texto escuro sobre dourado */
+  --surface-inline-create-tab:        rgba(11, 58, 102, 0.50);   /* azul primário com opacidade */
+  --border-inline-create-tab:         rgba(255, 255, 255, 0.22);
+  --color-inline-create-tab:          #ccdff5;                   /* texto claro sobre fundo escuro */
+  --color-inline-create-tab-icon-bg:  var(--color-accent);       /* círculo dourado */
+  --color-inline-create-tab-icon-fg:  var(--color-primary-dark); /* texto escuro sobre dourado */
 
   /* Header Filter Bar */
   --surface-filter-input:         rgba(255, 255, 255, 0.05);
@@ -341,11 +341,11 @@ html[data-theme="light"] {
   --shadow-quick-create:         none;
 
   /* Quick Add Folder Tab */
-  --surface-quick-add-tab:        #dbeaf8;
-  --border-quick-add-tab:         #a8c5de;
-  --color-quick-add-tab:          var(--color-primary-strong);
-  --color-quick-add-tab-icon-bg:  var(--color-primary);
-  --color-quick-add-tab-icon-fg:  var(--color-white);
+  --surface-inline-create-tab:        #dbeaf8;
+  --border-inline-create-tab:         #a8c5de;
+  --color-inline-create-tab:          var(--color-primary-strong);
+  --color-inline-create-tab-icon-bg:  var(--color-primary);
+  --color-inline-create-tab-icon-fg:  var(--color-white);
 
   /* Header Filter Bar */
   --surface-filter-input:         var(--color-surface);
@@ -904,12 +904,12 @@ html[data-theme="light"] {
 }
 
 /* Primeira seção e rodapé seguem o radius do painel (evita quinas no topo/base) */
-.main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--quick-add) > .form-section:first-child {
+.main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--inline-create) > .form-section:first-child {
   border-top-left-radius:  var(--form-panel-radius);
   border-top-right-radius: var(--form-panel-radius);
 }
 
-.main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--quick-add) > .footer-actions:last-child {
+.main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--inline-create) > .footer-actions:last-child {
   border-bottom-left-radius:  var(--form-panel-radius);
   border-bottom-right-radius: var(--form-panel-radius);
 }
@@ -924,7 +924,7 @@ html[data-theme="light"] {
   overflow: visible;
 }
 
-.main-form-panel--quick-add {
+.main-form-panel--inline-create {
   background: transparent;
   border: none;
   box-shadow: none;
@@ -2532,7 +2532,7 @@ body.has-delete-modal-open {
 
 /* Variações */
 .page-header-rail--filters,
-.page-header-rail--filters-quick-add {
+.page-header-rail--filters-inline-create {
   flex-wrap: wrap;
   gap:       var(--space-4);
 }
@@ -2543,7 +2543,7 @@ body.has-delete-modal-open {
 }
 
 /* Painel inline dentro do rail quick-add */
-.page-header-rail--filters-quick-add .quick-add-panel {
+.page-header-rail--filters-inline-create .cv-inline-create__panel {
   background:  transparent;
   border:      0;
   border-top:  1px solid var(--border-filter-bar);
@@ -2551,7 +2551,7 @@ body.has-delete-modal-open {
   width:       100%;
 }
 
-.page-header-rail--filters-quick-add .quick-add-inline__body {
+.page-header-rail--filters-inline-create .cv-inline-create__body {
   align-items: flex-end;
   display:     flex;
   gap:         var(--layout-quick-create-gap);
@@ -2559,7 +2559,7 @@ body.has-delete-modal-open {
   width:       100%;
 }
 
-.page-header-rail--filters-quick-add .quick-add-inline__actions {
+.page-header-rail--filters-inline-create .cv-inline-create__actions {
   margin-left: auto;
   width:       auto;
 }
@@ -2567,11 +2567,11 @@ body.has-delete-modal-open {
 /* Variante compacta (cargo/combustível): apenas o input.
    Sem label, sem botão e com o divisor indo de ponta a ponta do card. */
 
-.header-stack--quick-add-compact .quick-add-inline__body {
+.header-stack--inline-create-compact .cv-inline-create__body {
   padding: var(--space-3) 0 0; /* só o gap entre o divisor e o input */
 }
 
-.header-stack--quick-add-compact .page-header-rail--filters-quick-add .quick-add-panel {
+.header-stack--inline-create-compact .page-header-rail--filters-inline-create .cv-inline-create__panel {
   border-radius: 0;
   box-shadow:    none;
   flex-shrink:   0;             /* não deixa o flex encolher de volta */
@@ -2587,7 +2587,7 @@ body.has-delete-modal-open {
    Controlado por JS: remove [hidden] → adiciona .is-open.
    ========================================================= */
 
-.quick-add-panel {
+.cv-inline-create__panel {
   box-sizing:  border-box;
   margin-top:  0;
   max-height:  0;
@@ -2598,7 +2598,7 @@ body.has-delete-modal-open {
   width:       100%;
 }
 
-.quick-add-panel.is-open {
+.cv-inline-create__panel.is-open {
   max-height: 580px;
   opacity:    1;
   transform:  translateY(0);
@@ -2610,7 +2610,7 @@ body.has-delete-modal-open {
    dispara o painel de cadastro rápido.
    ========================================================= */
 
-.quick-add-footer-button {
+.cv-inline-create__toggle {
   align-items:     center;
   appearance:      none;
   background:      var(--surface-filter-bar);
@@ -2631,37 +2631,37 @@ body.has-delete-modal-open {
   width:           100%;
 }
 
-.quick-add-footer-button:hover {
+.cv-inline-create__toggle:hover {
   background: var(--surface-list-row-hover);
 }
 
-.quick-add-footer-button:focus-visible {
+.cv-inline-create__toggle:focus-visible {
   outline:        2px solid var(--border-focus);
   outline-offset: -2px;
 }
 
-.quick-add-footer-button.is-active,
-.quick-add-footer-button[aria-expanded="true"] {
+.cv-inline-create__toggle.is-active,
+.cv-inline-create__toggle[aria-expanded="true"] {
   background:   var(--surface-filter-bar);
   border-color: var(--border-filter-bar);
   box-shadow:   none;
 }
 
-.quick-add-footer-button.is-filled {
-  animation:    quick-add-btn-fill 0.4s cubic-bezier(0, 0, 0.2, 1) forwards;
+.cv-inline-create__toggle.is-filled {
+  animation:    inline-create-btn-fill 0.4s cubic-bezier(0, 0, 0.2, 1) forwards;
   background:   var(--cv-btn-primary-bg);
   border-color: var(--cv-btn-primary-border);
   box-shadow:   0 6px 14px rgba(11, 58, 102, 0.16);
   color:        var(--cv-btn-primary-color);
 }
 
-.quick-add-footer-button.is-filled:hover {
+.cv-inline-create__toggle.is-filled:hover {
   background:   var(--cv-btn-primary-hover-bg);
   border-color: var(--cv-btn-primary-hover-border);
   box-shadow:   0 10px 18px rgba(11, 58, 102, 0.22);
 }
 
-@keyframes quick-add-btn-fill {
+@keyframes inline-create-btn-fill {
   from {
     background:   var(--surface-filter-bar);
     border-color: var(--border-filter-bar);
@@ -2670,24 +2670,24 @@ body.has-delete-modal-open {
   }
 }
 
-html[data-theme="dark"] .quick-add-footer-button {
+html[data-theme="dark"] .cv-inline-create__toggle {
   background: var(--color-card-muted); /* #213246 */
   color:      var(--theme-text-body);
 }
 
-html[data-theme="dark"] .quick-add-footer-button:hover {
+html[data-theme="dark"] .cv-inline-create__toggle:hover {
   background: color-mix(in srgb, var(--color-card-muted) 80%, var(--color-white) 20%);
 }
 
-html[data-theme="dark"] .quick-add-footer-button.is-active,
-html[data-theme="dark"] .quick-add-footer-button[aria-expanded="true"] {
+html[data-theme="dark"] .cv-inline-create__toggle.is-active,
+html[data-theme="dark"] .cv-inline-create__toggle[aria-expanded="true"] {
   background:   var(--color-card-muted); /* #213246 — igual ao estado fechado */
   border-color: var(--border-filter-bar);
   color:        var(--theme-text-body);
 }
 
-html[data-theme="dark"] .quick-add-footer-button.is-filled {
-  animation-name:     quick-add-btn-fill-dark;
+html[data-theme="dark"] .cv-inline-create__toggle.is-filled {
+  animation-name:     inline-create-btn-fill-dark;
   animation-duration: 0.4s;
   animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
   background:     var(--cv-btn-primary-bg);
@@ -2695,7 +2695,7 @@ html[data-theme="dark"] .quick-add-footer-button.is-filled {
   color:          var(--cv-btn-primary-color);
 }
 
-@keyframes quick-add-btn-fill-dark {
+@keyframes inline-create-btn-fill-dark {
   from {
     background:   var(--color-card-muted);
     border-color: var(--border-filter-bar);
@@ -2704,18 +2704,18 @@ html[data-theme="dark"] .quick-add-footer-button.is-filled {
   }
 }
 
-html[data-theme="dark"] .quick-add-footer-button.is-filled:hover {
+html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
   background:   var(--cv-btn-primary-hover-bg);
   border-color: var(--cv-btn-primary-hover-border);
 }
 
-.quick-add-footer-button__icon {
+.cv-inline-create__toggle-icon {
   align-items:     center;
   display:         inline-flex;
   justify-content: center;
 }
 
-.quick-add-footer-button__label {
+.cv-inline-create__toggle-label {
   font-weight: var(--font-weight-bold);
 }
 
@@ -2935,7 +2935,7 @@ html[data-theme="dark"] .quick-add-footer-button.is-filled:hover {
    Extensão visual abaixo do filter bar / toolbar.
    ========================================================= */
 
-.quick-add-inline {
+.cv-inline-create {
   box-sizing:     border-box;
   display:        flex;
   flex-direction: column;
@@ -2945,15 +2945,15 @@ html[data-theme="dark"] .quick-add-footer-button.is-filled:hover {
 /* ─── Folder Tab — orelhinha de pasta física ─────────────── */
 
 /* Linha que contém a aba (não estica a aba) */
-.quick-add-inline__tab-row {
+.cv-inline-create__tab-row {
   display: flex;
   justify-content: flex-end;
 }
 
 /* Aba / gatilho de abertura — estilo pasta física */
-.quick-add-inline__tab {
-  width: var(--quick-add-tab-width);
-  height: var(--quick-add-tab-height);
+.cv-inline-create__tab {
+  width: var(--inline-create-tab-width);
+  height: var(--inline-create-tab-height);
   padding-inline: var(--space-4);
   border-radius: 0 0 var(--radius-md) 0;
   display: inline-flex;
@@ -2969,64 +2969,64 @@ html[data-theme="dark"] .quick-add-footer-button.is-filled:hover {
   border: 0;
   cursor: pointer;
 
-  clip-path: var(--quick-add-tab-clip-path);
+  clip-path: var(--inline-create-tab-clip-path);
 }
 
-.quick-add-inline__tab:hover,
-.quick-add-inline__tab:focus-visible {
-  box-shadow: var(--quick-add-tab-shadow);
+.cv-inline-create__tab:hover,
+.cv-inline-create__tab:focus-visible {
+  box-shadow: var(--inline-create-tab-shadow);
   color:      var(--theme-text-heading);
 }
 
-.quick-add-inline__tab:hover .quick-add-inline__tab-icon {
+.cv-inline-create__tab:hover .cv-inline-create__tab-icon {
   background: var(--color-accent-hover, var(--color-accent));
 }
 
-.quick-add-inline__tab:focus-visible {
+.cv-inline-create__tab:focus-visible {
   outline:        2px solid var(--border-focus);
   outline-offset: -2px;
 }
 
 /* Aberta: aba conectada visivelmente ao painel */
-.quick-add-inline__tab[aria-expanded="true"] {
+.cv-inline-create__tab[aria-expanded="true"] {
   background: var(--surface-quick-create-header);
   box-shadow: none;
   color:      var(--theme-text-heading);
 }
 
-.quick-add-inline__tab[aria-expanded="true"] .quick-add-inline__tab-icon {
+.cv-inline-create__tab[aria-expanded="true"] .cv-inline-create__tab-icon {
   background: var(--color-accent);
   transform:  rotate(45deg);
 }
 
 /* Ícone — círculo colorido com sinal + (gira 45° para virar ×) */
-.quick-add-inline__tab-icon {
+.cv-inline-create__tab-icon {
   align-items:     center;
-  background:      var(--color-quick-add-tab-icon-bg);
+  background:      var(--color-inline-create-tab-icon-bg);
   border-radius:   var(--radius-pill);
-  color:           var(--color-quick-add-tab-icon-fg);
+  color:           var(--color-inline-create-tab-icon-fg);
   display:         inline-flex;
   flex-shrink:     0;
   font-size:       var(--font-size-xs);
   font-weight:     var(--font-weight-bold);
-  height:          var(--quick-add-tab-icon-size);
+  height:          var(--inline-create-tab-icon-size);
   justify-content: center;
   line-height:     1;
   pointer-events:  none;
   transition:
     background  var(--transition-base),
     transform   var(--transition-base);
-  width:           var(--quick-add-tab-icon-size);
+  width:           var(--inline-create-tab-icon-size);
 }
 
 /* Label do texto */
-.quick-add-inline__tab-label {
+.cv-inline-create__tab-label {
   letter-spacing: inherit;
   pointer-events: none;
 }
 
 /* Painel: visualmente unido à aba acima */
-.quick-add-inline__panel {
+.cv-inline-create__panel {
   background:    var(--surface-quick-create);
   border:        1px solid var(--border-quick-create);
   border-radius: 0 var(--radius-sm) var(--radius-sm) var(--radius-sm);
@@ -3036,12 +3036,12 @@ html[data-theme="dark"] .quick-add-footer-button.is-filled:hover {
 }
 
 /* Fallback: quando não usa __panel (forma antiga com .is-open) */
-.quick-add-inline.is-open > :not(.quick-add-inline__tab-row) {
+.cv-inline-create.is-open > :not(.cv-inline-create__tab-row) {
   display: flex;
   flex-direction: column;
 }
 
-.quick-add-inline__header {
+.cv-inline-create__header {
   align-items:     center;
   background:      var(--surface-quick-create-header);
   border-bottom:   1px solid var(--border-quick-create);
@@ -3052,14 +3052,14 @@ html[data-theme="dark"] .quick-add-footer-button.is-filled:hover {
   padding:         var(--space-2) var(--filter-bar-padding-x);
 }
 
-.quick-add-inline__title {
+.cv-inline-create__title {
   color:       var(--theme-text-heading);
   font-size:   var(--font-size-sm);
   font-weight: var(--font-weight-bold);
   margin:      0;
 }
 
-.quick-add-inline__close {
+.cv-inline-create__close {
   align-items:     center;
   background:      transparent;
   border:          none;
@@ -3076,12 +3076,12 @@ html[data-theme="dark"] .quick-add-footer-button.is-filled:hover {
   width:           28px;
 }
 
-.quick-add-inline__close:hover {
+.cv-inline-create__close:hover {
   background: var(--border-quick-create);
   color:      var(--theme-text-heading);
 }
 
-.quick-add-inline__body {
+.cv-inline-create__body {
   align-items: flex-end;
   box-sizing:  border-box;
   display:     flex;
@@ -3090,29 +3090,29 @@ html[data-theme="dark"] .quick-add-footer-button.is-filled:hover {
   width:       100%;
 }
 
-.quick-add-inline__fields {
+.cv-inline-create__fields {
   flex:      1;
   min-width: 0;
 }
 
-.quick-add-inline__actions {
+.cv-inline-create__actions {
   align-items:    flex-end;
   display:        flex;
   flex-shrink:    0;
   gap:            var(--space-2);
-  padding-bottom: var(--quick-add-actions-offset);
+  padding-bottom: var(--inline-create-actions-offset);
   width:          var(--layout-quick-create-actions-width);
 }
 
-.quick-add-inline__actions .btn {
+.cv-inline-create__actions .btn {
   border-radius: var(--radius-md);
 }
 
-.quick-add-inline__actions .btn-primary {
-  border-color: var(--quick-add-primary-border);
+.cv-inline-create__actions .btn-primary {
+  border-color: var(--inline-create-primary-border);
 }
 
-.quick-add-inline__hint {
+.cv-inline-create__hint {
   box-sizing: border-box;
   color:      var(--theme-text-muted);
   font-size:  var(--font-size-xs);
@@ -3192,12 +3192,12 @@ html[data-theme="dark"] .quick-add-footer-button.is-filled:hover {
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   }
 
-  .quick-add-inline__body {
+  .cv-inline-create__body {
     align-items:    stretch;
     flex-direction: column;
   }
 
-  .quick-add-inline__actions {
+  .cv-inline-create__actions {
     justify-content: flex-end;
     width:           100%;
   }
@@ -3676,13 +3676,13 @@ html[data-theme="dark"] .quick-add-footer-button.is-filled:hover {
   }
 }
 
-#quick-add-modelo-motivo .quick-add-inline__fields {
+#quick-add-modelo-motivo .cv-inline-create__fields {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
 }
 
-#quick-add-modelo-motivo .quick-add-inline__fields > .field-grid {
+#quick-add-modelo-motivo .cv-inline-create__fields > .field-grid {
   margin: 0;
 }
 
@@ -3718,13 +3718,13 @@ html[data-theme="dark"] .quick-add-footer-button.is-filled:hover {
   outline: none;
 }
 
-#quick-add-atividade .quick-add-inline__fields {
+#quick-add-atividade .cv-inline-create__fields {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
 }
 
-#quick-add-atividade .quick-add-inline__fields > .field-grid {
+#quick-add-atividade .cv-inline-create__fields > .field-grid {
   margin: 0;
 }
 

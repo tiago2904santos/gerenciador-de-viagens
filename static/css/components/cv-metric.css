@@ -2,15 +2,14 @@
    cv-metric — métrica/resumo unificado (Etapa 7, fase 13)
 
    Substitui progressivamente: cv-summary-item/label/value, cv-summary-tile,
-   pt-resumo-box, admin-overview__stats.
+   pt-resumo-box.
    Aliases via seletores agrupados; overrides contextuais permanecem nos
-   CSS de módulo (roteiros, planos-trabalho, workspace-admin).
+   CSS de módulo (roteiros, planos-trabalho, usuarios.css).
    ======================================================================== */
 
 /* Grid de métricas */
 .cv-metric-grid,
-.cv-summary-grid,
-.admin-overview__stats {
+.cv-summary-grid {
   display: grid;
   gap: var(--space-3);
   min-width: 0;
@@ -29,12 +28,6 @@
 .cv-metric-grid--4,
 .cv-summary-grid--4 {
   grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-
-.admin-overview__stats {
-  gap: var(--space-2);
-  grid-template-columns: repeat(3, minmax(92px, 1fr));
-  margin: 0;
 }
 
 /* Item de métrica — mini-card label + valor */
@@ -140,33 +133,6 @@
   color: var(--color-muted);
   font-size: var(--font-size-sm, 0.85rem);
   line-height: 1.35;
-  margin: 0;
-}
-
-/* admin-overview: células dt/dd dentro do grid */
-.admin-overview__stats > div {
-  background: var(--theme-surface-card-soft, var(--color-surface-soft));
-  border: 1px solid var(--color-border-soft);
-  border-radius: var(--radius-control);
-  display: grid;
-  gap: 2px;
-  min-width: 92px;
-  padding: var(--space-3) var(--space-4);
-}
-
-.admin-overview__stats dt {
-  color: var(--theme-text-muted, var(--color-muted));
-  font-size: var(--font-size-2xs);
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-.admin-overview__stats dd {
-  color: var(--theme-text-heading, var(--color-heading));
-  font-size: var(--font-size-xl);
-  font-weight: 900;
-  line-height: 1;
   margin: 0;
 }
 

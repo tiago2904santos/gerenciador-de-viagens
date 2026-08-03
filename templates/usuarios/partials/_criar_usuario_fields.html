@@ -1,0 +1,22 @@
+<form method="post" novalidate>
+  {% csrf_token %}
+  {% if usuario_form.non_field_errors %}
+    {% include "components/ui/feedback/field_error.html" with errors=usuario_form.non_field_errors only %}
+  {% endif %}
+  <div class="field-grid">
+    {% include "components/ui/forms/field.html" with field=usuario_form.username size_class="field-size-1" only %}
+    {% include "components/ui/forms/field.html" with field=usuario_form.email size_class="field-size-1" only %}
+    {% include "components/ui/forms/field.html" with field=usuario_form.nome_completo size_class="field-size-2" only %}
+  </div>
+  <div class="field-grid">
+    {% include "components/ui/forms/field.html" with field=usuario_form.password1 size_class="field-size-2" only %}
+    {% include "components/ui/forms/field.html" with field=usuario_form.password2 size_class="field-size-2" only %}
+  </div>
+  <div class="field-grid">
+    {% include "components/ui/forms/field.html" with field=usuario_form.area size_class="field-size-2" help_text=usuario_form.area.help_text only %}
+    {% include "components/ui/forms/field.html" with field=usuario_form.papel size_class="field-size-2" only %}
+  </div>
+  <div class="cv-form-actions">
+    {% include "components/ui/buttons/button.html" with label="Criar usuário" variant="primary" icon="arrow-right" icon_after=True type="submit" name="action" value="criar_usuario" only %}
+  </div>
+</form>

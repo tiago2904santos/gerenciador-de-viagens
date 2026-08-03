@@ -496,7 +496,7 @@ document.documentElement.dataset.appReady = "true";
   var quickEditBound = false;
 
   function getPanelId(toggle) {
-    return toggle.getAttribute("aria-controls") || toggle.getAttribute("data-quick-add-toggle");
+    return toggle.getAttribute("aria-controls") || toggle.getAttribute("data-inline-create-toggle");
   }
 
   function initPanelFields(panel) {
@@ -512,8 +512,8 @@ document.documentElement.dataset.appReady = "true";
 
   function initQuickAddToggles(root) {
     var scope = root && root.querySelectorAll ? root : document;
-    var toggles = Array.prototype.slice.call(scope.querySelectorAll("[data-quick-add-toggle]"));
-    if (scope.matches && scope.matches("[data-quick-add-toggle]")) toggles.unshift(scope);
+    var toggles = Array.prototype.slice.call(scope.querySelectorAll("[data-inline-create-toggle]"));
+    if (scope.matches && scope.matches("[data-inline-create-toggle]")) toggles.unshift(scope);
 
     toggles.forEach(function (toggle) {
       if (toggle.dataset.inlineCreateBound === "true") return;
@@ -525,7 +525,7 @@ document.documentElement.dataset.appReady = "true";
       }
       toggle.dataset.inlineCreateBound = "true";
 
-      var closeButtons = Array.prototype.slice.call(panel.querySelectorAll("[data-quick-add-close]"));
+      var closeButtons = Array.prototype.slice.call(panel.querySelectorAll("[data-inline-create-close]"));
       var hideTimer = null;
 
       function resetToCreateMode() {
@@ -593,7 +593,7 @@ document.documentElement.dataset.appReady = "true";
         }
         // Painel aberto: no modo compacto o botão de rodapé salva quando há
         // valor preenchido e apenas recolhe quando está vazio.
-        if (toggle.hasAttribute("data-quick-add-submit-when-open")) {
+        if (toggle.hasAttribute("data-inline-create-submit-when-open")) {
           var field = panel.querySelector("input:not([type=hidden]), select, textarea");
           var filled = field && String(field.value || "").trim() !== "";
           if (filled) {
@@ -610,10 +610,10 @@ document.documentElement.dataset.appReady = "true";
         button.addEventListener("click", closePanel);
       });
 
-      if (toggle.hasAttribute("data-quick-add-submit-when-open")) {
-        var labelEl = toggle.querySelector(".quick-add-footer-button__label");
+      if (toggle.hasAttribute("data-inline-create-submit-when-open")) {
+        var labelEl = toggle.querySelector(".cv-inline-create__toggle-label");
         var originalLabel = labelEl ? labelEl.textContent : null;
-        var saveLabel = toggle.getAttribute("data-quick-add-save-label") || "Salvar";
+        var saveLabel = toggle.getAttribute("data-inline-create-save-label") || "Salvar";
 
         function updateToggleState() {
           var field = panel.querySelector("input:not([type=hidden]), select, textarea");
@@ -649,7 +649,7 @@ document.documentElement.dataset.appReady = "true";
       var fields = {};
       try { fields = JSON.parse(fieldsJson); } catch (e) {}
 
-      var toggle = document.querySelector("[data-quick-add-toggle]");
+      var toggle = document.querySelector("[data-inline-create-toggle]");
       if (!toggle) { return; }
 
       var panelId = getPanelId(toggle);
@@ -5129,18 +5129,6 @@ document.documentElement.dataset.appReady = "true";
     return String(select.options[select.selectedIndex].text || "").trim();
   }
 
-  function escapeHtml(value) {
-    if (window.CV && window.CV.util && typeof window.CV.util.escapeHtml === "function") {
-      return window.CV.util.escapeHtml(value);
-    }
-    return String(value == null ? "" : value)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#39;");
-  }
-
   function cityLabel(raw, fallback) {
     var nome = String(raw || "").trim();
     if (!nome || nome === "---------") return fallback;
@@ -5149,9 +5137,9 @@ document.documentElement.dataset.appReady = "true";
 
   function trechoHtml(step) {
     return (
-      '<span class="route-destinos-trechos__from">' + escapeHtml(step.from) + "</span>" +
+      '<span class="route-destinos-trechos__from">' + window.CV.util.escapeHtml(step.from) + "</span>" +
       '<span class="route-destinos-trechos__sep" aria-hidden="true">&gt;</span>' +
-      '<span class="route-destinos-trechos__to">' + escapeHtml(step.to) + "</span>"
+      '<span class="route-destinos-trechos__to">' + window.CV.util.escapeHtml(step.to) + "</span>"
     );
   }
 

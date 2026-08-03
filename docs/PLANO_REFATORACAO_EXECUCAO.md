@@ -707,6 +707,7 @@ perde o prazo e a Etapa 2 perde a rede.
 
 | Proposta | Estimativa | Situação |
 |---|---:|---|
+| Reescrita visual Administração (Cadastros + Usuários) | 4 PRs | ✅ PR1–PR4 (D-53/D-54 local/D-55/step1 Cadastros+Usuários) |
 | [Arquitetura de configurações](PROPOSTA_CONFIGURACOES.md) — tela por seções declaradas, config por documento, preferências por usuário | 17–28 dias | **aguardando decisão** de posição na fila |
 
 ---

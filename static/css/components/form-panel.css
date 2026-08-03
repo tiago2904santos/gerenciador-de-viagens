@@ -1,12 +1,12 @@
 /* Canonical structure for compact CRUD forms. Theme appearance is defined globally. */
 
-.main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--quick-add) {
+.main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--inline-create) {
   display: grid;
   gap: 0;
   overflow: hidden;
 }
 
-.main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--quick-add) > .form-section {
+.main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--inline-create) > .form-section {
   border: 0;
   display: grid;
   gap: 0;
@@ -36,11 +36,27 @@
   margin: 0;
 }
 
+.cv-confirm-page {
+  background: var(--step1-surface, var(--color-surface-muted));
+  border: 0;
+  border-radius: 14px;
+  display: grid;
+  gap: 0;
+  overflow: hidden;
+}
+
 .cv-confirm-page__header {
   align-items: start;
+  background: transparent;
+  border: 0;
   display: grid;
   gap: var(--space-4);
   grid-template-columns: auto minmax(0, 1fr);
+  padding: 18px clamp(20px, 3vw, 30px);
+}
+
+:is(html[data-theme="dark"]) .cv-confirm-page {
+  background: var(--step1-surface);
 }
 
 .cv-confirm-page__icon {

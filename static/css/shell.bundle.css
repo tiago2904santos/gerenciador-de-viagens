@@ -1067,16 +1067,16 @@ html[data-theme="light"] {
   --filter-input-height:        var(--control-height-md);
 
   /* --- Quick Add Folder Tab --- */
-  --quick-add-tab-radius:     var(--radius-md);  /* 14px — aba mais arredondada */
-  --quick-add-tab-px:         var(--space-5);    /* 20px — aba mais larga      */
-  --quick-add-tab-py:         var(--space-3);    /* 12px — aba mais alta        */
-  --quick-add-tab-icon-size:  var(--space-5);    /* 20px — círculo do ícone     */
-  --quick-add-tab-width:      230px;
-  --quick-add-tab-height:     35px;
-  --quick-add-tab-clip-path:  path("M 0 0 H 230 V 35 H 46 Q 38 35 33 32 Q 11 11 2 0 Z");
-  --quick-add-tab-shadow:     -1px -3px 12px rgba(0, 0, 0, 0.15), 1px -3px 12px rgba(0, 0, 0, 0.10);
-  --quick-add-actions-offset: 1px;
-  --quick-add-primary-border: rgba(255, 255, 255, 0.4);
+  --inline-create-tab-radius:     var(--radius-md);  /* 14px — aba mais arredondada */
+  --inline-create-tab-px:         var(--space-5);    /* 20px — aba mais larga      */
+  --inline-create-tab-py:         var(--space-3);    /* 12px — aba mais alta        */
+  --inline-create-tab-icon-size:  var(--space-5);    /* 20px — círculo do ícone     */
+  --inline-create-tab-width:      230px;
+  --inline-create-tab-height:     35px;
+  --inline-create-tab-clip-path:  path("M 0 0 H 230 V 35 H 46 Q 38 35 33 32 Q 11 11 2 0 Z");
+  --inline-create-tab-shadow:     -1px -3px 12px rgba(0, 0, 0, 0.15), 1px -3px 12px rgba(0, 0, 0, 0.10);
+  --inline-create-actions-offset: 1px;
+  --inline-create-primary-border: rgba(255, 255, 255, 0.4);
 
   /* --- Footer Actions --- */
   --footer-actions-padding-x: var(--form-section-padding-x);
@@ -1191,11 +1191,11 @@ html[data-theme="dark"] {
   --shadow-quick-create:         none;
 
   /* Quick Add Folder Tab */
-  --surface-quick-add-tab:        rgba(11, 58, 102, 0.50);   /* azul primário com opacidade */
-  --border-quick-add-tab:         rgba(255, 255, 255, 0.22);
-  --color-quick-add-tab:          #ccdff5;                   /* texto claro sobre fundo escuro */
-  --color-quick-add-tab-icon-bg:  var(--color-accent);       /* círculo dourado */
-  --color-quick-add-tab-icon-fg:  var(--color-primary-dark); /* texto escuro sobre dourado */
+  --surface-inline-create-tab:        rgba(11, 58, 102, 0.50);   /* azul primário com opacidade */
+  --border-inline-create-tab:         rgba(255, 255, 255, 0.22);
+  --color-inline-create-tab:          #ccdff5;                   /* texto claro sobre fundo escuro */
+  --color-inline-create-tab-icon-bg:  var(--color-accent);       /* círculo dourado */
+  --color-inline-create-tab-icon-fg:  var(--color-primary-dark); /* texto escuro sobre dourado */
 
   /* Header Filter Bar */
   --surface-filter-input:         rgba(255, 255, 255, 0.05);
@@ -1299,11 +1299,11 @@ html[data-theme="light"] {
   --shadow-quick-create:         none;
 
   /* Quick Add Folder Tab */
-  --surface-quick-add-tab:        #dbeaf8;
-  --border-quick-add-tab:         #a8c5de;
-  --color-quick-add-tab:          var(--color-primary-strong);
-  --color-quick-add-tab-icon-bg:  var(--color-primary);
-  --color-quick-add-tab-icon-fg:  var(--color-white);
+  --surface-inline-create-tab:        #dbeaf8;
+  --border-inline-create-tab:         #a8c5de;
+  --color-inline-create-tab:          var(--color-primary-strong);
+  --color-inline-create-tab-icon-bg:  var(--color-primary);
+  --color-inline-create-tab-icon-fg:  var(--color-white);
 
   /* Header Filter Bar */
   --surface-filter-input:         var(--color-surface);
@@ -1862,12 +1862,12 @@ html[data-theme="light"] {
 }
 
 /* Primeira seção e rodapé seguem o radius do painel (evita quinas no topo/base) */
-.main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--quick-add) > .form-section:first-child {
+.main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--inline-create) > .form-section:first-child {
   border-top-left-radius:  var(--form-panel-radius);
   border-top-right-radius: var(--form-panel-radius);
 }
 
-.main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--quick-add) > .footer-actions:last-child {
+.main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--inline-create) > .footer-actions:last-child {
   border-bottom-left-radius:  var(--form-panel-radius);
   border-bottom-right-radius: var(--form-panel-radius);
 }
@@ -1882,7 +1882,7 @@ html[data-theme="light"] {
   overflow: visible;
 }
 
-.main-form-panel--quick-add {
+.main-form-panel--inline-create {
   background: transparent;
   border: none;
   box-shadow: none;
@@ -3490,7 +3490,7 @@ body.has-delete-modal-open {
 
 /* Variações */
 .page-header-rail--filters,
-.page-header-rail--filters-quick-add {
+.page-header-rail--filters-inline-create {
   flex-wrap: wrap;
   gap:       var(--space-4);
 }
@@ -3501,7 +3501,7 @@ body.has-delete-modal-open {
 }
 
 /* Painel inline dentro do rail quick-add */
-.page-header-rail--filters-quick-add .quick-add-panel {
+.page-header-rail--filters-inline-create .cv-inline-create__panel {
   background:  transparent;
   border:      0;
   border-top:  1px solid var(--border-filter-bar);
@@ -3509,7 +3509,7 @@ body.has-delete-modal-open {
   width:       100%;
 }
 
-.page-header-rail--filters-quick-add .quick-add-inline__body {
+.page-header-rail--filters-inline-create .cv-inline-create__body {
   align-items: flex-end;
   display:     flex;
   gap:         var(--layout-quick-create-gap);
@@ -3517,7 +3517,7 @@ body.has-delete-modal-open {
   width:       100%;
 }
 
-.page-header-rail--filters-quick-add .quick-add-inline__actions {
+.page-header-rail--filters-inline-create .cv-inline-create__actions {
   margin-left: auto;
   width:       auto;
 }
@@ -3525,11 +3525,11 @@ body.has-delete-modal-open {
 /* Variante compacta (cargo/combustível): apenas o input.
    Sem label, sem botão e com o divisor indo de ponta a ponta do card. */
 
-.header-stack--quick-add-compact .quick-add-inline__body {
+.header-stack--inline-create-compact .cv-inline-create__body {
   padding: var(--space-3) 0 0; /* só o gap entre o divisor e o input */
 }
 
-.header-stack--quick-add-compact .page-header-rail--filters-quick-add .quick-add-panel {
+.header-stack--inline-create-compact .page-header-rail--filters-inline-create .cv-inline-create__panel {
   border-radius: 0;
   box-shadow:    none;
   flex-shrink:   0;             /* não deixa o flex encolher de volta */
@@ -3545,7 +3545,7 @@ body.has-delete-modal-open {
    Controlado por JS: remove [hidden] → adiciona .is-open.
    ========================================================= */
 
-.quick-add-panel {
+.cv-inline-create__panel {
   box-sizing:  border-box;
   margin-top:  0;
   max-height:  0;
@@ -3556,7 +3556,7 @@ body.has-delete-modal-open {
   width:       100%;
 }
 
-.quick-add-panel.is-open {
+.cv-inline-create__panel.is-open {
   max-height: 580px;
   opacity:    1;
   transform:  translateY(0);
@@ -3568,7 +3568,7 @@ body.has-delete-modal-open {
    dispara o painel de cadastro rápido.
    ========================================================= */
 
-.quick-add-footer-button {
+.cv-inline-create__toggle {
   align-items:     center;
   appearance:      none;
   background:      var(--surface-filter-bar);
@@ -3589,37 +3589,37 @@ body.has-delete-modal-open {
   width:           100%;
 }
 
-.quick-add-footer-button:hover {
+.cv-inline-create__toggle:hover {
   background: var(--surface-list-row-hover);
 }
 
-.quick-add-footer-button:focus-visible {
+.cv-inline-create__toggle:focus-visible {
   outline:        2px solid var(--border-focus);
   outline-offset: -2px;
 }
 
-.quick-add-footer-button.is-active,
-.quick-add-footer-button[aria-expanded="true"] {
+.cv-inline-create__toggle.is-active,
+.cv-inline-create__toggle[aria-expanded="true"] {
   background:   var(--surface-filter-bar);
   border-color: var(--border-filter-bar);
   box-shadow:   none;
 }
 
-.quick-add-footer-button.is-filled {
-  animation:    quick-add-btn-fill 0.4s cubic-bezier(0, 0, 0.2, 1) forwards;
+.cv-inline-create__toggle.is-filled {
+  animation:    inline-create-btn-fill 0.4s cubic-bezier(0, 0, 0.2, 1) forwards;
   background:   var(--cv-btn-primary-bg);
   border-color: var(--cv-btn-primary-border);
   box-shadow:   0 6px 14px rgba(11, 58, 102, 0.16);
   color:        var(--cv-btn-primary-color);
 }
 
-.quick-add-footer-button.is-filled:hover {
+.cv-inline-create__toggle.is-filled:hover {
   background:   var(--cv-btn-primary-hover-bg);
   border-color: var(--cv-btn-primary-hover-border);
   box-shadow:   0 10px 18px rgba(11, 58, 102, 0.22);
 }
 
-@keyframes quick-add-btn-fill {
+@keyframes inline-create-btn-fill {
   from {
     background:   var(--surface-filter-bar);
     border-color: var(--border-filter-bar);
@@ -3628,24 +3628,24 @@ body.has-delete-modal-open {
   }
 }
 
-html[data-theme="dark"] .quick-add-footer-button {
+html[data-theme="dark"] .cv-inline-create__toggle {
   background: var(--color-card-muted); /* #213246 */
   color:      var(--theme-text-body);
 }
 
-html[data-theme="dark"] .quick-add-footer-button:hover {
+html[data-theme="dark"] .cv-inline-create__toggle:hover {
   background: color-mix(in srgb, var(--color-card-muted) 80%, var(--color-white) 20%);
 }
 
-html[data-theme="dark"] .quick-add-footer-button.is-active,
-html[data-theme="dark"] .quick-add-footer-button[aria-expanded="true"] {
+html[data-theme="dark"] .cv-inline-create__toggle.is-active,
+html[data-theme="dark"] .cv-inline-create__toggle[aria-expanded="true"] {
   background:   var(--color-card-muted); /* #213246 — igual ao estado fechado */
   border-color: var(--border-filter-bar);
   color:        var(--theme-text-body);
 }
 
-html[data-theme="dark"] .quick-add-footer-button.is-filled {
-  animation-name:     quick-add-btn-fill-dark;
+html[data-theme="dark"] .cv-inline-create__toggle.is-filled {
+  animation-name:     inline-create-btn-fill-dark;
   animation-duration: 0.4s;
   animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
   background:     var(--cv-btn-primary-bg);
@@ -3653,7 +3653,7 @@ html[data-theme="dark"] .quick-add-footer-button.is-filled {
   color:          var(--cv-btn-primary-color);
 }
 
-@keyframes quick-add-btn-fill-dark {
+@keyframes inline-create-btn-fill-dark {
   from {
     background:   var(--color-card-muted);
     border-color: var(--border-filter-bar);
@@ -3662,18 +3662,18 @@ html[data-theme="dark"] .quick-add-footer-button.is-filled {
   }
 }
 
-html[data-theme="dark"] .quick-add-footer-button.is-filled:hover {
+html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
   background:   var(--cv-btn-primary-hover-bg);
   border-color: var(--cv-btn-primary-hover-border);
 }
 
-.quick-add-footer-button__icon {
+.cv-inline-create__toggle-icon {
   align-items:     center;
   display:         inline-flex;
   justify-content: center;
 }
 
-.quick-add-footer-button__label {
+.cv-inline-create__toggle-label {
   font-weight: var(--font-weight-bold);
 }
 
@@ -3893,7 +3893,7 @@ html[data-theme="dark"] .quick-add-footer-button.is-filled:hover {
    Extensão visual abaixo do filter bar / toolbar.
    ========================================================= */
 
-.quick-add-inline {
+.cv-inline-create {
   box-sizing:     border-box;
   display:        flex;
   flex-direction: column;
@@ -3903,15 +3903,15 @@ html[data-theme="dark"] .quick-add-footer-button.is-filled:hover {
 /* ─── Folder Tab — orelhinha de pasta física ─────────────── */
 
 /* Linha que contém a aba (não estica a aba) */
-.quick-add-inline__tab-row {
+.cv-inline-create__tab-row {
   display: flex;
   justify-content: flex-end;
 }
 
 /* Aba / gatilho de abertura — estilo pasta física */
-.quick-add-inline__tab {
-  width: var(--quick-add-tab-width);
-  height: var(--quick-add-tab-height);
+.cv-inline-create__tab {
+  width: var(--inline-create-tab-width);
+  height: var(--inline-create-tab-height);
   padding-inline: var(--space-4);
   border-radius: 0 0 var(--radius-md) 0;
   display: inline-flex;
@@ -3927,64 +3927,64 @@ html[data-theme="dark"] .quick-add-footer-button.is-filled:hover {
   border: 0;
   cursor: pointer;
 
-  clip-path: var(--quick-add-tab-clip-path);
+  clip-path: var(--inline-create-tab-clip-path);
 }
 
-.quick-add-inline__tab:hover,
-.quick-add-inline__tab:focus-visible {
-  box-shadow: var(--quick-add-tab-shadow);
+.cv-inline-create__tab:hover,
+.cv-inline-create__tab:focus-visible {
+  box-shadow: var(--inline-create-tab-shadow);
   color:      var(--theme-text-heading);
 }
 
-.quick-add-inline__tab:hover .quick-add-inline__tab-icon {
+.cv-inline-create__tab:hover .cv-inline-create__tab-icon {
   background: var(--color-accent-hover, var(--color-accent));
 }
 
-.quick-add-inline__tab:focus-visible {
+.cv-inline-create__tab:focus-visible {
   outline:        2px solid var(--border-focus);
   outline-offset: -2px;
 }
 
 /* Aberta: aba conectada visivelmente ao painel */
-.quick-add-inline__tab[aria-expanded="true"] {
+.cv-inline-create__tab[aria-expanded="true"] {
   background: var(--surface-quick-create-header);
   box-shadow: none;
   color:      var(--theme-text-heading);
 }
 
-.quick-add-inline__tab[aria-expanded="true"] .quick-add-inline__tab-icon {
+.cv-inline-create__tab[aria-expanded="true"] .cv-inline-create__tab-icon {
   background: var(--color-accent);
   transform:  rotate(45deg);
 }
 
 /* Ícone — círculo colorido com sinal + (gira 45° para virar ×) */
-.quick-add-inline__tab-icon {
+.cv-inline-create__tab-icon {
   align-items:     center;
-  background:      var(--color-quick-add-tab-icon-bg);
+  background:      var(--color-inline-create-tab-icon-bg);
   border-radius:   var(--radius-pill);
-  color:           var(--color-quick-add-tab-icon-fg);
+  color:           var(--color-inline-create-tab-icon-fg);
   display:         inline-flex;
   flex-shrink:     0;
   font-size:       var(--font-size-xs);
   font-weight:     var(--font-weight-bold);
-  height:          var(--quick-add-tab-icon-size);
+  height:          var(--inline-create-tab-icon-size);
   justify-content: center;
   line-height:     1;
   pointer-events:  none;
   transition:
     background  var(--transition-base),
     transform   var(--transition-base);
-  width:           var(--quick-add-tab-icon-size);
+  width:           var(--inline-create-tab-icon-size);
 }
 
 /* Label do texto */
-.quick-add-inline__tab-label {
+.cv-inline-create__tab-label {
   letter-spacing: inherit;
   pointer-events: none;
 }
 
 /* Painel: visualmente unido à aba acima */
-.quick-add-inline__panel {
+.cv-inline-create__panel {
   background:    var(--surface-quick-create);
   border:        1px solid var(--border-quick-create);
   border-radius: 0 var(--radius-sm) var(--radius-sm) var(--radius-sm);
@@ -3994,12 +3994,12 @@ html[data-theme="dark"] .quick-add-footer-button.is-filled:hover {
 }
 
 /* Fallback: quando não usa __panel (forma antiga com .is-open) */
-.quick-add-inline.is-open > :not(.quick-add-inline__tab-row) {
+.cv-inline-create.is-open > :not(.cv-inline-create__tab-row) {
   display: flex;
   flex-direction: column;
 }
 
-.quick-add-inline__header {
+.cv-inline-create__header {
   align-items:     center;
   background:      var(--surface-quick-create-header);
   border-bottom:   1px solid var(--border-quick-create);
@@ -4010,14 +4010,14 @@ html[data-theme="dark"] .quick-add-footer-button.is-filled:hover {
   padding:         var(--space-2) var(--filter-bar-padding-x);
 }
 
-.quick-add-inline__title {
+.cv-inline-create__title {
   color:       var(--theme-text-heading);
   font-size:   var(--font-size-sm);
   font-weight: var(--font-weight-bold);
   margin:      0;
 }
 
-.quick-add-inline__close {
+.cv-inline-create__close {
   align-items:     center;
   background:      transparent;
   border:          none;
@@ -4034,12 +4034,12 @@ html[data-theme="dark"] .quick-add-footer-button.is-filled:hover {
   width:           28px;
 }
 
-.quick-add-inline__close:hover {
+.cv-inline-create__close:hover {
   background: var(--border-quick-create);
   color:      var(--theme-text-heading);
 }
 
-.quick-add-inline__body {
+.cv-inline-create__body {
   align-items: flex-end;
   box-sizing:  border-box;
   display:     flex;
@@ -4048,29 +4048,29 @@ html[data-theme="dark"] .quick-add-footer-button.is-filled:hover {
   width:       100%;
 }
 
-.quick-add-inline__fields {
+.cv-inline-create__fields {
   flex:      1;
   min-width: 0;
 }
 
-.quick-add-inline__actions {
+.cv-inline-create__actions {
   align-items:    flex-end;
   display:        flex;
   flex-shrink:    0;
   gap:            var(--space-2);
-  padding-bottom: var(--quick-add-actions-offset);
+  padding-bottom: var(--inline-create-actions-offset);
   width:          var(--layout-quick-create-actions-width);
 }
 
-.quick-add-inline__actions .btn {
+.cv-inline-create__actions .btn {
   border-radius: var(--radius-md);
 }
 
-.quick-add-inline__actions .btn-primary {
-  border-color: var(--quick-add-primary-border);
+.cv-inline-create__actions .btn-primary {
+  border-color: var(--inline-create-primary-border);
 }
 
-.quick-add-inline__hint {
+.cv-inline-create__hint {
   box-sizing: border-box;
   color:      var(--theme-text-muted);
   font-size:  var(--font-size-xs);
@@ -4150,12 +4150,12 @@ html[data-theme="dark"] .quick-add-footer-button.is-filled:hover {
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   }
 
-  .quick-add-inline__body {
+  .cv-inline-create__body {
     align-items:    stretch;
     flex-direction: column;
   }
 
-  .quick-add-inline__actions {
+  .cv-inline-create__actions {
     justify-content: flex-end;
     width:           100%;
   }
@@ -4634,13 +4634,13 @@ html[data-theme="dark"] .quick-add-footer-button.is-filled:hover {
   }
 }
 
-#quick-add-modelo-motivo .quick-add-inline__fields {
+#quick-add-modelo-motivo .cv-inline-create__fields {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
 }
 
-#quick-add-modelo-motivo .quick-add-inline__fields > .field-grid {
+#quick-add-modelo-motivo .cv-inline-create__fields > .field-grid {
   margin: 0;
 }
 
@@ -4676,13 +4676,13 @@ html[data-theme="dark"] .quick-add-footer-button.is-filled:hover {
   outline: none;
 }
 
-#quick-add-atividade .quick-add-inline__fields {
+#quick-add-atividade .cv-inline-create__fields {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
 }
 
-#quick-add-atividade .quick-add-inline__fields > .field-grid {
+#quick-add-atividade .cv-inline-create__fields > .field-grid {
   margin: 0;
 }
 
@@ -8661,13 +8661,13 @@ html[data-theme="dark"] #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete,
 /* >>> css/components/form-panel.css >>> */
 /* Canonical structure for compact CRUD forms. Theme appearance is defined globally. */
 
-.main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--quick-add) {
+.main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--inline-create) {
   display: grid;
   gap: 0;
   overflow: hidden;
 }
 
-.main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--quick-add) > .form-section {
+.main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--inline-create) > .form-section {
   border: 0;
   display: grid;
   gap: 0;
@@ -8697,11 +8697,27 @@ html[data-theme="dark"] #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete,
   margin: 0;
 }
 
+.cv-confirm-page {
+  background: var(--step1-surface, var(--color-surface-muted));
+  border: 0;
+  border-radius: 14px;
+  display: grid;
+  gap: 0;
+  overflow: hidden;
+}
+
 .cv-confirm-page__header {
   align-items: start;
+  background: transparent;
+  border: 0;
   display: grid;
   gap: var(--space-4);
   grid-template-columns: auto minmax(0, 1fr);
+  padding: 18px clamp(20px, 3vw, 30px);
+}
+
+:is(html[data-theme="dark"]) .cv-confirm-page {
+  background: var(--step1-surface);
 }
 
 .cv-confirm-page__icon {
@@ -9553,15 +9569,14 @@ html[data-theme="light"] .cv-segment-toggle {
    cv-metric — métrica/resumo unificado (Etapa 7, fase 13)
 
    Substitui progressivamente: cv-summary-item/label/value, cv-summary-tile,
-   pt-resumo-box, admin-overview__stats.
+   pt-resumo-box.
    Aliases via seletores agrupados; overrides contextuais permanecem nos
-   CSS de módulo (roteiros, planos-trabalho, workspace-admin).
+   CSS de módulo (roteiros, planos-trabalho, usuarios.css).
    ======================================================================== */
 
 /* Grid de métricas */
 .cv-metric-grid,
-.cv-summary-grid,
-.admin-overview__stats {
+.cv-summary-grid {
   display: grid;
   gap: var(--space-3);
   min-width: 0;
@@ -9580,12 +9595,6 @@ html[data-theme="light"] .cv-segment-toggle {
 .cv-metric-grid--4,
 .cv-summary-grid--4 {
   grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-
-.admin-overview__stats {
-  gap: var(--space-2);
-  grid-template-columns: repeat(3, minmax(92px, 1fr));
-  margin: 0;
 }
 
 /* Item de métrica — mini-card label + valor */
@@ -9691,33 +9700,6 @@ html[data-theme="light"] .cv-segment-toggle {
   color: var(--color-muted);
   font-size: var(--font-size-sm, 0.85rem);
   line-height: 1.35;
-  margin: 0;
-}
-
-/* admin-overview: células dt/dd dentro do grid */
-.admin-overview__stats > div {
-  background: var(--theme-surface-card-soft, var(--color-surface-soft));
-  border: 1px solid var(--color-border-soft);
-  border-radius: var(--radius-control);
-  display: grid;
-  gap: 2px;
-  min-width: 92px;
-  padding: var(--space-3) var(--space-4);
-}
-
-.admin-overview__stats dt {
-  color: var(--theme-text-muted, var(--color-muted));
-  font-size: var(--font-size-2xs);
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-.admin-overview__stats dd {
-  color: var(--theme-text-heading, var(--color-heading));
-  font-size: var(--font-size-xl);
-  font-weight: 900;
-  line-height: 1;
   margin: 0;
 }
 
@@ -15533,7 +15515,7 @@ html[data-theme="dark"] *::after {
 }
 
 :is(html[data-theme="dark"])
-  .main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--quick-add) {
+  .main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--inline-create) {
   background: var(--cv-card-family-bg);
   border: 1px solid var(--cv-card-family-border);
   border-radius: 16px;
@@ -16515,7 +16497,7 @@ html[data-theme="dark"] *::after {
 }
 
 .list-header__rail--advanced,
-.list-header__rail--quick-add {
+.list-header__rail--inline-create {
   gap: var(--space-3);
 }
 
@@ -16717,12 +16699,12 @@ html[data-theme="dark"] *::after {
    Quick Add — barra de largura total modernizada
    ========================================================= */
 
-.list-header--quick-add .list-header__rail--quick-add {
+.list-header--inline-create .list-header__rail--inline-create {
   border-bottom: 0;
   flex-direction: column;
 }
 
-.list-header .quick-add-panel {
+.list-header .cv-inline-create__panel {
   background: transparent;
   border: 0;
   border-radius: 0;
@@ -16741,7 +16723,7 @@ html[data-theme="dark"] *::after {
   width: 100%;
 }
 
-.list-header .quick-add-panel.is-open {
+.list-header .cv-inline-create__panel.is-open {
   border-top: 1px solid var(--border-filter-bar);
   max-height: 640px;
   opacity: 1;
@@ -16754,7 +16736,7 @@ html[data-theme="dark"] *::after {
  * Textareas mantêm sua altura própria; selects e controles customizados
  * preservam o comportamento nativo, alterando apenas a camada visual.
  */
-.list-header--quick-add .quick-add-panel
+.list-header--inline-create .cv-inline-create__panel
   :is(
     .form-control,
     .form-select,
@@ -16762,17 +16744,27 @@ html[data-theme="dark"] *::after {
     .cv-custom-select__trigger,
     .cv-search-picker__control,
     .cv-search-picker__input
-  ) {
-  background: var(--list-header-control-bg);
+  ),
+.list-header--inline-create .cv-inline-create__panel
+  :is(
+    .form-control,
+    .form-select,
+    .cv-field__control,
+    .cv-custom-select__trigger,
+    .cv-search-picker__control,
+    .cv-search-picker__input
+  ):is(:hover, :focus, :focus-within, :focus-visible) {
+  background: var(--step1-field, var(--list-header-control-bg, var(--color-input-bg)));
   border: 0;
   border-radius: var(--radius-control);
   box-shadow: none;
   box-sizing: border-box;
   color: var(--color-filter-text);
   font-size: var(--font-size-sm);
+  transition: none;
 }
 
-.list-header--quick-add .quick-add-panel
+.list-header--inline-create .cv-inline-create__panel
   :is(
     input.form-control,
     select.form-control,
@@ -16786,34 +16778,34 @@ html[data-theme="dark"] *::after {
   min-height: var(--list-header-control-height);
 }
 
-.list-header--quick-add .quick-add-panel
+.list-header--inline-create .cv-inline-create__panel
   :is(.form-control, .form-select, .cv-field__control, .cv-search-picker__input)::placeholder {
   color: var(--color-filter-placeholder);
   opacity: 1;
 }
 
-.list-header--quick-add .quick-add-panel
+.list-header--inline-create .cv-inline-create__panel
   :is(
     .form-control,
     .form-select,
     .cv-field__control,
     .cv-custom-select__trigger
   ):focus,
-.list-header--quick-add .quick-add-panel
+.list-header--inline-create .cv-inline-create__panel
   :is(
     .form-control,
     .form-select,
     .cv-field__control,
     .cv-custom-select__trigger
   ):focus-visible,
-.list-header--quick-add .quick-add-panel
+.list-header--inline-create .cv-inline-create__panel
   .cv-search-picker__control:focus-within {
   border: 0;
   box-shadow: none;
   outline: none;
 }
 
-.list-header--quick-add .quick-add-panel
+.list-header--inline-create .cv-inline-create__panel
   :is(
     .form-control,
     .form-select,
@@ -16821,7 +16813,7 @@ html[data-theme="dark"] *::after {
     .cv-custom-select__trigger,
     .cv-search-picker__control
   ):is(.is-invalid, [aria-invalid="true"]),
-.list-header--quick-add .quick-add-panel
+.list-header--inline-create .cv-inline-create__panel
   :is(.app-form-field, .cv-field):has(.field-error)
   :is(
     .form-control,
@@ -16834,7 +16826,7 @@ html[data-theme="dark"] *::after {
 }
 
 
-.list-header .quick-add-inline__body {
+.list-header .cv-inline-create__body {
   align-items: flex-end;
   display: flex;
   flex-wrap: wrap;
@@ -16842,21 +16834,21 @@ html[data-theme="dark"] *::after {
   width: 100%;
 }
 
-.list-header .quick-add-inline__fields {
+.list-header .cv-inline-create__fields {
   flex: 1 1 16rem;
   min-width: 0;
 }
 
-.list-header .quick-add-inline__actions {
+.list-header .cv-inline-create__actions {
   flex-shrink: 0;
   margin-left: auto;
 }
 
-.list-header--quick-add-compact .quick-add-inline__body {
+.list-header--inline-create-compact .cv-inline-create__body {
   padding: 0;
 }
 
-.list-header .quick-add-footer-button {
+.list-header .cv-inline-create__toggle {
   align-items: center;
   appearance: none;
   background: var(--cv-card-family-bg);
@@ -16882,35 +16874,35 @@ html[data-theme="dark"] *::after {
   width: 100%;
 }
 
-.list-header .quick-add-footer-button:hover {
+.list-header .cv-inline-create__toggle:hover {
   background: color-mix(in srgb, var(--color-primary-soft) 70%, var(--color-white));
 }
 
-.list-header .quick-add-footer-button:focus-visible {
+.list-header .cv-inline-create__toggle:focus-visible {
   outline: 2px solid var(--border-focus);
   outline-offset: -2px;
 }
 
-.list-header .quick-add-footer-button.is-active,
-.list-header .quick-add-footer-button[aria-expanded="true"] {
+.list-header .cv-inline-create__toggle.is-active,
+.list-header .cv-inline-create__toggle[aria-expanded="true"] {
   background: color-mix(in srgb, var(--color-primary-soft) 55%, var(--color-white));
   box-shadow: none;
 }
 
-.list-header .quick-add-footer-button.is-filled {
-  animation: list-header-quick-add-fill 0.35s ease forwards;
+.list-header .cv-inline-create__toggle.is-filled {
+  animation: list-header-inline-create-fill 0.35s ease forwards;
   background: var(--cv-btn-primary-bg);
   border-color: var(--cv-btn-primary-border);
   box-shadow: var(--shadow-sm);
   color: var(--cv-btn-primary-color);
 }
 
-.list-header .quick-add-footer-button.is-filled:hover {
+.list-header .cv-inline-create__toggle.is-filled:hover {
   background: var(--cv-btn-primary-hover-bg);
   border-color: var(--cv-btn-primary-hover-border);
 }
 
-@keyframes list-header-quick-add-fill {
+@keyframes list-header-inline-create-fill {
   from {
     background: color-mix(in srgb, var(--color-primary-soft) 55%, var(--color-white));
     box-shadow: none;
@@ -16918,7 +16910,7 @@ html[data-theme="dark"] *::after {
   }
 }
 
-.list-header .quick-add-footer-button__icon {
+.list-header .cv-inline-create__toggle-icon {
   align-items: center;
   background: color-mix(in srgb, var(--color-primary) 12%, transparent);
   border-radius: 999px;
@@ -16933,12 +16925,12 @@ html[data-theme="dark"] *::after {
   width: 26px;
 }
 
-.list-header .quick-add-footer-button.is-filled .quick-add-footer-button__icon {
+.list-header .cv-inline-create__toggle.is-filled .cv-inline-create__toggle-icon {
   background: color-mix(in srgb, var(--color-white) 18%, transparent);
   color: inherit;
 }
 
-.list-header .quick-add-footer-button__label {
+.list-header .cv-inline-create__toggle-label {
   font-weight: var(--font-weight-bold);
 }
 
@@ -17061,42 +17053,42 @@ html[data-theme="dark"] *::after {
 }
 
 :is(html[data-theme="dark"])
-  .list-header .quick-add-footer-button {
+  .list-header .cv-inline-create__toggle {
   background: var(--cv-card-family-bg);
   border-top-color: var(--border-filter-bar);
   color: var(--theme-text-body);
 }
 
 :is(html[data-theme="dark"])
-  .list-header .quick-add-footer-button:hover,
+  .list-header .cv-inline-create__toggle:hover,
 :is(html[data-theme="dark"])
-  .list-header .quick-add-footer-button.is-active,
+  .list-header .cv-inline-create__toggle.is-active,
 :is(html[data-theme="dark"])
-  .list-header .quick-add-footer-button[aria-expanded="true"] {
+  .list-header .cv-inline-create__toggle[aria-expanded="true"] {
   background: color-mix(in srgb, var(--color-card-muted) 72%, var(--color-white) 10%);
 }
 
 :is(html[data-theme="dark"])
-  .list-header .quick-add-footer-button__icon {
+  .list-header .cv-inline-create__toggle-icon {
   background: color-mix(in srgb, var(--color-accent) 16%, transparent);
   color: var(--color-accent);
 }
 
 :is(html[data-theme="dark"])
-  .list-header .quick-add-footer-button.is-filled {
+  .list-header .cv-inline-create__toggle.is-filled {
   background: var(--cv-btn-primary-bg);
   border-color: var(--cv-btn-primary-border);
   color: var(--cv-btn-primary-color);
 }
 
 :is(html[data-theme="dark"])
-  .list-header .quick-add-footer-button.is-filled .quick-add-footer-button__icon {
+  .list-header .cv-inline-create__toggle.is-filled .cv-inline-create__toggle-icon {
   background: color-mix(in srgb, var(--color-white) 16%, transparent);
   color: inherit;
 }
 
 :is(html[data-theme="dark"])
-  .list-header .quick-add-panel.is-open {
+  .list-header .cv-inline-create__panel.is-open {
   border-top-color: var(--border-filter-bar);
 }
 

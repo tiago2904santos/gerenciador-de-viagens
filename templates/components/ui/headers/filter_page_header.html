@@ -5,17 +5,7 @@
   <div class="list-header cv-filter-header{% if extra_class %} {{ extra_class }}{% endif %}">
 {% endif %}
 
-  <div class="list-header__band">
-    <div class="list-header__title-block">
-      {% if eyebrow %}<span class="list-header__eyebrow">{{ eyebrow }}</span>{% endif %}
-      <div class="list-header__title-row">
-        <h1 class="list-header__title">{{ title }}</h1>
-        {% if status_label %}
-          {% include "components/ui/badges/status_badge.html" with label=status_label variant=status_variant|default:"draft" extra_class="page-header-status-chip" only %}
-        {% endif %}
-      </div>
-    </div>
-  </div>
+  {% include "components/ui/headers/_list_header_band.html" with title=title eyebrow=eyebrow status_label=status_label status_variant=status_variant only %}
 
   {% if advanced %}
   <div class="list-header__rail list-header__rail--advanced">
