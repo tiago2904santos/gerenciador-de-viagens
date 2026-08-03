@@ -6,6 +6,7 @@ from django.db.models import Count
 from django.db.models import Q
 from django.shortcuts import redirect
 from django.shortcuts import render
+from django.urls import reverse
 
 from .forms import AreaTrabalhoForm
 from .forms import UsuarioAreaCreationForm
@@ -82,6 +83,9 @@ def index(request):
         {
             "page_title": "Áreas e usuários",
             "page_description": "Crie áreas de trabalho, usuários e vínculos de acesso sem usar terminal.",
+            "flow_eyebrow": "ADMINISTRAÇÃO",
+            "flow_back_label": "Voltar",
+            "flow_back_url": reverse("core:dashboard"),
             "area_form": area_form,
             "usuario_form": usuario_form,
             "vinculo_form": vinculo_form,

@@ -1,45 +1,23 @@
-{% extends "base.html" %}
+{% extends "components/page/flow_base.html" %}
 {% load static %}
 
-{% block title %}{{ page_title }}{% endblock %}
-
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/workspace-admin.css' %}">
+  <link rel="stylesheet" href="{% static 'css/usuarios.css' %}">
 {% endblock %}
 
-{% block content %}
-  <div class="page-shell page-shell--standard">
-    {% include "components/ui/headers/page_header.html" with eyebrow="Administração" title=page_title description=page_description icon_label="AD" module_label="Administração" status_label="Acesso administrativo" status_variant="pending" only %}
+{% block flow_shell_modifier %}page-shell--standard cv-page--form{% endblock %}
+{% block flow_shell_extra %} document-form-page usuarios-admin-page{% endblock %}
 
-    <div class="main-form-panel main-form-panel--stack">
-      <div class="cv-form-section-stack cv-form-section-stack--comfortable">
+{% block flow_body %}
+  <div class="cv-form-section-stack cv-form-section-stack--comfortable" data-travel-document-wizard-step1>
+    <section class="cv-metric-grid cv-metric-grid--3" aria-label="Resumo administrativo">
+      {% include "components/cards/summary_card.html" with label="Áreas" value=total_areas description="Unidades de trabalho" only %}
+      {% include "components/cards/summary_card.html" with label="Usuários" value=total_usuarios description="Contas cadastradas" only %}
+      {% include "components/cards/summary_card.html" with label="Vínculos" value=total_vinculos description="Acessos concedidos" only %}
+    </section>
 
-        <section class="admin-overview" aria-label="Resumo administrativo">
-          <div class="admin-overview__intro">
-            <span class="admin-overview__eyebrow">Visão geral</span>
-            <strong>Gerencie a estrutura de acesso</strong>
-            <p>Cadastre usuários e áreas, depois confira os vínculos existentes.</p>
-          </div>
-          <dl class="admin-overview__stats">
-            <div>
-              <dt>Áreas</dt>
-              <dd>{{ total_areas }}</dd>
-            </div>
-            <div>
-              <dt>Usuários</dt>
-              <dd>{{ total_usuarios }}</dd>
-            </div>
-            <div>
-              <dt>Vínculos</dt>
-              <dd>{{ total_vinculos }}</dd>
-            </div>
-          </dl>
-        </section>
+    {% include "components/form/card.html" with title="Cadastros e acessos" description="Crie usuários, áreas de trabalho e vínculos de acesso." title_id="admin-card-cadastros-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="usuarios/partials/_admin_cadastros_body.html" %}
 
-        {% include "components/ui/forms/form_block.html" with shell="card" section_id="admin-card-cadastros-title" title="Cadastros e acessos" description="Crie usuários, áreas de trabalho e vínculos de acesso." body_template="usuarios/partials/_admin_cadastros_body.html" %}
-
-        {% include "components/ui/forms/form_block.html" with shell="card" section_id="admin-card-conferencia-title" title="Conferência de acessos" description="Consulte áreas cadastradas e permissões existentes." body_template="usuarios/partials/_admin_conferencia_body.html" %}
-      </div>
-    </div>
+    {% include "components/form/card.html" with title="Conferência de acessos" description="Consulte áreas cadastradas e permissões existentes." title_id="admin-card-conferencia-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="usuarios/partials/_admin_conferencia_body.html" %}
   </div>
 {% endblock %}

@@ -1,0 +1,32 @@
+/* Usuários / Administração — ações e tabelas no step1 (sem ilha admin-*). */
+
+.usuarios-admin-page .cv-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--space-3);
+}
+
+.usuarios-admin-page .cv-form-actions__row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.usuarios-admin-page .cv-form-actions--inline {
+  justify-content: flex-start;
+}
+
+.usuarios-admin-page .cv-table-wrap {
+  margin-top: var(--space-3);
+  overflow-x: auto;
+}
+
+.usuarios-admin-page .cv-data-table {
+  width: 100%;
+}
+
+:is(html[data-theme="dark"]) .usuarios-admin-page .cv-metric {
+  background: var(--step1-field, var(--color-input-bg));
+  border: 0;
+}

@@ -583,7 +583,7 @@ Legenda: **✅** conforme · **⚠️** desvio · **❌** fora do padrão
 | Dashboard | ❌ classes locais; `<ul class="summary-items">` sem CSS | ✅ sem JS de página |
 | Login | ❌ fora de `base.html`; **nenhum** script (nem tema) | ❌ o tema não é aplicado — a página é fixa |
 | Perfil | ⚠️ **19 includes**; 3 footers à mão | ❌ `gdrive_config.js` (491 l.) — `escapeHtml` próprio, 6 `innerHTML`, CSRF manual, `alert()` |
-| Administração | ❌ `admin-overview` com `<dl>` | — |
+| Administração | ✅ `flow_base` + step1 + `cv-metric` (D-55) | — |
 | Visualizador PDF | ⚠️ 8 classes sem CSS | ⚠️ `documentos-pdf-viewer.js` (200 l.) — pdf.js com `data-worker-src` |
 | Placeholders (2) | ⚠️ `module_placeholder` | — |
 
