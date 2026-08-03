@@ -5,7 +5,7 @@
   <div class="list-header cv-filter-header{% if extra_class %} {{ extra_class }}{% endif %}">
 {% endif %}
 
-  {% include "components/ui/headers/_list_header_band.html" with title=title eyebrow=eyebrow status_label=status_label status_variant=status_variant only %}
+  {% include "components/ui/headers/_list_header_band.html" with title=title eyebrow=eyebrow status_label=status_label status_variant=status_variant band_tabs_template=band_tabs_template abas=abas tabs_aria_label=tabs_aria_label only %}
 
   {% if advanced %}
   <div class="list-header__rail list-header__rail--advanced">

@@ -9,9 +9,9 @@
 
   {% include "components/ui/headers/filter_page_header.html" with advanced=True form_action=request.path title=title|default:page_title eyebrow=eyebrow search_placeholder=search_placeholder search_aria_label=search_aria_label current_aba=aba date_picker_id=date_picker_id date_start_id=date_start_id date_end_id=date_end_id %}
 
-  {% if abas or page_obj.paginator.num_pages > 1 %}
+  {% if abas and not band_tabs_template or page_obj.paginator.num_pages > 1 %}
   <div class="list-toolbar">
-    {% if abas %}
+    {% if abas and not band_tabs_template %}
       {% include tabs_template|default:"components/lists/list_tabs.html" with abas=abas tabs_aria_label=tabs_aria_label only %}
     {% endif %}
     {% include "components/ui/lists/pagination.html" with page_obj=page_obj pagination_pages=pagination_pages page_querystring=page_querystring pagination_part="controls" only %}

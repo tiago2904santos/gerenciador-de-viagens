@@ -31,6 +31,21 @@
   width: 100%;
 }
 
+/* Banda com aside (toggle de lista a direita do titulo): vira linha. Sem o
+   aside continua em coluna, como as demais listas. */
+.list-header__band--with-aside {
+  align-items: center;
+  column-gap: var(--space-4);
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  row-gap: var(--space-2);
+}
+
+.list-header__band-aside {
+  flex: 0 0 auto;
+}
+
 .list-header__title-block {
   display: flex;
   flex-direction: column;
