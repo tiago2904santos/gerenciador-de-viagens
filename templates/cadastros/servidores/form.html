@@ -1,20 +1,21 @@
-{% extends "base.html" %}
+{% extends "components/page/flow_base.html" %}
 {% load static %}
-{% block title %}{{ page_title }}{% endblock %}
-{% block content %}
-  <div class="page-shell page-shell--standard-simple">
-    {% include "components/ui/headers/page_header.html" with eyebrow="CADASTROS" title=page_title description=page_description icon_label="SV" module_label="Servidores" only %}
 
-    <div class="main-form-panel main-form-panel--stack">
-      <div class="cv-form-section-stack cv-form-section-stack--comfortable">
-        <form method="post" novalidate data-servidor-form>
-          {% csrf_token %}
-          {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
-          {% include "components/form/card.html" with title="Dados do servidor" title_id="servidores-form-card-title" body_template="cadastros/servidores/partials/_form_card_body.html" footer_template="cadastros/servidores/partials/_form_card_footer.html" %}
-        </form>
-      </div>
+{% block flow_shell_modifier %}page-shell--standard cv-page--form{% endblock %}
+{% block flow_shell_extra %} document-form-page cadastros-form-page{% endblock %}
+{% block flow_shell_attrs %} data-servidor-form-shell{% endblock %}
+
+{% block flow_body %}
+  <form method="post" class="document-form travel-document-wizard__form" novalidate data-servidor-form>
+    {% csrf_token %}
+    {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
+    {% if form.non_field_errors %}
+      {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
+    {% endif %}
+    <div class="cv-form-section-stack cv-form-section-stack--comfortable" data-travel-document-wizard-step1>
+      {% include "components/form/card.html" with title="Dados do servidor" description=page_description title_id="servidores-form-card-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="cadastros/servidores/partials/_form_card_body.html" footer_template="cadastros/servidores/partials/_form_card_footer.html" %}
     </div>
-  </div>
+  </form>
 {% endblock %}
 
 {% block extra_js %}

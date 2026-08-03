@@ -1,21 +1,90 @@
-{# Miolo do card de termo avulso — metadados principais. #}
+{# Miolo do card de termo — mesma linguagem do card de evento. Cresce por camadas:
+   destino/período ficam no cabeçalho; servidores e viatura só entram quando existem. #}
+
+{% if card.servidores %}
 <div class="cv-record-card__band">
-  <div class="cv-fact-grid cv-fact-grid--termo">
+  <ul class="cv-person-list cv-person-list--n{{ card.servidores_count }}">
+    {% for s in card.servidores %}
+    <li class="cv-person-row">
+      <span class="cv-person-row__avatar" aria-hidden="true">{{ s.initials }}</span>
+
+      <div class="cv-person-row__body">
+        <div class="cv-person-row__name-row">
+          <span class="cv-person-row__name">{{ s.name }}</span>
+          {% if card.com_viatura %}
+          <span class="cv-person-row__badge">com viatura</span>
+          {% endif %}
+        </div>
+        {% if s.cargo or s.unidade %}
+        <span class="cv-person-row__meta">{% if s.cargo %}{{ s.cargo }}{% endif %}{% if s.cargo and s.unidade %} · {% endif %}{% if s.unidade %}{{ s.unidade }}{% endif %}</span>
+        {% endif %}
+      </div>
+
+      {% if s.pdf_url or s.docx_url %}
+      <div class="cv-person-row__actions">
+        <button
+          type="button"
+          class="cv-icon-btn cv-icon-btn--documents"
+          aria-label="Baixar termo de {{ s.name }}"
+          aria-haspopup="true"
+          aria-expanded="false"
+          aria-controls="termo-servidor-menu-{{ card.termo_pk }}-{{ s.servidor_pk }}"
+          data-tooltip="Visualizar e baixar"
+          data-overlay-trigger data-overlay-kind="menu"
+          data-overlay-target="termo-servidor-menu-{{ card.termo_pk }}-{{ s.servidor_pk }}"
+        >{% include "components/ui/icons/icon.html" with icon="folder" only %}</button>
+        <div class="cv-action-menu cv-action-menu--rich" id="termo-servidor-menu-{{ card.termo_pk }}-{{ s.servidor_pk }}" role="menu" hidden>
+          {% if card.com_viatura %}
+            {% include "components/ui/menus/rich_menu_header.html" with title="Termo com viatura" subtitle=s.name icon="document" only %}
+          {% else %}
+            {% include "components/ui/menus/rich_menu_header.html" with title="Termo do servidor" subtitle=s.name icon="document" only %}
+          {% endif %}
+          {% if s.pdf_url %}
+            {% include "components/ui/menus/rich_menu_link.html" with href=s.pdf_url title="Baixar PDF" description="Documento pronto para assinatura" icon="pdf" tone="pdf" download=True only %}
+          {% endif %}
+          {% if s.docx_url %}
+            {% include "components/ui/menus/rich_menu_link.html" with href=s.docx_url title="Baixar DOCX" description="Arquivo editável do termo" icon="docx" tone="docx" download=True only %}
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+{% if card.viatura %}
+<div class="cv-record-card__band">
+  <div class="cv-fact-grid">
+
     <div class="cv-fact-block">
-      <span class="cv-fact-block__label">Período</span>
-      <div class="cv-fact-block__value">{{ card.periodo|default:"—" }}</div>
+      <span class="cv-fact-block__label">Placa</span>
+      {% if card.viatura.placa %}
+      <div class="cv-fact-block__value">{{ card.viatura.placa }}</div>
+      {% else %}
+      <div class="cv-fact-block__value cv-empty-hint">Não informada</div>
+      {% endif %}
+      {% if card.viatura.modelo %}
+      <span class="cv-fact-block__label">Modelo</span>
+      <div class="cv-fact-block__value--secondary">{{ card.viatura.modelo }}</div>
+      {% endif %}
     </div>
+
+    {% if card.viatura.tipo or card.viatura.unidade %}
     <div class="cv-fact-block">
-      <span class="cv-fact-block__label">Ofício</span>
-      <div class="cv-fact-block__value">{{ card.oficio_label|default:"—" }}</div>
+      {% if card.viatura.tipo %}
+      <span class="cv-fact-block__label">Tipo</span>
+      <div class="cv-fact-block__value--secondary">{{ card.viatura.tipo }}</div>
+      {% endif %}
+      {% if card.viatura.unidade %}
+      <span class="cv-fact-block__label">Unidade</span>
+      <div class="cv-fact-block__value--secondary">{{ card.viatura.unidade }}</div>
+      {% endif %}
     </div>
-    <div class="cv-fact-block">
-      <span class="cv-fact-block__label">Servidores</span>
-      <div class="cv-fact-block__value">{{ card.servidores_label|default:"—" }}</div>
-    </div>
-    <div class="cv-fact-block">
-      <span class="cv-fact-block__label">Viatura</span>
-      <div class="cv-fact-block__value">{{ card.viatura_label|default:"—" }}</div>
-    </div>
+    {% endif %}
+
   </div>
 </div>
+{% endif %}
