@@ -73,6 +73,22 @@ def index(request):
     termos = listar_termos(q=q or None, q_digits=q_digits or None)
     paginator = Paginator(termos, TERMOS_PER_PAGE)
     page_obj = paginator.get_page(request.GET.get("page"))
+    def _servidor_url(termo_pk):
+        def build(servidor_pk, formato):
+            return reverse(
+                "termos:baixar_termo_cadastro_servidor",
+                args=[termo_pk, servidor_pk, formato],
+            )
+        return build
+
+    def _servidor_view_url(termo_pk):
+        def build(servidor_pk):
+            return reverse(
+                "termos:termo_cadastro_servidor_pdf_inline",
+                args=[termo_pk, servidor_pk],
+            )
+        return build
+
     cards = [
         apresentar_termo_card(
             termo,
@@ -81,6 +97,13 @@ def index(request):
             delete_modal=True,
             pdf_url=reverse("termos:baixar_termo_cadastro_pdf", args=[termo.pk]),
             docx_url=reverse("termos:baixar_termo_cadastro_docx", args=[termo.pk]),
+            generico_pdf_url=reverse("termos:baixar_termo_cadastro_generico", args=[termo.pk, "pdf"]),
+            generico_docx_url=reverse("termos:baixar_termo_cadastro_generico", args=[termo.pk, "docx"]),
+            servidor_url_builder=_servidor_url(termo.pk),
+            servidor_view_url_builder=_servidor_view_url(termo.pk),
+            viatura_view_url=reverse("termos:termo_cadastro_viatura_pdf_inline", args=[termo.pk]),
+            viatura_pdf_url=reverse("termos:baixar_termo_cadastro_viatura", args=[termo.pk, "pdf"]),
+            viatura_docx_url=reverse("termos:baixar_termo_cadastro_viatura", args=[termo.pk, "docx"]),
             **termo_cadastro_assinado_info(termo, None),
         )
         for termo in page_obj.object_list
@@ -497,6 +520,86 @@ def termo_cadastro_servidor_pdf_inline(request, pk, servidor_pk):
             "modo": "servidor",
         },
         disposicao="inline",
+    )
+
+
+@require_GET
+def baixar_termo_cadastro_generico(request, pk, formato):
+    """Termo em branco (variante SEMIPREENCHIDO), sem servidor nem viatura."""
+    termo = get_termo_by_id(pk)
+    try:
+        fmt = DocumentoFormato(formato)
+    except ValueError as exc:
+        raise Http404("Formato nao suportado.") from exc
+    return enfileirar_documento(
+        request,
+        tipo="termo_cadastro",
+        parametros={
+            "object_id": termo.pk,
+            "formato": fmt.value,
+            "modo": "generico",
+        },
+    )
+
+
+@require_GET
+def termo_cadastro_viatura_pdf_inline(request, pk):
+    termo = get_termo_by_id(pk)
+    if termo.viatura_efetiva() is None:
+        raise Http404("Termo sem viatura.")
+    return enfileirar_documento(
+        request,
+        tipo="termo_cadastro",
+        parametros={
+            "object_id": termo.pk,
+            "formato": DocumentoFormato.PDF.value,
+            "modo": "viatura",
+        },
+        disposicao="inline",
+    )
+
+
+@require_GET
+def baixar_termo_cadastro_viatura(request, pk, formato):
+    """Termo preenchido so com a viatura, sem servidor."""
+    termo = get_termo_by_id(pk)
+    if termo.viatura_efetiva() is None:
+        raise Http404("Termo sem viatura.")
+    try:
+        fmt = DocumentoFormato(formato)
+    except ValueError as exc:
+        raise Http404("Formato nao suportado.") from exc
+    return enfileirar_documento(
+        request,
+        tipo="termo_cadastro",
+        parametros={
+            "object_id": termo.pk,
+            "formato": fmt.value,
+            "modo": "viatura",
+        },
+    )
+
+
+@require_GET
+def baixar_termo_cadastro_servidor(request, pk, servidor_pk, formato):
+    """Termo de um servidor. A viatura do termo decide a variante do template."""
+    termo = get_termo_by_id(pk)
+    try:
+        fmt = DocumentoFormato(formato)
+    except ValueError as exc:
+        raise Http404("Formato nao suportado.") from exc
+    servidor = get_servidor_para_termo(servidor_pk)
+    if not termo.servidores_efetivos().filter(pk=servidor.pk).exists():
+        raise Http404("Servidor nao selecionado para este termo.")
+    return enfileirar_documento(
+        request,
+        tipo="termo_cadastro",
+        parametros={
+            "object_id": termo.pk,
+            "servidor_id": servidor.pk,
+            "formato": fmt.value,
+            "modo": "servidor",
+        },
     )
 
 

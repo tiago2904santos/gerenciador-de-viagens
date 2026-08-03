@@ -1,0 +1,26 @@
+{# Menu de documentos de uma linha do card de termo (servidor ou viatura). #}
+<div class="cv-person-row__actions">
+  <button
+    type="button"
+    class="cv-icon-btn cv-icon-btn--documents"
+    aria-label="Documentos de {{ alvo }}"
+    aria-haspopup="true"
+    aria-expanded="false"
+    aria-controls="{{ menu_id }}"
+    data-tooltip="Visualizar e baixar"
+    data-overlay-trigger data-overlay-kind="menu"
+    data-overlay-target="{{ menu_id }}"
+  >{% include "components/ui/icons/icon.html" with icon="folder" only %}</button>
+  <div class="cv-action-menu cv-action-menu--rich" id="{{ menu_id }}" role="menu" hidden>
+    {% include "components/ui/menus/rich_menu_header.html" with title=titulo subtitle=subtitulo icon="document" only %}
+    {% if view_url %}
+      {% include "components/ui/menus/rich_menu_link.html" with href=view_url title="Visualizar termo" description="Abrir o documento no navegador" icon="eye" tone="preview" target_blank=True only %}
+    {% endif %}
+    {% if pdf_url %}
+      {% include "components/ui/menus/rich_menu_link.html" with href=pdf_url title="Baixar PDF" description="Documento pronto para assinatura" icon="pdf" tone="pdf" download=True only %}
+    {% endif %}
+    {% if docx_url %}
+      {% include "components/ui/menus/rich_menu_link.html" with href=docx_url title="Baixar DOCX" description="Arquivo editável do termo" icon="docx" tone="docx" download=True only %}
+    {% endif %}
+  </div>
+</div>

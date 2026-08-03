@@ -1,21 +1,54 @@
-{# Miolo do card de termo avulso — metadados principais. #}
+{# Miolo do card de termo — linguagem do card de evento; cresce por camadas: destino/período no cabeçalho, e uma faixa única com servidores e viatura quando existem. #}
+
+{% if card.compacto %}
+<p class="termo-card-vazio">
+  <span class="termo-card-vazio__texto">Sem servidores nem viatura</span>
+  <a class="termo-card-vazio__acao" href="{{ card.footer.edit_url }}">Definir equipe</a>
+</p>
+{% endif %}
+
+{% if card.servidores or card.viatura_row %}
 <div class="cv-record-card__band">
-  <div class="cv-fact-grid cv-fact-grid--termo">
-    <div class="cv-fact-block">
-      <span class="cv-fact-block__label">Período</span>
-      <div class="cv-fact-block__value">{{ card.periodo|default:"—" }}</div>
-    </div>
-    <div class="cv-fact-block">
-      <span class="cv-fact-block__label">Ofício</span>
-      <div class="cv-fact-block__value">{{ card.oficio_label|default:"—" }}</div>
-    </div>
-    <div class="cv-fact-block">
-      <span class="cv-fact-block__label">Servidores</span>
-      <div class="cv-fact-block__value">{{ card.servidores_label|default:"—" }}</div>
-    </div>
-    <div class="cv-fact-block">
-      <span class="cv-fact-block__label">Viatura</span>
-      <div class="cv-fact-block__value">{{ card.viatura_label|default:"—" }}</div>
-    </div>
-  </div>
+  <ul class="cv-person-list cv-person-list--n{{ card.linhas_count }}">
+
+    {% for s in card.servidores %}
+    <li class="cv-person-row">
+      <span class="cv-person-row__avatar" aria-hidden="true">{{ s.initials }}</span>
+      <div class="cv-person-row__body">
+        <div class="cv-person-row__name-row">
+          <span class="cv-person-row__name">{{ s.name }}</span>
+          {% if card.com_viatura %}
+          <span class="cv-person-row__badge">com viatura</span>
+          {% endif %}
+        </div>
+        {% if s.cargo or s.unidade %}
+        <span class="cv-person-row__meta">{% if s.cargo %}{{ s.cargo }}{% endif %}{% if s.cargo and s.unidade %} · {% endif %}{% if s.unidade %}{{ s.unidade }}{% endif %}</span>
+        {% endif %}
+      </div>
+      {% if s.view_url or s.pdf_url or s.docx_url %}
+      {% include "termos/partials/_termo_linha_menu.html" with menu_id=s.menu_id titulo=card.com_viatura|yesno:"Termo com viatura,Termo do servidor" subtitulo=s.name alvo=s.name view_url=s.view_url pdf_url=s.pdf_url docx_url=s.docx_url only %}
+      {% endif %}
+    </li>
+    {% endfor %}
+
+    {% if card.viatura_row %}
+    <li class="cv-person-row cv-person-row--viatura">
+      <span class="cv-person-row__avatar" aria-hidden="true">{{ card.viatura_row.initials }}</span>
+      <div class="cv-person-row__body">
+        <div class="cv-person-row__name-row">
+          <span class="cv-person-row__name">{{ card.viatura_row.name }}</span>
+          <span class="cv-person-row__badge">viatura</span>
+        </div>
+        {% if card.viatura_row.meta %}
+        <span class="cv-person-row__meta">{{ card.viatura_row.meta }}</span>
+        {% endif %}
+      </div>
+      {% if card.viatura_row.view_url or card.viatura_row.pdf_url or card.viatura_row.docx_url %}
+      {% include "termos/partials/_termo_linha_menu.html" with menu_id=card.viatura_row.menu_id titulo="Termo da viatura" subtitulo=card.viatura_row.name alvo=card.viatura_row.name view_url=card.viatura_row.view_url pdf_url=card.viatura_row.pdf_url docx_url=card.viatura_row.docx_url only %}
+      {% endif %}
+    </li>
+    {% endif %}
+
+  </ul>
 </div>
+{% endif %}
