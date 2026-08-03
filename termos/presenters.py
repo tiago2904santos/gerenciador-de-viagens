@@ -3,6 +3,51 @@ from core.presenters.meta import build_meta
 from core.utils.masks import format_placa
 
 
+def apresentar_linha_simples_termo(
+    termo,
+    *,
+    edit_url="#",
+    delete_url="#",
+    pdf_url="",
+    docx_url="",
+    # termo_cadastro_assinado_info() devolve este par junto das URLs; a linha
+    # decide o estado assinado por remover_assinado_url, mas precisa aceita-lo.
+    assinado=False,
+    anexar_assinado_url="",
+    assinado_nome_original="",
+    assinado_view_url="",
+    remover_assinado_url="",
+):
+    """Linha da lista de termos simples — os que nao tem servidor nem viatura.
+
+    Sem equipe e sem veiculo o card em camadas nao tem o que mostrar, entao
+    esses termos usam a linha de catalogo (components/lists/simple_list_row).
+    O download e o do termo generico: e a variante SEMIPREENCHIDO, a unica
+    que faz sentido sem servidor — ver termos.services.
+    """
+    periodo_vazio = termo.periodo_efetivo()[0] is None
+    facts = []
+    if not periodo_vazio:
+        facts.append(build_meta("Período", termo.periodo_display))
+    if termo.oficio_id:
+        facts.append(build_meta("Ofício", termo.oficio.numero_formatado))
+    return {
+        "avatar": "TA",
+        "title": termo.destino_display,
+        "facts": facts,
+        "search_extra": termo.periodo_display if not periodo_vazio else "",
+        "edit_url": edit_url,
+        "delete_url": delete_url,
+        "delete_modal": True,
+        "pdf_url": pdf_url,
+        "docx_url": docx_url,
+        "anexar_assinado_url": anexar_assinado_url,
+        "assinado_nome_original": assinado_nome_original,
+        "assinado_view_url": assinado_view_url,
+        "remover_assinado_url": remover_assinado_url,
+    }
+
+
 def apresentar_termo_card(
     termo,
     *,
@@ -141,12 +186,8 @@ def apresentar_termo_card(
 
     # Sem servidores e sem viatura o miolo nao renderiza faixa alguma; nesse caso
     # cabecalho e acoes dividem a mesma linha (ver static/css/termos.css).
-    compacto = not servidores_display and viatura_row is None
-
     return {
         "termo_pk": termo.pk,
-        "extra_class": "cv-record-card--termo-compacto" if compacto else "",
-        "compacto": compacto,
         "search_text": " ".join(filter(None, [
             destino, periodo, oficio_label,
             str(viatura) if viatura else "",

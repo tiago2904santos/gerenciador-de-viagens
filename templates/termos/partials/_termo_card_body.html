@@ -1,12 +1,5 @@
 {# Miolo do card de termo — linguagem do card de evento; cresce por camadas: destino/período no cabeçalho, e uma faixa única com servidores e viatura quando existem. #}
 
-{% if card.compacto %}
-<p class="termo-card-vazio">
-  <span class="termo-card-vazio__texto">Sem servidores nem viatura</span>
-  <a class="termo-card-vazio__acao" href="{{ card.footer.edit_url }}">Definir equipe</a>
-</p>
-{% endif %}
-
 {% if card.servidores or card.viatura_row %}
 <div class="cv-record-card__band">
   <ul class="cv-person-list cv-person-list--n{{ card.linhas_count }}">

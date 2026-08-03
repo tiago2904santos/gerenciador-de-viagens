@@ -94,6 +94,9 @@ class OrcamentoDeQueriesTermoTests(TestCase):
         )
 
     # Medidos no `main` em 29/07/2026, antes da camada de selectors.
-    QUERIES_LISTA = 54
-    QUERIES_LISTA_BUSCA = 54
+    # 54 -> 55: a lista ganhou as abas "Com equipe"/"Sem equipe", e a contagem
+    # das duas custa 1 query (agregacao condicional unica sobre a mesma base,
+    # nao dois .count()). Ver termos.views.index.
+    QUERIES_LISTA = 55
+    QUERIES_LISTA_BUSCA = 55
     QUERIES_EDITAR = 21

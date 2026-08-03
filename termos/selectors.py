@@ -8,6 +8,8 @@ reescritas: os mesmos `select_related`/`prefetch_related`, o mesmo recorte por
 
 from __future__ import annotations
 
+from django.db.models import Exists
+from django.db.models import OuterRef
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
@@ -18,7 +20,47 @@ from core.tenancy import filter_queryset_by_area
 from .models import TermoAutorizacao
 
 
-def listar_termos(q=None, q_digits=None):
+def anotar_composicao(termos):
+    """Anota se cada fonte de servidores do termo tem conteudo.
+
+    `TermoAutorizacao.servidores_efetivos()` cai em cascata — servidores
+    proprios, senao os do oficio, senao os dos oficios do evento — e
+    `viatura_efetiva()` faz o mesmo com a viatura. Para dividir a lista no
+    banco (em Python quebraria paginacao e contagem) cada fonte vira um
+    booleano via Exists, que nega de forma previsivel; `servidores__isnull`
+    direto no filtro passaria por join m2m e descartaria linhas nos dois lados.
+    """
+    from oficios.models import Oficio
+
+    through = TermoAutorizacao.servidores.through
+    return termos.annotate(
+        _tem_servidor_proprio=Exists(
+            through.objects.filter(termoautorizacao_id=OuterRef("pk"))
+        ),
+        _tem_servidor_oficio=Exists(
+            Oficio.objects.filter(
+                pk=OuterRef("oficio_id"), servidores_termo_autorizacao__isnull=False
+            )
+        ),
+        _tem_servidor_evento=Exists(
+            Oficio.objects.filter(evento_id=OuterRef("evento_id")).filter(
+                Q(servidores_termo_autorizacao__isnull=False) | Q(servidores__isnull=False)
+            )
+        ),
+    )
+
+
+# Termo "simples": nenhuma fonte de servidor e nenhuma viatura efetiva.
+Q_SIMPLES = Q(
+    _tem_servidor_proprio=False,
+    _tem_servidor_oficio=False,
+    _tem_servidor_evento=False,
+    viatura__isnull=True,
+    oficio__viatura__isnull=True,
+)
+
+
+def listar_termos(q=None, q_digits=None, simples=None):
     """Lista de termos da área, com a busca livre da tela.
 
     `q_digits` são os dígitos extraídos de `q` pela view — número e protocolo do
@@ -35,6 +77,9 @@ def listar_termos(q=None, q_digits=None):
         .prefetch_related("servidores")
         .order_by("-created_at")
     )
+    if simples is not None:
+        termos = anotar_composicao(termos)
+        termos = termos.filter(Q_SIMPLES) if simples else termos.exclude(Q_SIMPLES)
     if not q:
         return termos
 

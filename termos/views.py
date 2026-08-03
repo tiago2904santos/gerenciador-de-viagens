@@ -35,10 +35,15 @@ from oficios.services import validar_oficio_para_documento
 from .forms import TermoAutorizacaoForm
 from .models import TermoAutorizacao
 from .presenters import apresentar_linha_lista_simples_termo
+from .presenters import apresentar_linha_simples_termo
 from .presenters import apresentar_termo_card
 from .selectors import get_servidor_do_termo_do_oficio
 from .selectors import get_servidor_para_termo
 from .selectors import get_termo_by_id
+from django.db.models import Count
+
+from .selectors import Q_SIMPLES
+from .selectors import anotar_composicao
 from .selectors import listar_termos
 from .services import listar_servidores_com_termo
 from .services import preview_termo_context
@@ -67,10 +72,38 @@ def _sede_config_label():
     return ""
 
 
+# Duas listas: o termo sem servidor e sem viatura nao tem o que mostrar no card
+# em camadas, entao vai para a lista de linhas simples.
+ABAS_TERMO = (("especificos", "Com equipe"), ("simples", "Sem equipe"))
+
+
 def index(request):
     q = request.GET.get("q", "").strip()
     q_digits = _digits(q)
-    termos = listar_termos(q=q or None, q_digits=q_digits or None)
+    aba = request.GET.get("aba", "")
+    if aba not in dict(ABAS_TERMO):
+        aba = "especificos"
+    simples = aba == "simples"
+
+    busca = {"q": q or None, "q_digits": q_digits or None}
+    termos = listar_termos(**busca, simples=simples)
+    # Uma agregacao condicional em vez de dois .count(): as abas custam 1 query.
+    contagem = anotar_composicao(listar_termos(**busca)).aggregate(
+        simples=Count("pk", filter=Q_SIMPLES),
+        especificos=Count("pk", filter=~Q_SIMPLES),
+    )
+    preservado = urlencode({"q": q}) if q else ""
+    abas = [
+        {
+            "key": chave,
+            "label": label,
+            "count": contagem[chave],
+            "url": f"{reverse('termos:index')}?aba={chave}" + (f"&{preservado}" if preservado else ""),
+            "is_active": chave == aba,
+        }
+        for chave, label in ABAS_TERMO
+    ]
+
     paginator = Paginator(termos, TERMOS_PER_PAGE)
     page_obj = paginator.get_page(request.GET.get("page"))
     def _servidor_url(termo_pk):
@@ -89,7 +122,19 @@ def index(request):
             )
         return build
 
-    cards = [
+    rows = [
+        apresentar_linha_simples_termo(
+            termo,
+            edit_url=reverse("termos:editar", args=[termo.pk]),
+            delete_url=reverse("termos:excluir", args=[termo.pk]),
+            pdf_url=reverse("termos:baixar_termo_cadastro_generico", args=[termo.pk, "pdf"]),
+            docx_url=reverse("termos:baixar_termo_cadastro_generico", args=[termo.pk, "docx"]),
+            **termo_cadastro_assinado_info(termo, None),
+        )
+        for termo in page_obj.object_list
+    ] if simples else []
+
+    cards = [] if simples else [
         apresentar_termo_card(
             termo,
             edit_url=reverse("termos:editar", args=[termo.pk]),
@@ -115,10 +160,14 @@ def index(request):
             "page_title": "Termos de Autorização",
             "page_description": "Cadastre termos avulsos ou vinculados a ofícios existentes.",
             "cards": cards,
+            "rows": rows,
+            "aba": aba,
+            "abas": abas,
+            "simples": simples,
             "q": q,
             "page_obj": page_obj,
             "pagination_pages": _pagination_pages(page_obj),
-            "page_querystring": urlencode({"q": q}) if q else "",
+            "page_querystring": urlencode({k: v for k, v in {"q": q, "aba": aba}.items() if v}),
             "novo_url": reverse("termos:novo"),
             "oficios_url": reverse("oficios:index"),
         },
