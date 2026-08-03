@@ -28,10 +28,17 @@
 }
 
 .justificativas-page .cv-record-row,
-.justificativas-page .cv-record-row:hover,
-:is(html[data-theme="dark"]) .justificativas-page .cv-record-row,
-:is(html[data-theme="dark"]) .justificativas-page .cv-record-row:hover {
+:is(html[data-theme="dark"]) .justificativas-page .cv-record-row {
   background: var(--step1-field, var(--step1-surface));
+  border: 0;
+  box-shadow: none;
+}
+
+.justificativas-page .cv-record-row:hover,
+.justificativas-page .cv-record-row:focus-within,
+:is(html[data-theme="dark"]) .justificativas-page .cv-record-row:hover,
+:is(html[data-theme="dark"]) .justificativas-page .cv-record-row:focus-within {
+  background: color-mix(in srgb, var(--color-accent) 5%, var(--step1-field, var(--step1-surface)));
   border: 0;
   box-shadow: none;
 }

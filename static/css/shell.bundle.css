@@ -8224,19 +8224,25 @@ html[data-theme="dark"] #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete,
   align-items: center;
   background: var(--step1-field, var(--color-input-bg, var(--color-surface-muted, var(--color-card-muted))));
   border: 0;
-  border-radius: 10px;
+  border-radius: 12px;
   box-shadow: none;
   column-gap: 12px;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
+  min-height: 64px;
   min-width: 0;
-  padding: 12px 14px;
+  padding: 11px 12px;
   position: relative;
+  transition: background-color var(--transition-fast, 140ms ease);
 }
 
 .cv-record-row:hover,
 .cv-record-row:focus-within {
-  background: var(--step1-field, var(--color-input-bg, var(--color-surface-muted, var(--color-card-muted))));
+  background: color-mix(
+    in srgb,
+    var(--color-accent) 5%,
+    var(--step1-field, var(--color-input-bg, var(--color-surface-muted)))
+  );
   border: 0;
   box-shadow: none;
 }
@@ -8247,19 +8253,19 @@ html[data-theme="dark"] #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete,
 
 .cv-record-row__identity {
   align-items: center;
-  background: color-mix(in srgb, var(--color-heading) 8%, transparent);
-  border: 1px solid var(--color-border-soft);
-  border-radius: 10px;
-  color: var(--color-heading);
+  background: var(--color-accent-soft, color-mix(in srgb, var(--color-accent) 18%, transparent));
+  border: 1px solid var(--color-accent-border-soft, color-mix(in srgb, var(--color-accent) 55%, transparent));
+  border-radius: 12px;
+  color: var(--color-accent-text, var(--color-accent));
   display: inline-flex;
   flex-shrink: 0;
   font-size: var(--font-size-xs, 0.75rem);
   font-weight: 800;
-  height: 40px;
+  height: 42px;
   justify-content: center;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
   line-height: 1;
-  width: 40px;
+  width: 42px;
 }
 
 .cv-record-row__identity > span {
@@ -15862,16 +15868,17 @@ html[data-theme="dark"] *::after {
   .cv-record-row:hover,
 :is(html[data-theme="dark"])
   .cv-record-row:focus-within {
-  background: var(--step1-field, var(--color-input-bg, var(--color-surface-muted)));
+  /* Mesmo hover do Ofício vinculado (#termo-oficio-lista / related-route). */
+  background: color-mix(in srgb, var(--color-accent) 5%, var(--step1-field, var(--color-input-bg)));
   border: 0;
   box-shadow: none;
 }
 
 :is(html[data-theme="dark"])
   .cv-record-row__identity {
-  background: color-mix(in srgb, var(--color-heading) 10%, transparent);
-  border-color: color-mix(in srgb, var(--color-border) 70%, transparent);
-  color: var(--color-heading);
+  background: var(--color-accent-soft, color-mix(in srgb, var(--color-accent) 18%, transparent));
+  border-color: var(--color-accent-border-soft, color-mix(in srgb, var(--color-accent) 55%, transparent));
+  color: var(--color-accent-text, var(--color-accent));
 }
 
 :is(html[data-theme="dark"])

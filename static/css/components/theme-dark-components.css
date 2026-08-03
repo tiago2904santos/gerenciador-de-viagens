@@ -5287,16 +5287,17 @@ html[data-theme="dark"] *::after {
   .cv-record-row:hover,
 :is(html[data-theme="dark"])
   .cv-record-row:focus-within {
-  background: var(--step1-field, var(--color-input-bg, var(--color-surface-muted)));
+  /* Mesmo hover do Ofício vinculado (#termo-oficio-lista / related-route). */
+  background: color-mix(in srgb, var(--color-accent) 5%, var(--step1-field, var(--color-input-bg)));
   border: 0;
   box-shadow: none;
 }
 
 :is(html[data-theme="dark"])
   .cv-record-row__identity {
-  background: color-mix(in srgb, var(--color-heading) 10%, transparent);
-  border-color: color-mix(in srgb, var(--color-border) 70%, transparent);
-  color: var(--color-heading);
+  background: var(--color-accent-soft, color-mix(in srgb, var(--color-accent) 18%, transparent));
+  border-color: var(--color-accent-border-soft, color-mix(in srgb, var(--color-accent) 55%, transparent));
+  color: var(--color-accent-text, var(--color-accent));
 }
 
 :is(html[data-theme="dark"])
