@@ -8,7 +8,7 @@
   <script src="{% static 'js/core/theme-init.js' %}"></script>
   <title>{% block title %}Central de Viagens 3{% endblock %}</title>
   {# NOVO-12: um CSS de shell no lugar de 24 requests. Fontes em static/css/; regenere com scripts/build_shell_bundles.py #}
-  <link rel="stylesheet" href="{% static 'css/shell.bundle.css' %}?v=20260803-9">
+  <link rel="stylesheet" href="{% static 'css/shell.bundle.css' %}?v=20260803-10">
   {% block extra_css %}{% endblock %}
   {% block extra_css_after_theme %}{% endblock %}
 </head>
@@ -41,7 +41,7 @@
     </div>
   </div>
   {# NOVO-12: um JS de shell (defer) no lugar de 23 requests; theme-* ficam no head sem defer. #}
-  <script src="{% static 'js/shell.bundle.js' %}?v=20260803-9" defer></script>
+  <script src="{% static 'js/shell.bundle.js' %}?v=20260803-10" defer></script>
   {% block extra_js %}{% endblock %}
 </body>
 </html>

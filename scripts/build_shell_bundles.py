@@ -58,6 +58,7 @@ SHELL_JS: tuple[str, ...] = (
     "js/components/state-toggle.js",
     "js/components/card-toggle.js",
     "js/components/collection.js",
+    "js/components/segment-nav.js",
     "js/components/icon-tooltips.js",
     "js/components/overlay.js",
     "js/components/attach-signed-modal.js",

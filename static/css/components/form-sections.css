@@ -357,10 +357,12 @@ html[data-theme="light"] .cv-segment-toggle__btn:hover:not([aria-pressed="true"]
   padding: 7px var(--space-3);
   text-align: center;
   text-decoration: none;
-  transform: none;
   transition:
     background-color var(--transition-fast),
-    color var(--transition-fast);
+    color var(--transition-fast),
+    box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform, background;
 }
 
 .cv-segment-toggle--nav .cv-segment-toggle__btn[aria-current="page"] {
@@ -368,7 +370,11 @@ html[data-theme="light"] .cv-segment-toggle__btn:hover:not([aria-pressed="true"]
   border-color: var(--color-accent);
   box-shadow: none;
   color: var(--color-on-accent);
-  transform: none;
+  transform: scale(1.01);
+}
+
+.cv-segment-toggle--nav .cv-segment-toggle__btn--pop {
+  animation: cv-segment-pop 280ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 .cv-segment-toggle--nav .cv-segment-toggle__btn:hover:not([aria-current="page"]) {

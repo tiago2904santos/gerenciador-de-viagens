@@ -110,6 +110,16 @@
     });
   }
 
+  function initSegmentNav(root) {
+    return safeCall('segmentNav', function () {
+      if (window.CV && window.CV.segmentNav && typeof window.CV.segmentNav.init === 'function') {
+        window.CV.segmentNav.init(root);
+        return 1;
+      }
+      return 0;
+    });
+  }
+
   function emitInit(root, counts) {
     try {
       root.dispatchEvent(
@@ -131,6 +141,7 @@
     var counts = {
       masks: initMasks(scope),
       stateToggles: initStateToggles(scope),
+      segmentNav: initSegmentNav(scope),
       selects: initSelects(scope),
       searchPickers: initSearchPickers(scope),
       datePickers: initDatePickers(scope),
