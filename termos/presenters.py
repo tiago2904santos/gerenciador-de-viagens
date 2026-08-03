@@ -146,6 +146,7 @@ def apresentar_termo_card(
     return {
         "termo_pk": termo.pk,
         "extra_class": "cv-record-card--termo-compacto" if compacto else "",
+        "compacto": compacto,
         "search_text": " ".join(filter(None, [
             destino, periodo, oficio_label,
             str(viatura) if viatura else "",

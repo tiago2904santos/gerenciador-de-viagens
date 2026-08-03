@@ -103,31 +103,32 @@
 }
 
 /* ── Card da lista: estado minimo ──
-   Sem servidores e sem viatura o miolo nao renderiza faixa alguma. O cabecalho
-   padrao empilha label sobre valor num bloco de 66px e reserva a linha inteira,
-   o que num card de uma linha vira casco vazio: 545px de cabecalho para um
-   titulo de 40px. Aqui ele vira uma barra baixa, com o label como prefixo na
-   mesma linha do titulo e as acoes logo em seguida.
+   Sem servidores e sem viatura o card nao tem miolo. O cabecalho padrao
+   empilha label sobre valor num bloco de 66px e toma a linha inteira, o que
+   sobrava 550px de vazio ao lado de um titulo de 40px — parecia card quebrado.
+   Aqui ele vira uma barra baixa de tres partes: titulo, o que falta, acoes.
    A classe vem do presenter (termos.presenters.apresentar_termo_card). */
 .cv-record-card--termo-compacto .cv-record-card__layout {
   align-items: center;
   display: flex;
+  gap: var(--space-4);
 }
 
 .cv-record-card--termo-compacto .cv-record-card__id-row {
   /* o realce em gradiente cobre 76px fixos: num card baixo vira mancha */
   background-image: none;
   border-bottom: 0;
-  flex: 1 1 auto;
+  flex: 0 1 auto;
   gap: var(--space-3);
   min-height: 0;
   min-width: 0;
-  padding: var(--space-3) var(--space-3) var(--space-3) var(--space-6);
+  padding: var(--space-3) 0 var(--space-3) var(--space-6);
 }
 
 /* label deixa de ser bloco acima do valor e vira prefixo na mesma linha */
 .cv-record-card--termo-compacto .cv-record-card__info-item {
   align-items: baseline;
+  flex: 0 1 auto;
   flex-direction: row;
   gap: var(--space-2);
   padding: 0;
@@ -137,14 +138,43 @@
   flex: 0 0 auto;
 }
 
-/* Unico conteudo do card: merece o peso que o cabecalho empilhado nao dava.
-   Precisa dos 3 seletores: o tema escuro reduz este valor para
-   clamp(0.92rem, 1.15vw, 1.05rem) via :is(html[data-theme="dark"]) ...,
-   que pontua 0-2-1 e ganharia de um seletor com so 2 classes. */
-.cv-record-card--termo-compacto .cv-record-card__id-row .cv-record-card__info-value {
-  flex: 1 1 auto;
+/* Precisa de 4 classes: o tema escuro dimensiona este valor com
+   :is(html[data-theme="dark"]) .cv-record-card__id-row .cv-record-card__info-value,
+   que pontua 0-3-1 e ganha de qualquer seletor com apenas 3 classes. */
+.cv-entity-card.cv-record-card--termo-compacto .cv-record-card__id-row .cv-record-card__info-value {
   font-size: clamp(1.05rem, 1.4vw, 1.25rem);
   min-width: 0;
+}
+
+/* Ocupa o vazio que sobrava entre titulo e acoes, dizendo o que falta em vez
+   de deixar a lacuna sem explicacao. */
+.termo-card-vazio {
+  align-items: baseline;
+  color: var(--color-muted);
+  display: flex;
+  flex: 1 1 auto;
+  font-size: var(--font-size-sm);
+  gap: var(--space-3);
+  margin: 0;
+  min-width: 0;
+}
+
+.termo-card-vazio__texto {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.termo-card-vazio__acao {
+  border-bottom: 1px solid currentColor;
+  color: var(--color-accent);
+  flex: 0 0 auto;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.termo-card-vazio__acao:hover {
+  color: var(--color-heading);
 }
 
 .cv-record-card--termo-compacto .cv-record-card__footer {
@@ -160,19 +190,21 @@
   width: auto;
 }
 
-/* Em telas estreitas nao ha largura para as duas metades: volta a empilhar. */
+/* Abaixo de 720px nao ha largura para as tres partes lado a lado. */
 @media (max-width: 720px) {
   .cv-record-card--termo-compacto .cv-record-card__layout {
     align-items: stretch;
     display: grid;
+    gap: 0;
   }
 
   .cv-record-card--termo-compacto .cv-record-card__id-row {
     border-bottom: 1px solid var(--cv-form-section-border);
+    padding: var(--space-3) var(--space-4) var(--space-3) var(--space-6);
   }
 
-  .cv-record-card--termo-compacto .cv-record-card__footer {
-    border-top: 1px solid var(--cv-form-section-border, var(--color-border-soft));
+  .termo-card-vazio {
+    padding: var(--space-2) var(--space-4) 0 var(--space-6);
   }
 
   .cv-record-card--termo-compacto .cv-record-card__footer-actions {
