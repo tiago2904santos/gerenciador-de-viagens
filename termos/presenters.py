@@ -1,6 +1,5 @@
 from core import entity_cards
 from core.presenters.meta import build_meta
-from core.utils.masks import format_placa
 
 
 def apresentar_termo_card(
@@ -11,93 +10,72 @@ def apresentar_termo_card(
     delete_modal=False,
     pdf_url="",
     docx_url="",
-    generico_pdf_url="",
-    generico_docx_url="",
-    servidor_url_builder=None,
     assinado=False,
     anexar_assinado_url="",
     remover_assinado_url="",
     assinado_nome_original="",
     assinado_view_url="",
 ):
-    """Card do termo, montado por camadas conforme o que estiver preenchido.
-
-    O estado mínimo é destino + período. Servidores e viatura viram faixas
-    próprias só quando existem, e cada servidor ganha o menu de download do
-    seu termo. `servidor_url_builder(servidor_pk, formato)` devolve a URL.
-    """
-    from oficios.presenters import _iniciais_nome_servidor
+    servidores = termo.servidores_efetivos()
+    servidores_count = servidores.count()
+    if servidores_count:
+        servidores_label = str(servidores_count)
+    elif termo.oficio_id:
+        servidores_label = "fallback do ofício"
+    else:
+        servidores_label = "sem servidor"
 
     viatura = termo.viatura_efetiva()
-    oficio_label = termo.oficio.numero_formatado if termo.oficio_id else ""
+    oficio_label = termo.oficio.numero_formatado if termo.oficio_id else "—"
     destino = termo.destino_display
     periodo = termo.periodo_display
 
-    # A viatura do termo decide a variante do template do termo do servidor
-    # (COMPLETO_COM_VIATURA x COMPLETO_SEM_VIATURA) — ver
-    # termos.services._resolver_variante_termo_cadastro.
-    com_viatura = viatura is not None
-
-    servidores_display = []
-    for servidor in termo.servidores_efetivos():
-        cargo_nome = servidor.cargo.nome if servidor.cargo_id and servidor.cargo else ""
-        unidade_nome = str(servidor.unidade) if servidor.unidade_id else ""
-        servidores_display.append({
-            "servidor_pk": servidor.pk,
-            "initials": _iniciais_nome_servidor(servidor.nome),
-            "name": servidor.nome,
-            "cargo": cargo_nome,
-            "unidade": unidade_nome,
-            "pdf_url": servidor_url_builder(servidor.pk, "pdf") if servidor_url_builder else "",
-            "docx_url": servidor_url_builder(servidor.pk, "docx") if servidor_url_builder else "",
-        })
-
-    viatura_display = None
-    if viatura is not None:
-        viatura_display = {
-            "placa": format_placa(viatura.placa) if viatura.placa else "",
-            "modelo": viatura.modelo or "",
-            "tipo": viatura.get_tipo_display() if viatura.tipo else "",
-            "unidade": str(viatura.unidade) if viatura.unidade_id else "",
-        }
-
-    menus = []
     doc_items = []
     if pdf_url:
-        doc_items.append(entity_cards.menu_link(
-            pdf_url, "Baixar PDF", "Todos os servidores do termo", "pdf", "pdf", download=True,
-        ))
+        doc_items.append(
+            entity_cards.menu_link(
+                pdf_url,
+                "Baixar PDF",
+                "Documento pronto para impressão",
+                "pdf",
+                "pdf",
+                download=True,
+            )
+        )
     if docx_url:
-        doc_items.append(entity_cards.menu_link(
-            docx_url, "Baixar DOCX", "Arquivo editável", "docx", "docx", download=True,
-        ))
-    if generico_pdf_url:
-        doc_items.append(entity_cards.menu_link(
-            generico_pdf_url, "Termo em branco (PDF)",
-            "Sem preenchimento, para assinar à mão", "pdf", "pdf", download=True,
-        ))
-    if generico_docx_url:
-        doc_items.append(entity_cards.menu_link(
-            generico_docx_url, "Termo em branco (DOCX)",
-            "Sem preenchimento, para editar", "docx", "docx", download=True,
-        ))
+        doc_items.append(
+            entity_cards.menu_link(
+                docx_url,
+                "Baixar DOCX",
+                "Arquivo editável",
+                "docx",
+                "docx",
+                download=True,
+            )
+        )
     if anexar_assinado_url:
-        doc_items.append(entity_cards.menu_attach_signed(
-            anexar_assinado_url,
-            destino,
-            assinado=assinado,
-            current_name=assinado_nome_original,
-            current_view_url=assinado_view_url,
-            current_remove_url=remover_assinado_url,
-        ))
+        doc_items.append(
+            entity_cards.menu_attach_signed(
+                anexar_assinado_url,
+                destino,
+                assinado=assinado,
+                current_name=assinado_nome_original,
+                current_view_url=assinado_view_url,
+                current_remove_url=remover_assinado_url,
+            )
+        )
+
+    menus = []
     if doc_items:
-        menus.append(entity_cards.menu(
-            f"termo-docs-{termo.pk}",
-            "Documentos",
-            destino,
-            doc_items,
-            trigger_state_class="is-assinado" if assinado else "",
-        ))
+        menus.append(
+            entity_cards.menu(
+                f"termo-docs-{termo.pk}",
+                "Documentos",
+                destino,
+                doc_items,
+                trigger_state_class="is-assinado" if assinado else "",
+            )
+        )
 
     footer_kwargs = {
         "edit_url": edit_url,
@@ -112,28 +90,18 @@ def apresentar_termo_card(
         footer_kwargs["delete_url"] = delete_url
         footer_kwargs["delete_aria"] = "Excluir termo"
 
-    header_items = [entity_cards.header_item("Destino", destino, wide=True)]
-    if periodo:
-        header_items.append(entity_cards.header_item("Período", periodo))
-    header_chips = [entity_cards.chip("muted", oficio_label)] if oficio_label else []
-
     return {
-        "termo_pk": termo.pk,
-        "search_text": " ".join(filter(None, [
-            destino, periodo, oficio_label,
-            str(viatura) if viatura else "",
-            *[s["name"] for s in servidores_display],
-        ])),
-        "header": entity_cards.header(header_items, header_chips),
+        "search_text": " ".join(
+            filter(None, [destino, periodo, oficio_label, str(viatura) if viatura else ""])
+        ),
+        "header": entity_cards.header(
+            [entity_cards.header_item("Destino", destino, wide=True)],
+        ),
         "footer": entity_cards.footer(**footer_kwargs),
         "periodo": periodo,
-        "oficio_label": oficio_label or "—",
-        "servidores": servidores_display,
-        "servidores_count": len(servidores_display),
-        "com_viatura": com_viatura,
-        "viatura": viatura_display,
+        "oficio_label": oficio_label,
+        "servidores_label": servidores_label,
         "viatura_label": str(viatura) if viatura else "—",
-        "servidores_label": str(len(servidores_display)) if servidores_display else "sem servidor",
     }
 
 
