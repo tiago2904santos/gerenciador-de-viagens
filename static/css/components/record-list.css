@@ -10,7 +10,8 @@
 /* Painel intermediário — mesmo tom --step1-panel dos formulários. */
 .cv-collection-panel {
   --step1-panel: var(--color-surface-soft, var(--color-card-soft));
-  --step1-field: var(--color-input-bg, var(--color-surface-muted, var(--color-card-muted)));
+  --step1-surface: var(--color-surface-muted, var(--color-card-muted, var(--color-input-bg)));
+  --step1-field: var(--step1-surface);
   background: var(--step1-panel);
   border: 0;
   border-radius: 14px;
@@ -24,6 +25,17 @@
 .cv-collection-panel > .list-toolbar {
   margin: 0;
   padding: 0;
+}
+
+/* Controles elevados sobre o poço --step1-panel (abas + cápsula de páginas). */
+.cv-collection-panel .cv-list-tab {
+  --cv-list-tab-bg: var(--step1-surface);
+  --cv-list-tab-hover-bg: color-mix(in srgb, var(--step1-surface) 86%, #fff 14%);
+  --cv-list-tab-count-bg: color-mix(in srgb, var(--step1-panel) 55%, transparent);
+}
+
+.cv-collection-panel .pagination-shell__controls {
+  background: var(--step1-surface);
 }
 
 .cv-record-row {

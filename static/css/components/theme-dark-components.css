@@ -5270,10 +5270,25 @@ html[data-theme="dark"] *::after {
 :is(html[data-theme="dark"])
   .cv-collection-panel {
   --step1-panel: var(--color-surface-soft);
-  --step1-field: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
+  --step1-surface: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
+  --step1-field: var(--step1-surface);
   background: var(--step1-panel);
   border: 0;
   box-shadow: none;
+}
+
+:is(html[data-theme="dark"])
+  .cv-collection-panel
+  .cv-list-tab {
+  --cv-list-tab-bg: var(--step1-surface);
+  --cv-list-tab-hover-bg: color-mix(in srgb, var(--step1-surface) 82%, #fff 18%);
+  --cv-list-tab-count-bg: color-mix(in srgb, #fff 12%, transparent);
+}
+
+:is(html[data-theme="dark"])
+  .cv-collection-panel
+  .pagination-shell__controls {
+  background: var(--step1-surface);
 }
 
 :is(html[data-theme="dark"])
