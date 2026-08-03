@@ -33,6 +33,18 @@ urlpatterns = [
         views.termo_cadastro_servidor_assinado_anexar,
         name="termo_cadastro_servidor_assinado_anexar",
     ),
+    # Downloads por modo. Declarados apos as rotas literais acima
+    # ("pdf-inline/", "assinado/anexar/") para que <str:formato> nao as capture.
+    path(
+        "<int:pk>/generico/<str:formato>/",
+        views.baixar_termo_cadastro_generico,
+        name="baixar_termo_cadastro_generico",
+    ),
+    path(
+        "<int:pk>/servidor/<int:servidor_pk>/<str:formato>/",
+        views.baixar_termo_cadastro_servidor,
+        name="baixar_termo_cadastro_servidor",
+    ),
     path("oficio/<int:pk>/preview/", views.preview_termo_oficio, name="preview_termo_oficio"),
     path(
         "oficio/<int:pk>/servidor/<int:servidor_pk>/pdf-inline/",

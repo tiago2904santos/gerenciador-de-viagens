@@ -1,25 +1,25 @@
-<section class="wizard-inner-section" aria-labelledby="config-unidade-section">
-  <div class="field-grid field-grid--cols-2">
-    {% include "components/ui/forms/field.html" with field=form.unidade size_class="field-size-1" only %}
+<section class="cv-form-block" aria-labelledby="config-unidade-section">
+  <div class="field-grid">
+    {% include "components/ui/forms/field.html" with field=form.unidade size_class="field-size-4" only %}
   </div>
 </section>
 
-<section class="wizard-inner-section" aria-labelledby="config-endereco-section">
-  <header class="wizard-inner-section__header">
-    <h4 class="wizard-inner-section__title" id="config-endereco-section">Endereço dos documentos</h4>
+<section class="cv-form-block" aria-labelledby="config-endereco-section">
+  <header class="cv-form-block__header">
+    <h4 class="cv-form-block__title" id="config-endereco-section">Endereço dos documentos</h4>
   </header>
-  <div class="field-grid field-grid--cols-4">
+  <div class="field-grid">
     {% include "components/ui/forms/field.html" with field=form.cep size_class="field-size-1" only %}
     {% include "components/ui/forms/field.html" with field=form.numero size_class="field-size-1" only %}
     {% include "components/ui/forms/field.html" with field=form.logradouro size_class="field-size-2" only %}
   </div>
-  <div class="field-grid field-grid--cols-3">
-    {% include "components/ui/forms/field.html" with field=form.bairro size_class="field-size-1" only %}
+  <div class="field-grid">
+    {% include "components/ui/forms/field.html" with field=form.bairro size_class="field-size-2" only %}
     {% include "components/ui/forms/field.html" with field=form.cidade_endereco size_class="field-size-1" only %}
     {% include "components/ui/forms/field.html" with field=form.uf_nome size_class="field-size-1" only %}
     {{ form.uf }}
   </div>
-  <div class="field-grid field-grid--cols-4">
+  <div class="field-grid">
     {% include "components/ui/forms/field.html" with field=form.email size_class="field-size-2" only %}
     {% include "components/ui/forms/field.html" with field=form.telefone size_class="field-size-1" only %}
     {% include "components/ui/forms/field.html" with field=form.ramal size_class="field-size-1" only %}

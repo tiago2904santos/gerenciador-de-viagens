@@ -455,6 +455,9 @@ def configuracao_sistema(request):
         {
             "page_title": "Configurações do sistema",
             "page_description": "Unidade, cidade em documentos e assinantes padrão por tipo.",
+            "flow_eyebrow": "CADASTROS",
+            "flow_back_label": "Voltar",
+            "flow_back_url": reverse("core:dashboard"),
             "form": form,
             "assinaturas_form": assinaturas_form,
             "destinatario_form": destinatario_form,
