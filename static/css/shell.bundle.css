@@ -9195,7 +9195,7 @@ html[data-theme="light"] .cv-segment-toggle__btn:hover:not([aria-pressed="true"]
    automaticas, nao width:100%), e os segmentos sao links — link nao aceita
    aria-pressed, entao o ativo vem de aria-current="page". */
 .cv-segment-toggle--nav.cv-segment-toggle {
-  background: var(--step1-field, var(--color-surface-muted));
+  background: var(--step1-panel, var(--color-surface-soft));
   border-color: transparent;
   border-radius: 10px;
   box-shadow: none;

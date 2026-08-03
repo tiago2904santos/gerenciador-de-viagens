@@ -1,0 +1,22 @@
+<div class="cv-table-wrap">
+  <table class="cv-data-table">
+    <thead>
+      <tr>
+        <th>Sigla</th>
+        <th>Nome</th>
+        <th>Usuários</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for area in areas %}
+        <tr>
+          <td><strong>{{ area.sigla }}</strong></td>
+          <td>{{ area.nome }}</td>
+          <td>{{ area.total_vinculos }}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="3">Nenhuma área encontrada.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

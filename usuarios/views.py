@@ -82,7 +82,7 @@ def index(request):
         "usuarios/index.html",
         {
             "page_title": "Áreas e usuários",
-            "page_description": "Crie áreas de trabalho, usuários e vínculos de acesso sem usar terminal.",
+            "page_description": "Usuários, áreas e vínculos de acesso.",
             "flow_eyebrow": "ADMINISTRAÇÃO",
             "flow_back_label": "Voltar",
             "flow_back_url": reverse("core:dashboard"),

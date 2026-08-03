@@ -1,9 +1,9 @@
-/* Usuários / Administração — ações e tabelas no step1 (sem ilha admin-*). */
+/* Usuários / Administração — alinhado ao padrão travel-document dos cadastros. */
 
 .usuarios-admin-page .cv-form-actions {
   display: flex;
   justify-content: flex-end;
-  margin-top: var(--space-3);
+  margin-top: var(--space-2);
 }
 
 .usuarios-admin-page .cv-form-actions__row {
@@ -15,18 +15,38 @@
 
 .usuarios-admin-page .cv-form-actions--inline {
   justify-content: flex-start;
+  margin-top: 0;
+}
+
+.usuarios-admin-page form.cv-form-section-stack {
+  gap: var(--space-3);
+}
+
+.usuarios-admin-page form.cv-form-section-stack + form.cv-form-section-stack {
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--theme-border-soft, var(--color-border-soft));
 }
 
 .usuarios-admin-page .cv-table-wrap {
-  margin-top: var(--space-3);
+  margin-top: 0;
   overflow-x: auto;
+  width: 100%;
 }
 
 .usuarios-admin-page .cv-data-table {
   width: 100%;
 }
 
+.usuarios-admin-page .cv-admin-search .cv-field__hint {
+  margin-top: var(--space-2);
+}
+
 :is(html[data-theme="dark"]) .usuarios-admin-page .cv-metric {
   background: var(--step1-field, var(--color-input-bg));
   border: 0;
+}
+
+:is(html[data-theme="dark"]) .usuarios-admin-page form.cv-form-section-stack + form.cv-form-section-stack {
+  border-top-color: var(--step1-border, var(--color-border-soft));
 }

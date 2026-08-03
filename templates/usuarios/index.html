@@ -16,8 +16,8 @@
       {% include "components/cards/summary_card.html" with label="Vínculos" value=total_vinculos description="Acessos concedidos" only %}
     </section>
 
-    {% include "components/form/card.html" with title="Cadastros e acessos" description="Crie usuários, áreas de trabalho e vínculos de acesso." title_id="admin-card-cadastros-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="usuarios/partials/_admin_cadastros_body.html" %}
+    {% include "components/form/card.html" with title="Cadastros e acessos" description="Usuários, áreas e vínculos." title_id="admin-card-cadastros-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="usuarios/partials/_admin_cadastros_body.html" %}
 
-    {% include "components/form/card.html" with title="Conferência de acessos" description="Consulte áreas cadastradas e permissões existentes." title_id="admin-card-conferencia-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="usuarios/partials/_admin_conferencia_body.html" %}
+    {% include "components/form/card.html" with title="Conferência de acessos" description="Áreas cadastradas e permissões." title_id="admin-card-conferencia-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="usuarios/partials/_admin_conferencia_body.html" %}
   </div>
 {% endblock %}

@@ -66,7 +66,6 @@ class UsuarioAreaCreationForm(EstiloCamposMixin, UserCreationForm):
     area = forms.ModelChoiceField(
         queryset=AreaTrabalho.objects.none(),
         label="Área de trabalho",
-        help_text="Área que o usuário acessará ao entrar no sistema.",
         widget=forms.Select(
             attrs=_cv_picker_single_attrs(
                 label="Área de trabalho",

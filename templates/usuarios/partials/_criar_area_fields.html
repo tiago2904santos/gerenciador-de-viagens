@@ -1,13 +1,4 @@
-<form method="post" novalidate>
-  {% csrf_token %}
-  {% if area_form.non_field_errors %}
-    {% include "components/ui/feedback/field_error.html" with errors=area_form.non_field_errors only %}
-  {% endif %}
-  <div class="field-grid">
-    {% include "components/ui/forms/field.html" with field=area_form.nome size_class="field-size-3" only %}
-    {% include "components/ui/forms/field.html" with field=area_form.sigla size_class="field-size-1" only %}
-  </div>
-  <div class="cv-form-actions">
-    {% include "components/ui/buttons/button.html" with label="Criar área" variant="primary" icon="arrow-right" icon_after=True type="submit" name="action" value="criar_area" only %}
-  </div>
-</form>
+<div class="field-grid field-grid--cols-3">
+  {% include "components/ui/forms/field.html" with field=area_form.nome size_class="field-size-2" only %}
+  {% include "components/ui/forms/field.html" with field=area_form.sigla size_class="field-size-1" only %}
+</div>

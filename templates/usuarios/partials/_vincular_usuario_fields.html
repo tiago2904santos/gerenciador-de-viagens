@@ -1,14 +1,5 @@
-<form method="post" novalidate>
-  {% csrf_token %}
-  {% if vinculo_form.non_field_errors %}
-    {% include "components/ui/feedback/field_error.html" with errors=vinculo_form.non_field_errors only %}
-  {% endif %}
-  <div class="field-grid">
-    {% include "components/ui/forms/field.html" with field=vinculo_form.usuario size_class="field-size-2" only %}
-    {% include "components/ui/forms/field.html" with field=vinculo_form.area size_class="field-size-1" only %}
-    {% include "components/ui/forms/field.html" with field=vinculo_form.papel size_class="field-size-1" only %}
-  </div>
-  <div class="cv-form-actions">
-    {% include "components/ui/buttons/button.html" with label="Salvar vínculo" variant="primary" icon="arrow-right" icon_after=True type="submit" name="action" value="vincular_usuario" only %}
-  </div>
-</form>
+<div class="field-grid field-grid--cols-3">
+  {% include "components/ui/forms/field.html" with field=vinculo_form.usuario size_class="field-size-1" only %}
+  {% include "components/ui/forms/field.html" with field=vinculo_form.area size_class="field-size-1" only %}
+  {% include "components/ui/forms/field.html" with field=vinculo_form.papel size_class="field-size-1" only %}
+</div>
