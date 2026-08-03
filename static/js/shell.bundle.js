@@ -5129,18 +5129,6 @@ document.documentElement.dataset.appReady = "true";
     return String(select.options[select.selectedIndex].text || "").trim();
   }
 
-  function escapeHtml(value) {
-    if (window.CV && window.CV.util && typeof window.CV.util.escapeHtml === "function") {
-      return window.CV.util.escapeHtml(value);
-    }
-    return String(value == null ? "" : value)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#39;");
-  }
-
   function cityLabel(raw, fallback) {
     var nome = String(raw || "").trim();
     if (!nome || nome === "---------") return fallback;
@@ -5149,9 +5137,9 @@ document.documentElement.dataset.appReady = "true";
 
   function trechoHtml(step) {
     return (
-      '<span class="route-destinos-trechos__from">' + escapeHtml(step.from) + "</span>" +
+      '<span class="route-destinos-trechos__from">' + window.CV.util.escapeHtml(step.from) + "</span>" +
       '<span class="route-destinos-trechos__sep" aria-hidden="true">&gt;</span>' +
-      '<span class="route-destinos-trechos__to">' + escapeHtml(step.to) + "</span>"
+      '<span class="route-destinos-trechos__to">' + window.CV.util.escapeHtml(step.to) + "</span>"
     );
   }
 
