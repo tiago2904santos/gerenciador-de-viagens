@@ -122,7 +122,9 @@
   gap: var(--space-3);
   min-height: 0;
   min-width: 0;
-  padding: var(--space-3) 0 var(--space-3) var(--space-6);
+  /* space-10 a esquerda e o que a regra base usa para liberar a faixa de
+     status; com menos que isso a faixa cobre o inicio do rotulo. */
+  padding: var(--space-3) 0 var(--space-3) var(--space-10);
 }
 
 /* label deixa de ser bloco acima do valor e vira prefixo na mesma linha */
@@ -200,11 +202,11 @@
 
   .cv-record-card--termo-compacto .cv-record-card__id-row {
     border-bottom: 1px solid var(--cv-form-section-border);
-    padding: var(--space-3) var(--space-4) var(--space-3) var(--space-6);
+    padding: var(--space-3) var(--space-4) var(--space-3) var(--space-10);
   }
 
   .termo-card-vazio {
-    padding: var(--space-2) var(--space-4) 0 var(--space-6);
+    padding: var(--space-2) var(--space-4) 0 var(--space-10);
   }
 
   .cv-record-card--termo-compacto .cv-record-card__footer-actions {
