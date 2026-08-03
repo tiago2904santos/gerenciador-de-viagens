@@ -137,10 +137,13 @@
   flex: 0 0 auto;
 }
 
-/* unico conteudo do card: merece o peso que o cabecalho empilhado nao dava */
-.cv-record-card--termo-compacto .cv-record-card__info-value {
+/* Unico conteudo do card: merece o peso que o cabecalho empilhado nao dava.
+   Precisa dos 3 seletores: o tema escuro reduz este valor para
+   clamp(0.92rem, 1.15vw, 1.05rem) via :is(html[data-theme="dark"]) ...,
+   que pontua 0-2-1 e ganharia de um seletor com so 2 classes. */
+.cv-record-card--termo-compacto .cv-record-card__id-row .cv-record-card__info-value {
   flex: 1 1 auto;
-  font-size: var(--font-size-lg);
+  font-size: clamp(1.05rem, 1.4vw, 1.25rem);
   min-width: 0;
 }
 
@@ -189,4 +192,11 @@
 .cv-record-card--termo .cv-person-list--n0,
 .cv-record-card--termo .cv-person-list--n1 {
   grid-template-columns: minmax(0, 1fr);
+}
+
+/* Contagem impar deixa o ultimo item sozinho na fileira, ocupando meia
+   largura; ele passa a atravessar as duas colunas. :nth-child(odd) junto de
+   :last-child identifica exatamente esse caso numa grade de 2 colunas. */
+.cv-record-card--termo .cv-person-list > .cv-person-row:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
 }
