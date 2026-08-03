@@ -8422,10 +8422,6 @@ html[data-theme="dark"] #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete,
   padding: 0;
 }
 
-.cv-collection-panel > .list-panel > .pagination-shell {
-  padding-inline: 0;
-}
-
 @media (max-width: 720px) {
   .cv-record-row {
     align-items: start;
@@ -8539,6 +8535,15 @@ html[data-theme="dark"] #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete,
 .list-toolbar .pagination-shell--controls-only {
   flex: 0 0 auto;
   margin-left: auto;
+  padding: 0;
+}
+
+.list-toolbar .pagination-shell--info-only {
+  align-items: center;
+  background: transparent;
+  flex: 1 1 auto;
+  justify-content: flex-start;
+  min-width: 0;
   padding: 0;
 }
 
