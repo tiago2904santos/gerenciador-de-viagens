@@ -58,7 +58,12 @@
     {% if row.set_default_url %}
       <form method="post" action="{{ row.set_default_url }}" class="cv-record-row__inline-form">
         {% csrf_token %}
-        {% include "components/ui/buttons/button.html" with label="Definir como padrão" variant="secondary" size="sm" type="submit" only %}
+        <button
+          class="cv-icon-btn cv-icon-btn--star"
+          type="submit"
+          aria-label="Definir como padrão"
+          data-tooltip="Definir como padrão"
+        >{% include "components/ui/icons/icon.html" with icon="star" only %}</button>
       </form>
     {% endif %}
     <div class="cv-icon-btn-group">
