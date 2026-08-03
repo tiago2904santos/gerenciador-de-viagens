@@ -2524,17 +2524,17 @@ html[data-theme="light"] {
 }
 
 .pagination-shell__info-pill {
-  align-items: center;
+  align-items: baseline;
   background: transparent;
   border: 0;
   border-radius: 0;
   color: var(--theme-text-muted);
   display: inline-flex;
   flex-wrap: wrap;
-  font-size: var(--font-size-sm);
-  gap: 6px;
+  font-size: var(--font-size-xs);
+  gap: 0.4em;
   justify-content: flex-start;
-  line-height: 1.3;
+  line-height: 1.35;
   margin-inline: 0;
   padding: 0;
   text-align: left;
@@ -2542,13 +2542,26 @@ html[data-theme="light"] {
 
 .pagination-shell__info-pill strong {
   color: var(--theme-text-heading);
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
   font-weight: var(--font-weight-extrabold);
-  letter-spacing: 0.01em;
+  letter-spacing: -0.01em;
+  line-height: 1;
 }
 
 .pagination-shell__info-label,
-.pagination-shell__info-separator {
+.pagination-shell__info-separator,
+.pagination-shell__info-unit {
   color: var(--theme-text-muted);
+  font-size: 0.6875rem;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.pagination-shell__info-separator {
+  letter-spacing: 0.06em;
+  opacity: 0.72;
 }
 
 /* Cápsula única: setas + páginas */
@@ -8192,35 +8205,71 @@ html[data-theme="dark"] #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete,
 /* <<< css/components/action-system.css <<< */
 
 /* >>> css/components/record-list.css >>> */
-/* Canonical record list — roster rows (avatar + title/subtitle/facts + actions).
-   Visual theme overrides live in theme-dark-components.css. */
+/* Canonical record list — roster no ritmo das listas internas de formulário
+   (poço de campo, sem borda, sem hover de cor). */
 
 .cv-record-list {
   display: grid;
-  gap: 10px;
+  gap: 8px;
   min-width: 0;
+}
+
+/* Painel intermediário — mesmo tom --step1-panel dos formulários. */
+.cv-collection-panel {
+  --step1-panel: var(--color-surface-soft, var(--color-card-soft));
+  --step1-surface: var(--color-surface-muted, var(--color-card-muted, var(--color-input-bg)));
+  --step1-field: var(--step1-surface);
+  background: var(--step1-panel);
+  border: 0;
+  border-radius: 14px;
+  box-shadow: none;
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px;
+}
+
+.cv-collection-panel > .list-toolbar {
+  margin: 0;
+  padding: 0;
+}
+
+/* Controles elevados sobre o poço --step1-panel (abas + cápsula de páginas). */
+.cv-collection-panel .cv-list-tab {
+  --cv-list-tab-bg: var(--step1-surface);
+  --cv-list-tab-hover-bg: color-mix(in srgb, var(--step1-surface) 86%, #fff 14%);
+  --cv-list-tab-count-bg: color-mix(in srgb, var(--step1-panel) 55%, transparent);
+}
+
+.cv-collection-panel .pagination-shell__controls {
+  background: var(--step1-surface);
 }
 
 .cv-record-row {
   align-items: center;
-  background: var(--color-surface, var(--color-card));
-  border: 1px solid var(--color-border-soft, var(--color-border));
-  border-radius: var(--radius-lg, 14px);
-  column-gap: 14px;
+  background: var(--step1-field, var(--color-input-bg, var(--color-surface-muted, var(--color-card-muted))));
+  border: 0;
+  border-radius: 12px;
+  box-shadow: none;
+  column-gap: 12px;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
+  min-height: 64px;
   min-width: 0;
-  padding: 14px 16px;
+  padding: 11px 12px;
   position: relative;
-  transition:
-    background-color var(--transition-fast, 120ms ease),
-    border-color var(--transition-fast, 120ms ease),
-    box-shadow var(--transition-fast, 120ms ease);
+  transition: background-color var(--transition-fast, 140ms ease);
 }
 
-.cv-record-row:hover {
-  background: var(--color-surface-soft, var(--color-card-soft));
-  border-color: var(--color-border, var(--color-border-strong));
+.cv-record-row:hover,
+.cv-record-row:focus-within {
+  background: color-mix(
+    in srgb,
+    var(--color-accent) 5%,
+    var(--step1-field, var(--color-input-bg, var(--color-surface-muted)))
+  );
+  border: 0;
+  box-shadow: none;
 }
 
 .cv-record-row:not(:has(.cv-record-row__identity)) {
@@ -8229,19 +8278,19 @@ html[data-theme="dark"] #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete,
 
 .cv-record-row__identity {
   align-items: center;
-  background: color-mix(in srgb, var(--color-heading) 8%, transparent);
-  border: 1px solid var(--color-border-soft);
-  border-radius: 10px;
-  color: var(--color-heading);
+  background: var(--color-accent-soft, color-mix(in srgb, var(--color-accent) 18%, transparent));
+  border: 1px solid var(--color-accent-border-soft, color-mix(in srgb, var(--color-accent) 55%, transparent));
+  border-radius: 12px;
+  color: var(--color-accent-text, var(--color-accent));
   display: inline-flex;
   flex-shrink: 0;
   font-size: var(--font-size-xs, 0.75rem);
   font-weight: 800;
-  height: 40px;
+  height: 42px;
   justify-content: center;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
   line-height: 1;
-  width: 40px;
+  width: 42px;
 }
 
 .cv-record-row__identity > span {
@@ -8280,6 +8329,24 @@ html[data-theme="dark"] #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete,
   display: inline-flex;
   flex-wrap: wrap;
   gap: var(--space-2, 8px);
+}
+
+/* Mesmo chip do Motorista (cv-person-row__badge). */
+.cv-record-row__badge {
+  align-items: center;
+  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
+  border-radius: 999px;
+  color: var(--color-accent);
+  display: inline-flex;
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  min-height: 21px;
+  padding: 2px 8px;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .cv-record-row__subtitle {
@@ -8344,14 +8411,15 @@ html[data-theme="dark"] #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete,
   margin: 0;
 }
 
-/* When this canonical list sits inside a standard list panel, the panel's own
-   slab (background/border/shadow) doubles up behind the cards and they stop
-   reading as floating. Drop the slab so the cards float on the page surface. */
-.list-panel:has(> .cv-record-list) {
+/* When this canonical list sits inside a list/collection panel, drop the
+   panel slab so field wells sit on --step1-panel. */
+.list-panel:has(> .cv-record-list),
+.cv-collection-panel > .list-panel {
   background: transparent;
   border: 0;
   border-radius: 0;
   box-shadow: none;
+  padding: 0;
 }
 
 @media (max-width: 720px) {
@@ -8430,12 +8498,18 @@ html[data-theme="dark"] #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete,
 }
 
 .page-shell--list > .list-toolbar,
-.cv-page--collection > .list-toolbar {
+.cv-page--collection > .list-toolbar,
+.cv-collection-panel > .list-toolbar {
   background: transparent;
   border: 0;
   box-shadow: none;
   margin-top: calc(-1 * var(--space-1, 4px));
   padding: var(--space-3, 12px) 0 var(--space-1, 4px);
+}
+
+.cv-collection-panel > .list-toolbar {
+  margin-top: 0;
+  padding: 0;
 }
 
 .list-toolbar .cv-list-tabs {
@@ -8445,9 +8519,31 @@ html[data-theme="dark"] #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete,
   padding: 0;
 }
 
+.list-toolbar .cv-list-tab {
+  flex: 0 1 auto;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.list-toolbar .cv-list-tab__label {
+  max-width: 22ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .list-toolbar .pagination-shell--controls-only {
   flex: 0 0 auto;
   margin-left: auto;
+  padding: 0;
+}
+
+.list-toolbar .pagination-shell--info-only {
+  align-items: center;
+  background: transparent;
+  flex: 1 1 auto;
+  justify-content: flex-start;
+  min-width: 0;
   padding: 0;
 }
 
@@ -15818,29 +15914,51 @@ html[data-theme="dark"] *::after {
 }
 
 :is(html[data-theme="dark"])
-  .cv-record-row {
-  background: var(--color-surface);
-  border-color: var(--color-border);
-  box-shadow: var(--shadow-xs);
+  .cv-collection-panel {
+  --step1-panel: var(--color-surface-soft);
+  --step1-surface: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
+  --step1-field: var(--step1-surface);
+  background: var(--step1-panel);
+  border: 0;
+  box-shadow: none;
 }
 
 :is(html[data-theme="dark"])
-  .cv-record-row:hover {
-  background: var(--color-surface-soft);
-  border-color: var(--color-border-strong);
-  box-shadow: var(--shadow-sm);
+  .cv-collection-panel
+  .cv-list-tab {
+  --cv-list-tab-bg: var(--step1-surface);
+  --cv-list-tab-hover-bg: color-mix(in srgb, var(--step1-surface) 82%, #fff 18%);
+  --cv-list-tab-count-bg: color-mix(in srgb, #fff 12%, transparent);
 }
 
+:is(html[data-theme="dark"])
+  .cv-collection-panel
+  .pagination-shell__controls {
+  background: var(--step1-surface);
+}
+
+:is(html[data-theme="dark"])
+  .cv-record-row {
+  background: var(--step1-field, var(--color-input-bg, var(--color-surface-muted)));
+  border: 0;
+  box-shadow: none;
+}
+
+:is(html[data-theme="dark"])
+  .cv-record-row:hover,
 :is(html[data-theme="dark"])
   .cv-record-row:focus-within {
-  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--color-border));
+  /* Mesmo hover do Ofício vinculado (#termo-oficio-lista / related-route). */
+  background: color-mix(in srgb, var(--color-accent) 5%, var(--step1-field, var(--color-input-bg)));
+  border: 0;
+  box-shadow: none;
 }
 
 :is(html[data-theme="dark"])
   .cv-record-row__identity {
-  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
-  border: 1px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
-  color: var(--color-accent);
+  background: var(--color-accent-soft, color-mix(in srgb, var(--color-accent) 18%, transparent));
+  border-color: var(--color-accent-border-soft, color-mix(in srgb, var(--color-accent) 55%, transparent));
+  color: var(--color-accent-text, var(--color-accent));
 }
 
 :is(html[data-theme="dark"])
@@ -15967,7 +16085,9 @@ html[data-theme="dark"] *::after {
 
 /* Badge interna (Motorista, nº do ofício... ) mais contida. */
 :is(html[data-theme="dark"])
-  .cv-person-row__badge {
+  .cv-person-row__badge,
+:is(html[data-theme="dark"])
+  .cv-record-row__badge {
   box-shadow: none;
 }
 

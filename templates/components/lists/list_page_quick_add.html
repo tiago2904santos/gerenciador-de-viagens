@@ -72,9 +72,18 @@
     {% endif %}
   </div>
 
-  <div class="list-panel">
-    {% include "components/ui/lists/pagination.html" %}
-    {% include "components/lists/simple_list.html" with rows=rows empty_message=empty_message hide_realtime_count=hide_realtime_count %}
+  <div class="cv-collection-panel">
+    {% if page_obj.paginator.num_pages > 1 %}
+    <div class="list-toolbar">
+      {% include "components/ui/lists/pagination.html" with page_obj=page_obj pagination_pages=pagination_pages page_querystring=page_querystring pagination_part="info" only %}
+      {% include "components/ui/lists/pagination.html" with page_obj=page_obj pagination_pages=pagination_pages page_querystring=page_querystring pagination_part="controls" only %}
+    </div>
+    {% endif %}
+
+    <div class="list-panel{% if not rows %} list-panel--empty{% endif %}">
+      {% include "components/ui/lists/pagination.html" with page_obj=page_obj paginacao_obrigatoria=True pagination_part="erro" only %}
+      {% include "components/lists/simple_list.html" with rows=rows empty_message=empty_message hide_realtime_count=hide_realtime_count %}
+    </div>
   </div>
 
   {% if delete_modal_enabled %}

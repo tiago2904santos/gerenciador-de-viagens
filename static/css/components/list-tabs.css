@@ -25,12 +25,18 @@
 }
 
 .page-shell--list > .list-toolbar,
-.cv-page--collection > .list-toolbar {
+.cv-page--collection > .list-toolbar,
+.cv-collection-panel > .list-toolbar {
   background: transparent;
   border: 0;
   box-shadow: none;
   margin-top: calc(-1 * var(--space-1, 4px));
   padding: var(--space-3, 12px) 0 var(--space-1, 4px);
+}
+
+.cv-collection-panel > .list-toolbar {
+  margin-top: 0;
+  padding: 0;
 }
 
 .list-toolbar .cv-list-tabs {
@@ -40,9 +46,31 @@
   padding: 0;
 }
 
+.list-toolbar .cv-list-tab {
+  flex: 0 1 auto;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.list-toolbar .cv-list-tab__label {
+  max-width: 22ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .list-toolbar .pagination-shell--controls-only {
   flex: 0 0 auto;
   margin-left: auto;
+  padding: 0;
+}
+
+.list-toolbar .pagination-shell--info-only {
+  align-items: center;
+  background: transparent;
+  flex: 1 1 auto;
+  justify-content: flex-start;
+  min-width: 0;
   padding: 0;
 }
 

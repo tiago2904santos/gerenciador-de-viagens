@@ -7,6 +7,7 @@ Abas de listagem (temporais / de estado). Recebe:
   {% for tab in abas %}
   <a class="cv-list-tab{% if tab.is_active %} cv-list-tab--active{% endif %}"
      href="{{ tab.url }}"
+     title="{{ tab.label }}"
      {% if tab.is_active %}aria-current="page"{% endif %}>
     <span class="cv-list-tab__label">{{ tab.label }}</span>
     <span class="cv-list-tab__count">{{ tab.count }}</span>

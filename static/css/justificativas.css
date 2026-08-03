@@ -29,11 +29,18 @@
 
 .justificativas-page .cv-record-row,
 :is(html[data-theme="dark"]) .justificativas-page .cv-record-row {
-  background: var(--step1-surface);
+  background: var(--step1-field, var(--step1-surface));
+  border: 0;
+  box-shadow: none;
 }
 
-:is(html[data-theme="dark"]) .justificativas-page .cv-record-row:hover {
-  background: var(--step1-panel);
+.justificativas-page .cv-record-row:hover,
+.justificativas-page .cv-record-row:focus-within,
+:is(html[data-theme="dark"]) .justificativas-page .cv-record-row:hover,
+:is(html[data-theme="dark"]) .justificativas-page .cv-record-row:focus-within {
+  background: color-mix(in srgb, var(--color-accent) 5%, var(--step1-field, var(--step1-surface)));
+  border: 0;
+  box-shadow: none;
 }
 
 /* Aberto: sem linha; gap só o do rail (mesmo ritmo do padding). */

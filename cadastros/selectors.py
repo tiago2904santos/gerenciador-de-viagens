@@ -1,4 +1,5 @@
-﻿from django.db.models import Q
+﻿from django.db.models import Count
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
 from core.normalizers import remove_accents
@@ -95,8 +96,20 @@ def get_combustivel_by_id(pk):
     return get_object_or_404(filter_queryset_by_area(Combustivel.objects), pk=pk)
 
 
-def listar_servidores(q=None):
+def cargos_mais_frequentes_servidores(limit=3):
+    """Cargos com mais servidores na área atual (só os que têm ao menos um)."""
+    return list(
+        filter_queryset_by_area(Cargo.objects)
+        .annotate(servidores_count=Count("servidores"))
+        .filter(servidores_count__gt=0)
+        .order_by("-servidores_count", "nome")[:limit]
+    )
+
+
+def listar_servidores(q=None, cargo_id=None):
     queryset = filter_queryset_by_area(Servidor.objects).select_related("cargo", "unidade").order_by("nome")
+    if cargo_id:
+        queryset = queryset.filter(cargo_id=cargo_id)
     if q:
         q_unaccent = remove_accents(q)
         queryset = queryset.filter(
@@ -114,13 +127,27 @@ def get_servidor_by_id(pk):
     return get_object_or_404(filter_queryset_by_area(Servidor.objects).select_related("cargo", "unidade"), pk=pk)
 
 
-def listar_viaturas(q=None):
+def combustiveis_mais_frequentes_viaturas(limit=3):
+    """Combustíveis com mais viaturas na área atual (só os que têm ao menos uma)."""
+    return list(
+        filter_queryset_by_area(Combustivel.objects)
+        .annotate(viaturas_count=Count("viaturas"))
+        .filter(viaturas_count__gt=0)
+        .order_by("-viaturas_count", "nome")[:limit]
+    )
+
+
+def listar_viaturas(q=None, combustivel_id=None, unidade_id=None):
     queryset = (
         filter_queryset_by_area(Viatura.objects)
         .select_related("combustivel", "unidade")
         .prefetch_related("motoristas")
         .order_by("placa")
     )
+    if combustivel_id:
+        queryset = queryset.filter(combustivel_id=combustivel_id)
+    if unidade_id:
+        queryset = queryset.filter(unidade_id=unidade_id)
     if q:
         q_unaccent = remove_accents(q)
         queryset = (

@@ -17,7 +17,7 @@
       {% if row.badges %}
         <span class="cv-record-row__badges">
           {% for badge in row.badges %}
-            {% include "components/ui/badges/status_badge.html" with label=badge.text variant=badge.variant|default:'accent' only %}
+            <span class="cv-record-row__badge">{{ badge.text }}</span>
           {% endfor %}
         </span>
       {% endif %}

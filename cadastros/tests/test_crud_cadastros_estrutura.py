@@ -8,6 +8,7 @@ from django.urls import reverse
 
 from cadastros.models import Cargo
 from cadastros.models import Combustivel
+from cadastros.models import ConfiguracaoSistema
 from cadastros.models import Servidor
 from cadastros.models import Unidade
 from cadastros.models import Viatura
@@ -187,6 +188,36 @@ class ServidorCrudTests(TestCase):
         self.assertEqual(len(response.context["rows"]), 5)
         self.assertContains(response, ">26-30<")
         self.assertContains(response, ">30<")
+
+    def test_servidores_index_filtra_pelos_tres_cargos_mais_usados(self):
+        cargo_a = Cargo.objects.create(nome="DELEGADO")
+        cargo_b = Cargo.objects.create(nome="ESCRIVAO")
+        cargo_c = Cargo.objects.create(nome="MOTORISTA")
+        cargo_d = Cargo.objects.create(nome="RARO")
+        for i in range(5):
+            Servidor.objects.create(nome=f"SRV A {i}", cargo=cargo_a)
+        for i in range(3):
+            Servidor.objects.create(nome=f"SRV B {i}", cargo=cargo_b)
+        for i in range(2):
+            Servidor.objects.create(nome=f"SRV C {i}", cargo=cargo_c)
+        Servidor.objects.create(nome="SRV D", cargo=cargo_d)
+
+        response = self.client.get(reverse("cadastros:servidores_index"))
+        self.assertEqual(response.status_code, 200)
+        abas = response.context["abas"]
+        self.assertEqual([aba["label"] for aba in abas], ["Todos", "DELEGADO", "ESCRIVAO", "MOTORISTA"])
+        self.assertEqual(abas[0]["count"], 11)
+        self.assertNotIn("RARO", [aba["label"] for aba in abas])
+        self.assertContains(response, 'class="cv-list-tabs"')
+        self.assertContains(response, f"cargo={cargo_a.pk}")
+
+        filtrado = self.client.get(reverse("cadastros:servidores_index"), {"cargo": cargo_a.pk})
+        self.assertEqual(filtrado.status_code, 200)
+        self.assertEqual(len(filtrado.context["rows"]), 5)
+        self.assertTrue(
+            any(aba["is_active"] and aba["key"] == str(cargo_a.pk) for aba in filtrado.context["abas"])
+        )
+        self.assertContains(filtrado, f'name="cargo" value="{cargo_a.pk}"')
 
     def test_servidor_delete_get_redireciona_para_lista(self):
         servidor = Servidor.objects.create(nome="SERVIDOR SEM PAGINA DE DELETE", cargo=self.cargo)
@@ -392,6 +423,80 @@ class ViaturaCrudTests(TestCase):
         self.assertRedirects(response, reverse("cadastros:viaturas_index"))
         viatura.refresh_from_db()
         self.assertEqual(viatura.status, Viatura.STATUS_COMPLETO)
+
+    def test_viaturas_index_filtra_unidade_config_e_top_combustiveis(self):
+        unidade = Unidade.objects.create(nome="Assessoria", sigla="ASCOM")
+        outra = Unidade.objects.create(nome="Outra", sigla="OUT")
+        cfg = ConfiguracaoSistema.get_singleton()
+        cfg.unidade = unidade
+        cfg.save(update_fields=["unidade"])
+
+        flex = Combustivel.objects.create(nome="FLEX")
+        diesel = Combustivel.objects.create(nome="DIESEL")
+        etanol = Combustivel.objects.create(nome="ETANOL")
+        Combustivel.objects.create(nome="GNV")
+
+        for i in range(5):
+            Viatura.objects.create(
+                placa=f"FLX{i:04d}",
+                modelo="Duster",
+                combustivel=flex,
+                tipo=Viatura.TIPO_DESCARACTERIZADA,
+                unidade=unidade,
+            )
+        for i in range(3):
+            Viatura.objects.create(
+                placa=f"DSL{i:04d}",
+                modelo="S10",
+                combustivel=diesel,
+                tipo=Viatura.TIPO_DESCARACTERIZADA,
+                unidade=unidade,
+            )
+        for i in range(2):
+            Viatura.objects.create(
+                placa=f"ETA{i:04d}",
+                modelo="Onix",
+                combustivel=etanol,
+                tipo=Viatura.TIPO_CARACTERIZADA,
+                unidade=outra,
+            )
+        Viatura.objects.create(
+            placa="GNV0000",
+            modelo="Uno",
+            combustivel=Combustivel.objects.get(nome="GNV"),
+            tipo=Viatura.TIPO_CARACTERIZADA,
+            unidade=outra,
+        )
+
+        response = self.client.get(reverse("cadastros:viaturas_index"))
+        self.assertEqual(response.status_code, 200)
+        abas = response.context["abas"]
+        self.assertEqual(
+            [aba["label"] for aba in abas],
+            ["Todos", "ASCOM", "FLEX", "DIESEL", "ETANOL"],
+        )
+        self.assertEqual(abas[0]["count"], 11)
+        self.assertNotIn("GNV", [aba["label"] for aba in abas])
+        self.assertContains(response, 'class="cv-list-tabs"')
+
+        por_unidade = self.client.get(reverse("cadastros:viaturas_index"), {"unidade": unidade.pk})
+        self.assertEqual(len(por_unidade.context["rows"]), 8)
+        self.assertTrue(
+            any(aba["is_active"] and aba["key"] == f"unidade-{unidade.pk}" for aba in por_unidade.context["abas"])
+        )
+        self.assertContains(por_unidade, f'name="unidade" value="{unidade.pk}"')
+
+        por_combustivel = self.client.get(
+            reverse("cadastros:viaturas_index"), {"combustivel": flex.pk}
+        )
+        self.assertEqual(len(por_combustivel.context["rows"]), 5)
+        self.assertTrue(
+            any(
+                aba["is_active"] and aba["key"] == f"combustivel-{flex.pk}"
+                for aba in por_combustivel.context["abas"]
+            )
+        )
+        self.assertContains(por_combustivel, f'name="combustivel" value="{flex.pk}"')
 
 
 @override_settings(ALLOWED_HOSTS=["testserver", "localhost"])

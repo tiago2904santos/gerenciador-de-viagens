@@ -1,32 +1,68 @@
-/* Canonical record list — roster rows (avatar + title/subtitle/facts + actions).
-   Visual theme overrides live in theme-dark-components.css. */
+/* Canonical record list — roster no ritmo das listas internas de formulário
+   (poço de campo, sem borda, sem hover de cor). */
 
 .cv-record-list {
   display: grid;
-  gap: 10px;
+  gap: 8px;
   min-width: 0;
+}
+
+/* Painel intermediário — mesmo tom --step1-panel dos formulários. */
+.cv-collection-panel {
+  --step1-panel: var(--color-surface-soft, var(--color-card-soft));
+  --step1-surface: var(--color-surface-muted, var(--color-card-muted, var(--color-input-bg)));
+  --step1-field: var(--step1-surface);
+  background: var(--step1-panel);
+  border: 0;
+  border-radius: 14px;
+  box-shadow: none;
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px;
+}
+
+.cv-collection-panel > .list-toolbar {
+  margin: 0;
+  padding: 0;
+}
+
+/* Controles elevados sobre o poço --step1-panel (abas + cápsula de páginas). */
+.cv-collection-panel .cv-list-tab {
+  --cv-list-tab-bg: var(--step1-surface);
+  --cv-list-tab-hover-bg: color-mix(in srgb, var(--step1-surface) 86%, #fff 14%);
+  --cv-list-tab-count-bg: color-mix(in srgb, var(--step1-panel) 55%, transparent);
+}
+
+.cv-collection-panel .pagination-shell__controls {
+  background: var(--step1-surface);
 }
 
 .cv-record-row {
   align-items: center;
-  background: var(--color-surface, var(--color-card));
-  border: 1px solid var(--color-border-soft, var(--color-border));
-  border-radius: var(--radius-lg, 14px);
-  column-gap: 14px;
+  background: var(--step1-field, var(--color-input-bg, var(--color-surface-muted, var(--color-card-muted))));
+  border: 0;
+  border-radius: 12px;
+  box-shadow: none;
+  column-gap: 12px;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
+  min-height: 64px;
   min-width: 0;
-  padding: 14px 16px;
+  padding: 11px 12px;
   position: relative;
-  transition:
-    background-color var(--transition-fast, 120ms ease),
-    border-color var(--transition-fast, 120ms ease),
-    box-shadow var(--transition-fast, 120ms ease);
+  transition: background-color var(--transition-fast, 140ms ease);
 }
 
-.cv-record-row:hover {
-  background: var(--color-surface-soft, var(--color-card-soft));
-  border-color: var(--color-border, var(--color-border-strong));
+.cv-record-row:hover,
+.cv-record-row:focus-within {
+  background: color-mix(
+    in srgb,
+    var(--color-accent) 5%,
+    var(--step1-field, var(--color-input-bg, var(--color-surface-muted)))
+  );
+  border: 0;
+  box-shadow: none;
 }
 
 .cv-record-row:not(:has(.cv-record-row__identity)) {
@@ -35,19 +71,19 @@
 
 .cv-record-row__identity {
   align-items: center;
-  background: color-mix(in srgb, var(--color-heading) 8%, transparent);
-  border: 1px solid var(--color-border-soft);
-  border-radius: 10px;
-  color: var(--color-heading);
+  background: var(--color-accent-soft, color-mix(in srgb, var(--color-accent) 18%, transparent));
+  border: 1px solid var(--color-accent-border-soft, color-mix(in srgb, var(--color-accent) 55%, transparent));
+  border-radius: 12px;
+  color: var(--color-accent-text, var(--color-accent));
   display: inline-flex;
   flex-shrink: 0;
   font-size: var(--font-size-xs, 0.75rem);
   font-weight: 800;
-  height: 40px;
+  height: 42px;
   justify-content: center;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
   line-height: 1;
-  width: 40px;
+  width: 42px;
 }
 
 .cv-record-row__identity > span {
@@ -86,6 +122,24 @@
   display: inline-flex;
   flex-wrap: wrap;
   gap: var(--space-2, 8px);
+}
+
+/* Mesmo chip do Motorista (cv-person-row__badge). */
+.cv-record-row__badge {
+  align-items: center;
+  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
+  border-radius: 999px;
+  color: var(--color-accent);
+  display: inline-flex;
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  min-height: 21px;
+  padding: 2px 8px;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .cv-record-row__subtitle {
@@ -150,14 +204,15 @@
   margin: 0;
 }
 
-/* When this canonical list sits inside a standard list panel, the panel's own
-   slab (background/border/shadow) doubles up behind the cards and they stop
-   reading as floating. Drop the slab so the cards float on the page surface. */
-.list-panel:has(> .cv-record-list) {
+/* When this canonical list sits inside a list/collection panel, drop the
+   panel slab so field wells sit on --step1-panel. */
+.list-panel:has(> .cv-record-list),
+.cv-collection-panel > .list-panel {
   background: transparent;
   border: 0;
   border-radius: 0;
   box-shadow: none;
+  padding: 0;
 }
 
 @media (max-width: 720px) {

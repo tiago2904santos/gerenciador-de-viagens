@@ -5268,29 +5268,51 @@ html[data-theme="dark"] *::after {
 }
 
 :is(html[data-theme="dark"])
-  .cv-record-row {
-  background: var(--color-surface);
-  border-color: var(--color-border);
-  box-shadow: var(--shadow-xs);
+  .cv-collection-panel {
+  --step1-panel: var(--color-surface-soft);
+  --step1-surface: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
+  --step1-field: var(--step1-surface);
+  background: var(--step1-panel);
+  border: 0;
+  box-shadow: none;
 }
 
 :is(html[data-theme="dark"])
-  .cv-record-row:hover {
-  background: var(--color-surface-soft);
-  border-color: var(--color-border-strong);
-  box-shadow: var(--shadow-sm);
+  .cv-collection-panel
+  .cv-list-tab {
+  --cv-list-tab-bg: var(--step1-surface);
+  --cv-list-tab-hover-bg: color-mix(in srgb, var(--step1-surface) 82%, #fff 18%);
+  --cv-list-tab-count-bg: color-mix(in srgb, #fff 12%, transparent);
 }
 
+:is(html[data-theme="dark"])
+  .cv-collection-panel
+  .pagination-shell__controls {
+  background: var(--step1-surface);
+}
+
+:is(html[data-theme="dark"])
+  .cv-record-row {
+  background: var(--step1-field, var(--color-input-bg, var(--color-surface-muted)));
+  border: 0;
+  box-shadow: none;
+}
+
+:is(html[data-theme="dark"])
+  .cv-record-row:hover,
 :is(html[data-theme="dark"])
   .cv-record-row:focus-within {
-  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--color-border));
+  /* Mesmo hover do Ofício vinculado (#termo-oficio-lista / related-route). */
+  background: color-mix(in srgb, var(--color-accent) 5%, var(--step1-field, var(--color-input-bg)));
+  border: 0;
+  box-shadow: none;
 }
 
 :is(html[data-theme="dark"])
   .cv-record-row__identity {
-  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
-  border: 1px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
-  color: var(--color-accent);
+  background: var(--color-accent-soft, color-mix(in srgb, var(--color-accent) 18%, transparent));
+  border-color: var(--color-accent-border-soft, color-mix(in srgb, var(--color-accent) 55%, transparent));
+  color: var(--color-accent-text, var(--color-accent));
 }
 
 :is(html[data-theme="dark"])
@@ -5417,7 +5439,9 @@ html[data-theme="dark"] *::after {
 
 /* Badge interna (Motorista, nº do ofício... ) mais contida. */
 :is(html[data-theme="dark"])
-  .cv-person-row__badge {
+  .cv-person-row__badge,
+:is(html[data-theme="dark"])
+  .cv-record-row__badge {
   box-shadow: none;
 }
 
