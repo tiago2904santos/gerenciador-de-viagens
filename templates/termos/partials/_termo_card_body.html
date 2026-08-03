@@ -19,7 +19,7 @@
         {% endif %}
       </div>
       {% if s.view_url or s.pdf_url or s.docx_url %}
-      {% include "termos/partials/_termo_linha_menu.html" with menu_id="termo-servidor-menu-"|add:card.termo_pk|stringformat:"s"|add:"-"|add:s.servidor_pk|stringformat:"s" titulo=card.com_viatura|yesno:"Termo com viatura,Termo do servidor" subtitulo=s.name alvo=s.name view_url=s.view_url pdf_url=s.pdf_url docx_url=s.docx_url only %}
+      {% include "termos/partials/_termo_linha_menu.html" with menu_id=s.menu_id titulo=card.com_viatura|yesno:"Termo com viatura,Termo do servidor" subtitulo=s.name alvo=s.name view_url=s.view_url pdf_url=s.pdf_url docx_url=s.docx_url only %}
       {% endif %}
     </li>
     {% endfor %}
@@ -37,7 +37,7 @@
         {% endif %}
       </div>
       {% if card.viatura_row.view_url or card.viatura_row.pdf_url or card.viatura_row.docx_url %}
-      {% include "termos/partials/_termo_linha_menu.html" with menu_id="termo-viatura-menu-"|add:card.termo_pk|stringformat:"s" titulo="Termo da viatura" subtitulo=card.viatura_row.name alvo=card.viatura_row.name view_url=card.viatura_row.view_url pdf_url=card.viatura_row.pdf_url docx_url=card.viatura_row.docx_url only %}
+      {% include "termos/partials/_termo_linha_menu.html" with menu_id=card.viatura_row.menu_id titulo="Termo da viatura" subtitulo=card.viatura_row.name alvo=card.viatura_row.name view_url=card.viatura_row.view_url pdf_url=card.viatura_row.pdf_url docx_url=card.viatura_row.docx_url only %}
       {% endif %}
     </li>
     {% endif %}

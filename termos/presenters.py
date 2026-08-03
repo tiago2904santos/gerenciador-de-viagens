@@ -48,6 +48,7 @@ def apresentar_termo_card(
         unidade_nome = str(servidor.unidade) if servidor.unidade_id else ""
         servidores_display.append({
             "servidor_pk": servidor.pk,
+            "menu_id": f"termo-{termo.pk}-servidor-{servidor.pk}-docs",
             "initials": _iniciais_nome_servidor(servidor.nome),
             "name": servidor.nome,
             "cargo": cargo_nome,
@@ -68,6 +69,7 @@ def apresentar_termo_card(
             str(viatura.unidade) if viatura.unidade_id else "",
         ] if p)
         viatura_row = {
+            "menu_id": f"termo-{termo.pk}-viatura-docs",
             "initials": "VT",
             "name": titulo or "Viatura",
             "meta": meta,
