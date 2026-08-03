@@ -1,5 +1,4 @@
-{# Miolo do card de termo — mesma linguagem do card de evento. Cresce por camadas:
-   destino/período ficam no cabeçalho; servidores e viatura só entram quando existem. #}
+{# Miolo do card de termo — linguagem do card de evento; cresce por camadas: destino/período no cabeçalho, servidores e viatura só quando existem. #}
 
 {% if card.servidores %}
 <div class="cv-record-card__band">
@@ -20,7 +19,7 @@
         {% endif %}
       </div>
 
-      {% if s.pdf_url or s.docx_url %}
+      {% if s.view_url or s.pdf_url or s.docx_url %}
       <div class="cv-person-row__actions">
         <button
           type="button"
@@ -38,6 +37,9 @@
             {% include "components/ui/menus/rich_menu_header.html" with title="Termo com viatura" subtitle=s.name icon="document" only %}
           {% else %}
             {% include "components/ui/menus/rich_menu_header.html" with title="Termo do servidor" subtitle=s.name icon="document" only %}
+          {% endif %}
+          {% if s.view_url %}
+            {% include "components/ui/menus/rich_menu_link.html" with href=s.view_url title="Visualizar termo" description="Abrir o documento no navegador" icon="eye" tone="preview" target_blank=True only %}
           {% endif %}
           {% if s.pdf_url %}
             {% include "components/ui/menus/rich_menu_link.html" with href=s.pdf_url title="Baixar PDF" description="Documento pronto para assinatura" icon="pdf" tone="pdf" download=True only %}
@@ -68,7 +70,7 @@
       {% endif %}
       {% if card.viatura.modelo %}
       <span class="cv-fact-block__label">Modelo</span>
-      <div class="cv-fact-block__value--secondary">{{ card.viatura.modelo }}</div>
+      <div class="cv-fact-block__value--average cv-fact-block__value--average--fit">{{ card.viatura.modelo }}</div>
       {% endif %}
     </div>
 
@@ -76,11 +78,11 @@
     <div class="cv-fact-block">
       {% if card.viatura.tipo %}
       <span class="cv-fact-block__label">Tipo</span>
-      <div class="cv-fact-block__value--secondary">{{ card.viatura.tipo }}</div>
+      <div class="cv-fact-block__value--average cv-fact-block__value--average--fit">{{ card.viatura.tipo }}</div>
       {% endif %}
       {% if card.viatura.unidade %}
       <span class="cv-fact-block__label">Unidade</span>
-      <div class="cv-fact-block__value--secondary">{{ card.viatura.unidade }}</div>
+      <div class="cv-fact-block__value--average cv-fact-block__value--average--fit">{{ card.viatura.unidade }}</div>
       {% endif %}
     </div>
     {% endif %}

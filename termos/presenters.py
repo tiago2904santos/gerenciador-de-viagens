@@ -14,6 +14,7 @@ def apresentar_termo_card(
     generico_pdf_url="",
     generico_docx_url="",
     servidor_url_builder=None,
+    servidor_view_url_builder=None,
     assinado=False,
     anexar_assinado_url="",
     remover_assinado_url="",
@@ -50,6 +51,7 @@ def apresentar_termo_card(
             "unidade": unidade_nome,
             "pdf_url": servidor_url_builder(servidor.pk, "pdf") if servidor_url_builder else "",
             "docx_url": servidor_url_builder(servidor.pk, "docx") if servidor_url_builder else "",
+            "view_url": servidor_view_url_builder(servidor.pk) if servidor_view_url_builder else "",
         })
 
     viatura_display = None
@@ -113,12 +115,20 @@ def apresentar_termo_card(
         footer_kwargs["delete_aria"] = "Excluir termo"
 
     header_items = [entity_cards.header_item("Destino", destino, wide=True)]
-    if periodo:
-        header_items.append(entity_cards.header_item("Período", periodo))
+    # periodo_display devolve a sentinela "Periodo nao informado" (truthy) quando
+    # nao ha data; sem data o cabecalho fica so com o destino.
+    if termo.periodo_efetivo()[0] is not None:
+        # "dd/mm/aaaa a dd/mm/aaaa" nao cabe no info-value, que trunca por padrao.
+        header_items.append(entity_cards.header_item("Período", periodo, wrap=True))
     header_chips = [entity_cards.chip("muted", oficio_label)] if oficio_label else []
+
+    # Sem servidores e sem viatura o miolo nao renderiza faixa alguma; nesse caso
+    # cabecalho e acoes dividem a mesma linha (ver static/css/termos.css).
+    compacto = not servidores_display and viatura_display is None
 
     return {
         "termo_pk": termo.pk,
+        "extra_class": "cv-record-card--termo-compacto" if compacto else "",
         "search_text": " ".join(filter(None, [
             destino, periodo, oficio_label,
             str(viatura) if viatura else "",

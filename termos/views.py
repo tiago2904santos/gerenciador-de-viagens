@@ -81,6 +81,14 @@ def index(request):
             )
         return build
 
+    def _servidor_view_url(termo_pk):
+        def build(servidor_pk):
+            return reverse(
+                "termos:termo_cadastro_servidor_pdf_inline",
+                args=[termo_pk, servidor_pk],
+            )
+        return build
+
     cards = [
         apresentar_termo_card(
             termo,
@@ -92,6 +100,7 @@ def index(request):
             generico_pdf_url=reverse("termos:baixar_termo_cadastro_generico", args=[termo.pk, "pdf"]),
             generico_docx_url=reverse("termos:baixar_termo_cadastro_generico", args=[termo.pk, "docx"]),
             servidor_url_builder=_servidor_url(termo.pk),
+            servidor_view_url_builder=_servidor_view_url(termo.pk),
             **termo_cadastro_assinado_info(termo, None),
         )
         for termo in page_obj.object_list

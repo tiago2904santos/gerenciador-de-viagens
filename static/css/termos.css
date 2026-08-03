@@ -101,3 +101,54 @@
   display: grid;
   gap: var(--space-4);
 }
+
+/* ── Card da lista: estado minimo ──
+   Sem servidores e sem viatura o miolo nao renderiza faixa alguma, entao
+   cabecalho e acoes dividem a mesma linha em vez de empilhar. A classe vem do
+   presenter (termos.presenters.apresentar_termo_card). */
+.cv-record-card--termo-compacto .cv-record-card__layout {
+  align-items: stretch;
+  display: flex;
+}
+
+.cv-record-card--termo-compacto .cv-record-card__id-row {
+  border-bottom: 0;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.cv-record-card--termo-compacto .cv-record-card__footer {
+  align-items: center;
+  background: none;
+  border-left: 1px solid var(--cv-form-section-border, var(--color-border-soft));
+  border-top: 0;
+  display: flex;
+  flex: 0 0 auto;
+  padding: var(--space-3) var(--space-5);
+}
+
+.cv-record-card--termo-compacto .cv-record-card__footer-actions {
+  flex-wrap: nowrap;
+  gap: var(--space-3);
+  width: auto;
+}
+
+/* Em telas estreitas nao ha largura para as duas metades: volta a empilhar. */
+@media (max-width: 720px) {
+  .cv-record-card--termo-compacto .cv-record-card__layout {
+    display: grid;
+  }
+
+  .cv-record-card--termo-compacto .cv-record-card__id-row {
+    border-bottom: 1px solid var(--cv-form-section-border);
+  }
+
+  .cv-record-card--termo-compacto .cv-record-card__footer {
+    border-left: 0;
+    border-top: 1px solid var(--cv-form-section-border, var(--color-border-soft));
+  }
+
+  .cv-record-card--termo-compacto .cv-record-card__footer-actions {
+    width: 100%;
+  }
+}
