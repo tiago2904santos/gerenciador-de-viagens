@@ -222,10 +222,12 @@
 .list-header__rail .list-header__search-input.header-filter-input,
 .list-header__rail .cv-custom-select__trigger.cv-custom-select__trigger--v2,
 .list-header__rail .travel-period-filter__btn,
+.travel-period-filter--filled .travel-period-filter__btn,
 .list-header__rail .cv-btn.cv-btn--secondary.cv-btn--control,
 .list-header__rail .list-header__search-input.header-filter-input:hover,
 .list-header__rail .cv-custom-select__trigger.cv-custom-select__trigger--v2:hover,
 .list-header__rail .travel-period-filter__btn:hover:not(:disabled),
+.travel-period-filter--filled .travel-period-filter__btn:hover:not(:disabled),
 .list-header__rail .cv-btn.cv-btn--secondary.cv-btn--control:hover {
   background: var(--list-header-control-bg);
   border: 0;
@@ -250,6 +252,8 @@
 
 .list-header__rail .travel-period-filter__btn:focus,
 .list-header__rail .travel-period-filter__btn:focus-visible,
+.travel-period-filter--filled .travel-period-filter__btn:focus,
+.travel-period-filter--filled .travel-period-filter__btn:focus-visible,
 .list-header__rail .cv-btn.cv-btn--secondary.cv-btn--control:focus,
 .list-header__rail .cv-btn.cv-btn--secondary.cv-btn--control:focus-visible {
   border: 1px solid color-mix(in srgb, var(--border-focus) 42%, transparent);
@@ -561,6 +565,17 @@
     .travel-period-filter__btn,
     .cv-btn.cv-btn--secondary.cv-btn--control
   ):is(:hover, :hover:not(:disabled)) {
+  background: var(--color-card-soft);
+  border-color: transparent;
+  box-shadow: none;
+}
+
+:is(html[data-theme="dark"])
+  .travel-period-filter--filled
+  .travel-period-filter__btn,
+:is(html[data-theme="dark"])
+  .travel-period-filter--filled
+  .travel-period-filter__btn:hover:not(:disabled) {
   background: var(--color-card-soft);
   border-color: transparent;
   box-shadow: none;

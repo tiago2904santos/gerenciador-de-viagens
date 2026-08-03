@@ -2070,6 +2070,18 @@
   width: 100%;
 }
 
+/* Data e hora dividem a largura de cada perna. Controles de formulário têm
+   min-width automático por padrão; em larguras intermediárias isso fazia os
+   dois inputs ultrapassarem suas colunas e se sobreporem. */
+.roteiro-trecho-card__leg-grid > .cv-field,
+.roteiro-trecho-card__leg-grid .cv-date-picker,
+.roteiro-trecho-card__leg-grid .cv-date-picker__control,
+.roteiro-trecho-card__leg-grid .cv-field__control {
+  max-width: 100%;
+  min-width: 0;
+  width: 100%;
+}
+
 .roteiro-trecho-card__leg-cidade {
   grid-column: 1 / -1;
   width: 100%;

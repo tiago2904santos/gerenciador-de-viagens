@@ -126,7 +126,7 @@ class PlanoIdentificacaoForm(forms.ModelForm):
             "data_evento_fim": forms.HiddenInput(attrs={"data-cv-date-picker-end-value": "true"}),
             "contextualizacao": forms.Textarea(
                 attrs={
-                    "rows": 7,
+                    "rows": 4,
                     **widget_attrs(WidgetStyle.FIELD_CONTROL_TEXTAREA),
                     "placeholder": "Deixe em branco para gerar automaticamente a partir do destino e do programa.",
                 },

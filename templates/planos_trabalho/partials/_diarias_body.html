@@ -10,35 +10,42 @@
       <h4 class="cv-form-subsection__title" id="pt-diarias-resultado-title">Resultado do cálculo</h4>
     </div>
   </header>
-  <div class="cv-fact-grid" data-pt-diarias-resultado>
-    <div class="cv-fact-block">
-      <span class="cv-fact-block__label">Composição por servidor</span>
-      <div class="cv-fact-block__value" data-pt-resultado-composicao>
-        {% if diarias_resultado.ok %}{{ diarias_resultado.composicao }}{% else %}—{% endif %}
+  <div class="pt-diarias-summary-grid" data-pt-diarias-resultado>
+    <div class="cv-summary-item cv-summary-item--principal pt-diarias-summary-card pt-diarias-summary-card--principal">
+      <span class="cv-summary-label">Valor total do plano</span>
+      <div class="cv-summary-value cv-summary-value--principal" data-pt-resultado-total>
+        {% if diarias_resultado.ok %}R${{ diarias_resultado.valor_total_display }}{% else %}—{% endif %}
       </div>
-      <span class="cv-fact-block__label">Efetivo total</span>
-      <div class="cv-fact-block__value--secondary" data-pt-resultado-efetivo>
-        {% if diarias_resultado.ok %}{{ diarias_resultado.quantidade_servidores }} servidor(es){% else %}—{% endif %}
+      <span class="cv-summary-label">Valor por extenso</span>
+      <div class="pt-diarias-summary-extenso" data-pt-resultado-total-extenso>
+        {% if diarias_resultado.ok %}{{ diarias_resultado.valor_total_extenso }}{% else %}—{% endif %}
       </div>
     </div>
-    <div class="cv-fact-block">
-      <span class="cv-fact-block__label">Valor por servidor</span>
-      <div class="cv-fact-block__value--strong" data-pt-resultado-unitario>
+
+    <div class="cv-summary-item cv-summary-item--secondary pt-diarias-summary-card pt-diarias-summary-card--unitario">
+      <span class="cv-summary-label">Valor por servidor</span>
+      <div class="cv-summary-value" data-pt-resultado-unitario>
         {% if diarias_resultado.ok %}R${{ diarias_resultado.valor_unitario_display }}{% else %}—{% endif %}
       </div>
-      <span class="cv-fact-block__label">Por extenso</span>
-      <div class="cv-fact-block__value--long" data-pt-resultado-unitario-extenso>
+      <span class="cv-summary-label">Valor por extenso</span>
+      <div class="pt-diarias-summary-extenso" data-pt-resultado-unitario-extenso>
         {% if diarias_resultado.ok %}{{ diarias_resultado.valor_unitario_extenso }}{% else %}—{% endif %}
       </div>
     </div>
-    <div class="cv-fact-block cv-fact-block--valor">
-      <span class="cv-fact-block__label">Valor total do plano</span>
-      <div class="cv-fact-block__value--strong" data-pt-resultado-total>
-        {% if diarias_resultado.ok %}R${{ diarias_resultado.valor_total_display }}{% else %}—{% endif %}
+
+    <div class="pt-diarias-summary-secondary-stack">
+      <div class="cv-summary-item cv-summary-item--secondary pt-diarias-summary-card">
+        <span class="cv-summary-label">Composição por servidor</span>
+        <div class="cv-summary-value" data-pt-resultado-composicao>
+          {% if diarias_resultado.ok %}{{ diarias_resultado.composicao }}{% else %}—{% endif %}
+        </div>
       </div>
-      <span class="cv-fact-block__label">Por extenso</span>
-      <div class="cv-fact-block__value--long" data-pt-resultado-total-extenso>
-        {% if diarias_resultado.ok %}{{ diarias_resultado.valor_total_extenso }}{% else %}—{% endif %}
+
+      <div class="cv-summary-item cv-summary-item--secondary pt-diarias-summary-card">
+        <span class="cv-summary-label">Efetivo total</span>
+        <div class="cv-summary-value" data-pt-resultado-efetivo>
+          {% if diarias_resultado.ok %}{{ diarias_resultado.quantidade_servidores }} servidor(es){% else %}—{% endif %}
+        </div>
       </div>
     </div>
   </div>

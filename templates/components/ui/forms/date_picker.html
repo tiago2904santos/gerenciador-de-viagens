@@ -45,7 +45,8 @@ Modo multi:
   multi_placeholder     placeholder do input (default: "Selecione as datas")
   show_context          exibe o rotulo de trecho atual (default: true)
   show_confirm          exibe o botao "Aplicar datas" no rodape (default: true)
-  control_variant       "action-button" preserva um gatilho de acao sem input
+  control_variant       "action-button" preserva um gatilho de acao sem input;
+                        "filter-pill" reutiliza o controle compacto dos filtros de lista
   trigger_label / trigger_aria_label / trigger_class
 {% endcomment %}
 {% with root_id=picker_id|default:"cv-date-picker" %}
@@ -152,7 +153,21 @@ Modo multi:
       <p class="cv-date-picker__summary" data-cv-date-picker-summary></p>
     {% endif %}
   {% elif mode == "multi" %}
-    {% if control_variant == "action-button" %}
+    {% if control_variant == "filter-pill" %}
+      <button
+        type="button"
+        class="travel-period-filter__btn"
+        data-cv-date-picker-trigger
+        aria-expanded="false"
+        aria-controls="{{ panel_id }}"
+        aria-label="{{ trigger_aria_label|default:trigger_label|default:'Abrir calendario' }}"
+      >
+        <span class="cv-btn__icon" aria-hidden="true">
+          {% include "components/ui/forms/_date_picker_icon.html" %}
+        </span>
+        <span class="travel-period-filter__label">{{ trigger_label|default:"Preencher datas" }}</span>
+      </button>
+    {% elif control_variant == "action-button" %}
       <button
         type="button"
         class="{{ trigger_class|default:'cv-btn cv-btn--secondary' }} cv-date-picker__trigger"

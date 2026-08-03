@@ -84,10 +84,6 @@
   justify-content: flex-end;
 }
 
-.cv-dialog__panel.attach-signed-modal__dialog {
-  grid-template-rows: auto auto auto minmax(0, 1fr);
-}
-
 /* Variantes semanticas globais. Os seletores incluem o modificador do dialogo
    para que o tom continue visivel sobre a aparencia-base do tema escuro. */
 html[data-theme="dark"] .cv-dialog--danger .cv-dialog__panel {

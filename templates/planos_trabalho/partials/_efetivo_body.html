@@ -3,27 +3,31 @@
   {% include "components/ui/feedback/field_error.html" with errors=formset.non_form_errors only %}
 {% endif %}
 
-<section class="cv-form-subsection cv-ordered-field-collection pt-efetivo-section"
-         aria-labelledby="pt-efetivo-list-title"
-         id="pt-efetivo-section">
-  <header class="cv-form-subsection__header cv-ordered-field-collection__header">
-    <div class="cv-form-subsection__copy">
-      <h4 class="cv-form-subsection__title" id="pt-efetivo-list-title">Efetivos adicionados</h4>
-      <p class="cv-form-subsection__description">Cada linha é um cargo com a respectiva quantidade de servidores.</p>
+<section
+  class="cv-form-subsection travel-destinations cv-ordered-field-collection route-destinos-block route-destinos-block--split route-destinos-block--single travel-document-block pt-efetivo-section"
+  aria-labelledby="pt-efetivo-title"
+  id="pt-efetivo-section"
+>
+  <div class="route-destinos-block__rail">
+    <div class="route-destinos-block__copy">
+      <h4 class="route-destinos-block__title" id="pt-efetivo-title">Efetivo</h4>
+      <p class="route-destinos-block__subtitle route-destinos-block__description">
+        Composição da equipe por unidade, cargo e quantidade. O total entra no cálculo das diárias.
+      </p>
     </div>
-    <div class="cv-ordered-field-collection__actions">
-      <button type="button" class="cv-btn cv-btn--secondary cv-btn--sm" data-pt-efetivo-add>
-        <span>Adicionar efetivo</span>
-      </button>
+  </div>
+  <div class="route-destinos-block__body">
+    <div class="route-destinos-block__editor">
+      <div
+        class="cv-ordered-field-collection__list route-destinations-list pt-efetivo-rows"
+        aria-label="Efetivos adicionados"
+        data-pt-efetivo-rows
+      >
+        {% for efetivo_form in formset %}
+          {% include "planos_trabalho/partials/_efetivo_row.html" with efetivo_form=efetivo_form row_ordinal=forloop.counter total_forms=formset|length cargos_url=cargos_url only %}
+        {% endfor %}
+      </div>
     </div>
-  </header>
-
-  <div class="cv-ordered-field-collection__list route-destinations-list pt-efetivo-rows"
-       aria-label="Efetivos adicionados"
-       data-pt-efetivo-rows>
-    {% for efetivo_form in formset %}
-      {% include "planos_trabalho/partials/_efetivo_row.html" with efetivo_form=efetivo_form row_ordinal=forloop.counter total_forms=formset|length cargos_url=cargos_url only %}
-    {% endfor %}
   </div>
 </section>
 

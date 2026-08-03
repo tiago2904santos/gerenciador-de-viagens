@@ -1,14 +1,26 @@
 {% comment %}
-  Linha de efetivo no visual das linhas de destino do ofício (cv-ordered-field-row),
-  mantendo os hooks de JS do plano (data-pt-efetivo-*). Campos: Unidade · Cargo · Quantidade.
-  Params: efetivo_form, row_ordinal, total_forms, cargos_url.
-  Linha única (primeira e sozinha) esconde o botão remover — o JS reavalia isso.
+  Linha de efetivo no padrão Destinos (route-destinos-block): + · campos · ×.
+  Hooks JS: data-pt-efetivo-*. Campos: Unidade · Cargo · Quantidade.
+  Hiddens ficam num wrapper [hidden] para não virarem colunas da grade.
 {% endcomment %}
-<div class="destination-row cv-ordered-field-row pt-efetivo-card{% if row_ordinal == 1 and total_forms == 1 %} destination-row--single{% endif %}" data-pt-efetivo-row>
-  {% for hidden in efetivo_form.hidden_fields %}{{ hidden }}{% endfor %}
-  <div hidden>{{ efetivo_form.DELETE }}</div>
-  <span class="cv-ordered-field-row__badge" data-pt-efetivo-ord aria-hidden="true">{{ row_ordinal|default:1 }}</span>
-  <div class="cv-ordered-field-row__body">
+<div class="destination-row destination-row--with-add travel-destination-row cv-ordered-field-row pt-efetivo-card{% if row_ordinal == 1 and total_forms == 1 %} destination-row--single{% endif %}"
+     data-pt-efetivo-row>
+  <div hidden>
+    {% for hidden in efetivo_form.hidden_fields %}{{ hidden }}{% endfor %}
+    {{ efetivo_form.DELETE }}
+  </div>
+
+  <button type="button"
+          class="route-destinos-add cv-ordered-field-row__add"
+          data-pt-efetivo-add
+          title="Adicionar efetivo abaixo"
+          aria-label="Adicionar efetivo abaixo">
+    <span class="route-destinos-add__glyph" aria-hidden="true">+</span>
+  </button>
+
+  <span class="cv-ordered-field-row__badge sr-only" data-pt-efetivo-ord aria-hidden="true">{{ row_ordinal|default:1 }}</span>
+
+  <div class="cv-ordered-field-row__body pt-efetivo-card__body">
     <div class="field-grid cv-ordered-field-row__fields pt-efetivo-fields">
       <div class="field app-form-field">
         <label class="cv-field__label app-form-label" for="{{ efetivo_form.unidade.id_for_label }}">Unidade (opcional)</label>
@@ -18,19 +30,22 @@
       {% include "components/ui/forms/field.html" with field=efetivo_form.cargo action_url=cargos_url action_label="Gerenciar cargos" only %}
       <div class="field app-form-field">
         <label class="cv-field__label app-form-label" for="{{ efetivo_form.quantidade.id_for_label }}">Quantidade</label>
-        <div class="roteiro-time-calc-stepper pt-quantidade-stepper">
+        <div class="pt-quantidade-stepper" role="group" aria-label="Quantidade">
+          <button type="button" class="pt-quantidade-stepper__btn" data-pt-quantidade-delta="-1" aria-label="Diminuir quantidade">−</button>
           {{ efetivo_form.quantidade }}
-          <button type="button" class="cv-btn cv-btn--secondary cv-btn--control trecho-tempo-add-btn" data-pt-quantidade-delta="-1" aria-label="Diminuir quantidade">−</button>
-          <button type="button" class="cv-btn cv-btn--secondary cv-btn--control trecho-tempo-add-btn" data-pt-quantidade-delta="1" aria-label="Aumentar quantidade">+</button>
+          <button type="button" class="pt-quantidade-stepper__btn" data-pt-quantidade-delta="1" aria-label="Aumentar quantidade">+</button>
         </div>
         {% if efetivo_form.quantidade.errors %}{% include "components/ui/feedback/field_error.html" with errors=efetivo_form.quantidade.errors only %}{% endif %}
       </div>
     </div>
   </div>
+
   <button type="button"
           class="destination-remove-button cv-ordered-field-row__remove"
           title="Remover efetivo"
           aria-label="Remover efetivo"
           {% if row_ordinal == 1 and total_forms == 1 %}hidden{% endif %}
-          data-pt-efetivo-remove>×</button>
+          data-pt-efetivo-remove>
+    <span class="cv-ordered-field-row__remove-glyph" aria-hidden="true">&#215;</span>
+  </button>
 </div>

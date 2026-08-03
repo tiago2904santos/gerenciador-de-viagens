@@ -390,25 +390,10 @@
   function initEfetivoFormset(scope) {
     var rowsContainer = scope.querySelector("[data-pt-efetivo-rows]");
     var template = scope.querySelector("template[data-pt-efetivo-template]");
-    var addButton = scope.querySelector("[data-pt-efetivo-add]");
     var totalInput = scope.querySelector("input[name='efetivo-TOTAL_FORMS']");
-    if (!rowsContainer || !template || !addButton || !totalInput) return;
+    if (!rowsContainer || !template || !totalInput) return;
 
-    rowsContainer.addEventListener("click", function (e) {
-      var btn = e.target.closest("[data-pt-quantidade-delta]");
-      if (!btn) return;
-      var stepper = btn.closest(".pt-quantidade-stepper");
-      if (!stepper) return;
-      var input = stepper.querySelector("input");
-      if (!input) return;
-      var delta = parseInt(btn.getAttribute("data-pt-quantidade-delta") || "0", 10);
-      var cur = parseInt(input.value || "1", 10) || 1;
-      input.value = String(Math.max(1, cur + delta));
-      input.dispatchEvent(new Event("input", { bubbles: true }));
-      input.dispatchEvent(new Event("change", { bubbles: true }));
-    });
-
-    addButton.addEventListener("click", function () {
+    function addEfetivoRow() {
       var index = parseInt(totalInput.value || "0", 10);
       var html = template.innerHTML.replace(/__prefix__/g, String(index));
       var holder = document.createElement("div");
@@ -421,6 +406,28 @@
       if (picker && picker.initSelect) picker.initSelect(row);
       initPickers(scope);
       updateEfetivoRemoveButtons(scope);
+      notifyEfetivoChanged(scope);
+    }
+
+    rowsContainer.addEventListener("click", function (e) {
+      var addBtn = e.target.closest("[data-pt-efetivo-add]");
+      if (addBtn && rowsContainer.contains(addBtn)) {
+        e.preventDefault();
+        addEfetivoRow();
+        return;
+      }
+
+      var btn = e.target.closest("[data-pt-quantidade-delta]");
+      if (!btn || !rowsContainer.contains(btn)) return;
+      var stepper = btn.closest(".pt-quantidade-stepper");
+      if (!stepper) return;
+      var input = stepper.querySelector("input");
+      if (!input) return;
+      var delta = parseInt(btn.getAttribute("data-pt-quantidade-delta") || "0", 10);
+      var cur = parseInt(input.value || "1", 10) || 1;
+      input.value = String(Math.max(1, cur + delta));
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+      input.dispatchEvent(new Event("change", { bubbles: true }));
     });
 
     Array.prototype.slice.call(rowsContainer.querySelectorAll("[data-pt-efetivo-row]")).forEach(function (row) {
@@ -827,8 +834,11 @@
       if (target.matches("input[name$='-quantidade']")) ping();
     });
 
-    var addButton = scope.querySelector("[data-pt-efetivo-add]");
-    if (addButton) addButton.addEventListener("click", function () { window.setTimeout(ping, 50); });
+    rowsContainer.addEventListener("click", function (event) {
+      if (event.target && event.target.closest && event.target.closest("[data-pt-efetivo-add]")) {
+        window.setTimeout(ping, 50);
+      }
+    });
 
     form.addEventListener("autosave:success", function (event) {
       var data = event.detail || {};

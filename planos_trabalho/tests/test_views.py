@@ -91,6 +91,21 @@ class PlanoWizardViewsTests(TestCase):
             response = self.client.get(reverse(name, args=[plano.pk]))
             self.assertEqual(response.status_code, 200, msg=name)
 
+    def test_resumo_de_diarias_usa_hierarquia_financeira_de_roteiros(self):
+        plano = criar_plano_maringa(self.maringa)
+        response = self.client.get(
+            reverse("planos_trabalho:wizard_efetivo_diarias", args=[plano.pk])
+        )
+
+        self.assertContains(response, 'class="pt-diarias-summary-grid"')
+        self.assertContains(response, "cv-summary-item--principal")
+        self.assertContains(response, "pt-diarias-summary-secondary-stack")
+        self.assertContains(response, "cv-summary-item--secondary", count=3)
+        self.assertContains(response, "pt-diarias-summary-card--unitario")
+        self.assertContains(response, "data-pt-resultado-total")
+        self.assertContains(response, "data-pt-resultado-unitario")
+        self.assertContains(response, "data-pt-resultado-composicao")
+
     def test_get_identificacao_pre_preenche_textos_padrao(self):
         plano = criar_plano_maringa(self.maringa)
         response = self.client.get(reverse("planos_trabalho:wizard_identificacao", args=[plano.pk]))

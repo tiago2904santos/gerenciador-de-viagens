@@ -755,9 +755,13 @@ html[data-theme="dark"] .cv-action-menu {
   max-width: min(100%, 610px);
 }
 
+html[data-theme="dark"] #attach-signed-modal .attach-signed-modal__dialog {
+  background: var(--step1-surface) !important;
+}
+
 .attach-signed-modal__dialog > .cv-dialog__header {
   /* Header mantém o tom do diálogo; o restante do painel é --step1-surface. */
-  margin: -1px -1px 18px;
+  margin: -1px -1px 0;
 }
 
 .attach-signed-modal__icon {
@@ -792,6 +796,11 @@ html[data-theme="dark"] .cv-action-menu {
   height: 18px;
   margin-top: 2px;
   width: 18px;
+}
+
+.attach-signed-modal__body {
+  display: grid;
+  gap: 4px;
 }
 
 .attach-signed-modal__upload {
@@ -920,25 +929,25 @@ html[data-theme="dark"] .cv-action-menu {
 .attach-signed-modal__form .cv-file-picker__action {
   align-items: center;
   align-self: start;
-  background: var(--action-bg);
+  background: var(--step1-panel, var(--color-surface-soft));
   border: 0;
-  border-radius: 11px;
-  color: var(--action-text);
+  border-radius: 12px;
+  color: var(--color-heading);
   display: inline-flex;
-  font-size: 0.8rem;
-  font-weight: 720;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
   grid-column: 1;
   grid-row: 1;
   justify-content: center;
-  min-height: 38px;
-  padding: 0 13px;
+  min-height: var(--control-height-md, 44px);
+  padding: 0 18px;
   width: fit-content;
 }
 
 .attach-signed-modal__form .prestacao-file-picker__action:hover,
 .attach-signed-modal__form .cv-file-picker__action:hover {
-  background: var(--action-bg);
-  color: var(--action-text);
+  background: var(--step1-panel, var(--color-surface-soft));
+  color: var(--color-heading);
 }
 
 .attach-signed-modal__form .prestacao-file-picker__value,
@@ -1076,9 +1085,9 @@ html[data-theme="dark"] #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete,
  */
 #attach-signed-modal {
   --asm-panel: var(--step1-panel, var(--color-surface-soft));
-  --asm-action-bg: var(--action-bg);
-  --asm-action-border: var(--action-border);
-  --asm-action-text: var(--action-text);
+  --asm-action-bg: var(--step1-panel, var(--color-surface-soft));
+  --asm-action-border: transparent;
+  --asm-action-text: var(--color-heading);
   --asm-accent: var(--color-accent);
   --asm-accent-text: var(--color-on-accent, #19232d);
   --asm-preview-bg: var(--action-preview-bg);
@@ -1176,7 +1185,12 @@ html[data-theme="dark"] #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete,
   background: var(--asm-action-bg) !important;
   background-color: var(--asm-action-bg) !important;
   border: 0 !important;
+  border-radius: 12px !important;
   color: var(--asm-action-text) !important;
+  font-size: var(--font-size-sm) !important;
+  font-weight: var(--font-weight-bold) !important;
+  min-height: var(--control-height-md, 44px) !important;
+  padding: 0 18px !important;
   box-shadow: none !important;
   outline: none !important;
   transform: none !important;
@@ -1186,10 +1200,10 @@ html[data-theme="dark"] #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete,
   .prestacao-file-picker__action,
   .cv-file-picker__action
 ):is(:hover, :focus-visible) {
-  background: var(--action-bg-hover, color-mix(in srgb, var(--color-accent) 14%, var(--color-surface-muted))) !important;
-  background-color: var(--action-bg-hover, color-mix(in srgb, var(--color-accent) 14%, var(--color-surface-muted))) !important;
+  background: var(--asm-action-bg) !important;
+  background-color: var(--asm-action-bg) !important;
   border: 0 !important;
-  color: var(--action-text-strong, var(--color-accent-text, var(--asm-action-text))) !important;
+  color: var(--asm-action-text) !important;
   box-shadow: none !important;
   outline: none !important;
   transform: none !important;

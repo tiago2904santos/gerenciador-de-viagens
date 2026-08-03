@@ -7669,9 +7669,13 @@ html[data-theme="dark"] .cv-action-menu {
   max-width: min(100%, 610px);
 }
 
+html[data-theme="dark"] #attach-signed-modal .attach-signed-modal__dialog {
+  background: var(--step1-surface) !important;
+}
+
 .attach-signed-modal__dialog > .cv-dialog__header {
   /* Header mantém o tom do diálogo; o restante do painel é --step1-surface. */
-  margin: -1px -1px 18px;
+  margin: -1px -1px 0;
 }
 
 .attach-signed-modal__icon {
@@ -7706,6 +7710,11 @@ html[data-theme="dark"] .cv-action-menu {
   height: 18px;
   margin-top: 2px;
   width: 18px;
+}
+
+.attach-signed-modal__body {
+  display: grid;
+  gap: 4px;
 }
 
 .attach-signed-modal__upload {
@@ -7834,25 +7843,25 @@ html[data-theme="dark"] .cv-action-menu {
 .attach-signed-modal__form .cv-file-picker__action {
   align-items: center;
   align-self: start;
-  background: var(--action-bg);
+  background: var(--step1-panel, var(--color-surface-soft));
   border: 0;
-  border-radius: 11px;
-  color: var(--action-text);
+  border-radius: 12px;
+  color: var(--color-heading);
   display: inline-flex;
-  font-size: 0.8rem;
-  font-weight: 720;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
   grid-column: 1;
   grid-row: 1;
   justify-content: center;
-  min-height: 38px;
-  padding: 0 13px;
+  min-height: var(--control-height-md, 44px);
+  padding: 0 18px;
   width: fit-content;
 }
 
 .attach-signed-modal__form .prestacao-file-picker__action:hover,
 .attach-signed-modal__form .cv-file-picker__action:hover {
-  background: var(--action-bg);
-  color: var(--action-text);
+  background: var(--step1-panel, var(--color-surface-soft));
+  color: var(--color-heading);
 }
 
 .attach-signed-modal__form .prestacao-file-picker__value,
@@ -7990,9 +7999,9 @@ html[data-theme="dark"] #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete,
  */
 #attach-signed-modal {
   --asm-panel: var(--step1-panel, var(--color-surface-soft));
-  --asm-action-bg: var(--action-bg);
-  --asm-action-border: var(--action-border);
-  --asm-action-text: var(--action-text);
+  --asm-action-bg: var(--step1-panel, var(--color-surface-soft));
+  --asm-action-border: transparent;
+  --asm-action-text: var(--color-heading);
   --asm-accent: var(--color-accent);
   --asm-accent-text: var(--color-on-accent, #19232d);
   --asm-preview-bg: var(--action-preview-bg);
@@ -8090,7 +8099,12 @@ html[data-theme="dark"] #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete,
   background: var(--asm-action-bg) !important;
   background-color: var(--asm-action-bg) !important;
   border: 0 !important;
+  border-radius: 12px !important;
   color: var(--asm-action-text) !important;
+  font-size: var(--font-size-sm) !important;
+  font-weight: var(--font-weight-bold) !important;
+  min-height: var(--control-height-md, 44px) !important;
+  padding: 0 18px !important;
   box-shadow: none !important;
   outline: none !important;
   transform: none !important;
@@ -8100,10 +8114,10 @@ html[data-theme="dark"] #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete,
   .prestacao-file-picker__action,
   .cv-file-picker__action
 ):is(:hover, :focus-visible) {
-  background: var(--action-bg-hover, color-mix(in srgb, var(--color-accent) 14%, var(--color-surface-muted))) !important;
-  background-color: var(--action-bg-hover, color-mix(in srgb, var(--color-accent) 14%, var(--color-surface-muted))) !important;
+  background: var(--asm-action-bg) !important;
+  background-color: var(--asm-action-bg) !important;
   border: 0 !important;
-  color: var(--action-text-strong, var(--color-accent-text, var(--asm-action-text))) !important;
+  color: var(--asm-action-text) !important;
   box-shadow: none !important;
   outline: none !important;
   transform: none !important;
@@ -8870,6 +8884,11 @@ html[data-theme="dark"] #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete,
   grid-template-columns: minmax(0, 2fr) minmax(14rem, 1fr);
 }
 
+.travel-period-block--split .cv-travel-schedule__period-fields--with-extra {
+  align-items: end;
+  grid-template-columns: minmax(0, 2fr) minmax(12rem, 1fr);
+}
+
 .cv-travel-schedule__period-fields > * {
   min-width: 0;
 }
@@ -9016,6 +9035,103 @@ html[data-theme="dark"] #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete,
   .cv-resource-picker__actions .cv-btn {
     width: 100%;
   }
+}
+/* Segmented control canônico para opções mutuamente exclusivas. */
+.cv-segment-toggle {
+  align-items: center;
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface-strong));
+  border: 1px solid color-mix(in srgb, var(--color-accent) 35%, var(--color-border));
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  flex-shrink: 0;
+  gap: 2px;
+  padding: 3px;
+}
+
+.cv-segment-toggle__btn {
+  align-items: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: calc(var(--radius-pill) - 2px);
+  color: color-mix(in srgb, var(--color-accent) 60%, var(--color-muted-strong));
+  cursor: pointer;
+  display: inline-flex;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  gap: var(--space-1);
+  letter-spacing: 0.02em;
+  line-height: 1;
+  padding: 5px var(--space-3);
+  transition:
+    background 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    color 160ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  user-select: none;
+  white-space: nowrap;
+  will-change: transform, background;
+}
+
+html[data-theme="light"] .cv-segment-toggle__btn {
+  color: color-mix(in srgb, var(--color-primary-bright) 60%, var(--color-muted-strong));
+}
+
+.cv-segment-toggle__btn:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+html[data-theme="light"] .cv-segment-toggle__btn:focus-visible {
+  outline-color: var(--color-primary-bright);
+}
+
+.cv-segment-toggle__btn:hover:not([aria-pressed="true"]) {
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  color: var(--color-accent);
+}
+
+html[data-theme="light"] .cv-segment-toggle__btn:hover:not([aria-pressed="true"]) {
+  background: color-mix(in srgb, var(--color-primary-bright) 10%, transparent);
+  color: var(--color-primary-bright);
+}
+
+.cv-segment-toggle__btn[aria-pressed="true"] {
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-hover));
+  border-color: var(--color-accent-hover);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.30),
+    0 0 0 1px color-mix(in srgb, var(--color-accent) 45%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  color: #071a33;
+  transform: scale(1.01);
+}
+
+html[data-theme="light"] .cv-segment-toggle__btn[aria-pressed="true"] {
+  background: var(--color-primary-bright);
+  border-color: color-mix(in srgb, var(--color-primary-bright) 70%, #000);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.18),
+    0 0 0 1px color-mix(in srgb, var(--color-primary-bright) 45%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.20);
+  color: #fff;
+  transform: scale(1.01);
+}
+
+html[data-theme="light"] .cv-segment-toggle {
+  background: color-mix(in srgb, var(--color-primary-bright) 10%, var(--color-surface-strong));
+  border-color: color-mix(in srgb, var(--color-primary-bright) 35%, var(--color-border));
+}
+
+@keyframes cv-segment-pop {
+  0% { opacity: 0.55; transform: scale(0.88); }
+  55% { opacity: 1; transform: scale(1.06); }
+  100% { opacity: 1; transform: scale(1.01); }
+}
+
+.cv-segment-toggle__btn--pop {
+  animation: cv-segment-pop 280ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 /* <<< css/components/form-sections.css <<< */
 
@@ -10315,10 +10431,6 @@ html[data-theme="dark"] #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete,
   justify-content: flex-end;
 }
 
-.cv-dialog__panel.attach-signed-modal__dialog {
-  grid-template-rows: auto auto auto minmax(0, 1fr);
-}
-
 /* Variantes semanticas globais. Os seletores incluem o modificador do dialogo
    para que o tom continue visivel sobre a aparencia-base do tema escuro. */
 html[data-theme="dark"] .cv-dialog--danger .cv-dialog__panel {
@@ -11325,6 +11437,15 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
   width: 100%;
 }
 
+/* Horário na mesma linha do período (ex.: identificação do plano de trabalho). */
+:is(html[data-theme="dark"])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1])
+  .travel-period-block--split
+  .cv-travel-schedule__period-fields--with-extra {
+  align-items: end;
+  grid-template-columns: minmax(0, 2fr) minmax(12rem, 1fr);
+}
+
 :is(html[data-theme="dark"])
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .travel-period-block--split .field-grid.field-grid--cols-2 {
   gap: 12px 16px;
@@ -11425,7 +11546,7 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
 
 :is(html[data-theme="dark"])
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block--split > .route-destinos-block__rail {
-  align-self: start;
+  align-self: center;
   display: grid;
   gap: 4px;
   max-width: 14rem;
@@ -12251,7 +12372,7 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .cv-ordered-field-row__remove,
 :is(html[data-theme="dark"])
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-remove-button {
-  align-self: center;
+  align-self: end;
   border: 0 !important;
   border-radius: 10px !important;
   cursor: pointer;
@@ -12520,18 +12641,6 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
   display: flex;
   flex: 0 0 auto;
   margin-left: auto;
-}
-
-/* Mesmo porte tipográfico/padding do "Recalcular rota" (.roteiro-mapa__canvas-head .cv-btn). */
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro]
-  #trechos-date-picker
-  .cv-date-picker__trigger.cv-btn {
-  font-size: var(--font-size-xs);
-  height: var(--cv-btn-height);
-  max-height: var(--cv-btn-height);
-  min-height: var(--cv-btn-height);
-  padding: 0 var(--space-3);
 }
 
 /* Dentro de cada bloco de trecho: conteúdo plano (sem mini-card aninhado). */
@@ -12914,8 +13023,8 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
 :is(html[data-theme="dark"])
   .cv-form-block__description {
   color: var(--color-muted);
-  font-size: var(--font-size-xs);
-  line-height: 1.45;
+  font-size: var(--font-size-2xs);
+  line-height: 1.4;
   text-align: right;
 }
 
@@ -14508,20 +14617,6 @@ html[data-theme="dark"] .empty-state__title {
   background: transparent;
   border-top: 1px solid var(--color-border);
   padding: 16px 22px;
-}
-
-/* attach_signed_modal.html não envolve o conteúdo em .cv-dialog__body (que
-   ganharia os 22px de padding do contrato canônico) — sem isso, mensagem,
-   seletor de tipo e uploader ficam colados nas bordas do painel. */
-:is(html[data-theme="dark"])
-  :is(.attach-signed-modal__intro, .attach-signed-modal__kind, .attach-signed-modal__upload, .attach-signed-modal__form [data-attach-signed-current]) {
-  margin-inline: 22px;
-}
-
-:is(html[data-theme="dark"])
-  .attach-signed-modal__intro {
-  margin-top: 18px;
-  margin-bottom: 4px;
 }
 
 .cv-dialog__form {
@@ -16563,10 +16658,12 @@ html[data-theme="dark"] *::after {
 .list-header__rail .list-header__search-input.header-filter-input,
 .list-header__rail .cv-custom-select__trigger.cv-custom-select__trigger--v2,
 .list-header__rail .travel-period-filter__btn,
+.travel-period-filter--filled .travel-period-filter__btn,
 .list-header__rail .cv-btn.cv-btn--secondary.cv-btn--control,
 .list-header__rail .list-header__search-input.header-filter-input:hover,
 .list-header__rail .cv-custom-select__trigger.cv-custom-select__trigger--v2:hover,
 .list-header__rail .travel-period-filter__btn:hover:not(:disabled),
+.travel-period-filter--filled .travel-period-filter__btn:hover:not(:disabled),
 .list-header__rail .cv-btn.cv-btn--secondary.cv-btn--control:hover {
   background: var(--list-header-control-bg);
   border: 0;
@@ -16591,6 +16688,8 @@ html[data-theme="dark"] *::after {
 
 .list-header__rail .travel-period-filter__btn:focus,
 .list-header__rail .travel-period-filter__btn:focus-visible,
+.travel-period-filter--filled .travel-period-filter__btn:focus,
+.travel-period-filter--filled .travel-period-filter__btn:focus-visible,
 .list-header__rail .cv-btn.cv-btn--secondary.cv-btn--control:focus,
 .list-header__rail .cv-btn.cv-btn--secondary.cv-btn--control:focus-visible {
   border: 1px solid color-mix(in srgb, var(--border-focus) 42%, transparent);
@@ -16902,6 +17001,17 @@ html[data-theme="dark"] *::after {
     .travel-period-filter__btn,
     .cv-btn.cv-btn--secondary.cv-btn--control
   ):is(:hover, :hover:not(:disabled)) {
+  background: var(--color-card-soft);
+  border-color: transparent;
+  box-shadow: none;
+}
+
+:is(html[data-theme="dark"])
+  .travel-period-filter--filled
+  .travel-period-filter__btn,
+:is(html[data-theme="dark"])
+  .travel-period-filter--filled
+  .travel-period-filter__btn:hover:not(:disabled) {
   background: var(--color-card-soft);
   border-color: transparent;
   box-shadow: none;

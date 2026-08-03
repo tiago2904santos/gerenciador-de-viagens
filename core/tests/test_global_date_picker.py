@@ -94,6 +94,12 @@ class GlobalDatePickerTests(SimpleTestCase):
     def test_roteiro_trechos_calendar_allows_repeated_dates(self):
         html = render_to_string("roteiros/partials/roteiro/_trechos_actions.html")
         self.assertIn('data-allow-repeat-dates="true"', html)
+        self.assertIn(
+            'class="cv-date-picker travel-period-filter travel-period-filter--filled"',
+            html,
+        )
+        self.assertIn('class="travel-period-filter__btn"', html)
+        self.assertNotIn("cv-btn--secondary", html)
 
     def test_calendar_grid_uses_an_integer_uniform_gap(self):
         css_path = (
