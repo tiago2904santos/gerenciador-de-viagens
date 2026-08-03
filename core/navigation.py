@@ -58,9 +58,16 @@ NAVIGATION_ITEMS = [
             {"id": "configuracao", "label": "Configurações", "url_name": "cadastros:configuracao", "active_when": ["cadastros:configuracao"]},
             {
                 "id": "usuarios",
-                "label": "Usuários e áreas",
+                "label": "Usuários",
                 "url_name": "usuarios:index",
-                "active_when": ["usuarios:"],
+                "active_when": ["usuarios:index", "usuarios:usuario_", "usuarios:vinculo_"],
+                "staff_only": True,
+            },
+            {
+                "id": "areas",
+                "label": "Áreas",
+                "url_name": "usuarios:areas_index",
+                "active_when": ["usuarios:areas_index", "usuarios:area_"],
                 "staff_only": True,
             },
         ],

@@ -1,23 +1,13 @@
-{% extends "components/page/flow_base.html" %}
-{% load static %}
+{% extends "base.html" %}
+{% block title %}Usuários{% endblock %}
+{% block content %}
+  {% include "components/lists/list_page_standard.html" with eyebrow="Administração" title=page_title search_placeholder="Buscar por nome, usuário, e-mail ou área" search_aria_label="Buscar usuários" tabs_aria_label=tabs_aria_label band_tabs_template="components/lists/list_toggle.html" action_label="Novo usuário" action_url=novo_usuario_url action_aria_label="Cadastrar usuário" empty_message="Nenhum usuário encontrado." empty_action_label="Novo usuário" empty_action_url=novo_usuario_url rows=rows q=q disable_realtime_filter=True hide_realtime_count=True %}
 
-{% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/usuarios.css' %}">
-{% endblock %}
-
-{% block flow_shell_modifier %}page-shell--standard cv-page--form{% endblock %}
-{% block flow_shell_extra %} document-form-page usuarios-admin-page{% endblock %}
-
-{% block flow_body %}
-  <div class="cv-form-section-stack cv-form-section-stack--comfortable" data-travel-document-wizard-step1>
-    <section class="cv-metric-grid cv-metric-grid--3" aria-label="Resumo administrativo">
-      {% include "components/cards/summary_card.html" with label="Áreas" value=total_areas description="Unidades de trabalho" only %}
-      {% include "components/cards/summary_card.html" with label="Usuários" value=total_usuarios description="Contas cadastradas" only %}
-      {% include "components/cards/summary_card.html" with label="Vínculos" value=total_vinculos description="Acessos concedidos" only %}
-    </section>
-
-    {% include "components/form/card.html" with title="Cadastros e acessos" description="Usuários, áreas e vínculos." title_id="admin-card-cadastros-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="usuarios/partials/_admin_cadastros_body.html" %}
-
-    {% include "components/form/card.html" with title="Conferência de acessos" description="Áreas cadastradas e permissões." title_id="admin-card-conferencia-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="usuarios/partials/_admin_conferencia_body.html" %}
-  </div>
+  {% comment %}
+    Segunda ação da página: dar a uma conta que já existe acesso a outra área.
+    Fica fora do include porque `list_page_standard` só tem o slot da ação
+    principal; `.cv-floating-action` é `position: fixed`, então o lugar no DOM
+    não muda onde ela aparece.
+  {% endcomment %}
+  {% include "components/ui/buttons/floating_action.html" with href=vincular_url label="Vincular usuário" icon="link" variant="secondary" aria_label="Vincular usuário existente a uma área" extra_class="cv-floating-action--stacked" only %}
 {% endblock %}

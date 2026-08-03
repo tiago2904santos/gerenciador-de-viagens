@@ -4,7 +4,7 @@
    Substitui progressivamente: cv-summary-item/label/value, cv-summary-tile,
    pt-resumo-box.
    Aliases via seletores agrupados; overrides contextuais permanecem nos
-   CSS de módulo (roteiros, planos-trabalho, usuarios.css).
+   CSS de módulo (roteiros, planos-trabalho).
    ======================================================================== */
 
 /* Grid de métricas */

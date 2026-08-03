@@ -1197,6 +1197,23 @@ html[data-theme="light"] {
   }
 }
 
+/* Segunda ação flutuante na mesma página (ex.: "Vincular usuário" acima de
+   "Novo usuário") — empilha em vez de sobrepor.
+
+   Precisa ficar DEPOIS da base deste arquivo: `page-shell.css` também declara
+   `.cv-floating-action { bottom }` e, no bundle, este arquivo é o último a
+   falar sobre a propriedade. Enquanto o modificador morou lá, ele era vencido
+   pela base daqui e as duas ações caíam uma em cima da outra (NOVO-23). */
+.cv-floating-action--stacked {
+  bottom: calc(var(--space-6) + var(--control-height-md) + var(--space-3));
+}
+
+@media (max-width: 640px) {
+  .cv-floating-action--stacked {
+    bottom: calc(var(--space-4) + var(--control-height-md) + var(--space-3));
+  }
+}
+
 /* Add — ação de adição com plus */
 .cv-footer-action--add {
   background: var(--cv-btn-footer-bg);
