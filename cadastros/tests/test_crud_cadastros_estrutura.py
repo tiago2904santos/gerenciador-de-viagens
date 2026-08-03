@@ -8,6 +8,7 @@ from django.urls import reverse
 
 from cadastros.models import Cargo
 from cadastros.models import Combustivel
+from cadastros.models import ConfiguracaoSistema
 from cadastros.models import Servidor
 from cadastros.models import Unidade
 from cadastros.models import Viatura
@@ -422,6 +423,80 @@ class ViaturaCrudTests(TestCase):
         self.assertRedirects(response, reverse("cadastros:viaturas_index"))
         viatura.refresh_from_db()
         self.assertEqual(viatura.status, Viatura.STATUS_COMPLETO)
+
+    def test_viaturas_index_filtra_unidade_config_e_top_combustiveis(self):
+        unidade = Unidade.objects.create(nome="Assessoria", sigla="ASCOM")
+        outra = Unidade.objects.create(nome="Outra", sigla="OUT")
+        cfg = ConfiguracaoSistema.get_singleton()
+        cfg.unidade = unidade
+        cfg.save(update_fields=["unidade"])
+
+        flex = Combustivel.objects.create(nome="FLEX")
+        diesel = Combustivel.objects.create(nome="DIESEL")
+        etanol = Combustivel.objects.create(nome="ETANOL")
+        Combustivel.objects.create(nome="GNV")
+
+        for i in range(5):
+            Viatura.objects.create(
+                placa=f"FLX{i:04d}",
+                modelo="Duster",
+                combustivel=flex,
+                tipo=Viatura.TIPO_DESCARACTERIZADA,
+                unidade=unidade,
+            )
+        for i in range(3):
+            Viatura.objects.create(
+                placa=f"DSL{i:04d}",
+                modelo="S10",
+                combustivel=diesel,
+                tipo=Viatura.TIPO_DESCARACTERIZADA,
+                unidade=unidade,
+            )
+        for i in range(2):
+            Viatura.objects.create(
+                placa=f"ETA{i:04d}",
+                modelo="Onix",
+                combustivel=etanol,
+                tipo=Viatura.TIPO_CARACTERIZADA,
+                unidade=outra,
+            )
+        Viatura.objects.create(
+            placa="GNV0000",
+            modelo="Uno",
+            combustivel=Combustivel.objects.get(nome="GNV"),
+            tipo=Viatura.TIPO_CARACTERIZADA,
+            unidade=outra,
+        )
+
+        response = self.client.get(reverse("cadastros:viaturas_index"))
+        self.assertEqual(response.status_code, 200)
+        abas = response.context["abas"]
+        self.assertEqual(
+            [aba["label"] for aba in abas],
+            ["Todos", "ASCOM", "FLEX", "DIESEL", "ETANOL"],
+        )
+        self.assertEqual(abas[0]["count"], 11)
+        self.assertNotIn("GNV", [aba["label"] for aba in abas])
+        self.assertContains(response, 'class="cv-list-tabs"')
+
+        por_unidade = self.client.get(reverse("cadastros:viaturas_index"), {"unidade": unidade.pk})
+        self.assertEqual(len(por_unidade.context["rows"]), 8)
+        self.assertTrue(
+            any(aba["is_active"] and aba["key"] == f"unidade-{unidade.pk}" for aba in por_unidade.context["abas"])
+        )
+        self.assertContains(por_unidade, f'name="unidade" value="{unidade.pk}"')
+
+        por_combustivel = self.client.get(
+            reverse("cadastros:viaturas_index"), {"combustivel": flex.pk}
+        )
+        self.assertEqual(len(por_combustivel.context["rows"]), 5)
+        self.assertTrue(
+            any(
+                aba["is_active"] and aba["key"] == f"combustivel-{flex.pk}"
+                for aba in por_combustivel.context["abas"]
+            )
+        )
+        self.assertContains(por_combustivel, f'name="combustivel" value="{flex.pk}"')
 
 
 @override_settings(ALLOWED_HOSTS=["testserver", "localhost"])

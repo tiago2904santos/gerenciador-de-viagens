@@ -41,8 +41,12 @@ from .presenters import apresentar_linha_lista_simples_cidade
 from .presenters import apresentar_linha_lista_simples_servidor
 from .presenters import apresentar_linha_lista_simples_viatura
 from .selectors import cargos_mais_frequentes_servidores
+from .selectors import combustiveis_mais_frequentes_viaturas
 from .selectors import get_cargo_by_id
+from .selectors import get_combustivel_by_id
+from .selectors import get_configuracao_sistema
 from .selectors import get_servidor_by_id
+from .selectors import get_unidade_by_id
 from .selectors import get_viatura_by_id
 from .selectors import listar_cidades
 from .selectors import listar_servidores
@@ -377,7 +381,11 @@ def servidor_delete(request, pk):
 
 def viaturas_index(request):
     q = request.GET.get("q", "").strip()
-    viaturas = listar_viaturas(q=q)
+    combustivel_id = _viatura_combustivel_id(request)
+    unidade_id = None if combustivel_id else _viatura_unidade_id(request)
+    unidade_cfg = _unidade_da_configuracao()
+    top_combustiveis = combustiveis_mais_frequentes_viaturas(limit=3)
+    viaturas = listar_viaturas(q=q, combustivel_id=combustivel_id, unidade_id=unidade_id)
     paginator = Paginator(viaturas, CADASTROS_PER_PAGE)
     page_obj = paginator.get_page(request.GET.get("page"))
     rows = [
@@ -389,6 +397,20 @@ def viaturas_index(request):
         )
         for viatura in page_obj.object_list
     ]
+    page_params = {}
+    if q:
+        page_params["q"] = q
+    if combustivel_id:
+        page_params["combustivel"] = combustivel_id
+    elif unidade_id:
+        page_params["unidade"] = unidade_id
+    abas = _build_viatura_filtro_abas(
+        combustivel_atual=combustivel_id,
+        unidade_atual=unidade_id,
+        unidade_cfg=unidade_cfg,
+        top_combustiveis=top_combustiveis,
+        q=q,
+    )
     return _render_listagem(
         request,
         "cadastros/viaturas/index.html",
@@ -399,9 +421,88 @@ def viaturas_index(request):
             "q": q,
             "page_obj": page_obj,
             "pagination_pages": _pagination_pages(page_obj),
-            "page_querystring": urlencode({"q": q}) if q else "",
+            "page_querystring": urlencode(page_params) if page_params else "",
+            "abas": abas,
+            "tabs_aria_label": "Filtrar viaturas por unidade ou combustível",
+            "combustivel_filter": combustivel_id or "",
+            "unidade_filter": unidade_id or "",
         },
     )
+
+
+def _unidade_da_configuracao():
+    cfg = get_configuracao_sistema()
+    if not cfg or not cfg.unidade_id:
+        return None
+    return cfg.unidade
+
+
+def _viatura_combustivel_id(request):
+    raw = (request.GET.get("combustivel") or "").strip()
+    if not raw.isdigit():
+        return None
+    try:
+        return get_combustivel_by_id(int(raw)).pk
+    except Http404:
+        return None
+
+
+def _viatura_unidade_id(request):
+    raw = (request.GET.get("unidade") or "").strip()
+    if not raw.isdigit():
+        return None
+    try:
+        return get_unidade_by_id(int(raw)).pk
+    except Http404:
+        return None
+
+
+def _build_viatura_filtro_abas(*, combustivel_atual, unidade_atual, unidade_cfg, top_combustiveis, q):
+    """Abas Todos + unidade da config + top combustíveis."""
+    if not unidade_cfg and not top_combustiveis:
+        return None
+
+    index_url = reverse("cadastros:viaturas_index")
+    preserved = [("q", q)] if q else []
+
+    def _url(**extra):
+        params = list(preserved)
+        params.extend((k, v) for k, v in extra.items() if v)
+        query = urlencode(params)
+        return f"{index_url}?{query}" if query else index_url
+
+    base_qs = listar_viaturas(q=q)
+    abas = [
+        {
+            "key": "",
+            "label": "Todos",
+            "count": base_qs.count(),
+            "url": _url(),
+            "is_active": combustivel_atual is None and unidade_atual is None,
+        }
+    ]
+    if unidade_cfg:
+        label = (unidade_cfg.sigla or unidade_cfg.nome or "Unidade").strip()
+        abas.append(
+            {
+                "key": f"unidade-{unidade_cfg.pk}",
+                "label": label,
+                "count": base_qs.filter(unidade_id=unidade_cfg.pk).count(),
+                "url": _url(unidade=unidade_cfg.pk),
+                "is_active": unidade_atual == unidade_cfg.pk,
+            }
+        )
+    for combustivel in top_combustiveis:
+        abas.append(
+            {
+                "key": f"combustivel-{combustivel.pk}",
+                "label": combustivel.nome,
+                "count": base_qs.filter(combustivel_id=combustivel.pk).count(),
+                "url": _url(combustivel=combustivel.pk),
+                "is_active": combustivel_atual == combustivel.pk,
+            }
+        )
+    return abas
 
 
 def viatura_create(request):
