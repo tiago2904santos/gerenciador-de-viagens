@@ -5268,8 +5268,17 @@ html[data-theme="dark"] *::after {
 }
 
 :is(html[data-theme="dark"])
+  .cv-collection-panel {
+  --step1-panel: var(--color-surface-soft);
+  --step1-field: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
+  background: var(--step1-panel);
+  border: 0;
+  box-shadow: none;
+}
+
+:is(html[data-theme="dark"])
   .cv-record-row {
-  background: var(--color-input-bg, var(--step1-field, var(--color-surface-muted)));
+  background: var(--step1-field, var(--color-input-bg, var(--color-surface-muted)));
   border: 0;
   box-shadow: none;
 }
@@ -5278,7 +5287,7 @@ html[data-theme="dark"] *::after {
   .cv-record-row:hover,
 :is(html[data-theme="dark"])
   .cv-record-row:focus-within {
-  background: var(--color-input-bg, var(--step1-field, var(--color-surface-muted)));
+  background: var(--step1-field, var(--color-input-bg, var(--color-surface-muted)));
   border: 0;
   box-shadow: none;
 }

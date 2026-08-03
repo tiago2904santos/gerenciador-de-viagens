@@ -72,9 +72,11 @@
     {% endif %}
   </div>
 
-  <div class="list-panel">
-    {% include "components/ui/lists/pagination.html" %}
-    {% include "components/lists/simple_list.html" with rows=rows empty_message=empty_message hide_realtime_count=hide_realtime_count %}
+  <div class="cv-collection-panel">
+    <div class="list-panel">
+      {% include "components/ui/lists/pagination.html" %}
+      {% include "components/lists/simple_list.html" with rows=rows empty_message=empty_message hide_realtime_count=hide_realtime_count %}
+    </div>
   </div>
 
   {% if delete_modal_enabled %}

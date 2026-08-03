@@ -7,9 +7,28 @@
   min-width: 0;
 }
 
+/* Painel intermediário — mesmo tom --step1-panel dos formulários. */
+.cv-collection-panel {
+  --step1-panel: var(--color-surface-soft, var(--color-card-soft));
+  --step1-field: var(--color-input-bg, var(--color-surface-muted, var(--color-card-muted)));
+  background: var(--step1-panel);
+  border: 0;
+  border-radius: 14px;
+  box-shadow: none;
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px;
+}
+
+.cv-collection-panel > .list-toolbar {
+  margin: 0;
+  padding: 0;
+}
+
 .cv-record-row {
   align-items: center;
-  background: var(--color-input-bg, var(--color-surface-muted, var(--color-card-muted)));
+  background: var(--step1-field, var(--color-input-bg, var(--color-surface-muted, var(--color-card-muted))));
   border: 0;
   border-radius: 10px;
   box-shadow: none;
@@ -23,7 +42,7 @@
 
 .cv-record-row:hover,
 .cv-record-row:focus-within {
-  background: var(--color-input-bg, var(--color-surface-muted, var(--color-card-muted)));
+  background: var(--step1-field, var(--color-input-bg, var(--color-surface-muted, var(--color-card-muted))));
   border: 0;
   box-shadow: none;
 }
@@ -149,14 +168,15 @@
   margin: 0;
 }
 
-/* When this canonical list sits inside a standard list panel, the panel's own
-   slab (background/border/shadow) doubles up behind the cards and they stop
-   reading as floating. Drop the slab so the cards float on the page surface. */
-.list-panel:has(> .cv-record-list) {
+/* When this canonical list sits inside a list/collection panel, drop the
+   panel slab so field wells sit on --step1-panel. */
+.list-panel:has(> .cv-record-list),
+.cv-collection-panel > .list-panel {
   background: transparent;
   border: 0;
   border-radius: 0;
   box-shadow: none;
+  padding: 0;
 }
 
 @media (max-width: 720px) {

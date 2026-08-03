@@ -25,12 +25,18 @@
 }
 
 .page-shell--list > .list-toolbar,
-.cv-page--collection > .list-toolbar {
+.cv-page--collection > .list-toolbar,
+.cv-collection-panel > .list-toolbar {
   background: transparent;
   border: 0;
   box-shadow: none;
   margin-top: calc(-1 * var(--space-1, 4px));
   padding: var(--space-3, 12px) 0 var(--space-1, 4px);
+}
+
+.cv-collection-panel > .list-toolbar {
+  margin-top: 0;
+  padding: 0;
 }
 
 .list-toolbar .cv-list-tabs {
