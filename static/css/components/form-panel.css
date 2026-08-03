@@ -1,12 +1,12 @@
 /* Canonical structure for compact CRUD forms. Theme appearance is defined globally. */
 
-.main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--quick-add) {
+.main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--inline-create) {
   display: grid;
   gap: 0;
   overflow: hidden;
 }
 
-.main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--quick-add) > .form-section {
+.main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--inline-create) > .form-section {
   border: 0;
   display: grid;
   gap: 0;

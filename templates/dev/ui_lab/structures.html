@@ -14,12 +14,12 @@
     </div>
 
     <div class="ui-lab-stack">
-      <article class="ui-lab-preview-card ui-lab-structure-quick-add">
+      <article class="ui-lab-preview-card ui-lab-structure-inline-create">
         <div class="ui-lab-preview-card__header">
           <span class="ui-lab-preview-card__label">Quick Add Inline</span>
           <span class="ui-lab-status-pill ui-lab-status-pill--review">Em revisão</span>
         </div>
-        <div class="page-header-stack header-stack--quick-add">
+        <div class="page-header-stack header-stack--inline-create">
           <div class="page-header-band">
             <div class="page-header-band__content">
               <div class="page-header-band__text">
@@ -28,7 +28,7 @@
               </div>
             </div>
           </div>
-          <div class="page-header-rail page-header-rail--filters page-header-rail--filters-quick-add ui-lab-structure-quick-add__rail">
+          <div class="page-header-rail page-header-rail--filters page-header-rail--filters-inline-create ui-lab-structure-inline-create__rail">
             <div class="page-header-rail__marker" aria-hidden="true">TP</div>
             <div class="header-filter-bar">
               <div class="header-filter-bar__search">
@@ -38,24 +38,24 @@
             <div class="page-header-rail__actions">
               {% include "components/ui/buttons/button.html" with label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" only %}
             </div>
-            <div class="quick-add-inline__panel quick-add-panel" id="ui-lab-structure-quick-add" hidden>
-              <div class="quick-add-inline__body">
-                <div class="quick-add-inline__fields">
+            <div class="cv-inline-create__panel cv-inline-create__panel" id="ui-lab-structure-inline-create" hidden>
+              <div class="cv-inline-create__body">
+                <div class="cv-inline-create__fields">
                   <div class="field-grid">
                     {% for field in ui_lab_fields.quick_add_structure %}
                       {% include "dev/ui_lab/partials/_demo_field.html" with field=field only %}
                     {% endfor %}
                   </div>
                 </div>
-                <div class="quick-add-inline__actions">
+                <div class="cv-inline-create__actions">
                   <button class="cv-btn cv-btn--primary" type="button">Salvar</button>
                 </div>
               </div>
             </div>
           </div>
-          <button class="quick-add-footer-button" type="button" data-quick-add-toggle="ui-lab-structure-quick-add" aria-controls="ui-lab-structure-quick-add" aria-expanded="false">
-            <span class="quick-add-footer-button__icon" aria-hidden="true">+</span>
-            <span class="quick-add-footer-button__label">Cadastrar item</span>
+          <button class="cv-inline-create__toggle" type="button" data-inline-create-toggle="ui-lab-structure-inline-create" aria-controls="ui-lab-structure-inline-create" aria-expanded="false">
+            <span class="cv-inline-create__toggle-icon" aria-hidden="true">+</span>
+            <span class="cv-inline-create__toggle-label">Cadastrar item</span>
           </button>
         </div>
       </article>

@@ -8,7 +8,7 @@
      {% if link_target %}target="{{ link_target }}"{% endif %}
      {% if link_rel %}rel="{{ link_rel }}"{% endif %}
      {% if data_autosave_link %}data-autosave-link="1"{% endif %}
-     {% if data_quick_add_close %}data-quick-add-close{% endif %}
+     {% if data_inline_create_close or data_quick_add_close %}data-inline-create-close{% endif %}
      {% if data_cv_filter_clear %}data-collection-clear{% endif %}
      {% if data_delete_modal_cancel or data_cancel_modal_cancel or data_confirm_action_cancel %}data-overlay-close{% endif %}
      {% if data_attach_signed_cancel %}data-attach-signed-cancel{% endif %}
@@ -33,7 +33,7 @@
           {% if disabled or loading %}disabled{% endif %}
           {% if loading %}aria-busy="true"{% endif %}
           {% if data_autosave_link %}data-autosave-link="1"{% endif %}
-          {% if data_quick_add_close %}data-quick-add-close{% endif %}
+          {% if data_inline_create_close or data_quick_add_close %}data-inline-create-close{% endif %}
           {% if data_cv_filter_clear %}data-collection-clear{% endif %}
           {% if data_delete_modal_cancel or data_cancel_modal_cancel or data_confirm_action_cancel %}data-overlay-close{% endif %}
      {% if data_attach_signed_cancel %}data-attach-signed-cancel{% endif %}

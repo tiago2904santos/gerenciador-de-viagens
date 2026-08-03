@@ -707,6 +707,7 @@ perde o prazo e a Etapa 2 perde a rede.
 
 | Proposta | Estimativa | Situação |
 |---|---:|---|
+| Reescrita visual Administração (Cadastros + Usuários) | 4 PRs | Em curso: PR1 inline-create/D-53 ✅ no branch; PR2–4 pendentes |
 | [Arquitetura de configurações](PROPOSTA_CONFIGURACOES.md) — tela por seções declaradas, config por documento, preferências por usuário | 17–28 dias | **aguardando decisão** de posição na fila |
 
 ---

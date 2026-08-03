@@ -330,7 +330,7 @@ Numerados para rastreio. Severidade: 🔴 crítico (quebra a leitura) · 🟠 al
 | D-50 | 🟠 | **Botões** | `.cv-btn` (vivo) · `.btn`/`.btn-primary`/`.btn-*` (morto) · `.app-btn`/`.app-btn--*` (morto) · `.btn--document-*` (morto) · `.cv-icon-btn` (vivo) |
 | D-51 | 🟠 | **Alertas/banners** | `.alert`/`.alert-*` (utilities) · `.cv-alert`/`.cv-alert--*` (page-shell) · `.diario-diaria-alert` (RT) · `.pte-events__banner` (PT) |
 | D-52 | 🟠 | **Cards de lista** | `.cv-entity-card` + `.oficio-lc__*` (vivo, 6 módulos) · `.roteiro-list-card__*` (599 linhas, morto em produção) · `.evento-lc__*` (2 regras) · `.cv-document-card` (sem cor) |
-| D-53 | 🟠 | **Cabeçalho de lista** | `filter_page_header.html` (canônico) · markup inline duplicado em `list_page_quick_add.html:3-11` |
+| D-53 | ✅ | **Cabeçalho de lista** | `filter_page_header.html` + `_list_header_band.html` compartilhados; `list_page_quick_add` usa a banda canônica; classes `cv-inline-create__*` |
 | D-54 | 🟠 | **Confirmação de exclusão** | modal JS `delete_confirm_modal.html` (listas de cards) · página inteira `confirm_delete.html` (12 páginas de catálogo) — e a página usa `.cv-confirm-page*`, **sem CSS**, caindo em `.form-section`/`.section-header` legados |
 | D-55 | 🟡 | **Resumo/estatística** | `cv-summary-item/-label/-value` (summary-items.css) · `cv-summary-tile` (content-cards.css) · `pt-resumo-box` (dentro de content-cards.css!) · `admin-overview__stats` com `<dl>` (usuarios) |
 | D-56 | 🟡 | **Grid de campos** | `.field-grid` + `.field-size-1..4` (padrão) · `.field-grid--cols-2/3/4` (segundo padrão) · `.field-grid-rows` (terceiro) |
@@ -488,7 +488,7 @@ Legenda: **✅ conforme** · **⚠️ desvio** · **❌ fora do padrão**
 | `list-header` (CSS) | `components/list-header.css` (762) | ⚠️ contém também o `filter-pill` do date picker e o Quick Add inteiro — três responsabilidades. Consome `--cv-card-family-bg`, definido só em `dark-redesign.css:126`. |
 | `list_tabs` | `components/lists/list_tabs.html` | ✅ ok. `.cv-list-tab__label` sem CSS. |
 | `filter-header.css` | `components/filter-header.css` (18) | ❌ "compat residual", 3 regras — absorver e apagar. |
-| Quick Add | `list_page_quick_add.html` | ❌ duplica o markup do `filter_page_header` (linhas 3-11) em vez de incluí-lo (D-53). |
+| Quick Add / inline create | `list_page_quick_add.html` | ✅ banda canônica `_list_header_band.html` (D-53); classes `cv-inline-create__*` |
 
 ### 6.3 Cards de lista
 

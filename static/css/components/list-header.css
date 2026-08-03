@@ -79,7 +79,7 @@
 }
 
 .list-header__rail--advanced,
-.list-header__rail--quick-add {
+.list-header__rail--inline-create {
   gap: var(--space-3);
 }
 
@@ -281,12 +281,12 @@
    Quick Add — barra de largura total modernizada
    ========================================================= */
 
-.list-header--quick-add .list-header__rail--quick-add {
+.list-header--inline-create .list-header__rail--inline-create {
   border-bottom: 0;
   flex-direction: column;
 }
 
-.list-header .quick-add-panel {
+.list-header .cv-inline-create__panel {
   background: transparent;
   border: 0;
   border-radius: 0;
@@ -305,7 +305,7 @@
   width: 100%;
 }
 
-.list-header .quick-add-panel.is-open {
+.list-header .cv-inline-create__panel.is-open {
   border-top: 1px solid var(--border-filter-bar);
   max-height: 640px;
   opacity: 1;
@@ -318,7 +318,7 @@
  * Textareas mantêm sua altura própria; selects e controles customizados
  * preservam o comportamento nativo, alterando apenas a camada visual.
  */
-.list-header--quick-add .quick-add-panel
+.list-header--inline-create .cv-inline-create__panel
   :is(
     .form-control,
     .form-select,
@@ -326,17 +326,27 @@
     .cv-custom-select__trigger,
     .cv-search-picker__control,
     .cv-search-picker__input
-  ) {
-  background: var(--list-header-control-bg);
+  ),
+.list-header--inline-create .cv-inline-create__panel
+  :is(
+    .form-control,
+    .form-select,
+    .cv-field__control,
+    .cv-custom-select__trigger,
+    .cv-search-picker__control,
+    .cv-search-picker__input
+  ):is(:hover, :focus, :focus-within, :focus-visible) {
+  background: var(--step1-field, var(--list-header-control-bg, var(--color-input-bg)));
   border: 0;
   border-radius: var(--radius-control);
   box-shadow: none;
   box-sizing: border-box;
   color: var(--color-filter-text);
   font-size: var(--font-size-sm);
+  transition: none;
 }
 
-.list-header--quick-add .quick-add-panel
+.list-header--inline-create .cv-inline-create__panel
   :is(
     input.form-control,
     select.form-control,
@@ -350,34 +360,34 @@
   min-height: var(--list-header-control-height);
 }
 
-.list-header--quick-add .quick-add-panel
+.list-header--inline-create .cv-inline-create__panel
   :is(.form-control, .form-select, .cv-field__control, .cv-search-picker__input)::placeholder {
   color: var(--color-filter-placeholder);
   opacity: 1;
 }
 
-.list-header--quick-add .quick-add-panel
+.list-header--inline-create .cv-inline-create__panel
   :is(
     .form-control,
     .form-select,
     .cv-field__control,
     .cv-custom-select__trigger
   ):focus,
-.list-header--quick-add .quick-add-panel
+.list-header--inline-create .cv-inline-create__panel
   :is(
     .form-control,
     .form-select,
     .cv-field__control,
     .cv-custom-select__trigger
   ):focus-visible,
-.list-header--quick-add .quick-add-panel
+.list-header--inline-create .cv-inline-create__panel
   .cv-search-picker__control:focus-within {
   border: 0;
   box-shadow: none;
   outline: none;
 }
 
-.list-header--quick-add .quick-add-panel
+.list-header--inline-create .cv-inline-create__panel
   :is(
     .form-control,
     .form-select,
@@ -385,7 +395,7 @@
     .cv-custom-select__trigger,
     .cv-search-picker__control
   ):is(.is-invalid, [aria-invalid="true"]),
-.list-header--quick-add .quick-add-panel
+.list-header--inline-create .cv-inline-create__panel
   :is(.app-form-field, .cv-field):has(.field-error)
   :is(
     .form-control,
@@ -398,7 +408,7 @@
 }
 
 
-.list-header .quick-add-inline__body {
+.list-header .cv-inline-create__body {
   align-items: flex-end;
   display: flex;
   flex-wrap: wrap;
@@ -406,21 +416,21 @@
   width: 100%;
 }
 
-.list-header .quick-add-inline__fields {
+.list-header .cv-inline-create__fields {
   flex: 1 1 16rem;
   min-width: 0;
 }
 
-.list-header .quick-add-inline__actions {
+.list-header .cv-inline-create__actions {
   flex-shrink: 0;
   margin-left: auto;
 }
 
-.list-header--quick-add-compact .quick-add-inline__body {
+.list-header--inline-create-compact .cv-inline-create__body {
   padding: 0;
 }
 
-.list-header .quick-add-footer-button {
+.list-header .cv-inline-create__toggle {
   align-items: center;
   appearance: none;
   background: var(--cv-card-family-bg);
@@ -446,35 +456,35 @@
   width: 100%;
 }
 
-.list-header .quick-add-footer-button:hover {
+.list-header .cv-inline-create__toggle:hover {
   background: color-mix(in srgb, var(--color-primary-soft) 70%, var(--color-white));
 }
 
-.list-header .quick-add-footer-button:focus-visible {
+.list-header .cv-inline-create__toggle:focus-visible {
   outline: 2px solid var(--border-focus);
   outline-offset: -2px;
 }
 
-.list-header .quick-add-footer-button.is-active,
-.list-header .quick-add-footer-button[aria-expanded="true"] {
+.list-header .cv-inline-create__toggle.is-active,
+.list-header .cv-inline-create__toggle[aria-expanded="true"] {
   background: color-mix(in srgb, var(--color-primary-soft) 55%, var(--color-white));
   box-shadow: none;
 }
 
-.list-header .quick-add-footer-button.is-filled {
-  animation: list-header-quick-add-fill 0.35s ease forwards;
+.list-header .cv-inline-create__toggle.is-filled {
+  animation: list-header-inline-create-fill 0.35s ease forwards;
   background: var(--cv-btn-primary-bg);
   border-color: var(--cv-btn-primary-border);
   box-shadow: var(--shadow-sm);
   color: var(--cv-btn-primary-color);
 }
 
-.list-header .quick-add-footer-button.is-filled:hover {
+.list-header .cv-inline-create__toggle.is-filled:hover {
   background: var(--cv-btn-primary-hover-bg);
   border-color: var(--cv-btn-primary-hover-border);
 }
 
-@keyframes list-header-quick-add-fill {
+@keyframes list-header-inline-create-fill {
   from {
     background: color-mix(in srgb, var(--color-primary-soft) 55%, var(--color-white));
     box-shadow: none;
@@ -482,7 +492,7 @@
   }
 }
 
-.list-header .quick-add-footer-button__icon {
+.list-header .cv-inline-create__toggle-icon {
   align-items: center;
   background: color-mix(in srgb, var(--color-primary) 12%, transparent);
   border-radius: 999px;
@@ -497,12 +507,12 @@
   width: 26px;
 }
 
-.list-header .quick-add-footer-button.is-filled .quick-add-footer-button__icon {
+.list-header .cv-inline-create__toggle.is-filled .cv-inline-create__toggle-icon {
   background: color-mix(in srgb, var(--color-white) 18%, transparent);
   color: inherit;
 }
 
-.list-header .quick-add-footer-button__label {
+.list-header .cv-inline-create__toggle-label {
   font-weight: var(--font-weight-bold);
 }
 
@@ -625,42 +635,42 @@
 }
 
 :is(html[data-theme="dark"])
-  .list-header .quick-add-footer-button {
+  .list-header .cv-inline-create__toggle {
   background: var(--cv-card-family-bg);
   border-top-color: var(--border-filter-bar);
   color: var(--theme-text-body);
 }
 
 :is(html[data-theme="dark"])
-  .list-header .quick-add-footer-button:hover,
+  .list-header .cv-inline-create__toggle:hover,
 :is(html[data-theme="dark"])
-  .list-header .quick-add-footer-button.is-active,
+  .list-header .cv-inline-create__toggle.is-active,
 :is(html[data-theme="dark"])
-  .list-header .quick-add-footer-button[aria-expanded="true"] {
+  .list-header .cv-inline-create__toggle[aria-expanded="true"] {
   background: color-mix(in srgb, var(--color-card-muted) 72%, var(--color-white) 10%);
 }
 
 :is(html[data-theme="dark"])
-  .list-header .quick-add-footer-button__icon {
+  .list-header .cv-inline-create__toggle-icon {
   background: color-mix(in srgb, var(--color-accent) 16%, transparent);
   color: var(--color-accent);
 }
 
 :is(html[data-theme="dark"])
-  .list-header .quick-add-footer-button.is-filled {
+  .list-header .cv-inline-create__toggle.is-filled {
   background: var(--cv-btn-primary-bg);
   border-color: var(--cv-btn-primary-border);
   color: var(--cv-btn-primary-color);
 }
 
 :is(html[data-theme="dark"])
-  .list-header .quick-add-footer-button.is-filled .quick-add-footer-button__icon {
+  .list-header .cv-inline-create__toggle.is-filled .cv-inline-create__toggle-icon {
   background: color-mix(in srgb, var(--color-white) 16%, transparent);
   color: inherit;
 }
 
 :is(html[data-theme="dark"])
-  .list-header .quick-add-panel.is-open {
+  .list-header .cv-inline-create__panel.is-open {
   border-top-color: var(--border-filter-bar);
 }
 

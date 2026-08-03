@@ -4933,7 +4933,7 @@ html[data-theme="dark"] *::after {
 }
 
 :is(html[data-theme="dark"])
-  .main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--quick-add) {
+  .main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--inline-create) {
   background: var(--cv-card-family-bg);
   border: 1px solid var(--cv-card-family-border);
   border-radius: 16px;
