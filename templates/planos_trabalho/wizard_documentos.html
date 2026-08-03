@@ -4,24 +4,13 @@
 {% block extra_css %}
   {{ block.super }}
   <link rel="stylesheet" href="{% static 'css/oficios-documentos-inline.css' %}">
-  <link rel="stylesheet" href="{% static 'css/planos-trabalho-eventos.css' %}">
+  <link rel="stylesheet" href="{% static 'css/planos-trabalho-eventos.css' %}?v=20260803-7">
 {% endblock %}
 
 {% block wizard_content %}
   {% if mostrar_pendencias %}
     {% include "components/ui/feedback/pendencias_card.html" with items=pendencias_documentos lead="Corrija os itens abaixo antes de finalizar o plano ou gerar DOCX/PDF." only %}
   {% endif %}
-
-  <div data-travel-document-wizard-documentos>
-    {% include "components/form/card.html" with title="Resumo e documentos" description="Confira, baixe e finalize o plano de trabalho gerado" title_id="pt-documentos-card-title" extra_class="oficio-documentos-unified-card oficio-documentos-card pt-form-card" body_extra_class="oficio-documentos-body" body_template="planos_trabalho/partials/_documentos_wizard_body.html" footer_template="planos_trabalho/partials/_documentos_preview_footer.html" %}
-  </div>
-
-  {# ── Resumo de cada evento (etapa de conferência) ────────────── #}
-  {% with rd=resumo_documentos %}
-    {% for ev in rd.eventos %}
-      {% include "planos_trabalho/partials/resumo_evento_card.html" with ev=ev numero=rd.numero coordenador_adm_nome=rd.coordenador_adm_nome coordenador_adm_cargo=rd.coordenador_adm_cargo is_multi=rd.is_multi total_eventos=rd.total_eventos mostrar_acoes=False only %}
-    {% endfor %}
-  {% endwith %}
 
   {# ── Adicionar outro evento ao plano ─────────────────────────── #}
   <section class="cv-form-section-card pt-add-evento">
@@ -34,11 +23,18 @@
       </div>
       {# formaction: o botão está dentro do <form> do wizard (sem forms aninhados). #}
       <button type="submit" formmethod="post" formaction="{{ evento_adicionar_url }}" formnovalidate
-              class="cv-btn cv-btn--secondary pt-add-evento__btn">
-        <span>+ Adicionar evento ao plano</span>
+              class="cv-btn cv-btn--primary pt-add-evento__btn">
+        <span>Adicionar evento ao plano</span>
+        <span class="cv-btn__icon" aria-hidden="true">
+          {% include "components/ui/icons/icon.html" with icon="arrow-right" only %}
+        </span>
       </button>
     </div>
   </section>
+
+  <div class="pt-documentos-stage" data-travel-document-wizard-documentos>
+    {% include "components/form/card.html" with title="Resumo e documentos" description="Confira, baixe e finalize o plano de trabalho gerado" title_id="pt-documentos-card-title" extra_class="oficio-documentos-unified-card oficio-documentos-card pt-form-card" body_extra_class="oficio-documentos-body" body_template="planos_trabalho/partials/_documentos_wizard_body.html" footer_template="planos_trabalho/partials/_documentos_preview_footer.html" %}
+  </div>
 {% endblock %}
 
 {% block extra_js %}

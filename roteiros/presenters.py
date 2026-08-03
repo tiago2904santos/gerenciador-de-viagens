@@ -230,10 +230,6 @@ def apresentar_roteiro_card(roteiro, *, todos_trechos=False):
             "Roteiro", titulo_rota, wide=True, value_class="cv-record-card__info-value--rota"
         )
     ]
-    if inicio_display:
-        header_items.append(entity_cards.header_item("Início", inicio_display))
-    if fim_display:
-        header_items.append(entity_cards.header_item("Fim", fim_display))
     header_chips = [entity_cards.chip(temporal_tone, temporal_label)] if temporal_label else []
 
     return {
@@ -249,8 +245,8 @@ def apresentar_roteiro_card(roteiro, *, todos_trechos=False):
         ),
         "title": titulo_rota,
         "rota_display": titulo_rota,
-        "inicio_display": _format_roteiro_dt(inicio_dt),
-        "fim_display": _format_roteiro_dt(fim_dt),
+        "inicio_display": inicio_display,
+        "fim_display": fim_display,
         "temporal_label": temporal_label,
         "temporal_tone": temporal_tone,
         "valor_diarias_display": diaria_moeda or "",

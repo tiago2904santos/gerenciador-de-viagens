@@ -307,9 +307,14 @@ def enfileirar_documento(
             payload,
             status=202 if job.status != DocumentoGeracao.STATUS_ERRO else 503,
         )
+    template_name = (
+        "documentos/geracao_aguarde_embedded.html"
+        if request.headers.get("Sec-Fetch-Dest") == "iframe"
+        else "documentos/geracao_aguarde.html"
+    )
     return render(
         request,
-        "documentos/geracao_aguarde.html",
+        template_name,
         {
             "page_title": "Preparando documento",
             "geracao": payload,

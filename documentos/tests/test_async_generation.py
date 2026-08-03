@@ -78,6 +78,24 @@ class DocumentoGeracaoHttpTests(TestCase):
         self.assertEqual(payload["status_url"], reverse("documentos:geracao_status", args=[job.pk]))
         self.assertNotIn("result_url", payload)
 
+    @mock.patch("documentos.tasks.gerar_documento_assincrono.delay")
+    @mock.patch(
+        "oficios.document_views.validar_oficio_para_documento",
+        return_value={"status": "complete", "pendencias": []},
+    )
+    def test_geracao_em_iframe_usa_tela_embutida_sem_shell(self, _validar, _delay):
+        url = reverse(
+            "oficios:baixar_documento",
+            args=[self.oficio.pk, "pdf"],
+        )
+
+        response = self.client.get(url, HTTP_SEC_FETCH_DEST="iframe")
+
+        self.assertEqual(response.status_code, 202)
+        self.assertTemplateUsed(response, "documentos/geracao_aguarde_embedded.html")
+        self.assertContains(response, "data-document-generation-wait", status_code=202)
+        self.assertNotContains(response, 'class="app-shell', status_code=202)
+
     def test_status_e_resultado_respeitam_area_do_request(self):
         job = DocumentoGeracao.objects.create(
             tipo="oficio",

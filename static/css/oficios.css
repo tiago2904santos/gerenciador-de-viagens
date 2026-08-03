@@ -3607,6 +3607,7 @@ html[data-theme="light"] .cv-person-row--highlight .cv-person-row__name {
   overflow: hidden;
   padding: var(--space-3) var(--space-4);
   max-height: none;
+  min-height: 170px;
 }
 
 .cv-fact-block__label {

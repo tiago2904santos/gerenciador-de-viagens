@@ -11546,7 +11546,7 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
 
 :is(html[data-theme="dark"])
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block--split > .route-destinos-block__rail {
-  align-self: center;
+  align-self: start;
   display: grid;
   gap: 4px;
   max-width: 14rem;
@@ -12372,7 +12372,7 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .cv-ordered-field-row__remove,
 :is(html[data-theme="dark"])
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-remove-button {
-  align-self: end;
+  align-self: center;
   border: 0 !important;
   border-radius: 10px !important;
   cursor: pointer;

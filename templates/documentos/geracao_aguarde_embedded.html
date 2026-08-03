@@ -1,0 +1,32 @@
+{% load static %}
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="{% static 'js/core/theme-shared.js' %}"></script>
+  <script src="{% static 'js/core/theme-init.js' %}"></script>
+  <title>Preparando documento</title>
+  <link rel="stylesheet" href="{% static 'css/shell.bundle.css' %}?v=20260803-5">
+  <link rel="stylesheet" href="{% static 'css/components/document-generation-embedded.css' %}?v=20260803-5">
+</head>
+<body class="document-generation-embedded">
+  <main
+    class="document-generation-embedded__panel"
+    data-document-generation-wait
+    data-status-url="{{ geracao.status_url }}"
+  >
+    <span class="document-generation-embedded__icon" aria-hidden="true">
+      {% include "components/ui/icons/icon.html" with icon="document" only %}
+    </span>
+    <span class="document-generation-embedded__spinner" aria-hidden="true"></span>
+    <p class="document-generation-embedded__eyebrow">Documento em preparação</p>
+    <h1>Gerando a prévia do plano</h1>
+    <p class="document-generation-embedded__message" data-document-generation-message>
+      Aguarde um instante. O documento será exibido aqui automaticamente.
+    </p>
+  </main>
+  <script src="{% static 'js/shell.bundle.js' %}" defer></script>
+  <script src="{% static 'js/components/document-generation-wait.js' %}" defer></script>
+</body>
+</html>
