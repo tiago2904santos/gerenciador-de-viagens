@@ -16023,7 +16023,9 @@ html[data-theme="dark"] *::after {
 
 /* Badge interna (Motorista, nº do ofício... ) mais contida. */
 :is(html[data-theme="dark"])
-  .cv-person-row__badge {
+  .cv-person-row__badge,
+:is(html[data-theme="dark"])
+  .cv-record-row__badge {
   box-shadow: none;
 }
 
