@@ -8397,6 +8397,10 @@ html[data-theme="dark"] #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete,
   padding: 0;
 }
 
+.cv-collection-panel > .list-panel > .pagination-shell {
+  padding-inline: 0;
+}
+
 @media (max-width: 720px) {
   .cv-record-row {
     align-items: start;
