@@ -124,11 +124,31 @@ def apresentar_viatura_card(viatura, edit_url="#", delete_url="#"):
     }
 
 
+def _initials(text, fallback="??"):
+    parts = [part for part in str(text or "").strip().split() if part]
+    if not parts:
+        return fallback
+    if len(parts) == 1:
+        return parts[0][:2].upper()
+    return f"{parts[0][0]}{parts[-1][0]}".upper()
+
+
+def _join_subtitle(*parts):
+    clean = [
+        str(part).strip()
+        for part in parts
+        if part is not None and str(part).strip() and str(part).strip() not in {"—", "-"}
+    ]
+    return " · ".join(clean)
+
+
 def apresentar_linha_lista_simples_cargo(cargo, edit_url="#", delete_url="#", set_default_url=None, delete_modal=False):
     row = {
-        "avatar": "CG",
+        "avatar": _initials(cargo.nome, "CG"),
         "title": cargo.nome,
         "badges": [],
+        "subtitle": "",
+        "facts": [],
         "meta": [],
         "edit_url": edit_url,
         "edit_fields_json": json.dumps({"nome": cargo.nome}, ensure_ascii=False),
@@ -144,9 +164,11 @@ def apresentar_linha_lista_simples_cargo(cargo, edit_url="#", delete_url="#", se
 
 def apresentar_linha_lista_simples_combustivel(combustivel, edit_url="#", delete_url="#", set_default_url=None, delete_modal=False):
     row = {
-        "avatar": "CB",
+        "avatar": _initials(combustivel.nome, "CB"),
         "title": combustivel.nome,
         "badges": [],
+        "subtitle": "",
+        "facts": [],
         "meta": [],
         "edit_url": edit_url,
         "edit_fields_json": json.dumps({"nome": combustivel.nome}, ensure_ascii=False),
@@ -161,12 +183,15 @@ def apresentar_linha_lista_simples_combustivel(combustivel, edit_url="#", delete
 
 
 def apresentar_linha_lista_simples_unidade(unidade, edit_url="#", delete_url="#", delete_modal=False):
+    sigla = unidade.sigla or "—"
     return {
-        "avatar": "UN",
+        "avatar": _initials(unidade.sigla or unidade.nome, "UN"),
         "title": unidade.nome,
         "badges": [],
+        "subtitle": sigla if sigla != "—" else "",
+        "facts": [],
         "meta": [
-            build_meta("Sigla", unidade.sigla or "—"),
+            build_meta("Sigla", sigla),
         ],
         "edit_url": edit_url,
         "edit_fields_json": json.dumps({"nome": unidade.nome, "sigla": unidade.sigla or ""}, ensure_ascii=False),
@@ -176,26 +201,36 @@ def apresentar_linha_lista_simples_unidade(unidade, edit_url="#", delete_url="#"
 
 
 def apresentar_linha_lista_simples_cidade(cidade):
+    facts = [
+        build_meta("IBGE", cidade.codigo_ibge or "—"),
+    ]
     return {
-        "avatar": "CI",
+        "avatar": _initials(cidade.nome, "CI"),
         "title": cidade.nome,
         "badges": [],
+        "subtitle": cidade.uf or "",
+        "facts": facts,
         "meta": [
             build_meta("UF", cidade.uf),
-            build_meta("IBGE", cidade.codigo_ibge or "—"),
+            *facts,
         ],
     }
 
 
 def apresentar_linha_lista_simples_estado(estado, edit_url="#", delete_url="#", delete_modal=False):
     cod = str(estado.codigo_ibge) if estado.codigo_ibge is not None else "—"
+    facts = [
+        build_meta("IBGE", cod),
+    ]
     return {
-        "avatar": "UF",
+        "avatar": (estado.sigla or "UF")[:2].upper(),
         "title": estado.nome,
         "badges": [],
+        "subtitle": estado.sigla or "",
+        "facts": facts,
         "meta": [
             build_meta("Sigla", estado.sigla),
-            build_meta("IBGE", cod),
+            *facts,
         ],
         "edit_url": edit_url,
         "edit_fields_json": json.dumps(
@@ -219,15 +254,20 @@ def apresentar_linha_lista_simples_servidor(servidor, edit_url="#", delete_url="
     badges = []
     if servidor.status == servidor.STATUS_RASCUNHO:
         badges.append(build_badge("Rascunho", "draft"))
+    facts = [
+        build_meta("CPF", _format_cpf(servidor.cpf)),
+        build_meta("RG", _format_rg(servidor.rg, sem_rg=servidor.sem_rg)),
+        build_meta("Telefone", _format_telefone(servidor.telefone)),
+    ]
     return {
-        "avatar": "SV",
+        "avatar": _initials(servidor.nome, "SV"),
         "title": servidor.nome,
         "badges": badges,
+        "subtitle": _join_subtitle(cargo_label, unidade_label),
+        "facts": facts,
         "meta": [
             build_meta("Cargo", cargo_label),
-            build_meta("CPF", _format_cpf(servidor.cpf)),
-            build_meta("RG", _format_rg(servidor.rg, sem_rg=servidor.sem_rg)),
-            build_meta("Telefone", _format_telefone(servidor.telefone)),
+            *facts,
             build_meta("Unidade", unidade_label),
         ],
         "edit_url": edit_url,
@@ -243,15 +283,25 @@ def apresentar_linha_lista_simples_viatura(viatura, edit_url="#", delete_url="#"
     badges = []
     if viatura.status == viatura.STATUS_RASCUNHO:
         badges.append(build_badge("Rascunho", "draft"))
+    unidade_label = _viatura_unidade_label(viatura)
+    combustivel = viatura.combustivel.nome if viatura.combustivel else "—"
+    tipo = viatura.get_tipo_display() if viatura.tipo else "—"
+    facts = [
+        build_meta("Placa", placa_fmt),
+        build_meta("Tipo", tipo),
+        build_meta("Motoristas", _motoristas_label(viatura)),
+    ]
     return {
-        "avatar": "VT",
+        "avatar": _initials(modelo or placa_fmt, "VT"),
         "title": title,
         "badges": badges,
+        "subtitle": _join_subtitle(unidade_label, combustivel),
+        "facts": facts,
         "meta": [
             build_meta("Placa", placa_fmt),
-            build_meta("Unidade", _viatura_unidade_label(viatura)),
-            build_meta("Combustível", viatura.combustivel.nome if viatura.combustivel else "—"),
-            build_meta("Tipo", viatura.get_tipo_display() if viatura.tipo else "—"),
+            build_meta("Unidade", unidade_label),
+            build_meta("Combustível", combustivel),
+            build_meta("Tipo", tipo),
             build_meta("Motoristas", _motoristas_label(viatura)),
         ],
         "edit_url": edit_url,
