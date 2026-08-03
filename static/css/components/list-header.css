@@ -216,7 +216,7 @@
  * cv-select sem elevar artificialmente a especificidade.
  */
 .list-header__rail {
-  --list-header-control-bg: var(--color-card-soft);
+  --list-header-control-bg: var(--step1-panel, var(--color-surface-soft, var(--color-card-soft)));
 }
 
 .list-header__rail .list-header__search-input.header-filter-input,
@@ -555,10 +555,10 @@
   .list-header__rail {
   background: var(--cv-card-family-bg);
   border-top-color: var(--color-border);
-  --list-header-control-bg: var(--color-card-soft);
+  --list-header-control-bg: var(--step1-panel, var(--color-surface-soft, var(--color-card-soft)));
 }
 
-/* Quatro controles do filtro: card-soft (#223348). Vence input-bg / secondary. */
+/* Controles do filtro: soft panel (#223348 / --color-surface-soft). */
 :is(html[data-theme="dark"])
   .list-header__rail
   :is(
@@ -575,7 +575,7 @@
     .travel-period-filter__btn,
     .cv-btn.cv-btn--secondary.cv-btn--control
   ):is(:hover, :hover:not(:disabled)) {
-  background: var(--color-card-soft);
+  background: var(--step1-panel, var(--color-surface-soft, var(--color-card-soft)));
   border-color: transparent;
   box-shadow: none;
 }

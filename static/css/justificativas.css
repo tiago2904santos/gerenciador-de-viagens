@@ -275,47 +275,11 @@
   min-height: var(--text-area-height-justificativa);
 }
 
-.list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready,
-.list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready[aria-expanded="true"],
-html[data-theme="dark"] .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready,
-html[data-theme="dark"] .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready[aria-expanded="true"] {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-  border-style: solid;
-  color: var(--color-white);
-}
-
-.list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready:hover,
-.list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready:focus-visible,
-html[data-theme="dark"] .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready:hover,
-html[data-theme="dark"] .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready:focus-visible {
-  background: var(--color-primary-hover, var(--color-primary));
-  border-color: var(--color-primary-hover, var(--color-primary));
-  color: var(--color-white);
-}
-
-.list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready .cv-inline-create__toggle-icon {
-  background: rgba(255, 255, 255, 0.18);
-  color: inherit;
-}
-
-.cv-inline-create__toggle.justificativa-quick-add__toggle--ready,
-.cv-inline-create__toggle.justificativa-quick-add__toggle--ready[aria-expanded="true"],
-html[data-theme="dark"] .cv-inline-create__toggle.justificativa-quick-add__toggle--ready,
-html[data-theme="dark"] .cv-inline-create__toggle.justificativa-quick-add__toggle--ready[aria-expanded="true"] {
-  background: var(--color-primary);
-  color: var(--color-white);
-}
-
-.cv-inline-create__toggle.justificativa-quick-add__toggle--ready:hover,
-.cv-inline-create__toggle.justificativa-quick-add__toggle--ready:focus-visible,
-html[data-theme="dark"] .cv-inline-create__toggle.justificativa-quick-add__toggle--ready:hover,
-html[data-theme="dark"] .cv-inline-create__toggle.justificativa-quick-add__toggle--ready:focus-visible {
-  background: var(--color-primary-hover, var(--color-primary));
-  color: var(--color-white);
-}
-
-.justificativa-quick-add__toggle {
+/*
+ * Pronto para salvar: mesmo primary dourado do "Salvar rascunho" do cadastro
+ * de ofícios (.cv-form-card__footer .cv-card-footer__primary .cv-btn).
+ */
+.justificativas-page .list-header .cv-inline-create__toggle {
   transition:
     background-color 220ms ease,
     border-color 220ms ease,
@@ -323,15 +287,57 @@ html[data-theme="dark"] .cv-inline-create__toggle.justificativa-quick-add__toggl
     box-shadow 220ms ease;
 }
 
-.justificativa-quick-add__toggle .cv-inline-create__toggle-icon,
-.justificativa-quick-add__toggle .cv-inline-create__toggle-label {
+.justificativas-page .list-header .cv-inline-create__toggle .cv-inline-create__toggle-icon,
+.justificativas-page .list-header .cv-inline-create__toggle .cv-inline-create__toggle-label {
   transition:
     opacity 140ms ease,
-    transform 180ms ease;
+    transform 180ms ease,
+    background-color 220ms ease,
+    color 220ms ease;
 }
 
-.justificativa-quick-add__toggle--changing .cv-inline-create__toggle-icon,
-.justificativa-quick-add__toggle--changing .cv-inline-create__toggle-label {
+.justificativas-page .list-header .cv-inline-create__toggle.is-filled,
+.justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready,
+.justificativas-page .list-header .cv-inline-create__toggle.is-filled[aria-expanded="true"],
+.justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready[aria-expanded="true"],
+:is(html[data-theme="dark"]) .justificativas-page .list-header .cv-inline-create__toggle.is-filled,
+:is(html[data-theme="dark"]) .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready,
+:is(html[data-theme="dark"]) .justificativas-page .list-header .cv-inline-create__toggle.is-filled[aria-expanded="true"],
+:is(html[data-theme="dark"]) .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready[aria-expanded="true"] {
+  animation: none;
+  background: var(--color-accent);
+  background-image: none;
+  border: 0;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-accent) 28%, transparent);
+  color: var(--color-on-accent, #19232d);
+  font-weight: var(--font-weight-bold);
+}
+
+.justificativas-page .list-header .cv-inline-create__toggle.is-filled:hover,
+.justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready:hover,
+.justificativas-page .list-header .cv-inline-create__toggle.is-filled:focus-visible,
+.justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready:focus-visible,
+:is(html[data-theme="dark"]) .justificativas-page .list-header .cv-inline-create__toggle.is-filled:hover,
+:is(html[data-theme="dark"]) .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready:hover,
+:is(html[data-theme="dark"]) .justificativas-page .list-header .cv-inline-create__toggle.is-filled:focus-visible,
+:is(html[data-theme="dark"]) .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready:focus-visible {
+  background: var(--color-accent-hover, var(--color-accent));
+  background-image: none;
+  border: 0;
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--color-accent) 36%, transparent);
+  color: var(--color-on-accent, #19232d);
+}
+
+.justificativas-page .list-header .cv-inline-create__toggle.is-filled .cv-inline-create__toggle-icon,
+.justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready .cv-inline-create__toggle-icon,
+:is(html[data-theme="dark"]) .justificativas-page .list-header .cv-inline-create__toggle.is-filled .cv-inline-create__toggle-icon,
+:is(html[data-theme="dark"]) .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready .cv-inline-create__toggle-icon {
+  background: color-mix(in srgb, var(--color-on-accent, #19232d) 14%, transparent);
+  color: inherit;
+}
+
+.justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--changing .cv-inline-create__toggle-icon,
+.justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--changing .cv-inline-create__toggle-label {
   opacity: 0;
   transform: translateY(4px);
 }

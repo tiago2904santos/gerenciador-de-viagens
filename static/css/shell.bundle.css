@@ -11159,10 +11159,12 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
   align-self: center;
 }
 
-/* Campos no tom do card: poço inset dentro do painel intermediário. */
+/* Campos no tom do card: poço inset dentro do painel intermediário.
+   Exclui o filtro do list-header (soft panel / --color-surface-soft): o attr
+   data-travel-document-wizard-step1 no quick-add não deve pintar a busca. */
 :is(html[data-theme="dark"])
   :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) :is(
-    input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
+    input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not(.list-header__search-input):not(.header-filter-input),
     textarea,
     select,
     .form-control,
@@ -16705,7 +16707,7 @@ html[data-theme="dark"] *::after {
  * cv-select sem elevar artificialmente a especificidade.
  */
 .list-header__rail {
-  --list-header-control-bg: var(--color-card-soft);
+  --list-header-control-bg: var(--step1-panel, var(--color-surface-soft, var(--color-card-soft)));
 }
 
 .list-header__rail .list-header__search-input.header-filter-input,
@@ -17044,10 +17046,10 @@ html[data-theme="dark"] *::after {
   .list-header__rail {
   background: var(--cv-card-family-bg);
   border-top-color: var(--color-border);
-  --list-header-control-bg: var(--color-card-soft);
+  --list-header-control-bg: var(--step1-panel, var(--color-surface-soft, var(--color-card-soft)));
 }
 
-/* Quatro controles do filtro: card-soft (#223348). Vence input-bg / secondary. */
+/* Controles do filtro: soft panel (#223348 / --color-surface-soft). */
 :is(html[data-theme="dark"])
   .list-header__rail
   :is(
@@ -17064,7 +17066,7 @@ html[data-theme="dark"] *::after {
     .travel-period-filter__btn,
     .cv-btn.cv-btn--secondary.cv-btn--control
   ):is(:hover, :hover:not(:disabled)) {
-  background: var(--color-card-soft);
+  background: var(--step1-panel, var(--color-surface-soft, var(--color-card-soft)));
   border-color: transparent;
   box-shadow: none;
 }

@@ -174,9 +174,68 @@
     });
   }
 
+  /* Toggle: idle → dourado "Salvar rascunho" quando ofícios + texto estão ok. */
+  function initQuickAddSaveToggle() {
+    var form = document.querySelector("[data-justificativa-quick-add]");
+    var panel = form ? form.closest("form.cv-inline-create__panel") : null;
+    var toggle = document.querySelector(
+      ".justificativas-page .cv-inline-create__toggle[data-inline-create-toggle]"
+    );
+    if (!form || !panel || !toggle) return;
+    if (toggle.dataset.justificativaSaveToggleReady === "true") return;
+    toggle.dataset.justificativaSaveToggleReady = "true";
+
+    var labelEl = toggle.querySelector(".cv-inline-create__toggle-label");
+    var idleLabel =
+      toggle.getAttribute("data-inline-create-idle-label") ||
+      (labelEl ? labelEl.textContent.trim() : "Cadastrar justificativa");
+    var saveLabel =
+      toggle.getAttribute("data-inline-create-save-label") || "Salvar justificativa";
+    var oficios = panel.querySelector("select[name='oficios']");
+    var texto = panel.querySelector("[data-justificativa-textarea='true']");
+
+    function isReady() {
+      var hasOficio =
+        oficios &&
+        Array.from(oficios.options).some(function (opt) {
+          return opt.selected && opt.value;
+        });
+      var hasTexto = texto && String(texto.value || "").trim().length > 0;
+      return Boolean(hasOficio && hasTexto);
+    }
+
+    function syncToggle() {
+      var ready = isReady();
+      var nextLabel = ready ? saveLabel : idleLabel;
+      var labelChanged = labelEl && labelEl.textContent !== nextLabel;
+
+      toggle.classList.toggle("is-filled", ready);
+      toggle.classList.toggle("justificativa-quick-add__toggle--ready", ready);
+      toggle.setAttribute("aria-label", nextLabel);
+
+      if (!labelChanged || !labelEl) return;
+
+      toggle.classList.add("justificativa-quick-add__toggle--changing");
+      window.setTimeout(function () {
+        labelEl.textContent = nextLabel;
+        window.requestAnimationFrame(function () {
+          toggle.classList.remove("justificativa-quick-add__toggle--changing");
+        });
+      }, 120);
+    }
+
+    panel.addEventListener("input", syncToggle);
+    panel.addEventListener("change", syncToggle);
+    toggle.addEventListener("click", function () {
+      window.setTimeout(syncToggle, 0);
+    });
+    syncToggle();
+  }
+
   function init() {
     document.querySelectorAll("[data-justificativa-quick-add] .termo-oficio-picker").forEach(syncOficioPicker);
     initModeloJustificativa(document);
+    initQuickAddSaveToggle();
   }
 
   if (document.readyState === "loading") {
