@@ -5269,28 +5269,25 @@ html[data-theme="dark"] *::after {
 
 :is(html[data-theme="dark"])
   .cv-record-row {
-  background: var(--color-surface);
-  border-color: var(--color-border);
-  box-shadow: var(--shadow-xs);
+  background: var(--color-input-bg, var(--step1-field, var(--color-surface-muted)));
+  border: 0;
+  box-shadow: none;
 }
 
 :is(html[data-theme="dark"])
-  .cv-record-row:hover {
-  background: var(--color-surface-soft);
-  border-color: var(--color-border-strong);
-  box-shadow: var(--shadow-sm);
-}
-
+  .cv-record-row:hover,
 :is(html[data-theme="dark"])
   .cv-record-row:focus-within {
-  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--color-border));
+  background: var(--color-input-bg, var(--step1-field, var(--color-surface-muted)));
+  border: 0;
+  box-shadow: none;
 }
 
 :is(html[data-theme="dark"])
   .cv-record-row__identity {
-  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
-  border: 1px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
-  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-heading) 10%, transparent);
+  border-color: color-mix(in srgb, var(--color-border) 70%, transparent);
+  color: var(--color-heading);
 }
 
 :is(html[data-theme="dark"])

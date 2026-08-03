@@ -1,32 +1,31 @@
-/* Canonical record list — roster rows (avatar + title/subtitle/facts + actions).
-   Visual theme overrides live in theme-dark-components.css. */
+/* Canonical record list — roster no ritmo das listas internas de formulário
+   (poço de campo, sem borda, sem hover de cor). */
 
 .cv-record-list {
   display: grid;
-  gap: 10px;
+  gap: 8px;
   min-width: 0;
 }
 
 .cv-record-row {
   align-items: center;
-  background: var(--color-surface, var(--color-card));
-  border: 1px solid var(--color-border-soft, var(--color-border));
-  border-radius: var(--radius-lg, 14px);
-  column-gap: 14px;
+  background: var(--color-input-bg, var(--color-surface-muted, var(--color-card-muted)));
+  border: 0;
+  border-radius: 10px;
+  box-shadow: none;
+  column-gap: 12px;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   min-width: 0;
-  padding: 14px 16px;
+  padding: 12px 14px;
   position: relative;
-  transition:
-    background-color var(--transition-fast, 120ms ease),
-    border-color var(--transition-fast, 120ms ease),
-    box-shadow var(--transition-fast, 120ms ease);
 }
 
-.cv-record-row:hover {
-  background: var(--color-surface-soft, var(--color-card-soft));
-  border-color: var(--color-border, var(--color-border-strong));
+.cv-record-row:hover,
+.cv-record-row:focus-within {
+  background: var(--color-input-bg, var(--color-surface-muted, var(--color-card-muted)));
+  border: 0;
+  box-shadow: none;
 }
 
 .cv-record-row:not(:has(.cv-record-row__identity)) {

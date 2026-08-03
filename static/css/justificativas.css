@@ -28,12 +28,12 @@
 }
 
 .justificativas-page .cv-record-row,
-:is(html[data-theme="dark"]) .justificativas-page .cv-record-row {
-  background: var(--step1-surface);
-}
-
+.justificativas-page .cv-record-row:hover,
+:is(html[data-theme="dark"]) .justificativas-page .cv-record-row,
 :is(html[data-theme="dark"]) .justificativas-page .cv-record-row:hover {
-  background: var(--step1-panel);
+  background: var(--step1-field, var(--step1-surface));
+  border: 0;
+  box-shadow: none;
 }
 
 /* Aberto: sem linha; gap só o do rail (mesmo ritmo do padding). */
