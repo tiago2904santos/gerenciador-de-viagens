@@ -174,7 +174,9 @@
     });
   }
 
-  /* Toggle: idle → dourado "Salvar rascunho" quando ofícios + texto estão ok. */
+  /* Toggle: idle → dourado "Salvar rascunho" quando ofícios + texto estão ok.
+     Também intercepta o clique: o handler genérico do shell só olha o 1º
+     input (busca), e fecha o painel sem enviar o form. */
   function initQuickAddSaveToggle() {
     var form = document.querySelector("[data-justificativa-quick-add]");
     var panel = form ? form.closest("form.cv-inline-create__panel") : null;
@@ -224,8 +226,27 @@
       }, 120);
     }
 
+    function submitPanel() {
+      if (typeof panel.requestSubmit === "function") {
+        panel.requestSubmit();
+      } else {
+        panel.submit();
+      }
+    }
+
     panel.addEventListener("input", syncToggle);
     panel.addEventListener("change", syncToggle);
+    toggle.addEventListener(
+      "click",
+      function (event) {
+        if (toggle.getAttribute("aria-expanded") !== "true") return;
+        if (!isReady()) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        submitPanel();
+      },
+      true
+    );
     toggle.addEventListener("click", function () {
       window.setTimeout(syncToggle, 0);
     });
