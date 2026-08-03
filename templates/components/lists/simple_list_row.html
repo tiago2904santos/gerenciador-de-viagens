@@ -1,33 +1,62 @@
-<div class="cv-record-row simple-list-item" role="listitem" data-collection-item data-search-text="{{ row.title }}{% if row.search_extra %} {{ row.search_extra }}{% endif %}{% if row.meta %}{% if row.meta.0.label %}{% for item in row.meta %} {{ item.value }}{% endfor %}{% else %} {{ row.meta }}{% endif %}{% endif %}"{% if row.status_value %} data-status-value="{{ row.status_value }}"{% endif %}>
-  <div class="cv-record-row__content simple-list-item__body">
-    <div class="cv-record-row__heading simple-list-item__title">
-      <span class="cv-record-row__title simple-list-item__title-text">{{ row.title }}</span>
+{# Linha canônica de catálogo — roster: identity + título/subtitle/facts + ações. #}
+{# row: title, avatar?, badges?, subtitle?, facts?, meta? (fallback), edit/delete/docs hooks. #}
+<div
+  class="cv-record-row"
+  role="listitem"
+  data-collection-item
+  data-search-text="{{ row.title }}{% if row.search_extra %} {{ row.search_extra }}{% endif %}{% if row.subtitle %} {{ row.subtitle }}{% endif %}{% if row.facts %}{% for item in row.facts %} {{ item.value }}{% endfor %}{% elif row.meta %}{% if row.meta.0.label %}{% for item in row.meta %} {{ item.value }}{% endfor %}{% else %} {{ row.meta }}{% endif %}{% endif %}"
+  {% if row.status_value %}data-status-value="{{ row.status_value }}"{% endif %}
+>
+  {% if row.avatar %}
+    <span class="cv-record-row__identity" aria-hidden="true"><span>{{ row.avatar }}</span></span>
+  {% endif %}
+
+  <div class="cv-record-row__content">
+    <div class="cv-record-row__heading">
+      <span class="cv-record-row__title">{{ row.title }}</span>
       {% if row.badges %}
-        <span class="cv-record-row__badges simple-list-item__badges">
+        <span class="cv-record-row__badges">
           {% for badge in row.badges %}
             {% include "components/ui/badges/status_badge.html" with label=badge.text variant=badge.variant|default:'accent' only %}
           {% endfor %}
         </span>
       {% endif %}
     </div>
-    {% if row.meta %}
-      <div class="cv-record-row__meta simple-list-item__meta">
+
+    {% if row.subtitle %}
+      <p class="cv-record-row__subtitle">{{ row.subtitle }}</p>
+    {% endif %}
+
+    {% if row.facts %}
+      <div class="cv-record-row__facts">
+        {% for item in row.facts %}
+          {% if not forloop.first %}<span class="cv-record-row__facts-sep" aria-hidden="true">·</span>{% endif %}
+          <span class="cv-record-row__fact">
+            {% if item.label %}<span class="cv-record-row__fact-label">{{ item.label }}</span>{% endif %}
+            <span class="cv-record-row__fact-value">{{ item.value }}</span>
+          </span>
+        {% endfor %}
+      </div>
+    {% elif row.meta %}
+      <div class="cv-record-row__facts">
         {% if row.meta.0.label %}
           {% for item in row.meta %}
-            <span class="cv-record-row__meta-item simple-list-item__meta-item">
-              <span class="cv-record-row__meta-label simple-list-item__meta-label">{{ item.label }}</span>
-              <span class="cv-record-row__meta-value simple-list-item__meta-value">{{ item.value }}</span>
+            {% if not forloop.first %}<span class="cv-record-row__facts-sep" aria-hidden="true">·</span>{% endif %}
+            <span class="cv-record-row__fact">
+              <span class="cv-record-row__fact-label">{{ item.label }}</span>
+              <span class="cv-record-row__fact-value">{{ item.value }}</span>
             </span>
           {% endfor %}
         {% else %}
-          <span class="cv-record-row__meta-item simple-list-item__meta-item">{{ row.meta }}</span>
+          <span class="cv-record-row__fact"><span class="cv-record-row__fact-value">{{ row.meta }}</span></span>
         {% endif %}
       </div>
     {% endif %}
   </div>
-  <div class="cv-record-row__actions simple-list-item__aside">
+
+  <div class="cv-record-row__actions">
     {% if row.set_default_url %}
-      <form method="post" action="{{ row.set_default_url }}" class="simple-list-item__inline-form">
+      <form method="post" action="{{ row.set_default_url }}" class="cv-record-row__inline-form">
         {% csrf_token %}
         {% include "components/ui/buttons/button.html" with label="Definir como padrão" variant="secondary" size="sm" type="submit" only %}
       </form>

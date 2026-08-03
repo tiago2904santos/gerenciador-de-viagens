@@ -1,21 +1,21 @@
 {% if vinculos_area %}
   <div class="cv-record-list simple-list" role="list">
     {% for vinculo in vinculos_area %}
-      <div class="cv-record-row simple-list-item" role="listitem">
-        <div class="simple-list-item__avatar" aria-hidden="true">{{ vinculo.area.sigla|slice:":2" }}</div>
-        <div class="cv-record-row__content simple-list-item__body">
-          <div class="cv-record-row__heading simple-list-item__title">
-            <span class="cv-record-row__title simple-list-item__title-text">{{ vinculo.area.sigla }} · {{ vinculo.area.nome }}</span>
+      <div class="cv-record-row" role="listitem">
+        <span class="cv-record-row__identity" aria-hidden="true"><span>{{ vinculo.area.sigla|slice:":2" }}</span></span>
+        <div class="cv-record-row__content">
+          <div class="cv-record-row__heading">
+            <span class="cv-record-row__title">{{ vinculo.area.sigla }} · {{ vinculo.area.nome }}</span>
           </div>
-          <div class="cv-record-row__meta simple-list-item__meta">
-            <span class="cv-record-row__meta-item simple-list-item__meta-item">
-              <span class="cv-record-row__meta-label simple-list-item__meta-label">Perfil</span>
-              <span class="cv-record-row__meta-value simple-list-item__meta-value">{{ vinculo.get_papel_display }}</span>
+          <div class="cv-record-row__facts">
+            <span class="cv-record-row__fact">
+              <span class="cv-record-row__fact-label">Perfil</span>
+              <span class="cv-record-row__fact-value">{{ vinculo.get_papel_display }}</span>
             </span>
           </div>
         </div>
         {% if vinculo.area_padrao %}
-          <div class="cv-record-row__actions simple-list-item__aside">
+          <div class="cv-record-row__actions">
             {% include "components/ui/badges/chip.html" with tone="info" label="Padrão" size="compact" only %}
           </div>
         {% endif %}

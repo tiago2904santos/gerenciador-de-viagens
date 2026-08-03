@@ -329,7 +329,7 @@ Numerados para rastreio. Severidade: 🔴 crítico (quebra a leitura) · 🟠 al
 |---|---|---|---|
 | D-50 | 🟠 | **Botões** | `.cv-btn` (vivo) · `.btn`/`.btn-primary`/`.btn-*` (morto) · `.app-btn`/`.app-btn--*` (morto) · `.btn--document-*` (morto) · `.cv-icon-btn` (vivo) |
 | D-51 | 🟠 | **Alertas/banners** | `.alert`/`.alert-*` (utilities) · `.cv-alert`/`.cv-alert--*` (page-shell) · `.diario-diaria-alert` (RT) · `.pte-events__banner` (PT) |
-| D-52 | 🟠 | **Cards de lista** | `.cv-entity-card` + `.oficio-lc__*` (vivo, 6 módulos) · `.roteiro-list-card__*` (599 linhas, morto em produção) · `.evento-lc__*` (2 regras) · `.cv-document-card` (sem cor) |
+| D-52 | 🟡 | **Cards de lista** | Cards de documento: `.cv-entity-card` / `.cv-record-card`. Linha de catálogo unificada em `cv-record-row` (roster); gramática `simple-list-item` removida do componente compartilhado |
 | D-53 | ✅ | **Cabeçalho de lista** | `filter_page_header.html` + `_list_header_band.html` compartilhados; `list_page_quick_add` usa a banda canônica; classes `cv-inline-create__*` |
 | D-54 | 🟠 | **Confirmação de exclusão** | modal JS `delete_confirm_modal.html` (listas de cards) · página inteira `confirm_delete.html` (12 páginas de catálogo) — e a página usa `.cv-confirm-page*`, **sem CSS**, caindo em `.form-section`/`.section-header` legados |
 | D-55 | ✅ | **Resumo/estatística** | Usuários usa `cv-metric` / `summary_card` + `cv-metric-grid`; `admin-overview__stats` e `workspace-admin.css` removidos |
@@ -424,9 +424,9 @@ Legenda: **✅ conforme** · **⚠️ desvio** · **❌ fora do padrão**
 | Página | Template | Situação |
 |---|---|---|
 | Hub de Cadastros | `cadastros/index.html` | ❌ `page-shell` **sem modificador**. ❌ usa `dashboard-page__section-heading`, `dashboard-page__eyebrow`, `dashboard-page__module-grid` — **classes do Dashboard em outra página**. `.cadastros-hub` sem CSS. |
-| Servidores (lista) | `cadastros/servidores/index.html` | ⚠️ `list_page_standard` (linhas) — coerente para cadastro, mas é a 3ª família de lista. |
+| Servidores (lista) | `cadastros/servidores/index.html` | ✅ `list_page_standard` + `cv-record-row` roster (avatar / subtitle / facts). |
 | Servidor (form) | `cadastros/servidores/form.html` | ⚠️ `page-shell--standard-simple`; a irmã Viaturas usa `--standard`. Sem subtítulo no card. |
-| Viaturas (lista) | `cadastros/viaturas/index.html` | ⚠️ `list_page_standard`. |
+| Viaturas (lista) | `cadastros/viaturas/index.html` | ✅ `list_page_standard` + `cv-record-row` roster. |
 | Viatura (form) | `cadastros/viaturas/form.html` | ⚠️ `page-shell--standard` — diverge de Servidores (D-31 de shell). |
 | Configurações do sistema | `cadastros/configuracao/form.html` | ⚠️ usa `form_block shell="card"` (sem card mestre) e **dois `<form>` irmãos** com footers independentes — composição única no sistema. |
 | Estados / Cidades / Unidades / Cargos / Combustíveis | `*/index.html` | ⚠️ 5 listas Quick Add com cabeçalho duplicado (D-53). |
@@ -499,7 +499,7 @@ Legenda: **✅ conforme** · **⚠️ desvio** · **❌ fora do padrão**
 | CSS de `oficio-lc` | 7 arquivos | 🔴 `oficios.css` (169 regras), `dark-redesign.css` (30), `oficios-list-header.css` (49), `eventos-list.css` (8), `roteiros-list.css` (3), `planos-trabalho-eventos.css` (3), `list-header.css` (2). |
 | `main_list_card` | `components/lists/main_list_card.html` | ❌ **template morto**. |
 | `roteiro_list_card` | `roteiros/partials/` | ❌ **morto em produção** (599 linhas de CSS associado). |
-| `simple_list` / `simple_list_row` | `components/lists/` | ⚠️ terceira gramática de linha (`.cv-record-row` em `record-list.css` é a quarta). |
+| `simple_list` / `simple_list_row` | `components/lists/` | ✅ uma gramática: `.cv-record-row` (roster). |
 | `cv-document-card` | `cards/document_card.html` | ❌ sem `background`/`border` (D-05); botões com `variant="muted"` inexistente (D-04). |
 | `module_card` | `cards/module_card.html` | ✅ ok (`cards.css`). `.module-placeholder-card` com gradiente hardcoded. |
 | `summary_card` | `cards/summary_card.html` | ❌ emite `cv-summary-tile summary-card`; `summary-card` sem CSS, `cv-summary-tile` sem cor. |
@@ -621,7 +621,7 @@ Princípio: **o nome descreve o que o componente faz, nunca onde ele nasceu.** P
 | `evento-lc__items-grid` / `__documentos-card` | `cv-fact-grid--dense` / `cv-fact-block--documents` |
 | `roteiro-list-card__*` | **excluir** (morto) — o que sobreviver vira `cv-record-card` |
 | `os-lc`, `main_list_card` | **excluir** |
-| `simple-list-item`, `cv-record-row` | `cv-record-row` (um só) |
+| `simple-list-item`, `cv-record-row` | `cv-record-row` (um só) — ✅ feito |
 
 ### 7.3 Formulário
 
