@@ -152,3 +152,17 @@
     width: 100%;
   }
 }
+
+/* ── Card da lista: no maximo 2 colunas ──
+   O componente sobe para 3 colunas em --n3 e --n5..--n9. Nas linhas do termo
+   isso e apertado demais: nome completo, cargo e unidade passam a quebrar em
+   varias linhas. Os dois seletores abaixo tem 2 classes contra 1 das regras
+   de origem, entao vencem por especificidade, sem depender da ordem. */
+.cv-record-card--termo .cv-person-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.cv-record-card--termo .cv-person-list--n0,
+.cv-record-card--termo .cv-person-list--n1 {
+  grid-template-columns: minmax(0, 1fr);
+}
