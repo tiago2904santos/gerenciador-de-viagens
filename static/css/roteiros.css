@@ -3232,31 +3232,31 @@
 /* Hotfix de contraste: tÃ­tulos e descriÃ§Ãµes internos de Sede/Destinos/Loop */
 
 /* Tema escuro oficial: reforco de hierarquia premium no fluxo de roteiros */
-html[data-theme="dark"] .roteiro-editor__main.card,
-html[data-theme="dark"] .roteiro-editor--avulso .roteiro-editor__reference-block,
-html[data-theme="dark"] .roteiro-editor--avulso .roteiro-editor__section {
+ .roteiro-editor__main.card,
+ .roteiro-editor--avulso .roteiro-editor__reference-block,
+ .roteiro-editor--avulso .roteiro-editor__section {
   border-color: var(--route-card-border);
 }
 
-html[data-theme="dark"] .roteiro-editor__panel-surface,
-html[data-theme="dark"] .roteiro-editor__destinos-stack,
-html[data-theme="dark"] .roteiro-editor__destination-card.destination-row,
-html[data-theme="dark"] .card.roteiro-editor__trecho-card,
-html[data-theme="dark"] .roteiro-editor__subpanel,
-html[data-theme="dark"] .roteiro-mapa__stats,
-html[data-theme="dark"] .roteiro-mapa__canvas-shell {
+ .roteiro-editor__panel-surface,
+ .roteiro-editor__destinos-stack,
+ .roteiro-editor__destination-card.destination-row,
+ .card.roteiro-editor__trecho-card,
+ .roteiro-editor__subpanel,
+ .roteiro-mapa__stats,
+ .roteiro-mapa__canvas-shell {
   border: 0;
   border-color: transparent;
   box-shadow: none;
 }
 
-html[data-theme="dark"] .roteiro-editor__trecho-card .card-header,
-html[data-theme="dark"] .roteiro-editor--avulso .route-segment-card .card-header {
+ .roteiro-editor__trecho-card .card-header,
+ .roteiro-editor--avulso .route-segment-card .card-header {
   color: var(--theme-text-heading);
   font-weight: 900;
 }
 
-html[data-theme="light"] .roteiro-editor--avulso .roteiro-editor__reference-block--source .roteiro-editor__choice-card:has(input:checked) {
+ .roteiro-editor--avulso .roteiro-editor__reference-block--source .roteiro-editor__choice-card:has(input:checked) {
   border-color: var(--route-status-draft-border);
   box-shadow:
     0 0 0 1px var(--route-status-draft-border),
@@ -3333,9 +3333,9 @@ html[data-theme="light"] .roteiro-editor--avulso .roteiro-editor__reference-bloc
 }
 
 /* Sobrescreve o focus canônico do dark-redesign neste escopo */
-:is(html[data-theme="dark"])
+
   [data-travel-document-wizard-roteiro] .oficio-roteiro-body :is(button, a, input, select, textarea, [tabindex]):focus-visible,
-:is(html[data-theme="dark"])
+
   .roteiro-editor--oficio .oficio-roteiro-body :is(button, a, input, select, textarea, [tabindex]):focus-visible {
   outline: none !important;
   outline-offset: 0 !important;
@@ -3347,7 +3347,7 @@ html[data-theme="light"] .roteiro-editor--avulso .roteiro-editor__reference-bloc
    Também reforçado pós-tema no wizard_roteiro (extra_css_after_theme).
    --color-surface-soft (#223348) ≠ --step1-field do leg (≈ #132538).
    ======================================================================== */
-:is(html[data-theme="dark"])
+
   [data-travel-document-wizard-roteiro]
   .roteiro-trecho-card__leg
   :is(
@@ -3359,7 +3359,7 @@ html[data-theme="light"] .roteiro-editor--avulso .roteiro-editor__reference-bloc
     .cv-field__control[readonly],
     input[readonly]
   ),
-:is(html[data-theme="dark"])
+
   [data-travel-document-wizard-roteiro]
   #retorno-card
   .roteiro-trecho-card__leg

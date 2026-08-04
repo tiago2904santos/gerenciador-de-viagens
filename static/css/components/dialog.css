@@ -1,4 +1,4 @@
-/* Structural contract for global dialogs. Dark-theme appearance lives in theme-dark-components.css. */
+/* Structural contract for global dialogs; appearance is theme-agnostic. */
 
 .cv-dialog[hidden] {
   display: none;
@@ -86,55 +86,55 @@
 
 /* Variantes semanticas globais. Os seletores incluem o modificador do dialogo
    para que o tom continue visivel sobre a aparencia-base do tema escuro. */
-html[data-theme="dark"] .cv-dialog--danger .cv-dialog__panel {
+ .cv-dialog--danger .cv-dialog__panel {
   border-color: var(--color-danger-border-strong);
 }
 
-html[data-theme="dark"] .cv-dialog--danger .cv-dialog__header {
+ .cv-dialog--danger .cv-dialog__header {
   background: var(--color-danger-soft);
   border-bottom-color: var(--color-danger-border-soft);
 }
 
-html[data-theme="dark"] .cv-dialog--danger :is(.cv-dialog__icon, .cv-dialog__eyebrow) {
+ .cv-dialog--danger :is(.cv-dialog__icon, .cv-dialog__eyebrow) {
   color: var(--color-danger);
 }
 
-html[data-theme="dark"] .cv-dialog--warning .cv-dialog__panel {
+ .cv-dialog--warning .cv-dialog__panel {
   border-color: var(--color-accent-border-strong);
 }
 
-html[data-theme="dark"] .cv-dialog--warning .cv-dialog__header {
+ .cv-dialog--warning .cv-dialog__header {
   background: var(--color-warning-soft);
   border-bottom-color: var(--color-accent-border-soft);
 }
 
-html[data-theme="dark"] .cv-dialog--warning :is(.cv-dialog__icon, .cv-dialog__eyebrow) {
+ .cv-dialog--warning :is(.cv-dialog__icon, .cv-dialog__eyebrow) {
   color: var(--color-warning);
 }
 
-html[data-theme="dark"] .cv-dialog--success .cv-dialog__panel {
+ .cv-dialog--success .cv-dialog__panel {
   border-color: var(--color-success-border-soft);
 }
 
-html[data-theme="dark"] .cv-dialog--success .cv-dialog__header {
+ .cv-dialog--success .cv-dialog__header {
   background: var(--color-success-soft);
   border-bottom-color: var(--color-success-border-soft);
 }
 
-html[data-theme="dark"] .cv-dialog--success :is(.cv-dialog__icon, .cv-dialog__eyebrow) {
+ .cv-dialog--success :is(.cv-dialog__icon, .cv-dialog__eyebrow) {
   color: var(--color-success);
 }
 
-html[data-theme="dark"] .cv-dialog--document .cv-dialog__panel {
+ .cv-dialog--document .cv-dialog__panel {
   border-color: var(--color-info-border-strong);
 }
 
-html[data-theme="dark"] .cv-dialog--document .cv-dialog__header {
+ .cv-dialog--document .cv-dialog__header {
   background: var(--color-info-soft);
   border-bottom-color: var(--color-info-border);
 }
 
-html[data-theme="dark"] .cv-dialog--document :is(.cv-dialog__icon, .cv-dialog__eyebrow) {
+ .cv-dialog--document :is(.cv-dialog__icon, .cv-dialog__eyebrow) {
   color: var(--color-info);
 }
 

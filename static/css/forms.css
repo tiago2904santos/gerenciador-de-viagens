@@ -625,9 +625,9 @@ textarea[readonly] {
   font-weight: 700;
 }
 
-html[data-theme="dark"] .form-check-input,
-html[data-theme="dark"] input[type="radio"],
-html[data-theme="dark"] input[type="checkbox"] {
+ .form-check-input,
+ input[type="radio"],
+ input[type="checkbox"] {
   accent-color: var(--color-accent);
 }
 .form-field--hidden {

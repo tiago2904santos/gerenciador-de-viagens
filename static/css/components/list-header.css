@@ -543,7 +543,7 @@
    Tema escuro
    ========================================================= */
 
-:is(html[data-theme="dark"])
+
   .list-header {
   background: var(--color-surface-muted);
   border-color: var(--color-border);
@@ -551,30 +551,30 @@
 }
 
 /* Mesma cor do cabeçalho dos cards (.cv-entity-card__header) */
-:is(html[data-theme="dark"])
+
   .list-header__band {
   background: var(--color-surface-muted);
 }
 
-:is(html[data-theme="dark"])
+
   .list-header__eyebrow {
   color: var(--color-accent);
 }
 
-:is(html[data-theme="dark"])
+
   .list-header__title {
   color: var(--color-heading);
 }
 
 /* Mesma cor das seções internas do card (.cv-record-card__band). */
-:is(html[data-theme="dark"])
+
   .list-header__rail {
   background: var(--cv-card-family-bg);
   border-top-color: var(--color-border);
 }
 
 /* Controles do filtro: soft panel (#223348 / --color-surface-soft). */
-:is(html[data-theme="dark"])
+
   .list-header__rail
   :is(
     .list-header__search-input.header-filter-input,
@@ -582,7 +582,7 @@
     .travel-period-filter__btn,
     .cv-btn.cv-btn--secondary.cv-btn--control
   ),
-:is(html[data-theme="dark"])
+
   .list-header__rail
   :is(
     .list-header__search-input.header-filter-input,
@@ -595,10 +595,10 @@
   box-shadow: none;
 }
 
-:is(html[data-theme="dark"])
+
   .travel-period-filter--filled
   .travel-period-filter__btn,
-:is(html[data-theme="dark"])
+
   .travel-period-filter--filled
   .travel-period-filter__btn:hover:not(:disabled) {
   background: var(--color-card-soft);
@@ -606,39 +606,39 @@
   box-shadow: none;
 }
 
-:is(html[data-theme="dark"])
+
   .list-header__search-input,
-:is(html[data-theme="dark"])
+
   .list-header .header-filter-input {
   color: var(--color-text);
 }
 
-:is(html[data-theme="dark"])
+
   .list-header__search-icon {
   color: var(--color-filter-placeholder);
 }
 
 /* Select do rail: chevron sempre accent (fechado = aberto). */
-:is(html[data-theme="dark"])
+
   .list-header__rail .cv-custom-select--v2 {
 }
 
-:is(html[data-theme="dark"])
+
   .list-header__rail
   .cv-custom-select__trigger--v2
   .cv-custom-select__chevron,
-:is(html[data-theme="dark"])
+
   .list-header__rail
   .cv-custom-select__trigger--v2:is(:hover, :focus, :focus-visible, [aria-expanded="true"])
   .cv-custom-select__chevron,
-:is(html[data-theme="dark"])
+
   .list-header__rail
   .cv-custom-select--v2.cv-custom-select--open
   .cv-custom-select__chevron {
   color: var(--color-accent);
 }
 
-:is(html[data-theme="dark"])
+
   .list-header__rail
   .cv-custom-select__trigger--v2
   .cv-custom-select__chevron
@@ -648,42 +648,42 @@
   stroke: currentColor;
 }
 
-:is(html[data-theme="dark"])
+
   .list-header .cv-inline-create__toggle {
   background: var(--cv-card-family-bg);
   border-top-color: var(--border-filter-bar);
   color: var(--theme-text-body);
 }
 
-:is(html[data-theme="dark"])
+
   .list-header .cv-inline-create__toggle:hover,
-:is(html[data-theme="dark"])
+
   .list-header .cv-inline-create__toggle.is-active,
-:is(html[data-theme="dark"])
+
   .list-header .cv-inline-create__toggle[aria-expanded="true"] {
   background: color-mix(in srgb, var(--color-card-muted) 72%, var(--color-white) 10%);
 }
 
-:is(html[data-theme="dark"])
+
   .list-header .cv-inline-create__toggle-icon {
   background: color-mix(in srgb, var(--color-accent) 16%, transparent);
   color: var(--color-accent);
 }
 
-:is(html[data-theme="dark"])
+
   .list-header .cv-inline-create__toggle.is-filled {
   background: var(--cv-btn-primary-bg);
   border-color: var(--cv-btn-primary-border);
   color: var(--cv-btn-primary-color);
 }
 
-:is(html[data-theme="dark"])
+
   .list-header .cv-inline-create__toggle.is-filled .cv-inline-create__toggle-icon {
   background: color-mix(in srgb, var(--color-white) 16%, transparent);
   color: inherit;
 }
 
-:is(html[data-theme="dark"])
+
   .list-header .cv-inline-create__panel.is-open {
   border-top-color: var(--border-filter-bar);
 }
@@ -967,27 +967,27 @@
   width: 100%;
 }
 
-:is(html[data-theme="dark"]) .list-header--wizard-band {
-  background: var(--color-surface-muted);
+ .list-header--wizard-band {
+  background: var(--cv-surface-card);
   border-color: var(--color-border);
 }
 
-:is(html[data-theme="dark"]) .list-header--wizard-band .list-header__band {
-  background: var(--color-surface-muted);
+ .list-header--wizard-band .list-header__band {
+  background: var(--cv-surface-block);
 }
 
-:is(html[data-theme="dark"]) .list-header--wizard-stepper {
+ .list-header--wizard-stepper {
   background: var(--cv-card-family-bg, var(--color-card));
   border-color: var(--color-border);
 }
 
-:is(html[data-theme="dark"]) .list-header--wizard-stepper .list-header__rail--wizard {
+ .list-header--wizard-stepper .list-header__rail--wizard {
   background: var(--cv-card-family-bg, var(--color-card));
   border-top: 0;
 }
 
 /* Voltar no band = mesma linguagem do Voltar do footer. */
-:is(html[data-theme="dark"])
+
   .list-header--wizard-band
   .list-header__wizard-back.cv-btn--secondary {
   background: var(--step1-panel, var(--color-surface-soft));
@@ -1000,10 +1000,10 @@
   transform: none;
 }
 
-:is(html[data-theme="dark"])
+
   .list-header--wizard-band
   .list-header__wizard-back.cv-btn--secondary:hover,
-:is(html[data-theme="dark"])
+
   .list-header--wizard-band
   .list-header__wizard-back.cv-btn--secondary:focus-visible {
   background: color-mix(in srgb, var(--color-accent) 14%, var(--color-surface-muted));
@@ -1015,27 +1015,27 @@
   transform: none;
 }
 
-:is(html[data-theme="dark"])
+
   .list-header--wizard-band
   .list-header__wizard-back
   .cv-btn__icon {
   color: inherit;
 }
 
-:is(html[data-theme="dark"])
+
   .list-header--wizard-stepper
   .list-header__wizard-stepper
   .page-stepper {
   background: transparent;
 }
 
-:is(html[data-theme="dark"])
+
   .list-header--wizard-stepper
   .page-stepper__eyebrow {
   display: none;
 }
 
-:is(html[data-theme="dark"])
+
   .list-header--wizard-stepper
   .page-stepper__label {
   font-size: 0.8rem;
@@ -1043,14 +1043,14 @@
   letter-spacing: -0.01em;
 }
 
-:is(html[data-theme="dark"])
+
   .list-header--wizard-stepper
   .page-stepper__status {
   font-size: 0.68rem;
   font-weight: 600;
 }
 
-:is(html[data-theme="dark"])
+
   .list-header--wizard-stepper
   .page-stepper__item.is-missing
   .page-stepper__status {

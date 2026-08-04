@@ -5,10 +5,10 @@
 html {
 }
 
-html[data-theme="dark"] {
+:root {
 }
 
-html[data-theme="light"] {
+:root {
 }
 
 .cv-date-picker {
@@ -355,13 +355,13 @@ html[data-theme="light"] {
   z-index: 4;
 }
 
-html[data-theme="dark"] .cv-date-picker__day-badge {
+ .cv-date-picker__day-badge {
   background: var(--color-white);
   border-color: var(--stepper-active-bg, var(--color-accent));
   color: var(--stepper-active-bg, var(--color-accent));
 }
 
-html[data-theme="light"] .cv-date-picker__day-badge {
+ .cv-date-picker__day-badge {
   background: var(--color-white);
   border-color: #0b3a66;
   color: #0b3a66;
@@ -510,16 +510,16 @@ html[data-theme="light"] .cv-date-picker__day-badge {
   width: var(--cv-date-picker-day-size);
 }
 
-html[data-theme="dark"] .cv-date-picker .cv-date-picker__day--multi-selected,
-html[data-theme="dark"] .cv-date-picker .cv-date-picker__day--multi-start,
-html[data-theme="dark"] .cv-date-picker .cv-date-picker__day--multi-middle,
-html[data-theme="dark"] .cv-date-picker .cv-date-picker__day--multi-end,
-html[data-theme="dark"] .cv-date-picker .cv-date-picker__day--multi-single,
-html[data-theme="light"] .cv-date-picker .cv-date-picker__day--multi-selected,
-html[data-theme="light"] .cv-date-picker .cv-date-picker__day--multi-start,
-html[data-theme="light"] .cv-date-picker .cv-date-picker__day--multi-middle,
-html[data-theme="light"] .cv-date-picker .cv-date-picker__day--multi-end,
-html[data-theme="light"] .cv-date-picker .cv-date-picker__day--multi-single {
+ .cv-date-picker .cv-date-picker__day--multi-selected,
+ .cv-date-picker .cv-date-picker__day--multi-start,
+ .cv-date-picker .cv-date-picker__day--multi-middle,
+ .cv-date-picker .cv-date-picker__day--multi-end,
+ .cv-date-picker .cv-date-picker__day--multi-single,
+ .cv-date-picker .cv-date-picker__day--multi-selected,
+ .cv-date-picker .cv-date-picker__day--multi-start,
+ .cv-date-picker .cv-date-picker__day--multi-middle,
+ .cv-date-picker .cv-date-picker__day--multi-end,
+ .cv-date-picker .cv-date-picker__day--multi-single {
   background-color: transparent !important;
   background-image: none !important;
   border-color: transparent !important;
@@ -527,23 +527,23 @@ html[data-theme="light"] .cv-date-picker .cv-date-picker__day--multi-single {
   color: var(--cv-date-picker-selected-color) !important;
 }
 
-html[data-theme="dark"] .cv-date-picker .cv-date-picker__day--multi-single::before,
-html[data-theme="light"] .cv-date-picker .cv-date-picker__day--multi-single::before {
+ .cv-date-picker .cv-date-picker__day--multi-single::before,
+ .cv-date-picker .cv-date-picker__day--multi-single::before {
   background: var(--cv-date-picker-selected-bg-start) !important;
   border-color: transparent !important;
   box-shadow: var(--cv-date-picker-selected-shadow) !important;
 }
 
-html[data-theme="dark"] .cv-date-picker .cv-date-picker__day--multi-selected:hover,
-html[data-theme="dark"] .cv-date-picker .cv-date-picker__day--multi-start:hover,
-html[data-theme="dark"] .cv-date-picker .cv-date-picker__day--multi-middle:hover,
-html[data-theme="dark"] .cv-date-picker .cv-date-picker__day--multi-end:hover,
-html[data-theme="dark"] .cv-date-picker .cv-date-picker__day--multi-single:hover,
-html[data-theme="light"] .cv-date-picker .cv-date-picker__day--multi-selected:hover,
-html[data-theme="light"] .cv-date-picker .cv-date-picker__day--multi-start:hover,
-html[data-theme="light"] .cv-date-picker .cv-date-picker__day--multi-middle:hover,
-html[data-theme="light"] .cv-date-picker .cv-date-picker__day--multi-end:hover,
-html[data-theme="light"] .cv-date-picker .cv-date-picker__day--multi-single:hover {
+ .cv-date-picker .cv-date-picker__day--multi-selected:hover,
+ .cv-date-picker .cv-date-picker__day--multi-start:hover,
+ .cv-date-picker .cv-date-picker__day--multi-middle:hover,
+ .cv-date-picker .cv-date-picker__day--multi-end:hover,
+ .cv-date-picker .cv-date-picker__day--multi-single:hover,
+ .cv-date-picker .cv-date-picker__day--multi-selected:hover,
+ .cv-date-picker .cv-date-picker__day--multi-start:hover,
+ .cv-date-picker .cv-date-picker__day--multi-middle:hover,
+ .cv-date-picker .cv-date-picker__day--multi-end:hover,
+ .cv-date-picker .cv-date-picker__day--multi-single:hover {
   filter: brightness(1.08);
   z-index: 2;
 }

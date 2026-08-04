@@ -38,10 +38,6 @@ CSS_EXCEPTIONS: dict[str, dict] = {
         "reason": "Camada unica de tokens e temas (NOVO-30).",
         "rules": {"hex_color_outside_tokens"},
     },
-    "static/css/components/theme-dark-components.css": {
-        "reason": "Transitional dark-theme component overrides; literals allowed until dissolved into components.",
-        "rules": {"hex_color_outside_tokens"},
-    },
     "static/css/dashboard.css": {
         "reason": "Dashboard e excecao oficial -- hex restantes sao fallbacks de var() no botao do hero.",
         "rules": {"hex_color_outside_tokens"},

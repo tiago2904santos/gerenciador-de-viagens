@@ -494,8 +494,8 @@
   color: var(--text-primary);
 }
 
-html[data-theme="dark"] .ui-lab-header-inline-create .cv-inline-create__toggle.is-active,
-html[data-theme="dark"] .ui-lab-header-inline-create .cv-inline-create__toggle[aria-expanded="true"] {
+ .ui-lab-header-inline-create .cv-inline-create__toggle.is-active,
+ .ui-lab-header-inline-create .cv-inline-create__toggle[aria-expanded="true"] {
   background: var(--surface-inline-create-tab);
   border-color: var(--border-inline-create-tab);
   color: var(--color-inline-create-tab);
@@ -573,8 +573,8 @@ html[data-theme="dark"] .ui-lab-header-inline-create .cv-inline-create__toggle[a
   color: var(--text-primary);
 }
 
-html[data-theme="dark"] .ui-lab-structure-inline-create .cv-inline-create__toggle.is-active,
-html[data-theme="dark"] .ui-lab-structure-inline-create .cv-inline-create__toggle[aria-expanded="true"] {
+ .ui-lab-structure-inline-create .cv-inline-create__toggle.is-active,
+ .ui-lab-structure-inline-create .cv-inline-create__toggle[aria-expanded="true"] {
   background: var(--surface-inline-create-tab);
   border-color: var(--border-inline-create-tab);
   color: var(--color-inline-create-tab);
@@ -1609,22 +1609,22 @@ textarea.cv-field-control__input {
   margin: 0;
 }
 
-html[data-theme="dark"] :is(.ui-lab-chips-canvas, .ui-lab-status-showcase, .ui-lab-status-card) {
+ :is(.ui-lab-chips-canvas, .ui-lab-status-showcase, .ui-lab-status-card) {
   background: var(--color-surface);
   border-color: var(--color-border);
   box-shadow: none;
 }
 
-html[data-theme="dark"] :is(.ui-lab-feedback-grid, .ui-lab-feedback-examples) {
+ :is(.ui-lab-feedback-grid, .ui-lab-feedback-examples) {
   display: grid;
   gap: var(--space-4);
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
 }
 
 /* The lab is a consumer of the system, not a separate visual theme. */
-html[data-theme="dark"] .app-main:has(.ui-lab-page) {
+ .app-main:has(.ui-lab-page) {
   background: var(--color-bg);
 }
 
-html[data-theme="dark"] :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-layout) {
+ :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-layout) {
 }

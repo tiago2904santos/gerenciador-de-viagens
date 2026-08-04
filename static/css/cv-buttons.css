@@ -38,7 +38,7 @@
 
 }
 
-html[data-theme="dark"] {
+:root {
 
 
 
@@ -47,7 +47,7 @@ html[data-theme="dark"] {
 
 }
 
-html[data-theme="light"] {
+:root {
 }
 
 /* =========================================================

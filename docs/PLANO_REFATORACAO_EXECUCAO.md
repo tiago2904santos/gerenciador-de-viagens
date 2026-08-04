@@ -787,8 +787,8 @@ fica com a do bloco. Detalhe, hover de lista e foco usam `color-mix` do acento a
   aliases temporários remapeados para a paleta institucional). Declaracoes `--*`
   fora de `00-palette.css` / `01-tokens.css`: **0**. Coordenacao visual: superfícies
   e tinta dos aliases espelham card → bloco → campo das imagens de referencia.
-- [ ] **Fase 2 — regra do espelho:** zerar `data-theme` fora de `00-palette.css` /
-  `01-tokens.css`; eliminar `components/theme-dark-components.css`.
+- [x] **Fase 2 — regra do espelho (refazer):** `data-theme` eliminado dos componentes; `theme-dark-components.css` dissolvido em `app-shell.css` (regras theme-agnostic + tokens). Gate estrutural: **1.098 -> 0**. Coordenacao visual institucional nos dois temas.
+
 - [ ] **Fase 3 — geometria padronizada e fim dos aliases.**
 - [ ] **Fase 4 — fim das excecoes e do `!important`.**
 - [ ] **Fase 5 — apagar o CSS antigo.**

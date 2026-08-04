@@ -6,7 +6,7 @@
 .ui-lab-page {
 }
 
-html[data-theme="dark"] .ui-lab-page {
+ .ui-lab-page {
 }
 
 /* =========================================================
@@ -1018,7 +1018,7 @@ html[data-theme="dark"] .ui-lab-page {
 .ui-lab-page {
 }
 
-html[data-theme="dark"] .ui-lab-page {
+ .ui-lab-page {
 }
 
 /* ─── Wrapper root ──────────────────────────────────────────────────────── */

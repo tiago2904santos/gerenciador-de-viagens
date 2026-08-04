@@ -34,14 +34,14 @@
    02. Theme overrides — Dark
    ========================================================= */
 
-html[data-theme="dark"] {
+:root {
 }
 
 /* =========================================================
    03. Theme overrides — Light
    ========================================================= */
 
-html[data-theme="light"] {
+:root {
 }
 
 /* =========================================================
@@ -155,8 +155,8 @@ html[data-theme="light"] {
 }
 
 /* Opções no tema escuro */
-html[data-theme="dark"] .cv-select-wrapper select option,
-html[data-theme="dark"] .cv-select-native option {
+ .cv-select-wrapper select option,
+ .cv-select-native option {
   background: var(--theme-surface-card);
   color: var(--theme-text-body);
 }
@@ -460,7 +460,7 @@ html[data-theme="dark"] .cv-select-native option {
 :root {
 }
 
-html[data-theme="dark"] {
+:root {
 }
 
 .cv-field {
@@ -640,11 +640,11 @@ html[data-theme="dark"] {
   transform: rotate(180deg);
 }
 
-html[data-theme="dark"] .cv-custom-select--v2 {
+ .cv-custom-select--v2 {
 }
 
-html[data-theme="dark"] .cv-custom-select--v2 .cv-custom-select__chevron,
-html[data-theme="dark"] .cv-custom-select--v2 .cv-custom-select__chevron svg {
+ .cv-custom-select--v2 .cv-custom-select__chevron,
+ .cv-custom-select--v2 .cv-custom-select__chevron svg {
   color: var(--color-accent);
   stroke: currentColor;
 }

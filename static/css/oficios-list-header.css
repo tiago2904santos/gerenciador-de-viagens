@@ -170,28 +170,28 @@
   color: #65528b;
 }
 
-html[data-theme="dark"] .cv-action-menu {
+ .cv-action-menu {
   background: rgba(14, 30, 45, 0.98);
   border-color: rgba(120, 153, 181, 0.28);
   box-shadow: 0 22px 54px rgba(0, 0, 0, 0.48);
 }
 
-html[data-theme="dark"] .cv-action-menu__item:hover,
-html[data-theme="dark"] .cv-action-menu__item:focus-visible {
+ .cv-action-menu__item:hover,
+ .cv-action-menu__item:focus-visible {
   background: rgba(88, 122, 151, 0.13);
   border-color: rgba(120, 153, 181, 0.22);
 }
 
 /* Finalizar: sucesso sóbrio no tema escuro, sem o verde fluorescente. */
-html[data-theme="dark"] .cv-record-card .cv-icon-btn--complete {
+ .cv-record-card .cv-icon-btn--complete {
   background: linear-gradient(145deg, #1d4439, #17372f);
   border-color: #3e6f5e;
   box-shadow: 0 5px 14px rgba(0, 0, 0, 0.2);
   color: #b7e8d3;
 }
 
-html[data-theme="dark"] .cv-record-card .cv-icon-btn--complete:hover,
-html[data-theme="dark"] .cv-record-card .cv-icon-btn--complete:focus {
+ .cv-record-card .cv-icon-btn--complete:hover,
+ .cv-record-card .cv-icon-btn--complete:focus {
   background: linear-gradient(145deg, #245143, #1c4036);
   border-color: #568776;
   color: #d2f3e4;
