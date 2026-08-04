@@ -9,6 +9,9 @@
       {% if eyebrow %}<span class="list-header__eyebrow">{{ eyebrow }}</span>{% endif %}
       <div class="list-header__title-row">
         <h1 class="list-header__title">{{ title }}</h1>
+        {% if status_label %}
+          {% include "components/ui/badges/status_badge.html" with label=status_label variant=status_variant|default:"draft" extra_class="page-header-status-chip" only %}
+        {% endif %}
       </div>
     </div>
     {% if back_label %}

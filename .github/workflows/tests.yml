@@ -65,14 +65,16 @@ jobs:
       - name: Block backend architecture regressions (P-01, P-05)
         # Catraca: este número só desce. O P-01 fechou os quatro apps do
         # escopo: eventos 61 → 46, termos → 40, ordens_servico → 37,
-        # planos_trabalho → 32. O que resta está fora do P-01 —
-        # integracoes/google_drive (10), core (9), documentos (4), oficios (4),
-        # usuarios (3) e roteiros (2). Alvo final segue sendo zero; ver
-        # docs/PADRAO_SELECTORS.md.
+        # planos_trabalho → 32. Depois: NOVO-24 zerou usuarios (3) e NOVO-25
+        # centralizou o rotulo da sede, que voltara copiado em tres views
+        # (eventos, termos, ordens_servico) — 32 → 30. O que resta esta fora
+        # do P-01: integracoes/google_drive (10), core (9), documentos (4),
+        # oficios (4), roteiros (2) e justificativas (1). Alvo final segue
+        # sendo zero; ver docs/PADRAO_SELECTORS.md.
         # P-05: todo `except Exception` do Drive começa com captura estruturada.
         run: >-
           python scripts/audit_django_architecture.py
-          --max-orm-em-view 32
+          --max-orm-em-view 30
           --max-drive-except-without-capture 0
           --max-sync-document-generations 0
 

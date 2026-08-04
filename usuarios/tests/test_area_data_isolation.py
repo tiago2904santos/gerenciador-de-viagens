@@ -1,8 +1,10 @@
 from datetime import date
+from datetime import timedelta
 
 from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
 from django.test import TestCase
+from django.utils import timezone
 from django.urls import reverse
 
 from cadastros.models import Cargo
@@ -32,8 +34,13 @@ class AreaDataIsolationTests(TestCase):
         self.client.force_login(self.user_ascom)
 
     def test_eventos_index_filtra_area_do_usuario(self):
-        Evento.objects.create(area=self.ascom, titulo="Evento ASCOM", data_inicio=date(2026, 8, 1))
-        Evento.objects.create(area=self.dpcap, titulo="Evento DPCAP", data_inicio=date(2026, 8, 1))
+        # A lista abre na aba "atuais", que e relativa a hoje. Com data fixa o
+        # teste passava ate a data virar passado e entao acusava vazamento de
+        # area onde so havia calendario andando — foi o que aconteceu com
+        # 2026-08-01. Ancorar no presente mantem a afirmacao sobre area.
+        proximo = timezone.localdate() + timedelta(days=7)
+        Evento.objects.create(area=self.ascom, titulo="Evento ASCOM", data_inicio=proximo)
+        Evento.objects.create(area=self.dpcap, titulo="Evento DPCAP", data_inicio=proximo)
 
         response = self.client.get(reverse("eventos:index"))
 

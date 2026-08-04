@@ -688,7 +688,9 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertIn('components/ui/buttons/button.html', module_card)
 
         cadastros = (templates / "cadastros" / "index.html").read_text(encoding="utf-8")
-        self.assertIn("page-shell cadastros-hub", cadastros)
+        # `cadastros-hub` virou `cv-catalog-hub` na reescrita visual da
+        # Administracao; o contrato e o shell padrao mais o hub, nao o nome antigo.
+        self.assertIn("page-shell page-shell--standard cv-catalog-hub", cadastros)
         self.assertIn('components/ui/headers/page_header.html', cadastros)
         self.assertIn('components/cards/module_card.html', cadastros)
         self.assertNotIn("app-page-hero", cadastros)

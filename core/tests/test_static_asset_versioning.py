@@ -1,3 +1,5 @@
+import re
+
 from pathlib import Path
 
 from django.conf import settings
@@ -45,3 +47,34 @@ class StaticAssetVersioningContractTests(SimpleTestCase):
                 if "?v=" in source:
                     violations.append(path.relative_to(settings.BASE_DIR).as_posix())
         self.assertEqual(violations, [])
+
+    def test_referencias_de_sourcemap_apontam_para_arquivo_existente(self):
+        """Um `sourceMappingURL` pendurado reprova o `collectstatic` inteiro.
+
+        Aconteceu em `d845ef8`: o dist do Leaflet foi vendorizado sem o
+        `leaflet.js.map`, e a `VersionedStaticFilesStorage` levanta
+        `MissingFileError` ao pos-processar. Como o `collectstatic` roda ANTES da
+        suite no CI, o efeito e pior do que parece — nenhum teste chega a rodar,
+        e a falha se disfarca de "CI vermelho" sem dizer por que.
+
+        Este teste custa milissegundos e da a mensagem certa; o `collectstatic`
+        do CI continua sendo a prova final.
+        """
+        padrao = re.compile(r"sourceMappingURL=([^\s*'\"]+)")
+        pendurados = []
+        static_root = Path(settings.BASE_DIR) / "static"
+        for path in static_root.rglob("*"):
+            if not path.is_file() or path.suffix not in {".js", ".css"}:
+                continue
+            try:
+                source = path.read_text(encoding="utf-8-sig")
+            except UnicodeDecodeError:
+                continue
+            for referencia in padrao.findall(source):
+                if referencia.startswith(("data:", "http://", "https://")):
+                    continue
+                if not (path.parent / referencia).is_file():
+                    pendurados.append(
+                        f"{path.relative_to(settings.BASE_DIR).as_posix()} -> {referencia}"
+                    )
+        self.assertEqual(pendurados, [])

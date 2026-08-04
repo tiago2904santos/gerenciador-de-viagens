@@ -99,4 +99,13 @@ class OrcamentoDeQueriesTermoTests(TestCase):
     # nao dois .count()). Ver termos.views.index.
     QUERIES_LISTA = 55
     QUERIES_LISTA_BUSCA = 55
-    QUERIES_EDITAR = 21
+    # 21 -> 28 na edicao. Duas causas separadas, e so uma era defeito:
+    #  (a) N+1 REAL, corrigido: `termo_cadastro_assinado_info` consultava
+    #      DocumentoArtefato uma vez por servidor. Agora e uma query so, via
+    #      `mapa_artefatos_pdf_termo_cadastro`. Medido: 4 -> 1 com 3 servidores,
+    #      e o total parou de crescer com o tamanho da equipe.
+    #  (b) custo CONSTANTE novo: a previa de destinos passou a resolver a sede
+    #      das Configuracoes, e `ConfiguracaoSistema.get_singleton()` e relido
+    #      por request. Nao escala com dados; fica registrado como NOVO-27.
+    # Se este numero subir de novo, comece por (a): e o que volta sozinho.
+    QUERIES_EDITAR = 28

@@ -265,7 +265,9 @@ class TermoAutorizacaoCadastroTests(TestCase):
         self.assertContains(response_novo, "id=\"id_oficio_busca\"")
         self.assertContains(response_novo, "id=\"termo-oficio-lista\"")
         self.assertContains(response_novo, "id=\"termo-evento-date-picker\"")
-        self.assertContains(response_novo, "id=\"termo-btn-adicionar-destino\"")
+        # No layout `split` o botao "adicionar destino" mora dentro da linha e
+        # nao tem id proprio; o contrato vivo e o hook do motor de destinos.
+        self.assertContains(response_novo, "data-location-add")
 
         termo = TermoAutorizacao.objects.create(
             destino_estado=self.estado,
@@ -278,7 +280,7 @@ class TermoAutorizacaoCadastroTests(TestCase):
         self.assertNotContains(response_edit, "page-stepper page-stepper--horizontal")
         self.assertContains(response_edit, "id=\"id_oficio_busca\"")
 
-    @mock.patch("termos.views.resolver_sede_ids_desde_configuracao")
+    @mock.patch("cadastros.services.resolver_sede_ids_desde_configuracao")
     def test_form_expoe_sede_das_configuracoes_na_previa_de_destinos(self, m_resolver):
         m_resolver.return_value = (self.estado.pk, self.cidade.pk, "")
         response = self.client.get(reverse("termos:novo"))

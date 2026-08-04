@@ -39,3 +39,25 @@ def get_latest_artefato_pdf_termo_cadastro(termo_id: int, servidor_id: int | Non
         .order_by("-criado_em")
         .first()
     )
+
+
+def mapa_artefatos_pdf_termo_cadastro(termo_id: int) -> dict[int | None, DocumentoArtefato]:
+    """Todos os últimos PDFs de um termo — genérico e por servidor — em UMA query.
+
+    A versão unitária acima custa uma consulta por linha. A tela de edição de
+    Termos monta um bloco por servidor, então o custo crescia com o tamanho da
+    equipe (a mesma doença do NOVO-07 em Ordens de Serviço).
+
+    A chave é `servidor_id`, com `None` para o termo genérico. Como a ordenação
+    é por `-criado_em`, o primeiro de cada chave é o mais recente — por isso o
+    `setdefault`, que ignora os mais antigos sem uma segunda passada.
+    """
+    mapa: dict[int | None, DocumentoArtefato] = {}
+    artefatos = DocumentoArtefato.objects.filter(
+        termo_id=termo_id,
+        tipo=DocumentoTipo.TERMO_AUTORIZACAO.value,
+        formato="pdf",
+    ).order_by("-criado_em")
+    for artefato in artefatos:
+        mapa.setdefault(artefato.servidor_id, artefato)
+    return mapa

@@ -712,7 +712,7 @@ html[data-theme="dark"] .pt-add-evento__btn:focus-visible {
   background: var(--step1-surface) !important;
 }
 
-@media (max-width: 700px) {
+@media (max-width: 720px) {
   .pt-document-preview__header {
     align-items: flex-start;
     flex-direction: column;
@@ -977,7 +977,7 @@ html[data-theme="dark"] .pt-texto-block .cv-field__control--textarea {
   }
 }
 
-@media (max-width: 620px) {
+@media (max-width: 640px) {
   #pt-card-diarias .pt-diarias-summary-secondary-stack {
     grid-template-columns: 1fr;
   }
