@@ -136,7 +136,20 @@
         {% endwith %}
       {% endif %}
       {% if row.edit_url %}
-        {% if row.edit_fields_json %}
+        {% if row.edit_modal %}
+          {# Edição em diálogo: quem abre o modal é o script da página, que sabe #}
+          {# trocar a copy e sincronizar os pickers a partir de `edit_fields`.   #}
+          <button
+            class="cv-icon-btn cv-icon-btn--edit"
+            type="button"
+            data-row-edit-modal="{{ row.edit_modal }}"
+            data-edit-url="{{ row.edit_url }}"
+            data-edit-fields="{{ row.edit_fields_json }}"
+            data-edit-label="{{ row.title }}"
+            aria-label="Editar {{ row.title }}"
+            data-tooltip="Editar"
+          >{% include "components/ui/icons/icon.html" with icon="edit" only %}</button>
+        {% elif row.edit_fields_json %}
           <button
             class="cv-icon-btn cv-icon-btn--edit"
             type="button"

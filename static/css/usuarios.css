@@ -208,21 +208,23 @@
   padding: 18px 22px 16px;
 }
 
-.vincular-usuario-modal__form {
+.vincular-usuario-modal__form.cv-dialog__form {
   display: grid;
   grid-template-rows: auto auto;
   min-height: 0;
 }
 
 .vincular-usuario-modal__dialog.cv-dialog__panel {
+  align-content: start;
   grid-template-rows: auto auto;
   height: auto;
+  max-height: min(88vh, 760px);
 }
 
 .vincular-usuario-modal__body {
   display: grid;
-  gap: 14px;
-  padding: 18px 22px 8px !important;
+  gap: 12px;
+  padding: 18px 22px 16px !important;
 }
 
 .vincular-usuario-modal__intro {
@@ -251,6 +253,8 @@
   color: var(--action-text-strong, var(--theme-text-heading));
 }
 
+:is(html[data-theme="dark"]) .vincular-usuario-modal__fields.cv-form-stack,
+.vincular-usuario-modal__fields.cv-form-stack,
 .vincular-usuario-modal__fields {
   --step1-field: var(--step1-surface);
   --color-input-bg: var(--step1-field);
@@ -258,7 +262,7 @@
   background: var(--step1-panel, var(--color-surface-soft));
   border-radius: 15px;
   display: grid;
-  gap: 14px;
+  gap: 18px;
   margin: 0;
   padding: 14px;
 }
@@ -267,6 +271,11 @@
 .vincular-usuario-modal__fields > .cv-field {
   margin: 0;
   min-width: 0;
+}
+
+.vincular-usuario-modal__fields > .field + .field,
+.vincular-usuario-modal__fields > .cv-field + .cv-field {
+  margin-top: 0;
 }
 
 /* Controles no poço do formulário: sem borda e sem colar nas laterais do painel. */
@@ -327,20 +336,14 @@
   gap: var(--space-3);
   justify-content: space-between;
   min-height: 0;
-  padding: 14px 22px 18px;
+  padding: 12px 22px 16px;
 }
 
-.vincular-usuario-modal__footer .cv-card-footer__secondary,
-.vincular-usuario-modal__footer .cv-card-footer__primary {
-  align-items: center;
+/* Evita o secondary esticar e parecer um bloco maior que o primary. */
+#vincular-usuario-modal .cv-card-footer__secondary .cv-btn,
+#vincular-usuario-modal .cv-card-footer__primary .cv-btn {
   align-self: center;
-  display: flex;
-  flex: 0 0 auto;
-  min-height: 0;
-}
-
-.vincular-usuario-modal__footer .cv-card-footer__secondary .cv-btn,
-.vincular-usuario-modal__footer .cv-card-footer__primary .cv-btn {
+  box-sizing: border-box;
   height: var(--control-height-md, 44px);
   min-height: var(--control-height-md, 44px);
 }
@@ -362,4 +365,43 @@
  */
 .usuarios-area-form .cv-record-list {
   gap: var(--space-2);
+}
+
+/*
+ * A paginação aqui é rodapé de um BLOCO, não de uma página: o recuo lateral de
+ * 24px do `pagination-shell` desalinhava a contagem e as setas das bordas das
+ * linhas logo acima.
+ */
+.usuarios-area-form .pagination-shell {
+  padding-bottom: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/*
+ * Sem moldura na lista de vínculos.
+ *
+ * `simple_list.html` emite `cv-record-list simple-list`, e `.simple-list` ainda
+ * é o nome de uma lista LEGADA em `lists.css` — é dela que vinham a borda de
+ * 1px, o raio e a sombra em volta das linhas. O `cv-record-list` canônico não
+ * tem moldura nenhuma; aqui só desfazemos a herança acidental.
+ */
+.usuarios-area-form .cv-record-list.simple-list,
+:is(html[data-theme="dark"]) .usuarios-area-form .cv-record-list.simple-list {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: visible;
+}
+
+/*
+ * Empty state do bloco "Usuários da área": sem moldura de cartão, mesma
+ * superfície dos `form-control` do formulário.
+ */
+.usuarios-area-form .empty-state,
+:is(html[data-theme="dark"]) .usuarios-area-form .empty-state {
+  background: var(--step1-field, var(--color-input-bg));
+  border: 0;
+  box-shadow: none;
 }

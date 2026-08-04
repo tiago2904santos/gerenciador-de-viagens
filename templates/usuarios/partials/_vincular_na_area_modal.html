@@ -1,15 +1,15 @@
 {% comment %}
-  Vincular usuário a partir do gerenciador da área: a área é fixa, escolhe-se a
-  conta e o perfil. Reaproveita os hooks do modal da lista de Usuários
-  (`data-vincular-usuario-modal` / `data-vincular-usuario-form`), já registrados
-  em `overlay.js` — o `valueFields` de lá procura um `input[name=vinculo-usuario]`
-  e aqui o campo é `<select>`, então não mexe em nada.
+  Um diálogo para os dois gestos da área: vincular uma conta nova e trocar o
+  perfil de quem já está vinculado. São o mesmo registro — a unique de
+  (usuario, area) garante um vínculo por par —, então são o mesmo formulário e
+  o mesmo endpoint; só a copy muda, e quem troca é `usuarios-area-form.js`.
 {% endcomment %}
 <div
   id="vincular-usuario-modal"
   class="cv-dialog cv-dialog--document delete-confirm-modal vincular-usuario-modal"
   data-vincular-usuario-modal
   data-overlay-panel
+  data-vinculo-mode="create"
   hidden
 >
   <div class="cv-dialog__backdrop delete-confirm-modal__backdrop" data-overlay-close></div>
@@ -36,8 +36,13 @@
         <p class="cv-dialog__message vincular-usuario-modal__intro" id="vincular-na-area-description">
           {% include "components/ui/icons/icon.html" with icon="link" only %}
           <span>
-            Escolha a conta e o perfil de acesso à área
-            <strong data-vincular-usuario-label>{{ area.sigla }}</strong>.
+            <span data-vinculo-intro="create">
+              Escolha a conta e o perfil de acesso à área <strong>{{ area.sigla }}</strong>.
+            </span>
+            <span data-vinculo-intro="edit" hidden>
+              Trocando o perfil de <strong data-vinculo-edit-label>este usuário</strong>
+              na área {{ area.sigla }}.
+            </span>
           </span>
         </p>
 
@@ -45,14 +50,26 @@
           {% include "components/ui/feedback/field_error.html" with errors=vinculo_form.non_field_errors only %}
         {% endif %}
 
-        <div class="vincular-usuario-modal__fields cv-form-stack">
+        <div
+          class="vincular-usuario-modal__fields cv-form-stack document-form-page"
+          data-travel-document-wizard-step1
+        >
           {% include "components/ui/forms/field.html" with field=vinculo_form.usuario size_class="field-size-1" only %}
           {% include "components/ui/forms/field.html" with field=vinculo_form.papel size_class="field-size-1" only %}
         </div>
       </div>
-      <div class="cv-dialog__footer delete-confirm-modal__actions">
-        {% include "components/ui/buttons/button.html" with label="Cancelar" variant="secondary" type="button" data_cancel_modal_cancel=True only %}
-        {% include "components/ui/buttons/button.html" with label="Vincular usuário" variant="primary" type="submit" icon="check" only %}
+      <div class="cv-dialog__footer vincular-usuario-modal__footer cv-form-card__footer">
+        <section class="cv-card-footer-section">
+          <div class="cv-card-footer-section__divider" aria-hidden="true"></div>
+          <footer class="cv-card-footer">
+            <div class="cv-card-footer__secondary">
+              {% include "components/ui/buttons/button.html" with label="Cancelar" variant="secondary" type="button" icon="arrow-left" data_cancel_modal_cancel=True only %}
+            </div>
+            <div class="cv-card-footer__primary">
+              {% include "components/ui/buttons/button.html" with label="Salvar vínculo" variant="primary" type="submit" icon="arrow-right" icon_after=True only %}
+            </div>
+          </footer>
+        </section>
       </div>
     </form>
   </section>

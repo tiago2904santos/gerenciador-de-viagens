@@ -46,6 +46,7 @@ class UsuariosAdminPageTests(TestCase):
             reverse("usuarios:usuario_update", args=[user.pk]),
             reverse("usuarios:usuario_delete", args=[user.pk]),
             reverse("usuarios:area_update", args=[area.pk]),
+            reverse("usuarios:area_delete", args=[area.pk]),
             reverse("usuarios:vinculo_create_na_area", args=[area.pk]),
             reverse("usuarios:vinculo_delete", args=[vinculo.pk]),
         ]
@@ -88,6 +89,34 @@ class UsuariosAdminPageTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, reverse("usuarios:area_update", args=[area.pk]))
+        self.assertContains(response, reverse("usuarios:area_delete", args=[area.pk]))
+        self.assertContains(response, 'data-overlay-target="delete-confirm-modal"')
+        self.assertContains(response, "cv-icon-btn--delete")
+        self.assertContains(response, "Excluir área?")
+
+    def test_exclui_area_pela_lista(self):
+        self.client.force_login(self.admin)
+        area = AreaTrabalho.objects.create(nome="Area vazia", sigla="Z")
+
+        response = self.client.post(reverse("usuarios:area_delete", args=[area.pk]))
+
+        self.assertRedirects(response, reverse("usuarios:areas_index"))
+        self.assertFalse(AreaTrabalho.objects.filter(pk=area.pk).exists())
+
+    def test_nao_permite_excluir_area_com_usuarios(self):
+        self.client.force_login(self.admin)
+        area = AreaTrabalho.objects.create(nome="Assessoria", sigla="ASCOM")
+        user = get_user_model().objects.create_user(username="operador", password="123456")
+        VinculoUsuarioArea.objects.create(
+            usuario=user,
+            area=area,
+            papel=VinculoUsuarioArea.PAPEL_EDITOR,
+        )
+
+        response = self.client.post(reverse("usuarios:area_delete", args=[area.pk]))
+
+        self.assertRedirects(response, reverse("usuarios:areas_index"))
+        self.assertTrue(AreaTrabalho.objects.filter(pk=area.pk).exists())
 
     def test_gerenciador_atualiza_area_e_vincula_usuario(self):
         self.client.force_login(self.admin)
@@ -135,13 +164,81 @@ class UsuariosAdminPageTests(TestCase):
         self.assertRedirects(response, reverse("usuarios:area_update", args=[area.pk]))
         self.assertFalse(VinculoUsuarioArea.objects.filter(pk=vinculo.pk).exists())
 
+    def test_gerenciador_troca_o_perfil_de_quem_ja_esta_na_area(self):
+        """O mesmo POST que vincula também edita: a unique diz que é um registro só."""
+        self.client.force_login(self.admin)
+        area = AreaTrabalho.objects.create(nome="Assessoria", sigla="ASCOM")
+        user = get_user_model().objects.create_user(
+            username="operador", password="123456", first_name="Operador"
+        )
+        vinculo = VinculoUsuarioArea.objects.create(
+            usuario=user, area=area, papel=VinculoUsuarioArea.PAPEL_LEITOR
+        )
+
+        response = self.client.get(reverse("usuarios:area_update", args=[area.pk]))
+        self.assertContains(response, 'data-row-edit-modal="vincular-usuario-modal"')
+        self.assertContains(response, "vinculo-papel")
+
+        response = self.client.post(
+            reverse("usuarios:vinculo_create_na_area", args=[area.pk]),
+            {
+                "vinculo-usuario": str(user.pk),
+                "vinculo-area": str(area.pk),
+                "vinculo-papel": VinculoUsuarioArea.PAPEL_ADMIN,
+            },
+        )
+
+        self.assertRedirects(response, reverse("usuarios:area_update", args=[area.pk]))
+        self.assertEqual(VinculoUsuarioArea.objects.filter(usuario=user, area=area).count(), 1)
+        vinculo.refresh_from_db()
+        self.assertEqual(vinculo.papel, VinculoUsuarioArea.PAPEL_ADMIN)
+
+    def test_gerenciador_pagina_vinculos_de_cinco_em_cinco(self):
+        self.client.force_login(self.admin)
+        area = AreaTrabalho.objects.create(nome="Assessoria", sigla="ASCOM")
+        for indice in range(7):
+            VinculoUsuarioArea.objects.create(
+                usuario=get_user_model().objects.create_user(
+                    username=f"conta{indice}", password="123456"
+                ),
+                area=area,
+                papel=VinculoUsuarioArea.PAPEL_EDITOR,
+            )
+
+        response = self.client.get(reverse("usuarios:area_update", args=[area.pk]))
+
+        self.assertEqual(len(response.context["rows"]), 5)
+        self.assertEqual(response.context["page_obj"].paginator.num_pages, 2)
+        self.assertContains(response, "pagination-shell")
+
+        response = self.client.get(reverse("usuarios:area_update", args=[area.pk]), {"page": 2})
+
+        self.assertEqual(len(response.context["rows"]), 2)
+
+    def test_gerenciador_nao_pagina_com_cinco_ou_menos(self):
+        self.client.force_login(self.admin)
+        area = AreaTrabalho.objects.create(nome="Assessoria", sigla="ASCOM")
+        for indice in range(5):
+            VinculoUsuarioArea.objects.create(
+                usuario=get_user_model().objects.create_user(
+                    username=f"conta{indice}", password="123456"
+                ),
+                area=area,
+                papel=VinculoUsuarioArea.PAPEL_EDITOR,
+            )
+
+        response = self.client.get(reverse("usuarios:area_update", args=[area.pk]))
+
+        self.assertEqual(len(response.context["rows"]), 5)
+        self.assertNotContains(response, "pagination-shell")
+
     def test_renderiza_cv_pickers_single_nos_formularios(self):
         self.client.force_login(self.admin)
 
         response = self.client.get(reverse("usuarios:index"))
         self.assertEqual(response.status_code, 200)
-        # Quick-add (área) + modal (área + perfil) usam search-picker.
-        self.assertContains(response, 'data-entity-picker="true"', count=3)
+        # Quick-add e modal: área é search-picker; perfil é select (poucas opções).
+        self.assertContains(response, 'data-entity-picker="true"', count=2)
         self.assertContains(response, 'id="quick-add-usuario"')
         self.assertContains(response, 'id="vincular-usuario-modal"')
         self.assertContains(response, "vincular-usuario-modal__fields")
@@ -149,9 +246,8 @@ class UsuariosAdminPageTests(TestCase):
         self.assertContains(response, 'id="id_vinculo-area"')
         self.assertContains(response, 'id="id_vinculo-papel"')
         self.assertContains(response, "Buscar área...")
-        self.assertContains(response, "Buscar perfil...")
-        # Só o perfil do quick-add continua como select.
-        self.assertContains(response, 'data-entity-picker-renderer="select"', count=1)
+        self.assertNotContains(response, "Buscar perfil...")
+        self.assertContains(response, 'data-entity-picker-renderer="select"', count=2)
 
     def test_cria_usuario_vinculado_a_area(self):
         self.client.force_login(self.admin)

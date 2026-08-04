@@ -15,5 +15,6 @@ urlpatterns = [
     path("areas/", views.areas_index, name="areas_index"),
     path("areas/nova/", views.area_create, name="area_create"),
     path("areas/<int:pk>/", views.area_update, name="area_update"),
+    path("areas/<int:pk>/excluir/", views.area_delete, name="area_delete"),
     path("areas/<int:pk>/vinculos/", views.vinculo_create_na_area, name="vinculo_create_na_area"),
 ]

@@ -54,14 +54,12 @@ class AreaTrabalhoForm(EstiloCamposMixin, forms.ModelForm):
 
 
 class AreaTrabalhoEditForm(AreaTrabalhoForm):
-    """Edição no gerenciador: inclui o interruptor de área ativa."""
+    """Edição no gerenciador — mesmos campos da criação.
 
-    class Meta(AreaTrabalhoForm.Meta):
-        fields = ["nome", "sigla", "ativa"]
-        labels = {
-            **AreaTrabalhoForm.Meta.labels,
-            "ativa": "Área ativa",
-        }
+    `ativa` NÃO entra: o gerenciador não desenha o interruptor, e um
+    BooleanField sem input no HTML chega ausente no POST, o que o Django lê
+    como `False` — toda área salva viraria inativa em silêncio.
+    """
 
 
 class UsuarioEditForm(EstiloCamposMixin, forms.ModelForm):
@@ -221,13 +219,7 @@ class VinculoUsuarioAreaForm(EstiloCamposMixin, forms.ModelForm):
                     empty_message="Nenhuma área encontrada.",
                 )
             ),
-            "papel": forms.Select(
-                attrs=_cv_picker_single_attrs(
-                    label="Perfil na área",
-                    placeholder="Buscar perfil...",
-                    empty_message="Nenhum perfil encontrado.",
-                )
-            ),
+            "papel": forms.Select(attrs={**widget_attrs(WidgetStyle.FORM_SELECT)}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -256,31 +248,21 @@ class VinculoNaAreaForm(EstiloCamposMixin, forms.ModelForm):
                     empty_message="Nenhum usuário disponível.",
                 )
             ),
-            # Mesmo picker do modal da lista: os dois campos do diálogo têm de
-            # ser o mesmo controle, senão um vira busca e o outro select nativo.
-            "papel": forms.Select(
-                attrs=_cv_picker_single_attrs(
-                    label="Perfil na área",
-                    placeholder="Buscar perfil...",
-                    empty_message="Nenhum perfil encontrado.",
-                )
-            ),
+            "papel": forms.Select(attrs={**widget_attrs(WidgetStyle.FORM_SELECT)}),
         }
 
     def __init__(self, *args, area=None, **kwargs):
         super().__init__(*args, **kwargs)
         self._area = area
+        # As contas já vinculadas continuam na lista: o mesmo modal edita o
+        # perfil de quem já está na área, e um `<select>` sem a opção atual não
+        # consegue vir pré-preenchido. Reenviar um par existente é edição, e a
+        # view resolve isso passando o `instance`.
+        self.fields["usuario"].queryset = get_user_model().objects.order_by("username")
         if area is not None:
             self.fields["area"].initial = area.pk
             self.fields["area"].queryset = AreaTrabalho.objects.filter(pk=area.pk)
-            ja_vinculados = area.vinculos_usuario.values_list("usuario_id", flat=True)
-            self.fields["usuario"].queryset = (
-                get_user_model()
-                .objects.exclude(pk__in=ja_vinculados)
-                .order_by("username")
-            )
         else:
-            self.fields["usuario"].queryset = get_user_model().objects.order_by("username")
             self.fields["area"].queryset = AreaTrabalho.objects.filter(ativa=True).order_by("sigla")
 
     def clean_area(self):

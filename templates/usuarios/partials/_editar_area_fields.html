@@ -1,10 +1,9 @@
 {% comment %}
-  Corpo do card "Dados da área" — blocos internos, no padrão do cadastro de
-  servidor. Os campos precisam do painel `travel-document-block`: sem ele o
-  `form-control` fica com o mesmo fundo do card e o input some.
+  Corpo do card "Dados da área": identificação e usuários no mesmo card.
+
+  Os campos precisam do painel `travel-document-block`: sem ele o `form-control`
+  fica com o mesmo fundo do card e o input some.
 {% endcomment %}
 {% include "components/ui/forms/form_block.html" with element_id="area-identificacao" section_id="area-identificacao-title" variant="split" extra_class="travel-document-block document-form-block" title="Identificação" description="Nome e sigla usados em todo o sistema" body_template="usuarios/partials/_editar_area_identificacao_fields.html" %}
 
-{% if form.ativa %}
-  {% include "components/ui/forms/form_block.html" with element_id="area-situacao" section_id="area-situacao-title" variant="split" extra_class="travel-document-block document-form-block" title="Situação" description="Área inativa some das seleções e não recebe novos usuários" body_template="usuarios/partials/_editar_area_situacao_fields.html" %}
-{% endif %}
+{% include "components/ui/forms/form_block.html" with element_id="area-usuarios" section_id="area-usuarios-title" extra_class="travel-document-block document-form-block" title="Usuários da área" description="Contas com acesso a esta unidade de trabalho" heading_level=3 actions_template="usuarios/partials/_area_vincular_action.html" body_template="usuarios/partials/_area_vinculos_body.html" %}

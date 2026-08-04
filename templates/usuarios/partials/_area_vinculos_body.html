@@ -1,5 +1,2 @@
-<section class="cv-form-block travel-document-block document-form-block" aria-label="Contas com acesso à área">
-  <div class="cv-form-block__body">
-    {% include "components/lists/simple_list.html" with rows=rows empty_message="Nenhum usuário vinculado a esta área." hide_realtime_count=True empty_variant="compact" %}
-  </div>
-</section>
+{% include "components/lists/simple_list.html" with rows=rows empty_message="Nenhum usuário vinculado a esta área." hide_realtime_count=True empty_variant="compact" %}
+{% include "components/ui/lists/pagination.html" with page_obj=page_obj pagination_pages=pagination_pages only %}

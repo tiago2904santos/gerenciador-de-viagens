@@ -163,14 +163,34 @@
       "click",
       function (event) {
         if (toggle.getAttribute("aria-expanded") !== "true") return;
-        if (!isReady()) {
-          event.preventDefault();
-          event.stopImmediatePropagation();
-          return;
-        }
+        // Aberto: formulário completo → salva; incompleto → fecha (toggle).
         event.preventDefault();
         event.stopImmediatePropagation();
-        submitPanel();
+        if (isReady()) {
+          submitPanel();
+          return;
+        }
+        toggle.setAttribute("aria-expanded", "false");
+        toggle.classList.remove("is-active", "is-filled", readyClass);
+        if (labelEl) labelEl.textContent = idleLabel;
+        toggle.setAttribute("aria-label", idleLabel);
+        panel.classList.remove("is-open");
+        window.setTimeout(function () {
+          panel.hidden = true;
+          var createAction = panel.getAttribute("data-create-action");
+          if (createAction) panel.action = createAction;
+          Array.prototype.slice
+            .call(panel.querySelectorAll("input:not([type=hidden]), select, textarea"))
+            .forEach(function (input) {
+              if (input.type === "checkbox" || input.type === "radio") {
+                input.checked = false;
+              } else {
+                input.value = "";
+              }
+            });
+          delete panel.dataset.editMode;
+          syncToggle();
+        }, 280);
       },
       true
     );

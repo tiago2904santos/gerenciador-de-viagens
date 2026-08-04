@@ -103,6 +103,17 @@ def get_usuario_by_id(pk):
     return get_object_or_404(queryset_usuarios_base(), pk=pk)
 
 
+def get_vinculo_da_area(area, usuario_id):
+    """Vínculo desta conta com esta área, ou `None`.
+
+    `usuario_id` vem cru do POST: um valor não numérico faria o ORM levantar
+    `ValueError` em vez de simplesmente não achar nada.
+    """
+    if not str(usuario_id or "").isdigit():
+        return None
+    return VinculoUsuarioArea.objects.filter(area=area, usuario_id=usuario_id).first()
+
+
 def get_vinculo_by_id(pk):
     return get_object_or_404(
         VinculoUsuarioArea.objects.select_related("usuario", "area"),

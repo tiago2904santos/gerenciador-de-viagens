@@ -24,6 +24,10 @@ from .presenters import apresentar_linha_lista_simples_vinculo
 
 ADMIN_PER_PAGE = 25
 
+# A lista de vínculos vive dentro de um bloco do card da área, não numa página
+# só dela — passando de cinco linhas o card deixa de caber na tela.
+AREA_VINCULOS_PER_PAGE = 5
+
 
 def somente_administrador(view):
     """Administração de contas e áreas é exclusiva de staff/superuser."""
@@ -147,6 +151,7 @@ def areas_index(request):
         apresentar_linha_lista_simples_area(
             area,
             edit_url=reverse("usuarios:area_update", args=[area.pk]),
+            delete_url=reverse("usuarios:area_delete", args=[area.pk]),
         )
         for area in page_obj.object_list
     ]
@@ -187,12 +192,16 @@ def area_update(request, pk):
         return redirect("usuarios:area_update", pk=area.pk)
 
     vinculos = selectors.listar_vinculos_da_area(area)
+    paginator = Paginator(vinculos, AREA_VINCULOS_PER_PAGE)
+    page_obj = paginator.get_page(request.GET.get("page"))
+    vinculo_action_url = reverse("usuarios:vinculo_create_na_area", args=[area.pk])
     rows = [
         apresentar_linha_lista_simples_vinculo(
             vinculo,
             delete_url=reverse("usuarios:vinculo_delete", args=[vinculo.pk]),
+            edit_url=vinculo_action_url,
         )
-        for vinculo in vinculos
+        for vinculo in page_obj.object_list
     ]
 
     return render(
@@ -207,8 +216,10 @@ def area_update(request, pk):
             "form": form,
             "area": area,
             "rows": rows,
+            "page_obj": page_obj,
+            "pagination_pages": _pagination_pages(page_obj),
             "vinculo_form": vinculo_form,
-            "vinculo_action_url": reverse("usuarios:vinculo_create_na_area", args=[area.pk]),
+            "vinculo_action_url": vinculo_action_url,
             "submit_label": "Salvar área",
             "can_edit_area": True,
         },
@@ -256,6 +267,24 @@ def usuario_delete(request, pk):
 
 
 @somente_administrador
+def area_delete(request, pk):
+    """Exclui a área via modal de confirmação da lista."""
+    if request.method != "POST":
+        return redirect("usuarios:areas_index")
+
+    area = selectors.get_area_by_id(pk)
+    sigla = area.sigla
+    try:
+        services.excluir_area(area)
+    except services.AreaNaoPodeSerExcluida as exc:
+        messages.error(request, exc.messages[0] if exc.messages else str(exc))
+        return redirect("usuarios:areas_index")
+
+    messages.success(request, f"Área {sigla} excluída.")
+    return redirect("usuarios:areas_index")
+
+
+@somente_administrador
 def area_create(request):
     """Compat: redireciona para a lista, onde a criação passou a ser inline."""
     return redirect("usuarios:areas_index")
@@ -281,19 +310,33 @@ def vinculo_create(request):
 
 @somente_administrador
 def vinculo_create_na_area(request, pk):
-    """POST do formulário de vínculo dentro do gerenciador da área."""
+    """POST do modal de vínculo do gerenciador — vincula OU troca o perfil.
+
+    O mesmo endpoint atende os dois gestos porque são o mesmo registro: a
+    unique de (usuario, area) já diz que existe no máximo um vínculo por par.
+    Reenviar o par com outro papel é edição, não duplicata — daí o `instance`.
+    Sem ele o `validate_unique` do ModelForm rejeitaria o próprio registro que
+    se está editando.
+    """
     area = selectors.get_area_by_id(pk)
     if request.method != "POST":
         return redirect("usuarios:area_update", pk=pk)
 
-    form = VinculoNaAreaForm(request.POST, prefix="vinculo", area=area)
+    existente = selectors.get_vinculo_da_area(area, request.POST.get("vinculo-usuario"))
+    form = VinculoNaAreaForm(request.POST, prefix="vinculo", area=area, instance=existente)
     if form.is_valid():
         vinculo = services.vincular_usuario(form)
-        messages.success(request, f"{vinculo.usuario} vinculado à área {area.sigla}.")
+        if existente is not None:
+            messages.success(
+                request,
+                f"Perfil de {vinculo.usuario} na área {area.sigla} atualizado.",
+            )
+        else:
+            messages.success(request, f"{vinculo.usuario} vinculado à área {area.sigla}.")
     else:
         messages.error(
             request,
-            "Não foi possível vincular o usuário. Confira a conta e o perfil.",
+            "Não foi possível salvar o vínculo. Confira a conta e o perfil.",
         )
     return redirect("usuarios:area_update", pk=pk)
 

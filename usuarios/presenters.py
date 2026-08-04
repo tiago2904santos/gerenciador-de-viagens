@@ -23,7 +23,7 @@ def _nome_exibido(usuario):
     return usuario.get_full_name().strip() or usuario.get_username()
 
 
-def apresentar_linha_lista_simples_area(area, *, edit_url=None):
+def apresentar_linha_lista_simples_area(area, *, edit_url=None, delete_url=None):
     """Sigla como título, nome como subtítulo, contagem de contas como fato.
 
     Sem `avatar`: a inicial de uma sigla é a própria sigla, e repetir "AS" ao
@@ -46,11 +46,18 @@ def apresentar_linha_lista_simples_area(area, *, edit_url=None):
     }
     if edit_url:
         row["edit_url"] = edit_url
+    if delete_url:
+        row["delete_url"] = delete_url
+        row["delete_modal"] = True
     return row
 
 
-def apresentar_linha_lista_simples_vinculo(vinculo, *, delete_url=None):
-    """Linha de uma conta dentro do gerenciador da área."""
+def apresentar_linha_lista_simples_vinculo(vinculo, *, delete_url=None, edit_url=None):
+    """Linha de uma conta dentro do gerenciador da área.
+
+    `edit_url` é o MESMO endpoint do modal de vincular: editar o perfil de quem
+    já está na área é reenviar o par (usuário, área) com outro papel.
+    """
     usuario = vinculo.usuario
     badges = []
     if vinculo.area_padrao:
@@ -74,6 +81,16 @@ def apresentar_linha_lista_simples_vinculo(vinculo, *, delete_url=None):
             build_meta("Perfil", vinculo.get_papel_display()),
         ],
     }
+    if edit_url:
+        row["edit_url"] = edit_url
+        row["edit_modal"] = "vincular-usuario-modal"
+        row["edit_fields_json"] = json.dumps(
+            {
+                "vinculo-usuario": str(usuario.pk),
+                "vinculo-papel": vinculo.papel,
+            },
+            ensure_ascii=False,
+        )
     if delete_url:
         row["delete_url"] = delete_url
         row["delete_modal"] = True

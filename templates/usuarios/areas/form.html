@@ -3,16 +3,16 @@
 
 {% comment %}
   Gerenciador da área — mesmo casco das demais páginas de formulário do sistema
-  (`cadastros/servidores/form.html`, `cadastros/configuracao/form.html`):
-  `document-form-page` + cards mestres com blocos `travel-document-block` dentro.
+  (`cadastros/servidores/form.html`): `document-form-page` + UM card mestre com
+  blocos `travel-document-block` dentro.
 
   O vínculo de usuário sai por modal, e não por um segundo formulário na página:
-  é o mesmo gesto da lista de Usuários, e evita o `<form>` irmão solto entre os
-  cards.
+  é o mesmo gesto da lista de Usuários, e mantém tudo dentro de um card só sem
+  aninhar `<form>` dentro de `<form>`.
 {% endcomment %}
 
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/usuarios.css' %}">
+  <link rel="stylesheet" href="{% static 'css/usuarios.css' %}?v=20260803-16">
 {% endblock %}
 
 {% block flow_shell_modifier %}page-shell--standard cv-page--form{% endblock %}
@@ -25,11 +25,13 @@
       {% if form.non_field_errors %}
         {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
       {% endif %}
-      {% include "components/form/card.html" with title="Dados da área" description="Nome, sigla e situação desta unidade de trabalho." title_id="area-dados-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="usuarios/partials/_editar_area_fields.html" footer_template="usuarios/partials/_form_card_footer.html" %}
+      {% include "components/form/card.html" with title="Dados da área" description="Identificação da unidade de trabalho e contas com acesso a ela." title_id="area-dados-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="usuarios/partials/_editar_area_fields.html" footer_template="usuarios/partials/_form_card_footer.html" %}
     </form>
-
-    {% include "components/form/card.html" with title="Usuários da área" description="Contas com acesso a esta unidade de trabalho." title_id="area-usuarios-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="usuarios/partials/_area_vinculos_body.html" actions_template="usuarios/partials/_area_vincular_action.html" %}
   </div>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'js/pages/usuarios-area-form.js' %}" defer></script>
 {% endblock %}
 
 {% block flow_modals %}
